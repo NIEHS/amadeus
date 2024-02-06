@@ -1,0 +1,9 @@
+url: https://spatiotemporal-exposures-and-toxicology.github.io/amadeus
+template:
+  bootstrap: 5
+  bootswatch: minty
+
+navbar:
+  structure:
+    left:  [reference, articles, search]
+    right: [github]
