@@ -184,7 +184,6 @@ calc_koppen_geiger <-
 #' radius of buffer around points
 #' @param year numeric giving the year of NLCD data used
 #' @importFrom utils read.csv
-#' @importFrom utils data
 #' @importFrom terra rast
 #' @importFrom terra project
 #' @importFrom terra vect
@@ -195,7 +194,6 @@ calc_koppen_geiger <-
 #' @importFrom sf st_geometry
 #' @importFrom terra intersect
 #' @importFrom exactextractr exact_extract
-#' @import spData
 #' @export
 calc_nlcd_ratio <- function(path,
                             sites,
@@ -229,8 +227,6 @@ calc_nlcd_ratio <- function(path,
   }
   nlcd <- terra::rast(nlcd_file)
   # select points within mainland US and reproject on nlcd crs if necessary
-  # need spData library
-  utils::data("us_states", package = "spData")
   us_main <-
     terra::ext(c(xmin = -127, xmax = -65, ymin = 24, ymax = 51)) |>
     terra::vect() |>
