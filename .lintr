@@ -1,0 +1,6 @@
+linters: linters_with_defaults(
+    commented_code_linter = NULL
+  )
+exclusions: list(
+    "tests/testthat/test-download_functions.R"
+  )

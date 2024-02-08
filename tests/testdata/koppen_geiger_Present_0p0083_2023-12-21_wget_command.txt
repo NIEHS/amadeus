@@ -1,0 +1,1 @@
+wget https://figshare.com/ndownloader/files/12407516 -O ../testdata/koppen_geiger_present_0p0083.zip

@@ -1,0 +1,14 @@
+^vignettes/
+^input/
+^tools/
+^manuscript/
+^output/
+^\.github/workflows/
+^amadeus\.Rproj$
+^\.Rproj\.user$
+^\.github$
+^LICENSE\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^.lintr
