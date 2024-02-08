@@ -320,7 +320,8 @@ download_ecoregion_data <- function(
   #### 5. define download URL
   download_epa_certificate(
     epa_certificate_path = epa_certificate_path,
-    certificate_url = certificate_url)
+    certificate_url = certificate_url
+  )
 
   download_url <- paste0(
     "https://gaftp.epa.gov/EPADataCommons/ORD/Ecoregions/us/",
@@ -2448,7 +2449,7 @@ download_nei_data <- function(
     system.file("extdata/cacert_gaftp_epa.pem",
                 package = "amadeus"),
   certificate_url =
-  "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
+    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
 ) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)

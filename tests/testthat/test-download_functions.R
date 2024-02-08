@@ -1058,6 +1058,12 @@ testthat::test_that("Test error cases in EPA gaftp sources 1", {
   tdir <- tempdir()
   directory_to_save <- testthat::test_path("..", "testdata/", "")
   certificate <- file.path(tdir, "cacert_gaftp_epa.pem")
+  # remove if there is a preexisting file
+  if (file.exists(certificate)) {
+    file.remove(certificate)
+    file.remove(gsub("pem", "crt", certificate))
+  }
+
   # run download function
   year_target <- c(2017L)
   testthat::expect_message(
@@ -1091,6 +1097,12 @@ testthat::test_that("Test error cases in EPA gaftp sources 2", {
   tdir <- tempdir(check = TRUE)
   directory_to_save <- testthat::test_path("..", "testdata/", "")
   certificate <- file.path(tdir, "cacert_gaftp_epa.pem")
+  # remove if there is a preexisting file
+  if (file.exists(certificate)) {
+    file.remove(certificate)
+    file.remove(gsub("pem", "crt", certificate))
+  }
+
   # run download function
 
   testthat::expect_message(
