@@ -250,13 +250,15 @@ download_aqs_data <-
 #' The \code{download_ecoregion_data()} function accesses and downloads
 #' Ecoregions level 3 data, where all pieces of information in the higher
 #' levels are included.
-#' @note In Linux systems as of December 2023, downloading Ecoregion data from
-#' EPA Data Commons will result in certificate errors. This is bypassed by
-#' manually identifying .crt file link in your browser by connecting to
-#' https://gaftp.epa.gov then clicking a lock icon in the address bar.
-#' (TO DEVELOPERS: see the comments in source code)
+#' @note
+#' For EPA Data Commons certificate errors, follow the steps below:
+#' 1. Click Lock icon in the address bar at https://gaftp.epa.gov
+#' 2. Click Show Certificate
+#' 3. Access Details
+#' 4. Find URL with *.crt extension
 #' Currently we bundle the pre-downloaded crt and its PEM (which is accepted
-#' in wget command) file in ./inst/extdata.
+#' in wget command) file in ./inst/extdata. The instruction above is for
+#' certificate updates in the future.
 #' @param directory_to_download character(1). Directory to download zip file
 #' of Ecoregion level 3 shapefiles
 #' @param directory_to_save character(1). Directory to decompress zip files.
@@ -275,6 +277,8 @@ download_aqs_data <-
 #' @param epa_certificate_path character(1). Path to the certificate file
 #' for EPA DataCommons. Default is
 #' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
+#' @param certificate_url character(1). URL to certificate file. See notes for
+#' details.
 #' @author Insang Song
 #' @returns NULL;
 #' @importFrom utils download.file
@@ -289,7 +293,9 @@ download_ecoregion_data <- function(
   remove_command = TRUE,
   epa_certificate_path =
     system.file("extdata/cacert_gaftp_epa.pem",
-                package = "amadeus")
+                package = "amadeus"),
+  certificate_url =
+    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
 ) {
   #### 1. data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
@@ -312,29 +318,9 @@ download_ecoregion_data <- function(
     return(NULL)
   }
   #### 5. define download URL
-  if (startsWith(Sys.info()["sysname"], "Linux")) {
-    if (!file.exists(epa_certificate_path)) {
-      message("URL should be identified in web browser
-      Lock icon in the address bar at https://gaftp.epa.gov
-      Click Show Certificate
-      access Details then find URL with *.crt extension
-      copy and replace the url below.\n"
-      )
-      download_crt_target <- gsub("pem", "crt", epa_certificate_path)
-      certificate_url <-
-        "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
-      utils::download.file(certificate_url, download_crt_target)
-      system(paste(
-        "openssl x509",
-        "-inform DER",
-        "-outform PEM",
-        "-in",
-        download_crt_target,
-        "-out",
-        epa_certificate_path
-      ))
-    }
-  }
+  download_epa_certificate(
+    epa_certificate_path = epa_certificate_path,
+    certificate_url = certificate_url)
 
   download_url <- paste0(
     "https://gaftp.epa.gov/EPADataCommons/ORD/Ecoregions/us/",
@@ -2440,6 +2426,15 @@ download_tri_data <- function(
 #' for EPA DataCommons. Default is
 #' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
 #' @author Ranadeep Daw, Insang Song
+#' @note
+#' For EPA Data Commons certificate errors, follow the steps below:
+#' 1. Click Lock icon in the address bar at https://gaftp.epa.gov
+#' 2. Click Show Certificate
+#' 3. Access Details
+#' 4. Find URL with *.crt extension
+#' Currently we bundle the pre-downloaded crt and its PEM (which is accepted
+#' in wget command) file in ./inst/extdata. The instruction above is for
+#' certificate updates in the future.
 #' @returns NULL; Two comma-separated value (CSV) raw files for 2017 and 2020
 #' @export
 download_nei_data <- function(
@@ -2451,7 +2446,9 @@ download_nei_data <- function(
   unzip = FALSE,
   epa_certificate_path =
     system.file("extdata/cacert_gaftp_epa.pem",
-                package = "amadeus")
+                package = "amadeus"),
+  certificate_url =
+  "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
 ) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
@@ -2460,27 +2457,10 @@ download_nei_data <- function(
   directory_to_save <- download_sanitize_path(directory_to_save)
 
   #### 5. define download URL
-  if (startsWith(Sys.info()["sysname"], "Linux")) {
-    if (!file.exists(epa_certificate_path)) {
-      message("URL should be identified in web browser
-      Lock icon in the address bar at https://gaftp.epa.gov
-      Click Show Certificate
-      access Details then find URL with *.crt extension
-      copy and replace the url below.\n"
-      )
-      download_crt_target <- gsub("pem", "crt", epa_certificate_path)
-      certificate_url <-
-        "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
-      utils::download.file(certificate_url, download_crt_target)
-      system(paste("openssl x509",
-                   "-inform DER",
-                   "-outform PEM",
-                   "-in",
-                   download_crt_target,
-                   "-out",
-                   epa_certificate_path))
-    }
-  }
+  download_epa_certificate(
+    epa_certificate_path = epa_certificate_path,
+    certificate_url = certificate_url
+  )
 
   #### 3. define measurement data paths
   url_download_base <- "https://gaftp.epa.gov/air/nei/%d/data_summaries/"

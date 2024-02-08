@@ -1103,6 +1103,8 @@ testthat::test_that("Test error cases in EPA gaftp sources 2", {
                   epa_certificate_path = certificate
                   )
   )
+  # unlink dir
+  unlink(tdir)
 
   # define file path with commands
   commands_path <- paste0(
@@ -1115,4 +1117,19 @@ testthat::test_that("Test error cases in EPA gaftp sources 2", {
   # remove file with commands after test
   testthat::expect_true(file.exists(commands_path))
   file.remove(commands_path)
+})
+
+
+testthat::test_that("epa certificate", {
+  testthat::expect_error(
+    download_epa_certificate("file.txt")
+  )
+  testthat::expect_message(
+    download_epa_certificate(file.path(tempdir(), "file.pem"))
+  )
+  testthat::expect_no_error(
+    download_epa_certificate(
+      system.file("extdata/cacert_gaftp_epa.pem", package = "amadeus")
+    )
+  )
 })

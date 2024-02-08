@@ -198,3 +198,39 @@ generate_date_sequence <-
       return(dates_original)
     }
   }
+
+
+#' Check EPA Certificate
+#' @param epa_certificate_path character(1).
+#' Full path of a converted certificate of EPA.
+#' Should end with `.pem`
+#' @param certificate_url character(1).
+#' URL of the original certificate.
+#' @returns A file designated in `epa_certificate_path`
+#' @author Insang Song
+#' @importFrom utils download.file
+#' @export
+download_epa_certificate <-
+  function(
+    epa_certificate_path = "cacert_gaftp_epa.pem",
+    certificate_url =
+    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
+  ) {
+    if (!endsWith(epa_certificate_path, ".pem")) {
+      stop("Path should end with .pem .\n")
+    }
+    if (!file.exists(epa_certificate_path)) {
+      download_crt_target <- gsub("pem", "crt", epa_certificate_path)
+      utils::download.file(certificate_url, download_crt_target)
+      system(paste(
+        "openssl x509",
+        "-inform DER",
+        "-outform PEM",
+        "-in",
+        download_crt_target,
+        "-out",
+        epa_certificate_path
+      ))
+      message("Certificate conversion completed.\n")
+    }
+  }

@@ -1,0 +1,1 @@
+wget --ca-certificate=/tmp/RtmpeRLmFs/cacert_gaftp_epa.pem https://gaftp.epa.gov/EPADataCommons/ORD/Ecoregions/us/us_eco_l3_state_boundaries.zip -O tests/testthat/../testdata//us_eco_l3_state_boundaries.zip

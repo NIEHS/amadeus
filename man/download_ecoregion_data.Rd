@@ -12,7 +12,9 @@ download_ecoregion_data(
   remove_zip = FALSE,
   download = FALSE,
   remove_command = TRUE,
-  epa_certificate_path = system.file("extdata/cacert_gaftp_epa.pem", package = "amadeus")
+  epa_certificate_path = system.file("extdata/cacert_gaftp_epa.pem", package = "amadeus"),
+  certificate_url =
+    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
 )
 }
 \arguments{
@@ -41,6 +43,9 @@ the text file containing download commands.}
 \item{epa_certificate_path}{character(1). Path to the certificate file
 for EPA DataCommons. Default is
 'extdata/cacert_gaftp_epa.pem' under the package installation path.}
+
+\item{certificate_url}{character(1). URL to certificate file. See notes for
+details.}
 }
 \value{
 NULL;
@@ -51,13 +56,16 @@ Ecoregions level 3 data, where all pieces of information in the higher
 levels are included.
 }
 \note{
-In Linux systems as of December 2023, downloading Ecoregion data from
-EPA Data Commons will result in certificate errors. This is bypassed by
-manually identifying .crt file link in your browser by connecting to
-https://gaftp.epa.gov then clicking a lock icon in the address bar.
-(TO DEVELOPERS: see the comments in source code)
+For EPA Data Commons certificate errors, follow the steps below:
+\enumerate{
+\item Click Lock icon in the address bar at https://gaftp.epa.gov
+\item Click Show Certificate
+\item Access Details
+\item Find URL with *.crt extension
 Currently we bundle the pre-downloaded crt and its PEM (which is accepted
-in wget command) file in ./inst/extdata.
+in wget command) file in ./inst/extdata. The instruction above is for
+certificate updates in the future.
+}
 }
 \author{
 Insang Song

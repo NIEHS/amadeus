@@ -11,7 +11,9 @@ download_nei_data(
   remove_command = FALSE,
   year_target = c(2017L, 2020L),
   unzip = FALSE,
-  epa_certificate_path = system.file("extdata/cacert_gaftp_epa.pem", package = "amadeus")
+  epa_certificate_path = system.file("extdata/cacert_gaftp_epa.pem", package = "amadeus"),
+  certificate_url =
+    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
 )
 }
 \arguments{
@@ -44,6 +46,18 @@ NULL; Two comma-separated value (CSV) raw files for 2017 and 2020
 }
 \description{
 Download data from EPA National Emission Inventory aggregated on-road emission data
+}
+\note{
+For EPA Data Commons certificate errors, follow the steps below:
+\enumerate{
+\item Click Lock icon in the address bar at https://gaftp.epa.gov
+\item Click Show Certificate
+\item Access Details
+\item Find URL with *.crt extension
+Currently we bundle the pre-downloaded crt and its PEM (which is accepted
+in wget command) file in ./inst/extdata. The instruction above is for
+certificate updates in the future.
+}
 }
 \author{
 Ranadeep Daw, Insang Song
