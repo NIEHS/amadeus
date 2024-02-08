@@ -1,0 +1,11 @@
+pandoc: 2.19.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  download_functions: download_functions.html
+  epa_download: epa_download.html
+last_built: 2024-02-08T20:35Z
+urls:
+  reference: https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference
+  article: https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/articles
+
