@@ -2426,6 +2426,8 @@ download_tri_data <- function(
 #' @param epa_certificate_path character(1). Path to the certificate file
 #' for EPA DataCommons. Default is
 #' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
+#' @param certificate_url character(1). URL to certificate file. See notes for
+#' details.
 #' @author Ranadeep Daw, Insang Song
 #' @note
 #' For EPA Data Commons certificate errors, follow the steps below:

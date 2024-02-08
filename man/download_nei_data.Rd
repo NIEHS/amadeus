@@ -40,6 +40,9 @@ Default is \code{FALSE}.}
 \item{epa_certificate_path}{character(1). Path to the certificate file
 for EPA DataCommons. Default is
 'extdata/cacert_gaftp_epa.pem' under the package installation path.}
+
+\item{certificate_url}{character(1). URL to certificate file. See notes for
+details.}
 }
 \value{
 NULL; Two comma-separated value (CSV) raw files for 2017 and 2020
