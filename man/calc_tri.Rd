@@ -36,6 +36,9 @@ A data.frame object.
 \description{
 Calculate TRI covariates
 }
+\note{
+U.S. context.
+}
 \author{
-Insang Song
+Insang Song, Mariana Kassien
 }

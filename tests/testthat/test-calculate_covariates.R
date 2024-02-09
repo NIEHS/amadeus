@@ -484,3 +484,61 @@ testthat::test_that("NEI calculation", {
   )
 
 })
+
+
+testthat::test_that("TRI calculation", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_package("dplyr")
+  withr::local_package("tidyr")
+  withr::local_package("data.table")
+  withr::local_options(sf_use_s2 = FALSE)
+
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  ncp$time <- 2018
+  ncpt <-
+    terra::vect(ncp, geom = c("lon", "lat"),
+                keepgeom = TRUE, crs = "EPSG:4326")
+  ncpt <- rbind(ncpt, ncpt, ncpt, ncpt, ncpt)
+  ncpt$time <- seq(2018, 2022)
+
+  tdir <- testthat::test_path("..", "testdata")
+  testthat::expect_no_error(
+    tri_c <- calc_tri(
+      path = paste0(tdir, "/tri/"),
+      sites = ncpt,
+      radius = 50000L
+    )
+  )
+  testthat::expect_true(is.data.frame(tri_c))
+
+  testthat::expect_no_error(
+    calc_tri(
+      path = paste0(tdir, "/tri/"),
+      sites = sf::st_as_sf(ncpt),
+      radius = 50000L
+    )
+  )
+  testthat::expect_error(
+    calc_tri(
+      path = tempdir(),
+      sites = ncpt,
+      radius = 50000L
+    )
+  )
+  testthat::expect_error(
+    calc_tri(
+      path = paste0(tdir, "/tri/"),
+      sites = ncpt[, 1:2],
+      radius = 50000L
+    )
+  )
+  testthat::expect_error(
+    calc_tri(
+      path = paste0(tdir, "/tri/"),
+      sites = ncpt,
+      radius = "As far as the Earth's radius"
+    )
+  )
+})

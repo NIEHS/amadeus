@@ -758,7 +758,7 @@ calc_temporal_dummies <-
     return(sites_dums)
   }
 
-# nocov start
+
 #' Calculate TRI covariates
 #' @param path character(1). Path to the directory with TRI CSV files
 #' @param sites stdt/sf/SpatVector/data.frame. Unique sites
@@ -770,13 +770,25 @@ calc_temporal_dummies <-
 #' @param radius Circular buffer radius.
 #' Default is \code{c(1000, 10000, 50000)} (meters)
 #' @param sites_epsg character(1). Coordinate system of sites.
-#' @author Insang Song
+#' @author Insang Song, Mariana Kassien
 #' @returns A data.frame object.
+#' @note U.S. context.
 #' @importFrom terra vect
 #' @importFrom terra crs
+#' @importFrom terra nearby
 #' @importFrom methods is
-#' @importFrom data.table fread
+#' @importFrom data.table .SD
+#' @importFrom utils read.csv
 #' @importFrom data.table rbindlist
+#' @importFrom dplyr filter
+#' @importFrom dplyr mutate
+#' @importFrom dplyr across
+#' @importFrom dplyr ends_with
+#' @importFrom dplyr all_of
+#' @importFrom dplyr group_by
+#' @importFrom dplyr ungroup
+#' @importFrom dplyr summarize
+#' @importFrom tidyr pivot_wider
 #' @export
 calc_tri <- function(
   path = "./input/tri/",
@@ -790,7 +802,7 @@ calc_tri <- function(
     sites <- sites$stdt
     sites_epsg <- sites$crs_dt
   } else {
-    if (!all(c("lon", "lat", "time") %in% colnames(sites))) {
+    if (!all(c("lon", "lat", "time") %in% names(sites))) {
       stop("sites should be stdt or 
       have 'lon', 'lat', and 'time' fields.\n")
     }
@@ -803,6 +815,7 @@ calc_tri <- function(
         sites <-
           terra::vect(sites,
                       geom = c("lon", "lat"),
+                      keepgeom = TRUE,
                       crs = sites_epsg)
       }
     }
@@ -811,39 +824,107 @@ calc_tri <- function(
     stop("radius should be numeric.\n")
   }
 
-  csvs_tri <- list.files(path = path, pattern = "*.csv$", full.names = TRUE)
-  col_sel <- c(1, 13, 12, 34, 41, 42, 43, 45, 46, 48, 47, 104)
-  csvs_tri <- lapply(csvs_tri, read.csv)
-  csvs_tri <- lapply(csvs_tri, function(x) x[, col_sel])
+  csvs_tri_path <-
+    list.files(path = path, pattern = "*.csv$", full.names = TRUE)
+  csvs_tri <- lapply(csvs_tri_path, read.csv)
+  col_sel <- c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49)
   csvs_tri <- data.table::rbindlist(csvs_tri)
+  dt_tri <- csvs_tri[, col_sel, with = FALSE]
+
   # column name readjustment
+  tri_cns <- colnames(dt_tri)
+  tri_cns <- sub(".*?\\.\\.", "", tri_cns)
+  tri_cns <- sub("^[^A-Za-z]*", "", tri_cns)
+  tri_cns <- gsub("\\.", "_", tri_cns)
+  dt_tri <- setNames(dt_tri, tri_cns)
 
   # depending on the way the chemicals are summarized
-  # ... csvs are aggregated...
-  csvs_tri_x <-
-    data.table::dcast(csvs_tri, YEAR + LONGITUDE + LATITUDE ~ .)
+  # Unit is kilogram
+  # nolint start
+  dt_tri_x <-
+    dt_tri |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::ends_with("_AIR"),
+        ~ifelse(UNIT_OF_MEASURE == "Pounds", . / 453.592 / 1e3, . / 1e3)
+      )
+    ) |>
+    dplyr::group_by(YEAR, LONGITUDE, LATITUDE, TRI_CHEMICAL_COMPOUND_ID) |>
+    dplyr::summarize(
+      dplyr::across(
+        dplyr::ends_with("_AIR"),
+        ~sum(., na.rm = TRUE)
+      )
+    ) |>
+    dplyr::ungroup() |>
+    tidyr::pivot_wider(
+      values_from = c("FUGITIVE_AIR", "STACK_AIR"),
+      names_from = "TRI_CHEMICAL_COMPOUND_ID",
+      names_sep = "_"
+    ) |>
+    dplyr::filter(!is.na(LONGITUDE) | !is.na(LATITUDE))
+    #  |>
+    # dplyr::filter(LONGITUDE > -130 & LONGITUDE < -60) |>
+    # dplyr::filter(LATITUDE > 20 & LATITUDE < 52)
+
   spvect_tri <-
-    terra::vect(csvs_tri_x,
+    terra::vect(dt_tri_x,
                 geom = c("LONGITUDE", "LATITUDE"),
-                crs = "EPSG:4326",
+                crs = "EPSG:4269", # all are NAD83
                 keepgeom = TRUE)
+  # spvect_tri$to_id <- seq(1, nrow(spvect_tri))
   sites_re <- terra::project(sites, terra::crs(spvect_tri))
 
-  list_buffer <- split(radius, radius)
-  list_buffer <-
-    lapply(list_buffer,
-           function(x) {
-             xx <- terra::nearby(sites_re, spvect_tri, distance = x)
-             xx$buffer <- x
-             xx[, lapply(.SD, sum, na.rm = TRUE),
-                by = c("YEAR", "LONGITUDE", "LATITUDE", "buffer")]
-           })
-  df_tri <- data.table::rbindlist(list_buffer)
+  YEAR <- NULL
+  from_id <- NULL
+  buffer <- NULL
+
+  # strategy: year-buffer
+  # split by year: sites and tri locations
+  list_sites <- split(sites_re, unlist(sites_re[["time"]]))
+  list_tri <- split(spvect_tri, unlist(spvect_tri[["YEAR"]]))
+
+  # mapply and inner lapply
+  list_sites_tri <-
+    mapply(
+      function(sts, tri) {
+        list_buffer <- split(radius, radius)
+        list_buffer <-
+          lapply(list_buffer,
+                function(x) {
+                  tri_df <- as.data.frame(tri)
+                  sites_tri_near <-
+                    terra::nearby(sts, tri, distance = x)
+                  sites_tri_near <- as.data.frame(sites_tri_near)
+                  sites_tri_near$from_id <-
+                    unlist(sts[[id_col]])[sites_tri_near$from_id]
+                  sites_tri_near_e <-
+                    cbind(sites_tri_near, tri_df[sites_tri_near$to_id, ])
+                  sites_tri_near_e$buffer <- x
+                  print(names(sites_tri_near_e))
+                  sites_tri_s <- sites_tri_near_e |>
+                    as.data.frame() |>
+                    dplyr::group_by(YEAR, from_id, buffer) |>
+                    dplyr::summarize(
+                      dplyr::across(
+                        dplyr::all_of(dplyr::contains("_AIR")),
+                        ~sum(., na.rm = TRUE)
+                      )
+                    ) |>
+                    dplyr::ungroup()
+                  return(sites_tri_s)
+                })
+        df_buffer <- data.table::rbindlist(list_buffer)
+        return(df_buffer)
+      },
+      list_sites, list_tri, SIMPLIFY = FALSE
+    ) 
+
+  df_tri <- data.table::rbindlist(list_sites_tri)
 
   return(df_tri)
 }
-# nocov end
-
+# nolint end
 
 #' Calculate National Emission Inventory (NEI) covariates
 #' @description NEI data comprises multiple csv files where emissions of
