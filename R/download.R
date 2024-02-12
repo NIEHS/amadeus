@@ -438,13 +438,7 @@ download_geos_cf_data <- function(
     sub_hyphen = TRUE
   )
   #### 6. define time sequence
-  collection_end <- substr(collection, nchar(collection), nchar(collection))
-  if (collection_end == "1") {
-    time_sequence <- seq(from = 30, to = 2330, by = 100)
-  } else if (collection_end == "3") {
-    time_sequence <- seq(from = 0, to = 2300, by = 100)
-  }
-  time_sequence <- sprintf("%04d", time_sequence)
+  time_sequence <- generate_time_sequence(collection)
   #### 7. define URL base
   base <- "https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/"
   #### 8. initiate "..._wget_commands.txt" file
@@ -588,20 +582,17 @@ download_gmted_data <- function(
     "/downloads/GMTED/Grid_ZipFiles/"
   )
   #### 7. define URL statistic code
-  statistics <- c(
-    "Breakline Emphasis", "Systematic Subsample",
-    "Median Statistic", "Minimum Statistic",
-    "Mean Statistic", "Maximum Statistic",
-    "Standard Deviation Statistic"
+  statistic_code <- gmted_codes(
+    statistic,
+    statistic_code = TRUE,
+    invert = FALSE
   )
-  statistic_codes <- c("be", "ds", "md", "mi", "mn", "mx", "sd")
-  statistic_codes <- cbind(statistics, statistic_codes)
-  statistic_code <- subset(statistic_codes, statistics == statistic)[2]
   #### 8. define URL resolution code
-  resolutions <- c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds")
-  resolution_codes <- c("75", "15", "30")
-  resolution_codes <- cbind(resolutions, resolution_codes)
-  resolution_code <- subset(resolution_codes, resolutions == resolution)[2]
+  resolution_code <- gmted_codes(
+    resolution,
+    resolution_code = TRUE,
+    invert = FALSE
+  )
   #### 9. build url
   download_url <- paste0(
     base,

@@ -234,3 +234,21 @@ download_epa_certificate <-
       message("Certificate conversion completed.\n")
     }
   }
+
+#' Generate time sequence based on GEOS-CF data collection.
+#' @param collection character(1). GEOS-CF data collection
+#' @return vector
+#' @export
+generate_time_sequence <-
+  function(
+    collection
+  ) {
+    collection_end <- substr(collection, nchar(collection), nchar(collection))
+    if (collection_end == "1") {
+      ts <- seq(from = 30, to = 2330, by = 100)
+    } else if (collection_end == "3") {
+      ts <- seq(from = 0, to = 2300, by = 100)
+    }
+    time_sequence <- sprintf("%04d", ts)
+    return(time_sequence)
+  }
