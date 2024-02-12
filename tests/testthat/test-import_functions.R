@@ -9,9 +9,9 @@ testthat::test_that("import_hms returns expected.", {
   )
   for (d in seq_along(densities)) {
     hms <-
-      import_hms_explore(
-        date_start = "2018-12-30",
-        date_end = "2019-01-01",
+      import_hms(
+        date_start = "2022-06-10",
+        date_end = "2022-06-11",
         variable = densities[d],
         directory_with_data =
         "../testdata/hms/hms"
