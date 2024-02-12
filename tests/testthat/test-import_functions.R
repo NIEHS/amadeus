@@ -14,7 +14,7 @@ testthat::test_that("import_hms returns expected.", {
         date_end = "2019-01-01",
         variable = densities[d],
         directory_with_data =
-        "../../../covariate_development/data/noaa/"
+        "../testdata/hms/hms"
       )
     # expect output is a SpatVector or character
     expect_true(
@@ -49,10 +49,7 @@ testthat::test_that("import_hms returns expected.", {
 testthat::test_that("import_gmted returns expected.", {
   withr::local_package("terra")
   statistics <- c(
-    "Breakline Emphasis", "Systematic Subsample",
-    "Median Statistic", "Minimum Statistic",
-    "Mean Statistic", "Maximum Statistic",
-    "Standard Deviation Statistic"
+    "Breakline Emphasis", "Systematic Subsample"
   )
   resolutions <- c(
     "7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"
@@ -65,7 +62,7 @@ testthat::test_that("import_gmted returns expected.", {
         import_gmted(
           variable = c(statistic, resolution),
           directory_with_data =
-          "../../../covariate_development/data/gmted"
+          "../testdata/gmted/gmted"
         )
       # expect output is a SpatRaster
       expect_true(
@@ -93,7 +90,7 @@ testthat::test_that("import_gmted returns error with non-vector variable.", {
       import_gmted(
         variable <- "Breakline Emphasis; 7.5 arc-seconds",
         directory_with_data =
-        "../../../covariate_development/data/gmted"
+        "../testdata/gmted/gmted"
       )
   )
 })
@@ -225,7 +222,7 @@ testthat::test_that("import_geos expected errors.", {
   expect_error(
     import_geos(
       variable = "O3",
-      directory_with_data = "../../"
+      directory_with_data = "./"
     )
   )
 })

@@ -2,7 +2,7 @@
 
 testthat::test_that("sites_vector handles data type and missing columns.", {
   withr::local_package("terra")
-  sites <- readRDS("../testdata/sites_sample.RDS")
+  sites <- readRDS("../testdata/sites_nc.RDS")
   narr <-
     import_narr(
       date_start = "2018-01-01",

@@ -14,7 +14,7 @@
 #' @importFrom terra aggregate
 #' @importFrom terra subset
 #' @export
-import_hms_explore <- function(
+import_hms <- function(
     date_start = "2018-01-01",
     date_end = "2018-01-01",
     variable = c("Light", "Medium", "Heavy"),
@@ -344,9 +344,15 @@ import_narr <- function(
     "Returning daily ",
     variable,
     " data from ",
-    date_sequence[1],
+    as.Date(
+      date_sequence[1],
+      format = "%Y%m%d"
+    ),
     " to ",
-    date_sequence[length(date_sequence)],
+    as.Date(
+      date_sequence[length(date_sequence)],
+      format = "%Y%m%d"
+    ),
     ".\n"
   ))
   #### return SpatRaster

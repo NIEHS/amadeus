@@ -112,7 +112,7 @@ covar_hms <- function(
     #### extract layer data at sites
     sites_extracted_layer <- as.integer(
       terra::relate(
-        sites_v,
+        sites_e,
         data_layer,
         "intersects"
       )

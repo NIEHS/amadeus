@@ -55,5 +55,4 @@ rsconnect/
 # temporarily ignore testdata/ folders before spatial subsetting
 tests/testdata/hms/
 tests/testdata/gmted/
-tests/testdata/geos/
 tests/testdata/narr/

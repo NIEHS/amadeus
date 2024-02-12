@@ -8,6 +8,7 @@ testthat::test_that("import_hms returns expected.", {
     "Heavy"
   )
   buffers <- c(0, 1000)
+  sites <- readRDS("../testdata/sites_nc.RDS")
   # expect function
   expect_true(
     is.function(covar_hms)
@@ -21,7 +22,7 @@ testthat::test_that("import_hms returns expected.", {
           date_end = "2019-01-01",
           variable = density,
           directory_with_data =
-          "../../../covariate_development/data/noaa/"
+          "../testdata/hms/hms/"
         )
       hms_covar <-
         covar_hms(
@@ -63,8 +64,7 @@ testthat::test_that("covar_gmted returns expected.", {
     "7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"
   )
   buffers <- c(0, 1000)
-  # use data.table
-  sites <- readRDS("../testdata/sites_sample.RDS")
+  sites <- readRDS("../testdata/sites_nc.RDS")
   # expect function
   expect_true(
     is.function(covar_gmted)
@@ -78,7 +78,7 @@ testthat::test_that("covar_gmted returns expected.", {
           import_gmted(
             variable = c(statistic, resolution),
             directory_with_data =
-            "../../../covariate_development/data/gmted"
+            "../testdata/gmted/gmted"
           )
         gmted_covar <-
           covar_gmted(
@@ -112,8 +112,7 @@ testthat::test_that("covar_narr returns expected.", {
     "omega"
   )
   buffers <- c(0, 1000)
-  # use data.table
-  sites <- readRDS("../testdata/sites_sample.RDS")
+  sites <- readRDS("../testdata/sites_nc.RDS")
   # expect function
   expect_true(
     is.function(covar_narr)
@@ -167,8 +166,7 @@ testthat::test_that("covar_geos returns as expected.", {
     "chm_inst_1hr_g1440x721_p23"
   )
   buffers <- c(0, 1000)
-  # use data.frame
-  sites <- data.frame(readRDS("../testdata/sites_sample.RDS"))
+  sites <- data.frame(readRDS("../testdata/sites_nc.RDS"))
   # expect function
   expect_true(
     is.function(covar_geos)
