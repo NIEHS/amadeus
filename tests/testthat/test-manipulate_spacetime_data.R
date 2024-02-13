@@ -1,5 +1,4 @@
 test_that("convert_stobj_to_stdt works well", {
-  withr::local_package("sf")
   withr::local_package("terra")
   withr::local_package("data.table")
   withr::local_package("dplyr")
@@ -156,7 +155,6 @@ test_that("convert_stobj_to_stdt works well", {
 
 
 test_that("is_stdt works as expected", {
-  withr::local_package("sf")
   withr::local_package("terra")
   withr::local_package("data.table")
   withr::local_package("dplyr")
@@ -189,9 +187,96 @@ test_that("is_stdt works as expected", {
 
 })
 
+test_that("check_mysftime works as expected", {
+  # open testing data
+  stdata <- data.table::fread("../testdata/spacetime_table.csv")
+  mysft <- sftime::st_as_sftime(stdata,
+                                coords = c("lon", "lat"),
+                                crs = 4326,
+                                time_column_name = "time")
+  
+  # should work
+  expect_no_error(check_mysftime(x = mysft))
+  
+  # check that error messages work well
+  expect_error(check_mysftime(stdata), "x is not a sftime")
+  mysft <- sftime::st_as_sftime(as.data.frame(stdata),
+                                coords = c("lon", "lat"),
+                                crs = 4326,
+                                time_column_name = "time")
+  expect_error(check_mysftime(x = mysft),
+               "x is not inherited from a data.table")
+  mysft <- stdata |> 
+    dplyr::rename("date" = time) |>
+    sftime::st_as_sftime(coords = c("lon", "lat"),
+                         crs = 4326,
+                         time_column_name = "date") 
+  expect_error(check_mysftime(mysft), "time column should be called time")
+  mysft <- stdata |> 
+    sftime::st_as_sftime(coords = c("lon", "lat"),
+                         crs = 4326,
+                         time_column_name = "time") |>
+    dplyr::rename("geom" = "geometry")
+  expect_error(check_mysftime(mysft),
+               "geometry column should be called geometry")
+  mysft <- sftime::st_as_sftime(stdata,
+                                   coords = c("lon", "lat"),
+                                   crs = 4326,
+                                   time_column_name = "time")
+  pol <- cbind(
+    c(39.35, 39.36, 39.36, 39.35, 39.35),
+    c(-81.43, -81.43, -81.42, -81.42, -81.43)
+  ) |>
+    list() |>
+    st_polygon()
+  for (i in 1:27) {
+    mysft$geometry[i] <- pol
+  }
+  expect_error(check_mysftime(mysft),
+               "geometry is not a sfc_POINT")
+})
+
+
+test_that("check_mysf works as expected", {
+  # open testing data
+  stdata <- data.table::fread("../testdata/spacetime_table.csv")
+  mysf <- sf::st_as_sf(stdata,
+                                coords = c("lon", "lat"),
+                                crs = 4326)
+  
+  # should work
+  expect_no_error(check_mysf(x = mysf))
+  
+  # check that error messages work well
+  expect_error(check_mysf(stdata), "x is not a sf")
+  mysf <- sf::st_as_sf(as.data.frame(stdata),
+                                coords = c("lon", "lat"),
+                                crs = 4326)
+  expect_error(check_mysf(x = mysf),
+               "x is not inherited from a data.table")
+  mysf <- stdata |> 
+    sf::st_as_sf(coords = c("lon", "lat"),
+                         crs = 4326) |>
+    dplyr::rename("geom" = "geometry")
+  expect_error(check_mysf(mysf),
+               "geometry column should be called geometry")
+  mysf <- sf::st_as_sf(stdata,
+                                coords = c("lon", "lat"),
+                                crs = 4326)
+  pol <- cbind(
+    c(39.35, 39.36, 39.36, 39.35, 39.35),
+    c(-81.43, -81.43, -81.42, -81.42, -81.43)
+  ) |>
+    list() |>
+    st_polygon()
+  for (i in 1:27) {
+    mysf$geometry[i] <- pol
+  }
+  expect_error(check_mysf(mysf),
+               "geometry is not a sfc_POINT")
+})
 
 test_that("dt_to_sf works as expected", {
-  withr::local_package("sf")
   withr::local_package("terra")
   withr::local_package("data.table")
   withr::local_package("dplyr")
@@ -223,8 +308,6 @@ test_that("dt_to_sf works as expected", {
 
 
 test_that("dt_to_sftime works as expected", {
-  withr::local_package("sf")
-  withr::local_package("sftime")
   withr::local_package("terra")
   withr::local_package("data.table")
   withr::local_package("dplyr")
@@ -261,8 +344,6 @@ test_that("dt_to_sftime works as expected", {
 
 
 test_that("project_dt works as expected", {
-  withr::local_package("sf")
-  withr::local_package("sftime")
   withr::local_package("terra")
   withr::local_package("data.table")
   withr::local_package("dplyr")
