@@ -11,28 +11,28 @@ testthat::test_that("test MODIS prefilter", {
   txt_exp_output <- unname(txt_exp_output)
   # expect
   testthat::expect_message(
-    mcdtest <- modis_prefilter_sds("MCD19A2")
+    mcdtest <- process_modis_sds("MCD19A2")
   )
   testthat::expect_equal(
     mcdtest, "(Optical_Depth)"
   )
   testthat::expect_no_error(
-    modis_prefilter_sds("MCD19A2", "(cos|RelAZ|Angle)")
+    process_modis_sds("MCD19A2", "(cos|RelAZ|Angle)")
   )
   for (i in 1:3) {
     testthat::expect_equal(
-      modis_prefilter_sds(txt_products[i]), txt_exp_output[i]
+      process_modis_sds(txt_products[i]), txt_exp_output[i]
     )
   }
   testthat::expect_no_error(
-    filt_other <- modis_prefilter_sds("ignored", "(cos)")
+    filt_other <- process_modis_sds("ignored", "(cos)")
   )
   testthat::expect_equal(filt_other, "(cos)")
 
 })
 
 
-testthat::test_that("modis_aggregate_sds", {
+testthat::test_that("process_flatten_sds", {
   withr::local_package("terra")
   withr::local_package("stars")
   withr::local_options(list(sf_use_s2 = FALSE))
@@ -47,7 +47,7 @@ testthat::test_that("modis_aggregate_sds", {
   # main test: mcd19
   testthat::expect_no_error(
     mcdaggr <-
-      modis_aggregate_sds(
+      process_flatten_sds(
         path = mcd19,
         product = "MCD19A2",
         nsds = "Optical_Depth",
@@ -67,7 +67,7 @@ testthat::test_that("modis_aggregate_sds", {
   # main test: mcd19
   testthat::expect_no_error(
     modaggr <-
-      modis_aggregate_sds(
+      process_flatten_sds(
         path = mod09_sub,
         product = "MOD09GA",
         nsds = NULL,
@@ -80,7 +80,7 @@ testthat::test_that("modis_aggregate_sds", {
 })
 
 
-testthat::test_that("modis_get_vrt is good to go", {
+testthat::test_that("process_modis_merge is good to go", {
   withr::local_package("terra")
   withr::local_package("stars")
   withr::local_options(list(sf_use_s2 = FALSE))
@@ -91,7 +91,7 @@ testthat::test_that("modis_get_vrt is good to go", {
       "MOD11A1.A2021227.h11v05.061.2021228105320.hdf"
     )
   testthat::expect_no_error(
-    modis_get_vrt(
+    process_modis_merge(
       paths = path_mod11,
       "MOD11A1",
       date_in = "2021-08-15",
@@ -105,7 +105,7 @@ testthat::test_that("modis_get_vrt is good to go", {
       "MOD13A2.A2021225.h11v05.061.2021320163751.hdf"
     )
   testthat::expect_no_error(
-    modis_get_vrt(
+    process_modis_merge(
       paths = path_mod13,
       "MOD13A2",
       date_in = "2021-08-13",
@@ -120,7 +120,7 @@ testthat::test_that("modis_get_vrt is good to go", {
       "MCD19A2.A2021227.h11v05.061.2023149160635.hdf"
     )
   testthat::expect_no_error(
-    modis_get_vrt(
+    process_modis_merge(
       paths = path_mcd19,
       "MCD19A2",
       date_in = "2021-08-15",
@@ -135,7 +135,7 @@ testthat::test_that("modis_get_vrt is good to go", {
       "MOD09GA.A2021227.h11v05.061.2021229035936.hdf"
     )
   testthat::expect_no_error(
-    modis_get_vrt(
+    process_modis_merge(
       paths = path_mod09,
       "MOD09GA",
       date_in = "2021-08-15",
@@ -157,7 +157,7 @@ testthat::test_that("VNP46 preprocess tests", {
     )
 
   testthat::expect_warning(
-    vnp46_proc <- modis_preprocess_vnp46(
+    vnp46_proc <- process_bluemarble(
       paths = path_vnp46[1],
       date_in = "2018-08-13"
     )
@@ -166,7 +166,7 @@ testthat::test_that("VNP46 preprocess tests", {
   testthat::expect_equal(terra::nlyr(vnp46_proc), 1L)
 
   testthat::expect_error(
-    modis_preprocess_vnp46(
+    process_bluemarble(
       paths = path_vnp46[1],
       date_in = "2018~08~13"
     )
@@ -189,7 +189,7 @@ testthat::test_that("Swath warping abides", {
     sprintf("HDF4_EOS:EOS_SWATH:%s:mod06:Cloud_Fraction_Night", path_mod06)
   # internal warning from stars
   testthat::expect_warning(
-    warped <- modis_warp_stars(
+    warped <- process_modis_warp(
       path = path_mod06
     )
   )
@@ -215,26 +215,26 @@ testthat::test_that("Other MODIS function errors", {
 
   testthat::expect_no_error(
     suppressWarnings(
-      modis_mosaic_mod06(
+      process_modis_swath(
         paths = path_mod06,
         date_in = "2021-08-15"
       )
     )
   )
   testthat::expect_error(
-    modis_mosaic_mod06(
+    process_modis_swath(
       paths = path_mod06,
       date_in = "2021~08~15"
     )
   )
   testthat::expect_error(
-    modis_mosaic_mod06(
+    process_modis_swath(
       paths = path_mod06,
       date_in = "2021-13-15"
     )
   )
   testthat::expect_error(
-    modis_mosaic_mod06(
+    process_modis_swath(
       paths = path_mod06,
       date_in = "2021-12-45"
     )

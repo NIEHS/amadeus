@@ -1,15 +1,18 @@
 
-#' Selected MODIS product subdataset name selector
+#' Selected MODIS sinusoidal grid product subdataset name selector
 #' @param product character(1). Product code.
 #' @param custom_sel character(1). Custom filter.
 #' If this value is not NULL, preset filter is
 #' overridden.
+#' @description Four presets are supported. `custom_sel` supersedes
+#' presets of `product` values.
 #' @author Insang Song
 #' @returns A character object that conforms to the regular
 #' expression. Details of regular expression in R can be found in [regexp].
 #' @seealso [calc_modis]
 #' @export
-modis_prefilter_sds <-
+# previously modis_prefilter_sds
+process_modis_sds <-
   function(
     product = c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2"),
     custom_sel = NULL
@@ -38,29 +41,35 @@ modis_prefilter_sds <-
   }
 
 
-#' Aggregate layers in a MODIS sub-dataset
+#' Aggregate layers in a sub-dataset in sinusoidal MODIS products
 #' @param path character(1). Full path to MODIS HDF4/HDF5 file.
 #' Direct sub-dataset access is supported, for example,
 #' HDF4_EOS:EOS_GRID:\{filename\}:\{base_grid_information\}:\{sub-dataset\}
 #' @param product character(1). Name of MODIS product.
 #' @param nsds character(1). Exact or regular expression filter of sub-dataset.
-#' See [modis_prefilter_sds] for details.
+#' See [process_modis_sds] for details.
 #' @param fun_agg character(1). Function name to aggregate layers.
 #' Should be acceptable to [terra::tapp].
+#' @returns SpatRaster.
 #' @author Insang Song
 #' @seealso [terra::tapp], [terra::rast], [terra::describe]
+#' @description Some MODIS products consist of multi-layer subdatasets.
+#' This function aggregates multiple layers into single layer SpatRaster.
+#' `fun_agg` is applied at overlapping cells.
 #' @note HDF values are read as original without scaling.
 #' Users should consult MODIS product documentation to apply proper
 #' scaling factor for post-hoc adjustment. If users have no preliminary
-#' information about MODIS HDF sub-datasets, consider running
+#' information about MODIS sub-datasets, consider running
 #' `terra::describe(__filename__, sds = TRUE)` to navigate the full
-#' list of sub-datasets in the input file.
+#' list of sub-datasets in the input file then consult the documentation
+#' of MODIS product.
 #' @importFrom terra describe
 #' @importFrom terra rast
 #' @importFrom terra nlyr
 #' @importFrom terra tapp
 #' @export
-modis_aggregate_sds <-
+# previously modis_aggregate_sds
+process_flatten_sds <-
   function(
     path,
     product = c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2"),
@@ -75,7 +84,7 @@ modis_aggregate_sds <-
       sds_desc <- terra::describe(path, sds = TRUE)
       index_sds <- grep(nsds, sds_desc$var)
       sds_desc <- sds_desc[index_sds, c("name", "var", "nlyr")]
-
+      # raw is TRUE to ignore scaling factor.
       sds_read <- terra::rast(path, subds = index_sds, raw = TRUE)
       sds_nsds <- nrow(sds_desc)
       sds_nlyr <- sds_desc$nlyr
@@ -104,6 +113,7 @@ modis_aggregate_sds <-
     return(sds_agg)
   }
 
+
 #' Get mosaicked or merged raster from multiple MODIS hdf files
 #' @param paths character. Full list of hdf file paths.
 #'  preferably a recursive search result from \code{list.files}.
@@ -120,7 +130,8 @@ modis_aggregate_sds <-
 #' @author Insang Song
 #' @returns A SpatRaster object.
 #' @export
-modis_get_vrt <- function(
+# previously modis_get_vrt
+process_modis_merge <- function(
     paths,
     product = c("MOD11A1", "MOD13A2",
                 "MOD09GA", "MCD19A2"),
@@ -172,10 +183,10 @@ modis_get_vrt <- function(
   return(result_merged)
 }
 
-
-#' Assign MODIS VNP46 corner coordinates to retrieve a merged raster
+# nolint start
+#' Assign VIIRS Blue Marble products corner coordinates to retrieve a merged raster
 #' @description This function will return a SpatRaster object with
-#' georeferenced h5 files of VNP46A2 product. Referencing corner coordinates
+#' georeferenced h5 files of Blue Marble product. Referencing corner coordinates
 #' are necessary as the original h5 data do not include such information.
 #' @param paths character. Full paths of h5 files.
 #' @param date_in character(1). Date to query.
@@ -183,13 +194,18 @@ modis_get_vrt <- function(
 #' Default is 3L.
 #' @param crs_ref character(1). terra::crs compatible CRS.
 #' Default is "EPSG:4326"
+#' @returns SpatRaster.
 #' @author Insang Song
+#' @references
+#' - [Wang, Z. (2022). Blue Marble User Guide (Version 1.3). NASA.](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf)
 #' @importFrom terra rast
 #' @importFrom terra ext
 #' @importFrom terra crs
 #' @importFrom terra merge
 #' @export
-modis_preprocess_vnp46 <- function(
+# previously modis_preprocess_vnp46
+# nolint end
+process_bluemarble <- function(
   paths,
   date_in,
   subdataset = 3L,
@@ -230,7 +246,7 @@ modis_preprocess_vnp46 <- function(
     regmatches(filepaths_today,
                regexpr("h([0-2][0-9]|[3][0-6])v([0-1][0-9])", filepaths_today))
 
-  vnp46_today <- unname(split(filepaths_today, filepaths_today))
+  vnp_today <- unname(split(filepaths_today, filepaths_today))
   filepaths_today_tiles_list <-
     unname(split(filepaths_today_tiles, filepaths_today_tiles))
 
@@ -245,7 +261,7 @@ modis_preprocess_vnp46 <- function(
       terra::crs(vnp_) <- terra::crs(crs_ref)
       terra::ext(vnp_) <- unlist(tile_ext)
       return(vnp_)
-    }, vnp46_today, filepaths_today_tiles_list, SIMPLIFY = FALSE)
+    }, vnp_today, filepaths_today_tiles_list, SIMPLIFY = FALSE)
   if (length(filepaths_today) > 1) {
     vnp_all <- do.call(terra::merge, vnp_assigned)
   } else {
@@ -254,8 +270,8 @@ modis_preprocess_vnp46 <- function(
   return(vnp_all)
 }
 
-#' Warp MODIS Swath data into rectilinear grid raster
-#' @description Swath data is a type of MODIS data organization,
+#' Warp MODIS swath data into rectilinear grid raster
+#' @description Swath data is a type of MODIS data,
 #' where curvilinear points are stored with varying resolution depending on
 #' the relative position of the sensor axis. As this type of data
 #' typically does not work well with planar spatial data, users
@@ -279,7 +295,8 @@ modis_preprocess_vnp46 <- function(
 #' @importFrom stars st_warp
 #' @importFrom stars read_stars
 #' @export
-modis_warp_stars <-
+# previously modis_warp_stars
+process_modis_warp <-
   function(
     path,
     cellsize = 0.25,
@@ -301,16 +318,18 @@ modis_warp_stars <-
 
 
 
-#' Mosaic MODIS MOD06_L2 product files
+#' Mosaic MODIS swaths
 #' @description This function will return a SpatRaster object with
-#' mosaicked 5-minute cloud coverage values. Swath data include curvilinear
+#' values of selected subdatasets. Swath data include curvilinear
 #' grids, which require warping/rectifying the original curvilinear grids
 #' into rectilinear grids. The function internally warps each of inputs
 #' then mosaic the warped images into one large SpatRaster object.
 #' @param paths character. Full paths of hdf files.
 #' @param date_in character(1). Date to query.
 #' @param get_var character. One of `"Cloud_Fraction_Day"` or
-#' `"Cloud_Fraction_Night"`
+#' `"Cloud_Fraction_Night"` (which are available in MOD06_L2)
+#' @param suffix character(1). Should be formatted `:{product}:`,
+#' e.g., `:mod06:`
 #' @param resolution numeric(1). Resolution of output raster.
 #' Unit is degree.
 #' @returns SpatRaster object. CRS is `"EPSG:4326"`.
@@ -319,11 +338,13 @@ modis_warp_stars <-
 #' @importFrom terra crop
 #' @importFrom terra mosaic
 #' @export
-modis_mosaic_mod06 <-
+# previously modis_mosaic_mod06
+process_modis_swath <-
   function(
     paths,
     date_in,
     get_var = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+    suffix = ":mod06:",
     resolution = 0.025
   ) {
     if (!grepl("[0-9]{4,4}\\-([0][1-9]|[1][0-2])\\-([0-2][0-9]|[3][0-1])",
@@ -333,28 +354,30 @@ modis_mosaic_mod06 <-
            'YYYY-MM-DD'.\n")
     }
     header <- "HDF4_EOS:EOS_SWATH:"
-    suffix <- ":mod06:"
     ras_mod06 <- vector("list", 2L)
     datejul <- strftime(date_in, format = "%Y%j")
     paths_today <- grep(sprintf("A%s", datejul), paths, value = TRUE)
 
+    # if two or more paths are put in,
+    # these are read into a list then mosaicked
     if (length(paths) > 1) {
       for (element in seq_along(get_var)) {
         target_text <-
           sprintf("%s%s%s%s", header, paths_today, suffix, get_var[element])
         # rectified stars objects to SpatRaster
         mod06_element <- split(target_text, target_text) |>
-          lapply(modis_warp_stars) |>
+          lapply(process_modis_warp) |>
           lapply(terra::rast)
         mod06_element <- Reduce(f = terra::mosaic, x = mod06_element)
         ras_mod06[[element]] <- mod06_element
       }
       mod06_mosaic <- c(ras_mod06[[1]], ras_mod06[[2]])
       terra::varnames(mod06_mosaic) <- get_var
-      mod06_mosaic <- terra::crop(mod06_mosaic,
-                                  terra::ext(c(-130, -60, 20, 54)))
+      # removed for generality
+      # mod06_mosaic <- terra::crop(mod06_mosaic,
+      #                             terra::ext(c(-130, -60, 20, 54)))
     } else {
-      mod06_mosaic <- terra::rast(modis_warp_stars(paths))
+      mod06_mosaic <- terra::rast(process_modis_warp(paths))
     }
     return(mod06_mosaic)
   }
