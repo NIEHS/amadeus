@@ -62,7 +62,20 @@ testthat::test_that("import_gmted returns expected.", {
         import_gmted(
           variable = c(statistic, resolution),
           directory_with_data =
-          "../testdata/gmted/gmted"
+            paste0(
+              "../testdata/gmted/",
+              gmted_codes(
+                statistic,
+                statistic = TRUE,
+                invert = FALSE
+              ),
+              gmted_codes(
+                resolution,
+                resolution = TRUE,
+                invert = FALSE
+              ),
+              "_grd/"
+            )
         )
       # expect output is a SpatRaster
       expect_true(

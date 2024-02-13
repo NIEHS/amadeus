@@ -53,5 +53,4 @@ rsconnect/
 **/.DS_Store
 
 # temporarily ignore testdata/ folders before spatial subsetting
-tests/testdata/gmted/
 tests/testdata/narr/
