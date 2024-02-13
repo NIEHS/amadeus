@@ -15,8 +15,8 @@ Description of package
 
 `download_data()` accesses and downloads raw geospatial data from a variety of open source data repositories. The function is a wrapper that calls source-specific download functions, each of which account for the source's unique combination of URL, file naming conventions, and data types.
 
-| Function                     | Source       | Data Type &nbsp; &nbsp; | Genre       |
-| :--------------------------- | :----------- | :---------------------- | :---------- |
+| Function | Source | Data Type | Genre |
+| :--- | :--- | :--- | :--- |
 | `download_aqs_data()`    | [US EPA Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV | Air Pollution |
 | `download_ecoregion_data()` | [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregion) | **data type** | Climate Regions |
 | `download_geos_cf_data()` | [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere, Meteorology |
