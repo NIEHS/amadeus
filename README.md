@@ -15,9 +15,9 @@ Description of package
 
 `download_data()` accesses and downloads raw geospatial data from a variety of open source data repositories. The function is a wrapper that calls source-specific download functions, each of which account for the source's unique combination of URL, file naming conventions, and data types.
 
-| Function                     | Source       | Data Type   | Genre       |
+| Function                     | Source       | Data Type &nbsp; &nbsp  | Genre       |
 | :--------------------------- | :----------- | :---------- | :---------- |
-| `download_aqs_data()`    | [US EPA Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV &nbsp; &nbsp;| Air Pollution |
+| `download_aqs_data()`    | [US EPA Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV | Air Pollution |
 | `download_ecoregion_data()` | [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregion) | **data type** | Climate Regions |
 | `download_geos_cf_data()` | [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere, Meteorology |
 | `download_gmted_data()`   | [USGS Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation |
@@ -30,6 +30,8 @@ Description of package
 | `download_hms_data()` | [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0) | Shapefile | Wildfire Smoke |
 | `download_sedac_groads_data()` | [NASA SEDAC Global Roads Open Access Data Set](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download) | **data type** | Roadways |
 | `download_sedac_population_data()` | [NASA SEDAC UN WPP-Adjusted Population Density](https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11) | GeoTIFF | Population |
+
+Example use of `download_data()` using NOAA NCEP North American Regional Reanalysis's (NARR) "weasd" (Daily Accumulated Snow at Surface) variable.
 
 ```
 > download_data(
@@ -53,7 +55,7 @@ Requested files have been downloaded.
 
 To avoid errors when using `process()`, **do not edit the raw downloaded data files**. Passing user-generated or edited data into `procces()` may result in errors as the underlying functions are adapted to each sources' raw data file type.
 
-Example workflow using `download_data()` and `process_narr()`:
+Example use of `process()` using downloaded "weasd" data.
 
 ```
 > weasd <- process_narr(
@@ -80,6 +82,8 @@ time        : 2022-01-01 to 2022-01-05 UTC
 ### Calculate Covariates
 
 `calculate_covariate()` stems from the `beethoven` package, and the *air pollution model's (citation)* need for various types of data extracted at precise locations. `calculate_covariate()`, therefore, extracts data from the "cleaned" `SpatRaster` or `SpatVector` object at user defined locations. Users can choose to buffer the locations. The function returns a `data.frame` with data extracted at all locations for each layer or row in the `SpatRaster` or `SpatVector` object, respectively.
+
+Example of `calculate_covariate()` using processed "weasd" data.
 
 ```
 > weasd_covar <- covar_narr(
