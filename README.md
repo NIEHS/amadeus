@@ -9,7 +9,7 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 **A** **M**echanism/**M**achine for **D**ata, **E**nvironments, and **U**ser **S**etup
 
-Description of package
+`amadeus` is an R package devloped to improve and expideite users' access to large, publicly available geospatial data sets. The functions in `amadeus` allow users to download and import cleaned geospatial data directly in R, useful for automated run scripts, analysis pipelines, and reproducible science in general.
 
 ## Download
 
@@ -18,7 +18,7 @@ Description of package
 | Source | Data Type | Genre |
 | :--- | :--- | :--- |
 | [US EPA Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV | Air Pollution |
-| [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregion) | **data type** | Climate Regions |
+| [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregion) | Shapefile | Climate Regions |
 | [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere, Meteorology |
 | [USGS Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation |
 | [Köppen-Geiger Climate Classification (Beck et al., 2018)](https://www.nature.com/articles/sdata2018214) | GeoTIFF | Climate Classification |
@@ -26,8 +26,8 @@ Description of package
 | [NASA Moderate Resolution Imaging Spectroradiometer (MODIS)](https://modis.gsfc.nasa.gov/data/) | HDF | Atmosphere, Meteorology, Land Use, Satellite |
 | [NOAA NCEP North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) | netCDF | Atmosphere, Meteorology |
 | [MRLC Consortium National Land Cover Database (NLCD)](https://www.mrlc.gov/data) | GeoTIFF | Land Use |
-| [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0) | Shapefile | Wildfire Smoke |
-| [NASA SEDAC Global Roads Open Access Data Set](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download) | **data type** | Roadways |
+| [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0) | Shapefile, KML | Wildfire Smoke |
+| [NASA SEDAC Global Roads Open Access Data Set](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download) | Shapefile, Geodatabase | Roadways |
 | [NASA SEDAC UN WPP-Adjusted Population Density](https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11) | GeoTIFF | Population |
 
 See the `download_functions` vignette for a detailed description of source-specific download functions.
@@ -89,7 +89,7 @@ Example of `calculate_covariate()` using processed "weasd" data.
 ```
 > weasd_covar <- covar_narr(
 +   from = weasd,
-+   locs = sites,
++   locs = locs,
 +   id = "site_id",
 +   buffer = 0
 + )
