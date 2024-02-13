@@ -293,6 +293,32 @@ import_narr <- function(
     ))
     #### check for mono or pressure levels
     if (grepl("level", names(data_year)[1])) {
+      if (length(unique(terra::time(data_year))) == 1) {
+        cat(paste0("Detected test data set.\n"))
+        days <- sapply(
+          strsplit(
+            names(data_year),
+            "_"
+          ),
+          function(x) x[3]
+        )
+        terra::time(data_year) <- as.Date(
+          paste0(
+            substr(
+              terra::time(data_year),
+              1,
+              4
+            ),
+            stringi::stri_pad(
+              days,
+              width = 3,
+              pad = "0",
+              side = "left"
+            )
+          ),
+          format = "%Y%j"
+        )
+      }
       #### pressure levels data
       names(data_year) <- paste0(
         variable,
