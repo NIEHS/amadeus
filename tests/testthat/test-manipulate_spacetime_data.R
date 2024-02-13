@@ -70,17 +70,21 @@ test_that("convert_stobj_to_stdt works well", {
   # 1) it should work
   stobj <-
     terra::vect(
-                df,
-                geom = c("lon", "lat"),
-                crs = "EPSG:4326",
-                keepgeom = FALSE)
+      df,
+      geom = c("lon", "lat"),
+      crs = "EPSG:4326",
+      keepgeom = FALSE
+    )
   expect_no_error(convert_stobj_to_stdt(stobj))
   stdt <- convert_stobj_to_stdt(stobj)$stdt
   expect_equal(class(stdt)[[1]], "data.table")
   expect_equal(class(convert_stobj_to_stdt(stobj)$crs_stdt), "character")
   expect_true({
-               terra::same.crs(convert_stobj_to_stdt(stobj)$crs_stdt,
-                               "EPSG:4326")})
+    terra::same.crs(
+      convert_stobj_to_stdt(stobj)$crs_stdt,
+      "EPSG:4326"
+    )
+  })
   expect_false(any(!(c("lon", "lat", "time") %in% colnames(stdt))))
   expect_equal(
     stdt[lon == -112 & lat == 35.35 & time == "2023-11-02", var1],
@@ -96,12 +100,13 @@ test_that("convert_stobj_to_stdt works well", {
   # 1) it should work
   var1 <-
     terra::rast(
-                extent = c(-112, -101, 33.5, 40.9),
-                ncol = 5,
-                nrow = 5,
-                crs = "EPSG:4326")
+      extent = c(-112, -101, 33.5, 40.9),
+      ncol = 5,
+      nrow = 5,
+      crs = "EPSG:4326"
+    )
   terra::values(var1) <- seq(-5, 19)
-  terra::add(var1) <- c(var1 ** 2, var1 ** 3)
+  terra::add(var1) <- c(var1**2, var1**3)
   var1 <- rast(
     extent = c(-112, -101, 33.5, 40.9),
     ncol = 5,
@@ -109,7 +114,7 @@ test_that("convert_stobj_to_stdt works well", {
     crs = "EPSG:4326"
   )
   values(var1) <- seq(-5, 19)
-  add(var1) <- c(var1 ** 2, var1 ** 3)
+  add(var1) <- c(var1**2, var1**3)
   names(var1) <- c("2023-11-01", "2023-11-02", "2023-11-03")
   var2 <- rast(
     extent = c(-112, -101, 33.5, 40.9),
@@ -128,20 +133,29 @@ test_that("convert_stobj_to_stdt works well", {
   expect_true(terra::same.crs(stdt_converted$crs_stdt, "EPSG:4326"))
 
   expect_false({
-                any(!(c("lon", "lat", "time") %in%
-                        colnames(stdt_converted$stdt)))})
-  expect_equal({
-                stdt_converted$stdt[
-                                    lon == -106.5 &
-                                      lat == stdt_converted$stdt$lat[37] &
-                                      time == "2023-11-02", var1]},
-  49)
-  expect_equal({
-                stdt_converted$stdt[
-                                    lon == -106.5 &
-                                      lat == stdt_converted$stdt$lat[37] &
-                                      time == "2023-11-02", var2]},
-  9)
+    any(!(c("lon", "lat", "time") %in%
+            colnames(stdt_converted$stdt)))
+  })
+  expect_equal(
+    {
+      stdt_converted$stdt[
+        lon == -106.5 &
+          lat == stdt_converted$stdt$lat[37] &
+          time == "2023-11-02", var1
+      ]
+    },
+    49
+  )
+  expect_equal(
+    {
+      stdt_converted$stdt[
+        lon == -106.5 &
+          lat == stdt_converted$stdt$lat[37] &
+          time == "2023-11-02", var2
+      ]
+    },
+    9
+  )
 
   var1sds <- terra::sds(var1)
   expect_error(convert_stobj_to_stdt(var1sds))
@@ -149,7 +163,6 @@ test_that("convert_stobj_to_stdt works well", {
   # convert stdt to spatrastdataset test
   expect_no_error(sds_from_stdt <- convert_stdt_spatrastdataset(stdt_converted))
   expect_s4_class(sds_from_stdt, "SpatRasterDataset")
-
 })
 
 
@@ -183,46 +196,55 @@ test_that("is_stdt works as expected", {
   expect_error(convert_stdt_spatvect(errstdt2))
   expect_error(convert_stdt_sftime(errstdt2))
   expect_error(convert_stdt_spatrastdataset(errstdt2))
-
-
 })
 
 test_that("check_mysftime works as expected", {
   # open testing data
   stdata <- data.table::fread("../testdata/spacetime_table.csv")
   mysft <- sftime::st_as_sftime(stdata,
-                                coords = c("lon", "lat"),
-                                crs = 4326,
-                                time_column_name = "time")
-  
+    coords = c("lon", "lat"),
+    crs = 4326,
+    time_column_name = "time"
+  )
+
   # should work
   expect_no_error(check_mysftime(x = mysft))
-  
+
   # check that error messages work well
   expect_error(check_mysftime(stdata), "x is not a sftime")
   mysft <- sftime::st_as_sftime(as.data.frame(stdata),
-                                coords = c("lon", "lat"),
-                                crs = 4326,
-                                time_column_name = "time")
-  expect_error(check_mysftime(x = mysft),
-               "x is not inherited from a data.table")
-  mysft <- stdata |> 
+    coords = c("lon", "lat"),
+    crs = 4326,
+    time_column_name = "time"
+  )
+  expect_error(
+    check_mysftime(x = mysft),
+    "x is not inherited from a data.table"
+  )
+  mysft <- stdata |>
     dplyr::rename("date" = time) |>
-    sftime::st_as_sftime(coords = c("lon", "lat"),
-                         crs = 4326,
-                         time_column_name = "date") 
+    sftime::st_as_sftime(
+      coords = c("lon", "lat"),
+      crs = 4326,
+      time_column_name = "date"
+    )
   expect_error(check_mysftime(mysft), "time column should be called time")
-  mysft <- stdata |> 
-    sftime::st_as_sftime(coords = c("lon", "lat"),
-                         crs = 4326,
-                         time_column_name = "time") |>
+  mysft <- stdata |>
+    sftime::st_as_sftime(
+      coords = c("lon", "lat"),
+      crs = 4326,
+      time_column_name = "time"
+    ) |>
     dplyr::rename("geom" = "geometry")
-  expect_error(check_mysftime(mysft),
-               "geometry column should be called geometry")
+  expect_error(
+    check_mysftime(mysft),
+    "geometry column should be called geometry"
+  )
   mysft <- sftime::st_as_sftime(stdata,
-                                   coords = c("lon", "lat"),
-                                   crs = 4326,
-                                   time_column_name = "time")
+    coords = c("lon", "lat"),
+    crs = 4326,
+    time_column_name = "time"
+  )
   pol <- cbind(
     c(39.35, 39.36, 39.36, 39.35, 39.35),
     c(-81.43, -81.43, -81.42, -81.42, -81.43)
@@ -232,8 +254,10 @@ test_that("check_mysftime works as expected", {
   for (i in 1:27) {
     mysft$geometry[i] <- pol
   }
-  expect_error(check_mysftime(mysft),
-               "geometry is not a sfc_POINT")
+  expect_error(
+    check_mysftime(mysft),
+    "geometry is not a sfc_POINT"
+  )
 })
 
 
@@ -241,28 +265,37 @@ test_that("check_mysf works as expected", {
   # open testing data
   stdata <- data.table::fread("../testdata/spacetime_table.csv")
   mysf <- sf::st_as_sf(stdata,
-                                coords = c("lon", "lat"),
-                                crs = 4326)
-  
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+
   # should work
   expect_no_error(check_mysf(x = mysf))
-  
+
   # check that error messages work well
   expect_error(check_mysf(stdata), "x is not a sf")
   mysf <- sf::st_as_sf(as.data.frame(stdata),
-                                coords = c("lon", "lat"),
-                                crs = 4326)
-  expect_error(check_mysf(x = mysf),
-               "x is not inherited from a data.table")
-  mysf <- stdata |> 
-    sf::st_as_sf(coords = c("lon", "lat"),
-                         crs = 4326) |>
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+  expect_error(
+    check_mysf(x = mysf),
+    "x is not inherited from a data.table"
+  )
+  mysf <- stdata |>
+    sf::st_as_sf(
+      coords = c("lon", "lat"),
+      crs = 4326
+    ) |>
     dplyr::rename("geom" = "geometry")
-  expect_error(check_mysf(mysf),
-               "geometry column should be called geometry")
+  expect_error(
+    check_mysf(mysf),
+    "geometry column should be called geometry"
+  )
   mysf <- sf::st_as_sf(stdata,
-                                coords = c("lon", "lat"),
-                                crs = 4326)
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
   pol <- cbind(
     c(39.35, 39.36, 39.36, 39.35, 39.35),
     c(-81.43, -81.43, -81.42, -81.42, -81.43)
@@ -272,8 +305,10 @@ test_that("check_mysf works as expected", {
   for (i in 1:27) {
     mysf$geometry[i] <- pol
   }
-  expect_error(check_mysf(mysf),
-               "geometry is not a sfc_POINT")
+  expect_error(
+    check_mysf(mysf),
+    "geometry is not a sfc_POINT"
+  )
 })
 
 test_that("dt_to_sf works as expected", {

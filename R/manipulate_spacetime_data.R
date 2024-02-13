@@ -129,14 +129,16 @@ is_stdt <- function(obj) {
 #' @author Eva Marques
 #' @export
 check_mysftime <- function(x) {
-  stopifnot("x is not a sftime" = class(x)[1] == "sftime",
-            "x is not inherited from a data.table" =
-              class(x)[3] == "data.table",
-            "time column should be called time" =
-              attributes(x)$time_column == "time",
-            "geometry column should be called geometry" =
-              attributes(x)$sf_column == "geometry",
-            "geometry is not a sfc_POINT" = class(x$geometry)[1] == "sfc_POINT")
+  stopifnot(
+    "x is not a sftime" = class(x)[1] == "sftime",
+    "x is not inherited from a data.table" =
+      class(x)[3] == "data.table",
+    "time column should be called time" =
+      attributes(x)$time_column == "time",
+    "geometry column should be called geometry" =
+      attributes(x)$sf_column == "geometry",
+    "geometry is not a sfc_POINT" = class(x$geometry)[1] == "sfc_POINT"
+  )
 }
 
 #' Check if the sf object is formated on a specific way
@@ -146,12 +148,14 @@ check_mysftime <- function(x) {
 #' @author Eva Marques
 #' @export
 check_mysf <- function(x) {
-  stopifnot("x is not a sf" = class(x)[1] == "sf",
-            "x is not inherited from a data.table" =
-              class(x)[2] == "data.table",
-            "geometry column should be called geometry" =
-              attributes(x)$sf_column == "geometry",
-            "geometry is not a sfc_POINT" = class(x$geometry)[1] == "sfc_POINT")
+  stopifnot(
+    "x is not a sf" = class(x)[1] == "sf",
+    "x is not inherited from a data.table" =
+      class(x)[2] == "data.table",
+    "geometry column should be called geometry" =
+      attributes(x)$sf_column == "geometry",
+    "geometry is not a sfc_POINT" = class(x$geometry)[1] == "sfc_POINT"
+  )
 }
 
 
