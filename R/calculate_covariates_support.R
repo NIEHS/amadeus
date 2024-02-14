@@ -267,6 +267,7 @@ process_bluemarble <- function(
   } else {
     vnp_all <- vnp_assigned[[1]]
   }
+  vnp_all[vnp_all == 65535L] <- NaN
   return(vnp_all)
 }
 

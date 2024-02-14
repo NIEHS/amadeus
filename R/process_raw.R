@@ -62,7 +62,7 @@ process_nlcd_ratio <-
 #' @returns SpatVector object.
 #' @importFrom terra vect
 #' @export
-calc_ecoregion <-
+process_ecoregion <-
   function(
     path = "./input/data/ecoregions/raw/us_eco_l3_state_boundaries.shp"
   ) {

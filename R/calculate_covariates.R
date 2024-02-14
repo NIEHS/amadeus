@@ -3,8 +3,8 @@
 # nocov start
 # nolint start
 #' @param covariate character(1). Covariate type.
-#' @param path character. Single or multiple path strings.
-#' @param sites sf/SpatVector. Unique sites. Should include
+#' @param from character. Single or multiple from strings.
+#' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named \code{id_col}
 #' @param id_col character(1). Name of unique identifier.
 #'  Default is \code{"site_id"}.
@@ -26,8 +26,8 @@ calc_covariates <-
                     "geos", "dummies", "gmted", "roads",
                     "sedac_groads", "nlcd", "tri", "ncep", "aadt",
                     "ecoregions", "ecoregion"),
-      path,
-      sites,
+      from,
+      locs,
       id_col = "site_id",
       ...) {
 
@@ -67,8 +67,8 @@ calc_covariates <-
     res_covariate <-
       tryCatch({
         what_to_run(
-          path = path,
-          sites = sites,
+          from = from,
+          locs = locs,
           id_col = id_col,
           ...
         )
@@ -85,9 +85,9 @@ calc_covariates <-
 # nocov end
 
 #' Calculate Koeppen-Geiger climate zone binary variables
-#' @param path character(1). Path to Koppen-Geiger
+#' @param from character(1). from to Koppen-Geiger
 #'  climate zone raster file
-#' @param sites sf/SpatVector. Unique sites. Should include
+#' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named \code{id_col}
 #' @param id_col character(1). Name of unique identifier.
 #' @returns a data.frame object
@@ -101,20 +101,21 @@ calc_covariates <-
 #' @importFrom terra merge
 #' @importFrom methods is
 #' @export
+# locs (locs), from (from), locs_id (id_col), variables
 calc_koppen_geiger <-
   function(
-      path = "./input/koppen_geiger/raw/Beck_KG_V1_present_0p0083.tif",
-      sites,
-      id_col = "site_id") {
-    ## You will get "sites" in memory after sourcing the file above
-    kg_rast <- terra::rast(path)
-    sites_tr <- sites
+      locs = NULL,
+      from = NULL,
+      locs_id = "site_id",
+      variables = NULL) {
+    ## You will get "locs" in memory after sourcing the file above
+    locs_tr <- locs
 
-    if (!methods::is(sites, "SpatVector")) {
-      sites_tr <- terra::vect(sites)
+    if (!methods::is(locs, "SpatVector")) {
+      locs_tr <- terra::vect(locs)
     }
-    sites_kg <- terra::project(sites_tr, terra::crs(kg_rast))
-    sites_kg_extract <- terra::extract(kg_rast, sites_kg)
+    locs_kg <- terra::project(locs_tr, terra::crs(from))
+    locs_kg_extract <- terra::extract(from, locs_kg)
 
     # The starting value is NA as the color table has 0 value in it
     kg_class <-
@@ -124,44 +125,44 @@ calc_koppen_geiger <-
         "Dsa", "Dsb", "Dsc", "Dsd", "Dwa", "Dwb", "Dwc", "Dwd",
         "Dfa", "Dfb", "Dfc", "Dfd", "ET", "EF"
       )
-    kg_coltab <- terra::coltab(kg_rast)
+    kg_coltab <- terra::coltab(from)
     kg_coltab <- kg_coltab[[1]][seq(1, 31), ]
     kg_colclass <- data.frame(
       value = kg_coltab$value,
       class_kg = kg_class
     )
 
-    sites_kg_extract[[id_col]] <- unlist(sites_kg[[id_col]])
-    colnames(sites_kg_extract)[2] <- "value"
-    sites_kg_extract_e <- merge(sites_kg_extract, kg_colclass, by = "value")
+    locs_kg_extract[[locs_id]] <- unlist(locs_kg[[locs_id]])
+    colnames(locs_kg_extract)[2] <- "value"
+    locs_kg_extract_e <- merge(locs_kg_extract, kg_colclass, by = "value")
 
     # "Dfa": 25
     # "BSh": 6
     # "Dfb": 26
-    id_search <- unlist(sites_kg_extract_e[[id_col]])
+    id_search <- unlist(locs_kg_extract_e[[locs_id]])
     # errorfix: how to generalize and auto-fix it?
-    sites_kg_extract_e[
+    locs_kg_extract_e[
       which(id_search == "44009000788101"),
       "class_kg"
     ] <- "Dfa"
-    sites_kg_extract_e[
+    locs_kg_extract_e[
       which(id_search == "48061200488101"),
       "class_kg"
     ] <- "BSh"
-    sites_kg_extract_e[
+    locs_kg_extract_e[
       which(id_search == "33015001488101"),
       "class_kg"
     ] <- "Dfb"
 
-    sites_kg_extract_e$class_kg <-
-      as.factor(substr(sites_kg_extract_e$class_kg, 1, 1))
-    # currently there are no "E" region in sites.
+    locs_kg_extract_e$class_kg <-
+      as.factor(substr(locs_kg_extract_e$class_kg, 1, 1))
+    # currently there are no "E" region in locs.
     # however, E is filled with all zeros at the moment.
     aelabels <- LETTERS[1:5]
     df_ae_separated <-
       split(aelabels, aelabels) |>
       lapply(function(x) {
-        as.integer(sites_kg_extract_e$class_kg == x)
+        as.integer(locs_kg_extract_e$class_kg == x)
       }) |>
       Reduce(f = cbind, x = _) |>
       as.data.frame()
@@ -169,7 +170,7 @@ calc_koppen_geiger <-
 
     kg_extracted <-
       cbind(
-        site_id = unlist(sites_kg_extract_e[[id_col]]),
+        locs_id = unlist(locs_kg_extract_e[[locs_id]]),
         df_ae_separated
       )
     return(kg_extracted)
@@ -178,12 +179,15 @@ calc_koppen_geiger <-
 
 #' Compute land cover classes ratio in circle buffers around points
 #'
-#' @param path character giving nlcd data path
-#' @param sites terra::SpatVector of points geometry
+#' @param locs terra::SpatVector of points geometry
+#' @param from SpatRaster of NLCD
+#' @param locs_id character(1). Unique identifier of locations
 #' @param radius numeric (non-negative) giving the
 #' radius of buffer around points
 #' @param year numeric giving the year of NLCD data used
+#' @param variables character. Variable names to extract. Ignored.
 #' @importFrom utils read.csv
+#' @importFrom methods is
 #' @importFrom terra rast
 #' @importFrom terra project
 #' @importFrom terra vect
@@ -195,10 +199,11 @@ calc_koppen_geiger <-
 #' @importFrom terra intersect
 #' @importFrom exactextractr exact_extract
 #' @export
-calc_nlcd_ratio <- function(path,
-                            sites,
+calc_nlcd_ratio <- function(locs,
+                            from,
+                            locs_id,
                             radius = 1000,
-                            year = 2021) {
+                            variables = NULL) {
   # check inputs
   if (!is.numeric(radius)) {
     stop("radius is not a numeric.")
@@ -209,39 +214,29 @@ calc_nlcd_ratio <- function(path,
   if (!is.numeric(year)) {
     stop("year is not a numeric.")
   }
-  if (class(sites)[1] != "SpatVector") {
-    stop("sites is not a terra::SpatVector.")
+  if (!methods::is(locs, "SpatVector")) {
+    stop("locs is not a terra::SpatVector.")
   }
-  if (!is.character(path)) {
-    stop("path is not a character.")
+  if (!methods::is(from, "SpatRaster")) {
+    stop("from is not a SpatRaster.")
   }
-  if (!file.exists(path)) {
-    stop("path does not exist.")
-  }
-  # open nlcd file corresponding to the year
-  nlcd_file <- list.files(path,
-                          pattern = paste0("nlcd_", year, "_.*.tif$"),
-                          full.names = TRUE)
-  if (length(nlcd_file) == 0) {
-    stop("NLCD data not available for this year.")
-  }
-  nlcd <- terra::rast(nlcd_file)
+
   # select points within mainland US and reproject on nlcd crs if necessary
   us_main <-
     terra::ext(c(xmin = -127, xmax = -65, ymin = 24, ymax = 51)) |>
     terra::vect() |>
     terra::set.crs("EPSG:4326") |>
-    terra::project(y = terra::crs(sites))
-  data_vect_b <- sites |>
+    terra::project(y = terra::crs(locs))
+  data_vect_b <- locs |>
     terra::intersect(x = us_main)
-  if (!terra::same.crs(data_vect_b, nlcd)) {
-    data_vect_b <- terra::project(data_vect_b, terra::crs(nlcd))
+  if (!terra::same.crs(data_vect_b, from)) {
+    data_vect_b <- terra::project(data_vect_b, terra::crs(from))
   }
   # create circle buffers with buf_radius
   bufs_pol <- terra::buffer(data_vect_b, width = radius) |>
     sf::st_as_sf()
   # ratio of each nlcd class per buffer
-  nlcd_at_bufs <- exactextractr::exact_extract(nlcd,
+  nlcd_at_bufs <- exactextractr::exact_extract(from,
                                                sf::st_geometry(bufs_pol),
                                                fun = "frac",
                                                stack_apply = TRUE,
@@ -250,8 +245,8 @@ calc_nlcd_ratio <- function(path,
   nlcd_at_bufs <- nlcd_at_bufs[names(nlcd_at_bufs)[grepl("frac_",
                                                          names(nlcd_at_bufs))]]
   # change column names
-  fpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
-  nlcd_classes <- utils::read.csv(fpath)
+  cfpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
+  nlcd_classes <- utils::read.csv(cfpath)
   nlcd_names <- names(nlcd_at_bufs)
   nlcd_names <- sub(pattern = "frac_", replacement = "", x = nlcd_names)
   nlcd_names <- as.numeric(nlcd_names)
@@ -265,16 +260,16 @@ calc_nlcd_ratio <- function(path,
   names(nlcd_at_bufs) <- new_names
   # merge data_vect with nlcd class fractions (and reproject)
   new_data_vect <- cbind(data_vect_b, nlcd_at_bufs)
-  new_data_vect <- terra::project(new_data_vect, terra::crs(sites))
+  new_data_vect <- terra::project(new_data_vect, terra::crs(locs))
   return(new_data_vect)
 }
 
 
 #' Calculate EPA Ecoregions level 2/3 binary variables
-#' @param path character(1). Path to Ecoregion Shapefiles
-#' @param sites sf/SpatVector. Unique sites. Should include
-#'  a unique identifier field named \code{id_col}
-#' @param id_col character(1). Name of unique identifier.
+#' @param locs sf/SpatVector. Unique locs. Should include
+#'  a unique identifier field named \code{locs_id}
+#' @param from SpatVector. Ecoregion polygons
+#' @param locs_id character(1). Name of unique identifier.
 #' @returns a data.frame object with dummy variables and attributes of:
 #'   - \code{attr(., "ecoregion2_code")}: Ecoregion lv.2 code and key
 #'   - \code{attr(., "ecoregion3_code")}: Ecoregion lv.3 code and key
@@ -289,26 +284,24 @@ calc_nlcd_ratio <- function(path,
 #' @export
 calc_ecoregion <-
   function(
-    path = "./input/data/ecoregions/raw/us_eco_l3_state_boundaries.shp",
-    sites,
-    id_col = "site_id"
+    locs,
+    from = NULL, 
+    locs_id = "site_id"
   ) {
 
-    if (!methods::is(sites, "SpatVector")) {
-      sites <- terra::vect(sites)
+    if (!methods::is(locs, "SpatVector")) {
+      locs <- terra::vect(locs)
     }
-    ecoreg <- terra::vect(path)
-    ecoreg <- ecoreg[, grepl("^(L2_KEY|L3_KEY)", names(ecoreg))]
 
-    sites <- terra::project(sites, terra::crs(ecoreg))
+    locs <- terra::project(locs, terra::crs(from))
 
-    sites_in <- terra::intersect(sites, ecoreg)
-    sites_out <-
-      sites[!unlist(sites[[id_col]]) %in% unlist(sites_in[[id_col]]), ]
+    locs_in <- terra::intersect(locs, from)
+    locs_out <-
+      locs[!unlist(locs[[locs_id]]) %in% unlist(locs_in[[locs_id]]), ]
 
-    sites_snapped <- terra::snap(sites_out, ecoreg, tolerance = 50)
-    sites_fixed <- rbind(sites_in, sites_snapped)
-    extracted <- terra::extract(ecoreg, sites_fixed)
+    locs_snapped <- terra::snap(locs_out, from, tolerance = 50)
+    locs_fixed <- rbind(locs_in, locs_snapped)
+    extracted <- terra::extract(from, locs_fixed)
 
     # Generate field names from extracted ecoregion keys
     # TODO: if we keep all-zero fields, the initial reference
@@ -345,10 +338,10 @@ calc_ecoregion <-
       as.data.frame()
     colnames(df_lv3) <- key3_num_unique
 
-    sites_ecoreg <- cbind(sites[[id_col]], df_lv2, df_lv3)
-    attr(sites_ecoreg, "ecoregion2_code") <- sort(unique(ecoreg$L2_KEY))
-    attr(sites_ecoreg, "ecoregion3_code") <- sort(unique(ecoreg$L3_KEY))
-    return(sites_ecoreg)
+    locs_ecoreg <- cbind(locs[[locs_id]], df_lv2, df_lv3)
+    attr(locs_ecoreg, "ecoregion2_code") <- sort(unique(from$L2_KEY))
+    attr(locs_ecoreg, "ecoregion3_code") <- sort(unique(from$L3_KEY))
+    return(locs_ecoreg)
   }
 
 
@@ -361,18 +354,17 @@ calc_ecoregion <-
 #' files of scope on the date of interest. Please note that this function
 #' does not provide a function to filter swaths or tiles, so it is strongly
 #' recommended to check and pre-filter the file names at users' discretion.
-#' @param raster SpatRaster.
+#' @param locs SpatVector/sf/sftime object. Locations where MODIS values
+#' are summarized..
+#' @param from SpatRaster. Preprocessed objects.
 #' @param date Date(1). date to query.
-#' @param sites_in SpatVector/sf/sftime object. AQS sites.
 #' @param name_extracted character. Names of calculated covariates.
-#' @param product character(1). Product code of MODIS. Should be one of
-#' \code{c('MOD11A1', 'MOD13A2', 'MOD06_L2', 'VNP46A2', 'MOD09GA', 'MCD19A2')}
-#' @param fun_summary_raster function. Summary function for
+#' @param fun_summary function. Summary function for
 #' multilayer rasters. Passed to \code{foo}. See also
 #' \code{\link[exactextractr]{exact_extract}}
-#' @param id_col character(1). Field name where unique site identifiers
+#' @param locs_id character(1). Field name where unique site identifiers
 #' are stored. Default is `"site_id"`
-#' @param radius numeric. Radius to buffer.
+#' @param radius numeric. Radius to generate circular buffers.
 #' @author Insang Song
 #' @returns A data.frame object.
 #' @importFrom terra extract
@@ -385,35 +377,33 @@ calc_ecoregion <-
 #' @importFrom sf st_drop_geometry
 #' @export
 modis_worker <- function(
-  raster,
-  date,
-  sites_in = NULL,
+  locs = NULL,
+  from = NULL,
+  date = NULL,
   name_extracted = NULL,
-  product = c("MOD11A1", "MOD13A2", "MOD06_L2",
-              "VNP46A2", "MOD09GA", "MCD19A2"),
-  fun_summary_raster = "mean",
-  id_col = "site_id",
+  fun_summary = "mean",
+  locs_id = "site_id",
   radius = 0L
 ) {
-  if (!any(methods::is(sites_in, "SpatVector"),
-           methods::is(sites_in, "sf"),
-           methods::is(sites_in, "sftime"),
-           is_stdt(sites_in))) {
-    stop("sites_in should be one of sf, sftime, stdt, or SpatVector.\n")
+  if (!any(methods::is(locs_in, "SpatVector"),
+           methods::is(locs_in, "sf"),
+           methods::is(locs_in, "sftime"),
+           is_stdt(locs_in))) {
+    stop("locs_in should be one of sf, sftime, stdt, or SpatVector.\n")
   }
-  if (is_stdt(sites_in)) {
-    sites_in <- convert_stdt_spatvect(sites_in)
+  if (is_stdt(locs_in)) {
+    locs_in <- convert_stdt_spatvect(locs_in)
   }
-  if (!methods::is(sites_in, "SpatVector")) {
-    sites_in <- terra::vect(sites_in)
+  if (!methods::is(locs_in, "SpatVector")) {
+    locs_in <- terra::vect(locs_in)
   }
-  if (!id_col %in% names(sites_in)) {
-    stop(sprintf("sites should include columns named %s.\n",
-                 id_col)
+  if (!locs_id %in% names(locs_in)) {
+    stop(sprintf("locs should include columns named %s.\n",
+                 locs_id)
     )
   }
-  if (!"time" %in% names(sites_in)) {
-    sites_in$time <- date
+  if (!"time" %in% names(locs_in)) {
+    locs_in$time <- date
   }
 
   extract_with_buffer <- function(
@@ -427,8 +417,6 @@ modis_worker <- function(
     # generate buffers
     bufs <- terra::buffer(points, width = radius, quadsegs = 180L)
     bufs <- terra::project(bufs, terra::crs(surf))
-    # crop raster (deprecated)
-
     # extract raster values
     surf_at_bufs <-
       exactextractr::exact_extract(
@@ -442,37 +430,31 @@ modis_worker <- function(
       )
     return(surf_at_bufs)
   }
-
   product <- match.arg(product)
 
-  ## internal NaN values 65535 to NaN
-  if (product == "VNP46A2") {
-    raster[raster == 65535L] <- NaN
-  }
   ## NaN to zero
-  raster[is.nan(raster)] <- 0L
+  from[is.nan(from)] <- 0L
 
   # raster used to be vrt_today
   if (any(grepl("00000", name_extracted))) {
-    sites_tr <- terra::project(sites_in, terra::crs(raster))
-    extracted <- terra::extract(x = raster, y = sites_tr, ID = FALSE)
-    sites_blank <- as.data.frame(sites_in)
-    extracted <- cbind(sites_blank, extracted)
+    locs_tr <- terra::project(locs_in, terra::crs(from))
+    extracted <- terra::extract(x = from, y = locs_tr, ID = FALSE)
+    locs_blank <- as.data.frame(locs_in)
+    extracted <- cbind(locs_blank, extracted)
   } else {
     extracted <-
       extract_with_buffer(
-        points = sites_in,
-        surf = raster,
-        id = id_col,
+        points = locs,
+        surf = from,
+        id = locs_id,
         radius = radius,
-        func = fun_summary_raster
+        func = fun_summary
       )
   }
-
   # cleaning names
   # assuming that extracted is a data.frame
   #extracted$time <- date
-  name_offset <- terra::nlyr(raster)
+  name_offset <- terra::nlyr(from)
   # multiple columns will get proper names
   name_range <- seq(ncol(extracted) - name_offset + 1, ncol(extracted), 1)
   colnames(extracted)[name_range] <- name_extracted
@@ -493,10 +475,10 @@ modis_worker <- function(
 #' can handle concurrent access to the (network) disk by multiple processes.
 #' File system characteristics, package versions, and hardware settings/
 #' specification can affect the processing efficiency.
-#' @param path character. List of HDF files.
+#' @param from character. List of HDF files.
 #' @param product character(1). MODIS product. Should be one of
 #' \code{c("MOD11A1", "MOD13A2", "MOD06_L2", "VNP46A2", "MOD09GA", "MCD19A2")}
-#' @param sites sf object. Unique sites where covariates
+#' @param locs sf object. Unique locs where covariates
 #' will be calculated.
 #' @param id_col character(1). Site identifier. Default is `"site_id"`
 #' @param name_covariates character. Name header of covariates.
@@ -521,7 +503,7 @@ modis_worker <- function(
 #'  are the default packages to be loaded.
 #' @param export_list_add character. A vector with object names to export
 #'  to each thread. It should be minimized to spare memory.
-#' @description sites should be sf object as it is exportable to
+#' @description locs should be sf object as it is exportable to
 #' parallel workers.
 #' @note See details for setting parallelization
 #' \code{\link[foreach]{foreach}},
@@ -543,10 +525,10 @@ modis_worker <- function(
 #' @export
 calc_modis <-
   function(
-    path,
+    from,
     product = c("MOD11A1", "MOD13A2", "MOD06_L2",
                 "VNP46A2", "MOD09GA", "MCD19A2"),
-    sites,
+    locs,
     id_col = "site_id",
     name_covariates,
     radius = c(0L, 1e3L, 1e4L, 5e4L),
@@ -558,14 +540,14 @@ calc_modis <-
   ) {
     product <- match.arg(product)
     dates_available <-
-      regmatches(path, regexpr("A20\\d{2,2}[0-3]\\d{2,2}", path))
+      regmatches(from, regexpr("A20\\d{2,2}[0-3]\\d{2,2}", from))
     dates_available <- unique(dates_available)
     dates_available <- sub("A", "", dates_available)
 
-    sites_input <- try(sf::st_as_sf(sites), silent = TRUE)
-    if (inherits(sites_input, "try-error")) {
-      stop("sites cannot be convertible to sf.
-      Please convert sites into a sf object to proceed.\n")
+    locs_input <- try(sf::st_as_sf(locs), silent = TRUE)
+    if (inherits(locs_input, "try-error")) {
+      stop("locs cannot be convertible to sf.
+      Please convert locs into a sf object to proceed.\n")
     }
 
     export_list <- c()
@@ -606,7 +588,7 @@ calc_modis <-
         if (product == "VNP46A2") {
           vrt_today <-
             modis_preprocess_vnp46(
-              paths = path,
+              froms = from,
               date_in = day_to_pick,
               # upper level subdataset is ignored
               subdataset = 3L,
@@ -615,12 +597,12 @@ calc_modis <-
         } else if (product == "MOD06_L2") {
           vrt_today <-
             modis_mosaic_mod06(
-                               paths = path,
+                               froms = from,
                                date_in = day_to_pick)
         } else {
           vrt_today <-
             modis_get_vrt(
-                          paths = path,
+                          froms = from,
                           regex_sds = subdataset,
                           product = product,
                           date_in = day_to_pick)
@@ -643,7 +625,7 @@ calc_modis <-
                   modis_worker(
                     raster = vrt_today,
                     date = as.character(day_to_pick),
-                    sites_in = sites_input,
+                    locs_in = locs_input,
                     product = product,
                     fun_summary_raster = fun_summary,
                     name_extracted = name_radius,
@@ -656,7 +638,7 @@ calc_modis <-
                   sprintf("%s%05d",
                           name_covariates,
                           radius[k])
-                error_df <- sf::st_drop_geometry(sites_input)
+                error_df <- sf::st_drop_geometry(locs_input)
                 if (!"time" %in% names(error_df)) {
                   error_df$time <- day_to_pick
                 }
@@ -684,7 +666,7 @@ calc_modis <-
 
 
 #' Calculate temporal dummy variables
-#' @param sites data.frame with a temporal field named `"time"`
+#' @param locs data.frame with a temporal field named `"time"`
 #'  see \code{\link{convert_stobj_to_stdt}}
 #' @param id_col character(1). Unique site identifier column name.
 #'  Default is `"site_id"`.
@@ -699,15 +681,15 @@ calc_modis <-
 #' @export
 calc_temporal_dummies <-
   function(
-    sites,
+    locs,
     id_col = "site_id",
     domain_year = seq(2018L, 2022L)
   ) {
-    if (!methods::is(sites, "data.frame")) {
-      stop("Argument sites is not a data.frame.\n")
+    if (!methods::is(locs, "data.frame")) {
+      stop("Argument locs is not a data.frame.\n")
     }
-    if (!"time" %in% names(sites)) {
-      stop("A mandatory field 'time' does not exist in sites.\n")
+    if (!"time" %in% names(locs)) {
+      stop("A mandatory field 'time' does not exist in locs.\n")
     }
     id_col <- id_col
     dummify <- function(vec, domain) {
@@ -724,14 +706,14 @@ calc_temporal_dummies <-
     }
 
     # year
-    vec_year <- data.table::year(sites$time)
+    vec_year <- data.table::year(locs$time)
     dt_year_dum <- dummify(vec_year, domain_year)
     # should the last year be the present year or 2022?
     colnames(dt_year_dum) <-
       sprintf("DUM_Y%d_0_00000", domain_year)
 
     # month
-    vec_month <- data.table::month(sites$time)
+    vec_month <- data.table::month(locs$time)
     dt_month_dum <- dummify(vec_month, seq(1L, 12L))
     shortmn <-
       c("JANUA", "FEBRU", "MARCH", "APRIL",
@@ -741,27 +723,27 @@ calc_temporal_dummies <-
       sprintf("DUM_%s_0_00000", shortmn)
 
     # weekday (starts from 1-Monday)
-    vec_wday <- as.POSIXlt(sites$time)$wday
+    vec_wday <- as.POSIXlt(locs$time)$wday
     dt_wday_dum <- dummify(vec_wday, seq(1L, 7L))
     colnames(dt_wday_dum) <-
       sprintf("DUM_WKDY%d_0_00000", seq(1L, 7L))
 
     # column binding
-    sites_dums <-
+    locs_dums <-
       cbind(
-        sites,
+        locs,
         dt_year_dum,
         dt_month_dum,
         dt_wday_dum
       )
 
-    return(sites_dums)
+    return(locs_dums)
   }
 
 
 #' Calculate TRI covariates
-#' @param path character(1). Path to the directory with TRI CSV files
-#' @param sites stdt/sf/SpatVector/data.frame. Unique sites
+#' @param from character(1). from to the directory with TRI CSV files
+#' @param locs stdt/sf/SpatVector/data.frame. Unique locs
 #' see \code{\link{convert_stobj_to_stdt}}
 #' @param id_col character(1). Unique site identifier column name.
 #'  Default is `"site_id"`.
@@ -769,7 +751,7 @@ calc_temporal_dummies <-
 #'  Default is \code{seq(2018L, 2022L)}
 #' @param radius Circular buffer radius.
 #' Default is \code{c(1000, 10000, 50000)} (meters)
-#' @param sites_epsg character(1). Coordinate system of sites.
+#' @param locs_epsg character(1). Coordinate system of locs.
 #' @author Insang Song, Mariana Kassien
 #' @returns A data.frame object.
 #' @note U.S. context.
@@ -791,32 +773,32 @@ calc_temporal_dummies <-
 #' @importFrom tidyr pivot_wider
 #' @export
 calc_tri <- function(
-  path = "./input/tri/",
-  sites,
+  from = "./input/tri/",
+  locs,
   id_col = "site_id",
   domain_year = seq(2018L, 2022L),
   radius = c(1e3L, 1e4L, 5e4L),
-  sites_epsg = "EPSG:4326"
+  locs_epsg = "EPSG:4326"
 ) {
-  if (is_stdt(sites)) {
-    sites <- sites$stdt
-    sites_epsg <- sites$crs_dt
+  if (is_stdt(locs)) {
+    locs <- locs$stdt
+    locs_epsg <- locs$crs_dt
   } else {
-    if (!all(c("lon", "lat", "time") %in% names(sites))) {
-      stop("sites should be stdt or 
+    if (!all(c("lon", "lat", "time") %in% names(locs))) {
+      stop("locs should be stdt or 
       have 'lon', 'lat', and 'time' fields.\n")
     }
-    sites_epsg <- terra::crs(sites)
-    if (!methods::is(sites, "SpatVector")) {
-      if (methods::is(sites, "sf")) {
-        sites <- terra::vect(sites)
+    locs_epsg <- terra::crs(locs)
+    if (!methods::is(locs, "SpatVector")) {
+      if (methods::is(locs, "sf")) {
+        locs <- terra::vect(locs)
       }
-      if (is.data.frame(sites)) {
-        sites <-
-          terra::vect(sites,
+      if (is.data.frame(locs)) {
+        locs <-
+          terra::vect(locs,
                       geom = c("lon", "lat"),
                       keepgeom = TRUE,
-                      crs = sites_epsg)
+                      crs = locs_epsg)
       }
     }
   }
@@ -824,9 +806,9 @@ calc_tri <- function(
     stop("radius should be numeric.\n")
   }
 
-  csvs_tri_path <-
-    list.files(path = path, pattern = "*.csv$", full.names = TRUE)
-  csvs_tri <- lapply(csvs_tri_path, read.csv)
+  csvs_tri_from <-
+    list.files(from = from, pattern = "*.csv$", full.names = TRUE)
+  csvs_tri <- lapply(csvs_tri_from, read.csv)
   col_sel <- c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49)
   csvs_tri <- data.table::rbindlist(csvs_tri)
   dt_tri <- csvs_tri[, col_sel, with = FALSE]
@@ -873,19 +855,19 @@ calc_tri <- function(
                 crs = "EPSG:4269", # all are NAD83
                 keepgeom = TRUE)
   # spvect_tri$to_id <- seq(1, nrow(spvect_tri))
-  sites_re <- terra::project(sites, terra::crs(spvect_tri))
+  locs_re <- terra::project(locs, terra::crs(spvect_tri))
 
   YEAR <- NULL
   from_id <- NULL
   buffer <- NULL
 
   # strategy: year-buffer
-  # split by year: sites and tri locations
-  list_sites <- split(sites_re, unlist(sites_re[["time"]]))
+  # split by year: locs and tri locations
+  list_locs <- split(locs_re, unlist(locs_re[["time"]]))
   list_tri <- split(spvect_tri, unlist(spvect_tri[["YEAR"]]))
 
   # mapply and inner lapply
-  list_sites_tri <-
+  list_locs_tri <-
     mapply(
       function(sts, tri) {
         list_buffer <- split(radius, radius)
@@ -893,16 +875,16 @@ calc_tri <- function(
           lapply(list_buffer,
                 function(x) {
                   tri_df <- as.data.frame(tri)
-                  sites_tri_near <-
+                  locs_tri_near <-
                     terra::nearby(sts, tri, distance = x)
-                  sites_tri_near <- as.data.frame(sites_tri_near)
-                  sites_tri_near$from_id <-
-                    unlist(sts[[id_col]])[sites_tri_near$from_id]
-                  sites_tri_near_e <-
-                    cbind(sites_tri_near, tri_df[sites_tri_near$to_id, ])
-                  sites_tri_near_e$buffer <- x
-                  print(names(sites_tri_near_e))
-                  sites_tri_s <- sites_tri_near_e |>
+                  locs_tri_near <- as.data.frame(locs_tri_near)
+                  locs_tri_near$from_id <-
+                    unlist(sts[[id_col]])[locs_tri_near$from_id]
+                  locs_tri_near_e <-
+                    cbind(locs_tri_near, tri_df[locs_tri_near$to_id, ])
+                  locs_tri_near_e$buffer <- x
+                  print(names(locs_tri_near_e))
+                  locs_tri_s <- locs_tri_near_e |>
                     as.data.frame() |>
                     dplyr::group_by(YEAR, from_id, buffer) |>
                     dplyr::summarize(
@@ -912,15 +894,15 @@ calc_tri <- function(
                       )
                     ) |>
                     dplyr::ungroup()
-                  return(sites_tri_s)
+                  return(locs_tri_s)
                 })
         df_buffer <- data.table::rbindlist(list_buffer)
         return(df_buffer)
       },
-      list_sites, list_tri, SIMPLIFY = FALSE
+      list_locs, list_tri, SIMPLIFY = FALSE
     ) 
 
-  df_tri <- data.table::rbindlist(list_sites_tri)
+  df_tri <- data.table::rbindlist(list_locs_tri)
 
   return(df_tri)
 }
@@ -930,17 +912,17 @@ calc_tri <- function(
 #' @description NEI data comprises multiple csv files where emissions of
 #' 50+ pollutants are recorded at county level. With raw data files,
 #' this function will join a combined table of NEI data and county
-#' boundary, then perform a spatial join to the sites.
-#' @param path character(1). Path to the directory with NEI CSV files
-#' @param sites stdt/sf/SpatVector/data.frame. Unique sites.
+#' boundary, then perform a spatial join to the locs.
+#' @param from character(1). from to the directory with NEI CSV files
+#' @param locs stdt/sf/SpatVector/data.frame. Unique locs.
 #' See [`convert_stobj_to_stdt`] for details of `stdt`
 #' @param id_col character(1). Unique site identifier column name.
 #'  Default is `"site_id"`. It is no more than a placeholder
 #' in this function
 #' @param year integer(1). Data year.
 #'  Currently only accepts `c(2017, 2020)`
-#' @param county_shp character(1). Path to county boundary file.
-#' @param sites_epsg character(1). Coordinate system of sites.
+#' @param county_shp character(1). from to county boundary file.
+#' @param locs_epsg character(1). Coordinate system of locs.
 #' @author Insang Song, Ranadeep Daw
 #' @returns A data.frame object.
 #' @importFrom terra vect
@@ -951,38 +933,38 @@ calc_tri <- function(
 #' @importFrom data.table rbindlist
 #' @export
 calc_nei <- function(
-  path = "./input/nei/",
-  sites,
+  from = "./input/nei/",
+  locs,
   id_col = "site_id",
   year = 2017,
   county_shp = NULL,
-  sites_epsg = "EPSG:4326"
+  locs_epsg = "EPSG:4326"
 ) {
-  if (is_stdt(sites)) {
-    # sites <- sites$stdt
-    # sites_epsg <- sites$crs_stdt
-    sites <- convert_stdt_spatvect(sites)
+  if (is_stdt(locs)) {
+    # locs <- locs$stdt
+    # locs_epsg <- locs$crs_stdt
+    locs <- convert_stdt_spatvect(locs)
   } else {
-    if (!all(c("lon", "lat", "time") %in% colnames(sites))) {
-      stop("sites should be stdt or 
+    if (!all(c("lon", "lat", "time") %in% colnames(locs))) {
+      stop("locs should be stdt or 
       have 'lon', 'lat', and 'time' fields.\n")
     }
-    if (!methods::is(sites, "SpatVector")) {
-      if (methods::is(sites, "sf")) {
-        sites <- terra::vect(sites)
+    if (!methods::is(locs, "SpatVector")) {
+      if (methods::is(locs, "sf")) {
+        locs <- terra::vect(locs)
       }
-      if (is.data.frame(sites)) {
-        sites <-
-          terra::vect(sites,
+      if (is.data.frame(locs)) {
+        locs <-
+          terra::vect(locs,
             geom = c("lon", "lat"),
             keepgeom = TRUE,
-            crs = sites_epsg
+            crs = locs_epsg
           )
       }
     }
   }
   if (is.null(county_shp)) {
-    stop("county_shp should be provided. Put the right path to the
+    stop("county_shp should be provided. Put the right from to the
     county boundary file.")
   }
   if (!year %in% c(2017, 2020)) {
@@ -990,7 +972,7 @@ calc_nei <- function(
   }
 
   # Concatenate NEI csv files
-  csvs_nei <- list.files(path = path, pattern = "*.csv$", full.names = TRUE)
+  csvs_nei <- list.files(from = from, pattern = "*.csv$", full.names = TRUE)
   csvs_nei <- lapply(csvs_nei, data.table::fread)
   csvs_nei <- data.table::rbindlist(csvs_nei)
 
@@ -1033,8 +1015,8 @@ calc_nei <- function(
   names(cnty_vect)[3] <- sub("NP", yearabbr, names(cnty_vect)[3])
 
   # spatial join
-  sites_re <- terra::project(sites, terra::crs(cnty_vect))
-  sites_re <- terra::intersect(sites_re, cnty_vect)
+  locs_re <- terra::project(locs, terra::crs(cnty_vect))
+  locs_re <- terra::intersect(locs_re, cnty_vect)
 
-  return(sites_re)
+  return(locs_re)
 }
