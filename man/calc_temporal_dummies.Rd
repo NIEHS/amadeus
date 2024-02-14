@@ -5,19 +5,21 @@
 \title{Calculate temporal dummy variables}
 \usage{
 calc_temporal_dummies(
-  sites,
-  id_col = "site_id",
-  domain_year = seq(2018L, 2022L)
+  locs,
+  from = NULL,
+  locs_id = "site_id",
+  year = seq(2018L, 2022L)
 )
 }
 \arguments{
-\item{sites}{data.frame with a temporal field named \code{"time"}
-see \code{\link{convert_stobj_to_stdt}}}
+\item{locs}{data.frame with a temporal field named \code{"time"}}
 
-\item{id_col}{character(1). Unique site identifier column name.
+\item{from}{not used.}
+
+\item{locs_id}{character(1). Unique site identifier column name.
 Default is \code{"site_id"}.}
 
-\item{domain_year}{integer. Year domain to dummify.
+\item{year}{integer. Year domain to dummify.
 Default is \code{seq(2018L, 2022L)}}
 }
 \value{

@@ -36,6 +36,9 @@ grids, which require warping/rectifying the original curvilinear grids
 into rectilinear grids. The function internally warps each of inputs
 then mosaic the warped images into one large SpatRaster object.
 }
+\seealso{
+\link{process_modis_warp}
+}
 \author{
 Insang Song
 }

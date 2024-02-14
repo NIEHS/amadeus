@@ -333,6 +333,7 @@ process_modis_warp <-
 #' e.g., `:mod06:`
 #' @param resolution numeric(1). Resolution of output raster.
 #' Unit is degree.
+#' @seealso [process_modis_warp]
 #' @returns SpatRaster object. CRS is `"EPSG:4326"`.
 #' @author Insang Song
 #' @importFrom terra rast

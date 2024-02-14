@@ -5,19 +5,20 @@
 \title{Calculate Koeppen-Geiger climate zone binary variables}
 \usage{
 calc_koppen_geiger(
-  path = "./input/koppen_geiger/raw/Beck_KG_V1_present_0p0083.tif",
-  sites,
-  id_col = "site_id"
+  locs = NULL,
+  from = NULL,
+  locs_id = "site_id",
+  variables = NULL
 )
 }
 \arguments{
-\item{path}{character(1). Path to Koppen-Geiger
-climate zone raster file}
-
-\item{sites}{sf/SpatVector. Unique sites. Should include
+\item{locs}{sf/SpatVector. Unique locs. Should include
 a unique identifier field named \code{id_col}}
 
-\item{id_col}{character(1). Name of unique identifier.}
+\item{from}{character(1). from to Koppen-Geiger
+climate zone raster file}
+
+\item{locs_id}{character(1). Name of unique identifier.}
 }
 \value{
 a data.frame object

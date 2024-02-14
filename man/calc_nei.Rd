@@ -4,40 +4,22 @@
 \alias{calc_nei}
 \title{Calculate National Emission Inventory (NEI) covariates}
 \usage{
-calc_nei(
-  path = "./input/nei/",
-  sites,
-  id_col = "site_id",
-  year = 2017,
-  county_shp = NULL,
-  sites_epsg = "EPSG:4326"
-)
+calc_nei(locs, from = NULL, locs_id = "site_id")
 }
 \arguments{
-\item{path}{character(1). Path to the directory with NEI CSV files}
+\item{locs}{sf/SpatVector. Locations at NEI values are joined.}
 
-\item{sites}{stdt/sf/SpatVector/data.frame. Unique sites.
-See \code{\link{convert_stobj_to_stdt}} for details of \code{stdt}}
+\item{from}{character(1). from to the directory with NEI CSV files}
 
-\item{id_col}{character(1). Unique site identifier column name.
+\item{locs_id}{character(1). Unique site identifier column name.
 Default is \code{"site_id"}. It is no more than a placeholder
 in this function}
-
-\item{year}{integer(1). Data year.
-Currently only accepts \code{c(2017, 2020)}}
-
-\item{county_shp}{character(1). Path to county boundary file.}
-
-\item{sites_epsg}{character(1). Coordinate system of sites.}
 }
 \value{
 A data.frame object.
 }
 \description{
-NEI data comprises multiple csv files where emissions of
-50+ pollutants are recorded at county level. With raw data files,
-this function will join a combined table of NEI data and county
-boundary, then perform a spatial join to the sites.
+Calculate National Emission Inventory (NEI) covariates
 }
 \author{
 Insang Song, Ranadeep Daw

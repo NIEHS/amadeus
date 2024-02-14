@@ -8,21 +8,21 @@ calc_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
     "dummies", "gmted", "roads", "sedac_groads", "nlcd", "tri", "ncep", "aadt",
     "ecoregions", "ecoregion"),
-  path,
-  sites,
-  id_col = "site_id",
+  locs,
+  from,
+  locs_id = "site_id",
   ...
 )
 }
 \arguments{
 \item{covariate}{character(1). Covariate type.}
 
-\item{path}{character. Single or multiple path strings.}
-
-\item{sites}{sf/SpatVector. Unique sites. Should include
+\item{locs}{sf/SpatVector. Unique locs. Should include
 a unique identifier field named \code{id_col}}
 
-\item{id_col}{character(1). Name of unique identifier.
+\item{from}{character. Single or multiple from strings.}
+
+\item{locs_id}{character(1). Name of unique identifier.
 Default is \code{"site_id"}.}
 
 \item{...}{Arguments passed to each covariate calculation
