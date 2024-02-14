@@ -22,7 +22,7 @@
 #' * \link{download_narr_monolevel_data}: "narr_monolevel", "monolevel"
 #' * \link{download_narr_p_levels_data}: "narr_p_levels", "p_levels", "plevels"
 #' * \link{download_nlcd_data}: "nlcd", "NLCD"
-#' * \link{download_noaa_hms_smoke_data}: "noaa", "smoke", "hms"
+#' * \link{download_hms_data}: "noaa", "smoke", "hms"
 #' * \link{download_sedac_groads_data}: "sedac_groads", "groads"
 #' * \link{download_sedac_population_data}: "sedac_population", "population"
 #' * \link{download_modis_data}: "modis", "MODIS"
@@ -61,9 +61,9 @@ download_data <-
       p_levels = download_narr_p_levels_data,
       plevels = download_narr_p_levels_data,
       nlcd = download_nlcd_data,
-      noaa = download_noaa_hms_smoke_data,
-      smoke = download_noaa_hms_smoke_data,
-      hms = download_noaa_hms_smoke_data,
+      noaa = download_hms_data,
+      smoke = download_hms_data,
+      hms = download_hms_data,
       sedac_groads = download_sedac_groads_data,
       groads = download_sedac_groads_data,
       sedac_population = download_sedac_population_data,
@@ -582,13 +582,13 @@ download_gmted_data <- function(
     "/downloads/GMTED/Grid_ZipFiles/"
   )
   #### 7. define URL statistic code
-  statistic_code <- gmted_codes(
+  statistic_code <- process_gmted_codes(
     statistic,
     statistic_code = TRUE,
     invert = FALSE
   )
   #### 8. define URL resolution code
-  resolution_code <- gmted_codes(
+  resolution_code <- process_gmted_codes(
     resolution,
     resolution_code = TRUE,
     invert = FALSE
@@ -1671,7 +1671,7 @@ download_sedac_population_data <- function(
 # nolint start
 #' Download daily wildfire smoke plume data from NOAA Hazard Mapping System Fire and Smoke Product
 #' @description
-#' The \code{download_noaa_hms_smoke_data()} function accesses and downloads
+#' The \code{download_hms_data()} function accesses and downloads
 #' wildfire smoke plume coverage data from
 #' the National Oceanic and Atmospheric Administration's (NOAA)
 #' [Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0).
@@ -1706,7 +1706,7 @@ download_sedac_population_data <- function(
 #' @author Mitchell Manware, Insang Song
 #' @return NULL;
 #' @export
-download_noaa_hms_smoke_data <- function(
+download_hms_data <- function(
     date_start = "2023-09-01",
     date_end = "2023-09-01",
     data_format = "Shapefile",
