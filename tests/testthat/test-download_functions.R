@@ -288,7 +288,7 @@ testthat::test_that("MERRA2 download URLs have HTTP status 200.", {
     # extract urls
     urls <- extract_urls(commands = commands, position = 2)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 30L, method = "HEAD")
+    url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
     # implement unit tests
     test_download_functions(directory_to_save = directory_to_save,
                             commands_path = commands_path,

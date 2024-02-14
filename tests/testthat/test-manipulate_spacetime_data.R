@@ -200,7 +200,8 @@ test_that("is_stdt works as expected", {
 
 test_that("check_mysftime works as expected", {
   # open testing data
-  stdata <- data.table::fread("../testdata/spacetime_table.csv")
+  stdata <- data.table::fread(paste0(testthat::test_path("..", "testdata/"),
+                                     "spacetime_table.csv"))
   mysft <- sftime::st_as_sftime(stdata,
     coords = c("lon", "lat"),
     crs = 4326,
@@ -263,7 +264,8 @@ test_that("check_mysftime works as expected", {
 
 test_that("check_mysf works as expected", {
   # open testing data
-  stdata <- data.table::fread("../testdata/spacetime_table.csv")
+  stdata <- data.table::fread(paste0(testthat::test_path("..", "testdata/"),
+                                     "spacetime_table.csv"))
   mysf <- sf::st_as_sf(stdata,
     coords = c("lon", "lat"),
     crs = 4326
