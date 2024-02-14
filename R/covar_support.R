@@ -1,73 +1,73 @@
 #' Create circular buffer around site points.
-#' @param sites SpatVector(1). SpatVector object with point geometry
-#' @param buffer integer(1). Circular buffer size (meters).
-#' @description Creates a circular buffer around points if `buffer` is > 0.
-#' Returns points if `buffer` is 0.
+#' @param locs SpatVector(1). SpatVector object with point geometry
+#' @param radius integer(1). Circular buffer size (meters).
+#' @description Creates a circular buffer around points if `radius` is > 0.
+#' Returns points if `radius` is 0.
 #' @returns SpatVector.
 #' @importFrom terra buffer
 #' @export
-sites_buffer <-
+process_locs_radius <-
   function(
-    sites,
-    buffer
+    locs,
+    radius
   ) {
     cat(paste0(
       "Utilizing ",
-      buffer,
+      radius,
       " meter buffer for covariate calculations.\n"
     ))
-    if (buffer == 0) {
-      return(sites)
-    } else if (buffer > 0) {
+    if (radius == 0) {
+      return(locs)
+    } else if (radius > 0) {
       sites_buffer <- terra::buffer(
-        sites,
-        buffer
+        locs,
+        radius
       )
       return(sites_buffer)
     }
   }
 
 #' Import and prepare site point locations for covariate calculations.
-#' @param sites data.frame(1). Data frame containing columns for unique
+#' @param locs data.frame(1). Data frame containing columns for unique
 #' identifier, latitute, and longitude. Latitude and longitude columns **must**
 #' be named "lat" and "lon", respectively.
 #' @param crs Coordinate reference system (CRS) description utilizing
 #' `terra::crs()`.
-#' @param buffer integer(1). Circular buffer size (meters).
+#' @param radius integer(1). Circular buffer size (meters).
 #' @returns SpatVector
 #' @importFrom terra crs
 #' @importFrom terra vect
 #' @importFrom terra project
 #' @export
-sites_vector <-
+process_locs_vector <-
   function(
-    sites,
+    locs,
     crs,
-    buffer
+    radius
   ) {
     #### sites as data frame
-    if ("data.table" %in% class(sites)) {
+    if ("data.table" %in% class(locs)) {
       cat(paste0(
         "Converting data.table to data.frame...\n"
       ))
-      sites_df <- data.frame(sites)
-    } else if (class(sites) == "data.frame") {
+      sites_df <- data.frame(locs)
+    } else if (class(locs) == "data.frame") {
       cat(paste0(
         "Sites are class data.frame...\n"
       ))
-      sites_df <- sites
-    } else if (!(class(sites) == "data.frame") ||
-        "data.table" %in% class(sites)) {
+      sites_df <- locs
+    } else if (!(class(locs) == "data.frame") ||
+        "data.table" %in% class(locs)) {
       stop(
         paste0(
           "Detected a ",
-          class(sites)[1],
+          class(locs)[1],
           " object. Sites must be class data.frame or data.table.\n"
         )
       )
     }
     #### columns
-    if (any(!(c("lon", "lat") %in% colnames(sites)))) {
+    if (any(!(c("lon", "lat") %in% colnames(locs)))) {
       stop(paste0(
         "Sites data is missing 'lon', 'lat', or both.\n"
       ))
@@ -87,9 +87,9 @@ sites_vector <-
       crs
     )
     #### buffer SpatVector
-    sites_b <- sites_buffer(
+    sites_b <- process_locs_radius(
       sites_p,
-      buffer
+      radius
     )
     return(sites_b)
   }

@@ -8,7 +8,7 @@
 #' (YYYYMoMoDDHHMiMi) based on provided file path(s).
 #' @return character
 #' @export
-geos_strsplit <-
+process_geos_collection <-
   function(
       path,
       collection = FALSE,
@@ -99,7 +99,7 @@ geos_strsplit <-
 #' @param resolution logical(1). Matches resolution to resolution code.
 #' @return character
 #' @export
-gmted_codes <-
+process_gmted_codes <-
   function(
       string,
       statistic = FALSE,

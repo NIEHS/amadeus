@@ -6,26 +6,25 @@
 #' @param date_end character(1). length of 10. End date of downloaded data.
 #' Format YYYY-MM-DD (ex. September 10, 2023 = "2023-09-10").
 #' @param variable character(1). "Light", "Medium", or "Heavy".
-#' @param directory_with_data character(1). Directory with downloaded NOAA HMS
-#' data files.
+#' @param path character(1). Directory with downloaded NOAA HMS data files.
 #' @author Mitchell Manware.
 #' @return a SpatVector object;
 #' @importFrom terra vect
 #' @importFrom terra aggregate
 #' @importFrom terra subset
 #' @export
-import_hms <- function(
+process_hms <- function(
     date_start = "2018-01-01",
     date_end = "2018-01-01",
     variable = c("Light", "Medium", "Heavy"),
-    directory_with_data = "./input/noaa_hms/raw/") {
+    path = "./input/noaa_hms/raw/") {
   #### directory setup
-  directory_with_data <- download_sanitize_path(directory_with_data)
+  path <- download_sanitize_path(path)
   #### check for variable
   check_for_null_parameters(mget(ls()))
   #### identify file paths
   paths <- list.files(
-    directory_with_data,
+    path,
     pattern = "hms_smoke",
     full.names = TRUE
   )
@@ -165,17 +164,17 @@ import_hms <- function(
 #' @param variable vector(1). Vector containing the GMTED statistic first and
 #' the resolution second. (Example: variable = c("Breakline Emphasis",
 #' "7.5 arc-seconds")).
-#' @param directory_with_data character(1). Directory with downloaded GEOS-CF
+#' @param path character(1). Directory with downloaded GEOS-CF
 #' the "*_grd" folder containing .adf files.
 #' @author Mitchell Manware
 #' @return a SpatRaster object
 #' @importFrom terra rast
 #' @export
-import_gmted <- function(
+process_gmted <- function(
     variable = NULL,
-    directory_with_data = "../../data/covariates/gmted/") {
+    path = "../../data/covariates/gmted/") {
   #### directory setup
-  directory_with_data <- download_sanitize_path(directory_with_data)
+  path <- download_sanitize_path(path)
   #### check for variable
   check_for_null_parameters(mget(ls()))
   #### check for length of variable
@@ -188,13 +187,13 @@ import_gmted <- function(
   }
   #### identify statistic and resolution
   statistic <- variable[1]
-  statistic_code <- gmted_codes(
+  statistic_code <- process_gmted_codes(
     statistic,
     statistic = TRUE,
     invert = FALSE
   )
   resolution <- variable[2]
-  resolution_code <- gmted_codes(
+  resolution_code <- process_gmted_codes(
     resolution,
     resolution = TRUE,
     invert = FALSE
@@ -208,7 +207,7 @@ import_gmted <- function(
   ))
   #### identify file path
   paths <- list.files(
-    directory_with_data,
+    path,
     full.names = TRUE
   )
   #### select only the folder containing data
@@ -240,24 +239,24 @@ import_gmted <- function(
 #' @param date_start character(1). length of 10. Format "YYYY-MM-DD".
 #' @param date_end character(1). length of 10. Format "YYYY-MM-DD".
 #' @param variable character(1). NARR variable name(s).
-#' @param directory_with_data character(1). Directory with downloaded GEOS-CF
+#' @param path character(1). Directory with downloaded GEOS-CF
 #' netCDF files.
 #' @author Mitchell Manware
 #' @return a SpatRaster object
 #' @importFrom terra rast
 #' @export
-import_narr <- function(
+process_narr <- function(
     date_start = "2023-09-01",
     date_end = "2023-09-01",
     variable = NULL,
-    directory_with_data = "../../data/covariates/narr/") {
+    path = "../../data/covariates/narr/") {
   #### directory setup
-  directory_with_data <- download_sanitize_path(directory_with_data)
+  path <- download_sanitize_path(path)
   #### check for variable
   check_for_null_parameters(mget(ls()))
   #### identify file paths
   data_paths <- list.files(
-    directory_with_data,
+    path,
     pattern = variable,
     full.names = TRUE
   )
@@ -406,18 +405,18 @@ import_narr <- function(
 #' @importFrom terra hasValues
 #' @importFrom terra subset
 #' @export
-import_geos <-
+process_geos <-
   function(date_start = "2018-01-01",
            date_end = "2018-01-01",
            variable = NULL,
-           directory_with_data = "../../data/covariates/geos_cf/") {
+           path = "../../data/covariates/geos_cf/") {
     #### directory setup
-    directory_with_data <- download_sanitize_path(directory_with_data)
+    path <- download_sanitize_path(path)
     #### check for variable
     check_for_null_parameters(mget(ls()))
     #### identify file paths
     paths <- list.files(
-      directory_with_data,
+      path,
       pattern = "GEOS-CF.v01.rpl",
       full.names = TRUE
     )
@@ -443,7 +442,7 @@ import_geos <-
       )
     )
     #### identify collection
-    collection <- geos_strsplit(
+    collection <- process_geos_collection(
       data_paths[1],
       collection = TRUE
     )
@@ -459,7 +458,7 @@ import_geos <-
     for (p in seq_along(data_paths)) {
       #### import .nc4 data
       data_raw <- terra::rast(data_paths[p])
-      data_datetime <- geos_strsplit(data_paths[p], datetime = TRUE)
+      data_datetime <- process_geos_collection(data_paths[p], datetime = TRUE)
       cat(paste0(
         "Cleaning ",
         variable,

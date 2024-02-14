@@ -1,20 +1,24 @@
 # Tests for data import functions
 
-testthat::test_that("import_hms returns expected.", {
+testthat::test_that("process_hms returns expected.", {
   withr::local_package("terra")
   densities <- c(
     "Light",
     "Medium",
     "Heavy"
   )
+  # expect function
+  expect_true(
+    is.function(process_hms)
+  )
   for (d in seq_along(densities)) {
     hms <-
-      import_hms(
+      process_hms(
         date_start = "2022-06-10",
         date_end = "2022-06-11",
         variable = densities[d],
-        directory_with_data =
-        "../testdata/hms/hms"
+        path =
+        "../testdata/hms/"
       )
     # expect output is a SpatVector or character
     expect_true(
@@ -46,7 +50,7 @@ testthat::test_that("import_hms returns expected.", {
   }
 })
 
-testthat::test_that("import_gmted returns expected.", {
+testthat::test_that("process_gmted returns expected.", {
   withr::local_package("terra")
   statistics <- c(
     "Breakline Emphasis", "Systematic Subsample"
@@ -54,22 +58,26 @@ testthat::test_that("import_gmted returns expected.", {
   resolutions <- c(
     "7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"
   )
+  # expect function
+  expect_true(
+    is.function(process_gmted)
+  )
   for (s in seq_along(statistics)) {
     statistic <- statistics[s]
     for (r in seq_along(resolutions)) {
       resolution <- resolutions[r]
       gmted <-
-        import_gmted(
+        process_gmted(
           variable = c(statistic, resolution),
-          directory_with_data =
+          path =
             paste0(
               "../testdata/gmted/",
-              gmted_codes(
+              process_gmted_codes(
                 statistic,
                 statistic = TRUE,
                 invert = FALSE
               ),
-              gmted_codes(
+              process_gmted_codes(
                 resolution,
                 resolution = TRUE,
                 invert = FALSE
@@ -100,15 +108,14 @@ testthat::test_that("import_gmted returns expected.", {
 testthat::test_that("import_gmted returns error with non-vector variable.", {
   expect_error(
     gmted <-
-      import_gmted(
+      process_gmted(
         variable <- "Breakline Emphasis; 7.5 arc-seconds",
-        directory_with_data =
-        "../testdata/gmted/gmted"
+        path = "../testdata/gmted/gmted"
       )
   )
 })
 
-testthat::test_that("import_narr returns expected.", {
+testthat::test_that("process_narr returns expected.", {
   withr::local_package("terra")
   variables <- c(
     "weasd",
@@ -116,15 +123,15 @@ testthat::test_that("import_narr returns expected.", {
   )
   # expect function
   expect_true(
-    is.function(import_narr)
+    is.function(process_narr)
   )
   for (v in seq_along(variables)) {
     narr <-
-      import_narr(
+      process_narr(
         date_start = "2018-01-01",
         date_end = "2018-01-01",
         variable = variables[v],
-        directory_with_data =
+        path =
         paste0(
           "../testdata/narr/",
           variables[v]
@@ -163,7 +170,7 @@ testthat::test_that("import_narr returns expected.", {
   }
 })
 
-testthat::test_that("import_geos returns expected.", {
+testthat::test_that("process_geos returns expected.", {
   withr::local_package("terra")
   collections <- c(
     "aqc_tavg_1hr_g1440x721_v1",
@@ -171,16 +178,16 @@ testthat::test_that("import_geos returns expected.", {
   )
   # expect function
   expect_true(
-    is.function(import_geos)
+    is.function(process_geos)
   )
   for (c in seq_along(collections)) {
     collection <- collections[c]
     geos <-
-      import_geos(
+      process_geos(
         date_start = "2018-01-01",
         date_end = "2018-01-01",
         variable = "O3",
-        directory_with_data = paste0(
+        path = paste0(
           "../testdata/geos/",
           collection
         )
@@ -226,16 +233,16 @@ testthat::test_that("import_geos returns expected.", {
   }
 })
 
-testthat::test_that("import_geos expected errors.", {
+testthat::test_that("process_geos expected errors.", {
   # expect error without variable
   expect_error(
-    import_geos()
+    process_geos()
   )
   # expect error on directory without data
   expect_error(
-    import_geos(
+    process_geos(
       variable = "O3",
-      directory_with_data = "./"
+      path = "./"
     )
   )
 })

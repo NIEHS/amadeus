@@ -4,12 +4,12 @@
 #' Function returns a data frame containing wildfire smoke plume binary values
 #' (0 = smoke absent; 1 = smoke present) at user-defined sites. Unique columns
 #' reflect smoke density and circular buffer.
-#' @param data SpatVector(1). Cleaned SpatVector object that has been returned
+#' @param from SpatVector(1). Cleaned SpatVector object that has been returned
 #' from `import_hms` containing wildfire smoke plume coverage data.
-#' @param sites data.frame, characater to file path, SpatVector, or sf object.
-#' @param identifier character(1). Column within `locations` CSV file
+#' @param locs data.frame, characater to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
 #' containing identifier for each unique coordinate location.
-#' @param buffer integer(1). Circular buffer distance around site locations.
+#' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0).
 #' @author Mitchell Manware
 #' @return a data.frame object;
@@ -20,23 +20,23 @@
 #' @importFrom terra nlyr
 #' @importFrom terra crs
 #' @export
-covar_hms <- function(
-    data,
-    sites,
-    identifier = NULL,
-    buffer = 0) {
+calc_hms <- function(
+    from,
+    locs,
+    locs_id = NULL,
+    radius = 0) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
-  #### data == character indicates no wildfire smoke polumes are present
-  #### return 0 for all sites and dates
-  if (class(data) == "character") {
+  #### from == character indicates no wildfire smoke polumes are present
+  #### return 0 for all locs and dates
+  if (class(from) == "character") {
     cat(paste0(
       "Inherited list of dates due to absent smoke plume polygons.\n"
     ))
     skip_extraction <- NULL
-    skip_variable <- data[1]
-    skip_dates <- data[2:length(data)]
-    skip_sites_id <- data.frame(data.frame(sites)[, identifier])
+    skip_variable <- from[1]
+    skip_dates <- from[2:length(from)]
+    skip_sites_id <- data.frame(data.frame(locs)[, locs_id])
     for (s in seq_along(skip_dates)) {
       skip_extraction_date <- cbind(
         skip_sites_id,
@@ -44,15 +44,15 @@ covar_hms <- function(
           skip_dates[s],
           format = "%Y%m%d"
         ),
-        0
+        as.integer(0)
       )
       colnames(skip_extraction_date) <- c(
-        identifier,
+        locs_id,
         "date",
         paste0(
           skip_variable,
           "_",
-          buffer
+          radius
         )
       )
       skip_extraction <- rbind(
@@ -68,33 +68,33 @@ covar_hms <- function(
     return(skip_extraction)
   }
   #### prepare sites
-  sites_e <- sites_vector(
-    sites,
-    terra::crs(data),
-    buffer
+  sites_e <- process_locs_vector(
+    locs,
+    terra::crs(from),
+    radius
   )
   #### site identifiers only
   sites_id <- subset(
     terra::as.data.frame(sites_e),
-    select = identifier
+    select = locs_id
   )
   #### generate date sequence for missing polygon patch
   date_sequence <- generate_date_sequence(
     date_start = as.Date(
-      data$Date[1],
+      from$Date[1],
       format = "%Y%m%d"
     ),
     date_end = as.Date(
-      data$Date[nrow(data)],
+      from$Date[nrow(from)],
       format = "%Y%m%d"
     ),
     sub_hyphen = TRUE
   )
   #### empty location data.frame
   sites_extracted <- NULL
-  for (r in seq_len(nrow(data))) {
+  for (r in seq_len(nrow(from))) {
     #### select data layer
-    data_layer <- data[r]
+    data_layer <- from[r]
     layer_date <- as.Date(
       data_layer$Date,
       format = "%Y%m%d"
@@ -125,14 +125,14 @@ covar_hms <- function(
     )
     #### define column names
     colnames(sites_extracted_layer) <- c(
-      identifier,
+      locs_id,
       "date",
       paste0(
         tolower(
           layer_name
         ),
         "_",
-        buffer
+        radius
       )
     )
     #### merge with empty sites_extracted
@@ -142,12 +142,12 @@ covar_hms <- function(
     )
   }
   #### check for missing dates (missing polygons)
-  if (!(identical(date_sequence, data$Date))) {
+  if (!(identical(date_sequence, from$Date))) {
     cat(paste0(
       "Detected absent smoke plume polygons.\n"
     ))
     missing_dates <- date_sequence[
-      which(!(date_sequence %in% data$Date))
+      which(!(date_sequence %in% from$Date))
     ]
     ###
     for (m in seq_along(missing_dates)) {
@@ -172,6 +172,9 @@ covar_hms <- function(
       )
     }
   }
+  #### coerce binary to integer
+  sites_extracted[,3] <- as.integer(sites_extracted[,3])
+  cat(paste0("class :", class(sites_extracted[,3])))
   #### order by date
   sites_extracted_ordered <- sites_extracted[order(sites_extracted$date), ]
   cat(paste0(
@@ -188,13 +191,13 @@ covar_hms <- function(
 #' point locations using SpatRaster object from `import_gmted`. Function returns
 #' a data frame containing GEOS-CF variable values at user-defined sites. Unique
 #' column reflect statistic, resolution, and circular buffer.
-#' @param data SpatRaster(1). Cleaned SpatRaster object that has been returned
+#' @param from SpatRaster(1). Cleaned SpatRaster object that has been returned
 #' from `import_gmted` containing Global Multi-resolution Terrain Elevation Data
 #' (GMTED2010) data.
-#' @param sites data.frame, characater to file path, SpatVector, or sf object.
-#' @param identifier character(1). Column within `locations` CSV file
+#' @param locs data.frame, characater to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
 #' containing identifier for each unique coordinate location.
-#' @param buffer integer(1). Circular buffer distance around site locations.
+#' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
@@ -207,30 +210,30 @@ covar_hms <- function(
 #' @importFrom terra nlyr
 #' @importFrom terra crs
 #' @export
-covar_gmted <- function(
-    data,
-    sites,
-    identifier = NULL,
-    buffer = 0,
+calc_gmted <- function(
+    from,
+    locs,
+    locs_id = NULL,
+    radius = 0,
     fun = "mean") {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### prepare sites
-  sites_e <- sites_vector(
-    sites,
-    terra::crs(data),
-    buffer
+  sites_e <- process_locs_vector(
+    locs,
+    terra::crs(from),
+    radius
   )
   #### site identifiers only
   sites_id <- subset(
     terra::as.data.frame(sites_e),
-    select = identifier
+    select = locs_id
   )
   #### layer name
-  layer_name <- names(data)
+  layer_name <- names(from)
   cat(paste0(
     "Calculating ",
-    gmted_codes(
+    process_gmted_codes(
       substr(
         layer_name,
         1,
@@ -240,7 +243,7 @@ covar_gmted <- function(
       invert = TRUE
     ),
     " covariates with ",
-    gmted_codes(
+    process_gmted_codes(
       substr(
         layer_name,
         3,
@@ -253,7 +256,7 @@ covar_gmted <- function(
   ))
   #### extract layer data at sites
   sites_extracted <- terra::extract(
-    data,
+    from,
     sites_e,
     fun = fun,
     method = "simple",
@@ -269,13 +272,13 @@ covar_gmted <- function(
   sites_extracted[, 2] <- as.numeric(sites_extracted[, 2])
   #### define column names
   colnames(sites_extracted) <- c(
-    identifier,
+    locs_id,
     paste0(
       tolower(
         gsub(
           " ",
           "_",
-          gmted_codes(
+          process_gmted_codes(
             substr(
               layer_name,
               1,
@@ -293,7 +296,7 @@ covar_gmted <- function(
         4
       ),
       "_",
-      buffer
+      radius
     )
   )
   #### return data.frame
@@ -306,13 +309,13 @@ covar_gmted <- function(
 #' frame containing GEOS-CF variable values at user-defined sites. Unique column
 #' names reflect variable name, circular buffer, and vertical pressure level
 #' (if applicable).
-#' @param data SpatRaster(1). Cleaned SpatRaster object that has been returned
+#' @param from SpatRaster(1). Cleaned SpatRaster object that has been returned
 #' from `import_narr` containing NOAA NCEP North American Regional Reanalysis
 #' variable data.
-#' @param sites data.frame, characater to file path, SpatVector, or sf object.
-#' @param identifier character(1). Column within `locations` CSV file
+#' @param locs data.frame, characater to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
 #' containing identifier for each unique coordinate location.
-#' @param buffer integer(1). Circular buffer distance around site locations.
+#' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
@@ -325,30 +328,30 @@ covar_gmted <- function(
 #' @importFrom terra nlyr
 #' @importFrom terra crs
 #' @export
-covar_narr <- function(
-    data,
-    sites,
-    identifier = NULL,
-    buffer = 0,
+calc_narr <- function(
+    from,
+    locs,
+    locs_id = NULL,
+    radius = 0,
     fun = "mean") {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### prepare sites
-  sites_e <- sites_vector(
-    sites,
-    terra::crs(data),
-    buffer
+  sites_e <- process_locs_vector(
+    locs,
+    terra::crs(from),
+    radius
   )
   #### site identifiers only
   sites_id <- subset(
     terra::as.data.frame(sites_e),
-    select = identifier
+    select = locs_id
   )
   #### empty location data.frame
   sites_extracted <- NULL
-  for (l in seq_len(terra::nlyr(data))) {
+  for (l in seq_len(terra::nlyr(from))) {
     #### select data layer
-    data_layer <- data[[l]]
+    data_layer <- from[[l]]
     #### extract layer names for variable, date, and pressure level
     data_name <- strsplit(
       names(data_layer),
@@ -405,13 +408,13 @@ covar_narr <- function(
     )
     #### define column names
     colnames(sites_extracted_layer) <- c(
-      identifier,
+      locs_id,
       "date",
       "level",
       paste0(
         data_name[1],
         "_",
-        buffer
+        radius
       )
     )
     #### merge with empty sites_extracted
@@ -419,7 +422,7 @@ covar_narr <- function(
       sites_extracted,
       sites_extracted_layer
     )
-    if (l == terra::nlyr(data)) {
+    if (l == terra::nlyr(from)) {
       cat(paste0(
         "Returning ",
         data_name[1],
@@ -436,13 +439,12 @@ covar_narr <- function(
 #' `import_geos`. Function returns a data frame containing GEOS-CF variable
 #' values at user-defined sites. Unique column names reflect variable name,
 #' circular buffer, and vertical pressure level (if applicable).
-#'
-#' @param data SpatRaster(1). Cleaned SpatRaster object that has been returned
+#' @param from SpatRaster(1). Cleaned SpatRaster object that has been returned
 #' from `import_geos` containing GEOS-CF variable data.
-#' @param sites data.frame, characater to file path, SpatVector, or sf object.
-#' @param identifier character(1). Column within `locations` CSV file
+#' @param locs data.frame, characater to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
 #' containing identifier for each unique coordinate location.
-#' @param buffer integer(1). Circular buffer distance around site locations.
+#' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
@@ -456,30 +458,30 @@ covar_narr <- function(
 #' @importFrom terra nlyr
 #' @importFrom terra crs
 #' @export
-covar_geos <- function(
-    data,
-    sites,
-    identifier = NULL,
-    buffer = 0,
+calc_geos <- function(
+    from,
+    locs,
+    locs_id = NULL,
+    radius = 0,
     fun = "mean") {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### prepare sites
-  sites_e <- sites_vector(
-    sites,
-    terra::crs(data),
-    buffer
+  sites_e <- process_locs_vector(
+    locs,
+    terra::crs(from),
+    radius
   )
   #### site identifiers
   sites_id <- subset(
-    sites,
-    select = identifier
+    locs,
+    select = locs_id
   )
   #### empty location data.frame
   sites_extracted <- NULL
-  for (l in seq_len(terra::nlyr(data))) {
+  for (l in seq_len(terra::nlyr(from))) {
     #### select data layer
-    data_layer <- data[[l]]
+    data_layer <- from[[l]]
     #### extract layer names for variable and datetime sequence
     data_name <- strsplit(
       names(data_layer),
@@ -555,13 +557,13 @@ covar_geos <- function(
     )
     #### define column names
     colnames(sites_extracted_layer) <- c(
-      identifier,
+      locs_id,
       "date",
       "level",
       paste0(
         data_name[1],
         "_",
-        buffer
+        radius
       )
     )
     #### merge with empty sites_extracted
@@ -569,7 +571,7 @@ covar_geos <- function(
       sites_extracted,
       sites_extracted_layer
     )
-    if (l == terra::nlyr(data)) {
+    if (l == terra::nlyr(from)) {
       cat(paste0(
         "Returning ",
         data_name[1],
