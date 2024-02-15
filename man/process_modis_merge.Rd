@@ -4,7 +4,13 @@
 \alias{process_modis_merge}
 \title{Get mosaicked or merged raster from multiple MODIS hdf files}
 \usage{
-process_modis_merge(paths, date_in = NULL, subdataset = NULL, foo = "mean")
+process_modis_merge(
+  paths,
+  date_in = NULL,
+  subdataset = NULL,
+  foo = "mean",
+  ...
+)
 }
 \arguments{
 \item{paths}{character. Full list of hdf file paths.
@@ -20,6 +26,8 @@ which subdatasets will be imported.}
 
 \item{foo}{Function name or custom function to aggregate overlapping
 cell values. See \code{fun} description in \link[terra]{tapp} for details.}
+
+\item{...}{For internal use.}
 }
 \value{
 A SpatRaster object.

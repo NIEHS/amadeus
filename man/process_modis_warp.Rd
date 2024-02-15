@@ -4,7 +4,7 @@
 \alias{process_modis_warp}
 \title{Warp MODIS swath data into rectilinear grid raster}
 \usage{
-process_modis_warp(path, cellsize = 0.25, threshold = 0.5, crs_out = 4326)
+process_modis_warp(path, cellsize = 0.25, threshold = 0.5, crs_out = 4326, ...)
 }
 \arguments{
 \item{path}{File path of MODIS swath with exact sub-dataset specification.}
@@ -17,6 +17,8 @@ output rectilinear grid raster.}
 \item{crs_out}{integer(1)/character(1). Coordinate system definition.
 Should be compatible with EPSG codes or WKT2.
 See \link[terra:crs]{terra::crs} and \link[sf:st_crs]{sf::st_crs} / \href{https://www.epsg.io}{EPSG}}
+
+\item{...}{For internal use.}
 }
 \value{
 stars object.

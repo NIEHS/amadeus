@@ -27,6 +27,8 @@ will be calculated.}
 
 \item{locs_id}{character(1). Site identifier. Default is \code{"site_id"}}
 
+\item{fun_hdf}{function. Function to handle HDF files.}
+
 \item{name_covariates}{character. Name header of covariates.
 e.g., \code{"MOD_NDVIF_0_"}.
 The calculated covariate names will have a form of
@@ -37,9 +39,7 @@ was used to calculate mean NDVI value.}
 \item{radius}{numeric. Radii to calculate covariates.
 Default is \code{c(0, 1000, 10000, 50000)}.}
 
-\item{subdataset}{Index or search pattern of subdataset.
-Pattern is not accepted when product is \code{"VNP46A2"} or
-\code{"MOD06_L2"}}
+\item{subdataset}{Index or search pattern of subdataset.}
 
 \item{fun_summary}{character or function. Function to summarize
 extracted raster values.}
@@ -55,8 +55,7 @@ loaded.}
 \item{export_list_add}{character. A vector with object names to export
 to each thread. It should be minimized to spare memory.}
 
-\item{product}{character(1). MODIS product. Should be one of
-\code{c("MOD11A1", "MOD13A2", "MOD06_L2", "VNP46A2", "MOD09GA", "MCD19A2")}}
+\item{...}{Arguments passed to \code{fun_hdf}.}
 }
 \description{
 \code{calc_modis} essentially runs \code{process_modis_daily} function

@@ -4,7 +4,13 @@
 \alias{calc_nlcd_ratio}
 \title{Compute land cover classes ratio in circle buffers around points}
 \usage{
-calc_nlcd_ratio(locs, from, locs_id, radius = 1000, variables = NULL)
+calc_nlcd_ratio(
+  locs,
+  from,
+  locs_id = "site_id",
+  radius = 1000,
+  variables = NULL
+)
 }
 \arguments{
 \item{locs}{terra::SpatVector of points geometry}

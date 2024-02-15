@@ -4,7 +4,7 @@
 \alias{process_bluemarble_corners}
 \title{Tile corner generator for Blue Marble products}
 \usage{
-process_bluemarble_corners(hrange = c(3, 6), vrange = c(5, 11))
+process_bluemarble_corners(hrange = c(5, 11), vrange = c(3, 6))
 }
 \arguments{
 \item{hrange}{integer(2). Both should be in \link{0, 35}}

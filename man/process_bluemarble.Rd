@@ -9,7 +9,8 @@ process_bluemarble(
   date_in,
   tile_df = NULL,
   subdataset = 3L,
-  crs_ref = "EPSG:4326"
+  crs_ref = "EPSG:4326",
+  ...
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ Default is 3L.}
 
 \item{crs_ref}{character(1). terra::crs compatible CRS.
 Default is "EPSG:4326"}
+
+\item{...}{For internal use.}
 }
 \value{
 SpatRaster.

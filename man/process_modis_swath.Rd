@@ -9,7 +9,8 @@ process_modis_swath(
   date_in,
   get_var = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
   suffix = ":mod06:",
-  resolution = 0.025
+  resolution = 0.025,
+  ...
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ e.g., \verb{:mod06:}}
 
 \item{resolution}{numeric(1). Resolution of output raster.
 Unit is degree.}
+
+\item{...}{For internal use.}
 }
 \value{
 SpatRaster object. CRS is \code{"EPSG:4326"}.
