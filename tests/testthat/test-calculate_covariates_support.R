@@ -49,7 +49,6 @@ testthat::test_that("process_flatten_sds", {
     mcdaggr <-
       process_flatten_sds(
         path = mcd19,
-        product = "MCD19A2",
         nsds = "Optical_Depth",
         fun_agg = "mean"
       )
@@ -69,7 +68,6 @@ testthat::test_that("process_flatten_sds", {
     modaggr <-
       process_flatten_sds(
         path = mod09_sub,
-        product = "MOD09GA",
         nsds = NULL,
         fun_agg = "mean"
       )
@@ -93,7 +91,6 @@ testthat::test_that("process_modis_merge is good to go", {
   testthat::expect_no_error(
     process_modis_merge(
       paths = path_mod11,
-      "MOD11A1",
       date_in = "2021-08-15",
       regex_sds = "(LST_)"
     )
@@ -107,7 +104,6 @@ testthat::test_that("process_modis_merge is good to go", {
   testthat::expect_no_error(
     process_modis_merge(
       paths = path_mod13,
-      "MOD13A2",
       date_in = "2021-08-13",
       regex_sds = "(NDVI)"
     )
@@ -122,7 +118,6 @@ testthat::test_that("process_modis_merge is good to go", {
   testthat::expect_no_error(
     process_modis_merge(
       paths = path_mcd19,
-      "MCD19A2",
       date_in = "2021-08-15",
       regex_sds = "(Optical_Depth)"
     )
@@ -137,7 +132,6 @@ testthat::test_that("process_modis_merge is good to go", {
   testthat::expect_no_error(
     process_modis_merge(
       paths = path_mod09,
-      "MOD09GA",
       date_in = "2021-08-15",
       regex_sds = "(sur_refl_b0)"
     )
@@ -156,18 +150,36 @@ testthat::test_that("VNP46 preprocess tests", {
       full.names = TRUE
     )
 
+  testthat::expect_no_error(
+    corn <- process_bluemarble_corners()
+  )
+
   testthat::expect_warning(
     vnp46_proc <- process_bluemarble(
       paths = path_vnp46[1],
+      tile_df = corn,
       date_in = "2018-08-13"
     )
   )
   testthat::expect_s4_class(vnp46_proc, "SpatRaster")
   testthat::expect_equal(terra::nlyr(vnp46_proc), 1L)
 
+  testthat::expect_warning(
+    vnp46_proc2 <- process_bluemarble(
+      paths = path_vnp46[1],
+      tile_df = corn,
+      subdataset = c(3L, 5L),
+      date_in = "2018-08-13"
+    )
+  )
+
+  testthat::expect_s4_class(vnp46_proc2, "SpatRaster")
+  testthat::expect_equal(terra::nlyr(vnp46_proc2), 2L)
+
   testthat::expect_error(
     process_bluemarble(
       paths = path_vnp46[1],
+      tile_df = corn,
       date_in = "2018~08~13"
     )
   )
@@ -210,32 +222,32 @@ testthat::test_that("Other MODIS function errors", {
       "..", "testdata", "modis",
       "MOD06_L2.A2021227.0320.061.2021227134022.hdf"
     )
-  path_mod06 <-
+  path_mod06e <-
     sprintf("HDF4_EOS:EOS_SWATH:%s:mod06:Cloud_Fraction_Night", path_mod06)
 
   testthat::expect_no_error(
     suppressWarnings(
       process_modis_swath(
-        paths = path_mod06,
+        paths = path_mod06e,
         date_in = "2021-08-15"
       )
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      paths = path_mod06,
+      paths = path_mod06e,
       date_in = "2021~08~15"
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      paths = path_mod06,
+      paths = path_mod06e,
       date_in = "2021-13-15"
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      paths = path_mod06,
+      paths = path_mod06e,
       date_in = "2021-12-45"
     )
   )

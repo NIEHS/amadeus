@@ -4,28 +4,19 @@
 \alias{process_modis_merge}
 \title{Get mosaicked or merged raster from multiple MODIS hdf files}
 \usage{
-process_modis_merge(
-  paths,
-  product = c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2"),
-  date_in = NULL,
-  regex_sds = NULL,
-  foo = "mean"
-)
+process_modis_merge(paths, date_in = NULL, subdataset = NULL, foo = "mean")
 }
 \arguments{
 \item{paths}{character. Full list of hdf file paths.
 preferably a recursive search result from \code{list.files}.}
 
-\item{product}{character(1). Product code of MODIS. Should be one of
-\code{c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2")}}
-
 \item{date_in}{character(1). date to query. Should be in
 \code{"YYYY-MM-DD"} format.}
 
-\item{regex_sds}{character(1). subdataset names to extract.
+\item{subdataset}{character(1). subdataset names to extract.
 Should conform to regular expression. See \link{regex} for details.
-Default is NULL, which means that the subdataset names are automatically
-selected based on \code{product} value.}
+Default is NULL, which will result in errors. Users should specify
+which subdatasets will be imported.}
 
 \item{foo}{Function name or custom function to aggregate overlapping
 cell values. See \code{fun} description in \link[terra]{tapp} for details.}
@@ -35,6 +26,15 @@ A SpatRaster object.
 }
 \description{
 Get mosaicked or merged raster from multiple MODIS hdf files
+}
+\note{
+Curvilinear products (i.e., swaths) will not be accepted.
+MODIS products downloaded by functions in \code{amadeus},
+\href{https://cran.r-project.org/web/packages/MODISTools/index.html}{MODISTools},
+and \href{https://github.com/rspatial/luna}{luna} are accepted.
+}
+\seealso{
+\link{download_data}
 }
 \author{
 Insang Song

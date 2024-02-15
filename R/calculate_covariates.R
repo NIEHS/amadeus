@@ -3,18 +3,18 @@
 # nocov start
 # nolint start
 #' @param covariate character(1). Covariate type.
+#' @param locs sf/SpatVector. Unique locations. Should include
+#'  a unique identifier field named `locs_id`
 #' @param from character. Single or multiple from strings.
-#' @param locs sf/SpatVector. Unique locs. Should include
-#'  a unique identifier field named \code{id_col}
 #' @param locs_id character(1). Name of unique identifier.
-#'  Default is \code{"site_id"}.
+#'  Default is `"site_id"`.
 #' @param ... Arguments passed to each covariate calculation
 #'  function.
 #' @seealso
-#' - \link{calc_modis}: `"modis"`, `"MODIS"`
-#' - \link{calc_koppen_geiger}: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
-#' - \link{calc_ecoregion}: `"ecoregion"`, `"ecoregions"`
-#' - \link{calc_temporal_dummies}: `"dummies"`
+#' - `calc_modis`: `"modis"`, `"MODIS"`
+#' - `calc_koppen_geiger`: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
+#' - `calc_ecoregion`: `"ecoregion"`, `"ecoregions"`
+#' - `calc_temporal_dummies`: `"dummies"`
 #' @returns Calculated covariates. Mainly data.frame object.
 #' @author Insang Song
 #' @export
@@ -39,7 +39,7 @@ calc_covariates <-
 
     # select function to run
     what_to_run <- switch(covariate,
-      modis = calc_modis,
+      modis = calc_modis_par,
       ecoregion = calc_ecoregion,
       ecoregions = calc_ecoregion,
       koppen = calc_koppen_geiger,
@@ -86,7 +86,7 @@ calc_covariates <-
 
 #' Calculate Koeppen-Geiger climate zone binary variables
 #' @param locs sf/SpatVector. Unique locs. Should include
-#'  a unique identifier field named \code{id_col}
+#'  a unique identifier field named `locs_id`
 #' @param from character(1). from to Koppen-Geiger
 #'  climate zone raster file
 #' @param locs_id character(1). Name of unique identifier.
@@ -197,11 +197,12 @@ calc_koppen_geiger <-
 #' @importFrom sf st_union
 #' @importFrom sf st_geometry
 #' @importFrom terra intersect
+#' @importFrom terra metags
 #' @importFrom exactextractr exact_extract
 #' @export
 calc_nlcd_ratio <- function(locs,
                             from,
-                            locs_id,
+                            locs_id = "site_id",
                             radius = 1000,
                             variables = NULL) {
   # check inputs
@@ -211,16 +212,13 @@ calc_nlcd_ratio <- function(locs,
   if (radius <= 0) {
     stop("radius has not a likely value.")
   }
-  if (!is.numeric(year)) {
-    stop("year is not a numeric.")
-  }
   if (!methods::is(locs, "SpatVector")) {
     stop("locs is not a terra::SpatVector.")
   }
   if (!methods::is(from, "SpatRaster")) {
     stop("from is not a SpatRaster.")
   }
-
+  year <- try(as.integer(terra::metags(from, name = "year")))
   # select points within mainland US and reproject on nlcd crs if necessary
   us_main <-
     terra::ext(c(xmin = -127, xmax = -65, ymin = 24, ymax = 51)) |>
@@ -267,12 +265,12 @@ calc_nlcd_ratio <- function(locs,
 
 #' Calculate EPA Ecoregions level 2/3 binary variables
 #' @param locs sf/SpatVector. Unique locs. Should include
-#'  a unique identifier field named \code{locs_id}
+#'  a unique identifier field named `locs_id`
 #' @param from SpatVector. Ecoregion polygons
 #' @param locs_id character(1). Name of unique identifier.
 #' @returns a data.frame object with dummy variables and attributes of:
-#'   - \code{attr(., "ecoregion2_code")}: Ecoregion lv.2 code and key
-#'   - \code{attr(., "ecoregion3_code")}: Ecoregion lv.3 code and key
+#'   - `attr(., "ecoregion2_code")`: Ecoregion lv.2 code and key
+#'   - `attr(., "ecoregion3_code")`: Ecoregion lv.3 code and key
 #' @author Insang Song
 #' @importFrom methods is
 #' @importFrom terra vect
@@ -285,7 +283,7 @@ calc_nlcd_ratio <- function(locs,
 calc_ecoregion <-
   function(
     locs,
-    from = NULL, 
+    from = NULL,
     locs_id = "site_id"
   ) {
 
@@ -345,6 +343,17 @@ calc_ecoregion <-
 
 
 #' A single-date MODIS worker for parallelization
+#' @param locs SpatVector/sf/sftime object. Locations where MODIS values
+#' are summarized.
+#' @param from SpatRaster. Preprocessed objects.
+#' @param locs_id character(1). Field name where unique site identifiers
+#' are stored. Default is `"site_id"`
+#' @param date Date(1). date to query.
+#' @param name_extracted character. Names of calculated covariates.
+#' @param fun_summary function. Summary function for
+#' multilayer rasters. Passed to `foo`. See [exactextractr::exact_extract]
+#' for details.
+#' @param radius numeric. Radius to generate circular buffers.
 #' @description modis_worker operates at six MODIS/VIIRS products
 #' (MOD11A1, MOD13A2, MOD06_L2, VNP46A2, MOD09GA, and MCD19A2)
 #' on a daily basis. Given that the raw hdf files are downloaded from
@@ -353,17 +362,6 @@ calc_ecoregion <-
 #' files of scope on the date of interest. Please note that this function
 #' does not provide a function to filter swaths or tiles, so it is strongly
 #' recommended to check and pre-filter the file names at users' discretion.
-#' @param locs SpatVector/sf/sftime object. Locations where MODIS values
-#' are summarized..
-#' @param from SpatRaster. Preprocessed objects.
-#' @param date Date(1). date to query.
-#' @param name_extracted character. Names of calculated covariates.
-#' @param fun_summary function. Summary function for
-#' multilayer rasters. Passed to \code{foo}. See also
-#' \code{\link[exactextractr]{exact_extract}}
-#' @param locs_id character(1). Field name where unique site identifiers
-#' are stored. Default is `"site_id"`
-#' @param radius numeric. Radius to generate circular buffers.
 #' @author Insang Song
 #' @returns A data.frame object.
 #' @importFrom terra extract
@@ -378,31 +376,27 @@ calc_ecoregion <-
 process_modis_daily <- function(
   locs = NULL,
   from = NULL,
+  locs_id = "site_id",
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
-  locs_id = "site_id",
   radius = 0L
 ) {
-  if (!any(methods::is(locs_in, "SpatVector"),
-           methods::is(locs_in, "sf"),
-           methods::is(locs_in, "sftime"),
-           is_stdt(locs_in))) {
-    stop("locs_in should be one of sf, sftime, stdt, or SpatVector.\n")
+  if (!any(methods::is(locs, "SpatVector"),
+           methods::is(locs, "sf"),
+           methods::is(locs, "sftime"))) {
+    stop("locs should be one of sf, sftime, or SpatVector.\n")
   }
-  if (is_stdt(locs_in)) {
-    locs_in <- convert_stdt_spatvect(locs_in)
+  if (!methods::is(locs, "SpatVector")) {
+    locs <- terra::vect(locs)
   }
-  if (!methods::is(locs_in, "SpatVector")) {
-    locs_in <- terra::vect(locs_in)
-  }
-  if (!locs_id %in% names(locs_in)) {
+  if (!locs_id %in% names(locs)) {
     stop(sprintf("locs should include columns named %s.\n",
                  locs_id)
     )
   }
-  if (!"time" %in% names(locs_in)) {
-    locs_in$time <- date
+  if (!"time" %in% names(locs)) {
+    locs$time <- date
   }
 
   extract_with_buffer <- function(
@@ -429,16 +423,15 @@ process_modis_daily <- function(
       )
     return(surf_at_bufs)
   }
-  product <- match.arg(product)
 
   ## NaN to zero
   from[is.nan(from)] <- 0L
 
   # raster used to be vrt_today
   if (any(grepl("00000", name_extracted))) {
-    locs_tr <- terra::project(locs_in, terra::crs(from))
+    locs_tr <- terra::project(locs, terra::crs(from))
     extracted <- terra::extract(x = from, y = locs_tr, ID = FALSE)
-    locs_blank <- as.data.frame(locs_in)
+    locs_blank <- as.data.frame(locs)
     extracted <- cbind(locs_blank, extracted)
   } else {
     extracted <-
@@ -463,23 +456,11 @@ process_modis_daily <- function(
 
 
 #' Calculate MODIS product covariates in multiple CPU threads
-#' @description calc_modis essentially runs \code{modis_worker} function
-#' in each thread (subprocess). Based on daily resolution, each day's workload
-#' will be distributed to each thread. With \code{product} argument,
-#' the files are processed by a customized function where the unique structure
-#' and/or characteristics of the products are considered. \code{nthreads}
-#' argument should be carefully selected in consideration of the machine's
-#' CPU and memory capacities as products have their own memory pressure.
-#' Overall, this function and dependent routines assume that the file system
-#' can handle concurrent access to the (network) disk by multiple processes.
-#' File system characteristics, package versions, and hardware settings/
-#' specification can affect the processing efficiency.
-#' @param from character. List of HDF files.
-#' @param product character(1). MODIS product. Should be one of
-#' \code{c("MOD11A1", "MOD13A2", "MOD06_L2", "VNP46A2", "MOD09GA", "MCD19A2")}
 #' @param locs sf object. Unique locs where covariates
 #' will be calculated.
-#' @param id_col character(1). Site identifier. Default is `"site_id"`
+#' @param from character. List of HDF files.
+#' @param locs_id character(1). Site identifier. Default is `"site_id"`
+#' @param fun_hdf function. Function to handle HDF files.
 #' @param name_covariates character. Name header of covariates.
 #' e.g., `"MOD_NDVIF_0_"`.
 #' The calculated covariate names will have a form of
@@ -489,26 +470,34 @@ process_modis_daily <- function(
 #' @param radius numeric. Radii to calculate covariates.
 #' Default is `c(0, 1000, 10000, 50000)`.
 #' @param subdataset Index or search pattern of subdataset.
-#'  Pattern is not accepted when product is \code{"VNP46A2"} or
-#'  \code{"MOD06_L2"}
 #' @param fun_summary character or function. Function to summarize
 #'  extracted raster values.
 #' @param nthreads integer(1). Number of threads to be used
 #'  to calculate covariates.
 #' @param package_list_add character. A vector with package names to load
-#'  these in each thread. Note that \code{sf}, \code{terra},
-#'  \code{exactextractr}, \code{doParallel}, \code{parallelly},
-#'  and \code{dplyr}
-#'  are the default packages to be loaded.
+#'  these in each thread. Note that `sf`, `terra`, `exactextractr`,
+#' `doParallel`, `parallelly` and `dplyr` are the default packages to be
+#' loaded.
 #' @param export_list_add character. A vector with object names to export
 #'  to each thread. It should be minimized to spare memory.
-#' @description locs should be sf object as it is exportable to
-#' parallel workers.
-#' @note See details for setting parallelization
-#' \code{\link[foreach]{foreach}},
-#' \code{\link[parallelly]{makeClusterPSOCK}},
-#' \code{\link[parallelly]{availableCores}},
-#' \code{\link[doParallel]{registerDoParallel}}
+#' @param ... Arguments passed to `fun_hdf`.
+#' @description `calc_modis` essentially runs `process_modis_daily` function
+#' in each thread (subprocess). Based on daily resolution, each day's workload
+#' will be distributed to each thread. With `product` argument,
+#' the files are processed by a customized function where the unique structure
+#' and/or characteristics of the products are considered. `nthreads`
+#' argument should be carefully selected in consideration of the machine's
+#' CPU and memory capacities as products have their own memory pressure.
+#' `locs` should be `sf` object as it is exportable to parallel workers.
+#' @note Overall, this function and dependent routines assume that the file
+#' system can handle concurrent access to the (network) disk by multiple
+#' processes. File system characteristics, package versions, and hardware
+#' settings and specification can affect the processing efficiency.
+#' @seealso See details for setting parallelization
+#' * [foreach::foreach]
+#' * [parallelly::makeClusterPSOCK]
+#' * [parallelly::availableCores]
+#' * [doParallel::registerDoParallel]
 #' @importFrom foreach foreach
 #' @importFrom foreach %dopar%
 #' @importFrom methods is
@@ -517,6 +506,7 @@ process_modis_daily <- function(
 #' @importFrom terra nlyr
 #' @importFrom dplyr bind_rows
 #' @importFrom dplyr left_join
+#' @importFrom rlang inject
 #' @importFrom future plan
 #' @importFrom future cluster
 #' @importFrom parallelly availableWorkers
@@ -524,20 +514,26 @@ process_modis_daily <- function(
 #' @export
 calc_modis_par <-
   function(
-    locs,
-    from,
+    locs = NULL,
+    from = NULL,
     locs_id = "site_id",
-    product = c("MOD11A1", "MOD13A2", "MOD06_L2",
-                "VNP46A2", "MOD09GA", "MCD19A2"),
-    name_covariates,
+    fun_hdf = process_modis_merge,
+    name_covariates = NULL,
     radius = c(0L, 1e3L, 1e4L, 5e4L),
     subdataset = NULL,
     fun_summary = "mean",
     nthreads = floor(length(parallelly::availableWorkers()) / 2),
     package_list_add = NULL,
-    export_list_add = NULL
+    export_list_add = NULL,
+    ...
   ) {
-    product <- match.arg(product)
+    if (!is.function(fun_hdf)) {
+      stop("fun_hdf should be one of process_modis_merge,
+process_modis_swath, or process_bluemarble.")
+    }
+    # read all arguments
+    hdf_args <- c(as.list(environment()), list(...))
+
     dates_available <-
       regmatches(from, regexpr("A20\\d{2,2}[0-3]\\d{2,2}", from))
     dates_available <- unique(dates_available)
@@ -552,7 +548,7 @@ calc_modis_par <-
     export_list <- c()
     package_list <-
       c("sf", "terra", "exactextractr", "foreach", "data.table", "stars",
-        "dplyr", "parallelly", "doParallel")
+        "dplyr", "parallelly", "doParallel", "rlang")
     if (!is.null(export_list_add)) {
       export_list <- append(export_list, export_list_add)
     }
@@ -583,30 +579,12 @@ calc_modis_par <-
         radiusindex <- seq_along(radius)
         radiuslist <- split(radiusindex, radiusindex)
 
-        # VNP46 corner assignment
-        if (product == "VNP46A2") {
-          vrt_today <-
-            process_bluemarble(
-              paths = from,
-              date_in = day_to_pick,
-              # upper level subdataset is ignored
-              subdataset = 3L,
-              crs_ref = "EPSG:4326"
-            )
-        } else if (product == "MOD06_L2") {
-          vrt_today <-
-            process_modis_swath(
-                               paths = from,
-                               date_in = day_to_pick)
-        } else {
-          vrt_today <-
-            process_modis_merge(
-              paths = from,
-              regex_sds = subdataset,
-              product = product,
-              date_in = day_to_pick
-            )
-        }
+        hdf_args <- append(hdf_args, values = list(date_in = day_to_pick))
+        hdf_args <- append(hdf_args, values = list(paths = hdf_args$from))
+        # unified interface with rlang::inject
+        vrt_today <-
+          rlang::inject(fun_hdf(!!!hdf_args))
+
         if (terra::nlyr(vrt_today) != length(name_covariates)) {
           warning("The number of layers in the input raster do not match
                   the length of name_covariates.\n")
@@ -623,13 +601,12 @@ calc_modis_par <-
               tryCatch({
                 extracted <-
                   process_modis_daily(
-                    from = vrt_today,
-                    date = as.character(day_to_pick),
                     locs = locs_input,
-                    product = product,
+                    from = vrt_today,
+                    locs_id = locs_id,
+                    date = as.character(day_to_pick),
                     fun_summary = fun_summary,
                     name_extracted = name_radius,
-                    locs_id = locs_id,
                     radius = radius[k]
                   )
                 return(extracted)
@@ -646,13 +623,14 @@ calc_modis_par <-
                 error_df <- as.data.frame(error_df)
                 error_df <- error_df[, c(locs_id, "time")]
                 error_df[, name_radius] <- -99999
+                attr(error_df, "error_message") <- e
                 return(error_df)
               }
               )
             }
           )
         res <-
-          Reduce(\(x, y) {
+          Reduce(function(x, y) {
             dplyr::left_join(x, y,
               by = c("site_id", "time")
             )
@@ -692,7 +670,6 @@ calc_temporal_dummies <-
     if (!"time" %in% names(locs)) {
       stop("A mandatory field 'time' does not exist in locs.\n")
     }
-    id_col <- id_col
     dummify <- function(vec, domain) {
       vec_unique <- domain
       vec_split <- split(vec_unique, vec_unique)
@@ -708,10 +685,10 @@ calc_temporal_dummies <-
 
     # year
     vec_year <- data.table::year(locs$time)
-    dt_year_dum <- dummify(vec_year, domain_year)
+    dt_year_dum <- dummify(vec_year, year)
     # should the last year be the present year or 2022?
     colnames(dt_year_dum) <-
-      sprintf("DUM_Y%d_0_00000", domain_year)
+      sprintf("DUM_Y%d_0_00000", year)
 
     # month
     vec_month <- data.table::month(locs$time)
@@ -822,6 +799,7 @@ process_tri <- function(
 }
 # nolint end
 
+# nolint start
 #' Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates
 #' @param locs `SpatVector` object. Locations where
 #'  the sum of SEDCs are calculated.
@@ -878,6 +856,7 @@ process_tri <- function(
 #' @importFrom terra buffer
 #' @importFrom rlang sym
 #' @export
+# nolint end
 calc_sedc <-
   function(
     locs = NULL,
@@ -935,6 +914,7 @@ The result may not be accurate.\n",
       )
     dist_nearby_df <- cbind(dist_nearby_tdf, dist = dist_nearby_df)
 
+    id <- NULL
     # summary
     res_sedc <- res_nearby |>
       dplyr::as_tibble() |>
@@ -994,7 +974,7 @@ The result may not be accurate.\n",
 #' @export
 calc_tri <- function(
   locs,
-  from = NULL, 
+  from = NULL,
   locs_id = "site_id",
   radius = c(1e3L, 1e4L, 5e4L)
 ) {
@@ -1029,8 +1009,8 @@ calc_tri <- function(
             function(x) {
               locs_tri_s <-
                 calc_sedc(
-                  sts,
-                  tri,
+                  locs = sts,
+                  from = tri,
                   locs_id = locs_id,
                   sedc_bandwidth = x,
                   target_fields = tri_cols
@@ -1155,15 +1135,15 @@ calc_nei <- function(
   from = NULL,
   locs_id = "site_id"
 ) {
-  if (!all(c("lon", "lat", "time") %in% colnames(locs))) {
-    stop("locs should be stdt or 
-    have 'lon', 'lat', and 'time' fields.\n")
-  }
   if (!methods::is(locs, "SpatVector")) {
     locs <- try(terra::vect(locs))
     if (inherits(locs, "try-error")) {
       stop("locs is unable to be converted to SpatVector.\n")
     }
+  }
+  if (!all(c("lon", "lat", "time") %in% colnames(locs))) {
+    stop("locs should be stdt or 
+    have 'lon', 'lat', and 'time' fields.\n")
   }
   # spatial join
   locs_re <- terra::project(locs, terra::crs(from))

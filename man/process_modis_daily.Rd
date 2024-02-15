@@ -7,29 +7,29 @@
 process_modis_daily(
   locs = NULL,
   from = NULL,
+  locs_id = "site_id",
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
-  locs_id = "site_id",
   radius = 0L
 )
 }
 \arguments{
 \item{locs}{SpatVector/sf/sftime object. Locations where MODIS values
-are summarized..}
+are summarized.}
 
 \item{from}{SpatRaster. Preprocessed objects.}
+
+\item{locs_id}{character(1). Field name where unique site identifiers
+are stored. Default is \code{"site_id"}}
 
 \item{date}{Date(1). date to query.}
 
 \item{name_extracted}{character. Names of calculated covariates.}
 
 \item{fun_summary}{function. Summary function for
-multilayer rasters. Passed to \code{foo}. See also
-\code{\link[exactextractr]{exact_extract}}}
-
-\item{locs_id}{character(1). Field name where unique site identifiers
-are stored. Default is \code{"site_id"}}
+multilayer rasters. Passed to \code{foo}. See \link[exactextractr:exact_extract]{exactextractr::exact_extract}
+for details.}
 
 \item{radius}{numeric. Radius to generate circular buffers.}
 }

@@ -3,13 +3,15 @@
 #' Process Koeppen-Geiger climate data
 #' @param path character(1). Path to Koppen-Geiger
 #'  climate zone raster file
+#' @param year data year. Not applicable for this function.
 #' @returns SpatRaster object
 #' @author Insang Song
 #' @importFrom terra rast
 #' @export
 process_koppen_geiger <-
   function(
-    path = "./input/koppen_geiger/raw/Beck_KG_V1_present_0p0083.tif"
+    path = "./input/koppen_geiger/raw/Beck_KG_V1_present_0p0083.tif",
+    year = NULL
   ) {
     kg_rast <- terra::rast(path)
     return(kg_rast)
@@ -25,8 +27,9 @@ process_koppen_geiger <-
 #' @author Eva Marques
 #' @importFrom utils read.csv
 #' @importFrom terra rast
+#' @importFrom terra metags
 #' @export
-process_nlcd_ratio <-
+process_nlcd <-
   function(
     path,
     year = 2021
@@ -52,6 +55,7 @@ process_nlcd_ratio <-
       stop("NLCD data not available for this year.")
     }
     nlcd <- terra::rast(nlcd_file)
+    terra::metags(nlcd) <- c(year = year)
     return(nlcd)
   }
 

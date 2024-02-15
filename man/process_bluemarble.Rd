@@ -4,12 +4,22 @@
 \alias{process_bluemarble}
 \title{Assign VIIRS Blue Marble products corner coordinates to retrieve a merged raster}
 \usage{
-process_bluemarble(paths, date_in, subdataset = 3L, crs_ref = "EPSG:4326")
+process_bluemarble(
+  paths,
+  date_in,
+  tile_df = NULL,
+  subdataset = 3L,
+  crs_ref = "EPSG:4326"
+)
 }
 \arguments{
 \item{paths}{character. Full paths of h5 files.}
 
 \item{date_in}{character(1). Date to query.}
+
+\item{tile_df}{data.frame. Contains four corner coordinates in fields named
+\code{c("xmin", "xmax", "ymin", "ymax")}.
+See \link{process_bluemarble_corners} to generate a valid object for this argument.}
 
 \item{subdataset}{integer(1). Subdataset number to process.
 Default is 3L.}
@@ -28,6 +38,12 @@ are necessary as the original h5 data do not include such information.
 \references{
 \itemize{
 \item \href{https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document\%20Archive/Science\%20Data\%20Product\%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf}{Wang, Z. (2022). Blue Marble User Guide (Version 1.3). NASA.}
+}
+}
+\seealso{
+\itemize{
+\item \link[terra:describe]{terra::describe}
+\item \link[terra:merge]{terra::merge}
 }
 }
 \author{

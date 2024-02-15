@@ -37,7 +37,11 @@ into rectilinear grids. The function internally warps each of inputs
 then mosaic the warped images into one large SpatRaster object.
 }
 \seealso{
-\link{process_modis_warp}
+\itemize{
+\item \link{process_modis_warp}
+\item \href{https://gdal.org/drivers/raster/hdf4.html}{GDAL HDF4 driver documentation}
+\item \link[terra:describe]{terra::describe}: to list the full subdataset list with \code{sds = TRUE}
+}
 }
 \author{
 Insang Song

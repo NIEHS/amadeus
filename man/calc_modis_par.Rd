@@ -5,17 +5,18 @@
 \title{Calculate MODIS product covariates in multiple CPU threads}
 \usage{
 calc_modis_par(
-  locs,
-  from,
+  locs = NULL,
+  from = NULL,
   locs_id = "site_id",
-  product = c("MOD11A1", "MOD13A2", "MOD06_L2", "VNP46A2", "MOD09GA", "MCD19A2"),
-  name_covariates,
+  fun_hdf = process_modis_merge,
+  name_covariates = NULL,
   radius = c(0L, 1000L, 10000L, 50000L),
   subdataset = NULL,
   fun_summary = "mean",
   nthreads = floor(length(parallelly::availableWorkers())/2),
   package_list_add = NULL,
-  export_list_add = NULL
+  export_list_add = NULL,
+  ...
 )
 }
 \arguments{
@@ -24,8 +25,7 @@ will be calculated.}
 
 \item{from}{character. List of HDF files.}
 
-\item{product}{character(1). MODIS product. Should be one of
-\code{c("MOD11A1", "MOD13A2", "MOD06_L2", "VNP46A2", "MOD09GA", "MCD19A2")}}
+\item{locs_id}{character(1). Site identifier. Default is \code{"site_id"}}
 
 \item{name_covariates}{character. Name header of covariates.
 e.g., \code{"MOD_NDVIF_0_"}.
@@ -48,36 +48,38 @@ extracted raster values.}
 to calculate covariates.}
 
 \item{package_list_add}{character. A vector with package names to load
-these in each thread. Note that \code{sf}, \code{terra},
-\code{exactextractr}, \code{doParallel}, \code{parallelly},
-and \code{dplyr}
-are the default packages to be loaded.}
+these in each thread. Note that \code{sf}, \code{terra}, \code{exactextractr},
+\code{doParallel}, \code{parallelly} and \code{dplyr} are the default packages to be
+loaded.}
 
 \item{export_list_add}{character. A vector with object names to export
 to each thread. It should be minimized to spare memory.}
 
-\item{id_col}{character(1). Site identifier. Default is \code{"site_id"}}
+\item{product}{character(1). MODIS product. Should be one of
+\code{c("MOD11A1", "MOD13A2", "MOD06_L2", "VNP46A2", "MOD09GA", "MCD19A2")}}
 }
 \description{
-calc_modis essentially runs \code{modis_worker} function
+\code{calc_modis} essentially runs \code{process_modis_daily} function
 in each thread (subprocess). Based on daily resolution, each day's workload
 will be distributed to each thread. With \code{product} argument,
 the files are processed by a customized function where the unique structure
 and/or characteristics of the products are considered. \code{nthreads}
 argument should be carefully selected in consideration of the machine's
 CPU and memory capacities as products have their own memory pressure.
-Overall, this function and dependent routines assume that the file system
-can handle concurrent access to the (network) disk by multiple processes.
-File system characteristics, package versions, and hardware settings/
-specification can affect the processing efficiency.
-
-locs should be sf object as it is exportable to
-parallel workers.
+\code{locs} should be \code{sf} object as it is exportable to parallel workers.
 }
 \note{
+Overall, this function and dependent routines assume that the file
+system can handle concurrent access to the (network) disk by multiple
+processes. File system characteristics, package versions, and hardware
+settings and specification can affect the processing efficiency.
+}
+\seealso{
 See details for setting parallelization
-\code{\link[foreach]{foreach}},
-\code{\link[parallelly]{makeClusterPSOCK}},
-\code{\link[parallelly]{availableCores}},
-\code{\link[doParallel]{registerDoParallel}}
+\itemize{
+\item \link[foreach:foreach]{foreach::foreach}
+\item \link[parallelly:makeClusterPSOCK]{parallelly::makeClusterPSOCK}
+\item \link[parallelly:availableCores]{parallelly::availableCores}
+\item \link[doParallel:registerDoParallel]{doParallel::registerDoParallel}
+}
 }

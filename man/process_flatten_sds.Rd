@@ -4,25 +4,20 @@
 \alias{process_flatten_sds}
 \title{Aggregate layers in a sub-dataset in sinusoidal MODIS products}
 \usage{
-process_flatten_sds(
-  path,
-  product = c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2"),
-  nsds,
-  fun_agg = "mean"
-)
+process_flatten_sds(path, subdataset = NULL, fun_agg = "mean")
 }
 \arguments{
 \item{path}{character(1). Full path to MODIS HDF4/HDF5 file.
 Direct sub-dataset access is supported, for example,
 HDF4_EOS:EOS_GRID:\{filename\}:\{base_grid_information\}:\{sub-dataset\}}
 
-\item{product}{character(1). Name of MODIS product.}
-
-\item{nsds}{character(1). Exact or regular expression filter of sub-dataset.
-See \link{process_modis_sds} for details.}
+\item{subdataset}{character(1). Exact or regular expression filter of
+sub-dataset. See \link{process_modis_sds} for details.}
 
 \item{fun_agg}{character(1). Function name to aggregate layers.
 Should be acceptable to \link[terra:tapp]{terra::tapp}.}
+
+\item{product}{character(1). Name of MODIS product.}
 }
 \value{
 SpatRaster.

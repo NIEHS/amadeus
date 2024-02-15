@@ -13,7 +13,7 @@ calc_koppen_geiger(
 }
 \arguments{
 \item{locs}{sf/SpatVector. Unique locs. Should include
-a unique identifier field named \code{id_col}}
+a unique identifier field named \code{locs_id}}
 
 \item{from}{character(1). from to Koppen-Geiger
 climate zone raster file}

@@ -5,12 +5,15 @@
 \title{Process Koeppen-Geiger climate data}
 \usage{
 process_koppen_geiger(
-  path = "./input/koppen_geiger/raw/Beck_KG_V1_present_0p0083.tif"
+  path = "./input/koppen_geiger/raw/Beck_KG_V1_present_0p0083.tif",
+  year = NULL
 )
 }
 \arguments{
 \item{path}{character(1). Path to Koppen-Geiger
 climate zone raster file}
+
+\item{year}{data year. Not applicable for this function.}
 }
 \value{
 SpatRaster object
