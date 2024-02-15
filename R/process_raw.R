@@ -14,8 +14,6 @@ process_sedac_population <- function(
     cat(paste0("netCDF functionality for SEDAC data is under construction.\n"))
     return()
   }
-  #### directory setup
-  path <- download_sanitize_path(path)
   #### check for variable
   check_for_null_parameters(mget(ls()))
   #### import data

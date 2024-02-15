@@ -2,9 +2,11 @@
 
 testthat::test_that("process_sedac_population returns expected.", {
   withr::local_package("terra")
-  paths <- c(
-    "../testdata/population/gpw_v4_population_density_adjusted_to_2015_unwpp_country_totals_rev11_2020_30_sec.tif"
-  )
+  paths <- list.files(
+    "../testdata/population/",
+    pattern = ".tif",
+    full.names = TRUE
+    )
   # expect function
   expect_true(
     is.function(process_sedac_population)
