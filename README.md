@@ -63,7 +63,7 @@ Example use of `process()` using downloaded "weasd" data.
 +   date_start = "2022-01-01",
 +   date_end = "2022-01-05",
 +   variable = "weasd",
-+   directory_with_data = directory_with_data
++   path = path
 + )
 Cleaning weasd data for year 2022...
 Returning daily weasd data from 2022-01-01 to 2022-01-05.
@@ -82,16 +82,16 @@ time        : 2022-01-01 to 2022-01-05 UTC
 
 ## Calculate Covariates
 
-`calculate_covariate()` stems from the `beethoven` package, and the *air pollution model's (citation)* need for various types of data extracted at precise locations. `calculate_covariate()`, therefore, extracts data from the "cleaned" `SpatRaster` or `SpatVector` object at user defined locations. Users can choose to buffer the locations. The function returns a `data.frame` with data extracted at all locations for each layer or row in the `SpatRaster` or `SpatVector` object, respectively.
+`calc_covariates()` stems from the `beethoven` package, and the *air pollution model's (citation)* need for various types of data extracted at precise locations. `calc_covariates()`, therefore, extracts data from the "cleaned" `SpatRaster` or `SpatVector` object at user defined locations. Users can choose to buffer the locations. The function returns a `data.frame` with data extracted at all locations for each layer or row in the `SpatRaster` or `SpatVector` object, respectively.
 
-Example of `calculate_covariate()` using processed "weasd" data.
+Example of `calc_covariates()` using processed "weasd" data.
 
 ```
-> weasd_covar <- covar_narr(
+> weasd_covar <- calc_narr(
 +   from = weasd,
 +   locs = locs,
-+   id = "site_id",
-+   buffer = 0
++   locs_id = "site_id",
++   radius = 0
 + )
 Converting data.table to data.frame...
 Projecting data to desired coordinate reference system...

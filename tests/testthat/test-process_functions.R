@@ -1,5 +1,38 @@
 # Tests for data import functions
 
+testthat::test_that("process_sedac_population returns expected.", {
+  withr::local_package("terra")
+  paths <- c(
+    "../testdata/population/gpw_v4_population_density_adjusted_to_2015_unwpp_country_totals_rev11_2020_30_sec.tif"
+  )
+  # expect function
+  expect_true(
+    is.function(process_sedac_population)
+  )
+  for (p in seq_along(paths)) {
+    pop <-
+      process_sedac_population(
+        path = paths[p]
+      )
+    # expect output is a SpatRaster
+    expect_true(
+      class(pop)[1] == "SpatRaster"
+    )
+    # expect values
+    expect_true(
+      terra::hasValues(pop)
+    )
+    # expect non-null coordinate reference system
+    expect_false(
+      is.null(terra::crs(pop))
+    )
+    # expect lon and lat dimensions to be > 1
+    expect_false(
+      any(c(0, 1) %in% dim(pop)[1:2])
+    )
+  }
+})
+
 testthat::test_that("process_hms returns expected.", {
   withr::local_package("terra")
   densities <- c(

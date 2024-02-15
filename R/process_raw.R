@@ -1,4 +1,64 @@
 #' @description
+#' Import and clean population data from NASA Socioeconomic Data and
+#' Applications Center (SEDAC).
+#' @param path character(1). Path to GeoTIFF or netCDF file.
+#' @author Mitchell Manware
+#' @return a SpatRaster object;
+#' @importFrom package function
+#' @importFrom package function
+#' @export
+process_sedac_population <- function(
+    path = "./input/sedac_population/raw/"
+) {
+  if (substr(path, nchar(path) - 2, nchar(path)) == ".nc") {
+    cat(paste0("netCDF functionality for SEDAC data is under construction.\n"))
+    return()
+  }
+  #### directory setup
+  path <- download_sanitize_path(path)
+  #### check for variable
+  check_for_null_parameters(mget(ls()))
+  #### import data
+  data <- terra::rast(path)
+  #### identify names
+  names_raw <- names(data)
+  #### create new names
+  for (r in seq_along(names_raw)) {
+    split1 <- strsplit(
+      names_raw[r],
+      "_rev11_",
+    )[[1]][[2]]
+    split2 <- strsplit(
+      split1,
+      "_"
+    )[[1]]
+    names(data[[r]]) <- paste0(
+      "gpw_v4_population_",
+      split2[1],
+      "_",
+      split2[2],
+      "_",
+      split2[3]
+    )
+    cat(paste0(
+      "Cleaning ",
+      process_sedac_codes(
+        paste0(
+          split2[2],
+          "_",
+          split2[3]
+        ),
+        invert = TRUE
+      ),
+      " population data for year ",
+      split2[1],
+      "...\n"
+    ))
+  }
+  return(data)
+}
+
+#' @description
 #' Import and clean wildfire smoke plume coverage data from NOAA Hazard
 #' Mapping System Fire and Smoke Product.
 #' @param date_start character(1). length of 10. Start date of downloaded data.

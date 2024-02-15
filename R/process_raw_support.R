@@ -97,6 +97,9 @@ process_geos_collection <-
 #' @param string character(1). File path to GEOS-CF data file.
 #' @param statistic logical(1). Matches statistic to statistic code.
 #' @param resolution logical(1). Matches resolution to resolution code.
+#' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
+#' provides statistic or resolution code, and returns full length statistic
+#' or resolution.
 #' @return character
 #' @export
 process_gmted_codes <-
@@ -127,4 +130,34 @@ process_gmted_codes <-
       code <- resolution_codes[resolution_codes[, 2] == string][1]
     }
     return(code)
+  }
+
+#' Generate resolution codes based on NASA SEDAC population resolution.
+#' @param string character(1). Resolution name or code.
+#' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
+#' provides resolution code, and returns full length resolution.
+#' @export
+process_sedac_codes <-
+  function(
+    string,
+    invert = FALSE
+  ) {
+    resolution_namecodes <- cbind(
+      c(
+        "60 minute", "30 second", "2.5 minute",
+        "15 minute", "30 minute"
+      ),
+      c(
+        "1_deg", "30_sec", "2pt5_min",
+        "15_min", "30_min"
+      )
+    )
+    if (invert == FALSE) {
+      resolution <-
+        resolution_namecodes[resolution_namecodes[, 1] == string][2]
+    } else if (invert == TRUE) {
+      resolution <-
+        resolution_namecodes[resolution_namecodes[, 2] == string][1]
+    }
+    return(resolution)
   }

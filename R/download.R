@@ -1540,18 +1540,7 @@ download_sedac_population_data <- function(
   #### 5. define year
   year <- ifelse(year == "all", "totpop", as.character(year))
   #### 6. define data resolution
-  resolution_namecodes <- cbind(
-    c(
-      "60 minute", "30 second", "2.5 minute",
-      "15 minute", "30 minute"
-    ),
-    c(
-      "1_deg", "30_sec", "2pt5_min",
-      "15_min", "30_min"
-    )
-  )
-  resolution <-
-    resolution_namecodes[resolution_namecodes[, 1] == data_resolution][2]
+  resolution <- process_sedac_codes(data_resolution)
   #### 7. 30 second resolution not available for all years
   if (year == "totpop" && resolution == "30_sec") {
     resolution <- "2pt5_min"

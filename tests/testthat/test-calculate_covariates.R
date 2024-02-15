@@ -710,3 +710,49 @@ testthat::test_that("calc_geos returns as expected.", {
     }
   }
 })
+
+testthat::test_that("calc_sedac_population returns as expected.", {
+  withr::local_package("terra")
+  paths <- c(
+    "../testdata/population/gpw_v4_population_density_adjusted_to_2015_unwpp_country_totals_rev11_2020_30_sec.tif"
+  )
+  radii <- c(0, 1000)
+  locs <- data.frame(readRDS("../testdata/sites_nc.RDS"))
+  # expect function
+  expect_true(
+    is.function(calc_sedac_population)
+  )
+  for (p in seq_along(paths)) {
+    path = paths[p]
+    for (r in seq_along(radii)) {
+      pop <-
+        process_sedac_population(
+          path = path
+        )
+      pop_covariate <-
+        calc_sedac_population(
+          from = pop,
+          locs = locs,
+          locs_id = "site_id",
+          radius = radii[r],
+          fun = "mean"
+        )
+      # expect output is data.frame
+      expect_true(
+        class(pop_covariate) == "data.frame"
+      )
+      # expect 4 columns
+      expect_true(
+        ncol(pop_covariate) == 3
+      )
+      # expect numeric value
+      expect_true(
+        class(pop_covariate[, 3]) == "numeric"
+      )
+      # expect date and time column
+      expect_true(
+        "integer" %in% class(pop_covariate$year)
+      )
+    }
+  }
+})

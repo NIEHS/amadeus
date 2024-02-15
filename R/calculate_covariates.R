@@ -1558,3 +1558,115 @@ calc_geos <- function(
   return(sites_extracted)
 }
 
+#' Calculate UN WPP-Ajusted population density covariates covariates
+#' @description
+#' Extract population density data at point locations using SpatRaster object
+#' from `process_sedac_population`. Function returns a data frame containing
+#' population values at user-defined sites. Unique column names reflect variable
+#' name and circular buffer.
+#' @param from SpatRaster(1). Cleaned SpatRaster object that has been returned
+#' from `process_sedac_population` containing GEOS-CF variable data.
+#' @param locs data.frame, characater to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param fun character(1). Function used to summarize multiple raster cells
+#' within sites location buffer (Default = `mean`).
+#' @author Mitchell Manware
+#' @return a data.frame object;
+#' @importFrom terra vect
+#' @importFrom terra buffer
+#' @importFrom terra as.data.frame
+#' @importFrom terra time
+#' @importFrom terra extract
+#' @importFrom terra nlyr
+#' @importFrom terra crs
+#' @export
+calc_sedac_population <- function(
+    from,
+    locs,
+    locs_id = NULL,
+    radius = 0,
+    fun = "mean"
+) {
+  #### check for null parameters
+  check_for_null_parameters(mget(ls()))
+  #### prepare sites
+  sites_e <- process_locs_vector(
+    locs,
+    terra::crs(from),
+    radius
+  )
+  #### site identifiers
+  sites_id <- subset(
+    locs,
+    select = locs_id
+  )
+  #### empty location data.frame
+  sites_extracted <- NULL
+  for (l in seq_len(terra::nlyr(from))) {
+    data_layer <- from[[l]]
+    name_split <- strsplit(
+      names(data_layer),
+      "_"
+    )[[1]]
+    year <- name_split[4]
+    resolution <- name_split[5:6]
+    cat(
+      paste0(
+        "Calculating annual population density covariates for ",
+        year,
+        " at ",
+        process_sedac_codes(
+          paste0(
+            resolution[1],
+            "_",
+            resolution[2]
+          ),
+          invert = TRUE
+        ),
+        " resolution...\n"
+      )
+    )
+    #### extract layer data at sites
+    sites_extracted_layer <- terra::extract(
+      data_layer,
+      sites_e,
+      fun = fun,
+      method = "simple",
+      ID = FALSE,
+      bind = FALSE
+    )
+    #### merge with site_id, datetime, pressure level
+    sites_extracted_layer <- cbind(
+      sites_id,
+      as.integer(year),
+      sites_extracted_layer
+    )
+    #### define column names
+    colnames(sites_extracted_layer) <- c(
+      locs_id,
+      "year",
+      paste0(
+        "pop_",
+        resolution[1],
+        resolution[2],
+        "_",
+        radius
+      )
+    )
+    #### merge with empty sites_extracted
+    sites_extracted <- rbind(
+      sites_extracted,
+      sites_extracted_layer
+    )
+  }
+  cat(
+    paste0(
+      "Returning population covariates.\n"
+    )
+  )
+  #### return data frame
+  return(sites_extracted)
+}
