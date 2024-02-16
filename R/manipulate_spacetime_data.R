@@ -245,6 +245,21 @@ as_mysftime <- function(x, ...) {
   return(output)
 }
 
+#' Convert sftime object to SpatVector
+#'
+#' @param x a sftime
+#' @import sftime
+#' @author Eva Marques
+#' @export
+sftime_as_spatvector <- function(x) {
+  stopifnot("x is not a sftime" = class(x)[1] == "sftime")
+  timecol <- attributes(x)$time_column
+  tosf <- x[, !(colnames(x) %in% c(timecol))]
+  tosf[, timecol] <- as.data.table(x)[, get(timecol)]
+  return(terra::vect(tosf))
+}
+
+
 #' Convert a stdt to sf/sftime/SpatVector
 #' @param stdt A stdt object
 #' @param class_to character(1). Should be one of

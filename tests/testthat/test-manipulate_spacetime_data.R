@@ -426,6 +426,22 @@ test_that("as_mysftime works as expected", {
                "x class not accepted")
 })
 
+test_that("sftime_as_spatvector as expected", {
+  # open testing data
+  stdata <- data.table::fread(paste0(testthat::test_path("..", "testdata/", ""),
+                                     "spacetime_table.csv"))
+  mysftime <- sftime::st_as_sftime(stdata,
+                                   coords = c("lon", "lat"),
+                                   time_column_name = "time",
+                                   crs = 4326)
+  expect_no_error(sftime_as_spatvector(mysftime))
+  # with a different time column name:
+  attributes(mysftime)$time_column <- "date"
+  mysftime <- dplyr::rename(mysftime, "date" = "time")
+  expect_no_error(sftime_as_spatvector(mysftime))
+  # doesn't work with other classes:
+  expect_error(sftime_as_spatvector(stdata))
+})
 
 test_that("dt_to_sf works as expected", {
   withr::local_package("terra")
