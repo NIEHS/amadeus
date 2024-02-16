@@ -49,7 +49,7 @@ testthat::test_that("process_flatten_sds", {
     mcdaggr <-
       process_flatten_sds(
         path = mcd19,
-        nsds = "Optical_Depth",
+        subdataset = "Optical_Depth",
         fun_agg = "mean"
       )
   )
@@ -68,7 +68,7 @@ testthat::test_that("process_flatten_sds", {
     modaggr <-
       process_flatten_sds(
         path = mod09_sub,
-        nsds = NULL,
+        subdataset = NULL,
         fun_agg = "mean"
       )
   )
@@ -92,7 +92,7 @@ testthat::test_that("process_modis_merge is good to go", {
     process_modis_merge(
       paths = path_mod11,
       date_in = "2021-08-15",
-      regex_sds = "(LST_)"
+      subdataset = "(LST_)"
     )
   )
   # case 2: standard mod13a2
@@ -105,7 +105,7 @@ testthat::test_that("process_modis_merge is good to go", {
     process_modis_merge(
       paths = path_mod13,
       date_in = "2021-08-13",
-      regex_sds = "(NDVI)"
+      subdataset = "(NDVI)"
     )
   )
 
@@ -119,7 +119,7 @@ testthat::test_that("process_modis_merge is good to go", {
     process_modis_merge(
       paths = path_mcd19,
       date_in = "2021-08-15",
-      regex_sds = "(Optical_Depth)"
+      subdataset = "(Optical_Depth)"
     )
   )
 
@@ -133,7 +133,7 @@ testthat::test_that("process_modis_merge is good to go", {
     process_modis_merge(
       paths = path_mod09,
       date_in = "2021-08-15",
-      regex_sds = "(sur_refl_b0)"
+      subdataset = "(sur_refl_b0)"
     )
   )
 
@@ -270,13 +270,16 @@ testthat::test_that("process_nlcd tests", {
   withr::local_package("terra")
 
   path_nlcd19 <-
-    testthat::test_path("../testdata", "nlcd_2019_land_cover_l48_20210604.tif")
+    testthat::test_path(
+      "..",
+      "testdata"
+    )
 
   testthat::expect_no_error(
     nlcd19 <- process_nlcd(path = path_nlcd19, year = 2019)
   )
   testthat::expect_s4_class(nlcd19, "SpatRaster")
-  testthat::expect_equal(terra::metags(nlcd19, name = "year"), "2019")
+  testthat::expect_equal(unname(terra::metags(nlcd19, name = "year")), "2019")
 
   # error cases
   testthat::expect_error(
@@ -322,9 +325,11 @@ testthat::test_that("process_nei tests", {
 
   path_nei <- testthat::test_path("../testdata", "nei", "")
   path_cnty <- system.file("gpkg/nc.gpkg", package = "sf")
+  path_cnty <- terra::vect(path_cnty)
+  path_cnty$GEOID <- path_cnty$FIPS
 
   testthat::expect_no_error(
-    neinc <- process_nei(path = path_nei, year = 2020, auxfile = path_cnty)
+    neinc <- process_nei(path = path_nei, year = 2020, county = path_cnty)
   )
   testthat::expect_s4_class(neinc, "SpatVector")
 
@@ -333,9 +338,53 @@ testthat::test_that("process_nei tests", {
     process_nei(path_nei, year = 2030)
   )
   testthat::expect_error(
-    process_nei(path_nei, year = 2020, auxfile = NULL)
+    process_nei(path_nei, year = 2020, county = NULL)
   )
 
 })
 
 
+
+## ephemeral: process_conformity tests
+testthat::test_that("process_conformity tests", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  lon <- seq(-112, -101, length.out = 5) # create lon sequence
+  lat <- seq(33.5, 40.9, length.out = 5) # create lat sequence
+  df <- expand.grid("lon" = lon, "lat" = lat) # expand to regular grid
+  df <- rbind(df, df)
+  df$time <- c(rep("2023-11-02", 25), rep("2023-11-03", 25))
+  df$var1 <- 1:50
+  df$var2 <- 51:100
+  dfst <- convert_stobj_to_stdt(df)
+  dfst$crs_stdt <- "EPSG:4326"
+  dfsf <- sf::st_as_sf(
+    df,
+    coords = c("lon", "lat"),
+    crs = "EPSG:4326",
+    remove = FALSE
+  )
+
+  testthat::expect_no_error(
+    process_conformity(locs = df, check_time = TRUE)
+  )
+  testthat::expect_no_error(
+    process_conformity(locs = dfsf, check_time = TRUE)
+  )
+  testthat::expect_no_error(
+    process_conformity(locs = df, check_time = FALSE)
+  )
+  testthat::expect_no_error(
+    process_conformity(locs = dfst, check_time = TRUE)
+  )
+  # error cases
+  dfe <- df
+  names(dfe)[3] <- "date"
+  #dfe <- stats::setNames(df, c("lon", "lat", "date", "var1", "var2"))
+  testthat::expect_error(
+    process_conformity(locs = dfe, check_time = TRUE)
+  )
+
+})

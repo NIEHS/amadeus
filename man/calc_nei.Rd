@@ -4,7 +4,7 @@
 \alias{calc_nei}
 \title{Calculate National Emission Inventory (NEI) covariates}
 \usage{
-calc_nei(locs, from = NULL, locs_id = "site_id")
+calc_nei(locs, from = NULL, locs_id = "site_id", ...)
 }
 \arguments{
 \item{locs}{sf/SpatVector. Locations at NEI values are joined.}
@@ -12,8 +12,9 @@ calc_nei(locs, from = NULL, locs_id = "site_id")
 \item{from}{character(1). from to the directory with NEI CSV files}
 
 \item{locs_id}{character(1). Unique site identifier column name.
-Default is \code{"site_id"}. It is no more than a placeholder
-in this function}
+Unused but kept for compatibility.}
+
+\item{...}{Placeholders.}
 }
 \value{
 A data.frame object.

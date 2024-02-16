@@ -8,7 +8,8 @@ calc_temporal_dummies(
   locs,
   from = NULL,
   locs_id = "site_id",
-  year = seq(2018L, 2022L)
+  year = seq(2018L, 2022L),
+  ...
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ Default is \code{"site_id"}.}
 
 \item{year}{integer. Year domain to dummify.
 Default is \code{seq(2018L, 2022L)}}
+
+\item{...}{Placeholders.}
 }
 \value{
 data.frame with year, month, and weekday indicators.

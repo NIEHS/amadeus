@@ -6,7 +6,7 @@
 \usage{
 calc_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
-    "dummies", "gmted", "roads", "sedac_groads", "nlcd", "tri", "ncep", "aadt",
+    "dummies", "gmted", "roads", "sedac_groads", "nlcd", "tri", "ncep", "nei",
     "ecoregions", "ecoregion"),
   locs,
   from,

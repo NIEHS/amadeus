@@ -24,7 +24,7 @@ calc_covariates <-
       covariate = c("modis", "koppen-geiger",
                     "koeppen-geiger", "koppen", "koeppen",
                     "geos", "dummies", "gmted", "roads",
-                    "sedac_groads", "nlcd", "tri", "ncep", "aadt",
+                    "sedac_groads", "nlcd", "tri", "ncep", "nei",
                     "ecoregions", "ecoregion"),
       locs,
       from,
@@ -76,7 +76,7 @@ calc_covariates <-
         print(e)
         print(args(what_to_run))
         message(paste0("Please refer to the argument list and
-                        the error message above to rectify the error.\n"))
+the error message above to rectify the error.\n"))
         return(NULL)
       })
 
@@ -90,6 +90,7 @@ calc_covariates <-
 #' @param from character(1). from to Koppen-Geiger
 #'  climate zone raster file
 #' @param locs_id character(1). Name of unique identifier.
+#' @param ... Placeholders.
 #' @returns a data.frame object
 #' @author Insang Song
 #' @importFrom terra vect
@@ -107,7 +108,7 @@ calc_koppen_geiger <-
       locs = NULL,
       from = NULL,
       locs_id = "site_id",
-      variables = NULL) {
+      ...) {
     ## You will get "locs" in memory after sourcing the file above
     locs_tr <- locs
 
@@ -184,8 +185,7 @@ calc_koppen_geiger <-
 #' @param locs_id character(1). Unique identifier of locations
 #' @param radius numeric (non-negative) giving the
 #' radius of buffer around points
-#' @param year numeric giving the year of NLCD data used
-#' @param variables character. Variable names to extract. Ignored.
+#' @param ... Placeholders.
 #' @importFrom utils read.csv
 #' @importFrom methods is
 #' @importFrom terra rast
@@ -204,7 +204,7 @@ calc_nlcd_ratio <- function(locs,
                             from,
                             locs_id = "site_id",
                             radius = 1000,
-                            variables = NULL) {
+                            ...) {
   # check inputs
   if (!is.numeric(radius)) {
     stop("radius is not a numeric.")
@@ -268,6 +268,7 @@ calc_nlcd_ratio <- function(locs,
 #'  a unique identifier field named `locs_id`
 #' @param from SpatVector. Ecoregion polygons
 #' @param locs_id character(1). Name of unique identifier.
+#' @param ... Placeholders.
 #' @returns a data.frame object with dummy variables and attributes of:
 #'   - `attr(., "ecoregion2_code")`: Ecoregion lv.2 code and key
 #'   - `attr(., "ecoregion3_code")`: Ecoregion lv.3 code and key
@@ -284,7 +285,8 @@ calc_ecoregion <-
   function(
     locs,
     from = NULL,
-    locs_id = "site_id"
+    locs_id = "site_id",
+    ...
   ) {
 
     if (!methods::is(locs, "SpatVector")) {
@@ -340,118 +342,6 @@ calc_ecoregion <-
     attr(locs_ecoreg, "ecoregion3_code") <- sort(unique(from$L3_KEY))
     return(locs_ecoreg)
   }
-
-
-#' A single-date MODIS worker for parallelization
-#' @param locs SpatVector/sf/sftime object. Locations where MODIS values
-#' are summarized.
-#' @param from SpatRaster. Preprocessed objects.
-#' @param locs_id character(1). Field name where unique site identifiers
-#' are stored. Default is `"site_id"`
-#' @param date Date(1). date to query.
-#' @param name_extracted character. Names of calculated covariates.
-#' @param fun_summary function. Summary function for
-#' multilayer rasters. Passed to `foo`. See [exactextractr::exact_extract]
-#' for details.
-#' @param radius numeric. Radius to generate circular buffers.
-#' @description modis_worker operates at six MODIS/VIIRS products
-#' (MOD11A1, MOD13A2, MOD06_L2, VNP46A2, MOD09GA, and MCD19A2)
-#' on a daily basis. Given that the raw hdf files are downloaded from
-#' NASA, standard file names include a data retrieval date flag starting
-#' with A. Leveraging that piece of information, the function will select
-#' files of scope on the date of interest. Please note that this function
-#' does not provide a function to filter swaths or tiles, so it is strongly
-#' recommended to check and pre-filter the file names at users' discretion.
-#' @author Insang Song
-#' @returns A data.frame object.
-#' @importFrom terra extract
-#' @importFrom terra project
-#' @importFrom terra vect
-#' @importFrom terra nlyr
-#' @importFrom terra describe
-#' @importFrom methods is
-#' @importFrom sf st_as_sf
-#' @importFrom sf st_drop_geometry
-#' @export
-process_modis_daily <- function(
-  locs = NULL,
-  from = NULL,
-  locs_id = "site_id",
-  date = NULL,
-  name_extracted = NULL,
-  fun_summary = "mean",
-  radius = 0L
-) {
-  if (!any(methods::is(locs, "SpatVector"),
-           methods::is(locs, "sf"),
-           methods::is(locs, "sftime"))) {
-    stop("locs should be one of sf, sftime, or SpatVector.\n")
-  }
-  if (!methods::is(locs, "SpatVector")) {
-    locs <- terra::vect(locs)
-  }
-  if (!locs_id %in% names(locs)) {
-    stop(sprintf("locs should include columns named %s.\n",
-                 locs_id)
-    )
-  }
-  if (!"time" %in% names(locs)) {
-    locs$time <- date
-  }
-
-  extract_with_buffer <- function(
-    points,
-    surf,
-    radius,
-    id,
-    time = "time",
-    func = "mean"
-  ) {
-    # generate buffers
-    bufs <- terra::buffer(points, width = radius, quadsegs = 180L)
-    bufs <- terra::project(bufs, terra::crs(surf))
-    # extract raster values
-    surf_at_bufs <-
-      exactextractr::exact_extract(
-        x = surf,
-        y = sf::st_as_sf(bufs),
-        fun = func,
-        force_df = TRUE,
-        append_cols = c(id, time),
-        progress = FALSE,
-        max_cells_in_memory = 1e7
-      )
-    return(surf_at_bufs)
-  }
-
-  ## NaN to zero
-  from[is.nan(from)] <- 0L
-
-  # raster used to be vrt_today
-  if (any(grepl("00000", name_extracted))) {
-    locs_tr <- terra::project(locs, terra::crs(from))
-    extracted <- terra::extract(x = from, y = locs_tr, ID = FALSE)
-    locs_blank <- as.data.frame(locs)
-    extracted <- cbind(locs_blank, extracted)
-  } else {
-    extracted <-
-      extract_with_buffer(
-        points = locs,
-        surf = from,
-        id = locs_id,
-        radius = radius,
-        func = fun_summary
-      )
-  }
-  # cleaning names
-  # assuming that extracted is a data.frame
-  #extracted$time <- date
-  name_offset <- terra::nlyr(from)
-  # multiple columns will get proper names
-  name_range <- seq(ncol(extracted) - name_offset + 1, ncol(extracted), 1)
-  colnames(extracted)[name_range] <- name_extracted
-  return(extracted)
-}
 
 
 
@@ -650,6 +540,7 @@ process_modis_swath, or process_bluemarble.")
 #'  Default is `"site_id"`.
 #' @param year integer. Year domain to dummify.
 #'  Default is \code{seq(2018L, 2022L)}
+#' @param ... Placeholders.
 #' @returns data.frame with year, month, and weekday indicators.
 #' @author Insang Song
 #' @importFrom methods is
@@ -662,7 +553,8 @@ calc_temporal_dummies <-
     locs,
     from = NULL,
     locs_id = "site_id",
-    year = seq(2018L, 2022L)
+    year = seq(2018L, 2022L),
+    ...
   ) {
     if (!methods::is(locs, "data.frame")) {
       stop("Argument locs is not a data.frame.\n")
@@ -719,86 +611,6 @@ calc_temporal_dummies <-
   }
 
 
-#' Prepare Toxic Release Inventory (TRI) data
-#' @param path character(1). Path to the directory with TRI CSV files
-#' @param variables integer. Column index of TRI data.
-#' @author Insang Song, Mariana Kassien
-#' @returns SpatVector (points) object.
-#' @note TRI data is available in USEPA.
-#' @references
-#' https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-and-tools
-#' @importFrom terra vect
-#' @importFrom terra crs
-#' @importFrom terra nearby
-#' @importFrom methods is
-#' @importFrom data.table .SD
-#' @importFrom utils read.csv
-#' @importFrom data.table rbindlist
-#' @importFrom dplyr filter
-#' @importFrom dplyr mutate
-#' @importFrom dplyr across
-#' @importFrom dplyr ends_with
-#' @importFrom dplyr all_of
-#' @importFrom dplyr group_by
-#' @importFrom dplyr ungroup
-#' @importFrom dplyr summarize
-#' @importFrom tidyr pivot_wider
-#' @export
-process_tri <- function(
-  path = "./input/tri/",
-  variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49)
-) {
-
-  csvs_tri_from <-
-    list.files(path = path, pattern = "*.csv$", full.names = TRUE)
-  csvs_tri <- lapply(csvs_tri_from, read.csv)
-  col_sel <- variables
-  csvs_tri <- data.table::rbindlist(csvs_tri)
-  dt_tri <- csvs_tri[, col_sel, with = FALSE]
-
-  # column name readjustment
-  tri_cns <- colnames(dt_tri)
-  tri_cns <- sub(".*?\\.\\.", "", tri_cns)
-  tri_cns <- sub("^[^A-Za-z]*", "", tri_cns)
-  tri_cns <- gsub("\\.", "_", tri_cns)
-  dt_tri <- setNames(dt_tri, tri_cns)
-
-  # depending on the way the chemicals are summarized
-  # Unit is kilogram
-  # nolint start
-  dt_tri_x <-
-    dt_tri |>
-    dplyr::mutate(
-      dplyr::across(
-        dplyr::ends_with("_AIR"),
-        ~ifelse(UNIT_OF_MEASURE == "Pounds", . * (453.592 / 1e3), . / 1e3)
-      )
-    ) |>
-    dplyr::group_by(YEAR, LONGITUDE, LATITUDE, TRI_CHEMICAL_COMPOUND_ID) |>
-    dplyr::summarize(
-      dplyr::across(
-        dplyr::ends_with("_AIR"),
-        ~sum(., na.rm = TRUE)
-      )
-    ) |>
-    dplyr::ungroup() |>
-    tidyr::pivot_wider(
-      values_from = c("FUGITIVE_AIR", "STACK_AIR"),
-      names_from = "TRI_CHEMICAL_COMPOUND_ID",
-      names_sep = "_"
-    ) |>
-    dplyr::filter(!is.na(LONGITUDE) | !is.na(LATITUDE))
-
-  spvect_tri <-
-    terra::vect(dt_tri_x,
-                geom = c("LONGITUDE", "LATITUDE"),
-                crs = "EPSG:4269", # all are NAD83
-                keepgeom = TRUE)
-
-  return(spvect_tri)
-}
-# nolint end
-
 # nolint start
 #' Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates
 #' @param locs `SpatVector` object. Locations where
@@ -812,9 +624,9 @@ process_tri <- function(
 #' @returns data.frame (tibble) object with input field names with
 #'  a suffix \code{"_sedc"} where the sums of EDC are stored.
 #'  Additional attributes are attached for the EDC information.
-#'    - attr(result, "sedc_bandwidth"): the bandwidth where
+#'    - `attr(result, "sedc_bandwidth")``: the bandwidth where
 #'  concentration reduces to approximately five percent
-#'    - attr(result, "sedc_threshold"): the threshold distance
+#'    - `attr(result, "sedc_threshold")``: the threshold distance
 #'  at which emission source points are excluded beyond that
 #' @note The function is originally from
 #' [chopin](https://github.com/Spatiotemporal-Exposures-and-Toxicology/chopin)
@@ -824,7 +636,7 @@ process_tri <- function(
 #'  The threshold should be carefully chosen by users.
 #' @author Insang Song
 #' @references
-#' * [Messier KP, Akita Y, \& Serre ML. (2012). Integrating Address Geocoding, Land Use Regression, and Spatiotemporal Geostatistical Estimation for Groundwater Tetrachloroethylene. _Environmental Science \& Technology_ 46(5), 2772-2780.](https://dx.doi.org/10.1021/es203152a)
+#' * [Messier KP, Akita Y, & Serre ML. (2012). Integrating Address Geocoding, Land Use Regression, and Spatiotemporal Geostatistical Estimation for Groundwater Tetrachloroethylene. _Environmental Science \& Technology_ 46(5), 2772-2780.](https://dx.doi.org/10.1021/es203152a)
 #' * Wiesner C. (n.d.). [Euclidean Sum of Exponentially Decaying Contributions Tutorial](https://mserre.sph.unc.edu/BMElab_web/SEDCtutorial/index.html)
 #' @examples
 #' library(terra)
@@ -842,7 +654,7 @@ process_tri <- function(
 #' pnt_from$val2 <- rgamma(100L, 2, 1)
 #'
 #' vals <- c("val1", "val2")
-#' summarize_sedc(pnt_locs, pnt_from, "NAME", 1e5, 2e5, vals)
+#' calc_sedc(pnt_locs, pnt_from, "NAME", 1e5, vals)
 #' @importFrom dplyr as_tibble
 #' @importFrom dplyr left_join
 #' @importFrom dplyr summarize
@@ -866,8 +678,6 @@ calc_sedc <-
     target_fields = NULL
   ) {
     # define sources, set SEDC exponential decay range
-    len_point_locs <- seq_len(nrow(locs))
-    len_point_from <- seq_len(nrow(from))
 
     if (!methods::is(locs, "SpatVector")) {
       locs <- try(terra::vect(locs))
@@ -886,6 +696,8 @@ The result may not be accurate.\n",
         )
       )
     }
+    len_point_locs <- seq_len(nrow(locs))
+
     locs$from_id <- len_point_locs
     # select egrid_v only if closer than 3e5 meters from each aqs
     locs_buf <-
@@ -894,13 +706,17 @@ The result may not be accurate.\n",
         width = sedc_bandwidth * 2,
         quadsegs = 90
       )
+
     from <- from[locs_buf, ]
+    len_point_from <- seq_len(nrow(from))
+
     # len point from? len point to?
     from$to_id <- len_point_from
     dist <- NULL
 
     # near features with distance argument: only returns integer indices
     # threshold is set to the twice of sedc_bandwidth
+    # lines 895-900 may overlap with distance arg in 912-913
     res_nearby <-
       terra::nearby(locs, from, distance = sedc_bandwidth * 2)
     # attaching actual distance
@@ -944,12 +760,13 @@ The result may not be accurate.\n",
 
 #' Calculate TRI covariates
 #' @param locs sf/SpatVector. Locations where TRI variables are calculated.
-#' @param from SpatVector. Point vector object of TRI.
+#' @param from SpatVector. Point vector object of TRI in a year.
 #' See [process_tri]
 #' @param locs_id character(1). Unique site identifier column name.
 #'  Default is `"site_id"`.
 #' @param radius Circular buffer radius.
 #' Default is \code{c(1000, 10000, 50000)} (meters)
+#' @param ... Placeholders.
 #' @author Insang Song, Mariana Kassien
 #' @returns A data.frame object.
 #' @note U.S. context.
@@ -969,13 +786,13 @@ The result may not be accurate.\n",
 #' @importFrom dplyr group_by
 #' @importFrom dplyr ungroup
 #' @importFrom dplyr summarize
-#' @importFrom tidyr pivot_wider
 #' @export
 calc_tri <- function(
   locs,
   from = NULL,
   locs_id = "site_id",
-  radius = c(1e3L, 1e4L, 5e4L)
+  radius = c(1e3L, 1e4L, 5e4L),
+  ...
 ) {
   if (!all(c("lon", "lat", "time") %in% names(locs))) {
     stop("locs must have 'lon', 'lat', and 'time' fields.\n")
@@ -988,47 +805,27 @@ calc_tri <- function(
   if (!is.numeric(radius)) {
     stop("radius should be numeric.\n")
   }
-
   locs_re <- terra::project(locs, terra::crs(from))
 
-  # strategy: year-buffer
-  # assumption: years of coverage are the same in
-  # from and locs.
-  tlen_locs <- unlist(locs_re[["time"]])
-  tlen_tri <- unlist(from[["YEAR"]])
-  # if (!all.equal(unique(tlen_locs), unique(tlen_tri))) {
-  #   stop("Temporal coverage of each dataset does not match.")
-  # }
-
   # split by year: locs and tri locations
-  list_locs <- split(locs_re, tlen_locs)
-  list_tri <- split(from, tlen_tri)
   tri_cols <- grep("_AIR", names(from), value = TRUE)
 
   # mapply and inner lapply
+  list_radius <- split(radius, radius)
   list_locs_tri <-
-    mapply(
-      function(sts, tri) {
-        list_radius <- split(radius, radius)
-        list_radius <-
-          lapply(
-            list_radius,
-            function(x) {
-              locs_tri_s <-
-                calc_sedc(
-                  locs = sts,
-                  from = tri,
-                  locs_id = locs_id,
-                  sedc_bandwidth = x,
-                  target_fields = tri_cols
-                )
-              return(locs_tri_s)
-            }
+    lapply(
+      list_radius,
+      function(x) {
+        locs_tri_s <-
+          calc_sedc(
+            locs = locs_re,
+            from = from,
+            locs_id = locs_id,
+            sedc_bandwidth = x,
+            target_fields = tri_cols
           )
-        df_radius <- data.table::rbindlist(list_radius)
-        return(df_radius)
-      },
-      list_locs, list_tri, SIMPLIFY = FALSE
+        return(locs_tri_s)
+      }
     )
   # bind element data.frames into one
   df_tri <- data.table::rbindlist(list_locs_tri)
@@ -1036,101 +833,14 @@ calc_tri <- function(
 }
 
 
-# nolint start
-#' Prepare National Emission Inventory CSV files
-#' @param path character(1). Directory with NEI csv files.
-#' @param county SpatVector/sf. County boundaries.
-#' @param year integer(1) Year to use. Currently only 2017 or 2020
-#' is accepted.
-#' @returns SpatVector object.
-#' @author Insang Song
-#' @note Base files for `county` argument can be downloaded directly from
-#' [U.S. Census Bureau](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html)
-#' or by using `tigris` package. This function does not reproject census boundaries.
-#' Users should be aware of the coordinate system of census boundary data for
-#' other analyses.
-#' @description NEI data comprises multiple csv files where emissions of
-#' 50+ pollutants are recorded at county level. With raw data files,
-#' this function will join a combined table of NEI data and county
-#' boundary, then perform a spatial join to target locations.
-#' @importFrom terra vect
-#' @importFrom terra crs
-#' @importFrom methods is
-#' @importFrom data.table .SD
-#' @importFrom data.table fread
-#' @importFrom data.table rbindlist
-#' @export
-# nolint end
-process_nei <- function(
-  path,
-  county = NULL,
-  year = c(2017, 2020)
-) {
-  if (is.null(county)) {
-    stop("county argument is required.")
-  }
-  if (!methods::is(county, "SpatVector")) {
-    county <- try(terra::vect(county))
-    if (inherits(county, "try-error")) {
-      stop("county is unable to be converted to SpatVector.\n")
-    }
-  }
-  if (!"GEOID" %in% names(county)) {
-    stop("county should include a field named \"GEOID\"")
-  }
-  if (!year %in% c(2017, 2020)) {
-    stop("year should be one of 2017 or 2020.\n")
-  }
-  # Concatenate NEI csv files
-  csvs_nei <- list.files(path = path, pattern = "*.csv$", full.names = TRUE)
-  csvs_nei <- lapply(csvs_nei, data.table::fread)
-  csvs_nei <- data.table::rbindlist(csvs_nei)
-
-  # column name readjustment
-  target_nm <- c("fips code", "total emissions", "emissions uom")
-  # not grep-ping at once for flexibility
-  target_cns <- sapply(target_nm, function(x) grep(x, colnames(csvs_nei)))
-  colnames(csvs_nei)[target_cns] <-
-    c("geoid", "emissions_total", "unit_measurement")
-
-  # unify unit of measurement
-  # TON here is short tonne, which is 2000 lbs.
-  csvs_nei$emissions_total_ton <-
-    ifelse(
-      csvs_nei$unit_measurement == "TON",
-      csvs_nei$emissions_total,
-      csvs_nei$emissions_total / 2000
-    )
-  emissions_total_ton <- NULL
-  geoid <- NULL
-  yearabbr <- substr(year, 3, 4)
-  csvs_nei$geoid <- sprintf("%05d", as.integer(csvs_nei$geoid))
-  csvs_nei <-
-    csvs_nei[, list(
-      TRF_NEINP_0_00000 = sum(emissions_total_ton, na.rm = TRUE)
-    ),
-    by = geoid]
-  csvs_nei$Year <- year
-
-  # read county vector
-  cnty_geoid_guess <- grep("GEOID", names(county))
-  names(county)[cnty_geoid_guess] <- "geoid"
-  county$geoid <- sprintf("%05d", as.integer(county$geoid))
-  cnty_vect <- merge(county, csvs_nei, by = "geoid")
-  cnty_vect <- cnty_vect[, c("geoid", "Year", "TRF_NEINP_0_00000")]
-  names(cnty_vect)[3] <- sub("NP", yearabbr, names(cnty_vect)[3])
-  return(cnty_vect)
-
-}
-
 
 
 #' Calculate National Emission Inventory (NEI) covariates
 #' @param locs sf/SpatVector. Locations at NEI values are joined.
 #' @param from character(1). from to the directory with NEI CSV files
 #' @param locs_id character(1). Unique site identifier column name.
-#'  Default is `"site_id"`. It is no more than a placeholder
-#' in this function
+#' Unused but kept for compatibility.
+#' @param ... Placeholders.
 #' @author Insang Song, Ranadeep Daw
 #' @returns A data.frame object.
 #' @importFrom terra vect
@@ -1141,7 +851,8 @@ process_nei <- function(
 calc_nei <- function(
   locs,
   from = NULL,
-  locs_id = "site_id"
+  locs_id = "site_id",
+  ...
 ) {
   if (!methods::is(locs, "SpatVector")) {
     locs <- try(terra::vect(locs))

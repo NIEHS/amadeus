@@ -12,7 +12,7 @@ Authors@R: c(
     )
 Description: A Mechanism/Machine for Data, Environments, and User Setup package for health and climate research. It is fully tested, versioned, and open source and open access.
 Depends: R (>= 4.1.0)
-Imports: dplyr, sf, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringr, testthat (>= 3.0.0), doParallel, parallelly, stars, foreach, future, tidyr
+Imports: dplyr, sf, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringr, testthat (>= 3.0.0), doParallel, parallelly, stars, foreach, future, tidyr, rlang
 Suggests: covr, withr, knitr, rmarkdown, sftime, lwgeom, FNN, doRNG
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown

@@ -542,12 +542,11 @@ testthat::test_that("TRI calculation", {
   ncpt <-
     terra::vect(ncp, geom = c("lon", "lat"),
                 keepgeom = TRUE, crs = "EPSG:4326")
-  ncpt <- rbind(ncpt, ncpt, ncpt, ncpt, ncpt)
-  ncpt$time <- seq(2018, 2022)
+  ncpt$time <- c(2018)
   path_tri <- testthat::test_path("..", "testdata", "tri")
 
   testthat::expect_no_error(
-    tri_r <- process_tri(path = path_tri)
+    tri_r <- process_tri(path = path_tri, year = 2018)
   )
   testthat::expect_s4_class(tri_r, "SpatVector")
 
@@ -588,4 +587,64 @@ testthat::test_that("TRI calculation", {
       radius = "As far as the Earth's radius"
     )
   )
+})
+
+
+testthat::test_that("calc_sedc tests", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_package("dplyr")
+  withr::local_package("tidyr")
+  withr::local_package("data.table")
+  withr::local_options(sf_use_s2 = FALSE)
+
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  ncp$time <- 2018
+  ncpt <-
+    terra::vect(ncp, geom = c("lon", "lat"),
+                keepgeom = TRUE, crs = "EPSG:4326")
+  path_tri <- testthat::test_path("..", "testdata", "tri")
+
+  testthat::expect_no_error(
+    tri_r <- process_tri(path = path_tri, year = 2018)
+  )
+  tri_r <- terra::project(tri_r, terra::crs(ncpt))
+
+  targcols <- grep("FUGITIVE_", names(tri_r), value = TRUE)
+  testthat::expect_no_error(
+    tri_sedc <-
+      calc_sedc(
+        locs = ncpt,
+        from = tri_r,
+        locs_id = "site_id",
+        sedc_bandwidth = 30000,
+        target_fields = targcols
+      )
+  )
+  testthat::expect_s3_class(tri_sedc, "data.frame")
+
+  testthat::expect_no_error(
+    calc_sedc(
+      locs = sf::st_as_sf(ncpt),
+      from = sf::st_as_sf(tri_r),
+      locs_id = "site_id",
+      sedc_bandwidth = 30000,
+      target_fields = targcols
+    )
+  )
+
+  # warning case: duplicate field names between locs and from
+  ncpta <- ncpt
+  ncpta$YEAR <- 2018
+  testthat::expect_warning(
+    calc_sedc(
+      locs = ncpta,
+      from = sf::st_as_sf(tri_r),
+      locs_id = "site_id",
+      sedc_bandwidth = 30000,
+      target_fields = targcols
+    )
+  )
+
 })

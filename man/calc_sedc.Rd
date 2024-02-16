@@ -31,9 +31,9 @@ data.frame (tibble) object with input field names with
 a suffix \code{"_sedc"} where the sums of EDC are stored.
 Additional attributes are attached for the EDC information.
 \itemize{
-\item attr(result, "sedc_bandwidth"): the bandwidth where
+\item `attr(result, "sedc_bandwidth")``: the bandwidth where
 concentration reduces to approximately five percent
-\item attr(result, "sedc_threshold"): the threshold distance
+\item `attr(result, "sedc_threshold")``: the threshold distance
 at which emission source points are excluded beyond that
 }
 }
@@ -64,11 +64,11 @@ pnt_from$val1 <- rgamma(100L, 1, 0.05)
 pnt_from$val2 <- rgamma(100L, 2, 1)
 
 vals <- c("val1", "val2")
-summarize_sedc(pnt_locs, pnt_from, "NAME", 1e5, 2e5, vals)
+calc_sedc(pnt_locs, pnt_from, "NAME", 1e5, vals)
 }
 \references{
 \itemize{
-\item \href{https://dx.doi.org/10.1021/es203152a}{Messier KP, Akita Y, \& Serre ML. (2012). Integrating Address Geocoding, Land Use Regression, and Spatiotemporal Geostatistical Estimation for Groundwater Tetrachloroethylene. \emph{Environmental Science \& Technology} 46(5), 2772-2780.}
+\item \href{https://dx.doi.org/10.1021/es203152a}{Messier KP, Akita Y, & Serre ML. (2012). Integrating Address Geocoding, Land Use Regression, and Spatiotemporal Geostatistical Estimation for Groundwater Tetrachloroethylene. \emph{Environmental Science \& Technology} 46(5), 2772-2780.}
 \item Wiesner C. (n.d.). \href{https://mserre.sph.unc.edu/BMElab_web/SEDCtutorial/index.html}{Euclidean Sum of Exponentially Decaying Contributions Tutorial}
 }
 }

@@ -4,7 +4,7 @@
 \alias{calc_ecoregion}
 \title{Calculate EPA Ecoregions level 2/3 binary variables}
 \usage{
-calc_ecoregion(locs, from = NULL, locs_id = "site_id")
+calc_ecoregion(locs, from = NULL, locs_id = "site_id", ...)
 }
 \arguments{
 \item{locs}{sf/SpatVector. Unique locs. Should include
@@ -13,6 +13,8 @@ a unique identifier field named \code{locs_id}}
 \item{from}{SpatVector. Ecoregion polygons}
 
 \item{locs_id}{character(1). Name of unique identifier.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a data.frame object with dummy variables and attributes of:

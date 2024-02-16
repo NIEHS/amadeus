@@ -4,12 +4,7 @@
 \alias{calc_koppen_geiger}
 \title{Calculate Koeppen-Geiger climate zone binary variables}
 \usage{
-calc_koppen_geiger(
-  locs = NULL,
-  from = NULL,
-  locs_id = "site_id",
-  variables = NULL
-)
+calc_koppen_geiger(locs = NULL, from = NULL, locs_id = "site_id", ...)
 }
 \arguments{
 \item{locs}{sf/SpatVector. Unique locs. Should include
@@ -19,6 +14,8 @@ a unique identifier field named \code{locs_id}}
 climate zone raster file}
 
 \item{locs_id}{character(1). Name of unique identifier.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a data.frame object

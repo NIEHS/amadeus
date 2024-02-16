@@ -1,5 +1,5 @@
 # nolint start
-#' Convert spatio-temporal object to a datatable with lon, lat, time, predictors columns. It also returns the crs.
+#' Convert spatio-temporal object to a datatable with lon, lat, time, predictors columns.
 # nolint end
 #' @param stobj object containing space-time data. It can be a data.frame,
 #' a data.table, an sf or sftime, a SpatVector or a SpatRastDataset.

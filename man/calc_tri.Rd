@@ -8,13 +8,14 @@ calc_tri(
   locs,
   from = NULL,
   locs_id = "site_id",
-  radius = c(1000L, 10000L, 50000L)
+  radius = c(1000L, 10000L, 50000L),
+  ...
 )
 }
 \arguments{
 \item{locs}{sf/SpatVector. Locations where TRI variables are calculated.}
 
-\item{from}{SpatVector. Point vector object of TRI.
+\item{from}{SpatVector. Point vector object of TRI in a year.
 See \link{process_tri}}
 
 \item{locs_id}{character(1). Unique site identifier column name.
@@ -22,6 +23,8 @@ Default is \code{"site_id"}.}
 
 \item{radius}{Circular buffer radius.
 Default is \code{c(1000, 10000, 50000)} (meters)}
+
+\item{...}{Placeholders.}
 }
 \value{
 A data.frame object.
@@ -33,7 +36,7 @@ Calculate TRI covariates
 U.S. context.
 }
 \seealso{
-\link{calc_sedc}
+\link{calc_sedc}, \link{process_tri}
 }
 \author{
 Insang Song, Mariana Kassien
