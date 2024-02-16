@@ -173,10 +173,13 @@ dt_to_mysftime <- function(x, lonname, latname, timename, crs) {
   if (any(!(c(lonname, latname, timename) %in% colnames(x)))) {
     stop("Some of lon, lat, time columns missing or mispelled")
   }
-  mysft <- st_as_sftime(x,
-                        coords = c(lonname, latname),
-                        time_column_name = timename,
-                        crs = crs) |>
+  mysft <-
+    sftime::st_as_sftime(
+      x,
+      coords = c(lonname, latname),
+      time_column_name = timename,
+      crs = crs
+    ) |>
     dplyr::rename("time" = timename)
   return(mysft)
 }

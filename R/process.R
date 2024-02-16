@@ -306,9 +306,12 @@ process_bluemarble <- function(
   filepaths_today <- grep(sprintf("A%s", datejul), paths, value = TRUE)
   # today's filenames
   filepaths_today <-
-    grep(paste0("(",
-               paste(stdtile, collapse = "|"), ")"),
-         filepaths_today, value = TRUE)
+    grep(
+      paste0(
+        "(", paste(stdtile, collapse = "|"), ")"
+      ),
+      filepaths_today, value = TRUE
+    )
 
   filepaths_today_tiles <-
     regmatches(filepaths_today,
@@ -883,5 +886,3 @@ process_nei <- function(
   return(cnty_vect)
 
 }
-
-
