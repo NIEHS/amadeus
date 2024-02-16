@@ -158,7 +158,92 @@ check_mysf <- function(x) {
   )
 }
 
+#' Create a sftime from a datatable
+#'
+#' @param x a data.table
+#' @param lonname character for longitude column name
+#' @param latname character for latitude column name
+#' @param timename character for time column name
+#' @param crs coordinate reference system
+#' @import sftime
+#' @author Eva Marques
+#' @export
+dt_to_mysftime <- function(x, lonname, latname, timename, crs) {
+  stopifnot("x is not a data.table" = class(x)[1] == "data.table")
+  if (any(!(c(lonname, latname, timename) %in% colnames(x)))) {
+    stop("Some of lon, lat, time columns missing or mispelled")
+  }
+  mysft <- st_as_sftime(x,
+                        coords = c(lonname, latname),
+                        time_column_name = timename,
+                        crs = crs) |>
+    dplyr::rename("time" = timename)
+  return(mysft)
+}
 
+#' Convert to sftime object on the form adapted to beethoven code
+#'
+#' @param x a data.frame, data.table, SpatVector or SpatRasterDataset
+#' @param ... if x is a data.frame or data.table: lonname, latname, timename and
+#' crs arguments are recquired.
+#' @import sf
+#' @author Eva Marques
+#' @export
+as_mysftime <- function(x, ...) {
+  format <- class(x)[1]
+  if (format == "data.frame") {
+    output <- x |>
+      data.table::data.table() |>
+      dt_to_mysftime(...)
+  } else if (format == "data.table") {
+    output <- x |>
+      dt_to_mysftime(...)
+  } else if (format == "SpatVector") {
+    if (!("time" %in% names(x))) {
+      stop("x does not contain time column")
+    }
+    crs <- terra::crs(x)
+    output <- as.data.frame(x, geom = "XY") |>
+      data.table::as.data.table() |>
+      dt_to_mysftime("x", "y", "time", crs = crs)
+  } else if (format == "SpatRasterDataset") {
+    crs_dt <- terra::crs(x)
+    stdf <- as.data.frame(x[1], xy = TRUE)
+    colnames(stdf)[1] <- "lon"
+    colnames(stdf)[2] <- "lat"
+    # -- tranform from wide to long format
+    stdf <- stdf |>
+      data.table::as.data.table() |>
+      data.table::melt(
+        measure.vars = names(stdf)[-1:-2],
+        variable.name = "time",
+        value.name = names(x)[1]
+      )
+    for (var in seq(2, length(names(x)))) {
+      # test that the ts is identical to the ts of the 1st variable
+      if (!(identical(names(x[var]), names(x[1])))) {
+        stop("time series differ from 1 variable to the other")
+      }
+      varname_original <- names(x)[var]
+      df_var <- as.data.frame(x[var], xy = TRUE)
+      # -- tranform from wide to long format
+      df_var <- df_var |>
+        data.table::as.data.table() |>
+        data.table::melt(
+          measure.vars = names(df_var)[-1:-2],
+          variable.name = "time",
+          value.name = varname_original
+        ) |>
+        as.data.frame()
+      stdf[, varname_original] <- df_var[, 4]
+    }
+    output <- data.table::as.data.table(stdf) |>
+      dt_to_mysftime("lon", "lat", "time", crs_dt)
+  } else {
+    stop("x class not accepted")
+  }
+  return(output)
+}
 
 #' Convert a stdt to sf/sftime/SpatVector
 #' @param stdt A stdt object
