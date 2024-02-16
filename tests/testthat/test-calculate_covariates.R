@@ -451,85 +451,77 @@ testthat::test_that("NEI calculation", {
   nc <- terra::vect(ncpath)
   nc <- nc[grep("(Orange|Wake|Durham)", nc$NAME), ]
 
+  neipath <- testthat::test_path("..", "testdata", "nei")
+
   testthat::expect_error(
-    calc_nei(neipath,
-      ncp,
-      year = 2017,
-      county_shp = nc,
-      sites_epsg = "EPSG:4267"
-    )
-  )
-  testthat::expect_error(
-    calc_nei(neipath,
-      ncpt,
-      year = 2010,
-      county_shp = nc,
-      sites_epsg = "EPSG:4267"
-    )
-  )
-  testthat::expect_error(
-    calc_nei(neipath,
-      ncpt,
-      year = 2017,
-      county_shp = "your/file/is/nowhere",
-      sites_epsg = "EPSG:4267"
+    neiras <- process_nei(
+      path = neipath,
+      county = nc,
+      year = 2017
     )
   )
 
   nc$GEOID <- nc$FIPS
-  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
-  ncp$site_id <- "3799900018810101"
-  ncp$time <- 2018
-  ncpt <- ncp# as.data.frame(ncp, geom = "XY")
-
-  # test data should be prepared
-  neipath <- testthat::test_path("..", "testdata", "nei")
   testthat::expect_no_error(
-    ncnei <-
-      calc_nei(neipath,
-        ncpt,
-        year = 2017,
-        county_shp = nc,
-        sites_epsg = "EPSG:4267"
-      )
+    neiras <- process_nei(
+      path = neipath,
+      county = nc,
+      year = 2017
+    )
   )
+  # inspecting calculated results
+  testthat::expect_s4_class(neiras, "SpatVector")
+
+  # sf case
   testthat::expect_no_error(
-    calc_nei(neipath,
-      ncpt,
-      year = 2017,
-      county_shp = ncpath,
-      sites_epsg = "EPSG:4267"
+    process_nei(
+      path = neipath,
+      county = sf::st_as_sf(nc),
+      year = 2017
     )
   )
 
-  testthat::expect_true(any(grepl("NEI17", names(ncnei))))
-  testthat::expect_equal(ncnei$TRF_NEI17_0_00000, 1579079, tolerance = 1)
 
   # error cases
   testthat::expect_error(
-    calc_nei(neipath,
-      sf::st_as_sf(ncpt, coords = c("lon", "lat")),
-      year = 2017,
-      county_shp = nc,
-      sites_epsg = "EPSG:4267"
+    process_nei(neipath, year = 2017)
+  )
+  testthat::expect_error(
+    process_nei(neipath, "Orion/Betelgeuse", year = 2017)
+  )
+  testthat::expect_error(
+    process_nei(neipath, nc, year = 2083)
+  )
+
+  # calc_nei
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  ncp$time <- 2018
+  ncp <- terra::vect(ncp, keepgeom = TRUE, crs = "EPSG:4326")
+  nc <- terra::project(nc, "EPSG:4326")
+
+  testthat::expect_no_error(
+    neicalced <- calc_nei(
+      locs = ncp,
+      from = neiras
     )
   )
-  ncpsf <- sf::st_as_sf(ncpt, coords = c("lon", "lat"), remove = FALSE)
-  sf::st_crs(ncpsf) <- "EPSG:4267"
-  testthat::expect_no_error(
-    calc_nei(neipath,
-      ncpsf,
-      year = 2017,
-      county_shp = nc,
-      sites_epsg = "EPSG:4267"
+  testthat::expect_true(any(grepl("NEI17", names(neicalced))))
+  testthat::expect_equal(neicalced$TRF_NEI17_0_00000, 1579079, tolerance = 1)
+
+  # more error cases
+  testthat::expect_condition(
+    calc_nei(
+      locs = "jittered",
+      from = neiras
     )
   )
-  testthat::expect_no_error(
-    calc_nei(neipath,
-      convert_stobj_to_stdt(ncpsf),
-      year = 2017,
-      county_shp = ncpath,
-      sites_epsg = "EPSG:4267"
+
+  names(ncp)[4] <- "year"
+  testthat::expect_error(
+    calc_nei(
+      locs = ncp,
+      from = neiras
     )
   )
 
@@ -552,12 +544,17 @@ testthat::test_that("TRI calculation", {
                 keepgeom = TRUE, crs = "EPSG:4326")
   ncpt <- rbind(ncpt, ncpt, ncpt, ncpt, ncpt)
   ncpt$time <- seq(2018, 2022)
+  path_tri <- testthat::test_path("..", "testdata", "tri")
 
-  tdir <- testthat::test_path("..", "testdata")
+  testthat::expect_no_error(
+    tri_r <- process_tri(path = path_tri)
+  )
+  testthat::expect_s4_class(tri_r, "SpatVector")
+
   testthat::expect_no_error(
     tri_c <- calc_tri(
-      path = paste0(tdir, "/tri/"),
-      sites = ncpt,
+      from = tri_r,
+      locs = ncpt,
       radius = 50000L
     )
   )
@@ -565,29 +562,29 @@ testthat::test_that("TRI calculation", {
 
   testthat::expect_no_error(
     calc_tri(
-      path = paste0(tdir, "/tri/"),
-      sites = sf::st_as_sf(ncpt),
+      from = tri_r,
+      locs = sf::st_as_sf(ncpt),
       radius = 50000L
     )
   )
   testthat::expect_error(
     calc_tri(
-      path = tempdir(),
-      sites = ncpt,
+      from = tempdir(),
+      locs = ncpt,
       radius = 50000L
     )
   )
   testthat::expect_error(
     calc_tri(
-      path = paste0(tdir, "/tri/"),
-      sites = ncpt[, 1:2],
+      from = paste0(tdir, "/tri/"),
+      locs = ncpt[, 1:2],
       radius = 50000L
     )
   )
   testthat::expect_error(
     calc_tri(
-      path = paste0(tdir, "/tri/"),
-      sites = ncpt,
+      from = paste0(tdir, "/tri/"),
+      locs = ncpt,
       radius = "As far as the Earth's radius"
     )
   )

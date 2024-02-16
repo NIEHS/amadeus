@@ -914,7 +914,6 @@ The result may not be accurate.\n",
       )
     dist_nearby_df <- cbind(dist_nearby_tdf, dist = dist_nearby_df)
 
-    id <- NULL
     # summary
     res_sedc <- res_nearby |>
       dplyr::as_tibble() |>
@@ -925,7 +924,7 @@ The result may not be accurate.\n",
       # https://mserre.sph.unc.edu/BMElab_web/SEDCtutorial/index.html
       # exp(-3) is about 0.05
       dplyr::mutate(w_sedc = exp((-3 * dist) / sedc_bandwidth)) |>
-      dplyr::group_by(!!rlang::sym(id)) |>
+      dplyr::group_by(!!rlang::sym(locs_id)) |>
       dplyr::summarize(
         dplyr::across(
           dplyr::all_of(target_fields),
@@ -935,7 +934,7 @@ The result may not be accurate.\n",
       dplyr::ungroup()
 
     attr(res_sedc, "sedc_bandwidth") <- sedc_bandwidth
-    attr(res_sedc, "sedc_threshold") <- sedc_bandwidth * 2 
+    attr(res_sedc, "sedc_threshold") <- sedc_bandwidth * 2
 
     return(res_sedc)
   }
@@ -993,9 +992,17 @@ calc_tri <- function(
   locs_re <- terra::project(locs, terra::crs(from))
 
   # strategy: year-buffer
+  # assumption: years of coverage are the same in
+  # from and locs.
+  tlen_locs <- unlist(locs_re[["time"]])
+  tlen_tri <- unlist(from[["YEAR"]])
+  if (!all.equal(unique(tlen_locs), unique(tlen_tri))) {
+    stop("Temporal coverage of each dataset does not match.")
+  }
+
   # split by year: locs and tri locations
-  list_locs <- split(locs_re, unlist(locs_re[["time"]]))
-  list_tri <- split(from, unlist(from[["YEAR"]]))
+  list_locs <- split(locs_re, tlen_locs)
+  list_tri <- split(from, tlen_tri)
   tri_cols <- grep("_AIR", names(from), value = TRUE)
 
   # mapply and inner lapply
@@ -1039,7 +1046,9 @@ calc_tri <- function(
 #' @author Insang Song
 #' @note Base files for `county` argument can be downloaded directly from
 #' [U.S. Census Bureau](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html)
-#' or by using `tigris` package.
+#' or by using `tigris` package. This function does not reproject census boundaries.
+#' Users should be aware of the coordinate system of census boundary data for
+#' other analyses.
 #' @description NEI data comprises multiple csv files where emissions of
 #' 50+ pollutants are recorded at county level. With raw data files,
 #' this function will join a combined table of NEI data and county
@@ -1057,14 +1066,17 @@ process_nei <- function(
   county = NULL,
   year = c(2017, 2020)
 ) {
+  if (is.null(county)) {
+    stop("county argument is required.")
+  }
   if (!methods::is(county, "SpatVector")) {
     county <- try(terra::vect(county))
     if (inherits(county, "try-error")) {
       stop("county is unable to be converted to SpatVector.\n")
     }
   }
-  if (is.null(county)) {
-    stop("county argument is required.")
+  if (!"GEOID" %in% names(county)) {
+    stop("county should include a field named \"GEOID\"")
   }
   if (!year %in% c(2017, 2020)) {
     stop("year should be one of 2017 or 2020.\n")
@@ -1101,14 +1113,10 @@ process_nei <- function(
   csvs_nei$Year <- year
 
   # read county vector
-  cnty_vect <- county
-  if (is.character(cnty_vect)) {
-    cnty_vect <- terra::vect(cnty_vect)
-  }
-  cnty_geoid_guess <- grep("GEOID", names(cnty_vect))
-  names(cnty_vect)[cnty_geoid_guess] <- "geoid"
-  cnty_vect$geoid <- sprintf("%05d", as.integer(cnty_vect$geoid))
-  cnty_vect <- merge(cnty_vect, csvs_nei, by = "geoid")
+  cnty_geoid_guess <- grep("GEOID", names(county))
+  names(county)[cnty_geoid_guess] <- "geoid"
+  county$geoid <- sprintf("%05d", as.integer(county$geoid))
+  cnty_vect <- merge(county, csvs_nei, by = "geoid")
   cnty_vect <- cnty_vect[, c("geoid", "Year", "TRF_NEINP_0_00000")]
   names(cnty_vect)[3] <- sub("NP", yearabbr, names(cnty_vect)[3])
   return(cnty_vect)
@@ -1141,9 +1149,8 @@ calc_nei <- function(
       stop("locs is unable to be converted to SpatVector.\n")
     }
   }
-  if (!all(c("lon", "lat", "time") %in% colnames(locs))) {
-    stop("locs should be stdt or 
-    have 'lon', 'lat', and 'time' fields.\n")
+  if (!all(c("lon", "lat", "time") %in% names(locs))) {
+    stop("locs should have 'lon', 'lat', and 'time' fields.\n")
   }
   # spatial join
   locs_re <- terra::project(locs, terra::crs(from))
