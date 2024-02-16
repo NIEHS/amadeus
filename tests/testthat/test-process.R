@@ -382,7 +382,6 @@ testthat::test_that("process_conformity tests", {
   # error cases
   dfe <- df
   names(dfe)[3] <- "date"
-  #dfe <- stats::setNames(df, c("lon", "lat", "date", "var1", "var2"))
   testthat::expect_error(
     process_conformity(locs = dfe, check_time = TRUE)
   )
