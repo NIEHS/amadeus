@@ -252,3 +252,90 @@ testthat::test_that("Other MODIS function errors", {
     )
   )
 })
+
+
+
+testthat::test_that("read ecoregion", {
+  withr::local_package("terra")
+
+  path_eco <- testthat::test_path("..", "testdata", "eco_l3_clip.gpkg")
+
+  testthat::expect_no_error(
+    process_ecoregion(path_eco)
+  )
+})
+
+
+testthat::test_that("process_nlcd tests", {
+  withr::local_package("terra")
+
+  path_nlcd19 <-
+    testthat::test_path("../testdata", "nlcd_2019_land_cover_l48_20210604.tif")
+
+  testthat::expect_no_error(
+    nlcd19 <- process_nlcd(path = path_nlcd19, year = 2019)
+  )
+  testthat::expect_s4_class(nlcd19, "SpatRaster")
+  testthat::expect_equal(terra::metags(nlcd19, name = "year"), "2019")
+
+  # error cases
+  testthat::expect_error(
+    process_nlcd(path = 1L)
+  )
+  testthat::expect_error(
+    process_nlcd(path = "/universe/galaxy/solarsys/earth/usa.nc")
+  )
+  testthat::expect_error(
+    process_nlcd(path_nlcd19, "nineteen eighty-four")
+  )
+
+})
+
+
+
+testthat::test_that("process_koppen_geiger tests", {
+  withr::local_package("terra")
+  path_kgeiger <-
+    testthat::test_path("../testdata", "koppen_subset.tif")
+
+  testthat::expect_no_error(
+    kgeiger <- process_koppen_geiger(path_kgeiger)
+  )
+
+  testthat::expect_s4_class(kgeiger, "SpatRaster")
+})
+
+
+testthat::test_that("process_tri tests", {
+  withr::local_package("terra")
+  path_tri <- testthat::test_path("../testdata", "tri", "")
+
+  testthat::expect_no_error(
+    tri_r <- process_tri(path = path_tri)
+  )
+  testthat::expect_s4_class(tri_r, "SpatVector")
+})
+
+
+testthat::test_that("process_nei tests", {
+  withr::local_package("terra")
+
+  path_nei <- testthat::test_path("../testdata", "nei", "")
+  path_cnty <- system.file("gpkg/nc.gpkg", package = "sf")
+
+  testthat::expect_no_error(
+    neinc <- process_nei(path = path_nei, year = 2020, auxfile = path_cnty)
+  )
+  testthat::expect_s4_class(neinc, "SpatVector")
+
+  # error cases
+  testthat::expect_error(
+    process_nei(path_nei, year = 2030)
+  )
+  testthat::expect_error(
+    process_nei(path_nei, year = 2020, auxfile = NULL)
+  )
+
+})
+
+

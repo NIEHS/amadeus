@@ -18,5 +18,5 @@ SpatRaster object.
 Reads NLCD file of selected \code{year}.
 }
 \author{
-Eva Marques
+Eva Marques, Insang Song
 }
