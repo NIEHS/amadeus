@@ -4,17 +4,19 @@
 \alias{calc_nlcd_ratio}
 \title{Compute land cover classes ratio in circle buffers around points}
 \usage{
-calc_nlcd_ratio(path, sites, radius = 1000, year = 2021)
+calc_nlcd_ratio(locs, from, locs_id = "site_id", radius = 1000, ...)
 }
 \arguments{
-\item{path}{character giving nlcd data path}
+\item{locs}{terra::SpatVector of points geometry}
 
-\item{sites}{terra::SpatVector of points geometry}
+\item{from}{SpatRaster of NLCD}
+
+\item{locs_id}{character(1). Unique identifier of locations}
 
 \item{radius}{numeric (non-negative) giving the
 radius of buffer around points}
 
-\item{year}{numeric giving the year of NLCD data used}
+\item{...}{Placeholders.}
 }
 \description{
 Compute land cover classes ratio in circle buffers around points

@@ -6,23 +6,23 @@
 \usage{
 calc_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
-    "dummies", "gmted", "roads", "sedac_groads", "nlcd", "tri", "ncep", "aadt",
+    "dummies", "gmted", "roads", "sedac_groads", "nlcd", "tri", "ncep", "nei",
     "ecoregions", "ecoregion"),
-  path,
-  sites,
-  id_col = "site_id",
+  locs,
+  from,
+  locs_id = "site_id",
   ...
 )
 }
 \arguments{
 \item{covariate}{character(1). Covariate type.}
 
-\item{path}{character. Single or multiple path strings.}
+\item{locs}{sf/SpatVector. Unique locations. Should include
+a unique identifier field named \code{locs_id}}
 
-\item{sites}{sf/SpatVector. Unique sites. Should include
-a unique identifier field named \code{id_col}}
+\item{from}{character. Single or multiple from strings.}
 
-\item{id_col}{character(1). Name of unique identifier.
+\item{locs_id}{character(1). Name of unique identifier.
 Default is \code{"site_id"}.}
 
 \item{...}{Arguments passed to each covariate calculation
@@ -36,10 +36,10 @@ Calculate covariates
 }
 \seealso{
 \itemize{
-\item \link{calc_modis}: \code{"modis"}, \code{"MODIS"}
-\item \link{calc_koppen_geiger}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"},
-\item \link{calc_ecoregion}: \code{"ecoregion"}, \code{"ecoregions"}
-\item \link{calc_temporal_dummies}: \code{"dummies"}
+\item \code{calc_modis}: \code{"modis"}, \code{"MODIS"}
+\item \code{calc_koppen_geiger}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"},
+\item \code{calc_ecoregion}: \code{"ecoregion"}, \code{"ecoregions"}
+\item \code{calc_temporal_dummies}: \code{"dummies"}
 }
 }
 \author{

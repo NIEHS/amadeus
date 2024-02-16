@@ -1,5 +1,5 @@
 # nolint start
-#' Convert spatio-temporal object to a datatable with lon, lat, time, predictors columns. It also returns the crs.
+#' Convert spatio-temporal object to a datatable with lon, lat, time, predictors columns.
 # nolint end
 #' @param stobj object containing space-time data. It can be a data.frame,
 #' a data.table, an sf or sftime, a SpatVector or a SpatRastDataset.
@@ -173,10 +173,13 @@ dt_to_mysftime <- function(x, lonname, latname, timename, crs) {
   if (any(!(c(lonname, latname, timename) %in% colnames(x)))) {
     stop("Some of lon, lat, time columns missing or mispelled")
   }
-  mysft <- st_as_sftime(x,
-                        coords = c(lonname, latname),
-                        time_column_name = timename,
-                        crs = crs) |>
+  mysft <-
+    sftime::st_as_sftime(
+      x,
+      coords = c(lonname, latname),
+      time_column_name = timename,
+      crs = crs
+    ) |>
     dplyr::rename("time" = timename)
   return(mysft)
 }

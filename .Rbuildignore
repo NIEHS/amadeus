@@ -3,7 +3,7 @@
 ^tools/
 ^manuscript/
 ^output/
-^\.github/workflows/
+^\.github/
 ^amadeus\.Rproj$
 ^\.Rproj\.user$
 ^\.github$

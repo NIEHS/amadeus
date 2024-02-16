@@ -1,6 +1,6 @@
 Package: amadeus
 Title: AMADEUS: A Mechanism/Machine for Data, Environments, and User Setup
-Version: 0.0.1
+Version: 0.1.0
 Authors@R: c(
     person("Kyle", "Messier", , "kyle.messier@nih.gov", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9508-9623")),
     person("Mitchell", "Manware", role = c("aut", "ctb"), comment = c(ORCID = "0009-0003-6440-6106")),
@@ -12,7 +12,7 @@ Authors@R: c(
     )
 Description: A Mechanism/Machine for Data, Environments, and User Setup package for health and climate research. It is fully tested, versioned, and open source and open access.
 Depends: R (>= 4.1.0)
-Imports: dplyr, sf, sftime, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringr, testthat (>= 3.0.0), doParallel, parallelly, stars, foreach, future
+Imports: dplyr, sf, sftime, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringr, testthat (>= 3.0.0), doParallel, parallelly, stars, foreach, future, tidyr, rlang
 Suggests: covr, withr, knitr, rmarkdown, lwgeom, FNN, doRNG
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown
