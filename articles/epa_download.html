@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -213,7 +213,7 @@ sites<a class="anchor" aria-label="anchor" href="#downloading-monitor-metadata-f
 <span><span class="op">)</span></span></code></pre></div>
 <p>Filter monitors file to include only monitors in our csv</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">monitors_filter</span> <span class="op">&lt;-</span> <span class="va">monitors</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">monitors</span><span class="op">$</span><span class="va">ID.Code</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">data_all</span><span class="op">$</span><span class="va">ID.Code</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">monitors_filter</span> <span class="op">&lt;-</span> <span class="va">monitors</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">monitors</span><span class="op">$</span><span class="va">ID.Code</span> <span class="op"><a href="https://rspatial.github.io/terra/reference/match.html" class="external-link">%in%</a></span> <span class="va">data_all</span><span class="op">$</span><span class="va">ID.Code</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="uploading-data-to-desired-folder">5. Uploading data to desired folder<a class="anchor" aria-label="anchor" href="#uploading-data-to-desired-folder"></a>

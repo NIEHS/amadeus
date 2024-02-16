@@ -34,13 +34,19 @@
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/calc_koppen_geiger.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/calc_modis.html</loc>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/calc_modis_daily.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/calc_modis_par.html</loc>
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/calc_nei.html</loc>
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/calc_nlcd_ratio.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/calc_sedc.html</loc>
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/calc_temporal_dummies.html</loc>
@@ -172,28 +178,49 @@
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/is_date_proper.html</loc>
+  </url>
+  <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/is_stdt.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/modis_aggregate_sds.html</loc>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_bluemarble.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/modis_get_vrt.html</loc>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_bluemarble_corners.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/modis_mosaic_mod06.html</loc>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_conformity.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/modis_prefilter_sds.html</loc>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_ecoregion.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/modis_preprocess_vnp46.html</loc>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_flatten_sds.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/modis_warp_stars.html</loc>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_koppen_geiger.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/modis_worker.html</loc>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_modis_merge.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_modis_sds.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_modis_swath.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_modis_warp.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_nei.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_nlcd.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_tri.html</loc>
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/project_dt.html</loc>

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,12 @@
         <dd>Calculate Koeppen-Geiger climate zone binary variables</dd>
       </dl><dl><dt>
           
-          <code><a href="calc_modis.html">calc_modis()</a></code> 
+          <code><a href="calc_modis_daily.html">calc_modis_daily()</a></code> 
+        </dt>
+        <dd>A single-date MODIS worker for parallelization</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_modis_par.html">calc_modis_par()</a></code> 
         </dt>
         <dd>Calculate MODIS product covariates in multiple CPU threads</dd>
       </dl><dl><dt>
@@ -93,6 +98,11 @@
           <code><a href="calc_nlcd_ratio.html">calc_nlcd_ratio()</a></code> 
         </dt>
         <dd>Compute land cover classes ratio in circle buffers around points</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_sedc.html">calc_sedc()</a></code> 
+        </dt>
+        <dd>Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates</dd>
       </dl><dl><dt>
           
           <code><a href="calc_temporal_dummies.html">calc_temporal_dummies()</a></code> 
@@ -152,7 +162,7 @@
           
           <code><a href="convert_stobj_to_stdt.html">convert_stobj_to_stdt()</a></code> 
         </dt>
-        <dd>Convert spatio-temporal object to a datatable with lon, lat, time, predictors columns. It also returns the crs.</dd>
+        <dd>Convert spatio-temporal object to a datatable with lon, lat, time, predictors columns.</dd>
       </dl><dl><dt>
           
           <code><a href="download_aqs_data.html">download_aqs_data()</a></code> 
@@ -306,44 +316,79 @@ in data download function.</dd>
         <dd>Generate sequence of dates based on <code>date_start</code> and <code>date_end</code>.</dd>
       </dl><dl><dt>
           
+          <code><a href="is_date_proper.html">is_date_proper()</a></code> 
+        </dt>
+        <dd>Check input strings conform to the required format</dd>
+      </dl><dl><dt>
+          
           <code><a href="is_stdt.html">is_stdt()</a></code> 
         </dt>
         <dd>Boolean to know if an object correspond to a stdtobj</dd>
       </dl><dl><dt>
           
-          <code><a href="modis_aggregate_sds.html">modis_aggregate_sds()</a></code> 
+          <code><a href="process_bluemarble.html">process_bluemarble()</a></code> 
         </dt>
-        <dd>Aggregate layers in a MODIS sub-dataset</dd>
+        <dd>Assign VIIRS Blue Marble products corner coordinates to retrieve a merged raster</dd>
       </dl><dl><dt>
           
-          <code><a href="modis_get_vrt.html">modis_get_vrt()</a></code> 
+          <code><a href="process_bluemarble_corners.html">process_bluemarble_corners()</a></code> 
+        </dt>
+        <dd>Tile corner generator for Blue Marble products</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_conformity.html">process_conformity()</a></code> 
+        </dt>
+        <dd>Check input assumptions</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_ecoregion.html">process_ecoregion()</a></code> 
+        </dt>
+        <dd>Process EPA Ecoregion shapefiles</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_flatten_sds.html">process_flatten_sds()</a></code> 
+        </dt>
+        <dd>Aggregate layers in a sub-dataset in sinusoidal MODIS products</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_koppen_geiger.html">process_koppen_geiger()</a></code> 
+        </dt>
+        <dd>Process Koeppen-Geiger climate data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_modis_merge.html">process_modis_merge()</a></code> 
         </dt>
         <dd>Get mosaicked or merged raster from multiple MODIS hdf files</dd>
       </dl><dl><dt>
           
-          <code><a href="modis_mosaic_mod06.html">modis_mosaic_mod06()</a></code> 
+          <code><a href="process_modis_sds.html">process_modis_sds()</a></code> 
         </dt>
-        <dd>Mosaic MODIS MOD06_L2 product files</dd>
+        <dd>Selected MODIS sinusoidal grid product subdataset name selector</dd>
       </dl><dl><dt>
           
-          <code><a href="modis_prefilter_sds.html">modis_prefilter_sds()</a></code> 
+          <code><a href="process_modis_swath.html">process_modis_swath()</a></code> 
         </dt>
-        <dd>Selected MODIS product subdataset name selector</dd>
+        <dd>Mosaic MODIS swaths</dd>
       </dl><dl><dt>
           
-          <code><a href="modis_preprocess_vnp46.html">modis_preprocess_vnp46()</a></code> 
+          <code><a href="process_modis_warp.html">process_modis_warp()</a></code> 
         </dt>
-        <dd>Assign MODIS VNP46 corner coordinates to retrieve a merged raster</dd>
+        <dd>Warp MODIS swath data into rectilinear grid raster</dd>
       </dl><dl><dt>
           
-          <code><a href="modis_warp_stars.html">modis_warp_stars()</a></code> 
+          <code><a href="process_nei.html">process_nei()</a></code> 
         </dt>
-        <dd>Warp MODIS Swath data into rectilinear grid raster</dd>
+        <dd>Prepare National Emission Inventory CSV files</dd>
       </dl><dl><dt>
           
-          <code><a href="modis_worker.html">modis_worker()</a></code> 
+          <code><a href="process_nlcd.html">process_nlcd()</a></code> 
         </dt>
-        <dd>A single-date MODIS worker for parallelization</dd>
+        <dd>Process raw National Landuse Classification Dataset</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_tri.html">process_tri()</a></code> 
+        </dt>
+        <dd>Prepare Toxic Release Inventory (TRI) data</dd>
       </dl><dl><dt>
           
           <code><a href="project_dt.html">project_dt()</a></code> 

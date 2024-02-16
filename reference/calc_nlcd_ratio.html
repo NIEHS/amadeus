@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,17 +55,21 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calc_nlcd_ratio</span><span class="op">(</span><span class="va">path</span>, <span class="va">sites</span>, radius <span class="op">=</span> <span class="fl">1000</span>, year <span class="op">=</span> <span class="fl">2021</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calc_nlcd_ratio</span><span class="op">(</span><span class="va">locs</span>, <span class="va">from</span>, locs_id <span class="op">=</span> <span class="st">"site_id"</span>, radius <span class="op">=</span> <span class="fl">1000</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>path</dt>
-<dd><p>character giving nlcd data path</p></dd>
-
-
-<dt>sites</dt>
+    <dl><dt>locs</dt>
 <dd><p>terra::SpatVector of points geometry</p></dd>
+
+
+<dt>from</dt>
+<dd><p>SpatRaster of NLCD</p></dd>
+
+
+<dt>locs_id</dt>
+<dd><p>character(1). Unique identifier of locations</p></dd>
 
 
 <dt>radius</dt>
@@ -73,8 +77,8 @@
 radius of buffer around points</p></dd>
 
 
-<dt>year</dt>
-<dd><p>numeric giving the year of NLCD data used</p></dd>
+<dt>...</dt>
+<dd><p>Placeholders.</p></dd>
 
 </dl></div>
 
