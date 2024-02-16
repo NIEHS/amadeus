@@ -953,7 +953,7 @@ The result may not be accurate.\n",
 #' @author Insang Song, Mariana Kassien
 #' @returns A data.frame object.
 #' @note U.S. context.
-#' @seealso [calc_sedc]
+#' @seealso [calc_sedc], [process_tri]
 #' @importFrom terra vect
 #' @importFrom terra crs
 #' @importFrom terra nearby
@@ -996,9 +996,9 @@ calc_tri <- function(
   # from and locs.
   tlen_locs <- unlist(locs_re[["time"]])
   tlen_tri <- unlist(from[["YEAR"]])
-  if (!all.equal(unique(tlen_locs), unique(tlen_tri))) {
-    stop("Temporal coverage of each dataset does not match.")
-  }
+  # if (!all.equal(unique(tlen_locs), unique(tlen_tri))) {
+  #   stop("Temporal coverage of each dataset does not match.")
+  # }
 
   # split by year: locs and tri locations
   list_locs <- split(locs_re, tlen_locs)
