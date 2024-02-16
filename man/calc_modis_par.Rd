@@ -58,7 +58,7 @@ to each thread. It should be minimized to spare memory.}
 \item{...}{Arguments passed to \code{fun_hdf}.}
 }
 \description{
-\code{calc_modis} essentially runs \code{process_modis_daily} function
+\code{calc_modis} essentially runs \code{\link{calc_modis_daily}} function
 in each thread (subprocess). Based on daily resolution, each day's workload
 will be distributed to each thread. With \code{product} argument,
 the files are processed by a customized function where the unique structure

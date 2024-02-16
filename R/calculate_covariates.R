@@ -344,6 +344,118 @@ calc_ecoregion <-
   }
 
 
+#' A single-date MODIS worker for parallelization
+#' @param locs SpatVector/sf/sftime object. Locations where MODIS values
+#' are summarized.
+#' @param from SpatRaster. Preprocessed objects.
+#' @param locs_id character(1). Field name where unique site identifiers
+#' are stored. Default is `"site_id"`
+#' @param date Date(1). date to query.
+#' @param name_extracted character. Names of calculated covariates.
+#' @param fun_summary function. Summary function for
+#' multilayer rasters. Passed to `foo`. See [exactextractr::exact_extract]
+#' for details.
+#' @param radius numeric. Radius to generate circular buffers.
+#' @param ... Placeholders.
+#' @description modis_worker operates at six MODIS/VIIRS products
+#' (MOD11A1, MOD13A2, MOD06_L2, VNP46A2, MOD09GA, and MCD19A2)
+#' on a daily basis. Given that the raw hdf files are downloaded from
+#' NASA, standard file names include a data retrieval date flag starting
+#' with A. Leveraging that piece of information, the function will select
+#' files of scope on the date of interest. Please note that this function
+#' does not provide a function to filter swaths or tiles, so it is strongly
+#' recommended to check and pre-filter the file names at users' discretion.
+#' @author Insang Song
+#' @returns A data.frame object.
+#' @importFrom terra extract
+#' @importFrom terra project
+#' @importFrom terra vect
+#' @importFrom terra nlyr
+#' @importFrom terra describe
+#' @importFrom methods is
+#' @importFrom sf st_as_sf
+#' @importFrom sf st_drop_geometry
+#' @export
+calc_modis_daily <- function(
+  locs = NULL,
+  from = NULL,
+  locs_id = "site_id",
+  date = NULL,
+  name_extracted = NULL,
+  fun_summary = "mean",
+  radius = 0L,
+  ...
+) {
+  if (!any(methods::is(locs, "SpatVector"),
+           methods::is(locs, "sf"),
+           methods::is(locs, "sftime"))) {
+    stop("locs should be one of sf, sftime, or SpatVector.\n")
+  }
+  if (!methods::is(locs, "SpatVector")) {
+    locs <- terra::vect(locs)
+  }
+  if (!locs_id %in% names(locs)) {
+    stop(sprintf("locs should include columns named %s.\n",
+                 locs_id)
+    )
+  }
+  if (!"time" %in% names(locs)) {
+    locs$time <- date
+  }
+
+  extract_with_buffer <- function(
+    points,
+    surf,
+    radius,
+    id,
+    time = "time",
+    func = "mean"
+  ) {
+    # generate buffers
+    bufs <- terra::buffer(points, width = radius, quadsegs = 180L)
+    bufs <- terra::project(bufs, terra::crs(surf))
+    # extract raster values
+    surf_at_bufs <-
+      exactextractr::exact_extract(
+        x = surf,
+        y = sf::st_as_sf(bufs),
+        fun = func,
+        force_df = TRUE,
+        append_cols = c(id, time),
+        progress = FALSE,
+        max_cells_in_memory = 1e7
+      )
+    return(surf_at_bufs)
+  }
+
+  ## NaN to zero
+  from[is.nan(from)] <- 0L
+
+  # raster used to be vrt_today
+  if (any(grepl("00000", name_extracted))) {
+    locs_tr <- terra::project(locs, terra::crs(from))
+    extracted <- terra::extract(x = from, y = locs_tr, ID = FALSE)
+    locs_blank <- as.data.frame(locs)
+    extracted <- cbind(locs_blank, extracted)
+  } else {
+    extracted <-
+      extract_with_buffer(
+        points = locs,
+        surf = from,
+        id = locs_id,
+        radius = radius,
+        func = fun_summary
+      )
+  }
+  # cleaning names
+  # assuming that extracted is a data.frame
+  name_offset <- terra::nlyr(from)
+  # multiple columns will get proper names
+  name_range <- seq(ncol(extracted) - name_offset + 1, ncol(extracted), 1)
+  colnames(extracted)[name_range] <- name_extracted
+  return(extracted)
+}
+
 
 #' Calculate MODIS product covariates in multiple CPU threads
 #' @param locs sf object. Unique locs where covariates
@@ -371,7 +483,7 @@ calc_ecoregion <-
 #' @param export_list_add character. A vector with object names to export
 #'  to each thread. It should be minimized to spare memory.
 #' @param ... Arguments passed to `fun_hdf`.
-#' @description `calc_modis` essentially runs `process_modis_daily` function
+#' @description `calc_modis` essentially runs [`calc_modis_daily`] function
 #' in each thread (subprocess). Based on daily resolution, each day's workload
 #' will be distributed to each thread. With `product` argument,
 #' the files are processed by a customized function where the unique structure
@@ -490,7 +602,7 @@ process_modis_swath, or process_bluemarble.")
 
               tryCatch({
                 extracted <-
-                  process_modis_daily(
+                  calc_modis_daily(
                     locs = locs_input,
                     from = vrt_today,
                     locs_id = locs_id,
@@ -512,7 +624,7 @@ process_modis_swath, or process_bluemarble.")
                 # coerce to avoid errors
                 error_df <- as.data.frame(error_df)
                 error_df <- error_df[, c(locs_id, "time")]
-                error_df[, name_radius] <- -99999
+                error_df[[name_radius]] <- -99999
                 attr(error_df, "error_message") <- e
                 return(error_df)
               }
@@ -522,7 +634,7 @@ process_modis_swath, or process_bluemarble.")
         res <-
           Reduce(function(x, y) {
             dplyr::left_join(x, y,
-              by = c("site_id", "time")
+              by = c(locs_id, "time")
             )
           },
           res0)

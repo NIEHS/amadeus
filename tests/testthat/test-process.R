@@ -60,6 +60,21 @@ testthat::test_that("process_flatten_sds", {
     TRUE
   )
 
+  # flatten error
+  path_mod06 <-
+    testthat::test_path(
+      "..", "testdata", "modis",
+      "MOD06_L2.A2021227.0320.061.2021227134022.hdf"
+    )
+
+  testthat::expect_error(
+    process_flatten_sds(
+      path = path_mod06,
+      subdataset = "(Fraction)",
+      fun_agg = "mean"
+    )
+  )
+
   # mod09 test
   mod09_sub <-
     sprintf("HDF4_EOS:EOS_GRID:%s:MODIS_Grid_500m_2D:sur_refl_b01_1", mod09)
@@ -137,6 +152,21 @@ testthat::test_that("process_modis_merge is good to go", {
     )
   )
 
+  # multiple files
+  paths_mod13 <- list.files(
+    testthat::test_path("../testdata/modis/"),
+    pattern = "MOD13A2",
+    full.names = TRUE
+  )
+  testthat::expect_no_error(
+    process_modis_merge(
+      paths = paths_mod13,
+      date_in = "2021-08-13",
+      subdataset = "(NDVI)"
+    )
+  )
+
+
 })
 
 
@@ -152,6 +182,9 @@ testthat::test_that("VNP46 preprocess tests", {
 
   testthat::expect_no_error(
     corn <- process_bluemarble_corners()
+  )
+  testthat::expect_error(
+    process_bluemarble_corners(hrange = c(99, 104))
   )
 
   testthat::expect_warning(

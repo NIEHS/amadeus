@@ -275,33 +275,57 @@ testthat::test_that("calc_modis works well.", {
   site_faux_r <- site_faux
   names(site_faux_r)[1] <- "ID"
   testthat::expect_error(
-    process_modis_daily(
+    calc_modis_daily(
       from = rast(nrow = 3, ncol = 3),
       date = "2021-08-15",
       locs = site_faux_r
     )
   )
   testthat::expect_error(
-    process_modis_daily(
+    calc_modis_daily(
       from = rast(nrow = 3, ncol = 3),
       date = "2021-08-15",
       locs = matrix(c(1, 3, 4, 5), nrow = 2)
     )
   )
   testthat::expect_error(
-    process_modis_daily(
+    calc_modis_daily(
       from = rast(nrow = 3, ncol = 3),
       date = "2021-08-15",
       locs = sf::st_as_sf(site_faux)
     )
   )
-  site_faux2 <- site_faux
-  names(site_faux2)[2] <- "date"
+  site_faux0 <- site_faux
+  names(site_faux0)[2] <- "date"
   testthat::expect_error(
-    process_modis_daily(
+    calc_modis_daily(
       from = rast(nrow = 3, ncol = 3),
       date = "2021-08-15",
-      locs = sf::st_as_sf(site_faux2)
+      locs = sf::st_as_sf(site_faux0)
+    )
+  )
+  site_faux2 <- site_faux
+  site_faux2[, 4] <- NULL
+
+  path_mcd19 <-
+    testthat::test_path(
+      "../testdata/modis/",
+      "MCD19A2.A2021227.h11v05.061.2023149160635.hdf"
+    )
+  mcd_merge <-
+    process_modis_merge(
+      paths = path_mcd19,
+      date_in = "2021-08-15",
+      subdataset = "(Optical_Depth)"
+    )
+
+  testthat::expect_no_error(
+    calc_modis_daily(
+      from = mcd_merge,
+      date = "2021-08-15",
+      locs = sf::st_as_sf(site_faux2),
+      radius = 1000,
+      name_extracted = "MCD_EXTR_1K_"
     )
   )
 
@@ -310,6 +334,16 @@ testthat::test_that("calc_modis works well.", {
   )
   testthat::expect_error(
     calc_modis_par(from = path_mod11, product = "MOD11A1", locs = list(1, 2, 3))
+  )
+  testthat::expect_error(
+    calc_modis_par(
+      from = path_vnp46,
+      locs = site_faux,
+      fun_hdf = "fountain",
+      name_covariates = c("MOD_NITLT_0_", "MOD_K1_"),
+      subdataset = 3L,
+      nthreads = 1
+    )
   )
   testthat::expect_warning(
     calc_modis_par(
@@ -320,6 +354,20 @@ testthat::test_that("calc_modis works well.", {
       nthreads = 1
     )
   )
+  testthat::expect_warning(
+    flushed <- calc_modis_par(
+      from = path_vnp46,
+      locs = site_faux,
+      name_covariates = c("MOD_NITLT_0_"),
+      fun_hdf = process_bluemarble,
+      subdataset = 3L,
+      nthreads = 1,
+      radius = c(-1000, 0L),
+      tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
+    )
+  )
+  testthat::expect_s3_class(flushed, "data.frame")
+  testthat::expect_true(any(unlist(flushed) == -99999))
 
 })
 
