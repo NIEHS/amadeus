@@ -26,7 +26,7 @@ check_url_status <- function(
   }
 
   status <- hd$status_code
-  Sys.sleep(1)
+  Sys.sleep(1.5)
   return(status == http_status_ok)
 }
 
