@@ -1232,7 +1232,8 @@ calc_gmted <- function(
     fun = fun,
     method = "simple",
     ID = FALSE,
-    bind = FALSE
+    bind = FALSE,
+    na.rm = TRUE
   )
   #### merge with site_id and date (year)
   sites_extracted <- cbind(
@@ -1370,7 +1371,8 @@ calc_narr <- function(
       fun = fun,
       method = "simple",
       ID = FALSE,
-      bind = FALSE
+      bind = FALSE,
+      na.rm = TRUE
     )
     #### merge with site_id, datetime, pressure level
     sites_extracted_layer <- cbind(
@@ -1521,7 +1523,8 @@ calc_geos <- function(
       fun = fun,
       method = "simple",
       ID = FALSE,
-      bind = FALSE
+      bind = FALSE,
+      na.rm = TRUE
     )
     #### merge with site_id, datetime, pressure level
     sites_extracted_layer <- cbind(
@@ -1636,7 +1639,8 @@ calc_sedac_population <- function(
       fun = fun,
       method = "simple",
       ID = FALSE,
-      bind = FALSE
+      bind = FALSE,
+      na.rm = TRUE
     )
     #### merge with site_id, datetime, pressure level
     sites_extracted_layer <- cbind(
