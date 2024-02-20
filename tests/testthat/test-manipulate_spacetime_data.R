@@ -530,6 +530,21 @@ test_that("spatraster_as_sftime works as expected", {
                "x layers might not be time")
 })
 
+test_that("sftime_as_sf works as expected", {
+  # open testing data
+  stdata <- data.table::fread(paste0(testthat::test_path("..", "testdata/", ""),
+                                     "spacetime_table.csv"))
+  mysftime <- sftime::st_as_sftime(stdata,
+                                   coords = c("lon", "lat"),
+                                   time_column_name = "time",
+                                   crs = 4326)
+  expect_no_error(sftime_as_sf(mysftime))
+  expect_no_error(sftime_as_sf(mysftime, keeptime = FALSE))
+  expect_equal(class(sftime_as_sf(mysftime))[1], "sf")
+  expect_equal(class(sftime_as_sf(mysftime, keeptime = FALSE))[1], "sf")
+  expect_true("time" %in% colnames(sftime_as_sf(mysftime, keeptime = TRUE)))
+  expect_false("time" %in% colnames(sftime_as_sf(mysftime, keeptime = FALSE)))
+})
 
 test_that("project_dt works as expected", {
   withr::local_package("terra")

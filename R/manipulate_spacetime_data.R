@@ -217,6 +217,7 @@ spatraster_as_sftime <- function(x, varname, timename = "time") {
 #' @param x a sftime
 #' @param keeptime boolean: TRUE if user wants to keep time column 
 #' as simple column (default = TRUE)
+#' @return a sf object
 #' @author Eva Marques
 #' @export
 sftime_as_sf <- function(x, keeptime = TRUE) {
