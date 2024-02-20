@@ -778,7 +778,6 @@ process_nei <- function(
 
 
 
-#' @description
 #' Import and clean population data from NASA Socioeconomic Data and
 #' Applications Center (SEDAC).
 #' @param path character(1). Path to GeoTIFF or netCDF file.
@@ -836,7 +835,6 @@ process_sedac_population <- function(
   return(data)
 }
 
-#' @description
 #' Import and clean wildfire smoke plume coverage data from NOAA Hazard
 #' Mapping System Fire and Smoke Product.
 #' @param date_start character(1). length of 10. Start date of downloaded data.
@@ -993,7 +991,6 @@ process_hms <- function(
   }
 }
 
-#' @description
 #' Import and clean Global Multi-resolution Terrain Elevation Data (GMTED2010)
 #' downloaded with `download_gmted` or `download_data(dataset_name = "gmted")`.
 #' Function returns a SpatRast object containing the user-defined variable
@@ -1068,7 +1065,6 @@ process_gmted <- function(
   return(data)
 }
 
-#' @description
 #' Import and clean NOAA NCEP North American Regional Reanalysis (NARR) data
 #' downloaded with `download_narr` or `download_data(dataset_name = "NARR")`.
 #' Function returns a SpatRast object containing the user-defined variable
@@ -1222,7 +1218,6 @@ process_narr <- function(
   return(data_return)
 }
 
-#' @description
 #' Import and clean GEOS-CF data downloaded with
 #' `download_geos_cf_data` or `download_data(dataset_name = "geos")`. Function
 #' returns a SpatRast object containing the user-defined variables of interest.

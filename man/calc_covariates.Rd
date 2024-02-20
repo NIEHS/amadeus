@@ -6,8 +6,9 @@
 \usage{
 calc_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
-    "dummies", "gmted", "roads", "sedac_groads", "nlcd", "tri", "ncep", "nei",
-    "ecoregions", "ecoregion"),
+    "dummies", "gmted", "roads", "ecoregions", "ecoregion", "hms", "noaa", "smoke",
+    "gmted", "narr", "narr_monolevel", "narr_p_levels", "plevels", "monolevel",
+    "p_levels", "geos", "geos_cf"),
   locs,
   from,
   locs_id = "site_id",
@@ -40,6 +41,10 @@ Calculate covariates
 \item \code{calc_koppen_geiger}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"},
 \item \code{calc_ecoregion}: \code{"ecoregion"}, \code{"ecoregions"}
 \item \code{calc_temporal_dummies}: \code{"dummies"}
+\item \code{calc_hms}: \code{"hms"}, \code{"noaa"}, \code{"smoke"}
+\item \verb{calc_gmted``: }"gmted"`
+\item \verb{calc_narr``: }"narr"\verb{, }"narr_monolevel"\verb{, }"narr_p_levels\verb{", }"plevels"\verb{, }"monolevel"\verb{, }"p_levels"`
+\item \verb{calc_geos``: }"geos"\verb{, }"geos_cf"`
 }
 }
 \author{
