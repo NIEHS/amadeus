@@ -175,9 +175,10 @@ dt_as_mysftime <- function(x, lonname, latname, timename, crs) {
     stop("Some of lon, lat, time columns missing or mispelled")
   }
   mysft <- st_as_sftime(x,
-                        coords = c(lonname, latname),
-                        time_column_name = timename,
-                        crs = crs) |>
+    coords = c(lonname, latname),
+    time_column_name = timename,
+    crs = crs
+  ) |>
     dplyr::rename("time" = timename)
   return(mysft)
 }
@@ -194,10 +195,16 @@ dt_as_mysftime <- function(x, lonname, latname, timename, crs) {
 #' @export
 spatraster_as_sftime <- function(x, varname, timename = "time") {
   date_correct <- TRUE
-  tryCatch( { result <- as.POSIXct(names(x)) },
-            error = function(e) {date_correct <<- FALSE})
+  tryCatch(
+    {
+      as.POSIXct(names(x))
+    },
+    error = function(e) {
+      date_correct <<- FALSE
+    }
+  )
   stopifnot("x layers might not be time" = date_correct)
-  df <- as.data.frame(x, xy = T) 
+  df <- as.data.frame(x, xy = TRUE)
   output <- df |>
     data.table::as.data.table() |>
     data.table::melt(
@@ -205,9 +212,11 @@ spatraster_as_sftime <- function(x, varname, timename = "time") {
       variable.name = "time",
       value.name = varname
     ) |>
-    st_as_sftime(coords = c("x", "y"),
-                 time_column_name = "time",
-                 crs = terra::crs(x))
+    st_as_sftime(
+      coords = c("x", "y"),
+      time_column_name = "time",
+      crs = terra::crs(x)
+    )
   names(output)[names(output) == "time"] <- timename
   attributes(output)$time_column <- timename
   return(output)
@@ -216,7 +225,7 @@ spatraster_as_sftime <- function(x, varname, timename = "time") {
 #' Simplify an sftime to sf class
 #'
 #' @param x a sftime
-#' @param keeptime boolean: TRUE if user wants to keep time column 
+#' @param keeptime boolean: TRUE if user wants to keep time column
 #' as simple column (default = TRUE)
 #' @return a sf object
 #' @author Eva Marques
@@ -245,7 +254,7 @@ sf_as_mysftime <- function(x, timename) {
   if (!(timename %in% colnames(x))) {
     stop("time column missing or mispelled")
   }
-  output <- st_as_sftime(x, time_column_name = timename) 
+  output <- st_as_sftime(x, time_column_name = timename)
   attributes(output)$time_column <- "time"
   output <- dplyr::rename(output, "time" = timename)
   return(output)
@@ -273,7 +282,9 @@ sftime_as_mysftime <- function(x, timename) {
 #' @param x a data.frame, data.table, SpatVector or SpatRasterDataset
 #' @param ... if x is a data.frame or data.table: lonname, latname, timename and
 #' crs arguments are required. If x is a sf or sftime, timename argument is
-#' required. If x is a terra::SpatRaster, varname argument is required. 
+#' required. If x is a terra::SpatRaster, varname argument is required.
+#' @return a sftime object with constrained time column name
+#' (see check_mysftime() function)
 #' @import sf
 #' @author Eva Marques
 #' @export
@@ -292,8 +303,7 @@ as_mysftime <- function(x, ...) {
   } else if (format == "sftime") {
     output <- x |>
       sftime_as_mysftime(...)
-  } 
-  else if (format == "SpatRaster") {
+  } else if (format == "SpatRaster") {
     output <- x |>
       spatraster_as_sftime(timename = "time", ...)
   } else if (format == "SpatVector") {
@@ -346,6 +356,7 @@ as_mysftime <- function(x, ...) {
 #' Convert sftime object to SpatVector
 #'
 #' @param x a sftime
+#' @return a terra::SpatVector
 #' @import sftime
 #' @author Eva Marques
 #' @export
@@ -368,7 +379,7 @@ sftime_as_spatvector <- function(x) {
 #' @author Eva Marques
 #' @export
 sftime_as_spatraster <- function(x, varname) {
-  timecol <- attributes(x)$time_column
+  stopifnot("varname missing or mispelled" = varname %in% colnames(x))
   dates <- unique(sftime::st_time(x))
   layers <- list()
   for (d in dates) {
@@ -387,7 +398,6 @@ sftime_as_spatraster <- function(x, varname) {
 #' @export
 sftime_as_spatrds <- function(x) {
   stopifnot("x is not a sftime" = class(x)[1] == "sftime")
-  timecol <- attributes(x)$time_column
   df <- as.data.frame(x)
   col <- colnames(df)
   variables <- col[!(col %in% c("lon", "lat", "time"))]
@@ -404,8 +414,8 @@ sftime_as_spatrds <- function(x) {
       "",
       colnames(newdf)
     )
-    
-    var_rast <- terra::rast(newdf, type = "xyz", crs = stdt$crs_stdt)
+    var_rast <- terra::rast(newdf, type = "xyz",
+                            crs = attributes(x$geometry)$crs)
     rast_list[[var]] <- var_rast
   }
   output <- terra::sds(rast_list)
