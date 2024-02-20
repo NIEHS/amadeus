@@ -313,6 +313,120 @@ test_that("check_mysf works as expected", {
   )
 })
 
+
+test_that("dt_to_mysftime works as expected", {
+  # open testing data
+  stdata <- data.table::fread(paste0(testthat::test_path("..", "testdata/", ""),
+                                     "spacetime_table.csv"))
+  # should work
+  expect_no_error(dt_to_mysftime(x = stdata,
+                                 lonname = "lon",
+                                 latname = "lat",
+                                 timename = "time",
+                                 crs = 4326))
+  expect_no_error(check_mysftime(dt_to_mysftime(x = stdata,
+                                                lonname = "lon",
+                                                latname = "lat",
+                                                timename = "time",
+                                                crs = 4326)))
+  expect_error(dt_to_mysftime(x = stdata,
+                              lonname = "longitude",
+                              latname = "lat",
+                              timename = "time",
+                              crs = 4326),
+               "Some of lon, lat, time columns missing or mispelled")
+  expect_error(dt_to_mysftime(x = stdata[, lat := NULL],
+                              lonname = "lon",
+                              latname = "lat",
+                              timename = "time",
+                              crs = 4326),
+               "Some of lon, lat, time columns missing or mispelled")
+})
+
+test_that("as_mysftime works as expected", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  # open testing data
+  stdata <- data.table::fread(paste0(testthat::test_path("..", "testdata/", ""),
+                                     "spacetime_table.csv"))
+  # should work with data.table
+  expect_no_error(as_mysftime(x = stdata,
+                              lonname = "lon",
+                              latname = "lat",
+                              timename = "time",
+                              crs = 4326))
+  expect_no_error(check_mysftime(as_mysftime(x = stdata,
+                                             lonname = "lon",
+                                             latname = "lat",
+                                             timename = "time",
+                                             crs = 4326)))
+  expect_error(as_mysftime(x = stdata),
+               "argument \"lonname\" is missing, with no default")
+  # should work with data.frame
+  expect_no_error(as_mysftime(x = as.data.frame(stdata),
+                              lonname = "lon",
+                              latname = "lat",
+                              timename = "time",
+                              crs = 4326))
+  expect_no_error(check_mysftime(as_mysftime(x = as.data.frame(stdata),
+                                             lonname = "lon",
+                                             latname = "lat",
+                                             timename = "time",
+                                             crs = 4326)))
+  # with SpatVector
+  myvect <- terra::vect(
+    stdata,
+    geom = c("lon", "lat"),
+    crs = "EPSG:4326",
+    keepgeom = FALSE
+  )
+  expect_no_error(as_mysftime(x = myvect))
+  expect_no_error(check_mysftime(as_mysftime(x = myvect)))
+  myvect <- stdata |>
+    dplyr::rename("time2" = time) |>
+    terra::vect(
+      geom = c("lon", "lat"),
+      crs = "EPSG:4326",
+      keepgeom = FALSE
+    )
+  expect_error(as_mysftime(x = myvect),
+               "x does not contain time column")
+  # with SpatRasterDataset created from 2 SpatRast (i.e. 2 variables)
+  # with 3 layers (i.e. 3 timestamps)
+  var1 <- terra::rast(
+    extent = c(-112, -101, 33.5, 40.9),
+    ncol = 5,
+    nrow = 5,
+    crs = "EPSG:4326"
+  )
+  terra::values(var1) <- seq(-5, 19)
+  terra::add(var1) <- c(var1**2, var1**3)
+  var1 <- rast(
+    extent = c(-112, -101, 33.5, 40.9),
+    ncol = 5,
+    nrow = 5,
+    crs = "EPSG:4326"
+  )
+  terra::values(var1) <- seq(-5, 19)
+  add(var1) <- c(var1**2, var1**3)
+  names(var1) <- c("2023-11-01", "2023-11-02", "2023-11-03")
+  var2 <- terra::rast(
+    extent = c(-112, -101, 33.5, 40.9),
+    ncol = 5,
+    nrow = 5,
+    crs = "EPSG:4326"
+  )
+  terra::values(var2) <- seq(-15, 9)
+  add(var2) <- c(var2**2, var2**3)
+  names(var2) <- c("2023-11-01", "2023-11-02", "2023-11-03")
+  myrds <- terra::sds(var1, var2)
+  names(myrds) <- c("var1", "var2")
+  expect_no_error(as_mysftime(myrds))
+  expect_error(as_mysftime(x = "roquefort"),
+               "x class not accepted")
+})
+
+
 test_that("dt_to_sf works as expected", {
   withr::local_package("terra")
   withr::local_package("data.table")

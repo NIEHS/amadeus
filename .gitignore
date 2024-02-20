@@ -51,3 +51,6 @@ rsconnect/
 # DS_Store
 .DS_Store
 **/.DS_Store
+
+# custom linter dev
+\.github/linters

@@ -4,19 +4,17 @@
 \alias{calc_ecoregion}
 \title{Calculate EPA Ecoregions level 2/3 binary variables}
 \usage{
-calc_ecoregion(
-  path = "./input/data/ecoregions/raw/us_eco_l3_state_boundaries.shp",
-  sites,
-  id_col = "site_id"
-)
+calc_ecoregion(locs, from = NULL, locs_id = "site_id", ...)
 }
 \arguments{
-\item{path}{character(1). Path to Ecoregion Shapefiles}
+\item{locs}{sf/SpatVector. Unique locs. Should include
+a unique identifier field named \code{locs_id}}
 
-\item{sites}{sf/SpatVector. Unique sites. Should include
-a unique identifier field named \code{id_col}}
+\item{from}{SpatVector. Ecoregion polygons}
 
-\item{id_col}{character(1). Name of unique identifier.}
+\item{locs_id}{character(1). Name of unique identifier.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a data.frame object with dummy variables and attributes of:
