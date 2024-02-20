@@ -181,6 +181,57 @@ dt_to_mysftime <- function(x, lonname, latname, timename, crs) {
   return(mysft)
 }
 
+#' Create a sftime from a terra::SpatRaster
+#'
+#' @param x a terra::SpatRaster
+#' @param varname character for variable column name in the sftime
+#' @param timename character for time column name in the sftime
+#' (default: "time")
+#' @return a sftime object
+#' @import sftime
+#' @author Eva Marques
+#' @export
+spatraster_as_sftime <- function(x, varname, timename = "time") {
+  date_correct <- TRUE
+  tryCatch( { result <- as.POSIXct(names(x)) },
+            error = function(e) {date_correct <<- FALSE})
+  stopifnot("x layers might not be time" = date_correct)
+  df <- as.data.frame(x, xy = T) 
+  output <- df |>
+    data.table::as.data.table() |>
+    data.table::melt(
+      measure.vars = names(df)[-1:-2],
+      variable.name = "time",
+      value.name = varname
+    ) |>
+    st_as_sftime(coords = c("x", "y"),
+                 time_column_name = "time",
+                 crs = terra::crs(x))
+  names(output)[names(output) == "time"] <- timename
+  attributes(output)$time_column <- timename
+  return(output)
+}
+
+#' Simplify an sftime to sf class
+#'
+#' @param x a sftime
+#' @param keeptime boolean: TRUE if user wants to keep time column 
+#' as simple column (default = TRUE)
+#' @author Eva Marques
+#' @export
+sftime_as_sf <- function(x, keeptime = TRUE) {
+  stopifnot("x is not a sftime" = class(x)[1] == "sftime")
+  if (keeptime) {
+    timecol <- attributes(x)$time_column
+    output <- x[, !(colnames(x) %in% c(timecol))]
+    output[, timecol] <- as.data.table(x)[, get(timecol)]
+  } else {
+    output <- x
+    st_time(output) <- NULL
+  }
+  return(output)
+}
+
 #' Convert to sftime object on the form adapted to beethoven code
 #'
 #' @param x a data.frame, data.table, SpatVector or SpatRasterDataset
@@ -258,6 +309,62 @@ sftime_as_spatvector <- function(x) {
   tosf[, timecol] <- as.data.table(x)[, get(timecol)]
   return(terra::vect(tosf))
 }
+
+#' Convert sftime object to SpatRaster
+#' /!\ can be very time consuming if sftime is not spatially structured
+#'
+#' @param x a sftime
+#' @param varname variable to rasterize
+#' @return a SpatRaster with layers corresponding to timestamps
+#' @import sftime
+#' @import stars
+#' @author Eva Marques
+#' @export
+sftime_as_spatraster <- function(x, varname) {
+  timecol <- attributes(x)$time_column
+  dates <- unique(sftime::st_time(x))
+  layers <- list()
+  for (d in dates) {
+    newrast <- stars::st_rasterize(x[which(st_time(x) == d), varname]) |>
+      terra::rast()
+    layers[[d]] <- newrast
+  }
+  return(terra::rast(layers))
+}
+
+#' Convert sftime object to SpatVector
+#'
+#' @param x a sftime
+#' @import sftime
+#' @author Eva Marques
+#' @export
+sftime_as_spatrds <- function(x) {
+  stopifnot("x is not a sftime" = class(x)[1] == "sftime")
+  timecol <- attributes(x)$time_column
+  df <- as.data.frame(x)
+  col <- colnames(df)
+  variables <- col[!(col %in% c("lon", "lat", "time"))]
+  rast_list <- list()
+  for (var in variables) {
+    newdf <- stats::reshape(
+      df[, c("lon", "lat", "time", var)],
+      idvar = c("lon", "lat"),
+      timevar = "time",
+      direction = "wide"
+    )
+    colnames(newdf) <- gsub(
+      paste0(var, "."),
+      "",
+      colnames(newdf)
+    )
+    
+    var_rast <- terra::rast(newdf, type = "xyz", crs = stdt$crs_stdt)
+    rast_list[[var]] <- var_rast
+  }
+  output <- terra::sds(rast_list)
+  return(output)
+}
+
 
 
 #' Convert a stdt to sf/sftime/SpatVector

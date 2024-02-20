@@ -508,6 +508,27 @@ test_that("dt_to_sftime works as expected", {
   expect_error(dt_to_sftime(df_nonstandard, "EPSG:4326"))
 })
 
+test_that("spatraster_as_sftime works as expected", {
+  myrast <-
+    terra::rast(
+      extent = c(-112, -101, 33.5, 40.9),
+      ncol = 5,
+      nrow = 5,
+      crs = "EPSG:4326"
+    )
+  terra::values(myrast) <- seq(-5, 19)
+  terra::add(myrast) <- c(myrast**2, myrast**3)
+  names(myrast) <- c("2023-11-01", "2023-11-02", "2023-11-03")
+  # conversion should work 
+  expect_no_error(spatraster_as_sftime(myrast, "myvar"))
+  expect_no_error(spatraster_as_sftime(myrast, "myvar", "date"))
+  mysft <- spatraster_as_sftime(myrast, "myvar", "date")
+  expect_equal(attributes(mysft)$time, "date")
+  # conversion does not work because raster's names are not dates
+  names(myrast) <- c("roquefort", "comte", "camembert")
+  expect_error(spatraster_as_sftime(myrast, "myvar"),
+               "x layers might not be time")
+})
 
 
 test_that("project_dt works as expected", {
