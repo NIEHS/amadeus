@@ -675,6 +675,7 @@ process_tri <- function(
       names_sep = "_"
     ) |>
     dplyr::filter(!is.na(LONGITUDE) | !is.na(LATITUDE))
+  names(dt_tri_x) <- sub(" ", "_", names(dt_tri_x))
 
   spvect_tri <-
     terra::vect(dt_tri_x,
@@ -775,3 +776,118 @@ process_nei <- function(
   return(cnty_vect)
 
 }
+
+
+
+#' Filter unique AQS sites with or without temporal information
+#' @param path character(1). Path to daily measurement data.
+#' RDS and CSV are accepted.
+#' @param include_time logical(1). Should the output include
+#'  temporal information?
+#' @param date_start character(1). Start date.
+#'  Should be in "YYYY-MM-DD" format.
+#' @param date_end character(1). End date.
+#'  Should be in "YYYY-MM-DD" format.
+#' @returns data.table object with three or four fields.
+#' - "site_id"
+#' - "lon": in WGS 1984 (EPSG:4326)
+#' - "lat": in WGS 1984 (EPSG:4326)
+#' - "time"
+#' "time" field will be attached only when `include_time = TRUE`.
+#' @importFrom data.table as.data.table
+#' @importFrom utils read.csv
+#' @importFrom terra vect
+#' @importFrom terra project
+#' @note \code{include_time = TRUE} will return a massive data.table
+#' object. Please choose proper \code{date_start} and \code{date_end} values.
+#' @examples
+#' library(terra)
+#' library(data.table)
+#' aqs_sites <- process_aqs()
+#' @export
+process_aqs <-
+  function(
+    path = "./tests/testdata/daily_88101_2018-2022.rds",
+    include_time = FALSE,
+    date_start = "2018-01-01",
+    date_end = "2022-12-31",
+    return_format = "terra"
+  ) {
+    #sites <- try(read.csv(path))
+    #if (inherits(sites, "try-error")) {
+    sites <- try(readRDS(path))
+    #}
+    if (inherits(sites, "try-error")) {
+      stop("Failed to read file from path. Please enter a valid value.")
+    }
+
+    ## get unique sites
+    sites$site_id <-
+      sprintf("%02d%03d%04d%05d",
+              sites$State.Code,
+              sites$County.Code,
+              sites$Site.Num,
+              sites$Parameter.Code)
+
+    # nolint start
+    site_id <- NULL
+    Datum <- NULL
+    # nolint end
+
+    # select relevant fields only
+    sites_v <- unique(sites[, c("site_id", "Longitude", "Latitude", "Datum")])
+    names(sites_v)[2:3] <- c("lon", "lat")
+    sites_v <- data.table::as.data.table(sites_v)
+
+    # subset mainland
+    sites_v <- sites_v[!grepl("^(02|15|72|78|6|80)", site_id), ]
+
+    # NAD83 to WGS84
+    sites_v_nad <-
+      sites_v[Datum == "NAD83"]
+    sites_v_nad <-
+      terra::vect(
+        sites_v_nad,
+        keepgeom = TRUE,
+        crs = "EPSG:4269"
+      )
+    sites_v_nad <- terra::project(sites_v_nad, "EPSG:4326")
+    sites_v_nad <- sites_v_nad[, seq(1, 3)]
+    sites_v_nad <- as.data.frame(sites_v_nad)
+    sites_v_wgs <- sites_v[Datum == "WGS84"][, -4]
+    final_sites <- rbind(sites_v_wgs, sites_v_nad)
+
+    if (include_time) {
+      date_start <- as.Date(date_start)
+      date_end <- as.Date(date_end)
+      date_sequence <- seq(date_start, date_end, "day")
+      final_sites <-
+        split(date_sequence, date_sequence) |>
+        lapply(function(x) {
+          fs_time <- final_sites
+          fs_time$time <- x
+          return(fs_time)
+        })
+      final_sites <- Reduce(rbind, final_sites)
+    }
+
+    final_sites <-
+      switch(
+        return_format,
+        terra =
+        terra::vect(
+          final_sites,
+          keepgeom = TRUE,
+          crs = "EPSG:4326"
+        ),
+        sf =
+        sf::st_as_sf(
+          final_sites,
+          remove = FALSE,
+          coords = c("lon", "lat"),
+          epsg = 4326
+        )
+      )
+
+    return(final_sites)
+  }

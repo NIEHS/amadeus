@@ -811,7 +811,6 @@ The result may not be accurate.\n",
     len_point_locs <- seq_len(nrow(locs))
 
     locs$from_id <- len_point_locs
-    # select egrid_v only if closer than 3e5 meters from each aqs
     locs_buf <-
       terra::buffer(
         locs,
@@ -819,20 +818,20 @@ The result may not be accurate.\n",
         quadsegs = 90
       )
 
-    from <- from[locs_buf, ]
-    len_point_from <- seq_len(nrow(from))
+    from_in <- from[locs_buf, ]
+    len_point_from <- seq_len(nrow(from_in))
 
     # len point from? len point to?
-    from$to_id <- len_point_from
+    from_in$to_id <- len_point_from
     dist <- NULL
 
     # near features with distance argument: only returns integer indices
     # threshold is set to the twice of sedc_bandwidth
     # lines 895-900 may overlap with distance arg in 912-913
     res_nearby <-
-      terra::nearby(locs, from, distance = sedc_bandwidth * 2)
+      terra::nearby(locs, from_in, distance = sedc_bandwidth * 2)
     # attaching actual distance
-    dist_nearby <- terra::distance(locs, from)
+    dist_nearby <- terra::distance(locs, from_in)
     dist_nearby_df <- as.vector(dist_nearby)
     # adding integer indices
     dist_nearby_tdf <-
@@ -846,7 +845,7 @@ The result may not be accurate.\n",
     res_sedc <- res_nearby |>
       dplyr::as_tibble() |>
       dplyr::left_join(data.frame(locs)) |>
-      dplyr::left_join(data.frame(from)) |>
+      dplyr::left_join(data.frame(from_in)) |>
       dplyr::left_join(dist_nearby_df) |>
       # per the definition in
       # https://mserre.sph.unc.edu/BMElab_web/SEDCtutorial/index.html
@@ -856,7 +855,7 @@ The result may not be accurate.\n",
       dplyr::summarize(
         dplyr::across(
           dplyr::all_of(target_fields),
-          list(sedc = ~sum(w_sedc * ., na.rm = TRUE))
+          ~sum(w_sedc * ., na.rm = TRUE)
         )
       ) |>
       dplyr::ungroup()
@@ -906,9 +905,6 @@ calc_tri <- function(
   radius = c(1e3L, 1e4L, 5e4L),
   ...
 ) {
-  if (!all(c("lon", "lat", "time") %in% names(locs))) {
-    stop("locs must have 'lon', 'lat', and 'time' fields.\n")
-  }
   if (!methods::is(locs, "SpatVector")) {
     if (methods::is(locs, "sf")) {
       locs <- terra::vect(locs)
@@ -921,8 +917,10 @@ calc_tri <- function(
 
   # split by year: locs and tri locations
   tri_cols <- grep("_AIR", names(from), value = TRUE)
+  # error fix: no whitespace
+  tri_cols <- sub(" ", "_", tri_cols)
 
-  # mapply and inner lapply
+  # inner lapply
   list_radius <- split(radius, radius)
   list_locs_tri <-
     lapply(
