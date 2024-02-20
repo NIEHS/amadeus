@@ -45,7 +45,6 @@ read_commands <- function(
 #' Extract URLs from download commands
 #' @param commands character vector containing download commands
 #' @param position URL position in the vector
-#' @importFrom stringr str_split_i
 #' @return character vector containing download URLs
 #' @export
 extract_urls <- function(
@@ -55,12 +54,15 @@ extract_urls <- function(
     cat(paste0("URL position in command is not defined.\n"))
     return(NULL)
   }
-  url_list <- NULL
-  for (c in seq_along(commands)) {
-    url <- stringr::str_split_i(commands[c], " ", position)
-    url_list <- c(url_list, url)
-  }
-  return(url_list)
+  urls <- sapply(
+    strsplit(
+      commands,
+      " "
+    ),
+    function(x, l) x[l],
+    l = position
+  )
+  return(urls)
 }
 
 #' Sample download URLs and apply `check_url_status` function

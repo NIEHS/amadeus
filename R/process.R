@@ -783,8 +783,7 @@ process_nei <- function(
 #' @param path character(1). Path to GeoTIFF or netCDF file.
 #' @author Mitchell Manware
 #' @return a SpatRaster object;
-#' @importFrom package function
-#' @importFrom package function
+#' @importFrom terra rast
 #' @export
 process_sedac_population <- function(
     path = "./input/sedac_population/raw/"
@@ -1078,6 +1077,9 @@ process_gmted <- function(
 #' @author Mitchell Manware
 #' @return a SpatRaster object
 #' @importFrom terra rast
+#' @importFrom terra time
+#' @importFrom terra subset
+#' @importFrom stringi stri_pad
 #' @export
 process_narr <- function(
     date_start = "2023-09-01",
@@ -1607,13 +1609,13 @@ process_locs_vector <-
         "Converting data.table to data.frame...\n"
       ))
       sites_df <- data.frame(locs)
-    } else if (class(locs) == "data.frame") {
+    } else if ("data.frame" %in% class(locs) &&
+               !("data.table" %in% class(locs))) {
       cat(paste0(
         "Sites are class data.frame...\n"
       ))
       sites_df <- locs
-    } else if (!(class(locs) == "data.frame") ||
-               "data.table" %in% class(locs)) {
+    } else if (!c("data.table", "data.frame") %in% class(locs)) {
       stop(
         paste0(
           "Detected a ",

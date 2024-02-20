@@ -584,13 +584,13 @@ download_gmted_data <- function(
   #### 7. define URL statistic code
   statistic_code <- process_gmted_codes(
     statistic,
-    statistic_code = TRUE,
+    statistic = TRUE,
     invert = FALSE
   )
   #### 8. define URL resolution code
   resolution_code <- process_gmted_codes(
     resolution,
-    resolution_code = TRUE,
+    resolution = TRUE,
     invert = FALSE
   )
   #### 9. build url

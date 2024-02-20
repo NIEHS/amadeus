@@ -8,7 +8,7 @@ calc_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
     "dummies", "gmted", "roads", "ecoregions", "ecoregion", "hms", "noaa", "smoke",
     "gmted", "narr", "narr_monolevel", "narr_p_levels", "plevels", "monolevel",
-    "p_levels", "geos", "geos_cf"),
+    "p_levels", "geos", "geos_cf", "sedac_population", "population"),
   locs,
   from,
   locs_id = "site_id",
@@ -42,9 +42,11 @@ Calculate covariates
 \item \code{calc_ecoregion}: \code{"ecoregion"}, \code{"ecoregions"}
 \item \code{calc_temporal_dummies}: \code{"dummies"}
 \item \code{calc_hms}: \code{"hms"}, \code{"noaa"}, \code{"smoke"}
-\item \verb{calc_gmted``: }"gmted"`
-\item \verb{calc_narr``: }"narr"\verb{, }"narr_monolevel"\verb{, }"narr_p_levels\verb{", }"plevels"\verb{, }"monolevel"\verb{, }"p_levels"`
-\item \verb{calc_geos``: }"geos"\verb{, }"geos_cf"`
+\item \code{calc_gmted}: \code{"gmted"}
+\item \code{calc_narr}: \code{"narr"}, \code{"narr_monolevel"}, \verb{"narr_p_levels}",
+\code{"plevels"}, \code{"monolevel"}, \code{"p_levels"}
+\item \code{calc_geos}: \code{"geos"}, \code{"geos_cf"}
+\item \code{calc_sedac_population}: \code{"population"}, \code{"sedac_population"}
 }
 }
 \author{

@@ -16,10 +16,11 @@
 #' - `calc_ecoregion`: `"ecoregion"`, `"ecoregions"`
 #' - `calc_temporal_dummies`: `"dummies"`
 #' - `calc_hms`: `"hms"`, `"noaa"`, `"smoke"`
-#' - `calc_gmted``: `"gmted"`
-#' - `calc_narr``: `"narr"`, `"narr_monolevel"`, `"narr_p_levels`",
+#' - `calc_gmted`: `"gmted"`
+#' - `calc_narr`: `"narr"`, `"narr_monolevel"`, `"narr_p_levels`",
 #' `"plevels"`, `"monolevel"`, `"p_levels"`
-#' - `calc_geos``: `"geos"`, `"geos_cf"`
+#' - `calc_geos`: `"geos"`, `"geos_cf"`
+#' - `calc_sedac_population`: `"population"`, `"sedac_population"`
 #' @returns Calculated covariates. Mainly data.frame object.
 #' @author Insang Song
 #' @export
@@ -31,7 +32,8 @@ calc_covariates <-
                     "geos", "dummies", "gmted", "roads",
                     "ecoregions", "ecoregion", "hms", "noaa", "smoke",
                     "gmted", "narr", "narr_monolevel", "narr_p_levels", 
-                    "plevels", "monolevel", "p_levels", "geos", "geos_cf"),
+                    "plevels", "monolevel", "p_levels", "geos", "geos_cf",
+                    "sedac_population", "population"),
       locs,
       from,
       locs_id = "site_id",
@@ -61,8 +63,8 @@ calc_covariates <-
       hms = calc_hms,
       # sedac_groads = calc_sedac_groads,
       # roads = calc_sedac_groads,
-      # sedac_population = calc_sedac_population,
-      # population = calc_sedac_population,
+      sedac_population = calc_sedac_population,
+      population = calc_sedac_population,
       nei = calc_nei,
       tri = calc_tri,
       # ncep = calc_ncep,
@@ -1024,7 +1026,7 @@ calc_hms <- function(
   check_for_null_parameters(mget(ls()))
   #### from == character indicates no wildfire smoke polumes are present
   #### return 0 for all locs and dates
-  if (class(from) == "character") {
+  if ("character" %in% class(from)) {
     cat(paste0(
       "Inherited list of dates due to absent smoke plume polygons.\n"
     ))
