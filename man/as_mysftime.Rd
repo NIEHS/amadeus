@@ -10,7 +10,7 @@ as_mysftime(x, ...)
 \item{x}{a data.frame, data.table, SpatVector or SpatRasterDataset}
 
 \item{...}{if x is a data.frame or data.table: lonname, latname, timename and
-crs arguments are recquired.}
+crs arguments are recquired. If x is a sf, timename argument is required.}
 }
 \description{
 Convert to sftime object on the form adapted to beethoven code

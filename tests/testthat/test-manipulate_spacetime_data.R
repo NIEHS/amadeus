@@ -314,28 +314,28 @@ test_that("check_mysf works as expected", {
 })
 
 
-test_that("dt_to_mysftime works as expected", {
+test_that("dt_as_mysftime works as expected", {
   # open testing data
   stdata <- data.table::fread(paste0(testthat::test_path("..", "testdata/", ""),
                                      "spacetime_table.csv"))
   # should work
-  expect_no_error(dt_to_mysftime(x = stdata,
+  expect_no_error(dt_as_mysftime(x = stdata,
                                  lonname = "lon",
                                  latname = "lat",
                                  timename = "time",
                                  crs = 4326))
-  expect_no_error(check_mysftime(dt_to_mysftime(x = stdata,
+  expect_no_error(check_mysftime(dt_as_mysftime(x = stdata,
                                                 lonname = "lon",
                                                 latname = "lat",
                                                 timename = "time",
                                                 crs = 4326)))
-  expect_error(dt_to_mysftime(x = stdata,
+  expect_error(dt_as_mysftime(x = stdata,
                               lonname = "longitude",
                               latname = "lat",
                               timename = "time",
                               crs = 4326),
                "Some of lon, lat, time columns missing or mispelled")
-  expect_error(dt_to_mysftime(x = stdata[, lat := NULL],
+  expect_error(dt_as_mysftime(x = stdata[, lat := NULL],
                               lonname = "lon",
                               latname = "lat",
                               timename = "time",
@@ -349,7 +349,7 @@ test_that("as_mysftime works as expected", {
   # open testing data
   stdata <- data.table::fread(paste0(testthat::test_path("..", "testdata/", ""),
                                      "spacetime_table.csv"))
-  # should work with data.table
+  # with data.table
   expect_no_error(as_mysftime(x = stdata,
                               lonname = "lon",
                               latname = "lat",
@@ -362,7 +362,7 @@ test_that("as_mysftime works as expected", {
                                              crs = 4326)))
   expect_error(as_mysftime(x = stdata),
                "argument \"lonname\" is missing, with no default")
-  # should work with data.frame
+  # with data.frame
   expect_no_error(as_mysftime(x = as.data.frame(stdata),
                               lonname = "lon",
                               latname = "lat",
@@ -373,6 +373,36 @@ test_that("as_mysftime works as expected", {
                                              latname = "lat",
                                              timename = "time",
                                              crs = 4326)))
+  # with sf
+  mysf <- sf::st_as_sf(stdata,
+                       coords = c("lon", "lat"),
+                       crs = 4326)
+  expect_no_error(as_mysftime(mysf, "time"))
+  b <- mysf |>
+    dplyr::rename("date" = "time")
+  expect_no_error(as_mysftime(b, "date"))
+  expect_no_error(check_mysftime(as_mysftime(b, "date")))
+  # with sftime
+  mysft <- sftime::st_as_sftime(stdata,
+                                coords = c("lon", "lat"),
+                                crs = 4326,
+                                time_column_name = "time"
+  )
+  expect_no_error(as_mysftime(mysft, "time"))
+  expect_no_error(check_mysftime(as_mysftime(mysft, "time")))
+  # with SpatRaster 
+  myrast <- 
+    terra::rast(
+      extent = c(-112, -101, 33.5, 40.9),
+      ncol = 5,
+      nrow = 5,
+      crs = "EPSG:4326"
+    )
+  terra::values(myrast) <- seq(-5, 19)
+  terra::add(myrast) <- c(myrast**2, myrast**3)
+  names(myrast) <- c("2023-11-01", "2023-11-02", "2023-11-03")
+  expect_no_error(as_mysftime(x = myrast, varname = "altitude"))
+  expect_no_error(check_mysftime(as_mysftime(x = myrast, varname = "altitude")))
   # with SpatVector
   myvect <- terra::vect(
     stdata,
@@ -443,7 +473,7 @@ test_that("sftime_as_spatvector as expected", {
   expect_error(sftime_as_spatvector(stdata))
 })
 
-test_that("dt_to_sf works as expected", {
+test_that("dt_as_sf works as expected", {
   withr::local_package("terra")
   withr::local_package("data.table")
   withr::local_package("dplyr")
@@ -457,24 +487,24 @@ test_that("dt_to_sf works as expected", {
   df$var1 <- 1:50
   df$var2 <- 51:100
 
-  expect_error(dt_to_sf(df, 3L))
-  expect_error(dt_to_sf(as.data.table(df), 3L))
+  expect_error(dt_as_sf(df, 3L))
+  expect_error(dt_as_sf(as.data.table(df), 3L))
 
   dfe <- as.data.table(df)
   names(dfe)[1] <- "xcoord"
-  expect_error(dt_to_sf(dfe, "EPSG:4326"))
+  expect_error(dt_as_sf(dfe, "EPSG:4326"))
   dfe <- as.data.table(df)
   names(dfe)[2] <- "ycoord"
-  expect_error(dt_to_sf(dfe, "EPSG:4326"))
+  expect_error(dt_as_sf(dfe, "EPSG:4326"))
 
   dfdt <- as.data.table(df)
-  expect_no_error(dt_to_sf(dfdt, "EPSG:4326"))
-  dfsf <- dt_to_sf(dfdt, "EPSG:4326")
+  expect_no_error(dt_as_sf(dfdt, "EPSG:4326"))
+  dfsf <- dt_as_sf(dfdt, "EPSG:4326")
   expect_s3_class(dfsf, "sf")
 })
 
 
-test_that("dt_to_sftime works as expected", {
+test_that("dt_as_sftime works as expected", {
   withr::local_package("terra")
   withr::local_package("data.table")
   withr::local_package("dplyr")
@@ -488,24 +518,24 @@ test_that("dt_to_sftime works as expected", {
   df$var1 <- 1:50
   df$var2 <- 51:100
 
-  expect_error(dt_to_sftime(df, 3L))
-  expect_error(dt_to_sftime(as.data.table(df), 3L))
+  expect_error(dt_as_sftime(df, 3L))
+  expect_error(dt_as_sftime(as.data.table(df), 3L))
 
   dfe <- as.data.table(df)
   names(dfe)[1] <- "xcoord"
-  expect_error(dt_to_sftime(dfe, "EPSG:4326"))
+  expect_error(dt_as_sftime(dfe, "EPSG:4326"))
   dfe <- as.data.table(df)
   names(dfe)[2] <- "ycoord"
-  expect_error(dt_to_sftime(dfe, "EPSG:4326"))
+  expect_error(dt_as_sftime(dfe, "EPSG:4326"))
 
   dfdt <- as.data.table(df)
-  expect_no_error(dt_to_sftime(dfdt, "EPSG:4326"))
-  dfsf <- dt_to_sftime(dfdt, "EPSG:4326")
+  expect_no_error(dt_as_sftime(dfdt, "EPSG:4326"))
+  dfsf <- dt_as_sftime(dfdt, "EPSG:4326")
   expect_s3_class(dfsf, "sftime")
 
   df_nonstandard <- df
   colnames(df_nonstandard)[3] <- "yeardate"
-  expect_error(dt_to_sftime(df_nonstandard, "EPSG:4326"))
+  expect_error(dt_as_sftime(df_nonstandard, "EPSG:4326"))
 })
 
 test_that("spatraster_as_sftime works as expected", {

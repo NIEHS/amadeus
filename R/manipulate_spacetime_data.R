@@ -165,10 +165,11 @@ check_mysf <- function(x) {
 #' @param latname character for latitude column name
 #' @param timename character for time column name
 #' @param crs coordinate reference system
+#' @return a sftime object
 #' @import sftime
 #' @author Eva Marques
 #' @export
-dt_to_mysftime <- function(x, lonname, latname, timename, crs) {
+dt_as_mysftime <- function(x, lonname, latname, timename, crs) {
   stopifnot("x is not a data.table" = class(x)[1] == "data.table")
   if (any(!(c(lonname, latname, timename) %in% colnames(x)))) {
     stop("Some of lon, lat, time columns missing or mispelled")
@@ -233,11 +234,46 @@ sftime_as_sf <- function(x, keeptime = TRUE) {
   return(output)
 }
 
+#' Convert a sf object to mysftime
+#'
+#' @param x a sf
+#' @param timename character: name of time column in x
+#' @return a sftime object
+#' @author Eva Marques
+#' @export
+sf_as_mysftime <- function(x, timename) {
+  if (!(timename %in% colnames(x))) {
+    stop("time column missing or mispelled")
+  }
+  output <- st_as_sftime(x, time_column_name = timename) 
+  attributes(output)$time_column <- "time"
+  output <- dplyr::rename(output, "time" = timename)
+  return(output)
+}
+
+#' Convert a sftime object to mysftime
+#'
+#' @param x a sftime
+#' @param timename character: name of time column in x
+#' @return a sftime object with specific format (see check_mysftime() function)
+#' @author Eva Marques
+#' @export
+sftime_as_mysftime <- function(x, timename) {
+  if (!(timename %in% colnames(x))) {
+    stop("time column missing or mispelled")
+  }
+  output <- x
+  attributes(output)$time_column <- "time"
+  output <- dplyr::rename(output, "time" = timename)
+  return(output)
+}
+
 #' Convert to sftime object on the form adapted to beethoven code
 #'
 #' @param x a data.frame, data.table, SpatVector or SpatRasterDataset
 #' @param ... if x is a data.frame or data.table: lonname, latname, timename and
-#' crs arguments are recquired.
+#' crs arguments are required. If x is a sf or sftime, timename argument is
+#' required. If x is a terra::SpatRaster, varname argument is required. 
 #' @import sf
 #' @author Eva Marques
 #' @export
@@ -246,10 +282,20 @@ as_mysftime <- function(x, ...) {
   if (format == "data.frame") {
     output <- x |>
       data.table::data.table() |>
-      dt_to_mysftime(...)
+      dt_as_mysftime(...)
   } else if (format == "data.table") {
     output <- x |>
-      dt_to_mysftime(...)
+      dt_as_mysftime(...)
+  } else if (format == "sf") {
+    output <- x |>
+      sf_as_mysftime(...)
+  } else if (format == "sftime") {
+    output <- x |>
+      sftime_as_mysftime(...)
+  } 
+  else if (format == "SpatRaster") {
+    output <- x |>
+      spatraster_as_sftime(timename = "time", ...)
   } else if (format == "SpatVector") {
     if (!("time" %in% names(x))) {
       stop("x does not contain time column")
@@ -257,7 +303,7 @@ as_mysftime <- function(x, ...) {
     crs <- terra::crs(x)
     output <- as.data.frame(x, geom = "XY") |>
       data.table::as.data.table() |>
-      dt_to_mysftime("x", "y", "time", crs = crs)
+      dt_as_mysftime("x", "y", "time", crs = crs)
   } else if (format == "SpatRasterDataset") {
     crs_dt <- terra::crs(x)
     stdf <- as.data.frame(x[1], xy = TRUE)
@@ -290,7 +336,7 @@ as_mysftime <- function(x, ...) {
       stdf[, varname_original] <- df_var[, 4]
     }
     output <- data.table::as.data.table(stdf) |>
-      dt_to_mysftime("lon", "lat", "time", crs_dt)
+      dt_as_mysftime("lon", "lat", "time", crs_dt)
   } else {
     stop("x class not accepted")
   }
@@ -482,7 +528,7 @@ convert_stdt_spatrastdataset <- function(stdt) {
 #' @author Eva Marques
 #' @importFrom sf st_as_sf
 #' @return an sf object
-dt_to_sf <- function(datatable, crs) {
+dt_as_sf <- function(datatable, crs) {
   if (!("data.table" %in% class(datatable))) {
     stop("datatable is not a data.table")
   }
@@ -514,7 +560,7 @@ dt_to_sf <- function(datatable, crs) {
 #' e.g., "2023-01-01", "01/01/2023", etc.
 #' @author Eva Marques
 #' @return an sftime object
-dt_to_sftime <- function(datatable, crs) {
+dt_as_sftime <- function(datatable, crs) {
   if (!("data.table" %in% class(datatable))) {
     stop("datatable is not a data.table")
   }
@@ -573,7 +619,7 @@ project_dt <- function(datatable, crs_ori, crs_dest) {
   }
 
   loc <- unique(datatable[, c("lon", "lat")])
-  loc_sf <- dt_to_sf(loc, crs_ori)
+  loc_sf <- dt_as_sf(loc, crs_ori)
   loc_sf <- sf::st_transform(loc_sf, crs_dest)
   colnames(loc_sf)[colnames(loc_sf) == "lon"] <- "lon_ori"
   colnames(loc_sf)[colnames(loc_sf) == "lat"] <- "lat_ori"
