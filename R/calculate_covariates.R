@@ -859,6 +859,9 @@ The result may not be accurate.\n",
         )
       ) |>
       dplyr::ungroup()
+    idx_air <- grep("_AIR_", names(res_sedc))
+    names(res_sedc)[idx_air] <-
+      sprintf("%s_%05d", names(res_sedc)[idx_air], sedc_bandwidth)
 
     attr(res_sedc, "sedc_bandwidth") <- sedc_bandwidth
     attr(res_sedc, "sedc_threshold") <- sedc_bandwidth * 2
@@ -938,7 +941,10 @@ calc_tri <- function(
       }
     )
   # bind element data.frames into one
-  df_tri <- data.table::rbindlist(list_locs_tri)
+  df_tri <- Reduce(function(x, y) dplyr::full_join(x, y), list_locs_tri)
+  if (nrow(df_tri) != nrow(locs)) {
+    df_tri <- dplyr::left_join(as.data.frame(locs), df_tri)
+  }
   return(df_tri)
 }
 
