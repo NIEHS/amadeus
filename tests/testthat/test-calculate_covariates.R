@@ -789,7 +789,7 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
       expect_true(
         ncol(hms_covariate) == 3
       )
-      # expect 9 rows
+      # expect 12 rows
       expect_true(
         nrow(hms_covariate) == 12
       )

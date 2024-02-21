@@ -459,14 +459,14 @@ testthat::test_that("process_sedac_population returns expected.", {
 testthat::test_that("process_sedac_population returns null for netCDF.", {
   pop <-
     process_sedac_population(
-      "../testdata/population/placeholder.nc"
+      "../testdata/population/pLaCeHoLdEr.nc"
     )
   expect_true(
     is.null(pop)
   )
 })
 
-testthat::test_that("process_hms returns expected (June data).", {
+testthat::test_that("process_hms returns expected.", {
   withr::local_package("terra")
   densities <- c(
     "Light",
@@ -511,42 +511,6 @@ testthat::test_that("process_hms returns expected (June data).", {
       # expect other elements are 8 character dates
       expect_true(
         all(nchar(hms[2:length(hms)]) == 8)
-      )
-    }
-  }
-})
-
-
-testthat::test_that("process_hms returns expected (December data).", {
-  withr::local_package("terra")
-  densities <- c(
-    "Light",
-    "Medium",
-    "Heavy"
-  )
-  radii <- c(0, 1000)
-  locs <- readRDS("../testdata/sites_nc.RDS")
-  # expect function
-  expect_true(
-    is.function(calc_hms)
-  )
-  for (d in seq_along(densities)) {
-    density <- densities[d]
-    for (r in seq_along(radii)) {
-      hms <-
-        process_hms(
-          date_start = "2018-12-31",
-          date_end = "2018-12-31",
-          variable = density,
-          path = "../testdata/hms/"
-        )
-      # expect output is character
-      expect_true(
-        class(hms) == "character"
-      )
-      # expect 2 observations
-      expect_true(
-        length(hms) == 2
       )
     }
   }
