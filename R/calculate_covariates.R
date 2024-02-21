@@ -240,11 +240,16 @@ calc_nlcd_ratio <- function(locs,
                                                stack_apply = TRUE,
                                                progress = FALSE)
   # select only the columns of interest
-  nlcd_at_bufs <- nlcd_at_bufs[names(nlcd_at_bufs)[grepl("frac_",
-                                                         names(nlcd_at_bufs))]]
-  # change column names
   cfpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
   nlcd_classes <- utils::read.csv(cfpath)
+  nlcd_at_bufs <-
+    nlcd_at_bufs[
+      sort(names(nlcd_at_bufs)[
+        grepl(paste0("frac_(", paste(nlcd_classes$value, collapse = "|"), ")"),
+              names(nlcd_at_bufs))
+      ])
+    ]
+  # change column names
   nlcd_names <- names(nlcd_at_bufs)
   nlcd_names <- sub(pattern = "frac_", replacement = "", x = nlcd_names)
   nlcd_names <- as.numeric(nlcd_names)
@@ -252,13 +257,14 @@ calc_nlcd_ratio <- function(locs,
   new_names <- sapply(
     nlcd_names,
     function(x) {
-      sprintf("LDU_%s_0_%05d_%04d", x, radius, year)
+      sprintf("LDU_%s_0_%05d", x, radius)
     }
   )
   names(nlcd_at_bufs) <- new_names
   # merge data_vect with nlcd class fractions (and reproject)
   new_data_vect <- cbind(data_vect_b, nlcd_at_bufs)
   new_data_vect <- terra::project(new_data_vect, terra::crs(locs))
+  new_data_vect$time <- as.integer(year)
   return(new_data_vect)
 }
 
@@ -748,7 +754,7 @@ calc_temporal_dummies <-
 #'  The threshold should be carefully chosen by users.
 #' @author Insang Song
 #' @references
-#' * [Messier KP, Akita Y, & Serre ML. (2012). Integrating Address Geocoding, Land Use Regression, and Spatiotemporal Geostatistical Estimation for Groundwater Tetrachloroethylene. _Environmental Science \& Technology_ 46(5), 2772-2780.](https://dx.doi.org/10.1021/es203152a)
+#' * [Messier KP, Akita Y, & Serre ML. (2012). Integrating Address Geocoding, Land Use Regression, and Spatiotemporal Geostatistical Estimation for Groundwater Tetrachloroethylene. _Environmental Science & Technology_ 46(5), 2772-2780.](https://dx.doi.org/10.1021/es203152a)
 #' * Wiesner C. (n.d.). [Euclidean Sum of Exponentially Decaying Contributions Tutorial](https://mserre.sph.unc.edu/BMElab_web/SEDCtutorial/index.html)
 #' @examples
 #' library(terra)
