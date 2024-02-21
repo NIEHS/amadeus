@@ -222,6 +222,32 @@ spatraster_as_sftime <- function(x, varname, timename = "time") {
   return(output)
 }
 
+#' Create a sftime from a terra::SpatRasterDataset
+#'
+#' @param x a terra::SpatRasterDataset
+#' @param timename character for time column name in the sftime
+#' (default: "time")
+#' @return a sftime object
+#' @import sftime
+#' @author Eva Marques
+#' @export
+spatrds_as_sftime <- function(x, timename = "time") {
+  stopifnot("x is not a SpatRasterDataset" =
+              class(x)[1] == "SpatRasterDataset")
+  variables <- names(x)
+  sftime_list <- list()
+  newsft <- spatraster_as_sftime(x[[variables[1]]],
+                                 varname = variables[1],
+                                 timename = timename) 
+  for (var in variables[2:length(variables)]) {
+    newsft[, var] <- st_drop_geometry(
+      spatraster_as_sftime(x[[var]],
+                           varname = var,
+                           timename = timename)[, var])
+  }
+  return(newsft)
+}
+
 #' Simplify an sftime to sf class
 #'
 #' @param x a sftime
@@ -277,6 +303,25 @@ sftime_as_mysftime <- function(x, timename) {
   return(output)
 }
 
+#' Create a sftime from a terra::SpatVector
+#'
+#' @param x a terra::SpatVector
+#' @param timename character for time column name in x
+#' (default: "time")
+#' @return a sftime object
+#' @import sftime
+#' @author Eva Marques
+#' @export
+spatvector_as_sftime <- function(x, timename = "time") {
+  stopifnot("timename column missing or mispelled" = timename %in% names(x)) 
+  crs <- terra::crs(x)
+  output <- as.data.frame(x, geom = "XY") |>
+    data.table::as.data.table() |>
+    dt_as_mysftime("x", "y", timename, crs = crs)
+  return(output)
+}
+
+
 #' Convert to sftime object on the form adapted to beethoven code
 #'
 #' @param x a data.frame, data.table, SpatVector or SpatRasterDataset
@@ -307,13 +352,10 @@ as_mysftime <- function(x, ...) {
     output <- x |>
       spatraster_as_sftime(timename = "time", ...)
   } else if (format == "SpatVector") {
-    if (!("time" %in% names(x))) {
-      stop("x does not contain time column")
-    }
-    crs <- terra::crs(x)
-    output <- as.data.frame(x, geom = "XY") |>
-      data.table::as.data.table() |>
-      dt_as_mysftime("x", "y", "time", crs = crs)
+    output <- x |>
+      spatvector_as_sftime(...)
+    attributes(output)$time_column <- "time"
+    output <- dplyr::rename(output, "time" = timename)
   } else if (format == "SpatRasterDataset") {
     crs_dt <- terra::crs(x)
     stdf <- as.data.frame(x[1], xy = TRUE)

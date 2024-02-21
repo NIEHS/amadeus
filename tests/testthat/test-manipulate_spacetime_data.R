@@ -452,7 +452,7 @@ test_that("as_mysftime works as expected", {
     )
   expect_error(
     as_mysftime(x = myvect),
-    "x does not contain time column"
+    "timename column missing or mispelled"
   )
   # with SpatRasterDataset created from 2 SpatRast (i.e. 2 variables)
   # with 3 layers (i.e. 3 timestamps)
@@ -576,6 +576,42 @@ test_that("dt_as_sftime works as expected", {
   expect_error(dt_as_sftime(df_nonstandard, "EPSG:4326"))
 })
 
+test_that("sf_as_mysftime works as expected", {
+  # open testing data
+  stdata <- data.table::fread(paste0(
+    testthat::test_path("..", "testdata/", ""),
+    "spacetime_table.csv"
+  ))
+  mysf <- sf::st_as_sf(stdata,
+                       coords = c("lon", "lat"),
+                       crs = 4326
+  )
+  expect_no_error(sf_as_mysftime(mysf, "time"))
+  expect_no_error(check_mysftime(sf_as_mysftime(mysf, "time")))
+  b <- mysf |>
+    dplyr::rename("date" = "time")
+  expect_no_error(check_mysftime(sf_as_mysftime(b, "date")))
+})
+
+test_that("sftime_as_mysftime works as expected", {
+  # open testing data
+  stdata <- data.table::fread(paste0(
+    testthat::test_path("..", "testdata/", ""),
+    "spacetime_table.csv"
+  ))
+  mysft <- sftime::st_as_sftime(stdata,
+                       coords = c("lon", "lat"),
+                       time_column_name = "time",
+                       crs = 4326
+  )
+  expect_no_error(sftime_as_mysftime(mysft, "time"))
+  expect_no_error(check_mysftime(sftime_as_mysftime(mysft, "time")))
+  attributes(mysft)$time_column <- "date"
+  mysft <- dplyr::rename(mysft, "date" = "time")
+  expect_no_error(check_mysftime(sf_as_mysftime(mysft, "date")))
+})
+
+
 test_that("spatraster_as_sftime works as expected", {
   myrast <-
     terra::rast(
@@ -610,6 +646,25 @@ test_that("sftime_as_sf works as expected", {
     coords = c("lon", "lat"),
     time_column_name = "time",
     crs = 4326
+  )
+  expect_no_error(sftime_as_sf(mysftime))
+  expect_no_error(sftime_as_sf(mysftime, keeptime = FALSE))
+  expect_equal(class(sftime_as_sf(mysftime))[1], "sf")
+  expect_equal(class(sftime_as_sf(mysftime, keeptime = FALSE))[1], "sf")
+  expect_true("time" %in% colnames(sftime_as_sf(mysftime, keeptime = TRUE)))
+  expect_false("time" %in% colnames(sftime_as_sf(mysftime, keeptime = FALSE)))
+})
+
+test_that("sftime_as_sf works as expected", {
+  # open testing data
+  stdata <- data.table::fread(paste0(
+    testthat::test_path("..", "testdata/", ""),
+    "spacetime_table.csv"
+  ))
+  mysftime <- sftime::st_as_sftime(stdata,
+                                   coords = c("lon", "lat"),
+                                   time_column_name = "time",
+                                   crs = 4326
   )
   expect_no_error(sftime_as_sf(mysftime))
   expect_no_error(sftime_as_sf(mysftime, keeptime = FALSE))
