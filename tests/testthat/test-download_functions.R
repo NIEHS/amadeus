@@ -964,7 +964,6 @@ testthat::test_that("MODIS download error cases.", {
                           commands_path = commands_path,
                           url_status = url_status)
   # remove file with commands after test
-  Sys.sleep(1)
   file.remove(commands_path)
 })
 
