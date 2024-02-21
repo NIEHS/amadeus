@@ -109,7 +109,7 @@ It is important to note that `data_download()` calls a source-specific function 
 User-defined parameters differ based on the data source. Required parameters for each source can be checked with `names(formals())`.
 
 ```{r}
-names(formals(download_noaa_hms_smoke_data))
+names(formals(download_hms_data))
 names(formals(download_narr_monolevel_data))
 ```
 
