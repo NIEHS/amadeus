@@ -31,7 +31,7 @@ calc_covariates <-
                     "koeppen-geiger", "koppen", "koeppen",
                     "geos", "dummies", "gmted", "roads",
                     "ecoregions", "ecoregion", "hms", "noaa", "smoke",
-                    "gmted", "narr", "narr_monolevel", "narr_p_levels", 
+                    "gmted", "narr", "narr_monolevel", "narr_p_levels",
                     "plevels", "monolevel", "p_levels", "geos", "geos_cf",
                     "sedac_population", "population"),
       locs,
@@ -1170,8 +1170,7 @@ calc_hms <- function(
     }
   }
   #### coerce binary to integer
-  sites_extracted[,3] <- as.integer(sites_extracted[,3])
-  cat(paste0("class :", class(sites_extracted[,3])))
+  sites_extracted[, 3] <- as.integer(sites_extracted[, 3])
   #### order by date
   sites_extracted_ordered <- sites_extracted[order(sites_extracted$date), ]
   cat(paste0(
@@ -1180,19 +1179,19 @@ calc_hms <- function(
     " covariates.\n"
   ))
   #### return data.frame
-  return(sites_extracted_ordered)
+  return(data.frame(sites_extracted_ordered))
 }
 
 #' Calculate GMTED elevation covariates
 #' @description
 #' Extract Global Multi-resolution Terrain Elevation Data (GMTED2010) data at
-#' point locations using SpatRaster object from `process_gmted`. Function returns
-#' a data frame containing GEOS-CF variable values at user-defined sites. Unique
-#' column reflect statistic, resolution, and circular buffer.
+#' point locations using SpatRaster object from `process_gmted`. Function
+#' returns a data frame containing GMTED variable values at user-defined
+#' sites. Unique column reflect statistic, resolution, and circular buffer.
 #' @param from SpatRaster(1). Cleaned SpatRaster object that has been returned
-#' from `process_gmted` containing Global Multi-resolution Terrain Elevation Data
-#' (GMTED2010) data.
-#' @param locs data.frame, characater to file path, SpatVector, or sf object.
+#' from `process_gmted` containing Global Multi-resolution Terrain Elevation
+#' Data (GMTED2010) data.
+#' @param locs data.frame. character to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
 #' containing identifier for each unique coordinate location.
 #' @param radius integer(1). Circular buffer distance around site locations.
@@ -1299,17 +1298,17 @@ calc_gmted <- function(
     )
   )
   #### return data.frame
-  return(sites_extracted)
+  return(data.frame(sites_extracted))
 }
 
 #' Calculate NOAA NCEP North American Regional Reanalysis meteorological
 #' and atmospheric covariates
 #' @description
 #' Extract NOAA NCEP North American Regional Reanalysis (NARR) data at point
-#' locations using SpatRaster object from `process_narr`. Function returns a data
-#' frame containing GEOS-CF variable values at user-defined sites. Unique column
-#' names reflect variable name, circular buffer, and vertical pressure level
-#' (if applicable).
+#' locations using SpatRaster object from `process_narr`. Function returns a
+#' data frame containing NARR variable values at user-defined sites. Unique
+#' column names reflect variable name, circular buffer, and vertical pressure
+#' level (if applicable).
 #' @param from SpatRaster(1). Cleaned SpatRaster object that has been returned
 #' from `process_narr` containing NOAA NCEP North American Regional Reanalysis
 #' variable data.
@@ -1433,7 +1432,7 @@ calc_narr <- function(
     }
   }
   #### return data.frame
-  return(sites_extracted)
+  return(data.frame(sites_extracted))
 }
 
 
@@ -1491,58 +1490,26 @@ calc_geos <- function(
       names(data_layer),
       "_"
     )[[1]]
-    #### set datetime based on selections in import_geos
-    #### (2 = variable + date; 3 = variable + pressure level + date;
-    ####  4 = variable + pressure level + date + time)
-    if (length(data_name) == 2) {
-      layer_datetime <- as.Date(
-        data_name[2],
-        format = "%Y%m%d"
-      )
-      layer_level <- "monolevel"
-      cat(paste0(
-        "Calculating daily ",
-        data_name[1],
-        " covariates for date ",
-        layer_datetime,
-        "...\n"
-      ))
-    } else if (length(data_name) == 3) {
-      layer_datetime <- as.Date(
-        data_name[3],
-        format = "%Y%m%d"
-      )
-      layer_level <- data_name[2]
-      cat(paste0(
-        "Calculating daily ",
-        data_name[1],
-        " covariates at ",
-        layer_level,
-        " for date ",
-        layer_datetime,
-        "...\n"
-      ))
-    } else if (length(data_name) == 4) {
-      layer_datetime <- ISOdate(
-        year = substr(data_name[3], 1, 4),
-        month = substr(data_name[3], 5, 6),
-        day = substr(data_name[3], 7, 8),
-        hour = substr(data_name[4], 1, 2),
-        min = substr(data_name[4], 3, 4),
-        sec = substr(data_name[4], 5, 6),
-        tz = "UTC"
-      )
-      layer_level <- data_name[2]
-      cat(paste0(
-        "Calculating hourly ",
-        data_name[1],
-        " covariates at ",
-        layer_level,
-        " for date ",
-        layer_datetime,
-        "...\n"
-      ))
-    }
+    #### set datetime
+    layer_datetime <- ISOdate(
+      year = substr(data_name[3], 1, 4),
+      month = substr(data_name[3], 5, 6),
+      day = substr(data_name[3], 7, 8),
+      hour = substr(data_name[4], 1, 2),
+      min = substr(data_name[4], 3, 4),
+      sec = substr(data_name[4], 5, 6),
+      tz = "UTC"
+    )
+    layer_level <- data_name[2]
+    cat(paste0(
+      "Calculating hourly ",
+      data_name[1],
+      " covariates at ",
+      layer_level,
+      " for date ",
+      layer_datetime,
+      "...\n"
+    ))
     #### extract layer data at sites
     sites_extracted_layer <- terra::extract(
       data_layer,
@@ -1585,7 +1552,7 @@ calc_geos <- function(
     }
   }
   #### return data.frame
-  return(sites_extracted)
+  return(data.frame(sites_extracted))
 }
 
 #' Calculate UN WPP-Ajusted population density covariates covariates
@@ -1618,8 +1585,7 @@ calc_sedac_population <- function(
     locs,
     locs_id = NULL,
     radius = 0,
-    fun = "mean"
-) {
+    fun = "mean") {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### prepare sites
@@ -1699,5 +1665,5 @@ calc_sedac_population <- function(
     )
   )
   #### return data frame
-  return(sites_extracted)
+  return(data.frame(sites_extracted))
 }

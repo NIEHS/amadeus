@@ -456,7 +456,17 @@ testthat::test_that("process_sedac_population returns expected.", {
   }
 })
 
-testthat::test_that("process_hms returns expected.", {
+testthat::test_that("process_sedac_population returns null for netCDF.", {
+  pop <-
+    process_sedac_population(
+      "../testdata/population/placeholder.nc"
+    )
+  expect_true(
+    is.null(pop)
+  )
+})
+
+testthat::test_that("process_hms returns expected (June data).", {
   withr::local_package("terra")
   densities <- c(
     "Light",
@@ -474,7 +484,7 @@ testthat::test_that("process_hms returns expected.", {
         date_end = "2022-06-11",
         variable = densities[d],
         path =
-          "../testdata/hms/"
+        "../testdata/hms/"
       )
     # expect output is a SpatVector or character
     expect_true(
@@ -506,6 +516,42 @@ testthat::test_that("process_hms returns expected.", {
   }
 })
 
+
+testthat::test_that("process_hms returns expected (December data).", {
+  withr::local_package("terra")
+  densities <- c(
+    "Light",
+    "Medium",
+    "Heavy"
+  )
+  radii <- c(0, 1000)
+  locs <- readRDS("../testdata/sites_nc.RDS")
+  # expect function
+  expect_true(
+    is.function(calc_hms)
+  )
+  for (d in seq_along(densities)) {
+    density <- densities[d]
+    for (r in seq_along(radii)) {
+      hms <-
+        process_hms(
+          date_start = "2018-12-31",
+          date_end = "2018-12-31",
+          variable = density,
+          path = "../testdata/hms/"
+        )
+      # expect output is character
+      expect_true(
+        class(hms) == "character"
+      )
+      # expect 2 observations
+      expect_true(
+        length(hms) == 2
+      )
+    }
+  }
+})
+
 testthat::test_that("process_gmted returns expected.", {
   withr::local_package("terra")
   statistics <- c(
@@ -526,20 +572,20 @@ testthat::test_that("process_gmted returns expected.", {
         process_gmted(
           variable = c(statistic, resolution),
           path =
-            paste0(
-              "../testdata/gmted/",
-              process_gmted_codes(
-                statistic,
-                statistic = TRUE,
-                invert = FALSE
-              ),
-              process_gmted_codes(
-                resolution,
-                resolution = TRUE,
-                invert = FALSE
-              ),
-              "_grd/"
-            )
+          paste0(
+            "../testdata/gmted/",
+            process_gmted_codes(
+              statistic,
+              statistic = TRUE,
+              invert = FALSE
+            ),
+            process_gmted_codes(
+              resolution,
+              resolution = TRUE,
+              invert = FALSE
+            ),
+            "_grd/"
+          )
         )
       # expect output is a SpatRaster
       expect_true(
@@ -588,10 +634,10 @@ testthat::test_that("process_narr returns expected.", {
         date_end = "2018-01-01",
         variable = variables[v],
         path =
-          paste0(
-            "../testdata/narr/",
-            variables[v]
-          )
+        paste0(
+          "../testdata/narr/",
+          variables[v]
+        )
       )
     # expect output is SpatRaster
     expect_true(
@@ -734,38 +780,37 @@ testthat::test_that("proccess support functions return expected.", {
   )
 })
 
-testthat::test_that(
-  "process_locs_vector handles data type and missing columns.", {
-    withr::local_package("terra")
-    locs <- readRDS("../testdata/sites_nc.RDS")
-    narr <-
-      process_narr(
-        date_start = "2018-01-01",
-        date_end = "2018-01-01",
-        variable = "weasd",
-        path = "../testdata/narr/weasd/"
-      )
-    # expect error when missing `lat` or `lon`
-    expect_error(
-      calc_narr(
-        from = narr,
-        locs = subset(
-          locs,
-          select = "lon"
-        ),
-        locs_id = "site_id"
-      )
+testthat::test_that("process_locs_vector vector data and missing columns.", {
+  withr::local_package("terra")
+  locs <- readRDS("../testdata/sites_nc.RDS")
+  narr <-
+    process_narr(
+      date_start = "2018-01-01",
+      date_end = "2018-01-01",
+      variable = "weasd",
+      path = "../testdata/narr/weasd/"
     )
-    # expect error when sites are SpatVector
-    expect_error(
-      calc_narr(
-        from = narr,
-        locs = terra::vect(
-          locs,
-          geom = c("lon", "lat"),
-          crs = "EPSG:4326"
-        ),
-        locs_id = "site_id"
-      )
+  # expect error when missing `lat` or `lon`
+  expect_error(
+    calc_narr(
+      from = narr,
+      locs = subset(
+        locs,
+        select = "lon"
+      ),
+      locs_id = "site_id"
     )
-  })
+  )
+  # expect error when sites are SpatVector
+  expect_error(
+    calc_narr(
+      from = narr,
+      locs = terra::vect(
+        locs,
+        geom = c("lon", "lat"),
+        crs = "EPSG:4326"
+      ),
+      locs_id = "site_id"
+    )
+  )
+})

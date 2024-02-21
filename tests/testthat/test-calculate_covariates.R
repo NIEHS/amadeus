@@ -718,8 +718,61 @@ testthat::test_that("calc_hms returns expected.", {
           date_start = "2022-06-10",
           date_end = "2022-06-11",
           variable = density,
-          path =
-            "../testdata/hms/"
+          path = "../testdata/hms/"
+        )
+      hms_covariate <-
+        calc_hms(
+          from = hms,
+          locs = locs,
+          locs_id = "site_id",
+          radius = radii[r]
+        )
+      # expect output is data.frame
+      expect_true(
+        class(hms_covariate) == "data.frame"
+      )
+      # expect 3 columns
+      expect_true(
+        ncol(hms_covariate) == 3
+      )
+      # expect 6 rows
+      expect_true(
+        nrow(hms_covariate) == 6
+      )
+      # expect integer for binary value
+      expect_true(
+        class(hms_covariate[, 3]) == "integer"
+      )
+      # expect binary
+      expect_true(
+        all(unique(hms_covariate[, 3]) %in% c(0, 1))
+      )
+    }
+  }
+})
+
+testthat::test_that("calc_hms returns expected with missing polygons.", {
+  withr::local_package("terra")
+  densities <- c(
+    "Light",
+    "Medium",
+    "Heavy"
+  )
+  radii <- c(0, 1000)
+  locs <- readRDS("../testdata/sites_nc.RDS")
+  # expect function
+  expect_true(
+    is.function(calc_hms)
+  )
+  for (d in seq_along(densities)) {
+    density <- densities[d]
+    for (r in seq_along(radii)) {
+      hms <-
+        process_hms(
+          date_start = "2022-06-10",
+          date_end = "2022-06-13",
+          variable = density,
+          path = "../testdata/hms/"
         )
       hms_covariate <-
         calc_hms(
@@ -738,7 +791,7 @@ testthat::test_that("calc_hms returns expected.", {
       )
       # expect 9 rows
       expect_true(
-        nrow(hms_covariate) == 6
+        nrow(hms_covariate) == 12
       )
       # expect integer for binary value
       expect_true(
@@ -775,20 +828,20 @@ testthat::test_that("calc_gmted returns expected.", {
           process_gmted(
             variable = c(statistic, resolution),
             path =
-              paste0(
-                "../testdata/gmted/",
-                process_gmted_codes(
-                  statistic,
-                  statistic = TRUE,
-                  invert = FALSE
-                ),
-                process_gmted_codes(
-                  resolution,
-                  resolution = TRUE,
-                  invert = FALSE
-                ),
-                "_grd/"
-              )
+            paste0(
+              "../testdata/gmted/",
+              process_gmted_codes(
+                statistic,
+                statistic = TRUE,
+                invert = FALSE
+              ),
+              process_gmted_codes(
+                resolution,
+                resolution = TRUE,
+                invert = FALSE
+              ),
+              "_grd/"
+            )
           )
         gmted_covariate <-
           calc_gmted(
@@ -836,10 +889,10 @@ testthat::test_that("calc_narr returns expected.", {
           date_end = "2018-01-01",
           variable = variable,
           path =
-            paste0(
-              "../testdata/narr/",
-              variable
-            )
+          paste0(
+            "../testdata/narr/",
+            variable
+          )
         )
       narr_covariate <-
         calc_narr(
@@ -890,10 +943,10 @@ testthat::test_that("calc_geos returns as expected.", {
           date_end = "2018-01-01",
           variable = "O3",
           path =
-            paste0(
-              "../testdata/geos/",
-              collection
-            )
+          paste0(
+            "../testdata/geos/",
+            collection
+          )
         )
       geos_covariate <-
         calc_geos(
@@ -925,9 +978,7 @@ testthat::test_that("calc_geos returns as expected.", {
 
 testthat::test_that("calc_sedac_population returns as expected.", {
   withr::local_package("terra")
-  paths <- c(
-    "../testdata/population/gpw_v4_population_density_adjusted_to_2015_unwpp_country_totals_rev11_2020_30_sec.tif"
-  )
+  paths <- list.files("../testdata/population/", full.names = TRUE)
   radii <- c(0, 1000)
   locs <- data.frame(readRDS("../testdata/sites_nc.RDS"))
   # expect function
@@ -935,7 +986,7 @@ testthat::test_that("calc_sedac_population returns as expected.", {
     is.function(calc_sedac_population)
   )
   for (p in seq_along(paths)) {
-    path = paths[p]
+    path <- paths[p]
     for (r in seq_along(radii)) {
       pop <-
         process_sedac_population(

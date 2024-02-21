@@ -786,8 +786,7 @@ process_nei <- function(
 #' @importFrom terra rast
 #' @export
 process_sedac_population <- function(
-    path = "./input/sedac_population/raw/"
-) {
+    path = "./input/sedac_population/raw/") {
   if (substr(path, nchar(path) - 2, nchar(path)) == ".nc") {
     cat(paste0("netCDF functionality for SEDAC data is under construction.\n"))
     return()
@@ -949,7 +948,7 @@ process_hms <- function(
         seq_len(nrow(data_aggregate)), c("Density", "Date")
       ]
       #### merge with other data
-      data_return <- rbind(data_return, data_aggregate) 
+      data_return <- rbind(data_return, data_aggregate)
     }
   }
   #### if no polygons
@@ -1128,33 +1127,31 @@ process_narr <- function(
     ))
     #### check for mono or pressure levels
     if (grepl("level", names(data_year)[1])) {
-      if (length(unique(terra::time(data_year))) == 1) {
-        cat(paste0("Detected test data set.\n"))
-        days <- sapply(
-          strsplit(
-            names(data_year),
-            "_"
-          ),
-          function(x) x[3]
-        )
-        terra::time(data_year) <- as.Date(
-          paste0(
-            substr(
-              terra::time(data_year),
-              1,
-              4
-            ),
-            stringi::stri_pad(
-              days,
-              width = 3,
-              pad = "0",
-              side = "left"
-            )
-          ),
-          format = "%Y%j"
-        )
-      }
       #### pressure levels data
+      cat(paste0("Detected pressure levels data...\n"))
+      days <- sapply(
+        strsplit(
+          names(data_year),
+          "_"
+        ),
+        function(x) x[3]
+      )
+      terra::time(data_year) <- as.Date(
+        paste0(
+          substr(
+            terra::time(data_year),
+            1,
+            4
+          ),
+          stringi::stri_pad(
+            days,
+            width = 3,
+            pad = "0",
+            side = "left"
+          )
+        ),
+        format = "%Y%j"
+      )
       names(data_year) <- paste0(
         variable,
         "_",
@@ -1174,6 +1171,7 @@ process_narr <- function(
       )
     } else {
       #### mono level data
+      cat(paste0("Detected monolevel data...\n"))
       names(data_year) <- paste0(
         variable,
         "_",
@@ -1404,10 +1402,10 @@ process_geos <-
 #' @export
 process_geos_collection <-
   function(
-    path,
-    collection = FALSE,
-    date = FALSE,
-    datetime = FALSE) {
+      path,
+      collection = FALSE,
+      date = FALSE,
+      datetime = FALSE) {
     #### check for more than one true
     parameters <- c(collection, date, datetime)
     if (length(parameters[parameters == TRUE]) > 1) {
@@ -1498,10 +1496,10 @@ process_geos_collection <-
 #' @export
 process_gmted_codes <-
   function(
-    string,
-    statistic = FALSE,
-    resolution = FALSE,
-    invert = FALSE) {
+      string,
+      statistic = FALSE,
+      resolution = FALSE,
+      invert = FALSE) {
     statistics <- c(
       "Breakline Emphasis", "Systematic Subsample",
       "Median Statistic", "Minimum Statistic",
@@ -1610,12 +1608,13 @@ process_locs_vector <-
       ))
       sites_df <- data.frame(locs)
     } else if ("data.frame" %in% class(locs) &&
-               !("data.table" %in% class(locs))) {
+                 !("data.table" %in% class(locs))) {
       cat(paste0(
         "Sites are class data.frame...\n"
       ))
       sites_df <- locs
-    } else if (!c("data.table", "data.frame") %in% class(locs)) {
+    } else if (!("data.table" %in% class(locs)) &&
+                 !("data.frame" %in% class(locs))) {
       stop(
         paste0(
           "Detected a ",
