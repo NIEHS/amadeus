@@ -2,7 +2,7 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{convert_stobj_to_stdt}
 \alias{convert_stobj_to_stdt}
-\title{Convert spatio-temporal object to a datatable with lon, lat, time, predictors columns. It also returns the crs.}
+\title{Convert spatio-temporal object to a datatable with lon, lat, time, predictors columns.}
 \usage{
 convert_stobj_to_stdt(stobj)
 }
@@ -16,7 +16,7 @@ lat, lon, time columns and "crs_dt" the crs of the data in well-known text
 format.
 }
 \description{
-Convert spatio-temporal object to a datatable with lon, lat, time, predictors columns. It also returns the crs.
+Convert spatio-temporal object to a datatable with lon, lat, time, predictors columns.
 }
 \author{
 Eva Marques, Insang Song

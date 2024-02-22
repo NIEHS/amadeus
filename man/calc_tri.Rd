@@ -5,30 +5,26 @@
 \title{Calculate TRI covariates}
 \usage{
 calc_tri(
-  path = "./input/tri/",
-  sites,
-  id_col = "site_id",
-  domain_year = seq(2018L, 2022L),
+  locs,
+  from = NULL,
+  locs_id = "site_id",
   radius = c(1000L, 10000L, 50000L),
-  sites_epsg = "EPSG:4326"
+  ...
 )
 }
 \arguments{
-\item{path}{character(1). Path to the directory with TRI CSV files}
+\item{locs}{sf/SpatVector. Locations where TRI variables are calculated.}
 
-\item{sites}{stdt/sf/SpatVector/data.frame. Unique sites
-see \code{\link{convert_stobj_to_stdt}}}
+\item{from}{SpatVector. Point vector object of TRI in a year.
+See \link{process_tri}}
 
-\item{id_col}{character(1). Unique site identifier column name.
+\item{locs_id}{character(1). Unique site identifier column name.
 Default is \code{"site_id"}.}
-
-\item{domain_year}{integer. Year domain to dummify.
-Default is \code{seq(2018L, 2022L)}}
 
 \item{radius}{Circular buffer radius.
 Default is \code{c(1000, 10000, 50000)} (meters)}
 
-\item{sites_epsg}{character(1). Coordinate system of sites.}
+\item{...}{Placeholders.}
 }
 \value{
 A data.frame object.
@@ -36,6 +32,12 @@ A data.frame object.
 \description{
 Calculate TRI covariates
 }
+\note{
+U.S. context.
+}
+\seealso{
+\link{calc_sedc}, \link{process_tri}
+}
 \author{
-Insang Song
+Insang Song, Mariana Kassien
 }

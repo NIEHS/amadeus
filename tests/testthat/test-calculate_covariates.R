@@ -13,19 +13,23 @@ testthat::test_that("calc_koppen_geiger works well", {
       lon = -78.90,
       lat = 35.97
     )
-  site_faux <- terra::vect(site_faux, crs = "EPSG:4326")
+  site_faux <- terra::vect(site_faux, crs = "EPSG:4326", keepgeom = TRUE)
   kp_path <- testthat::test_path("..", "testdata", "koppen_subset.tif")
 
   testthat::expect_no_error(
+    kgras <- process_koppen_geiger(path = kp_path)
+  )
+
+  testthat::expect_no_error(
     kg_res <- calc_koppen_geiger(
-      path = kp_path,
-      sites = site_faux
+      from = kgras,
+      locs = site_faux
     )
   )
   testthat::expect_no_error(
     kg_res <- calc_koppen_geiger(
-      path = kp_path,
-      sites = sf::st_as_sf(site_faux)
+      from = kgras,
+      locs = sf::st_as_sf(site_faux)
     )
   )
   # the result is a data frame
@@ -48,8 +52,8 @@ testthat::test_that("calc_dummies works well", {
 
   testthat::expect_no_error(
     dum_res <- calc_temporal_dummies(
-      sites = site_faux,
-      domain_year = seq(2018L, 2022L)
+      locs = site_faux,
+      year = seq(2018L, 2022L)
     )
   )
 
@@ -78,11 +82,11 @@ testthat::test_that("calc_dummies works well", {
 })
 
 testthat::test_that("calc_ecoregion works well", {
-
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
 
+  ecol3 <- testthat::test_path("..", "testdata", "eco_l3_clip.gpkg")
   site_faux <-
     data.frame(
       site_id = "37999109988101",
@@ -94,14 +98,27 @@ testthat::test_that("calc_ecoregion works well", {
     terra::vect(
                 site_faux,
                 geom = c("lon", "lat"),
+                keepgeom = TRUE,
                 crs = "EPSG:4326")
   site_faux <- terra::project(site_faux, "EPSG:5070")
 
   testthat::expect_no_error(
+    erras <- process_ecoregion(ecol3)
+  )
+
+  testthat::expect_no_error(
     ecor_res <- calc_ecoregion(
-      path = testthat::test_path("..", "testdata", "eco_l3_clip.gpkg"),
-      sites = site_faux,
-      id_col = "site_id"
+      from = erras,
+      locs = sf::st_as_sf(site_faux),
+      locs_id = "site_id"
+    )
+  )
+
+  testthat::expect_no_error(
+    ecor_res <- calc_ecoregion(
+      from = erras,
+      locs = site_faux,
+      locs_id = "site_id"
     )
   )
 
@@ -112,7 +129,8 @@ testthat::test_that("calc_ecoregion works well", {
   # should have each of the indicator groups
   dum_cn <- grep("DUM_", colnames(ecor_res))
   testthat::expect_equal(
-                         sum(unlist(ecor_res[, dum_cn])), 2L)
+    sum(unlist(ecor_res[, dum_cn])), 2L
+  )
 })
 
 
@@ -139,6 +157,7 @@ testthat::test_that("calc_modis works well.", {
     terra::vect(
                 site_faux,
                 geom = c("lon", "lat"),
+                keepgeom = TRUE,
                 crs = "EPSG:4326")
 
   # case 1: standard mod11a1
@@ -148,12 +167,23 @@ testthat::test_that("calc_modis works well.", {
       "MOD11A1.A2021227.h11v05.061.2021228105320.hdf"
     )
   testthat::expect_no_error(
+    base_mod11 <-
+      process_modis_merge(
+        paths = path_mod11,
+        date_in = "2021-08-15",
+        subdataset = "(LST_)",
+        foo = "mean"
+      )
+  )
+  testthat::expect_s4_class(base_mod11, "SpatRaster")
+
+  testthat::expect_no_error(
     suppressWarnings(
       calc_mod11 <-
-        calc_modis(
-          path = path_mod11,
-          product = "MOD11A1",
-          sites = sf::st_as_sf(site_faux),
+        calc_modis_par(
+          from = path_mod11,
+          locs = sf::st_as_sf(site_faux),
+          fun_hdf = process_modis_merge,
           name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
           subdataset = "(LST_)",
           nthreads = 1L
@@ -171,7 +201,7 @@ testthat::test_that("calc_modis works well.", {
     )
   testthat::expect_no_error(
     suppressWarnings(
-      modis_mosaic_mod06(
+      process_modis_swath(
         paths = path_mod06,
         date_in = "2021-08-15"
       )
@@ -181,10 +211,10 @@ testthat::test_that("calc_modis works well.", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod06 <-
-        calc_modis(
-          path = path_mod06,
-          product = "MOD06_L2",
-          sites = site_faux,
+        calc_modis_par(
+          from = path_mod06,
+          locs = site_faux,
+          fun_hdf = process_modis_swath,
           name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_"),
           nthreads = 1
         )
@@ -199,17 +229,25 @@ testthat::test_that("calc_modis works well.", {
       "VNP46",
       full.names = TRUE
     )
+  testthat::expect_warning(
+    base_vnp <- process_bluemarble(
+      paths = path_vnp46,
+      date_in = "2018-08-13",
+      tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
+    )
+  )
 
   testthat::expect_no_error(
     suppressWarnings(
       calc_vnp46 <-
-        calc_modis(
-          path = path_vnp46,
-          product = "VNP46A2",
-          sites = site_faux,
+        calc_modis_par(
+          from = path_vnp46,
+          locs = site_faux,
+          fun_hdf = process_bluemarble,
           name_covariates = c("MOD_NITLT_0_"),
           subdataset = 3L,
-          nthreads = 1
+          nthreads = 1,
+          tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
         )
     )
   )
@@ -217,20 +255,18 @@ testthat::test_that("calc_modis works well.", {
 
   # error cases
   testthat::expect_error(
-    modis_get_vrt(path = site_faux)
+    process_modis_merge(paths = site_faux)
   )
   testthat::expect_error(
-    modis_get_vrt(
+    process_modis_merge(
       paths = path_mod11,
-      product = "MOD11A1",
       date_in = "2021-08-15",
       foo = 3L
     )
   )
   testthat::expect_error(
-    modis_get_vrt(
+    process_modis_merge(
       paths = path_mod11,
-      product = "MOD11A1",
       date_in = "2021~08~15",
       foo = "mean"
     )
@@ -239,40 +275,99 @@ testthat::test_that("calc_modis works well.", {
   site_faux_r <- site_faux
   names(site_faux_r)[1] <- "ID"
   testthat::expect_error(
-    modis_worker(raster = rast(nrow = 3, ncol = 3), date = "2021-08-15",
-                 sites_in = site_faux_r)
+    calc_modis_daily(
+      from = rast(nrow = 3, ncol = 3),
+      date = "2021-08-15",
+      locs = site_faux_r
+    )
   )
   testthat::expect_error(
-    modis_worker(raster = rast(nrow = 3, ncol = 3), date = "2021-08-15",
-                 sites_in = matrix(c(1, 3, 4, 5), nrow = 2))
+    calc_modis_daily(
+      from = rast(nrow = 3, ncol = 3),
+      date = "2021-08-15",
+      locs = matrix(c(1, 3, 4, 5), nrow = 2)
+    )
   )
   testthat::expect_error(
-    modis_worker(raster = rast(nrow = 3, ncol = 3), date = "2021-08-15",
-                 sites_in = sf::st_as_sf(site_faux))
+    calc_modis_daily(
+      from = rast(nrow = 3, ncol = 3),
+      date = "2021-08-15",
+      locs = sf::st_as_sf(site_faux)
+    )
+  )
+  site_faux0 <- site_faux
+  names(site_faux0)[2] <- "date"
+  testthat::expect_error(
+    calc_modis_daily(
+      from = rast(nrow = 3, ncol = 3),
+      date = "2021-08-15",
+      locs = sf::st_as_sf(site_faux0)
+    )
   )
   site_faux2 <- site_faux
-  names(site_faux2)[2] <- "date"
-  testthat::expect_error(
-    modis_worker(raster = rast(nrow = 3, ncol = 3), date = "2021-08-15",
-                 sites_in = sf::st_as_sf(site_faux2))
+  site_faux2[, 4] <- NULL
+
+  path_mcd19 <-
+    testthat::test_path(
+      "../testdata/modis/",
+      "MCD19A2.A2021227.h11v05.061.2023149160635.hdf"
+    )
+  mcd_merge <-
+    process_modis_merge(
+      paths = path_mcd19,
+      date_in = "2021-08-15",
+      subdataset = "(Optical_Depth)"
+    )
+
+  testthat::expect_no_error(
+    calc_modis_daily(
+      from = mcd_merge,
+      date = "2021-08-15",
+      locs = sf::st_as_sf(site_faux2),
+      radius = 1000,
+      name_extracted = "MCD_EXTR_1K_"
+    )
   )
 
   testthat::expect_error(
-    calc_modis(path = site_faux)
+    calc_modis_par(from = site_faux)
   )
   testthat::expect_error(
-    calc_modis(path = path_mod11, product = "MOD11A1", sites = list(1, 2, 3))
+    calc_modis_par(from = path_mod11, product = "MOD11A1", locs = list(1, 2, 3))
   )
-  testthat::expect_warning(
-    calc_modis(
-      path = path_vnp46,
-      product = "VNP46A2",
-      sites = site_faux,
+  testthat::expect_error(
+    calc_modis_par(
+      from = path_vnp46,
+      locs = site_faux,
+      fun_hdf = "fountain",
       name_covariates = c("MOD_NITLT_0_", "MOD_K1_"),
       subdataset = 3L,
       nthreads = 1
     )
   )
+  testthat::expect_warning(
+    calc_modis_par(
+      from = path_vnp46,
+      locs = site_faux,
+      name_covariates = c("MOD_NITLT_0_", "MOD_K1_"),
+      subdataset = 3L,
+      nthreads = 1
+    )
+  )
+  testthat::expect_warning(
+    flushed <- calc_modis_par(
+      from = path_vnp46,
+      locs = site_faux,
+      name_covariates = c("MOD_NITLT_0_"),
+      fun_hdf = process_bluemarble,
+      subdataset = 3L,
+      nthreads = 1,
+      radius = c(-1000, 0L),
+      tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
+    )
+  )
+  testthat::expect_s3_class(flushed, "data.frame")
+  testthat::expect_true(any(unlist(flushed) == -99999))
 
 })
 
@@ -296,56 +391,61 @@ testthat::test_that("Check extract_nlcd_ratio works", {
     )
   # CHECK INPUT (error message)
   # -- buf_radius is numeric
+  testthat::expect_no_error(
+    nlcdras <- process_nlcd(path = path_testdata)
+  )
+  testthat::expect_s4_class(nlcdras, "SpatRaster")
+
   testthat::expect_error(
-    calc_nlcd_ratio(sites = eg_data,
-                    radius = "1000",
-                    path = path_testdata),
+    calc_nlcd_ratio(locs = eg_data,
+                    from = nlcdras,
+                    radius = "1000"),
     "radius is not a numeric."
   )
   # -- buf_radius has likely value
   testthat::expect_error(
-    calc_nlcd_ratio(sites = eg_data,
-                    radius = -3,
-                    path = path_testdata),
+    calc_nlcd_ratio(locs = eg_data,
+                    from = nlcdras,
+                    radius = -3),
     "radius has not a likely value."
   )
   # -- year is numeric
   testthat::expect_error(
-    calc_nlcd_ratio(sites = eg_data,
-                    year = "2019",
-                    path = path_testdata),
+    process_nlcd(path = path_testdata, year = "2021"),
     "year is not a numeric."
   )
   # -- year has likely value
   testthat::expect_error(
-    calc_nlcd_ratio(sites = eg_data,
-                    year = 20192,
-                    path = path_testdata),
+    process_nlcd(path = path_testdata,
+                 year = 2032),
     "NLCD data not available for this year."
   )
   testthat::expect_error(
-    calc_nlcd_ratio(sites = eg_data,
-                    year = 2020,
-                    path = path_testdata),
+    process_nlcd(path = path_testdata,
+                 year = 1789),
     "NLCD data not available for this year."
   )
   # -- data_vect is a SpatVector
   testthat::expect_error(
-    calc_nlcd_ratio(sites = 12,
-                    path = path_testdata),
-    "sites is not a terra::SpatVector."
+    calc_nlcd_ratio(locs = 12,
+                    from = nlcdras),
+    "locs is not a terra::SpatVector."
+  )
+  testthat::expect_error(
+    calc_nlcd_ratio(locs = eg_data,
+                    from = 12)
   )
   # -- nlcd_path is not a character
   testthat::expect_error(
-    calc_nlcd_ratio(sites = eg_data,
-                    path = 2),
+    process_nlcd(path = 3,
+                 year = 2),
     "path is not a character."
   )
   # -- nlcd_path does not exist
   nice_sentence <- "That's one small step for a man, a giant leap for mankind."
   testthat::expect_error(
-    calc_nlcd_ratio(sites = eg_data,
-                    path = nice_sentence),
+    process_nlcd(
+                 path = nice_sentence),
     "path does not exist."
   )
 
@@ -354,17 +454,15 @@ testthat::test_that("Check extract_nlcd_ratio works", {
   buf_radius <- 3000
   testthat::expect_no_error(
     calc_nlcd_ratio(
-      sites = eg_data,
-      year = year,
-      radius = buf_radius,
-      path = path_testdata
+      locs = eg_data,
+      from = nlcdras,
+      radius = buf_radius
     )
   )
   output <- calc_nlcd_ratio(
-    sites = eg_data,
-    year = year,
+    locs = eg_data,
     radius = buf_radius,
-    path = path_testdata
+    from = nlcdras
   )
   # -- returns a SpatVector
   testthat::expect_equal(class(output)[1], "SpatVector")
@@ -401,85 +499,199 @@ testthat::test_that("NEI calculation", {
   nc <- terra::vect(ncpath)
   nc <- nc[grep("(Orange|Wake|Durham)", nc$NAME), ]
 
+  neipath <- testthat::test_path("..", "testdata", "nei")
+
   testthat::expect_error(
-    calc_nei(neipath,
-      ncp,
-      year = 2017,
-      county_shp = nc,
-      sites_epsg = "EPSG:4267"
-    )
-  )
-  testthat::expect_error(
-    calc_nei(neipath,
-      ncpt,
-      year = 2010,
-      county_shp = nc,
-      sites_epsg = "EPSG:4267"
-    )
-  )
-  testthat::expect_error(
-    calc_nei(neipath,
-      ncpt,
-      year = 2017,
-      county_shp = "your/file/is/nowhere",
-      sites_epsg = "EPSG:4267"
+    neiras <- process_nei(
+      path = neipath,
+      county = nc,
+      year = 2017
     )
   )
 
   nc$GEOID <- nc$FIPS
-  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
-  ncp$site_id <- "3799900018810101"
-  ncp$time <- 2018
-  ncpt <- ncp# as.data.frame(ncp, geom = "XY")
-
-  # test data should be prepared
-  neipath <- testthat::test_path("..", "testdata", "nei")
   testthat::expect_no_error(
-    ncnei <-
-      calc_nei(neipath,
-        ncpt,
-        year = 2017,
-        county_shp = nc,
-        sites_epsg = "EPSG:4267"
-      )
+    neiras <- process_nei(
+      path = neipath,
+      county = nc,
+      year = 2017
+    )
   )
+  # inspecting calculated results
+  testthat::expect_s4_class(neiras, "SpatVector")
+
+  # sf case
   testthat::expect_no_error(
-    calc_nei(neipath,
-      ncpt,
-      year = 2017,
-      county_shp = ncpath,
-      sites_epsg = "EPSG:4267"
+    process_nei(
+      path = neipath,
+      county = sf::st_as_sf(nc),
+      year = 2017
     )
   )
 
-  testthat::expect_true(any(grepl("NEI17", names(ncnei))))
-  testthat::expect_equal(ncnei$TRF_NEI17_0_00000, 1579079, tolerance = 1)
 
   # error cases
   testthat::expect_error(
-    calc_nei(neipath,
-      sf::st_as_sf(ncpt, coords = c("lon", "lat")),
-      year = 2017,
-      county_shp = nc,
-      sites_epsg = "EPSG:4267"
+    process_nei(neipath, year = 2017)
+  )
+  testthat::expect_error(
+    process_nei(neipath, "Orion/Betelgeuse", year = 2017)
+  )
+  testthat::expect_error(
+    process_nei(neipath, nc, year = 2083)
+  )
+
+  # calc_nei
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  ncp$time <- 2018
+  ncp <- terra::vect(ncp, keepgeom = TRUE, crs = "EPSG:4326")
+  nc <- terra::project(nc, "EPSG:4326")
+
+  testthat::expect_no_error(
+    neicalced <- calc_nei(
+      locs = ncp,
+      from = neiras
     )
   )
-  ncpsf <- sf::st_as_sf(ncpt, coords = c("lon", "lat"), remove = FALSE)
-  sf::st_crs(ncpsf) <- "EPSG:4267"
-  testthat::expect_no_error(
-    calc_nei(neipath,
-      ncpsf,
-      year = 2017,
-      county_shp = nc,
-      sites_epsg = "EPSG:4267"
+  testthat::expect_true(any(grepl("NEI17", names(neicalced))))
+  testthat::expect_equal(neicalced$TRF_NEI17_0_00000, 1579079, tolerance = 1)
+
+  # more error cases
+  testthat::expect_condition(
+    calc_nei(
+      locs = "jittered",
+      from = neiras
     )
   )
+
+  names(ncp)[4] <- "year"
+  testthat::expect_error(
+    calc_nei(
+      locs = ncp,
+      from = neiras
+    )
+  )
+
+})
+
+
+testthat::test_that("TRI calculation", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_package("dplyr")
+  withr::local_package("tidyr")
+  withr::local_package("data.table")
+  withr::local_options(sf_use_s2 = FALSE)
+
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  ncp$time <- 2018
+  ncpt <-
+    terra::vect(ncp, geom = c("lon", "lat"),
+                keepgeom = TRUE, crs = "EPSG:4326")
+  ncpt$time <- c(2018)
+  path_tri <- testthat::test_path("..", "testdata", "tri")
+
   testthat::expect_no_error(
-    calc_nei(neipath,
-      convert_stobj_to_stdt(ncpsf),
-      year = 2017,
-      county_shp = ncpath,
-      sites_epsg = "EPSG:4267"
+    tri_r <- process_tri(path = path_tri, year = 2018)
+  )
+  testthat::expect_s4_class(tri_r, "SpatVector")
+
+  testthat::expect_no_error(
+    tri_c <- calc_tri(
+      from = tri_r,
+      locs = ncpt,
+      radius = 50000L
+    )
+  )
+  testthat::expect_true(is.data.frame(tri_c))
+
+  testthat::expect_no_error(
+    calc_tri(
+      from = tri_r,
+      locs = sf::st_as_sf(ncpt),
+      radius = 50000L
+    )
+  )
+  testthat::expect_error(
+    calc_tri(
+      from = tempdir(),
+      locs = ncpt,
+      radius = 50000L
+    )
+  )
+  testthat::expect_error(
+    calc_tri(
+      from = paste0(tdir, "/tri/"),
+      locs = ncpt[, 1:2],
+      radius = 50000L
+    )
+  )
+  testthat::expect_error(
+    calc_tri(
+      from = paste0(tdir, "/tri/"),
+      locs = ncpt,
+      radius = "As far as the Earth's radius"
+    )
+  )
+})
+
+
+testthat::test_that("calc_sedc tests", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_package("dplyr")
+  withr::local_package("tidyr")
+  withr::local_package("data.table")
+  withr::local_options(sf_use_s2 = FALSE)
+
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  ncp$time <- 2018
+  ncpt <-
+    terra::vect(ncp, geom = c("lon", "lat"),
+                keepgeom = TRUE, crs = "EPSG:4326")
+  path_tri <- testthat::test_path("..", "testdata", "tri")
+
+  testthat::expect_no_error(
+    tri_r <- process_tri(path = path_tri, year = 2018)
+  )
+  tri_r <- terra::project(tri_r, terra::crs(ncpt))
+
+  targcols <- grep("FUGITIVE_", names(tri_r), value = TRUE)
+  testthat::expect_no_error(
+    tri_sedc <-
+      calc_sedc(
+        locs = ncpt,
+        from = tri_r,
+        locs_id = "site_id",
+        sedc_bandwidth = 30000,
+        target_fields = targcols
+      )
+  )
+  testthat::expect_s3_class(tri_sedc, "data.frame")
+
+  testthat::expect_no_error(
+    calc_sedc(
+      locs = sf::st_as_sf(ncpt),
+      from = sf::st_as_sf(tri_r),
+      locs_id = "site_id",
+      sedc_bandwidth = 30000,
+      target_fields = targcols
+    )
+  )
+
+  # warning case: duplicate field names between locs and from
+  ncpta <- ncpt
+  ncpta$YEAR <- 2018
+  testthat::expect_warning(
+    calc_sedc(
+      locs = ncpta,
+      from = sf::st_as_sf(tri_r),
+      locs_id = "site_id",
+      sedc_bandwidth = 30000,
+      target_fields = targcols
     )
   )
 
