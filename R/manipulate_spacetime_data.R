@@ -224,7 +224,7 @@ spatraster_as_sftime <- function(x, varname, timename = "time") {
 
 #' Create a sftime from a terra::SpatRasterDataset
 #'
-#' @param x a terra::SpatRasterDataset
+#' @param x a terra::SpatRasterDataset (~ list of named SpatRasters)
 #' @param timename character for time column name in the sftime
 #' (default: "time")
 #' @return a sftime object

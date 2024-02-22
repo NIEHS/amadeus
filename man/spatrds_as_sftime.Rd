@@ -7,7 +7,7 @@
 spatrds_as_sftime(x, timename = "time")
 }
 \arguments{
-\item{x}{a terra::SpatRasterDataset}
+\item{x}{a terra::SpatRasterDataset (~ list of named SpatRasters)}
 
 \item{timename}{character for time column name in the sftime
 (default: "time")}

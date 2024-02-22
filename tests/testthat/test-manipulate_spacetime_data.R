@@ -636,6 +636,44 @@ test_that("spatraster_as_sftime works as expected", {
   )
 })
 
+
+test_that("spatrds_as_sftime works as expected", {
+  var1 <-
+    terra::rast(
+      extent = c(-112, -101, 33.5, 40.9),
+      ncol = 5,
+      nrow = 5,
+      crs = "EPSG:4326"
+    )
+  terra::values(var1) <- seq(-5, 19)
+  terra::add(var1) <- c(var1**2, var1**3)
+  var1 <- rast(
+    extent = c(-112, -101, 33.5, 40.9),
+    ncol = 5,
+    nrow = 5,
+    crs = "EPSG:4326"
+  )
+  values(var1) <- seq(-5, 19)
+  add(var1) <- c(var1**2, var1**3)
+  names(var1) <- c("2023-11-01", "2023-11-02", "2023-11-03")
+  var2 <- rast(
+    extent = c(-112, -101, 33.5, 40.9),
+    ncol = 5,
+    nrow = 5,
+    crs = "EPSG:4326"
+  )
+  values(var2) <- seq(-15, 9)
+  add(var2) <- c(var2**2, var2**3)
+  names(var2) <- c("2023-11-01", "2023-11-02", "2023-11-03")
+  myrds <- terra::sds(var1, var2)
+  names(myrds) <- c("var1", "var2")
+  # conversion should work
+  expect_no_error(spatrds_as_sftime(myrds, "time"))
+  mysft <- spatrds_as_sftime(myrds, "date")
+  expect_equal(attributes(mysft)$time, "date")
+})
+
+
 test_that("sftime_as_sf works as expected", {
   # open testing data
   stdata <- data.table::fread(paste0(
