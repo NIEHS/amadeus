@@ -84,7 +84,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
 })
 
 testthat::test_that("EPA AQS download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year_start <- 2018
@@ -172,7 +172,7 @@ testthat::test_that("Ecoregion download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date_start <- "2019-09-09"
@@ -213,7 +213,7 @@ testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("GMTED download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   # function parameters
   statistics <- c("Breakline Emphasis",
                   # "Systematic Subsample",
@@ -259,7 +259,7 @@ testthat::test_that("GMTED download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("MERRA2 download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date_start <- "2022-02-14"
@@ -313,7 +313,7 @@ testthat::test_that("MERRA2 returns message with unrecognized collection.", {
 })
 
 testthat::test_that("NARR monolevel download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year_start <- 2018
@@ -348,7 +348,7 @@ testthat::test_that("NARR monolevel download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("NARR p-levels download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year_start <- 2020
@@ -383,7 +383,7 @@ testthat::test_that("NARR p-levels download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date_start <- "2022-08-12"
@@ -423,7 +423,7 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("NLCD download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   years <- c(2021, 2019, 2016)
@@ -482,7 +482,7 @@ testthat::test_that("NLCD download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("SEDAC groads download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   data_regions <- c("Americas", "Global")
@@ -541,7 +541,7 @@ testthat::test_that("SEDAC groads download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("SEDAC population download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   years <- c("2020")
@@ -605,7 +605,7 @@ testthat::test_that("SEDAC population download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("SEDAC population data types are coerced.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year <- c("totpop")
@@ -650,7 +650,7 @@ testthat::test_that("SEDAC population data types are coerced.", {
 })
 
 testthat::test_that("Koppen Geiger download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   time_periods <- c("Present", "Future")
@@ -700,7 +700,7 @@ testthat::test_that("Koppen Geiger download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("MODIS-MOD09GA download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   years <- 2020
@@ -753,7 +753,7 @@ testthat::test_that("MODIS-MOD09GA download URLs have HTTP status 200.", {
 
 
 testthat::test_that("MODIS-MOD06L2 download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   product <- "MOD06_L2"
@@ -833,7 +833,7 @@ testthat::test_that("MODIS-MOD06L2 download URLs have HTTP status 200.", {
 
 
 testthat::test_that("MODIS download error cases.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   years <- 2020
@@ -970,7 +970,7 @@ testthat::test_that("MODIS download error cases.", {
 
 
 testthat::test_that("EPA TRI download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- testthat::test_path("..", "testdata/", "")
@@ -1009,7 +1009,7 @@ testthat::test_that("EPA TRI download URLs have HTTP status 200.", {
 
 
 testthat::test_that("EPA NEI (AADT) download URLs have HTTP status 200.", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- testthat::test_path("..", "testdata/", "")
@@ -1052,7 +1052,7 @@ testthat::test_that("EPA NEI (AADT) download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("Test error cases in EPA gaftp sources 1", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   tdir <- tempdir()
@@ -1091,7 +1091,7 @@ testthat::test_that("Test error cases in EPA gaftp sources 1", {
 })
 
 testthat::test_that("Test error cases in EPA gaftp sources 2", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   tdir <- tempdir(check = TRUE)

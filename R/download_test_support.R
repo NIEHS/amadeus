@@ -70,6 +70,8 @@ extract_urls <- function(
 #' @param size number of observations to be sampled from \code{urls}
 #' @param method httr method to obtain URL (`"HEAD"` or `"GET"`)
 #' @return logical vector for URL status = 200
+#' @importFrom httr2 request
+#' @importFrom httr2 req_perform
 #' @export
 check_urls <- function(
     urls = urls,
@@ -83,13 +85,13 @@ check_urls <- function(
     size <- length(urls)
   }
   method <- match.arg(method)
-
-  url_sample <- sample(urls, size, replace = FALSE)
-  url_status <- sapply(url_sample,
-    check_url_status,
-    method = method
-  )
-  return(url_status)
+  url_status <- NULL
+  for (u in seq_along(urls)) {
+    response <- httr2::request(urls[u]) %>%
+      httr2::req_perform()
+    url_status <- c(url_status, response$status_code)
+  }
+  return(url_status == 200)
 }
 
 #' Apply download function-specific unit tests
