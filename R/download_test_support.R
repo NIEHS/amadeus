@@ -5,31 +5,6 @@
 # Date modified: 2024-01-21
 ###############################################################################
 
-#' Check if sample of download URLs have HTTP Status 200
-#' @param url Download URL to be checked.
-#' @param method httr method to obtain URL (`"HEAD"`` or `"GET"`)
-#' @author Insang Song; Mitchell Manware
-#' @importFrom httr HEAD
-#' @importFrom httr GET
-#' @return logical object
-#' @export
-check_url_status <- function(
-  url,
-  method = c("HEAD", "GET")
-) {
-  method <- match.arg(method)
-  http_status_ok <- 200
-  if (method == "HEAD") {
-    hd <- httr::HEAD(url)
-  } else if (method == "GET") {
-    hd <- httr::GET(url)
-  }
-
-  status <- hd$status_code
-  Sys.sleep(1.5)
-  return(status == http_status_ok)
-}
-
 #' Read commands and convert to character vector
 #' @param commands_path file path with wget/curl commands
 #' @return character vector containing download commands
@@ -75,8 +50,7 @@ extract_urls <- function(
 #' @export
 check_urls <- function(
     urls = urls,
-    size = NULL,
-    method = c("HEAD", "GET")) {
+    size = NULL) {
   if (is.null(size)) {
     cat(paste0("URL sample size is not defined.\n"))
     return(NULL)
@@ -84,7 +58,6 @@ check_urls <- function(
   if (length(urls) < size) {
     size <- length(urls)
   }
-  method <- match.arg(method)
   url_status <- NULL
   for (u in seq_along(urls)) {
     response <- httr2::request(urls[u]) %>%

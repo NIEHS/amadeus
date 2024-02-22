@@ -4,7 +4,7 @@
 \alias{check_urls}
 \title{Sample download URLs and apply \code{check_url_status} function}
 \usage{
-check_urls(urls = urls, size = NULL, method = c("HEAD", "GET"))
+check_urls(urls = urls, size = NULL)
 }
 \arguments{
 \item{urls}{character vector of URLs}
