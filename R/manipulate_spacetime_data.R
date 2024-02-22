@@ -436,42 +436,6 @@ sftime_as_spatraster <- function(x, varname) {
   return(terra::rast(layers))
 }
 
-#' Convert sftime object to SpatVector
-#'
-#' @param x a sftime
-#' @import sftime
-#' @author Eva Marques
-#' @export
-sftime_as_spatrds <- function(x) {
-  stopifnot("x is not a sftime" = class(x)[1] == "sftime")
-  df <- as.data.frame(x)
-  col <- colnames(df)
-  variables <- col[!(col %in% c("lon", "lat", "time"))]
-  rast_list <- list()
-  for (var in variables) {
-    newdf <- stats::reshape(
-      df[, c("lon", "lat", "time", var)],
-      idvar = c("lon", "lat"),
-      timevar = "time",
-      direction = "wide"
-    )
-    colnames(newdf) <- gsub(
-      paste0(var, "."),
-      "",
-      colnames(newdf)
-    )
-    var_rast <- terra::rast(newdf,
-      type = "xyz",
-      crs = attributes(x$geometry)$crs
-    )
-    rast_list[[var]] <- var_rast
-  }
-  output <- terra::sds(rast_list)
-  return(output)
-}
-
-
-
 #' Convert a stdt to sf/sftime/SpatVector
 #' @param stdt A stdt object
 #' @param class_to character(1). Should be one of

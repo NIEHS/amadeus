@@ -588,6 +588,8 @@ test_that("sf_as_mysftime works as expected", {
   b <- mysf |>
     dplyr::rename("date" = "time")
   expect_no_error(check_mysftime(sf_as_mysftime(b, "date")))
+  expect_error(sf_as_mysftime(b, "time"),
+               "time column missing or mispelled")
 })
 
 test_that("sftime_as_mysftime works as expected", {
@@ -606,6 +608,8 @@ test_that("sftime_as_mysftime works as expected", {
   attributes(mysft)$time_column <- "date"
   mysft <- dplyr::rename(mysft, "date" = "time")
   expect_no_error(check_mysftime(sf_as_mysftime(mysft, "date")))
+  expect_error(sf_as_mysftime(mysft, "time"),
+               "time column missing or mispelled")
 })
 
 
