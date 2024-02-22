@@ -232,18 +232,20 @@ spatraster_as_sftime <- function(x, varname, timename = "time") {
 #' @author Eva Marques
 #' @export
 spatrds_as_sftime <- function(x, timename = "time") {
-  stopifnot("x is not a SpatRasterDataset" =
-              class(x)[1] == "SpatRasterDataset")
+  stopifnot(
+    "x is not a SpatRasterDataset" =
+      class(x)[1] == "SpatRasterDataset"
+  )
   variables <- names(x)
-  sftime_list <- list()
   newsft <- spatraster_as_sftime(x[[variables[1]]],
-                                 varname = variables[1],
-                                 timename = timename) 
+    varname = variables[1],
+    timename = timename
+  )
   for (var in variables[2:length(variables)]) {
-    newsft[, var] <- st_drop_geometry(
-      spatraster_as_sftime(x[[var]],
-                           varname = var,
-                           timename = timename)[, var])
+    s <- spatraster_as_sftime(x[[var]],
+                              varname = var,
+                              timename = timename)
+    newsft[, var] <- st_drop_geometry(s[, var])
   }
   return(newsft)
 }
@@ -313,7 +315,7 @@ sftime_as_mysftime <- function(x, timename) {
 #' @author Eva Marques
 #' @export
 spatvector_as_sftime <- function(x, timename = "time") {
-  stopifnot("timename column missing or mispelled" = timename %in% names(x)) 
+  stopifnot("timename column missing or mispelled" = timename %in% names(x))
   crs <- terra::crs(x)
   output <- as.data.frame(x, geom = "XY") |>
     data.table::as.data.table() |>
@@ -456,8 +458,10 @@ sftime_as_spatrds <- function(x) {
       "",
       colnames(newdf)
     )
-    var_rast <- terra::rast(newdf, type = "xyz",
-                            crs = attributes(x$geometry)$crs)
+    var_rast <- terra::rast(newdf,
+      type = "xyz",
+      crs = attributes(x$geometry)$crs
+    )
     rast_list[[var]] <- var_rast
   }
   output <- terra::sds(rast_list)

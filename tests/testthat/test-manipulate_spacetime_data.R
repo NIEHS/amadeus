@@ -582,10 +582,7 @@ test_that("sf_as_mysftime works as expected", {
     testthat::test_path("..", "testdata/", ""),
     "spacetime_table.csv"
   ))
-  mysf <- sf::st_as_sf(stdata,
-                       coords = c("lon", "lat"),
-                       crs = 4326
-  )
+  mysf <- sf::st_as_sf(stdata, coords = c("lon", "lat"), crs = 4326)
   expect_no_error(sf_as_mysftime(mysf, "time"))
   expect_no_error(check_mysftime(sf_as_mysftime(mysf, "time")))
   b <- mysf |>
@@ -600,9 +597,9 @@ test_that("sftime_as_mysftime works as expected", {
     "spacetime_table.csv"
   ))
   mysft <- sftime::st_as_sftime(stdata,
-                       coords = c("lon", "lat"),
-                       time_column_name = "time",
-                       crs = 4326
+    coords = c("lon", "lat"),
+    time_column_name = "time",
+    crs = 4326
   )
   expect_no_error(sftime_as_mysftime(mysft, "time"))
   expect_no_error(check_mysftime(sftime_as_mysftime(mysft, "time")))
@@ -700,9 +697,9 @@ test_that("sftime_as_sf works as expected", {
     "spacetime_table.csv"
   ))
   mysftime <- sftime::st_as_sftime(stdata,
-                                   coords = c("lon", "lat"),
-                                   time_column_name = "time",
-                                   crs = 4326
+    coords = c("lon", "lat"),
+    time_column_name = "time",
+    crs = 4326
   )
   expect_no_error(sftime_as_sf(mysftime))
   expect_no_error(sftime_as_sf(mysftime, keeptime = FALSE))
