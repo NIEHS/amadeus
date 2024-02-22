@@ -650,8 +650,8 @@ test_that("spatrds_as_sftime works as expected", {
     nrow = 5,
     crs = "EPSG:4326"
   )
-  values(var1) <- seq(-5, 19)
-  add(var1) <- c(var1**2, var1**3)
+  terra::values(var1) <- seq(-5, 19)
+  terra::add(var1) <- c(var1**2, var1**3)
   names(var1) <- c("2023-11-01", "2023-11-02", "2023-11-03")
   var2 <- rast(
     extent = c(-112, -101, 33.5, 40.9),
@@ -659,8 +659,8 @@ test_that("spatrds_as_sftime works as expected", {
     nrow = 5,
     crs = "EPSG:4326"
   )
-  values(var2) <- seq(-15, 9)
-  add(var2) <- c(var2**2, var2**3)
+  terra::values(var2) <- seq(-15, 9)
+  terra::add(var2) <- c(var2**2, var2**3)
   names(var2) <- c("2023-11-01", "2023-11-02", "2023-11-03")
   myrds <- terra::sds(var1, var2)
   names(myrds) <- c("var1", "var2")

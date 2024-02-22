@@ -326,7 +326,6 @@ spatvector_as_sftime <- function(x, timename = "time") {
   return(output)
 }
 
-
 #' Convert to sftime object on the form adapted to beethoven code
 #'
 #' @param x a data.frame, data.table, SpatVector or SpatRasterDataset
@@ -360,7 +359,7 @@ as_mysftime <- function(x, ...) {
     output <- x |>
       spatvector_as_sftime(...)
     attributes(output)$time_column <- "time"
-    output <- dplyr::rename(output, "time" = timename)
+    output <- dplyr::rename(output, "time" = ...)
   } else if (format == "SpatRasterDataset") {
     crs_dt <- terra::crs(x)
     stdf <- as.data.frame(x[1], xy = TRUE)
