@@ -29,9 +29,7 @@ convert_stobj_to_stdt <- function(stobj) {
     if (any(!(c("geometry", "time") %in% colnames(stobj)))) {
       stop("Error: stobj does not contain geometry and time columns")
     }
-
     crs_dt <- sf::st_crs(stobj)$wkt
-
     stobj[, names_stcols] <- sf::st_coordinates(stobj)
     stobj <- sf::st_drop_geometry(stobj)
     stdt <- data.table::as.data.table(stobj)
@@ -158,6 +156,23 @@ check_mysf <- function(x) {
   )
 }
 
+#' Rename the time column of a sftime object
+#'
+#' @param x a sftime object
+#' @param newname character for new time column name
+#' @return a sftime object
+#' @import sftime
+#' @author Eva Marques
+#' @export
+rename_time <- function(x, newname) {
+  stopifnot("x is not a sftime" = class(x)[1] == "sftime")
+  oldname <- attributes(x)$time_column
+  output <- st_sftime(x, time_column_name = oldname)
+  attributes(output)$time_column <- newname
+  colnames(output)[which(colnames(output) == oldname)] <- newname
+  return(st_sftime(output, time_column_name = newname))
+}
+
 #' Create a sftime from a datatable
 #'
 #' @param x a data.table
@@ -250,7 +265,7 @@ spatrds_as_sftime <- function(x, timename = "time") {
                               timename = timename)
     newsft[, var] <- st_drop_geometry(s[, var])
   }
-  return(newsft)
+  return(st_sftime(newsft, time_column_name = timename))
 }
 
 #' Simplify an sftime to sf class
@@ -435,6 +450,48 @@ sftime_as_spatraster <- function(x, varname) {
   }
   return(terra::rast(layers))
 }
+
+#' Convert sftime object to SpatVectorDataset
+#' /!\ running time can be very long if x is not
+#' spatially and temporally structured
+#'
+#' @param x a sftime
+#' @import sftime
+#' @author Eva Marques
+#' @export
+sftime_as_spatrds <- function(x) {
+  stopifnot("x is not a sftime" = class(x)[1] == "sftime")
+  timecol <- attributes(x)$time_column
+  mysft <- x
+  coords <- sf::st_coordinates(mysft)
+  mysft$lon <- coords[, 1]
+  mysft$lat <- coords[, 2]
+  df <- as.data.frame(sf::st_drop_geometry(mysft))
+  col <- colnames(df)
+  variables <- col[!(col %in% c("lon", "lat", timecol))]
+  rast_list <- list()
+  for (var in variables) {
+    newdf <- stats::reshape(
+      df[, c("lon", "lat", timecol, var)],
+      idvar = c("lon", "lat"),
+      timevar = timecol,
+      direction = "wide"
+    )
+    colnames(newdf) <- gsub(
+      paste0(var, "."),
+      "",
+      colnames(newdf)
+    )
+    var_rast <- terra::rast(newdf,
+      type = "xyz",
+      crs = attributes(x$geometry)$crs
+    )
+    rast_list[[var]] <- var_rast
+  }
+  output <- terra::sds(rast_list)
+  return(output)
+}
+
 
 #' Convert a stdt to sf/sftime/SpatVector
 #' @param stdt A stdt object

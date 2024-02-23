@@ -2,7 +2,9 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{sftime_as_spatrds}
 \alias{sftime_as_spatrds}
-\title{Convert sftime object to SpatVector}
+\title{Convert sftime object to SpatVectorDataset
+/!\ running time can be very long if x is not
+spatially and temporally structured}
 \usage{
 sftime_as_spatrds(x)
 }
@@ -10,7 +12,9 @@ sftime_as_spatrds(x)
 \item{x}{a sftime}
 }
 \description{
-Convert sftime object to SpatVector
+Convert sftime object to SpatVectorDataset
+/!\ running time can be very long if x is not
+spatially and temporally structured
 }
 \author{
 Eva Marques

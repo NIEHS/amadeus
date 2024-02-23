@@ -317,6 +317,27 @@ test_that("check_mysf works as expected", {
   )
 })
 
+test_that("rename_time works as expected", {
+  # open testing data
+  stdata <- data.table::fread(paste0(
+    testthat::test_path("..", "testdata/", ""),
+    "spacetime_table.csv"
+  ))
+  mysft <- sftime::st_as_sftime(stdata,
+    coords = c("lon", "lat"),
+    crs = 4326,
+    time_column_name = "time"
+  )
+  expect_no_error(rename_time(mysft, "date"))
+  expect_equal(
+    attributes(rename_time(mysft, "date"))$time_column,
+    "date"
+  )
+  expect_error(
+    rename_time(stdata, "date"),
+    "x is not a sftime"
+  )
+})
 
 test_that("dt_as_mysftime works as expected", {
   # open testing data
@@ -732,6 +753,47 @@ test_that("sftime_as_spatraster works as expected", {
     "varname missing or mispelled"
   )
 })
+
+
+test_that("sftime_as_spatrds works as expected", {
+  var1 <-
+    terra::rast(
+      extent = c(-112, -101, 33.5, 40.9),
+      ncol = 5,
+      nrow = 5,
+      crs = "EPSG:4326"
+    )
+  terra::values(var1) <- seq(-5, 19)
+  terra::add(var1) <- c(var1**2, var1**3)
+  var1 <- rast(
+    extent = c(-112, -101, 33.5, 40.9),
+    ncol = 5,
+    nrow = 5,
+    crs = "EPSG:4326"
+  )
+  terra::values(var1) <- seq(-5, 19)
+  terra::add(var1) <- c(var1**2, var1**3)
+  names(var1) <- c("2023-11-01", "2023-11-02", "2023-11-03")
+  var2 <- rast(
+    extent = c(-112, -101, 33.5, 40.9),
+    ncol = 5,
+    nrow = 5,
+    crs = "EPSG:4326"
+  )
+  terra::values(var2) <- seq(-15, 9)
+  terra::add(var2) <- c(var2**2, var2**3)
+  names(var2) <- c("2023-11-01", "2023-11-02", "2023-11-03")
+  myrds <- terra::sds(var1, var2)
+  names(myrds) <- c("var1", "var2")
+  # create a structured sftime
+  mysft <- spatrds_as_sftime(myrds, "time")
+  # conversion should work
+  expect_no_error(sftime_as_spatrds(mysft))
+  expect_error(sftime_as_spatrds("hello"), "x is not a sftime")
+  rename_time(mysft, "date")
+  expect_no_error(sftime_as_spatrds(mysft))
+})
+
 
 test_that("project_dt works as expected", {
   withr::local_package("terra")
