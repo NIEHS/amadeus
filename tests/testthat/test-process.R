@@ -715,7 +715,7 @@ testthat::test_that("process_geos expected errors.", {
 
 testthat::test_that("proccess support functions return expected.", {
   path <- list.files(
-    "../testdata/geos/aqc_tavg_1hr_g1440x721_v1/",
+    "../testdata/geos/aqc/",
     full.names = TRUE
   )
   expect_error(
@@ -746,7 +746,8 @@ testthat::test_that("proccess support functions return expected.", {
 
 testthat::test_that("process_locs_vector vector data and missing columns.", {
   withr::local_package("terra")
-  locs <- readRDS("../testdata/sites_nc.RDS")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
   narr <-
     process_narr(
       date_start = "2018-01-01",
@@ -759,7 +760,7 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
     calc_narr(
       from = narr,
       locs = subset(
-        locs,
+        ncp,
         select = "lon"
       ),
       locs_id = "site_id"
@@ -770,7 +771,7 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
     calc_narr(
       from = narr,
       locs = terra::vect(
-        locs,
+        ncp,
         geom = c("lon", "lat"),
         crs = "EPSG:4326"
       ),
