@@ -705,7 +705,8 @@ testthat::test_that("calc_hms returns expected.", {
     "Heavy"
   )
   radii <- c(0, 1000)
-  locs <- readRDS("../testdata/sites_nc.RDS")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
     is.function(calc_hms)
@@ -723,7 +724,7 @@ testthat::test_that("calc_hms returns expected.", {
       hms_covariate <-
         calc_hms(
           from = hms,
-          locs = locs,
+          locs = ncp,
           locs_id = "site_id",
           radius = radii[r]
         )
@@ -759,7 +760,8 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
     "Heavy"
   )
   radii <- c(0, 1000)
-  locs <- readRDS("../testdata/sites_nc.RDS")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
     is.function(calc_hms)
@@ -777,7 +779,7 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
       hms_covariate <-
         calc_hms(
           from = hms,
-          locs = locs,
+          locs = ncp,
           locs_id = "site_id",
           radius = radii[r]
         )
@@ -814,7 +816,8 @@ testthat::test_that("calc_gmted returns expected.", {
     "7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"
   )
   radii <- c(0, 1000)
-  locs <- readRDS("../testdata/sites_nc.RDS")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
     is.function(calc_gmted)
@@ -846,7 +849,7 @@ testthat::test_that("calc_gmted returns expected.", {
         gmted_covariate <-
           calc_gmted(
             from = gmted,
-            locs = locs,
+            locs = ncp,
             locs_id = "site_id",
             radius = radii[a],
             fun = "mean"
@@ -875,7 +878,8 @@ testthat::test_that("calc_narr returns expected.", {
     "omega"
   )
   radii <- c(0, 1000)
-  locs <- readRDS("../testdata/sites_nc.RDS")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
     is.function(calc_narr)
@@ -897,7 +901,7 @@ testthat::test_that("calc_narr returns expected.", {
       narr_covariate <-
         calc_narr(
           from = narr,
-          locs = locs,
+          locs = ncp,
           locs_id = "site_id",
           radius = radii[r],
           fun = "mean"
@@ -925,11 +929,12 @@ testthat::test_that("calc_narr returns expected.", {
 testthat::test_that("calc_geos returns as expected.", {
   withr::local_package("terra")
   collections <- c(
-    "aqc_tavg_1hr_g1440x721_v1",
-    "chm_inst_1hr_g1440x721_p23"
+    "aqc",
+    "chm"
   )
   radii <- c(0, 1000)
-  locs <- data.frame(readRDS("../testdata/sites_nc.RDS"))
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
     is.function(calc_geos)
@@ -951,7 +956,7 @@ testthat::test_that("calc_geos returns as expected.", {
       geos_covariate <-
         calc_geos(
           from = geos,
-          locs = locs,
+          locs = ncp,
           locs_id = "site_id",
           radius = radii[r],
           fun = "mean"
@@ -978,9 +983,11 @@ testthat::test_that("calc_geos returns as expected.", {
 
 testthat::test_that("calc_sedac_population returns as expected.", {
   withr::local_package("terra")
+  withr::local_package("data.table")
   paths <- list.files("../testdata/population/", full.names = TRUE)
   radii <- c(0, 1000)
-  locs <- data.frame(readRDS("../testdata/sites_nc.RDS"))
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
     is.function(calc_sedac_population)
@@ -995,7 +1002,7 @@ testthat::test_that("calc_sedac_population returns as expected.", {
       pop_covariate <-
         calc_sedac_population(
           from = pop,
-          locs = locs,
+          locs = data.table::data.table(ncp),
           locs_id = "site_id",
           radius = radii[r],
           fun = "mean"

@@ -8,10 +8,10 @@ calc_gmted(from, locs, locs_id = NULL, radius = 0, fun = "mean")
 }
 \arguments{
 \item{from}{SpatRaster(1). Cleaned SpatRaster object that has been returned
-from \code{process_gmted} containing Global Multi-resolution Terrain Elevation Data
-(GMTED2010) data.}
+from \code{process_gmted} containing Global Multi-resolution Terrain Elevation
+Data (GMTED2010) data.}
 
-\item{locs}{data.frame, characater to file path, SpatVector, or sf object.}
+\item{locs}{data.frame. character to file path, SpatVector, or sf object.}
 
 \item{locs_id}{character(1). Column within \code{locations} CSV file
 containing identifier for each unique coordinate location.}
@@ -27,9 +27,9 @@ a data.frame object;
 }
 \description{
 Extract Global Multi-resolution Terrain Elevation Data (GMTED2010) data at
-point locations using SpatRaster object from \code{process_gmted}. Function returns
-a data frame containing GEOS-CF variable values at user-defined sites. Unique
-column reflect statistic, resolution, and circular buffer.
+point locations using SpatRaster object from \code{process_gmted}. Function
+returns a data frame containing GMTED variable values at user-defined
+sites. Unique column reflect statistic, resolution, and circular buffer.
 }
 \author{
 Mitchell Manware
