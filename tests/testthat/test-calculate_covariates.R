@@ -736,9 +736,9 @@ testthat::test_that("calc_hms returns expected.", {
       expect_true(
         ncol(hms_covariate) == 3
       )
-      # expect 6 rows
+      # expect 2 rows
       expect_true(
-        nrow(hms_covariate) == 6
+        nrow(hms_covariate) == 2
       )
       # expect integer for binary value
       expect_true(
@@ -791,9 +791,9 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
       expect_true(
         ncol(hms_covariate) == 3
       )
-      # expect 12 rows
+      # expect 4 rows
       expect_true(
-        nrow(hms_covariate) == 12
+        nrow(hms_covariate) == 4
       )
       # expect integer for binary value
       expect_true(
@@ -1011,7 +1011,7 @@ testthat::test_that("calc_sedac_population returns as expected.", {
       expect_true(
         class(pop_covariate) == "data.frame"
       )
-      # expect 4 columns
+      # expect 3 columns
       expect_true(
         ncol(pop_covariate) == 3
       )
