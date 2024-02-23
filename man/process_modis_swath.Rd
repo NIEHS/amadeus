@@ -5,8 +5,8 @@
 \title{Mosaic MODIS swaths}
 \usage{
 process_modis_swath(
-  paths,
-  date_in,
+  path,
+  date,
   get_var = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
   suffix = ":mod06:",
   resolution = 0.025,
@@ -14,9 +14,9 @@ process_modis_swath(
 )
 }
 \arguments{
-\item{paths}{character. Full paths of hdf files.}
+\item{path}{character. Full paths of hdf files.}
 
-\item{date_in}{character(1). Date to query.}
+\item{date}{character(1). Date to query.}
 
 \item{get_var}{character. One of \code{"Cloud_Fraction_Day"} or
 \code{"Cloud_Fraction_Night"} (which are available in MOD06_L2)}

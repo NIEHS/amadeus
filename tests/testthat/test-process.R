@@ -105,8 +105,8 @@ testthat::test_that("process_modis_merge is good to go", {
     )
   testthat::expect_no_error(
     process_modis_merge(
-      paths = path_mod11,
-      date_in = "2021-08-15",
+      path = path_mod11,
+      date = "2021-08-15",
       subdataset = "(LST_)"
     )
   )
@@ -118,8 +118,8 @@ testthat::test_that("process_modis_merge is good to go", {
     )
   testthat::expect_no_error(
     process_modis_merge(
-      paths = path_mod13,
-      date_in = "2021-08-13",
+      path = path_mod13,
+      date = "2021-08-13",
       subdataset = "(NDVI)"
     )
   )
@@ -132,8 +132,8 @@ testthat::test_that("process_modis_merge is good to go", {
     )
   testthat::expect_no_error(
     process_modis_merge(
-      paths = path_mcd19,
-      date_in = "2021-08-15",
+      path = path_mcd19,
+      date = "2021-08-15",
       subdataset = "(Optical_Depth)"
     )
   )
@@ -146,8 +146,8 @@ testthat::test_that("process_modis_merge is good to go", {
     )
   testthat::expect_no_error(
     process_modis_merge(
-      paths = path_mod09,
-      date_in = "2021-08-15",
+      path = path_mod09,
+      date = "2021-08-15",
       subdataset = "(sur_refl_b0)"
     )
   )
@@ -160,8 +160,8 @@ testthat::test_that("process_modis_merge is good to go", {
   )
   testthat::expect_no_error(
     process_modis_merge(
-      paths = paths_mod13,
-      date_in = "2021-08-13",
+      path = paths_mod13,
+      date = "2021-08-13",
       subdataset = "(NDVI)"
     )
   )
@@ -189,9 +189,9 @@ testthat::test_that("VNP46 preprocess tests", {
 
   testthat::expect_warning(
     vnp46_proc <- process_bluemarble(
-      paths = path_vnp46[1],
+      path = path_vnp46[1],
       tile_df = corn,
-      date_in = "2018-08-13"
+      date = "2018-08-13"
     )
   )
   testthat::expect_s4_class(vnp46_proc, "SpatRaster")
@@ -199,10 +199,10 @@ testthat::test_that("VNP46 preprocess tests", {
 
   testthat::expect_warning(
     vnp46_proc2 <- process_bluemarble(
-      paths = path_vnp46[1],
+      path = path_vnp46[1],
       tile_df = corn,
       subdataset = c(3L, 5L),
-      date_in = "2018-08-13"
+      date = "2018-08-13"
     )
   )
 
@@ -211,9 +211,9 @@ testthat::test_that("VNP46 preprocess tests", {
 
   testthat::expect_error(
     process_bluemarble(
-      paths = path_vnp46[1],
+      path = path_vnp46[1],
       tile_df = corn,
-      date_in = "2018~08~13"
+      date = "2018~08~13"
     )
   )
 
@@ -261,27 +261,27 @@ testthat::test_that("Other MODIS function errors", {
   testthat::expect_no_error(
     suppressWarnings(
       process_modis_swath(
-        paths = path_mod06e,
-        date_in = "2021-08-15"
+        path = path_mod06e,
+        date = "2021-08-15"
       )
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      paths = path_mod06e,
-      date_in = "2021~08~15"
+      path = path_mod06e,
+      date = "2021~08~15"
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      paths = path_mod06e,
-      date_in = "2021-13-15"
+      path = path_mod06e,
+      date = "2021-13-15"
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      paths = path_mod06e,
-      date_in = "2021-12-45"
+      path = path_mod06e,
+      date = "2021-12-45"
     )
   )
 })

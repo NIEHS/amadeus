@@ -5,8 +5,8 @@
 \title{Assign VIIRS Blue Marble products corner coordinates to retrieve a merged raster}
 \usage{
 process_bluemarble(
-  paths,
-  date_in,
+  path,
+  date,
   tile_df = NULL,
   subdataset = 3L,
   crs_ref = "EPSG:4326",
@@ -14,9 +14,9 @@ process_bluemarble(
 )
 }
 \arguments{
-\item{paths}{character. Full paths of h5 files.}
+\item{path}{character. Full paths of h5 files.}
 
-\item{date_in}{character(1). Date to query.}
+\item{date}{character(1). Date to query.}
 
 \item{tile_df}{data.frame. Contains four corner coordinates in fields named
 \code{c("xmin", "xmax", "ymin", "ymax")}.

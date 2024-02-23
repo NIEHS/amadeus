@@ -1,7 +1,7 @@
-#' Calculate covariates
 
 # nocov start
 # nolint start
+#' Calculate covariates
 #' @param covariate character(1). Covariate type.
 #' @param locs sf/SpatVector. Unique locations. Should include
 #'  a unique identifier field named `locs_id`

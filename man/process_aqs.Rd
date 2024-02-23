@@ -6,9 +6,7 @@
 \usage{
 process_aqs(
   path = "./tests/testdata/daily_88101_2018-2022.rds",
-  include_time = FALSE,
-  date_start = "2018-01-01",
-  date_end = "2022-12-31",
+  date = c("2018-01-01", "2022-12-31"),
   return_format = "terra"
 )
 }
@@ -16,14 +14,9 @@ process_aqs(
 \item{path}{character(1). Path to daily measurement data.
 RDS and CSV are accepted.}
 
-\item{include_time}{logical(1). Should the output include
-temporal information?}
-
-\item{date_start}{character(1). Start date.
-Should be in "YYYY-MM-DD" format.}
-
-\item{date_end}{character(1). End date.
-Should be in "YYYY-MM-DD" format.}
+\item{date}{character(2). Start and end date.
+Should be in \code{"YYYY-MM-DD"} format and sorted. If \code{NULL},
+only unique locations are returned.}
 }
 \value{
 data.table object with three or four fields.
@@ -39,8 +32,8 @@ data.table object with three or four fields.
 Filter unique AQS sites with or without temporal information
 }
 \note{
-\code{include_time = TRUE} will return a massive data.table
-object. Please choose proper \code{date_start} and \code{date_end} values.
+\code{date = NULL} will return a massive data.table
+object. Please choose proper \code{date} values.
 }
 \examples{
 library(terra)

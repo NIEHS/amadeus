@@ -1,3 +1,82 @@
+# nolint start
+#' Process covariates
+#' @param covariate character(1). Covariate type.
+#' @param path character(1). Directory or file path to raw data
+#' depending on `covariate` value.
+#' @param ... Arguments passed to each raw data processing function.
+#'  function.
+#' @seealso
+#' - `process_modis`: `"modis"`, `"MODIS"`
+#' - `process_koppen_geiger`: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
+#' - `process_ecoregion`: `"ecoregion"`, `"ecoregions"`
+#' @returns `SpatVector` or `SpatRaster` depending on covariate type.
+#' @author Insang Song
+#' @export
+# nolint end
+calc_covariates <-
+  function(
+    covariate = c("modis", "koppen-geiger",
+                  "koeppen-geiger", "koppen", "koeppen",
+                  "geos", "dummies", "gmted", "roads",
+                  "sedac_groads", "nlcd", "tri", "ncep", "nei",
+                  "ecoregions", "ecoregion"),
+    path,
+    ...
+  ) {
+    covariate <- tolower(covariate)
+    covariate <- match.arg(covariate)
+    if (startsWith(covariate, "ko")) {
+      covariate <- "koppen"
+    }
+
+    # select function to run
+    what_to_run <- switch(covariate,
+      modis_mod = process_modis_sds,
+      modis_mcd = process_modis_sds,
+      bluemarble = process_bluemarble,
+      ecoregion = process_ecoregion,
+      ecoregions = process_ecoregion,
+      koppen = process_koppen_geiger,
+      narr_monolevel = process_narr_monolevel,
+      monolevel = process_narr_monolevel,
+      narr_p_levels = process_narr_p_levels,
+      p_levels = process_narr_p_levels,
+      plevels = process_narr_p_levels,
+      nlcd = process_nlcd_ratio,
+      noaa = process_noaa_hms,
+      smoke = process_hms,
+      hms = process_hms,
+      sedac_groads = process_sedac_groads,
+      roads = process_sedac_groads,
+      sedac_population = process_sedac_population,
+      population = process_sedac_population,
+      nei = process_nei,
+      tri = process_tri,
+      geos = process_geos,
+      gmted = process_gmted
+    )
+
+    res_covariate <-
+      tryCatch({
+        what_to_run(
+          path = path,
+          ...
+        )
+      }, error = function(e) {
+        print(e)
+        print(args(what_to_run))
+        message(paste0("Please refer to the argument list and
+the error message above to rectify the error.\n"))
+        return(NULL)
+      })
+
+    return(res_covariate)
+  }
+# nocov end
+
+
+
+
 
 #' Selected MODIS sinusoidal grid product subdataset name selector
 #' @param product character(1). Product code.
@@ -121,13 +200,13 @@ the input then flatten it manually.")
 
 # nolint start
 #' Get mosaicked or merged raster from multiple MODIS hdf files
-#' @param paths character. Full list of hdf file paths.
+#' @param path character. Full list of hdf file paths.
 #'  preferably a recursive search result from \code{list.files}.
-#' @param date_in character(1). date to query. Should be in
+#' @param date character(1). date to query. Should be in
 #' \code{"YYYY-MM-DD"} format.
 #' @param subdataset character(1). subdataset names to extract.
 #' Should conform to regular expression. See \link{regex} for details.
-#' Default is NULL, which will result in errors. Users should specify
+#' Default is `NULL`, which will result in errors. Users should specify
 #' which subdatasets will be imported.
 #' @param foo Function name or custom function to aggregate overlapping
 #' cell values. See \code{fun} description in \link[terra]{tapp} for details.
@@ -143,13 +222,13 @@ the input then flatten it manually.")
 # nolint end
 # previously modis_get_vrt
 process_modis_merge <- function(
-    paths,
-    date_in = NULL,
+    path,
+    date = NULL,
     subdataset = NULL,
     foo = "mean",
     ...) {
 
-  if (!is.character(paths)) {
+  if (!is.character(path)) {
     stop("Argument flist should be a list of hdf files (character).\n")
   }
   if (!(is.character(foo) || is.function(foo))) {
@@ -157,12 +236,12 @@ process_modis_merge <- function(
          that is accepted in terra::tapp.\n")
   }
   # date format check
-  is_date_proper(instr = date_in)
+  is_date_proper(instr = date)
 
   # interpret date
-  today <- as.character(date_in)
+  today <- as.character(date)
   dayjul <- strftime(today, "%Y%j")
-  ftarget <- grep(sprintf("A%s", dayjul), paths, value = TRUE)
+  ftarget <- grep(sprintf("A%s", dayjul), path, value = TRUE)
 
   # get layer information
   layer_target <-
@@ -176,7 +255,7 @@ process_modis_merge <- function(
            })
   # Merge multiple rasters into one
   # do.call(f, l) is equivalent to f(l[[1]], ... , l[[length(l)]])
-  if (length(paths) > 1) {
+  if (length(path) > 1) {
     result_merged <- do.call(terra::merge, layer_target)
     gc()
   } else {
@@ -265,8 +344,8 @@ is_date_proper <- function(
 #' @description This function will return a SpatRaster object with
 #' georeferenced h5 files of Blue Marble product. Referencing corner coordinates
 #' are necessary as the original h5 data do not include such information.
-#' @param paths character. Full paths of h5 files.
-#' @param date_in character(1). Date to query.
+#' @param path character. Full paths of h5 files.
+#' @param date character(1). Date to query.
 #' @param tile_df data.frame. Contains four corner coordinates in fields named
 #' `c("xmin", "xmax", "ymin", "ymax")`.
 #' See [process_bluemarble_corners] to generate a valid object for this argument.
@@ -290,20 +369,19 @@ is_date_proper <- function(
 # previously modis_preprocess_vnp46
 # nolint end
 process_bluemarble <- function(
-  paths,
-  date_in,
+  path,
+  date,
   tile_df = NULL,
   subdataset = 3L,
   crs_ref = "EPSG:4326",
   ...
 ) {
-  is_date_proper(instr = date_in)
+  is_date_proper(instr = date)
   # interpret date from paths
-  date_in <- as.Date(date_in)
-  datejul <- strftime(date_in, format = "%Y%j")
+  datejul <- strftime(as.Date(date), format = "%Y%j")
   stdtile <- tile_df$tile
 
-  filepaths_today <- grep(sprintf("A%s", datejul), paths, value = TRUE)
+  filepaths_today <- grep(sprintf("A%s", datejul), path, value = TRUE)
   # today's filenames
   filepaths_today <-
     grep(
@@ -398,8 +476,8 @@ process_modis_warp <-
 #' grids, which require warping/rectifying the original curvilinear grids
 #' into rectilinear grids. The function internally warps each of inputs
 #' then mosaic the warped images into one large SpatRaster object.
-#' @param paths character. Full paths of hdf files.
-#' @param date_in character(1). Date to query.
+#' @param path character. Full paths of hdf files.
+#' @param date character(1). Date to query.
 #' @param get_var character. One of `"Cloud_Fraction_Day"` or
 #' `"Cloud_Fraction_Night"` (which are available in MOD06_L2)
 #' @param suffix character(1). Should be formatted `:{product}:`,
@@ -421,23 +499,23 @@ process_modis_warp <-
 # previously modis_mosaic_mod06
 process_modis_swath <-
   function(
-    paths,
-    date_in,
+    path,
+    date,
     get_var = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
     suffix = ":mod06:",
     resolution = 0.025,
     ...
   ) {
     # check date format
-    is_date_proper(instr = date_in)
+    is_date_proper(instr = date)
     header <- "HDF4_EOS:EOS_SWATH:"
     ras_mod06 <- vector("list", 2L)
-    datejul <- strftime(date_in, format = "%Y%j")
-    paths_today <- grep(sprintf("A%s", datejul), paths, value = TRUE)
+    datejul <- strftime(date, format = "%Y%j")
+    paths_today <- grep(sprintf("A%s", datejul), path, value = TRUE)
 
     # if two or more paths are put in,
     # these are read into a list then mosaicked
-    if (length(paths) > 1) {
+    if (length(path) > 1) {
       for (element in seq_along(get_var)) {
         target_text <-
           sprintf("%s%s%s%s", header, paths_today, suffix, get_var[element])
@@ -451,7 +529,7 @@ process_modis_swath <-
       mod06_mosaic <- c(ras_mod06[[1]], ras_mod06[[2]])
       terra::varnames(mod06_mosaic) <- get_var
     } else {
-      mod06_mosaic <- terra::rast(process_modis_warp(paths))
+      mod06_mosaic <- terra::rast(process_modis_warp(path))
     }
     return(mod06_mosaic)
   }
@@ -782,12 +860,9 @@ process_nei <- function(
 #' Filter unique AQS sites with or without temporal information
 #' @param path character(1). Path to daily measurement data.
 #' RDS and CSV are accepted.
-#' @param include_time logical(1). Should the output include
-#'  temporal information?
-#' @param date_start character(1). Start date.
-#'  Should be in "YYYY-MM-DD" format.
-#' @param date_end character(1). End date.
-#'  Should be in "YYYY-MM-DD" format.
+#' @param date character(2). Start and end date.
+#'  Should be in `"YYYY-MM-DD"` format and sorted. If `NULL`,
+#'  only unique locations are returned.
 #' @returns data.table object with three or four fields.
 #' - "site_id"
 #' - "lon": in WGS 1984 (EPSG:4326)
@@ -798,8 +873,8 @@ process_nei <- function(
 #' @importFrom utils read.csv
 #' @importFrom terra vect
 #' @importFrom terra project
-#' @note \code{include_time = TRUE} will return a massive data.table
-#' object. Please choose proper \code{date_start} and \code{date_end} values.
+#' @note `date = NULL` will return a massive data.table
+#' object. Please choose proper `date` values.
 #' @examples
 #' library(terra)
 #' library(data.table)
@@ -808,19 +883,21 @@ process_nei <- function(
 process_aqs <-
   function(
     path = "./tests/testdata/daily_88101_2018-2022.rds",
-    include_time = FALSE,
-    date_start = "2018-01-01",
-    date_end = "2022-12-31",
+    date = c("2018-01-01", "2022-12-31"),
     return_format = "terra"
   ) {
-    #sites <- try(read.csv(path))
-    #if (inherits(sites, "try-error")) {
+    date <- try(as.Date(date))
+    if (inherits(date, "try-error")) {
+      stop("date has invalid format(s). Please check the values.")
+    }
     sites <- try(readRDS(path))
-    #}
     if (inherits(sites, "try-error")) {
       stop("Failed to read file from path. Please enter a valid value.")
     }
 
+    if (length(date) != 2) {
+      stop("date should be a character vector of length 2.")
+    }
     ## get unique sites
     sites$site_id <-
       sprintf("%02d%03d%04d%05d",
@@ -857,9 +934,9 @@ process_aqs <-
     sites_v_wgs <- sites_v[Datum == "WGS84"][, -4]
     final_sites <- rbind(sites_v_wgs, sites_v_nad)
 
-    if (include_time) {
-      date_start <- as.Date(date_start)
-      date_end <- as.Date(date_end)
+    if (!is.null(date)) {
+      date_start <- as.Date(date[1])
+      date_end <- as.Date(date[2])
       date_sequence <- seq(date_start, date_end, "day")
       final_sites <-
         split(date_sequence, date_sequence) |>
