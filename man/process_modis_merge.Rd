@@ -4,7 +4,13 @@
 \alias{process_modis_merge}
 \title{Get mosaicked or merged raster from multiple MODIS hdf files}
 \usage{
-process_modis_merge(path, date = NULL, subdataset = NULL, foo = "mean", ...)
+process_modis_merge(
+  path,
+  date = NULL,
+  subdataset = NULL,
+  fun_agg = "mean",
+  ...
+)
 }
 \arguments{
 \item{path}{character. Full list of hdf file paths.
@@ -18,7 +24,7 @@ Should conform to regular expression. See \link{regex} for details.
 Default is \code{NULL}, which will result in errors. Users should specify
 which subdatasets will be imported.}
 
-\item{foo}{Function name or custom function to aggregate overlapping
+\item{fun_agg}{Function name or custom function to aggregate overlapping
 cell values. See \code{fun} description in \link[terra]{tapp} for details.}
 
 \item{...}{For internal use.}

@@ -13,7 +13,7 @@
 #' @author Insang Song
 #' @export
 # nolint end
-calc_covariates <-
+process_covariates <-
   function(
     covariate = c("modis", "koppen-geiger",
                   "koeppen-geiger", "koppen", "koeppen",
@@ -73,9 +73,6 @@ the error message above to rectify the error.\n"))
     return(res_covariate)
   }
 # nocov end
-
-
-
 
 
 #' Selected MODIS sinusoidal grid product subdataset name selector
@@ -208,7 +205,7 @@ the input then flatten it manually.")
 #' Should conform to regular expression. See \link{regex} for details.
 #' Default is `NULL`, which will result in errors. Users should specify
 #' which subdatasets will be imported.
-#' @param foo Function name or custom function to aggregate overlapping
+#' @param fun_agg Function name or custom function to aggregate overlapping
 #' cell values. See \code{fun} description in \link[terra]{tapp} for details.
 #' @param ... For internal use.
 #' @note Curvilinear products (i.e., swaths) will not be accepted.
@@ -225,13 +222,13 @@ process_modis_merge <- function(
     path,
     date = NULL,
     subdataset = NULL,
-    foo = "mean",
+    fun_agg = "mean",
     ...) {
 
   if (!is.character(path)) {
     stop("Argument flist should be a list of hdf files (character).\n")
   }
-  if (!(is.character(foo) || is.function(foo))) {
+  if (!(is.character(fun_agg) || is.function(fun_agg))) {
     stop("Argument foo should be a function or name of a function
          that is accepted in terra::tapp.\n")
   }
@@ -250,7 +247,7 @@ process_modis_merge <- function(
              process_flatten_sds(
                x,
                subdataset = subdataset,
-               fun_agg = foo
+               fun_agg = fun_agg
              )
            })
   # Merge multiple rasters into one
@@ -351,7 +348,7 @@ is_date_proper <- function(
 #' See [process_bluemarble_corners] to generate a valid object for this argument.
 #' @param subdataset integer(1). Subdataset number to process.
 #' Default is 3L.
-#' @param crs_ref character(1). terra::crs compatible CRS.
+#' @param crs character(1). terra::crs compatible CRS.
 #' Default is "EPSG:4326"
 #' @param ... For internal use.
 #' @returns SpatRaster.
@@ -373,7 +370,7 @@ process_bluemarble <- function(
   date,
   tile_df = NULL,
   subdataset = 3L,
-  crs_ref = "EPSG:4326",
+  crs = "EPSG:4326",
   ...
 ) {
   is_date_proper(instr = date)
@@ -406,7 +403,7 @@ process_bluemarble <- function(
       vnp_ <- terra::rast(vnp, subds = subdataset)
       tile_ext <- tile_df[tile_df$tile == tile_in, -1]
       # print(tile_ext)
-      terra::crs(vnp_) <- terra::crs(crs_ref)
+      terra::crs(vnp_) <- terra::crs(crs)
       terra::ext(vnp_) <- unlist(tile_ext)
       return(vnp_)
     }, vnp_today, filepaths_today_tiles_list, SIMPLIFY = FALSE)
@@ -434,7 +431,7 @@ process_bluemarble <- function(
 #' @param cellsize numeric(1). Cell size (spatial resolution) of
 #' output rectilinear grid raster.
 #' @param threshold numeric(1). Maximum distance to fill gaps if occur.
-#' @param crs_out integer(1)/character(1). Coordinate system definition.
+#' @param crs integer(1)/character(1). Coordinate system definition.
 #' Should be compatible with EPSG codes or WKT2.
 #' See [terra::crs] and [sf::st_crs] / [EPSG](https://www.epsg.io)
 #' @param ... For internal use.
@@ -452,7 +449,7 @@ process_modis_warp <-
     path,
     cellsize = 0.25,
     threshold = 0.5,
-    crs_out = 4326,
+    crs = 4326,
     ...
   ) {
     options(sf_use_s2 = FALSE)
@@ -460,7 +457,7 @@ process_modis_warp <-
     rtd <-
       stars::st_warp(
         ras,
-        crs = crs_out,
+        crs = crs,
         cellsize = cellsize,
         threshold = threshold
       )
@@ -476,9 +473,12 @@ process_modis_warp <-
 #' grids, which require warping/rectifying the original curvilinear grids
 #' into rectilinear grids. The function internally warps each of inputs
 #' then mosaic the warped images into one large SpatRaster object.
+#' Users need to select a subdataset to process. The full path looks like
+#' `"HDF4_EOS:EOS_SWATH:{file_path}:mod06:subdataset"`, where file_path is
+#' the full path to the hdf file.
 #' @param path character. Full paths of hdf files.
 #' @param date character(1). Date to query.
-#' @param get_var character. One of `"Cloud_Fraction_Day"` or
+#' @param subdataset character. One of `"Cloud_Fraction_Day"` or
 #' `"Cloud_Fraction_Night"` (which are available in MOD06_L2)
 #' @param suffix character(1). Should be formatted `:{product}:`,
 #' e.g., `:mod06:`
@@ -501,7 +501,7 @@ process_modis_swath <-
   function(
     path,
     date,
-    get_var = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+    subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
     suffix = ":mod06:",
     resolution = 0.025,
     ...
@@ -516,25 +516,25 @@ process_modis_swath <-
     # if two or more paths are put in,
     # these are read into a list then mosaicked
     if (length(path) > 1) {
-      for (element in seq_along(get_var)) {
+      for (element in seq_along(subdataset)) {
         target_text <-
-          sprintf("%s%s%s%s", header, paths_today, suffix, get_var[element])
+          sprintf("%s%s%s%s", header, paths_today, suffix, subdataset[element])
         # rectified stars objects to SpatRaster
         mod06_element <- split(target_text, target_text) |>
           lapply(process_modis_warp) |>
           lapply(terra::rast)
+        # mosaick the warped SpatRasters into one
         mod06_element <- Reduce(f = terra::mosaic, x = mod06_element)
         ras_mod06[[element]] <- mod06_element
       }
       mod06_mosaic <- c(ras_mod06[[1]], ras_mod06[[2]])
-      terra::varnames(mod06_mosaic) <- get_var
+      # assigning variable name
+      terra::varnames(mod06_mosaic) <- subdataset
     } else {
       mod06_mosaic <- terra::rast(process_modis_warp(path))
     }
     return(mod06_mosaic)
   }
-
-
 
 
 
@@ -929,6 +929,7 @@ process_aqs <-
         crs = "EPSG:4269"
       )
     sites_v_nad <- terra::project(sites_v_nad, "EPSG:4326")
+    # postprocessing: combine WGS84 and new WGS84 records
     sites_v_nad <- sites_v_nad[, seq(1, 3)]
     sites_v_nad <- as.data.frame(sites_v_nad)
     sites_v_wgs <- sites_v[Datum == "WGS84"][, -4]

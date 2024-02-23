@@ -7,7 +7,7 @@
 process_modis_swath(
   path,
   date,
-  get_var = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+  subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
   suffix = ":mod06:",
   resolution = 0.025,
   ...
@@ -18,7 +18,7 @@ process_modis_swath(
 
 \item{date}{character(1). Date to query.}
 
-\item{get_var}{character. One of \code{"Cloud_Fraction_Day"} or
+\item{subdataset}{character. One of \code{"Cloud_Fraction_Day"} or
 \code{"Cloud_Fraction_Night"} (which are available in MOD06_L2)}
 
 \item{suffix}{character(1). Should be formatted \verb{:\{product\}:},
@@ -38,6 +38,9 @@ values of selected subdatasets. Swath data include curvilinear
 grids, which require warping/rectifying the original curvilinear grids
 into rectilinear grids. The function internally warps each of inputs
 then mosaic the warped images into one large SpatRaster object.
+Users need to select a subdataset to process. The full path looks like
+\code{"HDF4_EOS:EOS_SWATH:{file_path}:mod06:subdataset"}, where file_path is
+the full path to the hdf file.
 }
 \seealso{
 \itemize{

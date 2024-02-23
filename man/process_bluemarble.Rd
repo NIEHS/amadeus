@@ -9,7 +9,7 @@ process_bluemarble(
   date,
   tile_df = NULL,
   subdataset = 3L,
-  crs_ref = "EPSG:4326",
+  crs = "EPSG:4326",
   ...
 )
 }
@@ -25,7 +25,7 @@ See \link{process_bluemarble_corners} to generate a valid object for this argume
 \item{subdataset}{integer(1). Subdataset number to process.
 Default is 3L.}
 
-\item{crs_ref}{character(1). terra::crs compatible CRS.
+\item{crs}{character(1). terra::crs compatible CRS.
 Default is "EPSG:4326"}
 
 \item{...}{For internal use.}
