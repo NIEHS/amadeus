@@ -165,7 +165,7 @@ download_aqs_data <-
       year_sequence
     )
     #### 6. check for valid URL
-    if (!(check_urls(download_urls[1], size = 1))) {
+    if (!(check_url_status(download_urls[1]))) {
       stop(paste0(
         "Invalid year returns HTTP code 404. ",
         "Check `year_start` parameter.\n"
@@ -477,7 +477,7 @@ download_geos_cf_data <- function(
         "z.nc4"
       )
       if (t == 1) {
-        if (!(check_urls(download_url, size = 1))) {
+        if (!(check_url_status(download_url))) {
           sink()
           file.remove(commands_txt)
           stop(paste0(
@@ -831,7 +831,7 @@ download_merra2_data <- function(
         month,
         "/"
       )
-      if (!(check_urls(base_url, size = 1))) {
+      if (!(check_url_status(base_url))) {
         stop(paste0(
           "Invalid date returns HTTP code 404. ",
           "Check `date_start` parameter.\n"
@@ -1023,7 +1023,7 @@ download_narr_monolevel_data <- function(
         ".nc"
       )
       if (y == 1) {
-        if (!(check_urls(url, size = 1))) {
+        if (!(check_url_status(url))) {
           sink()
           file.remove(commands_txt)
           stop(paste0(
@@ -1151,7 +1151,7 @@ download_narr_p_levels_data <- function(
           ".nc"
         )
         if (m == 1) {
-          if (!(check_urls(url, size = 1))) {
+          if (!(check_url_status(url))) {
             sink()
             file.remove(commands_txt)
             stop(paste0(
@@ -1764,7 +1764,7 @@ download_hms_data <- function(
       suffix
     )
     if (f == 1) {
-      if (!(check_urls(url, size = 1))) {
+      if (!(check_url_status(url))) {
         sink()
         file.remove(commands_txt)
         stop(paste0(

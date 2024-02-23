@@ -84,7 +84,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
 })
 
 testthat::test_that("EPA AQS download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   year_start <- 2018
@@ -120,7 +120,7 @@ testthat::test_that("EPA AQS download URLs have HTTP status 200.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 2)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = length(urls))
+  url_status <- check_urls(urls = urls, size = length(urls), method = "HEAD")
   # implement unit tets
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
@@ -172,7 +172,7 @@ testthat::test_that("Ecoregion download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   date_start <- "2019-09-09"
@@ -202,7 +202,7 @@ testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
     # extract urls
     urls <- extract_urls(commands = commands, position = 2)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 20L)
+    url_status <- check_urls(urls = urls, size = 20L, method = "HEAD")
     # implement unit tests
     test_download_functions(directory_to_save = directory_to_save,
                             commands_path = commands_path,
@@ -213,7 +213,7 @@ testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("GMTED download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   # function parameters
   statistics <- c("Breakline Emphasis",
                   # "Systematic Subsample",
@@ -248,7 +248,7 @@ testthat::test_that("GMTED download URLs have HTTP status 200.", {
     # extract urls
     urls <- extract_urls(commands = commands, position = 6)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 1L)
+    url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
     # implement unit tests
     test_download_functions(directory_to_save = directory_to_save,
                             commands_path = commands_path,
@@ -259,7 +259,7 @@ testthat::test_that("GMTED download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("MERRA2 download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   date_start <- "2022-02-14"
@@ -288,7 +288,7 @@ testthat::test_that("MERRA2 download URLs have HTTP status 200.", {
     # extract urls
     urls <- extract_urls(commands = commands, position = 2)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 3L)
+    url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
     # implement unit tests
     test_download_functions(directory_to_save = directory_to_save,
                             commands_path = commands_path,
@@ -313,7 +313,7 @@ testthat::test_that("MERRA2 returns message with unrecognized collection.", {
 })
 
 testthat::test_that("NARR monolevel download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   year_start <- 2018
@@ -338,7 +338,7 @@ testthat::test_that("NARR monolevel download URLs have HTTP status 200.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 6)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 5L)
+  url_status <- check_urls(urls = urls, size = 5L, method = "HEAD")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
@@ -348,7 +348,7 @@ testthat::test_that("NARR monolevel download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("NARR p-levels download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   year_start <- 2020
@@ -373,7 +373,7 @@ testthat::test_that("NARR p-levels download URLs have HTTP status 200.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 6)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 20L)
+  url_status <- check_urls(urls = urls, size = 20L, method = "HEAD")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
@@ -383,7 +383,7 @@ testthat::test_that("NARR p-levels download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   date_start <- "2022-08-12"
@@ -413,7 +413,7 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 6)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 3L)
+  url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
@@ -423,7 +423,7 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("NLCD download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   years <- c(2021, 2019, 2016)
@@ -457,7 +457,7 @@ testthat::test_that("NLCD download URLs have HTTP status 200.", {
     # extract urls
     urls <- extract_urls(commands = commands, position = 5)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 1L)
+    url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
     # implement unit tests
     test_download_functions(directory_to_download = directory_to_download,
                             directory_to_save = directory_to_save,
@@ -482,7 +482,7 @@ testthat::test_that("NLCD download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("SEDAC groads download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   data_regions <- c("Americas", "Global")
@@ -515,7 +515,7 @@ testthat::test_that("SEDAC groads download URLs have HTTP status 200.", {
       # extract urls
       urls <- extract_urls(commands = commands, position = 11)
       # check HTTP URL status
-      url_status <- check_urls(urls = urls, size = 1L)
+      url_status <- check_urls(urls = urls, size = 1L, method = "GET")
       # implement unit tests
       test_download_functions(directory_to_download = directory_to_download,
                               directory_to_save = directory_to_save,
@@ -541,7 +541,7 @@ testthat::test_that("SEDAC groads download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("SEDAC population download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   years <- c("2020")
@@ -591,7 +591,7 @@ testthat::test_that("SEDAC population download URLs have HTTP status 200.", {
         # extract urls
         urls <- extract_urls(commands = commands, position = 11)
         # check HTTP URL status
-        url_status <- check_urls(urls = urls, size = 1L)
+        url_status <- check_urls(urls = urls, size = 1L, method = "GET")
         # implement unit tests
         test_download_functions(directory_to_download = directory_to_download,
                                 directory_to_save = directory_to_save,
@@ -605,7 +605,7 @@ testthat::test_that("SEDAC population download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("SEDAC population data types are coerced.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   year <- c("totpop")
@@ -638,7 +638,7 @@ testthat::test_that("SEDAC population data types are coerced.", {
     # extract urls
     urls <- extract_urls(commands = commands, position = 11)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 1L)
+    url_status <- check_urls(urls = urls, size = 1L, method = "GET")
     # implement unit tests
     test_download_functions(directory_to_download = directory_to_download,
                             directory_to_save = directory_to_save,
@@ -650,7 +650,7 @@ testthat::test_that("SEDAC population data types are coerced.", {
 })
 
 testthat::test_that("Koppen Geiger download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   time_periods <- c("Present", "Future")
@@ -687,7 +687,7 @@ testthat::test_that("Koppen Geiger download URLs have HTTP status 200.", {
       # extract urls
       urls <- extract_urls(commands = commands, position = 2)
       # check HTTP URL status
-      url_status <- check_urls(urls = urls, size = 1L)
+      url_status <- check_urls(urls = urls, size = 1L, method = "GET")
       # implement unit tests
       test_download_functions(directory_to_download = directory_to_download,
                               directory_to_save = directory_to_save,
@@ -700,7 +700,7 @@ testthat::test_that("Koppen Geiger download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("MODIS-MOD09GA download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   years <- 2020
@@ -741,7 +741,7 @@ testthat::test_that("MODIS-MOD09GA download URLs have HTTP status 200.", {
     # extract urls
     urls <- extract_urls(commands = commands, position = 4)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 10L)
+    url_status <- check_urls(urls = urls, size = 10L, method = "HEAD")
     # implement unit tests
     test_download_functions(directory_to_save = directory_to_save,
                             commands_path = commands_path,
@@ -753,7 +753,7 @@ testthat::test_that("MODIS-MOD09GA download URLs have HTTP status 200.", {
 
 
 testthat::test_that("MODIS-MOD06L2 download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   product <- "MOD06_L2"
@@ -822,7 +822,7 @@ testthat::test_that("MODIS-MOD06L2 download URLs have HTTP status 200.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L)
+  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
@@ -833,7 +833,7 @@ testthat::test_that("MODIS-MOD06L2 download URLs have HTTP status 200.", {
 
 
 testthat::test_that("MODIS download error cases.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   years <- 2020
@@ -958,7 +958,7 @@ testthat::test_that("MODIS download error cases.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 10L)
+  url_status <- check_urls(urls = urls, size = 10L, method = "HEAD")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
@@ -970,7 +970,7 @@ testthat::test_that("MODIS download error cases.", {
 
 
 testthat::test_that("EPA TRI download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- testthat::test_path("..", "testdata/", "")
@@ -998,7 +998,7 @@ testthat::test_that("EPA TRI download URLs have HTTP status 200.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 3)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L)
+  url_status <- check_urls(urls = urls, size = 1L, method = "GET")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
@@ -1009,7 +1009,7 @@ testthat::test_that("EPA TRI download URLs have HTTP status 200.", {
 
 
 testthat::test_that("EPA NEI (AADT) download URLs have HTTP status 200.", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- testthat::test_path("..", "testdata/", "")
@@ -1052,7 +1052,7 @@ testthat::test_that("EPA NEI (AADT) download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("Test error cases in EPA gaftp sources 1", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   tdir <- tempdir()
@@ -1091,7 +1091,7 @@ testthat::test_that("Test error cases in EPA gaftp sources 1", {
 })
 
 testthat::test_that("Test error cases in EPA gaftp sources 2", {
-  withr::local_package("httr2")
+  withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   tdir <- tempdir(check = TRUE)

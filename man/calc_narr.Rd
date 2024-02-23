@@ -28,10 +28,10 @@ a data.frame object;
 }
 \description{
 Extract NOAA NCEP North American Regional Reanalysis (NARR) data at point
-locations using SpatRaster object from \code{process_narr}. Function returns a
-data frame containing NARR variable values at user-defined sites. Unique
-column names reflect variable name, circular buffer, and vertical pressure
-level (if applicable).
+locations using SpatRaster object from \code{process_narr}. Function returns a data
+frame containing GEOS-CF variable values at user-defined sites. Unique column
+names reflect variable name, circular buffer, and vertical pressure level
+(if applicable).
 }
 \author{
 Mitchell Manware
