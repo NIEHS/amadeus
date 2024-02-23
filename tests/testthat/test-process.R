@@ -424,7 +424,11 @@ testthat::test_that("process_conformity tests", {
 testthat::test_that("process_sedac_population returns expected.", {
   withr::local_package("terra")
   paths <- list.files(
-    "../testdata/population/",
+    testthat::test_path(
+      "..",
+      "testdata",
+      "population"
+    ),
     pattern = ".tif",
     full.names = TRUE
   )
@@ -459,7 +463,12 @@ testthat::test_that("process_sedac_population returns expected.", {
 testthat::test_that("process_sedac_population returns null for netCDF.", {
   pop <-
     process_sedac_population(
-      "../testdata/population/pLaCeHoLdEr.nc"
+      testthat::test_path(
+        "..",
+        "testdata",
+        "population",
+        "pLaCeHoLdEr.nc"
+      )
     )
   expect_true(
     is.null(pop)
@@ -483,8 +492,11 @@ testthat::test_that("process_hms returns expected.", {
         date_start = "2022-06-10",
         date_end = "2022-06-11",
         variable = densities[d],
-        path =
-        "../testdata/hms/"
+        path = testthat::test_path(
+          "..",
+          "testdata",
+          "hms"
+        )
       )
     # expect output is a SpatVector or character
     expect_true(
@@ -536,19 +548,23 @@ testthat::test_that("process_gmted returns expected.", {
         process_gmted(
           variable = c(statistic, resolution),
           path =
-          paste0(
-            "../testdata/gmted/",
-            process_gmted_codes(
-              statistic,
-              statistic = TRUE,
-              invert = FALSE
-            ),
-            process_gmted_codes(
-              resolution,
-              resolution = TRUE,
-              invert = FALSE
-            ),
-            "_grd/"
+          testthat::test_path(
+            "..",
+            "testdata",
+            "gmted",
+            paste0(
+              process_gmted_codes(
+                statistic,
+                statistic = TRUE,
+                invert = FALSE
+              ),
+              process_gmted_codes(
+                resolution,
+                resolution = TRUE,
+                invert = FALSE
+              ),
+              "_grd"
+            )
           )
         )
       # expect output is a SpatRaster
@@ -576,7 +592,11 @@ testthat::test_that("import_gmted returns error with non-vector variable.", {
     gmted <-
       process_gmted(
         variable <- "Breakline Emphasis; 7.5 arc-seconds",
-        path = "../testdata/gmted/gmted"
+        path = testthat::test_path(
+          "..",
+          "testdata",
+          "gmted"
+        )
       )
   )
 })
@@ -598,8 +618,10 @@ testthat::test_that("process_narr returns expected.", {
         date_end = "2018-01-01",
         variable = variables[v],
         path =
-        paste0(
-          "../testdata/narr/",
+        testthat::test_path(
+          "..",
+          "testdata",
+          "narr",
           variables[v]
         )
       )
@@ -639,8 +661,8 @@ testthat::test_that("process_narr returns expected.", {
 testthat::test_that("process_geos returns expected.", {
   withr::local_package("terra")
   collections <- c(
-    "aqc_tavg_1hr_g1440x721_v1",
-    "chm_inst_1hr_g1440x721_p23"
+    "a",
+    "c"
   )
   # expect function
   expect_true(
@@ -653,8 +675,11 @@ testthat::test_that("process_geos returns expected.", {
         date_start = "2018-01-01",
         date_end = "2018-01-01",
         variable = "O3",
-        path = paste0(
-          "../testdata/geos/",
+        path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "geos",
           collection
         )
       )
@@ -686,14 +711,14 @@ testthat::test_that("process_geos returns expected.", {
     expect_true(
       "seconds" %in% terra::timeInfo(geos)
     )
-    # expect dimensions according to collectoin
-    if (collection == "aqc_tavg_1hr_g1440x721_v1") {
+    # expect dimensions according to collection
+    if (collection == "a") {
       expect_true(
-        dim(geos)[3] == 24
+        dim(geos)[3] == 1
       )
-    } else if (collection == "chm_inst_1hr_g1440x721_p23") {
+    } else if (collection == "c") {
       expect_true(
-        dim(geos)[3] == 23 * 24
+        dim(geos)[3] == 5
       )
     }
   }
@@ -715,7 +740,12 @@ testthat::test_that("process_geos expected errors.", {
 
 testthat::test_that("proccess support functions return expected.", {
   path <- list.files(
-    "../testdata/geos/aqc_tavg_1hr_g1440x721_v1/",
+    testthat::test_path(
+      "..",
+      "testdata",
+      "geos",
+      "a"
+    ),
     full.names = TRUE
   )
   expect_error(
@@ -746,20 +776,26 @@ testthat::test_that("proccess support functions return expected.", {
 
 testthat::test_that("process_locs_vector vector data and missing columns.", {
   withr::local_package("terra")
-  locs <- readRDS("../testdata/sites_nc.RDS")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
   narr <-
     process_narr(
       date_start = "2018-01-01",
       date_end = "2018-01-01",
       variable = "weasd",
-      path = "../testdata/narr/weasd/"
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "narr",
+        "weasd"
+      )
     )
   # expect error when missing `lat` or `lon`
   expect_error(
     calc_narr(
       from = narr,
       locs = subset(
-        locs,
+        ncp,
         select = "lon"
       ),
       locs_id = "site_id"
@@ -770,7 +806,7 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
     calc_narr(
       from = narr,
       locs = terra::vect(
-        locs,
+        ncp,
         geom = c("lon", "lat"),
         crs = "EPSG:4326"
       ),
