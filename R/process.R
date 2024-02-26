@@ -6,9 +6,17 @@
 #' @param ... Arguments passed to each raw data processing function.
 #'  function.
 #' @seealso
-#' - `process_modis`: `"modis"`, `"MODIS"`
-#' - `process_koppen_geiger`: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
-#' - `process_ecoregion`: `"ecoregion"`, `"ecoregions"`
+#' - [`process_modis`]: `"modis"`, `"MODIS"`
+#' - [`process_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
+#' - [`process_ecoregion`]: `"ecoregion"`, `"ecoregions"`
+#' - [`process_nlcd`]: `"nlcd"`
+#' - [`process_tri`]: `"tri"`
+#' - [`process_nei`]: `"nei"`
+#' - [`process_gmted`]: `"gmted"`
+#' - [`process_aqs`]: `"aqs"`
+#' - [`process_hms`]: `"hms"`, `"smoke"`
+#' - [`process_sedac_groads`]: `"sedac_groads"`, `"roads"`
+#' - [`process_sedac_population`]: `"sedac_population"`, `"population"`
 #' @returns `SpatVector` or `SpatRaster` depending on covariate type.
 #' @author Insang Song
 #' @export
@@ -18,6 +26,7 @@ process_covariates <-
     covariate = c("modis", "koppen-geiger",
                   "koeppen-geiger", "koppen", "koeppen",
                   "geos", "dummies", "gmted", "roads",
+                  "sedac_population", "population",
                   "sedac_groads", "nlcd", "tri", "ncep", "nei",
                   "ecoregions", "ecoregion"),
     path,

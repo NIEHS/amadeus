@@ -6,8 +6,8 @@
 \usage{
 process_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
-    "dummies", "gmted", "roads", "sedac_groads", "nlcd", "tri", "ncep", "nei",
-    "ecoregions", "ecoregion"),
+    "dummies", "gmted", "roads", "sedac_population", "population", "sedac_groads",
+    "nlcd", "tri", "ncep", "nei", "ecoregions", "ecoregion"),
   path,
   ...
 )
@@ -29,9 +29,17 @@ Process covariates
 }
 \seealso{
 \itemize{
-\item \code{process_modis}: \code{"modis"}, \code{"MODIS"}
-\item \code{process_koppen_geiger}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"},
-\item \code{process_ecoregion}: \code{"ecoregion"}, \code{"ecoregions"}
+\item \code{\link{process_modis}}: \code{"modis"}, \code{"MODIS"}
+\item \code{\link{process_koppen_geiger}}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"},
+\item \code{\link{process_ecoregion}}: \code{"ecoregion"}, \code{"ecoregions"}
+\item 
+\item 
+\item 
+\item 
+\item 
+\item \code{\link{process_hms}}: \code{"hms"}, \code{"smoke"}
+\item \code{\link{process_sedac_groads}}: \code{"sedac_groads"}, \code{"roads"}
+\item \code{\link{process_sedac_population}}: \code{"sedac_population"}, \code{"population"}
 }
 }
 \author{
