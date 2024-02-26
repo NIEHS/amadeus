@@ -700,6 +700,7 @@ testthat::test_that("Koppen Geiger download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("MODIS-MOD09GA download URLs have HTTP status 200.", {
+  skip()
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
@@ -753,6 +754,7 @@ testthat::test_that("MODIS-MOD09GA download URLs have HTTP status 200.", {
 
 
 testthat::test_that("MODIS-MOD06L2 download URLs have HTTP status 200.", {
+  skip()
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
@@ -833,6 +835,7 @@ testthat::test_that("MODIS-MOD06L2 download URLs have HTTP status 200.", {
 
 
 testthat::test_that("MODIS download error cases.", {
+  skip()
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters

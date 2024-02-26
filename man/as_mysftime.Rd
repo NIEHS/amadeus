@@ -10,7 +10,12 @@ as_mysftime(x, ...)
 \item{x}{a data.frame, data.table, SpatVector or SpatRasterDataset}
 
 \item{...}{if x is a data.frame or data.table: lonname, latname, timename and
-crs arguments are recquired.}
+crs arguments are required. If x is a sf or sftime, timename argument is
+required. If x is a terra::SpatRaster, varname argument is required.}
+}
+\value{
+a sftime object with constrained time column name
+(see check_mysftime() function)
 }
 \description{
 Convert to sftime object on the form adapted to beethoven code
