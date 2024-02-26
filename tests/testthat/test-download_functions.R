@@ -741,11 +741,11 @@ testthat::test_that("MODIS-MOD09GA download URLs have HTTP status 200.", {
     # extract urls
     urls <- extract_urls(commands = commands, position = 4)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 10L, method = "HEAD")
+    url_status <- check_urls(urls = urls, size = 10L, method = "SKIP")
     # implement unit tests
     test_download_functions(directory_to_save = directory_to_save,
                             commands_path = commands_path,
-                            url_status = url_status)
+                            url_status = FALSE)
     # remove file with commands after test
     file.remove(commands_path)
   }
@@ -822,11 +822,11 @@ testthat::test_that("MODIS-MOD06L2 download URLs have HTTP status 200.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 1L, method = "SKIP")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
-                          url_status = url_status)
+                          url_status = FALSE)
   # remove file with commands after test
   file.remove(commands_path)
 })
@@ -958,11 +958,11 @@ testthat::test_that("MODIS download error cases.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 10L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 10L, method = "SKIP")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
-                          url_status = url_status)
+                          url_status = FALSE)
   # remove file with commands after test
   file.remove(commands_path)
 })

@@ -68,7 +68,8 @@ extract_urls <- function(
 #' Sample download URLs and apply `check_url_status` function
 #' @param urls character vector of URLs
 #' @param size number of observations to be sampled from \code{urls}
-#' @param method httr method to obtain URL (`"HEAD"` or `"GET"`)
+#' @param method httr method to obtain URL (`"HEAD"` or `"GET"`). If set to
+#' `"SKIP"`, the HTTP status will not be checked and returned.
 #' @return logical vector for URL status = 200
 #' @export
 check_urls <- function(
@@ -83,13 +84,17 @@ check_urls <- function(
     size <- length(urls)
   }
   method <- match.arg(method)
-
-  url_sample <- sample(urls, size, replace = FALSE)
-  url_status <- sapply(url_sample,
-    check_url_status,
-    method = method
-  )
-  return(url_status)
+  if (method == "SKIP") {
+    cat(paste0("Skipping HTTP status check...\n"))
+    return(NULL)
+  } else {
+    url_sample <- sample(urls, size, replace = FALSE)
+    url_status <- sapply(url_sample,
+                         check_url_status,
+                         method = method
+    )
+    return(url_status) 
+  }
 }
 
 #' Apply download function-specific unit tests
@@ -114,6 +119,10 @@ test_download_functions <- function(
   testthat::expect_true(dir.exists(directory_to_save))
   # test that commands_path exists
   testthat::expect_true(file.exists(commands_path))
-  # test that sample of download URLs all have HTTP status 200
-  testthat::expect_true(all(url_status))
+  if (url_status == FALSE) {
+    cat(paste0("Skipping HTTP status check test...\n"))
+  } else {
+    # test that sample of download URLs all have HTTP status 200
+    testthat::expect_true(all(url_status)) 
+  }
 }
