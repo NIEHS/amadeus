@@ -22,7 +22,7 @@
 #' * \link{download_narr_monolevel_data}: "narr_monolevel", "monolevel"
 #' * \link{download_narr_p_levels_data}: "narr_p_levels", "p_levels", "plevels"
 #' * \link{download_nlcd_data}: "nlcd", "NLCD"
-#' * \link{download_noaa_hms_smoke_data}: "noaa", "smoke", "hms"
+#' * \link{download_hms_data}: "noaa", "smoke", "hms"
 #' * \link{download_sedac_groads_data}: "sedac_groads", "groads"
 #' * \link{download_sedac_population_data}: "sedac_population", "population"
 #' * \link{download_modis_data}: "modis", "MODIS"
@@ -61,9 +61,9 @@ download_data <-
       p_levels = download_narr_p_levels_data,
       plevels = download_narr_p_levels_data,
       nlcd = download_nlcd_data,
-      noaa = download_noaa_hms_smoke_data,
-      smoke = download_noaa_hms_smoke_data,
-      hms = download_noaa_hms_smoke_data,
+      noaa = download_hms_data,
+      smoke = download_hms_data,
+      hms = download_hms_data,
       sedac_groads = download_sedac_groads_data,
       groads = download_sedac_groads_data,
       sedac_population = download_sedac_population_data,
@@ -438,13 +438,7 @@ download_geos_cf_data <- function(
     sub_hyphen = TRUE
   )
   #### 6. define time sequence
-  collection_end <- substr(collection, nchar(collection), nchar(collection))
-  if (collection_end == "1") {
-    time_sequence <- seq(from = 30, to = 2330, by = 100)
-  } else if (collection_end == "3") {
-    time_sequence <- seq(from = 0, to = 2300, by = 100)
-  }
-  time_sequence <- sprintf("%04d", time_sequence)
+  time_sequence <- generate_time_sequence(collection)
   #### 7. define URL base
   base <- "https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/"
   #### 8. initiate "..._wget_commands.txt" file
@@ -588,20 +582,17 @@ download_gmted_data <- function(
     "/downloads/GMTED/Grid_ZipFiles/"
   )
   #### 7. define URL statistic code
-  statistics <- c(
-    "Breakline Emphasis", "Systematic Subsample",
-    "Median Statistic", "Minimum Statistic",
-    "Mean Statistic", "Maximum Statistic",
-    "Standard Deviation Statistic"
+  statistic_code <- process_gmted_codes(
+    statistic,
+    statistic = TRUE,
+    invert = FALSE
   )
-  statistic_codes <- c("be", "ds", "md", "mi", "mn", "mx", "sd")
-  statistic_codes <- cbind(statistics, statistic_codes)
-  statistic_code <- subset(statistic_codes, statistics == statistic)[2]
   #### 8. define URL resolution code
-  resolutions <- c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds")
-  resolution_codes <- c("75", "15", "30")
-  resolution_codes <- cbind(resolutions, resolution_codes)
-  resolution_code <- subset(resolution_codes, resolutions == resolution)[2]
+  resolution_code <- process_gmted_codes(
+    resolution,
+    resolution = TRUE,
+    invert = FALSE
+  )
   #### 9. build url
   download_url <- paste0(
     base,
@@ -1549,18 +1540,7 @@ download_sedac_population_data <- function(
   #### 5. define year
   year <- ifelse(year == "all", "totpop", as.character(year))
   #### 6. define data resolution
-  resolution_namecodes <- cbind(
-    c(
-      "60 minute", "30 second", "2.5 minute",
-      "15 minute", "30 minute"
-    ),
-    c(
-      "1_deg", "30_sec", "2pt5_min",
-      "15_min", "30_min"
-    )
-  )
-  resolution <-
-    resolution_namecodes[resolution_namecodes[, 1] == data_resolution][2]
+  resolution <- process_sedac_codes(data_resolution)
   #### 7. 30 second resolution not available for all years
   if (year == "totpop" && resolution == "30_sec") {
     resolution <- "2pt5_min"
@@ -1680,7 +1660,7 @@ download_sedac_population_data <- function(
 # nolint start
 #' Download daily wildfire smoke plume data from NOAA Hazard Mapping System Fire and Smoke Product
 #' @description
-#' The \code{download_noaa_hms_smoke_data()} function accesses and downloads
+#' The \code{download_hms_data()} function accesses and downloads
 #' wildfire smoke plume coverage data from
 #' the National Oceanic and Atmospheric Administration's (NOAA)
 #' [Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0).
@@ -1715,7 +1695,7 @@ download_sedac_population_data <- function(
 #' @author Mitchell Manware, Insang Song
 #' @return NULL;
 #' @export
-download_noaa_hms_smoke_data <- function(
+download_hms_data <- function(
     date_start = "2023-09-01",
     date_end = "2023-09-01",
     data_format = "Shapefile",
