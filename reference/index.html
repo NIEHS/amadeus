@@ -75,6 +75,21 @@
         <dd>Calculate EPA Ecoregions level 2/3 binary variables</dd>
       </dl><dl><dt>
           
+          <code><a href="calc_geos.html">calc_geos()</a></code> 
+        </dt>
+        <dd>Calculate NASA GEOS-CF meteorological and atmospheric covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_gmted.html">calc_gmted()</a></code> 
+        </dt>
+        <dd>Calculate GMTED elevation covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_hms.html">calc_hms()</a></code> 
+        </dt>
+        <dd>Calculate NOAA HMS Wildfire Smoke covariates</dd>
+      </dl><dl><dt>
+          
           <code><a href="calc_koppen_geiger.html">calc_koppen_geiger()</a></code> 
         </dt>
         <dd>Calculate Koeppen-Geiger climate zone binary variables</dd>
@@ -90,6 +105,12 @@
         <dd>Calculate MODIS product covariates in multiple CPU threads</dd>
       </dl><dl><dt>
           
+          <code><a href="calc_narr.html">calc_narr()</a></code> 
+        </dt>
+        <dd>Calculate NOAA NCEP North American Regional Reanalysis meteorological
+and atmospheric covariates</dd>
+      </dl><dl><dt>
+          
           <code><a href="calc_nei.html">calc_nei()</a></code> 
         </dt>
         <dd>Calculate National Emission Inventory (NEI) covariates</dd>
@@ -98,6 +119,11 @@
           <code><a href="calc_nlcd_ratio.html">calc_nlcd_ratio()</a></code> 
         </dt>
         <dd>Compute land cover classes ratio in circle buffers around points</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_sedac_population.html">calc_sedac_population()</a></code> 
+        </dt>
+        <dd>Calculate UN WPP-Ajusted population density covariates covariates</dd>
       </dl><dl><dt>
           
           <code><a href="calc_sedc.html">calc_sedc()</a></code> 
@@ -195,6 +221,11 @@
         <dd>Download global elevation data from the Global Multi-resolution Terrain Elevation Data (GMTED2010).</dd>
       </dl><dl><dt>
           
+          <code><a href="download_hms_data.html">download_hms_data()</a></code> 
+        </dt>
+        <dd>Download daily wildfire smoke plume data from NOAA Hazard Mapping System Fire and Smoke Product</dd>
+      </dl><dl><dt>
+          
           <code><a href="download_koppen_geiger_data.html">download_koppen_geiger_data()</a></code> 
         </dt>
         <dd>Download climate classification data from the present and future Köppen-Geiger climate classification maps.</dd>
@@ -228,11 +259,6 @@
           <code><a href="download_nlcd_data.html">download_nlcd_data()</a></code> 
         </dt>
         <dd>Download land cover data from the National Land Cover Database Science Research Products.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="download_noaa_hms_smoke_data.html">download_noaa_hms_smoke_data()</a></code> 
-        </dt>
-        <dd>Download daily wildfire smoke plume data from NOAA Hazard Mapping System Fire and Smoke Product</dd>
       </dl><dl><dt>
           
           <code><a href="download_permit.html">download_permit()</a></code> 
@@ -316,6 +342,11 @@ in data download function.</dd>
         <dd>Generate sequence of dates based on <code>date_start</code> and <code>date_end</code>.</dd>
       </dl><dl><dt>
           
+          <code><a href="generate_time_sequence.html">generate_time_sequence()</a></code> 
+        </dt>
+        <dd>Generate time sequence based on GEOS-CF data collection.</dd>
+      </dl><dl><dt>
+          
           <code><a href="is_date_proper.html">is_date_proper()</a></code> 
         </dt>
         <dd>Check input strings conform to the required format</dd>
@@ -351,9 +382,54 @@ in data download function.</dd>
         <dd>Aggregate layers in a sub-dataset in sinusoidal MODIS products</dd>
       </dl><dl><dt>
           
+          <code><a href="process_geos.html">process_geos()</a></code> 
+        </dt>
+        <dd>Import and clean GEOS-CF data downloaded with
+<code>download_geos_cf_data</code> or <code>download_data(dataset_name = "geos")</code>. Function
+returns a SpatRast object containing the user-defined variables of interest.
+Layer names indicate the variable, pressure level, date (YYYYMMDD), and, if
+applicable, the hour (HHMMSS).</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_geos_collection.html">process_geos_collection()</a></code> 
+        </dt>
+        <dd>Identify GEOS-CF collection based on user-defined file paths</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_gmted.html">process_gmted()</a></code> 
+        </dt>
+        <dd>Import and clean Global Multi-resolution Terrain Elevation Data (GMTED2010)
+downloaded with <code>download_gmted</code> or <code>download_data(dataset_name = "gmted")</code>.
+Function returns a SpatRast object containing the user-defined variable
+of interest at specified resolution. Layer name indicates variable and
+resolution.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_gmted_codes.html">process_gmted_codes()</a></code> 
+        </dt>
+        <dd>Generate statistic and resolution codes based on GMTED statistic and
+resolution.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_hms.html">process_hms()</a></code> 
+        </dt>
+        <dd>Import and clean wildfire smoke plume coverage data from NOAA Hazard
+Mapping System Fire and Smoke Product.</dd>
+      </dl><dl><dt>
+          
           <code><a href="process_koppen_geiger.html">process_koppen_geiger()</a></code> 
         </dt>
         <dd>Process Koeppen-Geiger climate data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_locs_radius.html">process_locs_radius()</a></code> 
+        </dt>
+        <dd>Create circular buffer around site points.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_locs_vector.html">process_locs_vector()</a></code> 
+        </dt>
+        <dd>Import and prepare site point locations for covariate calculations.</dd>
       </dl><dl><dt>
           
           <code><a href="process_modis_merge.html">process_modis_merge()</a></code> 
@@ -376,6 +452,15 @@ in data download function.</dd>
         <dd>Warp MODIS swath data into rectilinear grid raster</dd>
       </dl><dl><dt>
           
+          <code><a href="process_narr.html">process_narr()</a></code> 
+        </dt>
+        <dd>Import and clean NOAA NCEP North American Regional Reanalysis (NARR) data
+downloaded with <code>download_narr</code> or <code>download_data(dataset_name = "NARR")</code>.
+Function returns a SpatRast object containing the user-defined variable
+of interest. Layer names indicate the variable, pressure level, and date
+(YYYYMMDD).</dd>
+      </dl><dl><dt>
+          
           <code><a href="process_nei.html">process_nei()</a></code> 
         </dt>
         <dd>Prepare National Emission Inventory CSV files</dd>
@@ -384,6 +469,17 @@ in data download function.</dd>
           <code><a href="process_nlcd.html">process_nlcd()</a></code> 
         </dt>
         <dd>Process raw National Landuse Classification Dataset</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_sedac_codes.html">process_sedac_codes()</a></code> 
+        </dt>
+        <dd>Generate resolution codes based on NASA SEDAC population resolution.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_sedac_population.html">process_sedac_population()</a></code> 
+        </dt>
+        <dd>Import and clean population data from NASA Socioeconomic Data and
+Applications Center (SEDAC).</dd>
       </dl><dl><dt>
           
           <code><a href="process_tri.html">process_tri()</a></code> 
