@@ -47,7 +47,7 @@ Please refer to:
 \item \link{download_narr_monolevel_data}: "narr_monolevel", "monolevel"
 \item \link{download_narr_p_levels_data}: "narr_p_levels", "p_levels", "plevels"
 \item \link{download_nlcd_data}: "nlcd", "NLCD"
-\item \link{download_noaa_hms_smoke_data}: "noaa", "smoke", "hms"
+\item \link{download_hms_data}: "noaa", "smoke", "hms"
 \item \link{download_sedac_groads_data}: "sedac_groads", "groads"
 \item \link{download_sedac_population_data}: "sedac_population", "population"
 \item \link{download_modis_data}: "modis", "MODIS"
