@@ -14,9 +14,8 @@
 #' @return logical object
 #' @export
 check_url_status <- function(
-  url,
-  method = c("HEAD", "GET")
-) {
+    url,
+    method = c("HEAD", "GET")) {
   method <- match.arg(method)
   http_status_ok <- 200
   if (method == "HEAD") {
@@ -45,7 +44,6 @@ read_commands <- function(
 #' Extract URLs from download commands
 #' @param commands character vector containing download commands
 #' @param position URL position in the vector
-#' @importFrom stringr str_split_i
 #' @return character vector containing download URLs
 #' @export
 extract_urls <- function(
@@ -55,24 +53,28 @@ extract_urls <- function(
     cat(paste0("URL position in command is not defined.\n"))
     return(NULL)
   }
-  url_list <- NULL
-  for (c in seq_along(commands)) {
-    url <- stringr::str_split_i(commands[c], " ", position)
-    url_list <- c(url_list, url)
-  }
-  return(url_list)
+  urls <- sapply(
+    strsplit(
+      commands,
+      " "
+    ),
+    function(x, l) x[l],
+    l = position
+  )
+  return(urls)
 }
 
 #' Sample download URLs and apply `check_url_status` function
 #' @param urls character vector of URLs
 #' @param size number of observations to be sampled from \code{urls}
-#' @param method httr method to obtain URL (`"HEAD"` or `"GET"`)
+#' @param method httr method to obtain URL (`"HEAD"` or `"GET"`). If set to
+#' `"SKIP"`, the HTTP status will not be checked and returned.
 #' @return logical vector for URL status = 200
 #' @export
 check_urls <- function(
     urls = urls,
     size = NULL,
-    method = c("HEAD", "GET")) {
+    method = c("HEAD", "GET", "SKIP")) {
   if (is.null(size)) {
     cat(paste0("URL sample size is not defined.\n"))
     return(NULL)
@@ -81,13 +83,17 @@ check_urls <- function(
     size <- length(urls)
   }
   method <- match.arg(method)
-
-  url_sample <- sample(urls, size, replace = FALSE)
-  url_status <- sapply(url_sample,
-    check_url_status,
-    method = method
-  )
-  return(url_status)
+  if (method == "SKIP") {
+    cat(paste0("Skipping HTTP status check...\n"))
+    return(NULL)
+  } else {
+    url_sample <- sample(urls, size, replace = FALSE)
+    url_status <- sapply(url_sample,
+      check_url_status,
+      method = method
+    )
+    return(url_status)
+  }
 }
 
 #' Apply download function-specific unit tests
@@ -112,6 +118,8 @@ test_download_functions <- function(
   testthat::expect_true(dir.exists(directory_to_save))
   # test that commands_path exists
   testthat::expect_true(file.exists(commands_path))
-  # test that sample of download URLs all have HTTP status 200
-  testthat::expect_true(all(url_status))
+  if (!(is.null(url_status))) {
+    # test that sample of download URLs all have HTTP status 200
+    testthat::expect_true(all(url_status))
+  }
 }

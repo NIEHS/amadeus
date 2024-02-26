@@ -38,7 +38,7 @@ functions <- c(
   "download_geos_cf_data", "download_gmted_data",
   "download_koppen_geiger_data", "download_merra2_data",
   "download_narr_monolevel_data", "download_narr_p_levels_data",
-  "download_nlcd_data", "download_noaa_hms_smoke_data",
+  "download_nlcd_data", "download_hms_data",
   "download_sedac_groads_data", "download_sedac_population_data",
   "download_modis_data"
 )
@@ -102,18 +102,18 @@ kable(functions_sources,
 )
 ```
 
-It is important to note that `data_download()` calls a source-specific function based on the `dataset_name =` parameter. Using the source-specific function directly will return the exact same data (**if the parameters are the same**), but `data_download()` may be beneficial if using a `for` loop to download data from various sources. For example, `download_data(dataset_name = "hms", ...)` will return the same data as `download_noaa_hms_smoke(...)` assuming that `...` indicates the same parameters.
+It is important to note that `data_download()` calls a source-specific function based on the `dataset_name =` parameter. Using the source-specific function directly will return the exact same data (**if the parameters are the same**), but `data_download()` may be beneficial if using a `for` loop to download data from various sources. For example, `download_data(dataset_name = "hms", ...)` will return the same data as `download_hms_data(...)` assuming that `...` indicates the same parameters.
 
 ### Parameters
 
 User-defined parameters differ based on the data source. Required parameters for each source can be checked with `names(formals())`.
 
 ```{r}
-names(formals(download_noaa_hms_smoke_data))
+names(formals(download_hms_data))
 names(formals(download_narr_monolevel_data))
 ```
 
-The two functions have different required parameters because `download_noaa_hms_smoke_data()` uses a daily temporal resolution while `download_narr_monolevel_data()` uses yearly, but they share some common, standard parameters.
+The two functions have different required parameters because `download_hms_data()` uses a daily temporal resolution while `download_narr_monolevel_data()` uses yearly, but they share some common, standard parameters.
 
 #### Standard parameters
 
@@ -156,7 +156,7 @@ Additionally, the `dataset_name =` parameter must be specified when using `data_
 
 ### Function Structure
 
-Although each source-specific download function is unique, they all follow the same general structure. The following chunks of code have been **adopted** from `download_noaa_hms_smoke_data()` to demonstrate the functions' structure.
+Although each source-specific download function is unique, they all follow the same general structure. The following chunks of code have been **adopted** from `download_hms_data()` to demonstrate the functions' structure.
 
 [1. Clean Parameters]
 
@@ -196,7 +196,7 @@ date_sequence
 
 #### 2. Generate download URLs
 
-The URL base and pattern are identified by manually inspecting the download link on the source-specific web page. `download_noaa_hms_smoke_data()` utilizes the year, month, date, and data format to generate the download url.
+The URL base and pattern are identified by manually inspecting the download link on the source-specific web page. `download_hms_data()` utilizes the year, month, date, and data format to generate the download url.
 
 ```{r}
 # user defined parameters
@@ -659,7 +659,7 @@ testthat::test_that(
 ```
 
 
-This test utilizes `expect_error()` because the `data_download()` wrapper function returns an error message if the underlying source-specific download function returns an error. If we directly used the `download_noaa_hms_smoke` function, we would expect and receive an error.
+This test utilizes `expect_error()` because the `data_download()` wrapper function returns an error message if the underlying source-specific download function returns an error. If we directly used the `download_hms_data` function, we would expect and receive an error.
 
 ```{r}
 testthat::test_that(
@@ -671,7 +671,7 @@ testthat::test_that(
     test_directory <- "../inst/extdata/"
     # test for error
     testthat::expect_error(
-      download_noaa_hms_smoke_data(
+      download_hms_data(
         date_start = test_start,
         date_end = test_end,
         data_format = "Shapefile",
@@ -698,7 +698,7 @@ These unit tests are just two of many implemented on `download_data()` and the a
 With the function structure outlined and the unit tests in place, we can now perform a data download. To begin, check the parameters required by the source-specific data download function.
 
 ```{r}
-names(formals(download_noaa_hms_smoke_data))
+names(formals(download_hms_data))
 ```
 
 Define the parameters.
@@ -1055,8 +1055,8 @@ sedac_files
 
 ## Code Example
 
-The following is the entire R code used to create `download_noaa_hms_smoke_data()`.
+The following is the entire R code used to create `download_hms_data()`.
 
 ```{r}
-download_noaa_hms_smoke_data
+download_hms_data
 ```
