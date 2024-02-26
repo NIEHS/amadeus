@@ -472,9 +472,10 @@ process_modis_swath <-
 #' @export
 process_koppen_geiger <-
   function(
-    path = "./input/koppen_geiger/raw/Beck_KG_V1_present_0p0083.tif",
+    path,
     year = NULL
   ) {
+    
     kg_rast <- terra::rast(path)
     return(kg_rast)
   }
@@ -530,7 +531,7 @@ process_nlcd <-
 #' @export
 process_ecoregion <-
   function(
-    path = "./input/data/ecoregions/raw/us_eco_l3_state_boundaries.shp"
+    path,
   ) {
     ecoreg <- terra::vect(path)
     ecoreg <- ecoreg[, grepl("^(L2_KEY|L3_KEY)", names(ecoreg))]
@@ -567,8 +568,7 @@ process_conformity <-
       locs_epsg <- locs$crs_dt
     } else {
       if (!all(keyword %in% names(locs))) {
-        stop("locs should be stdt or 
-have 'lon', 'lat', (and 'time') fields.\n")
+        stop("locs should be stdt or have 'lon', 'lat', (and 'time') fields.\n")
       }
       if (!methods::is(locs, "SpatVector")) {
         if (methods::is(locs, "sf")) {
@@ -624,7 +624,7 @@ have 'lon', 'lat', (and 'time') fields.\n")
 #' @importFrom stats setNames
 #' @export
 process_tri <- function(
-  path = "./input/tri/",
+  path,
   year = 2018,
   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49),
   ...
@@ -786,7 +786,8 @@ process_nei <- function(
 #' @importFrom terra rast
 #' @export
 process_sedac_population <- function(
-    path = "./input/sedac_population/raw/") {
+    path
+) {
   if (substr(path, nchar(path) - 2, nchar(path)) == ".nc") {
     cat(paste0("netCDF functionality for SEDAC data is under construction.\n"))
     return()
@@ -851,7 +852,7 @@ process_hms <- function(
     date_start = "2018-01-01",
     date_end = "2018-01-01",
     variable = c("Light", "Medium", "Heavy"),
-    path = "./input/noaa_hms/raw/") {
+    path) {
   #### directory setup
   path <- download_sanitize_path(path)
   #### check for variable
@@ -1005,7 +1006,7 @@ process_hms <- function(
 #' @export
 process_gmted <- function(
     variable = NULL,
-    path = "../../data/covariates/gmted/") {
+    path) {
   #### directory setup
   path <- download_sanitize_path(path)
   #### check for variable
@@ -1084,7 +1085,7 @@ process_narr <- function(
     date_start = "2023-09-01",
     date_end = "2023-09-01",
     variable = NULL,
-    path = "../../data/covariates/narr/") {
+    path) {
   #### directory setup
   path <- download_sanitize_path(path)
   #### check for variable
@@ -1242,7 +1243,7 @@ process_geos <-
   function(date_start = "2018-01-01",
            date_end = "2018-01-01",
            variable = NULL,
-           path = "../../data/covariates/geos_cf/") {
+           path) {
     #### directory setup
     path <- download_sanitize_path(path)
     #### check for variable
