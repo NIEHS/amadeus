@@ -14,9 +14,8 @@
 #' @return logical object
 #' @export
 check_url_status <- function(
-  url,
-  method = c("HEAD", "GET")
-) {
+    url,
+    method = c("HEAD", "GET")) {
   method <- match.arg(method)
   http_status_ok <- 200
   if (method == "HEAD") {
@@ -75,7 +74,7 @@ extract_urls <- function(
 check_urls <- function(
     urls = urls,
     size = NULL,
-    method = c("HEAD", "GET")) {
+    method = c("HEAD", "GET", "SKIP")) {
   if (is.null(size)) {
     cat(paste0("URL sample size is not defined.\n"))
     return(NULL)
@@ -90,10 +89,10 @@ check_urls <- function(
   } else {
     url_sample <- sample(urls, size, replace = FALSE)
     url_status <- sapply(url_sample,
-                         check_url_status,
-                         method = method
+      check_url_status,
+      method = method
     )
-    return(url_status) 
+    return(url_status)
   }
 }
 
@@ -123,6 +122,6 @@ test_download_functions <- function(
     cat(paste0("Skipping HTTP status check test...\n"))
   } else {
     # test that sample of download URLs all have HTTP status 200
-    testthat::expect_true(all(url_status)) 
+    testthat::expect_true(all(url_status))
   }
 }
