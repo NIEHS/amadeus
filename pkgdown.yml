@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   download_functions: download_functions.html
   epa_download: epa_download.html
-last_built: 2024-02-26T16:56Z
+last_built: 2024-02-26T20:29Z
 urls:
   reference: https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference
   article: https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/articles
