@@ -512,6 +512,7 @@ test_that("as_mysftime works as expected", {
   )
 })
 
+
 test_that("sftime_as_spatvector as expected", {
   # open testing data
   stdata <- data.table::fread(paste0(

@@ -196,8 +196,8 @@ dt_as_mysftime <- function(x, lonname, latname, timename, crs) {
       coords = c(lonname, latname),
       time_column_name = timename,
       crs = crs
-    ) |>
-    dplyr::rename("time" = timename)
+    )
+  mysft <- rename_time(mysft, timename)
   return(mysft)
 }
 
@@ -235,8 +235,7 @@ spatraster_as_sftime <- function(x, varname, timename = "time") {
       time_column_name = "time",
       crs = terra::crs(x)
     )
-  names(output)[names(output) == "time"] <- timename
-  attributes(output)$time_column <- timename
+  output <- rename_time(output, timename)
   return(output)
 }
 
@@ -301,8 +300,7 @@ sf_as_mysftime <- function(x, timename) {
     stop("time column missing or mispelled")
   }
   output <- st_as_sftime(x, time_column_name = timename)
-  attributes(output)$time_column <- "time"
-  output <- dplyr::rename(output, "time" = timename)
+  output <- rename_time(output, "time")
   return(output)
 }
 
@@ -317,9 +315,7 @@ sftime_as_mysftime <- function(x, timename) {
   if (!(timename %in% colnames(x))) {
     stop("time column missing or mispelled")
   }
-  output <- x
-  attributes(output)$time_column <- "time"
-  output <- dplyr::rename(output, "time" = timename)
+  output <- rename_time(x, timename)
   return(output)
 }
 
@@ -373,8 +369,7 @@ as_mysftime <- function(x, ...) {
   } else if (format == "SpatVector") {
     output <- x |>
       spatvector_as_sftime(...)
-    attributes(output)$time_column <- "time"
-    output <- dplyr::rename(output, "time" = ...)
+    output <- rename_time(output, "time")
   } else if (format == "SpatRasterDataset") {
     crs_dt <- terra::crs(x)
     stdf <- as.data.frame(x[1], xy = TRUE)
