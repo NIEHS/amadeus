@@ -118,9 +118,7 @@ test_download_functions <- function(
   testthat::expect_true(dir.exists(directory_to_save))
   # test that commands_path exists
   testthat::expect_true(file.exists(commands_path))
-  if (url_status == FALSE) {
-    cat(paste0("Skipping HTTP status check test...\n"))
-  } else {
+  if (!(is.null(url_status))) {
     # test that sample of download URLs all have HTTP status 200
     testthat::expect_true(all(url_status))
   }
