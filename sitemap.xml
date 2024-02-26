@@ -175,13 +175,13 @@
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/download_unzip.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/dt_to_mysftime.html</loc>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/dt_as_mysftime.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/dt_to_sf.html</loc>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/dt_as_sf.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/dt_to_sftime.html</loc>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/dt_as_sftime.html</loc>
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/extract_urls.html</loc>
@@ -275,6 +275,36 @@
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/read_commands.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/rename_time.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/sf_as_mysftime.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/sftime_as_mysftime.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/sftime_as_sf.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/sftime_as_spatraster.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/sftime_as_spatrds.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/sftime_as_spatvector.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/spatraster_as_sftime.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/spatrds_as_sftime.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/spatvector_as_sftime.html</loc>
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/test_download_functions.html</loc>

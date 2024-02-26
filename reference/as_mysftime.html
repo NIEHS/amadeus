@@ -66,9 +66,17 @@
 
 <dt>...</dt>
 <dd><p>if x is a data.frame or data.table: lonname, latname, timename and
-crs arguments are recquired.</p></dd>
+crs arguments are required. If x is a sf or sftime, timename argument is
+required. If x is a terra::SpatRaster, varname argument is required.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>a sftime object with constrained time column name
+(see check_mysftime() function)</p>
+    </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
     <p>Eva Marques</p>
