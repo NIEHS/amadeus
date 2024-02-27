@@ -1175,10 +1175,11 @@ testthat::test_that("download_hms_data LIVE run.", {
   date <- "2018-01-01"
   directory <- testthat::test_path("..", "testdata", "hms_live")
   # create file to be deleted
+  dir.create(directory)
   file.create(
-    testthat::test_path(
+    paste0(
       directory,
-      "hms_smoke_20180101_20180101_curl_commands.txt"
+      "/hms_smoke_20180101_20180101_curl_commands.txt"
     )
   )
   # run download function
@@ -1207,14 +1208,3 @@ testthat::test_that("download_hms_data LIVE run.", {
   sapply(files, file.remove)
   file.remove(directory)
 })
-
-
-
-
-
-
-
-
-
-
-
