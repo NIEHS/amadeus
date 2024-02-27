@@ -370,19 +370,17 @@ download_ecoregion_data <- function(
   #### 14. remove download command
   download_remove_command(commands_txt = commands_txt,
                           remove = remove_command)
-  if (download) {
-    #### 15. unzip files
-    download_unzip(
-      file_name = download_name,
-      directory_to_unzip = directory_to_save,
-      unzip = unzip
-    )
-    #### 16. remove zip files
-    download_remove_zips(
-      remove = remove_zip,
-      download_name = download_name
-    )
-  }
+  #### 15. unzip files
+  download_unzip(
+    file_name = download_name,
+    directory_to_unzip = directory_to_save,
+    unzip = unzip
+  )
+  #### 16. remove zip files
+  download_remove_zips(
+    remove = remove_zip,
+    download_name = download_name
+  )
 }
 
 # nolint start 
@@ -643,24 +641,22 @@ download_gmted_data <- function(
     download = download,
     system_command = system_command
   )
-  #### 18. Remove command file
+  #### 17. Remove command file
   download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
-  if (download) {
-    #### 17. end if unzip == FALSE
-    download_unzip(
-      file_name = download_name,
-      directory_to_unzip = directory_to_save,
-      unzip = unzip
-    )
-    #### 19. remove zip files
-    download_remove_zips(
-      remove = remove_zip,
-      download_name = download_name
-    )
-  }
+  #### 18. end if unzip == FALSE
+  download_unzip(
+    file_name = download_name,
+    directory_to_unzip = directory_to_save,
+    unzip = unzip
+  )
+  #### 19. remove zip files
+  download_remove_zips(
+    remove = remove_zip,
+    download_name = download_name
+  )
 }
 
 # nolint start
