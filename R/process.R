@@ -847,49 +847,43 @@ process_nei <- function(
     )
   emissions_total_ton <- NULL
   geoid <- NULL
-  yearabbr <- substr(year, 3, 4)
+  # yearabbr <- substr(year, 3, 4)
   csvs_nei$geoid <- sprintf("%05d", as.integer(csvs_nei$geoid))
   csvs_nei <-
     csvs_nei[, list(
       TRF_NEINP_0_00000 = sum(emissions_total_ton, na.rm = TRUE)
     ),
     by = geoid]
-  csvs_nei$Year <- year
+  csvs_nei$nei_year <- year
 
   # read county vector
   cnty_geoid_guess <- grep("GEOID", names(county))
   names(county)[cnty_geoid_guess] <- "geoid"
   county$geoid <- sprintf("%05d", as.integer(county$geoid))
   cnty_vect <- merge(county, csvs_nei, by = "geoid")
-  cnty_vect <- cnty_vect[, c("geoid", "Year", "TRF_NEINP_0_00000")]
-  names(cnty_vect)[3] <- sub("NP", yearabbr, names(cnty_vect)[3])
+  cnty_vect <- cnty_vect[, c("geoid", "nei_year", "TRF_NEINP_0_00000")]
   return(cnty_vect)
 
 }
 
 # nolint start
 #' Filter unique AQS sites with or without temporal information
-#' @param path character(1). Path to daily measurement data.
-#' RDS and CSV are accepted.
+#' @param path character(1). Directory path to daily measurement data.
 #' @param date character(2). Start and end date.
 #'  Should be in `"YYYY-MM-DD"` format and sorted. If `NULL`,
 #'  only unique locations are returned.
-#' @returns data.table object with three or four fields.
-#' - "site_id"
-#' - "lon": in WGS 1984 (EPSG:4326)
-#' - "lat": in WGS 1984 (EPSG:4326)
-#' - "time"
-#' "time" field will be attached only when `include_time = TRUE`.
+#' @param return_format character(1). `"terra"` or `"sf"`.
+#' @returns SpatVector or sf object depending on the `return_format`.
 #' @importFrom data.table as.data.table
 #' @importFrom utils read.csv
 #' @importFrom terra vect
 #' @importFrom terra project
+#' @importFrom sf st_as_sf
+#' @importFrom dplyr group_by
+#' @importFrom dplyr ungroup
+#' @importFrom dplyr filter
 #' @note `date = NULL` will return a massive data.table
 #' object. Please choose proper `date` values.
-#' @examples
-#' library(terra)
-#' library(data.table)
-#' aqs_sites <- process_aqs()
 #' @export
 process_aqs <-
   function(
@@ -897,18 +891,31 @@ process_aqs <-
     date = c("2018-01-01", "2022-12-31"),
     return_format = "terra"
   ) {
-    date <- try(as.Date(date))
-    if (inherits(date, "try-error")) {
-      stop("date has invalid format(s). Please check the values.")
-    }
-    sites <- try(readRDS(path))
-    if (inherits(sites, "try-error")) {
-      stop("Failed to read file from path. Please enter a valid value.")
+    if (!is.null(date)) {
+      date <- try(as.Date(date))
+      if (inherits(date, "try-error")) {
+        stop("date has invalid format(s). Please check the values.")
+      }
+      if (length(date) != 2) {
+        stop("date should be a character vector of length 2.")
+      }
     }
 
-    if (length(date) != 2) {
-      stop("date should be a character vector of length 2.")
+    if (length(path) == 1 && dir.exists(path)) {
+      path <- list.files(
+        path = path,
+        pattern = "*.csv$"
+      )
     }
+    
+    pathfiles <- try(lapply(path, read.csv))
+
+    if (inherits(pathfiles, "try-error")) {
+      stop("path is not a directory or does not contain csv files.")
+    }
+
+    sites <- data.table::rbindlist(pathfiles)
+
     ## get unique sites
     sites$site_id <-
       sprintf("%02d%03d%04d%05d",
@@ -921,6 +928,11 @@ process_aqs <-
     Datum <- NULL
 
     # select relevant fields only
+    sites <- sites |>
+      dplyr::as_tibble() |>
+      dplyr::group_by(site_id) |>
+      dplyr::filter(POC == min(POC)) |>
+      dplyr::ungroup()
     sites_v <- unique(sites[, c("site_id", "Longitude", "Latitude", "Datum")])
     names(sites_v)[2:3] <- c("lon", "lat")
     sites_v <- data.table::as.data.table(sites_v)

@@ -990,9 +990,6 @@ calc_nei <- function(
       stop("locs is unable to be converted to SpatVector.\n")
     }
   }
-  if (!all(c("lon", "lat", "time") %in% names(locs))) {
-    stop("locs should have 'lon', 'lat', and 'time' fields.\n")
-  }
   # spatial join
   locs_re <- terra::project(locs, terra::crs(from))
   locs_re <- terra::intersect(locs_re, from)

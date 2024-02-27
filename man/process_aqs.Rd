@@ -11,22 +11,16 @@ process_aqs(
 )
 }
 \arguments{
-\item{path}{character(1). Path to daily measurement data.
-RDS and CSV are accepted.}
+\item{path}{character(1). Directory path to daily measurement data.}
 
 \item{date}{character(2). Start and end date.
 Should be in \code{"YYYY-MM-DD"} format and sorted. If \code{NULL},
 only unique locations are returned.}
+
+\item{return_format}{character(1). \code{"terra"} or \code{"sf"}.}
 }
 \value{
-data.table object with three or four fields.
-\itemize{
-\item "site_id"
-\item "lon": in WGS 1984 (EPSG:4326)
-\item "lat": in WGS 1984 (EPSG:4326)
-\item "time"
-"time" field will be attached only when \code{include_time = TRUE}.
-}
+SpatVector or sf object depending on the \code{return_format}.
 }
 \description{
 Filter unique AQS sites with or without temporal information
@@ -34,9 +28,4 @@ Filter unique AQS sites with or without temporal information
 \note{
 \code{date = NULL} will return a massive data.table
 object. Please choose proper \code{date} values.
-}
-\examples{
-library(terra)
-library(data.table)
-aqs_sites <- process_aqs()
 }
