@@ -827,3 +827,27 @@ test_that("project_dt works as expected", {
 
   expect_s3_class(dfdtp, "data.table")
 })
+
+testthat::test_that("tests for missing 'time' column across functions.", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  locs <- data.frame(lon = -78.8277, lat = 35.95013)
+  locs$site_id <- "3799900018810101"
+  expect_error(
+    convert_stobj_to_stdt(
+      terra::vect(locs, geom = c("lon", "lat"), crs = "EPSG:4326")
+    )
+  )
+  expect_error(
+    sftime_as_mysftime(
+      locs,
+      "time"
+    )
+  )
+  expect_error(
+    dt_as_sftime(
+      data.table::data.table(locs),
+      "EPSG:4326"
+    )
+  )
+})

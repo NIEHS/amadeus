@@ -35,7 +35,7 @@ testthat::test_that("Error when one parameter is NULL.", {
 
 testthat::test_that("Errors when temporal ranges invalid.", {
   expect_error(
-    download_geos_cf_data(
+    download_geos_data(
       date_start = "1900-01-01",
       collection = "aqc_tavg_1hr_g1440x721_v1",
       data_download_acknowledgement = TRUE,
@@ -46,13 +46,14 @@ testthat::test_that("Errors when temporal ranges invalid.", {
     download_aqs_data(
       year_start = 1900,
       data_download_acknowledgement = TRUE,
-      directory_to_save = "../testdata"
+      directory_to_save = "../testdata",
+      directory_to_download = "../testdata"
     )
   )
   expect_error(
     download_narr_monolevel_data(
       year_start = 1900,
-      collection = "air.sfc",
+      variables = "air.sfc",
       data_download_acknowledgement = TRUE,
       directory_to_save = "../testdata"
     )
@@ -60,7 +61,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
   expect_error(
     download_narr_p_levels_data(
       year_start = 1900,
-      collection = "omega",
+      variables = "omega",
       data_download_acknowledgement = TRUE,
       directory_to_save = "../testdata"
     )
@@ -74,7 +75,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
     )
   )
   expect_error(
-    download_noaa_hms_smoke_data(
+    download_hms_data(
       date_start = "1900-01-01",
       directory_to_save = "../testdata",
       directory_to_download = "../testdata",
