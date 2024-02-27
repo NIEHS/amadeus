@@ -348,6 +348,19 @@ testthat::test_that("NARR monolevel download URLs have HTTP status 200.", {
   file.remove(commands_path)
 })
 
+testthat::test_that("NARR monolevel error with invalid years.", {
+  testthat::expect_error(
+    download_data(
+      dataset_name = "narr_monolevel",
+      variables = "weasd",
+      year_start = 10,
+      year_end = 11,
+      data_download_acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", "")
+    )
+  )
+})
+
 testthat::test_that("NARR p-levels download URLs have HTTP status 200.", {
   withr::local_package("httr")
   withr::local_package("stringr")
@@ -391,36 +404,53 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
   date_end <- "2022-09-21"
   directory_to_download <- testthat::test_path("..", "testdata/", "")
   directory_to_save <- testthat::test_path("..", "testdata/", "")
-  # run download function
-  download_data(dataset_name = "smoke",
-                date_start = date_start,
-                date_end = date_end,
-                directory_to_download = directory_to_download,
-                directory_to_save = directory_to_save,
-                data_download_acknowledgement = TRUE,
-                download = FALSE,
-                remove_command = FALSE,
-                unzip = FALSE,
-                remove_zip = FALSE)
-  # define file path with commands
-  commands_path <- paste0(directory_to_download,
-                          "hms_smoke_",
-                          gsub("-", "", date_start),
-                          "_",
-                          gsub("-", "", date_end),
-                          "_curl_commands.txt")
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
-  # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
-  # remove file with commands after test
-  file.remove(commands_path)
+  data_formats <- c("Shapefile", "KML")
+  for (d in seq_along(data_formats)) {
+    # run download function
+    download_data(dataset_name = "smoke",
+                  date_start = date_start,
+                  date_end = date_end,
+                  data_format = data_formats[d],
+                  directory_to_download = directory_to_download,
+                  directory_to_save = directory_to_save,
+                  data_download_acknowledgement = TRUE,
+                  download = FALSE,
+                  remove_command = FALSE,
+                  unzip = FALSE,
+                  remove_zip = FALSE)
+    # define file path with commands
+    commands_path <- paste0(directory_to_download,
+                            "hms_smoke_",
+                            gsub("-", "", date_start),
+                            "_",
+                            gsub("-", "", date_end),
+                            "_curl_commands.txt")
+    # import commands
+    commands <- read_commands(commands_path = commands_path)
+    # extract urls
+    urls <- extract_urls(commands = commands, position = 6)
+    # check HTTP URL status
+    url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
+    # implement unit tests
+    test_download_functions(directory_to_save = directory_to_save,
+                            commands_path = commands_path,
+                            url_status = url_status)
+    # remove file with commands after test
+    file.remove(commands_path)
+  }
+})
+
+testthat::test_that("download_hms_data error for unzip and directory.", {
+  testthat::expect_error(
+    download_data(
+      dataset_name = "hms",
+      data_download_acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", ""),
+      directory_to_download = testthat::test_path("..", "testdata/", ""),
+      unzip = FALSE,
+      remove_zip = TRUE
+    )
+  )
 })
 
 testthat::test_that("NLCD download URLs have HTTP status 200.", {
@@ -1155,7 +1185,7 @@ testthat::test_that("extract_urls returns NULL undefined position.", {
     "Shapefile/2023/09/hms_smoke20230901.zip"
     )
   urls <- extract_urls(commands = commands)
-  expect_true(
+  testthat::expect_true(
     is.null(urls)
   )
 })
@@ -1166,7 +1196,7 @@ testthat::test_that("check_urls returns NULL undefined size.", {
     "Shapefile/2023/09/hms_smoke20230901.zip"
   )
   url_status <- check_urls(urls = urls, method = "HEAD")
-  expect_true(
+  testthat::expect_true(
     is.null(url_status)
   )
 })
@@ -1196,11 +1226,11 @@ testthat::test_that("download_hms_data LIVE run.", {
     remove_zip = TRUE,
     remove_command = FALSE
   )
-  expect_true(
+  testthat::expect_true(
     length(list.files(directory)) == 5
   )
   commands <- list.files(directory, pattern = ".txt", full.names = TRUE)
-  expect_true(
+  testthat::expect_true(
     file.exists(commands)
   )
   Sys.sleep(1.5)
