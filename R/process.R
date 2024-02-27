@@ -531,7 +531,7 @@ process_nlcd <-
 #' @export
 process_ecoregion <-
   function(
-    path,
+    path
   ) {
     ecoreg <- terra::vect(path)
     ecoreg <- ecoreg[, grepl("^(L2_KEY|L3_KEY)", names(ecoreg))]
@@ -1220,7 +1220,7 @@ process_narr <- function(
 }
 
 #' Import and clean GEOS-CF data downloaded with
-#' `download_geos_cf_data` or `download_data(dataset_name = "geos")`. Function
+#' `download_geos_data` or `download_data(dataset_name = "geos")`. Function
 #' returns a SpatRast object containing the user-defined variables of interest.
 #' Layer names indicate the variable, pressure level, date (YYYYMMDD), and, if
 #' applicable, the hour (HHMMSS).

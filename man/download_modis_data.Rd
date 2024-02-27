@@ -12,7 +12,7 @@ download_modis_data(
   horizontal_tiles = c(7, 13),
   vertical_tiles = c(3, 6),
   nasa_earth_data_token = NULL,
-  directory_to_save = "./input/modis/raw/",
+  directory_to_save,
   data_download_acknowledgement = FALSE,
   mod06_links = NULL,
   download = TRUE,

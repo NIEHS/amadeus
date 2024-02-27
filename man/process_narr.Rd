@@ -12,7 +12,7 @@ process_narr(
   date_start = "2023-09-01",
   date_end = "2023-09-01",
   variable = NULL,
-  path = "../../data/covariates/narr/"
+  path
 )
 }
 \arguments{

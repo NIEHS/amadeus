@@ -5,7 +5,7 @@
 \title{Download data from EPA National Emission Inventory aggregated on-road emission data}
 \usage{
 download_nei_data(
-  directory_to_save = "./input/nei/",
+  directory_to_save,
   data_download_acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,

@@ -1145,3 +1145,76 @@ testthat::test_that("epa certificate", {
     )
   )
 })
+
+testthat::test_that("extract_urls returns NULL undefined position.", {
+  commands <- paste0(
+    "curl -s -o ",
+    "/PATH/hms_smoke_Shapefile_20230901.zip --url ",
+    "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/",
+    "Shapefile/2023/09/hms_smoke20230901.zip"
+    )
+  urls <- extract_urls(commands = commands)
+  expect_true(
+    is.null(urls)
+  )
+})
+
+testthat::test_that("check_urls returns NULL undefined size.", {
+  urls <- paste0(
+    "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/",
+    "Shapefile/2023/09/hms_smoke20230901.zip"
+  )
+  url_status <- check_urls(urls = urls, method = "HEAD")
+  expect_true(
+    is.null(url_status)
+  )
+})
+
+testthat::test_that("download_hms_data LIVE run.", {
+  # function parameters
+  date <- "2018-01-01"
+  directory <- testthat::test_path("..", "testdata", "hms_live")
+  # create file to be deleted
+  file.create(
+    testthat::test_path(
+      directory,
+      "hms_smoke_20180101_20180101_curl_commands.txt"
+    )
+  )
+  # run download function
+  download_data(
+    dataset_name = "hms",
+    date_start = date,
+    date_end = date,
+    directory_to_save = directory,
+    directory_to_download = directory,
+    data_download_acknowledgement = TRUE,
+    download = TRUE,
+    unzip = TRUE,
+    remove_zip = TRUE,
+    remove_command = FALSE
+  )
+  expect_true(
+    length(list.files(directory)) == 5
+  )
+  commands <- list.files(directory, pattern = ".txt", full.names = TRUE)
+  expect_true(
+    file.exists(commands)
+  )
+  Sys.sleep(1.5)
+  # remove directory
+  files <- list.files(directory, full.names = TRUE)
+  sapply(files, file.remove)
+  file.remove(directory)
+})
+
+
+
+
+
+
+
+
+
+
+

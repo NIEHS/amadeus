@@ -131,7 +131,7 @@ download_aqs_data <-
            year_start = 2018,
            year_end = 2022,
            resolution_temporal = "daily",
-           directory_to_download
+           directory_to_download,
            directory_to_save,
            url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
            data_download_acknowledgement = FALSE,
@@ -2325,7 +2325,7 @@ download_modis_data <- function(
 download_tri_data <- function(
   year_start = 2018L,
   year_end = 2022L,
-  directory_to_save =,
+  directory_to_save,
   data_download_acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE

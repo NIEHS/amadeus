@@ -5,7 +5,7 @@
 \title{Import and clean population data from NASA Socioeconomic Data and
 Applications Center (SEDAC).}
 \usage{
-process_sedac_population(path = "./input/sedac_population/raw/")
+process_sedac_population(path)
 }
 \arguments{
 \item{path}{character(1). Path to GeoTIFF or netCDF file.}

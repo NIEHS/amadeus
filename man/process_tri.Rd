@@ -5,7 +5,7 @@
 \title{Prepare Toxic Release Inventory (TRI) data}
 \usage{
 process_tri(
-  path = "./input/tri/",
+  path,
   year = 2018,
   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49),
   ...
