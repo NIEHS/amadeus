@@ -1,5 +1,5 @@
-#' @author Mitchell Manware
-#' @description Unit test for for checking data download functions.
+## test for download functions
+
 testthat::test_that("Error when data_download_acknowledgement = FALSE", {
   download_datasets <- c("aqs", "ecoregion", "geos", "gmted", "koppen",
                          "koppengeiger", "merra2", "merra", "narr_monolevel",
@@ -39,15 +39,15 @@ testthat::test_that("Errors when temporal ranges invalid.", {
       date_start = "1900-01-01",
       collection = "aqc_tavg_1hr_g1440x721_v1",
       data_download_acknowledgement = TRUE,
-      directory_to_save = "../testdata"
+      directory_to_save = testthat::test_path("..", "testdata/", "")
     )
   )
   expect_error(
     download_aqs_data(
       year_start = 1900,
       data_download_acknowledgement = TRUE,
-      directory_to_save = "../testdata",
-      directory_to_download = "../testdata"
+      directory_to_save = testthat::test_path("..", "testdata/", ""),
+      directory_to_download = testthat::test_path("..", "testdata/", "")
     )
   )
   expect_error(
@@ -55,7 +55,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
       year_start = 1900,
       variables = "air.sfc",
       data_download_acknowledgement = TRUE,
-      directory_to_save = "../testdata"
+      directory_to_save = testthat::test_path("..", "testdata/", "")
     )
   )
   expect_error(
@@ -63,22 +63,22 @@ testthat::test_that("Errors when temporal ranges invalid.", {
       year_start = 1900,
       variables = "omega",
       data_download_acknowledgement = TRUE,
-      directory_to_save = "../testdata"
+      directory_to_save = testthat::test_path("..", "testdata/", "")
     )
   )
   expect_error(
     download_merra2_data(
       date_start = "1900-01-01",
       collection = "inst1_2d_asm_Nx",
-      directory_to_save = "../testdata",
+      directory_to_save = testthat::test_path("..", "testdata/", ""),
       data_download_acknowledgement = TRUE
     )
   )
   expect_error(
     download_hms_data(
       date_start = "1900-01-01",
-      directory_to_save = "../testdata",
-      directory_to_download = "../testdata",
+      directory_to_save = testthat::test_path("..", "testdata/", ""),
+      directory_to_download = testthat::test_path("..", "testdata/", ""),
       data_download_acknowledgement = TRUE
     )
   )
@@ -642,8 +642,8 @@ testthat::test_that("SEDAC population data types are coerced.", {
   year <- c("totpop")
   data_formats <- c("GeoTIFF", "ASCII", "netCDF")
   data_resolutions <- c("30 second", "2pt5_min")
-  directory_to_download <- "../testdata/"
-  directory_to_save <- "../testdata/"
+  directory_to_download <- testthat::test_path("..", "testdata/", "")
+  directory_to_save <- testthat::test_path("..", "testdata/", "")
   for (f in seq_along(data_formats)) {
     download_data(dataset_name = "sedac_population",
                   year = year,

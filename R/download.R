@@ -15,7 +15,7 @@
 #' Please refer to:
 #' * \link{download_aqs_data}: "aqs", "AQS"
 #' * \link{download_ecoregion_data}: "ecoregion"
-#' * \link{download_geos_cf_data}: "geos"
+#' * \link{download_geos_data}: "geos"
 #' * \link{download_gmted_data}: "gmted", "GMTED"
 #' * \link{download_koppen_geiger_data}: "koppen", "koppengeiger"
 #' * \link{download_merra2_data}: "merra2", "merra", "MERRA", "MERRA2"
@@ -49,7 +49,7 @@ download_data <-
     what_to_run <- switch(dataset_name,
       aqs = download_aqs_data,
       ecoregion = download_ecoregion_data,
-      geos = download_geos_cf_data,
+      geos = download_geos_data,
       gmted = download_gmted_data,
       koppen = download_koppen_geiger_data,
       koppengeiger = download_koppen_geiger_data,
