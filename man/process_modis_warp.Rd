@@ -4,7 +4,13 @@
 \alias{process_modis_warp}
 \title{Warp MODIS swath data into rectilinear grid raster}
 \usage{
-process_modis_warp(path, cellsize = 0.25, threshold = 0.5, crs = 4326, ...)
+process_modis_warp(
+  path = NULL,
+  cellsize = 0.25,
+  threshold = 0.5,
+  crs = 4326,
+  ...
+)
 }
 \arguments{
 \item{path}{File path of MODIS swath with exact sub-dataset specification.}

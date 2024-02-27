@@ -7,8 +7,8 @@
 download_koppen_geiger_data(
   time_period = c("Present", "Future"),
   data_resolution = c("0.0083", "0.083", "0.5"),
-  directory_to_download = "./input/koppen_geiger/",
-  directory_to_save = "./input/koppen_geiger/",
+  directory_to_download = NULL,
+  directory_to_save = NULL,
   data_download_acknowledgement = FALSE,
   download = FALSE,
   unzip = TRUE,

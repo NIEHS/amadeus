@@ -1,3 +1,92 @@
+testthat::test_that("test generic process_covariates", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  # main test
+  testthat::expect_no_error(
+    covar <- process_covariates(
+      covariate = "tri",
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "tri",
+        ""
+      )
+    )
+  )
+  testthat::expect_no_error(
+    covar <- process_covariates(
+      covariate = "TRI",
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "tri",
+        ""
+      )
+    )
+  )
+  # expect
+  testthat::expect_s4_class(covar, "SpatVector")
+
+  path_vnp46 <-
+    list.files(
+      testthat::test_path("..", "testdata", "modis"),
+      "^VNP46A2",
+      full.names = TRUE
+    )
+
+  corn <- process_bluemarble_corners()
+  testthat::expect_warning(
+    bm_proc <- process_covariates(
+      covariate = "bluemarble",
+      path = path_vnp46[1],
+      tile_df = corn,
+      date = "2018-08-13"
+    )
+  )
+  testthat::expect_warning(
+    process_covariates(
+      covariate = "Bluemarble",
+      path = path_vnp46[1],
+      tile_df = corn,
+      date = "2018-08-13"
+    )
+  )
+  testthat::expect_warning(
+    process_covariates(
+      covariate = "BLUEMARBLE",
+      path = path_vnp46[1],
+      tile_df = corn,
+      date = "2018-08-13"
+    )
+  )
+  testthat::expect_s4_class(bm_proc, "SpatRaster")
+
+  covar_types <- c("modis_swath", "modis_merge",
+                   "koppen-geiger",
+                   "bluemarble",
+                   "koeppen-geiger", "koppen", "koeppen",
+                   "geos", "dummies", "gmted",
+                   "hms", "smoke",
+                   "sedac_population", "population",
+                   "sedac_groads", "groads", "roads",
+                   "nlcd", "narr", "nei",
+                   "ecoregions", "ecoregion")
+  for (cty in covar_types) {
+    testthat::expect_error(
+      process_covariates(
+        covariate = cty
+      )
+    )
+  }
+
+  # match.args works?
+  testthat::expect_error(
+    process_covariates(covariate = "MODIS_ALL")
+  )
+})
+
 testthat::test_that("test MODIS prefilter", {
   # main test
   txt_products <- c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2")

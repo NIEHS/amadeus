@@ -170,7 +170,7 @@ testthat::test_that("calc_modis works well.", {
     base_mod11 <-
       process_modis_merge(
         paths = path_mod11,
-        date_in = "2021-08-15",
+        date = "2021-08-15",
         subdataset = "(LST_)",
         foo = "mean"
       )
@@ -203,7 +203,7 @@ testthat::test_that("calc_modis works well.", {
     suppressWarnings(
       process_modis_swath(
         paths = path_mod06,
-        date_in = "2021-08-15"
+        date = "2021-08-15"
       )
     )
   )
@@ -232,7 +232,7 @@ testthat::test_that("calc_modis works well.", {
   testthat::expect_warning(
     base_vnp <- process_bluemarble(
       paths = path_vnp46,
-      date_in = "2018-08-13",
+      date = "2018-08-13",
       tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
     )
   )
@@ -260,14 +260,14 @@ testthat::test_that("calc_modis works well.", {
   testthat::expect_error(
     process_modis_merge(
       paths = path_mod11,
-      date_in = "2021-08-15",
+      date = "2021-08-15",
       foo = 3L
     )
   )
   testthat::expect_error(
     process_modis_merge(
       paths = path_mod11,
-      date_in = "2021~08~15",
+      date = "2021~08~15",
       foo = "mean"
     )
   )
@@ -315,7 +315,7 @@ testthat::test_that("calc_modis works well.", {
   mcd_merge <-
     process_modis_merge(
       paths = path_mcd19,
-      date_in = "2021-08-15",
+      date = "2021-08-15",
       subdataset = "(Optical_Depth)"
     )
 
@@ -716,8 +716,7 @@ testthat::test_that("calc_hms returns expected.", {
     for (r in seq_along(radii)) {
       hms <-
         process_hms(
-          date_start = "2022-06-10",
-          date_end = "2022-06-11",
+          date = c("2022-06-10", "2022-06-11"),
           variable = density,
           path = testthat::test_path(
             "..",
@@ -775,8 +774,7 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
     for (r in seq_along(radii)) {
       hms <-
         process_hms(
-          date_start = "2022-06-10",
-          date_end = "2022-06-13",
+          date = c("2022-06-10", "2022-06-13"),
           variable = density,
           path = testthat::test_path(
             "..",
@@ -901,8 +899,7 @@ testthat::test_that("calc_narr returns expected.", {
     for (r in seq_along(radii)) {
       narr <-
         process_narr(
-          date_start = "2018-01-01",
-          date_end = "2018-01-01",
+          date = c("2018-01-01", "2018-01-01"),
           variable = variable,
           path =
           testthat::test_path(
@@ -959,8 +956,7 @@ testthat::test_that("calc_geos returns as expected.", {
     for (r in seq_along(radii)) {
       geos <-
         process_geos(
-          date_start = "2018-01-01",
-          date_end = "2018-01-01",
+          date = c("2018-01-01", "2018-01-01"),
           variable = "O3",
           path =
           testthat::test_path(
@@ -1044,4 +1040,43 @@ testthat::test_that("calc_sedac_population returns as expected.", {
       )
     }
   }
+})
+
+
+testthat::test_that("groads calculation works", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  # test data generation
+  ncp <- data.frame(
+    site_id = c("1", "2"),
+    lon = c(-78.899, -78.643669),
+    lat = c(35.8774, 35.785342),
+    time = c(2022, 2022)
+  )
+  # ncp <- terra::vect(ncp, keepgeom = TRUE, crs = "EPSG:4326")
+  path_groads <- testthat::test_path("..", "testdata", "groads_test.gpkg")
+  groads <- terra::vect(path_groads)
+
+  testthat::expect_no_error(
+    groads_res <- calc_sedac_groads(
+      from = groads,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 5000
+    )
+  )
+
+  testthat::expect_error(
+    calc_sedac_groads(
+      from = groads,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0
+    )
+  )
+
+  # expect data.frame
+  testthat::expect_s3_class(groads_res, "data.frame")
 })

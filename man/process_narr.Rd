@@ -9,16 +9,13 @@ of interest. Layer names indicate the variable, pressure level, and date
 (YYYYMMDD).}
 \usage{
 process_narr(
-  date_start = "2023-09-01",
-  date_end = "2023-09-01",
+  date = c("2023-09-01", "2023-09-01"),
   variable = NULL,
   path = "../../data/covariates/narr/"
 )
 }
 \arguments{
-\item{date_start}{character(1). length of 10. Format "YYYY-MM-DD".}
-
-\item{date_end}{character(1). length of 10. Format "YYYY-MM-DD".}
+\item{date}{character(2). length of 10 each. Format "YYYY-MM-DD".}
 
 \item{variable}{character(1). NARR variable name(s).}
 

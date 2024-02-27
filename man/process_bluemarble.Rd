@@ -5,9 +5,9 @@
 \title{Assign VIIRS Blue Marble products corner coordinates to retrieve a merged raster}
 \usage{
 process_bluemarble(
-  path,
-  date,
-  tile_df = NULL,
+  path = NULL,
+  date = NULL,
+  tile_df = process_bluemarble_corners(),
   subdataset = 3L,
   crs = "EPSG:4326",
   ...
@@ -20,13 +20,13 @@ process_bluemarble(
 
 \item{tile_df}{data.frame. Contains four corner coordinates in fields named
 \code{c("xmin", "xmax", "ymin", "ymax")}.
-See \link{process_bluemarble_corners} to generate a valid object for this argument.}
+See \code{\link{process_bluemarble_corners}} to generate a valid object for this argument.}
 
 \item{subdataset}{integer(1). Subdataset number to process.
 Default is 3L.}
 
 \item{crs}{character(1). terra::crs compatible CRS.
-Default is "EPSG:4326"}
+Default is \code{"EPSG:4326"}}
 
 \item{...}{For internal use.}
 }
@@ -45,8 +45,9 @@ are necessary as the original h5 data do not include such information.
 }
 \seealso{
 \itemize{
-\item \link[terra:describe]{terra::describe}
-\item \link[terra:merge]{terra::merge}
+\item \code{\link[terra:describe]{terra::describe}}
+\item \code{\link[terra:merge]{terra::merge}}
+\item \code{\link{process_bluemarble_corners}}
 }
 }
 \author{

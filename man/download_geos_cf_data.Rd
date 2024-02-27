@@ -10,7 +10,7 @@ download_geos_cf_data(
   collection = c("aqc_tavg_1hr_g1440x721_v1", "chm_tavg_1hr_g1440x721_v1",
     "met_tavg_1hr_g1440x721_x1", "xgc_tavg_1hr_g1440x721_x1",
     "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"),
-  directory_to_save = "./input/data/geos_cf/",
+  directory_to_save = NULL,
   data_download_acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE

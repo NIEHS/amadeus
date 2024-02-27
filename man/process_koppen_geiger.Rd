@@ -4,10 +4,7 @@
 \alias{process_koppen_geiger}
 \title{Process Koeppen-Geiger climate data}
 \usage{
-process_koppen_geiger(
-  path = "./input/koppen_geiger/raw/Beck_KG_V1_present_0p0083.tif",
-  year = NULL
-)
+process_koppen_geiger(path = NULL, year = NULL)
 }
 \arguments{
 \item{path}{character(1). Path to Koppen-Geiger

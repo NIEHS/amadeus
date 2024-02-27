@@ -59,8 +59,7 @@ Example use of `process()` using downloaded "weasd" data.
 
 ```
 > weasd <- process_narr(
-+   date_start = "2022-01-01",
-+   date_end = "2022-01-05",
++   date = c("2022-01-01", "2022-01-05"),
 +   variable = "weasd",
 +   path = path
 + )

@@ -32,7 +32,7 @@ calc_covariates <-
                     "geos", "dummies", "gmted", "roads",
                     "ecoregions", "ecoregion", "hms", "noaa", "smoke",
                     "gmted", "narr", "narr_monolevel", "narr_p_levels",
-                    "plevels", "monolevel", "p_levels", "geos", "geos_cf",
+                    "plevels", "monolevel", "p_levels", "geos",
                     "sedac_population", "population"),
       locs,
       from,
@@ -61,15 +61,13 @@ calc_covariates <-
       noaa = calc_hms,
       smoke = calc_hms,
       hms = calc_hms,
-      # sedac_groads = calc_sedac_groads,
-      # roads = calc_sedac_groads,
+      sedac_groads = calc_sedac_groads,
+      roads = calc_sedac_groads,
       sedac_population = calc_sedac_population,
       population = calc_sedac_population,
       nei = calc_nei,
       tri = calc_tri,
-      # ncep = calc_ncep,
       geos = calc_geos,
-      geos_cf = calc_geos,
       gmted = calc_gmted,
       dummies = calc_temporal_dummies
     )
@@ -981,7 +979,7 @@ calc_tri <- function(
 #' @importFrom terra intersect
 #' @export
 calc_nei <- function(
-  locs,
+  locs = NULL,
   from = NULL,
   locs_id = "site_id",
   ...
@@ -1565,7 +1563,7 @@ calc_geos <- function(
   return(data.frame(sites_extracted))
 }
 
-#' Calculate UN WPP-Ajusted population density covariates covariates
+#' Calculate UN WPP-Ajusted population density covariates
 #' @description
 #' Extract population density data at point locations using SpatRaster object
 #' from `process_sedac_population`. Function returns a data frame containing
@@ -1676,4 +1674,87 @@ calc_sedac_population <- function(
   )
   #### return data frame
   return(data.frame(sites_extracted))
+}
+
+
+
+#' Calculate SEDAC groads density covariates
+#' @param from SpatVector(1). Output of `process_sedac_groads`.
+#' @param locs data.frame, characater to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 1000).
+#' @param fun function(1). Function used to summarize the length of roads
+#' within sites location buffer (Default is `sum`).
+#' @description Prepared groads data is clipped with the buffer polygons
+#' of `radius`. The total length of the roads are calculated.
+#' Then the density of the roads is calculated by dividing
+#' the total length from the area of the buffer. `terra::linearUnits()`
+#' is used to convert the unit of length to meters.
+#' @note Unit is km / sq km.
+#' @author Insang Song
+#' @seealso [`process_sedac_groads`]
+#' @return a data.frame object with three columns.
+#' @importFrom terra vect
+#' @importFrom stats aggregate
+#' @importFrom stats setNames
+#' @importFrom terra as.data.frame
+#' @importFrom terra project
+#' @importFrom terra intersect
+#' @importFrom terra perim
+#' @importFrom terra crs
+#' @importFrom terra expanse
+#' @importFrom terra linearUnits
+#' @export
+calc_sedac_groads <- function(
+    from = NULL,
+    locs = NULL,
+    locs_id = NULL,
+    radius = 1000,
+    fun = sum) {
+  #### check for null parameters
+  if (radius <= 0) {
+    stop("radius should be greater than 0.\n")
+  }
+  check_for_null_parameters(mget(ls()))
+  #### prepare sites
+  sites_e <- process_locs_vector(
+    locs,
+    terra::crs(from),
+    radius
+  )
+
+  from_re <- terra::project(from, terra::crs(sites_e))
+  from_re <- from[terra::ext(sites_e), ]
+  from_clip <- terra::intersect(sites_e, from_re)
+  area_buffer <- sites_e[1, ]
+  area_buffer <- terra::expanse(area_buffer)
+
+  from_clip$rlength <- terra::perim(from_clip)
+  from_clip <-
+    aggregate(
+      from_clip$rlength,
+      by = from_clip[[locs_id]],
+      FUN = fun,
+      na.rm = TRUE
+    )
+  # linear unit conversion
+  det_unit <- terra::linearUnits(from_re)
+  if (det_unit == 0) {
+    det_unit <- 1
+  }
+  # km / sq km
+  from_clip[["x"]] <- (from_clip[["x"]] * det_unit / 1e3)
+  from_clip$density <-
+    from_clip[["x"]] / (area_buffer * (det_unit ^ 2) / 1e6)
+  from_clip <-
+    setNames(
+      from_clip,
+      c(locs_id,
+        sprintf("GRD_TOTAL_0_%05d", radius),
+        sprintf("GRD_DENKM_0_%05d", radius))
+    )
+
+  return(from_clip)
 }

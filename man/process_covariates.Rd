@@ -5,10 +5,11 @@
 \title{Process covariates}
 \usage{
 process_covariates(
-  covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
-    "dummies", "gmted", "roads", "sedac_population", "population", "sedac_groads",
-    "nlcd", "tri", "ncep", "nei", "ecoregions", "ecoregion"),
-  path,
+  covariate = c("modis_swath", "modis_merge", "koppen-geiger", "bluemarble",
+    "koeppen-geiger", "koppen", "koeppen", "geos", "dummies", "gmted", "hms", "smoke",
+    "sedac_population", "population", "sedac_groads", "groads", "roads", "nlcd", "tri",
+    "narr", "nei", "ecoregions", "ecoregion"),
+  path = NULL,
   ...
 )
 }
@@ -18,8 +19,7 @@ process_covariates(
 \item{path}{character(1). Directory or file path to raw data
 depending on \code{covariate} value.}
 
-\item{...}{Arguments passed to each raw data processing function.
-function.}
+\item{...}{Arguments passed to each raw data processing function.}
 }
 \value{
 \code{SpatVector} or \code{SpatRaster} depending on covariate type.
@@ -29,16 +29,19 @@ Process covariates
 }
 \seealso{
 \itemize{
-\item \code{\link{process_modis}}: \code{"modis"}, \code{"MODIS"}
+\item 
+\item 
+\item 
 \item \code{\link{process_koppen_geiger}}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"},
 \item \code{\link{process_ecoregion}}: \code{"ecoregion"}, \code{"ecoregions"}
-\item 
-\item 
-\item 
-\item 
-\item 
-\item \code{\link{process_hms}}: \code{"hms"}, \code{"smoke"}
-\item \code{\link{process_sedac_groads}}: \code{"sedac_groads"}, \code{"roads"}
+\item \code{\link{process_nlcd}}: \code{"nlcd"}, \code{"NLCD"}
+\item \code{\link{process_tri}}: \code{"tri"}, \code{"TRI"}
+\item \code{\link{process_nei}}: \code{"nei"}, \verb{"NEI}
+\item \code{\link{process_gmted}}: \code{"gmted"}, \code{"GMTED"}
+\item \code{\link{process_aqs}}: \code{"aqs"}, \code{"AQS"}
+\item \code{\link{process_hms}}: \code{"hms"}, \code{"HMS"}, \code{"smoke"}
+\item \code{\link{process_narr}}: \code{"narr"}, \code{"NARR"}
+\item \code{\link{process_sedac_groads}}: \code{"sedac_groads"}, \code{"roads"}, \code{"groads"}
 \item \code{\link{process_sedac_population}}: \code{"sedac_population"}, \code{"population"}
 }
 }

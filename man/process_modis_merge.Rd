@@ -5,7 +5,7 @@
 \title{Get mosaicked or merged raster from multiple MODIS hdf files}
 \usage{
 process_modis_merge(
-  path,
+  path = NULL,
   date = NULL,
   subdataset = NULL,
   fun_agg = "mean",

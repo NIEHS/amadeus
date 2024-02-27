@@ -5,8 +5,8 @@
 \title{Mosaic MODIS swaths}
 \usage{
 process_modis_swath(
-  path,
-  date,
+  path = NULL,
+  date = NULL,
   subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
   suffix = ":mod06:",
   resolution = 0.025,

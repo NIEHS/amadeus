@@ -5,7 +5,7 @@
 \title{Filter unique AQS sites with or without temporal information}
 \usage{
 process_aqs(
-  path = "./tests/testdata/daily_88101_2018-2022.rds",
+  path = NULL,
   date = c("2018-01-01", "2022-12-31"),
   return_format = "terra"
 )

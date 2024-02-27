@@ -7,8 +7,8 @@
 download_nlcd_data(
   year = 2021,
   collection = "Coterminous United States",
-  directory_to_download = "./input/nlcd/",
-  directory_to_save = "./input/nlcd/",
+  directory_to_download = NULL,
+  directory_to_save = NULL,
   data_download_acknowledgement = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
