@@ -475,7 +475,6 @@ process_koppen_geiger <-
     path,
     year = NULL
   ) {
-    
     kg_rast <- terra::rast(path)
     return(kg_rast)
   }
@@ -786,7 +785,7 @@ process_nei <- function(
 #' @importFrom terra rast
 #' @export
 process_sedac_population <- function(
-    path
+  path
 ) {
   if (substr(path, nchar(path) - 2, nchar(path)) == ".nc") {
     cat(paste0("netCDF functionality for SEDAC data is under construction.\n"))
