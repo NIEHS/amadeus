@@ -20,10 +20,10 @@ calc_modis_par(
 )
 }
 \arguments{
-\item{locs}{sf object. Unique locs where covariates
+\item{locs}{sf/SpatVector object. Unique locs where covariates
 will be calculated.}
 
-\item{from}{character. List of HDF files.}
+\item{from}{character. List of paths to MODIS/VIIRS files.}
 
 \item{locs_id}{character(1). Site identifier. Default is \code{"site_id"}}
 
@@ -58,7 +58,7 @@ to each thread. It should be minimized to spare memory.}
 \item{...}{Arguments passed to \code{preprocess}.}
 }
 \description{
-\code{calc_modis} essentially runs \code{\link{calc_modis_daily}} function
+\code{calc_modis_par} essentially runs \code{\link{calc_modis_daily}} function
 in each thread (subprocess). Based on daily resolution, each day's workload
 will be distributed to each thread. With \code{product} argument,
 the files are processed by a customized function where the unique structure
@@ -72,13 +72,24 @@ Overall, this function and dependent routines assume that the file
 system can handle concurrent access to the (network) disk by multiple
 processes. File system characteristics, package versions, and hardware
 settings and specification can affect the processing efficiency.
+\code{locs} is expected to be convertible to \code{sf} object. \code{sf}, \code{SpatVector}, and
+other class objects that could be converted to \code{sf} can be used.
+Common arguments in \code{preprocess} functions such as \code{date} and \code{path} are
+automatically detected and passed to the function. Please note that
+\code{locs} here and \code{path} in \code{preprocess} functions are assumed to have a
+standard naming convention of raw files from NASA.
 }
 \seealso{
-See details for setting parallelization
+See details for setting parallelization:
 \itemize{
 \item \link[foreach:foreach]{foreach::foreach}
 \item \link[parallelly:makeClusterPSOCK]{parallelly::makeClusterPSOCK}
 \item \link[parallelly:availableCores]{parallelly::availableCores}
 \item \link[doParallel:registerDoParallel]{doParallel::registerDoParallel}
+Also, for \code{preprocess}, see:
+\item \link{process_covariates}
+\item \link{process_modis_merge}
+\item \link{process_modis_swath}
+\item \link{process_bluemarble}
 }
 }

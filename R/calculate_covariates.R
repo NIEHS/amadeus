@@ -472,9 +472,9 @@ calc_modis_daily <- function(
 
 
 #' Calculate MODIS product covariates in multiple CPU threads
-#' @param locs sf object. Unique locs where covariates
+#' @param locs sf/SpatVector object. Unique locs where covariates
 #' will be calculated.
-#' @param from character. List of HDF files.
+#' @param from character. List of paths to MODIS/VIIRS files.
 #' @param locs_id character(1). Site identifier. Default is `"site_id"`
 #' @param preprocess function. Function to handle HDF files.
 #' @param name_covariates character. Name header of covariates.
@@ -497,7 +497,7 @@ calc_modis_daily <- function(
 #' @param export_list_add character. A vector with object names to export
 #'  to each thread. It should be minimized to spare memory.
 #' @param ... Arguments passed to `preprocess`.
-#' @description `calc_modis` essentially runs [`calc_modis_daily`] function
+#' @description `calc_modis_par` essentially runs [`calc_modis_daily`] function
 #' in each thread (subprocess). Based on daily resolution, each day's workload
 #' will be distributed to each thread. With `product` argument,
 #' the files are processed by a customized function where the unique structure
@@ -509,11 +509,22 @@ calc_modis_daily <- function(
 #' system can handle concurrent access to the (network) disk by multiple
 #' processes. File system characteristics, package versions, and hardware
 #' settings and specification can affect the processing efficiency.
-#' @seealso See details for setting parallelization
+#' `locs` is expected to be convertible to `sf` object. `sf`, `SpatVector`, and
+#' other class objects that could be converted to `sf` can be used.
+#' Common arguments in `preprocess` functions such as `date` and `path` are
+#' automatically detected and passed to the function. Please note that
+#' `locs` here and `path` in `preprocess` functions are assumed to have a
+#' standard naming convention of raw files from NASA.
+#' @seealso See details for setting parallelization:
 #' * [foreach::foreach]
 #' * [parallelly::makeClusterPSOCK]
 #' * [parallelly::availableCores]
 #' * [doParallel::registerDoParallel]
+#' Also, for `preprocess`, see:
+#' * [process_covariates]
+#' * [process_modis_merge]
+#' * [process_modis_swath]
+#' * [process_bluemarble]
 #' @importFrom foreach foreach
 #' @importFrom foreach %dopar%
 #' @importFrom methods is
@@ -595,8 +606,8 @@ process_modis_swath, or process_bluemarble.")
         radiusindex <- seq_along(radius)
         radiuslist <- split(radiusindex, radiusindex)
 
-        hdf_args <- append(hdf_args, values = list(date_in = day_to_pick))
-        hdf_args <- append(hdf_args, values = list(paths = hdf_args$from))
+        hdf_args <- append(hdf_args, values = list(date = day_to_pick))
+        hdf_args <- append(hdf_args, values = list(path = hdf_args$from))
         # unified interface with rlang::inject
         vrt_today <-
           rlang::inject(preprocess(!!!hdf_args))
