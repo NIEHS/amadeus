@@ -1,4 +1,3 @@
-# nocov start
 # nolint start
 #' Process covariates
 #' @param covariate character(1). Covariate type.
@@ -83,7 +82,6 @@ the error message above to rectify the error.\n")
 
     return(res_covariate)
   }
-# nocov end
 
 
 #' Selected MODIS sinusoidal grid product subdataset name selector
@@ -237,10 +235,10 @@ process_modis_merge <- function(
     ...) {
 
   if (!is.character(path)) {
-    stop("Argument flist should be a list of hdf files (character).\n")
+    stop("Argument path should be a list of hdf files (character).\n")
   }
   if (!(is.character(fun_agg) || is.function(fun_agg))) {
-    stop("Argument foo should be a function or name of a function
+    stop("Argument fun_agg should be a function or name of a function
          that is accepted in terra::tapp.\n")
   }
   # date format check
@@ -1883,4 +1881,3 @@ process_locs_vector <-
     )
     return(sites_b)
   }
-

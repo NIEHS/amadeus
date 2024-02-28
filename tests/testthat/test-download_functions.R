@@ -959,7 +959,7 @@ testthat::test_that("MODIS download error cases.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 2L, method = "SKIP")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,

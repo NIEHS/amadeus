@@ -476,7 +476,7 @@ calc_modis_daily <- function(
 #' will be calculated.
 #' @param from character. List of HDF files.
 #' @param locs_id character(1). Site identifier. Default is `"site_id"`
-#' @param fun_hdf function. Function to handle HDF files.
+#' @param preprocess function. Function to handle HDF files.
 #' @param name_covariates character. Name header of covariates.
 #' e.g., `"MOD_NDVIF_0_"`.
 #' The calculated covariate names will have a form of
@@ -496,7 +496,7 @@ calc_modis_daily <- function(
 #' loaded.
 #' @param export_list_add character. A vector with object names to export
 #'  to each thread. It should be minimized to spare memory.
-#' @param ... Arguments passed to `fun_hdf`.
+#' @param ... Arguments passed to `preprocess`.
 #' @description `calc_modis` essentially runs [`calc_modis_daily`] function
 #' in each thread (subprocess). Based on daily resolution, each day's workload
 #' will be distributed to each thread. With `product` argument,
@@ -533,7 +533,7 @@ calc_modis_par <-
     locs = NULL,
     from = NULL,
     locs_id = "site_id",
-    fun_hdf = process_modis_merge,
+    preprocess = process_modis_merge,
     name_covariates = NULL,
     radius = c(0L, 1e3L, 1e4L, 5e4L),
     subdataset = NULL,
@@ -543,8 +543,8 @@ calc_modis_par <-
     export_list_add = NULL,
     ...
   ) {
-    if (!is.function(fun_hdf)) {
-      stop("fun_hdf should be one of process_modis_merge,
+    if (!is.function(preprocess)) {
+      stop("preprocess should be one of process_modis_merge,
 process_modis_swath, or process_bluemarble.")
     }
     # read all arguments
@@ -599,7 +599,7 @@ process_modis_swath, or process_bluemarble.")
         hdf_args <- append(hdf_args, values = list(paths = hdf_args$from))
         # unified interface with rlang::inject
         vrt_today <-
-          rlang::inject(fun_hdf(!!!hdf_args))
+          rlang::inject(preprocess(!!!hdf_args))
 
         if (terra::nlyr(vrt_today) != length(name_covariates)) {
           warning("The number of layers in the input raster do not match

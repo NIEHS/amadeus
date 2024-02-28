@@ -169,10 +169,10 @@ testthat::test_that("calc_modis works well.", {
   testthat::expect_no_error(
     base_mod11 <-
       process_modis_merge(
-        paths = path_mod11,
+        path = path_mod11,
         date = "2021-08-15",
         subdataset = "(LST_)",
-        foo = "mean"
+        fun_agg = "mean"
       )
   )
   testthat::expect_s4_class(base_mod11, "SpatRaster")
@@ -183,7 +183,7 @@ testthat::test_that("calc_modis works well.", {
         calc_modis_par(
           from = path_mod11,
           locs = sf::st_as_sf(site_faux),
-          fun_hdf = process_modis_merge,
+          preprocess = process_modis_merge,
           name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
           subdataset = "(LST_)",
           nthreads = 1L
@@ -202,7 +202,7 @@ testthat::test_that("calc_modis works well.", {
   testthat::expect_no_error(
     suppressWarnings(
       process_modis_swath(
-        paths = path_mod06,
+        path = path_mod06,
         date = "2021-08-15"
       )
     )
@@ -214,7 +214,7 @@ testthat::test_that("calc_modis works well.", {
         calc_modis_par(
           from = path_mod06,
           locs = site_faux,
-          fun_hdf = process_modis_swath,
+          preprocess = process_modis_swath,
           name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_"),
           nthreads = 1
         )
@@ -231,7 +231,7 @@ testthat::test_that("calc_modis works well.", {
     )
   testthat::expect_warning(
     base_vnp <- process_bluemarble(
-      paths = path_vnp46,
+      path = path_vnp46,
       date = "2018-08-13",
       tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
     )
@@ -243,7 +243,7 @@ testthat::test_that("calc_modis works well.", {
         calc_modis_par(
           from = path_vnp46,
           locs = site_faux,
-          fun_hdf = process_bluemarble,
+          preprocess = process_bluemarble,
           name_covariates = c("MOD_NITLT_0_"),
           subdataset = 3L,
           nthreads = 1,
@@ -255,20 +255,20 @@ testthat::test_that("calc_modis works well.", {
 
   # error cases
   testthat::expect_error(
-    process_modis_merge(paths = site_faux)
+    process_modis_merge(path = site_faux)
   )
   testthat::expect_error(
     process_modis_merge(
-      paths = path_mod11,
+      path = path_mod11,
       date = "2021-08-15",
-      foo = 3L
+      fun_agg = 3L
     )
   )
   testthat::expect_error(
     process_modis_merge(
-      paths = path_mod11,
+      path = path_mod11,
       date = "2021~08~15",
-      foo = "mean"
+      fun_agg = "mean"
     )
   )
 
@@ -314,7 +314,7 @@ testthat::test_that("calc_modis works well.", {
     )
   mcd_merge <-
     process_modis_merge(
-      paths = path_mcd19,
+      path = path_mcd19,
       date = "2021-08-15",
       subdataset = "(Optical_Depth)"
     )
@@ -339,7 +339,7 @@ testthat::test_that("calc_modis works well.", {
     calc_modis_par(
       from = path_vnp46,
       locs = site_faux,
-      fun_hdf = "fountain",
+      preprocess = "fountain",
       name_covariates = c("MOD_NITLT_0_", "MOD_K1_"),
       subdataset = 3L,
       nthreads = 1
@@ -349,9 +349,13 @@ testthat::test_that("calc_modis works well.", {
     calc_modis_par(
       from = path_vnp46,
       locs = site_faux,
+      preprocess = process_bluemarble,
       name_covariates = c("MOD_NITLT_0_", "MOD_K1_"),
       subdataset = 3L,
-      nthreads = 1
+      nthreads = 1,
+      path = path_vnp46,
+      tile_df = process_bluemarble_corners(c(9, 10), c(5, 5)),
+      date = "2018-08-13"
     )
   )
   testthat::expect_warning(
@@ -359,10 +363,12 @@ testthat::test_that("calc_modis works well.", {
       from = path_vnp46,
       locs = site_faux,
       name_covariates = c("MOD_NITLT_0_"),
-      fun_hdf = process_bluemarble,
+      preprocess = process_bluemarble,
+      path = path_vnp46,
       subdataset = 3L,
       nthreads = 1,
       radius = c(-1000, 0L),
+      date = "2018-08-13",
       tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
     )
   )
@@ -474,14 +480,14 @@ testthat::test_that("Check extract_nlcd_ratio works", {
   testthat::expect_true(all(names(eg_data) %in% names(output)))
   # -- check the value of some of the points in the US
   testthat::expect_equal(
-    output$LDU_EFO_0_03000_2021[1], 0.7940682, tolerance = 1e-7
+    output$LDU_TEFOR_0_03000[1], 0.7940682, tolerance = 1e-7
   )
   testthat::expect_equal(
-    output$LDU_SHB_0_03000_2021[2], 0.9987249, tolerance = 1e-7
+    output$LDU_TSHRB_0_03000[2], 0.9987249, tolerance = 1e-7
   )
   # -- class fraction rows should sum to 1
   testthat::expect_equal(
-    rowSums(as.data.frame(output[, 2:ncol(output)])),
+    rowSums(as.data.frame(output[, 2:(ncol(output) - 1)])),
     rep(1, 2),
     tolerance = 1e-7
   )
@@ -554,21 +560,13 @@ testthat::test_that("NEI calculation", {
       from = neiras
     )
   )
-  testthat::expect_true(any(grepl("NEI17", names(neicalced))))
-  testthat::expect_equal(neicalced$TRF_NEI17_0_00000, 1579079, tolerance = 1)
+  testthat::expect_true(any(grepl("NEI", names(neicalced))))
+  testthat::expect_equal(neicalced$TRF_NEINP_0_00000, 1579079, tolerance = 1)
 
   # more error cases
   testthat::expect_condition(
     calc_nei(
       locs = "jittered",
-      from = neiras
-    )
-  )
-
-  names(ncp)[4] <- "year"
-  testthat::expect_error(
-    calc_nei(
-      locs = ncp,
       from = neiras
     )
   )

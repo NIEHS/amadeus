@@ -8,7 +8,7 @@ calc_modis_par(
   locs = NULL,
   from = NULL,
   locs_id = "site_id",
-  fun_hdf = process_modis_merge,
+  preprocess = process_modis_merge,
   name_covariates = NULL,
   radius = c(0L, 1000L, 10000L, 50000L),
   subdataset = NULL,
@@ -27,7 +27,7 @@ will be calculated.}
 
 \item{locs_id}{character(1). Site identifier. Default is \code{"site_id"}}
 
-\item{fun_hdf}{function. Function to handle HDF files.}
+\item{preprocess}{function. Function to handle HDF files.}
 
 \item{name_covariates}{character. Name header of covariates.
 e.g., \code{"MOD_NDVIF_0_"}.
@@ -55,7 +55,7 @@ loaded.}
 \item{export_list_add}{character. A vector with object names to export
 to each thread. It should be minimized to spare memory.}
 
-\item{...}{Arguments passed to \code{fun_hdf}.}
+\item{...}{Arguments passed to \code{preprocess}.}
 }
 \description{
 \code{calc_modis} essentially runs \code{\link{calc_modis_daily}} function
