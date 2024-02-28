@@ -902,7 +902,8 @@ process_aqs <-
     if (length(path) == 1 && dir.exists(path)) {
       path <- list.files(
         path = path,
-        pattern = "*.csv$"
+        pattern = "*.csv$",
+        full.names = TRUE
       )
     }
     
@@ -981,8 +982,9 @@ process_aqs <-
         sf::st_as_sf(
           final_sites,
           remove = FALSE,
+          dim = "XY",
           coords = c("lon", "lat"),
-          epsg = 4326
+          crs = "EPSG:4326"
         )
       )
 
@@ -1057,12 +1059,11 @@ process_sedac_population <- function(
 # nolint end
 process_sedac_groads <- function(
     path = NULL) {
-  if (!grepl("(.shp$|.gdb$)", path)) {
-    cat(paste0("Input is not in expected format.\n"))
-    return()
-  }
   #### check for variable
   check_for_null_parameters(mget(ls()))
+  if (!grepl("(shp|gdb)$", path)) {
+    stop("Input is not in expected format.\n")
+  }
   #### import data
   data <- terra::vect(path)
   return(data)

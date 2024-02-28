@@ -899,3 +899,80 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
     )
   )
 })
+
+testthat::test_that("process_aqs", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+
+  aqssub <- testthat::test_path(
+    "..",
+    "testdata",
+    "aqs_daily_88101_triangle.csv"
+  )
+  testd <- testthat::test_path(
+    "..", "testdata"
+  )
+
+  # main test
+  testthat::expect_no_error(
+    aqs <- process_aqs(path = aqssub, date = NULL)
+  )
+  testthat::expect_no_error(
+    aqse <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28")
+    )
+  )
+
+  # expect
+  testthat::expect_s4_class(aqs, "SpatVector")
+  testthat::expect_s4_class(aqse, "SpatVector")
+
+  testthat::expect_no_error(
+    aqssf <- process_aqs(path = aqssub, date = NULL, return_format = "sf")
+  )
+  testthat::expect_no_error(
+    aqsesf <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      return_format = "sf"
+    )
+  )
+
+  # expect
+  testthat::expect_s3_class(aqssf, "sf")
+  testthat::expect_s3_class(aqsesf, "sf")
+
+
+  # error cases
+  testthat::expect_error(
+    process_aqs(path = 1L)
+  )
+  testthat::expect_error(
+    process_aqs(path = aqssub, date = c("January", "Januar"))
+  )
+  testthat::expect_error(
+    process_aqs(path = aqssub, date = c("2021-08-15"))
+  )
+  testthat::expect_error(
+    process_aqs(path = testd, date = NULL)
+  )
+})
+
+
+testthat::test_that("test process_sedac_groads", {
+  withr::local_package("terra")
+
+  # main test
+  testthat::expect_no_error(
+    groads <- process_sedac_groads(
+      path = testthat::test_path("../testdata/groads_test.shp")
+    )
+  )
+  # expect
+  testthat::expect_s4_class(groads, "SpatVector")
+  # error cases
+  testthat::expect_error(
+    process_sedac_groads(path = 1L)
+  )
+})

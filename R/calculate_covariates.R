@@ -643,9 +643,6 @@ process_modis_swath, or process_bluemarble.")
                           name_covariates,
                           radius[k])
                 error_df <- sf::st_drop_geometry(locs_input)
-                if (!"time" %in% names(error_df)) {
-                  error_df$time <- day_to_pick
-                }
                 # coerce to avoid errors
                 error_df <- as.data.frame(error_df)
                 error_df <- error_df[, c(locs_id, "time")]

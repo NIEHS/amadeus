@@ -69,13 +69,13 @@ testthat::test_that("calc_dummies works well", {
   colnames(site_faux_err)[4] <- "date"
   testthat::expect_error(
     dum_res <- calc_temporal_dummies(
-      sites = site_faux_err
+      locs = site_faux_err
     )
   )
 
   testthat::expect_error(
     dum_res <- calc_temporal_dummies(
-      sites = as.matrix(site_faux_err)
+      locs = as.matrix(site_faux_err)
     )
   )
 
@@ -191,6 +191,24 @@ testthat::test_that("calc_modis works well.", {
     )
   )
   testthat::expect_s3_class(calc_mod11, "data.frame")
+
+  # ... _add arguments test
+  aux <- 0L
+  testthat::expect_no_error(
+    suppressWarnings(
+      calc_mod11 <-
+        calc_modis_par(
+          from = path_mod11,
+          locs = sf::st_as_sf(site_faux),
+          preprocess = process_modis_merge,
+          package_list_add = c("MASS"),
+          export_list_add = c("aux"),
+          name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
+          subdataset = "(LST_)",
+          nthreads = 1L
+        )
+    )
+  )
 
   # case 2: swath mod06l2
   path_mod06 <-
@@ -1050,7 +1068,7 @@ testthat::test_that("groads calculation works", {
     time = c(2022, 2022)
   )
   # ncp <- terra::vect(ncp, keepgeom = TRUE, crs = "EPSG:4326")
-  path_groads <- testthat::test_path("..", "testdata", "groads_test.gpkg")
+  path_groads <- testthat::test_path("..", "testdata", "groads_test.shp")
   groads <- terra::vect(path_groads)
 
   testthat::expect_no_error(
