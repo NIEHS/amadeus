@@ -578,8 +578,7 @@ testthat::test_that("process_hms returns expected.", {
   for (d in seq_along(densities)) {
     hms <-
       process_hms(
-        date_start = "2022-06-10",
-        date_end = "2022-06-11",
+        date = c("2022-06-10", "2022-06-11"),
         variable = densities[d],
         path = testthat::test_path(
           "..",
@@ -703,8 +702,7 @@ testthat::test_that("process_narr returns expected.", {
   for (v in seq_along(variables)) {
     narr <-
       process_narr(
-        date_start = "2018-01-01",
-        date_end = "2018-01-01",
+        date = c("2018-01-01", "2018-01-01"),
         variable = variables[v],
         path =
         testthat::test_path(
@@ -761,8 +759,7 @@ testthat::test_that("process_geos returns expected.", {
     collection <- collections[c]
     geos <-
       process_geos(
-        date_start = "2018-01-01",
-        date_end = "2018-01-01",
+        date = c("2018-01-01", "2018-01-01"),
         variable = "O3",
         path =
         testthat::test_path(
@@ -869,8 +866,7 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
   ncp$site_id <- "3799900018810101"
   narr <-
     process_narr(
-      date_start = "2018-01-01",
-      date_end = "2018-01-01",
+      date = c("2018-01-01", "2018-01-01"),
       variable = "weasd",
       path = testthat::test_path(
         "..",

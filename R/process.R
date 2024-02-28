@@ -712,7 +712,7 @@ have 'lon', 'lat', (and 'time') fields.\n")
 #' @importFrom stats setNames
 #' @export
 process_tri <- function(
-  path = NULL, 
+  path = NULL,
   year = 2018,
   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49),
   ...
