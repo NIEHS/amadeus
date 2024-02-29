@@ -7,7 +7,7 @@
 
 #' Check if sample of download URLs have HTTP Status 200
 #' @param url Download URL to be checked.
-#' @param method httr method to obtain URL (`"HEAD"`` or `"GET"`)
+#' @param method httr method to obtain URL (`"HEAD"` or `"GET"`)
 #' @author Insang Song; Mitchell Manware
 #' @importFrom httr HEAD
 #' @importFrom httr GET
