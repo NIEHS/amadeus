@@ -29,6 +29,7 @@
 | [NASA SEDAC Global Roads Open Access Data Set](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download) | Shapefile, Geodatabase | Roadways |
 | [NASA SEDAC UN WPP-Adjusted Population Density](https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11) | GeoTIFF, netCDF | Population |
 
+
 See the `download_functions` vignette for a detailed description of source-specific download functions.
 
 Example use of `download_data()` using NOAA NCEP North American Regional Reanalysis's (NARR) "weasd" (Daily Accumulated Snow at Surface) variable.
@@ -118,4 +119,22 @@ Returning weasd covariates.
 14 37183002188101 2022-01-05 monolevel 0.001953125
 15 37063001588101 2022-01-05 monolevel 0.001953125
 ```
+
+## Other sources
+- Below is a list of other data sources that can be accessed via R packages for .
+
+| Source | Link | R package |
+| :----- | :--- | :-------- |
+| Monitoring Trends in Burn Severity (MTBS) | https://www.mtbs.gov/ | |
+| Daymet | https://daac.ornl.gov/cgi-bin/dataset_lister.pl?p=32 | [`daymetr`](https://cran.r-project.org/web/packages/daymetr/index.html) |
+| Gridmet | https://www.climatologylab.org/gridmet.html | [`climateR`](https://github.com/mikejohnson51/climateR?tab=readme-ov-file) |
+| NEX-GDDP-CMIP6 | | [`RClimChange`<sup>*</sup>](https://github.com/hllauca/RClimChange/) |
+| ECMWF (e.g., ERA5) | https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5 | [`ecmwfr`](https://cran.r-project.org/web/packages/ecmwfr/index.html) |
+| Copernicus/Sentinel | https://sentinels.copernicus.eu/web/sentinel/home | [`sen2r`<sup>**</sup>](https://github.com/ranghetti/sen2r) |
+| USGS and EPA Hydrology and Water Quality Data | | [`dataRetrieval`](https://cran.r-project.org/web/packages/dataRetrieval/index.html) |
+| NASA and USGS Satellite Products | | [`luna`](https://github.com/rspatial/luna) |
+
+<sup>*</sup> Updated longer than two years before.
+<sup>**</sup> Archived; no longer maintained.
+
 ## References
