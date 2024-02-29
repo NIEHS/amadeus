@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -171,8 +171,7 @@ Requested files have been downloaded.
 <p>To avoid errors when using <code>process()</code>, <strong>do not edit the raw downloaded data files</strong>. Passing user-generated or edited data into <code>procces()</code> may result in errors as the underlying functions are adapted to each sources’ raw data file type.</p>
 <p>Example use of <code>process()</code> using downloaded “weasd” data.</p>
 <pre><code>&gt; weasd &lt;- process_narr(
-+   date_start = "2022-01-01",
-+   date_end = "2022-01-05",
++   date = c("2022-01-01", "2022-01-05"),
 +   variable = "weasd",
 +   path = path
 + )

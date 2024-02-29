@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -739,7 +739,7 @@ containing the output from <code><a href="../reference/check_url_status.html">ch
 <span><span class="co">## Downloaded files will not be unzipped.</span></span>
 <span><span class="co">## Downloaded files will not be unzipped.</span></span>
 <span><span class="co">## Downloaded files will not be unzipped.</span></span>
-<span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🥇</span></span></code></pre>
+<span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🌈</span></span></code></pre>
 <p>Although the <code>testthat::test_that(...)</code> chunk contains 32
 lines of code, the unit test is performed by
 <code>expect_true(all(url_status))</code>. In words, this line is
@@ -782,11 +782,11 @@ source-specific download function returns an error.</p>
 <pre><code><span><span class="co">## &lt;simpleError in what_to_run(directory_to_save = directory_to_save, data_download_acknowledgement = data_download_acknowledgement,     ...): Invalid date returns HTTP code 404. Check `date_start` parameter.</span></span>
 <span><span class="co">## &gt;</span></span>
 <span><span class="co">## function (date_start = "2023-09-01", date_end = "2023-09-01", </span></span>
-<span><span class="co">##     data_format = "Shapefile", directory_to_download = "./input/noaa_hms/", </span></span>
-<span><span class="co">##     directory_to_save = "./input/noaa_hms/", data_download_acknowledgement = FALSE, </span></span>
+<span><span class="co">##     data_format = "Shapefile", directory_to_download = NULL, </span></span>
+<span><span class="co">##     directory_to_save = NULL, data_download_acknowledgement = FALSE, </span></span>
 <span><span class="co">##     download = FALSE, remove_command = FALSE, unzip = TRUE, remove_zip = FALSE) </span></span>
 <span><span class="co">## NULL</span></span>
-<span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🥇</span></span></code></pre>
+<span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🌈</span></span></code></pre>
 <p>This test utilizes <code><a href="https://testthat.r-lib.org/reference/expect_error.html" class="external-link">expect_error()</a></code> because the
 <code>data_download()</code> wrapper function returns an error message
 if the underlying source-specific download function returns an error. If
@@ -817,7 +817,7 @@ expect and receive an error.</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #00BB00;">Test passed</span> 😸</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🎊</span></span></code></pre>
 <p>As expected, the test passes because the NOAA HMS Smoke data set does
 not contain data for January 1-2, 1800.</p>
 <p>These unit tests are just two of many implemented on
@@ -938,8 +938,8 @@ downloaded properly.</p>
 </h3>
 <p>Visit <a href="http://urs.earthdata.nasa.gov" class="external-link">https://urs.earthdata.nasa.gov/</a>
 to register for or log into a NASA EarthData account.</p>
-<div class="figure">
-<img src="../inst/extdata/vignette_images/NASA_EarthData_login.png" alt=""><p class="caption">NASA EarthData Account Landing Page</p>
+<div class="float">
+<img src="../inst/extdata/vignette_images/NASA_EarthData_login.png" alt="NASA EarthData Account Landing Page"><div class="figcaption">NASA EarthData Account Landing Page</div>
 </div>
 <p>Account registration provides access to NASA’s Earth Observing System
 Data and Information System (EOSDIS) and its twelve Distributed Active
@@ -972,8 +972,8 @@ specifies which NASA EarthData applications can use your login
 credentials. For this example, ensure that authorization is enabled for
 “SEDAC Website”, “SEDAC Website (Alpha)”, and “SEDAC Website
 (Beta)”.</p>
-<div class="figure">
-<img src="../inst/extdata/vignette_images/NASA_EarthData_applications.png" alt=""><p class="caption">NASA EarthData Approved Applications</p>
+<div class="float">
+<img src="../inst/extdata/vignette_images/NASA_EarthData_applications.png" alt="NASA EarthData Approved Applications"><div class="figcaption">NASA EarthData Approved Applications</div>
 </div>
 </div>
 <div class="section level3">
@@ -1150,8 +1150,8 @@ Aeronautics and Space Administration (NASA)</em>. Date accessed: January
 <div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">download_hms_data</span></span></code></pre></div>
 <pre><code><span><span class="co">## function (date_start = "2023-09-01", date_end = "2023-09-01", </span></span>
-<span><span class="co">##     data_format = "Shapefile", directory_to_download = "./input/noaa_hms/", </span></span>
-<span><span class="co">##     directory_to_save = "./input/noaa_hms/", data_download_acknowledgement = FALSE, </span></span>
+<span><span class="co">##     data_format = "Shapefile", directory_to_download = NULL, </span></span>
+<span><span class="co">##     directory_to_save = NULL, data_download_acknowledgement = FALSE, </span></span>
 <span><span class="co">##     download = FALSE, remove_command = FALSE, unzip = TRUE, remove_zip = FALSE) </span></span>
 <span><span class="co">## {</span></span>
 <span><span class="co">##     download_permit(data_download_acknowledgement = data_download_acknowledgement)</span></span>
@@ -1213,7 +1213,7 @@ Aeronautics and Space Administration (NASA)</em>. Date accessed: January
 <span><span class="co">##     }</span></span>
 <span><span class="co">##     download_remove_zips(remove = remove_zip, download_name = download_names)</span></span>
 <span><span class="co">## }</span></span>
-<span><span class="co">## &lt;bytecode: 0x558c2a6f9640&gt;</span></span></code></pre>
+<span><span class="co">## &lt;bytecode: 0x560dfea34158&gt;</span></span></code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

@@ -16,7 +16,7 @@ Köppen-Geiger climate classification maps at
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,8 +67,8 @@ Köppen-Geiger climate classification maps at
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">download_koppen_geiger_data</span><span class="op">(</span></span>
 <span>  time_period <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Present"</span>, <span class="st">"Future"</span><span class="op">)</span>,</span>
 <span>  data_resolution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0.0083"</span>, <span class="st">"0.083"</span>, <span class="st">"0.5"</span><span class="op">)</span>,</span>
-<span>  directory_to_download <span class="op">=</span> <span class="st">"./input/koppen_geiger/"</span>,</span>
-<span>  directory_to_save <span class="op">=</span> <span class="st">"./input/koppen_geiger/"</span>,</span>
+<span>  directory_to_download <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  directory_to_save <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data_download_acknowledgement <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unzip <span class="op">=</span> <span class="cn">TRUE</span>,</span>

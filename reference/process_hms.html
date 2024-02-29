@@ -14,7 +14,7 @@ Mapping System Fire and Smoke Product."><!-- mathjax --><script src="https://cdn
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,23 +62,18 @@ Mapping System Fire and Smoke Product.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">process_hms</span><span class="op">(</span></span>
-<span>  date_start <span class="op">=</span> <span class="st">"2018-01-01"</span>,</span>
-<span>  date_end <span class="op">=</span> <span class="st">"2018-01-01"</span>,</span>
+<span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2018-01-01"</span>, <span class="st">"2018-01-01"</span><span class="op">)</span>,</span>
 <span>  variable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Light"</span>, <span class="st">"Medium"</span>, <span class="st">"Heavy"</span><span class="op">)</span>,</span>
-<span>  path <span class="op">=</span> <span class="st">"./input/noaa_hms/raw/"</span></span>
+<span>  path <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>date_start</dt>
-<dd><p>character(1). length of 10. Start date of downloaded data.
+    <dl><dt>date</dt>
+<dd><p>character(2). length of 10 each.
+Start/end date of downloaded data.
 Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").</p></dd>
-
-
-<dt>date_end</dt>
-<dd><p>character(1). length of 10. End date of downloaded data.
-Format YYYY-MM-DD (ex. September 10, 2023 = "2023-09-10").</p></dd>
 
 
 <dt>variable</dt>

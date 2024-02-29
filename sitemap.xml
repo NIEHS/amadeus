@@ -58,6 +58,9 @@
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/calc_nlcd_ratio.html</loc>
   </url>
   <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/calc_sedac_groads.html</loc>
+  </url>
+  <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/calc_sedac_population.html</loc>
   </url>
   <url>
@@ -202,6 +205,9 @@
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/is_stdt.html</loc>
   </url>
   <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_aqs.html</loc>
+  </url>
+  <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_bluemarble.html</loc>
   </url>
   <url>
@@ -209,6 +215,9 @@
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_conformity.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_covariates.html</loc>
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_ecoregion.html</loc>
@@ -263,6 +272,9 @@
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_sedac_codes.html</loc>
+  </url>
+  <url>
+    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_sedac_groads.html</loc>
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_sedac_population.html</loc>
