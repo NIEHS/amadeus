@@ -4,7 +4,7 @@
 \alias{process_ecoregion}
 \title{Process EPA Ecoregion shapefiles}
 \usage{
-process_ecoregion(path)
+process_ecoregion(path = NULL)
 }
 \arguments{
 \item{path}{character(1). Path to Ecoregion Shapefiles}

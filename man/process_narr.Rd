@@ -8,7 +8,11 @@ Function returns a SpatRast object containing the user-defined variable
 of interest. Layer names indicate the variable, pressure level, and date
 (YYYYMMDD).}
 \usage{
-process_narr(date = c("2023-09-01", "2023-09-01"), variable = NULL, path)
+process_narr(
+  date = c("2023-09-01", "2023-09-01"),
+  variable = NULL,
+  path = NULL
+)
 }
 \arguments{
 \item{date}{character(2). length of 10 each. Format "YYYY-MM-DD".}

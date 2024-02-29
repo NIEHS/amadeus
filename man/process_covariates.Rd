@@ -37,6 +37,7 @@ Process covariates
 \item \code{\link{process_nlcd}}: \code{"nlcd"}, \code{"NLCD"}
 \item \code{\link{process_tri}}: \code{"tri"}, \code{"TRI"}
 \item \code{\link{process_nei}}: \code{"nei"}, \verb{"NEI}
+\item 
 \item \code{\link{process_gmted}}: \code{"gmted"}, \code{"GMTED"}
 \item \code{\link{process_aqs}}: \code{"aqs"}, \code{"AQS"}
 \item \code{\link{process_hms}}: \code{"hms"}, \code{"HMS"}, \code{"smoke"}

@@ -8,7 +8,11 @@ returns a SpatRast object containing the user-defined variables of interest.
 Layer names indicate the variable, pressure level, date (YYYYMMDD), and, if
 applicable, the hour (HHMMSS).}
 \usage{
-process_geos(date = c("2018-01-01", "2018-01-01"), variable = NULL, path)
+process_geos(
+  date = c("2018-01-01", "2018-01-01"),
+  variable = NULL,
+  path = NULL
+)
 }
 \arguments{
 \item{date}{character(2). length of 10. Format "YYYY-MM-DD".}

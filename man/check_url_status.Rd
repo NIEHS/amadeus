@@ -9,7 +9,7 @@ check_url_status(url, method = c("HEAD", "GET"))
 \arguments{
 \item{url}{Download URL to be checked.}
 
-\item{method}{httr method to obtain URL (\verb{"HEAD"`` or }"GET"`)}
+\item{method}{httr method to obtain URL (\code{"HEAD"} or \code{"GET"})}
 }
 \value{
 logical object
