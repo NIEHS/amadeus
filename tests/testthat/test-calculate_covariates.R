@@ -81,6 +81,22 @@ testthat::test_that("calc_dummies works well", {
 
 })
 
+testthat::test_that("calc_temporal_dummies errors.", {
+  withr::local_package("terra")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  testthat::expect_error(
+    calc_temporal_dummies(
+      ncp
+    )
+  )
+  testthat::expect_error(
+    calc_temporal_dummies(
+      terra::vect(ncp)
+    )
+  )
+})
+
 testthat::test_that("calc_ecoregion works well", {
   withr::local_package("terra")
   withr::local_package("sf")

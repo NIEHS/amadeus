@@ -13,6 +13,7 @@
 #' - [`process_nlcd`]: `"nlcd"`, `"NLCD"`
 #' - [`process_tri`]: `"tri"`, `"TRI"`
 #' - [`process_nei`]: `"nei"`, `"NEI`
+#' - [`process_geos`]: `"geos"`
 #' - [`process_gmted`]: `"gmted"`, `"GMTED"`
 #' - [`process_aqs`]: `"aqs"`, `"AQS"`
 #' - [`process_hms`]: `"hms"`, `"HMS"`, `"smoke"`
@@ -76,8 +77,12 @@ process_covariates <-
       }, error = function(e) {
         print(e)
         print(args(what_to_run))
-        stop("Please refer to the argument list and
-the error message above to rectify the error.\n")
+        stop(
+          paste0(
+            "Please refer to the argument list and the error message above to ",
+            "rectify the error.\n"
+          )
+        )
       })
 
     return(res_covariate)
@@ -618,7 +623,7 @@ process_nlcd <-
 #' @export
 process_ecoregion <-
   function(
-    path = "./input/data/ecoregions/raw/us_eco_l3_state_boundaries.shp"
+    path = NULL
   ) {
     ecoreg <- terra::vect(path)
     ecoreg <- ecoreg[, grepl("^(L2_KEY|L3_KEY)", names(ecoreg))]
@@ -655,8 +660,7 @@ process_conformity <-
       locs_epsg <- locs$crs_dt
     } else {
       if (!all(keyword %in% names(locs))) {
-        stop("locs should be stdt or 
-have 'lon', 'lat', (and 'time') fields.\n")
+        stop("locs should be stdt or have 'lon', 'lat', (and 'time') fields.\n")
       }
       if (!methods::is(locs, "SpatVector")) {
         if (methods::is(locs, "sf")) {
@@ -1318,7 +1322,7 @@ process_gmted <- function(
 process_narr <- function(
     date = c("2023-09-01", "2023-09-01"),
     variable = NULL,
-    path = "../../data/covariates/narr/") {
+    path = NULL) {
   #### directory setup
   path <- download_sanitize_path(path)
   #### check for variable
@@ -1453,7 +1457,7 @@ process_narr <- function(
 }
 
 #' Import and clean GEOS-CF data downloaded with
-#' `download_geos_cf_data` or `download_data(dataset_name = "geos")`. Function
+#' `download_geos_data` or `download_data(dataset_name = "geos")`. Function
 #' returns a SpatRast object containing the user-defined variables of interest.
 #' Layer names indicate the variable, pressure level, date (YYYYMMDD), and, if
 #' applicable, the hour (HHMMSS).
@@ -1474,7 +1478,7 @@ process_narr <- function(
 process_geos <-
   function(date = c("2018-01-01", "2018-01-01"),
            variable = NULL,
-           path = "../../data/covariates/geos_cf/") {
+           path = NULL) {
     #### directory setup
     path <- download_sanitize_path(path)
     #### check for variable

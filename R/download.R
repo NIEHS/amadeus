@@ -15,7 +15,7 @@
 #' Please refer to:
 #' * \link{download_aqs_data}: "aqs", "AQS"
 #' * \link{download_ecoregion_data}: "ecoregion"
-#' * \link{download_geos_cf_data}: "geos"
+#' * \link{download_geos_data}: "geos"
 #' * \link{download_gmted_data}: "gmted", "GMTED"
 #' * \link{download_koppen_geiger_data}: "koppen", "koppengeiger"
 #' * \link{download_merra2_data}: "merra2", "merra", "MERRA", "MERRA2"
@@ -49,7 +49,7 @@ download_data <-
     what_to_run <- switch(dataset_name,
       aqs = download_aqs_data,
       ecoregion = download_ecoregion_data,
-      geos = download_geos_cf_data,
+      geos = download_geos_data,
       gmted = download_gmted_data,
       koppen = download_koppen_geiger_data,
       koppengeiger = download_koppen_geiger_data,
@@ -144,7 +144,7 @@ download_aqs_data <-
       data_download_acknowledgement =
         data_download_acknowledgement
     )
-    #### 2. check for null parameteres
+    #### 2. check for null parameters
     check_for_null_parameters(mget(ls()))
     #### 3. directory setup
     directory_to_download <- download_sanitize_path(directory_to_download)
@@ -370,25 +370,23 @@ download_ecoregion_data <- function(
   #### 14. remove download command
   download_remove_command(commands_txt = commands_txt,
                           remove = remove_command)
-  if (download) {
-    #### 15. unzip files
-    download_unzip(
-      file_name = download_name,
-      directory_to_unzip = directory_to_save,
-      unzip = unzip
-    )
-    #### 16. remove zip files
-    download_remove_zips(
-      remove = remove_zip,
-      download_name = download_name
-    )
-  }
+  #### 15. unzip files
+  download_unzip(
+    file_name = download_name,
+    directory_to_unzip = directory_to_save,
+    unzip = unzip
+  )
+  #### 16. remove zip files
+  download_remove_zips(
+    remove = remove_zip,
+    download_name = download_name
+  )
 }
 
 # nolint start 
 #' Download atmospheric composition data from the NASA Global Earth Observing System (GEOS) model.
 #' @description
-#' The \code{download_goes_cf_data()} function accesses and downloads various
+#' The \code{download_geos_data()} function accesses and downloads various
 #' atmospheric composition collections from the [NASA Global Earth Observing System (GEOS) model](https://gmao.gsfc.nasa.gov/GEOS_systems/).
 # nolint end
 #' @param date_start character(1). length of 10. Start date for downloading
@@ -409,7 +407,7 @@ download_ecoregion_data <- function(
 #' @author Mitchell Manware, Insang Song
 #' @return NULL;
 #' @export
-download_geos_cf_data <- function(
+download_geos_data <- function(
     date_start = "2023-09-01",
     date_end = "2023-09-01",
     collection =
@@ -643,24 +641,22 @@ download_gmted_data <- function(
     download = download,
     system_command = system_command
   )
-  #### 18. Remove command file
+  #### 17. Remove command file
   download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
-  if (download) {
-    #### 17. end if unzip == FALSE
-    download_unzip(
-      file_name = download_name,
-      directory_to_unzip = directory_to_save,
-      unzip = unzip
-    )
-    #### 19. remove zip files
-    download_remove_zips(
-      remove = remove_zip,
-      download_name = download_name
-    )
-  }
+  #### 18. end if unzip == FALSE
+  download_unzip(
+    file_name = download_name,
+    directory_to_unzip = directory_to_save,
+    unzip = unzip
+  )
+  #### 19. remove zip files
+  download_remove_zips(
+    remove = remove_zip,
+    download_name = download_name
+  )
 }
 
 # nolint start

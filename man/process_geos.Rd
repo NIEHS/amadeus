@@ -3,7 +3,7 @@
 \name{process_geos}
 \alias{process_geos}
 \title{Import and clean GEOS-CF data downloaded with
-\code{download_geos_cf_data} or \code{download_data(dataset_name = "geos")}. Function
+\code{download_geos_data} or \code{download_data(dataset_name = "geos")}. Function
 returns a SpatRast object containing the user-defined variables of interest.
 Layer names indicate the variable, pressure level, date (YYYYMMDD), and, if
 applicable, the hour (HHMMSS).}
@@ -11,7 +11,7 @@ applicable, the hour (HHMMSS).}
 process_geos(
   date = c("2018-01-01", "2018-01-01"),
   variable = NULL,
-  path = "../../data/covariates/geos_cf/"
+  path = NULL
 )
 }
 \arguments{
@@ -27,7 +27,7 @@ a SpatRaster object;
 }
 \description{
 Import and clean GEOS-CF data downloaded with
-\code{download_geos_cf_data} or \code{download_data(dataset_name = "geos")}. Function
+\code{download_geos_data} or \code{download_data(dataset_name = "geos")}. Function
 returns a SpatRast object containing the user-defined variables of interest.
 Layer names indicate the variable, pressure level, date (YYYYMMDD), and, if
 applicable, the hour (HHMMSS).

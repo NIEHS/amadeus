@@ -11,7 +11,7 @@ of interest. Layer names indicate the variable, pressure level, and date
 process_narr(
   date = c("2023-09-01", "2023-09-01"),
   variable = NULL,
-  path = "../../data/covariates/narr/"
+  path = NULL
 )
 }
 \arguments{
