@@ -121,7 +121,7 @@ Returning weasd covariates.
 ```
 
 ## Other sources
-- Below is a list of other data sources that can be accessed via R packages for .
+- Below is a list of other data sources that can be accessed via R packages for climate and weather datasets.
 
 | Source | Link | R package |
 | :----- | :--- | :-------- |
@@ -133,6 +133,7 @@ Returning weasd covariates.
 | Copernicus/Sentinel | https://sentinels.copernicus.eu/web/sentinel/home | [`sen2r`<sup>**</sup>](https://github.com/ranghetti/sen2r) |
 | USGS and EPA Hydrology and Water Quality Data | | [`dataRetrieval`](https://cran.r-project.org/web/packages/dataRetrieval/index.html) |
 | NASA and USGS Satellite Products | | [`luna`](https://github.com/rspatial/luna) |
+| NOAA Operational Model Archive | [https://nomads.ncep.noaa.gov] | [`rNOMADS`](https://cran.r-project.org/web/packages/rNOMADS/) |
 
 <sup>*</sup> Updated longer than two years before.
 <sup>**</sup> Archived; no longer maintained.
