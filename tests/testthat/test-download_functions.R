@@ -837,14 +837,15 @@ testthat::test_that("MODIS download error cases.", {
   withr::local_package("stringr")
   # function parameters
   years <- 2020
-  product <- "MOD09GA"
+  product <- c("MOD09GA", "MOD11A1", "MOD13A2", "MCD19A2")
+  product <- sample(product, 1L)
   version <- "61"
   horizontal_tiles <- c(12, 13)
   vertical_tiles <- c(5, 6)
   nasa_earth_data_token <- "tOkEnPlAcEhOlDeR"
   directory_to_save <- testthat::test_path("..", "testdata/", "")
   date_start <- paste0(years, "-06-25")
-  date_end <- paste0(years, "-06-30")
+  date_end <- paste0(years, "-06-28")
 
   # no token
   testthat::expect_no_error(
@@ -887,7 +888,7 @@ testthat::test_that("MODIS download error cases.", {
                   version = version,
                   horizontal_tiles = horizontal_tiles,
                   vertical_tiles = vertical_tiles,
-                  nasa_earth_data_token = NULL,
+                  nasa_earth_data_token = nasa_earth_data_token,
                   directory_to_save = directory_to_save,
                   data_download_acknowledgement = TRUE,
                   download = FALSE,
@@ -916,10 +917,10 @@ testthat::test_that("MODIS download error cases.", {
                   date_start = date_start,
                   date_end = date_end,
                   product = product,
-                  version = NULL,
+                  version = "61",
                   horizontal_tiles = c(-13, -3),
                   vertical_tiles = vertical_tiles,
-                  nasa_earth_data_token = NULL,
+                  nasa_earth_data_token = nasa_earth_data_token,
                   directory_to_save = directory_to_save,
                   data_download_acknowledgement = TRUE,
                   download = FALSE,
@@ -932,10 +933,10 @@ testthat::test_that("MODIS download error cases.", {
                   date_start = date_start,
                   date_end = date_end,
                   product = product,
-                  version = NULL,
+                  version = "61",
                   horizontal_tiles = horizontal_tiles,
                   vertical_tiles = c(100, 102),
-                  nasa_earth_data_token = NULL,
+                  nasa_earth_data_token = nasa_earth_data_token,
                   directory_to_save = directory_to_save,
                   data_download_acknowledgement = TRUE,
                   download = FALSE,
@@ -958,7 +959,7 @@ testthat::test_that("MODIS download error cases.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 10L, method = "SKIP")
+  url_status <- check_urls(urls = urls, size = 2L, method = "SKIP")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,

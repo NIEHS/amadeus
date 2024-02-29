@@ -7,7 +7,7 @@
 download_tri_data(
   year_start = 2018L,
   year_end = 2022L,
-  directory_to_save = "./input/tri/",
+  directory_to_save = NULL,
   data_download_acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE

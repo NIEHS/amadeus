@@ -18,7 +18,7 @@ download_merra2_data(
     "tavg3_3d_mst_Np", "tavg3_3d_rad_Np", "tavg3_3d_tdt_Np", "tavg3_3d_trb_Np",
     "tavg3_3d_udt_Np", "tavg3_3d_odt_Np", "tavg3_3d_qdt_Np", "tavg3_3d_asm_Nv",
     "tavg3_3d_cld_Nv", "tavg3_3d_mst_Nv", "tavg3_3d_rad_Nv", "tavg3_2d_glc_Nx"),
-  directory_to_save = "./input/merra2/",
+  directory_to_save = NULL,
   data_download_acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE

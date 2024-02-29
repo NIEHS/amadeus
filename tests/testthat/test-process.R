@@ -1,3 +1,92 @@
+testthat::test_that("test generic process_covariates", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  # main test
+  testthat::expect_no_error(
+    covar <- process_covariates(
+      covariate = "tri",
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "tri",
+        ""
+      )
+    )
+  )
+  testthat::expect_no_error(
+    covar <- process_covariates(
+      covariate = "TRI",
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "tri",
+        ""
+      )
+    )
+  )
+  # expect
+  testthat::expect_s4_class(covar, "SpatVector")
+
+  path_vnp46 <-
+    list.files(
+      testthat::test_path("..", "testdata", "modis"),
+      "^VNP46A2",
+      full.names = TRUE
+    )
+
+  corn <- process_bluemarble_corners()
+  testthat::expect_warning(
+    bm_proc <- process_covariates(
+      covariate = "bluemarble",
+      path = path_vnp46[1],
+      tile_df = corn,
+      date = "2018-08-13"
+    )
+  )
+  testthat::expect_warning(
+    process_covariates(
+      covariate = "Bluemarble",
+      path = path_vnp46[1],
+      tile_df = corn,
+      date = "2018-08-13"
+    )
+  )
+  testthat::expect_warning(
+    process_covariates(
+      covariate = "BLUEMARBLE",
+      path = path_vnp46[1],
+      tile_df = corn,
+      date = "2018-08-13"
+    )
+  )
+  testthat::expect_s4_class(bm_proc, "SpatRaster")
+
+  covar_types <- c("modis_swath", "modis_merge",
+                   "koppen-geiger",
+                   "bluemarble",
+                   "koeppen-geiger", "koppen", "koeppen",
+                   "geos", "dummies", "gmted",
+                   "hms", "smoke",
+                   "sedac_population", "population",
+                   "sedac_groads", "groads", "roads",
+                   "nlcd", "narr", "nei",
+                   "ecoregions", "ecoregion")
+  for (cty in covar_types) {
+    testthat::expect_error(
+      process_covariates(
+        covariate = cty
+      )
+    )
+  }
+
+  # match.args works?
+  testthat::expect_error(
+    process_covariates(covariate = "MODIS_ALL")
+  )
+})
+
 testthat::test_that("test MODIS prefilter", {
   # main test
   txt_products <- c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2")
@@ -105,8 +194,8 @@ testthat::test_that("process_modis_merge is good to go", {
     )
   testthat::expect_no_error(
     process_modis_merge(
-      paths = path_mod11,
-      date_in = "2021-08-15",
+      path = path_mod11,
+      date = "2021-08-15",
       subdataset = "(LST_)"
     )
   )
@@ -118,8 +207,8 @@ testthat::test_that("process_modis_merge is good to go", {
     )
   testthat::expect_no_error(
     process_modis_merge(
-      paths = path_mod13,
-      date_in = "2021-08-13",
+      path = path_mod13,
+      date = "2021-08-13",
       subdataset = "(NDVI)"
     )
   )
@@ -132,8 +221,8 @@ testthat::test_that("process_modis_merge is good to go", {
     )
   testthat::expect_no_error(
     process_modis_merge(
-      paths = path_mcd19,
-      date_in = "2021-08-15",
+      path = path_mcd19,
+      date = "2021-08-15",
       subdataset = "(Optical_Depth)"
     )
   )
@@ -146,8 +235,8 @@ testthat::test_that("process_modis_merge is good to go", {
     )
   testthat::expect_no_error(
     process_modis_merge(
-      paths = path_mod09,
-      date_in = "2021-08-15",
+      path = path_mod09,
+      date = "2021-08-15",
       subdataset = "(sur_refl_b0)"
     )
   )
@@ -160,8 +249,8 @@ testthat::test_that("process_modis_merge is good to go", {
   )
   testthat::expect_no_error(
     process_modis_merge(
-      paths = paths_mod13,
-      date_in = "2021-08-13",
+      path = paths_mod13,
+      date = "2021-08-13",
       subdataset = "(NDVI)"
     )
   )
@@ -189,9 +278,9 @@ testthat::test_that("VNP46 preprocess tests", {
 
   testthat::expect_warning(
     vnp46_proc <- process_bluemarble(
-      paths = path_vnp46[1],
+      path = path_vnp46[1],
       tile_df = corn,
-      date_in = "2018-08-13"
+      date = "2018-08-13"
     )
   )
   testthat::expect_s4_class(vnp46_proc, "SpatRaster")
@@ -199,10 +288,10 @@ testthat::test_that("VNP46 preprocess tests", {
 
   testthat::expect_warning(
     vnp46_proc2 <- process_bluemarble(
-      paths = path_vnp46[1],
+      path = path_vnp46[1],
       tile_df = corn,
       subdataset = c(3L, 5L),
-      date_in = "2018-08-13"
+      date = "2018-08-13"
     )
   )
 
@@ -211,9 +300,9 @@ testthat::test_that("VNP46 preprocess tests", {
 
   testthat::expect_error(
     process_bluemarble(
-      paths = path_vnp46[1],
+      path = path_vnp46[1],
       tile_df = corn,
-      date_in = "2018~08~13"
+      date = "2018~08~13"
     )
   )
 
@@ -261,27 +350,27 @@ testthat::test_that("Other MODIS function errors", {
   testthat::expect_no_error(
     suppressWarnings(
       process_modis_swath(
-        paths = path_mod06e,
-        date_in = "2021-08-15"
+        path = path_mod06e,
+        date = "2021-08-15"
       )
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      paths = path_mod06e,
-      date_in = "2021~08~15"
+      path = path_mod06e,
+      date = "2021~08~15"
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      paths = path_mod06e,
-      date_in = "2021-13-15"
+      path = path_mod06e,
+      date = "2021-13-15"
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      paths = path_mod06e,
-      date_in = "2021-12-45"
+      path = path_mod06e,
+      date = "2021-12-45"
     )
   )
 })
@@ -489,8 +578,7 @@ testthat::test_that("process_hms returns expected.", {
   for (d in seq_along(densities)) {
     hms <-
       process_hms(
-        date_start = "2022-06-10",
-        date_end = "2022-06-11",
+        date = c("2022-06-10", "2022-06-11"),
         variable = densities[d],
         path = testthat::test_path(
           "..",
@@ -614,8 +702,7 @@ testthat::test_that("process_narr returns expected.", {
   for (v in seq_along(variables)) {
     narr <-
       process_narr(
-        date_start = "2018-01-01",
-        date_end = "2018-01-01",
+        date = c("2018-01-01", "2018-01-01"),
         variable = variables[v],
         path =
         testthat::test_path(
@@ -672,8 +759,7 @@ testthat::test_that("process_geos returns expected.", {
     collection <- collections[c]
     geos <-
       process_geos(
-        date_start = "2018-01-01",
-        date_end = "2018-01-01",
+        date = c("2018-01-01", "2018-01-01"),
         variable = "O3",
         path =
         testthat::test_path(
@@ -780,8 +866,7 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
   ncp$site_id <- "3799900018810101"
   narr <-
     process_narr(
-      date_start = "2018-01-01",
-      date_end = "2018-01-01",
+      date = c("2018-01-01", "2018-01-01"),
       variable = "weasd",
       path = testthat::test_path(
         "..",
@@ -812,5 +897,82 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
       ),
       locs_id = "site_id"
     )
+  )
+})
+
+testthat::test_that("process_aqs", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+
+  aqssub <- testthat::test_path(
+    "..",
+    "testdata",
+    "aqs_daily_88101_triangle.csv"
+  )
+  testd <- testthat::test_path(
+    "..", "testdata"
+  )
+
+  # main test
+  testthat::expect_no_error(
+    aqs <- process_aqs(path = aqssub, date = NULL)
+  )
+  testthat::expect_no_error(
+    aqse <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28")
+    )
+  )
+
+  # expect
+  testthat::expect_s4_class(aqs, "SpatVector")
+  testthat::expect_s4_class(aqse, "SpatVector")
+
+  testthat::expect_no_error(
+    aqssf <- process_aqs(path = aqssub, date = NULL, return_format = "sf")
+  )
+  testthat::expect_no_error(
+    aqsesf <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      return_format = "sf"
+    )
+  )
+
+  # expect
+  testthat::expect_s3_class(aqssf, "sf")
+  testthat::expect_s3_class(aqsesf, "sf")
+
+
+  # error cases
+  testthat::expect_error(
+    process_aqs(path = 1L)
+  )
+  testthat::expect_error(
+    process_aqs(path = aqssub, date = c("January", "Januar"))
+  )
+  testthat::expect_error(
+    process_aqs(path = aqssub, date = c("2021-08-15"))
+  )
+  testthat::expect_error(
+    process_aqs(path = testd, date = NULL)
+  )
+})
+
+
+testthat::test_that("test process_sedac_groads", {
+  withr::local_package("terra")
+
+  # main test
+  testthat::expect_no_error(
+    groads <- process_sedac_groads(
+      path = testthat::test_path("../testdata/groads_test.shp")
+    )
+  )
+  # expect
+  testthat::expect_s4_class(groads, "SpatVector")
+  # error cases
+  testthat::expect_error(
+    process_sedac_groads(path = 1L)
   )
 })

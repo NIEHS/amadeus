@@ -4,7 +4,7 @@
 \alias{calc_nei}
 \title{Calculate National Emission Inventory (NEI) covariates}
 \usage{
-calc_nei(locs, from = NULL, locs_id = "site_id", ...)
+calc_nei(locs = NULL, from = NULL, locs_id = "site_id", ...)
 }
 \arguments{
 \item{locs}{sf/SpatVector. Locations at NEI values are joined.}

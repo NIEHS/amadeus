@@ -4,7 +4,7 @@
 \alias{process_conformity}
 \title{Check input assumptions}
 \usage{
-process_conformity(locs, check_time = FALSE, locs_epsg = "EPSG:4326")
+process_conformity(locs = NULL, check_time = FALSE, locs_epsg = "EPSG:4326")
 }
 \arguments{
 \item{locs}{Data. \link[=convert_stobj_to_stdt]{stdt}, \link[sf:st_as_sf]{sf},

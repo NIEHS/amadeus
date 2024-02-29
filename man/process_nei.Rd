@@ -4,7 +4,7 @@
 \alias{process_nei}
 \title{Prepare National Emission Inventory CSV files}
 \usage{
-process_nei(path, county = NULL, year = c(2017, 2020))
+process_nei(path = NULL, county = NULL, year = c(2017, 2020))
 }
 \arguments{
 \item{path}{character(1). Directory with NEI csv files.}

@@ -131,8 +131,8 @@ download_aqs_data <-
            year_start = 2018,
            year_end = 2022,
            resolution_temporal = "daily",
-           directory_to_download = "./input/aqs/",
-           directory_to_save = "./input/aqs/",
+           directory_to_download = NULL,
+           directory_to_save = NULL,
            url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
            data_download_acknowledgement = FALSE,
            unzip = TRUE,
@@ -284,8 +284,8 @@ download_aqs_data <-
 #' @importFrom utils download.file
 #' @export
 download_ecoregion_data <- function(
-  directory_to_download = "./input/ecoregions/",
-  directory_to_save = "./input/ecoregions/",
+  directory_to_download = NULL,
+  directory_to_save = NULL,
   data_download_acknowledgement = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
@@ -418,7 +418,7 @@ download_geos_cf_data <- function(
           "met_tavg_1hr_g1440x721_x1", "xgc_tavg_1hr_g1440x721_x1",
           "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"
         ),
-    directory_to_save = "./input/data/geos_cf/",
+    directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE) {
@@ -556,8 +556,8 @@ download_gmted_data <- function(
       "Standard Deviation Statistic"
     ),
     resolution = c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"),
-    directory_to_download = "./input/gmted/",
-    directory_to_save = "./input/gmted/",
+    directory_to_download = NULL,
+    directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     unzip = TRUE,
     remove_zip = FALSE,
@@ -705,7 +705,7 @@ download_merra2_data <- function(
       "tavg3_3d_qdt_Np", "tavg3_3d_asm_Nv", "tavg3_3d_cld_Nv",
       "tavg3_3d_mst_Nv", "tavg3_3d_rad_Nv", "tavg3_2d_glc_Nx"
     ),
-    directory_to_save = "./input/merra2/",
+    directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE) {
@@ -978,7 +978,7 @@ download_narr_monolevel_data <- function(
     year_start = 2022,
     year_end = 2022,
     variables = NULL,
-    directory_to_save = "./input/narr/",
+    directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE) {
@@ -1101,7 +1101,7 @@ download_narr_p_levels_data <- function(
     year_start = 2022,
     year_end = 2022,
     variables = NULL,
-    directory_to_save = "./input/narr/",
+    directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE) {
@@ -1235,8 +1235,8 @@ download_narr_p_levels_data <- function(
 download_nlcd_data <- function(
     year = 2021,
     collection = "Coterminous United States",
-    directory_to_download = "./input/nlcd/",
-    directory_to_save = "./input/nlcd/",
+    directory_to_download = NULL,
+    directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     unzip = TRUE,
     remove_zip = FALSE,
@@ -1376,8 +1376,8 @@ download_nlcd_data <- function(
 download_sedac_groads_data <- function(
     data_format = c("Shapefile", "Geodatabase"),
     data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
-    directory_to_download = "./input/sedac_groads/",
-    directory_to_save = "./input/sedac_groads/",
+    directory_to_download = NULL, 
+    directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     unzip = TRUE,
     remove_zip = FALSE,
@@ -1518,8 +1518,8 @@ download_sedac_population_data <- function(
   year = "2020",
   data_format = c("GeoTIFF", "ASCII", "netCDF"),
   data_resolution = "60 minute",
-  directory_to_download = "./input/sedac_population/",
-  directory_to_save = "./input/sedac_population/",
+  directory_to_download = NULL,
+  directory_to_save = NULL,
   data_download_acknowledgement = FALSE,
   download = FALSE,
   unzip = TRUE,
@@ -1699,8 +1699,8 @@ download_hms_data <- function(
     date_start = "2023-09-01",
     date_end = "2023-09-01",
     data_format = "Shapefile",
-    directory_to_download = "./input/noaa_hms/",
-    directory_to_save = "./input/noaa_hms/",
+    directory_to_download = NULL,
+    directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE,
@@ -1865,8 +1865,8 @@ download_hms_data <- function(
 download_koppen_geiger_data <- function(
     time_period = c("Present", "Future"),
     data_resolution = c("0.0083", "0.083", "0.5"),
-    directory_to_download = "./input/koppen_geiger/",
-    directory_to_save = "./input/koppen_geiger/",
+    directory_to_download = NULL,
+    directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     download = FALSE,
     unzip = TRUE,
@@ -2039,7 +2039,7 @@ download_modis_data <- function(
     horizontal_tiles = c(7, 13),
     vertical_tiles = c(3, 6),
     nasa_earth_data_token = NULL,
-    directory_to_save = "./input/modis/raw/",
+    directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     mod06_links = NULL,
     download = TRUE,
@@ -2325,7 +2325,7 @@ download_modis_data <- function(
 download_tri_data <- function(
   year_start = 2018L,
   year_end = 2022L,
-  directory_to_save = "./input/tri/",
+  directory_to_save = NULL,
   data_download_acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE
@@ -2421,7 +2421,7 @@ download_tri_data <- function(
 #' @returns NULL; Two comma-separated value (CSV) raw files for 2017 and 2020
 #' @export
 download_nei_data <- function(
-  directory_to_save = "./input/nei/",
+  directory_to_save = NULL,
   data_download_acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,

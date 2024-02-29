@@ -5,26 +5,26 @@
 \title{Get mosaicked or merged raster from multiple MODIS hdf files}
 \usage{
 process_modis_merge(
-  paths,
-  date_in = NULL,
+  path = NULL,
+  date = NULL,
   subdataset = NULL,
-  foo = "mean",
+  fun_agg = "mean",
   ...
 )
 }
 \arguments{
-\item{paths}{character. Full list of hdf file paths.
+\item{path}{character. Full list of hdf file paths.
 preferably a recursive search result from \code{list.files}.}
 
-\item{date_in}{character(1). date to query. Should be in
+\item{date}{character(1). date to query. Should be in
 \code{"YYYY-MM-DD"} format.}
 
 \item{subdataset}{character(1). subdataset names to extract.
 Should conform to regular expression. See \link{regex} for details.
-Default is NULL, which will result in errors. Users should specify
+Default is \code{NULL}, which will result in errors. Users should specify
 which subdatasets will be imported.}
 
-\item{foo}{Function name or custom function to aggregate overlapping
+\item{fun_agg}{Function name or custom function to aggregate overlapping
 cell values. See \code{fun} description in \link[terra]{tapp} for details.}
 
 \item{...}{For internal use.}

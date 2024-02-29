@@ -4,7 +4,7 @@
 \alias{process_nlcd}
 \title{Process raw National Landuse Classification Dataset}
 \usage{
-process_nlcd(path, year = 2021)
+process_nlcd(path = NULL, year = 2021)
 }
 \arguments{
 \item{path}{character giving nlcd data path}
