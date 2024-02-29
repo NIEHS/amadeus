@@ -40,7 +40,7 @@ Please refer to:
 \itemize{
 \item \link{download_aqs_data}: "aqs", "AQS"
 \item \link{download_ecoregion_data}: "ecoregion"
-\item \link{download_geos_cf_data}: "geos"
+\item \link{download_geos_data}: "geos"
 \item \link{download_gmted_data}: "gmted", "GMTED"
 \item \link{download_koppen_geiger_data}: "koppen", "koppengeiger"
 \item \link{download_merra2_data}: "merra2", "merra", "MERRA", "MERRA2"

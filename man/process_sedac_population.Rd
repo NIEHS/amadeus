@@ -2,10 +2,9 @@
 % Please edit documentation in R/process.R
 \name{process_sedac_population}
 \alias{process_sedac_population}
-\title{Import and clean population data from NASA Socioeconomic Data and
-Applications Center (SEDAC).}
+\title{Import and clean population data from NASA Socioeconomic Data and Applications Center (SEDAC).}
 \usage{
-process_sedac_population(path)
+process_sedac_population(path = NULL)
 }
 \arguments{
 \item{path}{character(1). Path to GeoTIFF or netCDF file.}
@@ -14,8 +13,7 @@ process_sedac_population(path)
 a SpatRaster object;
 }
 \description{
-Import and clean population data from NASA Socioeconomic Data and
-Applications Center (SEDAC).
+Import and clean population data from NASA Socioeconomic Data and Applications Center (SEDAC).
 }
 \author{
 Mitchell Manware

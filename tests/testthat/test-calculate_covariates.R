@@ -69,13 +69,13 @@ testthat::test_that("calc_dummies works well", {
   colnames(site_faux_err)[4] <- "date"
   testthat::expect_error(
     dum_res <- calc_temporal_dummies(
-      sites = site_faux_err
+      locs = site_faux_err
     )
   )
 
   testthat::expect_error(
     dum_res <- calc_temporal_dummies(
-      sites = as.matrix(site_faux_err)
+      locs = as.matrix(site_faux_err)
     )
   )
 
@@ -185,10 +185,10 @@ testthat::test_that("calc_modis works well.", {
   testthat::expect_no_error(
     base_mod11 <-
       process_modis_merge(
-        paths = path_mod11,
-        date_in = "2021-08-15",
+        path = path_mod11,
+        date = "2021-08-15",
         subdataset = "(LST_)",
-        foo = "mean"
+        fun_agg = "mean"
       )
   )
   testthat::expect_s4_class(base_mod11, "SpatRaster")
@@ -199,7 +199,7 @@ testthat::test_that("calc_modis works well.", {
         calc_modis_par(
           from = path_mod11,
           locs = sf::st_as_sf(site_faux),
-          fun_hdf = process_modis_merge,
+          preprocess = process_modis_merge,
           name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
           subdataset = "(LST_)",
           nthreads = 1L
@@ -207,6 +207,24 @@ testthat::test_that("calc_modis works well.", {
     )
   )
   testthat::expect_s3_class(calc_mod11, "data.frame")
+
+  # ... _add arguments test
+  aux <- 0L
+  testthat::expect_no_error(
+    suppressWarnings(
+      calc_mod11 <-
+        calc_modis_par(
+          from = path_mod11,
+          locs = sf::st_as_sf(site_faux),
+          preprocess = process_modis_merge,
+          package_list_add = c("MASS"),
+          export_list_add = c("aux"),
+          name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
+          subdataset = "(LST_)",
+          nthreads = 1L
+        )
+    )
+  )
 
   # case 2: swath mod06l2
   path_mod06 <-
@@ -218,8 +236,8 @@ testthat::test_that("calc_modis works well.", {
   testthat::expect_no_error(
     suppressWarnings(
       process_modis_swath(
-        paths = path_mod06,
-        date_in = "2021-08-15"
+        path = path_mod06,
+        date = "2021-08-15"
       )
     )
   )
@@ -230,7 +248,8 @@ testthat::test_that("calc_modis works well.", {
         calc_modis_par(
           from = path_mod06,
           locs = site_faux,
-          fun_hdf = process_modis_swath,
+          subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+          preprocess = process_modis_swath,
           name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_"),
           nthreads = 1
         )
@@ -247,8 +266,8 @@ testthat::test_that("calc_modis works well.", {
     )
   testthat::expect_warning(
     base_vnp <- process_bluemarble(
-      paths = path_vnp46,
-      date_in = "2018-08-13",
+      path = path_vnp46,
+      date = "2018-08-13",
       tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
     )
   )
@@ -259,7 +278,7 @@ testthat::test_that("calc_modis works well.", {
         calc_modis_par(
           from = path_vnp46,
           locs = site_faux,
-          fun_hdf = process_bluemarble,
+          preprocess = process_bluemarble,
           name_covariates = c("MOD_NITLT_0_"),
           subdataset = 3L,
           nthreads = 1,
@@ -271,20 +290,20 @@ testthat::test_that("calc_modis works well.", {
 
   # error cases
   testthat::expect_error(
-    process_modis_merge(paths = site_faux)
+    process_modis_merge(path = site_faux)
   )
   testthat::expect_error(
     process_modis_merge(
-      paths = path_mod11,
-      date_in = "2021-08-15",
-      foo = 3L
+      path = path_mod11,
+      date = "2021-08-15",
+      fun_agg = 3L
     )
   )
   testthat::expect_error(
     process_modis_merge(
-      paths = path_mod11,
-      date_in = "2021~08~15",
-      foo = "mean"
+      path = path_mod11,
+      date = "2021~08~15",
+      fun_agg = "mean"
     )
   )
 
@@ -330,8 +349,8 @@ testthat::test_that("calc_modis works well.", {
     )
   mcd_merge <-
     process_modis_merge(
-      paths = path_mcd19,
-      date_in = "2021-08-15",
+      path = path_mcd19,
+      date = "2021-08-15",
       subdataset = "(Optical_Depth)"
     )
 
@@ -355,7 +374,7 @@ testthat::test_that("calc_modis works well.", {
     calc_modis_par(
       from = path_vnp46,
       locs = site_faux,
-      fun_hdf = "fountain",
+      preprocess = "fountain",
       name_covariates = c("MOD_NITLT_0_", "MOD_K1_"),
       subdataset = 3L,
       nthreads = 1
@@ -365,9 +384,11 @@ testthat::test_that("calc_modis works well.", {
     calc_modis_par(
       from = path_vnp46,
       locs = site_faux,
+      preprocess = process_bluemarble,
       name_covariates = c("MOD_NITLT_0_", "MOD_K1_"),
       subdataset = 3L,
-      nthreads = 1
+      nthreads = 1,
+      tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
     )
   )
   testthat::expect_warning(
@@ -375,11 +396,10 @@ testthat::test_that("calc_modis works well.", {
       from = path_vnp46,
       locs = site_faux,
       name_covariates = c("MOD_NITLT_0_"),
-      fun_hdf = process_bluemarble,
+      preprocess = process_bluemarble,
       subdataset = 3L,
       nthreads = 1,
-      radius = c(-1000, 0L),
-      tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
+      radius = c(-1000, 0L)
     )
   )
   testthat::expect_s3_class(flushed, "data.frame")
@@ -490,14 +510,14 @@ testthat::test_that("Check extract_nlcd_ratio works", {
   testthat::expect_true(all(names(eg_data) %in% names(output)))
   # -- check the value of some of the points in the US
   testthat::expect_equal(
-    output$LDU_EFO_0_03000_2021[1], 0.7940682, tolerance = 1e-7
+    output$LDU_TEFOR_0_03000[1], 0.7940682, tolerance = 1e-7
   )
   testthat::expect_equal(
-    output$LDU_SHB_0_03000_2021[2], 0.9987249, tolerance = 1e-7
+    output$LDU_TSHRB_0_03000[2], 0.9987249, tolerance = 1e-7
   )
   # -- class fraction rows should sum to 1
   testthat::expect_equal(
-    rowSums(as.data.frame(output[, 2:ncol(output)])),
+    rowSums(as.data.frame(output[, 2:(ncol(output) - 1)])),
     rep(1, 2),
     tolerance = 1e-7
   )
@@ -570,21 +590,13 @@ testthat::test_that("NEI calculation", {
       from = neiras
     )
   )
-  testthat::expect_true(any(grepl("NEI17", names(neicalced))))
-  testthat::expect_equal(neicalced$TRF_NEI17_0_00000, 1579079, tolerance = 1)
+  testthat::expect_true(any(grepl("NEI", names(neicalced))))
+  testthat::expect_equal(neicalced$TRF_NEINP_0_00000, 1579079, tolerance = 1)
 
   # more error cases
   testthat::expect_condition(
     calc_nei(
       locs = "jittered",
-      from = neiras
-    )
-  )
-
-  names(ncp)[4] <- "year"
-  testthat::expect_error(
-    calc_nei(
-      locs = ncp,
       from = neiras
     )
   )
@@ -732,8 +744,7 @@ testthat::test_that("calc_hms returns expected.", {
     for (r in seq_along(radii)) {
       hms <-
         process_hms(
-          date_start = "2022-06-10",
-          date_end = "2022-06-11",
+          date = c("2022-06-10", "2022-06-11"),
           variable = density,
           path = testthat::test_path(
             "..",
@@ -791,8 +802,7 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
     for (r in seq_along(radii)) {
       hms <-
         process_hms(
-          date_start = "2022-06-10",
-          date_end = "2022-06-13",
+          date = c("2022-06-10", "2022-06-13"),
           variable = density,
           path = testthat::test_path(
             "..",
@@ -917,8 +927,7 @@ testthat::test_that("calc_narr returns expected.", {
     for (r in seq_along(radii)) {
       narr <-
         process_narr(
-          date_start = "2018-01-01",
-          date_end = "2018-01-01",
+          date = c("2018-01-01", "2018-01-01"),
           variable = variable,
           path =
           testthat::test_path(
@@ -975,8 +984,7 @@ testthat::test_that("calc_geos returns as expected.", {
     for (r in seq_along(radii)) {
       geos <-
         process_geos(
-          date_start = "2018-01-01",
-          date_end = "2018-01-01",
+          date = c("2018-01-01", "2018-01-01"),
           variable = "O3",
           path =
           testthat::test_path(
@@ -1060,4 +1068,43 @@ testthat::test_that("calc_sedac_population returns as expected.", {
       )
     }
   }
+})
+
+
+testthat::test_that("groads calculation works", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  # test data generation
+  ncp <- data.frame(
+    site_id = c("1", "2"),
+    lon = c(-78.899, -78.643669),
+    lat = c(35.8774, 35.785342),
+    time = c(2022, 2022)
+  )
+  # ncp <- terra::vect(ncp, keepgeom = TRUE, crs = "EPSG:4326")
+  path_groads <- testthat::test_path("..", "testdata", "groads_test.shp")
+  groads <- terra::vect(path_groads)
+
+  testthat::expect_no_error(
+    groads_res <- calc_sedac_groads(
+      from = groads,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 5000
+    )
+  )
+
+  testthat::expect_error(
+    calc_sedac_groads(
+      from = groads,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0
+    )
+  )
+
+  # expect data.frame
+  testthat::expect_s3_class(groads_res, "data.frame")
 })

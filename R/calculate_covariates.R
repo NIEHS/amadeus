@@ -1,7 +1,7 @@
-#' Calculate covariates
 
 # nocov start
 # nolint start
+#' Calculate covariates
 #' @param covariate character(1). Covariate type.
 #' @param locs sf/SpatVector. Unique locations. Should include
 #'  a unique identifier field named `locs_id`
@@ -32,7 +32,7 @@ calc_covariates <-
                     "geos", "dummies", "gmted", "roads",
                     "ecoregions", "ecoregion", "hms", "noaa", "smoke",
                     "gmted", "narr", "narr_monolevel", "narr_p_levels",
-                    "plevels", "monolevel", "p_levels", "geos", "geos_cf",
+                    "plevels", "monolevel", "p_levels", "geos",
                     "sedac_population", "population"),
       locs,
       from,
@@ -61,15 +61,13 @@ calc_covariates <-
       noaa = calc_hms,
       smoke = calc_hms,
       hms = calc_hms,
-      # sedac_groads = calc_sedac_groads,
-      # roads = calc_sedac_groads,
+      sedac_groads = calc_sedac_groads,
+      roads = calc_sedac_groads,
       sedac_population = calc_sedac_population,
       population = calc_sedac_population,
       nei = calc_nei,
       tri = calc_tri,
-      # ncep = calc_ncep,
       geos = calc_geos,
-      geos_cf = calc_geos,
       gmted = calc_gmted,
       dummies = calc_temporal_dummies
     )
@@ -250,11 +248,16 @@ calc_nlcd_ratio <- function(locs,
                                                stack_apply = TRUE,
                                                progress = FALSE)
   # select only the columns of interest
-  nlcd_at_bufs <- nlcd_at_bufs[names(nlcd_at_bufs)[grepl("frac_",
-                                                         names(nlcd_at_bufs))]]
-  # change column names
   cfpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
   nlcd_classes <- utils::read.csv(cfpath)
+  nlcd_at_bufs <-
+    nlcd_at_bufs[
+      sort(names(nlcd_at_bufs)[
+        grepl(paste0("frac_(", paste(nlcd_classes$value, collapse = "|"), ")"),
+              names(nlcd_at_bufs))
+      ])
+    ]
+  # change column names
   nlcd_names <- names(nlcd_at_bufs)
   nlcd_names <- sub(pattern = "frac_", replacement = "", x = nlcd_names)
   nlcd_names <- as.numeric(nlcd_names)
@@ -262,13 +265,14 @@ calc_nlcd_ratio <- function(locs,
   new_names <- sapply(
     nlcd_names,
     function(x) {
-      sprintf("LDU_%s_0_%05d_%04d", x, radius, year)
+      sprintf("LDU_%s_0_%05d", x, radius)
     }
   )
   names(nlcd_at_bufs) <- new_names
   # merge data_vect with nlcd class fractions (and reproject)
   new_data_vect <- cbind(data_vect_b, nlcd_at_bufs)
   new_data_vect <- terra::project(new_data_vect, terra::crs(locs))
+  new_data_vect$time <- as.integer(year)
   return(new_data_vect)
 }
 
@@ -468,11 +472,11 @@ calc_modis_daily <- function(
 
 
 #' Calculate MODIS product covariates in multiple CPU threads
-#' @param locs sf object. Unique locs where covariates
+#' @param locs sf/SpatVector object. Unique locs where covariates
 #' will be calculated.
-#' @param from character. List of HDF files.
+#' @param from character. List of paths to MODIS/VIIRS files.
 #' @param locs_id character(1). Site identifier. Default is `"site_id"`
-#' @param fun_hdf function. Function to handle HDF files.
+#' @param preprocess function. Function to handle HDF files.
 #' @param name_covariates character. Name header of covariates.
 #' e.g., `"MOD_NDVIF_0_"`.
 #' The calculated covariate names will have a form of
@@ -492,8 +496,8 @@ calc_modis_daily <- function(
 #' loaded.
 #' @param export_list_add character. A vector with object names to export
 #'  to each thread. It should be minimized to spare memory.
-#' @param ... Arguments passed to `fun_hdf`.
-#' @description `calc_modis` essentially runs [`calc_modis_daily`] function
+#' @param ... Arguments passed to `preprocess`.
+#' @description `calc_modis_par` essentially runs [`calc_modis_daily`] function
 #' in each thread (subprocess). Based on daily resolution, each day's workload
 #' will be distributed to each thread. With `product` argument,
 #' the files are processed by a customized function where the unique structure
@@ -505,11 +509,22 @@ calc_modis_daily <- function(
 #' system can handle concurrent access to the (network) disk by multiple
 #' processes. File system characteristics, package versions, and hardware
 #' settings and specification can affect the processing efficiency.
-#' @seealso See details for setting parallelization
+#' `locs` is expected to be convertible to `sf` object. `sf`, `SpatVector`, and
+#' other class objects that could be converted to `sf` can be used.
+#' Common arguments in `preprocess` functions such as `date` and `path` are
+#' automatically detected and passed to the function. Please note that
+#' `locs` here and `path` in `preprocess` functions are assumed to have a
+#' standard naming convention of raw files from NASA.
+#' @seealso See details for setting parallelization:
 #' * [foreach::foreach]
 #' * [parallelly::makeClusterPSOCK]
 #' * [parallelly::availableCores]
 #' * [doParallel::registerDoParallel]
+#' Also, for `preprocess`, see:
+#' * [process_covariates]
+#' * [process_modis_merge]
+#' * [process_modis_swath]
+#' * [process_bluemarble]
 #' @importFrom foreach foreach
 #' @importFrom foreach %dopar%
 #' @importFrom methods is
@@ -529,7 +544,7 @@ calc_modis_par <-
     locs = NULL,
     from = NULL,
     locs_id = "site_id",
-    fun_hdf = process_modis_merge,
+    preprocess = process_modis_merge,
     name_covariates = NULL,
     radius = c(0L, 1e3L, 1e4L, 5e4L),
     subdataset = NULL,
@@ -539,8 +554,8 @@ calc_modis_par <-
     export_list_add = NULL,
     ...
   ) {
-    if (!is.function(fun_hdf)) {
-      stop("fun_hdf should be one of process_modis_merge,
+    if (!is.function(preprocess)) {
+      stop("preprocess should be one of process_modis_merge,
 process_modis_swath, or process_bluemarble.")
     }
     # read all arguments
@@ -591,11 +606,11 @@ process_modis_swath, or process_bluemarble.")
         radiusindex <- seq_along(radius)
         radiuslist <- split(radiusindex, radiusindex)
 
-        hdf_args <- append(hdf_args, values = list(date_in = day_to_pick))
-        hdf_args <- append(hdf_args, values = list(paths = hdf_args$from))
+        hdf_args <- append(hdf_args, values = list(date = day_to_pick))
+        hdf_args <- append(hdf_args, values = list(path = hdf_args$from))
         # unified interface with rlang::inject
         vrt_today <-
-          rlang::inject(fun_hdf(!!!hdf_args))
+          rlang::inject(preprocess(!!!hdf_args))
 
         if (terra::nlyr(vrt_today) != length(name_covariates)) {
           warning("The number of layers in the input raster do not match
@@ -628,9 +643,6 @@ process_modis_swath, or process_bluemarble.")
                           name_covariates,
                           radius[k])
                 error_df <- sf::st_drop_geometry(locs_input)
-                if (!"time" %in% names(error_df)) {
-                  error_df$time <- day_to_pick
-                }
                 # coerce to avoid errors
                 error_df <- as.data.frame(error_df)
                 error_df <- error_df[, c(locs_id, "time")]
@@ -758,7 +770,7 @@ calc_temporal_dummies <-
 #'  The threshold should be carefully chosen by users.
 #' @author Insang Song
 #' @references
-#' * [Messier KP, Akita Y, & Serre ML. (2012). Integrating Address Geocoding, Land Use Regression, and Spatiotemporal Geostatistical Estimation for Groundwater Tetrachloroethylene. _Environmental Science \& Technology_ 46(5), 2772-2780.](https://dx.doi.org/10.1021/es203152a)
+#' * [Messier KP, Akita Y, & Serre ML. (2012). Integrating Address Geocoding, Land Use Regression, and Spatiotemporal Geostatistical Estimation for Groundwater Tetrachloroethylene. _Environmental Science & Technology_ 46(5), 2772-2780.](https://dx.doi.org/10.1021/es203152a)
 #' * Wiesner C. (n.d.). [Euclidean Sum of Exponentially Decaying Contributions Tutorial](https://mserre.sph.unc.edu/BMElab_web/SEDCtutorial/index.html)
 #' @examples
 #' library(terra)
@@ -821,7 +833,6 @@ The result may not be accurate.\n",
     len_point_locs <- seq_len(nrow(locs))
 
     locs$from_id <- len_point_locs
-    # select egrid_v only if closer than 3e5 meters from each aqs
     locs_buf <-
       terra::buffer(
         locs,
@@ -829,20 +840,20 @@ The result may not be accurate.\n",
         quadsegs = 90
       )
 
-    from <- from[locs_buf, ]
-    len_point_from <- seq_len(nrow(from))
+    from_in <- from[locs_buf, ]
+    len_point_from <- seq_len(nrow(from_in))
 
     # len point from? len point to?
-    from$to_id <- len_point_from
+    from_in$to_id <- len_point_from
     dist <- NULL
 
     # near features with distance argument: only returns integer indices
     # threshold is set to the twice of sedc_bandwidth
     # lines 895-900 may overlap with distance arg in 912-913
     res_nearby <-
-      terra::nearby(locs, from, distance = sedc_bandwidth * 2)
+      terra::nearby(locs, from_in, distance = sedc_bandwidth * 2)
     # attaching actual distance
-    dist_nearby <- terra::distance(locs, from)
+    dist_nearby <- terra::distance(locs, from_in)
     dist_nearby_df <- as.vector(dist_nearby)
     # adding integer indices
     dist_nearby_tdf <-
@@ -856,7 +867,7 @@ The result may not be accurate.\n",
     res_sedc <- res_nearby |>
       dplyr::as_tibble() |>
       dplyr::left_join(data.frame(locs)) |>
-      dplyr::left_join(data.frame(from)) |>
+      dplyr::left_join(data.frame(from_in)) |>
       dplyr::left_join(dist_nearby_df) |>
       # per the definition in
       # https://mserre.sph.unc.edu/BMElab_web/SEDCtutorial/index.html
@@ -866,10 +877,13 @@ The result may not be accurate.\n",
       dplyr::summarize(
         dplyr::across(
           dplyr::all_of(target_fields),
-          list(sedc = ~sum(w_sedc * ., na.rm = TRUE))
+          ~sum(w_sedc * ., na.rm = TRUE)
         )
       ) |>
       dplyr::ungroup()
+    idx_air <- grep("_AIR_", names(res_sedc))
+    names(res_sedc)[idx_air] <-
+      sprintf("%s_%05d", names(res_sedc)[idx_air], sedc_bandwidth)
 
     attr(res_sedc, "sedc_bandwidth") <- sedc_bandwidth
     attr(res_sedc, "sedc_threshold") <- sedc_bandwidth * 2
@@ -916,9 +930,6 @@ calc_tri <- function(
   radius = c(1e3L, 1e4L, 5e4L),
   ...
 ) {
-  if (!all(c("lon", "lat", "time") %in% names(locs))) {
-    stop("locs must have 'lon', 'lat', and 'time' fields.\n")
-  }
   if (!methods::is(locs, "SpatVector")) {
     if (methods::is(locs, "sf")) {
       locs <- terra::vect(locs)
@@ -931,8 +942,10 @@ calc_tri <- function(
 
   # split by year: locs and tri locations
   tri_cols <- grep("_AIR", names(from), value = TRUE)
+  # error fix: no whitespace
+  tri_cols <- sub(" ", "_", tri_cols)
 
-  # mapply and inner lapply
+  # inner lapply
   list_radius <- split(radius, radius)
   list_locs_tri <-
     lapply(
@@ -950,7 +963,10 @@ calc_tri <- function(
       }
     )
   # bind element data.frames into one
-  df_tri <- data.table::rbindlist(list_locs_tri)
+  df_tri <- Reduce(function(x, y) dplyr::full_join(x, y), list_locs_tri)
+  if (nrow(df_tri) != nrow(locs)) {
+    df_tri <- dplyr::left_join(as.data.frame(locs), df_tri)
+  }
   return(df_tri)
 }
 
@@ -971,7 +987,7 @@ calc_tri <- function(
 #' @importFrom terra intersect
 #' @export
 calc_nei <- function(
-  locs,
+  locs = NULL,
   from = NULL,
   locs_id = "site_id",
   ...
@@ -981,9 +997,6 @@ calc_nei <- function(
     if (inherits(locs, "try-error")) {
       stop("locs is unable to be converted to SpatVector.\n")
     }
-  }
-  if (!all(c("lon", "lat", "time") %in% names(locs))) {
-    stop("locs should have 'lon', 'lat', and 'time' fields.\n")
   }
   # spatial join
   locs_re <- terra::project(locs, terra::crs(from))
@@ -1555,7 +1568,7 @@ calc_geos <- function(
   return(data.frame(sites_extracted))
 }
 
-#' Calculate UN WPP-Ajusted population density covariates covariates
+#' Calculate UN WPP-Ajusted population density covariates
 #' @description
 #' Extract population density data at point locations using SpatRaster object
 #' from `process_sedac_population`. Function returns a data frame containing
@@ -1666,4 +1679,87 @@ calc_sedac_population <- function(
   )
   #### return data frame
   return(data.frame(sites_extracted))
+}
+
+
+
+#' Calculate SEDAC groads density covariates
+#' @param from SpatVector(1). Output of `process_sedac_groads`.
+#' @param locs data.frame, characater to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 1000).
+#' @param fun function(1). Function used to summarize the length of roads
+#' within sites location buffer (Default is `sum`).
+#' @description Prepared groads data is clipped with the buffer polygons
+#' of `radius`. The total length of the roads are calculated.
+#' Then the density of the roads is calculated by dividing
+#' the total length from the area of the buffer. `terra::linearUnits()`
+#' is used to convert the unit of length to meters.
+#' @note Unit is km / sq km.
+#' @author Insang Song
+#' @seealso [`process_sedac_groads`]
+#' @return a data.frame object with three columns.
+#' @importFrom terra vect
+#' @importFrom stats aggregate
+#' @importFrom stats setNames
+#' @importFrom terra as.data.frame
+#' @importFrom terra project
+#' @importFrom terra intersect
+#' @importFrom terra perim
+#' @importFrom terra crs
+#' @importFrom terra expanse
+#' @importFrom terra linearUnits
+#' @export
+calc_sedac_groads <- function(
+    from = NULL,
+    locs = NULL,
+    locs_id = NULL,
+    radius = 1000,
+    fun = sum) {
+  #### check for null parameters
+  if (radius <= 0) {
+    stop("radius should be greater than 0.\n")
+  }
+  check_for_null_parameters(mget(ls()))
+  #### prepare sites
+  sites_e <- process_locs_vector(
+    locs,
+    terra::crs(from),
+    radius
+  )
+
+  from_re <- terra::project(from, terra::crs(sites_e))
+  from_re <- from[terra::ext(sites_e), ]
+  from_clip <- terra::intersect(sites_e, from_re)
+  area_buffer <- sites_e[1, ]
+  area_buffer <- terra::expanse(area_buffer)
+
+  from_clip$rlength <- terra::perim(from_clip)
+  from_clip <-
+    aggregate(
+      from_clip$rlength,
+      by = from_clip[[locs_id]],
+      FUN = fun,
+      na.rm = TRUE
+    )
+  # linear unit conversion
+  det_unit <- terra::linearUnits(from_re)
+  if (det_unit == 0) {
+    det_unit <- 1
+  }
+  # km / sq km
+  from_clip[["x"]] <- (from_clip[["x"]] * det_unit / 1e3)
+  from_clip$density <-
+    from_clip[["x"]] / (area_buffer * (det_unit ^ 2) / 1e6)
+  from_clip <-
+    setNames(
+      from_clip,
+      c(locs_id,
+        sprintf("GRD_TOTAL_0_%05d", radius),
+        sprintf("GRD_DENKM_0_%05d", radius))
+    )
+
+  return(from_clip)
 }

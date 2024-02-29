@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_sedac_population}
 \alias{calc_sedac_population}
-\title{Calculate UN WPP-Ajusted population density covariates covariates}
+\title{Calculate UN WPP-Ajusted population density covariates}
 \usage{
 calc_sedac_population(from, locs, locs_id = NULL, radius = 0, fun = "mean")
 }

@@ -8,7 +8,7 @@ download_narr_monolevel_data(
   year_start = 2022,
   year_end = 2022,
   variables = NULL,
-  directory_to_save,
+  directory_to_save = NULL,
   data_download_acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE

@@ -1,3 +1,88 @@
+# nolint start
+#' Process covariates
+#' @param covariate character(1). Covariate type.
+#' @param path character(1). Directory or file path to raw data
+#' depending on `covariate` value.
+#' @param ... Arguments passed to each raw data processing function.
+#' @seealso
+#' - [`process_modis_swath`]: `"modis_swath"`
+#' - [`process_modis_merge`]: `"modis_merge"`
+#' - [`process_bluemarble`]: `"bluemarble"`
+#' - [`process_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
+#' - [`process_ecoregion`]: `"ecoregion"`, `"ecoregions"`
+#' - [`process_nlcd`]: `"nlcd"`, `"NLCD"`
+#' - [`process_tri`]: `"tri"`, `"TRI"`
+#' - [`process_nei`]: `"nei"`, `"NEI`
+#' - [`process_gmted`]: `"gmted"`, `"GMTED"`
+#' - [`process_aqs`]: `"aqs"`, `"AQS"`
+#' - [`process_hms`]: `"hms"`, `"HMS"`, `"smoke"`
+#' - [`process_narr`]: `"narr"`, `"NARR"`
+#' - [`process_sedac_groads`]: `"sedac_groads"`, `"roads"`, `"groads"`
+#' - [`process_sedac_population`]: `"sedac_population"`, `"population"`
+#' @returns `SpatVector` or `SpatRaster` depending on covariate type.
+#' @author Insang Song
+#' @export
+# nolint end
+process_covariates <-
+  function(
+    covariate = c("modis_swath", "modis_merge",
+                  "koppen-geiger",
+                  "bluemarble",
+                  "koeppen-geiger", "koppen", "koeppen",
+                  "geos", "dummies", "gmted",
+                  "hms", "smoke",
+                  "sedac_population", "population",
+                  "sedac_groads", "groads", "roads",
+                  "nlcd", "tri", "narr", "nei",
+                  "ecoregions", "ecoregion"),
+    path = NULL,
+    ...
+  ) {
+    covariate <- tolower(covariate)
+    covariate <- match.arg(covariate)
+    if (startsWith(covariate, "ko")) {
+      covariate <- "koppen"
+    }
+
+    # select function to run
+    what_to_run <- switch(covariate,
+      modis_merge = process_modis_merge,
+      modis_swath = process_modis_swath,
+      bluemarble = process_bluemarble,
+      ecoregion = process_ecoregion,
+      ecoregions = process_ecoregion,
+      koppen = process_koppen_geiger,
+      narr = process_narr,
+      nlcd = process_nlcd,
+      smoke = process_hms,
+      hms = process_hms,
+      sedac_groads = process_sedac_groads,
+      roads = process_sedac_groads,
+      groads = process_sedac_groads,
+      sedac_population = process_sedac_population,
+      population = process_sedac_population,
+      nei = process_nei,
+      tri = process_tri,
+      geos = process_geos,
+      gmted = process_gmted
+    )
+
+    res_covariate <-
+      tryCatch({
+        what_to_run(
+          path = path,
+          ...
+        )
+      }, error = function(e) {
+        print(e)
+        print(args(what_to_run))
+        stop("Please refer to the argument list and
+the error message above to rectify the error.\n")
+      })
+
+    return(res_covariate)
+  }
+
 
 #' Selected MODIS sinusoidal grid product subdataset name selector
 #' @param product character(1). Product code.
@@ -71,7 +156,7 @@ process_modis_sds <-
 # previously modis_aggregate_sds
 process_flatten_sds <-
   function(
-    path,
+    path = NULL,
     subdataset = NULL,
     fun_agg = "mean"
   ) {
@@ -121,15 +206,15 @@ the input then flatten it manually.")
 
 # nolint start
 #' Get mosaicked or merged raster from multiple MODIS hdf files
-#' @param paths character. Full list of hdf file paths.
+#' @param path character. Full list of hdf file paths.
 #'  preferably a recursive search result from \code{list.files}.
-#' @param date_in character(1). date to query. Should be in
+#' @param date character(1). date to query. Should be in
 #' \code{"YYYY-MM-DD"} format.
 #' @param subdataset character(1). subdataset names to extract.
 #' Should conform to regular expression. See \link{regex} for details.
-#' Default is NULL, which will result in errors. Users should specify
+#' Default is `NULL`, which will result in errors. Users should specify
 #' which subdatasets will be imported.
-#' @param foo Function name or custom function to aggregate overlapping
+#' @param fun_agg Function name or custom function to aggregate overlapping
 #' cell values. See \code{fun} description in \link[terra]{tapp} for details.
 #' @param ... For internal use.
 #' @note Curvilinear products (i.e., swaths) will not be accepted.
@@ -143,26 +228,26 @@ the input then flatten it manually.")
 # nolint end
 # previously modis_get_vrt
 process_modis_merge <- function(
-    paths,
-    date_in = NULL,
+    path = NULL,
+    date = NULL,
     subdataset = NULL,
-    foo = "mean",
+    fun_agg = "mean",
     ...) {
 
-  if (!is.character(paths)) {
-    stop("Argument flist should be a list of hdf files (character).\n")
+  if (!is.character(path)) {
+    stop("Argument path should be a list of hdf files (character).\n")
   }
-  if (!(is.character(foo) || is.function(foo))) {
-    stop("Argument foo should be a function or name of a function
+  if (!(is.character(fun_agg) || is.function(fun_agg))) {
+    stop("Argument fun_agg should be a function or name of a function
          that is accepted in terra::tapp.\n")
   }
   # date format check
-  is_date_proper(instr = date_in)
+  is_date_proper(instr = date)
 
   # interpret date
-  today <- as.character(date_in)
+  today <- as.character(date)
   dayjul <- strftime(today, "%Y%j")
-  ftarget <- grep(sprintf("A%s", dayjul), paths, value = TRUE)
+  ftarget <- grep(sprintf("A%s", dayjul), path, value = TRUE)
 
   # get layer information
   layer_target <-
@@ -171,12 +256,12 @@ process_modis_merge <- function(
              process_flatten_sds(
                x,
                subdataset = subdataset,
-               fun_agg = foo
+               fun_agg = fun_agg
              )
            })
   # Merge multiple rasters into one
   # do.call(f, l) is equivalent to f(l[[1]], ... , l[[length(l)]])
-  if (length(paths) > 1) {
+  if (length(path) > 1) {
     result_merged <- do.call(terra::merge, layer_target)
     gc()
   } else {
@@ -265,21 +350,22 @@ is_date_proper <- function(
 #' @description This function will return a SpatRaster object with
 #' georeferenced h5 files of Blue Marble product. Referencing corner coordinates
 #' are necessary as the original h5 data do not include such information.
-#' @param paths character. Full paths of h5 files.
-#' @param date_in character(1). Date to query.
+#' @param path character. Full paths of h5 files.
+#' @param date character(1). Date to query.
 #' @param tile_df data.frame. Contains four corner coordinates in fields named
 #' `c("xmin", "xmax", "ymin", "ymax")`.
-#' See [process_bluemarble_corners] to generate a valid object for this argument.
+#' See [`process_bluemarble_corners`] to generate a valid object for this argument.
 #' @param subdataset integer(1). Subdataset number to process.
 #' Default is 3L.
-#' @param crs_ref character(1). terra::crs compatible CRS.
-#' Default is "EPSG:4326"
+#' @param crs character(1). terra::crs compatible CRS.
+#' Default is `"EPSG:4326"`
 #' @param ... For internal use.
 #' @returns SpatRaster.
 #' @author Insang Song
 #' @seealso
-#' * [terra::describe]
-#' * [terra::merge]
+#' * [`terra::describe`]
+#' * [`terra::merge`]
+#' * [`process_bluemarble_corners`]
 #' @references
 #' - [Wang, Z. (2022). Blue Marble User Guide (Version 1.3). NASA.](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf)
 #' @importFrom terra rast
@@ -290,20 +376,19 @@ is_date_proper <- function(
 # previously modis_preprocess_vnp46
 # nolint end
 process_bluemarble <- function(
-  paths,
-  date_in,
-  tile_df = NULL,
+  path = NULL,
+  date = NULL,
+  tile_df = process_bluemarble_corners(),
   subdataset = 3L,
-  crs_ref = "EPSG:4326",
+  crs = "EPSG:4326",
   ...
 ) {
-  is_date_proper(instr = date_in)
+  is_date_proper(instr = date)
   # interpret date from paths
-  date_in <- as.Date(date_in)
-  datejul <- strftime(date_in, format = "%Y%j")
+  datejul <- strftime(as.Date(date), format = "%Y%j")
   stdtile <- tile_df$tile
 
-  filepaths_today <- grep(sprintf("A%s", datejul), paths, value = TRUE)
+  filepaths_today <- grep(sprintf("A%s", datejul), path, value = TRUE)
   # today's filenames
   filepaths_today <-
     grep(
@@ -327,8 +412,8 @@ process_bluemarble <- function(
     mapply(function(vnp, tile_in) {
       vnp_ <- terra::rast(vnp, subds = subdataset)
       tile_ext <- tile_df[tile_df$tile == tile_in, -1]
-      # print(tile_ext)
-      terra::crs(vnp_) <- terra::crs(crs_ref)
+
+      terra::crs(vnp_) <- terra::crs(crs)
       terra::ext(vnp_) <- unlist(tile_ext)
       return(vnp_)
     }, vnp_today, filepaths_today_tiles_list, SIMPLIFY = FALSE)
@@ -356,7 +441,7 @@ process_bluemarble <- function(
 #' @param cellsize numeric(1). Cell size (spatial resolution) of
 #' output rectilinear grid raster.
 #' @param threshold numeric(1). Maximum distance to fill gaps if occur.
-#' @param crs_out integer(1)/character(1). Coordinate system definition.
+#' @param crs integer(1)/character(1). Coordinate system definition.
 #' Should be compatible with EPSG codes or WKT2.
 #' See [terra::crs] and [sf::st_crs] / [EPSG](https://www.epsg.io)
 #' @param ... For internal use.
@@ -371,10 +456,10 @@ process_bluemarble <- function(
 # previously modis_warp_stars
 process_modis_warp <-
   function(
-    path,
+    path = NULL,
     cellsize = 0.25,
     threshold = 0.5,
-    crs_out = 4326,
+    crs = 4326,
     ...
   ) {
     options(sf_use_s2 = FALSE)
@@ -382,7 +467,7 @@ process_modis_warp <-
     rtd <-
       stars::st_warp(
         ras,
-        crs = crs_out,
+        crs = crs,
         cellsize = cellsize,
         threshold = threshold
       )
@@ -398,9 +483,12 @@ process_modis_warp <-
 #' grids, which require warping/rectifying the original curvilinear grids
 #' into rectilinear grids. The function internally warps each of inputs
 #' then mosaic the warped images into one large SpatRaster object.
-#' @param paths character. Full paths of hdf files.
-#' @param date_in character(1). Date to query.
-#' @param get_var character. One of `"Cloud_Fraction_Day"` or
+#' Users need to select a subdataset to process. The full path looks like
+#' `"HDF4_EOS:EOS_SWATH:{file_path}:mod06:subdataset"`, where file_path is
+#' the full path to the hdf file.
+#' @param path character. Full paths of hdf files.
+#' @param date character(1). Date to query.
+#' @param subdataset character. One of `"Cloud_Fraction_Day"` or
 #' `"Cloud_Fraction_Night"` (which are available in MOD06_L2)
 #' @param suffix character(1). Should be formatted `:{product}:`,
 #' e.g., `:mod06:`
@@ -421,42 +509,42 @@ process_modis_warp <-
 # previously modis_mosaic_mod06
 process_modis_swath <-
   function(
-    paths,
-    date_in,
-    get_var = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+    path = NULL,
+    date = NULL,
+    subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
     suffix = ":mod06:",
     resolution = 0.025,
     ...
   ) {
     # check date format
-    is_date_proper(instr = date_in)
+    is_date_proper(instr = date)
     header <- "HDF4_EOS:EOS_SWATH:"
     ras_mod06 <- vector("list", 2L)
-    datejul <- strftime(date_in, format = "%Y%j")
-    paths_today <- grep(sprintf("A%s", datejul), paths, value = TRUE)
+    datejul <- strftime(date, format = "%Y%j")
+    paths_today <- grep(sprintf("A%s", datejul), path, value = TRUE)
 
     # if two or more paths are put in,
     # these are read into a list then mosaicked
-    if (length(paths) > 1) {
-      for (element in seq_along(get_var)) {
+    if (length(path) > 1) {
+      for (element in seq_along(subdataset)) {
         target_text <-
-          sprintf("%s%s%s%s", header, paths_today, suffix, get_var[element])
+          sprintf("%s%s%s%s", header, paths_today, suffix, subdataset[element])
         # rectified stars objects to SpatRaster
         mod06_element <- split(target_text, target_text) |>
           lapply(process_modis_warp) |>
           lapply(terra::rast)
+        # mosaick the warped SpatRasters into one
         mod06_element <- Reduce(f = terra::mosaic, x = mod06_element)
         ras_mod06[[element]] <- mod06_element
       }
       mod06_mosaic <- c(ras_mod06[[1]], ras_mod06[[2]])
-      terra::varnames(mod06_mosaic) <- get_var
+      # assigning variable name
+      terra::varnames(mod06_mosaic) <- subdataset
     } else {
-      mod06_mosaic <- terra::rast(process_modis_warp(paths))
+      mod06_mosaic <- terra::rast(process_modis_warp(path))
     }
     return(mod06_mosaic)
   }
-
-
 
 
 
@@ -472,7 +560,7 @@ process_modis_swath <-
 #' @export
 process_koppen_geiger <-
   function(
-    path,
+    path = NULL,
     year = NULL
   ) {
     kg_rast <- terra::rast(path)
@@ -493,11 +581,11 @@ process_koppen_geiger <-
 #' @export
 process_nlcd <-
   function(
-    path,
+    path = NULL,
     year = 2021
   ) {
     # check inputs
-    if (!is.character(path)) {
+    if (!is.character(path) || is.null(path)) {
       stop("path is not a character.")
     }
     if (!dir.exists(path)) {
@@ -554,7 +642,7 @@ process_ecoregion <-
 #' @export
 process_conformity <-
   function(
-    locs,
+    locs = NULL,
     check_time = FALSE,
     locs_epsg = "EPSG:4326"
   ) {
@@ -623,7 +711,7 @@ process_conformity <-
 #' @importFrom stats setNames
 #' @export
 process_tri <- function(
-  path,
+  path = NULL,
   year = 2018,
   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49),
   ...
@@ -674,6 +762,7 @@ process_tri <- function(
       names_sep = "_"
     ) |>
     dplyr::filter(!is.na(LONGITUDE) | !is.na(LATITUDE))
+  names(dt_tri_x) <- sub(" ", "_", names(dt_tri_x))
 
   spvect_tri <-
     terra::vect(dt_tri_x,
@@ -714,7 +803,7 @@ process_tri <- function(
 #' @export
 # nolint end
 process_nei <- function(
-  path,
+  path = NULL,
   county = NULL,
   year = c(2017, 2020)
 ) {
@@ -755,38 +844,162 @@ process_nei <- function(
     )
   emissions_total_ton <- NULL
   geoid <- NULL
-  yearabbr <- substr(year, 3, 4)
+  # yearabbr <- substr(year, 3, 4)
   csvs_nei$geoid <- sprintf("%05d", as.integer(csvs_nei$geoid))
   csvs_nei <-
     csvs_nei[, list(
       TRF_NEINP_0_00000 = sum(emissions_total_ton, na.rm = TRUE)
     ),
     by = geoid]
-  csvs_nei$Year <- year
+  csvs_nei$nei_year <- year
 
   # read county vector
   cnty_geoid_guess <- grep("GEOID", names(county))
   names(county)[cnty_geoid_guess] <- "geoid"
   county$geoid <- sprintf("%05d", as.integer(county$geoid))
   cnty_vect <- merge(county, csvs_nei, by = "geoid")
-  cnty_vect <- cnty_vect[, c("geoid", "Year", "TRF_NEINP_0_00000")]
-  names(cnty_vect)[3] <- sub("NP", yearabbr, names(cnty_vect)[3])
+  cnty_vect <- cnty_vect[, c("geoid", "nei_year", "TRF_NEINP_0_00000")]
   return(cnty_vect)
 
 }
 
+# nolint start
+#' Filter unique AQS sites with or without temporal information
+#' @param path character(1). Directory path to daily measurement data.
+#' @param date character(2). Start and end date.
+#'  Should be in `"YYYY-MM-DD"` format and sorted. If `NULL`,
+#'  only unique locations are returned.
+#' @param return_format character(1). `"terra"` or `"sf"`.
+#' @returns SpatVector or sf object depending on the `return_format`.
+#' @importFrom data.table as.data.table
+#' @importFrom utils read.csv
+#' @importFrom terra vect
+#' @importFrom terra project
+#' @importFrom sf st_as_sf
+#' @importFrom dplyr group_by
+#' @importFrom dplyr ungroup
+#' @importFrom dplyr filter
+#' @note `date = NULL` will return a massive data.table
+#' object. Please choose proper `date` values.
+#' @export
+process_aqs <-
+  function(
+    path = NULL,
+    date = c("2018-01-01", "2022-12-31"),
+    return_format = "terra"
+  ) {
+    if (!is.null(date)) {
+      date <- try(as.Date(date))
+      if (inherits(date, "try-error")) {
+        stop("date has invalid format(s). Please check the values.")
+      }
+      if (length(date) != 2) {
+        stop("date should be a character vector of length 2.")
+      }
+    }
+
+    if (length(path) == 1 && dir.exists(path)) {
+      path <- list.files(
+        path = path,
+        pattern = "*.csv$",
+        full.names = TRUE
+      )
+    }
+    
+    pathfiles <- try(lapply(path, read.csv))
+
+    if (inherits(pathfiles, "try-error")) {
+      stop("path is not a directory or does not contain csv files.")
+    }
+
+    sites <- data.table::rbindlist(pathfiles)
+
+    ## get unique sites
+    sites$site_id <-
+      sprintf("%02d%03d%04d%05d",
+              sites$State.Code,
+              sites$County.Code,
+              sites$Site.Num,
+              sites$Parameter.Code)
+
+    site_id <- NULL
+    Datum <- NULL
+
+    # select relevant fields only
+    sites <- sites |>
+      dplyr::as_tibble() |>
+      dplyr::group_by(site_id) |>
+      dplyr::filter(POC == min(POC)) |>
+      dplyr::ungroup()
+    sites_v <- unique(sites[, c("site_id", "Longitude", "Latitude", "Datum")])
+    names(sites_v)[2:3] <- c("lon", "lat")
+    sites_v <- data.table::as.data.table(sites_v)
+
+    # subset mainland
+    sites_v <- sites_v[!grepl("^(02|15|72|78|6|80)", site_id), ]
+
+    # NAD83 to WGS84
+    sites_v_nad <-
+      sites_v[Datum == "NAD83"]
+    sites_v_nad <-
+      terra::vect(
+        sites_v_nad,
+        keepgeom = TRUE,
+        crs = "EPSG:4269"
+      )
+    sites_v_nad <- terra::project(sites_v_nad, "EPSG:4326")
+    # postprocessing: combine WGS84 and new WGS84 records
+    sites_v_nad <- sites_v_nad[, seq(1, 3)]
+    sites_v_nad <- as.data.frame(sites_v_nad)
+    sites_v_wgs <- sites_v[Datum == "WGS84"][, -4]
+    final_sites <- rbind(sites_v_wgs, sites_v_nad)
+
+    if (!is.null(date)) {
+      date_start <- as.Date(date[1])
+      date_end <- as.Date(date[2])
+      date_sequence <- seq(date_start, date_end, "day")
+      final_sites <-
+        split(date_sequence, date_sequence) |>
+        lapply(function(x) {
+          fs_time <- final_sites
+          fs_time$time <- x
+          return(fs_time)
+        })
+      final_sites <- Reduce(rbind, final_sites)
+    }
+
+    final_sites <-
+      switch(
+        return_format,
+        terra =
+        terra::vect(
+          final_sites,
+          keepgeom = TRUE,
+          crs = "EPSG:4326"
+        ),
+        sf =
+        sf::st_as_sf(
+          final_sites,
+          remove = FALSE,
+          dim = "XY",
+          coords = c("lon", "lat"),
+          crs = "EPSG:4326"
+        )
+      )
+
+    return(final_sites)
+  }
 
 
-#' Import and clean population data from NASA Socioeconomic Data and
-#' Applications Center (SEDAC).
+#' Import and clean population data from NASA Socioeconomic Data and Applications Center (SEDAC).
 #' @param path character(1). Path to GeoTIFF or netCDF file.
 #' @author Mitchell Manware
 #' @return a SpatRaster object;
 #' @importFrom terra rast
 #' @export
+# nolint end
 process_sedac_population <- function(
-  path
-) {
+    path = NULL) {
   if (substr(path, nchar(path) - 2, nchar(path)) == ".nc") {
     cat(paste0("netCDF functionality for SEDAC data is under construction.\n"))
     return()
@@ -833,12 +1046,35 @@ process_sedac_population <- function(
   return(data)
 }
 
+
+# nolint start
+#' Import and clean groads data from NASA Socioeconomic Data and Applications Center (SEDAC).
+#' @param path character(1). Path to geodatabase or shapefiles.
+#' @note U.S. context.
+#' @author Insang Song
+#' @returns a SpatVector.
+#' @importFrom terra vect
+#' @export
+# nolint end
+process_sedac_groads <- function(
+    path = NULL) {
+  #### check for variable
+  check_for_null_parameters(mget(ls()))
+  if (!grepl("(shp|gdb)$", path)) {
+    stop("Input is not in expected format.\n")
+  }
+  #### import data
+  data <- terra::vect(path)
+  return(data)
+}
+
+
+
 #' Import and clean wildfire smoke plume coverage data from NOAA Hazard
 #' Mapping System Fire and Smoke Product.
-#' @param date_start character(1). length of 10. Start date of downloaded data.
+#' @param date character(2). length of 10 each.
+#' Start/end date of downloaded data.
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
-#' @param date_end character(1). length of 10. End date of downloaded data.
-#' Format YYYY-MM-DD (ex. September 10, 2023 = "2023-09-10").
 #' @param variable character(1). "Light", "Medium", or "Heavy".
 #' @param path character(1). Directory with downloaded NOAA HMS data files.
 #' @author Mitchell Manware.
@@ -848,10 +1084,9 @@ process_sedac_population <- function(
 #' @importFrom terra subset
 #' @export
 process_hms <- function(
-    date_start = "2018-01-01",
-    date_end = "2018-01-01",
+    date = c("2018-01-01", "2018-01-01"),
     variable = c("Light", "Medium", "Heavy"),
-    path) {
+    path = NULL) {
   #### directory setup
   path <- download_sanitize_path(path)
   #### check for variable
@@ -868,8 +1103,8 @@ process_hms <- function(
   )]
   #### identify dates based on user input
   dates_of_interest <- generate_date_sequence(
-    date_start,
-    date_end,
+    date[1],
+    date[2],
     sub_hyphen = TRUE
   )
   #### subset file paths to only dates of interest
@@ -1005,7 +1240,7 @@ process_hms <- function(
 #' @export
 process_gmted <- function(
     variable = NULL,
-    path) {
+    path = NULL) {
   #### directory setup
   path <- download_sanitize_path(path)
   #### check for variable
@@ -1068,8 +1303,7 @@ process_gmted <- function(
 #' Function returns a SpatRast object containing the user-defined variable
 #' of interest. Layer names indicate the variable, pressure level, and date
 #' (YYYYMMDD).
-#' @param date_start character(1). length of 10. Format "YYYY-MM-DD".
-#' @param date_end character(1). length of 10. Format "YYYY-MM-DD".
+#' @param date character(2). length of 10 each. Format "YYYY-MM-DD".
 #' @param variable character(1). NARR variable name(s).
 #' @param path character(1). Directory with downloaded GEOS-CF
 #' netCDF files.
@@ -1081,8 +1315,7 @@ process_gmted <- function(
 #' @importFrom stringi stri_pad
 #' @export
 process_narr <- function(
-    date_start = "2023-09-01",
-    date_end = "2023-09-01",
+    date = c("2023-09-01", "2023-09-01"),
     variable = NULL,
     path) {
   #### directory setup
@@ -1101,8 +1334,8 @@ process_narr <- function(
   )]
   #### define date sequence
   date_sequence <- generate_date_sequence(
-    date_start,
-    date_end,
+    date[1],
+    date[2],
     sub_hyphen = TRUE
   )
   #### initiate for loop
@@ -1223,8 +1456,7 @@ process_narr <- function(
 #' returns a SpatRast object containing the user-defined variables of interest.
 #' Layer names indicate the variable, pressure level, date (YYYYMMDD), and, if
 #' applicable, the hour (HHMMSS).
-#' @param date_start character(1). length of 10. Format "YYYY-MM-DD".
-#' @param date_end character(1). length of 10. Format "YYYY-MM-DD".
+#' @param date character(2). length of 10. Format "YYYY-MM-DD".
 #' @param variable character(1). GEOS-CF variable name(s).
 #' @param path character(1). Directory with downloaded GEOS-CF
 #' netCDF files.
@@ -1239,8 +1471,7 @@ process_narr <- function(
 #' @importFrom terra subset
 #' @export
 process_geos <-
-  function(date_start = "2018-01-01",
-           date_end = "2018-01-01",
+  function(date = c("2018-01-01", "2018-01-01"),
            variable = NULL,
            path) {
     #### directory setup
@@ -1259,8 +1490,8 @@ process_geos <-
     )]
     #### identify dates based on user input
     dates_of_interest <- generate_date_sequence(
-      date_start,
-      date_end,
+      date[1],
+      date[2],
       sub_hyphen = TRUE
     )
     #### subset file paths to only dates of interest

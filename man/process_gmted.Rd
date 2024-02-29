@@ -8,7 +8,7 @@ Function returns a SpatRast object containing the user-defined variable
 of interest at specified resolution. Layer name indicates variable and
 resolution.}
 \usage{
-process_gmted(variable = NULL, path)
+process_gmted(variable = NULL, path = NULL)
 }
 \arguments{
 \item{variable}{vector(1). Vector containing the GMTED statistic first and

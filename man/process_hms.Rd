@@ -6,18 +6,15 @@
 Mapping System Fire and Smoke Product.}
 \usage{
 process_hms(
-  date_start = "2018-01-01",
-  date_end = "2018-01-01",
+  date = c("2018-01-01", "2018-01-01"),
   variable = c("Light", "Medium", "Heavy"),
-  path
+  path = NULL
 )
 }
 \arguments{
-\item{date_start}{character(1). length of 10. Start date of downloaded data.
+\item{date}{character(2). length of 10 each.
+Start/end date of downloaded data.
 Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
-
-\item{date_end}{character(1). length of 10. End date of downloaded data.
-Format YYYY-MM-DD (ex. September 10, 2023 = "2023-09-10").}
 
 \item{variable}{character(1). "Light", "Medium", or "Heavy".}
 

@@ -4,7 +4,7 @@
 \alias{process_flatten_sds}
 \title{Aggregate layers in a sub-dataset in sinusoidal MODIS products}
 \usage{
-process_flatten_sds(path, subdataset = NULL, fun_agg = "mean")
+process_flatten_sds(path = NULL, subdataset = NULL, fun_agg = "mean")
 }
 \arguments{
 \item{path}{character(1). Full path to MODIS HDF4/HDF5 file.
