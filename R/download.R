@@ -127,19 +127,20 @@ download_data <-
 #'  will be stored in \code{directory_to_save}.
 #' @export
 download_aqs_data <-
-  function(parameter_code = 88101,
-           resolution_temporal = "daily",
-           year_start = 2018,
-           year_end = 2022,
-           url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
-           directory_to_download = NULL,
-           directory_to_save = NULL,
-           data_download_acknowledgement = FALSE,
-           download = FALSE,
-           remove_command = FALSE,
-           unzip = TRUE,
-           remove_zip = FALSE
-           ) {
+  function(
+    parameter_code = 88101,
+    resolution_temporal = "daily",
+    year_start = 2018,
+    year_end = 2022,
+    url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
+    directory_to_download = NULL,
+    directory_to_save = NULL,
+    data_download_acknowledgement = FALSE,
+    download = FALSE,
+    remove_command = FALSE,
+    unzip = TRUE,
+    remove_zip = FALSE
+  ) {
     #### 1. check for data download acknowledgement
     download_permit(
       data_download_acknowledgement =
@@ -285,18 +286,18 @@ download_aqs_data <-
 #' @importFrom utils download.file
 #' @export
 download_ecoregion_data <- function(
-    epa_certificate_path =
-      system.file("extdata/cacert_gaftp_epa.pem",
-                  package = "amadeus"),
-    certificate_url =
-      "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
-    directory_to_download = NULL,
-    directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE
+  epa_certificate_path =
+    system.file("extdata/cacert_gaftp_epa.pem",
+                package = "amadeus"),
+  certificate_url =
+    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  directory_to_download = NULL,
+  directory_to_save = NULL,
+  data_download_acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE
 ) {
   #### 1. data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
@@ -406,15 +407,16 @@ download_ecoregion_data <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL;
+#' @return NULL; Hourly netCDF (.nc4) files will be stored in
+#' \code{directory_to_save}.
 #' @export
 download_geos_data <- function(
     collection =
-      c(
-        "aqc_tavg_1hr_g1440x721_v1", "chm_tavg_1hr_g1440x721_v1",
-        "met_tavg_1hr_g1440x721_x1", "xgc_tavg_1hr_g1440x721_x1",
-        "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"
-      ),
+        c(
+          "aqc_tavg_1hr_g1440x721_v1", "chm_tavg_1hr_g1440x721_v1",
+          "met_tavg_1hr_g1440x721_x1", "xgc_tavg_1hr_g1440x721_x1",
+          "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"
+        ),
     date_start = "2023-09-01",
     date_end = "2023-09-01",
     directory_to_save = NULL,
@@ -545,23 +547,25 @@ download_geos_data <- function(
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
-#' @return NULL;
+#' @return NULL; Statistic and resolution-specific zip files will be stored in
+#' \code{directory_to_download}, and directories containing raw ASCII Grid data
+#'will be stored in \code{directory_to_save}.
 #' @export
 download_gmted_data <- function(
-    statistic = c(
-      "Breakline Emphasis", "Systematic Subsample",
-      "Median Statistic", "Minimum Statistic",
-      "Mean Statistic", "Maximum Statistic",
-      "Standard Deviation Statistic"
-    ),
-    resolution = c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"),
-    directory_to_download = NULL,
-    directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE
+  statistic = c(
+    "Breakline Emphasis", "Systematic Subsample",
+    "Median Statistic", "Minimum Statistic",
+    "Mean Statistic", "Maximum Statistic",
+    "Standard Deviation Statistic"
+  ),
+  resolution = c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"),
+  directory_to_download = NULL,
+  directory_to_save = NULL,
+  data_download_acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
@@ -682,7 +686,8 @@ download_gmted_data <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL;
+#' @return NULL; Daily netCDF (.nc4) files will be stored in
+#' \code{directory_to_save}.
 #' @export
 # nolint end
 download_merra2_data <- function(
@@ -970,7 +975,8 @@ download_merra2_data <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL;
+#' @return NULL; Yearly netCDF (.nc) files will be stored in
+#' \code{directory_to_save}.
 #' @export
 download_narr_monolevel_data <- function(
     variables = NULL,
@@ -1093,7 +1099,8 @@ download_narr_monolevel_data <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL;
+#' @return NULL; Monthly netCDF (.nc) files will be stored in
+#' \code{directory_to_save}.
 #' @export
 download_narr_p_levels_data <- function(
     variables = NULL,
@@ -1228,19 +1235,20 @@ download_narr_p_levels_data <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL;
+#' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
+#' selected GeoTIFF (.tif) files will be stored in \code{directory_to_save}.
 #' @export
 download_nlcd_data <- function(
-    collection = "Coterminous United States",
-    year = 2021,
-    directory_to_download = NULL,
-    directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE
-    ) {
+  collection = "Coterminous United States",
+  year = 2021,
+  directory_to_download = NULL,
+  directory_to_save = NULL,
+  data_download_acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE
+) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
   #### 2. check for null parameters
@@ -1370,7 +1378,9 @@ download_nlcd_data <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL;
+#' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
+#' selected Shapefile (.shp) or Geodatabase (.gdb) files will be stored in 
+#' \code{directory_to_save}.
 #' @export
 download_sedac_groads_data <- function(
     data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
@@ -1381,7 +1391,7 @@ download_sedac_groads_data <- function(
     download = FALSE,
     remove_command = FALSE,
     unzip = TRUE,
-    remove_zip = FALSE,
+    remove_zip = FALSE
     ) {
   # nolint end
   #### 1. check for data download acknowledgement
@@ -1512,19 +1522,20 @@ download_sedac_groads_data <- function(
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
-#' @return NULL;
+#' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
+#' selected GeoTIFF (.tif) files will be stored in \code{directory_to_save}.
 #' @export
 download_sedac_population_data <- function(
-    data_resolution = "60 minute",
-    data_format = c("GeoTIFF", "ASCII", "netCDF"),
-    year = "2020",
-    directory_to_download = NULL,
-    directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE
+  data_resolution = "60 minute",
+  data_format = c("GeoTIFF", "ASCII", "netCDF"),
+  year = "2020",
+  directory_to_download = NULL,
+  directory_to_save = NULL,
+  data_download_acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
@@ -1693,7 +1704,9 @@ download_sedac_population_data <- function(
 #' @importFrom utils head
 #' @importFrom utils tail
 #' @author Mitchell Manware, Insang Song
-#' @return NULL;
+#' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
+#' Shapefiles (.shp) or KML files (.kml) will be stored in
+#' \code{directory_to_save}.
 #' @export
 download_hms_data <- function(
     data_format = "Shapefile",
@@ -1860,7 +1873,8 @@ download_hms_data <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL;
+#' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
+#' selected GeoTIFF (.tif) files will be stored in \code{directory_to_save}.
 #' @export
 download_koppen_geiger_data <- function(
     data_resolution = c("0.0083", "0.083", "0.5"),
@@ -2026,7 +2040,8 @@ download_koppen_geiger_data <- function(
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
 #' @import rvest
-#' @returns NULL;
+#' @return NULL; Raw HDF (.hdf) files will be stored in
+#' \code{directory_to_save}.
 #' @export
 download_modis_data <- function(
     product = c(
@@ -2320,7 +2335,8 @@ download_modis_data <- function(
 #' @param remove_command logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mariana Kassien, Insang Song
-#' @returns NULL; Yearly comma-separated value (CSV) raw files for each year
+#' @returns NULL; Yearly comma-separated value (CSV) files will be stored in
+#' \code{directory_to_save}.
 #' @export
 download_tri_data <- function(
   year_start = 2018L,
@@ -2418,20 +2434,21 @@ download_tri_data <- function(
 #' Currently we bundle the pre-downloaded crt and its PEM (which is accepted
 #' in wget command) file in ./inst/extdata. The instruction above is for
 #' certificate updates in the future.
-#' @returns NULL; Two comma-separated value (CSV) raw files for 2017 and 2020
+#' @returns NULL; Yearly comma-separated value (CSV) files will be stored in
+#' \code{directory_to_save}.
 #' @export
 download_nei_data <- function(
-    epa_certificate_path =
-      system.file("extdata/cacert_gaftp_epa.pem",
-                  package = "amadeus"),
-    certificate_url =
-      "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
-    year_target = c(2017L, 2020L),
-    directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    unzip = TRUE
+  epa_certificate_path =
+    system.file("extdata/cacert_gaftp_epa.pem",
+                package = "amadeus"),
+  certificate_url =
+    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  year_target = c(2017L, 2020L),
+  directory_to_save = NULL,
+  data_download_acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
