@@ -96,31 +96,31 @@ download_data <-
 #'  EPA pollutant parameter code. For details, please refer to
 #'  [AQS parameter codes](https://aqs.epa.gov/aqsweb/documents/codetables/parameters.html)
 # nolint end
+#' @param resolution_temporal character(1).
+#'  Name of column containing POC values.
+#'  Currently, no value other than `"daily"` works.
+#' @param url_aqs_download character(1).
+#'  URL to the AQS pre-generated datasets.
 #' @param year_start integer(1). length of 4.
 #'  Start year for downloading data.
 #' @param year_end integer(1). length of 4.
 #'  End year for downloading data.
-#' @param resolution_temporal character(1).
-#'  Name of column containing POC values.
-#'  Currently, no value other than `"daily"` works.
 #' @param directory_to_download character(1).
 #'  Directory to download zip files from AQS data mart.
 #' @param directory_to_save character(1).
 #'  Directory to decompress zip files.
-#' @param url_aqs_download character(1).
-#'  URL to the AQS pre-generated datasets.
 #' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledge that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
-#' @param unzip logical(1). Unzip zip files. Default \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip file from directory_to_download.
-#' Default \code{FALSE}.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
 #' will download all of the requested data files.
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands. Default is FALSE.
+#' @param unzip logical(1). Unzip zip files. Default \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip file from directory_to_download.
+#' Default \code{FALSE}.
 #' @author Mariana Kassien, Insang Song, Mitchell Manware
 #' @returns NULL; Separate comma-separated value (CSV) files of
 #'  monitors and the daily representative values
@@ -128,17 +128,18 @@ download_data <-
 #' @export
 download_aqs_data <-
   function(parameter_code = 88101,
+           resolution_temporal = "daily",
            year_start = 2018,
            year_end = 2022,
-           resolution_temporal = "daily",
+           url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
            directory_to_download = NULL,
            directory_to_save = NULL,
-           url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
            data_download_acknowledgement = FALSE,
-           unzip = TRUE,
-           remove_zip = FALSE,
            download = FALSE,
-           remove_command = FALSE) {
+           remove_command = FALSE,
+           unzip = TRUE,
+           remove_zip = FALSE
+           ) {
     #### 1. check for data download acknowledgement
     download_permit(
       data_download_acknowledgement =
@@ -259,43 +260,43 @@ download_aqs_data <-
 #' Currently we bundle the pre-downloaded crt and its PEM (which is accepted
 #' in wget command) file in ./inst/extdata. The instruction above is for
 #' certificate updates in the future.
+#' @param epa_certificate_path character(1). Path to the certificate file
+#' for EPA DataCommons. Default is
+#' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
+#' @param certificate_url character(1). URL to certificate file. See notes for
+#' details.
 #' @param directory_to_download character(1). Directory to download zip file
 #' of Ecoregion level 3 shapefiles
 #' @param directory_to_save character(1). Directory to decompress zip files.
 #' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledge that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
-#' @param unzip logical(1). Unzip zip files. Default \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip file from directory_to_download.
-#' Default \code{FALSE}.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
 #' will download all of the requested data files.
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
-#' @param epa_certificate_path character(1). Path to the certificate file
-#' for EPA DataCommons. Default is
-#' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
-#' @param certificate_url character(1). URL to certificate file. See notes for
-#' details.
+#' @param unzip logical(1). Unzip zip files. Default \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip file from directory_to_download.
+#' Default \code{FALSE}.
 #' @author Insang Song
 #' @returns NULL;
 #' @importFrom utils download.file
 #' @export
 download_ecoregion_data <- function(
-  directory_to_download = NULL,
-  directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
-  unzip = TRUE,
-  remove_zip = FALSE,
-  download = FALSE,
-  remove_command = TRUE,
-  epa_certificate_path =
-    system.file("extdata/cacert_gaftp_epa.pem",
-                package = "amadeus"),
-  certificate_url =
-    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
+    epa_certificate_path =
+      system.file("extdata/cacert_gaftp_epa.pem",
+                  package = "amadeus"),
+    certificate_url =
+      "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
+    directory_to_download = NULL,
+    directory_to_save = NULL,
+    data_download_acknowledgement = FALSE,
+    download = FALSE,
+    remove_command = TRUE
+    unzip = TRUE,
+    remove_zip = FALSE
 ) {
   #### 1. data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
@@ -389,11 +390,11 @@ download_ecoregion_data <- function(
 #' The \code{download_geos_data()} function accesses and downloads various
 #' atmospheric composition collections from the [NASA Global Earth Observing System (GEOS) model](https://gmao.gsfc.nasa.gov/GEOS_systems/).
 # nolint end
+#' @param collection character(1). GEOS-CF data collection file name.
 #' @param date_start character(1). length of 10. Start date for downloading
 #' data. Format YYYY-MM-DD (ex. September 1, 2023 = `"2023-09-01"`).
 #' @param date_end character(1). length of 10. End date for downloading data.
 #' Format YYYY-MM-DD (ex. September 1, 2023 = `"2023-09-01"`).
-#' @param collection character(1). GEOS-CF data collection file name.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledge that the data downloaded using this function may be very
@@ -408,14 +409,14 @@ download_ecoregion_data <- function(
 #' @return NULL;
 #' @export
 download_geos_data <- function(
+    collection =
+      c(
+        "aqc_tavg_1hr_g1440x721_v1", "chm_tavg_1hr_g1440x721_v1",
+        "met_tavg_1hr_g1440x721_x1", "xgc_tavg_1hr_g1440x721_x1",
+        "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"
+      ),
     date_start = "2023-09-01",
     date_end = "2023-09-01",
-    collection =
-        c(
-          "aqc_tavg_1hr_g1440x721_v1", "chm_tavg_1hr_g1440x721_v1",
-          "met_tavg_1hr_g1440x721_x1", "xgc_tavg_1hr_g1440x721_x1",
-          "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"
-        ),
     directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     download = FALSE,
@@ -533,15 +534,15 @@ download_geos_data <- function(
 #' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledge that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip file from directory_to_download.
-#' Default is \code{FALSE}.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
 #' will download all of the requested data files.
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands. Default is FALSE.
+#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip file from directory_to_download.
+#' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
 #' @return NULL;
@@ -557,10 +558,11 @@ download_gmted_data <- function(
     directory_to_download = NULL,
     directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE,
     download = FALSE,
-    remove_command = FALSE) {
+    remove_command = FALSE,
+    unzip = TRUE,
+    remove_zip = FALSE
+) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
   #### 2. check for null parameters
@@ -664,11 +666,11 @@ download_gmted_data <- function(
 #' @description
 #' The \code{download_merra2_data()} function accesses and downloads various
 #' meteorological and atmospheric collections from the [Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/).
+#' @param collection character(1). MERRA-2 data collection file name.
 #' @param date_start character(1). length of 10. Start date for downloading
 #' data. Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
 #' @param date_end character(1). length of 10. End date for downloading data.
 #' Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
-#' @param collection character(1). MERRA-2 data collection file name.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledge that the data downloaded using this function may be very
@@ -684,8 +686,6 @@ download_gmted_data <- function(
 #' @export
 # nolint end
 download_merra2_data <- function(
-    date_start = "2023-09-01",
-    date_end = "2023-09-01",
     collection = c(
       "inst1_2d_asm_Nx", "inst1_2d_int_Nx", "inst1_2d_lfo_Nx",
       "inst3_3d_asm_Np", "inst3_3d_aer_Nv", "inst3_3d_asm_Nv",
@@ -701,6 +701,8 @@ download_merra2_data <- function(
       "tavg3_3d_qdt_Np", "tavg3_3d_asm_Nv", "tavg3_3d_cld_Nv",
       "tavg3_3d_mst_Nv", "tavg3_3d_rad_Nv", "tavg3_2d_glc_Nx"
     ),
+    date_start = "2023-09-01",
+    date_end = "2023-09-01",
     directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     download = FALSE,
@@ -951,11 +953,11 @@ download_merra2_data <- function(
 #' The \code{download_narr_monolevel_data} function accesses and downloads
 #' monolevel meteorological data from [NOAA NCEP North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html).
 # nolint end
+#' @param variables character. Variable(s) name acronym.
 #' @param year_start integer(1). length of 4. Start of year range for
 #' downloading data.
 #' @param year_end integer(1). length of 4. End of year range for downloading
 #' data.
-#' @param variables character. Variable(s) name acronym.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
@@ -971,9 +973,9 @@ download_merra2_data <- function(
 #' @return NULL;
 #' @export
 download_narr_monolevel_data <- function(
+    variables = NULL,
     year_start = 2022,
     year_end = 2022,
-    variables = NULL,
     directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     download = FALSE,
@@ -1074,11 +1076,11 @@ download_narr_monolevel_data <- function(
 #' The \code{download_narr_p_levels_data} function accesses and downloads
 #' pressure level meteorological data from [NOAA NCEP North American Regional
 #' Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html).
+#' @param variables character(1). Variable(s) name acronym.
 #' @param year_start integer(1). length of 4. Start of year range for
 #' downloading data.
 #' @param year_end integer(1). length of 4. End of year range for downloading
 #' data.
-#' @param variables character(1). Variable(s) name acronym.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
@@ -1094,9 +1096,9 @@ download_narr_monolevel_data <- function(
 #' @return NULL;
 #' @export
 download_narr_p_levels_data <- function(
+    variables = NULL,
     year_start = 2022,
     year_end = 2022,
-    variables = NULL,
     directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     download = FALSE,
@@ -1205,39 +1207,40 @@ download_narr_p_levels_data <- function(
 #' The \code{download_nlcd_data()} function accesses and downloads
 #' land cover data from the
 #' [NLCD Science Research Products](https://www.mrlc.gov/data) data base.
+#' @param collection character(1). `"Coterminous United States"` or `"Alaska"`.
 #' @param year integer(1). Available years for Coterminous United States
 #' include `2001`, `2004`, `2006`, `2008`, `2011`, `2013`, `2016`,
 #' `2019`, and `2021`.
 #' Available years for Alaska include `2001`, `2011`, and `2016`.
-#' @param collection character(1). `"Coterminous United States"` or `"Alaska"`.
 #' @param directory_to_download character(1). Directory to download zip files
 #' from National Land Cover Database Science Research Products.
 #' @param directory_to_save character(1). Directory to decompress zip files.
 #' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledge that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip files from directory_to_download.
-#' Default is \code{FALSE}.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
 #' will download all of the requested data files.
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip files from directory_to_download.
+#' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 #' @returns NULL;
 #' @export
 download_nlcd_data <- function(
-    year = 2021,
     collection = "Coterminous United States",
+    year = 2021,
     directory_to_download = NULL,
     directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE,
     download = FALSE,
-    remove_command = FALSE) {
+    remove_command = FALSE,
+    unzip = TRUE,
+    remove_zip = FALSE
+    ) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
   #### 2. check for null parameters
@@ -1347,38 +1350,39 @@ download_nlcd_data <- function(
 #' The \code{download_sedac_groads_data()} function accesses and downloads
 #' roads data from the National Aeronautics and Space
 #' Administration's (NASA) [Global Roads Open Access Data Set](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download).
-#' @param data_format character(1). Data can be downloaded as `"Shapefile"` or
-#' `"Geodatabase"`. (Only `"Geodatabase"` available for `"Global"` region).
 #' @param data_region character(1). Data can be downloaded for `"Global"`,
 #' `"Africa"`, `"Asia"`, `"Europe"`, `"Americas"`, `"Oceania East"`, and `"Oceania West"`.
+#' @param data_format character(1). Data can be downloaded as `"Shapefile"` or
+#' `"Geodatabase"`. (Only `"Geodatabase"` available for `"Global"` region).
 #' @param directory_to_download character(1). Directory to download zip files
 #' from NASA Global Roads Open Access Data Set.
 #' @param directory_to_save character(1). Directory to decompress zip files.
 #' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledge that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip files from directory_to_download.
-#' Default is \code{FALSE}.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
 #' will download all of the requested data files.
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip files from directory_to_download.
+#' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 #' @return NULL;
 #' @export
 download_sedac_groads_data <- function(
-    data_format = c("Shapefile", "Geodatabase"),
     data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
+    data_format = c("Shapefile", "Geodatabase"),
     directory_to_download = NULL, 
     directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
+    download = FALSE,
+    remove_command = FALSE,
     unzip = TRUE,
     remove_zip = FALSE,
-    download = FALSE,
-    remove_command = FALSE) {
+    ) {
   # nolint end
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
@@ -1484,13 +1488,13 @@ download_sedac_groads_data <- function(
 #' The \code{download_sedac_population_data()} function accesses and downloads
 #' population density data from the National Aeronatuics and Space
 #' Administration's (NASA) [UN WPP-Adjusted Population Density, v4.11]( https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11).
-#' @param year character(1). Available years are `2000`, `2005`, `2010`, `2015`, and
-#' `2020`, or `"all"` for all years.
-#' @param data_format character(1). Individual year data can be downloaded as
-#' `"ASCII"` or `"GeoTIFF"`. "all" years is downloaded as `"netCDF"`.
 #' @param data_resolution character(1). Available resolutions are 30 second
 #' (approx. 1 km), 2.5 minute (approx. 5 km), 15 minute (approx. 30 km),
 #' 30 minute (approx. 55 km), and 60 minute (approx. 110 km).
+#' @param data_format character(1). Individual year data can be downloaded as
+#' `"ASCII"` or `"GeoTIFF"`. "all" years is downloaded as `"netCDF"`.
+#' @param year character(1). Available years are `2000`, `2005`, `2010`, `2015`, and
+#' `2020`, or `"all"` for all years.
 #' @param directory_to_download character(1). Directory to download zip files
 #' from NASA UN WPP-Adjusted Population Density, v4.11.
 #' @param directory_to_save character(1). Directory to decompress zip files.
@@ -1500,27 +1504,27 @@ download_sedac_groads_data <- function(
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
 #' will download all of the requested data files.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip files from directory_to_download.
-#' Default is \code{FALSE}.
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip files from directory_to_download.
+#' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
 #' @return NULL;
 #' @export
 download_sedac_population_data <- function(
-  year = "2020",
-  data_format = c("GeoTIFF", "ASCII", "netCDF"),
-  data_resolution = "60 minute",
-  directory_to_download = NULL,
-  directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
-  download = FALSE,
-  unzip = TRUE,
-  remove_zip = FALSE,
-  remove_command = FALSE
+    data_resolution = "60 minute",
+    data_format = c("GeoTIFF", "ASCII", "netCDF"),
+    year = "2020",
+    directory_to_download = NULL,
+    directory_to_save = NULL,
+    data_download_acknowledgement = FALSE,
+    download = FALSE,
+    remove_command = FALSE,
+    unzip = TRUE,
+    remove_zip = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
@@ -1661,11 +1665,11 @@ download_sedac_population_data <- function(
 #' the National Oceanic and Atmospheric Administration's (NOAA)
 #' [Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0).
 # nolint end
+#' @param data_format character(1). "Shapefile" or "KML".
 #' @param date_start character(1). length of 10. Start date for downloading
 #' data. Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
 #' @param date_end character(1). length of 10. End date for downloading data.
 #' Format YYYY-MM-DD (ex. September 10, 2023 is `"2023-09-10"`).
-#' @param data_format character(1). "Shapefile" or "KML".
 #' @param directory_to_download character(1). Directory to download zip files
 #' from NOAA Hazard Mapping System Fire and Smoke Product. (Ignored if
 #' \code{data_format = "KML"}.)
@@ -1678,23 +1682,23 @@ download_sedac_population_data <- function(
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
 #' will download all of the requested data files.
+#' @param remove_command logical(1).
+#' Remove (\code{TRUE}) or keep (\code{FALSE})
+#' the text file containing download commands.
 #' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}. (Ignored
 #' if \code{data_format = "KML"}.)
 #' @param remove_zip logical(1). Remove zip files from
 #' directory_to_download. Default is \code{FALSE}.
 #' (Ignored if \code{data_format = "KML"}.)
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
 #' @importFrom utils head
 #' @importFrom utils tail
 #' @author Mitchell Manware, Insang Song
 #' @return NULL;
 #' @export
 download_hms_data <- function(
+    data_format = "Shapefile",
     date_start = "2023-09-01",
     date_end = "2023-09-01",
-    data_format = "Shapefile",
     directory_to_download = NULL,
     directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
@@ -1833,12 +1837,12 @@ download_hms_data <- function(
 #' Köppen-Geiger climate classification maps at
 #'  1-km resolution ([link for article](https://www.nature.com/articles/sdata2018214); [link for data](https://figshare.com/articles/dataset/Present_and_future_K_ppen-Geiger_climate_classification_maps_at_1-km_resolution/6396959/2)).
 # nolint end
-#' @param time_period character(1). Available times are `"Present"` (1980-2016)
-#' and `"Future"` (2071-2100). ("Future" classifications are based on scenario
-#' RCP8.5).
 #' @param data_resolution character(1). Available resolutions are `"0.0083"`
 #' degrees (approx. 1 km), `"0.083"` degrees (approx. 10 km), and
 #' `"0.5"` degrees (approx. 50 km).
+#' @param time_period character(1). Available times are `"Present"` (1980-2016)
+#' and `"Future"` (2071-2100). ("Future" classifications are based on scenario
+#' RCP8.5).
 #' @param directory_to_download character(1). Directory to download zip files
 #' from Present and future Köppen-Geiger climate classification maps at 1-km
 #' resolution.
@@ -1846,28 +1850,28 @@ download_hms_data <- function(
 #' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledge that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip files from directory_to_download.
-#' Default is \code{FALSE}.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
 #' will download all of the requested data files.
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip files from directory_to_download.
+#' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 #' @return NULL;
 #' @export
 download_koppen_geiger_data <- function(
-    time_period = c("Present", "Future"),
     data_resolution = c("0.0083", "0.083", "0.5"),
+    time_period = c("Present", "Future"),
     directory_to_download = NULL,
     directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     download = FALSE,
+    remove_command = FALSE,
     unzip = TRUE,
-    remove_zip = FALSE,
-    remove_command = FALSE) {
+    remove_zip = FALSE) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
   #### 2. check for null parameters
@@ -1997,10 +2001,6 @@ download_koppen_geiger_data <- function(
 #'  input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}
 #'  Please note that \code{date_start} and \code{date_end} are
 #'  ignored if \code{product == 'MOD06_L2'}.
-#' @param date_start character(1). length of 10. Start date for downloading
-#' data. Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
-#' @param date_end character(1). length of 10. End date for downloading data.
-#' Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
 #' @param product character(1).
 #' One of `c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2")`
 #' @param version character(1). Default is `"61"`, meaning v061.
@@ -2011,12 +2011,16 @@ download_koppen_geiger_data <- function(
 #' @param nasa_earth_data_token character(1).
 #'  Token for downloading data from NASA. Should be set before
 #'  trying running the function.
+#' @param mod06_links character(1). CSV file path to MOD06_L2 download links
+#' from NASA LPDAAC. Default is `NULL`.
+#' @param date_start character(1). length of 10. Start date for downloading
+#' data. Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
+#' @param date_end character(1). length of 10. End date for downloading data.
+#' Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
 #' @param directory_to_save character(1). Directory to save data.
 #' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledge that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
-#' @param mod06_links character(1). CSV file path to MOD06_L2 download links
-#' from NASA LPDAAC. Default is `NULL`.
 #' @param download logical(1). Download data or only save wget commands.
 #' @param remove_command logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
@@ -2025,8 +2029,6 @@ download_koppen_geiger_data <- function(
 #' @returns NULL;
 #' @export
 download_modis_data <- function(
-    date_start = "2023-09-01",
-    date_end = "2023-09-01",
     product = c(
       "MOD09GA", "MOD11A1", "MOD06_L2",
       "MCD19A2", "MOD13A2", "VNP46A2"
@@ -2034,11 +2036,13 @@ download_modis_data <- function(
     version = "61",
     horizontal_tiles = c(7, 13),
     vertical_tiles = c(3, 6),
+    mod06_links = NULL,
     nasa_earth_data_token = NULL,
+    date_start = "2023-09-01",
+    date_end = "2023-09-01",
     directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
-    mod06_links = NULL,
-    download = TRUE,
+    download = FALSE,
     remove_command = FALSE) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
@@ -2385,6 +2389,13 @@ download_tri_data <- function(
 # nolint start
 #' Download data from EPA National Emission Inventory aggregated on-road emission data
 # nolint end
+#' @param epa_certificate_path character(1). Path to the certificate file
+#' for EPA DataCommons. Default is
+#' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
+#' @param certificate_url character(1). URL to certificate file. See notes for
+#' details.
+#' @param year_target Available years of NEI data.
+#' Default is \code{c(2017L, 2020L)}.
 #' @param directory_to_save character(1). Directory to download files.
 #' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledge that the data downloaded using this function may be very
@@ -2395,15 +2406,8 @@ download_tri_data <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
-#' @param year_target Available years of NEI data.
-#' Default is \code{c(2017L, 2020L)}.
 #' @param unzip logical(1). Unzip the downloaded zip files.
 #' Default is \code{FALSE}.
-#' @param epa_certificate_path character(1). Path to the certificate file
-#' for EPA DataCommons. Default is
-#' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
-#' @param certificate_url character(1). URL to certificate file. See notes for
-#' details.
 #' @author Ranadeep Daw, Insang Song
 #' @note
 #' For EPA Data Commons certificate errors, follow the steps below:
@@ -2417,17 +2421,17 @@ download_tri_data <- function(
 #' @returns NULL; Two comma-separated value (CSV) raw files for 2017 and 2020
 #' @export
 download_nei_data <- function(
-  directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
-  download = FALSE,
-  remove_command = FALSE,
-  year_target = c(2017L, 2020L),
-  unzip = FALSE,
-  epa_certificate_path =
-    system.file("extdata/cacert_gaftp_epa.pem",
-                package = "amadeus"),
-  certificate_url =
-    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
+    epa_certificate_path =
+      system.file("extdata/cacert_gaftp_epa.pem",
+                  package = "amadeus"),
+    certificate_url =
+      "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+    year_target = c(2017L, 2020L),
+    directory_to_save = NULL,
+    data_download_acknowledgement = FALSE,
+    download = FALSE,
+    remove_command = FALSE,
+    unzip = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
