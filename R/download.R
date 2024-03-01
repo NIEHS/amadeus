@@ -294,7 +294,7 @@ download_ecoregion_data <- function(
     directory_to_save = NULL,
     data_download_acknowledgement = FALSE,
     download = FALSE,
-    remove_command = TRUE
+    remove_command = FALSE,
     unzip = TRUE,
     remove_zip = FALSE
 ) {
@@ -2431,7 +2431,7 @@ download_nei_data <- function(
     data_download_acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE,
-    unzip = FALSE
+    unzip = TRUE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(data_download_acknowledgement = data_download_acknowledgement)
