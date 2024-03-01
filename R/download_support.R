@@ -42,13 +42,13 @@ download_sanitize_path <-
 
 
 #' Check for data download acknowledgement
-#' @param data_download_acknowledgement logical(1). Whether to
+#' @param acknowledgement logical(1). Whether to
 #' start downloading
 #' @returns NULL
 #' @export
 download_permit <-
-  function(data_download_acknowledgement) {
-    if (!data_download_acknowledgement) {
+  function(acknowledgement) {
+    if (!acknowledgement) {
       stop(paste0(
         "Data download acknowledgement is set to FALSE. ",
         "Please acknowledge that the data downloaded using this ",

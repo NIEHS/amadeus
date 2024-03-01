@@ -122,7 +122,7 @@ Four parameters are included in all of the data download functions.
 ```{r, echo = FALSE}
 parameter <- c(
   "directory_to_save",
-  "data_download_acknowledgement",
+  "acknowledgement",
   "download", "remove_command"
 )
 type <- c("Character", "Logical", "Logical", "Logical")
@@ -558,7 +558,7 @@ testthat::test_that(
       data_format = "Shapefile",
       directory_to_download = test_directory,
       directory_to_save = test_directory,
-      data_download_acknowledgement = TRUE,
+      acknowledgement = TRUE,
       download = FALSE,
       remove_command = FALSE,
       unzip = FALSE,
@@ -599,7 +599,7 @@ testthat::test_that(
       data_format = "Shapefile",
       directory_to_download = test_directory,
       directory_to_save = test_directory,
-      data_download_acknowledgement = TRUE,
+      acknowledgement = TRUE,
       download = FALSE,
       remove_command = FALSE,
       unzip = FALSE,
@@ -647,7 +647,7 @@ testthat::test_that(
         data_format = "Shapefile",
         directory_to_download = test_directory,
         directory_to_save = test_directory,
-        data_download_acknowledgement = TRUE,
+        acknowledgement = TRUE,
         download = FALSE,
         remove_command = FALSE,
         unzip = FALSE,
@@ -677,7 +677,7 @@ testthat::test_that(
         data_format = "Shapefile",
         directory_to_download = test_directory,
         directory_to_save = test_directory,
-        data_download_acknowledgement = TRUE,
+        acknowledgement = TRUE,
         download = FALSE,
         remove_command = FALSE,
         unzip = FALSE,
@@ -708,7 +708,7 @@ date_start <- "2023-12-28"
 date_end <- "2024-01-02"
 data_format <- "Shapefile"
 data_directory <- "./download_example/"
-data_download_acknowledgement <- TRUE
+acknowledgement <- TRUE
 download <- TRUE # run data download
 remove_command <- TRUE # delete "...commands.txt" file
 unzip <- TRUE # inflate (unzip) downloaded zip files
@@ -724,7 +724,7 @@ download_data(
   date_end = date_end,
   directory_to_download = data_directory,
   directory_to_save = data_directory,
-  data_download_acknowledgement = data_download_acknowledgement,
+  acknowledgement = acknowledgement,
   download = download,
   remove_command = remove_command,
   unzip = unzip,
@@ -783,7 +783,7 @@ download_data(
   data_resolution = "60 minute",
   directory_to_download = "./sedac_population/",
   directory_to_save = "./sedac_population",
-  data_download_acknowledgement = TRUE,
+  acknowledgement = TRUE,
   download = TRUE,
   unzip = TRUE,
   remove_zip = FALSE,
@@ -1007,7 +1007,7 @@ download_data(
   data_resolution = "60 minute",
   directory_to_download = "./sedac_population/",
   directory_to_save = "./sedac_population",
-  data_download_acknowledgement = TRUE,
+  acknowledgement = TRUE,
   download = TRUE,
   unzip = TRUE,
   remove_zip = FALSE,

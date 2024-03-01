@@ -3,8 +3,8 @@
 #' @param dataset_name character(1). Dataset to download.
 #' @param directory_to_save character(1). Directory to save / unzip
 #'  (if zip files are downloaded) data.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param ... Arguments passed to each download function.
 #' @note
@@ -38,7 +38,7 @@ download_data <-
                      "sedac_population", "groads", "population", "plevels",
                      "p_levels", "monolevel", "hms", "smoke", "tri", "nei"),
     directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
+    acknowledgement = FALSE,
     ...
   ) {
 
@@ -77,7 +77,7 @@ download_data <-
       {
         what_to_run(
           directory_to_save = directory_to_save,
-          data_download_acknowledgement = data_download_acknowledgement,
+          acknowledgement = acknowledgement,
           ...
         )
       },
@@ -109,8 +109,8 @@ download_data <-
 #'  Directory to download zip files from AQS data mart.
 #' @param directory_to_save character(1).
 #'  Directory to decompress zip files.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -135,7 +135,7 @@ download_aqs_data <-
     url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
     directory_to_download = NULL,
     directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
+    acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE,
     unzip = TRUE,
@@ -143,8 +143,8 @@ download_aqs_data <-
   ) {
     #### 1. check for data download acknowledgement
     download_permit(
-      data_download_acknowledgement =
-        data_download_acknowledgement
+      acknowledgement =
+        acknowledgement
     )
     #### 2. check for null parameters
     check_for_null_parameters(mget(ls()))
@@ -269,8 +269,8 @@ download_aqs_data <-
 #' @param directory_to_download character(1). Directory to download zip file
 #' of Ecoregion level 3 shapefiles
 #' @param directory_to_save character(1). Directory to decompress zip files.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -293,14 +293,14 @@ download_ecoregion_data <- function(
     "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   directory_to_download = NULL,
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE
 ) {
   #### 1. data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
@@ -397,8 +397,8 @@ download_ecoregion_data <- function(
 #' @param date_end character(1). length of 10. End date for downloading data.
 #' Format YYYY-MM-DD (ex. September 1, 2023 = `"2023-09-01"`).
 #' @param directory_to_save character(1). Directory to save data.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -420,11 +420,11 @@ download_geos_data <- function(
     date_start = "2023-09-01",
     date_end = "2023-09-01",
     directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
+    acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE) {
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
@@ -533,8 +533,8 @@ download_geos_data <- function(
 #' @param directory_to_download character(1). Directory to download zip files
 #' from Global Multi-resolution Terrain Elevation Data (GMTED2010).
 #' @param directory_to_save character(1). Directory to decompress zip files.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -561,14 +561,14 @@ download_gmted_data <- function(
   resolution = c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"),
   directory_to_download = NULL,
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
@@ -676,8 +676,8 @@ download_gmted_data <- function(
 #' @param date_end character(1). length of 10. End date for downloading data.
 #' Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
 #' @param directory_to_save character(1). Directory to save data.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -709,11 +709,11 @@ download_merra2_data <- function(
     date_start = "2023-09-01",
     date_end = "2023-09-01",
     directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
+    acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE) {
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
@@ -965,8 +965,8 @@ download_merra2_data <- function(
 #' data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -983,11 +983,11 @@ download_narr_monolevel_data <- function(
     year_start = 2022,
     year_end = 2022,
     directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
+    acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE) {
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
@@ -1089,8 +1089,8 @@ download_narr_monolevel_data <- function(
 #' data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -1107,11 +1107,11 @@ download_narr_p_levels_data <- function(
     year_start = 2022,
     year_end = 2022,
     directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
+    acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE) {
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
@@ -1222,8 +1222,8 @@ download_narr_p_levels_data <- function(
 #' @param directory_to_download character(1). Directory to download zip files
 #' from National Land Cover Database Science Research Products.
 #' @param directory_to_save character(1). Directory to decompress zip files.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -1243,14 +1243,14 @@ download_nlcd_data <- function(
   year = 2021,
   directory_to_download = NULL,
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
@@ -1365,8 +1365,8 @@ download_nlcd_data <- function(
 #' @param directory_to_download character(1). Directory to download zip files
 #' from NASA Global Roads Open Access Data Set.
 #' @param directory_to_save character(1). Directory to decompress zip files.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -1387,7 +1387,7 @@ download_sedac_groads_data <- function(
     data_format = c("Shapefile", "Geodatabase"),
     directory_to_download = NULL, 
     directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
+    acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE,
     unzip = TRUE,
@@ -1395,7 +1395,7 @@ download_sedac_groads_data <- function(
     ) {
   # nolint end
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
@@ -1508,8 +1508,8 @@ download_sedac_groads_data <- function(
 #' @param directory_to_download character(1). Directory to download zip files
 #' from NASA UN WPP-Adjusted Population Density, v4.11.
 #' @param directory_to_save character(1). Directory to decompress zip files.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -1531,14 +1531,14 @@ download_sedac_population_data <- function(
   year = "2020",
   directory_to_download = NULL,
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
@@ -1686,9 +1686,9 @@ download_sedac_population_data <- function(
 #' \code{data_format = "KML"}.)
 #' @param directory_to_save character(1). Directory to save unzipped shapefiles
 #' and KML files.
-#' @param data_download_acknowledgement logical(1).
+#' @param acknowledgement logical(1).
 #' By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -1714,13 +1714,13 @@ download_hms_data <- function(
     date_end = "2023-09-01",
     directory_to_download = NULL,
     directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
+    acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE,
     unzip = TRUE,
     remove_zip = FALSE) {
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
@@ -1860,8 +1860,8 @@ download_hms_data <- function(
 #' from Present and future Köppen-Geiger climate classification maps at 1-km
 #' resolution.
 #' @param directory_to_save character(1). Directory to decompress zip files.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -1881,13 +1881,13 @@ download_koppen_geiger_data <- function(
     time_period = c("Present", "Future"),
     directory_to_download = NULL,
     directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
+    acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE,
     unzip = TRUE,
     remove_zip = FALSE) {
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
@@ -2032,8 +2032,8 @@ download_koppen_geiger_data <- function(
 #' @param date_end character(1). length of 10. End date for downloading data.
 #' Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
 #' @param directory_to_save character(1). Directory to save data.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). Download data or only save wget commands.
 #' @param remove_command logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
@@ -2056,11 +2056,11 @@ download_modis_data <- function(
     date_start = "2023-09-01",
     date_end = "2023-09-01",
     directory_to_save = NULL,
-    data_download_acknowledgement = FALSE,
+    acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE) {
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
@@ -2326,8 +2326,8 @@ download_modis_data <- function(
 #' @param year_start integer(1). length of 4. Start year for downloading data.
 #' @param year_end integer(1). length of 4. End year for downloading data.
 #' @param directory_to_save character(1). Directory to download files.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -2342,12 +2342,12 @@ download_tri_data <- function(
   year_start = 2018L,
   year_end = 2022L,
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
@@ -2413,8 +2413,8 @@ download_tri_data <- function(
 #' @param year_target Available years of NEI data.
 #' Default is \code{c(2017L, 2020L)}.
 #' @param directory_to_save character(1). Directory to download files.
-#' @param data_download_acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledge that the data downloaded using this function may be very
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param download logical(1). \code{FALSE} will generate a *.txt file
 #' containing all download commands. By setting \code{TRUE} the function
@@ -2445,13 +2445,13 @@ download_nei_data <- function(
     "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   year_target = c(2017L, 2020L),
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(data_download_acknowledgement = data_download_acknowledgement)
+  download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
