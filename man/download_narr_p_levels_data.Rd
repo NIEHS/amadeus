@@ -2,32 +2,32 @@
 % Please edit documentation in R/download.R
 \name{download_narr_p_levels_data}
 \alias{download_narr_p_levels_data}
-\title{Download pressure level meteorological data from NOAA NCEP North American Regional Reanalysis (NARR) model.}
+\title{Download meteorological data (pressure levels)}
 \usage{
 download_narr_p_levels_data(
+  variables = NULL,
   year_start = 2022,
   year_end = 2022,
-  variables = NULL,
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE
 )
 }
 \arguments{
+\item{variables}{character(1). Variable(s) name acronym.}
+
 \item{year_start}{integer(1). length of 4. Start of year range for
 downloading data.}
 
 \item{year_end}{integer(1). length of 4. End of year range for downloading
 data.}
 
-\item{variables}{character(1). Variable(s) name acronym.}
-
 \item{directory_to_save}{character(1). Directory(s) to save downloaded data
 files.}
 
-\item{data_download_acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+\item{acknowledgement}{logical(1). By setting \code{TRUE} the
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
 
 \item{download}{logical(1). \code{FALSE} will generate a *.txt file
@@ -39,11 +39,11 @@ Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 }
 \value{
-NULL;
+NULL; Monthly netCDF (.nc) files will be stored in
+\code{directory_to_save}.
 }
 \description{
-The \code{download_narr_p_levels_data} function accesses and downloads
-pressure level meteorological data from \href{https://psl.noaa.gov/data/gridded/data.narr.html}{NOAA NCEP North American Regional Reanalysis (NARR)}.
+The \code{download_narr_p_levels_data} function accesses and downloads pressure levels meteorological data from \href{https://psl.noaa.gov/data/gridded/data.narr.html}{NOAA's North American Regional Reanalysis (NARR) model}. "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
 }
 \author{
 Mitchell Manware, Insang Song

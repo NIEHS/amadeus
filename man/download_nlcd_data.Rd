@@ -2,41 +2,36 @@
 % Please edit documentation in R/download.R
 \name{download_nlcd_data}
 \alias{download_nlcd_data}
-\title{Download land cover data from the National Land Cover Database Science Research Products.}
+\title{Download land cover data}
 \usage{
 download_nlcd_data(
-  year = 2021,
   collection = "Coterminous United States",
+  year = 2021,
   directory_to_download = NULL,
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
-  unzip = TRUE,
-  remove_zip = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE
 )
 }
 \arguments{
+\item{collection}{character(1). \code{"Coterminous United States"} or \code{"Alaska"}.}
+
 \item{year}{integer(1). Available years for Coterminous United States
 include \code{2001}, \code{2004}, \code{2006}, \code{2008}, \code{2011}, \code{2013}, \code{2016},
 \code{2019}, and \code{2021}.
 Available years for Alaska include \code{2001}, \code{2011}, and \code{2016}.}
-
-\item{collection}{character(1). \code{"Coterminous United States"} or \code{"Alaska"}.}
 
 \item{directory_to_download}{character(1). Directory to download zip files
 from National Land Cover Database Science Research Products.}
 
 \item{directory_to_save}{character(1). Directory to decompress zip files.}
 
-\item{data_download_acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+\item{acknowledgement}{logical(1). By setting \code{TRUE} the
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
-
-\item{unzip}{logical(1). Unzip zip files. Default is \code{TRUE}.}
-
-\item{remove_zip}{logical(1). Remove zip files from directory_to_download.
-Default is \code{FALSE}.}
 
 \item{download}{logical(1). \code{FALSE} will generate a *.txt file
 containing all download commands. By setting \code{TRUE} the function
@@ -45,14 +40,20 @@ will download all of the requested data files.}
 \item{remove_command}{logical(1).
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
+
+\item{unzip}{logical(1). Unzip zip files. Default is \code{TRUE}.}
+
+\item{remove_zip}{logical(1). Remove zip files from directory_to_download.
+Default is \code{FALSE}.}
 }
 \value{
-NULL;
+NULL; Zip file will be stored in \code{directory_to_download}, and
+selected GeoTIFF (.tif) files will be stored in \code{directory_to_save}.
 }
 \description{
 The \code{download_nlcd_data()} function accesses and downloads
 land cover data from the
-\href{https://www.mrlc.gov/data}{NLCD Science Research Products} data base.
+\href{https://www.mrlc.gov/data}{Multi-Resolution Land Characteristics (MRLC) Consortium's National Land Cover Database (NLCD) products data base}.
 }
 \author{
 Mitchell Manware, Insang Song

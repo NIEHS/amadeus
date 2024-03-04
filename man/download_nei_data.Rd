@@ -2,25 +2,35 @@
 % Please edit documentation in R/download.R
 \name{download_nei_data}
 \alias{download_nei_data}
-\title{Download data from EPA National Emission Inventory aggregated on-road emission data}
+\title{Download road emissions data}
 \usage{
 download_nei_data(
-  directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
-  download = FALSE,
-  remove_command = FALSE,
-  year_target = c(2017L, 2020L),
-  unzip = FALSE,
   epa_certificate_path = system.file("extdata/cacert_gaftp_epa.pem", package = "amadeus"),
   certificate_url =
-    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
+    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  year_target = c(2017L, 2020L),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE
 )
 }
 \arguments{
+\item{epa_certificate_path}{character(1). Path to the certificate file
+for EPA DataCommons. Default is
+'extdata/cacert_gaftp_epa.pem' under the package installation path.}
+
+\item{certificate_url}{character(1). URL to certificate file. See notes for
+details.}
+
+\item{year_target}{Available years of NEI data.
+Default is \code{c(2017L, 2020L)}.}
+
 \item{directory_to_save}{character(1). Directory to download files.}
 
-\item{data_download_acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+\item{acknowledgement}{logical(1). By setting \code{TRUE} the
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
 
 \item{download}{logical(1). \code{FALSE} will generate a *.txt file
@@ -31,24 +41,15 @@ will download all of the requested data files.}
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 
-\item{year_target}{Available years of NEI data.
-Default is \code{c(2017L, 2020L)}.}
-
 \item{unzip}{logical(1). Unzip the downloaded zip files.
 Default is \code{FALSE}.}
-
-\item{epa_certificate_path}{character(1). Path to the certificate file
-for EPA DataCommons. Default is
-'extdata/cacert_gaftp_epa.pem' under the package installation path.}
-
-\item{certificate_url}{character(1). URL to certificate file. See notes for
-details.}
 }
 \value{
-NULL; Two comma-separated value (CSV) raw files for 2017 and 2020
+NULL; Yearly comma-separated value (CSV) files will be stored in
+\code{directory_to_save}.
 }
 \description{
-Download data from EPA National Emission Inventory aggregated on-road emission data
+The \code{download_nei_data()} function accesses and downloads road emissions data from the \href{https://www.epa.gov/air-emissions-inventories/national-emissions-inventory-nei}{U.S Environmental Protection Agency's (EPA) National Emissions Inventory (NEI)}.
 }
 \note{
 For EPA Data Commons certificate errors, follow the steps below:

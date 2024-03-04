@@ -4,10 +4,10 @@
 \alias{download_permit}
 \title{Check for data download acknowledgement}
 \usage{
-download_permit(data_download_acknowledgement)
+download_permit(acknowledgement)
 }
 \arguments{
-\item{data_download_acknowledgement}{logical(1). Whether to
+\item{acknowledgement}{logical(1). Whether to
 start downloading}
 }
 \description{

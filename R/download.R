@@ -1,6 +1,10 @@
 # download.R
-#' Download raw data from sources
-#' @param dataset_name character(1). Dataset to download.
+#' Download raw data
+# nolint start
+#' @description
+#' The \code{download_data()} function accesses and downloads atmospheric, meteorological, and environmental data from various open-access data sources.
+# nolint end
+#' @param dataset_name character(1). Data set to download.
 #' @param directory_to_save character(1). Directory to save / unzip
 #'  (if zip files are downloaded) data.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -91,7 +95,9 @@ download_data <-
   }
 
 # nolint start
-#' Download daily data from AQS datamart
+#' Download air quality data
+#' @description
+#' The \code{download_aqs_data()} function accesses and downloads Air Quality System (AQS) data from the [U.S. Environmental Protection Agency's (EPA) Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html).
 #' @param parameter_code integer(1). length of 5.
 #'  EPA pollutant parameter code. For details, please refer to
 #'  [AQS parameter codes](https://aqs.epa.gov/aqsweb/documents/codetables/parameters.html)
@@ -246,12 +252,11 @@ download_aqs_data <-
 
 
 
-
-#' Download Ecoregion Shapefiles from EPA
+# nolint start
+#' Download ecoregion data
 #' @description
-#' The \code{download_ecoregion_data()} function accesses and downloads
-#' Ecoregions level 3 data, where all pieces of information in the higher
-#' levels are included.
+#' The \code{download_ecoregion_data()} function accesses and downloads United States Ecoregions data from the [U.S. Environmental Protection Agency's (EPA) Ecorgions](https://www.epa.gov/eco-research/ecoregions). Level 3 data, where all pieces of information in the higher levels are included, are downloaded.
+# nolint end
 #' @note
 #' For EPA Data Commons certificate errors, follow the steps below:
 #' 1. Click Lock icon in the address bar at https://gaftp.epa.gov
@@ -386,10 +391,10 @@ download_ecoregion_data <- function(
 }
 
 # nolint start 
-#' Download atmospheric composition data from the NASA Global Earth Observing System (GEOS) model.
+#' Download atmospheric composition data
 #' @description
 #' The \code{download_geos_data()} function accesses and downloads various
-#' atmospheric composition collections from the [NASA Global Earth Observing System (GEOS) model](https://gmao.gsfc.nasa.gov/GEOS_systems/).
+#' atmospheric composition collections from [NASA's Global Earth Observing System (GEOS) model](https://gmao.gsfc.nasa.gov/GEOS_systems/).
 # nolint end
 #' @param collection character(1). GEOS-CF data collection file name.
 #' @param date_start character(1). length of 10. Start date for downloading
@@ -521,9 +526,9 @@ download_geos_data <- function(
 }
 
 # nolint start
-#' Download global elevation data from the Global Multi-resolution Terrain Elevation Data (GMTED2010).
+#' Download elevation data
 #' @description
-#' The \code{download_gmted_data()} function acesses and downloads Global
+#' The \code{download_gmted_data()} function accesses and downloads Global
 #' Multi-resolution Terrain Elevation Data (GMTED2010) from
 #' [U.S. Geological Survey and National Geospatial-Intelligence Agency](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010).
 #' @param statistic character(1). Available statistics include `"Breakline Emphasis"`, `"Systematic Subsample"`, `"Median Statistic"`,
@@ -666,10 +671,10 @@ download_gmted_data <- function(
 }
 
 # nolint start
-#' Download meteorological and atmospheric data from the Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model.
+#' Download meteorological and atmospheric data 
 #' @description
 #' The \code{download_merra2_data()} function accesses and downloads various
-#' meteorological and atmospheric collections from the [Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/).
+#' meteorological and atmospheric collections from [NASA's Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/).
 #' @param collection character(1). MERRA-2 data collection file name.
 #' @param date_start character(1). length of 10. Start date for downloading
 #' data. Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
@@ -953,10 +958,9 @@ download_merra2_data <- function(
 }
 
 # nolint start
-#' download_narr_monolevel_data: download monolevel meteorological data from NOAA NCEP North American Regional Reanalysis (NARR) model.
+#' Download meteorological data (monolevel)
 #' @description
-#' The \code{download_narr_monolevel_data} function accesses and downloads
-#' monolevel meteorological data from [NOAA NCEP North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html).
+#' The \code{download_narr_monolevel_data} function accesses and downloads monolevel meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Monolevel" variables contain a single value for the entire atmospheric column (ie. Variable: Convective cloud cover; Level: Entire atmosphere considered as a single layer), or represent a specific altitude associated with the variable (ie. Variable: Air temperature; Level: 2 m).
 # nolint end
 #' @param variables character. Variable(s) name acronym.
 #' @param year_start integer(1). length of 4. Start of year range for
@@ -1076,12 +1080,10 @@ download_narr_monolevel_data <- function(
 }
 
 # nolint start
-#' Download pressure level meteorological data from NOAA NCEP North American Regional Reanalysis (NARR) model.
+#' Download meteorological data (pressure levels)
 # nolint end
 #' @description
-#' The \code{download_narr_p_levels_data} function accesses and downloads
-#' pressure level meteorological data from [NOAA NCEP North American Regional
-#' Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html).
+#' The \code{download_narr_p_levels_data} function accesses and downloads pressure levels meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
 #' @param variables character(1). Variable(s) name acronym.
 #' @param year_start integer(1). length of 4. Start of year range for
 #' downloading data.
@@ -1208,12 +1210,12 @@ download_narr_p_levels_data <- function(
 
 
 # nolint start
-#' Download land cover data from the National Land Cover Database Science Research Products.
-# nolint end
+#' Download land cover data
 #' @description
 #' The \code{download_nlcd_data()} function accesses and downloads
 #' land cover data from the
-#' [NLCD Science Research Products](https://www.mrlc.gov/data) data base.
+#' [Multi-Resolution Land Characteristics (MRLC) Consortium's National Land Cover Database (NLCD) products data base](https://www.mrlc.gov/data).
+# nolint end
 #' @param collection character(1). `"Coterminous United States"` or `"Alaska"`.
 #' @param year integer(1). Available years for Coterminous United States
 #' include `2001`, `2004`, `2006`, `2008`, `2011`, `2013`, `2016`,
@@ -1353,11 +1355,10 @@ download_nlcd_data <- function(
 }
 
 # nolint start
-#' Download Global Roads Open Access Data Set (gROADS), v1 (1980-2010) data from NASA Socioeconomic Data and Applications Center (SEDAC).
+#' Download roads data
 #' @description
 #' The \code{download_sedac_groads_data()} function accesses and downloads
-#' roads data from the National Aeronautics and Space
-#' Administration's (NASA) [Global Roads Open Access Data Set](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download).
+#' roads data from [NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download).
 #' @param data_region character(1). Data can be downloaded for `"Global"`,
 #' `"Africa"`, `"Asia"`, `"Europe"`, `"Americas"`, `"Oceania East"`, and `"Oceania West"`.
 #' @param data_format character(1). Data can be downloaded as `"Shapefile"` or
@@ -1493,11 +1494,10 @@ download_sedac_groads_data <- function(
 }
 
 # nolint start
-#' Download UN WPP-Adjusted population density data from NASA Socioeconomic Data and Applications Center (SEDAC)
+#' Download population density data
 #' @description
 #' The \code{download_sedac_population_data()} function accesses and downloads
-#' population density data from the National Aeronatuics and Space
-#' Administration's (NASA) [UN WPP-Adjusted Population Density, v4.11]( https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11).
+#' population density data from [NASA's UN WPP-Adjusted Population Density, v4.11](https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11).
 #' @param data_resolution character(1). Available resolutions are 30 second
 #' (approx. 1 km), 2.5 minute (approx. 5 km), 15 minute (approx. 30 km),
 #' 30 minute (approx. 55 km), and 60 minute (approx. 110 km).
@@ -1669,12 +1669,10 @@ download_sedac_population_data <- function(
 }
 
 # nolint start
-#' Download daily wildfire smoke plume data from NOAA Hazard Mapping System Fire and Smoke Product
+#' Download wildfire smoke data
 #' @description
 #' The \code{download_hms_data()} function accesses and downloads
-#' wildfire smoke plume coverage data from
-#' the National Oceanic and Atmospheric Administration's (NOAA)
-#' [Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0).
+#' wildfire smoke plume coverage data from [NOAA's Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0).
 # nolint end
 #' @param data_format character(1). "Shapefile" or "KML".
 #' @param date_start character(1). length of 10. Start date for downloading
@@ -1843,12 +1841,12 @@ download_hms_data <- function(
 
 
 # nolint start
-#' Download climate classification data from the present and future Köppen-Geiger climate classification maps.
+#' Download climate classification data
 #' @description
 #' The \code{download_koppen_geiger_data()} function accesses and downloads
-#' climate classification data from the Present and future
+#' climate classification data from the \emph{Present and future
 #' Köppen-Geiger climate classification maps at
-#'  1-km resolution ([link for article](https://www.nature.com/articles/sdata2018214); [link for data](https://figshare.com/articles/dataset/Present_and_future_K_ppen-Geiger_climate_classification_maps_at_1-km_resolution/6396959/2)).
+#' 1-km resolution}([link for article](https://www.nature.com/articles/sdata2018214); [link for data](https://figshare.com/articles/dataset/Present_and_future_K_ppen-Geiger_climate_classification_maps_at_1-km_resolution/6396959/2)).
 # nolint end
 #' @param data_resolution character(1). Available resolutions are `"0.0083"`
 #' degrees (approx. 1 km), `"0.083"` degrees (approx. 10 km), and
@@ -2322,7 +2320,12 @@ download_modis_data <- function(
 }
 
 
-#' Download data from EPA toxic release inventory
+
+# nolint start
+#' Download toxic release data
+#' @description
+#' The \code{download_tri_data()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/find-understand-and-use-tri).
+# nolint end
 #' @param year_start integer(1). length of 4. Start year for downloading data.
 #' @param year_end integer(1). length of 4. End year for downloading data.
 #' @param directory_to_save character(1). Directory to download files.
@@ -2403,7 +2406,9 @@ download_tri_data <- function(
 
 
 # nolint start
-#' Download data from EPA National Emission Inventory aggregated on-road emission data
+#' Download road emissions data
+#' @description
+#' The \code{download_nei_data()} function accesses and downloads road emissions data from the [U.S Environmental Protection Agency's (EPA) National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories/national-emissions-inventory-nei).
 # nolint end
 #' @param epa_certificate_path character(1). Path to the certificate file
 #' for EPA DataCommons. Default is
