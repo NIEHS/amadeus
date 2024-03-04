@@ -13,3 +13,4 @@ download_setup_dir(directory)
 If directory does not exist, the directory
 will be created.
 }
+\keyword{internal}

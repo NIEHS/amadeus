@@ -15,3 +15,4 @@ keep (\code{FALSE}) commands}
 \description{
 Remove or keep wget command file
 }
+\keyword{internal}

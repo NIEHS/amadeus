@@ -21,3 +21,4 @@ vector
 \description{
 Generate sequence of dates based on \code{date_start} and \code{date_end}.
 }
+\keyword{internal}

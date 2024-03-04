@@ -20,3 +20,4 @@ logical vector for URL status = 200
 \description{
 Sample download URLs and apply \code{check_url_status} function
 }
+\keyword{internal}

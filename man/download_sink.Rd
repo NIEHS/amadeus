@@ -12,3 +12,4 @@ download_sink(command_txt)
 \description{
 Start sink download commands into a text file
 }
+\keyword{internal}

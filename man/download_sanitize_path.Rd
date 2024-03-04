@@ -15,3 +15,4 @@ character ending with a forward slash.
 \description{
 Sanitize path to end with a forward slash
 }
+\keyword{internal}

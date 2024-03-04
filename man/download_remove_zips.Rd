@@ -14,3 +14,4 @@ download_remove_zips(remove = FALSE, download_name)
 \description{
 Remove downloaded zip files
 }
+\keyword{internal}

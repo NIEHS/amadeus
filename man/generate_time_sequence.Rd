@@ -15,3 +15,4 @@ vector
 \description{
 Generate time sequence based on GEOS-CF data collection.
 }
+\keyword{internal}

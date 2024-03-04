@@ -1,9 +1,4 @@
-###############################################################################
-# Functions used to implement and simplify unit tests on data download
-# functions
-# Date created: 2023-11-30
-# Date modified: 2024-01-21
-###############################################################################
+# Functions used to simplify, implement and support download unit tests
 
 #' Check if sample of download URLs have HTTP Status 200
 #' @param url Download URL to be checked.
@@ -12,6 +7,7 @@
 #' @importFrom httr HEAD
 #' @importFrom httr GET
 #' @return logical object
+#' @keywords internal
 #' @export
 check_url_status <- function(
     url,
@@ -33,6 +29,7 @@ check_url_status <- function(
 #' @param commands_path file path with wget/curl commands
 #' @return character vector containing download commands
 #' @importFrom utils read.csv
+#' @keywords internal
 #' @export
 read_commands <- function(
     commands_path = commands_path) {
@@ -45,6 +42,7 @@ read_commands <- function(
 #' @param commands character vector containing download commands
 #' @param position URL position in the vector
 #' @return character vector containing download URLs
+#' @keywords internal
 #' @export
 extract_urls <- function(
     commands = commands,
@@ -70,6 +68,7 @@ extract_urls <- function(
 #' @param method httr method to obtain URL (`"HEAD"` or `"GET"`). If set to
 #' `"SKIP"`, the HTTP status will not be checked and returned.
 #' @return logical vector for URL status = 200
+#' @keywords internal
 #' @export
 check_urls <- function(
     urls = urls,
@@ -103,6 +102,7 @@ check_urls <- function(
 #' @param url_status logical vector for URL status = 200
 #' @importFrom testthat expect_true
 #' @return NULL
+#' @keywords internal
 #' @export
 test_download_functions <- function(
     directory_to_download = NULL,

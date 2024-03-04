@@ -1,14 +1,11 @@
-################################################################################
-# Date created: 2023-12-06
-# Packages required: None
-################################################################################
-
+# Functions used to simplify and support download functions
 
 #' Check if input directory exists
 #' @param directory character(1) directory path
 #' @description If directory does not exist, the directory
 #' will be created.
 #' @returns NULL
+#' @keywords internal
 #' @export
 download_setup_dir <-
   function(directory) {
@@ -21,6 +18,7 @@ download_setup_dir <-
 #' Sanitize path to end with a forward slash
 #' @param directory character(1). Path
 #' @returns character ending with a forward slash.
+#' @keywords internal
 #' @export
 download_sanitize_path <-
   function(directory) {
@@ -45,6 +43,7 @@ download_sanitize_path <-
 #' @param acknowledgement logical(1). Whether to
 #' start downloading
 #' @returns NULL
+#' @keywords internal
 #' @export
 download_permit <-
   function(acknowledgement) {
@@ -70,6 +69,7 @@ download_permit <-
 #' @param system_command character(1). Linux command to execute downloads.
 #' Inherited from data download function.
 #' @returns NULL
+#' @keywords internal
 #' @export
 download_run <- function(
     download = FALSE,
@@ -91,6 +91,7 @@ download_run <- function(
 #' @param remove logical(1). Remove (\code{TRUE}) or
 #'  keep (\code{FALSE}) commands
 #' @returns NULL
+#' @keywords internal
 #' @export
 download_remove_command <-
   function(commands_txt = NULL,
@@ -104,6 +105,7 @@ download_remove_command <-
 #' Start sink download commands into a text file
 #' @param command_txt character(1). file path to export commands.
 #' @returns NULL
+#' @keywords internal
 #' @export
 download_sink <-
   function(command_txt) {
@@ -120,6 +122,7 @@ download_sink <-
 #' data
 #' @param unzip logical(1). Unzip (\code{TRUE}) or not.
 #' @returns NULL
+#' @keywords internal
 #' @export
 download_unzip <-
   function(file_name,
@@ -146,6 +149,7 @@ download_unzip <-
 #' @param remove logical(1). Confirm removal. Default is FALSE.
 #' @param download_name character. Full zip file path
 #' @returns NULL
+#' @keywords internal
 #' @export
 download_remove_zips <-
   function(remove = FALSE,
@@ -163,6 +167,7 @@ download_remove_zips <-
 #' @param parameters parameters passed to function (called by
 #' \code{mget(ls())}.)
 #' @returns NULL
+#' @keywords internal
 #' @export
 check_for_null_parameters <-
   function(
@@ -180,6 +185,7 @@ check_for_null_parameters <-
 #' date sequence as "YYYYMMDD". If `FALSE`, returns date sequence as
 #' "YYYY-MM-DD".
 #' @returns vector
+#' @keywords internal
 #' @export
 generate_date_sequence <-
   function(
@@ -209,6 +215,7 @@ generate_date_sequence <-
 #' @returns A file designated in `epa_certificate_path`
 #' @author Insang Song
 #' @importFrom utils download.file
+#' @keywords internal
 #' @export
 download_epa_certificate <-
   function(
@@ -238,6 +245,7 @@ download_epa_certificate <-
 #' Generate time sequence based on GEOS-CF data collection.
 #' @param collection character(1). GEOS-CF data collection
 #' @return vector
+#' @keywords internal
 #' @export
 generate_time_sequence <-
   function(
