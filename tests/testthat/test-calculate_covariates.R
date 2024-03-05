@@ -408,7 +408,7 @@ testthat::test_that("calc_modis works well.", {
 })
 
 
-testthat::test_that("Check extract_nlcd_ratio works", {
+testthat::test_that("Check calc_nlcd works", {
   withr::local_package("terra")
   withr::local_package("exactextractr")
 
@@ -433,16 +433,16 @@ testthat::test_that("Check extract_nlcd_ratio works", {
   testthat::expect_s4_class(nlcdras, "SpatRaster")
 
   testthat::expect_error(
-    calc_nlcd_ratio(locs = eg_data,
-                    from = nlcdras,
-                    radius = "1000"),
+    calc_nlcd(locs = eg_data,
+              from = nlcdras,
+              radius = "1000"),
     "radius is not a numeric."
   )
   # -- buf_radius has likely value
   testthat::expect_error(
-    calc_nlcd_ratio(locs = eg_data,
-                    from = nlcdras,
-                    radius = -3),
+    calc_nlcd(locs = eg_data,
+              from = nlcdras,
+              radius = -3),
     "radius has not a likely value."
   )
   # -- year is numeric
@@ -463,13 +463,13 @@ testthat::test_that("Check extract_nlcd_ratio works", {
   )
   # -- data_vect is a SpatVector
   testthat::expect_error(
-    calc_nlcd_ratio(locs = 12,
-                    from = nlcdras),
+    calc_nlcd(locs = 12,
+              from = nlcdras),
     "locs is not a terra::SpatVector."
   )
   testthat::expect_error(
-    calc_nlcd_ratio(locs = eg_data,
-                    from = 12)
+    calc_nlcd(locs = eg_data,
+              from = 12)
   )
   # -- nlcd_path is not a character
   testthat::expect_error(
@@ -489,13 +489,13 @@ testthat::test_that("Check extract_nlcd_ratio works", {
   year <- 2021
   buf_radius <- 3000
   testthat::expect_no_error(
-    calc_nlcd_ratio(
+    calc_nlcd(
       locs = eg_data,
       from = nlcdras,
       radius = buf_radius
     )
   )
-  output <- calc_nlcd_ratio(
+  output <- calc_nlcd(
     locs = eg_data,
     radius = buf_radius,
     from = nlcdras

@@ -27,7 +27,8 @@ a data.frame object
 Extract atmospheric composition values at point locations. Returns a
 \code{data.frame} object containing \code{locs_id}, date and hour, vertical
 pressure level, and atmospheric composition variable. Atmospheric
-composition variable column name reflects variable and circular buffer radius.
+composition variable column name reflects variable and circular buffer
+radius.
 }
 \seealso{
 \code{\link[=process_geos]{process_geos()}}

@@ -28,6 +28,8 @@
 #' `"plevels"`, `"monolevel"`, `"p_levels"`
 #' - `calc_geos`: `"geos"`, `"geos_cf"`
 #' - `calc_sedac_population`: `"population"`, `"sedac_population"`
+#' - `calc_sedac_groads`: `"roads"`
+#' - `calc_nlcd`: `"nlcd"`
 #' @returns Calculated covariates. Mainly data.frame object.
 #' @author Insang Song
 #' @export
@@ -40,7 +42,7 @@ calc_covariates <-
                     "ecoregions", "ecoregion", "hms", "noaa", "smoke",
                     "gmted", "narr", "narr_monolevel", "narr_p_levels",
                     "plevels", "monolevel", "p_levels", "geos",
-                    "sedac_population", "population"),
+                    "sedac_population", "population", "nlcd"),
       from,
       locs,
       locs_id = "site_id",
@@ -64,7 +66,7 @@ calc_covariates <-
       narr_p_levels = calc_narr,
       p_levels = calc_narr,
       plevels = calc_narr,
-      nlcd = calc_nlcd_ratio,
+      nlcd = calc_nlcd,
       noaa = calc_hms,
       smoke = calc_hms,
       hms = calc_hms,
@@ -229,11 +231,11 @@ calc_koppen_geiger <-
 #' @importFrom terra metags
 #' @importFrom exactextractr exact_extract
 #' @export
-calc_nlcd_ratio <- function(from,
-                            locs,
-                            locs_id = "site_id",
-                            radius = 1000,
-                            ...) {
+calc_nlcd <- function(from,
+                      locs,
+                      locs_id = "site_id",
+                      radius = 1000,
+                      ...) {
   # check inputs
   if (!is.numeric(radius)) {
     stop("radius is not a numeric.")
