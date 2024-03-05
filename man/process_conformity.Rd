@@ -16,7 +16,7 @@ process_conformity(locs = NULL, check_time = FALSE, locs_epsg = "EPSG:4326")
 Well-Known Text format for coordinate reference system definition.}
 }
 \value{
-SpatVector object.
+a SpatVector object
 }
 \description{
 Check if all of \code{"lon"}, \code{"lat"}, and \code{"time"}

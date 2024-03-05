@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_geos_collection}
 \alias{process_geos_collection}
-\title{Identify GEOS-CF collection based on user-defined file paths}
+\title{Process GEOS-CF collections}
 \usage{
 process_geos_collection(
   path,
@@ -27,5 +27,6 @@ on provided file path(s).}
 character
 }
 \description{
-Identify GEOS-CF collection based on user-defined file paths
+Identify the GEOS-CF collection based on the file path.
 }
+\keyword{internal}

@@ -18,7 +18,7 @@ sub-dataset. See \link{process_modis_sds} for details.}
 Should be acceptable to \link[terra:tapp]{terra::tapp}.}
 }
 \value{
-SpatRaster.
+a SpatRaster object
 }
 \description{
 Some MODIS products consist of multi-layer subdatasets.

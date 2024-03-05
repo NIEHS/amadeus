@@ -31,7 +31,7 @@ Default is \code{"EPSG:4326"}}
 \item{...}{For internal use.}
 }
 \value{
-SpatRaster.
+a SpatRaster object
 }
 \description{
 This function will return a SpatRaster object with

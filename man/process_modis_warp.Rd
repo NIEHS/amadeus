@@ -27,7 +27,7 @@ See \link[terra:crs]{terra::crs} and \link[sf:st_crs]{sf::st_crs} / \href{https:
 \item{...}{For internal use.}
 }
 \value{
-stars object.
+a stars object
 }
 \description{
 Swath data is a type of MODIS data,

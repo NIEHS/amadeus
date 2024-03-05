@@ -30,7 +30,7 @@ Unit is degree.}
 \item{...}{For internal use.}
 }
 \value{
-SpatRaster object. CRS is \code{"EPSG:4326"}.
+a SpatRaster object (crs = \code{"EPSG:4326"})
 }
 \description{
 This function will return a SpatRaster object with

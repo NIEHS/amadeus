@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_tri}
 \alias{process_tri}
-\title{Prepare Toxic Release Inventory (TRI) data}
+\title{Process toxic release data}
 \usage{
 process_tri(
   path = NULL,
@@ -21,14 +21,15 @@ process_tri(
 \item{...}{Placeholders.}
 }
 \value{
-SpatVector (points) object in \code{year}.
+a SpatVector object (points) in \code{year}
 }
 \description{
-Prepare Toxic Release Inventory (TRI) data
+The \code{process_tri()} function imports and cleans raw toxic release data,
+returning a single SpatVector (points) object for the selected \code{year}.
 }
 \note{
-TRI data is available in USEPA. Visit the page to see the available
-year and column descriptions.
+Visit \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-and-tools}{TRI Data and Tools}
+to view the available years and variables.
 }
 \references{
 https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-and-tools

@@ -2,11 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_narr}
 \alias{process_narr}
-\title{Import and clean NOAA NCEP North American Regional Reanalysis (NARR) data
-downloaded with \code{download_narr} or \code{download_data(dataset_name = "NARR")}.
-Function returns a SpatRast object containing the user-defined variable
-of interest. Layer names indicate the variable, pressure level, and date
-(YYYYMMDD).}
+\title{Process meteorological data}
 \usage{
 process_narr(
   date = c("2023-09-01", "2023-09-01"),
@@ -17,20 +13,20 @@ process_narr(
 \arguments{
 \item{date}{character(2). length of 10 each. Format "YYYY-MM-DD".}
 
-\item{variable}{character(1). NARR variable name(s).}
+\item{variable}{character(1). Variable name acronym.}
 
-\item{path}{character(1). Directory with downloaded GEOS-CF
-netCDF files.}
+\item{path}{character(1). Directory with downloaded netCDF (.nc) files.}
 }
 \value{
 a SpatRaster object
 }
 \description{
-Import and clean NOAA NCEP North American Regional Reanalysis (NARR) data
-downloaded with \code{download_narr} or \code{download_data(dataset_name = "NARR")}.
-Function returns a SpatRast object containing the user-defined variable
-of interest. Layer names indicate the variable, pressure level, and date
-(YYYYMMDD).
+The \code{process_narr()} function imports and cleans raw meteorological
+data, returning a single SpatRaster object.
+}
+\note{
+Layer names of the returned SpatRaster object contain the variable acronym,
+pressure level, and date.
 }
 \author{
 Mitchell Manware

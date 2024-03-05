@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_aqs}
 \alias{process_aqs}
-\title{Filter unique AQS sites with or without temporal information}
+\title{Process unique U.S. EPA AQS sites}
 \usage{
 process_aqs(
   path = NULL,
@@ -20,10 +20,11 @@ only unique locations are returned.}
 \item{return_format}{character(1). \code{"terra"} or \code{"sf"}.}
 }
 \value{
-SpatVector or sf object depending on the \code{return_format}.
+a SpatVector or sf object depending on the \code{return_format}
 }
 \description{
-Filter unique AQS sites with or without temporal information
+The \code{process_aqs()} function cleans and imports raw air quality
+monitoring sites, returning a single SpatVector or sf object.
 }
 \note{
 \code{date = NULL} will return a massive data.table

@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_sedac_groads}
 \alias{process_sedac_groads}
-\title{Import and clean groads data from NASA Socioeconomic Data and Applications Center (SEDAC).}
+\title{Process roads data}
 \usage{
 process_sedac_groads(path = NULL)
 }
@@ -10,10 +10,11 @@ process_sedac_groads(path = NULL)
 \item{path}{character(1). Path to geodatabase or shapefiles.}
 }
 \value{
-a SpatVector.
+a SpatVector boject
 }
 \description{
-Import and clean groads data from NASA Socioeconomic Data and Applications Center (SEDAC).
+The \code{process_sedac_groads()} function imports and cleans raw road data,
+returning a single SpatVector object.
 }
 \note{
 U.S. context.

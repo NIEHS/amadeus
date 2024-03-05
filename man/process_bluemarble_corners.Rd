@@ -12,7 +12,7 @@ process_bluemarble_corners(hrange = c(5, 11), vrange = c(3, 6))
 \item{vrange}{integer(2). Both should be in 0-17.}
 }
 \value{
-data.frame with xmin, xmax, ymin, and ymax fields.
+data.frame with xmin, xmax, ymin, and ymax fields
 }
 \description{
 Blue Marble products are in HDF5 format and are read without

@@ -2,8 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_gmted_codes}
 \alias{process_gmted_codes}
-\title{Generate statistic and resolution codes based on GMTED statistic and
-resolution.}
+\title{Process elevation statistic and resolution codes}
 \usage{
 process_gmted_codes(
   string,
@@ -13,7 +12,7 @@ process_gmted_codes(
 )
 }
 \arguments{
-\item{string}{character(1). File path to GEOS-CF data file.}
+\item{string}{character(1). File path to GMTED data file.}
 
 \item{statistic}{logical(1). Matches statistic to statistic code.}
 
@@ -27,6 +26,8 @@ or resolution.}
 character
 }
 \description{
-Generate statistic and resolution codes based on GMTED statistic and
-resolution.
+Identify the GMTED statistic and resolution based on the file path. Convert
+statistic and resolution to/from full string to/from statistic and
+resolution code.
 }
+\keyword{internal}

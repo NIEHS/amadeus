@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_koppen_geiger}
 \alias{process_koppen_geiger}
-\title{Process Koeppen-Geiger climate data}
+\title{Process climate classification data}
 \usage{
 process_koppen_geiger(path = NULL, year = NULL)
 }
@@ -13,10 +13,11 @@ climate zone raster file}
 \item{year}{data year. Not applicable for this function.}
 }
 \value{
-SpatRaster object
+a SpatRaster object
 }
 \description{
-Process Koeppen-Geiger climate data
+The \code{process_koppen_geiger()} function imports and cleans raw climate
+classification data, returning a single SpatRaster object.
 }
 \author{
 Insang Song

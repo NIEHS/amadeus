@@ -2,7 +2,8 @@
 % Please edit documentation in R/process.R
 \name{process_nei}
 \alias{process_nei}
-\title{Prepare National Emission Inventory CSV files}
+\title{Prepare National Emission Inventory CSV files
+Process road emissions data}
 \usage{
 process_nei(path = NULL, county = NULL, year = c(2017, 2020))
 }
@@ -15,9 +16,12 @@ process_nei(path = NULL, county = NULL, year = c(2017, 2020))
 is accepted.}
 }
 \value{
-SpatVector object.
+a SpatVector object
 }
 \description{
+The \code{process_tri()} function imports and cleans raw road emissions data,
+returning a single SpatVector object.
+
 NEI data comprises multiple csv files where emissions of
 50+ pollutants are recorded at county level. With raw data files,
 this function will join a combined table of NEI data and county

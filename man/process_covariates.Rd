@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_covariates}
 \alias{process_covariates}
-\title{Process covariates}
+\title{Process raw data}
 \usage{
 process_covariates(
   covariate = c("modis_swath", "modis_merge", "koppen-geiger", "bluemarble",
@@ -22,10 +22,15 @@ depending on \code{covariate} value.}
 \item{...}{Arguments passed to each raw data processing function.}
 }
 \value{
-\code{SpatVector} or \code{SpatRaster} depending on covariate type.
+\code{SpatVector}, \code{SpatRaster}, \code{sf}, or \code{character} depending on
+covariate type and selections.
 }
 \description{
-Process covariates
+The \code{process_covariates()} function processes raw data files which have
+been downloaded by \code{download_data()}. \code{process_covariates()} and
+the underlying source-specific processing functions have been designed to
+operate on the raw data files. To avoid errors, \strong{do not edit the raw
+data files before passing to \code{process_covariates()}}.
 }
 \seealso{
 \itemize{

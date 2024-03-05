@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_locs_vector}
 \alias{process_locs_vector}
-\title{Import and prepare site point locations for covariate calculations.}
+\title{Process locations as SpatVector}
 \usage{
 process_locs_vector(locs, crs, radius)
 }
@@ -20,5 +20,8 @@ be named "lat" and "lon", respectively.}
 SpatVector
 }
 \description{
-Import and prepare site point locations for covariate calculations.
+Convert locations from class \code{data.frame} or \code{data.table} to
+SpatVector object, project to coordinate reference system, and apply
+circular buffer.
 }
+\keyword{internal}
