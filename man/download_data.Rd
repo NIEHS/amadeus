@@ -15,7 +15,7 @@ download_data(
 )
 }
 \arguments{
-\item{dataset_name}{character(1). Data set to download.}
+\item{dataset_name}{character(1). Dataset to download.}
 
 \item{directory_to_save}{character(1). Directory to save / unzip
 (if zip files are downloaded) data.}

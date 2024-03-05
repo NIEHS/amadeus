@@ -8,7 +8,7 @@
 
 **A** **M**echanism/**M**achine for **D**ata, **E**nvironments, and **U**ser **S**etup
 
-`amadeus` is an R package devloped to improve and expideite users' access to large, publicly available geospatial data sets. The functions in `amadeus` allow users to download and import cleaned geospatial data directly in R, useful for automated run scripts, analysis pipelines, and reproducible science in general.
+`amadeus` is an R package devloped to improve and expideite users' access to large, publicly available geospatial datasets. The functions in `amadeus` allow users to download and import cleaned geospatial data directly in R, useful for automated run scripts, analysis pipelines, and reproducible science in general.
 
 ## Download
 

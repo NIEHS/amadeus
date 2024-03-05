@@ -4,7 +4,7 @@
 #' @description
 #' The \code{download_data()} function accesses and downloads atmospheric, meteorological, and environmental data from various open-access data sources.
 # nolint end
-#' @param dataset_name character(1). Data set to download.
+#' @param dataset_name character(1). Dataset to download.
 #' @param directory_to_save character(1). Directory to save / unzip
 #'  (if zip files are downloaded) data.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -1949,7 +1949,7 @@ download_koppen_geiger_data <- function(
   )
 
   if (unzip) {
-    #### 17. remove unwanted files
+    #### 16. remove unwanted files
     unwanted_names <- list.files(
       path = directory_to_save,
       pattern = "Beck_KG",
@@ -1978,24 +1978,22 @@ download_koppen_geiger_data <- function(
     file.remove(unwanted_names)
   }
 
-  #### 18. Remove command file
+  #### 17. Remove command file
   download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
-  if (download) {
-    #### 16. end if unzip == FALSE
-    download_unzip(
-      file_name = download_name,
-      directory_to_unzip = directory_to_save,
-      unzip = unzip
-    )
-    #### 19. remove zip files
-    download_remove_zips(
-      remove = remove_zip,
-      download_name = download_name
-    )
-  }
+  #### 18. end if unzip == FALSE
+  download_unzip(
+    file_name = download_name,
+    directory_to_unzip = directory_to_save,
+    unzip = unzip
+  )
+  #### 19. remove zip files
+  download_remove_zips(
+    remove = remove_zip,
+    download_name = download_name
+  )
 }
 
 
