@@ -6,7 +6,6 @@
 #' the underlying source-specific processing functions have been designed to
 #' operate on the raw data files. To avoid errors, \strong{do not edit the raw
 #' data files before passing to \code{process_covariates()}}.
-#' 
 #' @param covariate character(1). Covariate type.
 #' @param path character(1). Directory or file path to raw data
 #' depending on `covariate` value.
@@ -97,7 +96,9 @@ process_covariates <-
   }
 
 
-#' Selected MODIS sinusoidal grid product subdataset name selector
+#' Process MODIS sub-datasets
+#' @description
+#' Selected MODIS sinusoidal grid product subdataset name selector.
 #' @param product character(1). Product code.
 #' @param custom_sel character(1). Custom filter.
 #' If this value is not NULL, preset filter is
@@ -139,7 +140,9 @@ process_modis_sds <-
   }
 
 
-#' Aggregate layers in a sub-dataset in sinusoidal MODIS products
+#' Process MODIS layers
+#' @description
+#' Aggregate layers in a sub-dataset in sinusoidal MODIS products.
 #' @param path character(1). Full path to MODIS HDF4/HDF5 file.
 #' Direct sub-dataset access is supported, for example,
 #' HDF4_EOS:EOS_GRID:\{filename\}:\{base_grid_information\}:\{sub-dataset\}
@@ -218,7 +221,9 @@ the input then flatten it manually.")
 
 
 # nolint start
-#' Get mosaicked or merged raster from multiple MODIS hdf files
+#' Process MODIS .hdf files
+#' @description
+#' Get mosaicked or merged raster from multiple MODIS hdf files.
 #' @param path character. Full list of hdf file paths.
 #'  preferably a recursive search result from \code{list.files}.
 #' @param date character(1). date to query. Should be in
@@ -285,7 +290,9 @@ process_modis_merge <- function(
 
 
 # nolint start
-#' Tile corner generator for Blue Marble products
+#' Process Blue Marble corners
+#' @description
+#' Tile corner generator for Blue Marble products.
 #' @param hrange integer(2). Both should be in 0-35.
 #' @param vrange integer(2). Both should be in 0-17.
 #' @description Blue Marble products are in HDF5 format and are read without
@@ -335,7 +342,9 @@ process_bluemarble_corners <-
     return(tile_df)
   }
 
-#' Check input strings conform to the required format
+#' Check date format
+#' @description
+#' Check date input strings conform to the required format.
 #' @param instr character(1). String to check.
 #' @param format character(1). Matching format to be checked.
 #' Default is `"%Y-%m-%d"`, which can detect `"%Y/%m/%d`.
@@ -803,7 +812,6 @@ process_tri <- function(
 
 
 # nolint start
-#' Prepare National Emission Inventory CSV files
 #' Process road emissions data
 #' @description
 #' The \code{process_tri()} function imports and cleans raw road emissions data,

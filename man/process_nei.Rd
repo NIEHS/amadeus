@@ -2,8 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_nei}
 \alias{process_nei}
-\title{Prepare National Emission Inventory CSV files
-Process road emissions data}
+\title{Process road emissions data}
 \usage{
 process_nei(path = NULL, county = NULL, year = c(2017, 2020))
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_modis_sds}
 \alias{process_modis_sds}
-\title{Selected MODIS sinusoidal grid product subdataset name selector}
+\title{Process MODIS sub-datasets}
 \usage{
 process_modis_sds(
   product = c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2"),
@@ -21,6 +21,8 @@ A character object that conforms to the regular
 expression. Details of regular expression in R can be found in \link{regexp}.
 }
 \description{
+Selected MODIS sinusoidal grid product subdataset name selector.
+
 Four presets are supported. \code{custom_sel} supersedes
 presets of \code{product} values.
 }

@@ -1,11 +1,18 @@
-
 # nocov start
 # nolint start
 #' Calculate covariates
+#' @description
+#' The \code{calculate_covariates()} function extracts values at point
+#' locations from a SpatRaster or SpatVector object returned from
+#' \code{process_covariates()}. \code{calculate_covariates()} and the underlying
+#' source-specific covariate functions have been designed to operate on the
+#' processed objects. To avoid errors, \strong{do not edit the processed
+#' SpatRaster or SpatVector objects before passing to
+#' \code{calculate_covariates()}}.
 #' @param covariate character(1). Covariate type.
+#' @param from character. Single or multiple from strings.
 #' @param locs sf/SpatVector. Unique locations. Should include
 #'  a unique identifier field named `locs_id`
-#' @param from character. Single or multiple from strings.
 #' @param locs_id character(1). Name of unique identifier.
 #'  Default is `"site_id"`.
 #' @param ... Arguments passed to each covariate calculation
@@ -34,8 +41,8 @@ calc_covariates <-
                     "gmted", "narr", "narr_monolevel", "narr_p_levels",
                     "plevels", "monolevel", "p_levels", "geos",
                     "sedac_population", "population"),
-      locs,
       from,
+      locs,
       locs_id = "site_id",
       ...) {
 
@@ -83,8 +90,12 @@ calc_covariates <-
       }, error = function(e) {
         print(e)
         print(args(what_to_run))
-        message(paste0("Please refer to the argument list and
-the error message above to rectify the error.\n"))
+        message(
+          paste0(
+            "Please refer to the argument list andthe error message above to ",
+            "rectify the error.\n"
+            )
+          )
         return(NULL)
       })
 
@@ -92,13 +103,18 @@ the error message above to rectify the error.\n"))
   }
 # nocov end
 
-#' Calculate Koeppen-Geiger climate zone binary variables
+#' Calculate climate classification covariates
+#' @description
+#' Extract climate classification values at point locations. Returns a
+#' \code{data.frame} object containing \code{locs_id} and
+#' binary (0 = point not in climate region; 1 = point in climate region)
+#' variables for each climate classification region.
+#' @param from SpatVector(1). Output of \code{process_koppen_geiger()}.
 #' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named `locs_id`
-#' @param from character(1). from to Koppen-Geiger
-#'  climate zone raster file
 #' @param locs_id character(1). Name of unique identifier.
 #' @param ... Placeholders.
+#' @seealso [process_koppen_geiger()]
 #' @returns a data.frame object
 #' @author Insang Song
 #' @importFrom terra vect
@@ -113,8 +129,8 @@ the error message above to rectify the error.\n"))
 # locs (locs), from (from), locs_id (id_col), variables
 calc_koppen_geiger <-
   function(
-      locs = NULL,
       from = NULL,
+      locs = NULL,
       locs_id = "site_id",
       ...) {
     ## You will get "locs" in memory after sourcing the file above
@@ -186,14 +202,19 @@ calc_koppen_geiger <-
   }
 
 
-#' Compute land cover classes ratio in circle buffers around points
-#'
+#' Calculate land cover covariates
+#' @description
+#' Compute ratio of land cover class in circle buffers around points. Returns
+#' a \code{data.frame} object containing \code{locs_id}, longitude, latitude,
+#' time (year), and computed ratio for each land cover class.
+#' @param from SpatRaster(1). Output of \code{process_nlcd()}.
 #' @param locs terra::SpatVector of points geometry
-#' @param from SpatRaster of NLCD
 #' @param locs_id character(1). Unique identifier of locations
 #' @param radius numeric (non-negative) giving the
 #' radius of buffer around points
 #' @param ... Placeholders.
+#' @seealso [process_nlcd()]
+#' @returns a data.frame object
 #' @importFrom utils read.csv
 #' @importFrom methods is
 #' @importFrom terra rast
@@ -208,8 +229,8 @@ calc_koppen_geiger <-
 #' @importFrom terra metags
 #' @importFrom exactextractr exact_extract
 #' @export
-calc_nlcd_ratio <- function(locs,
-                            from,
+calc_nlcd_ratio <- function(from,
+                            locs,
                             locs_id = "site_id",
                             radius = 1000,
                             ...) {
@@ -277,12 +298,18 @@ calc_nlcd_ratio <- function(locs,
 }
 
 
-#' Calculate EPA Ecoregions level 2/3 binary variables
+#' Calculate ecoregions covariates
+#' @description
+#' Extract ecoregions covariates (U.S. EPA Ecoregions Level 2/3) at point
+#' locations. Returns a \code{data.frame} object containing \code{locs_id} and
+#' binary (0 = point not in ecoregion; 1 = point in ecoregion) variables for
+#' each ecoregion.
+#' @param from SpatVector(1). Output of \code{process_ecoregion()}.
 #' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named `locs_id`
-#' @param from SpatVector. Ecoregion polygons
 #' @param locs_id character(1). Name of unique identifier.
 #' @param ... Placeholders.
+#' @seealso [process_ecoregion()]
 #' @returns a data.frame object with dummy variables and attributes of:
 #'   - `attr(., "ecoregion2_code")`: Ecoregion lv.2 code and key
 #'   - `attr(., "ecoregion3_code")`: Ecoregion lv.3 code and key
@@ -297,8 +324,8 @@ calc_nlcd_ratio <- function(locs,
 #' @export
 calc_ecoregion <-
   function(
-    locs,
     from = NULL,
+    locs,
     locs_id = "site_id",
     ...
   ) {
@@ -359,17 +386,17 @@ calc_ecoregion <-
 
 
 #' A single-date MODIS worker for parallelization
+#' @param from SpatRaster. Preprocessed objects.
 #' @param locs SpatVector/sf/sftime object. Locations where MODIS values
 #' are summarized.
-#' @param from SpatRaster. Preprocessed objects.
 #' @param locs_id character(1). Field name where unique site identifiers
 #' are stored. Default is `"site_id"`
+#' @param radius numeric. Radius to generate circular buffers.
 #' @param date Date(1). date to query.
 #' @param name_extracted character. Names of calculated covariates.
 #' @param fun_summary function. Summary function for
 #' multilayer rasters. Passed to `foo`. See [exactextractr::exact_extract]
 #' for details.
-#' @param radius numeric. Radius to generate circular buffers.
 #' @param ... Placeholders.
 #' @description modis_worker operates at six MODIS/VIIRS products
 #' (MOD11A1, MOD13A2, MOD06_L2, VNP46A2, MOD09GA, and MCD19A2)
@@ -391,13 +418,13 @@ calc_ecoregion <-
 #' @importFrom sf st_drop_geometry
 #' @export
 calc_modis_daily <- function(
-  locs = NULL,
   from = NULL,
+  locs = NULL,
   locs_id = "site_id",
+  radius = 0L,
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
-  radius = 0L,
   ...
 ) {
   if (!any(methods::is(locs, "SpatVector"),
@@ -472,10 +499,12 @@ calc_modis_daily <- function(
 
 
 #' Calculate MODIS product covariates in multiple CPU threads
+#' @param from character. List of paths to MODIS/VIIRS files.
 #' @param locs sf/SpatVector object. Unique locs where covariates
 #' will be calculated.
-#' @param from character. List of paths to MODIS/VIIRS files.
 #' @param locs_id character(1). Site identifier. Default is `"site_id"`
+#' @param radius numeric. Radii to calculate covariates.
+#' Default is `c(0, 1000, 10000, 50000)`.
 #' @param preprocess function. Function to handle HDF files.
 #' @param name_covariates character. Name header of covariates.
 #' e.g., `"MOD_NDVIF_0_"`.
@@ -483,8 +512,6 @@ calc_modis_daily <- function(
 #' '{name_covariates}{zero-padded buffer radius in meters}',
 #' e.g., 'MOD_NDVIF_0_50000' where 50 km radius circular buffer
 #' was used to calculate mean NDVI value.
-#' @param radius numeric. Radii to calculate covariates.
-#' Default is `c(0, 1000, 10000, 50000)`.
 #' @param subdataset Index or search pattern of subdataset.
 #' @param fun_summary character or function. Function to summarize
 #'  extracted raster values.
@@ -541,12 +568,12 @@ calc_modis_daily <- function(
 #' @export
 calc_modis_par <-
   function(
-    locs = NULL,
     from = NULL,
+    locs = NULL,
     locs_id = "site_id",
+    radius = c(0L, 1e3L, 1e4L, 5e4L),
     preprocess = process_modis_merge,
     name_covariates = NULL,
-    radius = c(0L, 1e3L, 1e4L, 5e4L),
     subdataset = NULL,
     fun_summary = "mean",
     nthreads = floor(length(parallelly::availableWorkers()) / 2),
@@ -667,15 +694,18 @@ process_modis_swath, or process_bluemarble.")
   }
 
 
-#' Calculate temporal dummy variables
+#' Calculate temporal dummy covariates
+#' @description
+#' Calculate temporal dummy covariates at point locations. Returns a
+#' \code{data.frame} object with \code{locs_id}, year binary variable for each
+#' value in \code{year}, and month and day of week binary variables.
 #' @param locs data.frame with a temporal field named `"time"`
-#' @param from not used.
 #' @param locs_id character(1). Unique site identifier column name.
 #'  Default is `"site_id"`.
 #' @param year integer. Year domain to dummify.
 #'  Default is \code{seq(2018L, 2022L)}
 #' @param ... Placeholders.
-#' @returns data.frame with year, month, and weekday indicators.
+#' @returns a data.frame object
 #' @author Insang Song
 #' @importFrom methods is
 #' @importFrom data.table year
@@ -685,7 +715,6 @@ process_modis_swath, or process_bluemarble.")
 calc_temporal_dummies <-
   function(
     locs,
-    from = NULL,
     locs_id = "site_id",
     year = seq(2018L, 2022L),
     ...
@@ -747,15 +776,15 @@ calc_temporal_dummies <-
 
 # nolint start
 #' Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates
+#' @param from `SpatVector` object. Locations where each SEDC is calculated. 
 #' @param locs `SpatVector` object. Locations where
 #'  the sum of SEDCs are calculated.
-#' @param from `SpatVector` object. Locations where each SEDC is calculated.
 #' @param locs_id character(1). Name of the unique id field in `point_to`.
 #' @param sedc_bandwidth numeric(1).
 #' Distance at which the source concentration is reduced to
 #'  `exp(-3)` (approximately -95 %)
 #' @param target_fields character(varying). Field names in characters.
-#' @returns data.frame (tibble) object with input field names with
+#' @returns a data.frame (tibble) object with input field names with
 #'  a suffix \code{"_sedc"} where the sums of EDC are stored.
 #'  Additional attributes are attached for the EDC information.
 #'    - `attr(result, "sedc_bandwidth")``: the bandwidth where
@@ -805,8 +834,8 @@ calc_temporal_dummies <-
 # nolint end
 calc_sedc <-
   function(
-    locs = NULL,
     from = NULL,
+    locs = NULL,
     locs_id = NULL,
     sedc_bandwidth = NULL,
     target_fields = NULL
@@ -894,19 +923,22 @@ The result may not be accurate.\n",
 
 
 
-#' Calculate TRI covariates
+#' Calculate toxic release covariates
+#' @description
+#' Extract toxic release values at point locations. Returns a \code{data.frame}
+#' object containing \code{locs_id} and variables for each chemical in
+#' \code{from}.
+#' @param from SpatVector(1). Output of \code{process_tri()}.
 #' @param locs sf/SpatVector. Locations where TRI variables are calculated.
-#' @param from SpatVector. Point vector object of TRI in a year.
-#' See [process_tri]
 #' @param locs_id character(1). Unique site identifier column name.
 #'  Default is `"site_id"`.
 #' @param radius Circular buffer radius.
 #' Default is \code{c(1000, 10000, 50000)} (meters)
 #' @param ... Placeholders.
 #' @author Insang Song, Mariana Kassien
-#' @returns A data.frame object.
+#' @returns a data.frame object
 #' @note U.S. context.
-#' @seealso [calc_sedc], [process_tri]
+#' @seealso [calc_sedc()], [process_tri()]
 #' @importFrom terra vect
 #' @importFrom terra crs
 #' @importFrom terra nearby
@@ -924,8 +956,8 @@ The result may not be accurate.\n",
 #' @importFrom dplyr summarize
 #' @export
 calc_tri <- function(
-  locs,
   from = NULL,
+  locs,
   locs_id = "site_id",
   radius = c(1e3L, 1e4L, 5e4L),
   ...
@@ -973,22 +1005,23 @@ calc_tri <- function(
 
 
 
-#' Calculate National Emission Inventory (NEI) covariates
+#' Calculate road emissions covariates
+#' @param from SpatVector(1). Output of \code{process_nei()}.
 #' @param locs sf/SpatVector. Locations at NEI values are joined.
-#' @param from character(1). from to the directory with NEI CSV files
 #' @param locs_id character(1). Unique site identifier column name.
 #' Unused but kept for compatibility.
 #' @param ... Placeholders.
 #' @author Insang Song, Ranadeep Daw
-#' @returns A data.frame object.
+#' @seealso [process_nei()]
+#' @returns a data.frame object
 #' @importFrom terra vect
 #' @importFrom methods is
 #' @importFrom terra project
 #' @importFrom terra intersect
 #' @export
 calc_nei <- function(
-  locs = NULL,
   from = NULL,
+  locs = NULL,
   locs_id = "site_id",
   ...
 ) {
@@ -1007,22 +1040,21 @@ calc_nei <- function(
 
 
 
-#' Calculate NOAA HMS Wildfire Smoke covariates
+#' Calculate wildfire smoke covariates
 #' @description
-#' Extract wildfire smoke plume coverage data from NOAA Hazard Mapping Fire and
-#' Smoke Product at point locations using SpatVector object from `process_hms`.
-#' Function returns a data frame containing wildfire smoke plume binary values
-#' (0 = smoke absent; 1 = smoke present) at user-defined sites. Unique columns
-#' reflect smoke density and circular buffer.
-#' @param from SpatVector(1). Cleaned SpatVector object that has been returned
-#' from `process_hms` containing wildfire smoke plume coverage data.
+#' Extract wildfire smoke plume values at point locations. Returns a
+#' \code{data.frame} object containing \code{locs_id}, date, and binary variable
+#' for wildfire smoke plume density inherited from \code{from} (0 = point not
+#' covered by wildfire smoke plume; 1 = point covered by wildfire smoke plume).
+#' @param from SpatVector(1). Output of \code{process_hms()}.
 #' @param locs data.frame, characater to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
 #' containing identifier for each unique coordinate location.
 #' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0).
+#' @seealso [process_hms()]
 #' @author Mitchell Manware
-#' @return a data.frame object;
+#' @return a data.frame object
 #' @importFrom terra vect
 #' @importFrom terra as.data.frame
 #' @importFrom terra time
@@ -1195,15 +1227,13 @@ calc_hms <- function(
   return(data.frame(sites_extracted_ordered))
 }
 
-#' Calculate GMTED elevation covariates
+#' Calculate elevation covariates
 #' @description
-#' Extract Global Multi-resolution Terrain Elevation Data (GMTED2010) data at
-#' point locations using SpatRaster object from `process_gmted`. Function
-#' returns a data frame containing GMTED variable values at user-defined
-#' sites. Unique column reflect statistic, resolution, and circular buffer.
-#' @param from SpatRaster(1). Cleaned SpatRaster object that has been returned
-#' from `process_gmted` containing Global Multi-resolution Terrain Elevation
-#' Data (GMTED2010) data.
+#' Extract elevation values at point locations. Returns a \code{data.frame}
+#' object containing \code{locs_id} and elevation variable. Elevation variable
+#' column name reflects the elevation statistic, spatial resolution of
+#' \code{from}, and circular buffer radius.
+#' @param from SpatRaster(1). Output from \code{process_gmted()}.
 #' @param locs data.frame. character to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
 #' containing identifier for each unique coordinate location.
@@ -1212,7 +1242,8 @@ calc_hms <- function(
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
 #' @author Mitchell Manware
-#' @return a data.frame object;
+#' @seealso [process_gmted()]
+#' @return a data.frame object
 #' @importFrom terra vect
 #' @importFrom terra as.data.frame
 #' @importFrom terra time
@@ -1314,17 +1345,13 @@ calc_gmted <- function(
   return(data.frame(sites_extracted))
 }
 
-#' Calculate NOAA NCEP North American Regional Reanalysis meteorological
-#' and atmospheric covariates
+#' Calculate meteorological covariates
 #' @description
-#' Extract NOAA NCEP North American Regional Reanalysis (NARR) data at point
-#' locations using SpatRaster object from `process_narr`. Function returns a
-#' data frame containing NARR variable values at user-defined sites. Unique
-#' column names reflect variable name, circular buffer, and vertical pressure
-#' level (if applicable).
-#' @param from SpatRaster(1). Cleaned SpatRaster object that has been returned
-#' from `process_narr` containing NOAA NCEP North American Regional Reanalysis
-#' variable data.
+#' Extract meteorological values at point locations. Returns a \code{data.frame}
+#' object containing \code{locs_id}, date, vertical pressure level, and
+#' meteorological variable. Meteorological variable column name reflects
+#' variable and circular buffer radius.
+#' @param from SpatRaster(1). Output of \code{process_narr()}.
 #' @param locs data.frame, characater to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
 #' containing identifier for each unique coordinate location.
@@ -1333,7 +1360,8 @@ calc_gmted <- function(
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
 #' @author Mitchell Manware
-#' @return a data.frame object;
+#' @seealso [process_narr()]
+#' @return a data.frame object
 #' @importFrom terra vect
 #' @importFrom terra as.data.frame
 #' @importFrom terra time
@@ -1449,14 +1477,13 @@ calc_narr <- function(
 }
 
 
-#' Calculate NASA GEOS-CF meteorological and atmospheric covariates
+#' Calculate atmospheric composition covariates
 #' @description
-#' Extract GEOS-CF data at point locations using SpatRaster object from
-#' `process_geos`. Function returns a data frame containing GEOS-CF variable
-#' values at user-defined sites. Unique column names reflect variable name,
-#' circular buffer, and vertical pressure level (if applicable).
-#' @param from SpatRaster(1). Cleaned SpatRaster object that has been returned
-#' from `process_eos` containing GEOS-CF variable data.
+#' Extract atmospheric composition values at point locations. Returns a
+#' \code{data.frame} object containing \code{locs_id}, date and hour, vertical
+#' pressure level, and atmospheric composition variable. Atmospheric
+#' composition variable column name reflects variable and circular buffer radius.
+#' @param from SpatRaster(1). Output of \code{process_geos()}.
 #' @param locs data.frame, characater to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
 #' containing identifier for each unique coordinate location.
@@ -1465,7 +1492,8 @@ calc_narr <- function(
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
 #' @author Mitchell Manware
-#' @return a data.frame object;
+#' @seealso [process_geos()]
+#' @return a data.frame object
 #' @importFrom terra vect
 #' @importFrom terra buffer
 #' @importFrom terra as.data.frame
@@ -1568,14 +1596,13 @@ calc_geos <- function(
   return(data.frame(sites_extracted))
 }
 
-#' Calculate UN WPP-Ajusted population density covariates
+#' Calculate population density covariates
 #' @description
-#' Extract population density data at point locations using SpatRaster object
-#' from `process_sedac_population`. Function returns a data frame containing
-#' population values at user-defined sites. Unique column names reflect variable
-#' name and circular buffer.
-#' @param from SpatRaster(1). Cleaned SpatRaster object that has been returned
-#' from `process_sedac_population` containing GEOS-CF variable data.
+#' Extract population density values at point locations. Returns a
+#' \code{data.frame} object containing \code{locs_id}, year, and population
+#' density variable. Population density variable column name reflects
+#' spatial resolution of \code{from} and circular buffer radius.
+#' @param from SpatRaster(1). Output of \code{process_sedac_population()}.
 #' @param locs data.frame, characater to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
 #' containing identifier for each unique coordinate location.
@@ -1584,7 +1611,8 @@ calc_geos <- function(
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
 #' @author Mitchell Manware
-#' @return a data.frame object;
+#' @seealso [process_sedac_population()]
+#' @return a data.frame object
 #' @importFrom terra vect
 #' @importFrom terra buffer
 #' @importFrom terra as.data.frame
@@ -1683,7 +1711,12 @@ calc_sedac_population <- function(
 
 
 
-#' Calculate SEDAC groads density covariates
+#' Calculate roads covariates
+#' @description Prepared groads data is clipped with the buffer polygons
+#' of `radius`. The total length of the roads are calculated.
+#' Then the density of the roads is calculated by dividing
+#' the total length from the area of the buffer. `terra::linearUnits()`
+#' is used to convert the unit of length to meters.
 #' @param from SpatVector(1). Output of `process_sedac_groads`.
 #' @param locs data.frame, characater to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
@@ -1692,11 +1725,6 @@ calc_sedac_population <- function(
 #' (Default = 1000).
 #' @param fun function(1). Function used to summarize the length of roads
 #' within sites location buffer (Default is `sum`).
-#' @description Prepared groads data is clipped with the buffer polygons
-#' of `radius`. The total length of the roads are calculated.
-#' Then the density of the roads is calculated by dividing
-#' the total length from the area of the buffer. `terra::linearUnits()`
-#' is used to convert the unit of length to meters.
 #' @note Unit is km / sq km.
 #' @author Insang Song
 #' @seealso [`process_sedac_groads`]

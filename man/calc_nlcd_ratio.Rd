@@ -2,14 +2,14 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_nlcd_ratio}
 \alias{calc_nlcd_ratio}
-\title{Compute land cover classes ratio in circle buffers around points}
+\title{Calculate land cover covariates}
 \usage{
-calc_nlcd_ratio(locs, from, locs_id = "site_id", radius = 1000, ...)
+calc_nlcd_ratio(from, locs, locs_id = "site_id", radius = 1000, ...)
 }
 \arguments{
-\item{locs}{terra::SpatVector of points geometry}
+\item{from}{SpatRaster(1). Output of \code{process_nlcd()}.}
 
-\item{from}{SpatRaster of NLCD}
+\item{locs}{terra::SpatVector of points geometry}
 
 \item{locs_id}{character(1). Unique identifier of locations}
 
@@ -18,6 +18,14 @@ radius of buffer around points}
 
 \item{...}{Placeholders.}
 }
+\value{
+a data.frame object
+}
 \description{
-Compute land cover classes ratio in circle buffers around points
+Compute ratio of land cover class in circle buffers around points. Returns
+a \code{data.frame} object containing \code{locs_id}, longitude, latitude,
+time (year), and computed ratio for each land cover class.
+}
+\seealso{
+\code{\link[=process_nlcd]{process_nlcd()}}
 }

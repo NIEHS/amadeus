@@ -2,13 +2,12 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_hms}
 \alias{calc_hms}
-\title{Calculate NOAA HMS Wildfire Smoke covariates}
+\title{Calculate wildfire smoke covariates}
 \usage{
 calc_hms(from, locs, locs_id = NULL, radius = 0)
 }
 \arguments{
-\item{from}{SpatVector(1). Cleaned SpatVector object that has been returned
-from \code{process_hms} containing wildfire smoke plume coverage data.}
+\item{from}{SpatVector(1). Output of \code{process_hms()}.}
 
 \item{locs}{data.frame, characater to file path, SpatVector, or sf object.}
 
@@ -19,14 +18,16 @@ containing identifier for each unique coordinate location.}
 (Default = 0).}
 }
 \value{
-a data.frame object;
+a data.frame object
 }
 \description{
-Extract wildfire smoke plume coverage data from NOAA Hazard Mapping Fire and
-Smoke Product at point locations using SpatVector object from \code{process_hms}.
-Function returns a data frame containing wildfire smoke plume binary values
-(0 = smoke absent; 1 = smoke present) at user-defined sites. Unique columns
-reflect smoke density and circular buffer.
+Extract wildfire smoke plume values at point locations. Returns a
+\code{data.frame} object containing \code{locs_id}, date, and binary variable
+for wildfire smoke plume density inherited from \code{from} (0 = point not
+covered by wildfire smoke plume; 1 = point covered by wildfire smoke plume).
+}
+\seealso{
+\code{\link[=process_hms]{process_hms()}}
 }
 \author{
 Mitchell Manware

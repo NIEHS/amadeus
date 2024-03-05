@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{is_date_proper}
 \alias{is_date_proper}
-\title{Check input strings conform to the required format}
+\title{Check date format}
 \usage{
 is_date_proper(instr = NULL, format = "\%Y-\%m-\%d")
 }
@@ -18,7 +18,7 @@ No returning value. It stops the function if \code{instr} doesn't
 conform to the \code{format}.
 }
 \description{
-Check input strings conform to the required format
+Check date input strings conform to the required format.
 }
 \author{
 Insang Song

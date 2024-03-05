@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_bluemarble_corners}
 \alias{process_bluemarble_corners}
-\title{Tile corner generator for Blue Marble products}
+\title{Process Blue Marble corners}
 \usage{
 process_bluemarble_corners(hrange = c(5, 11), vrange = c(3, 6))
 }
@@ -15,6 +15,8 @@ process_bluemarble_corners(hrange = c(5, 11), vrange = c(3, 6))
 data.frame with xmin, xmax, ymin, and ymax fields
 }
 \description{
+Tile corner generator for Blue Marble products.
+
 Blue Marble products are in HDF5 format and are read without
 georeference with typical R geospatial packages.
 This function generates a data.frame of corner coordinates for assignment.

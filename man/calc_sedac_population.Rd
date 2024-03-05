@@ -2,13 +2,12 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_sedac_population}
 \alias{calc_sedac_population}
-\title{Calculate UN WPP-Ajusted population density covariates}
+\title{Calculate population density covariates}
 \usage{
 calc_sedac_population(from, locs, locs_id = NULL, radius = 0, fun = "mean")
 }
 \arguments{
-\item{from}{SpatRaster(1). Cleaned SpatRaster object that has been returned
-from \code{process_sedac_population} containing GEOS-CF variable data.}
+\item{from}{SpatRaster(1). Output of \code{process_sedac_population()}.}
 
 \item{locs}{data.frame, characater to file path, SpatVector, or sf object.}
 
@@ -22,13 +21,16 @@ containing identifier for each unique coordinate location.}
 within sites location buffer (Default = \code{mean}).}
 }
 \value{
-a data.frame object;
+a data.frame object
 }
 \description{
-Extract population density data at point locations using SpatRaster object
-from \code{process_sedac_population}. Function returns a data frame containing
-population values at user-defined sites. Unique column names reflect variable
-name and circular buffer.
+Extract population density values at point locations. Returns a
+\code{data.frame} object containing \code{locs_id}, year, and population
+density variable. Population density variable column name reflects
+spatial resolution of \code{from} and circular buffer radius.
+}
+\seealso{
+\code{\link[=process_sedac_population]{process_sedac_population()}}
 }
 \author{
 Mitchell Manware

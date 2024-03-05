@@ -9,8 +9,8 @@ calc_covariates(
     "dummies", "gmted", "roads", "ecoregions", "ecoregion", "hms", "noaa", "smoke",
     "gmted", "narr", "narr_monolevel", "narr_p_levels", "plevels", "monolevel",
     "p_levels", "geos", "sedac_population", "population"),
-  locs,
   from,
+  locs,
   locs_id = "site_id",
   ...
 )
@@ -18,10 +18,10 @@ calc_covariates(
 \arguments{
 \item{covariate}{character(1). Covariate type.}
 
+\item{from}{character. Single or multiple from strings.}
+
 \item{locs}{sf/SpatVector. Unique locations. Should include
 a unique identifier field named \code{locs_id}}
-
-\item{from}{character. Single or multiple from strings.}
 
 \item{locs_id}{character(1). Name of unique identifier.
 Default is \code{"site_id"}.}
@@ -33,7 +33,13 @@ function.}
 Calculated covariates. Mainly data.frame object.
 }
 \description{
-Calculate covariates
+The \code{calculate_covariates()} function extracts values at point
+locations from a SpatRaster or SpatVector object returned from
+\code{process_covariates()}. \code{calculate_covariates()} and the underlying
+source-specific covariate functions have been designed to operate on the
+processed objects. To avoid errors, \strong{do not edit the processed
+SpatRaster or SpatVector objects before passing to
+\code{calculate_covariates()}}.
 }
 \seealso{
 \itemize{

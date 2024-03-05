@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_modis_merge}
 \alias{process_modis_merge}
-\title{Get mosaicked or merged raster from multiple MODIS hdf files}
+\title{Process MODIS .hdf files}
 \usage{
 process_modis_merge(
   path = NULL,
@@ -33,7 +33,7 @@ cell values. See \code{fun} description in \link[terra]{tapp} for details.}
 a SpatRaster object
 }
 \description{
-Get mosaicked or merged raster from multiple MODIS hdf files
+Get mosaicked or merged raster from multiple MODIS hdf files.
 }
 \note{
 Curvilinear products (i.e., swaths) will not be accepted.

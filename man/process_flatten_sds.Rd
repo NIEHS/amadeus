@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_flatten_sds}
 \alias{process_flatten_sds}
-\title{Aggregate layers in a sub-dataset in sinusoidal MODIS products}
+\title{Process MODIS layers}
 \usage{
 process_flatten_sds(path = NULL, subdataset = NULL, fun_agg = "mean")
 }
@@ -21,6 +21,8 @@ Should be acceptable to \link[terra:tapp]{terra::tapp}.}
 a SpatRaster object
 }
 \description{
+Aggregate layers in a sub-dataset in sinusoidal MODIS products.
+
 Some MODIS products consist of multi-layer subdatasets.
 This function aggregates multiple layers into single layer SpatRaster.
 \code{fun_agg} is applied at overlapping cells.
