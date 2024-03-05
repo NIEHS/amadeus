@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_support.R
 \name{download_remove_command}
 \alias{download_remove_command}
-\title{Remove or keep wget command file}
+\title{Remove download commands}
 \usage{
 download_remove_command(commands_txt = NULL, remove = FALSE)
 }
@@ -13,6 +13,6 @@ download_remove_command(commands_txt = NULL, remove = FALSE)
 keep (\code{FALSE}) commands}
 }
 \description{
-Remove or keep wget command file
+Remove or retain the .txt file storing all download commands.
 }
 \keyword{internal}

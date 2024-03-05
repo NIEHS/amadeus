@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_support.R
 \name{download_epa_certificate}
 \alias{download_epa_certificate}
-\title{Check EPA Certificate}
+\title{Check EPA certificate}
 \usage{
 download_epa_certificate(
   epa_certificate_path = "cacert_gaftp_epa.pem",
@@ -22,7 +22,7 @@ URL of the original certificate.}
 A file designated in \code{epa_certificate_path}
 }
 \description{
-Check EPA Certificate
+Check EPA certificate
 }
 \author{
 Insang Song

@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_support.R
 \name{check_for_null_parameters}
 \alias{check_for_null_parameters}
-\title{Check for null arguments}
+\title{Check parameters}
 \usage{
 check_for_null_parameters(parameters)
 }
@@ -11,6 +11,6 @@ check_for_null_parameters(parameters)
 \code{mget(ls())}.)}
 }
 \description{
-Check for null arguments
+Check that all parameters have been assigned a value.
 }
 \keyword{internal}

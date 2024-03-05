@@ -2,8 +2,7 @@
 % Please edit documentation in R/download_support.R
 \name{download_run}
 \alias{download_run}
-\title{download_run: execute or skip \code{system_command}
-in data download function.}
+\title{Run download commands}
 \usage{
 download_run(download = FALSE, system_command = NULL)
 }

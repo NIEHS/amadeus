@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_test_support.R
 \name{read_commands}
 \alias{read_commands}
-\title{Read commands and convert to character vector}
+\title{Import download commands}
 \usage{
 read_commands(commands_path = commands_path)
 }
@@ -13,6 +13,6 @@ read_commands(commands_path = commands_path)
 character vector containing download commands
 }
 \description{
-Read commands and convert to character vector
+Read download commands from .txt file and convert to character vector.
 }
 \keyword{internal}

@@ -1,6 +1,8 @@
 # Functions used to simplify and support download functions
 
-#' Check if input directory exists
+#' Setup directory
+#' @description
+#' Create \code{directory} if it does not already exist.
 #' @param directory character(1) directory path
 #' @description If directory does not exist, the directory
 #' will be created.
@@ -15,7 +17,10 @@ download_setup_dir <-
   }
 
 
-#' Sanitize path to end with a forward slash
+#' Sanitize directory
+#' @description
+#' Append forward slash to end of \code{directory} if it does not already
+#' end with one.
 #' @param directory character(1). Path
 #' @returns character ending with a forward slash.
 #' @keywords internal
@@ -39,9 +44,15 @@ download_sanitize_path <-
   }
 
 
-#' Check for data download acknowledgement
+#' Check data download acknowledgement
+#' @description
+#' Return an error if the \code{acknowledgement = FALSE}.
 #' @param acknowledgement logical(1). Whether to
 #' start downloading
+#' @note
+#' The \code{acknowledgement} parameter is designed to help users avoid
+#' accidentally initiating a very large data download that may take a very long
+#' time to run or exceed machine capabilities.
 #' @returns NULL
 #' @keywords internal
 #' @export
@@ -58,9 +69,7 @@ download_permit <-
   }
 
 
-#' download_run: execute or skip \code{system_command}
-#' in data download function.
-#'
+#' Run download commands
 #' @description
 #' Execute or skip the commands listed in the ...wget/curl_commands.txt file
 #' produced by one of the data download functions.
@@ -85,8 +94,9 @@ download_run <- function(
 }
 
 
-#' Remove or keep wget command file
-#'
+#' Remove download commands
+#' @description
+#' Remove or retain the .txt file storing all download commands.
 #' @param commands_txt character(1). Path of download commands
 #' @param remove logical(1). Remove (\code{TRUE}) or
 #'  keep (\code{FALSE}) commands
@@ -102,7 +112,9 @@ download_remove_command <-
   }
 
 
-#' Start sink download commands into a text file
+#' Sink download commands
+#' @description
+#' Open connection to \code{command_txt} file to store download commands.
 #' @param command_txt character(1). file path to export commands.
 #' @returns NULL
 #' @keywords internal
@@ -116,7 +128,9 @@ download_sink <-
   }
 
 
-#' Unzip downloaded data
+#' Unzip zip files
+#' @description
+#' Unzip (inflate) downloaded ".zip" files.
 #' @param file_name character(1). Full zip file path
 #' @param directory_to_unzip character(1). Directory to unzip
 #' data
@@ -145,9 +159,14 @@ download_unzip <-
   }
 
 
-#' Remove downloaded zip files
+#' Remove zip files
+#' @description
+#' Remove downloaded ".zip" files.
 #' @param remove logical(1). Confirm removal. Default is FALSE.
 #' @param download_name character. Full zip file path
+#' @note
+#' If \code{remove = TRUE}, ensure that \code{unzip = TRUE}. Choosing to remove
+#' ".zip" files without unzipping will retain none of the downloaded data.
 #' @returns NULL
 #' @keywords internal
 #' @export
@@ -163,7 +182,9 @@ download_remove_zips <-
   }
 
 
-#' Check for null arguments
+#' Check parameters
+#' @description
+#' Check that all parameters have been assigned a value.
 #' @param parameters parameters passed to function (called by
 #' \code{mget(ls())}.)
 #' @returns NULL
@@ -178,7 +199,9 @@ check_for_null_parameters <-
     }
   }
 
-#' Generate sequence of dates based on `date_start` and `date_end`.
+#' Generate date sequence
+#' @description
+#' Generate a sequence of dates from \code{date_start} to \code{date_end}.
 #' @param date_start character(1). Beginning of date sequence.
 #' @param date_end character(1). End of date sequence.
 #' @param sub_hyphen logical(1). Substitute hyphen in dates. If `TRUE`, returns
@@ -206,7 +229,7 @@ generate_date_sequence <-
   }
 
 
-#' Check EPA Certificate
+#' Check EPA certificate
 #' @param epa_certificate_path character(1).
 #' Full path of a converted certificate of EPA.
 #' Should end with `.pem`
@@ -242,9 +265,17 @@ download_epa_certificate <-
     }
   }
 
-#' Generate time sequence based on GEOS-CF data collection.
+#' Generate time sequence
+#' @description
+#' Generate a sequence of time values based on the GEOS-CF collection.
 #' @param collection character(1). GEOS-CF data collection
 #' @return vector
+#' @note
+#' GEOS-CF hourly values are observed on the hour (ie. 0000 = 12:00:00 AM, 0100
+#' = 01:00:00 AM) or the half hour (ie. 0030 = 12:30:00 AM, 0130 = 01:30:00 AM).
+#' Typically, 2-dimensional collections (latitute and longitude only) utilize
+#' half hour, and 3-dimensional collections (latitute, longitude, and time)
+#' utilize hour.
 #' @keywords internal
 #' @export
 generate_time_sequence <-

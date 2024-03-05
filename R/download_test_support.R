@@ -1,6 +1,8 @@
 # Functions used to simplify, implement and support download unit tests
 
-#' Check if sample of download URLs have HTTP Status 200
+#' Check HTTP status
+#' @description
+#' Check if provided URL returns HTTP status 200.
 #' @param url Download URL to be checked.
 #' @param method httr method to obtain URL (`"HEAD"` or `"GET"`)
 #' @author Insang Song; Mitchell Manware
@@ -25,7 +27,9 @@ check_url_status <- function(
   return(status == http_status_ok)
 }
 
-#' Read commands and convert to character vector
+#' Import download commands
+#' @description
+#' Read download commands from .txt file and convert to character vector.
 #' @param commands_path file path with wget/curl commands
 #' @return character vector containing download commands
 #' @importFrom utils read.csv
@@ -38,7 +42,9 @@ read_commands <- function(
   return(commands)
 }
 
-#' Extract URLs from download commands
+#' Extract download URLs
+#' @description
+#' Extract download URLs from multi-argument download commands.
 #' @param commands character vector containing download commands
 #' @param position URL position in the vector
 #' @return character vector containing download URLs
@@ -62,7 +68,9 @@ extract_urls <- function(
   return(urls)
 }
 
-#' Sample download URLs and apply `check_url_status` function
+#' Check HTTP status
+#' @description
+#' Apply \code{check_url_status()} function to a sample of download URLs.
 #' @param urls character vector of URLs
 #' @param size number of observations to be sampled from \code{urls}
 #' @param method httr method to obtain URL (`"HEAD"` or `"GET"`). If set to
@@ -95,7 +103,9 @@ check_urls <- function(
   }
 }
 
-#' Apply download function-specific unit tests
+#' Download unit tests
+#' @description
+#' Implement directory, file, and download URL unit tests.
 #' @param directory_to_save directory to test saving
 #' @param directory_to_download directory to test download
 #' @param commands_path file path with download commands

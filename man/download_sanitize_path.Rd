@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_support.R
 \name{download_sanitize_path}
 \alias{download_sanitize_path}
-\title{Sanitize path to end with a forward slash}
+\title{Sanitize directory}
 \usage{
 download_sanitize_path(directory)
 }
@@ -13,6 +13,7 @@ download_sanitize_path(directory)
 character ending with a forward slash.
 }
 \description{
-Sanitize path to end with a forward slash
+Append forward slash to end of \code{directory} if it does not already
+end with one.
 }
 \keyword{internal}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_support.R
 \name{download_sink}
 \alias{download_sink}
-\title{Start sink download commands into a text file}
+\title{Sink download commands}
 \usage{
 download_sink(command_txt)
 }
@@ -10,6 +10,6 @@ download_sink(command_txt)
 \item{command_txt}{character(1). file path to export commands.}
 }
 \description{
-Start sink download commands into a text file
+Open connection to \code{command_txt} file to store download commands.
 }
 \keyword{internal}

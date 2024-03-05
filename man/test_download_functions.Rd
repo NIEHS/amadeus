@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_test_support.R
 \name{test_download_functions}
 \alias{test_download_functions}
-\title{Apply download function-specific unit tests}
+\title{Download unit tests}
 \usage{
 test_download_functions(
   directory_to_download = NULL,
@@ -21,6 +21,6 @@ test_download_functions(
 \item{url_status}{logical vector for URL status = 200}
 }
 \description{
-Apply download function-specific unit tests
+Implement directory, file, and download URL unit tests.
 }
 \keyword{internal}

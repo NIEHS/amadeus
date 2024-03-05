@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_support.R
 \name{generate_time_sequence}
 \alias{generate_time_sequence}
-\title{Generate time sequence based on GEOS-CF data collection.}
+\title{Generate time sequence}
 \usage{
 generate_time_sequence(collection)
 }
@@ -13,6 +13,13 @@ generate_time_sequence(collection)
 vector
 }
 \description{
-Generate time sequence based on GEOS-CF data collection.
+Generate a sequence of time values based on the GEOS-CF collection.
+}
+\note{
+GEOS-CF hourly values are observed on the hour (ie. 0000 = 12:00:00 AM, 0100
+= 01:00:00 AM) or the half hour (ie. 0030 = 12:30:00 AM, 0130 = 01:30:00 AM).
+Typically, 2-dimensional collections (latitute and longitude only) utilize
+half hour, and 3-dimensional collections (latitute, longitude, and time)
+utilize hour.
 }
 \keyword{internal}
