@@ -810,7 +810,7 @@ The downloaded file cannot be unzipped because the data was not downloaded prope
 
 Visit [https://urs.earthdata.nasa.gov/](http://urs.earthdata.nasa.gov) to register for or log into a NASA EarthData account.
 
-![NASA EarthData Account Landing Page](../inst/extdata/vignette_images/NASA_EarthData_login.png)
+![NASA EarthData Account Landing Page](images/NASA_EarthData_login.png)
 
 Account registration provides access to NASA's Earth Observing System Data and Information System (EOSDIS) and its twelve Distributed Active Archive Centers (DAAC), including:
 
@@ -833,7 +833,7 @@ See <https://www.earthdata.nasa.gov/eosdis/daacs> for more information.
 
 After creating an account, navigate to "My Profile"(https://urs.earthdata.nasa.gov/profile), and then to "Applications \> Authorized Apps". This "Authorized Apps" page specifies which NASA EarthData applications can use your login credentials. For this example, ensure that authorization is enabled for "SEDAC Website", "SEDAC Website (Alpha)", and "SEDAC Website (Beta)".
 
-![NASA EarthData Approved Applications](../inst/extdata/vignette_images/NASA_EarthData_applications.png)
+![NASA EarthData Approved Applications](images/NASA_EarthData_applications.png)
 
 ### Prerequisite files
 

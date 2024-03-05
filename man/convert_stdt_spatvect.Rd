@@ -18,3 +18,4 @@ Convert a stdt to SpatVector
 \author{
 Eva Marques
 }
+\keyword{spacetime}

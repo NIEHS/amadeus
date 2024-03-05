@@ -2,7 +2,7 @@
 % Please edit documentation in R/download.R
 \name{download_data}
 \alias{download_data}
-\title{Download raw data}
+\title{Download raw data wrapper function}
 \usage{
 download_data(
   dataset_name = c("aqs", "ecoregion", "geos", "gmted", "koppen", "koppengeiger",

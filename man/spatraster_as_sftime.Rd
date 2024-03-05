@@ -23,3 +23,4 @@ Create a sftime from a terra::SpatRaster
 \author{
 Eva Marques
 }
+\keyword{spacetime}

@@ -26,3 +26,4 @@ Create a sftime from a datatable
 \author{
 Eva Marques
 }
+\keyword{spacetime}

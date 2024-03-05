@@ -19,3 +19,4 @@ Convert a stdtobj to SpatRasterDataset
 \author{
 Eva Marques
 }
+\keyword{spacetime}

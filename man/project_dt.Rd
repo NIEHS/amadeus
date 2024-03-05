@@ -26,3 +26,4 @@ This function assumes that users have point geometry.
 \author{
 Eva Marques
 }
+\keyword{spacetime}

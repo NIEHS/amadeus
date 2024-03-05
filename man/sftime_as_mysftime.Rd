@@ -20,3 +20,4 @@ Convert a sftime object to mysftime
 \author{
 Eva Marques
 }
+\keyword{spacetime}

@@ -21,3 +21,4 @@ Convert spatio-temporal object to a datatable with lon, lat, time, predictors co
 \author{
 Eva Marques, Insang Song
 }
+\keyword{spacetime}

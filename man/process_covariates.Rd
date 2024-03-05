@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_covariates}
 \alias{process_covariates}
-\title{Process raw data}
+\title{Process raw data wrapper function}
 \usage{
 process_covariates(
   covariate = c("modis_swath", "modis_merge", "koppen-geiger", "bluemarble",

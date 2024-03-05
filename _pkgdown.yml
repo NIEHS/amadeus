@@ -9,26 +9,26 @@ navbar:
     right: [github]
 
 reference:
-- title: Download
-  desc: Functions to download raw data from URLs
+- subtitle: Download
+  desc: Functions which download data from URLs
 - contents:
-  - data_download
+  - download_data
   - starts_with("download_")
-- title: Process
-  desc: Functions to import data into R
+- subtitle: Process
+  desc: Functions which import and clean raw data in R
 - contents:
   - process_covariates
   - starts_with("process_")
-- title: Covariates
-  desc: Functions to extract data values at points
+- subtitle: Covariates
+  desc: Functions which extract data values at user-defined points
 - contents:
   - calc_covariates
   - starts_with("calc_")
-- title: Spatio-Temporal
-  desc: Functions to convert to and between spatio-temporal data types
+- subtitle: Spatio-Temporal
+  desc: Functions which convert to, from, and between spatio-temporal data types
 - contents:
   - has_keyword("spacetime")
-- title: Auxillary/Internal
-  desc: Support functions
+- subtitle: Internal
+  desc: Functions which support download, process, and covariate functions and associated unit tests
 - contents:
   - has_keyword("internal")

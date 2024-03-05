@@ -1,5 +1,5 @@
 # nolint start
-#' Process raw data
+#' Process raw data wrapper function
 #' @description
 #' The \code{process_covariates()} function processes raw data files which have
 #' been downloaded by \code{download_data()}. \code{process_covariates()} and
@@ -352,6 +352,7 @@ process_bluemarble_corners <-
 #' @returns No returning value. It stops the function if `instr` doesn't
 #' conform to the `format`.
 #' @author Insang Song
+#' @keywords internal
 #' @export
 is_date_proper <- function(
   instr = NULL,
@@ -1131,11 +1132,11 @@ process_sedac_groads <- function(
 #' character will contain the selected density value and the sequence of dates
 #' for which no wildfire smoke plumes were detected.
 #' @examples
-#' > process_hms(
-#' +   date = c("2018-12-30", "2019-01-01"),
-#' +   variable = "Light",
-#' +   path = "tests/testdata/hms/"
-#' + )
+#' process_hms(
+#'   date = c("2018-12-30", "2019-01-01"),
+#'   variable = "Light",
+#'   path = "your/path/"
+#' )
 #' Light smoke plume polygons absent from 2018-12-30 to 2019-01-01. Returning vector of dates.
 #' [1] "Light"    "20181230" "20181231" "20190101"
 # nolint end

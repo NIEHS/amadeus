@@ -18,3 +18,4 @@ Boolean to know if an object correspond to a stdtobj
 \author{
 Eva Marques
 }
+\keyword{spacetime}

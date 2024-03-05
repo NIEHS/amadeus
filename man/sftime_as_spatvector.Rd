@@ -18,3 +18,4 @@ Convert sftime object to SpatVector
 \author{
 Eva Marques
 }
+\keyword{spacetime}

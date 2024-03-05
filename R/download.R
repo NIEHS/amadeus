@@ -1,5 +1,5 @@
 # download.R
-#' Download raw data
+#' Download raw data wrapper function
 # nolint start
 #' @description
 #' The \code{download_data()} function accesses and downloads atmospheric, meteorological, and environmental data from various open-access data sources.

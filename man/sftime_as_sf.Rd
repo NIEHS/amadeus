@@ -21,3 +21,4 @@ Simplify an sftime to sf class
 \author{
 Eva Marques
 }
+\keyword{spacetime}

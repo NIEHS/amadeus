@@ -15,3 +15,4 @@ Check if the sf object is formated on a specific way
 \author{
 Eva Marques
 }
+\keyword{spacetime}

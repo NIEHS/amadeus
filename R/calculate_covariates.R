@@ -1,6 +1,6 @@
 # nocov start
 # nolint start
-#' Calculate covariates
+#' Calculate covariates wrapper function
 #' @description
 #' The \code{calculate_covariates()} function extracts values at point
 #' locations from a SpatRaster or SpatVector object returned from

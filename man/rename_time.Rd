@@ -20,3 +20,4 @@ Rename the time column of a sftime object
 \author{
 Eva Marques
 }
+\keyword{spacetime}

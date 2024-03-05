@@ -22,3 +22,4 @@ Convert sftime object to SpatRaster
 \author{
 Eva Marques
 }
+\keyword{spacetime}

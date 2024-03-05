@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_covariates}
 \alias{calc_covariates}
-\title{Calculate covariates}
+\title{Calculate covariates wrapper function}
 \usage{
 calc_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",

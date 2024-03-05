@@ -20,3 +20,4 @@ Create a sf object from a data.table
 \author{
 Eva Marques
 }
+\keyword{spacetime}

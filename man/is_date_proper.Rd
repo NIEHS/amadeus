@@ -23,3 +23,4 @@ Check date input strings conform to the required format.
 \author{
 Insang Song
 }
+\keyword{internal}

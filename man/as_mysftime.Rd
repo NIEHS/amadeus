@@ -23,3 +23,4 @@ Convert to sftime object on the form adapted to beethoven code
 \author{
 Eva Marques
 }
+\keyword{spacetime}

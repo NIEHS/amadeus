@@ -18,3 +18,4 @@ Convert a stdtobj to sftime
 \author{
 Eva Marques
 }
+\keyword{spacetime}
