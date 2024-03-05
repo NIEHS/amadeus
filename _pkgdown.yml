@@ -7,3 +7,28 @@ navbar:
   structure:
     left:  [reference, articles, search]
     right: [github]
+
+reference:
+- title: Download
+  desc: Functions to download raw data from URLs
+- contents:
+  - data_download
+  - starts_with("download_")
+- title: Process
+  desc: Functions to import data into R
+- contents:
+  - process_covariates
+  - starts_with("process_")
+- title: Covariates
+  desc: Functions to extract data values at points
+- contents:
+  - calc_covariates
+  - starts_with("calc_")
+- title: Spatio-Temporal
+  desc: Functions to convert to and between spatio-temporal data types
+- contents:
+  - has_keyword("spacetime")
+- title: Auxillary/Internal
+  desc: Support functions
+- contents:
+  - has_keyword("internal")

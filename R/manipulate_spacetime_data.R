@@ -13,6 +13,7 @@
 #' @importFrom data.table melt
 #' @importFrom data.table .SD
 #' @importFrom sf st_crs
+#' @keywords spacetime
 #' @author Eva Marques, Insang Song
 #' @export
 convert_stobj_to_stdt <- function(stobj) {
@@ -103,6 +104,7 @@ convert_stobj_to_stdt <- function(stobj) {
 #' @param obj an object
 #' @return a boolean to know if obj is from newly created class "stdt"
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 is_stdt <- function(obj) {
   if (!(identical(class(obj), c("list", "stdt")))) {
@@ -125,6 +127,7 @@ is_stdt <- function(obj) {
 #' @param x a sftime object
 #' @import sftime
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 check_mysftime <- function(x) {
   stopifnot(
@@ -144,6 +147,7 @@ check_mysftime <- function(x) {
 #' @param x a sf object
 #' @import sf
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 check_mysf <- function(x) {
   stopifnot(
@@ -163,6 +167,7 @@ check_mysf <- function(x) {
 #' @return a sftime object
 #' @import sftime
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 rename_time <- function(x, newname) {
   stopifnot("x is not a sftime" = class(x)[1] == "sftime")
@@ -183,6 +188,7 @@ rename_time <- function(x, newname) {
 #' @return a sftime object
 #' @import sftime
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 dt_as_mysftime <- function(x, lonname, latname, timename, crs) {
   stopifnot("x is not a data.table" = class(x)[1] == "data.table")
@@ -210,6 +216,7 @@ dt_as_mysftime <- function(x, lonname, latname, timename, crs) {
 #' @return a sftime object
 #' @import sftime
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 spatraster_as_sftime <- function(x, varname, timename = "time") {
   date_correct <- TRUE
@@ -247,6 +254,7 @@ spatraster_as_sftime <- function(x, varname, timename = "time") {
 #' @return a sftime object
 #' @import sftime
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 spatrds_as_sftime <- function(x, timename = "time") {
   stopifnot(
@@ -274,6 +282,7 @@ spatrds_as_sftime <- function(x, timename = "time") {
 #' as simple column (default = TRUE)
 #' @return a sf object
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sftime_as_sf <- function(x, keeptime = TRUE) {
   stopifnot("x is not a sftime" = class(x)[1] == "sftime")
@@ -294,6 +303,7 @@ sftime_as_sf <- function(x, keeptime = TRUE) {
 #' @param timename character: name of time column in x
 #' @return a sftime object
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sf_as_mysftime <- function(x, timename) {
   if (!(timename %in% colnames(x))) {
@@ -310,6 +320,7 @@ sf_as_mysftime <- function(x, timename) {
 #' @param timename character: name of time column in x
 #' @return a sftime object with specific format (see check_mysftime() function)
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sftime_as_mysftime <- function(x, timename) {
   if (!(timename %in% colnames(x))) {
@@ -327,6 +338,7 @@ sftime_as_mysftime <- function(x, timename) {
 #' @return a sftime object
 #' @import sftime
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 spatvector_as_sftime <- function(x, timename = "time") {
   stopifnot("timename column missing or mispelled" = timename %in% names(x))
@@ -347,6 +359,7 @@ spatvector_as_sftime <- function(x, timename = "time") {
 #' (see check_mysftime() function)
 #' @import sf
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 as_mysftime <- function(x, ...) {
   format <- class(x)[1]
@@ -415,6 +428,7 @@ as_mysftime <- function(x, ...) {
 #' @return a terra::SpatVector
 #' @import sftime
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sftime_as_spatvector <- function(x) {
   stopifnot("x is not a sftime" = class(x)[1] == "sftime")
@@ -433,6 +447,7 @@ sftime_as_spatvector <- function(x) {
 #' @import sftime
 #' @import stars
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sftime_as_spatraster <- function(x, varname) {
   stopifnot("varname missing or mispelled" = varname %in% colnames(x))
@@ -453,6 +468,7 @@ sftime_as_spatraster <- function(x, varname) {
 #' @param x a sftime
 #' @import sftime
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sftime_as_spatrds <- function(x) {
   stopifnot("x is not a sftime" = class(x)[1] == "sftime")
@@ -497,6 +513,7 @@ sftime_as_spatrds <- function(x) {
 #' @importFrom terra vect
 #' @importFrom terra sds
 #' @author Insang Song
+#' @keywords spacetime
 #' @export
 convert_stdt <- function(
     stdt,
@@ -521,6 +538,7 @@ convert_stdt <- function(
 #' @return a SpatVector
 #' @author Eva Marques
 #' @importFrom terra vect
+#' @keywords spacetime
 #' @export
 convert_stdt_spatvect <- function(stdt) {
   if (!is_stdt(stdt)) {
@@ -540,6 +558,7 @@ convert_stdt_spatvect <- function(stdt) {
 #' @param stdt A stdt object
 #' @return a sftime object
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 convert_stdt_sftime <- function(stdt) {
   if (!is_stdt(stdt)) {
@@ -566,6 +585,7 @@ convert_stdt_sftime <- function(stdt) {
 #' @author Eva Marques
 #' @importFrom stats reshape
 #' @importFrom terra sds
+#' @keywords spacetime
 #' @export
 convert_stdt_spatrastdataset <- function(stdt) {
   if (!is_stdt(stdt)) {
@@ -601,6 +621,7 @@ convert_stdt_spatrastdataset <- function(stdt) {
 #' @param crs A character containing the original crs
 #' @author Eva Marques
 #' @importFrom sf st_as_sf
+#' @keywords spacetime
 #' @return an sf object
 dt_as_sf <- function(datatable, crs) {
   if (!("data.table" %in% class(datatable))) {
@@ -633,6 +654,7 @@ dt_as_sf <- function(datatable, crs) {
 #' @note "time" column in datatable argument should be in date format,
 #' e.g., "2023-01-01", "01/01/2023", etc.
 #' @author Eva Marques
+#' @keywords spacetime
 #' @return an sftime object
 dt_as_sftime <- function(datatable, crs) {
   if (!("data.table" %in% class(datatable))) {
@@ -676,6 +698,7 @@ dt_as_sftime <- function(datatable, crs) {
 #' @importFrom data.table as.data.table
 #' @importFrom data.table merge.data.table
 #' @importFrom methods is
+#' @keywords spacetime
 #' @return same datatable object with "lon", "lat",
 #' "lon_ori", "lat_ori" columns
 project_dt <- function(datatable, crs_ori, crs_dest) {
