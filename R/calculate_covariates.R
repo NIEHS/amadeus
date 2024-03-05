@@ -94,8 +94,8 @@ calc_covariates <-
           paste0(
             "Please refer to the argument list andthe error message above to ",
             "rectify the error.\n"
-            )
           )
+        )
         return(NULL)
       })
 
@@ -1482,7 +1482,8 @@ calc_narr <- function(
 #' Extract atmospheric composition values at point locations. Returns a
 #' \code{data.frame} object containing \code{locs_id}, date and hour, vertical
 #' pressure level, and atmospheric composition variable. Atmospheric
-#' composition variable column name reflects variable and circular buffer radius.
+#' composition variable column name reflects variable and circular buffer
+#' radius.
 #' @param from SpatRaster(1). Output of \code{process_geos()}.
 #' @param locs data.frame, characater to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
