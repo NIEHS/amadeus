@@ -368,5 +368,3 @@ sftime_as_spatrds <- function(x) {
   output <- terra::sds(rast_list)
   return(output)
 }
-
-
