@@ -655,26 +655,21 @@ process_conformity <-
     if (!check_time) {
       keyword <- keyword[-3]
     }
-    if (is_stdt(locs)) {
-      locs <- locs$stdt
-      locs_epsg <- locs$crs_dt
-    } else {
-      if (!all(keyword %in% names(locs))) {
-        stop("locs should be stdt or have 'lon', 'lat', (and 'time') fields.\n")
+    if (!all(keyword %in% names(locs))) {
+      stop("locs should be stdt or have 'lon', 'lat', (and 'time') fields.\n")
+    }
+    if (!methods::is(locs, "SpatVector")) {
+      if (methods::is(locs, "sf")) {
+        locs <- terra::vect(locs)
       }
-      if (!methods::is(locs, "SpatVector")) {
-        if (methods::is(locs, "sf")) {
-          locs <- terra::vect(locs)
-        }
-        if (is.data.frame(locs)) {
-          locs <-
-            terra::vect(
-              locs,
-              geom = c("lon", "lat"),
-              keepgeom = TRUE,
-              crs = locs_epsg
-            )
-        }
+      if (is.data.frame(locs)) {
+        locs <-
+          terra::vect(
+            locs,
+            geom = c("lon", "lat"),
+            keepgeom = TRUE,
+            crs = locs_epsg
+          )
       }
     }
     return(locs)
