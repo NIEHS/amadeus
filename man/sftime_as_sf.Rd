@@ -2,21 +2,22 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{sftime_as_sf}
 \alias{sftime_as_sf}
-\title{Simplify an sftime to sf class}
+\title{Convert an \code{sftime} to an \code{sf}}
 \usage{
 sftime_as_sf(x, keeptime = TRUE)
 }
 \arguments{
-\item{x}{a sftime}
+\item{x}{an \code{sftime} object}
 
 \item{keeptime}{boolean: TRUE if user wants to keep time column
 as simple column (default = TRUE)}
 }
 \value{
-a sf object
+an \code{sf} object
 }
 \description{
-Simplify an sftime to sf class
+Convert an \code{sftime} object to an \code{sf} object. \code{x} must
+contain a time-defining column, identified in \code{timename}.
 }
 \author{
 Eva Marques

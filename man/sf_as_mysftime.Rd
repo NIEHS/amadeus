@@ -2,20 +2,21 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{sf_as_mysftime}
 \alias{sf_as_mysftime}
-\title{Convert a sf object to mysftime}
+\title{Convert an \code{sf} to an \code{sftime}}
 \usage{
 sf_as_mysftime(x, timename)
 }
 \arguments{
-\item{x}{a sf}
+\item{x}{an \code{sf} object}
 
 \item{timename}{character: name of time column in x}
 }
 \value{
-a sftime object
+an \code{sftime} object
 }
 \description{
-Convert a sf object to mysftime
+Convert an \code{sf} object to an \code{sftime} object. \code{x} must
+contain a time-defining column, identified in \code{timename}.
 }
 \author{
 Eva Marques

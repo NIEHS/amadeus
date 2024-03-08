@@ -2,18 +2,21 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{sftime_as_spatvector}
 \alias{sftime_as_spatvector}
-\title{Convert sftime object to SpatVector}
+\title{Convert an \code{sftime} to a \code{SpatVector}}
 \usage{
 sftime_as_spatvector(x)
 }
 \arguments{
-\item{x}{a sftime}
+\item{x}{an \code{sftime} object}
 }
 \value{
-a terra::SpatVector
+a \code{SpatVector} object
 }
 \description{
-Convert sftime object to SpatVector
+Convert an \code{sftime} object to a \code{SpatVector} object.
+}
+\seealso{
+\link[terra:vect]{terra::vect}
 }
 \author{
 Eva Marques

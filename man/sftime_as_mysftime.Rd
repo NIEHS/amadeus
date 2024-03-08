@@ -2,20 +2,24 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{sftime_as_mysftime}
 \alias{sftime_as_mysftime}
-\title{Convert a sftime object to mysftime}
+\title{Convert an \code{sftime} to a \code{mysftime}}
 \usage{
 sftime_as_mysftime(x, timename)
 }
 \arguments{
-\item{x}{a sftime}
+\item{x}{an \code{sftime} object}
 
-\item{timename}{character: name of time column in x}
+\item{timename}{character: name of time column in \code{x}}
 }
 \value{
-a sftime object with specific format (see check_mysftime() function)
+an \code{sftime} object with specific format
 }
 \description{
-Convert a sftime object to mysftime
+Convert an \code{sftime} object to a \code{mysftime} object. \code{x} must
+contain a time-defining column, identified in \code{timename}.
+}
+\seealso{
+\link{check_mysftime}
 }
 \author{
 Eva Marques

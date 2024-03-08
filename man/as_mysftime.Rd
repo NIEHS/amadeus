@@ -2,23 +2,29 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{as_mysftime}
 \alias{as_mysftime}
-\title{Convert to sftime object on the form adapted to beethoven code}
+\title{Create an \code{sftime} object}
 \usage{
 as_mysftime(x, ...)
 }
 \arguments{
-\item{x}{a data.frame, data.table, SpatVector or SpatRasterDataset}
+\item{x}{an object of class \code{data.frame}, \code{data.table}, \code{sf}, \code{sftime},
+\code{SpatRaster}, \code{SpatRasterDataset} or \code{SpatVector}}
 
 \item{...}{if x is a data.frame or data.table: lonname, latname, timename and
 crs arguments are required. If x is a sf or sftime, timename argument is
 required. If x is a terra::SpatRaster, varname argument is required.}
 }
 \value{
-a sftime object with constrained time column name
-(see check_mysftime() function)
+an \code{sftime} object with constrained time column name
 }
 \description{
-Convert to sftime object on the form adapted to beethoven code
+Create a \code{sftime} object from one of \code{data.frame},
+\code{data.table}, \code{sf}, \code{sftime}, \code{SpatRaster},
+\code{SpatRasterDataset}, \code{SpatVector}
+}
+\seealso{
+\link{check_mysftime}, \link{sf_as_sftime}, \link{data.frame},
+\link[data.table:data.table]{data.table::data.table}, \link[terra:rast]{terra::rast}, \link[terra:sds]{terra::sds}, \link[terra:vect]{terra::vect}
 }
 \author{
 Eva Marques

@@ -2,20 +2,20 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{rename_time}
 \alias{rename_time}
-\title{Rename the time column of a sftime object}
+\title{Rename \code{$time}}
 \usage{
 rename_time(x, newname)
 }
 \arguments{
-\item{x}{a sftime object}
+\item{x}{an \code{sftime} object}
 
 \item{newname}{character for new time column name}
 }
 \value{
-a sftime object
+an \code{sftime} object
 }
 \description{
-Rename the time column of a sftime object
+Rename the \code{$time} column of an \code{sftime} object.
 }
 \author{
 Eva Marques
