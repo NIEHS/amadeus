@@ -22,9 +22,19 @@ expression. Details of regular expression in R can be found in \link{regexp}.
 }
 \description{
 Selected MODIS sinusoidal grid product subdataset name selector.
-
 Four presets are supported. \code{custom_sel} supersedes
 presets of \code{product} values.
+}
+\note{
+Preset product codes and associated variables include \code{MOD11A1} -
+land surface temperature (LST), \code{MOD13A2} - Normalized Difference
+Vegetation Index (NDVI), \code{MOD09GA} - surface reflectance, and
+\code{MCD19A2} - aerosol optical depth (AOD). For a full list of available
+MODIS product codes, see the "Short Name" column at
+\link{https://lpdaac.usgs.gov/product_search/?collections=Combined+MODIS&collections=Terra+MODIS&collections=Aqua+MODIS&view=list}.
+When utilizing a product code from this "Short Name" column, \strong{do
+not include} the version number following the period. For example, if "Short
+Name" = MCD12C1.006, then \code{product = MCD12C1}.
 }
 \seealso{
 \link{calc_modis_par}

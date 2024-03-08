@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_test_support.R
 \name{check_urls}
 \alias{check_urls}
-\title{Check HTTP status}
+\title{Implement \code{check_url_status}}
 \usage{
 check_urls(urls = urls, size = NULL, method = c("HEAD", "GET", "SKIP"))
 }

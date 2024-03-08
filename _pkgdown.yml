@@ -15,7 +15,7 @@ reference:
   - download_data
   - starts_with("download_")
 - subtitle: Process
-  desc: Functions which import and clean raw data in R
+  desc: Functions which import and clean raw data
 - contents:
   - process_covariates
   - starts_with("process_")

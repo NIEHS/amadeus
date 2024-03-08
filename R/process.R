@@ -1136,15 +1136,13 @@ process_sedac_groads <- function(
 #' \code{process_hms()} will return a character object if there are no wildfire
 #' smoke plumes present for the selected dates and density. The returned
 #' character will contain the selected density value and the sequence of dates
-#' for which no wildfire smoke plumes were detected.
+#' for which no wildfire smoke plumes were detected (see "Examples").
 #' @examples
 #' process_hms(
 #'   date = c("2018-12-30", "2019-01-01"),
 #'   variable = "Light",
-#'   path = "your/path/"
+#'   path = "../tests/testdata/hms/"
 #' )
-#' Light smoke plume polygons absent from 2018-12-30 to 2019-01-01. Returning vector of dates.
-#' [1] "Light"    "20181230" "20181231" "20190101"
 # nolint end
 #' @author Mitchell Manware
 #' @return a SpatVector or character object

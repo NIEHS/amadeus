@@ -25,3 +25,4 @@ contain a time-defining column, identified in \code{timename}.
 \author{
 Eva Marques
 }
+\keyword{spacetime}

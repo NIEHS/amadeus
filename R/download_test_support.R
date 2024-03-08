@@ -68,7 +68,7 @@ extract_urls <- function(
   return(urls)
 }
 
-#' Check HTTP status
+#' Implement \code{check_url_status}
 #' @description
 #' Apply \code{check_url_status()} function to a sample of download URLs.
 #' @param urls character vector of URLs
