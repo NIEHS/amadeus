@@ -480,8 +480,6 @@ testthat::test_that("process_conformity tests", {
   df$time <- c(rep("2023-11-02", 25), rep("2023-11-03", 25))
   df$var1 <- 1:50
   df$var2 <- 51:100
-  dfst <- convert_stobj_to_stdt(df)
-  dfst$crs_stdt <- "EPSG:4326"
   dfsf <- sf::st_as_sf(
     df,
     coords = c("lon", "lat"),
@@ -497,9 +495,6 @@ testthat::test_that("process_conformity tests", {
   )
   testthat::expect_no_error(
     process_conformity(locs = df, check_time = FALSE)
-  )
-  testthat::expect_no_error(
-    process_conformity(locs = dfst, check_time = TRUE)
   )
   # error cases
   dfe <- df

@@ -7,7 +7,7 @@
 process_conformity(locs = NULL, check_time = FALSE, locs_epsg = "EPSG:4326")
 }
 \arguments{
-\item{locs}{Data. \link[=convert_stobj_to_stdt]{stdt}, \link[sf:st_as_sf]{sf},
+\item{locs}{Data. \link[sf:st_as_sf]{sf},
 \link[terra:vect]{SpatVector}, or \link{data.frame}}
 
 \item{check_time}{logical(1). Whether \code{"time"} exists in column names.}
