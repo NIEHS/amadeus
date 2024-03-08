@@ -88,21 +88,6 @@
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/check_urls.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/convert_stdt.html</loc>
-  </url>
-  <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/convert_stdt_sftime.html</loc>
-  </url>
-  <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/convert_stdt_spatrastdataset.html</loc>
-  </url>
-  <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/convert_stdt_spatvect.html</loc>
-  </url>
-  <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/convert_stobj_to_stdt.html</loc>
-  </url>
-  <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/download_aqs_data.html</loc>
   </url>
   <url>
@@ -181,12 +166,6 @@
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/dt_as_mysftime.html</loc>
   </url>
   <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/dt_as_sf.html</loc>
-  </url>
-  <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/dt_as_sftime.html</loc>
-  </url>
-  <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/extract_urls.html</loc>
   </url>
   <url>
@@ -200,9 +179,6 @@
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/is_date_proper.html</loc>
-  </url>
-  <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/is_stdt.html</loc>
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_aqs.html</loc>
@@ -281,9 +257,6 @@
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/process_tri.html</loc>
-  </url>
-  <url>
-    <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/project_dt.html</loc>
   </url>
   <url>
     <loc>https://spatiotemporal-exposures-and-toxicology.github.io/amadeus/reference/read_commands.html</loc>
