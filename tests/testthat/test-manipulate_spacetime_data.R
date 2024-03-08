@@ -363,6 +363,7 @@ test_that("sftime_as_mysftime works as expected", {
   )
   expect_no_error(sftime_as_mysftime(mysft, "time"))
   expect_no_error(check_mysftime(sftime_as_mysftime(mysft, "time")))
+  expect_error(sftime_as_mysftime(mysft, "date"))
   attributes(mysft)$time_column <- "date"
   mysft <- dplyr::rename(mysft, "date" = "time")
   expect_no_error(check_mysftime(sf_as_mysftime(mysft, "date")))
