@@ -632,7 +632,7 @@ process_ecoregion <-
 
 
 #' Check input assumptions
-#' @param locs Data. [stdt][convert_stobj_to_stdt], [sf][sf::st_as_sf],
+#' @param locs Data. [sf][sf::st_as_sf],
 #' [SpatVector][terra::vect], or [data.frame]
 #' @param check_time logical(1). Whether `"time"` exists in column names.
 #' @param locs_epsg character(1). `"{authority}:{code}"` or
@@ -655,26 +655,21 @@ process_conformity <-
     if (!check_time) {
       keyword <- keyword[-3]
     }
-    if (is_stdt(locs)) {
-      locs <- locs$stdt
-      locs_epsg <- locs$crs_dt
-    } else {
-      if (!all(keyword %in% names(locs))) {
-        stop("locs should be stdt or have 'lon', 'lat', (and 'time') fields.\n")
+    if (!all(keyword %in% names(locs))) {
+      stop("locs should have 'lon', 'lat', (and 'time') fields.\n")
+    }
+    if (!methods::is(locs, "SpatVector")) {
+      if (methods::is(locs, "sf")) {
+        locs <- terra::vect(locs)
       }
-      if (!methods::is(locs, "SpatVector")) {
-        if (methods::is(locs, "sf")) {
-          locs <- terra::vect(locs)
-        }
-        if (is.data.frame(locs)) {
-          locs <-
-            terra::vect(
-              locs,
-              geom = c("lon", "lat"),
-              keepgeom = TRUE,
-              crs = locs_epsg
-            )
-        }
+      if (is.data.frame(locs)) {
+        locs <-
+          terra::vect(
+            locs,
+            geom = c("lon", "lat"),
+            keepgeom = TRUE,
+            crs = locs_epsg
+          )
       }
     }
     return(locs)
