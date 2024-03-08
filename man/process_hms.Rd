@@ -33,7 +33,6 @@ character will contain the selected density value and the sequence of dates
 for which no wildfire smoke plumes were detected.
 }
 \examples{
-## Not run:
 process_hms(
   date = c("2018-12-30", "2019-01-01"),
   variable = "Light",
@@ -41,7 +40,6 @@ process_hms(
 )
 Light smoke plume polygons absent from 2018-12-30 to 2019-01-01. Returning vector of dates.
 [1] "Light"    "20181230" "20181231" "20190101"
-## End(Not run)
 }
 \author{
 Mitchell Manware

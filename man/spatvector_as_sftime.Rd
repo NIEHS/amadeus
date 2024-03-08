@@ -21,4 +21,3 @@ Create a sftime from a terra::SpatVector
 \author{
 Eva Marques
 }
-\keyword{spacetime}
