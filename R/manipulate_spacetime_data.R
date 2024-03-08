@@ -102,6 +102,7 @@ dt_as_mysftime <- function(x, lonname, latname, timename, crs) {
 #' @param timename character: name of time column in x
 #' @return an `sftime` object
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sf_as_mysftime <- function(x, timename) {
   if (!(timename %in% colnames(x))) {
@@ -123,6 +124,7 @@ sf_as_mysftime <- function(x, timename) {
 #' @import sftime
 #' @seealso [terra::vect]
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 spatvector_as_sftime <- function(x, timename = "time") {
   stopifnot("timename column missing or mispelled" = timename %in% names(x))
@@ -296,6 +298,7 @@ as_mysftime <- function(x, ...) {
 #' as simple column (default = TRUE)
 #' @return an `sf` object
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sftime_as_sf <- function(x, keeptime = TRUE) {
   stopifnot("x is not a sftime" = class(x)[1] == "sftime")
@@ -320,6 +323,7 @@ sftime_as_sf <- function(x, keeptime = TRUE) {
 #' @return an `sftime` object with specific format
 #' @seealso [check_mysftime]
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sftime_as_mysftime <- function(x, timename) {
   if (!(timename %in% colnames(x))) {

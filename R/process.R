@@ -95,16 +95,27 @@ process_covariates <-
     return(res_covariate)
   }
 
-
+# nolint start
 #' Process MODIS sub-datasets
 #' @description
 #' Selected MODIS sinusoidal grid product subdataset name selector.
+#' Four presets are supported. `custom_sel` supersedes
+#' presets of `product` values.
 #' @param product character(1). Product code.
 #' @param custom_sel character(1). Custom filter.
 #' If this value is not NULL, preset filter is
 #' overridden.
-#' @description Four presets are supported. `custom_sel` supersedes
-#' presets of `product` values.
+#' @note
+#' Preset product codes and associated variables include \code{MOD11A1} -
+#' land surface temperature (LST), \code{MOD13A2} - Normalized Difference
+#' Vegetation Index (NDVI), \code{MOD09GA} - surface reflectance, and
+#' \code{MCD19A2} - aerosol optical depth (AOD). For a full list of available
+#' MODIS product codes, see the "Short Name" column at
+#' [https://lpdaac.usgs.gov/product_search/?collections=Combined+MODIS&collections=Terra+MODIS&collections=Aqua+MODIS&view=list].
+#' When utilizing a product code from this "Short Name" column, \strong{do
+#' not include} the version number following the period. For example, if "Short
+#' Name" = MCD12C1.006, then \code{product = MCD12C1}.
+# nolint end
 #' @author Insang Song
 #' @returns A character object that conforms to the regular
 #' expression. Details of regular expression in R can be found in [regexp].
