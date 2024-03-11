@@ -222,7 +222,7 @@ spatrds_as_sftime <- function(x, timename = "time") {
 #' required. If x is a terra::SpatRaster, varname argument is required.
 #' @return an `sftime` object with constrained time column name
 #' @import sf
-#' @seealso [check_mysftime], [sf_as_sftime], [data.frame],
+#' @seealso [check_mysftime], [sf_as_mysftime], [data.frame],
 #' [data.table::data.table], [terra::rast], [terra::sds], [terra::vect]
 #' @author Eva Marques
 #' @keywords spacetime
