@@ -23,7 +23,7 @@ Create a \code{sftime} object from one of \code{data.frame},
 \code{SpatRasterDataset}, \code{SpatVector}
 }
 \seealso{
-\link{check_mysftime}, \link{sf_as_sftime}, \link{data.frame},
+\link{check_mysftime}, \link{sf_as_mysftime}, \link{data.frame},
 \link[data.table:data.table]{data.table::data.table}, \link[terra:rast]{terra::rast}, \link[terra:sds]{terra::sds}, \link[terra:vect]{terra::vect}
 }
 \author{
