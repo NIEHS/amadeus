@@ -111,7 +111,7 @@ process_covariates <-
 #' Vegetation Index (NDVI), \code{MOD09GA} - surface reflectance, and
 #' \code{MCD19A2} - aerosol optical depth (AOD). For a full list of available
 #' MODIS product codes, see the "Short Name" column at
-#' [https://lpdaac.usgs.gov/product_search/?collections=Combined+MODIS&collections=Terra+MODIS&collections=Aqua+MODIS&view=list].
+#' [NASA LP DAAC Search Data Catalog](https://lpdaac.usgs.gov/product_search/?collections=Combined+MODIS&collections=Terra+MODIS&collections=Aqua+MODIS&view=list).
 #' When utilizing a product code from this "Short Name" column, \strong{do
 #' not include} the version number following the period. For example, if "Short
 #' Name" = MCD12C1.006, then \code{product = MCD12C1}.
