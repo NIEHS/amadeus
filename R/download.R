@@ -671,7 +671,7 @@ download_gmted_data <- function(
 }
 
 # nolint start
-#' Download meteorological and atmospheric data 
+#' Download meteorological and atmospheric data
 #' @description
 #' The \code{download_merra2_data()} function accesses and downloads various
 #' meteorological and atmospheric collections from [NASA's Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/).

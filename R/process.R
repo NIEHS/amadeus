@@ -1536,8 +1536,6 @@ process_narr <- function(
 #' @importFrom terra time
 #' @importFrom terra varnames
 #' @importFrom terra crs
-#' @importFrom terra timeInfo
-#' @importFrom terra hasValues
 #' @importFrom terra subset
 #' @export
 process_geos <-
@@ -1576,8 +1574,9 @@ process_geos <-
       )
     )
     #### identify collection
-    collection <- process_geos_collection(
+    collection <- process_collection(
       data_paths[1],
+      source = "geos",
       collection = TRUE
     )
     cat(
@@ -1592,7 +1591,11 @@ process_geos <-
     for (p in seq_along(data_paths)) {
       #### import .nc4 data
       data_raw <- terra::rast(data_paths[p])
-      data_datetime <- process_geos_collection(data_paths[p], datetime = TRUE)
+      data_datetime <- process_collection(
+        data_paths[p],
+        source = "geos",
+        datetime = TRUE
+        )
       cat(paste0(
         "Cleaning ",
         variable,
@@ -1670,7 +1673,7 @@ process_geos <-
         warn = FALSE
       )
     }
-    #### set coordinate refernce system
+    #### set coordinate reference system
     terra::crs(data_return) <- "EPSG:4326"
     cat(paste0(
       "Returning hourly ",
@@ -1691,11 +1694,12 @@ process_geos <-
     return(data_return)
   }
 
-#' Process GEOS-CF collections
+#' Process GEOS-CF and MERRA2 collection codes
 #' @description
-#' Identify the GEOS-CF collection based on the file path.
-#' @param path character(1). File path to GEOS-CF data file.
-#' @param collection logical(1). Identifies and returns GEOS-CF collection
+#' Identify the GEOS-CF or MERRA2 collection based on the file path.
+#' @param path character(1). File path to data file.
+#' @param source character(1). "geos" for GEOS-CF or "merra2" for MERRA2
+#' @param collection logical(1). Identifies and returns collection
 #' name(s) based on provided file path(s).
 #' @param date logical(1). Identifies and returns date sequence (YYYYMMDD) based
 #' on provided file path(s).
@@ -1704,12 +1708,13 @@ process_geos <-
 #' @keywords internal
 #' @return character
 #' @export
-process_geos_collection <-
+process_collection <-
   function(
-      path,
-      collection = FALSE,
-      date = FALSE,
-      datetime = FALSE) {
+    path,
+    source,
+    collection = FALSE,
+    date = FALSE,
+    datetime = FALSE) {
     #### check for more than one true
     parameters <- c(collection, date, datetime)
     if (length(parameters[parameters == TRUE]) > 1) {
@@ -1719,19 +1724,28 @@ process_geos_collection <-
         )
       )
     }
+    #### source names
+    geos <- c("geos", "GEOS", "geos-cf", "GEOS-CF")
+    merra2 <- c("merra", "merra2", "MERRA", "MERRA2")
+    #### string split point
+    if (source %in% merra2) {
+      code <- "MERRA2_400."
+    } else if (source %in% geos) {
+      code <- "GEOS-CF.v01.rpl."
+    }
     #### split full file path based on unique GEOS-CF character
-    split_geos <- unlist(
+    split_source <- unlist(
       strsplit(
         path,
-        "GEOS-CF.v01.rpl."
+        code
       )
     )
     #### split file path into collection, datetime, and "nc4"
     split_period <- unlist(
       strsplit(
-        split_geos[
+        split_source[
           which(
-            endsWith(split_geos, ".nc4")
+            endsWith(split_source, ".nc4")
           )
         ],
         "\\."
@@ -1739,6 +1753,17 @@ process_geos_collection <-
     )
     #### remove "nc4"
     split_wo_nc4 <- split_period[!split_period == "nc4"]
+    #### return merra2 collection information
+    if (source %in% merra2) {
+      #### return only collection name
+      if (collection == TRUE) {
+        return(split_wo_nc4[1])
+      }
+      #### return date sequence
+      if (date == TRUE) {
+        return(split_wo_nc4[2])
+      }
+    }
     #### create data frame
     split_df <- data.frame(
       split_wo_nc4[
@@ -1786,6 +1811,199 @@ process_geos_collection <-
       )
       return(split_datetime)
     }
+  }
+
+#' Process meteorological and atmospheric data 
+#' @description
+#' The \code{process_merra2()} function imports and cleans raw atmospheric
+#' composition data, returning a single SpatRaster object.
+#' @param date character(2). length of 10. Format "YYYY-MM-DD".
+#' @param variable character(1). MERRA2 variable name(s).
+#' @param path character(1). Directory with downloaded netCDF (.nc4) files.
+#' @note
+#' Layer names of the returned SpatRaster object contain the variable,
+#' pressure level, date, and hour.
+#' @author Mitchell Manware
+#' @return a SpatRaster object;
+#' @importFrom terra rast
+#' @importFrom terra time
+#' @importFrom terra names
+#' @importFrom terra crs
+#' @importFrom terra subset
+#' @export
+process_merra2 <-
+  function(date = c("2018-01-01", "2018-01-01"),
+           variable = NULL,
+           path = NULL) {
+    #### directory setup
+    path <- download_sanitize_path(path)
+    #### check for variable
+    check_for_null_parameters(mget(ls()))
+    #### identify file paths
+    paths <- list.files(
+      path,
+      pattern = "MERRA2_400",
+      full.names = TRUE
+    )
+    paths <- paths[grep(
+      ".nc4",
+      paths
+    )]
+    #### identify dates based on user input
+    dates_of_interest <- generate_date_sequence(
+      date[1],
+      date[2],
+      sub_hyphen = TRUE
+    )
+    #### subset file paths to only dates of interest
+    data_paths <- unique(
+      grep(
+        paste(
+          dates_of_interest,
+          collapse = "|"
+        ),
+        paths,
+        value = TRUE
+      )
+    )
+    #### identify collection
+    collection <- process_collection(
+      data_paths[1],
+      source = "merra2",
+      collection = TRUE
+    )
+    cat(
+      paste0(
+        "Identified collection ",
+        collection,
+        ".\n"
+      )
+    )
+    #### initiate for loop
+    data_return <- terra::rast()
+    for (p in seq_along(data_paths)) {
+      #### import .nc4 data
+      data_raw <- terra::rast(data_paths[p])
+      data_date <- process_collection(
+        data_paths[p],
+        source = "merra2",
+        date = TRUE
+      )
+      cat(
+        paste0(
+          "Cleaning ",
+          variable,
+          " data for ",
+          as.Date(
+            data_date,
+            format = "%Y%m%d"
+          ),
+          "...\n"
+        )
+      )
+      #### subset to user-selected variable
+      data_variable <- terra::subset(
+        data_raw,
+        subset = grep(
+          variable,
+          names(data_raw)
+        )
+      )
+      #### identify time step
+      times <- process_merra2_timestep(collection)
+      #### identify unique pressure levels
+      levels <- 
+        unique(
+          grep(
+            "lev=",
+            unlist(
+              strsplit(names(data_variable), "_")
+            ), 
+            value = TRUE
+          )
+        )
+      #### empty `levels` if 2 dimensional data
+      if (length(levels) == 0 ) {
+        levels <- ""
+      }
+      #### merge levels and times
+      leveltimes <- merge(levels, times)
+      #### set layer names
+      names(data_variable) <- gsub(
+        "__",
+        "_",
+        paste0(
+          variable,
+          "_",
+          leveltimes[,1],
+          "_",
+          data_date,
+          leveltimes[,2]
+        )
+      )
+      #### set layer times
+      terra::time(data_variable) <- ISOdatetime(
+        year = substr(data_date, 1, 4),
+        month = substr(data_date, 5, 6),
+        day = substr(data_date, 7, 8),
+        hour = substr(leveltimes[,2], 1, 2),
+        min = substr(leveltimes[,2], 3, 4),
+        sec = 00,
+        tz = "UTC"
+      )
+      data_return <- c(
+        data_return,
+        data_variable,
+        warn = FALSE
+      )
+    }
+    # terra::crs(data_return) <- "EPSG:4326"
+    cat(paste0(
+      "Returning hourly ",
+      variable,
+      " data from ",
+      as.Date(
+        dates_of_interest[1],
+        format = "%Y%m%d"
+      ),
+      " to ",
+      as.Date(
+        dates_of_interest[length(dates_of_interest)],
+        format = "%Y%m%d"
+      ),
+      ".\n"
+    ))
+    #### return SpatRaster
+    return(data_return)
+  }
+
+#' Process MERRA2 time steps
+#' @description
+#' Identify the time step based on MERRA2 collection.
+#' @param collection character(1). MERRA2 collection name.
+#' @importFrom stringi stri_pad
+#' @keywords internal
+#' @return character
+#' @export
+process_merra2_timestep <-
+  function(collection) {
+    split <- unlist(strsplit(collection, "_"))
+    code <- split[1]
+    dim <- split[2]
+    if (code == "inst1") {
+      ts <- seq(from = 0, to = 2300, by = 100)
+    } else if (code == "inst3") {
+      ts <- seq(from = 0, to = 2100, by = 300)
+    } else if (code == "inst6") {
+      ts <- seq(from = 0, to = 1800, by = 600)
+    } else if (code == "statD") {
+      ts <- 0030
+    } else if (code == "tavg1") {
+      ts <- seq(from = 0030, to = 2330, by = 100)
+    } else if (code == "tavg3") {
+      ts <- seq(from = 0130, to = 2330, by = 300)
+    }
+    return(stringi::stri_pad(ts, side = "left", width = 4, pad = 0))
   }
 
 #' Process elevation statistic and resolution codes

@@ -830,15 +830,17 @@ testthat::test_that("proccess support functions return expected.", {
     full.names = TRUE
   )
   expect_error(
-    process_geos_collection(
+    process_collection(
       path = path,
+      source = "geos",
       collection = TRUE,
       date = TRUE,
       datetime = TRUE
     )
   )
-  path_split_d <- process_geos_collection(
+  path_split_d <- process_collection(
     path = path,
+    source = "geos",
     date = TRUE
   )
   # expect YYYYMMDD dates
@@ -971,3 +973,74 @@ testthat::test_that("test process_sedac_groads", {
     process_sedac_groads(path = 1L)
   )
 })
+
+testthat::test_that("process_merra2 returns as expected.", {
+  withr::local_package("terra")
+  collection <- c(
+    "inst1_2d_int_Nx", "inst3_2d_gas_Nx", "inst3_3d_chm_Nv",
+    "inst6_3d_ana_Np", "statD_2d_slv_Nx", "tavg1_2d_chm_Nx",
+    "tavg3_2d_glc_Nx", "tavg3_3d_mst_Ne"
+  )
+  variable <- c(
+    "CPT", "AODANA", "CO",
+    "O3", "HOURNORAIN", "TO3",
+    "WESNSC", "CMFMC"
+  )
+  z <- c(
+    24, 8, 72 * 8,
+    42 * 4, 1, 24,
+    8, 73 * 8
+  )
+  merra2_df <- data.frame(collection, variable, z)
+  # expect function
+  expect_true(
+    is.function(process_merra2)
+  )
+  for (c in seq_along(merra2_df$collection)) {
+    merra2 <-
+      process_merra2(
+        date = c("2018-01-01", "2018-01-01"),
+        variable = merra2_df$variable[c],
+        path =
+          testthat::test_path(
+            "..",
+            "testdata",
+            "merra",
+            merra2_df$collection[c]
+          )
+      )
+    # expect output is SpatRaster
+    expect_true(
+      class(merra2)[1] == "SpatRaster"
+    )
+    # expect values
+    expect_true(
+      terra::hasValues(merra2)
+    )
+    # expect non-null coordinate reference system
+    # expect_false(
+    #   terra::crs(merra2) == ""
+    # )
+    # expect lon and lat dimensions to be > 1
+    expect_false(
+      any(c(0, 1) %in% dim(merra2)[1:2])
+    )
+    # expect non-numeric and non-empty time
+    expect_false(
+      any(c("", 0) %in% terra::time(merra2))
+    )
+    # expect time dimension is POSIXt for hourly
+    expect_true(
+      "POSIXt" %in% class(terra::time(merra2))
+    )
+    # expect seconds in time information
+    expect_true(
+      "seconds" %in% terra::timeInfo(merra2)
+    )
+    # expect 8 levels for 3 hourly data
+    expect_true(
+      dim(merra2)[3] == merra2_df$z[c]
+    ) 
+  }
+})
+
