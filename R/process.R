@@ -26,6 +26,7 @@
 #' - [`process_narr`]: `"narr"`, `"NARR"`
 #' - [`process_sedac_groads`]: `"sedac_groads"`, `"roads"`, `"groads"`
 #' - [`process_sedac_population`]: `"sedac_population"`, `"population"`
+#' - [`process_merra2`]: `merra`, `MERRA`, `merra2`, `MERRA2`
 #' @returns `SpatVector`, `SpatRaster`, `sf`, or `character` depending on
 #' covariate type and selections.
 #' @author Insang Song
@@ -42,7 +43,8 @@ process_covariates <-
                   "sedac_population", "population",
                   "sedac_groads", "groads", "roads",
                   "nlcd", "tri", "narr", "nei",
-                  "ecoregions", "ecoregion"),
+                  "ecoregions", "ecoregion",
+                  "merra", "MERRA2", "merra2", "MERRA2"),
     path = NULL,
     ...
   ) {
@@ -72,7 +74,9 @@ process_covariates <-
       nei = process_nei,
       tri = process_tri,
       geos = process_geos,
-      gmted = process_gmted
+      gmted = process_gmted,
+      merra = process_merra2,
+      merra2 = process_merra2
     )
 
     res_covariate <-

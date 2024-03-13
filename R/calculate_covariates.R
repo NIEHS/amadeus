@@ -30,6 +30,7 @@
 #' - `calc_sedac_population`: `"population"`, `"sedac_population"`
 #' - `calc_sedac_groads`: `"roads"`
 #' - `calc_nlcd`: `"nlcd"`
+#' - `calc_merra2`: `"merra"`, `"MERRA"`, `"merra2"`, `"MERRA2"`
 #' @returns Calculated covariates. Mainly data.frame object.
 #' @author Insang Song
 #' @export
@@ -42,7 +43,8 @@ calc_covariates <-
                     "ecoregions", "ecoregion", "hms", "noaa", "smoke",
                     "gmted", "narr", "narr_monolevel", "narr_p_levels",
                     "plevels", "monolevel", "p_levels", "geos",
-                    "sedac_population", "population", "nlcd"),
+                    "sedac_population", "population", "nlcd",
+                    "merra", "MERRA", "merra2", "MERRA2"),
       from,
       locs,
       locs_id = "site_id",
@@ -78,7 +80,9 @@ calc_covariates <-
       tri = calc_tri,
       geos = calc_geos,
       gmted = calc_gmted,
-      dummies = calc_temporal_dummies
+      dummies = calc_temporal_dummies,
+      merra = calc_merra2,
+      merra2 = calc_merra2
     )
 
     res_covariate <-
@@ -1534,8 +1538,12 @@ calc_geos <- function(
       names(data_layer),
       "_"
     )[[1]]
+    if (length(data_name) == 3) {
+      data_name[3:4] <- data_name[2:3]
+      data_name[2] <- "horizontal only level"
+    }
     #### set datetime
-    layer_datetime <- ISOdate(
+    layer_datetime <- ISOdatetime(
       year = substr(data_name[3], 1, 4),
       month = substr(data_name[3], 5, 6),
       day = substr(data_name[3], 7, 8),
@@ -1793,4 +1801,47 @@ calc_sedac_groads <- function(
     )
 
   return(from_clip)
+}
+
+#' Calculate meteorological and atmospheric covariates
+#' @description
+#' Extract meteorological and atmospheric values at point locations. Returns a
+#' \code{data.frame} object containing \code{locs_id}, date and hour, vertical
+#' pressure level, and meteorological or atmospheric variable. Variable column
+#' name reflects variable and circular buffer radius.
+#' @param from SpatRaster(1). Output of \code{process_merra2()}.
+#' @param locs data.frame, characater to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param fun character(1). Function used to summarize multiple raster cells
+#' within sites location buffer (Default = `mean`).
+#' @author Mitchell Manware
+#' @seealso [calc_geos()], [process_merra2()]
+#' @return a data.frame object
+#' @importFrom terra vect
+#' @importFrom terra buffer
+#' @importFrom terra as.data.frame
+#' @importFrom terra time
+#' @importFrom terra extract
+#' @importFrom terra nlyr
+#' @importFrom terra crs
+#' @export
+calc_merra2 <- function(
+    from,
+    locs,
+    locs_id = NULL,
+    radius = 0,
+    fun = "mean") {
+  #### check for null parameters
+  check_for_null_parameters(mget(ls()))
+  #### run `calc_geos`
+  calc_geos(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    fun = fun
+  )
 }

@@ -8,7 +8,8 @@ calc_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
     "dummies", "gmted", "roads", "ecoregions", "ecoregion", "hms", "noaa", "smoke",
     "gmted", "narr", "narr_monolevel", "narr_p_levels", "plevels", "monolevel",
-    "p_levels", "geos", "sedac_population", "population", "nlcd"),
+    "p_levels", "geos", "sedac_population", "population", "nlcd", "merra", "MERRA",
+    "merra2", "MERRA2"),
   from,
   locs,
   locs_id = "site_id",
@@ -55,6 +56,7 @@ SpatRaster or SpatVector objects before passing to
 \item \code{calc_sedac_population}: \code{"population"}, \code{"sedac_population"}
 \item \code{calc_sedac_groads}: \code{"roads"}
 \item \code{calc_nlcd}: \code{"nlcd"}
+\item \code{calc_merra2}: \code{"merra"}, \code{"MERRA"}, \code{"merra2"}, \code{"MERRA2"}
 }
 }
 \author{
