@@ -32,4 +32,4 @@ character
 \description{
 Identify the GEOS-CF or MERRA2 collection based on the file path.
 }
-\keyword{internal}
+\keyword{auxillary}

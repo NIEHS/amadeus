@@ -1709,7 +1709,7 @@ process_geos <-
 #' on provided file path(s).
 #' @param datetime logical(1). Identifies and returns date time sequence
 #' (YYYYMoMoDDHHMiMi) based on provided file path(s).
-#' @keywords internal
+#' @keywords auxillary
 #' @return character
 #' @export
 process_collection <-
@@ -1993,7 +1993,7 @@ process_merra2 <-
 #' @param collection character(1). MERRA2 collection name.
 #' @param from SpatRaster(1). Object to extract time values from. 
 #' @importFrom stringi stri_pad
-#' @keywords internal
+#' @keywords auxillary
 #' @return character
 #' @export
 process_merra2_time <-
@@ -2051,7 +2051,7 @@ process_merra2_time <-
 #' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
 #' provides statistic or resolution code, and returns full length statistic
 #' or resolution.
-#' @keywords internal
+#' @keywords auxillary
 #' @return character
 #' @export
 process_gmted_codes <-
@@ -2090,7 +2090,7 @@ process_gmted_codes <-
 #' @param string character(1). Resolution name or code.
 #' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
 #' provides resolution code, and returns full length resolution.
-#' @keywords internal
+#' @keywords auxillary
 #' @export
 process_sedac_codes <-
   function(

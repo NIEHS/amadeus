@@ -208,7 +208,7 @@ check_for_null_parameters <-
 #' date sequence as "YYYYMMDD". If `FALSE`, returns date sequence as
 #' "YYYY-MM-DD".
 #' @returns vector
-#' @keywords internal
+#' @keywords auxillary
 #' @export
 generate_date_sequence <-
   function(
@@ -276,7 +276,7 @@ download_epa_certificate <-
 #' Typically, 2-dimensional collections (latitute and longitude only) utilize
 #' half hour, and 3-dimensional collections (latitute, longitude, and time)
 #' utilize hour.
-#' @keywords internal
+#' @keywords auxillary
 #' @export
 generate_time_sequence <-
   function(

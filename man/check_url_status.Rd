@@ -20,4 +20,4 @@ Check if provided URL returns HTTP status 200.
 \author{
 Insang Song; Mitchell Manware
 }
-\keyword{internal}
+\keyword{auxillary}

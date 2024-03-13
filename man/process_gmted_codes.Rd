@@ -30,4 +30,4 @@ Identify the GMTED statistic and resolution based on the file path. Convert
 statistic and resolution to/from full string to/from statistic and
 resolution code.
 }
-\keyword{internal}
+\keyword{auxillary}

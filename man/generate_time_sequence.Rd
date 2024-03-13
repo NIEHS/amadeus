@@ -22,4 +22,4 @@ Typically, 2-dimensional collections (latitute and longitude only) utilize
 half hour, and 3-dimensional collections (latitute, longitude, and time)
 utilize hour.
 }
-\keyword{internal}
+\keyword{auxillary}

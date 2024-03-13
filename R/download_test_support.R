@@ -9,7 +9,7 @@
 #' @importFrom httr HEAD
 #' @importFrom httr GET
 #' @return logical object
-#' @keywords internal
+#' @keywords auxillary
 #' @export
 check_url_status <- function(
     url,
@@ -76,7 +76,7 @@ extract_urls <- function(
 #' @param method httr method to obtain URL (`"HEAD"` or `"GET"`). If set to
 #' `"SKIP"`, the HTTP status will not be checked and returned.
 #' @return logical vector for URL status = 200
-#' @keywords internal
+#' @keywords auxillary
 #' @export
 check_urls <- function(
     urls = urls,
