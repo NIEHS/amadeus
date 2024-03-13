@@ -27,7 +27,8 @@ composition data, returning a single \code{SpatRaster} object.
 \note{
 Layer names of the returned \code{SpatRaster} object contain the variable,
 pressure level, date, and hour. Pressure level values utilized for layer
-names are
+names are taken directly from raw data and are not edited to retain
+pressure level information.
 }
 \author{
 Mitchell Manware

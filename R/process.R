@@ -1599,7 +1599,7 @@ process_geos <-
         data_paths[p],
         source = "geos",
         datetime = TRUE
-        )
+      )
       cat(paste0(
         "Cleaning ",
         variable,
@@ -1714,11 +1714,11 @@ process_geos <-
 #' @export
 process_collection <-
   function(
-    path,
-    source,
-    collection = FALSE,
-    date = FALSE,
-    datetime = FALSE) {
+      path,
+      source,
+      collection = FALSE,
+      date = FALSE,
+      datetime = FALSE) {
     #### check for more than one true
     parameters <- c(collection, date, datetime)
     if (length(parameters[parameters == TRUE]) > 1) {
@@ -1817,7 +1817,7 @@ process_collection <-
     }
   }
 
-#' Process meteorological and atmospheric data 
+#' Process meteorological and atmospheric data
 #' @description
 #' The \code{process_merra2()} function imports and cleans raw atmospheric
 #' composition data, returning a single `SpatRaster` object.
@@ -1827,7 +1827,8 @@ process_collection <-
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable,
 #' pressure level, date, and hour. Pressure level values utilized for layer
-#' names are  
+#' names are taken directly from raw data and are not edited to retain
+#' pressure level information.
 #' @author Mitchell Manware
 #' @return a `SpatRaster` object;
 #' @importFrom terra rast
@@ -1920,18 +1921,18 @@ process_merra2 <-
         from = data_variable
       )
       #### identify unique pressure levels
-      levels <- 
+      levels <-
         unique(
           grep(
             "lev=",
             unlist(
               strsplit(names(data_variable), "_")
-            ), 
+            ),
             value = TRUE
           )
         )
       #### empty `levels` if 2 dimensional data
-      if (length(levels) == 0 ) {
+      if (length(levels) == 0) {
         levels <- ""
       }
       #### merge levels and times
@@ -1943,11 +1944,11 @@ process_merra2 <-
         paste0(
           variable,
           "_",
-          leveltimes[,1],
+          leveltimes[, 1],
           "_",
           data_date,
           "_",
-          leveltimes[,2]
+          leveltimes[, 2]
         )
       )
       #### set layer times
@@ -1955,9 +1956,9 @@ process_merra2 <-
         year = substr(data_date, 1, 4),
         month = substr(data_date, 5, 6),
         day = substr(data_date, 7, 8),
-        hour = substr(leveltimes[,2], 1, 2),
-        min = substr(leveltimes[,2], 3, 4),
-        sec = substr(leveltimes[,2], 5, 6),
+        hour = substr(leveltimes[, 2], 1, 2),
+        min = substr(leveltimes[, 2], 3, 4),
+        sec = substr(leveltimes[, 2], 5, 6),
         tz = "UTC"
       )
       data_return <- c(
@@ -1991,7 +1992,7 @@ process_merra2 <-
 #' Identify the time step of data observations based on MERRA2 collection and
 #' filter to time values in `from`.
 #' @param collection character(1). MERRA2 collection name.
-#' @param from SpatRaster(1). Object to extract time values from. 
+#' @param from SpatRaster(1). Object to extract time values from.
 #' @importFrom stringi stri_pad
 #' @keywords auxillary
 #' @return character

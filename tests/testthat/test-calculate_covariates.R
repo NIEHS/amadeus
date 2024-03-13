@@ -1140,12 +1140,12 @@ testthat::test_that("calc_merra2 returns as expected.", {
           date = c("2018-01-01", "2018-01-01"),
           variable = variable,
           path =
-            testthat::test_path(
-              "..",
-              "testdata",
-              "merra2",
-              collection
-            )
+          testthat::test_path(
+            "..",
+            "testdata",
+            "merra2",
+            collection
+          )
         )
       merra2_covariate <-
         calc_geos(

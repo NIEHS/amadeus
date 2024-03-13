@@ -847,8 +847,9 @@ testthat::test_that("proccess support functions return expected.", {
   expect_true(
     unique(nchar(path_split_d)) == 8
   )
-  path_split_dt <- process_geos_collection(
+  path_split_dt <- process_collection(
     path = path,
+    source = "geos",
     datetime = TRUE
   )
   # expect YYYYMMDD dates
@@ -999,12 +1000,12 @@ testthat::test_that("process_merra2 returns as expected.", {
         date = c("2018-01-01", "2018-01-01"),
         variable = merra2_df$variable[c],
         path =
-          testthat::test_path(
-            "..",
-            "testdata",
-            "merra2",
-            merra2_df$collection[c]
-          )
+        testthat::test_path(
+          "..",
+          "testdata",
+          "merra2",
+          merra2_df$collection[c]
+        )
       )
     # expect output is SpatRaster
     expect_true(
@@ -1037,6 +1038,6 @@ testthat::test_that("process_merra2 returns as expected.", {
     # expect 8 levels for 3 hourly data
     expect_true(
       all(dim(merra2) == c(2, 3, 1))
-    ) 
+    )
   }
 })
