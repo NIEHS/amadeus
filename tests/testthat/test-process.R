@@ -988,12 +988,7 @@ testthat::test_that("process_merra2 returns as expected.", {
     "SLP", #*
     "HOURNORAIN", "COCL", "DUDTANA" #*
   )
-  z <- c(
-    24, 8, 8, #* 
-    4, #*
-    1, 24, 8 #*
-  )
-  merra2_df <- data.frame(collection, variable, z)
+  merra2_df <- data.frame(collection, variable)
   # expect function
   expect_true(
     is.function(process_merra2)
@@ -1041,7 +1036,7 @@ testthat::test_that("process_merra2 returns as expected.", {
     )
     # expect 8 levels for 3 hourly data
     expect_true(
-      dim(merra2)[3] == merra2_df$z[c]
+      all(dim(merra2) == c(2, 3, 1))
     ) 
   }
 })

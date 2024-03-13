@@ -1911,7 +1911,10 @@ process_merra2 <-
         )
       )
       #### identify time step
-      times <- process_merra2_timestep(collection)
+      times <- process_merra2_time(
+        collection = collection,
+        from = data_variable
+      )
       #### identify unique pressure levels
       levels <- 
         unique(
@@ -1939,6 +1942,7 @@ process_merra2 <-
           leveltimes[,1],
           "_",
           data_date,
+          "_",
           leveltimes[,2]
         )
       )
@@ -1949,7 +1953,7 @@ process_merra2 <-
         day = substr(data_date, 7, 8),
         hour = substr(leveltimes[,2], 1, 2),
         min = substr(leveltimes[,2], 3, 4),
-        sec = 00,
+        sec = substr(leveltimes[,2], 5, 6),
         tz = "UTC"
       )
       data_return <- c(
@@ -1980,32 +1984,57 @@ process_merra2 <-
 
 #' Process MERRA2 time steps
 #' @description
-#' Identify the time step of data observations based on MERRA2 collection.
+#' Identify the time step of data observations based on MERRA2 collection and
+#' filter to time values in `from`.
 #' @param collection character(1). MERRA2 collection name.
+#' @param from SpatRaster(1). Object to extract time values from. 
 #' @importFrom stringi stri_pad
 #' @keywords internal
 #' @return character
 #' @export
-process_merra2_timestep <-
-  function(collection) {
+process_merra2_time <-
+  function(collection, from) {
     split <- unlist(strsplit(collection, "_"))
     code <- split[1]
-    dim <- split[2]
     if (code == "inst1") {
-      ts <- seq(from = 0, to = 2300, by = 100)
+      step <- seq(from = 0, to = 2300, by = 100)
     } else if (code == "inst3") {
-      ts <- seq(from = 0, to = 2100, by = 300)
+      step <- seq(from = 0, to = 2100, by = 300)
     } else if (code == "inst6") {
-      ts <- seq(from = 0, to = 1800, by = 600)
+      step <- seq(from = 0, to = 1800, by = 600)
     } else if (code == "statD") {
-      ts <- 0030
+      step <- 1200
     } else if (code == "tavg1") {
-      ts <- seq(from = 0030, to = 2330, by = 100)
+      step <- seq(from = 0030, to = 2330, by = 100)
     } else if (code == "tavg3") {
-      ts <- seq(from = 0130, to = 2330, by = 300)
+      step <- seq(from = 0130, to = 2330, by = 300)
     }
-    return(stringi::stri_pad(ts, side = "left", width = 4, pad = 0))
+    pad_l <- stringi::stri_pad(step, side = "left", width = 4, pad = 0)
+    pad_r <- stringi::stri_pad(pad_l, side = "right", width = 6, pad = 0)
+    time_f <- gsub(
+      " ",
+      "",
+      gsub(
+        "-",
+        "",
+        gsub(
+          ":",
+          "",
+          terra::time(from)
+        )
+      )
+    )
+    for (f in seq_along(time_f)) {
+      if (nchar(time_f[f]) == 8) {
+        time_f[f] <- paste0(time_f[f], "000000")
+      }
+    }
+    time_return <- pad_r[
+      pad_r %in% unique(substr(time_f, 9, 14))
+    ]
+    return(time_return)
   }
+
 
 #' Process elevation statistic and resolution codes
 #' @description
