@@ -18,14 +18,14 @@ process_narr(
 \item{path}{character(1). Directory with downloaded netCDF (.nc) files.}
 }
 \value{
-a SpatRaster object
+a \code{SpatRaster} object
 }
 \description{
 The \code{process_narr()} function imports and cleans raw meteorological
-data, returning a single SpatRaster object.
+data, returning a single \code{SpatRaster} object.
 }
 \note{
-Layer names of the returned SpatRaster object contain the variable acronym,
+Layer names of the returned \code{SpatRaster} object contain the variable acronym,
 pressure level, and date.
 }
 \author{

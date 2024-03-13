@@ -13,6 +13,6 @@ process_merra2_timestep(collection)
 character
 }
 \description{
-Identify the time step based on MERRA2 collection.
+Identify the time step of data observations based on MERRA2 collection.
 }
 \keyword{internal}

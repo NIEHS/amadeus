@@ -30,7 +30,7 @@ cell values. See \code{fun} description in \link[terra]{tapp} for details.}
 \item{...}{For internal use.}
 }
 \value{
-a SpatRaster object
+a \code{SpatRaster} object
 }
 \description{
 Get mosaicked or merged raster from multiple MODIS hdf files.

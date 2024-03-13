@@ -18,14 +18,14 @@ process_geos(
 \item{path}{character(1). Directory with downloaded netCDF (.nc4) files.}
 }
 \value{
-a SpatRaster object;
+a \code{SpatRaster} object;
 }
 \description{
 The \code{process_geos()} function imports and cleans raw atmospheric
-composition data, returning a single SpatRaster object.
+composition data, returning a single \code{SpatRaster} object.
 }
 \note{
-Layer names of the returned SpatRaster object contain the variable,
+Layer names of the returned \code{SpatRaster} object contain the variable,
 pressure level, date, and hour.
 }
 \author{

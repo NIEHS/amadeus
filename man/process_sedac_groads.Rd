@@ -10,11 +10,11 @@ process_sedac_groads(path = NULL)
 \item{path}{character(1). Path to geodatabase or shapefiles.}
 }
 \value{
-a SpatVector boject
+a \code{SpatVector} boject
 }
 \description{
 The \code{process_sedac_groads()} function imports and cleans raw road data,
-returning a single SpatVector object.
+returning a single \code{SpatVector} object.
 }
 \note{
 U.S. context.

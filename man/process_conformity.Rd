@@ -16,12 +16,12 @@ process_conformity(locs = NULL, check_time = FALSE, locs_epsg = "EPSG:4326")
 Well-Known Text format for coordinate reference system definition.}
 }
 \value{
-a SpatVector object
+a \code{SpatVector} object
 }
 \description{
 Check if all of \code{"lon"}, \code{"lat"}, and \code{"time"}
 (only if \code{check_time = TRUE}) then convert inputs into a
-SpatVector object.
+\code{SpatVector} object.
 }
 \author{
 Insang Song

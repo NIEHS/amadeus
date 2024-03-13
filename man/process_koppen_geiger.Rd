@@ -13,11 +13,11 @@ climate zone raster file}
 \item{year}{data year. Not applicable for this function.}
 }
 \value{
-a SpatRaster object
+a \code{SpatRaster} object
 }
 \description{
 The \code{process_koppen_geiger()} function imports and cleans raw climate
-classification data, returning a single SpatRaster object.
+classification data, returning a single \code{SpatRaster} object.
 }
 \author{
 Insang Song

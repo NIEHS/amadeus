@@ -2,13 +2,13 @@
 % Please edit documentation in R/process.R
 \name{process_locs_vector}
 \alias{process_locs_vector}
-\title{Process locations as SpatVector}
+\title{Process locations as \code{SpatVector}}
 \usage{
 process_locs_vector(locs, crs, radius)
 }
 \arguments{
 \item{locs}{data.frame(1). Data frame containing columns for unique
-identifier, latitute, and longitude. Latitude and longitude columns \strong{must}
+identifier, latitude, and longitude. Latitude and longitude columns \strong{must}
 be named "lat" and "lon", respectively.}
 
 \item{crs}{Coordinate reference system (CRS) description utilizing
@@ -17,11 +17,11 @@ be named "lat" and "lon", respectively.}
 \item{radius}{integer(1). Circular buffer size (meters).}
 }
 \value{
-SpatVector
+a \code{SpatVector} object
 }
 \description{
 Convert locations from class \code{data.frame} or \code{data.table} to
-SpatVector object, project to coordinate reference system, and apply
+\code{SpatVector} object, project to coordinate reference system, and apply
 circular buffer.
 }
 \keyword{internal}

@@ -12,7 +12,7 @@ process_locs_radius(locs, radius)
 \item{radius}{integer(1). Circular buffer size (meters).}
 }
 \value{
-SpatVector.
+a \code{SpatVector} object
 }
 \description{
 Create circular buffer around locations based on user defined radius.

@@ -9,17 +9,17 @@ process_nei(path = NULL, county = NULL, year = c(2017, 2020))
 \arguments{
 \item{path}{character(1). Directory with NEI csv files.}
 
-\item{county}{SpatVector/sf. County boundaries.}
+\item{county}{\code{SpatVector}/\code{sf.} County boundaries.}
 
 \item{year}{integer(1) Year to use. Currently only 2017 or 2020
 is accepted.}
 }
 \value{
-a SpatVector object
+a \code{SpatVector} object
 }
 \description{
 The \code{process_tri()} function imports and cleans raw road emissions data,
-returning a single SpatVector object.
+returning a single \code{SpatVector} object.
 
 NEI data comprises multiple csv files where emissions of
 50+ pollutants are recorded at county level. With raw data files,

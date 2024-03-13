@@ -976,20 +976,22 @@ testthat::test_that("test process_sedac_groads", {
 
 testthat::test_that("process_merra2 returns as expected.", {
   withr::local_package("terra")
+  #* indicates three dimensional data that has subset to single
+  #* pressure level for test data set
   collection <- c(
-    "inst1_2d_int_Nx", "inst3_2d_gas_Nx", "inst3_3d_chm_Nv",
-    "inst6_3d_ana_Np", "statD_2d_slv_Nx", "tavg1_2d_chm_Nx",
-    "tavg3_2d_glc_Nx", "tavg3_3d_mst_Ne"
+    "inst1_2d_int_Nx", "inst3_2d_gas_Nx", "inst3_3d_chm_Nv", #*
+    "inst6_3d_ana_Np", #*
+    "statD_2d_slv_Nx", "tavg1_2d_chm_Nx", "tavg3_3d_udt_Np" #*
   )
   variable <- c(
-    "CPT", "AODANA", "CO",
-    "O3", "HOURNORAIN", "TO3",
-    "WESNSC", "CMFMC"
+    "CPT", "AODANA", "AIRDENS", #*
+    "SLP", #*
+    "HOURNORAIN", "COCL", "DUDTANA" #*
   )
   z <- c(
-    24, 8, 72 * 8,
-    42 * 4, 1, 24,
-    8, 73 * 8
+    24, 8, 8, #* 
+    4, #*
+    1, 24, 8 #*
   )
   merra2_df <- data.frame(collection, variable, z)
   # expect function
@@ -1005,7 +1007,7 @@ testthat::test_that("process_merra2 returns as expected.", {
           testthat::test_path(
             "..",
             "testdata",
-            "merra",
+            "merra2",
             merra2_df$collection[c]
           )
       )
@@ -1018,9 +1020,9 @@ testthat::test_that("process_merra2 returns as expected.", {
       terra::hasValues(merra2)
     )
     # expect non-null coordinate reference system
-    # expect_false(
-    #   terra::crs(merra2) == ""
-    # )
+    expect_false(
+      terra::crs(merra2) == ""
+    )
     # expect lon and lat dimensions to be > 1
     expect_false(
       any(c(0, 1) %in% dim(merra2)[1:2])
@@ -1043,4 +1045,3 @@ testthat::test_that("process_merra2 returns as expected.", {
     ) 
   }
 })
-

@@ -15,14 +15,14 @@ the resolution second. (Example: variable = c("Breakline Emphasis",
 folder containing .adf files.}
 }
 \value{
-a SpatRaster object
+a \code{SpatRaster} object
 }
 \description{
 The \code{process_gmted()} function imports and cleans raw elevation data,
-returning a single SpatRaster object.
+returning a single \code{SpatRaster} object.
 }
 \note{
-SpatRaster layer name indicates selected variable and resolution.
+\code{SpatRaster} layer name indicates selected variable and resolution.
 }
 \author{
 Mitchell Manware

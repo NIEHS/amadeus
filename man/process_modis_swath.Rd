@@ -30,14 +30,14 @@ Unit is degree.}
 \item{...}{For internal use.}
 }
 \value{
-a SpatRaster object (crs = \code{"EPSG:4326"})
+a \code{SpatRaster} object (crs = \code{"EPSG:4326"})
 }
 \description{
-This function will return a SpatRaster object with
+This function will return a \code{SpatRaster} object with
 values of selected subdatasets. Swath data include curvilinear
 grids, which require warping/rectifying the original curvilinear grids
 into rectilinear grids. The function internally warps each of inputs
-then mosaic the warped images into one large SpatRaster object.
+then mosaic the warped images into one large \code{SpatRaster} object.
 Users need to select a subdataset to process. The full path looks like
 \code{"HDF4_EOS:EOS_SWATH:{file_path}:mod06:subdataset"}, where file_path is
 the full path to the hdf file.

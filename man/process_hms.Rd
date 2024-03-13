@@ -20,11 +20,11 @@ Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 \item{path}{character(1). Directory with downloaded NOAA HMS data files.}
 }
 \value{
-a SpatVector or character object
+a \code{SpatVector} or character object
 }
 \description{
 The \code{process_hms()} function imports and cleans raw wildfire smoke
-plume coverage data, returning a single SpatVector object.
+plume coverage data, returning a single \code{SpatVector} object.
 }
 \note{
 \code{process_hms()} will return a character object if there are no wildfire

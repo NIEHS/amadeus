@@ -10,11 +10,11 @@ process_ecoregion(path = NULL)
 \item{path}{character(1). Path to Ecoregion Shapefiles}
 }
 \value{
-a SpatVector object
+a \code{SpatVector} object
 }
 \description{
 The \code{process_ecoregion()} function imports and cleans raw ecoregion
-data, returning a SpatVector object.
+data, returning a \code{SpatVector} object.
 }
 \author{
 Insang Song

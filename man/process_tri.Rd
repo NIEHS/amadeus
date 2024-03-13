@@ -21,11 +21,11 @@ process_tri(
 \item{...}{Placeholders.}
 }
 \value{
-a SpatVector object (points) in \code{year}
+a \code{SpatVector} object (points) in \code{year}
 }
 \description{
 The \code{process_tri()} function imports and cleans raw toxic release data,
-returning a single SpatVector (points) object for the selected \code{year}.
+returning a single \code{SpatVector} (points) object for the selected \code{year}.
 }
 \note{
 Visit \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-and-tools}{TRI Data and Tools}

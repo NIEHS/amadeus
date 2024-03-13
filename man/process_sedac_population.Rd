@@ -10,11 +10,11 @@ process_sedac_population(path = NULL)
 \item{path}{character(1). Path to GeoTIFF (.tif) or netCDF (.nc) file.}
 }
 \value{
-a SpatRaster object
+a \code{SpatRaster} object
 }
 \description{
 The \code{process_secac_population()} function imports and cleans raw
-population density data, returning a single SpatRaster object.
+population density data, returning a single \code{SpatRaster} object.
 }
 \author{
 Mitchell Manware

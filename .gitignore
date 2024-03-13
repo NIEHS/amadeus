@@ -54,6 +54,3 @@ rsconnect/
 
 # custom linter dev
 \.github/linters
-
-# merra data before subset
-tests/testdata/merra/

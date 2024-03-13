@@ -20,11 +20,11 @@ only unique locations are returned.}
 \item{return_format}{character(1). \code{"terra"} or \code{"sf"}.}
 }
 \value{
-a SpatVector or sf object depending on the \code{return_format}
+a \code{SpatVector} or sf object depending on the \code{return_format}
 }
 \description{
 The \code{process_aqs()} function cleans and imports raw air quality
-monitoring sites, returning a single SpatVector or sf object.
+monitoring sites, returning a single \code{SpatVector} or sf object.
 }
 \note{
 \code{date = NULL} will return a massive data.table

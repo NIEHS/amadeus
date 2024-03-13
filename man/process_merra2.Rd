@@ -18,15 +18,16 @@ process_merra2(
 \item{path}{character(1). Directory with downloaded netCDF (.nc4) files.}
 }
 \value{
-a SpatRaster object;
+a \code{SpatRaster} object;
 }
 \description{
 The \code{process_merra2()} function imports and cleans raw atmospheric
-composition data, returning a single SpatRaster object.
+composition data, returning a single \code{SpatRaster} object.
 }
 \note{
-Layer names of the returned SpatRaster object contain the variable,
-pressure level, date, and hour.
+Layer names of the returned \code{SpatRaster} object contain the variable,
+pressure level, date, and hour. Pressure level values utilized for layer
+names are
 }
 \author{
 Mitchell Manware

@@ -18,13 +18,13 @@ sub-dataset. See \link{process_modis_sds} for details.}
 Should be acceptable to \link[terra:tapp]{terra::tapp}.}
 }
 \value{
-a SpatRaster object
+a \code{SpatRaster} object
 }
 \description{
 Aggregate layers in a sub-dataset in sinusoidal MODIS products.
 
 Some MODIS products consist of multi-layer subdatasets.
-This function aggregates multiple layers into single layer SpatRaster.
+This function aggregates multiple layers into single layer \code{SpatRaster.}
 \code{fun_agg} is applied at overlapping cells.
 }
 \note{

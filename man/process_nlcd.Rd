@@ -12,11 +12,11 @@ process_nlcd(path = NULL, year = 2021)
 \item{year}{numeric giving the year of NLCD data used}
 }
 \value{
-a SpatRaster object
+a \code{SpatRaster} object
 }
 \description{
 The \code{process_nlcd()} function imports and cleans raw land cover data,
-returning a single SpatRaster object.
+returning a single \code{SpatRaster} object.
 
 Reads NLCD file of selected \code{year}.
 }
