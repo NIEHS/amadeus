@@ -1148,7 +1148,7 @@ testthat::test_that("calc_merra2 returns as expected.", {
           )
         )
       merra2_covariate <-
-        calc_geos(
+        calc_merra2(
           from = merra2,
           locs = data.table::data.table(ncp),
           locs_id = "site_id",
