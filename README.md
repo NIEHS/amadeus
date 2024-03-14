@@ -1,10 +1,10 @@
 # amadeus
 
-[![R-CMD-check](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/check-standard.yaml)
-[![test-coverage](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/test-coverage.yaml)
-[![codecov](https://codecov.io/gh/Spatiotemporal-Exposures-and-Toxicology/amadeus/graph/badge.svg?token=enftVpFDNF)](https://codecov.io/gh/Spatiotemporal-Exposures-and-Toxicology/amadeus)
-[![lint](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/lint.yaml/badge.svg)](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/lint.yaml)
-[![pkgdown](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/pkgdown.yaml)
+[![R-CMD-check](https://github.com/kyle-messier/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/check-standard.yaml)
+[![test-coverage](https://github.com/kyle-messier/amadeus/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/test-coverage.yaml)
+[![codecov](https://codecov.io/gh/kyle-messier/amadeus/graph/badge.svg?token=enftVpFDNF)](https://codecov.io/gh/kyle-messier/amadeus)
+[![lint](https://github.com/kyle-messier/amadeus/actions/workflows/lint.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/lint.yaml)
+[![pkgdown](https://github.com/kyle-messier/amadeus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/pkgdown.yaml)
 
 **A** **M**echanism/**M**achine for **D**ata, **E**nvironments, and **U**ser **S**etup
 
