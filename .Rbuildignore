@@ -12,3 +12,10 @@
 ^docs$
 ^pkgdown$
 ^.lintr
+tools
+.github
+pkgdown
+*.Rproj
+output
+manuscript
+input
