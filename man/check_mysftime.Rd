@@ -2,16 +2,18 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{check_mysftime}
 \alias{check_mysftime}
-\title{Check if the sftime object is formated on a specific way}
+\title{Check \code{sftime} object}
 \usage{
 check_mysftime(x)
 }
 \arguments{
-\item{x}{a sftime object}
+\item{x}{an \code{sftime} object}
 }
 \description{
-Check if the sftime object is formated on a specific way
+Check an \code{sftime} object for its class, \code{$time} column,
+\code{$geometry} column, and geometry class.
 }
 \author{
 Eva Marques
 }
+\keyword{spacetime}

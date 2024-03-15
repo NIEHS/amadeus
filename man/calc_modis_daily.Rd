@@ -5,24 +5,26 @@
 \title{A single-date MODIS worker for parallelization}
 \usage{
 calc_modis_daily(
-  locs = NULL,
   from = NULL,
+  locs = NULL,
   locs_id = "site_id",
+  radius = 0L,
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
-  radius = 0L,
   ...
 )
 }
 \arguments{
+\item{from}{SpatRaster. Preprocessed objects.}
+
 \item{locs}{SpatVector/sf/sftime object. Locations where MODIS values
 are summarized.}
 
-\item{from}{SpatRaster. Preprocessed objects.}
-
 \item{locs_id}{character(1). Field name where unique site identifiers
 are stored. Default is \code{"site_id"}}
+
+\item{radius}{numeric. Radius to generate circular buffers.}
 
 \item{date}{Date(1). date to query.}
 
@@ -31,8 +33,6 @@ are stored. Default is \code{"site_id"}}
 \item{fun_summary}{function. Summary function for
 multilayer rasters. Passed to \code{foo}. See \link[exactextractr:exact_extract]{exactextractr::exact_extract}
 for details.}
-
-\item{radius}{numeric. Radius to generate circular buffers.}
 
 \item{...}{Placeholders.}
 }

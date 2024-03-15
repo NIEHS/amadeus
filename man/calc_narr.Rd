@@ -2,15 +2,12 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_narr}
 \alias{calc_narr}
-\title{Calculate NOAA NCEP North American Regional Reanalysis meteorological
-and atmospheric covariates}
+\title{Calculate meteorological covariates}
 \usage{
 calc_narr(from, locs, locs_id = NULL, radius = 0, fun = "mean")
 }
 \arguments{
-\item{from}{SpatRaster(1). Cleaned SpatRaster object that has been returned
-from \code{process_narr} containing NOAA NCEP North American Regional Reanalysis
-variable data.}
+\item{from}{SpatRaster(1). Output of \code{process_narr()}.}
 
 \item{locs}{data.frame, characater to file path, SpatVector, or sf object.}
 
@@ -24,14 +21,16 @@ containing identifier for each unique coordinate location.}
 within sites location buffer (Default = \code{mean}).}
 }
 \value{
-a data.frame object;
+a data.frame object
 }
 \description{
-Extract NOAA NCEP North American Regional Reanalysis (NARR) data at point
-locations using SpatRaster object from \code{process_narr}. Function returns a
-data frame containing NARR variable values at user-defined sites. Unique
-column names reflect variable name, circular buffer, and vertical pressure
-level (if applicable).
+Extract meteorological values at point locations. Returns a \code{data.frame}
+object containing \code{locs_id}, date, vertical pressure level, and
+meteorological variable. Meteorological variable column name reflects
+variable and circular buffer radius.
+}
+\seealso{
+\code{\link[=process_narr]{process_narr()}}
 }
 \author{
 Mitchell Manware

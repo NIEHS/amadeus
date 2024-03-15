@@ -1,14 +1,14 @@
 # amadeus
 
-[![R-CMD-check](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/check-standard.yaml)
-[![test-coverage](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/test-coverage.yaml)
-[![codecov](https://codecov.io/gh/Spatiotemporal-Exposures-and-Toxicology/amadeus/graph/badge.svg?token=enftVpFDNF)](https://codecov.io/gh/Spatiotemporal-Exposures-and-Toxicology/amadeus)
-[![lint](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/lint.yaml/badge.svg)](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/lint.yaml)
-[![pkgdown](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/pkgdown.yaml)
+[![R-CMD-check](https://github.com/kyle-messier/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/check-standard.yaml)
+[![test-coverage](https://github.com/kyle-messier/amadeus/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/test-coverage.yaml)
+[![codecov](https://codecov.io/gh/kyle-messier/amadeus/graph/badge.svg?token=enftVpFDNF)](https://codecov.io/gh/kyle-messier/amadeus)
+[![lint](https://github.com/kyle-messier/amadeus/actions/workflows/lint.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/lint.yaml)
+[![pkgdown](https://github.com/kyle-messier/amadeus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/pkgdown.yaml)
 
 **A** **M**echanism/**M**achine for **D**ata, **E**nvironments, and **U**ser **S**etup
 
-`amadeus` is an R package devloped to improve and expideite users' access to large, publicly available geospatial data sets. The functions in `amadeus` allow users to download and import cleaned geospatial data directly in R, useful for automated run scripts, analysis pipelines, and reproducible science in general.
+`amadeus` is an R package devloped to improve and expideite users' access to large, publicly available geospatial datasets. The functions in `amadeus` allow users to download and import cleaned geospatial data directly in R, useful for automated run scripts, analysis pipelines, and reproducible science in general.
 
 ## Download
 
@@ -52,14 +52,15 @@ Requested files have been downloaded.
 
 ## Process
 
-`process()` imports and cleans raw geospatial data (downloaded with `download()`), and returns a single `SpatRaster` or `SpatVector` into the user's R environment. `process()` "cleans" the data by defining interpretable layer names, ensuring a coordinate reference system is present, and managing `time` data (if applicable).
+`process_covariates()` imports and cleans raw geospatial data (downloaded with `download_data()`), and returns a single `SpatRaster` or `SpatVector` into the user's R environment. `process_covariates()` "cleans" the data by defining interpretable layer names, ensuring a coordinate reference system is present, and managing `time` data (if applicable).
 
-To avoid errors when using `process()`, **do not edit the raw downloaded data files**. Passing user-generated or edited data into `procces()` may result in errors as the underlying functions are adapted to each sources' raw data file type.
+To avoid errors when using `process_covariates()`, **do not edit the raw downloaded data files**. Passing user-generated or edited data into `process_covariates()` may result in errors as the underlying functions are adapted to each sources' raw data file type.
 
-Example use of `process()` using downloaded "weasd" data.
+Example use of `process_covariates()` using the downloaded "weasd" data.
 
 ```
-> weasd <- process_narr(
+> weasd <- process_covariates(
++   covariate = "narr",
 +   date = c("2022-01-01", "2022-01-05"),
 +   variable = "weasd",
 +   path = path
@@ -86,7 +87,8 @@ time        : 2022-01-01 to 2022-01-05 UTC
 Example of `calc_covariates()` using processed "weasd" data.
 
 ```
-> weasd_covar <- calc_narr(
+> weasd_covar <- calc_covariates(
++   covariate = "narr",
 +   from = weasd,
 +   locs = locs,
 +   locs_id = "site_id",

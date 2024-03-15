@@ -2,14 +2,12 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_gmted}
 \alias{calc_gmted}
-\title{Calculate GMTED elevation covariates}
+\title{Calculate elevation covariates}
 \usage{
 calc_gmted(from, locs, locs_id = NULL, radius = 0, fun = "mean")
 }
 \arguments{
-\item{from}{SpatRaster(1). Cleaned SpatRaster object that has been returned
-from \code{process_gmted} containing Global Multi-resolution Terrain Elevation
-Data (GMTED2010) data.}
+\item{from}{SpatRaster(1). Output from \code{process_gmted()}.}
 
 \item{locs}{data.frame. character to file path, SpatVector, or sf object.}
 
@@ -23,13 +21,16 @@ containing identifier for each unique coordinate location.}
 within sites location buffer (Default = \code{mean}).}
 }
 \value{
-a data.frame object;
+a data.frame object
 }
 \description{
-Extract Global Multi-resolution Terrain Elevation Data (GMTED2010) data at
-point locations using SpatRaster object from \code{process_gmted}. Function
-returns a data frame containing GMTED variable values at user-defined
-sites. Unique column reflect statistic, resolution, and circular buffer.
+Extract elevation values at point locations. Returns a \code{data.frame}
+object containing \code{locs_id} and elevation variable. Elevation variable
+column name reflects the elevation statistic, spatial resolution of
+\code{from}, and circular buffer radius.
+}
+\seealso{
+\code{\link[=process_gmted]{process_gmted()}}
 }
 \author{
 Mitchell Manware

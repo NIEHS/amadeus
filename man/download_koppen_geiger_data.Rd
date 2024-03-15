@@ -2,28 +2,28 @@
 % Please edit documentation in R/download.R
 \name{download_koppen_geiger_data}
 \alias{download_koppen_geiger_data}
-\title{Download climate classification data from the present and future Köppen-Geiger climate classification maps.}
+\title{Download climate classification data}
 \usage{
 download_koppen_geiger_data(
-  time_period = c("Present", "Future"),
   data_resolution = c("0.0083", "0.083", "0.5"),
+  time_period = c("Present", "Future"),
   directory_to_download = NULL,
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
+  remove_command = FALSE,
   unzip = TRUE,
-  remove_zip = FALSE,
-  remove_command = FALSE
+  remove_zip = FALSE
 )
 }
 \arguments{
-\item{time_period}{character(1). Available times are \code{"Present"} (1980-2016)
-and \code{"Future"} (2071-2100). ("Future" classifications are based on scenario
-RCP8.5).}
-
 \item{data_resolution}{character(1). Available resolutions are \code{"0.0083"}
 degrees (approx. 1 km), \code{"0.083"} degrees (approx. 10 km), and
 \code{"0.5"} degrees (approx. 50 km).}
+
+\item{time_period}{character(1). Available times are \code{"Present"} (1980-2016)
+and \code{"Future"} (2071-2100). ("Future" classifications are based on scenario
+RCP8.5).}
 
 \item{directory_to_download}{character(1). Directory to download zip files
 from Present and future Köppen-Geiger climate classification maps at 1-km
@@ -31,31 +31,32 @@ resolution.}
 
 \item{directory_to_save}{character(1). Directory to decompress zip files.}
 
-\item{data_download_acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+\item{acknowledgement}{logical(1). By setting \code{TRUE} the
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
 
 \item{download}{logical(1). \code{FALSE} will generate a *.txt file
 containing all download commands. By setting \code{TRUE} the function
 will download all of the requested data files.}
 
+\item{remove_command}{logical(1).
+Remove (\code{TRUE}) or keep (\code{FALSE})
+the text file containing download commands.}
+
 \item{unzip}{logical(1). Unzip zip files. Default is \code{TRUE}.}
 
 \item{remove_zip}{logical(1). Remove zip files from directory_to_download.
 Default is \code{FALSE}.}
-
-\item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE})
-the text file containing download commands.}
 }
 \value{
-NULL;
+NULL; Zip file will be stored in \code{directory_to_download}, and
+selected GeoTIFF (.tif) files will be stored in \code{directory_to_save}.
 }
 \description{
 The \code{download_koppen_geiger_data()} function accesses and downloads
-climate classification data from the Present and future
+climate classification data from the \emph{Present and future
 Köppen-Geiger climate classification maps at
-1-km resolution (\href{https://www.nature.com/articles/sdata2018214}{link for article}; \href{https://figshare.com/articles/dataset/Present_and_future_K_ppen-Geiger_climate_classification_maps_at_1-km_resolution/6396959/2}{link for data}).
+1-km resolution}(\href{https://www.nature.com/articles/sdata2018214}{link for article}; \href{https://figshare.com/articles/dataset/Present_and_future_K_ppen-Geiger_climate_classification_maps_at_1-km_resolution/6396959/2}{link for data}).
 }
 \author{
 Mitchell Manware, Insang Song

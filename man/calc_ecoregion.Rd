@@ -2,15 +2,15 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_ecoregion}
 \alias{calc_ecoregion}
-\title{Calculate EPA Ecoregions level 2/3 binary variables}
+\title{Calculate ecoregions covariates}
 \usage{
-calc_ecoregion(locs, from = NULL, locs_id = "site_id", ...)
+calc_ecoregion(from = NULL, locs, locs_id = "site_id", ...)
 }
 \arguments{
+\item{from}{SpatVector(1). Output of \code{process_ecoregion()}.}
+
 \item{locs}{sf/SpatVector. Unique locs. Should include
 a unique identifier field named \code{locs_id}}
-
-\item{from}{SpatVector. Ecoregion polygons}
 
 \item{locs_id}{character(1). Name of unique identifier.}
 
@@ -24,7 +24,13 @@ a data.frame object with dummy variables and attributes of:
 }
 }
 \description{
-Calculate EPA Ecoregions level 2/3 binary variables
+Extract ecoregions covariates (U.S. EPA Ecoregions Level 2/3) at point
+locations. Returns a \code{data.frame} object containing \code{locs_id} and
+binary (0 = point not in ecoregion; 1 = point in ecoregion) variables for
+each ecoregion.
+}
+\seealso{
+\code{\link[=process_ecoregion]{process_ecoregion()}}
 }
 \author{
 Insang Song

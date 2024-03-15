@@ -2,21 +2,22 @@
 % Please edit documentation in R/download_test_support.R
 \name{check_url_status}
 \alias{check_url_status}
-\title{Check if sample of download URLs have HTTP Status 200}
+\title{Check HTTP status}
 \usage{
 check_url_status(url, method = c("HEAD", "GET"))
 }
 \arguments{
 \item{url}{Download URL to be checked.}
 
-\item{method}{httr method to obtain URL (\verb{"HEAD"`` or }"GET"`)}
+\item{method}{httr method to obtain URL (\code{"HEAD"} or \code{"GET"})}
 }
 \value{
 logical object
 }
 \description{
-Check if sample of download URLs have HTTP Status 200
+Check if provided URL returns HTTP status 200.
 }
 \author{
 Insang Song; Mitchell Manware
 }
+\keyword{auxillary}

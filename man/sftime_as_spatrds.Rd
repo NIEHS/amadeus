@@ -2,20 +2,27 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{sftime_as_spatrds}
 \alias{sftime_as_spatrds}
-\title{Convert sftime object to SpatVectorDataset
-/!\ running time can be very long if x is not
-spatially and temporally structured}
+\title{Convert an \code{sftime} to a \code{SpatRasterDataset}}
 \usage{
 sftime_as_spatrds(x)
 }
 \arguments{
-\item{x}{a sftime}
+\item{x}{an \code{sftime} object}
+}
+\value{
+an \code{SpatRasterDataset} object
 }
 \description{
-Convert sftime object to SpatVectorDataset
-/!\ running time can be very long if x is not
-spatially and temporally structured
+Convert an \code{sftime} object to a \code{SpatRasterDataset} object.
+}
+\note{
+Running \code{sftime_as_spatrds} can take a long time if \code{x} is not
+spatially and temporally structured.
+}
+\seealso{
+\link[terra:sds]{terra::sds}
 }
 \author{
 Eva Marques
 }
+\keyword{spacetime}

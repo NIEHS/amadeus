@@ -2,14 +2,20 @@
 % Please edit documentation in R/download_support.R
 \name{download_permit}
 \alias{download_permit}
-\title{Check for data download acknowledgement}
+\title{Check data download acknowledgement}
 \usage{
-download_permit(data_download_acknowledgement)
+download_permit(acknowledgement)
 }
 \arguments{
-\item{data_download_acknowledgement}{logical(1). Whether to
+\item{acknowledgement}{logical(1). Whether to
 start downloading}
 }
 \description{
-Check for data download acknowledgement
+Return an error if the \code{acknowledgement = FALSE}.
 }
+\note{
+The \code{acknowledgement} parameter is designed to help users avoid
+accidentally initiating a very large data download that may take a very long
+time to run or exceed machine capabilities.
+}
+\keyword{internal}

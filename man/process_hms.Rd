@@ -2,8 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_hms}
 \alias{process_hms}
-\title{Import and clean wildfire smoke plume coverage data from NOAA Hazard
-Mapping System Fire and Smoke Product.}
+\title{Process wildfire smoke data}
 \usage{
 process_hms(
   date = c("2018-01-01", "2018-01-01"),
@@ -21,12 +20,25 @@ Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 \item{path}{character(1). Directory with downloaded NOAA HMS data files.}
 }
 \value{
-a SpatVector object;
+a \code{SpatVector} or character object
 }
 \description{
-Import and clean wildfire smoke plume coverage data from NOAA Hazard
-Mapping System Fire and Smoke Product.
+The \code{process_hms()} function imports and cleans raw wildfire smoke
+plume coverage data, returning a single \code{SpatVector} object.
+}
+\note{
+\code{process_hms()} will return a character object if there are no wildfire
+smoke plumes present for the selected dates and density. The returned
+character will contain the selected density value and the sequence of dates
+for which no wildfire smoke plumes were detected (see "Examples").
+}
+\examples{
+process_hms(
+  date = c("2018-12-30", "2019-01-01"),
+  variable = "Light",
+  path = "../tests/testdata/hms/"
+)
 }
 \author{
-Mitchell Manware.
+Mitchell Manware
 }

@@ -2,22 +2,27 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{spatrds_as_sftime}
 \alias{spatrds_as_sftime}
-\title{Create a sftime from a terra::SpatRasterDataset}
+\title{Convert a \code{SpatRasterDataset} to an \code{sftime}}
 \usage{
 spatrds_as_sftime(x, timename = "time")
 }
 \arguments{
-\item{x}{a terra::SpatRasterDataset (~ list of named SpatRasters)}
+\item{x}{a \code{SpatRasterDataset} object (~ list of named SpatRasters)}
 
 \item{timename}{character for time column name in the sftime
 (default: "time")}
 }
 \value{
-a sftime object
+an \code{sftime} object
 }
 \description{
-Create a sftime from a terra::SpatRasterDataset
+Convert a \code{SpatRasterDataset} object to an \code{sftime} object.
+\code{x} must contain a time-defining column, identified in \code{timename}.
+}
+\seealso{
+\link[terra:sds]{terra::sds}
 }
 \author{
 Eva Marques
 }
+\keyword{spacetime}

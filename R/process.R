@@ -1,5 +1,11 @@
 # nolint start
-#' Process covariates
+#' Process raw data wrapper function
+#' @description
+#' The \code{process_covariates()} function processes raw data files which have
+#' been downloaded by \code{download_data()}. \code{process_covariates()} and
+#' the underlying source-specific processing functions have been designed to
+#' operate on the raw data files. To avoid errors, \strong{do not edit the raw
+#' data files before passing to \code{process_covariates()}}.
 #' @param covariate character(1). Covariate type.
 #' @param path character(1). Directory or file path to raw data
 #' depending on `covariate` value.
@@ -13,13 +19,16 @@
 #' - [`process_nlcd`]: `"nlcd"`, `"NLCD"`
 #' - [`process_tri`]: `"tri"`, `"TRI"`
 #' - [`process_nei`]: `"nei"`, `"NEI`
+#' - [`process_geos`]: `"geos"`
 #' - [`process_gmted`]: `"gmted"`, `"GMTED"`
 #' - [`process_aqs`]: `"aqs"`, `"AQS"`
 #' - [`process_hms`]: `"hms"`, `"HMS"`, `"smoke"`
 #' - [`process_narr`]: `"narr"`, `"NARR"`
 #' - [`process_sedac_groads`]: `"sedac_groads"`, `"roads"`, `"groads"`
 #' - [`process_sedac_population`]: `"sedac_population"`, `"population"`
-#' @returns `SpatVector` or `SpatRaster` depending on covariate type.
+#' - [`process_merra2`]: `merra`, `MERRA`, `merra2`, `MERRA2`
+#' @returns `SpatVector`, `SpatRaster`, `sf`, or `character` depending on
+#' covariate type and selections.
 #' @author Insang Song
 #' @export
 # nolint end
@@ -34,7 +43,8 @@ process_covariates <-
                   "sedac_population", "population",
                   "sedac_groads", "groads", "roads",
                   "nlcd", "tri", "narr", "nei",
-                  "ecoregions", "ecoregion"),
+                  "ecoregions", "ecoregion",
+                  "merra", "MERRA2", "merra2", "MERRA2"),
     path = NULL,
     ...
   ) {
@@ -64,7 +74,9 @@ process_covariates <-
       nei = process_nei,
       tri = process_tri,
       geos = process_geos,
-      gmted = process_gmted
+      gmted = process_gmted,
+      merra = process_merra2,
+      merra2 = process_merra2
     )
 
     res_covariate <-
@@ -76,21 +88,38 @@ process_covariates <-
       }, error = function(e) {
         print(e)
         print(args(what_to_run))
-        stop("Please refer to the argument list and
-the error message above to rectify the error.\n")
+        stop(
+          paste0(
+            "Please refer to the argument list and the error message above to ",
+            "rectify the error.\n"
+          )
+        )
       })
 
     return(res_covariate)
   }
 
-
-#' Selected MODIS sinusoidal grid product subdataset name selector
+# nolint start
+#' Process MODIS sub-datasets
+#' @description
+#' Selected MODIS sinusoidal grid product subdataset name selector.
+#' Four presets are supported. `custom_sel` supersedes
+#' presets of `product` values.
 #' @param product character(1). Product code.
 #' @param custom_sel character(1). Custom filter.
 #' If this value is not NULL, preset filter is
 #' overridden.
-#' @description Four presets are supported. `custom_sel` supersedes
-#' presets of `product` values.
+#' @note
+#' Preset product codes and associated variables include \code{MOD11A1} -
+#' land surface temperature (LST), \code{MOD13A2} - Normalized Difference
+#' Vegetation Index (NDVI), \code{MOD09GA} - surface reflectance, and
+#' \code{MCD19A2} - aerosol optical depth (AOD). For a full list of available
+#' MODIS product codes, see the "Short Name" column at
+#' [NASA LP DAAC Search Data Catalog](https://lpdaac.usgs.gov/product_search/?collections=Combined+MODIS&collections=Terra+MODIS&collections=Aqua+MODIS&view=list).
+#' When utilizing a product code from this "Short Name" column, \strong{do
+#' not include} the version number following the period. For example, if "Short
+#' Name" = MCD12C1.006, then \code{product = MCD12C1}.
+# nolint end
 #' @author Insang Song
 #' @returns A character object that conforms to the regular
 #' expression. Details of regular expression in R can be found in [regexp].
@@ -126,7 +155,9 @@ process_modis_sds <-
   }
 
 
-#' Aggregate layers in a sub-dataset in sinusoidal MODIS products
+#' Process MODIS layers
+#' @description
+#' Aggregate layers in a sub-dataset in sinusoidal MODIS products.
 #' @param path character(1). Full path to MODIS HDF4/HDF5 file.
 #' Direct sub-dataset access is supported, for example,
 #' HDF4_EOS:EOS_GRID:\{filename\}:\{base_grid_information\}:\{sub-dataset\}
@@ -134,11 +165,11 @@ process_modis_sds <-
 #' sub-dataset. See [process_modis_sds] for details.
 #' @param fun_agg character(1). Function name to aggregate layers.
 #' Should be acceptable to [terra::tapp].
-#' @returns SpatRaster.
+#' @returns a `SpatRaster` object
 #' @author Insang Song
 #' @seealso [terra::tapp], [terra::rast], [terra::describe]
 #' @description Some MODIS products consist of multi-layer subdatasets.
-#' This function aggregates multiple layers into single layer SpatRaster.
+#' This function aggregates multiple layers into single layer `SpatRaster.`
 #' `fun_agg` is applied at overlapping cells.
 #' @note HDF values are read as original without scaling.
 #' Users should consult MODIS product documentation to apply proper
@@ -205,7 +236,9 @@ the input then flatten it manually.")
 
 
 # nolint start
-#' Get mosaicked or merged raster from multiple MODIS hdf files
+#' Process MODIS .hdf files
+#' @description
+#' Get mosaicked or merged raster from multiple MODIS hdf files.
 #' @param path character. Full list of hdf file paths.
 #'  preferably a recursive search result from \code{list.files}.
 #' @param date character(1). date to query. Should be in
@@ -223,7 +256,7 @@ the input then flatten it manually.")
 #' and [luna](https://github.com/rspatial/luna) are accepted.
 #' @seealso [download_data]
 #' @author Insang Song
-#' @returns A SpatRaster object.
+#' @returns a `SpatRaster` object
 #' @export
 # nolint end
 # previously modis_get_vrt
@@ -272,13 +305,15 @@ process_modis_merge <- function(
 
 
 # nolint start
-#' Tile corner generator for Blue Marble products
+#' Process Blue Marble corners
+#' @description
+#' Tile corner generator for Blue Marble products.
 #' @param hrange integer(2). Both should be in 0-35.
 #' @param vrange integer(2). Both should be in 0-17.
 #' @description Blue Marble products are in HDF5 format and are read without
 #' georeference with typical R geospatial packages.
-#' This function generates a data.frame of corner coordinates for assignment.
-#' @returns data.frame with xmin, xmax, ymin, and ymax fields.
+#' This function generates a `data.frame` of corner coordinates for assignment.
+#' @returns `data.frame` with xmin, xmax, ymin, and ymax fields
 #' @author Insang Song
 #' @references
 #' - [Wang, Z. (2022). Blue Marble User Guide (Version 1.3). NASA.](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf)
@@ -322,7 +357,9 @@ process_bluemarble_corners <-
     return(tile_df)
   }
 
-#' Check input strings conform to the required format
+#' Check date format
+#' @description
+#' Check date input strings conform to the required format.
 #' @param instr character(1). String to check.
 #' @param format character(1). Matching format to be checked.
 #' Default is `"%Y-%m-%d"`, which can detect `"%Y/%m/%d`.
@@ -330,6 +367,7 @@ process_bluemarble_corners <-
 #' @returns No returning value. It stops the function if `instr` doesn't
 #' conform to the `format`.
 #' @author Insang Song
+#' @keywords internal
 #' @export
 is_date_proper <- function(
   instr = NULL,
@@ -347,7 +385,7 @@ is_date_proper <- function(
 
 # nolint start
 #' Assign VIIRS Blue Marble products corner coordinates to retrieve a merged raster
-#' @description This function will return a SpatRaster object with
+#' @description This function will return a `SpatRaster` object with
 #' georeferenced h5 files of Blue Marble product. Referencing corner coordinates
 #' are necessary as the original h5 data do not include such information.
 #' @param path character. Full paths of h5 files.
@@ -360,7 +398,7 @@ is_date_proper <- function(
 #' @param crs character(1). terra::crs compatible CRS.
 #' Default is `"EPSG:4326"`
 #' @param ... For internal use.
-#' @returns SpatRaster.
+#' @returns a `SpatRaster` object
 #' @author Insang Song
 #' @seealso
 #' * [`terra::describe`]
@@ -447,7 +485,7 @@ process_bluemarble <- function(
 #' @param ... For internal use.
 #' @note Users should specify sub-dataset with all flags that are
 #' compatible with `gdalinfo`
-#' @returns stars object.
+#' @returns a `stars` object
 #' @author Insang Song
 #' @seealso [terra::rectify]
 #' @importFrom stars st_warp
@@ -478,11 +516,11 @@ process_modis_warp <-
 
 # nolint start
 #' Mosaic MODIS swaths
-#' @description This function will return a SpatRaster object with
+#' @description This function will return a `SpatRaster` object with
 #' values of selected subdatasets. Swath data include curvilinear
 #' grids, which require warping/rectifying the original curvilinear grids
 #' into rectilinear grids. The function internally warps each of inputs
-#' then mosaic the warped images into one large SpatRaster object.
+#' then mosaic the warped images into one large `SpatRaster` object.
 #' Users need to select a subdataset to process. The full path looks like
 #' `"HDF4_EOS:EOS_SWATH:{file_path}:mod06:subdataset"`, where file_path is
 #' the full path to the hdf file.
@@ -499,7 +537,7 @@ process_modis_warp <-
 #' * [process_modis_warp]
 #' * [GDAL HDF4 driver documentation](https://gdal.org/drivers/raster/hdf4.html)
 #' * [terra::describe]: to list the full subdataset list with `sds = TRUE`
-#' @returns SpatRaster object. CRS is `"EPSG:4326"`.
+#' @returns a `SpatRaster` object (crs = `"EPSG:4326"`)
 #' @author Insang Song
 #' @importFrom terra rast
 #' @importFrom terra crop
@@ -550,11 +588,14 @@ process_modis_swath <-
 
 # Process downloaded raw data
 
-#' Process Koeppen-Geiger climate data
+#' Process climate classification data
+#' @description
+#' The \code{process_koppen_geiger()} function imports and cleans raw climate
+#' classification data, returning a single `SpatRaster` object.
 #' @param path character(1). Path to Koppen-Geiger
 #'  climate zone raster file
 #' @param year data year. Not applicable for this function.
-#' @returns SpatRaster object
+#' @returns a `SpatRaster` object
 #' @author Insang Song
 #' @importFrom terra rast
 #' @export
@@ -568,12 +609,14 @@ process_koppen_geiger <-
   }
 
 
-#' Process raw National Landuse Classification Dataset
-#'
+#' Process land cover data
+#' @description
+#' The \code{process_nlcd()} function imports and cleans raw land cover data,
+#' returning a single `SpatRaster` object.
 #' @param path character giving nlcd data path
 #' @param year numeric giving the year of NLCD data used
 #' @description Reads NLCD file of selected `year`.
-#' @returns SpatRaster object.
+#' @returns a `SpatRaster` object
 #' @author Eva Marques, Insang Song
 #' @importFrom utils read.csv
 #' @importFrom terra rast
@@ -610,15 +653,18 @@ process_nlcd <-
   }
 
 
-#' Process EPA Ecoregion shapefiles
+#' Process ecoregion data
+#' @description
+#' The \code{process_ecoregion()} function imports and cleans raw ecoregion
+#' data, returning a `SpatVector` object.
 #' @param path character(1). Path to Ecoregion Shapefiles
 #' @author Insang Song
-#' @returns SpatVector object.
+#' @returns a `SpatVector` object
 #' @importFrom terra vect
 #' @export
 process_ecoregion <-
   function(
-    path = "./input/data/ecoregions/raw/us_eco_l3_state_boundaries.shp"
+    path = NULL
   ) {
     ecoreg <- terra::vect(path)
     ecoreg <- ecoreg[, grepl("^(L2_KEY|L3_KEY)", names(ecoreg))]
@@ -627,15 +673,15 @@ process_ecoregion <-
 
 
 #' Check input assumptions
-#' @param locs Data. [stdt][convert_stobj_to_stdt], [sf][sf::st_as_sf],
+#' @param locs Data. [sf][sf::st_as_sf],
 #' [SpatVector][terra::vect], or [data.frame]
 #' @param check_time logical(1). Whether `"time"` exists in column names.
 #' @param locs_epsg character(1). `"{authority}:{code}"` or
 #' Well-Known Text format for coordinate reference system definition.
 #' @description Check if all of `"lon"`, `"lat"`, and `"time"`
 #' (only if `check_time = TRUE`) then convert inputs into a
-#' SpatVector object.
-#' @returns SpatVector object.
+#' `SpatVector` object.
+#' @returns a `SpatVector` object
 #' @author Insang Song
 #' @importFrom methods is
 #' @importFrom terra vect
@@ -650,27 +696,21 @@ process_conformity <-
     if (!check_time) {
       keyword <- keyword[-3]
     }
-    if (is_stdt(locs)) {
-      locs <- locs$stdt
-      locs_epsg <- locs$crs_dt
-    } else {
-      if (!all(keyword %in% names(locs))) {
-        stop("locs should be stdt or 
-have 'lon', 'lat', (and 'time') fields.\n")
+    if (!all(keyword %in% names(locs))) {
+      stop("locs should have 'lon', 'lat', (and 'time') fields.\n")
+    }
+    if (!methods::is(locs, "SpatVector")) {
+      if (methods::is(locs, "sf")) {
+        locs <- terra::vect(locs)
       }
-      if (!methods::is(locs, "SpatVector")) {
-        if (methods::is(locs, "sf")) {
-          locs <- terra::vect(locs)
-        }
-        if (is.data.frame(locs)) {
-          locs <-
-            terra::vect(
-              locs,
-              geom = c("lon", "lat"),
-              keepgeom = TRUE,
-              crs = locs_epsg
-            )
-        }
+      if (is.data.frame(locs)) {
+        locs <-
+          terra::vect(
+            locs,
+            geom = c("lon", "lat"),
+            keepgeom = TRUE,
+            crs = locs_epsg
+          )
       }
     }
     return(locs)
@@ -681,16 +721,19 @@ have 'lon', 'lat', (and 'time') fields.\n")
 
 
 
-
-#' Prepare Toxic Release Inventory (TRI) data
+# nolint start
+#' Process toxic release data
+#' @description
+#' The \code{process_tri()} function imports and cleans raw toxic release data,
+#' returning a single `SpatVector` (points) object for the selected `year`.
 #' @param path character(1). Path to the directory with TRI CSV files
 #' @param year integer(1). Single year to select.
 #' @param variables integer. Column index of TRI data.
 #' @param ... Placeholders.
 #' @author Insang Song, Mariana Kassien
-#' @returns SpatVector (points) object in `year`.
-#' @note TRI data is available in USEPA. Visit the page to see the available
-#' year and column descriptions.
+#' @returns a `SpatVector` object (points) in `year`
+#' @note Visit [TRI Data and Tools](https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-and-tools)
+#' to view the available years and variables.
 #' @references
 #' https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-and-tools
 #' @importFrom terra vect
@@ -710,6 +753,7 @@ have 'lon', 'lat', (and 'time') fields.\n")
 #' @importFrom dplyr summarize
 #' @importFrom tidyr pivot_wider
 #' @importFrom stats setNames
+# nolint end
 #' @export
 process_tri <- function(
   path = NULL,
@@ -779,12 +823,15 @@ process_tri <- function(
 
 
 # nolint start
-#' Prepare National Emission Inventory CSV files
+#' Process road emissions data
+#' @description
+#' The \code{process_tri()} function imports and cleans raw road emissions data,
+#' returning a single `SpatVector` object.
 #' @param path character(1). Directory with NEI csv files.
-#' @param county SpatVector/sf. County boundaries.
+#' @param county `SpatVector`/`sf.` County boundaries.
 #' @param year integer(1) Year to use. Currently only 2017 or 2020
 #' is accepted.
-#' @returns SpatVector object.
+#' @returns a `SpatVector` object
 #' @author Insang Song
 #' @note Base files for `county` argument can be downloaded directly from
 #' [U.S. Census Bureau](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html)
@@ -865,13 +912,16 @@ process_nei <- function(
 }
 
 # nolint start
-#' Filter unique AQS sites with or without temporal information
+#' Process unique U.S. EPA AQS sites
+#' @description
+#' The \code{process_aqs()} function cleans and imports raw air quality
+#' monitoring sites, returning a single `SpatVector` or sf object. 
 #' @param path character(1). Directory path to daily measurement data.
 #' @param date character(2). Start and end date.
 #'  Should be in `"YYYY-MM-DD"` format and sorted. If `NULL`,
 #'  only unique locations are returned.
 #' @param return_format character(1). `"terra"` or `"sf"`.
-#' @returns SpatVector or sf object depending on the `return_format`.
+#' @returns a `SpatVector` or sf object depending on the `return_format`
 #' @importFrom data.table as.data.table
 #' @importFrom utils read.csv
 #' @importFrom terra vect
@@ -992,10 +1042,13 @@ process_aqs <-
   }
 
 
-#' Import and clean population data from NASA Socioeconomic Data and Applications Center (SEDAC).
-#' @param path character(1). Path to GeoTIFF or netCDF file.
+#' Process population density data
+#' @description
+#' The \code{process_secac_population()} function imports and cleans raw
+#' population density data, returning a single `SpatRaster` object.
+#' @param path character(1). Path to GeoTIFF (.tif) or netCDF (.nc) file.
 #' @author Mitchell Manware
-#' @return a SpatRaster object;
+#' @return a `SpatRaster` object
 #' @importFrom terra rast
 #' @export
 # nolint end
@@ -1049,11 +1102,14 @@ process_sedac_population <- function(
 
 
 # nolint start
-#' Import and clean groads data from NASA Socioeconomic Data and Applications Center (SEDAC).
+#' Process roads data
+#' @description
+#' The \code{process_sedac_groads()} function imports and cleans raw road data,
+#' returning a single `SpatVector` object.
 #' @param path character(1). Path to geodatabase or shapefiles.
 #' @note U.S. context.
 #' @author Insang Song
-#' @returns a SpatVector.
+#' @returns a `SpatVector` boject
 #' @importFrom terra vect
 #' @export
 # nolint end
@@ -1070,16 +1126,30 @@ process_sedac_groads <- function(
 }
 
 
-
-#' Import and clean wildfire smoke plume coverage data from NOAA Hazard
-#' Mapping System Fire and Smoke Product.
+# nolint start
+#' Process wildfire smoke data
+#' @description
+#' The \code{process_hms()} function imports and cleans raw wildfire smoke
+#' plume coverage data, returning a single `SpatVector` object. 
 #' @param date character(2). length of 10 each.
 #' Start/end date of downloaded data.
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
 #' @param variable character(1). "Light", "Medium", or "Heavy".
 #' @param path character(1). Directory with downloaded NOAA HMS data files.
-#' @author Mitchell Manware.
-#' @return a SpatVector object;
+#' @note
+#' \code{process_hms()} will return a character object if there are no wildfire
+#' smoke plumes present for the selected dates and density. The returned
+#' character will contain the selected density value and the sequence of dates
+#' for which no wildfire smoke plumes were detected (see "Examples").
+#' @examples
+#' process_hms(
+#'   date = c("2018-12-30", "2019-01-01"),
+#'   variable = "Light",
+#'   path = "../tests/testdata/hms/"
+#' )
+# nolint end
+#' @author Mitchell Manware
+#' @return a `SpatVector` or character object
 #' @importFrom terra vect
 #' @importFrom terra aggregate
 #' @importFrom terra subset
@@ -1225,18 +1295,19 @@ process_hms <- function(
   }
 }
 
-#' Import and clean Global Multi-resolution Terrain Elevation Data (GMTED2010)
-#' downloaded with `download_gmted` or `download_data(dataset_name = "gmted")`.
-#' Function returns a SpatRast object containing the user-defined variable
-#' of interest at specified resolution. Layer name indicates variable and
-#' resolution.
+#' Process elevation data
+#' @description
+#' The \code{process_gmted()} function imports and cleans raw elevation data,
+#' returning a single `SpatRaster` object.
 #' @param variable vector(1). Vector containing the GMTED statistic first and
 #' the resolution second. (Example: variable = c("Breakline Emphasis",
 #' "7.5 arc-seconds")).
-#' @param path character(1). Directory with downloaded GEOS-CF
-#' the "*_grd" folder containing .adf files.
+#' @param path character(1). Directory with downloaded GMTED  "*_grd"
+#' folder containing .adf files.
 #' @author Mitchell Manware
-#' @return a SpatRaster object
+#' @note
+#' `SpatRaster` layer name indicates selected variable and resolution.
+#' @return a `SpatRaster` object
 #' @importFrom terra rast
 #' @export
 process_gmted <- function(
@@ -1299,17 +1370,18 @@ process_gmted <- function(
   return(data)
 }
 
-#' Import and clean NOAA NCEP North American Regional Reanalysis (NARR) data
-#' downloaded with `download_narr` or `download_data(dataset_name = "NARR")`.
-#' Function returns a SpatRast object containing the user-defined variable
-#' of interest. Layer names indicate the variable, pressure level, and date
-#' (YYYYMMDD).
+#' Process meteorological data
+#' @description
+#' The \code{process_narr()} function imports and cleans raw meteorological
+#' data, returning a single `SpatRaster` object.
 #' @param date character(2). length of 10 each. Format "YYYY-MM-DD".
-#' @param variable character(1). NARR variable name(s).
-#' @param path character(1). Directory with downloaded GEOS-CF
-#' netCDF files.
+#' @param variable character(1). Variable name acronym.
+#' @param path character(1). Directory with downloaded netCDF (.nc) files.
+#' @note
+#' Layer names of the returned `SpatRaster` object contain the variable acronym,
+#' pressure level, and date.
 #' @author Mitchell Manware
-#' @return a SpatRaster object
+#' @return a `SpatRaster` object
 #' @importFrom terra rast
 #' @importFrom terra time
 #' @importFrom terra subset
@@ -1318,7 +1390,7 @@ process_gmted <- function(
 process_narr <- function(
     date = c("2023-09-01", "2023-09-01"),
     variable = NULL,
-    path = "../../data/covariates/narr/") {
+    path = NULL) {
   #### directory setup
   path <- download_sanitize_path(path)
   #### check for variable
@@ -1452,29 +1524,28 @@ process_narr <- function(
   return(data_return)
 }
 
-#' Import and clean GEOS-CF data downloaded with
-#' `download_geos_cf_data` or `download_data(dataset_name = "geos")`. Function
-#' returns a SpatRast object containing the user-defined variables of interest.
-#' Layer names indicate the variable, pressure level, date (YYYYMMDD), and, if
-#' applicable, the hour (HHMMSS).
+#' Process atmospheric composition data
+#' @description
+#' The \code{process_geos()} function imports and cleans raw atmospheric
+#' composition data, returning a single `SpatRaster` object.
 #' @param date character(2). length of 10. Format "YYYY-MM-DD".
 #' @param variable character(1). GEOS-CF variable name(s).
-#' @param path character(1). Directory with downloaded GEOS-CF
-#' netCDF files.
+#' @param path character(1). Directory with downloaded netCDF (.nc4) files.
+#' @note
+#' Layer names of the returned `SpatRaster` object contain the variable,
+#' pressure level, date, and hour.
 #' @author Mitchell Manware
-#' @return a SpatRaster object;
+#' @return a `SpatRaster` object;
 #' @importFrom terra rast
 #' @importFrom terra time
 #' @importFrom terra varnames
 #' @importFrom terra crs
-#' @importFrom terra timeInfo
-#' @importFrom terra hasValues
 #' @importFrom terra subset
 #' @export
 process_geos <-
   function(date = c("2018-01-01", "2018-01-01"),
            variable = NULL,
-           path = "../../data/covariates/geos_cf/") {
+           path = NULL) {
     #### directory setup
     path <- download_sanitize_path(path)
     #### check for variable
@@ -1507,8 +1578,9 @@ process_geos <-
       )
     )
     #### identify collection
-    collection <- process_geos_collection(
+    collection <- process_collection(
       data_paths[1],
+      source = "geos",
       collection = TRUE
     )
     cat(
@@ -1523,7 +1595,11 @@ process_geos <-
     for (p in seq_along(data_paths)) {
       #### import .nc4 data
       data_raw <- terra::rast(data_paths[p])
-      data_datetime <- process_geos_collection(data_paths[p], datetime = TRUE)
+      data_datetime <- process_collection(
+        data_paths[p],
+        source = "geos",
+        datetime = TRUE
+      )
       cat(paste0(
         "Cleaning ",
         variable,
@@ -1601,7 +1677,7 @@ process_geos <-
         warn = FALSE
       )
     }
-    #### set coordinate refernce system
+    #### set coordinate reference system
     terra::crs(data_return) <- "EPSG:4326"
     cat(paste0(
       "Returning hourly ",
@@ -1622,19 +1698,24 @@ process_geos <-
     return(data_return)
   }
 
-#' Identify GEOS-CF collection based on user-defined file paths
-#' @param path character(1). File path to GEOS-CF data file.
-#' @param collection logical(1). Identifies and returns GEOS-CF collection
+#' Process GEOS-CF and MERRA2 collection codes
+#' @description
+#' Identify the GEOS-CF or MERRA2 collection based on the file path.
+#' @param path character(1). File path to data file.
+#' @param source character(1). "geos" for GEOS-CF or "merra2" for MERRA2
+#' @param collection logical(1). Identifies and returns collection
 #' name(s) based on provided file path(s).
 #' @param date logical(1). Identifies and returns date sequence (YYYYMMDD) based
 #' on provided file path(s).
 #' @param datetime logical(1). Identifies and returns date time sequence
 #' (YYYYMoMoDDHHMiMi) based on provided file path(s).
+#' @keywords auxillary
 #' @return character
 #' @export
-process_geos_collection <-
+process_collection <-
   function(
       path,
+      source,
       collection = FALSE,
       date = FALSE,
       datetime = FALSE) {
@@ -1647,19 +1728,28 @@ process_geos_collection <-
         )
       )
     }
+    #### source names
+    geos <- c("geos", "GEOS", "geos-cf", "GEOS-CF")
+    merra2 <- c("merra", "merra2", "MERRA", "MERRA2")
+    #### string split point
+    if (source %in% merra2) {
+      code <- "MERRA2_400."
+    } else if (source %in% geos) {
+      code <- "GEOS-CF.v01.rpl."
+    }
     #### split full file path based on unique GEOS-CF character
-    split_geos <- unlist(
+    split_source <- unlist(
       strsplit(
         path,
-        "GEOS-CF.v01.rpl."
+        code
       )
     )
     #### split file path into collection, datetime, and "nc4"
     split_period <- unlist(
       strsplit(
-        split_geos[
+        split_source[
           which(
-            endsWith(split_geos, ".nc4")
+            endsWith(split_source, ".nc4")
           )
         ],
         "\\."
@@ -1667,6 +1757,17 @@ process_geos_collection <-
     )
     #### remove "nc4"
     split_wo_nc4 <- split_period[!split_period == "nc4"]
+    #### return merra2 collection information
+    if (source %in% merra2) {
+      #### return only collection name
+      if (collection == TRUE) {
+        return(split_wo_nc4[1])
+      }
+      #### return date sequence
+      if (date == TRUE) {
+        return(split_wo_nc4[2])
+      }
+    }
     #### create data frame
     split_df <- data.frame(
       split_wo_nc4[
@@ -1716,14 +1817,242 @@ process_geos_collection <-
     }
   }
 
-#' Generate statistic and resolution codes based on GMTED statistic and
-#' resolution.
-#' @param string character(1). File path to GEOS-CF data file.
+#' Process meteorological and atmospheric data
+#' @description
+#' The \code{process_merra2()} function imports and cleans raw atmospheric
+#' composition data, returning a single `SpatRaster` object.
+#' @param date character(2). length of 10. Format "YYYY-MM-DD".
+#' @param variable character(1). MERRA2 variable name(s).
+#' @param path character(1). Directory with downloaded netCDF (.nc4) files.
+#' @note
+#' Layer names of the returned `SpatRaster` object contain the variable,
+#' pressure level, date, and hour. Pressure level values utilized for layer
+#' names are taken directly from raw data and are not edited to retain
+#' pressure level information.
+#' @author Mitchell Manware
+#' @return a `SpatRaster` object;
+#' @importFrom terra rast
+#' @importFrom terra time
+#' @importFrom terra names
+#' @importFrom terra crs
+#' @importFrom terra subset
+#' @export
+process_merra2 <-
+  function(date = c("2018-01-01", "2018-01-01"),
+           variable = NULL,
+           path = NULL) {
+    #### directory setup
+    path <- download_sanitize_path(path)
+    #### check for variable
+    check_for_null_parameters(mget(ls()))
+    #### identify file paths
+    paths <- list.files(
+      path,
+      pattern = "MERRA2_400",
+      full.names = TRUE
+    )
+    paths <- paths[grep(
+      ".nc4",
+      paths
+    )]
+    #### identify dates based on user input
+    dates_of_interest <- generate_date_sequence(
+      date[1],
+      date[2],
+      sub_hyphen = TRUE
+    )
+    #### subset file paths to only dates of interest
+    data_paths <- unique(
+      grep(
+        paste(
+          dates_of_interest,
+          collapse = "|"
+        ),
+        paths,
+        value = TRUE
+      )
+    )
+    #### identify collection
+    collection <- process_collection(
+      data_paths[1],
+      source = "merra2",
+      collection = TRUE
+    )
+    cat(
+      paste0(
+        "Identified collection ",
+        collection,
+        ".\n"
+      )
+    )
+    #### initiate for loop
+    data_return <- terra::rast()
+    for (p in seq_along(data_paths)) {
+      #### import .nc4 data
+      data_raw <- terra::rast(data_paths[p])
+      data_date <- process_collection(
+        data_paths[p],
+        source = "merra2",
+        date = TRUE
+      )
+      cat(
+        paste0(
+          "Cleaning ",
+          variable,
+          " data for ",
+          as.Date(
+            data_date,
+            format = "%Y%m%d"
+          ),
+          "...\n"
+        )
+      )
+      #### subset to user-selected variable
+      data_variable <- terra::subset(
+        data_raw,
+        subset = grep(
+          variable,
+          names(data_raw)
+        )
+      )
+      #### identify time step
+      times <- process_merra2_time(
+        collection = collection,
+        from = data_variable
+      )
+      #### identify unique pressure levels
+      levels <-
+        unique(
+          grep(
+            "lev=",
+            unlist(
+              strsplit(names(data_variable), "_")
+            ),
+            value = TRUE
+          )
+        )
+      #### empty `levels` if 2 dimensional data
+      if (length(levels) == 0) {
+        levels <- ""
+      }
+      #### merge levels and times
+      leveltimes <- merge(levels, times)
+      #### set layer names
+      names(data_variable) <- gsub(
+        "__",
+        "_",
+        paste0(
+          variable,
+          "_",
+          leveltimes[, 1],
+          "_",
+          data_date,
+          "_",
+          leveltimes[, 2]
+        )
+      )
+      #### set layer times
+      terra::time(data_variable) <- ISOdatetime(
+        year = substr(data_date, 1, 4),
+        month = substr(data_date, 5, 6),
+        day = substr(data_date, 7, 8),
+        hour = substr(leveltimes[, 2], 1, 2),
+        min = substr(leveltimes[, 2], 3, 4),
+        sec = substr(leveltimes[, 2], 5, 6),
+        tz = "UTC"
+      )
+      data_return <- c(
+        data_return,
+        data_variable,
+        warn = FALSE
+      )
+    }
+    terra::crs(data_return) <- "EPSG:4267"
+    cat(paste0(
+      "Returning hourly ",
+      variable,
+      " data from ",
+      as.Date(
+        dates_of_interest[1],
+        format = "%Y%m%d"
+      ),
+      " to ",
+      as.Date(
+        dates_of_interest[length(dates_of_interest)],
+        format = "%Y%m%d"
+      ),
+      ".\n"
+    ))
+    #### return SpatRaster
+    return(data_return)
+  }
+
+#' Process MERRA2 time steps
+#' @description
+#' Identify the time step of data observations based on MERRA2 collection and
+#' filter to time values in `from`.
+#' @param collection character(1). MERRA2 collection name.
+#' @param from SpatRaster(1). Object to extract time values from.
+#' @importFrom stringi stri_pad
+#' @keywords auxillary
+#' @return character
+#' @export
+process_merra2_time <-
+  function(collection, from) {
+    split <- unlist(strsplit(collection, "_"))
+    code <- split[1]
+    if (code == "inst1") {
+      step <- seq(from = 0, to = 2300, by = 100)
+    } else if (code == "inst3") {
+      step <- seq(from = 0, to = 2100, by = 300)
+    } else if (code == "inst6") {
+      step <- seq(from = 0, to = 1800, by = 600)
+    } else if (code == "statD") {
+      step <- 1200
+    } else if (code == "tavg1") {
+      step <- seq(from = 0030, to = 2330, by = 100)
+    } else if (code == "tavg3") {
+      step <- seq(from = 0130, to = 2330, by = 300)
+    }
+    pad_l <- stringi::stri_pad(step, side = "left", width = 4, pad = 0)
+    pad_r <- stringi::stri_pad(pad_l, side = "right", width = 6, pad = 0)
+    time_f <- gsub(
+      " ",
+      "",
+      gsub(
+        "-",
+        "",
+        gsub(
+          ":",
+          "",
+          terra::time(from)
+        )
+      )
+    )
+    for (f in seq_along(time_f)) {
+      if (nchar(time_f[f]) == 8) {
+        time_f[f] <- paste0(time_f[f], "000000")
+      }
+    }
+    time_return <- pad_r[
+      pad_r %in% unique(substr(time_f, 9, 14))
+    ]
+    return(time_return)
+  }
+
+
+#' Process elevation statistic and resolution codes
+#' @description
+#' Identify the GMTED statistic and resolution based on the file path. Convert
+#' statistic and resolution to/from full string to/from statistic and
+#' resolution code.
+#' @param string character(1). File path to GMTED data file.
 #' @param statistic logical(1). Matches statistic to statistic code.
 #' @param resolution logical(1). Matches resolution to resolution code.
 #' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
 #' provides statistic or resolution code, and returns full length statistic
 #' or resolution.
+#' @keywords auxillary
 #' @return character
 #' @export
 process_gmted_codes <-
@@ -1756,10 +2085,13 @@ process_gmted_codes <-
     return(code)
   }
 
-#' Generate resolution codes based on NASA SEDAC population resolution.
+#' Process population resolution code
+#' @description
+#' Convert full length resolution name to/from resolution code.
 #' @param string character(1). Resolution name or code.
 #' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
 #' provides resolution code, and returns full length resolution.
+#' @keywords auxillary
 #' @export
 process_sedac_codes <-
   function(
@@ -1786,12 +2118,15 @@ process_sedac_codes <-
     return(resolution)
   }
 
-#' Create circular buffer around site points.
+#' Process locations buffer
+#' @description
+#' Create circular buffer around locations based on user defined radius.
 #' @param locs SpatVector(1). SpatVector object with point geometry
 #' @param radius integer(1). Circular buffer size (meters).
 #' @description Creates a circular buffer around points if `radius` is > 0.
 #' Returns points if `radius` is 0.
-#' @returns SpatVector.
+#' @keywords internal
+#' @returns a `SpatVector` object
 #' @importFrom terra buffer
 #' @export
 process_locs_radius <-
@@ -1815,14 +2150,19 @@ process_locs_radius <-
     }
   }
 
-#' Import and prepare site point locations for covariate calculations.
+#' Process locations as `SpatVector`
+#' @description
+#' Convert locations from class \code{data.frame} or \code{data.table} to
+#' `SpatVector` object, project to coordinate reference system, and apply
+#' circular buffer.
 #' @param locs data.frame(1). Data frame containing columns for unique
-#' identifier, latitute, and longitude. Latitude and longitude columns **must**
+#' identifier, latitude, and longitude. Latitude and longitude columns **must**
 #' be named "lat" and "lon", respectively.
 #' @param crs Coordinate reference system (CRS) description utilizing
 #' `terra::crs()`.
 #' @param radius integer(1). Circular buffer size (meters).
-#' @returns SpatVector
+#' @keywords internal
+#' @returns a `SpatVector` object
 #' @importFrom terra crs
 #' @importFrom terra vect
 #' @importFrom terra project

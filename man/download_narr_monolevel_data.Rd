@@ -2,32 +2,32 @@
 % Please edit documentation in R/download.R
 \name{download_narr_monolevel_data}
 \alias{download_narr_monolevel_data}
-\title{download_narr_monolevel_data: download monolevel meteorological data from NOAA NCEP North American Regional Reanalysis (NARR) model.}
+\title{Download meteorological data (monolevel)}
 \usage{
 download_narr_monolevel_data(
+  variables = NULL,
   year_start = 2022,
   year_end = 2022,
-  variables = NULL,
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE
 )
 }
 \arguments{
+\item{variables}{character. Variable(s) name acronym.}
+
 \item{year_start}{integer(1). length of 4. Start of year range for
 downloading data.}
 
 \item{year_end}{integer(1). length of 4. End of year range for downloading
 data.}
 
-\item{variables}{character. Variable(s) name acronym.}
-
 \item{directory_to_save}{character(1). Directory(s) to save downloaded data
 files.}
 
-\item{data_download_acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+\item{acknowledgement}{logical(1). By setting \code{TRUE} the
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
 
 \item{download}{logical(1). \code{FALSE} will generate a *.txt file
@@ -39,11 +39,11 @@ Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 }
 \value{
-NULL;
+NULL; Yearly netCDF (.nc) files will be stored in
+\code{directory_to_save}.
 }
 \description{
-The \code{download_narr_monolevel_data} function accesses and downloads
-monolevel meteorological data from \href{https://psl.noaa.gov/data/gridded/data.narr.html}{NOAA NCEP North American Regional Reanalysis (NARR)}.
+The \code{download_narr_monolevel_data} function accesses and downloads monolevel meteorological data from \href{https://psl.noaa.gov/data/gridded/data.narr.html}{NOAA's North American Regional Reanalysis (NARR) model}. "Monolevel" variables contain a single value for the entire atmospheric column (ie. Variable: Convective cloud cover; Level: Entire atmosphere considered as a single layer), or represent a specific altitude associated with the variable (ie. Variable: Air temperature; Level: 2 m).
 }
 \author{
 Mitchell Manware, Insang Song

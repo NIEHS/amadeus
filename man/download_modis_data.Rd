@@ -5,27 +5,21 @@
 \title{Download MODIS product files}
 \usage{
 download_modis_data(
-  date_start = "2023-09-01",
-  date_end = "2023-09-01",
   product = c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2"),
   version = "61",
   horizontal_tiles = c(7, 13),
   vertical_tiles = c(3, 6),
-  nasa_earth_data_token = NULL,
-  directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
   mod06_links = NULL,
-  download = TRUE,
+  nasa_earth_data_token = NULL,
+  date_start = "2023-09-01",
+  date_end = "2023-09-01",
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
   remove_command = FALSE
 )
 }
 \arguments{
-\item{date_start}{character(1). length of 10. Start date for downloading
-data. Format YYYY-MM-DD (ex. September 1, 2023 is \code{"2023-09-01"}).}
-
-\item{date_end}{character(1). length of 10. End date for downloading data.
-Format YYYY-MM-DD (ex. September 1, 2023 is \code{"2023-09-01"}).}
-
 \item{product}{character(1).
 One of \code{c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2")}}
 
@@ -37,18 +31,24 @@ One of \code{c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2"
 \item{vertical_tiles}{integer(2). Vertical tile numbers
 \code{c({start}, {end})}. Default is \code{c(3, 6)}.}
 
+\item{mod06_links}{character(1). CSV file path to MOD06_L2 download links
+from NASA LPDAAC. Default is \code{NULL}.}
+
 \item{nasa_earth_data_token}{character(1).
 Token for downloading data from NASA. Should be set before
 trying running the function.}
 
+\item{date_start}{character(1). length of 10. Start date for downloading
+data. Format YYYY-MM-DD (ex. September 1, 2023 is \code{"2023-09-01"}).}
+
+\item{date_end}{character(1). length of 10. End date for downloading data.
+Format YYYY-MM-DD (ex. September 1, 2023 is \code{"2023-09-01"}).}
+
 \item{directory_to_save}{character(1). Directory to save data.}
 
-\item{data_download_acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+\item{acknowledgement}{logical(1). By setting \code{TRUE} the
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
-
-\item{mod06_links}{character(1). CSV file path to MOD06_L2 download links
-from NASA LPDAAC. Default is \code{NULL}.}
 
 \item{download}{logical(1). Download data or only save wget commands.}
 
@@ -56,7 +56,8 @@ from NASA LPDAAC. Default is \code{NULL}.}
 the text file containing download commands.}
 }
 \value{
-NULL;
+NULL; Raw HDF (.hdf) files will be stored in
+\code{directory_to_save}.
 }
 \description{
 Need maintenance for the directory path change

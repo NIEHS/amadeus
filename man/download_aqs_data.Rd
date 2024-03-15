@@ -2,21 +2,21 @@
 % Please edit documentation in R/download.R
 \name{download_aqs_data}
 \alias{download_aqs_data}
-\title{Download daily data from AQS datamart}
+\title{Download air quality data}
 \usage{
 download_aqs_data(
   parameter_code = 88101,
+  resolution_temporal = "daily",
   year_start = 2018,
   year_end = 2022,
-  resolution_temporal = "daily",
+  url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
   directory_to_download = NULL,
   directory_to_save = NULL,
-  url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
-  data_download_acknowledgement = FALSE,
-  unzip = TRUE,
-  remove_zip = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE
 )
 }
 \arguments{
@@ -24,15 +24,18 @@ download_aqs_data(
 EPA pollutant parameter code. For details, please refer to
 \href{https://aqs.epa.gov/aqsweb/documents/codetables/parameters.html}{AQS parameter codes}}
 
+\item{resolution_temporal}{character(1).
+Name of column containing POC values.
+Currently, no value other than \code{"daily"} works.}
+
 \item{year_start}{integer(1). length of 4.
 Start year for downloading data.}
 
 \item{year_end}{integer(1). length of 4.
 End year for downloading data.}
 
-\item{resolution_temporal}{character(1).
-Name of column containing POC values.
-Currently, no value other than \code{"daily"} works.}
+\item{url_aqs_download}{character(1).
+URL to the AQS pre-generated datasets.}
 
 \item{directory_to_download}{character(1).
 Directory to download zip files from AQS data mart.}
@@ -40,17 +43,9 @@ Directory to download zip files from AQS data mart.}
 \item{directory_to_save}{character(1).
 Directory to decompress zip files.}
 
-\item{url_aqs_download}{character(1).
-URL to the AQS pre-generated datasets.}
-
-\item{data_download_acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+\item{acknowledgement}{logical(1). By setting \code{TRUE} the
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
-
-\item{unzip}{logical(1). Unzip zip files. Default \code{TRUE}.}
-
-\item{remove_zip}{logical(1). Remove zip file from directory_to_download.
-Default \code{FALSE}.}
 
 \item{download}{logical(1). \code{FALSE} will generate a *.txt file
 containing all download commands. By setting \code{TRUE} the function
@@ -59,6 +54,11 @@ will download all of the requested data files.}
 \item{remove_command}{logical(1).
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands. Default is FALSE.}
+
+\item{unzip}{logical(1). Unzip zip files. Default \code{TRUE}.}
+
+\item{remove_zip}{logical(1). Remove zip file from directory_to_download.
+Default \code{FALSE}.}
 }
 \value{
 NULL; Separate comma-separated value (CSV) files of
@@ -66,7 +66,7 @@ monitors and the daily representative values
 will be stored in \code{directory_to_save}.
 }
 \description{
-Download daily data from AQS datamart
+The \code{download_aqs_data()} function accesses and downloads Air Quality System (AQS) data from the \href{https://aqs.epa.gov/aqsweb/airdata/download_files.html}{U.S. Environmental Protection Agency's (EPA) Pre-Generated Data Files}.
 }
 \author{
 Mariana Kassien, Insang Song, Mitchell Manware

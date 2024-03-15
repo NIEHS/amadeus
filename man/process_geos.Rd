@@ -2,16 +2,12 @@
 % Please edit documentation in R/process.R
 \name{process_geos}
 \alias{process_geos}
-\title{Import and clean GEOS-CF data downloaded with
-\code{download_geos_cf_data} or \code{download_data(dataset_name = "geos")}. Function
-returns a SpatRast object containing the user-defined variables of interest.
-Layer names indicate the variable, pressure level, date (YYYYMMDD), and, if
-applicable, the hour (HHMMSS).}
+\title{Process atmospheric composition data}
 \usage{
 process_geos(
   date = c("2018-01-01", "2018-01-01"),
   variable = NULL,
-  path = "../../data/covariates/geos_cf/"
+  path = NULL
 )
 }
 \arguments{
@@ -19,18 +15,18 @@ process_geos(
 
 \item{variable}{character(1). GEOS-CF variable name(s).}
 
-\item{path}{character(1). Directory with downloaded GEOS-CF
-netCDF files.}
+\item{path}{character(1). Directory with downloaded netCDF (.nc4) files.}
 }
 \value{
-a SpatRaster object;
+a \code{SpatRaster} object;
 }
 \description{
-Import and clean GEOS-CF data downloaded with
-\code{download_geos_cf_data} or \code{download_data(dataset_name = "geos")}. Function
-returns a SpatRast object containing the user-defined variables of interest.
-Layer names indicate the variable, pressure level, date (YYYYMMDD), and, if
-applicable, the hour (HHMMSS).
+The \code{process_geos()} function imports and cleans raw atmospheric
+composition data, returning a single \code{SpatRaster} object.
+}
+\note{
+Layer names of the returned \code{SpatRaster} object contain the variable,
+pressure level, date, and hour.
 }
 \author{
 Mitchell Manware

@@ -2,20 +2,19 @@
 % Please edit documentation in R/process.R
 \name{process_ecoregion}
 \alias{process_ecoregion}
-\title{Process EPA Ecoregion shapefiles}
+\title{Process ecoregion data}
 \usage{
-process_ecoregion(
-  path = "./input/data/ecoregions/raw/us_eco_l3_state_boundaries.shp"
-)
+process_ecoregion(path = NULL)
 }
 \arguments{
 \item{path}{character(1). Path to Ecoregion Shapefiles}
 }
 \value{
-SpatVector object.
+a \code{SpatVector} object
 }
 \description{
-Process EPA Ecoregion shapefiles
+The \code{process_ecoregion()} function imports and cleans raw ecoregion
+data, returning a \code{SpatVector} object.
 }
 \author{
 Insang Song

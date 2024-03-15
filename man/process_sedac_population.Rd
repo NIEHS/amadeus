@@ -2,18 +2,19 @@
 % Please edit documentation in R/process.R
 \name{process_sedac_population}
 \alias{process_sedac_population}
-\title{Import and clean population data from NASA Socioeconomic Data and Applications Center (SEDAC).}
+\title{Process population density data}
 \usage{
 process_sedac_population(path = NULL)
 }
 \arguments{
-\item{path}{character(1). Path to GeoTIFF or netCDF file.}
+\item{path}{character(1). Path to GeoTIFF (.tif) or netCDF (.nc) file.}
 }
 \value{
-a SpatRaster object;
+a \code{SpatRaster} object
 }
 \description{
-Import and clean population data from NASA Socioeconomic Data and Applications Center (SEDAC).
+The \code{process_secac_population()} function imports and cleans raw
+population density data, returning a single \code{SpatRaster} object.
 }
 \author{
 Mitchell Manware

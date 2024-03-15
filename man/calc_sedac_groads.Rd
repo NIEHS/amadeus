@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_sedac_groads}
 \alias{calc_sedac_groads}
-\title{Calculate SEDAC groads density covariates}
+\title{Calculate roads covariates}
 \usage{
 calc_sedac_groads(
   from = NULL,

@@ -2,13 +2,13 @@
 % Please edit documentation in R/process.R
 \name{process_covariates}
 \alias{process_covariates}
-\title{Process covariates}
+\title{Process raw data wrapper function}
 \usage{
 process_covariates(
   covariate = c("modis_swath", "modis_merge", "koppen-geiger", "bluemarble",
     "koeppen-geiger", "koppen", "koeppen", "geos", "dummies", "gmted", "hms", "smoke",
     "sedac_population", "population", "sedac_groads", "groads", "roads", "nlcd", "tri",
-    "narr", "nei", "ecoregions", "ecoregion"),
+    "narr", "nei", "ecoregions", "ecoregion", "merra", "MERRA2", "merra2", "MERRA2"),
   path = NULL,
   ...
 )
@@ -22,10 +22,15 @@ depending on \code{covariate} value.}
 \item{...}{Arguments passed to each raw data processing function.}
 }
 \value{
-\code{SpatVector} or \code{SpatRaster} depending on covariate type.
+\code{SpatVector}, \code{SpatRaster}, \code{sf}, or \code{character} depending on
+covariate type and selections.
 }
 \description{
-Process covariates
+The \code{process_covariates()} function processes raw data files which have
+been downloaded by \code{download_data()}. \code{process_covariates()} and
+the underlying source-specific processing functions have been designed to
+operate on the raw data files. To avoid errors, \strong{do not edit the raw
+data files before passing to \code{process_covariates()}}.
 }
 \seealso{
 \itemize{
@@ -37,12 +42,14 @@ Process covariates
 \item \code{\link{process_nlcd}}: \code{"nlcd"}, \code{"NLCD"}
 \item \code{\link{process_tri}}: \code{"tri"}, \code{"TRI"}
 \item \code{\link{process_nei}}: \code{"nei"}, \verb{"NEI}
+\item 
 \item \code{\link{process_gmted}}: \code{"gmted"}, \code{"GMTED"}
 \item \code{\link{process_aqs}}: \code{"aqs"}, \code{"AQS"}
 \item \code{\link{process_hms}}: \code{"hms"}, \code{"HMS"}, \code{"smoke"}
 \item \code{\link{process_narr}}: \code{"narr"}, \code{"NARR"}
 \item \code{\link{process_sedac_groads}}: \code{"sedac_groads"}, \code{"roads"}, \code{"groads"}
 \item \code{\link{process_sedac_population}}: \code{"sedac_population"}, \code{"population"}
+\item \code{\link{process_merra2}}: \code{merra}, \code{MERRA}, \code{merra2}, \code{MERRA2}
 }
 }
 \author{

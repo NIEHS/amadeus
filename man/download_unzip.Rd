@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_support.R
 \name{download_unzip}
 \alias{download_unzip}
-\title{Unzip downloaded data}
+\title{Unzip zip files}
 \usage{
 download_unzip(file_name, directory_to_unzip, unzip = TRUE)
 }
@@ -15,5 +15,6 @@ data}
 \item{unzip}{logical(1). Unzip (\code{TRUE}) or not.}
 }
 \description{
-Unzip downloaded data
+Unzip (inflate) downloaded ".zip" files.
 }
+\keyword{internal}

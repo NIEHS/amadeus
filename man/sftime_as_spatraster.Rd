@@ -2,23 +2,30 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{sftime_as_spatraster}
 \alias{sftime_as_spatraster}
-\title{Convert sftime object to SpatRaster
-/!\ can be very time consuming if sftime is not spatially structured}
+\title{Convert an \code{sftime} to a \code{SpatRaster}}
 \usage{
 sftime_as_spatraster(x, varname)
 }
 \arguments{
-\item{x}{a sftime}
+\item{x}{an \code{sftime} object}
 
 \item{varname}{variable to rasterize}
 }
 \value{
-a SpatRaster with layers corresponding to timestamps
+a \code{SpatRaster} object
 }
 \description{
-Convert sftime object to SpatRaster
-/!\ can be very time consuming if sftime is not spatially structured
+Convert an \code{sftime} object to a \code{SpatRaster} object. Returns a
+\code{SpatRatser} with one layer for each time step in \code{x}.
+}
+\note{
+Running \code{sftime_as_spatraster} can take a long time if \code{x} is not
+spatially structured.
+}
+\seealso{
+\link[terra:rast]{terra::rast}
 }
 \author{
 Eva Marques
 }
+\keyword{spacetime}

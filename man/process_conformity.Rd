@@ -7,7 +7,7 @@
 process_conformity(locs = NULL, check_time = FALSE, locs_epsg = "EPSG:4326")
 }
 \arguments{
-\item{locs}{Data. \link[=convert_stobj_to_stdt]{stdt}, \link[sf:st_as_sf]{sf},
+\item{locs}{Data. \link[sf:st_as_sf]{sf},
 \link[terra:vect]{SpatVector}, or \link{data.frame}}
 
 \item{check_time}{logical(1). Whether \code{"time"} exists in column names.}
@@ -16,12 +16,12 @@ process_conformity(locs = NULL, check_time = FALSE, locs_epsg = "EPSG:4326")
 Well-Known Text format for coordinate reference system definition.}
 }
 \value{
-SpatVector object.
+a \code{SpatVector} object
 }
 \description{
 Check if all of \code{"lon"}, \code{"lat"}, and \code{"time"}
 (only if \code{check_time = TRUE}) then convert inputs into a
-SpatVector object.
+\code{SpatVector} object.
 }
 \author{
 Insang Song

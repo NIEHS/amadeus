@@ -2,11 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_gmted}
 \alias{process_gmted}
-\title{Import and clean Global Multi-resolution Terrain Elevation Data (GMTED2010)
-downloaded with \code{download_gmted} or \code{download_data(dataset_name = "gmted")}.
-Function returns a SpatRast object containing the user-defined variable
-of interest at specified resolution. Layer name indicates variable and
-resolution.}
+\title{Process elevation data}
 \usage{
 process_gmted(variable = NULL, path = NULL)
 }
@@ -15,18 +11,18 @@ process_gmted(variable = NULL, path = NULL)
 the resolution second. (Example: variable = c("Breakline Emphasis",
 "7.5 arc-seconds")).}
 
-\item{path}{character(1). Directory with downloaded GEOS-CF
-the "*_grd" folder containing .adf files.}
+\item{path}{character(1). Directory with downloaded GMTED  "*_grd"
+folder containing .adf files.}
 }
 \value{
-a SpatRaster object
+a \code{SpatRaster} object
 }
 \description{
-Import and clean Global Multi-resolution Terrain Elevation Data (GMTED2010)
-downloaded with \code{download_gmted} or \code{download_data(dataset_name = "gmted")}.
-Function returns a SpatRast object containing the user-defined variable
-of interest at specified resolution. Layer name indicates variable and
-resolution.
+The \code{process_gmted()} function imports and cleans raw elevation data,
+returning a single \code{SpatRaster} object.
+}
+\note{
+\code{SpatRaster} layer name indicates selected variable and resolution.
 }
 \author{
 Mitchell Manware
