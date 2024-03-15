@@ -1143,6 +1143,8 @@ testthat::test_that("Test error cases in EPA gaftp sources 2", {
                   acknowledgement = TRUE,
                   download = FALSE,
                   remove_command = FALSE,
+                  unzip = FALSE,
+                  remove_zip = FALSE,
                   directory_to_download = directory_to_save,
                   epa_certificate_path = certificate
                   )

@@ -378,18 +378,16 @@ download_ecoregion_data <- function(
   download_remove_command(commands_txt = commands_txt,
                           remove = remove_command)
   #### 15. unzip files
-  if (download) {
-    download_unzip(
-      file_name = download_name,
-      directory_to_unzip = directory_to_save,
-      unzip = unzip
-    )
-    #### 16. remove zip files
-    download_remove_zips(
-      remove = remove_zip,
-      download_name = download_name
-    )
-  }
+  download_unzip(
+    file_name = download_name,
+    directory_to_unzip = directory_to_save,
+    unzip = unzip
+  )
+  #### 16. remove zip files
+  download_remove_zips(
+    remove = remove_zip,
+    download_name = download_name
+  )
 }
 
 # nolint start 
