@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,9 +67,9 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="amadeus">amadeus<a class="anchor" aria-label="anchor" href="#amadeus"></a>
 </h1></div>
-<p><a href="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/check-standard.yaml" class="external-link"><img src="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/check-standard.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/test-coverage.yaml" class="external-link"><img src="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/test-coverage.yaml/badge.svg" alt="test-coverage"></a> <a href="https://codecov.io/gh/Spatiotemporal-Exposures-and-Toxicology/amadeus" class="external-link"><img src="https://codecov.io/gh/Spatiotemporal-Exposures-and-Toxicology/amadeus/graph/badge.svg?token=enftVpFDNF" alt="codecov"></a> <a href="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/lint.yaml" class="external-link"><img src="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/lint.yaml/badge.svg" alt="lint"></a> <a href="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/pkgdown.yaml" class="external-link"><img src="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/actions/workflows/pkgdown.yaml/badge.svg" alt="pkgdown"></a></p>
+<p><a href="https://github.com/kyle-messier/amadeus/actions/workflows/check-standard.yaml" class="external-link"><img src="https://github.com/kyle-messier/amadeus/actions/workflows/check-standard.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://github.com/kyle-messier/amadeus/actions/workflows/test-coverage.yaml" class="external-link"><img src="https://github.com/kyle-messier/amadeus/actions/workflows/test-coverage.yaml/badge.svg" alt="test-coverage"></a> <a href="https://codecov.io/gh/kyle-messier/amadeus" class="external-link"><img src="https://codecov.io/gh/kyle-messier/amadeus/graph/badge.svg?token=enftVpFDNF" alt="codecov"></a> <a href="https://github.com/kyle-messier/amadeus/actions/workflows/lint.yaml" class="external-link"><img src="https://github.com/kyle-messier/amadeus/actions/workflows/lint.yaml/badge.svg" alt="lint"></a> <a href="https://github.com/kyle-messier/amadeus/actions/workflows/pkgdown.yaml" class="external-link"><img src="https://github.com/kyle-messier/amadeus/actions/workflows/pkgdown.yaml/badge.svg" alt="pkgdown"></a></p>
 <p><strong>A</strong> <strong>M</strong>echanism/<strong>M</strong>achine for <strong>D</strong>ata, <strong>E</strong>nvironments, and <strong>U</strong>ser <strong>S</strong>etup</p>
-<p><code>amadeus</code> is an R package devloped to improve and expideite users’ access to large, publicly available geospatial data sets. The functions in <code>amadeus</code> allow users to download and import cleaned geospatial data directly in R, useful for automated run scripts, analysis pipelines, and reproducible science in general.</p>
+<p><code>amadeus</code> is an R package devloped to improve and expideite users’ access to large, publicly available geospatial datasets. The functions in <code>amadeus</code> allow users to download and import cleaned geospatial data directly in R, useful for automated run scripts, analysis pipelines, and reproducible science in general.</p>
 <div class="section level2">
 <h2 id="download">Download<a class="anchor" aria-label="anchor" href="#download"></a>
 </h2>
@@ -167,10 +167,11 @@ Requested files have been downloaded.
 <div class="section level2">
 <h2 id="process">Process<a class="anchor" aria-label="anchor" href="#process"></a>
 </h2>
-<p><code>process()</code> imports and cleans raw geospatial data (downloaded with <code>download()</code>), and returns a single <code>SpatRaster</code> or <code>SpatVector</code> into the user’s R environment. <code>process()</code> “cleans” the data by defining interpretable layer names, ensuring a coordinate reference system is present, and managing <code>time</code> data (if applicable).</p>
-<p>To avoid errors when using <code>process()</code>, <strong>do not edit the raw downloaded data files</strong>. Passing user-generated or edited data into <code>procces()</code> may result in errors as the underlying functions are adapted to each sources’ raw data file type.</p>
-<p>Example use of <code>process()</code> using downloaded “weasd” data.</p>
-<pre><code>&gt; weasd &lt;- process_narr(
+<p><code><a href="reference/process_covariates.html">process_covariates()</a></code> imports and cleans raw geospatial data (downloaded with <code><a href="reference/download_data.html">download_data()</a></code>), and returns a single <code>SpatRaster</code> or <code>SpatVector</code> into the user’s R environment. <code><a href="reference/process_covariates.html">process_covariates()</a></code> “cleans” the data by defining interpretable layer names, ensuring a coordinate reference system is present, and managing <code>time</code> data (if applicable).</p>
+<p>To avoid errors when using <code><a href="reference/process_covariates.html">process_covariates()</a></code>, <strong>do not edit the raw downloaded data files</strong>. Passing user-generated or edited data into <code><a href="reference/process_covariates.html">process_covariates()</a></code> may result in errors as the underlying functions are adapted to each sources’ raw data file type.</p>
+<p>Example use of <code><a href="reference/process_covariates.html">process_covariates()</a></code> using the downloaded “weasd” data.</p>
+<pre><code>&gt; weasd &lt;- process_covariates(
++   covariate = "narr",
 +   date = c("2022-01-01", "2022-01-05"),
 +   variable = "weasd",
 +   path = path
@@ -194,7 +195,8 @@ time        : 2022-01-01 to 2022-01-05 UTC </code></pre>
 </h2>
 <p><code><a href="reference/calc_covariates.html">calc_covariates()</a></code> stems from the <code>beethoven</code> package, and the <em>air pollution model’s (citation)</em> need for various types of data extracted at precise locations. <code><a href="reference/calc_covariates.html">calc_covariates()</a></code>, therefore, extracts data from the “cleaned” <code>SpatRaster</code> or <code>SpatVector</code> object at user defined locations. Users can choose to buffer the locations. The function returns a <code>data.frame</code> with data extracted at all locations for each layer or row in the <code>SpatRaster</code> or <code>SpatVector</code> object, respectively.</p>
 <p>Example of <code><a href="reference/calc_covariates.html">calc_covariates()</a></code> using processed “weasd” data.</p>
-<pre><code>&gt; weasd_covar &lt;- calc_narr(
+<pre><code>&gt; weasd_covar &lt;- calc_covariates(
++   covariate = "narr",
 +   from = weasd,
 +   locs = locs,
 +   locs_id = "site_id",

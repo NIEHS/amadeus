@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,7 @@ Manware</h4>
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
 <p>The <code>data_download()</code> function was developed to improve
-researchers’ access to publicly available geospatial data sets. Although
+researchers’ access to publicly available geospatial datasets. Although
 the data are already available online, using a web browser to manually
 download hundreds or thousands of data files is slow, arduous, and not
 (efficiently) repeatable. Additionally, as users may not be familiar
@@ -102,7 +102,7 @@ repeated code or automated analysis pipelines.</p>
 <h2 id="data_download">data_download()<a class="anchor" aria-label="anchor" href="#data_download"></a>
 </h2>
 <p><code>data_download()</code> is capable of accessing and downloading
-geospatial data sets, collections, and variables from a variety of
+geospatial datasets, collections, and variables from a variety of
 sources. This wrapper function calls on source-specific data download
 functions, each utilizing a unique combination of input parameters, host
 URL, naming convention, and data formats.</p>
@@ -203,16 +203,14 @@ parameters for each source can be checked with
 <code>names(formals())</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_hms_data</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "date_start"                    "date_end"                     </span></span>
-<span><span class="co">##  [3] "data_format"                   "directory_to_download"        </span></span>
-<span><span class="co">##  [5] "directory_to_save"             "data_download_acknowledgement"</span></span>
-<span><span class="co">##  [7] "download"                      "remove_command"               </span></span>
-<span><span class="co">##  [9] "unzip"                         "remove_zip"</span></span></code></pre>
+<pre><code><span><span class="co">##  [1] "data_format"           "date_start"            "date_end"             </span></span>
+<span><span class="co">##  [4] "directory_to_download" "directory_to_save"     "acknowledgement"      </span></span>
+<span><span class="co">##  [7] "download"              "remove_command"        "unzip"                </span></span>
+<span><span class="co">## [10] "remove_zip"</span></span></code></pre>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_narr_monolevel_data</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "year_start"                    "year_end"                     </span></span>
-<span><span class="co">## [3] "variables"                     "directory_to_save"            </span></span>
-<span><span class="co">## [5] "data_download_acknowledgement" "download"                     </span></span>
+<pre><code><span><span class="co">## [1] "variables"         "year_start"        "year_end"         </span></span>
+<span><span class="co">## [4] "directory_to_save" "acknowledgement"   "download"         </span></span>
 <span><span class="co">## [7] "remove_command"</span></span></code></pre>
 <p>The two functions have different required parameters because
 <code><a href="../reference/download_hms_data.html">download_hms_data()</a></code> uses a daily temporal resolution while
@@ -225,9 +223,9 @@ some common, standard parameters.</p>
 functions.</p>
 <table class="table">
 <colgroup>
-<col width="14%">
-<col width="4%">
-<col width="80%">
+<col width="9%">
+<col width="5%">
+<col width="85%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Parameter</th>
@@ -242,7 +240,7 @@ functions.</p>
 Default = ‘./input/DATASET_NAME/’.</td>
 </tr>
 <tr class="even">
-<td align="left">data_download_acknowledgement</td>
+<td align="left">acknowledgement</td>
 <td align="left">Logical</td>
 <td align="left">User must acknowledge that downloading geospatial data
 can be very lage and may use lots of machine storage and memory.</td>
@@ -351,7 +349,7 @@ based on the fixed pattern.</p>
 <h4 id="generate-download-file-names">3. Generate download file names<a class="anchor" aria-label="anchor" href="#generate-download-file-names"></a>
 </h4>
 <p>The generation of download file names also follows a fixed pattern,
-typically a combination of the user-defined download directory, data set
+typically a combination of the user-defined download directory, dataset
 name, spatiotemporal characteristic, data type, and, if applicable,
 specific variable name. Unlike the download URLs, the download file
 names can be defined in any way by the writer of the function, but using
@@ -404,7 +402,7 @@ arguments and flags.</p></li>
 download allows for unit testing and URL checking (more on this in <a href="#unit-tests">Unit Tests</a>).</p></li>
 </ul>
 <p>The text file containing the download commands is named based on the
-data set, temporal range, and data transfer method.</p>
+dataset, temporal range, and data transfer method.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">commands_txt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
 <span>  <span class="va">directory_to_download</span>,</span>
@@ -664,7 +662,7 @@ response status codes</a>.</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p><code><a href="../reference/check_urls.html">check_urls()</a></code> applies <code><a href="../reference/check_url_status.html">check_url_status()</a></code> to
 a random sample of URLs extracted by <code><a href="../reference/extract_urls.html">extract_urls()</a></code>. The
-sample size will vary based on the data set and spatio-temporal
+sample size will vary based on the dataset and spatio-temporal
 parameters being tested. The function returns a logical vector
 containing the output from <code><a href="../reference/check_url_status.html">check_url_status()</a></code>.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
@@ -691,7 +689,7 @@ containing the output from <code><a href="../reference/check_url_status.html">ch
 <h3 id="testthat">testthat<a class="anchor" aria-label="anchor" href="#testthat"></a>
 </h3>
 <p>To demonstrate a test in action, test the URLs generated by
-<code><a href="../reference/download_data.html">download_data()</a></code> for the NOAA HMS Smoke data set.</p>
+<code><a href="../reference/download_data.html">download_data()</a></code> for the NOAA HMS Smoke dataset.</p>
 <p>For more information see <a href="https://testthat.r-lib.org/" class="external-link">testthat</a>.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org" class="external-link">testthat</a></span><span class="op">)</span></span>
@@ -710,7 +708,7 @@ containing the output from <code><a href="../reference/check_url_status.html">ch
 <span>      data_format <span class="op">=</span> <span class="st">"Shapefile"</span>,</span>
 <span>      directory_to_download <span class="op">=</span> <span class="va">test_directory</span>,</span>
 <span>      directory_to_save <span class="op">=</span> <span class="va">test_directory</span>,</span>
-<span>      data_download_acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>      acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>      download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      remove_command <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      unzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -739,7 +737,7 @@ containing the output from <code><a href="../reference/check_url_status.html">ch
 <span><span class="co">## Downloaded files will not be unzipped.</span></span>
 <span><span class="co">## Downloaded files will not be unzipped.</span></span>
 <span><span class="co">## Downloaded files will not be unzipped.</span></span>
-<span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🥳</span></span></code></pre>
+<span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🎊</span></span></code></pre>
 <p>Although the <code>testthat::test_that(...)</code> chunk contains 32
 lines of code, the unit test is performed by
 <code>expect_true(all(url_status))</code>. In words, this line is
@@ -770,7 +768,7 @@ source-specific download function returns an error.</p>
 <span>        data_format <span class="op">=</span> <span class="st">"Shapefile"</span>,</span>
 <span>        directory_to_download <span class="op">=</span> <span class="va">test_directory</span>,</span>
 <span>        directory_to_save <span class="op">=</span> <span class="va">test_directory</span>,</span>
-<span>        data_download_acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>        acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>        download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>        remove_command <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>        unzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -779,14 +777,14 @@ source-specific download function returns an error.</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## &lt;simpleError in what_to_run(directory_to_save = directory_to_save, data_download_acknowledgement = data_download_acknowledgement,     ...): Invalid date returns HTTP code 404. Check `date_start` parameter.</span></span>
+<pre><code><span><span class="co">## &lt;simpleError in what_to_run(directory_to_save = directory_to_save, acknowledgement = acknowledgement,     ...): Invalid date returns HTTP code 404. Check `date_start` parameter.</span></span>
 <span><span class="co">## &gt;</span></span>
-<span><span class="co">## function (date_start = "2023-09-01", date_end = "2023-09-01", </span></span>
-<span><span class="co">##     data_format = "Shapefile", directory_to_download = NULL, </span></span>
-<span><span class="co">##     directory_to_save = NULL, data_download_acknowledgement = FALSE, </span></span>
-<span><span class="co">##     download = FALSE, remove_command = FALSE, unzip = TRUE, remove_zip = FALSE) </span></span>
+<span><span class="co">## function (data_format = "Shapefile", date_start = "2023-09-01", </span></span>
+<span><span class="co">##     date_end = "2023-09-01", directory_to_download = NULL, directory_to_save = NULL, </span></span>
+<span><span class="co">##     acknowledgement = FALSE, download = FALSE, remove_command = FALSE, </span></span>
+<span><span class="co">##     unzip = TRUE, remove_zip = FALSE) </span></span>
 <span><span class="co">## NULL</span></span>
-<span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🥇</span></span></code></pre>
+<span><span class="co">## <span style="color: #00BB00;">Test passed</span> 😸</span></span></code></pre>
 <p>This test utilizes <code><a href="https://testthat.r-lib.org/reference/expect_error.html" class="external-link">expect_error()</a></code> because the
 <code>data_download()</code> wrapper function returns an error message
 if the underlying source-specific download function returns an error. If
@@ -808,7 +806,7 @@ expect and receive an error.</p>
 <span>        data_format <span class="op">=</span> <span class="st">"Shapefile"</span>,</span>
 <span>        directory_to_download <span class="op">=</span> <span class="va">test_directory</span>,</span>
 <span>        directory_to_save <span class="op">=</span> <span class="va">test_directory</span>,</span>
-<span>        data_download_acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>        acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>        download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>        remove_command <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>        unzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -817,8 +815,8 @@ expect and receive an error.</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🎉</span></span></code></pre>
-<p>As expected, the test passes because the NOAA HMS Smoke data set does
+<pre><code><span><span class="co">## <span style="color: #00BB00;">Test passed</span> 😸</span></span></code></pre>
+<p>As expected, the test passes because the NOAA HMS Smoke dataset does
 not contain data for January 1-2, 1800.</p>
 <p>These unit tests are just two of many implemented on
 <code><a href="../reference/download_data.html">download_data()</a></code> and the accompanying source-specific
@@ -834,18 +832,17 @@ can now perform a data download. To begin, check the parameters required
 by the source-specific data download function.</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_hms_data</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "date_start"                    "date_end"                     </span></span>
-<span><span class="co">##  [3] "data_format"                   "directory_to_download"        </span></span>
-<span><span class="co">##  [5] "directory_to_save"             "data_download_acknowledgement"</span></span>
-<span><span class="co">##  [7] "download"                      "remove_command"               </span></span>
-<span><span class="co">##  [9] "unzip"                         "remove_zip"</span></span></code></pre>
+<pre><code><span><span class="co">##  [1] "data_format"           "date_start"            "date_end"             </span></span>
+<span><span class="co">##  [4] "directory_to_download" "directory_to_save"     "acknowledgement"      </span></span>
+<span><span class="co">##  [7] "download"              "remove_command"        "unzip"                </span></span>
+<span><span class="co">## [10] "remove_zip"</span></span></code></pre>
 <p>Define the parameters.</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">date_start</span> <span class="op">&lt;-</span> <span class="st">"2023-12-28"</span></span>
 <span><span class="va">date_end</span> <span class="op">&lt;-</span> <span class="st">"2024-01-02"</span></span>
 <span><span class="va">data_format</span> <span class="op">&lt;-</span> <span class="st">"Shapefile"</span></span>
 <span><span class="va">data_directory</span> <span class="op">&lt;-</span> <span class="st">"./download_example/"</span></span>
-<span><span class="va">data_download_acknowledgement</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span><span class="va">acknowledgement</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span><span class="va">download</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># run data download</span></span>
 <span><span class="va">remove_command</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># delete "...commands.txt" file</span></span>
 <span><span class="va">unzip</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># inflate (unzip) downloaded zip files</span></span>
@@ -858,7 +855,7 @@ by the source-specific data download function.</p>
 <span>  date_end <span class="op">=</span> <span class="va">date_end</span>,</span>
 <span>  directory_to_download <span class="op">=</span> <span class="va">data_directory</span>,</span>
 <span>  directory_to_save <span class="op">=</span> <span class="va">data_directory</span>,</span>
-<span>  data_download_acknowledgement <span class="op">=</span> <span class="va">data_download_acknowledgement</span>,</span>
+<span>  acknowledgement <span class="op">=</span> <span class="va">acknowledgement</span>,</span>
 <span>  download <span class="op">=</span> <span class="va">download</span>,</span>
 <span>  remove_command <span class="op">=</span> <span class="va">remove_command</span>,</span>
 <span>  unzip <span class="op">=</span> <span class="va">unzip</span>,</span>
@@ -918,7 +915,7 @@ prepared, the data download functions will return an error.</p>
 <span>  data_resolution <span class="op">=</span> <span class="st">"60 minute"</span>,</span>
 <span>  directory_to_download <span class="op">=</span> <span class="st">"./sedac_population/"</span>,</span>
 <span>  directory_to_save <span class="op">=</span> <span class="st">"./sedac_population"</span>,</span>
-<span>  data_download_acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  unzip <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  remove_zip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -939,7 +936,7 @@ downloaded properly.</p>
 <p>Visit <a href="http://urs.earthdata.nasa.gov" class="external-link">https://urs.earthdata.nasa.gov/</a>
 to register for or log into a NASA EarthData account.</p>
 <div class="float">
-<img src="../inst/extdata/vignette_images/NASA_EarthData_login.png" alt="NASA EarthData Account Landing Page"><div class="figcaption">NASA EarthData Account Landing Page</div>
+<img src="images/NASA_EarthData_login.png" alt="NASA EarthData Account Landing Page"><div class="figcaption">NASA EarthData Account Landing Page</div>
 </div>
 <p>Account registration provides access to NASA’s Earth Observing System
 Data and Information System (EOSDIS) and its twelve Distributed Active
@@ -973,7 +970,7 @@ credentials. For this example, ensure that authorization is enabled for
 “SEDAC Website”, “SEDAC Website (Alpha)”, and “SEDAC Website
 (Beta)”.</p>
 <div class="float">
-<img src="../inst/extdata/vignette_images/NASA_EarthData_applications.png" alt="NASA EarthData Approved Applications"><div class="figcaption">NASA EarthData Approved Applications</div>
+<img src="images/NASA_EarthData_applications.png" alt="NASA EarthData Approved Applications"><div class="figcaption">NASA EarthData Approved Applications</div>
 </div>
 </div>
 <div class="section level3">
@@ -1112,7 +1109,7 @@ error.</p>
 <span>  data_resolution <span class="op">=</span> <span class="st">"60 minute"</span>,</span>
 <span>  directory_to_download <span class="op">=</span> <span class="st">"./sedac_population/"</span>,</span>
 <span>  directory_to_save <span class="op">=</span> <span class="st">"./sedac_population"</span>,</span>
-<span>  data_download_acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  unzip <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  remove_zip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -1149,12 +1146,12 @@ Aeronautics and Space Administration (NASA)</em>. Date accessed: January
 <code><a href="../reference/download_hms_data.html">download_hms_data()</a></code>.</p>
 <div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">download_hms_data</span></span></code></pre></div>
-<pre><code><span><span class="co">## function (date_start = "2023-09-01", date_end = "2023-09-01", </span></span>
-<span><span class="co">##     data_format = "Shapefile", directory_to_download = NULL, </span></span>
-<span><span class="co">##     directory_to_save = NULL, data_download_acknowledgement = FALSE, </span></span>
-<span><span class="co">##     download = FALSE, remove_command = FALSE, unzip = TRUE, remove_zip = FALSE) </span></span>
+<pre><code><span><span class="co">## function (data_format = "Shapefile", date_start = "2023-09-01", </span></span>
+<span><span class="co">##     date_end = "2023-09-01", directory_to_download = NULL, directory_to_save = NULL, </span></span>
+<span><span class="co">##     acknowledgement = FALSE, download = FALSE, remove_command = FALSE, </span></span>
+<span><span class="co">##     unzip = TRUE, remove_zip = FALSE) </span></span>
 <span><span class="co">## {</span></span>
-<span><span class="co">##     download_permit(data_download_acknowledgement = data_download_acknowledgement)</span></span>
+<span><span class="co">##     download_permit(acknowledgement = acknowledgement)</span></span>
 <span><span class="co">##     check_for_null_parameters(mget(ls()))</span></span>
 <span><span class="co">##     download_setup_dir(directory_to_download)</span></span>
 <span><span class="co">##     download_setup_dir(directory_to_save)</span></span>
@@ -1213,7 +1210,7 @@ Aeronautics and Space Administration (NASA)</em>. Date accessed: January
 <span><span class="co">##     }</span></span>
 <span><span class="co">##     download_remove_zips(remove = remove_zip, download_name = download_names)</span></span>
 <span><span class="co">## }</span></span>
-<span><span class="co">## &lt;bytecode: 0x563bd8487d38&gt;</span></span></code></pre>
+<span><span class="co">## &lt;bytecode: 0x60bcf20194e8&gt;</span></span></code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

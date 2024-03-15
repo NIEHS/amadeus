@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,9 +48,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
       
-      
+      <h3 id="download">Download<a class="anchor" aria-label="anchor" href="#download"></a></h3>
+      <p class="section-desc"></p><p>Functions which download data from URLs</p>
 
       
     </div><div id="" class="section level2">
@@ -60,160 +60,44 @@
 
       <dl><dt>
           
-          <code><a href="as_mysftime.html">as_mysftime()</a></code> 
+          <code><a href="download_data.html">download_data()</a></code> 
         </dt>
-        <dd>Convert to sftime object on the form adapted to beethoven code</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_covariates.html">calc_covariates()</a></code> 
-        </dt>
-        <dd>Calculate covariates</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_ecoregion.html">calc_ecoregion()</a></code> 
-        </dt>
-        <dd>Calculate EPA Ecoregions level 2/3 binary variables</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_geos.html">calc_geos()</a></code> 
-        </dt>
-        <dd>Calculate NASA GEOS-CF meteorological and atmospheric covariates</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_gmted.html">calc_gmted()</a></code> 
-        </dt>
-        <dd>Calculate GMTED elevation covariates</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_hms.html">calc_hms()</a></code> 
-        </dt>
-        <dd>Calculate NOAA HMS Wildfire Smoke covariates</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_koppen_geiger.html">calc_koppen_geiger()</a></code> 
-        </dt>
-        <dd>Calculate Koeppen-Geiger climate zone binary variables</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_modis_daily.html">calc_modis_daily()</a></code> 
-        </dt>
-        <dd>A single-date MODIS worker for parallelization</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_modis_par.html">calc_modis_par()</a></code> 
-        </dt>
-        <dd>Calculate MODIS product covariates in multiple CPU threads</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_narr.html">calc_narr()</a></code> 
-        </dt>
-        <dd>Calculate NOAA NCEP North American Regional Reanalysis meteorological
-and atmospheric covariates</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_nei.html">calc_nei()</a></code> 
-        </dt>
-        <dd>Calculate National Emission Inventory (NEI) covariates</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_nlcd_ratio.html">calc_nlcd_ratio()</a></code> 
-        </dt>
-        <dd>Compute land cover classes ratio in circle buffers around points</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_sedac_groads.html">calc_sedac_groads()</a></code> 
-        </dt>
-        <dd>Calculate SEDAC groads density covariates</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_sedac_population.html">calc_sedac_population()</a></code> 
-        </dt>
-        <dd>Calculate UN WPP-Ajusted population density covariates</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_sedc.html">calc_sedc()</a></code> 
-        </dt>
-        <dd>Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_temporal_dummies.html">calc_temporal_dummies()</a></code> 
-        </dt>
-        <dd>Calculate temporal dummy variables</dd>
-      </dl><dl><dt>
-          
-          <code><a href="calc_tri.html">calc_tri()</a></code> 
-        </dt>
-        <dd>Calculate TRI covariates</dd>
-      </dl><dl><dt>
-          
-          <code><a href="check_for_null_parameters.html">check_for_null_parameters()</a></code> 
-        </dt>
-        <dd>Check for null arguments</dd>
-      </dl><dl><dt>
-          
-          <code><a href="check_mysf.html">check_mysf()</a></code> 
-        </dt>
-        <dd>Check if the sf object is formated on a specific way</dd>
-      </dl><dl><dt>
-          
-          <code><a href="check_mysftime.html">check_mysftime()</a></code> 
-        </dt>
-        <dd>Check if the sftime object is formated on a specific way</dd>
-      </dl><dl><dt>
-          
-          <code><a href="check_url_status.html">check_url_status()</a></code> 
-        </dt>
-        <dd>Check if sample of download URLs have HTTP Status 200</dd>
-      </dl><dl><dt>
-          
-          <code><a href="check_urls.html">check_urls()</a></code> 
-        </dt>
-        <dd>Sample download URLs and apply <code>check_url_status</code> function</dd>
+        <dd>Download raw data wrapper function</dd>
       </dl><dl><dt>
           
           <code><a href="download_aqs_data.html">download_aqs_data()</a></code> 
         </dt>
-        <dd>Download daily data from AQS datamart</dd>
-      </dl><dl><dt>
-          
-          <code><a href="download_data.html">download_data()</a></code> 
-        </dt>
-        <dd>Download raw data from sources</dd>
+        <dd>Download air quality data</dd>
       </dl><dl><dt>
           
           <code><a href="download_ecoregion_data.html">download_ecoregion_data()</a></code> 
         </dt>
-        <dd>Download Ecoregion Shapefiles from EPA</dd>
-      </dl><dl><dt>
-          
-          <code><a href="download_epa_certificate.html">download_epa_certificate()</a></code> 
-        </dt>
-        <dd>Check EPA Certificate</dd>
+        <dd>Download ecoregion data</dd>
       </dl><dl><dt>
           
           <code><a href="download_geos_data.html">download_geos_data()</a></code> 
         </dt>
-        <dd>Download atmospheric composition data from the NASA Global Earth Observing System (GEOS) model.</dd>
+        <dd>Download atmospheric composition data</dd>
       </dl><dl><dt>
           
           <code><a href="download_gmted_data.html">download_gmted_data()</a></code> 
         </dt>
-        <dd>Download global elevation data from the Global Multi-resolution Terrain Elevation Data (GMTED2010).</dd>
+        <dd>Download elevation data</dd>
       </dl><dl><dt>
           
           <code><a href="download_hms_data.html">download_hms_data()</a></code> 
         </dt>
-        <dd>Download daily wildfire smoke plume data from NOAA Hazard Mapping System Fire and Smoke Product</dd>
+        <dd>Download wildfire smoke data</dd>
       </dl><dl><dt>
           
           <code><a href="download_koppen_geiger_data.html">download_koppen_geiger_data()</a></code> 
         </dt>
-        <dd>Download climate classification data from the present and future Köppen-Geiger climate classification maps.</dd>
+        <dd>Download climate classification data</dd>
       </dl><dl><dt>
           
           <code><a href="download_merra2_data.html">download_merra2_data()</a></code> 
         </dt>
-        <dd>Download meteorological and atmospheric data from the Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model.</dd>
+        <dd>Download meteorological and atmospheric data</dd>
       </dl><dl><dt>
           
           <code><a href="download_modis_data.html">download_modis_data()</a></code> 
@@ -223,108 +107,58 @@ and atmospheric covariates</dd>
           
           <code><a href="download_narr_monolevel_data.html">download_narr_monolevel_data()</a></code> 
         </dt>
-        <dd>download_narr_monolevel_data: download monolevel meteorological data from NOAA NCEP North American Regional Reanalysis (NARR) model.</dd>
+        <dd>Download meteorological data (monolevel)</dd>
       </dl><dl><dt>
           
           <code><a href="download_narr_p_levels_data.html">download_narr_p_levels_data()</a></code> 
         </dt>
-        <dd>Download pressure level meteorological data from NOAA NCEP North American Regional Reanalysis (NARR) model.</dd>
+        <dd>Download meteorological data (pressure levels)</dd>
       </dl><dl><dt>
           
           <code><a href="download_nei_data.html">download_nei_data()</a></code> 
         </dt>
-        <dd>Download data from EPA National Emission Inventory aggregated on-road emission data</dd>
+        <dd>Download road emissions data</dd>
       </dl><dl><dt>
           
           <code><a href="download_nlcd_data.html">download_nlcd_data()</a></code> 
         </dt>
-        <dd>Download land cover data from the National Land Cover Database Science Research Products.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="download_permit.html">download_permit()</a></code> 
-        </dt>
-        <dd>Check for data download acknowledgement</dd>
-      </dl><dl><dt>
-          
-          <code><a href="download_remove_command.html">download_remove_command()</a></code> 
-        </dt>
-        <dd>Remove or keep wget command file</dd>
-      </dl><dl><dt>
-          
-          <code><a href="download_remove_zips.html">download_remove_zips()</a></code> 
-        </dt>
-        <dd>Remove downloaded zip files</dd>
-      </dl><dl><dt>
-          
-          <code><a href="download_run.html">download_run()</a></code> 
-        </dt>
-        <dd>download_run: execute or skip <code>system_command</code>
-in data download function.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="download_sanitize_path.html">download_sanitize_path()</a></code> 
-        </dt>
-        <dd>Sanitize path to end with a forward slash</dd>
+        <dd>Download land cover data</dd>
       </dl><dl><dt>
           
           <code><a href="download_sedac_groads_data.html">download_sedac_groads_data()</a></code> 
         </dt>
-        <dd>Download Global Roads Open Access Data Set (gROADS), v1 (1980-2010) data from NASA Socioeconomic Data and Applications Center (SEDAC).</dd>
+        <dd>Download roads data</dd>
       </dl><dl><dt>
           
           <code><a href="download_sedac_population_data.html">download_sedac_population_data()</a></code> 
         </dt>
-        <dd>Download UN WPP-Adjusted population density data from NASA Socioeconomic Data and Applications Center (SEDAC)</dd>
-      </dl><dl><dt>
-          
-          <code><a href="download_setup_dir.html">download_setup_dir()</a></code> 
-        </dt>
-        <dd>Check if input directory exists</dd>
-      </dl><dl><dt>
-          
-          <code><a href="download_sink.html">download_sink()</a></code> 
-        </dt>
-        <dd>Start sink download commands into a text file</dd>
+        <dd>Download population density data</dd>
       </dl><dl><dt>
           
           <code><a href="download_tri_data.html">download_tri_data()</a></code> 
         </dt>
-        <dd>Download data from EPA toxic release inventory</dd>
-      </dl><dl><dt>
+        <dd>Download toxic release data</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="process">Process<a class="anchor" aria-label="anchor" href="#process"></a></h3>
+      <p class="section-desc"></p><p>Functions which import and clean raw data</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
-          <code><a href="download_unzip.html">download_unzip()</a></code> 
+          <code><a href="process_covariates.html">process_covariates()</a></code> 
         </dt>
-        <dd>Unzip downloaded data</dd>
-      </dl><dl><dt>
-          
-          <code><a href="dt_as_mysftime.html">dt_as_mysftime()</a></code> 
-        </dt>
-        <dd>Create a sftime from a datatable</dd>
-      </dl><dl><dt>
-          
-          <code><a href="extract_urls.html">extract_urls()</a></code> 
-        </dt>
-        <dd>Extract URLs from download commands</dd>
-      </dl><dl><dt>
-          
-          <code><a href="generate_date_sequence.html">generate_date_sequence()</a></code> 
-        </dt>
-        <dd>Generate sequence of dates based on <code>date_start</code> and <code>date_end</code>.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="generate_time_sequence.html">generate_time_sequence()</a></code> 
-        </dt>
-        <dd>Generate time sequence based on GEOS-CF data collection.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="is_date_proper.html">is_date_proper()</a></code> 
-        </dt>
-        <dd>Check input strings conform to the required format</dd>
+        <dd>Process raw data wrapper function</dd>
       </dl><dl><dt>
           
           <code><a href="process_aqs.html">process_aqs()</a></code> 
         </dt>
-        <dd>Filter unique AQS sites with or without temporal information</dd>
+        <dd>Process unique U.S. EPA AQS sites</dd>
       </dl><dl><dt>
           
           <code><a href="process_bluemarble.html">process_bluemarble()</a></code> 
@@ -334,7 +168,12 @@ in data download function.</dd>
           
           <code><a href="process_bluemarble_corners.html">process_bluemarble_corners()</a></code> 
         </dt>
-        <dd>Tile corner generator for Blue Marble products</dd>
+        <dd>Process Blue Marble corners</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_collection.html">process_collection()</a></code> 
+        </dt>
+        <dd>Process GEOS-CF and MERRA2 collection codes</dd>
       </dl><dl><dt>
           
           <code><a href="process_conformity.html">process_conformity()</a></code> 
@@ -342,79 +181,59 @@ in data download function.</dd>
         <dd>Check input assumptions</dd>
       </dl><dl><dt>
           
-          <code><a href="process_covariates.html">process_covariates()</a></code> 
-        </dt>
-        <dd>Process covariates</dd>
-      </dl><dl><dt>
-          
           <code><a href="process_ecoregion.html">process_ecoregion()</a></code> 
         </dt>
-        <dd>Process EPA Ecoregion shapefiles</dd>
+        <dd>Process ecoregion data</dd>
       </dl><dl><dt>
           
           <code><a href="process_flatten_sds.html">process_flatten_sds()</a></code> 
         </dt>
-        <dd>Aggregate layers in a sub-dataset in sinusoidal MODIS products</dd>
+        <dd>Process MODIS layers</dd>
       </dl><dl><dt>
           
           <code><a href="process_geos.html">process_geos()</a></code> 
         </dt>
-        <dd>Import and clean GEOS-CF data downloaded with
-<code>download_geos_data</code> or <code>download_data(dataset_name = "geos")</code>. Function
-returns a SpatRast object containing the user-defined variables of interest.
-Layer names indicate the variable, pressure level, date (YYYYMMDD), and, if
-applicable, the hour (HHMMSS).</dd>
-      </dl><dl><dt>
-          
-          <code><a href="process_geos_collection.html">process_geos_collection()</a></code> 
-        </dt>
-        <dd>Identify GEOS-CF collection based on user-defined file paths</dd>
+        <dd>Process atmospheric composition data</dd>
       </dl><dl><dt>
           
           <code><a href="process_gmted.html">process_gmted()</a></code> 
         </dt>
-        <dd>Import and clean Global Multi-resolution Terrain Elevation Data (GMTED2010)
-downloaded with <code>download_gmted</code> or <code>download_data(dataset_name = "gmted")</code>.
-Function returns a SpatRast object containing the user-defined variable
-of interest at specified resolution. Layer name indicates variable and
-resolution.</dd>
+        <dd>Process elevation data</dd>
       </dl><dl><dt>
           
           <code><a href="process_gmted_codes.html">process_gmted_codes()</a></code> 
         </dt>
-        <dd>Generate statistic and resolution codes based on GMTED statistic and
-resolution.</dd>
+        <dd>Process elevation statistic and resolution codes</dd>
       </dl><dl><dt>
           
           <code><a href="process_hms.html">process_hms()</a></code> 
         </dt>
-        <dd>Import and clean wildfire smoke plume coverage data from NOAA Hazard
-Mapping System Fire and Smoke Product.</dd>
+        <dd>Process wildfire smoke data</dd>
       </dl><dl><dt>
           
           <code><a href="process_koppen_geiger.html">process_koppen_geiger()</a></code> 
         </dt>
-        <dd>Process Koeppen-Geiger climate data</dd>
+        <dd>Process climate classification data</dd>
       </dl><dl><dt>
           
-          <code><a href="process_locs_radius.html">process_locs_radius()</a></code> 
+          <code><a href="process_merra2.html">process_merra2()</a></code> 
         </dt>
-        <dd>Create circular buffer around site points.</dd>
+        <dd>Process meteorological and atmospheric data</dd>
       </dl><dl><dt>
           
-          <code><a href="process_locs_vector.html">process_locs_vector()</a></code> 
+          <code><a href="process_merra2_time.html">process_merra2_time()</a></code> 
         </dt>
-        <dd>Import and prepare site point locations for covariate calculations.</dd>
+        <dd>Process MERRA2 time steps</dd>
       </dl><dl><dt>
           
           <code><a href="process_modis_merge.html">process_modis_merge()</a></code> 
         </dt>
-        <dd>Get mosaicked or merged raster from multiple MODIS hdf files</dd>
+        <dd>Process MODIS .hdf files</dd>
       </dl><dl><dt>
           
           <code><a href="process_modis_sds.html">process_modis_sds()</a></code> 
         </dt>
-        <dd>Selected MODIS sinusoidal grid product subdataset name selector</dd>
+        <dd>Process MODIS sub-datasets</dd>
       </dl><dl><dt>
           
           <code><a href="process_modis_swath.html">process_modis_swath()</a></code> 
@@ -429,106 +248,268 @@ Mapping System Fire and Smoke Product.</dd>
           
           <code><a href="process_narr.html">process_narr()</a></code> 
         </dt>
-        <dd>Import and clean NOAA NCEP North American Regional Reanalysis (NARR) data
-downloaded with <code>download_narr</code> or <code>download_data(dataset_name = "NARR")</code>.
-Function returns a SpatRast object containing the user-defined variable
-of interest. Layer names indicate the variable, pressure level, and date
-(YYYYMMDD).</dd>
+        <dd>Process meteorological data</dd>
       </dl><dl><dt>
           
           <code><a href="process_nei.html">process_nei()</a></code> 
         </dt>
-        <dd>Prepare National Emission Inventory CSV files</dd>
+        <dd>Process road emissions data</dd>
       </dl><dl><dt>
           
           <code><a href="process_nlcd.html">process_nlcd()</a></code> 
         </dt>
-        <dd>Process raw National Landuse Classification Dataset</dd>
+        <dd>Process land cover data</dd>
       </dl><dl><dt>
           
           <code><a href="process_sedac_codes.html">process_sedac_codes()</a></code> 
         </dt>
-        <dd>Generate resolution codes based on NASA SEDAC population resolution.</dd>
+        <dd>Process population resolution code</dd>
       </dl><dl><dt>
           
           <code><a href="process_sedac_groads.html">process_sedac_groads()</a></code> 
         </dt>
-        <dd>Import and clean groads data from NASA Socioeconomic Data and Applications Center (SEDAC).</dd>
+        <dd>Process roads data</dd>
       </dl><dl><dt>
           
           <code><a href="process_sedac_population.html">process_sedac_population()</a></code> 
         </dt>
-        <dd>Import and clean population data from NASA Socioeconomic Data and Applications Center (SEDAC).</dd>
+        <dd>Process population density data</dd>
       </dl><dl><dt>
           
           <code><a href="process_tri.html">process_tri()</a></code> 
         </dt>
-        <dd>Prepare Toxic Release Inventory (TRI) data</dd>
+        <dd>Process toxic release data</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="covariates">Covariates<a class="anchor" aria-label="anchor" href="#covariates"></a></h3>
+      <p class="section-desc"></p><p>Functions which extract data values at user-defined points</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="calc_covariates.html">calc_covariates()</a></code> 
+        </dt>
+        <dd>Calculate covariates wrapper function</dd>
       </dl><dl><dt>
           
-          <code><a href="read_commands.html">read_commands()</a></code> 
+          <code><a href="calc_ecoregion.html">calc_ecoregion()</a></code> 
         </dt>
-        <dd>Read commands and convert to character vector</dd>
+        <dd>Calculate ecoregions covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_geos.html">calc_geos()</a></code> 
+        </dt>
+        <dd>Calculate atmospheric composition covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_gmted.html">calc_gmted()</a></code> 
+        </dt>
+        <dd>Calculate elevation covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_hms.html">calc_hms()</a></code> 
+        </dt>
+        <dd>Calculate wildfire smoke covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_koppen_geiger.html">calc_koppen_geiger()</a></code> 
+        </dt>
+        <dd>Calculate climate classification covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_merra2.html">calc_merra2()</a></code> 
+        </dt>
+        <dd>Calculate meteorological and atmospheric covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_modis_daily.html">calc_modis_daily()</a></code> 
+        </dt>
+        <dd>A single-date MODIS worker for parallelization</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_modis_par.html">calc_modis_par()</a></code> 
+        </dt>
+        <dd>Calculate MODIS product covariates in multiple CPU threads</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_narr.html">calc_narr()</a></code> 
+        </dt>
+        <dd>Calculate meteorological covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_nei.html">calc_nei()</a></code> 
+        </dt>
+        <dd>Calculate road emissions covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_nlcd.html">calc_nlcd()</a></code> 
+        </dt>
+        <dd>Calculate land cover covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_sedac_groads.html">calc_sedac_groads()</a></code> 
+        </dt>
+        <dd>Calculate roads covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_sedac_population.html">calc_sedac_population()</a></code> 
+        </dt>
+        <dd>Calculate population density covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_sedc.html">calc_sedc()</a></code> 
+        </dt>
+        <dd>Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_temporal_dummies.html">calc_temporal_dummies()</a></code> 
+        </dt>
+        <dd>Calculate temporal dummy covariates</dd>
+      </dl><dl><dt>
+          
+          <code><a href="calc_tri.html">calc_tri()</a></code> 
+        </dt>
+        <dd>Calculate toxic release covariates</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="spatio-temporal">Spatio-Temporal<a class="anchor" aria-label="anchor" href="#spatio-temporal"></a></h3>
+      <p class="section-desc"></p><p>Functions which convert to, from, and between spatio-temporal data types</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="as_mysftime.html">as_mysftime()</a></code> 
+        </dt>
+        <dd>Create an <code>sftime</code> object</dd>
+      </dl><dl><dt>
+          
+          <code><a href="check_mysf.html">check_mysf()</a></code> 
+        </dt>
+        <dd>Check <code>sf</code> object</dd>
+      </dl><dl><dt>
+          
+          <code><a href="check_mysftime.html">check_mysftime()</a></code> 
+        </dt>
+        <dd>Check <code>sftime</code> object</dd>
+      </dl><dl><dt>
+          
+          <code><a href="dt_as_mysftime.html">dt_as_mysftime()</a></code> 
+        </dt>
+        <dd>Convert a <code>data.table</code> to an <code>sftime</code></dd>
       </dl><dl><dt>
           
           <code><a href="rename_time.html">rename_time()</a></code> 
         </dt>
-        <dd>Rename the time column of a sftime object</dd>
+        <dd>Rename <code>$time</code></dd>
       </dl><dl><dt>
           
           <code><a href="sf_as_mysftime.html">sf_as_mysftime()</a></code> 
         </dt>
-        <dd>Convert a sf object to mysftime</dd>
+        <dd>Convert an <code>sf</code> to an <code>sftime</code></dd>
       </dl><dl><dt>
           
           <code><a href="sftime_as_mysftime.html">sftime_as_mysftime()</a></code> 
         </dt>
-        <dd>Convert a sftime object to mysftime</dd>
+        <dd>Convert an <code>sftime</code> to a <code>mysftime</code></dd>
       </dl><dl><dt>
           
           <code><a href="sftime_as_sf.html">sftime_as_sf()</a></code> 
         </dt>
-        <dd>Simplify an sftime to sf class</dd>
+        <dd>Convert an <code>sftime</code> to an <code>sf</code></dd>
       </dl><dl><dt>
           
           <code><a href="sftime_as_spatraster.html">sftime_as_spatraster()</a></code> 
         </dt>
-        <dd>Convert sftime object to SpatRaster
-/!\ can be very time consuming if sftime is not spatially structured</dd>
+        <dd>Convert an <code>sftime</code> to a <code>SpatRaster</code></dd>
       </dl><dl><dt>
           
           <code><a href="sftime_as_spatrds.html">sftime_as_spatrds()</a></code> 
         </dt>
-        <dd>Convert sftime object to SpatVectorDataset
-/!\ running time can be very long if x is not
-spatially and temporally structured</dd>
+        <dd>Convert an <code>sftime</code> to a <code>SpatRasterDataset</code></dd>
       </dl><dl><dt>
           
           <code><a href="sftime_as_spatvector.html">sftime_as_spatvector()</a></code> 
         </dt>
-        <dd>Convert sftime object to SpatVector</dd>
+        <dd>Convert an <code>sftime</code> to a <code>SpatVector</code></dd>
       </dl><dl><dt>
           
           <code><a href="spatraster_as_sftime.html">spatraster_as_sftime()</a></code> 
         </dt>
-        <dd>Create a sftime from a terra::SpatRaster</dd>
+        <dd>Convert a <code>SpatRaster</code> to an <code>sftime</code></dd>
       </dl><dl><dt>
           
           <code><a href="spatrds_as_sftime.html">spatrds_as_sftime()</a></code> 
         </dt>
-        <dd>Create a sftime from a terra::SpatRasterDataset</dd>
+        <dd>Convert a <code>SpatRasterDataset</code> to an <code>sftime</code></dd>
       </dl><dl><dt>
           
           <code><a href="spatvector_as_sftime.html">spatvector_as_sftime()</a></code> 
         </dt>
-        <dd>Create a sftime from a terra::SpatVector</dd>
+        <dd>Convert a <code>SpatVector</code> to an <code>sftime</code></dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="auxillary">Auxillary<a class="anchor" aria-label="anchor" href="#auxillary"></a></h3>
+      <p class="section-desc"></p><p>Functions which support the download, process, and covariate calculation functions</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="check_url_status.html">check_url_status()</a></code> 
+        </dt>
+        <dd>Check HTTP status</dd>
       </dl><dl><dt>
           
-          <code><a href="test_download_functions.html">test_download_functions()</a></code> 
+          <code><a href="check_urls.html">check_urls()</a></code> 
         </dt>
-        <dd>Apply download function-specific unit tests</dd>
+        <dd>Implement <code>check_url_status</code></dd>
+      </dl><dl><dt>
+          
+          <code><a href="generate_date_sequence.html">generate_date_sequence()</a></code> 
+        </dt>
+        <dd>Generate date sequence</dd>
+      </dl><dl><dt>
+          
+          <code><a href="generate_time_sequence.html">generate_time_sequence()</a></code> 
+        </dt>
+        <dd>Generate time sequence</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_collection.html">process_collection()</a></code> 
+        </dt>
+        <dd>Process GEOS-CF and MERRA2 collection codes</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_gmted_codes.html">process_gmted_codes()</a></code> 
+        </dt>
+        <dd>Process elevation statistic and resolution codes</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_merra2_time.html">process_merra2_time()</a></code> 
+        </dt>
+        <dd>Process MERRA2 time steps</dd>
+      </dl><dl><dt>
+          
+          <code><a href="process_sedac_codes.html">process_sedac_codes()</a></code> 
+        </dt>
+        <dd>Process population resolution code</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

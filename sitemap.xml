@@ -43,6 +43,9 @@
     <loc>https://kyle-messier.github.io/amadeus/reference/calc_koppen_geiger.html</loc>
   </url>
   <url>
+    <loc>https://kyle-messier.github.io/amadeus/reference/calc_merra2.html</loc>
+  </url>
+  <url>
     <loc>https://kyle-messier.github.io/amadeus/reference/calc_modis_daily.html</loc>
   </url>
   <url>
@@ -55,7 +58,7 @@
     <loc>https://kyle-messier.github.io/amadeus/reference/calc_nei.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_nlcd_ratio.html</loc>
+    <loc>https://kyle-messier.github.io/amadeus/reference/calc_nlcd.html</loc>
   </url>
   <url>
     <loc>https://kyle-messier.github.io/amadeus/reference/calc_sedac_groads.html</loc>
@@ -190,6 +193,9 @@
     <loc>https://kyle-messier.github.io/amadeus/reference/process_bluemarble_corners.html</loc>
   </url>
   <url>
+    <loc>https://kyle-messier.github.io/amadeus/reference/process_collection.html</loc>
+  </url>
+  <url>
     <loc>https://kyle-messier.github.io/amadeus/reference/process_conformity.html</loc>
   </url>
   <url>
@@ -203,9 +209,6 @@
   </url>
   <url>
     <loc>https://kyle-messier.github.io/amadeus/reference/process_geos.html</loc>
-  </url>
-  <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_geos_collection.html</loc>
   </url>
   <url>
     <loc>https://kyle-messier.github.io/amadeus/reference/process_gmted.html</loc>
@@ -224,6 +227,12 @@
   </url>
   <url>
     <loc>https://kyle-messier.github.io/amadeus/reference/process_locs_vector.html</loc>
+  </url>
+  <url>
+    <loc>https://kyle-messier.github.io/amadeus/reference/process_merra2.html</loc>
+  </url>
+  <url>
+    <loc>https://kyle-messier.github.io/amadeus/reference/process_merra2_time.html</loc>
   </url>
   <url>
     <loc>https://kyle-messier.github.io/amadeus/reference/process_modis_merge.html</loc>

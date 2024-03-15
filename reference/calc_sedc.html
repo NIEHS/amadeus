@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,8 +56,8 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calc_sedc</span><span class="op">(</span></span>
-<span>  locs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  from <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  locs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  locs_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sedc_bandwidth <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  target_fields <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -66,13 +66,13 @@
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>locs</dt>
+    <dl><dt>from</dt>
+<dd><p><code>SpatVector</code> object. Locations where each SEDC is calculated.</p></dd>
+
+
+<dt>locs</dt>
 <dd><p><code>SpatVector</code> object. Locations where
 the sum of SEDCs are calculated.</p></dd>
-
-
-<dt>from</dt>
-<dd><p><code>SpatVector</code> object. Locations where each SEDC is calculated.</p></dd>
 
 
 <dt>locs_id</dt>
@@ -93,7 +93,7 @@ Distance at which the source concentration is reduced to
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>data.frame (tibble) object with input field names with
+<p>a data.frame (tibble) object with input field names with
 a suffix <code>"_sedc"</code> where the sums of EDC are stored.
 Additional attributes are attached for the EDC information.</p><ul><li><p>`attr(result, "sedc_bandwidth")``: the bandwidth where
 concentration reduces to approximately five percent</p></li>
