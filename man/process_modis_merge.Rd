@@ -14,13 +14,13 @@ process_modis_merge(
 }
 \arguments{
 \item{path}{character. Full list of hdf file paths.
-preferably a recursive search result from \code{\link{list.files}}.}
+preferably a recursive search result from \code{\link[base:list.files]{base::list.files}}.}
 
 \item{date}{character(1). date to query. Should be in
 \code{"YYYY-MM-DD"} format.}
 
 \item{subdataset}{character(1). subdataset names to extract.
-Should conform to regular expression. See \link{regex} for details.
+Should conform to regular expression. See \code{\link[base:regex]{base::regex}} for details.
 Default is \code{NULL}, which will result in errors. Users should specify
 which subdatasets will be imported.}
 

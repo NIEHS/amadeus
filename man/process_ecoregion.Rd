@@ -13,7 +13,7 @@ process_ecoregion(path = NULL)
 a \code{SpatVector} object
 }
 \description{
-The \code{process_ecoregion()} function imports and cleans raw ecoregion
+The \code{\link{process_ecoregion}} function imports and cleans raw ecoregion
 data, returning a \code{SpatVector} object.
 }
 \author{

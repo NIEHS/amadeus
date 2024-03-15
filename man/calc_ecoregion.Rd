@@ -7,7 +7,7 @@
 calc_ecoregion(from = NULL, locs, locs_id = "site_id", ...)
 }
 \arguments{
-\item{from}{SpatVector(1). Output of \code{process_ecoregion()}.}
+\item{from}{SpatVector(1). Output of \code{\link{process_ecoregion}}.}
 
 \item{locs}{sf/SpatVector. Unique locs. Should include
 a unique identifier field named \code{locs_id}}
@@ -30,7 +30,7 @@ binary (0 = point not in ecoregion; 1 = point in ecoregion) variables for
 each ecoregion.
 }
 \seealso{
-\code{\link[=process_ecoregion]{process_ecoregion()}}
+\code{\link{process_ecoregion}}
 }
 \author{
 Insang Song

@@ -243,11 +243,11 @@ the input then flatten it manually.")
 #' @description
 #' Get mosaicked or merged raster from multiple MODIS hdf files.
 #' @param path character. Full list of hdf file paths.
-#'  preferably a recursive search result from [`list.files`].
+#'  preferably a recursive search result from [`base::list.files`].
 #' @param date character(1). date to query. Should be in
 #' `"YYYY-MM-DD"` format.
 #' @param subdataset character(1). subdataset names to extract.
-#' Should conform to regular expression. See \link{regex} for details.
+#' Should conform to regular expression. See [`base::regex`] for details.
 #' Default is `NULL`, which will result in errors. Users should specify
 #' which subdatasets will be imported.
 #' @param fun_agg Function name or custom function to aggregate overlapping
@@ -366,7 +366,7 @@ process_bluemarble_corners <-
 #' @param instr character(1). String to check.
 #' @param format character(1). Matching format to be checked.
 #' Default is `"%Y-%m-%d"`, which can detect `"%Y/%m/%d`.
-#' See [strftime] for details of formatting this string.
+#' See [`strftime`] for details of formatting this string.
 #' @returns No returning value. It stops the function if `instr` doesn't
 #' conform to the `format`.
 #' @author Insang Song
@@ -484,13 +484,12 @@ process_bluemarble <- function(
 #' @param threshold numeric(1). Maximum distance to fill gaps if occur.
 #' @param crs integer(1)/character(1). Coordinate system definition.
 #' Should be compatible with EPSG codes or WKT2.
-#' See [terra::crs] and [sf::st_crs] / [EPSG](https://www.epsg.io)
+#' See [`terra::crs`] and [`sf::st_crs`] / [EPSG](https://www.epsg.io)
 #' @param ... For internal use.
-#' @note Users should specify sub-dataset with all flags that are
-#' compatible with `gdalinfo`
+#' @note This function handles one file at a time.
 #' @returns a `stars` object
 #' @author Insang Song
-#' @seealso [terra::rectify]
+#' @seealso [`terra::rectify`]
 #' @importFrom stars st_warp
 #' @importFrom stars read_stars
 #' @export
@@ -529,8 +528,7 @@ process_modis_warp <-
 #' the full path to the hdf file.
 #' @param path character. Full paths of hdf files.
 #' @param date character(1). Date to query.
-#' @param subdataset character. One of `"Cloud_Fraction_Day"` or
-#' `"Cloud_Fraction_Night"` (which are available in MOD06_L2)
+#' @param subdataset character. Subdatasets to process.
 #' @param suffix character(1). Should be formatted `:{product}:`,
 #' e.g., `:mod06:`
 #' @param resolution numeric(1). Resolution of output raster.
@@ -552,7 +550,7 @@ process_modis_swath <-
   function(
     path = NULL,
     date = NULL,
-    subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+    subdataset = NULL,
     suffix = ":mod06:",
     resolution = 0.025,
     ...
@@ -658,7 +656,7 @@ process_nlcd <-
 
 #' Process ecoregion data
 #' @description
-#' The \code{process_ecoregion()} function imports and cleans raw ecoregion
+#' The [`process_ecoregion`] function imports and cleans raw ecoregion
 #' data, returning a `SpatVector` object.
 #' @param path character(1). Path to Ecoregion Shapefiles
 #' @author Insang Song
@@ -727,7 +725,7 @@ process_conformity <-
 # nolint start
 #' Process toxic release data
 #' @description
-#' The \code{process_tri()} function imports and cleans raw toxic release data,
+#' This function imports and cleans raw toxic release data,
 #' returning a single `SpatVector` (points) object for the selected `year`.
 #' @param path character(1). Path to the directory with TRI CSV files
 #' @param year integer(1). Single year to select.

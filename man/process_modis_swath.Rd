@@ -7,7 +7,7 @@
 process_modis_swath(
   path = NULL,
   date = NULL,
-  subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+  subdataset = NULL,
   suffix = ":mod06:",
   resolution = 0.025,
   ...
@@ -18,8 +18,7 @@ process_modis_swath(
 
 \item{date}{character(1). Date to query.}
 
-\item{subdataset}{character. One of \code{"Cloud_Fraction_Day"} or
-\code{"Cloud_Fraction_Night"} (which are available in MOD06_L2)}
+\item{subdataset}{character. Subdatasets to process.}
 
 \item{suffix}{character(1). Should be formatted \verb{:\{product\}:},
 e.g., \verb{:mod06:}}

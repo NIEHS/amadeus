@@ -314,15 +314,15 @@ calc_nlcd <- function(from,
 #' Calculate ecoregions covariates
 #' @description
 #' Extract ecoregions covariates (U.S. EPA Ecoregions Level 2/3) at point
-#' locations. Returns a \code{data.frame} object containing \code{locs_id} and
+#' locations. Returns a `data.frame` object containing `locs_id` and
 #' binary (0 = point not in ecoregion; 1 = point in ecoregion) variables for
 #' each ecoregion.
-#' @param from SpatVector(1). Output of \code{process_ecoregion()}.
+#' @param from SpatVector(1). Output of [`process_ecoregion`].
 #' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
 #' @param ... Placeholders.
-#' @seealso [process_ecoregion()]
+#' @seealso [`process_ecoregion`]
 #' @returns a data.frame object with dummy variables and attributes of:
 #'   - `attr(., "ecoregion2_code")`: Ecoregion lv.2 code and key
 #'   - `attr(., "ecoregion3_code")`: Ecoregion lv.3 code and key
@@ -1385,7 +1385,7 @@ calc_gmted <- function(
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
 #' @author Mitchell Manware
-#' @seealso [process_narr()]
+#' @seealso [`process_narr`]
 #' @return a data.frame object
 #' @importFrom terra vect
 #' @importFrom terra as.data.frame
