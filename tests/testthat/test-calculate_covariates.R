@@ -237,6 +237,7 @@ testthat::test_that("calc_modis works well.", {
     suppressWarnings(
       process_modis_swath(
         path = path_mod06,
+        subdataset = "Cloud_Fraction_Day",
         date = "2021-08-15"
       )
     )

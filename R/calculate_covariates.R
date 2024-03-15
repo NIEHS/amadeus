@@ -19,7 +19,7 @@
 #'  function.
 #' @note `covariate` argument value is converted to lowercase.
 #' @seealso
-#' - [`calc_modis`]: `"modis"`, `"MODIS"`
+#' - [`calc_modis_par`]: `"modis"`, `"MODIS"`
 #' - [`calc_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
 #' - [`calc_ecoregion`]: `"ecoregion"`, `"ecoregions"`
 #' - [`calc_temporal_dummies`]: `"dummies"`

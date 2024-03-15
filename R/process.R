@@ -976,6 +976,7 @@ process_aqs <-
 
     site_id <- NULL
     Datum <- NULL
+    POC <- NULL
 
     # select relevant fields only
     sites <- sites |>
