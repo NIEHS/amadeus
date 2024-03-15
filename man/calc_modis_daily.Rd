@@ -12,6 +12,7 @@ calc_modis_daily(
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
+  max_cells = 1e+08,
   ...
 )
 }
@@ -31,8 +32,13 @@ are stored. Default is \code{"site_id"}}
 \item{name_extracted}{character. Names of calculated covariates.}
 
 \item{fun_summary}{function. Summary function for
-multilayer rasters. Passed to \code{foo}. See \link[exactextractr:exact_extract]{exactextractr::exact_extract}
+multilayer rasters. Passed to \code{foo}. See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}}
 for details.}
+
+\item{max_cells}{integer(1). Maximum number of cells to be read at once.
+Higher values will expedite processing, but will increase memory usage.
+Maximum possible value is \code{2^31 - 1}.
+See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
 
 \item{...}{Placeholders.}
 }
@@ -40,14 +46,14 @@ for details.}
 A data.frame object.
 }
 \description{
-modis_worker operates at six MODIS/VIIRS products
-(MOD11A1, MOD13A2, MOD06_L2, VNP46A2, MOD09GA, and MCD19A2)
+The function operates at MODIS/VIIRS products
 on a daily basis. Given that the raw hdf files are downloaded from
 NASA, standard file names include a data retrieval date flag starting
-with A. Leveraging that piece of information, the function will select
-files of scope on the date of interest. Please note that this function
-does not provide a function to filter swaths or tiles, so it is strongly
-recommended to check and pre-filter the file names at users' discretion.
+with letter "A". Leveraging that piece of information, the function will
+select files of scope on the date of interest.
+Please note that this function does not provide a function to filter
+swaths or tiles, so it is strongly recommended to check and pre-filter
+the file names at users' discretion.
 }
 \author{
 Insang Song

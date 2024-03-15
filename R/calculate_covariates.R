@@ -17,20 +17,21 @@
 #'  Default is `"site_id"`.
 #' @param ... Arguments passed to each covariate calculation
 #'  function.
+#' @note `covariate` argument value is converted to lowercase.
 #' @seealso
-#' - `calc_modis`: `"modis"`, `"MODIS"`
-#' - `calc_koppen_geiger`: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
-#' - `calc_ecoregion`: `"ecoregion"`, `"ecoregions"`
-#' - `calc_temporal_dummies`: `"dummies"`
-#' - `calc_hms`: `"hms"`, `"noaa"`, `"smoke"`
-#' - `calc_gmted`: `"gmted"`
-#' - `calc_narr`: `"narr"`, `"narr_monolevel"`, `"narr_p_levels`",
+#' - [`calc_modis`]: `"modis"`, `"MODIS"`
+#' - [`calc_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
+#' - [`calc_ecoregion`]: `"ecoregion"`, `"ecoregions"`
+#' - [`calc_temporal_dummies`]: `"dummies"`
+#' - [`calc_hms`]: `"hms"`, `"noaa"`, `"smoke"`
+#' - [`calc_gmted`]: `"gmted"`
+#' - [`calc_narr`]: `"narr"`, `"narr_monolevel"`, `"narr_p_levels`",
 #' `"plevels"`, `"monolevel"`, `"p_levels"`
-#' - `calc_geos`: `"geos"`, `"geos_cf"`
-#' - `calc_sedac_population`: `"population"`, `"sedac_population"`
-#' - `calc_sedac_groads`: `"roads"`
-#' - `calc_nlcd`: `"nlcd"`
-#' - `calc_merra2`: `"merra"`, `"MERRA"`, `"merra2"`, `"MERRA2"`
+#' - [`calc_geos`]: `"geos"`, `"geos_cf"`
+#' - [`calc_sedac_population`]: `"population"`, `"sedac_population"`
+#' - [`calc_sedac_groads`]: `"roads"`
+#' - [`calc_nlcd`]: `"nlcd"`
+#' - [`calc_merra2`]: `"merra"`, `"MERRA"`, `"merra2"`, `"MERRA2"`
 #' @returns Calculated covariates. Mainly data.frame object.
 #' @author Insang Song
 #' @export
@@ -120,7 +121,7 @@ calc_covariates <-
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
 #' @param ... Placeholders.
-#' @seealso [process_koppen_geiger()]
+#' @seealso [`process_koppen_geiger`]
 #' @returns a data.frame object
 #' @author Insang Song
 #' @importFrom terra vect
@@ -218,8 +219,12 @@ calc_koppen_geiger <-
 #' @param locs_id character(1). Unique identifier of locations
 #' @param radius numeric (non-negative) giving the
 #' radius of buffer around points
+#' @param max_cells integer(1). Maximum number of cells to be read at once.
+#' Higher values will expedite processing, but will increase memory usage.
+#' Maximum possible value is `2^31 - 1`.
+#' See [`exactextractr::exact_extract`] for details.
 #' @param ... Placeholders.
-#' @seealso [process_nlcd()]
+#' @seealso [`process_nlcd`]
 #' @returns a data.frame object
 #' @importFrom utils read.csv
 #' @importFrom methods is
@@ -239,6 +244,7 @@ calc_nlcd <- function(from,
                       locs,
                       locs_id = "site_id",
                       radius = 1000,
+                      max_cells = 1e8,
                       ...) {
   # check inputs
   if (!is.numeric(radius)) {
@@ -273,7 +279,8 @@ calc_nlcd <- function(from,
                                                sf::st_geometry(bufs_pol),
                                                fun = "frac",
                                                stack_apply = TRUE,
-                                               progress = FALSE)
+                                               progress = FALSE,
+                                               max_cells_in_memory = max_cells)
   # select only the columns of interest
   cfpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
   nlcd_classes <- utils::read.csv(cfpath)
@@ -401,17 +408,21 @@ calc_ecoregion <-
 #' @param date Date(1). date to query.
 #' @param name_extracted character. Names of calculated covariates.
 #' @param fun_summary function. Summary function for
-#' multilayer rasters. Passed to `foo`. See [exactextractr::exact_extract]
+#' multilayer rasters. Passed to `foo`. See [`exactextractr::exact_extract`]
 #' for details.
+#' @param max_cells integer(1). Maximum number of cells to be read at once.
+#' Higher values will expedite processing, but will increase memory usage.
+#' Maximum possible value is `2^31 - 1`.
+#' See [`exactextractr::exact_extract`] for details.
 #' @param ... Placeholders.
-#' @description modis_worker operates at six MODIS/VIIRS products
-#' (MOD11A1, MOD13A2, MOD06_L2, VNP46A2, MOD09GA, and MCD19A2)
+#' @description The function operates at MODIS/VIIRS products
 #' on a daily basis. Given that the raw hdf files are downloaded from
 #' NASA, standard file names include a data retrieval date flag starting
-#' with A. Leveraging that piece of information, the function will select
-#' files of scope on the date of interest. Please note that this function
-#' does not provide a function to filter swaths or tiles, so it is strongly
-#' recommended to check and pre-filter the file names at users' discretion.
+#' with letter "A". Leveraging that piece of information, the function will
+#' select files of scope on the date of interest.
+#' Please note that this function does not provide a function to filter
+#' swaths or tiles, so it is strongly recommended to check and pre-filter
+#' the file names at users' discretion.
 #' @author Insang Song
 #' @returns A data.frame object.
 #' @importFrom terra extract
@@ -431,6 +442,7 @@ calc_modis_daily <- function(
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
+  max_cells = 1e8,
   ...
 ) {
   if (!any(methods::is(locs, "SpatVector"),
@@ -470,7 +482,7 @@ calc_modis_daily <- function(
         force_df = TRUE,
         append_cols = c(id, time),
         progress = FALSE,
-        max_cells_in_memory = 1e7
+        max_cells_in_memory = max_cells
       )
     return(surf_at_bufs)
   }
@@ -529,6 +541,10 @@ calc_modis_daily <- function(
 #' loaded.
 #' @param export_list_add character. A vector with object names to export
 #'  to each thread. It should be minimized to spare memory.
+#' @param max_cells integer(1). Maximum number of cells to be read at once.
+#' Higher values will expedite processing, but will increase memory usage.
+#' Maximum possible value is `2^31 - 1`.
+#' See [`exactextractr::exact_extract`] for details.
 #' @param ... Arguments passed to `preprocess`.
 #' @description `calc_modis_par` essentially runs [`calc_modis_daily`] function
 #' in each thread (subprocess). Based on daily resolution, each day's workload
@@ -549,15 +565,16 @@ calc_modis_daily <- function(
 #' `locs` here and `path` in `preprocess` functions are assumed to have a
 #' standard naming convention of raw files from NASA.
 #' @seealso See details for setting parallelization:
-#' * [foreach::foreach]
-#' * [parallelly::makeClusterPSOCK]
-#' * [parallelly::availableCores]
-#' * [doParallel::registerDoParallel]
-#' Also, for `preprocess`, see:
-#' * [process_covariates]
-#' * [process_modis_merge]
-#' * [process_modis_swath]
-#' * [process_bluemarble]
+#' * [`foreach::foreach`]
+#' * [`parallelly::makeClusterPSOCK`]
+#' * [`parallelly::availableCores`]
+#' * [`doParallel::registerDoParallel`]
+#'
+#' Also, for preprocessing, see:
+#' * [`process_covariates`]
+#' * [`process_modis_merge`]
+#' * [`process_modis_swath`]
+#' * [`process_bluemarble`]
 #' @importFrom foreach foreach
 #' @importFrom foreach %dopar%
 #' @importFrom methods is
@@ -585,6 +602,7 @@ calc_modis_par <-
     nthreads = floor(length(parallelly::availableWorkers()) / 2),
     package_list_add = NULL,
     export_list_add = NULL,
+    max_cells = 1e8,
     ...
   ) {
     if (!is.function(preprocess)) {
@@ -667,7 +685,8 @@ process_modis_swath, or process_bluemarble.")
                     date = as.character(day_to_pick),
                     fun_summary = fun_summary,
                     name_extracted = name_radius,
-                    radius = radius[k]
+                    radius = radius[k],
+                    max_cells = max_cells
                   )
                 return(extracted)
               }, error = function(e) {
@@ -798,7 +817,7 @@ calc_temporal_dummies <-
 #'    - `attr(result, "sedc_threshold")``: the threshold distance
 #'  at which emission source points are excluded beyond that
 #' @note The function is originally from
-#' [chopin](https://github.com/Spatiotemporal-Exposures-and-Toxicology/chopin)
+#' [chopin](https://github.com/kyle-messier/chopin)
 #' Distance calculation is done with terra functions internally.
 #'  Thus, the function internally converts sf objects in
 #'  \code{point_*} arguments to terra.
@@ -944,7 +963,7 @@ The result may not be accurate.\n",
 #' @author Insang Song, Mariana Kassien
 #' @returns a data.frame object
 #' @note U.S. context.
-#' @seealso [calc_sedc()], [process_tri()]
+#' @seealso [`calc_sedc`], [`process_tri`]
 #' @importFrom terra vect
 #' @importFrom terra crs
 #' @importFrom terra nearby
@@ -1018,7 +1037,7 @@ calc_tri <- function(
 #' Unused but kept for compatibility.
 #' @param ... Placeholders.
 #' @author Insang Song, Ranadeep Daw
-#' @seealso [process_nei()]
+#' @seealso [`process_nei`]
 #' @returns a data.frame object
 #' @importFrom terra vect
 #' @importFrom methods is
@@ -1248,7 +1267,7 @@ calc_hms <- function(
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
 #' @author Mitchell Manware
-#' @seealso [process_gmted()]
+#' @seealso [`process_gmted()`]
 #' @return a data.frame object
 #' @importFrom terra vect
 #' @importFrom terra as.data.frame

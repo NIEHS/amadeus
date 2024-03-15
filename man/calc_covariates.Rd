@@ -42,21 +42,24 @@ processed objects. To avoid errors, \strong{do not edit the processed
 SpatRaster or SpatVector objects before passing to
 \code{calculate_covariates()}}.
 }
+\note{
+\code{covariate} argument value is converted to lowercase.
+}
 \seealso{
 \itemize{
-\item \code{calc_modis}: \code{"modis"}, \code{"MODIS"}
-\item \code{calc_koppen_geiger}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"},
-\item \code{calc_ecoregion}: \code{"ecoregion"}, \code{"ecoregions"}
-\item \code{calc_temporal_dummies}: \code{"dummies"}
-\item \code{calc_hms}: \code{"hms"}, \code{"noaa"}, \code{"smoke"}
-\item \code{calc_gmted}: \code{"gmted"}
-\item \code{calc_narr}: \code{"narr"}, \code{"narr_monolevel"}, \verb{"narr_p_levels}",
+\item \code{\link{calc_modis}}: \code{"modis"}, \code{"MODIS"}
+\item \code{\link{calc_koppen_geiger}}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"},
+\item \code{\link{calc_ecoregion}}: \code{"ecoregion"}, \code{"ecoregions"}
+\item 
+\item \code{\link{calc_hms}}: \code{"hms"}, \code{"noaa"}, \code{"smoke"}
+\item 
+\item \code{\link{calc_narr}}: \code{"narr"}, \code{"narr_monolevel"}, \verb{"narr_p_levels}",
 \code{"plevels"}, \code{"monolevel"}, \code{"p_levels"}
-\item \code{calc_geos}: \code{"geos"}, \code{"geos_cf"}
-\item \code{calc_sedac_population}: \code{"population"}, \code{"sedac_population"}
-\item \code{calc_sedac_groads}: \code{"roads"}
-\item \code{calc_nlcd}: \code{"nlcd"}
-\item \code{calc_merra2}: \code{"merra"}, \code{"MERRA"}, \code{"merra2"}, \code{"MERRA2"}
+\item \code{\link{calc_geos}}: \code{"geos"}, \code{"geos_cf"}
+\item \code{\link{calc_sedac_population}}: \code{"population"}, \code{"sedac_population"}
+\item 
+\item 
+\item \code{\link{calc_merra2}}: \code{"merra"}, \code{"MERRA"}, \code{"merra2"}, \code{"MERRA2"}
 }
 }
 \author{

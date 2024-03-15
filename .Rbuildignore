@@ -15,7 +15,8 @@
 tools
 .github
 pkgdown
-*.Rproj
+\*.Rproj
 output
 manuscript
 input
+tests

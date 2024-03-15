@@ -26,7 +26,7 @@ binary (0 = point not in climate region; 1 = point in climate region)
 variables for each climate classification region.
 }
 \seealso{
-\code{\link[=process_koppen_geiger]{process_koppen_geiger()}}
+\code{\link{process_koppen_geiger}}
 }
 \author{
 Insang Song

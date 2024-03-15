@@ -23,7 +23,7 @@ a data.frame object
 Calculate road emissions covariates
 }
 \seealso{
-\code{\link[=process_nei]{process_nei()}}
+\code{\link{process_nei}}
 }
 \author{
 Insang Song, Ranadeep Daw

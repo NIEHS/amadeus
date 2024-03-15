@@ -16,6 +16,7 @@ calc_modis_par(
   nthreads = floor(length(parallelly::availableWorkers())/2),
   package_list_add = NULL,
   export_list_add = NULL,
+  max_cells = 1e+08,
   ...
 )
 }
@@ -55,6 +56,11 @@ loaded.}
 \item{export_list_add}{character. A vector with object names to export
 to each thread. It should be minimized to spare memory.}
 
+\item{max_cells}{integer(1). Maximum number of cells to be read at once.
+Higher values will expedite processing, but will increase memory usage.
+Maximum possible value is \code{2^31 - 1}.
+See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
+
 \item{...}{Arguments passed to \code{preprocess}.}
 }
 \description{
@@ -82,14 +88,17 @@ standard naming convention of raw files from NASA.
 \seealso{
 See details for setting parallelization:
 \itemize{
-\item \link[foreach:foreach]{foreach::foreach}
-\item \link[parallelly:makeClusterPSOCK]{parallelly::makeClusterPSOCK}
-\item \link[parallelly:availableCores]{parallelly::availableCores}
-\item \link[doParallel:registerDoParallel]{doParallel::registerDoParallel}
-Also, for \code{preprocess}, see:
-\item \link{process_covariates}
-\item \link{process_modis_merge}
-\item \link{process_modis_swath}
-\item \link{process_bluemarble}
+\item \code{\link[foreach:foreach]{foreach::foreach}}
+\item \code{\link[parallelly:makeClusterPSOCK]{parallelly::makeClusterPSOCK}}
+\item \code{\link[parallelly:availableCores]{parallelly::availableCores}}
+\item \code{\link[doParallel:registerDoParallel]{doParallel::registerDoParallel}}
+}
+
+Also, for preprocessing, see:
+\itemize{
+\item \code{\link{process_covariates}}
+\item \code{\link{process_modis_merge}}
+\item \code{\link{process_modis_swath}}
+\item \code{\link{process_bluemarble}}
 }
 }

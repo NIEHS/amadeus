@@ -35,7 +35,7 @@ where curvilinear points are stored with varying resolution depending on
 the relative position of the sensor axis. As this type of data
 typically does not work well with planar spatial data, users
 should warp or rectify this data into a rectilinear raster.
-Main procedure is done with \link[stars:st_warp]{stars::st_warp}, in which users are able to
+Main procedure is done with \code{\link[stars:st_warp]{stars::st_warp}}, in which users are able to
 customize the threshold to fill potential gaps that appear where
 the target resolution is finer than the local resolution of curvilinear
 grid points.

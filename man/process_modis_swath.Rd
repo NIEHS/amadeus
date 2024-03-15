@@ -44,9 +44,9 @@ the full path to the hdf file.
 }
 \seealso{
 \itemize{
-\item \link{process_modis_warp}
+\item \code{\link{process_modis_warp}}
 \item \href{https://gdal.org/drivers/raster/hdf4.html}{GDAL HDF4 driver documentation}
-\item \link[terra:describe]{terra::describe}: to list the full subdataset list with \code{sds = TRUE}
+\item \code{\link[terra:describe]{terra::describe}}: to list the full subdataset list with \code{sds = TRUE}
 }
 }
 \author{

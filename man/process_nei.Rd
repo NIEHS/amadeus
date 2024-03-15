@@ -9,7 +9,7 @@ process_nei(path = NULL, county = NULL, year = c(2017, 2020))
 \arguments{
 \item{path}{character(1). Directory with NEI csv files.}
 
-\item{county}{\code{SpatVector}/\code{sf.} County boundaries.}
+\item{county}{\code{SpatVector}/\code{sf}. County boundaries.}
 
 \item{year}{integer(1) Year to use. Currently only 2017 or 2020
 is accepted.}
