@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_support.R
 \name{download_setup_dir}
 \alias{download_setup_dir}
-\title{Check if input directory exists}
+\title{Setup directory}
 \usage{
 download_setup_dir(directory)
 }
@@ -10,6 +10,9 @@ download_setup_dir(directory)
 \item{directory}{character(1) directory path}
 }
 \description{
+Create \code{directory} if it does not already exist.
+
 If directory does not exist, the directory
 will be created.
 }
+\keyword{internal}

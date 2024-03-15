@@ -1,8 +1,11 @@
-#' Check if the sftime object is formated on a specific way
-#'
-#' @param x a sftime object
+#' Check \code{sftime} object
+#' @description
+#' Check an \code{sftime} object for its class, \code{$time} column,
+#' \code{$geometry} column, and geometry class.
+#' @param x an `sftime` object
 #' @import sftime
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 check_mysftime <- function(x) {
   stopifnot(
@@ -17,11 +20,14 @@ check_mysftime <- function(x) {
   )
 }
 
-#' Check if the sf object is formated on a specific way
-#'
-#' @param x a sf object
+#' Check \code{sf} object
+#' @description
+#' Check an \code{sf} object for its class, \code{$geometry} column, and
+#' geometry class.
+#' @param x an `sf` object
 #' @import sf
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 check_mysf <- function(x) {
   stopifnot(
@@ -34,13 +40,15 @@ check_mysf <- function(x) {
   )
 }
 
-#' Rename the time column of a sftime object
-#'
-#' @param x a sftime object
+#' Rename \code{$time}
+#' @description
+#' Rename the \code{$time} column of an \code{sftime} object.
+#' @param x an `sftime` object
 #' @param newname character for new time column name
-#' @return a sftime object
+#' @return an `sftime` object
 #' @import sftime
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 rename_time <- function(x, newname) {
   stopifnot("x is not a sftime" = class(x)[1] == "sftime")
@@ -52,16 +60,21 @@ rename_time <- function(x, newname) {
 }
 
 
-#' Create a sftime from a datatable
-#'
-#' @param x a data.table
+#' Convert a \code{data.table} to an \code{sftime}
+#' @description
+#' Convert a \code{data.table} object to an \code{sftime}. \code{x} must be
+#' a \code{data.table} object with "lon", "lat", and "time" columns to
+#' describe the longitude, latitude, and time-orientation, respectively, of
+#' \code{x}.
+#' @param x a `data.table`
 #' @param lonname character for longitude column name
 #' @param latname character for latitude column name
 #' @param timename character for time column name
 #' @param crs coordinate reference system
-#' @return a sftime object
+#' @return an `sftime` object
 #' @import sftime
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 dt_as_mysftime <- function(x, lonname, latname, timename, crs) {
   stopifnot("x is not a data.table" = class(x)[1] == "data.table")
@@ -80,12 +93,16 @@ dt_as_mysftime <- function(x, lonname, latname, timename, crs) {
   return(mysft)
 }
 
-#' Convert a sf object to mysftime
-#'
-#' @param x a sf
+
+#' Convert an \code{sf} to an \code{sftime}
+#' @description
+#' Convert an \code{sf} object to an \code{sftime} object. \code{x} must
+#' contain a time-defining column, identified in \code{timename}.
+#' @param x an `sf` object
 #' @param timename character: name of time column in x
-#' @return a sftime object
+#' @return an `sftime` object
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sf_as_mysftime <- function(x, timename) {
   if (!(timename %in% colnames(x))) {
@@ -96,14 +113,18 @@ sf_as_mysftime <- function(x, timename) {
   return(output)
 }
 
-#' Create a sftime from a terra::SpatVector
-#'
-#' @param x a terra::SpatVector
+#' Convert a \code{SpatVector} to an \code{sftime}
+#' @description
+#' Convert a \code{SpatVector} object to an \code{sftime} object. \code{x} must
+#' contain a time-defining column, identified in \code{timename}.
+#' @param x a `SpatVector` object
 #' @param timename character for time column name in x
 #' (default: "time")
-#' @return a sftime object
+#' @return an `sftime` object
 #' @import sftime
+#' @seealso [terra::vect]
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 spatvector_as_sftime <- function(x, timename = "time") {
   stopifnot("timename column missing or mispelled" = timename %in% names(x))
@@ -114,15 +135,19 @@ spatvector_as_sftime <- function(x, timename = "time") {
   return(output)
 }
 
-#' Create a sftime from a terra::SpatRaster
-#'
-#' @param x a terra::SpatRaster
+#' Convert a \code{SpatRaster} to an \code{sftime}
+#' @description
+#' Convert a \code{SpatRaster} object to an \code{sftime} object. \code{x} must
+#' contain a time-defining column, identified in \code{timename}.
+#' @param x a `SpatRaster` object
 #' @param varname character for variable column name in the sftime
 #' @param timename character for time column name in the sftime
 #' (default: "time")
-#' @return a sftime object
+#' @return a `sftime` object
 #' @import sftime
+#' @seealso [terra::rast]
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 spatraster_as_sftime <- function(x, varname, timename = "time") {
   date_correct <- TRUE
@@ -152,14 +177,18 @@ spatraster_as_sftime <- function(x, varname, timename = "time") {
   return(output)
 }
 
-#' Create a sftime from a terra::SpatRasterDataset
-#'
-#' @param x a terra::SpatRasterDataset (~ list of named SpatRasters)
+#' Convert a \code{SpatRasterDataset} to an \code{sftime}
+#' @description
+#' Convert a \code{SpatRasterDataset} object to an \code{sftime} object.
+#' \code{x} must contain a time-defining column, identified in \code{timename}.
+#' @param x a `SpatRasterDataset` object (~ list of named SpatRasters)
 #' @param timename character for time column name in the sftime
 #' (default: "time")
-#' @return a sftime object
+#' @return an `sftime` object
 #' @import sftime
+#' @seealso [terra::sds]
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 spatrds_as_sftime <- function(x, timename = "time") {
   stopifnot(
@@ -181,16 +210,22 @@ spatrds_as_sftime <- function(x, timename = "time") {
 }
 
 
-#' Convert to sftime object on the form adapted to beethoven code
-#'
-#' @param x a data.frame, data.table, SpatVector or SpatRasterDataset
+#' Create an \code{sftime} object
+#' @description
+#' Create a \code{sftime} object from one of \code{data.frame},
+#' \code{data.table}, \code{sf}, \code{sftime}, \code{SpatRaster},
+#' \code{SpatRasterDataset}, \code{SpatVector}
+#' @param x an object of class `data.frame`, `data.table`, `sf`, `sftime`,
+#' `SpatRaster`, `SpatRasterDataset` or `SpatVector`
 #' @param ... if x is a data.frame or data.table: lonname, latname, timename and
 #' crs arguments are required. If x is a sf or sftime, timename argument is
 #' required. If x is a terra::SpatRaster, varname argument is required.
-#' @return a sftime object with constrained time column name
-#' (see check_mysftime() function)
+#' @return an `sftime` object with constrained time column name
 #' @import sf
+#' @seealso [check_mysftime], [sf_as_mysftime], [data.frame],
+#' [data.table::data.table], [terra::rast], [terra::sds], [terra::vect]
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 as_mysftime <- function(x, ...) {
   format <- class(x)[1]
@@ -254,13 +289,16 @@ as_mysftime <- function(x, ...) {
 }
 
 
-#' Simplify an sftime to sf class
-#'
-#' @param x a sftime
+#' Convert an \code{sftime} to an \code{sf}
+#' @description
+#' Convert an \code{sftime} object to an \code{sf} object. \code{x} must
+#' contain a time-defining column, identified in \code{timename}.
+#' @param x an `sftime` object
 #' @param keeptime boolean: TRUE if user wants to keep time column
 #' as simple column (default = TRUE)
-#' @return a sf object
+#' @return an `sf` object
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sftime_as_sf <- function(x, keeptime = TRUE) {
   stopifnot("x is not a sftime" = class(x)[1] == "sftime")
@@ -276,12 +314,16 @@ sftime_as_sf <- function(x, keeptime = TRUE) {
 }
 
 
-#' Convert a sftime object to mysftime
-#'
-#' @param x a sftime
-#' @param timename character: name of time column in x
-#' @return a sftime object with specific format (see check_mysftime() function)
+#' Convert an \code{sftime} to a \code{mysftime}
+#' @description
+#' Convert an \code{sftime} object to a \code{mysftime} object. \code{x} must
+#' contain a time-defining column, identified in \code{timename}.
+#' @param x an `sftime` object
+#' @param timename character: name of time column in `x`
+#' @return an `sftime` object with specific format
+#' @seealso [check_mysftime]
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sftime_as_mysftime <- function(x, timename) {
   if (!(timename %in% colnames(x))) {
@@ -291,12 +333,16 @@ sftime_as_mysftime <- function(x, timename) {
   return(output)
 }
 
-#' Convert sftime object to SpatVector
-#'
-#' @param x a sftime
-#' @return a terra::SpatVector
+
+#' Convert an \code{sftime} to a \code{SpatVector}
+#' @description
+#' Convert an \code{sftime} object to a \code{SpatVector} object.
+#' @param x an `sftime` object
+#' @return a `SpatVector` object
+#' @seealso [terra::vect]
 #' @import sftime
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sftime_as_spatvector <- function(x) {
   stopifnot("x is not a sftime" = class(x)[1] == "sftime")
@@ -306,15 +352,22 @@ sftime_as_spatvector <- function(x) {
   return(terra::vect(tosf))
 }
 
-#' Convert sftime object to SpatRaster
-#' /!\ can be very time consuming if sftime is not spatially structured
-#'
-#' @param x a sftime
+
+#' Convert an \code{sftime} to a \code{SpatRaster}
+#' @description
+#' Convert an \code{sftime} object to a \code{SpatRaster} object. Returns a
+#' \code{SpatRatser} with one layer for each time step in \code{x}.
+#' @note
+#' Running \code{sftime_as_spatraster} can take a long time if \code{x} is not
+#' spatially structured.
+#' @param x an `sftime` object
 #' @param varname variable to rasterize
-#' @return a SpatRaster with layers corresponding to timestamps
+#' @return a `SpatRaster` object
 #' @import sftime
 #' @import stars
+#' @seealso [terra::rast]
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sftime_as_spatraster <- function(x, varname) {
   stopifnot("varname missing or mispelled" = varname %in% colnames(x))
@@ -328,13 +381,19 @@ sftime_as_spatraster <- function(x, varname) {
   return(terra::rast(layers))
 }
 
-#' Convert sftime object to SpatVectorDataset
-#' /!\ running time can be very long if x is not
-#' spatially and temporally structured
-#'
-#' @param x a sftime
+
+#' Convert an \code{sftime} to a \code{SpatRasterDataset}
+#' @description
+#' Convert an \code{sftime} object to a \code{SpatRasterDataset} object.
+#' @note
+#' Running \code{sftime_as_spatrds} can take a long time if \code{x} is not
+#' spatially and temporally structured.
+#' @param x an `sftime` object
 #' @import sftime
+#' @return an `SpatRasterDataset` object
+#' @seealso [terra::sds]
 #' @author Eva Marques
+#' @keywords spacetime
 #' @export
 sftime_as_spatrds <- function(x) {
   stopifnot("x is not a sftime" = class(x)[1] == "sftime")

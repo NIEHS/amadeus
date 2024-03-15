@@ -31,10 +31,10 @@ Default is \code{"EPSG:4326"}}
 \item{...}{For internal use.}
 }
 \value{
-SpatRaster.
+a \code{SpatRaster} object
 }
 \description{
-This function will return a SpatRaster object with
+This function will return a \code{SpatRaster} object with
 georeferenced h5 files of Blue Marble product. Referencing corner coordinates
 are necessary as the original h5 data do not include such information.
 }

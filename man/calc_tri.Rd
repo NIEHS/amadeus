@@ -2,21 +2,20 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_tri}
 \alias{calc_tri}
-\title{Calculate TRI covariates}
+\title{Calculate toxic release covariates}
 \usage{
 calc_tri(
-  locs,
   from = NULL,
+  locs,
   locs_id = "site_id",
   radius = c(1000L, 10000L, 50000L),
   ...
 )
 }
 \arguments{
-\item{locs}{sf/SpatVector. Locations where TRI variables are calculated.}
+\item{from}{SpatVector(1). Output of \code{process_tri()}.}
 
-\item{from}{SpatVector. Point vector object of TRI in a year.
-See \link{process_tri}}
+\item{locs}{sf/SpatVector. Locations where TRI variables are calculated.}
 
 \item{locs_id}{character(1). Unique site identifier column name.
 Default is \code{"site_id"}.}
@@ -27,16 +26,18 @@ Default is \code{c(1000, 10000, 50000)} (meters)}
 \item{...}{Placeholders.}
 }
 \value{
-A data.frame object.
+a data.frame object
 }
 \description{
-Calculate TRI covariates
+Extract toxic release values at point locations. Returns a \code{data.frame}
+object containing \code{locs_id} and variables for each chemical in
+\code{from}.
 }
 \note{
 U.S. context.
 }
 \seealso{
-\link{calc_sedc}, \link{process_tri}
+\code{\link[=calc_sedc]{calc_sedc()}}, \code{\link[=process_tri]{process_tri()}}
 }
 \author{
 Insang Song, Mariana Kassien

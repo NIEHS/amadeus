@@ -5,12 +5,12 @@
 \title{Calculate MODIS product covariates in multiple CPU threads}
 \usage{
 calc_modis_par(
-  locs = NULL,
   from = NULL,
+  locs = NULL,
   locs_id = "site_id",
+  radius = c(0L, 1000L, 10000L, 50000L),
   preprocess = process_modis_merge,
   name_covariates = NULL,
-  radius = c(0L, 1000L, 10000L, 50000L),
   subdataset = NULL,
   fun_summary = "mean",
   nthreads = floor(length(parallelly::availableWorkers())/2),
@@ -20,12 +20,15 @@ calc_modis_par(
 )
 }
 \arguments{
+\item{from}{character. List of paths to MODIS/VIIRS files.}
+
 \item{locs}{sf/SpatVector object. Unique locs where covariates
 will be calculated.}
 
-\item{from}{character. List of paths to MODIS/VIIRS files.}
-
 \item{locs_id}{character(1). Site identifier. Default is \code{"site_id"}}
+
+\item{radius}{numeric. Radii to calculate covariates.
+Default is \code{c(0, 1000, 10000, 50000)}.}
 
 \item{preprocess}{function. Function to handle HDF files.}
 
@@ -35,9 +38,6 @@ The calculated covariate names will have a form of
 '{name_covariates}{zero-padded buffer radius in meters}',
 e.g., 'MOD_NDVIF_0_50000' where 50 km radius circular buffer
 was used to calculate mean NDVI value.}
-
-\item{radius}{numeric. Radii to calculate covariates.
-Default is \code{c(0, 1000, 10000, 50000)}.}
 
 \item{subdataset}{Index or search pattern of subdataset.}
 

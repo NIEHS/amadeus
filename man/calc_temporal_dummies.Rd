@@ -2,20 +2,12 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_temporal_dummies}
 \alias{calc_temporal_dummies}
-\title{Calculate temporal dummy variables}
+\title{Calculate temporal dummy covariates}
 \usage{
-calc_temporal_dummies(
-  locs,
-  from = NULL,
-  locs_id = "site_id",
-  year = seq(2018L, 2022L),
-  ...
-)
+calc_temporal_dummies(locs, locs_id = "site_id", year = seq(2018L, 2022L), ...)
 }
 \arguments{
 \item{locs}{data.frame with a temporal field named \code{"time"}}
-
-\item{from}{not used.}
 
 \item{locs_id}{character(1). Unique site identifier column name.
 Default is \code{"site_id"}.}
@@ -26,10 +18,12 @@ Default is \code{seq(2018L, 2022L)}}
 \item{...}{Placeholders.}
 }
 \value{
-data.frame with year, month, and weekday indicators.
+a data.frame object
 }
 \description{
-Calculate temporal dummy variables
+Calculate temporal dummy covariates at point locations. Returns a
+\code{data.frame} object with \code{locs_id}, year binary variable for each
+value in \code{year}, and month and day of week binary variables.
 }
 \author{
 Insang Song

@@ -2,12 +2,12 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{spatraster_as_sftime}
 \alias{spatraster_as_sftime}
-\title{Create a sftime from a terra::SpatRaster}
+\title{Convert a \code{SpatRaster} to an \code{sftime}}
 \usage{
 spatraster_as_sftime(x, varname, timename = "time")
 }
 \arguments{
-\item{x}{a terra::SpatRaster}
+\item{x}{a \code{SpatRaster} object}
 
 \item{varname}{character for variable column name in the sftime}
 
@@ -15,11 +15,16 @@ spatraster_as_sftime(x, varname, timename = "time")
 (default: "time")}
 }
 \value{
-a sftime object
+a \code{sftime} object
 }
 \description{
-Create a sftime from a terra::SpatRaster
+Convert a \code{SpatRaster} object to an \code{sftime} object. \code{x} must
+contain a time-defining column, identified in \code{timename}.
+}
+\seealso{
+\link[terra:rast]{terra::rast}
 }
 \author{
 Eva Marques
 }
+\keyword{spacetime}

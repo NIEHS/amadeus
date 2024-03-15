@@ -2,22 +2,27 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{spatvector_as_sftime}
 \alias{spatvector_as_sftime}
-\title{Create a sftime from a terra::SpatVector}
+\title{Convert a \code{SpatVector} to an \code{sftime}}
 \usage{
 spatvector_as_sftime(x, timename = "time")
 }
 \arguments{
-\item{x}{a terra::SpatVector}
+\item{x}{a \code{SpatVector} object}
 
 \item{timename}{character for time column name in x
 (default: "time")}
 }
 \value{
-a sftime object
+an \code{sftime} object
 }
 \description{
-Create a sftime from a terra::SpatVector
+Convert a \code{SpatVector} object to an \code{sftime} object. \code{x} must
+contain a time-defining column, identified in \code{timename}.
+}
+\seealso{
+\link[terra:vect]{terra::vect}
 }
 \author{
 Eva Marques
 }
+\keyword{spacetime}

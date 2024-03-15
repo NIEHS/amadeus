@@ -2,13 +2,12 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_geos}
 \alias{calc_geos}
-\title{Calculate NASA GEOS-CF meteorological and atmospheric covariates}
+\title{Calculate atmospheric composition covariates}
 \usage{
 calc_geos(from, locs, locs_id = NULL, radius = 0, fun = "mean")
 }
 \arguments{
-\item{from}{SpatRaster(1). Cleaned SpatRaster object that has been returned
-from \code{process_eos} containing GEOS-CF variable data.}
+\item{from}{SpatRaster(1). Output of \code{process_geos()}.}
 
 \item{locs}{data.frame, characater to file path, SpatVector, or sf object.}
 
@@ -22,13 +21,17 @@ containing identifier for each unique coordinate location.}
 within sites location buffer (Default = \code{mean}).}
 }
 \value{
-a data.frame object;
+a data.frame object
 }
 \description{
-Extract GEOS-CF data at point locations using SpatRaster object from
-\code{process_geos}. Function returns a data frame containing GEOS-CF variable
-values at user-defined sites. Unique column names reflect variable name,
-circular buffer, and vertical pressure level (if applicable).
+Extract atmospheric composition values at point locations. Returns a
+\code{data.frame} object containing \code{locs_id}, date and hour, vertical
+pressure level, and atmospheric composition variable. Atmospheric
+composition variable column name reflects variable and circular buffer
+radius.
+}
+\seealso{
+\code{\link[=process_geos]{process_geos()}}
 }
 \author{
 Mitchell Manware

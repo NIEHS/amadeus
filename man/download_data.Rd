@@ -2,7 +2,7 @@
 % Please edit documentation in R/download.R
 \name{download_data}
 \alias{download_data}
-\title{Download raw data from sources}
+\title{Download raw data wrapper function}
 \usage{
 download_data(
   dataset_name = c("aqs", "ecoregion", "geos", "gmted", "koppen", "koppengeiger",
@@ -10,7 +10,7 @@ download_data(
     "sedac_groads", "sedac_population", "groads", "population", "plevels", "p_levels",
     "monolevel", "hms", "smoke", "tri", "nei"),
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   ...
 )
 }
@@ -20,14 +20,14 @@ download_data(
 \item{directory_to_save}{character(1). Directory to save / unzip
 (if zip files are downloaded) data.}
 
-\item{data_download_acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+\item{acknowledgement}{logical(1). By setting \code{TRUE} the
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
 
 \item{...}{Arguments passed to each download function.}
 }
 \description{
-Download raw data from sources
+The \code{download_data()} function accesses and downloads atmospheric, meteorological, and environmental data from various open-access data sources.
 }
 \note{
 \itemize{

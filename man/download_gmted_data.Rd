@@ -2,7 +2,7 @@
 % Please edit documentation in R/download.R
 \name{download_gmted_data}
 \alias{download_gmted_data}
-\title{Download global elevation data from the Global Multi-resolution Terrain Elevation Data (GMTED2010).}
+\title{Download elevation data}
 \usage{
 download_gmted_data(
   statistic = c("Breakline Emphasis", "Systematic Subsample", "Median Statistic",
@@ -11,11 +11,11 @@ download_gmted_data(
   resolution = c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"),
   directory_to_download = NULL,
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
-  unzip = TRUE,
-  remove_zip = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE
 )
 }
 \arguments{
@@ -30,14 +30,9 @@ from Global Multi-resolution Terrain Elevation Data (GMTED2010).}
 
 \item{directory_to_save}{character(1). Directory to decompress zip files.}
 
-\item{data_download_acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+\item{acknowledgement}{logical(1). By setting \code{TRUE} the
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
-
-\item{unzip}{logical(1). Unzip zip files. Default is \code{TRUE}.}
-
-\item{remove_zip}{logical(1). Remove zip file from directory_to_download.
-Default is \code{FALSE}.}
 
 \item{download}{logical(1). \code{FALSE} will generate a *.txt file
 containing all download commands. By setting \code{TRUE} the function
@@ -46,12 +41,19 @@ will download all of the requested data files.}
 \item{remove_command}{logical(1).
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands. Default is FALSE.}
+
+\item{unzip}{logical(1). Unzip zip files. Default is \code{TRUE}.}
+
+\item{remove_zip}{logical(1). Remove zip file from directory_to_download.
+Default is \code{FALSE}.}
 }
 \value{
-NULL;
+NULL; Statistic and resolution-specific zip files will be stored in
+\code{directory_to_download}, and directories containing raw ASCII Grid data
+will be stored in \code{directory_to_save}.
 }
 \description{
-The \code{download_gmted_data()} function acesses and downloads Global
+The \code{download_gmted_data()} function accesses and downloads Global
 Multi-resolution Terrain Elevation Data (GMTED2010) from
 \href{https://www.usgs.gov/coastal-changes-and-impacts/gmted2010}{U.S. Geological Survey and National Geospatial-Intelligence Agency}.
 }

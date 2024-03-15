@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_nlcd}
 \alias{process_nlcd}
-\title{Process raw National Landuse Classification Dataset}
+\title{Process land cover data}
 \usage{
 process_nlcd(path = NULL, year = 2021)
 }
@@ -12,9 +12,12 @@ process_nlcd(path = NULL, year = 2021)
 \item{year}{numeric giving the year of NLCD data used}
 }
 \value{
-SpatRaster object.
+a \code{SpatRaster} object
 }
 \description{
+The \code{process_nlcd()} function imports and cleans raw land cover data,
+returning a single \code{SpatRaster} object.
+
 Reads NLCD file of selected \code{year}.
 }
 \author{

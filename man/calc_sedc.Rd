@@ -5,18 +5,18 @@
 \title{Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates}
 \usage{
 calc_sedc(
-  locs = NULL,
   from = NULL,
+  locs = NULL,
   locs_id = NULL,
   sedc_bandwidth = NULL,
   target_fields = NULL
 )
 }
 \arguments{
+\item{from}{\code{SpatVector} object. Locations where each SEDC is calculated.}
+
 \item{locs}{\code{SpatVector} object. Locations where
 the sum of SEDCs are calculated.}
-
-\item{from}{\code{SpatVector} object. Locations where each SEDC is calculated.}
 
 \item{locs_id}{character(1). Name of the unique id field in \code{point_to}.}
 
@@ -27,7 +27,7 @@ Distance at which the source concentration is reduced to
 \item{target_fields}{character(varying). Field names in characters.}
 }
 \value{
-data.frame (tibble) object with input field names with
+a data.frame (tibble) object with input field names with
 a suffix \code{"_sedc"} where the sums of EDC are stored.
 Additional attributes are attached for the EDC information.
 \itemize{

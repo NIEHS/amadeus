@@ -2,15 +2,16 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_covariates}
 \alias{calc_covariates}
-\title{Calculate covariates}
+\title{Calculate covariates wrapper function}
 \usage{
 calc_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
     "dummies", "gmted", "roads", "ecoregions", "ecoregion", "hms", "noaa", "smoke",
     "gmted", "narr", "narr_monolevel", "narr_p_levels", "plevels", "monolevel",
-    "p_levels", "geos", "sedac_population", "population"),
-  locs,
+    "p_levels", "geos", "sedac_population", "population", "nlcd", "merra", "MERRA",
+    "merra2", "MERRA2"),
   from,
+  locs,
   locs_id = "site_id",
   ...
 )
@@ -18,10 +19,10 @@ calc_covariates(
 \arguments{
 \item{covariate}{character(1). Covariate type.}
 
+\item{from}{character. Single or multiple from strings.}
+
 \item{locs}{sf/SpatVector. Unique locations. Should include
 a unique identifier field named \code{locs_id}}
-
-\item{from}{character. Single or multiple from strings.}
 
 \item{locs_id}{character(1). Name of unique identifier.
 Default is \code{"site_id"}.}
@@ -33,7 +34,13 @@ function.}
 Calculated covariates. Mainly data.frame object.
 }
 \description{
-Calculate covariates
+The \code{calculate_covariates()} function extracts values at point
+locations from a SpatRaster or SpatVector object returned from
+\code{process_covariates()}. \code{calculate_covariates()} and the underlying
+source-specific covariate functions have been designed to operate on the
+processed objects. To avoid errors, \strong{do not edit the processed
+SpatRaster or SpatVector objects before passing to
+\code{calculate_covariates()}}.
 }
 \seealso{
 \itemize{
@@ -47,6 +54,9 @@ Calculate covariates
 \code{"plevels"}, \code{"monolevel"}, \code{"p_levels"}
 \item \code{calc_geos}: \code{"geos"}, \code{"geos_cf"}
 \item \code{calc_sedac_population}: \code{"population"}, \code{"sedac_population"}
+\item \code{calc_sedac_groads}: \code{"roads"}
+\item \code{calc_nlcd}: \code{"nlcd"}
+\item \code{calc_merra2}: \code{"merra"}, \code{"MERRA"}, \code{"merra2"}, \code{"MERRA2"}
 }
 }
 \author{

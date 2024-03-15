@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_sedac_codes}
 \alias{process_sedac_codes}
-\title{Generate resolution codes based on NASA SEDAC population resolution.}
+\title{Process population resolution code}
 \usage{
 process_sedac_codes(string, invert = FALSE)
 }
@@ -13,5 +13,6 @@ process_sedac_codes(string, invert = FALSE)
 provides resolution code, and returns full length resolution.}
 }
 \description{
-Generate resolution codes based on NASA SEDAC population resolution.
+Convert full length resolution name to/from resolution code.
 }
+\keyword{auxillary}

@@ -2,14 +2,14 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_nei}
 \alias{calc_nei}
-\title{Calculate National Emission Inventory (NEI) covariates}
+\title{Calculate road emissions covariates}
 \usage{
-calc_nei(locs = NULL, from = NULL, locs_id = "site_id", ...)
+calc_nei(from = NULL, locs = NULL, locs_id = "site_id", ...)
 }
 \arguments{
-\item{locs}{sf/SpatVector. Locations at NEI values are joined.}
+\item{from}{SpatVector(1). Output of \code{process_nei()}.}
 
-\item{from}{character(1). from to the directory with NEI CSV files}
+\item{locs}{sf/SpatVector. Locations at NEI values are joined.}
 
 \item{locs_id}{character(1). Unique site identifier column name.
 Unused but kept for compatibility.}
@@ -17,10 +17,13 @@ Unused but kept for compatibility.}
 \item{...}{Placeholders.}
 }
 \value{
-A data.frame object.
+a data.frame object
 }
 \description{
-Calculate National Emission Inventory (NEI) covariates
+Calculate road emissions covariates
+}
+\seealso{
+\code{\link[=process_nei]{process_nei()}}
 }
 \author{
 Insang Song, Ranadeep Daw

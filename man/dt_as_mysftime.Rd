@@ -2,12 +2,12 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{dt_as_mysftime}
 \alias{dt_as_mysftime}
-\title{Create a sftime from a datatable}
+\title{Convert a \code{data.table} to an \code{sftime}}
 \usage{
 dt_as_mysftime(x, lonname, latname, timename, crs)
 }
 \arguments{
-\item{x}{a data.table}
+\item{x}{a \code{data.table}}
 
 \item{lonname}{character for longitude column name}
 
@@ -18,11 +18,15 @@ dt_as_mysftime(x, lonname, latname, timename, crs)
 \item{crs}{coordinate reference system}
 }
 \value{
-a sftime object
+an \code{sftime} object
 }
 \description{
-Create a sftime from a datatable
+Convert a \code{data.table} object to an \code{sftime}. \code{x} must be
+a \code{data.table} object with "lon", "lat", and "time" columns to
+describe the longitude, latitude, and time-orientation, respectively, of
+\code{x}.
 }
 \author{
 Eva Marques
 }
+\keyword{spacetime}

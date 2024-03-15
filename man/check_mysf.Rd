@@ -2,16 +2,18 @@
 % Please edit documentation in R/manipulate_spacetime_data.R
 \name{check_mysf}
 \alias{check_mysf}
-\title{Check if the sf object is formated on a specific way}
+\title{Check \code{sf} object}
 \usage{
 check_mysf(x)
 }
 \arguments{
-\item{x}{a sf object}
+\item{x}{an \code{sf} object}
 }
 \description{
-Check if the sf object is formated on a specific way
+Check an \code{sf} object for its class, \code{$geometry} column, and
+geometry class.
 }
 \author{
 Eva Marques
 }
+\keyword{spacetime}

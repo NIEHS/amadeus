@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_support.R
 \name{download_remove_zips}
 \alias{download_remove_zips}
-\title{Remove downloaded zip files}
+\title{Remove zip files}
 \usage{
 download_remove_zips(remove = FALSE, download_name)
 }
@@ -12,5 +12,10 @@ download_remove_zips(remove = FALSE, download_name)
 \item{download_name}{character. Full zip file path}
 }
 \description{
-Remove downloaded zip files
+Remove downloaded ".zip" files.
 }
+\note{
+If \code{remove = TRUE}, ensure that \code{unzip = TRUE}. Choosing to remove
+".zip" files without unzipping will retain none of the downloaded data.
+}
+\keyword{internal}

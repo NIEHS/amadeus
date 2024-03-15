@@ -2,11 +2,9 @@
 % Please edit documentation in R/download.R
 \name{download_merra2_data}
 \alias{download_merra2_data}
-\title{Download meteorological and atmospheric data from the Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model.}
+\title{Download meteorological and atmospheric data}
 \usage{
 download_merra2_data(
-  date_start = "2023-09-01",
-  date_end = "2023-09-01",
   collection = c("inst1_2d_asm_Nx", "inst1_2d_int_Nx", "inst1_2d_lfo_Nx",
     "inst3_3d_asm_Np", "inst3_3d_aer_Nv", "inst3_3d_asm_Nv", "inst3_3d_chm_Nv",
     "inst3_3d_gas_Nv", "inst3_2d_gas_Nx", "inst6_3d_ana_Np", "inst6_3d_ana_Nv",
@@ -18,25 +16,27 @@ download_merra2_data(
     "tavg3_3d_mst_Np", "tavg3_3d_rad_Np", "tavg3_3d_tdt_Np", "tavg3_3d_trb_Np",
     "tavg3_3d_udt_Np", "tavg3_3d_odt_Np", "tavg3_3d_qdt_Np", "tavg3_3d_asm_Nv",
     "tavg3_3d_cld_Nv", "tavg3_3d_mst_Nv", "tavg3_3d_rad_Nv", "tavg3_2d_glc_Nx"),
+  date_start = "2023-09-01",
+  date_end = "2023-09-01",
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE
 )
 }
 \arguments{
+\item{collection}{character(1). MERRA-2 data collection file name.}
+
 \item{date_start}{character(1). length of 10. Start date for downloading
 data. Format YYYY-MM-DD (ex. September 1, 2023 is \code{"2023-09-01"}).}
 
 \item{date_end}{character(1). length of 10. End date for downloading data.
 Format YYYY-MM-DD (ex. September 1, 2023 is \code{"2023-09-01"}).}
 
-\item{collection}{character(1). MERRA-2 data collection file name.}
-
 \item{directory_to_save}{character(1). Directory to save data.}
 
-\item{data_download_acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+\item{acknowledgement}{logical(1). By setting \code{TRUE} the
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
 
 \item{download}{logical(1). \code{FALSE} will generate a *.txt file
@@ -48,11 +48,12 @@ Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 }
 \value{
-NULL;
+NULL; Daily netCDF (.nc4) files will be stored in
+\code{directory_to_save}.
 }
 \description{
 The \code{download_merra2_data()} function accesses and downloads various
-meteorological and atmospheric collections from the \href{https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/}{Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)}.
+meteorological and atmospheric collections from \href{https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/}{NASA's Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model}.
 }
 \author{
 Mitchell Manware, Insang Song

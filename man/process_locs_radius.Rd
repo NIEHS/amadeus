@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_locs_radius}
 \alias{process_locs_radius}
-\title{Create circular buffer around site points.}
+\title{Process locations buffer}
 \usage{
 process_locs_radius(locs, radius)
 }
@@ -12,9 +12,12 @@ process_locs_radius(locs, radius)
 \item{radius}{integer(1). Circular buffer size (meters).}
 }
 \value{
-SpatVector.
+a \code{SpatVector} object
 }
 \description{
+Create circular buffer around locations based on user defined radius.
+
 Creates a circular buffer around points if \code{radius} is > 0.
 Returns points if \code{radius} is 0.
 }
+\keyword{internal}

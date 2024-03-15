@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_test_support.R
 \name{check_urls}
 \alias{check_urls}
-\title{Sample download URLs and apply \code{check_url_status} function}
+\title{Implement \code{check_url_status}}
 \usage{
 check_urls(urls = urls, size = NULL, method = c("HEAD", "GET", "SKIP"))
 }
@@ -18,5 +18,6 @@ check_urls(urls = urls, size = NULL, method = c("HEAD", "GET", "SKIP"))
 logical vector for URL status = 200
 }
 \description{
-Sample download URLs and apply \code{check_url_status} function
+Apply \code{check_url_status()} function to a sample of download URLs.
 }
+\keyword{auxillary}

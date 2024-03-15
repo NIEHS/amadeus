@@ -2,15 +2,15 @@
 % Please edit documentation in R/download.R
 \name{download_hms_data}
 \alias{download_hms_data}
-\title{Download daily wildfire smoke plume data from NOAA Hazard Mapping System Fire and Smoke Product}
+\title{Download wildfire smoke data}
 \usage{
 download_hms_data(
+  data_format = "Shapefile",
   date_start = "2023-09-01",
   date_end = "2023-09-01",
-  data_format = "Shapefile",
   directory_to_download = NULL,
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE,
@@ -18,13 +18,13 @@ download_hms_data(
 )
 }
 \arguments{
+\item{data_format}{character(1). "Shapefile" or "KML".}
+
 \item{date_start}{character(1). length of 10. Start date for downloading
 data. Format YYYY-MM-DD (ex. September 1, 2023 is \code{"2023-09-01"}).}
 
 \item{date_end}{character(1). length of 10. End date for downloading data.
 Format YYYY-MM-DD (ex. September 10, 2023 is \code{"2023-09-10"}).}
-
-\item{data_format}{character(1). "Shapefile" or "KML".}
 
 \item{directory_to_download}{character(1). Directory to download zip files
 from NOAA Hazard Mapping System Fire and Smoke Product. (Ignored if
@@ -33,9 +33,9 @@ from NOAA Hazard Mapping System Fire and Smoke Product. (Ignored if
 \item{directory_to_save}{character(1). Directory to save unzipped shapefiles
 and KML files.}
 
-\item{data_download_acknowledgement}{logical(1).
+\item{acknowledgement}{logical(1).
 By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
 
 \item{download}{logical(1). \code{FALSE} will generate a *.txt file
@@ -54,13 +54,13 @@ directory_to_download. Default is \code{FALSE}.
 (Ignored if \code{data_format = "KML"}.)}
 }
 \value{
-NULL;
+NULL; Zip file will be stored in \code{directory_to_download}, and
+Shapefiles (.shp) or KML files (.kml) will be stored in
+\code{directory_to_save}.
 }
 \description{
 The \code{download_hms_data()} function accesses and downloads
-wildfire smoke plume coverage data from
-the National Oceanic and Atmospheric Administration's (NOAA)
-\href{https://www.ospo.noaa.gov/Products/land/hms.html#0}{Hazard Mapping System Fire and Smoke Product}.
+wildfire smoke plume coverage data from \href{https://www.ospo.noaa.gov/Products/land/hms.html#0}{NOAA's Hazard Mapping System Fire and Smoke Product}.
 }
 \author{
 Mitchell Manware, Insang Song

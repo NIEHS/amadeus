@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_test_support.R
 \name{extract_urls}
 \alias{extract_urls}
-\title{Extract URLs from download commands}
+\title{Extract download URLs}
 \usage{
 extract_urls(commands = commands, position = NULL)
 }
@@ -15,5 +15,6 @@ extract_urls(commands = commands, position = NULL)
 character vector containing download URLs
 }
 \description{
-Extract URLs from download commands
+Extract download URLs from multi-argument download commands.
 }
+\keyword{internal}

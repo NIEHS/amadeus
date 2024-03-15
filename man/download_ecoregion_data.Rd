@@ -2,35 +2,37 @@
 % Please edit documentation in R/download.R
 \name{download_ecoregion_data}
 \alias{download_ecoregion_data}
-\title{Download Ecoregion Shapefiles from EPA}
+\title{Download ecoregion data}
 \usage{
 download_ecoregion_data(
-  directory_to_download = NULL,
-  directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
-  unzip = TRUE,
-  remove_zip = FALSE,
-  download = FALSE,
-  remove_command = TRUE,
   epa_certificate_path = system.file("extdata/cacert_gaftp_epa.pem", package = "amadeus"),
   certificate_url =
-    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
+    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  directory_to_download = NULL,
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE
 )
 }
 \arguments{
+\item{epa_certificate_path}{character(1). Path to the certificate file
+for EPA DataCommons. Default is
+'extdata/cacert_gaftp_epa.pem' under the package installation path.}
+
+\item{certificate_url}{character(1). URL to certificate file. See notes for
+details.}
+
 \item{directory_to_download}{character(1). Directory to download zip file
 of Ecoregion level 3 shapefiles}
 
 \item{directory_to_save}{character(1). Directory to decompress zip files.}
 
-\item{data_download_acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+\item{acknowledgement}{logical(1). By setting \code{TRUE} the
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
-
-\item{unzip}{logical(1). Unzip zip files. Default \code{TRUE}.}
-
-\item{remove_zip}{logical(1). Remove zip file from directory_to_download.
-Default \code{FALSE}.}
 
 \item{download}{logical(1). \code{FALSE} will generate a *.txt file
 containing all download commands. By setting \code{TRUE} the function
@@ -40,20 +42,16 @@ will download all of the requested data files.}
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 
-\item{epa_certificate_path}{character(1). Path to the certificate file
-for EPA DataCommons. Default is
-'extdata/cacert_gaftp_epa.pem' under the package installation path.}
+\item{unzip}{logical(1). Unzip zip files. Default \code{TRUE}.}
 
-\item{certificate_url}{character(1). URL to certificate file. See notes for
-details.}
+\item{remove_zip}{logical(1). Remove zip file from directory_to_download.
+Default \code{FALSE}.}
 }
 \value{
 NULL;
 }
 \description{
-The \code{download_ecoregion_data()} function accesses and downloads
-Ecoregions level 3 data, where all pieces of information in the higher
-levels are included.
+The \code{download_ecoregion_data()} function accesses and downloads United States Ecoregions data from the \href{https://www.epa.gov/eco-research/ecoregions}{U.S. Environmental Protection Agency's (EPA) Ecorgions}. Level 3 data, where all pieces of information in the higher levels are included, are downloaded.
 }
 \note{
 For EPA Data Commons certificate errors, follow the steps below:

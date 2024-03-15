@@ -2,13 +2,13 @@
 % Please edit documentation in R/download.R
 \name{download_tri_data}
 \alias{download_tri_data}
-\title{Download data from EPA toxic release inventory}
+\title{Download toxic release data}
 \usage{
 download_tri_data(
   year_start = 2018L,
   year_end = 2022L,
   directory_to_save = NULL,
-  data_download_acknowledgement = FALSE,
+  acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE
 )
@@ -20,8 +20,8 @@ download_tri_data(
 
 \item{directory_to_save}{character(1). Directory to download files.}
 
-\item{data_download_acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledge that the data downloaded using this function may be very
+\item{acknowledgement}{logical(1). By setting \code{TRUE} the
+user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
 
 \item{download}{logical(1). \code{FALSE} will generate a *.txt file
@@ -32,10 +32,11 @@ will download all of the requested data files.}
 the text file containing download commands.}
 }
 \value{
-NULL; Yearly comma-separated value (CSV) raw files for each year
+NULL; Yearly comma-separated value (CSV) files will be stored in
+\code{directory_to_save}.
 }
 \description{
-Download data from EPA toxic release inventory
+The \code{download_tri_data()} function accesses and downloads toxic release data from the \href{https://www.epa.gov/toxics-release-inventory-tri-program/find-understand-and-use-tri}{U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program}.
 }
 \author{
 Mariana Kassien, Insang Song

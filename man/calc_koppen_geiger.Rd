@@ -2,16 +2,15 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calc_koppen_geiger}
 \alias{calc_koppen_geiger}
-\title{Calculate Koeppen-Geiger climate zone binary variables}
+\title{Calculate climate classification covariates}
 \usage{
-calc_koppen_geiger(locs = NULL, from = NULL, locs_id = "site_id", ...)
+calc_koppen_geiger(from = NULL, locs = NULL, locs_id = "site_id", ...)
 }
 \arguments{
+\item{from}{SpatVector(1). Output of \code{process_koppen_geiger()}.}
+
 \item{locs}{sf/SpatVector. Unique locs. Should include
 a unique identifier field named \code{locs_id}}
-
-\item{from}{character(1). from to Koppen-Geiger
-climate zone raster file}
 
 \item{locs_id}{character(1). Name of unique identifier.}
 
@@ -21,7 +20,13 @@ climate zone raster file}
 a data.frame object
 }
 \description{
-Calculate Koeppen-Geiger climate zone binary variables
+Extract climate classification values at point locations. Returns a
+\code{data.frame} object containing \code{locs_id} and
+binary (0 = point not in climate region; 1 = point in climate region)
+variables for each climate classification region.
+}
+\seealso{
+\code{\link[=process_koppen_geiger]{process_koppen_geiger()}}
 }
 \author{
 Insang Song
