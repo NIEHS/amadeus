@@ -30,7 +30,7 @@ meteorological variable. Meteorological variable column name reflects
 variable and circular buffer radius.
 }
 \seealso{
-\code{\link[=process_narr]{process_narr()}}
+\code{\link{process_narr}}
 }
 \author{
 Mitchell Manware

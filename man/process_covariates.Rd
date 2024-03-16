@@ -26,11 +26,11 @@ depending on \code{covariate} value.}
 covariate type and selections.
 }
 \description{
-The \code{process_covariates()} function processes raw data files which have
-been downloaded by \code{download_data()}. \code{process_covariates()} and
+This function processes raw data files which have
+been downloaded by \code{\link{download_data}}. \code{process_covariates} and
 the underlying source-specific processing functions have been designed to
 operate on the raw data files. To avoid errors, \strong{do not edit the raw
-data files before passing to \code{process_covariates()}}.
+data files before passing to \code{process_covariates}}.
 }
 \seealso{
 \itemize{

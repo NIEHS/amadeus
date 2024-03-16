@@ -7,7 +7,7 @@
 process_modis_swath(
   path = NULL,
   date = NULL,
-  subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+  subdataset = NULL,
   suffix = ":mod06:",
   resolution = 0.025,
   ...
@@ -18,8 +18,7 @@ process_modis_swath(
 
 \item{date}{character(1). Date to query.}
 
-\item{subdataset}{character. One of \code{"Cloud_Fraction_Day"} or
-\code{"Cloud_Fraction_Night"} (which are available in MOD06_L2)}
+\item{subdataset}{character. Subdatasets to process.}
 
 \item{suffix}{character(1). Should be formatted \verb{:\{product\}:},
 e.g., \verb{:mod06:}}
@@ -44,9 +43,9 @@ the full path to the hdf file.
 }
 \seealso{
 \itemize{
-\item \link{process_modis_warp}
+\item \code{\link{process_modis_warp}}
 \item \href{https://gdal.org/drivers/raster/hdf4.html}{GDAL HDF4 driver documentation}
-\item \link[terra:describe]{terra::describe}: to list the full subdataset list with \code{sds = TRUE}
+\item \code{\link[terra:describe]{terra::describe}}: to list the full subdataset list with \code{sds = TRUE}
 }
 }
 \author{

@@ -42,7 +42,7 @@ Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates
 }
 \note{
 The function is originally from
-\href{https://github.com/Spatiotemporal-Exposures-and-Toxicology/chopin}{chopin}
+\href{https://github.com/kyle-messier/chopin}{chopin}
 Distance calculation is done with terra functions internally.
 Thus, the function internally converts sf objects in
 \code{point_*} arguments to terra.

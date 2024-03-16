@@ -4,7 +4,14 @@
 \alias{calc_nlcd}
 \title{Calculate land cover covariates}
 \usage{
-calc_nlcd(from, locs, locs_id = "site_id", radius = 1000, ...)
+calc_nlcd(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 1000,
+  max_cells = 1e+08,
+  ...
+)
 }
 \arguments{
 \item{from}{SpatRaster(1). Output of \code{process_nlcd()}.}
@@ -15,6 +22,11 @@ calc_nlcd(from, locs, locs_id = "site_id", radius = 1000, ...)
 
 \item{radius}{numeric (non-negative) giving the
 radius of buffer around points}
+
+\item{max_cells}{integer(1). Maximum number of cells to be read at once.
+Higher values will expedite processing, but will increase memory usage.
+Maximum possible value is \code{2^31 - 1}.
+See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
 
 \item{...}{Placeholders.}
 }
@@ -27,5 +39,5 @@ a \code{data.frame} object containing \code{locs_id}, longitude, latitude,
 time (year), and computed ratio for each land cover class.
 }
 \seealso{
-\code{\link[=process_nlcd]{process_nlcd()}}
+\code{\link{process_nlcd}}
 }

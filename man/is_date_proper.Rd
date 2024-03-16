@@ -11,7 +11,7 @@ is_date_proper(instr = NULL, format = "\%Y-\%m-\%d")
 
 \item{format}{character(1). Matching format to be checked.
 Default is \code{"\%Y-\%m-\%d"}, which can detect \verb{"\%Y/\%m/\%d}.
-See \link{strftime} for details of formatting this string.}
+See \code{\link{strftime}} for details of formatting this string.}
 }
 \value{
 No returning value. It stops the function if \code{instr} doesn't

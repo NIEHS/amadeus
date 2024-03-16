@@ -24,7 +24,7 @@ process_tri(
 a \code{SpatVector} object (points) in \code{year}
 }
 \description{
-The \code{process_tri()} function imports and cleans raw toxic release data,
+This function imports and cleans raw toxic release data,
 returning a single \code{SpatVector} (points) object for the selected \code{year}.
 }
 \note{

@@ -14,18 +14,18 @@ process_modis_merge(
 }
 \arguments{
 \item{path}{character. Full list of hdf file paths.
-preferably a recursive search result from \code{list.files}.}
+preferably a recursive search result from \code{\link[base:list.files]{base::list.files}}.}
 
 \item{date}{character(1). date to query. Should be in
 \code{"YYYY-MM-DD"} format.}
 
 \item{subdataset}{character(1). subdataset names to extract.
-Should conform to regular expression. See \link{regex} for details.
+Should conform to regular expression. See \code{\link[base:regex]{base::regex}} for details.
 Default is \code{NULL}, which will result in errors. Users should specify
 which subdatasets will be imported.}
 
 \item{fun_agg}{Function name or custom function to aggregate overlapping
-cell values. See \code{fun} description in \link[terra]{tapp} for details.}
+cell values. See \code{fun} description in \code{\link[terra:tapp]{terra::tapp}} for details.}
 
 \item{...}{For internal use.}
 }
@@ -42,7 +42,7 @@ MODIS products downloaded by functions in \code{amadeus},
 and \href{https://github.com/rspatial/luna}{luna} are accepted.
 }
 \seealso{
-\link{download_data}
+\code{\link{download_data}}
 }
 \author{
 Insang Song

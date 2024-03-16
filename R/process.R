@@ -1,11 +1,11 @@
 # nolint start
 #' Process raw data wrapper function
 #' @description
-#' The \code{process_covariates()} function processes raw data files which have
-#' been downloaded by \code{download_data()}. \code{process_covariates()} and
+#' This function processes raw data files which have
+#' been downloaded by [`download_data`]. `process_covariates` and
 #' the underlying source-specific processing functions have been designed to
 #' operate on the raw data files. To avoid errors, \strong{do not edit the raw
-#' data files before passing to \code{process_covariates()}}.
+#' data files before passing to `process_covariates`}.
 #' @param covariate character(1). Covariate type.
 #' @param path character(1). Directory or file path to raw data
 #' depending on `covariate` value.
@@ -110,15 +110,18 @@ process_covariates <-
 #' If this value is not NULL, preset filter is
 #' overridden.
 #' @note
-#' Preset product codes and associated variables include \code{MOD11A1} -
-#' land surface temperature (LST), \code{MOD13A2} - Normalized Difference
-#' Vegetation Index (NDVI), \code{MOD09GA} - surface reflectance, and
-#' \code{MCD19A2} - aerosol optical depth (AOD). For a full list of available
+#' Preset product codes and associated variables include
+#' * "MOD11A1" - Land surface temperature (LST)
+#' * "MOD13A2" - Normalized Difference Vegetation Index (NDVI)
+#' * "MOD09GA" - Surface reflectance, and
+#' * "MCD19A2" - Aerosol optical depth (AOD).
+#'
+#' For a full list of available
 #' MODIS product codes, see the "Short Name" column at
 #' [NASA LP DAAC Search Data Catalog](https://lpdaac.usgs.gov/product_search/?collections=Combined+MODIS&collections=Terra+MODIS&collections=Aqua+MODIS&view=list).
 #' When utilizing a product code from this "Short Name" column, \strong{do
 #' not include} the version number following the period. For example, if "Short
-#' Name" = MCD12C1.006, then \code{product = MCD12C1}.
+#' Name" = MCD12C1.006, then `product = "MCD12C1"`.
 # nolint end
 #' @author Insang Song
 #' @returns A character object that conforms to the regular
@@ -240,21 +243,21 @@ the input then flatten it manually.")
 #' @description
 #' Get mosaicked or merged raster from multiple MODIS hdf files.
 #' @param path character. Full list of hdf file paths.
-#'  preferably a recursive search result from \code{list.files}.
+#'  preferably a recursive search result from [`base::list.files`].
 #' @param date character(1). date to query. Should be in
-#' \code{"YYYY-MM-DD"} format.
+#' `"YYYY-MM-DD"` format.
 #' @param subdataset character(1). subdataset names to extract.
-#' Should conform to regular expression. See \link{regex} for details.
+#' Should conform to regular expression. See [`base::regex`] for details.
 #' Default is `NULL`, which will result in errors. Users should specify
 #' which subdatasets will be imported.
 #' @param fun_agg Function name or custom function to aggregate overlapping
-#' cell values. See \code{fun} description in \link[terra]{tapp} for details.
+#' cell values. See `fun` description in [`terra::tapp`] for details.
 #' @param ... For internal use.
 #' @note Curvilinear products (i.e., swaths) will not be accepted.
 #' MODIS products downloaded by functions in `amadeus`,
 #' [MODISTools](https://cran.r-project.org/web/packages/MODISTools/index.html),
 #' and [luna](https://github.com/rspatial/luna) are accepted.
-#' @seealso [download_data]
+#' @seealso [`download_data`]
 #' @author Insang Song
 #' @returns a `SpatRaster` object
 #' @export
@@ -363,7 +366,7 @@ process_bluemarble_corners <-
 #' @param instr character(1). String to check.
 #' @param format character(1). Matching format to be checked.
 #' Default is `"%Y-%m-%d"`, which can detect `"%Y/%m/%d`.
-#' See [strftime] for details of formatting this string.
+#' See [`strftime`] for details of formatting this string.
 #' @returns No returning value. It stops the function if `instr` doesn't
 #' conform to the `format`.
 #' @author Insang Song
@@ -471,7 +474,7 @@ process_bluemarble <- function(
 #' the relative position of the sensor axis. As this type of data
 #' typically does not work well with planar spatial data, users
 #' should warp or rectify this data into a rectilinear raster.
-#' Main procedure is done with [stars::st_warp], in which users are able to
+#' Main procedure is done with [`stars::st_warp`], in which users are able to
 #' customize the threshold to fill potential gaps that appear where
 #' the target resolution is finer than the local resolution of curvilinear
 #' grid points.
@@ -481,13 +484,12 @@ process_bluemarble <- function(
 #' @param threshold numeric(1). Maximum distance to fill gaps if occur.
 #' @param crs integer(1)/character(1). Coordinate system definition.
 #' Should be compatible with EPSG codes or WKT2.
-#' See [terra::crs] and [sf::st_crs] / [EPSG](https://www.epsg.io)
+#' See [`terra::crs`] and [`sf::st_crs`] / [EPSG](https://www.epsg.io)
 #' @param ... For internal use.
-#' @note Users should specify sub-dataset with all flags that are
-#' compatible with `gdalinfo`
+#' @note This function handles one file at a time.
 #' @returns a `stars` object
 #' @author Insang Song
-#' @seealso [terra::rectify]
+#' @seealso [`terra::rectify`]
 #' @importFrom stars st_warp
 #' @importFrom stars read_stars
 #' @export
@@ -526,17 +528,16 @@ process_modis_warp <-
 #' the full path to the hdf file.
 #' @param path character. Full paths of hdf files.
 #' @param date character(1). Date to query.
-#' @param subdataset character. One of `"Cloud_Fraction_Day"` or
-#' `"Cloud_Fraction_Night"` (which are available in MOD06_L2)
+#' @param subdataset character. Subdatasets to process.
 #' @param suffix character(1). Should be formatted `:{product}:`,
 #' e.g., `:mod06:`
 #' @param resolution numeric(1). Resolution of output raster.
 #' Unit is degree.
 #' @param ... For internal use.
 #' @seealso
-#' * [process_modis_warp]
+#' * [`process_modis_warp`]
 #' * [GDAL HDF4 driver documentation](https://gdal.org/drivers/raster/hdf4.html)
-#' * [terra::describe]: to list the full subdataset list with `sds = TRUE`
+#' * [`terra::describe`]: to list the full subdataset list with `sds = TRUE`
 #' @returns a `SpatRaster` object (crs = `"EPSG:4326"`)
 #' @author Insang Song
 #' @importFrom terra rast
@@ -549,7 +550,7 @@ process_modis_swath <-
   function(
     path = NULL,
     date = NULL,
-    subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+    subdataset = NULL,
     suffix = ":mod06:",
     resolution = 0.025,
     ...
@@ -655,7 +656,7 @@ process_nlcd <-
 
 #' Process ecoregion data
 #' @description
-#' The \code{process_ecoregion()} function imports and cleans raw ecoregion
+#' The [`process_ecoregion`] function imports and cleans raw ecoregion
 #' data, returning a `SpatVector` object.
 #' @param path character(1). Path to Ecoregion Shapefiles
 #' @author Insang Song
@@ -724,7 +725,7 @@ process_conformity <-
 # nolint start
 #' Process toxic release data
 #' @description
-#' The \code{process_tri()} function imports and cleans raw toxic release data,
+#' This function imports and cleans raw toxic release data,
 #' returning a single `SpatVector` (points) object for the selected `year`.
 #' @param path character(1). Path to the directory with TRI CSV files
 #' @param year integer(1). Single year to select.
@@ -828,7 +829,7 @@ process_tri <- function(
 #' The \code{process_tri()} function imports and cleans raw road emissions data,
 #' returning a single `SpatVector` object.
 #' @param path character(1). Directory with NEI csv files.
-#' @param county `SpatVector`/`sf.` County boundaries.
+#' @param county `SpatVector`/`sf`. County boundaries.
 #' @param year integer(1) Year to use. Currently only 2017 or 2020
 #' is accepted.
 #' @returns a `SpatVector` object
@@ -975,6 +976,7 @@ process_aqs <-
 
     site_id <- NULL
     Datum <- NULL
+    POC <- NULL
 
     # select relevant fields only
     sites <- sites |>

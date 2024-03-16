@@ -37,7 +37,7 @@ object containing \code{locs_id} and variables for each chemical in
 U.S. context.
 }
 \seealso{
-\code{\link[=calc_sedc]{calc_sedc()}}, \code{\link[=process_tri]{process_tri()}}
+\code{\link{calc_sedc}}, \code{\link{process_tri}}
 }
 \author{
 Insang Song, Mariana Kassien

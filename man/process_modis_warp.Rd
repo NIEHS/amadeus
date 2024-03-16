@@ -22,7 +22,7 @@ output rectilinear grid raster.}
 
 \item{crs}{integer(1)/character(1). Coordinate system definition.
 Should be compatible with EPSG codes or WKT2.
-See \link[terra:crs]{terra::crs} and \link[sf:st_crs]{sf::st_crs} / \href{https://www.epsg.io}{EPSG}}
+See \code{\link[terra:crs]{terra::crs}} and \code{\link[sf:st_crs]{sf::st_crs}} / \href{https://www.epsg.io}{EPSG}}
 
 \item{...}{For internal use.}
 }
@@ -35,17 +35,16 @@ where curvilinear points are stored with varying resolution depending on
 the relative position of the sensor axis. As this type of data
 typically does not work well with planar spatial data, users
 should warp or rectify this data into a rectilinear raster.
-Main procedure is done with \link[stars:st_warp]{stars::st_warp}, in which users are able to
+Main procedure is done with \code{\link[stars:st_warp]{stars::st_warp}}, in which users are able to
 customize the threshold to fill potential gaps that appear where
 the target resolution is finer than the local resolution of curvilinear
 grid points.
 }
 \note{
-Users should specify sub-dataset with all flags that are
-compatible with \code{gdalinfo}
+This function handles one file at a time.
 }
 \seealso{
-\link[terra:rectify]{terra::rectify}
+\code{\link[terra:rectify]{terra::rectify}}
 }
 \author{
 Insang Song
