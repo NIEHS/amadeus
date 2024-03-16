@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,7 +32,7 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/kyle-messier/amadeus/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -45,7 +45,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Process MODIS .hdf files</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/blob/HEAD/R/process.R" class="external-link"><code>R/process.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/kyle-messier/amadeus/blob/HEAD/R/process.R" class="external-link"><code>R/process.R</code></a></small>
       <div class="d-none name"><code>process_modis_merge.Rd</code></div>
     </div>
 
@@ -68,7 +68,7 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>path</dt>
 <dd><p>character. Full list of hdf file paths.
-preferably a recursive search result from <code>list.files</code>.</p></dd>
+preferably a recursive search result from <code><a href="https://rdrr.io/r/base/list.files.html" class="external-link">base::list.files</a></code>.</p></dd>
 
 
 <dt>date</dt>
@@ -78,14 +78,14 @@ preferably a recursive search result from <code>list.files</code>.</p></dd>
 
 <dt>subdataset</dt>
 <dd><p>character(1). subdataset names to extract.
-Should conform to regular expression. See <a href="https://rdrr.io/r/base/regex.html" class="external-link">regex</a> for details.
+Should conform to regular expression. See <code><a href="https://rdrr.io/r/base/regex.html" class="external-link">base::regex</a></code> for details.
 Default is <code>NULL</code>, which will result in errors. Users should specify
 which subdatasets will be imported.</p></dd>
 
 
 <dt>fun_agg</dt>
 <dd><p>Function name or custom function to aggregate overlapping
-cell values. See <code>fun</code> description in <a href="https://rspatial.github.io/terra/reference/tapp.html" class="external-link">tapp</a> for details.</p></dd>
+cell values. See <code>fun</code> description in <code><a href="https://rspatial.github.io/terra/reference/tapp.html" class="external-link">terra::tapp</a></code> for details.</p></dd>
 
 
 <dt>...</dt>
@@ -107,7 +107,7 @@ and <a href="https://github.com/rspatial/luna" class="external-link">luna</a> ar
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><a href="download_data.html">download_data</a></p></div>
+    <div class="dont-index"><p><code><a href="download_data.html">download_data</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

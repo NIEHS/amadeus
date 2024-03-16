@@ -26,7 +26,7 @@ grid points."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/lib
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,7 @@ grid points."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/lib
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/kyle-messier/amadeus/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -61,7 +61,7 @@ grid points."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/lib
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Warp MODIS swath data into rectilinear grid raster</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/blob/HEAD/R/process.R" class="external-link"><code>R/process.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/kyle-messier/amadeus/blob/HEAD/R/process.R" class="external-link"><code>R/process.R</code></a></small>
       <div class="d-none name"><code>process_modis_warp.Rd</code></div>
     </div>
 
@@ -71,7 +71,7 @@ where curvilinear points are stored with varying resolution depending on
 the relative position of the sensor axis. As this type of data
 typically does not work well with planar spatial data, users
 should warp or rectify this data into a rectilinear raster.
-Main procedure is done with <a href="https://r-spatial.github.io/stars/reference/st_warp.html" class="external-link">stars::st_warp</a>, in which users are able to
+Main procedure is done with <code><a href="https://r-spatial.github.io/stars/reference/st_warp.html" class="external-link">stars::st_warp</a></code>, in which users are able to
 customize the threshold to fill potential gaps that appear where
 the target resolution is finer than the local resolution of curvilinear
 grid points.</p>
@@ -106,7 +106,7 @@ output rectilinear grid raster.</p></dd>
 <dt>crs</dt>
 <dd><p>integer(1)/character(1). Coordinate system definition.
 Should be compatible with EPSG codes or WKT2.
-See <a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">terra::crs</a> and <a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">sf::st_crs</a> / <a href="https://www.epsg.io" class="external-link">EPSG</a></p></dd>
+See <code><a href="https://rspatial.github.io/terra/reference/crs.html" class="external-link">terra::crs</a></code> and <code><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">sf::st_crs</a></code> / <a href="https://www.epsg.io" class="external-link">EPSG</a></p></dd>
 
 
 <dt>...</dt>
@@ -121,12 +121,11 @@ See <a href="https://rspatial.github.io/terra/reference/crs.html" class="externa
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>Users should specify sub-dataset with all flags that are
-compatible with <code>gdalinfo</code></p>
+    <p>This function handles one file at a time.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><a href="https://rspatial.github.io/terra/reference/rectify.html" class="external-link">terra::rectify</a></p></div>
+    <div class="dont-index"><p><code><a href="https://rspatial.github.io/terra/reference/rectify.html" class="external-link">terra::rectify</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

@@ -24,7 +24,7 @@ the full path to the hdf file.'><!-- mathjax --><script src="https://cdnjs.cloud
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,7 +46,7 @@ the full path to the hdf file.'><!-- mathjax --><script src="https://cdnjs.cloud
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/kyle-messier/amadeus/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -59,7 +59,7 @@ the full path to the hdf file.'><!-- mathjax --><script src="https://cdnjs.cloud
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Mosaic MODIS swaths</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/blob/HEAD/R/process.R" class="external-link"><code>R/process.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/kyle-messier/amadeus/blob/HEAD/R/process.R" class="external-link"><code>R/process.R</code></a></small>
       <div class="d-none name"><code>process_modis_swath.Rd</code></div>
     </div>
 
@@ -79,7 +79,7 @@ the full path to the hdf file.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">process_modis_swath</span><span class="op">(</span></span>
 <span>  path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  date <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  subdataset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cloud_Fraction_Day"</span>, <span class="st">"Cloud_Fraction_Night"</span><span class="op">)</span>,</span>
+<span>  subdataset <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  suffix <span class="op">=</span> <span class="st">":mod06:"</span>,</span>
 <span>  resolution <span class="op">=</span> <span class="fl">0.025</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -97,8 +97,7 @@ the full path to the hdf file.</p>
 
 
 <dt>subdataset</dt>
-<dd><p>character. One of <code>"Cloud_Fraction_Day"</code> or
-<code>"Cloud_Fraction_Night"</code> (which are available in MOD06_L2)</p></dd>
+<dd><p>character. Subdatasets to process.</p></dd>
 
 
 <dt>suffix</dt>
@@ -124,9 +123,9 @@ Unit is degree.</p></dd>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index">
-<ul><li><p><a href="process_modis_warp.html">process_modis_warp</a></p></li>
+<ul><li><p><code><a href="process_modis_warp.html">process_modis_warp</a></code></p></li>
 <li><p><a href="https://gdal.org/drivers/raster/hdf4.html" class="external-link">GDAL HDF4 driver documentation</a></p></li>
-<li><p><a href="https://rspatial.github.io/terra/reference/describe.html" class="external-link">terra::describe</a>: to list the full subdataset list with <code>sds = TRUE</code></p></li>
+<li><p><code><a href="https://rspatial.github.io/terra/reference/describe.html" class="external-link">terra::describe</a></code>: to list the full subdataset list with <code>sds = TRUE</code></p></li>
 </ul></div>
     </div>
     <div class="section level2">

@@ -14,7 +14,7 @@ presets of product values."><!-- mathjax --><script src="https://cdnjs.cloudflar
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@ presets of product values."><!-- mathjax --><script src="https://cdnjs.cloudflar
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/kyle-messier/amadeus/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -49,7 +49,7 @@ presets of product values."><!-- mathjax --><script src="https://cdnjs.cloudflar
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Process MODIS sub-datasets</h1>
-      <small class="dont-index">Source: <a href="https://github.com/Spatiotemporal-Exposures-and-Toxicology/amadeus/blob/HEAD/R/process.R" class="external-link"><code>R/process.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/kyle-messier/amadeus/blob/HEAD/R/process.R" class="external-link"><code>R/process.R</code></a></small>
       <div class="d-none name"><code>process_modis_sds.Rd</code></div>
     </div>
 
@@ -88,15 +88,16 @@ expression. Details of regular expression in R can be found in <a href="https://
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>Preset product codes and associated variables include <code>MOD11A1</code> -
-land surface temperature (LST), <code>MOD13A2</code> - Normalized Difference
-Vegetation Index (NDVI), <code>MOD09GA</code> - surface reflectance, and
-<code>MCD19A2</code> - aerosol optical depth (AOD). For a full list of available
+    <p>Preset product codes and associated variables include</p><ul><li><p>"MOD11A1" - Land surface temperature (LST)</p></li>
+<li><p>"MOD13A2" - Normalized Difference Vegetation Index (NDVI)</p></li>
+<li><p>"MOD09GA" - Surface reflectance, and</p></li>
+<li><p>"MCD19A2" - Aerosol optical depth (AOD).</p></li>
+</ul><p>For a full list of available
 MODIS product codes, see the "Short Name" column at
 <a href="https://lpdaac.usgs.gov/product_search/?collections=Combined+MODIS&amp;collections=Terra+MODIS&amp;collections=Aqua+MODIS&amp;view=list" class="external-link">NASA LP DAAC Search Data Catalog</a>.
 When utilizing a product code from this "Short Name" column, <strong>do
 not include</strong> the version number following the period. For example, if "Short
-Name" = MCD12C1.006, then <code>product = MCD12C1</code>.</p>
+Name" = MCD12C1.006, then <code>product = "MCD12C1"</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
