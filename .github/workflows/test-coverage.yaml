@@ -13,8 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }} # Add this line
-
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      COVR_REPORT_FILE: 'coverage.json' 
+      REPO_NAME: 'kyle-messier/amadeus' 
+      COVERAGE_BADGE_PATH: 'README.md' 
+      
     steps:
       - uses: actions/checkout@v4
 
@@ -54,6 +57,18 @@ jobs:
           name: coverage-test-failures
           path: ${{ runner.temp }}/package
 
-      - name: Upload coverage to Codecov # Add this step
+      - name: Generate coverage badge
         run: |
-          Rscript -e "covr::codecov(token = Sys.getenv('CODECOV_TOKEN'))"
+          COVERAGE=$(jq -r '.result.coverage' ${{ env.COVERAGE_REPORT_FILE }})
+          echo "Current coverage: $COVERAGE%"
+          sed -i "s|![Coverage](.*)|![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-brightgreen.svg)|" ${{ env.COVERAGE_BADGE_PATH }}
+        shell: bash
+        
+      - name: Commit and push updated README
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add ${{ env.COVERAGE_BADGE_PATH }}
+          git commit -m "Update coverage badge [skip ci]"
+          git push origin HEAD:${{ github.ref }}
+        if: always()
