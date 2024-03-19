@@ -1,5 +1,6 @@
-# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
-# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+# Workflow designed to run tests via R package covr, save the test results to
+# GitHub artifacts, and manually update the README.md with a badge https://img.shields.io/badge/
+
 on:
   push:
     branches: [main, master]
@@ -13,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }} # Add this line
 
     steps:
       - uses: actions/checkout@v4
@@ -47,13 +47,32 @@ jobs:
           find ${{ runner.temp }}/package -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
 
-      - name: Upload test results
-        if: failure()
-        uses: actions/upload-artifact@v3
+      - name: Save test coverage results
+        if: always()
+        uses: actions/upload-artifact@v2
         with:
-          name: coverage-test-failures
-          path: ${{ runner.temp }}/package
+          name: covr-report
+          path: ${{ runner.temp }}/package/covr
 
-      - name: Upload coverage to Codecov # Add this step
+      - name: Update README.md
+        if: always()
         run: |
-          Rscript -e "covr::codecov(token = Sys.getenv('CODECOV_TOKEN'))"
+          ## --------------------------------------------------------------------
+          ## Update README.md with test coverage badge
+          ## --------------------------------------------------------------------
+          Rscript -e 'covr::codecov()'
+        shell: Rscript {0}
+
+      - name: Commit changes
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          ## Commit changes to the repository
+          ## --------------------------------------------------------------------
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "
+          git add README.md
+          git commit -m "Update README.md with test coverage badge"
+          git push
+        shell: bash
+
