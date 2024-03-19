@@ -54,14 +54,23 @@ jobs:
           name: covr-report
           path: ${{ runner.temp }}/package/covr
 
-      - name: Update README.md
+      - name: Get badge image svg
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          ## Get badge image svg
+          ## --------------------------------------------------------------------
+          curl -s https://img.shields.io/badge/coverage-$(curl -s https://codecov.io/gh/${{ github.repository }}/branch/${{ github.ref }}/graph/badge.svg | grep -oP 'coverage-[0-9]+.[0-9]+%')-brightgreen.svg > coverage.svg
+        shell: bash
+
+      - name: Update README.md with test coverage badge
         if: always()
         run: |
           ## --------------------------------------------------------------------
           ## Update README.md with test coverage badge
           ## --------------------------------------------------------------------
-          Rscript -e 'covr::codecov()'
-        shell: Rscript {0}
+          sed -i 's|https://img.shields.io/badge/coverage-[0-9]+.[0-9]+%25-brightgreen.svg|coverage.svg|' README.md
+        shell: bash
 
       - name: Commit changes
         if: always()
