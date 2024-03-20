@@ -32,9 +32,9 @@ jobs:
 
       - name: Generate coverage report
         run: |
-          cov <- covr::package_coverage()
-          json_cov <- jsonlite::toJSON(cov)
-          writeLines(json_cov, "coverage.json")
+          Rscript -e "cov <- covr::package_coverage()"
+          Rscript -e "json_cov <- jsonlite::toJSON(cov)"
+          Rscript -e "writeLines(json_cov, "coverage.json")"
 
       - name: Save coverage report as artifact
         uses: actions/upload-artifact@v2
