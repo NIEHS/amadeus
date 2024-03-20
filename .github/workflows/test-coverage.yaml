@@ -32,7 +32,7 @@ jobs:
 
       - name: Generate coverage report
         run: |
-          Rscript -e "covr::package_coverage()"
+          Rscript -e "covr::package_coverage(type = "json")"
 
       - name: Save coverage report as artifact
         uses: actions/upload-artifact@v2
