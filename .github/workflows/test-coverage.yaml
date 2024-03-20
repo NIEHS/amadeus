@@ -28,6 +28,7 @@ jobs:
             any::units
             any::knitr
             any::rmarkdown
+            jsonlite
           needs: coverage
 
       - name: Generate coverage report
