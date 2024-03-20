@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }} # Add this line
 
     steps:
       - uses: actions/checkout@v4
@@ -31,29 +30,19 @@ jobs:
             any::rmarkdown
           needs: coverage
 
-      - name: Test coverage
+      - name: Generate coverage report
         run: |
-          covr::codecov(
-            quiet = FALSE,
-            clean = FALSE,
-            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
-          )
-        shell: Rscript {0}
+          Rscript -e "covr::package_coverage()"
 
-      - name: Show testthat output
-        if: always()
-        run: |
-          ## --------------------------------------------------------------------
-          find ${{ runner.temp }}/package -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-
-      - name: Upload test results
-        if: failure()
-        uses: actions/upload-artifact@v3
+      - name: Save coverage report as artifact
+        uses: actions/upload-artifact@v2
         with:
-          name: coverage-test-failures
-          path: ${{ runner.temp }}/package
-
-      - name: Upload coverage to Codecov # Add this step
-        run: |
-          Rscript -e "covr::codecov(token = Sys.getenv('CODECOV_TOKEN'))"
+          name: coverage-report
+          path: coverage.json
+          
+      - name: ⚙️ Generating coverage badges
+        uses: jpb06/coverage-badges-action@latest
+          with:
+            branches: main
+            badges-icon: vitest
+          
