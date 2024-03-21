@@ -22,4 +22,4 @@ Config/Needs/website: tidyverse/tidytemplate
 Config/testhat/edition: 3
 License: MIT + file LICENSE
 URL: https://github.com/kyle-messier/amadeus, 
-https: //kyle-messier.github.io/amadeus/
+https://niehs.github.io/amadeus/
