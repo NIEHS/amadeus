@@ -1,9 +1,9 @@
 # amadeus
 
-[![R-CMD-check](https://github.com/kyle-messier/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/check-standard.yaml)
-[![cov](https://kyle-messier.github.io/amadeus/badges/coverage.svg)](https://github.com/kyle-messier/amadeus/actions)
-[![lint](https://github.com/kyle-messier/amadeus/actions/workflows/lint.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/lint.yaml)
-[![pkgdown](https://github.com/kyle-messier/amadeus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/pkgdown.yaml)
+[![R-CMD-check](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml)
+[![cov](https://NIEHS.github.io/amadeus/badges/coverage.svg)](https://github.com/NIEHS/amadeus/actions)
+[![lint](https://github.com/NIEHS/amadeus/actions/workflows/lint.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/lint.yaml)
+[![pkgdown](https://github.com/NIEHS/amadeus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/pkgdown.yaml)
 
 **A** **M**echanism/**M**achine for **D**ata, **E**nvironments, and **U**ser **S**etup
 
