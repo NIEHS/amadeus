@@ -1,306 +1,306 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/404.html</loc>
+    <loc>https://niehs.github.io/amadeus/404.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/LICENSE-text.html</loc>
+    <loc>https://niehs.github.io/amadeus/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/articles/download_functions.html</loc>
+    <loc>https://niehs.github.io/amadeus/articles/download_functions.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/articles/epa_download.html</loc>
+    <loc>https://niehs.github.io/amadeus/articles/epa_download.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/articles/index.html</loc>
+    <loc>https://niehs.github.io/amadeus/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/authors.html</loc>
+    <loc>https://niehs.github.io/amadeus/authors.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/index.html</loc>
+    <loc>https://niehs.github.io/amadeus/index.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/as_mysftime.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/as_mysftime.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_covariates.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_covariates.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_ecoregion.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_ecoregion.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_geos.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_geos.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_gmted.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_gmted.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_hms.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_hms.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_koppen_geiger.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_koppen_geiger.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_merra2.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_merra2.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_modis_daily.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_modis_daily.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_modis_par.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_modis_par.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_narr.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_narr.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_nei.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_nei.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_nlcd.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_nlcd.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_sedac_groads.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_sedac_groads.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_sedac_population.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_sedac_population.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_sedc.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_sedc.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_temporal_dummies.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_temporal_dummies.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/calc_tri.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/calc_tri.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/check_for_null_parameters.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/check_for_null_parameters.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/check_mysf.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/check_mysf.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/check_mysftime.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/check_mysftime.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/check_url_status.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/check_url_status.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/check_urls.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/check_urls.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_aqs_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_aqs_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_ecoregion_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_ecoregion_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_epa_certificate.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_epa_certificate.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_geos_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_geos_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_gmted_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_gmted_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_hms_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_hms_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_koppen_geiger_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_koppen_geiger_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_merra2_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_merra2_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_modis_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_modis_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_narr_monolevel_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_narr_monolevel_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_narr_p_levels_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_narr_p_levels_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_nei_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_nei_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_nlcd_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_nlcd_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_permit.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_permit.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_remove_command.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_remove_command.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_remove_zips.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_remove_zips.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_run.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_run.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_sanitize_path.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_sanitize_path.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_sedac_groads_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_sedac_groads_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_sedac_population_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_sedac_population_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_setup_dir.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_setup_dir.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_sink.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_sink.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_tri_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_tri_data.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/download_unzip.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_unzip.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/dt_as_mysftime.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/dt_as_mysftime.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/extract_urls.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/extract_urls.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/generate_date_sequence.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/generate_date_sequence.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/generate_time_sequence.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/generate_time_sequence.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/index.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/is_date_proper.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/is_date_proper.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_aqs.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_aqs.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_bluemarble.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_bluemarble.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_bluemarble_corners.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_bluemarble_corners.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_collection.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_collection.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_conformity.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_conformity.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_covariates.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_covariates.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_ecoregion.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_ecoregion.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_flatten_sds.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_flatten_sds.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_geos.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_geos.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_gmted.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_gmted.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_gmted_codes.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_gmted_codes.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_hms.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_hms.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_koppen_geiger.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_koppen_geiger.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_locs_radius.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_locs_radius.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_locs_vector.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_locs_vector.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_merra2.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_merra2.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_merra2_time.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_merra2_time.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_modis_merge.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_modis_merge.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_modis_sds.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_modis_sds.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_modis_swath.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_modis_swath.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_modis_warp.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_modis_warp.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_narr.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_narr.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_nei.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_nei.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_nlcd.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_nlcd.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_sedac_codes.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_sedac_codes.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_sedac_groads.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_sedac_groads.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_sedac_population.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_sedac_population.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/process_tri.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/process_tri.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/read_commands.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/read_commands.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/rename_time.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/rename_time.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/sf_as_mysftime.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/sf_as_mysftime.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/sftime_as_mysftime.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/sftime_as_mysftime.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/sftime_as_sf.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/sftime_as_sf.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/sftime_as_spatraster.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/sftime_as_spatraster.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/sftime_as_spatrds.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/sftime_as_spatrds.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/sftime_as_spatvector.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/sftime_as_spatvector.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/spatraster_as_sftime.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/spatraster_as_sftime.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/spatrds_as_sftime.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/spatrds_as_sftime.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/spatvector_as_sftime.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/spatvector_as_sftime.html</loc>
   </url>
   <url>
-    <loc>https://kyle-messier.github.io/amadeus/reference/test_download_functions.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/test_download_functions.html</loc>
   </url>
 </urlset>
