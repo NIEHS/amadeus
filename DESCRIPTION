@@ -1,5 +1,5 @@
 Package: amadeus
-Title: AMADEUS: A Mechanism/Machine for Data, Environments, and User Setup
+Title: AMADEUS: A Machine for Data, Environments, and User Setup for common environmental and climate health datasets 
 Version: 0.1.5
 Authors@R: c(
     person("Kyle", "Messier", , "kyle.messier@nih.gov", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9508-9623")),

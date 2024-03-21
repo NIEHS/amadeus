@@ -1,11 +1,11 @@
-# amadeus
+# **A** **M**achine for **D**ata, **E**nvironments, and **U**ser **S**etup for common environmental and climate health datasets
 
-[![R-CMD-check](https://github.com/kyle-messier/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/check-standard.yaml)
-[![cov](https://kyle-messier.github.io/amadeus/badges/coverage.svg)](https://github.com/kyle-messier/amadeus/actions)
-[![lint](https://github.com/kyle-messier/amadeus/actions/workflows/lint.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/lint.yaml)
-[![pkgdown](https://github.com/kyle-messier/amadeus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/kyle-messier/amadeus/actions/workflows/pkgdown.yaml)
 
-**A** **M**echanism/**M**achine for **D**ata, **E**nvironments, and **U**ser **S**etup
+[![R-CMD-check](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml)
+[![cov](https://NIEHS.github.io/amadeus/badges/coverage.svg)](https://github.com/NIEHS/amadeus/actions)
+[![lint](https://github.com/NIEHS/amadeus/actions/workflows/lint.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/lint.yaml)
+[![pkgdown](https://github.com/NIEHS/amadeus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/pkgdown.yaml)
+
 
 `amadeus` is an R package devloped to improve and expideite users' access to large, publicly available geospatial datasets. The functions in `amadeus` allow users to download and import cleaned geospatial data directly in R, useful for automated run scripts, analysis pipelines, and reproducible science in general.
 
