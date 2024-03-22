@@ -1427,7 +1427,7 @@ process_narr <- function(
         "."
       )
     )[[1]][3]
-  ) 
+  )
   if (path_ncar == 9) {
     #### define year-months of interest
     ym_of_interest <- unique(
