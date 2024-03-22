@@ -1372,12 +1372,16 @@ process_gmted <- function(
   return(data)
 }
 
+# nolint start
 #' Process meteorological data
 #' @description
 #' The \code{process_narr()} function imports and cleans raw meteorological
 #' data, returning a single `SpatRaster` object.
-#' @param date character(2). length of 10 each. Format "YYYY-MM-DD".
-#' @param variable character(1). Variable name acronym.
+#' @param date character(2). length of 10 each.
+#' Start/end date of downloaded data.
+#' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
+#' @param variable character(1). Variable name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
+#' for variable names and acronym codes.
 #' @param path character(1). Directory with downloaded netCDF (.nc) files.
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable acronym,
@@ -1389,6 +1393,7 @@ process_gmted <- function(
 #' @importFrom terra subset
 #' @importFrom stringi stri_pad
 #' @export
+# nolint end
 process_narr <- function(
     date = c("2023-09-01", "2023-09-01"),
     variable = NULL,
@@ -1413,15 +1418,48 @@ process_narr <- function(
     date[2],
     sub_hyphen = TRUE
   )
+  #### define year-months of interest
+  ym_of_interest <- unique(
+    substr(
+      date_sequence,
+      1,
+      6
+    )
+  )
+  #### subset file paths to only dates of interest
+  data_paths_ym <- unique(
+    grep(
+      paste(
+        ym_of_interest,
+        collapse = "|"
+      ),
+      data_paths,
+      value = TRUE
+    )
+  )
   #### initiate for loop
   data_full <- terra::rast()
-  for (p in seq_along(data_paths)) {
+  for (p in seq_along(data_paths_ym)) {
     #### import data
-    data_year <- terra::rast(data_paths[p])
+    data_year <- terra::rast(data_paths_ym[p])
     cat(paste0(
       "Cleaning ",
       variable,
-      " data for year ",
+      " data for ",
+      month.name[
+        as.numeric(
+          substr(
+            gsub(
+              "-",
+              "",
+              terra::time(data_year)[1]
+            ),
+            5,
+            6
+          )
+        )
+      ],
+      ", ",
       substr(
         gsub(
           "-",
@@ -1451,14 +1489,18 @@ process_narr <- function(
             1,
             4
           ),
-          stringi::stri_pad(
-            days,
-            width = 3,
-            pad = "0",
-            side = "left"
-          )
+          substr(
+            gsub(
+              "-",
+              "",
+              terra::time(data_year)
+            ),
+            5,
+            6
+          ),
+          days
         ),
-        format = "%Y%j"
+        format = "%Y%m%d"
       )
       names(data_year) <- paste0(
         variable,
