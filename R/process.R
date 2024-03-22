@@ -1418,14 +1418,35 @@ process_narr <- function(
     date[2],
     sub_hyphen = TRUE
   )
-  #### define year-months of interest
-  ym_of_interest <- unique(
-    substr(
-      date_sequence,
-      1,
-      6
+  #### path ncar
+  path_ncar <- nchar(
+    strsplit(
+      data_paths[1],
+      paste0(
+        variable,
+        "."
+      )
+    )[[1]][3]
+  ) 
+  if (path_ncar == 9) {
+    #### define year-months of interest
+    ym_of_interest <- unique(
+      substr(
+        date_sequence,
+        1,
+        6
+      )
     )
-  )
+  } else if (path_ncar == 7) {
+    #### define years of interest
+    ym_of_interest <- unique(
+      substr(
+        date_sequence,
+        1,
+        4
+      )
+    )
+  }
   #### subset file paths to only dates of interest
   data_paths_ym <- unique(
     grep(
