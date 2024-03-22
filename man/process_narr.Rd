@@ -12,9 +12,12 @@ process_narr(
 )
 }
 \arguments{
-\item{date}{character(2). length of 10 each. Format "YYYY-MM-DD".}
+\item{date}{character(2). length of 10 each.
+Start/end date of downloaded data.
+Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 
-\item{variable}{character(1). Variable name acronym.}
+\item{variable}{character(1). Variable name acronym. See \href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{List of Variables in NARR Files}
+for variable names and acronym codes.}
 
 \item{path}{character(1). Directory with downloaded netCDF (.nc) files.}
 
