@@ -4,7 +4,7 @@
 \alias{process_nei}
 \title{Process road emissions data}
 \usage{
-process_nei(path = NULL, county = NULL, year = c(2017, 2020))
+process_nei(path = NULL, county = NULL, year = c(2017, 2020), ...)
 }
 \arguments{
 \item{path}{character(1). Directory with NEI csv files.}
@@ -13,6 +13,8 @@ process_nei(path = NULL, county = NULL, year = c(2017, 2020))
 
 \item{year}{integer(1) Year to use. Currently only 2017 or 2020
 is accepted.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatVector} object

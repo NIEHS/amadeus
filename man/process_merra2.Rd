@@ -7,7 +7,8 @@
 process_merra2(
   date = c("2018-01-01", "2018-01-01"),
   variable = NULL,
-  path = NULL
+  path = NULL,
+  ...
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ process_merra2(
 \item{variable}{character(1). MERRA2 variable name(s).}
 
 \item{path}{character(1). Directory with downloaded netCDF (.nc4) files.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatRaster} object;

@@ -31,6 +31,8 @@
 #' - [`calc_sedac_population`]: `"population"`, `"sedac_population"`
 #' - [`calc_sedac_groads`]: `"roads"`
 #' - [`calc_nlcd`]: `"nlcd"`
+#' - [`calc_tri`]: `"tri"`
+#' - [`calc_nei`]: `"nei"`
 #' - [`calc_merra2`]: `"merra"`, `"MERRA"`, `"merra2"`, `"MERRA2"`
 #' @returns Calculated covariates. Mainly data.frame object.
 #' @author Insang Song
@@ -45,7 +47,8 @@ calc_covariates <-
                     "gmted", "narr", "narr_monolevel", "narr_p_levels",
                     "plevels", "monolevel", "p_levels", "geos",
                     "sedac_population", "population", "nlcd",
-                    "merra", "MERRA", "merra2", "MERRA2"),
+                    "merra", "MERRA", "merra2", "MERRA2",
+                    "tri", "nei"),
       from,
       locs,
       locs_id = "site_id",
@@ -1077,6 +1080,7 @@ calc_nei <- function(
 #' containing identifier for each unique coordinate location.
 #' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0).
+#' @param ... Placeholders.
 #' @seealso [process_hms()]
 #' @author Mitchell Manware
 #' @return a data.frame object
@@ -1091,7 +1095,8 @@ calc_hms <- function(
     from,
     locs,
     locs_id = NULL,
-    radius = 0) {
+    radius = 0,
+    ...) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### from == character indicates no wildfire smoke polumes are present
@@ -1266,6 +1271,7 @@ calc_hms <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [`process_gmted()`]
 #' @return a data.frame object
@@ -1281,7 +1287,8 @@ calc_gmted <- function(
     locs,
     locs_id = NULL,
     radius = 0,
-    fun = "mean") {
+    fun = "mean",
+    ...) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### prepare sites
@@ -1384,6 +1391,7 @@ calc_gmted <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [`process_narr`]
 #' @return a data.frame object
@@ -1399,7 +1407,8 @@ calc_narr <- function(
     locs,
     locs_id = NULL,
     radius = 0,
-    fun = "mean") {
+    fun = "mean",
+    ...) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### prepare sites
@@ -1517,6 +1526,7 @@ calc_narr <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [process_geos()]
 #' @return a data.frame object
@@ -1533,7 +1543,8 @@ calc_geos <- function(
     locs,
     locs_id = NULL,
     radius = 0,
-    fun = "mean") {
+    fun = "mean",
+    ...) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### prepare sites
@@ -1640,6 +1651,7 @@ calc_geos <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [process_sedac_population()]
 #' @return a data.frame object
@@ -1656,7 +1668,8 @@ calc_sedac_population <- function(
     locs,
     locs_id = NULL,
     radius = 0,
-    fun = "mean") {
+    fun = "mean",
+    ...) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### prepare sites
@@ -1755,6 +1768,7 @@ calc_sedac_population <- function(
 #' (Default = 1000).
 #' @param fun function(1). Function used to summarize the length of roads
 #' within sites location buffer (Default is `sum`).
+#' @param ... Placeholders.
 #' @note Unit is km / sq km.
 #' @author Insang Song
 #' @seealso [`process_sedac_groads`]
@@ -1775,7 +1789,8 @@ calc_sedac_groads <- function(
     locs = NULL,
     locs_id = NULL,
     radius = 1000,
-    fun = sum) {
+    fun = sum,
+    ...) {
   #### check for null parameters
   if (radius <= 0) {
     stop("radius should be greater than 0.\n")
@@ -1836,6 +1851,7 @@ calc_sedac_groads <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [calc_geos()], [process_merra2()]
 #' @return a data.frame object
@@ -1852,7 +1868,8 @@ calc_merra2 <- function(
     locs,
     locs_id = NULL,
     radius = 0,
-    fun = "mean") {
+    fun = "mean",
+    ...) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### run `calc_geos`

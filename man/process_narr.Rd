@@ -7,7 +7,8 @@
 process_narr(
   date = c("2023-09-01", "2023-09-01"),
   variable = NULL,
-  path = NULL
+  path = NULL,
+  ...
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ process_narr(
 \item{variable}{character(1). Variable name acronym.}
 
 \item{path}{character(1). Directory with downloaded netCDF (.nc) files.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatRaster} object

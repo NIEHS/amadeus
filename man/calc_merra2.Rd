@@ -4,7 +4,7 @@
 \alias{calc_merra2}
 \title{Calculate meteorological and atmospheric covariates}
 \usage{
-calc_merra2(from, locs, locs_id = NULL, radius = 0, fun = "mean")
+calc_merra2(from, locs, locs_id = NULL, radius = 0, fun = "mean", ...)
 }
 \arguments{
 \item{from}{SpatRaster(1). Output of \code{process_merra2()}.}
@@ -19,6 +19,8 @@ containing identifier for each unique coordinate location.}
 
 \item{fun}{character(1). Function used to summarize multiple raster cells
 within sites location buffer (Default = \code{mean}).}
+
+\item{...}{Placeholders}
 }
 \value{
 a data.frame object

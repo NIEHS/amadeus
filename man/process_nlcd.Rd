@@ -4,12 +4,14 @@
 \alias{process_nlcd}
 \title{Process land cover data}
 \usage{
-process_nlcd(path = NULL, year = 2021)
+process_nlcd(path = NULL, year = 2021, ...)
 }
 \arguments{
 \item{path}{character giving nlcd data path}
 
 \item{year}{numeric giving the year of NLCD data used}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatRaster} object

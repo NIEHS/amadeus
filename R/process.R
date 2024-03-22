@@ -109,6 +109,7 @@ process_covariates <-
 #' @param custom_sel character(1). Custom filter.
 #' If this value is not NULL, preset filter is
 #' overridden.
+#' @param ... Placeholders.
 #' @note
 #' Preset product codes and associated variables include
 #' * "MOD11A1" - Land surface temperature (LST)
@@ -132,7 +133,8 @@ process_covariates <-
 process_modis_sds <-
   function(
     product = c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2"),
-    custom_sel = NULL
+    custom_sel = NULL,
+    ...
   ) {
     if (!is.null(custom_sel)) {
       modis_sds <- custom_sel
@@ -168,6 +170,7 @@ process_modis_sds <-
 #' sub-dataset. See [process_modis_sds] for details.
 #' @param fun_agg character(1). Function name to aggregate layers.
 #' Should be acceptable to [terra::tapp].
+#' @param ... Placeholders.
 #' @returns a `SpatRaster` object
 #' @author Insang Song
 #' @seealso [terra::tapp], [terra::rast], [terra::describe]
@@ -192,7 +195,8 @@ process_flatten_sds <-
   function(
     path = NULL,
     subdataset = NULL,
-    fun_agg = "mean"
+    fun_agg = "mean",
+    ...
   ) {
     # if curvilinear, halt
     status_curv <-
@@ -596,6 +600,7 @@ process_modis_swath <-
 #' @param path character(1). Path to Koppen-Geiger
 #'  climate zone raster file
 #' @param year data year. Not applicable for this function.
+#' @param ... Placeholders.
 #' @returns a `SpatRaster` object
 #' @author Insang Song
 #' @importFrom terra rast
@@ -603,7 +608,8 @@ process_modis_swath <-
 process_koppen_geiger <-
   function(
     path = NULL,
-    year = NULL
+    year = NULL,
+    ...
   ) {
     kg_rast <- terra::rast(path)
     return(kg_rast)
@@ -616,6 +622,7 @@ process_koppen_geiger <-
 #' returning a single `SpatRaster` object.
 #' @param path character giving nlcd data path
 #' @param year numeric giving the year of NLCD data used
+#' @param ... Placeholders.
 #' @description Reads NLCD file of selected `year`.
 #' @returns a `SpatRaster` object
 #' @author Eva Marques, Insang Song
@@ -626,7 +633,8 @@ process_koppen_geiger <-
 process_nlcd <-
   function(
     path = NULL,
-    year = 2021
+    year = 2021,
+    ...
   ) {
     # check inputs
     if (!is.character(path) || is.null(path)) {
@@ -659,13 +667,15 @@ process_nlcd <-
 #' The [`process_ecoregion`] function imports and cleans raw ecoregion
 #' data, returning a `SpatVector` object.
 #' @param path character(1). Path to Ecoregion Shapefiles
+#' @param ... Placeholders.
 #' @author Insang Song
 #' @returns a `SpatVector` object
 #' @importFrom terra vect
 #' @export
 process_ecoregion <-
   function(
-    path = NULL
+    path = NULL,
+    ...
   ) {
     ecoreg <- terra::vect(path)
     ecoreg <- ecoreg[, grepl("^(L2_KEY|L3_KEY)", names(ecoreg))]
@@ -832,6 +842,7 @@ process_tri <- function(
 #' @param county `SpatVector`/`sf`. County boundaries.
 #' @param year integer(1) Year to use. Currently only 2017 or 2020
 #' is accepted.
+#' @param ... Placeholders.
 #' @returns a `SpatVector` object
 #' @author Insang Song
 #' @note Base files for `county` argument can be downloaded directly from
@@ -854,7 +865,8 @@ process_tri <- function(
 process_nei <- function(
   path = NULL,
   county = NULL,
-  year = c(2017, 2020)
+  year = c(2017, 2020),
+  ...
 ) {
   if (is.null(county)) {
     stop("county argument is required.")
@@ -922,6 +934,7 @@ process_nei <- function(
 #'  Should be in `"YYYY-MM-DD"` format and sorted. If `NULL`,
 #'  only unique locations are returned.
 #' @param return_format character(1). `"terra"` or `"sf"`.
+#' @param ... Placeholders.
 #' @returns a `SpatVector` or sf object depending on the `return_format`
 #' @importFrom data.table as.data.table
 #' @importFrom utils read.csv
@@ -938,7 +951,8 @@ process_aqs <-
   function(
     path = NULL,
     date = c("2018-01-01", "2022-12-31"),
-    return_format = "terra"
+    return_format = "terra",
+    ...
   ) {
     if (!is.null(date)) {
       date <- try(as.Date(date))
@@ -964,7 +978,7 @@ process_aqs <-
       stop("path is not a directory or does not contain csv files.")
     }
 
-    sites <- data.table::rbindlist(pathfiles)
+    sites <- data.table::rbindlist(pathfiles, fill = TRUE)
 
     ## get unique sites
     sites$site_id <-
@@ -1049,13 +1063,15 @@ process_aqs <-
 #' The \code{process_secac_population()} function imports and cleans raw
 #' population density data, returning a single `SpatRaster` object.
 #' @param path character(1). Path to GeoTIFF (.tif) or netCDF (.nc) file.
+#' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @return a `SpatRaster` object
 #' @importFrom terra rast
 #' @export
 # nolint end
 process_sedac_population <- function(
-    path = NULL) {
+    path = NULL,
+    ...) {
   if (substr(path, nchar(path) - 2, nchar(path)) == ".nc") {
     cat(paste0("netCDF functionality for SEDAC data is under construction.\n"))
     return()
@@ -1109,6 +1125,7 @@ process_sedac_population <- function(
 #' The \code{process_sedac_groads()} function imports and cleans raw road data,
 #' returning a single `SpatVector` object.
 #' @param path character(1). Path to geodatabase or shapefiles.
+#' @param ... Placeholders.
 #' @note U.S. context.
 #' @author Insang Song
 #' @returns a `SpatVector` boject
@@ -1116,7 +1133,8 @@ process_sedac_population <- function(
 #' @export
 # nolint end
 process_sedac_groads <- function(
-    path = NULL) {
+    path = NULL,
+    ...) {
   #### check for variable
   check_for_null_parameters(mget(ls()))
   if (!grepl("(shp|gdb)$", path)) {
@@ -1138,6 +1156,7 @@ process_sedac_groads <- function(
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
 #' @param variable character(1). "Light", "Medium", or "Heavy".
 #' @param path character(1). Directory with downloaded NOAA HMS data files.
+#' @param ... Placeholders.
 #' @note
 #' \code{process_hms()} will return a character object if there are no wildfire
 #' smoke plumes present for the selected dates and density. The returned
@@ -1159,7 +1178,8 @@ process_sedac_groads <- function(
 process_hms <- function(
     date = c("2018-01-01", "2018-01-01"),
     variable = c("Light", "Medium", "Heavy"),
-    path = NULL) {
+    path = NULL,
+    ...) {
   #### directory setup
   path <- download_sanitize_path(path)
   #### check for variable
@@ -1306,6 +1326,7 @@ process_hms <- function(
 #' "7.5 arc-seconds")).
 #' @param path character(1). Directory with downloaded GMTED  "*_grd"
 #' folder containing .adf files.
+#' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @note
 #' `SpatRaster` layer name indicates selected variable and resolution.
@@ -1314,7 +1335,8 @@ process_hms <- function(
 #' @export
 process_gmted <- function(
     variable = NULL,
-    path = NULL) {
+    path = NULL,
+    ...) {
   #### directory setup
   path <- download_sanitize_path(path)
   #### check for variable
@@ -1379,6 +1401,7 @@ process_gmted <- function(
 #' @param date character(2). length of 10 each. Format "YYYY-MM-DD".
 #' @param variable character(1). Variable name acronym.
 #' @param path character(1). Directory with downloaded netCDF (.nc) files.
+#' @param ... Placeholders.
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable acronym,
 #' pressure level, and date.
@@ -1392,7 +1415,8 @@ process_gmted <- function(
 process_narr <- function(
     date = c("2023-09-01", "2023-09-01"),
     variable = NULL,
-    path = NULL) {
+    path = NULL,
+    ...) {
   #### directory setup
   path <- download_sanitize_path(path)
   #### check for variable
@@ -1533,6 +1557,7 @@ process_narr <- function(
 #' @param date character(2). length of 10. Format "YYYY-MM-DD".
 #' @param variable character(1). GEOS-CF variable name(s).
 #' @param path character(1). Directory with downloaded netCDF (.nc4) files.
+#' @param ... Placeholders.
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable,
 #' pressure level, date, and hour.
@@ -1547,7 +1572,8 @@ process_narr <- function(
 process_geos <-
   function(date = c("2018-01-01", "2018-01-01"),
            variable = NULL,
-           path = NULL) {
+           path = NULL,
+           ...) {
     #### directory setup
     path <- download_sanitize_path(path)
     #### check for variable
@@ -1826,6 +1852,7 @@ process_collection <-
 #' @param date character(2). length of 10. Format "YYYY-MM-DD".
 #' @param variable character(1). MERRA2 variable name(s).
 #' @param path character(1). Directory with downloaded netCDF (.nc4) files.
+#' @param ... Placeholders.
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable,
 #' pressure level, date, and hour. Pressure level values utilized for layer
@@ -1842,7 +1869,8 @@ process_collection <-
 process_merra2 <-
   function(date = c("2018-01-01", "2018-01-01"),
            variable = NULL,
-           path = NULL) {
+           path = NULL,
+           ...) {
     #### directory setup
     path <- download_sanitize_path(path)
     #### check for variable

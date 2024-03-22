@@ -9,7 +9,7 @@ calc_covariates(
     "dummies", "gmted", "roads", "ecoregions", "ecoregion", "hms", "noaa", "smoke",
     "gmted", "narr", "narr_monolevel", "narr_p_levels", "plevels", "monolevel",
     "p_levels", "geos", "sedac_population", "population", "nlcd", "merra", "MERRA",
-    "merra2", "MERRA2"),
+    "merra2", "MERRA2", "tri", "nei"),
   from,
   locs,
   locs_id = "site_id",
@@ -57,6 +57,8 @@ SpatRaster or SpatVector objects before passing to
 \code{"plevels"}, \code{"monolevel"}, \code{"p_levels"}
 \item \code{\link{calc_geos}}: \code{"geos"}, \code{"geos_cf"}
 \item \code{\link{calc_sedac_population}}: \code{"population"}, \code{"sedac_population"}
+\item 
+\item 
 \item 
 \item 
 \item \code{\link{calc_merra2}}: \code{"merra"}, \code{"MERRA"}, \code{"merra2"}, \code{"MERRA2"}

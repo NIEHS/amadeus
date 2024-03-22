@@ -4,7 +4,7 @@
 \alias{process_flatten_sds}
 \title{Process MODIS layers}
 \usage{
-process_flatten_sds(path = NULL, subdataset = NULL, fun_agg = "mean")
+process_flatten_sds(path = NULL, subdataset = NULL, fun_agg = "mean", ...)
 }
 \arguments{
 \item{path}{character(1). Full path to MODIS HDF4/HDF5 file.
@@ -16,6 +16,8 @@ sub-dataset. See \link{process_modis_sds} for details.}
 
 \item{fun_agg}{character(1). Function name to aggregate layers.
 Should be acceptable to \link[terra:tapp]{terra::tapp}.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatRaster} object

@@ -4,13 +4,15 @@
 \alias{process_koppen_geiger}
 \title{Process climate classification data}
 \usage{
-process_koppen_geiger(path = NULL, year = NULL)
+process_koppen_geiger(path = NULL, year = NULL, ...)
 }
 \arguments{
 \item{path}{character(1). Path to Koppen-Geiger
 climate zone raster file}
 
 \item{year}{data year. Not applicable for this function.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatRaster} object

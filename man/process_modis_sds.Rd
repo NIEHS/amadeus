@@ -6,7 +6,8 @@
 \usage{
 process_modis_sds(
   product = c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2"),
-  custom_sel = NULL
+  custom_sel = NULL,
+  ...
 )
 }
 \arguments{
@@ -15,6 +16,8 @@ process_modis_sds(
 \item{custom_sel}{character(1). Custom filter.
 If this value is not NULL, preset filter is
 overridden.}
+
+\item{...}{Placeholders.}
 }
 \value{
 A character object that conforms to the regular

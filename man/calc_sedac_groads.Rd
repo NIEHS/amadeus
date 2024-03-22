@@ -9,7 +9,8 @@ calc_sedac_groads(
   locs = NULL,
   locs_id = NULL,
   radius = 1000,
-  fun = sum
+  fun = sum,
+  ...
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ containing identifier for each unique coordinate location.}
 
 \item{fun}{function(1). Function used to summarize the length of roads
 within sites location buffer (Default is \code{sum}).}
+
+\item{...}{Placeholders.}
 }
 \value{
 a data.frame object with three columns.
