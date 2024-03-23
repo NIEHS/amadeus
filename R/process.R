@@ -1789,6 +1789,137 @@ process_geos <-
     return(data_return)
   }
 
+
+#' Process atmospheric composition data bulk
+#' @description
+#' The \code{process_geos()} function imports and cleans raw atmospheric
+#' composition data, returning a single `SpatRaster` object.
+#' @param date character(2). length of 10. Format "YYYY-MM-DD".
+#' @param variable character(1). GEOS-CF variable name(s).
+#' @param path character(1). Directory with downloaded netCDF (.nc4) files.
+#' @param ... Placeholders.
+#' @note
+#' Layer names of the returned `SpatRaster` object contain the variable,
+#' pressure level, date, and hour.
+#' @author Mitchell Manware
+#' @return a `SpatRaster` object;
+#' @importFrom terra rast
+#' @importFrom terra time
+#' @importFrom terra varnames
+#' @importFrom terra crs
+#' @importFrom terra subset
+#' @export
+process_geos_bulk <-
+  function(path = NULL,
+           date = c("2018-01-01", "2018-01-01"),
+           ...) {
+    #### directory setup
+    if (length(path) == 1) {
+
+      if (dir.exists(path)) {
+      path <- download_sanitize_path(path)
+      paths <- list.files(
+        path,
+        pattern = "GEOS-CF.v01.rpl",
+        full.names = TRUE
+      )
+      paths <- paths[grep(
+        ".nc4",
+        paths
+      )]
+    }
+    } else {
+      paths <- path
+    }
+    #### check for variable
+    check_for_null_parameters(mget(ls()))
+    #### identify file paths
+    #### identify dates based on user input
+    dates_of_interest <- generate_date_sequence(
+      date[1],
+      date[2],
+      sub_hyphen = TRUE
+    )
+    #### subset file paths to only dates of interest
+    data_paths <- unique(
+      grep(
+        paste(
+          dates_of_interest,
+          collapse = "|"
+        ),
+        paths,
+        value = TRUE
+      )
+    )
+    #### identify collection
+    collection <- process_collection(
+      data_paths[1],
+      source = "geos",
+      collection = TRUE
+    )
+    cat(
+      paste0(
+        "Identified collection ",
+        collection,
+        ".\n"
+      )
+    )
+    if (length(unique(collection)) > 1) {
+      warning(
+        "Multiple collections detected. Returning data for all collections.\n"
+      )
+    }
+
+    filename_date <- regmatches(
+      data_paths,
+      regexpr(
+        "20[0-9]{2}(0[1-9]|1[0-2])([0-2][0-9]|3[0-1])",
+        data_paths
+      )
+    )
+    if (any(table(filename_date) < 24)) {
+      warning("Some dates include less than 24 hours. Check the downloaded files.")
+    }
+    if (length(unique(filename_date)) > 30) {
+      message("More than 30 unique dates detected. Try 30-day chunks...")
+    }
+
+    # split filename date every 10 days
+    filename_date <- as.Date(filename_date, format = "%Y%m%d")
+    filename_date_cl <- as.integer(cut(filename_date, "30 days"))
+
+    future_inserted <- split(data_paths, filename_date_cl)
+    other_args <- list(...)
+    data_variables <- names(terra::rast(data_paths[1]))
+
+    summary_byvar <- function(x = data_variables, fs) {
+      do.call(c, lapply(
+        x,
+        function(v) {
+          rast_in <- rlang::inject(terra::rast(fs, !!!other_args))
+          rast_inidx <- grep(v, names(rast_in))
+          rast_in <- rast_in[[rast_inidx]]
+          rast_summary <- terra::tapp(rast_in, index = "days", fun = "mean")
+          terra::varnames(rast_summary) <- v
+          return(rast_summary)
+        }
+      ))
+    }
+
+    # summary by 10 days
+    rast_10d_summary <-
+      furrr::future_map(
+        .x = future_inserted,
+        .f = ~summary_byvar(fs = .x),
+        .options = furrr::furrr_options(globals = c("other_args", "data_variables"))
+      )
+    rast_10d_summary <- Reduce(c, rast_10d_summary)
+    terra::set.crs(rast_10d_summary, "EPSG:4326")
+    return(rast_10d_summary)
+
+  }
+
+
 #' Process GEOS-CF and MERRA2 collection codes
 #' @description
 #' Identify the GEOS-CF or MERRA2 collection based on the file path.
