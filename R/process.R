@@ -1774,7 +1774,7 @@ process_geos <-
 #' on provided file path(s).
 #' @param datetime logical(1). Identifies and returns date time sequence
 #' (YYYYMoMoDDHHMiMi) based on provided file path(s).
-#' @keywords auxillary
+#' @keywords auxiliary
 #' @return character
 #' @export
 process_collection <-
@@ -2059,7 +2059,7 @@ process_merra2 <-
 #' @param collection character(1). MERRA2 collection name.
 #' @param from SpatRaster(1). Object to extract time values from.
 #' @importFrom stringi stri_pad
-#' @keywords auxillary
+#' @keywords auxiliary
 #' @return character
 #' @export
 process_merra2_time <-
@@ -2117,7 +2117,7 @@ process_merra2_time <-
 #' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
 #' provides statistic or resolution code, and returns full length statistic
 #' or resolution.
-#' @keywords auxillary
+#' @keywords auxiliary
 #' @return character
 #' @export
 process_gmted_codes <-
@@ -2156,7 +2156,7 @@ process_gmted_codes <-
 #' @param string character(1). Resolution name or code.
 #' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
 #' provides resolution code, and returns full length resolution.
-#' @keywords auxillary
+#' @keywords auxiliary
 #' @export
 process_sedac_codes <-
   function(
@@ -2286,4 +2286,83 @@ process_locs_vector <-
       radius
     )
     return(sites_b)
+  }
+
+
+
+
+
+
+
+#' Process gridMET variable codes
+#' @description
+#' Convert gridMET variable names to/from variable codes.
+#' @param string character(1). gridMET variable name or variable code.
+#' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
+#' provides variable code and returns full length variable name.
+#' @keywords auxiliary
+#' @return character
+#' @export
+process_gridmet_codes <-
+  function(
+    string,
+    invert = FALSE) {
+    names <- c(
+      "Near-Surface Specific Humidity", "Mean Vapor Pressure Deficit",
+      "Precipitation", "Minimum Near-Surface Relative Humidity",
+      "Maximum Near-Surface Relative Humidity",
+      "Surface Downwelling Solar Radiation",
+      "Minimum Near-Surface Air Temperature",
+      "Maximum Near-Surface Air Temperature",
+      "Wind speed at 10 m",  "Wind direction at 10 m",
+      "Palmer Drought Severity Index",  "Reference grass evaportranspiration",
+      "Reference alfalfa evaportranspiration",  "Energy Release Component",
+      "Burning Index",  "100-hour dead fuel moisture",
+      "1000-hour dead fuel moisture"
+    )
+    codes <- c(
+      "sph", "vpd", "pr", "rmin", "rmax", "srad", "tmmn", "tmmx", "vs",
+      "th", "pdsi", "pet", "etr", "ERC", "BI", "FM100", "FM1000"
+    )
+    names_codes <- cbind(tolower(names), tolower(codes))
+    name_code <- names_codes[names_codes[, 1] == tolower(string), ]
+    if (invert == FALSE) {
+      return(name_code[2])
+    } else if (invert == TRUE) {
+      return(name_code[1])
+    }
+  }
+
+#' Process terraClimate variable codes
+#' @description
+#' Convert terraClimate variable names to/from variable codes.
+#' @param string character(1). terraClimate variable name or variable code.
+#' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
+#' provides variable code and returns full length variable name.
+#' @keywords auxiliary
+#' @return character
+#' @export
+process_terraclimate_codes <-
+  function(
+    string,
+    invert = FALSE) {
+    names <- c(
+      "Actual Evapotranspiration", "Climate Water Deficit",
+      "Potential evapotranspiration", "Precipitation", "Runoff",
+      "Soil Moisture", "Downward surface shortwave radiation",
+      "Snow water equivalent - at end of month", "Max Temperature",
+      "Min Temperature", "Vapor pressure", "Wind speed",
+      "Vapor Pressure Deficit", "Palmer Drought Severity Index"
+    )
+    codes <- c(
+      "aet", "def", "pet", "ppt", "q", "soil", "srad", "swe", "tmax", "tmin",
+      "vap", "ws", "vpd", "PDSI"
+    )
+    names_codes <- cbind(tolower(names), tolower(codes))
+    name_code <- names_codes[names_codes[, 1] == tolower(string), ]
+    if (invert == FALSE) {
+      return(name_code[2])
+    } else if (invert == TRUE) {
+      return(name_code[1])
+    }
   }

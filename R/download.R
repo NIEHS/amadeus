@@ -32,6 +32,8 @@
 #' * \link{download_modis_data}: "modis", "MODIS"
 #' * \link{download_tri_data}: "tri", "TRI"
 #' * \link{download_nei_data}: "nei", "NEI"
+#' * \link{download_gridmet_data}: "gridMET", "gridmet"
+#' * \link{download_terraclimate_data}: "TerraClimate", "terraclimate"
 #' @returns NULL
 #' @export
 download_data <-
@@ -40,7 +42,8 @@ download_data <-
                      "koppengeiger", "merra2", "merra", "narr_monolevel",
                      "modis", "narr_p_levels", "nlcd", "noaa", "sedac_groads",
                      "sedac_population", "groads", "population", "plevels",
-                     "p_levels", "monolevel", "hms", "smoke", "tri", "nei"),
+                     "p_levels", "monolevel", "hms", "smoke", "tri", "nei",
+                     "gridMET", "terraClimate"),
     directory_to_save = NULL,
     acknowledgement = FALSE,
     ...
@@ -74,7 +77,9 @@ download_data <-
       population = download_sedac_population_data,
       modis = download_modis_data,
       tri = download_tri_data,
-      nei = download_nei_data
+      nei = download_nei_data,
+      gridmet = download_gridmet_data,
+      terraclimate = download_terraclimate_data
     )
 
     tryCatch(
@@ -979,8 +984,8 @@ download_merra2_data <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Yearly netCDF (.nc) files will be stored in
-#' \code{directory_to_save}.
+#' @return NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
+#' folder within \code{directory_to_save}.
 #' @export
 download_narr_monolevel_data <- function(
     variables = NULL,
@@ -2530,4 +2535,253 @@ download_nei_data <- function(
   download_remove_command(commands_txt = commands_txt,
                           remove = remove_command)
 
+}
+
+# nolint start
+#' Download gridMET data
+#' @description
+#' The \code{download_gridmet_data} function accesses and downloads gridded surface meteorological data from the [University of California Merced Climatology Lab's gridMET dataset](https://www.climatologylab.org/gridmet.html).
+# nolint end
+#' @param variables character(1). Variable(s) name(s).
+#' @param year_start integer(1). length of 4. Start of year range for
+#' downloading data.
+#' @param year_end integer(1). length of 4. End of year range for downloading
+#' data.
+#' @param directory_to_save character(1). Directory(s) to save downloaded data
+#' files.
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
+#' large and use lots of machine storage and memory.
+#' @param download logical(1). \code{FALSE} will generate a *.txt file
+#' containing all download commands. By setting \code{TRUE} the function
+#' will download all of the requested data files.
+#' @param remove_command logical(1).
+#' Remove (\code{TRUE}) or keep (\code{FALSE})
+#' the text file containing download commands.
+#' @author Mitchell Manware
+#' @return NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
+#' folder within \code{directory_to_save}.
+#' @export
+download_gridmet_data <- function(
+    variables = NULL,
+    year_start = 2022,
+    year_end = 2022,
+    directory_to_save = NULL,
+    acknowledgement = FALSE,
+    download = FALSE,
+    remove_command = FALSE) {
+  #### 1. check for data download acknowledgement
+  download_permit(acknowledgement = acknowledgement)
+  #### 2. check for null parameters
+  check_for_null_parameters(mget(ls()))
+  #### 3. directory setup
+  download_setup_dir(directory_to_save)
+  directory_to_save <- download_sanitize_path(directory_to_save)
+  #### 4. define years sequence
+  if (any(nchar(year_start) != 4, nchar(year_end) != 4)) {
+    stop("year_start and year_end should be 4-digit integers.\n")
+  }
+  years <- seq(year_start, year_end, 1)
+  #### 5. define variables
+  variables_list <- unlist(
+    lapply(variables, process_gridmet_codes, invert = FALSE)
+    )
+  #### 6. define URL base
+  base <- "https://www.northwestknowledge.net/metdata/data/"
+  #### 7. initiate "..._curl_commands.txt"
+  commands_txt <- paste0(
+    directory_to_save,
+    "gridmet_",
+    year_start, "_", year_end,
+    "_curl_commands.txt"
+  )
+  download_sink(commands_txt)
+  #### 8. concatenate and print download commands to "..._curl_commands.txt"
+  for (v in seq_along(variables_list)) {
+    variable <- variables_list[v]
+    folder <- paste0(directory_to_save, variable, "/")
+    if (!(file.exists(folder))) {
+      dir.create(folder)
+    }
+    for (y in seq_along(years)) {
+      year <- years[y]
+      url <- paste0(
+        base,
+        variable,
+        "_",
+        year,
+        ".nc"
+      )
+      if (y == 1) {
+        if (!(check_url_status(url))) {
+          sink()
+          file.remove(commands_txt)
+          stop(paste0(
+            "Invalid year returns HTTP code 404. ",
+            "Check `year_start` parameter.\n"
+          ))
+        }
+      }
+      destfile <- paste0(
+        directory_to_save,
+        variable,
+        "/",
+        variable,
+        "_",
+        year,
+        ".nc"
+      )
+      command <- paste0(
+        "curl -s -o ",
+        destfile,
+        " --url ",
+        url,
+        "\n"
+      )
+      cat(command)
+    }
+  }
+  #### 9. finish "..._curl_commands.txt"
+  sink()
+  #### 10. build system command
+  system_command <- paste0(
+    ". ",
+    commands_txt,
+    "\n"
+  )
+  #### 11. download data
+  download_run(
+    download = download,
+    system_command = system_command
+  )
+  #### 12. remove command text file
+  download_remove_command(
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
+}
+
+# nolint start
+#' Download TerraClimate data
+#' @description
+#' The \code{download_terraclimate_data} function accesses and downloads climate and water balance data from the [University of California Merced Climatology Lab's TerraClimate dataset](https://www.climatologylab.org/terraclimate.html).
+# nolint end
+#' @param variables character(1). Variable(s) name(s).
+#' @param year_start integer(1). length of 4. Start of year range for
+#' downloading data.
+#' @param year_end integer(1). length of 4. End of year range for downloading
+#' data.
+#' @param directory_to_save character(1). Directory(s) to save downloaded data
+#' files.
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
+#' large and use lots of machine storage and memory.
+#' @param download logical(1). \code{FALSE} will generate a *.txt file
+#' containing all download commands. By setting \code{TRUE} the function
+#' will download all of the requested data files.
+#' @param remove_command logical(1).
+#' Remove (\code{TRUE}) or keep (\code{FALSE})
+#' the text file containing download commands.
+#' @author Mitchell Manware, Insang Song
+#' @return NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
+#' folder within \code{directory_to_save}.
+#' @export
+download_terraclimate_data <- function(
+    variables = NULL,
+    year_start = 2022,
+    year_end = 2022,
+    directory_to_save = NULL,
+    acknowledgement = FALSE,
+    download = FALSE,
+    remove_command = FALSE) {
+  #### 1. check for data download acknowledgement
+  download_permit(acknowledgement = acknowledgement)
+  #### 2. check for null parameters
+  check_for_null_parameters(mget(ls()))
+  #### 3. directory setup
+  download_setup_dir(directory_to_save)
+  directory_to_save <- download_sanitize_path(directory_to_save)
+  #### 4. define years sequence
+  if (any(nchar(year_start) != 4, nchar(year_end) != 4)) {
+    stop("year_start and year_end should be 4-digit integers.\n")
+  }
+  years <- seq(year_start, year_end, 1)
+  #### 5. define variables
+  variables_list <- unlist(
+    lapply(variables, process_terraclimate_codes, invert = FALSE)
+  )
+  #### 6. define URL base
+  base <-
+    "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_"
+  #### 7. initiate "..._curl_commands.txt"
+  commands_txt <- paste0(
+    directory_to_save,
+    "terraclimate_",
+    year_start, "_", year_end,
+    "_curl_commands.txt"
+  )
+  download_sink(commands_txt)
+  #### 8. concatenate and print download commands to "..._curl_commands.txt"
+  for (v in seq_along(variables_list)) {
+    variable <- variables_list[v]
+    folder <- paste0(directory_to_save, variable, "/")
+    if (!(file.exists(folder))) {
+      dir.create(folder)
+    }
+    for (y in seq_along(years)) {
+      year <- years[y]
+      url <- paste0(
+        base,
+        variable,
+        "_",
+        year,
+        ".nc"
+      )
+      if (y == 1) {
+        if (!(check_url_status(url))) {
+          sink()
+          file.remove(commands_txt)
+          stop(paste0(
+            "Invalid year returns HTTP code 404. ",
+            "Check `year_start` parameter.\n"
+          ))
+        }
+      }
+      destfile <- paste0(
+        directory_to_save,
+        variable,
+        "/",
+        variable,
+        "_",
+        year,
+        ".nc"
+      )
+      command <- paste0(
+        "curl -s -o ",
+        destfile,
+        " --url ",
+        url,
+        "\n"
+      )
+      cat(command)
+    }
+  }
+  #### 9. finish "..._curl_commands.txt"
+  sink()
+  #### 10. build system command
+  system_command <- paste0(
+    ". ",
+    commands_txt,
+    "\n"
+  )
+  #### 11. download data
+  download_run(
+    download = download,
+    system_command = system_command
+  )
+  #### 12. remove command text file
+  download_remove_command(
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
 }
