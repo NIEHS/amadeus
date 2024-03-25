@@ -43,7 +43,7 @@ download_data <-
                      "modis", "narr_p_levels", "nlcd", "noaa", "sedac_groads",
                      "sedac_population", "groads", "population", "plevels",
                      "p_levels", "monolevel", "hms", "smoke", "tri", "nei",
-                     "gridMET", "terraClimate"),
+                     "gridmet", "terraclimate"),
     directory_to_save = NULL,
     acknowledgement = FALSE,
     ...
@@ -967,7 +967,8 @@ download_merra2_data <- function(
 #' @description
 #' The \code{download_narr_monolevel_data} function accesses and downloads monolevel meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Monolevel" variables contain a single value for the entire atmospheric column (ie. Variable: Convective cloud cover; Level: Entire atmosphere considered as a single layer), or represent a specific altitude associated with the variable (ie. Variable: Air temperature; Level: 2 m).
 # nolint end
-#' @param variables character. Variable(s) name acronym.
+#' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
+#' for variable names and acronym codes.
 #' @param year_start integer(1). length of 4. Start of year range for
 #' downloading data.
 #' @param year_end integer(1). length of 4. End of year range for downloading
@@ -1090,8 +1091,8 @@ download_narr_monolevel_data <- function(
 #' The \code{download_narr_p_levels_data} function accesses and downloads pressure levels meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
 # nolint end
 #' @param variables character(1). Variable(s) name acronym.
-#' @param year_start integer(1). length of 4. Start of year range for
-#' downloading data.
+#' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
+#' for variable names and acronym codes.
 #' @param year_end integer(1). length of 4. End of year range for downloading
 #' data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
@@ -2542,7 +2543,9 @@ download_nei_data <- function(
 #' @description
 #' The \code{download_gridmet_data} function accesses and downloads gridded surface meteorological data from the [University of California Merced Climatology Lab's gridMET dataset](https://www.climatologylab.org/gridmet.html).
 # nolint end
-#' @param variables character(1). Variable(s) name(s).
+#' @param variables character(1). Variable(s) name(s). See [gridMET Generate Wget File](https://www.climatologylab.org/wget-gridmet.html)
+#' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
+#' "Energy Release Component" has code "erc").
 #' @param year_start integer(1). length of 4. Start of year range for
 #' downloading data.
 #' @param year_end integer(1). length of 4. End of year range for downloading
@@ -2570,25 +2573,26 @@ download_gridmet_data <- function(
     acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE) {
-  #### 1. check for data download acknowledgement
+  #### check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
-  #### 2. check for null parameters
+  #### check for null parameters
   check_for_null_parameters(mget(ls()))
-  #### 3. directory setup
+  #### directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
-  #### 4. define years sequence
+  #### define years sequence
   if (any(nchar(year_start) != 4, nchar(year_end) != 4)) {
     stop("year_start and year_end should be 4-digit integers.\n")
   }
   years <- seq(year_start, year_end, 1)
-  #### 5. define variables
-  variables_list <- unlist(
-    lapply(variables, process_gridmet_codes, invert = FALSE)
-    )
-  #### 6. define URL base
+  #### define variables
+  variables_list <- process_variable_codes(
+    variables = variables,
+    source = "gridmet"
+  )
+  #### define URL base
   base <- "https://www.northwestknowledge.net/metdata/data/"
-  #### 7. initiate "..._curl_commands.txt"
+  #### initiate "..._curl_commands.txt"
   commands_txt <- paste0(
     directory_to_save,
     "gridmet_",
@@ -2596,7 +2600,7 @@ download_gridmet_data <- function(
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
-  #### 8. concatenate and print download commands to "..._curl_commands.txt"
+  #### concatenate and print download commands to "..._curl_commands.txt"
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
     folder <- paste0(directory_to_save, variable, "/")
@@ -2641,20 +2645,20 @@ download_gridmet_data <- function(
       cat(command)
     }
   }
-  #### 9. finish "..._curl_commands.txt"
+  #### finish "..._curl_commands.txt"
   sink()
-  #### 10. build system command
+  #### build system command
   system_command <- paste0(
     ". ",
     commands_txt,
     "\n"
   )
-  #### 11. download data
+  #### download data
   download_run(
     download = download,
     system_command = system_command
   )
-  #### 12. remove command text file
+  #### remove command text file
   download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
@@ -2666,7 +2670,8 @@ download_gridmet_data <- function(
 #' @description
 #' The \code{download_terraclimate_data} function accesses and downloads climate and water balance data from the [University of California Merced Climatology Lab's TerraClimate dataset](https://www.climatologylab.org/terraclimate.html).
 # nolint end
-#' @param variables character(1). Variable(s) name(s).
+#' @param variables character(1). Variable(s) name(s). See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
+#' for variable names and acronym codes.
 #' @param year_start integer(1). length of 4. Start of year range for
 #' downloading data.
 #' @param year_end integer(1). length of 4. End of year range for downloading
@@ -2694,23 +2699,24 @@ download_terraclimate_data <- function(
     acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE) {
-  #### 1. check for data download acknowledgement
+  #### check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
-  #### 2. check for null parameters
+  #### check for null parameters
   check_for_null_parameters(mget(ls()))
-  #### 3. directory setup
+  #### directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
-  #### 4. define years sequence
+  #### define years sequence
   if (any(nchar(year_start) != 4, nchar(year_end) != 4)) {
     stop("year_start and year_end should be 4-digit integers.\n")
   }
   years <- seq(year_start, year_end, 1)
-  #### 5. define variables
-  variables_list <- unlist(
-    lapply(variables, process_terraclimate_codes, invert = FALSE)
+  #### define variables
+  variables_list <- process_variable_codes(
+    variables = variables,
+    source = "terraclimate"
   )
-  #### 6. define URL base
+  #### define URL base
   base <-
     "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_"
   #### 7. initiate "..._curl_commands.txt"
@@ -2721,7 +2727,7 @@ download_terraclimate_data <- function(
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
-  #### 8. concatenate and print download commands to "..._curl_commands.txt"
+  #### concatenate and print download commands to "..._curl_commands.txt"
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
     folder <- paste0(directory_to_save, variable, "/")
@@ -2766,20 +2772,20 @@ download_terraclimate_data <- function(
       cat(command)
     }
   }
-  #### 9. finish "..._curl_commands.txt"
+  #### finish "..._curl_commands.txt"
   sink()
-  #### 10. build system command
+  #### build system command
   system_command <- paste0(
     ". ",
     commands_txt,
     "\n"
   )
-  #### 11. download data
+  #### download data
   download_run(
     download = download,
     system_command = system_command
   )
-  #### 12. remove command text file
+  #### remove command text file
   download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command

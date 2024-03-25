@@ -1322,7 +1322,20 @@ testthat::test_that("gridmet error with invalid years.", {
   )
 })
 
-testthat::test_that("terraClimate download URLs have HTTP status 200.", {
+testthat::test_that("gridmet error with invalid variables", {
+  testthat::expect_error(
+    download_data(
+      dataset_name = "gridmet",
+      variables = "temp",
+      year_start = 2018,
+      year_end = 2018,
+      acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", "")
+    )
+  )
+})
+
+testthat::test_that("terraclimate download URLs have HTTP status 200.", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
@@ -1357,13 +1370,26 @@ testthat::test_that("terraClimate download URLs have HTTP status 200.", {
   file.remove(commands_path)
 })
 
-testthat::test_that("gridmet error with invalid years.", {
+testthat::test_that("terraclimate error with invalid years.", {
   testthat::expect_error(
     download_data(
       dataset_name = "terraclimate",
       variables = "Precipitation",
       year_start = 10,
       year_end = 11,
+      acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", "")
+    )
+  )
+})
+
+testthat::test_that("terraclimate error with invalid variables", {
+  testthat::expect_error(
+    download_data(
+      dataset_name = "gridmet",
+      variables = "temp",
+      year_start = 2018,
+      year_end = 2018,
       acknowledgement = TRUE,
       directory_to_save = testthat::test_path("..", "testdata/", "")
     )

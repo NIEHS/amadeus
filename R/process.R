@@ -2288,12 +2288,6 @@ process_locs_vector <-
     return(sites_b)
   }
 
-
-
-
-
-
-
 #' Process gridMET variable codes
 #' @description
 #' Convert gridMET variable names to/from variable codes.
@@ -2324,11 +2318,15 @@ process_gridmet_codes <-
       "sph", "vpd", "pr", "rmin", "rmax", "srad", "tmmn", "tmmx", "vs",
       "th", "pdsi", "pet", "etr", "ERC", "BI", "FM100", "FM1000"
     )
-    names_codes <- cbind(tolower(names), tolower(codes))
-    name_code <- names_codes[names_codes[, 1] == tolower(string), ]
+    names_codes <- cbind(tolower(names), codes)
+    if (string == "all") {
+      return(names_codes)
+    }
     if (invert == FALSE) {
+      name_code <- names_codes[names_codes[, 1] == string, ]
       return(name_code[2])
     } else if (invert == TRUE) {
+      name_code <- names_codes[names_codes[, 2] == string, ]
       return(name_code[1])
     }
   }
@@ -2358,11 +2356,380 @@ process_terraclimate_codes <-
       "aet", "def", "pet", "ppt", "q", "soil", "srad", "swe", "tmax", "tmin",
       "vap", "ws", "vpd", "PDSI"
     )
-    names_codes <- cbind(tolower(names), tolower(codes))
-    name_code <- names_codes[names_codes[, 1] == tolower(string), ]
+    names_codes <- cbind(tolower(names), codes)
+    if (string == "all") {
+      return(names_codes)
+    }
     if (invert == FALSE) {
+      name_code <- names_codes[names_codes[, 1] == string, ]
       return(name_code[2])
     } else if (invert == TRUE) {
+      name_code <- names_codes[names_codes[, 2] == string, ]
       return(name_code[1])
     }
   }
+
+#' Filter gridMET and terraClimate variable names and variable codes
+#' @TerraClimate
+#' Check user defined variables for gridMET and TerraClimate functions.
+#' @param variables character(1). Data variables. (Passed from download_* or
+#' process_*).
+#' @param source character(1). Data source for selected variables ("gridMET" or
+#' "TerraClimate").
+#' @keywords auxiliary
+#' @return character
+#' @export
+process_variable_codes <-
+  function(
+    variables,
+    source = c("gridmet", "terraclimate")) {
+    if (tolower(source) == "gridmet") {
+      code_function <- process_gridmet_codes
+    } else if (tolower(source) == "terraclimate") {
+      code_function <- process_terraclimate_codes
+    }
+    names_codes <- do.call(code_function, list(string = "all"))
+    if (all(variables %in% names_codes[, 2]) == TRUE) {
+      return(variables)
+    } else {
+      if (all(tolower(variables) %in% names_codes[, 1]) == TRUE) {
+        cat(
+          paste0(
+            "Converting variable names to variable codes...\n"
+          )
+        )
+        codes_return <- do.call(
+          code_function,
+          list(tolower(variables), invert = FALSE)
+          )
+        return(as.vector(codes_return))
+      } else {
+        stop(
+          paste0(
+            "Unable to identify requested variables.\n"
+          )
+        )
+      }
+    }
+  }
+
+# nolint start
+#' Process gridMET data
+#' @description
+#' The \code{process_gridmet()} function imports and cleans raw gridded surface meteorological
+#' data, returning a single `SpatRaster` object.
+#' @param date character(2). length of 10 each.
+#' Start/end date of downloaded data.
+#' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
+#' @param variable character(1). Variable name or acronym code. See [gridMET Generate Wget File](https://www.climatologylab.org/wget-gridmet.html)
+#' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
+#' "Energy Release Component" has code "erc").
+#' @param path character(1). Directory with downloaded netCDF (.nc) files.
+#' @note
+#' Layer names of the returned `SpatRaster` object contain the variable acronym,
+#' and date.
+#' @author Mitchell Manware
+#' @return a `SpatRaster` object
+#' @importFrom terra rast
+#' @importFrom terra time
+#' @importFrom terra subset
+#' @importFrom stringi stri_pad
+#' @export
+# nolint end
+process_gridmet <- function(
+    date = c("2023-09-01", "2023-09-01"),
+    variable = NULL,
+    path = NULL) {
+  #### directory setup
+  path <- download_sanitize_path(path)
+  #### check for variable
+  check_for_null_parameters(mget(ls()))
+  variable_checked <- process_variable_codes(
+    variables = variable,
+    source = "gridmet"
+  )
+  variable_checked_long <- process_gridmet_codes(
+    variable_checked,
+    invert = TRUE
+  )
+  #### identify file paths
+  data_paths <- list.files(
+    path,
+    pattern = variable_checked,
+    full.names = TRUE
+  )
+  data_paths <- data_paths[grep(
+    ".nc",
+    data_paths
+  )]
+  #### define date sequence
+  date_sequence <- generate_date_sequence(
+    date[1],
+    date[2],
+    sub_hyphen = TRUE
+  )
+  #### years of interest
+  yoi <- unique(
+    substr(
+      date_sequence,
+      1, 4
+    )
+  )
+  #### subset file paths to only dates of interest
+  data_paths <- unique(
+    grep(
+      paste(
+        yoi,
+        collapse = "|"
+      ),
+      data_paths,
+      value = TRUE
+    )
+  )
+  #### initiate for loop
+  data_full <- terra::rast()
+  for (p in seq_along(data_paths)) {
+    #### import data
+    data_year <- terra::rast(data_paths[p])
+    cat(paste0(
+      "Cleaning daily ",
+      variable_checked_long,
+      " data for year ",
+      gsub(
+        ".nc",
+        "",
+        strsplit(
+          data_paths[p],
+          paste0(
+            variable_checked,
+            "_"
+          )
+        )[[1]][2]
+      ),
+      "...\n"
+    ))
+    time_numeric <- sapply(
+      strsplit(
+        names(data_year),
+        "="
+      ),
+      function(x) as.numeric(x[2]) - 25567
+    )
+    terra::time(data_year) <- as.Date(time_numeric)
+    names(data_year) <- paste0(
+      variable_checked,
+      "_",
+      gsub(
+        "-",
+        "",
+        terra::time(data_year)
+      )
+    )
+    terra::varnames(data_year) <- variable_checked
+    terra::longnames(data_year) <- variable_checked_long
+    data_full <- c(
+      data_full,
+      data_year,
+      warn = FALSE
+    )
+  }
+  #### subset years to dates of interest
+  data_return <- terra::subset(
+    data_full,
+    which(
+      substr(
+        names(data_full),
+        nchar(names(data_full)) - 7,
+        nchar(names(data_full))
+      ) %in% date_sequence
+    )
+  )
+  cat(paste0(
+    "Returning daily ",
+    variable_checked_long,
+    " data from ",
+    as.Date(
+      date_sequence[1],
+      format = "%Y%m%d"
+    ),
+    " to ",
+    as.Date(
+      date_sequence[length(date_sequence)],
+      format = "%Y%m%d"
+    ),
+    ".\n"
+  ))
+  #### return SpatRaster
+  return(data_return)
+}
+
+# nolint start
+#' Process TerraClimate data
+#' @description
+#' The \code{process_terraclimate()} function imports and cleans climate and water balance
+#' data, returning a single `SpatRaster` object.
+#' @param date character(2). length of 10 each.
+#' Start/end date of downloaded data.
+#' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
+#' @param variable character(1). Variable name or acronym code. See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
+#' for variable names and acronym codes.
+#' @param path character(1). Directory with downloaded netCDF (.nc) files.
+#' @note
+#' Layer names of the returned `SpatRaster` object contain the variable acronym, year,
+#' and month.
+#' @note
+#' TerraClimate data has monthly temporal resolution, so the first day of each month
+#' is used as a placeholder temporal value.
+#' @author Mitchell Manware
+#' @return a `SpatRaster` object
+#' @importFrom terra rast
+#' @importFrom terra time
+#' @importFrom terra subset
+#' @importFrom stringi stri_pad
+#' @export
+# nolint end
+process_terraclimate <- function(
+    date = c("2023-09-01", "2023-09-01"),
+    variable = NULL,
+    path = NULL) {
+  #### directory setup
+  path <- download_sanitize_path(path)
+  #### check for variable
+  check_for_null_parameters(mget(ls()))
+  variable_checked <- process_variable_codes(
+    variables = variable,
+    source = "terraclimate"
+  )
+  variable_checked_long <- process_terraclimate_codes(
+    variable_checked,
+    invert = TRUE
+  )
+  #### identify file paths
+  data_paths <- list.files(
+    path,
+    pattern = variable_checked,
+    full.names = TRUE
+  )
+  data_paths <- data_paths[grep(
+    ".nc",
+    data_paths
+  )]
+  #### define date sequence
+  date_sequence <- generate_date_sequence(
+    date[1],
+    date[2],
+    sub_hyphen = TRUE
+  )
+  #### years of interest
+  yoi <- unique(
+    substr(
+      date_sequence,
+      1, 4
+    )
+  )
+  #### year-months of interest
+  ymoi <- unique(
+    substr(
+      date_sequence,
+      1, 6
+    )
+  )
+  #### subset file paths to only dates of interest
+  data_paths <- unique(
+    grep(
+      paste(
+        yoi,
+        collapse = "|"
+      ),
+      data_paths,
+      value = TRUE
+    )
+  )
+  #### initiate for loop
+  data_full <- terra::rast()
+  for (p in seq_along(data_paths)) {
+    #### import data
+    data_year <- terra::rast(data_paths[p])
+    cat(paste0(
+      "Cleaning monthly ",
+      variable_checked_long,
+      " data for ",
+      substr(
+        terra::time(data_year)[1],
+        1,
+        4
+      ),
+      "...\n"
+    ))
+    names(data_year) <- paste0(
+      variable_checked,
+      "_",
+      substr(
+        gsub(
+          "-",
+          "",
+          terra::time(data_year)
+        ),
+        1,
+        6
+      )
+    )
+    terra::varnames(data_year) <- variable_checked
+    terra::longnames(data_year) <- variable_checked_long
+    data_full <- c(
+      data_full,
+      data_year,
+      warn = FALSE
+    )
+  }
+  #### subset years to dates of interest
+  data_return <- terra::subset(
+    data_full,
+    which(
+      substr(
+        names(data_full),
+        nchar(names(data_full)) - 5,
+        nchar(names(data_full))
+      ) %in% ymoi
+    )
+  )
+  cat(paste0(
+    "Returning monthly ",
+    variable_checked_long,
+    " data from ",
+    month.name[
+      as.numeric(
+        substr(
+          ymoi[1],
+          5,
+          6
+        )
+      )
+    ],
+    ", ",
+    substr(
+      ymoi[1],
+      1,
+      4
+    ),
+    " to ",
+    month.name[
+      as.numeric(
+        substr(
+          ymoi[length(ymoi)],
+          5,
+          6
+        )
+      )
+    ],
+    ", ",
+    substr(
+      ymoi[length(ymoi)],
+      1,
+      4
+    ),
+    ".\n"
+  ))
+  #### return SpatRaster
+  return(data_return)
+}

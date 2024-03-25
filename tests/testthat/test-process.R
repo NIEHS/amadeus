@@ -1041,3 +1041,93 @@ testthat::test_that("process_merra2 returns as expected.", {
     )
   }
 })
+
+testthat::test_that("process_gridmet returns expected.", {
+  withr::local_package("terra")
+  variable <- "Precipitation"
+  # expect function
+  expect_true(
+    is.function(process_gridmet)
+  )
+  gridmet <-
+    process_gridmet(
+      date = c("2018-01-01", "2018-01-01"),
+      variable = variable,
+      path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "gridmet",
+          "pr"
+        )
+    )
+  # expect output is SpatRaster
+  expect_true(
+    class(gridmet)[1] == "SpatRaster"
+  )
+  # expect values
+  expect_true(
+    terra::hasValues(gridmet)
+  )
+  # expect non-null coordinate reference system
+  expect_false(
+    is.null(terra::crs(gridmet))
+  )
+  # expect lon and lat dimensions to be > 1
+  expect_false(
+    any(c(0, 1) %in% dim(gridmet)[1:2])
+  )
+  # expect non-numeric and non-empty time
+  expect_false(
+    any(c("", 0) %in% terra::time(gridmet))
+  )
+  # expect dimensions according to levels
+  expect_true(
+    dim(gridmet)[3] == 1
+  )
+})
+
+testthat::test_that("process_terraclimate returns expected.", {
+  withr::local_package("terra")
+  variable <- "ppt"
+  # expect function
+  expect_true(
+    is.function(process_terraclimate)
+  )
+  terraclimate <-
+    process_terraclimate(
+      date = c("2018-01-01", "2018-01-01"),
+      variable = variable,
+      path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "terraclimate",
+          "ppt"
+        )
+    )
+  # expect output is SpatRaster
+  expect_true(
+    class(terraclimate)[1] == "SpatRaster"
+  )
+  # expect values
+  expect_true(
+    terra::hasValues(terraclimate)
+  )
+  # expect non-null coordinate reference system
+  expect_false(
+    is.null(terra::crs(terraclimate))
+  )
+  # expect lon and lat dimensions to be > 1
+  expect_false(
+    any(c(0, 1) %in% dim(terraclimate)[1:2])
+  )
+  # expect non-numeric and non-empty time
+  expect_false(
+    any(c("", 0) %in% terra::time(terraclimate))
+  )
+  # expect dimensions according to levels
+  expect_true(
+    dim(terraclimate)[3] == 1
+  )
+})
