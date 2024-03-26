@@ -2319,3 +2319,81 @@ process_locs_vector <-
     )
     return(sites_b)
   }
+
+
+
+#' Retrieve Hydrologic Unit Code (HUC) data
+#' @author Insang Song
+#' @param path character. Path to the file or the directory containing HUC data.
+#' @param layer_name character(1). Layer name in the `path`
+#' @param huc_level character(1). Field name of HUC level
+#' @param huc_header character(1). The upper level HUC code header to extract
+#' lower level HUCs.
+#' @param ... Arguments passed to `nhdplusTools::get_huc()`
+#' @returns a `SpatVector` object
+#' @seealso [`nhdplusTools::get_huc`]
+#' @importFrom terra vect
+#' @importFrom terra vector_layers
+#' @importFrom rlang inject
+#' @importFrom nhdplusTools get_huc
+#' @examples
+#'
+#' library(terra)
+#' getf <- "../../../../group/set/Projects/PrestoGP_Pesticides/input/WBD-National/WBD_National_GDB.gdb"
+#' terra::vector_layers(getf)
+#' test <- process_huc(
+#'   getf,
+#'   layer_name = "WBDHU8",
+#'   huc_level = "huc8"
+#' )
+#' test <- process_huc(
+#'   "",
+#'   layer_name = NULL,
+#'   huc_level = NULL,
+#'   huc_header = NULL,
+#'   id = "020974",
+#'   type = "huc06"
+#' )
+#' @export
+process_huc <-
+  function(
+    path,
+    layer_name = NULL,
+    huc_level = NULL,
+    huc_header = NULL,
+    ...
+  ) {
+    if (!file.exists(path) || !dir.exists(path)) {
+      hucpoly <- try(
+        rlang::inject(nhdplusTools::get_huc(!!!list(...)))
+      )
+      if (inherits(hucpoly, "try-error")) {
+        stop(
+          "HUC data was not found."
+        )
+      }
+    }
+    if (file.exists(path) || dir.exists(path)) {
+      if (!is.null(huc_header)) {
+        querybase <-
+          sprintf("SELECT * FROM %s WHERE %s LIKE '%s%%'",
+                  layer_name, huc_level, huc_header)
+      } else {
+        querybase <-
+          sprintf("SELECT * FROM %s", layer_name)
+      }
+      if (!layer_name %in% terra::vector_layers(path)) {
+        stop(
+          paste0(
+            "Layer ",
+            layer_name,
+            " not found in ",
+            path
+          )
+        )
+      }
+
+      hucpoly <- try(terra::vect(path, query = querybase))
+    }
+    return(hucpoly)
+  }
