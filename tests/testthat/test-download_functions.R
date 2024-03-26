@@ -84,11 +84,6 @@ testthat::test_that("Errors when temporal ranges invalid.", {
       acknowledgement = TRUE
     )
   )
-  
-  
-  
-  
-  ###################################################################
   expect_error(
     download_gridmet_data(
       year_start = 1900,
@@ -98,20 +93,13 @@ testthat::test_that("Errors when temporal ranges invalid.", {
     )
   )
   expect_error(
-    download_narr_p_levels_data(
+    download_terraclimate_data(
       year_start = 1900,
       variables = "Wind Speed",
       acknowledgement = TRUE,
       directory_to_save = testthat::test_path("..", "testdata/", "")
     )
   )
-  ###################################################################
-  
-  
-  
-  
-  
-  
 })
 
 testthat::test_that("EPA AQS download URLs have HTTP status 200.", {
@@ -1281,7 +1269,8 @@ testthat::test_that("gridmet download URLs have HTTP status 200.", {
   year_start <- 2018
   year_end <- 2023
   variables <- "Precipitation"
-  directory_to_save <- testthat::test_path("..", "testdata/", "")
+  directory_to_save <-
+    testthat::test_path("..", "testdata", "gridmet", "tmp")
   # run download function
   download_data(dataset_name = "gridmet",
                 year_start = year_start,
@@ -1292,7 +1281,7 @@ testthat::test_that("gridmet download URLs have HTTP status 200.", {
                 download = FALSE)
   # define path with commands
   commands_path <- paste0(directory_to_save,
-                          "gridmet_",
+                          "/gridmet_",
                           year_start, "_", year_end,
                           "_curl_commands.txt")
   # import commands
@@ -1307,6 +1296,8 @@ testthat::test_that("gridmet download URLs have HTTP status 200.", {
                           url_status = url_status)
   # remove file with commands after test
   file.remove(commands_path)
+  file.remove(list.files(directory_to_save, full.names = TRUE))
+  file.remove(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("gridmet error with invalid years.", {
@@ -1317,7 +1308,8 @@ testthat::test_that("gridmet error with invalid years.", {
       year_start = 10,
       year_end = 11,
       acknowledgement = TRUE,
-      directory_to_save = testthat::test_path("..", "testdata/", "")
+      directory_to_save =
+        testthat::test_path("..", "testdata", "gridmet", "tmp")
     )
   )
 })
@@ -1330,7 +1322,8 @@ testthat::test_that("gridmet error with invalid variables", {
       year_start = 2018,
       year_end = 2018,
       acknowledgement = TRUE,
-      directory_to_save = testthat::test_path("..", "testdata/", "")
+      directory_to_save =
+        testthat::test_path("..", "testdata", "gridmet", "tmp")
     )
   )
 })
@@ -1342,7 +1335,8 @@ testthat::test_that("terraclimate download URLs have HTTP status 200.", {
   year_start <- 2018
   year_end <- 2023
   variables <- "Precipitation"
-  directory_to_save <- testthat::test_path("..", "testdata/", "")
+  directory_to_save <-
+    testthat::test_path("..", "testdata", "terraclimate", "tmp")
   # run download function
   download_data(dataset_name = "terraclimate",
                 year_start = year_start,
@@ -1353,7 +1347,7 @@ testthat::test_that("terraclimate download URLs have HTTP status 200.", {
                 download = FALSE)
   # define path with commands
   commands_path <- paste0(directory_to_save,
-                          "terraclimate_",
+                          "/terraclimate_",
                           year_start, "_", year_end,
                           "_curl_commands.txt")
   # import commands
@@ -1368,6 +1362,8 @@ testthat::test_that("terraclimate download URLs have HTTP status 200.", {
                           url_status = url_status)
   # remove file with commands after test
   file.remove(commands_path)
+  file.remove(list.files(directory_to_save, full.names = TRUE))
+  file.remove(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("terraclimate error with invalid years.", {
@@ -1378,7 +1374,8 @@ testthat::test_that("terraclimate error with invalid years.", {
       year_start = 10,
       year_end = 11,
       acknowledgement = TRUE,
-      directory_to_save = testthat::test_path("..", "testdata/", "")
+      directory_to_save =
+        testthat::test_path("..", "testdata", "terraclimate", "tmp")
     )
   )
 })
@@ -1391,7 +1388,11 @@ testthat::test_that("terraclimate error with invalid variables", {
       year_start = 2018,
       year_end = 2018,
       acknowledgement = TRUE,
-      directory_to_save = testthat::test_path("..", "testdata/", "")
+      directory_to_save =
+        testthat::test_path("..", "testdata", "terraclimate", "tmp")
     )
+  )
+  file.remove(
+    testthat::test_path("..", "testdata", "terraclimate", "tmp")
   )
 })

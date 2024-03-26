@@ -54,7 +54,3 @@ rsconnect/
 
 # custom linter dev
 \.github/linters
-
-# new data while making subsets
-tests/testdata/gridmet/
-tests/testdata/terraclimate/

@@ -38,9 +38,24 @@ jobs:
             dependencies-${{ runner.os }}-
 
       - name: Test coverage
-        run: |
-          Rscript -e "covd<-covr::coverage_to_list()$totalcoverage;write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F)"
+        run: >
+          Rscript -e
+          "covd<-covr::coverage_to_list()$totalcoverage; 
+          write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F); 
+          cat(paste0(covd[length(covd)]), file = '${{ github.workspace }}/coverage.txt')"
         shell: bash
+
+      - name: Patch comparison
+        shell: Rscript {0}
+        run: |
+          cov_patch <- readlines('${{ github.workspace }}/coverage.txt')
+          cov_current <- readlines("tests/testdata/current_coverage.txt")
+          cov_comparison <- cov_patch >= cov_current
+          testthat::test_that(expect_true(cov_comparison))
+          if (cov_comparison == TRUE) {
+            file.remove("tests/testdata/current_coverage.txt")
+            cat(paste0(cov_patch), file = "tests/testdata/current_coverage.txt")
+          }
 
       - name: Get Values
         id: get-values

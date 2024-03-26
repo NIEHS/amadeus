@@ -2323,10 +2323,10 @@ process_gridmet_codes <-
       return(names_codes)
     }
     if (invert == FALSE) {
-      name_code <- names_codes[names_codes[, 1] == string, ]
+      name_code <- names_codes[names_codes[, 1] == tolower(string), ]
       return(name_code[2])
     } else if (invert == TRUE) {
-      name_code <- names_codes[names_codes[, 2] == string, ]
+      name_code <- names_codes[names_codes[, 2] == tolower(string), ]
       return(name_code[1])
     }
   }
@@ -2361,16 +2361,16 @@ process_terraclimate_codes <-
       return(names_codes)
     }
     if (invert == FALSE) {
-      name_code <- names_codes[names_codes[, 1] == string, ]
+      name_code <- names_codes[names_codes[, 1] == tolower(string), ]
       return(name_code[2])
     } else if (invert == TRUE) {
-      name_code <- names_codes[names_codes[, 2] == string, ]
+      name_code <- names_codes[names_codes[, 2] == tolower(string), ]
       return(name_code[1])
     }
   }
 
 #' Filter gridMET and terraClimate variable names and variable codes
-#' @TerraClimate
+#' @description
 #' Check user defined variables for gridMET and TerraClimate functions.
 #' @param variables character(1). Data variables. (Passed from download_* or
 #' process_*).
@@ -2393,7 +2393,7 @@ process_variable_codes <-
       return(variables)
     } else {
       if (all(tolower(variables) %in% names_codes[, 1]) == TRUE) {
-        cat(
+        message(
           paste0(
             "Converting variable names to variable codes...\n"
           )
@@ -2401,7 +2401,7 @@ process_variable_codes <-
         codes_return <- do.call(
           code_function,
           list(tolower(variables), invert = FALSE)
-          )
+        )
         return(as.vector(codes_return))
       } else {
         stop(
@@ -2433,7 +2433,6 @@ process_variable_codes <-
 #' @importFrom terra rast
 #' @importFrom terra time
 #' @importFrom terra subset
-#' @importFrom stringi stri_pad
 #' @export
 # nolint end
 process_gridmet <- function(
@@ -2585,7 +2584,6 @@ process_gridmet <- function(
 #' @importFrom terra rast
 #' @importFrom terra time
 #' @importFrom terra subset
-#' @importFrom stringi stri_pad
 #' @export
 # nolint end
 process_terraclimate <- function(
