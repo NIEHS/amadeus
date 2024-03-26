@@ -18,4 +18,4 @@ character
 Identify the time step of data observations based on MERRA2 collection and
 filter to time values in \code{from}.
 }
-\keyword{auxillary}
+\keyword{auxiliary}

@@ -15,4 +15,4 @@ provides resolution code, and returns full length resolution.}
 \description{
 Convert full length resolution name to/from resolution code.
 }
-\keyword{auxillary}
+\keyword{auxiliary}

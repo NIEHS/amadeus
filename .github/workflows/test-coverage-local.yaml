@@ -24,7 +24,9 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr
+          extra-packages: |
+            any::covr
+            any::testthat
           needs: coverage
 
       - name: Cache C++ and R dependencies
@@ -41,17 +43,16 @@ jobs:
         run: >
           Rscript -e
           "covd<-covr::coverage_to_list()$totalcoverage; 
-          write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F); 
-          cat(paste0(covd[length(covd)]), file = '${{ github.workspace }}/coverage.txt')"
+          write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F)"
         shell: bash
 
       - name: Patch comparison
         shell: Rscript {0}
         run: |
-          cov_patch <- readLines('${{ github.workspace }}/coverage.txt')
-          cov_current <- readLines("tests/testdata/current_coverage.txt")
-          cov_comparison <- cov_patch >= cov_current
-          testthat::test_that(expect_true(cov_comparison))
+          cov_patch <- read.table('${{ github.workspace }}/local_cov.Rout')[1, 1]
+          cov_current <- gsub("\"", "", readLines("tests/testdata/current_coverage.txt"))
+          cov_comparison <- as.numeric(cov_patch) >= as.numeric(cov_current)
+          testthat::test_that(testthat::expect_true(cov_comparison))
           if (cov_comparison == TRUE) {
             file.remove("tests/testdata/current_coverage.txt")
             cat(paste0(cov_patch), file = "tests/testdata/current_coverage.txt")

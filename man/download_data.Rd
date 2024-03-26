@@ -8,7 +8,7 @@ download_data(
   dataset_name = c("aqs", "ecoregion", "geos", "gmted", "koppen", "koppengeiger",
     "merra2", "merra", "narr_monolevel", "modis", "narr_p_levels", "nlcd", "noaa",
     "sedac_groads", "sedac_population", "groads", "population", "plevels", "p_levels",
-    "monolevel", "hms", "smoke", "tri", "nei"),
+    "monolevel", "hms", "smoke", "tri", "nei", "gridmet", "terraclimate"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   ...
@@ -53,6 +53,8 @@ Please refer to:
 \item \link{download_modis_data}: "modis", "MODIS"
 \item \link{download_tri_data}: "tri", "TRI"
 \item \link{download_nei_data}: "nei", "NEI"
+\item \link{download_gridmet_data}: "gridMET", "gridmet"
+\item \link{download_terraclimate_data}: "TerraClimate", "terraclimate"
 }
 }
 \author{
