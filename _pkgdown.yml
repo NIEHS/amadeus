@@ -28,7 +28,7 @@ reference:
   desc: Functions which convert to, from, and between spatio-temporal data types
 - contents:
   - has_keyword("spacetime")
-- subtitle: Auxillary
+- subtitle: Auxiliary
   desc: Functions which support the download, process, and covariate calculation functions
 - contents:
-  - has_keyword("auxillary")
+  - has_keyword("auxiliary")
