@@ -2492,7 +2492,7 @@ process_gridmet <- function(
     data_year <- terra::rast(data_paths[p])
     cat(paste0(
       "Cleaning daily ",
-      variable_checked_long,
+      variable_checked,
       " data for year ",
       gsub(
         ".nc",

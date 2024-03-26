@@ -1089,9 +1089,10 @@ download_narr_monolevel_data <- function(
 #' Download meteorological data (pressure levels)
 #' @description
 #' The \code{download_narr_p_levels_data} function accesses and downloads pressure levels meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
-#' @param variables character(1). Variable(s) name acronym.
 #' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
+#' @param year_start integer(1). length of 4. Start of year range for
+#' downloading data.
 #' @param year_end integer(1). length of 4. End of year range for downloading
 #' data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data

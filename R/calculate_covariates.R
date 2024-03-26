@@ -1864,3 +1864,245 @@ calc_merra2 <- function(
     fun = fun
   )
 }
+
+#' Calculate gridMET covariates
+#' @description
+#' Extract gridMET values at point locations. Returns a \code{data.frame}
+#' object containing \code{locs_id} and gridMET variable. gridMET variable
+#' column name reflects the gridMET variable and circular buffer radius.
+#' @param from SpatRaster(1). Output from \code{process_gridmet()}.
+#' @param locs data.frame. character to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param fun character(1). Function used to summarize multiple raster cells
+#' within sites location buffer (Default = `mean`).
+#' @author Mitchell Manware
+#' @seealso [`process_gridmet()`]
+#' @return a data.frame object
+#' @importFrom terra vect
+#' @importFrom terra as.data.frame
+#' @importFrom terra time
+#' @importFrom terra extract
+#' @importFrom terra nlyr
+#' @importFrom terra crs
+#' @export
+calc_gridmet <- function(
+    from,
+    locs,
+    locs_id = NULL,
+    radius = 0,
+    fun = "mean") {
+  #### check for null parameters
+  check_for_null_parameters(mget(ls()))
+  #### prepare sites
+  sites_e <- process_locs_vector(
+    locs,
+    terra::crs(from),
+    radius
+  )
+  #### site identifiers only
+  sites_id <- subset(
+    terra::as.data.frame(sites_e),
+    select = locs_id
+  )
+  #### empty location data.frame
+  sites_extracted <- NULL
+  for (l in seq_len(terra::nlyr(from))) {
+    #### select data layer
+    data_layer <- from[[l]]
+    #### extract layer names for variable and date
+    data_name <- strsplit(
+      names(data_layer),
+      "_"
+    )[[1]]
+    #### extract layer date
+    layer_date <- as.Date(
+      data_name[2],
+      format = "%Y%m%d"
+    )
+    cat(paste0(
+      "Calculating daily ",
+      process_gridmet_codes(
+        data_name[1],
+        invert = TRUE
+      ),
+      " covariates for date ",
+      layer_date,
+      "...\n"
+    ))
+    #### extract layer data at sites
+    sites_extracted_layer <- terra::extract(
+      data_layer,
+      sites_e,
+      fun = fun,
+      method = "simple",
+      ID = FALSE,
+      bind = FALSE,
+      na.rm = TRUE
+    )
+    #### merge with site_id, datetime, pressure level
+    sites_extracted_layer <- cbind(
+      sites_id,
+      layer_date,
+      sites_extracted_layer
+    )
+    #### define column names
+    colnames(sites_extracted_layer) <- c(
+      locs_id,
+      "date",
+      paste0(
+        data_name[1],
+        "_",
+        radius
+      )
+    )
+    #### merge with empty sites_extracted
+    sites_extracted <- rbind(
+      sites_extracted,
+      sites_extracted_layer
+    )
+    if (l == terra::nlyr(from)) {
+      cat(paste0(
+        "Returning ",
+        process_gridmet_codes(
+          data_name[1],
+          invert = TRUE
+        ),
+        " covariates.\n"
+      ))
+    }
+  }
+  #### return data.frame
+  return(data.frame(sites_extracted))
+}
+
+#' Calculate TerraClimate covariates
+#' @description
+#' Extract TerraClimate values at point locations. Returns a \code{data.frame}
+#' object containing \code{locs_id} and TerraClimate variable. TerraClimate
+#' variable column name reflects the TerraClimate variable and
+#' circular buffer radius.
+#' @param from SpatRaster(1). Output from \code{process_terraclimate()}.
+#' @param locs data.frame. character to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param fun character(1). Function used to summarize multiple raster cells
+#' within sites location buffer (Default = `mean`).
+#' @note
+#' TerraClimate data has monthly temporal resolution, so the `$time` column
+#' will contain the year and month in YYYYMM format (ie. January, 2018 =
+#' 201801).
+#' @author Mitchell Manware
+#' @seealso [`process_terraclimate()`]
+#' @return a data.frame object
+#' @importFrom terra vect
+#' @importFrom terra as.data.frame
+#' @importFrom terra time
+#' @importFrom terra extract
+#' @importFrom terra nlyr
+#' @importFrom terra crs
+#' @export
+calc_terraclimate <- function(
+    from,
+    locs,
+    locs_id = NULL,
+    radius = 0,
+    fun = "mean") {
+  #### check for null parameters
+  check_for_null_parameters(mget(ls()))
+  #### prepare sites
+  sites_e <- process_locs_vector(
+    locs,
+    terra::crs(from),
+    radius
+  )
+  #### site identifiers only
+  sites_id <- subset(
+    terra::as.data.frame(sites_e),
+    select = locs_id
+  )
+  #### empty location data.frame
+  sites_extracted <- NULL
+  for (l in seq_len(terra::nlyr(from))) {
+    #### select data layer
+    data_layer <- from[[l]]
+    #### extract layer names for variable and date
+    data_name <- strsplit(
+      names(data_layer),
+      "_"
+    )[[1]]
+    cat(paste0(
+      "Calculating monthly ",
+      process_terraclimate_codes(
+        data_name[1],
+        invert = TRUE
+      ),
+      " covariates for ",
+      month.name[
+        as.numeric(
+          substr(
+            data_name[2],
+            5,
+            6
+          )
+        )
+      ],
+      ", ",
+      substr(
+        data_name[2],
+        1,
+        4
+      ),
+      "...\n"
+    ))
+    #### extract layer data at sites
+    sites_extracted_layer <- terra::extract(
+      data_layer,
+      sites_e,
+      fun = fun,
+      method = "simple",
+      ID = FALSE,
+      bind = FALSE,
+      na.rm = TRUE
+    )
+    #### merge with site_id, datetime, pressure level
+    sites_extracted_layer <- cbind(
+      sites_id,
+      paste0(
+        data_name[2]
+      ),
+      sites_extracted_layer
+    )
+    #### define column names
+    colnames(sites_extracted_layer) <- c(
+      locs_id,
+      "time",
+      paste0(
+        data_name[1],
+        "_",
+        radius
+      )
+    )
+    #### merge with empty sites_extracted
+    sites_extracted <- rbind(
+      sites_extracted,
+      sites_extracted_layer
+    )
+    if (l == terra::nlyr(from)) {
+      cat(paste0(
+        "Returning ",
+        process_terraclimate_codes(
+          data_name[1],
+          invert = TRUE
+        ),
+        " covariates.\n"
+      ))
+    }
+  }
+  #### return data.frame
+  return(data.frame(sites_extracted))
+}

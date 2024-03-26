@@ -1175,3 +1175,103 @@ testthat::test_that("calc_merra2 returns as expected.", {
     }
   }
 })
+
+testthat::test_that("calc_gridmet returns as expected.", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  radii <- c(0, 1000)
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  # expect function
+  expect_true(
+    is.function(calc_terraclimate)
+  )
+  for (r in seq_along(radii)) {
+    gridmet <-
+      process_gridmet(
+        date = c("2018-01-03", "2018-01-03"),
+        variable = "pr",
+        path =
+          testthat::test_path(
+            "..",
+            "testdata",
+            "gridmet",
+            "pr"
+          )
+      )
+    gridmet_covariate <-
+      calc_gridmet(
+        from = gridmet,
+        locs = data.table::data.table(ncp),
+        locs_id = "site_id",
+        radius = radii[r],
+        fun = "mean"
+      )
+    # expect output is data.frame
+    expect_true(
+      class(gridmet_covariate) == "data.frame"
+    )
+    # expect 3 columns
+    expect_true(
+      ncol(gridmet_covariate) == 3
+    )
+    # expect numeric value
+    expect_true(
+      class(gridmet_covariate[, 3]) == "numeric"
+    )
+    # expect date and time column
+    expect_true(
+      "Date" %in% class(gridmet_covariate$date)
+    )
+  }
+})
+
+testthat::test_that("calc_terraclimate returns as expected.", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  radii <- c(0, 1000)
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  # expect function
+  expect_true(
+    is.function(calc_terraclimate)
+  )
+  for (r in seq_along(radii)) {
+    terraclimate <-
+      process_terraclimate(
+        date = c("2018-01-01", "2018-01-01"),
+        variable = "Precipitation",
+        path =
+          testthat::test_path(
+            "..",
+            "testdata",
+            "terraclimate",
+            "ppt"
+          )
+      )
+    terraclimate_covariate <-
+      calc_terraclimate(
+        from = terraclimate,
+        locs = data.table::data.table(ncp),
+        locs_id = "site_id",
+        radius = radii[r],
+        fun = "mean"
+      )
+    # expect output is data.frame
+    expect_true(
+      class(terraclimate_covariate) == "data.frame"
+    )
+    # expect 3 columns
+    expect_true(
+      ncol(terraclimate_covariate) == 3
+    )
+    # expect numeric value
+    expect_true(
+      class(terraclimate_covariate[, 3]) == "numeric"
+    )
+    # expect date and time column
+    expect_true(
+      nchar(terraclimate_covariate$time)[1] == 6
+    )
+  }
+})

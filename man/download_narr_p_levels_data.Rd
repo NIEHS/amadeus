@@ -18,6 +18,9 @@ download_narr_p_levels_data(
 \item{variables}{character. Variable(s) name acronym. See \href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{List of Variables in NARR Files}
 for variable names and acronym codes.}
 
+\item{year_start}{integer(1). length of 4. Start of year range for
+downloading data.}
+
 \item{year_end}{integer(1). length of 4. End of year range for downloading
 data.}
 
