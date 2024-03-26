@@ -1192,12 +1192,12 @@ testthat::test_that("calc_gridmet returns as expected.", {
         date = c("2018-01-03", "2018-01-03"),
         variable = "pr",
         path =
-          testthat::test_path(
-            "..",
-            "testdata",
-            "gridmet",
-            "pr"
-          )
+        testthat::test_path(
+          "..",
+          "testdata",
+          "gridmet",
+          "pr"
+        )
       )
     gridmet_covariate <-
       calc_gridmet(
@@ -1242,12 +1242,12 @@ testthat::test_that("calc_terraclimate returns as expected.", {
         date = c("2018-01-01", "2018-01-01"),
         variable = "Precipitation",
         path =
-          testthat::test_path(
-            "..",
-            "testdata",
-            "terraclimate",
-            "ppt"
-          )
+        testthat::test_path(
+          "..",
+          "testdata",
+          "terraclimate",
+          "ppt"
+        )
       )
     terraclimate_covariate <-
       calc_terraclimate(
