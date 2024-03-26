@@ -2299,8 +2299,8 @@ process_locs_vector <-
 #' @export
 process_gridmet_codes <-
   function(
-    string,
-    invert = FALSE) {
+      string,
+      invert = FALSE) {
     names <- c(
       "Near-Surface Specific Humidity", "Mean Vapor Pressure Deficit",
       "Precipitation", "Minimum Near-Surface Relative Humidity",
@@ -2342,8 +2342,8 @@ process_gridmet_codes <-
 #' @export
 process_terraclimate_codes <-
   function(
-    string,
-    invert = FALSE) {
+      string,
+      invert = FALSE) {
     names <- c(
       "Actual Evapotranspiration", "Climate Water Deficit",
       "Potential evapotranspiration", "Precipitation", "Runoff",
@@ -2381,8 +2381,8 @@ process_terraclimate_codes <-
 #' @export
 process_variable_codes <-
   function(
-    variables,
-    source = c("gridmet", "terraclimate")) {
+      variables,
+      source = c("gridmet", "terraclimate")) {
     if (tolower(source) == "gridmet") {
       code_function <- process_gridmet_codes
     } else if (tolower(source) == "terraclimate") {

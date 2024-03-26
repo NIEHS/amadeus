@@ -48,8 +48,8 @@ jobs:
       - name: Patch comparison
         shell: Rscript {0}
         run: |
-          cov_patch <- readlines('${{ github.workspace }}/coverage.txt')
-          cov_current <- readlines("tests/testdata/current_coverage.txt")
+          cov_patch <- readLines('${{ github.workspace }}/coverage.txt')
+          cov_current <- readLines("tests/testdata/current_coverage.txt")
           cov_comparison <- cov_patch >= cov_current
           testthat::test_that(expect_true(cov_comparison))
           if (cov_comparison == TRUE) {

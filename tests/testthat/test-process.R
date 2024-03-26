@@ -1054,12 +1054,12 @@ testthat::test_that("process_gridmet returns expected.", {
       date = c("2018-01-03", "2018-01-03"),
       variable = variable,
       path =
-        testthat::test_path(
-          "..",
-          "testdata",
-          "gridmet",
-          "pr"
-        )
+      testthat::test_path(
+        "..",
+        "testdata",
+        "gridmet",
+        "pr"
+      )
     )
   # expect output is SpatRaster
   expect_true(
@@ -1099,12 +1099,12 @@ testthat::test_that("process_terraclimate returns expected.", {
       date = c("2018-01-01", "2018-01-01"),
       variable = variable,
       path =
-        testthat::test_path(
-          "..",
-          "testdata",
-          "terraclimate",
-          "ppt"
-        )
+      testthat::test_path(
+        "..",
+        "testdata",
+        "terraclimate",
+        "ppt"
+      )
     )
   # expect output is SpatRaster
   expect_true(
@@ -1133,7 +1133,6 @@ testthat::test_that("process_terraclimate returns expected.", {
 })
 
 testthat::test_that("gridmet and terraclimate auxiliary functions.", {
-  
   # gridmet
   gc1 <- process_gridmet_codes("all")
   expect_true(ncol(gc1) == 2)
@@ -1143,7 +1142,6 @@ testthat::test_that("gridmet and terraclimate auxiliary functions.", {
   gc3 <- process_gridmet_codes("Near-Surface Specific Humidity")
   expect_true(class(gc3) == "character")
   expect_true(nchar(gc3) < 7)
-  
   # terraclimate
   tc1 <- process_terraclimate_codes("all")
   expect_true(ncol(gc1) == 2)
@@ -1153,7 +1151,6 @@ testthat::test_that("gridmet and terraclimate auxiliary functions.", {
   tc3 <- process_terraclimate_codes("Actual Evapotranspiration")
   expect_true(class(gc3) == "character")
   expect_true(nchar(gc3) < 7)
-  
   # process_variable_codes
   expect_no_error(process_variable_codes("sph", "gridmet"))
   expect_message(

@@ -966,7 +966,6 @@ download_merra2_data <- function(
 #' Download meteorological data (monolevel)
 #' @description
 #' The \code{download_narr_monolevel_data} function accesses and downloads monolevel meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Monolevel" variables contain a single value for the entire atmospheric column (ie. Variable: Convective cloud cover; Level: Entire atmosphere considered as a single layer), or represent a specific altitude associated with the variable (ie. Variable: Air temperature; Level: 2 m).
-# nolint end
 #' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
 #' @param year_start integer(1). length of 4. Start of year range for
@@ -988,6 +987,7 @@ download_merra2_data <- function(
 #' @return NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @export
+# nolint end
 download_narr_monolevel_data <- function(
     variables = NULL,
     year_start = 2022,
@@ -1089,7 +1089,6 @@ download_narr_monolevel_data <- function(
 #' Download meteorological data (pressure levels)
 #' @description
 #' The \code{download_narr_p_levels_data} function accesses and downloads pressure levels meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
-# nolint end
 #' @param variables character(1). Variable(s) name acronym.
 #' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
@@ -1110,6 +1109,7 @@ download_narr_monolevel_data <- function(
 #' @return NULL; Monthly netCDF (.nc) files will be stored in
 #' \code{directory_to_save}.
 #' @export
+# nolint end
 download_narr_p_levels_data <- function(
     variables = NULL,
     year_start = 2022,
@@ -2542,7 +2542,6 @@ download_nei_data <- function(
 #' Download gridMET data
 #' @description
 #' The \code{download_gridmet_data} function accesses and downloads gridded surface meteorological data from the [University of California Merced Climatology Lab's gridMET dataset](https://www.climatologylab.org/gridmet.html).
-# nolint end
 #' @param variables character(1). Variable(s) name(s). See [gridMET Generate Wget File](https://www.climatologylab.org/wget-gridmet.html)
 #' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
 #' "Energy Release Component" has code "erc").
@@ -2565,6 +2564,7 @@ download_nei_data <- function(
 #' @return NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @export
+# nolint end
 download_gridmet_data <- function(
     variables = NULL,
     year_start = 2022,
@@ -2669,7 +2669,6 @@ download_gridmet_data <- function(
 #' Download TerraClimate data
 #' @description
 #' The \code{download_terraclimate_data} function accesses and downloads climate and water balance data from the [University of California Merced Climatology Lab's TerraClimate dataset](https://www.climatologylab.org/terraclimate.html).
-# nolint end
 #' @param variables character(1). Variable(s) name(s). See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
 #' for variable names and acronym codes.
 #' @param year_start integer(1). length of 4. Start of year range for
@@ -2691,6 +2690,7 @@ download_gridmet_data <- function(
 #' @return NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @export
+# nolint end
 download_terraclimate_data <- function(
     variables = NULL,
     year_start = 2022,
