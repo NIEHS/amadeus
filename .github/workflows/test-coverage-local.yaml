@@ -51,8 +51,7 @@ jobs:
         run: |
           cov_patch <- read.table('${{ github.workspace }}/local_cov.Rout')[1, 1]
           cov_current <- gsub("\"", "", readLines("tests/testdata/current_coverage.txt"))
-          cov_comparison <- as.numeric(cov_patch) >= as.numeric(cov_current)
-          testthat::test_that(testthat::expect_true(cov_comparison))
+          testthat::test_that(testthat::expect_true(as.numeric(cov_patch) >= as.numeric(cov_current)))
           if (cov_comparison == TRUE) {
             file.remove("tests/testdata/current_coverage.txt")
             cat(paste0(cov_patch), file = "tests/testdata/current_coverage.txt")
