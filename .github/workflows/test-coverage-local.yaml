@@ -67,8 +67,7 @@ jobs:
           export cov_current=${{ steps.get-values.outputs.cov_current }}
           if [ $(echo "$cov_patch >= $cov_current" | bc -l) -eq 1 ]; then
             echo "Patch coverage is greater than or equal to current coverage."
-            rm ${{ github.workspace }}/tests/testdata/coverage/cov_current.Rout
-            echo "$cov_patch" >> ${{ github.workspace }}/tests/testdata/coverage/cov_current.Rout
+            echo "$cov_patch" > tests/testdata/coverage/cov_current.Rout
           else
             echo "Patch coverage is less than current coverage."
             exit 1
