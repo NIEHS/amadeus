@@ -54,6 +54,19 @@ jobs:
         with:
           ref: gh-pages
   
+      - name: Patch comparison
+        shell: Rscript {0}
+        run: |
+          cov_patch <- read.table('${{ github.workspace }}/local_cov.Rout')[1, 1]
+          cov_current <- gsub("\"", "", readLines("tests/testdata/current_coverage.txt"))
+          testthat::test_that("Patch code coverage is greater than or equal to current coverage.", {
+            testthat::expect_true(as.numeric(cov_patch) >= as.numeric(cov_current))
+          })
+          if ((as.numeric(cov_patch) >= as.numeric(cov_current)) == TRUE) {
+            file.remove("tests/testdata/current_coverage.txt")
+            cat(paste0(cov_patch), file = "tests/testdata/current_coverage.txt")
+          }  
+
       - name: Create Badges
         shell: bash
         run: |
