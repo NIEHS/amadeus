@@ -52,8 +52,8 @@ jobs:
         run: |
           COV=$(cat ${{ github.workspace }}/cov_patch.Rout)
           echo "cov_patch=$COV" >> $GITHUB_OUTPUT
-          COV_current=$(cat ${{ github.workspace }}/cov_current.Rout)
-          echo "cov_current=$COV_current" >> $GITHUB_OUTPUT
+          COV_c=$(cat ${{ github.workspace }}/cov_current.Rout)
+          echo "cov_current=$COV_c" >> $GITHUB_OUTPUT
 
       - name: Patch comparison
         id: patch-comparison
@@ -63,7 +63,6 @@ jobs:
           export cov_current=${{ steps.get-values.outputs.cov_current }}
           if [ $(echo "$cov_patch >= $cov_current" | bc -l) -eq 1 ]; then
             echo "Patch coverage is greater than or equal to current coverage."
-            echo "cov_new=$COV" >> $GITHUB_OUTPUT
           else
             echo "Patch coverage is less than current coverage."
             exit 1
@@ -77,9 +76,9 @@ jobs:
       - name: Overwrite cov_current.Rout
         uses: DamianReeves/write-file-action@master
         with:
-          path: tests/testdata/coverage/ccov_current.Rout
+          path: tests/testdata/coverage/cov_current.Rout
           write-mode: overwrite
-          contents: ${{ steps.patch-comparison.outputs.cov_new}}
+          contents: ${{ steps.get-values.outputs.cov_patch }}
 
       - name: Create Badges
         shell: bash
