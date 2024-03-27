@@ -1,3 +1,26 @@
+fake <- 
+  function(x) {
+    cat(
+      paste0(
+        "This",
+        "is",
+        "a", 
+        "fake",
+        "function",
+        "to",
+        "decrease",
+        "code",
+        "coverage",
+        "and",
+        "check",
+        "the",
+        "new",
+        "workflow",
+        "response"
+      )
+    )
+    return(x)
+  }
 # Functions used to simplify and support download functions
 
 #' Setup directory
