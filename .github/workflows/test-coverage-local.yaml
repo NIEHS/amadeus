@@ -56,17 +56,19 @@ jobs:
           ref: gh-pages
   
       - name: Patch comparison
-        shell: Rscript {0}
+        shell: bash
         run: |
-          cov_patch <- readLines("tests/testdata/coverage/patch_coverage.Rout")
-          cov_current <- readLines("tests/testdata/coverage/current_coverage.Rout")
-          testthat::test_that("Patch code coverage is greater than or equal to current coverage.", {
-            testthat::expect_true(as.numeric(cov_patch) >= as.numeric(cov_current))
-          })
-          if ((as.numeric(cov_patch) >= as.numeric(cov_current)) == TRUE) {
-            file.remove("tests/testdata/current_coverage.Rout")
-            cat(paste0(cov_patch), file = "tests/testdata/current_coverage.Rout")
-          }
+          export cov_patch=${{ steps.get-values.outputs.coverage }}
+          export cov_current=$(cat tests/testdata/coverage/current_coverage.Rout)
+          if [ $cov_patch -ge $cov_current ]
+            then
+              echo "Patch coverage is greater than or equal to current."
+              rm tests/testdata/coverage/current_coverage.Rout
+              echo "$cov_patch" >> tests/testdata/coverage/current_coverage.Rout
+            else
+              echo "Patch coverage is less than current coverage."
+              exit 1
+          fi
 
       - name: Create Badges
         shell: bash
