@@ -38,17 +38,23 @@ jobs:
             dependencies-${{ runner.os }}-
 
       - name: Test coverage
-        run: |
-          Rscript -e "covd<-covr::coverage_to_list()$totalcoverage;write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F)"
+        run: >
+          ls -l tests/testdata/coverage/
+          Rscript -e
+          "covd<-covr::coverage_to_list()$totalcoverage;
+          write.table(covd[length(covd)], file = '${{ github.workspace }}/cov_patch.Rout', row.names = F, col.names = F);
+          cov_current<-readLines('tests/testdata/coverage/cov_current.Rout');
+          write.table(cov_current, file = '${{ github.workspace }}/cov_current.Rout')"
         shell: bash
 
       - name: Get Values
         id: get-values
         shell: bash
         run: |
-          COV=$(cat ${{ github.workspace }}/local_cov.Rout)
-          echo "coverage=$COV" >> $GITHUB_OUTPUT
-          echo "coverage=$COV" >> tests/testdata/coverage/patch_coverage.Rout
+          COV=$(cat ${{ github.workspace }}/cov_patch.Rout)
+          echo "cov_patch=$COV" >> $GITHUB_OUTPUT
+          COV_c=$(cat ${{ github.workspace }}/cov_current.Rout)
+          echo "cov_current=$COV" >> $GITHUB_OUTPUT
 
       - name: Checkout gh-pages
         uses: actions/checkout@v4
@@ -58,13 +64,13 @@ jobs:
       - name: Patch comparison
         shell: bash
         run: |
-          export cov_patch=${{ steps.get-values.outputs.coverage }}
-          export cov_current="$(cat tests/testdata/coverage/current_coverage.Rout)"
+          export cov_patch=${{ steps.get-values.outputs.cov_patch }}
+          export cov_current=${{ steps.get-values.outputs.cov_current }}
           if [ $cov_patch -ge $cov_current ]
             then
               echo "Patch coverage is greater than or equal to current."
-              rm tests/testdata/coverage/current_coverage.Rout
-              echo "$cov_patch" >> tests/testdata/coverage/current_coverage.Rout
+              rm ${{ github.workspace }}/tests/testdata/coverage/cov_current.Rout
+              echo "$cov_patch" >> ${{ github.workspace }}/tests/testdata/coverage/cov_current.Rout
             else
               echo "Patch coverage is less than current coverage."
               exit 1
@@ -74,10 +80,10 @@ jobs:
         shell: bash
         run: |
           npm i -g badgen-cli
-          export COV=${{ steps.get-values.outputs.coverage }}
+          export COV=${{ steps.get-values.outputs.cov_patch }}
           COLOR=$(node -p '+process.env.COV >= 95 ? `green` : `orange`')
           mkdir -p badges
-          badgen -j coverage -s $COV% -c $COLOR > badges/coverage.svg
+          badgen -j cov_patch -s $COV% -c $COLOR > badges/coverage.svg
   
       - name: Deploy Badges
         uses: stefanzweifel/git-auto-commit-action@v4
