@@ -59,7 +59,7 @@ jobs:
         shell: bash
         run: |
           export cov_patch=${{ steps.get-values.outputs.coverage }}
-          export cov_current=$(cat tests/testdata/coverage/current_coverage.Rout)
+          export cov_current="$(cat tests/testdata/coverage/current_coverage.Rout)"
           if [ $cov_patch -ge $cov_current ]
             then
               echo "Patch coverage is greater than or equal to current."
