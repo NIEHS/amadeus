@@ -55,6 +55,11 @@ jobs:
           COV_c=$(cat ${{ github.workspace }}/cov_current.Rout)
           echo "cov_current=$COV_c" >> $GITHUB_OUTPUT
 
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
       - name: Patch comparison
         id: patch-comparison
         shell: bash
@@ -67,11 +72,6 @@ jobs:
             echo "Patch coverage is less than current coverage."
             exit 1
           fi
-
-      - name: Checkout gh-pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
 
       - name: Overwrite cov_current.Rout
         uses: DamianReeves/write-file-action@master
