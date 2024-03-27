@@ -39,7 +39,6 @@ jobs:
 
       - name: Test coverage
         run: >
-          ls -l tests/testdata/coverage/
           Rscript -e
           "covd<-covr::coverage_to_list()$totalcoverage;
           write.table(covd[length(covd)], file = '${{ github.workspace }}/cov_patch.Rout', row.names = F, col.names = F);
