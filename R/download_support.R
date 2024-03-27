@@ -1,21 +1,3 @@
-fake_function <- function(x) {
-  cat(
-    paste0(
-      x,
-      "Adding",
-      "lines",
-      "of",
-      "code",
-      "to",
-      "test",
-      "coverage",
-      "in",
-      "workflow",
-    )
-  )
-}
-
-
 # Functions used to simplify and support download functions
 
 #' Setup directory
