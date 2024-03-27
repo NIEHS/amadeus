@@ -1,4 +1,52 @@
-fake <- 
+fake <-
+  function(x) {
+    cat(
+      paste0(
+        "This",
+        "is",
+        "a", 
+        "fake",
+        "function",
+        "to",
+        "decrease",
+        "code",
+        "coverage",
+        "and",
+        "check",
+        "the",
+        "new",
+        "workflow",
+        "response"
+      )
+    )
+    return(x)
+  }
+
+  fake2 <-
+  function(x) {
+    cat(
+      paste0(
+        "This",
+        "is",
+        "a", 
+        "fake",
+        "function",
+        "to",
+        "decrease",
+        "code",
+        "coverage",
+        "and",
+        "check",
+        "the",
+        "new",
+        "workflow",
+        "response"
+      )
+    )
+    return(x)
+  }
+  
+  fake3 <-
   function(x) {
     cat(
       paste0(
