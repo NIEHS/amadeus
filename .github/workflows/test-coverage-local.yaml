@@ -41,9 +41,7 @@ jobs:
         run: >
           Rscript -e
           "covd<-covr::coverage_to_list()$totalcoverage;
-          write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F);
-          cov_current<-readLines('tests/testdata/coverage/cov_current.Rout');
-          write.table(cov_current, file = '${{ github.workspace }}/cov_current.Rout', row.names = F, col.names = F)"
+          write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F)"
         shell: bash
 
       - name: Get Values
@@ -53,9 +51,6 @@ jobs:
           COV=$(cat ${{ github.workspace }}/local_cov.Rout)
           echo "Patch coverage read from local_cov.Rout: $COV"
           echo "coverage=$COV" >> $GITHUB_OUTPUT
-          COV_CURRENT=$(cat ${{ github.workspace }}/cov_current.Rout)
-          echo "Current coverage read from cov_current.Rout: $COV_CURRENT"
-          echo "coverage_current=$COV_CURRENT" >> $GITHUB_OUTPUT
 
       - name: Checkout gh-pages
         uses: actions/checkout@v4
@@ -67,13 +62,14 @@ jobs:
         shell: bash
         run: |
           cov_patch="${{ steps.get-values.outputs.coverage }}"
-          cov_current="${{ steps.get-values.outputs.coverage_current }}"
+          cov_current=$(cat cov_current.Rout)
+          echo "Current coverage: $cov_current"
 
           if (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
             echo "Patch coverage ($cov_patch) is greater than or equal to current coverage ($cov_current)."
             mkdir -p tests/testdata/coverage
             touch tests/testdata/coverage/cov_current.Rout
-            echo "$cov_patch" > tests/testdata/coverage/cov_current.Rout
+            echo "$cov_patch" > cov_current.Rout
            else
             echo "Patch coverage ($cov_patch) is less than current coverage ($cov_current)."
             exit 1
