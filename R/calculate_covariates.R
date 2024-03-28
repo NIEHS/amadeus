@@ -1119,7 +1119,7 @@ calc_hms <- function(
       )
       colnames(skip_extraction_date) <- c(
         locs_id,
-        "date",
+        "time",
         paste0(
           skip_variable,
           "_",
@@ -1407,6 +1407,14 @@ calc_narr <- function(
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
+  #### identify pressure level or monolevel data
+  if (grepl("level", names(from)[1])) {
+    narr_time <- 3
+    narr_level <- 2
+  } else {
+    narr_time <- 2
+    narr_level <- NULL
+  }
   #### perform extraction
   sites_extracted <- calc_worker(
     from = from,
@@ -1415,8 +1423,9 @@ calc_narr <- function(
     radius = radius,
     fun = fun,
     variable = 1,
-    time = 2,
-    time_type = "date"
+    time = narr_time,
+    time_type = "date",
+    level = narr_level
   )
   #### return data.frame
   return(data.frame(sites_extracted))
@@ -1714,16 +1723,6 @@ calc_gridmet <- function(
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
-  #### empty location data.frame
-  #### prepare locations list
-  sites_list <- process_locs(
-    from = from,
-    locs = locs,
-    locs_id = locs_id,
-    radius = radius
-  )
-  sites_e <- sites_list[[1]]
-  sites_id <- sites_list[[2]]
   #### perform extraction
   sites_extracted <- calc_worker(
     from = from,
@@ -1774,7 +1773,7 @@ calc_terraclimate <- function(
     radius = 0,
     fun = "mean") {
   #### prepare locations list
-  sites_list <- process_locs(
+  sites_list <- calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,

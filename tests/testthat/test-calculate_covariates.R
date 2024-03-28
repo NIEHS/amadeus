@@ -958,14 +958,25 @@ testthat::test_that("calc_narr returns expected.", {
       expect_true(
         class(narr_covariate) == "data.frame"
       )
-      # expect 4 columns
-      expect_true(
-        ncol(narr_covariate) == 4
-      )
-      # expect numeric value
-      expect_true(
-        class(narr_covariate[, 4]) == "numeric"
-      )
+      if (variable == "weasd") {
+        # expect 3 columns (no pressure level)
+        expect_true(
+          ncol(narr_covariate) == 3
+        )
+        # expect numeric value
+        expect_true(
+          class(narr_covariate[, 3]) == "numeric"
+        )
+      } else {
+        # expect 4 columns
+        expect_true(
+          ncol(narr_covariate) == 4
+        )
+        # expect numeric value
+        expect_true(
+          class(narr_covariate[, 4]) == "numeric"
+        )
+      }
       # expect $time is class Date
       expect_true(
         "Date" %in% class(narr_covariate$time)
