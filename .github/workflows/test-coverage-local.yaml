@@ -65,10 +65,10 @@ jobs:
         id: patch-comparison
         shell: bash
         run: |
-          if (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
-            echo "Patch coverage is greater than or equal to current coverage."
+          if (( $(echo "$cov_patch >= $cov_current" | bc) )); then
+            echo "Patch coverage ($cov_patch) is greater than or equal to current coverage ($cov_current)."
           else
-            echo "Patch coverage is less than current coverage."
+            echo "Patch coverage ($cov_patch) is less than current coverage ($cov_current)."
             exit 1
           fi
 

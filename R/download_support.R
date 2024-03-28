@@ -4,7 +4,7 @@ fake <-
       paste0(
         "This",
         "is",
-        "a", 
+        "a",
         "fake",
         "function",
         "to",
@@ -22,13 +22,13 @@ fake <-
     return(x)
   }
 
-  fake2 <-
+fake2 <-
   function(x) {
     cat(
       paste0(
         "This",
         "is",
-        "a", 
+        "a",
         "fake",
         "function",
         "to",
@@ -46,13 +46,13 @@ fake <-
     return(x)
   }
   
-  fake3 <-
+fake3 <-
   function(x) {
     cat(
       paste0(
         "This",
         "is",
-        "a", 
+        "a",
         "fake",
         "function",
         "to",
