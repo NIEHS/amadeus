@@ -44,7 +44,7 @@ jobs:
           write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F);
           cov_current<-readLines('tests/testdata/coverage/cov_current.Rout');
           cat(cov_current);
-          write.table(cov_current, file = '${{ github.workspace }}/cov_current.Rout', , row.names = F, col.names = F)"
+          write.table(cov_current, file = '${{ github.workspace }}/cov_current.Rout', row.names = F, col.names = F)"
         shell: bash
 
       - name: Get Values
