@@ -50,11 +50,11 @@ jobs:
         id: get-values
         shell: bash
         run: |
-          COV=$(cat ${{ github.workspace }}/cov_patch.Rout)
-          echo "cov_patch=$COV" >> $GITHUB_OUTPUT
-          echo "cov_patch=$COV"
-          COV_c=$(cat ${{ github.workspace }}/cov_current.Rout)
-          echo "cov_current=$COV_c"
+          COV_PATCH=$(cat ${{ github.workspace }}/cov_patch.Rout)
+          echo "cov_patch=$COV_PATCH" >> $GITHUB_ENV
+          echo "cov_patch=$COV_PATCH"
+          COV_CURRENT=$(cat ${{ github.workspace }}/cov_current.Rout)
+          echo "cov_current=$COV_CURRENT"
 
       - name: Checkout gh-pages
         uses: actions/checkout@v4
@@ -65,10 +65,10 @@ jobs:
         id: patch-comparison
         shell: bash
         run: |
-          if (( $(echo "$cov_patch >= $cov_current" | bc) )); then
-            echo "Patch coverage ($cov_patch) is greater than or equal to current coverage ($cov_current)."
+          if (( $(echo "${{ steps.get-values.outputs.cov_patch }} >= ${{ steps.get-values.outputs.cov_current }}" | bc) )); then
+            echo "Patch coverage (${steps.get-values.outputs.cov_patch}) is greater than or equal to current coverage (${steps.get-values.outputs.cov_current})."
           else
-            echo "Patch coverage ($cov_patch) is less than current coverage ($cov_current)."
+            echo "Patch coverage (${steps.get-values.outputs.cov_patch}) is less than current coverage (${steps.get-values.outputs.cov_current})."
             exit 1
           fi
 

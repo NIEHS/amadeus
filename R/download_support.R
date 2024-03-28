@@ -45,7 +45,7 @@ fake2 <-
     )
     return(x)
   }
-  
+
 fake3 <-
   function(x) {
     cat(
