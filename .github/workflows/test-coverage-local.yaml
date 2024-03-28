@@ -64,7 +64,6 @@ jobs:
 
       - name: Patch comparison
         id: patch-comparison
-        shell: bash
         run: |
           cov_patch="${{ env.cov_patch }}"
           cov_current="${{ env.cov_current }}"
