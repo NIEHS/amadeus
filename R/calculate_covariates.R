@@ -283,6 +283,7 @@ calc_nlcd <- function(from,
                                                sf::st_geometry(bufs_pol),
                                                fun = "frac",
                                                stack_apply = TRUE,
+                                               force_df = TRUE,
                                                progress = FALSE,
                                                max_cells_in_memory = max_cells)
   # select only the columns of interest
@@ -1666,6 +1667,7 @@ calc_geos <- function(
 #' @importFrom terra extract
 #' @importFrom terra nlyr
 #' @importFrom terra crs
+#' @importFrom methods is
 #' @export
 calc_sedac_population <- function(
     from,
@@ -1677,16 +1679,17 @@ calc_sedac_population <- function(
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### prepare sites
-  sites_e <- process_locs_vector(
-    locs,
-    terra::crs(from),
-    radius
-  )
+  if (methods::is(locs, "sf")) {
+    sites_e <- terra::vect(locs)
+  } else if (methods::is(locs, "data.frame")) {
+    sites_e <- process_locs_vector(
+      locs,
+      terra::crs(from),
+      radius
+    )
+  }
   #### site identifiers
-  sites_id <- subset(
-    locs,
-    select = locs_id
-  )
+  sites_id <- unlist(locs[[locs_id]])
   #### empty location data.frame
   sites_extracted <- NULL
   for (l in seq_len(terra::nlyr(from))) {
@@ -1787,6 +1790,7 @@ calc_sedac_population <- function(
 #' @importFrom terra crs
 #' @importFrom terra expanse
 #' @importFrom terra linearUnits
+#' @importFrom methods is
 #' @export
 calc_sedac_groads <- function(
     from = NULL,
@@ -1801,11 +1805,13 @@ calc_sedac_groads <- function(
   }
   check_for_null_parameters(mget(ls()))
   #### prepare sites
-  sites_e <- process_locs_vector(
-    locs,
-    terra::crs(from),
-    radius
-  )
+  if (methods::is(locs, "data.frame")) {
+    sites_e <- process_locs_vector(
+      locs,
+      terra::crs(from),
+      radius
+    )
+  }
 
   from_re <- terra::project(from, terra::crs(sites_e))
   from_re <- from[terra::ext(sites_e), ]
