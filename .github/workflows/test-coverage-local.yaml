@@ -71,6 +71,8 @@ jobs:
 
           if (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
             echo "Patch coverage ($cov_patch) is greater than or equal to current coverage ($cov_current)."
+            mkdir -p tests/testdata/coverage
+            touch tests/testdata/coverage/cov_current.Rout
             echo "$cov_patch" > tests/testdata/coverage/cov_current.Rout
            else
             echo "Patch coverage ($cov_patch) is less than current coverage ($cov_current)."
