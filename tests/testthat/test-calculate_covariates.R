@@ -780,6 +780,10 @@ testthat::test_that("calc_hms returns expected.", {
       expect_true(
         all(unique(hms_covariate[, 3]) %in% c(0, 1))
       )
+      # expect $time is class Date
+      expect_true(
+        "Date" %in% class(hms_covariate$time)
+      )
     }
   }
 })
@@ -837,6 +841,10 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
       # expect binary
       expect_true(
         all(unique(hms_covariate[, 3]) %in% c(0, 1))
+      )
+      # expect $time is class Date
+      expect_true(
+        "Date" %in% class(hms_covariate$time)
       )
     }
   }
@@ -958,9 +966,9 @@ testthat::test_that("calc_narr returns expected.", {
       expect_true(
         class(narr_covariate[, 4]) == "numeric"
       )
-      # expect date column
+      # expect $time is class Date
       expect_true(
-        class(narr_covariate[, 2]) == "Date"
+        "Date" %in% class(narr_covariate$time)
       )
     }
   }
@@ -1015,9 +1023,9 @@ testthat::test_that("calc_geos returns as expected.", {
       expect_true(
         class(geos_covariate[, 4]) == "numeric"
       )
-      # expect date and time column
+      # expect $time is class POSIXt
       expect_true(
-        "POSIXt" %in% class(geos_covariate$date)
+        "POSIXt" %in% class(geos_covariate$time)
       )
     }
   }
@@ -1063,9 +1071,9 @@ testthat::test_that("calc_sedac_population returns as expected.", {
       expect_true(
         class(pop_covariate[, 3]) == "numeric"
       )
-      # expect date and time column
+      # expect $time is class integer for year
       expect_true(
-        "integer" %in% class(pop_covariate$year)
+        "integer" %in% class(pop_covariate$time)
       )
     }
   }
@@ -1168,9 +1176,9 @@ testthat::test_that("calc_merra2 returns as expected.", {
       expect_true(
         class(merra2_covariate[, 4]) == "numeric"
       )
-      # expect date and time column
+      # expect $time is class Date
       expect_true(
-        "POSIXt" %in% class(merra2_covariate$date)
+        "POSIXt" %in% class(merra2_covariate$time)
       )
     }
   }
@@ -1219,9 +1227,9 @@ testthat::test_that("calc_gridmet returns as expected.", {
     expect_true(
       class(gridmet_covariate[, 3]) == "numeric"
     )
-    # expect date and time column
+    # expect $time is class Date
     expect_true(
-      "Date" %in% class(gridmet_covariate$date)
+      "Date" %in% class(gridmet_covariate$time)
     )
   }
 })

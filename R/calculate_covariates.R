@@ -32,6 +32,8 @@
 #' - [`calc_sedac_groads`]: `"roads"`
 #' - [`calc_nlcd`]: `"nlcd"`
 #' - [`calc_merra2`]: `"merra"`, `"MERRA"`, `"merra2"`, `"MERRA2"`
+#' - [`calc_gridmet`]: `"gridMET"`, `"gridmet"`
+#' - [`calc_terraclimate`]: `"terraclimate"`, `"TerraClimate"`
 #' @returns Calculated covariates. Mainly data.frame object.
 #' @author Insang Song
 #' @export
@@ -45,7 +47,7 @@ calc_covariates <-
                     "gmted", "narr", "narr_monolevel", "narr_p_levels",
                     "plevels", "monolevel", "p_levels", "geos",
                     "sedac_population", "population", "nlcd",
-                    "merra", "MERRA", "merra2", "MERRA2"),
+                    "merra", "merra2", "gridmet", "terraclimate"),
       from,
       locs,
       locs_id = "site_id",
@@ -83,7 +85,9 @@ calc_covariates <-
       gmted = calc_gmted,
       dummies = calc_temporal_dummies,
       merra = calc_merra2,
-      merra2 = calc_merra2
+      merra2 = calc_merra2,
+      gridmet = calc_gridmet,
+      terraclimate = calc_terraclimate
     )
 
     res_covariate <-
@@ -1134,17 +1138,15 @@ calc_hms <- function(
     ))
     return(skip_extraction)
   }
-  #### prepare sites
-  sites_e <- process_locs_vector(
-    locs,
-    terra::crs(from),
-    radius
+  #### prepare locations list
+  sites_list <- calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius
   )
-  #### site identifiers only
-  sites_id <- subset(
-    terra::as.data.frame(sites_e),
-    select = locs_id
-  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
   #### generate date sequence for missing polygon patch
   date_sequence <- generate_date_sequence(
     date_start = as.Date(
@@ -1193,7 +1195,7 @@ calc_hms <- function(
     #### define column names
     colnames(sites_extracted_layer) <- c(
       locs_id,
-      "date",
+      "time",
       paste0(
         tolower(
           layer_name
@@ -1242,7 +1244,7 @@ calc_hms <- function(
   #### coerce binary to integer
   sites_extracted[, 3] <- as.integer(sites_extracted[, 3])
   #### order by date
-  sites_extracted_ordered <- sites_extracted[order(sites_extracted$date), ]
+  sites_extracted_ordered <- sites_extracted[order(sites_extracted$time), ]
   cat(paste0(
     "Returning ",
     layer_name,
@@ -1282,19 +1284,15 @@ calc_gmted <- function(
     locs_id = NULL,
     radius = 0,
     fun = "mean") {
-  #### check for null parameters
-  check_for_null_parameters(mget(ls()))
-  #### prepare sites
-  sites_e <- process_locs_vector(
-    locs,
-    terra::crs(from),
-    radius
+  #### prepare locations list
+  sites_list <- calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius
   )
-  #### site identifiers only
-  sites_id <- subset(
-    terra::as.data.frame(sites_e),
-    select = locs_id
-  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
   #### layer name
   layer_name <- names(from)
   cat(paste0(
@@ -1400,103 +1398,26 @@ calc_narr <- function(
     locs_id = NULL,
     radius = 0,
     fun = "mean") {
-  #### check for null parameters
-  check_for_null_parameters(mget(ls()))
-  #### prepare sites
-  sites_e <- process_locs_vector(
-    locs,
-    terra::crs(from),
-    radius
+  #### prepare locations list
+  sites_list <- calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius
   )
-  #### site identifiers only
-  sites_id <- subset(
-    terra::as.data.frame(sites_e),
-    select = locs_id
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### perform extraction
+  sites_extracted <- calc_worker(
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
+    fun = fun,
+    variable = 1,
+    time = 2,
+    time_type = "date"
   )
-  #### empty location data.frame
-  sites_extracted <- NULL
-  for (l in seq_len(terra::nlyr(from))) {
-    #### select data layer
-    data_layer <- from[[l]]
-    #### extract layer names for variable, date, and pressure level
-    data_name <- strsplit(
-      names(data_layer),
-      "_"
-    )[[1]]
-    #### monolevel data
-    if (length(data_name) == 2) {
-      layer_level <- "monolevel"
-      layer_date <- as.Date(
-        data_name[2],
-        format = "%Y%m%d"
-      )
-      cat(paste0(
-        "Calculating daily ",
-        data_name[1],
-        " covariates at ",
-        layer_level,
-        " for date ",
-        layer_date,
-        "...\n"
-      ))
-      #### pressure level data
-    } else if (length(data_name) == 3) {
-      layer_level <- data_name[2]
-      layer_date <- as.Date(
-        data_name[3],
-        format = "%Y%m%d"
-      )
-      cat(paste0(
-        "Calculating daily ",
-        data_name[1],
-        " covariates at ",
-        layer_level,
-        " for date ",
-        layer_date,
-        "...\n"
-      ))
-    }
-    #### extract layer data at sites
-    sites_extracted_layer <- terra::extract(
-      data_layer,
-      sites_e,
-      fun = fun,
-      method = "simple",
-      ID = FALSE,
-      bind = FALSE,
-      na.rm = TRUE
-    )
-    #### merge with site_id, datetime, pressure level
-    sites_extracted_layer <- cbind(
-      sites_id,
-      layer_date,
-      layer_level,
-      sites_extracted_layer
-    )
-    #### define column names
-    colnames(sites_extracted_layer) <- c(
-      locs_id,
-      "date",
-      "level",
-      paste0(
-        data_name[1],
-        "_",
-        radius
-      )
-    )
-    #### merge with empty sites_extracted
-    sites_extracted <- rbind(
-      sites_extracted,
-      sites_extracted_layer
-    )
-    if (l == terra::nlyr(from)) {
-      cat(paste0(
-        "Returning ",
-        data_name[1],
-        " covariates.\n"
-      ))
-    }
-  }
   #### return data.frame
   return(data.frame(sites_extracted))
 }
@@ -1534,94 +1455,27 @@ calc_geos <- function(
     locs_id = NULL,
     radius = 0,
     fun = "mean") {
-  #### check for null parameters
-  check_for_null_parameters(mget(ls()))
-  #### prepare sites
-  sites_e <- process_locs_vector(
-    locs,
-    terra::crs(from),
-    radius
+  #### prepare locations list
+  sites_list <- calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius
   )
-  #### site identifiers
-  sites_id <- subset(
-    locs,
-    select = locs_id
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### perform extraction
+  sites_extracted <- calc_worker(
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
+    fun = fun,
+    variable = 1,
+    time = c(3, 4),
+    time_type = "hour",
+    level = 2
   )
-  #### empty location data.frame
-  sites_extracted <- NULL
-  for (l in seq_len(terra::nlyr(from))) {
-    #### select data layer
-    data_layer <- from[[l]]
-    #### extract layer names for variable and datetime sequence
-    data_name <- strsplit(
-      names(data_layer),
-      "_"
-    )[[1]]
-    if (length(data_name) == 3) {
-      data_name[3:4] <- data_name[2:3]
-      data_name[2] <- "horizontal only level"
-    }
-    #### set datetime
-    layer_datetime <- ISOdatetime(
-      year = substr(data_name[3], 1, 4),
-      month = substr(data_name[3], 5, 6),
-      day = substr(data_name[3], 7, 8),
-      hour = substr(data_name[4], 1, 2),
-      min = substr(data_name[4], 3, 4),
-      sec = substr(data_name[4], 5, 6),
-      tz = "UTC"
-    )
-    layer_level <- data_name[2]
-    cat(paste0(
-      "Calculating hourly ",
-      data_name[1],
-      " covariates at ",
-      layer_level,
-      " for date ",
-      layer_datetime,
-      "...\n"
-    ))
-    #### extract layer data at sites
-    sites_extracted_layer <- terra::extract(
-      data_layer,
-      sites_e,
-      fun = fun,
-      method = "simple",
-      ID = FALSE,
-      bind = FALSE,
-      na.rm = TRUE
-    )
-    #### merge with site_id, datetime, pressure level
-    sites_extracted_layer <- cbind(
-      sites_id,
-      layer_datetime,
-      layer_level,
-      sites_extracted_layer
-    )
-    #### define column names
-    colnames(sites_extracted_layer) <- c(
-      locs_id,
-      "date",
-      "level",
-      paste0(
-        data_name[1],
-        "_",
-        radius
-      )
-    )
-    #### merge with empty sites_extracted
-    sites_extracted <- rbind(
-      sites_extracted,
-      sites_extracted_layer
-    )
-    if (l == terra::nlyr(from)) {
-      cat(paste0(
-        "Returning ",
-        data_name[1],
-        " covariates.\n"
-      ))
-    }
-  }
   #### return data.frame
   return(data.frame(sites_extracted))
 }
@@ -1657,85 +1511,28 @@ calc_sedac_population <- function(
     locs_id = NULL,
     radius = 0,
     fun = "mean") {
-  #### check for null parameters
-  check_for_null_parameters(mget(ls()))
-  #### prepare sites
-  sites_e <- process_locs_vector(
-    locs,
-    terra::crs(from),
-    radius
+  #### prepare locations list
+  sites_list <- calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius
   )
-  #### site identifiers
-  sites_id <- subset(
-    locs,
-    select = locs_id
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  
+  #### perform extraction
+  sites_extracted <- calc_worker(
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
+    fun = fun,
+    variable = 1,
+    time = 2,
+    time_type = "year"
   )
-  #### empty location data.frame
-  sites_extracted <- NULL
-  for (l in seq_len(terra::nlyr(from))) {
-    data_layer <- from[[l]]
-    name_split <- strsplit(
-      names(data_layer),
-      "_"
-    )[[1]]
-    year <- name_split[4]
-    resolution <- name_split[5:6]
-    cat(
-      paste0(
-        "Calculating annual population density covariates for ",
-        year,
-        " at ",
-        process_sedac_codes(
-          paste0(
-            resolution[1],
-            "_",
-            resolution[2]
-          ),
-          invert = TRUE
-        ),
-        " resolution...\n"
-      )
-    )
-    #### extract layer data at sites
-    sites_extracted_layer <- terra::extract(
-      data_layer,
-      sites_e,
-      fun = fun,
-      method = "simple",
-      ID = FALSE,
-      bind = FALSE,
-      na.rm = TRUE
-    )
-    #### merge with site_id, datetime, pressure level
-    sites_extracted_layer <- cbind(
-      sites_id,
-      as.integer(year),
-      sites_extracted_layer
-    )
-    #### define column names
-    colnames(sites_extracted_layer) <- c(
-      locs_id,
-      "year",
-      paste0(
-        "pop_",
-        resolution[1],
-        resolution[2],
-        "_",
-        radius
-      )
-    )
-    #### merge with empty sites_extracted
-    sites_extracted <- rbind(
-      sites_extracted,
-      sites_extracted_layer
-    )
-  }
-  cat(
-    paste0(
-      "Returning population covariates.\n"
-    )
-  )
-  #### return data frame
+  #### return data.frame
   return(data.frame(sites_extracted))
 }
 
@@ -1780,13 +1577,14 @@ calc_sedac_groads <- function(
   if (radius <= 0) {
     stop("radius should be greater than 0.\n")
   }
-  check_for_null_parameters(mget(ls()))
-  #### prepare sites
-  sites_e <- process_locs_vector(
-    locs,
-    terra::crs(from),
-    radius
+  #### prepare locations list
+  sites_list <- calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius
   )
+  sites_e <- sites_list[[1]]
 
   from_re <- terra::project(from, terra::crs(sites_e))
   from_re <- from[terra::ext(sites_e), ]
@@ -1853,16 +1651,29 @@ calc_merra2 <- function(
     locs_id = NULL,
     radius = 0,
     fun = "mean") {
-  #### check for null parameters
-  check_for_null_parameters(mget(ls()))
-  #### run `calc_geos`
-  calc_geos(
+  #### prepare locations list
+  sites_list <- calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
-    radius = radius,
-    fun = fun
+    radius = radius
   )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### perform extraction
+  sites_extracted <- calc_worker(
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
+    fun = fun,
+    variable = 1,
+    time = c(3, 4),
+    time_type = "hour",
+    level = 2
+  )
+  #### return data.frame
+  return(data.frame(sites_extracted))
 }
 
 #' Calculate gridMET covariates
@@ -1894,86 +1705,36 @@ calc_gridmet <- function(
     locs_id = NULL,
     radius = 0,
     fun = "mean") {
-  #### check for null parameters
-  check_for_null_parameters(mget(ls()))
-  #### prepare sites
-  sites_e <- process_locs_vector(
-    locs,
-    terra::crs(from),
-    radius
+  #### prepare locations list
+  sites_list <- calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius
   )
-  #### site identifiers only
-  sites_id <- subset(
-    terra::as.data.frame(sites_e),
-    select = locs_id
-  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
   #### empty location data.frame
-  sites_extracted <- NULL
-  for (l in seq_len(terra::nlyr(from))) {
-    #### select data layer
-    data_layer <- from[[l]]
-    #### extract layer names for variable and date
-    data_name <- strsplit(
-      names(data_layer),
-      "_"
-    )[[1]]
-    #### extract layer date
-    layer_date <- as.Date(
-      data_name[2],
-      format = "%Y%m%d"
-    )
-    cat(paste0(
-      "Calculating daily ",
-      process_gridmet_codes(
-        data_name[1],
-        invert = TRUE
-      ),
-      " covariates for date ",
-      layer_date,
-      "...\n"
-    ))
-    #### extract layer data at sites
-    sites_extracted_layer <- terra::extract(
-      data_layer,
-      sites_e,
-      fun = fun,
-      method = "simple",
-      ID = FALSE,
-      bind = FALSE,
-      na.rm = TRUE
-    )
-    #### merge with site_id, datetime, pressure level
-    sites_extracted_layer <- cbind(
-      sites_id,
-      layer_date,
-      sites_extracted_layer
-    )
-    #### define column names
-    colnames(sites_extracted_layer) <- c(
-      locs_id,
-      "date",
-      paste0(
-        data_name[1],
-        "_",
-        radius
-      )
-    )
-    #### merge with empty sites_extracted
-    sites_extracted <- rbind(
-      sites_extracted,
-      sites_extracted_layer
-    )
-    if (l == terra::nlyr(from)) {
-      cat(paste0(
-        "Returning ",
-        process_gridmet_codes(
-          data_name[1],
-          invert = TRUE
-        ),
-        " covariates.\n"
-      ))
-    }
-  }
+  #### prepare locations list
+  sites_list <- process_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius
+  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### perform extraction
+  sites_extracted <- calc_worker(
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
+    fun = fun,
+    variable = 1,
+    time = 2,
+    time_type = "date"
+  )
   #### return data.frame
   return(data.frame(sites_extracted))
 }
@@ -2012,97 +1773,26 @@ calc_terraclimate <- function(
     locs_id = NULL,
     radius = 0,
     fun = "mean") {
-  #### check for null parameters
-  check_for_null_parameters(mget(ls()))
-  #### prepare sites
-  sites_e <- process_locs_vector(
-    locs,
-    terra::crs(from),
-    radius
+  #### prepare locations list
+  sites_list <- process_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius
   )
-  #### site identifiers only
-  sites_id <- subset(
-    terra::as.data.frame(sites_e),
-    select = locs_id
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### perform extraction
+  sites_extracted <- calc_worker(
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
+    fun = fun,
+    variable = 1,
+    time = 2,
+    time_type = "yearmonth"
   )
-  #### empty location data.frame
-  sites_extracted <- NULL
-  for (l in seq_len(terra::nlyr(from))) {
-    #### select data layer
-    data_layer <- from[[l]]
-    #### extract layer names for variable and date
-    data_name <- strsplit(
-      names(data_layer),
-      "_"
-    )[[1]]
-    cat(paste0(
-      "Calculating monthly ",
-      process_terraclimate_codes(
-        data_name[1],
-        invert = TRUE
-      ),
-      " covariates for ",
-      month.name[
-        as.numeric(
-          substr(
-            data_name[2],
-            5,
-            6
-          )
-        )
-      ],
-      ", ",
-      substr(
-        data_name[2],
-        1,
-        4
-      ),
-      "...\n"
-    ))
-    #### extract layer data at sites
-    sites_extracted_layer <- terra::extract(
-      data_layer,
-      sites_e,
-      fun = fun,
-      method = "simple",
-      ID = FALSE,
-      bind = FALSE,
-      na.rm = TRUE
-    )
-    #### merge with site_id, datetime, pressure level
-    sites_extracted_layer <- cbind(
-      sites_id,
-      paste0(
-        data_name[2]
-      ),
-      sites_extracted_layer
-    )
-    #### define column names
-    colnames(sites_extracted_layer) <- c(
-      locs_id,
-      "time",
-      paste0(
-        data_name[1],
-        "_",
-        radius
-      )
-    )
-    #### merge with empty sites_extracted
-    sites_extracted <- rbind(
-      sites_extracted,
-      sites_extracted_layer
-    )
-    if (l == terra::nlyr(from)) {
-      cat(paste0(
-        "Returning ",
-        process_terraclimate_codes(
-          data_name[1],
-          invert = TRUE
-        ),
-        " covariates.\n"
-      ))
-    }
-  }
   #### return data.frame
   return(data.frame(sites_extracted))
 }
