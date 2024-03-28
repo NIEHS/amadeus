@@ -42,7 +42,7 @@ jobs:
           Rscript -e
           "covd<-covr::coverage_to_list()$totalcoverage;
           write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F);
-          cov_current<-readLines('tests/testdata/coverage/cov_current.Rout');
+          cov_current<-readLines('tests/testdata/coverage/cov_current.Rout', row.names = F, col.names = F);
           cat(cov_current);
           write.table(cov_current, file = '${{ github.workspace }}/cov_current.Rout')"
         shell: bash
