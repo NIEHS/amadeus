@@ -1175,3 +1175,29 @@ testthat::test_that("calc_merra2 returns as expected.", {
     }
   }
 })
+
+
+testthat::test_that("calc_covariates wrapper works", {
+
+  withr::local_package("rlang")
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  candidates <-
+    c("modis", "koppen-geiger",
+      "koeppen-geiger", "koppen", "koeppen",
+      "geos", "dummies", "gmted",
+      "sedac_groads", "groads", "roads",
+      "ecoregions", "ecoregion", "hms", "noaa", "smoke",
+      "gmted", "narr", "narr_monolevel", "narr_p_levels",
+      "plevels", "monolevel", "p_levels", "geos",
+      "sedac_population", "population", "nlcd",
+      "merra", "MERRA", "merra2", "MERRA2",
+      "tri", "nei")
+  for (cand in candidates) {
+    testthat::expect_error(
+      calc_covariates(covariate = cand)
+    )
+  }
+})

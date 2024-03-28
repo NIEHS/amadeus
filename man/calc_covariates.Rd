@@ -6,10 +6,10 @@
 \usage{
 calc_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
-    "dummies", "gmted", "roads", "ecoregions", "ecoregion", "hms", "noaa", "smoke",
-    "gmted", "narr", "narr_monolevel", "narr_p_levels", "plevels", "monolevel",
-    "p_levels", "geos", "sedac_population", "population", "nlcd", "merra", "MERRA",
-    "merra2", "MERRA2", "tri", "nei"),
+    "dummies", "gmted", "sedac_groads", "groads", "roads", "ecoregions", "ecoregion",
+    "hms", "noaa", "smoke", "gmted", "narr", "narr_monolevel", "narr_p_levels",
+    "plevels", "monolevel", "p_levels", "geos", "sedac_population", "population", "nlcd",
+    "merra", "MERRA", "merra2", "MERRA2", "tri", "nei"),
   from,
   locs,
   locs_id = "site_id",
@@ -57,7 +57,7 @@ SpatRaster or SpatVector objects before passing to
 \code{"plevels"}, \code{"monolevel"}, \code{"p_levels"}
 \item \code{\link{calc_geos}}: \code{"geos"}, \code{"geos_cf"}
 \item \code{\link{calc_sedac_population}}: \code{"population"}, \code{"sedac_population"}
-\item 
+\item \code{\link{calc_sedac_groads}}: \code{"roads"}, \code{"groads"}, \code{"sedac_groads"}
 \item 
 \item 
 \item 

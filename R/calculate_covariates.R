@@ -1,4 +1,3 @@
-# nocov start
 # nolint start
 #' Calculate covariates wrapper function
 #' @description
@@ -29,7 +28,7 @@
 #' `"plevels"`, `"monolevel"`, `"p_levels"`
 #' - [`calc_geos`]: `"geos"`, `"geos_cf"`
 #' - [`calc_sedac_population`]: `"population"`, `"sedac_population"`
-#' - [`calc_sedac_groads`]: `"roads"`
+#' - [`calc_sedac_groads`]: `"roads"`, `"groads"`, `"sedac_groads"`
 #' - [`calc_nlcd`]: `"nlcd"`
 #' - [`calc_tri`]: `"tri"`
 #' - [`calc_nei`]: `"nei"`
@@ -42,7 +41,8 @@ calc_covariates <-
   function(
       covariate = c("modis", "koppen-geiger",
                     "koeppen-geiger", "koppen", "koeppen",
-                    "geos", "dummies", "gmted", "roads",
+                    "geos", "dummies", "gmted",
+                    "sedac_groads", "groads", "roads",
                     "ecoregions", "ecoregion", "hms", "noaa", "smoke",
                     "gmted", "narr", "narr_monolevel", "narr_p_levels",
                     "plevels", "monolevel", "p_levels", "geos",
@@ -78,6 +78,7 @@ calc_covariates <-
       hms = calc_hms,
       sedac_groads = calc_sedac_groads,
       roads = calc_sedac_groads,
+      groads = calc_sedac_groads,
       sedac_population = calc_sedac_population,
       population = calc_sedac_population,
       nei = calc_nei,
@@ -100,18 +101,17 @@ calc_covariates <-
       }, error = function(e) {
         print(e)
         print(args(what_to_run))
-        message(
+        stop(
           paste0(
             "Please refer to the argument list and the error message above ",
             "to rectify the error.\n"
           )
         )
-        return(NULL)
       })
 
     return(res_covariate)
   }
-# nocov end
+
 
 #' Calculate climate classification covariates
 #' @description
@@ -208,6 +208,7 @@ calc_koppen_geiger <-
         locs_id = unlist(locs_kg_extract_e[[locs_id]]),
         df_ae_separated
       )
+    names(kg_extracted)[1] <- locs_id
     return(kg_extracted)
   }
 
@@ -573,8 +574,11 @@ calc_modis_daily <- function(
 #' * [`parallelly::availableCores`]
 #' * [`doParallel::registerDoParallel`]
 #'
+#' This function leverages the calculation of single-day MODIS
+#' covariates:
+#' * [`calc_modis_daily`]
+#' 
 #' Also, for preprocessing, see:
-#' * [`process_covariates`]
 #' * [`process_modis_merge`]
 #' * [`process_modis_swath`]
 #' * [`process_bluemarble`]
