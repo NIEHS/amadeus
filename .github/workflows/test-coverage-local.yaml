@@ -65,10 +65,13 @@ jobs:
         id: patch-comparison
         shell: bash
         run: |
-          if (( $(echo "${{ steps.get-values.outputs.cov_patch }} >= ${{ steps.get-values.outputs.cov_current }}" | bc) )); then
-            echo "Patch coverage (${steps.get-values.outputs.cov_patch}) is greater than or equal to current coverage (${steps.get-values.outputs.cov_current})."
+          cov_patch="${{ steps.get-values.outputs.cov_patch }}"
+          cov_current="${{ steps.get-values.outputs.cov_current }}"
+          
+          if (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
+            echo "Patch coverage ($cov_patch) is greater than or equal to current coverage ($cov_current)."
           else
-            echo "Patch coverage (${steps.get-values.outputs.cov_patch}) is less than current coverage (${steps.get-values.outputs.cov_current})."
+            echo "Patch coverage ($cov_patch) is less than current coverage ($cov_current)."
             exit 1
           fi
 
