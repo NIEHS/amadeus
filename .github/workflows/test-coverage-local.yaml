@@ -43,7 +43,6 @@ jobs:
           "covd<-covr::coverage_to_list()$totalcoverage;
           write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F);
           cov_current<-readLines('tests/testdata/coverage/cov_current.Rout');
-          cat(cov_current);
           write.table(cov_current, file = '${{ github.workspace }}/cov_current.Rout', row.names = F, col.names = F)"
         shell: bash
 
@@ -69,9 +68,6 @@ jobs:
         run: |
           cov_patch="${{ steps.get-values.outputs.coverage }}"
           cov_current="${{ steps.get-values.outputs.coverage_current }}"
-
-          echo "cov_patch: $cov_patch"
-          echo "cov_current: $cov_current"
 
           if (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
             echo "Patch coverage ($cov_patch) is greater than or equal to current coverage ($cov_current)."
