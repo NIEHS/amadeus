@@ -41,8 +41,9 @@ jobs:
         run: >
           Rscript -e
           "covd<-covr::coverage_to_list()$totalcoverage;
-          write.table(covd[length(covd)], file = '${{ github.workspace }}/cov_patch.Rout', row.names = F, col.names = F);
+          write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F);
           cov_current<-readLines('tests/testdata/coverage/cov_current.Rout');
+          cat(cov_current);
           write.table(cov_current, file = '${{ github.workspace }}/cov_current.Rout')"
         shell: bash
 
@@ -50,12 +51,12 @@ jobs:
         id: get-values
         shell: bash
         run: |
-          COV_PATCH=$(cat ${{ github.workspace }}/cov_patch.Rout)
-          echo "::set-output name=cov_patch::$COV_PATCH"
-          echo "cov_patch=$COV_PATCH"
+          COV=$(cat ${{ github.workspace }}/local_cov.Rout)
+          echo "Patch coverage read from local_cov.Rout: $COV"
+          echo "coverage=$COV" >> $GITHUB_OUTPUT
           COV_CURRENT=$(cat ${{ github.workspace }}/cov_current.Rout)
-          echo "::set-output name=cov_current::$COV_CURRENT"
-          echo "cov_current=$COV_CURRENT"
+          echo "Current coverage read from cov_current.Rout: $COV_CURRENT"
+          echo "coverage_current=$COV_CURRENT" >> $GITHUB_OUTPUT
 
       - name: Checkout gh-pages
         uses: actions/checkout@v4
@@ -64,17 +65,13 @@ jobs:
 
       - name: Patch comparison
         id: patch-comparison
+        shell: bash
         run: |
-          cov_patch="${{ env.cov_patch }}"
-          cov_current="${{ env.cov_current }}"
+          cov_patch="${{ steps.get-values.outputs.coverage }}"
+          cov_current="${{ steps.get-values.outputs.coverage_current }}"
 
           echo "cov_patch: $cov_patch"
           echo "cov_current: $cov_current"
-
-          if [ -z "$cov_patch" ] || [ -z "$cov_current" ]; then
-            echo "Error: One or both of the coverage values is empty."
-            exit 1
-          fi
 
           if (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
             echo "Patch coverage ($cov_patch) is greater than or equal to current coverage ($cov_current)."
@@ -82,23 +79,15 @@ jobs:
             echo "Patch coverage ($cov_patch) is less than current coverage ($cov_current)."
             exit 1
           fi
-        shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
-
-      - name: Overwrite cov_current.Rout
-        uses: DamianReeves/write-file-action@master
-        with:
-          path: tests/testdata/coverage/cov_current.Rout
-          write-mode: overwrite
-          contents: ${{ steps.get-values.outputs.cov_patch }}
 
       - name: Create Badges
         shell: bash
         run: |
           npm i -g badgen-cli
-          export COV=${{ steps.get-values.outputs.cov_patch }}
+          export COV=${{ steps.get-values.outputs.coverage }}
           COLOR=$(node -p '+process.env.COV >= 95 ? `green` : `orange`')
           mkdir -p badges
-          badgen -j cov_patch -s $COV% -c $COLOR > badges/coverage.svg
+          badgen -j coverage -s $COV% -c $COLOR > badges/coverage.svg
   
       - name: Deploy Badges
         uses: stefanzweifel/git-auto-commit-action@v4
