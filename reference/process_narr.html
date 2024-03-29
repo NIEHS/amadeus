@@ -68,11 +68,14 @@ data, returning a single <code>SpatRaster</code> object.</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>date</dt>
-<dd><p>character(2). length of 10 each. Format "YYYY-MM-DD".</p></dd>
+<dd><p>character(2). length of 10 each.
+Start/end date of downloaded data.
+Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").</p></dd>
 
 
 <dt>variable</dt>
-<dd><p>character(1). Variable name acronym.</p></dd>
+<dd><p>character(1). Variable name acronym. See <a href="https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf" class="external-link">List of Variables in NARR Files</a>
+for variable names and acronym codes.</p></dd>
 
 
 <dt>path</dt>
