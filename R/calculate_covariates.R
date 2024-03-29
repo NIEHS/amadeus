@@ -1864,3 +1864,39 @@ calc_merra2 <- function(
     fun = fun
   )
 }
+
+#' Covariate time auxiliary function
+#' @description
+#' Convert character value to time value.
+#' @param time character. Time value.
+#' @param format character(1). Desired output format based on time value.
+#' Can be "timeless", "hour", "date", "year", or "yearmonth".
+#' @return NULL ("timeless"); POSIXt ("hour"); Date ("date"); integer
+#' ("year" and "yearmonth")
+#' @keywords auxiliary
+#' @export
+calc_time <- function(
+    time,
+    format) {
+  if (format == "timeless") {
+    return()
+  } else if (format == "date") {
+    return_time <- as.Date(
+      time,
+      format = "%Y%m%d"
+    )
+  } else if (format == "hour") {
+    return_time <- ISOdatetime(
+      year = substr(time[1], 1, 4),
+      month = substr(time[1], 5, 6),
+      day = substr(time[1], 7, 8),
+      hour = substr(time[2], 1, 2),
+      min = substr(time[2], 3, 4),
+      sec = substr(time[2], 5, 6),
+      tz = "UTC"
+    )
+  } else if (format %in% c("yearmonth", "year")) {
+    return_time <- as.integer(time)
+  }
+  return(return_time)
+}

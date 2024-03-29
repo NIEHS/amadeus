@@ -1175,3 +1175,32 @@ testthat::test_that("calc_merra2 returns as expected.", {
     }
   }
 })
+
+testthat::test_that("calc_time returns expected.", {
+  time_in <- c("20180101", "003000")
+  # null case
+  time_null <- calc_time(time_in, "timeless")
+  expect_true(is.null(time_null))
+  # hour case
+  time_hour <- calc_time(time_in, "hour")
+  expect_true("POSIXt" %in% class(time_hour))
+  # day case
+  time_day <- calc_time(time_in, "date")
+  expect_true("Date" %in% class(time_day[1]))
+  # year/yearmonth case
+  time_year <- calc_time(2020, "year")
+  expect_true("integer" %in% class(time_year))
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
