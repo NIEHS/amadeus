@@ -52,11 +52,6 @@ jobs:
           echo "Patch coverage read from local_cov.Rout: $COV"
           echo "coverage=$COV" >> $GITHUB_OUTPUT
 
-      - name: Checkout gh-pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-
       - name: Patch comparison
         id: patch-comparison
         shell: bash
@@ -67,11 +62,24 @@ jobs:
 
           if (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
             echo "Patch coverage ($cov_patch) is greater than or equal to current coverage ($cov_current)."
-            echo "$cov_patch" > cov_current.Rout
+            echo "cov_update=$cov_patch" >> $GITHUB_OUTPUT
            else
             echo "Patch coverage ($cov_patch) is less than current coverage ($cov_current)."
             exit 1
           fi
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Overwrite cov_current.Rout
+        if: ${{ github.event_name == 'push' }}
+        shell: bash
+        run: |
+          cov_update="${{ steps.patch-comparison.outputs.cov_update }}"
+          touch cov_current.Rout
+          echo "$cov_update" > cov_current.Rout
 
       - name: Create Badges
         shell: bash
