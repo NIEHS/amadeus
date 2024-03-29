@@ -85,6 +85,8 @@ calc_message <- function(
 #' @return A `list` containing `SpatVector` and `data.frame` objects
 #' @seealso [`process_sites_vector()`], [`check_for_null_parameters()`]
 #' @keywords internal
+#' @importFrom terra as.data.frame
+#' @importFrom terra crs
 #' @export
 calc_prepare_locs <- function(
     from,
@@ -107,7 +109,17 @@ calc_prepare_locs <- function(
   return(list(sites_e, sites_id))
 }
 
-#' Prepare 
+#' Prepare time values
+#' @description
+#' Prepare the time values for covariate calculation based on type of time
+#' value.
+#' @param time Time value
+#' @param format Type of time to return in the `$time` column. Can be
+#' "timeless" (ie. GMTED data), "date" (ie. NARR data), "hour", (ie. GEOS data),
+#' "year" (ie. SEDAC population data), or "yearmonth" (ie. TerraClimate data).
+#' @return a `Date`, `POSIXt`, or `integer` object based on `format =`
+#' @keywords internal
+#' @export
 calc_time <- function(
     time,
     format) {
@@ -134,13 +146,31 @@ calc_time <- function(
   return(return_time)
 }
 
-#' @importFrom terra vect
-#' @importFrom terra buffer
-#' @importFrom terra as.data.frame
-#' @importFrom terra time
-#' @importFrom terra extract
+#' Peform covariate extraction
+#' @description
+#' Extract covariate values from `SpatRaster` object passed from
+#' \code{process_*()}.
+#' @param dataset character(1). Dataset name.
+#' @param from SpatRaster(1). Cleaned `SpatRaster` object.
+#' @param locs_vector SpatVector(1). Cleaned `SpatVector` object passed
+#' from \code{calc_prepare_locs()}. Contains location point/polygon values.
+#' @param locs_df data.frame(1). Cleaned `data.frame` object passed from
+#' \code{calc_prepare_locs()}. Contains location identifiers.
+#' @param fun character(1). Summary function. Passed to \code{terra::extract()}.
+#' @param variable integer. Position within the layer name containing the
+#' variable name/code.
+#' @param time integer. Position within the layer name containing the time
+#' value(s).
+#' @param time_type character(1). Type of time observation. One of "date",
+#' "hour", "year", "yearmonth", "timeless".
+#' @param level integer. Position within the layer name containing the vertical
+#' pressure level value (if applicable). Default = `NULL`.
+#' @param radius integer(1). Buffer distance (m). Passed from
+#' \code{calc_prepare_locs()}. Used in column naming.
 #' @importFrom terra nlyr
-#' @importFrom terra crs
+#' @importFrom terra extract
+#' @return a `data.frame` object
+#' @keywords internal
 #' @export
 calc_worker <- function(
     dataset,
@@ -148,9 +178,8 @@ calc_worker <- function(
     locs_vector,
     locs_df,
     fun,
-    variable = 1, # position within names() which contains variable (always 1)
-    time, # position within the layer names which contains the date
-    # vector c(3, 4) for hour (YYYYMMDD_HH)
+    variable = 1,
+    time,
     time_type = c("date", "hour", "year", "yearmonth", "timeless"),
     radius,
     level = NULL) {
