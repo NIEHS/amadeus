@@ -309,11 +309,6 @@ process_locs_radius <-
     locs,
     radius
   ) {
-    cat(paste0(
-      "Utilizing ",
-      radius,
-      " meter buffer for covariate calculations.\n"
-    ))
     if (radius == 0) {
       return(locs)
     } else if (radius > 0) {
@@ -350,15 +345,9 @@ process_locs_vector <-
   ) {
     #### sites as data frame
     if ("data.table" %in% class(locs)) {
-      cat(paste0(
-        "Converting data.table to data.frame...\n"
-      ))
       sites_df <- data.frame(locs)
     } else if ("data.frame" %in% class(locs) &&
                !("data.table" %in% class(locs))) {
-      cat(paste0(
-        "Sites are class data.frame...\n"
-      ))
       sites_df <- locs
     } else if (!("data.table" %in% class(locs)) &&
                !("data.frame" %in% class(locs))) {
@@ -382,10 +371,6 @@ process_locs_vector <-
       geom = c("lon", "lat"),
       crs = "EPSG:4326"
     )
-    #### project SpatVector
-    cat(paste0(
-      "Projecting data to desired coordinate reference system...\n"
-    ))
     sites_p <- terra::project(
       sites_v,
       crs
@@ -503,11 +488,6 @@ process_variable_codes <-
       return(variables)
     } else {
       if (all(tolower(variables) %in% names_codes[, 1]) == TRUE) {
-        message(
-          paste0(
-            "Converting variable names to variable codes...\n"
-          )
-        )
         codes_return <- do.call(
           code_function,
           list(tolower(variables), invert = FALSE)

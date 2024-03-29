@@ -1159,14 +1159,14 @@ testthat::test_that("gridmet and terraclimate auxiliary functions.", {
   expect_true(nchar(gc3) < 7)
   # process_variable_codes
   expect_no_error(process_variable_codes("sph", "gridmet"))
-  expect_message(
+  expect_no_error(
     process_variable_codes("Near-Surface Specific Humidity", "gridmet")
   )
   expect_error(
     process_variable_codes("error", "gridmet")
   )
   expect_no_error(process_variable_codes("aet", "terraclimate"))
-  expect_message(
+  expect_no_error(
     process_variable_codes("Actual Evapotranspiration", "terraclimate")
   )
   expect_error(
