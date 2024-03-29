@@ -1179,14 +1179,25 @@ testthat::test_that("calc_merra2 returns as expected.", {
       expect_true(
         class(merra2_covariate) == "data.frame"
       )
-      # expect 4 columns
-      expect_true(
-        ncol(merra2_covariate) == 4
-      )
-      # expect numeric value
-      expect_true(
-        class(merra2_covariate[, 4]) == "numeric"
-      )
+      if (grepl("lev", names(merra2)[1])) {
+        # expect 4 columns
+        expect_true(
+          ncol(merra2_covariate) == 4
+        )
+        # expect numeric value
+        expect_true(
+          class(merra2_covariate[, 4]) == "numeric"
+        )
+      } else {
+        # expect 3 columns
+        expect_true(
+          ncol(merra2_covariate) == 3
+        )
+        # expect numeric value
+        expect_true(
+          class(merra2_covariate[, 3]) == "numeric"
+        )
+      }
       # expect $time is class Date
       expect_true(
         "POSIXt" %in% class(merra2_covariate$time)

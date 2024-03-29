@@ -1,3 +1,84 @@
+#' Send progress messages
+#' @description
+#' Send messages updating covariate extraction progress.
+#' @param dataset character(1). Data source.
+#' @param variable placeholder
+#' @param time placeholder
+#' @param time_type placeholder
+#' @param level placeholder
+#' @return NULL
+#' @keywords internal
+#' @export
+calc_message <- function(
+    dataset,
+    variable,
+    time,
+    time_type,
+    level) {
+  message_time <- calc_time(time, time_type)
+  if (dataset == "gmted") {
+    return_message <- paste0(
+      "Calculating ",
+      process_gmted_codes(
+        substr(
+          variable,
+          1,
+          2
+        ),
+        statistic = TRUE,
+        invert = TRUE
+      ),
+      " covariates with ",
+      process_gmted_codes(
+        substr(
+          variable,
+          3,
+          4
+        ),
+        resolution = TRUE,
+        invert = TRUE
+      ),
+      " resolution data.\n"
+    )
+  } else if (dataset == "sedac_population") {
+    # return_message <- paste0(
+    #   "Calculating population density covariates for ",
+    #   message_time,
+    #   " at ",
+    #   process_sedac_codes(
+    #     paste0(
+    #       variable[1],
+    #       "_",
+    #       variable[2]
+    #     ),
+    #     invert = TRUE
+    #   ),
+    #   " resolution...\n"
+    # )
+  } else {
+    if (is.null(level)) {
+      return_message <- paste0(
+        "Calculating ",
+        variable,
+        " covariates for ",
+        message_time,
+        "...\n"
+      )
+    } else {
+      return_message <- paste0(
+        "Calculating ",
+        variable,
+        " covariates at ",
+        level,
+        " for ",
+        message_time,
+        "...\n"
+      )
+    }
+  }
+  cat(return_message)
+}
+
 #' Prepare extraction locations
 #' @description
 #' Prepare the point locations for extracting data by transforming `locs` to
@@ -59,12 +140,13 @@ calc_time <- function(
       tz = "UTC"
     )
   } else if (format %in% c("yearmonth", "year")) {
-    return_time <- time
+    return_time <- as.integer(time)
   }
   return(return_time)
 }
 
 calc_worker <- function(
+    dataset,
     from,
     locs_vector,
     locs_df,
@@ -87,21 +169,27 @@ calc_worker <- function(
     )[[1]]
     #### extract variable
     data_name <- data_split[variable]
-    #### extract time
-    data_time <- calc_time(
-      data_split[time],
-      time_type
-    )
+    if (!is.null(time)) {
+      #### extract time
+      data_time <- calc_time(
+        data_split[time],
+        time_type
+      ) 
+    }
     #### extract level (if applicable)
     if (!(is.null(level))) {
       data_level <- data_split[level]
+    } else {
+      data_level <- NULL
     }
     #### message
-    # calc_message(
-    #   time = time,
-    #   time_type = time_type,
-    #   level = level
-    # )
+    calc_message(
+      dataset = dataset,
+      variable = data_name,
+      time = data_split[time],
+      time_type = time_type,
+      level = data_level
+    )
     #### extract layer data at sites
     sites_extracted_layer <- terra::extract(
       data_layer,
@@ -166,17 +254,13 @@ calc_worker <- function(
       sites_extracted,
       sites_extracted_layer
     )
-    #### cat finishing message
-    if (l == terra::nlyr(from)) {
-      cat(
-        paste0(
-          "Returning ",
-          data_name,
-          " covariates.\n"
-        )
-      )
-    }
   }
+  #### finish message
+  cat(
+    paste0(
+      "Returning extracted covariates.\n"
+    )
+  )
   #### return data.frame
   return(data.frame(sites_extracted))
 }

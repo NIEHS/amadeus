@@ -1264,6 +1264,7 @@ process_hms <- function(
 #' `SpatRaster` layer name indicates selected variable and resolution.
 #' @return a `SpatRaster` object
 #' @importFrom terra rast
+#' @importFrom terra varnames
 #' @export
 process_gmted <- function(
     variable = NULL,
@@ -1321,6 +1322,23 @@ process_gmted <- function(
   data_path <- data_paths[endsWith(data_paths, "_grd")]
   #### import data
   data <- terra::rast(data_path)
+  #### layer name
+  names(data) <- paste0(
+    "elevation_",
+    gsub(
+      "_grd",
+      "",
+      names(data)
+    )
+  )
+  #### varnames
+  terra::varnames(data) <- paste0(
+    "Elevation: ",
+    statistic,
+    " (",
+    resolution,
+    ")"
+  )
   #### set coordinate reference system
   return(data)
 }

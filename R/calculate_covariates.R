@@ -1170,11 +1170,13 @@ calc_hms <- function(
     )
     layer_name <- data_layer$Density
     cat(paste0(
-      "Calculating daily ",
-      as.character(
-        layer_name
+      "Calculating ",
+      tolower(
+        as.character(
+          layer_name
+          )
       ),
-      " covariates for date ",
+      " covariates for ",
       layer_date,
       "...\n"
     ))
@@ -1259,7 +1261,8 @@ calc_hms <- function(
 #' Extract elevation values at point locations. Returns a \code{data.frame}
 #' object containing \code{locs_id} and elevation variable. Elevation variable
 #' column name reflects the elevation statistic, spatial resolution of
-#' \code{from}, and circular buffer radius.
+#' \code{from}, and circular buffer radius (ie. Breakline Emphasis at 7.5
+#' arc-second resolution with 0 meter buffer: breakline_emphasis_r75_0).
 #' @param from SpatRaster(1). Output from \code{process_gmted()}.
 #' @param locs data.frame. character to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
@@ -1293,45 +1296,17 @@ calc_gmted <- function(
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
-  #### layer name
-  layer_name <- names(from)
-  cat(paste0(
-    "Calculating ",
-    process_gmted_codes(
-      substr(
-        layer_name,
-        1,
-        2
-      ),
-      statistic = TRUE,
-      invert = TRUE
-    ),
-    " covariates with ",
-    process_gmted_codes(
-      substr(
-        layer_name,
-        3,
-        4
-      ),
-      resolution = TRUE,
-      invert = TRUE
-    ),
-    " resolution data.\n"
-  ))
-  #### extract layer data at sites
-  sites_extracted <- terra::extract(
-    from,
-    sites_e,
+  #### perform extraction
+  sites_extracted <- calc_worker(
+    dataset = "gmted",
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
     fun = fun,
-    method = "simple",
-    ID = FALSE,
-    bind = FALSE,
-    na.rm = TRUE
-  )
-  #### merge with site_id and date (year)
-  sites_extracted <- cbind(
-    sites_id,
-    sites_extracted
+    variable = 2,
+    time = NULL,
+    time_type = "timeless"
   )
   #### convert integer to numeric
   sites_extracted[, 2] <- as.numeric(sites_extracted[, 2])
@@ -1339,13 +1314,16 @@ calc_gmted <- function(
   colnames(sites_extracted) <- c(
     locs_id,
     paste0(
-      tolower(
-        gsub(
-          " ",
-          "_",
+      gsub(
+        " ",
+        "_",
+        tolower(
           process_gmted_codes(
             substr(
-              layer_name,
+              strsplit(
+                names(from),
+                "_"
+              )[[1]][2],
               1,
               2
             ),
@@ -1354,9 +1332,12 @@ calc_gmted <- function(
           )
         )
       ),
-      "_",
+      "_r",
       substr(
-        layer_name,
+        strsplit(
+          names(from),
+          "_"
+        )[[1]][2],
         3,
         4
       ),
@@ -1417,6 +1398,7 @@ calc_narr <- function(
   }
   #### perform extraction
   sites_extracted <- calc_worker(
+    dataset = "narr",
     from = from,
     locs_vector = sites_e,
     locs_df = sites_id,
@@ -1475,6 +1457,7 @@ calc_geos <- function(
   sites_id <- sites_list[[2]]
   #### perform extraction
   sites_extracted <- calc_worker(
+    dataset = "geos",
     from = from,
     locs_vector = sites_e,
     locs_df = sites_id,
@@ -1532,13 +1515,14 @@ calc_sedac_population <- function(
   
   #### perform extraction
   sites_extracted <- calc_worker(
+    dataset = "sedac_population",
     from = from,
     locs_vector = sites_e,
     locs_df = sites_id,
     radius = radius,
     fun = fun,
-    variable = 1,
-    time = 2,
+    variable = 3,
+    time = 4,
     time_type = "year"
   )
   #### return data.frame
@@ -1669,17 +1653,27 @@ calc_merra2 <- function(
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
+  #### identify pressure level or monolevel data
+  if (grepl("lev", names(from)[1])) {
+    merra2_time <- c(3, 4)
+    merra2_level <- 2
+  } else {
+    merra2_time <- c(2, 3)
+    merra2_level <- NULL
+  }
+  #### identify 
   #### perform extraction
   sites_extracted <- calc_worker(
+    dataset = "merra2",
     from = from,
     locs_vector = sites_e,
     locs_df = sites_id,
     radius = radius,
     fun = fun,
     variable = 1,
-    time = c(3, 4),
+    time = merra2_time,
     time_type = "hour",
-    level = 2
+    level = merra2_level
   )
   #### return data.frame
   return(data.frame(sites_extracted))
@@ -1725,6 +1719,7 @@ calc_gridmet <- function(
   sites_id <- sites_list[[2]]
   #### perform extraction
   sites_extracted <- calc_worker(
+    dataset = "gridmet",
     from = from,
     locs_vector = sites_e,
     locs_df = sites_id,
@@ -1783,6 +1778,7 @@ calc_terraclimate <- function(
   sites_id <- sites_list[[2]]
   #### perform extraction
   sites_extracted <- calc_worker(
+    dataset = "terraclimate",
     from = from,
     locs_vector = sites_e,
     locs_df = sites_id,

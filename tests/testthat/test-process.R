@@ -1007,6 +1007,12 @@ testthat::test_that("process_merra2 returns as expected.", {
           merra2_df$collection[c]
         )
       )
+    cat(
+      paste0(
+        names(merra2),
+        "\n"
+      )
+    )
     # expect output is SpatRaster
     expect_true(
       class(merra2)[1] == "SpatRaster"
