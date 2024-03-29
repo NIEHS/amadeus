@@ -3,6 +3,7 @@
 export(as_mysftime)
 export(calc_covariates)
 export(calc_ecoregion)
+export(calc_example)
 export(calc_geos)
 export(calc_gmted)
 export(calc_hms)

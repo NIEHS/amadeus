@@ -1878,25 +1878,111 @@ calc_merra2 <- function(
 calc_time <- function(
     time,
     format) {
-  if (format == "timeless") {
+  if (format == "timeless"
+      ) {
     return()
-  } else if (format == "date") {
+  } else if (
+    format == "date"
+    ) {
     return_time <- as.Date(
       time,
       format = "%Y%m%d"
     )
-  } else if (format == "hour") {
+  } else if (
+    format == "hour"
+    ) {
     return_time <- ISOdatetime(
-      year = substr(time[1], 1, 4),
-      month = substr(time[1], 5, 6),
-      day = substr(time[1], 7, 8),
-      hour = substr(time[2], 1, 2),
-      min = substr(time[2], 3, 4),
-      sec = substr(time[2], 5, 6),
+      year = substr(
+        time[1],
+        1,
+        4),
+      month = substr(
+        time[1],
+        5,
+        6),
+      day = substr(
+        time[1],
+        7,
+        8),
+      hour = substr(
+        time[2], 
+        1, 
+        2),
+      min = substr(
+        time[2],
+        3,
+        4),
+      sec = substr(
+        time[2],
+        5,
+        6),
       tz = "UTC"
     )
-  } else if (format %in% c("yearmonth", "year")) {
+  } else if (
+    format %in% c(
+      "yearmonth", "year"
+      )
+    ) {
     return_time <- as.integer(time)
   }
   return(return_time)
 }
+
+#' Example function to increase length
+#' @description
+#' Example function to increase length
+#' @param x character.
+#' @keywords auxiliary
+#' @export
+calc_example <- 
+  function(x) {
+  y <- paste0(
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder",
+    "placeholder"
+    )
+  return(y[1])
+  }

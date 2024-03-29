@@ -1192,15 +1192,7 @@ testthat::test_that("calc_time returns expected.", {
   expect_true("integer" %in% class(time_year))
 })
 
-
-
-
-
-
-
-
-
-
-
-
-
+testthat::test_that("placeholder function", {
+  placeholder <- calc_example(1)
+  expect_true("character" %in% class(placeholder))
+})
