@@ -38,8 +38,10 @@ jobs:
             dependencies-${{ runner.os }}-
 
       - name: Test coverage
-        run: |
-          Rscript -e "covd<-covr::coverage_to_list()$totalcoverage;write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F)"
+        run: >
+          Rscript -e
+          "covd<-covr::coverage_to_list()$totalcoverage;
+          write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F)"
         shell: bash
 
       - name: Get Values
@@ -47,13 +49,38 @@ jobs:
         shell: bash
         run: |
           COV=$(cat ${{ github.workspace }}/local_cov.Rout)
+          echo "Patch coverage read from local_cov.Rout: $COV"
           echo "coverage=$COV" >> $GITHUB_OUTPUT
 
       - name: Checkout gh-pages
         uses: actions/checkout@v4
         with:
           ref: gh-pages
-  
+
+      - name: Patch comparison
+        id: patch-comparison
+        shell: bash
+        run: |
+          cov_patch="${{ steps.get-values.outputs.coverage }}"
+          cov_current=$(cat cov_current.Rout)
+          echo "Current coverage: $cov_current"
+
+          if (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
+            echo "Patch coverage ($cov_patch) is greater than or equal to current coverage ($cov_current)."
+            echo "cov_update=$cov_patch" >> $GITHUB_OUTPUT
+           else
+            echo "Patch coverage ($cov_patch) is less than current coverage ($cov_current)."
+            exit 1
+          fi
+
+      - name: Overwrite cov_current.Rout
+        if: ${{ github.event_name == 'push' }}
+        shell: bash
+        run: |
+          cov_update="${{ steps.patch-comparison.outputs.cov_update }}"
+          touch cov_current.Rout
+          echo "$cov_update" > cov_current.Rout
+
       - name: Create Badges
         shell: bash
         run: |
@@ -66,7 +93,7 @@ jobs:
       - name: Deploy Badges
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Update badges [skip ci]"
+          commit_message: "Update badges [skip ci] & cov_current.Rout"
           branch: gh-pages
           skip_fetch: true
           skip_checkout: true
