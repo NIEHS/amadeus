@@ -1489,13 +1489,6 @@ calc_geos <- function(
 #' @author Mitchell Manware
 #' @seealso [process_sedac_population()]
 #' @return a data.frame object
-#' @importFrom terra vect
-#' @importFrom terra buffer
-#' @importFrom terra as.data.frame
-#' @importFrom terra time
-#' @importFrom terra extract
-#' @importFrom terra nlyr
-#' @importFrom terra crs
 #' @export
 calc_sedac_population <- function(
     from,
@@ -1512,10 +1505,30 @@ calc_sedac_population <- function(
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
-  
+  #### message information
+  name_split <- strsplit(
+    names(from),
+    "_"
+  )[[1]]
+  cat(
+    paste0(
+      "Calculating population covariates for ",
+      name_split[4],
+      " at ",
+      process_sedac_codes(
+        paste0(
+          name_split[5],
+          "_",
+          name_split[6]
+        ),
+        invert = TRUE
+      ),
+      " resolution...\n"
+    )
+  )
   #### perform extraction
   sites_extracted <- calc_worker(
-    dataset = "sedac_population",
+    dataset = "skip",
     from = from,
     locs_vector = sites_e,
     locs_df = sites_id,

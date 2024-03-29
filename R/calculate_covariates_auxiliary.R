@@ -16,6 +16,9 @@ calc_message <- function(
     time_type,
     level) {
   message_time <- calc_time(time, time_type)
+  if (dataset == "skip") {
+    return()
+  }
   if (dataset == "gmted") {
     return_message <- paste0(
       "Calculating ",
@@ -40,21 +43,6 @@ calc_message <- function(
       ),
       " resolution data.\n"
     )
-  } else if (dataset == "sedac_population") {
-    # return_message <- paste0(
-    #   "Calculating population density covariates for ",
-    #   message_time,
-    #   " at ",
-    #   process_sedac_codes(
-    #     paste0(
-    #       variable[1],
-    #       "_",
-    #       variable[2]
-    #     ),
-    #     invert = TRUE
-    #   ),
-    #   " resolution...\n"
-    # )
   } else {
     if (is.null(level)) {
       return_message <- paste0(
@@ -119,6 +107,7 @@ calc_prepare_locs <- function(
   return(list(sites_e, sites_id))
 }
 
+#' Prepare 
 calc_time <- function(
     time,
     format) {
@@ -145,6 +134,14 @@ calc_time <- function(
   return(return_time)
 }
 
+#' @importFrom terra vect
+#' @importFrom terra buffer
+#' @importFrom terra as.data.frame
+#' @importFrom terra time
+#' @importFrom terra extract
+#' @importFrom terra nlyr
+#' @importFrom terra crs
+#' @export
 calc_worker <- function(
     dataset,
     from,

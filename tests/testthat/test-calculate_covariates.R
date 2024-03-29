@@ -1060,7 +1060,7 @@ testthat::test_that("calc_sedac_population returns as expected.", {
     for (r in seq_along(radii)) {
       pop <-
         process_sedac_population(
-          path = path
+          path = paths
         )
       pop_covariate <-
         calc_sedac_population(
