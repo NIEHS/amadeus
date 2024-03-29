@@ -24,9 +24,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: |
-            any::covr
-            any::testthat
+          extra-packages: any::covr
           needs: coverage
 
       - name: Cache C++ and R dependencies
