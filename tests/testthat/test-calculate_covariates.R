@@ -760,6 +760,13 @@ testthat::test_that("calc_hms returns expected.", {
           locs_id = "site_id",
           radius = radii[r]
         )
+      # set column names
+      hms_covariate <- calc_setcolumns(
+        from = hms_covariate,
+        lag = 0,
+        dataset = "hms",
+        locs_id = "site_id"
+      )
       # expect output is data.frame
       expect_true(
         class(hms_covariate) == "data.frame"
@@ -822,6 +829,13 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
           locs_id = "site_id",
           radius = radii[r]
         )
+      # set column names
+      hms_covariate <- calc_setcolumns(
+        from = hms_covariate,
+        lag = 0,
+        dataset = "hms",
+        locs_id = "site_id"
+      )
       # expect output is data.frame
       expect_true(
         class(hms_covariate) == "data.frame"
@@ -901,6 +915,13 @@ testthat::test_that("calc_gmted returns expected.", {
             radius = radii[a],
             fun = "mean"
           )
+        # set column names
+        gmted_covariate <- calc_setcolumns(
+          from = gmted_covariate,
+          lag = 0,
+          dataset = "gmted",
+          locs_id = "site_id"
+        )
         # expect output is data.frame
         expect_true(
           class(gmted_covariate) == "data.frame"
@@ -954,6 +975,13 @@ testthat::test_that("calc_narr returns expected.", {
           radius = radii[r],
           fun = "mean"
         )
+      # set column names
+      narr_covariate <- calc_setcolumns(
+        from = narr_covariate,
+        lag = 0,
+        dataset = "narr",
+        locs_id = "site_id"
+      )
       # expect output is data.frame
       expect_true(
         class(narr_covariate) == "data.frame"
@@ -1022,6 +1050,13 @@ testthat::test_that("calc_geos returns as expected.", {
           radius = radii[r],
           fun = "mean"
         )
+      # set column names
+      geos_covariate <- calc_setcolumns(
+        from = geos_covariate,
+        lag = 0,
+        dataset = "geos",
+        locs_id = "site_id"
+      )
       # expect output is data.frame
       expect_true(
         class(geos_covariate) == "data.frame"
@@ -1070,6 +1105,13 @@ testthat::test_that("calc_sedac_population returns as expected.", {
           radius = radii[r],
           fun = "mean"
         )
+      # set column names
+      pop_covariate <- calc_setcolumns(
+        from = pop_covariate,
+        lag = 0,
+        dataset = "pop",
+        locs_id = "site_id"
+      )
       # expect output is data.frame
       expect_true(
         class(pop_covariate) == "data.frame"
@@ -1175,6 +1217,13 @@ testthat::test_that("calc_merra2 returns as expected.", {
           radius = radii[r],
           fun = "mean"
         )
+      # set column names
+      merra2_covariate <- calc_setcolumns(
+        from = merra2_covariate,
+        lag = 0,
+        dataset = "merra2",
+        locs_id = "site_id"
+      )
       # expect output is data.frame
       expect_true(
         class(merra2_covariate) == "data.frame"
@@ -1237,6 +1286,13 @@ testthat::test_that("calc_gridmet returns as expected.", {
         radius = radii[r],
         fun = "mean"
       )
+    # set column names
+    gridmet_covariate <- calc_setcolumns(
+      from = gridmet_covariate,
+      lag = 0,
+      dataset = "gridmet",
+      locs_id = "site_id"
+    )
     # expect output is data.frame
     expect_true(
       class(gridmet_covariate) == "data.frame"
@@ -1287,6 +1343,13 @@ testthat::test_that("calc_terraclimate returns as expected.", {
         radius = radii[r],
         fun = "mean"
       )
+    # set column names
+    terraclimate_covariate <- calc_setcolumns(
+      from = terraclimate_covariate,
+      lag = 0,
+      dataset = "terraclimate",
+      locs_id = "site_id"
+    )
     # expect output is data.frame
     expect_true(
       class(terraclimate_covariate) == "data.frame"
