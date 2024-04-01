@@ -364,10 +364,13 @@ download_ecoregion_data <- function(
   )
   #### 9. concatenate
   download_sink(commands_txt)
-  #### 10. concatenate and print download commands to "..._wget_commands.txt"
-  cat(download_command)
+  if (!file.exists(download_name)) {
+    #### 10. concatenate and print download commands to "..._wget_commands.txt"
+    #### cat command only if file does not already exist
+    cat(download_command)
+  }
   #### 11. finish "...curl_commands.txt" file
-  sink()
+  sink() 
   #### 12. build system command
   system_command <- paste0(
     ". ",
@@ -643,7 +646,10 @@ download_gmted_data <- function(
   )
   download_sink(commands_txt)
   #### 13. concatenate and print download command to "..._curl_commands.txt"
-  cat(download_command)
+  if (!file.exists(download_name)) {
+    #### cat command only if file does not already exist
+    cat(download_command)
+  }
   #### 14. finish "..._curl_commands.txt" file
   sink()
   #### 15. build system command
@@ -1062,7 +1068,10 @@ download_narr_monolevel_data <- function(
         url,
         "\n"
       )
-      cat(command)
+      if (!file.exists(destfile)) {
+        #### cat command only if file does not already exist
+        cat(command)
+      }
     }
   }
   #### 9. finish "..._curl_commands.txt"
@@ -1191,7 +1200,11 @@ download_narr_p_levels_data <- function(
           url,
           "\n"
         )
-        cat(command)
+        #### cat command only if file does not already exist
+        if (!file.exists(destfile)) {
+          #### cat command only if file does not already exist
+          cat(command)
+        }
       }
     }
   }
@@ -1329,7 +1342,10 @@ download_nlcd_data <- function(
   )
   download_sink(commands_txt)
   #### 12. concatenate and print download command to "..._curl_commands.txt"
-  cat(download_command)
+  if (!file.exists(download_name)) {
+    #### cat command only if file does not already exist
+    cat(command)
+  }
   #### 13. finish "..._curl_command.txt"
   sink()
   #### 14. build system command
@@ -1467,8 +1483,11 @@ download_sedac_groads_data <- function(
     "_curl_command.txt"
   )
   download_sink(commands_txt)
-  #### 12. concatenate and print download command to "..._curl_commands.txt"
-  cat(download_command)
+  if (!file.exists(download_name)) {
+    #### 12. concatenate and print download command to "..._curl_commands.txt"
+    #### cat command only if file does not already exist
+    cat(command)
+  }
   #### 13. finish "..._curl_commands.txt" file
   sink()
   #### 14. build system command
@@ -1642,8 +1661,11 @@ download_sedac_population_data <- function(
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
-  #### 13. concatenate and print download command to "..._curl_commands.txt"
-  cat(download_command)
+  if (!file.exists(download_name)) {
+    #### 13. concatenate and print download command to "..._curl_commands.txt"
+    #### cat command only if file does not already exist
+    cat(command)
+  }
   #### 14. finish "..._curl_commands.txt" file
   sink()
   #### 15. build system command
@@ -1807,7 +1829,10 @@ download_hms_data <- function(
       url,
       "\n"
     )
-    cat(command)
+    if (!file.exists(destfile)) {
+      #### cat command only if file does not already exist
+      cat(command)
+    }
   }
   #### 9. finish "..._curl_commands.txt"
   sink()
@@ -1939,9 +1964,11 @@ download_koppen_geiger_data <- function(
     "_wget_command.txt"
   )
   download_sink(commands_txt)
-  #### 12. concatenate and print download command to "..._wget_commands.txt"
-  cat(download_command)
-  #### 13. finish "..._wget_commands.txt" file
+  if (!file.exists(download_name)) {
+    #### 12. concatenate and print download command to "..._wget_commands.txt"
+    #### cat command only if file does not already exist
+    cat(command)
+  }
   sink()
   #### 14. build system command
   system_command <- paste0(
@@ -2643,7 +2670,10 @@ download_gridmet_data <- function(
         url,
         "\n"
       )
-      cat(command)
+      if (!file.exists(destfile)) {
+        #### cat command only if file does not already exist
+        cat(command)
+      }
     }
   }
   #### finish "..._curl_commands.txt"
@@ -2770,7 +2800,10 @@ download_terraclimate_data <- function(
         url,
         "\n"
       )
-      cat(command)
+      if (!file.exists(destfile)) {
+        #### cat command only if file does not already exist
+        cat(command)
+      }
     }
   }
   #### finish "..._curl_commands.txt"
