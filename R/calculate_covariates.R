@@ -1332,7 +1332,7 @@ calc_gmted <- function(
           )
         )
       ),
-      "_r",
+      "r",
       substr(
         strsplit(
           names(from),

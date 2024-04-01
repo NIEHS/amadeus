@@ -7,7 +7,7 @@
 [![pkgdown](https://github.com/NIEHS/amadeus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/pkgdown.yaml)
 
 
-`amadeus` is an R package devloped to improve and expideite users' access to large, publicly available geospatial datasets. The functions in `amadeus` allow users to download and import cleaned geospatial data directly in R, useful for automated run scripts, analysis pipelines, and reproducible science in general.
+`amadeus` is an R package developed to improve and expedite users' access to large, publicly available geospatial datasets. The functions in `amadeus` allow users to download and import cleaned geospatial data directly in R, useful for automated run scripts, analysis pipelines, and reproducible science in general.
 
 ## Download
 
@@ -27,7 +27,8 @@
 | [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0) | Shapefile, KML | Wildfire Smoke |
 | [NASA SEDAC Global Roads Open Access Data Set](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download) | Shapefile, Geodatabase | Roadways |
 | [NASA SEDAC UN WPP-Adjusted Population Density](https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11) | GeoTIFF, netCDF | Population |
-
+| [Climatology Lab TerraClimate](https://www.climatologylab.org/terraclimate.html) | netCDF | Climate, Water |
+| [Climatology Lab GridMet](https://www.climatologylab.org/gridmet.html) | netCDF | Meteorology |
 
 See the `download_functions` vignette for a detailed description of source-specific download functions.
 
