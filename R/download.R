@@ -371,7 +371,7 @@ download_ecoregion_data <- function(
     cat(download_command)
   }
   #### 11. finish "...curl_commands.txt" file
-  sink() 
+  sink()
   #### 12. build system command
   system_command <- paste0(
     ". ",
@@ -483,7 +483,7 @@ download_geos_data <- function(
         "/D",
         day,
         "/"
-        )
+      )
       download_name <- paste0(
         "GEOS-CF.v01.rpl.",
         collection,
@@ -934,7 +934,9 @@ download_merra2_data <- function(
       directory_to_save,
       collection
     )
-    if (!file.exists(download_folder)) {dir.create(download_folder)}
+    if (!file.exists(download_folder)) {
+      dir.create(download_folder)
+    }
     download_name <- paste0(
       download_folder,
       "/",
@@ -1157,6 +1159,7 @@ download_narr_monolevel_data <- function(
 #' \code{directory_to_save}.
 #' @export
 # nolint end
+# nolint start: cyclocomp
 download_narr_p_levels_data <- function(
     variables = NULL,
     year_start = 2022,
@@ -1264,7 +1267,7 @@ download_narr_p_levels_data <- function(
     remove = remove_command
   )
 }
-
+# nolint end: cyclocomp
 
 # nolint start
 #' Download land cover data
@@ -1772,6 +1775,7 @@ download_sedac_population_data <- function(
 #' Shapefiles (.shp) or KML files (.kml) will be stored in
 #' \code{directory_to_save}.
 #' @export
+# nolint start: cyclocomp
 download_hms_data <- function(
     data_format = "Shapefile",
     date_start = "2023-09-01",
@@ -1907,7 +1911,7 @@ download_hms_data <- function(
     download_name = download_names
   )
 }
-
+# nolint end: cyclocomp
 
 # nolint start
 #' Download climate classification data
@@ -2226,14 +2230,14 @@ download_modis_data <- function(
     file_dates <- as.integer(file_dates)
     date_start <- as.Date(as.character(min(file_dates)), format = "%Y%j")
     date_end <- as.Date(as.character(max(file_dates)), format = "%Y%j")
-    
+
     # Extract year and month from file_dates
     splitter <- paste0(
       substr(file_dates, 1, 4), "/", substr(file_dates, 5, 7), "/"
-      )
+    )
     # Extract download names from file_url using splitter
     download_name <- sapply(strsplit(file_url, splitter), `[`, 2)
-    
+
     #### 10-3. initiate "..._wget_commands.txt" file
     commands_txt <- paste0(
       directory_to_save,
@@ -2257,7 +2261,7 @@ download_modis_data <- function(
       download_name,
       "\n"
     )
-    
+
     #### filter commands to non-existing files
     download_command <- download_command[
       which(
@@ -2368,11 +2372,11 @@ download_modis_data <- function(
         value = TRUE
       )
     download_url <- sprintf("%s%s", ladsurl, filelist_sub)
-    
+
     download_name <- sapply(
       strsplit(download_url, paste0("/", day, "/")), `[`, 2
-      )
-    
+    )
+
     # Main wget run
     download_command <- paste0(
       "wget -e robots=off -np -R .html,.tmp ",
@@ -2385,14 +2389,14 @@ download_modis_data <- function(
       download_name,
       "\n"
     )
-    
+
     #### filter commands to non-existing files
     download_command <- download_command[
       which(
         !file.exists(download_name)
       )
     ]
-    
+
     #### 15. concatenate and print download commands to "..._wget_commands.txt"
     #### cat command only if file does not already exist
     cat(download_command)

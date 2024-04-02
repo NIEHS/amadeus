@@ -16,10 +16,9 @@
 #' @export
 process_conformity <-
   function(
-    locs = NULL,
-    check_time = FALSE,
-    locs_epsg = "EPSG:4326"
-  ) {
+      locs = NULL,
+      check_time = FALSE,
+      locs_epsg = "EPSG:4326") {
     keyword <- c("lon", "lat", "time")
     if (!check_time) {
       keyword <- keyword[-3]
@@ -60,11 +59,11 @@ process_conformity <-
 #' @export
 process_collection <-
   function(
-    path,
-    source,
-    collection = FALSE,
-    date = FALSE,
-    datetime = FALSE) {
+      path,
+      source,
+      collection = FALSE,
+      date = FALSE,
+      datetime = FALSE) {
     #### check for more than one true
     parameters <- c(collection, date, datetime)
     if (length(parameters[parameters == TRUE]) > 1) {
@@ -232,10 +231,10 @@ process_merra2_time <-
 #' @export
 process_gmted_codes <-
   function(
-    string,
-    statistic = FALSE,
-    resolution = FALSE,
-    invert = FALSE) {
+      string,
+      statistic = FALSE,
+      resolution = FALSE,
+      invert = FALSE) {
     statistics <- c(
       "Breakline Emphasis", "Systematic Subsample",
       "Median Statistic", "Minimum Statistic",
@@ -270,9 +269,8 @@ process_gmted_codes <-
 #' @export
 process_sedac_codes <-
   function(
-    string,
-    invert = FALSE
-  ) {
+      string,
+      invert = FALSE) {
     resolution_namecodes <- cbind(
       c(
         "60 minute", "30 second", "2.5 minute",
@@ -306,9 +304,8 @@ process_sedac_codes <-
 #' @export
 process_locs_radius <-
   function(
-    locs,
-    radius
-  ) {
+      locs,
+      radius) {
     if (radius == 0) {
       return(locs)
     } else if (radius > 0) {
@@ -339,18 +336,17 @@ process_locs_radius <-
 #' @export
 process_locs_vector <-
   function(
-    locs,
-    crs,
-    radius
-  ) {
+      locs,
+      crs,
+      radius) {
     #### sites as data frame
     if ("data.table" %in% class(locs)) {
       sites_df <- data.frame(locs)
     } else if ("data.frame" %in% class(locs) &&
-               !("data.table" %in% class(locs))) {
+                 !("data.table" %in% class(locs))) {
       sites_df <- locs
     } else if (!("data.table" %in% class(locs)) &&
-               !("data.frame" %in% class(locs))) {
+                 !("data.frame" %in% class(locs))) {
       stop(
         paste0(
           "Detected a ",
@@ -394,8 +390,8 @@ process_locs_vector <-
 #' @export
 process_gridmet_codes <-
   function(
-    string,
-    invert = FALSE) {
+      string,
+      invert = FALSE) {
     names <- c(
       "Near-Surface Specific Humidity", "Mean Vapor Pressure Deficit",
       "Precipitation", "Minimum Near-Surface Relative Humidity",
@@ -403,10 +399,10 @@ process_gridmet_codes <-
       "Surface Downwelling Solar Radiation",
       "Minimum Near-Surface Air Temperature",
       "Maximum Near-Surface Air Temperature",
-      "Wind speed at 10 m",  "Wind direction at 10 m",
-      "Palmer Drought Severity Index",  "Reference grass evaportranspiration",
-      "Reference alfalfa evaportranspiration",  "Energy Release Component",
-      "Burning Index",  "100-hour dead fuel moisture",
+      "Wind speed at 10 m", "Wind direction at 10 m",
+      "Palmer Drought Severity Index", "Reference grass evaportranspiration",
+      "Reference alfalfa evaportranspiration", "Energy Release Component",
+      "Burning Index", "100-hour dead fuel moisture",
       "1000-hour dead fuel moisture"
     )
     codes <- c(
@@ -437,8 +433,8 @@ process_gridmet_codes <-
 #' @export
 process_terraclimate_codes <-
   function(
-    string,
-    invert = FALSE) {
+      string,
+      invert = FALSE) {
     names <- c(
       "Actual Evapotranspiration", "Climate Water Deficit",
       "Potential evapotranspiration", "Precipitation", "Runoff",
@@ -476,8 +472,8 @@ process_terraclimate_codes <-
 #' @export
 process_variable_codes <-
   function(
-    variables,
-    source = c("gridmet", "terraclimate")) {
+      variables,
+      source = c("gridmet", "terraclimate")) {
     if (tolower(source) == "gridmet") {
       code_function <- process_gridmet_codes
     } else if (tolower(source) == "terraclimate") {

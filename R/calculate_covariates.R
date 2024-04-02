@@ -1174,7 +1174,7 @@ calc_hms <- function(
       tolower(
         as.character(
           layer_name
-          )
+        )
       ),
       " covariates for ",
       layer_date,
@@ -1674,7 +1674,6 @@ calc_merra2 <- function(
     merra2_time <- c(2, 3)
     merra2_level <- NULL
   }
-  #### identify 
   #### perform extraction
   sites_extracted <- calc_worker(
     dataset = "merra2",

@@ -313,7 +313,6 @@ check_url_status <- function(
   } else if (method == "GET") {
     hd <- httr::GET(url)
   }
-  
   status <- hd$status_code
   Sys.sleep(1.5)
   return(status == http_status_ok)
@@ -387,9 +386,10 @@ check_urls <- function(
     return(NULL)
   } else {
     url_sample <- sample(urls, size, replace = FALSE)
-    url_status <- sapply(url_sample,
-                         check_url_status,
-                         method = method
+    url_status <- sapply(
+      url_sample,
+      check_url_status,
+      method = method
     )
     return(url_status)
   }

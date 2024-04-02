@@ -11,7 +11,7 @@
 #' padded to 5 digits. If provided a buffer radius greater than 5 digits,
 #'  \code{calc_setcolumns()} will expand to the number of digits. (ie. buffer
 #' radius of 100km = CCC_CCCCC_I_100000).
-#' @param from data.frame(1). Calculated covariates as returned from 
+#' @param from data.frame(1). Calculated covariates as returned from
 #' \code{calc_covariates()} or a source specific covariate function.
 #' @param lag integer(1). Temporal lag.
 #' @param dataset character(1). Covariate parent dataset.
@@ -314,7 +314,7 @@ calc_worker <- function(
       data_time <- calc_time(
         data_split[time],
         time_type
-      ) 
+      )
     }
     #### extract level (if applicable)
     if (!(is.null(level))) {
