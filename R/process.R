@@ -743,6 +743,7 @@ process_conformity <-
 #' @param ... Placeholders.
 #' @author Insang Song, Mariana Kassien
 #' @returns a `SpatVector` object (points) in `year`
+#' `year` is stored in a field named `"year"`.
 #' @note Visit [TRI Data and Tools](https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-and-tools)
 #' to view the available years and variables.
 #' @references
@@ -825,6 +826,7 @@ process_tri <- function(
                 geom = c("LONGITUDE", "LATITUDE"),
                 crs = "EPSG:4269", # all are NAD83
                 keepgeom = TRUE)
+  attr(spvect_tri, "tri_year") <- year
 
   return(spvect_tri)
 }

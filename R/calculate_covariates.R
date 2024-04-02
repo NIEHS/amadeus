@@ -1032,6 +1032,8 @@ calc_tri <- function(
   if (nrow(df_tri) != nrow(locs)) {
     df_tri <- dplyr::left_join(as.data.frame(locs), df_tri)
   }
+  # read attr
+  df_tri$time <- attr(from, "tri_year")
   return(df_tri)
 }
 
