@@ -30,6 +30,6 @@ and creating a \code{data.frame} containing \code{locs_id} for retaining extract
 values.
 }
 \seealso{
-\code{\link[=process_sites_vector]{process_sites_vector()}}, \code{\link[=check_for_null_parameters]{check_for_null_parameters()}}
+\code{\link[=process_locs_vector]{process_locs_vector()}}, \code{\link[=check_for_null_parameters]{check_for_null_parameters()}}
 }
 \keyword{internal}
