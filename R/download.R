@@ -204,6 +204,12 @@ download_aqs_data <-
       download_names,
       "\n"
     )
+    #### filter commands to non-existing files
+    download_commands <- download_commands[
+      which(
+        !file.exists(download_names)
+      )
+    ]
     #### 7. initiate "..._curl_commands.txt"
     commands_txt <- paste0(
       directory_to_download,
@@ -227,12 +233,10 @@ download_aqs_data <-
       "\n"
     )
     #### 11. download data
-    if (!any(file.exists(download_names))) {
-      download_run(
-        download = download,
-        system_command = system_command
-      )
-    }
+    download_run(
+      download = download,
+      system_command = system_command
+    )
     #### 12. unzip data
     for (n in seq_along(download_names)) {
       download_unzip(
@@ -240,19 +244,16 @@ download_aqs_data <-
         directory_to_unzip = directory_to_save,
         unzip = unzip
       )
+      download_remove_zips(
+        remove = remove_zip,
+        download_name = download_names[d]
+      )
     }
     #### 13. remove command file
     download_remove_command(
       commands_txt = commands_txt,
       remove = remove_command
     )
-    #### 14. remove zip files
-    for (d in seq_along(download_names)) {
-      download_remove_zips(
-        remove = remove_zip,
-        download_name = download_names[d]
-      )
-    }
   }
 
 
@@ -465,7 +466,6 @@ download_geos_data <- function(
     date_end,
     "_wget_commands.txt"
   )
-
   download_sink(commands_txt)
   #### 9. concatenate and print download commands to "..._wget_commands.txt"
   for (d in seq_along(date_sequence)) {
@@ -474,7 +474,7 @@ download_geos_data <- function(
     month <- substr(date, 5, 6)
     day <- substr(date, 7, 8)
     for (t in seq_along(time_sequence)) {
-      download_url <- paste0(
+      download_url_base <- paste0(
         base,
         "Y",
         year,
@@ -482,13 +482,20 @@ download_geos_data <- function(
         month,
         "/D",
         day,
-        "/GEOS-CF.v01.rpl.",
+        "/"
+        )
+      download_name <- paste0(
+        "GEOS-CF.v01.rpl.",
         collection,
         ".",
         date,
         "_",
         time_sequence[t],
         "z.nc4"
+      )
+      download_url <- paste0(
+        download_url_base,
+        download_name
       )
       if (t == 1) {
         if (!(check_url_status(download_url))) {
@@ -502,16 +509,27 @@ download_geos_data <- function(
       }
       download_folder <- paste0(
         directory_to_save,
-        collection
+        collection,
+        "/"
       )
-      download_command <- paste0(
-        "wget ",
-        download_url,
-        " -P ",
+      download_folder_name <- paste0(
         download_folder,
+        download_name
+      )
+      if (!file.exists(download_folder)) {
+        dir.create(download_folder)
+      }
+      download_command <- paste0(
+        "curl ",
+        download_url,
+        " -o ",
+        download_folder_name,
         "\n"
       )
-      cat(download_command)
+      if (!file.exists(download_folder_name)) {
+        #### cat command only if file does not already exist
+        cat(download_command)
+      }
     }
   }
   #### 9. finish "..._wget_commands.txt" file
@@ -916,14 +934,23 @@ download_merra2_data <- function(
       directory_to_save,
       collection
     )
+    if (!file.exists(download_folder)) {dir.create(download_folder)}
+    download_name <- paste0(
+      download_folder,
+      "/",
+      list_urls_data[l]
+    )
     download_command <- paste0(
       "wget ",
       download_url,
-      " -P ",
-      download_folder,
+      " -O ",
+      download_name,
       "\n"
     )
-    cat(download_command)
+    if (!file.exists(download_name)) {
+      #### cat command only if file does not already exist
+      cat(download_command)
+    }
     download_url_metadata <- paste0(
       base,
       esdt_name,
@@ -939,14 +966,24 @@ download_merra2_data <- function(
       collection,
       "/metadata/"
     )
+    if (!file.exists(download_folder_metadata)) {
+      dir.create(download_folder_metadata)
+    }
+    download_name_metadata <- paste0(
+      download_folder_metadata,
+      list_urls_metadata[l]
+    )
     download_command_metadata <- paste0(
       "wget ",
       download_url_metadata,
-      " -P ",
-      download_folder_metadata,
+      " -O ",
+      download_name_metadata,
       "\n"
     )
-    cat(download_command_metadata)
+    if (!file.exists(download_name)) {
+      #### cat command only if file does not already exist
+      cat(download_command_metadata)
+    }
   }
   #### 14. finish "..._wget_commands.txt"
   sink()
@@ -1344,7 +1381,7 @@ download_nlcd_data <- function(
   #### 12. concatenate and print download command to "..._curl_commands.txt"
   if (!file.exists(download_name)) {
     #### cat command only if file does not already exist
-    cat(command)
+    cat(download_command)
   }
   #### 13. finish "..._curl_command.txt"
   sink()
@@ -1486,7 +1523,7 @@ download_sedac_groads_data <- function(
   if (!file.exists(download_name)) {
     #### 12. concatenate and print download command to "..._curl_commands.txt"
     #### cat command only if file does not already exist
-    cat(command)
+    cat(download_command)
   }
   #### 13. finish "..._curl_commands.txt" file
   sink()
@@ -1664,7 +1701,7 @@ download_sedac_population_data <- function(
   if (!file.exists(download_name)) {
     #### 13. concatenate and print download command to "..._curl_commands.txt"
     #### cat command only if file does not already exist
-    cat(command)
+    cat(download_command)
   }
   #### 14. finish "..._curl_commands.txt" file
   sink()
@@ -1967,7 +2004,7 @@ download_koppen_geiger_data <- function(
   if (!file.exists(download_name)) {
     #### 12. concatenate and print download command to "..._wget_commands.txt"
     #### cat command only if file does not already exist
-    cat(command)
+    cat(download_command)
   }
   sink()
   #### 14. build system command
@@ -2189,7 +2226,14 @@ download_modis_data <- function(
     file_dates <- as.integer(file_dates)
     date_start <- as.Date(as.character(min(file_dates)), format = "%Y%j")
     date_end <- as.Date(as.character(max(file_dates)), format = "%Y%j")
-
+    
+    # Extract year and month from file_dates
+    splitter <- paste0(
+      substr(file_dates, 1, 4), "/", substr(file_dates, 5, 7), "/"
+      )
+    # Extract download names from file_url using splitter
+    download_name <- sapply(strsplit(file_url, splitter), `[`, 2)
+    
     #### 10-3. initiate "..._wget_commands.txt" file
     commands_txt <- paste0(
       directory_to_save,
@@ -2203,18 +2247,27 @@ download_modis_data <- function(
 
     #### 10-4. write download_command
     download_command <- paste0(
-      "wget -e robots=off -m -np -R .html,.tmp ",
+      "wget -e robots=off -np -R .html,.tmp ",
       "-nH --cut-dirs=3 \"",
       download_url,
       "\" --header \"Authorization: Bearer ",
       nasa_earth_data_token,
-      "\" -P ",
+      "\" -O ",
       directory_to_save,
+      download_name,
       "\n"
     )
+    
+    #### filter commands to non-existing files
+    download_command <- download_command[
+      which(
+        !file.exists(download_name)
+      )
+    ]
 
     # avoid any possible errors by removing existing command files
     download_sink(commands_txt)
+    #### cat command only if file does not already exist
     cat(download_command)
     sink()
 
@@ -2315,18 +2368,33 @@ download_modis_data <- function(
         value = TRUE
       )
     download_url <- sprintf("%s%s", ladsurl, filelist_sub)
+    
+    download_name <- sapply(
+      strsplit(download_url, paste0("/", day, "/")), `[`, 2
+      )
+    
     # Main wget run
     download_command <- paste0(
-      "wget -e robots=off -m -np -R .html,.tmp ",
+      "wget -e robots=off -np -R .html,.tmp ",
       "-nH --cut-dirs=3 \"",
       download_url,
       "\" --header \"Authorization: Bearer ",
       nasa_earth_data_token,
-      "\" -P ",
+      "\" -O ",
       directory_to_save,
+      download_name,
       "\n"
     )
+    
+    #### filter commands to non-existing files
+    download_command <- download_command[
+      which(
+        !file.exists(download_name)
+      )
+    ]
+    
     #### 15. concatenate and print download commands to "..._wget_commands.txt"
+    #### cat command only if file does not already exist
     cat(download_command)
   }
 
@@ -2406,6 +2474,12 @@ download_tri_data <- function(
                               " --output ",
                               download_names,
                               "\n")
+  #### filter commands to non-existing files
+  download_commands <- download_commands[
+    which(
+      !file.exists(download_names)
+    )
+  ]
   #### 5. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
     directory_to_save,
@@ -2513,7 +2587,12 @@ download_nei_data <- function(
     c("2017neiApr_onroad_byregions.zip",
       "2020nei_onroad_byregion.zip")
   download_names <- paste0(directory_to_save, download_names_file)
-
+  #### filter commands to non-existing files
+  download_urls <- download_urls[
+    which(
+      !file.exists(download_names)
+    )
+  ]
   #### 4. build download command
   download_commands <-
     paste0("wget --ca-certificate=",

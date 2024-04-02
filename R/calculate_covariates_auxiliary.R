@@ -107,7 +107,7 @@ calc_setcolumns <- function(
     names_return[cov_index[c]] <- name_new
   }
   #### check for unique names
-  stopifnot(length(names_return) == length(unique(names(return))))
+  stopifnot(length(names_return) == length(unique(names_return)))
   colnames(from) <- names_return
   return(from)
 }
