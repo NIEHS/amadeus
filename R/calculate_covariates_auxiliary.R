@@ -197,7 +197,7 @@ calc_message <- function(
 #' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0). Passed from \code{calc_\*()}.
 #' @return A `list` containing `SpatVector` and `data.frame` objects
-#' @seealso [`process_sites_vector()`], [`check_for_null_parameters()`]
+#' @seealso [`process_locs_vector()`], [`check_for_null_parameters()`]
 #' @keywords internal
 #' @importFrom terra as.data.frame
 #' @importFrom terra crs

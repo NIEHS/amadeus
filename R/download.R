@@ -246,7 +246,7 @@ download_aqs_data <-
       )
       download_remove_zips(
         remove = remove_zip,
-        download_name = download_names[d]
+        download_name = download_names[n]
       )
     }
     #### 13. remove command file
