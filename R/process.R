@@ -2399,3 +2399,105 @@ process_huc <-
     }
     return(hucpoly)
   }
+
+
+
+#' Process CropScape data
+#' @description
+#' This function imports and cleans raw CropScape data,
+#' returning a single `SpatRaster` object.
+#' @param path character giving CropScape data path
+#' @param year numeric giving the year of CropScape data used
+#' @param ... Placeholders.
+#' @description Reads CropScape file of selected `year`.
+#' @returns a `SpatRaster` object
+#' @author Insang Song
+#' @importFrom utils read.csv
+#' @importFrom terra rast
+#' @importFrom terra metags
+#' @export
+process_cropscape <-
+  function(
+    path = NULL,
+    year = 2021,
+    ...
+  ) {
+    # check inputs
+    if (!is.character(path) || is.null(path)) {
+      stop("path is not a character.")
+    }
+    if (!dir.exists(path)) {
+      stop("path does not exist.")
+    }
+    if (!is.numeric(year)) {
+      stop("year is not a numeric.")
+    }
+    # open cdl file corresponding to the year
+    cdl_file <-
+      list.files(
+        path,
+        pattern = paste0("cdl_30m_*", year, "_.*.tif$"),
+        full.names = TRUE
+      )
+    cdl <- terra::rast(cdl_file)
+    terra::metags(cdl) <- c(year = year)
+    return(cdl)
+  }
+
+
+#' Process PRISM data
+#' @description
+#' This function imports and cleans raw PRISM data,
+#' returning a single `SpatRaster` object.
+#' @param path character giving PRISM data path
+#' @param element character(1). PRISM element name
+#' @param time character(1). PRISM time name.
+#' Should be character in length of 2, 4, 6, or 8.
+#' "annual" is acceptable.
+#' @param ... Placeholders.
+#' @description Reads time series or 30-year normal PRISM data.
+#' @returns a `SpatRaster` object with metadata of time and element.
+#' @seealso [`terra::rast`], [`terra::metags`]
+#' @author Insang Song
+#' @importFrom utils read.csv
+#' @importFrom terra rast
+#' @importFrom terra metags
+#' @export
+# nolint start
+process_prism <-
+  function(
+    path = NULL,
+    element = NULL,
+    time = NULL,
+    ...
+  ) {
+    # check inputs
+    if (!is.character(path) || is.null(path)) {
+      stop("path is not a character.")
+    }
+    if (!dir.exists(path)) {
+      stop("path does not exist.")
+    }
+    if (!nchar(time) %in% seq(2, 8, 2)) {
+      stop("time does not have valid length.")
+    }
+
+    if (!element %in%
+          c("ppt", "tmin", "tmax", "tmean", "tdmean",
+            "vpdmin", "vpdmax",
+            "solslope", "soltotal", "solclear", "soltrans")) {
+      stop("element is not a valid PRISM element.")
+    }
+    pattern <- "PRISM_%s*.*M[4-5]_([0-1][0-9]{1,7}|annual)_*.*(bil|nc|grib2|asc)$"
+    pattern <- sprintf(pattern, element)
+    prism_file <-
+      list.files(
+        path,
+        pattern = pattern,
+        full.names = TRUE
+      )
+    prism <- terra::rast(prism_file)
+    terra::metags(prism) <- c(time = time, element = element)
+    return(prism)
+  }
+# nolint end
