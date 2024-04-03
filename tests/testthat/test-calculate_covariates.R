@@ -1368,3 +1368,81 @@ testthat::test_that("calc_terraclimate returns as expected.", {
     )
   }
 })
+
+testthat::test_that("calc_lagged returns as expected.", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  lags <- c(0, 1, 2)
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  # expect function
+  expect_true(
+    is.function(calc_lagged)
+  )
+  for (l in seq_along(lags)) {
+    narr <-
+      process_narr(
+        date = c("2018-01-01", "2018-01-10"),
+        variable = "weasd",
+        path =
+          testthat::test_path(
+            "..",
+            "testdata",
+            "narr",
+            "weasd"
+          )
+      )
+    narr_covariate <-
+      calc_narr(
+        from = narr,
+        locs = ncp,
+        locs_id = "site_id",
+        radius = 0,
+        fun = "mean"
+      )
+    # set column names
+    narr_covariate <- calc_setcolumns(
+      from = narr_covariate,
+      lag = 0,
+      dataset = "narr",
+      locs_id = "site_id"
+    )
+    # expect identical if lag = 0
+    if (lags[l] == 0) {
+      narr_lagged <- calc_lagged(
+        from = narr_covariate,
+        date = c("2018-01-05", "2018-01-10"),
+        lag = lags[l],
+        locs_id = "site_id",
+        time_id = "time"
+      )
+      expect_identical(narr_lagged, narr_covariate)
+    } else {
+      # expect error because 2018-01-01 will not have lag data from 2017-12-31
+      expect_error(
+        calc_lagged(
+          from = narr_covariate,
+          date = c("2018-01-01", "2018-01-10"),
+          lag = lags[l],
+          locs_id = "site_id",
+          time_id = "time"
+        )
+      )
+      narr_lagged <- calc_lagged(
+        from = narr_covariate,
+        date = c("2018-01-05", "2018-01-10"),
+        lag = lags[l],
+        locs_id = "site_id",
+        time_id = "time"
+      )
+      # expect output is data.frame
+      expect_true(
+        class(narr_lagged) == "data.frame"
+      )
+      # expect lag day
+      expect_true(grepl("_[0-9]{1}_", colnames(narr_lagged)[3]))
+      # expect no NA
+      expect_true(all(!is.na(narr_lagged)))
+    }
+  }
+})

@@ -1803,3 +1803,80 @@ calc_terraclimate <- function(
   #### return data.frame
   return(data.frame(sites_extracted))
 }
+
+#' Calculate temporally lagged covariates
+#' @description
+#' The \code{calc_lagged()} function calculates daily temporal lagged covariates
+#' from the output of \code{calculate_covariates()} or \code{calc_*()}.
+#' @param from data.frame(1). A `data.frame` containing calculated covariates
+#' returned from \code{calculate_covariates()} or \code{calc_*()}.
+#' @param date character(2). Start and end dates of desired lagged covariates.
+#' Length of 10 each, format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
+#' @param lag integer(1). Number of lag days.
+#' @param time_id character(1). Column containing time values.
+#' @param locs_id character(1). Name of unique identifier.
+#' @seealso [calculate_covariates()]
+#' @note
+#' In order to calculate temporally lagged covariates, `from` must contain at
+#' least the number of lag days before the desired start date. For example, if
+#' `date = c("2024-01-01", "2024-01-31)` and `lag = 1`, `from` must contain data
+#' starting at 2023-12-31.
+#' 
+#' \code{calc_lagged()} assumes that all columns other than `time_id`,
+#' `locs_id`, and fixed columns of "lat" and "lon", follow the genre, variable,
+#' lag, buffer radius format adopted in \code{calc_setcolumns()}.
+#' @return a `data.frame` object
+#' @importFrom dplyr lag
+#' @export
+calc_lagged <- function(
+    from,
+    date,
+    lag,
+    locs_id,
+    time_id) {
+  #### check input data types
+  stopifnot(class(from) %in% c("data.frame", "data.table"))
+  #### check if time_id is not null
+  stopifnot(!is.null(time_id))
+  #### return from if lag == 0
+  if (lag == 0) {
+    cat("`lag` set to 0. Returning `from`.\n")
+    return(from)
+  }
+  #### extract times
+  time <- from[[time_id]]
+  ### check temporal alignment
+  if (!all(c(as.Date(date)[1] - lag, as.Date(date)[2]) %in% time)) {
+    stop(
+      paste0(
+        "Dates requested in `date` do not align with data available in `from`."
+      )
+    )
+  }
+  #### etract variables
+  variables <- from[
+    , !(names(from) %in% c(time_id, locs_id, "lon", "lat")), 
+    drop = FALSE
+  ]
+  #### apply lag using dplyr::lag
+  variables_lag <- dplyr::lag(variables, lag, default = NA)
+  colnames(variables_lag) <- gsub(
+    paste0("_[0-9]{1}_"),
+    paste0("_", lag, "_"),
+    colnames(variables_lag)
+  )
+  #### create the return dataframe
+  variables_return <- cbind(from[[locs_id]], time, variables_lag)
+  colnames(variables_return)[1:2] <- c(locs_id, time_id)
+  #### identify dates of interest
+  date_sequence <- generate_date_sequence(
+    date[1],
+    date[2],
+    by = "day"
+  )
+  #### filter to dates of interest
+  variables_return_date <- variables_return[time %in% date_sequence, ]
+  return(variables_return_date)
+}
+
+
