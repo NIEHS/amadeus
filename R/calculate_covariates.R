@@ -1821,7 +1821,6 @@ calc_terraclimate <- function(
 #' least the number of lag days before the desired start date. For example, if
 #' `date = c("2024-01-01", "2024-01-31)` and `lag = 1`, `from` must contain data
 #' starting at 2023-12-31.
-#' 
 #' \code{calc_lagged()} assumes that all columns other than `time_id`,
 #' `locs_id`, and fixed columns of "lat" and "lon", follow the genre, variable,
 #' lag, buffer radius format adopted in \code{calc_setcolumns()}.
@@ -1855,7 +1854,7 @@ calc_lagged <- function(
   }
   #### etract variables
   variables <- from[
-    , !(names(from) %in% c(time_id, locs_id, "lon", "lat")), 
+    , !(names(from) %in% c(time_id, locs_id, "lon", "lat")),
     drop = FALSE
   ]
   #### apply lag using dplyr::lag
@@ -1872,11 +1871,9 @@ calc_lagged <- function(
   date_sequence <- generate_date_sequence(
     date[1],
     date[2],
-    by = "day"
+    sub_hyphen = FALSE
   )
   #### filter to dates of interest
   variables_return_date <- variables_return[time %in% date_sequence, ]
   return(variables_return_date)
 }
-
-
