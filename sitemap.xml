@@ -37,6 +37,9 @@
     <loc>https://niehs.github.io/amadeus/reference/calc_gmted.html</loc>
   </url>
   <url>
+    <loc>https://niehs.github.io/amadeus/reference/calc_gridmet.html</loc>
+  </url>
+  <url>
     <loc>https://niehs.github.io/amadeus/reference/calc_hms.html</loc>
   </url>
   <url>
@@ -44,6 +47,9 @@
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/calc_merra2.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/calc_message.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/calc_modis_daily.html</loc>
@@ -61,6 +67,9 @@
     <loc>https://niehs.github.io/amadeus/reference/calc_nlcd.html</loc>
   </url>
   <url>
+    <loc>https://niehs.github.io/amadeus/reference/calc_prepare_locs.html</loc>
+  </url>
+  <url>
     <loc>https://niehs.github.io/amadeus/reference/calc_sedac_groads.html</loc>
   </url>
   <url>
@@ -70,10 +79,22 @@
     <loc>https://niehs.github.io/amadeus/reference/calc_sedc.html</loc>
   </url>
   <url>
+    <loc>https://niehs.github.io/amadeus/reference/calc_setcolumns.html</loc>
+  </url>
+  <url>
     <loc>https://niehs.github.io/amadeus/reference/calc_temporal_dummies.html</loc>
   </url>
   <url>
+    <loc>https://niehs.github.io/amadeus/reference/calc_terraclimate.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/calc_time.html</loc>
+  </url>
+  <url>
     <loc>https://niehs.github.io/amadeus/reference/calc_tri.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/calc_worker.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/check_for_null_parameters.html</loc>
@@ -107,6 +128,9 @@
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_gmted_data.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/download_gridmet_data.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_hms_data.html</loc>
@@ -158,6 +182,9 @@
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_sink.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/download_terraclimate_data.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_tri_data.html</loc>
@@ -217,6 +244,12 @@
     <loc>https://niehs.github.io/amadeus/reference/process_gmted_codes.html</loc>
   </url>
   <url>
+    <loc>https://niehs.github.io/amadeus/reference/process_gridmet.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/process_gridmet_codes.html</loc>
+  </url>
+  <url>
     <loc>https://niehs.github.io/amadeus/reference/process_hms.html</loc>
   </url>
   <url>
@@ -265,7 +298,16 @@
     <loc>https://niehs.github.io/amadeus/reference/process_sedac_population.html</loc>
   </url>
   <url>
+    <loc>https://niehs.github.io/amadeus/reference/process_terraclimate.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/process_terraclimate_codes.html</loc>
+  </url>
+  <url>
     <loc>https://niehs.github.io/amadeus/reference/process_tri.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/process_variable_codes.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/read_commands.html</loc>
