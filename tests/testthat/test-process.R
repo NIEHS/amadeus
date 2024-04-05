@@ -1007,6 +1007,12 @@ testthat::test_that("process_merra2 returns as expected.", {
           merra2_df$collection[c]
         )
       )
+    cat(
+      paste0(
+        names(merra2),
+        "\n"
+      )
+    )
     # expect output is SpatRaster
     expect_true(
       class(merra2)[1] == "SpatRaster"
@@ -1040,4 +1046,130 @@ testthat::test_that("process_merra2 returns as expected.", {
       all(dim(merra2) == c(2, 3, 1))
     )
   }
+})
+
+testthat::test_that("process_gridmet returns expected.", {
+  withr::local_package("terra")
+  variable <- "Precipitation"
+  # expect function
+  expect_true(
+    is.function(process_gridmet)
+  )
+  gridmet <-
+    process_gridmet(
+      date = c("2018-01-03", "2018-01-03"),
+      variable = variable,
+      path =
+      testthat::test_path(
+        "..",
+        "testdata",
+        "gridmet",
+        "pr"
+      )
+    )
+  # expect output is SpatRaster
+  expect_true(
+    class(gridmet)[1] == "SpatRaster"
+  )
+  # expect values
+  expect_true(
+    terra::hasValues(gridmet)
+  )
+  # expect non-null coordinate reference system
+  expect_false(
+    is.null(terra::crs(gridmet))
+  )
+  # expect lon and lat dimensions to be > 1
+  expect_false(
+    any(c(0, 1) %in% dim(gridmet)[1:2])
+  )
+  # expect non-numeric and non-empty time
+  expect_false(
+    any(c("", 0) %in% terra::time(gridmet))
+  )
+  # expect dimensions according to levels
+  expect_true(
+    dim(gridmet)[3] == 1
+  )
+})
+
+testthat::test_that("process_terraclimate returns expected.", {
+  withr::local_package("terra")
+  variable <- "ppt"
+  # expect function
+  expect_true(
+    is.function(process_terraclimate)
+  )
+  terraclimate <-
+    process_terraclimate(
+      date = c("2018-01-01", "2018-01-01"),
+      variable = variable,
+      path =
+      testthat::test_path(
+        "..",
+        "testdata",
+        "terraclimate",
+        "ppt"
+      )
+    )
+  # expect output is SpatRaster
+  expect_true(
+    class(terraclimate)[1] == "SpatRaster"
+  )
+  # expect values
+  expect_true(
+    terra::hasValues(terraclimate)
+  )
+  # expect non-null coordinate reference system
+  expect_false(
+    is.null(terra::crs(terraclimate))
+  )
+  # expect lon and lat dimensions to be > 1
+  expect_false(
+    any(c(0, 1) %in% dim(terraclimate)[1:2])
+  )
+  # expect non-numeric and non-empty time
+  expect_false(
+    any(c("", 0) %in% terra::time(terraclimate))
+  )
+  # expect dimensions according to levels
+  expect_true(
+    dim(terraclimate)[3] == 1
+  )
+})
+
+testthat::test_that("gridmet and terraclimate auxiliary functions.", {
+  # gridmet
+  gc1 <- process_gridmet_codes("all")
+  expect_true(ncol(gc1) == 2)
+  gc2 <- process_gridmet_codes("sph", invert = TRUE)
+  expect_true(class(gc2) == "character")
+  expect_true(nchar(gc2) > 7)
+  gc3 <- process_gridmet_codes("Near-Surface Specific Humidity")
+  expect_true(class(gc3) == "character")
+  expect_true(nchar(gc3) < 7)
+  # terraclimate
+  tc1 <- process_terraclimate_codes("all")
+  expect_true(ncol(gc1) == 2)
+  tc2 <- process_terraclimate_codes("aet", invert = TRUE)
+  expect_true(class(gc2) == "character")
+  expect_true(nchar(gc2) > 7)
+  tc3 <- process_terraclimate_codes("Actual Evapotranspiration")
+  expect_true(class(gc3) == "character")
+  expect_true(nchar(gc3) < 7)
+  # process_variable_codes
+  expect_no_error(process_variable_codes("sph", "gridmet"))
+  expect_no_error(
+    process_variable_codes("Near-Surface Specific Humidity", "gridmet")
+  )
+  expect_error(
+    process_variable_codes("error", "gridmet")
+  )
+  expect_no_error(process_variable_codes("aet", "terraclimate"))
+  expect_no_error(
+    process_variable_codes("Actual Evapotranspiration", "terraclimate")
+  )
+  expect_error(
+    process_variable_codes("error", "terraclimate")
+  )
 })

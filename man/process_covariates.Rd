@@ -8,7 +8,8 @@ process_covariates(
   covariate = c("modis_swath", "modis_merge", "koppen-geiger", "bluemarble",
     "koeppen-geiger", "koppen", "koeppen", "geos", "dummies", "gmted", "hms", "smoke",
     "sedac_population", "population", "sedac_groads", "groads", "roads", "nlcd", "tri",
-    "narr", "nei", "ecoregions", "ecoregion", "merra", "MERRA2", "merra2", "MERRA2"),
+    "narr", "nei", "ecoregions", "ecoregion", "merra", "merra2", "gridmet",
+    "terraclimate"),
   path = NULL,
   ...
 )
@@ -49,7 +50,9 @@ data files before passing to \code{process_covariates}}.
 \item \code{\link{process_narr}}: \code{"narr"}, \code{"NARR"}
 \item \code{\link{process_sedac_groads}}: \code{"sedac_groads"}, \code{"roads"}, \code{"groads"}
 \item \code{\link{process_sedac_population}}: \code{"sedac_population"}, \code{"population"}
-\item \code{\link{process_merra2}}: \code{merra}, \code{MERRA}, \code{merra2}, \code{MERRA2}
+\item \code{\link{process_merra2}}: \code{"merra"}, \code{"MERRA"}, \code{"merra2"}, \code{"MERRA2"}
+\item \code{\link{process_gridmet}}: \code{"gridmet"}, \verb{"gridMET}"
+\item \code{\link{process_terraclimate}}: \code{"terraclimate"}, \code{"TerraClimate"}
 }
 }
 \author{

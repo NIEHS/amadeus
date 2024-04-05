@@ -760,6 +760,13 @@ testthat::test_that("calc_hms returns expected.", {
           locs_id = "site_id",
           radius = radii[r]
         )
+      # set column names
+      hms_covariate <- calc_setcolumns(
+        from = hms_covariate,
+        lag = 0,
+        dataset = "hms",
+        locs_id = "site_id"
+      )
       # expect output is data.frame
       expect_true(
         class(hms_covariate) == "data.frame"
@@ -779,6 +786,10 @@ testthat::test_that("calc_hms returns expected.", {
       # expect binary
       expect_true(
         all(unique(hms_covariate[, 3]) %in% c(0, 1))
+      )
+      # expect $time is class Date
+      expect_true(
+        "Date" %in% class(hms_covariate$time)
       )
     }
   }
@@ -818,6 +829,13 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
           locs_id = "site_id",
           radius = radii[r]
         )
+      # set column names
+      hms_covariate <- calc_setcolumns(
+        from = hms_covariate,
+        lag = 0,
+        dataset = "hms",
+        locs_id = "site_id"
+      )
       # expect output is data.frame
       expect_true(
         class(hms_covariate) == "data.frame"
@@ -837,6 +855,10 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
       # expect binary
       expect_true(
         all(unique(hms_covariate[, 3]) %in% c(0, 1))
+      )
+      # expect $time is class Date
+      expect_true(
+        "Date" %in% class(hms_covariate$time)
       )
     }
   }
@@ -893,6 +915,13 @@ testthat::test_that("calc_gmted returns expected.", {
             radius = radii[a],
             fun = "mean"
           )
+        # set column names
+        gmted_covariate <- calc_setcolumns(
+          from = gmted_covariate,
+          lag = 0,
+          dataset = "gmted",
+          locs_id = "site_id"
+        )
         # expect output is data.frame
         expect_true(
           class(gmted_covariate) == "data.frame"
@@ -946,21 +975,39 @@ testthat::test_that("calc_narr returns expected.", {
           radius = radii[r],
           fun = "mean"
         )
+      # set column names
+      narr_covariate <- calc_setcolumns(
+        from = narr_covariate,
+        lag = 0,
+        dataset = "narr",
+        locs_id = "site_id"
+      )
       # expect output is data.frame
       expect_true(
         class(narr_covariate) == "data.frame"
       )
-      # expect 4 columns
+      if (variable == "weasd") {
+        # expect 3 columns (no pressure level)
+        expect_true(
+          ncol(narr_covariate) == 3
+        )
+        # expect numeric value
+        expect_true(
+          class(narr_covariate[, 3]) == "numeric"
+        )
+      } else {
+        # expect 4 columns
+        expect_true(
+          ncol(narr_covariate) == 4
+        )
+        # expect numeric value
+        expect_true(
+          class(narr_covariate[, 4]) == "numeric"
+        )
+      }
+      # expect $time is class Date
       expect_true(
-        ncol(narr_covariate) == 4
-      )
-      # expect numeric value
-      expect_true(
-        class(narr_covariate[, 4]) == "numeric"
-      )
-      # expect date column
-      expect_true(
-        class(narr_covariate[, 2]) == "Date"
+        "Date" %in% class(narr_covariate$time)
       )
     }
   }
@@ -1003,6 +1050,13 @@ testthat::test_that("calc_geos returns as expected.", {
           radius = radii[r],
           fun = "mean"
         )
+      # set column names
+      geos_covariate <- calc_setcolumns(
+        from = geos_covariate,
+        lag = 0,
+        dataset = "geos",
+        locs_id = "site_id"
+      )
       # expect output is data.frame
       expect_true(
         class(geos_covariate) == "data.frame"
@@ -1015,9 +1069,9 @@ testthat::test_that("calc_geos returns as expected.", {
       expect_true(
         class(geos_covariate[, 4]) == "numeric"
       )
-      # expect date and time column
+      # expect $time is class POSIXt
       expect_true(
-        "POSIXt" %in% class(geos_covariate$date)
+        "POSIXt" %in% class(geos_covariate$time)
       )
     }
   }
@@ -1041,7 +1095,7 @@ testthat::test_that("calc_sedac_population returns as expected.", {
     for (r in seq_along(radii)) {
       pop <-
         process_sedac_population(
-          path = path
+          path = paths
         )
       pop_covariate <-
         calc_sedac_population(
@@ -1051,6 +1105,13 @@ testthat::test_that("calc_sedac_population returns as expected.", {
           radius = radii[r],
           fun = "mean"
         )
+      # set column names
+      pop_covariate <- calc_setcolumns(
+        from = pop_covariate,
+        lag = 0,
+        dataset = "pop",
+        locs_id = "site_id"
+      )
       # expect output is data.frame
       expect_true(
         class(pop_covariate) == "data.frame"
@@ -1063,9 +1124,9 @@ testthat::test_that("calc_sedac_population returns as expected.", {
       expect_true(
         class(pop_covariate[, 3]) == "numeric"
       )
-      # expect date and time column
+      # expect $time is class integer for year
       expect_true(
-        "integer" %in% class(pop_covariate$year)
+        "integer" %in% class(pop_covariate$time)
       )
     }
   }
@@ -1156,22 +1217,232 @@ testthat::test_that("calc_merra2 returns as expected.", {
           radius = radii[r],
           fun = "mean"
         )
+      # set column names
+      merra2_covariate <- calc_setcolumns(
+        from = merra2_covariate,
+        lag = 0,
+        dataset = "merra2",
+        locs_id = "site_id"
+      )
       # expect output is data.frame
       expect_true(
         class(merra2_covariate) == "data.frame"
       )
-      # expect 4 columns
+      if (grepl("lev", names(merra2)[1])) {
+        # expect 4 columns
+        expect_true(
+          ncol(merra2_covariate) == 4
+        )
+        # expect numeric value
+        expect_true(
+          class(merra2_covariate[, 4]) == "numeric"
+        )
+      } else {
+        # expect 3 columns
+        expect_true(
+          ncol(merra2_covariate) == 3
+        )
+        # expect numeric value
+        expect_true(
+          class(merra2_covariate[, 3]) == "numeric"
+        )
+      }
+      # expect $time is class Date
       expect_true(
-        ncol(merra2_covariate) == 4
+        "POSIXt" %in% class(merra2_covariate$time)
       )
-      # expect numeric value
+    }
+  }
+})
+
+testthat::test_that("calc_gridmet returns as expected.", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  radii <- c(0, 1000)
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  # expect function
+  expect_true(
+    is.function(calc_terraclimate)
+  )
+  for (r in seq_along(radii)) {
+    gridmet <-
+      process_gridmet(
+        date = c("2018-01-03", "2018-01-03"),
+        variable = "pr",
+        path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "gridmet",
+          "pr"
+        )
+      )
+    gridmet_covariate <-
+      calc_gridmet(
+        from = gridmet,
+        locs = data.table::data.table(ncp),
+        locs_id = "site_id",
+        radius = radii[r],
+        fun = "mean"
+      )
+    # set column names
+    gridmet_covariate <- calc_setcolumns(
+      from = gridmet_covariate,
+      lag = 0,
+      dataset = "gridmet",
+      locs_id = "site_id"
+    )
+    # expect output is data.frame
+    expect_true(
+      class(gridmet_covariate) == "data.frame"
+    )
+    # expect 3 columns
+    expect_true(
+      ncol(gridmet_covariate) == 3
+    )
+    # expect numeric value
+    expect_true(
+      class(gridmet_covariate[, 3]) == "numeric"
+    )
+    # expect $time is class Date
+    expect_true(
+      "Date" %in% class(gridmet_covariate$time)
+    )
+  }
+})
+
+testthat::test_that("calc_terraclimate returns as expected.", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  radii <- c(0, 1000)
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  # expect function
+  expect_true(
+    is.function(calc_terraclimate)
+  )
+  for (r in seq_along(radii)) {
+    terraclimate <-
+      process_terraclimate(
+        date = c("2018-01-01", "2018-01-01"),
+        variable = "Precipitation",
+        path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "terraclimate",
+          "ppt"
+        )
+      )
+    terraclimate_covariate <-
+      calc_terraclimate(
+        from = terraclimate,
+        locs = data.table::data.table(ncp),
+        locs_id = "site_id",
+        radius = radii[r],
+        fun = "mean"
+      )
+    # set column names
+    terraclimate_covariate <- calc_setcolumns(
+      from = terraclimate_covariate,
+      lag = 0,
+      dataset = "terraclimate",
+      locs_id = "site_id"
+    )
+    # expect output is data.frame
+    expect_true(
+      class(terraclimate_covariate) == "data.frame"
+    )
+    # expect 3 columns
+    expect_true(
+      ncol(terraclimate_covariate) == 3
+    )
+    # expect numeric value
+    expect_true(
+      class(terraclimate_covariate[, 3]) == "numeric"
+    )
+    # expect date and time column
+    expect_true(
+      nchar(terraclimate_covariate$time)[1] == 6
+    )
+  }
+})
+
+testthat::test_that("calc_lagged returns as expected.", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  lags <- c(0, 1, 2)
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  # expect function
+  expect_true(
+    is.function(calc_lagged)
+  )
+  for (l in seq_along(lags)) {
+    narr <-
+      process_narr(
+        date = c("2018-01-01", "2018-01-10"),
+        variable = "weasd",
+        path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "narr",
+          "weasd"
+        )
+      )
+    narr_covariate <-
+      calc_narr(
+        from = narr,
+        locs = ncp,
+        locs_id = "site_id",
+        radius = 0,
+        fun = "mean"
+      )
+    # set column names
+    narr_covariate <- calc_setcolumns(
+      from = narr_covariate,
+      lag = 0,
+      dataset = "narr",
+      locs_id = "site_id"
+    )
+    # expect identical if lag = 0
+    if (lags[l] == 0) {
+      narr_lagged <- calc_lagged(
+        from = narr_covariate,
+        date = c("2018-01-05", "2018-01-10"),
+        lag = lags[l],
+        locs_id = "site_id",
+        time_id = "time"
+      )
+      expect_identical(narr_lagged, narr_covariate)
+    } else {
+      # expect error because 2018-01-01 will not have lag data from 2017-12-31
+      expect_error(
+        calc_lagged(
+          from = narr_covariate,
+          date = c("2018-01-01", "2018-01-10"),
+          lag = lags[l],
+          locs_id = "site_id",
+          time_id = "time"
+        )
+      )
+      narr_lagged <- calc_lagged(
+        from = narr_covariate,
+        date = c("2018-01-05", "2018-01-10"),
+        lag = lags[l],
+        locs_id = "site_id",
+        time_id = "time"
+      )
+      # expect output is data.frame
       expect_true(
-        class(merra2_covariate[, 4]) == "numeric"
+        class(narr_lagged) == "data.frame"
       )
-      # expect date and time column
-      expect_true(
-        "POSIXt" %in% class(merra2_covariate$date)
-      )
+      # expect lag day
+      expect_true(grepl("_[0-9]{1}_", colnames(narr_lagged)[3]))
+      # expect no NA
+      expect_true(all(!is.na(narr_lagged)))
     }
   }
 })
