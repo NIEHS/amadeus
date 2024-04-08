@@ -2513,3 +2513,24 @@ process_prism <-
     return(prism)
   }
 # nolint end
+
+
+#' Process OpenLandMap data
+#' @param path character giving OpenLandMap data path
+#' @param ... Placeholders.
+#' @returns SpatRaster
+#' @author Insang Song
+#' @importFrom terra rast
+#' @export
+process_olm <-
+  function(
+    path = NULL,
+    ...
+  ) {
+    # check inputs
+    if (!is.character(path) || is.null(path)) {
+      stop("path is not a character.")
+    }
+    olm <- terra::rast(path)
+    return(olm)
+  }

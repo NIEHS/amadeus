@@ -2540,6 +2540,80 @@ download_nei_data <- function(
 #' Accesses and downloads OpenLandMap data from the [OpenLandMap website](https://www.openlandmap.org/).
 #' @param product character(1). Available collection name in OpenLandMap
 #' STAC Catalog. [list_stac_files] with `id_only = TRUE` to see available collections.
+#' * "no2_s5p.l3.trop.tmwm"
+#' * "no2_s5p.l3.trop.tmwm.ltm"
+#' * "log.oc_iso.10694"
+#' * "evi_mod13q1.stl.trend.logit.ols.beta"
+#' * "land.cover_esacci.lc.l4"
+#' * "evi_mod13q1.tmwm.inpaint"
+#' * "dtm.bareearth_ensemble"
+#' * "fapar_essd.lstm"
+#' * "fapar_essd.lstm.p95.beta"
+#' * "pot.fapar_fapar.p95.eml.m"
+#' * "pot.fapar_fapar.p95.eml"
+#' * "snow.cover_esa.modis"
+#' * "snow.cover_esa.modis.ltm"
+#' * "wilderness_li2022.human.footprint"
+#' * "wv_mcd19a2v061.seasconv"
+#' * "wv_mcd19a2v061.seasconv.m_p50"
+#' * "wv_mcd19a2v061.seasconv.m_p25"
+#' * "wv_mcd19a2v061.seasconv.m_p75"
+#' * "wv_mcd19a2v061.seasconv.m_std"
+#' * "wv_mcd19a2v061.seasconv.m.yearly"
+#' * "bulkdens.fineearth_usda.4a1h"
+#' * "geom_merit.dem"
+#' * "fapar_proba.v"
+#' * "forest.cover_esacci.ifl"
+#' * "grtgroup_usda.soiltax"
+#' * "land.cover_copernicus"
+#' * "organic.carbon.stock_msa.kgm2"
+#' * "organic.carbon_usda.6a1c"
+#' * "pft.landcover_esa.cci.lc"
+#' * "precipitation_sm2rain.ltm"
+#' * "ph.h2o_usda.4c1a2a"
+#' * "pop.count_ghs.jrc"
+#' * "sand.wfraction_usda.3a1a1a"
+#' * "lc_mcd12q1v061.p1"
+#' * "texture.class_usda.tt"
+#' * "water.occurrence_jrc.surfacewater"
+#' * "watercontent.33kPa_usda.4b1c"
+#' * "dsm_glo30"
+#' * "lc_glad.glcluc"
+#' * "lc_glad.glcluc.change"
+#' * "landuse.cropland_hyde"
+#' * "landuse.pasture_hyde"
+#' * "land.use.land.cover_hilda.plus"
+#' * "lst_mod11a2.daytime.trend.logit.ols.beta"
+#' * "lst_mod11a2.nighttime.trend.logit.ols.beta"
+#' * "lst_mod11a2.daytime.annual"
+#' * "lst_mod11a2.nighttime.annual"
+#' * "lst_mod11a2.daytime"
+#' * "lst_mod11a2.nighttime"
+#' * "landform_usgs.ecotapestry"
+#' * "lithology_usgs.ecotapestry"
+#' * "grtgroup_usda.soiltax.hapludalfs"
+#' * "biome.type_biome00k"
+#' * "biomes_biome6k.tropical.evergreen.broadleaf.forest"
+#' * "biomes_biome6k.tropical.evergreen.broadleaf.forest.rcp26"
+#' * "biomes_biome6k.tropical.evergreen.broadleaf.forest.rcp45"
+#' * "biomes_biome6k.tropical.evergreen.broadleaf.forest.rcp85"
+#' * "biomes_biome6k.tropical.savanna"
+#' * "biomes_biome6k.tropical.savanna.rcp26"
+#' * "biomes_biome6k.tropical.savanna.rcp45"
+#' * "biomes_biome6k.tropical.savanna.rcp85"
+#' * "lc_glc.fcs30d"
+#' * "nightlights.average_viirs.v21"
+#' * "nightlights.difference_viirs.v21"
+#' * "l2a.gedi"
+#' * "fluxnet"
+#' * "gbov"
+#' * "geowiki.lc"
+#' * "geowiki.forest.loss"
+#' * "veg.plot"
+#' * "obis"
+#' * "fapar.eml"
+#' @param format character(1). File format to query. Default is "tif".
+#' It could be used as a pattern search for the file names.
 #' @param directory_to_save character(1). Directory to download files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -2551,15 +2625,17 @@ download_nei_data <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Insang Song
-#' @note JSON files should be found at STAC catalog of OpenLandMap
-#' @returns NULL; Yearly comma-separated value (CSV) files will be stored in
+#' @note `extdata/openlandmap_assets.rds` contains the available assets in OpenLandMap.
+#' Users may want to check the available assets to download data directly.
+#' For developers: JSON files should be found at STAC catalog of OpenLandMap when updated.
+#' @returns NULL; GeoTIFF (.tif) files will be stored in
 #' \code{directory_to_save}.
 #' @seealso [list_stac_files]
 #' @export
 # nolint end
 download_olm_data <- function(
   product = NULL,
-  file_format = "tif",
+  format = "tif",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -2576,7 +2652,7 @@ download_olm_data <- function(
   download_urls <-
     list_stac_files(
       which = product,
-      format = file_format,
+      format = format,
       id_only = FALSE
     )
   url_filenames <- strsplit(download_urls, "/", fixed = TRUE)[[1]]
