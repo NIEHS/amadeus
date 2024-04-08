@@ -1243,3 +1243,296 @@ testthat::test_that("download_hms_data LIVE run.", {
   sapply(files, file.remove)
   file.remove(directory)
 })
+
+
+
+
+testthat::test_that("download_cropscape_data throws an error for invalid year", {
+  # Set up test data
+  invalid_year <- 1996
+  testthat::expect_error(download_cropscape_data(year = 2020, source = "CMU"))
+  # Call the function and expect an error
+  testthat::expect_error(download_cropscape_data(year = invalid_year, source = "GMU"))
+  testthat::expect_error(download_cropscape_data(year = 2000, source = "USDA"))
+})
+
+testthat::test_that("download_cropscape_data generates correct download commands (GMU)", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # Set up test data
+  year <- 2010
+  directory_to_save <- testthat::test_path("../testdata/")
+
+  # Call the function
+  testthat::expect_no_error(
+    download_cropscape_data(
+      year = year,
+      source = "GMU",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE
+    )
+  )
+  commands_path <- paste0(
+    directory_to_save,
+    "CropScape_CDL_",
+    "GMU",
+    "_",
+    year,
+    "_",
+    Sys.Date(),
+    "_wget_commands.txt"
+  )
+
+  # import commands
+  commands <- read_commands(commands_path = commands_path)
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 5)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  # implement unit tests
+  test_download_functions(directory_to_download = directory_to_save,
+                          directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+  # remove file with commands after test
+  file.remove(commands_path)
+
+})
+
+
+test_that("download_cropscape_data generates correct download commands (USDA)", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # Set up test data
+  year <- 2010
+  directory_to_save <- testthat::test_path("../testdata/")
+
+  # Call the function
+  testthat::expect_no_error(
+    download_cropscape_data(
+      year = year,
+      source = "USDA",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE
+    )
+  )
+  commands_path <- paste0(
+    directory_to_save,
+    "CropScape_CDL_",
+    "USDA",
+    "_",
+    year,
+    "_",
+    Sys.Date(),
+    "_wget_commands.txt"
+  )
+
+  # import commands
+  commands <- read_commands(commands_path = commands_path)
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 5)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  # implement unit tests
+  test_download_functions(directory_to_download = directory_to_save,
+                          directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+  # remove file with commands after test
+  file.remove(commands_path)
+
+})
+
+
+testthat::test_that("download_prism_data downloads the correct data files", {
+  # Set up test data
+  time <- seq(201005, 201012, by = 1)
+  element <- c("ppt", "tmin", "tmax", "tmean", "tdmean",
+               "vpdmin", "vpdmax")
+  # in case of multiple test runs
+  # note that PRISM download for the same data element
+  # is allowed up to twice a day. IP address could be blocked
+  # if the limit is exceeded
+  time <- sample(time, 1)
+  element <- sample(element, 1)
+  data_type <- "ts"
+  format <- "nc"
+  directory_to_save <- testthat::test_path("..", "testdata/")
+  acknowledgement <- TRUE
+  download <- FALSE
+  remove_command <- FALSE
+  unzip <- FALSE
+
+  # Call the function
+  download_prism_data(
+    time = time,
+    element = element,
+    data_type = data_type,
+    format = format,
+    directory_to_save = directory_to_save,
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip
+  )
+
+  testthat::expect_message(
+    download_prism_data(
+      time = time,
+      element = "ppt",
+      data_type = "normals",
+      format = "asc",
+      directory_to_save = directory_to_save,
+      acknowledgement = acknowledgement,
+      download = download,
+      remove_command = TRUE,
+      unzip = FALSE
+    )
+  )
+
+  commands_path <- paste0(
+    directory_to_save,
+    "PRISM_",
+    element,
+    "_",
+    data_type,
+    "_",
+    time,
+    "_",
+    Sys.Date(),
+    "_wget_commands.txt"
+  )
+  # import commands
+  commands <- read_commands(commands_path = commands_path)
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 6)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  # implement unit tests
+  test_download_functions(directory_to_download = directory_to_save,
+                          directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+  # remove file with commands after test
+  file.remove(commands_path)
+
+  # Set up test data
+  time <- "202105"
+  element <- "soltotal"
+  data_type <- "ts"
+  format <- "nc"
+  directory_to_save <- testthat::test_path("..", "testdata/")
+  acknowledgement <- TRUE
+  download <- FALSE
+  remove_command <- FALSE
+  unzip <- TRUE
+
+  # Call the function and expect an error
+  testthat::expect_error(download_prism_data(
+    time = time,
+    element = element,
+    data_type = data_type,
+    format = format,
+    directory_to_save = directory_to_save,
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip
+  ))
+
+})
+
+
+
+testthat::test_that("list_stac_files returns a character vector of file links", {
+  withr::local_package("rstac")
+  # Set up test data
+  stac_json <- "https://s3.eu-central-1.wasabisys.com/stac/openlandmap/catalog.json"
+  format <- "tif"
+  which <- 64
+
+  # Call the function
+  testthat::expect_message(
+    result <- list_stac_files(stac_json, format, which)
+  )
+  # Check the return type
+  testthat::expect_true(is.character(result))
+  # Check if all elements end with the specified format
+  testthat::expect_true(all(grepl(sprintf("%s$", format), result)))
+
+  # string search keyword
+  keyword <- "bulkdens"
+  testthat::expect_message(
+    result1 <- list_stac_files(stac_json, format, keyword)
+  )
+  testthat::expect_true(is.character(result1))
+
+  # retrieve ids only
+  testthat::expect_no_error(
+    result2 <- list_stac_files(stac_json, format, keyword, id_only = TRUE)
+  )
+  testthat::expect_true(is.character(result2))
+
+})
+
+
+testthat::test_that("download_huc_data works",
+  {
+    withr::local_package("httr")
+
+    directory_to_save <- testthat::test_path("..", "testdata/")
+    allregions <- c("Lower48", "Islands")
+    alltypes <- c("Seamless", "OceanCatchment")
+
+    for (region in allregions) {
+      for (type in alltypes) {
+        testthat::expect_no_error(
+          download_huc_data(
+            region, type,
+            directory_to_save,
+            acknowledgement = TRUE,
+            download = FALSE,
+            unzip = FALSE
+          )
+        )
+        commands_path <- paste0(
+          directory_to_save,
+          "USGS_NHD_",
+          region,
+          "_",
+          type,
+          "_",
+          Sys.Date(),
+          "_wget_commands.txt"
+        )
+        # import commands
+        commands <- read_commands(commands_path = commands_path)
+        # extract urls
+        urls <- extract_urls(commands = commands, position = 5)
+        # check HTTP URL status
+        url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+        # implement unit tests
+        test_download_functions(directory_to_download = directory_to_save,
+                                directory_to_save = directory_to_save,
+                                commands_path = commands_path,
+                                url_status = url_status)
+        # remove file with commands after test
+        file.remove(commands_path)
+    
+        }
+      }
+    
+      testthat::expect_error(
+        download_huc_data(
+          "Lower48", "OceanCatchment",
+          tempdir(),
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = TRUE
+        )
+      )
+  })

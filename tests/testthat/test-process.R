@@ -1041,3 +1041,129 @@ testthat::test_that("process_merra2 returns as expected.", {
     )
   }
 })
+
+
+test_that("process_prism returns a SpatRaster object with correct metadata", {
+  # Set up test data
+  withr::local_package("terra")
+  path <- testthat::test_path(
+    "..", "testdata", "prism", "PRISM_tmin_30yr_normal_4kmD1_0228_bil_test.nc"
+  )
+  element <- "tmin"
+  time <- "0228"
+
+  # Call the function
+  expect_no_error(result <- process_prism(path, element, time))
+
+  # Check the return type
+  expect_true(inherits(result, "SpatRaster"))
+
+  # Check the metadata
+  expect_equal(unname(terra::metags(result)["time"]), time)
+  expect_equal(unname(terra::metags(result)["element"]), element)
+
+  # Set up test data
+  path <- "/path/to/nonexistent/folder"
+  element <- "invalid_element"
+  time <- "invalid_time"
+
+  # Call the function and expect an error
+  expect_error(process_prism(path, element, time))
+})
+
+
+testthat::test_that(
+  "process_cropscape returns a SpatRaster object with correct metadata", {
+    # Set up test data
+    filepath <-
+      testthat::test_path("..", "testdata/cropscape/cdl_30m_r_nc_2019_sub.tif")
+    dirpath <- testthat::test_path("..", "testdata/cropscape")
+    year <- 2019
+
+    # Call the function
+    testthat::expect_no_error(result <- process_cropscape(filepath, year))
+    testthat::expect_no_error(process_cropscape(dirpath, year))
+
+    # Check the return type
+    testthat::expect_true(inherits(result, "SpatRaster"))
+
+    # Check the metadata
+    testthat::expect_equal(
+      unname(terra::metags(result)["year"]),
+      as.character(year)
+    )
+
+    # error cases
+    testthat::expect_error(process_cropscape(path = 0, year = "MILLENNIUM"))
+    testthat::expect_error(
+      process_cropscape(path = "/home/some/path", year = "MILLENNIUM")
+    )
+  }
+)
+
+
+testthat::test_that("process_huc",
+  {
+    withr::local_package("terra")
+    withr::local_package("sf")
+    withr::local_package("nhdplusTools")
+    withr::local_options(list(sf_use_s2 = FALSE))
+    # Set up test data
+    path <- testthat::test_path(
+      "..", "testdata", "huc12", "NHDPlus_test.gpkg"
+    )
+
+    # Call the function
+    testthat::expect_error(process_huc(path))
+    testthat::expect_no_error(
+      result <-
+        process_huc(
+          path,
+          layer_name = "NHDPlus_test",
+          huc_level = "HUC_12",
+          huc_header = "030202"
+        )
+    )
+    testthat::expect_true(inherits(result, "SpatVector"))
+
+    # query case
+    testthat::expect_no_error(
+      result <-
+        process_huc(
+          path,
+          layer_name = "NHDPlus_test",
+          huc_level = "HUC_12",
+          huc_header = "030202"
+        )
+    )
+    testthat::expect_true(inherits(result, "SpatVector"))
+
+    testthat::expect_error(
+      process_huc(
+        path,
+        layer_name = "HUc",
+        huc_level = "HUC_12",
+        huc_header = "030202"
+      )
+    )
+
+
+    # Set up test data
+    path <- file.path(path, "..")
+
+    # Call the function and expect an error
+    testthat::expect_error(process_huc(path))
+    # using nhdplusTools
+    testthat::expect_no_error(
+      test3 <- process_huc(
+        "",
+        layer_name = NULL,
+        huc_level = NULL,
+        huc_header = NULL,
+        id = "030202",
+        type = "huc06"
+      )
+    )
+    testthat::expect_s4_class(test3, "SpatVector")
+  }
+)

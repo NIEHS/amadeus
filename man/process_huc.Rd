@@ -25,23 +25,30 @@ a \code{SpatVector} object
 Retrieve Hydrologic Unit Code (HUC) data
 }
 \examples{
-
+\dontrun{
 library(terra)
-getf <- "../../../../group/set/Projects/PrestoGP_Pesticides/input/WBD-National/WBD_National_GDB.gdb"
+getf <- "WBD_National_GDB.gdb"
+# check the layer name to read
 terra::vector_layers(getf)
-test <- process_huc(
+test1 <- process_huc(
   getf,
   layer_name = "WBDHU8",
   huc_level = "huc8"
 )
-test <- process_huc(
+test2 <- process_huc(
+  getf,
+  layer_name = "WBDHU8",
+  huc_level = "huc8"
+)
+test3 <- process_huc(
   "",
   layer_name = NULL,
   huc_level = NULL,
   huc_header = NULL,
-  id = "020974",
+  id = "030202",
   type = "huc06"
 )
+}
 }
 \seealso{
 \code{\link[nhdplusTools:get_huc]{nhdplusTools::get_huc}}

@@ -1190,8 +1190,7 @@ testthat::test_that("calc_covariates wrapper works", {
       "geos", "dummies", "gmted",
       "sedac_groads", "groads", "roads",
       "ecoregions", "ecoregion", "hms", "noaa", "smoke",
-      "gmted", "narr", "narr_monolevel", "narr_p_levels",
-      "plevels", "monolevel", "p_levels", "geos",
+      "gmted", "narr", "geos",
       "sedac_population", "population", "nlcd",
       "merra", "MERRA", "merra2", "MERRA2",
       "tri", "nei")

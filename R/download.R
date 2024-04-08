@@ -2538,9 +2538,8 @@ download_nei_data <- function(
 #' Download OpenLandMap data
 #' @description
 #' Accesses and downloads OpenLandMap data from the [OpenLandMap website](https://www.openlandmap.org/).
-# nolint end
-#' @param product character(1).
-#' Referring to https://s3.eu-central-1.wasabisys.com/stac/openlandmap/catalog.json
+#' @param product character(1). Available collection name in OpenLandMap
+#' STAC Catalog. [list_stac_files] with `id_only = TRUE` to see available collections.
 #' @param directory_to_save character(1). Directory to download files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -2551,20 +2550,20 @@ download_nei_data <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
-#' @param unzip logical(1). Unzip the downloaded zip files.
-#' Default is \code{FALSE}.
 #' @author Insang Song
 #' @note JSON files should be found at STAC catalog of OpenLandMap
 #' @returns NULL; Yearly comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
+#' @seealso [list_stac_files]
 #' @export
+# nolint end
 download_olm_data <- function(
   product = NULL,
+  file_format = "tif",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE,
-  unzip = TRUE
+  remove_command = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -2572,25 +2571,21 @@ download_olm_data <- function(
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
 
-
   #### 3. define measurement data paths
-  url_download_base <- "https://s3.openlandmap.org/arco/"
 
   download_urls <-
-    paste0(
-      sprintf(url_download_base, year_target),
-      url_download_remain
+    list_stac_files(
+      which = product,
+      format = file_format,
+      id_only = FALSE
     )
-  download_names_file <-
-    c("2017neiApr_onroad_byregions.zip",
-      "2020nei_onroad_byregion.zip")
-  download_names <- paste0(directory_to_save, download_names_file)
+  url_filenames <- strsplit(download_urls, "/", fixed = TRUE)[[1]]
+  url_filenames <- sapply(url_filenames, \(x) x[length(x)])
 
+  download_names <- paste0(directory_to_save, url_filenames)
   #### 4. build download command
   download_commands <-
-    paste0("wget --ca-certificate=",
-           epa_certificate_path,
-           " ",
+    paste0("wget -e robots=off -np ",
            download_urls,
            " -O ",
            download_names,
@@ -2599,8 +2594,8 @@ download_olm_data <- function(
   #### 5. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
     directory_to_save,
-    "NEI_AADT_",
-    paste(year_target, collapse = "-"),
+    "OLM_queried_",
+    product,
     "_",
     Sys.Date(),
     "_wget_commands.txt"
@@ -2620,17 +2615,6 @@ download_olm_data <- function(
   download_run(download = download,
                system_command = system_command)
 
-  #### 10. unzip data
-  # note that this part does not utilize download_unzip
-  # as duplicate file names are across multiple zip files
-  if (download) {
-    if (unzip) {
-      dir_unzip <- sub(".zip", "", download_names)
-      for (fn in seq_along(dir_unzip)) {
-        utils::unzip(zipfile = download_names[fn], exdir = dir_unzip[fn])
-      }
-    }
-  }
   message("Requests were processed.\n")
   #### 10. remove download commands
   download_remove_command(commands_txt = commands_txt,
@@ -2639,15 +2623,20 @@ download_olm_data <- function(
 }
 
 
-
 # nolint start
-#' Download CropScape data
+#' Download National Hydrography Dataset (NHD) data
 #' @description
-#' Accesses and downloads United States Department of Agriculture
-#' CropScape Cropland Data Layer data from the 
-#' [George Mason University website](https://https://nassgeodata.gmu.edu/CropScape/).
-# nolint end
-#' @param year integer(1). Year of the data to download.
+#' NHDPlus data provides the most comprehensive and high-resolution
+#' hydrography data. This function downloads **national** dataset from
+#' NHDPlus Version 2.1 on USGS Amazon S3 storage.
+#' @note
+#' For HUC, set `type = "Seamless"`. HUC12 layer presents in the seamless
+#' geodatabase. Users can aggregate HUC12 layer to make HUC6, HUC8, HUC10, etc.
+#' For whom wants to download a specific region,
+#' please visit [Get NHDPlus Data](https://www.epa.gov/waterdata/get-nhdplus-national-hydrography-dataset-plus-data#ListofAreas)
+#' @param region character(1). One of `c("Lower48", "Islands")`.
+#' When `"Islands"` is selected, the data will be downloaded for Hawaii, Puerto Rico, and Virgin Islands.
+#' @param type character(1). One of `c("Seamless", "OceanCatchment")`.
 #' @param directory_to_save character(1). Directory to download files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -2658,23 +2647,180 @@ download_olm_data <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
-#' @param unzip logical(1). Unzip the downloaded zip files.
+#' @param unzip logical(1). Unzip the downloaded compressed files.
+#' Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.
+#' @returns None. Downloaded files will be stored in \code{directory_to_save}.
+#' @author Insang Song
+#' @examples
+#' \dontrun{
+#' download_huc("Lower48", "Seamless", "~/data"
+#'              acknowledgement = TRUE,
+#'              download = TRUE,
+#'              unzip = TRUE)
+#' }
+#' @export
+# @importFrom archive archive_extract
+download_huc_data <-
+  function(
+    region = c("Lower48", "Islands"),
+    type = c("Seamless", "OceanCatchment"),
+    directory_to_save = NULL,
+    acknowledgement = FALSE,
+    download = FALSE,
+    remove_command = FALSE,
+    unzip = FALSE
+  ) {
+    #### 1. check for data download acknowledgement
+    download_permit(acknowledgement = acknowledgement)
+    #### 2. directory setup
+    download_setup_dir(directory_to_save)
+    directory_to_save <- download_sanitize_path(directory_to_save)
+
+    region <- match.arg(region)
+    type <- match.arg(type)
+
+    url_base <-
+      "https://dmap-data-commons-ow.s3.amazonaws.com/NHDPlusV21/Data/NationalData/"
+
+    if (region == "Lower48") {
+      if (type == "Seamless") {
+        url_template_nat <-
+          "NHDPlusV21_NationalData_Seamless_Geodatabase_Lower48_07.7z"
+      }
+      if (type == "OceanCatchment") {
+        url_template_nat <-
+          "NHDPlusV21_NationalData_OceanCatchment_Lower48_fgdb_01.7z"
+      }
+    }
+    if (region == "Islands") {
+      if (type == "Seamless") {
+        url_template_nat <-
+          "NHDPlusV21_NationalData_Seamless_Geodatabase_HI_PR_VI_PI_03.7z"
+      }
+      if (type == "OceanCatchment") {
+        url_template_nat <-
+          "NHDPlusV21_NationalData_OceanCatchment_Islands_fgdb_01.7z"
+      }
+    }
+    download_urls <- paste0(url_base, url_template_nat)
+    download_names <- paste0(directory_to_save, url_template_nat)
+
+    #### 4. build download command
+    download_commands <-
+      paste0(
+        "wget -e robots=off -np",
+        " ",
+        download_urls,
+        " -O ",
+        download_names,
+        "\n"
+      )
+
+    #### 5. initiate "..._curl_commands.txt"
+    commands_txt <- paste0(
+      directory_to_save,
+      "USGS_NHD_",
+      region,
+      "_",
+      type,
+      "_",
+      Sys.Date(),
+      "_wget_commands.txt"
+    )
+    download_sink(commands_txt)
+    #### 6. concatenate and print download commands to "..._curl_commands.txt"
+    writeLines(download_commands)
+    #### 7. finish "..._curl_commands.txt" file
+    sink()
+    #### 8. build system command
+    system_command <- paste0(
+      ". ",
+      commands_txt,
+      "\n"
+    )
+    #### 9. download data
+    download_run(download = download,
+                 system_command = system_command)
+
+    #### 10. unzip data
+    # note that this part does not utilize download_unzip
+    # as duplicate file names are across multiple zip files
+    if (download) {
+      if (unzip) {
+        stop("Unzipping is not supported for 7z files. Please do it manually with 7-zip program")
+        # dir_unzip <- gsub("(\\.7z)", "", download_names)
+        # for (fn in seq_along(dir_unzip)) {
+        #   archive::archive_extract(
+        #     archive = download_names[fn],
+        #     dir = dir_unzip[fn]
+        #   )
+        # }
+      }
+    }
+    message("Requests were processed.\n")
+    #### 10. remove download commands
+    download_remove_command(commands_txt = commands_txt,
+                            remove = remove_command)
+
+  }
+# nolint end
+
+
+
+# nolint start
+#' Download CropScape data
+#' @description
+#' Accesses and downloads United States Department of Agriculture
+#' CropScape Cropland Data Layer data from 
+#' the [USDA National Agricultural Statistics Service](https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.php) or the 
+#' [George Mason University website](https://https://nassgeodata.gmu.edu/CropScape/).
+#' @param year integer(1). Year of the data to download.
+#' @param source character(1). Data source, one of `c("USDA", "GMU")`.
+#' * `"USDA"` will download the national data from the USDA website (available in 2008-last year).
+#' * `"GMU"` will download the data from the George Mason University website (available in 1997-last year).
+#' @param directory_to_save character(1). Directory to download files.
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
+#' large and use lots of machine storage and memory.
+#' @param download logical(1). \code{FALSE} will generate a *.txt file
+#' containing all download commands. By setting \code{TRUE} the function
+#' will download all of the requested data files.
+#' @param remove_command logical(1).
+#' Remove (\code{TRUE}) or keep (\code{FALSE})
+#' the text file containing download commands.
+#' @param unzip logical(1). Unzip the downloaded compressed files.
 #' Default is \code{FALSE}.
 #' @author Insang Song
 #' @note JSON files should be found at STAC catalog of OpenLandMap
 #' @returns NULL; Yearly comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_cropscape_data(
+#'   2020, "~/data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   unzip = TRUE
+#' )
+#' }
+#' @importFrom utils untar
+#' @importFrom utils unzip
 #' @export
 download_cropscape_data <- function(
   year = seq(1997, 2023),
+  source = c("USDA", "GMU"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE
 ) {
-  if (year < 1997) {
+  source <- match.arg(source)
+  if (source == "GMU" && year < 1997) {
     stop("Year should be equal to or greater than 1997.")
+  }
+  if (source == "USDA" && year < 2008) {
+    stop("Year should be equal to or greater than 2008.")
   }
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -2683,9 +2829,16 @@ download_cropscape_data <- function(
   directory_to_save <- download_sanitize_path(directory_to_save)
 
   #### 3. define measurement data paths
-  url_download_base <-
-    "https://nassgeodata.gmu.edu/nass_data_cache/tar/"
-  filename_template <- "%d_cdls.tar.gz"
+  url_download_base <- switch(
+    source,
+    USDA = "https://www.nass.usda.gov/Research_and_Science/Cropland/Release/datasets/",
+    GMU = "https://nassgeodata.gmu.edu/nass_data_cache/tar/"
+  )
+  filename_template <- switch(
+    source,
+    USDA = "%d_30m_cdls.zip",
+    GMU = "%d_cdls.tar.gz"
+  )
   url_download_template <- paste0(url_download_base, filename_template)
 
   download_urls <-
@@ -2706,7 +2859,9 @@ download_cropscape_data <- function(
   commands_txt <- paste0(
     directory_to_save,
     "CropScape_CDL_",
-    paste(year, collapse = "-"),
+    source,
+    "_",
+    year,
     "_",
     Sys.Date(),
     "_wget_commands.txt"
@@ -2731,9 +2886,14 @@ download_cropscape_data <- function(
   # as duplicate file names are across multiple zip files
   if (download) {
     if (unzip) {
-      dir_unzip <- gsub("(\\.tar|\\.tar\\.gz)", "", download_names)
+      extension <- ifelse(source == "USDA", "\\.zip", "(\\.tar|\\.tar\\.gz)")
+      dir_unzip <- gsub(extension, "", download_names)
       for (fn in seq_along(dir_unzip)) {
-        utils::untar(tarfile = download_names[fn], exdir = dir_unzip[fn])
+        if (source == "GMU") {
+          utils::untar(tarfile = download_names[fn], exdir = dir_unzip[fn])
+        } else {
+          utils::unzip(zipfile = download_names[fn], exdir = dir_unzip[fn])
+        }
       }
     }
   }
@@ -2743,7 +2903,7 @@ download_cropscape_data <- function(
                           remove = remove_command)
 
 }
-
+# nolint end
 
 # nolint start
 #' Download PRISM data
@@ -2786,9 +2946,24 @@ download_cropscape_data <- function(
 #' @author Insang Song
 #' @returns NULL; .bil (normals) or single grid files depending on the format choice.
 #' \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_prism_data(
+#'   time = "202104",
+#'   element = "ppt",
+#'   data_type = "ts",
+#'   format = "nc",
+#'   directory_to_save = "~/data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE,
+#'   unzip = TRUE
+#' )
+#' }
 #' @references
 #' * [PRISM Climate Group](http://www.prism.oregonstate.edu/)
 #' * [PRISM Web Service Guide](https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf)
+#' @importFrom utils unzip
 #' @export
 # nolint end
 download_prism_data <- function(
@@ -2806,6 +2981,8 @@ download_prism_data <- function(
 ) {
   data_type <- match.arg(data_type)
   element <- match.arg(element)
+  format <- match.arg(format)
+
   if (startsWith(data_type, "ts")) {
     if (startsWith(element, "sol")) {
       stop("sol* elements are not available for 'ts' data type.")
@@ -2830,7 +3007,7 @@ download_prism_data <- function(
   #### 3. define measurement data paths
   url_download_template <-
     file.path(
-      "https://services.nacse.org/prism/data/public/",
+      "https://services.nacse.org/prism/data/public",
       url_middle
     )
 
@@ -2838,13 +3015,15 @@ download_prism_data <- function(
     ifelse(data_type == "ts",
            sprintf(url_download_template, element, time, format),
            sprintf(url_download_template, element, time))
- 
+
   #### 4. build download command
+  # --content-disposition flag is for web service retrieval
+  # when using the URL does not end with the file name
   download_commands <-
-    paste0("wget -e robots=off -np",
-           " ",
+    paste0("wget -e robots=off -np ",
+           "--content-disposition ",
            download_urls,
-           " -C ",
+           " -P ",
            directory_to_save,
            "\n")
 
@@ -2853,8 +3032,8 @@ download_prism_data <- function(
     directory_to_save,
     "PRISM_",
     element, "_",
-    time, "_",
-    paste(date, collapse = "-"),
+    data_type, "_",
+    time,
     "_",
     Sys.Date(),
     "_wget_commands.txt"
@@ -2882,11 +3061,15 @@ download_prism_data <- function(
       path_unzip <-
         list.files(
           directory_to_save,
-          pattern = "*.zip",
+          pattern = paste0("*.*", element, "*.*", time, "*.*.zip"),
           full.names = TRUE
         )
       for (fn in seq_along(path_unzip)) {
-        utils::unzip(zipfile = fn, exdir = directory_to_save)
+        utils::unzip(
+          zipfile = path_unzip[fn],
+          exdir = directory_to_save,
+          overwrite = FALSE
+        )
       }
     }
   }
@@ -2896,4 +3079,3 @@ download_prism_data <- function(
                           remove = remove_command)
 
 }
-

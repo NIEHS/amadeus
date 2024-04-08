@@ -24,8 +24,7 @@
 #' - [`calc_temporal_dummies`]: `"dummies"`
 #' - [`calc_hms`]: `"hms"`, `"noaa"`, `"smoke"`
 #' - [`calc_gmted`]: `"gmted"`
-#' - [`calc_narr`]: `"narr"`, `"narr_monolevel"`, `"narr_p_levels`",
-#' `"plevels"`, `"monolevel"`, `"p_levels"`
+#' - [`calc_narr`]: `"narr"`
 #' - [`calc_geos`]: `"geos"`, `"geos_cf"`
 #' - [`calc_sedac_population`]: `"population"`, `"sedac_population"`
 #' - [`calc_sedac_groads`]: `"roads"`, `"groads"`, `"sedac_groads"`
@@ -44,8 +43,7 @@ calc_covariates <-
                     "geos", "dummies", "gmted",
                     "sedac_groads", "groads", "roads",
                     "ecoregions", "ecoregion", "hms", "noaa", "smoke",
-                    "gmted", "narr", "narr_monolevel", "narr_p_levels",
-                    "plevels", "monolevel", "p_levels", "geos",
+                    "gmted", "narr", "geos",
                     "sedac_population", "population", "nlcd",
                     "merra", "MERRA", "merra2", "MERRA2",
                     "tri", "nei"),
@@ -67,11 +65,6 @@ calc_covariates <-
       ecoregions = calc_ecoregion,
       koppen = calc_koppen_geiger,
       narr = calc_narr,
-      narr_monolevel = calc_narr,
-      monolevel = calc_narr,
-      narr_p_levels = calc_narr,
-      p_levels = calc_narr,
-      plevels = calc_narr,
       nlcd = calc_nlcd,
       noaa = calc_hms,
       smoke = calc_hms,
@@ -1821,6 +1814,7 @@ calc_sedac_groads <- function(
   area_buffer <- sites_e[1, ]
   area_buffer <- terra::expanse(area_buffer)
 
+  # assign road lengths to rlength field
   from_clip$rlength <- terra::perim(from_clip)
   from_clip <-
     aggregate(
@@ -1830,6 +1824,7 @@ calc_sedac_groads <- function(
       na.rm = TRUE
     )
   # linear unit conversion
+  # if no unit is detected, set to 1
   det_unit <- terra::linearUnits(from_re)
   if (det_unit == 0) {
     det_unit <- 1

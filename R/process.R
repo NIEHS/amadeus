@@ -2339,23 +2339,30 @@ process_locs_vector <-
 #' @importFrom rlang inject
 #' @importFrom nhdplusTools get_huc
 #' @examples
-#'
+#' \dontrun{
 #' library(terra)
-#' getf <- "../../../../group/set/Projects/PrestoGP_Pesticides/input/WBD-National/WBD_National_GDB.gdb"
+#' getf <- "WBD_National_GDB.gdb"
+#' # check the layer name to read
 #' terra::vector_layers(getf)
-#' test <- process_huc(
+#' test1 <- process_huc(
 #'   getf,
 #'   layer_name = "WBDHU8",
 #'   huc_level = "huc8"
 #' )
-#' test <- process_huc(
+#' test2 <- process_huc(
+#'   getf,
+#'   layer_name = "WBDHU8",
+#'   huc_level = "huc8"
+#' )
+#' test3 <- process_huc(
 #'   "",
 #'   layer_name = NULL,
 #'   huc_level = NULL,
 #'   huc_header = NULL,
-#'   id = "020974",
+#'   id = "030202",
 #'   type = "huc06"
 #' )
+#' }
 #' @export
 process_huc <-
   function(
@@ -2365,7 +2372,7 @@ process_huc <-
     huc_header = NULL,
     ...
   ) {
-    if (!file.exists(path) || !dir.exists(path)) {
+    if (!file.exists(path) && !dir.exists(path)) {
       hucpoly <- try(
         rlang::inject(nhdplusTools::get_huc(!!!list(...)))
       )
@@ -2374,6 +2381,7 @@ process_huc <-
           "HUC data was not found."
         )
       }
+      hucpoly <- terra::vect(hucpoly)
     }
     if (file.exists(path) || dir.exists(path)) {
       if (!is.null(huc_header)) {
@@ -2426,19 +2434,20 @@ process_cropscape <-
     if (!is.character(path) || is.null(path)) {
       stop("path is not a character.")
     }
-    if (!dir.exists(path)) {
-      stop("path does not exist.")
-    }
     if (!is.numeric(year)) {
       stop("year is not a numeric.")
     }
     # open cdl file corresponding to the year
-    cdl_file <-
-      list.files(
-        path,
-        pattern = paste0("cdl_30m_*", year, "_.*.tif$"),
-        full.names = TRUE
-      )
+    if (dir.exists(path)) {
+      cdl_file <-
+        list.files(
+          path,
+          pattern = paste0("cdl_30m_*.*", year, "_*.*.tif$"),
+          full.names = TRUE
+        )
+    } else {
+      cdl_file <- path
+    }
     cdl <- terra::rast(cdl_file)
     terra::metags(cdl) <- c(year = year)
     return(cdl)
@@ -2450,6 +2459,7 @@ process_cropscape <-
 #' This function imports and cleans raw PRISM data,
 #' returning a single `SpatRaster` object.
 #' @param path character giving PRISM data path
+#' Both file and directory path are acceptable.
 #' @param element character(1). PRISM element name
 #' @param time character(1). PRISM time name.
 #' Should be character in length of 2, 4, 6, or 8.
@@ -2475,9 +2485,6 @@ process_prism <-
     if (!is.character(path) || is.null(path)) {
       stop("path is not a character.")
     }
-    if (!dir.exists(path)) {
-      stop("path does not exist.")
-    }
     if (!nchar(time) %in% seq(2, 8, 2)) {
       stop("time does not have valid length.")
     }
@@ -2488,14 +2495,19 @@ process_prism <-
             "solslope", "soltotal", "solclear", "soltrans")) {
       stop("element is not a valid PRISM element.")
     }
-    pattern <- "PRISM_%s*.*M[4-5]_([0-1][0-9]{1,7}|annual)_*.*(bil|nc|grib2|asc)$"
-    pattern <- sprintf(pattern, element)
-    prism_file <-
-      list.files(
-        path,
-        pattern = pattern,
-        full.names = TRUE
-      )
+
+    if (dir.exists(path)) {
+      pattern <- "PRISM_%s*.*M[4-5]_([0-1][0-9]{1,7}|annual)_*.*(bil|nc|grib2|asc)$"
+      pattern <- sprintf(pattern, element)
+      prism_file <-
+        list.files(
+          path,
+          pattern = pattern,
+          full.names = TRUE
+        )
+    } else {
+      prism_file <- path
+    }
     prism <- terra::rast(prism_file)
     terra::metags(prism) <- c(time = time, element = element)
     return(prism)
