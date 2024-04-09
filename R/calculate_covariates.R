@@ -1506,7 +1506,8 @@ calc_sedac_population <- function(
     locs,
     locs_id = NULL,
     radius = 0,
-    fun = "mean") {
+    fun = "mean",
+    ...) {
   #### prepare locations list
   sites_list <- calc_prepare_locs(
     from = from,
@@ -1834,7 +1835,7 @@ calc_terraclimate <- function(
 #' @param lag integer(1). Number of lag days.
 #' @param time_id character(1). Column containing time values.
 #' @param locs_id character(1). Name of unique identifier.
-#' @seealso [calculate_covariates()]
+#' @seealso [calc_covariates()]
 #' @note
 #' In order to calculate temporally lagged covariates, `from` must contain at
 #' least the number of lag days before the desired start date. For example, if

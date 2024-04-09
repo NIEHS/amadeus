@@ -36,5 +36,5 @@ starting at 2023-12-31.
 lag, buffer radius format adopted in \code{calc_setcolumns()}.
 }
 \seealso{
-\code{\link[=calculate_covariates]{calculate_covariates()}}
+\code{\link[=calc_covariates]{calc_covariates()}}
 }
