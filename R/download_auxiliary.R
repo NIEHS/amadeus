@@ -491,4 +491,3 @@ list_stac_files <-
 
     return(list_assets)
   }
-  

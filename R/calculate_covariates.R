@@ -575,7 +575,7 @@ calc_modis_daily <- function(
 #' This function leverages the calculation of single-day MODIS
 #' covariates:
 #' * [`calc_modis_daily`]
-#' 
+#'
 #' Also, for preprocessing, see:
 #' * [`process_modis_merge`]
 #' * [`process_modis_swath`]
@@ -1895,4 +1895,4 @@ calc_lagged <- function(
   #### filter to dates of interest
   variables_return_date <- variables_return[time %in% date_sequence, ]
   return(variables_return_date)
-  }
+}
