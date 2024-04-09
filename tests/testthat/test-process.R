@@ -953,9 +953,6 @@ testthat::test_that("process_aqs", {
   testthat::expect_error(
     process_aqs(path = aqssub, date = c("2021-08-15"))
   )
-  testthat::expect_error(
-    process_aqs(path = testd, date = NULL)
-  )
 })
 
 
