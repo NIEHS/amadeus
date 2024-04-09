@@ -43,7 +43,8 @@ download_data <-
                      "modis", "narr_p_levels", "nlcd", "noaa", "sedac_groads",
                      "sedac_population", "groads", "population", "plevels",
                      "p_levels", "monolevel", "hms", "smoke", "tri", "nei",
-                     "gridmet", "terraclimate"),
+                     "gridmet", "terraclimate", "huc", "cropscape", "cdl",
+                     "prism", "olm", "openlandmap"),
     directory_to_save = NULL,
     acknowledgement = FALSE,
     ...
@@ -79,7 +80,13 @@ download_data <-
       tri = download_tri_data,
       nei = download_nei_data,
       gridmet = download_gridmet_data,
-      terraclimate = download_terraclimate_data
+      terraclimate = download_terraclimate_data,
+      huc = download_huc_data,
+      cropscape = download_cropscape_data,
+      cdl = download_cropscape_data,
+      prism = download_prism_data,
+      olm = download_olm_data,
+      openlandmap = download_olm_data
     )
 
     tryCatch(
@@ -3439,7 +3446,7 @@ download_olm_data <- function(
 
 }
 
-i
+
 # nolint start
 #' Download National Hydrography Dataset (NHD) data
 #' @description

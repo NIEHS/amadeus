@@ -72,7 +72,8 @@ testthat::test_that("test generic process_covariates", {
                    "sedac_population", "population",
                    "sedac_groads", "groads", "roads",
                    "nlcd", "narr", "nei",
-                   "ecoregions", "ecoregion")
+                   "ecoregions", "ecoregion", "huc", "cropscape", "cdl",
+                   "prism", "olm", "openlandmap", "terraclimate", "gridmet")
   for (cty in covar_types) {
     testthat::expect_error(
       process_covariates(

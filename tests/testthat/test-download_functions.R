@@ -6,7 +6,8 @@ testthat::test_that("Error when acknowledgement = FALSE", {
                          "narr_p_levels", "nlcd", "noaa", "sedac_groads",
                          "sedac_population", "groads", "population", "plevels",
                          "p_levels", "monolevel", "hms", "smoke", "gridmet",
-                         "terraclimate")
+                         "terraclimate", "huc", "cropscape", "cdl", "prism",
+                         "olm", "openlandmap")
   for (d in seq_along(download_datasets)) {
     expect_error(
       download_data(dataset_name = download_datasets[d],
@@ -23,7 +24,8 @@ testthat::test_that("Error when one parameter is NULL.", {
                          "narr_p_levels", "nlcd", "noaa", "sedac_groads",
                          "sedac_population", "groads", "population", "plevels",
                          "p_levels", "monolevel", "hms", "smoke", "gridmet",
-                         "terraclimate")
+                         "terraclimate", "huc", "cropscape", "cdl", "prism",
+                         "olm", "openlandmap")
   for (d in seq_along(download_datasets)) {
     expect_error(
       download_data(dataset_name = download_datasets[d],

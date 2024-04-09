@@ -1035,8 +1035,6 @@ calc_tri <- function(
 }
 
 
-
-
 #' Calculate road emissions covariates
 #' @param from SpatVector(1). Output of \code{process_nei()}.
 #' @param locs sf/SpatVector. Locations at NEI values are joined.
@@ -1508,50 +1506,38 @@ calc_sedac_population <- function(
     locs,
     locs_id = NULL,
     radius = 0,
-    fun = "mean",
-    ...) {
-  #### check for null parameters
-  check_for_null_parameters(mget(ls()))
-  #### prepare sites
-  if (methods::is(locs, "sf")) {
-    sites_e <- terra::vect(locs)
-  } else if (methods::is(locs, "data.frame")) {
-    sites_e <- calc_prepare_locs(
-      from = from,
-      locs_id = locs_id,
-      radius = radius
-    )
-  }
-  #### site identifiers
+    fun = "mean") {
+  #### prepare locations list
+  sites_list <- calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius
+  )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
-  #### empty location data.frame
-  sites_extracted <- NULL
-  for (l in seq_len(terra::nlyr(from))) {
-    data_layer <- from[[l]]
-    name_split <- strsplit(
-      names(data_layer),
-      "_"
-    )[[1]]
-    year <- name_split[4]
-    resolution <- name_split[5:6]
-    cat(
-      paste0(
-        "Calculating annual population density covariates for ",
-        year,
-        " at ",
-        process_sedac_codes(
-          paste0(
-            name_split[5],
-            "_",
-            name_split[6]
-          ),
-          invert = TRUE
+  #### message information
+  name_split <- strsplit(
+    names(from),
+    "_"
+  )[[1]]
+  cat(
+    paste0(
+      "Calculating population covariates for ",
+      name_split[4],
+      " at ",
+      process_sedac_codes(
+        paste0(
+          name_split[5],
+          "_",
+          name_split[6]
         ),
-        " resolution...\n"
-      )
+        invert = TRUE
+      ),
+      " resolution...\n"
     )
-#### perform extraction
+  )
+  #### perform extraction
   sites_extracted <- calc_worker(
     dataset = "skip",
     from = from,
@@ -1562,9 +1548,11 @@ calc_sedac_population <- function(
     variable = 3,
     time = 4,
     time_type = "year"
+  )
   #### return data.frame
   return(data.frame(sites_extracted))
 }
+
 
 
 
@@ -1907,4 +1895,4 @@ calc_lagged <- function(
   #### filter to dates of interest
   variables_return_date <- variables_return[time %in% date_sequence, ]
   return(variables_return_date)
-}
+  }

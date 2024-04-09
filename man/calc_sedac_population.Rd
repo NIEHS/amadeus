@@ -4,14 +4,7 @@
 \alias{calc_sedac_population}
 \title{Calculate population density covariates}
 \usage{
-calc_sedac_population(
-  from,
-  locs,
-  locs_id = NULL,
-  radius = 0,
-  fun = "mean",
-  ...
-)
+calc_sedac_population(from, locs, locs_id = NULL, radius = 0, fun = "mean")
 }
 \arguments{
 \item{from}{SpatRaster(1). Output of \code{process_sedac_population()}.}

@@ -16,19 +16,23 @@
 #' - [`process_bluemarble`]: `"bluemarble"`
 #' - [`process_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
 #' - [`process_ecoregion`]: `"ecoregion"`, `"ecoregions"`
-#' - [`process_nlcd`]: `"nlcd"`, `"NLCD"`
-#' - [`process_tri`]: `"tri"`, `"TRI"`
-#' - [`process_nei`]: `"nei"`, `"NEI`
+#' - [`process_nlcd`]: `"nlcd"`
+#' - [`process_tri`]: `"tri"`
+#' - [`process_nei`]: `"nei"`
 #' - [`process_geos`]: `"geos"`
-#' - [`process_gmted`]: `"gmted"`, `"GMTED"`
-#' - [`process_aqs`]: `"aqs"`, `"AQS"`
-#' - [`process_hms`]: `"hms"`, `"HMS"`, `"smoke"`
-#' - [`process_narr`]: `"narr"`, `"NARR"`
+#' - [`process_gmted`]: `"gmted"`
+#' - [`process_aqs`]: `"aqs"`
+#' - [`process_hms`]: `"hms"`, `"smoke"`
+#' - [`process_narr`]: `"narr"`
 #' - [`process_sedac_groads`]: `"sedac_groads"`, `"roads"`, `"groads"`
 #' - [`process_sedac_population`]: `"sedac_population"`, `"population"`
-#' - [`process_merra2`]: `"merra"`, `"MERRA"`, `"merra2"`, `"MERRA2"`
+#' - [`process_merra2`]: `"merra"`, `"merra2"`
 #' - [`process_gridmet`]: `"gridmet"`, `"gridMET`"
 #' - [`process_terraclimate`]: `"terraclimate"`, `"TerraClimate"`
+#' - [`process_huc`]: `"huc"`
+#' - [`process_cropscape`]: `"cropscape"`, `"cdl"`
+#' - [`process_prism`]: `"prism"`
+#' - [`process_olm`]: `"olm"`, `"openlandmap`
 #' @returns `SpatVector`, `SpatRaster`, `sf`, or `character` depending on
 #' covariate type and selections.
 #' @author Insang Song
@@ -46,7 +50,8 @@ process_covariates <-
                   "sedac_groads", "groads", "roads",
                   "nlcd", "tri", "narr", "nei",
                   "ecoregions", "ecoregion",
-                  "merra", "merra2", "gridmet", "terraclimate"),
+                  "merra", "merra2", "gridmet", "terraclimate",
+                  "huc", "cropscape", "cdl", "prism", "olm", "openlandmap"),
     path = NULL,
     ...
   ) {
@@ -80,7 +85,13 @@ process_covariates <-
       merra = process_merra2,
       merra2 = process_merra2,
       gridmet = process_gridmet,
-      terraclimate = process_terraclimate
+      terraclimate = process_terraclimate,
+      huc = process_huc,
+      cropscape = process_cropscape,
+      cdl = process_cropscape,
+      prism = process_prism,
+      olm = process_olm,
+      openlandmap = process_olm
     )
 
     res_covariate <-

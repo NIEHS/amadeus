@@ -9,7 +9,7 @@ process_covariates(
     "koeppen-geiger", "koppen", "koeppen", "geos", "dummies", "gmted", "hms", "smoke",
     "sedac_population", "population", "sedac_groads", "groads", "roads", "nlcd", "tri",
     "narr", "nei", "ecoregions", "ecoregion", "merra", "merra2", "gridmet",
-    "terraclimate"),
+    "terraclimate", "huc", "cropscape", "cdl", "prism", "olm", "openlandmap"),
   path = NULL,
   ...
 )
@@ -40,19 +40,23 @@ data files before passing to \code{process_covariates}}.
 \item 
 \item \code{\link{process_koppen_geiger}}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"},
 \item \code{\link{process_ecoregion}}: \code{"ecoregion"}, \code{"ecoregions"}
-\item \code{\link{process_nlcd}}: \code{"nlcd"}, \code{"NLCD"}
-\item \code{\link{process_tri}}: \code{"tri"}, \code{"TRI"}
-\item \code{\link{process_nei}}: \code{"nei"}, \verb{"NEI}
 \item 
-\item \code{\link{process_gmted}}: \code{"gmted"}, \code{"GMTED"}
-\item \code{\link{process_aqs}}: \code{"aqs"}, \code{"AQS"}
-\item \code{\link{process_hms}}: \code{"hms"}, \code{"HMS"}, \code{"smoke"}
-\item \code{\link{process_narr}}: \code{"narr"}, \code{"NARR"}
+\item 
+\item 
+\item 
+\item 
+\item 
+\item \code{\link{process_hms}}: \code{"hms"}, \code{"smoke"}
+\item 
 \item \code{\link{process_sedac_groads}}: \code{"sedac_groads"}, \code{"roads"}, \code{"groads"}
 \item \code{\link{process_sedac_population}}: \code{"sedac_population"}, \code{"population"}
-\item \code{\link{process_merra2}}: \code{"merra"}, \code{"MERRA"}, \code{"merra2"}, \code{"MERRA2"}
+\item \code{\link{process_merra2}}: \code{"merra"}, \code{"merra2"}
 \item \code{\link{process_gridmet}}: \code{"gridmet"}, \verb{"gridMET}"
 \item \code{\link{process_terraclimate}}: \code{"terraclimate"}, \code{"TerraClimate"}
+\item 
+\item \code{\link{process_cropscape}}: \code{"cropscape"}, \code{"cdl"}
+\item 
+\item \code{\link{process_olm}}: \code{"olm"}, \verb{"openlandmap}
 }
 }
 \author{

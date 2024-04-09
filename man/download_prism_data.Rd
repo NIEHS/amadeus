@@ -16,6 +16,19 @@ download_prism_data(
   remove_command = FALSE,
   unzip = TRUE
 )
+
+download_prism_data(
+  time,
+  element = c("ppt", "tmin", "tmax", "tmean", "tdmean", "vpdmin", "vpdmax", "solslope",
+    "soltotal", "solclear", "soltrans"),
+  data_type = c("ts", "normals_800", "normals"),
+  format = c("nc", "asc", "grib2"),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE
+)
 }
 \arguments{
 \item{time}{character(1). Length of 2, 4, 6, or 8. Time period for
@@ -69,8 +82,14 @@ Default is \code{FALSE}.}
 \value{
 NULL; .bil (normals) or single grid files depending on the format choice.
 \code{directory_to_save}.
+
+NULL; .bil (normals) or single grid files depending on the format choice.
+\code{directory_to_save}.
 }
 \description{
+Accesses and downloads Oregon State University's
+PRISM data from the PRISM Climate Group Web Service
+
 Accesses and downloads Oregon State University's
 PRISM data from the PRISM Climate Group Web Service
 }
@@ -88,8 +107,26 @@ download_prism_data(
   unzip = TRUE
 )
 }
+\dontrun{
+download_prism_data(
+  time = "202104",
+  element = "ppt",
+  data_type = "ts",
+  format = "nc",
+  directory_to_save = "~/data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE,
+  unzip = TRUE
+)
+}
 }
 \references{
+\itemize{
+\item \href{http://www.prism.oregonstate.edu/}{PRISM Climate Group}
+\item \href{https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf}{PRISM Web Service Guide}
+}
+
 \itemize{
 \item \href{http://www.prism.oregonstate.edu/}{PRISM Climate Group}
 \item \href{https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf}{PRISM Web Service Guide}
