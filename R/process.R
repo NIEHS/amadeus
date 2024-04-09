@@ -932,11 +932,10 @@ process_aqs <-
       )
     }
     
-    pathfiles <- try(lapply(path, read.csv))
-
-    if (inherits(pathfiles, "try-error")) {
-      stop("path is not a directory or does not contain csv files.")
+    if (length(path) == 0) {
+      stop("path does not contain csv files.")
     }
+    pathfiles <- lapply(path, read.csv)
 
     sites <- data.table::rbindlist(pathfiles, fill = TRUE)
 
@@ -2542,6 +2541,12 @@ process_prism <-
     ...
   ) {
     # check inputs
+    if (!element %in%
+          c("ppt", "tmin", "tmax", "tmean", "tdmean",
+            "vpdmin", "vpdmax",
+            "solslope", "soltotal", "solclear", "soltrans")) {
+      stop("element is not a valid PRISM element.")
+    }
     if (!is.character(path) || is.null(path)) {
       stop("path is not a character.")
     }
@@ -2549,16 +2554,9 @@ process_prism <-
       stop("time does not have valid length.")
     }
 
-    if (!element %in%
-          c("ppt", "tmin", "tmax", "tmean", "tdmean",
-            "vpdmin", "vpdmax",
-            "solslope", "soltotal", "solclear", "soltrans")) {
-      stop("element is not a valid PRISM element.")
-    }
-
     if (dir.exists(path)) {
-      pattern <- "PRISM_%s*.*M[4-5]_([0-1][0-9]{1,7}|annual)_*.*(bil|nc|grib2|asc)$"
-      pattern <- sprintf(pattern, element)
+      pattern <- "PRISM_%s*.*_%s_*.*(bil|nc|grib2|asc)$"
+      pattern <- sprintf(pattern, element, time)
       prism_file <-
         list.files(
           path,

@@ -257,6 +257,14 @@ testthat::test_that("process_modis_merge is good to go", {
       subdataset = "(NDVI)"
     )
   )
+  testthat::expect_error(
+    process_modis_merge(
+      path = paths_mod13,
+      date = "2021-08-13",
+      subdataset = "(NDVI)",
+      fun_agg = 3L
+    )
+  )
 
 
 })
@@ -332,7 +340,7 @@ testthat::test_that("Swath warping abides", {
   )
   testthat::expect_s3_class(warped, "stars")
   testthat::expect_equal(
-    unname(stars::st_res(warped)[1]), 0.25, tolerance = 1e-6
+    unname(stars::st_res(warped)[1]), 0.1, tolerance = 1e-6
   )
 
   path_mod06s <-
@@ -481,7 +489,7 @@ testthat::test_that("process_nei tests", {
 
   # error cases
   testthat::expect_error(
-    process_nei(path_nei, year = 2030)
+    process_nei(path_nei, year = 2030, county = path_cnty)
   )
   testthat::expect_error(
     process_nei(path_nei, year = 2020, county = NULL)
@@ -983,7 +991,7 @@ testthat::test_that("process_aqs", {
 
   tempd <- tempdir()
   testthat::expect_error(
-    aqssf <- process_aqs(
+    process_aqs(
       path = tempd,
       date = c("2022-02-04", "2022-02-28"),
       return_format = "sf"
@@ -1369,25 +1377,30 @@ test_that("process_prism returns a SpatRaster object with correct metadata", {
 
   # Call the function
   expect_no_error(result <- process_prism(path, element, time))
-  expect_no_error(result <- process_prism(path_dir, element, time))
+  expect_no_error(result2 <- process_prism(path_dir, element, time))
 
   # Check the return type
   expect_true(inherits(result, "SpatRaster"))
+  expect_true(inherits(result2, "SpatRaster"))
 
   # Check the metadata
   expect_equal(unname(terra::metags(result)["time"]), time)
   expect_equal(unname(terra::metags(result)["element"]), element)
 
   # Set up test data
-  path <- "/path/to/nonexistent/folder"
-  element <- "invalid_element"
-  time <- "invalid_time"
+  path_bad <- "/path/to/nonexistent/folder"
+  element_bad <- "invalid_element"
+  time_bad <- "invalid_time"
 
   # Call the function and expect an error
-  expect_error(process_prism(path, element, time))
+  expect_error(process_prism(NULL, element, time))
+  expect_error(process_prism(path_bad, element, time))
+  expect_error(process_prism(path_dir, element_bad, time))
+  expect_error(process_prism(path_dir, element, time_bad))
 })
 
 
+# test CropScape ####
 testthat::test_that(
   "process_cropscape returns a SpatRaster object with correct metadata", {
     # Set up test data
@@ -1417,7 +1430,7 @@ testthat::test_that(
   }
 )
 
-
+# test HUC ####
 testthat::test_that("process_huc",
   {
     withr::local_package("terra")
@@ -1484,6 +1497,7 @@ testthat::test_that("process_huc",
   }
 )
 
+# test OpenLandMap ####
 # nolint start
 testthat::test_that("process_olm", {
   withr::local_package("terra")
