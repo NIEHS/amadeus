@@ -1480,6 +1480,29 @@ testthat::test_that("calc_covariates wrapper works", {
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
 
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  ncp$time <- 2018
+  ncpt <-
+    terra::vect(ncp, geom = c("lon", "lat"),
+                keepgeom = TRUE, crs = "EPSG:4326")
+  ncpt$time <- c(2018)
+  path_tri <- testthat::test_path("..", "testdata", "tri")
+
+  testthat::expect_no_error(
+    tri_r <- process_tri(path = path_tri, year = 2018)
+  )
+
+  testthat::expect_no_error(
+    tri_c <- calc_covariates(
+      covariate = "tri",
+      from = tri_r,
+      locs = ncpt,
+      radius = 50000L
+    )
+  )
+  testthat::expect_true(is.data.frame(tri_c))
+
   candidates <-
     c("modis", "koppen-geiger",
       "koeppen-geiger", "koppen", "koeppen",

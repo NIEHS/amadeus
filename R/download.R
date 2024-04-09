@@ -1927,7 +1927,6 @@ download_hms_data <- function(
 #' climate classification data from the \emph{Present and future
 #' Köppen-Geiger climate classification maps at
 #' 1-km resolution}([link for article](https://www.nature.com/articles/sdata2018214); [link for data](https://figshare.com/articles/dataset/Present_and_future_K_ppen-Geiger_climate_classification_maps_at_1-km_resolution/6396959/2)).
-# nolint end
 #' @param data_resolution character(1). Available resolutions are `"0.0083"`
 #' degrees (approx. 1 km), `"0.083"` degrees (approx. 10 km), and
 #' `"0.5"` degrees (approx. 50 km).
@@ -2032,31 +2031,38 @@ download_koppen_geiger_data <- function(
 
   if (unzip) {
     #### 16. remove unwanted files
-    unwanted_names <- list.files(
+    wanted_names <- list.files(
       path = directory_to_save,
-      pattern = "Beck_KG",
+      pattern =
+      sprintf("(Beck_KG_*.*_%s_*.*%s*.*tif$|legend.txt)",
+              time_period, data_resolution),
       full.names = TRUE
     )
-    unwanted_names <- as.vector(c(
-      unwanted_names,
-      paste0(
-        directory_to_save,
-        "KoppenGeiger.m"
-      )
-    ))
-    tif <- paste0(
-      directory_to_save,
-      "/Beck_KG_V1_",
-      period,
-      "_",
-      data_resolution,
-      ".tif"
+    all_names <- list.files(
+      path = directory_to_save,
+      full.names = TRUE
     )
-    unwanted_names <- unwanted_names[grep(
-      pattern = tif,
-      unwanted_names,
-      invert = TRUE
-    )]
+    unwanted_names <- all_names[!all_names %in% wanted_names]
+    # unwanted_names <- as.vector(c(
+    #   unwanted_names,
+    #   paste0(
+    #     directory_to_save,
+    #     "KoppenGeiger.m"
+    #   )
+    # ))
+    # tif <- paste0(
+    #   directory_to_save,
+    #   "/Beck_KG_V1_",
+    #   period,
+    #   "_",
+    #   data_resolution,
+    #   ".tif"
+    # )
+    # unwanted_names <- unwanted_names[grep(
+    #   pattern = tif,
+    #   unwanted_names,
+    #   invert = TRUE
+    # )]
     file.remove(unwanted_names)
   }
 
@@ -2079,7 +2085,7 @@ download_koppen_geiger_data <- function(
 }
 
 
-# nolint start
+
 #' Download MODIS product files
 # nolint end
 #' @description Need maintenance for the directory path change
