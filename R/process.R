@@ -533,10 +533,10 @@ process_modis_warp <-
 #' * [GDAL HDF4 driver documentation](https://gdal.org/drivers/raster/hdf4.html)
 #' * [`terra::describe`]: to list the full subdataset list with `sds = TRUE`
 #' * [`terra::sprc`], [`terra::rast`]
-#' @returns Depending on `path` and the length of `subdataset`:
+#' @returns
 #' * a `SpatRaster` object (crs = `"EPSG:4326"`): if `path` is a single file with
 #' full specification of subdataset.
-#' * a `SpatRasterCollection` object (crs = `"EPSG:4326"`): if `path` is a list of files
+#' * a `SpatRaster` object (crs = `"EPSG:4326"`): if `path` is a list of files. In this case, the returned object will have the maximal extent of multiple warped layers
 #' @author Insang Song
 #' @importFrom terra rast
 #' @importFrom terra crop
@@ -559,7 +559,7 @@ process_modis_swath <-
     # check date format
     is_date_proper(instr = date)
     header <- "HDF4_EOS:EOS_SWATH:"
-    ras_mod06 <- vector("list", 2L)
+    ras_mod06 <- vector("list", length = length(subdataset))
     datejul <- strftime(date, format = "%Y%j")
     paths_today <- grep(sprintf("A%s", datejul), path, value = TRUE)
 
@@ -590,12 +590,23 @@ process_modis_swath <-
       }
       # SpatRasterCollection can accommodate multiple SpatRasters
       # with different extents (most flexible kind)
-      mod06_mosaic <- terra::sprc(ras_mod06)
+      mod06_sprc <- terra::sprc(ras_mod06)
+      # post-hoc: stack multiple layers with different extent
+      # into one SpatRaster
+      # 1. mosaic all layers into one
+      mod06_mosaic <- terra::mosaic(mod06_sprc, fun = "first")
+      # 2. Assign NAs to prepare "etching"
+      terra::values(mod06_mosaic) <- NA
+      # 3. Looping main "etching"; each element is put first
+      mod06_etched <-
+        sapply(mod06_sprc, terra::mosaic, y = mod06_mosaic, fun = "first")
+      # 4. stack
+      mod06_return <- do.call(c, mod06_etched)
     } else {
-      mod06_mosaic <-
+      mod06_return <-
         terra::rast(process_modis_warp(path, cellsize = resolution))
     }
-    return(mod06_mosaic)
+    return(mod06_return)
   }
 
 

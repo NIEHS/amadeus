@@ -235,9 +235,9 @@ testthat::test_that("calc_modis works well.", {
     )
   testthat::expect_no_error(
     suppressWarnings(
-      process_modis_swath(
+      cloud0 <- process_modis_swath(
         path = path_mod06,
-        subdataset = "Cloud_Fraction_Day",
+        subdataset = c("Cloud_Fraction_Day"),
         date = "2021-08-15"
       )
     )

@@ -29,11 +29,10 @@ Unit is degree.}
 \item{...}{For internal use.}
 }
 \value{
-Depending on \code{path} and the length of \code{subdataset}:
 \itemize{
 \item a \code{SpatRaster} object (crs = \code{"EPSG:4326"}): if \code{path} is a single file with
 full specification of subdataset.
-\item a \code{SpatRasterCollection} object (crs = \code{"EPSG:4326"}): if \code{path} is a list of files
+\item a \code{SpatRaster} object (crs = \code{"EPSG:4326"}): if \code{path} is a list of files. In this case, the returned object will have the maximal extent of multiple warped layers
 }
 }
 \description{

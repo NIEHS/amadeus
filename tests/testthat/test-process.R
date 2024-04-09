@@ -351,13 +351,13 @@ testthat::test_that("Swath warping abides", {
     )
 
   testthat::expect_warning(
-    warped3 <- process_modis_swath(
+    warped4 <- process_modis_swath(
       path = path_mod06s,
       date = "2021-08-15",
       subdataset = c("Cloud_Fraction_Night", "Cloud_Fraction_Day")
     )
   )
-  testthat::expect_s4_class(warped3, "SpatRasterCollection")
+  testthat::expect_s4_class(warped4, "SpatRaster")
 
 
 })

@@ -668,7 +668,7 @@ process_modis_swath, or process_bluemarble.")
         vrt_today <-
           rlang::inject(preprocess(!!!hdf_args))
 
-        if (terra::nlyr(vrt_today) != length(name_covariates)) {
+        if (sum(terra::nlyr(vrt_today)) != length(name_covariates)) {
           warning("The number of layers in the input raster do not match
                   the length of name_covariates.\n")
         }
