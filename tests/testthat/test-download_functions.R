@@ -1520,7 +1520,6 @@ testthat::test_that("download_prism_data downloads the correct data files", {
   acknowledgement <- TRUE
   download <- FALSE
   remove_command <- FALSE
-  unzip <- FALSE
 
   # Call the function
   download_prism_data(
@@ -1531,8 +1530,7 @@ testthat::test_that("download_prism_data downloads the correct data files", {
     directory_to_save = directory_to_save,
     acknowledgement = acknowledgement,
     download = download,
-    remove_command = remove_command,
-    unzip = unzip
+    remove_command = remove_command
   )
 
   testthat::expect_message(
@@ -1544,8 +1542,7 @@ testthat::test_that("download_prism_data downloads the correct data files", {
       directory_to_save = directory_to_save,
       acknowledgement = acknowledgement,
       download = download,
-      remove_command = TRUE,
-      unzip = FALSE
+      remove_command = TRUE
     )
   )
 
@@ -1584,7 +1581,6 @@ testthat::test_that("download_prism_data downloads the correct data files", {
   acknowledgement <- TRUE
   download <- FALSE
   remove_command <- FALSE
-  unzip <- TRUE
 
   # Call the function and expect an error
   testthat::expect_error(download_prism_data(
@@ -1595,8 +1591,7 @@ testthat::test_that("download_prism_data downloads the correct data files", {
     directory_to_save = directory_to_save,
     acknowledgement = acknowledgement,
     download = download,
-    remove_command = remove_command,
-    unzip = unzip
+    remove_command = remove_command
   ))
 
 })

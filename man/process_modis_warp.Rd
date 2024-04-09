@@ -6,8 +6,8 @@
 \usage{
 process_modis_warp(
   path = NULL,
-  cellsize = 0.25,
-  threshold = 0.5,
+  cellsize = 0.1,
+  threshold = cellsize * 2,
   crs = 4326,
   ...
 )

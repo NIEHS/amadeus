@@ -498,3 +498,29 @@ process_variable_codes <-
       }
     }
   }
+
+
+#' Check date format
+#' @description
+#' Check date input strings conform to the required format.
+#' @param instr character(1). String to check.
+#' @param format character(1). Matching format to be checked.
+#' Default is `"%Y-%m-%d"`, which can detect `"%Y/%m/%d`.
+#' See [`strftime`] for details of formatting this string.
+#' @returns No returning value. It stops the function if `instr` doesn't
+#' conform to the `format`.
+#' @author Insang Song
+#' @keywords internal
+#' @export
+is_date_proper <- function(
+  instr = NULL,
+  format = "%Y-%m-%d"
+) {
+  # the results are alphabetically ordered
+  argnames <- mget(ls())
+  datestr <- try(strftime(instr, format = format))
+  if (inherits(datestr, "try-error")) {
+    stop(sprintf("%s does not conform to the required format
+         \"YYYY-MM-DD\".\n", names(argnames)[2]))
+  }
+}

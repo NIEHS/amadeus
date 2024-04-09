@@ -9,7 +9,7 @@ process_modis_swath(
   date = NULL,
   subdataset = NULL,
   suffix = ":mod06:",
-  resolution = 0.025,
+  resolution = 0.05,
   ...
 )
 }
@@ -29,7 +29,12 @@ Unit is degree.}
 \item{...}{For internal use.}
 }
 \value{
-a \code{SpatRaster} object (crs = \code{"EPSG:4326"})
+Depending on \code{path} and the length of \code{subdataset}:
+\itemize{
+\item a \code{SpatRaster} object (crs = \code{"EPSG:4326"}): if \code{path} is a single file with
+full specification of subdataset.
+\item a \code{SpatRasterCollection} object (crs = \code{"EPSG:4326"}): if \code{path} is a list of files
+}
 }
 \description{
 This function will return a \code{SpatRaster} object with
@@ -46,6 +51,7 @@ the full path to the hdf file.
 \item \code{\link{process_modis_warp}}
 \item \href{https://gdal.org/drivers/raster/hdf4.html}{GDAL HDF4 driver documentation}
 \item \code{\link[terra:describe]{terra::describe}}: to list the full subdataset list with \code{sds = TRUE}
+\item \code{\link[terra:sprc]{terra::sprc}}, \code{\link[terra:rast]{terra::rast}}
 }
 }
 \author{

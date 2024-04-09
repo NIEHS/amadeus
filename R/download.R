@@ -3713,11 +3713,7 @@ download_cropscape_data <- function(
       extension <- ifelse(source == "USDA", "\\.zip", "(\\.tar|\\.tar\\.gz)")
       dir_unzip <- gsub(extension, "", download_names)
       for (fn in seq_along(dir_unzip)) {
-        if (source == "GMU") {
-          utils::untar(tarfile = download_names[fn], exdir = dir_unzip[fn])
-        } else {
-          utils::unzip(zipfile = download_names[fn], exdir = dir_unzip[fn])
-        }
+        archive::archive_extract(download_names[fn], exdir = dir_unzip[fn])
       }
     }
   }
@@ -3765,8 +3761,6 @@ download_cropscape_data <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
-#' @param unzip logical(1). Unzip the downloaded zip files.
-#' Default is \code{FALSE}.
 #' @author Insang Song
 #' @returns NULL; .bil (normals) or single grid files depending on the format choice.
 #' \code{directory_to_save}.
@@ -3800,8 +3794,7 @@ download_prism_data <- function(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE,
-  unzip = TRUE
+  remove_command = FALSE
 ) {
   data_type <- match.arg(data_type)
   element <- match.arg(element)
@@ -3877,26 +3870,6 @@ download_prism_data <- function(
   download_run(download = download,
                system_command = system_command)
 
-  #### 10. unzip data
-  # note that this part does not utilize download_unzip
-  # as duplicate file names are across multiple zip files
-  if (download) {
-    if (unzip) {
-      path_unzip <-
-        list.files(
-          directory_to_save,
-          pattern = paste0("*.*", element, "*.*", time, "*.*.zip"),
-          full.names = TRUE
-        )
-      for (fn in seq_along(path_unzip)) {
-        utils::unzip(
-          zipfile = path_unzip[fn],
-          exdir = directory_to_save,
-          overwrite = FALSE
-        )
-      }
-    }
-  }
   message("Requests were processed.\n")
   #### 10. remove download commands
   download_remove_command(commands_txt = commands_txt,

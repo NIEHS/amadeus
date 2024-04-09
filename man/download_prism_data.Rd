@@ -13,8 +13,7 @@ download_prism_data(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE,
-  unzip = TRUE
+  remove_command = FALSE
 )
 
 download_prism_data(
@@ -26,8 +25,7 @@ download_prism_data(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE,
-  unzip = TRUE
+  remove_command = FALSE
 )
 }
 \arguments{

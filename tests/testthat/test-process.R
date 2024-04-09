@@ -1,3 +1,4 @@
+# test process_covariates ####
 testthat::test_that("test generic process_covariates", {
   withr::local_package("terra")
   withr::local_package("sf")
@@ -88,6 +89,7 @@ testthat::test_that("test generic process_covariates", {
   )
 })
 
+# test MODIS suites ####
 testthat::test_that("test MODIS prefilter", {
   # main test
   txt_products <- c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2")
@@ -333,6 +335,23 @@ testthat::test_that("Swath warping abides", {
     unname(stars::st_res(warped)[1]), 0.25, tolerance = 1e-6
   )
 
+  path_mod06s <-
+    list.files(
+      testthat::test_path("..", "testdata", "modis"),
+      pattern = "MOD06_L2",
+      full.names = TRUE
+    )
+
+  testthat::expect_warning(
+    warped3 <- process_modis_swath(
+      path = path_mod06s,
+      date = "2021-08-15",
+      subdataset = c("Cloud_Fraction_Night", "Cloud_Fraction_Day")
+    )
+  )
+  testthat::expect_s4_class(warped3, "SpatRasterCollection")
+
+
 })
 
 
@@ -377,7 +396,7 @@ testthat::test_that("Other MODIS function errors", {
 })
 
 
-
+# test Ecoregions ####
 testthat::test_that("read ecoregion", {
   withr::local_package("terra")
 
@@ -389,6 +408,7 @@ testthat::test_that("read ecoregion", {
 })
 
 
+# test NLCD ####
 testthat::test_that("process_nlcd tests", {
   withr::local_package("terra")
 
@@ -414,11 +434,14 @@ testthat::test_that("process_nlcd tests", {
   testthat::expect_error(
     process_nlcd(path_nlcd19, "nineteen eighty-four")
   )
+  testthat::expect_error(
+    process_nlcd(path_nlcd19, year = 2020)
+  )
 
 })
 
 
-
+# test Koppen-Geiger ####
 testthat::test_that("process_koppen_geiger tests", {
   withr::local_package("terra")
   path_kgeiger <-
@@ -431,7 +454,7 @@ testthat::test_that("process_koppen_geiger tests", {
   testthat::expect_s4_class(kgeiger, "SpatRaster")
 })
 
-
+# test TRI ####
 testthat::test_that("process_tri tests", {
   withr::local_package("terra")
   path_tri <- testthat::test_path("../testdata", "tri", "")
@@ -442,7 +465,7 @@ testthat::test_that("process_tri tests", {
   testthat::expect_s4_class(tri_r, "SpatVector")
 })
 
-
+# test NEI ####
 testthat::test_that("process_nei tests", {
   withr::local_package("terra")
 
@@ -462,6 +485,13 @@ testthat::test_that("process_nei tests", {
   )
   testthat::expect_error(
     process_nei(path_nei, year = 2020, county = NULL)
+  )
+  testthat::expect_error(
+    process_nei(path_nei, year = 2020, county = array(1, 2))
+  )
+  names(path_cnty)[which(names(path_cnty) == "GEOID")] <- "COUNTYID"
+  testthat::expect_error(
+    process_nei(path_nei, year = 2020, county = path_cnty)
   )
 
 })
@@ -506,6 +536,7 @@ testthat::test_that("process_conformity tests", {
 
 })
 
+# test SEDAC population ####
 testthat::test_that("process_sedac_population returns expected.", {
   withr::local_package("terra")
   paths <- list.files(
@@ -560,6 +591,7 @@ testthat::test_that("process_sedac_population returns null for netCDF.", {
   )
 })
 
+# test HMS ####
 testthat::test_that("process_hms returns expected.", {
   withr::local_package("terra")
   densities <- c(
@@ -612,6 +644,7 @@ testthat::test_that("process_hms returns expected.", {
   }
 })
 
+# test GMTED ####
 testthat::test_that("process_gmted returns expected.", {
   withr::local_package("terra")
   statistics <- c(
@@ -741,6 +774,7 @@ testthat::test_that("process_narr returns expected.", {
   }
 })
 
+# test GEOS-CF ####
 testthat::test_that("process_geos returns expected.", {
   withr::local_package("terra")
   collections <- c(
@@ -820,6 +854,7 @@ testthat::test_that("process_geos expected errors.", {
   )
 })
 
+# test support functions ####
 testthat::test_that("proccess support functions return expected.", {
   path <- list.files(
     testthat::test_path(
@@ -899,6 +934,7 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
   )
 })
 
+# test AQS ####
 testthat::test_that("process_aqs", {
   withr::local_package("terra")
   withr::local_package("data.table")
@@ -937,6 +973,22 @@ testthat::test_that("process_aqs", {
       return_format = "sf"
     )
   )
+  testthat::expect_no_error(
+    aqssf <- process_aqs(
+      path = testd,
+      date = c("2022-02-04", "2022-02-28"),
+      return_format = "sf"
+    )
+  )
+
+  tempd <- tempdir()
+  testthat::expect_error(
+    aqssf <- process_aqs(
+      path = tempd,
+      date = c("2022-02-04", "2022-02-28"),
+      return_format = "sf"
+    )
+  )
 
   # expect
   testthat::expect_s3_class(aqssf, "sf")
@@ -955,7 +1007,7 @@ testthat::test_that("process_aqs", {
   )
 })
 
-
+# test SEDAC GRoads ####
 testthat::test_that("test process_sedac_groads", {
   withr::local_package("terra")
 
@@ -973,6 +1025,7 @@ testthat::test_that("test process_sedac_groads", {
   )
 })
 
+# test MERRA2 ####
 testthat::test_that("process_merra2 returns as expected.", {
   withr::local_package("terra")
   #* indicates three dimensional data that has subset to single
@@ -1046,6 +1099,7 @@ testthat::test_that("process_merra2 returns as expected.", {
   }
 })
 
+# test GridMET ####
 testthat::test_that("process_gridmet returns expected.", {
   withr::local_package("terra")
   variable <- "Precipitation"
@@ -1091,6 +1145,7 @@ testthat::test_that("process_gridmet returns expected.", {
   )
 })
 
+# test TerraClimate ####
 testthat::test_that("process_terraclimate returns expected.", {
   withr::local_package("terra")
   variable <- "ppt"
@@ -1299,17 +1354,22 @@ testthat::test_that("gridmet and terraclimate auxiliary functions.", {
 })
 
 
+# test PRISM ####
 test_that("process_prism returns a SpatRaster object with correct metadata", {
   # Set up test data
   withr::local_package("terra")
   path <- testthat::test_path(
     "..", "testdata", "prism", "PRISM_tmin_30yr_normal_4kmD1_0228_bil_test.nc"
   )
+  path_dir <- testthat::test_path(
+    "..", "testdata", "prism"
+  )
   element <- "tmin"
   time <- "0228"
 
   # Call the function
   expect_no_error(result <- process_prism(path, element, time))
+  expect_no_error(result <- process_prism(path_dir, element, time))
 
   # Check the return type
   expect_true(inherits(result, "SpatRaster"))

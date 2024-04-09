@@ -379,31 +379,6 @@ process_bluemarble_corners <-
     return(tile_df)
   }
 
-#' Check date format
-#' @description
-#' Check date input strings conform to the required format.
-#' @param instr character(1). String to check.
-#' @param format character(1). Matching format to be checked.
-#' Default is `"%Y-%m-%d"`, which can detect `"%Y/%m/%d`.
-#' See [`strftime`] for details of formatting this string.
-#' @returns No returning value. It stops the function if `instr` doesn't
-#' conform to the `format`.
-#' @author Insang Song
-#' @keywords internal
-#' @export
-is_date_proper <- function(
-  instr = NULL,
-  format = "%Y-%m-%d"
-) {
-  # the results are alphabetically ordered
-  argnames <- mget(ls())
-  datestr <- try(strftime(instr, format = format))
-  if (inherits(datestr, "try-error")) {
-    stop(sprintf("%s does not conform to the required format
-         \"YYYY-MM-DD\".\n", names(argnames)[2]))
-  }
-}
-
 
 # nolint start
 #' Assign VIIRS Blue Marble products corner coordinates to retrieve a merged raster
@@ -516,8 +491,8 @@ process_bluemarble <- function(
 process_modis_warp <-
   function(
     path = NULL,
-    cellsize = 0.25,
-    threshold = 0.5,
+    cellsize = 0.1,
+    threshold = cellsize * 2,
     crs = 4326,
     ...
   ) {
@@ -557,11 +532,18 @@ process_modis_warp <-
 #' * [`process_modis_warp`]
 #' * [GDAL HDF4 driver documentation](https://gdal.org/drivers/raster/hdf4.html)
 #' * [`terra::describe`]: to list the full subdataset list with `sds = TRUE`
-#' @returns a `SpatRaster` object (crs = `"EPSG:4326"`)
+#' * [`terra::sprc`], [`terra::rast`]
+#' @returns Depending on `path` and the length of `subdataset`:
+#' * a `SpatRaster` object (crs = `"EPSG:4326"`): if `path` is a single file with
+#' full specification of subdataset.
+#' * a `SpatRasterCollection` object (crs = `"EPSG:4326"`): if `path` is a list of files
 #' @author Insang Song
 #' @importFrom terra rast
 #' @importFrom terra crop
 #' @importFrom terra mosaic
+#' @importFrom terra varnames
+#' @importFrom terra values
+#' @importFrom terra sprc
 #' @export
 # nolint end
 # previously modis_mosaic_mod06
@@ -571,7 +553,7 @@ process_modis_swath <-
     date = NULL,
     subdataset = NULL,
     suffix = ":mod06:",
-    resolution = 0.025,
+    resolution = 0.05,
     ...
   ) {
     # check date format
@@ -589,17 +571,29 @@ process_modis_swath <-
           sprintf("%s%s%s%s", header, paths_today, suffix, subdataset[element])
         # rectified stars objects to SpatRaster
         mod06_element <- split(target_text, target_text) |>
-          lapply(process_modis_warp) |>
+          lapply(process_modis_warp, cellsize = resolution) |>
           lapply(terra::rast)
+        # Remove all NA layers to avoid erroneous values
+        mod06_element_nas <-
+          sapply(
+            mod06_element,
+            function(x) {
+              all(is.na(terra::values(x)))
+            }
+          )
+        mod06_element <- mod06_element[!mod06_element_nas]
         # mosaick the warped SpatRasters into one
-        mod06_element <- Reduce(f = terra::mosaic, x = mod06_element)
-        ras_mod06[[element]] <- mod06_element
+        mod06_element_mosaic <- Reduce(f = terra::mosaic, x = mod06_element)
+        ras_mod06[[element]] <- mod06_element_mosaic
+        # assigning variable name
+        names(ras_mod06)[element] <- subdataset[element]
       }
-      mod06_mosaic <- c(ras_mod06[[1]], ras_mod06[[2]])
-      # assigning variable name
-      terra::varnames(mod06_mosaic) <- subdataset
+      # SpatRasterCollection can accommodate multiple SpatRasters
+      # with different extents (most flexible kind)
+      mod06_mosaic <- terra::sprc(ras_mod06)
     } else {
-      mod06_mosaic <- terra::rast(process_modis_warp(path))
+      mod06_mosaic <-
+        terra::rast(process_modis_warp(path, cellsize = resolution))
     }
     return(mod06_mosaic)
   }
@@ -846,7 +840,7 @@ process_nei <- function(
   if (!"GEOID" %in% names(county)) {
     stop("county should include a field named \"GEOID\"")
   }
-  if (!year %in% c(2017, 2020)) {
+  if (!as.character(year) %in% c("2017", "2020")) {
     stop("year should be one of 2017 or 2020.\n")
   }
   # Concatenate NEI csv files
