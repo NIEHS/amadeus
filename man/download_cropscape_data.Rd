@@ -13,16 +13,6 @@ download_cropscape_data(
   remove_command = FALSE,
   unzip = TRUE
 )
-
-download_cropscape_data(
-  year = seq(1997, 2023),
-  source = c("USDA", "GMU"),
-  directory_to_save = NULL,
-  acknowledgement = FALSE,
-  download = FALSE,
-  remove_command = FALSE,
-  unzip = TRUE
-)
 }
 \arguments{
 \item{year}{integer(1). Year of the data to download.}
@@ -53,16 +43,8 @@ Default is \code{FALSE}.}
 \value{
 NULL; Yearly comma-separated value (CSV) files will be stored in
 \code{directory_to_save}.
-
-NULL; Yearly comma-separated value (CSV) files will be stored in
-\code{directory_to_save}.
 }
 \description{
-Accesses and downloads United States Department of Agriculture
-CropScape Cropland Data Layer data from
-the \href{https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.php}{USDA National Agricultural Statistics Service} or the
-\href{https://https://nassgeodata.gmu.edu/CropScape/}{George Mason University website}.
-
 Accesses and downloads United States Department of Agriculture
 CropScape Cropland Data Layer data from
 the \href{https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.php}{USDA National Agricultural Statistics Service} or the
@@ -70,18 +52,8 @@ the \href{https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.
 }
 \note{
 JSON files should be found at STAC catalog of OpenLandMap
-
-JSON files should be found at STAC catalog of OpenLandMap
 }
 \examples{
-\dontrun{
-download_cropscape_data(
-  2020, "~/data",
-  acknowledgement = TRUE,
-  download = TRUE,
-  unzip = TRUE
-)
-}
 \dontrun{
 download_cropscape_data(
   2020, "~/data",

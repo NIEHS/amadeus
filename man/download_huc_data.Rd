@@ -13,16 +13,6 @@ download_huc_data(
   remove_command = FALSE,
   unzip = FALSE
 )
-
-download_huc_data(
-  region = c("Lower48", "Islands"),
-  type = c("Seamless", "OceanCatchment"),
-  directory_to_save = NULL,
-  acknowledgement = FALSE,
-  download = FALSE,
-  remove_command = FALSE,
-  unzip = FALSE
-)
 }
 \arguments{
 \item{region}{character(1). One of \code{c("Lower48", "Islands")}.
@@ -49,14 +39,8 @@ Default is \code{FALSE}. Not working for this function since HUC data is in 7z f
 }
 \value{
 None. Downloaded files will be stored in \code{directory_to_save}.
-
-None. Downloaded files will be stored in \code{directory_to_save}.
 }
 \description{
-NHDPlus data provides the most comprehensive and high-resolution
-hydrography data. This function downloads \strong{national} dataset from
-NHDPlus Version 2.1 on USGS Amazon S3 storage.
-
 NHDPlus data provides the most comprehensive and high-resolution
 hydrography data. This function downloads \strong{national} dataset from
 NHDPlus Version 2.1 on USGS Amazon S3 storage.
@@ -66,19 +50,8 @@ For HUC, set \code{type = "Seamless"}. HUC12 layer presents in the seamless
 geodatabase. Users can aggregate HUC12 layer to make HUC6, HUC8, HUC10, etc.
 For whom wants to download a specific region,
 please visit \href{https://www.epa.gov/waterdata/get-nhdplus-national-hydrography-dataset-plus-data#ListofAreas}{Get NHDPlus Data}
-
-For HUC, set \code{type = "Seamless"}. HUC12 layer presents in the seamless
-geodatabase. Users can aggregate HUC12 layer to make HUC6, HUC8, HUC10, etc.
-For whom wants to download a specific region,
-please visit \href{https://www.epa.gov/waterdata/get-nhdplus-national-hydrography-dataset-plus-data#ListofAreas}{Get NHDPlus Data}
 }
 \examples{
-\dontrun{
-download_huc("Lower48", "Seamless", "~/data"
-             acknowledgement = TRUE,
-             download = TRUE,
-             unzip = TRUE)
-}
 \dontrun{
 download_huc("Lower48", "Seamless", "~/data"
              acknowledgement = TRUE,

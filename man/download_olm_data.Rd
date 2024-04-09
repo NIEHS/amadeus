@@ -12,15 +12,6 @@ download_olm_data(
   download = FALSE,
   remove_command = FALSE
 )
-
-download_olm_data(
-  product = NULL,
-  format = "tif",
-  directory_to_save = NULL,
-  acknowledgement = FALSE,
-  download = FALSE,
-  remove_command = FALSE
-)
 }
 \arguments{
 \item{product}{character(1). Available collection name in OpenLandMap
@@ -120,27 +111,16 @@ the text file containing download commands.}
 \value{
 NULL; GeoTIFF (.tif) files will be stored in
 \code{directory_to_save}.
-
-NULL; GeoTIFF (.tif) files will be stored in
-\code{directory_to_save}.
 }
 \description{
-Accesses and downloads OpenLandMap data from the \href{https://www.openlandmap.org/}{OpenLandMap website}.
-
 Accesses and downloads OpenLandMap data from the \href{https://www.openlandmap.org/}{OpenLandMap website}.
 }
 \note{
 \code{extdata/openlandmap_assets.rds} contains the available assets in OpenLandMap.
 Users may want to check the available assets to download data directly.
 For developers: JSON files should be found at STAC catalog of OpenLandMap when updated.
-
-\code{extdata/openlandmap_assets.rds} contains the available assets in OpenLandMap.
-Users may want to check the available assets to download data directly.
-For developers: JSON files should be found at STAC catalog of OpenLandMap when updated.
 }
 \seealso{
-\link{list_stac_files}
-
 \link{list_stac_files}
 }
 \author{

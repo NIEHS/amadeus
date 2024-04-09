@@ -15,18 +15,6 @@ download_prism_data(
   download = FALSE,
   remove_command = FALSE
 )
-
-download_prism_data(
-  time,
-  element = c("ppt", "tmin", "tmax", "tmean", "tdmean", "vpdmin", "vpdmax", "solslope",
-    "soltotal", "solclear", "soltrans"),
-  data_type = c("ts", "normals_800", "normals"),
-  format = c("nc", "asc", "grib2"),
-  directory_to_save = NULL,
-  acknowledgement = FALSE,
-  download = FALSE,
-  remove_command = FALSE
-)
 }
 \arguments{
 \item{time}{character(1). Length of 2, 4, 6, or 8. Time period for
@@ -38,7 +26,7 @@ minimal formatting is applied):
 \item \code{YYYYMMDD} for daily data (between yesterday and January 1st, 1981) – returns a single grid in a .zip file
 \item \code{YYYYMM} for monthly data (between last month and January 1981) – returns a single grid in a .zip file
 \item \code{YYYY} for annual data (between last year and 1981) - returns a single grid in a .zip file
-\item \verb{YYYY`` for historical data (between 1980 and 1895) - returns a single zip file containing 12 monthly grids for }YYYY` plus the annual.
+\item \code{YYYY} for historical data (between 1980 and 1895) - returns a single zip file containing 12 monthly grids for \code{YYYY} plus the annual.
 }
 
 \strong{Normals}:
@@ -73,21 +61,12 @@ will download all of the requested data files.}
 \item{remove_command}{logical(1).
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
-
-\item{unzip}{logical(1). Unzip the downloaded zip files.
-Default is \code{FALSE}.}
 }
 \value{
 NULL; .bil (normals) or single grid files depending on the format choice.
 \code{directory_to_save}.
-
-NULL; .bil (normals) or single grid files depending on the format choice.
-\code{directory_to_save}.
 }
 \description{
-Accesses and downloads Oregon State University's
-PRISM data from the PRISM Climate Group Web Service
-
 Accesses and downloads Oregon State University's
 PRISM data from the PRISM Climate Group Web Service
 }
@@ -101,30 +80,11 @@ download_prism_data(
   directory_to_save = "~/data",
   acknowledgement = TRUE,
   download = TRUE,
-  remove_command = TRUE,
-  unzip = TRUE
-)
-}
-\dontrun{
-download_prism_data(
-  time = "202104",
-  element = "ppt",
-  data_type = "ts",
-  format = "nc",
-  directory_to_save = "~/data",
-  acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE,
-  unzip = TRUE
+  remove_command = TRUE
 )
 }
 }
 \references{
-\itemize{
-\item \href{http://www.prism.oregonstate.edu/}{PRISM Climate Group}
-\item \href{https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf}{PRISM Web Service Guide}
-}
-
 \itemize{
 \item \href{http://www.prism.oregonstate.edu/}{PRISM Climate Group}
 \item \href{https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf}{PRISM Web Service Guide}
