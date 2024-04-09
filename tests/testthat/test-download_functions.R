@@ -5,7 +5,8 @@ testthat::test_that("Error when acknowledgement = FALSE", {
                          "koppengeiger", "merra2", "merra", "narr_monolevel",
                          "narr_p_levels", "nlcd", "noaa", "sedac_groads",
                          "sedac_population", "groads", "population", "plevels",
-                         "p_levels", "monolevel", "hms", "smoke")
+                         "p_levels", "monolevel", "hms", "smoke", "gridmet",
+                         "terraclimate")
   for (d in seq_along(download_datasets)) {
     expect_error(
       download_data(dataset_name = download_datasets[d],
@@ -21,7 +22,8 @@ testthat::test_that("Error when one parameter is NULL.", {
                          "koppengeiger", "merra2", "merra", "narr_monolevel",
                          "narr_p_levels", "nlcd", "noaa", "sedac_groads",
                          "sedac_population", "groads", "population", "plevels",
-                         "p_levels", "monolevel", "hms", "smoke")
+                         "p_levels", "monolevel", "hms", "smoke", "gridmet",
+                         "terraclimate")
   for (d in seq_along(download_datasets)) {
     expect_error(
       download_data(dataset_name = download_datasets[d],
@@ -80,6 +82,22 @@ testthat::test_that("Errors when temporal ranges invalid.", {
       directory_to_save = testthat::test_path("..", "testdata/", ""),
       directory_to_download = testthat::test_path("..", "testdata/", ""),
       acknowledgement = TRUE
+    )
+  )
+  expect_error(
+    download_gridmet_data(
+      year_start = 1900,
+      variables = "Precipitation",
+      acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", "")
+    )
+  )
+  expect_error(
+    download_terraclimate_data(
+      year_start = 1900,
+      variables = "Wind Speed",
+      acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", "")
     )
   )
 })
@@ -1242,6 +1260,141 @@ testthat::test_that("download_hms_data LIVE run.", {
   files <- list.files(directory, full.names = TRUE)
   sapply(files, file.remove)
   file.remove(directory)
+})
+
+testthat::test_that("gridmet download URLs have HTTP status 200.", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  year_start <- 2018
+  year_end <- 2023
+  variables <- "Precipitation"
+  directory_to_save <-
+    testthat::test_path("..", "testdata", "gridmet", "tmp")
+  # run download function
+  download_data(dataset_name = "gridmet",
+                year_start = year_start,
+                year_end = year_end,
+                variables = variables,
+                directory_to_save = directory_to_save,
+                acknowledgement = TRUE,
+                download = FALSE)
+  # define path with commands
+  commands_path <- paste0(directory_to_save,
+                          "/gridmet_",
+                          year_start, "_", year_end,
+                          "_curl_commands.txt")
+  # import commands
+  commands <- read_commands(commands_path = commands_path)
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 6)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 5L, method = "HEAD")
+  # implement unit tests
+  test_download_functions(directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+  # remove file with commands after test
+  file.remove(commands_path)
+  file.remove(list.files(directory_to_save, full.names = TRUE))
+  file.remove(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("gridmet error with invalid years.", {
+  testthat::expect_error(
+    download_data(
+      dataset_name = "gridmet",
+      variables = "Precipitation",
+      year_start = 10,
+      year_end = 11,
+      acknowledgement = TRUE,
+      directory_to_save =
+        testthat::test_path("..", "testdata", "gridmet", "tmp")
+    )
+  )
+})
+
+testthat::test_that("gridmet error with invalid variables", {
+  testthat::expect_error(
+    download_data(
+      dataset_name = "gridmet",
+      variables = "temp",
+      year_start = 2018,
+      year_end = 2018,
+      acknowledgement = TRUE,
+      directory_to_save =
+        testthat::test_path("..", "testdata", "gridmet", "tmp")
+    )
+  )
+})
+
+testthat::test_that("terraclimate download URLs have HTTP status 200.", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  year_start <- 2018
+  year_end <- 2023
+  variables <- "Precipitation"
+  directory_to_save <-
+    testthat::test_path("..", "testdata", "terraclimate", "tmp")
+  # run download function
+  download_data(dataset_name = "terraclimate",
+                year_start = year_start,
+                year_end = year_end,
+                variables = variables,
+                directory_to_save = directory_to_save,
+                acknowledgement = TRUE,
+                download = FALSE)
+  # define path with commands
+  commands_path <- paste0(directory_to_save,
+                          "/terraclimate_",
+                          year_start, "_", year_end,
+                          "_curl_commands.txt")
+  # import commands
+  commands <- read_commands(commands_path = commands_path)
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 6)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 5L, method = "HEAD")
+  # implement unit tests
+  test_download_functions(directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+  # remove file with commands after test
+  file.remove(commands_path)
+  file.remove(list.files(directory_to_save, full.names = TRUE))
+  file.remove(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("terraclimate error with invalid years.", {
+  testthat::expect_error(
+    download_data(
+      dataset_name = "terraclimate",
+      variables = "Precipitation",
+      year_start = 10,
+      year_end = 11,
+      acknowledgement = TRUE,
+      directory_to_save =
+        testthat::test_path("..", "testdata", "terraclimate", "tmp")
+    )
+  )
+})
+
+testthat::test_that("terraclimate error with invalid variables", {
+  testthat::expect_error(
+    download_data(
+      dataset_name = "gridmet",
+      variables = "temp",
+      year_start = 2018,
+      year_end = 2018,
+      acknowledgement = TRUE,
+      directory_to_save =
+        testthat::test_path("..", "testdata", "terraclimate", "tmp")
+    )
+  )
+  file.remove(
+    testthat::test_path("..", "testdata", "terraclimate", "tmp")
+  )
 })
 
 

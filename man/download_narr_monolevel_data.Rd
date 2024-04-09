@@ -15,7 +15,8 @@ download_narr_monolevel_data(
 )
 }
 \arguments{
-\item{variables}{character. Variable(s) name acronym.}
+\item{variables}{character. Variable(s) name acronym. See \href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{List of Variables in NARR Files}
+for variable names and acronym codes.}
 
 \item{year_start}{integer(1). length of 4. Start of year range for
 downloading data.}
@@ -39,8 +40,8 @@ Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 }
 \value{
-NULL; Yearly netCDF (.nc) files will be stored in
-\code{directory_to_save}.
+NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
+folder within \code{directory_to_save}.
 }
 \description{
 The \code{download_narr_monolevel_data} function accesses and downloads monolevel meteorological data from \href{https://psl.noaa.gov/data/gridded/data.narr.html}{NOAA's North American Regional Reanalysis (NARR) model}. "Monolevel" variables contain a single value for the entire atmospheric column (ie. Variable: Convective cloud cover; Level: Entire atmosphere considered as a single layer), or represent a specific altitude associated with the variable (ie. Variable: Air temperature; Level: 2 m).

@@ -29,7 +29,8 @@ a data.frame object
 Extract elevation values at point locations. Returns a \code{data.frame}
 object containing \code{locs_id} and elevation variable. Elevation variable
 column name reflects the elevation statistic, spatial resolution of
-\code{from}, and circular buffer radius.
+\code{from}, and circular buffer radius (ie. Breakline Emphasis at 7.5
+arc-second resolution with 0 meter buffer: breakline_emphasis_r75_0).
 }
 \seealso{
 \code{\link[=process_gmted]{process_gmted()}}

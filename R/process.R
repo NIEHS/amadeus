@@ -26,7 +26,9 @@
 #' - [`process_narr`]: `"narr"`, `"NARR"`
 #' - [`process_sedac_groads`]: `"sedac_groads"`, `"roads"`, `"groads"`
 #' - [`process_sedac_population`]: `"sedac_population"`, `"population"`
-#' - [`process_merra2`]: `merra`, `MERRA`, `merra2`, `MERRA2`
+#' - [`process_merra2`]: `"merra"`, `"MERRA"`, `"merra2"`, `"MERRA2"`
+#' - [`process_gridmet`]: `"gridmet"`, `"gridMET`"
+#' - [`process_terraclimate`]: `"terraclimate"`, `"TerraClimate"`
 #' @returns `SpatVector`, `SpatRaster`, `sf`, or `character` depending on
 #' covariate type and selections.
 #' @author Insang Song
@@ -44,7 +46,7 @@ process_covariates <-
                   "sedac_groads", "groads", "roads",
                   "nlcd", "tri", "narr", "nei",
                   "ecoregions", "ecoregion",
-                  "merra", "MERRA2", "merra2", "MERRA2"),
+                  "merra", "merra2", "gridmet", "terraclimate"),
     path = NULL,
     ...
   ) {
@@ -76,7 +78,9 @@ process_covariates <-
       geos = process_geos,
       gmted = process_gmted,
       merra = process_merra2,
-      merra2 = process_merra2
+      merra2 = process_merra2,
+      gridmet = process_gridmet,
+      terraclimate = process_terraclimate
     )
 
     res_covariate <-
@@ -683,55 +687,6 @@ process_ecoregion <-
   }
 
 
-#' Check input assumptions
-#' @param locs Data. [sf][sf::st_as_sf],
-#' [SpatVector][terra::vect], or [data.frame]
-#' @param check_time logical(1). Whether `"time"` exists in column names.
-#' @param locs_epsg character(1). `"{authority}:{code}"` or
-#' Well-Known Text format for coordinate reference system definition.
-#' @description Check if all of `"lon"`, `"lat"`, and `"time"`
-#' (only if `check_time = TRUE`) then convert inputs into a
-#' `SpatVector` object.
-#' @returns a `SpatVector` object
-#' @author Insang Song
-#' @importFrom methods is
-#' @importFrom terra vect
-#' @export
-process_conformity <-
-  function(
-    locs = NULL,
-    check_time = FALSE,
-    locs_epsg = "EPSG:4326"
-  ) {
-    keyword <- c("lon", "lat", "time")
-    if (!check_time) {
-      keyword <- keyword[-3]
-    }
-    if (!all(keyword %in% names(locs))) {
-      stop("locs should have 'lon', 'lat', (and 'time') fields.\n")
-    }
-    if (!methods::is(locs, "SpatVector")) {
-      if (methods::is(locs, "sf")) {
-        locs <- terra::vect(locs)
-      }
-      if (is.data.frame(locs)) {
-        locs <-
-          terra::vect(
-            locs,
-            geom = c("lon", "lat"),
-            keepgeom = TRUE,
-            crs = locs_epsg
-          )
-      }
-    }
-    return(locs)
-  }
-
-
-
-
-
-
 # nolint start
 #' Process toxic release data
 #' @description
@@ -831,8 +786,6 @@ process_tri <- function(
   return(spvect_tri)
 }
 # nolint end
-
-
 
 
 # nolint start
@@ -1334,6 +1287,7 @@ process_hms <- function(
 #' `SpatRaster` layer name indicates selected variable and resolution.
 #' @return a `SpatRaster` object
 #' @importFrom terra rast
+#' @importFrom terra varnames
 #' @export
 process_gmted <- function(
     variable = NULL,
@@ -1392,6 +1346,23 @@ process_gmted <- function(
   data_path <- data_paths[endsWith(data_paths, "_grd")]
   #### import data
   data <- terra::rast(data_path)
+  #### layer name
+  names(data) <- paste0(
+    "elevation_",
+    gsub(
+      "_grd",
+      "",
+      names(data)
+    )
+  )
+  #### varnames
+  terra::varnames(data) <- paste0(
+    "Elevation: ",
+    statistic,
+    " (",
+    resolution,
+    ")"
+  )
   #### set coordinate reference system
   return(data)
 }
@@ -2086,241 +2057,325 @@ process_merra2 <-
     return(data_return)
   }
 
-#' Process MERRA2 time steps
+
+# nolint start
+#' Process gridMET data
 #' @description
-#' Identify the time step of data observations based on MERRA2 collection and
-#' filter to time values in `from`.
-#' @param collection character(1). MERRA2 collection name.
-#' @param from SpatRaster(1). Object to extract time values from.
-#' @importFrom stringi stri_pad
-#' @keywords auxillary
-#' @return character
+#' The \code{process_gridmet()} function imports and cleans raw gridded surface meteorological
+#' data, returning a single `SpatRaster` object.
+#' @param date character(2). length of 10 each.
+#' Start/end date of downloaded data.
+#' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
+#' @param variable character(1). Variable name or acronym code. See [gridMET Generate Wget File](https://www.climatologylab.org/wget-gridmet.html)
+#' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
+#' "Energy Release Component" has code "erc").
+#' @param path character(1). Directory with downloaded netCDF (.nc) files.
+#' @note
+#' Layer names of the returned `SpatRaster` object contain the variable acronym,
+#' and date.
+#' @author Mitchell Manware
+#' @return a `SpatRaster` object
+#' @importFrom terra rast
+#' @importFrom terra time
+#' @importFrom terra subset
 #' @export
-process_merra2_time <-
-  function(collection, from) {
-    split <- unlist(strsplit(collection, "_"))
-    code <- split[1]
-    if (code == "inst1") {
-      step <- seq(from = 0, to = 2300, by = 100)
-    } else if (code == "inst3") {
-      step <- seq(from = 0, to = 2100, by = 300)
-    } else if (code == "inst6") {
-      step <- seq(from = 0, to = 1800, by = 600)
-    } else if (code == "statD") {
-      step <- 1200
-    } else if (code == "tavg1") {
-      step <- seq(from = 0030, to = 2330, by = 100)
-    } else if (code == "tavg3") {
-      step <- seq(from = 0130, to = 2330, by = 300)
-    }
-    pad_l <- stringi::stri_pad(step, side = "left", width = 4, pad = 0)
-    pad_r <- stringi::stri_pad(pad_l, side = "right", width = 6, pad = 0)
-    time_f <- gsub(
-      " ",
-      "",
+# nolint end
+process_gridmet <- function(
+    date = c("2023-09-01", "2023-09-01"),
+    variable = NULL,
+    path = NULL) {
+  #### directory setup
+  path <- download_sanitize_path(path)
+  #### check for variable
+  check_for_null_parameters(mget(ls()))
+  variable_checked <- process_variable_codes(
+    variables = variable,
+    source = "gridmet"
+  )
+  variable_checked_long <- process_gridmet_codes(
+    variable_checked,
+    invert = TRUE
+  )
+  #### identify file paths
+  data_paths <- list.files(
+    path,
+    pattern = variable_checked,
+    full.names = TRUE
+  )
+  data_paths <- data_paths[grep(
+    ".nc",
+    data_paths
+  )]
+  #### define date sequence
+  date_sequence <- generate_date_sequence(
+    date[1],
+    date[2],
+    sub_hyphen = TRUE
+  )
+  #### years of interest
+  yoi <- unique(
+    substr(
+      date_sequence,
+      1, 4
+    )
+  )
+  #### subset file paths to only dates of interest
+  data_paths <- unique(
+    grep(
+      paste(
+        yoi,
+        collapse = "|"
+      ),
+      data_paths,
+      value = TRUE
+    )
+  )
+  #### initiate for loop
+  data_full <- terra::rast()
+  for (p in seq_along(data_paths)) {
+    #### import data
+    data_year <- terra::rast(data_paths[p])
+    cat(paste0(
+      "Cleaning daily ",
+      variable_checked,
+      " data for year ",
+      gsub(
+        ".nc",
+        "",
+        strsplit(
+          data_paths[p],
+          paste0(
+            variable_checked,
+            "_"
+          )
+        )[[1]][2]
+      ),
+      "...\n"
+    ))
+    time_numeric <- sapply(
+      strsplit(
+        names(data_year),
+        "="
+      ),
+      function(x) as.numeric(x[2]) - 25567
+    )
+    terra::time(data_year) <- as.Date(time_numeric)
+    names(data_year) <- paste0(
+      variable_checked,
+      "_",
       gsub(
         "-",
         "",
-        gsub(
-          ":",
-          "",
-          terra::time(from)
-        )
+        terra::time(data_year)
       )
     )
-    for (f in seq_along(time_f)) {
-      if (nchar(time_f[f]) == 8) {
-        time_f[f] <- paste0(time_f[f], "000000")
-      }
-    }
-    time_return <- pad_r[
-      pad_r %in% unique(substr(time_f, 9, 14))
-    ]
-    return(time_return)
-  }
-
-
-#' Process elevation statistic and resolution codes
-#' @description
-#' Identify the GMTED statistic and resolution based on the file path. Convert
-#' statistic and resolution to/from full string to/from statistic and
-#' resolution code.
-#' @param string character(1). File path to GMTED data file.
-#' @param statistic logical(1). Matches statistic to statistic code.
-#' @param resolution logical(1). Matches resolution to resolution code.
-#' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
-#' provides statistic or resolution code, and returns full length statistic
-#' or resolution.
-#' @keywords auxillary
-#' @return character
-#' @export
-process_gmted_codes <-
-  function(
-      string,
-      statistic = FALSE,
-      resolution = FALSE,
-      invert = FALSE) {
-    statistics <- c(
-      "Breakline Emphasis", "Systematic Subsample",
-      "Median Statistic", "Minimum Statistic",
-      "Mean Statistic", "Maximum Statistic",
-      "Standard Deviation Statistic"
+    terra::varnames(data_year) <- variable_checked
+    terra::longnames(data_year) <- variable_checked_long
+    data_full <- c(
+      data_full,
+      data_year,
+      warn = FALSE
     )
-    statistic_codes <- c("be", "ds", "md", "mi", "mn", "mx", "sd")
-    statistic_codes <- cbind(statistics, statistic_codes)
-    resolutions <- c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds")
-    resolution_codes <- c("75", "15", "30")
-    resolution_codes <- cbind(resolutions, resolution_codes)
-    if (statistic == TRUE && invert == FALSE) {
-      code <- statistic_codes[statistic_codes[, 1] == string][2]
-    } else if (statistic == TRUE && invert == TRUE) {
-      code <- statistic_codes[statistic_codes[, 2] == string][1]
-    }
-    if (resolution == TRUE && invert == FALSE) {
-      code <- resolution_codes[resolution_codes[, 1] == string][2]
-    } else if (resolution == TRUE && invert == TRUE) {
-      code <- resolution_codes[resolution_codes[, 2] == string][1]
-    }
-    return(code)
   }
+  #### subset years to dates of interest
+  data_return <- terra::subset(
+    data_full,
+    which(
+      substr(
+        names(data_full),
+        nchar(names(data_full)) - 7,
+        nchar(names(data_full))
+      ) %in% date_sequence
+    )
+  )
+  cat(paste0(
+    "Returning daily ",
+    variable_checked_long,
+    " data from ",
+    as.Date(
+      date_sequence[1],
+      format = "%Y%m%d"
+    ),
+    " to ",
+    as.Date(
+      date_sequence[length(date_sequence)],
+      format = "%Y%m%d"
+    ),
+    ".\n"
+  ))
+  #### return SpatRaster
+  return(data_return)
+}
 
-#' Process population resolution code
+# nolint start
+#' Process TerraClimate data
 #' @description
-#' Convert full length resolution name to/from resolution code.
-#' @param string character(1). Resolution name or code.
-#' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
-#' provides resolution code, and returns full length resolution.
-#' @keywords auxillary
+#' The \code{process_terraclimate()} function imports and cleans climate and water balance
+#' data, returning a single `SpatRaster` object.
+#' @param date character(2). length of 10 each.
+#' Start/end date of downloaded data.
+#' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
+#' @param variable character(1). Variable name or acronym code. See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
+#' for variable names and acronym codes.
+#' @param path character(1). Directory with downloaded netCDF (.nc) files.
+#' @note
+#' Layer names of the returned `SpatRaster` object contain the variable acronym, year,
+#' and month.
+#' @note
+#' TerraClimate data has monthly temporal resolution, so the first day of each month
+#' is used as a placeholder temporal value.
+#' @author Mitchell Manware
+#' @return a `SpatRaster` object
+#' @importFrom terra rast
+#' @importFrom terra time
+#' @importFrom terra subset
 #' @export
-process_sedac_codes <-
-  function(
-    string,
-    invert = FALSE
-  ) {
-    resolution_namecodes <- cbind(
-      c(
-        "60 minute", "30 second", "2.5 minute",
-        "15 minute", "30 minute"
+# nolint end
+process_terraclimate <- function(
+    date = c("2023-09-01", "2023-09-01"),
+    variable = NULL,
+    path = NULL) {
+  #### directory setup
+  path <- download_sanitize_path(path)
+  #### check for variable
+  check_for_null_parameters(mget(ls()))
+  variable_checked <- process_variable_codes(
+    variables = variable,
+    source = "terraclimate"
+  )
+  variable_checked_long <- process_terraclimate_codes(
+    variable_checked,
+    invert = TRUE
+  )
+  #### identify file paths
+  data_paths <- list.files(
+    path,
+    pattern = variable_checked,
+    full.names = TRUE
+  )
+  data_paths <- data_paths[grep(
+    ".nc",
+    data_paths
+  )]
+  #### define date sequence
+  date_sequence <- generate_date_sequence(
+    date[1],
+    date[2],
+    sub_hyphen = TRUE
+  )
+  #### years of interest
+  yoi <- unique(
+    substr(
+      date_sequence,
+      1, 4
+    )
+  )
+  #### year-months of interest
+  ymoi <- unique(
+    substr(
+      date_sequence,
+      1, 6
+    )
+  )
+  #### subset file paths to only dates of interest
+  data_paths <- unique(
+    grep(
+      paste(
+        yoi,
+        collapse = "|"
       ),
-      c(
-        "1_deg", "30_sec", "2pt5_min",
-        "15_min", "30_min"
+      data_paths,
+      value = TRUE
+    )
+  )
+  #### initiate for loop
+  data_full <- terra::rast()
+  for (p in seq_along(data_paths)) {
+    #### import data
+    data_year <- terra::rast(data_paths[p])
+    cat(paste0(
+      "Cleaning monthly ",
+      variable_checked_long,
+      " data for ",
+      substr(
+        terra::time(data_year)[1],
+        1,
+        4
+      ),
+      "...\n"
+    ))
+    names(data_year) <- paste0(
+      variable_checked,
+      "_",
+      substr(
+        gsub(
+          "-",
+          "",
+          terra::time(data_year)
+        ),
+        1,
+        6
       )
     )
-    if (invert == FALSE) {
-      resolution <-
-        resolution_namecodes[resolution_namecodes[, 1] == string][2]
-    } else if (invert == TRUE) {
-      resolution <-
-        resolution_namecodes[resolution_namecodes[, 2] == string][1]
-    }
-    return(resolution)
+    terra::varnames(data_year) <- variable_checked
+    terra::longnames(data_year) <- variable_checked_long
+    data_full <- c(
+      data_full,
+      data_year,
+      warn = FALSE
+    )
   }
-
-#' Process locations buffer
-#' @description
-#' Create circular buffer around locations based on user defined radius.
-#' @param locs SpatVector(1). SpatVector object with point geometry
-#' @param radius integer(1). Circular buffer size (meters).
-#' @description Creates a circular buffer around points if `radius` is > 0.
-#' Returns points if `radius` is 0.
-#' @keywords internal
-#' @returns a `SpatVector` object
-#' @importFrom terra buffer
-#' @export
-process_locs_radius <-
-  function(
-    locs,
-    radius
-  ) {
-    cat(paste0(
-      "Utilizing ",
-      radius,
-      " meter buffer for covariate calculations.\n"
-    ))
-    if (radius == 0) {
-      return(locs)
-    } else if (radius > 0) {
-      sites_buffer <- terra::buffer(
-        locs,
-        radius
-      )
-      return(sites_buffer)
-    }
-  }
-
-#' Process locations as `SpatVector`
-#' @description
-#' Convert locations from class \code{data.frame} or \code{data.table} to
-#' `SpatVector` object, project to coordinate reference system, and apply
-#' circular buffer.
-#' @param locs data.frame(1). Data frame containing columns for unique
-#' identifier, latitude, and longitude. Latitude and longitude columns **must**
-#' be named "lat" and "lon", respectively.
-#' @param crs Coordinate reference system (CRS) description utilizing
-#' `terra::crs()`.
-#' @param radius integer(1). Circular buffer size (meters).
-#' @keywords internal
-#' @returns a `SpatVector` object
-#' @importFrom terra crs
-#' @importFrom terra vect
-#' @importFrom terra project
-#' @export
-process_locs_vector <-
-  function(
-    locs,
-    crs,
-    radius
-  ) {
-    #### sites as data frame
-    if ("data.table" %in% class(locs)) {
-      cat(paste0(
-        "Converting data.table to data.frame...\n"
-      ))
-      sites_df <- data.frame(locs)
-    } else if ("data.frame" %in% class(locs) &&
-                 !("data.table" %in% class(locs))) {
-      cat(paste0(
-        "Sites are class data.frame...\n"
-      ))
-      sites_df <- locs
-    } else if (!("data.table" %in% class(locs)) &&
-                 !("data.frame" %in% class(locs))) {
-      stop(
-        paste0(
-          "Detected a ",
-          class(locs)[1],
-          " object. Sites must be class data.frame or data.table.\n"
+  #### subset years to dates of interest
+  data_return <- terra::subset(
+    data_full,
+    which(
+      substr(
+        names(data_full),
+        nchar(names(data_full)) - 5,
+        nchar(names(data_full))
+      ) %in% ymoi
+    )
+  )
+  cat(paste0(
+    "Returning monthly ",
+    variable_checked_long,
+    " data from ",
+    month.name[
+      as.numeric(
+        substr(
+          ymoi[1],
+          5,
+          6
         )
       )
-    }
-    #### columns
-    if (any(!(c("lon", "lat") %in% colnames(locs)))) {
-      stop(paste0(
-        "Sites data is missing 'lon', 'lat', or both.\n"
-      ))
-    }
-    #### as SpatVector
-    sites_v <- terra::vect(
-      sites_df,
-      geom = c("lon", "lat"),
-      crs = "EPSG:4326"
-    )
-    #### project SpatVector
-    cat(paste0(
-      "Projecting data to desired coordinate reference system...\n"
-    ))
-    sites_p <- terra::project(
-      sites_v,
-      crs
-    )
-    #### buffer SpatVector
-    sites_b <- process_locs_radius(
-      sites_p,
-      radius
-    )
-    return(sites_b)
-  }
+    ],
+    ", ",
+    substr(
+      ymoi[1],
+      1,
+      4
+    ),
+    " to ",
+    month.name[
+      as.numeric(
+        substr(
+          ymoi[length(ymoi)],
+          5,
+          6
+        )
+      )
+    ],
+    ", ",
+    substr(
+      ymoi[length(ymoi)],
+      1,
+      4
+    ),
+    ".\n"
+  ))
+  #### return SpatRaster
+  return(data_return)
+}
 
 
 

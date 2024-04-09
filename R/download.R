@@ -32,6 +32,8 @@
 #' * \link{download_modis_data}: "modis", "MODIS"
 #' * \link{download_tri_data}: "tri", "TRI"
 #' * \link{download_nei_data}: "nei", "NEI"
+#' * \link{download_gridmet_data}: "gridMET", "gridmet"
+#' * \link{download_terraclimate_data}: "TerraClimate", "terraclimate"
 #' @returns NULL
 #' @export
 download_data <-
@@ -40,7 +42,8 @@ download_data <-
                      "koppengeiger", "merra2", "merra", "narr_monolevel",
                      "modis", "narr_p_levels", "nlcd", "noaa", "sedac_groads",
                      "sedac_population", "groads", "population", "plevels",
-                     "p_levels", "monolevel", "hms", "smoke", "tri", "nei"),
+                     "p_levels", "monolevel", "hms", "smoke", "tri", "nei",
+                     "gridmet", "terraclimate"),
     directory_to_save = NULL,
     acknowledgement = FALSE,
     ...
@@ -74,7 +77,9 @@ download_data <-
       population = download_sedac_population_data,
       modis = download_modis_data,
       tri = download_tri_data,
-      nei = download_nei_data
+      nei = download_nei_data,
+      gridmet = download_gridmet_data,
+      terraclimate = download_terraclimate_data
     )
 
     tryCatch(
@@ -199,6 +204,12 @@ download_aqs_data <-
       download_names,
       "\n"
     )
+    #### filter commands to non-existing files
+    download_commands <- download_commands[
+      which(
+        !file.exists(download_names)
+      )
+    ]
     #### 7. initiate "..._curl_commands.txt"
     commands_txt <- paste0(
       directory_to_download,
@@ -222,12 +233,10 @@ download_aqs_data <-
       "\n"
     )
     #### 11. download data
-    if (!any(file.exists(download_names))) {
-      download_run(
-        download = download,
-        system_command = system_command
-      )
-    }
+    download_run(
+      download = download,
+      system_command = system_command
+    )
     #### 12. unzip data
     for (n in seq_along(download_names)) {
       download_unzip(
@@ -235,19 +244,16 @@ download_aqs_data <-
         directory_to_unzip = directory_to_save,
         unzip = unzip
       )
+      download_remove_zips(
+        remove = remove_zip,
+        download_name = download_names[n]
+      )
     }
     #### 13. remove command file
     download_remove_command(
       commands_txt = commands_txt,
       remove = remove_command
     )
-    #### 14. remove zip files
-    for (d in seq_along(download_names)) {
-      download_remove_zips(
-        remove = remove_zip,
-        download_name = download_names[d]
-      )
-    }
   }
 
 
@@ -359,8 +365,11 @@ download_ecoregion_data <- function(
   )
   #### 9. concatenate
   download_sink(commands_txt)
-  #### 10. concatenate and print download commands to "..._wget_commands.txt"
-  cat(download_command)
+  if (!file.exists(download_name)) {
+    #### 10. concatenate and print download commands to "..._wget_commands.txt"
+    #### cat command only if file does not already exist
+    cat(download_command)
+  }
   #### 11. finish "...curl_commands.txt" file
   sink()
   #### 12. build system command
@@ -457,7 +466,6 @@ download_geos_data <- function(
     date_end,
     "_wget_commands.txt"
   )
-
   download_sink(commands_txt)
   #### 9. concatenate and print download commands to "..._wget_commands.txt"
   for (d in seq_along(date_sequence)) {
@@ -466,7 +474,7 @@ download_geos_data <- function(
     month <- substr(date, 5, 6)
     day <- substr(date, 7, 8)
     for (t in seq_along(time_sequence)) {
-      download_url <- paste0(
+      download_url_base <- paste0(
         base,
         "Y",
         year,
@@ -474,13 +482,20 @@ download_geos_data <- function(
         month,
         "/D",
         day,
-        "/GEOS-CF.v01.rpl.",
+        "/"
+      )
+      download_name <- paste0(
+        "GEOS-CF.v01.rpl.",
         collection,
         ".",
         date,
         "_",
         time_sequence[t],
         "z.nc4"
+      )
+      download_url <- paste0(
+        download_url_base,
+        download_name
       )
       if (t == 1) {
         if (!(check_url_status(download_url))) {
@@ -494,16 +509,27 @@ download_geos_data <- function(
       }
       download_folder <- paste0(
         directory_to_save,
-        collection
+        collection,
+        "/"
       )
-      download_command <- paste0(
-        "wget ",
-        download_url,
-        " -P ",
+      download_folder_name <- paste0(
         download_folder,
+        download_name
+      )
+      if (!file.exists(download_folder)) {
+        dir.create(download_folder)
+      }
+      download_command <- paste0(
+        "curl ",
+        download_url,
+        " -o ",
+        download_folder_name,
         "\n"
       )
-      cat(download_command)
+      if (!file.exists(download_folder_name)) {
+        #### cat command only if file does not already exist
+        cat(download_command)
+      }
     }
   }
   #### 9. finish "..._wget_commands.txt" file
@@ -638,7 +664,10 @@ download_gmted_data <- function(
   )
   download_sink(commands_txt)
   #### 13. concatenate and print download command to "..._curl_commands.txt"
-  cat(download_command)
+  if (!file.exists(download_name)) {
+    #### cat command only if file does not already exist
+    cat(download_command)
+  }
   #### 14. finish "..._curl_commands.txt" file
   sink()
   #### 15. build system command
@@ -905,14 +934,25 @@ download_merra2_data <- function(
       directory_to_save,
       collection
     )
+    if (!file.exists(download_folder)) {
+      dir.create(download_folder)
+    }
+    download_name <- paste0(
+      download_folder,
+      "/",
+      list_urls_data[l]
+    )
     download_command <- paste0(
       "wget ",
       download_url,
-      " -P ",
-      download_folder,
+      " -O ",
+      download_name,
       "\n"
     )
-    cat(download_command)
+    if (!file.exists(download_name)) {
+      #### cat command only if file does not already exist
+      cat(download_command)
+    }
     download_url_metadata <- paste0(
       base,
       esdt_name,
@@ -928,14 +968,24 @@ download_merra2_data <- function(
       collection,
       "/metadata/"
     )
+    if (!file.exists(download_folder_metadata)) {
+      dir.create(download_folder_metadata)
+    }
+    download_name_metadata <- paste0(
+      download_folder_metadata,
+      list_urls_metadata[l]
+    )
     download_command_metadata <- paste0(
       "wget ",
       download_url_metadata,
-      " -P ",
-      download_folder_metadata,
+      " -O ",
+      download_name_metadata,
       "\n"
     )
-    cat(download_command_metadata)
+    if (!file.exists(download_name)) {
+      #### cat command only if file does not already exist
+      cat(download_command_metadata)
+    }
   }
   #### 14. finish "..._wget_commands.txt"
   sink()
@@ -961,8 +1011,8 @@ download_merra2_data <- function(
 #' Download meteorological data (monolevel)
 #' @description
 #' The \code{download_narr_monolevel_data} function accesses and downloads monolevel meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Monolevel" variables contain a single value for the entire atmospheric column (ie. Variable: Convective cloud cover; Level: Entire atmosphere considered as a single layer), or represent a specific altitude associated with the variable (ie. Variable: Air temperature; Level: 2 m).
-# nolint end
-#' @param variables character. Variable(s) name acronym.
+#' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
+#' for variable names and acronym codes.
 #' @param year_start integer(1). length of 4. Start of year range for
 #' downloading data.
 #' @param year_end integer(1). length of 4. End of year range for downloading
@@ -979,9 +1029,10 @@ download_merra2_data <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Yearly netCDF (.nc) files will be stored in
-#' \code{directory_to_save}.
+#' @return NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
+#' folder within \code{directory_to_save}.
 #' @export
+# nolint end
 download_narr_monolevel_data <- function(
     variables = NULL,
     year_start = 2022,
@@ -1056,7 +1107,10 @@ download_narr_monolevel_data <- function(
         url,
         "\n"
       )
-      cat(command)
+      if (!file.exists(destfile)) {
+        #### cat command only if file does not already exist
+        cat(command)
+      }
     }
   }
   #### 9. finish "..._curl_commands.txt"
@@ -1083,8 +1137,8 @@ download_narr_monolevel_data <- function(
 #' Download meteorological data (pressure levels)
 #' @description
 #' The \code{download_narr_p_levels_data} function accesses and downloads pressure levels meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
-# nolint end
-#' @param variables character(1). Variable(s) name acronym.
+#' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
+#' for variable names and acronym codes.
 #' @param year_start integer(1). length of 4. Start of year range for
 #' downloading data.
 #' @param year_end integer(1). length of 4. End of year range for downloading
@@ -1104,6 +1158,8 @@ download_narr_monolevel_data <- function(
 #' @return NULL; Monthly netCDF (.nc) files will be stored in
 #' \code{directory_to_save}.
 #' @export
+# nolint end
+# nolint start: cyclocomp
 download_narr_p_levels_data <- function(
     variables = NULL,
     year_start = 2022,
@@ -1184,7 +1240,11 @@ download_narr_p_levels_data <- function(
           url,
           "\n"
         )
-        cat(command)
+        #### cat command only if file does not already exist
+        if (!file.exists(destfile)) {
+          #### cat command only if file does not already exist
+          cat(command)
+        }
       }
     }
   }
@@ -1207,7 +1267,7 @@ download_narr_p_levels_data <- function(
     remove = remove_command
   )
 }
-
+# nolint end: cyclocomp
 
 # nolint start
 #' Download land cover data
@@ -1322,7 +1382,10 @@ download_nlcd_data <- function(
   )
   download_sink(commands_txt)
   #### 12. concatenate and print download command to "..._curl_commands.txt"
-  cat(download_command)
+  if (!file.exists(download_name)) {
+    #### cat command only if file does not already exist
+    cat(download_command)
+  }
   #### 13. finish "..._curl_command.txt"
   sink()
   #### 14. build system command
@@ -1460,8 +1523,11 @@ download_sedac_groads_data <- function(
     "_curl_command.txt"
   )
   download_sink(commands_txt)
-  #### 12. concatenate and print download command to "..._curl_commands.txt"
-  cat(download_command)
+  if (!file.exists(download_name)) {
+    #### 12. concatenate and print download command to "..._curl_commands.txt"
+    #### cat command only if file does not already exist
+    cat(download_command)
+  }
   #### 13. finish "..._curl_commands.txt" file
   sink()
   #### 14. build system command
@@ -1635,8 +1701,11 @@ download_sedac_population_data <- function(
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
-  #### 13. concatenate and print download command to "..._curl_commands.txt"
-  cat(download_command)
+  if (!file.exists(download_name)) {
+    #### 13. concatenate and print download command to "..._curl_commands.txt"
+    #### cat command only if file does not already exist
+    cat(download_command)
+  }
   #### 14. finish "..._curl_commands.txt" file
   sink()
   #### 15. build system command
@@ -1706,6 +1775,7 @@ download_sedac_population_data <- function(
 #' Shapefiles (.shp) or KML files (.kml) will be stored in
 #' \code{directory_to_save}.
 #' @export
+# nolint start: cyclocomp
 download_hms_data <- function(
     data_format = "Shapefile",
     date_start = "2023-09-01",
@@ -1800,7 +1870,10 @@ download_hms_data <- function(
       url,
       "\n"
     )
-    cat(command)
+    if (!file.exists(destfile)) {
+      #### cat command only if file does not already exist
+      cat(command)
+    }
   }
   #### 9. finish "..._curl_commands.txt"
   sink()
@@ -1838,7 +1911,7 @@ download_hms_data <- function(
     download_name = download_names
   )
 }
-
+# nolint end: cyclocomp
 
 # nolint start
 #' Download climate classification data
@@ -1932,9 +2005,11 @@ download_koppen_geiger_data <- function(
     "_wget_command.txt"
   )
   download_sink(commands_txt)
-  #### 12. concatenate and print download command to "..._wget_commands.txt"
-  cat(download_command)
-  #### 13. finish "..._wget_commands.txt" file
+  if (!file.exists(download_name)) {
+    #### 12. concatenate and print download command to "..._wget_commands.txt"
+    #### cat command only if file does not already exist
+    cat(download_command)
+  }
   sink()
   #### 14. build system command
   system_command <- paste0(
@@ -2156,6 +2231,13 @@ download_modis_data <- function(
     date_start <- as.Date(as.character(min(file_dates)), format = "%Y%j")
     date_end <- as.Date(as.character(max(file_dates)), format = "%Y%j")
 
+    # Extract year and month from file_dates
+    splitter <- paste0(
+      substr(file_dates, 1, 4), "/", substr(file_dates, 5, 7), "/"
+    )
+    # Extract download names from file_url using splitter
+    download_name <- sapply(strsplit(file_url, splitter), `[`, 2)
+
     #### 10-3. initiate "..._wget_commands.txt" file
     commands_txt <- paste0(
       directory_to_save,
@@ -2169,18 +2251,27 @@ download_modis_data <- function(
 
     #### 10-4. write download_command
     download_command <- paste0(
-      "wget -e robots=off -m -np -R .html,.tmp ",
+      "wget -e robots=off -np -R .html,.tmp ",
       "-nH --cut-dirs=3 \"",
       download_url,
       "\" --header \"Authorization: Bearer ",
       nasa_earth_data_token,
-      "\" -P ",
+      "\" -O ",
       directory_to_save,
+      download_name,
       "\n"
     )
 
+    #### filter commands to non-existing files
+    download_command <- download_command[
+      which(
+        !file.exists(download_name)
+      )
+    ]
+
     # avoid any possible errors by removing existing command files
     download_sink(commands_txt)
+    #### cat command only if file does not already exist
     cat(download_command)
     sink()
 
@@ -2281,18 +2372,33 @@ download_modis_data <- function(
         value = TRUE
       )
     download_url <- sprintf("%s%s", ladsurl, filelist_sub)
+
+    download_name <- sapply(
+      strsplit(download_url, paste0("/", day, "/")), `[`, 2
+    )
+
     # Main wget run
     download_command <- paste0(
-      "wget -e robots=off -m -np -R .html,.tmp ",
+      "wget -e robots=off -np -R .html,.tmp ",
       "-nH --cut-dirs=3 \"",
       download_url,
       "\" --header \"Authorization: Bearer ",
       nasa_earth_data_token,
-      "\" -P ",
+      "\" -O ",
       directory_to_save,
+      download_name,
       "\n"
     )
+
+    #### filter commands to non-existing files
+    download_command <- download_command[
+      which(
+        !file.exists(download_name)
+      )
+    ]
+
     #### 15. concatenate and print download commands to "..._wget_commands.txt"
+    #### cat command only if file does not already exist
     cat(download_command)
   }
 
@@ -2372,6 +2478,12 @@ download_tri_data <- function(
                               " --output ",
                               download_names,
                               "\n")
+  #### filter commands to non-existing files
+  download_commands <- download_commands[
+    which(
+      !file.exists(download_names)
+    )
+  ]
   #### 5. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
     directory_to_save,
@@ -2479,7 +2591,12 @@ download_nei_data <- function(
     c("2017neiApr_onroad_byregions.zip",
       "2020nei_onroad_byregion.zip")
   download_names <- paste0(directory_to_save, download_names_file)
-
+  #### filter commands to non-existing files
+  download_urls <- download_urls[
+    which(
+      !file.exists(download_names)
+    )
+  ]
   #### 4. build download command
   download_commands <-
     paste0("wget --ca-certificate=",
@@ -3154,4 +3271,888 @@ download_prism_data <- function(
   download_remove_command(commands_txt = commands_txt,
                           remove = remove_command)
 
+}
+
+
+
+# nolint start
+#' Download OpenLandMap data
+#' @description
+#' Accesses and downloads OpenLandMap data from the [OpenLandMap website](https://www.openlandmap.org/).
+#' @param product character(1). Available collection name in OpenLandMap
+#' STAC Catalog. [list_stac_files] with `id_only = TRUE` to see available collections.
+#' * "no2_s5p.l3.trop.tmwm"
+#' * "no2_s5p.l3.trop.tmwm.ltm"
+#' * "log.oc_iso.10694"
+#' * "evi_mod13q1.stl.trend.logit.ols.beta"
+#' * "land.cover_esacci.lc.l4"
+#' * "evi_mod13q1.tmwm.inpaint"
+#' * "dtm.bareearth_ensemble"
+#' * "fapar_essd.lstm"
+#' * "fapar_essd.lstm.p95.beta"
+#' * "pot.fapar_fapar.p95.eml.m"
+#' * "pot.fapar_fapar.p95.eml"
+#' * "snow.cover_esa.modis"
+#' * "snow.cover_esa.modis.ltm"
+#' * "wilderness_li2022.human.footprint"
+#' * "wv_mcd19a2v061.seasconv"
+#' * "wv_mcd19a2v061.seasconv.m_p50"
+#' * "wv_mcd19a2v061.seasconv.m_p25"
+#' * "wv_mcd19a2v061.seasconv.m_p75"
+#' * "wv_mcd19a2v061.seasconv.m_std"
+#' * "wv_mcd19a2v061.seasconv.m.yearly"
+#' * "bulkdens.fineearth_usda.4a1h"
+#' * "geom_merit.dem"
+#' * "fapar_proba.v"
+#' * "forest.cover_esacci.ifl"
+#' * "grtgroup_usda.soiltax"
+#' * "land.cover_copernicus"
+#' * "organic.carbon.stock_msa.kgm2"
+#' * "organic.carbon_usda.6a1c"
+#' * "pft.landcover_esa.cci.lc"
+#' * "precipitation_sm2rain.ltm"
+#' * "ph.h2o_usda.4c1a2a"
+#' * "pop.count_ghs.jrc"
+#' * "sand.wfraction_usda.3a1a1a"
+#' * "lc_mcd12q1v061.p1"
+#' * "texture.class_usda.tt"
+#' * "water.occurrence_jrc.surfacewater"
+#' * "watercontent.33kPa_usda.4b1c"
+#' * "dsm_glo30"
+#' * "lc_glad.glcluc"
+#' * "lc_glad.glcluc.change"
+#' * "landuse.cropland_hyde"
+#' * "landuse.pasture_hyde"
+#' * "land.use.land.cover_hilda.plus"
+#' * "lst_mod11a2.daytime.trend.logit.ols.beta"
+#' * "lst_mod11a2.nighttime.trend.logit.ols.beta"
+#' * "lst_mod11a2.daytime.annual"
+#' * "lst_mod11a2.nighttime.annual"
+#' * "lst_mod11a2.daytime"
+#' * "lst_mod11a2.nighttime"
+#' * "landform_usgs.ecotapestry"
+#' * "lithology_usgs.ecotapestry"
+#' * "grtgroup_usda.soiltax.hapludalfs"
+#' * "biome.type_biome00k"
+#' * "biomes_biome6k.tropical.evergreen.broadleaf.forest"
+#' * "biomes_biome6k.tropical.evergreen.broadleaf.forest.rcp26"
+#' * "biomes_biome6k.tropical.evergreen.broadleaf.forest.rcp45"
+#' * "biomes_biome6k.tropical.evergreen.broadleaf.forest.rcp85"
+#' * "biomes_biome6k.tropical.savanna"
+#' * "biomes_biome6k.tropical.savanna.rcp26"
+#' * "biomes_biome6k.tropical.savanna.rcp45"
+#' * "biomes_biome6k.tropical.savanna.rcp85"
+#' * "lc_glc.fcs30d"
+#' * "nightlights.average_viirs.v21"
+#' * "nightlights.difference_viirs.v21"
+#' * "l2a.gedi"
+#' * "fluxnet"
+#' * "gbov"
+#' * "geowiki.lc"
+#' * "geowiki.forest.loss"
+#' * "veg.plot"
+#' * "obis"
+#' * "fapar.eml"
+#' @param format character(1). File format to query. Default is "tif".
+#' It could be used as a pattern search for the file names.
+#' @param directory_to_save character(1). Directory to download files.
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
+#' large and use lots of machine storage and memory.
+#' @param download logical(1). \code{FALSE} will generate a *.txt file
+#' containing all download commands. By setting \code{TRUE} the function
+#' will download all of the requested data files.
+#' @param remove_command logical(1).
+#' Remove (\code{TRUE}) or keep (\code{FALSE})
+#' the text file containing download commands.
+#' @author Insang Song
+#' @note `extdata/openlandmap_assets.rds` contains the available assets in OpenLandMap.
+#' Users may want to check the available assets to download data directly.
+#' For developers: JSON files should be found at STAC catalog of OpenLandMap when updated.
+#' @returns NULL; GeoTIFF (.tif) files will be stored in
+#' \code{directory_to_save}.
+#' @seealso [list_stac_files]
+#' @export
+# nolint end
+download_olm_data <- function(
+  product = NULL,
+  format = "tif",
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE
+) {
+  #### 1. check for data download acknowledgement
+  download_permit(acknowledgement = acknowledgement)
+  #### 2. directory setup
+  download_setup_dir(directory_to_save)
+  directory_to_save <- download_sanitize_path(directory_to_save)
+
+  #### 3. define measurement data paths
+
+  download_urls <-
+    list_stac_files(
+      which = product,
+      format = format,
+      id_only = FALSE
+    )
+  url_filenames <- strsplit(download_urls, "/", fixed = TRUE)[[1]]
+  url_filenames <- sapply(url_filenames, \(x) x[length(x)])
+
+  download_names <- paste0(directory_to_save, url_filenames)
+  #### 4. build download command
+  download_commands <-
+    paste0("wget -e robots=off -np ",
+           download_urls,
+           " -O ",
+           download_names,
+           "\n")
+
+  #### 5. initiate "..._curl_commands.txt"
+  commands_txt <- paste0(
+    directory_to_save,
+    "OLM_queried_",
+    product,
+    "_",
+    Sys.Date(),
+    "_wget_commands.txt"
+  )
+  download_sink(commands_txt)
+  #### 6. concatenate and print download commands to "..._curl_commands.txt"
+  writeLines(download_commands)
+  #### 7. finish "..._curl_commands.txt" file
+  sink()
+  #### 8. build system command
+  system_command <- paste0(
+    ". ",
+    commands_txt,
+    "\n"
+  )
+  #### 9. download data
+  download_run(download = download,
+               system_command = system_command)
+
+  message("Requests were processed.\n")
+  #### 10. remove download commands
+  download_remove_command(commands_txt = commands_txt,
+                          remove = remove_command)
+
+}
+
+i
+# nolint start
+#' Download National Hydrography Dataset (NHD) data
+#' @description
+#' NHDPlus data provides the most comprehensive and high-resolution
+#' hydrography data. This function downloads **national** dataset from
+#' NHDPlus Version 2.1 on USGS Amazon S3 storage.
+#' @note
+#' For HUC, set `type = "Seamless"`. HUC12 layer presents in the seamless
+#' geodatabase. Users can aggregate HUC12 layer to make HUC6, HUC8, HUC10, etc.
+#' For whom wants to download a specific region,
+#' please visit [Get NHDPlus Data](https://www.epa.gov/waterdata/get-nhdplus-national-hydrography-dataset-plus-data#ListofAreas)
+#' @param region character(1). One of `c("Lower48", "Islands")`.
+#' When `"Islands"` is selected, the data will be downloaded for Hawaii, Puerto Rico, and Virgin Islands.
+#' @param type character(1). One of `c("Seamless", "OceanCatchment")`.
+#' @param directory_to_save character(1). Directory to download files.
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
+#' large and use lots of machine storage and memory.
+#' @param download logical(1). \code{FALSE} will generate a *.txt file
+#' containing all download commands. By setting \code{TRUE} the function
+#' will download all of the requested data files.
+#' @param remove_command logical(1).
+#' Remove (\code{TRUE}) or keep (\code{FALSE})
+#' the text file containing download commands.
+#' @param unzip logical(1). Unzip the downloaded compressed files.
+#' Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.
+#' @returns None. Downloaded files will be stored in \code{directory_to_save}.
+#' @author Insang Song
+#' @examples
+#' \dontrun{
+#' download_huc("Lower48", "Seamless", "~/data"
+#'              acknowledgement = TRUE,
+#'              download = TRUE,
+#'              unzip = TRUE)
+#' }
+#' @export
+# @importFrom archive archive_extract
+download_huc_data <-
+  function(
+    region = c("Lower48", "Islands"),
+    type = c("Seamless", "OceanCatchment"),
+    directory_to_save = NULL,
+    acknowledgement = FALSE,
+    download = FALSE,
+    remove_command = FALSE,
+    unzip = FALSE
+  ) {
+    #### 1. check for data download acknowledgement
+    download_permit(acknowledgement = acknowledgement)
+    #### 2. directory setup
+    download_setup_dir(directory_to_save)
+    directory_to_save <- download_sanitize_path(directory_to_save)
+
+    region <- match.arg(region)
+    type <- match.arg(type)
+
+    url_base <-
+      "https://dmap-data-commons-ow.s3.amazonaws.com/NHDPlusV21/Data/NationalData/"
+
+    if (region == "Lower48") {
+      if (type == "Seamless") {
+        url_template_nat <-
+          "NHDPlusV21_NationalData_Seamless_Geodatabase_Lower48_07.7z"
+      }
+      if (type == "OceanCatchment") {
+        url_template_nat <-
+          "NHDPlusV21_NationalData_OceanCatchment_Lower48_fgdb_01.7z"
+      }
+    }
+    if (region == "Islands") {
+      if (type == "Seamless") {
+        url_template_nat <-
+          "NHDPlusV21_NationalData_Seamless_Geodatabase_HI_PR_VI_PI_03.7z"
+      }
+      if (type == "OceanCatchment") {
+        url_template_nat <-
+          "NHDPlusV21_NationalData_OceanCatchment_Islands_fgdb_01.7z"
+      }
+    }
+    download_urls <- paste0(url_base, url_template_nat)
+    download_names <- paste0(directory_to_save, url_template_nat)
+
+    #### 4. build download command
+    download_commands <-
+      paste0(
+        "wget -e robots=off -np",
+        " ",
+        download_urls,
+        " -O ",
+        download_names,
+        "\n"
+      )
+
+    #### 5. initiate "..._curl_commands.txt"
+    commands_txt <- paste0(
+      directory_to_save,
+      "USGS_NHD_",
+      region,
+      "_",
+      type,
+      "_",
+      Sys.Date(),
+      "_wget_commands.txt"
+    )
+    download_sink(commands_txt)
+    #### 6. concatenate and print download commands to "..._curl_commands.txt"
+    writeLines(download_commands)
+    #### 7. finish "..._curl_commands.txt" file
+    sink()
+    #### 8. build system command
+    system_command <- paste0(
+      ". ",
+      commands_txt,
+      "\n"
+    )
+    #### 9. download data
+    download_run(download = download,
+                 system_command = system_command)
+
+    #### 10. unzip data
+    # note that this part does not utilize download_unzip
+    # as duplicate file names are across multiple zip files
+    if (download) {
+      if (unzip) {
+        stop("Unzipping is not supported for 7z files. Please do it manually with 7-zip program")
+        # dir_unzip <- gsub("(\\.7z)", "", download_names)
+        # for (fn in seq_along(dir_unzip)) {
+        #   archive::archive_extract(
+        #     archive = download_names[fn],
+        #     dir = dir_unzip[fn]
+        #   )
+        # }
+      }
+    }
+    message("Requests were processed.\n")
+    #### 10. remove download commands
+    download_remove_command(commands_txt = commands_txt,
+                            remove = remove_command)
+
+  }
+# nolint end
+
+
+
+# nolint start
+#' Download CropScape data
+#' @description
+#' Accesses and downloads United States Department of Agriculture
+#' CropScape Cropland Data Layer data from 
+#' the [USDA National Agricultural Statistics Service](https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.php) or the 
+#' [George Mason University website](https://https://nassgeodata.gmu.edu/CropScape/).
+#' @param year integer(1). Year of the data to download.
+#' @param source character(1). Data source, one of `c("USDA", "GMU")`.
+#' * `"USDA"` will download the national data from the USDA website (available in 2008-last year).
+#' * `"GMU"` will download the data from the George Mason University website (available in 1997-last year).
+#' @param directory_to_save character(1). Directory to download files.
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
+#' large and use lots of machine storage and memory.
+#' @param download logical(1). \code{FALSE} will generate a *.txt file
+#' containing all download commands. By setting \code{TRUE} the function
+#' will download all of the requested data files.
+#' @param remove_command logical(1).
+#' Remove (\code{TRUE}) or keep (\code{FALSE})
+#' the text file containing download commands.
+#' @param unzip logical(1). Unzip the downloaded compressed files.
+#' Default is \code{FALSE}.
+#' @author Insang Song
+#' @note JSON files should be found at STAC catalog of OpenLandMap
+#' @returns NULL; Yearly comma-separated value (CSV) files will be stored in
+#' \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_cropscape_data(
+#'   2020, "~/data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   unzip = TRUE
+#' )
+#' }
+#' @importFrom utils untar
+#' @importFrom utils unzip
+#' @export
+download_cropscape_data <- function(
+  year = seq(1997, 2023),
+  source = c("USDA", "GMU"),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE
+) {
+  source <- match.arg(source)
+  if (source == "GMU" && year < 1997) {
+    stop("Year should be equal to or greater than 1997.")
+  }
+  if (source == "USDA" && year < 2008) {
+    stop("Year should be equal to or greater than 2008.")
+  }
+  #### 1. check for data download acknowledgement
+  download_permit(acknowledgement = acknowledgement)
+  #### 2. directory setup
+  download_setup_dir(directory_to_save)
+  directory_to_save <- download_sanitize_path(directory_to_save)
+
+  #### 3. define measurement data paths
+  url_download_base <- switch(
+    source,
+    USDA = "https://www.nass.usda.gov/Research_and_Science/Cropland/Release/datasets/",
+    GMU = "https://nassgeodata.gmu.edu/nass_data_cache/tar/"
+  )
+  filename_template <- switch(
+    source,
+    USDA = "%d_30m_cdls.zip",
+    GMU = "%d_cdls.tar.gz"
+  )
+  url_download_template <- paste0(url_download_base, filename_template)
+
+  download_urls <-
+    sprintf(url_download_template, year)
+  download_names_file <- sprintf(filename_template, year)
+  download_names <- paste0(directory_to_save, download_names_file)
+
+  #### 4. build download command
+  download_commands <-
+    paste0("wget -e robots=off -np",
+           " ",
+           download_urls,
+           " -O ",
+           download_names,
+           "\n")
+
+  #### 5. initiate "..._curl_commands.txt"
+  commands_txt <- paste0(
+    directory_to_save,
+    "CropScape_CDL_",
+    source,
+    "_",
+    year,
+    "_",
+    Sys.Date(),
+    "_wget_commands.txt"
+  )
+  download_sink(commands_txt)
+  #### 6. concatenate and print download commands to "..._curl_commands.txt"
+  writeLines(download_commands)
+  #### 7. finish "..._curl_commands.txt" file
+  sink()
+  #### 8. build system command
+  system_command <- paste0(
+    ". ",
+    commands_txt,
+    "\n"
+  )
+  #### 9. download data
+  download_run(download = download,
+               system_command = system_command)
+
+  #### 10. unzip data
+  # note that this part does not utilize download_unzip
+  # as duplicate file names are across multiple zip files
+  if (download) {
+    if (unzip) {
+      extension <- ifelse(source == "USDA", "\\.zip", "(\\.tar|\\.tar\\.gz)")
+      dir_unzip <- gsub(extension, "", download_names)
+      for (fn in seq_along(dir_unzip)) {
+        if (source == "GMU") {
+          utils::untar(tarfile = download_names[fn], exdir = dir_unzip[fn])
+        } else {
+          utils::unzip(zipfile = download_names[fn], exdir = dir_unzip[fn])
+        }
+      }
+    }
+  }
+  message("Requests were processed.\n")
+  #### 10. remove download commands
+  download_remove_command(commands_txt = commands_txt,
+                          remove = remove_command)
+
+}
+# nolint end
+
+# nolint start
+#' Download PRISM data
+#' @description
+#' Accesses and downloads Oregon State University's
+#' PRISM data from the PRISM Climate Group Web Service
+#' @param time character(1). Length of 2, 4, 6, or 8. Time period for
+#' time series or normals. According to the PRISM Web Service Guide,
+#' acceptable formats include (disclaimer: the following is a direct quote;
+#' minimal formatting is applied):
+#' __Time Series__:
+#' * `YYYYMMDD` for daily data (between yesterday and January 1st, 1981) – returns a single grid in a .zip file
+#' * `YYYYMM` for monthly data (between last month and January 1981) – returns a single grid in a .zip file
+#' * `YYYY` for annual data (between last year and 1981) - returns a single grid in a .zip file
+#' * `YYYY`` for historical data (between 1980 and 1895) - returns a single zip file containing 12 monthly grids for `YYYY` plus the annual.
+#'
+#' __Normals__:
+#' * Monthly normal: date is `MM` (i.e., 04 for April) or the value 14, which returns the annual normal
+#' * Daily normal: date is `MMDD` (i.e., 0430 for April 30)
+#' @param element character(1). Data element.
+#' One of `c("ppt", "tmin", "tmax", "tmean", "tdmean", "vpdmin", "vpdmax")`
+#' For normals, `c("solslope", "soltotal", "solclear", "soltrans")` are also accepted.
+#' @param data_type character(1). Data type.
+#' * `"ts"`: 4km resolution time series.
+#' * `"normals_800"`: 800m resolution normals.
+#' * `"normals"`: 4km resolution normals.
+#' @param format character(1). Data format. Only applicable for `data_type = "ts"`.
+#' @param directory_to_save character(1). Directory to download files.
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
+#' large and use lots of machine storage and memory.
+#' @param download logical(1). \code{FALSE} will generate a *.txt file
+#' containing all download commands. By setting \code{TRUE} the function
+#' will download all of the requested data files.
+#' @param remove_command logical(1).
+#' Remove (\code{TRUE}) or keep (\code{FALSE})
+#' the text file containing download commands.
+#' @param unzip logical(1). Unzip the downloaded zip files.
+#' Default is \code{FALSE}.
+#' @author Insang Song
+#' @returns NULL; .bil (normals) or single grid files depending on the format choice.
+#' \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_prism_data(
+#'   time = "202104",
+#'   element = "ppt",
+#'   data_type = "ts",
+#'   format = "nc",
+#'   directory_to_save = "~/data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE,
+#'   unzip = TRUE
+#' )
+#' }
+#' @references
+#' * [PRISM Climate Group](http://www.prism.oregonstate.edu/)
+#' * [PRISM Web Service Guide](https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf)
+#' @importFrom utils unzip
+#' @export
+# nolint end
+download_prism_data <- function(
+  time,
+  element = c("ppt", "tmin", "tmax", "tmean", "tdmean",
+              "vpdmin", "vpdmax",
+              "solslope", "soltotal", "solclear", "soltrans"),
+  data_type = c("ts", "normals_800", "normals"),
+  format = c("nc", "asc", "grib2"),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE
+) {
+  data_type <- match.arg(data_type)
+  element <- match.arg(element)
+  format <- match.arg(format)
+
+  if (startsWith(data_type, "ts")) {
+    if (startsWith(element, "sol")) {
+      stop("sol* elements are not available for 'ts' data type.")
+    }
+  } else {
+    message("format is ignored for normals data type.")
+  }
+
+  #### 1. check for data download acknowledgement
+  download_permit(acknowledgement = acknowledgement)
+  #### 2. directory setup
+  download_setup_dir(directory_to_save)
+  directory_to_save <- download_sanitize_path(directory_to_save)
+
+  url_middle <-
+    # ts: element-date-format
+    # normals: element-date
+    switch(data_type,
+           "ts" = "4km/%s/%s?format=%s",
+           "normals_800" = "normals/800m/%s/%s",
+           "normals" = "normals/4km/%s/%s")
+  #### 3. define measurement data paths
+  url_download_template <-
+    file.path(
+      "https://services.nacse.org/prism/data/public",
+      url_middle
+    )
+
+  download_urls <-
+    ifelse(data_type == "ts",
+           sprintf(url_download_template, element, time, format),
+           sprintf(url_download_template, element, time))
+
+  #### 4. build download command
+  # --content-disposition flag is for web service retrieval
+  # when using the URL does not end with the file name
+  download_commands <-
+    paste0("wget -e robots=off -np ",
+           "--content-disposition ",
+           download_urls,
+           " -P ",
+           directory_to_save,
+           "\n")
+
+  #### 5. initiate "..._curl_commands.txt"
+  commands_txt <- paste0(
+    directory_to_save,
+    "PRISM_",
+    element, "_",
+    data_type, "_",
+    time,
+    "_",
+    Sys.Date(),
+    "_wget_commands.txt"
+  )
+  download_sink(commands_txt)
+  #### 6. concatenate and print download commands to "..._curl_commands.txt"
+  writeLines(download_commands)
+  #### 7. finish "..._curl_commands.txt" file
+  sink()
+  #### 8. build system command
+  system_command <- paste0(
+    ". ",
+    commands_txt,
+    "\n"
+  )
+  #### 9. download data
+  download_run(download = download,
+               system_command = system_command)
+
+  #### 10. unzip data
+  # note that this part does not utilize download_unzip
+  # as duplicate file names are across multiple zip files
+  if (download) {
+    if (unzip) {
+      path_unzip <-
+        list.files(
+          directory_to_save,
+          pattern = paste0("*.*", element, "*.*", time, "*.*.zip"),
+          full.names = TRUE
+        )
+      for (fn in seq_along(path_unzip)) {
+        utils::unzip(
+          zipfile = path_unzip[fn],
+          exdir = directory_to_save,
+          overwrite = FALSE
+        )
+      }
+    }
+  }
+  message("Requests were processed.\n")
+  #### 10. remove download commands
+  download_remove_command(commands_txt = commands_txt,
+                          remove = remove_command)
+
+}
+
+# nolint start
+#' Download gridMET data
+#' @description
+#' The \code{download_gridmet_data} function accesses and downloads gridded surface meteorological data from the [University of California Merced Climatology Lab's gridMET dataset](https://www.climatologylab.org/gridmet.html).
+#' @param variables character(1). Variable(s) name(s). See [gridMET Generate Wget File](https://www.climatologylab.org/wget-gridmet.html)
+#' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
+#' "Energy Release Component" has code "erc").
+#' @param year_start integer(1). length of 4. Start of year range for
+#' downloading data.
+#' @param year_end integer(1). length of 4. End of year range for downloading
+#' data.
+#' @param directory_to_save character(1). Directory(s) to save downloaded data
+#' files.
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
+#' large and use lots of machine storage and memory.
+#' @param download logical(1). \code{FALSE} will generate a *.txt file
+#' containing all download commands. By setting \code{TRUE} the function
+#' will download all of the requested data files.
+#' @param remove_command logical(1).
+#' Remove (\code{TRUE}) or keep (\code{FALSE})
+#' the text file containing download commands.
+#' @author Mitchell Manware
+#' @return NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
+#' folder within \code{directory_to_save}.
+#' @export
+# nolint end
+download_gridmet_data <- function(
+    variables = NULL,
+    year_start = 2022,
+    year_end = 2022,
+    directory_to_save = NULL,
+    acknowledgement = FALSE,
+    download = FALSE,
+    remove_command = FALSE) {
+  #### check for data download acknowledgement
+  download_permit(acknowledgement = acknowledgement)
+  #### check for null parameters
+  check_for_null_parameters(mget(ls()))
+  #### directory setup
+  download_setup_dir(directory_to_save)
+  directory_to_save <- download_sanitize_path(directory_to_save)
+  #### define years sequence
+  if (any(nchar(year_start) != 4, nchar(year_end) != 4)) {
+    stop("year_start and year_end should be 4-digit integers.\n")
+  }
+  years <- seq(year_start, year_end, 1)
+  #### define variables
+  variables_list <- process_variable_codes(
+    variables = variables,
+    source = "gridmet"
+  )
+  #### define URL base
+  base <- "https://www.northwestknowledge.net/metdata/data/"
+  #### initiate "..._curl_commands.txt"
+  commands_txt <- paste0(
+    directory_to_save,
+    "gridmet_",
+    year_start, "_", year_end,
+    "_curl_commands.txt"
+  )
+  download_sink(commands_txt)
+  #### concatenate and print download commands to "..._curl_commands.txt"
+  for (v in seq_along(variables_list)) {
+    variable <- variables_list[v]
+    folder <- paste0(directory_to_save, variable, "/")
+    if (!(file.exists(folder))) {
+      dir.create(folder)
+    }
+    for (y in seq_along(years)) {
+      year <- years[y]
+      url <- paste0(
+        base,
+        variable,
+        "_",
+        year,
+        ".nc"
+      )
+      if (y == 1) {
+        if (!(check_url_status(url))) {
+          sink()
+          file.remove(commands_txt)
+          stop(paste0(
+            "Invalid year returns HTTP code 404. ",
+            "Check `year_start` parameter.\n"
+          ))
+        }
+      }
+      destfile <- paste0(
+        directory_to_save,
+        variable,
+        "/",
+        variable,
+        "_",
+        year,
+        ".nc"
+      )
+      command <- paste0(
+        "curl -s -o ",
+        destfile,
+        " --url ",
+        url,
+        "\n"
+      )
+      if (!file.exists(destfile)) {
+        #### cat command only if file does not already exist
+        cat(command)
+      }
+    }
+  }
+  #### finish "..._curl_commands.txt"
+  sink()
+  #### build system command
+  system_command <- paste0(
+    ". ",
+    commands_txt,
+    "\n"
+  )
+  #### download data
+  download_run(
+    download = download,
+    system_command = system_command
+  )
+  #### remove command text file
+  download_remove_command(
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
+}
+
+# nolint start
+#' Download TerraClimate data
+#' @description
+#' The \code{download_terraclimate_data} function accesses and downloads climate and water balance data from the [University of California Merced Climatology Lab's TerraClimate dataset](https://www.climatologylab.org/terraclimate.html).
+#' @param variables character(1). Variable(s) name(s). See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
+#' for variable names and acronym codes.
+#' @param year_start integer(1). length of 4. Start of year range for
+#' downloading data.
+#' @param year_end integer(1). length of 4. End of year range for downloading
+#' data.
+#' @param directory_to_save character(1). Directory(s) to save downloaded data
+#' files.
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
+#' large and use lots of machine storage and memory.
+#' @param download logical(1). \code{FALSE} will generate a *.txt file
+#' containing all download commands. By setting \code{TRUE} the function
+#' will download all of the requested data files.
+#' @param remove_command logical(1).
+#' Remove (\code{TRUE}) or keep (\code{FALSE})
+#' the text file containing download commands.
+#' @author Mitchell Manware, Insang Song
+#' @return NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
+#' folder within \code{directory_to_save}.
+#' @export
+# nolint end
+download_terraclimate_data <- function(
+    variables = NULL,
+    year_start = 2022,
+    year_end = 2022,
+    directory_to_save = NULL,
+    acknowledgement = FALSE,
+    download = FALSE,
+    remove_command = FALSE) {
+  #### check for data download acknowledgement
+  download_permit(acknowledgement = acknowledgement)
+  #### check for null parameters
+  check_for_null_parameters(mget(ls()))
+  #### directory setup
+  download_setup_dir(directory_to_save)
+  directory_to_save <- download_sanitize_path(directory_to_save)
+  #### define years sequence
+  if (any(nchar(year_start) != 4, nchar(year_end) != 4)) {
+    stop("year_start and year_end should be 4-digit integers.\n")
+  }
+  years <- seq(year_start, year_end, 1)
+  #### define variables
+  variables_list <- process_variable_codes(
+    variables = variables,
+    source = "terraclimate"
+  )
+  #### define URL base
+  base <-
+    "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_"
+  #### 7. initiate "..._curl_commands.txt"
+  commands_txt <- paste0(
+    directory_to_save,
+    "terraclimate_",
+    year_start, "_", year_end,
+    "_curl_commands.txt"
+  )
+  download_sink(commands_txt)
+  #### concatenate and print download commands to "..._curl_commands.txt"
+  for (v in seq_along(variables_list)) {
+    variable <- variables_list[v]
+    folder <- paste0(directory_to_save, variable, "/")
+    if (!(file.exists(folder))) {
+      dir.create(folder)
+    }
+    for (y in seq_along(years)) {
+      year <- years[y]
+      url <- paste0(
+        base,
+        variable,
+        "_",
+        year,
+        ".nc"
+      )
+      if (y == 1) {
+        if (!(check_url_status(url))) {
+          sink()
+          file.remove(commands_txt)
+          stop(paste0(
+            "Invalid year returns HTTP code 404. ",
+            "Check `year_start` parameter.\n"
+          ))
+        }
+      }
+      destfile <- paste0(
+        directory_to_save,
+        variable,
+        "/",
+        variable,
+        "_",
+        year,
+        ".nc"
+      )
+      command <- paste0(
+        "curl -s -o ",
+        destfile,
+        " --url ",
+        url,
+        "\n"
+      )
+      if (!file.exists(destfile)) {
+        #### cat command only if file does not already exist
+        cat(command)
+      }
+    }
+  }
+  #### finish "..._curl_commands.txt"
+  sink()
+  #### build system command
+  system_command <- paste0(
+    ". ",
+    commands_txt,
+    "\n"
+  )
+  #### download data
+  download_run(
+    download = download,
+    system_command = system_command
+  )
+  #### remove command text file
+  download_remove_command(
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
 }
