@@ -24,7 +24,7 @@ locs should be sf object as it is exportable to parallel workers."><!-- mathjax 
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,7 +46,7 @@ locs should be sf object as it is exportable to parallel workers."><!-- mathjax 
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/kyle-messier/amadeus/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/NIEHS/amadeus/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -59,7 +59,7 @@ locs should be sf object as it is exportable to parallel workers."><!-- mathjax 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Calculate MODIS product covariates in multiple CPU threads</h1>
-      <small class="dont-index">Source: <a href="https://github.com/kyle-messier/amadeus/blob/HEAD/R/calculate_covariates.R" class="external-link"><code>R/calculate_covariates.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/NIEHS/amadeus/blob/HEAD/R/calculate_covariates.R" class="external-link"><code>R/calculate_covariates.R</code></a></small>
       <div class="d-none name"><code>calc_modis_par.Rd</code></div>
     </div>
 
@@ -182,8 +182,9 @@ standard naming convention of raw files from NASA.</p>
 <li><p><code><a href="https://parallelly.futureverse.org/reference/makeClusterPSOCK.html" class="external-link">parallelly::makeClusterPSOCK</a></code></p></li>
 <li><p><code><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">parallelly::availableCores</a></code></p></li>
 <li><p><code><a href="https://rdrr.io/pkg/doParallel/man/registerDoParallel.html" class="external-link">doParallel::registerDoParallel</a></code></p></li>
-</ul><p>Also, for preprocessing, see:</p><ul><li><p><code><a href="process_covariates.html">process_covariates</a></code></p></li>
-<li><p><code><a href="process_modis_merge.html">process_modis_merge</a></code></p></li>
+</ul><p>This function leverages the calculation of single-day MODIS
+covariates:</p><ul><li><p><code><a href="calc_modis_daily.html">calc_modis_daily</a></code></p></li>
+</ul><p>Also, for preprocessing, see:</p><ul><li><p><code><a href="process_modis_merge.html">process_modis_merge</a></code></p></li>
 <li><p><code><a href="process_modis_swath.html">process_modis_swath</a></code></p></li>
 <li><p><code><a href="process_bluemarble.html">process_bluemarble</a></code></p></li>
 </ul></div>

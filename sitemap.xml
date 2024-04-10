@@ -46,6 +46,9 @@
     <loc>https://niehs.github.io/amadeus/reference/calc_koppen_geiger.html</loc>
   </url>
   <url>
+    <loc>https://niehs.github.io/amadeus/reference/calc_lagged.html</loc>
+  </url>
+  <url>
     <loc>https://niehs.github.io/amadeus/reference/calc_merra2.html</loc>
   </url>
   <url>
@@ -115,6 +118,9 @@
     <loc>https://niehs.github.io/amadeus/reference/download_aqs_data.html</loc>
   </url>
   <url>
+    <loc>https://niehs.github.io/amadeus/reference/download_cropscape_data.html</loc>
+  </url>
+  <url>
     <loc>https://niehs.github.io/amadeus/reference/download_data.html</loc>
   </url>
   <url>
@@ -134,6 +140,9 @@
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_hms_data.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/download_huc_data.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_koppen_geiger_data.html</loc>
@@ -157,7 +166,13 @@
     <loc>https://niehs.github.io/amadeus/reference/download_nlcd_data.html</loc>
   </url>
   <url>
+    <loc>https://niehs.github.io/amadeus/reference/download_olm_data.html</loc>
+  </url>
+  <url>
     <loc>https://niehs.github.io/amadeus/reference/download_permit.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/download_prism_data.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_remove_command.html</loc>
@@ -211,6 +226,9 @@
     <loc>https://niehs.github.io/amadeus/reference/is_date_proper.html</loc>
   </url>
   <url>
+    <loc>https://niehs.github.io/amadeus/reference/list_stac_files.html</loc>
+  </url>
+  <url>
     <loc>https://niehs.github.io/amadeus/reference/process_aqs.html</loc>
   </url>
   <url>
@@ -227,6 +245,9 @@
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/process_covariates.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/process_cropscape.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/process_ecoregion.html</loc>
@@ -251,6 +272,9 @@
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/process_hms.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/process_huc.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/process_koppen_geiger.html</loc>
@@ -287,6 +311,12 @@
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/process_nlcd.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/process_olm.html</loc>
+  </url>
+  <url>
+    <loc>https://niehs.github.io/amadeus/reference/process_prism.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/process_sedac_codes.html</loc>

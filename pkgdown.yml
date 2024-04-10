@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   download_functions: download_functions.html
   epa_download: epa_download.html
-last_built: 2024-04-08T12:56Z
+last_built: 2024-04-10T17:55Z
 urls:
   reference: https://niehs.github.io/amadeus/reference
   article: https://niehs.github.io/amadeus/articles

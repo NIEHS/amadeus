@@ -18,7 +18,7 @@ data files before passing to process_covariates."><!-- mathjax --><script src="h
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +40,7 @@ data files before passing to process_covariates."><!-- mathjax --><script src="h
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/kyle-messier/amadeus/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/NIEHS/amadeus/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -53,7 +53,7 @@ data files before passing to process_covariates."><!-- mathjax --><script src="h
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Process raw data wrapper function</h1>
-      <small class="dont-index">Source: <a href="https://github.com/kyle-messier/amadeus/blob/HEAD/R/process.R" class="external-link"><code>R/process.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/NIEHS/amadeus/blob/HEAD/R/process.R" class="external-link"><code>R/process.R</code></a></small>
       <div class="d-none name"><code>process_covariates.Rd</code></div>
     </div>
 
@@ -72,7 +72,7 @@ data files before passing to <code>process_covariates</code></strong>.</p>
 <span>    <span class="st">"koeppen-geiger"</span>, <span class="st">"koppen"</span>, <span class="st">"koeppen"</span>, <span class="st">"geos"</span>, <span class="st">"dummies"</span>, <span class="st">"gmted"</span>, <span class="st">"hms"</span>, <span class="st">"smoke"</span>,</span>
 <span>    <span class="st">"sedac_population"</span>, <span class="st">"population"</span>, <span class="st">"sedac_groads"</span>, <span class="st">"groads"</span>, <span class="st">"roads"</span>, <span class="st">"nlcd"</span>, <span class="st">"tri"</span>,</span>
 <span>    <span class="st">"narr"</span>, <span class="st">"nei"</span>, <span class="st">"ecoregions"</span>, <span class="st">"ecoregion"</span>, <span class="st">"merra"</span>, <span class="st">"merra2"</span>, <span class="st">"gridmet"</span>,</span>
-<span>    <span class="st">"terraclimate"</span><span class="op">)</span>,</span>
+<span>    <span class="st">"terraclimate"</span>, <span class="st">"huc"</span>, <span class="st">"cropscape"</span>, <span class="st">"cdl"</span>, <span class="st">"prism"</span>, <span class="st">"olm"</span>, <span class="st">"openlandmap"</span><span class="op">)</span>,</span>
 <span>  path <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -108,19 +108,23 @@ covariate type and selections.</p>
 <li><p></p></li>
 <li><p><code><a href="process_koppen_geiger.html">process_koppen_geiger</a></code>: <code>"koppen-geiger"</code>, <code>"koeppen-geiger"</code>, <code>"koppen"</code>,</p></li>
 <li><p><code><a href="process_ecoregion.html">process_ecoregion</a></code>: <code>"ecoregion"</code>, <code>"ecoregions"</code></p></li>
-<li><p><code><a href="process_nlcd.html">process_nlcd</a></code>: <code>"nlcd"</code>, <code>"NLCD"</code></p></li>
-<li><p><code><a href="process_tri.html">process_tri</a></code>: <code>"tri"</code>, <code>"TRI"</code></p></li>
-<li><p><code><a href="process_nei.html">process_nei</a></code>: <code>"nei"</code>, <code>"NEI</code></p></li>
 <li><p></p></li>
-<li><p><code><a href="process_gmted.html">process_gmted</a></code>: <code>"gmted"</code>, <code>"GMTED"</code></p></li>
-<li><p><code><a href="process_aqs.html">process_aqs</a></code>: <code>"aqs"</code>, <code>"AQS"</code></p></li>
-<li><p><code><a href="process_hms.html">process_hms</a></code>: <code>"hms"</code>, <code>"HMS"</code>, <code>"smoke"</code></p></li>
-<li><p><code><a href="process_narr.html">process_narr</a></code>: <code>"narr"</code>, <code>"NARR"</code></p></li>
+<li><p></p></li>
+<li><p></p></li>
+<li><p></p></li>
+<li><p></p></li>
+<li><p></p></li>
+<li><p><code><a href="process_hms.html">process_hms</a></code>: <code>"hms"</code>, <code>"smoke"</code></p></li>
+<li><p></p></li>
 <li><p><code><a href="process_sedac_groads.html">process_sedac_groads</a></code>: <code>"sedac_groads"</code>, <code>"roads"</code>, <code>"groads"</code></p></li>
 <li><p><code><a href="process_sedac_population.html">process_sedac_population</a></code>: <code>"sedac_population"</code>, <code>"population"</code></p></li>
-<li><p><code><a href="process_merra2.html">process_merra2</a></code>: <code>"merra"</code>, <code>"MERRA"</code>, <code>"merra2"</code>, <code>"MERRA2"</code></p></li>
+<li><p><code><a href="process_merra2.html">process_merra2</a></code>: <code>"merra"</code>, <code>"merra2"</code></p></li>
 <li><p><code><a href="process_gridmet.html">process_gridmet</a></code>: <code>"gridmet"</code>, <code>"gridMET</code>"</p></li>
 <li><p><code><a href="process_terraclimate.html">process_terraclimate</a></code>: <code>"terraclimate"</code>, <code>"TerraClimate"</code></p></li>
+<li><p></p></li>
+<li><p><code><a href="process_cropscape.html">process_cropscape</a></code>: <code>"cropscape"</code>, <code>"cdl"</code></p></li>
+<li><p></p></li>
+<li><p><code><a href="process_olm.html">process_olm</a></code>: <code>"olm"</code>, <code>"openlandmap</code></p></li>
 </ul></div>
     </div>
     <div class="section level2">

@@ -12,7 +12,7 @@ plume coverage data, returning a single SpatVector object."><!-- mathjax --><scr
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,7 @@ plume coverage data, returning a single SpatVector object."><!-- mathjax --><scr
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/kyle-messier/amadeus/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/NIEHS/amadeus/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -47,7 +47,7 @@ plume coverage data, returning a single SpatVector object."><!-- mathjax --><scr
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Process wildfire smoke data</h1>
-      <small class="dont-index">Source: <a href="https://github.com/kyle-messier/amadeus/blob/HEAD/R/process.R" class="external-link"><code>R/process.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/NIEHS/amadeus/blob/HEAD/R/process.R" class="external-link"><code>R/process.R</code></a></small>
       <div class="d-none name"><code>process_hms.Rd</code></div>
     </div>
 
@@ -61,7 +61,8 @@ plume coverage data, returning a single <code>SpatVector</code> object.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">process_hms</span><span class="op">(</span></span>
 <span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2018-01-01"</span>, <span class="st">"2018-01-01"</span><span class="op">)</span>,</span>
 <span>  variable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Light"</span>, <span class="st">"Medium"</span>, <span class="st">"Heavy"</span><span class="op">)</span>,</span>
-<span>  path <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  path <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -79,6 +80,10 @@ Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").</p></dd>
 
 <dt>path</dt>
 <dd><p>character(1). Directory with downloaded NOAA HMS data files.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Placeholders.</p></dd>
 
 </dl></div>
     <div class="section level2">

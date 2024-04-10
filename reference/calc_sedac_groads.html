@@ -18,7 +18,7 @@ is used to convert the unit of length to meters."><!-- mathjax --><script src="h
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +40,7 @@ is used to convert the unit of length to meters."><!-- mathjax --><script src="h
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/kyle-messier/amadeus/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/NIEHS/amadeus/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -53,7 +53,7 @@ is used to convert the unit of length to meters."><!-- mathjax --><script src="h
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Calculate roads covariates</h1>
-      <small class="dont-index">Source: <a href="https://github.com/kyle-messier/amadeus/blob/HEAD/R/calculate_covariates.R" class="external-link"><code>R/calculate_covariates.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/NIEHS/amadeus/blob/HEAD/R/calculate_covariates.R" class="external-link"><code>R/calculate_covariates.R</code></a></small>
       <div class="d-none name"><code>calc_sedac_groads.Rd</code></div>
     </div>
 
@@ -72,7 +72,8 @@ is used to convert the unit of length to meters.</p>
 <span>  locs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  locs_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  radius <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  fun <span class="op">=</span> <span class="va">sum</span></span>
+<span>  fun <span class="op">=</span> <span class="va">sum</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -99,6 +100,10 @@ containing identifier for each unique coordinate location.</p></dd>
 <dt>fun</dt>
 <dd><p>function(1). Function used to summarize the length of roads
 within sites location buffer (Default is <code>sum</code>).</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Placeholders.</p></dd>
 
 </dl></div>
     <div class="section level2">
