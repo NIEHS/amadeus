@@ -4,10 +4,12 @@
 \alias{process_sedac_groads}
 \title{Process roads data}
 \usage{
-process_sedac_groads(path = NULL)
+process_sedac_groads(path = NULL, ...)
 }
 \arguments{
 \item{path}{character(1). Path to geodatabase or shapefiles.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatVector} boject

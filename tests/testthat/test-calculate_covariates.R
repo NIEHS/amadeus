@@ -235,9 +235,9 @@ testthat::test_that("calc_modis works well.", {
     )
   testthat::expect_no_error(
     suppressWarnings(
-      process_modis_swath(
+      cloud0 <- process_modis_swath(
         path = path_mod06,
-        subdataset = "Cloud_Fraction_Day",
+        subdataset = c("Cloud_Fraction_Day"),
         date = "2021-08-15"
       )
     )
@@ -1444,5 +1444,79 @@ testthat::test_that("calc_lagged returns as expected.", {
       # expect no NA
       expect_true(all(!is.na(narr_lagged)))
     }
+  }
+})
+
+
+testthat::test_that("calc_covariates wrapper works", {
+
+  withr::local_package("rlang")
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  candidates <-
+    c("modis", "koppen-geiger",
+      "koeppen-geiger", "koppen", "koeppen",
+      "geos", "dummies", "gmted",
+      "sedac_groads", "groads", "roads",
+      "ecoregions", "ecoregion", "hms", "noaa", "smoke",
+      "gmted", "narr", "geos",
+      "sedac_population", "population", "nlcd",
+      "merra", "MERRA", "merra2", "MERRA2",
+      "tri", "nei")
+  for (cand in candidates) {
+    testthat::expect_error(
+      calc_covariates(covariate = cand)
+    )
+  }
+})
+
+
+testthat::test_that("calc_covariates wrapper works", {
+
+  withr::local_package("rlang")
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  ncp$time <- 2018
+  ncpt <-
+    terra::vect(ncp, geom = c("lon", "lat"),
+                keepgeom = TRUE, crs = "EPSG:4326")
+  ncpt$time <- c(2018)
+  path_tri <- testthat::test_path("..", "testdata", "tri")
+
+  testthat::expect_no_error(
+    tri_r <- process_tri(path = path_tri, year = 2018)
+  )
+
+  testthat::expect_no_error(
+    tri_c <- calc_covariates(
+      covariate = "tri",
+      from = tri_r,
+      locs = ncpt,
+      radius = 50000L
+    )
+  )
+  testthat::expect_true(is.data.frame(tri_c))
+
+  candidates <-
+    c("modis", "koppen-geiger",
+      "koeppen-geiger", "koppen", "koeppen",
+      "geos", "dummies", "gmted",
+      "sedac_groads", "groads", "roads",
+      "ecoregions", "ecoregion", "hms", "noaa", "smoke",
+      "gmted", "narr", "geos",
+      "sedac_population", "population", "nlcd",
+      "merra", "merra2",
+      "gridmet", "terraclimate",
+      "tri", "nei")
+  for (cand in candidates) {
+    testthat::expect_error(
+      calc_covariates(covariate = cand)
+    )
   }
 })

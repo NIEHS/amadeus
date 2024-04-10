@@ -4,7 +4,7 @@
 \alias{calc_hms}
 \title{Calculate wildfire smoke covariates}
 \usage{
-calc_hms(from, locs, locs_id = NULL, radius = 0)
+calc_hms(from, locs, locs_id = NULL, radius = 0, ...)
 }
 \arguments{
 \item{from}{SpatVector(1). Output of \code{process_hms()}.}
@@ -16,6 +16,8 @@ containing identifier for each unique coordinate location.}
 
 \item{radius}{integer(1). Circular buffer distance around site locations.
 (Default = 0).}
+
+\item{...}{Placeholders.}
 }
 \value{
 a data.frame object

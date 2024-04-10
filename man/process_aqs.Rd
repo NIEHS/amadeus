@@ -7,7 +7,8 @@
 process_aqs(
   path = NULL,
   date = c("2018-01-01", "2022-12-31"),
-  return_format = "terra"
+  return_format = "terra",
+  ...
 )
 }
 \arguments{
@@ -18,6 +19,8 @@ Should be in \code{"YYYY-MM-DD"} format and sorted. If \code{NULL},
 only unique locations are returned.}
 
 \item{return_format}{character(1). \code{"terra"} or \code{"sf"}.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatVector} or sf object depending on the \code{return_format}

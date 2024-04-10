@@ -22,6 +22,7 @@ process_tri(
 }
 \value{
 a \code{SpatVector} object (points) in \code{year}
+\code{year} is stored in a field named \code{"year"}.
 }
 \description{
 This function imports and cleans raw toxic release data,

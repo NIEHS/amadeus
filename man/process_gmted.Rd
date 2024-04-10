@@ -4,7 +4,7 @@
 \alias{process_gmted}
 \title{Process elevation data}
 \usage{
-process_gmted(variable = NULL, path = NULL)
+process_gmted(variable = NULL, path = NULL, ...)
 }
 \arguments{
 \item{variable}{vector(1). Vector containing the GMTED statistic first and
@@ -13,6 +13,8 @@ the resolution second. (Example: variable = c("Breakline Emphasis",
 
 \item{path}{character(1). Directory with downloaded GMTED  "*_grd"
 folder containing .adf files.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatRaster} object

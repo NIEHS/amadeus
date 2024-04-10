@@ -4,10 +4,12 @@
 \alias{process_sedac_population}
 \title{Process population density data}
 \usage{
-process_sedac_population(path = NULL)
+process_sedac_population(path = NULL, ...)
 }
 \arguments{
 \item{path}{character(1). Path to GeoTIFF (.tif) or netCDF (.nc) file.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatRaster} object

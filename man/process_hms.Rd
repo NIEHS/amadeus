@@ -7,7 +7,8 @@
 process_hms(
   date = c("2018-01-01", "2018-01-01"),
   variable = c("Light", "Medium", "Heavy"),
-  path = NULL
+  path = NULL,
+  ...
 )
 }
 \arguments{
@@ -18,6 +19,8 @@ Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 \item{variable}{character(1). "Light", "Medium", or "Heavy".}
 
 \item{path}{character(1). Directory with downloaded NOAA HMS data files.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatVector} or character object

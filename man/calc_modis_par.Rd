@@ -94,9 +94,14 @@ See details for setting parallelization:
 \item \code{\link[doParallel:registerDoParallel]{doParallel::registerDoParallel}}
 }
 
+This function leverages the calculation of single-day MODIS
+covariates:
+\itemize{
+\item \code{\link{calc_modis_daily}}
+}
+
 Also, for preprocessing, see:
 \itemize{
-\item \code{\link{process_covariates}}
 \item \code{\link{process_modis_merge}}
 \item \code{\link{process_modis_swath}}
 \item \code{\link{process_bluemarble}}

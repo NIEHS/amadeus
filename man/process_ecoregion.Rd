@@ -4,10 +4,12 @@
 \alias{process_ecoregion}
 \title{Process ecoregion data}
 \usage{
-process_ecoregion(path = NULL)
+process_ecoregion(path = NULL, ...)
 }
 \arguments{
 \item{path}{character(1). Path to Ecoregion Shapefiles}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatVector} object
