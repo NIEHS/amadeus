@@ -1191,7 +1191,7 @@ testthat::test_that("calc_merra2 returns as expected.", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_geos)
+    is.function(calc_merra2)
   )
   for (c in seq_along(collections)) {
     collection <- collections[c]

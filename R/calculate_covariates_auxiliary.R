@@ -374,7 +374,11 @@ calc_worker <- function(
         sites_extracted_layer <- cbind(
           locs_df,
           data_time,
-          data_level,
+          gsub(
+            "level=|lev=",
+            "",
+            data_level
+          ),
           sites_extracted_layer
         )
         colnames(sites_extracted_layer) <- c(
