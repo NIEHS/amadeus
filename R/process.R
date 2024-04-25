@@ -1170,6 +1170,12 @@ process_hms <- function(
     date[2],
     sub_hyphen = TRUE
   )
+  #### dates of interest with hyphen for return in 0 polygon case
+  dates_no_polygon <- generate_date_sequence(
+    date[1],
+    date[2],
+    sub_hyphen = FALSE
+  )
   #### subset file paths to only dates of interest
   data_paths <- unique(
     grep(
@@ -1190,7 +1196,9 @@ process_hms <- function(
       "EPSG:4326"
     )
     #### subset to density of interest
-    data_density <- data_date_p[data_date_p$Density == variable]
+    data_density <- data_date_p[
+      tolower(data_date_p$Density) == tolower(variable)
+      ]
     #### absent polygons (ie. December 31, 2018)
     if (nrow(data_density) == 0) {
       cat(paste0(
@@ -1245,6 +1253,11 @@ process_hms <- function(
       data_aggregate <- data_aggregate[
         seq_len(nrow(data_aggregate)), c("Density", "Date")
       ]
+      #### apply date format
+      data_aggregate$Date <- as.Date(
+        data_aggregate$Date,
+        format = "%Y%m%d"
+      )
       #### merge with other data
       data_return <- rbind(data_return, data_aggregate)
     }
@@ -1265,7 +1278,8 @@ process_hms <- function(
       ),
       ". Returning vector of dates.\n"
     ))
-    return(c(variable, dates_of_interest))
+    no_polygon_return <- c(variable, as.character(dates_no_polygon))
+    return(no_polygon_return)
   } else if (nrow(data_return) > 0) {
     cat(paste0(
       "Returning daily ",
