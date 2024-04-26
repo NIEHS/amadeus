@@ -1757,8 +1757,11 @@ download_sedac_population <- function(
 #' @param directory_to_download character(1). Directory to download zip files
 #' from NOAA Hazard Mapping System Fire and Smoke Product. (Ignored if
 #' \code{data_format = "KML"}.)
-#' @param directory_to_save character(1). Directory to save unzipped shapefiles
-#' and KML files.
+#' @param directory_to_save character(1). Directory to save data. If
+#' `data_format = "Shapefile"`, two sub-directories will be created for the
+#' downloaded zip files ("/zip_files") and the unzipped shapefiles
+#' ("/data_files"). If `data_format = "KML"`, a single sub-directory
+#' ("/data_files") will be created.
 #' @param acknowledgement logical(1).
 #' By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -1786,7 +1789,6 @@ download_hms <- function(
     data_format = "Shapefile",
     date_start = "2023-09-01",
     date_end = "2023-09-01",
-    directory_to_download = NULL,
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
@@ -1798,10 +1800,21 @@ download_hms <- function(
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  download_setup_dir(directory_to_download)
-  download_setup_dir(directory_to_save)
-  directory_to_download <- download_sanitize_path(directory_to_download)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  directory_original <- directory_to_save
+  download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- download_sanitize_path(
+    paste0(
+      download_sanitize_path(directory_to_save),
+      "zip_files"
+      )
+  )
+  directory_to_save <- download_sanitize_path(
+    paste0(
+      download_sanitize_path(directory_to_save),
+      "data_files"
+    )
+  )
+  cat(c(directory_to_download, directory_to_save))
   #### 4. check for unzip == FALSE && remove_zip == TRUE
   if (unzip == FALSE && remove_zip == TRUE) {
     stop(paste0(
@@ -1819,7 +1832,7 @@ download_hms <- function(
   base <- "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/"
   #### 7. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
-    directory_to_download,
+    directory_original,
     "hms_smoke_",
     utils::head(date_sequence, n = 1),
     "_",
@@ -1901,6 +1914,7 @@ download_hms <- function(
   )
   #### 13. end if data_format == "KML"
   if (data_format == "KML") {
+    unlink(directory_to_download, recursive = TRUE)
     return(cat(paste0("KML files cannot be unzipped.\n")))
   }
   #### 14. unzip downloaded zip files

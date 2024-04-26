@@ -416,8 +416,7 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
   # function parameters
   date_start <- "2022-08-12"
   date_end <- "2022-09-21"
-  directory_to_download <- testthat::test_path("..", "testdata/", "")
-  directory_to_save <- testthat::test_path("..", "testdata/", "")
+  directory_to_save <- testthat::test_path("..", "testdata", "hms_temp")
   data_formats <- c("Shapefile", "KML")
   for (d in seq_along(data_formats)) {
     # run download function
@@ -425,7 +424,6 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
                   date_start = date_start,
                   date_end = date_end,
                   data_format = data_formats[d],
-                  directory_to_download = directory_to_download,
                   directory_to_save = directory_to_save,
                   acknowledgement = TRUE,
                   download = FALSE,
@@ -433,7 +431,7 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
                   unzip = FALSE,
                   remove_zip = FALSE)
     # define file path with commands
-    commands_path <- paste0(directory_to_download,
+    commands_path <- paste0(directory_to_save,
                             "hms_smoke_",
                             gsub("-", "", date_start),
                             "_",
@@ -451,6 +449,8 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
                             url_status = url_status)
     # remove file with commands after test
     file.remove(commands_path)
+    # remove temporary hms
+    unlink(directory_to_save, recursive = TRUE)
   }
 })
 

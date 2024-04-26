@@ -4,15 +4,33 @@
 #' @description
 #' Create \code{directory} if it does not already exist.
 #' @param directory character(1) directory path
+#' @param zip logical(1). Should sub-directories be created for zip files and
+#' data files?
 #' @description If directory does not exist, the directory
 #' will be created.
 #' @returns NULL
 #' @keywords internal
 #' @export
 download_setup_dir <-
-  function(directory) {
+  function(directory, zip) {
     if (!dir.exists(directory)) {
       dir.create(directory, recursive = TRUE)
+    }
+    if (zip) {
+      directory_zip <- paste0(
+        directory,
+        "zip_files/"
+      )
+      if (!dir.exists(directory_zip)) {
+        dir.create(directory_zip, recursive = TRUE)
+      }
+      directory_data <- paste0(
+        directory,
+        "data_files/"
+      )
+      if (!dir.exists(directory_data)) {
+        dir.create(directory_data, recursive = TRUE)
+      }
     }
   }
 
