@@ -201,36 +201,33 @@ testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
   collections <- c("aqc_tavg_1hr_g1440x721_v1",
                    "chm_inst_1hr_g1440x721_p23")
   directory_to_save <- testthat::test_path("..", "testdata/", "")
-  for (c in seq_along(collections)) {
-    # run download function
-    download_data(dataset_name = "geos",
-                  date_start = date_start,
-                  date_end = date_end,
-                  collection = collections[c],
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE)
-    # define file path with commands
-    commands_path <- paste0(directory_to_save,
-                            collections[c],
-                            "_",
-                            date_start,
-                            "_",
-                            date_end,
-                            "_wget_commands.txt")
-    # import commands
-    commands <- read_commands(commands_path = commands_path)
-    # extract urls
-    urls <- extract_urls(commands = commands, position = 2)
-    # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 20L, method = "HEAD")
-    # implement unit tests
-    test_download_functions(directory_to_save = directory_to_save,
-                            commands_path = commands_path,
-                            url_status = url_status)
-    # remove file with commands after test
-    file.remove(commands_path)
-  }
+  # run download function
+  download_data(dataset_name = "geos",
+                date_start = date_start,
+                date_end = date_end,
+                collection = collections,
+                directory_to_save = directory_to_save,
+                acknowledgement = TRUE,
+                download = FALSE)
+  # define file path with commands
+  commands_path <- paste0(directory_to_save,
+                          "geos_",
+                          date_start,
+                          "_",
+                          date_end,
+                          "_wget_commands.txt")
+  # import commands
+  commands <- read_commands(commands_path = commands_path)
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 2)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 20L, method = "HEAD")
+  # implement unit tests
+  test_download_functions(directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+  # remove file with commands after test
+  file.remove(commands_path)
 })
 
 testthat::test_that("GMTED download URLs have HTTP status 200.", {
@@ -287,36 +284,33 @@ testthat::test_that("MERRA2 download URLs have HTTP status 200.", {
   date_end <- "2022-03-08"
   collections <- c("inst1_2d_asm_Nx", "inst3_3d_asm_Np")
   directory_to_save <- testthat::test_path("..", "testdata/", "")
-  for (c in seq_along(collections)) {
-    # run download function
-    download_data(dataset_name = "merra2",
-                  date_start = date_start,
-                  date_end = date_end,
-                  collection = collections[c],
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE)
-    # define path with commands
-    commands_path <- paste0(directory_to_save,
-                            collections[c],
-                            "_",
-                            date_start,
-                            "_",
-                            date_end,
-                            "_wget_commands.txt")
-    # import commands
-    commands <- read_commands(commands_path = commands_path)
-    # extract urls
-    urls <- extract_urls(commands = commands, position = 2)
-    # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
-    # implement unit tests
-    test_download_functions(directory_to_save = directory_to_save,
-                            commands_path = commands_path,
-                            url_status = url_status)
-    # remove file with commands after test
-    file.remove(commands_path)
-  }
+  # run download function
+  download_data(dataset_name = "merra2",
+                date_start = date_start,
+                date_end = date_end,
+                collection = collections,
+                directory_to_save = directory_to_save,
+                acknowledgement = TRUE,
+                download = FALSE)
+  # define path with commands
+  commands_path <- paste0(directory_to_save,
+                          "merra2_",
+                          date_start,
+                          "_",
+                          date_end,
+                          "_wget_commands.txt")
+  # import commands
+  commands <- read_commands(commands_path = commands_path)
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 2)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
+  # implement unit tests
+  test_download_functions(directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+  # remove file with commands after test
+  file.remove(commands_path)
 })
 
 testthat::test_that("MERRA2 returns message with unrecognized collection.", {

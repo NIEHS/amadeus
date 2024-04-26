@@ -428,9 +428,10 @@ download_ecoregion <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Hourly netCDF (.nc4) files will be stored in
-#' \code{directory_to_save}.
+#' @return NULL; Hourly netCDF (.nc4) files will be stored in a
+#' collection-specific folder within \code{directory_to_save}.
 #' @export
+# nolint start: cyclocomp
 download_geos <- function(
     collection =
         c(
@@ -452,22 +453,19 @@ download_geos <- function(
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
   #### 4. match collection
-  collection <- match.arg(collection)
+  collection <- match.arg(collection, several.ok = TRUE)
   #### 5. define date sequence
   date_sequence <- generate_date_sequence(
     date_start,
     date_end,
     sub_hyphen = TRUE
   )
-  #### 6. define time sequence
-  time_sequence <- generate_time_sequence(collection)
   #### 7. define URL base
   base <- "https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/"
   #### 8. initiate "..._wget_commands.txt" file
   commands_txt <- paste0(
     directory_to_save,
-    collection,
-    "_",
+    "geos_",
     date_start,
     "_",
     date_end,
@@ -475,67 +473,71 @@ download_geos <- function(
   )
   download_sink(commands_txt)
   #### 9. concatenate and print download commands to "..._wget_commands.txt"
-  for (d in seq_along(date_sequence)) {
-    date <- date_sequence[d]
-    year <- substr(date, 1, 4)
-    month <- substr(date, 5, 6)
-    day <- substr(date, 7, 8)
-    for (t in seq_along(time_sequence)) {
-      download_url_base <- paste0(
-        base,
-        "Y",
-        year,
-        "/M",
-        month,
-        "/D",
-        day,
-        "/"
-      )
-      download_name <- paste0(
-        "GEOS-CF.v01.rpl.",
-        collection,
-        ".",
-        date,
-        "_",
-        time_sequence[t],
-        "z.nc4"
-      )
-      download_url <- paste0(
-        download_url_base,
-        download_name
-      )
-      if (t == 1) {
-        if (!(check_url_status(download_url))) {
-          sink()
-          file.remove(commands_txt)
-          stop(paste0(
-            "Invalid date returns HTTP code 404. ",
-            "Check `date_start` parameter.\n"
-          ))
+  for (c in seq_along(collection)) {
+    collection_loop <- collection[c]
+    download_folder <- paste0(
+      directory_to_save,
+      collection_loop,
+      "/"
+    )
+    if (!file.exists(download_folder)) {
+      dir.create(download_folder)
+    }
+    for (d in seq_along(date_sequence)) {
+      date <- date_sequence[d]
+      year <- substr(date, 1, 4)
+      month <- substr(date, 5, 6)
+      day <- substr(date, 7, 8)
+      time_sequence <- generate_time_sequence(collection_loop)
+      for (t in seq_along(time_sequence)) {
+        download_url_base <- paste0(
+          base,
+          "Y",
+          year,
+          "/M",
+          month,
+          "/D",
+          day,
+          "/"
+        )
+        download_name <- paste0(
+          "GEOS-CF.v01.rpl.",
+          collection_loop,
+          ".",
+          date,
+          "_",
+          time_sequence[t],
+          "z.nc4"
+        )
+        download_url <- paste0(
+          download_url_base,
+          download_name
+        )
+        if (t == 1) {
+          if (!(check_url_status(download_url))) {
+            sink()
+            file.remove(commands_txt)
+            stop(paste0(
+              "Invalid date returns HTTP code 404. ",
+              "Check `date_start` parameter.\n"
+            ))
+          }
         }
-      }
-      download_folder <- paste0(
-        directory_to_save,
-        collection,
-        "/"
-      )
-      download_folder_name <- paste0(
-        download_folder,
-        download_name
-      )
-      if (!file.exists(download_folder)) {
-        dir.create(download_folder)
-      }
-      download_command <- paste0(
-        "curl ",
-        download_url,
-        " -o ",
-        download_folder_name,
-        "\n"
-      )
-      if (!file.exists(download_folder_name)) {
-        #### cat command only if file does not already exist
-        cat(download_command)
+        download_folder_name <- paste0(
+          download_folder,
+          download_name
+        )
+        download_command <- paste0(
+          "curl ",
+          download_url,
+          " -o ",
+          download_folder_name,
+          "\n"
+        )
+        if (!file.exists(download_folder_name)) {
+          #### cat command only if file does not already exist
+          cat(download_command)
+        }
       }
     }
   }
@@ -557,6 +559,7 @@ download_geos <- function(
     remove = remove_command
   )
 }
+# nolint end: cyclocomp
 
 # nolint start
 #' Download elevation data
@@ -727,10 +730,11 @@ download_gmted <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Daily netCDF (.nc4) files will be stored in
-#' \code{directory_to_save}.
+#' @return NULL; Daily netCDF (.nc4) files will be stored in a
+#' collection-specific folder within \code{directory_to_save}.
 #' @export
 # nolint end
+# nolint start: cyclocomp
 download_merra2 <- function(
     collection = c(
       "inst1_2d_asm_Nx", "inst1_2d_int_Nx", "inst1_2d_lfo_Nx",
@@ -753,14 +757,14 @@ download_merra2 <- function(
     acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE) {
-  #### 1. check for data download acknowledgement
+  #### check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
-  #### 2. directory setup
+  #### directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
-  #### 3. check for null parameters
+  #### check for null parameters
   check_for_null_parameters(mget(ls()))
-  #### 4. check if collection is recognized
+  #### check if collection is recognized
   identifiers <- c(
     "inst1_2d_asm_Nx M2I1NXASM 10.5067/3Z173KIE2TPD",
     "inst1_2d_int_Nx M2I1NXINT 10.5067/G0U6NGQ3BLE0",
@@ -807,212 +811,207 @@ download_merra2 <- function(
   identifiers <- do.call(rbind, identifiers)
   identifiers_df <- as.data.frame(identifiers)
   colnames(identifiers_df) <- c("collection_id", "estd_name", "DOI")
-  if (!(collection %in% identifiers_df$collection_id)) {
+  if (!all(collection %in% identifiers_df$collection_id)) {
     print(identifiers_df)
     stop(paste0("Requested collection is not recognized.\n
     Please refer to the table above to find a proper collection.\n"))
   }
-  #### 5. define date sequence
+  #### define date sequence
   date_sequence <- generate_date_sequence(
     date_start,
     date_end,
     sub_hyphen = TRUE
   )
-  #### 6. define year + month sequence
+  #### define year + month sequence
   yearmonth_sequence <- unique(substr(date_sequence, 1, 6))
-  #### 7. define ESDT name and DOI
-  identifiers_df_requested <- subset(identifiers_df,
-    subset =
-      identifiers_df$collection_id ==
-      collection
-  )
-  esdt_name <- identifiers_df_requested[, 2]
-  cat(paste0(
-    "Collection: ",
-    collection,
-    " | ESDT Name: ",
-    esdt_name,
-    " | DOI: ",
-    identifiers_df_requested[, 3],
-    "\n"
-  ))
-  #### 8. define URL base
-  #### NOTE: sorted and defined manually according to
-  ####       https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/ \&
-  ####       https://goldsmr5.gesdisc.eosdis.nasa.gov/data/MERRA2/
-  esdt_name_4 <- c(
-    "M2I1NXASM", "M2I1NXINT", "M2I1NXLFO", "M2I3NXGAS",
-    "M2SDNXSLV", "M2T1NXADG", "M2T1NXAER", "M2T1NXCHM",
-    "M2T1NXCSP", "M2T1NXFLX", "M2T1NXINT", "M2T1NXLFO",
-    "M2T1NXLND", "M2T1NXOCN", "M2T1NXRAD", "M2T1NXSLV",
-    "M2T3NXGLC"
-  )
-  esdt_name_5 <- c(
-    "M2I3NPASM", "M2I3NVAER", "M2I3NVASM", "M2I3NVCHM",
-    "M2I3NVGAS", "M2I6NPANA", "M2I6NVANA", "M2T3NEMST",
-    "M2T3NENAV", "M2T3NETRB", "M2T3NPCLD", "M2T3NPMST",
-    "M2T3NPODT", "M2T3NPQDT", "M2T3NPRAD", "M2T3NPTDT",
-    "M2T3NPTRB", "M2T3NPUDT", "M2T3NVASM", "M2T3NVCLD",
-    "M2T3NVMST", "M2T3NVRAD"
-  )
-  if (esdt_name %in% esdt_name_4) {
-    base <- "https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/"
-  } else if (esdt_name %in% esdt_name_5) {
-    base <- "https://goldsmr5.gesdisc.eosdis.nasa.gov/data/MERRA2/"
-  }
-  #### 9. identify download URLs
-  list_urls <- NULL
-  for (y in seq_along(yearmonth_sequence)) {
-    year <- substr(yearmonth_sequence[y], 1, 4)
-    month <- substr(yearmonth_sequence[y], 5, 6)
-    if (y == 1) {
-      base_url <- paste0(
-        base,
-        esdt_name,
-        ".5.12.4/",
-        year,
-        "/",
-        month,
-        "/"
-      )
-      if (!(check_url_status(base_url))) {
-        stop(paste0(
-          "Invalid date returns HTTP code 404. ",
-          "Check `date_start` parameter.\n"
-        ))
-      }
-    }
-    list_urls_month <- system(
-      paste0(
-        "wget -q -nH -nd ",
-        "\"",
-        base,
-        esdt_name,
-        ".5.12.4/",
-        year,
-        "/",
-        month,
-        "/\"",
-        " -O - | grep .nc4 | awk -F'\"' ",
-        "'{print $4}'"
-      ),
-      intern = TRUE
-    )
-    list_urls <- c(list_urls, list_urls_month)
-  }
-  #### 10. match list_urls to date sequence
-  list_urls_date_sequence <- list_urls[substr(list_urls, 28, 35) %in%
-                                         date_sequence]
-  #### 11. separate data and metadata
-  list_urls_data <- list_urls_date_sequence[grep("*.xml",
-    list_urls_date_sequence,
-    invert = TRUE
-  )]
-  list_urls_metadata <- list_urls_date_sequence[grep("*.xml",
-    list_urls_date_sequence,
-    invert = FALSE
-  )]
-  #### 12. initiate "..._wget_commands.txt" file
+  #### initiate "..._wget_commands.txt" file
   commands_txt <- paste0(
     directory_to_save,
-    collection,
-    "_",
+    "merra2_",
     date_start,
     "_",
     date_end,
     "_wget_commands.txt"
   )
   download_sink(commands_txt)
-  #### 13. concatenate and print download commands to "..._wget_commands.txt"
-  for (l in seq_along(date_sequence)) {
-    year <- as.character(substr(date_sequence[l], 1, 4))
-    month <- as.character(substr(date_sequence[l], 5, 6))
-    download_url <- paste0(
-      base,
-      esdt_name,
-      ".5.12.4/",
-      year,
-      "/",
-      month,
-      "/",
-      list_urls_data[l]
+  for (c in seq_along(collection)) {
+    collection_loop <- collection[c]
+    #### define ESDT name and DOI
+    identifiers_df_requested <- subset(
+      identifiers_df,
+      subset = identifiers_df$collection_id == collection_loop
     )
-    download_folder <- paste0(
-      directory_to_save,
-      collection
+    esdt_name <- identifiers_df_requested[, 2]
+    #### define URL base
+    #### NOTE: sorted and defined manually according to
+    ####       https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/ \&
+    ####       https://goldsmr5.gesdisc.eosdis.nasa.gov/data/MERRA2/
+    esdt_name_4 <- c(
+      "M2I1NXASM", "M2I1NXINT", "M2I1NXLFO", "M2I3NXGAS",
+      "M2SDNXSLV", "M2T1NXADG", "M2T1NXAER", "M2T1NXCHM",
+      "M2T1NXCSP", "M2T1NXFLX", "M2T1NXINT", "M2T1NXLFO",
+      "M2T1NXLND", "M2T1NXOCN", "M2T1NXRAD", "M2T1NXSLV",
+      "M2T3NXGLC"
     )
-    if (!file.exists(download_folder)) {
-      dir.create(download_folder)
+    esdt_name_5 <- c(
+      "M2I3NPASM", "M2I3NVAER", "M2I3NVASM", "M2I3NVCHM",
+      "M2I3NVGAS", "M2I6NPANA", "M2I6NVANA", "M2T3NEMST",
+      "M2T3NENAV", "M2T3NETRB", "M2T3NPCLD", "M2T3NPMST",
+      "M2T3NPODT", "M2T3NPQDT", "M2T3NPRAD", "M2T3NPTDT",
+      "M2T3NPTRB", "M2T3NPUDT", "M2T3NVASM", "M2T3NVCLD",
+      "M2T3NVMST", "M2T3NVRAD"
+    )
+    if (esdt_name %in% esdt_name_4) {
+      base <- "https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/"
+    } else if (esdt_name %in% esdt_name_5) {
+      base <- "https://goldsmr5.gesdisc.eosdis.nasa.gov/data/MERRA2/"
     }
-    download_name <- paste0(
-      download_folder,
-      "/",
-      list_urls_data[l]
-    )
-    download_command <- paste0(
-      "wget ",
-      download_url,
-      " -O ",
-      download_name,
-      "\n"
-    )
-    if (!file.exists(download_name)) {
-      #### cat command only if file does not already exist
-      cat(download_command)
+    #### identify download URLs
+    list_urls <- NULL
+    for (y in seq_along(yearmonth_sequence)) {
+      year <- substr(yearmonth_sequence[y], 1, 4)
+      month <- substr(yearmonth_sequence[y], 5, 6)
+      if (y == 1) {
+        base_url <- paste0(
+          base,
+          esdt_name,
+          ".5.12.4/",
+          year,
+          "/",
+          month,
+          "/"
+        )
+        if (!(check_url_status(base_url))) {
+          stop(paste0(
+            "Invalid date returns HTTP code 404. ",
+            "Check `date_start` parameter.\n"
+          ))
+        }
+      }
+      list_urls_month <- system(
+        paste0(
+          "wget -q -nH -nd ",
+          "\"",
+          base,
+          esdt_name,
+          ".5.12.4/",
+          year,
+          "/",
+          month,
+          "/\"",
+          " -O - | grep .nc4 | awk -F'\"' ",
+          "'{print $4}'"
+        ),
+        intern = TRUE
+      )
+      list_urls <- c(list_urls, list_urls_month)
     }
-    download_url_metadata <- paste0(
-      base,
-      esdt_name,
-      ".5.12.4/",
-      year,
-      "/",
-      month,
-      "/",
-      list_urls_metadata[l]
-    )
-    download_folder_metadata <- paste0(
-      directory_to_save,
-      collection,
-      "/metadata/"
-    )
-    if (!file.exists(download_folder_metadata)) {
-      dir.create(download_folder_metadata)
-    }
-    download_name_metadata <- paste0(
-      download_folder_metadata,
-      list_urls_metadata[l]
-    )
-    download_command_metadata <- paste0(
-      "wget ",
-      download_url_metadata,
-      " -O ",
-      download_name_metadata,
-      "\n"
-    )
-    if (!file.exists(download_name)) {
-      #### cat command only if file does not already exist
-      cat(download_command_metadata)
+    #### match list_urls to date sequence
+    list_urls_date_sequence <- list_urls[substr(list_urls, 28, 35) %in%
+                                           date_sequence]
+    #### separate data and metadata
+    list_urls_data <- list_urls_date_sequence[grep(
+      "*.xml",
+      list_urls_date_sequence,
+      invert = TRUE
+    )]
+    list_urls_metadata <- list_urls_date_sequence[grep(
+      "*.xml",
+      list_urls_date_sequence,
+      invert = FALSE
+    )]
+    #### concatenate and print download commands to "..._wget_commands.txt"
+    for (l in seq_along(date_sequence)) {
+      year <- as.character(substr(date_sequence[l], 1, 4))
+      month <- as.character(substr(date_sequence[l], 5, 6))
+      download_url <- paste0(
+        base,
+        esdt_name,
+        ".5.12.4/",
+        year,
+        "/",
+        month,
+        "/",
+        list_urls_data[l]
+      )
+      download_folder <- paste0(
+        directory_to_save,
+        collection_loop
+      )
+      if (!file.exists(download_folder)) {
+        dir.create(download_folder)
+      }
+      download_name <- paste0(
+        download_folder,
+        "/",
+        list_urls_data[l]
+      )
+      download_command <- paste0(
+        "wget ",
+        download_url,
+        " -O ",
+        download_name,
+        "\n"
+      )
+      if (!file.exists(download_name)) {
+        #### cat command only if file does not already exist
+        cat(download_command)
+      }
+      download_url_metadata <- paste0(
+        base,
+        esdt_name,
+        ".5.12.4/",
+        year,
+        "/",
+        month,
+        "/",
+        list_urls_metadata[l]
+      )
+      download_folder_metadata <- paste0(
+        directory_to_save,
+        collection_loop,
+        "/metadata/"
+      )
+      if (!file.exists(download_folder_metadata)) {
+        dir.create(download_folder_metadata)
+      }
+      download_name_metadata <- paste0(
+        download_folder_metadata,
+        list_urls_metadata[l]
+      )
+      download_command_metadata <- paste0(
+        "wget ",
+        download_url_metadata,
+        " -O ",
+        download_name_metadata,
+        "\n"
+      )
+      if (!file.exists(download_name)) {
+        #### cat command only if file does not already exist
+        cat(download_command_metadata)
+      }
     }
   }
-  #### 14. finish "..._wget_commands.txt"
+  #### finish "..._wget_commands.txt"
   sink()
-  #### 15. build system command
+  #### build system command
   system_command <- paste0(
     ". ",
     commands_txt,
     "\n"
   )
-  #### 16. download data
+  #### download data
   download_run(
     download = download,
     system_command = system_command
   )
-  #### 17. Remove command file
+  #### Remove command file
   download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
 }
+# nolint end: cyclocomp
 
 # nolint start
 #' Download meteorological data (monolevel)
