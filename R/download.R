@@ -12,28 +12,28 @@
 #' large and use lots of machine storage and memory.
 #' @param ... Arguments passed to each download function.
 #' @note
-#' - All download function names are in \code{download_*_data} formats
+#' - All download function names are in \code{download_*} formats
 #' @author Insang Song
 #' @seealso
 #' For details of each download function per dataset,
 #' Please refer to:
-#' * \link{download_aqs_data}: "aqs", "AQS"
-#' * \link{download_ecoregion_data}: "ecoregion"
-#' * \link{download_geos_data}: "geos"
-#' * \link{download_gmted_data}: "gmted", "GMTED"
-#' * \link{download_koppen_geiger_data}: "koppen", "koppengeiger"
-#' * \link{download_merra2_data}: "merra2", "merra", "MERRA", "MERRA2"
-#' * \link{download_narr_monolevel_data}: "narr_monolevel", "monolevel"
-#' * \link{download_narr_p_levels_data}: "narr_p_levels", "p_levels", "plevels"
-#' * \link{download_nlcd_data}: "nlcd", "NLCD"
-#' * \link{download_hms_data}: "noaa", "smoke", "hms"
-#' * \link{download_sedac_groads_data}: "sedac_groads", "groads"
-#' * \link{download_sedac_population_data}: "sedac_population", "population"
-#' * \link{download_modis_data}: "modis", "MODIS"
-#' * \link{download_tri_data}: "tri", "TRI"
-#' * \link{download_nei_data}: "nei", "NEI"
-#' * \link{download_gridmet_data}: "gridMET", "gridmet"
-#' * \link{download_terraclimate_data}: "TerraClimate", "terraclimate"
+#' * \link{download_aqs}: "aqs", "AQS"
+#' * \link{download_ecoregion}: "ecoregion"
+#' * \link{download_geos}: "geos"
+#' * \link{download_gmted}: "gmted", "GMTED"
+#' * \link{download_koppen_geiger}: "koppen", "koppengeiger"
+#' * \link{download_merra2}: "merra2", "merra", "MERRA", "MERRA2"
+#' * \link{download_narr_monolevel}: "narr_monolevel", "monolevel"
+#' * \link{download_narr_p_levels}: "narr_p_levels", "p_levels", "plevels"
+#' * \link{download_nlcd}: "nlcd", "NLCD"
+#' * \link{download_hms}: "noaa", "smoke", "hms"
+#' * \link{download_sedac_groads}: "sedac_groads", "groads"
+#' * \link{download_sedac_population}: "sedac_population", "population"
+#' * \link{download_modis}: "modis", "MODIS"
+#' * \link{download_tri}: "tri", "TRI"
+#' * \link{download_nei}: "nei", "NEI"
+#' * \link{download_gridmet}: "gridMET", "gridmet"
+#' * \link{download_terraclimate}: "TerraClimate", "terraclimate"
 #' @returns NULL
 #' @export
 download_data <-
@@ -55,38 +55,38 @@ download_data <-
 
     # determine whether the data exist and deter proceeding?
     what_to_run <- switch(dataset_name,
-      aqs = download_aqs_data,
-      ecoregion = download_ecoregion_data,
-      geos = download_geos_data,
-      gmted = download_gmted_data,
-      koppen = download_koppen_geiger_data,
-      koppengeiger = download_koppen_geiger_data,
-      merra2 = download_merra2_data,
-      merra = download_merra2_data,
-      narr_monolevel = download_narr_monolevel_data,
-      monolevel = download_narr_monolevel_data,
-      narr_p_levels = download_narr_p_levels_data,
-      p_levels = download_narr_p_levels_data,
-      plevels = download_narr_p_levels_data,
-      nlcd = download_nlcd_data,
-      noaa = download_hms_data,
-      smoke = download_hms_data,
-      hms = download_hms_data,
-      sedac_groads = download_sedac_groads_data,
-      groads = download_sedac_groads_data,
-      sedac_population = download_sedac_population_data,
-      population = download_sedac_population_data,
-      modis = download_modis_data,
-      tri = download_tri_data,
-      nei = download_nei_data,
-      gridmet = download_gridmet_data,
-      terraclimate = download_terraclimate_data,
-      huc = download_huc_data,
-      cropscape = download_cropscape_data,
-      cdl = download_cropscape_data,
-      prism = download_prism_data,
-      olm = download_olm_data,
-      openlandmap = download_olm_data
+      aqs = download_aqs,
+      ecoregion = download_ecoregion,
+      geos = download_geos,
+      gmted = download_gmted,
+      koppen = download_koppen_geiger,
+      koppengeiger = download_koppen_geiger,
+      merra2 = download_merra2,
+      merra = download_merra2,
+      narr_monolevel = download_narr_monolevel,
+      monolevel = download_narr_monolevel,
+      narr_p_levels = download_narr_p_levels,
+      p_levels = download_narr_p_levels,
+      plevels = download_narr_p_levels,
+      nlcd = download_nlcd,
+      noaa = download_hms,
+      smoke = download_hms,
+      hms = download_hms,
+      sedac_groads = download_sedac_groads,
+      groads = download_sedac_groads,
+      sedac_population = download_sedac_population,
+      population = download_sedac_population,
+      modis = download_modis,
+      tri = download_tri,
+      nei = download_nei,
+      gridmet = download_gridmet,
+      terraclimate = download_terraclimate,
+      huc = download_huc,
+      cropscape = download_cropscape,
+      cdl = download_cropscape,
+      prism = download_prism,
+      olm = download_olm,
+      openlandmap = download_olm
     )
 
     tryCatch(
@@ -109,7 +109,7 @@ download_data <-
 # nolint start
 #' Download air quality data
 #' @description
-#' The \code{download_aqs_data()} function accesses and downloads Air Quality System (AQS) data from the [U.S. Environmental Protection Agency's (EPA) Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html).
+#' The \code{download_aqs()} function accesses and downloads Air Quality System (AQS) data from the [U.S. Environmental Protection Agency's (EPA) Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html).
 #' @param parameter_code integer(1). length of 5.
 #'  EPA pollutant parameter code. For details, please refer to
 #'  [AQS parameter codes](https://aqs.epa.gov/aqsweb/documents/codetables/parameters.html)
@@ -144,7 +144,7 @@ download_data <-
 #'  monitors and the daily representative values
 #'  will be stored in \code{directory_to_save}.
 #' @export
-download_aqs_data <-
+download_aqs <-
   function(
     parameter_code = 88101,
     resolution_temporal = "daily",
@@ -268,7 +268,7 @@ download_aqs_data <-
 # nolint start
 #' Download ecoregion data
 #' @description
-#' The \code{download_ecoregion_data()} function accesses and downloads United States Ecoregions data from the [U.S. Environmental Protection Agency's (EPA) Ecorgions](https://www.epa.gov/eco-research/ecoregions). Level 3 data, where all pieces of information in the higher levels are included, are downloaded.
+#' The \code{download_ecoregion()} function accesses and downloads United States Ecoregions data from the [U.S. Environmental Protection Agency's (EPA) Ecorgions](https://www.epa.gov/eco-research/ecoregions). Level 3 data, where all pieces of information in the higher levels are included, are downloaded.
 # nolint end
 #' @note
 #' For EPA Data Commons certificate errors, follow the steps below:
@@ -303,7 +303,7 @@ download_aqs_data <-
 #' @returns NULL;
 #' @importFrom utils download.file
 #' @export
-download_ecoregion_data <- function(
+download_ecoregion <- function(
   epa_certificate_path =
     system.file("extdata/cacert_gaftp_epa.pem",
                 package = "amadeus"),
@@ -409,7 +409,7 @@ download_ecoregion_data <- function(
 # nolint start 
 #' Download atmospheric composition data
 #' @description
-#' The \code{download_geos_data()} function accesses and downloads various
+#' The \code{download_geos()} function accesses and downloads various
 #' atmospheric composition collections from [NASA's Global Earth Observing System (GEOS) model](https://gmao.gsfc.nasa.gov/GEOS_systems/).
 # nolint end
 #' @param collection character(1). GEOS-CF data collection file name.
@@ -431,7 +431,7 @@ download_ecoregion_data <- function(
 #' @return NULL; Hourly netCDF (.nc4) files will be stored in
 #' \code{directory_to_save}.
 #' @export
-download_geos_data <- function(
+download_geos <- function(
     collection =
         c(
           "aqc_tavg_1hr_g1440x721_v1", "chm_tavg_1hr_g1440x721_v1",
@@ -561,7 +561,7 @@ download_geos_data <- function(
 # nolint start
 #' Download elevation data
 #' @description
-#' The \code{download_gmted_data()} function accesses and downloads Global
+#' The \code{download_gmted()} function accesses and downloads Global
 #' Multi-resolution Terrain Elevation Data (GMTED2010) from
 #' [U.S. Geological Survey and National Geospatial-Intelligence Agency](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010).
 #' @param statistic character(1). Available statistics include `"Breakline Emphasis"`, `"Systematic Subsample"`, `"Median Statistic"`,
@@ -589,7 +589,7 @@ download_geos_data <- function(
 #' \code{directory_to_download}, and directories containing raw ASCII Grid data
 #'will be stored in \code{directory_to_save}.
 #' @export
-download_gmted_data <- function(
+download_gmted <- function(
   statistic = c(
     "Breakline Emphasis", "Systematic Subsample",
     "Median Statistic", "Minimum Statistic",
@@ -709,7 +709,7 @@ download_gmted_data <- function(
 # nolint start
 #' Download meteorological and atmospheric data
 #' @description
-#' The \code{download_merra2_data()} function accesses and downloads various
+#' The \code{download_merra2()} function accesses and downloads various
 #' meteorological and atmospheric collections from [NASA's Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/).
 #' @param collection character(1). MERRA-2 data collection file name.
 #' @param date_start character(1). length of 10. Start date for downloading
@@ -731,7 +731,7 @@ download_gmted_data <- function(
 #' \code{directory_to_save}.
 #' @export
 # nolint end
-download_merra2_data <- function(
+download_merra2 <- function(
     collection = c(
       "inst1_2d_asm_Nx", "inst1_2d_int_Nx", "inst1_2d_lfo_Nx",
       "inst3_3d_asm_Np", "inst3_3d_aer_Nv", "inst3_3d_asm_Nv",
@@ -1017,7 +1017,7 @@ download_merra2_data <- function(
 # nolint start
 #' Download meteorological data (monolevel)
 #' @description
-#' The \code{download_narr_monolevel_data} function accesses and downloads monolevel meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Monolevel" variables contain a single value for the entire atmospheric column (ie. Variable: Convective cloud cover; Level: Entire atmosphere considered as a single layer), or represent a specific altitude associated with the variable (ie. Variable: Air temperature; Level: 2 m).
+#' The \code{download_narr_monolevel} function accesses and downloads monolevel meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Monolevel" variables contain a single value for the entire atmospheric column (ie. Variable: Convective cloud cover; Level: Entire atmosphere considered as a single layer), or represent a specific altitude associated with the variable (ie. Variable: Air temperature; Level: 2 m).
 #' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
 #' @param year_start integer(1). length of 4. Start of year range for
@@ -1040,7 +1040,7 @@ download_merra2_data <- function(
 #' folder within \code{directory_to_save}.
 #' @export
 # nolint end
-download_narr_monolevel_data <- function(
+download_narr_monolevel <- function(
     variables = NULL,
     year_start = 2022,
     year_end = 2022,
@@ -1143,7 +1143,7 @@ download_narr_monolevel_data <- function(
 # nolint start
 #' Download meteorological data (pressure levels)
 #' @description
-#' The \code{download_narr_p_levels_data} function accesses and downloads pressure levels meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
+#' The \code{download_narr_p_levels} function accesses and downloads pressure levels meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
 #' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
 #' @param year_start integer(1). length of 4. Start of year range for
@@ -1167,7 +1167,7 @@ download_narr_monolevel_data <- function(
 #' @export
 # nolint end
 # nolint start: cyclocomp
-download_narr_p_levels_data <- function(
+download_narr_p_levels <- function(
     variables = NULL,
     year_start = 2022,
     year_end = 2022,
@@ -1279,7 +1279,7 @@ download_narr_p_levels_data <- function(
 # nolint start
 #' Download land cover data
 #' @description
-#' The \code{download_nlcd_data()} function accesses and downloads
+#' The \code{download_nlcd()} function accesses and downloads
 #' land cover data from the
 #' [Multi-Resolution Land Characteristics (MRLC) Consortium's National Land Cover Database (NLCD) products data base](https://www.mrlc.gov/data).
 # nolint end
@@ -1307,7 +1307,7 @@ download_narr_p_levels_data <- function(
 #' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
 #' selected GeoTIFF (.tif) files will be stored in \code{directory_to_save}.
 #' @export
-download_nlcd_data <- function(
+download_nlcd <- function(
   collection = "Coterminous United States",
   year = 2021,
   directory_to_download = NULL,
@@ -1427,7 +1427,7 @@ download_nlcd_data <- function(
 # nolint start
 #' Download roads data
 #' @description
-#' The \code{download_sedac_groads_data()} function accesses and downloads
+#' The \code{download_sedac_groads()} function accesses and downloads
 #' roads data from [NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download).
 #' @param data_region character(1). Data can be downloaded for `"Global"`,
 #' `"Africa"`, `"Asia"`, `"Europe"`, `"Americas"`, `"Oceania East"`, and `"Oceania West"`.
@@ -1453,7 +1453,7 @@ download_nlcd_data <- function(
 #' selected Shapefile (.shp) or Geodatabase (.gdb) files will be stored in 
 #' \code{directory_to_save}.
 #' @export
-download_sedac_groads_data <- function(
+download_sedac_groads <- function(
     data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
     data_format = c("Shapefile", "Geodatabase"),
     directory_to_download = NULL, 
@@ -1569,7 +1569,7 @@ download_sedac_groads_data <- function(
 # nolint start
 #' Download population density data
 #' @description
-#' The \code{download_sedac_population_data()} function accesses and downloads
+#' The \code{download_sedac_population()} function accesses and downloads
 #' population density data from [NASA's UN WPP-Adjusted Population Density, v4.11](https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11).
 #' @param data_resolution character(1). Available resolutions are 30 second
 #' (approx. 1 km), 2.5 minute (approx. 5 km), 15 minute (approx. 30 km),
@@ -1598,7 +1598,7 @@ download_sedac_groads_data <- function(
 #' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
 #' selected GeoTIFF (.tif) files will be stored in \code{directory_to_save}.
 #' @export
-download_sedac_population_data <- function(
+download_sedac_population <- function(
   data_resolution = "60 minute",
   data_format = c("GeoTIFF", "ASCII", "netCDF"),
   year = "2020",
@@ -1747,7 +1747,7 @@ download_sedac_population_data <- function(
 # nolint start
 #' Download wildfire smoke data
 #' @description
-#' The \code{download_hms_data()} function accesses and downloads
+#' The \code{download_hms()} function accesses and downloads
 #' wildfire smoke plume coverage data from [NOAA's Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0).
 # nolint end
 #' @param data_format character(1). "Shapefile" or "KML".
@@ -1783,7 +1783,7 @@ download_sedac_population_data <- function(
 #' \code{directory_to_save}.
 #' @export
 # nolint start: cyclocomp
-download_hms_data <- function(
+download_hms <- function(
     data_format = "Shapefile",
     date_start = "2023-09-01",
     date_end = "2023-09-01",
@@ -1923,7 +1923,7 @@ download_hms_data <- function(
 # nolint start
 #' Download climate classification data
 #' @description
-#' The \code{download_koppen_geiger_data()} function accesses and downloads
+#' The \code{download_koppen_geiger()} function accesses and downloads
 #' climate classification data from the \emph{Present and future
 #' Köppen-Geiger climate classification maps at
 #' 1-km resolution}([link for article](https://www.nature.com/articles/sdata2018214); [link for data](https://figshare.com/articles/dataset/Present_and_future_K_ppen-Geiger_climate_classification_maps_at_1-km_resolution/6396959/2)).
@@ -1953,7 +1953,7 @@ download_hms_data <- function(
 #' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
 #' selected GeoTIFF (.tif) files will be stored in \code{directory_to_save}.
 #' @export
-download_koppen_geiger_data <- function(
+download_koppen_geiger <- function(
     data_resolution = c("0.0083", "0.083", "0.5"),
     time_period = c("Present", "Future"),
     directory_to_download = NULL,
@@ -2127,7 +2127,7 @@ download_koppen_geiger_data <- function(
 #' @return NULL; Raw HDF (.hdf) files will be stored in
 #' \code{directory_to_save}.
 #' @export
-download_modis_data <- function(
+download_modis <- function(
     product = c(
       "MOD09GA", "MOD11A1", "MOD06_L2",
       "MCD19A2", "MOD13A2", "VNP46A2"
@@ -2441,7 +2441,7 @@ download_modis_data <- function(
 # nolint start
 #' Download toxic release data
 #' @description
-#' The \code{download_tri_data()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/find-understand-and-use-tri).
+#' The \code{download_tri()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/find-understand-and-use-tri).
 # nolint end
 #' @param year_start integer(1). length of 4. Start year for downloading data.
 #' @param year_end integer(1). length of 4. End year for downloading data.
@@ -2458,7 +2458,7 @@ download_modis_data <- function(
 #' @returns NULL; Yearly comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @export
-download_tri_data <- function(
+download_tri <- function(
   year_start = 2018L,
   year_end = 2022L,
   directory_to_save = NULL,
@@ -2531,7 +2531,7 @@ download_tri_data <- function(
 # nolint start
 #' Download road emissions data
 #' @description
-#' The \code{download_nei_data()} function accesses and downloads road emissions data from the [U.S Environmental Protection Agency's (EPA) National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories/national-emissions-inventory-nei).
+#' The \code{download_nei()} function accesses and downloads road emissions data from the [U.S Environmental Protection Agency's (EPA) National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories/national-emissions-inventory-nei).
 # nolint end
 #' @param epa_certificate_path character(1). Path to the certificate file
 #' for EPA DataCommons. Default is
@@ -2565,7 +2565,7 @@ download_tri_data <- function(
 #' @returns NULL; Yearly comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @export
-download_nei_data <- function(
+download_nei <- function(
   epa_certificate_path =
     system.file("extdata/cacert_gaftp_epa.pem",
                 package = "amadeus"),
@@ -2762,7 +2762,7 @@ download_nei_data <- function(
 #' @seealso [list_stac_files]
 #' @export
 # nolint end
-download_olm_data <- function(
+download_olm <- function(
   product = NULL,
   format = "tif",
   directory_to_save = NULL,
@@ -2865,7 +2865,7 @@ download_olm_data <- function(
 #' }
 #' @export
 # @importFrom archive archive_extract
-download_huc_data <-
+download_huc <-
   function(
     region = c("Lower48", "Islands"),
     type = c("Seamless", "OceanCatchment"),
@@ -3001,7 +3001,7 @@ download_huc_data <-
 #' \code{directory_to_save}.
 #' @examples
 #' \dontrun{
-#' download_cropscape_data(
+#' download_cropscape(
 #'   2020, "~/data",
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
@@ -3010,7 +3010,7 @@ download_huc_data <-
 #' }
 #' @importFrom archive archive_extract
 #' @export
-download_cropscape_data <- function(
+download_cropscape <- function(
   year = seq(1997, 2023),
   source = c("USDA", "GMU"),
   directory_to_save = NULL,
@@ -3146,7 +3146,7 @@ download_cropscape_data <- function(
 #' \code{directory_to_save}.
 #' @examples
 #' \dontrun{
-#' download_prism_data(
+#' download_prism(
 #'   time = "202104",
 #'   element = "ppt",
 #'   data_type = "ts",
@@ -3162,7 +3162,7 @@ download_cropscape_data <- function(
 #' * [PRISM Web Service Guide](https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf)
 #' @export
 # nolint end
-download_prism_data <- function(
+download_prism <- function(
   time,
   element = c("ppt", "tmin", "tmax", "tmean", "tdmean",
               "vpdmin", "vpdmax",
@@ -3258,7 +3258,7 @@ download_prism_data <- function(
 # nolint start
 #' Download gridMET data
 #' @description
-#' The \code{download_gridmet_data} function accesses and downloads gridded surface meteorological data from the [University of California Merced Climatology Lab's gridMET dataset](https://www.climatologylab.org/gridmet.html).
+#' The \code{download_gridmet} function accesses and downloads gridded surface meteorological data from the [University of California Merced Climatology Lab's gridMET dataset](https://www.climatologylab.org/gridmet.html).
 #' @param variables character(1). Variable(s) name(s). See [gridMET Generate Wget File](https://www.climatologylab.org/wget-gridmet.html)
 #' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
 #' "Energy Release Component" has code "erc").
@@ -3282,7 +3282,7 @@ download_prism_data <- function(
 #' folder within \code{directory_to_save}.
 #' @export
 # nolint end
-download_gridmet_data <- function(
+download_gridmet <- function(
     variables = NULL,
     year_start = 2022,
     year_end = 2022,
@@ -3388,7 +3388,7 @@ download_gridmet_data <- function(
 # nolint start
 #' Download TerraClimate data
 #' @description
-#' The \code{download_terraclimate_data} function accesses and downloads climate and water balance data from the [University of California Merced Climatology Lab's TerraClimate dataset](https://www.climatologylab.org/terraclimate.html).
+#' The \code{download_terraclimate} function accesses and downloads climate and water balance data from the [University of California Merced Climatology Lab's TerraClimate dataset](https://www.climatologylab.org/terraclimate.html).
 #' @param variables character(1). Variable(s) name(s). See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
 #' for variable names and acronym codes.
 #' @param year_start integer(1). length of 4. Start of year range for
@@ -3411,7 +3411,7 @@ download_gridmet_data <- function(
 #' folder within \code{directory_to_save}.
 #' @export
 # nolint end
-download_terraclimate_data <- function(
+download_terraclimate <- function(
     variables = NULL,
     year_start = 2022,
     year_end = 2022,

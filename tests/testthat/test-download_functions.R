@@ -39,7 +39,7 @@ testthat::test_that("Error when one parameter is NULL.", {
 
 testthat::test_that("Errors when temporal ranges invalid.", {
   expect_error(
-    download_geos_data(
+    download_geos(
       date_start = "1900-01-01",
       collection = "aqc_tavg_1hr_g1440x721_v1",
       acknowledgement = TRUE,
@@ -47,7 +47,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
     )
   )
   expect_error(
-    download_aqs_data(
+    download_aqs(
       year_start = 1900,
       acknowledgement = TRUE,
       directory_to_save = testthat::test_path("..", "testdata/", ""),
@@ -55,7 +55,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
     )
   )
   expect_error(
-    download_narr_monolevel_data(
+    download_narr_monolevel(
       year_start = 1900,
       variables = "air.sfc",
       acknowledgement = TRUE,
@@ -63,7 +63,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
     )
   )
   expect_error(
-    download_narr_p_levels_data(
+    download_narr_p_levels(
       year_start = 1900,
       variables = "omega",
       acknowledgement = TRUE,
@@ -71,7 +71,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
     )
   )
   expect_error(
-    download_merra2_data(
+    download_merra2(
       date_start = "1900-01-01",
       collection = "inst1_2d_asm_Nx",
       directory_to_save = testthat::test_path("..", "testdata/", ""),
@@ -79,7 +79,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
     )
   )
   expect_error(
-    download_hms_data(
+    download_hms(
       date_start = "1900-01-01",
       directory_to_save = testthat::test_path("..", "testdata/", ""),
       directory_to_download = testthat::test_path("..", "testdata/", ""),
@@ -87,7 +87,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
     )
   )
   expect_error(
-    download_gridmet_data(
+    download_gridmet(
       year_start = 1900,
       variables = "Precipitation",
       acknowledgement = TRUE,
@@ -95,7 +95,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
     )
   )
   expect_error(
-    download_terraclimate_data(
+    download_terraclimate(
       year_start = 1900,
       variables = "Wind Speed",
       acknowledgement = TRUE,
@@ -460,7 +460,7 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
   }
 })
 
-testthat::test_that("download_hms_data error for unzip and directory.", {
+testthat::test_that("download_hms error for unzip and directory.", {
   testthat::expect_error(
     download_data(
       dataset_name = "hms",
@@ -1225,7 +1225,7 @@ testthat::test_that("check_urls returns NULL undefined size.", {
   )
 })
 
-testthat::test_that("download_hms_data LIVE run.", {
+testthat::test_that("download_hms LIVE run.", {
   # function parameters
   date <- "2018-01-01"
   directory <- testthat::test_path("..", "testdata", "hms_live")
@@ -1402,16 +1402,16 @@ testthat::test_that("terraclimate error with invalid variables", {
 
 
 
-testthat::test_that("download_cropscape_data throws an error for invalid year", {
+testthat::test_that("download_cropscape throws an error for invalid year", {
   # Set up test data
   invalid_year <- 1996
-  testthat::expect_error(download_cropscape_data(year = 2020, source = "CMU"))
+  testthat::expect_error(download_cropscape(year = 2020, source = "CMU"))
   # Call the function and expect an error
-  testthat::expect_error(download_cropscape_data(year = invalid_year, source = "GMU"))
-  testthat::expect_error(download_cropscape_data(year = 2000, source = "USDA"))
+  testthat::expect_error(download_cropscape(year = invalid_year, source = "GMU"))
+  testthat::expect_error(download_cropscape(year = 2000, source = "USDA"))
 })
 
-testthat::test_that("download_cropscape_data generates correct download commands (GMU)", {
+testthat::test_that("download_cropscape generates correct download commands (GMU)", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # Set up test data
@@ -1420,7 +1420,7 @@ testthat::test_that("download_cropscape_data generates correct download commands
 
   # Call the function
   testthat::expect_no_error(
-    download_cropscape_data(
+    download_cropscape(
       year = year,
       source = "GMU",
       directory_to_save = directory_to_save,
@@ -1457,7 +1457,7 @@ testthat::test_that("download_cropscape_data generates correct download commands
 })
 
 
-test_that("download_cropscape_data generates correct download commands (USDA)", {
+test_that("download_cropscape generates correct download commands (USDA)", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # Set up test data
@@ -1466,7 +1466,7 @@ test_that("download_cropscape_data generates correct download commands (USDA)", 
 
   # Call the function
   testthat::expect_no_error(
-    download_cropscape_data(
+    download_cropscape(
       year = year,
       source = "USDA",
       directory_to_save = directory_to_save,
@@ -1503,7 +1503,7 @@ test_that("download_cropscape_data generates correct download commands (USDA)", 
 })
 
 
-testthat::test_that("download_prism_data downloads the correct data files", {
+testthat::test_that("download_prism downloads the correct data files", {
   # Set up test data
   time <- seq(201005, 201012, by = 1)
   element <- c("ppt", "tmin", "tmax", "tmean", "tdmean",
@@ -1522,7 +1522,7 @@ testthat::test_that("download_prism_data downloads the correct data files", {
   remove_command <- FALSE
 
   # Call the function
-  download_prism_data(
+  download_prism(
     time = time,
     element = element,
     data_type = data_type,
@@ -1534,7 +1534,7 @@ testthat::test_that("download_prism_data downloads the correct data files", {
   )
 
   testthat::expect_message(
-    download_prism_data(
+    download_prism(
       time = time,
       element = "ppt",
       data_type = "normals",
@@ -1583,7 +1583,7 @@ testthat::test_that("download_prism_data downloads the correct data files", {
   remove_command <- FALSE
 
   # Call the function and expect an error
-  testthat::expect_error(download_prism_data(
+  testthat::expect_error(download_prism(
     time = time,
     element = element,
     data_type = data_type,
@@ -1630,7 +1630,7 @@ testthat::test_that("list_stac_files returns a character vector of file links", 
 })
 
 
-testthat::test_that("download_huc_data works",
+testthat::test_that("download_huc works",
   {
     withr::local_package("httr")
 
@@ -1641,7 +1641,7 @@ testthat::test_that("download_huc_data works",
     for (region in allregions) {
       for (type in alltypes) {
         testthat::expect_no_error(
-          download_huc_data(
+          download_huc(
             region, type,
             directory_to_save,
             acknowledgement = TRUE,
@@ -1677,7 +1677,7 @@ testthat::test_that("download_huc_data works",
       }
     
       testthat::expect_error(
-        download_huc_data(
+        download_huc(
           "Lower48", "OceanCatchment",
           tempdir(),
           acknowledgement = TRUE,
@@ -1703,7 +1703,7 @@ testthat::test_that(
     download <- FALSE
 
     testthat::expect_no_error(
-      download_olm_data(
+      download_olm(
         product = product,
         format = format,
         directory_to_save = directory_to_save,
