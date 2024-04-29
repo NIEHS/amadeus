@@ -123,10 +123,9 @@ download_data <-
 #'  Start year for downloading data.
 #' @param year_end integer(1). length of 4.
 #'  End year for downloading data.
-#' @param directory_to_download character(1).
-#'  Directory to download zip files from AQS data mart.
-#' @param directory_to_save character(1).
-#'  Directory to decompress zip files.
+#' @param directory_to_save character(1). Directory to save data. Two
+#' sub-directories will be created for the downloaded zip files ("/zip_files")
+#' and the unzipped data files ("/data_files").
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
@@ -151,7 +150,6 @@ download_aqs <-
     year_start = 2018,
     year_end = 2022,
     url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
-    directory_to_download = NULL,
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
@@ -167,10 +165,10 @@ download_aqs <-
     #### 2. check for null parameters
     check_for_null_parameters(mget(ls()))
     #### 3. directory setup
-    directory_to_download <- download_sanitize_path(directory_to_download)
-    directory_to_save <- download_sanitize_path(directory_to_save)
-    download_setup_dir(directory_to_download)
-    download_setup_dir(directory_to_save)
+    directory_original <- download_sanitize_path(directory_to_save)
+    directories <- download_setup_dir(directory_original, zip = TRUE)
+    directory_to_download <- directories[1]
+    directory_to_save <- directories[2]
     #### 4. define year sequence
     year_sequence <- seq(year_start, year_end, 1)
     #### 5. build URLs
@@ -219,7 +217,7 @@ download_aqs <-
     ]
     #### 7. initiate "..._curl_commands.txt"
     commands_txt <- paste0(
-      directory_to_download,
+      directory_original,
       "aqs_",
       parameter_code,
       "_",
@@ -256,6 +254,9 @@ download_aqs <-
         download_name = download_names[n]
       )
     }
+    if (remove_zip) {
+      unlink(directory_to_download, recursive = TRUE)
+    }
     #### 13. remove command file
     download_remove_command(
       commands_txt = commands_txt,
@@ -284,9 +285,9 @@ download_aqs <-
 #' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
 #' @param certificate_url character(1). URL to certificate file. See notes for
 #' details.
-#' @param directory_to_download character(1). Directory to download zip file
-#' of Ecoregion level 3 shapefiles
-#' @param directory_to_save character(1). Directory to decompress zip files.
+#' @param directory_to_save character(1). Directory to save data. Two
+#' sub-directories will be created for the downloaded zip files ("/zip_files")
+#' and the unzipped data files ("/data_files").
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
@@ -309,7 +310,6 @@ download_ecoregion <- function(
                 package = "amadeus"),
   certificate_url =
     "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
-  directory_to_download = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -322,10 +322,10 @@ download_ecoregion <- function(
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  download_setup_dir(directory_to_save)
-  download_setup_dir(directory_to_download)
-  directory_to_download <- download_sanitize_path(directory_to_download)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  directory_original <- download_sanitize_path(directory_to_save)
+  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- directories[1]
+  directory_to_save <- directories[2]
   #### 4. Check the presence of file
   ## This part is hard-coded as the original file appears to
   ## be a misnomer. May need to be modified accordingly in the future.
@@ -365,7 +365,7 @@ download_ecoregion <- function(
     )
   #### 8. initiate "..._curl_commands.txt" file
   commands_txt <- paste0(
-    directory_to_download,
+    directory_original,
     "us_eco_l3_state_boundaries_",
     Sys.Date(),
     "_wget_command.txt"
@@ -404,6 +404,9 @@ download_ecoregion <- function(
     remove = remove_zip,
     download_name = download_name
   )
+  if (remove_zip) {
+    unlink(directory_to_download, recursive = TRUE)
+  }
 }
 
 # nolint start 
@@ -571,9 +574,9 @@ download_geos <- function(
 #' `"Minimum Statistic"`, `"Mean Statistic"`, `"Maximum Statistic"`, and
 #' `"Standard Deviation Statistic"`.
 #' @param resolution character(1). Available resolutions include `"7.5 arc-seconds"`, `"15 arc-seconds"`, and `"30 arc-seconds"`.
-#' @param directory_to_download character(1). Directory to download zip files
-#' from Global Multi-resolution Terrain Elevation Data (GMTED2010).
-#' @param directory_to_save character(1). Directory to decompress zip files.
+#' @param directory_to_save character(1). Directory to save data. Two
+#' sub-directories will be created for the downloaded zip files ("/zip_files")
+#' and the unzipped data files ("/data_files").
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
@@ -600,7 +603,6 @@ download_gmted <- function(
     "Standard Deviation Statistic"
   ),
   resolution = c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"),
-  directory_to_download = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -613,10 +615,10 @@ download_gmted <- function(
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  download_setup_dir(directory_to_download)
-  download_setup_dir(directory_to_save)
-  directory_to_download <- download_sanitize_path(directory_to_download)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  directory_original <- download_sanitize_path(directory_to_save)
+  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- directories[1]
+  directory_to_save <- directories[2]
   #### 4. check for valid statistic
   statistic <- match.arg(statistic)
   #### 5. check for valid resolution
@@ -663,7 +665,7 @@ download_gmted <- function(
   )
   #### 12. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
-    directory_to_download,
+    directory_original,
     "gmted_",
     gsub(" ", "", statistic),
     "_",
@@ -707,6 +709,9 @@ download_gmted <- function(
     remove = remove_zip,
     download_name = download_name
   )
+  if (remove_zip) {
+    unlink(directory_to_download, recursive = TRUE)
+  }
 }
 
 # nolint start
@@ -1287,9 +1292,9 @@ download_narr_p_levels <- function(
 #' include `2001`, `2004`, `2006`, `2008`, `2011`, `2013`, `2016`,
 #' `2019`, and `2021`.
 #' Available years for Alaska include `2001`, `2011`, and `2016`.
-#' @param directory_to_download character(1). Directory to download zip files
-#' from National Land Cover Database Science Research Products.
-#' @param directory_to_save character(1). Directory to decompress zip files.
+#' @param directory_to_save character(1). Directory to save data. Two
+#' sub-directories will be created for the downloaded zip files ("/zip_files")
+#' and the unzipped shapefiles ("/data_files").
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
@@ -1303,13 +1308,13 @@ download_narr_p_levels <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
-#' selected GeoTIFF (.tif) files will be stored in \code{directory_to_save}.
+#' @return NULL; Zip files and unzipped data files will be stored in
+#' "/zip_files" and "/data_files" sub-directories, respectively, within the
+#' \code{directory_to_save}.
 #' @export
 download_nlcd <- function(
   collection = "Coterminous United States",
   year = 2021,
-  directory_to_download = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -1322,10 +1327,10 @@ download_nlcd <- function(
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  download_setup_dir(directory_to_download)
-  download_setup_dir(directory_to_save)
-  directory_to_download <- download_sanitize_path(directory_to_download)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  directory_original <- download_sanitize_path(directory_to_save)
+  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- directories[1]
+  directory_to_save <- directories[2]
   #### 4. check for valid years
   valid_years <- c(2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019, 2021)
   if (!(year %in% valid_years)) {
@@ -1381,7 +1386,7 @@ download_nlcd <- function(
   )
   #### 11. initiate "..._curl_command.txt"
   commands_txt <- paste0(
-    directory_to_download,
+    directory_original,
     tolower(collection_code),
     Sys.Date(),
     "_curl_command.txt"
@@ -1416,6 +1421,9 @@ download_nlcd <- function(
     remove = remove_zip,
     download_name = download_name
   )
+  if (remove_zip) {
+    unlink(directory_to_download, recursive = TRUE)
+  }
   #### 18. remove command text
   download_remove_command(
     commands_txt = commands_txt,
@@ -1432,9 +1440,9 @@ download_nlcd <- function(
 #' `"Africa"`, `"Asia"`, `"Europe"`, `"Americas"`, `"Oceania East"`, and `"Oceania West"`.
 #' @param data_format character(1). Data can be downloaded as `"Shapefile"` or
 #' `"Geodatabase"`. (Only `"Geodatabase"` available for `"Global"` region).
-#' @param directory_to_download character(1). Directory to download zip files
-#' from NASA Global Roads Open Access Data Set.
-#' @param directory_to_save character(1). Directory to decompress zip files.
+#' @param directory_to_save character(1). Directory to save data. Two
+#' sub-directories will be created for the downloaded zip files ("/zip_files")
+#' and the unzipped shapefiles ("/data_files").
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
@@ -1448,14 +1456,13 @@ download_nlcd <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
-#' selected Shapefile (.shp) or Geodatabase (.gdb) files will be stored in 
+#' @return NULL; Zip files and unzipped data files will be stored in
+#' "/zip_files" and "/data_files" sub-directories, respectively, within the
 #' \code{directory_to_save}.
 #' @export
 download_sedac_groads <- function(
     data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
     data_format = c("Shapefile", "Geodatabase"),
-    directory_to_download = NULL, 
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
@@ -1469,10 +1476,10 @@ download_sedac_groads <- function(
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  download_setup_dir(directory_to_download)
-  download_setup_dir(directory_to_save)
-  directory_to_download <- download_sanitize_path(directory_to_download)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  directory_original <- download_sanitize_path(directory_to_save)
+  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- directories[1]
+  directory_to_save <- directories[2]
   #### 4. check if region is valid
   data_format <- match.arg(data_format)
   data_region <- match.arg(data_region)
@@ -1521,7 +1528,7 @@ download_sedac_groads <- function(
   )
   #### 11. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
-    directory_to_download,
+    directory_original,
     "sedac_groads_",
     gsub(" ", "_", region),
     "_",
@@ -1563,6 +1570,9 @@ download_sedac_groads <- function(
     remove = remove_zip,
     download_name = download_name
   )
+  if (remove_zip) {
+    unlink(directory_to_download, recursive = TRUE)
+  }
 }
 
 # nolint start
@@ -1577,9 +1587,9 @@ download_sedac_groads <- function(
 #' `"ASCII"` or `"GeoTIFF"`. "all" years is downloaded as `"netCDF"`.
 #' @param year character(1). Available years are `2000`, `2005`, `2010`, `2015`, and
 #' `2020`, or `"all"` for all years.
-#' @param directory_to_download character(1). Directory to download zip files
-#' from NASA UN WPP-Adjusted Population Density, v4.11.
-#' @param directory_to_save character(1). Directory to decompress zip files.
+#' @param directory_to_save character(1). Directory to save data. Two
+#' sub-directories will be created for the downloaded zip files ("/zip_files")
+#' and the unzipped shapefiles ("/data_files").
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
@@ -1594,14 +1604,14 @@ download_sedac_groads <- function(
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
-#' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
-#' selected GeoTIFF (.tif) files will be stored in \code{directory_to_save}.
+#' @return NULL; Zip files and unzipped data files will be stored in
+#' "/zip_files" and "/data_files" sub-directories, respectively, within the
+#' \code{directory_to_save}.
 #' @export
 download_sedac_population <- function(
   data_resolution = "60 minute",
   data_format = c("GeoTIFF", "ASCII", "netCDF"),
   year = "2020",
-  directory_to_download = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -1614,10 +1624,10 @@ download_sedac_population <- function(
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  download_setup_dir(directory_to_download)
-  download_setup_dir(directory_to_save)
-  directory_to_download <- download_sanitize_path(directory_to_download)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  directory_original <- download_sanitize_path(directory_to_save)
+  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- directories[1]
+  directory_to_save <- directories[2]
   #### 4. define URL base
   base <- paste0("https://sedac.ciesin.columbia.edu/downloads/data/gpw-v4/")
   #### 5. define year
@@ -1697,7 +1707,7 @@ download_sedac_population <- function(
   )
   #### 12. initiate "..._curl_command.txt"
   commands_txt <- paste0(
-    directory_to_download,
+    directory_original,
     "sedac_population_",
     year,
     "_",
@@ -1741,6 +1751,9 @@ download_sedac_population <- function(
     remove = remove_zip,
     download_name = download_name
   )
+  if (remove_zip) {
+    unlink(directory_to_download, recursive = TRUE)
+  }
 }
 
 # nolint start
@@ -1780,8 +1793,8 @@ download_sedac_population <- function(
 #' @importFrom utils head
 #' @importFrom utils tail
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
-#' Shapefiles (.shp) or KML files (.kml) will be stored in
+#' @return NULL; Zip files and unzipped data files will be stored in
+#' "/zip_files" and "/data_files" sub-directories, respectively, within the
 #' \code{directory_to_save}.
 #' @export
 # nolint start: cyclocomp
@@ -1800,21 +1813,10 @@ download_hms <- function(
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  directory_original <- directory_to_save
-  download_setup_dir(directory_original, zip = TRUE)
-  directory_to_download <- download_sanitize_path(
-    paste0(
-      download_sanitize_path(directory_to_save),
-      "zip_files"
-      )
-  )
-  directory_to_save <- download_sanitize_path(
-    paste0(
-      download_sanitize_path(directory_to_save),
-      "data_files"
-    )
-  )
-  cat(c(directory_to_download, directory_to_save))
+  directory_original <- download_sanitize_path(directory_to_save)
+  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- directories[1]
+  directory_to_save <- directories[2]
   #### 4. check for unzip == FALSE && remove_zip == TRUE
   if (unzip == FALSE && remove_zip == TRUE) {
     stop(paste0(
@@ -1845,10 +1847,12 @@ download_hms <- function(
   for (f in seq_along(date_sequence)) {
     year <- substr(date_sequence[f], 1, 4)
     month <- substr(date_sequence[f], 5, 6)
-    if (data_format == "Shapefile") {
+    if (tolower(data_format) == "shapefile") {
+      data_format <- "Shapefile"
       suffix <- ".zip"
       directory_to_cat <- directory_to_download
-    } else if (data_format == "KML") {
+    } else if (tolower(data_format) == "kml") {
+      data_format <- "KML"
       suffix <- ".kml"
       directory_to_cat <- directory_to_save
     }
@@ -1930,6 +1934,9 @@ download_hms <- function(
     remove = remove_zip,
     download_name = download_names
   )
+  if (remove_zip) {
+    unlink(directory_to_download, recursive = TRUE)
+  }
 }
 # nolint end: cyclocomp
 
@@ -1946,10 +1953,9 @@ download_hms <- function(
 #' @param time_period character(1). Available times are `"Present"` (1980-2016)
 #' and `"Future"` (2071-2100). ("Future" classifications are based on scenario
 #' RCP8.5).
-#' @param directory_to_download character(1). Directory to download zip files
-#' from Present and future Köppen-Geiger climate classification maps at 1-km
-#' resolution.
-#' @param directory_to_save character(1). Directory to decompress zip files.
+#' @param directory_to_save character(1). Directory to save data. Two
+#' sub-directories will be created for the downloaded zip files ("/zip_files")
+#' and the unzipped shapefiles ("/data_files").
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
@@ -1963,13 +1969,13 @@ download_hms <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; Zip file will be stored in \code{directory_to_download}, and
-#' selected GeoTIFF (.tif) files will be stored in \code{directory_to_save}.
+#' @return NULL; Zip files and unzipped data files will be stored in
+#' "/zip_files" and "/data_files" sub-directories, respectively, within the
+#' \code{directory_to_save}.
 #' @export
 download_koppen_geiger <- function(
     data_resolution = c("0.0083", "0.083", "0.5"),
     time_period = c("Present", "Future"),
-    directory_to_download = NULL,
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
@@ -1981,10 +1987,10 @@ download_koppen_geiger <- function(
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  download_setup_dir(directory_to_download)
-  download_setup_dir(directory_to_save)
-  directory_to_download <- download_sanitize_path(directory_to_download)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  directory_original <- download_sanitize_path(directory_to_save)
+  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- directories[1]
+  directory_to_save <- directories[2]
   #### 4. check for data resolution
   data_resolution <- match.arg(data_resolution)
   #### 5. check for valid time period
@@ -2014,7 +2020,7 @@ download_koppen_geiger <- function(
   )
   #### 11. initiate "..._wget_commands.txt"
   commands_txt <- paste0(
-    directory_to_download,
+    directory_original,
     "koppen_geiger_",
     time_period,
     "_",
@@ -2041,44 +2047,6 @@ download_koppen_geiger <- function(
     download = download,
     system_command = system_command
   )
-
-  if (unzip) {
-    #### 16. remove unwanted files
-    wanted_names <- list.files(
-      path = directory_to_save,
-      pattern =
-      sprintf("(Beck_KG_*.*_%s_*.*%s*.*tif$|legend.txt)",
-              time_period, data_resolution),
-      full.names = TRUE
-    )
-    all_names <- list.files(
-      path = directory_to_save,
-      full.names = TRUE
-    )
-    unwanted_names <- all_names[!all_names %in% wanted_names]
-    # unwanted_names <- as.vector(c(
-    #   unwanted_names,
-    #   paste0(
-    #     directory_to_save,
-    #     "KoppenGeiger.m"
-    #   )
-    # ))
-    # tif <- paste0(
-    #   directory_to_save,
-    #   "/Beck_KG_V1_",
-    #   period,
-    #   "_",
-    #   data_resolution,
-    #   ".tif"
-    # )
-    # unwanted_names <- unwanted_names[grep(
-    #   pattern = tif,
-    #   unwanted_names,
-    #   invert = TRUE
-    # )]
-    file.remove(unwanted_names)
-  }
-
   #### 17. Remove command file
   download_remove_command(
     commands_txt = commands_txt,
@@ -2090,11 +2058,37 @@ download_koppen_geiger <- function(
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
+  if (unzip) {
+    #### 16. remove unwanted files
+    wanted_names <- grep(
+      "conf",
+      list.files(
+        path = directory_to_save,
+        pattern = sprintf(
+          "Beck_KG_.*_%s_.*%s.*\\.tif$|legend\\.txt",
+          period,
+          data_resolution
+        ),
+        full.names = TRUE
+      ),
+      invert = TRUE,
+      value = TRUE
+    )
+    all_names <- list.files(
+      path = directory_to_save,
+      full.names = TRUE
+    )
+    unwanted_names <- all_names[!all_names %in% wanted_names]
+    file.remove(unwanted_names)
+  }
   #### 19. remove zip files
   download_remove_zips(
     remove = remove_zip,
     download_name = download_name
   )
+  if (remove_zip) {
+    unlink(directory_to_download, recursive = TRUE)
+  }
 }
 
 
@@ -2484,7 +2478,8 @@ download_tri <- function(
   #### 2. directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
-
+  
+  
   #### 3. define measurement data paths
   url_download <-
     "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/"
@@ -2553,7 +2548,9 @@ download_tri <- function(
 #' details.
 #' @param year_target Available years of NEI data.
 #' Default is \code{c(2017L, 2020L)}.
-#' @param directory_to_save character(1). Directory to download files.
+#' @param directory_to_save character(1). Directory to save data. Two
+#' sub-directories will be created for the downloaded zip files ("/zip_files")
+#' and the unzipped data files ("/data_files").
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
@@ -2594,8 +2591,10 @@ download_nei <- function(
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
-  download_setup_dir(directory_to_save)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  directory_original <- download_sanitize_path(directory_to_save)
+  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- directories[1]
+  directory_to_save <- directories[2]
 
   #### 5. define download URL
   download_epa_certificate(
@@ -2616,7 +2615,7 @@ download_nei <- function(
   download_names_file <-
     c("2017neiApr_onroad_byregions.zip",
       "2020nei_onroad_byregion.zip")
-  download_names <- paste0(directory_to_save, download_names_file)
+  download_names <- paste0(directory_to_download, download_names_file)
   #### filter commands to non-existing files
   download_urls <- download_urls[
     which(
@@ -2635,7 +2634,7 @@ download_nei <- function(
 
   #### 5. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
-    directory_to_save,
+    directory_original,
     "NEI_AADT_",
     paste(year_target, collapse = "-"),
     "_",
@@ -2662,7 +2661,10 @@ download_nei <- function(
   # as duplicate file names are across multiple zip files
   if (download) {
     if (unzip) {
-      dir_unzip <- sub(".zip", "", download_names)
+      dir_unzip <- paste0(
+        directory_to_save,
+        sub(".zip", "", download_names_file)
+      )
       for (fn in seq_along(dir_unzip)) {
         utils::unzip(zipfile = download_names[fn], exdir = dir_unzip[fn])
       }
