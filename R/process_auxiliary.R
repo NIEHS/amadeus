@@ -319,7 +319,8 @@ process_locs_radius <-
 
 #' Process locations as `SpatVector`
 #' @description
-#' Convert locations from class \code{data.frame} or \code{data.table} to
+#' Detect `SpatVector` object, or convert locations from class \code{sf},
+#' \code{data.frame} or \code{data.table} to
 #' `SpatVector` object, project to coordinate reference system, and apply
 #' circular buffer.
 #' @param locs data.frame(1). Data frame containing columns for unique
@@ -338,35 +339,32 @@ process_locs_vector <-
   function(
       locs,
       crs,
-      radius) {
-    #### sites as data frame
-    if ("data.table" %in% class(locs)) {
-      sites_df <- data.frame(locs)
-    } else if ("data.frame" %in% class(locs) &&
-                 !("data.table" %in% class(locs))) {
-      sites_df <- locs
-    } else if (!("data.table" %in% class(locs)) &&
-                 !("data.frame" %in% class(locs))) {
-      stop(
-        paste0(
-          "Detected a ",
-          class(locs)[1],
-          " object. Sites must be class data.frame or data.table.\n"
-        )
+      radius
+      ) {
+    #### detect SpatVector
+    if (methods::is(locs, "SpatVector")) {
+      cat("Detected `SpatVector` extraction locations...\n")
+      sites_v <- locs
+    #### detect sf object
+    } else if (methods::is(locs, "sf")) {
+      cat("Detected `sf` extraction locations...\n")
+      sites_v <- terra::vect(locs)
+    ### detect data.frame object
+    } else if (methods::is(locs, "data.frame")) {
+      cat("Detected `data.frame` extraction locations...\n")
+      #### columns
+      if (any(!(c("lon", "lat") %in% colnames(locs)))) {
+        stop(paste0(
+          "`locs` is missing 'lon', 'lat', or both.\n"
+        ))
+      }
+      sites_v <- terra::vect(
+        data.frame(locs),
+        geom = c("lon", "lat"),
+        crs = "EPSG:4326"
       )
     }
-    #### columns
-    if (any(!(c("lon", "lat") %in% colnames(locs)))) {
-      stop(paste0(
-        "Sites data is missing 'lon', 'lat', or both.\n"
-      ))
-    }
-    #### as SpatVector
-    sites_v <- terra::vect(
-      sites_df,
-      geom = c("lon", "lat"),
-      crs = "EPSG:4326"
-    )
+    ##### project to desired coordinate reference system
     sites_p <- terra::project(
       sites_v,
       crs

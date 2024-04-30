@@ -928,13 +928,39 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
       locs_id = "site_id"
     )
   )
-  # expect error when sites are SpatVector
-  expect_error(
+  # expect error when sites are SpatVector (points)
+  expect_no_error(
     calc_narr(
       from = narr,
       locs = terra::vect(
         ncp,
         geom = c("lon", "lat"),
+        crs = "EPSG:4326"
+      ),
+      locs_id = "site_id"
+    )
+  )
+  # expect error when sites are SpatVector (polygons)
+  expect_no_error(
+    calc_narr(
+      from = narr,
+      locs = terra::centroids(
+        terra::vect(
+          ncp,
+          geom = c("lon", "lat"),
+          crs = "EPSG:4326"
+        )
+      ),
+      locs_id = "site_id"
+    )
+  )
+  # expect error when sites are sf
+  expect_no_error(
+    calc_narr(
+      from = narr,
+      locs = sf::st_as_sf(
+        ncp,
+        coords = c("lon", "lat"),
         crs = "EPSG:4326"
       ),
       locs_id = "site_id"
