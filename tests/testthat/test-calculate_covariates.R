@@ -35,9 +35,9 @@ testthat::test_that("calc_koppen_geiger works well", {
   # the result is a data frame
   testthat::expect_s3_class(kg_res, "data.frame")
   # ncol is equal to 6
-  testthat::expect_equal(ncol(kg_res), 6)
+  testthat::expect_equal(ncol(kg_res), 7)
   # should have only one climate zone
-  testthat::expect_equal(sum(unlist(kg_res[, -1])), 1)
+  testthat::expect_equal(sum(unlist(kg_res[, c(-1, -2)])), 1)
 })
 
 testthat::test_that("calc_dummies works well", {
@@ -141,7 +141,7 @@ testthat::test_that("calc_ecoregion works well", {
   # the result is a data frame
   testthat::expect_s3_class(ecor_res, "data.frame")
   # ncol is equal to 2 + 5 + 2 + 1 + 1
-  testthat::expect_equal(ncol(ecor_res), 3L)
+  testthat::expect_equal(ncol(ecor_res), 4L)
   # should have each of the indicator groups
   dum_cn <- grep("DUM_", colnames(ecor_res))
   testthat::expect_equal(
@@ -928,11 +928,11 @@ testthat::test_that("calc_gmted returns expected.", {
         )
         # expect 2 columns
         expect_true(
-          ncol(gmted_covariate) == 2
+          ncol(gmted_covariate) == 3
         )
         # expect numeric value
         expect_true(
-          class(gmted_covariate[, 2]) == "numeric"
+          class(gmted_covariate[, 3]) == "numeric"
         )
       }
     }

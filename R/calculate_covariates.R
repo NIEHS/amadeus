@@ -123,6 +123,10 @@ calc_covariates <-
 #' @param ... Placeholders.
 #' @seealso [`process_koppen_geiger`]
 #' @returns a data.frame object
+#' @note The returned `data.frame` object contains a
+#' `$time` column to represent the temporal range covered by the
+#' dataset. For more information, see
+#' <https://www.nature.com/articles/sdata2018214>.
 #' @author Insang Song
 #' @importFrom terra vect
 #' @importFrom terra rast
@@ -144,7 +148,9 @@ calc_koppen_geiger <-
     locs_tr <- locs
 
     if (!methods::is(locs, "SpatVector")) {
-      locs_tr <- terra::vect(locs)
+      locs_tr <- process_conformity(
+        locs = locs
+      )
     }
     locs_kg <- terra::project(locs_tr, terra::crs(from))
     locs_kg_extract <- terra::extract(from, locs_kg)
@@ -203,9 +209,11 @@ calc_koppen_geiger <-
     kg_extracted <-
       cbind(
         locs_id = unlist(locs_kg_extract_e[[locs_id]]),
+        as.character(terra::metags(from)),
         df_ae_separated
       )
     names(kg_extracted)[1] <- locs_id
+    names(kg_extracted)[2] <- "time"
     return(kg_extracted)
   }
 
@@ -348,7 +356,7 @@ calc_ecoregion <-
     if (!methods::is(locs, "SpatVector")) {
       locs <- terra::vect(locs)
     }
-
+    
     locs <- terra::project(locs, terra::crs(from))
     locs_in <- terra::intersect(locs, from)
     locs_out <-
@@ -393,7 +401,11 @@ calc_ecoregion <-
       as.data.frame()
     colnames(df_lv3) <- key3_num_unique
 
-    locs_ecoreg <- cbind(locs[[locs_id]], df_lv2, df_lv3)
+    locs_ecoreg <- cbind(
+      locs[[locs_id]],
+      paste0("1997 - ", data.table::year(Sys.Date())),
+      df_lv2, df_lv3)
+    names(locs_ecoreg)[2] <- "time"
     attr(locs_ecoreg, "ecoregion2_code") <- sort(unique(from$L2_KEY))
     attr(locs_ecoreg, "ecoregion3_code") <- sort(unique(from$L3_KEY))
     return(locs_ecoreg)
@@ -1262,10 +1274,10 @@ calc_hms <- function(
 #' Calculate elevation covariates
 #' @description
 #' Extract elevation values at point locations. Returns a \code{data.frame}
-#' object containing \code{locs_id} and elevation variable. Elevation variable
-#' column name reflects the elevation statistic, spatial resolution of
-#' \code{from}, and circular buffer radius (ie. Breakline Emphasis at 7.5
-#' arc-second resolution with 0 meter buffer: breakline_emphasis_r75_0).
+#' object containing \code{locs_id}, year of release, and elevation variable.
+#' Elevation variable column name reflects the elevation statistic, spatial
+#' resolution of \code{from}, and circular buffer radius (ie. Breakline Emphasis
+#' at 7.5 arc-second resolution with 0 meter buffer: breakline_emphasis_r75_0).
 #' @param from SpatRaster(1). Output from \code{process_gmted()}.
 #' @param locs data.frame. character to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
@@ -1310,14 +1322,15 @@ calc_gmted <- function(
     radius = radius,
     fun = fun,
     variable = 2,
-    time = NULL,
-    time_type = "timeless"
+    time = 3,
+    time_type = "year"
   )
   #### convert integer to numeric
-  sites_extracted[, 2] <- as.numeric(sites_extracted[, 2])
+  sites_extracted[, 3] <- as.numeric(sites_extracted[, 3])
   #### define column names
   colnames(sites_extracted) <- c(
     locs_id,
+    "time",
     paste0(
       gsub(
         " ",
@@ -1572,7 +1585,11 @@ calc_sedac_population <- function(
 #' @param fun function(1). Function used to summarize the length of roads
 #' within sites location buffer (Default is `sum`).
 #' @param ... Placeholders.
-#' @note Unit is km / sq km.
+# nolint start
+#' @note Unit is km / sq km. The returned `data.frame` object contains a
+#' `$time` column to represent the temporal range covered by the
+#' dataset. For more information, see <https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata>.
+# nolint end
 #' @author Insang Song
 #' @seealso [`process_sedac_groads`]
 #' @return a data.frame object with three columns.
@@ -1640,8 +1657,11 @@ calc_sedac_groads <- function(
         sprintf("GRD_TOTAL_0_%05d", radius),
         sprintf("GRD_DENKM_0_%05d", radius))
     )
-
-  return(from_clip)
+  #### time
+  from_clip$time <- "1980 - 2010"
+  #### reorder
+  from_clip_reorder <- from_clip[, c(1, 4, 2, 3)]
+  return(from_clip_reorder)
 }
 
 #' Calculate meteorological and atmospheric covariates

@@ -631,7 +631,18 @@ process_koppen_geiger <-
     year = NULL,
     ...
   ) {
+    # import data
     kg_rast <- terra::rast(path)
+    # identify time period
+    period <- strsplit(
+      names(kg_rast),
+      "_"
+    )[[1]][4]
+    if (period == "present") {
+      terra::metags(kg_rast) <- c(year = "1980 - 2016")
+    } else {
+      terra::meteags(kg_rast) <- c(year = "2071 - 2100")
+    }
     return(kg_rast)
   }
 
@@ -699,6 +710,9 @@ process_ecoregion <-
   ) {
     ecoreg <- terra::vect(path)
     ecoreg <- ecoreg[, grepl("^(L2_KEY|L3_KEY)", names(ecoreg))]
+    ecoreg$time <- paste0(
+      "1997 - ", data.table::year(Sys.time())
+    )
     return(ecoreg)
   }
 
@@ -1084,6 +1098,8 @@ process_sedac_population <- function(
       split2[1],
       "...\n"
     ))
+    #### year
+    terra::metags(data) <- c(year = split2[1])
   }
   return(data)
 }
@@ -1096,9 +1112,11 @@ process_sedac_population <- function(
 #' returning a single `SpatVector` object.
 #' @param path character(1). Path to geodatabase or shapefiles.
 #' @param ... Placeholders.
-#' @note U.S. context.
+#' @note U.S. context. The returned `SpatVector` object contains a
+#' `$time` column to represent the temporal range covered by the
+#' dataset. For more information, see <https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata>.
 #' @author Insang Song
-#' @returns a `SpatVector` boject
+#' @returns a `SpatVector` object
 #' @importFrom terra vect
 #' @export
 # nolint end
@@ -1112,6 +1130,8 @@ process_sedac_groads <- function(
   }
   #### import data
   data <- terra::vect(path)
+  #### time period
+  data$time <- "1980 - 2010"
   return(data)
 }
 
@@ -1313,7 +1333,8 @@ process_hms <- function(
 #' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @note
-#' `SpatRaster` layer name indicates selected variable and resolution.
+#' `SpatRaster` layer name indicates selected variable and resolution, and year
+#' of release (2010).
 #' @return a `SpatRaster` object
 #' @importFrom terra rast
 #' @importFrom terra varnames
@@ -1382,7 +1403,8 @@ process_gmted <- function(
       "_grd",
       "",
       names(data)
-    )
+    ),
+    "_2010"
   )
   #### varnames
   terra::varnames(data) <- paste0(
@@ -1392,6 +1414,8 @@ process_gmted <- function(
     resolution,
     ")"
   )
+  #### year
+  terra::metags(data) <- c(year = 2010)
   #### set coordinate reference system
   return(data)
 }
@@ -2601,7 +2625,7 @@ process_prism <-
 #' Process OpenLandMap data
 #' @param path character giving OpenLandMap data path
 #' @param ... Placeholders.
-#' @returns SpatRaster
+#' @returns a `SpatRaster` object
 #' @author Insang Song
 #' @importFrom terra rast
 #' @export
