@@ -14,7 +14,7 @@
 #' - [`process_modis_swath`]: `"modis_swath"`
 #' - [`process_modis_merge`]: `"modis_merge"`
 #' - [`process_bluemarble`]: `"bluemarble"`
-#' - [`process_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
+#' - [`process_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`
 #' - [`process_ecoregion`]: `"ecoregion"`, `"ecoregions"`
 #' - [`process_nlcd`]: `"nlcd"`
 #' - [`process_tri`]: `"tri"`
@@ -32,7 +32,7 @@
 #' - [`process_huc`]: `"huc"`
 #' - [`process_cropscape`]: `"cropscape"`, `"cdl"`
 #' - [`process_prism`]: `"prism"`
-#' - [`process_olm`]: `"olm"`, `"openlandmap`
+#' - [`process_olm`]: `"olm"`, `"openlandmap"`
 #' @returns `SpatVector`, `SpatRaster`, `sf`, or `character` depending on
 #' covariate type and selections.
 #' @author Insang Song
@@ -807,7 +807,7 @@ process_tri <- function(
 # nolint start
 #' Process road emissions data
 #' @description
-#' The \code{process_tri()} function imports and cleans raw road emissions data,
+#' The \code{process_nei()} function imports and cleans raw road emissions data,
 #' returning a single `SpatVector` object.
 #' @param path character(1). Directory with NEI csv files.
 #' @param county `SpatVector`/`sf`. County boundaries.
@@ -855,7 +855,8 @@ process_nei <- function(
     stop("year should be one of 2017 or 2020.\n")
   }
   # Concatenate NEI csv files
-  csvs_nei <- list.files(path = path, pattern = "*.csv$", full.names = TRUE)
+  csvs_nei <- list.files(path = path, pattern = "*.csv$", recursive = TRUE, full.names = TRUE)
+  csvs_nei <- grep(year, csvs_nei, value = TRUE)
   csvs_nei <- lapply(csvs_nei, data.table::fread)
   csvs_nei <- data.table::rbindlist(csvs_nei)
 
@@ -1294,6 +1295,10 @@ process_hms <- function(
 #' @param variable vector(1). Vector containing the GMTED statistic first and
 #' the resolution second. (Example: variable = c("Breakline Emphasis",
 #' "7.5 arc-seconds")).
+#' * Statistic options: "Breakline Emphasis", "Systematic Subsample",
+#'   "Median Statistic", "Minimum Statistic", "Mean Statistic",
+#'   "Maximum Statistic", "Standard Deviation Statistic"
+#' * Resolution options: "30 arc-seconds", "15 arc-seconds", "7.5 arc-seconds"
 #' @param path character(1). Directory with downloaded GMTED  "*_grd"
 #' folder containing .adf files.
 #' @param ... Placeholders.

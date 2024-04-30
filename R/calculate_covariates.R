@@ -19,7 +19,7 @@
 #' @note `covariate` argument value is converted to lowercase.
 #' @seealso
 #' - [`calc_modis_par`]: `"modis"`, `"MODIS"`
-#' - [`calc_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
+#' - [`calc_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`
 #' - [`calc_ecoregion`]: `"ecoregion"`, `"ecoregions"`
 #' - [`calc_temporal_dummies`]: `"dummies"`
 #' - [`calc_hms`]: `"hms"`, `"noaa"`, `"smoke"`
@@ -255,7 +255,10 @@ calc_nlcd <- function(from,
     stop("radius has not a likely value.")
   }
   if (!methods::is(locs, "SpatVector")) {
-    stop("locs is not a terra::SpatVector.")
+    message("locs is not a terra::SpatVector.")
+    locs <- tryCatch(terra::vect(locs), error = function(e) {
+      stop("Failed to locs to a terra::SpatVector.")
+    })
   }
   if (!methods::is(from, "SpatRaster")) {
     stop("from is not a SpatRaster.")

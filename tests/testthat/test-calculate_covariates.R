@@ -412,6 +412,8 @@ testthat::test_that("calc_modis works well.", {
 testthat::test_that("Check calc_nlcd works", {
   withr::local_package("terra")
   withr::local_package("exactextractr")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
 
   point_us1 <- cbind(lon = -114.7, lat = 38.9, dem = 40)
   point_us2 <- cbind(lon = -114, lat = 39, dem = 15)
@@ -463,10 +465,13 @@ testthat::test_that("Check calc_nlcd works", {
     "NLCD data not available for this year."
   )
   # -- data_vect is a SpatVector
+  testthat::expect_message(
+    calc_nlcd(locs = sf::st_as_sf(eg_data),
+              from = nlcdras)
+  )
   testthat::expect_error(
     calc_nlcd(locs = 12,
-              from = nlcdras),
-    "locs is not a terra::SpatVector."
+              from = nlcdras)
   )
   testthat::expect_error(
     calc_nlcd(locs = eg_data,
