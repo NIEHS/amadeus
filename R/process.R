@@ -1158,7 +1158,7 @@ process_hms <- function(
   #### identify file paths
   paths <- list.files(
     path,
-    pattern = "hms_smoke",
+    pattern = "hms_smoke*.*.shp$",
     full.names = TRUE
   )
   paths <- paths[grep(
@@ -1423,12 +1423,14 @@ process_narr <- function(
   data_paths <- list.files(
     path,
     pattern = variable,
+    recursive = TRUE,
     full.names = TRUE
   )
-  data_paths <- data_paths[grep(
-    ".nc",
-    data_paths
-  )]
+  data_paths <- grep(
+    sprintf("%s*.*.nc", variable),
+    data_paths,
+    value = TRUE
+  )
   #### define date sequence
   date_sequence <- generate_date_sequence(
     date[1],
