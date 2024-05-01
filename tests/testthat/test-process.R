@@ -944,12 +944,13 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
   expect_no_error(
     calc_narr(
       from = narr,
-      locs = terra::centroids(
+      locs = terra::buffer(
         terra::vect(
           ncp,
           geom = c("lon", "lat"),
           crs = "EPSG:4326"
-        )
+        ),
+        1000
       ),
       locs_id = "site_id"
     )

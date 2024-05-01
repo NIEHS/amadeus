@@ -40,6 +40,10 @@ calc_setcolumns <- function(
   )
   stopifnot(length(time_index) <= 1)
   names_return[time_index] <- "time"
+  #### geometry
+  geometry_index <- which(names_from == "geometry")
+  stopifnot(length(geometry_index) <= 1)
+  names_return[geometry_index] <- "geometry"
   #### latitude and longitude
   lat_index <- which(
     tolower(names_from) %in% c("lat", "latitude")
@@ -65,7 +69,7 @@ calc_setcolumns <- function(
   genre <- substr(dataset, 1, 3)
   #### covariates
   cov_index <- which(
-    !(c(names_from %in% c(locs_id, "time", "lat", "lon", "level")))
+    !(c(names_from %in% c(locs_id, "geometry" "time", "lat", "lon", "level")))
   )
   for (c in seq_along(cov_index)) {
     name_covariate <- names_return[cov_index[c]]
@@ -196,6 +200,8 @@ calc_message <- function(
 #' Passed from \code{calc_\*()}.
 #' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0). Passed from \code{calc_\*()}.
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`.
 #' @return A `list` containing `SpatVector` and `data.frame` objects
 #' @seealso [`process_locs_vector()`], [`check_for_null_parameters()`]
 #' @keywords internal
@@ -206,7 +212,8 @@ calc_prepare_locs <- function(
     from,
     locs,
     locs_id,
-    radius) {
+    radius,
+    geom = FALSE) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### prepare sites
@@ -215,11 +222,19 @@ calc_prepare_locs <- function(
     terra::crs(from),
     radius
   )
+  #### site identifiers and geometry
+  if (geom) {
+    sites_id <- subset(
+      terra::as.data.frame(sites_e, geom = "WKT"),
+      select = c(locs_id, "geometry")
+    )
+  } else {
   #### site identifiers only
-  sites_id <- subset(
-    terra::as.data.frame(sites_e),
-    select = locs_id
-  )
+    sites_id <- subset(
+      terra::as.data.frame(sites_e),
+      select = locs_id
+    )
+  }
   return(list(sites_e, sites_id))
 }
 
@@ -281,8 +296,15 @@ calc_time <- function(
 #' pressure level value (if applicable). Default = `NULL`.
 #' @param radius integer(1). Buffer distance (m). Passed from
 #' \code{calc_prepare_locs()}. Used in column naming.
+#' @param max_cells integer(1). Maximum number of cells to be read at once.
+#' Higher values will expedite processing, but will increase memory usage.
+#' Maximum possible value is `2^31 - 1`.
+#' See [`exactextractr::exact_extract`] for details.
+#' @param ... Placeholders.
 #' @importFrom terra nlyr
 #' @importFrom terra extract
+#' @importFrom exactextractr exact_extract
+#' @importFrom sf st_as_sf
 #' @return a `data.frame` object
 #' @keywords internal
 #' @export
@@ -296,7 +318,9 @@ calc_worker <- function(
     time,
     time_type = c("date", "hour", "year", "yearmonth", "timeless"),
     radius,
-    level = NULL) {
+    level = NULL,
+    max_cells = 1e8,
+    ...) {
   #### empty location data.frame
   sites_extracted <- NULL
   for (l in seq_len(terra::nlyr(from))) {
@@ -331,15 +355,28 @@ calc_worker <- function(
       level = data_level
     )
     #### extract layer data at sites
-    sites_extracted_layer <- terra::extract(
-      data_layer,
-      locs_vector,
-      fun = fun,
-      method = "simple",
-      ID = FALSE,
-      bind = FALSE,
-      na.rm = TRUE
-    )
+    if (terra::geomtype(locs_vector) == "polygons") {
+      ### apply exactextractr::exact_extract for polygons
+      sites_extracted_layer <- exactextractr::exact_extract(
+        data_layer,
+        sf::st_as_sf(locs_vector),
+        progress = FALSE,
+        force_df = TRUE,
+        fun = fun,
+        max_cells_in_memory = max_cells,
+        ...
+      )
+    } else if (terra::geomtype(locs_vector) == "points") {
+      #### apply terra::extract for points
+      sites_extracted_layer <- terra::extract(
+        data_layer,
+        locs_vector,
+        method = "simple",
+        ID = FALSE,
+        bind = FALSE,
+        na.rm = TRUE
+      )
+    }
     # merge with site_id, time, and pressure levels (if applicable)
     if (time_type == "timeless") {
       sites_extracted_layer <- cbind(

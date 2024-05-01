@@ -1381,6 +1381,12 @@ calc_gmted <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
+#' polygon geometries, the `$geometry` column in the returned data frame may
+#' make the `data.frame` difficult to read due to long geometry strings. The
+#' coordinate reference system of the `$geometry` is the coordinate
+#' reference system of `from`.
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [`process_narr`]
@@ -1398,13 +1404,15 @@ calc_narr <- function(
     locs_id = NULL,
     radius = 0,
     fun = "mean",
+    geom = FALSE,
     ...) {
   #### prepare locations list
   sites_list <- calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
-    radius = radius
+    radius = radius,
+    geom = geom
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
@@ -1427,7 +1435,8 @@ calc_narr <- function(
     variable = 1,
     time = narr_time,
     time_type = "date",
-    level = narr_level
+    level = narr_level,
+    ...
   )
   #### return data.frame
   return(data.frame(sites_extracted))

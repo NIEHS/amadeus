@@ -343,7 +343,13 @@ process_locs_vector <-
       ) {
     #### detect SpatVector
     if (methods::is(locs, "SpatVector")) {
-      cat("Detected `SpatVector` extraction locations...\n")
+      cat(
+        paste0(
+          "Detected `SpatVector` (",
+          terra::geomtype(locs),
+          ") extraction locations...\n"
+          )
+      )
       sites_v <- locs
     #### detect sf object
     } else if (methods::is(locs, "sf")) {
@@ -361,7 +367,8 @@ process_locs_vector <-
       sites_v <- terra::vect(
         data.frame(locs),
         geom = c("lon", "lat"),
-        crs = "EPSG:4326"
+        crs = "EPSG:4326",
+        keepgeom = TRUE
       )
     }
     ##### project to desired coordinate reference system
