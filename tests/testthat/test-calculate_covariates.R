@@ -157,6 +157,21 @@ testthat::test_that("calc_ecoregion works well", {
   testthat::expect_equal(
     sum(unlist(ecor_res[, dum_cn])), 2L
   )
+  
+  testthat::expect_no_error(
+    ecor_geom <- calc_ecoregion(
+      from = erras,
+      locs = site_faux,
+      locs_id = "site_id",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(ecor_geom), 5
+  )
+  testthat::expect_true(
+    "geometry" %in% names(ecor_geom)
+  )
 })
 
 
@@ -965,6 +980,28 @@ testthat::test_that("calc_gmted returns expected.", {
       }
     }
   }
+  testthat::expect_no_error(
+    gmted <- process_gmted(
+      variable = c("Breakline Emphasis", "7.5 arc-seconds"),
+      testthat::test_path(
+        "..", "testdata", "gmted", "be75_grd"
+      )
+    )
+  )
+  testthat::expect_no_error(
+    gmted_geom <- calc_gmted(
+      gmted,
+      ncp,
+      "site_id",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(gmted_geom), 4
+  )
+  testthat::expect_true(
+    "geometry" %in% names(gmted_geom)
+  )
 })
 
 testthat::test_that("calc_narr returns expected.", {
@@ -1197,6 +1234,23 @@ testthat::test_that("groads calculation works", {
 
   # expect data.frame
   testthat::expect_s3_class(groads_res, "data.frame")
+  
+  # return with geometry
+  testthat::expect_no_error(
+    groads_geom <- calc_sedac_groads(
+      from = groads,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 5000,
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(groads_geom), 5
+  )
+  testthat::expect_true(
+    "geometry" %in% names(groads_geom)
+  )
 })
 
 testthat::test_that("calc_merra2 returns as expected.", {

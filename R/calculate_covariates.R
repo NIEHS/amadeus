@@ -368,6 +368,12 @@ calc_nlcd <- function(from,
 #' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
+#' polygon geometries, the `$geometry` column in the returned data frame may
+#' make the `data.frame` difficult to read due to long geometry strings. The
+#' coordinate reference system of the `$geometry` is the coordinate
+#' reference system of `from`.
 #' @param ... Placeholders.
 #' @seealso [`process_ecoregion`]
 #' @returns a data.frame object with dummy variables and attributes of:
@@ -387,14 +393,20 @@ calc_ecoregion <-
     from = NULL,
     locs,
     locs_id = "site_id",
+    geom = FALSE,
     ...
   ) {
-
-    if (!methods::is(locs, "SpatVector")) {
-      locs <- terra::vect(locs)
-    }
+    # prepare locations
+    locs_prepared <- calc_prepare_locs(
+      from = from,
+      locs = locs,
+      locs_id = locs_id,
+      radius = 0,
+      geom = geom
+    )
+    locs <- locs_prepared[[1]]
+    locs_df <- locs_prepared[[2]]
     
-    locs <- terra::project(locs, terra::crs(from))
     locs_in <- terra::intersect(locs, from)
     locs_out <-
       locs[!unlist(locs[[locs_id]]) %in% unlist(locs_in[[locs_id]]), ]
@@ -439,10 +451,14 @@ calc_ecoregion <-
     colnames(df_lv3) <- key3_num_unique
 
     locs_ecoreg <- cbind(
-      locs[[locs_id]],
+      locs_df,
       paste0("1997 - ", data.table::year(Sys.Date())),
       df_lv2, df_lv3)
-    names(locs_ecoreg)[2] <- "description"
+    if (geom) {
+      names(locs_ecoreg)[3] <- "description"
+    } else {
+      names(locs_ecoreg)[2] <- "description"
+    }
     attr(locs_ecoreg, "ecoregion2_code") <- sort(unique(from$L2_KEY))
     attr(locs_ecoreg, "ecoregion3_code") <- sort(unique(from$L3_KEY))
     return(locs_ecoreg)
@@ -1323,6 +1339,12 @@ calc_hms <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
+#' polygon geometries, the `$geometry` column in the returned data frame may
+#' make the `data.frame` difficult to read due to long geometry strings. The
+#' coordinate reference system of the `$geometry` is the coordinate
+#' reference system of `from`.
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [`process_gmted()`]
@@ -1340,13 +1362,15 @@ calc_gmted <- function(
     locs_id = NULL,
     radius = 0,
     fun = "mean",
+    geom = FALSE,
     ...) {
   #### prepare locations list
   sites_list <- calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
-    radius = radius
+    radius = radius,
+    geom = geom
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
@@ -1362,13 +1386,8 @@ calc_gmted <- function(
     time = 3,
     time_type = "year"
   )
-  #### convert integer to numeric
-  sites_extracted[, 3] <- as.numeric(sites_extracted[, 3])
-  #### define column names
-  colnames(sites_extracted) <- c(
-    locs_id,
-    "time",
-    paste0(
+  #### variable column name
+  variable_name <- paste0(
       gsub(
         " ",
         "_",
@@ -1399,7 +1418,16 @@ calc_gmted <- function(
       "_",
       radius
     )
-  )
+  if (geom) {
+    #### convert integer to numeric
+    sites_extracted[, 4] <- as.numeric(sites_extracted[, 4])
+    names(sites_extracted) <- c(locs_id, "geometry", "time", variable_name)
+  } else {
+    #### convert integer to numeric
+    sites_extracted[, 3] <- as.numeric(sites_extracted[, 3])
+    names(sites_extracted) <- c(locs_id, "time", variable_name)
+    
+  }
   #### return data.frame
   return(data.frame(sites_extracted))
 }
@@ -1495,7 +1523,13 @@ calc_narr <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param ... Placeholders
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
+#' polygon geometries, the `$geometry` column in the returned data frame may
+#' make the `data.frame` difficult to read due to long geometry strings. The
+#' coordinate reference system of the `$geometry` is the coordinate
+#' reference system of `from`.
+#' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @seealso [process_geos()]
 #' @return a data.frame object
@@ -1513,13 +1547,15 @@ calc_geos <- function(
     locs_id = NULL,
     radius = 0,
     fun = "mean",
+    geom = FALSE,
     ...) {
   #### prepare locations list
   sites_list <- calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
-    radius = radius
+    radius = radius,
+    geom = geom
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
@@ -1534,7 +1570,8 @@ calc_geos <- function(
     variable = 1,
     time = c(3, 4),
     time_type = "hour",
-    level = 2
+    level = 2,
+    ...
   )
   #### return data.frame
   return(data.frame(sites_extracted))
@@ -1554,6 +1591,12 @@ calc_geos <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
+#' polygon geometries, the `$geometry` column in the returned data frame may
+#' make the `data.frame` difficult to read due to long geometry strings. The
+#' coordinate reference system of the `$geometry` is the coordinate
+#' reference system of `from`.
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [process_sedac_population()]
@@ -1566,13 +1609,15 @@ calc_sedac_population <- function(
     locs_id = NULL,
     radius = 0,
     fun = "mean",
+    geom = FALSE,
     ...) {
   #### prepare locations list
   sites_list <- calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
-    radius = radius
+    radius = radius,
+    geom = geom
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
@@ -1607,7 +1652,8 @@ calc_sedac_population <- function(
     fun = fun,
     variable = 3,
     time = 4,
-    time_type = "year"
+    time_type = "year",
+    ...
   )
   #### return data.frame
   return(data.frame(sites_extracted))
@@ -1630,6 +1676,12 @@ calc_sedac_population <- function(
 #' (Default = 1000).
 #' @param fun function(1). Function used to summarize the length of roads
 #' within sites location buffer (Default is `sum`).
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
+#' polygon geometries, the `$geometry` column in the returned data frame may
+#' make the `data.frame` difficult to read due to long geometry strings. The
+#' coordinate reference system of the `$geometry` is the coordinate
+#' reference system of `from`.
 #' @param ... Placeholders.
 # nolint start
 #' @note Unit is km / sq km. The returned `data.frame` object contains a
@@ -1656,7 +1708,8 @@ calc_sedac_groads <- function(
     locs = NULL,
     locs_id = NULL,
     radius = 1000,
-    fun = sum,
+    fun = "sum",
+    geom = FALSE,
     ...) {
   #### check for null parameters
   if (radius <= 0) {
@@ -1667,7 +1720,8 @@ calc_sedac_groads <- function(
     from = from,
     locs = locs,
     locs_id = locs_id,
-    radius = radius
+    radius = radius,
+    geom = geom
   )
   sites_e <- sites_list[[1]]
 
@@ -1705,8 +1759,13 @@ calc_sedac_groads <- function(
     )
   #### time period
   from_clip$description <- "1980 - 2010"
-  #### reorder
-  from_clip_reorder <- from_clip[, c(1, 4, 2, 3)]
+  if (geom) {
+    from_clip$geometry <- sites_list[[2]]$geometry
+    from_clip_reorder <- from_clip[, c(1, 5, 4, 2, 3)]
+  } else {
+    #### reorder
+    from_clip_reorder <- from_clip[, c(1, 4, 2, 3)]
+  }
   return(from_clip_reorder)
 }
 
@@ -1724,6 +1783,12 @@ calc_sedac_groads <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
+#' polygon geometries, the `$geometry` column in the returned data frame may
+#' make the `data.frame` difficult to read due to long geometry strings. The
+#' coordinate reference system of the `$geometry` is the coordinate
+#' reference system of `from`.
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [calc_geos()], [process_merra2()]
@@ -1742,13 +1807,15 @@ calc_merra2 <- function(
     locs_id = NULL,
     radius = 0,
     fun = "mean",
+    geom = FALSE,
     ...) {
   #### prepare locations list
   sites_list <- calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
-    radius = radius
+    radius = radius,
+    geom = geom
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
@@ -1771,7 +1838,8 @@ calc_merra2 <- function(
     variable = 1,
     time = merra2_time,
     time_type = "hour",
-    level = merra2_level
+    level = merra2_level,
+    ...
   )
   #### return data.frame
   return(data.frame(sites_extracted))
@@ -1790,6 +1858,13 @@ calc_merra2 <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
+#' polygon geometries, the `$geometry` column in the returned data frame may
+#' make the `data.frame` difficult to read due to long geometry strings. The
+#' coordinate reference system of the `$geometry` is the coordinate
+#' reference system of `from`.
+#' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @seealso [`process_gridmet()`]
 #' @return a data.frame object
@@ -1805,13 +1880,16 @@ calc_gridmet <- function(
     locs,
     locs_id = NULL,
     radius = 0,
-    fun = "mean") {
+    fun = "mean",
+    geom = FALSE,
+    ...) {
   #### prepare locations list
   sites_list <- calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
-    radius = radius
+    radius = radius,
+    geom = geom
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
@@ -1825,7 +1903,8 @@ calc_gridmet <- function(
     fun = fun,
     variable = 1,
     time = 2,
-    time_type = "date"
+    time_type = "date",
+    ...
   )
   #### return data.frame
   return(data.frame(sites_extracted))
@@ -1845,6 +1924,13 @@ calc_gridmet <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
+#' polygon geometries, the `$geometry` column in the returned data frame may
+#' make the `data.frame` difficult to read due to long geometry strings. The
+#' coordinate reference system of the `$geometry` is the coordinate
+#' reference system of `from`.
+#' @param ... Placeholders.
 #' @note
 #' TerraClimate data has monthly temporal resolution, so the `$time` column
 #' will contain the year and month in YYYYMM format (ie. January, 2018 =
@@ -1864,13 +1950,16 @@ calc_terraclimate <- function(
     locs,
     locs_id = NULL,
     radius = 0,
-    fun = "mean") {
+    fun = "mean",
+    geom = geom,
+    ...) {
   #### prepare locations list
   sites_list <- calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
-    radius = radius
+    radius = radius,
+    geom = geom
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
@@ -1884,7 +1973,8 @@ calc_terraclimate <- function(
     fun = fun,
     variable = 1,
     time = 2,
-    time_type = "yearmonth"
+    time_type = "yearmonth",
+    ...
   )
   #### return data.frame
   return(data.frame(sites_extracted))

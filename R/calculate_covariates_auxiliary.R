@@ -42,8 +42,8 @@ calc_setcolumns <- function(
   names_return[time_index] <- "time"
   #### description (for time period coverage)
   description_index <- which(names_from == "description")
-  stopifnot(length(geometry_index) <= 1)
-  names_return[geometry_index] <- "description"
+  stopifnot(length(description_index) <= 1)
+  names_return[description_index] <- "description"
   #### geometry
   geometry_index <- which(names_from == "geometry")
   stopifnot(length(geometry_index) <= 1)
@@ -223,6 +223,11 @@ calc_prepare_locs <- function(
     geom = FALSE) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
+  if (!locs_id %in% names(locs)) {
+    stop(sprintf("locs should include columns named %s.\n",
+                 locs_id)
+    )
+  }
   #### prepare sites
   sites_e <- process_locs_vector(
     locs,
