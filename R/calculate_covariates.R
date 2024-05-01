@@ -120,11 +120,17 @@ calc_covariates <-
 #' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
+#' polygon geometries, the `$geometry` column in the returned data frame may
+#' make the `data.frame` difficult to read due to long geometry strings. The
+#' coordinate reference system of the `$geometry` is the coordinate
+#' reference system of `from`.
 #' @param ... Placeholders.
 #' @seealso [`process_koppen_geiger`]
 #' @returns a data.frame object
 #' @note The returned `data.frame` object contains a
-#' `$time` column to represent the temporal range covered by the
+#' `$description` column to represent the temporal range covered by the
 #' dataset. For more information, see
 #' <https://www.nature.com/articles/sdata2018214>.
 #' @author Insang Song
@@ -143,16 +149,18 @@ calc_koppen_geiger <-
       from = NULL,
       locs = NULL,
       locs_id = "site_id",
+      geom = FALSE,
       ...) {
-    ## You will get "locs" in memory after sourcing the file above
-    locs_tr <- locs
-
-    if (!methods::is(locs, "SpatVector")) {
-      locs_tr <- process_conformity(
-        locs = locs
-      )
-    }
-    locs_kg <- terra::project(locs_tr, terra::crs(from))
+    # prepare locations
+    locs_prepared <- calc_prepare_locs(
+      from = from,
+      locs = locs,
+      locs_id = locs_id,
+      radius = 0,
+      geom = geom
+    )
+    locs_kg <- locs_prepared[[1]]
+    locs_df <- locs_prepared[[2]]
     locs_kg_extract <- terra::extract(from, locs_kg)
 
     # The starting value is NA as the color table has 0 value in it
@@ -170,7 +178,10 @@ calc_koppen_geiger <-
       class_kg = kg_class
     )
 
-    locs_kg_extract[[locs_id]] <- unlist(locs_kg[[locs_id]])
+    locs_kg_extract[[locs_id]] <- locs_df[,1]
+    if (geom) {
+      locs_kg_extract$geometry <- locs_df[,2]
+    }
     colnames(locs_kg_extract)[2] <- "value"
     locs_kg_extract_e <- merge(locs_kg_extract, kg_colclass, by = "value")
 
@@ -208,12 +219,16 @@ calc_koppen_geiger <-
 
     kg_extracted <-
       cbind(
-        locs_id = unlist(locs_kg_extract_e[[locs_id]]),
+        locs_id = locs_df,
         as.character(terra::metags(from)),
         df_ae_separated
       )
     names(kg_extracted)[1] <- locs_id
-    names(kg_extracted)[2] <- "time"
+    if (geom) {
+      names(kg_extracted)[2:3] <- c("geometry", "description")
+    } else {
+      names(kg_extracted)[2] <- "description"
+    }
     return(kg_extracted)
   }
 
@@ -232,6 +247,12 @@ calc_koppen_geiger <-
 #' Higher values will expedite processing, but will increase memory usage.
 #' Maximum possible value is `2^31 - 1`.
 #' See [`exactextractr::exact_extract`] for details.
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
+#' polygon geometries, the `$geometry` column in the returned data frame may
+#' make the `data.frame` difficult to read due to long geometry strings. The
+#' coordinate reference system of the `$geometry` is the coordinate
+#' reference system of `from`.
 #' @param ... Placeholders.
 #' @seealso [`process_nlcd`]
 #' @returns a data.frame object
@@ -254,38 +275,51 @@ calc_nlcd <- function(from,
                       locs_id = "site_id",
                       radius = 1000,
                       max_cells = 1e8,
+                      geom = FALSE,
                       ...) {
   # check inputs
   if (!is.numeric(radius)) {
     stop("radius is not a numeric.")
   }
-  if (radius <= 0) {
+  if (radius <= 0 && terra::geomtype(locs) == "points") {
     stop("radius has not a likely value.")
-  }
-  if (!methods::is(locs, "SpatVector")) {
-    stop("locs is not a terra::SpatVector.")
   }
   if (!methods::is(from, "SpatRaster")) {
     stop("from is not a SpatRaster.")
   }
+  
+  # prepare locations
+  locs_prepared <- calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  locs_vector <- locs_prepared[[1]]
+  locs_df <- locs_prepared[[2]]
+  
   year <- try(as.integer(terra::metags(from, name = "year")))
   # select points within mainland US and reproject on nlcd crs if necessary
   us_main <-
     terra::ext(c(xmin = -127, xmax = -65, ymin = 24, ymax = 51)) |>
     terra::vect() |>
     terra::set.crs("EPSG:4326") |>
-    terra::project(y = terra::crs(locs))
-  data_vect_b <- locs |>
+    terra::project(y = terra::crs(locs_vector))
+  data_vect_b <- locs_vector |>
     terra::intersect(x = us_main)
+  # subset locs_df to those in us extent
+  locs_df <- locs_df[
+    unlist(locs_df[[locs_id]]) %in% unlist(data_vect_b[[locs_id]]),
+    ]
   if (!terra::same.crs(data_vect_b, from)) {
     data_vect_b <- terra::project(data_vect_b, terra::crs(from))
   }
   # create circle buffers with buf_radius
-  bufs_pol <- terra::buffer(data_vect_b, width = radius) |>
-    sf::st_as_sf()
+  # bufs_pol <- sf::st_as_sf(data_vect_b)
   # ratio of each nlcd class per buffer
   nlcd_at_bufs <- exactextractr::exact_extract(from,
-                                               sf::st_geometry(bufs_pol),
+                                               sf::st_as_sf(data_vect_b),
                                                fun = "frac",
                                                stack_apply = TRUE,
                                                force_df = TRUE,
@@ -313,10 +347,13 @@ calc_nlcd <- function(from,
     }
   )
   names(nlcd_at_bufs) <- new_names
-  # merge data_vect with nlcd class fractions (and reproject)
-  new_data_vect <- cbind(data_vect_b, nlcd_at_bufs)
-  new_data_vect <- terra::project(new_data_vect, terra::crs(locs))
-  new_data_vect$time <- as.integer(year)
+  # merge locs_df with nlcd class fractions
+  new_data_vect <- cbind(locs_df, year, nlcd_at_bufs)
+  if (geom) {
+    names(new_data_vect)[1:3] <- c(locs_id, "geometry", "time")
+  } else {
+    names(new_data_vect)[1:2] <- c(locs_id, "time")
+  }
   return(new_data_vect)
 }
 
@@ -405,7 +442,7 @@ calc_ecoregion <-
       locs[[locs_id]],
       paste0("1997 - ", data.table::year(Sys.Date())),
       df_lv2, df_lv3)
-    names(locs_ecoreg)[2] <- "time"
+    names(locs_ecoreg)[2] <- "description"
     attr(locs_ecoreg, "ecoregion2_code") <- sort(unique(from$L2_KEY))
     attr(locs_ecoreg, "ecoregion3_code") <- sort(unique(from$L3_KEY))
     return(locs_ecoreg)
@@ -1666,8 +1703,8 @@ calc_sedac_groads <- function(
         sprintf("GRD_TOTAL_0_%05d", radius),
         sprintf("GRD_DENKM_0_%05d", radius))
     )
-  #### time
-  from_clip$time <- "1980 - 2010"
+  #### time period
+  from_clip$description <- "1980 - 2010"
   #### reorder
   from_clip_reorder <- from_clip[, c(1, 4, 2, 3)]
   return(from_clip_reorder)

@@ -370,6 +370,12 @@ process_locs_vector <-
         crs = "EPSG:4326",
         keepgeom = TRUE
       )
+    } else {
+      stop(
+        paste0(
+          "`locs` is not a `SpatVector`, `sf`, or `data.frame` object.\n"
+        )
+      )
     }
     ##### project to desired coordinate reference system
     sites_p <- terra::project(

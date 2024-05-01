@@ -34,10 +34,20 @@ testthat::test_that("calc_koppen_geiger works well", {
   )
   # the result is a data frame
   testthat::expect_s3_class(kg_res, "data.frame")
-  # ncol is equal to 6
+  # ncol is equal to 7
   testthat::expect_equal(ncol(kg_res), 7)
   # should have only one climate zone
   testthat::expect_equal(sum(unlist(kg_res[, c(-1, -2)])), 1)
+  # with included geometry
+  testthat::expect_no_error(
+    kg_geom <- calc_koppen_geiger(
+      from = kgras,
+      locs = sf::st_as_sf(site_faux),
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(ncol(kg_geom), 8)
+  testthat::expect_true("geometry" %in% names(kg_geom))
 })
 
 testthat::test_that("calc_dummies works well", {
@@ -413,10 +423,10 @@ testthat::test_that("Check calc_nlcd works", {
   withr::local_package("terra")
   withr::local_package("exactextractr")
 
-  point_us1 <- cbind(lon = -114.7, lat = 38.9, dem = 40)
-  point_us2 <- cbind(lon = -114, lat = 39, dem = 15)
-  point_ak <- cbind(lon = -155.997, lat = 69.3884, dem = 100) # alaska
-  point_fr <- cbind(lon = 2.957, lat = 43.976, dem = 15) # france
+  point_us1 <- cbind(lon = -114.7, lat = 38.9, id = 1)
+  point_us2 <- cbind(lon = -114, lat = 39, id = 2)
+  point_ak <- cbind(lon = -155.997, lat = 69.3884, id = 3) # alaska
+  point_fr <- cbind(lon = 2.957, lat = 43.976, id = 4) # france
   eg_data <- rbind(point_us1, point_us2, point_ak, point_fr) |>
     as.data.frame() |>
     terra::vect(crs = "EPSG:4326")
@@ -466,7 +476,7 @@ testthat::test_that("Check calc_nlcd works", {
   testthat::expect_error(
     calc_nlcd(locs = 12,
               from = nlcdras),
-    "locs is not a terra::SpatVector."
+    "`locs` is not a `SpatVector`, `sf`, or `data.frame` object."
   )
   testthat::expect_error(
     calc_nlcd(locs = eg_data,
@@ -492,35 +502,53 @@ testthat::test_that("Check calc_nlcd works", {
   testthat::expect_no_error(
     calc_nlcd(
       locs = eg_data,
+      locs_id = "id",
       from = nlcdras,
       radius = buf_radius
     )
   )
   output <- calc_nlcd(
     locs = eg_data,
+    locs_id = "id",
     radius = buf_radius,
     from = nlcdras
   )
-  # -- returns a SpatVector
-  testthat::expect_equal(class(output)[1], "SpatVector")
-  # -- crs is the same than input
-  testthat::expect_true(terra::same.crs(eg_data, output))
+  # -- returns a data.frame
+  testthat::expect_equal(class(output)[1], "data.frame")
   # -- out-of-mainland-US points removed (France and Alaska)
   testthat::expect_equal(nrow(output), 2)
-  # -- initial names are still in the output SpatVector
+  # -- initial names are still in the output data.frame
   testthat::expect_true(all(names(eg_data) %in% names(output)))
   # -- check the value of some of the points in the US
   testthat::expect_equal(
-    output$LDU_TEFOR_0_03000[1], 0.7940682, tolerance = 1e-7
+    output$LDU_TEFOR_0_03000[2], 0.7940682, tolerance = 1e-7
   )
   testthat::expect_equal(
-    output$LDU_TSHRB_0_03000[2], 0.9987249, tolerance = 1e-7
+    output$LDU_TSHRB_0_03000[1], 0.9987249, tolerance = 1e-7
   )
   # -- class fraction rows should sum to 1
   testthat::expect_equal(
-    rowSums(as.data.frame(output[, 2:(ncol(output) - 1)])),
+    rowSums(as.data.frame(output[, 3:(ncol(output))])),
     rep(1, 2),
     tolerance = 1e-7
+  )
+  # without geometry will have 11 columns
+  expect_equal(
+    ncol(output), 11
+  )
+  output_geom <- calc_nlcd(
+    locs = eg_data,
+    locs_id = "id",
+    radius = buf_radius,
+    from = nlcdras,
+    geom = TRUE
+  )
+  # with geometry will have 12 columns
+  expect_equal(
+    ncol(output_geom), 12
+  )
+  expect_true(
+    "geometry" %in% names(output_geom)
   )
 })
 

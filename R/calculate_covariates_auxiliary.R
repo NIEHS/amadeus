@@ -40,6 +40,10 @@ calc_setcolumns <- function(
   )
   stopifnot(length(time_index) <= 1)
   names_return[time_index] <- "time"
+  #### description (for time period coverage)
+  description_index <- which(names_from == "description")
+  stopifnot(length(geometry_index) <= 1)
+  names_return[geometry_index] <- "description"
   #### geometry
   geometry_index <- which(names_from == "geometry")
   stopifnot(length(geometry_index) <= 1)
@@ -69,7 +73,10 @@ calc_setcolumns <- function(
   genre <- substr(dataset, 1, 3)
   #### covariates
   cov_index <- which(
-    !(c(names_from %in% c(locs_id, "geometry" "time", "lat", "lon", "level")))
+    !(c(names_from %in% c(
+      locs_id, "geometry", "time", "lat", "lon", "level", "description"
+      ))
+    )
   )
   for (c in seq_along(cov_index)) {
     name_covariate <- names_return[cov_index[c]]
