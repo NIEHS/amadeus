@@ -311,7 +311,7 @@ calc_nlcd <- function(from,
   # merge data_vect with nlcd class fractions (and reproject)
   new_data_vect <- cbind(data_vect_b, nlcd_at_bufs)
   new_data_vect <- terra::project(new_data_vect, terra::crs(locs))
-  new_data_vect$time <- as.integer(year)
+  new_data_vect$nlcd_year <- as.integer(year)
   return(new_data_vect)
 }
 
@@ -1033,7 +1033,7 @@ calc_tri <- function(
     df_tri <- dplyr::left_join(as.data.frame(locs), df_tri)
   }
   # read attr
-  df_tri$time <- attr(from, "tri_year")
+  df_tri$tri_year <- attr(from, "tri_year")
   return(df_tri)
 }
 
@@ -1551,7 +1551,7 @@ calc_sedac_population <- function(
     fun = fun,
     variable = 3,
     time = 4,
-    time_type = "year"
+    time_type = "sedac_population_year"
   )
   #### return data.frame
   return(data.frame(sites_extracted))
