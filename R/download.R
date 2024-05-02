@@ -139,9 +139,8 @@ download_data <-
 #' @param remove_zip logical(1). Remove zip file from directory_to_download.
 #' Default \code{FALSE}.
 #' @author Mariana Kassien, Insang Song, Mitchell Manware
-#' @returns NULL; Separate comma-separated value (CSV) files of
-#'  monitors and the daily representative values
-#'  will be stored in \code{directory_to_save}.
+#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' \code{directory_to_save}.
 #' @export
 download_aqs <-
   function(
@@ -158,10 +157,7 @@ download_aqs <-
     remove_zip = FALSE
   ) {
     #### 1. check for data download acknowledgement
-    download_permit(
-      acknowledgement =
-        acknowledgement
-    )
+    download_permit(acknowledgement = acknowledgement)
     #### 2. check for null parameters
     check_for_null_parameters(mget(ls()))
     #### 3. directory setup
@@ -298,10 +294,11 @@ download_aqs <-
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @param unzip logical(1). Unzip zip files. Default \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip file from directory_to_download.
-#' Default \code{FALSE}.
+#' @param remove_zip logical(1). Remove zip file from
+#' \code{directory_to_download}. Default \code{FALSE}.
 #' @author Insang Song
-#' @returns NULL;
+#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' \code{directory_to_save}.
 #' @importFrom utils download.file
 #' @export
 download_ecoregion <- function(
@@ -421,6 +418,8 @@ download_ecoregion <- function(
 #' @param date_end character(1). length of 10. End date for downloading data.
 #' Format YYYY-MM-DD (ex. September 1, 2023 = `"2023-09-01"`).
 #' @param directory_to_save character(1). Directory to save data.
+#' Sub-directories will be created within \code{directory_to_save} for each
+#' GEOS-CF collection.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
@@ -431,7 +430,7 @@ download_ecoregion <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Hourly netCDF (.nc4) files will be stored in a
+#' @return NULL; netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
 #' @export
 # nolint start: cyclocomp
@@ -591,9 +590,8 @@ download_geos <- function(
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
-#' @return NULL; Statistic and resolution-specific zip files will be stored in
-#' \code{directory_to_download}, and directories containing raw ASCII Grid data
-#'will be stored in \code{directory_to_save}.
+#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' \code{directory_to_save}.
 #' @export
 download_gmted <- function(
   statistic = c(
@@ -735,7 +733,7 @@ download_gmted <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Daily netCDF (.nc4) files will be stored in a
+#' @return NULL; netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
 #' @export
 # nolint end
@@ -1040,7 +1038,7 @@ download_merra2 <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
+#' @return NULL; netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @export
 # nolint end
@@ -1166,7 +1164,7 @@ download_narr_monolevel <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Monthly netCDF (.nc) files will be stored in
+#' @return NULL; netCDF (.nc) files will be stored in
 #' \code{directory_to_save}.
 #' @export
 # nolint end
@@ -1308,9 +1306,8 @@ download_narr_p_levels <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Zip files and unzipped data files will be stored in
-#' "/zip_files" and "/data_files" sub-directories, respectively, within the
-#' \code{directory_to_save}.
+#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' respective sub-directories within \code{directory_to_save}.
 #' @export
 download_nlcd <- function(
   collection = "Coterminous United States",
@@ -1456,9 +1453,8 @@ download_nlcd <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Zip files and unzipped data files will be stored in
-#' "/zip_files" and "/data_files" sub-directories, respectively, within the
-#' \code{directory_to_save}.
+#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' respective sub-directories within \code{directory_to_save}.
 #' @export
 download_sedac_groads <- function(
     data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
@@ -1604,9 +1600,8 @@ download_sedac_groads <- function(
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
-#' @return NULL; Zip files and unzipped data files will be stored in
-#' "/zip_files" and "/data_files" sub-directories, respectively, within the
-#' \code{directory_to_save}.
+#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' respective sub-directories within \code{directory_to_save}.
 #' @export
 download_sedac_population <- function(
   data_resolution = "60 minute",
@@ -1793,9 +1788,8 @@ download_sedac_population <- function(
 #' @importFrom utils head
 #' @importFrom utils tail
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Zip files and unzipped data files will be stored in
-#' "/zip_files" and "/data_files" sub-directories, respectively, within the
-#' \code{directory_to_save}.
+##' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' respective sub-directories within \code{directory_to_save}.
 #' @export
 # nolint start: cyclocomp
 download_hms <- function(
@@ -1969,9 +1963,8 @@ download_hms <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Zip files and unzipped data files will be stored in
-#' "/zip_files" and "/data_files" sub-directories, respectively, within the
-#' \code{directory_to_save}.
+#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' respective sub-directories within \code{directory_to_save}.
 #' @export
 download_koppen_geiger <- function(
     data_resolution = c("0.0083", "0.083", "0.5"),
@@ -2131,7 +2124,7 @@ download_koppen_geiger <- function(
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
 #' @import rvest
-#' @return NULL; Raw HDF (.hdf) files will be stored in
+#' @return NULL; HDF (.hdf) files will be stored in
 #' \code{directory_to_save}.
 #' @export
 download_modis <- function(
@@ -2462,7 +2455,7 @@ download_modis <- function(
 #' @param remove_command logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mariana Kassien, Insang Song
-#' @returns NULL; Yearly comma-separated value (CSV) files will be stored in
+#' @returns NULL; Comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @export
 download_tri <- function(
@@ -2572,8 +2565,8 @@ download_tri <- function(
 #' Currently we bundle the pre-downloaded crt and its PEM (which is accepted
 #' in wget command) file in ./inst/extdata. The instruction above is for
 #' certificate updates in the future.
-#' @returns NULL; Yearly comma-separated value (CSV) files will be stored in
-#' \code{directory_to_save}.
+#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' respective sub-directories within \code{directory_to_save}.
 #' @export
 download_nei <- function(
   epa_certificate_path =
@@ -2869,7 +2862,7 @@ download_olm <- function(
 #' the text file containing download commands.
 #' @param unzip logical(1). Unzip the downloaded compressed files.
 #' Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.
-#' @returns None. Downloaded files will be stored in \code{directory_to_save}.
+#' @returns NULL. Downloaded files will be stored in \code{directory_to_save}.
 #' @author Insang Song
 #' @examples
 #' \dontrun{
@@ -3157,8 +3150,8 @@ download_cropscape <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Insang Song
-#' @returns NULL; .bil (normals) or single grid files depending on the format choice.
-#' \code{directory_to_save}.
+#' @returns NULL; .bil (normals) or single grid files depending on the format
+#' choice will be stored in \code{directory_to_save}.
 #' @examples
 #' \dontrun{
 #' download_prism(
@@ -3293,7 +3286,7 @@ download_prism <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware
-#' @return NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
+#' @return NULL; netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @export
 # nolint end
@@ -3422,7 +3415,7 @@ download_gridmet <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
+#' @return NULL; netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @export
 # nolint end
