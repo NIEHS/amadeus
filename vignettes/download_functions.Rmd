@@ -5,32 +5,28 @@ vignette: >
   %\VignetteIndexEntry{download_data() and NASA EarthData Account}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-date: "2024-01-18"
+date: "2024-05-02"
 author: "Mitchell Manware"
 ---
 
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
+```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "hide"}
 # packages
 library(knitr)
 library(testthat)
+library(devtools)
 # source functions
-sapply(
-  list.files(
-    "../R/",
-    pattern = "download",
-    full.names = TRUE
-  ),
-  source
-)
+devtools::load_all("../")
 ```
 
 ## Motivation
 
-The `data_download()` function was developed to improve researchers' access to publicly available geospatial datasets. Although the data are already available online, using a web browser to manually download hundreds or thousands of data files is slow, arduous, and not (efficiently) repeatable. Additionally, as users may not be familiar with creating download recipes in Bash (Unix shell), `data_download()` allows researchers to download data directly with R, a common coding language in the field of environmental health research. Finally, function-izing data downloads is useful for repeated code or automated analysis pipelines.
+The `data_download` function was developed to improve researchers' access to publicly available geospatial datasets. Although the data are already available online, using a web browser to manually download hundreds or thousands of data files is slow, arduous, and not efficiently repeatable. A function which downloads raw data files onto the user's machine allows for re
 
-## data_download()
+Additionally, as users may not be familiar with creating download recipes in Bash (Unix shell), `data_download` allows researchers to download data directly with R, a common coding language in the field of environmental health research. Finally, function-izing data downloads is useful for repeated code or automated analysis pipelines.
 
-`data_download()` is capable of accessing and downloading geospatial datasets, collections, and variables from a variety of sources. This wrapper function calls on source-specific data download functions, each utilizing a unique combination of input parameters, host URL, naming convention, and data formats.
+## data_download
+
+`data_download` is capable of accessing and downloading geospatial datasets, collections, and variables from a variety of sources. This wrapper function calls on source-specific data download functions, each utilizing a unique combination of input parameters, host URL, naming convention, and data formats.
 
 ```{r, echo = FALSE}
 functions <- c(
@@ -102,7 +98,7 @@ kable(functions_sources,
 )
 ```
 
-It is important to note that `data_download()` calls a source-specific function based on the `dataset_name =` parameter. Using the source-specific function directly will return the exact same data (**if the parameters are the same**), but `data_download()` may be beneficial if using a `for` loop to download data from various sources. For example, `download_data(dataset_name = "hms", ...)` will return the same data as `download_hms(...)` assuming that `...` indicates the same parameters.
+It is important to note that `data_download` calls a source-specific function based on the `dataset_name` parameter. Using the source-specific function directly will return the exact same data (**if the parameters are the same**), but the error messages produced by each differ slightly/
 
 ### Parameters
 
@@ -113,7 +109,7 @@ names(formals(download_hms))
 names(formals(download_narr_monolevel))
 ```
 
-The two functions have different required parameters because `download_hms()` uses a daily temporal resolution while `download_narr_monolevel()` uses yearly, but they share some common, standard parameters.
+The two functions have different required parameters because `download_hms` uses a daily temporal resolution while `download_narr_monolevel` uses yearly, but they share some common, standard parameters.
 
 #### Standard parameters
 
@@ -152,11 +148,11 @@ colnames(parameter_descriptions) <- c("Parameter", "Type", "Description")
 kable(parameter_descriptions)
 ```
 
-Additionally, the `dataset_name =` parameter must be specified when using `data_download()`, but is assumed when using a source-specific download function.
+Additionally, the `dataset_name` parameter must be specified when using `data_download`, but is assumed when using a source-specific download function.
 
 ### Function Structure
 
-Although each source-specific download function is unique, they all follow the same general structure. The following chunks of code have been **adopted** from `download_hms()` to demonstrate the functions' structure.
+Although each source-specific download function is unique, they all follow the same general structure. The following chunks of code have been adopted from `download_hms` to demonstrate the functions' structure.
 
 [1. Clean Parameters]
 
@@ -196,7 +192,7 @@ date_sequence
 
 #### 2. Generate download URLs
 
-The URL base and pattern are identified by manually inspecting the download link on the source-specific web page. `download_hms()` utilizes the year, month, date, and data format to generate the download url.
+The URL base and pattern are identified by manually inspecting the download link on the source-specific web page. `download_hms` utilizes the year, month, date, and data format to generate the download url.
 
 ```{r}
 # user defined parameters
@@ -257,13 +253,13 @@ A download URL is created for each date in `date_sequence` based on the fixed pa
 
 #### 4. Initiate "...commands.txt"
 
-An important aspect of the data download function is its `sink()...cat()...sink()` structure. Rather than using the `utils::download.file()` function, a text file is created to store all of the download commands generated from the URLs and file names.
+An important aspect of the data download function is its `sink...cat...sink` structure. Rather than using the `utils::download.file` function, a text file is created to store all of the download commands generated from the URLs and file names.
 
 This structure is utilized for several reasons:
 
 - Consistent structure for all the source-specific download functions.
 
-- The `download.file()` function cannot accept vectors of URLs and destination files for downloading. An additional `for` loop to download data will increase function complexity and may reduce performance.
+- The `download.file` function cannot accept vectors of URLs and destination files for downloading. An additional `for` loop to download data will increase function complexity and may reduce performance.
 
 - Writing commands in Bash (Unix shell) script allows for specific arguments and flags.
 
@@ -311,7 +307,7 @@ for (d in seq_along(date_sequence)) {
 
 #### 6. Finalize "...commands.txt"
 
-After the download commands have been concatenated to the commands text file, a second `sink()` command is run to finalize the file and stop the appending of R output.
+After the download commands have been concatenated to the commands text file, a second `sink` command is run to finalize the file and stop the appending of R output.
 
 ```{r, eval = FALSE}
 sink()
@@ -330,7 +326,7 @@ system_command <- paste0(
 system_command
 ```
 
-Running the `system_command` deploys a "helper function", `download_run()`, a function created to reduce repeated code across the source-specific download functions. The function takes two parameters, `system_command =`, which indicates the command to be run, and `download =`, a user-defined logical parameter.
+Running the `system_command` deploys a "helper function", `download_run`, a function created to reduce repeated code across the source-specific download functions. The function takes two parameters, `system_command`, which indicates the command to be run, and `download`, a user-defined logical parameter.
 
 ```{r}
 download_run <- function(
@@ -347,7 +343,7 @@ download_run <- function(
 }
 ```
 
-The data download is initiated by running `download_run()` with the system command identified and `download = TRUE`.
+The data download is initiated by running `download_run` with the system command identified and `download = TRUE`.
 
 ```{r, eval = FALSE}
 download_run(
@@ -369,9 +365,9 @@ paste0("hms_smoke_Shapefile_", date_sequence, ".zip")
 
 #### 8. Zip files (if applicable) {#zip-files-if-applicable}
 
-All of the source-specific data download functions follow this general pattern, but those functions which download zip files require additional steps to inflate and remove the downloaded zip files, if desired. Each of these two steps are run by helper functions, and they are run by the user-defined `unzip = ` and `remove_zip = ` parameters in `data_download()`.
+All of the source-specific data download functions follow this general pattern, but those functions which download zip files require additional steps to inflate and remove the downloaded zip files, if desired. Each of these two steps are run by helper functions, and they are run by the user-defined `unzip` and `remove_zip` parameters in `data_download`.
 
-`download_unzip()` inflates zip files if `unzip = TRUE`, and skips inflation if `unzip = FALSE`. 
+`download_unzip` inflates zip files if `unzip = TRUE`, and skips inflation if `unzip = FALSE`. 
 
 ```{r}
 download_unzip <-
@@ -394,7 +390,7 @@ download_unzip <-
   }
 ```
 
-`download_remove_zips()` removes the downloaded zip files if `remove = TRUE`, and skips removal if `remove = FALSE`.
+`download_remove_zips` removes the downloaded zip files if `remove = TRUE`, and skips removal if `remove = FALSE`.
 
 ```{r}
 download_remove_zips <-
@@ -464,7 +460,7 @@ The previous outline successfully cleaned parameters, generated URLs, and downlo
 
 ### Helper functions
 
-`read_commands()` imports the commands text file and converts the data frame to a vector.
+`read_commands` imports the commands text file and converts the data frame to a vector.
 
 ```{r}
 read_commands <- function(
@@ -475,7 +471,7 @@ read_commands <- function(
 }
 ```
 
-`extract_urls()` extracts each download URL from the vector of commands. The `position =` of the URL within the download command is determined in [5. Concatenate download commands].
+`extract_urls` extracts each download URL from the vector of commands. The `position` of the URL within the download command is determined in [5. Concatenate download commands].
 
 ```{r}
 # function to extract URLs from vector
@@ -495,7 +491,7 @@ extract_urls <- function(
 }
 ```
 
-`check_url_status()` is the most important of the download test "helper" functions. This function utilizes `httr::HEAD()` and `httr::GET()` to check the HTTP response status of a given URL. The desired HTTP response status is 200, which means the URL is valid and accessible. `check_url_status()` returns a logical value to indicate whether the URL returns HTTP status 200 (`TRUE`) or not (`FALSE`). For more information on HTTP status', see [HTTP response status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
+`check_url_status` is the most important of the download test "helper" functions. This function utilizes `httr::HEAD` and `httr::GET` to check the HTTP response status of a given URL. The desired HTTP response status is 200, which means the URL is valid and accessible. `check_url_status` returns a logical value to indicate whether the URL returns HTTP status 200 (`TRUE`) or not (`FALSE`). For more information on HTTP status', see [HTTP response status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
 
 ```{r}
 check_url_status <- function(
@@ -512,7 +508,7 @@ check_url_status <- function(
 }
 ```
 
-`check_urls()` applies `check_url_status()` to a random sample of URLs extracted by `extract_urls()`. The sample size will vary based on the dataset and spatio-temporal parameters being tested. The function returns a logical vector containing the output from `check_url_status()`.
+`check_urls` applies `check_url_status` to a random sample of URLs extracted by `extract_urls`. The sample size will vary based on the dataset and spatio-temporal parameters being tested. The function returns a logical vector containing the output from `check_url_status`.
 
 ```{r}
 check_urls <- function(
@@ -537,7 +533,7 @@ check_urls <- function(
 
 ### testthat
 
-To demonstrate a test in action, test the URLs generated by `download_data()` for the NOAA HMS Smoke dataset. 
+To demonstrate a test in action, test the URLs generated by `download_data` for the NOAA HMS Smoke dataset. 
 
 For more information see [testthat](https://testthat.r-lib.org/).
 
@@ -626,9 +622,9 @@ testthat::test_that(
 ```
 
 
-Although the `testthat::test_that(...)` chunk contains 32 lines of code, the unit test is performed by `expect_true(all(url_status))`. In words, this line is expecting (`expect_true()`) that all (`all()`) of the sampled URLs return HTTP response status 200 (`url_status`). Since this expectation was met, the test passed!
+Although the `testthat::test_that(...)` chunk contains 32 lines of code, the unit test is performed by `expect_true(all(url_status))`. In words, this line is expecting (`expect_true`) that all (`all`) of the sampled URLs return HTTP response status 200 (`url_status`). Since this expectation was met, the test passed!
 
-For an alternate example, we can use a start and end date that are known to not have data. As the URLs associated with these dates do not exist, we expect the function will fail. This test utilizes `expect_error()` because the `data_download()` wrapper function returns an error message if the underlying source-specific download function returns an error.
+For an alternate example, we can use a start and end date that are known to not have data. As the URLs associated with these dates do not exist, we expect the function will fail. This test utilizes `expect_error()` because the `data_download` wrapper function returns an error message if the underlying source-specific download function returns an error.
 
 ```{r}
 testthat::test_that(
@@ -659,7 +655,7 @@ testthat::test_that(
 ```
 
 
-This test utilizes `expect_error()` because the `data_download()` wrapper function returns an error message if the underlying source-specific download function returns an error. If we directly used the `download_hms` function, we would expect and receive an error.
+This test utilizes `testthat::expect_error` because the `data_download` wrapper function returns an error message if the underlying source-specific download function returns an error. If we directly used the `download_hms` function, we would expect and receive an error.
 
 ```{r}
 testthat::test_that(
@@ -691,7 +687,7 @@ testthat::test_that(
 
 As expected, the test passes because the NOAA HMS Smoke dataset does not contain data for January 1-2, 1800.
 
-These unit tests are just two of many implemented on `download_data()` and the accompanying source-specific download functions, but they demonstrate how unit testing helps build stable code.
+These unit tests are just two of many implemented on `download_data` and the accompanying source-specific download functions, but they demonstrate how unit testing helps build stable code.
 
 ## Download Example
 
@@ -771,7 +767,7 @@ zips
 
 ## NASA EarthData Account
 
-As mentioned in [Motivation], `data_download()` provides access to **publicly available** geospatial data. Although publicly available, some of the NASA data sources require a NASA EarthData Account.
+As mentioned in [Motivation], `data_download` provides access to publicly available geospatial data. Although publicly available, some of the NASA data sources require a NASA EarthData Account.
 
 For example, the UN WPP-Adjusted population density data from NASA Socioeconomic Data and Applications Center (SEDAC) requires an EarthData account. Without an EarthData Account and the prerequisite files prepared, the data download functions will return an error.
 
@@ -855,13 +851,13 @@ if (.Platform$OS.type == "unix") {
 }
 ```
 
-Create a file named `.netrc` with `file.create()`.
+Create a file named `.netrc` with `file.create`.
 
 ```{r, eval = FALSE}
 file.create(".netrc")
 ```
 
-Open a connection to `.netrc` with `sink()`. Write the line `machine urs...` replacing `YOUR_USERNAME` and `YOUR_PASSWORD` with your NASA EarthData username and password, respectively. After writing the line, close the connection with `sink()` again. 
+Open a connection to `.netrc` with `sink`. Write the line `machine urs...` replacing `YOUR_USERNAME` and `YOUR_PASSWORD` with your NASA EarthData username and password, respectively. After writing the line, close the connection with `sink` again. 
 
 ```{r, eval = FALSE}
 sink(".netrc")
@@ -912,7 +908,7 @@ if (.Platform$OS.type == "unix") {
 }
 ```
 
-Create a file named `.netrc` with `file.create()`.
+Create a file named `.netrc` with `file.create`.
 
 ```{r, eval = FALSE}
 file.create(".urs_cookies")
@@ -942,13 +938,13 @@ if (.Platform$OS.type == "unix") {
 }
 ```
 
-Create a file named ".dodsrc" with `file.create()`
+Create a file named ".dodsrc" with `file.create`.
 
 ```{r, eval = FALSE}
 file.create(".dodsrc")
 ```
 
-Open a connection to `.dodsrc` with `sink()`. Write the lines beginning with `HTTP.`, replacing `YOUR_USERNAME` and `YOUR_PASSWORD` with your NASA EarthData username and password, respectively. After writing the line, close the connection with `sink()` again. 
+Open a connection to `.dodsrc` with `sink`. Write the lines beginning with `HTTP.`, replacing `YOUR_USERNAME` and `YOUR_PASSWORD` with your NASA EarthData username and password, respectively. After writing the line, close the connection with `sink` again. 
 
 ```{r, eval = FALSE}
 sink(".dodsrc")
@@ -984,7 +980,7 @@ paste0(
 )
 ```
 
-If working on a **Windows** machine, copy the `.dodsrc` file to the project working directory. Replace `YOUR_WORKING_DIRECTORY` with the absolute path to the project working directory.
+If working on a Windows machine, copy the `.dodsrc` file to the project working directory. Replace `YOUR_WORKING_DIRECTORY` with the absolute path to the project working directory.
 
 ```{r}
 if (.Platform$OS.type == "windows") {
@@ -1055,7 +1051,7 @@ sedac_files
 
 ## Code Example
 
-The following is the entire R code used to create `download_hms()`.
+The following is the entire R code used to create `download_hms`.
 
 ```{r}
 download_hms
