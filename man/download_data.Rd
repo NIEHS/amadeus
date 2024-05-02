@@ -32,30 +32,30 @@ The \code{download_data()} function accesses and downloads atmospheric, meteorol
 }
 \note{
 \itemize{
-\item All download function names are in \code{download_*_data} formats
+\item All download function names are in \code{download_*} formats
 }
 }
 \seealso{
 For details of each download function per dataset,
 Please refer to:
 \itemize{
-\item \link{download_aqs_data}: "aqs", "AQS"
-\item \link{download_ecoregion_data}: "ecoregion"
-\item \link{download_geos_data}: "geos"
-\item \link{download_gmted_data}: "gmted", "GMTED"
-\item \link{download_koppen_geiger_data}: "koppen", "koppengeiger"
-\item \link{download_merra2_data}: "merra2", "merra", "MERRA", "MERRA2"
-\item \link{download_narr_monolevel_data}: "narr_monolevel", "monolevel"
-\item \link{download_narr_p_levels_data}: "narr_p_levels", "p_levels", "plevels"
-\item \link{download_nlcd_data}: "nlcd", "NLCD"
-\item \link{download_hms_data}: "noaa", "smoke", "hms"
-\item \link{download_sedac_groads_data}: "sedac_groads", "groads"
-\item \link{download_sedac_population_data}: "sedac_population", "population"
-\item \link{download_modis_data}: "modis", "MODIS"
-\item \link{download_tri_data}: "tri", "TRI"
-\item \link{download_nei_data}: "nei", "NEI"
-\item \link{download_gridmet_data}: "gridMET", "gridmet"
-\item \link{download_terraclimate_data}: "TerraClimate", "terraclimate"
+\item \link{download_aqs}: "aqs", "AQS"
+\item \link{download_ecoregion}: "ecoregion"
+\item \link{download_geos}: "geos"
+\item \link{download_gmted}: "gmted", "GMTED"
+\item \link{download_koppen_geiger}: "koppen", "koppengeiger"
+\item \link{download_merra2}: "merra2", "merra", "MERRA", "MERRA2"
+\item \link{download_narr_monolevel}: "narr_monolevel", "monolevel"
+\item \link{download_narr_p_levels}: "narr_p_levels", "p_levels", "plevels"
+\item \link{download_nlcd}: "nlcd", "NLCD"
+\item \link{download_hms}: "noaa", "smoke", "hms"
+\item \link{download_sedac_groads}: "sedac_groads", "groads"
+\item \link{download_sedac_population}: "sedac_population", "population"
+\item \link{download_modis}: "modis", "MODIS"
+\item \link{download_tri}: "tri", "TRI"
+\item \link{download_nei}: "nei", "NEI"
+\item \link{download_gridmet}: "gridMET", "gridmet"
+\item \link{download_terraclimate}: "TerraClimate", "terraclimate"
 }
 }
 \author{

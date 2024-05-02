@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate_covariates_auxiliary.R
 \name{calc_worker}
 \alias{calc_worker}
-\title{Peform covariate extraction}
+\title{Perform covariate extraction}
 \usage{
 calc_worker(
   dataset,
@@ -14,7 +14,9 @@ calc_worker(
   time,
   time_type = c("date", "hour", "year", "yearmonth", "timeless"),
   radius,
-  level = NULL
+  level = NULL,
+  max_cells = 1e+08,
+  ...
 )
 }
 \arguments{
@@ -44,6 +46,13 @@ value(s).}
 
 \item{level}{integer. Position within the layer name containing the vertical
 pressure level value (if applicable). Default = \code{NULL}.}
+
+\item{max_cells}{integer(1). Maximum number of cells to be read at once.
+Higher values will expedite processing, but will increase memory usage.
+Maximum possible value is \code{2^31 - 1}.
+See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{data.frame} object

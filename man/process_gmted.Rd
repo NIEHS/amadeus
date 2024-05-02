@@ -24,7 +24,8 @@ The \code{process_gmted()} function imports and cleans raw elevation data,
 returning a single \code{SpatRaster} object.
 }
 \note{
-\code{SpatRaster} layer name indicates selected variable and resolution.
+\code{SpatRaster} layer name indicates selected variable and resolution, and year
+of release (2010).
 }
 \author{
 Mitchell Manware

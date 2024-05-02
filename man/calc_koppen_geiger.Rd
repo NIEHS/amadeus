@@ -4,7 +4,13 @@
 \alias{calc_koppen_geiger}
 \title{Calculate climate classification covariates}
 \usage{
-calc_koppen_geiger(from = NULL, locs = NULL, locs_id = "site_id", ...)
+calc_koppen_geiger(
+  from = NULL,
+  locs = NULL,
+  locs_id = "site_id",
+  geom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{from}{SpatVector(1). Output of \code{process_koppen_geiger()}.}
@@ -13,6 +19,13 @@ calc_koppen_geiger(from = NULL, locs = NULL, locs_id = "site_id", ...)
 a unique identifier field named \code{locs_id}}
 
 \item{locs_id}{character(1). Name of unique identifier.}
+
+\item{geom}{logical(1). Should the geometry of \code{locs} be returned in the
+\code{data.frame}? Default is \code{FALSE}. If \code{geom = TRUE} and \code{locs} contain
+polygon geometries, the \verb{$geometry} column in the returned data frame may
+make the \code{data.frame} difficult to read due to long geometry strings. The
+coordinate reference system of the \verb{$geometry} is the coordinate
+reference system of \code{from}.}
 
 \item{...}{Placeholders.}
 }
@@ -24,6 +37,12 @@ Extract climate classification values at point locations. Returns a
 \code{data.frame} object containing \code{locs_id} and
 binary (0 = point not in climate region; 1 = point in climate region)
 variables for each climate classification region.
+}
+\note{
+The returned \code{data.frame} object contains a
+\verb{$description} column to represent the temporal range covered by the
+dataset. For more information, see
+\url{https://www.nature.com/articles/sdata2018214}.
 }
 \seealso{
 \code{\link{process_koppen_geiger}}
