@@ -256,8 +256,9 @@ calc_prepare_locs <- function(
 #' value.
 #' @param time Time value
 #' @param format Type of time to return in the `$time` column. Can be
-#' "timeless" (ie. GMTED data), "date" (ie. NARR data), "hour", (ie. GEOS data),
-#' "year" (ie. SEDAC population data), or "yearmonth" (ie. TerraClimate data).
+#' "timeless" (ie. Ecoregions data), "date" (ie. NARR data), "hour"
+#' (ie. GEOS data), "year" (ie. SEDAC population data), or "yearmonth"
+#' (ie. TerraClimate data).
 #' @return a `Date`, `POSIXt`, or `integer` object based on `format =`
 #' @keywords internal
 #' @export
@@ -267,19 +268,22 @@ calc_time <- function(
   if (format == "timeless") {
     return()
   } else if (format == "date") {
-    return_time <- as.Date(
+    return_time <- as.POSIXlt(
       time,
-      format = "%Y%m%d"
+      format = "%Y%m%d",
+      tz = "UTC"
     )
   } else if (format == "hour") {
-    return_time <- ISOdatetime(
-      year = substr(time[1], 1, 4),
-      month = substr(time[1], 5, 6),
-      day = substr(time[1], 7, 8),
-      hour = substr(time[2], 1, 2),
-      min = substr(time[2], 3, 4),
-      sec = substr(time[2], 5, 6),
-      tz = "UTC"
+    return_time <- as.POSIXlt(
+      ISOdatetime(
+        year = substr(time[1], 1, 4),
+        month = substr(time[1], 5, 6),
+        day = substr(time[1], 7, 8),
+        hour = substr(time[2], 1, 2),
+        min = substr(time[2], 3, 4),
+        sec = substr(time[2], 5, 6),
+        tz = "UTC"
+      )
     )
   } else if (format %in% c("yearmonth", "year")) {
     return_time <- as.integer(time)
@@ -287,7 +291,35 @@ calc_time <- function(
   return(return_time)
 }
 
-#' Peform covariate extraction
+#' Check time values
+#' @description
+#' Check the time values within calculated covariates `data.frame`
+#' @param covar data.frame(1). Calculated covariates `data.frame`.
+#' @param POSIXt logical(1). Should the time values in `covar` be of class
+#' `POSIXt`? If `FALSE`, the time values will be checked for integer class
+#' (year and year-month).
+#' @return NULL
+#' @keywords internal
+#' @export
+calc_check_time <- function(
+    covar,
+    POSIXt = TRUE
+) {
+  stopifnot(methods::is(covar, "data.frame"))
+  if ("time" %in% names(covar)) {
+    if (POSIXt) {
+      stopifnot(methods::is(covar$time), "POSIXt")
+    } else {
+      stopifnot(methods::is(covar$time), "integer")
+    }
+  } else {
+    message(
+      "`$time` not detected in `data.frame` provided.\n"
+    )
+  }
+}
+
+#' Perform covariate extraction
 #' @description
 #' Extract covariate values from `SpatRaster` object passed from
 #' \code{process_*()}.

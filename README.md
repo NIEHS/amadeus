@@ -32,7 +32,7 @@ To add or edit functionality for new data sources or datasets, open a [Pull requ
 Utilize [Issues](https://github.com/NIEHS/amadeus/issues) to notify the authors of bugs, questions, or recommendations. Identify each issue with the appropriate label to help ensure a timely response.
 
 <div align="center">
-  <img src="vignettes/images/readme_issues.png" style="width: 80%;">
+  <img src="vignettes/images/readme_issues.png" style="width: 100%;">
 </div>
 
 ## Download
@@ -57,7 +57,7 @@ Utilize [Issues](https://github.com/NIEHS/amadeus/issues) to notify the authors 
 | [USGS Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation |
 
 
-See the "`download_data` and NASA EarthData Account" vignette for a detailed description of source-specific download functions.
+See the "download_data and NASA EarthData Account" vignette for a detailed description of source-specific download functions.
 
 Example use of `download_data` using NOAA NCEP North American Regional Reanalysis's (NARR) "weasd" (Daily Accumulated Snow at Surface) variable.
 

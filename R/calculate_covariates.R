@@ -348,12 +348,13 @@ calc_nlcd <- function(from,
   )
   names(nlcd_at_bufs) <- new_names
   # merge locs_df with nlcd class fractions
-  new_data_vect <- cbind(locs_df, year, nlcd_at_bufs)
+  new_data_vect <- cbind(locs_df, as.integer(year), nlcd_at_bufs)
   if (geom) {
     names(new_data_vect)[1:3] <- c(locs_id, "geometry", "time")
   } else {
     names(new_data_vect)[1:2] <- c(locs_id, "time")
   }
+  calc_check_time(covar = new_data_vect, POSIXt = FALSE)
   return(new_data_vect)
 }
 
@@ -526,9 +527,10 @@ calc_modis_daily <- function(
     )
   }
   if (!"time" %in% names(locs)) {
-    locs$time <- date
+    locs$time <- as.POSIXlt(date)
   }
-
+  stopifnot(methods::is(locs$time, "POSIXt"))
+  
   extract_with_buffer <- function(
     points,
     surf,
@@ -579,6 +581,7 @@ calc_modis_daily <- function(
   # multiple columns will get proper names
   name_range <- seq(ncol(extracted) - name_offset + 1, ncol(extracted), 1)
   colnames(extracted)[name_range] <- name_extracted
+  calc_check_time(covar = extracted, POSIXt = TRUE)
   return(extracted)
 }
 
@@ -864,7 +867,7 @@ calc_temporal_dummies <-
         dt_month_dum,
         dt_wday_dum
       )
-
+    calc_check_time(covar = locs_dums, POSIXt = TRUE)
     return(locs_dums)
   }
 
@@ -1011,7 +1014,7 @@ The result may not be accurate.\n",
 
     attr(res_sedc, "sedc_bandwidth") <- sedc_bandwidth
     attr(res_sedc, "sedc_threshold") <- sedc_bandwidth * 2
-
+    calc_check_time(covar = extracted, POSIXt = TRUE)
     return(res_sedc)
   }
 
@@ -1096,6 +1099,7 @@ calc_tri <- function(
   }
   # read attr
   df_tri$time <- attr(from, "tri_year")
+  calc_check_time(covar = df_tri, POSIXt = FALSE)
   return(df_tri)
 }
 
@@ -1129,7 +1133,7 @@ calc_nei <- function(
   # spatial join
   locs_re <- terra::project(locs, terra::crs(from))
   locs_re <- terra::intersect(locs_re, from)
-
+  calc_check_time(covar = locs_re, POSIXt = FALSE)
   return(locs_re)
 }
 
@@ -1320,6 +1324,7 @@ calc_hms <- function(
     layer_name,
     " covariates.\n"
   ))
+  calc_check_time(covar = sites_extracted_ordered, POSIXt = TRUE)
   #### return data.frame
   return(data.frame(sites_extracted_ordered))
 }
@@ -1428,6 +1433,7 @@ calc_gmted <- function(
     names(sites_extracted) <- c(locs_id, "time", variable_name)
     
   }
+  calc_check_time(covar = sites_extracted, POSIXt = FALSE)
   #### return data.frame
   return(data.frame(sites_extracted))
 }
@@ -1503,6 +1509,7 @@ calc_narr <- function(
     level = narr_level,
     ...
   )
+  calc_check_time(covar = sites_extracted, POSIXt = TRUE)
   #### return data.frame
   return(data.frame(sites_extracted))
 }
@@ -1573,6 +1580,7 @@ calc_geos <- function(
     level = 2,
     ...
   )
+  calc_check_time(covar = sites_extracted, POSIXt = TRUE)
   #### return data.frame
   return(data.frame(sites_extracted))
 }
@@ -1655,6 +1663,7 @@ calc_sedac_population <- function(
     time_type = "year",
     ...
   )
+  calc_check_time(covar = sites_extracted, POSIXt = FALSE)
   #### return data.frame
   return(data.frame(sites_extracted))
 }
@@ -1841,6 +1850,7 @@ calc_merra2 <- function(
     level = merra2_level,
     ...
   )
+  calc_check_time(covar = sites_extracted, POSIXt = TRUE)
   #### return data.frame
   return(data.frame(sites_extracted))
 }
@@ -1906,6 +1916,7 @@ calc_gridmet <- function(
     time_type = "date",
     ...
   )
+  calc_check_time(covar = sites_extracted, POSIXt = TRUE)
   #### return data.frame
   return(data.frame(sites_extracted))
 }
@@ -1976,6 +1987,7 @@ calc_terraclimate <- function(
     time_type = "yearmonth",
     ...
   )
+  calc_check_time(covar = sites_extracted, POSIXt = FALSE)
   #### return data.frame
   return(data.frame(sites_extracted))
 }
@@ -2064,5 +2076,6 @@ calc_lagged <- function(
     #### merge with other locations
     variables_merge <- rbind(variables_merge, variables_return_date)
   }
+  calc_check_time(covar = sites_extracted, POSIXt = TRUE)
   return(variables_merge)
 }

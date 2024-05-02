@@ -1602,3 +1602,17 @@ testthat::test_that("calc_covariates wrapper works", {
     )
   }
 })
+
+testthat::test_that("calc_check_time identifies missing `time` column.", {
+  testthat::expect_error(
+    # provide integer instead of data.frame to provoke error
+    calc_check_time(12, TRUE)
+  )
+  testthat::expect_message(
+    # provide data.frame without time to provoke message
+    calc_check_time(
+      data.frame(x = 10, y = 20),
+      true
+    )
+  )
+})
