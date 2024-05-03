@@ -961,30 +961,100 @@ testthat::test_that("process_aqs", {
     aqs <- process_aqs(path = aqssub, date = NULL)
   )
   testthat::expect_no_error(
-    aqse <- process_aqs(
+    aqsft <- process_aqs(
       path = aqssub,
-      date = c("2022-02-04", "2022-02-28")
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "full",
+      return_format = "terra"
+    )
+  )
+  testthat::expect_no_error(
+    aqsst <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "sparse",
+      return_format = "terra"
+    )
+  )
+  testthat::expect_no_error(
+    aqslt <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "location",
+      return_format = "terra"
     )
   )
 
   # expect
   testthat::expect_s4_class(aqs, "SpatVector")
-  testthat::expect_s4_class(aqse, "SpatVector")
+  testthat::expect_s4_class(aqsft, "SpatVector")
+  testthat::expect_s4_class(aqsst, "SpatVector")
+  testthat::expect_s4_class(aqslt, "SpatVector")
+
+  testthat::expect_no_error(
+    aqsfs <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "full",
+      return_format = "sf"
+    )
+  )
+  testthat::expect_no_error(
+    aqsss <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "sparse",
+      return_format = "sf"
+    )
+  )
+  testthat::expect_no_error(
+    aqsls <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "location",
+      return_format = "sf"
+    )
+  )
+  testthat::expect_s3_class(aqsfs, "sf")
+  testthat::expect_s3_class(aqsss, "sf")
+  testthat::expect_s3_class(aqsls, "sf")
+
+  testthat::expect_no_error(
+    aqsfd <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "full",
+      return_format = "data.table"
+    )
+  )
+  testthat::expect_no_error(
+    aqssd <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "sparse",
+      return_format = "data.table"
+    )
+  )
+  testthat::expect_no_error(
+    aqsld <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "location",
+      return_format = "data.table"
+    )
+  )
+  testthat::expect_s3_class(aqsfd, "data.table")
+  testthat::expect_s3_class(aqssd, "data.table")
+  testthat::expect_s3_class(aqsld, "data.table")
 
   testthat::expect_no_error(
     aqssf <- process_aqs(path = aqssub, date = NULL, return_format = "sf")
   )
   testthat::expect_no_error(
-    aqsesf <- process_aqs(
-      path = aqssub,
-      date = c("2022-02-04", "2022-02-28"),
-      return_format = "sf"
-    )
-  )
-  testthat::expect_no_error(
     aqssf <- process_aqs(
       path = testd,
       date = c("2022-02-04", "2022-02-28"),
+      mode = "location",
       return_format = "sf"
     )
   )
@@ -1000,7 +1070,6 @@ testthat::test_that("process_aqs", {
 
   # expect
   testthat::expect_s3_class(aqssf, "sf")
-  testthat::expect_s3_class(aqsesf, "sf")
 
 
   # error cases

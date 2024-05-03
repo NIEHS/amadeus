@@ -233,7 +233,8 @@ calc_koppen_geiger <-
 #' @importFrom terra project
 #' @importFrom terra vect
 #' @importFrom terra crs
-#' @importFrom terra same.crs
+#' @importFrom terra deepcopy
+#' @importFrom terra set.crs
 #' @importFrom terra buffer
 #' @importFrom sf st_union
 #' @importFrom sf st_geometry
@@ -256,9 +257,21 @@ calc_nlcd <- function(from,
   }
   if (!methods::is(locs, "SpatVector")) {
     message("locs is not a terra::SpatVector.")
-    locs <- tryCatch(terra::vect(locs), error = function(e) {
+    locs <- tryCatch({
+      if (data.table::is.data.table(locs)) {
+        locs <- as.data.frame(locs)
+      }
+      locsa <- terra::deepcopy(terra::vect(locs))
+      locs_crs <- terra::crs(locsa)
+      if (locs_crs == "" || is.na(locs_crs)) {
+        terra::crs(locsa) <- "EPSG:4326"
+      }
+      locsa
+    },
+    error = function(e) {
       stop("Failed to locs to a terra::SpatVector.")
-    })
+    }
+    )
   }
   if (!methods::is(from, "SpatRaster")) {
     stop("from is not a SpatRaster.")
@@ -272,20 +285,21 @@ calc_nlcd <- function(from,
     terra::project(y = terra::crs(locs))
   data_vect_b <- locs |>
     terra::intersect(x = us_main)
-  if (!terra::same.crs(data_vect_b, from)) {
-    data_vect_b <- terra::project(data_vect_b, terra::crs(from))
-  }
+  data_vect_b <- terra::project(data_vect_b, terra::crs(from))
   # create circle buffers with buf_radius
   bufs_pol <- terra::buffer(data_vect_b, width = radius) |>
-    sf::st_as_sf()
+    sf::st_as_sf() |>
+    sf::st_geometry()
   # ratio of each nlcd class per buffer
-  nlcd_at_bufs <- exactextractr::exact_extract(from,
-                                               sf::st_geometry(bufs_pol),
-                                               fun = "frac",
-                                               stack_apply = TRUE,
-                                               force_df = TRUE,
-                                               progress = FALSE,
-                                               max_cells_in_memory = max_cells)
+  nlcd_at_bufs <-
+    exactextractr::exact_extract(
+      from,
+      bufs_pol,
+      fun = "frac",
+      #stack_apply = TRUE,
+      force_df = TRUE,
+      progress = FALSE,
+      max_cells_in_memory = max_cells)
   # select only the columns of interest
   cfpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
   nlcd_classes <- utils::read.csv(cfpath)
@@ -311,9 +325,10 @@ calc_nlcd <- function(from,
   # merge data_vect with nlcd class fractions (and reproject)
   new_data_vect <- cbind(data_vect_b, nlcd_at_bufs)
   new_data_vect <- terra::project(new_data_vect, terra::crs(locs))
-  new_data_vect$nlcd_year <- as.integer(year)
+  new_data_vect$time <- as.integer(year)
   return(new_data_vect)
 }
+
 
 
 #' Calculate ecoregions covariates
@@ -1033,7 +1048,7 @@ calc_tri <- function(
     df_tri <- dplyr::left_join(as.data.frame(locs), df_tri)
   }
   # read attr
-  df_tri$tri_year <- attr(from, "tri_year")
+  df_tri$time <- attr(from, "tri_year")
   return(df_tri)
 }
 
@@ -1067,7 +1082,7 @@ calc_nei <- function(
   # spatial join
   locs_re <- terra::project(locs, terra::crs(from))
   locs_re <- terra::intersect(locs_re, from)
-
+  locs_re$time <- unique(from$nei_year)
   return(locs_re)
 }
 
@@ -1551,7 +1566,7 @@ calc_sedac_population <- function(
     fun = fun,
     variable = 3,
     time = 4,
-    time_type = "sedac_population_year"
+    time_type = "year"
   )
   #### return data.frame
   return(data.frame(sites_extracted))
