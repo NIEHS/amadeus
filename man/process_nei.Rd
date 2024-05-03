@@ -20,7 +20,7 @@ is accepted.}
 a \code{SpatVector} object
 }
 \description{
-The \code{process_tri()} function imports and cleans raw road emissions data,
+The \code{process_nei()} function imports and cleans raw road emissions data,
 returning a single \code{SpatVector} object.
 
 NEI data comprises multiple csv files where emissions of

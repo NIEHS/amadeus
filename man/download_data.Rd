@@ -5,11 +5,11 @@
 \title{Download raw data wrapper function}
 \usage{
 download_data(
-  dataset_name = c("aqs", "ecoregion", "geos", "gmted", "koppen", "koppengeiger",
-    "merra2", "merra", "narr_monolevel", "modis", "narr_p_levels", "nlcd", "noaa",
-    "sedac_groads", "sedac_population", "groads", "population", "plevels", "p_levels",
-    "monolevel", "hms", "smoke", "tri", "nei", "gridmet", "terraclimate", "huc",
-    "cropscape", "cdl", "prism", "olm", "openlandmap"),
+  dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "gmted", "koppen",
+    "koppengeiger", "merra2", "merra", "narr_monolevel", "modis", "narr_p_levels",
+    "nlcd", "noaa", "sedac_groads", "sedac_population", "groads", "population",
+    "plevels", "p_levels", "monolevel", "hms", "smoke", "tri", "nei", "gridmet",
+    "terraclimate", "huc", "cropscape", "cdl", "prism", "olm", "openlandmap"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   ...
@@ -38,24 +38,23 @@ The \code{download_data()} function accesses and downloads atmospheric, meteorol
 \seealso{
 For details of each download function per dataset,
 Please refer to:
-\itemize{
-\item \link{download_aqs}: "aqs", "AQS"
-\item \link{download_ecoregion}: "ecoregion"
-\item \link{download_geos}: "geos"
-\item \link{download_gmted}: "gmted", "GMTED"
-\item \link{download_koppen_geiger}: "koppen", "koppengeiger"
-\item \link{download_merra2}: "merra2", "merra", "MERRA", "MERRA2"
-\item \link{download_narr_monolevel}: "narr_monolevel", "monolevel"
-\item \link{download_narr_p_levels}: "narr_p_levels", "p_levels", "plevels"
-\item \link{download_nlcd}: "nlcd", "NLCD"
-\item \link{download_hms}: "noaa", "smoke", "hms"
-\item \link{download_sedac_groads}: "sedac_groads", "groads"
-\item \link{download_sedac_population}: "sedac_population", "population"
-\item \link{download_modis}: "modis", "MODIS"
-\item \link{download_tri}: "tri", "TRI"
-\item \link{download_nei}: "nei", "NEI"
-\item \link{download_gridmet}: "gridMET", "gridmet"
-\item \link{download_terraclimate}: "TerraClimate", "terraclimate"
+\item \link{`download_aqs`}: \code{"aqs"}, \code{"AQS"}
+\item \link{`download_ecoregion`}: \code{"ecoregions"}, \code{"ecoregion"}
+\item \link{`download_geos`}: \code{"geos"}
+\item \link{`download_gmted`}: \code{"gmted"}, \code{"GMTED"}
+\item \link{`download_koppen_geiger`}: \code{"koppen"}, \code{"koppengeiger"}
+\item \link{`download_merra2`}: "merra2", \code{"merra"}, \code{"MERRA"}, \code{"MERRA2"}
+\item \link{`download_narr_monolevel`}: \code{"narr_monolevel"}, \code{"monolevel"}
+\item \link{`download_narr_p_levels`}: \code{"narr_p_levels"}, \code{"p_levels"}, \code{"plevels"}
+\item \link{`download_nlcd`}: \code{"nlcd"}, \code{"NLCD"}
+\item \link{`download_hms`}: \code{"noaa"}, \code{"smoke"}, \code{"hms"}
+\item \link{`download_sedac_groads`}: \code{"sedac_groads"}, \code{"groads"}
+\item \link{`download_sedac_population`}: \code{"sedac_population"}, \code{"population"}
+\item \link{`download_modis`}: \code{"modis"}, \code{"MODIS"}
+\item \link{`download_tri`}: \code{"tri"}, \code{"TRI"}
+\item \link{`download_nei`}: \code{"nei"}, \code{"NEI"}
+\item \link{`download_gridmet`}: \code{"gridMET"}, \code{"gridmet"}
+\item \link{`download_terraclimate`}: \code{"TerraClimate"}, \code{"terraclimate"}
 }
 }
 \author{

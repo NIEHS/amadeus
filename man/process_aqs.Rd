@@ -7,7 +7,9 @@
 process_aqs(
   path = NULL,
   date = c("2018-01-01", "2022-12-31"),
-  return_format = "terra",
+  mode = c("full", "sparse", "location"),
+  data_field = "Arithmetic.Mean",
+  return_format = c("terra", "sf", "data.table"),
   ...
 )
 }
@@ -18,7 +20,13 @@ process_aqs(
 Should be in \code{"YYYY-MM-DD"} format and sorted. If \code{NULL},
 only unique locations are returned.}
 
-\item{return_format}{character(1). \code{"terra"} or \code{"sf"}.}
+\item{mode}{character(1). One of "full" (all dates * all locations)
+or "sparse" (date-location pairs with available data) or
+"location" (unique locations).}
+
+\item{data_field}{character(1). Data field to extract.}
+
+\item{return_format}{character(1). \code{"terra"} or \code{"sf"} or \code{"data.table"}.}
 
 \item{...}{Placeholders.}
 }
@@ -30,6 +38,13 @@ The \code{process_aqs()} function cleans and imports raw air quality
 monitoring sites, returning a single \code{SpatVector} or sf object.
 }
 \note{
-\code{date = NULL} will return a massive data.table
-object. Please choose proper \code{date} values.
+Choose \code{date} and \code{mode} values with caution.
+The function may return a massive data.table, resulting in
+a long processing time or even a crash.
+}
+\seealso{
+\itemize{
+\item \code{\link[=download_aqs_data]{download_aqs_data()}}
+\item \href{https://aqs.epa.gov/aqsweb/documents/codetables/parameters.csv}{EPA, n.d., \emph{AQS Parameter Codes}}
+}
 }

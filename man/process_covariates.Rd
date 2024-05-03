@@ -38,7 +38,7 @@ data files before passing to \code{process_covariates}}.
 \item 
 \item 
 \item 
-\item \code{\link{process_koppen_geiger}}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"},
+\item \code{\link{process_koppen_geiger}}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"}
 \item \code{\link{process_ecoregion}}: \code{"ecoregion"}, \code{"ecoregions"}
 \item 
 \item 
@@ -56,7 +56,7 @@ data files before passing to \code{process_covariates}}.
 \item 
 \item \code{\link{process_cropscape}}: \code{"cropscape"}, \code{"cdl"}
 \item 
-\item \code{\link{process_olm}}: \code{"olm"}, \verb{"openlandmap}
+\item \code{\link{process_olm}}: \code{"olm"}, \code{"openlandmap"}
 }
 }
 \author{

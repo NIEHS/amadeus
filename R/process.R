@@ -14,7 +14,7 @@
 #' - [`process_modis_swath`]: `"modis_swath"`
 #' - [`process_modis_merge`]: `"modis_merge"`
 #' - [`process_bluemarble`]: `"bluemarble"`
-#' - [`process_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
+#' - [`process_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`
 #' - [`process_ecoregion`]: `"ecoregion"`, `"ecoregions"`
 #' - [`process_nlcd`]: `"nlcd"`
 #' - [`process_tri`]: `"tri"`
@@ -32,7 +32,7 @@
 #' - [`process_huc`]: `"huc"`
 #' - [`process_cropscape`]: `"cropscape"`, `"cdl"`
 #' - [`process_prism`]: `"prism"`
-#' - [`process_olm`]: `"olm"`, `"openlandmap`
+#' - [`process_olm`]: `"olm"`, `"openlandmap"`
 #' @returns `SpatVector`, `SpatRaster`, `sf`, or `character` depending on
 #' covariate type and selections.
 #' @author Insang Song
@@ -821,7 +821,7 @@ process_tri <- function(
 # nolint start
 #' Process road emissions data
 #' @description
-#' The \code{process_tri()} function imports and cleans raw road emissions data,
+#' The \code{process_nei()} function imports and cleans raw road emissions data,
 #' returning a single `SpatVector` object.
 #' @param path character(1). Directory with NEI csv files.
 #' @param county `SpatVector`/`sf`. County boundaries.
@@ -869,7 +869,8 @@ process_nei <- function(
     stop("year should be one of 2017 or 2020.\n")
   }
   # Concatenate NEI csv files
-  csvs_nei <- list.files(path = path, pattern = "*.csv$", full.names = TRUE)
+  csvs_nei <- list.files(path = path, pattern = "*.csv$", recursive = TRUE, full.names = TRUE)
+  csvs_nei <- grep(year, csvs_nei, value = TRUE)
   csvs_nei <- lapply(csvs_nei, data.table::fread)
   csvs_nei <- data.table::rbindlist(csvs_nei)
 
@@ -918,8 +919,16 @@ process_nei <- function(
 #' @param date character(2). Start and end date.
 #'  Should be in `"YYYY-MM-DD"` format and sorted. If `NULL`,
 #'  only unique locations are returned.
-#' @param return_format character(1). `"terra"` or `"sf"`.
+#' @param mode character(1). One of "full" (all dates * all locations)
+#'   or "sparse" (date-location pairs with available data) or
+#'   "location" (unique locations).
+#' @param data_field character(1). Data field to extract.
+#' @param return_format character(1). `"terra"` or `"sf"` or `"data.table"`.
 #' @param ... Placeholders.
+#' @seealso
+#' * [`download_aqs_data()`]
+#' * [EPA, n.d., _AQS Parameter Codes_](
+#'   https://aqs.epa.gov/aqsweb/documents/codetables/parameters.csv)
 #' @returns a `SpatVector` or sf object depending on the `return_format`
 #' @importFrom data.table as.data.table
 #' @importFrom utils read.csv
@@ -929,16 +938,21 @@ process_nei <- function(
 #' @importFrom dplyr group_by
 #' @importFrom dplyr ungroup
 #' @importFrom dplyr filter
-#' @note `date = NULL` will return a massive data.table
-#' object. Please choose proper `date` values.
+#' @note Choose `date` and `mode` values with caution.
+#' The function may return a massive data.table, resulting in
+#' a long processing time or even a crash.
 #' @export
 process_aqs <-
   function(
     path = NULL,
     date = c("2018-01-01", "2022-12-31"),
-    return_format = "terra",
+    mode = c("full", "sparse", "location"),
+    data_field = "Arithmetic.Mean",
+    return_format = c("terra", "sf", "data.table"),
     ...
   ) {
+    mode <- match.arg(mode)
+    return_format <- match.arg(return_format)
     if (!is.null(date)) {
       date <- try(as.Date(date))
       if (inherits(date, "try-error")) {
@@ -948,7 +962,6 @@ process_aqs <-
         stop("date should be a character vector of length 2.")
       }
     }
-
     if (length(path) == 1 && dir.exists(path)) {
       path <- list.files(
         path = path,
@@ -981,8 +994,18 @@ process_aqs <-
       dplyr::as_tibble() |>
       dplyr::group_by(site_id) |>
       dplyr::filter(POC == min(POC)) |>
+      dplyr::mutate(time = Date.Local) |>
       dplyr::ungroup()
-    sites_v <- unique(sites[, c("site_id", "Longitude", "Latitude", "Datum")])
+    col_sel <- c("site_id", "Longitude", "Latitude", "Datum")
+    if (mode != "sparse") {
+      sites_v <- unique(sites[, col_sel])
+    } else {
+      col_sel <- append(col_sel, "time")
+      col_sel <- append(col_sel, data_field)
+      sites_v <- sites |>
+        dplyr::select(dplyr::all_of(col_sel)) |>
+        dplyr::distinct()
+    }
     names(sites_v)[2:3] <- c("lon", "lat")
     sites_v <- data.table::as.data.table(sites_v)
 
@@ -991,7 +1014,7 @@ process_aqs <-
 
     # NAD83 to WGS84
     sites_v_nad <-
-      sites_v[Datum == "NAD83"]
+      sites_v[sites_v$Datum == "NAD83", ]
     sites_v_nad <-
       terra::vect(
         sites_v_nad,
@@ -1000,23 +1023,34 @@ process_aqs <-
       )
     sites_v_nad <- terra::project(sites_v_nad, "EPSG:4326")
     # postprocessing: combine WGS84 and new WGS84 records
-    sites_v_nad <- sites_v_nad[, seq(1, 3)]
     sites_v_nad <- as.data.frame(sites_v_nad)
-    sites_v_wgs <- sites_v[Datum == "WGS84"][, -4]
-    final_sites <- rbind(sites_v_wgs, sites_v_nad)
+    sites_v_wgs <- sites_v[sites_v$Datum == "WGS84"]
+    final_sites <- data.table::rbindlist(
+      list(sites_v_wgs, sites_v_nad), fill = TRUE)
+    final_sites <-
+      final_sites[, grep("Datum", names(final_sites), invert = TRUE), with = FALSE]
 
     if (!is.null(date)) {
       date_start <- as.Date(date[1])
       date_end <- as.Date(date[2])
       date_sequence <- seq(date_start, date_end, "day")
-      final_sites <-
-        split(date_sequence, date_sequence) |>
-        lapply(function(x) {
-          fs_time <- final_sites
-          fs_time$time <- x
-          return(fs_time)
-        })
-      final_sites <- Reduce(rbind, final_sites)
+      date_sequence <- as.character(date_sequence)
+
+      if (mode == "full") {
+        final_sites <-
+          split(date_sequence, date_sequence) |>
+          lapply(function(x) {
+            fs_time <- final_sites
+            fs_time$time <- x
+            return(fs_time)
+          })
+        final_sites <- data.table::rbindlist(final_sites, fill = TRUE)
+      }
+      if (mode == "sparse") {
+        final_sites <-
+          final_sites[final_sites$time %in% date_sequence, ]
+        final_sites <- unique(final_sites)
+      }
     }
 
     final_sites <-
@@ -1035,7 +1069,8 @@ process_aqs <-
           dim = "XY",
           coords = c("lon", "lat"),
           crs = "EPSG:4326"
-        )
+        ),
+        data.table = final_sites
       )
 
     return(final_sites)
@@ -1177,7 +1212,7 @@ process_hms <- function(
   #### identify file paths
   paths <- list.files(
     path,
-    pattern = "hms_smoke",
+    pattern = "hms_smoke*.*.shp$",
     full.names = TRUE
   )
   paths <- paths[grep(
@@ -1328,6 +1363,10 @@ process_hms <- function(
 #' @param variable vector(1). Vector containing the GMTED statistic first and
 #' the resolution second. (Example: variable = c("Breakline Emphasis",
 #' "7.5 arc-seconds")).
+#' * Statistic options: "Breakline Emphasis", "Systematic Subsample",
+#'   "Median Statistic", "Minimum Statistic", "Mean Statistic",
+#'   "Maximum Statistic", "Standard Deviation Statistic"
+#' * Resolution options: "30 arc-seconds", "15 arc-seconds", "7.5 arc-seconds"
 #' @param path character(1). Directory with downloaded GMTED  "*_grd"
 #' folder containing .adf files.
 #' @param ... Placeholders.
@@ -1456,12 +1495,14 @@ process_narr <- function(
   data_paths <- list.files(
     path,
     pattern = variable,
+    recursive = TRUE,
     full.names = TRUE
   )
-  data_paths <- data_paths[grep(
-    ".nc",
-    data_paths
-  )]
+  data_paths <- grep(
+    sprintf("%s*.*.nc", variable),
+    data_paths,
+    value = TRUE
+  )
   #### define date sequence
   date_sequence <- generate_date_sequence(
     date[1],

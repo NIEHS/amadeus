@@ -19,7 +19,7 @@
 #' @note `covariate` argument value is converted to lowercase.
 #' @seealso
 #' - [`calc_modis_par`]: `"modis"`, `"MODIS"`
-#' - [`calc_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
+#' - [`calc_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`
 #' - [`calc_ecoregion`]: `"ecoregion"`, `"ecoregions"`
 #' - [`calc_temporal_dummies`]: `"dummies"`
 #' - [`calc_hms`]: `"hms"`, `"noaa"`, `"smoke"`
@@ -262,7 +262,8 @@ calc_koppen_geiger <-
 #' @importFrom terra project
 #' @importFrom terra vect
 #' @importFrom terra crs
-#' @importFrom terra same.crs
+#' @importFrom terra deepcopy
+#' @importFrom terra set.crs
 #' @importFrom terra buffer
 #' @importFrom sf st_union
 #' @importFrom sf st_geometry
@@ -284,6 +285,7 @@ calc_nlcd <- function(from,
   if (radius <= 0 && terra::geomtype(locs) == "points") {
     stop("radius has not a likely value.")
   }
+
   if (!methods::is(from, "SpatRaster")) {
     stop("from is not a SpatRaster.")
   }
@@ -307,24 +309,29 @@ calc_nlcd <- function(from,
     terra::set.crs("EPSG:4326") |>
     terra::project(y = terra::crs(locs_vector))
   data_vect_b <- locs_vector |>
-    terra::intersect(x = us_main)
+    terra::intersect(x = us_main) |>
+    terra::project(y = terra::crs(from))
+
   # subset locs_df to those in us extent
   locs_df <- locs_df[
     unlist(locs_df[[locs_id]]) %in% unlist(data_vect_b[[locs_id]]),
     ]
-  if (!terra::same.crs(data_vect_b, from)) {
-    data_vect_b <- terra::project(data_vect_b, terra::crs(from))
-  }
+  
   # create circle buffers with buf_radius
-  # bufs_pol <- sf::st_as_sf(data_vect_b)
+  bufs_pol <- terra::buffer(data_vect_b, width = radius) |>
+    sf::st_as_sf() |>
+    sf::st_geometry()
   # ratio of each nlcd class per buffer
-  nlcd_at_bufs <- exactextractr::exact_extract(from,
-                                               sf::st_as_sf(data_vect_b),
-                                               fun = "frac",
-                                               stack_apply = TRUE,
-                                               force_df = TRUE,
-                                               progress = FALSE,
-                                               max_cells_in_memory = max_cells)
+  nlcd_at_bufs <-
+    exactextractr::exact_extract(
+      from,
+      bufs_pol,
+      fun = "frac",
+      stack_apply = TRUE,
+      force_df = TRUE,
+      progress = FALSE,
+      max_cells_in_memory = max_cells)
+
   # select only the columns of interest
   cfpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
   nlcd_classes <- utils::read.csv(cfpath)
@@ -357,6 +364,7 @@ calc_nlcd <- function(from,
   calc_check_time(covar = new_data_vect, POSIXt = FALSE)
   return(new_data_vect)
 }
+
 
 
 #' Calculate ecoregions covariates

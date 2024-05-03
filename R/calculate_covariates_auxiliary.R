@@ -367,6 +367,7 @@ calc_worker <- function(
     ...) {
   #### empty location data.frame
   sites_extracted <- NULL
+  time_type <- match.arg(time_type)
   for (l in seq_len(terra::nlyr(from))) {
     #### select data layer
     data_layer <- from[[l]]
@@ -385,10 +386,8 @@ calc_worker <- function(
       )
     }
     #### extract level (if applicable)
-    if (!(is.null(level))) {
+    if (!is.null(level)) {
       data_level <- data_split[level]
-    } else {
-      data_level <- NULL
     }
     #### message
     calc_message(

@@ -17,28 +17,28 @@
 #' @seealso
 #' For details of each download function per dataset,
 #' Please refer to:
-#' * \link{download_aqs}: "aqs", "AQS"
-#' * \link{download_ecoregion}: "ecoregion"
-#' * \link{download_geos}: "geos"
-#' * \link{download_gmted}: "gmted", "GMTED"
-#' * \link{download_koppen_geiger}: "koppen", "koppengeiger"
-#' * \link{download_merra2}: "merra2", "merra", "MERRA", "MERRA2"
-#' * \link{download_narr_monolevel}: "narr_monolevel", "monolevel"
-#' * \link{download_narr_p_levels}: "narr_p_levels", "p_levels", "plevels"
-#' * \link{download_nlcd}: "nlcd", "NLCD"
-#' * \link{download_hms}: "noaa", "smoke", "hms"
-#' * \link{download_sedac_groads}: "sedac_groads", "groads"
-#' * \link{download_sedac_population}: "sedac_population", "population"
-#' * \link{download_modis}: "modis", "MODIS"
-#' * \link{download_tri}: "tri", "TRI"
-#' * \link{download_nei}: "nei", "NEI"
-#' * \link{download_gridmet}: "gridMET", "gridmet"
-#' * \link{download_terraclimate}: "TerraClimate", "terraclimate"
+#' * \link{`download_aqs_data`}: `"aqs"`, `"AQS"`
+#' * \link{`download_ecoregion_data`}: `"ecoregions"`, `"ecoregion"`
+#' * \link{`download_geos_data`}: `"geos"`
+#' * \link{`download_gmted_data`}: `"gmted"`, `"GMTED"`
+#' * \link{`download_koppen_geiger_data`}: `"koppen"`, `"koppengeiger"`
+#' * \link{`download_merra2_data`}: "merra2", `"merra"`, `"MERRA"`, `"MERRA2"`
+#' * \link{`download_narr_monolevel_data`}: `"narr_monolevel"`, `"monolevel"`
+#' * \link{`download_narr_p_levels_data`}: `"narr_p_levels"`, `"p_levels"`, `"plevels"`
+#' * \link{`download_nlcd_data`}: `"nlcd"`, `"NLCD"`
+#' * \link{`download_hms_data`}: `"noaa"`, `"smoke"`, `"hms"`
+#' * \link{`download_sedac_groads_data`}: `"sedac_groads"`, `"groads"`
+#' * \link{`download_sedac_population_data`}: `"sedac_population"`, `"population"`
+#' * \link{`download_modis_data`}: `"modis"`, `"MODIS"`
+#' * \link{`download_tri_data`}: `"tri"`, `"TRI"`
+#' * \link{`download_nei_data`}: `"nei"`, `"NEI"`
+#' * \link{`download_gridmet_data`}: `"gridMET"`, `"gridmet"`
+#' * \link{`download_terraclimate_data`}: `"TerraClimate"`, `"terraclimate"`
 #' @returns NULL
 #' @export
 download_data <-
   function(
-    dataset_name = c("aqs", "ecoregion", "geos", "gmted", "koppen",
+    dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "gmted", "koppen",
                      "koppengeiger", "merra2", "merra", "narr_monolevel",
                      "modis", "narr_p_levels", "nlcd", "noaa", "sedac_groads",
                      "sedac_population", "groads", "population", "plevels",
@@ -57,6 +57,7 @@ download_data <-
     what_to_run <- switch(dataset_name,
       aqs = download_aqs,
       ecoregion = download_ecoregion,
+      ecoregions = download_ecoregion,
       geos = download_geos,
       gmted = download_gmted,
       koppen = download_koppen_geiger,
