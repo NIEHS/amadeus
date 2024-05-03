@@ -10,8 +10,9 @@ calc_time(time, format)
 \item{time}{Time value}
 
 \item{format}{Type of time to return in the \verb{$time} column. Can be
-"timeless" (ie. GMTED data), "date" (ie. NARR data), "hour", (ie. GEOS data),
-"year" (ie. SEDAC population data), or "yearmonth" (ie. TerraClimate data).}
+"timeless" (ie. Ecoregions data), "date" (ie. NARR data), "hour"
+(ie. GEOS data), "year" (ie. SEDAC population data), or "yearmonth"
+(ie. TerraClimate data).}
 }
 \value{
 a \code{Date}, \code{POSIXt}, or \code{integer} object based on \verb{format =}

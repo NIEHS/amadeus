@@ -4,7 +4,7 @@
 \alias{calc_prepare_locs}
 \title{Prepare extraction locations}
 \usage{
-calc_prepare_locs(from, locs, locs_id, radius)
+calc_prepare_locs(from, locs, locs_id, radius, geom = FALSE)
 }
 \arguments{
 \item{from}{SpatRaster(1) or SpatVector(1). Output from
@@ -19,6 +19,9 @@ Passed from \code{calc_\*()}.}
 
 \item{radius}{integer(1). Circular buffer distance around site locations.
 (Default = 0). Passed from \code{calc_\*()}.}
+
+\item{geom}{logical(1). Should the geometry of \code{locs} be returned in the
+\code{data.frame}? Default is \code{FALSE}.}
 }
 \value{
 A \code{list} containing \code{SpatVector} and \code{data.frame} objects

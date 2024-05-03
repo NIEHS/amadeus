@@ -4,7 +4,7 @@
 \alias{calc_lagged}
 \title{Calculate temporally lagged covariates}
 \usage{
-calc_lagged(from, date, lag, locs_id, time_id)
+calc_lagged(from, date, lag, locs_id, time_id = "time")
 }
 \arguments{
 \item{from}{data.frame(1). A \code{data.frame} containing calculated covariates
@@ -31,6 +31,8 @@ In order to calculate temporally lagged covariates, \code{from} must contain at
 least the number of lag days before the desired start date. For example, if
 \verb{date = c("2024-01-01", "2024-01-31)} and \code{lag = 1}, \code{from} must contain data
 starting at 2023-12-31.
+If \code{from} contains geometry features, \code{calc_lagged} will return a column
+with geometry features of the same name.
 \code{calc_lagged()} assumes that all columns other than \code{time_id},
 \code{locs_id}, and fixed columns of "lat" and "lon", follow the genre, variable,
 lag, buffer radius format adopted in \code{calc_setcolumns()}.

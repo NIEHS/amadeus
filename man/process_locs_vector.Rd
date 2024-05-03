@@ -20,7 +20,8 @@ be named "lat" and "lon", respectively.}
 a \code{SpatVector} object
 }
 \description{
-Convert locations from class \code{data.frame} or \code{data.table} to
+Detect \code{SpatVector} object, or convert locations from class \code{sf},
+\code{data.frame} or \code{data.table} to
 \code{SpatVector} object, project to coordinate reference system, and apply
 circular buffer.
 }

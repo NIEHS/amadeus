@@ -4,7 +4,15 @@
 \alias{calc_gridmet}
 \title{Calculate gridMET covariates}
 \usage{
-calc_gridmet(from, locs, locs_id = NULL, radius = 0, fun = "mean")
+calc_gridmet(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  fun = "mean",
+  geom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{from}{SpatRaster(1). Output from \code{process_gridmet()}.}
@@ -19,6 +27,15 @@ containing identifier for each unique coordinate location.}
 
 \item{fun}{character(1). Function used to summarize multiple raster cells
 within sites location buffer (Default = \code{mean}).}
+
+\item{geom}{logical(1). Should the geometry of \code{locs} be returned in the
+\code{data.frame}? Default is \code{FALSE}. If \code{geom = TRUE} and \code{locs} contain
+polygon geometries, the \verb{$geometry} column in the returned data frame may
+make the \code{data.frame} difficult to read due to long geometry strings. The
+coordinate reference system of the \verb{$geometry} is the coordinate
+reference system of \code{from}.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a data.frame object

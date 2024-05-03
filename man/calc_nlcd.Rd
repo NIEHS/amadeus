@@ -10,6 +10,7 @@ calc_nlcd(
   locs_id = "site_id",
   radius = 1000,
   max_cells = 1e+08,
+  geom = FALSE,
   ...
 )
 }
@@ -27,6 +28,13 @@ radius of buffer around points}
 Higher values will expedite processing, but will increase memory usage.
 Maximum possible value is \code{2^31 - 1}.
 See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
+
+\item{geom}{logical(1). Should the geometry of \code{locs} be returned in the
+\code{data.frame}? Default is \code{FALSE}. If \code{geom = TRUE} and \code{locs} contain
+polygon geometries, the \verb{$geometry} column in the returned data frame may
+make the \code{data.frame} difficult to read due to long geometry strings. The
+coordinate reference system of the \verb{$geometry} is the coordinate
+reference system of \code{from}.}
 
 \item{...}{Placeholders.}
 }

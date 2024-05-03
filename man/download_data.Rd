@@ -32,30 +32,29 @@ The \code{download_data()} function accesses and downloads atmospheric, meteorol
 }
 \note{
 \itemize{
-\item All download function names are in \code{download_*_data} formats
+\item All download function names are in \code{download_*} formats
 }
 }
 \seealso{
 For details of each download function per dataset,
 Please refer to:
-\itemize{
-\item \link{`download_aqs_data`}: \code{"aqs"}, \code{"AQS"}
-\item \link{`download_ecoregion_data`}: \code{"ecoregions"}, \code{"ecoregion"}
-\item \link{`download_geos_data`}: \code{"geos"}
-\item \link{`download_gmted_data`}: \code{"gmted"}, \code{"GMTED"}
-\item \link{`download_koppen_geiger_data`}: \code{"koppen"}, \code{"koppengeiger"}
-\item \link{`download_merra2_data`}: "merra2", \code{"merra"}, \code{"MERRA"}, \code{"MERRA2"}
-\item \link{`download_narr_monolevel_data`}: \code{"narr_monolevel"}, \code{"monolevel"}
-\item \link{`download_narr_p_levels_data`}: \code{"narr_p_levels"}, \code{"p_levels"}, \code{"plevels"}
-\item \link{`download_nlcd_data`}: \code{"nlcd"}, \code{"NLCD"}
-\item \link{`download_hms_data`}: \code{"noaa"}, \code{"smoke"}, \code{"hms"}
-\item \link{`download_sedac_groads_data`}: \code{"sedac_groads"}, \code{"groads"}
-\item \link{`download_sedac_population_data`}: \code{"sedac_population"}, \code{"population"}
-\item \link{`download_modis_data`}: \code{"modis"}, \code{"MODIS"}
-\item \link{`download_tri_data`}: \code{"tri"}, \code{"TRI"}
-\item \link{`download_nei_data`}: \code{"nei"}, \code{"NEI"}
-\item \link{`download_gridmet_data`}: \code{"gridMET"}, \code{"gridmet"}
-\item \link{`download_terraclimate_data`}: \code{"TerraClimate"}, \code{"terraclimate"}
+\item \link{`download_aqs`}: \code{"aqs"}, \code{"AQS"}
+\item \link{`download_ecoregion`}: \code{"ecoregions"}, \code{"ecoregion"}
+\item \link{`download_geos`}: \code{"geos"}
+\item \link{`download_gmted`}: \code{"gmted"}, \code{"GMTED"}
+\item \link{`download_koppen_geiger`}: \code{"koppen"}, \code{"koppengeiger"}
+\item \link{`download_merra2`}: "merra2", \code{"merra"}, \code{"MERRA"}, \code{"MERRA2"}
+\item \link{`download_narr_monolevel`}: \code{"narr_monolevel"}, \code{"monolevel"}
+\item \link{`download_narr_p_levels`}: \code{"narr_p_levels"}, \code{"p_levels"}, \code{"plevels"}
+\item \link{`download_nlcd`}: \code{"nlcd"}, \code{"NLCD"}
+\item \link{`download_hms`}: \code{"noaa"}, \code{"smoke"}, \code{"hms"}
+\item \link{`download_sedac_groads`}: \code{"sedac_groads"}, \code{"groads"}
+\item \link{`download_sedac_population`}: \code{"sedac_population"}, \code{"population"}
+\item \link{`download_modis`}: \code{"modis"}, \code{"MODIS"}
+\item \link{`download_tri`}: \code{"tri"}, \code{"TRI"}
+\item \link{`download_nei`}: \code{"nei"}, \code{"NEI"}
+\item \link{`download_gridmet`}: \code{"gridMET"}, \code{"gridmet"}
+\item \link{`download_terraclimate`}: \code{"TerraClimate"}, \code{"terraclimate"}
 }
 }
 \author{

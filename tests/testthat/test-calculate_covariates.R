@@ -34,10 +34,20 @@ testthat::test_that("calc_koppen_geiger works well", {
   )
   # the result is a data frame
   testthat::expect_s3_class(kg_res, "data.frame")
-  # ncol is equal to 6
-  testthat::expect_equal(ncol(kg_res), 6)
+  # ncol is equal to 7
+  testthat::expect_equal(ncol(kg_res), 7)
   # should have only one climate zone
-  testthat::expect_equal(sum(unlist(kg_res[, -1])), 1)
+  testthat::expect_equal(sum(unlist(kg_res[, c(-1, -2)])), 1)
+  # with included geometry
+  testthat::expect_no_error(
+    kg_geom <- calc_koppen_geiger(
+      from = kgras,
+      locs = sf::st_as_sf(site_faux),
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(ncol(kg_geom), 8)
+  testthat::expect_true("geometry" %in% names(kg_geom))
 })
 
 testthat::test_that("calc_dummies works well", {
@@ -141,11 +151,26 @@ testthat::test_that("calc_ecoregion works well", {
   # the result is a data frame
   testthat::expect_s3_class(ecor_res, "data.frame")
   # ncol is equal to 2 + 5 + 2 + 1 + 1
-  testthat::expect_equal(ncol(ecor_res), 3L)
+  testthat::expect_equal(ncol(ecor_res), 4L)
   # should have each of the indicator groups
   dum_cn <- grep("DUM_", colnames(ecor_res))
   testthat::expect_equal(
     sum(unlist(ecor_res[, dum_cn])), 2L
+  )
+  
+  testthat::expect_no_error(
+    ecor_geom <- calc_ecoregion(
+      from = erras,
+      locs = site_faux,
+      locs_id = "site_id",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(ecor_geom), 5
+  )
+  testthat::expect_true(
+    "geometry" %in% names(ecor_geom)
   )
 })
 
@@ -415,10 +440,10 @@ testthat::test_that("Check calc_nlcd works", {
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
 
-  point_us1 <- cbind(lon = -114.7, lat = 38.9, dem = 40)
-  point_us2 <- cbind(lon = -114, lat = 39, dem = 15)
-  point_ak <- cbind(lon = -155.997, lat = 69.3884, dem = 100) # alaska
-  point_fr <- cbind(lon = 2.957, lat = 43.976, dem = 15) # france
+  point_us1 <- cbind(lon = -114.7, lat = 38.9, id = 1)
+  point_us2 <- cbind(lon = -114, lat = 39, id = 2)
+  point_ak <- cbind(lon = -155.997, lat = 69.3884, id = 3) # alaska
+  point_fr <- cbind(lon = 2.957, lat = 43.976, id = 4) # france
   eg_data <- rbind(point_us1, point_us2, point_ak, point_fr) |>
     as.data.frame() |>
     terra::vect(crs = "EPSG:4326")
@@ -471,7 +496,8 @@ testthat::test_that("Check calc_nlcd works", {
   )
   testthat::expect_error(
     calc_nlcd(locs = 12,
-              from = nlcdras)
+              from = nlcdras),
+    "`locs` is not a `SpatVector`, `sf`, or `data.frame` object."
   )
   testthat::expect_error(
     calc_nlcd(locs = eg_data,
@@ -497,35 +523,53 @@ testthat::test_that("Check calc_nlcd works", {
   testthat::expect_no_error(
     calc_nlcd(
       locs = eg_data,
+      locs_id = "id",
       from = nlcdras,
       radius = buf_radius
     )
   )
   output <- calc_nlcd(
     locs = eg_data,
+    locs_id = "id",
     radius = buf_radius,
     from = nlcdras
   )
-  # -- returns a SpatVector
-  testthat::expect_equal(class(output)[1], "SpatVector")
-  # -- crs is the same than input
-  testthat::expect_true(terra::same.crs(eg_data, output))
+  # -- returns a data.frame
+  testthat::expect_equal(class(output)[1], "data.frame")
   # -- out-of-mainland-US points removed (France and Alaska)
   testthat::expect_equal(nrow(output), 2)
-  # -- initial names are still in the output SpatVector
+  # -- initial names are still in the output data.frame
   testthat::expect_true(all(names(eg_data) %in% names(output)))
   # -- check the value of some of the points in the US
   testthat::expect_equal(
-    output$LDU_TEFOR_0_03000[1], 0.7940682, tolerance = 1e-7
+    output$LDU_TEFOR_0_03000[2], 0.7940682, tolerance = 1e-7
   )
   testthat::expect_equal(
-    output$LDU_TSHRB_0_03000[2], 0.9987249, tolerance = 1e-7
+    output$LDU_TSHRB_0_03000[1], 0.9987249, tolerance = 1e-7
   )
   # -- class fraction rows should sum to 1
   testthat::expect_equal(
-    rowSums(as.data.frame(output[, 2:(ncol(output) - 1)])),
+    rowSums(as.data.frame(output[, 3:(ncol(output))])),
     rep(1, 2),
     tolerance = 1e-7
+  )
+  # without geometry will have 11 columns
+  expect_equal(
+    ncol(output), 11
+  )
+  output_geom <- calc_nlcd(
+    locs = eg_data,
+    locs_id = "id",
+    radius = buf_radius,
+    from = nlcdras,
+    geom = TRUE
+  )
+  # with geometry will have 12 columns
+  expect_equal(
+    ncol(output_geom), 12
+  )
+  expect_true(
+    "geometry" %in% names(output_geom)
   )
 })
 
@@ -933,15 +977,37 @@ testthat::test_that("calc_gmted returns expected.", {
         )
         # expect 2 columns
         expect_true(
-          ncol(gmted_covariate) == 2
+          ncol(gmted_covariate) == 3
         )
         # expect numeric value
         expect_true(
-          class(gmted_covariate[, 2]) == "numeric"
+          class(gmted_covariate[, 3]) == "numeric"
         )
       }
     }
   }
+  testthat::expect_no_error(
+    gmted <- process_gmted(
+      variable = c("Breakline Emphasis", "7.5 arc-seconds"),
+      testthat::test_path(
+        "..", "testdata", "gmted", "be75_grd"
+      )
+    )
+  )
+  testthat::expect_no_error(
+    gmted_geom <- calc_gmted(
+      gmted,
+      ncp,
+      "site_id",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(gmted_geom), 4
+  )
+  testthat::expect_true(
+    "geometry" %in% names(gmted_geom)
+  )
 })
 
 testthat::test_that("calc_narr returns expected.", {
@@ -1174,6 +1240,23 @@ testthat::test_that("groads calculation works", {
 
   # expect data.frame
   testthat::expect_s3_class(groads_res, "data.frame")
+  
+  # return with geometry
+  testthat::expect_no_error(
+    groads_geom <- calc_sedac_groads(
+      from = groads,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 5000,
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(groads_geom), 5
+  )
+  testthat::expect_true(
+    "geometry" %in% names(groads_geom)
+  )
 })
 
 testthat::test_that("calc_merra2 returns as expected.", {
@@ -1196,7 +1279,7 @@ testthat::test_that("calc_merra2 returns as expected.", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_geos)
+    is.function(calc_merra2)
   )
   for (c in seq_along(collections)) {
     collection <- collections[c]
@@ -1524,4 +1607,18 @@ testthat::test_that("calc_covariates wrapper works", {
       calc_covariates(covariate = cand)
     )
   }
+})
+
+testthat::test_that("calc_check_time identifies missing `time` column.", {
+  testthat::expect_error(
+    # provide integer instead of data.frame to provoke error
+    calc_check_time(12, TRUE)
+  )
+  testthat::expect_message(
+    # provide data.frame without time to provoke message
+    calc_check_time(
+      data.frame(x = 10, y = 20),
+      true
+    )
+  )
 })

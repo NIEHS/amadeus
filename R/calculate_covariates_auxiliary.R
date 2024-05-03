@@ -40,6 +40,14 @@ calc_setcolumns <- function(
   )
   stopifnot(length(time_index) <= 1)
   names_return[time_index] <- "time"
+  #### description (for time period coverage)
+  description_index <- which(names_from == "description")
+  stopifnot(length(description_index) <= 1)
+  names_return[description_index] <- "description"
+  #### geometry
+  geometry_index <- which(names_from == "geometry")
+  stopifnot(length(geometry_index) <= 1)
+  names_return[geometry_index] <- "geometry"
   #### latitude and longitude
   lat_index <- which(
     tolower(names_from) %in% c("lat", "latitude")
@@ -65,7 +73,10 @@ calc_setcolumns <- function(
   genre <- substr(dataset, 1, 3)
   #### covariates
   cov_index <- which(
-    !(c(names_from %in% c(locs_id, "time", "lat", "lon", "level")))
+    !(c(names_from %in% c(
+      locs_id, "geometry", "time", "lat", "lon", "level", "description"
+      ))
+    )
   )
   for (c in seq_along(cov_index)) {
     name_covariate <- names_return[cov_index[c]]
@@ -196,6 +207,8 @@ calc_message <- function(
 #' Passed from \code{calc_\*()}.
 #' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0). Passed from \code{calc_\*()}.
+#' @param geom logical(1). Should the geometry of `locs` be returned in the
+#' `data.frame`? Default is `FALSE`.
 #' @return A `list` containing `SpatVector` and `data.frame` objects
 #' @seealso [`process_locs_vector()`], [`check_for_null_parameters()`]
 #' @keywords internal
@@ -206,20 +219,34 @@ calc_prepare_locs <- function(
     from,
     locs,
     locs_id,
-    radius) {
+    radius,
+    geom = FALSE) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
+  if (!locs_id %in% names(locs)) {
+    stop(sprintf("locs should include columns named %s.\n",
+                 locs_id)
+    )
+  }
   #### prepare sites
   sites_e <- process_locs_vector(
     locs,
     terra::crs(from),
     radius
   )
+  #### site identifiers and geometry
+  if (geom) {
+    sites_id <- subset(
+      terra::as.data.frame(sites_e, geom = "WKT"),
+      select = c(locs_id, "geometry")
+    )
+  } else {
   #### site identifiers only
-  sites_id <- subset(
-    terra::as.data.frame(sites_e),
-    select = locs_id
-  )
+    sites_id <- subset(
+      terra::as.data.frame(sites_e),
+      select = locs_id
+    )
+  }
   return(list(sites_e, sites_id))
 }
 
@@ -229,8 +256,9 @@ calc_prepare_locs <- function(
 #' value.
 #' @param time Time value
 #' @param format Type of time to return in the `$time` column. Can be
-#' "timeless" (ie. GMTED data), "date" (ie. NARR data), "hour", (ie. GEOS data),
-#' "year" (ie. SEDAC population data), or "yearmonth" (ie. TerraClimate data).
+#' "timeless" (ie. Ecoregions data), "date" (ie. NARR data), "hour"
+#' (ie. GEOS data), "year" (ie. SEDAC population data), or "yearmonth"
+#' (ie. TerraClimate data).
 #' @return a `Date`, `POSIXt`, or `integer` object based on `format =`
 #' @keywords internal
 #' @export
@@ -240,19 +268,22 @@ calc_time <- function(
   if (format == "timeless") {
     return()
   } else if (format == "date") {
-    return_time <- as.Date(
+    return_time <- as.POSIXlt(
       time,
-      format = "%Y%m%d"
+      format = "%Y%m%d",
+      tz = "UTC"
     )
   } else if (format == "hour") {
-    return_time <- ISOdatetime(
-      year = substr(time[1], 1, 4),
-      month = substr(time[1], 5, 6),
-      day = substr(time[1], 7, 8),
-      hour = substr(time[2], 1, 2),
-      min = substr(time[2], 3, 4),
-      sec = substr(time[2], 5, 6),
-      tz = "UTC"
+    return_time <- as.POSIXlt(
+      ISOdatetime(
+        year = substr(time[1], 1, 4),
+        month = substr(time[1], 5, 6),
+        day = substr(time[1], 7, 8),
+        hour = substr(time[2], 1, 2),
+        min = substr(time[2], 3, 4),
+        sec = substr(time[2], 5, 6),
+        tz = "UTC"
+      )
     )
   } else if (format %in% c("yearmonth", "year")) {
     return_time <- as.integer(time)
@@ -260,7 +291,35 @@ calc_time <- function(
   return(return_time)
 }
 
-#' Peform covariate extraction
+#' Check time values
+#' @description
+#' Check the time values within calculated covariates `data.frame`
+#' @param covar data.frame(1). Calculated covariates `data.frame`.
+#' @param POSIXt logical(1). Should the time values in `covar` be of class
+#' `POSIXt`? If `FALSE`, the time values will be checked for integer class
+#' (year and year-month).
+#' @return NULL
+#' @keywords internal
+#' @export
+calc_check_time <- function(
+    covar,
+    POSIXt = TRUE
+) {
+  stopifnot(methods::is(covar, "data.frame"))
+  if ("time" %in% names(covar)) {
+    if (POSIXt) {
+      stopifnot(methods::is(covar$time), "POSIXt")
+    } else {
+      stopifnot(methods::is(covar$time), "integer")
+    }
+  } else {
+    message(
+      "`$time` not detected in `data.frame` provided.\n"
+    )
+  }
+}
+
+#' Perform covariate extraction
 #' @description
 #' Extract covariate values from `SpatRaster` object passed from
 #' \code{process_*()}.
@@ -281,8 +340,15 @@ calc_time <- function(
 #' pressure level value (if applicable). Default = `NULL`.
 #' @param radius integer(1). Buffer distance (m). Passed from
 #' \code{calc_prepare_locs()}. Used in column naming.
+#' @param max_cells integer(1). Maximum number of cells to be read at once.
+#' Higher values will expedite processing, but will increase memory usage.
+#' Maximum possible value is `2^31 - 1`.
+#' See [`exactextractr::exact_extract`] for details.
+#' @param ... Placeholders.
 #' @importFrom terra nlyr
 #' @importFrom terra extract
+#' @importFrom exactextractr exact_extract
+#' @importFrom sf st_as_sf
 #' @return a `data.frame` object
 #' @keywords internal
 #' @export
@@ -296,7 +362,9 @@ calc_worker <- function(
     time,
     time_type = c("date", "hour", "year", "yearmonth", "timeless"),
     radius,
-    level = NULL) {
+    level = NULL,
+    max_cells = 1e8,
+    ...) {
   #### empty location data.frame
   sites_extracted <- NULL
   time_type <- match.arg(time_type)
@@ -330,15 +398,28 @@ calc_worker <- function(
       level = data_level
     )
     #### extract layer data at sites
-    sites_extracted_layer <- terra::extract(
-      data_layer,
-      locs_vector,
-      fun = fun,
-      method = "simple",
-      ID = FALSE,
-      bind = FALSE,
-      na.rm = TRUE
-    )
+    if (terra::geomtype(locs_vector) == "polygons") {
+      ### apply exactextractr::exact_extract for polygons
+      sites_extracted_layer <- exactextractr::exact_extract(
+        data_layer,
+        sf::st_as_sf(locs_vector),
+        progress = FALSE,
+        force_df = TRUE,
+        fun = fun,
+        max_cells_in_memory = max_cells,
+        ...
+      )
+    } else if (terra::geomtype(locs_vector) == "points") {
+      #### apply terra::extract for points
+      sites_extracted_layer <- terra::extract(
+        data_layer,
+        locs_vector,
+        method = "simple",
+        ID = FALSE,
+        bind = FALSE,
+        na.rm = TRUE
+      )
+    }
     # merge with site_id, time, and pressure levels (if applicable)
     if (time_type == "timeless") {
       sites_extracted_layer <- cbind(
@@ -373,7 +454,11 @@ calc_worker <- function(
         sites_extracted_layer <- cbind(
           locs_df,
           data_time,
-          data_level,
+          gsub(
+            "level=|lev=",
+            "",
+            data_level
+          ),
           sites_extracted_layer
         )
         colnames(sites_extracted_layer) <- c(

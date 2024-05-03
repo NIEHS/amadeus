@@ -4,7 +4,7 @@
 \alias{calc_ecoregion}
 \title{Calculate ecoregions covariates}
 \usage{
-calc_ecoregion(from = NULL, locs, locs_id = "site_id", ...)
+calc_ecoregion(from = NULL, locs, locs_id = "site_id", geom = FALSE, ...)
 }
 \arguments{
 \item{from}{SpatVector(1). Output of \code{\link{process_ecoregion}}.}
@@ -13,6 +13,13 @@ calc_ecoregion(from = NULL, locs, locs_id = "site_id", ...)
 a unique identifier field named \code{locs_id}}
 
 \item{locs_id}{character(1). Name of unique identifier.}
+
+\item{geom}{logical(1). Should the geometry of \code{locs} be returned in the
+\code{data.frame}? Default is \code{FALSE}. If \code{geom = TRUE} and \code{locs} contain
+polygon geometries, the \verb{$geometry} column in the returned data frame may
+make the \code{data.frame} difficult to read due to long geometry strings. The
+coordinate reference system of the \verb{$geometry} is the coordinate
+reference system of \code{from}.}
 
 \item{...}{Placeholders.}
 }
