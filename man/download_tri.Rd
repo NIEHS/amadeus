@@ -32,7 +32,7 @@ will download all of the requested data files.}
 the text file containing download commands.}
 }
 \value{
-NULL; Yearly comma-separated value (CSV) files will be stored in
+NULL; Comma-separated value (CSV) files will be stored in
 \code{directory_to_save}.
 }
 \description{

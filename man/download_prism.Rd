@@ -63,8 +63,8 @@ Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 }
 \value{
-NULL; .bil (normals) or single grid files depending on the format choice.
-\code{directory_to_save}.
+NULL; .bil (normals) or single grid files depending on the format
+choice will be stored in \code{directory_to_save}.
 }
 \description{
 Accesses and downloads Oregon State University's

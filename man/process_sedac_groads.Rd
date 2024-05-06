@@ -20,7 +20,7 @@ returning a single \code{SpatVector} object.
 }
 \note{
 U.S. context. The returned \code{SpatVector} object contains a
-\verb{$time} column to represent the temporal range covered by the
+\verb{$description} column to represent the temporal range covered by the
 dataset. For more information, see \url{https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata}.
 }
 \author{

@@ -16,7 +16,7 @@ calc_modis_par(
   nthreads = floor(length(parallelly::availableWorkers())/2),
   package_list_add = NULL,
   export_list_add = NULL,
-  max_cells = 1e+08,
+  max_cells = 3e+07,
   ...
 )
 }
@@ -40,7 +40,8 @@ The calculated covariate names will have a form of
 e.g., 'MOD_NDVIF_0_50000' where 50 km radius circular buffer
 was used to calculate mean NDVI value.}
 
-\item{subdataset}{Index or search pattern of subdataset.}
+\item{subdataset}{Indices, names, or search patterns for subdatasets.
+Find detail usage of the argument in notes.}
 
 \item{fun_summary}{character or function. Function to summarize
 extracted raster values.}
@@ -84,26 +85,36 @@ Common arguments in \code{preprocess} functions such as \code{date} and \code{pa
 automatically detected and passed to the function. Please note that
 \code{locs} here and \code{path} in \code{preprocess} functions are assumed to have a
 standard naming convention of raw files from NASA.
+The argument \code{subdataset} should be in a proper format
+depending on \code{preprocess} function:
+\itemize{
+\item \code{process_modis_merge()}: Regular expression pattern.
+e.g., \code{"^LST_"}
+\item \code{process_modis_swath()}: Subdataset names.
+e.g., \code{c("Cloud_Fraction_Day", "Cloud_Fraction_Night")}
+\item \code{process_bluemarble()}: Subdataset number.
+e.g., for VNP46A2 product, 3L.
+}
 }
 \seealso{
 See details for setting parallelization:
 \itemize{
-\item \code{\link[foreach:foreach]{foreach::foreach}}
-\item \code{\link[parallelly:makeClusterPSOCK]{parallelly::makeClusterPSOCK}}
-\item \code{\link[parallelly:availableCores]{parallelly::availableCores}}
-\item \code{\link[doParallel:registerDoParallel]{doParallel::registerDoParallel}}
+\item \code{\link[future:plan]{future::plan()}}
+\item \code{\link[future.apply:future_lapply]{future.apply::future_lapply()}}
+\item \code{\link[parallelly:makeClusterPSOCK]{parallelly::makeClusterPSOCK()}}
+\item \code{\link[parallelly:availableCores]{parallelly::availableCores()}}
 }
 
 This function leverages the calculation of single-day MODIS
 covariates:
 \itemize{
-\item \code{\link{calc_modis_daily}}
+\item \code{\link[=calc_modis_daily]{calc_modis_daily()}}
 }
 
-Also, for preprocessing, see:
+Also, for preprocessing, please refer to:
 \itemize{
-\item \code{\link{process_modis_merge}}
-\item \code{\link{process_modis_swath}}
-\item \code{\link{process_bluemarble}}
+\item \code{\link[=process_modis_merge]{process_modis_merge()}}
+\item \code{\link[=process_modis_swath]{process_modis_swath()}}
+\item \code{\link[=process_bluemarble]{process_bluemarble()}}
 }
 }

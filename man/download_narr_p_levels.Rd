@@ -40,7 +40,7 @@ Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 }
 \value{
-NULL; Monthly netCDF (.nc) files will be stored in
+NULL; netCDF (.nc) files will be stored in
 \code{directory_to_save}.
 }
 \description{

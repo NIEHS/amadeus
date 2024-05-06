@@ -47,8 +47,8 @@ the text file containing download commands.}
 Default is \code{FALSE}.}
 }
 \value{
-NULL; Yearly comma-separated value (CSV) files will be stored in
-\code{directory_to_save}.
+NULL; Zip and/or data files will be downloaded and stored in
+respective sub-directories within \code{directory_to_save}.
 }
 \description{
 The \code{download_nei()} function accesses and downloads road emissions data from the \href{https://www.epa.gov/air-emissions-inventories/national-emissions-inventory-nei}{U.S Environmental Protection Agency's (EPA) National Emissions Inventory (NEI)}.

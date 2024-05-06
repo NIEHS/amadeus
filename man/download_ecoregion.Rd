@@ -42,11 +42,12 @@ the text file containing download commands.}
 
 \item{unzip}{logical(1). Unzip zip files. Default \code{TRUE}.}
 
-\item{remove_zip}{logical(1). Remove zip file from directory_to_download.
-Default \code{FALSE}.}
+\item{remove_zip}{logical(1). Remove zip file from
+\code{directory_to_download}. Default \code{FALSE}.}
 }
 \value{
-NULL;
+NULL; Zip and/or data files will be downloaded and stored in
+\code{directory_to_save}.
 }
 \description{
 The \code{download_ecoregion()} function accesses and downloads United States Ecoregions data from the \href{https://www.epa.gov/eco-research/ecoregions}{U.S. Environmental Protection Agency's (EPA) Ecorgions}. Level 3 data, where all pieces of information in the higher levels are included, are downloaded.

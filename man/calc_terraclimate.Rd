@@ -5,12 +5,12 @@
 \title{Calculate TerraClimate covariates}
 \usage{
 calc_terraclimate(
-  from,
-  locs,
+  from = NULL,
+  locs = NULL,
   locs_id = NULL,
   radius = 0,
   fun = "mean",
-  geom = geom,
+  geom = FALSE,
   ...
 )
 }

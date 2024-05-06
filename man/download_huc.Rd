@@ -38,7 +38,7 @@ the text file containing download commands.}
 Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.}
 }
 \value{
-None. Downloaded files will be stored in \code{directory_to_save}.
+NULL. Downloaded files will be stored in \code{directory_to_save}.
 }
 \description{
 NHDPlus data provides the most comprehensive and high-resolution

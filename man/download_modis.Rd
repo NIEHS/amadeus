@@ -56,7 +56,7 @@ large and use lots of machine storage and memory.}
 the text file containing download commands.}
 }
 \value{
-NULL; Raw HDF (.hdf) files will be stored in
+NULL; HDF (.hdf) files will be stored in
 \code{directory_to_save}.
 }
 \description{

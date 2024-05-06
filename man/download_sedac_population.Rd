@@ -49,9 +49,8 @@ the text file containing download commands.}
 Default is \code{FALSE}.}
 }
 \value{
-NULL; Zip files and unzipped data files will be stored in
-"/zip_files" and "/data_files" sub-directories, respectively, within the
-\code{directory_to_save}.
+NULL; Zip and/or data files will be downloaded and stored in
+respective sub-directories within \code{directory_to_save}.
 }
 \description{
 The \code{download_sedac_population()} function accesses and downloads

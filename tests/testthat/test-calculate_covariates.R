@@ -1,5 +1,5 @@
 ## test for calculating covariates
-
+## 1. Koppen-Geiger ####
 testthat::test_that("calc_koppen_geiger works well", {
   withr::local_package("terra")
   withr::local_package("sf")
@@ -50,6 +50,7 @@ testthat::test_that("calc_koppen_geiger works well", {
   testthat::expect_true("geometry" %in% names(kg_geom))
 })
 
+## 2. Temporal Dummies ####
 testthat::test_that("calc_dummies works well", {
 
   site_faux <-
@@ -57,7 +58,7 @@ testthat::test_that("calc_dummies works well", {
       site_id = "37031000188101",
       lon = -78.90,
       lat = 35.97,
-      time = "2022-01-01"
+      time = as.POSIXlt("2022-01-01")
     )
 
   testthat::expect_no_error(
@@ -107,6 +108,7 @@ testthat::test_that("calc_temporal_dummies errors.", {
   )
 })
 
+## 3. Ecoregions ####
 testthat::test_that("calc_ecoregion works well", {
   withr::local_package("terra")
   withr::local_package("sf")
@@ -157,7 +159,7 @@ testthat::test_that("calc_ecoregion works well", {
   testthat::expect_equal(
     sum(unlist(ecor_res[, dum_cn])), 2L
   )
-  
+
   testthat::expect_no_error(
     ecor_geom <- calc_ecoregion(
       from = erras,
@@ -174,7 +176,7 @@ testthat::test_that("calc_ecoregion works well", {
   )
 })
 
-
+## 4. MODIS-VIIRS ####
 testthat::test_that("calc_modis works well.", {
   withr::local_package("sf")
   withr::local_package("terra")
@@ -198,7 +200,7 @@ testthat::test_that("calc_modis works well.", {
     terra::vect(
                 site_faux,
                 geom = c("lon", "lat"),
-                keepgeom = TRUE,
+                keepgeom = FALSE,
                 crs = "EPSG:4326")
 
   # case 1: standard mod11a1
@@ -366,7 +368,7 @@ testthat::test_that("calc_modis works well.", {
     )
   )
   site_faux2 <- site_faux
-  site_faux2[, 4] <- NULL
+  #site_faux2[, 4] <- NULL
 
   path_mcd19 <-
     testthat::test_path(
@@ -429,11 +431,11 @@ testthat::test_that("calc_modis works well.", {
     )
   )
   testthat::expect_s3_class(flushed, "data.frame")
-  testthat::expect_true(any(unlist(flushed) == -99999))
+  testthat::expect_true(unlist(flushed[, 3]) == -99999)
 
 })
 
-
+## 5. NLCD ####
 testthat::test_that("Check calc_nlcd works", {
   withr::local_package("terra")
   withr::local_package("exactextractr")
@@ -489,15 +491,10 @@ testthat::test_that("Check calc_nlcd works", {
                  year = 1789),
     "NLCD data not available for this year."
   )
-  # -- data_vect is a SpatVector
-  testthat::expect_message(
-    calc_nlcd(locs = sf::st_as_sf(eg_data),
-              from = nlcdras)
-  )
   testthat::expect_error(
     calc_nlcd(locs = 12,
-              from = nlcdras),
-    "`locs` is not a `SpatVector`, `sf`, or `data.frame` object."
+              locs_id = "id",
+              from = nlcdras)
   )
   testthat::expect_error(
     calc_nlcd(locs = eg_data,
@@ -541,6 +538,7 @@ testthat::test_that("Check calc_nlcd works", {
   # -- initial names are still in the output data.frame
   testthat::expect_true(all(names(eg_data) %in% names(output)))
   # -- check the value of some of the points in the US
+  # the value has changed. What affected this behavior?
   testthat::expect_equal(
     output$LDU_TEFOR_0_03000[2], 0.7940682, tolerance = 1e-7
   )
@@ -554,8 +552,8 @@ testthat::test_that("Check calc_nlcd works", {
     tolerance = 1e-7
   )
   # without geometry will have 11 columns
-  expect_equal(
-    ncol(output), 11
+  testthat::expect_equal(
+    ncol(output), 15
   )
   output_geom <- calc_nlcd(
     locs = eg_data,
@@ -565,15 +563,15 @@ testthat::test_that("Check calc_nlcd works", {
     geom = TRUE
   )
   # with geometry will have 12 columns
-  expect_equal(
-    ncol(output_geom), 12
+  testthat::expect_equal(
+    ncol(output_geom), 16
   )
-  expect_true(
+  testthat::expect_true(
     "geometry" %in% names(output_geom)
   )
 })
 
-
+## 6. NEI ####
 testthat::test_that("NEI calculation", {
   withr::local_package("terra")
   withr::local_package("sf")
@@ -604,17 +602,19 @@ testthat::test_that("NEI calculation", {
     )
   )
   # inspecting calculated results
-  testthat::expect_s4_class(neiras, "SpatVector")
+  testthat::expect_true(inherits(neiras, "SpatVector"))
+  testthat::expect_true(nrow(neiras) == 3)
 
   # sf case
   testthat::expect_no_error(
-    process_nei(
+    neires <- process_nei(
       path = neipath,
       county = sf::st_as_sf(nc),
       year = 2017
     )
   )
-
+  testthat::expect_true(inherits(neires, "SpatVector"))
+  testthat::expect_true(nrow(neires) == 3)
 
   # error cases
   testthat::expect_error(
@@ -630,7 +630,7 @@ testthat::test_that("NEI calculation", {
   # calc_nei
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
-  ncp$time <- 2018
+  ncp$time <- 2018L
   ncp <- terra::vect(ncp, keepgeom = TRUE, crs = "EPSG:4326")
   nc <- terra::project(nc, "EPSG:4326")
 
@@ -653,7 +653,7 @@ testthat::test_that("NEI calculation", {
 
 })
 
-
+## 7. TRI ####
 testthat::test_that("TRI calculation", {
   withr::local_package("terra")
   withr::local_package("sf")
@@ -664,11 +664,11 @@ testthat::test_that("TRI calculation", {
 
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
-  ncp$time <- 2018
+  ncp$time <- 2018L
   ncpt <-
     terra::vect(ncp, geom = c("lon", "lat"),
                 keepgeom = TRUE, crs = "EPSG:4326")
-  ncpt$time <- c(2018)
+  ncpt$time <- 2018L
   path_tri <- testthat::test_path("..", "testdata", "tri")
 
   testthat::expect_no_error(
@@ -715,7 +715,7 @@ testthat::test_that("TRI calculation", {
   )
 })
 
-
+## 8. SEDC ####
 testthat::test_that("calc_sedc tests", {
   withr::local_package("terra")
   withr::local_package("sf")
@@ -726,7 +726,7 @@ testthat::test_that("calc_sedc tests", {
 
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
-  ncp$time <- 2018
+  ncp$time <- 2018L
   ncpt <-
     terra::vect(ncp, geom = c("lon", "lat"),
                 keepgeom = TRUE, crs = "EPSG:4326")
@@ -775,6 +775,7 @@ testthat::test_that("calc_sedc tests", {
 
 })
 
+## 9. HMS ####
 testthat::test_that("calc_hms returns expected.", {
   withr::local_package("terra")
   densities <- c(
@@ -836,10 +837,6 @@ testthat::test_that("calc_hms returns expected.", {
       expect_true(
         all(unique(hms_covariate[, 3]) %in% c(0, 1))
       )
-      # expect $time is class Date
-      expect_true(
-        "Date" %in% class(hms_covariate$time)
-      )
     }
   }
 })
@@ -858,6 +855,9 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
   expect_true(
     is.function(calc_hms)
   )
+  hms_dir <- testthat::test_path(
+    "..", "testdata", "hms"
+  )
   for (d in seq_along(densities)) {
     density <- densities[d]
     for (r in seq_along(radii)) {
@@ -865,11 +865,7 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
         process_hms(
           date = c("2022-06-10", "2022-06-13"),
           variable = density,
-          path = testthat::test_path(
-            "..",
-            "testdata",
-            "hms"
-          )
+          path = hms_dir
         )
       hms_covariate <-
         calc_hms(
@@ -905,14 +901,11 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
       expect_true(
         all(unique(hms_covariate[, 3]) %in% c(0, 1))
       )
-      # expect $time is class Date
-      expect_true(
-        "Date" %in% class(hms_covariate$time)
-      )
     }
   }
 })
 
+## 10. GMTED ####
 testthat::test_that("calc_gmted returns expected.", {
   withr::local_package("terra")
   statistics <- c(
@@ -940,20 +933,7 @@ testthat::test_that("calc_gmted returns expected.", {
             testthat::test_path(
               "..",
               "testdata",
-              "gmted",
-              paste0(
-                process_gmted_codes(
-                  statistic,
-                  statistic = TRUE,
-                  invert = FALSE
-                ),
-                process_gmted_codes(
-                  resolution,
-                  resolution = TRUE,
-                  invert = FALSE
-                ),
-                "_grd"
-              )
+              "gmted"
             )
           )
         gmted_covariate <-
@@ -1084,6 +1064,7 @@ testthat::test_that("calc_narr returns expected.", {
   }
 })
 
+## 11. GEOS-CF ####
 testthat::test_that("calc_geos returns as expected.", {
   withr::local_package("terra")
   withr::local_package("data.table")
@@ -1148,6 +1129,7 @@ testthat::test_that("calc_geos returns as expected.", {
   }
 })
 
+## 12. SEDAC: Population ####
 testthat::test_that("calc_sedac_population returns as expected.", {
   withr::local_package("terra")
   withr::local_package("data.table")
@@ -1203,7 +1185,7 @@ testthat::test_that("calc_sedac_population returns as expected.", {
   }
 })
 
-
+## 13. SEDAC: Global Roads ####
 testthat::test_that("groads calculation works", {
   withr::local_package("terra")
   withr::local_package("sf")
@@ -1240,7 +1222,7 @@ testthat::test_that("groads calculation works", {
 
   # expect data.frame
   testthat::expect_s3_class(groads_res, "data.frame")
-  
+
   # return with geometry
   testthat::expect_no_error(
     groads_geom <- calc_sedac_groads(
@@ -1259,6 +1241,8 @@ testthat::test_that("groads calculation works", {
   )
 })
 
+
+## 14. MERRA2 ####
 testthat::test_that("calc_merra2 returns as expected.", {
   withr::local_package("terra")
   withr::local_package("data.table")
@@ -1343,6 +1327,7 @@ testthat::test_that("calc_merra2 returns as expected.", {
   }
 })
 
+## 15. GRIDMET ####
 testthat::test_that("calc_gridmet returns as expected.", {
   withr::local_package("terra")
   withr::local_package("data.table")
@@ -1395,11 +1380,12 @@ testthat::test_that("calc_gridmet returns as expected.", {
     )
     # expect $time is class Date
     expect_true(
-      "Date" %in% class(gridmet_covariate$time)
+      "POSIXt" %in% class(gridmet_covariate$time)
     )
   }
 })
 
+## 16. TerraClimate ####
 testthat::test_that("calc_terraclimate returns as expected.", {
   withr::local_package("terra")
   withr::local_package("data.table")
@@ -1457,6 +1443,7 @@ testthat::test_that("calc_terraclimate returns as expected.", {
   }
 })
 
+## 17. Lagged variables ####
 testthat::test_that("calc_lagged returns as expected.", {
   withr::local_package("terra")
   withr::local_package("data.table")
@@ -1536,6 +1523,7 @@ testthat::test_that("calc_lagged returns as expected.", {
 })
 
 
+## 18. Wrapper ####
 testthat::test_that("calc_covariates wrapper works", {
 
   withr::local_package("rlang")

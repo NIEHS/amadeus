@@ -311,7 +311,8 @@ process_locs_radius <-
     } else if (radius > 0) {
       sites_buffer <- terra::buffer(
         locs,
-        radius
+        radius,
+        quadsegs = 180L
       )
       return(sites_buffer)
     }

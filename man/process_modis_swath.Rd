@@ -18,13 +18,17 @@ process_modis_swath(
 
 \item{date}{character(1). Date to query.}
 
-\item{subdataset}{character. Subdatasets to process.}
+\item{subdataset}{character. Subdatasets to process.
+\strong{Unlike other preprocessing functions, this argument should specify
+the exact subdataset name.} For example, when using MOD06_L2 product,
+one may specify \code{c("Cloud_Fraction", "Cloud_Optical_Thickness")},
+etc. The subdataset names can be found in \code{terra::describe()} output.}
 
 \item{suffix}{character(1). Should be formatted \verb{:\{product\}:},
 e.g., \verb{:mod06:}}
 
 \item{resolution}{numeric(1). Resolution of output raster.
-Unit is degree.}
+Unit is degree (decimal degree in WGS84).}
 
 \item{...}{For internal use.}
 }
@@ -47,10 +51,10 @@ the full path to the hdf file.
 }
 \seealso{
 \itemize{
-\item \code{\link{process_modis_warp}}
+\item \code{\link[=process_modis_warp]{process_modis_warp()}}, \code{\link[stars:read_stars]{stars::read_stars()}}, \code{\link[stars:st_warp]{stars::st_warp()}}
 \item \href{https://gdal.org/drivers/raster/hdf4.html}{GDAL HDF4 driver documentation}
-\item \code{\link[terra:describe]{terra::describe}}: to list the full subdataset list with \code{sds = TRUE}
-\item \code{\link[terra:sprc]{terra::sprc}}, \code{\link[terra:rast]{terra::rast}}
+\item \code{\link[terra:describe]{terra::describe()}}: to list the full subdataset list with \code{sds = TRUE}
+\item \code{\link[terra:sprc]{terra::sprc()}}, \code{\link[terra:rast]{terra::rast()}}
 }
 }
 \author{

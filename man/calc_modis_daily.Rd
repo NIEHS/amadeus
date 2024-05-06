@@ -12,7 +12,7 @@ calc_modis_daily(
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
-  max_cells = 1e+08,
+  max_cells = 3e+07,
   ...
 )
 }
@@ -54,6 +54,13 @@ select files of scope on the date of interest.
 Please note that this function does not provide a function to filter
 swaths or tiles, so it is strongly recommended to check and pre-filter
 the file names at users' discretion.
+}
+\seealso{
+\itemize{
+\item Preprocessing: \code{\link[=process_modis_merge]{process_modis_merge()}}, \code{\link[=process_modis_swath]{process_modis_swath()}},
+\code{\link[=process_bluemarble]{process_bluemarble()}}
+\item Parallelization: \code{\link[=calc_modis_par]{calc_modis_par()}}
+}
 }
 \author{
 Insang Song

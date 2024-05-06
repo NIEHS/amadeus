@@ -75,7 +75,7 @@ calc_setcolumns <- function(
   cov_index <- which(
     !(c(names_from %in% c(
       locs_id, "geometry", "time", "lat", "lon", "level", "description"
-      ))
+    ))
     )
   )
   for (c in seq_along(cov_index)) {
@@ -119,7 +119,7 @@ calc_setcolumns <- function(
   }
   #### check for unique names
   stopifnot(length(names_return) == length(unique(names_return)))
-  colnames(from) <- names_return
+  colnames(from) <- toupper(names_return)
   return(from)
 }
 
@@ -241,7 +241,7 @@ calc_prepare_locs <- function(
       select = c(locs_id, "geometry")
     )
   } else {
-  #### site identifiers only
+    #### site identifiers only
     sites_id <- subset(
       terra::as.data.frame(sites_e),
       select = locs_id
@@ -302,15 +302,15 @@ calc_time <- function(
 #' @keywords internal
 #' @export
 calc_check_time <- function(
-    covar,
-    POSIXt = TRUE
+  covar,
+  POSIXt = TRUE
 ) {
   stopifnot(methods::is(covar, "data.frame"))
   if ("time" %in% names(covar)) {
     if (POSIXt) {
-      stopifnot(methods::is(covar$time), "POSIXt")
+      stopifnot(all(sapply(covar$time, methods::is, "POSIXt")))
     } else {
-      stopifnot(methods::is(covar$time), "integer")
+      stopifnot(all(sapply(covar$time, methods::is, "integer")))
     }
   } else {
     message(
@@ -388,6 +388,8 @@ calc_worker <- function(
     #### extract level (if applicable)
     if (!is.null(level)) {
       data_level <- data_split[level]
+    } else {
+      data_level <- ""
     }
     #### message
     calc_message(
@@ -406,8 +408,7 @@ calc_worker <- function(
         progress = FALSE,
         force_df = TRUE,
         fun = fun,
-        max_cells_in_memory = max_cells,
-        ...
+        max_cells_in_memory = max_cells
       )
     } else if (terra::geomtype(locs_vector) == "points") {
       #### apply terra::extract for points

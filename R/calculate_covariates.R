@@ -178,9 +178,9 @@ calc_koppen_geiger <-
       class_kg = kg_class
     )
 
-    locs_kg_extract[[locs_id]] <- locs_df[,1]
+    locs_kg_extract[[locs_id]] <- locs_df[, 1]
     if (geom) {
-      locs_kg_extract$geometry <- locs_df[,2]
+      locs_kg_extract$geometry <- locs_df[, 2]
     }
     colnames(locs_kg_extract)[2] <- "value"
     locs_kg_extract_e <- merge(locs_kg_extract, kg_colclass, by = "value")
@@ -289,7 +289,7 @@ calc_nlcd <- function(from,
   if (!methods::is(from, "SpatRaster")) {
     stop("from is not a SpatRaster.")
   }
-  
+
   # prepare locations
   locs_prepared <- calc_prepare_locs(
     from = from,
@@ -300,7 +300,7 @@ calc_nlcd <- function(from,
   )
   locs_vector <- locs_prepared[[1]]
   locs_df <- locs_prepared[[2]]
-  
+
   year <- try(as.integer(terra::metags(from, name = "year")))
   # select points within mainland US and reproject on nlcd crs if necessary
   us_main <-
@@ -313,10 +313,10 @@ calc_nlcd <- function(from,
     terra::project(y = terra::crs(from))
 
   # subset locs_df to those in us extent
-  locs_df <- locs_df[
+  locs_dfs <- locs_df[
     unlist(locs_df[[locs_id]]) %in% unlist(data_vect_b[[locs_id]]),
-    ]
-  
+  ]
+
   # create circle buffers with buf_radius
   bufs_pol <- terra::buffer(data_vect_b, width = radius) |>
     sf::st_as_sf() |>
@@ -330,7 +330,8 @@ calc_nlcd <- function(from,
       stack_apply = TRUE,
       force_df = TRUE,
       progress = FALSE,
-      max_cells_in_memory = max_cells)
+      max_cells_in_memory = max_cells
+    )
 
   # select only the columns of interest
   cfpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
@@ -345,7 +346,7 @@ calc_nlcd <- function(from,
   # change column names
   nlcd_names <- names(nlcd_at_bufs)
   nlcd_names <- sub(pattern = "frac_", replacement = "", x = nlcd_names)
-  nlcd_names <- as.numeric(nlcd_names)
+  nlcd_names <- sort(as.numeric(nlcd_names))
   nlcd_names <- nlcd_classes[nlcd_classes$value %in% nlcd_names, c("class")]
   new_names <- sapply(
     nlcd_names,
@@ -355,7 +356,7 @@ calc_nlcd <- function(from,
   )
   names(nlcd_at_bufs) <- new_names
   # merge locs_df with nlcd class fractions
-  new_data_vect <- cbind(locs_df, as.integer(year), nlcd_at_bufs)
+  new_data_vect <- cbind(locs_dfs, as.integer(year), nlcd_at_bufs)
   if (geom) {
     names(new_data_vect)[1:3] <- c(locs_id, "geometry", "time")
   } else {
@@ -415,7 +416,7 @@ calc_ecoregion <-
     )
     locs <- locs_prepared[[1]]
     locs_df <- locs_prepared[[2]]
-    
+
     locs_in <- terra::intersect(locs, from)
     locs_out <-
       locs[!unlist(locs[[locs_id]]) %in% unlist(locs_in[[locs_id]]), ]
@@ -441,7 +442,6 @@ calc_ecoregion <-
     key3_num <- sprintf("DUM_E3%03d_0_00000", key3_num)
     key3_num_unique <- sort(unique(key3_num))
 
-
     df_lv2 <-
       split(key2_num_unique, key2_num_unique) |>
       lapply(function(x) {
@@ -462,7 +462,8 @@ calc_ecoregion <-
     locs_ecoreg <- cbind(
       locs_df,
       paste0("1997 - ", data.table::year(Sys.Date())),
-      df_lv2, df_lv3)
+      df_lv2, df_lv3
+    )
     if (geom) {
       names(locs_ecoreg)[3] <- "description"
     } else {
@@ -499,6 +500,10 @@ calc_ecoregion <-
 #' Please note that this function does not provide a function to filter
 #' swaths or tiles, so it is strongly recommended to check and pre-filter
 #' the file names at users' discretion.
+#' @seealso
+#' * Preprocessing: [process_modis_merge()], [process_modis_swath()],
+#'     [process_bluemarble()]
+#' * Parallelization: [calc_modis_par()]
 #' @author Insang Song
 #' @returns A data.frame object.
 #' @importFrom terra extract
@@ -518,7 +523,7 @@ calc_modis_daily <- function(
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
-  max_cells = 1e8,
+  max_cells = 3e7,
   ...
 ) {
   if (!any(methods::is(locs, "SpatVector"),
@@ -534,11 +539,7 @@ calc_modis_daily <- function(
                  locs_id)
     )
   }
-  if (!"time" %in% names(locs)) {
-    locs$time <- as.POSIXlt(date)
-  }
-  stopifnot(methods::is(locs$time, "POSIXt"))
-  
+
   extract_with_buffer <- function(
     points,
     surf,
@@ -589,6 +590,7 @@ calc_modis_daily <- function(
   # multiple columns will get proper names
   name_range <- seq(ncol(extracted) - name_offset + 1, ncol(extracted), 1)
   colnames(extracted)[name_range] <- name_extracted
+  extracted$time <- as.POSIXlt(extracted$time)
   calc_check_time(covar = extracted, POSIXt = TRUE)
   return(extracted)
 }
@@ -608,7 +610,8 @@ calc_modis_daily <- function(
 #' '{name_covariates}{zero-padded buffer radius in meters}',
 #' e.g., 'MOD_NDVIF_0_50000' where 50 km radius circular buffer
 #' was used to calculate mean NDVI value.
-#' @param subdataset Index or search pattern of subdataset.
+#' @param subdataset Indices, names, or search patterns for subdatasets.
+#' Find detail usage of the argument in notes.
 #' @param fun_summary character or function. Function to summarize
 #'  extracted raster values.
 #' @param nthreads integer(1). Number of threads to be used
@@ -642,22 +645,28 @@ calc_modis_daily <- function(
 #' automatically detected and passed to the function. Please note that
 #' `locs` here and `path` in `preprocess` functions are assumed to have a
 #' standard naming convention of raw files from NASA.
+#' The argument `subdataset` should be in a proper format
+#' depending on `preprocess` function:
+#' * `process_modis_merge()`: Regular expression pattern.
+#'   e.g., `"^LST_"`
+#' * `process_modis_swath()`: Subdataset names.
+#'   e.g., `c("Cloud_Fraction_Day", "Cloud_Fraction_Night")`
+#' * `process_bluemarble()`: Subdataset number.
+#'   e.g., for VNP46A2 product, 3L.
 #' @seealso See details for setting parallelization:
-#' * [`foreach::foreach`]
-#' * [`parallelly::makeClusterPSOCK`]
-#' * [`parallelly::availableCores`]
-#' * [`doParallel::registerDoParallel`]
+#' * [`future::plan()`]
+#' * [`future.apply::future_lapply()`]
+#' * [`parallelly::makeClusterPSOCK()`]
+#' * [`parallelly::availableCores()`]
 #'
 #' This function leverages the calculation of single-day MODIS
 #' covariates:
-#' * [`calc_modis_daily`]
+#' * [`calc_modis_daily()`]
 #'
-#' Also, for preprocessing, see:
-#' * [`process_modis_merge`]
-#' * [`process_modis_swath`]
-#' * [`process_bluemarble`]
-#' @importFrom foreach foreach
-#' @importFrom foreach %dopar%
+#' Also, for preprocessing, please refer to:
+#' * [`process_modis_merge()`]
+#' * [`process_modis_swath()`]
+#' * [`process_bluemarble()`]
 #' @importFrom methods is
 #' @importFrom sf st_as_sf
 #' @importFrom sf st_drop_geometry
@@ -667,8 +676,8 @@ calc_modis_daily <- function(
 #' @importFrom rlang inject
 #' @importFrom future plan
 #' @importFrom future cluster
+#' @importFrom future.apply future_lapply
 #' @importFrom parallelly availableWorkers
-#' @importFrom doParallel registerDoParallel
 #' @export
 calc_modis_par <-
   function(
@@ -683,7 +692,7 @@ calc_modis_par <-
     nthreads = floor(length(parallelly::availableWorkers()) / 2),
     package_list_add = NULL,
     export_list_add = NULL,
-    max_cells = 1e8,
+    max_cells = 3e7,
     ...
   ) {
     if (!is.function(preprocess)) {
@@ -691,8 +700,9 @@ calc_modis_par <-
 process_modis_swath, or process_bluemarble.")
     }
     # read all arguments
+    # nolint start
     hdf_args <- c(as.list(environment()), list(...))
-
+    # nolint end
     dates_available <-
       regmatches(from, regexpr("A20\\d{2,2}[0-3]\\d{2,2}", from))
     dates_available <- unique(dates_available)
@@ -707,7 +717,7 @@ process_modis_swath, or process_bluemarble.")
     export_list <- c()
     package_list <-
       c("sf", "terra", "exactextractr", "foreach", "data.table", "stars",
-        "dplyr", "parallelly", "doParallel", "rlang")
+        "dplyr", "parallelly", "doParallel", "rlang", "amadeus")
     if (!is.null(export_list_add)) {
       export_list <- append(export_list, export_list_add)
     }
@@ -716,85 +726,93 @@ process_modis_swath, or process_bluemarble.")
     }
 
     # make clusters
-    doParallel::registerDoParallel(cores = nthreads)
-    future::future(future::cluster, workers = nthreads)
-
-    datei <- NULL
+    # doParallel::registerDoParallel(cores = nthreads)
+    if (nthreads == 1) {
+      future::plan(future::sequential)
+    } else {
+      future::plan(future::multisession, workers = nthreads)
+    }
+    # future::future(future::multicore, workers = nthreads)
+    idx_date_available <- seq_along(dates_available)
+    list_date_available <-
+      split(idx_date_available, idx_date_available)
     calc_results <-
-      foreach::foreach(
-        datei = seq_along(dates_available),
-        .packages = package_list,
-        .export = export_list,
-        .combine = dplyr::bind_rows,
-        .errorhandling = "pass",
-        .verbose = TRUE
-      ) %dopar% {
-        options(sf_use_s2 = FALSE)
-        # nolint start
-        day_to_pick <- dates_available[datei]
-        # nolint end
-        day_to_pick <- as.Date(day_to_pick, format = "%Y%j")
+      future.apply::future_lapply(
+        list_date_available,
+        FUN = function (datei) {
+          options(sf_use_s2 = FALSE)
+          # nolint start
+          day_to_pick <- dates_available[datei]
+          # nolint end
+          day_to_pick <- as.Date(day_to_pick, format = "%Y%j")
 
-        radiusindex <- seq_along(radius)
-        radiuslist <- split(radiusindex, radiusindex)
+          radiusindex <- seq_along(radius)
+          radiuslist <- split(radiusindex, radiusindex)
 
-        hdf_args <- append(hdf_args, values = list(date = day_to_pick))
-        hdf_args <- append(hdf_args, values = list(path = hdf_args$from))
-        # unified interface with rlang::inject
-        vrt_today <-
-          rlang::inject(preprocess(!!!hdf_args))
+          hdf_args <- append(hdf_args, values = list(date = day_to_pick))
+          hdf_args <- append(hdf_args, values = list(path = hdf_args$from))
+          # unified interface with rlang::inject
+          vrt_today <-
+            rlang::inject(preprocess(!!!hdf_args))
 
-        if (sum(terra::nlyr(vrt_today)) != length(name_covariates)) {
-          warning("The number of layers in the input raster do not match
-                  the length of name_covariates.\n")
-        }
+          if (sum(terra::nlyr(vrt_today)) != length(name_covariates)) {
+            warning("The number of layers in the input raster do not match
+                    the length of name_covariates.\n")
+          }
 
-        res0 <-
-          lapply(radiuslist,
-            function(k) {
-              name_radius <-
-                sprintf("%s%05d",
-                        name_covariates,
-                        radius[k])
-
-              tryCatch({
-                extracted <-
-                  calc_modis_daily(
-                    locs = locs_input,
-                    from = vrt_today,
-                    locs_id = locs_id,
-                    date = as.character(day_to_pick),
-                    fun_summary = fun_summary,
-                    name_extracted = name_radius,
-                    radius = radius[k],
-                    max_cells = max_cells
-                  )
-                return(extracted)
-              }, error = function(e) {
+          res0 <-
+            lapply(radiuslist,
+              function(k) {
                 name_radius <-
                   sprintf("%s%05d",
                           name_covariates,
                           radius[k])
-                error_df <- sf::st_drop_geometry(locs_input)
-                # coerce to avoid errors
-                error_df <- as.data.frame(error_df)
-                error_df <- error_df[, c(locs_id, "time")]
-                error_df[[name_radius]] <- -99999
-                attr(error_df, "error_message") <- e
-                return(error_df)
+
+                tryCatch({
+                  extracted <-
+                    calc_modis_daily(
+                      locs = locs_input,
+                      from = vrt_today,
+                      locs_id = locs_id,
+                      date = as.character(day_to_pick),
+                      fun_summary = fun_summary,
+                      name_extracted = name_radius,
+                      radius = radius[k],
+                      max_cells = max_cells
+                    )
+                  return(extracted)
+                }, error = function(e) {
+                  name_radius <-
+                    sprintf("%s%05d",
+                            name_covariates,
+                            radius[k])
+                  error_df <- sf::st_drop_geometry(locs_input)
+                  # coerce to avoid errors
+                  error_df <- as.data.frame(error_df)
+                  error_df <- error_df[, c(locs_id, "time")]
+                  error_df[[name_radius]] <- -99999
+                  attr(error_df, "error_message") <- e
+                  return(error_df)
+                }
+                )
               }
-              )
-            }
-          )
-        res <-
-          Reduce(function(x, y) {
-            dplyr::left_join(x, y,
-              by = c(locs_id, "time")
             )
-          },
-          res0)
-        return(res)
-      }
+          res <-
+            Reduce(function(x, y) {
+              dplyr::left_join(x, y,
+                by = c(locs_id, "time")
+              )
+            },
+            res0)
+          return(res)
+
+        },
+        future.packages = package_list,
+        future.globals = TRUE,
+        future.seed = TRUE
+      )
+    calc_results <- do.call(dplyr::bind_rows, calc_results)
+
     Sys.sleep(1L)
     return(calc_results)
   }
@@ -844,6 +862,7 @@ calc_temporal_dummies <-
       return(dt_dum)
     }
 
+    calc_check_time(covar = locs, POSIXt = TRUE)
     # year
     vec_year <- data.table::year(locs$time)
     dt_year_dum <- dummify(vec_year, year)
@@ -875,7 +894,6 @@ calc_temporal_dummies <-
         dt_month_dum,
         dt_wday_dum
       )
-    calc_check_time(covar = locs_dums, POSIXt = TRUE)
     return(locs_dums)
   }
 
@@ -946,8 +964,6 @@ calc_sedc <-
     sedc_bandwidth = NULL,
     target_fields = NULL
   ) {
-    # define sources, set SEDC exponential decay range
-
     if (!methods::is(locs, "SpatVector")) {
       locs <- try(terra::vect(locs))
     }
@@ -984,7 +1000,6 @@ The result may not be accurate.\n",
 
     # near features with distance argument: only returns integer indices
     # threshold is set to the twice of sedc_bandwidth
-    # lines 895-900 may overlap with distance arg in 912-913
     res_nearby <-
       terra::nearby(locs, from_in, distance = sedc_bandwidth * 2)
     # attaching actual distance
@@ -1006,7 +1021,7 @@ The result may not be accurate.\n",
       dplyr::left_join(dist_nearby_df) |>
       # per the definition in
       # https://mserre.sph.unc.edu/BMElab_web/SEDCtutorial/index.html
-      # exp(-3) is about 0.05
+      # exp(-3) is about 0.05 * (value at origin)
       dplyr::mutate(w_sedc = exp((-3 * dist) / sedc_bandwidth)) |>
       dplyr::group_by(!!rlang::sym(locs_id)) |>
       dplyr::summarize(
@@ -1022,7 +1037,7 @@ The result may not be accurate.\n",
 
     attr(res_sedc, "sedc_bandwidth") <- sedc_bandwidth
     attr(res_sedc, "sedc_threshold") <- sedc_bandwidth * 2
-    calc_check_time(covar = extracted, POSIXt = TRUE)
+    calc_check_time(covar = res_sedc, POSIXt = TRUE)
     return(res_sedc)
   }
 
@@ -1086,8 +1101,7 @@ calc_tri <- function(
   # inner lapply
   list_radius <- split(radius, radius)
   list_locs_tri <-
-    lapply(
-      list_radius,
+    Map(
       function(x) {
         locs_tri_s <-
           calc_sedc(
@@ -1098,7 +1112,8 @@ calc_tri <- function(
             target_fields = tri_cols
           )
         return(locs_tri_s)
-      }
+      },
+      list_radius
     )
   # bind element data.frames into one
   df_tri <- Reduce(function(x, y) dplyr::full_join(x, y), list_locs_tri)
@@ -1106,7 +1121,7 @@ calc_tri <- function(
     df_tri <- dplyr::left_join(as.data.frame(locs), df_tri)
   }
   # read attr
-  df_tri$time <- attr(from, "tri_year")
+  df_tri$time <- as.integer(attr(from, "tri_year"))
   calc_check_time(covar = df_tri, POSIXt = FALSE)
   return(df_tri)
 }
@@ -1141,6 +1156,7 @@ calc_nei <- function(
   # spatial join
   locs_re <- terra::project(locs, terra::crs(from))
   locs_re <- terra::intersect(locs_re, from)
+  locs_re <- as.data.frame(locs_re)
   calc_check_time(covar = locs_re, POSIXt = FALSE)
   return(locs_re)
 }
@@ -1178,7 +1194,7 @@ calc_hms <- function(
     ...) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
-  #### from == character indicates no wildfire smoke polumes are present
+  #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all locs and dates
   if ("character" %in% class(from)) {
     cat(paste0(
@@ -1237,7 +1253,7 @@ calc_hms <- function(
       from$Date[nrow(from)],
       format = "%Y%m%d"
     ),
-    sub_hyphen = TRUE
+    sub_hyphen = FALSE
   )
   #### empty location data.frame
   sites_extracted <- NULL
@@ -1293,7 +1309,7 @@ calc_hms <- function(
     )
   }
   #### check for missing dates (missing polygons)
-  if (!(identical(date_sequence, from$Date))) {
+  if (!(identical(date_sequence, sort(unique(from$Date))))) {
     cat(paste0(
       "Detected absent smoke plume polygons.\n"
     ))
@@ -1325,8 +1341,12 @@ calc_hms <- function(
   }
   #### coerce binary to integer
   sites_extracted[, 3] <- as.integer(sites_extracted[, 3])
+  #### date to POSIXlt
+  sites_extracted$time <- as.POSIXlt(sites_extracted$time)
   #### order by date
-  sites_extracted_ordered <- sites_extracted[order(sites_extracted$time), ]
+  sites_extracted_ordered <- as.data.frame(
+    sites_extracted[order(sites_extracted$time), ]
+  )
   cat(paste0(
     "Returning ",
     layer_name,
@@ -1334,7 +1354,7 @@ calc_hms <- function(
   ))
   calc_check_time(covar = sites_extracted_ordered, POSIXt = TRUE)
   #### return data.frame
-  return(data.frame(sites_extracted_ordered))
+  return(sites_extracted_ordered)
 }
 
 #' Calculate elevation covariates
@@ -1400,37 +1420,35 @@ calc_gmted <- function(
     time_type = "year"
   )
   #### variable column name
-  variable_name <- paste0(
-      gsub(
-        " ",
-        "_",
-        tolower(
-          process_gmted_codes(
-            substr(
-              strsplit(
-                names(from),
-                "_"
-              )[[1]][2],
-              1,
-              2
-            ),
-            statistic = TRUE,
-            invert = TRUE
-          )
-        )
-      ),
-      "r",
-      substr(
-        strsplit(
-          names(from),
-          "_"
-        )[[1]][2],
-        3,
-        4
-      ),
-      "_",
-      radius
+  statistic_codes <- c("be", "ds", "md", "mi", "mn", "mx", "sd")
+  statistic_to <- c(
+    "BRK", "SUB", "MED", "MEA", "MIN", "MAX", "STD"
+  )
+  name_from <- names(from)
+  code_unique <-
+    regmatches(
+      name_from,
+      regexpr(
+        paste0("(",
+               paste(statistic_codes, collapse = "|"),
+               ")[0-9]{2,2}"),
+        name_from
+      )
     )
+  statistic <- substr(code_unique, 1, 2)
+  resolution <- substr(code_unique, 3, 4)
+  statistic_to <-
+    sprintf(
+      "%s%s",
+      statistic_to[match(statistic, statistic_codes)],
+      resolution
+    )
+
+  variable_name <- paste0(
+    statistic_to,
+    "_",
+    sprintf("%05d", as.integer(radius))
+  )
   if (geom) {
     #### convert integer to numeric
     sites_extracted[, 4] <- as.numeric(sites_extracted[, 4])
@@ -1439,12 +1457,13 @@ calc_gmted <- function(
     #### convert integer to numeric
     sites_extracted[, 3] <- as.numeric(sites_extracted[, 3])
     names(sites_extracted) <- c(locs_id, "time", variable_name)
-    
   }
   calc_check_time(covar = sites_extracted, POSIXt = FALSE)
   #### return data.frame
   return(data.frame(sites_extracted))
 }
+
+
 
 #' Calculate meteorological covariates
 #' @description
@@ -1965,12 +1984,12 @@ calc_gridmet <- function(
 #' @importFrom terra crs
 #' @export
 calc_terraclimate <- function(
-    from,
-    locs,
+    from = NULL,
+    locs = NULL,
     locs_id = NULL,
     radius = 0,
     fun = "mean",
-    geom = geom,
+    geom = FALSE,
     ...) {
   #### prepare locations list
   sites_list <- calc_prepare_locs(
@@ -2084,6 +2103,6 @@ calc_lagged <- function(
     #### merge with other locations
     variables_merge <- rbind(variables_merge, variables_return_date)
   }
-  calc_check_time(covar = sites_extracted, POSIXt = TRUE)
+  calc_check_time(covar = variables_merge, POSIXt = TRUE)
   return(variables_merge)
 }

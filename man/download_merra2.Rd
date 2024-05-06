@@ -48,7 +48,7 @@ Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 }
 \value{
-NULL; Daily netCDF (.nc4) files will be stored in a
+NULL; netCDF (.nc4) files will be stored in a
 collection-specific folder within \code{directory_to_save}.
 }
 \description{

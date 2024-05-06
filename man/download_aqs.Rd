@@ -58,9 +58,8 @@ the text file containing download commands. Default is FALSE.}
 Default \code{FALSE}.}
 }
 \value{
-NULL; Separate comma-separated value (CSV) files of
-monitors and the daily representative values
-will be stored in \code{directory_to_save}.
+NULL; Zip and/or data files will be downloaded and stored in
+\code{directory_to_save}.
 }
 \description{
 The \code{download_aqs()} function accesses and downloads Air Quality System (AQS) data from the \href{https://aqs.epa.gov/aqsweb/airdata/download_files.html}{U.S. Environmental Protection Agency's (EPA) Pre-Generated Data Files}.

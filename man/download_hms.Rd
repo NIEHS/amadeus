@@ -56,9 +56,8 @@ from NOAA Hazard Mapping System Fire and Smoke Product. (Ignored if
 \code{data_format = "KML"}.)}
 }
 \value{
-NULL; Zip files and unzipped data files will be stored in
-"/zip_files" and "/data_files" sub-directories, respectively, within the
-\code{directory_to_save}.
+NULL; Zip and/or data files will be downloaded and stored in
+respective sub-directories within \code{directory_to_save}.
 }
 \description{
 The \code{download_hms()} function accesses and downloads

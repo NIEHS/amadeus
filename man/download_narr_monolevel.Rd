@@ -40,7 +40,7 @@ Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 }
 \value{
-NULL; Yearly netCDF (.nc) files will be stored in a variable-specific
+NULL; netCDF (.nc) files will be stored in a variable-specific
 folder within \code{directory_to_save}.
 }
 \description{

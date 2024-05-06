@@ -7,7 +7,7 @@
 process_modis_warp(
   path = NULL,
   cellsize = 0.1,
-  threshold = cellsize * 2,
+  threshold = cellsize * 4,
   crs = 4326,
   ...
 )

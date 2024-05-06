@@ -25,7 +25,9 @@ data. Format YYYY-MM-DD (ex. September 1, 2023 = \code{"2023-09-01"}).}
 \item{date_end}{character(1). length of 10. End date for downloading data.
 Format YYYY-MM-DD (ex. September 1, 2023 = \code{"2023-09-01"}).}
 
-\item{directory_to_save}{character(1). Directory to save data.}
+\item{directory_to_save}{character(1). Directory to save data.
+Sub-directories will be created within \code{directory_to_save} for each
+GEOS-CF collection.}
 
 \item{acknowledgement}{logical(1). By setting \code{TRUE} the
 user acknowledges that the data downloaded using this function may be very
@@ -40,7 +42,7 @@ Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 }
 \value{
-NULL; Hourly netCDF (.nc4) files will be stored in a
+NULL; netCDF (.nc4) files will be stored in a
 collection-specific folder within \code{directory_to_save}.
 }
 \description{

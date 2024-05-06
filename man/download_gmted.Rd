@@ -46,9 +46,8 @@ the text file containing download commands. Default is FALSE.}
 Default is \code{FALSE}.}
 }
 \value{
-NULL; Statistic and resolution-specific zip files will be stored in
-\code{directory_to_download}, and directories containing raw ASCII Grid data
-will be stored in \code{directory_to_save}.
+NULL; Zip and/or data files will be downloaded and stored in
+\code{directory_to_save}.
 }
 \description{
 The \code{download_gmted()} function accesses and downloads Global

@@ -492,7 +492,7 @@ process_modis_warp <-
   function(
     path = NULL,
     cellsize = 0.1,
-    threshold = cellsize * 2,
+    threshold = cellsize * 4,
     crs = 4326,
     ...
   ) {
@@ -502,13 +502,12 @@ process_modis_warp <-
       stars::st_warp(
         ras,
         crs = crs,
+        segments = 500,
         cellsize = cellsize,
         threshold = threshold
       )
     return(rtd)
   }
-
-
 
 # nolint start
 #' Mosaic MODIS swaths
@@ -523,16 +522,20 @@ process_modis_warp <-
 #' @param path character. Full paths of hdf files.
 #' @param date character(1). Date to query.
 #' @param subdataset character. Subdatasets to process.
+#' __Unlike other preprocessing functions, this argument should specify
+#' the exact subdataset name.__ For example, when using MOD06_L2 product,
+#' one may specify `c("Cloud_Fraction", "Cloud_Optical_Thickness")`,
+#' etc. The subdataset names can be found in `terra::describe()` output.
 #' @param suffix character(1). Should be formatted `:{product}:`,
 #' e.g., `:mod06:`
 #' @param resolution numeric(1). Resolution of output raster.
-#' Unit is degree.
+#' Unit is degree (decimal degree in WGS84).
 #' @param ... For internal use.
 #' @seealso
-#' * [`process_modis_warp`]
+#' * [`process_modis_warp()`], [`stars::read_stars()`], [`stars::st_warp()`]
 #' * [GDAL HDF4 driver documentation](https://gdal.org/drivers/raster/hdf4.html)
-#' * [`terra::describe`]: to list the full subdataset list with `sds = TRUE`
-#' * [`terra::sprc`], [`terra::rast`]
+#' * [`terra::describe()`]: to list the full subdataset list with `sds = TRUE`
+#' * [`terra::sprc()`], [`terra::rast()`]
 #' @returns
 #' * a `SpatRaster` object (crs = `"EPSG:4326"`): if `path` is a single file with
 #' full specification of subdataset.
@@ -540,8 +543,9 @@ process_modis_warp <-
 #' @author Insang Song
 #' @importFrom terra rast
 #' @importFrom terra crop
+#' @importFrom terra ext
 #' @importFrom terra mosaic
-#' @importFrom terra varnames
+#' @importFrom stars st_mosaic
 #' @importFrom terra values
 #' @importFrom terra sprc
 #' @export
@@ -561,51 +565,71 @@ process_modis_swath <-
     header <- "HDF4_EOS:EOS_SWATH:"
     ras_mod06 <- vector("list", length = length(subdataset))
     datejul <- strftime(date, format = "%Y%j")
+    ## FIXME: this part may result in underperformance.
+    ##        Find a way to optimize this part.
     paths_today <- grep(sprintf("A%s", datejul), path, value = TRUE)
 
     # if two or more paths are put in,
     # these are read into a list then mosaicked
-    if (length(path) > 1) {
-      for (element in seq_along(subdataset)) {
-        target_text <-
-          sprintf("%s%s%s%s", header, paths_today, suffix, subdataset[element])
-        # rectified stars objects to SpatRaster
-        mod06_element <- split(target_text, target_text) |>
-          lapply(process_modis_warp, cellsize = resolution) |>
-          lapply(terra::rast)
-        # Remove all NA layers to avoid erroneous values
-        mod06_element_nas <-
-          sapply(
-            mod06_element,
-            function(x) {
-              all(is.na(terra::values(x)))
-            }
-          )
-        mod06_element <- mod06_element[!mod06_element_nas]
+    for (element in seq_along(subdataset)) {
+      target_text <-
+        sprintf("%s%s%s%s", header, paths_today, suffix, subdataset[element])
+      # rectified stars objects to SpatRaster
+      mod06_element <- split(target_text, target_text) |>
+        lapply(process_modis_warp, cellsize = resolution)
+      # Remove all NA layers to avoid erroneous values
+      mod06_element_nas <-
+        sapply(
+          mod06_element,
+          function(x) {
+            xvals <- x[[subdataset[element]]]
+            all(is.na(xvals)) || all(is.nan(xvals))
+          }
+        )
+      mod06_element <-
+        mod06_element[!mod06_element_nas & !is.null(mod06_element_nas)]
+
+      # prepare a fail-safe alternative return
+      # It will be used again later.
+      alt <- terra::rast(
+        xmin = -128,
+        xmax = -64,
+        ymin = 20,
+        ymax = 52,
+        resolution = resolution
+      )
+      # initialize values with NA
+      alt[] <- NA
+
+      if (is.null(mod06_element) || length(mod06_element) == 0) {
+        message("All layers are NA or NaN.")
+        mod06_element_mosaic <- alt
+      } else {
         # mosaick the warped SpatRasters into one
-        mod06_element_mosaic <- Reduce(f = terra::mosaic, x = mod06_element)
-        ras_mod06[[element]] <- mod06_element_mosaic
+        mod06_element_mosaic <-
+          do.call(stars::st_mosaic, mod06_element) |>
+          terra::rast()
         # assigning variable name
-        names(ras_mod06)[element] <- subdataset[element]
+        mod06_element_mosaic <-
+          terra::crop(mod06_element_mosaic, terra::ext(alt))
       }
-      # SpatRasterCollection can accommodate multiple SpatRasters
-      # with different extents (most flexible kind)
-      mod06_sprc <- terra::sprc(ras_mod06)
-      # post-hoc: stack multiple layers with different extent
-      # into one SpatRaster
-      # 1. mosaic all layers into one
-      mod06_mosaic <- terra::mosaic(mod06_sprc, fun = "first")
-      # 2. Assign NAs to prepare "etching"
-      terra::values(mod06_mosaic) <- NA
-      # 3. Looping main "etching"; each element is put first
-      mod06_etched <-
-        sapply(mod06_sprc, terra::mosaic, y = mod06_mosaic, fun = "first")
-      # 4. stack
-      mod06_return <- do.call(c, mod06_etched)
-    } else {
-      mod06_return <-
-        terra::rast(process_modis_warp(path, cellsize = resolution))
+      names(mod06_element_mosaic) <- subdataset[element]
+      ras_mod06[[element]] <- mod06_element_mosaic
     }
+    # SpatRasterCollection can accommodate multiple SpatRasters
+    # with different extents (most flexible kind)
+    mod06_sprc <- terra::sprc(ras_mod06)
+    # post-hoc: stack multiple layers with different extent
+    # into one SpatRaster
+    # 1. mosaic all layers into one
+    mod06_mosaic <- terra::mosaic(mod06_sprc, fun = "median")
+    # 2. Assign NAs to prepare "etching"; NA will result in NaNs
+    terra::values(mod06_mosaic) <- NA
+    # 3. Looping main "etching"; each element is put first
+    mod06_etched <-
+      sapply(mod06_sprc, terra::mosaic, y = mod06_mosaic, fun = "first")
+    # 4. stack
+    mod06_return <- do.call(c, mod06_etched)
     return(mod06_return)
   }
 
@@ -869,11 +893,19 @@ process_nei <- function(
     stop("year should be one of 2017 or 2020.\n")
   }
   # Concatenate NEI csv files
-  csvs_nei <- list.files(path = path, pattern = "*.csv$", recursive = TRUE, full.names = TRUE)
+  csvs_nei <-
+    list.files(
+      path = path,
+      pattern = "*.csv$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
   csvs_nei <- grep(year, csvs_nei, value = TRUE)
+  if (is.null(csvs_nei) || length(csvs_nei) == 0) {
+    stop("No files found for the year. The file names should include the year")
+  }
   csvs_nei <- lapply(csvs_nei, data.table::fread)
   csvs_nei <- data.table::rbindlist(csvs_nei)
-
   # column name readjustment
   target_nm <- c("fips code", "total emissions", "emissions uom")
   # not grep-ping at once for flexibility
@@ -898,14 +930,14 @@ process_nei <- function(
       TRF_NEINP_0_00000 = sum(emissions_total_ton, na.rm = TRUE)
     ),
     by = geoid]
-  csvs_nei$nei_year <- year
+  csvs_nei$time <- as.integer(year)
 
   # read county vector
   cnty_geoid_guess <- grep("GEOID", names(county))
   names(county)[cnty_geoid_guess] <- "geoid"
   county$geoid <- sprintf("%05d", as.integer(county$geoid))
-  cnty_vect <- merge(county, csvs_nei, by = "geoid")
-  cnty_vect <- cnty_vect[, c("geoid", "nei_year", "TRF_NEINP_0_00000")]
+  cnty_vect <- merge(county, as.data.frame(csvs_nei), by = "geoid")
+  cnty_vect <- cnty_vect[, c("geoid", "time", "TRF_NEINP_0_00000")]
   return(cnty_vect)
 
 }
@@ -1148,7 +1180,7 @@ process_sedac_population <- function(
 #' @param path character(1). Path to geodatabase or shapefiles.
 #' @param ... Placeholders.
 #' @note U.S. context. The returned `SpatVector` object contains a
-#' `$time` column to represent the temporal range covered by the
+#' `$description` column to represent the temporal range covered by the
 #' dataset. For more information, see <https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata>.
 #' @author Insang Song
 #' @returns a `SpatVector` object
@@ -1166,7 +1198,7 @@ process_sedac_groads <- function(
   #### import data
   data <- terra::vect(path)
   #### time period
-  data$time <- "1980 - 2010"
+  data$description <- "1980 - 2010"
   return(data)
 }
 
@@ -1253,7 +1285,7 @@ process_hms <- function(
     #### subset to density of interest
     data_density <- data_date_p[
       tolower(data_date_p$Density) == tolower(variable)
-      ]
+    ]
     #### absent polygons (ie. December 31, 2018)
     if (nrow(data_density) == 0) {
       cat(paste0(
@@ -1417,8 +1449,10 @@ process_gmted <- function(
   #### identify file path
   paths <- list.files(
     path,
-    full.names = TRUE
+    full.names = TRUE,
+    recursive = TRUE
   )
+
   #### select only the folder containing data
   data_paths <- unique(
     grep(
@@ -1432,7 +1466,7 @@ process_gmted <- function(
       value = TRUE
     )
   )
-  data_path <- data_paths[endsWith(data_paths, "_grd")]
+  data_path <- data_paths[grep("(_grd$|w001001.adf)", data_paths)]
   #### import data
   data <- terra::rast(data_path)
   #### layer name
@@ -1454,7 +1488,8 @@ process_gmted <- function(
     ")"
   )
   #### year
-  terra::metags(data) <- c(year = 2010)
+  terra::metags(data) <-
+    c(year = 2010L)
   #### set coordinate reference system
   return(data)
 }
