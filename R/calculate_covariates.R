@@ -526,18 +526,15 @@ calc_modis_daily <- function(
   max_cells = 3e7,
   ...
 ) {
-  if (!any(methods::is(locs, "SpatVector"),
-           methods::is(locs, "sf"),
-           methods::is(locs, "sftime"))) {
-    stop("locs should be one of sf, sftime, or SpatVector.\n")
-  }
   if (!methods::is(locs, "SpatVector")) {
-    locs <- terra::vect(locs)
+    locs <- try(terra::vect(locs))
+    if (inherits(locs, "try-error")) {
+      stop("locs should be a SpatVector or convertible object.")
+    }
   }
   if (!locs_id %in% names(locs)) {
     stop(sprintf("locs should include columns named %s.\n",
-                 locs_id)
-    )
+                 locs_id))
   }
 
   extract_with_buffer <- function(
@@ -545,10 +542,11 @@ calc_modis_daily <- function(
     surf,
     radius,
     id,
-    time = "time",
-    func = "mean"
+    func = "mean",
+    maxcells = NULL
   ) {
     # generate buffers
+    if (radius == 0) radius <- 1e-6 # approximately 1 meter in degree
     bufs <- terra::buffer(points, width = radius, quadsegs = 180L)
     bufs <- terra::project(bufs, terra::crs(surf))
     # extract raster values
@@ -558,39 +556,33 @@ calc_modis_daily <- function(
         y = sf::st_as_sf(bufs),
         fun = func,
         force_df = TRUE,
-        append_cols = c(id, time),
+        append_cols = id,
         progress = FALSE,
-        max_cells_in_memory = max_cells
+        max_cells_in_memory = maxcells
       )
     return(surf_at_bufs)
   }
 
-  ## NaN to zero
-  from[is.nan(from)] <- 0L
+  ## NaN to NA
+  from[is.nan(from)] <- NA
 
   # raster used to be vrt_today
-  if (any(grepl("00000", name_extracted))) {
-    locs_tr <- terra::project(locs, terra::crs(from))
-    extracted <- terra::extract(x = from, y = locs_tr, ID = FALSE)
-    locs_blank <- as.data.frame(locs)
-    extracted <- cbind(locs_blank, extracted)
-  } else {
-    extracted <-
-      extract_with_buffer(
-        points = locs,
-        surf = from,
-        id = locs_id,
-        radius = radius,
-        func = fun_summary
-      )
-  }
+  extracted <-
+    extract_with_buffer(
+      points = locs,
+      surf = from,
+      id = locs_id,
+      radius = radius,
+      func = fun_summary,
+      maxcells = max_cells
+    )
   # cleaning names
   # assuming that extracted is a data.frame
   name_offset <- terra::nlyr(from)
   # multiple columns will get proper names
   name_range <- seq(ncol(extracted) - name_offset + 1, ncol(extracted), 1)
   colnames(extracted)[name_range] <- name_extracted
-  extracted$time <- as.POSIXlt(extracted$time)
+  extracted$time <- as.POSIXlt(date)
   calc_check_time(covar = extracted, POSIXt = TRUE)
   return(extracted)
 }
@@ -716,8 +708,9 @@ process_modis_swath, or process_bluemarble.")
 
     export_list <- c()
     package_list <-
-      c("sf", "terra", "exactextractr", "foreach", "data.table", "stars",
-        "dplyr", "parallelly", "doParallel", "rlang", "amadeus")
+      c("sf", "terra", "exactextractr", "data.table", "stars",
+        "dplyr", "parallelly", "rlang", "amadeus", "future",
+        "future.apply")
     if (!is.null(export_list_add)) {
       export_list <- append(export_list, export_list_add)
     }
@@ -730,16 +723,15 @@ process_modis_swath, or process_bluemarble.")
     if (nthreads == 1) {
       future::plan(future::sequential)
     } else {
-      future::plan(future::multisession, workers = nthreads)
+      future::plan(future::multicore, workers = nthreads)
     }
-    # future::future(future::multicore, workers = nthreads)
     idx_date_available <- seq_along(dates_available)
     list_date_available <-
       split(idx_date_available, idx_date_available)
     calc_results <-
       future.apply::future_lapply(
         list_date_available,
-        FUN = function (datei) {
+        FUN = function(datei) {
           options(sf_use_s2 = FALSE)
           # nolint start
           day_to_pick <- dates_available[datei]
@@ -747,29 +739,28 @@ process_modis_swath, or process_bluemarble.")
           day_to_pick <- as.Date(day_to_pick, format = "%Y%j")
 
           radiusindex <- seq_along(radius)
-          radiuslist <- split(radiusindex, radiusindex)
+          radiusindexlist <- split(radiusindex, radiusindex)
 
-          hdf_args <- append(hdf_args, values = list(date = day_to_pick))
-          hdf_args <- append(hdf_args, values = list(path = hdf_args$from))
+          hdf_args <- c(hdf_args, list(date = day_to_pick))
+          hdf_args <- c(hdf_args, list(path = hdf_args$from))
           # unified interface with rlang::inject
           vrt_today <-
             rlang::inject(preprocess(!!!hdf_args))
 
           if (sum(terra::nlyr(vrt_today)) != length(name_covariates)) {
-            warning("The number of layers in the input raster do not match
+            message("The number of layers in the input raster do not match
                     the length of name_covariates.\n")
           }
 
           res0 <-
-            lapply(radiuslist,
+            lapply(radiusindexlist,
               function(k) {
                 name_radius <-
                   sprintf("%s%05d",
                           name_covariates,
                           radius[k])
-
-                tryCatch({
-                  extracted <-
+                extracted <-
+                  try(
                     calc_modis_daily(
                       locs = locs_input,
                       from = vrt_today,
@@ -780,21 +771,20 @@ process_modis_swath, or process_bluemarble.")
                       radius = radius[k],
                       max_cells = max_cells
                     )
-                  return(extracted)
-                }, error = function(e) {
-                  name_radius <-
-                    sprintf("%s%05d",
-                            name_covariates,
-                            radius[k])
-                  error_df <- sf::st_drop_geometry(locs_input)
+                  )
+                if (inherits(extracted, "try-error")) {
                   # coerce to avoid errors
-                  error_df <- as.data.frame(error_df)
-                  error_df <- error_df[, c(locs_id, "time")]
-                  error_df[[name_radius]] <- -99999
-                  attr(error_df, "error_message") <- e
-                  return(error_df)
+                  error_df <- data.frame(
+                    matrix(-99999,
+                           ncol = length(name_radius) + 1,
+                           nrow = nrow(locs_input))
+                  )
+                  error_df <- stats::setNames(error_df, c(locs_id, name_radius))
+                  error_df[[locs_id]] <- unlist(locs_input[[locs_id]])
+                  error_df$time <- day_to_pick
+                  extracted <- error_df
                 }
-                )
+                return(extracted)
               }
             )
           res <-
@@ -807,8 +797,6 @@ process_modis_swath, or process_bluemarble.")
           return(res)
 
         },
-        future.packages = package_list,
-        future.globals = TRUE,
         future.seed = TRUE
       )
     calc_results <- do.call(dplyr::bind_rows, calc_results)

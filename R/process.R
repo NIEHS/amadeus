@@ -600,10 +600,16 @@ process_modis_swath <-
       )
       # initialize values with NA
       alt[] <- NA
+      alt_dim <- dim(alt)
+      alt[1, 1] <- 0
+      alt[1, alt_dim[2]] <- 0
+      alt[alt_dim[1], 1] <- 0
+      alt[alt_dim[1], alt_dim[2]] <- 0
+      terra::crs(alt) <- "EPSG:4326"
 
       if (is.null(mod06_element) || length(mod06_element) == 0) {
         message("All layers are NA or NaN.")
-        mod06_element_mosaic <- alt
+        mod06_element_mosaic <- terra::deepcopy(alt)
       } else {
         # mosaick the warped SpatRasters into one
         mod06_element_mosaic <-
