@@ -338,10 +338,10 @@ process_locs_radius <-
 #' @export
 process_locs_vector <-
   function(
-      locs,
-      crs,
-      radius
-      ) {
+    locs,
+    crs,
+    radius
+  ) {
     #### detect SpatVector
     if (methods::is(locs, "SpatVector")) {
       cat(
@@ -349,14 +349,14 @@ process_locs_vector <-
           "Detected `SpatVector` (",
           terra::geomtype(locs),
           ") extraction locations...\n"
-          )
+        )
       )
       sites_v <- locs
-    #### detect sf object
+      #### detect sf object
     } else if (methods::is(locs, "sf")) {
       cat("Detected `sf` extraction locations...\n")
       sites_v <- terra::vect(locs)
-    ### detect data.frame object
+      ### detect data.frame object
     } else if (methods::is(locs, "data.frame")) {
       cat("Detected `data.frame` extraction locations...\n")
       #### columns

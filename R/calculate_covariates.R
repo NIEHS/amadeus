@@ -244,7 +244,7 @@ calc_koppen_geiger <-
 #' @param radius numeric (non-negative) giving the
 #' radius of buffer around points
 #' @param max_cells integer(1). Maximum number of cells to be read at once.
-#' Higher values will expedite processing, but will increase memory usage.
+#' Higher values may expedite processing, but will increase memory usage.
 #' Maximum possible value is `2^31 - 1`.
 #' See [`exactextractr::exact_extract`] for details.
 #' @param geom logical(1). Should the geometry of `locs` be returned in the
@@ -254,6 +254,8 @@ calc_koppen_geiger <-
 #' coordinate reference system of the `$geometry` is the coordinate
 #' reference system of `from`.
 #' @param ... Placeholders.
+#' @notes NLCD is available in U.S. only. Users should be cautious
+#' the spatial extent of the data.
 #' @seealso [`process_nlcd`]
 #' @returns a data.frame object
 #' @importFrom utils read.csv
@@ -275,7 +277,7 @@ calc_nlcd <- function(from,
                       locs,
                       locs_id = "site_id",
                       radius = 1000,
-                      max_cells = 1e8,
+                      max_cells = 5e7,
                       geom = FALSE,
                       ...) {
   # check inputs
@@ -303,19 +305,8 @@ calc_nlcd <- function(from,
 
   year <- try(as.integer(terra::metags(from, name = "year")))
   # select points within mainland US and reproject on nlcd crs if necessary
-  us_main <-
-    terra::ext(c(xmin = -127, xmax = -65, ymin = 24, ymax = 51)) |>
-    terra::vect() |>
-    terra::set.crs("EPSG:4326") |>
-    terra::project(y = terra::crs(locs_vector))
-  data_vect_b <- locs_vector |>
-    terra::intersect(x = us_main) |>
-    terra::project(y = terra::crs(from))
-
-  # subset locs_df to those in us extent
-  locs_dfs <- locs_df[
-    unlist(locs_df[[locs_id]]) %in% unlist(data_vect_b[[locs_id]]),
-  ]
+  data_vect_b <-
+    terra::project(locs_vector, y = terra::crs(from))
 
   # create circle buffers with buf_radius
   bufs_pol <- terra::buffer(data_vect_b, width = radius) |>
@@ -356,7 +347,7 @@ calc_nlcd <- function(from,
   )
   names(nlcd_at_bufs) <- new_names
   # merge locs_df with nlcd class fractions
-  new_data_vect <- cbind(locs_dfs, as.integer(year), nlcd_at_bufs)
+  new_data_vect <- cbind(locs_df, as.integer(year), nlcd_at_bufs)
   if (geom) {
     names(new_data_vect)[1:3] <- c(locs_id, "geometry", "time")
   } else {
@@ -1329,8 +1320,8 @@ calc_hms <- function(
   }
   #### coerce binary to integer
   sites_extracted[, 3] <- as.integer(sites_extracted[, 3])
-  #### date to POSIXlt
-  sites_extracted$time <- as.POSIXlt(sites_extracted$time)
+  #### date to POSIXct
+  sites_extracted$time <- as.POSIXct(sites_extracted$time)
   #### order by date
   sites_extracted_ordered <- as.data.frame(
     sites_extracted[order(sites_extracted$time), ]
