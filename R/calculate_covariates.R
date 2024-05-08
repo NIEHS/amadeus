@@ -254,7 +254,7 @@ calc_koppen_geiger <-
 #' coordinate reference system of the `$geometry` is the coordinate
 #' reference system of `from`.
 #' @param ... Placeholders.
-#' @notes NLCD is available in U.S. only. Users should be cautious
+#' @note NLCD is available in U.S. only. Users should be cautious
 #' the spatial extent of the data.
 #' @seealso [`process_nlcd`]
 #' @returns a data.frame object
