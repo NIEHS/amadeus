@@ -318,7 +318,6 @@ calc_nlcd <- function(from,
       from,
       bufs_pol,
       fun = "frac",
-      stack_apply = TRUE,
       force_df = TRUE,
       progress = FALSE,
       max_cells_in_memory = max_cells
@@ -547,6 +546,7 @@ calc_modis_daily <- function(
         y = sf::st_as_sf(bufs),
         fun = func,
         force_df = TRUE,
+        stack_apply = TRUE,
         append_cols = id,
         progress = FALSE,
         max_cells_in_memory = maxcells
@@ -575,6 +575,7 @@ calc_modis_daily <- function(
   colnames(extracted)[name_range] <- name_extracted
   extracted$time <- as.POSIXlt(date)
   calc_check_time(covar = extracted, POSIXt = TRUE)
+  gc()
   return(extracted)
 }
 
@@ -636,6 +637,15 @@ calc_modis_daily <- function(
 #'   e.g., `c("Cloud_Fraction_Day", "Cloud_Fraction_Night")`
 #' * `process_bluemarble()`: Subdataset number.
 #'   e.g., for VNP46A2 product, 3L.
+#' Dates with less than 80 percent of the expected number of tiles,
+#' which are determined by the mode of the number of tiles, are removed.
+#' Users will be informed of the dates with insufficient tiles.
+#' The result data.frame will have an attribute with the dates with
+#' insufficient tiles.
+#' @returns A data.frame with an attribute:
+#' * `attr(., "dates_dropped")`: Dates with insufficient tiles.
+#'   Note that the dates mean the dates with insufficient tiles,
+#'   not the dates without available tiles.
 #' @seealso See details for setting parallelization:
 #' * [`future::plan()`]
 #' * [`future.apply::future_lapply()`]
@@ -686,10 +696,35 @@ process_modis_swath, or process_bluemarble.")
     # nolint start
     hdf_args <- c(as.list(environment()), list(...))
     # nolint end
-    dates_available <-
+    dates_available_m <-
       regmatches(from, regexpr("A20\\d{2,2}[0-3]\\d{2,2}", from))
-    dates_available <- unique(dates_available)
+    dates_available <- sort(unique(dates_available_m))
     dates_available <- sub("A", "", dates_available)
+
+    # When multiple dates are concerned,
+    # the number of tiles are expected to be the same.
+    # Exceptions could exist, so here the number of tiles are checked.
+    summary_available <- table(dates_available_m)
+    summary_available_mode <-
+      sort(table(summary_available), decreasing = TRUE)[1]
+    summary_available_mode <- as.numeric(names(summary_available_mode))
+    summary_available_insuf <-
+      which(summary_available < floor(summary_available_mode * 0.8))
+    if (length(summary_available_insuf) > 0) {
+      dates_insuf <-
+        as.Date(dates_available[summary_available_insuf], "%Y%j")
+      message(
+        paste0(
+          "The number of tiles on the following dates are insufficient: ",
+          paste(dates_insuf, collapse = ", "),
+          ".\n"
+        )
+      )
+      # finally it removes the dates with insufficient tiles
+      dates_available <- dates_available[-summary_available_insuf]
+    } else {
+      dates_insuf <- NA
+    }
 
     locs_input <- try(sf::st_as_sf(locs), silent = TRUE)
     if (inherits(locs_input, "try-error")) {
@@ -791,7 +826,7 @@ process_modis_swath, or process_bluemarble.")
         future.seed = TRUE
       )
     calc_results <- do.call(dplyr::bind_rows, calc_results)
-
+    attr(calc_results, "dates_dropped") <- dates_insuf
     Sys.sleep(1L)
     return(calc_results)
   }

@@ -64,6 +64,14 @@ See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for 
 
 \item{...}{Arguments passed to \code{preprocess}.}
 }
+\value{
+A data.frame with an attribute:
+\itemize{
+\item \code{attr(., "dates_dropped")}: Dates with insufficient tiles.
+Note that the dates mean the dates with insufficient tiles,
+not the dates without available tiles.
+}
+}
 \description{
 \code{calc_modis_par} essentially runs \code{\link{calc_modis_daily}} function
 in each thread (subprocess). Based on daily resolution, each day's workload
@@ -94,6 +102,11 @@ e.g., \code{"^LST_"}
 e.g., \code{c("Cloud_Fraction_Day", "Cloud_Fraction_Night")}
 \item \code{process_bluemarble()}: Subdataset number.
 e.g., for VNP46A2 product, 3L.
+Dates with less than 80 percent of the expected number of tiles,
+which are determined by the mode of the number of tiles, are removed.
+Users will be informed of the dates with insufficient tiles.
+The result data.frame will have an attribute with the dates with
+insufficient tiles.
 }
 }
 \seealso{
