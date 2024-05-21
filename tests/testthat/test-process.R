@@ -378,26 +378,30 @@ testthat::test_that("Other MODIS function errors", {
   testthat::expect_no_error(
     suppressWarnings(
       process_modis_swath(
-        path = path_mod06e,
+        path = path_mod06,
+        subdataset = "Cloud_Fraction_Night",
         date = "2021-08-15"
       )
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      path = path_mod06e,
+      path = path_mod06,
+      subdataset = "Cloud_Fraction_Night",
       date = "2021~08~15"
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      path = path_mod06e,
+      path = path_mod06,
+      subdataset = "Cloud_Fraction_Night",
       date = "2021-13-15"
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      path = path_mod06e,
+      path = path_mod06,
+      subdataset = "Cloud_Fraction_Night",
       date = "2021-12-45"
     )
   )
@@ -483,7 +487,7 @@ testthat::test_that("process_nei tests", {
   path_cnty$GEOID <- path_cnty$FIPS
 
   testthat::expect_no_error(
-    neinc <- process_nei(path = path_nei, year = 2020, county = path_cnty)
+    neinc <- process_nei(path = path_nei, year = 2017, county = path_cnty)
   )
   testthat::expect_s4_class(neinc, "SpatVector")
 
@@ -608,7 +612,7 @@ testthat::test_that("process_hms returns expected.", {
     "Heavy"
   )
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_hms)
   )
   for (d in seq_along(densities)) {
@@ -623,30 +627,30 @@ testthat::test_that("process_hms returns expected.", {
         )
       )
     # expect output is a SpatVector or character
-    expect_true(
+    testthat::expect_true(
       class(hms)[1] %in% c("SpatVector", "character")
     )
     if (class(hms)[1] == "SpatVector") {
       # expect non-null coordinate reference system
-      expect_false(
+      testthat::expect_false(
         is.null(terra::crs(hms))
       )
       # expect two columns
-      expect_true(
+      testthat::expect_true(
         ncol(hms) == 2
       )
       # expect density and date column
-      expect_true(
+      testthat::expect_true(
         all(c("Density", "Date") %in% names(hms))
       )
     } else if (class(hms)[1] == "character") {
       # expect first is density type
-      expect_true(
+      testthat::expect_true(
         hms[1] %in% c("Light", "Medium", "Heavy")
       )
-      # expect other elements are 8 character dates
-      expect_true(
-        all(nchar(hms[2:length(hms)]) == 8)
+      # expect other elements are 10 character dates
+      testthat::expect_true(
+        all(nchar(hms[2:length(hms)]) == 10)
       )
     }
   }
@@ -1459,7 +1463,7 @@ testthat::test_that("gridmet and terraclimate auxiliary functions.", {
 
 
 # test PRISM ####
-test_that("process_prism returns a SpatRaster object with correct metadata", {
+testthat::test_that("process_prism returns a SpatRaster object with correct metadata", {
   # Set up test data
   withr::local_package("terra")
   path <- testthat::test_path(
@@ -1472,16 +1476,16 @@ test_that("process_prism returns a SpatRaster object with correct metadata", {
   time <- "0228"
 
   # Call the function
-  expect_no_error(result <- process_prism(path, element, time))
-  expect_no_error(result2 <- process_prism(path_dir, element, time))
+  testthat::expect_no_error(result <- process_prism(path, element, time))
+  testthat::expect_no_error(result2 <- process_prism(path_dir, element, time))
 
   # Check the return type
-  expect_true(inherits(result, "SpatRaster"))
-  expect_true(inherits(result2, "SpatRaster"))
+  testthat::expect_true(inherits(result, "SpatRaster"))
+  testthat::expect_true(inherits(result2, "SpatRaster"))
 
   # Check the metadata
-  expect_equal(unname(terra::metags(result)["time"]), time)
-  expect_equal(unname(terra::metags(result)["element"]), element)
+  testthat::expect_equal(unname(terra::metags(result)["time"]), time)
+  testthat::expect_equal(unname(terra::metags(result)["element"]), element)
 
   # Set up test data
   path_bad <- "/path/to/nonexistent/folder"
@@ -1489,10 +1493,14 @@ test_that("process_prism returns a SpatRaster object with correct metadata", {
   time_bad <- "invalid_time"
 
   # Call the function and expect an error
-  expect_error(process_prism(NULL, element, time))
-  expect_error(process_prism(path_bad, element, time))
-  expect_error(process_prism(path_dir, element_bad, time))
-  expect_error(process_prism(path_dir, element, time_bad))
+  testthat::expect_error(process_prism(NULL, element, time))
+  testthat::expect_error(
+    testthat::expect_warning(
+      process_prism(path_bad, element, time)
+    )
+  )
+  testthat::expect_error(process_prism(path_dir, element_bad, time))
+  testthat::expect_error(process_prism(path_dir, element, time_bad))
 })
 
 

@@ -115,11 +115,10 @@ calc_setcolumns <- function(
         side = "left"
       )
     )
-    names_return[cov_index[c]] <- name_new
+    names_return[cov_index[c]] <- toupper(name_new)
   }
   #### check for unique names
   stopifnot(length(names_return) == length(unique(names_return)))
-  colnames(from) <- toupper(names_return)
   return(from)
 }
 

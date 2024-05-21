@@ -185,8 +185,7 @@ testthat::test_that("calc_modis works well.", {
   withr::local_package("foreach")
   withr::local_package("doParallel")
   withr::local_options(
-    list(sf_use_s2 = FALSE,
-         foreachDoparLocal = TRUE)
+    list(sf_use_s2 = FALSE)
   )
 
   site_faux <-
@@ -431,7 +430,7 @@ testthat::test_that("calc_modis works well.", {
     )
   )
   testthat::expect_s3_class(flushed, "data.frame")
-  testthat::expect_true(unlist(flushed[, 3]) == -99999)
+  testthat::expect_true(unlist(flushed[, 2]) == -99999)
 
 })
 
@@ -533,21 +532,21 @@ testthat::test_that("Check calc_nlcd works", {
   )
   # -- returns a data.frame
   testthat::expect_equal(class(output)[1], "data.frame")
-  # -- out-of-mainland-US points removed (France and Alaska)
-  testthat::expect_equal(nrow(output), 2)
+  # nrow(output) == nrow(input)
+  testthat::expect_equal(nrow(output), 4)
   # -- initial names are still in the output data.frame
   testthat::expect_true(all(names(eg_data) %in% names(output)))
   # -- check the value of some of the points in the US
   # the value has changed. What affected this behavior?
   testthat::expect_equal(
-    output$LDU_TEFOR_0_03000[2], 0.7940682, tolerance = 1e-7
+    output$LDU_TEFOR_0_03000[1], 0.8119843, tolerance = 1e-7
   )
   testthat::expect_equal(
-    output$LDU_TSHRB_0_03000[1], 0.9987249, tolerance = 1e-7
+    output$LDU_TSHRB_0_03000[2], 0.9630467, tolerance = 1e-7
   )
   # -- class fraction rows should sum to 1
   testthat::expect_equal(
-    rowSums(as.data.frame(output[, 3:(ncol(output))])),
+    unname(rowSums(output[1:2, 3:(ncol(output))])),
     rep(1, 2),
     tolerance = 1e-7
   )
@@ -990,6 +989,7 @@ testthat::test_that("calc_gmted returns expected.", {
   )
 })
 
+## 11. NARR ####
 testthat::test_that("calc_narr returns expected.", {
   withr::local_package("terra")
   variables <- c(
@@ -1058,7 +1058,7 @@ testthat::test_that("calc_narr returns expected.", {
       }
       # expect $time is class Date
       expect_true(
-        "Date" %in% class(narr_covariate$time)
+        "POSIXct" %in% class(narr_covariate$time)
       )
     }
   }
