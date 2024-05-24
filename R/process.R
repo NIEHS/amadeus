@@ -1030,6 +1030,7 @@ process_aqs <-
     # select relevant fields only
     sites <- sites |>
       dplyr::as_tibble() |>
+      dplyr::filter(startsWith(Sample.Duration, "24")) |>
       dplyr::group_by(site_id) |>
       dplyr::filter(POC == min(POC)) |>
       dplyr::mutate(time = Date.Local) |>
