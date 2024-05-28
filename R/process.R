@@ -1018,10 +1018,10 @@ process_aqs <-
     ## get unique sites
     sites$site_id <-
       sprintf("%02d%03d%04d%05d",
-              sites$State.Code,
-              sites$County.Code,
-              sites$Site.Num,
-              sites$Parameter.Code)
+              as.integer(sites$State.Code),
+              as.integer(sites$County.Code),
+              as.integer(sites$Site.Num),
+              as.integer(sites$Parameter.Code))
 
     site_id <- NULL
     Datum <- NULL
