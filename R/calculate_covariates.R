@@ -418,14 +418,14 @@ calc_ecoregion <-
     # Generate field names from extracted ecoregion keys
     # TODO: if we keep all-zero fields, the initial reference
     # should be the ecoregion polygon, not the extracted data
-    key2_sorted <- unlist(extracted[, 3])
+    key2_sorted <- unlist(extracted[, grep("L2", names(extracted))])
     key2_num <-
       regmatches(key2_sorted, regexpr("\\d{1,2}\\.[1-9]", key2_sorted))
     key2_num <- as.integer(10 * as.numeric(key2_num))
     key2_num <- sprintf("DUM_E2%03d_0_00000", key2_num)
     key2_num_unique <- sort(unique(key2_num))
 
-    key3_sorted <- unlist(extracted[, 2])
+    key3_sorted <- unlist(extracted[, grep("L3", names(extracted))])
     key3_num <-
       regmatches(key3_sorted, regexpr("\\d{1,3}", key3_sorted))
     key3_num <- as.integer(as.numeric(key3_num))
