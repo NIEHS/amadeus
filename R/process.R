@@ -732,17 +732,33 @@ process_nlcd <-
 #' @author Insang Song
 #' @returns a `SpatVector` object
 #' @importFrom terra vect
+#' @importFrom sf st_read st_crs st_as_sfc st_transform st_intersects st_union
+#' @importFrom data.table year
 #' @export
 process_ecoregion <-
   function(
     path = NULL,
     ...
   ) {
-    ecoreg <- terra::vect(path)
+    ecoreg <- sf::st_read(path)
+    # fix Tukey's bridge in Portland, ME
+    # nolint start
+    poly_tukey <-
+      "POLYGON ((-70.258 43.68, -70.2555 43.68, -70.255 43.6733, -70.2576 43.6732, -70.258 43.68))"
+    poly_tukey <- sf::st_as_sfc(poly_tukey, crs = "EPSG:4326")
+    poly_tukey <- sf::st_transform(poly_tukey, sf::st_crs(ecoreg))
+
+    # nolint end
     ecoreg <- ecoreg[, grepl("^(L2_KEY|L3_KEY)", names(ecoreg))]
+    ecoreg_edit_idx <- sf::st_intersects(ecoreg, poly_tukey, sparse = FALSE)
+    ecoreg_edit_idx <- vapply(ecoreg_edit_idx, function(x) any(x), logical(1))
+    ecoreg_else <- ecoreg[!ecoreg_edit_idx, ]
+    ecoreg_edit <- sf::st_union(ecoreg[ecoreg_edit_idx, ], poly_tukey)
+    ecoreg <- rbind(ecoreg_else, ecoreg_edit)
     ecoreg$time <- paste0(
       "1997 - ", data.table::year(Sys.time())
     )
+    ecoreg <- terra::vect(ecoreg)
     return(ecoreg)
   }
 
