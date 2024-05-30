@@ -43,6 +43,8 @@ make the \code{data.frame} difficult to read due to long geometry strings. The
 coordinate reference system of the \verb{$geometry} is the coordinate
 reference system of \code{from}.}
 
+\item{nthreads}{integer(1). Number of threads to be used}
+
 \item{...}{Placeholders.}
 }
 \value{

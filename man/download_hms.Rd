@@ -50,10 +50,6 @@ if \code{data_format = "KML"}.)}
 \item{remove_zip}{logical(1). Remove zip files from
 directory_to_download. Default is \code{FALSE}.
 (Ignored if \code{data_format = "KML"}.)}
-
-\item{directory_to_download}{character(1). Directory to download zip files
-from NOAA Hazard Mapping System Fire and Smoke Product. (Ignored if
-\code{data_format = "KML"}.)}
 }
 \value{
 NULL; Zip and/or data files will be downloaded and stored in

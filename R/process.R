@@ -671,7 +671,7 @@ process_koppen_geiger <-
     if (period == "present") {
       terra::metags(kg_rast) <- c(year = "1980 - 2016")
     } else {
-      terra::meteags(kg_rast) <- c(year = "2071 - 2100")
+      terra::metags(kg_rast) <- c(year = "2071 - 2100")
     }
     return(kg_rast)
   }
@@ -1047,6 +1047,8 @@ process_aqs <-
     site_id <- NULL
     Datum <- NULL
     POC <- NULL
+    Date.Local <- NULL
+    Sample.Duration <- NULL
 
     # select relevant fields only
     sites <- sites |>

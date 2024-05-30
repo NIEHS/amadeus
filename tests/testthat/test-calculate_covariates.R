@@ -439,7 +439,11 @@ testthat::test_that("Check calc_nlcd works", {
   withr::local_package("terra")
   withr::local_package("exactextractr")
   withr::local_package("sf")
-  withr::local_options(list(sf_use_s2 = FALSE))
+  withr::local_package("future")
+  withr::local_package("future.apply")
+  withr::local_options(
+    list(sf_use_s2 = FALSE, future.resolve.recursive = 2L)
+  )
 
   point_us1 <- cbind(lon = -114.7, lat = 38.9, site_id = 1)
   point_us2 <- cbind(lon = -114, lat = 39, site_id = 2)
@@ -475,7 +479,7 @@ testthat::test_that("Check calc_nlcd works", {
     "radius has not a likely value."
   )
 
-  # -- buf_radius has likely value
+  # -- two modes work properly
   testthat::expect_no_error(
     calc_nlcd(locs = eg_data,
               from = nlcdras,
@@ -487,6 +491,21 @@ testthat::test_that("Check calc_nlcd works", {
               from = nlcdras,
               mode = "terra",
               radius = 300)
+  )
+  # -- multicore mode works properly
+  testthat::expect_no_error(
+    calc_nlcd(locs = eg_data,
+              from = nlcdras,
+              mode = "exact",
+              radius = 1000,
+              nthreads = 2L)
+  )
+  testthat::expect_no_error(
+    calc_nlcd(locs = eg_data,
+              from = nlcdras,
+              mode = "terra",
+              radius = 1000,
+              nthreads = 2L)
   )
 
 

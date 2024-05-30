@@ -241,7 +241,7 @@ calc_koppen_geiger <-
 #' @param from SpatRaster(1). Output of \code{process_nlcd()}.
 #' @param locs terra::SpatVector of points geometry
 #' @param locs_id character(1). Unique identifier of locations
-#' @param mode character(1). One of `"exact"` 
+#' @param mode character(1). One of `"exact"`
 #'   (using [`exactextractr::exact_extract()`])
 #'   or `"terra"` (using [`terra::freq()`]).
 #' @param radius numeric (non-negative) giving the
@@ -257,6 +257,7 @@ calc_koppen_geiger <-
 #' make the `data.frame` difficult to read due to long geometry strings. The
 #' coordinate reference system of the `$geometry` is the coordinate
 #' reference system of `from`.
+#' @param nthreads integer(1). Number of threads to be used
 #' @param ... Placeholders.
 #' @note NLCD is available in U.S. only. Users should be aware of
 #' the spatial extent of the data. The results are different depending
@@ -280,6 +281,9 @@ calc_koppen_geiger <-
 #' @importFrom terra intersect
 #' @importFrom terra metags
 #' @importFrom exactextractr exact_extract
+#' @importFrom future plan multicore sequential
+#' @importFrom future.apply future_Map
+#' @importFrom collapse rowbind
 #' @export
 calc_nlcd <- function(from,
                       locs,
@@ -302,6 +306,12 @@ calc_nlcd <- function(from,
   if (!methods::is(from, "SpatRaster")) {
     stop("from is not a SpatRaster.")
   }
+  if (nthreads > 1L) {
+    stopifnot(Sys.info()["sysname"] != "Windows")
+    future::plan(future::multicore, workers = nthreads)
+  } else {
+    future::plan(future::sequential)
+  }
 
   # prepare locations
   locs_prepared <- calc_prepare_locs(
@@ -323,19 +333,24 @@ calc_nlcd <- function(from,
   cfpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
   nlcd_classes <- utils::read.csv(cfpath)
 
-  if (mode == "fast") {
-    # fast mode
+  if (mode == "terra") {
+    # terra mode
     class_query <- "names"
     # extract land cover class in each buffer
-    nlcd_at_bufs <-
-      terra::freq(
-        from,
-        zones = bufs_pol,
-        wide = TRUE
-      )
+    nlcd_at_bufs <- future.apply::future_Map(
+      function(i) {
+        terra::freq(
+          from,
+          zones = bufs_pol[i, ],
+          wide = TRUE
+        )
+      }, seq_len(nrow(bufs_pol)),
+      future.seed = TRUE
+    ) |>
+      collapse::rowbind(fill = TRUE)
     nlcd_at_bufs <- nlcd_at_bufs[, -seq(1, 2)]
     nlcd_cellcnt <- nlcd_at_bufs[, seq(1, ncol(nlcd_at_bufs), 1)]
-    nlcd_cellcnt <- nlcd_cellcnt / rowSums(nlcd_cellcnt)
+    nlcd_cellcnt <- nlcd_cellcnt / rowSums(nlcd_cellcnt, na.rm = TRUE)
     nlcd_at_bufs[, seq(1, ncol(nlcd_at_bufs), 1)] <- nlcd_cellcnt
   } else {
     class_query <- "value"
@@ -343,22 +358,28 @@ calc_nlcd <- function(from,
     bufs_pol <- bufs_pol |>
       sf::st_as_sf() |>
       sf::st_geometry()
-    nlcd_at_bufs <-
-      exactextractr::exact_extract(
-        from,
-        bufs_pol,
-        fun = "frac",
-        force_df = TRUE,
-        progress = FALSE,
-        max_cells_in_memory = max_cells
-      )
-
+    nlcd_at_bufs <- future.apply::future_Map(
+      function(i) {
+        exactextractr::exact_extract(
+          from,
+          bufs_pol[i, ],
+          fun = "frac",
+          force_df = TRUE,
+          progress = FALSE,
+          max_cells_in_memory = max_cells
+        )
+      }, seq_len(length(bufs_pol)),
+      future.seed = TRUE
+    ) |>
+      collapse::rowbind(fill = TRUE)
     # select only the columns of interest
     nlcd_at_buf_names <- names(nlcd_at_bufs)
     nlcd_val_cols <-
       grep("^frac_", nlcd_at_buf_names)
     nlcd_at_bufs <- nlcd_at_bufs[, nlcd_val_cols]
   }
+  # fill NAs
+  nlcd_at_bufs[is.na(nlcd_at_bufs)] <- 0
 
   # change column names
   nlcd_names <- names(nlcd_at_bufs)
@@ -367,11 +388,10 @@ calc_nlcd <- function(from,
     switch(
       mode,
       exact = sort(as.numeric(nlcd_names)),
-      fast = nlcd_names
+      terra = nlcd_names
     )
   nlcd_names <-
     nlcd_classes$class[match(nlcd_names, nlcd_classes[[class_query]])]
-  #nlcd_classes[nlcd_classes[[class_query]] %in% nlcd_names, c("class")]
   new_names <- sprintf("LDU_%s_0_%05d", nlcd_names, radius)
   names(nlcd_at_bufs) <- new_names
   # merge locs_df with nlcd class fractions
@@ -382,6 +402,7 @@ calc_nlcd <- function(from,
     names(new_data_vect)[1:2] <- c(locs_id, "time")
   }
   calc_check_time(covar = new_data_vect, POSIXt = FALSE)
+  future::plan(future::sequential)
   return(new_data_vect)
 }
 

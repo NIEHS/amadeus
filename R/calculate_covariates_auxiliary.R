@@ -300,6 +300,7 @@ calc_time <- function(
 #' @return NULL
 #' @keywords internal
 #' @export
+# nolint start
 calc_check_time <- function(
   covar,
   POSIXt = TRUE
@@ -317,6 +318,7 @@ calc_check_time <- function(
     )
   }
 }
+# nolint end
 
 #' Perform covariate extraction
 #' @description
