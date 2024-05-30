@@ -985,7 +985,7 @@ process_nei <- function(
 #' @param return_format character(1). `"terra"` or `"sf"` or `"data.table"`.
 #' @param ... Placeholders.
 #' @seealso
-#' * [`download_aqs_data()`]
+#' * [`download_aqs()`]
 #' * [EPA, n.d., _AQS Parameter Codes_](
 #'   https://aqs.epa.gov/aqsweb/documents/codetables/parameters.csv)
 #' @returns a `SpatVector` or sf object depending on the `return_format`

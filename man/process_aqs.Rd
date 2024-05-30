@@ -44,7 +44,7 @@ a long processing time or even a crash.
 }
 \seealso{
 \itemize{
-\item \code{\link[=download_aqs_data]{download_aqs_data()}}
+\item \code{\link[=download_aqs]{download_aqs()}}
 \item \href{https://aqs.epa.gov/aqsweb/documents/codetables/parameters.csv}{EPA, n.d., \emph{AQS Parameter Codes}}
 }
 }

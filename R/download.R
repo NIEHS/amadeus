@@ -17,24 +17,24 @@
 #' @seealso
 #' For details of each download function per dataset,
 #' Please refer to:
-#' * \link{`download_aqs`}: `"aqs"`, `"AQS"`
-#' * \link{`download_ecoregion`}: `"ecoregions"`, `"ecoregion"`
-#' * \link{`download_geos`}: `"geos"`
-#' * \link{`download_gmted`}: `"gmted"`, `"GMTED"`
-#' * \link{`download_koppen_geiger`}: `"koppen"`, `"koppengeiger"`
-#' * \link{`download_merra2`}: "merra2", `"merra"`, `"MERRA"`, `"MERRA2"`
-#' * \link{`download_narr_monolevel`}: `"narr_monolevel"`, `"monolevel"`
-#' * \link{`download_narr_p_levels`}: `"narr_p_levels"`, `"p_levels"`,
+#' * \code{\link{download_aqs}}: `"aqs"`, `"AQS"`
+#' * \code{\link{download_ecoregion}}: `"ecoregions"`, `"ecoregion"`
+#' * \code{\link{download_geos}}: `"geos"`
+#' * \code{\link{download_gmted}}: `"gmted"`, `"GMTED"`
+#' * \code{\link{download_koppen_geiger}}: `"koppen"`, `"koppengeiger"`
+#' * \code{\link{download_merra2}}: "merra2", `"merra"`, `"MERRA"`, `"MERRA2"`
+#' * \code{\link{download_narr_monolevel}}: `"narr_monolevel"`, `"monolevel"`
+#' * \code{\link{download_narr_p_levels}}: `"narr_p_levels"`, `"p_levels"`,
 #'   `"plevels"`
-#' * \link{`download_nlcd`}: `"nlcd"`, `"NLCD"`
-#' * \link{`download_hms`}: `"noaa"`, `"smoke"`, `"hms"`
-#' * \link{`download_sedac_groads`}: `"sedac_groads"`, `"groads"`
-#' * \link{`download_sedac_population`}: `"sedac_population"`, `"population"`
-#' * \link{`download_modis`}: `"modis"`, `"MODIS"`
-#' * \link{`download_tri`}: `"tri"`, `"TRI"`
-#' * \link{`download_nei`}: `"nei"`, `"NEI"`
-#' * \link{`download_gridmet`}: `"gridMET"`, `"gridmet"`
-#' * \link{`download_terraclimate`}: `"TerraClimate"`, `"terraclimate"`
+#' * \code{\link{download_nlcd}}: `"nlcd"`, `"NLCD"`
+#' * \code{\link{download_hms}}: `"noaa"`, `"smoke"`, `"hms"`
+#' * \code{\link{download_sedac_groads}}: `"sedac_groads"`, `"groads"`
+#' * \code{\link{download_sedac_population}}: `"sedac_population"`, `"population"`
+#' * \code{\link{download_modis}}: `"modis"`, `"MODIS"`
+#' * \code{\link{download_tri}}: `"tri"`, `"TRI"`
+#' * \code{\link{download_nei}}: `"nei"`, `"NEI"`
+#' * \code{\link{download_gridmet}}: `"gridMET"`, `"gridmet"`
+#' * \code{\link{download_terraclimate}}: `"TerraClimate"`, `"terraclimate"`
 #' @returns NULL
 #' @export
 download_data <-
