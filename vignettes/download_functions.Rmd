@@ -2,7 +2,7 @@
 title: "download_data and NASA EarthData Account"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{download_data() and NASA EarthData Account}
+  %\VignetteIndexEntry{download_data and NASA EarthData Account}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "2024-05-02"

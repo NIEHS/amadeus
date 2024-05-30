@@ -1463,45 +1463,48 @@ testthat::test_that("gridmet and terraclimate auxiliary functions.", {
 
 
 # test PRISM ####
-testthat::test_that("process_prism returns a SpatRaster object with correct metadata", {
-  # Set up test data
-  withr::local_package("terra")
-  path <- testthat::test_path(
-    "..", "testdata", "prism", "PRISM_tmin_30yr_normal_4kmD1_0228_bil_test.nc"
-  )
-  path_dir <- testthat::test_path(
-    "..", "testdata", "prism"
-  )
-  element <- "tmin"
-  time <- "0228"
-
-  # Call the function
-  testthat::expect_no_error(result <- process_prism(path, element, time))
-  testthat::expect_no_error(result2 <- process_prism(path_dir, element, time))
-
-  # Check the return type
-  testthat::expect_true(inherits(result, "SpatRaster"))
-  testthat::expect_true(inherits(result2, "SpatRaster"))
-
-  # Check the metadata
-  testthat::expect_equal(unname(terra::metags(result)["time"]), time)
-  testthat::expect_equal(unname(terra::metags(result)["element"]), element)
-
-  # Set up test data
-  path_bad <- "/path/to/nonexistent/folder"
-  element_bad <- "invalid_element"
-  time_bad <- "invalid_time"
-
-  # Call the function and expect an error
-  testthat::expect_error(process_prism(NULL, element, time))
-  testthat::expect_error(
-    testthat::expect_warning(
-      process_prism(path_bad, element, time)
+testthat::test_that(
+  "process_prism returns a SpatRaster object with correct metadata",
+  {
+    # Set up test data
+    withr::local_package("terra")
+    path <- testthat::test_path(
+      "..", "testdata", "prism", "PRISM_tmin_30yr_normal_4kmD1_0228_bil_test.nc"
     )
-  )
-  testthat::expect_error(process_prism(path_dir, element_bad, time))
-  testthat::expect_error(process_prism(path_dir, element, time_bad))
-})
+    path_dir <- testthat::test_path(
+      "..", "testdata", "prism"
+    )
+    element <- "tmin"
+    time <- "0228"
+
+    # Call the function
+    testthat::expect_no_error(result <- process_prism(path, element, time))
+    testthat::expect_no_error(result2 <- process_prism(path_dir, element, time))
+
+    # Check the return type
+    testthat::expect_true(inherits(result, "SpatRaster"))
+    testthat::expect_true(inherits(result2, "SpatRaster"))
+
+    # Check the metadata
+    testthat::expect_equal(unname(terra::metags(result)["time"]), time)
+    testthat::expect_equal(unname(terra::metags(result)["element"]), element)
+
+    # Set up test data
+    path_bad <- "/path/to/nonexistent/folder"
+    element_bad <- "invalid_element"
+    time_bad <- "invalid_time"
+
+    # Call the function and expect an error
+    testthat::expect_error(process_prism(NULL, element, time))
+    testthat::expect_error(
+      testthat::expect_warning(
+        process_prism(path_bad, element, time)
+      )
+    )
+    testthat::expect_error(process_prism(path_dir, element_bad, time))
+    testthat::expect_error(process_prism(path_dir, element, time_bad))
+  }
+)
 
 
 # test CropScape ####

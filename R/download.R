@@ -29,7 +29,8 @@
 #' * \code{\link{download_nlcd}}: `"nlcd"`, `"NLCD"`
 #' * \code{\link{download_hms}}: `"noaa"`, `"smoke"`, `"hms"`
 #' * \code{\link{download_sedac_groads}}: `"sedac_groads"`, `"groads"`
-#' * \code{\link{download_sedac_population}}: `"sedac_population"`, `"population"`
+#' * \code{\link{download_sedac_population}}: `"sedac_population"`,
+#'   `"population"`
 #' * \code{\link{download_modis}}: `"modis"`, `"MODIS"`
 #' * \code{\link{download_tri}}: `"tri"`, `"TRI"`
 #' * \code{\link{download_nei}}: `"nei"`, `"NEI"`
