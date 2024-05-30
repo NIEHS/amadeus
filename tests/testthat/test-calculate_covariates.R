@@ -441,10 +441,10 @@ testthat::test_that("Check calc_nlcd works", {
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
 
-  point_us1 <- cbind(lon = -114.7, lat = 38.9, id = 1)
-  point_us2 <- cbind(lon = -114, lat = 39, id = 2)
-  point_ak <- cbind(lon = -155.997, lat = 69.3884, id = 3) # alaska
-  point_fr <- cbind(lon = 2.957, lat = 43.976, id = 4) # france
+  point_us1 <- cbind(lon = -114.7, lat = 38.9, site_id = 1)
+  point_us2 <- cbind(lon = -114, lat = 39, site_id = 2)
+  point_ak <- cbind(lon = -155.997, lat = 69.3884, site_id = 3) # alaska
+  point_fr <- cbind(lon = 2.957, lat = 43.976, site_id = 4) # france
   eg_data <- rbind(point_us1, point_us2, point_ak, point_fr) |>
     as.data.frame() |>
     terra::vect(crs = "EPSG:4326")
@@ -474,6 +474,22 @@ testthat::test_that("Check calc_nlcd works", {
               radius = -3),
     "radius has not a likely value."
   )
+
+  # -- buf_radius has likely value
+  testthat::expect_no_error(
+    calc_nlcd(locs = eg_data,
+              from = nlcdras,
+              mode = "exact",
+              radius = 300)
+  )
+  testthat::expect_no_error(
+    calc_nlcd(locs = eg_data,
+              from = nlcdras,
+              mode = "terra",
+              radius = 300)
+  )
+
+
   # -- year is numeric
   testthat::expect_error(
     process_nlcd(path = path_testdata, year = "2021"),
@@ -492,7 +508,7 @@ testthat::test_that("Check calc_nlcd works", {
   )
   testthat::expect_error(
     calc_nlcd(locs = 12,
-              locs_id = "id",
+              locs_id = "site_id",
               from = nlcdras)
   )
   testthat::expect_error(
@@ -519,14 +535,14 @@ testthat::test_that("Check calc_nlcd works", {
   testthat::expect_no_error(
     calc_nlcd(
       locs = eg_data,
-      locs_id = "id",
+      locs_id = "site_id",
       from = nlcdras,
       radius = buf_radius
     )
   )
   output <- calc_nlcd(
     locs = eg_data,
-    locs_id = "id",
+    locs_id = "site_id",
     radius = buf_radius,
     from = nlcdras
   )
@@ -556,7 +572,7 @@ testthat::test_that("Check calc_nlcd works", {
   )
   output_geom <- calc_nlcd(
     locs = eg_data,
-    locs_id = "id",
+    locs_id = "site_id",
     radius = buf_radius,
     from = nlcdras,
     geom = TRUE

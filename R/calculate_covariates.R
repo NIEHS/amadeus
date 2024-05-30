@@ -241,11 +241,15 @@ calc_koppen_geiger <-
 #' @param from SpatRaster(1). Output of \code{process_nlcd()}.
 #' @param locs terra::SpatVector of points geometry
 #' @param locs_id character(1). Unique identifier of locations
+#' @param mode character(1). One of `"exact"` 
+#'   (using [`exactextractr::exact_extract()`])
+#'   or `"terra"` (using [`terra::freq()`]).
 #' @param radius numeric (non-negative) giving the
 #' radius of buffer around points
 #' @param max_cells integer(1). Maximum number of cells to be read at once.
 #' Higher values may expedite processing, but will increase memory usage.
-#' Maximum possible value is `2^31 - 1`.
+#' Maximum possible value is `2^31 - 1`. Only valid when
+#' `mode = "exact"`.
 #' See [`exactextractr::exact_extract`] for details.
 #' @param geom logical(1). Should the geometry of `locs` be returned in the
 #' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
@@ -254,8 +258,13 @@ calc_koppen_geiger <-
 #' coordinate reference system of the `$geometry` is the coordinate
 #' reference system of `from`.
 #' @param ... Placeholders.
-#' @note NLCD is available in U.S. only. Users should be cautious
-#' the spatial extent of the data.
+#' @note NLCD is available in U.S. only. Users should be aware of
+#' the spatial extent of the data. The results are different depending
+#' on `mode` argument. The `"terra"` mode is less memory intensive
+#' but less accurate because it counts the number of cells
+#' intersecting with the buffer. The `"exact"` may be more accurate
+#' but uses more memory as it will account for the partial overlap
+#' with the buffer.
 #' @seealso [`process_nlcd`]
 #' @returns a data.frame object
 #' @importFrom utils read.csv
@@ -264,7 +273,6 @@ calc_koppen_geiger <-
 #' @importFrom terra project
 #' @importFrom terra vect
 #' @importFrom terra crs
-#' @importFrom terra deepcopy
 #' @importFrom terra set.crs
 #' @importFrom terra buffer
 #' @importFrom sf st_union
@@ -276,11 +284,14 @@ calc_koppen_geiger <-
 calc_nlcd <- function(from,
                       locs,
                       locs_id = "site_id",
+                      mode = c("exact", "terra"),
                       radius = 1000,
                       max_cells = 5e7,
                       geom = FALSE,
+                      nthreads = 1L,
                       ...) {
   # check inputs
+  mode <- match.arg(mode)
   if (!is.numeric(radius)) {
     stop("radius is not a numeric.")
   }
@@ -307,43 +318,61 @@ calc_nlcd <- function(from,
   # select points within mainland US and reproject on nlcd crs if necessary
   data_vect_b <-
     terra::project(locs_vector, y = terra::crs(from))
-
   # create circle buffers with buf_radius
-  bufs_pol <- terra::buffer(data_vect_b, width = radius) |>
-    sf::st_as_sf() |>
-    sf::st_geometry()
-  # ratio of each nlcd class per buffer
-  nlcd_at_bufs <-
-    exactextractr::exact_extract(
-      from,
-      bufs_pol,
-      fun = "frac",
-      force_df = TRUE,
-      progress = FALSE,
-      max_cells_in_memory = max_cells
-    )
-
-  # select only the columns of interest
+  bufs_pol <- terra::buffer(data_vect_b, width = radius)
   cfpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
   nlcd_classes <- utils::read.csv(cfpath)
-  nlcd_at_bufs <-
-    nlcd_at_bufs[
-      sort(names(nlcd_at_bufs)[
-        grepl(paste0("frac_(", paste(nlcd_classes$value, collapse = "|"), ")"),
-              names(nlcd_at_bufs))
-      ])
-    ]
+
+  if (mode == "fast") {
+    # fast mode
+    class_query <- "names"
+    # extract land cover class in each buffer
+    nlcd_at_bufs <-
+      terra::freq(
+        from,
+        zones = bufs_pol,
+        wide = TRUE
+      )
+    nlcd_at_bufs <- nlcd_at_bufs[, -seq(1, 2)]
+    nlcd_cellcnt <- nlcd_at_bufs[, seq(1, ncol(nlcd_at_bufs), 1)]
+    nlcd_cellcnt <- nlcd_cellcnt / rowSums(nlcd_cellcnt)
+    nlcd_at_bufs[, seq(1, ncol(nlcd_at_bufs), 1)] <- nlcd_cellcnt
+  } else {
+    class_query <- "value"
+    # ratio of each nlcd class per buffer
+    bufs_pol <- bufs_pol |>
+      sf::st_as_sf() |>
+      sf::st_geometry()
+    nlcd_at_bufs <-
+      exactextractr::exact_extract(
+        from,
+        bufs_pol,
+        fun = "frac",
+        force_df = TRUE,
+        progress = FALSE,
+        max_cells_in_memory = max_cells
+      )
+
+    # select only the columns of interest
+    nlcd_at_buf_names <- names(nlcd_at_bufs)
+    nlcd_val_cols <-
+      grep("^frac_", nlcd_at_buf_names)
+    nlcd_at_bufs <- nlcd_at_bufs[, nlcd_val_cols]
+  }
+
   # change column names
   nlcd_names <- names(nlcd_at_bufs)
   nlcd_names <- sub(pattern = "frac_", replacement = "", x = nlcd_names)
-  nlcd_names <- sort(as.numeric(nlcd_names))
-  nlcd_names <- nlcd_classes[nlcd_classes$value %in% nlcd_names, c("class")]
-  new_names <- sapply(
-    nlcd_names,
-    function(x) {
-      sprintf("LDU_%s_0_%05d", x, radius)
-    }
-  )
+  nlcd_names <-
+    switch(
+      mode,
+      exact = sort(as.numeric(nlcd_names)),
+      fast = nlcd_names
+    )
+  nlcd_names <-
+    nlcd_classes$class[match(nlcd_names, nlcd_classes[[class_query]])]
+  #nlcd_classes[nlcd_classes[[class_query]] %in% nlcd_names, c("class")]
+  new_names <- sprintf("LDU_%s_0_%05d", nlcd_names, radius)
   names(nlcd_at_bufs) <- new_names
   # merge locs_df with nlcd class fractions
   new_data_vect <- cbind(locs_df, as.integer(year), nlcd_at_bufs)
@@ -404,7 +433,7 @@ calc_ecoregion <-
     locs_df <- locs_prepared[[2]]
 
     extracted <- terra::intersect(locsp, from)
-    return(extracted)
+
     # Generate field names from extracted ecoregion keys
     # TODO: if we keep all-zero fields, the initial reference
     # should be the ecoregion polygon, not the extracted data

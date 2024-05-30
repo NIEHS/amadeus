@@ -683,6 +683,8 @@ process_koppen_geiger <-
 #' returning a single `SpatRaster` object.
 #' @param path character giving nlcd data path
 #' @param year numeric giving the year of NLCD data used
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @description Reads NLCD file of selected `year`.
 #' @returns a `SpatRaster` object
@@ -695,6 +697,7 @@ process_nlcd <-
   function(
     path = NULL,
     year = 2021,
+    extent = NULL,
     ...
   ) {
     # check inputs
@@ -717,7 +720,7 @@ process_nlcd <-
     if (length(nlcd_file) == 0) {
       stop("NLCD data not available for this year.")
     }
-    nlcd <- terra::rast(nlcd_file)
+    nlcd <- terra::rast(nlcd_file, win = extent)
     terra::metags(nlcd) <- c(year = year)
     return(nlcd)
   }
@@ -752,9 +755,11 @@ process_ecoregion <-
     ecoreg <- ecoreg[, grepl("^(L2_KEY|L3_KEY)", names(ecoreg))]
     ecoreg_edit_idx <- sf::st_intersects(ecoreg, poly_tukey, sparse = FALSE)
     ecoreg_edit_idx <- vapply(ecoreg_edit_idx, function(x) any(x), logical(1))
-    ecoreg_else <- ecoreg[!ecoreg_edit_idx, ]
-    ecoreg_edit <- sf::st_union(ecoreg[ecoreg_edit_idx, ], poly_tukey)
-    ecoreg <- rbind(ecoreg_else, ecoreg_edit)
+    if (!all(ecoreg_edit_idx == 0)) {
+      ecoreg_else <- ecoreg[!ecoreg_edit_idx, ]
+      ecoreg_edit <- sf::st_union(ecoreg[ecoreg_edit_idx, ], poly_tukey)
+      ecoreg <- rbind(ecoreg_else, ecoreg_edit)
+    }
     ecoreg$time <- paste0(
       "1997 - ", data.table::year(Sys.time())
     )
