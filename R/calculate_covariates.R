@@ -394,6 +394,7 @@ calc_nlcd <- function(from,
     nlcd_classes$class[match(nlcd_names, nlcd_classes[[class_query]])]
   new_names <- sprintf("LDU_%s_0_%05d", nlcd_names, radius)
   names(nlcd_at_bufs) <- new_names
+
   # merge locs_df with nlcd class fractions
   new_data_vect <- cbind(locs_df, as.integer(year), nlcd_at_bufs)
   if (geom) {

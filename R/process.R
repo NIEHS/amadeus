@@ -732,6 +732,9 @@ process_nlcd <-
 #' data, returning a `SpatVector` object.
 #' @param path character(1). Path to Ecoregion Shapefiles
 #' @param ... Placeholders.
+#' @note The function will fix Tukey's bridge in Portland, ME.
+#' This fix will ensure that the EPA air quality monitoring sites
+#' will be located within the ecoregion.
 #' @author Insang Song
 #' @returns a `SpatVector` object
 #' @importFrom terra vect
