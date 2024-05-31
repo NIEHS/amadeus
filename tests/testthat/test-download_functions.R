@@ -709,7 +709,6 @@ testthat::test_that("SEDAC population data types are coerced.", {
                   year = year,
                   data_format = data_formats[f],
                   data_resolution = data_resolutions[1],
-                  directory_to_download = directory_to_download,
                   directory_to_save = directory_to_save,
                   acknowledgement = TRUE,
                   download = FALSE,
@@ -1224,7 +1223,6 @@ testthat::test_that("Test error cases in EPA gaftp sources 2", {
                   remove_command = FALSE,
                   unzip = FALSE,
                   remove_zip = FALSE,
-                  directory_to_download = directory_to_save,
                   epa_certificate_path = certificate
                   )
   )

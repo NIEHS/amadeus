@@ -714,7 +714,7 @@ process_nlcd <-
     nlcd_file <-
       list.files(
         path,
-        pattern = paste0("nlcd_", year, "_.*.tif$"),
+        pattern = paste0("nlcd_", year, "_.*.(tif|img)$"),
         full.names = TRUE
       )
     if (length(nlcd_file) == 0) {

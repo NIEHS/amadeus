@@ -346,8 +346,8 @@ calc_nlcd <- function(from,
         )
       }, seq_len(nrow(bufs_pol)),
       future.seed = TRUE
-    ) |>
-      collapse::rowbind(fill = TRUE)
+    )
+    nlcd_at_bufs <- collapse::rowbind(nlcd_at_bufs, fill = TRUE)
     nlcd_at_bufs <- nlcd_at_bufs[, -seq(1, 2)]
     nlcd_cellcnt <- nlcd_at_bufs[, seq(1, ncol(nlcd_at_bufs), 1)]
     nlcd_cellcnt <- nlcd_cellcnt / rowSums(nlcd_cellcnt, na.rm = TRUE)
@@ -355,23 +355,23 @@ calc_nlcd <- function(from,
   } else {
     class_query <- "value"
     # ratio of each nlcd class per buffer
-    bufs_pol <- bufs_pol |>
+    bufs_polx <- bufs_pol[terra::ext(from), ] |>
       sf::st_as_sf() |>
       sf::st_geometry()
     nlcd_at_bufs <- future.apply::future_Map(
       function(i) {
         exactextractr::exact_extract(
           from,
-          bufs_pol[i, ],
+          bufs_polx[i, ],
           fun = "frac",
           force_df = TRUE,
           progress = FALSE,
           max_cells_in_memory = max_cells
         )
-      }, seq_len(length(bufs_pol)),
+      }, seq_len(length(bufs_polx)),
       future.seed = TRUE
-    ) |>
-      collapse::rowbind(fill = TRUE)
+    )
+    nlcd_at_bufs <- collapse::rowbind(nlcd_at_bufs, fill = TRUE)
     # select only the columns of interest
     nlcd_at_buf_names <- names(nlcd_at_bufs)
     nlcd_val_cols <-
@@ -387,7 +387,7 @@ calc_nlcd <- function(from,
   nlcd_names <-
     switch(
       mode,
-      exact = sort(as.numeric(nlcd_names)),
+      exact = as.numeric(nlcd_names),
       terra = nlcd_names
     )
   nlcd_names <-

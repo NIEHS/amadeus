@@ -471,6 +471,12 @@ testthat::test_that("Check calc_nlcd works", {
               radius = "1000"),
     "radius is not a numeric."
   )
+  testthat::expect_error(
+    calc_nlcd(locs = eg_data,
+              from = nlcdras,
+              mode = "whatnot",
+              radius = 1000)
+  )
   # -- buf_radius has likely value
   testthat::expect_error(
     calc_nlcd(locs = eg_data,
@@ -481,10 +487,10 @@ testthat::test_that("Check calc_nlcd works", {
 
   # -- two modes work properly
   testthat::expect_no_error(
-    calc_nlcd(locs = eg_data,
+    calc_nlcd(locs = sf::st_as_sf(eg_data),
               from = nlcdras,
               mode = "exact",
-              radius = 300)
+              radius = 1000)
   )
   testthat::expect_no_error(
     calc_nlcd(locs = eg_data,
@@ -1486,7 +1492,7 @@ testthat::test_that("calc_lagged returns as expected.", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(calc_lagged)
   )
   for (l in seq_along(lags)) {
@@ -1526,10 +1532,10 @@ testthat::test_that("calc_lagged returns as expected.", {
         locs_id = "site_id",
         time_id = "time"
       )
-      expect_identical(narr_lagged, narr_covariate)
+      testthat::expect_identical(narr_lagged, narr_covariate)
     } else {
       # expect error because 2018-01-01 will not have lag data from 2017-12-31
-      expect_error(
+      testthat::expect_error(
         calc_lagged(
           from = narr_covariate,
           date = c("2018-01-01", "2018-01-10"),
@@ -1546,13 +1552,13 @@ testthat::test_that("calc_lagged returns as expected.", {
         time_id = "time"
       )
       # expect output is data.frame
-      expect_true(
+      testthat::expect_true(
         class(narr_lagged) == "data.frame"
       )
       # expect lag day
-      expect_true(grepl("_[0-9]{1}_", colnames(narr_lagged)[3]))
+      testthat::expect_true(grepl("_[0-9]{1}$", colnames(narr_lagged)[3]))
       # expect no NA
-      expect_true(all(!is.na(narr_lagged)))
+      testthat::expect_true(all(!is.na(narr_lagged)))
     }
   }
 })

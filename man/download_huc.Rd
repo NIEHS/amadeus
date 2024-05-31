@@ -53,7 +53,7 @@ please visit \href{https://www.epa.gov/waterdata/get-nhdplus-national-hydrograph
 }
 \examples{
 \dontrun{
-download_huc("Lower48", "Seamless", "~/data"
+download_huc("Lower48", "Seamless", "/data"
              acknowledgement = TRUE,
              download = TRUE,
              unzip = TRUE)
