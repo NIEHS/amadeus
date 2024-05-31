@@ -1511,6 +1511,7 @@ testthat::test_that(
 testthat::test_that(
   "process_cropscape returns a SpatRaster object with correct metadata", {
     # Set up test data
+    withr::local_package("terra")
     filepath <-
       testthat::test_path("..", "testdata/cropscape/cdl_30m_r_nc_2019_sub.tif")
     dirpath <- testthat::test_path("..", "testdata/cropscape")

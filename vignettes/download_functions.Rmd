@@ -545,14 +545,13 @@ testthat::test_that(
     # parameters
     test_start <- "2023-12-28"
     test_end <- "2024-01-02"
-    test_directory <- "./data"
+    test_directory <- "./data/"
     # download
     download_data(
       dataset_name = "noaa",
       date_start = test_start,
       date_end = test_end,
       data_format = "Shapefile",
-      directory_to_download = test_directory,
       directory_to_save = test_directory,
       acknowledgement = TRUE,
       download = FALSE,
@@ -593,7 +592,6 @@ testthat::test_that(
       date_start = test_start,
       date_end = test_end,
       data_format = "Shapefile",
-      directory_to_download = test_directory,
       directory_to_save = test_directory,
       acknowledgement = TRUE,
       download = FALSE,
@@ -684,6 +682,9 @@ testthat::test_that(
 )
 ```
 
+```{r, echo = FALSE, include = FALSE}
+file.remove(commands_txt)
+```
 
 As expected, the test passes because the NOAA HMS Smoke dataset does not contain data for January 1-2, 1800.
 
@@ -1001,7 +1002,6 @@ download_data(
   year = "2020",
   data_format = "GeoTIFF",
   data_resolution = "60 minute",
-  directory_to_download = "./sedac_population/",
   directory_to_save = "./sedac_population",
   acknowledgement = TRUE,
   download = TRUE,
