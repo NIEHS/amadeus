@@ -459,12 +459,17 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
                             gsub("-", "", date_end),
                             "_curl_commands.txt")
     # expect sub-directories to be created
+    if (data_formats[d] == "Shapefile") {
+      expected_folders <- 3
+    } else {
+      expected_folders <- 2
+    }
     testthat::expect_true(
       length(
         list.files(
           directory_to_save, include.dirs = TRUE
           )
-        ) == 3
+        ) == expected_folders
     )
     # import commands
     commands <- read_commands(commands_path = commands_path)
