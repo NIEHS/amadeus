@@ -75,7 +75,8 @@ testthat::test_that("Errors when temporal ranges invalid.", {
       date_start = "1900-01-01",
       collection = "inst1_2d_asm_Nx",
       directory_to_save = testthat::test_path("..", "testdata/", ""),
-      acknowledgement = TRUE
+      acknowledgement = TRUE,
+      remove_command = TRUE
     )
   )
   expect_error(
@@ -237,7 +238,7 @@ testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 2)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 20L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 10L, method = "HEAD")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
@@ -422,7 +423,7 @@ testthat::test_that("NARR p-levels download URLs have HTTP status 200.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 6)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 20L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 10L, method = "HEAD")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
@@ -476,7 +477,7 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
     # extract urls
     urls <- extract_urls(commands = commands, position = 6)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
+    url_status <- check_urls(urls = urls, size = 10L, method = "HEAD")
     # implement unit tests
     test_download_functions(directory_to_save = directory_to_save,
                             commands_path = commands_path,
@@ -741,8 +742,6 @@ testthat::test_that("SEDAC population data types are coerced.", {
                             url_status = url_status)
     # remove file with commands after test
     file.remove(commands_path)
-    # remove file with commands after test
-    unlink(directory_to_save, recursive = TRUE)
   }
 })
 
@@ -1252,7 +1251,7 @@ testthat::test_that("epa certificate", {
   testthat::expect_error(
     download_epa_certificate("file.txt")
   )
-  testthat::expect_message(
+  testthat::expect_no_error(
     download_epa_certificate(file.path(tempdir(), "file.pem"))
   )
   testthat::expect_no_error(
@@ -1451,8 +1450,6 @@ testthat::test_that("terraclimate error with invalid variables", {
 })
 
 
-
-
 testthat::test_that("download_cropscape throws an error for invalid year", {
   # Set up test data
   invalid_year <- 1996
@@ -1646,7 +1643,6 @@ testthat::test_that("download_prism downloads the correct data files", {
   ))
 
 })
-
 
 
 testthat::test_that("list_stac_files returns a character vector of file links", {

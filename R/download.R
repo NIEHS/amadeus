@@ -177,7 +177,7 @@ download_aqs <-
         resolution_temporal,
         "_",
         parameter_code,
-        "_%.0f.zip",
+        "_%d.zip",
         sep = ""
       ),
       year_sequence
@@ -196,7 +196,7 @@ download_aqs <-
         resolution_temporal,
         "_",
         parameter_code,
-        "_%.0f.zip",
+        "_%d.zip",
         sep = ""
       ),
       year_sequence
@@ -228,7 +228,7 @@ download_aqs <-
     )
     download_sink(commands_txt)
     #### 8. concatenate and print download commands to "..._curl_commands.txt"
-    writeLines(download_commands)
+    cat(download_commands)
     #### 9. finish "..._curl_commands.txt" file
     sink()
     #### 10. build system command

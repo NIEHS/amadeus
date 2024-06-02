@@ -2547,7 +2547,7 @@ process_terraclimate <- function(
 #' @param layer_name character(1). Layer name in the `path`
 #' @param huc_level character(1). Field name of HUC level
 #' @param huc_header character(1). The upper level HUC code header to extract
-#' lower level HUCs.
+#'  lower level HUCs.
 #' @param ... Arguments passed to `nhdplusTools::get_huc()`
 #' @returns a `SpatVector` object
 #' @seealso [`nhdplusTools::get_huc`]
