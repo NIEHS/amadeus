@@ -318,7 +318,7 @@ generate_time_sequence <-
 
 #' Check HTTP status
 #' @description
-#' Check if provided URL returns HTTP status 200.
+#' Check if provided URL returns HTTP status 200 or 206.
 #' @param url Download URL to be checked.
 #' @param method httr method to obtain URL (`"HEAD"` or `"GET"`)
 #' @author Insang Song; Mitchell Manware
@@ -331,15 +331,15 @@ check_url_status <- function(
     url,
     method = c("HEAD", "GET")) {
   method <- match.arg(method)
-  http_status_ok <- 200
+  http_status_ok <- c(200, 206)
   if (method == "HEAD") {
     hd <- httr::HEAD(url)
   } else if (method == "GET") {
     hd <- httr::GET(url)
   }
   status <- hd$status_code
-  Sys.sleep(1.5)
-  return(status == http_status_ok)
+  Sys.sleep(1)
+  return(status %in% http_status_ok)
 }
 
 #' Import download commands

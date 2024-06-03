@@ -509,7 +509,6 @@ testthat::test_that("process_nei tests", {
 })
 
 
-
 ## ephemeral: process_conformity tests
 testthat::test_that("process_conformity tests", {
   withr::local_package("terra")

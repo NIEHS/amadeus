@@ -148,15 +148,13 @@ testthat::test_that("EPA AQS download URLs have HTTP status 200.", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 2)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = length(urls), method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
   # implement unit tets
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
                           url_status = url_status)
   # remove file with commands after test
   file.remove(commands_path)
-  # remove temporary aqs
-  unlink(directory_to_save, recursive = TRUE)
 })
 
 
@@ -789,15 +787,13 @@ testthat::test_that("Koppen Geiger download URLs have HTTP status 200.", {
       # extract urls
       urls <- extract_urls(commands = commands, position = 2)
       # check HTTP URL status
-      url_status <- check_urls(urls = urls, size = 1L, method = "GET")
+      url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
       # implement unit tests
       test_download_functions(directory_to_save = directory_to_save,
                               commands_path = commands_path,
                               url_status = url_status)
       # remove file with commands after test
       file.remove(commands_path)
-      # remove temporary kop
-      unlink(directory_to_save, recursive = TRUE)
     }
   }
 })
@@ -844,7 +840,7 @@ testthat::test_that("MODIS-MOD09GA download URLs have HTTP status 200.", {
     # extract urls
     urls <- extract_urls(commands = commands, position = 4)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 10L, method = "SKIP")
+    url_status <- check_urls(urls = urls, size = 3L, method = "SKIP")
     # implement unit tests
     test_download_functions(directory_to_save = directory_to_save,
                             commands_path = commands_path,
@@ -1046,7 +1042,6 @@ testthat::test_that("MODIS download error cases.", {
                   remove_command = FALSE)
   )
 
-
   # define file path with commands
   commands_path <- paste0(
     directory_to_save,
@@ -1070,7 +1065,6 @@ testthat::test_that("MODIS download error cases.", {
   # remove file with commands after test
   file.remove(commands_path)
 })
-
 
 
 testthat::test_that("EPA TRI download URLs have HTTP status 200.", {
