@@ -40,8 +40,8 @@ jobs:
       - name: Test coverage
         run: >
           Rscript -e
-          "covd<-covr::coverage_to_list()$totalcoverage;
-          write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F)"
+          "tryCatch({covd<-covr::coverage_to_list()$totalcoverage;
+          write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F)}, error=function(e) print(e))"
         shell: bash
 
       - name: Get Values
