@@ -146,7 +146,7 @@ testthat::test_that("EPA AQS download URLs have HTTP status 200.", {
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
-  urls <- extract_urls(commands = commands, position = 2)
+  urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
   # implement unit tets

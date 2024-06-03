@@ -203,7 +203,7 @@ download_aqs <-
     )
     #### 6. build download command
     download_commands <- paste0(
-      "curl ",
+      "curl -s --url ",
       download_urls,
       " --output ",
       download_names,

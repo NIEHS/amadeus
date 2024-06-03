@@ -374,7 +374,7 @@ extract_urls <- function(
   }
   urls <- sapply(
     strsplit(
-      commands,
+      trimws(commands),
       " "
     ),
     function(x, l) x[l],
