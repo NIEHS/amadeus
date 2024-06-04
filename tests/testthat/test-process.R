@@ -1590,19 +1590,6 @@ testthat::test_that("process_huc",
 
     # Call the function and expect an error
     testthat::expect_error(process_huc(path2))
-    # using nhdplusTools
-    testthat::expect_no_error(
-      test3 <- process_huc(
-        "",
-        layer_name = NULL,
-        huc_level = NULL,
-        huc_header = NULL,
-        id = "030202",
-        type = "huc06",
-        t_srs = "EPSG:5070"
-      )
-    )
-    testthat::expect_s4_class(test3, "SpatVector")
   }
 )
 

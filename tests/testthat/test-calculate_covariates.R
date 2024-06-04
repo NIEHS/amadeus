@@ -182,10 +182,11 @@ testthat::test_that("calc_modis works well.", {
   withr::local_package("terra")
   withr::local_package("stars")
   withr::local_package("lwgeom")
-  withr::local_package("foreach")
-  withr::local_package("doParallel")
   withr::local_options(
-    list(sf_use_s2 = FALSE)
+    list(
+      sf_use_s2 = FALSE,
+      future.resolve.recursive = 2L
+    )
   )
 
   site_faux <-
@@ -1527,7 +1528,7 @@ testthat::test_that("calc_lagged returns as expected.", {
     if (lags[l] == 0) {
       narr_lagged <- calc_lagged(
         from = narr_covariate,
-        date = c("2018-01-05", "2018-01-10"),
+        date = c("2018-01-01", "2018-01-10"),
         lag = lags[l],
         locs_id = "site_id",
         time_id = "time"
