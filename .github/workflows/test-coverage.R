@@ -2,6 +2,7 @@ args <- commandArgs(trailingOnly = TRUE)
 runnertemp <- args[[1]]
 ghworkspace <- args[[2]]
 
+dir.create(runnertemp, showWarnings = FALSE, recursive = TRUE)
 sink(paste0(runnertemp, '/package/testthat.Rout.res'))
 cov <- covr::package_coverage()
 sink()
