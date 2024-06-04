@@ -46,6 +46,13 @@ jobs:
           write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F)}, error=function(e) stop(print(e)))"
         shell: bash
 
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          find ${{ runner.temp }}/package -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
+
       - name: Get Values
         id: get-values
         shell: bash

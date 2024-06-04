@@ -2589,14 +2589,12 @@ process_huc <-
     huc_header = NULL,
     ...
   ) {
-    if (!file.exists(path) && !dir.exists(path)) {
+    if (missing(path) || (!file.exists(path) && !dir.exists(path))) {
       hucpoly <- try(
         rlang::inject(nhdplusTools::get_huc(!!!list(...)))
       )
       if (inherits(hucpoly, "try-error")) {
-        stop(
-          "HUC data was not found."
-        )
+        stop("HUC data was not found.")
       }
       hucpoly <- terra::vect(hucpoly)
     }

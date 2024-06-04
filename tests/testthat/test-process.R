@@ -1583,12 +1583,13 @@ testthat::test_that("process_huc",
       )
     )
 
-
     # Set up test data
-    path <- file.path(path, "..")
+    path2 <- testthat::test_path(
+      "..", "testdata", "huc12"
+    )
 
     # Call the function and expect an error
-    testthat::expect_error(process_huc(path))
+    testthat::expect_error(process_huc(path2))
     # using nhdplusTools
     testthat::expect_no_error(
       test3 <- process_huc(
@@ -1597,7 +1598,8 @@ testthat::test_that("process_huc",
         huc_level = NULL,
         huc_header = NULL,
         id = "030202",
-        type = "huc06"
+        type = "huc06",
+        t_srs = "EPSG:5070"
       )
     )
     testthat::expect_s4_class(test3, "SpatVector")
