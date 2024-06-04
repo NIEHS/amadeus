@@ -12,7 +12,30 @@ on:
 name: pkgdown
   
 jobs:
+  test-covr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - name: Install dependencies
+        run: |
+          install.packages(c("covr", "testthat"))
+          install.packages(".", repos = NULL, type = "source")
+
+      - name: Run tests and generate covr report
+        run: |
+          covr::report(file = "coverage_report.html")
+
+      - name: Upload covr report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: covr-report
+          path: coverage_report.html
+
   pkgdown:
+    needs: test-covr
     runs-on: ubuntu-latest
     # Only restrict concurrency for non-PR jobs
     concurrency:
@@ -23,6 +46,12 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download covr report
+        uses: actions/download-artifact@v4
+        with:
+          name: covr-report
+          path: .
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -41,7 +70,7 @@ jobs:
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        uses: JamesIves/github-pages-deploy-action@v4.6.1
         with:
           clean: false
           branch: gh-pages
