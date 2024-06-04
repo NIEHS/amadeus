@@ -41,15 +41,7 @@ jobs:
 
       - name: Test coverage
         run: |
-          Rscript -e \
-          "tryCatch({ \
-          sink('${{ runner.temp }}/package/testthat.Rout.res') \
-          cov <- covr::package_coverage() \
-          sink() \
-          covd <- covr::coverage_to_list(cov)$totalcoverage \
-          write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F)}, \
-          error=function(e) stop(print(e))) \
-          "
+          Rscript ${{ github.workspace }}/.github/workflows/test-coverage.R ${{ runner.temp }} ${{ github.workspace }}
         shell: bash
 
       - name: Show testthat output
