@@ -335,8 +335,7 @@ download_ecoregion <- function(
     directory_to_save
   )
   if (file.exists(path_downloaded_file)) {
-    message("Requested files exist in the target directory.\n")
-    return(NULL)
+    stop("Requested files exist in the target directory.\n")
   }
   #### 5. define download URL
   download_epa_certificate(
@@ -486,7 +485,7 @@ download_geos <- function(
       collection_loop,
       "/"
     )
-    if (!file.exists(download_folder)) {
+    if (!dir.exists(download_folder)) {
       dir.create(download_folder)
     }
     for (d in seq_along(date_sequence)) {
@@ -945,7 +944,7 @@ download_merra2 <- function(
         directory_to_save,
         collection_loop
       )
-      if (!file.exists(download_folder)) {
+      if (!dir.exists(download_folder)) {
         dir.create(download_folder)
       }
       download_name <- paste0(
@@ -1082,7 +1081,7 @@ download_narr_monolevel <- function(
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
     folder <- paste0(directory_to_save, variable, "/")
-    if (!(file.exists(folder))) {
+    if (!(dir.exists(folder))) {
       dir.create(folder)
     }
     for (y in seq_along(years)) {
@@ -1211,7 +1210,7 @@ download_narr_p_levels <- function(
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
     folder <- paste0(directory_to_save, variable, "/")
-    if (!(file.exists(folder))) {
+    if (!(dir.exists(folder))) {
       dir.create(folder)
     }
     for (y in seq_along(years)) {

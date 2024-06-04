@@ -266,7 +266,6 @@ testthat::test_that("process_modis_merge is good to go", {
     )
   )
 
-
 })
 
 
@@ -492,6 +491,9 @@ testthat::test_that("process_nei tests", {
   testthat::expect_s4_class(neinc, "SpatVector")
 
   # error cases
+  testthat::expect_error(
+    process_nei(testthat::test_path("../testdata", "modis"), year = 2017)
+  )
   testthat::expect_error(
     process_nei(path_nei, year = 2030, county = path_cnty)
   )
@@ -970,6 +972,18 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
       locs_id = "site_id"
     )
   )
+  # error if one of "lat" or "lon" is missing (or both)
+  ncpp <- data.frame(long = -78.8277, lat = 35.95013)
+  ncpp$site_id <- "3799900018810101"
+
+  expect_error(
+    process_locs_vector(
+      locs = ncpp, crs = "EPSG:4326", 0
+    )
+  )
+  expect_error(
+    process_locs_vector(array(1))
+  )
 })
 
 # test AQS ####
@@ -1101,8 +1115,10 @@ testthat::test_that("process_aqs", {
   # expect
   testthat::expect_s3_class(aqssf, "sf")
 
-
   # error cases
+  testthat::expect_error(
+    process_aqs(testthat::test_path("../testdata", "modis"))
+  )
   testthat::expect_error(
     process_aqs(path = 1L)
   )

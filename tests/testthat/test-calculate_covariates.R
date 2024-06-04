@@ -1652,3 +1652,10 @@ testthat::test_that("calc_check_time identifies missing `time` column.", {
     )
   )
 })
+
+# Calc message
+testthat::test_that("calc_message exception",
+  testthat::expect_no_error(
+    calc_message("gmted", "mean", "2020", "year", NULL)
+  )
+)
