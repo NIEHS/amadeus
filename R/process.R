@@ -2589,6 +2589,8 @@ process_huc <-
     huc_header = NULL,
     ...
   ) {
+    # exclude the coverage due to write permission related to memoization
+    #nocov start
     if (missing(path) || (!file.exists(path) && !dir.exists(path))) {
       hucpoly <- try(
         rlang::inject(nhdplusTools::get_huc(!!!list(...)))
@@ -2598,6 +2600,7 @@ process_huc <-
       }
       hucpoly <- terra::vect(hucpoly)
     }
+    #nocov end
     if (file.exists(path) || dir.exists(path)) {
       if (!is.null(huc_header)) {
         querybase <-

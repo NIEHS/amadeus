@@ -49,9 +49,9 @@ testthat::test_that("Errors when temporal ranges invalid.", {
   expect_error(
     download_aqs(
       year_start = 1900,
+      year_end = 1919,
       acknowledgement = TRUE,
       directory_to_save = testthat::test_path("..", "testdata/", ""),
-      directory_to_download = testthat::test_path("..", "testdata/", "")
     )
   )
   expect_error(
@@ -79,11 +79,16 @@ testthat::test_that("Errors when temporal ranges invalid.", {
       remove_command = TRUE
     )
   )
+  file.remove(
+    testthat::test_path(
+      "../testdata", "merra2_1900-01-01_2023-09-01_wget_commands.txt"
+    )
+  )
+  sink()
   expect_error(
     download_hms(
       date_start = "1900-01-01",
       directory_to_save = testthat::test_path("..", "testdata/", ""),
-      directory_to_download = testthat::test_path("..", "testdata/", ""),
       acknowledgement = TRUE
     )
   )
@@ -157,7 +162,7 @@ testthat::test_that("EPA AQS download URLs have HTTP status 200.", {
   file.remove(commands_path)
 })
 
-
+# Ecoregion tests ####
 testthat::test_that("Ecoregion download URLs have HTTP status 200.", {
   withr::local_package("httr")
   withr::local_package("stringr")
@@ -207,6 +212,7 @@ testthat::test_that("Ecoregion download URLs have HTTP status 200.", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+# GEOS-CF tests ####
 testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
   withr::local_package("httr")
   withr::local_package("stringr")
@@ -217,13 +223,15 @@ testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
                    "chm_inst_1hr_g1440x721_p23")
   directory_to_save <- testthat::test_path("..", "testdata/", "")
   # run download function
-  download_data(dataset_name = "geos",
-                date_start = date_start,
-                date_end = date_end,
-                collection = collections,
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                download = FALSE)
+  testthat::expect_no_error(
+    download_data(dataset_name = "geos",
+                  date_start = date_start,
+                  date_end = date_end,
+                  collection = collections,
+                  directory_to_save = directory_to_save,
+                  acknowledgement = TRUE,
+                  download = FALSE)
+  )
   # define file path with commands
   commands_path <- paste0(directory_to_save,
                           "geos_",
@@ -245,6 +253,7 @@ testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
   file.remove(commands_path)
 })
 
+# GMTED tests ####
 testthat::test_that("GMTED download URLs have HTTP status 200.", {
   withr::local_package("httr")
   # function parameters
@@ -296,6 +305,7 @@ testthat::test_that("GMTED download URLs have HTTP status 200.", {
   }
 })
 
+# MERRA2 ####
 testthat::test_that("MERRA2 download URLs have HTTP status 200.", {
   withr::local_package("httr")
   withr::local_package("stringr")
@@ -305,13 +315,15 @@ testthat::test_that("MERRA2 download URLs have HTTP status 200.", {
   collections <- c("inst1_2d_asm_Nx", "inst3_3d_asm_Np")
   directory_to_save <- testthat::test_path("..", "testdata/", "")
   # run download function
-  download_data(dataset_name = "merra2",
-                date_start = date_start,
-                date_end = date_end,
-                collection = collections,
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                download = FALSE)
+  testthat::expect_no_error(
+    download_data(dataset_name = "merra2",
+                  date_start = date_start,
+                  date_end = date_end,
+                  collection = collections,
+                  directory_to_save = directory_to_save,
+                  acknowledgement = TRUE,
+                  download = FALSE)
+  )
   # define path with commands
   commands_path <- paste0(directory_to_save,
                           "merra2_",
@@ -333,6 +345,7 @@ testthat::test_that("MERRA2 download URLs have HTTP status 200.", {
   file.remove(commands_path)
 })
 
+# MERRA2 Collection error test ####
 testthat::test_that("MERRA2 returns message with unrecognized collection.", {
   # function parameters
   collections <- "uNrEcOgNiZeD"
@@ -382,6 +395,7 @@ testthat::test_that("NARR monolevel download URLs have HTTP status 200.", {
   file.remove(commands_path)
 })
 
+# NARR -- Monolevel ####
 testthat::test_that("NARR monolevel error with invalid years.", {
   testthat::expect_error(
     download_data(
@@ -395,6 +409,7 @@ testthat::test_that("NARR monolevel error with invalid years.", {
   )
 })
 
+# NARR -- p-levels ####
 testthat::test_that("NARR p-levels download URLs have HTTP status 200.", {
   withr::local_package("httr")
   withr::local_package("stringr")
@@ -1778,3 +1793,21 @@ testthat::test_that(
 
   }
 )
+
+testthat::test_that("download_sink test", {
+  testfile <- testthat::test_path("../testdata", "sink_test.txt")
+  file.create(testfile)
+  testthat::expect_no_error(
+    download_sink(testfile)
+  )
+  sink()
+  file.remove(testfile)
+})
+
+testthat::test_that("download_remove_zips test", {
+  testfile <- testthat::test_path("../testdata", "coyote.zip")
+  file.create(testfile)
+  testthat::expect_no_error(
+    download_remove_zips(remove = TRUE, testfile)
+  )
+})

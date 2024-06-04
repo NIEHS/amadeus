@@ -265,7 +265,7 @@ calc_time <- function(
     time,
     format) {
   if (format == "timeless") {
-    return()
+    return(time)
   } else if (format == "date") {
     return_time <- as.POSIXlt(
       time,

@@ -30,7 +30,7 @@ jobs:
             needs: coverage
 
       - name: Cache C++ and R dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cache/R
@@ -93,7 +93,7 @@ jobs:
         run: |
           npm i -g badgen-cli
           export COV=${{ steps.get-values.outputs.coverage }}
-          COLOR=$(node -p '+process.env.COV >= 95 ? `green` : `orange`')
+          COLOR=$(node -p '+process.env.COV >= 95 ? `green` : `yellow`')
           mkdir -p badges
           badgen -j coverage -s $COV% -c $COLOR > badges/coverage.svg
   

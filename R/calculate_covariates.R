@@ -2115,13 +2115,14 @@ calc_lagged <- function(
     return(from)
   }
   #### extract times
-  time <- from[[time_id]]
+  time <- as.character(from[[time_id]])
+  dateseq <- seq(as.Date(date[1]) - lag, as.Date(date[2]), by = 1)
+  dateseq <- as.character(dateseq)
+  align <- setdiff(dateseq, unique(time))
   ### check temporal alignment
-  if (!all(c(as.Date(date)[1] - lag, as.Date(date)[2]) %in% time)) {
+  if (length(align) > 0) {
     stop(
-      paste0(
-        "Dates requested in `date` do not align with data available in `from`."
-      )
+      "Dates requested in `date` do not align with data available in `from`."
     )
   }
   unique_locs <- unique(from[[locs_id]])
