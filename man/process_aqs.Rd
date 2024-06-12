@@ -17,8 +17,7 @@ process_aqs(
 \item{path}{character(1). Directory path to daily measurement data.}
 
 \item{date}{character(2). Start and end date.
-Should be in \code{"YYYY-MM-DD"} format and sorted. If \code{NULL},
-only unique locations are returned.}
+Should be in \code{"YYYY-MM-DD"} format and sorted.}
 
 \item{mode}{character(1). One of "full" (all dates * all locations)
 or "sparse" (date-location pairs with available data) or
@@ -36,6 +35,8 @@ a SpatVector, sf, or data.table object depending on the \code{return_format}
 \description{
 The \code{process_aqs()} function cleans and imports raw air quality
 monitoring sites, returning a single \code{SpatVector} or sf object.
+\code{date} is used to filter the raw data read from csv files.
+Filtered rows are then processed according to \code{mode} argument.
 Some sites report multiple measurements per day with and without
 \href{https://www.epa.gov/sites/default/files/2016-10/documents/exceptional_events.pdf}{exceptional events}
 the internal procedure of this function keeps "Included" if there

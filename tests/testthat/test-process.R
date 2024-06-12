@@ -1017,9 +1017,6 @@ testthat::test_that("process_aqs", {
 
   # main test
   testthat::expect_no_error(
-    aqs <- process_aqs(path = aqssub, date = NULL)
-  )
-  testthat::expect_no_error(
     aqsft <- process_aqs(
       path = aqssub,
       date = c("2022-02-04", "2022-02-28"),
@@ -1045,7 +1042,6 @@ testthat::test_that("process_aqs", {
   )
 
   # expect
-  testthat::expect_s4_class(aqs, "SpatVector")
   testthat::expect_s4_class(aqsft, "SpatVector")
   testthat::expect_s4_class(aqsst, "SpatVector")
   testthat::expect_s4_class(aqslt, "SpatVector")
@@ -1095,6 +1091,15 @@ testthat::test_that("process_aqs", {
     )
   )
   testthat::expect_no_error(
+    aqssdd <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "sparse",
+      data_field = "Arithmetic.Mean",
+      return_format = "data.table"
+    )
+  )
+  testthat::expect_no_error(
     aqsld <- process_aqs(
       path = aqssub,
       date = c("2022-02-04", "2022-02-28"),
@@ -1102,13 +1107,21 @@ testthat::test_that("process_aqs", {
       return_format = "data.table"
     )
   )
+  testthat::expect_no_error(
+    aqsldd <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "location",
+      data_field = "Arithmetic.Mean",
+      return_format = "data.table"
+    )
+  )
   testthat::expect_s3_class(aqsfd, "data.table")
   testthat::expect_s3_class(aqssd, "data.table")
+  testthat::expect_s3_class(aqssdd, "data.table")
   testthat::expect_s3_class(aqsld, "data.table")
+  testthat::expect_s3_class(aqsldd, "data.table")
 
-  testthat::expect_no_error(
-    aqssf <- process_aqs(path = aqssub, date = NULL, return_format = "sf")
-  )
   testthat::expect_no_error(
     aqssf <- process_aqs(
       path = testd,

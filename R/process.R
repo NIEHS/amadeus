@@ -977,14 +977,15 @@ process_nei <- function(
 #' @description
 #' The \code{process_aqs()} function cleans and imports raw air quality
 #' monitoring sites, returning a single `SpatVector` or sf object.
+#' `date` is used to filter the raw data read from csv files.
+#' Filtered rows are then processed according to `mode` argument.
 #' Some sites report multiple measurements per day with and without
 #' [exceptional events](https://www.epa.gov/sites/default/files/2016-10/documents/exceptional_events.pdf)
 #' the internal procedure of this function keeps "Included" if there
 #' are multiple event types per site-time.
 #' @param path character(1). Directory path to daily measurement data.
 #' @param date character(2). Start and end date.
-#'  Should be in `"YYYY-MM-DD"` format and sorted. If `NULL`,
-#'  only unique locations are returned.
+#'  Should be in `"YYYY-MM-DD"` format and sorted.
 #' @param mode character(1). One of "full" (all dates * all locations)
 #'   or "sparse" (date-location pairs with available data) or
 #'   "location" (unique locations).
@@ -998,12 +999,9 @@ process_nei <- function(
 #' @returns a SpatVector, sf, or data.table object depending on the `return_format`
 #' @importFrom data.table as.data.table
 #' @importFrom utils read.csv
-#' @importFrom terra vect
-#' @importFrom terra project
+#' @importFrom terra vect project
 #' @importFrom sf st_as_sf
-#' @importFrom dplyr group_by
-#' @importFrom dplyr ungroup
-#' @importFrom dplyr filter
+#' @importFrom dplyr group_by ungroup filter mutate select distinct
 #' @note Choose `date` and `mode` values with caution.
 #' The function may return a massive data.table, resulting in
 #' a long processing time or even a crash.
@@ -1027,6 +1025,8 @@ process_aqs <-
       if (length(date) != 2) {
         stop("date should be a character vector of length 2.")
       }
+    } else {
+      stop("date should be defined.")
     }
     if (length(path) == 1 && dir.exists(path)) {
       path <- list.files(
@@ -1057,18 +1057,25 @@ process_aqs <-
     Date.Local <- NULL
     Sample.Duration <- NULL
 
+    date_start <- as.Date(date[1])
+    date_end <- as.Date(date[2])
+    date_sequence <- seq(date_start, date_end, "day")
+    date_sequence <- as.character(date_sequence)
+
     # select relevant fields only
     sites <- sites |>
       dplyr::as_tibble() |>
+      dplyr::filter(as.character(Date.Local) %in% date_sequence) |>
       dplyr::filter(startsWith(Sample.Duration, "24")) |>
       dplyr::group_by(site_id) |>
       dplyr::filter(POC == min(POC)) |>
       dplyr::mutate(time = Date.Local) |>
       dplyr::ungroup()
-    col_sel <- c("site_id", "Longitude", "Latitude", "Event.Type", "Datum")
+    col_sel <- c("site_id", "Longitude", "Latitude", "Datum")
     if (mode != "sparse") {
       sites_v <- unique(sites[, col_sel])
     } else {
+      col_sel <- append(col_sel, "Event.Type")
       col_sel <- append(col_sel, "time")
       col_sel <- append(col_sel, data_field)
       sites_v <- sites |>
@@ -1080,7 +1087,7 @@ process_aqs <-
         dplyr::group_by(site_id, time) |>
         dplyr::filter(dplyr::n() > 1) |>
         dplyr::filter(Event.Type == "Excluded") |>
-        ungroup()
+        dplyr::ungroup()
       sites_v <-
         dplyr::anti_join(
           sites_v, sites_vdup,
@@ -1111,27 +1118,18 @@ process_aqs <-
     final_sites <-
       final_sites[, grep("Datum", names(final_sites), invert = TRUE), with = FALSE]
 
-    if (!is.null(date)) {
-      date_start <- as.Date(date[1])
-      date_end <- as.Date(date[2])
-      date_sequence <- seq(date_start, date_end, "day")
-      date_sequence <- as.character(date_sequence)
-
-      if (mode == "full") {
-        final_sites <-
-          split(date_sequence, date_sequence) |>
-          lapply(function(x) {
-            fs_time <- final_sites
-            fs_time$time <- x
-            return(fs_time)
-          })
-        final_sites <- data.table::rbindlist(final_sites, fill = TRUE)
-      }
-      if (mode == "sparse") {
-        final_sites <-
-          final_sites[final_sites$time %in% date_sequence, ]
-        final_sites <- unique(final_sites)
-      }
+    if (mode == "full") {
+      final_sites <-
+        split(date_sequence, date_sequence) |>
+        lapply(function(x) {
+          fs_time <- final_sites
+          fs_time$time <- x
+          return(fs_time)
+        })
+      final_sites <- data.table::rbindlist(final_sites, fill = TRUE)
+    }
+    if (mode == "sparse") {
+      final_sites <- unique(final_sites)
     }
 
     final_sites <-
