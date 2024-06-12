@@ -410,11 +410,26 @@ testthat::test_that("Other MODIS function errors", {
 # test Ecoregions ####
 testthat::test_that("read ecoregion", {
   withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
 
   path_eco <- testthat::test_path("..", "testdata", "eco_l3_clip.gpkg")
-
   testthat::expect_no_error(
     process_ecoregion(path_eco)
+  )
+
+  ecotemp <- sf::st_read(path_eco)
+  # nolint start
+  addpoly <-
+    "POLYGON ((-70.2681 43.6787, -70.252234 43.677145, -70.251036 -43.680758, -70.268666 43.681505, -70.2681 43.6787))"
+  # nolint end
+  addpoly <- sf::st_as_sfc(addpoly, crs = "EPSG:4326")
+  addpoly <- sf::st_transform(addpoly, sf::st_crs(ecotemp))
+  ecotemp[1, "geom"] <- addpoly
+  tdir <- tempdir()
+  sf::st_write(ecotemp, paste0(tdir, "/ecoregions.gpkg"), append = FALSE)
+  testthat::expect_no_error(
+    suppressWarnings(process_ecoregion(paste0(tdir, "/ecoregions.gpkg")))
   )
 })
 

@@ -935,9 +935,10 @@ calc_temporal_dummies <-
     colnames(dt_month_dum) <-
       sprintf("DUM_%s_0_00000", shortmn)
 
-    # weekday (starts from 1-Monday)
+    # weekday (starts from 0 - Sunday)
     vec_wday <- as.POSIXlt(locs$time)$wday
-    dt_wday_dum <- dummify(vec_wday, seq(1L, 7L))
+    # subtracting 1 due to the difference in the base
+    dt_wday_dum <- dummify(vec_wday, seq(1L, 7L) - 1)
     colnames(dt_wday_dum) <-
       sprintf("DUM_WKDY%d_0_00000", seq(1L, 7L))
 

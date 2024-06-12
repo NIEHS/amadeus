@@ -31,11 +31,15 @@ or "sparse" (date-location pairs with available data) or
 \item{...}{Placeholders.}
 }
 \value{
-a \code{SpatVector} or sf object depending on the \code{return_format}
+a SpatVector, sf, or data.table object depending on the \code{return_format}
 }
 \description{
 The \code{process_aqs()} function cleans and imports raw air quality
 monitoring sites, returning a single \code{SpatVector} or sf object.
+Some sites report multiple measurements per day with and without
+\href{https://www.epa.gov/sites/default/files/2016-10/documents/exceptional_events.pdf}{exceptional events}
+the internal procedure of this function keeps "Included" if there
+are multiple event types per site-time.
 }
 \note{
 Choose \code{date} and \code{mode} values with caution.

@@ -976,7 +976,11 @@ process_nei <- function(
 #' Process unique U.S. EPA AQS sites
 #' @description
 #' The \code{process_aqs()} function cleans and imports raw air quality
-#' monitoring sites, returning a single `SpatVector` or sf object. 
+#' monitoring sites, returning a single `SpatVector` or sf object.
+#' Some sites report multiple measurements per day with and without
+#' [exceptional events](https://www.epa.gov/sites/default/files/2016-10/documents/exceptional_events.pdf)
+#' the internal procedure of this function keeps "Included" if there
+#' are multiple event types per site-time.
 #' @param path character(1). Directory path to daily measurement data.
 #' @param date character(2). Start and end date.
 #'  Should be in `"YYYY-MM-DD"` format and sorted. If `NULL`,
@@ -991,7 +995,7 @@ process_nei <- function(
 #' * [`download_aqs()`]
 #' * [EPA, n.d., _AQS Parameter Codes_](
 #'   https://aqs.epa.gov/aqsweb/documents/codetables/parameters.csv)
-#' @returns a `SpatVector` or sf object depending on the `return_format`
+#' @returns a SpatVector, sf, or data.table object depending on the `return_format`
 #' @importFrom data.table as.data.table
 #' @importFrom utils read.csv
 #' @importFrom terra vect
@@ -1061,7 +1065,7 @@ process_aqs <-
       dplyr::filter(POC == min(POC)) |>
       dplyr::mutate(time = Date.Local) |>
       dplyr::ungroup()
-    col_sel <- c("site_id", "Longitude", "Latitude", "Datum")
+    col_sel <- c("site_id", "Longitude", "Latitude", "Event.Type", "Datum")
     if (mode != "sparse") {
       sites_v <- unique(sites[, col_sel])
     } else {
@@ -1070,6 +1074,18 @@ process_aqs <-
       sites_v <- sites |>
         dplyr::select(dplyr::all_of(col_sel)) |>
         dplyr::distinct()
+      # excluding site-time with multiple event types
+      # sites_vdup will be "subtracted" from the original sites_v
+      sites_vdup <- sites_v |>
+        dplyr::group_by(site_id, time) |>
+        dplyr::filter(dplyr::n() > 1) |>
+        dplyr::filter(Event.Type == "Excluded") |>
+        ungroup()
+      sites_v <-
+        dplyr::anti_join(
+          sites_v, sites_vdup,
+          by = c("site_id", "time", "Event.Type")
+        )
     }
     names(sites_v)[2:3] <- c("lon", "lat")
     sites_v <- data.table::as.data.table(sites_v)
