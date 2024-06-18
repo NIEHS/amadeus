@@ -619,6 +619,15 @@ testthat::test_that("process_sedac_population returns null for netCDF.", {
   )
 })
 
+testthat::test_that("sedac_codes", {
+  string <- "2.5 minute"
+  testthat::expect_no_error(
+    code <- process_sedac_codes(string)
+  )
+  testthat::expect_equal(code, "2pt5_min")
+})
+
+
 # test HMS ####
 testthat::test_that("process_hms returns expected.", {
   withr::local_package("terra")
@@ -746,6 +755,32 @@ testthat::test_that("import_gmted returns error with non-vector variable.", {
   )
 })
 
+testthat::test_that("gmted_codes inversion", {
+  teststring <- "mx"
+  testthat::expect_no_error(
+    statorig <- process_gmted_codes(
+      teststring,
+      statistic = TRUE,
+      resolution = FALSE,
+      invert = TRUE
+    )
+  )
+  testthat::expect_equal(statorig, "Maximum Statistic")
+
+  teststring <- "75"
+  testthat::expect_no_error(
+    resoorig <- process_gmted_codes(
+      teststring,
+      statistic = FALSE,
+      resolution = TRUE,
+      invert = TRUE
+    )
+  )
+  testthat::expect_equal(resoorig, "7.5 arc-seconds")
+})
+
+
+## test NARR ####
 testthat::test_that("process_narr returns expected.", {
   withr::local_package("terra")
   variables <- c(
@@ -1652,3 +1687,72 @@ testthat::test_that("process_olm", {
   )
 })
 # nolint end
+
+## AUX tests ####
+testthat::test_that("loc_radius tests", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  lon <- seq(-112, -101, length.out = 5) # create lon sequence
+  lat <- seq(33.5, 40.9, length.out = 5) # create lat sequence
+  df <- expand.grid("lon" = lon, "lat" = lat) # expand to regular grid
+  df <- rbind(df, df)
+  df$time <- c(rep("2023-11-02", 25), rep("2023-11-03", 25))
+  df$var1 <- 1:50
+  df$var2 <- 51:100
+  dfsf <- sf::st_as_sf(
+    df,
+    coords = c("lon", "lat"),
+    crs = "EPSG:4326",
+    remove = FALSE
+  )
+  dftr <- terra::vect(dfsf)
+
+  testthat::expect_no_error(
+    dftrb00 <- process_locs_radius(dftr, 0)
+  )
+  testthat::expect_no_error(
+    dftrb1k <- process_locs_radius(dftr, 1000L)
+  )
+  testthat::expect_true(terra::geomtype(dftrb00) == "points")
+  testthat::expect_true(terra::geomtype(dftrb1k) == "polygons")
+  testthat::expect_s4_class(dftrb00, "SpatVector")
+  testthat::expect_s4_class(dftrb1k, "SpatVector")
+})
+
+testthat::test_that("process_locs_vector tests", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  lon <- seq(-112, -101, length.out = 5) # create lon sequence
+  lat <- seq(33.5, 40.9, length.out = 5) # create lat sequence
+  df <- expand.grid("lon" = lon, "lat" = lat) # expand to regular grid
+  dfsf <- sf::st_as_sf(
+    df,
+    coords = c("lon", "lat"),
+    crs = "EPSG:4326",
+    remove = FALSE
+  )
+  dftr <- terra::vect(dfsf)
+
+  testthat::expect_no_error(
+    dftr1 <- process_locs_vector(dftr, "EPSG:4326", 0)
+  )
+  testthat::expect_no_error(
+    dfsftr <- process_locs_vector(dfsf, "EPSG:4326", 0)
+  )
+  testthat::expect_no_error(
+    dfdftr <- process_locs_vector(df, "EPSG:4326", 0)
+  )
+  testthat::expect_no_error(
+    dfdftrb <- process_locs_vector(df, "EPSG:4326", radius = 1000L)
+  )
+  testthat::expect_s4_class(dftr1, "SpatVector")
+  testthat::expect_s4_class(dfsftr, "SpatVector")
+  testthat::expect_s4_class(dfdftr, "SpatVector")
+  testthat::expect_s4_class(dfdftrb, "SpatVector")
+  testthat::expect_true(terra::geomtype(dfdftr) == "points")
+  testthat::expect_true(terra::geomtype(dfdftrb) == "polygons")
+})

@@ -358,6 +358,13 @@ testthat::test_that("calc_modis works well.", {
       locs = sf::st_as_sf(site_faux)
     )
   )
+  testthat::expect_error(
+    calc_modis_daily(
+      from = terra::rast(nrow = 3, ncol = 3, vals = 1:9, names = "a"),
+      date = "2021-08-15",
+      locs = array(1:12, dim = c(2, 2, 3))
+    )
+  )
   site_faux0 <- site_faux
   names(site_faux0)[2] <- "date"
   testthat::expect_error(
@@ -415,7 +422,7 @@ testthat::test_that("calc_modis works well.", {
       preprocess = process_bluemarble,
       name_covariates = c("MOD_NITLT_0_", "MOD_K1_"),
       subdataset = 3L,
-      nthreads = 1,
+      nthreads = 2,
       tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
     )
   )
@@ -1655,7 +1662,54 @@ testthat::test_that("calc_check_time identifies missing `time` column.", {
 
 # Calc message
 testthat::test_that("calc_message exception",
-  testthat::expect_no_error(
-    calc_message("gmted", "mean", "2020", "year", NULL)
-  )
+  {
+    testthat::expect_no_error(
+      calc_message("gmted", "mean", "2020", "year", NULL)
+    )
+    testthat::expect_no_error(
+      calc_message("narr", "shum", 2000, "year", NULL)
+    )
+  }
 )
+
+# calc time
+testthat::test_that("calc time remains", {
+  testthat::expect_no_error(
+    rr <- calc_time("eternal", "timeless")
+  )
+  testthat::expect_true(rr == "eternal")
+})
+
+# calc worker
+testthat::test_that("calc_worker remaining", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_package("exactextractr")
+  withr::local_options(sf_use_s2 = FALSE)
+
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013, time = "boundless")
+  ncp$site_id <- "3799900018810101"
+  ncpt <-
+    terra::vect(ncp, geom = c("lon", "lat"),
+                keepgeom = TRUE, crs = "EPSG:4326")
+  nc <- system.file("gpkg/nc.gpkg", package = "sf")
+  nc <- terra::vect(nc)
+  nc <- terra::project(nc, "EPSG:4326")
+  ncrast <- terra::rast(nc, resolution = 0.05)
+  terra::values(ncrast) <- rgamma(terra::ncell(ncrast), 1, 1e-4)
+
+  testthat::expect_no_error(
+    cwres <-
+      calc_worker(
+        from = ncrast,
+        dataset = "whatever",
+        locs_vector = ncpt,
+        locs_df = ncp,
+        time = ncpt$time,
+        time_type = "timeless",
+        radius = 1e5,
+        max_cells = 3e7
+      )
+  )
+  testthat::expect_s3_class(cwres, "data.frame")
+})
