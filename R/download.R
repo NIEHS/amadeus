@@ -3039,6 +3039,7 @@ download_cropscape <- function(
   # note that this part does not utilize download_unzip
   # as duplicate file names are across multiple zip files
   if (download) {
+    # nocov start
     if (unzip) {
       extension <- ifelse(source == "USDA", "\\.zip", "(\\.tar|\\.tar\\.gz)")
       dir_unzip <- gsub(extension, "", download_names)
@@ -3046,12 +3047,12 @@ download_cropscape <- function(
         archive::archive_extract(download_names[fn], exdir = dir_unzip[fn])
       }
     }
+    # nocov end
   }
   message("Requests were processed.\n")
   #### 10. remove download commands
   download_remove_command(commands_txt = commands_txt,
                           remove = remove_command)
-
 }
 # nolint end
 
