@@ -201,6 +201,9 @@ download_remove_zips <-
     if (remove) {
       cat(paste0("Removing download files...\n"))
       file.remove(download_name)
+      # oftentimes zipfiles are stored in zip_files under
+      # directory_to_save in download functions.
+      unlink(dirname(dirname(download_name)), recursive = TRUE)
       cat(paste0("Download files removed.\n"))
     }
   }

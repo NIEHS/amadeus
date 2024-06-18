@@ -243,20 +243,17 @@ download_aqs <-
       system_command = system_command
     )
     #### 12. unzip data
-    for (n in seq_along(download_names)) {
-      download_unzip(
-        file_name = download_names[n],
-        directory_to_unzip = directory_to_save,
-        unzip = unzip
-      )
-      download_remove_zips(
-        remove = remove_zip,
-        download_name = download_names[n]
-      )
-    }
-    if (remove_zip) {
-      unlink(directory_to_download, recursive = TRUE)
-    }
+    vapply(
+      download_names,
+      download_unzip,
+      FUN.VALUE = logical(1),
+      directory_to_unzip = directory_to_save,
+      unzip = unzip
+    )
+    download_remove_zips(
+      remove = remove_zip,
+      download_name = download_names
+    )
     #### 13. remove command file
     download_remove_command(
       commands_txt = commands_txt,
@@ -327,16 +324,6 @@ download_ecoregion <- function(
   directories <- download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
-  #### 4. Check the presence of file
-  ## This part is hard-coded as the original file appears to
-  ## be a misnomer. May need to be modified accordingly in the future.
-  path_downloaded_file <- sprintf(
-    "%sus_eco_l3_state_boundaries.shp",
-    directory_to_save
-  )
-  if (file.exists(path_downloaded_file)) {
-    stop("Requested files exist in the target directory.\n")
-  }
   #### 5. define download URL
   download_epa_certificate(
     epa_certificate_path = epa_certificate_path,
@@ -348,9 +335,9 @@ download_ecoregion <- function(
     "us_eco_l3_state_boundaries.zip"
   )
   #### 6. build download file name
-  download_name <- sprintf(
-    "%sus_eco_l3_state_boundaries.zip",
-    directory_to_download
+  download_name <- file.path(
+    directory_to_download,
+    "us_eco_l3_state_boundaries.zip"
   )
   #### 7. build download command
   download_command <-
@@ -404,9 +391,6 @@ download_ecoregion <- function(
     remove = remove_zip,
     download_name = download_name
   )
-  if (remove_zip) {
-    unlink(directory_to_download, recursive = TRUE)
-  }
 }
 
 # nolint start 
@@ -486,7 +470,7 @@ download_geos <- function(
       "/"
     )
     if (!dir.exists(download_folder)) {
-      dir.create(download_folder)
+      dir.create(download_folder, recursive = TRUE)
     }
     for (d in seq_along(date_sequence)) {
       date <- date_sequence[d]
@@ -710,9 +694,6 @@ download_gmted <- function(
     remove = remove_zip,
     download_name = download_name
   )
-  if (remove_zip) {
-    unlink(directory_to_download, recursive = TRUE)
-  }
 }
 
 # nolint start
@@ -945,7 +926,7 @@ download_merra2 <- function(
         collection_loop
       )
       if (!dir.exists(download_folder)) {
-        dir.create(download_folder)
+        dir.create(download_folder, recursive = TRUE)
       }
       download_name <- paste0(
         download_folder,
@@ -978,8 +959,8 @@ download_merra2 <- function(
         collection_loop,
         "/metadata/"
       )
-      if (!file.exists(download_folder_metadata)) {
-        dir.create(download_folder_metadata)
+      if (!dir.exists(download_folder_metadata)) {
+        dir.create(download_folder_metadata, recursive = TRUE)
       }
       download_name_metadata <- paste0(
         download_folder_metadata,
@@ -1081,8 +1062,8 @@ download_narr_monolevel <- function(
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
     folder <- paste0(directory_to_save, variable, "/")
-    if (!(dir.exists(folder))) {
-      dir.create(folder)
+    if (!dir.exists(folder)) {
+      dir.create(folder, recursive = TRUE)
     }
     for (y in seq_along(years)) {
       year <- years[y]
@@ -1210,8 +1191,8 @@ download_narr_p_levels <- function(
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
     folder <- paste0(directory_to_save, variable, "/")
-    if (!(dir.exists(folder))) {
-      dir.create(folder)
+    if (!dir.exists(folder)) {
+      dir.create(folder, recursive = TRUE)
     }
     for (y in seq_along(years)) {
       year <- years[y]
@@ -1421,9 +1402,6 @@ download_nlcd <- function(
     remove = remove_zip,
     download_name = download_name
   )
-  if (remove_zip) {
-    unlink(directory_to_download, recursive = TRUE)
-  }
   #### 18. remove command text
   download_remove_command(
     commands_txt = commands_txt,
@@ -1569,9 +1547,6 @@ download_sedac_groads <- function(
     remove = remove_zip,
     download_name = download_name
   )
-  if (remove_zip) {
-    unlink(directory_to_download, recursive = TRUE)
-  }
 }
 
 # nolint start
@@ -1749,9 +1724,6 @@ download_sedac_population <- function(
     remove = remove_zip,
     download_name = download_name
   )
-  if (remove_zip) {
-    unlink(directory_to_download, recursive = TRUE)
-  }
 }
 
 # nolint start
@@ -1913,7 +1885,8 @@ download_hms <- function(
   #### 13. end if data_format == "KML"
   if (data_format == "KML") {
     unlink(directory_to_download, recursive = TRUE)
-    return(cat(paste0("KML files cannot be unzipped.\n")))
+    cat(paste0("KML files cannot be unzipped.\n"))
+    return(TRUE)
   }
   #### 14. unzip downloaded zip files
   for (d in seq_along(download_names)) {
@@ -1928,9 +1901,6 @@ download_hms <- function(
     remove = remove_zip,
     download_name = download_names
   )
-  if (remove_zip) {
-    unlink(directory_to_download, recursive = TRUE)
-  }
 }
 # nolint end: cyclocomp
 
@@ -2051,37 +2021,12 @@ download_koppen_geiger <- function(
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
-  if (unzip) {
-    #### 16. remove unwanted files
-    wanted_names <- grep(
-      "conf",
-      list.files(
-        path = directory_to_save,
-        pattern = sprintf(
-          "Beck_KG_.*_%s_.*%s.*\\.tif$|legend\\.txt",
-          period,
-          data_resolution
-        ),
-        full.names = TRUE
-      ),
-      invert = TRUE,
-      value = TRUE
-    )
-    all_names <- list.files(
-      path = directory_to_save,
-      full.names = TRUE
-    )
-    unwanted_names <- all_names[!all_names %in% wanted_names]
-    file.remove(unwanted_names)
-  }
+
   #### 19. remove zip files
   download_remove_zips(
     remove = remove_zip,
     download_name = download_name
   )
-  if (remove_zip) {
-    unlink(directory_to_save, recursive = TRUE)
-  }
 }
 
 
