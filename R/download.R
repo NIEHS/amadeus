@@ -243,10 +243,9 @@ download_aqs <-
       system_command = system_command
     )
     #### 12. unzip data
-    vapply(
+    sapply(
       download_names,
       download_unzip,
-      FUN.VALUE = logical(1),
       directory_to_unzip = directory_to_save,
       unzip = unzip
     )

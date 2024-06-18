@@ -1869,7 +1869,9 @@ testthat::test_that("download_sink test", {
 })
 
 testthat::test_that("download_remove_zips test", {
-  testfile <- testthat::test_path("../testdata", "yellowstone", "coyote.zip")
+  testfile <-
+    testthat::test_path("..", "testdata", "yellowstone/barren", "coyote.zip")
+  dir.create(dirname(testfile), recursive = TRUE)
   file.create(testfile, recursive = TRUE)
   testthat::expect_no_error(
     download_remove_zips(remove = TRUE, testfile)

@@ -15,7 +15,9 @@ download_remove_zips(remove = FALSE, download_name)
 Remove downloaded ".zip" files.
 }
 \note{
+!!! USE THE FUNCTION WITH CAUTION !!!
 If \code{remove = TRUE}, ensure that \code{unzip = TRUE}. Choosing to remove
 ".zip" files without unzipping will retain none of the downloaded data.
+then it will remove all files in the second higher level directory.
 }
 \keyword{internal}

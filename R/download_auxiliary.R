@@ -189,8 +189,10 @@ download_unzip <-
 #' @param remove logical(1). Confirm removal. Default is FALSE.
 #' @param download_name character. Full zip file path
 #' @note
+#' !!! USE THE FUNCTION WITH CAUTION !!!
 #' If \code{remove = TRUE}, ensure that \code{unzip = TRUE}. Choosing to remove
 #' ".zip" files without unzipping will retain none of the downloaded data.
+#' then it will remove all files in the second higher level directory.
 #' @returns NULL
 #' @keywords internal
 #' @export
