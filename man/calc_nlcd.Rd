@@ -8,8 +8,11 @@ calc_nlcd(
   from,
   locs,
   locs_id = "site_id",
+  mode = c("exact", "terra"),
   radius = 1000,
-  max_cells = 1e+08,
+  max_cells = 5e+07,
+  geom = FALSE,
+  nthreads = 1L,
   ...
 )
 }
@@ -20,13 +23,27 @@ calc_nlcd(
 
 \item{locs_id}{character(1). Unique identifier of locations}
 
+\item{mode}{character(1). One of \code{"exact"}
+(using \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract()}})
+or \code{"terra"} (using \code{\link[terra:freq]{terra::freq()}}).}
+
 \item{radius}{numeric (non-negative) giving the
 radius of buffer around points}
 
 \item{max_cells}{integer(1). Maximum number of cells to be read at once.
-Higher values will expedite processing, but will increase memory usage.
-Maximum possible value is \code{2^31 - 1}.
+Higher values may expedite processing, but will increase memory usage.
+Maximum possible value is \code{2^31 - 1}. Only valid when
+\code{mode = "exact"}.
 See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
+
+\item{geom}{logical(1). Should the geometry of \code{locs} be returned in the
+\code{data.frame}? Default is \code{FALSE}. If \code{geom = TRUE} and \code{locs} contain
+polygon geometries, the \verb{$geometry} column in the returned data frame may
+make the \code{data.frame} difficult to read due to long geometry strings. The
+coordinate reference system of the \verb{$geometry} is the coordinate
+reference system of \code{from}.}
+
+\item{nthreads}{integer(1). Number of threads to be used}
 
 \item{...}{Placeholders.}
 }
@@ -37,6 +54,15 @@ a data.frame object
 Compute ratio of land cover class in circle buffers around points. Returns
 a \code{data.frame} object containing \code{locs_id}, longitude, latitude,
 time (year), and computed ratio for each land cover class.
+}
+\note{
+NLCD is available in U.S. only. Users should be aware of
+the spatial extent of the data. The results are different depending
+on \code{mode} argument. The \code{"terra"} mode is less memory intensive
+but less accurate because it counts the number of cells
+intersecting with the buffer. The \code{"exact"} may be more accurate
+but uses more memory as it will account for the partial overlap
+with the buffer.
 }
 \seealso{
 \code{\link{process_nlcd}}

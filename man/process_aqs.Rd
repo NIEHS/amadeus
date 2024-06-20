@@ -7,7 +7,9 @@
 process_aqs(
   path = NULL,
   date = c("2018-01-01", "2022-12-31"),
-  return_format = "terra",
+  mode = c("full", "sparse", "location"),
+  data_field = "Arithmetic.Mean",
+  return_format = c("terra", "sf", "data.table"),
   ...
 )
 }
@@ -15,21 +17,39 @@ process_aqs(
 \item{path}{character(1). Directory path to daily measurement data.}
 
 \item{date}{character(2). Start and end date.
-Should be in \code{"YYYY-MM-DD"} format and sorted. If \code{NULL},
-only unique locations are returned.}
+Should be in \code{"YYYY-MM-DD"} format and sorted.}
 
-\item{return_format}{character(1). \code{"terra"} or \code{"sf"}.}
+\item{mode}{character(1). One of "full" (all dates * all locations)
+or "sparse" (date-location pairs with available data) or
+"location" (unique locations).}
+
+\item{data_field}{character(1). Data field to extract.}
+
+\item{return_format}{character(1). \code{"terra"} or \code{"sf"} or \code{"data.table"}.}
 
 \item{...}{Placeholders.}
 }
 \value{
-a \code{SpatVector} or sf object depending on the \code{return_format}
+a SpatVector, sf, or data.table object depending on the \code{return_format}
 }
 \description{
 The \code{process_aqs()} function cleans and imports raw air quality
 monitoring sites, returning a single \code{SpatVector} or sf object.
+\code{date} is used to filter the raw data read from csv files.
+Filtered rows are then processed according to \code{mode} argument.
+Some sites report multiple measurements per day with and without
+\href{https://www.epa.gov/sites/default/files/2016-10/documents/exceptional_events.pdf}{exceptional events}
+the internal procedure of this function keeps "Included" if there
+are multiple event types per site-time.
 }
 \note{
-\code{date = NULL} will return a massive data.table
-object. Please choose proper \code{date} values.
+Choose \code{date} and \code{mode} values with caution.
+The function may return a massive data.table, resulting in
+a long processing time or even a crash.
+}
+\seealso{
+\itemize{
+\item \code{\link[=download_aqs]{download_aqs()}}
+\item \href{https://aqs.epa.gov/aqsweb/documents/codetables/parameters.csv}{EPA, n.d., \emph{AQS Parameter Codes}}
+}
 }

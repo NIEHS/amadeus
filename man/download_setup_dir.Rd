@@ -4,10 +4,17 @@
 \alias{download_setup_dir}
 \title{Setup directory}
 \usage{
-download_setup_dir(directory)
+download_setup_dir(directory, zip = FALSE)
 }
 \arguments{
 \item{directory}{character(1) directory path}
+
+\item{zip}{logical(1). Should sub-directories be created for zip files and
+data files? If \code{TRUE}, a vector of sub-directoy names will be returned.}
+}
+\value{
+NULL; if \code{zip = TRUE} a vector of directories for zip files and
+data files
 }
 \description{
 Create \code{directory} if it does not already exist.

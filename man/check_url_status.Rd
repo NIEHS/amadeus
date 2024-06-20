@@ -15,7 +15,7 @@ check_url_status(url, method = c("HEAD", "GET"))
 logical object
 }
 \description{
-Check if provided URL returns HTTP status 200.
+Check if provided URL returns HTTP status 200 or 206.
 }
 \author{
 Insang Song; Mitchell Manware

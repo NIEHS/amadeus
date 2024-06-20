@@ -24,11 +24,13 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr
-          needs: coverage
+            extra-packages: |
+              any::pak
+              any::covr
+            needs: coverage
 
       - name: Cache C++ and R dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cache/R
@@ -38,10 +40,15 @@ jobs:
             dependencies-${{ runner.os }}-
 
       - name: Test coverage
-        run: >
-          Rscript -e
-          "covd<-covr::coverage_to_list()$totalcoverage;
-          write.table(covd[length(covd)], file = '${{ github.workspace }}/local_cov.Rout', row.names = F, col.names = F)"
+        run: |
+          Rscript ${{ github.workspace }}/.github/workflows/test-coverage.R ${{ runner.temp }} ${{ github.workspace }}
+        shell: bash
+
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          find ${{ runner.temp }}/package -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
 
       - name: Get Values
@@ -61,6 +68,10 @@ jobs:
         id: patch-comparison
         shell: bash
         run: |
+          if ( ! test -f cov_current.Rout ); then
+            echo "0" >> cov_current.Rout
+          fi
+
           cov_patch="${{ steps.get-values.outputs.coverage }}"
           cov_current=$(cat cov_current.Rout)
           echo "Current coverage: $cov_current"
@@ -86,7 +97,7 @@ jobs:
         run: |
           npm i -g badgen-cli
           export COV=${{ steps.get-values.outputs.coverage }}
-          COLOR=$(node -p '+process.env.COV >= 95 ? `green` : `orange`')
+          COLOR=$(node -p '+process.env.COV >= 95 ? `green` : `yellow`')
           mkdir -p badges
           badgen -j coverage -s $COV% -c $COLOR > badges/coverage.svg
   

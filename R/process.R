@@ -14,7 +14,7 @@
 #' - [`process_modis_swath`]: `"modis_swath"`
 #' - [`process_modis_merge`]: `"modis_merge"`
 #' - [`process_bluemarble`]: `"bluemarble"`
-#' - [`process_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`,
+#' - [`process_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`
 #' - [`process_ecoregion`]: `"ecoregion"`, `"ecoregions"`
 #' - [`process_nlcd`]: `"nlcd"`
 #' - [`process_tri`]: `"tri"`
@@ -32,7 +32,7 @@
 #' - [`process_huc`]: `"huc"`
 #' - [`process_cropscape`]: `"cropscape"`, `"cdl"`
 #' - [`process_prism`]: `"prism"`
-#' - [`process_olm`]: `"olm"`, `"openlandmap`
+#' - [`process_olm`]: `"olm"`, `"openlandmap"`
 #' @returns `SpatVector`, `SpatRaster`, `sf`, or `character` depending on
 #' covariate type and selections.
 #' @author Insang Song
@@ -492,7 +492,7 @@ process_modis_warp <-
   function(
     path = NULL,
     cellsize = 0.1,
-    threshold = cellsize * 2,
+    threshold = cellsize * 4,
     crs = 4326,
     ...
   ) {
@@ -502,13 +502,12 @@ process_modis_warp <-
       stars::st_warp(
         ras,
         crs = crs,
+        segments = 500,
         cellsize = cellsize,
         threshold = threshold
       )
     return(rtd)
   }
-
-
 
 # nolint start
 #' Mosaic MODIS swaths
@@ -523,16 +522,20 @@ process_modis_warp <-
 #' @param path character. Full paths of hdf files.
 #' @param date character(1). Date to query.
 #' @param subdataset character. Subdatasets to process.
+#' __Unlike other preprocessing functions, this argument should specify
+#' the exact subdataset name.__ For example, when using MOD06_L2 product,
+#' one may specify `c("Cloud_Fraction", "Cloud_Optical_Thickness")`,
+#' etc. The subdataset names can be found in `terra::describe()` output.
 #' @param suffix character(1). Should be formatted `:{product}:`,
 #' e.g., `:mod06:`
 #' @param resolution numeric(1). Resolution of output raster.
-#' Unit is degree.
+#' Unit is degree (decimal degree in WGS84).
 #' @param ... For internal use.
 #' @seealso
-#' * [`process_modis_warp`]
+#' * [`process_modis_warp()`], [`stars::read_stars()`], [`stars::st_warp()`]
 #' * [GDAL HDF4 driver documentation](https://gdal.org/drivers/raster/hdf4.html)
-#' * [`terra::describe`]: to list the full subdataset list with `sds = TRUE`
-#' * [`terra::sprc`], [`terra::rast`]
+#' * [`terra::describe()`]: to list the full subdataset list with `sds = TRUE`
+#' * [`terra::sprc()`], [`terra::rast()`]
 #' @returns
 #' * a `SpatRaster` object (crs = `"EPSG:4326"`): if `path` is a single file with
 #' full specification of subdataset.
@@ -540,8 +543,9 @@ process_modis_warp <-
 #' @author Insang Song
 #' @importFrom terra rast
 #' @importFrom terra crop
+#' @importFrom terra ext
 #' @importFrom terra mosaic
-#' @importFrom terra varnames
+#' @importFrom stars st_mosaic
 #' @importFrom terra values
 #' @importFrom terra sprc
 #' @export
@@ -561,51 +565,77 @@ process_modis_swath <-
     header <- "HDF4_EOS:EOS_SWATH:"
     ras_mod06 <- vector("list", length = length(subdataset))
     datejul <- strftime(date, format = "%Y%j")
+    ## FIXME: this part may result in underperformance.
+    ##        Find a way to optimize this part.
     paths_today <- grep(sprintf("A%s", datejul), path, value = TRUE)
 
     # if two or more paths are put in,
     # these are read into a list then mosaicked
-    if (length(path) > 1) {
-      for (element in seq_along(subdataset)) {
-        target_text <-
-          sprintf("%s%s%s%s", header, paths_today, suffix, subdataset[element])
-        # rectified stars objects to SpatRaster
-        mod06_element <- split(target_text, target_text) |>
-          lapply(process_modis_warp, cellsize = resolution) |>
-          lapply(terra::rast)
-        # Remove all NA layers to avoid erroneous values
-        mod06_element_nas <-
-          sapply(
-            mod06_element,
-            function(x) {
-              all(is.na(terra::values(x)))
-            }
-          )
-        mod06_element <- mod06_element[!mod06_element_nas]
+    for (element in seq_along(subdataset)) {
+      target_text <-
+        sprintf("%s%s%s%s", header, paths_today, suffix, subdataset[element])
+      # rectified stars objects to SpatRaster
+      mod06_element <- split(target_text, target_text) |>
+        lapply(process_modis_warp, cellsize = resolution)
+      # Remove all NA layers to avoid erroneous values
+      mod06_element_nas <-
+        sapply(
+          mod06_element,
+          function(x) {
+            xvals <- x[[subdataset[element]]]
+            all(is.na(xvals)) || all(is.nan(xvals))
+          }
+        )
+      mod06_element <-
+        mod06_element[!mod06_element_nas & !is.null(mod06_element_nas)]
+
+      # prepare a fail-safe alternative return
+      # It will be used again later.
+      alt <- terra::rast(
+        xmin = -128,
+        xmax = -64,
+        ymin = 20,
+        ymax = 52,
+        resolution = resolution
+      )
+      # initialize values with NA
+      alt[] <- NA
+      alt_dim <- dim(alt)
+      alt[1, 1] <- 0
+      alt[1, alt_dim[2]] <- 0
+      alt[alt_dim[1], 1] <- 0
+      alt[alt_dim[1], alt_dim[2]] <- 0
+      terra::crs(alt) <- "EPSG:4326"
+
+      if (is.null(mod06_element) || length(mod06_element) == 0) {
+        message("All layers are NA or NaN.")
+        mod06_element_mosaic <- terra::deepcopy(alt)
+      } else {
         # mosaick the warped SpatRasters into one
-        mod06_element_mosaic <- Reduce(f = terra::mosaic, x = mod06_element)
-        ras_mod06[[element]] <- mod06_element_mosaic
+        mod06_element_mosaic <-
+          do.call(stars::st_mosaic, mod06_element) |>
+          terra::rast()
         # assigning variable name
-        names(ras_mod06)[element] <- subdataset[element]
+        mod06_element_mosaic <-
+          terra::crop(mod06_element_mosaic, terra::ext(alt))
       }
-      # SpatRasterCollection can accommodate multiple SpatRasters
-      # with different extents (most flexible kind)
-      mod06_sprc <- terra::sprc(ras_mod06)
-      # post-hoc: stack multiple layers with different extent
-      # into one SpatRaster
-      # 1. mosaic all layers into one
-      mod06_mosaic <- terra::mosaic(mod06_sprc, fun = "first")
-      # 2. Assign NAs to prepare "etching"
-      terra::values(mod06_mosaic) <- NA
-      # 3. Looping main "etching"; each element is put first
-      mod06_etched <-
-        sapply(mod06_sprc, terra::mosaic, y = mod06_mosaic, fun = "first")
-      # 4. stack
-      mod06_return <- do.call(c, mod06_etched)
-    } else {
-      mod06_return <-
-        terra::rast(process_modis_warp(path, cellsize = resolution))
+      names(mod06_element_mosaic) <- subdataset[element]
+      ras_mod06[[element]] <- mod06_element_mosaic
     }
+    # SpatRasterCollection can accommodate multiple SpatRasters
+    # with different extents (most flexible kind)
+    mod06_sprc <- terra::sprc(ras_mod06)
+    # post-hoc: stack multiple layers with different extent
+    # into one SpatRaster
+    # 1. mosaic all layers into one
+    mod06_mosaic <- terra::mosaic(mod06_sprc, fun = "median")
+    # 2. Assign NAs to prepare "etching"; NA will result in NaNs
+    terra::values(mod06_mosaic) <- NA
+    # 3. Looping main "etching"; each element is put first
+    mod06_etched <-
+      sapply(mod06_sprc, terra::mosaic, y = mod06_mosaic, fun = "first")
+    # 4. stack
+    mod06_return <- do.call(c, mod06_etched)
     return(mod06_return)
   }
 
@@ -631,7 +661,18 @@ process_koppen_geiger <-
     year = NULL,
     ...
   ) {
+    # import data
     kg_rast <- terra::rast(path)
+    # identify time period
+    period <- strsplit(
+      names(kg_rast),
+      "_"
+    )[[1]][4]
+    if (period == "present") {
+      terra::metags(kg_rast) <- c(year = "1980 - 2016")
+    } else {
+      terra::metags(kg_rast) <- c(year = "2071 - 2100")
+    }
     return(kg_rast)
   }
 
@@ -642,6 +683,8 @@ process_koppen_geiger <-
 #' returning a single `SpatRaster` object.
 #' @param path character giving nlcd data path
 #' @param year numeric giving the year of NLCD data used
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @description Reads NLCD file of selected `year`.
 #' @returns a `SpatRaster` object
@@ -654,6 +697,7 @@ process_nlcd <-
   function(
     path = NULL,
     year = 2021,
+    extent = NULL,
     ...
   ) {
     # check inputs
@@ -670,13 +714,13 @@ process_nlcd <-
     nlcd_file <-
       list.files(
         path,
-        pattern = paste0("nlcd_", year, "_.*.tif$"),
+        pattern = paste0("nlcd_", year, "_.*.(tif|img)$"),
         full.names = TRUE
       )
     if (length(nlcd_file) == 0) {
       stop("NLCD data not available for this year.")
     }
-    nlcd <- terra::rast(nlcd_file)
+    nlcd <- terra::rast(nlcd_file, win = extent)
     terra::metags(nlcd) <- c(year = year)
     return(nlcd)
   }
@@ -688,17 +732,41 @@ process_nlcd <-
 #' data, returning a `SpatVector` object.
 #' @param path character(1). Path to Ecoregion Shapefiles
 #' @param ... Placeholders.
+#' @note The function will fix Tukey's bridge in Portland, ME.
+#' This fix will ensure that the EPA air quality monitoring sites
+#' will be located within the ecoregion.
 #' @author Insang Song
 #' @returns a `SpatVector` object
 #' @importFrom terra vect
+#' @importFrom sf st_read st_crs st_as_sfc st_transform st_intersects st_union
+#' @importFrom data.table year
 #' @export
 process_ecoregion <-
   function(
     path = NULL,
     ...
   ) {
-    ecoreg <- terra::vect(path)
+    ecoreg <- sf::st_read(path)
+    # fix Tukey's bridge in Portland, ME
+    # nolint start
+    poly_tukey <-
+      "POLYGON ((-70.258 43.68, -70.2555 43.68, -70.255 43.6733, -70.2576 43.6732, -70.258 43.68))"
+    poly_tukey <- sf::st_as_sfc(poly_tukey, crs = "EPSG:4326")
+    poly_tukey <- sf::st_transform(poly_tukey, sf::st_crs(ecoreg))
+
+    # nolint end
     ecoreg <- ecoreg[, grepl("^(L2_KEY|L3_KEY)", names(ecoreg))]
+    ecoreg_edit_idx <- sf::st_intersects(ecoreg, poly_tukey, sparse = FALSE)
+    ecoreg_edit_idx <- vapply(ecoreg_edit_idx, function(x) any(x), logical(1))
+    if (!all(ecoreg_edit_idx == 0)) {
+      ecoreg_else <- ecoreg[!ecoreg_edit_idx, ]
+      ecoreg_edit <- sf::st_union(ecoreg[ecoreg_edit_idx, ], poly_tukey)
+      ecoreg <- rbind(ecoreg_else, ecoreg_edit)
+    }
+    ecoreg$time <- paste0(
+      "1997 - ", data.table::year(Sys.time())
+    )
+    ecoreg <- terra::vect(ecoreg)
     return(ecoreg)
   }
 
@@ -807,7 +875,7 @@ process_tri <- function(
 # nolint start
 #' Process road emissions data
 #' @description
-#' The \code{process_tri()} function imports and cleans raw road emissions data,
+#' The \code{process_nei()} function imports and cleans raw road emissions data,
 #' returning a single `SpatVector` object.
 #' @param path character(1). Directory with NEI csv files.
 #' @param county `SpatVector`/`sf`. County boundaries.
@@ -855,10 +923,19 @@ process_nei <- function(
     stop("year should be one of 2017 or 2020.\n")
   }
   # Concatenate NEI csv files
-  csvs_nei <- list.files(path = path, pattern = "*.csv$", full.names = TRUE)
+  csvs_nei <-
+    list.files(
+      path = path,
+      pattern = "*.csv$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
+  csvs_nei <- grep(year, csvs_nei, value = TRUE)
+  if (is.null(csvs_nei) || length(csvs_nei) == 0) {
+    stop("No files found for the year. The file names should include the year")
+  }
   csvs_nei <- lapply(csvs_nei, data.table::fread)
   csvs_nei <- data.table::rbindlist(csvs_nei)
-
   # column name readjustment
   target_nm <- c("fips code", "total emissions", "emissions uom")
   # not grep-ping at once for flexibility
@@ -883,14 +960,14 @@ process_nei <- function(
       TRF_NEINP_0_00000 = sum(emissions_total_ton, na.rm = TRUE)
     ),
     by = geoid]
-  csvs_nei$nei_year <- year
+  csvs_nei$time <- as.integer(year)
 
   # read county vector
   cnty_geoid_guess <- grep("GEOID", names(county))
   names(county)[cnty_geoid_guess] <- "geoid"
   county$geoid <- sprintf("%05d", as.integer(county$geoid))
-  cnty_vect <- merge(county, csvs_nei, by = "geoid")
-  cnty_vect <- cnty_vect[, c("geoid", "nei_year", "TRF_NEINP_0_00000")]
+  cnty_vect <- merge(county, as.data.frame(csvs_nei), by = "geoid")
+  cnty_vect <- cnty_vect[, c("geoid", "time", "TRF_NEINP_0_00000")]
   return(cnty_vect)
 
 }
@@ -899,32 +976,47 @@ process_nei <- function(
 #' Process unique U.S. EPA AQS sites
 #' @description
 #' The \code{process_aqs()} function cleans and imports raw air quality
-#' monitoring sites, returning a single `SpatVector` or sf object. 
+#' monitoring sites, returning a single `SpatVector` or sf object.
+#' `date` is used to filter the raw data read from csv files.
+#' Filtered rows are then processed according to `mode` argument.
+#' Some sites report multiple measurements per day with and without
+#' [exceptional events](https://www.epa.gov/sites/default/files/2016-10/documents/exceptional_events.pdf)
+#' the internal procedure of this function keeps "Included" if there
+#' are multiple event types per site-time.
 #' @param path character(1). Directory path to daily measurement data.
 #' @param date character(2). Start and end date.
-#'  Should be in `"YYYY-MM-DD"` format and sorted. If `NULL`,
-#'  only unique locations are returned.
-#' @param return_format character(1). `"terra"` or `"sf"`.
+#'  Should be in `"YYYY-MM-DD"` format and sorted.
+#' @param mode character(1). One of "full" (all dates * all locations)
+#'   or "sparse" (date-location pairs with available data) or
+#'   "location" (unique locations).
+#' @param data_field character(1). Data field to extract.
+#' @param return_format character(1). `"terra"` or `"sf"` or `"data.table"`.
 #' @param ... Placeholders.
-#' @returns a `SpatVector` or sf object depending on the `return_format`
+#' @seealso
+#' * [`download_aqs()`]
+#' * [EPA, n.d., _AQS Parameter Codes_](
+#'   https://aqs.epa.gov/aqsweb/documents/codetables/parameters.csv)
+#' @returns a SpatVector, sf, or data.table object depending on the `return_format`
 #' @importFrom data.table as.data.table
 #' @importFrom utils read.csv
-#' @importFrom terra vect
-#' @importFrom terra project
+#' @importFrom terra vect project
 #' @importFrom sf st_as_sf
-#' @importFrom dplyr group_by
-#' @importFrom dplyr ungroup
-#' @importFrom dplyr filter
-#' @note `date = NULL` will return a massive data.table
-#' object. Please choose proper `date` values.
+#' @importFrom dplyr group_by ungroup filter mutate select distinct
+#' @note Choose `date` and `mode` values with caution.
+#' The function may return a massive data.table, resulting in
+#' a long processing time or even a crash.
 #' @export
 process_aqs <-
   function(
     path = NULL,
     date = c("2018-01-01", "2022-12-31"),
-    return_format = "terra",
+    mode = c("full", "sparse", "location"),
+    data_field = "Arithmetic.Mean",
+    return_format = c("terra", "sf", "data.table"),
     ...
   ) {
+    mode <- match.arg(mode)
+    return_format <- match.arg(return_format)
     if (!is.null(date)) {
       date <- try(as.Date(date))
       if (inherits(date, "try-error")) {
@@ -933,8 +1025,9 @@ process_aqs <-
       if (length(date) != 2) {
         stop("date should be a character vector of length 2.")
       }
+    } else {
+      stop("date should be defined.")
     }
-
     if (length(path) == 1 && dir.exists(path)) {
       path <- list.files(
         path = path,
@@ -953,22 +1046,54 @@ process_aqs <-
     ## get unique sites
     sites$site_id <-
       sprintf("%02d%03d%04d%05d",
-              sites$State.Code,
-              sites$County.Code,
-              sites$Site.Num,
-              sites$Parameter.Code)
+              as.integer(sites$State.Code),
+              as.integer(sites$County.Code),
+              as.integer(sites$Site.Num),
+              as.integer(sites$Parameter.Code))
 
     site_id <- NULL
     Datum <- NULL
     POC <- NULL
+    Date.Local <- NULL
+    Sample.Duration <- NULL
+
+    date_start <- as.Date(date[1])
+    date_end <- as.Date(date[2])
+    date_sequence <- seq(date_start, date_end, "day")
+    date_sequence <- as.character(date_sequence)
 
     # select relevant fields only
     sites <- sites |>
       dplyr::as_tibble() |>
+      dplyr::filter(as.character(Date.Local) %in% date_sequence) |>
+      dplyr::filter(startsWith(Sample.Duration, "24")) |>
       dplyr::group_by(site_id) |>
       dplyr::filter(POC == min(POC)) |>
+      dplyr::mutate(time = Date.Local) |>
       dplyr::ungroup()
-    sites_v <- unique(sites[, c("site_id", "Longitude", "Latitude", "Datum")])
+    col_sel <- c("site_id", "Longitude", "Latitude", "Datum")
+    if (mode != "sparse") {
+      sites_v <- unique(sites[, col_sel])
+    } else {
+      col_sel <- append(col_sel, "Event.Type")
+      col_sel <- append(col_sel, "time")
+      col_sel <- append(col_sel, data_field)
+      sites_v <- sites |>
+        dplyr::select(dplyr::all_of(col_sel)) |>
+        dplyr::distinct()
+      # excluding site-time with multiple event types
+      # sites_vdup will be "subtracted" from the original sites_v
+      sites_vdup <- sites_v |>
+        dplyr::group_by(site_id, time) |>
+        dplyr::filter(dplyr::n() > 1) |>
+        dplyr::filter(Event.Type == "Excluded") |>
+        dplyr::ungroup()
+      sites_v <-
+        dplyr::anti_join(
+          sites_v, sites_vdup,
+          by = c("site_id", "time", "Event.Type")
+        )
+    }
     names(sites_v)[2:3] <- c("lon", "lat")
     sites_v <- data.table::as.data.table(sites_v)
 
@@ -977,7 +1102,7 @@ process_aqs <-
 
     # NAD83 to WGS84
     sites_v_nad <-
-      sites_v[Datum == "NAD83"]
+      sites_v[sites_v$Datum == "NAD83", ]
     sites_v_nad <-
       terra::vect(
         sites_v_nad,
@@ -986,15 +1111,14 @@ process_aqs <-
       )
     sites_v_nad <- terra::project(sites_v_nad, "EPSG:4326")
     # postprocessing: combine WGS84 and new WGS84 records
-    sites_v_nad <- sites_v_nad[, seq(1, 3)]
     sites_v_nad <- as.data.frame(sites_v_nad)
-    sites_v_wgs <- sites_v[Datum == "WGS84"][, -4]
-    final_sites <- rbind(sites_v_wgs, sites_v_nad)
+    sites_v_wgs <- sites_v[sites_v$Datum == "WGS84"]
+    final_sites <- data.table::rbindlist(
+      list(sites_v_wgs, sites_v_nad), fill = TRUE)
+    final_sites <-
+      final_sites[, grep("Datum", names(final_sites), invert = TRUE), with = FALSE]
 
-    if (!is.null(date)) {
-      date_start <- as.Date(date[1])
-      date_end <- as.Date(date[2])
-      date_sequence <- seq(date_start, date_end, "day")
+    if (mode == "full") {
       final_sites <-
         split(date_sequence, date_sequence) |>
         lapply(function(x) {
@@ -1002,7 +1126,10 @@ process_aqs <-
           fs_time$time <- x
           return(fs_time)
         })
-      final_sites <- Reduce(rbind, final_sites)
+      final_sites <- data.table::rbindlist(final_sites, fill = TRUE)
+    }
+    if (mode == "sparse") {
+      final_sites <- unique(final_sites)
     }
 
     final_sites <-
@@ -1021,7 +1148,8 @@ process_aqs <-
           dim = "XY",
           coords = c("lon", "lat"),
           crs = "EPSG:4326"
-        )
+        ),
+        data.table = final_sites
       )
 
     return(final_sites)
@@ -1084,6 +1212,8 @@ process_sedac_population <- function(
       split2[1],
       "...\n"
     ))
+    #### year
+    terra::metags(data) <- c(year = split2[1])
   }
   return(data)
 }
@@ -1096,9 +1226,11 @@ process_sedac_population <- function(
 #' returning a single `SpatVector` object.
 #' @param path character(1). Path to geodatabase or shapefiles.
 #' @param ... Placeholders.
-#' @note U.S. context.
+#' @note U.S. context. The returned `SpatVector` object contains a
+#' `$description` column to represent the temporal range covered by the
+#' dataset. For more information, see <https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata>.
 #' @author Insang Song
-#' @returns a `SpatVector` boject
+#' @returns a `SpatVector` object
 #' @importFrom terra vect
 #' @export
 # nolint end
@@ -1112,6 +1244,8 @@ process_sedac_groads <- function(
   }
   #### import data
   data <- terra::vect(path)
+  #### time period
+  data$description <- "1980 - 2010"
   return(data)
 }
 
@@ -1157,7 +1291,7 @@ process_hms <- function(
   #### identify file paths
   paths <- list.files(
     path,
-    pattern = "hms_smoke",
+    pattern = "hms_smoke*.*.shp$",
     full.names = TRUE
   )
   paths <- paths[grep(
@@ -1169,6 +1303,12 @@ process_hms <- function(
     date[1],
     date[2],
     sub_hyphen = TRUE
+  )
+  #### dates of interest with hyphen for return in 0 polygon case
+  dates_no_polygon <- generate_date_sequence(
+    date[1],
+    date[2],
+    sub_hyphen = FALSE
   )
   #### subset file paths to only dates of interest
   data_paths <- unique(
@@ -1190,7 +1330,9 @@ process_hms <- function(
       "EPSG:4326"
     )
     #### subset to density of interest
-    data_density <- data_date_p[data_date_p$Density == variable]
+    data_density <- data_date_p[
+      tolower(data_date_p$Density) == tolower(variable)
+    ]
     #### absent polygons (ie. December 31, 2018)
     if (nrow(data_density) == 0) {
       cat(paste0(
@@ -1245,6 +1387,11 @@ process_hms <- function(
       data_aggregate <- data_aggregate[
         seq_len(nrow(data_aggregate)), c("Density", "Date")
       ]
+      #### apply date format
+      data_aggregate$Date <- as.Date(
+        data_aggregate$Date,
+        format = "%Y%m%d"
+      )
       #### merge with other data
       data_return <- rbind(data_return, data_aggregate)
     }
@@ -1265,7 +1412,8 @@ process_hms <- function(
       ),
       ". Returning vector of dates.\n"
     ))
-    return(c(variable, dates_of_interest))
+    no_polygon_return <- c(variable, as.character(dates_no_polygon))
+    return(no_polygon_return)
   } else if (nrow(data_return) > 0) {
     cat(paste0(
       "Returning daily ",
@@ -1294,12 +1442,17 @@ process_hms <- function(
 #' @param variable vector(1). Vector containing the GMTED statistic first and
 #' the resolution second. (Example: variable = c("Breakline Emphasis",
 #' "7.5 arc-seconds")).
+#' * Statistic options: "Breakline Emphasis", "Systematic Subsample",
+#'   "Median Statistic", "Minimum Statistic", "Mean Statistic",
+#'   "Maximum Statistic", "Standard Deviation Statistic"
+#' * Resolution options: "30 arc-seconds", "15 arc-seconds", "7.5 arc-seconds"
 #' @param path character(1). Directory with downloaded GMTED  "*_grd"
 #' folder containing .adf files.
 #' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @note
-#' `SpatRaster` layer name indicates selected variable and resolution.
+#' `SpatRaster` layer name indicates selected variable and resolution, and year
+#' of release (2010).
 #' @return a `SpatRaster` object
 #' @importFrom terra rast
 #' @importFrom terra varnames
@@ -1343,8 +1496,10 @@ process_gmted <- function(
   #### identify file path
   paths <- list.files(
     path,
-    full.names = TRUE
+    full.names = TRUE,
+    recursive = TRUE
   )
+
   #### select only the folder containing data
   data_paths <- unique(
     grep(
@@ -1358,7 +1513,7 @@ process_gmted <- function(
       value = TRUE
     )
   )
-  data_path <- data_paths[endsWith(data_paths, "_grd")]
+  data_path <- data_paths[grep("(_grd$|w001001.adf)", data_paths)]
   #### import data
   data <- terra::rast(data_path)
   #### layer name
@@ -1368,7 +1523,8 @@ process_gmted <- function(
       "_grd",
       "",
       names(data)
-    )
+    ),
+    "_2010"
   )
   #### varnames
   terra::varnames(data) <- paste0(
@@ -1378,6 +1534,9 @@ process_gmted <- function(
     resolution,
     ")"
   )
+  #### year
+  terra::metags(data) <-
+    c(year = 2010L)
   #### set coordinate reference system
   return(data)
 }
@@ -1418,12 +1577,14 @@ process_narr <- function(
   data_paths <- list.files(
     path,
     pattern = variable,
+    recursive = TRUE,
     full.names = TRUE
   )
-  data_paths <- data_paths[grep(
-    ".nc",
-    data_paths
-  )]
+  data_paths <- grep(
+    sprintf("%s*.*.nc", variable),
+    data_paths,
+    value = TRUE
+  )
   #### define date sequence
   date_sequence <- generate_date_sequence(
     date[1],
@@ -2400,7 +2561,7 @@ process_terraclimate <- function(
 #' @param layer_name character(1). Layer name in the `path`
 #' @param huc_level character(1). Field name of HUC level
 #' @param huc_header character(1). The upper level HUC code header to extract
-#' lower level HUCs.
+#'  lower level HUCs.
 #' @param ... Arguments passed to `nhdplusTools::get_huc()`
 #' @returns a `SpatVector` object
 #' @seealso [`nhdplusTools::get_huc`]
@@ -2442,17 +2603,18 @@ process_huc <-
     huc_header = NULL,
     ...
   ) {
-    if (!file.exists(path) && !dir.exists(path)) {
+    # exclude the coverage due to write permission related to memoization
+    #nocov start
+    if (missing(path) || (!file.exists(path) && !dir.exists(path))) {
       hucpoly <- try(
         rlang::inject(nhdplusTools::get_huc(!!!list(...)))
       )
       if (inherits(hucpoly, "try-error")) {
-        stop(
-          "HUC data was not found."
-        )
+        stop("HUC data was not found.")
       }
       hucpoly <- terra::vect(hucpoly)
     }
+    #nocov end
     if (file.exists(path) || dir.exists(path)) {
       if (!is.null(huc_header)) {
         querybase <-
@@ -2587,7 +2749,7 @@ process_prism <-
 #' Process OpenLandMap data
 #' @param path character giving OpenLandMap data path
 #' @param ... Placeholders.
-#' @returns SpatRaster
+#' @returns a `SpatRaster` object
 #' @author Insang Song
 #' @importFrom terra rast
 #' @export

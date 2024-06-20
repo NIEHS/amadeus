@@ -266,7 +266,6 @@ testthat::test_that("process_modis_merge is good to go", {
     )
   )
 
-
 })
 
 
@@ -378,26 +377,30 @@ testthat::test_that("Other MODIS function errors", {
   testthat::expect_no_error(
     suppressWarnings(
       process_modis_swath(
-        path = path_mod06e,
+        path = path_mod06,
+        subdataset = "Cloud_Fraction_Night",
         date = "2021-08-15"
       )
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      path = path_mod06e,
+      path = path_mod06,
+      subdataset = "Cloud_Fraction_Night",
       date = "2021~08~15"
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      path = path_mod06e,
+      path = path_mod06,
+      subdataset = "Cloud_Fraction_Night",
       date = "2021-13-15"
     )
   )
   testthat::expect_error(
     process_modis_swath(
-      path = path_mod06e,
+      path = path_mod06,
+      subdataset = "Cloud_Fraction_Night",
       date = "2021-12-45"
     )
   )
@@ -407,11 +410,26 @@ testthat::test_that("Other MODIS function errors", {
 # test Ecoregions ####
 testthat::test_that("read ecoregion", {
   withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
 
   path_eco <- testthat::test_path("..", "testdata", "eco_l3_clip.gpkg")
-
   testthat::expect_no_error(
     process_ecoregion(path_eco)
+  )
+
+  ecotemp <- sf::st_read(path_eco)
+  # nolint start
+  addpoly <-
+    "POLYGON ((-70.2681 43.6787, -70.252234 43.677145, -70.251036 -43.680758, -70.268666 43.681505, -70.2681 43.6787))"
+  # nolint end
+  addpoly <- sf::st_as_sfc(addpoly, crs = "EPSG:4326")
+  addpoly <- sf::st_transform(addpoly, sf::st_crs(ecotemp))
+  ecotemp[1, "geom"] <- addpoly
+  tdir <- tempdir()
+  sf::st_write(ecotemp, paste0(tdir, "/ecoregions.gpkg"), append = FALSE)
+  testthat::expect_no_error(
+    suppressWarnings(process_ecoregion(paste0(tdir, "/ecoregions.gpkg")))
   )
 })
 
@@ -483,11 +501,14 @@ testthat::test_that("process_nei tests", {
   path_cnty$GEOID <- path_cnty$FIPS
 
   testthat::expect_no_error(
-    neinc <- process_nei(path = path_nei, year = 2020, county = path_cnty)
+    neinc <- process_nei(path = path_nei, year = 2017, county = path_cnty)
   )
   testthat::expect_s4_class(neinc, "SpatVector")
 
   # error cases
+  testthat::expect_error(
+    process_nei(testthat::test_path("../testdata", "modis"), year = 2017)
+  )
   testthat::expect_error(
     process_nei(path_nei, year = 2030, county = path_cnty)
   )
@@ -503,7 +524,6 @@ testthat::test_that("process_nei tests", {
   )
 
 })
-
 
 
 ## ephemeral: process_conformity tests
@@ -599,6 +619,15 @@ testthat::test_that("process_sedac_population returns null for netCDF.", {
   )
 })
 
+testthat::test_that("sedac_codes", {
+  string <- "2.5 minute"
+  testthat::expect_no_error(
+    code <- process_sedac_codes(string)
+  )
+  testthat::expect_equal(code, "2pt5_min")
+})
+
+
 # test HMS ####
 testthat::test_that("process_hms returns expected.", {
   withr::local_package("terra")
@@ -608,7 +637,7 @@ testthat::test_that("process_hms returns expected.", {
     "Heavy"
   )
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_hms)
   )
   for (d in seq_along(densities)) {
@@ -623,30 +652,30 @@ testthat::test_that("process_hms returns expected.", {
         )
       )
     # expect output is a SpatVector or character
-    expect_true(
+    testthat::expect_true(
       class(hms)[1] %in% c("SpatVector", "character")
     )
     if (class(hms)[1] == "SpatVector") {
       # expect non-null coordinate reference system
-      expect_false(
+      testthat::expect_false(
         is.null(terra::crs(hms))
       )
       # expect two columns
-      expect_true(
+      testthat::expect_true(
         ncol(hms) == 2
       )
       # expect density and date column
-      expect_true(
+      testthat::expect_true(
         all(c("Density", "Date") %in% names(hms))
       )
     } else if (class(hms)[1] == "character") {
       # expect first is density type
-      expect_true(
+      testthat::expect_true(
         hms[1] %in% c("Light", "Medium", "Heavy")
       )
-      # expect other elements are 8 character dates
-      expect_true(
-        all(nchar(hms[2:length(hms)]) == 8)
+      # expect other elements are 10 character dates
+      testthat::expect_true(
+        all(nchar(hms[2:length(hms)]) == 10)
       )
     }
   }
@@ -726,6 +755,32 @@ testthat::test_that("import_gmted returns error with non-vector variable.", {
   )
 })
 
+testthat::test_that("gmted_codes inversion", {
+  teststring <- "mx"
+  testthat::expect_no_error(
+    statorig <- process_gmted_codes(
+      teststring,
+      statistic = TRUE,
+      resolution = FALSE,
+      invert = TRUE
+    )
+  )
+  testthat::expect_equal(statorig, "Maximum Statistic")
+
+  teststring <- "75"
+  testthat::expect_no_error(
+    resoorig <- process_gmted_codes(
+      teststring,
+      statistic = FALSE,
+      resolution = TRUE,
+      invert = TRUE
+    )
+  )
+  testthat::expect_equal(resoorig, "7.5 arc-seconds")
+})
+
+
+## test NARR ####
 testthat::test_that("process_narr returns expected.", {
   withr::local_package("terra")
   variables <- c(
@@ -928,8 +983,8 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
       locs_id = "site_id"
     )
   )
-  # expect error when sites are SpatVector
-  expect_error(
+  # expect error when sites are SpatVector (points)
+  expect_no_error(
     calc_narr(
       from = narr,
       locs = terra::vect(
@@ -939,6 +994,45 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
       ),
       locs_id = "site_id"
     )
+  )
+  # expect error when sites are SpatVector (polygons)
+  expect_no_error(
+    calc_narr(
+      from = narr,
+      locs = terra::buffer(
+        terra::vect(
+          ncp,
+          geom = c("lon", "lat"),
+          crs = "EPSG:4326"
+        ),
+        1000
+      ),
+      locs_id = "site_id"
+    )
+  )
+  # expect error when sites are sf
+  expect_no_error(
+    calc_narr(
+      from = narr,
+      locs = sf::st_as_sf(
+        ncp,
+        coords = c("lon", "lat"),
+        crs = "EPSG:4326"
+      ),
+      locs_id = "site_id"
+    )
+  )
+  # error if one of "lat" or "lon" is missing (or both)
+  ncpp <- data.frame(long = -78.8277, lat = 35.95013)
+  ncpp$site_id <- "3799900018810101"
+
+  expect_error(
+    process_locs_vector(
+      locs = ncpp, crs = "EPSG:4326", 0
+    )
+  )
+  expect_error(
+    process_locs_vector(array(1))
   )
 })
 
@@ -958,33 +1052,116 @@ testthat::test_that("process_aqs", {
 
   # main test
   testthat::expect_no_error(
-    aqs <- process_aqs(path = aqssub, date = NULL)
+    aqsft <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "full",
+      return_format = "terra"
+    )
   )
   testthat::expect_no_error(
-    aqse <- process_aqs(
+    aqsst <- process_aqs(
       path = aqssub,
-      date = c("2022-02-04", "2022-02-28")
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "sparse",
+      return_format = "terra"
+    )
+  )
+  testthat::expect_no_error(
+    aqslt <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "location",
+      return_format = "terra"
     )
   )
 
   # expect
-  testthat::expect_s4_class(aqs, "SpatVector")
-  testthat::expect_s4_class(aqse, "SpatVector")
+  testthat::expect_s4_class(aqsft, "SpatVector")
+  testthat::expect_s4_class(aqsst, "SpatVector")
+  testthat::expect_s4_class(aqslt, "SpatVector")
 
   testthat::expect_no_error(
-    aqssf <- process_aqs(path = aqssub, date = NULL, return_format = "sf")
-  )
-  testthat::expect_no_error(
-    aqsesf <- process_aqs(
+    aqsfs <- process_aqs(
       path = aqssub,
       date = c("2022-02-04", "2022-02-28"),
+      mode = "full",
       return_format = "sf"
     )
   )
   testthat::expect_no_error(
+    aqsss <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "sparse",
+      return_format = "sf"
+    )
+  )
+  testthat::expect_no_error(
+    aqsls <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "location",
+      return_format = "sf"
+    )
+  )
+  testthat::expect_s3_class(aqsfs, "sf")
+  testthat::expect_s3_class(aqsss, "sf")
+  testthat::expect_s3_class(aqsls, "sf")
+
+  testthat::expect_no_error(
+    aqsfd <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "full",
+      return_format = "data.table"
+    )
+  )
+  testthat::expect_no_error(
+    aqssd <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "sparse",
+      return_format = "data.table"
+    )
+  )
+  testthat::expect_no_error(
+    aqssdd <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "sparse",
+      data_field = "Arithmetic.Mean",
+      return_format = "data.table"
+    )
+  )
+  testthat::expect_no_error(
+    aqsld <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "location",
+      return_format = "data.table"
+    )
+  )
+  testthat::expect_no_error(
+    aqsldd <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "location",
+      data_field = "Arithmetic.Mean",
+      return_format = "data.table"
+    )
+  )
+  testthat::expect_s3_class(aqsfd, "data.table")
+  testthat::expect_s3_class(aqssd, "data.table")
+  testthat::expect_s3_class(aqssdd, "data.table")
+  testthat::expect_s3_class(aqsld, "data.table")
+  testthat::expect_s3_class(aqsldd, "data.table")
+
+  testthat::expect_no_error(
     aqssf <- process_aqs(
       path = testd,
       date = c("2022-02-04", "2022-02-28"),
+      mode = "location",
       return_format = "sf"
     )
   )
@@ -1000,10 +1177,11 @@ testthat::test_that("process_aqs", {
 
   # expect
   testthat::expect_s3_class(aqssf, "sf")
-  testthat::expect_s3_class(aqsesf, "sf")
-
 
   # error cases
+  testthat::expect_error(
+    process_aqs(testthat::test_path("../testdata", "modis"))
+  )
   testthat::expect_error(
     process_aqs(path = 1L)
   )
@@ -1363,47 +1541,55 @@ testthat::test_that("gridmet and terraclimate auxiliary functions.", {
 
 
 # test PRISM ####
-test_that("process_prism returns a SpatRaster object with correct metadata", {
-  # Set up test data
-  withr::local_package("terra")
-  path <- testthat::test_path(
-    "..", "testdata", "prism", "PRISM_tmin_30yr_normal_4kmD1_0228_bil_test.nc"
-  )
-  path_dir <- testthat::test_path(
-    "..", "testdata", "prism"
-  )
-  element <- "tmin"
-  time <- "0228"
+testthat::test_that(
+  "process_prism returns a SpatRaster object with correct metadata",
+  {
+    # Set up test data
+    withr::local_package("terra")
+    path <- testthat::test_path(
+      "..", "testdata", "prism", "PRISM_tmin_30yr_normal_4kmD1_0228_bil_test.nc"
+    )
+    path_dir <- testthat::test_path(
+      "..", "testdata", "prism"
+    )
+    element <- "tmin"
+    time <- "0228"
 
-  # Call the function
-  expect_no_error(result <- process_prism(path, element, time))
-  expect_no_error(result2 <- process_prism(path_dir, element, time))
+    # Call the function
+    testthat::expect_no_error(result <- process_prism(path, element, time))
+    testthat::expect_no_error(result2 <- process_prism(path_dir, element, time))
 
-  # Check the return type
-  expect_true(inherits(result, "SpatRaster"))
-  expect_true(inherits(result2, "SpatRaster"))
+    # Check the return type
+    testthat::expect_true(inherits(result, "SpatRaster"))
+    testthat::expect_true(inherits(result2, "SpatRaster"))
 
-  # Check the metadata
-  expect_equal(unname(terra::metags(result)["time"]), time)
-  expect_equal(unname(terra::metags(result)["element"]), element)
+    # Check the metadata
+    testthat::expect_equal(unname(terra::metags(result)["time"]), time)
+    testthat::expect_equal(unname(terra::metags(result)["element"]), element)
 
-  # Set up test data
-  path_bad <- "/path/to/nonexistent/folder"
-  element_bad <- "invalid_element"
-  time_bad <- "invalid_time"
+    # Set up test data
+    path_bad <- "/path/to/nonexistent/folder"
+    element_bad <- "invalid_element"
+    time_bad <- "invalid_time"
 
-  # Call the function and expect an error
-  expect_error(process_prism(NULL, element, time))
-  expect_error(process_prism(path_bad, element, time))
-  expect_error(process_prism(path_dir, element_bad, time))
-  expect_error(process_prism(path_dir, element, time_bad))
-})
+    # Call the function and expect an error
+    testthat::expect_error(process_prism(NULL, element, time))
+    testthat::expect_error(
+      testthat::expect_warning(
+        process_prism(path_bad, element, time)
+      )
+    )
+    testthat::expect_error(process_prism(path_dir, element_bad, time))
+    testthat::expect_error(process_prism(path_dir, element, time_bad))
+  }
+)
 
 
 # test CropScape ####
 testthat::test_that(
   "process_cropscape returns a SpatRaster object with correct metadata", {
     # Set up test data
+    withr::local_package("terra")
     filepath <-
       testthat::test_path("..", "testdata/cropscape/cdl_30m_r_nc_2019_sub.tif")
     dirpath <- testthat::test_path("..", "testdata/cropscape")
@@ -1476,24 +1662,13 @@ testthat::test_that("process_huc",
       )
     )
 
-
     # Set up test data
-    path <- file.path(path, "..")
+    path2 <- testthat::test_path(
+      "..", "testdata", "huc12"
+    )
 
     # Call the function and expect an error
-    testthat::expect_error(process_huc(path))
-    # using nhdplusTools
-    testthat::expect_no_error(
-      test3 <- process_huc(
-        "",
-        layer_name = NULL,
-        huc_level = NULL,
-        huc_header = NULL,
-        id = "030202",
-        type = "huc06"
-      )
-    )
-    testthat::expect_s4_class(test3, "SpatVector")
+    testthat::expect_error(process_huc(path2))
   }
 )
 
@@ -1512,3 +1687,72 @@ testthat::test_that("process_olm", {
   )
 })
 # nolint end
+
+## AUX tests ####
+testthat::test_that("loc_radius tests", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  lon <- seq(-112, -101, length.out = 5) # create lon sequence
+  lat <- seq(33.5, 40.9, length.out = 5) # create lat sequence
+  df <- expand.grid("lon" = lon, "lat" = lat) # expand to regular grid
+  df <- rbind(df, df)
+  df$time <- c(rep("2023-11-02", 25), rep("2023-11-03", 25))
+  df$var1 <- 1:50
+  df$var2 <- 51:100
+  dfsf <- sf::st_as_sf(
+    df,
+    coords = c("lon", "lat"),
+    crs = "EPSG:4326",
+    remove = FALSE
+  )
+  dftr <- terra::vect(dfsf)
+
+  testthat::expect_no_error(
+    dftrb00 <- process_locs_radius(dftr, 0)
+  )
+  testthat::expect_no_error(
+    dftrb1k <- process_locs_radius(dftr, 1000L)
+  )
+  testthat::expect_true(terra::geomtype(dftrb00) == "points")
+  testthat::expect_true(terra::geomtype(dftrb1k) == "polygons")
+  testthat::expect_s4_class(dftrb00, "SpatVector")
+  testthat::expect_s4_class(dftrb1k, "SpatVector")
+})
+
+testthat::test_that("process_locs_vector tests", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  lon <- seq(-112, -101, length.out = 5) # create lon sequence
+  lat <- seq(33.5, 40.9, length.out = 5) # create lat sequence
+  df <- expand.grid("lon" = lon, "lat" = lat) # expand to regular grid
+  dfsf <- sf::st_as_sf(
+    df,
+    coords = c("lon", "lat"),
+    crs = "EPSG:4326",
+    remove = FALSE
+  )
+  dftr <- terra::vect(dfsf)
+
+  testthat::expect_no_error(
+    dftr1 <- process_locs_vector(dftr, "EPSG:4326", 0)
+  )
+  testthat::expect_no_error(
+    dfsftr <- process_locs_vector(dfsf, "EPSG:4326", 0)
+  )
+  testthat::expect_no_error(
+    dfdftr <- process_locs_vector(df, "EPSG:4326", 0)
+  )
+  testthat::expect_no_error(
+    dfdftrb <- process_locs_vector(df, "EPSG:4326", radius = 1000L)
+  )
+  testthat::expect_s4_class(dftr1, "SpatVector")
+  testthat::expect_s4_class(dfsftr, "SpatVector")
+  testthat::expect_s4_class(dfdftr, "SpatVector")
+  testthat::expect_s4_class(dfdftrb, "SpatVector")
+  testthat::expect_true(terra::geomtype(dfdftr) == "points")
+  testthat::expect_true(terra::geomtype(dfdftrb) == "polygons")
+})

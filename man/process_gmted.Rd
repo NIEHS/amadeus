@@ -9,7 +9,13 @@ process_gmted(variable = NULL, path = NULL, ...)
 \arguments{
 \item{variable}{vector(1). Vector containing the GMTED statistic first and
 the resolution second. (Example: variable = c("Breakline Emphasis",
-"7.5 arc-seconds")).}
+"7.5 arc-seconds")).
+\itemize{
+\item Statistic options: "Breakline Emphasis", "Systematic Subsample",
+"Median Statistic", "Minimum Statistic", "Mean Statistic",
+"Maximum Statistic", "Standard Deviation Statistic"
+\item Resolution options: "30 arc-seconds", "15 arc-seconds", "7.5 arc-seconds"
+}}
 
 \item{path}{character(1). Directory with downloaded GMTED  "*_grd"
 folder containing .adf files.}
@@ -24,7 +30,8 @@ The \code{process_gmted()} function imports and cleans raw elevation data,
 returning a single \code{SpatRaster} object.
 }
 \note{
-\code{SpatRaster} layer name indicates selected variable and resolution.
+\code{SpatRaster} layer name indicates selected variable and resolution, and year
+of release (2010).
 }
 \author{
 Mitchell Manware

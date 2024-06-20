@@ -12,7 +12,7 @@ process_olm(path = NULL, ...)
 \item{...}{Placeholders.}
 }
 \value{
-SpatRaster
+a \code{SpatRaster} object
 }
 \description{
 Process OpenLandMap data

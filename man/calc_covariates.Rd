@@ -47,7 +47,7 @@ SpatRaster or SpatVector objects before passing to
 \seealso{
 \itemize{
 \item \code{\link{calc_modis_par}}: \code{"modis"}, \code{"MODIS"}
-\item \code{\link{calc_koppen_geiger}}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"},
+\item \code{\link{calc_koppen_geiger}}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"}
 \item \code{\link{calc_ecoregion}}: \code{"ecoregion"}, \code{"ecoregions"}
 \item 
 \item \code{\link{calc_hms}}: \code{"hms"}, \code{"noaa"}, \code{"smoke"}

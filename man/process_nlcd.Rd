@@ -4,12 +4,15 @@
 \alias{process_nlcd}
 \title{Process land cover data}
 \usage{
-process_nlcd(path = NULL, year = 2021, ...)
+process_nlcd(path = NULL, year = 2021, extent = NULL, ...)
 }
 \arguments{
 \item{path}{character giving nlcd data path}
 
 \item{year}{numeric giving the year of NLCD data used}
+
+\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
+if \code{NULL} (default), the entire raster is loaded}
 
 \item{...}{Placeholders.}
 }

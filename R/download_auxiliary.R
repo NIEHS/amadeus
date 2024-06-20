@@ -4,15 +4,39 @@
 #' @description
 #' Create \code{directory} if it does not already exist.
 #' @param directory character(1) directory path
+#' @param zip logical(1). Should sub-directories be created for zip files and
+#' data files? If `TRUE`, a vector of sub-directoy names will be returned.
 #' @description If directory does not exist, the directory
 #' will be created.
-#' @returns NULL
+#' @returns NULL; if `zip = TRUE` a vector of directories for zip files and
+#' data files
 #' @keywords internal
 #' @export
 download_setup_dir <-
-  function(directory) {
+  function(directory, zip = FALSE) {
     if (!dir.exists(directory)) {
       dir.create(directory, recursive = TRUE)
+    }
+    if (zip) {
+      directory_zip <- download_sanitize_path(
+        paste0(
+          download_sanitize_path(directory),
+          "zip_files"
+        )
+      )
+      if (!dir.exists(directory_zip)) {
+        dir.create(directory_zip, recursive = TRUE)
+      }
+      directory_data <- download_sanitize_path(
+        paste0(
+          download_sanitize_path(directory),
+          "data_files"
+        )
+      )
+      if (!dir.exists(directory_data)) {
+        dir.create(directory_data, recursive = TRUE)
+      }
+      return(c(directory_zip, directory_data))
     }
   }
 
@@ -165,8 +189,10 @@ download_unzip <-
 #' @param remove logical(1). Confirm removal. Default is FALSE.
 #' @param download_name character. Full zip file path
 #' @note
+#' !!! USE THE FUNCTION WITH CAUTION !!!
 #' If \code{remove = TRUE}, ensure that \code{unzip = TRUE}. Choosing to remove
 #' ".zip" files without unzipping will retain none of the downloaded data.
+#' then it will remove all files in the second higher level directory.
 #' @returns NULL
 #' @keywords internal
 #' @export
@@ -177,6 +203,9 @@ download_remove_zips <-
     if (remove) {
       cat(paste0("Removing download files...\n"))
       file.remove(download_name)
+      # oftentimes zipfiles are stored in zip_files under
+      # directory_to_save in download functions.
+      unlink(dirname(dirname(download_name)), recursive = TRUE)
       cat(paste0("Download files removed.\n"))
     }
   }
@@ -294,7 +323,7 @@ generate_time_sequence <-
 
 #' Check HTTP status
 #' @description
-#' Check if provided URL returns HTTP status 200.
+#' Check if provided URL returns HTTP status 200 or 206.
 #' @param url Download URL to be checked.
 #' @param method httr method to obtain URL (`"HEAD"` or `"GET"`)
 #' @author Insang Song; Mitchell Manware
@@ -307,15 +336,15 @@ check_url_status <- function(
     url,
     method = c("HEAD", "GET")) {
   method <- match.arg(method)
-  http_status_ok <- 200
+  http_status_ok <- c(200, 206)
   if (method == "HEAD") {
     hd <- httr::HEAD(url)
   } else if (method == "GET") {
     hd <- httr::GET(url)
   }
   status <- hd$status_code
-  Sys.sleep(1.5)
-  return(status == http_status_ok)
+  Sys.sleep(1)
+  return(status %in% http_status_ok)
 }
 
 #' Import download commands
@@ -350,7 +379,7 @@ extract_urls <- function(
   }
   urls <- sapply(
     strsplit(
-      commands,
+      trimws(commands),
       " "
     ),
     function(x, l) x[l],
