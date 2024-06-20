@@ -14,7 +14,7 @@ will be created."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,7 +28,7 @@ will be created."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/download_functions.html">download_data() and NASA EarthData Account</a>
+    <a class="dropdown-item" href="../articles/download_functions.html">download_data and NASA EarthData Account</a>
     <a class="dropdown-item" href="../articles/epa_download.html">Downloading EPA Daily Data</a>
   </div>
 </li>
@@ -61,7 +61,7 @@ will be created.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">download_setup_dir</span><span class="op">(</span><span class="va">directory</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">download_setup_dir</span><span class="op">(</span><span class="va">directory</span>, zip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -69,7 +69,19 @@ will be created.</p>
     <dl><dt>directory</dt>
 <dd><p>character(1) directory path</p></dd>
 
+
+<dt>zip</dt>
+<dd><p>logical(1). Should sub-directories be created for zip files and
+data files? If <code>TRUE</code>, a vector of sub-directoy names will be returned.</p></dd>
+
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>NULL; if <code>zip = TRUE</code> a vector of directories for zip files and
+data files</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

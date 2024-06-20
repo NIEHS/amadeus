@@ -18,7 +18,7 @@ is used to convert the unit of length to meters."><!-- mathjax --><script src="h
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,7 +32,7 @@ is used to convert the unit of length to meters."><!-- mathjax --><script src="h
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/download_functions.html">download_data() and NASA EarthData Account</a>
+    <a class="dropdown-item" href="../articles/download_functions.html">download_data and NASA EarthData Account</a>
     <a class="dropdown-item" href="../articles/epa_download.html">Downloading EPA Daily Data</a>
   </div>
 </li>
@@ -72,7 +72,8 @@ is used to convert the unit of length to meters.</p>
 <span>  locs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  locs_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  radius <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  fun <span class="op">=</span> <span class="va">sum</span>,</span>
+<span>  fun <span class="op">=</span> <span class="st">"sum"</span>,</span>
+<span>  geom <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -102,6 +103,15 @@ containing identifier for each unique coordinate location.</p></dd>
 within sites location buffer (Default is <code>sum</code>).</p></dd>
 
 
+<dt>geom</dt>
+<dd><p>logical(1). Should the geometry of <code>locs</code> be returned in the
+<code>data.frame</code>? Default is <code>FALSE</code>. If <code>geom = TRUE</code> and <code>locs</code> contain
+polygon geometries, the <code>$geometry</code> column in the returned data frame may
+make the <code>data.frame</code> difficult to read due to long geometry strings. The
+coordinate reference system of the <code>$geometry</code> is the coordinate
+reference system of <code>from</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Placeholders.</p></dd>
 
@@ -114,7 +124,9 @@ within sites location buffer (Default is <code>sum</code>).</p></dd>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>Unit is km / sq km.</p>
+    <p>Unit is km / sq km. The returned <code>data.frame</code> object contains a
+<code>$time</code> column to represent the temporal range covered by the
+dataset. For more information, see <a href="https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata" class="external-link">https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata</a>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

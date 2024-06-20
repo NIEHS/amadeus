@@ -14,7 +14,7 @@ time (year), and computed ratio for each land cover class."><!-- mathjax --><scr
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,7 +28,7 @@ time (year), and computed ratio for each land cover class."><!-- mathjax --><scr
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/download_functions.html">download_data() and NASA EarthData Account</a>
+    <a class="dropdown-item" href="../articles/download_functions.html">download_data and NASA EarthData Account</a>
     <a class="dropdown-item" href="../articles/epa_download.html">Downloading EPA Daily Data</a>
   </div>
 </li>
@@ -65,8 +65,11 @@ time (year), and computed ratio for each land cover class.</p>
 <span>  <span class="va">from</span>,</span>
 <span>  <span class="va">locs</span>,</span>
 <span>  locs_id <span class="op">=</span> <span class="st">"site_id"</span>,</span>
+<span>  mode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"exact"</span>, <span class="st">"terra"</span><span class="op">)</span>,</span>
 <span>  radius <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  max_cells <span class="op">=</span> <span class="fl">1e+08</span>,</span>
+<span>  max_cells <span class="op">=</span> <span class="fl">5e+07</span>,</span>
+<span>  geom <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  nthreads <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -85,6 +88,12 @@ time (year), and computed ratio for each land cover class.</p>
 <dd><p>character(1). Unique identifier of locations</p></dd>
 
 
+<dt>mode</dt>
+<dd><p>character(1). One of <code>"exact"</code>
+(using <code><a href="https://isciences.gitlab.io/exactextractr/reference/exact_extract.html" class="external-link">exactextractr::exact_extract()</a></code>)
+or <code>"terra"</code> (using <code><a href="https://rspatial.github.io/terra/reference/freq.html" class="external-link">terra::freq()</a></code>).</p></dd>
+
+
 <dt>radius</dt>
 <dd><p>numeric (non-negative) giving the
 radius of buffer around points</p></dd>
@@ -92,9 +101,23 @@ radius of buffer around points</p></dd>
 
 <dt>max_cells</dt>
 <dd><p>integer(1). Maximum number of cells to be read at once.
-Higher values will expedite processing, but will increase memory usage.
-Maximum possible value is <code>2^31 - 1</code>.
+Higher values may expedite processing, but will increase memory usage.
+Maximum possible value is <code>2^31 - 1</code>. Only valid when
+<code>mode = "exact"</code>.
 See <code><a href="https://isciences.gitlab.io/exactextractr/reference/exact_extract.html" class="external-link">exactextractr::exact_extract</a></code> for details.</p></dd>
+
+
+<dt>geom</dt>
+<dd><p>logical(1). Should the geometry of <code>locs</code> be returned in the
+<code>data.frame</code>? Default is <code>FALSE</code>. If <code>geom = TRUE</code> and <code>locs</code> contain
+polygon geometries, the <code>$geometry</code> column in the returned data frame may
+make the <code>data.frame</code> difficult to read due to long geometry strings. The
+coordinate reference system of the <code>$geometry</code> is the coordinate
+reference system of <code>from</code>.</p></dd>
+
+
+<dt>nthreads</dt>
+<dd><p>integer(1). Number of threads to be used</p></dd>
 
 
 <dt>...</dt>
@@ -106,6 +129,16 @@ See <code><a href="https://isciences.gitlab.io/exactextractr/reference/exact_ext
     
 
 <p>a data.frame object</p>
+    </div>
+    <div class="section level2">
+    <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
+    <p>NLCD is available in U.S. only. Users should be aware of
+the spatial extent of the data. The results are different depending
+on <code>mode</code> argument. The <code>"terra"</code> mode is less memory intensive
+but less accurate because it counts the number of cells
+intersecting with the buffer. The <code>"exact"</code> may be more accurate
+but uses more memory as it will account for the partial overlap
+with the buffer.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

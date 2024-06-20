@@ -24,7 +24,7 @@ locs should be sf object as it is exportable to parallel workers."><!-- mathjax 
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,7 @@ locs should be sf object as it is exportable to parallel workers."><!-- mathjax 
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/download_functions.html">download_data() and NASA EarthData Account</a>
+    <a class="dropdown-item" href="../articles/download_functions.html">download_data and NASA EarthData Account</a>
     <a class="dropdown-item" href="../articles/epa_download.html">Downloading EPA Daily Data</a>
   </div>
 </li>
@@ -88,7 +88,7 @@ CPU and memory capacities as products have their own memory pressure.
 <span>  nthreads <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableWorkers.html" class="external-link">availableWorkers</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>,</span>
 <span>  package_list_add <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  export_list_add <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  max_cells <span class="op">=</span> <span class="fl">1e+08</span>,</span>
+<span>  max_cells <span class="op">=</span> <span class="fl">3e+07</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -127,7 +127,8 @@ was used to calculate mean NDVI value.</p></dd>
 
 
 <dt>subdataset</dt>
-<dd><p>Index or search pattern of subdataset.</p></dd>
+<dd><p>Indices, names, or search patterns for subdatasets.
+Find detail usage of the argument in notes.</p></dd>
 
 
 <dt>fun_summary</dt>
@@ -164,6 +165,14 @@ See <code><a href="https://isciences.gitlab.io/exactextractr/reference/exact_ext
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>A data.frame with an attribute:</p><ul><li><p><code>attr(., "dates_dropped")</code>: Dates with insufficient tiles.
+Note that the dates mean the dates with insufficient tiles,
+not the dates without available tiles.</p></li>
+</ul></div>
+    <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p>Overall, this function and dependent routines assume that the file
 system can handle concurrent access to the (network) disk by multiple
@@ -174,19 +183,31 @@ other class objects that could be converted to <code>sf</code> can be used.
 Common arguments in <code>preprocess</code> functions such as <code>date</code> and <code>path</code> are
 automatically detected and passed to the function. Please note that
 <code>locs</code> here and <code>path</code> in <code>preprocess</code> functions are assumed to have a
-standard naming convention of raw files from NASA.</p>
-    </div>
+standard naming convention of raw files from NASA.
+The argument <code>subdataset</code> should be in a proper format
+depending on <code>preprocess</code> function:</p><ul><li><p><code><a href="process_modis_merge.html">process_modis_merge()</a></code>: Regular expression pattern.
+e.g., <code>"^LST_"</code></p></li>
+<li><p><code><a href="process_modis_swath.html">process_modis_swath()</a></code>: Subdataset names.
+e.g., <code>c("Cloud_Fraction_Day", "Cloud_Fraction_Night")</code></p></li>
+<li><p><code><a href="process_bluemarble.html">process_bluemarble()</a></code>: Subdataset number.
+e.g., for VNP46A2 product, 3L.
+Dates with less than 80 percent of the expected number of tiles,
+which are determined by the mode of the number of tiles, are removed.
+Users will be informed of the dates with insufficient tiles.
+The result data.frame will have an attribute with the dates with
+insufficient tiles.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>See details for setting parallelization:</p><ul><li><p><code><a href="https://rdrr.io/pkg/foreach/man/foreach.html" class="external-link">foreach::foreach</a></code></p></li>
-<li><p><code><a href="https://parallelly.futureverse.org/reference/makeClusterPSOCK.html" class="external-link">parallelly::makeClusterPSOCK</a></code></p></li>
-<li><p><code><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">parallelly::availableCores</a></code></p></li>
-<li><p><code><a href="https://rdrr.io/pkg/doParallel/man/registerDoParallel.html" class="external-link">doParallel::registerDoParallel</a></code></p></li>
+    <div class="dont-index"><p>See details for setting parallelization:</p><ul><li><p><code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">future::plan()</a></code></p></li>
+<li><p><code><a href="https://future.apply.futureverse.org/reference/future_lapply.html" class="external-link">future.apply::future_lapply()</a></code></p></li>
+<li><p><code><a href="https://parallelly.futureverse.org/reference/makeClusterPSOCK.html" class="external-link">parallelly::makeClusterPSOCK()</a></code></p></li>
+<li><p><code><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">parallelly::availableCores()</a></code></p></li>
 </ul><p>This function leverages the calculation of single-day MODIS
-covariates:</p><ul><li><p><code><a href="calc_modis_daily.html">calc_modis_daily</a></code></p></li>
-</ul><p>Also, for preprocessing, see:</p><ul><li><p><code><a href="process_modis_merge.html">process_modis_merge</a></code></p></li>
-<li><p><code><a href="process_modis_swath.html">process_modis_swath</a></code></p></li>
-<li><p><code><a href="process_bluemarble.html">process_bluemarble</a></code></p></li>
+covariates:</p><ul><li><p><code><a href="calc_modis_daily.html">calc_modis_daily()</a></code></p></li>
+</ul><p>Also, for preprocessing, please refer to:</p><ul><li><p><code><a href="process_modis_merge.html">process_modis_merge()</a></code></p></li>
+<li><p><code><a href="process_modis_swath.html">process_modis_swath()</a></code></p></li>
+<li><p><code><a href="process_bluemarble.html">process_bluemarble()</a></code></p></li>
 </ul></div>
     </div>
 

@@ -25,6 +25,9 @@
     <loc>https://niehs.github.io/amadeus/reference/as_mysftime.html</loc>
   </url>
   <url>
+    <loc>https://niehs.github.io/amadeus/reference/calc_check_time.html</loc>
+  </url>
+  <url>
     <loc>https://niehs.github.io/amadeus/reference/calc_covariates.html</loc>
   </url>
   <url>
@@ -115,64 +118,64 @@
     <loc>https://niehs.github.io/amadeus/reference/check_urls.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_aqs_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_aqs.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_cropscape_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_cropscape.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_data.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_ecoregion_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_ecoregion.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_epa_certificate.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_geos_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_geos.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_gmted_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_gmted.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_gridmet_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_gridmet.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_hms_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_hms.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_huc_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_huc.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_koppen_geiger_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_koppen_geiger.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_merra2_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_merra2.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_modis_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_modis.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_narr_monolevel_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_narr_monolevel.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_narr_p_levels_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_narr_p_levels.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_nei_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_nei.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_nlcd_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_nlcd.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_olm_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_olm.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_permit.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_prism_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_prism.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_remove_command.html</loc>
@@ -187,10 +190,10 @@
     <loc>https://niehs.github.io/amadeus/reference/download_sanitize_path.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_sedac_groads_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_sedac_groads.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_sedac_population_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_sedac_population.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_setup_dir.html</loc>
@@ -199,10 +202,10 @@
     <loc>https://niehs.github.io/amadeus/reference/download_sink.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_terraclimate_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_terraclimate.html</loc>
   </url>
   <url>
-    <loc>https://niehs.github.io/amadeus/reference/download_tri_data.html</loc>
+    <loc>https://niehs.github.io/amadeus/reference/download_tri.html</loc>
   </url>
   <url>
     <loc>https://niehs.github.io/amadeus/reference/download_unzip.html</loc>

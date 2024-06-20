@@ -24,7 +24,7 @@ the full path to the hdf file.'><!-- mathjax --><script src="https://cdnjs.cloud
     
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,7 @@ the full path to the hdf file.'><!-- mathjax --><script src="https://cdnjs.cloud
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/download_functions.html">download_data() and NASA EarthData Account</a>
+    <a class="dropdown-item" href="../articles/download_functions.html">download_data and NASA EarthData Account</a>
     <a class="dropdown-item" href="../articles/epa_download.html">Downloading EPA Daily Data</a>
   </div>
 </li>
@@ -97,7 +97,11 @@ the full path to the hdf file.</p>
 
 
 <dt>subdataset</dt>
-<dd><p>character. Subdatasets to process.</p></dd>
+<dd><p>character. Subdatasets to process.
+<strong>Unlike other preprocessing functions, this argument should specify
+the exact subdataset name.</strong> For example, when using MOD06_L2 product,
+one may specify <code>c("Cloud_Fraction", "Cloud_Optical_Thickness")</code>,
+etc. The subdataset names can be found in <code><a href="https://rspatial.github.io/terra/reference/describe.html" class="external-link">terra::describe()</a></code> output.</p></dd>
 
 
 <dt>suffix</dt>
@@ -107,7 +111,7 @@ e.g., <code>:mod06:</code></p></dd>
 
 <dt>resolution</dt>
 <dd><p>numeric(1). Resolution of output raster.
-Unit is degree.</p></dd>
+Unit is degree (decimal degree in WGS84).</p></dd>
 
 
 <dt>...</dt>
@@ -125,10 +129,10 @@ full specification of subdataset.</p></li>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index">
-<ul><li><p><code><a href="process_modis_warp.html">process_modis_warp</a></code></p></li>
+<ul><li><p><code><a href="process_modis_warp.html">process_modis_warp()</a></code>, <code><a href="https://r-spatial.github.io/stars/reference/read_stars.html" class="external-link">stars::read_stars()</a></code>, <code><a href="https://r-spatial.github.io/stars/reference/st_warp.html" class="external-link">stars::st_warp()</a></code></p></li>
 <li><p><a href="https://gdal.org/drivers/raster/hdf4.html" class="external-link">GDAL HDF4 driver documentation</a></p></li>
-<li><p><code><a href="https://rspatial.github.io/terra/reference/describe.html" class="external-link">terra::describe</a></code>: to list the full subdataset list with <code>sds = TRUE</code></p></li>
-<li><p><code><a href="https://rspatial.github.io/terra/reference/sprc.html" class="external-link">terra::sprc</a></code>, <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast</a></code></p></li>
+<li><p><code><a href="https://rspatial.github.io/terra/reference/describe.html" class="external-link">terra::describe()</a></code>: to list the full subdataset list with <code>sds = TRUE</code></p></li>
+<li><p><code><a href="https://rspatial.github.io/terra/reference/sprc.html" class="external-link">terra::sprc()</a></code>, <code><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">terra::rast()</a></code></p></li>
 </ul></div>
     </div>
     <div class="section level2">
