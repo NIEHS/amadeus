@@ -1409,6 +1409,154 @@ download_nlcd <- function(
 }
 
 # nolint start
+#' Download urban imperviousness (developed urban descriptor for Alaska) data
+#' @description
+#' The \code{download_imperviousness()} function accesses and downloads
+#' imperviousness data from the
+#' [Multi-Resolution Land Characteristics (MRLC) Consortium's National Urban Imperviousness Database products data base](https://www.mrlc.gov/data).
+# nolint end
+#' @param collection character(1). `"Coterminous United States"` or `"Alaska"`.
+#' @param year integer(1). Available years for Coterminous United States
+#' include `2001`, `2004`, `2006`, `2008`, `2011`, `2013`, `2016`,
+#' `2019`, and `2021`.
+#' Available years for Alaska include `2001`, `2011`, and `2016`. 
+#' @param directory_to_save character(1). Directory to save data. Two
+#' sub-directories will be created for the downloaded zip files ("/zip_files")
+#' and the unzipped shapefiles ("/data_files").
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#' user acknowledges that the data downloaded using this function may be very
+#' large and use lots of machine storage and memory.
+#' @param download logical(1). \code{FALSE} will generate a *.txt file
+#' containing all download commands. By setting \code{TRUE} the function
+#' will download all of the requested data files.
+#' @param remove_command logical(1).
+#' Remove (\code{TRUE}) or keep (\code{FALSE})
+#' the text file containing download commands.
+#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip files from directory_to_download.
+#' Default is \code{FALSE}.
+#' @author Mitchell Manware, Insang Song
+#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' respective sub-directories within \code{directory_to_save}.
+#' @export
+download_imperviousness <- function(
+    collection = "Coterminous United States",
+    year = 2021,
+    directory_to_save = NULL,
+    acknowledgement = FALSE,
+    download = FALSE,
+    remove_command = FALSE,
+    unzip = TRUE,
+    remove_zip = FALSE
+) {
+  #### 1. check for data download acknowledgement
+  download_permit(acknowledgement = acknowledgement)
+  #### 2. check for null parameters
+  check_for_null_parameters(mget(ls()))
+  #### 3. directory setup
+  directory_original <- download_sanitize_path(directory_to_save)
+  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- directories[1]
+  directory_to_save <- directories[2]
+  #### 4. check for valid years
+  valid_years <- c(2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019, 2021)
+  if (!(year %in% valid_years)) {
+    stop(paste0("Requested year is not recognized.\n"))
+  }
+  #### 5. define URL base
+  base <- "https://s3-us-west-2.amazonaws.com/mrlc/"
+  #### 6. define collection code
+  if (collection == "Coterminous United States") {
+    collection_code <- paste0(
+      "nlcd_",
+      as.character(year),
+      "_impervious_l48_"
+    )
+  } else if (collection == "Alaska") {
+    collection_code <- paste0(
+      "NLCD_",
+      as.character(year),
+      "_Urban_Descriptor_AK_"
+    )
+  }
+  #### 7. define release date
+  #### NOTE: release dates identified by inspecting URLs on from
+  ####       https://www.mrlc.gov/data?f%5B0%5D=category%3ALand%20Cover
+  if (year == 2021 && collection == "Coterminous United States") {
+    release_date <- "20230630"
+  } else if (!(year == 2021) && collection == "Coterminous United States") {
+    release_date <- "20210604"
+  } else if (collection == "Alaska") {
+    release_date <- "20200724"
+  }
+  #### 8. build URL
+  download_url <- paste0(
+    base,
+    collection_code,
+    release_date,
+    ".zip"
+  )
+  #### 9. build download file name
+  download_name <- paste0(
+    directory_to_download,
+    tolower(collection_code),
+    release_date,
+    ".zip"
+  )
+  #### 10. build system command
+  download_command <- paste0(
+    "curl -o ",
+    download_name,
+    " --url ",
+    download_url,
+    "\n"
+  )
+  #### 11. initiate "..._curl_command.txt"
+  commands_txt <- paste0(
+    directory_original,
+    tolower(collection_code),
+    Sys.Date(),
+    "_curl_command.txt"
+  )
+  download_sink(commands_txt)
+  #### 12. concatenate and print download command to "..._curl_commands.txt"
+  if (!file.exists(download_name)) {
+    #### cat command only if file does not already exist
+    cat(download_command)
+  }
+  #### 13. finish "..._curl_command.txt"
+  sink()
+  #### 14. build system command
+  system_command <- paste0(
+    ". ",
+    commands_txt,
+    "\n"
+  )
+  #### 15. download data
+  download_run(
+    download = download,
+    system_command = system_command
+  )
+  #### 16. end if unzip == FALSE
+  download_unzip(
+    file_name = download_name,
+    directory_to_unzip = directory_to_save,
+    unzip = unzip
+  )
+  #### 17. remove zip files
+  download_remove_zips(
+    remove = remove_zip,
+    download_name = download_name
+  )
+  #### 18. remove command text
+  download_remove_command(
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
+}
+
+
+# nolint start
 #' Download roads data
 #' @description
 #' The \code{download_sedac_groads()} function accesses and downloads
