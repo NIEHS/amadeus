@@ -37,10 +37,10 @@ testthat::test_that("test generic process_covariates", {
       full.names = TRUE
     )
 
-  corn <- process_bluemarble_corners()
+  corn <- process_blackmarble_corners()
   testthat::expect_warning(
     bm_proc <- process_covariates(
-      covariate = "bluemarble",
+      covariate = "blackmarble",
       path = path_vnp46[1],
       tile_df = corn,
       date = "2018-08-13"
@@ -48,7 +48,7 @@ testthat::test_that("test generic process_covariates", {
   )
   testthat::expect_warning(
     process_covariates(
-      covariate = "Bluemarble",
+      covariate = "Blackmarble",
       path = path_vnp46[1],
       tile_df = corn,
       date = "2018-08-13"
@@ -56,7 +56,7 @@ testthat::test_that("test generic process_covariates", {
   )
   testthat::expect_warning(
     process_covariates(
-      covariate = "BLUEMARBLE",
+      covariate = "BLACKMARBLE",
       path = path_vnp46[1],
       tile_df = corn,
       date = "2018-08-13"
@@ -66,7 +66,7 @@ testthat::test_that("test generic process_covariates", {
 
   covar_types <- c("modis_swath", "modis_merge",
                    "koppen-geiger",
-                   "bluemarble",
+                   "blackmarble",
                    "koeppen-geiger", "koppen", "koeppen",
                    "geos", "dummies", "gmted",
                    "hms", "smoke",
@@ -280,14 +280,14 @@ testthat::test_that("VNP46 preprocess tests", {
     )
 
   testthat::expect_no_error(
-    corn <- process_bluemarble_corners()
+    corn <- process_blackmarble_corners()
   )
   testthat::expect_error(
-    process_bluemarble_corners(hrange = c(99, 104))
+    process_blackmarble_corners(hrange = c(99, 104))
   )
 
   testthat::expect_warning(
-    vnp46_proc <- process_bluemarble(
+    vnp46_proc <- process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
       date = "2018-08-13"
@@ -297,7 +297,7 @@ testthat::test_that("VNP46 preprocess tests", {
   testthat::expect_equal(terra::nlyr(vnp46_proc), 1L)
 
   testthat::expect_warning(
-    vnp46_proc2 <- process_bluemarble(
+    vnp46_proc2 <- process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
       subdataset = c(3L, 5L),
@@ -309,7 +309,7 @@ testthat::test_that("VNP46 preprocess tests", {
   testthat::expect_equal(terra::nlyr(vnp46_proc2), 2L)
 
   testthat::expect_error(
-    process_bluemarble(
+    process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
       date = "2018~08~13"
@@ -462,6 +462,14 @@ testthat::test_that("process_nlcd tests", {
   )
   testthat::expect_error(
     process_nlcd(path_nlcd19, year = 2020)
+  )
+  # make duplicate with tif and img
+  tdir <- tempdir()
+  dir.create(paste0(tdir, "/nlcd_all"))
+  file.create(paste0(tdir, "/nlcd_all/nlcd_2019_land_cover_20240624.tif"))
+  file.create(paste0(tdir, "/nlcd_all/nlcd_2019_land_cover_20240624.img"))
+  testthat::expect_error(
+    process_nlcd(path = paste0(tdir, "/nlcd_all"), year = 2019)
   )
 
 })

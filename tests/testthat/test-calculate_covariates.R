@@ -293,10 +293,10 @@ testthat::test_that("calc_modis works well.", {
       full.names = TRUE
     )
   testthat::expect_warning(
-    base_vnp <- process_bluemarble(
+    base_vnp <- process_blackmarble(
       path = path_vnp46,
       date = "2018-08-13",
-      tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
+      tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
     )
   )
 
@@ -306,11 +306,11 @@ testthat::test_that("calc_modis works well.", {
         calc_modis_par(
           from = path_vnp46,
           locs = site_faux,
-          preprocess = process_bluemarble,
+          preprocess = process_blackmarble,
           name_covariates = c("MOD_NITLT_0_"),
           subdataset = 3L,
           nthreads = 1,
-          tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
+          tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
         )
     )
   )
@@ -419,11 +419,11 @@ testthat::test_that("calc_modis works well.", {
     calc_modis_par(
       from = path_vnp46,
       locs = site_faux,
-      preprocess = process_bluemarble,
+      preprocess = process_blackmarble,
       name_covariates = c("MOD_NITLT_0_", "MOD_K1_"),
       subdataset = 3L,
       nthreads = 2,
-      tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
+      tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
     )
   )
   testthat::expect_warning(
@@ -431,7 +431,7 @@ testthat::test_that("calc_modis works well.", {
       from = path_vnp46,
       locs = site_faux,
       name_covariates = c("MOD_NITLT_0_"),
-      preprocess = process_bluemarble,
+      preprocess = process_blackmarble,
       subdataset = 3L,
       nthreads = 1,
       radius = c(-1000, 0L)

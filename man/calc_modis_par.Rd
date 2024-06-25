@@ -100,7 +100,7 @@ depending on \code{preprocess} function:
 e.g., \code{"^LST_"}
 \item \code{process_modis_swath()}: Subdataset names.
 e.g., \code{c("Cloud_Fraction_Day", "Cloud_Fraction_Night")}
-\item \code{process_bluemarble()}: Subdataset number.
+\item \code{process_blackmarble()}: Subdataset number.
 e.g., for VNP46A2 product, 3L.
 Dates with less than 80 percent of the expected number of tiles,
 which are determined by the mode of the number of tiles, are removed.
@@ -128,6 +128,6 @@ Also, for preprocessing, please refer to:
 \itemize{
 \item \code{\link[=process_modis_merge]{process_modis_merge()}}
 \item \code{\link[=process_modis_swath]{process_modis_swath()}}
-\item \code{\link[=process_bluemarble]{process_bluemarble()}}
+\item \code{\link[=process_blackmarble]{process_blackmarble()}}
 }
 }

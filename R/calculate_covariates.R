@@ -379,7 +379,7 @@ calc_nlcd <- function(from,
     nlcd_at_bufs <- nlcd_at_bufs[, nlcd_val_cols]
   }
   # fill NAs
-  nlcd_at_bufs[is.na(nlcd_at_bufs)] <- 0
+  nlcd_at_bufs[is.na(nlcd_at_bufs), with = FALSE] <- 0
 
   # change column names
   nlcd_names <- names(nlcd_at_bufs)
@@ -533,7 +533,7 @@ calc_ecoregion <-
 #' the file names at users' discretion.
 #' @seealso
 #' * Preprocessing: [process_modis_merge()], [process_modis_swath()],
-#'     [process_bluemarble()]
+#'     [process_blackmarble()]
 #' * Parallelization: [calc_modis_par()]
 #' @author Insang Song
 #' @returns A data.frame object.
@@ -676,7 +676,7 @@ calc_modis_daily <- function(
 #'   e.g., `"^LST_"`
 #' * `process_modis_swath()`: Subdataset names.
 #'   e.g., `c("Cloud_Fraction_Day", "Cloud_Fraction_Night")`
-#' * `process_bluemarble()`: Subdataset number.
+#' * `process_blackmarble()`: Subdataset number.
 #'   e.g., for VNP46A2 product, 3L.
 #' Dates with less than 80 percent of the expected number of tiles,
 #' which are determined by the mode of the number of tiles, are removed.
@@ -700,7 +700,7 @@ calc_modis_daily <- function(
 #' Also, for preprocessing, please refer to:
 #' * [`process_modis_merge()`]
 #' * [`process_modis_swath()`]
-#' * [`process_bluemarble()`]
+#' * [`process_blackmarble()`]
 #' @importFrom methods is
 #' @importFrom sf st_as_sf
 #' @importFrom sf st_drop_geometry
@@ -731,7 +731,7 @@ calc_modis_par <-
   ) {
     if (!is.function(preprocess)) {
       stop("preprocess should be one of process_modis_merge,
-process_modis_swath, or process_bluemarble.")
+process_modis_swath, or process_blackmarble.")
     }
     # read all arguments
     # nolint start
