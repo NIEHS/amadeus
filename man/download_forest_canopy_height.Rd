@@ -39,6 +39,9 @@ The \code{download_forest_canopy_height()} function accesses and downloads
 2019 forest canopy height data from the
 \href{https://glad.umd.edu/dataset/gedi}{Global Land Analysis and Discovery (GLAD) laboratory Global Forest Canopy Height product}.
 }
+\references{
+P. Potapov, X. Li, A. Hernandez-Serna, A. Tyukavina, M.C. Hansen, A. Kommareddy, A. Pickens, S. Turubanova, H. Tang, C.E. Silva, J. Armston, R. Dubayah, J. B. Blair, M. Hofton (2020) Mapping and monitoring global forest canopy height through integration of GEDI and Landsat data. Remote Sensing of Environment, 112165. https://doi.org/10.1016/j.rse.2020.112165
+}
 \author{
 Eva Marques, Mitchell Manware, Insang Song
 }

@@ -14,17 +14,6 @@ download_imperviousness(
   unzip = TRUE,
   remove_zip = FALSE
 )
-
-download_imperviousness(
-  collection = "Coterminous United States",
-  year = 2021,
-  directory_to_save = NULL,
-  acknowledgement = FALSE,
-  download = FALSE,
-  remove_command = FALSE,
-  unzip = TRUE,
-  remove_zip = FALSE
-)
 }
 \arguments{
 \item{collection}{character(1). \code{"Coterminous United States"} or \code{"Alaska"}.}
@@ -58,21 +47,19 @@ Default is \code{FALSE}.}
 \value{
 NULL; Zip and/or data files will be downloaded and stored in
 respective sub-directories within \code{directory_to_save}.
-
-NULL; Zip and/or data files will be downloaded and stored in
-respective sub-directories within \code{directory_to_save}.
 }
 \description{
 The \code{download_imperviousness()} function accesses and downloads
 imperviousness data from the
 \href{https://www.mrlc.gov/data}{Multi-Resolution Land Characteristics (MRLC) Consortium's National Urban Imperviousness Database products data base}.
+}
+\references{
+Dewitz, J., and U.S. Geological Survey, 2021, National Land Cover Database (NLCD) 2019 Products (ver. 2.0, June 2021): U.S. Geological Survey data release, https://doi.org/10.5066/P9KZCM54
 
-The \code{download_imperviousness()} function accesses and downloads
-imperviousness data from the
-\href{https://www.mrlc.gov/data}{Multi-Resolution Land Characteristics (MRLC) Consortium's National Urban Imperviousness Database products data base}.
+Xian, G., Homer, C., Dewitz, J., Fry, J., Hossain, N., and Wickham, J., 2011. The change of impervious surface area between 2001 and 2006 in the conterminous United States. Photogrammetric Engineering and Remote Sensing, Vol. 77(8): 758-762.
+
+Yang, L., Huang, C., Homer, C., Wylie, B., and M. Coan. 2003. An approach for mapping large-area impervious surfaces: Synergistic use of Landsat 7 ETM+ and high spatial resolution imagery. Canadian Journal of Remote Sensing, Vol. 29, No. 2, pp.230-240.
 }
 \author{
 Eva Marques, Mitchell Manware, Insang Song
-
-Mitchell Manware, Insang Song
 }

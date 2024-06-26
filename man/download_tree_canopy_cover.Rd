@@ -49,7 +49,8 @@ respective sub-directories within \code{directory_to_save}.
 \description{
 The \code{download_tree_canopy_cover()} function accesses and downloads
 tree canopy cover data from the
-\href{https://www.mrlc.gov/data}{Multi-Resolution Land Characteristics (MRLC) Consortium's National Database products data base}.
+\href{https://www.mrlc.gov/data}{Multi-Resolution Land Characteristics (MRLC) Consortium's National Database products}.
+More information on tree canopy cover methods \href{https://data.fs.usda.gov/geodata/rastergateway/treecanopycover/docs/TCC_v2021-4_Methods.pdf}{here}.
 }
 \author{
 Eva Marques, Mitchell Manware, Insang Song
