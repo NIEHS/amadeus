@@ -706,6 +706,69 @@ testthat::test_that("imperviousness download URLs have HTTP status 200.", {
   )
 })
 
+testthat::test_that("tree_canopy_cover download URLs have HTTP status 200.", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  years <- c(2021, 2019, 2016)
+  collections <- c(rep("Coterminous United States", 2), "Alaska")
+  collection_codes <- c(rep("CONUS_", 2), "SEAK_")
+  directory_to_save <- testthat::test_path("..", "testdata", "tcc_temp")
+  # run download function
+  for (y in seq_along(years)) {
+    download_data(dataset_name = "tree_canopy_cover",
+                  year = years[y],
+                  collection = collections[y],
+                  directory_to_save = directory_to_save,
+                  acknowledgement = TRUE,
+                  download = FALSE,
+                  remove_command = FALSE,
+                  unzip = FALSE,
+                  remove_zip = FALSE)
+    # define file path with commands
+    commands_path <- paste0(download_sanitize_path(directory_to_save),
+                            "nlcd_tcc_",
+                            collection_codes[y], 
+                            years[y],
+                            "_v2021-4_",
+                            Sys.Date(),
+                            "_curl_command.txt")
+    # expect sub-directories to be created
+    testthat::expect_true(
+      length(
+        list.files(
+          directory_to_save, include.dirs = TRUE
+        )
+      ) == 3
+    )
+    # import commands
+    commands <- read_commands(commands_path = commands_path)
+    # extract urls
+    urls <- extract_urls(commands = commands, position = 5)
+    # check HTTP URL status
+    url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+    # implement unit tests
+    test_download_functions(directory_to_save = directory_to_save,
+                            commands_path = commands_path,
+                            url_status = url_status)
+    # remove file with commands after test
+    file.remove(commands_path)
+    # remove temporary imperviousness
+    unlink(directory_to_save, recursive = TRUE)
+  }
+  testthat::expect_error(
+    download_data(dataset_name = "tree_canopy_cover",
+                  year = 2000,
+                  collection = "Coterminous United States",
+                  directory_to_save = directory_to_save,
+                  acknowledgement = TRUE,
+                  download = FALSE,
+                  remove_command = TRUE,
+                  unzip = FALSE,
+                  remove_zip = FALSE)
+  )
+})
+
 
 testthat::test_that("SEDAC groads download URLs have HTTP status 200.", {
   withr::local_package("httr")

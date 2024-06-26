@@ -21,6 +21,7 @@
 #' * \code{\link{download_ecoregion}}: `"ecoregions"`, `"ecoregion"`
 #' * \code{\link{download_geos}}: `"geos"`
 #' * \code{\link{download_gmted}}: `"gmted"`, `"GMTED"`
+#' * \code{\link{download_imperviousness}}: `"imperviousness"`
 #' * \code{\link{download_koppen_geiger}}: `"koppen"`, `"koppengeiger"`
 #' * \code{\link{download_merra2}}: "merra2", `"merra"`, `"MERRA"`, `"MERRA2"`
 #' * \code{\link{download_narr_monolevel}}: `"narr_monolevel"`, `"monolevel"`
@@ -32,6 +33,7 @@
 #' * \code{\link{download_sedac_population}}: `"sedac_population"`,
 #'   `"population"`
 #' * \code{\link{download_modis}}: `"modis"`, `"MODIS"`
+#' * \code{\link{download_tree_canopy_cover}}: `"tree_canopy_cover"`
 #' * \code{\link{download_tri}}: `"tri"`, `"TRI"`
 #' * \code{\link{download_nei}}: `"nei"`, `"NEI"`
 #' * \code{\link{download_gridmet}}: `"gridMET"`, `"gridmet"`
@@ -45,7 +47,8 @@ download_data <-
                      "koppengeiger", "merra2", "merra", "narr_monolevel",
                      "modis", "narr_p_levels", "nlcd", "noaa", "sedac_groads",
                      "sedac_population", "groads", "population", "plevels",
-                     "p_levels", "monolevel", "hms", "smoke", "tri", "nei",
+                     "p_levels", "monolevel", "hms", "smoke",
+                     "tree_canopy_cover", "tri", "nei",
                      "gridmet", "terraclimate", "huc", "cropscape", "cdl",
                      "prism", "olm", "openlandmap"),
     directory_to_save = NULL,
@@ -82,6 +85,7 @@ download_data <-
       sedac_population = download_sedac_population,
       population = download_sedac_population,
       modis = download_modis,
+      tree_canopy_cover = download_tree_canopy_cover,
       tri = download_tri,
       nei = download_nei,
       gridmet = download_gridmet,
@@ -1656,6 +1660,7 @@ download_tree_canopy_cover <- function(
   commands_txt <- paste0(
     directory_original,
     tolower(collection_code),
+    "_",
     Sys.Date(),
     "_curl_command.txt"
   )
