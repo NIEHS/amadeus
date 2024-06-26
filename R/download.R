@@ -41,7 +41,7 @@
 download_data <-
   function(
     dataset_name = c("aqs", "ecoregion", "ecoregions",
-                     "geos", "gmted", "koppen",
+                     "geos", "gmted", "imperviousness", "koppen",
                      "koppengeiger", "merra2", "merra", "narr_monolevel",
                      "modis", "narr_p_levels", "nlcd", "noaa", "sedac_groads",
                      "sedac_population", "groads", "population", "plevels",
@@ -63,6 +63,7 @@ download_data <-
       ecoregions = download_ecoregion,
       geos = download_geos,
       gmted = download_gmted,
+      imperviousness = download_imperviousness,
       koppen = download_koppen_geiger,
       koppengeiger = download_koppen_geiger,
       merra2 = download_merra2,
@@ -1314,12 +1315,11 @@ download_nlcd <- function(
   #### 4. check for valid years
   valid_years_conus <- c(2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019, 2021)
   valid_years_ak <- c(2001, 2011, 2016)
-  if ((collection == "Coterminous United States") &
-      !(year %in% valid_years_conus)) {
-    stop(paste0("Requested year is not recognized.\n"))
-  } else if ((collection == "Alaska") & !(year %in% valid_years_ak)) {
-    stop(paste0("Requested year is not recognized.\n"))
-  }
+  stopifnot("Requested year is not recognized.\n" =
+      ((collection == "Coterminous United States") &&
+       (year %in% valid_years_conus)) ||
+      ((collection == "Alaska") && (year %in% valid_years_ak))
+  )
   #### 5. define URL base
   base <- "https://s3-us-west-2.amazonaws.com/mrlc/"
   #### 6. define collection code
@@ -1423,7 +1423,7 @@ download_nlcd <- function(
 #' @param year integer(1). Available years for Coterminous United States
 #' include `2001`, `2004`, `2006`, `2008`, `2011`, `2013`, `2016`,
 #' `2019`, and `2021`.
-#' Available years for Alaska include `2001`, `2011`, and `2016`. 
+#' Available years for Alaska include `2001`, `2011`, and `2016`.
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
 #' and the unzipped shapefiles ("/data_files").
@@ -1444,14 +1444,14 @@ download_nlcd <- function(
 #' respective sub-directories within \code{directory_to_save}.
 #' @export
 download_imperviousness <- function(
-    collection = "Coterminous United States",
-    year = 2021,
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE
+  collection = "Coterminous United States",
+  year = 2021,
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -1465,12 +1465,11 @@ download_imperviousness <- function(
   #### 4. check for valid years
   valid_years_conus <- c(2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019, 2021)
   valid_years_ak <- c(2001, 2011, 2016)
-  if ((collection == "Coterminous United States") &
-      !(year %in% valid_years_conus)) {
-    stop(paste0("Requested year is not recognized.\n"))
-  } else if ((collection == "Alaska") & !(year %in% valid_years_ak)) {
-    stop(paste0("Requested year is not recognized.\n"))
-  }
+  stopifnot("Requested year is not recognized.\n" =
+      ((collection == "Coterminous United States") &&
+       (year %in% valid_years_conus)) ||
+      ((collection == "Alaska") && (year %in% valid_years_ak))
+  )
   #### 5. define URL base
   base <- "https://s3-us-west-2.amazonaws.com/mrlc/"
   #### 6. define collection code
@@ -1594,14 +1593,14 @@ download_imperviousness <- function(
 #' respective sub-directories within \code{directory_to_save}.
 #' @export
 download_tree_canopy_cover <- function(
-    collection = "Coterminous United States",
-    year = 2021,
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE
+  collection = "Coterminous United States",
+  year = 2021,
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -1633,8 +1632,6 @@ download_tree_canopy_cover <- function(
       "_v2021-4"
     )
   }
-  #### 7. define release date (not applicable for tree canopy cover)
-  
   #### 8. build URL
   download_url <- paste0(
     base,
@@ -1708,7 +1705,7 @@ download_tree_canopy_cover <- function(
 # nolint end
 #' @param collection character(1). `"NAM"`, `"SAM"`, `"NAFR"`, `"SAFR"`,
 #' `"NASIA"`, `"SASIA"` or `"AUS"`..
-#' Available years for Alaska include `2001`, `2011`, and `2016`. 
+#' Available years for Alaska include `2001`, `2011`, and `2016`.
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
 #' and the unzipped shapefiles ("/data_files").
@@ -1729,12 +1726,12 @@ download_tree_canopy_cover <- function(
 #' respective sub-directories within \code{directory_to_save}.
 #' @export
 download_forest_canopy_height <- function(
-    collection = "NAM",
-    year = 2021,
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE
+  collection = "NAM",
+  year = 2021,
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -1746,9 +1743,7 @@ download_forest_canopy_height <- function(
   #### 4. define URL base
   base <- "https://glad.geog.umd.edu/Potapov/Forest_height_2019/"
   #### 5. define collection code
-  collection_code <- paste0(
-      "Forest_height_2019_",
-      collection)
+  collection_code <- paste0("Forest_height_2019_", collection)
   #### 6. build URL
   download_url <- paste0(
     base,
@@ -1808,7 +1803,6 @@ download_forest_canopy_height <- function(
 #' The \code{download_lcz()} function accesses and downloads
 #' Local Climate Zone data produced within produced within 
 #' [CONUS-wide LCZ map and Training areas](https://figshare.com/articles/dataset/CONUS-wide_LCZ_map_and_Training_Areas/11416950). When using the data, please cite data authors listed in References section below. 
-# nolint end
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
 #' and the unzipped shapefiles ("/data_files").
@@ -1825,15 +1819,16 @@ download_forest_canopy_height <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @references Demuzere et al. (2020). *Combining expert and crowd-sourced training data to map urban form and functions for the continental US.* Nature Scientific Data. https://doi.org/10.1038/s41597-020-00605-z
+# nolint end
 #' @author Eva Marques, Mitchell Manware, Insang Song
 #' @returns NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @export
 download_lcz <- function(
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -2220,7 +2215,7 @@ download_sedac_population <- function(
 #' @param year integer(1). Available years for Coterminous United States
 #' include `2001`, `2004`, `2006`, `2008`, `2011`, `2013`, `2016`,
 #' `2019`, and `2021`.
-#' Available years for Alaska include `2001`, `2011`, and `2016`. 
+#' Available years for Alaska include `2001`, `2011`, and `2016`.
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
 #' and the unzipped shapefiles ("/data_files").
@@ -2241,14 +2236,14 @@ download_sedac_population <- function(
 #' respective sub-directories within \code{directory_to_save}.
 #' @export
 download_imperviousness <- function(
-    collection = "Coterminous United States",
-    year = 2021,
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE
+  collection = "Coterminous United States",
+  year = 2021,
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -2262,12 +2257,11 @@ download_imperviousness <- function(
   #### 4. check for valid years
   valid_years_conus <- c(2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019, 2021)
   valid_years_ak <- c(2001, 2011, 2016)
-  if ((collection == "Coterminous United States") &
-      !(year %in% valid_years_conus)) {
-    stop(paste0("Requested year is not recognized.\n"))
-  } else if ((collection == "Alaska") & !(year %in% valid_years_ak)) {
-    stop(paste0("Requested year is not recognized.\n"))
-  }
+  stopifnot("Requested year is not recognized.\n" =
+      ((collection == "Coterminous United States") &&
+       (year %in% valid_years_conus)) ||
+      ((collection == "Alaska") && (year %in% valid_years_ak))
+  )
   #### 5. define URL base
   base <- "https://s3-us-west-2.amazonaws.com/mrlc/"
   #### 6. define collection code
