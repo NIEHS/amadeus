@@ -769,6 +769,54 @@ testthat::test_that("tree_canopy_cover download URLs have HTTP status 200.", {
   )
 })
 
+ 
+testthat::test_that("forest_canopy_height download URLs have HTTP status 200.", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  collections <- c("NAM", "NAFR")
+  directory_to_save <- testthat::test_path("..", "testdata", "fch_temp")
+  # run download function
+  for (coll in seq_along(collections)) {
+    download_data(dataset_name = "forest_canopy_height",
+                  collection = collections[coll],
+                  directory_to_save = directory_to_save,
+                  acknowledgement = TRUE,
+                  download = FALSE,
+                  remove_command = FALSE)
+    # define file path with commands
+    commands_path <- paste0(download_sanitize_path(directory_to_save),
+                            "Forest_height_2019_",
+                            collections[coll], 
+                            "_",
+                            Sys.Date(),
+                            "_curl_command.txt")
+    
+    # import commands
+    commands <- read_commands(commands_path = commands_path)
+    # extract urls
+    urls <- extract_urls(commands = commands, position = 5)
+    # check HTTP URL status
+    url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+    # implement unit tests
+    test_download_functions(directory_to_save = directory_to_save,
+                            commands_path = commands_path,
+                            url_status = url_status)
+    # remove file with commands after test
+    file.remove(commands_path)
+    # remove temporary imperviousness
+    unlink(directory_to_save, recursive = TRUE)
+  }
+  testthat::expect_error(
+    download_data(dataset_name = "forest_canopy_height",
+                  collection = "NAME",
+                  directory_to_save = directory_to_save,
+                  acknowledgement = TRUE,
+                  download = FALSE,
+                  remove_command = TRUE)
+  )
+})
+
 
 testthat::test_that("SEDAC groads download URLs have HTTP status 200.", {
   withr::local_package("httr")

@@ -19,6 +19,7 @@
 #' Please refer to:
 #' * \code{\link{download_aqs}}: `"aqs"`, `"AQS"`
 #' * \code{\link{download_ecoregion}}: `"ecoregions"`, `"ecoregion"`
+#' * \code{\link{download_forest_canopy_height}}: `"forest_canopy_height"`
 #' * \code{\link{download_geos}}: `"geos"`
 #' * \code{\link{download_gmted}}: `"gmted"`, `"GMTED"`
 #' * \code{\link{download_imperviousness}}: `"imperviousness"`
@@ -42,7 +43,7 @@
 #' @export
 download_data <-
   function(
-    dataset_name = c("aqs", "ecoregion", "ecoregions",
+    dataset_name = c("aqs", "ecoregion", "ecoregions", "forest_canopy_height",
                      "geos", "gmted", "imperviousness", "koppen",
                      "koppengeiger", "merra2", "merra", "narr_monolevel",
                      "modis", "narr_p_levels", "nlcd", "noaa", "sedac_groads",
@@ -64,6 +65,7 @@ download_data <-
       aqs = download_aqs,
       ecoregion = download_ecoregion,
       ecoregions = download_ecoregion,
+      forest_canopy_height = download_forest_canopy_height,
       geos = download_geos,
       gmted = download_gmted,
       imperviousness = download_imperviousness,
@@ -1709,11 +1711,8 @@ download_tree_canopy_cover <- function(
 #' [Global Land Analysis and Discovery (GLAD) laboratory Global Forest Canopy Height product](https://glad.umd.edu/dataset/gedi).
 # nolint end
 #' @param collection character(1). `"NAM"`, `"SAM"`, `"NAFR"`, `"SAFR"`,
-#' `"NASIA"`, `"SASIA"` or `"AUS"`..
-#' Available years for Alaska include `2001`, `2011`, and `2016`.
-#' @param directory_to_save character(1). Directory to save data. Two
-#' sub-directories will be created for the downloaded zip files ("/zip_files")
-#' and the unzipped shapefiles ("/data_files").
+#' `"NASIA"`, `"SASIA"` or `"AUS"`.
+#' @param directory_to_save character(1). Directory to save data. 
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
@@ -1723,16 +1722,12 @@ download_tree_canopy_cover <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip files from directory_to_download.
-#' Default is \code{FALSE}.
 #' @author Eva Marques, Mitchell Manware, Insang Song
 #' @returns NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @export
 download_forest_canopy_height <- function(
   collection = "NAM",
-  year = 2021,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -1742,7 +1737,11 @@ download_forest_canopy_height <- function(
   download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
+  #### 2.5 check for valid collection
+  valid_coll <- c("NAM", "SAM", "NAFR", "SAFR", "NASIA", "SASIA", "AUS")
+  stopifnot("collection is not recognized.\n" = collection %in% valid_coll)
   #### 3. directory setup
+  download_setup_dir(directory_to_save)
   directory_to_save <- directory_to_save |>
     download_sanitize_path()
   #### 4. define URL base
@@ -1773,6 +1772,7 @@ download_forest_canopy_height <- function(
   commands_txt <- paste0(
     directory_to_save,
     tolower(collection_code),
+    "_",
     Sys.Date(),
     "_curl_command.txt"
   )
@@ -1808,9 +1808,7 @@ download_forest_canopy_height <- function(
 #' The \code{download_lcz()} function accesses and downloads
 #' Local Climate Zone data produced within produced within 
 #' [CONUS-wide LCZ map and Training areas](https://figshare.com/articles/dataset/CONUS-wide_LCZ_map_and_Training_Areas/11416950). When using the data, please cite data authors listed in References section below. 
-#' @param directory_to_save character(1). Directory to save data. Two
-#' sub-directories will be created for the downloaded zip files ("/zip_files")
-#' and the unzipped shapefiles ("/data_files").
+#' @param directory_to_save character(1). Directory to save data. 
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
@@ -1820,9 +1818,6 @@ download_forest_canopy_height <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip files from directory_to_download.
-#' Default is \code{FALSE}.
 #' @references Demuzere et al. (2020). *Combining expert and crowd-sourced training data to map urban form and functions for the continental US.* Nature Scientific Data. https://doi.org/10.1038/s41597-020-00605-z
 # nolint end
 #' @author Eva Marques, Mitchell Manware, Insang Song
@@ -1840,6 +1835,7 @@ download_lcz <- function(
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### 3. directory setup
+  download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
   #### 5. define URL base
   base <- "https://figshare.com/ndownloader/files/22447964"

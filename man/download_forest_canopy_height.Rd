@@ -6,7 +6,6 @@
 \usage{
 download_forest_canopy_height(
   collection = "NAM",
-  year = 2021,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -15,12 +14,9 @@ download_forest_canopy_height(
 }
 \arguments{
 \item{collection}{character(1). \code{"NAM"}, \code{"SAM"}, \code{"NAFR"}, \code{"SAFR"},
-\code{"NASIA"}, \code{"SASIA"} or \code{"AUS"}..
-Available years for Alaska include \code{2001}, \code{2011}, and \code{2016}.}
+\code{"NASIA"}, \code{"SASIA"} or \code{"AUS"}.}
 
-\item{directory_to_save}{character(1). Directory to save data. Two
-sub-directories will be created for the downloaded zip files ("/zip_files")
-and the unzipped shapefiles ("/data_files").}
+\item{directory_to_save}{character(1). Directory to save data.}
 
 \item{acknowledgement}{logical(1). By setting \code{TRUE} the
 user acknowledges that the data downloaded using this function may be very
@@ -33,11 +29,6 @@ will download all of the requested data files.}
 \item{remove_command}{logical(1).
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
-
-\item{unzip}{logical(1). Unzip zip files. Default is \code{TRUE}.}
-
-\item{remove_zip}{logical(1). Remove zip files from directory_to_download.
-Default is \code{FALSE}.}
 }
 \value{
 NULL; Zip and/or data files will be downloaded and stored in

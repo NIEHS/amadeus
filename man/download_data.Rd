@@ -5,12 +5,12 @@
 \title{Download raw data wrapper function}
 \usage{
 download_data(
-  dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "gmted", "imperviousness",
-    "koppen", "koppengeiger", "merra2", "merra", "narr_monolevel", "modis",
-    "narr_p_levels", "nlcd", "noaa", "sedac_groads", "sedac_population", "groads",
-    "population", "plevels", "p_levels", "monolevel", "hms", "smoke",
-    "tree_canopy_cover", "tri", "nei", "gridmet", "terraclimate", "huc", "cropscape",
-    "cdl", "prism", "olm", "openlandmap"),
+  dataset_name = c("aqs", "ecoregion", "ecoregions", "forest_canopy_height", "geos",
+    "gmted", "imperviousness", "koppen", "koppengeiger", "merra2", "merra",
+    "narr_monolevel", "modis", "narr_p_levels", "nlcd", "noaa", "sedac_groads",
+    "sedac_population", "groads", "population", "plevels", "p_levels", "monolevel",
+    "hms", "smoke", "tree_canopy_cover", "tri", "nei", "gridmet", "terraclimate", "huc",
+    "cropscape", "cdl", "prism", "olm", "openlandmap"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   ...
@@ -42,6 +42,7 @@ Please refer to:
 \itemize{
 \item \code{\link{download_aqs}}: \code{"aqs"}, \code{"AQS"}
 \item \code{\link{download_ecoregion}}: \code{"ecoregions"}, \code{"ecoregion"}
+\item \code{\link{download_forest_canopy_height}}: \code{"forest_canopy_height"}
 \item \code{\link{download_geos}}: \code{"geos"}
 \item \code{\link{download_gmted}}: \code{"gmted"}, \code{"GMTED"}
 \item \code{\link{download_imperviousness}}: \code{"imperviousness"}
