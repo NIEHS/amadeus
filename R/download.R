@@ -24,6 +24,7 @@
 #' * \code{\link{download_gmted}}: `"gmted"`, `"GMTED"`
 #' * \code{\link{download_imperviousness}}: `"imperviousness"`
 #' * \code{\link{download_koppen_geiger}}: `"koppen"`, `"koppengeiger"`
+#' * \code{\link{download_lcz}}: `"lcz"`
 #' * \code{\link{download_merra2}}: "merra2", `"merra"`, `"MERRA"`, `"MERRA2"`
 #' * \code{\link{download_narr_monolevel}}: `"narr_monolevel"`, `"monolevel"`
 #' * \code{\link{download_narr_p_levels}}: `"narr_p_levels"`, `"p_levels"`,
@@ -45,7 +46,7 @@ download_data <-
   function(
     dataset_name = c("aqs", "ecoregion", "ecoregions", "forest_canopy_height",
                      "geos", "gmted", "imperviousness", "koppen",
-                     "koppengeiger", "merra2", "merra", "narr_monolevel",
+                     "koppengeiger", "lcz", "merra2", "merra", "narr_monolevel",
                      "modis", "narr_p_levels", "nlcd", "noaa", "sedac_groads",
                      "sedac_population", "groads", "population", "plevels",
                      "p_levels", "monolevel", "hms", "smoke",
@@ -71,6 +72,7 @@ download_data <-
       imperviousness = download_imperviousness,
       koppen = download_koppen_geiger,
       koppengeiger = download_koppen_geiger,
+      lcz = download_lcz,
       merra2 = download_merra2,
       merra = download_merra2,
       narr_monolevel = download_narr_monolevel,
@@ -1856,8 +1858,8 @@ download_lcz <- function(
   )
   #### 11. initiate "..._curl_command.txt"
   commands_txt <- paste0(
-    directory_original,
-    tolower("lcz_conus_demuzere_2020"),
+    directory_to_save,
+    tolower("lcz_conus_demuzere_2020_"),
     Sys.Date(),
     "_curl_command.txt"
   )

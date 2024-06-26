@@ -753,7 +753,7 @@ testthat::test_that("tree_canopy_cover download URLs have HTTP status 200.", {
                             url_status = url_status)
     # remove file with commands after test
     file.remove(commands_path)
-    # remove temporary imperviousness
+    # remove temporary 
     unlink(directory_to_save, recursive = TRUE)
   }
   testthat::expect_error(
@@ -804,7 +804,7 @@ testthat::test_that("forest_canopy_height download URLs have HTTP status 200.", 
                             url_status = url_status)
     # remove file with commands after test
     file.remove(commands_path)
-    # remove temporary imperviousness
+    # remove temporary
     unlink(directory_to_save, recursive = TRUE)
   }
   testthat::expect_error(
@@ -815,6 +815,39 @@ testthat::test_that("forest_canopy_height download URLs have HTTP status 200.", 
                   download = FALSE,
                   remove_command = TRUE)
   )
+})
+
+testthat::test_that("lcz download URLs have HTTP status 200.", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  directory_to_save <- testthat::test_path("..", "testdata", "lcz_temp")
+  # run download function
+  download_data(dataset_name = "lcz",
+                  directory_to_save = directory_to_save,
+                  acknowledgement = TRUE,
+                  download = FALSE,
+                  remove_command = FALSE)
+    # define file path with commands
+    commands_path <- paste0(download_sanitize_path(directory_to_save),
+                            "lcz_conus_demuzere_2020_",
+                            Sys.Date(),
+                            "_curl_command.txt")
+    
+    # import commands
+    commands <- read_commands(commands_path = commands_path)
+    # extract urls
+    urls <- extract_urls(commands = commands, position = 5)
+    # check HTTP URL status
+    url_status <- check_urls(urls = urls, size = 1L, method = "GET")
+    # implement unit tests
+    test_download_functions(directory_to_save = directory_to_save,
+                            commands_path = commands_path,
+                            url_status = url_status)
+    # remove file with commands after test
+    file.remove(commands_path)
+    # remove temporary
+    unlink(directory_to_save, recursive = TRUE)
 })
 
 
