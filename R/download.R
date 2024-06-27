@@ -42,7 +42,7 @@ download_data <-
                      "geos", "gmted", "koppen",
                      "koppengeiger", "merra2", "merra",
                      "modis", "narr", "nlcd", "noaa", "sedac_groads",
-                     "sedac_population", "groads", "population", "plevels",
+                     "sedac_population", "groads", "population",
                      "hms", "smoke", "tri", "nei",
                      "gridmet", "terraclimate", "huc", "cropscape", "cdl",
                      "prism", "olm", "openlandmap"),
@@ -1089,6 +1089,7 @@ download_narr <- function(
           variable,
           ".",
           year,
+          months[m],
           ".nc"
         )
         command <- paste0(
