@@ -117,10 +117,7 @@ download_data <-
 #'  Currently, no value other than `"daily"` works.
 #' @param url_aqs_download character(1).
 #'  URL to the AQS pre-generated datasets.
-#' @param year_start integer(1). length of 4.
-#'  Start year for downloading data.
-#' @param year_end integer(1). length of 4.
-#'  End year for downloading data.
+#' @param year character(2). length of 4 each. Start/end years for downloading data.
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
 #' and the unzipped data files ("/data_files").
@@ -144,8 +141,7 @@ download_aqs <-
   function(
     parameter_code = 88101,
     resolution_temporal = "daily",
-    year_start = 2018,
-    year_end = 2022,
+    year = c(2018, 2022),
     url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
     directory_to_save = NULL,
     acknowledgement = FALSE,
@@ -164,7 +160,7 @@ download_aqs <-
     directory_to_download <- directories[1]
     directory_to_save <- directories[2]
     #### 4. define year sequence
-    year_sequence <- seq(year_start, year_end, 1)
+    year_sequence <- seq(year[1], year[2], 1)
     #### 5. build URLs
     download_urls <- sprintf(
       paste(url_aqs_download,
@@ -180,7 +176,7 @@ download_aqs <-
     if (!(check_url_status(download_urls[1]))) {
       stop(paste0(
         "Invalid year returns HTTP code 404. ",
-        "Check `year_start` parameter.\n"
+        "Check `year` parameter.\n"
       ))
     }
     #### 5. build download file name
@@ -215,7 +211,7 @@ download_aqs <-
       "aqs_",
       parameter_code,
       "_",
-      year_start, "_", year_end,
+      year[1], "_", year[2],
       "_",
       resolution_temporal,
       "_curl_commands.txt"
@@ -393,10 +389,8 @@ download_ecoregion <- function(
 #' atmospheric composition collections from [NASA's Global Earth Observing System (GEOS) model](https://gmao.gsfc.nasa.gov/GEOS_systems/).
 # nolint end
 #' @param collection character(1). GEOS-CF data collection file name.
-#' @param date_start character(1). length of 10. Start date for downloading
-#' data. Format YYYY-MM-DD (ex. September 1, 2023 = `"2023-09-01"`).
-#' @param date_end character(1). length of 10. End date for downloading data.
-#' Format YYYY-MM-DD (ex. September 1, 2023 = `"2023-09-01"`).
+#' @param date character(2). length of 10 each. Start/end date for downloading data.
+#' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
 #' @param directory_to_save character(1). Directory to save data.
 #' Sub-directories will be created within \code{directory_to_save} for each
 #' GEOS-CF collection.
@@ -421,8 +415,7 @@ download_geos <- function(
           "met_tavg_1hr_g1440x721_x1", "xgc_tavg_1hr_g1440x721_x1",
           "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"
         ),
-    date_start = "2023-09-01",
-    date_end = "2023-09-01",
+    date = c("2018-01-01", "2018-01-01"),
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
@@ -438,8 +431,8 @@ download_geos <- function(
   collection <- match.arg(collection, several.ok = TRUE)
   #### 5. define date sequence
   date_sequence <- generate_date_sequence(
-    date_start,
-    date_end,
+    date[1],
+    date[2],
     sub_hyphen = TRUE
   )
   #### 7. define URL base
@@ -448,9 +441,9 @@ download_geos <- function(
   commands_txt <- paste0(
     directory_to_save,
     "geos_",
-    date_start,
+    date[1],
     "_",
-    date_end,
+    date[2],
     "_wget_commands.txt"
   )
   download_sink(commands_txt)
@@ -501,7 +494,7 @@ download_geos <- function(
             file.remove(commands_txt)
             stop(paste0(
               "Invalid date returns HTTP code 404. ",
-              "Check `date_start` parameter.\n"
+              "Check `date` parameter.\n"
             ))
           }
         }
@@ -695,10 +688,8 @@ download_gmted <- function(
 #' The \code{download_merra2()} function accesses and downloads various
 #' meteorological and atmospheric collections from [NASA's Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/).
 #' @param collection character(1). MERRA-2 data collection file name.
-#' @param date_start character(1). length of 10. Start date for downloading
-#' data. Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
-#' @param date_end character(1). length of 10. End date for downloading data.
-#' Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
+#' @param date character(2). length of 10 each. Start/end date for downloading data.
+#' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -731,8 +722,7 @@ download_merra2 <- function(
       "tavg3_3d_qdt_Np", "tavg3_3d_asm_Nv", "tavg3_3d_cld_Nv",
       "tavg3_3d_mst_Nv", "tavg3_3d_rad_Nv", "tavg3_2d_glc_Nx"
     ),
-    date_start = "2023-09-01",
-    date_end = "2023-09-01",
+    date = c("2018-01-01", "2018-01-01"),
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
@@ -798,8 +788,8 @@ download_merra2 <- function(
   }
   #### define date sequence
   date_sequence <- generate_date_sequence(
-    date_start,
-    date_end,
+    date[1],
+    date[2],
     sub_hyphen = TRUE
   )
   #### define year + month sequence
@@ -808,9 +798,9 @@ download_merra2 <- function(
   commands_txt <- paste0(
     directory_to_save,
     "merra2_",
-    date_start,
+    date[1],
     "_",
-    date_end,
+    date[2],
     "_wget_commands.txt"
   )
   download_sink(commands_txt)
@@ -864,7 +854,7 @@ download_merra2 <- function(
         if (!(check_url_status(base_url))) {
           stop(paste0(
             "Invalid date returns HTTP code 404. ",
-            "Check `date_start` parameter.\n"
+            "Check `date` parameter.\n"
           ))
         }
       }
@@ -1000,10 +990,7 @@ download_merra2 <- function(
 #' @note "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
 #' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
-#' @param year_start integer(1). length of 4. Start of year range for
-#' downloading data.
-#' @param year_end integer(1). length of 4. End of year range for downloading
-#' data.
+#' @param year character(2). length of 4 each. Start/end years for downloading data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -1023,8 +1010,7 @@ download_merra2 <- function(
 # nolint start: cyclocomp
 download_narr <- function(
     variables = NULL,
-    year_start = 2022,
-    year_end = 2022,
+    year = c(2018, 2022),
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
@@ -1037,17 +1023,17 @@ download_narr <- function(
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
   #### 4. define years and months sequence
-  if (any(nchar(year_start) != 4, nchar(year_end) != 4)) {
-    stop("year_start and year_end should be 4-digit integers.\n")
+  if (any(nchar(year[1]) != 4, nchar(year[2]) != 4)) {
+    stop("years should be 4-digit integers.\n")
   }
-  years <- seq(year_start, year_end, 1)
+  years <- seq(year[1], year[2], 1)
   #### 5. define variables
   variables_list <- as.vector(variables)
   #### 7. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
     directory_to_save,
     "narr_",
-    year_start, "_", year_end,
+    year[1], "_", year[2],
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
@@ -1062,13 +1048,13 @@ download_narr <- function(
       dir.create(folder, recursive = TRUE)
     }
     for (y in seq_along(years)) {
-      year <- years[y]
+      year_l <- years[y]
       for (m in seq_along(months)) {
         url <- paste0(
           base,
           variable,
           ".",
-          year,
+          year_l,
           months[m],
           ".nc"
         )
@@ -1078,7 +1064,7 @@ download_narr <- function(
             file.remove(commands_txt)
             stop(paste0(
               "Invalid year returns HTTP code 404. ",
-              "Check `year_start` parameter.\n"
+              "Check `year` parameter.\n"
             ))
           }
         }
@@ -1088,7 +1074,7 @@ download_narr <- function(
           "/",
           variable,
           ".",
-          year,
+          year_l,
           months[m],
           ".nc"
         )
@@ -1598,10 +1584,7 @@ download_sedac_population <- function(
 #' wildfire smoke plume coverage data from [NOAA's Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0).
 # nolint end
 #' @param data_format character(1). "Shapefile" or "KML".
-#' @param date_start character(1). length of 10. Start date for downloading
-#' data. Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
-#' @param date_end character(1). length of 10. End date for downloading data.
-#' Format YYYY-MM-DD (ex. September 10, 2023 is `"2023-09-10"`).
+#' @param date character(2). length of 10 each. Start/end date for downloading data.
 #' @param directory_to_save character(1). Directory to save data. If
 #' `data_format = "Shapefile"`, two sub-directories will be created for the
 #' downloaded zip files ("/zip_files") and the unzipped shapefiles
@@ -1631,8 +1614,7 @@ download_sedac_population <- function(
 # nolint start: cyclocomp
 download_hms <- function(
     data_format = "Shapefile",
-    date_start = "2023-09-01",
-    date_end = "2023-09-01",
+    date = c("2018-01-01", "2018-01-01"),
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
@@ -1657,8 +1639,8 @@ download_hms <- function(
   }
   #### 5. define date sequence
   date_sequence <- generate_date_sequence(
-    date_start,
-    date_end,
+    date[1],
+    date[2],
     sub_hyphen = TRUE
   )
   #### 6. define URL base
@@ -1704,7 +1686,7 @@ download_hms <- function(
         file.remove(commands_txt)
         stop(paste0(
           "Invalid date returns HTTP code 404. ",
-          "Check `date_start` parameter.\n"
+          "Check `date` parameter.\n"
         ))
       }
     }
@@ -1904,7 +1886,7 @@ download_koppen_geiger <- function(
 #' links. Download is only done at the queried horizontal-vertical tile number
 #' combinations. An exception is MOD06_L2 product, which is produced
 #' every five minutes every day.
-#' @note \code{date_start} and \code{date_end} should be in the same year.
+#' @note Both dates in \code{date} should be in the same year.
 #'  Directory structure looks like
 #'  input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}
 #'  Please note that \code{date_start} and \code{date_end} are
@@ -1921,10 +1903,8 @@ download_koppen_geiger <- function(
 #'  trying running the function.
 #' @param mod06_links character(1). CSV file path to MOD06_L2 download links
 #' from NASA LPDAAC. Default is `NULL`.
-#' @param date_start character(1). length of 10. Start date for downloading
-#' data. Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
-#' @param date_end character(1). length of 10. End date for downloading data.
-#' Format YYYY-MM-DD (ex. September 1, 2023 is `"2023-09-01"`).
+#' @param date character(2). length of 10 each. Start/end date for downloading data.
+#' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -1947,8 +1927,7 @@ download_modis <- function(
     vertical_tiles = c(3, 6),
     mod06_links = NULL,
     nasa_earth_data_token = NULL,
-    date_start = "2023-09-01",
-    date_end = "2023-09-01",
+    date = c("2023-09-01", "2023-09-01"),
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
@@ -1966,9 +1945,9 @@ download_modis <- function(
   #### 4. check for product
   product <- match.arg(product)
 
-  if (substr(date_start, 1, 4) != substr(date_end, 1, 4)) {
+  if (substr(date[1], 1, 4) != substr(date[2], 1, 4)) {
     if (product != "MOD06_L2") {
-      stop("date_start and date_end should be in the same year.\n")
+      stop("dates should be in the same year.\n")
     }
   }
 
@@ -2025,7 +2004,7 @@ download_modis <- function(
     mod06l2_url_template <-
       paste0(mod06l2_url1, mod06l2_url2, mod06l2_url3)
     mod06l2_full <-
-      sprintf(mod06l2_url_template, date_start, date_end)
+      sprintf(mod06l2_url_template, date[1], date[2])
 
     if (is.null(mod06_links)) {
       stop(paste(
@@ -2120,12 +2099,12 @@ download_modis <- function(
 
   #### 11. define date sequence
   date_sequence <- generate_date_sequence(
-    date_start,
-    date_end,
+    date[1],
+    date[2],
     sub_hyphen = FALSE
   )
   # In a certain year, list all available dates
-  year <- as.character(substr(date_start, 1, 4))
+  year <- as.character(substr(date[1], 1, 4))
   filedir_year_url <-
     paste0(
       ladsurl,
@@ -2148,8 +2127,8 @@ download_modis <- function(
   date_sequence <- list_available_d[!is.na(list_available_d)]
   date_sequence_i <- as.integer(date_sequence)
   # Queried dates to integer range
-  date_start_i <- as.integer(strftime(date_start, "%j"))
-  date_end_i <- as.integer(strftime(date_end, "%j"))
+  date_start_i <- as.integer(strftime(date[1], "%j"))
+  date_end_i <- as.integer(strftime(date[2], "%j"))
   date_range_julian <- seq(date_start_i, date_end_i)
   date_sequence_in <- (date_sequence_i %in% date_range_julian)
 
@@ -2165,9 +2144,9 @@ download_modis <- function(
     directory_to_save,
     product,
     "_",
-    date_start,
+    date[1],
     "_",
-    date_end,
+    date[2],
     "_wget_commands.txt"
   )
 
@@ -2253,8 +2232,7 @@ download_modis <- function(
 #' @description
 #' The \code{download_tri()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/find-understand-and-use-tri).
 # nolint end
-#' @param year_start integer(1). length of 4. Start year for downloading data.
-#' @param year_end integer(1). length of 4. End year for downloading data.
+#' @param year character(2). length of 4 each. Start/end years for downloading data.
 #' @param directory_to_save character(1). Directory to download files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -2269,8 +2247,7 @@ download_modis <- function(
 #' \code{directory_to_save}.
 #' @export
 download_tri <- function(
-  year_start = 2018L,
-  year_end = 2022L,
+  year = c(2018L, 2022L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -2284,7 +2261,7 @@ download_tri <- function(
   #### 3. define measurement data paths
   url_download <-
     "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/"
-  year_sequence <- seq(year_start, year_end, 1)
+  year_sequence <- seq(year[1], year[2], 1)
   download_urls <- sprintf(
     paste(url_download, "%.0f", "_US/csv", sep = ""),
     year_sequence
@@ -2310,7 +2287,7 @@ download_tri <- function(
   commands_txt <- paste0(
     directory_to_save,
     "TRI_",
-    year_start, "_", year_end,
+    year[1], "_", year[2],
     "_",
     Sys.Date(),
     "_curl_commands.txt"
@@ -2347,7 +2324,7 @@ download_tri <- function(
 #' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
 #' @param certificate_url character(1). URL to certificate file. See notes for
 #' details.
-#' @param year_target Available years of NEI data.
+#' @param year Available years of NEI data.
 #' Default is \code{c(2017L, 2020L)}.
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
@@ -2382,7 +2359,7 @@ download_nei <- function(
                 package = "amadeus"),
   certificate_url =
     "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
-  year_target = c(2017L, 2020L),
+  year = c(2017L, 2020L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -2410,7 +2387,7 @@ download_nei <- function(
       "2020nei_onroad_byregion.zip")
   download_urls <-
     paste0(
-      sprintf(url_download_base, year_target),
+      sprintf(url_download_base, year),
       url_download_remain
     )
   download_names_file <-
@@ -2437,7 +2414,7 @@ download_nei <- function(
   commands_txt <- paste0(
     directory_original,
     "NEI_AADT_",
-    paste(year_target, collapse = "-"),
+    paste(year, collapse = "-"),
     "_",
     Sys.Date(),
     "_wget_commands.txt"
@@ -3079,10 +3056,7 @@ download_prism <- function(
 #' @param variables character(1). Variable(s) name(s). See [gridMET Generate Wget File](https://www.climatologylab.org/wget-gridmet.html)
 #' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
 #' "Energy Release Component" has code "erc").
-#' @param year_start integer(1). length of 4. Start of year range for
-#' downloading data.
-#' @param year_end integer(1). length of 4. End of year range for downloading
-#' data.
+#' @param year character(2). length of 4 each. Start/end years for downloading data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -3101,8 +3075,7 @@ download_prism <- function(
 # nolint end
 download_gridmet <- function(
     variables = NULL,
-    year_start = 2022,
-    year_end = 2022,
+    year = c(2018, 2022),
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
@@ -3115,10 +3088,10 @@ download_gridmet <- function(
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
   #### define years sequence
-  if (any(nchar(year_start) != 4, nchar(year_end) != 4)) {
-    stop("year_start and year_end should be 4-digit integers.\n")
+  if (any(nchar(year[1]) != 4, nchar(year[1]) != 4)) {
+    stop("years should be 4-digit integers.\n")
   }
-  years <- seq(year_start, year_end, 1)
+  years <- seq(year[1], year[1], 1)
   #### define variables
   variables_list <- process_variable_codes(
     variables = variables,
@@ -3130,7 +3103,7 @@ download_gridmet <- function(
   commands_txt <- paste0(
     directory_to_save,
     "gridmet_",
-    year_start, "_", year_end,
+    year[1], "_", year[2],
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
@@ -3142,12 +3115,12 @@ download_gridmet <- function(
       dir.create(folder)
     }
     for (y in seq_along(years)) {
-      year <- years[y]
+      year_l <- years[y]
       url <- paste0(
         base,
         variable,
         "_",
-        year,
+        year_l,
         ".nc"
       )
       if (y == 1) {
@@ -3156,7 +3129,7 @@ download_gridmet <- function(
           file.remove(commands_txt)
           stop(paste0(
             "Invalid year returns HTTP code 404. ",
-            "Check `year_start` parameter.\n"
+            "Check `year` parameter.\n"
           ))
         }
       }
@@ -3166,7 +3139,7 @@ download_gridmet <- function(
         "/",
         variable,
         "_",
-        year,
+        year_l,
         ".nc"
       )
       command <- paste0(
@@ -3208,10 +3181,7 @@ download_gridmet <- function(
 #' The \code{download_terraclimate} function accesses and downloads climate and water balance data from the [University of California Merced Climatology Lab's TerraClimate dataset](https://www.climatologylab.org/terraclimate.html).
 #' @param variables character(1). Variable(s) name(s). See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
 #' for variable names and acronym codes.
-#' @param year_start integer(1). length of 4. Start of year range for
-#' downloading data.
-#' @param year_end integer(1). length of 4. End of year range for downloading
-#' data.
+#' @param year character(2). length of 4 each. Start/end years for downloading data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -3230,8 +3200,7 @@ download_gridmet <- function(
 # nolint end
 download_terraclimate <- function(
     variables = NULL,
-    year_start = 2022,
-    year_end = 2022,
+    year = c(2018, 2022),
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
@@ -3244,10 +3213,10 @@ download_terraclimate <- function(
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
   #### define years sequence
-  if (any(nchar(year_start) != 4, nchar(year_end) != 4)) {
-    stop("year_start and year_end should be 4-digit integers.\n")
+  if (any(nchar(year[1]) != 4, nchar(year[2]) != 4)) {
+    stop("years should be 4-digit integers.\n")
   }
-  years <- seq(year_start, year_end, 1)
+  years <- seq(year[1], year[2], 1)
   #### define variables
   variables_list <- process_variable_codes(
     variables = variables,
@@ -3260,7 +3229,7 @@ download_terraclimate <- function(
   commands_txt <- paste0(
     directory_to_save,
     "terraclimate_",
-    year_start, "_", year_end,
+    year[1], "_", year[2],
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
@@ -3272,12 +3241,12 @@ download_terraclimate <- function(
       dir.create(folder)
     }
     for (y in seq_along(years)) {
-      year <- years[y]
+      year_l <- years[y]
       url <- paste0(
         base,
         variable,
         "_",
-        year,
+        year_l,
         ".nc"
       )
       if (y == 1) {
@@ -3286,7 +3255,7 @@ download_terraclimate <- function(
           file.remove(commands_txt)
           stop(paste0(
             "Invalid year returns HTTP code 404. ",
-            "Check `year_start` parameter.\n"
+            "Check `year` parameter.\n"
           ))
         }
       }
@@ -3296,7 +3265,7 @@ download_terraclimate <- function(
         "/",
         variable,
         "_",
-        year,
+        year_l,
         ".nc"
       )
       command <- paste0(

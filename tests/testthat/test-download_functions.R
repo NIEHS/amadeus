@@ -41,6 +41,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
   expect_error(
     download_geos(
       date_start = "1900-01-01",
+      date = c("1900-01-01", "2018-01-01"),
       collection = "aqc_tavg_1hr_g1440x721_v1",
       acknowledgement = TRUE,
       directory_to_save = testthat::test_path("..", "testdata/", "")
@@ -48,15 +49,14 @@ testthat::test_that("Errors when temporal ranges invalid.", {
   )
   expect_error(
     download_aqs(
-      year_start = 1900,
-      year_end = 1919,
+      year = c(1900, 2022),
       acknowledgement = TRUE,
       directory_to_save = testthat::test_path("..", "testdata/", ""),
     )
   )
   expect_error(
     download_narr(
-      year_start = 1900,
+      year = c(1900, 2022),
       variables = "air.sfc",
       acknowledgement = TRUE,
       directory_to_save = testthat::test_path("..", "testdata/", "")
@@ -64,7 +64,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
   )
   expect_error(
     download_merra2(
-      date_start = "1900-01-01",
+      date = c("1900-01-01", "2023-09-01"),
       collection = "inst1_2d_asm_Nx",
       directory_to_save = testthat::test_path("..", "testdata/", ""),
       acknowledgement = TRUE,
@@ -79,14 +79,14 @@ testthat::test_that("Errors when temporal ranges invalid.", {
   sink()
   expect_error(
     download_hms(
-      date_start = "1900-01-01",
+      date = c("1900-01-01", "2018-01-01"),
       directory_to_save = testthat::test_path("..", "testdata/", ""),
       acknowledgement = TRUE
     )
   )
   expect_error(
     download_gridmet(
-      year_start = 1900,
+      year = c(1900, 2022),
       variables = "Precipitation",
       acknowledgement = TRUE,
       directory_to_save = testthat::test_path("..", "testdata/", "")
@@ -94,7 +94,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
   )
   expect_error(
     download_terraclimate(
-      year_start = 1900,
+      year = c(1900, 2022),
       variables = "Wind Speed",
       acknowledgement = TRUE,
       directory_to_save = testthat::test_path("..", "testdata/", "")
@@ -113,8 +113,7 @@ testthat::test_that("EPA AQS download URLs have HTTP status 200.", {
   directory_to_save <- testthat::test_path("..", "testdata", "aqs_temp")
   # run download function
   download_data(dataset_name = "aqs",
-                year_start = year_start,
-                year_end = year_end,
+                year = c(year_start, year_end),
                 directory_to_save = directory_to_save,
                 acknowledgement = TRUE,
                 unzip = FALSE,
@@ -234,8 +233,7 @@ testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
   # run download function
   testthat::expect_no_error(
     download_data(dataset_name = "geos",
-                  date_start = date_start,
-                  date_end = date_end,
+                  date = c(date_start, date_end),
                   collection = collections,
                   directory_to_save = directory_to_save,
                   acknowledgement = TRUE,
@@ -260,8 +258,7 @@ testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
                           url_status = url_status)
   testthat::expect_no_error(
     download_data(dataset_name = "geos",
-                  date_start = date_start,
-                  date_end = date_end,
+                  date = c(date_start, date_end),
                   collection = collections,
                   directory_to_save = directory_to_save2,
                   acknowledgement = TRUE,
@@ -354,8 +351,7 @@ testthat::test_that("MERRA2 download URLs have HTTP status 200.", {
   # run download function
   testthat::expect_no_error(
     download_data(dataset_name = "merra2",
-                  date_start = date_start,
-                  date_end = date_end,
+                  date = c(date_start, date_end),
                   collection = collections,
                   directory_to_save = directory_to_save,
                   acknowledgement = TRUE,
@@ -380,8 +376,7 @@ testthat::test_that("MERRA2 download URLs have HTTP status 200.", {
                           url_status = url_status)
   testthat::expect_no_error(
     download_data(dataset_name = "merra2",
-                  date_start = date_start,
-                  date_end = date_end,
+                  date = c(date_start, date_end),
                   collection = collections,
                   directory_to_save = directory_to_save2,
                   acknowledgement = TRUE,
@@ -418,8 +413,7 @@ testthat::test_that("NARR download URLs have HTTP status 200.", {
   directory_to_save <- testthat::test_path("..", "testdata/", "")
   # run download function
   download_data(dataset_name = "narr",
-                year_start = year_start,
-                year_end = year_end,
+                year = c(year_start, year_end),
                 variables = variables,
                 directory_to_save = directory_to_save,
                 acknowledgement = TRUE,
@@ -448,8 +442,7 @@ testthat::test_that("NARR error with invalid years.", {
     download_data(
       dataset_name = "narr",
       variables = "weasd",
-      year_start = 10,
-      year_end = 11,
+      year = c(10, 11),
       acknowledgement = TRUE,
       directory_to_save = testthat::test_path("..", "testdata/", "")
     )
@@ -474,8 +467,7 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
   for (d in seq_along(data_formats)) {
     # run download function
     download_data(dataset_name = "smoke",
-                  date_start = date_start,
-                  date_end = date_end,
+                  date = c(date_start, date_end),
                   data_format = data_formats[d],
                   directory_to_save = directory_to_save,
                   acknowledgement = TRUE,
@@ -847,8 +839,7 @@ testthat::test_that("MODIS-MOD09GA download URLs have HTTP status 200.", {
     date_end <- paste0(years[y], "-06-24")
     # run download function
     download_data(dataset_name = "modis",
-                  date_start = date_start,
-                  date_end = date_end,
+                  date = c(date_start, date_end),
                   product = product,
                   version = version,
                   horizontal_tiles = horizontal_tiles,
@@ -899,8 +890,7 @@ testthat::test_that("MODIS-MOD06L2 download URLs have HTTP status 200.", {
 
   testthat::expect_error(
     kax <- download_data(dataset_name = "modis",
-                    date_start = date_start,
-                    date_end = date_end,
+                    date = c(date_start, date_end),
                     product = product,
                     version = version,
                     horizontal_tiles = horizontal_tiles,
@@ -926,8 +916,7 @@ testthat::test_that("MODIS-MOD06L2 download URLs have HTTP status 200.", {
   write.csv(faux_urls, mod06_scenes, row.names = FALSE)
 
   download_data(dataset_name = "modis",
-                  date_start = date_start,
-                  date_end = date_end,
+                  date = c(date_start, date_end),
                   product = product,
                   version = version,
                   horizontal_tiles = horizontal_tiles,
@@ -982,8 +971,7 @@ testthat::test_that("MODIS download error cases.", {
   # no token
   testthat::expect_no_error(
     download_data(dataset_name = "modis",
-                  date_start = date_start,
-                  date_end = date_end,
+                  date = c(date_start, date_end),
                   product = product,
                   version = version,
                   horizontal_tiles = horizontal_tiles,
@@ -998,8 +986,7 @@ testthat::test_that("MODIS download error cases.", {
   # no token
   testthat::expect_error(
     download_data(dataset_name = "modis",
-                  date_start = date_start,
-                  date_end = date_end,
+                  date = c(date_start, date_end),
                   product = product,
                   version = version,
                   horizontal_tiles = horizontal_tiles,
@@ -1014,8 +1001,7 @@ testthat::test_that("MODIS download error cases.", {
   # year difference between date_start and date_end
   testthat::expect_error(
     download_data(dataset_name = "modis",
-                  date_start = date_start,
-                  date_end = "2024-03-28",
+                  date = c(date_start, "2024-03-28"),
                   product = "MOD11A1",
                   version = version,
                   horizontal_tiles = horizontal_tiles,
@@ -1030,8 +1016,7 @@ testthat::test_that("MODIS download error cases.", {
   # null version
   testthat::expect_error(
     download_data(dataset_name = "modis",
-                  date_start = date_start,
-                  date_end = date_end,
+                  date = c(date_start, date_end),
                   product = product,
                   version = NULL,
                   horizontal_tiles = horizontal_tiles,
@@ -1046,8 +1031,7 @@ testthat::test_that("MODIS download error cases.", {
   # invalid tile range (horizontal)
   testthat::expect_error(
     download_data(dataset_name = "modis",
-                  date_start = date_start,
-                  date_end = date_end,
+                  date = c(date_start, date_end),
                   product = product,
                   version = "61",
                   horizontal_tiles = c(-13, -3),
@@ -1062,8 +1046,7 @@ testthat::test_that("MODIS download error cases.", {
   # invalid tile range (horizontal)
   testthat::expect_error(
     download_data(dataset_name = "modis",
-                  date_start = date_start,
-                  date_end = date_end,
+                  date = c(date_start, date_end),
                   product = product,
                   version = "61",
                   horizontal_tiles = horizontal_tiles,
@@ -1147,12 +1130,12 @@ testthat::test_that("EPA NEI (AADT) download URLs have HTTP status 200.", {
   certificate <- system.file("extdata/cacert_gaftp_epa.pem",
                              package = "amadeus")
   # run download function
-  year_target <- c(2017L, 2020L)
+  year <- c(2017L, 2020L)
   download_data(dataset_name = "nei",
                 directory_to_save = directory_to_save,
                 acknowledgement = TRUE,
                 download = FALSE,
-                year_target = year_target,
+                year = year,
                 remove_command = FALSE,
                 epa_certificate_path = certificate
                 )
@@ -1168,7 +1151,7 @@ testthat::test_that("EPA NEI (AADT) download URLs have HTTP status 200.", {
   commands_path <- paste0(
     download_sanitize_path(directory_to_save),
     "NEI_AADT_",
-    paste(year_target, collapse = "-"),
+    paste(year, collapse = "-"),
     "_",
     Sys.Date(),
     "_wget_commands.txt"
@@ -1206,13 +1189,13 @@ testthat::test_that("Test error cases in EPA gaftp sources 1", {
   }
 
   # run download function
-  year_target <- c(2017L)
+  year <- c(2017L)
   testthat::expect_message(
     download_data(dataset_name = "nei",
                   directory_to_save = directory_to_save,
                   acknowledgement = TRUE,
                   download = FALSE,
-                  year_target = year_target,
+                  year = year,
                   remove_command = FALSE,
                   epa_certificate_path = certificate
                   )
@@ -1221,7 +1204,7 @@ testthat::test_that("Test error cases in EPA gaftp sources 1", {
   commands_path <- paste0(
     directory_to_save,
     "NEI_AADT_",
-    paste(year_target, collapse = "-"),
+    paste(year, collapse = "-"),
     "_",
     Sys.Date(),
     "_wget_commands.txt"
@@ -1320,8 +1303,7 @@ testthat::test_that("download_hms LIVE run.", {
   # run download function
   download_data(
     dataset_name = "hms",
-    date_start = date,
-    date_end = date,
+    date = c(date, date),
     directory_to_save = directory,
     acknowledgement = TRUE,
     download = TRUE,
@@ -1352,8 +1334,7 @@ testthat::test_that("gridmet download URLs have HTTP status 200.", {
     testthat::test_path("..", "testdata", "gridmet", "tmp")
   # run download function
   download_data(dataset_name = "gridmet",
-                year_start = year_start,
-                year_end = year_end,
+                year = c(year_start, year_end),
                 variables = variables,
                 directory_to_save = directory_to_save,
                 acknowledgement = TRUE,
@@ -1384,8 +1365,7 @@ testthat::test_that("gridmet error with invalid years.", {
     download_data(
       dataset_name = "gridmet",
       variables = "Precipitation",
-      year_start = 10,
-      year_end = 11,
+      year = c(10, 11),
       acknowledgement = TRUE,
       directory_to_save =
         testthat::test_path("..", "testdata", "gridmet", "tmp")
@@ -1398,8 +1378,7 @@ testthat::test_that("gridmet error with invalid variables", {
     download_data(
       dataset_name = "gridmet",
       variables = "temp",
-      year_start = 2018,
-      year_end = 2018,
+      year = c(2018, 2018),
       acknowledgement = TRUE,
       directory_to_save =
         testthat::test_path("..", "testdata", "gridmet", "tmp")
@@ -1418,8 +1397,7 @@ testthat::test_that("terraclimate download URLs have HTTP status 200.", {
     testthat::test_path("..", "testdata", "terraclimate", "tmp")
   # run download function
   download_data(dataset_name = "terraclimate",
-                year_start = year_start,
-                year_end = year_end,
+                year = c(year_start, year_end),
                 variables = variables,
                 directory_to_save = directory_to_save,
                 acknowledgement = TRUE,
@@ -1450,8 +1428,7 @@ testthat::test_that("terraclimate error with invalid years.", {
     download_data(
       dataset_name = "terraclimate",
       variables = "Precipitation",
-      year_start = 10,
-      year_end = 11,
+      year = c(10, 11),
       acknowledgement = TRUE,
       directory_to_save =
         testthat::test_path("..", "testdata", "terraclimate", "tmp")
@@ -1464,8 +1441,7 @@ testthat::test_that("terraclimate error with invalid variables", {
     download_data(
       dataset_name = "gridmet",
       variables = "temp",
-      year_start = 2018,
-      year_end = 2018,
+      year = c(2018, 2018),
       acknowledgement = TRUE,
       directory_to_save =
         testthat::test_path("..", "testdata", "terraclimate", "tmp")
