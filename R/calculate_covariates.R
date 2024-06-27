@@ -379,7 +379,7 @@ calc_nlcd <- function(from,
     nlcd_at_bufs <- nlcd_at_bufs[, nlcd_val_cols]
   }
   # fill NAs
-  nlcd_at_bufs[is.na(nlcd_at_bufs), with = FALSE] <- 0
+  nlcd_at_bufs[is.na(nlcd_at_bufs), ] <- 0
 
   # change column names
   nlcd_names <- names(nlcd_at_bufs)
