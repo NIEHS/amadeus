@@ -490,3 +490,42 @@ calc_worker <- function(
   #### return data.frame
   return(data.frame(sites_extracted))
 }
+
+#' Prepare covariates for return
+#' @description
+#' Check the time column for proper class and, if `geom = TRUE`,
+#' transform `data.frame` into a `SpatVector` object.
+#' @param covar data.frame(1). Calculated covariates `data.frame`.
+#' @param POSIXt logical(1). Should the time values in `covar` be of class
+#' `POSIXt`? If `FALSE`, the time values will be checked for integer class
+#' (year and year-month).
+#' @param geom logical(1). Should `covar` be returned as a
+#' `data.frame`? Default is `FALSE`.
+#' @param crs terra::crs(1). Coordinate reference system (inherited from
+#' `from`).
+#' @importFrom terra vect
+#' @keywords auxiliary
+#' @author Mitchell Manware
+#' @export
+# nolint start
+calc_return_locs <- function(
+  covar,
+  POSIXt = TRUE,
+  geom,
+  crs
+) {
+  # time value check
+  calc_check_time(covar = covar, POSIXt = POSIXt)
+  # if geom, convert to and return SpatVector
+  if (geom) {
+    covar_return <- terra::vect(
+      covar,
+      geom = "geometry",
+      crs = crs
+    )
+    return(covar_return)
+  } else {
+    return(data.frame(covar))
+  }
+}
+# nolint end

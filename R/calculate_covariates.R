@@ -1593,8 +1593,14 @@ calc_narr <- function(
     ...
   )
   calc_check_time(covar = sites_extracted, POSIXt = TRUE)
+  sites_return <- calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
   #### return data.frame
-  return(data.frame(sites_extracted))
+  return(sites_return)
 }
 
 
