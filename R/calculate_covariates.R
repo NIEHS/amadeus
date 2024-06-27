@@ -1592,7 +1592,6 @@ calc_narr <- function(
     level = narr_level,
     ...
   )
-  calc_check_time(covar = sites_extracted, POSIXt = TRUE)
   sites_return <- calc_return_locs(
     covar = sites_extracted,
     POSIXt = TRUE,
