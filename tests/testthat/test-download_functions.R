@@ -2,10 +2,10 @@
 
 testthat::test_that("Error when acknowledgement = FALSE", {
   download_datasets <- c("aqs", "ecoregion", "geos", "gmted", "koppen",
-                         "koppengeiger", "merra2", "merra", "narr_monolevel",
-                         "narr_p_levels", "nlcd", "noaa", "sedac_groads",
-                         "sedac_population", "groads", "population", "plevels",
-                         "p_levels", "monolevel", "hms", "smoke", "gridmet",
+                         "koppengeiger", "merra2", "merra", "narr",
+                         "nlcd", "noaa", "sedac_groads",
+                         "sedac_population", "groads", "population",
+                         "hms", "smoke", "gridmet",
                          "terraclimate", "huc", "cropscape", "cdl", "prism",
                          "olm", "openlandmap")
   for (d in seq_along(download_datasets)) {
@@ -20,10 +20,10 @@ testthat::test_that("Error when acknowledgement = FALSE", {
 
 testthat::test_that("Error when one parameter is NULL.", {
   download_datasets <- c("aqs", "ecoregion", "geos", "gmted", "koppen",
-                         "koppengeiger", "merra2", "merra", "narr_monolevel",
-                         "narr_p_levels", "nlcd", "noaa", "sedac_groads",
-                         "sedac_population", "groads", "population", "plevels",
-                         "p_levels", "monolevel", "hms", "smoke", "gridmet",
+                         "koppengeiger", "merra2", "merra", "narr",
+                         "nlcd", "noaa", "sedac_groads",
+                         "sedac_population", "groads", "population",
+                         "hms", "smoke", "gridmet",
                          "terraclimate", "huc", "cropscape", "cdl", "prism",
                          "olm", "openlandmap")
   for (d in seq_along(download_datasets)) {
@@ -55,17 +55,9 @@ testthat::test_that("Errors when temporal ranges invalid.", {
     )
   )
   expect_error(
-    download_narr_monolevel(
+    download_narr(
       year_start = 1900,
       variables = "air.sfc",
-      acknowledgement = TRUE,
-      directory_to_save = testthat::test_path("..", "testdata/", "")
-    )
-  )
-  expect_error(
-    download_narr_p_levels(
-      year_start = 1900,
-      variables = "omega",
       acknowledgement = TRUE,
       directory_to_save = testthat::test_path("..", "testdata/", "")
     )
@@ -415,17 +407,17 @@ testthat::test_that("MERRA2 returns message with unrecognized collection.", {
   )
 })
 
-## NARR Monolevel ####
-testthat::test_that("NARR monolevel download URLs have HTTP status 200.", {
+## NARR (monolevel and pressure level)
+testthat::test_that("NARR download URLs have HTTP status 200.", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   year_start <- 2018
   year_end <- 2018
-  variables <- c("weasd", "air.2m")
+  variables <- c("weasd", "omega") # includes monolevel and pressure levels
   directory_to_save <- testthat::test_path("..", "testdata/", "")
   # run download function
-  download_data(dataset_name = "narr_monolevel",
+  download_data(dataset_name = "narr",
                 year_start = year_start,
                 year_end = year_end,
                 variables = variables,
@@ -434,7 +426,7 @@ testthat::test_that("NARR monolevel download URLs have HTTP status 200.", {
                 download = FALSE)
   # define path with commands
   commands_path <- paste0(directory_to_save,
-                          "narr_monolevel_",
+                          "narr_",
                           year_start, "_", year_end,
                           "_curl_commands.txt")
   # import commands
@@ -451,10 +443,10 @@ testthat::test_that("NARR monolevel download URLs have HTTP status 200.", {
   file.remove(commands_path)
 })
 
-testthat::test_that("NARR monolevel error with invalid years.", {
+testthat::test_that("NARR error with invalid years.", {
   testthat::expect_error(
     download_data(
-      dataset_name = "narr_monolevel",
+      dataset_name = "narr",
       variables = "weasd",
       year_start = 10,
       year_end = 11,
@@ -464,49 +456,11 @@ testthat::test_that("NARR monolevel error with invalid years.", {
   )
 })
 
-# NARR -- p-levels ####
-testthat::test_that("NARR p-levels download URLs have HTTP status 200.", {
-  withr::local_package("httr")
-  withr::local_package("stringr")
-  # function parameters
-  year_start <- 2020
-  year_end <- 2021
-  variables <- c("shum", "omega")
-  directory_to_save <- testthat::test_path("..", "testdata/", "")
-  directory_to_save2 <- testthat::test_path("..", "testdata", "hej")
-  # run download function
-  download_data(dataset_name = "narr_p_levels",
-                year_start = year_start,
-                year_end = year_end,
-                variables = variables,
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                download = FALSE)
-  # define file path with commands
-  commands_path <- paste0(directory_to_save,
-                          "narr_p_levels_",
-                          year_start, "_", year_end,
-                          "_curl_commands.txt")
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 10L, method = "HEAD")
-  # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
-  download_data(dataset_name = "narr_p_levels",
-                year_start = year_start,
-                year_end = year_end,
-                variables = variables,
-                directory_to_save = directory_to_save2,
-                acknowledgement = TRUE,
-                remove_command = TRUE,
-                download = FALSE)
-  # remove file with commands after test
-  file.remove(commands_path)
+#### NARR variable sorting function
+testthat::test_that("narr_variable with unrecognized variable.", {
+  testthat::expect_error(
+    narr_variable("uNrEcOgNiZed")
+  )
 })
 
 testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {

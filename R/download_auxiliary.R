@@ -520,3 +520,53 @@ list_stac_files <-
 
     return(list_assets)
   }
+
+#' Sort NOAA NARR variables
+#' @description
+#' Determine whether a NOAA NARR variable selected for download is a
+#' monolevel or pressure level variable. Monolevel variables are derived
+#' from https://downloads.psl.noaa.gov/Datasets/NARR/Dailies/monolevel/,
+#' and pressure level variables are derived from
+#' https://downloads.psl.noaa.gov//Datasets/NARR/Dailies/pressure/.
+#' @param variable character(1). User-selected NARR variable
+#' @returns list with URL base and vector of months (blank for monolevel)
+#' @keywords auxiliary
+#' @export
+narr_variable <- function(variable) {
+  stopifnot(length(variable) == 1)
+  mono <- c(
+    "acpcp", "air.2m", "air.sfc", "albedo", "apcp",
+    "bgrun", "bmixl.hl1", "cape", "ccond", "cdcon",
+    "cdlyr", "cfrzr", "cicep", "cin", "cnwat",
+    "crain", "csnow", "dlwrf", "dpt.2m", "dswrf",
+    "evap", "gflux", "hcdc", "hgt.tropo", "hlcy",
+    "hpbl", "lcdc", "lftx4", "lhtfl", "mcdc",
+    "mconv.hl1", "mslet", "mstav", "pevap", "pottmp.hl1",
+    "pottmp.sfc", "prate", "pres.sfc", "pres.tropo", "prmsl",
+    "pr_wtr", "rcq", "rcs", "rcsol", "rct",
+    "rhum.2m", "shtfl", "shum.2m", "snod","snohf",
+    "snom", "snowc","soilm", "ssrun", "tcdc",
+    "tke.hl1", "ulwrf.ntat", "ulwrf.sfc", "ustm", "uswrf.ntat",
+    "uswrf.sfc", "uwnd.10m", "veg", "vis", "vstm",
+    "vvel.hl1", "vwnd.10m", "vwsh.tropo", "wcconv", "wcinc",
+    "wcuflx", "wcvflx", "weasd", "wvconv", "wvinc",
+    "wvuflx", "wvvflx"
+  )
+  pressure <- c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd")
+  if (variable %in% mono) {
+    base <- "https://downloads.psl.noaa.gov/Datasets/NARR/Dailies/monolevel/"
+    months <- ""
+  } else if (variable %in% pressure) {
+    base <- "https://downloads.psl.noaa.gov/Datasets/NARR/Dailies/pressure/"
+    months <- sprintf("%02d", seq(1, 12, by = 1))
+  } else {
+    stop(
+      paste0(
+        "Selected variable \"",
+        variable,
+        "\" is not available.\n"
+      )
+    )
+  }
+  return(list(base, months))
+}

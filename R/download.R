@@ -23,9 +23,7 @@
 #' * \code{\link{download_gmted}}: `"gmted"`, `"GMTED"`
 #' * \code{\link{download_koppen_geiger}}: `"koppen"`, `"koppengeiger"`
 #' * \code{\link{download_merra2}}: "merra2", `"merra"`, `"MERRA"`, `"MERRA2"`
-#' * \code{\link{download_narr_monolevel}}: `"narr_monolevel"`, `"monolevel"`
-#' * \code{\link{download_narr_p_levels}}: `"narr_p_levels"`, `"p_levels"`,
-#'   `"plevels"`
+#' * \code{\link{download_narr}}: `"narr"`
 #' * \code{\link{download_nlcd}}: `"nlcd"`, `"NLCD"`
 #' * \code{\link{download_hms}}: `"noaa"`, `"smoke"`, `"hms"`
 #' * \code{\link{download_sedac_groads}}: `"sedac_groads"`, `"groads"`
@@ -42,10 +40,10 @@ download_data <-
   function(
     dataset_name = c("aqs", "ecoregion", "ecoregions",
                      "geos", "gmted", "koppen",
-                     "koppengeiger", "merra2", "merra", "narr_monolevel",
-                     "modis", "narr_p_levels", "nlcd", "noaa", "sedac_groads",
+                     "koppengeiger", "merra2", "merra",
+                     "modis", "narr", "nlcd", "noaa", "sedac_groads",
                      "sedac_population", "groads", "population", "plevels",
-                     "p_levels", "monolevel", "hms", "smoke", "tri", "nei",
+                     "hms", "smoke", "tri", "nei",
                      "gridmet", "terraclimate", "huc", "cropscape", "cdl",
                      "prism", "olm", "openlandmap"),
     directory_to_save = NULL,
@@ -67,11 +65,7 @@ download_data <-
       koppengeiger = download_koppen_geiger,
       merra2 = download_merra2,
       merra = download_merra2,
-      narr_monolevel = download_narr_monolevel,
-      monolevel = download_narr_monolevel,
-      narr_p_levels = download_narr_p_levels,
-      p_levels = download_narr_p_levels,
-      plevels = download_narr_p_levels,
+      narr = download_narr,
       nlcd = download_nlcd,
       noaa = download_hms,
       smoke = download_hms,
@@ -1000,135 +994,10 @@ download_merra2 <- function(
 # nolint end: cyclocomp
 
 # nolint start
-#' Download meteorological data (monolevel)
+#' Download meteorological data
 #' @description
-#' The \code{download_narr_monolevel} function accesses and downloads monolevel meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Monolevel" variables contain a single value for the entire atmospheric column (ie. Variable: Convective cloud cover; Level: Entire atmosphere considered as a single layer), or represent a specific altitude associated with the variable (ie. Variable: Air temperature; Level: 2 m).
-#' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
-#' for variable names and acronym codes.
-#' @param year_start integer(1). length of 4. Start of year range for
-#' downloading data.
-#' @param year_end integer(1). length of 4. End of year range for downloading
-#' data.
-#' @param directory_to_save character(1). Directory(s) to save downloaded data
-#' files.
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @author Mitchell Manware, Insang Song
-#' @return NULL; netCDF (.nc) files will be stored in a variable-specific
-#' folder within \code{directory_to_save}.
-#' @export
-# nolint end
-download_narr_monolevel <- function(
-    variables = NULL,
-    year_start = 2022,
-    year_end = 2022,
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE) {
-  #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
-  #### 2. check for null parameters
-  check_for_null_parameters(mget(ls()))
-  #### 3. directory setup
-  download_setup_dir(directory_to_save)
-  directory_to_save <- download_sanitize_path(directory_to_save)
-  #### 4. define years sequence
-  if (any(nchar(year_start) != 4, nchar(year_end) != 4)) {
-    stop("year_start and year_end should be 4-digit integers.\n")
-  }
-  years <- seq(year_start, year_end, 1)
-  #### 5. define variables
-  variables_list <- as.vector(variables)
-  #### 6. define URL base
-  base <- "https://downloads.psl.noaa.gov/Datasets/NARR/Dailies/monolevel/"
-  #### 7. initiate "..._curl_commands.txt"
-  commands_txt <- paste0(
-    directory_to_save,
-    "narr_monolevel_",
-    year_start, "_", year_end,
-    "_curl_commands.txt"
-  )
-  download_sink(commands_txt)
-  #### 8. concatenate and print download commands to "..._curl_commands.txt"
-  for (v in seq_along(variables_list)) {
-    variable <- variables_list[v]
-    folder <- paste0(directory_to_save, variable, "/")
-    if (!dir.exists(folder)) {
-      dir.create(folder, recursive = TRUE)
-    }
-    for (y in seq_along(years)) {
-      year <- years[y]
-      url <- paste0(
-        base,
-        variable,
-        ".",
-        year,
-        ".nc"
-      )
-      if (y == 1) {
-        if (!(check_url_status(url))) {
-          sink()
-          file.remove(commands_txt)
-          stop(paste0(
-            "Invalid year returns HTTP code 404. ",
-            "Check `year_start` parameter.\n"
-          ))
-        }
-      }
-      destfile <- paste0(
-        directory_to_save,
-        variable,
-        "/",
-        variable,
-        ".",
-        year,
-        ".nc"
-      )
-      command <- paste0(
-        "curl -s -o ",
-        destfile,
-        " --url ",
-        url,
-        "\n"
-      )
-      if (!file.exists(destfile)) {
-        #### cat command only if file does not already exist
-        cat(command)
-      }
-    }
-  }
-  #### 9. finish "..._curl_commands.txt"
-  sink()
-  #### 10. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
-  #### 11. download data
-  download_run(
-    download = download,
-    system_command = system_command
-  )
-  #### 12. remove command text file
-  download_remove_command(
-    commands_txt = commands_txt,
-    remove = remove_command
-  )
-}
-
-# nolint start
-#' Download meteorological data (pressure levels)
-#' @description
-#' The \code{download_narr_p_levels} function accesses and downloads pressure levels meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html). "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
+#' The \code{download_narr} function accesses and downloads daily meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html).
+#' @note "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
 #' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
 #' @param year_start integer(1). length of 4. Start of year range for
@@ -1152,7 +1021,7 @@ download_narr_monolevel <- function(
 #' @export
 # nolint end
 # nolint start: cyclocomp
-download_narr_p_levels <- function(
+download_narr <- function(
     variables = NULL,
     year_start = 2022,
     year_end = 2022,
@@ -1167,45 +1036,43 @@ download_narr_p_levels <- function(
   #### 3. directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
-  #### 4. define years sequence
+  #### 4. define years and months sequence
+  if (any(nchar(year_start) != 4, nchar(year_end) != 4)) {
+    stop("year_start and year_end should be 4-digit integers.\n")
+  }
   years <- seq(year_start, year_end, 1)
-  #### 5. define months sequence
-  months <- sprintf("%02d", seq(1, 12, by = 1))
-
-  #### 6. define variables
+  #### 5. define variables
   variables_list <- as.vector(variables)
-  #### 7. define URL base
-  base <- "https://downloads.psl.noaa.gov//Datasets/NARR/Dailies/pressure/"
-  #### 8. initiate "..._curl_commands.txt"
+  #### 7. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
     directory_to_save,
-    "narr_p_levels_",
-    year_start,
-    "_",
-    year_end,
+    "narr_",
+    year_start, "_", year_end,
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
-  #### 9. concatenate download commands to "..._curl_commands.txt"
+  #### 8. concatenate and print download commands to "..._curl_commands.txt"
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
     folder <- paste0(directory_to_save, variable, "/")
+    # implement variable sorting function
+    base <- narr_variable(variable)[[1]]
+    months <- narr_variable(variable)[[2]]
     if (!dir.exists(folder)) {
       dir.create(folder, recursive = TRUE)
     }
     for (y in seq_along(years)) {
       year <- years[y]
       for (m in seq_along(months)) {
-        month <- months[m]
         url <- paste0(
           base,
           variable,
           ".",
           year,
-          month,
+          months[m],
           ".nc"
         )
-        if (m == 1) {
+        if (y == 1) {
           if (!(check_url_status(url))) {
             sink()
             file.remove(commands_txt)
@@ -1222,7 +1089,6 @@ download_narr_p_levels <- function(
           variable,
           ".",
           year,
-          month,
           ".nc"
         )
         command <- paste0(
@@ -1232,7 +1098,6 @@ download_narr_p_levels <- function(
           url,
           "\n"
         )
-        #### cat command only if file does not already exist
         if (!file.exists(destfile)) {
           #### cat command only if file does not already exist
           cat(command)
@@ -1240,20 +1105,20 @@ download_narr_p_levels <- function(
       }
     }
   }
-  #### 10. finish "..._curl_commands.txt"
+  #### 9. finish "..._curl_commands.txt"
   sink()
-  #### 11. build system command
+  #### 10. build system command
   system_command <- paste0(
     ". ",
     commands_txt,
     "\n"
   )
-  #### 12. download data
+  #### 11. download data
   download_run(
     download = download,
     system_command = system_command
   )
-  #### 13. Remove command file
+  #### 12. remove command text file
   download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
