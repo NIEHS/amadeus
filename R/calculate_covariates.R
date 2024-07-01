@@ -22,7 +22,7 @@
 #' - [`calc_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`
 #' - [`calc_ecoregion`]: `"ecoregion"`, `"ecoregions"`
 #' - [`calc_temporal_dummies`]: `"dummies"`
-#' - [`calc_hms`]: `"hms"`, `"noaa"`, `"smoke"`
+#' - [`calc_hms`]: `"hms"`, `"smoke"`
 #' - [`calc_gmted`]: `"gmted"`
 #' - [`calc_narr`]: `"narr"`
 #' - [`calc_geos`]: `"geos"`, `"geos_cf"`
@@ -34,7 +34,7 @@
 #' - [`calc_merra2`]: `"merra"`, `"MERRA"`, `"merra2"`, `"MERRA2"`
 #' - [`calc_gridmet`]: `"gridMET"`, `"gridmet"`
 #' - [`calc_terraclimate`]: `"terraclimate"`, `"TerraClimate"`
-#' @returns Calculated covariates. Mainly data.frame object.
+#' @return Calculated covariates as a data.frame or SpatVector object
 #' @author Insang Song
 #' @export
 # nolint end
@@ -44,7 +44,7 @@ calc_covariates <-
                     "koeppen-geiger", "koppen", "koeppen",
                     "geos", "dummies", "gmted",
                     "sedac_groads", "groads", "roads",
-                    "ecoregions", "ecoregion", "hms", "noaa", "smoke",
+                    "ecoregions", "ecoregion", "hms", "smoke",
                     "gmted", "narr", "geos",
                     "sedac_population", "population", "nlcd",
                     "merra", "merra2", "gridmet", "terraclimate",
@@ -68,7 +68,6 @@ calc_covariates <-
       koppen = calc_koppen_geiger,
       narr = calc_narr,
       nlcd = calc_nlcd,
-      noaa = calc_hms,
       smoke = calc_hms,
       hms = calc_hms,
       sedac_groads = calc_sedac_groads,
@@ -120,16 +119,13 @@ calc_covariates <-
 #' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
-#' @param geom logical(1). Should the geometry of `locs` be returned in the
-#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
-#' polygon geometries, the `$geometry` column in the returned data frame may
-#' make the `data.frame` difficult to read due to long geometry strings. The
-#' coordinate reference system of the `$geometry` is the coordinate
-#' reference system of `from`.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders.
 #' @seealso [`process_koppen_geiger`]
-#' @returns a data.frame object
-#' @note The returned `data.frame` object contains a
+#' @return a data.frame or SpatVector object
+#' @note The returned object contains a
 #' `$description` column to represent the temporal range covered by the
 #' dataset. For more information, see
 #' <https://www.nature.com/articles/sdata2018214>.
@@ -226,10 +222,18 @@ calc_koppen_geiger <-
     names(kg_extracted)[1] <- locs_id
     if (geom) {
       names(kg_extracted)[2:3] <- c("geometry", "description")
+      sites_return <- calc_return_locs(
+        covar = kg_extracted,
+        POSIXt = FALSE,
+        geom = geom,
+        crs = terra::crs(from)
+      )
+      #### return data.frame
+      return(sites_return)
     } else {
       names(kg_extracted)[2] <- "description"
+      return(kg_extracted)
     }
-    return(kg_extracted)
   }
 
 
@@ -251,12 +255,9 @@ calc_koppen_geiger <-
 #' Maximum possible value is `2^31 - 1`. Only valid when
 #' `mode = "exact"`.
 #' See [`exactextractr::exact_extract`] for details.
-#' @param geom logical(1). Should the geometry of `locs` be returned in the
-#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
-#' polygon geometries, the `$geometry` column in the returned data frame may
-#' make the `data.frame` difficult to read due to long geometry strings. The
-#' coordinate reference system of the `$geometry` is the coordinate
-#' reference system of `from`.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param nthreads integer(1). Number of threads to be used
 #' @param ... Placeholders.
 #' @note NLCD is available in U.S. only. Users should be aware of
@@ -267,7 +268,7 @@ calc_koppen_geiger <-
 #' but uses more memory as it will account for the partial overlap
 #' with the buffer.
 #' @seealso [`process_nlcd`]
-#' @returns a data.frame object
+#' @return a data.frame or SpatVector object
 #' @importFrom utils read.csv
 #' @importFrom methods is
 #' @importFrom terra rast
@@ -402,7 +403,12 @@ calc_nlcd <- function(from,
   } else {
     names(new_data_vect)[1:2] <- c(locs_id, "time")
   }
-  calc_check_time(covar = new_data_vect, POSIXt = FALSE)
+  new_data_vect <- calc_return_locs(
+    covar = new_data_vect,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
   future::plan(future::sequential)
   return(new_data_vect)
 }
@@ -419,15 +425,13 @@ calc_nlcd <- function(from,
 #' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
-#' @param geom logical(1). Should the geometry of `locs` be returned in the
-#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
-#' polygon geometries, the `$geometry` column in the returned data frame may
-#' make the `data.frame` difficult to read due to long geometry strings. The
-#' coordinate reference system of the `$geometry` is the coordinate
-#' reference system of `from`.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders.
 #' @seealso [`process_ecoregion`]
-#' @returns a data.frame object with dummy variables and attributes of:
+#' @return a data.frame or SpatVector object object with dummy variables and
+#' attributes of:
 #'   - `attr(., "ecoregion2_code")`: Ecoregion lv.2 code and key
 #'   - `attr(., "ecoregion3_code")`: Ecoregion lv.3 code and key
 #' @author Insang Song
@@ -496,13 +500,19 @@ calc_ecoregion <-
       df_lv2, df_lv3
     )
     if (geom) {
-      names(locs_ecoreg)[3] <- "description"
+      locs_return <- calc_return_locs(
+        covar = locs_ecoreg,
+        POSIXt = FALSE,
+        geom = geom,
+        crs = terra::crs(from)
+      )
     } else {
       names(locs_ecoreg)[2] <- "description"
+      locs_return <- locs_ecoreg
     }
-    attr(locs_ecoreg, "ecoregion2_code") <- sort(unique(from$L2_KEY))
-    attr(locs_ecoreg, "ecoregion3_code") <- sort(unique(from$L3_KEY))
-    return(locs_ecoreg)
+    attr(locs_return, "ecoregion2_code") <- sort(unique(from$L2_KEY))
+    attr(locs_return, "ecoregion3_code") <- sort(unique(from$L3_KEY))
+    return(locs_return)
   }
 
 
@@ -536,7 +546,7 @@ calc_ecoregion <-
 #'     [process_bluemarble()]
 #' * Parallelization: [calc_modis_par()]
 #' @author Insang Song
-#' @returns A data.frame object.
+#' @return A data.frame object.
 #' @importFrom terra extract
 #' @importFrom terra project
 #' @importFrom terra vect
@@ -683,7 +693,7 @@ calc_modis_daily <- function(
 #' Users will be informed of the dates with insufficient tiles.
 #' The result data.frame will have an attribute with the dates with
 #' insufficient tiles.
-#' @returns A data.frame with an attribute:
+#' @return A data.frame with an attribute:
 #' * `attr(., "dates_dropped")`: Dates with insufficient tiles.
 #'   Note that the dates mean the dates with insufficient tiles,
 #'   not the dates without available tiles.
@@ -884,7 +894,7 @@ process_modis_swath, or process_bluemarble.")
 #' @param year integer. Year domain to dummify.
 #'  Default is \code{seq(2018L, 2022L)}
 #' @param ... Placeholders.
-#' @returns a data.frame object
+#' @return a data.frame object
 #' @author Insang Song
 #' @importFrom methods is
 #' @importFrom data.table year
@@ -964,7 +974,7 @@ calc_temporal_dummies <-
 #' Distance at which the source concentration is reduced to
 #'  `exp(-3)` (approximately -95 %)
 #' @param target_fields character(varying). Field names in characters.
-#' @returns a data.frame (tibble) object with input field names with
+#' @return a data.frame (tibble) object with input field names with
 #'  a suffix \code{"_sedc"} where the sums of EDC are stored.
 #'  Additional attributes are attached for the EDC information.
 #'    - `attr(result, "sedc_bandwidth")``: the bandwidth where
@@ -1113,7 +1123,7 @@ The result may not be accurate.\n",
 #' Default is \code{c(1000, 10000, 50000)} (meters)
 #' @param ... Placeholders.
 #' @author Insang Song, Mariana Kassien
-#' @returns a data.frame object
+#' @return a data.frame object
 #' @note U.S. context.
 #' @seealso [`calc_sedc`], [`process_tri`]
 #' @importFrom terra vect
@@ -1191,7 +1201,7 @@ calc_tri <- function(
 #' @param ... Placeholders.
 #' @author Insang Song, Ranadeep Daw
 #' @seealso [`process_nei`]
-#' @returns a data.frame object
+#' @return a data.frame object
 #' @importFrom terra vect
 #' @importFrom methods is
 #' @importFrom terra project
@@ -1231,6 +1241,9 @@ calc_nei <- function(
 #' containing identifier for each unique coordinate location.
 #' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0).
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders.
 #' @seealso [process_hms()]
 #' @author Mitchell Manware
@@ -1247,6 +1260,7 @@ calc_hms <- function(
     locs,
     locs_id = NULL,
     radius = 0,
+    geom = FALSE,
     ...) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
@@ -1295,7 +1309,8 @@ calc_hms <- function(
     from = from,
     locs = locs,
     locs_id = locs_id,
-    radius = radius
+    radius = radius,
+    geom = geom
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
@@ -1346,18 +1361,28 @@ calc_hms <- function(
       layer_date,
       sites_extracted_layer
     )
-    #### define column names
-    colnames(sites_extracted_layer) <- c(
-      locs_id,
-      "time",
-      paste0(
+    binary_colname <- paste0(
         tolower(
           layer_name
         ),
         "_",
         radius
       )
-    )
+    #### define column names
+    if (geom) {
+      colnames(sites_extracted_layer) <- c(
+        locs_id,
+        "geometry",
+        "time",
+        binary_colname
+      )
+    } else {
+      colnames(sites_extracted_layer) <- c(
+        locs_id,
+        "time",
+        binary_colname
+      )
+    }
     #### merge with empty sites_extracted
     sites_extracted <- rbind(
       sites_extracted,
@@ -1396,7 +1421,8 @@ calc_hms <- function(
     }
   }
   #### coerce binary to integer
-  sites_extracted[, 3] <- as.integer(sites_extracted[, 3])
+  sites_extracted[[binary_colname]] <-
+    as.integer(sites_extracted[[binary_colname]])
   #### date to POSIXct
   sites_extracted$time <- as.POSIXct(sites_extracted$time)
   #### order by date
@@ -1408,7 +1434,12 @@ calc_hms <- function(
     layer_name,
     " covariates.\n"
   ))
-  calc_check_time(covar = sites_extracted_ordered, POSIXt = TRUE)
+  sites_extracted_ordered <- calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
   #### return data.frame
   return(sites_extracted_ordered)
 }
@@ -1428,16 +1459,13 @@ calc_hms <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the geometry of `locs` be returned in the
-#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
-#' polygon geometries, the `$geometry` column in the returned data frame may
-#' make the `data.frame` difficult to read due to long geometry strings. The
-#' coordinate reference system of the `$geometry` is the coordinate
-#' reference system of `from`.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [`process_gmted()`]
-#' @return a data.frame object
+#' @return a data.frame or SpatVector object
 #' @importFrom terra vect
 #' @importFrom terra as.data.frame
 #' @importFrom terra time
@@ -1514,9 +1542,14 @@ calc_gmted <- function(
     sites_extracted[, 3] <- as.numeric(sites_extracted[, 3])
     names(sites_extracted) <- c(locs_id, "time", variable_name)
   }
-  calc_check_time(covar = sites_extracted, POSIXt = FALSE)
+  sites_return <- calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
   #### return data.frame
-  return(data.frame(sites_extracted))
+  return(sites_return)
 }
 
 
@@ -1535,16 +1568,13 @@ calc_gmted <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the geometry of `locs` be returned in the
-#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
-#' polygon geometries, the `$geometry` column in the returned data frame may
-#' make the `data.frame` difficult to read due to long geometry strings. The
-#' coordinate reference system of the `$geometry` is the coordinate
-#' reference system of `from`.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [`process_narr`]
-#' @return a data.frame object
+#' @return a data.frame or SpatVector object
 #' @importFrom terra vect
 #' @importFrom terra as.data.frame
 #' @importFrom terra time
@@ -1618,16 +1648,13 @@ calc_narr <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the geometry of `locs` be returned in the
-#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
-#' polygon geometries, the `$geometry` column in the returned data frame may
-#' make the `data.frame` difficult to read due to long geometry strings. The
-#' coordinate reference system of the `$geometry` is the coordinate
-#' reference system of `from`.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @seealso [process_geos()]
-#' @return a data.frame object
+#' @return a data.frame or SpatVector object
 #' @importFrom terra vect
 #' @importFrom terra buffer
 #' @importFrom terra as.data.frame
@@ -1668,9 +1695,14 @@ calc_geos <- function(
     level = 2,
     ...
   )
-  calc_check_time(covar = sites_extracted, POSIXt = TRUE)
+  sites_return <- calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
   #### return data.frame
-  return(data.frame(sites_extracted))
+  return(sites_return)
 }
 
 #' Calculate population density covariates
@@ -1687,16 +1719,13 @@ calc_geos <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the geometry of `locs` be returned in the
-#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
-#' polygon geometries, the `$geometry` column in the returned data frame may
-#' make the `data.frame` difficult to read due to long geometry strings. The
-#' coordinate reference system of the `$geometry` is the coordinate
-#' reference system of `from`.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [process_sedac_population()]
-#' @return a data.frame object
+#' @return a data.frame or SpatVector object
 #' @importFrom methods is
 #' @export
 calc_sedac_population <- function(
@@ -1751,9 +1780,14 @@ calc_sedac_population <- function(
     time_type = "year",
     ...
   )
-  calc_check_time(covar = sites_extracted, POSIXt = FALSE)
+  sites_return <- calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
   #### return data.frame
-  return(data.frame(sites_extracted))
+  return(sites_return)
 }
 
 
@@ -1773,12 +1807,9 @@ calc_sedac_population <- function(
 #' (Default = 1000).
 #' @param fun function(1). Function used to summarize the length of roads
 #' within sites location buffer (Default is `sum`).
-#' @param geom logical(1). Should the geometry of `locs` be returned in the
-#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
-#' polygon geometries, the `$geometry` column in the returned data frame may
-#' make the `data.frame` difficult to read due to long geometry strings. The
-#' coordinate reference system of the `$geometry` is the coordinate
-#' reference system of `from`.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders.
 # nolint start
 #' @note Unit is km / sq km. The returned `data.frame` object contains a
@@ -1787,7 +1818,7 @@ calc_sedac_population <- function(
 # nolint end
 #' @author Insang Song
 #' @seealso [`process_sedac_groads`]
-#' @return a data.frame object with three columns.
+#' @return a data.frame or SpatVector object
 #' @importFrom terra vect
 #' @importFrom stats aggregate
 #' @importFrom stats setNames
@@ -1863,7 +1894,14 @@ calc_sedac_groads <- function(
     #### reorder
     from_clip_reorder <- from_clip[, c(1, 4, 2, 3)]
   }
-  return(from_clip_reorder)
+  sites_return <- calc_return_locs(
+    covar = from_clip_reorder,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  #### return data.frame
+  return(sites_return)
 }
 
 #' Calculate meteorological and atmospheric covariates
@@ -1880,16 +1918,13 @@ calc_sedac_groads <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the geometry of `locs` be returned in the
-#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
-#' polygon geometries, the `$geometry` column in the returned data frame may
-#' make the `data.frame` difficult to read due to long geometry strings. The
-#' coordinate reference system of the `$geometry` is the coordinate
-#' reference system of `from`.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [calc_geos()], [process_merra2()]
-#' @return a data.frame object
+#' @return a data.frame or SpatVector object
 #' @importFrom terra vect
 #' @importFrom terra buffer
 #' @importFrom terra as.data.frame
@@ -1938,9 +1973,14 @@ calc_merra2 <- function(
     level = merra2_level,
     ...
   )
-  calc_check_time(covar = sites_extracted, POSIXt = TRUE)
+  sites_return <- calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
   #### return data.frame
-  return(data.frame(sites_extracted))
+  return(sites_return)
 }
 
 #' Calculate gridMET covariates
@@ -1956,16 +1996,13 @@ calc_merra2 <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the geometry of `locs` be returned in the
-#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
-#' polygon geometries, the `$geometry` column in the returned data frame may
-#' make the `data.frame` difficult to read due to long geometry strings. The
-#' coordinate reference system of the `$geometry` is the coordinate
-#' reference system of `from`.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @seealso [`process_gridmet()`]
-#' @return a data.frame object
+#' @return a data.frame or SpatVector object
 #' @importFrom terra vect
 #' @importFrom terra as.data.frame
 #' @importFrom terra time
@@ -2004,9 +2041,14 @@ calc_gridmet <- function(
     time_type = "date",
     ...
   )
-  calc_check_time(covar = sites_extracted, POSIXt = TRUE)
+  sites_return <- calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
   #### return data.frame
-  return(data.frame(sites_extracted))
+  return(sites_return)
 }
 
 #' Calculate TerraClimate covariates
@@ -2023,12 +2065,9 @@ calc_gridmet <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the geometry of `locs` be returned in the
-#' `data.frame`? Default is `FALSE`. If `geom = TRUE` and `locs` contain
-#' polygon geometries, the `$geometry` column in the returned data frame may
-#' make the `data.frame` difficult to read due to long geometry strings. The
-#' coordinate reference system of the `$geometry` is the coordinate
-#' reference system of `from`.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders.
 #' @note
 #' TerraClimate data has monthly temporal resolution, so the `$time` column
@@ -2036,7 +2075,7 @@ calc_gridmet <- function(
 #' 201801).
 #' @author Mitchell Manware
 #' @seealso [`process_terraclimate()`]
-#' @return a data.frame object
+#' @return a data.frame or SpatVector object
 #' @importFrom terra vect
 #' @importFrom terra as.data.frame
 #' @importFrom terra time
@@ -2075,9 +2114,14 @@ calc_terraclimate <- function(
     time_type = "yearmonth",
     ...
   )
-  calc_check_time(covar = sites_extracted, POSIXt = FALSE)
+  sites_return <- calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
   #### return data.frame
-  return(data.frame(sites_extracted))
+  return(sites_return)
 }
 
 #' Calculate temporally lagged covariates
@@ -2112,6 +2156,14 @@ calc_lagged <- function(
     locs_id,
     time_id = "time") {
   #### check input data types
+  if ("SpatVector" %in% class(from)) {
+    cat(
+      paste0(
+        "`calc_lagged` for `SpatVector` objects is under construction.",
+        " Returning `NULL`.\n"
+      )
+    )
+  }
   stopifnot(methods::is(from, "data.frame"))
   #### check if time_id is not null
   stopifnot(!is.null(time_id))

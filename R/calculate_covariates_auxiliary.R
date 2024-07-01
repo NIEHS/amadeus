@@ -11,8 +11,9 @@
 #' padded to 5 digits. If provided a buffer radius greater than 5 digits,
 #'  \code{calc_setcolumns()} will expand to the number of digits. (ie. buffer
 #' radius of 100km = CCC_CCCCC_I_100000).
-#' @param from data.frame(1). Calculated covariates as returned from
-#' \code{calc_covariates()} or a source specific covariate function.
+#' @param from data.frame(1) or SpatVector(1). Calculated covariates as
+#' returned from \code{calc_covariates()} or a source specific covariate
+#' function.
 #' @param lag integer(1). Temporal lag.
 #' @param dataset character(1). Covariate parent dataset.
 #' @param locs_id character(1). Column containing identifier for each unique
@@ -26,7 +27,7 @@ calc_setcolumns <- function(
     dataset,
     locs_id) {
   #### check from is data.frame
-  stopifnot(is.data.frame(from))
+  stopifnot(class(from) %in% c("data.frame", "SpatVector"))
   #### original names
   names_from <- colnames(from)
   #### copy
@@ -515,7 +516,9 @@ calc_return_locs <- function(
   crs
 ) {
   # time value check
-  calc_check_time(covar = covar, POSIXt = POSIXt)
+  if ("time" %in% names(covar)) {
+    calc_check_time(covar = covar, POSIXt = POSIXt)
+  }
   # if geom, convert to and return SpatVector
   if (geom) {
     covar_return <- terra::vect(
