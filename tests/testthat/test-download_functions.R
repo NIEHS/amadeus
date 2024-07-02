@@ -409,7 +409,7 @@ testthat::test_that("NARR download URLs have HTTP status 200.", {
   # function parameters
   year_start <- 2018
   year_end <- 2018
-  variables <- c("weasd", "omega") # includes monolevel and pressure levels
+  variables <- c("weasd", "omega", "soill") # includes monolevel, pressure level, subsurface
   directory_to_save <- testthat::test_path("..", "testdata/", "")
   # run download function
   download_data(dataset_name = "narr",

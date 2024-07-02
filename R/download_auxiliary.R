@@ -544,8 +544,8 @@ narr_variable <- function(variable) {
     "mconv.hl1", "mslet", "mstav", "pevap", "pottmp.hl1",
     "pottmp.sfc", "prate", "pres.sfc", "pres.tropo", "prmsl",
     "pr_wtr", "rcq", "rcs", "rcsol", "rct",
-    "rhum.2m", "shtfl", "shum.2m", "snod","snohf",
-    "snom", "snowc","soilm", "ssrun", "tcdc",
+    "rhum.2m", "shtfl", "shum.2m", "snod", "snohf",
+    "snom", "snowc", "soilm", "ssrun", "tcdc",
     "tke.hl1", "ulwrf.ntat", "ulwrf.sfc", "ustm", "uswrf.ntat",
     "uswrf.sfc", "uwnd.10m", "veg", "vis", "vstm",
     "vvel.hl1", "vwnd.10m", "vwsh.tropo", "wcconv", "wcinc",
@@ -553,20 +553,26 @@ narr_variable <- function(variable) {
     "wvuflx", "wvvflx"
   )
   pressure <- c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd")
+  soil <- c("soill", "soilw", "tsoil")
+  base <- "https://psl.noaa.gov/thredds/catalog/Datasets/NARR/Dailies/"
   if (variable %in% mono) {
-    base <- "https://downloads.psl.noaa.gov/Datasets/NARR/Dailies/monolevel/"
+    base <- paste0(base, "monolevel/")
     months <- ""
-  } else if (variable %in% pressure) {
-    base <- "https://downloads.psl.noaa.gov/Datasets/NARR/Dailies/pressure/"
-    months <- sprintf("%02d", seq(1, 12, by = 1))
   } else {
-    stop(
-      paste0(
-        "Selected variable \"",
-        variable,
-        "\" is not available.\n"
+    months <- sprintf("%02d", seq(1, 12, by = 1))
+    if (variable %in% pressure) {
+      base <- paste0(base, "pressure/")
+    } else if (variable %in% soil) {
+      base <- paste0(base, "subsurface/")
+    } else {
+      stop(
+        paste0(
+          "Selected variable \"",
+          variable,
+          "\" is not available.\n"
+        )
       )
-    )
+    }
   }
   return(list(base, months))
 }
