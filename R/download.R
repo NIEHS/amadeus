@@ -1026,6 +1026,12 @@ download_narr <- function(
   if (any(nchar(year[1]) != 4, nchar(year[2]) != 4)) {
     stop("years should be 4-digit integers.\n")
   }
+  stopifnot(
+    all(
+      seq(year[1], year[2], 1) %in%
+        seq(1979, as.numeric(substr(Sys.Date(), 1, 4)))
+    )
+  )
   years <- seq(year[1], year[2], 1)
   #### 5. define variables
   variables_list <- as.vector(variables)
@@ -1058,16 +1064,6 @@ download_narr <- function(
           months[m],
           ".nc"
         )
-        if (y == 1) {
-          if (!(check_url_status(url))) {
-            sink()
-            file.remove(commands_txt)
-            stop(paste0(
-              "Invalid year returns HTTP code 404. ",
-              "Check `year` parameter.\n"
-            ))
-          }
-        }
         destfile <- paste0(
           directory_to_save,
           variable,

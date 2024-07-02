@@ -910,10 +910,10 @@ testthat::test_that("calc_hms with geom = TRUE", {
   )
   # with geometry will have 3 columns
   testthat::expect_equal(
-    ncol(output_geom), 3
+    ncol(hms_covariate_geom), 3
   )
   testthat::expect_true(
-    "SpatVector" %in% class(output_geom)
+    "SpatVector" %in% class(hms_covariate_geom)
   )
 })
 
