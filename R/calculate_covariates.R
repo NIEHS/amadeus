@@ -356,8 +356,8 @@ calc_nlcd <- function(from,
     class_query <- "value"
     # ratio of each nlcd class per buffer
     bufs_polx <- bufs_pol[terra::ext(from), ] |>
-      sf::st_as_sf() |>
-      sf::st_geometry()
+      sf::st_as_sf()# |>
+      # sf::st_geometry()
     nlcd_at_bufs <- future.apply::future_Map(
       function(i) {
         exactextractr::exact_extract(
@@ -366,6 +366,7 @@ calc_nlcd <- function(from,
           fun = "frac",
           force_df = TRUE,
           progress = FALSE,
+          append_cols = locs_id,
           max_cells_in_memory = max_cells
         )
       }, seq_len(length(bufs_polx)),
@@ -379,7 +380,7 @@ calc_nlcd <- function(from,
     nlcd_at_bufs <- nlcd_at_bufs[, nlcd_val_cols]
   }
   # fill NAs
-  nlcd_at_bufs[is.na(nlcd_at_bufs), ] <- 0
+  nlcd_at_bufs[is.na(nlcd_at_bufs)] <- 0
 
   # change column names
   nlcd_names <- names(nlcd_at_bufs)

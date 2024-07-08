@@ -1,6 +1,6 @@
 Package: amadeus
 Title: AMADEUS: A Machine for Data, Environments, and User Setup for common environmental and climate health datasets 
-Version: 0.2.0
+Version: 0.2.2
 Authors@R: c(
     person("Kyle", "Messier", , "kyle.messier@nih.gov", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9508-9623")),
     person("Mitchell", "Manware", role = c("aut", "ctb"), comment = c(ORCID = "0009-0003-6440-6106")),
@@ -17,9 +17,9 @@ Suggests: covr, withr, knitr, rmarkdown, lwgeom, FNN, doRNG
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Config/Needs/website: tidyverse/tidytemplate
 Config/testhat/edition: 3
 License: MIT + file LICENSE
 URL: https://github.com/NIEHS/amadeus, 
-https://niehs.github.io/amadeus/
+https: //niehs.github.io/amadeus/

@@ -979,10 +979,11 @@ process_nei <- function(
 }
 
 # nolint start
-#' Process unique U.S. EPA AQS sites
+#' Process U.S. EPA AQS daily CSV data
 #' @description
 #' The \code{process_aqs()} function cleans and imports raw air quality
-#' monitoring sites, returning a single `SpatVector` or sf object.
+#' monitoring sites from pre-generated daily CSV files, returning a single
+#' `SpatVector` or `sf` object.
 #' `date` is used to filter the raw data read from csv files.
 #' Filtered rows are then processed according to `mode` argument.
 #' Some sites report multiple measurements per day with and without
@@ -992,11 +993,15 @@ process_nei <- function(
 #' @param path character(1). Directory path to daily measurement data.
 #' @param date character(2). Start and end date.
 #'  Should be in `"YYYY-MM-DD"` format and sorted.
-#' @param mode character(1). One of "full" (all dates * all locations)
-#'   or "sparse" (date-location pairs with available data) or
-#'   "location" (unique locations).
+#' @param mode character(1). One of
+#'   * "date-location" (all dates * all locations)
+#'   * "available-data" (date-location pairs with available data)
+#'   * "location" (unique locations).
 #' @param data_field character(1). Data field to extract.
 #' @param return_format character(1). `"terra"` or `"sf"` or `"data.table"`.
+#' @param extent numeric(4). Spatial extent of the resulting object.
+#'   The order should be `c(xmin, xmax, ymin, ymax)`.
+#'   The coordinate system should be WGS84 (EPSG:4326).
 #' @param ... Placeholders.
 #' @seealso
 #' * [`download_aqs()`]
@@ -1009,16 +1014,18 @@ process_nei <- function(
 #' @importFrom sf st_as_sf
 #' @importFrom dplyr group_by ungroup filter mutate select distinct
 #' @note Choose `date` and `mode` values with caution.
-#' The function may return a massive data.table, resulting in
-#' a long processing time or even a crash.
+#' The function may return a massive data.table depending on the time range,
+#' resulting in a long processing time or even a crash if data is too large
+#' for your computing environment to process.
 #' @export
 process_aqs <-
   function(
     path = NULL,
     date = c("2018-01-01", "2022-12-31"),
-    mode = c("full", "sparse", "location"),
+    mode = c("date-location", "available-data", "location"),
     data_field = "Arithmetic.Mean",
     return_format = c("terra", "sf", "data.table"),
+    extent = NULL,
     ...
   ) {
     mode <- match.arg(mode)
@@ -1124,7 +1131,7 @@ process_aqs <-
     final_sites <-
       final_sites[, grep("Datum", names(final_sites), invert = TRUE), with = FALSE]
 
-    if (mode == "full") {
+    if (mode == "date-location") {
       final_sites <-
         split(date_sequence, date_sequence) |>
         lapply(function(x) {
@@ -1134,7 +1141,7 @@ process_aqs <-
         })
       final_sites <- data.table::rbindlist(final_sites, fill = TRUE)
     }
-    if (mode == "sparse") {
+    if (mode == "available-data") {
       final_sites <- unique(final_sites)
     }
 
@@ -1157,6 +1164,13 @@ process_aqs <-
         ),
         data.table = final_sites
       )
+    if (!is.null(extent)) {
+      if (return_format == "data.table") {
+        warning("Extent is not applicable for data.table. Returning data.table...\n")
+        return(final_sites)
+      }
+      final_sites <- apply_extent(final_sites, extent)
+    }
 
     return(final_sites)
   }

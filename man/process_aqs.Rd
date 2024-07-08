@@ -2,14 +2,15 @@
 % Please edit documentation in R/process.R
 \name{process_aqs}
 \alias{process_aqs}
-\title{Process unique U.S. EPA AQS sites}
+\title{Process U.S. EPA AQS daily CSV data}
 \usage{
 process_aqs(
   path = NULL,
   date = c("2018-01-01", "2022-12-31"),
-  mode = c("full", "sparse", "location"),
+  mode = c("date-location", "available-data", "location"),
   data_field = "Arithmetic.Mean",
   return_format = c("terra", "sf", "data.table"),
+  extent = NULL,
   ...
 )
 }
@@ -19,13 +20,20 @@ process_aqs(
 \item{date}{character(2). Start and end date.
 Should be in \code{"YYYY-MM-DD"} format and sorted.}
 
-\item{mode}{character(1). One of "full" (all dates * all locations)
-or "sparse" (date-location pairs with available data) or
-"location" (unique locations).}
+\item{mode}{character(1). One of
+\itemize{
+\item "date-location" (all dates * all locations)
+\item "available-data" (date-location pairs with available data)
+\item "location" (unique locations).
+}}
 
 \item{data_field}{character(1). Data field to extract.}
 
 \item{return_format}{character(1). \code{"terra"} or \code{"sf"} or \code{"data.table"}.}
+
+\item{extent}{numeric(4). Spatial extent of the resulting object.
+The order should be \code{c(xmin, xmax, ymin, ymax)}.
+The coordinate system should be WGS84 (EPSG:4326).}
 
 \item{...}{Placeholders.}
 }
@@ -34,7 +42,8 @@ a SpatVector, sf, or data.table object depending on the \code{return_format}
 }
 \description{
 The \code{process_aqs()} function cleans and imports raw air quality
-monitoring sites, returning a single \code{SpatVector} or sf object.
+monitoring sites from pre-generated daily CSV files, returning a single
+\code{SpatVector} or \code{sf} object.
 \code{date} is used to filter the raw data read from csv files.
 Filtered rows are then processed according to \code{mode} argument.
 Some sites report multiple measurements per day with and without
@@ -44,8 +53,9 @@ are multiple event types per site-time.
 }
 \note{
 Choose \code{date} and \code{mode} values with caution.
-The function may return a massive data.table, resulting in
-a long processing time or even a crash.
+The function may return a massive data.table depending on the time range,
+resulting in a long processing time or even a crash if data is too large
+for your computing environment to process.
 }
 \seealso{
 \itemize{
