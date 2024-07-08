@@ -1029,7 +1029,7 @@ download_narr <- function(
   stopifnot(
     all(
       seq(year[1], year[2], 1) %in%
-        seq(1979, as.numeric(substr(Sys.Date(), 1, 4)))
+        seq(1979, as.numeric(substr(Sys.Date(), 1, 4)), 1)
     )
   )
   years <- seq(year[1], year[2], 1)

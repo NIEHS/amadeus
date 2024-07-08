@@ -650,6 +650,8 @@ process_modis_swath <-
 #' @param path character(1). Path to Koppen-Geiger
 #'  climate zone raster file
 #' @param year data year. Not applicable for this function.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @returns a `SpatRaster` object
 #' @author Insang Song
@@ -659,10 +661,11 @@ process_koppen_geiger <-
   function(
     path = NULL,
     year = NULL,
+    extent = NULL,
     ...
   ) {
     # import data
-    kg_rast <- terra::rast(path)
+    kg_rast <- terra::rast(path, win = extent)
     # identify time period
     period <- strsplit(
       names(kg_rast),
@@ -731,6 +734,8 @@ process_nlcd <-
 #' The [`process_ecoregion`] function imports and cleans raw ecoregion
 #' data, returning a `SpatVector` object.
 #' @param path character(1). Path to Ecoregion Shapefiles
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @note The function will fix Tukey's bridge in Portland, ME.
 #' This fix will ensure that the EPA air quality monitoring sites
@@ -744,6 +749,7 @@ process_nlcd <-
 process_ecoregion <-
   function(
     path = NULL,
+    extent = NULL,
     ...
   ) {
     ecoreg <- sf::st_read(path)
@@ -767,7 +773,12 @@ process_ecoregion <-
       "1997 - ", data.table::year(Sys.time())
     )
     ecoreg <- terra::vect(ecoreg)
-    return(ecoreg)
+    if (!is.null(extent)) {
+      ecoreg_crop <- terra::crop(ecoreg, extent)
+      return(ecoreg_crop)
+    } else {
+      return(ecoreg)
+    }
   }
 
 
@@ -1161,6 +1172,8 @@ process_aqs <-
 #' The \code{process_secac_population()} function imports and cleans raw
 #' population density data, returning a single `SpatRaster` object.
 #' @param path character(1). Path to GeoTIFF (.tif) or netCDF (.nc) file.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @return a `SpatRaster` object
@@ -1169,6 +1182,7 @@ process_aqs <-
 # nolint end
 process_sedac_population <- function(
     path = NULL,
+    extent = NULL,
     ...) {
   if (substr(path, nchar(path) - 2, nchar(path)) == ".nc") {
     cat(paste0("netCDF functionality for SEDAC data is under construction.\n"))
@@ -1177,7 +1191,7 @@ process_sedac_population <- function(
   #### check for variable
   check_for_null_parameters(mget(ls()))
   #### import data
-  data <- terra::rast(path)
+  data <- terra::rast(path, win = extent)
   #### identify names
   names_raw <- names(data)
   #### create new names
@@ -1225,6 +1239,8 @@ process_sedac_population <- function(
 #' The \code{process_sedac_groads()} function imports and cleans raw road data,
 #' returning a single `SpatVector` object.
 #' @param path character(1). Path to geodatabase or shapefiles.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @note U.S. context. The returned `SpatVector` object contains a
 #' `$description` column to represent the temporal range covered by the
@@ -1236,6 +1252,7 @@ process_sedac_population <- function(
 # nolint end
 process_sedac_groads <- function(
     path = NULL,
+    extent = NULL,
     ...) {
   #### check for variable
   check_for_null_parameters(mget(ls()))
@@ -1243,7 +1260,7 @@ process_sedac_groads <- function(
     stop("Input is not in expected format.\n")
   }
   #### import data
-  data <- terra::vect(path)
+  data <- terra::vect(path, extent = extent)
   #### time period
   data$description <- "1980 - 2010"
   return(data)
@@ -1260,6 +1277,8 @@ process_sedac_groads <- function(
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
 #' @param variable character(1). "Light", "Medium", or "Heavy".
 #' @param path character(1). Directory with downloaded NOAA HMS data files.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @note
 #' \code{process_hms()} will return a character object if there are no wildfire
@@ -1283,6 +1302,7 @@ process_hms <- function(
     date = c("2018-01-01", "2018-01-01"),
     variable = c("Light", "Medium", "Heavy"),
     path = NULL,
+    extent = NULL,
     ...) {
   #### directory setup
   path <- download_sanitize_path(path)
@@ -1324,7 +1344,7 @@ process_hms <- function(
   #### process data
   data_return <- terra::vect()
   for (d in seq_along(data_paths)) {
-    data_date <- terra::vect(data_paths[d])
+    data_date <- terra::vect(data_paths[d], extent = extent)
     data_date_p <- terra::project(
       data_date,
       "EPSG:4326"
@@ -1448,6 +1468,8 @@ process_hms <- function(
 #' * Resolution options: "30 arc-seconds", "15 arc-seconds", "7.5 arc-seconds"
 #' @param path character(1). Directory with downloaded GMTED  "*_grd"
 #' folder containing .adf files.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @note
@@ -1460,6 +1482,7 @@ process_hms <- function(
 process_gmted <- function(
     variable = NULL,
     path = NULL,
+    extent = NULL,
     ...) {
   #### directory setup
   path <- download_sanitize_path(path)
@@ -1515,7 +1538,7 @@ process_gmted <- function(
   )
   data_path <- data_paths[grep("(_grd$|w001001.adf)", data_paths)]
   #### import data
-  data <- terra::rast(data_path)
+  data <- terra::rast(data_path, win = extent)
   #### layer name
   names(data) <- paste0(
     "elevation_",
@@ -1552,6 +1575,8 @@ process_gmted <- function(
 #' @param variable character(1). Variable name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
 #' @param path character(1). Directory with downloaded netCDF (.nc) files.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable acronym,
@@ -1568,6 +1593,7 @@ process_narr <- function(
     date = c("2023-09-01", "2023-09-01"),
     variable = NULL,
     path = NULL,
+    extent = NULL,
     ...) {
   #### directory setup
   path <- download_sanitize_path(path)
@@ -1635,7 +1661,7 @@ process_narr <- function(
   data_full <- terra::rast()
   for (p in seq_along(data_paths_ym)) {
     #### import data
-    data_year <- terra::rast(data_paths_ym[p])
+    data_year <- terra::rast(data_paths_ym[p], win = extent)
     cat(paste0(
       "Cleaning ",
       variable,
@@ -1769,6 +1795,8 @@ process_narr <- function(
 #' @param date character(2). length of 10. Format "YYYY-MM-DD".
 #' @param variable character(1). GEOS-CF variable name(s).
 #' @param path character(1). Directory with downloaded netCDF (.nc4) files.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable,
@@ -1785,6 +1813,7 @@ process_geos <-
   function(date = c("2018-01-01", "2018-01-01"),
            variable = NULL,
            path = NULL,
+           extent = NULL,
            ...) {
     #### directory setup
     path <- download_sanitize_path(path)
@@ -1945,6 +1974,8 @@ process_geos <-
 #' @param date character(2). length of 10. Format "YYYY-MM-DD".
 #' @param variable character(1). MERRA2 variable name(s).
 #' @param path character(1). Directory with downloaded netCDF (.nc4) files.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable,
@@ -1963,6 +1994,7 @@ process_merra2 <-
   function(date = c("2018-01-01", "2018-01-01"),
            variable = NULL,
            path = NULL,
+           extent = NULL,
            ...) {
     #### directory setup
     path <- download_sanitize_path(path)
@@ -2012,7 +2044,7 @@ process_merra2 <-
     data_return <- terra::rast()
     for (p in seq_along(data_paths)) {
       #### import .nc4 data
-      data_raw <- terra::rast(data_paths[p])
+      data_raw <- terra::rast(data_paths[p], win = extent)
       data_date <- process_collection(
         data_paths[p],
         source = "merra2",
@@ -2123,6 +2155,9 @@ process_merra2 <-
 #' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
 #' "Energy Release Component" has code "erc").
 #' @param path character(1). Directory with downloaded netCDF (.nc) files.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param ... Placeholders.
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable acronym,
 #' and date.
@@ -2136,7 +2171,9 @@ process_merra2 <-
 process_gridmet <- function(
     date = c("2023-09-01", "2023-09-01"),
     variable = NULL,
-    path = NULL) {
+    path = NULL,
+    extent = NULL,
+    ...) {
   #### directory setup
   path <- download_sanitize_path(path)
   #### check for variable
@@ -2187,7 +2224,7 @@ process_gridmet <- function(
   data_full <- terra::rast()
   for (p in seq_along(data_paths)) {
     #### import data
-    data_year <- terra::rast(data_paths[p])
+    data_year <- terra::rast(data_paths[p], win = extent)
     cat(paste0(
       "Cleaning daily ",
       variable_checked,
@@ -2271,6 +2308,9 @@ process_gridmet <- function(
 #' @param variable character(1). Variable name or acronym code. See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
 #' for variable names and acronym codes.
 #' @param path character(1). Directory with downloaded netCDF (.nc) files.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param ... Placeholders.
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable acronym, year,
 #' and month.
@@ -2287,7 +2327,9 @@ process_gridmet <- function(
 process_terraclimate <- function(
     date = c("2023-09-01", "2023-09-01"),
     variable = NULL,
-    path = NULL) {
+    path = NULL,
+    extent = NULL,
+    ...) {
   #### directory setup
   path <- download_sanitize_path(path)
   #### check for variable
@@ -2345,7 +2387,7 @@ process_terraclimate <- function(
   data_full <- terra::rast()
   for (p in seq_along(data_paths)) {
     #### import data
-    data_year <- terra::rast(data_paths[p])
+    data_year <- terra::rast(data_paths[p], win = extent)
     cat(paste0(
       "Cleaning monthly ",
       variable_checked_long,
@@ -2439,6 +2481,8 @@ process_terraclimate <- function(
 #' @param huc_level character(1). Field name of HUC level
 #' @param huc_header character(1). The upper level HUC code header to extract
 #'  lower level HUCs.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Arguments passed to `nhdplusTools::get_huc()`
 #' @returns a `SpatVector` object
 #' @seealso [`nhdplusTools::get_huc`]
@@ -2478,6 +2522,7 @@ process_huc <-
     layer_name = NULL,
     huc_level = NULL,
     huc_header = NULL,
+    extent = NULL,
     ...
   ) {
     # exclude the coverage due to write permission related to memoization
@@ -2512,7 +2557,13 @@ process_huc <-
         )
       }
 
-      hucpoly <- try(terra::vect(path, query = querybase))
+      hucpoly <- try(
+        terra::vect(
+          path,
+          query = querybase,
+          extent = extent
+        )
+      )
     }
     return(hucpoly)
   }
@@ -2525,6 +2576,8 @@ process_huc <-
 #' returning a single `SpatRaster` object.
 #' @param path character giving CropScape data path
 #' @param year numeric giving the year of CropScape data used
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @description Reads CropScape file of selected `year`.
 #' @returns a `SpatRaster` object
@@ -2537,6 +2590,7 @@ process_cropscape <-
   function(
     path = NULL,
     year = 2021,
+    extent = NULL,
     ...
   ) {
     # check inputs
@@ -2557,7 +2611,7 @@ process_cropscape <-
     } else {
       cdl_file <- path
     }
-    cdl <- terra::rast(cdl_file)
+    cdl <- terra::rast(cdl_file, win = extent)
     terra::metags(cdl) <- c(year = year)
     return(cdl)
   }
@@ -2573,6 +2627,8 @@ process_cropscape <-
 #' @param time character(1). PRISM time name.
 #' Should be character in length of 2, 4, 6, or 8.
 #' "annual" is acceptable.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @description Reads time series or 30-year normal PRISM data.
 #' @returns a `SpatRaster` object with metadata of time and element.
@@ -2588,6 +2644,7 @@ process_prism <-
     path = NULL,
     element = NULL,
     time = NULL,
+    extent = NULL,
     ...
   ) {
     # check inputs
@@ -2616,7 +2673,7 @@ process_prism <-
     } else {
       prism_file <- path
     }
-    prism <- terra::rast(prism_file)
+    prism <- terra::rast(prism_file, win = extent)
     terra::metags(prism) <- c(time = time, element = element)
     return(prism)
   }
@@ -2625,6 +2682,8 @@ process_prism <-
 
 #' Process OpenLandMap data
 #' @param path character giving OpenLandMap data path
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @returns a `SpatRaster` object
 #' @author Insang Song
@@ -2633,12 +2692,13 @@ process_prism <-
 process_olm <-
   function(
     path = NULL,
+    extent = NULL,
     ...
   ) {
     # check inputs
     if (!is.character(path) || is.null(path)) {
       stop("path is not a character.")
     }
-    olm <- terra::rast(path)
+    olm <- terra::rast(path, win = extent)
     return(olm)
   }

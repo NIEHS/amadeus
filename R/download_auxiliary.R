@@ -222,6 +222,9 @@ download_remove_zips <-
 check_for_null_parameters <-
   function(
       parameters) {
+    if ("extent" %in% names(parameters)) {
+      parameters <- parameters[-grep("extent", names(parameters))]
+    }
     parameters_status <- any(unlist(lapply(parameters, is.null)))
     if (parameters_status) {
       stop(paste0("One or more parameters are NULL\n"))
