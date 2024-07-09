@@ -41,7 +41,7 @@ Utilize [Issues](https://github.com/NIEHS/amadeus/issues) to notify the authors 
 | Data Source | File Type | Data Genre |
 | :---- | :-- | :--- |
 | [Climatology Lab TerraClimate](https://www.climatologylab.org/terraclimate.html) | netCDF | Meteorology |
-| [Climatology Lab GridMet](https://www.climatologylab.org/gridmet.html) | netCDF | Cliamte<br>Water |
+| [Climatology Lab GridMet](https://www.climatologylab.org/gridmet.html) | netCDF | Climate<br>Water |
 | [Köppen-Geiger Climate Classification](https://www.nature.com/articles/sdata2018214) | GeoTIFF | Climate Classification |
 | [MRLC[^1] Consortium National Land Cover Database (NLCD)](https://www.mrlc.gov/data) | GeoTIFF | Land Use |
 | [NASA[^2] Moderate Resolution Imaging Spectroradiometer (MODIS)](https://modis.gsfc.nasa.gov/data/) | HDF | Atmosphere<br>Meteorology<br>Land Use<br>Satellite |
