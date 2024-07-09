@@ -64,8 +64,7 @@ Example use of `download_data` using NOAA NCEP North American Regional Reanalysi
 > directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
 > download_data(
 +   dataset_name = "narr_monolevel",
-+   year_start = 2022,
-+   year_end = 2022,
++   year = c(2022, 2022),
 +   variable = "weasd",
 +   directory_to_save = directory,
 +   acknowledgement = TRUE,
@@ -90,7 +89,8 @@ Example use of `process_covariates` using the downloaded "weasd" data.
 +   covariate = "narr",
 +   date = c("2022-01-01", "2022-01-05"),
 +   variable = "weasd",
-+   path = paste0(directory, "weasd")
++   path = paste0(directory, "weasd"),
++   extent = NULL
 + )
 Cleaning weasd data for January, 2022...
 Detected monolevel data...
