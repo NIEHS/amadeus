@@ -55,6 +55,101 @@ Utilize [Issues](https://github.com/NIEHS/amadeus/issues) to notify the authors 
 | [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregion) | Shapefile | Climate Regions |
 | [USGS Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation |
 
+```{r, echo = FALSE, message = FALSE}
+library(knitr); library(kableExtra)
+source <- c(
+  "Climatology Lab TerraClimate",
+  "Climatology Lab GridMet",
+  "Köppen-Geiger Climate Classification",
+  "MRLC\\footnote{Multi-Resolution Land Characteristics} Consortium National Land Cover Database (NLCD)",
+  "NASA Moderate Resolution Imaging Spectroradiometer (MODIS)",
+  "NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)",
+  "NASA SEDAC\\footnote{Socioeconomic Data and Applications Center} UN WPP-Adjusted Population Density",
+  "NASA SEDAC Global Roads Open Access Data Set",
+  "NASA Goddard Earth Observing System Composition Forecasting (GEOS-CF)",
+  "NOAA Hazard Mapping System Fire and Smoke Product",
+  "NOAA NCEP\\footnote{National Centers for Environmental Protection} North American Regional Reanalysis (NARR)",
+  "OpenGeoHub Foundation OpenLandMap",
+  "Parameter Elevation Regression on Independent Slopes Model (PRISM)",
+  "US EPA\\footnote{United States Environmental Protection Agency} Air Data Pre-Generated Data Files",
+  "US EPA Ecoregions",
+  "US EPA National Emissions Inventory (NEI)",
+  "US EPA Toxic Release Inventory (TRI) Program",
+  "USGS\\footnote{United States Geological Survey} Global Multi-Resolution Terrain Elevation Data (GMTED2010)",
+  "USGS National Hydrography Dataset (NHD)"
+)
+link <- c(
+  "https://aqs.epa.gov/aqsweb/airdata/download_files.html",
+  "https://www.epa.gov/eco-research/ecoregions",
+  "https://gmao.gsfc.nasa.gov/GEOS_systems/",
+  "https://www.usgs.gov/coastal-changes-and-impacts/gmted2010",
+  "https://www.nature.com/articles/sdata2018214",
+  "https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/",
+  "https://psl.noaa.gov/data/gridded/data.narr.html",
+  "https://www.mrlc.gov/data",
+  "https://www.ospo.noaa.gov/Products/land/hms.html#0",
+  paste0(
+    "https://sedac.ciesin.columbia.edu/data/set/groads-",
+    "global-roads-open-access-v1/data-download"
+  ),
+  paste0(
+    "https://sedac.ciesin.columbia.edu/data/set/gpw-v4-",
+    "population-density-adjusted-to-2015-unwpp-country-",
+    "totals-rev11"
+  ),
+  "https://modis.gsfc.nasa.gov/data/",
+  "https://www.climatologylab.org/terraclimate.html",
+  "https://www.climatologylab.org/gridmet.html",
+  "https://opengeohub.org/about-openlandmap/",
+  paste0(
+    "https://elibrary.asabe.org/abstract.asp??JID=3&",
+    "AID=3101&CID=t2000&v=43&i=6&T=1"
+  ),
+  "https://www.epa.gov/air-emissions-inventories",
+  paste0(
+    "https://www.epa.gov/toxics-release-inventory-tri-program/",
+    "tri-basic-data-files-calendar-years-1987-present"
+  ),
+  "https://www.sciencebase.gov/catalog/item/4f5545cce4b018de15819ca9"
+)
+source_link <- paste0(
+  "[",
+  source,
+  "](",
+  link,
+  ")"
+)
+type <- linebreak(c(
+  "netCDF", "netCDF", "GeoTIFF", "GeoTIFF", "HDF", "netCDF", "GeoTIFF\nnetCDF",
+  "Shapefile\nGeodatabase", "netCDF", "Shapefile\nKML", "netCDF", "GeoTIFF", 
+  "BIL\\footnote{binary interleaved by line}\nASCII\\footnote{American Standard Code for Information Interchange}",
+  "CSV", "Shapefile", "CSV", "CSV", "ESRI ASCII Grid", "Geopackage\nGeodatabase"
+))
+compress <- c(
+  "No", "No", "Yes", "Yes", "No", "No", "Yes", "Yes", "No", "Yes",
+  "No", "No", "Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes"
+)
+genre <- linebreak(c(
+  "Meteorology", "Climate\nWater", "Climate Classification",
+  "Land Use", "Atmosphere\nMeteorology\nLand Use\nSatellite",
+  "Atmosphere\nMeteorology", "Population", "Roadways",
+  "Atmosphere\nMeteorology", "Wildfire Smoke", "Atmosphere\nMeteorology",
+  "Climate\nElevation\nSoil\nLand Use\nSatellite", "Climate",
+  "Air Pollution", "Climate Regions", "Emissions", "Chemicals\nPollution", "Elevation",
+  "Hydrography"
+))
+tds <- data.frame(source_link, type, compress, genre)
+colnames(tds) <- c(
+  "Data Source",
+  "File Type",
+  "Zip File\\footnote{Indicates whether the data file is downloaded from the web URL as a zip file}",
+  "Data Genre"
+)
+kable(
+  tds,
+  booktabs = TRUE
+)
+```
 
 See the "download_data and NASA EarthData Account" vignette for a detailed description of source-specific download functions.
 
@@ -63,7 +158,7 @@ Example use of `download_data` using NOAA NCEP North American Regional Reanalysi
 ```
 > directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
 > download_data(
-+   dataset_name = "narr_monolevel",
++   dataset_name = "narr",
 +   year = c(2022, 2022),
 +   variable = "weasd",
 +   directory_to_save = directory,
