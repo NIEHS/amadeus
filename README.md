@@ -55,7 +55,7 @@ Utilize [Issues](https://github.com/NIEHS/amadeus/issues) to notify the authors 
 | [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregion) | Shapefile | Climate Regions |
 | [USGS Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation |
 
-```{r, echo = FALSE, message = FALSE}
+```r, echo = FALSE, message = FALSE
 library(knitr); library(kableExtra)
 source <- c(
   "Climatology Lab TerraClimate",
