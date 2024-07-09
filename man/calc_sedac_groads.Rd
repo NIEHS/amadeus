@@ -28,17 +28,14 @@ containing identifier for each unique coordinate location.}
 \item{fun}{function(1). Function used to summarize the length of roads
 within sites location buffer (Default is \code{sum}).}
 
-\item{geom}{logical(1). Should the geometry of \code{locs} be returned in the
-\code{data.frame}? Default is \code{FALSE}. If \code{geom = TRUE} and \code{locs} contain
-polygon geometries, the \verb{$geometry} column in the returned data frame may
-make the \code{data.frame} difficult to read due to long geometry strings. The
-coordinate reference system of the \verb{$geometry} is the coordinate
-reference system of \code{from}.}
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.}}
 
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame object with three columns.
+a data.frame or SpatVector object
 }
 \description{
 Prepared groads data is clipped with the buffer polygons
@@ -51,6 +48,19 @@ is used to convert the unit of length to meters.
 Unit is km / sq km. The returned \code{data.frame} object contains a
 \verb{$time} column to represent the temporal range covered by the
 dataset. For more information, see \url{https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata}.
+}
+\examples{
+\dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+calc_sedac_groads(
+  from = groads, # derived from process_sedac_groads() example
+  locs = loc,
+  locs_id = "id",
+  radius = 1000,
+  fun = "sum",
+  geom = FALSE
+)
+}
 }
 \seealso{
 \code{\link{process_sedac_groads}}

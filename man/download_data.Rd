@@ -7,8 +7,8 @@
 download_data(
   dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "gmted", "koppen",
     "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd", "noaa", "sedac_groads",
-    "sedac_population", "groads", "population", "plevels", "hms", "smoke", "tri", "nei",
-    "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "olm", "openlandmap"),
+    "sedac_population", "groads", "population", "hms", "smoke", "tri", "nei", "gridmet",
+    "terraclimate", "huc", "cropscape", "cdl", "prism", "olm", "openlandmap"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   ...
@@ -32,6 +32,19 @@ The \code{download_data()} function accesses and downloads atmospheric, meteorol
 \note{
 \itemize{
 \item All download function names are in \code{download_*} formats
+}
+}
+\examples{
+\dontrun{
+download_data(
+  dataset_name = "narr",
+  variables = "weasd",
+  year = c(2023, 2023),
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_commands = TRUE
+)
 }
 }
 \seealso{

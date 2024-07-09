@@ -28,17 +28,14 @@ containing identifier for each unique coordinate location.}
 \item{fun}{character(1). Function used to summarize multiple raster cells
 within sites location buffer (Default = \code{mean}).}
 
-\item{geom}{logical(1). Should the geometry of \code{locs} be returned in the
-\code{data.frame}? Default is \code{FALSE}. If \code{geom = TRUE} and \code{locs} contain
-polygon geometries, the \verb{$geometry} column in the returned data frame may
-make the \code{data.frame} difficult to read due to long geometry strings. The
-coordinate reference system of the \verb{$geometry} is the coordinate
-reference system of \code{from}.}
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.}}
 
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame object
+a data.frame or SpatVector object
 }
 \description{
 Extract TerraClimate values at point locations. Returns a \code{data.frame}
@@ -50,6 +47,19 @@ circular buffer radius.
 TerraClimate data has monthly temporal resolution, so the \verb{$time} column
 will contain the year and month in YYYYMM format (ie. January, 2018 =
 201801).
+}
+\examples{
+\dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+calc_terraclimate(
+  from = terraclimate, # derived from process_terraclimate() example
+  locs = loc,
+  locs_id = "id",
+  radius = 0,
+  fun = "mean",
+  geom = FALSE
+)
+}
 }
 \seealso{
 \code{\link[=process_terraclimate]{process_terraclimate()}}

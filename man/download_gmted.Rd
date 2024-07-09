@@ -54,6 +54,18 @@ The \code{download_gmted()} function accesses and downloads Global
 Multi-resolution Terrain Elevation Data (GMTED2010) from
 \href{https://www.usgs.gov/coastal-changes-and-impacts/gmted2010}{U.S. Geological Survey and National Geospatial-Intelligence Agency}.
 }
+\examples{
+\dontrun{
+download_gmted(
+  statistic = "Breakline Emphasis",
+  resolution = "7.5 arc-seconds",
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
+}
 \author{
 Mitchell Manware, Insang Song
 }

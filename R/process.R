@@ -36,6 +36,15 @@
 #' @returns `SpatVector`, `SpatRaster`, `sf`, or `character` depending on
 #' covariate type and selections.
 #' @author Insang Song
+#' @examples
+#' \dontrun{
+#' narr <- process_covariates(
+#'   covariate = "narr",
+#'   date = c("2023-01-01", "2023-01-10"),
+#'   variable = "weasd",
+#'   path = "./data/weasd"
+#' )
+#' }
 #' @export
 # nolint end
 process_covariates <-
@@ -656,6 +665,12 @@ process_modis_swath <-
 #' @returns a `SpatRaster` object
 #' @author Insang Song
 #' @importFrom terra rast
+#' @examples
+#' \dontrun{
+#' kg <- process_koppen_geiger(
+#'   path = "./data/koppen_geiger_data.tif"
+#' )
+#' }
 #' @export
 process_koppen_geiger <-
   function(
@@ -695,6 +710,13 @@ process_koppen_geiger <-
 #' @importFrom utils read.csv
 #' @importFrom terra rast
 #' @importFrom terra metags
+#' @examples
+#' \dontrun{
+#' nlcd <- process_nlcd(
+#'   path = "./data/",
+#'   year = 2021
+#' )
+#' }
 #' @export
 process_nlcd <-
   function(
@@ -745,6 +767,12 @@ process_nlcd <-
 #' @importFrom terra vect
 #' @importFrom sf st_read st_crs st_as_sfc st_transform st_intersects st_union
 #' @importFrom data.table year
+#' @examples
+#' \dontrun{
+#' ecoregion <- process_ecoregion(
+#'   path = "./data/epa_ecoregion.gpkg"
+#' )
+#' }
 #' @export
 process_ecoregion <-
   function(
@@ -815,6 +843,14 @@ process_ecoregion <-
 #' @importFrom dplyr summarize
 #' @importFrom tidyr pivot_wider
 #' @importFrom stats setNames
+#' @examples
+#' \dontrun{
+#' tri <- process_tri(
+#'   path = "./data",
+#'   year = 2020,
+#'   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49)
+#' )
+#' }
 # nolint end
 #' @export
 process_tri <- function(
@@ -910,6 +946,14 @@ process_tri <- function(
 #' @importFrom data.table .SD
 #' @importFrom data.table fread
 #' @importFrom data.table rbindlist
+#' @examples
+#' \dontrun{
+#' nei <- process_nei(
+#'   path = "./data",
+#'   county = system.file("gpkg/nc.gpkg", package = "sf"),
+#'   year = 2017
+#' )
+#' }
 #' @export
 # nolint end
 process_nei <- function(
@@ -1016,6 +1060,15 @@ process_nei <- function(
 #' @note Choose `date` and `mode` values with caution.
 #' The function may return a massive data.table, resulting in
 #' a long processing time or even a crash.
+#' @examples
+#' \dontrun{
+#' aqs <- process_aqs(
+#'   path = "./data/aqs_daily_example.csv",
+#'   date = c("2022-12-01", "2023-01-31"),
+#'   mode = "full",
+#'   return_format = "terra"
+#' )
+#' }
 #' @export
 process_aqs <-
   function(
@@ -1178,6 +1231,12 @@ process_aqs <-
 #' @author Mitchell Manware
 #' @return a `SpatRaster` object
 #' @importFrom terra rast
+#' @examples
+#' \dontrun{
+#' pop <- process_sedac_population(
+#'   path = "./data/sedac_population_example.tif"
+#' )
+#' }
 #' @export
 # nolint end
 process_sedac_population <- function(
@@ -1248,6 +1307,12 @@ process_sedac_population <- function(
 #' @author Insang Song
 #' @returns a `SpatVector` object
 #' @importFrom terra vect
+#' @examples
+#' \dontrun{
+#' groads <- process_sedac_groads(
+#'   path = "./data/groads_example.shp"
+#' )
+#' }
 #' @export
 # nolint end
 process_sedac_groads <- function(
@@ -1286,7 +1351,7 @@ process_sedac_groads <- function(
 #' character will contain the selected density value and the sequence of dates
 #' for which no wildfire smoke plumes were detected (see "Examples").
 #' @examples
-#' process_hms(
+#' hms <- process_hms(
 #'   date = c("2018-12-30", "2019-01-01"),
 #'   variable = "Light",
 #'   path = "../tests/testdata/hms/"
@@ -1478,6 +1543,13 @@ process_hms <- function(
 #' @return a `SpatRaster` object
 #' @importFrom terra rast
 #' @importFrom terra varnames
+#' @examples
+#' \dontrun{
+#' gmted <- process_gmted(
+#'   variable = c("Breakline Emphasis", "7.5 arc-seconds"),
+#'   path = "./data/be75_grd"
+#' )
+#' }
 #' @export
 process_gmted <- function(
     variable = NULL,
@@ -1587,6 +1659,14 @@ process_gmted <- function(
 #' @importFrom terra time
 #' @importFrom terra subset
 #' @importFrom stringi stri_pad
+#' @examples
+#' \dontrun{
+#' narr <- process_narr(
+#'   date = c("2022-01-01", "2022-01-10"),
+#'   variable = "weasd",
+#'   path = "./data/weasd"
+#' )
+#' }
 #' @export
 # nolint end
 process_narr <- function(
@@ -1808,6 +1888,14 @@ process_narr <- function(
 #' @importFrom terra varnames
 #' @importFrom terra crs
 #' @importFrom terra subset
+#' @examples
+#' \dontrun{
+#' geos <- process_geos(
+#'   date = c("2024-01-01", "2024-01-10"),
+#'   variable = "O3",
+#'   path = "./data/aqc_tavg_1hr_g1440x721_v1"
+#' )
+#' }
 #' @export
 process_geos <-
   function(date = c("2018-01-01", "2018-01-01"),
@@ -1989,6 +2077,14 @@ process_geos <-
 #' @importFrom terra names
 #' @importFrom terra crs
 #' @importFrom terra subset
+#' @examples
+#' \dontrun{
+#' merra2 <- process_merra2(
+#'   date = c("2024-01-01", "2024-01-10"),
+#'   variable = "CPT",
+#'   path = "./data/inst1_2d_int_Nx"
+#' )
+#' }
 #' @export
 process_merra2 <-
   function(date = c("2018-01-01", "2018-01-01"),
@@ -2166,6 +2262,14 @@ process_merra2 <-
 #' @importFrom terra rast
 #' @importFrom terra time
 #' @importFrom terra subset
+#' @examples
+#' \dontrun{
+#' gridmet <- process_gridmet(
+#'   date = c("2023-01-01", "2023-01-10"),
+#'   variable = "Precipitation",
+#'   path = "./data/pr"
+#' )
+#' }
 #' @export
 # nolint end
 process_gridmet <- function(
@@ -2322,6 +2426,14 @@ process_gridmet <- function(
 #' @importFrom terra rast
 #' @importFrom terra time
 #' @importFrom terra subset
+#' @examples
+#' \dontrun{
+#' terraclimate <- process_terraclimate(
+#'   date = c("2023-01-01", "2023-01-10"),
+#'   variable = "Precipitation",
+#'   path = "./data/ppt"
+#' )
+#' }
 #' @export
 # nolint end
 process_terraclimate <- function(
@@ -2585,6 +2697,13 @@ process_huc <-
 #' @importFrom utils read.csv
 #' @importFrom terra rast
 #' @importFrom terra metags
+#' @examples
+#' \dontrun{
+#' cropscape <- process_cropscape(
+#'   path = "./data/cropscape_example.tif",
+#'   year = 2020
+#' )
+#' }
 #' @export
 process_cropscape <-
   function(
@@ -2637,6 +2756,14 @@ process_cropscape <-
 #' @importFrom utils read.csv
 #' @importFrom terra rast
 #' @importFrom terra metags
+#' @examples
+#' \dontrun{
+#' prism <- process_prism(
+#'   path = "./data/PRISM_ppt_stable_4kmM3_202104_nc.nc",
+#'   element = "ppt",
+#'   time = "202104"
+#' )
+#' }
 #' @export
 # nolint start
 process_prism <-
@@ -2688,6 +2815,15 @@ process_prism <-
 #' @returns a `SpatRaster` object
 #' @author Insang Song
 #' @importFrom terra rast
+#' @examples
+#' \dontrun{
+#' olm <- process_olm(
+#'   path = paste0(
+#'     "./data/no2_s5p.l3.trop.tmwm.p50_p90_2km_a_",
+#'     "20180501_20221130_go_epsg.4326_v20221219.tif"
+#'  )
+#' )
+#' }
 #' @export
 process_olm <-
   function(

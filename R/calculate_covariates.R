@@ -36,6 +36,17 @@
 #' - [`calc_terraclimate`]: `"terraclimate"`, `"TerraClimate"`
 #' @return Calculated covariates as a data.frame or SpatVector object
 #' @author Insang Song
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_covariates(
+#'   covariate = "narr",
+#'   from = narr, # derived from process_covariates() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 # nolint end
 calc_covariates <-
@@ -138,6 +149,16 @@ calc_covariates <-
 #' @importFrom terra coltab
 #' @importFrom terra merge
 #' @importFrom methods is
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_koppen_geiger(
+#'   from = kg, # derived from process_koppen_geiger() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 # locs (locs), from (from), locs_id (id_col), variables
 calc_koppen_geiger <-
@@ -285,6 +306,17 @@ calc_koppen_geiger <-
 #' @importFrom future plan multicore sequential
 #' @importFrom future.apply future_Map
 #' @importFrom collapse rowbind
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_nlcd(
+#'   from = nlcd, # derived from process_nlcd() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   mode = "exact",
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 calc_nlcd <- function(from,
                       locs,
@@ -437,6 +469,16 @@ calc_nlcd <- function(from,
 #' @author Insang Song
 #' @importFrom terra extract
 #' @importFrom data.table year
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_ecoregion(
+#'   from = ecoregion, # derived from process_ecoregion() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 calc_ecoregion <-
   function(
@@ -900,6 +942,15 @@ process_modis_swath, or process_bluemarble.")
 #' @importFrom data.table year
 #' @importFrom data.table month
 #' @importFrom data.table as.data.table
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_temporal_dummies(
+#'   locs = loc,
+#'   locs_id = "id",
+#'   year = seq(2018L, 2022L)
+#' )
+#' }
 #' @export
 calc_temporal_dummies <-
   function(
@@ -1141,6 +1192,16 @@ The result may not be accurate.\n",
 #' @importFrom dplyr group_by
 #' @importFrom dplyr ungroup
 #' @importFrom dplyr summarize
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_tri(
+#'   from = tri, # derived from process_tri() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = c(1e3L, 1e4L, 5e4L)
+#' )
+#' }
 #' @export
 calc_tri <- function(
   from = NULL,
@@ -1206,6 +1267,15 @@ calc_tri <- function(
 #' @importFrom methods is
 #' @importFrom terra project
 #' @importFrom terra intersect
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_nei(
+#'   from = nei, # derived from process_nei example,
+#'   locs = loc,
+#'   locs_id = "id"
+#' )
+#' }
 #' @export
 calc_nei <- function(
   from = NULL,
@@ -1254,6 +1324,17 @@ calc_nei <- function(
 #' @importFrom terra extract
 #' @importFrom terra nlyr
 #' @importFrom terra crs
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_hms(
+#'   from = hms, # derived from process_hms() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 calc_hms <- function(
     from,
@@ -1472,6 +1553,18 @@ calc_hms <- function(
 #' @importFrom terra extract
 #' @importFrom terra nlyr
 #' @importFrom terra crs
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_gmted(
+#'   from = gmted, # derived from process_gmted() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 calc_gmted <- function(
     from,
@@ -1581,6 +1674,18 @@ calc_gmted <- function(
 #' @importFrom terra extract
 #' @importFrom terra nlyr
 #' @importFrom terra crs
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_narr(
+#'   from = narr, # derived from process_narr() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 calc_narr <- function(
     from,
@@ -1662,6 +1767,18 @@ calc_narr <- function(
 #' @importFrom terra extract
 #' @importFrom terra nlyr
 #' @importFrom terra crs
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_geos(
+#'   from = geos, # derived from process_geos() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 calc_geos <- function(
     from,
@@ -1727,6 +1844,18 @@ calc_geos <- function(
 #' @seealso [process_sedac_population()]
 #' @return a data.frame or SpatVector object
 #' @importFrom methods is
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_sedac_population(
+#'   from = pop, # derived from process_sedac_population() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 calc_sedac_population <- function(
     from,
@@ -1830,6 +1959,18 @@ calc_sedac_population <- function(
 #' @importFrom terra expanse
 #' @importFrom terra linearUnits
 #' @importFrom methods is
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_sedac_groads(
+#'   from = groads, # derived from process_sedac_groads() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 1000,
+#'   fun = "sum",
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 calc_sedac_groads <- function(
     from = NULL,
@@ -1932,6 +2073,18 @@ calc_sedac_groads <- function(
 #' @importFrom terra extract
 #' @importFrom terra nlyr
 #' @importFrom terra crs
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_merra2(
+#'   from = merra2, # derived from process_merra2() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 calc_merra2 <- function(
     from,
@@ -2009,6 +2162,18 @@ calc_merra2 <- function(
 #' @importFrom terra extract
 #' @importFrom terra nlyr
 #' @importFrom terra crs
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_gridmet(
+#'   from = gridmet, # derived from process_gridmet() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 calc_gridmet <- function(
     from,
@@ -2082,6 +2247,18 @@ calc_gridmet <- function(
 #' @importFrom terra extract
 #' @importFrom terra nlyr
 #' @importFrom terra crs
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calc_terraclimate(
+#'   from = terraclimate, # derived from process_terraclimate() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' }
 #' @export
 calc_terraclimate <- function(
     from = NULL,
@@ -2148,6 +2325,25 @@ calc_terraclimate <- function(
 #' lag, buffer radius format adopted in \code{calc_setcolumns()}.
 #' @return a `data.frame` object
 #' @importFrom dplyr lag
+#' @examples
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' terracliamte_covar <- calc_terraclimate(
+#'   from = terraclimate, # derived from process_terraclimate() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' calc_lagged(
+#'   from = terracliamte_covar,
+#'   locs_id = "id",
+#'   date = c("2023-01-02", "2023-01-10"),
+#'   lag = 1,
+#'   time_id = "time"
+#' )
+#' }
 #' @export
 calc_lagged <- function(
     from,

@@ -8,6 +8,7 @@ process_hms(
   date = c("2018-01-01", "2018-01-01"),
   variable = c("Light", "Medium", "Heavy"),
   path = NULL,
+  extent = NULL,
   ...
 )
 }
@@ -19,6 +20,9 @@ Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 \item{variable}{character(1). "Light", "Medium", or "Heavy".}
 
 \item{path}{character(1). Directory with downloaded NOAA HMS data files.}
+
+\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
+if \code{NULL} (default), the entire raster is loaded}
 
 \item{...}{Placeholders.}
 }
@@ -36,7 +40,7 @@ character will contain the selected density value and the sequence of dates
 for which no wildfire smoke plumes were detected (see "Examples").
 }
 \examples{
-process_hms(
+hms <- process_hms(
   date = c("2018-12-30", "2019-01-01"),
   variable = "Light",
   path = "../tests/testdata/hms/"

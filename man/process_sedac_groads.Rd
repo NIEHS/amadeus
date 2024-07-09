@@ -4,10 +4,13 @@
 \alias{process_sedac_groads}
 \title{Process roads data}
 \usage{
-process_sedac_groads(path = NULL, ...)
+process_sedac_groads(path = NULL, extent = NULL, ...)
 }
 \arguments{
 \item{path}{character(1). Path to geodatabase or shapefiles.}
+
+\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
+if \code{NULL} (default), the entire raster is loaded}
 
 \item{...}{Placeholders.}
 }
@@ -22,6 +25,13 @@ returning a single \code{SpatVector} object.
 U.S. context. The returned \code{SpatVector} object contains a
 \verb{$description} column to represent the temporal range covered by the
 dataset. For more information, see \url{https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata}.
+}
+\examples{
+\dontrun{
+groads <- process_sedac_groads(
+  path = "./data/groads_example.shp"
+)
+}
 }
 \author{
 Insang Song

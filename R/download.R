@@ -35,6 +35,18 @@
 #' * \code{\link{download_gridmet}}: `"gridMET"`, `"gridmet"`
 #' * \code{\link{download_terraclimate}}: `"TerraClimate"`, `"terraclimate"`
 #' @returns NULL
+#' @examples
+#' \dontrun{
+#' download_data(
+#'   dataset_name = "narr",
+#'   variables = "weasd",
+#'   year = c(2023, 2023),
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_commands = TRUE
+#' )
+#' }
 #' @export
 download_data <-
   function(
@@ -111,7 +123,6 @@ download_data <-
 #' @param parameter_code integer(1). length of 5.
 #'  EPA pollutant parameter code. For details, please refer to
 #'  [AQS parameter codes](https://aqs.epa.gov/aqsweb/documents/codetables/parameters.html)
-# nolint end
 #' @param resolution_temporal character(1).
 #'  Name of column containing POC values.
 #'  Currently, no value other than `"daily"` works.
@@ -136,6 +147,19 @@ download_data <-
 #' @author Mariana Kassien, Insang Song, Mitchell Manware
 #' @returns NULL; Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_aqs(
+#'   parameter_code = 88101,
+#'   resolution_temporal = "daily",
+#'   year = c(2022, 2023),
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
+# nolint end
 #' @export
 download_aqs <-
   function(
@@ -290,6 +314,15 @@ download_aqs <-
 #' @returns NULL; Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom utils download.file
+#' @examples
+#' \dontrun{
+#' download_ecoregion(
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 download_ecoregion <- function(
   epa_certificate_path =
@@ -387,7 +420,6 @@ download_ecoregion <- function(
 #' @description
 #' The \code{download_geos()} function accesses and downloads various
 #' atmospheric composition collections from [NASA's Global Earth Observing System (GEOS) model](https://gmao.gsfc.nasa.gov/GEOS_systems/).
-# nolint end
 #' @param collection character(1). GEOS-CF data collection file name.
 #' @param date character(2). length of 10 each. Start/end date for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
@@ -406,7 +438,19 @@ download_ecoregion <- function(
 #' @author Mitchell Manware, Insang Song
 #' @return NULL; netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_geos(
+#'   collection = "aqc_tavg_1hr_g1440x721_v1",
+#'   date = c("2024-01-01", "2024-01-05"),
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
+# nolint end
 # nolint start: cyclocomp
 download_geos <- function(
     collection =
@@ -565,6 +609,17 @@ download_geos <- function(
 # nolint end
 #' @returns NULL; Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_gmted(
+#'   statistic = "Breakline Emphasis",
+#'   resolution = "7.5 arc-seconds",
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 download_gmted <- function(
   statistic = c(
@@ -703,6 +758,17 @@ download_gmted <- function(
 #' @author Mitchell Manware, Insang Song
 #' @return NULL; netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_merra2(
+#'   collection = "inst1_2d_int_Nx",
+#'   date = c("2024-01-01", "2024-01-05"),
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -1005,6 +1071,17 @@ download_merra2 <- function(
 #' @author Mitchell Manware, Insang Song
 #' @return NULL; netCDF (.nc) files will be stored in
 #' \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_narr(
+#'   variables = c("weasd", "omega"),
+#'   year = c(2022, 2023),
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -1139,6 +1216,17 @@ download_narr <- function(
 #' @author Mitchell Manware, Insang Song
 #' @returns NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_nlcd(
+#'   collection = "Coterminous United States",
+#'   year = 2021,
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 download_nlcd <- function(
   collection = "Coterminous United States",
@@ -1283,6 +1371,17 @@ download_nlcd <- function(
 #' @author Mitchell Manware, Insang Song
 #' @returns NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_sedac_groads(
+#'   data_region = "Americas",
+#'   data_format = "Shapefile",
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 download_sedac_groads <- function(
     data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
@@ -1427,6 +1526,18 @@ download_sedac_groads <- function(
 # nolint end
 #' @returns NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_sedac_population(
+#'   data_resolution = "30 second",
+#'   data_format = "GeoTIFF",
+#'   year = "2020",
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 download_sedac_population <- function(
   data_resolution = "60 minute",
@@ -1578,9 +1689,9 @@ download_sedac_population <- function(
 #' @description
 #' The \code{download_hms()} function accesses and downloads
 #' wildfire smoke plume coverage data from [NOAA's Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0).
-# nolint end
 #' @param data_format character(1). "Shapefile" or "KML".
 #' @param date character(2). length of 10 each. Start/end date for downloading data.
+# nolint end
 #' @param directory_to_save character(1). Directory to save data. If
 #' `data_format = "Shapefile"`, two sub-directories will be created for the
 #' downloaded zip files ("/zip_files") and the unzipped shapefiles
@@ -1604,8 +1715,19 @@ download_sedac_population <- function(
 #' @importFrom utils head
 #' @importFrom utils tail
 #' @author Mitchell Manware, Insang Song
-##' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @returns NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_hms(
+#'   data_format = "Shapefile",
+#'   date = c("2024-01-01", "2024-01-05"),
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 # nolint start: cyclocomp
 download_hms <- function(
@@ -1778,6 +1900,18 @@ download_hms <- function(
 #' @author Mitchell Manware, Insang Song
 #' @returns NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_koppen_geiger(
+#'   data_resolution = "0.0083",
+#'   time_period = "Present",
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
+# nolint end
 #' @export
 download_koppen_geiger <- function(
     data_resolution = c("0.0083", "0.083", "0.5"),
@@ -1875,7 +2009,7 @@ download_koppen_geiger <- function(
 
 
 #' Download MODIS product files
-# nolint end
+# nolint start
 #' @description Need maintenance for the directory path change
 #' in NASA EOSDIS. This function first retrieves the all hdf download links
 #' on a certain day, then only selects the relevant tiles from the retrieved
@@ -1901,6 +2035,7 @@ download_koppen_geiger <- function(
 #' from NASA LPDAAC. Default is `NULL`.
 #' @param date character(2). length of 10 each. Start/end date for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
+# nolint end
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -1912,6 +2047,21 @@ download_koppen_geiger <- function(
 #' @import rvest
 #' @return NULL; HDF (.hdf) files will be stored in
 #' \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_modis(
+#'   product = "MOD09GA",
+#'   version = "61",
+#'   horizontal_tiles = c(8, 10),
+#'   vertical_tiles = c(4, 5),
+#'   date = c("2024-01-01", "2024-01-10"),
+#'   nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 download_modis <- function(
     product = c(
@@ -2227,8 +2377,8 @@ download_modis <- function(
 #' Download toxic release data
 #' @description
 #' The \code{download_tri()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/find-understand-and-use-tri).
-# nolint end
 #' @param year character(2). length of 4 each. Start/end years for downloading data.
+# nolint end
 #' @param directory_to_save character(1). Directory to download files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -2241,6 +2391,16 @@ download_modis <- function(
 #' @author Mariana Kassien, Insang Song
 #' @returns NULL; Comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_tri(
+#'   year = c(2020L, 2021L),
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 download_tri <- function(
   year = c(2018L, 2022L),
@@ -2348,6 +2508,16 @@ download_tri <- function(
 #' certificate updates in the future.
 #' @returns NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_nei(
+#'   year = c(2017L, 2020L),
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 download_nei <- function(
   epa_certificate_path =
@@ -2549,6 +2719,17 @@ download_nei <- function(
 #' @returns NULL; GeoTIFF (.tif) files will be stored in
 #' \code{directory_to_save}.
 #' @seealso [list_stac_files]
+#' @examples
+#' \dontrun{
+#' download_olm(
+#'   product = "no2_s5p.l3.trop.tmwm",
+#'   format = "tif",
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 # nolint end
 download_olm <- function(
@@ -2647,10 +2828,14 @@ download_olm <- function(
 #' @author Insang Song
 #' @examples
 #' \dontrun{
-#' download_huc("Lower48", "Seamless", "/data"
-#'              acknowledgement = TRUE,
-#'              download = TRUE,
-#'              unzip = TRUE)
+#' download_huc(
+#'   region = "Lower48",
+#'   type = "Seamless",
+#'   directory_to_save = "./data",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
 #' }
 #' @export
 # @importFrom archive archive_extract
@@ -2791,10 +2976,12 @@ download_huc <-
 #' @examples
 #' \dontrun{
 #' download_cropscape(
-#'   2020, "~/data",
+#'   year = 2020,
+#'   source = "USDA",
+#'   directory_to_save = "./data",
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
-#'   unzip = TRUE
+#'   remove_command = TRUE
 #' )
 #' }
 #' @importFrom archive archive_extract
@@ -2941,7 +3128,7 @@ download_cropscape <- function(
 #'   element = "ppt",
 #'   data_type = "ts",
 #'   format = "nc",
-#'   directory_to_save = "~/data",
+#'   directory_to_save = "./data",
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -3067,6 +3254,17 @@ download_prism <- function(
 #' @author Mitchell Manware
 #' @return NULL; netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_gridmet(
+#'   variables = "Precipitation",
+#'   year = c(2023, 2024),
+#'   directory_to_save = "./data"
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 # nolint end
 download_gridmet <- function(
@@ -3192,6 +3390,17 @@ download_gridmet <- function(
 #' @author Mitchell Manware, Insang Song
 #' @return NULL; netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
+#' @examples
+#' \dontrun{
+#' download_gridmet(
+#'   variables = "Precipitation",
+#'   year = c(2023, 2024),
+#'   directory_to_save = "./data"
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' }
 #' @export
 # nolint end
 download_terraclimate <- function(

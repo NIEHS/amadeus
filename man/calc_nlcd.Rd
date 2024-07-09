@@ -36,19 +36,16 @@ Maximum possible value is \code{2^31 - 1}. Only valid when
 \code{mode = "exact"}.
 See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
 
-\item{geom}{logical(1). Should the geometry of \code{locs} be returned in the
-\code{data.frame}? Default is \code{FALSE}. If \code{geom = TRUE} and \code{locs} contain
-polygon geometries, the \verb{$geometry} column in the returned data frame may
-make the \code{data.frame} difficult to read due to long geometry strings. The
-coordinate reference system of the \verb{$geometry} is the coordinate
-reference system of \code{from}.}
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.}}
 
 \item{nthreads}{integer(1). Number of threads to be used}
 
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame object
+a data.frame or SpatVector object
 }
 \description{
 Compute ratio of land cover class in circle buffers around points. Returns
@@ -63,6 +60,18 @@ but less accurate because it counts the number of cells
 intersecting with the buffer. The \code{"exact"} may be more accurate
 but uses more memory as it will account for the partial overlap
 with the buffer.
+}
+\examples{
+\dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+calc_nlcd(
+  from = nlcd, # derived from process_nlcd() example
+  locs = loc,
+  locs_id = "id",
+  mode = "exact",
+  geom = FALSE
+)
+}
 }
 \seealso{
 \code{\link{process_nlcd}}

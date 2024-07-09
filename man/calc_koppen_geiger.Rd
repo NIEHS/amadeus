@@ -20,17 +20,14 @@ a unique identifier field named \code{locs_id}}
 
 \item{locs_id}{character(1). Name of unique identifier.}
 
-\item{geom}{logical(1). Should the geometry of \code{locs} be returned in the
-\code{data.frame}? Default is \code{FALSE}. If \code{geom = TRUE} and \code{locs} contain
-polygon geometries, the \verb{$geometry} column in the returned data frame may
-make the \code{data.frame} difficult to read due to long geometry strings. The
-coordinate reference system of the \verb{$geometry} is the coordinate
-reference system of \code{from}.}
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.}}
 
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame object
+a data.frame or SpatVector object
 }
 \description{
 Extract climate classification values at point locations. Returns a
@@ -39,10 +36,21 @@ binary (0 = point not in climate region; 1 = point in climate region)
 variables for each climate classification region.
 }
 \note{
-The returned \code{data.frame} object contains a
+The returned object contains a
 \verb{$description} column to represent the temporal range covered by the
 dataset. For more information, see
 \url{https://www.nature.com/articles/sdata2018214}.
+}
+\examples{
+\dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+calc_koppen_geiger(
+  from = kg, # derived from process_koppen_geiger() example
+  locs = loc,
+  locs_id = "id",
+  geom = FALSE
+)
+}
 }
 \seealso{
 \code{\link{process_koppen_geiger}}

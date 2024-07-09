@@ -47,6 +47,16 @@ Choose \code{date} and \code{mode} values with caution.
 The function may return a massive data.table, resulting in
 a long processing time or even a crash.
 }
+\examples{
+\dontrun{
+aqs <- process_aqs(
+  path = "./data/aqs_daily_example.csv",
+  date = c("2022-12-01", "2023-01-31"),
+  mode = "full",
+  return_format = "terra"
+)
+}
+}
 \seealso{
 \itemize{
 \item \code{\link[=download_aqs]{download_aqs()}}

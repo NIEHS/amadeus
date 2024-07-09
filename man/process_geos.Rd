@@ -8,6 +8,7 @@ process_geos(
   date = c("2018-01-01", "2018-01-01"),
   variable = NULL,
   path = NULL,
+  extent = NULL,
   ...
 )
 }
@@ -17,6 +18,9 @@ process_geos(
 \item{variable}{character(1). GEOS-CF variable name(s).}
 
 \item{path}{character(1). Directory with downloaded netCDF (.nc4) files.}
+
+\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
+if \code{NULL} (default), the entire raster is loaded}
 
 \item{...}{Placeholders.}
 }
@@ -30,6 +34,15 @@ composition data, returning a single \code{SpatRaster} object.
 \note{
 Layer names of the returned \code{SpatRaster} object contain the variable,
 pressure level, date, and hour.
+}
+\examples{
+\dontrun{
+geos <- process_geos(
+  date = c("2024-01-01", "2024-01-10"),
+  variable = "O3",
+  path = "./data/aqc_tavg_1hr_g1440x721_v1"
+)
+}
 }
 \author{
 Mitchell Manware

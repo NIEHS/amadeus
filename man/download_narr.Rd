@@ -6,8 +6,7 @@
 \usage{
 download_narr(
   variables = NULL,
-  year_start = 2022,
-  year_end = 2022,
+  year = c(2018, 2022),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -18,11 +17,7 @@ download_narr(
 \item{variables}{character. Variable(s) name acronym. See \href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{List of Variables in NARR Files}
 for variable names and acronym codes.}
 
-\item{year_start}{integer(1). length of 4. Start of year range for
-downloading data.}
-
-\item{year_end}{integer(1). length of 4. End of year range for downloading
-data.}
+\item{year}{character(2). length of 4 each. Start/end years for downloading data.}
 
 \item{directory_to_save}{character(1). Directory(s) to save downloaded data
 files.}
@@ -48,6 +43,18 @@ The \code{download_narr} function accesses and downloads daily meteorological da
 }
 \note{
 "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
+}
+\examples{
+\dontrun{
+download_narr(
+  variables = c("weasd", "omega"),
+  year = c(2022, 2023),
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
 }
 \author{
 Mitchell Manware, Insang Song

@@ -37,6 +37,26 @@ with geometry features of the same name.
 \code{locs_id}, and fixed columns of "lat" and "lon", follow the genre, variable,
 lag, buffer radius format adopted in \code{calc_setcolumns()}.
 }
+\examples{
+\dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+terracliamte_covar <- calc_terraclimate(
+  from = terraclimate, # derived from process_terraclimate() example
+  locs = loc,
+  locs_id = "id",
+  radius = 0,
+  fun = "mean",
+  geom = FALSE
+)
+calc_lagged(
+  from = terracliamte_covar,
+  locs_id = "id",
+  date = c("2023-01-02", "2023-01-10"),
+  lag = 1,
+  time_id = "time"
+)
+}
+}
 \seealso{
 \code{\link[=calc_covariates]{calc_covariates()}}
 }

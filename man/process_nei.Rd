@@ -35,6 +35,15 @@ or by using \code{tigris} package. This function does not reproject census bound
 Users should be aware of the coordinate system of census boundary data for
 other analyses.
 }
+\examples{
+\dontrun{
+nei <- process_nei(
+  path = "./data",
+  county = system.file("gpkg/nc.gpkg", package = "sf"),
+  year = 2017
+)
+}
+}
 \author{
 Insang Song
 }
