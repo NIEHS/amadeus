@@ -16,11 +16,11 @@
 devtools::install_github("NIEHS/amadeus")
 ```
 
-```
+```r
 remotes::install_github("NIEHS/amadeus")
 ```
 
-```
+```r
 pak::pak("NIEHS/amadeus")
 ```
 
@@ -60,7 +60,7 @@ See the "download_data and NASA EarthData Account" vignette for a detailed descr
 
 Example use of `download_data` using NOAA NCEP North American Regional Reanalysis's (NARR) "weasd" (Daily Accumulated Snow at Surface) variable.
 
-```
+```r
 > directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
 > download_data(
 +   dataset_name = "narr_monolevel",
@@ -85,7 +85,7 @@ To avoid errors when using `process_covariates`, **do not edit the raw downloade
 
 Example use of `process_covariates` using the downloaded "weasd" data.
 
-```
+```r
 > weasd <- process_covariates(
 +   covariate = "narr",
 +   date = c("2022-01-01", "2022-01-05"),
@@ -114,7 +114,7 @@ time        : 2022-01-01 to 2022-01-05 UTC
 
 Example of `calc_covariates` using processed "weasd" data.
 
-```
+```r
 > locs <- data.frame(lon = -78.8277, lat = 35.95013)
 > locs$id <- "0001"
 > weasd_covar <- calc_covariates(
