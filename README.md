@@ -64,7 +64,7 @@ See the "[download_data](https://niehs.github.io/amadeus/articles/download_funct
 
 Example use of `download_data` using NOAA NCEP North American Regional Reanalysis's (NARR) "weasd" (Daily Accumulated Snow at Surface) variable.
 
-```
+```r
 directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
 download_data(
   dataset_name = "narr",
@@ -79,7 +79,7 @@ download_data(
 Downloading requested files...
 Requested files have been downloaded.
 ```
-```
+```r
 list.files(paste0(directory, "weasd"))
 ```
 ```
@@ -94,7 +94,7 @@ To avoid errors when using `process_covariates`, **do not edit the raw downloade
 
 Example use of `process_covariates` using the downloaded "weasd" data.
 
-```
+```r
 weasd <- process_covariates(
   covariate = "narr",
   date = c("2022-01-01", "2022-01-05"),
@@ -108,7 +108,7 @@ Cleaning weasd data for January, 2022...
 Detected monolevel data...
 Returning daily weasd data from 2022-01-01 to 2022-01-05.
 ```
-```
+```r
 weasd
 ```
 ```
@@ -130,7 +130,7 @@ time        : 2022-01-01 to 2022-01-05 UTC
 
 Example of `calc_covariates` using processed "weasd" data.
 
-```
+```r
 locs <- data.frame(lon = -78.8277, lat = 35.95013)
 locs$id <- "0001"
 weasd_covar <- calc_covariates(
@@ -151,7 +151,7 @@ Calculating weasd covariates for 2022-01-04...
 Calculating weasd covariates for 2022-01-05...
 Returning extracted covariates.
 ```
-```
+```r
 weasd_covar
 ```
 ```
