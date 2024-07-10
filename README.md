@@ -65,18 +65,24 @@ See the "[download_data](https://niehs.github.io/amadeus/articles/download_funct
 Example use of `download_data` using NOAA NCEP North American Regional Reanalysis's (NARR) "weasd" (Daily Accumulated Snow at Surface) variable.
 
 ```
-> directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
-> download_data(
-+   dataset_name = "narr",
-+   year = c(2022, 2022),
-+   variable = "weasd",
-+   directory_to_save = directory,
-+   acknowledgement = TRUE,
-+   download = TRUE
-+ )
+directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
+download_data(
+  dataset_name = "narr",
+  year = c(2022, 2022),
+  variable = "weasd",
+  directory_to_save = directory,
+  acknowledgement = TRUE,
+  download = TRUE
+)
+```
 Downloading requested files...
 Requested files have been downloaded.
-> list.files(paste0(directory, "weasd"))
+```
+
+```
+list.files(paste0(directory, "weasd"))
+```
+```
 [1] "weasd.2022.nc"
 ```
 
@@ -89,17 +95,23 @@ To avoid errors when using `process_covariates`, **do not edit the raw downloade
 Example use of `process_covariates` using the downloaded "weasd" data.
 
 ```
-> weasd <- process_covariates(
-+   covariate = "narr",
-+   date = c("2022-01-01", "2022-01-05"),
-+   variable = "weasd",
-+   path = paste0(directory, "weasd"),
-+   extent = NULL
-+ )
+weasd <- process_covariates(
+  covariate = "narr",
+  date = c("2022-01-01", "2022-01-05"),
+  variable = "weasd",
+  path = paste0(directory, "weasd"),
+  extent = NULL
+)
+```
+```
 Cleaning weasd data for January, 2022...
 Detected monolevel data...
 Returning daily weasd data from 2022-01-01 to 2022-01-05.
-> weasd
+```
+```
+weasd
+```
+```
 class       : SpatRaster
 dimensions  : 277, 349, 5  (nrow, ncol, nlyr)
 resolution  : 32462.99, 32463  (x, y)
@@ -119,16 +131,18 @@ time        : 2022-01-01 to 2022-01-05 UTC
 Example of `calc_covariates` using processed "weasd" data.
 
 ```
-> locs <- data.frame(lon = -78.8277, lat = 35.95013)
-> locs$id <- "0001"
-> weasd_covar <- calc_covariates(
-+   covariate = "narr",
-+   from = weasd_process,
-+   locs = locs,
-+   locs_id = "id",
-+   radius = 0,
-+   geom = FALSE
-+ )
+locs <- data.frame(lon = -78.8277, lat = 35.95013)
+locs$id <- "0001"
+weasd_covar <- calc_covariates(
+  covariate = "narr",
+  from = weasd_process,
+  locs = locs,
+  locs_id = "id",
+  radius = 0,
+  geom = FALSE
+)
+```
+```
 Detected `data.frame` extraction locations...
 Calculating weasd covariates for 2022-01-01...
 Calculating weasd covariates for 2022-01-02...
@@ -136,7 +150,11 @@ Calculating weasd covariates for 2022-01-03...
 Calculating weasd covariates for 2022-01-04...
 Calculating weasd covariates for 2022-01-05...
 Returning extracted covariates.
-> weasd_covar
+```
+```
+weasd_covar
+```
+```
     id       time     weasd_0
 1 0001 2022-01-01 0.000000000
 2 0001 2022-01-02 0.000000000
