@@ -75,10 +75,10 @@ download_data(
   download = TRUE
 )
 ```
+```
 Downloading requested files...
 Requested files have been downloaded.
 ```
-
 ```
 list.files(paste0(directory, "weasd"))
 ```
