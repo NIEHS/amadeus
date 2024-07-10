@@ -77,7 +77,7 @@ download_prism(
   element = "ppt",
   data_type = "ts",
   format = "nc",
-  directory_to_save = "~/data",
+  directory_to_save = "./data",
   acknowledgement = TRUE,
   download = TRUE,
   remove_command = TRUE

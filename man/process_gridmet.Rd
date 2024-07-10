@@ -7,7 +7,9 @@
 process_gridmet(
   date = c("2023-09-01", "2023-09-01"),
   variable = NULL,
-  path = NULL
+  path = NULL,
+  extent = NULL,
+  ...
 )
 }
 \arguments{
@@ -20,6 +22,11 @@ for variable names and acronym codes. (Note: variable "Burning Index" has code "
 "Energy Release Component" has code "erc").}
 
 \item{path}{character(1). Directory with downloaded netCDF (.nc) files.}
+
+\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
+if \code{NULL} (default), the entire raster is loaded}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatRaster} object
@@ -31,6 +38,15 @@ data, returning a single \code{SpatRaster} object.
 \note{
 Layer names of the returned \code{SpatRaster} object contain the variable acronym,
 and date.
+}
+\examples{
+\dontrun{
+gridmet <- process_gridmet(
+  date = c("2023-01-01", "2023-01-10"),
+  variable = "Precipitation",
+  path = "./data/pr"
+)
+}
 }
 \author{
 Mitchell Manware

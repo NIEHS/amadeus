@@ -22,6 +22,16 @@ a data.frame object
 \description{
 Calculate road emissions covariates
 }
+\examples{
+\dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+calc_nei(
+  from = nei, # derived from process_nei example,
+  locs = loc,
+  locs_id = "id"
+)
+}
+}
 \seealso{
 \code{\link{process_nei}}
 }

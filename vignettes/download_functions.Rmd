@@ -1,11 +1,11 @@
 ---
-title: "download_data and NASA EarthData Account"
+title: "download_data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{download_data and NASA EarthData Account}
+  %\VignetteIndexEntry{download_data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-date: "2024-05-02"
+date: "2024-07-09"
 author: "Mitchell Manware"
 ---
 
@@ -20,23 +20,37 @@ devtools::load_all("../")
 
 ## Motivation
 
-The `data_download` function was developed to improve researchers' access to publicly available geospatial datasets. Although the data are already available online, using a web browser to manually download hundreds or thousands of data files is slow, arduous, and not efficiently repeatable. A function which downloads raw data files onto the user's machine allows for re
+The `download_data` function was developed to improve researchers' access to publicly available environmental data.
+Although the data are already available online, using a web browser to manually download hundreds or thousands of data files is slow, arduous, and not efficiently repeatable.
+Additionally, as users may not be familiar with creating download recipes in Bash (Unix shell), `download_data` allows researchers to download data directly with `R`, a common coding language in the field of environmental health research.
+Finally, function-izing data downloads is useful for repeated code or automated analysis pipelines.
 
-Additionally, as users may not be familiar with creating download recipes in Bash (Unix shell), `data_download` allows researchers to download data directly with R, a common coding language in the field of environmental health research. Finally, function-izing data downloads is useful for repeated code or automated analysis pipelines.
+## download_data
 
-## data_download
-
-`data_download` is capable of accessing and downloading geospatial datasets, collections, and variables from a variety of sources. This wrapper function calls on source-specific data download functions, each utilizing a unique combination of input parameters, host URL, naming convention, and data formats.
+`download_data` is acccesses and downloads environmental datasets, collections, and variables from a variety of sources.
+This wrapper function calls source-specific data download functions, each utilizing a unique combination of input parameters, host URL, naming convention, and data formats.
 
 ```{r, echo = FALSE}
 functions <- c(
-  "download_aqs", "download_ecoregion",
-  "download_geos_cf_data", "download_gmted",
-  "download_koppen_geiger", "download_merra2",
-  "download_narr_monolevel", "download_narr_p_levels",
-  "download_nlcd", "download_hms",
-  "download_sedac_groads", "download_sedac_population",
-  "download_modis"
+  "download_aqs",
+  "download_ecoregion",
+  "download_geos_data",
+  "download_gmted",
+  "download_koppen_geiger",
+  "download_merra2",
+  "download_narr",
+  "download_nlcd",
+  "download_hms",
+  "download_sedac_groads",
+  "download_sedac_population",
+  "download_modis",
+  "download_terraclimate",
+  "download_gridmet",
+  "download_osm",
+  "download_prism",
+  "download_nei",
+  "download_tri",
+  "download_huc"
 )
 source <- c(
   "US EPA Air Data Pre-Generated Data Files",
@@ -48,16 +62,19 @@ source <- c(
     "NASA Modern-Era Retrospective analysis for Research and ",
     "Applications, Version 2 (MERRA-2)"
   ),
-  "NOAA NCEP North American Regional Reanalysis (NARR) (monolevel variables)",
-  paste0(
-    "NOAA NCEP North American Regional Reanalysis (NARR) (pressure ",
-    "levels variables)"
-  ),
+  "NOAA NCEP North American Regional Reanalysis (NARR)",
   "MRLC Consortium National Land Cover Database (NLCD)",
   "NOAA Hazard Mapping System Fire and Smoke Product",
   "NASA SEDAC Global Roads Open Access Data Set",
   "NASA SEDAC UN WPP-Adjusted Population Density",
-  "NASA Moderate Resolution Imaging Spectroradiometer (MODIS)"
+  "NASA Moderate Resolution Imaging Spectroradiometer (MODIS)",
+  "Climatology Lab TerraClimate",
+  "Climatology Lab GridMet",
+  "OpenGeoHub Foundation OpenLandMap",
+  "Parameter Elevation Regression on Independent Slopes Model (PRISM)",
+  "US EPA National Emissions Inventory (NEI)",
+  "US EPA Toxic Release Inventory (TRI) Program",
+  "USGS National Hydrography Dataset (NHD)"
 )
 
 link <- c(
@@ -67,7 +84,6 @@ link <- c(
   "https://www.usgs.gov/coastal-changes-and-impacts/gmted2010",
   "https://www.nature.com/articles/sdata2018214",
   "https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/",
-  "https://psl.noaa.gov/data/gridded/data.narr.html",
   "https://psl.noaa.gov/data/gridded/data.narr.html",
   "https://www.mrlc.gov/data",
   "https://www.ospo.noaa.gov/Products/land/hms.html#0",
@@ -80,8 +96,22 @@ link <- c(
     "population-density-adjusted-to-2015-unwpp-country-",
     "totals-rev11"
   ),
-  "https://modis.gsfc.nasa.gov/data/"
+  "https://modis.gsfc.nasa.gov/data/",
+  "https://www.climatologylab.org/terraclimate.html",
+  "https://www.climatologylab.org/gridmet.html",
+  "https://opengeohub.org/about-openlandmap/",
+  paste0(
+    "https://elibrary.asabe.org/abstract.asp??JID=3&",
+    "AID=3101&CID=t2000&v=43&i=6&T=1"
+  ),
+  "https://www.epa.gov/air-emissions-inventories",
+  paste0(
+    "https://www.epa.gov/toxics-release-inventory-tri-program/",
+    "tri-basic-data-files-calendar-years-1987-present"
+  ),
+  "https://www.sciencebase.gov/catalog/item/4f5545cce4b018de15819ca9"
 )
+
 source <- paste0(
   "[",
   source,
@@ -91,14 +121,15 @@ source <- paste0(
 )
 
 functions_sources <- data.frame(functions, source)
-colnames(functions_sources) <- c("Function", "Source")
-kable(functions_sources,
+functions_sources_sorted <- functions_sources[order(functions_sources$source), ]
+colnames(functions_sources_sorted) <- c("Download Function", "Data Source")
+kable(functions_sources_sorted,
   caption =
-    "Source-Specific Download Functions and Sources"
+    "Source-specific download functions and data sources"
 )
 ```
 
-It is important to note that `data_download` calls a source-specific function based on the `dataset_name` parameter. Using the source-specific function directly will return the exact same data (**if the parameters are the same**), but the error messages produced by each differ slightly/
+It is important to note that `download_data` calls a source-specific function based on the `dataset_name` parameter. Using the source-specific function directly will return the same data **if the parameters are the same**, but the error messages produced by each differ slightly.
 
 ### Parameters
 
@@ -106,10 +137,10 @@ User-defined parameters differ based on the data source. Required parameters for
 
 ```{r}
 names(formals(download_hms))
-names(formals(download_narr_monolevel))
+names(formals(download_narr))
 ```
 
-The two functions have different required parameters because `download_hms` uses a daily temporal resolution while `download_narr_monolevel` uses yearly, but they share some common, standard parameters.
+The two functions have different required parameters because `download_hms` uses a daily temporal resolution while `download_narr` uses yearly, but they share some common, standard parameters.
 
 #### Standard parameters
 
@@ -119,7 +150,8 @@ Four parameters are included in all of the data download functions.
 parameter <- c(
   "directory_to_save",
   "acknowledgement",
-  "download", "remove_command"
+  "download",
+  "remove_command"
 )
 type <- c("Character", "Logical", "Logical", "Logical")
 description <- c(
@@ -148,7 +180,7 @@ colnames(parameter_descriptions) <- c("Parameter", "Type", "Description")
 kable(parameter_descriptions)
 ```
 
-Additionally, the `dataset_name` parameter must be specified when using `data_download`, but is assumed when using a source-specific download function.
+Additionally, the `dataset_name` parameter must be specified when using `download_data`, but is assumed when using a source-specific download function.
 
 ### Function Structure
 
@@ -176,14 +208,13 @@ Cleaning the user-defined parameters is highly dependent on the parameters thems
 
 ```{r}
 # user defined parameters
-date_start <- "2023-12-28"
-date_end <- "2024-01-02"
+dates <- c("2023-12-28", "2024-01-02")
 ```
 
 ```{r}
 date_sequence <- seq(
-  as.Date(date_start, format = "%Y-%m-%d"),
-  as.Date(date_end, format = "%Y-%m-%d"),
+  as.Date(dates[1], format = "%Y-%m-%d"),
+  as.Date(dates[2], format = "%Y-%m-%d"),
   "day"
 )
 date_sequence <- gsub("-", "", as.character(date_sequence))
@@ -326,7 +357,7 @@ system_command <- paste0(
 system_command
 ```
 
-Running the `system_command` deploys a "helper function", `download_run`, a function created to reduce repeated code across the source-specific download functions. The function takes two parameters, `system_command`, which indicates the command to be run, and `download`, a user-defined logical parameter.
+Running the `system_command` deploys an "auxiliary" function, `download_run`, a function created to reduce repeated code across the source-specific download functions. The function takes two parameters, `system_command`, which indicates the command to be run, and `download`, a user-defined logical parameter.
 
 ```{r}
 download_run <- function(
@@ -365,7 +396,7 @@ paste0("hms_smoke_Shapefile_", date_sequence, ".zip")
 
 #### 8. Zip files (if applicable) {#zip-files-if-applicable}
 
-All of the source-specific data download functions follow this general pattern, but those functions which download zip files require additional steps to inflate and remove the downloaded zip files, if desired. Each of these two steps are run by helper functions, and they are run by the user-defined `unzip` and `remove_zip` parameters in `data_download`.
+All of the source-specific data download functions follow this general pattern, but those functions which download zip files require additional steps to inflate and remove the downloaded zip files, if desired. Each of these two steps are run by helper functions, and they are run by the user-defined `unzip` and `remove_zip` parameters in `download_data`.
 
 `download_unzip` inflates zip files if `unzip = TRUE`, and skips inflation if `unzip = FALSE`. 
 
@@ -548,9 +579,8 @@ testthat::test_that(
     test_directory <- "./data/"
     # download
     download_data(
-      dataset_name = "noaa",
-      date_start = test_start,
-      date_end = test_end,
+      dataset_name = "hms",
+      date = c(test_start, test_end),
       data_format = "Shapefile",
       directory_to_save = test_directory,
       acknowledgement = TRUE,
@@ -588,9 +618,8 @@ testthat::test_that(
     test_directory <- "../inst/extdata/"
     # download
     download_data(
-      dataset_name = "noaa",
-      date_start = test_start,
-      date_end = test_end,
+      dataset_name = "hms",
+      date = c(test_start, test_end),
       data_format = "Shapefile",
       directory_to_save = test_directory,
       acknowledgement = TRUE,
@@ -619,10 +648,9 @@ testthat::test_that(
 )
 ```
 
-
 Although the `testthat::test_that(...)` chunk contains 32 lines of code, the unit test is performed by `expect_true(all(url_status))`. In words, this line is expecting (`expect_true`) that all (`all`) of the sampled URLs return HTTP response status 200 (`url_status`). Since this expectation was met, the test passed!
 
-For an alternate example, we can use a start and end date that are known to not have data. As the URLs associated with these dates do not exist, we expect the function will fail. This test utilizes `expect_error()` because the `data_download` wrapper function returns an error message if the underlying source-specific download function returns an error.
+For an alternate example, we can use a start and end date that are known to not have data. As the URLs associated with these dates do not exist, we expect the function will fail. This test utilizes `expect_error()` because the `download_data` wrapper function returns an error message if the underlying source-specific download function returns an error.
 
 ```{r}
 testthat::test_that(
@@ -635,9 +663,8 @@ testthat::test_that(
     # test for error
     testthat::expect_error(
       download_data(
-        dataset_name = "noaa",
-        date_start = test_start,
-        date_end = test_end,
+        dataset_name = "hms",
+        date = c(test_start, test_end),
         data_format = "Shapefile",
         directory_to_download = test_directory,
         directory_to_save = test_directory,
@@ -653,7 +680,7 @@ testthat::test_that(
 ```
 
 
-This test utilizes `testthat::expect_error` because the `data_download` wrapper function returns an error message if the underlying source-specific download function returns an error. If we directly used the `download_hms` function, we would expect and receive an error.
+This test utilizes `testthat::expect_error` because the `download_data` wrapper function returns an error message if the underlying source-specific download function returns an error. If we directly used the `download_hms` function, we would expect and receive an error.
 
 ```{r}
 testthat::test_that(
@@ -666,8 +693,7 @@ testthat::test_that(
     # test for error
     testthat::expect_error(
       download_hms(
-        date_start = test_start,
-        date_end = test_end,
+        date = c(test_start, test_end),
         data_format = "Shapefile",
         directory_to_download = test_directory,
         directory_to_save = test_directory,
@@ -701,8 +727,7 @@ names(formals(download_hms))
 Define the parameters.
 
 ```{r}
-date_start <- "2023-12-28"
-date_end <- "2024-01-02"
+dates <- c("2023-12-28", "2024-01-02")
 data_format <- "Shapefile"
 data_directory <- "./download_example/"
 acknowledgement <- TRUE
@@ -717,9 +742,7 @@ Download the data.
 ```{r, eval = FALSE}
 download_data(
   dataset_name = "hms",
-  date_start = date_start,
-  date_end = date_end,
-  directory_to_download = data_directory,
+  date = dates,
   directory_to_save = data_directory,
   acknowledgement = acknowledgement,
   download = download,
@@ -766,290 +789,7 @@ for (s in seq_along(date_sequence)) {
 zips
 ```
 
-## NASA EarthData Account
-
-As mentioned in [Motivation], `data_download` provides access to publicly available geospatial data. Although publicly available, some of the NASA data sources require a NASA EarthData Account.
-
-For example, the UN WPP-Adjusted population density data from NASA Socioeconomic Data and Applications Center (SEDAC) requires an EarthData account. Without an EarthData Account and the prerequisite files prepared, the data download functions will return an error.
-
-```{r, eval = FALSE}
-download_data(
-  dataset_name = "sedac_population",
-  year = "2020",
-  data_format = "GeoTIFF",
-  data_resolution = "60 minute",
-  directory_to_download = "./sedac_population/",
-  directory_to_save = "./sedac_population",
-  acknowledgement = TRUE,
-  download = TRUE,
-  unzip = TRUE,
-  remove_zip = FALSE,
-  remove_command = TRUE
-)
-```
-
-```{r, echo = FALSE}
-to_cat <-
-  paste0(
-    "Downloading requested files...\n",
-    "Requested files have been downloaded.\n",
-    "Unzipping files...\n\n",
-    "Warning in unzip(file_name, exdir = directory_to_unzip): ",
-    "error 1 in extracting from zip file\n\n",
-    "Files unzipped and saved in ./sedac_population/.\n\n"
-  )
-cat(to_cat)
-```
-
-The downloaded file cannot be unzipped because the data was not downloaded properly.
-
-### Register or log in
-
-Visit [https://urs.earthdata.nasa.gov/](http://urs.earthdata.nasa.gov) to register for or log into a NASA EarthData account.
-
-![NASA EarthData Account Landing Page](images/NASA_EarthData_login.png)
-
-Account registration provides access to NASA's Earth Observing System Data and Information System (EOSDIS) and its twelve Distributed Active Archive Centers (DAAC), including:
-
--   Alaska Satellite Facility (ASF) DAAC
--   Atmospheric Science Data Center (ASDC)
--   Crustal Dynamics Data Information System (CDDIS)
--   Global Hydrometeorology Resource Center (GHRC)
--   Goddard Earth Sciences Data and Information Services Center (GES DISC)
--   Land Processes DAAC (LP DAAC)
--   Level 1 and Atmosphere Archive and Distribution System (LAADS) DAAC
--   National Snow and Ice Data Center (NSIDC) DAAC
--   Oak Ridge National Laboratory (ORNL) DAAC
--   Ocean Biology DAAC (OB.DAAC)
--   Physical Oceanography DAAC (PO.DAAC)
--   Socioeconomic Data and Applications Center (SEDAC)
-
-See <https://www.earthdata.nasa.gov/eosdis/daacs> for more information.
-
-### Approved applications
-
-After creating an account, navigate to "My Profile"(https://urs.earthdata.nasa.gov/profile), and then to "Applications \> Authorized Apps". This "Authorized Apps" page specifies which NASA EarthData applications can use your login credentials. For this example, ensure that authorization is enabled for "SEDAC Website", "SEDAC Website (Alpha)", and "SEDAC Website (Beta)".
-
-![NASA EarthData Approved Applications](images/NASA_EarthData_applications.png)
-
-### Prerequisite files
-
-With a NASA EarthData Account and the required applications authorized to use the credentials, it is time to create the prerequisite files.
-
-**Note** As the steps to produce the prerequisite files is very specific, much of the code used is adopted from [How to Generate Earthdata Prerequisite Files](https://disc.gsfc.nasa.gov/information/howto?title=How%20to%20Generate%20Earthdata%20Prerequisite%20Files) on NASA GES DISC's "How-To's" webpage ([link](https://disc.gsfc.nasa.gov/information/howto)).
-
-#### `.netrc`
-
-The following commands create the `.netrc` file, which contains your NASA EarthData Account credentials.
-
-First, set your working directory to the home directory. Setting a working directory differs between Mac/Linux and Windows machines.
-
-```{r, eval = FALSE}
-if (.Platform$OS.type == "unix") {
-  setwd("~/")
-} else if (.Platform$OS.type == "windows") {
-  setwd("C:/")
-}
-```
-
-Create a file named `.netrc` with `file.create`.
-
-```{r, eval = FALSE}
-file.create(".netrc")
-```
-
-Open a connection to `.netrc` with `sink`. Write the line `machine urs...` replacing `YOUR_USERNAME` and `YOUR_PASSWORD` with your NASA EarthData username and password, respectively. After writing the line, close the connection with `sink` again. 
-
-```{r, eval = FALSE}
-sink(".netrc")
-writeLines(
-  "machine urs.earthdata.nasa.gov login YOUR_USERNAME password YOUR_PASSWORD"
-)
-sink()
-```
-
-Edit the settings so only you, the owner of the file, can read and write `.netrc`.
-
-```{r, eval = FALSE}
-system("chmod 0600 .netrc")
-```
-
-After, check to ensure the file was created properly.
-
-```{r, eval = FALSE}
-file.exists(".netrc")
-```
-
-```{r, echo = FALSE}
-TRUE
-```
-
-```{r, eval = FALSE}
-readLines(".netrc")
-```
-
-```{r, echo = FALSE}
-paste0(
-  "machine urs.earthdata.nasa.gov login YOUR_USERNAME password YOUR_PASSWORD"
-)
-```
-
-
-#### `.urs_cookies`
-
-The following commands create the `.urs_cookies` file.
-
-First, set your working directory to the home directory.
-
-```{r, eval = FALSE}
-if (.Platform$OS.type == "unix") {
-  setwd("~/")
-} else if (.Platform$OS.type == "windows") {
-  setwd("C:/")
-}
-```
-
-Create a file named `.netrc` with `file.create`.
-
-```{r, eval = FALSE}
-file.create(".urs_cookies")
-```
-
-After, check to ensure the file was created properly.
-
-```{r, eval = FALSE}
-file.exists(".urs_cookies")
-```
-
-```{r, echo = FALSE}
-TRUE
-```
-
-#### `.dodsrc`
-
-The following commands create the `.urs_cookies` file.
-
-First, set your working directory to the home directory.
-
-```{r, eval = FALSE}
-if (.Platform$OS.type == "unix") {
-  setwd("~/")
-} else if (.Platform$OS.type == "windows") {
-  setwd("C:/")
-}
-```
-
-Create a file named ".dodsrc" with `file.create`.
-
-```{r, eval = FALSE}
-file.create(".dodsrc")
-```
-
-Open a connection to `.dodsrc` with `sink`. Write the lines beginning with `HTTP.`, replacing `YOUR_USERNAME` and `YOUR_PASSWORD` with your NASA EarthData username and password, respectively. After writing the line, close the connection with `sink` again. 
-
-```{r, eval = FALSE}
-sink(".dodsrc")
-writeLines(
-  paste0(
-    "HTTP.NETRC=YOUR_HOME_DIRECTORY/.netrc\n",
-    "HTTP.COOKIE.JAR=YOUR_HOME_DIRECTORY/.urs_cookies"
-  )
-)
-sink()
-```
-
-After, check to ensure the file was created properly.
-
-```{r, eval = FALSE}
-file.exists(".dodsrc")
-```
-
-```{r, echo = FALSE}
-TRUE
-```
-
-```{r, eval = FALSE}
-readLines(".dodsrc")
-```
-
-```{r, echo = FALSE}
-paste0(
-  c(
-    "HTTP.NETRC=YOUR_HOME_DIRECTORY/.netrc",
-    "HTTP.COOKIE.JAR=YOUR_HOME_DIRECTORY/.urs_cookies"
-  )
-)
-```
-
-If working on a Windows machine, copy the `.dodsrc` file to the project working directory. Replace `YOUR_WORKING_DIRECTORY` with the absolute path to the project working directory.
-
-```{r}
-if (.Platform$OS.type == "windows") {
-  file.copy(
-    "C:/.dodsrc",
-    "YOUR_WORKING_DIRECTORY/.dodsrc"
-  )
-}
-```
-
-It is important to ensure that these commands, as well as your username, password, and home directory, are typed without error, as a single problem with any of these files will result in a failed download.
-
-If the files have been created correctly, the UN WPP-Adjusted population density data from NASA Socioeconomic Data and Applications Center (SEDAC) will be downloaded and unzipped without returning an error.
-
-```{r, eval = FALSE}
-download_data(
-  dataset_name = "sedac_population",
-  year = "2020",
-  data_format = "GeoTIFF",
-  data_resolution = "60 minute",
-  directory_to_save = "./sedac_population",
-  acknowledgement = TRUE,
-  download = TRUE,
-  unzip = TRUE,
-  remove_zip = FALSE,
-  remove_command = TRUE
-)
-```
-
-```{r, echo = FALSE}
-to_cat <-
-  paste0(
-    "Downloading requested files...\n",
-    "Requested files have been downloaded.\n",
-    "Unzipping files...\n",
-    "Files unzipped and saved in ./sedac_population/.\n"
-  )
-cat(to_cat)
-```
-
-```{r, eval = FALSE}
-list.files("./sedac_population")
-```
-
-```{r, echo = FALSE}
-sedac_files <- c(
-  paste0(
-    "gpw_v4_population_density_adjusted_to_2015_unwpp_country_totals_",
-    "rev11_2020_1_deg_tif_readme.txt"
-  ),
-  paste0(
-    "gpw_v4_population_density_adjusted_to_2015_unwpp_country_totals_",
-    "rev11_2020_1_deg_tif.zip"
-  ),
-  paste0(
-    "gpw_v4_population_density_adjusted_to_2015_unwpp_country_totals_",
-    "rev11_2020_1_deg.tif"
-  )
-)
-sedac_files
-```
-
-## References
-
--   EOSDIS Distributed Active Archive Centers (DAAC). *National Aeronautics and Space Administration (NASA)*. Date accessed: January 3, 2024. [https://www.earthdata.nasa.gov/eosdis/daacs](). 
--   How to Generate Earthdata Prerequisite Files. *National Aeronautics and Space Administration (NASA)*. Date accessed: January 3, 2024. [https://disc.gsfc.nasa.gov/information/howto?title=How%20to%20Generate%20Earthdata%20Prerequisite%20Files]().
-
-## Code Example
+## `download_hms` function code
 
 The following is the entire R code used to create `download_hms`.
 

@@ -4,12 +4,15 @@
 \alias{process_cropscape}
 \title{Process CropScape data}
 \usage{
-process_cropscape(path = NULL, year = 2021, ...)
+process_cropscape(path = NULL, year = 2021, extent = NULL, ...)
 }
 \arguments{
 \item{path}{character giving CropScape data path}
 
 \item{year}{numeric giving the year of CropScape data used}
+
+\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
+if \code{NULL} (default), the entire raster is loaded}
 
 \item{...}{Placeholders.}
 }
@@ -21,6 +24,14 @@ This function imports and cleans raw CropScape data,
 returning a single \code{SpatRaster} object.
 
 Reads CropScape file of selected \code{year}.
+}
+\examples{
+\dontrun{
+cropscape <- process_cropscape(
+  path = "./data/cropscape_example.tif",
+  year = 2020
+)
+}
 }
 \author{
 Insang Song

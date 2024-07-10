@@ -52,6 +52,18 @@ respective sub-directories within \code{directory_to_save}.
 The \code{download_sedac_groads()} function accesses and downloads
 roads data from \href{https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download}{NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)}.
 }
+\examples{
+\dontrun{
+download_sedac_groads(
+  data_region = "Americas",
+  data_format = "Shapefile",
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
+}
 \author{
 Mitchell Manware, Insang Song
 }

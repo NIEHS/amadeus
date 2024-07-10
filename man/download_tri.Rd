@@ -5,8 +5,7 @@
 \title{Download toxic release data}
 \usage{
 download_tri(
-  year_start = 2018L,
-  year_end = 2022L,
+  year = c(2018L, 2022L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -14,9 +13,7 @@ download_tri(
 )
 }
 \arguments{
-\item{year_start}{integer(1). length of 4. Start year for downloading data.}
-
-\item{year_end}{integer(1). length of 4. End year for downloading data.}
+\item{year}{character(2). length of 4 each. Start/end years for downloading data.}
 
 \item{directory_to_save}{character(1). Directory to download files.}
 
@@ -37,6 +34,17 @@ NULL; Comma-separated value (CSV) files will be stored in
 }
 \description{
 The \code{download_tri()} function accesses and downloads toxic release data from the \href{https://www.epa.gov/toxics-release-inventory-tri-program/find-understand-and-use-tri}{U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program}.
+}
+\examples{
+\dontrun{
+download_tri(
+  year = c(2020L, 2021L),
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
 }
 \author{
 Mariana Kassien, Insang Song

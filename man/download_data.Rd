@@ -6,9 +6,8 @@
 \usage{
 download_data(
   dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "gmted", "koppen",
-    "koppengeiger", "merra2", "merra", "narr_monolevel", "modis", "narr_p_levels",
-    "nlcd", "noaa", "sedac_groads", "sedac_population", "groads", "population",
-    "plevels", "p_levels", "monolevel", "hms", "smoke", "tri", "nei", "gridmet",
+    "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd", "noaa", "sedac_groads",
+    "sedac_population", "groads", "population", "hms", "smoke", "tri", "nei", "gridmet",
     "terraclimate", "huc", "cropscape", "cdl", "prism", "olm", "openlandmap"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -35,6 +34,19 @@ The \code{download_data()} function accesses and downloads atmospheric, meteorol
 \item All download function names are in \code{download_*} formats
 }
 }
+\examples{
+\dontrun{
+download_data(
+  dataset_name = "narr",
+  variables = "weasd",
+  year = c(2023, 2023),
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_commands = TRUE
+)
+}
+}
 \seealso{
 For details of each download function per dataset,
 Please refer to:
@@ -45,9 +57,7 @@ Please refer to:
 \item \code{\link{download_gmted}}: \code{"gmted"}, \code{"GMTED"}
 \item \code{\link{download_koppen_geiger}}: \code{"koppen"}, \code{"koppengeiger"}
 \item \code{\link{download_merra2}}: "merra2", \code{"merra"}, \code{"MERRA"}, \code{"MERRA2"}
-\item \code{\link{download_narr_monolevel}}: \code{"narr_monolevel"}, \code{"monolevel"}
-\item \code{\link{download_narr_p_levels}}: \code{"narr_p_levels"}, \code{"p_levels"},
-\code{"plevels"}
+\item \code{\link{download_narr}}: \code{"narr"}
 \item \code{\link{download_nlcd}}: \code{"nlcd"}, \code{"NLCD"}
 \item \code{\link{download_hms}}: \code{"noaa"}, \code{"smoke"}, \code{"hms"}
 \item \code{\link{download_sedac_groads}}: \code{"sedac_groads"}, \code{"groads"}

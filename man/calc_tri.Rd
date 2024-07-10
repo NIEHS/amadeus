@@ -36,6 +36,17 @@ object containing \code{locs_id} and variables for each chemical in
 \note{
 U.S. context.
 }
+\examples{
+\dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+calc_tri(
+  from = tri, # derived from process_tri() example
+  locs = loc,
+  locs_id = "id",
+  radius = c(1e3L, 1e4L, 5e4L)
+)
+}
+}
 \seealso{
 \code{\link{calc_sedc}}, \code{\link{process_tri}}
 }

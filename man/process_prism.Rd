@@ -4,7 +4,7 @@
 \alias{process_prism}
 \title{Process PRISM data}
 \usage{
-process_prism(path = NULL, element = NULL, time = NULL, ...)
+process_prism(path = NULL, element = NULL, time = NULL, extent = NULL, ...)
 }
 \arguments{
 \item{path}{character giving PRISM data path
@@ -16,6 +16,9 @@ Both file and directory path are acceptable.}
 Should be character in length of 2, 4, 6, or 8.
 "annual" is acceptable.}
 
+\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
+if \code{NULL} (default), the entire raster is loaded}
+
 \item{...}{Placeholders.}
 }
 \value{
@@ -26,6 +29,15 @@ This function imports and cleans raw PRISM data,
 returning a single \code{SpatRaster} object.
 
 Reads time series or 30-year normal PRISM data.
+}
+\examples{
+\dontrun{
+prism <- process_prism(
+  path = "./data/PRISM_ppt_stable_4kmM3_202104_nc.nc",
+  element = "ppt",
+  time = "202104"
+)
+}
 }
 \seealso{
 \code{\link[terra:rast]{terra::rast}}, \code{\link[terra:metags]{terra::metags}}

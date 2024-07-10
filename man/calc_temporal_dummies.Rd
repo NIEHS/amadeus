@@ -25,6 +25,16 @@ Calculate temporal dummy covariates at point locations. Returns a
 \code{data.frame} object with \code{locs_id}, year binary variable for each
 value in \code{year}, and month and day of week binary variables.
 }
+\examples{
+\dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+calc_temporal_dummies(
+  locs = loc,
+  locs_id = "id",
+  year = seq(2018L, 2022L)
+)
+}
+}
 \author{
 Insang Song
 }

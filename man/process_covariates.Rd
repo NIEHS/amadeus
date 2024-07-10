@@ -33,6 +33,16 @@ the underlying source-specific processing functions have been designed to
 operate on the raw data files. To avoid errors, \strong{do not edit the raw
 data files before passing to \code{process_covariates}}.
 }
+\examples{
+\dontrun{
+narr <- process_covariates(
+  covariate = "narr",
+  date = c("2023-01-01", "2023-01-10"),
+  variable = "weasd",
+  path = "./data/weasd"
+)
+}
+}
 \seealso{
 \itemize{
 \item 

@@ -4,10 +4,13 @@
 \alias{process_sedac_population}
 \title{Process population density data}
 \usage{
-process_sedac_population(path = NULL, ...)
+process_sedac_population(path = NULL, extent = NULL, ...)
 }
 \arguments{
 \item{path}{character(1). Path to GeoTIFF (.tif) or netCDF (.nc) file.}
+
+\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
+if \code{NULL} (default), the entire raster is loaded}
 
 \item{...}{Placeholders.}
 }
@@ -17,6 +20,13 @@ a \code{SpatRaster} object
 \description{
 The \code{process_secac_population()} function imports and cleans raw
 population density data, returning a single \code{SpatRaster} object.
+}
+\examples{
+\dontrun{
+pop <- process_sedac_population(
+  path = "./data/sedac_population_example.tif"
+)
+}
 }
 \author{
 Mitchell Manware

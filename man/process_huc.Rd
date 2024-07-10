@@ -4,7 +4,14 @@
 \alias{process_huc}
 \title{Retrieve Hydrologic Unit Code (HUC) data}
 \usage{
-process_huc(path, layer_name = NULL, huc_level = NULL, huc_header = NULL, ...)
+process_huc(
+  path,
+  layer_name = NULL,
+  huc_level = NULL,
+  huc_header = NULL,
+  extent = NULL,
+  ...
+)
 }
 \arguments{
 \item{path}{character. Path to the file or the directory containing HUC data.}
@@ -15,6 +22,9 @@ process_huc(path, layer_name = NULL, huc_level = NULL, huc_header = NULL, ...)
 
 \item{huc_header}{character(1). The upper level HUC code header to extract
 lower level HUCs.}
+
+\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
+if \code{NULL} (default), the entire raster is loaded}
 
 \item{...}{Arguments passed to \code{nhdplusTools::get_huc()}}
 }

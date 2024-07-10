@@ -32,6 +32,15 @@ returning a single \code{SpatVector} (points) object for the selected \code{year
 Visit \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-and-tools}{TRI Data and Tools}
 to view the available years and variables.
 }
+\examples{
+\dontrun{
+tri <- process_tri(
+  path = "./data",
+  year = 2020,
+  variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49)
+)
+}
+}
 \references{
 https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-and-tools
 }

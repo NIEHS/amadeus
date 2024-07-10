@@ -11,8 +11,7 @@ download_modis(
   vertical_tiles = c(3, 6),
   mod06_links = NULL,
   nasa_earth_data_token = NULL,
-  date_start = "2023-09-01",
-  date_end = "2023-09-01",
+  date = c("2023-09-01", "2023-09-01"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -38,11 +37,8 @@ from NASA LPDAAC. Default is \code{NULL}.}
 Token for downloading data from NASA. Should be set before
 trying running the function.}
 
-\item{date_start}{character(1). length of 10. Start date for downloading
-data. Format YYYY-MM-DD (ex. September 1, 2023 is \code{"2023-09-01"}).}
-
-\item{date_end}{character(1). length of 10. End date for downloading data.
-Format YYYY-MM-DD (ex. September 1, 2023 is \code{"2023-09-01"}).}
+\item{date}{character(2). length of 10 each. Start/end date for downloading data.
+Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}).}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
@@ -68,11 +64,27 @@ combinations. An exception is MOD06_L2 product, which is produced
 every five minutes every day.
 }
 \note{
-\code{date_start} and \code{date_end} should be in the same year.
+Both dates in \code{date} should be in the same year.
 Directory structure looks like
 input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}
 Please note that \code{date_start} and \code{date_end} are
 ignored if \code{product == 'MOD06_L2'}.
+}
+\examples{
+\dontrun{
+download_modis(
+  product = "MOD09GA",
+  version = "61",
+  horizontal_tiles = c(8, 10),
+  vertical_tiles = c(4, 5),
+  date = c("2024-01-01", "2024-01-10"),
+  nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
 }
 \author{
 Mitchell Manware, Insang Song

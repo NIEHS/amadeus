@@ -415,9 +415,13 @@ testthat::test_that("read ecoregion", {
 
   path_eco <- testthat::test_path("..", "testdata", "eco_l3_clip.gpkg")
   testthat::expect_no_error(
-    process_ecoregion(path_eco)
+    eco <- process_ecoregion(path_eco)
   )
 
+  # test with cropping extent
+  testthat::expect_no_error(
+    process_ecoregion(path_eco, extent = terra::ext(eco))
+  )
   ecotemp <- sf::st_read(path_eco)
   # nolint start
   addpoly <-
@@ -446,6 +450,14 @@ testthat::test_that("process_nlcd tests", {
 
   testthat::expect_no_error(
     nlcd19 <- process_nlcd(path = path_nlcd19, year = 2019)
+  )
+  # test with extent cropping
+  testthat::expect_no_error(
+    nlcd19_ext <- process_nlcd(
+      path = path_nlcd19,
+      year = 2019,
+      extent = terra::ext(-1580000, -1520000, 1920000, 1980000)
+    )
   )
   testthat::expect_s4_class(nlcd19, "SpatRaster")
   testthat::expect_equal(unname(terra::metags(nlcd19, name = "year")), "2019")
@@ -485,6 +497,14 @@ testthat::test_that("process_koppen_geiger tests", {
     kgeiger <- process_koppen_geiger(path_kgeiger)
   )
 
+  # test with cropping extent
+  testthat::expect_no_error(
+    kgeiger_ext <- process_koppen_geiger(
+      path_kgeiger,
+      extent = terra::ext(kgeiger)
+    )
+  )
+
   testthat::expect_s4_class(kgeiger, "SpatRaster")
 })
 
@@ -495,6 +515,15 @@ testthat::test_that("process_tri tests", {
 
   testthat::expect_no_error(
     tri_r <- process_tri(path = path_tri)
+  )
+  testthat::expect_s4_class(tri_r, "SpatVector")
+
+  # test with cropping extent
+  testthat::expect_no_error(
+    tri_r_ext <- process_tri(
+      path = path_tri,
+      extent = terra::ext(tri_r)
+    )
   )
   testthat::expect_s4_class(tri_r, "SpatVector")
 })
@@ -610,6 +639,13 @@ testthat::test_that("process_sedac_population returns expected.", {
       any(c(0, 1) %in% dim(pop)[1:2])
     )
   }
+  # test with cropping extent
+  testthat::expect_no_error(
+    pop_ext <- process_sedac_population(
+      paths[1],
+      extent = terra::ext(pop)
+    )
+  )
 })
 
 testthat::test_that("process_sedac_population returns null for netCDF.", {
@@ -640,9 +676,9 @@ testthat::test_that("sedac_codes", {
 testthat::test_that("process_hms returns expected.", {
   withr::local_package("terra")
   densities <- c(
-    "Light",
     "Medium",
-    "Heavy"
+    "Heavy",
+    "Light"
   )
   # expect function
   testthat::expect_true(
@@ -687,6 +723,19 @@ testthat::test_that("process_hms returns expected.", {
       )
     }
   }
+  # test with cropping extent
+  testthat::expect_no_error(
+    hms_ext <- process_hms(
+      date = c("2022-06-10", "2022-06-11"),
+      variable = "light",
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "hms"
+      ),
+      extent = terra::ext(hms)
+    )
+  )
 })
 
 # test GMTED ####
@@ -747,6 +796,21 @@ testthat::test_that("process_gmted returns expected.", {
       )
     }
   }
+  # test with cropping extent
+  testthat::expect_no_error(
+    gmted_ext <-
+        process_gmted(
+          variable = c("Breakline Emphasis", "7.5 arc-seconds"),
+          path =
+          testthat::test_path(
+            "..",
+            "testdata",
+            "gmted",
+            "be75_grd"
+          ),
+          ext = terra::ext(gmted)
+        )
+  )
 })
 
 testthat::test_that("import_gmted returns error with non-vector variable.", {
@@ -843,6 +907,22 @@ testthat::test_that("process_narr returns expected.", {
       )
     }
   }
+  # test with cropping extent
+  testthat::expect_no_error(
+    narr_ext <-
+      process_narr(
+        date = c("2018-01-01", "2018-01-01"),
+        variable = "omega",
+        path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "narr",
+          "omega"
+        ),
+        extent = terra::ext(narr)
+    )
+  )
 })
 
 # test GEOS-CF ####
@@ -909,6 +989,21 @@ testthat::test_that("process_geos returns expected.", {
       )
     }
   }
+  # test with cropping extent
+  testthat::expect_no_error(
+    geos_ext <- process_geos(
+        date = c("2018-01-01", "2018-01-01"),
+        variable = "O3",
+        path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "geos",
+          "c"
+        ),
+        extent = terra::ext(geos)
+      )
+  )
 })
 
 testthat::test_that("process_geos expected errors.", {
@@ -1235,6 +1330,13 @@ testthat::test_that("test process_sedac_groads", {
   testthat::expect_error(
     process_sedac_groads(path = 1L)
   )
+  # test with cropping extent
+  testthat::expect_no_error(
+    groads_ext <- process_sedac_groads(
+      path = testthat::test_path("../testdata/groads_test.shp"),
+      extent = terra::ext(groads)
+    )
+  )
 })
 
 # test MERRA2 ####
@@ -1270,12 +1372,6 @@ testthat::test_that("process_merra2 returns as expected.", {
           merra2_df$collection[c]
         )
       )
-    cat(
-      paste0(
-        names(merra2),
-        "\n"
-      )
-    )
     # expect output is SpatRaster
     expect_true(
       class(merra2)[1] == "SpatRaster"
@@ -1309,6 +1405,22 @@ testthat::test_that("process_merra2 returns as expected.", {
       all(dim(merra2) == c(2, 3, 1))
     )
   }
+  class(merra2)
+  # test with cropping extent
+  testthat::expect_no_error(
+    merra2_ext <- process_merra2(
+        date = c("2018-01-01", "2018-01-01"),
+        variable = "CPT",
+        path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "merra2",
+          "inst1_2d_int_Nx"
+        ),
+        extent = terra::ext(merra2)
+      )
+  )
 })
 
 # test GridMET ####
@@ -1354,6 +1466,21 @@ testthat::test_that("process_gridmet returns expected.", {
   # expect dimensions according to levels
   expect_true(
     dim(gridmet)[3] == 1
+  )
+  # test with cropping extent
+  testthat::expect_no_error(
+    gridmet_ext <- process_gridmet(
+      date = c("2018-01-03", "2018-01-03"),
+      variable = "Precipitation",
+      path =
+      testthat::test_path(
+        "..",
+        "testdata",
+        "gridmet",
+        "pr"
+      ),
+      extent = terra::ext(gridmet)
+    )
   )
 })
 
@@ -1401,131 +1528,20 @@ testthat::test_that("process_terraclimate returns expected.", {
   expect_true(
     dim(terraclimate)[3] == 1
   )
-})
-
-testthat::test_that("gridmet and terraclimate auxiliary functions.", {
-  # gridmet
-  gc1 <- process_gridmet_codes("all")
-  expect_true(ncol(gc1) == 2)
-  gc2 <- process_gridmet_codes("sph", invert = TRUE)
-  expect_true(class(gc2) == "character")
-  expect_true(nchar(gc2) > 7)
-  gc3 <- process_gridmet_codes("Near-Surface Specific Humidity")
-  expect_true(class(gc3) == "character")
-  expect_true(nchar(gc3) < 7)
-  # terraclimate
-  tc1 <- process_terraclimate_codes("all")
-  expect_true(ncol(gc1) == 2)
-  tc2 <- process_terraclimate_codes("aet", invert = TRUE)
-  expect_true(class(gc2) == "character")
-  expect_true(nchar(gc2) > 7)
-  tc3 <- process_terraclimate_codes("Actual Evapotranspiration")
-  expect_true(class(gc3) == "character")
-  expect_true(nchar(gc3) < 7)
-  # process_variable_codes
-  expect_no_error(process_variable_codes("sph", "gridmet"))
-  expect_no_error(
-    process_variable_codes("Near-Surface Specific Humidity", "gridmet")
-  )
-  expect_error(
-    process_variable_codes("error", "gridmet")
-  )
-  expect_no_error(process_variable_codes("aet", "terraclimate"))
-  expect_no_error(
-    process_variable_codes("Actual Evapotranspiration", "terraclimate")
-  )
-  expect_error(
-    process_variable_codes("error", "terraclimate")
-  )
-})
-
-testthat::test_that("process_gridmet returns expected.", {
-  withr::local_package("terra")
-  variable <- "Precipitation"
-  # expect function
-  expect_true(
-    is.function(process_gridmet)
-  )
-  gridmet <-
-    process_gridmet(
-      date = c("2018-01-03", "2018-01-03"),
-      variable = variable,
-      path =
-      testthat::test_path(
-        "..",
-        "testdata",
-        "gridmet",
-        "pr"
-      )
-    )
-  # expect output is SpatRaster
-  expect_true(
-    class(gridmet)[1] == "SpatRaster"
-  )
-  # expect values
-  expect_true(
-    terra::hasValues(gridmet)
-  )
-  # expect non-null coordinate reference system
-  expect_false(
-    is.null(terra::crs(gridmet))
-  )
-  # expect lon and lat dimensions to be > 1
-  expect_false(
-    any(c(0, 1) %in% dim(gridmet)[1:2])
-  )
-  # expect non-numeric and non-empty time
-  expect_false(
-    any(c("", 0) %in% terra::time(gridmet))
-  )
-  # expect dimensions according to levels
-  expect_true(
-    dim(gridmet)[3] == 1
-  )
-})
-
-testthat::test_that("process_terraclimate returns expected.", {
-  withr::local_package("terra")
-  variable <- "ppt"
-  # expect function
-  expect_true(
-    is.function(process_terraclimate)
-  )
-  terraclimate <-
-    process_terraclimate(
+  # test with cropping extent
+  testthat::expect_no_error(
+    terraclimate_ext <- process_terraclimate(
       date = c("2018-01-01", "2018-01-01"),
-      variable = variable,
+      variable = "ppt",
       path =
       testthat::test_path(
         "..",
         "testdata",
         "terraclimate",
         "ppt"
-      )
+      ),
+      extent = terra::ext(terraclimate)
     )
-  # expect output is SpatRaster
-  expect_true(
-    class(terraclimate)[1] == "SpatRaster"
-  )
-  # expect values
-  expect_true(
-    terra::hasValues(terraclimate)
-  )
-  # expect non-null coordinate reference system
-  expect_false(
-    is.null(terra::crs(terraclimate))
-  )
-  # expect lon and lat dimensions to be > 1
-  expect_false(
-    any(c(0, 1) %in% dim(terraclimate)[1:2])
-  )
-  # expect non-numeric and non-empty time
-  expect_false(
-    any(c("", 0) %in% terra::time(terraclimate))
-  )
-  # expect dimensions according to levels
-  expect_true(
-    dim(terraclimate)[3] == 1
   )
 })
 
@@ -1564,7 +1580,6 @@ testthat::test_that("gridmet and terraclimate auxiliary functions.", {
     process_variable_codes("error", "terraclimate")
   )
 })
-
 
 # test PRISM ####
 testthat::test_that(
@@ -1607,6 +1622,12 @@ testthat::test_that(
     )
     testthat::expect_error(process_prism(path_dir, element_bad, time))
     testthat::expect_error(process_prism(path_dir, element, time_bad))
+
+    # test with cropping extent
+    testthat::expect_no_error(
+      result_ext <- process_prism(path, element, time,
+      extent = terra::ext(result))
+    )
   }
 )
 
@@ -1624,6 +1645,13 @@ testthat::test_that(
     # Call the function
     testthat::expect_no_error(result <- process_cropscape(filepath, year))
     testthat::expect_no_error(process_cropscape(dirpath, year))
+
+    # test with cropping extent
+    testthat::expect_no_error(
+      result_ext <- process_cropscape(
+        filepath, year, extent = terra::ext(result)
+      )
+    )
 
     # Check the return type
     testthat::expect_true(inherits(result, "SpatRaster"))
@@ -1695,6 +1723,17 @@ testthat::test_that("process_huc",
 
     # Call the function and expect an error
     testthat::expect_error(process_huc(path2))
+
+    # test with cropping extent
+    testthat::expect_no_error(
+      huc_ext <- process_huc(
+          path,
+          layer_name = "NHDPlus_test",
+          huc_level = "HUC_12",
+          huc_header = "030202",
+          extent = terra::ext(result)
+        )
+    )
   }
 )
 
@@ -1710,6 +1749,11 @@ testthat::test_that("process_olm", {
   testthat::expect_s4_class(olm, "SpatRaster")
   testthat::expect_error(
     process_olm(path = 1L)
+  )
+
+  # test with cropping extent
+  testthat::expect_no_error(
+    olm_ext <- process_olm(path = tmwm, extent = terra::ext(olm))
   )
 })
 # nolint end

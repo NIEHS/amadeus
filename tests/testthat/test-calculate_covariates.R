@@ -46,8 +46,8 @@ testthat::test_that("calc_koppen_geiger works well", {
       geom = TRUE
     )
   )
-  testthat::expect_equal(ncol(kg_geom), 8)
-  testthat::expect_true("geometry" %in% names(kg_geom))
+  testthat::expect_equal(ncol(kg_geom), 7)
+  testthat::expect_true("SpatVector" %in% class(kg_geom))
 })
 
 ## 2. Temporal Dummies ####
@@ -169,10 +169,10 @@ testthat::test_that("calc_ecoregion works well", {
     )
   )
   testthat::expect_equal(
-    ncol(ecor_geom), 5
+    ncol(ecor_geom), 4
   )
   testthat::expect_true(
-    "geometry" %in% names(ecor_geom)
+    "SpatVector" %in% class(ecor_geom)
   )
 })
 
@@ -612,10 +612,10 @@ testthat::test_that("Check calc_nlcd works", {
   )
   # with geometry will have 12 columns
   testthat::expect_equal(
-    ncol(output_geom), 16
+    ncol(output_geom), 15
   )
   testthat::expect_true(
-    "geometry" %in% names(output_geom)
+    "SpatVector" %in% class(output_geom)
   )
 })
 
@@ -856,7 +856,8 @@ testthat::test_that("calc_hms returns expected.", {
           from = hms,
           locs = ncp,
           locs_id = "site_id",
-          radius = radii[r]
+          radius = radii[r],
+          geom = FALSE
         )
       # set column names
       hms_covariate <- calc_setcolumns(
@@ -887,6 +888,33 @@ testthat::test_that("calc_hms returns expected.", {
       )
     }
   }
+})
+
+testthat::test_that("calc_hms with geom = TRUE", {
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  hms_dir <- testthat::test_path(
+    "..", "testdata", "hms"
+  )
+  hms <-  process_hms(
+    date = c("2022-06-10", "2022-06-13"),
+    variable = "light",
+    path = hms_dir
+  )
+  hms_covariate_geom <- calc_hms(
+    from = hms,
+    locs = ncp,
+    locs_id = "site_id",
+    radius = 0,
+    geom = TRUE
+  )
+  # with geometry will have 3 columns
+  testthat::expect_equal(
+    ncol(hms_covariate_geom), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(hms_covariate_geom)
+  )
 })
 
 testthat::test_that("calc_hms returns expected with missing polygons.", {
@@ -920,7 +948,8 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
           from = hms,
           locs = ncp,
           locs_id = "site_id",
-          radius = radii[r]
+          radius = radii[r],
+          geom = FALSE
         )
       # set column names
       hms_covariate <- calc_setcolumns(
@@ -1031,10 +1060,10 @@ testthat::test_that("calc_gmted returns expected.", {
     )
   )
   testthat::expect_equal(
-    ncol(gmted_geom), 4
+    ncol(gmted_geom), 3
   )
   testthat::expect_true(
-    "geometry" %in% names(gmted_geom)
+    "SpatVector" %in% class(gmted_geom)
   )
 })
 
@@ -1111,6 +1140,23 @@ testthat::test_that("calc_narr returns expected.", {
       )
     }
   }
+  # with geometry
+  testthat::expect_no_error(
+    narr_covariate_geom <- calc_narr(
+      from = narr,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(narr_covariate_geom), 4 # 4 columns because omega has pressure levels
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(narr_covariate_geom)
+  )
 })
 
 ## 11. GEOS-CF ####
@@ -1176,6 +1222,23 @@ testthat::test_that("calc_geos returns as expected.", {
       )
     }
   }
+  # with included geometry
+  testthat::expect_no_error(
+    geos_covariate_geom <- calc_geos(
+      from = geos,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(geos_covariate_geom), 4
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(geos_covariate_geom)
+  )
 })
 
 ## 12. SEDAC: Population ####
@@ -1232,6 +1295,23 @@ testthat::test_that("calc_sedac_population returns as expected.", {
       )
     }
   }
+  # with included geometry
+  testthat::expect_no_error(
+    pop_covariate_geom <- calc_sedac_population(
+      from = pop,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(pop_covariate_geom), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(pop_covariate_geom)
+  )
 })
 
 ## 13. SEDAC: Global Roads ####
@@ -1283,10 +1363,10 @@ testthat::test_that("groads calculation works", {
     )
   )
   testthat::expect_equal(
-    ncol(groads_geom), 5
+    ncol(groads_geom), 4
   )
   testthat::expect_true(
-    "geometry" %in% names(groads_geom)
+    "SpatVector" %in% class(groads_geom)
   )
 })
 
@@ -1374,6 +1454,23 @@ testthat::test_that("calc_merra2 returns as expected.", {
       )
     }
   }
+  # with included geometry
+  testthat::expect_no_error(
+    merra2_covariate_geom <- calc_merra2(
+      from = merra2,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(merra2_covariate_geom), 4
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(merra2_covariate_geom)
+  )
 })
 
 ## 15. GRIDMET ####
@@ -1385,7 +1482,7 @@ testthat::test_that("calc_gridmet returns as expected.", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_terraclimate)
+    is.function(calc_gridmet)
   )
   for (r in seq_along(radii)) {
     gridmet <-
@@ -1432,6 +1529,23 @@ testthat::test_that("calc_gridmet returns as expected.", {
       "POSIXt" %in% class(gridmet_covariate$time)
     )
   }
+  # with included geometry
+  testthat::expect_no_error(
+    gridmet_covariate_geom <- calc_gridmet(
+      from = gridmet,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(gridmet_covariate_geom), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(gridmet_covariate_geom)
+  )
 })
 
 ## 16. TerraClimate ####
@@ -1490,6 +1604,23 @@ testthat::test_that("calc_terraclimate returns as expected.", {
       nchar(terraclimate_covariate$time)[1] == 6
     )
   }
+  # with included geometry
+  testthat::expect_no_error(
+    terraclimate_covariate_geom <- calc_terraclimate(
+      from = terraclimate,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(terraclimate_covariate_geom), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(terraclimate_covariate_geom)
+  )
 })
 
 ## 17. Lagged variables ####
@@ -1571,6 +1702,41 @@ testthat::test_that("calc_lagged returns as expected.", {
   }
 })
 
+## 17.1 calc_lag with SpatVector
+testthat::test_that("calc_lagged error with SpatVector.", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  # expect function
+  testthat::expect_true(
+    is.function(calc_lagged)
+  )
+  narr <-
+    process_narr(
+      date = c("2018-01-01", "2018-01-10"),
+      variable = "weasd",
+      path =
+      testthat::test_path(
+        "..",
+        "testdata",
+        "narr",
+        "weasd"
+      )
+    )
+  narr_covariate_geom <-
+    calc_narr(
+      from = narr,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  testthat::expect_error(
+    calc_lagged(from = narr_covariate_geom)
+  )
+})
 
 ## 18. Wrapper ####
 testthat::test_that("calc_covariates wrapper works", {
@@ -1585,7 +1751,7 @@ testthat::test_that("calc_covariates wrapper works", {
       "koeppen-geiger", "koppen", "koeppen",
       "geos", "dummies", "gmted",
       "sedac_groads", "groads", "roads",
-      "ecoregions", "ecoregion", "hms", "noaa", "smoke",
+      "ecoregions", "ecoregion", "hms","smoke",
       "gmted", "narr", "geos",
       "sedac_population", "population", "nlcd",
       "merra", "MERRA", "merra2", "MERRA2",
@@ -1633,7 +1799,7 @@ testthat::test_that("calc_covariates wrapper works", {
       "koeppen-geiger", "koppen", "koeppen",
       "geos", "dummies", "gmted",
       "sedac_groads", "groads", "roads",
-      "ecoregions", "ecoregion", "hms", "noaa", "smoke",
+      "ecoregions", "ecoregion", "hms", "smoke",
       "gmted", "narr", "geos",
       "sedac_population", "population", "nlcd",
       "merra", "merra2",
@@ -1646,6 +1812,7 @@ testthat::test_that("calc_covariates wrapper works", {
   }
 })
 
+# calc check time
 testthat::test_that("calc_check_time identifies missing `time` column.", {
   testthat::expect_error(
     # provide integer instead of data.frame to provoke error

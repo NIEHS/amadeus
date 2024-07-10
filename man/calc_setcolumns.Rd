@@ -7,8 +7,9 @@
 calc_setcolumns(from, lag, dataset, locs_id)
 }
 \arguments{
-\item{from}{data.frame(1). Calculated covariates as returned from
-\code{calc_covariates()} or a source specific covariate function.}
+\item{from}{data.frame(1) or SpatVector(1). Calculated covariates as
+returned from \code{calc_covariates()} or a source specific covariate
+function.}
 
 \item{lag}{integer(1). Temporal lag.}
 

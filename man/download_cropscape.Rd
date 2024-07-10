@@ -56,10 +56,12 @@ JSON files should be found at STAC catalog of OpenLandMap
 \examples{
 \dontrun{
 download_cropscape(
-  2020, "~/data",
+  year = 2020,
+  source = "USDA",
+  directory_to_save = "./data",
   acknowledgement = TRUE,
   download = TRUE,
-  unzip = TRUE
+  remove_command = TRUE
 )
 }
 }

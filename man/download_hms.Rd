@@ -6,8 +6,7 @@
 \usage{
 download_hms(
   data_format = "Shapefile",
-  date_start = "2023-09-01",
-  date_end = "2023-09-01",
+  date = c("2018-01-01", "2018-01-01"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -19,11 +18,7 @@ download_hms(
 \arguments{
 \item{data_format}{character(1). "Shapefile" or "KML".}
 
-\item{date_start}{character(1). length of 10. Start date for downloading
-data. Format YYYY-MM-DD (ex. September 1, 2023 is \code{"2023-09-01"}).}
-
-\item{date_end}{character(1). length of 10. End date for downloading data.
-Format YYYY-MM-DD (ex. September 10, 2023 is \code{"2023-09-10"}).}
+\item{date}{character(2). length of 10 each. Start/end date for downloading data.}
 
 \item{directory_to_save}{character(1). Directory to save data. If
 \code{data_format = "Shapefile"}, two sub-directories will be created for the
@@ -58,6 +53,18 @@ respective sub-directories within \code{directory_to_save}.
 \description{
 The \code{download_hms()} function accesses and downloads
 wildfire smoke plume coverage data from \href{https://www.ospo.noaa.gov/Products/land/hms.html#0}{NOAA's Hazard Mapping System Fire and Smoke Product}.
+}
+\examples{
+\dontrun{
+download_hms(
+  data_format = "Shapefile",
+  date = c("2024-01-01", "2024-01-05"),
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
 }
 \author{
 Mitchell Manware, Insang Song
