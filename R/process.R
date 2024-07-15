@@ -887,6 +887,8 @@ process_ecoregion <-
 #' @param path character(1). Path to the directory with TRI CSV files
 #' @param year integer(1). Single year to select.
 #' @param variables integer. Column index of TRI data.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @author Insang Song, Mariana Kassien
 #' @returns a `SpatVector` object (points) in `year`
@@ -926,6 +928,7 @@ process_tri <- function(
   path = NULL,
   year = 2018,
   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49),
+  extent = NULL,
   ...
 ) {
 
@@ -982,8 +985,12 @@ process_tri <- function(
                 crs = "EPSG:4269", # all are NAD83
                 keepgeom = TRUE)
   attr(spvect_tri, "tri_year") <- year
-
-  return(spvect_tri)
+  if(!is.null(extent)) {
+    tri_final <- apply_extent(spvect_tri, extent)
+    return(tri_final)
+  } else {
+    return(spvect_tri)
+  }
 }
 # nolint end
 
