@@ -38,6 +38,16 @@ information about MODIS sub-datasets, consider running
 list of sub-datasets in the input file then consult the documentation
 of MODIS product.
 }
+\examples{
+/dontrun{
+mod09ga_flatten <- process_flatten_sds(
+  path =
+    list.files("./data", pattern = "MOD09GA.", full.names = TRUE)[1],
+  subdataset = process_modis_sds("MOD09GA"),
+  fun_agg = "mean"
+)
+}
+}
 \seealso{
 \link[terra:tapp]{terra::tapp}, \link[terra:rast]{terra::rast}, \link[terra:describe]{terra::describe}
 }

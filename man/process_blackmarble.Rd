@@ -38,6 +38,19 @@ This function will return a \code{SpatRaster} object with
 georeferenced h5 files of Black Marble product. Referencing corner coordinates
 are necessary as the original h5 data do not include such information.
 }
+\examples{
+/dontrun{
+vnp46a2 <- process_blackmarble(
+  path =
+    list.files("./data", pattern = "VNP46A2.", full.names = TRUE),
+  date = "2024-01-01",
+  tile_df =
+    process_blackmarble_corners(hrange = c(8, 10), vrange = c(4, 5))
+  subdataset = 3L,
+  crs = "EPSG:4326"
+)
+}
+}
 \references{
 \itemize{
 \item \href{https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document\%20Archive/Science\%20Data\%20Product\%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf}{Wang, Z. (2022). Black Marble User Guide (Version 1.3). NASA.}

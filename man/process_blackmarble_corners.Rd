@@ -21,6 +21,9 @@ Black Marble products are in HDF5 format and are read without
 georeference with typical R geospatial packages.
 This function generates a \code{data.frame} of corner coordinates for assignment.
 }
+\examples{
+process_blackmarble_corners(hrange = c(1, 2), vrange = c(1, 2))
+}
 \references{
 \itemize{
 \item \href{https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document\%20Archive/Science\%20Data\%20Product\%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf}{Wang, Z. (2022). Black Marble User Guide (Version 1.3). NASA.}

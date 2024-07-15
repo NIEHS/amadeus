@@ -55,6 +55,21 @@ Please note that this function does not provide a function to filter
 swaths or tiles, so it is strongly recommended to check and pre-filter
 the file names at users' discretion.
 }
+\examples{
+\dontrun{
+locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
+calc_modis_daily(
+  from = mod06l2_warp,
+  locs = locs,
+  locs_id = "id",
+  radius = 0,
+  date = "2024-01-01",
+  name_extracted = "cloud_fraction_0",
+  fun_summary = "mean",
+  max_cells = 3e7
+)
+}
+}
 \seealso{
 \itemize{
 \item Preprocessing: \code{\link[=process_modis_merge]{process_modis_merge()}}, \code{\link[=process_modis_swath]{process_modis_swath()}},

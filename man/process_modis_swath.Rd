@@ -49,6 +49,21 @@ Users need to select a subdataset to process. The full path looks like
 \code{"HDF4_EOS:EOS_SWATH:{file_path}:mod06:subdataset"}, where file_path is
 the full path to the hdf file.
 }
+\examples{
+\dontrun{
+mod06l2_swath <- process_modis_swath(
+  path = list.files(
+    "./data/mod06l2",
+    full.names = TRUE,
+    pattern = ".hdf"
+  ),
+  date = "2024-01-01",
+  subdataset = "Cloud_Fraction",
+  suffix = ":mod06:",
+  resolution = 0.05
+)
+}
+}
 \seealso{
 \itemize{
 \item \code{\link[=process_modis_warp]{process_modis_warp()}}, \code{\link[stars:read_stars]{stars::read_stars()}}, \code{\link[stars:st_warp]{stars::st_warp()}}

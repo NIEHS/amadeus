@@ -109,6 +109,24 @@ The result data.frame will have an attribute with the dates with
 insufficient tiles.
 }
 }
+\examples{
+/dontrun{
+locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
+locs <- terra::vect(locs, geom = c("lon", "lat"), crs = "EPSG:4326")
+calc_modis_par(
+  from =
+    list.files("./data", pattern = "VNP46A2.", full.names = TRUE),
+  locs = locs,
+  locs_id = "site_id",
+  radius = c(0L, 1000L),
+  preprocess = process_modis_merge,
+  name_covariates = "cloud_fraction_0",
+  subdataset = "Cloud_Fraction",
+  fun_summary = "mean",
+  nthreads = 1
+)
+}
+}
 \seealso{
 See details for setting parallelization:
 \itemize{

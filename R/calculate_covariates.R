@@ -598,6 +598,20 @@ calc_ecoregion <-
 #' @importFrom methods is
 #' @importFrom sf st_as_sf
 #' @importFrom sf st_drop_geometry
+#' @examples
+#' \dontrun{
+#' locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
+#' calc_modis_daily(
+#'   from = mod06l2_warp,
+#'   locs = locs,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   date = "2024-01-01",
+#'   name_extracted = "cloud_fraction_0",
+#'   fun_summary = "mean",
+#'   max_cells = 3e7
+#' )
+#' }
 #' @export
 calc_modis_daily <- function(
   from = NULL,
@@ -765,6 +779,23 @@ calc_modis_daily <- function(
 #' @importFrom future cluster
 #' @importFrom future.apply future_lapply
 #' @importFrom parallelly availableWorkers
+#' @examples
+#' /dontrun{
+#' locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
+#' locs <- terra::vect(locs, geom = c("lon", "lat"), crs = "EPSG:4326")
+#' calc_modis_par(
+#'   from =
+#'     list.files("./data", pattern = "VNP46A2.", full.names = TRUE),
+#'   locs = locs,
+#'   locs_id = "site_id",
+#'   radius = c(0L, 1000L),
+#'   preprocess = process_modis_merge,
+#'   name_covariates = "cloud_fraction_0",
+#'   subdataset = "Cloud_Fraction",
+#'   fun_summary = "mean",
+#'   nthreads = 1
+#' )
+#' }
 #' @export
 calc_modis_par <-
   function(
