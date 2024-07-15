@@ -1360,20 +1360,20 @@ process_sedac_groads <- function(
 #' @param date character(2). length of 10 each.
 #' Start/end date of downloaded data.
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
-#' @param variable character(1). "Light", "Medium", or "Heavy".
 #' @param path character(1). Directory with downloaded NOAA HMS data files.
-#' @param extent numeric(4) or SpatExtent giving the extent of the raster
-#'   if `NULL` (default), the entire raster is loaded
+#' @param extent numeric(4) or SpatExtent giving the extent of the output
+#'   if `NULL` (default), the entire data is returned
 #' @param ... Placeholders.
 #' @note
 #' \code{process_hms()} will return a character object if there are no wildfire
 #' smoke plumes present for the selected dates and density. The returned
-#' character will contain the selected density value and the sequence of dates
+#' character will contain the density value and the sequence of dates
 #' for which no wildfire smoke plumes were detected (see "Examples").
+#' If multiple density polygons overlap, the function will return the
+#' highest density value.
 #' @examples
 #' hms <- process_hms(
 #'   date = c("2018-12-30", "2019-01-01"),
-#'   variable = "Light",
 #'   path = "../tests/testdata/hms/"
 #' )
 # nolint end
@@ -1385,7 +1385,6 @@ process_sedac_groads <- function(
 #' @export
 process_hms <- function(
     date = c("2018-01-01", "2018-01-01"),
-    variable = c("Light", "Medium", "Heavy"),
     path = NULL,
     extent = NULL,
     ...) {
@@ -1435,9 +1434,8 @@ process_hms <- function(
       "EPSG:4326"
     )
     #### subset to density of interest
-    data_density <- data_date_p[
-      tolower(data_date_p$Density) == tolower(variable)
-    ]
+    data_density <- data_date_p
+
     #### absent polygons (ie. December 31, 2018)
     if (nrow(data_density) == 0) {
       cat(paste0(
@@ -1455,18 +1453,12 @@ process_hms <- function(
       data_return <- rbind(data_return, data_missing)
     } else {
       date <- as.Date(
-        substr(
-          data_density$Start[1],
-          1,
-          7
-        ),
+        substr(data_density$Start[1], 1, 7),
         format = "%Y%j"
       )
-      cat(paste0(
-        "Cleaning ",
-        tolower(variable),
-        " data for date ",
-        date,
+      message(paste0(
+        "Cleaning smoke data for date ",
+        date[1],
         "...\n"
       ))
       #### zero buffer to avoid self intersection
@@ -1474,38 +1466,72 @@ process_hms <- function(
         data_density,
         width = 0
       )
+      # add dummy polygons
+      poly_dummy <-
+        "POLYGON((-180 -86,-179.99 -86,-179.99 -85.99,-180 -85.99,-180 -86))"
+      poly_dummy <- terra::vect(poly_dummy)
+      poly_dummy <- rbind(poly_dummy, poly_dummy, poly_dummy)
+      poly_dummy <- terra::set.crs(poly_dummy, terra::crs(data_0_buffer))
+      poly_dummy$Density <- c("Heavy", "Medium", "Light")
+      poly_dummy$.hmsdummy <- 1
+      data_0_buffer_a <- rbind(data_0_buffer, poly_dummy)
+      data_0_buffer_a$.hmsdummy <-
+        ifelse(
+          is.nan(data_0_buffer_a$.hmsdummy),
+          NA,
+          data_0_buffer_a$.hmsdummy
+        )
       #### aggregate polygons
       data_aggregate <- terra::aggregate(
-        data_0_buffer,
+        data_0_buffer_a,
         by = "Density",
         dissolve = TRUE
       )
-      #### factorize
-      data_aggregate$Date <- paste0(
-        gsub(
-          "-",
-          "",
-          date
+
+      # Density index sorting to Heavy-Medium-Light
+      sort_index <- data_aggregate$Density
+      sort_index <-
+        match(
+          c("Heavy", "Medium", "Light"),
+          sort_index
         )
-      )
+      sort_index <- na.omit(sort_index)
+      data_aggregate <- data_aggregate[sort_index, ]
+
+      # union polygons. Heavy-Medium-Light are 1, 2, 3, respectively.
+      data_aggregate <- terra::union(data_aggregate)
+      data_aggregate$indx <-
+        as.numeric(
+          paste0(
+            data_aggregate$id_1,
+            data_aggregate$id_2,
+            data_aggregate$id_3
+          )
+        )
+      # cut integers into three classes, assign labels
+      data_aggregate$Density <-
+        cut(
+          data_aggregate$indx,
+          c(0, 10, 100, 1000),
+          labels = c("Light", "Medium", "Heavy"),
+          right = FALSE
+        )
+      # reaggregate to dissolve polygons
+      data_aggregate <- terra::aggregate(data_aggregate, by = "Density")
+      data_aggregate$Date <- date
+      #### factorize
       #### select "Density" and "Date"
-      data_aggregate <- data_aggregate[
-        seq_len(nrow(data_aggregate)), c("Density", "Date")
-      ]
-      #### apply date format
-      data_aggregate$Date <- as.Date(
-        data_aggregate$Date,
-        format = "%Y%m%d"
-      )
+      data_aggregate <- data_aggregate[, c("Density", "Date")]
       #### merge with other data
       data_return <- rbind(data_return, data_aggregate)
+      reext <- terra::ext(c(-180, 180, -65, 85))
+      data_return <- terra::crop(data_return, reext)
     }
   }
   #### if no polygons
   if (nrow(data_return) == 0) {
     cat(paste0(
-      variable,
-      " smoke plume polygons absent from ",
+      "Smoke plume polygons absent from ",
       as.Date(
         dates_of_interest[1],
         format = "%Y%m%d"
@@ -1517,13 +1543,11 @@ process_hms <- function(
       ),
       ". Returning vector of dates.\n"
     ))
-    no_polygon_return <- c(variable, as.character(dates_no_polygon))
+    no_polygon_return <- c(as.character(dates_no_polygon))
     return(no_polygon_return)
   } else if (nrow(data_return) > 0) {
     cat(paste0(
-      "Returning daily ",
-      tolower(variable),
-      " data from ",
+      "Returning daily smoke data from ",
       as.Date(
         dates_of_interest[1],
         format = "%Y%m%d"

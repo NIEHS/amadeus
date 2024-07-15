@@ -826,11 +826,6 @@ testthat::test_that("calc_sedc tests", {
 ## 9. HMS ####
 testthat::test_that("calc_hms returns expected.", {
   withr::local_package("terra")
-  densities <- c(
-    "Light",
-    "Medium",
-    "Heavy"
-  )
   radii <- c(0, 1000)
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
@@ -838,55 +833,51 @@ testthat::test_that("calc_hms returns expected.", {
   expect_true(
     is.function(calc_hms)
   )
-  for (d in seq_along(densities)) {
-    density <- densities[d]
-    for (r in seq_along(radii)) {
-      hms <-
-        process_hms(
-          date = c("2022-06-10", "2022-06-11"),
-          variable = density,
-          path = testthat::test_path(
-            "..",
-            "testdata",
-            "hms"
-          )
+  for (r in seq_along(radii)) {
+    hms <-
+      process_hms(
+        date = c("2022-06-10", "2022-06-11"),
+        path = testthat::test_path(
+          "..",
+          "testdata",
+          "hms"
         )
-      hms_covariate <-
-        calc_hms(
-          from = hms,
-          locs = ncp,
-          locs_id = "site_id",
-          radius = radii[r],
-          geom = FALSE
-        )
-      # set column names
-      hms_covariate <- calc_setcolumns(
-        from = hms_covariate,
-        lag = 0,
-        dataset = "hms",
-        locs_id = "site_id"
       )
-      # expect output is data.frame
-      expect_true(
-        class(hms_covariate) == "data.frame"
+    hms_covariate <-
+      calc_hms(
+        from = hms,
+        locs = ncp,
+        locs_id = "site_id",
+        radius = radii[r],
+        geom = FALSE
       )
-      # expect 3 columns
-      expect_true(
-        ncol(hms_covariate) == 3
-      )
-      # expect 2 rows
-      expect_true(
-        nrow(hms_covariate) == 2
-      )
-      # expect integer for binary value
-      expect_true(
-        class(hms_covariate[, 3]) == "integer"
-      )
-      # expect binary
-      expect_true(
-        all(unique(hms_covariate[, 3]) %in% c(0, 1))
-      )
-    }
+    # set column names
+    hms_covariate <- calc_setcolumns(
+      from = hms_covariate,
+      lag = 0,
+      dataset = "hms",
+      locs_id = "site_id"
+    )
+    # expect output is data.frame
+    expect_true(
+      class(hms_covariate) == "data.frame"
+    )
+    # expect 3 columns
+    expect_true(
+      ncol(hms_covariate) == 3
+    )
+    # expect 2 rows
+    expect_true(
+      nrow(hms_covariate) == 2
+    )
+    # expect integer for binary value
+    expect_true(
+      class(hms_covariate[, 3]) == "integer"
+    )
+    # expect binary
+    expect_true(
+      all(unique(hms_covariate[, 3]) %in% c(0, 1))
+    )
   }
 })
 

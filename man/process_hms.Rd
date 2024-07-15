@@ -6,7 +6,6 @@
 \usage{
 process_hms(
   date = c("2018-01-01", "2018-01-01"),
-  variable = c("Light", "Medium", "Heavy"),
   path = NULL,
   extent = NULL,
   ...
@@ -17,12 +16,10 @@ process_hms(
 Start/end date of downloaded data.
 Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 
-\item{variable}{character(1). "Light", "Medium", or "Heavy".}
-
 \item{path}{character(1). Directory with downloaded NOAA HMS data files.}
 
-\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
-if \code{NULL} (default), the entire raster is loaded}
+\item{extent}{numeric(4) or SpatExtent giving the extent of the output
+if \code{NULL} (default), the entire data is returned}
 
 \item{...}{Placeholders.}
 }
@@ -36,13 +33,14 @@ plume coverage data, returning a single \code{SpatVector} object.
 \note{
 \code{process_hms()} will return a character object if there are no wildfire
 smoke plumes present for the selected dates and density. The returned
-character will contain the selected density value and the sequence of dates
+character will contain the density value and the sequence of dates
 for which no wildfire smoke plumes were detected (see "Examples").
+If multiple density polygons overlap, the function will return the
+highest density value.
 }
 \examples{
 hms <- process_hms(
   date = c("2018-12-30", "2019-01-01"),
-  variable = "Light",
   path = "../tests/testdata/hms/"
 )
 }
