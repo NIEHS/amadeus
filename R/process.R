@@ -13,7 +13,7 @@
 #' @seealso
 #' - [`process_modis_swath`]: `"modis_swath"`
 #' - [`process_modis_merge`]: `"modis_merge"`
-#' - [`process_bluemarble`]: `"bluemarble"`
+#' - [`process_blackmarble`]: `"blackmarble"`
 #' - [`process_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`
 #' - [`process_ecoregion`]: `"ecoregion"`, `"ecoregions"`
 #' - [`process_nlcd`]: `"nlcd"`
@@ -51,7 +51,7 @@ process_covariates <-
   function(
     covariate = c("modis_swath", "modis_merge",
                   "koppen-geiger",
-                  "bluemarble",
+                  "blackmarble",
                   "koeppen-geiger", "koppen", "koeppen",
                   "geos", "dummies", "gmted",
                   "hms", "smoke",
@@ -74,7 +74,7 @@ process_covariates <-
     what_to_run <- switch(covariate,
       modis_merge = process_modis_merge,
       modis_swath = process_modis_swath,
-      bluemarble = process_bluemarble,
+      blackmarble = process_blackmarble,
       ecoregion = process_ecoregion,
       ecoregions = process_ecoregion,
       koppen = process_koppen_geiger,
@@ -336,21 +336,21 @@ process_modis_merge <- function(
 
 
 # nolint start
-#' Process Blue Marble corners
+#' Process Black Marble corners
 #' @description
-#' Tile corner generator for Blue Marble products.
+#' Tile corner generator for Black Marble products.
 #' @param hrange integer(2). Both should be in 0-35.
 #' @param vrange integer(2). Both should be in 0-17.
-#' @description Blue Marble products are in HDF5 format and are read without
+#' @description Black Marble products are in HDF5 format and are read without
 #' georeference with typical R geospatial packages.
 #' This function generates a `data.frame` of corner coordinates for assignment.
 #' @returns `data.frame` with xmin, xmax, ymin, and ymax fields
 #' @author Insang Song
 #' @references
-#' - [Wang, Z. (2022). Blue Marble User Guide (Version 1.3). NASA.](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf)
+#' - [Wang, Z. (2022). Black Marble User Guide (Version 1.3). NASA.](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf)
 #' @export
 # nolint end
-process_bluemarble_corners <-
+process_blackmarble_corners <-
   function(
     hrange = c(5, 11),
     vrange = c(3, 6)
@@ -390,15 +390,15 @@ process_bluemarble_corners <-
 
 
 # nolint start
-#' Assign VIIRS Blue Marble products corner coordinates to retrieve a merged raster
+#' Assign VIIRS Black Marble products corner coordinates to retrieve a merged raster
 #' @description This function will return a `SpatRaster` object with
-#' georeferenced h5 files of Blue Marble product. Referencing corner coordinates
+#' georeferenced h5 files of Black Marble product. Referencing corner coordinates
 #' are necessary as the original h5 data do not include such information.
 #' @param path character. Full paths of h5 files.
 #' @param date character(1). Date to query.
 #' @param tile_df data.frame. Contains four corner coordinates in fields named
 #' `c("xmin", "xmax", "ymin", "ymax")`.
-#' See [`process_bluemarble_corners`] to generate a valid object for this argument.
+#' See [`process_blackmarble_corners`] to generate a valid object for this argument.
 #' @param subdataset integer(1). Subdataset number to process.
 #' Default is 3L.
 #' @param crs character(1). terra::crs compatible CRS.
@@ -409,9 +409,9 @@ process_bluemarble_corners <-
 #' @seealso
 #' * [`terra::describe`]
 #' * [`terra::merge`]
-#' * [`process_bluemarble_corners`]
+#' * [`process_blackmarble_corners`]
 #' @references
-#' - [Wang, Z. (2022). Blue Marble User Guide (Version 1.3). NASA.](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf)
+#' - [Wang, Z. (2022). Black Marble User Guide (Version 1.3). NASA.](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf)
 #' @importFrom terra rast
 #' @importFrom terra ext
 #' @importFrom terra crs
@@ -419,10 +419,10 @@ process_bluemarble_corners <-
 #' @export
 # previously modis_preprocess_vnp46
 # nolint end
-process_bluemarble <- function(
+process_blackmarble <- function(
   path = NULL,
   date = NULL,
-  tile_df = process_bluemarble_corners(),
+  tile_df = process_blackmarble_corners(),
   subdataset = 3L,
   crs = "EPSG:4326",
   ...
@@ -708,8 +708,8 @@ process_koppen_geiger <-
 #' @returns a `SpatRaster` object
 #' @author Eva Marques, Insang Song
 #' @importFrom utils read.csv
-#' @importFrom terra rast
-#' @importFrom terra metags
+#' @importFrom tools file_path_sans_ext
+#' @importFrom terra rast metags
 #' @examples
 #' \dontrun{
 #' nlcd <- process_nlcd(
@@ -742,6 +742,12 @@ process_nlcd <-
         pattern = paste0("nlcd_", year, "_.*.(tif|img)$"),
         full.names = TRUE
       )
+    # check if name without extension is duplicated
+    nlcd_file_base <- basename(nlcd_file)
+    nlcd_file_base <- tools::file_path_sans_ext(nlcd_file_base)
+    if (any(duplicated(nlcd_file_base))) {
+      stop("Duplicated NLCD files are detected. Please remove duplicates.")
+    }
     if (length(nlcd_file) == 0) {
       stop("NLCD data not available for this year.")
     }
@@ -1028,10 +1034,11 @@ process_nei <- function(
 }
 
 # nolint start
-#' Process unique U.S. EPA AQS sites
+#' Process U.S. EPA AQS daily CSV data
 #' @description
 #' The \code{process_aqs()} function cleans and imports raw air quality
-#' monitoring sites, returning a single `SpatVector` or sf object.
+#' monitoring sites from pre-generated daily CSV files, returning a single
+#' `SpatVector` or `sf` object.
 #' `date` is used to filter the raw data read from csv files.
 #' Filtered rows are then processed according to `mode` argument.
 #' Some sites report multiple measurements per day with and without
@@ -1041,11 +1048,15 @@ process_nei <- function(
 #' @param path character(1). Directory path to daily measurement data.
 #' @param date character(2). Start and end date.
 #'  Should be in `"YYYY-MM-DD"` format and sorted.
-#' @param mode character(1). One of "full" (all dates * all locations)
-#'   or "sparse" (date-location pairs with available data) or
-#'   "location" (unique locations).
+#' @param mode character(1). One of
+#'   * "date-location" (all dates * all locations)
+#'   * "available-data" (date-location pairs with available data)
+#'   * "location" (unique locations).
 #' @param data_field character(1). Data field to extract.
 #' @param return_format character(1). `"terra"` or `"sf"` or `"data.table"`.
+#' @param extent numeric(4). Spatial extent of the resulting object.
+#'   The order should be `c(xmin, xmax, ymin, ymax)`.
+#'   The coordinate system should be WGS84 (EPSG:4326).
 #' @param ... Placeholders.
 #' @seealso
 #' * [`download_aqs()`]
@@ -1058,8 +1069,9 @@ process_nei <- function(
 #' @importFrom sf st_as_sf
 #' @importFrom dplyr group_by ungroup filter mutate select distinct
 #' @note Choose `date` and `mode` values with caution.
-#' The function may return a massive data.table, resulting in
-#' a long processing time or even a crash.
+#' The function may return a massive data.table depending on the time range,
+#' resulting in a long processing time or even a crash if data is too large
+#' for your computing environment to process.
 #' @examples
 #' \dontrun{
 #' aqs <- process_aqs(
@@ -1074,9 +1086,10 @@ process_aqs <-
   function(
     path = NULL,
     date = c("2018-01-01", "2022-12-31"),
-    mode = c("full", "sparse", "location"),
+    mode = c("date-location", "available-data", "location"),
     data_field = "Arithmetic.Mean",
     return_format = c("terra", "sf", "data.table"),
+    extent = NULL,
     ...
   ) {
     mode <- match.arg(mode)
@@ -1182,7 +1195,7 @@ process_aqs <-
     final_sites <-
       final_sites[, grep("Datum", names(final_sites), invert = TRUE), with = FALSE]
 
-    if (mode == "full") {
+    if (mode == "date-location") {
       final_sites <-
         split(date_sequence, date_sequence) |>
         lapply(function(x) {
@@ -1192,7 +1205,7 @@ process_aqs <-
         })
       final_sites <- data.table::rbindlist(final_sites, fill = TRUE)
     }
-    if (mode == "sparse") {
+    if (mode == "available-data") {
       final_sites <- unique(final_sites)
     }
 
@@ -1215,6 +1228,13 @@ process_aqs <-
         ),
         data.table = final_sites
       )
+    if (!is.null(extent)) {
+      if (return_format == "data.table") {
+        warning("Extent is not applicable for data.table. Returning data.table...\n")
+        return(final_sites)
+      }
+      final_sites <- apply_extent(final_sites, extent)
+    }
 
     return(final_sites)
   }

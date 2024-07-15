@@ -536,3 +536,25 @@ is_date_proper <- function(
          \"YYYY-MM-DD\".\n", names(argnames)[2]))
   }
 }
+
+
+#' Apply extent to the processed data
+#'
+#' User-defined extent is used to filter the data.
+#' 
+#' @param data sf/terra object.
+#' @param extent numeric(4). Extent to filter the data.
+#'   Should be ordered as c(xmin, xmax, ymin, ymax).
+#' @importFrom sf st_as_sfc st_bbox st_crs
+#' @importFrom terra ext
+#' @returns sf/terra object with the extent applied.
+#' @keywords internal
+apply_extent <-
+  function(data, extent) {
+    extent <- terra::ext(extent)
+    if (inherits(data, "sf")) {
+      extent <- sf::st_as_sfc(sf::st_bbox(extent), crs = sf::st_crs(data))
+    }
+    data <- data[extent, ]
+    return(data)
+  }

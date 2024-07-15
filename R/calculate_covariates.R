@@ -389,8 +389,8 @@ calc_nlcd <- function(from,
     class_query <- "value"
     # ratio of each nlcd class per buffer
     bufs_polx <- bufs_pol[terra::ext(from), ] |>
-      sf::st_as_sf() |>
-      sf::st_geometry()
+      sf::st_as_sf()# |>
+      # sf::st_geometry()
     nlcd_at_bufs <- future.apply::future_Map(
       function(i) {
         exactextractr::exact_extract(
@@ -399,6 +399,7 @@ calc_nlcd <- function(from,
           fun = "frac",
           force_df = TRUE,
           progress = FALSE,
+          append_cols = locs_id,
           max_cells_in_memory = max_cells
         )
       }, seq_len(length(bufs_polx)),
@@ -585,7 +586,7 @@ calc_ecoregion <-
 #' the file names at users' discretion.
 #' @seealso
 #' * Preprocessing: [process_modis_merge()], [process_modis_swath()],
-#'     [process_bluemarble()]
+#'     [process_blackmarble()]
 #' * Parallelization: [calc_modis_par()]
 #' @author Insang Song
 #' @return A data.frame object.
@@ -728,7 +729,7 @@ calc_modis_daily <- function(
 #'   e.g., `"^LST_"`
 #' * `process_modis_swath()`: Subdataset names.
 #'   e.g., `c("Cloud_Fraction_Day", "Cloud_Fraction_Night")`
-#' * `process_bluemarble()`: Subdataset number.
+#' * `process_blackmarble()`: Subdataset number.
 #'   e.g., for VNP46A2 product, 3L.
 #' Dates with less than 80 percent of the expected number of tiles,
 #' which are determined by the mode of the number of tiles, are removed.
@@ -752,7 +753,7 @@ calc_modis_daily <- function(
 #' Also, for preprocessing, please refer to:
 #' * [`process_modis_merge()`]
 #' * [`process_modis_swath()`]
-#' * [`process_bluemarble()`]
+#' * [`process_blackmarble()`]
 #' @importFrom methods is
 #' @importFrom sf st_as_sf
 #' @importFrom sf st_drop_geometry
@@ -783,7 +784,7 @@ calc_modis_par <-
   ) {
     if (!is.function(preprocess)) {
       stop("preprocess should be one of process_modis_merge,
-process_modis_swath, or process_bluemarble.")
+process_modis_swath, or process_blackmarble.")
     }
     # read all arguments
     # nolint start

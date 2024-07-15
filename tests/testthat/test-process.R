@@ -37,10 +37,10 @@ testthat::test_that("test generic process_covariates", {
       full.names = TRUE
     )
 
-  corn <- process_bluemarble_corners()
+  corn <- process_blackmarble_corners()
   testthat::expect_warning(
     bm_proc <- process_covariates(
-      covariate = "bluemarble",
+      covariate = "blackmarble",
       path = path_vnp46[1],
       tile_df = corn,
       date = "2018-08-13"
@@ -48,7 +48,7 @@ testthat::test_that("test generic process_covariates", {
   )
   testthat::expect_warning(
     process_covariates(
-      covariate = "Bluemarble",
+      covariate = "Blackmarble",
       path = path_vnp46[1],
       tile_df = corn,
       date = "2018-08-13"
@@ -56,7 +56,7 @@ testthat::test_that("test generic process_covariates", {
   )
   testthat::expect_warning(
     process_covariates(
-      covariate = "BLUEMARBLE",
+      covariate = "BLACKMARBLE",
       path = path_vnp46[1],
       tile_df = corn,
       date = "2018-08-13"
@@ -66,7 +66,7 @@ testthat::test_that("test generic process_covariates", {
 
   covar_types <- c("modis_swath", "modis_merge",
                    "koppen-geiger",
-                   "bluemarble",
+                   "blackmarble",
                    "koeppen-geiger", "koppen", "koeppen",
                    "geos", "dummies", "gmted",
                    "hms", "smoke",
@@ -280,14 +280,14 @@ testthat::test_that("VNP46 preprocess tests", {
     )
 
   testthat::expect_no_error(
-    corn <- process_bluemarble_corners()
+    corn <- process_blackmarble_corners()
   )
   testthat::expect_error(
-    process_bluemarble_corners(hrange = c(99, 104))
+    process_blackmarble_corners(hrange = c(99, 104))
   )
 
   testthat::expect_warning(
-    vnp46_proc <- process_bluemarble(
+    vnp46_proc <- process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
       date = "2018-08-13"
@@ -297,7 +297,7 @@ testthat::test_that("VNP46 preprocess tests", {
   testthat::expect_equal(terra::nlyr(vnp46_proc), 1L)
 
   testthat::expect_warning(
-    vnp46_proc2 <- process_bluemarble(
+    vnp46_proc2 <- process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
       subdataset = c(3L, 5L),
@@ -309,7 +309,7 @@ testthat::test_that("VNP46 preprocess tests", {
   testthat::expect_equal(terra::nlyr(vnp46_proc2), 2L)
 
   testthat::expect_error(
-    process_bluemarble(
+    process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
       date = "2018~08~13"
@@ -474,6 +474,14 @@ testthat::test_that("process_nlcd tests", {
   )
   testthat::expect_error(
     process_nlcd(path_nlcd19, year = 2020)
+  )
+  # make duplicate with tif and img
+  tdir <- tempdir()
+  dir.create(paste0(tdir, "/nlcd_all"))
+  file.create(paste0(tdir, "/nlcd_all/nlcd_2019_land_cover_20240624.tif"))
+  file.create(paste0(tdir, "/nlcd_all/nlcd_2019_land_cover_20240624.img"))
+  testthat::expect_error(
+    process_nlcd(path = paste0(tdir, "/nlcd_all"), year = 2019)
   )
 
 })
@@ -1135,6 +1143,9 @@ testthat::test_that("process_locs_vector vector data and missing columns.", {
 testthat::test_that("process_aqs", {
   withr::local_package("terra")
   withr::local_package("data.table")
+  withr::local_package("sf")
+  withr::local_package("dplyr")
+  withr::local_options(list(sf_use_s2 = FALSE))
 
   aqssub <- testthat::test_path(
     "..",
@@ -1150,7 +1161,7 @@ testthat::test_that("process_aqs", {
     aqsft <- process_aqs(
       path = aqssub,
       date = c("2022-02-04", "2022-02-28"),
-      mode = "full",
+      mode = "date-location",
       return_format = "terra"
     )
   )
@@ -1158,7 +1169,7 @@ testthat::test_that("process_aqs", {
     aqsst <- process_aqs(
       path = aqssub,
       date = c("2022-02-04", "2022-02-28"),
-      mode = "sparse",
+      mode = "available-data",
       return_format = "terra"
     )
   )
@@ -1180,7 +1191,7 @@ testthat::test_that("process_aqs", {
     aqsfs <- process_aqs(
       path = aqssub,
       date = c("2022-02-04", "2022-02-28"),
-      mode = "full",
+      mode = "date-location",
       return_format = "sf"
     )
   )
@@ -1188,7 +1199,7 @@ testthat::test_that("process_aqs", {
     aqsss <- process_aqs(
       path = aqssub,
       date = c("2022-02-04", "2022-02-28"),
-      mode = "sparse",
+      mode = "available-data",
       return_format = "sf"
     )
   )
@@ -1208,7 +1219,7 @@ testthat::test_that("process_aqs", {
     aqsfd <- process_aqs(
       path = aqssub,
       date = c("2022-02-04", "2022-02-28"),
-      mode = "full",
+      mode = "date-location",
       return_format = "data.table"
     )
   )
@@ -1216,7 +1227,7 @@ testthat::test_that("process_aqs", {
     aqssd <- process_aqs(
       path = aqssub,
       date = c("2022-02-04", "2022-02-28"),
-      mode = "sparse",
+      mode = "available-data",
       return_format = "data.table"
     )
   )
@@ -1224,7 +1235,7 @@ testthat::test_that("process_aqs", {
     aqssdd <- process_aqs(
       path = aqssub,
       date = c("2022-02-04", "2022-02-28"),
-      mode = "sparse",
+      mode = "available-data",
       data_field = "Arithmetic.Mean",
       return_format = "data.table"
     )
@@ -1285,6 +1296,21 @@ testthat::test_that("process_aqs", {
   )
   testthat::expect_error(
     process_aqs(path = aqssub, date = c("2021-08-15"))
+  )
+  testthat::expect_error(
+    process_aqs(
+      path = aqssub, date = c("2022-02-04", "2022-02-28"),
+      mode = "available-data", return_format = "sf",
+      extent = c(-79, 33, -78, 36)
+    )
+  )
+  testthat::expect_warning(
+    process_aqs(
+      path = aqssub, date = c("2022-02-04", "2022-02-28"),
+      mode = "available-data", return_format = "data.table",
+      extent = c(-79, -78, 33, 36)
+    ),
+    "Extent is not applicable for data.table. Returning data.table..."
   )
 })
 
@@ -1732,7 +1758,7 @@ testthat::test_that("process_olm", {
 })
 # nolint end
 
-## AUX tests ####
+# AUX tests ####
 testthat::test_that("loc_radius tests", {
   withr::local_package("terra")
   withr::local_package("sf")
@@ -1799,4 +1825,35 @@ testthat::test_that("process_locs_vector tests", {
   testthat::expect_s4_class(dfdftrb, "SpatVector")
   testthat::expect_true(terra::geomtype(dfdftr) == "points")
   testthat::expect_true(terra::geomtype(dfdftrb) == "polygons")
+})
+
+# apply_extent
+testthat::test_that("apply_extent tests", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  lon <- seq(-112, -101, length.out = 5) # create lon sequence
+  lat <- seq(33.5, 40.9, length.out = 5) # create lat sequence
+  df <- expand.grid("lon" = lon, "lat" = lat) # expand to regular grid
+  dfsf <- sf::st_as_sf(
+    df,
+    coords = c("lon", "lat"),
+    crs = "EPSG:4326",
+    remove = FALSE
+  )
+  dftr <- terra::vect(dfsf)
+
+  testthat::expect_no_error(
+    dftr1 <- apply_extent(dftr, c(-112, -101, 33.5, 40.9))
+  )
+  testthat::expect_no_error(
+    dfsftr <- apply_extent(dfsf, c(-112, -101, 33.5, 40.9))
+  )
+  testthat::expect_no_error(
+    dfdftr <- apply_extent(df, c(-112, -101, 33.5, 40.9))
+  )
+  testthat::expect_s4_class(dftr1, "SpatVector")
+  testthat::expect_s4_class(dfsftr, "SpatVector")
+  testthat::expect_s4_class(dfdftr, "SpatVector")
 })

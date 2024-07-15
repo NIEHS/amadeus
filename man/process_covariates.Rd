@@ -5,7 +5,7 @@
 \title{Process raw data wrapper function}
 \usage{
 process_covariates(
-  covariate = c("modis_swath", "modis_merge", "koppen-geiger", "bluemarble",
+  covariate = c("modis_swath", "modis_merge", "koppen-geiger", "blackmarble",
     "koeppen-geiger", "koppen", "koeppen", "geos", "dummies", "gmted", "hms", "smoke",
     "sedac_population", "population", "sedac_groads", "groads", "roads", "nlcd", "tri",
     "narr", "nei", "ecoregions", "ecoregion", "merra", "merra2", "gridmet",
