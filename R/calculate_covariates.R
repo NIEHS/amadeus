@@ -1318,13 +1318,11 @@ calc_nei <- function(
 #' @param ... Placeholders.
 #' @seealso [process_hms()]
 #' @author Mitchell Manware
-#' @return a data.frame object
-#' @importFrom terra vect
-#' @importFrom terra as.data.frame
-#' @importFrom terra time
-#' @importFrom terra extract
-#' @importFrom terra nlyr
-#' @importFrom terra crs
+#' @return a data.frame or SpatVector object
+#' @importFrom terra vect as.data.frame time extract crs
+#' @importFrom tidyr pivot_wider
+#' @importFrom dplyr all_of
+#' @importFrom stats setNames
 #' @examples
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
@@ -1348,7 +1346,7 @@ calc_hms <- function(
   check_for_null_parameters(mget(ls()))
   #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all locs and dates
-  if ("character" %in% class(from)) {
+  if (is.character(from)) {
     cat(paste0(
       "Inherited list of dates due to absent smoke plume polygons.\n"
     ))
@@ -1408,114 +1406,101 @@ calc_hms <- function(
     ),
     sub_hyphen = FALSE
   )
-  #### empty location data.frame
-  sites_extracted <- NULL
-  for (r in seq_len(nrow(from))) {
-    #### select data layer
-    data_layer <- from[r]
-    layer_date <- as.Date(
-      data_layer$Date,
-      format = "%Y%m%d"
+  
+  ### Full SPT
+  data_template <- expand.grid(
+    id = sites_id[[locs_id]],
+    time = date_sequence
+  )
+  data_template <- stats::setNames(data_template, c(locs_id, "time"))
+
+  #### extract layer data at sites
+  message("Calculating smoke intensity covariates...")
+  sites_extracted_layer <-
+    terra::extract(from, sites_e)
+
+  sites_extracted_layer$id.y <-
+    unlist(sites_e[[locs_id]])[sites_extracted_layer$id.y]
+  names(sites_extracted_layer)[
+    names(sites_extracted_layer) == "id.y"
+  ] <- locs_id
+  sites_extracted_layer$value <- 1L
+  #### merge with site_id and date
+  sites_extracted_layer <-
+    tidyr::pivot_wider(
+      data = sites_extracted_layer,
+      names_from = "Density",
+      values_from = "value",
+      id_cols = dplyr::all_of(c(locs_id, "Date"))
     )
-    layer_name <- data_layer$Density
-    cat(paste0(
-      "Calculating ",
-      tolower(
-        as.character(
-          layer_name
-        )
-      ),
-      " covariates for ",
-      layer_date,
-      "...\n"
-    ))
-    #### extract layer data at sites
-    sites_extracted_layer <- as.integer(
-      terra::relate(
-        sites_e,
-        data_layer,
-        "intersects"
-      )
-    )
-    #### merge with site_id and date
-    sites_extracted_layer <- cbind(
-      sites_id,
-      layer_date,
-      sites_extracted_layer
-    )
-    binary_colname <- paste0(
-        tolower(
-          layer_name
-        ),
-        "_",
-        radius
-      )
-    #### define column names
-    if (geom) {
-      colnames(sites_extracted_layer) <- c(
-        locs_id,
-        "geometry",
-        "time",
-        binary_colname
-      )
-    } else {
-      colnames(sites_extracted_layer) <- c(
-        locs_id,
-        "time",
-        binary_colname
-      )
-    }
-    #### merge with empty sites_extracted
-    sites_extracted <- rbind(
-      sites_extracted,
-      sites_extracted_layer
-    )
+
+  # Fill in missing columns
+  levels_acceptable <- c("Light", "Medium", "Heavy")
+  # Detect missing columns
+  col_tofill <-
+    setdiff(levels_acceptable, names(sites_extracted_layer))
+  # Fill zeros
+  if (length(col_tofill) > 0) {
+    sites_extracted_layer[col_tofill] <- 0L
   }
-  #### check for missing dates (missing polygons)
-  if (!(identical(date_sequence, sort(unique(from$Date))))) {
-    cat(paste0(
-      "Detected absent smoke plume polygons.\n"
-    ))
-    missing_dates <- date_sequence[
-      which(!(date_sequence %in% from$Date))
-    ]
-    ###
-    for (m in seq_along(missing_dates)) {
-      missing_date <- as.Date(
-        missing_dates[m],
-        format = "%Y%m%d"
-      )
-      cat(paste0(
-        "Smoke plume polygons absent for date ",
-        missing_date,
-        ". Returning 0 (smoke plumes absent).\n"
-      ))
-      missing_data <- cbind(
-        sites_id,
-        missing_date,
-        0
-      )
-      colnames(missing_data) <- colnames(sites_extracted)
-      sites_extracted <- rbind(
+  col_order <- c(locs_id, "Date", levels_acceptable)
+  sites_extracted_layer <- sites_extracted_layer[, col_order]
+  sites_extracted_layer <-
+    stats::setNames(
+      sites_extracted_layer,
+      c(locs_id, "time", levels_acceptable)
+    )
+
+  binary_colname <-
+    paste0(tolower(levels_acceptable), "_", sprintf("%05d", radius))
+
+  # Join full space-time pairs with extracted data
+  sites_extracted <- merge(
+    data_template,
+    sites_extracted_layer,
+    by = c(locs_id, "time"),
+    all.x = TRUE
+  )
+  #### define column names
+  colname_common <- c(locs_id, "time", binary_colname)
+  if (geom) {
+    sites_extracted <-
+      merge(sites_extracted,
+            sites_id,
+            by = locs_id)
+    sites_extracted <-
+      stats::setNames(
         sites_extracted,
-        missing_data
+        c(colname_common, "geometry")
       )
-    }
+  } else {
+    sites_extracted <-
+      stats::setNames(
+        sites_extracted,
+        colname_common
+      )
   }
-  #### coerce binary to integer
-  sites_extracted[[binary_colname]] <-
-    as.integer(sites_extracted[[binary_colname]])
+  # Filling NAs to 0 (explicit integer)
+  sites_extracted[is.na(sites_extracted)] <- 0L
+
+  # Messaging
+  timevals <- sites_extracted[["time"]]
+  intensities <- sites_extracted[, binary_colname]
+  intensities <- apply(intensities, 1, sum)
+  time_allzero <- unique(timevals[intensities == 0])
+  time_allzero_c <- paste(time_allzero, collapse = "\n")
+  message(paste0(
+    "Smoke plume polygons absent for date(s):\n",
+    time_allzero_c
+  ))
+
   #### date to POSIXct
   sites_extracted$time <- as.POSIXct(sites_extracted$time)
   #### order by date
   sites_extracted_ordered <- as.data.frame(
     sites_extracted[order(sites_extracted$time), ]
   )
-  cat(paste0(
-    "Returning ",
-    layer_name,
-    " covariates.\n"
-  ))
+  message("Returning smoke intensity covariates.")
   sites_extracted_ordered <- calc_return_locs(
     covar = sites_extracted,
     POSIXt = TRUE,
@@ -1525,6 +1510,7 @@ calc_hms <- function(
   #### return data.frame
   return(sites_extracted_ordered)
 }
+
 
 #' Calculate elevation covariates
 #' @description

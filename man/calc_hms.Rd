@@ -24,7 +24,7 @@ that of \code{from.}}
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame object
+a data.frame or SpatVector object
 }
 \description{
 Extract wildfire smoke plume values at point locations. Returns a

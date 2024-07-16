@@ -864,7 +864,7 @@ testthat::test_that("calc_hms returns expected.", {
     )
     # expect 3 columns
     expect_true(
-      ncol(hms_covariate) == 3
+      ncol(hms_covariate) == 5
     )
     # expect 2 rows
     expect_true(
@@ -872,7 +872,7 @@ testthat::test_that("calc_hms returns expected.", {
     )
     # expect integer for binary value
     expect_true(
-      class(hms_covariate[, 3]) == "integer"
+      is.integer(hms_covariate[, 3])
     )
     # expect binary
     expect_true(
@@ -889,7 +889,6 @@ testthat::test_that("calc_hms with geom = TRUE", {
   )
   hms <-  process_hms(
     date = c("2022-06-10", "2022-06-13"),
-    variable = "light",
     path = hms_dir
   )
   hms_covariate_geom <- calc_hms(
@@ -901,10 +900,10 @@ testthat::test_that("calc_hms with geom = TRUE", {
   )
   # with geometry will have 3 columns
   testthat::expect_equal(
-    ncol(hms_covariate_geom), 3
+    ncol(hms_covariate_geom), 5
   )
-  testthat::expect_true(
-    "SpatVector" %in% class(hms_covariate_geom)
+  testthat::expect_s4_class(
+    hms_covariate_geom, "SpatVector"
   )
 })
 
