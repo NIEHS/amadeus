@@ -557,7 +557,7 @@ narr_variable <- function(variable) {
   )
   pressure <- c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd")
   soil <- c("soill", "soilw", "tsoil")
-  base <- "https://psl.noaa.gov/thredds/catalog/Datasets/NARR/Dailies/"
+  base <- "https://psl.noaa.gov/thredds/fileServer/Datasets/NARR/Dailies/"
   if (variable %in% mono) {
     base <- paste0(base, "monolevel/")
     months <- ""
