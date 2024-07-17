@@ -67,6 +67,9 @@ download_koppen_geiger(
 )
 }
 }
+\references{
+\insertRef{article_beck2023koppen, article_beck2018present}{amadeus}
+}
 \author{
 Mitchell Manware, Insang Song
 }

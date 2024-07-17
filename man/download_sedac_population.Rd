@@ -69,6 +69,9 @@ download_sedac_population(
 )
 }
 }
+\references{
+\insertRef{data_ciesin2017gpwv4}{amadeus}
+}
 \author{
 Mitchell Manware, Insang Song
 }

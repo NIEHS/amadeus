@@ -113,6 +113,9 @@ download_modis(
 )
 }
 }
+\references{
+\insertRef{data_mcd19a22021, data_mod06l2_2017, data_mod09ga2021, data_mod11a12021, data_mod13a22021, article_roman2018vnp46}{amadeus}
+}
 \author{
 Mitchell Manware, Insang Song
 }

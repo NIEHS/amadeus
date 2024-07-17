@@ -64,6 +64,9 @@ download_sedac_groads(
 )
 }
 }
+\references{
+\insertRef{data_ciesin2013groads}{amadeus}
+}
 \author{
 Mitchell Manware, Insang Song
 }

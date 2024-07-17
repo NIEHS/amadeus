@@ -53,6 +53,9 @@ download_gridmet(
 )
 }
 }
+\references{
+\insertRef{article_abatzoglou2018terraclimate}{amadeus}
+}
 \author{
 Mitchell Manware, Insang Song
 }

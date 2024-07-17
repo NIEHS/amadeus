@@ -56,6 +56,9 @@ download_narr(
 )
 }
 }
+\references{
+\insertRef{mesinger_north_2006}{amadeus}
+}
 \author{
 Mitchell Manware, Insang Song
 }
