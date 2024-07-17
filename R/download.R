@@ -436,7 +436,7 @@ download_ecoregion <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; netCDF (.nc4) files will be stored in a
+#' @returns NULL; netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
 #' @examples
 #' \dontrun{
@@ -756,7 +756,7 @@ download_gmted <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; netCDF (.nc4) files will be stored in a
+#' @returns NULL; netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
 #' @examples
 #' \dontrun{
@@ -1069,7 +1069,7 @@ download_merra2 <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; netCDF (.nc) files will be stored in
+#' @returns NULL; netCDF (.nc) files will be stored in
 #' \code{directory_to_save}.
 #' @examples
 #' \dontrun{
@@ -2018,9 +2018,7 @@ download_koppen_geiger <- function(
 #' every five minutes every day.
 #' @note Both dates in \code{date} should be in the same year.
 #'  Directory structure looks like
-#'  input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}
-#'  Please note that \code{date_start} and \code{date_end} are
-#'  ignored if \code{product == 'MOD06_L2'}.
+#'  input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
 #' @param product character(1).
 #' One of `c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2")`
 #' @param version character(1). Default is `"61"`, meaning v061.
@@ -2034,7 +2032,8 @@ download_koppen_geiger <- function(
 #' @param mod06_links character(1). CSV file path to MOD06_L2 download links
 #' from NASA LPDAAC. Default is `NULL`.
 #' @param date character(2). length of 10 each. Start/end date for downloading data.
-#' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
+#' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`). Note: ignored if
+#' \code{product == "MOD06_L2"}.
 # nolint end
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -2045,10 +2044,11 @@ download_koppen_geiger <- function(
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
 #' @import rvest
-#' @return NULL; HDF (.hdf) files will be stored in
+#' @returns NULL; HDF (.hdf) files will be stored in
 #' \code{directory_to_save}.
 #' @examples
 #' \dontrun{
+#' # example with MOD0GA product
 #' download_modis(
 #'   product = "MOD09GA",
 #'   version = "61",
@@ -2056,7 +2056,34 @@ download_koppen_geiger <- function(
 #'   vertical_tiles = c(4, 5),
 #'   date = c("2024-01-01", "2024-01-10"),
 #'   nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
-#'   directory_to_save = "./data",
+#'   directory_to_save = "./data/mod09ga",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' # example with MOD06_L2 product
+#' download_modis(
+#'   product = "MOD06_L2",
+#'   version = "61",
+#'   horizontal_tiles = c(8, 10),
+#'   vertical_tiles = c(4, 5),
+#'   mod06_links = "~/LAADS_query.2024-07-15T12_17.csv",
+#'   date = c("2024-01-01", "2024-01-10"),
+#'   nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
+#'   directory_to_save = "./data/mod06l2",
+#'   acknowledgement = TRUE,
+#'   download = TRUE,
+#'   remove_command = TRUE
+#' )
+#' # example with VNP46A2 product
+#' download_modis(
+#'   product = "VNP46A2",
+#'   version = "61",
+#'   horizontal_tiles = c(8, 10),
+#'   vertical_tiles = c(4, 5),
+#'   date = c("2024-01-01", "2024-01-10"),
+#'   nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
+#'   directory_to_save = "./data/vnp46a2",
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -3252,7 +3279,7 @@ download_prism <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware
-#' @return NULL; netCDF (.nc) files will be stored in a variable-specific
+#' @returns NULL; netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @examples
 #' \dontrun{
@@ -3388,7 +3415,7 @@ download_gridmet <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; netCDF (.nc) files will be stored in a variable-specific
+#' @returns NULL; netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @examples
 #' \dontrun{

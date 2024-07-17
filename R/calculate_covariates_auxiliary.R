@@ -519,16 +519,24 @@ calc_return_locs <- function(
   if ("time" %in% names(covar)) {
     calc_check_time(covar = covar, POSIXt = POSIXt)
   }
+  # nolint ent
   # if geom, convert to and return SpatVector
   if (geom) {
-    covar_return <- terra::vect(
-      covar,
-      geom = "geometry",
-      crs = crs
-    )
+    if ("geometry" %in% names(covar)){
+      covar_return <- terra::vect(
+        covar,
+        geom = "geometry",
+        crs = crs
+      )
+    } else if (all(c("lon", "lat") %in% names(covar))) {
+      covar_return <- terra::vect(
+        covar,
+        geom = c("lon", "lat"),
+        crs = crs
+      )
+    }
     return(covar_return)
   } else {
     return(data.frame(covar))
   }
 }
-# nolint end

@@ -38,7 +38,8 @@ Token for downloading data from NASA. Should be set before
 trying running the function.}
 
 \item{date}{character(2). length of 10 each. Start/end date for downloading data.
-Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}).}
+Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}). Note: ignored if
+\code{product == "MOD06_L2"}.}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
@@ -66,12 +67,11 @@ every five minutes every day.
 \note{
 Both dates in \code{date} should be in the same year.
 Directory structure looks like
-input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}
-Please note that \code{date_start} and \code{date_end} are
-ignored if \code{product == 'MOD06_L2'}.
+input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
 }
 \examples{
 \dontrun{
+# example with MOD0GA product
 download_modis(
   product = "MOD09GA",
   version = "61",
@@ -79,7 +79,34 @@ download_modis(
   vertical_tiles = c(4, 5),
   date = c("2024-01-01", "2024-01-10"),
   nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
-  directory_to_save = "./data",
+  directory_to_save = "./data/mod09ga",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+# example with MOD06_L2 product
+download_modis(
+  product = "MOD06_L2",
+  version = "61",
+  horizontal_tiles = c(8, 10),
+  vertical_tiles = c(4, 5),
+  mod06_links = "~/LAADS_query.2024-07-15T12_17.csv",
+  date = c("2024-01-01", "2024-01-10"),
+  nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
+  directory_to_save = "./data/mod06l2",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+# example with VNP46A2 product
+download_modis(
+  product = "VNP46A2",
+  version = "61",
+  horizontal_tiles = c(8, 10),
+  vertical_tiles = c(4, 5),
+  date = c("2024-01-01", "2024-01-10"),
+  nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
+  directory_to_save = "./data/vnp46a2",
   acknowledgement = TRUE,
   download = TRUE,
   remove_command = TRUE

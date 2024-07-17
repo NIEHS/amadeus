@@ -4,7 +4,7 @@
 \alias{calc_lagged}
 \title{Calculate temporally lagged covariates}
 \usage{
-calc_lagged(from, date, lag, locs_id, time_id = "time")
+calc_lagged(from, date, lag, locs_id, time_id = "time", geom = FALSE)
 }
 \arguments{
 \item{from}{data.frame(1). A \code{data.frame} containing calculated covariates
@@ -18,6 +18,10 @@ Length of 10 each, format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 \item{locs_id}{character(1). Name of unique identifier.}
 
 \item{time_id}{character(1). Column containing time values.}
+
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.} To return as a \code{SpatVector}, \code{from} must also be a \code{SpatVector}}
 }
 \value{
 a \code{data.frame} object

@@ -43,6 +43,24 @@ grid points.
 \note{
 This function handles one file at a time.
 }
+\examples{
+\dontrun{
+mod06l2_warp <- process_modis_warp(
+  path = paste0(
+    "HDF4_EOS:EOS_SWATH:",
+    list.files(
+      "./data/mod06l2",
+      full.names = TRUE,
+      pattern = ".hdf"
+    )[1],
+    ":mod06:Cloud_Fraction"
+  ),
+  cellsize = 0.1,
+  threshold = 0.4,
+  crs = 4326
+)
+}
+}
 \seealso{
 \code{\link[terra:rectify]{terra::rectify}}
 }

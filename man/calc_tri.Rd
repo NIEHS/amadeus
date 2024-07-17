@@ -9,6 +9,7 @@ calc_tri(
   locs,
   locs_id = "site_id",
   radius = c(1000L, 10000L, 50000L),
+  geom = FALSE,
   ...
 )
 }
@@ -23,10 +24,14 @@ Default is \code{"site_id"}.}
 \item{radius}{Circular buffer radius.
 Default is \code{c(1000, 10000, 50000)} (meters)}
 
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.}}
+
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame object
+a data.frame or SpatVector object
 }
 \description{
 Extract toxic release values at point locations. Returns a \code{data.frame}

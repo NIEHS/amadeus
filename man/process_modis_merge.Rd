@@ -41,6 +41,17 @@ MODIS products downloaded by functions in \code{amadeus},
 \href{https://cran.r-project.org/web/packages/MODISTools/index.html}{MODISTools},
 and \href{https://github.com/rspatial/luna}{luna} are accepted.
 }
+\examples{
+/dontrun{
+mod09ga_merge <- process_modis_merge(
+  path =
+    list.files("./data", pattern = "MOD09GA.", full.names = TRUE),
+  date = "2024-01-01",
+  subdataset = "sur_refl_b01_1",
+  fun_agg = "mean"
+)
+}
+}
 \seealso{
 \code{\link{download_data}}
 }

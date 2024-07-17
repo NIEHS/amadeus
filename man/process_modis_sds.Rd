@@ -44,6 +44,9 @@ When utilizing a product code from this "Short Name" column, \strong{do
 not include} the version number following the period. For example, if "Short
 Name" = MCD12C1.006, then \code{product = "MCD12C1"}.
 }
+\examples{
+process_modis_sds(product = "MOD09GA")
+}
 \seealso{
 \link{calc_modis_par}
 }

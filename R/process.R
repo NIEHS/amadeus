@@ -152,6 +152,8 @@ process_covariates <-
 #' @returns A character object that conforms to the regular
 #' expression. Details of regular expression in R can be found in [regexp].
 #' @seealso [calc_modis_par]
+#' @examples
+#' process_modis_sds(product = "MOD09GA")
 #' @export
 # previously modis_prefilter_sds
 process_modis_sds <-
@@ -213,6 +215,15 @@ process_modis_sds <-
 #' @importFrom terra nlyr
 #' @importFrom terra tapp
 #' @importFrom terra is.rotated
+#' @examples
+#' /dontrun{
+#' mod09ga_flatten <- process_flatten_sds(
+#'   path =
+#'     list.files("./data", pattern = "MOD09GA.", full.names = TRUE)[1],
+#'   subdataset = process_modis_sds("MOD09GA"),
+#'   fun_agg = "mean"
+#' )
+#' }
 #' @export
 # previously modis_aggregate_sds
 process_flatten_sds <-
@@ -288,6 +299,16 @@ the input then flatten it manually.")
 #' @seealso [`download_data`]
 #' @author Insang Song
 #' @returns a `SpatRaster` object
+#' @examples
+#' /dontrun{
+#' mod09ga_merge <- process_modis_merge(
+#'   path =
+#'     list.files("./data", pattern = "MOD09GA.", full.names = TRUE),
+#'   date = "2024-01-01",
+#'   subdataset = "sur_refl_b01_1",
+#'   fun_agg = "mean"
+#' )
+#' }
 #' @export
 # nolint end
 # previously modis_get_vrt
@@ -348,6 +369,8 @@ process_modis_merge <- function(
 #' @author Insang Song
 #' @references
 #' - [Wang, Z. (2022). Black Marble User Guide (Version 1.3). NASA.](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf)
+#' @examples
+#' process_blackmarble_corners(hrange = c(1, 2), vrange = c(1, 2))
 #' @export
 # nolint end
 process_blackmarble_corners <-
@@ -416,6 +439,18 @@ process_blackmarble_corners <-
 #' @importFrom terra ext
 #' @importFrom terra crs
 #' @importFrom terra merge
+#' @examples
+#' /dontrun{
+#' vnp46a2 <- process_blackmarble(
+#'   path =
+#'     list.files("./data", pattern = "VNP46A2.", full.names = TRUE),
+#'   date = "2024-01-01",
+#'   tile_df =
+#'     process_blackmarble_corners(hrange = c(8, 10), vrange = c(4, 5))
+#'   subdataset = 3L,
+#'   crs = "EPSG:4326"
+#' )
+#' }
 #' @export
 # previously modis_preprocess_vnp46
 # nolint end
@@ -495,6 +530,23 @@ process_blackmarble <- function(
 #' @seealso [`terra::rectify`]
 #' @importFrom stars st_warp
 #' @importFrom stars read_stars
+#' @examples
+#' \dontrun{
+#' mod06l2_warp <- process_modis_warp(
+#'   path = paste0(
+#'     "HDF4_EOS:EOS_SWATH:",
+#'     list.files(
+#'       "./data/mod06l2",
+#'       full.names = TRUE,
+#'       pattern = ".hdf"
+#'     )[1],
+#'     ":mod06:Cloud_Fraction"
+#'   ),
+#'   cellsize = 0.1,
+#'   threshold = 0.4,
+#'   crs = 4326
+#' )
+#' }
 #' @export
 # previously modis_warp_stars
 process_modis_warp <-
@@ -557,6 +609,20 @@ process_modis_warp <-
 #' @importFrom stars st_mosaic
 #' @importFrom terra values
 #' @importFrom terra sprc
+#' @examples
+#' \dontrun{
+#' mod06l2_swath <- process_modis_swath(
+#'   path = list.files(
+#'     "./data/mod06l2",
+#'     full.names = TRUE,
+#'     pattern = ".hdf"
+#'   ),
+#'   date = "2024-01-01",
+#'   subdataset = "Cloud_Fraction",
+#'   suffix = ":mod06:",
+#'   resolution = 0.05
+#' )
+#' }
 #' @export
 # nolint end
 # previously modis_mosaic_mod06
@@ -648,9 +714,6 @@ process_modis_swath <-
     return(mod06_return)
   }
 
-
-
-# Process downloaded raw data
 
 #' Process climate classification data
 #' @description
@@ -824,6 +887,8 @@ process_ecoregion <-
 #' @param path character(1). Path to the directory with TRI CSV files
 #' @param year integer(1). Single year to select.
 #' @param variables integer. Column index of TRI data.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @author Insang Song, Mariana Kassien
 #' @returns a `SpatVector` object (points) in `year`
@@ -863,6 +928,7 @@ process_tri <- function(
   path = NULL,
   year = 2018,
   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49),
+  extent = NULL,
   ...
 ) {
 
@@ -919,8 +985,12 @@ process_tri <- function(
                 crs = "EPSG:4269", # all are NAD83
                 keepgeom = TRUE)
   attr(spvect_tri, "tri_year") <- year
-
-  return(spvect_tri)
+  if(!is.null(extent)) {
+    tri_final <- apply_extent(spvect_tri, extent)
+    return(tri_final)
+  } else {
+    return(spvect_tri)
+  }
 }
 # nolint end
 
