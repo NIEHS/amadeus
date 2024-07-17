@@ -1048,7 +1048,8 @@ download_narr_monolevel <- function(
   #### 5. define variables
   variables_list <- as.vector(variables)
   #### 6. define URL base
-  base <- "https://downloads.psl.noaa.gov/Datasets/NARR/Dailies/monolevel/"
+  base <-
+    "https://psl.noaa.gov/thredds/fileServer/Datasets/NARR/Dailies/monolevel/"
   #### 7. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
     directory_to_save,
@@ -1175,7 +1176,8 @@ download_narr_p_levels <- function(
   #### 6. define variables
   variables_list <- as.vector(variables)
   #### 7. define URL base
-  base <- "https://downloads.psl.noaa.gov//Datasets/NARR/Dailies/pressure/"
+    base <-
+    "https://psl.noaa.gov/thredds/fileServer/Datasets/NARR/Dailies/pressure/"
   #### 8. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
     directory_to_save,
