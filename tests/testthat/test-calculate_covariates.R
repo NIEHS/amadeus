@@ -75,6 +75,16 @@ testthat::test_that("calc_dummies works well", {
   # should have each of the indicator groups
   testthat::expect_equal(sum(unlist(dum_res[, -1:-4])), 3L)
 
+  # with geometry
+  testthat::expect_no_error(
+    dum_res_geom <- calc_temporal_dummies(
+      locs = site_faux,
+      year = seq(2018L, 2022L),
+      geom = TRUE
+    )
+  )
+  testthat::expect_s4_class(dum_res_geom, "SpatVector")
+
   # error cases
   site_faux_err <- site_faux
   colnames(site_faux_err)[4] <- "date"
@@ -253,6 +263,25 @@ testthat::test_that("calc_modis works well.", {
     )
   )
 
+  # with geometry
+  testthat::expect_no_error(
+    suppressWarnings(
+      calc_mod11_geom <-
+        calc_modis_par(
+          from = path_mod11,
+          locs = sf::st_as_sf(site_faux),
+          preprocess = process_modis_merge,
+          package_list_add = c("MASS"),
+          export_list_add = c("aux"),
+          name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
+          subdataset = "(LST_)",
+          nthreads = 1L,
+          geom = TRUE
+        )
+    )
+  )
+  testthat::expect_s4_class(calc_mod11_geom, "SpatVector")
+
   # case 2: swath mod06l2
   path_mod06 <-
     list.files(
@@ -285,6 +314,24 @@ testthat::test_that("calc_modis works well.", {
   )
   testthat::expect_s3_class(calc_mod06, "data.frame")
 
+  # with geometry
+    testthat::expect_no_error(
+    suppressWarnings(
+      calc_mod06_geom <-
+        calc_modis_par(
+          from = path_mod06,
+          locs = site_faux,
+          subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+          preprocess = process_modis_swath,
+          name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_"),
+          nthreads = 1,
+          geom = TRUE
+        )
+    )
+  )
+  testthat::expect_s4_class(calc_mod06_geom, "SpatVector")
+  
+
   # case 3: VIIRS
   path_vnp46 <-
     list.files(
@@ -315,6 +362,43 @@ testthat::test_that("calc_modis works well.", {
     )
   )
   testthat::expect_s3_class(calc_vnp46, "data.frame")
+
+  # with geometry (as SpatVector)
+  testthat::expect_no_error(
+    suppressWarnings(
+      calc_vnp46_geom_v <-
+        calc_modis_par(
+          from = path_vnp46,
+          locs = site_faux,
+          preprocess = process_blackmarble,
+          name_covariates = c("MOD_NITLT_0_"),
+          subdataset = 3L,
+          nthreads = 1,
+          tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
+          geom = TRUE
+        )
+    )
+  )
+  testthat::expect_s4_class(calc_vnp46_geom_v, "SpatVector")
+
+
+  # with geometry (as sf)
+  testthat::expect_no_error(
+    suppressWarnings(
+      calc_vnp46_geom_sf <-
+        calc_modis_par(
+          from = path_vnp46,
+          locs = sf::st_as_sf(site_faux),
+          preprocess = process_blackmarble,
+          name_covariates = c("MOD_NITLT_0_"),
+          subdataset = 3L,
+          nthreads = 1,
+          tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
+          geom = TRUE
+        )
+    )
+  )
+  testthat::expect_s4_class(calc_vnp46_geom_sf, "SpatVector")
 
   # error cases
   testthat::expect_error(
@@ -398,6 +482,19 @@ testthat::test_that("calc_modis works well.", {
       name_extracted = "MCD_EXTR_1K_"
     )
   )
+
+  # test calc_modis_daily directly with geometry
+  testthat::expect_no_error(
+    calc_mod_geom <- calc_modis_daily(
+      from = mcd_merge,
+      date = "2021-08-15",
+      locs = sf::st_as_sf(site_faux2),
+      radius = 1000,
+      name_extracted = "MCD_EXTR_1K_",
+      geom = TRUE
+    )
+  )
+  testthat::expect_s4_class(calc_mod_geom, "SpatVector")
 
   testthat::expect_error(
     calc_modis_par(from = site_faux)
@@ -691,6 +788,16 @@ testthat::test_that("NEI calculation", {
   testthat::expect_true(any(grepl("NEI", names(neicalced))))
   testthat::expect_equal(neicalced$TRF_NEINP_0_00000, 1579079, tolerance = 1)
 
+  # with geometry
+  testthat::expect_no_error(
+    neicalced_geom <- calc_nei(
+      locs = ncp,
+      from = neiras,
+      geom = TRUE
+    )
+  )
+  testthat::expect_s4_class(neicalced_geom, "SpatVector")
+
   # more error cases
   testthat::expect_condition(
     calc_nei(
@@ -710,8 +817,8 @@ testthat::test_that("TRI calculation", {
   withr::local_package("data.table")
   withr::local_options(sf_use_s2 = FALSE)
 
-  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
-  ncp$site_id <- "3799900018810101"
+  ncp <- data.frame(lon = c(-78.8277, -78.0000), lat = c(35.95013, 80.000))
+  ncp$site_id <- c("3799900018810101", "3799900018819999")
   ncp$time <- 2018L
   ncpt <-
     terra::vect(ncp, geom = c("lon", "lat"),
@@ -728,10 +835,21 @@ testthat::test_that("TRI calculation", {
     tri_c <- calc_tri(
       from = tri_r,
       locs = ncpt,
-      radius = 50000L
+      radius = c(1500L, 50000L)
     )
   )
   testthat::expect_true(is.data.frame(tri_c))
+
+  # with geometry
+  testthat::expect_no_error(
+    tri_c_geom <- calc_tri(
+      from = tri_r,
+      locs = ncpt,
+      radius = c(1500L, 50000L),
+      geom = TRUE
+    )
+  )
+  testthat::expect_s4_class(tri_c_geom, "SpatVector")
 
   testthat::expect_no_error(
     calc_tri(
@@ -807,6 +925,19 @@ testthat::test_that("calc_sedc tests", {
       target_fields = targcols
     )
   )
+
+  # with geometry
+  testthat::expect_no_error(
+    tri_sedc_geom <- calc_sedc(
+        locs = ncpt,
+        from = tri_r,
+        locs_id = "site_id",
+        sedc_bandwidth = 30000,
+        target_fields = targcols,
+        geom = TRUE
+      )
+  )
+  testthat::expect_s4_class(tri_sedc_geom, "SpatVector")
 
   # warning case: duplicate field names between locs and from
   ncpta <- ncpt
@@ -1708,6 +1839,7 @@ testthat::test_that("calc_lagged error with SpatVector.", {
   withr::local_package("data.table")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
+  ncpv <- terra::vect(ncp, geom = c("lon", "lat"), crs = "EPSG:4326")
   # expect function
   testthat::expect_true(
     is.function(calc_lagged)
@@ -1727,14 +1859,32 @@ testthat::test_that("calc_lagged error with SpatVector.", {
   narr_covariate_geom <-
     calc_narr(
       from = narr,
-      locs = ncp,
+      locs = ncpv,
       locs_id = "site_id",
       radius = 0,
       fun = "mean",
       geom = TRUE
     )
+  testthat::expect_no_error(
+    narr_covariate_geom_lag <- calc_lagged(
+      from = narr_covariate_geom,
+      date = c("2018-01-03", "2018-01-05"),
+      lag = 1,
+      locs_id = "site_id",
+      time_id = "time",
+      geom = TRUE
+    )
+  )
+  testthat::expect_s4_class(narr_covariate_geom_lag, "SpatVector")
   testthat::expect_error(
-    calc_lagged(from = narr_covariate_geom)
+    calc_lagged(
+      from = as.data.frame(narr_covariate_geom),
+      date = c("2018-01-03", "2018-01-05"),
+      lag = 1,
+      locs_id = "site_id",
+      time_id = "time",
+      geom = TRUE
+    )
   )
 })
 

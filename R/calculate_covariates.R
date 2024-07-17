@@ -542,17 +542,13 @@ calc_ecoregion <-
       paste0("1997 - ", data.table::year(Sys.Date())),
       df_lv2, df_lv3
     )
-    if (geom) {
-      locs_return <- calc_return_locs(
-        covar = locs_ecoreg,
-        POSIXt = FALSE,
-        geom = geom,
-        crs = terra::crs(from)
-      )
-    } else {
-      names(locs_ecoreg)[2] <- "description"
-      locs_return <- locs_ecoreg
-    }
+    locs_return <- calc_return_locs(
+      covar = locs_ecoreg,
+      POSIXt = FALSE,
+      geom = geom,
+      crs = terra::crs(from)
+    )
+    names(locs_return)[2] <- "description"
     attr(locs_return, "ecoregion2_code") <- sort(unique(from$L2_KEY))
     attr(locs_return, "ecoregion3_code") <- sort(unique(from$L3_KEY))
     return(locs_return)
@@ -574,6 +570,9 @@ calc_ecoregion <-
 #' @param max_cells integer(1). Maximum number of cells to be read at once.
 #' Higher values will expedite processing, but will increase memory usage.
 #' Maximum possible value is `2^31 - 1`.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' See [`exactextractr::exact_extract`] for details.
 #' @param ... Placeholders.
 #' @description The function operates at MODIS/VIIRS products
@@ -589,7 +588,7 @@ calc_ecoregion <-
 #'     [process_blackmarble()]
 #' * Parallelization: [calc_modis_par()]
 #' @author Insang Song
-#' @return A data.frame object.
+#' @return a data.frame or SpatVector object.
 #' @importFrom terra extract
 #' @importFrom terra project
 #' @importFrom terra vect
@@ -622,6 +621,7 @@ calc_modis_daily <- function(
   name_extracted = NULL,
   fun_summary = "mean",
   max_cells = 3e7,
+  geom = FALSE,
   ...
 ) {
   if (!methods::is(locs, "SpatVector")) {
@@ -682,9 +682,38 @@ calc_modis_daily <- function(
   name_range <- seq(ncol(extracted) - name_offset + 1, ncol(extracted), 1)
   colnames(extracted)[name_range] <- name_extracted
   extracted$time <- as.POSIXlt(date)
-  calc_check_time(covar = extracted, POSIXt = TRUE)
+  if (geom) {
+    # convert to base date, as terra::vect does not like class "POSIXlt"
+    extracted$time <- as.Date.POSIXlt(extracted$time)
+    # location ID with geometry
+    locs_geom_id <- suppressMessages(calc_prepare_locs(
+      from = from,
+      locs = locs,
+      locs_id = locs_id,
+      radius = radius,
+      geom = geom
+    )[[2]]
+    )
+    # merge
+    extracted_merge <- merge(
+      locs_geom_id,
+      extracted,
+      by = locs_id
+    )
+    # re-convert to POSIXlt after creating the vect
+    extracted_merge$time <- as.POSIXlt(extracted_merge$time)
+    extracted_return <- calc_return_locs(
+      covar = extracted_merge,
+      POSIXt = TRUE,
+      geom = geom,
+      crs = terra::crs(from)
+    )
+  } else {
+    calc_check_time(covar = extracted, POSIXt = TRUE)
+    extracted_return <- extracted
+  }
   gc()
-  return(extracted)
+  return(extracted_return)
 }
 
 
@@ -718,6 +747,9 @@ calc_modis_daily <- function(
 #' Higher values will expedite processing, but will increase memory usage.
 #' Maximum possible value is `2^31 - 1`.
 #' See [`exactextractr::exact_extract`] for details.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Arguments passed to `preprocess`.
 #' @description `calc_modis_par` essentially runs [`calc_modis_daily`] function
 #' in each thread (subprocess). Based on daily resolution, each day's workload
@@ -750,7 +782,7 @@ calc_modis_daily <- function(
 #' Users will be informed of the dates with insufficient tiles.
 #' The result data.frame will have an attribute with the dates with
 #' insufficient tiles.
-#' @return A data.frame with an attribute:
+#' @return A data.frame or SpatVector with an attribute:
 #' * `attr(., "dates_dropped")`: Dates with insufficient tiles.
 #'   Note that the dates mean the dates with insufficient tiles,
 #'   not the dates without available tiles.
@@ -811,6 +843,7 @@ calc_modis_par <-
     package_list_add = NULL,
     export_list_add = NULL,
     max_cells = 3e7,
+    geom = FALSE,
     ...
   ) {
     if (!is.function(preprocess)) {
@@ -920,7 +953,8 @@ process_modis_swath, or process_blackmarble.")
                       fun_summary = fun_summary,
                       name_extracted = name_radius,
                       radius = radius[k],
-                      max_cells = max_cells
+                      max_cells = max_cells,
+                      geom = FALSE
                     )
                   )
                 if (inherits(extracted, "try-error")) {
@@ -951,9 +985,22 @@ process_modis_swath, or process_blackmarble.")
         future.seed = TRUE
       )
     calc_results <- do.call(dplyr::bind_rows, calc_results)
-    attr(calc_results, "dates_dropped") <- dates_insuf
+    if (geom) {
+      # merge
+      calc_results_return <- merge(
+        locs,
+        calc_results,
+        by = locs_id
+      )
+      if ("sf" %in% class(calc_results_return)) {
+        calc_results_return <- terra::vect(calc_results_return)
+      }
+    } else {
+      calc_results_return <- calc_results
+    }
+    attr(calc_results_return, "dates_dropped") <- dates_insuf
     Sys.sleep(1L)
-    return(calc_results)
+    return(calc_results_return)
   }
 
 
@@ -966,9 +1013,12 @@ process_modis_swath, or process_blackmarble.")
 #' @param locs_id character(1). Unique site identifier column name.
 #'  Default is `"site_id"`.
 #' @param year integer. Year domain to dummify.
-#'  Default is \code{seq(2018L, 2022L)}
+#'  Default is \code{seq(2018L, 2022L)}.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders.
-#' @return a data.frame object
+#' @return a data.frame or SpatVector object
 #' @author Insang Song
 #' @importFrom methods is
 #' @importFrom data.table year
@@ -989,6 +1039,7 @@ calc_temporal_dummies <-
     locs,
     locs_id = "site_id",
     year = seq(2018L, 2022L),
+    geom = FALSE,
     ...
   ) {
     if (!methods::is(locs, "data.frame")) {
@@ -1043,7 +1094,15 @@ calc_temporal_dummies <-
         dt_month_dum,
         dt_wday_dum
       )
-    return(locs_dums)
+
+    # geom
+    locs_return <- calc_return_locs(
+      covar = locs_dums,
+      POSIXt = TRUE,
+      geom = geom,
+      crs = "EPSG:4326"
+    )
+    return(locs_return)
   }
 
 
@@ -1057,7 +1116,10 @@ calc_temporal_dummies <-
 #' Distance at which the source concentration is reduced to
 #'  `exp(-3)` (approximately -95 %)
 #' @param target_fields character(varying). Field names in characters.
-#' @return a data.frame (tibble) object with input field names with
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
+#' @return a data.frame (tibble) or SpatVector object with input field names with
 #'  a suffix \code{"_sedc"} where the sums of EDC are stored.
 #'  Additional attributes are attached for the EDC information.
 #'    - `attr(result, "sedc_bandwidth")``: the bandwidth where
@@ -1111,7 +1173,8 @@ calc_sedc <-
     locs = NULL,
     locs_id = NULL,
     sedc_bandwidth = NULL,
-    target_fields = NULL
+    target_fields = NULL,
+    geom = FALSE
   ) {
     if (!methods::is(locs, "SpatVector")) {
       locs <- try(terra::vect(locs))
@@ -1184,10 +1247,25 @@ The result may not be accurate.\n",
     names(res_sedc)[idx_air] <-
       sprintf("%s_%05d", names(res_sedc)[idx_air], sedc_bandwidth)
 
-    attr(res_sedc, "sedc_bandwidth") <- sedc_bandwidth
-    attr(res_sedc, "sedc_threshold") <- sedc_bandwidth * 2
-    calc_check_time(covar = res_sedc, POSIXt = TRUE)
-    return(res_sedc)
+    if (geom) {
+      res_sedc <- merge(
+        terra::as.data.frame(locs, geom = "WKT")[, c("site_id", "geometry")],
+        res_sedc,
+        "site_id"
+      )
+    }
+
+    res_sedc_return <- calc_return_locs(
+      covar = res_sedc,
+      POSIXt = TRUE,
+      geom = geom,
+      crs = terra::crs(from)
+    )
+
+    attr(res_sedc_return, "sedc_bandwidth") <- sedc_bandwidth
+    attr(res_sedc_return, "sedc_threshold") <- sedc_bandwidth * 2
+
+    return(res_sedc_return)
   }
 
 
@@ -1204,9 +1282,12 @@ The result may not be accurate.\n",
 #'  Default is `"site_id"`.
 #' @param radius Circular buffer radius.
 #' Default is \code{c(1000, 10000, 50000)} (meters)
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders.
 #' @author Insang Song, Mariana Kassien
-#' @return a data.frame object
+#' @return a data.frame or SpatVector object
 #' @note U.S. context.
 #' @seealso [`calc_sedc`], [`process_tri`]
 #' @importFrom terra vect
@@ -1240,6 +1321,7 @@ calc_tri <- function(
   locs,
   locs_id = "site_id",
   radius = c(1e3L, 1e4L, 5e4L),
+  geom = FALSE,
   ...
 ) {
   if (!methods::is(locs, "SpatVector")) {
@@ -1268,21 +1350,31 @@ calc_tri <- function(
             from = from,
             locs_id = locs_id,
             sedc_bandwidth = x,
-            target_fields = tri_cols
+            target_fields = tri_cols,
+            geom = FALSE
           )
         return(locs_tri_s)
       },
       list_radius
     )
+
   # bind element data.frames into one
   df_tri <- Reduce(function(x, y) dplyr::full_join(x, y), list_locs_tri)
   if (nrow(df_tri) != nrow(locs)) {
     df_tri <- dplyr::left_join(as.data.frame(locs), df_tri)
   }
+
+  df_tri_return <- calc_return_locs(
+    covar = df_tri,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+
   # read attr
-  df_tri$time <- as.integer(attr(from, "tri_year"))
-  calc_check_time(covar = df_tri, POSIXt = FALSE)
-  return(df_tri)
+  df_tri_return$time <- as.integer(attr(from, "tri_year"))
+
+  return(df_tri_return)
 }
 
 
@@ -1291,10 +1383,13 @@ calc_tri <- function(
 #' @param locs sf/SpatVector. Locations at NEI values are joined.
 #' @param locs_id character(1). Unique site identifier column name.
 #' Unused but kept for compatibility.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.`
 #' @param ... Placeholders.
 #' @author Insang Song, Ranadeep Daw
 #' @seealso [`process_nei`]
-#' @return a data.frame object
+#' @return a data.frame or SpatVector object
 #' @importFrom terra vect
 #' @importFrom methods is
 #' @importFrom terra project
@@ -1313,6 +1408,7 @@ calc_nei <- function(
   from = NULL,
   locs = NULL,
   locs_id = "site_id",
+  geom = FALSE,
   ...
 ) {
   if (!methods::is(locs, "SpatVector")) {
@@ -1325,8 +1421,14 @@ calc_nei <- function(
   locs_re <- terra::project(locs, terra::crs(from))
   locs_re <- terra::intersect(locs_re, from)
   locs_re <- as.data.frame(locs_re)
-  calc_check_time(covar = locs_re, POSIXt = FALSE)
-  return(locs_re)
+
+  locs_return <- calc_return_locs(
+    covar = locs_re,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  return(locs_return)
 }
 
 
@@ -1349,7 +1451,7 @@ calc_nei <- function(
 #' @param ... Placeholders.
 #' @seealso [process_hms()]
 #' @author Mitchell Manware
-#' @return a data.frame object
+#' @return a data.frame or SpatVector object
 #' @importFrom terra vect
 #' @importFrom terra as.data.frame
 #' @importFrom terra time
@@ -2333,6 +2435,7 @@ calc_terraclimate <- function(
   return(sites_return)
 }
 
+# nolint start
 #' Calculate temporally lagged covariates
 #' @description
 #' The \code{calc_lagged()} function calculates daily temporal lagged covariates
@@ -2344,6 +2447,9 @@ calc_terraclimate <- function(
 #' @param lag integer(1). Number of lag days.
 #' @param time_id character(1). Column containing time values.
 #' @param locs_id character(1). Name of unique identifier.
+#' @param geom logical(1). Should the function return a `SpatVector`?
+#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
+#' that of `from.` To return as a `SpatVector`, `from` must also be a `SpatVector`
 #' @seealso [calc_covariates()]
 #' @note
 #' In order to calculate temporally lagged covariates, `from` must contain at
@@ -2357,6 +2463,7 @@ calc_terraclimate <- function(
 #' lag, buffer radius format adopted in \code{calc_setcolumns()}.
 #' @return a `data.frame` object
 #' @importFrom dplyr lag
+#' @importFrom dplyr select
 #' @examples
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
@@ -2376,21 +2483,28 @@ calc_terraclimate <- function(
 #'   time_id = "time"
 #' )
 #' }
+# nolint end
 #' @export
 calc_lagged <- function(
     from,
     date,
     lag,
     locs_id,
-    time_id = "time") {
-  #### check input data types
-  if ("SpatVector" %in% class(from)) {
-    cat(
+    time_id = "time",
+    geom = FALSE) {
+  #### geom and from
+  if (geom && !("SpatVector" %in% class(from))) {
+    stop(
       paste0(
-        "`calc_lagged` for `SpatVector` objects is under construction.",
-        " Returning `NULL`.\n"
+        "To return with geometry, `from` must be a `SpatVector` object.\n"
       )
     )
+  }
+  #### check input data types
+  if ("SpatVector" %in% class(from)) {
+    from_full <- terra::as.data.frame(from, geom = "WKT")
+    geoms <- unique(from_full[, c("site_id", "geometry")])
+    from <- from_full |> dplyr::select(-"geometry")
   }
   stopifnot(methods::is(from, "data.frame"))
   #### check if time_id is not null
@@ -2445,6 +2559,14 @@ calc_lagged <- function(
     #### merge with other locations
     variables_merge <- rbind(variables_merge, variables_return_date)
   }
-  calc_check_time(covar = variables_merge, POSIXt = TRUE)
-  return(variables_merge)
+  if (geom) {
+    variables_merge <- merge(variables_merge, geoms)
+  }
+  variables_return <- calc_return_locs(
+    covar = variables_merge,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  return(variables_return)
 }

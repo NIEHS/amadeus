@@ -344,7 +344,7 @@ process_locs_vector <-
   ) {
     #### detect SpatVector
     if (methods::is(locs, "SpatVector")) {
-      cat(
+      message(
         paste0(
           "Detected `SpatVector` (",
           terra::geomtype(locs),
@@ -545,15 +545,20 @@ is_date_proper <- function(
 #' @param data sf/terra object.
 #' @param extent numeric(4). Extent to filter the data.
 #'   Should be ordered as c(xmin, xmax, ymin, ymax).
+#' @param geom character(1 or 2). Geometry type for if `data` is `data.frame`.
+#' One of "geometry" or c("lon", "lat").
 #' @importFrom sf st_as_sfc st_bbox st_crs
 #' @importFrom terra ext
 #' @returns sf/terra object with the extent applied.
 #' @keywords internal
 apply_extent <-
-  function(data, extent) {
+  function(data, extent, geom) {
     extent <- terra::ext(extent)
     if (inherits(data, "sf")) {
-      extent <- sf::st_as_sfc(sf::st_bbox(extent), crs = sf::st_crs(data))
+      extent <- sf::st_as_sfc(sf::st_bbox(extent))
+      sf::st_crs(extent) <- sf::st_crs(data)
+    } else if (inherits(data, "data.frame")) {
+      data <- terra::vect(data, geom = geom, crs = "EPSG:4326")
     }
     data <- data[extent, ]
     return(data)

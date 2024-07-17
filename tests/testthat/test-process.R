@@ -1297,7 +1297,7 @@ testthat::test_that("process_aqs", {
   testthat::expect_error(
     process_aqs(path = aqssub, date = c("2021-08-15"))
   )
-  testthat::expect_error(
+  testthat::expect_no_error(
     process_aqs(
       path = aqssub, date = c("2022-02-04", "2022-02-28"),
       mode = "available-data", return_format = "sf",
@@ -1851,9 +1851,10 @@ testthat::test_that("apply_extent tests", {
     dfsftr <- apply_extent(dfsf, c(-112, -101, 33.5, 40.9))
   )
   testthat::expect_no_error(
-    dfdftr <- apply_extent(df, c(-112, -101, 33.5, 40.9))
+    dfdftr <-
+      apply_extent(df, c(-112, -101, 33.5, 40.9), geom = c("lon", "lat"))
   )
   testthat::expect_s4_class(dftr1, "SpatVector")
-  testthat::expect_s4_class(dfsftr, "SpatVector")
+  testthat::expect_s3_class(dfsftr, "sf")
   testthat::expect_s4_class(dfdftr, "SpatVector")
 })
