@@ -4,13 +4,16 @@
 \alias{apply_extent}
 \title{Apply extent to the processed data}
 \usage{
-apply_extent(data, extent)
+apply_extent(data, extent, geom)
 }
 \arguments{
 \item{data}{sf/terra object.}
 
 \item{extent}{numeric(4). Extent to filter the data.
 Should be ordered as c(xmin, xmax, ymin, ymax).}
+
+\item{geom}{character(1 or 2). Geometry type for if \code{data} is \code{data.frame}.
+One of "geometry" or c("lon", "lat").}
 }
 \value{
 sf/terra object with the extent applied.

@@ -9,7 +9,8 @@ calc_sedc(
   locs = NULL,
   locs_id = NULL,
   sedc_bandwidth = NULL,
-  target_fields = NULL
+  target_fields = NULL,
+  geom = FALSE
 )
 }
 \arguments{
@@ -25,9 +26,13 @@ Distance at which the source concentration is reduced to
 \code{exp(-3)} (approximately -95 \%)}
 
 \item{target_fields}{character(varying). Field names in characters.}
+
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.}}
 }
 \value{
-a data.frame (tibble) object with input field names with
+a data.frame (tibble) or SpatVector object with input field names with
 a suffix \code{"_sedc"} where the sums of EDC are stored.
 Additional attributes are attached for the EDC information.
 \itemize{

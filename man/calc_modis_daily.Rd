@@ -13,6 +13,7 @@ calc_modis_daily(
   name_extracted = NULL,
   fun_summary = "mean",
   max_cells = 3e+07,
+  geom = FALSE,
   ...
 )
 }
@@ -37,13 +38,17 @@ for details.}
 
 \item{max_cells}{integer(1). Maximum number of cells to be read at once.
 Higher values will expedite processing, but will increase memory usage.
-Maximum possible value is \code{2^31 - 1}.
+Maximum possible value is \code{2^31 - 1}.}
+
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.}
 See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
 
 \item{...}{Placeholders.}
 }
 \value{
-A data.frame object.
+a data.frame or SpatVector object.
 }
 \description{
 The function operates at MODIS/VIIRS products

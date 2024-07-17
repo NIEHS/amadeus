@@ -4,7 +4,7 @@
 \alias{calc_nei}
 \title{Calculate road emissions covariates}
 \usage{
-calc_nei(from = NULL, locs = NULL, locs_id = "site_id", ...)
+calc_nei(from = NULL, locs = NULL, locs_id = "site_id", geom = FALSE, ...)
 }
 \arguments{
 \item{from}{SpatVector(1). Output of \code{process_nei()}.}
@@ -14,10 +14,14 @@ calc_nei(from = NULL, locs = NULL, locs_id = "site_id", ...)
 \item{locs_id}{character(1). Unique site identifier column name.
 Unused but kept for compatibility.}
 
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.}}
+
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame object
+a data.frame or SpatVector object
 }
 \description{
 Calculate road emissions covariates

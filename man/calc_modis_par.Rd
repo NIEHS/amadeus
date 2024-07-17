@@ -17,6 +17,7 @@ calc_modis_par(
   package_list_add = NULL,
   export_list_add = NULL,
   max_cells = 3e+07,
+  geom = FALSE,
   ...
 )
 }
@@ -62,10 +63,14 @@ Higher values will expedite processing, but will increase memory usage.
 Maximum possible value is \code{2^31 - 1}.
 See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
 
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.}}
+
 \item{...}{Arguments passed to \code{preprocess}.}
 }
 \value{
-A data.frame with an attribute:
+A data.frame or SpatVector with an attribute:
 \itemize{
 \item \code{attr(., "dates_dropped")}: Dates with insufficient tiles.
 Note that the dates mean the dates with insufficient tiles,
