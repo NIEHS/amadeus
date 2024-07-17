@@ -12,7 +12,7 @@
 
 `amadeus` is not yet available from CRAN, but it can be installed with the `devtools`, `remotes`, or `pak` packages.
 
-```
+```r
 devtools::install_github("NIEHS/amadeus")
 ```
 
@@ -65,16 +65,18 @@ See the "[download_data](https://niehs.github.io/amadeus/articles/download_funct
 Example use of `download_data` using NOAA NCEP North American Regional Reanalysis's (NARR) "weasd" (Daily Accumulated Snow at Surface) variable.
 
 ```r
-> directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
-> download_data(
-+   dataset_name = "narr_monolevel",
-+   year_start = 2022,
-+   year_end = 2022,
-+   variable = "weasd",
-+   directory_to_save = directory,
-+   acknowledgement = TRUE,
-+   download = TRUE
-+ )
+directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
+download_data(
+  dataset_name = "narr_monolevel",
+  year_start = 2022,
+  year_end = 2022,
+  variable = "weasd",
+  directory_to_save = directory,
+  acknowledgement = TRUE,
+  download = TRUE
+)
+```
+```
 Downloading requested files...
 Requested files have been downloaded.
 ```
@@ -93,13 +95,6 @@ To avoid errors when using `process_covariates`, **do not edit the raw downloade
 
 Example use of `process_covariates` using the downloaded "weasd" data.
 
-```r
-> weasd <- process_covariates(
-+   covariate = "narr",
-+   date = c("2022-01-01", "2022-01-05"),
-+   variable = "weasd",
-+   path = paste0(directory, "weasd")
-+ )
 ```r
 weasd <- process_covariates(
   covariate = "narr",
@@ -137,16 +132,18 @@ time        : 2022-01-01 to 2022-01-05 UTC
 Example of `calc_covariates` using processed "weasd" data.
 
 ```r
-> locs <- data.frame(lon = -78.8277, lat = 35.95013)
-> locs$id <- "0001"
-> weasd_covar <- calc_covariates(
-+   covariate = "narr",
-+   from = weasd_process,
-+   locs = locs,
-+   locs_id = "id",
-+   radius = 0,
-+   geom = FALSE
-+ )
+locs <- data.frame(id = "001", lon = -78.8277, lat = 35.95013)
+locs$id <- "0001"
+weasd_covar <- calc_covariates(
+  covariate = "narr",
+  from = weasd_process,
+  locs = locs,
+  locs_id = "id",
+  radius = 0,
+  geom = FALSE
+)
+```
+```
 Detected `data.frame` extraction locations...
 Calculating weasd covariates for 2022-01-01...
 Calculating weasd covariates for 2022-01-02...

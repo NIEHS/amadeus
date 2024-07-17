@@ -2066,7 +2066,10 @@ download_koppen_geiger <- function(
   #### 7. define data resolution
   data_resolution <- gsub("\\.", "p", data_resolution)
   #### 8 define download URL
-  download_url <- "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/12407516/Beck_KG_V1.zip"
+  download_url <- paste0(
+    "https://s3-eu-west-1.amazonaws.com/",
+    "pfigshare-u-files/12407516/Beck_KG_V1.zip"
+  )
   #### 9 build download file name
   download_name <- paste0(
     directory_to_download,
