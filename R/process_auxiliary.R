@@ -496,11 +496,13 @@ process_variable_codes <-
       return(variables)
     } else {
       if (all(tolower(variables) %in% names_codes[, 1]) == TRUE) {
-        codes_return <- do.call(
-          code_function,
-          list(tolower(variables), invert = FALSE)
+        codes_return <- lapply(
+          tolower(variables),
+          function(var) {
+            do.call(code_function, list(var, invert = FALSE))
+          }
         )
-        return(as.vector(codes_return))
+        return(as.vector(unlist(codes_return)))
       } else {
         stop(
           paste0(
