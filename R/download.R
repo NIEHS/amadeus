@@ -3462,7 +3462,7 @@ download_gridmet <- function(
   if (any(nchar(year[1]) != 4, nchar(year[1]) != 4)) {
     stop("years should be 4-digit integers.\n")
   }
-  years <- seq(year[1], year[1], 1)
+  years <- seq(year[1], year[2], 1)
   #### define variables
   variables_list <- process_variable_codes(
     variables = variables,
