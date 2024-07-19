@@ -509,7 +509,7 @@ testthat::test_that("process_koppen_geiger tests", {
   path_kgeiger_f <-
     testthat::test_path("../testdata", "kop", "Beck_KG_V1_future_0p5.tif")
   testthat::expect_no_error(
-    kgeiger_f <- process_koppen_geiger(path_kgeiger, year = "future")
+    kgeiger_f <- process_koppen_geiger(path_kgeiger_f)
   )
 })
 
@@ -1301,6 +1301,16 @@ testthat::test_that("process_aqs", {
   )
   testthat::expect_error(
     process_aqs(path = aqssub, date = c("2021-08-15"))
+  )
+  testthat::expect_error(
+    process_aqs(path = aqssub, date = NULL)
+  )
+  testthat::expect_no_error(
+    process_aqs(
+      path = aqssub, date = c("2022-02-04", "2022-02-28"),
+      mode = "available-data", return_format = "sf",
+      extent = c(-79, 33, -78, 36)
+    )
   )
   testthat::expect_no_error(
     process_aqs(

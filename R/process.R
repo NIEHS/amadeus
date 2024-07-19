@@ -1217,7 +1217,7 @@ process_aqs <-
       dplyr::mutate(time = Date.Local) |>
       dplyr::ungroup()
     col_sel <- c("site_id", "Longitude", "Latitude", "Datum")
-    if (mode != "sparse") {
+    if (mode != "available-data") {
       sites_v <- unique(sites[, col_sel])
     } else {
       col_sel <- append(col_sel, "Event.Type")

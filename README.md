@@ -1,40 +1,4 @@
-# amadeus
-
-<style>
-  .hex-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .hex-item {
-    position: relative;
-    margin: 5px;
-  }
-
-  .hex-item img {
-    width: 150px;
-    height: auto;
-  }
-
-  .hex-item:nth-child(odd) {
-    margin-top: 50px;
-  }
-</style>
-
-<div class="hex-container">
-  <div class="hex-item">
-    <a href="https://niehs.github.io/amadeus/">
-      <img src="man/figures/amadeus_hex.svg" alt="tidymodels">
-    </a>
-  </div>
-  <div class="hex-item">
-    <a href="https://www.niehs.nih.gov/research/programs/chords">
-      <img src="man/figures/chords_hex.svg" alt="rsample">
-    </a>
-  </div>
-</div>
-
+# amadeus <a href="https://niehs.github.io/amadeus/"><img src="man/figures/amadeus-combined.svg" align="right" height="250" /><a>
 
 [![R-CMD-check](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml)
 [![cov](https://NIEHS.github.io/amadeus/badges/coverage.svg)](https://github.com/NIEHS/amadeus/actions)

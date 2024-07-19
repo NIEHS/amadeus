@@ -4,13 +4,11 @@
 \alias{process_koppen_geiger}
 \title{Process climate classification data}
 \usage{
-process_koppen_geiger(path = NULL, year = NULL, extent = NULL, ...)
+process_koppen_geiger(path = NULL, extent = NULL, ...)
 }
 \arguments{
 \item{path}{character(1). Path to Koppen-Geiger
 climate zone raster file}
-
-\item{year}{data year. Not applicable for this function.}
 
 \item{extent}{numeric(4) or SpatExtent giving the extent of the raster
 if \code{NULL} (default), the entire raster is loaded}
