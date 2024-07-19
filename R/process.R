@@ -721,7 +721,6 @@ process_modis_swath <-
 #' classification data, returning a single `SpatRaster` object.
 #' @param path character(1). Path to Koppen-Geiger
 #'  climate zone raster file
-#' @param year data year. Not applicable for this function.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
@@ -738,7 +737,6 @@ process_modis_swath <-
 process_koppen_geiger <-
   function(
     path = NULL,
-    year = NULL,
     extent = NULL,
     ...
   ) {

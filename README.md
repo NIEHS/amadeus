@@ -1,5 +1,18 @@
 # amadeus <a href="https://niehs.github.io/amadeus/"><img src="man/figures/amadeus_hex.svg" align="right" height="200" /><a>
 
+<div style="display: flex; flex-wrap: wrap; justify-content: center;">
+  <div style="margin: 10px;">
+    <a href="https://niehs.github.io/amadeus/">
+      <img src="man/figures/amadeus_hex.svg" height="150" style="margin-bottom: -50px;" />
+    </a>
+  </div>
+  <div style="margin: 10px;">
+    <a href="https://www.niehs.nih.gov/research/programs/chords">
+      <img src="man/figures/chords_hex.svg" height="150" style="margin-top: 50px;" />
+    </a>
+  </div>
+</div>
+
 [![R-CMD-check](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml)
 [![cov](https://NIEHS.github.io/amadeus/badges/coverage.svg)](https://github.com/NIEHS/amadeus/actions)
 [![lint](https://github.com/NIEHS/amadeus/actions/workflows/lint.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/lint.yaml)

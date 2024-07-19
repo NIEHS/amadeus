@@ -504,8 +504,13 @@ testthat::test_that("process_koppen_geiger tests", {
       extent = terra::ext(kgeiger)
     )
   )
-
   testthat::expect_s4_class(kgeiger, "SpatRaster")
+
+  path_kgeiger_f <-
+    testthat::test_path("../testdata", "kop", "Beck_KG_V1_future_0p5.tif")
+  testthat::expect_no_error(
+    kgeiger_f <- process_koppen_geiger(path_kgeiger, year = "future")
+  )
 })
 
 # test TRI ####
