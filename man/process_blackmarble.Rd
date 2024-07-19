@@ -39,7 +39,7 @@ georeferenced h5 files of Black Marble product. Referencing corner coordinates
 are necessary as the original h5 data do not include such information.
 }
 \examples{
-/dontrun{
+\dontrun{
 vnp46a2 <- process_blackmarble(
   path =
     list.files("./data", pattern = "VNP46A2.", full.names = TRUE),

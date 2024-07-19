@@ -216,7 +216,7 @@ process_modis_sds <-
 #' @importFrom terra tapp
 #' @importFrom terra is.rotated
 #' @examples
-#' /dontrun{
+#' \dontrun{
 #' mod09ga_flatten <- process_flatten_sds(
 #'   path =
 #'     list.files("./data", pattern = "MOD09GA.", full.names = TRUE)[1],
@@ -300,7 +300,7 @@ the input then flatten it manually.")
 #' @author Insang Song
 #' @returns a `SpatRaster` object
 #' @examples
-#' /dontrun{
+#' \dontrun{
 #' mod09ga_merge <- process_modis_merge(
 #'   path =
 #'     list.files("./data", pattern = "MOD09GA.", full.names = TRUE),
@@ -440,7 +440,7 @@ process_blackmarble_corners <-
 #' @importFrom terra crs
 #' @importFrom terra merge
 #' @examples
-#' /dontrun{
+#' \dontrun{
 #' vnp46a2 <- process_blackmarble(
 #'   path =
 #'     list.files("./data", pattern = "VNP46A2.", full.names = TRUE),

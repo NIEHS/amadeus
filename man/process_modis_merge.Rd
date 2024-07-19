@@ -42,7 +42,7 @@ MODIS products downloaded by functions in \code{amadeus},
 and \href{https://github.com/rspatial/luna}{luna} are accepted.
 }
 \examples{
-/dontrun{
+\dontrun{
 mod09ga_merge <- process_modis_merge(
   path =
     list.files("./data", pattern = "MOD09GA.", full.names = TRUE),

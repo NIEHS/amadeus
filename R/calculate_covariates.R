@@ -812,7 +812,7 @@ calc_modis_daily <- function(
 #' @importFrom future.apply future_lapply
 #' @importFrom parallelly availableWorkers
 #' @examples
-#' /dontrun{
+#' \dontrun{
 #' locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
 #' locs <- terra::vect(locs, geom = c("lon", "lat"), crs = "EPSG:4326")
 #' calc_modis_par(
