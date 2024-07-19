@@ -67,9 +67,8 @@ Example use of `download_data` using NOAA NCEP North American Regional Reanalysi
 ```r
 directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
 download_data(
-  dataset_name = "narr_monolevel",
-  year_start = 2022,
-  year_end = 2022,
+  dataset_name = "narr",
+  year = c(2022, 2022),
   variable = "weasd",
   directory_to_save = directory,
   acknowledgement = TRUE,
@@ -133,7 +132,6 @@ Example of `calc_covariates` using processed "weasd" data.
 
 ```r
 locs <- data.frame(id = "001", lon = -78.8277, lat = 35.95013)
-locs$id <- "0001"
 weasd_covar <- calc_covariates(
   covariate = "narr",
   from = weasd_process,
