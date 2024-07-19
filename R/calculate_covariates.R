@@ -389,8 +389,8 @@ calc_nlcd <- function(from,
     class_query <- "value"
     # ratio of each nlcd class per buffer
     bufs_polx <- bufs_pol[terra::ext(from), ] |>
-      sf::st_as_sf()# |>
-      # sf::st_geometry()
+      sf::st_as_sf()
+
     nlcd_at_bufs <- future.apply::future_Map(
       function(i) {
         exactextractr::exact_extract(
@@ -1578,12 +1578,12 @@ calc_hms <- function(
       sites_extracted_layer
     )
     binary_colname <- paste0(
-        tolower(
-          layer_name
-        ),
-        "_",
-        radius
-      )
+      tolower(
+        layer_name
+      ),
+      "_",
+      radius
+    )
     #### define column names
     if (geom) {
       colnames(sites_extracted_layer) <- c(

@@ -522,7 +522,7 @@ calc_return_locs <- function(
   # nolint end
   # if geom, convert to and return SpatVector
   if (geom) {
-    if ("geometry" %in% names(covar)){
+    if ("geometry" %in% names(covar)) {
       covar_return <- terra::vect(
         covar,
         geom = "geometry",

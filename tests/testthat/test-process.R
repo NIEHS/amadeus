@@ -806,17 +806,17 @@ testthat::test_that("process_gmted returns expected.", {
   # test with cropping extent
   testthat::expect_no_error(
     gmted_ext <-
-        process_gmted(
-          variable = c("Breakline Emphasis", "7.5 arc-seconds"),
-          path =
-          testthat::test_path(
-            "..",
-            "testdata",
-            "gmted",
-            "be75_grd"
-          ),
-          ext = terra::ext(gmted)
-        )
+      process_gmted(
+        variable = c("Breakline Emphasis", "7.5 arc-seconds"),
+        path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "gmted",
+          "be75_grd"
+        ),
+        ext = terra::ext(gmted)
+      )
   )
 })
 
@@ -928,7 +928,7 @@ testthat::test_that("process_narr returns expected.", {
           "omega"
         ),
         extent = terra::ext(narr)
-    )
+      )
   )
 })
 
@@ -999,17 +999,17 @@ testthat::test_that("process_geos returns expected.", {
   # test with cropping extent
   testthat::expect_no_error(
     geos_ext <- process_geos(
-        date = c("2018-01-01", "2018-01-01"),
-        variable = "O3",
-        path =
+      date = c("2018-01-01", "2018-01-01"),
+      variable = "O3",
+      path =
         testthat::test_path(
           "..",
           "testdata",
           "geos",
           "c"
         ),
-        extent = terra::ext(geos)
-      )
+      extent = terra::ext(geos)
+    )
   )
 })
 
@@ -1426,17 +1426,17 @@ testthat::test_that("process_merra2 returns as expected.", {
   # test with cropping extent
   testthat::expect_no_error(
     merra2_ext <- process_merra2(
-        date = c("2018-01-01", "2018-01-01"),
-        variable = "CPT",
-        path =
+      date = c("2018-01-01", "2018-01-01"),
+      variable = "CPT",
+      path =
         testthat::test_path(
           "..",
           "testdata",
           "merra2",
           "inst1_2d_int_Nx"
         ),
-        extent = terra::ext(merra2)
-      )
+      extent = terra::ext(merra2)
+    )
   )
 })
 
@@ -1490,12 +1490,12 @@ testthat::test_that("process_gridmet returns expected.", {
       date = c("2018-01-03", "2018-01-03"),
       variable = "Precipitation",
       path =
-      testthat::test_path(
-        "..",
-        "testdata",
-        "gridmet",
-        "pr"
-      ),
+        testthat::test_path(
+          "..",
+          "testdata",
+          "gridmet",
+          "pr"
+        ),
       extent = terra::ext(gridmet)
     )
   )
@@ -1551,12 +1551,12 @@ testthat::test_that("process_terraclimate returns expected.", {
       date = c("2018-01-01", "2018-01-01"),
       variable = "ppt",
       path =
-      testthat::test_path(
-        "..",
-        "testdata",
-        "terraclimate",
-        "ppt"
-      ),
+        testthat::test_path(
+          "..",
+          "testdata",
+          "terraclimate",
+          "ppt"
+        ),
       extent = terra::ext(terraclimate)
     )
   )
@@ -1642,8 +1642,12 @@ testthat::test_that(
 
     # test with cropping extent
     testthat::expect_no_error(
-      result_ext <- process_prism(path, element, time,
-      extent = terra::ext(result))
+      result_ext <- process_prism(
+        path,
+        element,
+        time,
+        extent = terra::ext(result)
+      )
     )
   }
 )
@@ -1744,12 +1748,12 @@ testthat::test_that("process_huc",
     # test with cropping extent
     testthat::expect_no_error(
       huc_ext <- process_huc(
-          path,
-          layer_name = "NHDPlus_test",
-          huc_level = "HUC_12",
-          huc_header = "030202",
-          extent = terra::ext(result)
-        )
+        path,
+        layer_name = "NHDPlus_test",
+        huc_level = "HUC_12",
+        huc_header = "030202",
+        extent = terra::ext(result)
+      )
     )
   }
 )

@@ -330,7 +330,6 @@ testthat::test_that("calc_modis works well.", {
     )
   )
   testthat::expect_s4_class(calc_mod06_geom, "SpatVector")
-  
 
   # case 3: VIIRS
   path_vnp46 <-
@@ -929,13 +928,13 @@ testthat::test_that("calc_sedc tests", {
   # with geometry
   testthat::expect_no_error(
     tri_sedc_geom <- calc_sedc(
-        locs = ncpt,
-        from = tri_r,
-        locs_id = "site_id",
-        sedc_bandwidth = 30000,
-        target_fields = targcols,
-        geom = TRUE
-      )
+      locs = ncpt,
+      from = tri_r,
+      locs_id = "site_id",
+      sedc_bandwidth = 30000,
+      target_fields = targcols,
+      geom = TRUE
+    )
   )
   testthat::expect_s4_class(tri_sedc_geom, "SpatVector")
 
@@ -1901,7 +1900,7 @@ testthat::test_that("calc_covariates wrapper works", {
       "koeppen-geiger", "koppen", "koeppen",
       "geos", "dummies", "gmted",
       "sedac_groads", "groads", "roads",
-      "ecoregions", "ecoregion", "hms","smoke",
+      "ecoregions", "ecoregion", "hms", "smoke",
       "gmted", "narr", "geos",
       "sedac_population", "population", "nlcd",
       "merra", "MERRA", "merra2", "MERRA2",

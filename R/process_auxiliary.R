@@ -541,9 +541,8 @@ is_date_proper <- function(
 
 
 #' Apply extent to the processed data
-#'
+#' @description
 #' User-defined extent is used to filter the data.
-#' 
 #' @param data sf/terra object.
 #' @param extent numeric(4). Extent to filter the data.
 #'   Should be ordered as c(xmin, xmax, ymin, ymax).
