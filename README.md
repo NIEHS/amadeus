@@ -185,5 +185,3 @@ The following R packages can also be used to access climate and weather data in 
 [^6]: United States Geological Survey
 [^7]: Last updated more than two years ago.
 [^8]: Archived; no longer maintained.
-
-<a href="https://www.niehs.nih.gov/research/programs/chords"><img src="man/figures/chords_hex.svg" align="center" height="150" /><a>
