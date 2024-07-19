@@ -1,4 +1,4 @@
-# amadeus <a href="https://niehs.github.io/amadeus/"><img src="man/figures/amadeus_hex.svg" align="right" height="138" /><a>
+# amadeus <a href="https://niehs.github.io/amadeus/"><img src="man/figures/amadeus_hex.svg" align="right" height="150" /><a>
 
 [![R-CMD-check](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml)
 [![cov](https://NIEHS.github.io/amadeus/badges/coverage.svg)](https://github.com/NIEHS/amadeus/actions)
