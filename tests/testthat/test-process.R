@@ -564,7 +564,9 @@ testthat::test_that("process_nei tests", {
   testthat::expect_error(
     process_nei(path_nei, year = 2020, county = path_cnty)
   )
-
+  testthat::expect_error(
+    process_nei("./EmPtY/pAtH", year = 2020, county = path_cnty)
+  )
 })
 
 

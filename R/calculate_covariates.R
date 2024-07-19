@@ -868,6 +868,7 @@ process_modis_swath, or process_blackmarble.")
     summary_available_mode <- as.numeric(names(summary_available_mode))
     summary_available_insuf <-
       which(summary_available < floor(summary_available_mode * 0.8))
+
     if (length(summary_available_insuf) > 0) {
       dates_insuf <-
         as.Date(dates_available[summary_available_insuf], "%Y%j")

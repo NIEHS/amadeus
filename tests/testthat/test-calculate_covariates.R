@@ -315,7 +315,7 @@ testthat::test_that("calc_modis works well.", {
   testthat::expect_s3_class(calc_mod06, "data.frame")
 
   # with geometry
-    testthat::expect_no_error(
+  testthat::expect_no_error(
     suppressWarnings(
       calc_mod06_geom <-
         calc_modis_par(
