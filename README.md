@@ -1,4 +1,6 @@
-# amadeus <a href="https://niehs.github.io/amadeus/"><img src="man/figures/amadeus_hex.svg" align="right" height="150" /><a>
+# amadeus
+
+<a href="https://niehs.github.io/amadeus/"><img src="man/figures/amadeus_hex.svg" align="right" height="200" /><a>
 
 [![R-CMD-check](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml)
 [![cov](https://NIEHS.github.io/amadeus/badges/coverage.svg)](https://github.com/NIEHS/amadeus/actions)
@@ -185,3 +187,7 @@ The following R packages can also be used to access climate and weather data in 
 [^6]: United States Geological Survey
 [^7]: Last updated more than two years ago.
 [^8]: Archived; no longer maintained.
+
+-----
+
+<a href="https://www.niehs.nih.gov/research/programs/chords"><img src="man/figures/chords_hex.svg" align="center" height="150" /><a>
