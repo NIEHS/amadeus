@@ -3572,7 +3572,7 @@ download_gridmet <- function(
 #' \insertRef{article_abatzoglou2018terraclimate}{amadeus}
 #' @examples
 #' \dontrun{
-#' download_gridmet(
+#' download_terraclimate(
 #'   variables = "Precipitation",
 #'   year = c(2023, 2024),
 #'   directory_to_save = "./data"

@@ -1,4 +1,4 @@
-# amadeus
+# amadeus <a href="https://niehs.github.io/amadeus/"><img src="man/figures/amadeus_hex.svg" align="right" height="138" /><a>
 
 [![R-CMD-check](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml)
 [![cov](https://NIEHS.github.io/amadeus/badges/coverage.svg)](https://github.com/NIEHS/amadeus/actions)
@@ -31,7 +31,7 @@ To add or edit functionality for new data sources or datasets, open a [Pull requ
 Utilize [Issues](https://github.com/NIEHS/amadeus/issues) to notify the authors of bugs, questions, or recommendations. Identify each issue with the appropriate label to help ensure a timely response.
 
 <div align="center">
-  <img src="vignettes/images/readme_issues.png" style="width: 100%;">
+  <img src="man/figures/readme_issues.png" style="width: 100%;">
 </div>
 
 ## Download
