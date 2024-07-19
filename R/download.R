@@ -838,7 +838,6 @@ download_gmted <- function(
 #' \insertRef{data_gmao_merra-tavgM_3d_udt_Np}{amadeus}
 #' \insertRef{data_gmao_merra-tavgM_3d_odt_Np}{amadeus}
 #' \insertRef{data_gmao_merra-tavgM_3d_qdt_Np}{amadeus}
-#' \insertRef{data_gmao_merra-statD_2d_slv_Nx}{amadeus}
 #' \insertRef{data_gmao_merra-const_2d_asm_Nx}{amadeus}
 #' \insertRef{data_gmao_merra-instU_2d_asm_Nx}{amadeus}
 #' \insertRef{data_gmao_merra-instU_2d_int_Nx}{amadeus}
@@ -1329,7 +1328,8 @@ download_narr <- function(
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
-#' \insertRef{dewitz_national_2023, dewitz_national_2024}{amadeus}
+#' \insertRef{dewitz_national_2023}{amadeus}
+#' \insertRef{dewitz_national_2024}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_nlcd(
@@ -2025,7 +2025,8 @@ download_hms <- function(
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
-#' \insertRef{article_beck2023koppen, article_beck2018present}{amadeus}
+#' \insertRef{article_beck2023koppen}{amadeus}
+#' \insertRef{article_beck2018present}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_koppen_geiger(
@@ -2176,7 +2177,12 @@ download_koppen_geiger <- function(
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
-#' \insertRef{data_mcd19a22021, data_mod06l2_2017, data_mod09ga2021, data_mod11a12021, data_mod13a22021, article_roman2018vnp46}{amadeus}
+#' \insertRef{data_mcd19a22021}{amadeus}
+#' \insertRef{data_mod06l2_2017}{amadeus}
+#' \insertRef{data_mod09ga2021}{amadeus}
+#' \insertRef{data_mod11a12021}{amadeus}
+#' \insertRef{data_mod13a22021}{amadeus}
+#' \insertRef{article_roman2018vnp46}{amadeus}
 # nolint end
 #' @examples
 #' \dontrun{

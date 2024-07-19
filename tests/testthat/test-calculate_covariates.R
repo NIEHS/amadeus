@@ -1832,61 +1832,6 @@ testthat::test_that("calc_lagged returns as expected.", {
   }
 })
 
-## 17.1 calc_lag with SpatVector
-testthat::test_that("calc_lagged error with SpatVector.", {
-  withr::local_package("terra")
-  withr::local_package("data.table")
-  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
-  ncp$site_id <- "3799900018810101"
-  ncpv <- terra::vect(ncp, geom = c("lon", "lat"), crs = "EPSG:4326")
-  # expect function
-  testthat::expect_true(
-    is.function(calc_lagged)
-  )
-  narr <-
-    process_narr(
-      date = c("2018-01-01", "2018-01-10"),
-      variable = "weasd",
-      path =
-      testthat::test_path(
-        "..",
-        "testdata",
-        "narr",
-        "weasd"
-      )
-    )
-  narr_covariate_geom <-
-    calc_narr(
-      from = narr,
-      locs = ncpv,
-      locs_id = "site_id",
-      radius = 0,
-      fun = "mean",
-      geom = TRUE
-    )
-  testthat::expect_no_error(
-    narr_covariate_geom_lag <- calc_lagged(
-      from = narr_covariate_geom,
-      date = c("2018-01-03", "2018-01-05"),
-      lag = 1,
-      locs_id = "site_id",
-      time_id = "time",
-      geom = TRUE
-    )
-  )
-  testthat::expect_s4_class(narr_covariate_geom_lag, "SpatVector")
-  testthat::expect_error(
-    calc_lagged(
-      from = as.data.frame(narr_covariate_geom),
-      date = c("2018-01-03", "2018-01-05"),
-      lag = 1,
-      locs_id = "site_id",
-      time_id = "time",
-      geom = TRUE
-    )
-  )
-})
-
 ## 18. Wrapper ####
 testthat::test_that("calc_covariates wrapper works", {
 
@@ -2028,4 +1973,58 @@ testthat::test_that("calc_worker remaining", {
       )
   )
   testthat::expect_s3_class(cwres, "data.frame")
+})
+
+## 17.1 calc_lag with SpatVector
+testthat::test_that("calc_lagged with SpatVector.", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  loc <- data.frame(id = "001", lon = -78.8277, lat = 35.95013)
+  locs_v <- terra::vect(loc, geom = c("lon", "lat"), crs = "EPSG:4326")
+  # expect function
+  testthat::expect_true(
+    is.function(calc_lagged)
+  )
+  p <-
+    process_narr(
+      date = c("2018-01-01", "2018-01-10"),
+      variable = "weasd",
+      path =
+      testthat::test_path(
+        "..",
+        "testdata",
+        "narr",
+        "weasd"
+      )
+    )
+  c <-
+    calc_narr(
+      from = p,
+      locs = locs_v,
+      locs_id = "id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  testthat::expect_no_error(
+    c_g <- calc_lagged(
+      from = c,
+      date = c("2018-01-03", "2018-01-05"),
+      lag = 1,
+      locs_id = "id",
+      time_id = "time",
+      geom = TRUE
+    )
+  )
+  testthat::expect_s4_class(c_g, "SpatVector")
+  testthat::expect_error(
+    calc_lagged(
+      from = as.data.frame(c_g),
+      date = c("2018-01-03", "2018-01-05"),
+      lag = 1,
+      locs_id = "id",
+      time_id = "time",
+      geom = TRUE
+    )
+  )
 })

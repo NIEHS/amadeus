@@ -728,7 +728,7 @@ calc_modis_daily <- function(
 #' @param name_covariates character. Name header of covariates.
 #' e.g., `"MOD_NDVIF_0_"`.
 #' The calculated covariate names will have a form of
-#' '{name_covariates}{zero-padded buffer radius in meters}',
+#' "{name_covariates}{zero-padded buffer radius in meters}",
 #' e.g., 'MOD_NDVIF_0_50000' where 50 km radius circular buffer
 #' was used to calculate mean NDVI value.
 #' @param subdataset Indices, names, or search patterns for subdatasets.
@@ -2504,7 +2504,7 @@ calc_lagged <- function(
   #### check input data types
   if ("SpatVector" %in% class(from)) {
     from_full <- terra::as.data.frame(from, geom = "WKT")
-    geoms <- unique(from_full[, c("site_id", "geometry")])
+    geoms <- unique(from_full[, c(locs_id, "geometry")])
     from <- from_full |> dplyr::select(-"geometry")
   }
   stopifnot(methods::is(from, "data.frame"))

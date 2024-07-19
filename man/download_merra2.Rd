@@ -129,7 +129,6 @@ download_merra2(
 \insertRef{data_gmao_merra-tavgM_3d_udt_Np}{amadeus}
 \insertRef{data_gmao_merra-tavgM_3d_odt_Np}{amadeus}
 \insertRef{data_gmao_merra-tavgM_3d_qdt_Np}{amadeus}
-\insertRef{data_gmao_merra-statD_2d_slv_Nx}{amadeus}
 \insertRef{data_gmao_merra-const_2d_asm_Nx}{amadeus}
 \insertRef{data_gmao_merra-instU_2d_asm_Nx}{amadeus}
 \insertRef{data_gmao_merra-instU_2d_int_Nx}{amadeus}
