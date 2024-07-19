@@ -728,7 +728,7 @@ calc_modis_daily <- function(
 #' @param name_covariates character. Name header of covariates.
 #' e.g., `"MOD_NDVIF_0_"`.
 #' The calculated covariate names will have a form of
-#' "{name_covariates}{zero-padded buffer radius in meters}",
+#' "\code{\{name_covariates\}\{zero-padded buffer radius in meters\}}",
 #' e.g., 'MOD_NDVIF_0_50000' where 50 km radius circular buffer
 #' was used to calculate mean NDVI value.
 #' @param subdataset Indices, names, or search patterns for subdatasets.

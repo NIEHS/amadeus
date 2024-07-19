@@ -784,7 +784,8 @@ download_gmted <- function(
 #' \insertRef{data_gmao_merra-inst3_2d_gas_Nx}{amadeus}
 #' \insertRef{data_gmao_merra-inst6_3d_ana_Np}{amadeus}
 #' \insertRef{data_gmao_merra-inst6_3d_ana_Nv}{amadeus}
-#' \insertRef{data_gmao_merra-statD_2d_slv_Nx}{amadeus}
+#' \insertRef{data_gmao_merra-statD_2d_slv_Nx_m}{amadeus}
+#' \insertRef{data_gmao_merra-statD_2d_slv_Nx_d}{amadeus}
 #' \insertRef{data_gmao_merra-tavg1_2d_adg_Nx}{amadeus}
 #' \insertRef{data_gmao_merra-tavg1_2d_aer_Nx}{amadeus}
 #' \insertRef{data_gmao_merra-tavg1_2d_chm_Nx}{amadeus}
