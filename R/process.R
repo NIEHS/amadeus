@@ -1509,7 +1509,6 @@ process_hms <- function(
     #### absent polygons (ie. December 31, 2018)
     if (nrow(data_density) == 0) {
       cat(paste0(
-        variable,
         " smoke plume polygons absent for date ",
         as.Date(
           dates_of_interest[d],
