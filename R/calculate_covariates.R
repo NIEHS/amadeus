@@ -402,7 +402,7 @@ calc_nlcd <- function(from,
           append_cols = locs_id,
           max_cells_in_memory = max_cells
         )
-      }, seq_len(length(bufs_polx)),
+      }, seq_len(nrow(bufs_polx)),
       future.seed = TRUE
     )
     nlcd_at_bufs <- collapse::rowbind(nlcd_at_bufs, fill = TRUE)
