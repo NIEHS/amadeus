@@ -682,59 +682,51 @@ testthat::test_that("sedac_codes", {
 # test HMS ####
 testthat::test_that("process_hms returns expected.", {
   withr::local_package("terra")
-  densities <- c(
-    "Medium",
-    "Heavy",
-    "Light"
-  )
   # expect function
   testthat::expect_true(
     is.function(process_hms)
   )
-  for (d in seq_along(densities)) {
-    hms <-
-      process_hms(
-        date = c("2022-06-10", "2022-06-11"),
-        variable = densities[d],
-        path = testthat::test_path(
-          "..",
-          "testdata",
-          "hms"
-        )
+
+  hms <-
+    process_hms(
+      date = c("2022-06-10", "2022-06-11"),
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "hms"
       )
-    # expect output is a SpatVector or character
-    testthat::expect_true(
-      class(hms)[1] %in% c("SpatVector", "character")
     )
-    if (class(hms)[1] == "SpatVector") {
-      # expect non-null coordinate reference system
-      testthat::expect_false(
-        is.null(terra::crs(hms))
-      )
-      # expect two columns
-      testthat::expect_true(
-        ncol(hms) == 2
-      )
-      # expect density and date column
-      testthat::expect_true(
-        all(c("Density", "Date") %in% names(hms))
-      )
-    } else if (class(hms)[1] == "character") {
-      # expect first is density type
-      testthat::expect_true(
-        hms[1] %in% c("Light", "Medium", "Heavy")
-      )
-      # expect other elements are 10 character dates
-      testthat::expect_true(
-        all(nchar(hms[2:length(hms)]) == 10)
-      )
-    }
+  # expect output is a SpatVector or character
+  testthat::expect_true(
+    class(hms)[1] %in% c("SpatVector", "character")
+  )
+  if (class(hms)[1] == "SpatVector") {
+    # expect non-null coordinate reference system
+    testthat::expect_false(
+      is.null(terra::crs(hms))
+    )
+    # expect two columns
+    testthat::expect_true(
+      ncol(hms) == 2
+    )
+    # expect density and date column
+    testthat::expect_true(
+      all(c("Density", "Date") %in% names(hms))
+    )
+  } else if (class(hms)[1] == "character") {
+    # expect first is density type
+    testthat::expect_true(
+      hms[1] %in% c("Light", "Medium", "Heavy")
+    )
+    # expect other elements are 10 character dates
+    testthat::expect_true(
+      all(nchar(hms[2:length(hms)]) == 10)
+    )
   }
   # test with cropping extent
   testthat::expect_no_error(
     hms_ext <- process_hms(
       date = c("2022-06-10", "2022-06-11"),
-      variable = "light",
       path = testthat::test_path(
         "..",
         "testdata",
