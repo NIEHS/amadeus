@@ -1084,7 +1084,7 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
       )
       # expect 3 columns
       expect_true(
-        ncol(hms_covariate) == 3
+        ncol(hms_covariate) == 5
       )
       # expect 4 rows
       expect_true(
@@ -1092,11 +1092,11 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
       )
       # expect integer for binary value
       expect_true(
-        class(hms_covariate[, 3]) == "integer"
+        unlist(unique(lapply(hms_covariate[, 3:5], class))) == "integer"
       )
       # expect binary
       expect_true(
-        all(unique(hms_covariate[, 3]) %in% c(0, 1))
+        all(unlist(lapply(hms_covariate[, 3:5], unique)) %in% c(0, 1))
       )
     }
   }

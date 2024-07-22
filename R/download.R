@@ -230,7 +230,7 @@ download_aqs <-
     #### filter commands to non-existing files
     download_commands <- download_commands[
       which(
-        !check_file_size(download_urls, download_names)
+        !file.exists(download_names)
       )
     ]
     #### 7. initiate "..._curl_commands.txt"
@@ -386,9 +386,8 @@ download_ecoregion <- function(
     Sys.Date(),
     "_wget_command.txt"
   )
-  #### 9. concatenateƒ
+  #### 9. concatenate
   download_sink(commands_txt)
-  # if (!check_file_size(download_url, download_name)) {
   if (!file.exists(download_name)) {
     #### 10. concatenate and print download commands to "..._wget_commands.txt"
     #### cat command only file does not already exist or
@@ -566,7 +565,7 @@ download_geos <- function(
           download_folder_name,
           "\n"
         )
-        if (!check_file_size(download_url, download_folder_name)) {
+        if (!file.exists(download_folder_name)) {
           #### cat command only if file does not already exist
           cat(download_command)
         }
@@ -718,7 +717,7 @@ download_gmted <- function(
   )
   download_sink(commands_txt)
   #### 13. concatenate and print download command to "..._curl_commands.txt"
-  if (!check_file_size(download_url, download_name)) {
+  if (!file.exists(download_name)) {
     #### cat command only if file does not already exist
     cat(download_command)
   }
@@ -1100,7 +1099,7 @@ download_merra2 <- function(
         download_name,
         "\n"
       )
-      if (!check_file_size(download_url, download_name)) {
+      if (!file.exists(download_name)) {
         #### cat command only if file does not already exist
         cat(download_command)
       }
@@ -1272,7 +1271,7 @@ download_narr <- function(
           url,
           "\n"
         )
-        if (!check_file_size(url = url, file = destfile)) {
+        if (!file.exists(destfile)) {
           #### cat command if file does not already exist or if local file size
           #### and the HTTP length (url file size) do not match
           cat(command)
@@ -1428,7 +1427,7 @@ download_nlcd <- function(
   )
   download_sink(commands_txt)
   #### 12. concatenate and print download command to "..._curl_commands.txt"
-  if (!check_file_size(download_url, download_name)) {
+  if (!file.exists(download_name)) {
     #### cat command only if file does not already exist
     cat(download_command)
   }
@@ -1581,7 +1580,7 @@ download_sedac_groads <- function(
     "_curl_command.txt"
   )
   download_sink(commands_txt)
-  if (!check_file_size(download_url, download_name)) {
+  if (!file.exists(download_name)) {
     #### 12. concatenate and print download command to "..._curl_commands.txt"
     #### cat command if file does not already exist or is incomplete
     cat(download_command)
@@ -1773,7 +1772,7 @@ download_sedac_population <- function(
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
-  if (!check_file_size(download_url, download_name)) {
+  if (!file.exists(download_name)) {
     #### 13. concatenate and print download command to "..._curl_commands.txt"
     #### cat command if file does not already exist or is incomplete
     cat(download_command)
@@ -1952,7 +1951,7 @@ download_hms <- function(
       url,
       "\n"
     )
-    if (!check_file_size(url, destfile)) {
+    if (!file.exists(destfile)) {
       #### cat command only if file does not already exist
       cat(command)
     }
@@ -2105,7 +2104,7 @@ download_koppen_geiger <- function(
     "_wget_command.txt"
   )
   download_sink(commands_txt)
-  if (!check_file_size(download_url, download_name)) {
+  if (!file.exists(download_name)) {
     #### 12. concatenate and print download command to "..._wget_commands.txt"
     #### cat command if file does not already exist or is incomplete
     cat(download_command)
@@ -2383,10 +2382,7 @@ download_modis <- function(
     #### filter commands to non-existing files
     download_command <- download_command[
       which(
-        !check_file_size(
-          download_url,
-          paste0(directory_to_save, download_name)
-        )
+        !file.exists(paste0(directory_to_save, download_name))
       )
     ]
 
@@ -2514,8 +2510,7 @@ download_modis <- function(
     #### filter commands to non-existing files
     download_command <- download_command[
       which(
-        !check_file_size(
-          download_url,
+        !file.exists(
           paste0(directory_to_save, download_name)
         )
       )
@@ -2568,9 +2563,6 @@ download_modis <- function(
 #' @returns NULL; Comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @importFrom purrr map_dbl
-#' @importFrom httr2 request
-#' @importFrom httr2 req_perform
 #' @references
 #' \insertRef{web_usepa2024tri}{amadeus}
 #' @examples
@@ -2615,17 +2607,10 @@ download_tri <- function(
                               " --output ",
                               download_names,
                               "\n")
-  # compare file sizes
-  file_sizes <- unlist(purrr::map_dbl(download_names, file.size))
-  url_filesize <- function(u) {
-    u_r <- httr2::request(u) |> httr2::req_perform()
-    return(as.numeric(length(u_r$body)))
-  }
-  url_sizes <- unlist(purrr::map_dbl(download_urls, url_filesize))
   #### filter commands to non-existing files
   download_commands <- download_commands[
     which(
-      !(file_sizes == url_sizes)
+      !file.exists(download_names)
     )
   ]
   #### 5. initiate "..._curl_commands.txt"
@@ -2764,7 +2749,7 @@ download_nei <- function(
   #### filter commands to non-existing files
   download_commands <- download_commands[
     which(
-      !check_file_size(download_urls, download_names)
+      !file.exists(download_names)
     )
   ]
   #### 5. initiate "..._curl_commands.txt"
@@ -3546,7 +3531,7 @@ download_gridmet <- function(
         url,
         "\n"
       )
-      if (!check_file_size(url, destfile)) {
+      if (!file.exists(destfile)) {
         #### cat command only if file does not already exist
         cat(command)
       }
@@ -3686,7 +3671,7 @@ download_terraclimate <- function(
         url,
         "\n"
       )
-      if (!check_file_size(url, destfile)) {
+      if (!file.exists(destfile)) {
         #### cat command only if file does not already exist
         cat(command)
       }

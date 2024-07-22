@@ -350,56 +350,6 @@ check_url_status <- function(
   return(status %in% http_status_ok)
 }
 
-#' Compare file sizes
-#' @description
-#' Compare the size of a locally stored data file to the size of the to-be
-#' downloaded file, retrieved with `httr2`. This check helps to ensure that
-#' incomplete or corrupted data files are re-downloaded if the file path
-#' currently exists.
-#' @param url character(1). URL of data file to be downloaded.
-#' @param file character(1). Destination path of the data file to be
-#' downloaded.
-#' @author Mitchell Manware
-#' @importFrom httr2 req_perform
-#' @importFrom httr2 request
-#' @importFrom purrr map_dbl
-#' @return logical object
-#' @keywords auxiliary
-#' @export
-check_file_size <- function(
-  url,
-  file
-) {
-  stopifnot(is.character(url))
-  stopifnot(is.character(file))
-  # Helper function to get file size
-  file_size <- function(f) {
-    if (file.exists(f)) {
-      return(file.size(f))
-    } else {
-      return(NA)
-    }
-  }
-  # Helper function to get URL file size
-  url_size <- function(u) {
-    tryCatch({
-      u_req <- httr2::request(u) |> httr2::req_perform()
-      as.numeric(u_req$headers$`Content-Length`)
-    }, error = function(e) {
-      NA  # Return NA if there is an error (e.g., URL not reachable)
-    })
-  }
-  # Check local file sizes
-  file_sizes <- purrr::map_dbl(file, file_size)
-  # Check URL file sizes
-  url_sizes <- purrr::map_dbl(url, url_size)
-  # Compare file size to URL size
-  compare <- file_sizes == url_sizes
-  # Replace NA with false
-  compare[is.na(compare)] <- FALSE
-  return(compare)
-}
-
 #' Import download commands
 #' @description
 #' Read download commands from .txt file and convert to character vector.
