@@ -37,7 +37,7 @@ Default is \code{c(0, 1000, 10000, 50000)}.}
 \item{name_covariates}{character. Name header of covariates.
 e.g., \code{"MOD_NDVIF_0_"}.
 The calculated covariate names will have a form of
-'{name_covariates}{zero-padded buffer radius in meters}',
+"\code{\{name_covariates\}\{zero-padded buffer radius in meters\}}",
 e.g., 'MOD_NDVIF_0_50000' where 50 km radius circular buffer
 was used to calculate mean NDVI value.}
 
@@ -115,7 +115,7 @@ insufficient tiles.
 }
 }
 \examples{
-/dontrun{
+\dontrun{
 locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
 locs <- terra::vect(locs, geom = c("lon", "lat"), crs = "EPSG:4326")
 calc_modis_par(

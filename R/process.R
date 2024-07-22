@@ -216,7 +216,7 @@ process_modis_sds <-
 #' @importFrom terra tapp
 #' @importFrom terra is.rotated
 #' @examples
-#' /dontrun{
+#' \dontrun{
 #' mod09ga_flatten <- process_flatten_sds(
 #'   path =
 #'     list.files("./data", pattern = "MOD09GA.", full.names = TRUE)[1],
@@ -300,7 +300,7 @@ the input then flatten it manually.")
 #' @author Insang Song
 #' @returns a `SpatRaster` object
 #' @examples
-#' /dontrun{
+#' \dontrun{
 #' mod09ga_merge <- process_modis_merge(
 #'   path =
 #'     list.files("./data", pattern = "MOD09GA.", full.names = TRUE),
@@ -440,7 +440,7 @@ process_blackmarble_corners <-
 #' @importFrom terra crs
 #' @importFrom terra merge
 #' @examples
-#' /dontrun{
+#' \dontrun{
 #' vnp46a2 <- process_blackmarble(
 #'   path =
 #'     list.files("./data", pattern = "VNP46A2.", full.names = TRUE),
@@ -721,7 +721,6 @@ process_modis_swath <-
 #' classification data, returning a single `SpatRaster` object.
 #' @param path character(1). Path to Koppen-Geiger
 #'  climate zone raster file
-#' @param year data year. Not applicable for this function.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
@@ -738,7 +737,6 @@ process_modis_swath <-
 process_koppen_geiger <-
   function(
     path = NULL,
-    year = NULL,
     extent = NULL,
     ...
   ) {
@@ -1219,7 +1217,7 @@ process_aqs <-
       dplyr::mutate(time = Date.Local) |>
       dplyr::ungroup()
     col_sel <- c("site_id", "Longitude", "Latitude", "Datum")
-    if (mode != "sparse") {
+    if (mode != "available-data") {
       sites_v <- unique(sites[, col_sel])
     } else {
       col_sel <- append(col_sel, "Event.Type")

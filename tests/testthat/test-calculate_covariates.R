@@ -315,7 +315,7 @@ testthat::test_that("calc_modis works well.", {
   testthat::expect_s3_class(calc_mod06, "data.frame")
 
   # with geometry
-    testthat::expect_no_error(
+  testthat::expect_no_error(
     suppressWarnings(
       calc_mod06_geom <-
         calc_modis_par(
@@ -330,7 +330,6 @@ testthat::test_that("calc_modis works well.", {
     )
   )
   testthat::expect_s4_class(calc_mod06_geom, "SpatVector")
-  
 
   # case 3: VIIRS
   path_vnp46 <-
@@ -929,13 +928,13 @@ testthat::test_that("calc_sedc tests", {
   # with geometry
   testthat::expect_no_error(
     tri_sedc_geom <- calc_sedc(
-        locs = ncpt,
-        from = tri_r,
-        locs_id = "site_id",
-        sedc_bandwidth = 30000,
-        target_fields = targcols,
-        geom = TRUE
-      )
+      locs = ncpt,
+      from = tri_r,
+      locs_id = "site_id",
+      sedc_bandwidth = 30000,
+      target_fields = targcols,
+      geom = TRUE
+    )
   )
   testthat::expect_s4_class(tri_sedc_geom, "SpatVector")
 
@@ -1823,13 +1822,12 @@ testthat::test_that("calc_lagged returns as expected.", {
   }
 })
 
-## 17.1 calc_lag with SpatVector
-testthat::test_that("calc_lagged error with SpatVector.", {
+## 18.. calc_lag with SpatVector
+testthat::test_that("calc_lagged with SpatVector.", {
   withr::local_package("terra")
   withr::local_package("data.table")
-  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
-  ncp$site_id <- "3799900018810101"
-  ncpv <- terra::vect(ncp, geom = c("lon", "lat"), crs = "EPSG:4326")
+  loc <- data.frame(id = "001", lon = -78.8277, lat = 35.95013)
+  locs_v <- terra::vect(loc, geom = c("lon", "lat"), crs = "EPSG:4326")
   # expect function
   testthat::expect_true(
     is.function(calc_lagged)
@@ -1846,39 +1844,46 @@ testthat::test_that("calc_lagged error with SpatVector.", {
         "weasd"
       )
     )
-  narr_covariate_geom <-
+  narr_covariate <-
     calc_narr(
       from = narr,
-      locs = ncpv,
-      locs_id = "site_id",
+      locs = locs_v,
+      locs_id = "id",
       radius = 0,
       fun = "mean",
       geom = TRUE
     )
+  # set column names
+  narr_covariate <- calc_setcolumns(
+    from = narr_covariate,
+    lag = 0,
+    dataset = "narr",
+    locs_id = "id"
+  )
   testthat::expect_no_error(
-    narr_covariate_geom_lag <- calc_lagged(
-      from = narr_covariate_geom,
+    covar_lag <- calc_lagged(
+      from = narr_covariate,
       date = c("2018-01-03", "2018-01-05"),
       lag = 1,
-      locs_id = "site_id",
+      locs_id = "id",
       time_id = "time",
       geom = TRUE
     )
   )
-  testthat::expect_s4_class(narr_covariate_geom_lag, "SpatVector")
+  testthat::expect_s4_class(covar_lag, "SpatVector")
   testthat::expect_error(
     calc_lagged(
-      from = as.data.frame(narr_covariate_geom),
+      from = as.data.frame(covar_lag),
       date = c("2018-01-03", "2018-01-05"),
       lag = 1,
-      locs_id = "site_id",
+      locs_id = "id",
       time_id = "time",
       geom = TRUE
     )
   )
 })
 
-## 18. Wrapper ####
+## 19. Wrapper ####
 testthat::test_that("calc_covariates wrapper works", {
 
   withr::local_package("rlang")
@@ -1891,7 +1896,7 @@ testthat::test_that("calc_covariates wrapper works", {
       "koeppen-geiger", "koppen", "koeppen",
       "geos", "dummies", "gmted",
       "sedac_groads", "groads", "roads",
-      "ecoregions", "ecoregion", "hms","smoke",
+      "ecoregions", "ecoregion", "hms", "smoke",
       "gmted", "narr", "geos",
       "sedac_population", "population", "nlcd",
       "merra", "MERRA", "merra2", "MERRA2",

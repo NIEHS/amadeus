@@ -54,6 +54,9 @@ download_gridmet(
 )
 }
 }
+\references{
+\insertRef{article_abatzoglou2013development}{amadeus}
+}
 \author{
 Mitchell Manware
 }

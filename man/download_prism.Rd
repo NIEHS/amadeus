@@ -85,6 +85,8 @@ download_prism(
 }
 }
 \references{
+\insertRef{article_daly2000prism}{amadeus}
+
 \itemize{
 \item \href{http://www.prism.oregonstate.edu/}{PRISM Climate Group}
 \item \href{https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf}{PRISM Web Service Guide}

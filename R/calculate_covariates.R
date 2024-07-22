@@ -389,8 +389,8 @@ calc_nlcd <- function(from,
     class_query <- "value"
     # ratio of each nlcd class per buffer
     bufs_polx <- bufs_pol[terra::ext(from), ] |>
-      sf::st_as_sf()# |>
-      # sf::st_geometry()
+      sf::st_as_sf()
+
     nlcd_at_bufs <- future.apply::future_Map(
       function(i) {
         exactextractr::exact_extract(
@@ -728,7 +728,7 @@ calc_modis_daily <- function(
 #' @param name_covariates character. Name header of covariates.
 #' e.g., `"MOD_NDVIF_0_"`.
 #' The calculated covariate names will have a form of
-#' '{name_covariates}{zero-padded buffer radius in meters}',
+#' "\code{\{name_covariates\}\{zero-padded buffer radius in meters\}}",
 #' e.g., 'MOD_NDVIF_0_50000' where 50 km radius circular buffer
 #' was used to calculate mean NDVI value.
 #' @param subdataset Indices, names, or search patterns for subdatasets.
@@ -812,7 +812,7 @@ calc_modis_daily <- function(
 #' @importFrom future.apply future_lapply
 #' @importFrom parallelly availableWorkers
 #' @examples
-#' /dontrun{
+#' \dontrun{
 #' locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
 #' locs <- terra::vect(locs, geom = c("lon", "lat"), crs = "EPSG:4326")
 #' calc_modis_par(
@@ -868,6 +868,7 @@ process_modis_swath, or process_blackmarble.")
     summary_available_mode <- as.numeric(names(summary_available_mode))
     summary_available_insuf <-
       which(summary_available < floor(summary_available_mode * 0.8))
+
     if (length(summary_available_insuf) > 0) {
       dates_insuf <-
         as.Date(dates_available[summary_available_insuf], "%Y%j")
@@ -2523,7 +2524,7 @@ calc_lagged <- function(
   #### check input data types
   if ("SpatVector" %in% class(from)) {
     from_full <- terra::as.data.frame(from, geom = "WKT")
-    geoms <- unique(from_full[, c("site_id", "geometry")])
+    geoms <- unique(from_full[, c(locs_id, "geometry")])
     from <- from_full |> dplyr::select(-"geometry")
   }
   stopifnot(methods::is(from, "data.frame"))

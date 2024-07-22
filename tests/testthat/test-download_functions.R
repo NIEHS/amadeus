@@ -38,20 +38,20 @@ testthat::test_that("Error when one parameter is NULL.", {
 })
 
 testthat::test_that("Errors when temporal ranges invalid.", {
+  error_directory <- testthat::test_path("..", "testdata", "error_temp/")
   expect_error(
     download_geos(
-      date_start = "1900-01-01",
       date = c("1900-01-01", "2018-01-01"),
       collection = "aqc_tavg_1hr_g1440x721_v1",
       acknowledgement = TRUE,
-      directory_to_save = testthat::test_path("..", "testdata/", "")
+      directory_to_save = error_directory
     )
   )
   expect_error(
     download_aqs(
       year = c(1900, 2022),
       acknowledgement = TRUE,
-      directory_to_save = testthat::test_path("..", "testdata/", ""),
+      directory_to_save = error_directory
     )
   )
   expect_error(
@@ -59,28 +59,29 @@ testthat::test_that("Errors when temporal ranges invalid.", {
       year = c(1900, 2022),
       variables = "air.sfc",
       acknowledgement = TRUE,
-      directory_to_save = testthat::test_path("..", "testdata/", "")
+      directory_to_save = error_directory
     )
   )
   expect_error(
     download_merra2(
       date = c("1900-01-01", "2023-09-01"),
       collection = "inst1_2d_asm_Nx",
-      directory_to_save = testthat::test_path("..", "testdata/", ""),
+      directory_to_save = error_directory,
       acknowledgement = TRUE,
       remove_command = TRUE
     )
   )
   file.remove(
     testthat::test_path(
-      "../testdata", "merra2_1900-01-01_2023-09-01_wget_commands.txt"
+      "..", "testdata", "error_temp",
+      "merra2_1900-01-01_2023-09-01_wget_commands.txt"
     )
   )
   sink()
   expect_error(
     download_hms(
       date = c("1900-01-01", "2018-01-01"),
-      directory_to_save = testthat::test_path("..", "testdata/", ""),
+      directory_to_save = error_directory,
       acknowledgement = TRUE
     )
   )
@@ -89,7 +90,7 @@ testthat::test_that("Errors when temporal ranges invalid.", {
       year = c(1900, 2022),
       variables = "Precipitation",
       acknowledgement = TRUE,
-      directory_to_save = testthat::test_path("..", "testdata/", "")
+      directory_to_save = error_directory
     )
   )
   expect_error(
@@ -97,9 +98,10 @@ testthat::test_that("Errors when temporal ranges invalid.", {
       year = c(1900, 2022),
       variables = "Wind Speed",
       acknowledgement = TRUE,
-      directory_to_save = testthat::test_path("..", "testdata/", "")
+      directory_to_save = error_directory
     )
   )
+  unlink(error_directory, recursive = TRUE)
 })
 
 testthat::test_that("EPA AQS download URLs have HTTP status 200.", {
@@ -151,6 +153,7 @@ testthat::test_that("EPA AQS download URLs have HTTP status 200.", {
                           url_status = url_status)
   # remove file with commands after test
   file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 # Ecoregion tests ####
@@ -215,7 +218,7 @@ testthat::test_that("Ecoregion download URLs have HTTP status 200.", {
       epa_certificate_path = certificate
     )
   )
-
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 # GEOS-CF tests ####
@@ -227,8 +230,7 @@ testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
   date_end <- "2019-09-21"
   collections <- c("aqc_tavg_1hr_g1440x721_v1",
                    "chm_inst_1hr_g1440x721_p23")
-  directory_to_save <- testthat::test_path("..", "testdata/", "")
-  directory_to_save2 <- testthat::test_path("..", "testdata", "geos_temp")
+  directory_to_save <- testthat::test_path("..", "testdata", "geos_temp/")
    
   # run download function
   testthat::expect_no_error(
@@ -256,18 +258,10 @@ testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
                           url_status = url_status)
-  testthat::expect_no_error(
-    download_data(dataset_name = "geos",
-                  date = c(date_start, date_end),
-                  collection = collections,
-                  directory_to_save = directory_to_save2,
-                  acknowledgement = TRUE,
-                  remove_command = TRUE,
-                  download = FALSE)
-  )
 
   # remove file with commands after test
   file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 # GMTED tests ####
@@ -346,8 +340,7 @@ testthat::test_that("MERRA2 download URLs have HTTP status 200.", {
   date_start <- "2022-02-14"
   date_end <- "2022-03-08"
   collections <- c("inst1_2d_asm_Nx", "inst3_3d_asm_Np")
-  directory_to_save <- testthat::test_path("..", "testdata/", "")
-  directory_to_save2 <- testthat::test_path("..", "testdata", "hej")
+  directory_to_save <- testthat::test_path("..", "testdata", "merra2_temp/")
   # run download function
   testthat::expect_no_error(
     download_data(dataset_name = "merra2",
@@ -374,17 +367,9 @@ testthat::test_that("MERRA2 download URLs have HTTP status 200.", {
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
                           url_status = url_status)
-  testthat::expect_no_error(
-    download_data(dataset_name = "merra2",
-                  date = c(date_start, date_end),
-                  collection = collections,
-                  directory_to_save = directory_to_save2,
-                  acknowledgement = TRUE,
-                  remove_command = TRUE,
-                  download = FALSE)
-  )
   # remove file with commands after test
   file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 # MERRA2 Collection error test ####
@@ -410,7 +395,7 @@ testthat::test_that("NARR download URLs have HTTP status 200.", {
   year_start <- 2018
   year_end <- 2018
   variables <- c("weasd", "omega", "soill") # includes monolevel, pressure level, subsurface
-  directory_to_save <- testthat::test_path("..", "testdata/", "")
+  directory_to_save <- testthat::test_path("..", "testdata", "narr_temp/")
   # run download function
   download_data(dataset_name = "narr",
                 year = c(year_start, year_end),
@@ -435,6 +420,7 @@ testthat::test_that("NARR download URLs have HTTP status 200.", {
                           url_status = url_status)
   # remove file with commands after test
   file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("NARR error with invalid years.", {
@@ -513,15 +499,17 @@ testthat::test_that("NOAA HMS Smoke download URLs have HTTP status 200.", {
 })
 
 testthat::test_that("download_hms error for unzip and directory.", {
+  error_directory <- testthat::test_path("..", "testdata", "error_temp/")
   testthat::expect_error(
     download_data(
       dataset_name = "hms",
       acknowledgement = TRUE,
-      directory_to_save = testthat::test_path("..", "testdata/", ""),
+      directory_to_save = error_directory,
       unzip = FALSE,
       remove_zip = TRUE
     )
   )
+  unlink(error_directory, recursive = TRUE)
 })
 
 testthat::test_that("NLCD download URLs have HTTP status 200.", {
@@ -572,8 +560,6 @@ testthat::test_that("NLCD download URLs have HTTP status 200.", {
                             url_status = url_status)
     # remove file with commands after test
     file.remove(commands_path)
-    # remove temporary nlcd
-    unlink(directory_to_save, recursive = TRUE)
   }
   testthat::expect_error(
     download_data(dataset_name = "nlcd",
@@ -586,6 +572,8 @@ testthat::test_that("NLCD download URLs have HTTP status 200.", {
                   unzip = FALSE,
                   remove_zip = FALSE)
   )
+  # remove temporary nlcd
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("SEDAC groads download URLs have HTTP status 200.", {
@@ -635,8 +623,6 @@ testthat::test_that("SEDAC groads download URLs have HTTP status 200.", {
                               url_status = url_status)
       # remove file with commands after test
       file.remove(commands_path)
-      # remove temporary groads
-      unlink(directory_to_save, recursive = TRUE)
     }
   }
 
@@ -651,14 +637,16 @@ testthat::test_that("SEDAC groads download URLs have HTTP status 200.", {
                   remove_zip = FALSE,
                   remove_command = TRUE)
   )
+  # remove temporary groads
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("SEDAC population download URLs have HTTP status 200.", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
-  years <- c("2020")
-  data_formats <- c("GeoTIFF")
+  years <- c("2020", "all")
+  data_formats <- c("GeoTIFF", "ASCII")
   data_resolutions <- cbind(c("30 second"),
                             c("30_sec"))
   directory_to_save <- testthat::test_path("..", "testdata", "pop_temp")
@@ -717,7 +705,7 @@ testthat::test_that("SEDAC population download URLs have HTTP status 200.", {
                                 url_status = url_status)
         # remove file with commands after test
         file.remove(commands_path)
-        # remove temporary groads
+        # remove temporary population
         unlink(directory_to_save, recursive = TRUE)
       }
     }
@@ -728,11 +716,10 @@ testthat::test_that("SEDAC population data types are coerced.", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
-  year <- c("totpop")
+  year <- c("all")
   data_formats <- c("GeoTIFF", "ASCII", "netCDF")
   data_resolutions <- c("30 second", "2pt5_min")
-  directory_to_download <- testthat::test_path("..", "testdata/", "")
-  directory_to_save <- testthat::test_path("..", "testdata/", "")
+  directory_to_save <- testthat::test_path("..", "testdata", "pop_temp/")
   for (f in seq_along(data_formats)) {
     download_data(dataset_name = "sedac_population",
                   year = year,
@@ -744,9 +731,9 @@ testthat::test_that("SEDAC population data types are coerced.", {
                   unzip = FALSE,
                   remove_zip = FALSE,
                   remove_command = FALSE)
-    commands_path <- paste0(directory_to_download,
+    commands_path <- paste0(directory_to_save,
                             "sedac_population_",
-                            year,
+                            "totpop",
                             "_",
                             data_resolutions[2],
                             "_",
@@ -759,12 +746,12 @@ testthat::test_that("SEDAC population data types are coerced.", {
     # check HTTP URL status
     url_status <- check_urls(urls = urls, size = 1L, method = "GET")
     # implement unit tests
-    test_download_functions(directory_to_download = directory_to_download,
-                            directory_to_save = directory_to_save,
+    test_download_functions(directory_to_save = directory_to_save,
                             commands_path = commands_path,
                             url_status = url_status)
     # remove file with commands after test
     file.remove(commands_path)
+    unlink(directory_to_save, recursive = TRUE)
   }
 })
 
@@ -821,6 +808,7 @@ testthat::test_that("Koppen Geiger download URLs have HTTP status 200.", {
       file.remove(commands_path)
     }
   }
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("MODIS-MOD09GA download URLs have HTTP status 200.", {
@@ -1087,7 +1075,7 @@ testthat::test_that("EPA TRI download URLs have HTTP status 200.", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
-  directory_to_save <- testthat::test_path("..", "testdata/", "")
+  directory_to_save <- testthat::test_path("..", "testdata", "tri_temp/")
   # run download function
   download_data(dataset_name = "tri",
                 directory_to_save = directory_to_save,
@@ -1119,6 +1107,7 @@ testthat::test_that("EPA TRI download URLs have HTTP status 200.", {
                           url_status = url_status)
   # remove file with commands after test
   file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 
@@ -1175,12 +1164,45 @@ testthat::test_that("EPA NEI (AADT) download URLs have HTTP status 200.", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that("EPA NEI (AADT) download LIVE.", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  directory_to_save <- testthat::test_path("..", "testdata", "nei_live")
+  certificate <- system.file("extdata/cacert_gaftp_epa.pem",
+                             package = "amadeus")
+  # run download function
+  year <- c(2017L, 2020L)
+  testthat::expect_no_error(
+    download_data(dataset_name = "nei",
+                directory_to_save = directory_to_save,
+                acknowledgement = TRUE,
+                download = TRUE,
+                year = year,
+                remove_command = FALSE,
+                epa_certificate_path = certificate,
+                unzip = TRUE
+                )
+  )
+  testthat::expect_equal(
+    length(list.files(paste0(directory_to_save, "/zip_files"))), 2
+  )
+  testthat::expect_equal(
+    length(list.files(
+      paste0(directory_to_save, "/data_files"),
+      recursive = TRUE)
+    ), 12
+  )
+  # remove temporary nei
+  unlink(directory_to_save, recursive = TRUE)
+})
+
 testthat::test_that("Test error cases in EPA gaftp sources 1", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
   tdir <- tempdir()
-  directory_to_save <- testthat::test_path("..", "testdata/", "")
+  directory_to_save <- testthat::test_path("..", "testdata", "epa_temp/")
   certificate <- file.path(tdir, "cacert_gaftp_epa.pem")
   # remove if there is a preexisting file
   if (file.exists(certificate)) {
@@ -1212,6 +1234,7 @@ testthat::test_that("Test error cases in EPA gaftp sources 1", {
   # remove file with commands after test
   testthat::expect_true(file.exists(commands_path))
   file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("Test error cases in EPA gaftp sources 2", {
@@ -1219,7 +1242,7 @@ testthat::test_that("Test error cases in EPA gaftp sources 2", {
   withr::local_package("stringr")
   # function parameters
   tdir <- tempdir(check = TRUE)
-  directory_to_save <- testthat::test_path("..", "testdata/", "")
+  directory_to_save <- testthat::test_path("..", "testdata", "epa_temp/")
   certificate <- file.path(tdir, "cacert_gaftp_epa.pem")
   # remove if there is a preexisting file
   if (file.exists(certificate)) {
@@ -1254,6 +1277,7 @@ testthat::test_that("Test error cases in EPA gaftp sources 2", {
   # remove file with commands after test
   testthat::expect_true(file.exists(commands_path))
   file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 
@@ -1331,7 +1355,7 @@ testthat::test_that("gridmet download URLs have HTTP status 200.", {
   year_end <- 2023
   variables <- "Precipitation"
   directory_to_save <-
-    testthat::test_path("..", "testdata", "gridmet", "tmp")
+    testthat::test_path("..", "testdata", "gridmet_temp/")
   # run download function
   download_data(dataset_name = "gridmet",
                 year = c(year_start, year_end),
@@ -1356,8 +1380,7 @@ testthat::test_that("gridmet download URLs have HTTP status 200.", {
                           url_status = url_status)
   # remove file with commands after test
   file.remove(commands_path)
-  file.remove(list.files(directory_to_save, full.names = TRUE))
-  file.remove(directory_to_save, recursive = TRUE)
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("gridmet error with invalid years.", {
@@ -1394,7 +1417,7 @@ testthat::test_that("terraclimate download URLs have HTTP status 200.", {
   year_end <- 2023
   variables <- "Precipitation"
   directory_to_save <-
-    testthat::test_path("..", "testdata", "terraclimate", "tmp")
+    testthat::test_path("..", "testdata", "terraclimate_temp/")
   # run download function
   download_data(dataset_name = "terraclimate",
                 year = c(year_start, year_end),
@@ -1419,8 +1442,7 @@ testthat::test_that("terraclimate download URLs have HTTP status 200.", {
                           url_status = url_status)
   # remove file with commands after test
   file.remove(commands_path)
-  file.remove(list.files(directory_to_save, full.names = TRUE))
-  file.remove(directory_to_save, recursive = TRUE)
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("terraclimate error with invalid years.", {
@@ -1467,7 +1489,7 @@ testthat::test_that("download_cropscape generates correct download commands (GMU
   withr::local_package("stringr")
   # Set up test data
   year <- 2010
-  directory_to_save <- testthat::test_path("../testdata/")
+  directory_to_save <- testthat::test_path("..", "testdata", "cps_temp/")
 
   # Call the function
   testthat::expect_no_error(
@@ -1498,13 +1520,12 @@ testthat::test_that("download_cropscape generates correct download commands (GMU
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
   # implement unit tests
-  test_download_functions(directory_to_download = directory_to_save,
-                          directory_to_save = directory_to_save,
+  test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
                           url_status = url_status)
   # remove file with commands after test
   file.remove(commands_path)
-
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 
@@ -1513,7 +1534,7 @@ test_that("download_cropscape generates correct download commands (USDA)", {
   withr::local_package("stringr")
   # Set up test data
   year <- 2010
-  directory_to_save <- testthat::test_path("../testdata/")
+  directory_to_save <- testthat::test_path("..", "testdata", "cps_temp/")
 
   # Call the function
   testthat::expect_no_error(
@@ -1544,13 +1565,12 @@ test_that("download_cropscape generates correct download commands (USDA)", {
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
   # implement unit tests
-  test_download_functions(directory_to_download = directory_to_save,
-                          directory_to_save = directory_to_save,
+  test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
                           url_status = url_status)
   # remove file with commands after test
   file.remove(commands_path)
-
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 
@@ -1567,7 +1587,7 @@ testthat::test_that("download_prism downloads the correct data files", {
   element <- sample(element, 1)
   data_type <- "ts"
   format <- "nc"
-  directory_to_save <- testthat::test_path("..", "testdata/")
+  directory_to_save <- testthat::test_path("..", "testdata", "prism_temp/")
   acknowledgement <- TRUE
   download <- FALSE
   remove_command <- FALSE
@@ -1616,8 +1636,7 @@ testthat::test_that("download_prism downloads the correct data files", {
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
   # implement unit tests
-  test_download_functions(directory_to_download = directory_to_save,
-                          directory_to_save = directory_to_save,
+  test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
                           url_status = url_status)
   # remove file with commands after test
@@ -1628,7 +1647,7 @@ testthat::test_that("download_prism downloads the correct data files", {
   element <- "soltotal"
   data_type <- "ts"
   format <- "nc"
-  directory_to_save <- testthat::test_path("..", "testdata/")
+  directory_to_save <- testthat::test_path("..", "testdata", "prism_temp/")
   acknowledgement <- TRUE
   download <- FALSE
   remove_command <- FALSE
@@ -1644,7 +1663,7 @@ testthat::test_that("download_prism downloads the correct data files", {
     download = download,
     remove_command = remove_command
   ))
-
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 
@@ -1684,7 +1703,7 @@ testthat::test_that("download_huc works",
   {
     withr::local_package("httr")
 
-    directory_to_save <- testthat::test_path("..", "testdata/")
+    directory_to_save <- testthat::test_path("..", "testdata", "huc_temp/")
     allregions <- c("Lower48", "Islands")
     alltypes <- c("Seamless", "OceanCatchment")
 
@@ -1716,8 +1735,7 @@ testthat::test_that("download_huc works",
         # check HTTP URL status
         url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
         # implement unit tests
-        test_download_functions(directory_to_download = directory_to_save,
-                                directory_to_save = directory_to_save,
+        test_download_functions(directory_to_save = directory_to_save,
                                 commands_path = commands_path,
                                 url_status = url_status)
         # remove file with commands after test
@@ -1735,6 +1753,7 @@ testthat::test_that("download_huc works",
           unzip = TRUE
         )
       )
+      unlink(directory_to_save, recursive = TRUE)
   })
 
 
@@ -1748,7 +1767,7 @@ testthat::test_that(
       )
     product <- "no2_s5p.l3.trop.tmwm"
     format <- "p50_p90_2km*.*tif"
-    directory_to_save <- testthat::test_path("..", "testdata/")
+    directory_to_save <- testthat::test_path("..", "testdata", "olm_temp/")
     acknowledgement <- TRUE
     download <- FALSE
 
@@ -1778,13 +1797,12 @@ testthat::test_that(
     # check HTTP URL status
     url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
     # implement unit tests
-    test_download_functions(directory_to_download = directory_to_save,
-                            directory_to_save = directory_to_save,
+    test_download_functions(directory_to_save = directory_to_save,
                             commands_path = commands_path,
                             url_status = url_status)
     # remove file with commands after test
     file.remove(commands_path)
-
+    unlink(directory_to_save, recursive = TRUE)
   }
 )
 

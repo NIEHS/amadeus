@@ -5,15 +5,12 @@
 \title{Download unit tests}
 \usage{
 test_download_functions(
-  directory_to_download = NULL,
   directory_to_save = directory_to_save,
   commands_path = commands_path,
   url_status = url_status
 )
 }
 \arguments{
-\item{directory_to_download}{directory to test download}
-
 \item{directory_to_save}{directory to test saving}
 
 \item{commands_path}{file path with download commands}

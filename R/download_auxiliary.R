@@ -431,7 +431,6 @@ check_urls <- function(
 #' @description
 #' Implement directory, file, and download URL unit tests.
 #' @param directory_to_save directory to test saving
-#' @param directory_to_download directory to test download
 #' @param commands_path file path with download commands
 #' @param url_status logical vector for URL status = 200
 #' @importFrom testthat expect_true
@@ -439,15 +438,9 @@ check_urls <- function(
 #' @keywords internal
 #' @export
 test_download_functions <- function(
-    directory_to_download = NULL,
     directory_to_save = directory_to_save,
     commands_path = commands_path,
     url_status = url_status) {
-  # test that directory_to_download exists
-  # skip test if directory_to_download is default (NULL)
-  if (!(is.null(directory_to_download))) {
-    testthat::expect_true(dir.exists(directory_to_download))
-  }
   # test that directory_to_save exists
   testthat::expect_true(dir.exists(directory_to_save))
   # test that commands_path exists
@@ -557,7 +550,7 @@ narr_variable <- function(variable) {
   )
   pressure <- c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd")
   soil <- c("soill", "soilw", "tsoil")
-  base <- "https://psl.noaa.gov/thredds/catalog/Datasets/NARR/Dailies/"
+  base <- "https://psl.noaa.gov/thredds/fileServer/Datasets/NARR/Dailies/"
   if (variable %in% mono) {
     base <- paste0(base, "monolevel/")
     months <- ""

@@ -132,6 +132,9 @@ download_olm(
 )
 }
 }
+\references{
+\insertRef{data_hengl2023openlandmap}{amadeus}
+}
 \seealso{
 \link{list_stac_files}
 }
