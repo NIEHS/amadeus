@@ -108,11 +108,11 @@ download_run <- function(
     download = FALSE,
     system_command = NULL) {
   if (download == TRUE) {
-    cat(paste0("Downloading requested files...\n"))
+    message(paste0("Downloading requested files...\n"))
     system(command = system_command)
-    cat(paste0("Requested files have been downloaded.\n"))
+    message(paste0("Requested files have been downloaded.\n"))
   } else {
-    cat(paste0("Skipping data download.\n"))
+    message(paste0("Skipping data download.\n"))
     return(NULL)
   }
 }
@@ -167,15 +167,15 @@ download_unzip <-
            directory_to_unzip,
            unzip = TRUE) {
     if (!unzip) {
-      cat(paste0("Downloaded files will not be unzipped.\n"))
+      message(paste0("Downloaded files will not be unzipped.\n"))
       return(NULL)
     }
 
-    cat(paste0("Unzipping files...\n"))
+    message(paste0("Unzipping files...\n"))
     unzip(file_name,
       exdir = directory_to_unzip
     )
-    cat(paste0(
+    message(paste0(
       "Files unzipped and saved in ",
       directory_to_unzip,
       ".\n"
@@ -201,12 +201,12 @@ download_remove_zips <-
            download_name) {
     #### remove zip files
     if (remove) {
-      cat(paste0("Removing download files...\n"))
+      message(paste0("Removing download files...\n"))
       file.remove(download_name)
       # oftentimes zipfiles are stored in zip_files under
       # directory_to_save in download functions.
       unlink(dirname(dirname(download_name)), recursive = TRUE)
-      cat(paste0("Download files removed.\n"))
+      message(paste0("Download files removed.\n"))
     }
   }
 
@@ -350,6 +350,56 @@ check_url_status <- function(
   return(status %in% http_status_ok)
 }
 
+#' Compare file sizes
+#' @description
+#' Compare the size of a locally stored data file to the size of the to-be
+#' downloaded file, retrieved with `httr2`. This check helps to ensure that
+#' incomplete or corrupted data files are re-downloaded if the file path
+#' currently exists.
+#' @param url character(1). URL of data file to be downloaded.
+#' @param file character(1). Destination path of the data file to be
+#' downloaded.
+#' @author Mitchell Manware
+#' @importFrom httr2 request
+#' @importFrom httr2 req_perform
+#' @importFrom purrr map_dbl
+#' @return logical object
+#' @keywords auxiliary
+#' @export
+check_file_size <- function(
+  url,
+  file
+) {
+  stopifnot(is.character(url))
+  stopifnot(is.character(file))
+  # Helper function to get file size
+  file_size <- function(f) {
+    if (file.exists(f)) {
+      return(file.size(f))
+    } else {
+      return(NA)
+    }
+  }
+  # Helper function to get URL file size
+  url_size <- function(u) {
+    tryCatch({
+      u_req <- httr2::request(u) |> httr2::req_perform()
+      as.numeric(u_req$headers$`Content-Length`)
+    }, error = function(e) {
+      NA  # Return NA if there is an error (e.g., URL not reachable)
+    })
+  }
+  # Check local file sizes
+  file_sizes <- purrr::map_dbl(file, file_size)
+  # Check URL file sizes
+  url_sizes <- purrr::map_dbl(url, url_size)
+  # Compare file size to URL size
+  compare <- file_sizes == url_sizes
+  # Replace NA with false
+  compare[is.na(compare)] <- FALSE
+  return(compare)
+}
+
 #' Import download commands
 #' @description
 #' Read download commands from .txt file and convert to character vector.
@@ -377,7 +427,7 @@ extract_urls <- function(
     commands = commands,
     position = NULL) {
   if (is.null(position)) {
-    cat(paste0("URL position in command is not defined.\n"))
+    message(paste0("URL position in command is not defined.\n"))
     return(NULL)
   }
   urls <- sapply(
@@ -406,7 +456,7 @@ check_urls <- function(
     size = NULL,
     method = c("HEAD", "GET", "SKIP")) {
   if (is.null(size)) {
-    cat(paste0("URL sample size is not defined.\n"))
+    message(paste0("URL sample size is not defined.\n"))
     return(NULL)
   }
   if (length(urls) < size) {
@@ -414,7 +464,7 @@ check_urls <- function(
   }
   method <- match.arg(method)
   if (method == "SKIP") {
-    cat(paste0("Skipping HTTP status check...\n"))
+    message(paste0("Skipping HTTP status check...\n"))
     return(NULL)
   } else {
     url_sample <- sample(urls, size, replace = FALSE)

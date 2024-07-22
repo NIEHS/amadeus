@@ -1481,7 +1481,7 @@ calc_hms <- function(
   #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all locs and dates
   if (is.character(from)) {
-    cat(paste0(
+    message(paste0(
       "Inherited list of dates due to absent smoke plume polygons.\n"
     ))
     skip_extraction <- NULL
@@ -1511,7 +1511,7 @@ calc_hms <- function(
         skip_extraction_date
       )
     }
-    cat(paste0(
+    message(paste0(
       "Returning ",
       tolower(skip_variable),
       " smoke plume covariates.\n"
@@ -2035,7 +2035,7 @@ calc_sedac_population <- function(
     names(from),
     "_"
   )[[1]]
-  cat(
+  message(
     paste0(
       "Calculating population covariates for ",
       name_split[4],
@@ -2532,7 +2532,7 @@ calc_lagged <- function(
   stopifnot(!is.null(time_id))
   #### return from if lag == 0
   if (lag == 0) {
-    cat("`lag` set to 0. Returning `from`.\n")
+    message("`lag` set to 0. Returning `from`.\n")
     return(from)
   }
   #### extract times

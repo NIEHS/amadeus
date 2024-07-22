@@ -1332,7 +1332,7 @@ process_sedac_population <- function(
     extent = NULL,
     ...) {
   if (substr(path, nchar(path) - 2, nchar(path)) == ".nc") {
-    cat(paste0("netCDF functionality for SEDAC data is under construction.\n"))
+    message(paste0("netCDF functionality for SEDAC data is under construction.\n"))
     return()
   }
   #### check for variable
@@ -1359,7 +1359,7 @@ process_sedac_population <- function(
       "_",
       split2[3]
     )
-    cat(paste0(
+    message(paste0(
       "Cleaning ",
       process_sedac_codes(
         paste0(
@@ -1506,7 +1506,7 @@ process_hms <- function(
 
     #### absent polygons (ie. December 31, 2018)
     if (nrow(data_density) == 0) {
-      cat(paste0(
+      message(paste0(
         " smoke plume polygons absent for date ",
         as.Date(
           dates_of_interest[d],
@@ -1597,7 +1597,7 @@ process_hms <- function(
   }
   #### if no polygons
   if (nrow(data_return) == 0) {
-    cat(paste0(
+    message(paste0(
       "Smoke plume polygons absent from ",
       as.Date(
         dates_of_interest[1],
@@ -1613,7 +1613,7 @@ process_hms <- function(
     no_polygon_return <- c(as.character(dates_no_polygon))
     return(no_polygon_return)
   } else if (nrow(data_return) > 0) {
-    cat(paste0(
+    message(paste0(
       "Returning daily smoke data from ",
       as.Date(
         dates_of_interest[1],
@@ -1692,7 +1692,7 @@ process_gmted <- function(
     resolution = TRUE,
     invert = FALSE
   )
-  cat(paste0(
+  message(paste0(
     "Cleaning ",
     statistic,
     " data at ",
@@ -1853,7 +1853,7 @@ process_narr <- function(
   for (p in seq_along(data_paths_ym)) {
     #### import data
     data_year <- terra::rast(data_paths_ym[p], win = extent)
-    cat(paste0(
+    message(paste0(
       "Cleaning ",
       variable,
       " data for ",
@@ -1885,7 +1885,7 @@ process_narr <- function(
     #### check for mono or pressure levels
     if (grepl("level", names(data_year)[1])) {
       #### pressure levels data
-      cat(paste0("Detected pressure levels data...\n"))
+      message(paste0("Detected pressure levels data...\n"))
       days <- sapply(
         strsplit(
           names(data_year),
@@ -1932,7 +1932,7 @@ process_narr <- function(
       )
     } else {
       #### mono level data
-      cat(paste0("Detected monolevel data...\n"))
+      message(paste0("Detected monolevel data...\n"))
       names(data_year) <- paste0(
         variable,
         "_",
@@ -1960,7 +1960,7 @@ process_narr <- function(
       ) %in% date_sequence
     )
   )
-  cat(paste0(
+  message(paste0(
     "Returning daily ",
     variable,
     " data from ",
@@ -2051,7 +2051,7 @@ process_geos <-
       source = "geos",
       collection = TRUE
     )
-    cat(
+    message(
       paste0(
         "Identified collection ",
         collection,
@@ -2068,7 +2068,7 @@ process_geos <-
         source = "geos",
         datetime = TRUE
       )
-      cat(paste0(
+      message(paste0(
         "Cleaning ",
         variable,
         " data for ",
@@ -2147,7 +2147,7 @@ process_geos <-
     }
     #### set coordinate reference system
     terra::crs(data_return) <- "EPSG:4326"
-    cat(paste0(
+    message(paste0(
       "Returning hourly ",
       variable,
       " data from ",
@@ -2240,7 +2240,7 @@ process_merra2 <-
       source = "merra2",
       collection = TRUE
     )
-    cat(
+    message(
       paste0(
         "Identified collection ",
         collection,
@@ -2257,7 +2257,7 @@ process_merra2 <-
         source = "merra2",
         date = TRUE
       )
-      cat(
+      message(
         paste0(
           "Cleaning ",
           variable,
@@ -2330,7 +2330,7 @@ process_merra2 <-
       )
     }
     terra::crs(data_return) <- "EPSG:4267"
-    cat(paste0(
+    message(paste0(
       "Returning hourly ",
       variable,
       " data from ",
@@ -2440,7 +2440,7 @@ process_gridmet <- function(
   for (p in seq_along(data_paths)) {
     #### import data
     data_year <- terra::rast(data_paths[p], win = extent)
-    cat(paste0(
+    message(paste0(
       "Cleaning daily ",
       variable_checked,
       " data for year ",
@@ -2493,7 +2493,7 @@ process_gridmet <- function(
       ) %in% date_sequence
     )
   )
-  cat(paste0(
+  message(paste0(
     "Returning daily ",
     variable_checked_long,
     " data from ",
@@ -2611,7 +2611,7 @@ process_terraclimate <- function(
   for (p in seq_along(data_paths)) {
     #### import data
     data_year <- terra::rast(data_paths[p], win = extent)
-    cat(paste0(
+    message(paste0(
       "Cleaning monthly ",
       variable_checked_long,
       " data for ",
@@ -2654,7 +2654,7 @@ process_terraclimate <- function(
       ) %in% ymoi
     )
   )
-  cat(paste0(
+  message(paste0(
     "Returning monthly ",
     variable_checked_long,
     " data from ",

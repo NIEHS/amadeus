@@ -189,7 +189,7 @@ calc_message <- function(
       )
     }
   }
-  cat(return_message)
+  message(return_message)
 }
 
 #' Prepare extraction locations
@@ -483,7 +483,7 @@ calc_worker <- function(
     )
   }
   #### finish message
-  cat(
+  message(
     paste0(
       "Returning extracted covariates.\n"
     )

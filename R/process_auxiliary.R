@@ -354,11 +354,11 @@ process_locs_vector <-
       sites_v <- locs
       #### detect sf object
     } else if (methods::is(locs, "sf")) {
-      cat("Detected `sf` extraction locations...\n")
+      message("Detected `sf` extraction locations...\n")
       sites_v <- terra::vect(locs)
       ### detect data.frame object
     } else if (methods::is(locs, "data.frame")) {
-      cat("Detected `data.frame` extraction locations...\n")
+      message("Detected `data.frame` extraction locations...\n")
       #### columns
       if (any(!(c("lon", "lat") %in% colnames(locs)))) {
         stop(paste0(

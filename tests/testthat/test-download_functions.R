@@ -227,7 +227,7 @@ testthat::test_that("GEOS-CF download URLs have HTTP status 200.", {
   withr::local_package("stringr")
   # function parameters
   date_start <- "2019-09-09"
-  date_end <- "2019-09-21"
+  date_end <- "2019-09-09"
   collections <- c("aqc_tavg_1hr_g1440x721_v1",
                    "chm_inst_1hr_g1440x721_p23")
   directory_to_save <- testthat::test_path("..", "testdata", "geos_temp/")
