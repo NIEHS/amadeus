@@ -2568,6 +2568,7 @@ download_modis <- function(
 #' @returns NULL; Comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
+#' @importFrom purrr map_dbl
 #' @references
 #' \insertRef{web_usepa2024tri}{amadeus}
 #' @examples
@@ -2612,10 +2613,17 @@ download_tri <- function(
                               " --output ",
                               download_names,
                               "\n")
+  # compare file sizes
+  file_sizes <- unlist(purrr::map_dbl(download_names, file.size))
+  url_filesize <- function(u) {
+    u_r <- httr2::request(u) |> httr2::req_perform()
+    return(as.numeric(length(u_r$body)))
+  }
+  url_sizes <- unlist(purrr::map_dbl(download_urls, url_filesize))
   #### filter commands to non-existing files
   download_commands <- download_commands[
     which(
-      !check_file_size(download_urls, download_names)
+      !(file_sizes == url_sizes)
     )
   ]
   #### 5. initiate "..._curl_commands.txt"

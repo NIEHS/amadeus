@@ -1332,7 +1332,11 @@ process_sedac_population <- function(
     extent = NULL,
     ...) {
   if (substr(path, nchar(path) - 2, nchar(path)) == ".nc") {
-    message(paste0("netCDF functionality for SEDAC data is under construction.\n"))
+    message(
+      paste0(
+        "netCDF functionality for SEDAC data is under construction.\n"
+      )
+    )
     return()
   }
   #### check for variable
