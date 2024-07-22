@@ -360,8 +360,8 @@ check_url_status <- function(
 #' @param file character(1). Destination path of the data file to be
 #' downloaded.
 #' @author Mitchell Manware
-#' @importFrom httr2 request
 #' @importFrom httr2 req_perform
+#' @importFrom httr2 request
 #' @importFrom purrr map_dbl
 #' @return logical object
 #' @keywords auxiliary

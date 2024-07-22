@@ -2569,6 +2569,8 @@ download_modis <- function(
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @importFrom purrr map_dbl
+#' @importFrom httr2 request
+#' @importFrom httr2 req_perform
 #' @references
 #' \insertRef{web_usepa2024tri}{amadeus}
 #' @examples
