@@ -1528,7 +1528,7 @@ process_hms <- function(
       message(paste0(
         "Cleaning smoke data for date ",
         date[1],
-        "...\n"
+        "..."
       ))
       #### zero buffer to avoid self intersection
       data_0_buffer <- terra::buffer(

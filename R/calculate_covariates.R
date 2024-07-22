@@ -1527,6 +1527,7 @@ calc_hms <- function(
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
+
   #### generate date sequence for missing polygon patch
   date_sequence <- generate_date_sequence(
     date_start = as.Date(
@@ -1539,61 +1540,94 @@ calc_hms <- function(
     ),
     sub_hyphen = FALSE
   )
-  
-  ### Full SPT
-  data_template <- expand.grid(
-    id = sites_id[[locs_id]],
-    time = date_sequence
-  )
-  data_template <- stats::setNames(data_template, c(locs_id, "time"))
 
-  #### extract layer data at sites
-  message("Calculating smoke intensity covariates...")
-  sites_extracted_layer <-
-    terra::extract(from, sites_e)
+  ### split date_sequence by 30 days
+  date_sequence_split <-
+    split(date_sequence, ceiling(seq_along(date_sequence) / 30))
+  return_list <- vector("list", length(date_sequence_split))
 
-  sites_extracted_layer$id.y <-
-    unlist(sites_e[[locs_id]])[sites_extracted_layer$id.y]
-  names(sites_extracted_layer)[
-    names(sites_extracted_layer) == "id.y"
-  ] <- locs_id
-  sites_extracted_layer$value <- 1L
-  #### merge with site_id and date
-  sites_extracted_layer <-
-    tidyr::pivot_wider(
-      data = sites_extracted_layer,
-      names_from = "Density",
-      values_from = "value",
-      id_cols = dplyr::all_of(c(locs_id, "Date"))
+  ### extract layer data at sites
+  for (i in seq_along(date_sequence_split)) {
+    message(paste0(
+      "Calculating smoke intensity covariates for date range: ",
+      date_sequence_split[[i]][1],
+      " to ",
+      date_sequence_split[[i]][length(date_sequence_split[[i]])]
+    ))
+
+    ### Full SPT
+    data_template <- expand.grid(
+      id = sites_id[[locs_id]],
+      time = date_sequence_split[[i]]
     )
+    data_template <- stats::setNames(data_template, c(locs_id, "time"))
+    from_sub <- from[from$Date %in% date_sequence_split[[i]], ]
 
-  # Fill in missing columns
-  levels_acceptable <- c("Light", "Medium", "Heavy")
-  # Detect missing columns
-  col_tofill <-
-    setdiff(levels_acceptable, names(sites_extracted_layer))
-  # Fill zeros
-  if (length(col_tofill) > 0) {
-    sites_extracted_layer[col_tofill] <- 0L
-  }
-  col_order <- c(locs_id, "Date", levels_acceptable)
-  sites_extracted_layer <- sites_extracted_layer[, col_order]
-  sites_extracted_layer <-
-    stats::setNames(
+    ## Extract values
+    sites_extracted_layer <-
+      terra::extract(from_sub, sites_e)
+    sites_extracted_layer$id.y <-
+      unlist(sites_e[[locs_id]])[sites_extracted_layer$id.y]
+    names(sites_extracted_layer)[
+      names(sites_extracted_layer) == "id.y"
+    ] <- locs_id
+    sites_extracted_layer$value <- 1L
+
+    # remove duplicates
+    sites_extracted_layer <- unique(sites_extracted_layer)
+
+    #### merge with site_id and date
+    sites_extracted_layer <-
+      tidyr::pivot_wider(
+        data = sites_extracted_layer,
+        names_from = "Density",
+        values_from = "value",
+        id_cols = dplyr::all_of(c(locs_id, "Date"))
+      )
+
+    # Fill in missing columns
+    levels_acceptable <- c("Light", "Medium", "Heavy")
+    # Detect missing columns
+    col_tofill <-
+      setdiff(levels_acceptable, names(sites_extracted_layer))
+    # Fill zeros
+    if (length(col_tofill) > 0) {
+      sites_extracted_layer[col_tofill] <- 0L
+    }
+    col_order <- c(locs_id, "Date", levels_acceptable)
+    sites_extracted_layer <- sites_extracted_layer[, col_order]
+    sites_extracted_layer <-
+      stats::setNames(
+        sites_extracted_layer,
+        c(locs_id, "time", levels_acceptable)
+      )
+
+    binary_colname <-
+      paste0(tolower(levels_acceptable), "_", sprintf("%05d", radius))
+    # sites_extracted_layer$time <- as.Date(sites_extracted_layer$time)
+    sites_extracted_layer <-
+      stats::setNames(
+        sites_extracted_layer,
+        c(locs_id, "time", binary_colname)
+      )
+
+    # Filling NAs to 0 (explicit integer)
+    # sites_extracted_layer[is.na(sites_extracted_layer)] <- 0L
+
+    # Join full space-time pairs with extracted data
+    site_extracted <- merge(
+      data_template,
       sites_extracted_layer,
-      c(locs_id, "time", levels_acceptable)
+      by = c(locs_id, "time"),
+      all.x = TRUE
     )
+    # append list with the extracted data.frame
+    return_list[[i]] <- site_extracted
+  }
 
-  binary_colname <-
-    paste0(tolower(levels_acceptable), "_", sprintf("%05d", radius))
+  ### Merge data.frame in list
+  sites_extracted <- do.call(rbind, return_list)
 
-  # Join full space-time pairs with extracted data
-  sites_extracted <- merge(
-    data_template,
-    sites_extracted_layer,
-    by = c(locs_id, "time"),
-    all.x = TRUE
-  )
   #### define column names
   colname_common <- c(locs_id, "time", binary_colname)
   if (geom) {
@@ -1623,7 +1657,7 @@ calc_hms <- function(
   time_allzero <- unique(timevals[intensities == 0])
   time_allzero_c <- paste(time_allzero, collapse = "\n")
   message(paste0(
-    "Smoke plume polygons absent for date(s):\n",
+    "No intersecting smoke plume polygons for date(s):\n",
     time_allzero_c
   ))
 
