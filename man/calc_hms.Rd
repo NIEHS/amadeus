@@ -4,7 +4,7 @@
 \alias{calc_hms}
 \title{Calculate wildfire smoke covariates}
 \usage{
-calc_hms(from, locs, locs_id = NULL, radius = 0, ...)
+calc_hms(from, locs, locs_id = NULL, radius = 0, geom = FALSE, ...)
 }
 \arguments{
 \item{from}{SpatVector(1). Output of \code{process_hms()}.}
@@ -17,16 +17,32 @@ containing identifier for each unique coordinate location.}
 \item{radius}{integer(1). Circular buffer distance around site locations.
 (Default = 0).}
 
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.}}
+
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame object
+a data.frame or SpatVector object
 }
 \description{
 Extract wildfire smoke plume values at point locations. Returns a
 \code{data.frame} object containing \code{locs_id}, date, and binary variable
 for wildfire smoke plume density inherited from \code{from} (0 = point not
 covered by wildfire smoke plume; 1 = point covered by wildfire smoke plume).
+}
+\examples{
+\dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+calc_hms(
+  from = hms, # derived from process_hms() example
+  locs = loc,
+  locs_id = "id",
+  radius = 0,
+  geom = FALSE
+)
+}
 }
 \seealso{
 \code{\link[=process_hms]{process_hms()}}

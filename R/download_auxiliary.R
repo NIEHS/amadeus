@@ -108,11 +108,11 @@ download_run <- function(
     download = FALSE,
     system_command = NULL) {
   if (download == TRUE) {
-    cat(paste0("Downloading requested files...\n"))
+    message(paste0("Downloading requested files...\n"))
     system(command = system_command)
-    cat(paste0("Requested files have been downloaded.\n"))
+    message(paste0("Requested files have been downloaded.\n"))
   } else {
-    cat(paste0("Skipping data download.\n"))
+    message(paste0("Skipping data download.\n"))
     return(NULL)
   }
 }
@@ -167,15 +167,15 @@ download_unzip <-
            directory_to_unzip,
            unzip = TRUE) {
     if (!unzip) {
-      cat(paste0("Downloaded files will not be unzipped.\n"))
+      message(paste0("Downloaded files will not be unzipped.\n"))
       return(NULL)
     }
 
-    cat(paste0("Unzipping files...\n"))
+    message(paste0("Unzipping files...\n"))
     unzip(file_name,
       exdir = directory_to_unzip
     )
-    cat(paste0(
+    message(paste0(
       "Files unzipped and saved in ",
       directory_to_unzip,
       ".\n"
@@ -201,12 +201,12 @@ download_remove_zips <-
            download_name) {
     #### remove zip files
     if (remove) {
-      cat(paste0("Removing download files...\n"))
+      message(paste0("Removing download files...\n"))
       file.remove(download_name)
       # oftentimes zipfiles are stored in zip_files under
       # directory_to_save in download functions.
       unlink(dirname(dirname(download_name)), recursive = TRUE)
-      cat(paste0("Download files removed.\n"))
+      message(paste0("Download files removed.\n"))
     }
   }
 
@@ -222,6 +222,9 @@ download_remove_zips <-
 check_for_null_parameters <-
   function(
       parameters) {
+    if ("extent" %in% names(parameters)) {
+      parameters <- parameters[-grep("extent", names(parameters))]
+    }
     parameters_status <- any(unlist(lapply(parameters, is.null)))
     if (parameters_status) {
       stop(paste0("One or more parameters are NULL\n"))
@@ -374,7 +377,7 @@ extract_urls <- function(
     commands = commands,
     position = NULL) {
   if (is.null(position)) {
-    cat(paste0("URL position in command is not defined.\n"))
+    message(paste0("URL position in command is not defined.\n"))
     return(NULL)
   }
   urls <- sapply(
@@ -403,7 +406,7 @@ check_urls <- function(
     size = NULL,
     method = c("HEAD", "GET", "SKIP")) {
   if (is.null(size)) {
-    cat(paste0("URL sample size is not defined.\n"))
+    message(paste0("URL sample size is not defined.\n"))
     return(NULL)
   }
   if (length(urls) < size) {
@@ -411,7 +414,7 @@ check_urls <- function(
   }
   method <- match.arg(method)
   if (method == "SKIP") {
-    cat(paste0("Skipping HTTP status check...\n"))
+    message(paste0("Skipping HTTP status check...\n"))
     return(NULL)
   } else {
     url_sample <- sample(urls, size, replace = FALSE)
@@ -428,7 +431,6 @@ check_urls <- function(
 #' @description
 #' Implement directory, file, and download URL unit tests.
 #' @param directory_to_save directory to test saving
-#' @param directory_to_download directory to test download
 #' @param commands_path file path with download commands
 #' @param url_status logical vector for URL status = 200
 #' @importFrom testthat expect_true
@@ -436,15 +438,9 @@ check_urls <- function(
 #' @keywords internal
 #' @export
 test_download_functions <- function(
-    directory_to_download = NULL,
     directory_to_save = directory_to_save,
     commands_path = commands_path,
     url_status = url_status) {
-  # test that directory_to_download exists
-  # skip test if directory_to_download is default (NULL)
-  if (!(is.null(directory_to_download))) {
-    testthat::expect_true(dir.exists(directory_to_download))
-  }
   # test that directory_to_save exists
   testthat::expect_true(dir.exists(directory_to_save))
   # test that commands_path exists
@@ -520,3 +516,59 @@ list_stac_files <-
 
     return(list_assets)
   }
+
+#' Sort NOAA NARR variables
+#' @description
+#' Determine whether a NOAA NARR variable selected for download is a
+#' monolevel or pressure level variable. Monolevel variables are derived
+#' from https://downloads.psl.noaa.gov/Datasets/NARR/Dailies/monolevel/,
+#' and pressure level variables are derived from
+#' https://downloads.psl.noaa.gov//Datasets/NARR/Dailies/pressure/.
+#' @param variable character(1). User-selected NARR variable
+#' @returns list with URL base and vector of months (blank for monolevel)
+#' @keywords auxiliary
+#' @export
+narr_variable <- function(variable) {
+  stopifnot(length(variable) == 1)
+  mono <- c(
+    "acpcp", "air.2m", "air.sfc", "albedo", "apcp",
+    "bgrun", "bmixl.hl1", "cape", "ccond", "cdcon",
+    "cdlyr", "cfrzr", "cicep", "cin", "cnwat",
+    "crain", "csnow", "dlwrf", "dpt.2m", "dswrf",
+    "evap", "gflux", "hcdc", "hgt.tropo", "hlcy",
+    "hpbl", "lcdc", "lftx4", "lhtfl", "mcdc",
+    "mconv.hl1", "mslet", "mstav", "pevap", "pottmp.hl1",
+    "pottmp.sfc", "prate", "pres.sfc", "pres.tropo", "prmsl",
+    "pr_wtr", "rcq", "rcs", "rcsol", "rct",
+    "rhum.2m", "shtfl", "shum.2m", "snod", "snohf",
+    "snom", "snowc", "soilm", "ssrun", "tcdc",
+    "tke.hl1", "ulwrf.ntat", "ulwrf.sfc", "ustm", "uswrf.ntat",
+    "uswrf.sfc", "uwnd.10m", "veg", "vis", "vstm",
+    "vvel.hl1", "vwnd.10m", "vwsh.tropo", "wcconv", "wcinc",
+    "wcuflx", "wcvflx", "weasd", "wvconv", "wvinc",
+    "wvuflx", "wvvflx"
+  )
+  pressure <- c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd")
+  soil <- c("soill", "soilw", "tsoil")
+  base <- "https://psl.noaa.gov/thredds/fileServer/Datasets/NARR/Dailies/"
+  if (variable %in% mono) {
+    base <- paste0(base, "monolevel/")
+    months <- ""
+  } else {
+    months <- sprintf("%02d", seq(1, 12, by = 1))
+    if (variable %in% pressure) {
+      base <- paste0(base, "pressure/")
+    } else if (variable %in% soil) {
+      base <- paste0(base, "subsurface/")
+    } else {
+      stop(
+        paste0(
+          "Selected variable \"",
+          variable,
+          "\" is not available.\n"
+        )
+      )
+    }
+  }
+  return(list(base, months))
+}

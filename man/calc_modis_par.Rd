@@ -17,6 +17,7 @@ calc_modis_par(
   package_list_add = NULL,
   export_list_add = NULL,
   max_cells = 3e+07,
+  geom = FALSE,
   ...
 )
 }
@@ -36,7 +37,7 @@ Default is \code{c(0, 1000, 10000, 50000)}.}
 \item{name_covariates}{character. Name header of covariates.
 e.g., \code{"MOD_NDVIF_0_"}.
 The calculated covariate names will have a form of
-'{name_covariates}{zero-padded buffer radius in meters}',
+"\code{\{name_covariates\}\{zero-padded buffer radius in meters\}}",
 e.g., 'MOD_NDVIF_0_50000' where 50 km radius circular buffer
 was used to calculate mean NDVI value.}
 
@@ -62,10 +63,14 @@ Higher values will expedite processing, but will increase memory usage.
 Maximum possible value is \code{2^31 - 1}.
 See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
 
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.}}
+
 \item{...}{Arguments passed to \code{preprocess}.}
 }
 \value{
-A data.frame with an attribute:
+A data.frame or SpatVector with an attribute:
 \itemize{
 \item \code{attr(., "dates_dropped")}: Dates with insufficient tiles.
 Note that the dates mean the dates with insufficient tiles,
@@ -100,13 +105,31 @@ depending on \code{preprocess} function:
 e.g., \code{"^LST_"}
 \item \code{process_modis_swath()}: Subdataset names.
 e.g., \code{c("Cloud_Fraction_Day", "Cloud_Fraction_Night")}
-\item \code{process_bluemarble()}: Subdataset number.
+\item \code{process_blackmarble()}: Subdataset number.
 e.g., for VNP46A2 product, 3L.
 Dates with less than 80 percent of the expected number of tiles,
 which are determined by the mode of the number of tiles, are removed.
 Users will be informed of the dates with insufficient tiles.
 The result data.frame will have an attribute with the dates with
 insufficient tiles.
+}
+}
+\examples{
+\dontrun{
+locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
+locs <- terra::vect(locs, geom = c("lon", "lat"), crs = "EPSG:4326")
+calc_modis_par(
+  from =
+    list.files("./data", pattern = "VNP46A2.", full.names = TRUE),
+  locs = locs,
+  locs_id = "site_id",
+  radius = c(0L, 1000L),
+  preprocess = process_modis_merge,
+  name_covariates = "cloud_fraction_0",
+  subdataset = "Cloud_Fraction",
+  fun_summary = "mean",
+  nthreads = 1
+)
 }
 }
 \seealso{
@@ -128,6 +151,6 @@ Also, for preprocessing, please refer to:
 \itemize{
 \item \code{\link[=process_modis_merge]{process_modis_merge()}}
 \item \code{\link[=process_modis_swath]{process_modis_swath()}}
-\item \code{\link[=process_bluemarble]{process_bluemarble()}}
+\item \code{\link[=process_blackmarble]{process_blackmarble()}}
 }
 }

@@ -77,7 +77,7 @@ download_prism(
   element = "ppt",
   data_type = "ts",
   format = "nc",
-  directory_to_save = "~/data",
+  directory_to_save = "./data",
   acknowledgement = TRUE,
   download = TRUE,
   remove_command = TRUE
@@ -85,6 +85,8 @@ download_prism(
 }
 }
 \references{
+\insertRef{article_daly2000prism}{amadeus}
+
 \itemize{
 \item \href{http://www.prism.oregonstate.edu/}{PRISM Climate Group}
 \item \href{https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf}{PRISM Web Service Guide}

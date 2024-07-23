@@ -55,6 +55,22 @@ climate classification data from the \emph{Present and future
 Köppen-Geiger climate classification maps at
 1-km resolution}(\href{https://www.nature.com/articles/sdata2018214}{link for article}; \href{https://figshare.com/articles/dataset/Present_and_future_K_ppen-Geiger_climate_classification_maps_at_1-km_resolution/6396959/2}{link for data}).
 }
+\examples{
+\dontrun{
+download_koppen_geiger(
+  data_resolution = "0.0083",
+  time_period = "Present",
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
+}
+\references{
+\insertRef{article_beck2023koppen}{amadeus}
+\insertRef{article_beck2018present}{amadeus}
+}
 \author{
 Mitchell Manware, Insang Song
 }

@@ -6,8 +6,7 @@
 \usage{
 download_gridmet(
   variables = NULL,
-  year_start = 2022,
-  year_end = 2022,
+  year = c(2018, 2022),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -19,11 +18,7 @@ download_gridmet(
 for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
 "Energy Release Component" has code "erc").}
 
-\item{year_start}{integer(1). length of 4. Start of year range for
-downloading data.}
-
-\item{year_end}{integer(1). length of 4. End of year range for downloading
-data.}
+\item{year}{character(2). length of 4 each. Start/end years for downloading data.}
 
 \item{directory_to_save}{character(1). Directory(s) to save downloaded data
 files.}
@@ -46,6 +41,21 @@ folder within \code{directory_to_save}.
 }
 \description{
 The \code{download_gridmet} function accesses and downloads gridded surface meteorological data from the \href{https://www.climatologylab.org/gridmet.html}{University of California Merced Climatology Lab's gridMET dataset}.
+}
+\examples{
+\dontrun{
+download_gridmet(
+  variables = "Precipitation",
+  year = c(2023, 2024),
+  directory_to_save = "./data"
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
+}
+\references{
+\insertRef{article_abatzoglou2013development}{amadeus}
 }
 \author{
 Mitchell Manware

@@ -344,7 +344,7 @@ process_locs_vector <-
   ) {
     #### detect SpatVector
     if (methods::is(locs, "SpatVector")) {
-      cat(
+      message(
         paste0(
           "Detected `SpatVector` (",
           terra::geomtype(locs),
@@ -354,11 +354,11 @@ process_locs_vector <-
       sites_v <- locs
       #### detect sf object
     } else if (methods::is(locs, "sf")) {
-      cat("Detected `sf` extraction locations...\n")
+      message("Detected `sf` extraction locations...\n")
       sites_v <- terra::vect(locs)
       ### detect data.frame object
     } else if (methods::is(locs, "data.frame")) {
-      cat("Detected `data.frame` extraction locations...\n")
+      message("Detected `data.frame` extraction locations...\n")
       #### columns
       if (any(!(c("lon", "lat") %in% colnames(locs)))) {
         stop(paste0(
@@ -496,11 +496,13 @@ process_variable_codes <-
       return(variables)
     } else {
       if (all(tolower(variables) %in% names_codes[, 1]) == TRUE) {
-        codes_return <- do.call(
-          code_function,
-          list(tolower(variables), invert = FALSE)
+        codes_return <- lapply(
+          tolower(variables),
+          function(var) {
+            do.call(code_function, list(var, invert = FALSE))
+          }
         )
-        return(as.vector(codes_return))
+        return(as.vector(unlist(codes_return)))
       } else {
         stop(
           paste0(
@@ -536,3 +538,29 @@ is_date_proper <- function(
          \"YYYY-MM-DD\".\n", names(argnames)[2]))
   }
 }
+
+
+#' Apply extent to the processed data
+#' @description
+#' User-defined extent is used to filter the data.
+#' @param data sf/terra object.
+#' @param extent numeric(4). Extent to filter the data.
+#'   Should be ordered as c(xmin, xmax, ymin, ymax).
+#' @param geom character(1 or 2). Geometry type for if `data` is `data.frame`.
+#' One of "geometry" or c("lon", "lat").
+#' @importFrom sf st_as_sfc st_bbox st_crs
+#' @importFrom terra ext
+#' @returns sf/terra object with the extent applied.
+#' @keywords internal
+apply_extent <-
+  function(data, extent, geom) {
+    extent <- terra::ext(extent)
+    if (inherits(data, "sf")) {
+      extent <- sf::st_as_sfc(sf::st_bbox(extent))
+      sf::st_crs(extent) <- sf::st_crs(data)
+    } else if (inherits(data, "data.frame")) {
+      data <- terra::vect(data, geom = geom, crs = "EPSG:4326")
+    }
+    data <- data[extent, ]
+    return(data)
+  }

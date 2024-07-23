@@ -6,8 +6,7 @@
 \usage{
 download_terraclimate(
   variables = NULL,
-  year_start = 2022,
-  year_end = 2022,
+  year = c(2018, 2022),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -18,11 +17,7 @@ download_terraclimate(
 \item{variables}{character(1). Variable(s) name(s). See \href{https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php}{TerraClimate Direct Downloads}
 for variable names and acronym codes.}
 
-\item{year_start}{integer(1). length of 4. Start of year range for
-downloading data.}
-
-\item{year_end}{integer(1). length of 4. End of year range for downloading
-data.}
+\item{year}{character(2). length of 4 each. Start/end years for downloading data.}
 
 \item{directory_to_save}{character(1). Directory(s) to save downloaded data
 files.}
@@ -45,6 +40,21 @@ folder within \code{directory_to_save}.
 }
 \description{
 The \code{download_terraclimate} function accesses and downloads climate and water balance data from the \href{https://www.climatologylab.org/terraclimate.html}{University of California Merced Climatology Lab's TerraClimate dataset}.
+}
+\examples{
+\dontrun{
+download_terraclimate(
+  variables = "Precipitation",
+  year = c(2023, 2024),
+  directory_to_save = "./data"
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
+}
+\references{
+\insertRef{article_abatzoglou2018terraclimate}{amadeus}
 }
 \author{
 Mitchell Manware, Insang Song

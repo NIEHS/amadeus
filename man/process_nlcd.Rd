@@ -25,6 +25,14 @@ returning a single \code{SpatRaster} object.
 
 Reads NLCD file of selected \code{year}.
 }
+\examples{
+\dontrun{
+nlcd <- process_nlcd(
+  path = "./data/",
+  year = 2021
+)
+}
+}
 \author{
 Eva Marques, Insang Song
 }

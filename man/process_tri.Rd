@@ -8,6 +8,7 @@ process_tri(
   path = NULL,
   year = 2018,
   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49),
+  extent = NULL,
   ...
 )
 }
@@ -17,6 +18,9 @@ process_tri(
 \item{year}{integer(1). Single year to select.}
 
 \item{variables}{integer. Column index of TRI data.}
+
+\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
+if \code{NULL} (default), the entire raster is loaded}
 
 \item{...}{Placeholders.}
 }
@@ -31,6 +35,15 @@ returning a single \code{SpatVector} (points) object for the selected \code{year
 \note{
 Visit \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-and-tools}{TRI Data and Tools}
 to view the available years and variables.
+}
+\examples{
+\dontrun{
+tri <- process_tri(
+  path = "./data",
+  year = 2020,
+  variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49)
+)
+}
 }
 \references{
 https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-and-tools

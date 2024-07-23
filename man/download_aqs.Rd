@@ -7,8 +7,7 @@
 download_aqs(
   parameter_code = 88101,
   resolution_temporal = "daily",
-  year_start = 2018,
-  year_end = 2022,
+  year = c(2018, 2022),
   url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -27,11 +26,7 @@ EPA pollutant parameter code. For details, please refer to
 Name of column containing POC values.
 Currently, no value other than \code{"daily"} works.}
 
-\item{year_start}{integer(1). length of 4.
-Start year for downloading data.}
-
-\item{year_end}{integer(1). length of 4.
-End year for downloading data.}
+\item{year}{character(2). length of 4 each. Start/end years for downloading data.}
 
 \item{url_aqs_download}{character(1).
 URL to the AQS pre-generated datasets.}
@@ -63,6 +58,22 @@ NULL; Zip and/or data files will be downloaded and stored in
 }
 \description{
 The \code{download_aqs()} function accesses and downloads Air Quality System (AQS) data from the \href{https://aqs.epa.gov/aqsweb/airdata/download_files.html}{U.S. Environmental Protection Agency's (EPA) Pre-Generated Data Files}.
+}
+\examples{
+\dontrun{
+download_aqs(
+  parameter_code = 88101,
+  resolution_temporal = "daily",
+  year = c(2022, 2023),
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
+}
+\references{
+\insertRef{data_usepa2023airdata}{amadeus}
 }
 \author{
 Mariana Kassien, Insang Song, Mitchell Manware

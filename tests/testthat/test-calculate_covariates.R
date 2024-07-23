@@ -46,8 +46,8 @@ testthat::test_that("calc_koppen_geiger works well", {
       geom = TRUE
     )
   )
-  testthat::expect_equal(ncol(kg_geom), 8)
-  testthat::expect_true("geometry" %in% names(kg_geom))
+  testthat::expect_equal(ncol(kg_geom), 7)
+  testthat::expect_true("SpatVector" %in% class(kg_geom))
 })
 
 ## 2. Temporal Dummies ####
@@ -74,6 +74,16 @@ testthat::test_that("calc_dummies works well", {
   testthat::expect_equal(ncol(dum_res), 28L)
   # should have each of the indicator groups
   testthat::expect_equal(sum(unlist(dum_res[, -1:-4])), 3L)
+
+  # with geometry
+  testthat::expect_no_error(
+    dum_res_geom <- calc_temporal_dummies(
+      locs = site_faux,
+      year = seq(2018L, 2022L),
+      geom = TRUE
+    )
+  )
+  testthat::expect_s4_class(dum_res_geom, "SpatVector")
 
   # error cases
   site_faux_err <- site_faux
@@ -169,10 +179,10 @@ testthat::test_that("calc_ecoregion works well", {
     )
   )
   testthat::expect_equal(
-    ncol(ecor_geom), 5
+    ncol(ecor_geom), 4
   )
   testthat::expect_true(
-    "geometry" %in% names(ecor_geom)
+    "SpatVector" %in% class(ecor_geom)
   )
 })
 
@@ -253,6 +263,25 @@ testthat::test_that("calc_modis works well.", {
     )
   )
 
+  # with geometry
+  testthat::expect_no_error(
+    suppressWarnings(
+      calc_mod11_geom <-
+        calc_modis_par(
+          from = path_mod11,
+          locs = sf::st_as_sf(site_faux),
+          preprocess = process_modis_merge,
+          package_list_add = c("MASS"),
+          export_list_add = c("aux"),
+          name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
+          subdataset = "(LST_)",
+          nthreads = 1L,
+          geom = TRUE
+        )
+    )
+  )
+  testthat::expect_s4_class(calc_mod11_geom, "SpatVector")
+
   # case 2: swath mod06l2
   path_mod06 <-
     list.files(
@@ -285,6 +314,23 @@ testthat::test_that("calc_modis works well.", {
   )
   testthat::expect_s3_class(calc_mod06, "data.frame")
 
+  # with geometry
+  testthat::expect_no_error(
+    suppressWarnings(
+      calc_mod06_geom <-
+        calc_modis_par(
+          from = path_mod06,
+          locs = site_faux,
+          subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+          preprocess = process_modis_swath,
+          name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_"),
+          nthreads = 1,
+          geom = TRUE
+        )
+    )
+  )
+  testthat::expect_s4_class(calc_mod06_geom, "SpatVector")
+
   # case 3: VIIRS
   path_vnp46 <-
     list.files(
@@ -293,10 +339,10 @@ testthat::test_that("calc_modis works well.", {
       full.names = TRUE
     )
   testthat::expect_warning(
-    base_vnp <- process_bluemarble(
+    base_vnp <- process_blackmarble(
       path = path_vnp46,
       date = "2018-08-13",
-      tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
+      tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
     )
   )
 
@@ -306,15 +352,52 @@ testthat::test_that("calc_modis works well.", {
         calc_modis_par(
           from = path_vnp46,
           locs = site_faux,
-          preprocess = process_bluemarble,
+          preprocess = process_blackmarble,
           name_covariates = c("MOD_NITLT_0_"),
           subdataset = 3L,
           nthreads = 1,
-          tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
+          tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
         )
     )
   )
   testthat::expect_s3_class(calc_vnp46, "data.frame")
+
+  # with geometry (as SpatVector)
+  testthat::expect_no_error(
+    suppressWarnings(
+      calc_vnp46_geom_v <-
+        calc_modis_par(
+          from = path_vnp46,
+          locs = site_faux,
+          preprocess = process_blackmarble,
+          name_covariates = c("MOD_NITLT_0_"),
+          subdataset = 3L,
+          nthreads = 1,
+          tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
+          geom = TRUE
+        )
+    )
+  )
+  testthat::expect_s4_class(calc_vnp46_geom_v, "SpatVector")
+
+
+  # with geometry (as sf)
+  testthat::expect_no_error(
+    suppressWarnings(
+      calc_vnp46_geom_sf <-
+        calc_modis_par(
+          from = path_vnp46,
+          locs = sf::st_as_sf(site_faux),
+          preprocess = process_blackmarble,
+          name_covariates = c("MOD_NITLT_0_"),
+          subdataset = 3L,
+          nthreads = 1,
+          tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
+          geom = TRUE
+        )
+    )
+  )
+  testthat::expect_s4_class(calc_vnp46_geom_sf, "SpatVector")
 
   # error cases
   testthat::expect_error(
@@ -399,6 +482,19 @@ testthat::test_that("calc_modis works well.", {
     )
   )
 
+  # test calc_modis_daily directly with geometry
+  testthat::expect_no_error(
+    calc_mod_geom <- calc_modis_daily(
+      from = mcd_merge,
+      date = "2021-08-15",
+      locs = sf::st_as_sf(site_faux2),
+      radius = 1000,
+      name_extracted = "MCD_EXTR_1K_",
+      geom = TRUE
+    )
+  )
+  testthat::expect_s4_class(calc_mod_geom, "SpatVector")
+
   testthat::expect_error(
     calc_modis_par(from = site_faux)
   )
@@ -419,11 +515,11 @@ testthat::test_that("calc_modis works well.", {
     calc_modis_par(
       from = path_vnp46,
       locs = site_faux,
-      preprocess = process_bluemarble,
+      preprocess = process_blackmarble,
       name_covariates = c("MOD_NITLT_0_", "MOD_K1_"),
       subdataset = 3L,
       nthreads = 2,
-      tile_df = process_bluemarble_corners(c(9, 10), c(5, 5))
+      tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
     )
   )
   testthat::expect_warning(
@@ -431,7 +527,7 @@ testthat::test_that("calc_modis works well.", {
       from = path_vnp46,
       locs = site_faux,
       name_covariates = c("MOD_NITLT_0_"),
-      preprocess = process_bluemarble,
+      preprocess = process_blackmarble,
       subdataset = 3L,
       nthreads = 1,
       radius = c(-1000, 0L)
@@ -612,10 +708,10 @@ testthat::test_that("Check calc_nlcd works", {
   )
   # with geometry will have 12 columns
   testthat::expect_equal(
-    ncol(output_geom), 16
+    ncol(output_geom), 15
   )
   testthat::expect_true(
-    "geometry" %in% names(output_geom)
+    "SpatVector" %in% class(output_geom)
   )
 })
 
@@ -691,6 +787,16 @@ testthat::test_that("NEI calculation", {
   testthat::expect_true(any(grepl("NEI", names(neicalced))))
   testthat::expect_equal(neicalced$TRF_NEINP_0_00000, 1579079, tolerance = 1)
 
+  # with geometry
+  testthat::expect_no_error(
+    neicalced_geom <- calc_nei(
+      locs = ncp,
+      from = neiras,
+      geom = TRUE
+    )
+  )
+  testthat::expect_s4_class(neicalced_geom, "SpatVector")
+
   # more error cases
   testthat::expect_condition(
     calc_nei(
@@ -710,8 +816,8 @@ testthat::test_that("TRI calculation", {
   withr::local_package("data.table")
   withr::local_options(sf_use_s2 = FALSE)
 
-  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
-  ncp$site_id <- "3799900018810101"
+  ncp <- data.frame(lon = c(-78.8277, -78.0000), lat = c(35.95013, 80.000))
+  ncp$site_id <- c("3799900018810101", "3799900018819999")
   ncp$time <- 2018L
   ncpt <-
     terra::vect(ncp, geom = c("lon", "lat"),
@@ -728,10 +834,21 @@ testthat::test_that("TRI calculation", {
     tri_c <- calc_tri(
       from = tri_r,
       locs = ncpt,
-      radius = 50000L
+      radius = c(1500L, 50000L)
     )
   )
   testthat::expect_true(is.data.frame(tri_c))
+
+  # with geometry
+  testthat::expect_no_error(
+    tri_c_geom <- calc_tri(
+      from = tri_r,
+      locs = ncpt,
+      radius = c(1500L, 50000L),
+      geom = TRUE
+    )
+  )
+  testthat::expect_s4_class(tri_c_geom, "SpatVector")
 
   testthat::expect_no_error(
     calc_tri(
@@ -808,6 +925,19 @@ testthat::test_that("calc_sedc tests", {
     )
   )
 
+  # with geometry
+  testthat::expect_no_error(
+    tri_sedc_geom <- calc_sedc(
+      locs = ncpt,
+      from = tri_r,
+      locs_id = "site_id",
+      sedc_bandwidth = 30000,
+      target_fields = targcols,
+      geom = TRUE
+    )
+  )
+  testthat::expect_s4_class(tri_sedc_geom, "SpatVector")
+
   # warning case: duplicate field names between locs and from
   ncpta <- ncpt
   ncpta$YEAR <- 2018
@@ -826,11 +956,6 @@ testthat::test_that("calc_sedc tests", {
 ## 9. HMS ####
 testthat::test_that("calc_hms returns expected.", {
   withr::local_package("terra")
-  densities <- c(
-    "Light",
-    "Medium",
-    "Heavy"
-  )
   radii <- c(0, 1000)
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
@@ -838,64 +963,82 @@ testthat::test_that("calc_hms returns expected.", {
   expect_true(
     is.function(calc_hms)
   )
-  for (d in seq_along(densities)) {
-    density <- densities[d]
-    for (r in seq_along(radii)) {
-      hms <-
-        process_hms(
-          date = c("2022-06-10", "2022-06-11"),
-          variable = density,
-          path = testthat::test_path(
-            "..",
-            "testdata",
-            "hms"
-          )
+  for (r in seq_along(radii)) {
+    hms <-
+      process_hms(
+        date = c("2022-06-10", "2022-06-11"),
+        path = testthat::test_path(
+          "..",
+          "testdata",
+          "hms"
         )
-      hms_covariate <-
-        calc_hms(
-          from = hms,
-          locs = ncp,
-          locs_id = "site_id",
-          radius = radii[r]
-        )
-      # set column names
-      hms_covariate <- calc_setcolumns(
-        from = hms_covariate,
-        lag = 0,
-        dataset = "hms",
-        locs_id = "site_id"
       )
-      # expect output is data.frame
-      expect_true(
-        class(hms_covariate) == "data.frame"
+    hms_covariate <-
+      calc_hms(
+        from = hms,
+        locs = ncp,
+        locs_id = "site_id",
+        radius = radii[r],
+        geom = FALSE
       )
-      # expect 3 columns
-      expect_true(
-        ncol(hms_covariate) == 3
-      )
-      # expect 2 rows
-      expect_true(
-        nrow(hms_covariate) == 2
-      )
-      # expect integer for binary value
-      expect_true(
-        class(hms_covariate[, 3]) == "integer"
-      )
-      # expect binary
-      expect_true(
-        all(unique(hms_covariate[, 3]) %in% c(0, 1))
-      )
-    }
+    # set column names
+    hms_covariate <- calc_setcolumns(
+      from = hms_covariate,
+      lag = 0,
+      dataset = "hms",
+      locs_id = "site_id"
+    )
+    # expect output is data.frame
+    expect_true(
+      class(hms_covariate) == "data.frame"
+    )
+    # expect 3 columns
+    expect_true(
+      ncol(hms_covariate) == 5
+    )
+    # expect 2 rows
+    expect_true(
+      nrow(hms_covariate) == 2
+    )
+    # expect integer for binary value
+    expect_true(
+      is.integer(hms_covariate[, 3])
+    )
+    # expect binary
+    expect_true(
+      all(unique(hms_covariate[, 3]) %in% c(0, 1))
+    )
   }
 })
 
-testthat::test_that("calc_hms returns expected with missing polygons.", {
-  withr::local_package("terra")
-  densities <- c(
-    "Light",
-    "Medium",
-    "Heavy"
+testthat::test_that("calc_hms with geom = TRUE", {
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  hms_dir <- testthat::test_path(
+    "..", "testdata", "hms"
   )
+  hms <-  process_hms(
+    date = c("2022-06-10", "2022-06-13"),
+    path = hms_dir
+  )
+  hms_covariate_geom <- calc_hms(
+    from = hms,
+    locs = ncp,
+    locs_id = "site_id",
+    radius = 0,
+    geom = TRUE
+  )
+  # with geometry will have 5 columns
+  testthat::expect_equal(
+    ncol(hms_covariate_geom), 5
+  )
+  testthat::expect_s4_class(
+    hms_covariate_geom, "SpatVector"
+  )
+})
+
+testthat::test_that("calc_hms with missing polygons (12/31/2018).", {
+  withr::local_package("terra")
   radii <- c(0, 1000)
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
@@ -903,53 +1046,44 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
   expect_true(
     is.function(calc_hms)
   )
-  hms_dir <- testthat::test_path(
-    "..", "testdata", "hms"
+  # expect function
+  testthat::expect_true(
+    is.function(process_hms)
   )
-  for (d in seq_along(densities)) {
-    density <- densities[d]
-    for (r in seq_along(radii)) {
-      hms <-
-        process_hms(
-          date = c("2022-06-10", "2022-06-13"),
-          variable = density,
-          path = hms_dir
-        )
-      hms_covariate <-
-        calc_hms(
-          from = hms,
-          locs = ncp,
-          locs_id = "site_id",
-          radius = radii[r]
-        )
-      # set column names
-      hms_covariate <- calc_setcolumns(
-        from = hms_covariate,
-        lag = 0,
-        dataset = "hms",
-        locs_id = "site_id"
+  hms <-
+    process_hms(
+      date = c("2018-12-31", "2018-12-31"),
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "hms"
       )
-      # expect output is data.frame
-      expect_true(
-        class(hms_covariate) == "data.frame"
-      )
-      # expect 3 columns
-      expect_true(
-        ncol(hms_covariate) == 3
-      )
-      # expect 4 rows
-      expect_true(
-        nrow(hms_covariate) == 4
-      )
-      # expect integer for binary value
-      expect_true(
-        class(hms_covariate[, 3]) == "integer"
-      )
-      # expect binary
-      expect_true(
-        all(unique(hms_covariate[, 3]) %in% c(0, 1))
-      )
-    }
+    )
+  for (r in seq_along(radii)) {
+    hms_covar <- calc_hms(
+      from = hms,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = radii[r],
+      geom = FALSE
+    )
+    # data frame
+    testthat::expect_true(methods::is(hms_covar, "data.frame"))
+    # 5 columns
+    testthat::expect_equal(ncol(hms_covar), 7)
+  }
+  for (r in seq_along(radii)) {
+    hms_covar <- calc_hms(
+      from = hms,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = radii[r],
+      geom = TRUE
+    )
+    # SpatVector
+    testthat::expect_true(methods::is(hms_covar, "SpatVector"))
+    # 5 columns
+    testthat::expect_equal(ncol(hms_covar), 5)
   }
 })
 
@@ -1031,10 +1165,10 @@ testthat::test_that("calc_gmted returns expected.", {
     )
   )
   testthat::expect_equal(
-    ncol(gmted_geom), 4
+    ncol(gmted_geom), 3
   )
   testthat::expect_true(
-    "geometry" %in% names(gmted_geom)
+    "SpatVector" %in% class(gmted_geom)
   )
 })
 
@@ -1111,6 +1245,23 @@ testthat::test_that("calc_narr returns expected.", {
       )
     }
   }
+  # with geometry
+  testthat::expect_no_error(
+    narr_covariate_geom <- calc_narr(
+      from = narr,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(narr_covariate_geom), 4 # 4 columns because omega has pressure levels
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(narr_covariate_geom)
+  )
 })
 
 ## 11. GEOS-CF ####
@@ -1176,6 +1327,23 @@ testthat::test_that("calc_geos returns as expected.", {
       )
     }
   }
+  # with included geometry
+  testthat::expect_no_error(
+    geos_covariate_geom <- calc_geos(
+      from = geos,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(geos_covariate_geom), 4
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(geos_covariate_geom)
+  )
 })
 
 ## 12. SEDAC: Population ####
@@ -1232,6 +1400,23 @@ testthat::test_that("calc_sedac_population returns as expected.", {
       )
     }
   }
+  # with included geometry
+  testthat::expect_no_error(
+    pop_covariate_geom <- calc_sedac_population(
+      from = pop,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(pop_covariate_geom), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(pop_covariate_geom)
+  )
 })
 
 ## 13. SEDAC: Global Roads ####
@@ -1283,10 +1468,10 @@ testthat::test_that("groads calculation works", {
     )
   )
   testthat::expect_equal(
-    ncol(groads_geom), 5
+    ncol(groads_geom), 4
   )
   testthat::expect_true(
-    "geometry" %in% names(groads_geom)
+    "SpatVector" %in% class(groads_geom)
   )
 })
 
@@ -1374,6 +1559,23 @@ testthat::test_that("calc_merra2 returns as expected.", {
       )
     }
   }
+  # with included geometry
+  testthat::expect_no_error(
+    merra2_covariate_geom <- calc_merra2(
+      from = merra2,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(merra2_covariate_geom), 4
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(merra2_covariate_geom)
+  )
 })
 
 ## 15. GRIDMET ####
@@ -1385,7 +1587,7 @@ testthat::test_that("calc_gridmet returns as expected.", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_terraclimate)
+    is.function(calc_gridmet)
   )
   for (r in seq_along(radii)) {
     gridmet <-
@@ -1432,6 +1634,23 @@ testthat::test_that("calc_gridmet returns as expected.", {
       "POSIXt" %in% class(gridmet_covariate$time)
     )
   }
+  # with included geometry
+  testthat::expect_no_error(
+    gridmet_covariate_geom <- calc_gridmet(
+      from = gridmet,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(gridmet_covariate_geom), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(gridmet_covariate_geom)
+  )
 })
 
 ## 16. TerraClimate ####
@@ -1490,6 +1709,23 @@ testthat::test_that("calc_terraclimate returns as expected.", {
       nchar(terraclimate_covariate$time)[1] == 6
     )
   }
+  # with included geometry
+  testthat::expect_no_error(
+    terraclimate_covariate_geom <- calc_terraclimate(
+      from = terraclimate,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(terraclimate_covariate_geom), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(terraclimate_covariate_geom)
+  )
 })
 
 ## 17. Lagged variables ####
@@ -1571,8 +1807,7 @@ testthat::test_that("calc_lagged returns as expected.", {
   }
 })
 
-
-## 18. Wrapper ####
+## 19. Wrapper ####
 testthat::test_that("calc_covariates wrapper works", {
 
   withr::local_package("rlang")
@@ -1585,7 +1820,7 @@ testthat::test_that("calc_covariates wrapper works", {
       "koeppen-geiger", "koppen", "koeppen",
       "geos", "dummies", "gmted",
       "sedac_groads", "groads", "roads",
-      "ecoregions", "ecoregion", "hms", "noaa", "smoke",
+      "ecoregions", "ecoregion", "hms", "smoke",
       "gmted", "narr", "geos",
       "sedac_population", "population", "nlcd",
       "merra", "MERRA", "merra2", "MERRA2",
@@ -1633,7 +1868,7 @@ testthat::test_that("calc_covariates wrapper works", {
       "koeppen-geiger", "koppen", "koeppen",
       "geos", "dummies", "gmted",
       "sedac_groads", "groads", "roads",
-      "ecoregions", "ecoregion", "hms", "noaa", "smoke",
+      "ecoregions", "ecoregion", "hms", "smoke",
       "gmted", "narr", "geos",
       "sedac_population", "population", "nlcd",
       "merra", "merra2",
@@ -1646,6 +1881,7 @@ testthat::test_that("calc_covariates wrapper works", {
   }
 })
 
+# calc check time
 testthat::test_that("calc_check_time identifies missing `time` column.", {
   testthat::expect_error(
     # provide integer instead of data.frame to provoke error

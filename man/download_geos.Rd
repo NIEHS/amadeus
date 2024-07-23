@@ -8,8 +8,7 @@ download_geos(
   collection = c("aqc_tavg_1hr_g1440x721_v1", "chm_tavg_1hr_g1440x721_v1",
     "met_tavg_1hr_g1440x721_x1", "xgc_tavg_1hr_g1440x721_x1",
     "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"),
-  date_start = "2023-09-01",
-  date_end = "2023-09-01",
+  date = c("2018-01-01", "2018-01-01"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -19,11 +18,8 @@ download_geos(
 \arguments{
 \item{collection}{character(1). GEOS-CF data collection file name.}
 
-\item{date_start}{character(1). length of 10. Start date for downloading
-data. Format YYYY-MM-DD (ex. September 1, 2023 = \code{"2023-09-01"}).}
-
-\item{date_end}{character(1). length of 10. End date for downloading data.
-Format YYYY-MM-DD (ex. September 1, 2023 = \code{"2023-09-01"}).}
+\item{date}{character(2). length of 10 each. Start/end date for downloading data.
+Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}).}
 
 \item{directory_to_save}{character(1). Directory to save data.
 Sub-directories will be created within \code{directory_to_save} for each
@@ -48,6 +44,21 @@ collection-specific folder within \code{directory_to_save}.
 \description{
 The \code{download_geos()} function accesses and downloads various
 atmospheric composition collections from \href{https://gmao.gsfc.nasa.gov/GEOS_systems/}{NASA's Global Earth Observing System (GEOS) model}.
+}
+\examples{
+\dontrun{
+download_geos(
+  collection = "aqc_tavg_1hr_g1440x721_v1",
+  date = c("2024-01-01", "2024-01-05"),
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
+}
+\references{
+\insertRef{keller_description_2021}{amadeus}
 }
 \author{
 Mitchell Manware, Insang Song

@@ -4,13 +4,14 @@
 \alias{process_koppen_geiger}
 \title{Process climate classification data}
 \usage{
-process_koppen_geiger(path = NULL, year = NULL, ...)
+process_koppen_geiger(path = NULL, extent = NULL, ...)
 }
 \arguments{
 \item{path}{character(1). Path to Koppen-Geiger
 climate zone raster file}
 
-\item{year}{data year. Not applicable for this function.}
+\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
+if \code{NULL} (default), the entire raster is loaded}
 
 \item{...}{Placeholders.}
 }
@@ -20,6 +21,13 @@ a \code{SpatRaster} object
 \description{
 The \code{process_koppen_geiger()} function imports and cleans raw climate
 classification data, returning a single \code{SpatRaster} object.
+}
+\examples{
+\dontrun{
+kg <- process_koppen_geiger(
+  path = "./data/koppen_geiger_data.tif"
+)
+}
 }
 \author{
 Insang Song

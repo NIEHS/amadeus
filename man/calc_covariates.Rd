@@ -7,8 +7,8 @@
 calc_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
     "dummies", "gmted", "sedac_groads", "groads", "roads", "ecoregions", "ecoregion",
-    "hms", "noaa", "smoke", "gmted", "narr", "geos", "sedac_population", "population",
-    "nlcd", "merra", "merra2", "gridmet", "terraclimate", "tri", "nei"),
+    "hms", "smoke", "gmted", "narr", "geos", "sedac_population", "population", "nlcd",
+    "merra", "merra2", "gridmet", "terraclimate", "tri", "nei"),
   from,
   locs,
   locs_id = "site_id",
@@ -30,7 +30,7 @@ Default is \code{"site_id"}.}
 function.}
 }
 \value{
-Calculated covariates. Mainly data.frame object.
+Calculated covariates as a data.frame or SpatVector object
 }
 \description{
 The \code{calculate_covariates()} function extracts values at point
@@ -44,13 +44,25 @@ SpatRaster or SpatVector objects before passing to
 \note{
 \code{covariate} argument value is converted to lowercase.
 }
+\examples{
+\dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+calc_covariates(
+  covariate = "narr",
+  from = narr, # derived from process_covariates() example
+  locs = loc,
+  locs_id = "id",
+  geom = FALSE
+)
+}
+}
 \seealso{
 \itemize{
 \item \code{\link{calc_modis_par}}: \code{"modis"}, \code{"MODIS"}
 \item \code{\link{calc_koppen_geiger}}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"}
 \item \code{\link{calc_ecoregion}}: \code{"ecoregion"}, \code{"ecoregions"}
 \item 
-\item \code{\link{calc_hms}}: \code{"hms"}, \code{"noaa"}, \code{"smoke"}
+\item \code{\link{calc_hms}}: \code{"hms"}, \code{"smoke"}
 \item 
 \item 
 \item \code{\link{calc_geos}}: \code{"geos"}, \code{"geos_cf"}

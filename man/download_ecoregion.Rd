@@ -64,6 +64,19 @@ in wget command) file in ./inst/extdata. The instruction above is for
 certificate updates in the future.
 }
 }
+\examples{
+\dontrun{
+download_ecoregion(
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
+}
+\references{
+\insertRef{article_omernik2014ecoregions}{amadeus}
+}
 \author{
 Insang Song
 }

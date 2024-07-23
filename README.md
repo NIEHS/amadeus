@@ -1,4 +1,4 @@
-# amadeus
+# amadeus <a href="https://niehs.github.io/amadeus/"><img src="man/figures/amadeus-combined.svg" align="right" height="250" /><a>
 
 [![R-CMD-check](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml)
 [![cov](https://NIEHS.github.io/amadeus/badges/coverage.svg)](https://github.com/NIEHS/amadeus/actions)
@@ -12,15 +12,15 @@
 
 `amadeus` is not yet available from CRAN, but it can be installed with the `devtools`, `remotes`, or `pak` packages.
 
-```
+```r
 devtools::install_github("NIEHS/amadeus")
 ```
 
-```
+```r
 remotes::install_github("NIEHS/amadeus")
 ```
 
-```
+```r
 pak::pak("NIEHS/amadeus")
 ```
 
@@ -31,49 +31,58 @@ To add or edit functionality for new data sources or datasets, open a [Pull requ
 Utilize [Issues](https://github.com/NIEHS/amadeus/issues) to notify the authors of bugs, questions, or recommendations. Identify each issue with the appropriate label to help ensure a timely response.
 
 <div align="center">
-  <img src="vignettes/images/readme_issues.png" style="width: 100%;">
+  <img src="man/figures/readme_issues.png" style="width: 100%;">
 </div>
 
 ## Download
 
 `download_data` accesses and downloads raw geospatial data from a variety of open source data repositories. The function is a wrapper that calls source-specific download functions, each of which account for the source's unique combination of URL, file naming conventions, and data types. Download functions cover the following sources:
 
-| Source | Data Type | Genre |
-| :--- | :--- | :--- |
-| [Climatology Lab TerraClimate](https://www.climatologylab.org/terraclimate.html) | netCDF | Climate, Water |
-| [Climatology Lab GridMet](https://www.climatologylab.org/gridmet.html) | netCDF | Meteorology |
-| [Köppen-Geiger Climate Classification (Beck et al., 2018)](https://www.nature.com/articles/sdata2018214) | GeoTIFF | Climate Classification |
-| [MRLC Consortium National Land Cover Database (NLCD)](https://www.mrlc.gov/data) | GeoTIFF | Land Use |
-| [NASA Moderate Resolution Imaging Spectroradiometer (MODIS)](https://modis.gsfc.nasa.gov/data/) | HDF | Atmosphere, Meteorology, Land Use, Satellite |
-| [NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://www.nature.com/articles/sdata2018214) | netCDF | Atmosphere, Meteorology |
-| [NASA SEDAC UN WPP-Adjusted Population Density](https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11) | GeoTIFF, netCDF | Population |
-| [NASA SEDAC Global Roads Open Access Data Set](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download) | Shapefile, Geodatabase | Roadways |
-| [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere, Meteorology |
-| [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0) | Shapefile, KML | Wildfire Smoke |
-| [NOAA NCEP North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) | netCDF | Atmosphere, Meteorology |
-| [US EPA Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV | Air Pollution |
+| Data Source | File Type | Data Genre |
+| :---- | :-- | :--- |
+| [Climatology Lab TerraClimate](https://www.climatologylab.org/terraclimate.html) | netCDF | Meteorology |
+| [Climatology Lab GridMet](https://www.climatologylab.org/gridmet.html) | netCDF | Climate<br>Water |
+| [Köppen-Geiger Climate Classification](https://www.nature.com/articles/sdata2018214) | GeoTIFF | Climate Classification |
+| [MRLC[^1] Consortium National Land Cover Database (NLCD)](https://www.mrlc.gov/data) | GeoTIFF | Land Use |
+| [NASA[^2] Moderate Resolution Imaging Spectroradiometer (MODIS)](https://modis.gsfc.nasa.gov/data/) | HDF | Atmosphere<br>Meteorology<br>Land Use<br>Satellite |
+| [NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://www.nature.com/articles/sdata2018214) | netCDF | Atmosphere<br>Meteorology |
+| [NASA SEDAC[^3] UN WPP-Adjusted Population Density](https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11) | GeoTIFF<br>netCDF | Population |
+| [NASA SEDAC Global Roads Open Access Data Set](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download) | Shapefile<br>Geodatabase | Roadways |
+| [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere<br>Meteorology |
+| [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0) | Shapefile<br>KML | Wildfire Smoke |
+| [NOAA NCEP[^4] North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) | netCDF | Atmosphere<br>Meteorology |
+| [OpenGeoHub Foundation OpenLandMap](https://opengeohub.org/about-openlandmap/) | GeoTIFF | Climate<br>Elevation<br>Soil<br>Land Use<br>Satellite |
+| [Parameter Elevation Regression on Independent Slopes Model (PRISM)](https://elibrary.asabe.org/abstract.asp??JID=3&AID=3101&CID=t2000&v=43&i=6&T=1) | BIL<br>ASCII | Climate |
+| [US EPA[^5] Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV | Air Pollution |
 | [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregion) | Shapefile | Climate Regions |
-| [USGS Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation |
+| [US EPA National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories) | CSV | Emissions |
+| [US EPA Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present) | CSV | Chemicals<br>Pollution |
+| [USGS[^6] Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation |
+| [USGS National Hydrography Dataset (NHD)](https://www.sciencebase.gov/catalog/item/4f5545cce4b018de15819ca9) | Geopackage<br>Geodatabase | Hydrography |
 
-
-See the "download_data and NASA EarthData Account" vignette for a detailed description of source-specific download functions.
+See the "[download_data](https://niehs.github.io/amadeus/articles/download_functions.html)" vignette for a detailed description of source-specific download functions.
 
 Example use of `download_data` using NOAA NCEP North American Regional Reanalysis's (NARR) "weasd" (Daily Accumulated Snow at Surface) variable.
 
+```r
+directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
+download_data(
+  dataset_name = "narr",
+  year = c(2022, 2022),
+  variable = "weasd",
+  directory_to_save = directory,
+  acknowledgement = TRUE,
+  download = TRUE
+)
 ```
-> directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
-> download_data(
-+   dataset_name = "narr_monolevel",
-+   year_start = 2022,
-+   year_end = 2022,
-+   variable = "weasd",
-+   directory_to_save = directory,
-+   acknowledgement = TRUE,
-+   download = TRUE
-+ )
+```
 Downloading requested files...
 Requested files have been downloaded.
-> list.files(paste0(directory, "weasd"))
+```
+```r
+list.files(paste0(directory, "weasd"))
+```
+```
 [1] "weasd.2022.nc"
 ```
 
@@ -85,17 +94,24 @@ To avoid errors when using `process_covariates`, **do not edit the raw downloade
 
 Example use of `process_covariates` using the downloaded "weasd" data.
 
+```r
+weasd <- process_covariates(
+  covariate = "narr",
+  date = c("2022-01-01", "2022-01-05"),
+  variable = "weasd",
+  path = paste0(directory, "weasd"),
+  extent = NULL
+)
 ```
-> weasd <- process_covariates(
-+   covariate = "narr",
-+   date = c("2022-01-01", "2022-01-05"),
-+   variable = "weasd",
-+   path = paste0(directory, "weasd")
-+ )
+```
 Cleaning weasd data for January, 2022...
 Detected monolevel data...
 Returning daily weasd data from 2022-01-01 to 2022-01-05.
-> weasd
+```
+```r
+weasd
+```
+```
 class       : SpatRaster
 dimensions  : 277, 349, 5  (nrow, ncol, nlyr)
 resolution  : 32462.99, 32463  (x, y)
@@ -110,21 +126,22 @@ time        : 2022-01-01 to 2022-01-05 UTC
 
 ## Calculate Covariates
 
-`calc_covariates` stems from the `beethoven` package's need for various types of data extracted at precise locations. `calc_covariates`, therefore, extracts data from the "cleaned" `SpatRaster` or `SpatVector` object at user defined locations. Users can choose to buffer the locations. The function returns a `data.frame` with data extracted at all locations for each layer or row in the `SpatRaster` or `SpatVector` object, respectively.
+`calc_covariates` stems from the [`beethoven`](https://github.com/NIEHS/beethoven) project's need for various types of data extracted at precise locations. `calc_covariates`, therefore, extracts data from the "cleaned" `SpatRaster` or `SpatVector` object at user defined locations. Users can choose to buffer the locations. The function returns a `data.frame` or `SpatVector` with data extracted at all locations for each layer or row in the `SpatRaster` or `SpatVector` object, respectively.
 
 Example of `calc_covariates` using processed "weasd" data.
 
+```r
+locs <- data.frame(id = "001", lon = -78.8277, lat = 35.95013)
+weasd_covar <- calc_covariates(
+  covariate = "narr",
+  from = weasd_process,
+  locs = locs,
+  locs_id = "id",
+  radius = 0,
+  geom = FALSE
+)
 ```
-> locs <- data.frame(lon = -78.8277, lat = 35.95013)
-> locs$id <- "0001"
-> weasd_covar <- calc_covariates(
-+   covariate = "narr",
-+   from = weasd_process,
-+   locs = locs,
-+   locs_id = "id",
-+   radius = 0,
-+   geom = FALSE
-+ )
+```
 Detected `data.frame` extraction locations...
 Calculating weasd covariates for 2022-01-01...
 Calculating weasd covariates for 2022-01-02...
@@ -132,7 +149,11 @@ Calculating weasd covariates for 2022-01-03...
 Calculating weasd covariates for 2022-01-04...
 Calculating weasd covariates for 2022-01-05...
 Returning extracted covariates.
-> weasd_covar
+```
+```r
+weasd_covar
+```
+```
     id       time     weasd_0
 1 0001 2022-01-01 0.000000000
 2 0001 2022-01-02 0.000000000
@@ -150,9 +171,15 @@ The following R packages can also be used to access climate and weather data in 
 | [`dataRetrieval`](https://cran.r-project.org/web/packages/dataRetrieval/index.html) | [USGS Hydrological Data](https://www.usgs.gov/mission-areas/water-resources/data) and [EPA Water Quality Data](https://www.epa.gov/waterdata/water-quality-data) |
 | [`daymetr`](https://cran.r-project.org/web/packages/daymetr/index.html) | [Daymet](https://daac.ornl.gov/cgi-bin/dataset_lister.pl?p=32) |
 | [`ecmwfr`](https://cran.r-project.org/web/packages/ecmwfr/index.html) | [ECMWF Reanalysis v5 (ERA5)](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) |
-| [`RClimChange`[^1]](https://github.com/hllauca/RClimChange/) | [NASA Earth Exchange Global Daily Downscaled Projections (NEX-GDDP-CMIP6)](https://www.nccs.nasa.gov/services/data-collections/land-based-products/nex-gddp-cmip6) |
+| [`RClimChange`[^7]](https://github.com/hllauca/RClimChange/) | [NASA Earth Exchange Global Daily Downscaled Projections (NEX-GDDP-CMIP6)](https://www.nccs.nasa.gov/services/data-collections/land-based-products/nex-gddp-cmip6) |
 | [`rNOMADS`](https://cran.r-project.org/web/packages/rNOMADS/) | [NOAA Operational Model Archive and Distribution System](https://nomads.ncep.noaa.gov/) |
-| [`sen2r`[^2]](https://github.com/ranghetti/sen2r) | [Sentinel-2](https://sentinels.copernicus.eu/web/sentinel/missions/sentinel-2) |
+| [`sen2r`[^8]](https://github.com/ranghetti/sen2r) | [Sentinel-2](https://sentinels.copernicus.eu/web/sentinel/missions/sentinel-2) |
 
-[^1]: Last updated more than two years ago.
-[^2]: Archived; no longer maintained.
+[^1]: Multi-Resolution Land Characteristics
+[^2]: National Aeronautics and Space Administration
+[^3]: Socioeconomic Data and Applications Center
+[^4]: National Centers for Environmental Prediction
+[^5]: United States Environmental Protection Agency
+[^6]: United States Geological Survey
+[^7]: Last updated more than two years ago.
+[^8]: Archived; no longer maintained.

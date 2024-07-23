@@ -120,6 +120,21 @@ Accesses and downloads OpenLandMap data from the \href{https://www.openlandmap.o
 Users may want to check the available assets to download data directly.
 For developers: JSON files should be found at STAC catalog of OpenLandMap when updated.
 }
+\examples{
+\dontrun{
+download_olm(
+  product = "no2_s5p.l3.trop.tmwm",
+  format = "tif",
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
+}
+\references{
+\insertRef{data_hengl2023openlandmap}{amadeus}
+}
 \seealso{
 \link{list_stac_files}
 }

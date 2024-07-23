@@ -598,3 +598,15 @@ testthat::test_that("sftime_as_spatrds works as expected", {
   rename_time(mysft, "date")
   testthat::expect_no_error(sftime_as_spatrds(mysft))
 })
+
+testthat::test_that("as_mysftime with time-varying SpatRasterDataset.", {
+  m1 <- terra::rast(matrix(1:100, nrow = 10))
+  terra::time(m1) <- as.Date("2024-01-01")
+  m2 <- terra::rast(matrix(1:100, nrow = 10))
+  terra::time(m2) <- as.Date("2024-01-02")
+  m3 <- terra::sds(c(m1, m2))
+
+  testthat::expect_error(
+    as_mysftime(m3)
+  )
+})

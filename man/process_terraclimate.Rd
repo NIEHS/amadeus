@@ -7,7 +7,9 @@
 process_terraclimate(
   date = c("2023-09-01", "2023-09-01"),
   variable = NULL,
-  path = NULL
+  path = NULL,
+  extent = NULL,
+  ...
 )
 }
 \arguments{
@@ -19,6 +21,11 @@ Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 for variable names and acronym codes.}
 
 \item{path}{character(1). Directory with downloaded netCDF (.nc) files.}
+
+\item{extent}{numeric(4) or SpatExtent giving the extent of the raster
+if \code{NULL} (default), the entire raster is loaded}
+
+\item{...}{Placeholders.}
 }
 \value{
 a \code{SpatRaster} object
@@ -33,6 +40,15 @@ and month.
 
 TerraClimate data has monthly temporal resolution, so the first day of each month
 is used as a placeholder temporal value.
+}
+\examples{
+\dontrun{
+terraclimate <- process_terraclimate(
+  date = c("2023-01-01", "2023-01-10"),
+  variable = "Precipitation",
+  path = "./data/ppt"
+)
+}
 }
 \author{
 Mitchell Manware

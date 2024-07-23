@@ -8,7 +8,7 @@ download_nei(
   epa_certificate_path = system.file("extdata/cacert_gaftp_epa.pem", package = "amadeus"),
   certificate_url =
     "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
-  year_target = c(2017L, 2020L),
+  year = c(2017L, 2020L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -24,7 +24,7 @@ for EPA DataCommons. Default is
 \item{certificate_url}{character(1). URL to certificate file. See notes for
 details.}
 
-\item{year_target}{Available years of NEI data.
+\item{year}{Available years of NEI data.
 Default is \code{c(2017L, 2020L)}.}
 
 \item{directory_to_save}{character(1). Directory to save data. Two
@@ -64,6 +64,20 @@ Currently we bundle the pre-downloaded crt and its PEM (which is accepted
 in wget command) file in ./inst/extdata. The instruction above is for
 certificate updates in the future.
 }
+}
+\examples{
+\dontrun{
+download_nei(
+  year = c(2017L, 2020L),
+  directory_to_save = "./data",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+}
+}
+\references{
+\insertRef{web_usepa2024nei}{amadeus}
 }
 \author{
 Ranadeep Daw, Insang Song

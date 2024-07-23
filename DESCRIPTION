@@ -1,6 +1,6 @@
 Package: amadeus
 Title: AMADEUS: A Machine for Data, Environments, and User Setup for common environmental and climate health datasets 
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: c(
     person("Mitchell", "Manware", role = c("aut", "ctb"), comment = c(ORCID = "0009-0003-6440-6106")),
     person("Insang", "Song", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-8732-3256")),
@@ -10,14 +10,15 @@ Authors@R: c(
     )
 Description: A Mechanism/Machine for Data, Environments, and User Setup package for health and climate research. It is fully tested, versioned, and open source and open access.
 Depends: R (>= 4.1.0)
-Imports: dplyr, sf, sftime, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringi, testthat (>= 3.0.0), parallelly, stars, future, future.apply, tidyr, rlang, rstac, nhdplusTools, archive, collapse, devtools
+Imports: dplyr, sf, sftime, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringi, testthat (>= 3.0.0), parallelly, stars, future, future.apply, tidyr, rlang, rstac, nhdplusTools, archive, collapse, Rdpack
 Suggests: covr, withr, knitr, rmarkdown, lwgeom, FNN, doRNG
+RdMacros: Rdpack
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Config/Needs/website: tidyverse/tidytemplate
 Config/testhat/edition: 3
 License: MIT + file LICENSE
 URL: https://github.com/NIEHS/amadeus, 
-https://niehs.github.io/amadeus/
+BugReports: https://github.com/NIEHS/amadeus/issues

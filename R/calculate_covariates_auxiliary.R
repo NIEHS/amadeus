@@ -11,8 +11,9 @@
 #' padded to 5 digits. If provided a buffer radius greater than 5 digits,
 #'  \code{calc_setcolumns()} will expand to the number of digits. (ie. buffer
 #' radius of 100km = CCC_CCCCC_I_100000).
-#' @param from data.frame(1). Calculated covariates as returned from
-#' \code{calc_covariates()} or a source specific covariate function.
+#' @param from data.frame(1) or SpatVector(1). Calculated covariates as
+#' returned from \code{calc_covariates()} or a source specific covariate
+#' function.
 #' @param lag integer(1). Temporal lag.
 #' @param dataset character(1). Covariate parent dataset.
 #' @param locs_id character(1). Column containing identifier for each unique
@@ -26,7 +27,7 @@ calc_setcolumns <- function(
     dataset,
     locs_id) {
   #### check from is data.frame
-  stopifnot(is.data.frame(from))
+  stopifnot(class(from) %in% c("data.frame", "SpatVector"))
   #### original names
   names_from <- colnames(from)
   #### copy
@@ -188,7 +189,7 @@ calc_message <- function(
       )
     }
   }
-  cat(return_message)
+  message(return_message)
 }
 
 #' Prepare extraction locations
@@ -482,11 +483,60 @@ calc_worker <- function(
     )
   }
   #### finish message
-  cat(
+  message(
     paste0(
       "Returning extracted covariates.\n"
     )
   )
   #### return data.frame
   return(data.frame(sites_extracted))
+}
+
+#' Prepare covariates for return
+#' @description
+#' Check the time column for proper class and, if `geom = TRUE`,
+#' transform `data.frame` into a `SpatVector` object.
+#' @param covar data.frame(1). Calculated covariates `data.frame`.
+#' @param POSIXt logical(1). Should the time values in `covar` be of class
+#' `POSIXt`? If `FALSE`, the time values will be checked for integer class
+#' (year and year-month).
+#' @param geom logical(1). Should `covar` be returned as a
+#' `data.frame`? Default is `FALSE`.
+#' @param crs terra::crs(1). Coordinate reference system (inherited from
+#' `from`).
+#' @importFrom terra vect
+#' @keywords auxiliary
+#' @author Mitchell Manware
+#' @export
+# nolint start
+calc_return_locs <- function(
+  covar,
+  POSIXt = TRUE,
+  geom,
+  crs
+) {
+  # time value check
+  if ("time" %in% names(covar)) {
+    calc_check_time(covar = covar, POSIXt = POSIXt)
+  }
+  # nolint end
+  # if geom, convert to and return SpatVector
+  if (geom) {
+    if ("geometry" %in% names(covar)) {
+      covar_return <- terra::vect(
+        covar,
+        geom = "geometry",
+        crs = crs
+      )
+    } else if (all(c("lon", "lat") %in% names(covar))) {
+      covar_return <- terra::vect(
+        covar,
+        geom = c("lon", "lat"),
+        crs = crs
+      )
+    }
+    return(covar_return)
+  } else {
+    return(data.frame(covar))
+  }
 }

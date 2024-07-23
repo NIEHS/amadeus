@@ -4,7 +4,13 @@
 \alias{calc_temporal_dummies}
 \title{Calculate temporal dummy covariates}
 \usage{
-calc_temporal_dummies(locs, locs_id = "site_id", year = seq(2018L, 2022L), ...)
+calc_temporal_dummies(
+  locs,
+  locs_id = "site_id",
+  year = seq(2018L, 2022L),
+  geom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{locs}{data.frame with a temporal field named \code{"time"}}
@@ -13,17 +19,31 @@ calc_temporal_dummies(locs, locs_id = "site_id", year = seq(2018L, 2022L), ...)
 Default is \code{"site_id"}.}
 
 \item{year}{integer. Year domain to dummify.
-Default is \code{seq(2018L, 2022L)}}
+Default is \code{seq(2018L, 2022L)}.}
+
+\item{geom}{logical(1). Should the function return a \code{SpatVector}?
+Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
+that of \code{from.}}
 
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame object
+a data.frame or SpatVector object
 }
 \description{
 Calculate temporal dummy covariates at point locations. Returns a
 \code{data.frame} object with \code{locs_id}, year binary variable for each
 value in \code{year}, and month and day of week binary variables.
+}
+\examples{
+\dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+calc_temporal_dummies(
+  locs = loc,
+  locs_id = "id",
+  year = seq(2018L, 2022L)
+)
+}
 }
 \author{
 Insang Song
