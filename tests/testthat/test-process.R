@@ -680,16 +680,15 @@ testthat::test_that("sedac_codes", {
 
 
 # test HMS ####
-testthat::test_that("process_hms returns expected.", {
+testthat::test_that("process_hms with present polygons", {
   withr::local_package("terra")
   # expect function
   testthat::expect_true(
     is.function(process_hms)
   )
-
   hms <-
     process_hms(
-      date = c("2022-06-10", "2022-06-11"),
+      date = c("2022-06-10", "2022-06-13"),
       path = testthat::test_path(
         "..",
         "testdata",
@@ -698,31 +697,20 @@ testthat::test_that("process_hms returns expected.", {
     )
   # expect output is a SpatVector or character
   testthat::expect_true(
-    class(hms)[1] %in% c("SpatVector", "character")
+    methods::is(hms, "SpatVector")
   )
-  if (class(hms)[1] == "SpatVector") {
-    # expect non-null coordinate reference system
-    testthat::expect_false(
-      is.null(terra::crs(hms))
-    )
-    # expect two columns
-    testthat::expect_true(
-      ncol(hms) == 2
-    )
-    # expect density and date column
-    testthat::expect_true(
-      all(c("Density", "Date") %in% names(hms))
-    )
-  } else if (class(hms)[1] == "character") {
-    # expect first is density type
-    testthat::expect_true(
-      hms[1] %in% c("Light", "Medium", "Heavy")
-    )
-    # expect other elements are 10 character dates
-    testthat::expect_true(
-      all(nchar(hms[2:length(hms)]) == 10)
-    )
-  }
+  # expect non-null coordinate reference system
+  testthat::expect_false(
+    is.null(terra::crs(hms))
+  )
+  # expect two columns
+  testthat::expect_true(
+    ncol(hms) == 2
+  )
+  # expect density and date column
+  testthat::expect_true(
+    all(c("Density", "Date") %in% names(hms))
+  )
   # test with cropping extent
   testthat::expect_no_error(
     hms_ext <- process_hms(
@@ -735,6 +723,25 @@ testthat::test_that("process_hms returns expected.", {
       extent = terra::ext(hms)
     )
   )
+})
+
+testthat::test_that("process_hms with missing polygons (12/31/2018).", {
+  withr::local_package("terra")
+  # expect function
+  testthat::expect_true(
+    is.function(process_hms)
+  )
+  hms <-
+    process_hms(
+      date = c("2018-12-31", "2018-12-31"),
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "hms"
+      )
+    )
+  # expect character
+  testthat::expect_true(is.character(hms))
 })
 
 # test GMTED ####

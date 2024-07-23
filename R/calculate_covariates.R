@@ -1479,44 +1479,26 @@ calc_hms <- function(
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### from == character indicates no wildfire smoke plumes are present
-  #### return 0 for all locs and dates
+  #### return 0 for all densities, locs and dates
   if (is.character(from)) {
     message(paste0(
       "Inherited list of dates due to absent smoke plume polygons.\n"
     ))
-    skip_extraction <- NULL
-    skip_variable <- from[1]
-    skip_dates <- from[2:length(from)]
-    skip_sites_id <- data.frame(data.frame(locs)[, locs_id])
-    for (s in seq_along(skip_dates)) {
-      skip_extraction_date <- cbind(
-        skip_sites_id,
-        as.Date(
-          skip_dates[s],
-          format = "%Y%m%d"
-        ),
-        as.integer(0)
-      )
-      colnames(skip_extraction_date) <- c(
-        locs_id,
-        "time",
-        paste0(
-          skip_variable,
-          "_",
-          radius
-        )
-      )
-      skip_extraction <- rbind(
-        skip_extraction,
-        skip_extraction_date
-      )
-    }
-    message(paste0(
-      "Returning ",
-      tolower(skip_variable),
-      " smoke plume covariates.\n"
-    ))
-    return(skip_extraction)
+    skip_df <- data.frame(as.POSIXlt(from), 0, 0, 0)
+    colnames(skip_df) <- c(
+      "time",
+      paste0("light_", radius),
+      paste0("medium_", radius),
+      paste0("heavy_", radius)
+    )
+    skip_merge <- merge(locs, skip_df)
+    skip_return <- calc_return_locs(
+      skip_merge,
+      POSIXt = TRUE,
+      geom = geom,
+      crs = "EPSG:4326"
+    )
+    return(skip_return)
   }
   #### prepare locations list
   sites_list <- calc_prepare_locs(

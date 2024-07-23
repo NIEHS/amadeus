@@ -1028,7 +1028,7 @@ testthat::test_that("calc_hms with geom = TRUE", {
     radius = 0,
     geom = TRUE
   )
-  # with geometry will have 3 columns
+  # with geometry will have 5 columns
   testthat::expect_equal(
     ncol(hms_covariate_geom), 5
   )
@@ -1037,13 +1037,8 @@ testthat::test_that("calc_hms with geom = TRUE", {
   )
 })
 
-testthat::test_that("calc_hms returns expected with missing polygons.", {
+testthat::test_that("calc_hms with missing polygons (12/31/2018).", {
   withr::local_package("terra")
-  densities <- c(
-    "Light",
-    "Medium",
-    "Heavy"
-  )
   radii <- c(0, 1000)
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
@@ -1051,54 +1046,44 @@ testthat::test_that("calc_hms returns expected with missing polygons.", {
   expect_true(
     is.function(calc_hms)
   )
-  hms_dir <- testthat::test_path(
-    "..", "testdata", "hms"
+  # expect function
+  testthat::expect_true(
+    is.function(process_hms)
   )
-  for (d in seq_along(densities)) {
-    density <- densities[d]
-    for (r in seq_along(radii)) {
-      hms <-
-        process_hms(
-          date = c("2022-06-10", "2022-06-13"),
-          variable = density,
-          path = hms_dir
-        )
-      hms_covariate <-
-        calc_hms(
-          from = hms,
-          locs = ncp,
-          locs_id = "site_id",
-          radius = radii[r],
-          geom = FALSE
-        )
-      # set column names
-      hms_covariate <- calc_setcolumns(
-        from = hms_covariate,
-        lag = 0,
-        dataset = "hms",
-        locs_id = "site_id"
+  hms <-
+    process_hms(
+      date = c("2018-12-31", "2018-12-31"),
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "hms"
       )
-      # expect output is data.frame
-      expect_true(
-        class(hms_covariate) == "data.frame"
-      )
-      # expect 3 columns
-      expect_true(
-        ncol(hms_covariate) == 5
-      )
-      # expect 4 rows
-      expect_true(
-        nrow(hms_covariate) == 4
-      )
-      # expect integer for binary value
-      expect_true(
-        unlist(unique(lapply(hms_covariate[, 3:5], class))) == "integer"
-      )
-      # expect binary
-      expect_true(
-        all(unlist(lapply(hms_covariate[, 3:5], unique)) %in% c(0, 1))
-      )
-    }
+    )
+  for (r in seq_along(radii)) {
+    hms_covar <- calc_hms(
+      from = hms,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = radii[r],
+      geom = FALSE
+    )
+    # data frame
+    testthat::expect_true(methods::is(hms_covar, "data.frame"))
+    # 5 columns
+    testthat::expect_equal(ncol(hms_covar), 7)
+  }
+  for (r in seq_along(radii)) {
+    hms_covar <- calc_hms(
+      from = hms,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = radii[r],
+      geom = TRUE
+    )
+    # SpatVector
+    testthat::expect_true(methods::is(hms_covar, "SpatVector"))
+    # 5 columns
+    testthat::expect_equal(ncol(hms_covar), 5)
   }
 })
 
