@@ -1231,7 +1231,7 @@ process_aqs <-
       sites_vdup <- sites_v |>
         dplyr::group_by(site_id, time) |>
         dplyr::filter(dplyr::n() > 1) |>
-        dplyr::filter(Event.Type == "Excluded") |>
+        dplyr::filter(!!dplyr::sym("Event.Type") == "Excluded") |>
         dplyr::ungroup()
       sites_v <-
         dplyr::anti_join(
@@ -1454,6 +1454,7 @@ process_sedac_groads <- function(
 #' @importFrom terra vect
 #' @importFrom terra aggregate
 #' @importFrom terra subset
+#' @importFrom stats na.omit
 #' @export
 process_hms <- function(
     date = c("2018-01-01", "2018-01-01"),
@@ -1566,7 +1567,7 @@ process_hms <- function(
           c("Heavy", "Medium", "Light"),
           sort_index
         )
-      sort_index <- na.omit(sort_index)
+      sort_index <- stats::na.omit(sort_index)
       data_aggregate <- data_aggregate[sort_index, ]
 
       # union polygons. Heavy-Medium-Light are 1, 2, 3, respectively.

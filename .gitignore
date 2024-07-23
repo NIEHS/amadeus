@@ -54,6 +54,3 @@ rsconnect/
 
 # custom linter dev
 \.github/linters
-
-# development work
-scratch.R
