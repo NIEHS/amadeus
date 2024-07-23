@@ -2495,6 +2495,9 @@ calc_lagged <- function(
     locs_id,
     time_id = "time",
     geom = FALSE) {
+  #### check years
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
   #### geom and from
   if (geom && !("SpatVector" %in% class(from))) {
     stop(

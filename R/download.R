@@ -181,6 +181,9 @@ download_aqs <-
     download_permit(acknowledgement = acknowledgement)
     #### 2. check for null parameters
     check_for_null_parameters(mget(ls()))
+    #### check years
+    stopifnot(length(year) == 2)
+    year <- year[order(year)]
     #### 3. directory setup
     directory_original <- download_sanitize_path(directory_to_save)
     directories <- download_setup_dir(directory_original, zip = TRUE)
@@ -480,6 +483,9 @@ download_geos <- function(
   download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
+  #### check dates
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
   #### 3. directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
@@ -908,6 +914,9 @@ download_merra2 <- function(
   #### directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
+  #### check dates
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### check if collection is recognized
@@ -1209,6 +1218,9 @@ download_narr <- function(
   download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
+  #### check years
+  stopifnot(length(year) == 2)
+  year <- year[order(year)]
   #### 3. directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
@@ -1870,6 +1882,9 @@ download_hms <- function(
   download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
+  #### check dates
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
   #### 3. directory setup
   directory_original <- download_sanitize_path(directory_to_save)
   directories <- download_setup_dir(directory_original, zip = TRUE)
@@ -2252,6 +2267,9 @@ download_modis <- function(
   #### 2. directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
+  #### check dates
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
 
   #### 3. check for NASA earth data token
   if (is.null(nasa_earth_data_token)) {
@@ -2588,6 +2606,9 @@ download_tri <- function(
   #### 2. directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
+  #### check years
+  stopifnot(length(year) == 2)
+  year <- year[order(year)]
   #### 3. define measurement data paths
   url_download <-
     "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/"
@@ -3466,6 +3487,9 @@ download_gridmet <- function(
   download_permit(acknowledgement = acknowledgement)
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
+  #### check years
+  stopifnot(length(year) == 2)
+  year <- year[order(year)]
   #### directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
@@ -3605,6 +3629,9 @@ download_terraclimate <- function(
   download_permit(acknowledgement = acknowledgement)
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
+  #### check years
+  stopifnot(length(year) == 2)
+  year <- year[order(year)]
   #### directory setup
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)

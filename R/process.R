@@ -1465,6 +1465,9 @@ process_hms <- function(
   path <- download_sanitize_path(path)
   #### check for variable
   check_for_null_parameters(mget(ls()))
+  #### check dates
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
   #### identify file paths
   paths <- list.files(
     path,
@@ -1795,6 +1798,9 @@ process_narr <- function(
   path <- download_sanitize_path(path)
   #### check for variable
   check_for_null_parameters(mget(ls()))
+  #### check dates
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
   #### identify file paths
   data_paths <- list.files(
     path,
@@ -2023,6 +2029,9 @@ process_geos <-
     path <- download_sanitize_path(path)
     #### check for variable
     check_for_null_parameters(mget(ls()))
+    #### check dates
+    stopifnot(length(date) == 2)
+    date <- date[order(as.Date(date))]
     #### identify file paths
     paths <- list.files(
       path,
@@ -2212,6 +2221,9 @@ process_merra2 <-
     path <- download_sanitize_path(path)
     #### check for variable
     check_for_null_parameters(mget(ls()))
+    #### check dates
+    stopifnot(length(date) == 2)
+    date <- date[order(as.Date(date))]
     #### identify file paths
     paths <- list.files(
       path,
@@ -2396,6 +2408,9 @@ process_gridmet <- function(
     ...) {
   #### directory setup
   path <- download_sanitize_path(path)
+  #### check dates
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
   #### check for variable
   check_for_null_parameters(mget(ls()))
   variable_checked <- process_variable_codes(
@@ -2562,6 +2577,9 @@ process_terraclimate <- function(
   path <- download_sanitize_path(path)
   #### check for variable
   check_for_null_parameters(mget(ls()))
+  #### check dates
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
   variable_checked <- process_variable_codes(
     variables = variable,
     source = "terraclimate"
