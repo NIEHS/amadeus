@@ -19,7 +19,7 @@ calculate_covariates()."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,8 +30,9 @@ calculate_covariates()."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/download_functions.html">download_data and NASA EarthData Account</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/download_functions.html">download_data</a></li>
     <li><a class="dropdown-item" href="../articles/epa_download.html">Downloading EPA Daily Data</a></li>
+    <li><a class="dropdown-item" href="../articles/protected_datasets.html">Protected Data Sources</a></li>
   </ul></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -64,8 +65,8 @@ SpatRaster or SpatVector objects before passing to
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calc_covariates</span><span class="op">(</span></span>
 <span>  covariate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"modis"</span>, <span class="st">"koppen-geiger"</span>, <span class="st">"koeppen-geiger"</span>, <span class="st">"koppen"</span>, <span class="st">"koeppen"</span>, <span class="st">"geos"</span>,</span>
 <span>    <span class="st">"dummies"</span>, <span class="st">"gmted"</span>, <span class="st">"sedac_groads"</span>, <span class="st">"groads"</span>, <span class="st">"roads"</span>, <span class="st">"ecoregions"</span>, <span class="st">"ecoregion"</span>,</span>
-<span>    <span class="st">"hms"</span>, <span class="st">"noaa"</span>, <span class="st">"smoke"</span>, <span class="st">"gmted"</span>, <span class="st">"narr"</span>, <span class="st">"geos"</span>, <span class="st">"sedac_population"</span>, <span class="st">"population"</span>,</span>
-<span>    <span class="st">"nlcd"</span>, <span class="st">"merra"</span>, <span class="st">"merra2"</span>, <span class="st">"gridmet"</span>, <span class="st">"terraclimate"</span>, <span class="st">"tri"</span>, <span class="st">"nei"</span><span class="op">)</span>,</span>
+<span>    <span class="st">"hms"</span>, <span class="st">"smoke"</span>, <span class="st">"gmted"</span>, <span class="st">"narr"</span>, <span class="st">"geos"</span>, <span class="st">"sedac_population"</span>, <span class="st">"population"</span>, <span class="st">"nlcd"</span>,</span>
+<span>    <span class="st">"merra"</span>, <span class="st">"merra2"</span>, <span class="st">"gridmet"</span>, <span class="st">"terraclimate"</span>, <span class="st">"tri"</span>, <span class="st">"nei"</span><span class="op">)</span>,</span>
 <span>  <span class="va">from</span>,</span>
 <span>  <span class="va">locs</span>,</span>
 <span>  locs_id <span class="op">=</span> <span class="st">"site_id"</span>,</span>
@@ -102,7 +103,7 @@ function.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Calculated covariates. Mainly data.frame object.</p>
+    <p>Calculated covariates as a data.frame or SpatVector object</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
@@ -115,7 +116,7 @@ function.</p></dd>
 <li><p><code><a href="calc_koppen_geiger.html">calc_koppen_geiger</a></code>: <code>"koppen-geiger"</code>, <code>"koeppen-geiger"</code>, <code>"koppen"</code></p></li>
 <li><p><code><a href="calc_ecoregion.html">calc_ecoregion</a></code>: <code>"ecoregion"</code>, <code>"ecoregions"</code></p></li>
 <li><p></p></li>
-<li><p><code><a href="calc_hms.html">calc_hms</a></code>: <code>"hms"</code>, <code>"noaa"</code>, <code>"smoke"</code></p></li>
+<li><p><code><a href="calc_hms.html">calc_hms</a></code>: <code>"hms"</code>, <code>"smoke"</code></p></li>
 <li><p></p></li>
 <li><p></p></li>
 <li><p><code><a href="calc_geos.html">calc_geos</a></code>: <code>"geos"</code>, <code>"geos_cf"</code></p></li>
@@ -134,6 +135,20 @@ function.</p></dd>
     <p>Insang Song</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">loc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"001"</span>, lon <span class="op">=</span> <span class="op">-</span><span class="fl">78.90</span>, lat <span class="op">=</span> <span class="fl">35.97</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">calc_covariates</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  covariate <span class="op">=</span> <span class="st">"narr"</span>,</span></span>
+<span class="r-in"><span>  from <span class="op">=</span> <span class="va">narr</span>, <span class="co"># derived from process_covariates() example</span></span></span>
+<span class="r-in"><span>  locs <span class="op">=</span> <span class="va">loc</span>,</span></span>
+<span class="r-in"><span>  locs_id <span class="op">=</span> <span class="st">"id"</span>,</span></span>
+<span class="r-in"><span>  geom <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

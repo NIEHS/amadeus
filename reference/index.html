@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,8 +18,9 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/download_functions.html">download_data and NASA EarthData Account</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/download_functions.html">download_data</a></li>
     <li><a class="dropdown-item" href="../articles/epa_download.html">Downloading EPA Daily Data</a></li>
+    <li><a class="dropdown-item" href="../articles/protected_datasets.html">Protected Data Sources</a></li>
   </ul></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -120,16 +121,10 @@
         <dd>Download MODIS product files</dd>
       </dl><dl><dt>
 
-          <code><a href="download_narr_monolevel.html">download_narr_monolevel()</a></code>
+          <code><a href="download_narr.html">download_narr()</a></code>
 
         </dt>
-        <dd>Download meteorological data (monolevel)</dd>
-      </dl><dl><dt>
-
-          <code><a href="download_narr_p_levels.html">download_narr_p_levels()</a></code>
-
-        </dt>
-        <dd>Download meteorological data (pressure levels)</dd>
+        <dd>Download meteorological data</dd>
       </dl><dl><dt>
 
           <code><a href="download_nei.html">download_nei()</a></code>
@@ -200,19 +195,19 @@
           <code><a href="process_aqs.html">process_aqs()</a></code>
 
         </dt>
-        <dd>Process unique U.S. EPA AQS sites</dd>
+        <dd>Process U.S. EPA AQS daily CSV data</dd>
       </dl><dl><dt>
 
-          <code><a href="process_bluemarble.html">process_bluemarble()</a></code>
+          <code><a href="process_blackmarble.html">process_blackmarble()</a></code>
 
         </dt>
-        <dd>Assign VIIRS Blue Marble products corner coordinates to retrieve a merged raster</dd>
+        <dd>Assign VIIRS Black Marble products corner coordinates to retrieve a merged raster</dd>
       </dl><dl><dt>
 
-          <code><a href="process_bluemarble_corners.html">process_bluemarble_corners()</a></code>
+          <code><a href="process_blackmarble_corners.html">process_blackmarble_corners()</a></code>
 
         </dt>
-        <dd>Process Blue Marble corners</dd>
+        <dd>Process Black Marble corners</dd>
       </dl><dl><dt>
 
           <code><a href="process_collection.html">process_collection()</a></code>
@@ -496,6 +491,12 @@
         <dd>Calculate land cover covariates</dd>
       </dl><dl><dt>
 
+          <code><a href="calc_return_locs.html">calc_return_locs()</a></code>
+
+        </dt>
+        <dd>Prepare covariates for return</dd>
+      </dl><dl><dt>
+
           <code><a href="calc_sedac_groads.html">calc_sedac_groads()</a></code>
 
         </dt>
@@ -638,6 +639,12 @@
 
       <dl><dt>
 
+          <code><a href="calc_return_locs.html">calc_return_locs()</a></code>
+
+        </dt>
+        <dd>Prepare covariates for return</dd>
+      </dl><dl><dt>
+
           <code><a href="check_url_status.html">check_url_status()</a></code>
 
         </dt>
@@ -666,6 +673,12 @@
 
         </dt>
         <dd>Retrieve file links from SpatioTemporal Assets Catalog (STAC)</dd>
+      </dl><dl><dt>
+
+          <code><a href="narr_variable.html">narr_variable()</a></code>
+
+        </dt>
+        <dd>Sort NOAA NARR variables</dd>
       </dl><dl><dt>
 
           <code><a href="process_collection.html">process_collection()</a></code>

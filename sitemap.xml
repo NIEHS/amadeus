@@ -4,8 +4,10 @@
 <url><loc>https://niehs.github.io/amadeus/articles/download_functions.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/articles/epa_download.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/articles/index.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/articles/protected_datasets.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/authors.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/index.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/apply_extent.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/as_mysftime.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calc_check_time.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calc_covariates.html</loc></url>
@@ -24,6 +26,7 @@
 <url><loc>https://niehs.github.io/amadeus/reference/calc_nei.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calc_nlcd.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calc_prepare_locs.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/calc_return_locs.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calc_sedac_groads.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calc_sedac_population.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calc_sedc.html</loc></url>
@@ -51,8 +54,7 @@
 <url><loc>https://niehs.github.io/amadeus/reference/download_koppen_geiger.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_merra2.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_modis.html</loc></url>
-<url><loc>https://niehs.github.io/amadeus/reference/download_narr_monolevel.html</loc></url>
-<url><loc>https://niehs.github.io/amadeus/reference/download_narr_p_levels.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/download_narr.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_nei.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_nlcd.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_olm.html</loc></url>
@@ -76,9 +78,10 @@
 <url><loc>https://niehs.github.io/amadeus/reference/index.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/is_date_proper.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/list_stac_files.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/narr_variable.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/process_aqs.html</loc></url>
-<url><loc>https://niehs.github.io/amadeus/reference/process_bluemarble.html</loc></url>
-<url><loc>https://niehs.github.io/amadeus/reference/process_bluemarble_corners.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/process_blackmarble.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/process_blackmarble_corners.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/process_collection.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/process_conformity.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/process_covariates.html</loc></url>

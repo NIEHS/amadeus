@@ -9,7 +9,7 @@ PRISM data from the PRISM Climate Group Web Service"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,8 +20,9 @@ PRISM data from the PRISM Climate Group Web Service"></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/download_functions.html">download_data and NASA EarthData Account</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/download_functions.html">download_data</a></li>
     <li><a class="dropdown-item" href="../articles/epa_download.html">Downloading EPA Daily Data</a></li>
+    <li><a class="dropdown-item" href="../articles/protected_datasets.html">Protected Data Sources</a></li>
   </ul></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -123,7 +124,11 @@ choice will be stored in <code>directory_to_save</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-
+    <p>Daly C, Taylor GH, Gibson WP, Parzybok TW, Johnson GL, Pasteris PA (2000).
+“HIGH-QUALITY SPATIAL CLIMATE DATA SETS FOR THE UNITED STATES AND BEYOND.”
+<em>Transactions of the ASAE</em>, <b>43</b>(6), 1957–1962.
+ISSN 2151-0059, <a href="https://doi.org/10.13031/2013.3101" class="external-link">doi:10.13031/2013.3101</a>
+, <a href="http://elibrary.asabe.org/abstract.asp??JID=3&amp;AID=3101&amp;CID=t2000&amp;v=43&amp;i=6&amp;T=1" class="external-link">http://elibrary.asabe.org/abstract.asp??JID=3&amp;AID=3101&amp;CID=t2000&amp;v=43&amp;i=6&amp;T=1</a>.</p>
 <ul><li><p><a href="http://www.prism.oregonstate.edu/" class="external-link">PRISM Climate Group</a></p></li>
 <li><p><a href="https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf" class="external-link">PRISM Web Service Guide</a></p></li>
 </ul></div>
@@ -140,7 +145,7 @@ choice will be stored in <code>directory_to_save</code>.</p>
 <span class="r-in"><span>  element <span class="op">=</span> <span class="st">"ppt"</span>,</span></span>
 <span class="r-in"><span>  data_type <span class="op">=</span> <span class="st">"ts"</span>,</span></span>
 <span class="r-in"><span>  format <span class="op">=</span> <span class="st">"nc"</span>,</span></span>
-<span class="r-in"><span>  directory_to_save <span class="op">=</span> <span class="st">"~/data"</span>,</span></span>
+<span class="r-in"><span>  directory_to_save <span class="op">=</span> <span class="st">"./data"</span>,</span></span>
 <span class="r-in"><span>  acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span></span></span>

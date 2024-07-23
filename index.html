@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,8 +35,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/download_functions.html">download_data and NASA EarthData Account</a></li>
+<li><a class="dropdown-item" href="articles/download_functions.html">download_data</a></li>
     <li><a class="dropdown-item" href="articles/epa_download.html">Downloading EPA Daily Data</a></li>
+    <li><a class="dropdown-item" href="articles/protected_datasets.html">Protected Data Sources</a></li>
   </ul>
 </li>
 <li class="nav-item"><form class="form-inline" role="search">
@@ -53,7 +54,8 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="amadeus">amadeus<a class="anchor" aria-label="anchor" href="#amadeus"></a>
+<div class="page-header"><h1 id="amadeus-">amadeus <a href="https://niehs.github.io/amadeus/"><img src="reference/figures/amadeus-combined.svg" align="right" height="250"></a><a></a>
+<a class="anchor" aria-label="anchor" href="#amadeus-"></a>
 </h1></div>
 <p><a href="https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml" class="external-link"><img src="https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://github.com/NIEHS/amadeus/actions" class="external-link"><img src="https://NIEHS.github.io/amadeus/badges/coverage.svg" alt="cov"></a> <a href="https://github.com/NIEHS/amadeus/actions/workflows/lint.yaml" class="external-link"><img src="https://github.com/NIEHS/amadeus/actions/workflows/lint.yaml/badge.svg" alt="lint"></a> <a href="https://github.com/NIEHS/amadeus/actions/workflows/pkgdown.yaml" class="external-link"><img src="https://github.com/NIEHS/amadeus/actions/workflows/pkgdown.yaml/badge.svg" alt="pkgdown"></a> <a href="https://www.repostatus.org/#wip" class="external-link"><img src="https://www.repostatus.org/badges/latest/wip.svg" alt="Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public."></a></p>
 <p><code>amadeus</code> is <strong>a</strong> <strong>m</strong>ech<strong>a</strong>nism for <strong>d</strong>ata, <strong>e</strong>nvironments, and <strong>u</strong>ser <strong>s</strong>etup for common environmental and climate health datasets in R. <code>amadeus</code> has been developed to improve access to and utility with large scale, publicly available environmental data in R.</p>
@@ -61,9 +63,12 @@
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p><code>amadeus</code> is not yet available from CRAN, but it can be installed with the <code>devtools</code>, <code>remotes</code>, or <code>pak</code> packages.</p>
-<pre><code><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"NIEHS/amadeus"</span><span class="op">)</span></span></code></pre>
-<pre><code><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"NIEHS/amadeus"</span><span class="op">)</span></span></code></pre>
-<pre><code><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"NIEHS/amadeus"</span><span class="op">)</span></span></code></pre>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"NIEHS/amadeus"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"NIEHS/amadeus"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"NIEHS/amadeus"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="contribution">Contribution<a class="anchor" aria-label="anchor" href="#contribution"></a>
@@ -71,7 +76,7 @@
 <p>To add or edit functionality for new data sources or datasets, open a <a href="https://github.com/NIEHS/amadeus/pulls" class="external-link">Pull request</a> into the main branch with a detailed description of the proposed changes. Pull requests must pass all status checks, and then will be approved or rejected by <code>amadeus</code>’s authors.</p>
 <p>Utilize <a href="https://github.com/NIEHS/amadeus/issues" class="external-link">Issues</a> to notify the authors of bugs, questions, or recommendations. Identify each issue with the appropriate label to help ensure a timely response.</p>
 <div align="center">
-<p><img src="articles/images/readme_issues.png" style="width: 100%;"></p>
+<p><img src="reference/figures/readme_issues.png" style="width: 100%;"></p>
 </div>
 </div>
 <div class="section level2">
@@ -80,73 +85,88 @@
 <p><code>download_data</code> accesses and downloads raw geospatial data from a variety of open source data repositories. The function is a wrapper that calls source-specific download functions, each of which account for the source’s unique combination of URL, file naming conventions, and data types. Download functions cover the following sources:</p>
 <table class="table">
 <colgroup>
-<col width="33%">
-<col width="33%">
+<col width="41%">
+<col width="25%">
 <col width="33%">
 </colgroup>
 <thead><tr class="header">
-<th align="left">Source</th>
-<th align="left">Data Type</th>
-<th align="left">Genre</th>
+<th align="left">Data Source</th>
+<th align="left">File Type</th>
+<th align="left">Data Genre</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left"><a href="https://www.climatologylab.org/terraclimate.html" class="external-link">Climatology Lab TerraClimate</a></td>
 <td align="left">netCDF</td>
-<td align="left">Climate, Water</td>
+<td align="left">Meteorology</td>
 </tr>
 <tr class="even">
 <td align="left"><a href="https://www.climatologylab.org/gridmet.html" class="external-link">Climatology Lab GridMet</a></td>
 <td align="left">netCDF</td>
-<td align="left">Meteorology</td>
+<td align="left">Climate<br>Water</td>
 </tr>
 <tr class="odd">
-<td align="left"><a href="https://www.nature.com/articles/sdata2018214" class="external-link">Köppen-Geiger Climate Classification (Beck et al., 2018)</a></td>
+<td align="left"><a href="https://www.nature.com/articles/sdata2018214" class="external-link">Köppen-Geiger Climate Classification</a></td>
 <td align="left">GeoTIFF</td>
 <td align="left">Climate Classification</td>
 </tr>
 <tr class="even">
-<td align="left"><a href="https://www.mrlc.gov/data" class="external-link">MRLC Consortium National Land Cover Database (NLCD)</a></td>
+<td align="left">
+<a href="https://www.mrlc.gov/data" class="external-link">MRLC</a><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Multi-Resolution Land Characteristics&lt;/p&gt;"><sup>1</sup></a> Consortium National Land Cover Database (NLCD)</td>
 <td align="left">GeoTIFF</td>
 <td align="left">Land Use</td>
 </tr>
 <tr class="odd">
-<td align="left"><a href="https://modis.gsfc.nasa.gov/data/" class="external-link">NASA Moderate Resolution Imaging Spectroradiometer (MODIS)</a></td>
+<td align="left">
+<a href="https://modis.gsfc.nasa.gov/data/" class="external-link">NASA</a><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;National Aeronautics and Space Administration&lt;/p&gt;"><sup>2</sup></a> Moderate Resolution Imaging Spectroradiometer (MODIS)</td>
 <td align="left">HDF</td>
-<td align="left">Atmosphere, Meteorology, Land Use, Satellite</td>
+<td align="left">Atmosphere<br>Meteorology<br>Land Use<br>Satellite</td>
 </tr>
 <tr class="even">
 <td align="left"><a href="https://www.nature.com/articles/sdata2018214" class="external-link">NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)</a></td>
 <td align="left">netCDF</td>
-<td align="left">Atmosphere, Meteorology</td>
+<td align="left">Atmosphere<br>Meteorology</td>
 </tr>
 <tr class="odd">
-<td align="left"><a href="https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11" class="external-link">NASA SEDAC UN WPP-Adjusted Population Density</a></td>
-<td align="left">GeoTIFF, netCDF</td>
+<td align="left">
+<a href="https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11" class="external-link">NASA SEDAC</a><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Socioeconomic Data and Applications Center&lt;/p&gt;"><sup>3</sup></a> UN WPP-Adjusted Population Density</td>
+<td align="left">GeoTIFF<br>netCDF</td>
 <td align="left">Population</td>
 </tr>
 <tr class="even">
 <td align="left"><a href="https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download" class="external-link">NASA SEDAC Global Roads Open Access Data Set</a></td>
-<td align="left">Shapefile, Geodatabase</td>
+<td align="left">Shapefile<br>Geodatabase</td>
 <td align="left">Roadways</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href="https://gmao.gsfc.nasa.gov/GEOS_systems/" class="external-link">NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)</a></td>
 <td align="left">netCDF</td>
-<td align="left">Atmosphere, Meteorology</td>
+<td align="left">Atmosphere<br>Meteorology</td>
 </tr>
 <tr class="even">
 <td align="left"><a href="https://www.ospo.noaa.gov/Products/land/hms.html#0" class="external-link">NOAA Hazard Mapping System Fire and Smoke Product</a></td>
-<td align="left">Shapefile, KML</td>
+<td align="left">Shapefile<br>KML</td>
 <td align="left">Wildfire Smoke</td>
 </tr>
 <tr class="odd">
-<td align="left"><a href="https://psl.noaa.gov/data/gridded/data.narr.html" class="external-link">NOAA NCEP North American Regional Reanalysis (NARR)</a></td>
+<td align="left">
+<a href="https://psl.noaa.gov/data/gridded/data.narr.html" class="external-link">NOAA NCEP</a><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;National Centers for Environmental Prediction&lt;/p&gt;"><sup>4</sup></a> North American Regional Reanalysis (NARR)</td>
 <td align="left">netCDF</td>
-<td align="left">Atmosphere, Meteorology</td>
+<td align="left">Atmosphere<br>Meteorology</td>
 </tr>
 <tr class="even">
-<td align="left"><a href="https://aqs.epa.gov/aqsweb/airdata/download_files.html" class="external-link">US EPA Air Data Pre-Generated Data Files</a></td>
+<td align="left"><a href="https://opengeohub.org/about-openlandmap/" class="external-link">OpenGeoHub Foundation OpenLandMap</a></td>
+<td align="left">GeoTIFF</td>
+<td align="left">Climate<br>Elevation<br>Soil<br>Land Use<br>Satellite</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="https://elibrary.asabe.org/abstract.asp??JID=3&amp;AID=3101&amp;CID=t2000&amp;v=43&amp;i=6&amp;T=1" class="external-link">Parameter Elevation Regression on Independent Slopes Model (PRISM)</a></td>
+<td align="left">BIL<br>ASCII</td>
+<td align="left">Climate</td>
+</tr>
+<tr class="even">
+<td align="left">
+<a href="https://aqs.epa.gov/aqsweb/airdata/download_files.html" class="external-link">US EPA</a><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;United States Environmental Protection Agency&lt;/p&gt;"><sup>5</sup></a> Air Data Pre-Generated Data Files</td>
 <td align="left">CSV</td>
 <td align="left">Air Pollution</td>
 </tr>
@@ -156,28 +176,45 @@
 <td align="left">Climate Regions</td>
 </tr>
 <tr class="even">
-<td align="left"><a href="https://www.usgs.gov/coastal-changes-and-impacts/gmted2010" class="external-link">USGS Global Multi-resolution Terrain Elevation Data (GMTED2010)</a></td>
+<td align="left"><a href="https://www.epa.gov/air-emissions-inventories" class="external-link">US EPA National Emissions Inventory (NEI)</a></td>
+<td align="left">CSV</td>
+<td align="left">Emissions</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present" class="external-link">US EPA Toxic Release Inventory (TRI) Program</a></td>
+<td align="left">CSV</td>
+<td align="left">Chemicals<br>Pollution</td>
+</tr>
+<tr class="even">
+<td align="left">
+<a href="https://www.usgs.gov/coastal-changes-and-impacts/gmted2010" class="external-link">USGS</a><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;United States Geological Survey&lt;/p&gt;"><sup>6</sup></a> Global Multi-resolution Terrain Elevation Data (GMTED2010)</td>
 <td align="left">ESRI ASCII Grid</td>
 <td align="left">Elevation</td>
 </tr>
+<tr class="odd">
+<td align="left"><a href="https://www.sciencebase.gov/catalog/item/4f5545cce4b018de15819ca9" class="external-link">USGS National Hydrography Dataset (NHD)</a></td>
+<td align="left">Geopackage<br>Geodatabase</td>
+<td align="left">Hydrography</td>
+</tr>
 </tbody>
 </table>
-<p>See the “download_data and NASA EarthData Account” vignette for a detailed description of source-specific download functions.</p>
+<p>See the “<a href="https://niehs.github.io/amadeus/articles/download_functions.html">download_data</a>” vignette for a detailed description of source-specific download functions.</p>
 <p>Example use of <code>download_data</code> using NOAA NCEP North American Regional Reanalysis’s (NARR) “weasd” (Daily Accumulated Snow at Surface) variable.</p>
-<pre><code>&gt; directory &lt;- "/  EXAMPLE  /  FILE  /  PATH  /"
-&gt; download_data(
-+   dataset_name = "narr_monolevel",
-+   year_start = 2022,
-+   year_end = 2022,
-+   variable = "weasd",
-+   directory_to_save = directory,
-+   acknowledgement = TRUE,
-+   download = TRUE
-+ )
-Downloading requested files...
-Requested files have been downloaded.
-&gt; list.files(paste0(directory, "weasd"))
-[1] "weasd.2022.nc"</code></pre>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">directory</span> <span class="op">&lt;-</span> <span class="st">"/  EXAMPLE  /  FILE  /  PATH  /"</span></span>
+<span><span class="fu"><a href="reference/download_data.html">download_data</a></span><span class="op">(</span></span>
+<span>  dataset_name <span class="op">=</span> <span class="st">"narr"</span>,</span>
+<span>  year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2022</span><span class="op">)</span>,</span>
+<span>  variable <span class="op">=</span> <span class="st">"weasd"</span>,</span>
+<span>  directory_to_save <span class="op">=</span> <span class="va">directory</span>,</span>
+<span>  acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  download <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code>Downloading requested files...
+Requested files have been downloaded.</code></pre>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"weasd"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>[1] "weasd.2022.nc"</code></pre>
 </div>
 <div class="section level2">
 <h2 id="process">Process<a class="anchor" aria-label="anchor" href="#process"></a>
@@ -185,17 +222,20 @@ Requested files have been downloaded.
 <p><code>process_covariates</code> imports and cleans raw geospatial data (downloaded with <code>download_data</code>), and returns a single <code>SpatRaster</code> or <code>SpatVector</code> into the user’s R environment. <code>process_covariates</code> “cleans” the data by defining interpretable layer names, ensuring a coordinate reference system is present, and managing `timedata (if applicable).</p>
 <p>To avoid errors when using <code>process_covariates</code>, <strong>do not edit the raw downloaded data files</strong>. Passing user-generated or edited data into <code>process_covariates</code> may result in errors as the underlying functions are adapted to each sources’ raw data file type.</p>
 <p>Example use of <code>process_covariates</code> using the downloaded “weasd” data.</p>
-<pre><code>&gt; weasd &lt;- process_covariates(
-+   covariate = "narr",
-+   date = c("2022-01-01", "2022-01-05"),
-+   variable = "weasd",
-+   path = paste0(directory, "weasd")
-+ )
-Cleaning weasd data for January, 2022...
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">weasd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/process_covariates.html">process_covariates</a></span><span class="op">(</span></span>
+<span>  covariate <span class="op">=</span> <span class="st">"narr"</span>,</span>
+<span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2022-01-01"</span>, <span class="st">"2022-01-05"</span><span class="op">)</span>,</span>
+<span>  variable <span class="op">=</span> <span class="st">"weasd"</span>,</span>
+<span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"weasd"</span><span class="op">)</span>,</span>
+<span>  extent <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code>Cleaning weasd data for January, 2022...
 Detected monolevel data...
-Returning daily weasd data from 2022-01-01 to 2022-01-05.
-&gt; weasd
-class       : SpatRaster
+Returning daily weasd data from 2022-01-01 to 2022-01-05.</code></pre>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">weasd</span></span></code></pre></div>
+<pre><code>class       : SpatRaster
 dimensions  : 277, 349, 5  (nrow, ncol, nlyr)
 resolution  : 32462.99, 32463  (x, y)
 extent      : -16231.49, 11313351, -16231.5, 8976020  (xmin, xmax, ymin, ymax)
@@ -209,27 +249,28 @@ time        : 2022-01-01 to 2022-01-05 UTC</code></pre>
 <div class="section level2">
 <h2 id="calculate-covariates">Calculate Covariates<a class="anchor" aria-label="anchor" href="#calculate-covariates"></a>
 </h2>
-<p><code>calc_covariates</code> stems from the <code>beethoven</code> package’s need for various types of data extracted at precise locations. <code>calc_covariates</code>, therefore, extracts data from the “cleaned” <code>SpatRaster</code> or <code>SpatVector</code> object at user defined locations. Users can choose to buffer the locations. The function returns a <code>data.frame</code> with data extracted at all locations for each layer or row in the <code>SpatRaster</code> or <code>SpatVector</code> object, respectively.</p>
+<p><code>calc_covariates</code> stems from the <a href="https://github.com/NIEHS/beethoven" class="external-link"><code>beethoven</code></a> project’s need for various types of data extracted at precise locations. <code>calc_covariates</code>, therefore, extracts data from the “cleaned” <code>SpatRaster</code> or <code>SpatVector</code> object at user defined locations. Users can choose to buffer the locations. The function returns a <code>data.frame</code> or <code>SpatVector</code> with data extracted at all locations for each layer or row in the <code>SpatRaster</code> or <code>SpatVector</code> object, respectively.</p>
 <p>Example of <code>calc_covariates</code> using processed “weasd” data.</p>
-<pre><code>&gt; locs &lt;- data.frame(lon = -78.8277, lat = 35.95013)
-&gt; locs$id &lt;- "0001"
-&gt; weasd_covar &lt;- calc_covariates(
-+   covariate = "narr",
-+   from = weasd_process,
-+   locs = locs,
-+   locs_id = "id",
-+   radius = 0,
-+   geom = FALSE
-+ )
-Detected `data.frame` extraction locations...
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">locs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"001"</span>, lon <span class="op">=</span> <span class="op">-</span><span class="fl">78.8277</span>, lat <span class="op">=</span> <span class="fl">35.95013</span><span class="op">)</span></span>
+<span><span class="va">weasd_covar</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calc_covariates.html">calc_covariates</a></span><span class="op">(</span></span>
+<span>  covariate <span class="op">=</span> <span class="st">"narr"</span>,</span>
+<span>  from <span class="op">=</span> <span class="va">weasd_process</span>,</span>
+<span>  locs <span class="op">=</span> <span class="va">locs</span>,</span>
+<span>  locs_id <span class="op">=</span> <span class="st">"id"</span>,</span>
+<span>  radius <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  geom <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code>Detected `data.frame` extraction locations...
 Calculating weasd covariates for 2022-01-01...
 Calculating weasd covariates for 2022-01-02...
 Calculating weasd covariates for 2022-01-03...
 Calculating weasd covariates for 2022-01-04...
 Calculating weasd covariates for 2022-01-05...
-Returning extracted covariates.
-&gt; weasd_covar
-    id       time     weasd_0
+Returning extracted covariates.</code></pre>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">weasd_covar</span></span></code></pre></div>
+<pre><code>    id       time     weasd_0
 1 0001 2022-01-01 0.000000000
 2 0001 2022-01-02 0.000000000
 3 0001 2022-01-03 0.000000000
@@ -266,7 +307,7 @@ Returning extracted covariates.
 </tr>
 <tr class="even">
 <td align="left">
-<a href="https://github.com/hllauca/RClimChange/" class="external-link"><code>RClimChange</code></a><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Last updated more than two years ago.&lt;/p&gt;"><sup>1</sup></a>
+<a href="https://github.com/hllauca/RClimChange/" class="external-link"><code>RClimChange</code></a><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Last updated more than two years ago.&lt;/p&gt;"><sup>7</sup></a>
 </td>
 <td align="left"><a href="https://www.nccs.nasa.gov/services/data-collections/land-based-products/nex-gddp-cmip6" class="external-link">NASA Earth Exchange Global Daily Downscaled Projections (NEX-GDDP-CMIP6)</a></td>
 </tr>
@@ -276,7 +317,7 @@ Returning extracted covariates.
 </tr>
 <tr class="even">
 <td align="left">
-<a href="https://github.com/ranghetti/sen2r" class="external-link"><code>sen2r</code></a><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Archived; no longer maintained.&lt;/p&gt;"><sup>2</sup></a>
+<a href="https://github.com/ranghetti/sen2r" class="external-link"><code>sen2r</code></a><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Archived; no longer maintained.&lt;/p&gt;"><sup>8</sup></a>
 </td>
 <td align="left"><a href="https://sentinels.copernicus.eu/web/sentinel/missions/sentinel-2" class="external-link">Sentinel-2</a></td>
 </tr>
@@ -290,6 +331,7 @@ Returning extracted covariates.
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/NIEHS/amadeus/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/NIEHS/amadeus/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 

@@ -9,7 +9,7 @@ population density data from NASA's UN WPP-Adjusted Population Density, v4.11.">
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,8 +20,9 @@ population density data from NASA's UN WPP-Adjusted Population Density, v4.11.">
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/download_functions.html">download_data and NASA EarthData Account</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/download_functions.html">download_data</a></li>
     <li><a class="dropdown-item" href="../articles/epa_download.html">Downloading EPA Daily Data</a></li>
+    <li><a class="dropdown-item" href="../articles/protected_datasets.html">Protected Data Sources</a></li>
   </ul></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -118,10 +119,32 @@ Default is <code>FALSE</code>.</p></dd>
 respective sub-directories within <code>directory_to_save</code>.</p>
     </div>
     <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Center For International Earth Science Information Network-CIESIN-Columbia University (2017).
+“Gridded Population of the World, Version 4 (GPWv4): Population Density, Revision 11.”
+<a href="https://doi.org/10.7927/H49C6VHW" class="external-link">doi:10.7927/H49C6VHW</a>
+, <a href="https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-rev11" class="external-link">https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-rev11</a>.</p>
+    </div>
+    <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
     <p>Mitchell Manware, Insang Song</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="fu">download_sedac_population</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  data_resolution <span class="op">=</span> <span class="st">"30 second"</span>,</span></span>
+<span class="r-in"><span>  data_format <span class="op">=</span> <span class="st">"GeoTIFF"</span>,</span></span>
+<span class="r-in"><span>  year <span class="op">=</span> <span class="st">"2020"</span>,</span></span>
+<span class="r-in"><span>  directory_to_save <span class="op">=</span> <span class="st">"./data"</span>,</span></span>
+<span class="r-in"><span>  acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
