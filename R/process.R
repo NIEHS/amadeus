@@ -294,7 +294,7 @@ the input then flatten it manually.")
 #' @param ... For internal use.
 #' @note Curvilinear products (i.e., swaths) will not be accepted.
 #' MODIS products downloaded by functions in `amadeus`,
-#' [MODISTools](https://cran.r-project.org/web/packages/MODISTools/index.html),
+#' [MODISTools](https://cran.r-project.org/package=MODISTools),
 #' and [luna](https://github.com/rspatial/luna) are accepted.
 #' @seealso [`download_data`]
 #' @author Insang Song
@@ -522,7 +522,7 @@ process_blackmarble <- function(
 #' @param threshold numeric(1). Maximum distance to fill gaps if occur.
 #' @param crs integer(1)/character(1). Coordinate system definition.
 #' Should be compatible with EPSG codes or WKT2.
-#' See [`terra::crs`] and [`sf::st_crs`] / [EPSG](https://www.epsg.io)
+#' See [`terra::crs`] and [`sf::st_crs`] / [EPSG](https://epsg.io/)
 #' @param ... For internal use.
 #' @note This function handles one file at a time.
 #' @returns a `stars` object

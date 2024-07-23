@@ -1128,15 +1128,15 @@ calc_temporal_dummies <-
 #'    - `attr(result, "sedc_threshold")``: the threshold distance
 #'  at which emission source points are excluded beyond that
 #' @note The function is originally from
-#' [chopin](https://github.com/kyle-messier/chopin)
+#' [chopin](https://github.com/NIEHS/chopin)
 #' Distance calculation is done with terra functions internally.
 #'  Thus, the function internally converts sf objects in
 #'  \code{point_*} arguments to terra.
 #'  The threshold should be carefully chosen by users.
 #' @author Insang Song
 #' @references
-#' * [Messier KP, Akita Y, & Serre ML. (2012). Integrating Address Geocoding, Land Use Regression, and Spatiotemporal Geostatistical Estimation for Groundwater Tetrachloroethylene. _Environmental Science & Technology_ 46(5), 2772-2780.](https://dx.doi.org/10.1021/es203152a)
-#' * Wiesner C. (n.d.). [Euclidean Sum of Exponentially Decaying Contributions Tutorial](https://mserre.sph.unc.edu/BMElab_web/SEDCtutorial/index.html)
+#' \insertRef{messier2012integrating}{amadeus}
+#' \insertRef{web_sedctutorial}{amadeus}
 #' @examples
 #' library(terra)
 #' library(sf)

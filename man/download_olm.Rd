@@ -113,7 +113,7 @@ NULL; GeoTIFF (.tif) files will be stored in
 \code{directory_to_save}.
 }
 \description{
-Accesses and downloads OpenLandMap data from the \href{https://www.openlandmap.org/}{OpenLandMap website}.
+Accesses and downloads OpenLandMap data from the \href{https://opengeohub.org/about-openlandmap/}{OpenLandMap website}.
 }
 \note{
 \code{extdata/openlandmap_assets.rds} contains the available assets in OpenLandMap.

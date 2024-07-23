@@ -1824,7 +1824,7 @@ download_sedac_population <- function(
 #' Download wildfire smoke data
 #' @description
 #' The \code{download_hms()} function accesses and downloads
-#' wildfire smoke plume coverage data from [NOAA's Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0).
+#' wildfire smoke plume coverage data from [NOAA's Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#0).
 #' @param data_format character(1). "Shapefile" or "KML".
 #' @param date character(2). length of 10 each. Start/end date for downloading data.
 # nolint end
@@ -2565,7 +2565,7 @@ download_modis <- function(
 # nolint start
 #' Download toxic release data
 #' @description
-#' The \code{download_tri()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/find-understand-and-use-tri).
+#' The \code{download_tri()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-action-0).
 #' @param year character(2). length of 4 each. Start/end years for downloading data.
 # nolint end
 #' @param directory_to_save character(1). Directory to download files.
@@ -2822,7 +2822,7 @@ download_nei <- function(
 # nolint start
 #' Download OpenLandMap data
 #' @description
-#' Accesses and downloads OpenLandMap data from the [OpenLandMap website](https://www.openlandmap.org/).
+#' Accesses and downloads OpenLandMap data from the [OpenLandMap website](https://opengeohub.org/about-openlandmap/).
 #' @param product character(1). Available collection name in OpenLandMap
 #' STAC Catalog. [list_stac_files] with `id_only = TRUE` to see available collections.
 #' * "no2_s5p.l3.trop.tmwm"
@@ -3155,7 +3155,7 @@ download_huc <-
 #' Accesses and downloads United States Department of Agriculture
 #' CropScape Cropland Data Layer data from 
 #' the [USDA National Agricultural Statistics Service](https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.php) or the 
-#' [George Mason University website](https://https://nassgeodata.gmu.edu/CropScape/).
+#' [George Mason University website](https://nassgeodata.gmu.edu/CropScape/).
 #' @param year integer(1). Year of the data to download.
 #' @param source character(1). Data source, one of `c("USDA", "GMU")`.
 #' * `"USDA"` will download the national data from the USDA website (available in 2008-last year).
@@ -3341,7 +3341,7 @@ download_cropscape <- function(
 #' )
 #' }
 #' @references
-#' * [PRISM Climate Group](http://www.prism.oregonstate.edu/)
+#' * [PRISM Climate Group](https://prism.oregonstate.edu/)
 #' * [PRISM Web Service Guide](https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf)
 #' @export
 # nolint end

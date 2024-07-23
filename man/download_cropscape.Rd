@@ -48,7 +48,7 @@ NULL; Yearly comma-separated value (CSV) files will be stored in
 Accesses and downloads United States Department of Agriculture
 CropScape Cropland Data Layer data from
 the \href{https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.php}{USDA National Agricultural Statistics Service} or the
-\href{https://https://nassgeodata.gmu.edu/CropScape/}{George Mason University website}.
+\href{https://nassgeodata.gmu.edu/CropScape/}{George Mason University website}.
 }
 \note{
 JSON files should be found at STAC catalog of OpenLandMap

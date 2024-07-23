@@ -1,5 +1,5 @@
 Package: amadeus
-Title: AMADEUS: A Machine for Data, Environments, and User Setup for common environmental and climate health datasets 
+Title: A Machine for Data, Environments, and User Setup for Common Environmental and Climate Health Datasets
 Version: 0.3.0
 Authors@R: c(
     person("Mitchell", "Manware", role = c("aut", "ctb"), comment = c(ORCID = "0009-0003-6440-6106")),
@@ -8,6 +8,7 @@ Authors@R: c(
     person("Mariana", "Alifa Kassien", role = c("aut", "ctb"), comment = c(ORCID = "0000-0003-2295-406X")),
     person("Kyle", "Messier", , "kyle.messier@nih.gov", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9508-9623"))
     )
+Maintainer: Mitchell Manware <mitchell.manware@nih.gov>
 Description: A Mechanism/Machine for Data, Environments, and User Setup package for health and climate research. It is fully tested, versioned, and open source and open access.
 Depends: R (>= 4.1.0)
 Imports: dplyr, sf, sftime, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringi, testthat (>= 3.0.0), parallelly, stars, future, future.apply, tidyr, rlang, rstac, nhdplusTools, archive, collapse, Rdpack

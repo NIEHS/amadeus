@@ -33,7 +33,7 @@ NULL; Comma-separated value (CSV) files will be stored in
 \code{directory_to_save}.
 }
 \description{
-The \code{download_tri()} function accesses and downloads toxic release data from the \href{https://www.epa.gov/toxics-release-inventory-tri-program/find-understand-and-use-tri}{U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program}.
+The \code{download_tri()} function accesses and downloads toxic release data from the \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-action-0}{U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program}.
 }
 \examples{
 \dontrun{

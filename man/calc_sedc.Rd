@@ -47,7 +47,7 @@ Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates
 }
 \note{
 The function is originally from
-\href{https://github.com/kyle-messier/chopin}{chopin}
+\href{https://github.com/NIEHS/chopin}{chopin}
 Distance calculation is done with terra functions internally.
 Thus, the function internally converts sf objects in
 \code{point_*} arguments to terra.
@@ -72,10 +72,8 @@ vals <- c("val1", "val2")
 calc_sedc(pnt_locs, pnt_from, "NAME", 1e5, vals)
 }
 \references{
-\itemize{
-\item \href{https://dx.doi.org/10.1021/es203152a}{Messier KP, Akita Y, & Serre ML. (2012). Integrating Address Geocoding, Land Use Regression, and Spatiotemporal Geostatistical Estimation for Groundwater Tetrachloroethylene. \emph{Environmental Science & Technology} 46(5), 2772-2780.}
-\item Wiesner C. (n.d.). \href{https://mserre.sph.unc.edu/BMElab_web/SEDCtutorial/index.html}{Euclidean Sum of Exponentially Decaying Contributions Tutorial}
-}
+\insertRef{messier2012integrating}{amadeus}
+\insertRef{web_sedctutorial}{amadeus}
 }
 \author{
 Insang Song

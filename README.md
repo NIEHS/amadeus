@@ -49,12 +49,12 @@ Utilize [Issues](https://github.com/NIEHS/amadeus/issues) to notify the authors 
 | [NASA SEDAC[^3] UN WPP-Adjusted Population Density](https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11) | GeoTIFF<br>netCDF | Population |
 | [NASA SEDAC Global Roads Open Access Data Set](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download) | Shapefile<br>Geodatabase | Roadways |
 | [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere<br>Meteorology |
-| [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0) | Shapefile<br>KML | Wildfire Smoke |
+| [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#about) | Shapefile<br>KML | Wildfire Smoke |
 | [NOAA NCEP[^4] North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) | netCDF | Atmosphere<br>Meteorology |
 | [OpenGeoHub Foundation OpenLandMap](https://opengeohub.org/about-openlandmap/) | GeoTIFF | Climate<br>Elevation<br>Soil<br>Land Use<br>Satellite |
 | [Parameter Elevation Regression on Independent Slopes Model (PRISM)](https://elibrary.asabe.org/abstract.asp??JID=3&AID=3101&CID=t2000&v=43&i=6&T=1) | BIL<br>ASCII | Climate |
 | [US EPA[^5] Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV | Air Pollution |
-| [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregion) | Shapefile | Climate Regions |
+| [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregions) | Shapefile | Climate Regions |
 | [US EPA National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories) | CSV | Emissions |
 | [US EPA Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present) | CSV | Chemicals<br>Pollution |
 | [USGS[^6] Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation |
@@ -168,12 +168,12 @@ The following R packages can also be used to access climate and weather data in 
 
 | Package | Source |
 | :--- | :----- |
-| [`dataRetrieval`](https://cran.r-project.org/web/packages/dataRetrieval/index.html) | [USGS Hydrological Data](https://www.usgs.gov/mission-areas/water-resources/data) and [EPA Water Quality Data](https://www.epa.gov/waterdata/water-quality-data) |
-| [`daymetr`](https://cran.r-project.org/web/packages/daymetr/index.html) | [Daymet](https://daac.ornl.gov/cgi-bin/dataset_lister.pl?p=32) |
-| [`ecmwfr`](https://cran.r-project.org/web/packages/ecmwfr/index.html) | [ECMWF Reanalysis v5 (ERA5)](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) |
+| [`dataRetrieval`](https://cran.r-project.org/package=dataRetrieval) | [USGS Hydrological Data](https://www.usgs.gov/mission-areas/water-resources/data) and [EPA Water Quality Data](https://www.epa.gov/waterdata/water-quality-data) |
+| [`daymetr`](https://cran.r-project.org/package=daymetr) | [Daymet](https://daac.ornl.gov/cgi-bin/dataset_lister.pl?p=32) |
+| [`ecmwfr`](https://cran.r-project.org/package=ecmwfr) | [ECMWF Reanalysis v5 (ERA5)](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) |
 | [`RClimChange`[^7]](https://github.com/hllauca/RClimChange/) | [NASA Earth Exchange Global Daily Downscaled Projections (NEX-GDDP-CMIP6)](https://www.nccs.nasa.gov/services/data-collections/land-based-products/nex-gddp-cmip6) |
-| [`rNOMADS`](https://cran.r-project.org/web/packages/rNOMADS/) | [NOAA Operational Model Archive and Distribution System](https://nomads.ncep.noaa.gov/) |
-| [`sen2r`[^8]](https://github.com/ranghetti/sen2r) | [Sentinel-2](https://sentinels.copernicus.eu/web/sentinel/missions/sentinel-2) |
+| [`rNOMADS`](https://cran.r-project.org/package=rNOMADS) | [NOAA Operational Model Archive and Distribution System](https://nomads.ncep.noaa.gov/) |
+| [`sen2r`[^8]](https://github.com/ranghetti/sen2r) | [Sentinel-2](https://sentiwiki.copernicus.eu/web/s2-mission) |
 
 [^1]: Multi-Resolution Land Characteristics
 [^2]: National Aeronautics and Space Administration
