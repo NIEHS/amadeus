@@ -3468,7 +3468,7 @@ download_prism <- function(
 #' download_gridmet(
 #'   variables = "Precipitation",
 #'   year = c(2023, 2024),
-#'   directory_to_save = "./data"
+#'   directory_to_save = "./data",
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -3610,7 +3610,7 @@ download_gridmet <- function(
 #' download_terraclimate(
 #'   variables = "Precipitation",
 #'   year = c(2023, 2024),
-#'   directory_to_save = "./data"
+#'   directory_to_save = "./data",
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE

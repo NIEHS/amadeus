@@ -11,28 +11,28 @@
 #' depending on `covariate` value.
 #' @param ... Arguments passed to each raw data processing function.
 #' @seealso
-#' - [`process_modis_swath`]: `"modis_swath"`
-#' - [`process_modis_merge`]: `"modis_merge"`
-#' - [`process_blackmarble`]: `"blackmarble"`
-#' - [`process_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`
-#' - [`process_ecoregion`]: `"ecoregion"`, `"ecoregions"`
-#' - [`process_nlcd`]: `"nlcd"`
-#' - [`process_tri`]: `"tri"`
-#' - [`process_nei`]: `"nei"`
-#' - [`process_geos`]: `"geos"`
-#' - [`process_gmted`]: `"gmted"`
-#' - [`process_aqs`]: `"aqs"`
-#' - [`process_hms`]: `"hms"`, `"smoke"`
-#' - [`process_narr`]: `"narr"`
-#' - [`process_sedac_groads`]: `"sedac_groads"`, `"roads"`, `"groads"`
-#' - [`process_sedac_population`]: `"sedac_population"`, `"population"`
-#' - [`process_merra2`]: `"merra"`, `"merra2"`
-#' - [`process_gridmet`]: `"gridmet"`, `"gridMET`"
-#' - [`process_terraclimate`]: `"terraclimate"`, `"TerraClimate"`
-#' - [`process_huc`]: `"huc"`
-#' - [`process_cropscape`]: `"cropscape"`, `"cdl"`
-#' - [`process_prism`]: `"prism"`
-#' - [`process_olm`]: `"olm"`, `"openlandmap"`
+#' * \code{\link{process_modis_swath}}: "modis_swath"
+#' * \code{\link{process_modis_merge}}: "modis_merge"
+#' * \code{\link{process_blackmarble}}: "blackmarble"
+#' * \code{\link{process_koppen_geiger}}: "koppen-geiger", "koeppen-geiger", "koppen"
+#' * \code{\link{process_ecoregion}}: "ecoregion", "ecoregions"
+#' * \code{\link{process_nlcd}}: "nlcd", "NLCD"
+#' * \code{\link{process_tri}}: "tri", "TRI"
+#' * \code{\link{process_nei}}: "nei", "NEI"
+#' * \code{\link{process_geos}}: "geos", "GEOS"
+#' * \code{\link{process_gmted}}: "gmted", "GMTED"
+#' * \code{\link{process_aqs}}: "aqs", "AQS"
+#' * \code{\link{process_hms}}: "hms", "smoke", "HMS"
+#' * \code{\link{process_narr}}: "narr", "NARR"
+#' * \code{\link{process_sedac_groads}}: "sedac_groads", "roads", "groads"
+#' * \code{\link{process_sedac_population}}: "sedac_population", "population"
+#' * \code{\link{process_merra2}}: "merra", "merra2", "MERRA2"
+#' * \code{\link{process_gridmet}}: "gridmet", "gridMET"
+#' * \code{\link{process_terraclimate}}: "terraclimate", "TerraClimate"
+#' * \code{\link{process_huc}}: "huc", "HUC"
+#' * \code{\link{process_cropscape}}: "cropscape", "cdl"
+#' * \code{\link{process_prism}}: "prism", "PRISM"
+#' * \code{\link{process_olm}}: "olm", "openlandmap"
 #' @returns `SpatVector`, `SpatRaster`, `sf`, or `character` depending on
 #' covariate type and selections.
 #' @author Insang Song
@@ -446,7 +446,7 @@ process_blackmarble_corners <-
 #'     list.files("./data", pattern = "VNP46A2.", full.names = TRUE),
 #'   date = "2024-01-01",
 #'   tile_df =
-#'     process_blackmarble_corners(hrange = c(8, 10), vrange = c(4, 5))
+#'     process_blackmarble_corners(hrange = c(8, 10), vrange = c(4, 5)),
 #'   subdataset = 3L,
 #'   crs = "EPSG:4326"
 #' )
