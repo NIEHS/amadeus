@@ -9,10 +9,10 @@ Authors@R: c(
     person("Kyle", "Messier", role = c("aut", "cre"), email = "kyle.messier@nih.gov", comment = c(ORCID = "0000-0001-9508-9623"))
     )
 Maintainer: Kyle Messier <kyle.messier@nih.gov>
-Description: amadeus is designed to faciliate access to and utiltiy with large scale, publicly available environmental data in R. The package contains funtions for downloading (download_data()) raw data files from web URLs, processing (process_covariates()) the raw data files into interpretable spatial objects, and extracting values (calc_covariates()) from the spatial data objects at point and polygon locations. These functions call a series of source-specific functions which are tailored to each data sources/datasets particular URL structure, data format, and spatio-temporal resolution. amadeus functions are tested, versioned, and open source and open access.
+Description: Functions are designed to facilitate access to and utility with large scale, publicly available environmental data in R. The package contains functions for downloading (download_data()) raw data files from web URLs, processing (process_covariates()) the raw data files into clean spatial objects, and extracting values (calc_covariates()) from the spatial data objects at point and polygon locations. These functions call a series of source-specific functions which are tailored to each data sources/datasets particular URL structure, data format, and spatial/temporal resolution. amadeus functions are tested, versioned, and open source and open access.
 Depends: R (>= 4.1.0)
 Imports: dplyr, sf, sftime, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringi, testthat (>= 3.0.0), parallelly, stars, future, future.apply, tidyr, rlang, rstac, nhdplusTools, archive, collapse, Rdpack
-Suggests: covr, withr, knitr, rmarkdown, lwgeom, FNN, doRNG
+Suggests: covr, withr, knitr, rmarkdown, pandoc, lwgeom, FNN, doRNG
 RdMacros: Rdpack
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown
