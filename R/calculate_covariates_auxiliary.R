@@ -20,6 +20,7 @@
 #' coordinate location.
 #' @keywords internal
 #' @importFrom stringi stri_pad
+#' @return a data.frame or SpatVector object (depending on `from`)
 #' @export
 calc_setcolumns <- function(
     from,
@@ -507,6 +508,7 @@ calc_worker <- function(
 #' @importFrom terra vect
 #' @keywords auxiliary
 #' @author Mitchell Manware
+#' @return a data.frame or SpatVector object (depending on `geom` paramter)
 #' @export
 # nolint start
 calc_return_locs <- function(

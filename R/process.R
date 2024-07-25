@@ -33,7 +33,7 @@
 #' * \code{\link{process_cropscape}}: "cropscape", "cdl"
 #' * \code{\link{process_prism}}: "prism", "PRISM"
 #' * \code{\link{process_olm}}: "olm", "openlandmap"
-#' @returns `SpatVector`, `SpatRaster`, `sf`, or `character` depending on
+#' @return `SpatVector`, `SpatRaster`, `sf`, or `character` depending on
 #' covariate type and selections.
 #' @author Insang Song
 #' @examples
@@ -149,7 +149,7 @@ process_covariates <-
 #' Name" = MCD12C1.006, then `product = "MCD12C1"`.
 # nolint end
 #' @author Insang Song
-#' @returns A character object that conforms to the regular
+#' @return A character object that conforms to the regular
 #' expression. Details of regular expression in R can be found in [regexp].
 #' @seealso [calc_modis_par]
 #' @examples
@@ -197,7 +197,7 @@ process_modis_sds <-
 #' @param fun_agg character(1). Function name to aggregate layers.
 #' Should be acceptable to [terra::tapp].
 #' @param ... Placeholders.
-#' @returns a `SpatRaster` object
+#' @return a `SpatRaster` object
 #' @author Insang Song
 #' @seealso [terra::tapp], [terra::rast], [terra::describe]
 #' @description Some MODIS products consist of multi-layer subdatasets.
@@ -298,7 +298,7 @@ the input then flatten it manually.")
 #' and [luna](https://github.com/rspatial/luna) are accepted.
 #' @seealso [`download_data`]
 #' @author Insang Song
-#' @returns a `SpatRaster` object
+#' @return a `SpatRaster` object
 #' @examples
 #' \dontrun{
 #' mod09ga_merge <- process_modis_merge(
@@ -365,7 +365,7 @@ process_modis_merge <- function(
 #' @description Black Marble products are in HDF5 format and are read without
 #' georeference with typical R geospatial packages.
 #' This function generates a `data.frame` of corner coordinates for assignment.
-#' @returns `data.frame` with xmin, xmax, ymin, and ymax fields
+#' @return `data.frame` with xmin, xmax, ymin, and ymax fields
 #' @author Insang Song
 #' @references
 #' - [Wang, Z. (2022). Black Marble User Guide (Version 1.3). NASA.](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf)
@@ -427,7 +427,7 @@ process_blackmarble_corners <-
 #' @param crs character(1). terra::crs compatible CRS.
 #' Default is `"EPSG:4326"`
 #' @param ... For internal use.
-#' @returns a `SpatRaster` object
+#' @return a `SpatRaster` object
 #' @author Insang Song
 #' @seealso
 #' * [`terra::describe`]
@@ -525,7 +525,7 @@ process_blackmarble <- function(
 #' See [`terra::crs`] and [`sf::st_crs`] / [EPSG](https://epsg.io/)
 #' @param ... For internal use.
 #' @note This function handles one file at a time.
-#' @returns a `stars` object
+#' @return a `stars` object
 #' @author Insang Song
 #' @seealso [`terra::rectify`]
 #' @importFrom stars st_warp
@@ -597,7 +597,7 @@ process_modis_warp <-
 #' * [GDAL HDF4 driver documentation](https://gdal.org/drivers/raster/hdf4.html)
 #' * [`terra::describe()`]: to list the full subdataset list with `sds = TRUE`
 #' * [`terra::sprc()`], [`terra::rast()`]
-#' @returns
+#' @return
 #' * a `SpatRaster` object (crs = `"EPSG:4326"`): if `path` is a single file with
 #' full specification of subdataset.
 #' * a `SpatRaster` object (crs = `"EPSG:4326"`): if `path` is a list of files. In this case, the returned object will have the maximal extent of multiple warped layers
@@ -724,7 +724,7 @@ process_modis_swath <-
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
-#' @returns a `SpatRaster` object
+#' @return a `SpatRaster` object
 #' @author Insang Song
 #' @importFrom terra rast
 #' @examples
@@ -766,7 +766,7 @@ process_koppen_geiger <-
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @description Reads NLCD file of selected `year`.
-#' @returns a `SpatRaster` object
+#' @return a `SpatRaster` object
 #' @author Eva Marques, Insang Song
 #' @importFrom utils read.csv
 #' @importFrom tools file_path_sans_ext
@@ -830,7 +830,7 @@ process_nlcd <-
 #' This fix will ensure that the EPA air quality monitoring sites
 #' will be located within the ecoregion.
 #' @author Insang Song
-#' @returns a `SpatVector` object
+#' @return a `SpatVector` object
 #' @importFrom terra vect
 #' @importFrom sf st_read st_crs st_as_sfc st_transform st_intersects st_union
 #' @importFrom data.table year
@@ -889,7 +889,7 @@ process_ecoregion <-
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @author Insang Song, Mariana Kassien
-#' @returns a `SpatVector` object (points) in `year`
+#' @return a `SpatVector` object (points) in `year`
 #' `year` is stored in a field named `"year"`.
 #' @note Visit [TRI Data and Tools](https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-and-tools)
 #' to view the available years and variables.
@@ -1003,7 +1003,7 @@ process_tri <- function(
 #' @param year integer(1) Year to use. Currently only 2017 or 2020
 #' is accepted.
 #' @param ... Placeholders.
-#' @returns a `SpatVector` object
+#' @return a `SpatVector` object
 #' @author Insang Song
 #' @note Base files for `county` argument can be downloaded directly from
 #' [U.S. Census Bureau](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html)
@@ -1130,7 +1130,7 @@ process_nei <- function(
 #' * [`download_aqs()`]
 #' * [EPA, n.d., _AQS Parameter Codes_](
 #'   https://aqs.epa.gov/aqsweb/documents/codetables/parameters.csv)
-#' @returns a SpatVector, sf, or data.table object depending on the `return_format`
+#' @return a SpatVector, sf, or data.table object depending on the `return_format`
 #' @importFrom data.table as.data.table
 #' @importFrom utils read.csv
 #' @importFrom terra vect project
@@ -1397,7 +1397,7 @@ process_sedac_population <- function(
 #' `$description` column to represent the temporal range covered by the
 #' dataset. For more information, see <https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata>.
 #' @author Insang Song
-#' @returns a `SpatVector` object
+#' @return a `SpatVector` object
 #' @importFrom terra vect
 #' @examples
 #' \dontrun{
@@ -2730,7 +2730,7 @@ process_terraclimate <- function(
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Arguments passed to `nhdplusTools::get_huc()`
-#' @returns a `SpatVector` object
+#' @return a `SpatVector` object
 #' @seealso [`nhdplusTools::get_huc`]
 #' @importFrom terra vect
 #' @importFrom terra vector_layers
@@ -2826,7 +2826,7 @@ process_huc <-
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @description Reads CropScape file of selected `year`.
-#' @returns a `SpatRaster` object
+#' @return a `SpatRaster` object
 #' @author Insang Song
 #' @importFrom utils read.csv
 #' @importFrom terra rast
@@ -2884,7 +2884,7 @@ process_cropscape <-
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @description Reads time series or 30-year normal PRISM data.
-#' @returns a `SpatRaster` object with metadata of time and element.
+#' @return a `SpatRaster` object with metadata of time and element.
 #' @seealso [`terra::rast`], [`terra::metags`]
 #' @author Insang Song
 #' @importFrom utils read.csv
@@ -2946,7 +2946,7 @@ process_prism <-
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
-#' @returns a `SpatRaster` object
+#' @return a `SpatRaster` object
 #' @author Insang Song
 #' @importFrom terra rast
 #' @examples

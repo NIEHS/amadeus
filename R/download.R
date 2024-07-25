@@ -34,7 +34,7 @@
 #' * \code{\link{download_nei}}: `"nei"`, `"NEI"`
 #' * \code{\link{download_gridmet}}: `"gridMET"`, `"gridmet"`
 #' * \code{\link{download_terraclimate}}: `"TerraClimate"`, `"terraclimate"`
-#' @returns NULL
+#' @return NULL
 #' @examples
 #' \dontrun{
 #' download_data(
@@ -145,7 +145,7 @@ download_data <-
 #' @param remove_zip logical(1). Remove zip file from directory_to_download.
 #' Default \code{FALSE}.
 #' @author Mariana Kassien, Insang Song, Mitchell Manware
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -318,7 +318,7 @@ download_aqs <-
 #' @param remove_zip logical(1). Remove zip file from
 #' \code{directory_to_download}. Default \code{FALSE}.
 #' @author Insang Song
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom utils download.file
 #' @importFrom Rdpack reprompt
@@ -447,7 +447,7 @@ download_ecoregion <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; netCDF (.nc4) files will be stored in a
+#' @return NULL; netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
 #' @importFrom utils download.file
 #' @importFrom Rdpack reprompt
@@ -625,7 +625,7 @@ download_geos <- function(
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -777,7 +777,7 @@ download_gmted <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; netCDF (.nc4) files will be stored in a
+#' @return NULL; netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1188,7 +1188,7 @@ download_merra2 <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; netCDF (.nc) files will be stored in
+#' @return NULL; netCDF (.nc) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1340,7 +1340,7 @@ download_narr <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1499,7 +1499,7 @@ download_nlcd <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1657,7 +1657,7 @@ download_sedac_groads <- function(
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1851,7 +1851,7 @@ download_sedac_population <- function(
 #' @importFrom utils head
 #' @importFrom utils tail
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2040,7 +2040,7 @@ download_hms <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2192,7 +2192,7 @@ download_koppen_geiger <- function(
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
 #' @import rvest
-#' @returns NULL; HDF (.hdf) files will be stored in
+#' @return NULL; HDF (.hdf) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2578,7 +2578,7 @@ download_modis <- function(
 #' @param remove_command logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mariana Kassien, Insang Song
-#' @returns NULL; Comma-separated value (CSV) files will be stored in
+#' @return NULL; Comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2701,7 +2701,7 @@ download_tri <- function(
 #' Currently we bundle the pre-downloaded crt and its PEM (which is accepted
 #' in wget command) file in ./inst/extdata. The instruction above is for
 #' certificate updates in the future.
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2913,7 +2913,7 @@ download_nei <- function(
 #' @note `extdata/openlandmap_assets.rds` contains the available assets in OpenLandMap.
 #' Users may want to check the available assets to download data directly.
 #' For developers: JSON files should be found at STAC catalog of OpenLandMap when updated.
-#' @returns NULL; GeoTIFF (.tif) files will be stored in
+#' @return NULL; GeoTIFF (.tif) files will be stored in
 #' \code{directory_to_save}.
 #' @seealso [list_stac_files]
 #' @importFrom Rdpack reprompt
@@ -3024,7 +3024,7 @@ download_olm <- function(
 #' the text file containing download commands.
 #' @param unzip logical(1). Unzip the downloaded compressed files.
 #' Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.
-#' @returns NULL. Downloaded files will be stored in \code{directory_to_save}.
+#' @return NULL. Downloaded files will be stored in \code{directory_to_save}.
 #' @author Insang Song
 #' @importFrom Rdpack reprompt
 #' @references
@@ -3174,7 +3174,7 @@ download_huc <-
 #' Default is \code{FALSE}.
 #' @author Insang Song
 #' @note JSON files should be found at STAC catalog of OpenLandMap
-#' @returns NULL; Yearly comma-separated value (CSV) files will be stored in
+#' @return NULL; Yearly comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @examples
 #' \dontrun{
@@ -3322,7 +3322,7 @@ download_cropscape <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Insang Song
-#' @returns NULL; .bil (normals) or single grid files depending on the format
+#' @return NULL; .bil (normals) or single grid files depending on the format
 #' choice will be stored in \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -3458,7 +3458,7 @@ download_prism <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware
-#' @returns NULL; netCDF (.nc) files will be stored in a variable-specific
+#' @return NULL; netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -3600,7 +3600,7 @@ download_gridmet <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; netCDF (.nc) files will be stored in a variable-specific
+#' @return NULL; netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references

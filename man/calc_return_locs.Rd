@@ -19,6 +19,9 @@ calc_return_locs(covar, POSIXt = TRUE, geom, crs)
 \item{crs}{terra::crs(1). Coordinate reference system (inherited from
 \code{from}).}
 }
+\value{
+a data.frame or SpatVector object (depending on \code{geom} paramter)
+}
 \description{
 Check the time column for proper class and, if \code{geom = TRUE},
 transform \code{data.frame} into a \code{SpatVector} object.

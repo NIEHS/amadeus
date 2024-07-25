@@ -9,7 +9,7 @@
 #' @description Check if all of `"lon"`, `"lat"`, and `"time"`
 #' (only if `check_time = TRUE`) then convert inputs into a
 #' `SpatVector` object.
-#' @returns a `SpatVector` object
+#' @return a `SpatVector` object
 #' @author Insang Song
 #' @importFrom methods is
 #' @importFrom terra vect
@@ -266,6 +266,7 @@ process_gmted_codes <-
 #' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
 #' provides resolution code, and returns full length resolution.
 #' @keywords auxiliary
+#' @return character
 #' @export
 process_sedac_codes <-
   function(
@@ -299,7 +300,7 @@ process_sedac_codes <-
 #' @description Creates a circular buffer around points if `radius` is > 0.
 #' Returns points if `radius` is 0.
 #' @keywords internal
-#' @returns a `SpatVector` object
+#' @return a `SpatVector` object
 #' @importFrom terra buffer
 #' @export
 process_locs_radius <-
@@ -331,7 +332,7 @@ process_locs_radius <-
 #' `terra::crs()`.
 #' @param radius integer(1). Circular buffer size (meters).
 #' @keywords internal
-#' @returns a `SpatVector` object
+#' @return a `SpatVector` object
 #' @importFrom terra crs
 #' @importFrom terra vect
 #' @importFrom terra project
@@ -521,7 +522,7 @@ process_variable_codes <-
 #' @param format character(1). Matching format to be checked.
 #' Default is `"%Y-%m-%d"`, which can detect `"%Y/%m/%d`.
 #' See [`strftime`] for details of formatting this string.
-#' @returns No returning value. It stops the function if `instr` doesn't
+#' @return No returning value. It stops the function if `instr` doesn't
 #' conform to the `format`.
 #' @author Insang Song
 #' @keywords internal
@@ -550,8 +551,9 @@ is_date_proper <- function(
 #' One of "geometry" or c("lon", "lat").
 #' @importFrom sf st_as_sfc st_bbox st_crs
 #' @importFrom terra ext
-#' @returns sf/terra object with the extent applied.
+#' @return sf/terra object with the extent applied.
 #' @keywords internal
+#' @export 
 apply_extent <-
   function(data, extent, geom) {
     extent <- terra::ext(extent)
