@@ -6,6 +6,7 @@
 #' @import sftime
 #' @author Eva Marques
 #' @keywords spacetime
+#' @return NULL
 #' @export
 check_mysftime <- function(x) {
   stopifnot(
@@ -28,6 +29,7 @@ check_mysftime <- function(x) {
 #' @import sf
 #' @author Eva Marques
 #' @keywords spacetime
+#' @return NULL
 #' @export
 check_mysf <- function(x) {
   stopifnot(

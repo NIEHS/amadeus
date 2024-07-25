@@ -46,7 +46,7 @@ The \code{download_terraclimate} function accesses and downloads climate and wat
 download_terraclimate(
   variables = "Precipitation",
   year = c(2023, 2024),
-  directory_to_save = "./data"
+  directory_to_save = "./data",
   acknowledgement = TRUE,
   download = TRUE,
   remove_command = TRUE

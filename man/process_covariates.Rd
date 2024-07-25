@@ -45,28 +45,28 @@ narr <- process_covariates(
 }
 \seealso{
 \itemize{
-\item 
-\item 
-\item 
-\item \code{\link{process_koppen_geiger}}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"}
-\item \code{\link{process_ecoregion}}: \code{"ecoregion"}, \code{"ecoregions"}
-\item 
-\item 
-\item 
-\item 
-\item 
-\item 
-\item \code{\link{process_hms}}: \code{"hms"}, \code{"smoke"}
-\item 
-\item \code{\link{process_sedac_groads}}: \code{"sedac_groads"}, \code{"roads"}, \code{"groads"}
-\item \code{\link{process_sedac_population}}: \code{"sedac_population"}, \code{"population"}
-\item \code{\link{process_merra2}}: \code{"merra"}, \code{"merra2"}
-\item \code{\link{process_gridmet}}: \code{"gridmet"}, \verb{"gridMET}"
-\item \code{\link{process_terraclimate}}: \code{"terraclimate"}, \code{"TerraClimate"}
-\item 
-\item \code{\link{process_cropscape}}: \code{"cropscape"}, \code{"cdl"}
-\item 
-\item \code{\link{process_olm}}: \code{"olm"}, \code{"openlandmap"}
+\item \code{\link{process_modis_swath}}: "modis_swath"
+\item \code{\link{process_modis_merge}}: "modis_merge"
+\item \code{\link{process_blackmarble}}: "blackmarble"
+\item \code{\link{process_koppen_geiger}}: "koppen-geiger", "koeppen-geiger", "koppen"
+\item \code{\link{process_ecoregion}}: "ecoregion", "ecoregions"
+\item \code{\link{process_nlcd}}: "nlcd", "NLCD"
+\item \code{\link{process_tri}}: "tri", "TRI"
+\item \code{\link{process_nei}}: "nei", "NEI"
+\item \code{\link{process_geos}}: "geos", "GEOS"
+\item \code{\link{process_gmted}}: "gmted", "GMTED"
+\item \code{\link{process_aqs}}: "aqs", "AQS"
+\item \code{\link{process_hms}}: "hms", "smoke", "HMS"
+\item \code{\link{process_narr}}: "narr", "NARR"
+\item \code{\link{process_sedac_groads}}: "sedac_groads", "roads", "groads"
+\item \code{\link{process_sedac_population}}: "sedac_population", "population"
+\item \code{\link{process_merra2}}: "merra", "merra2", "MERRA2"
+\item \code{\link{process_gridmet}}: "gridmet", "gridMET"
+\item \code{\link{process_terraclimate}}: "terraclimate", "TerraClimate"
+\item \code{\link{process_huc}}: "huc", "HUC"
+\item \code{\link{process_cropscape}}: "cropscape", "cdl"
+\item \code{\link{process_prism}}: "prism", "PRISM"
+\item \code{\link{process_olm}}: "olm", "openlandmap"
 }
 }
 \author{

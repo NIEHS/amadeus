@@ -8,7 +8,7 @@
 #' data files? If `TRUE`, a vector of sub-directoy names will be returned.
 #' @description If directory does not exist, the directory
 #' will be created.
-#' @returns NULL; if `zip = TRUE` a vector of directories for zip files and
+#' @return NULL; if `zip = TRUE` a vector of directories for zip files and
 #' data files
 #' @keywords internal
 #' @export
@@ -46,7 +46,7 @@ download_setup_dir <-
 #' Append forward slash to end of \code{directory} if it does not already
 #' end with one.
 #' @param directory character(1). Path
-#' @returns character ending with a forward slash.
+#' @return character ending with a forward slash.
 #' @keywords internal
 #' @export
 download_sanitize_path <-
@@ -77,7 +77,7 @@ download_sanitize_path <-
 #' The \code{acknowledgement} parameter is designed to help users avoid
 #' accidentally initiating a very large data download that may take a very long
 #' time to run or exceed machine capabilities.
-#' @returns NULL
+#' @return NULL
 #' @keywords internal
 #' @export
 download_permit <-
@@ -101,7 +101,7 @@ download_permit <-
 #'  skip (\code{FALSE}) download.
 #' @param system_command character(1). Linux command to execute downloads.
 #' Inherited from data download function.
-#' @returns NULL
+#' @return NULL
 #' @keywords internal
 #' @export
 download_run <- function(
@@ -124,7 +124,7 @@ download_run <- function(
 #' @param commands_txt character(1). Path of download commands
 #' @param remove logical(1). Remove (\code{TRUE}) or
 #'  keep (\code{FALSE}) commands
-#' @returns NULL
+#' @return NULL
 #' @keywords internal
 #' @export
 download_remove_command <-
@@ -140,7 +140,7 @@ download_remove_command <-
 #' @description
 #' Open connection to \code{command_txt} file to store download commands.
 #' @param command_txt character(1). file path to export commands.
-#' @returns NULL
+#' @return NULL
 #' @keywords internal
 #' @export
 download_sink <-
@@ -159,7 +159,7 @@ download_sink <-
 #' @param directory_to_unzip character(1). Directory to unzip
 #' data
 #' @param unzip logical(1). Unzip (\code{TRUE}) or not.
-#' @returns NULL
+#' @return NULL
 #' @keywords internal
 #' @export
 download_unzip <-
@@ -193,7 +193,7 @@ download_unzip <-
 #' If \code{remove = TRUE}, ensure that \code{unzip = TRUE}. Choosing to remove
 #' ".zip" files without unzipping will retain none of the downloaded data.
 #' then it will remove all files in the second higher level directory.
-#' @returns NULL
+#' @return NULL
 #' @keywords internal
 #' @export
 download_remove_zips <-
@@ -216,7 +216,7 @@ download_remove_zips <-
 #' Check that all parameters have been assigned a value.
 #' @param parameters parameters passed to function (called by
 #' \code{mget(ls())}.)
-#' @returns NULL
+#' @return NULL
 #' @keywords internal
 #' @export
 check_for_null_parameters <-
@@ -239,7 +239,7 @@ check_for_null_parameters <-
 #' @param sub_hyphen logical(1). Substitute hyphen in dates. If `TRUE`, returns
 #' date sequence as "YYYYMMDD". If `FALSE`, returns date sequence as
 #' "YYYY-MM-DD".
-#' @returns vector
+#' @return vector
 #' @keywords auxiliary
 #' @export
 generate_date_sequence <-
@@ -267,7 +267,7 @@ generate_date_sequence <-
 #' Should end with `.pem`
 #' @param certificate_url character(1).
 #' URL of the original certificate.
-#' @returns A file designated in `epa_certificate_path`
+#' @return A file designated in `epa_certificate_path`
 #' @author Insang Song
 #' @importFrom utils download.file
 #' @keywords internal
@@ -462,7 +462,7 @@ test_download_functions <- function(
 #' @param format character(1). Format of target files. Default is "tif".
 #' @param which numeric/character. Index or name of collection to retrieve.
 #' @param id_only logical(1). Return collection IDs only.
-#' @returns character vector of file links.
+#' @return character vector of file links.
 #' @examples
 #' \dontrun{
 #' read_stac_json()
@@ -525,7 +525,7 @@ list_stac_files <-
 #' and pressure level variables are derived from
 #' https://downloads.psl.noaa.gov//Datasets/NARR/Dailies/pressure/.
 #' @param variable character(1). User-selected NARR variable
-#' @returns list with URL base and vector of months (blank for monolevel)
+#' @return list with URL base and vector of months (blank for monolevel)
 #' @keywords auxiliary
 #' @export
 narr_variable <- function(variable) {

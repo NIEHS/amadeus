@@ -1,14 +1,15 @@
 Package: amadeus
-Title: AMADEUS: A Machine for Data, Environments, and User Setup for common environmental and climate health datasets 
+Title: A Machine for Data, Environments, and User Setup for Common Environmental and Climate Health Datasets
 Version: 0.3.0
 Authors@R: c(
     person("Mitchell", "Manware", role = c("aut", "ctb"), comment = c(ORCID = "0009-0003-6440-6106")),
     person("Insang", "Song", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-8732-3256")),
     person("Eva", "Marques", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-9817-6546")),
     person("Mariana", "Alifa Kassien", role = c("aut", "ctb"), comment = c(ORCID = "0000-0003-2295-406X")),
-    person("Kyle", "Messier", , "kyle.messier@nih.gov", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9508-9623"))
+    person("Kyle", "Messier", role = c("aut", "cre"), email = "kyle.messier@nih.gov", comment = c(ORCID = "0000-0001-9508-9623"))
     )
-Description: A Mechanism/Machine for Data, Environments, and User Setup package for health and climate research. It is fully tested, versioned, and open source and open access.
+Maintainer: Kyle Messier <kyle.messier@nih.gov>
+Description: amadeus is designed to faciliate access to and utiltiy with large scale, publicly available environmental data in R. The package contains funtions for downloading (download_data()) raw data files from web URLs, processing (process_covariates()) the raw data files into interpretable spatial objects, and extracting values (calc_covariates()) from the spatial data objects at point and polygon locations. These functions call a series of source-specific functions which are tailored to each data sources/datasets particular URL structure, data format, and spatio-temporal resolution. amadeus functions are tested, versioned, and open source and open access.
 Depends: R (>= 4.1.0)
 Imports: dplyr, sf, sftime, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringi, testthat (>= 3.0.0), parallelly, stars, future, future.apply, tidyr, rlang, rstac, nhdplusTools, archive, collapse, Rdpack
 Suggests: covr, withr, knitr, rmarkdown, lwgeom, FNN, doRNG

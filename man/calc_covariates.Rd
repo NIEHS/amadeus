@@ -58,22 +58,22 @@ calc_covariates(
 }
 \seealso{
 \itemize{
-\item \code{\link{calc_modis_par}}: \code{"modis"}, \code{"MODIS"}
-\item \code{\link{calc_koppen_geiger}}: \code{"koppen-geiger"}, \code{"koeppen-geiger"}, \code{"koppen"}
-\item \code{\link{calc_ecoregion}}: \code{"ecoregion"}, \code{"ecoregions"}
-\item 
-\item \code{\link{calc_hms}}: \code{"hms"}, \code{"smoke"}
-\item 
-\item 
-\item \code{\link{calc_geos}}: \code{"geos"}, \code{"geos_cf"}
-\item \code{\link{calc_sedac_population}}: \code{"population"}, \code{"sedac_population"}
-\item \code{\link{calc_sedac_groads}}: \code{"roads"}, \code{"groads"}, \code{"sedac_groads"}
-\item 
-\item 
-\item 
-\item \code{\link{calc_merra2}}: \code{"merra"}, \code{"MERRA"}, \code{"merra2"}, \code{"MERRA2"}
-\item \code{\link{calc_gridmet}}: \code{"gridMET"}, \code{"gridmet"}
-\item \code{\link{calc_terraclimate}}: \code{"terraclimate"}, \code{"TerraClimate"}
+\item \code{\link{calc_modis_par}}: "modis", "MODIS"
+\item \code{\link{calc_koppen_geiger}}: "koppen-geiger", "koeppen-geiger", "koppen"
+\item \code{\link{calc_ecoregion}}: "ecoregion", "ecoregions"
+\item \code{\link{calc_temporal_dummies}}: "dummies", "Dummies"
+\item \code{\link{calc_hms}}: "hms", "smoke", "HMS"
+\item \code{\link{calc_gmted}}: "gmted", "GMTED"
+\item \code{\link{calc_narr}}: "narr", "NARR"
+\item \code{\link{calc_geos}}: "geos", "geos_cf", "GEOS"
+\item \code{\link{calc_sedac_population}}: "population", "sedac_population"
+\item \code{\link{calc_sedac_groads}}: "roads", "groads", "sedac_groads"
+\item \code{\link{calc_nlcd}}: "nlcd", "NLCD"
+\item \code{\link{calc_tri}}: "tri", "TRI"
+\item \code{\link{calc_nei}}: "nei", "NEI"
+\item \code{\link{calc_merra2}}: "merra", "MERRA", "merra2", "MERRA2"
+\item \code{\link{calc_gridmet}}: "gridMET", "gridmet"
+\item \code{\link{calc_terraclimate}}: "terraclimate", "TerraClimate"
 }
 }
 \author{

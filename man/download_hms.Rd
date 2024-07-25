@@ -52,7 +52,7 @@ respective sub-directories within \code{directory_to_save}.
 }
 \description{
 The \code{download_hms()} function accesses and downloads
-wildfire smoke plume coverage data from \href{https://www.ospo.noaa.gov/Products/land/hms.html#0}{NOAA's Hazard Mapping System Fire and Smoke Product}.
+wildfire smoke plume coverage data from \href{https://www.ospo.noaa.gov/products/land/hms.html#0}{NOAA's Hazard Mapping System Fire and Smoke Product}.
 }
 \examples{
 \dontrun{

@@ -12,6 +12,9 @@ process_sedac_codes(string, invert = FALSE)
 \item{invert}{logical(1). Default = FALSE. \code{invert = TRUE} assumes \code{string}
 provides resolution code, and returns full length resolution.}
 }
+\value{
+character
+}
 \description{
 Convert full length resolution name to/from resolution code.
 }

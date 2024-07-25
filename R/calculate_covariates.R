@@ -18,22 +18,22 @@
 #'  function.
 #' @note `covariate` argument value is converted to lowercase.
 #' @seealso
-#' - [`calc_modis_par`]: `"modis"`, `"MODIS"`
-#' - [`calc_koppen_geiger`]: `"koppen-geiger"`, `"koeppen-geiger"`, `"koppen"`
-#' - [`calc_ecoregion`]: `"ecoregion"`, `"ecoregions"`
-#' - [`calc_temporal_dummies`]: `"dummies"`
-#' - [`calc_hms`]: `"hms"`, `"smoke"`
-#' - [`calc_gmted`]: `"gmted"`
-#' - [`calc_narr`]: `"narr"`
-#' - [`calc_geos`]: `"geos"`, `"geos_cf"`
-#' - [`calc_sedac_population`]: `"population"`, `"sedac_population"`
-#' - [`calc_sedac_groads`]: `"roads"`, `"groads"`, `"sedac_groads"`
-#' - [`calc_nlcd`]: `"nlcd"`
-#' - [`calc_tri`]: `"tri"`
-#' - [`calc_nei`]: `"nei"`
-#' - [`calc_merra2`]: `"merra"`, `"MERRA"`, `"merra2"`, `"MERRA2"`
-#' - [`calc_gridmet`]: `"gridMET"`, `"gridmet"`
-#' - [`calc_terraclimate`]: `"terraclimate"`, `"TerraClimate"`
+#' * \code{\link{calc_modis_par}}: "modis", "MODIS"
+#' * \code{\link{calc_koppen_geiger}}: "koppen-geiger", "koeppen-geiger", "koppen"
+#' * \code{\link{calc_ecoregion}}: "ecoregion", "ecoregions"
+#' * \code{\link{calc_temporal_dummies}}: "dummies", "Dummies"
+#' * \code{\link{calc_hms}}: "hms", "smoke", "HMS"
+#' * \code{\link{calc_gmted}}: "gmted", "GMTED"
+#' * \code{\link{calc_narr}}: "narr", "NARR"
+#' * \code{\link{calc_geos}}: "geos", "geos_cf", "GEOS"
+#' * \code{\link{calc_sedac_population}}: "population", "sedac_population"
+#' * \code{\link{calc_sedac_groads}}: "roads", "groads", "sedac_groads"
+#' * \code{\link{calc_nlcd}}: "nlcd", "NLCD"
+#' * \code{\link{calc_tri}}: "tri", "TRI"
+#' * \code{\link{calc_nei}}: "nei", "NEI"
+#' * \code{\link{calc_merra2}}: "merra", "MERRA", "merra2", "MERRA2"
+#' * \code{\link{calc_gridmet}}: "gridMET", "gridmet"
+#' * \code{\link{calc_terraclimate}}: "terraclimate", "TerraClimate"
 #' @return Calculated covariates as a data.frame or SpatVector object
 #' @author Insang Song
 #' @examples
@@ -1128,15 +1128,15 @@ calc_temporal_dummies <-
 #'    - `attr(result, "sedc_threshold")``: the threshold distance
 #'  at which emission source points are excluded beyond that
 #' @note The function is originally from
-#' [chopin](https://github.com/kyle-messier/chopin)
+#' [chopin](https://github.com/NIEHS/chopin)
 #' Distance calculation is done with terra functions internally.
 #'  Thus, the function internally converts sf objects in
 #'  \code{point_*} arguments to terra.
 #'  The threshold should be carefully chosen by users.
 #' @author Insang Song
 #' @references
-#' * [Messier KP, Akita Y, & Serre ML. (2012). Integrating Address Geocoding, Land Use Regression, and Spatiotemporal Geostatistical Estimation for Groundwater Tetrachloroethylene. _Environmental Science & Technology_ 46(5), 2772-2780.](https://dx.doi.org/10.1021/es203152a)
-#' * Wiesner C. (n.d.). [Euclidean Sum of Exponentially Decaying Contributions Tutorial](https://mserre.sph.unc.edu/BMElab_web/SEDCtutorial/index.html)
+#' \insertRef{messier2012integrating}{amadeus}
+#' \insertRef{web_sedctutorial}{amadeus}
 #' @examples
 #' library(terra)
 #' library(sf)

@@ -45,7 +45,7 @@ vnp46a2 <- process_blackmarble(
     list.files("./data", pattern = "VNP46A2.", full.names = TRUE),
   date = "2024-01-01",
   tile_df =
-    process_blackmarble_corners(hrange = c(8, 10), vrange = c(4, 5))
+    process_blackmarble_corners(hrange = c(8, 10), vrange = c(4, 5)),
   subdataset = 3L,
   crs = "EPSG:4326"
 )

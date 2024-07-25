@@ -38,7 +38,7 @@ Get mosaicked or merged raster from multiple MODIS hdf files.
 \note{
 Curvilinear products (i.e., swaths) will not be accepted.
 MODIS products downloaded by functions in \code{amadeus},
-\href{https://cran.r-project.org/web/packages/MODISTools/index.html}{MODISTools},
+\href{https://cran.r-project.org/package=MODISTools}{MODISTools},
 and \href{https://github.com/rspatial/luna}{luna} are accepted.
 }
 \examples{

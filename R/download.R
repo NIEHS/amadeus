@@ -34,7 +34,7 @@
 #' * \code{\link{download_nei}}: `"nei"`, `"NEI"`
 #' * \code{\link{download_gridmet}}: `"gridMET"`, `"gridmet"`
 #' * \code{\link{download_terraclimate}}: `"TerraClimate"`, `"terraclimate"`
-#' @returns NULL
+#' @return NULL
 #' @examples
 #' \dontrun{
 #' download_data(
@@ -145,7 +145,7 @@ download_data <-
 #' @param remove_zip logical(1). Remove zip file from directory_to_download.
 #' Default \code{FALSE}.
 #' @author Mariana Kassien, Insang Song, Mitchell Manware
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -318,7 +318,7 @@ download_aqs <-
 #' @param remove_zip logical(1). Remove zip file from
 #' \code{directory_to_download}. Default \code{FALSE}.
 #' @author Insang Song
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom utils download.file
 #' @importFrom Rdpack reprompt
@@ -447,7 +447,7 @@ download_ecoregion <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; netCDF (.nc4) files will be stored in a
+#' @return NULL; netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
 #' @importFrom utils download.file
 #' @importFrom Rdpack reprompt
@@ -625,7 +625,7 @@ download_geos <- function(
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -777,7 +777,7 @@ download_gmted <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; netCDF (.nc4) files will be stored in a
+#' @return NULL; netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1188,7 +1188,7 @@ download_merra2 <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; netCDF (.nc) files will be stored in
+#' @return NULL; netCDF (.nc) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1340,7 +1340,7 @@ download_narr <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1499,7 +1499,7 @@ download_nlcd <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1657,7 +1657,7 @@ download_sedac_groads <- function(
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1824,7 +1824,7 @@ download_sedac_population <- function(
 #' Download wildfire smoke data
 #' @description
 #' The \code{download_hms()} function accesses and downloads
-#' wildfire smoke plume coverage data from [NOAA's Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html#0).
+#' wildfire smoke plume coverage data from [NOAA's Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#0).
 #' @param data_format character(1). "Shapefile" or "KML".
 #' @param date character(2). length of 10 each. Start/end date for downloading data.
 # nolint end
@@ -1851,7 +1851,7 @@ download_sedac_population <- function(
 #' @importFrom utils head
 #' @importFrom utils tail
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2040,7 +2040,7 @@ download_hms <- function(
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2192,7 +2192,7 @@ download_koppen_geiger <- function(
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
 #' @import rvest
-#' @returns NULL; HDF (.hdf) files will be stored in
+#' @return NULL; HDF (.hdf) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2565,7 +2565,7 @@ download_modis <- function(
 # nolint start
 #' Download toxic release data
 #' @description
-#' The \code{download_tri()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/find-understand-and-use-tri).
+#' The \code{download_tri()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-action-0).
 #' @param year character(2). length of 4 each. Start/end years for downloading data.
 # nolint end
 #' @param directory_to_save character(1). Directory to download files.
@@ -2578,7 +2578,7 @@ download_modis <- function(
 #' @param remove_command logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mariana Kassien, Insang Song
-#' @returns NULL; Comma-separated value (CSV) files will be stored in
+#' @return NULL; Comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2701,7 +2701,7 @@ download_tri <- function(
 #' Currently we bundle the pre-downloaded crt and its PEM (which is accepted
 #' in wget command) file in ./inst/extdata. The instruction above is for
 #' certificate updates in the future.
-#' @returns NULL; Zip and/or data files will be downloaded and stored in
+#' @return NULL; Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2822,7 +2822,7 @@ download_nei <- function(
 # nolint start
 #' Download OpenLandMap data
 #' @description
-#' Accesses and downloads OpenLandMap data from the [OpenLandMap website](https://www.openlandmap.org/).
+#' Accesses and downloads OpenLandMap data from the [OpenLandMap website](https://opengeohub.org/about-openlandmap/).
 #' @param product character(1). Available collection name in OpenLandMap
 #' STAC Catalog. [list_stac_files] with `id_only = TRUE` to see available collections.
 #' * "no2_s5p.l3.trop.tmwm"
@@ -2913,7 +2913,7 @@ download_nei <- function(
 #' @note `extdata/openlandmap_assets.rds` contains the available assets in OpenLandMap.
 #' Users may want to check the available assets to download data directly.
 #' For developers: JSON files should be found at STAC catalog of OpenLandMap when updated.
-#' @returns NULL; GeoTIFF (.tif) files will be stored in
+#' @return NULL; GeoTIFF (.tif) files will be stored in
 #' \code{directory_to_save}.
 #' @seealso [list_stac_files]
 #' @importFrom Rdpack reprompt
@@ -3024,7 +3024,7 @@ download_olm <- function(
 #' the text file containing download commands.
 #' @param unzip logical(1). Unzip the downloaded compressed files.
 #' Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.
-#' @returns NULL. Downloaded files will be stored in \code{directory_to_save}.
+#' @return NULL. Downloaded files will be stored in \code{directory_to_save}.
 #' @author Insang Song
 #' @importFrom Rdpack reprompt
 #' @references
@@ -3155,7 +3155,7 @@ download_huc <-
 #' Accesses and downloads United States Department of Agriculture
 #' CropScape Cropland Data Layer data from 
 #' the [USDA National Agricultural Statistics Service](https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.php) or the 
-#' [George Mason University website](https://https://nassgeodata.gmu.edu/CropScape/).
+#' [George Mason University website](https://nassgeodata.gmu.edu/CropScape/).
 #' @param year integer(1). Year of the data to download.
 #' @param source character(1). Data source, one of `c("USDA", "GMU")`.
 #' * `"USDA"` will download the national data from the USDA website (available in 2008-last year).
@@ -3174,7 +3174,7 @@ download_huc <-
 #' Default is \code{FALSE}.
 #' @author Insang Song
 #' @note JSON files should be found at STAC catalog of OpenLandMap
-#' @returns NULL; Yearly comma-separated value (CSV) files will be stored in
+#' @return NULL; Yearly comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @examples
 #' \dontrun{
@@ -3322,7 +3322,7 @@ download_cropscape <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Insang Song
-#' @returns NULL; .bil (normals) or single grid files depending on the format
+#' @return NULL; .bil (normals) or single grid files depending on the format
 #' choice will be stored in \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -3341,7 +3341,7 @@ download_cropscape <- function(
 #' )
 #' }
 #' @references
-#' * [PRISM Climate Group](http://www.prism.oregonstate.edu/)
+#' * [PRISM Climate Group](https://prism.oregonstate.edu/)
 #' * [PRISM Web Service Guide](https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf)
 #' @export
 # nolint end
@@ -3458,7 +3458,7 @@ download_prism <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware
-#' @returns NULL; netCDF (.nc) files will be stored in a variable-specific
+#' @return NULL; netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -3468,7 +3468,7 @@ download_prism <- function(
 #' download_gridmet(
 #'   variables = "Precipitation",
 #'   year = c(2023, 2024),
-#'   directory_to_save = "./data"
+#'   directory_to_save = "./data",
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -3600,7 +3600,7 @@ download_gridmet <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @returns NULL; netCDF (.nc) files will be stored in a variable-specific
+#' @return NULL; netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -3610,7 +3610,7 @@ download_gridmet <- function(
 #' download_terraclimate(
 #'   variables = "Precipitation",
 #'   year = c(2023, 2024),
-#'   directory_to_save = "./data"
+#'   directory_to_save = "./data",
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE

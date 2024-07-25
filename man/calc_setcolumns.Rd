@@ -18,6 +18,9 @@ function.}
 \item{locs_id}{character(1). Column containing identifier for each unique
 coordinate location.}
 }
+\value{
+a data.frame or SpatVector object (depending on \code{from})
+}
 \description{
 Apply standard column names to calculated covariates consistent with
 the requirements of the \code{beethoven} package. Column names follow fixed

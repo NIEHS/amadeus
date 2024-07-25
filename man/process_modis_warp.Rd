@@ -22,7 +22,7 @@ output rectilinear grid raster.}
 
 \item{crs}{integer(1)/character(1). Coordinate system definition.
 Should be compatible with EPSG codes or WKT2.
-See \code{\link[terra:crs]{terra::crs}} and \code{\link[sf:st_crs]{sf::st_crs}} / \href{https://www.epsg.io}{EPSG}}
+See \code{\link[terra:crs]{terra::crs}} and \code{\link[sf:st_crs]{sf::st_crs}} / \href{https://epsg.io/}{EPSG}}
 
 \item{...}{For internal use.}
 }

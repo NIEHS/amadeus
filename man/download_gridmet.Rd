@@ -47,7 +47,7 @@ The \code{download_gridmet} function accesses and downloads gridded surface mete
 download_gridmet(
   variables = "Precipitation",
   year = c(2023, 2024),
-  directory_to_save = "./data"
+  directory_to_save = "./data",
   acknowledgement = TRUE,
   download = TRUE,
   remove_command = TRUE
