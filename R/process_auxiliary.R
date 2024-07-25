@@ -553,7 +553,7 @@ is_date_proper <- function(
 #' @importFrom terra ext
 #' @return sf/terra object with the extent applied.
 #' @keywords internal
-#' @export 
+#' @export
 apply_extent <-
   function(data, extent, geom) {
     extent <- terra::ext(extent)
