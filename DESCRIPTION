@@ -11,10 +11,11 @@ Authors@R: c(
 Maintainer: Kyle Messier <kyle.messier@nih.gov>
 Description: Functions are designed to facilitate access to and utility with large scale, publicly available environmental data in R. The package contains functions for downloading (download_data()) raw data files from web URLs, processing (process_covariates()) the raw data files into clean spatial objects, and extracting values (calc_covariates()) from the spatial data objects at point and polygon locations. These functions call a series of source-specific functions which are tailored to each data sources/datasets particular URL structure, data format, and spatial/temporal resolution. The functions are tested, versioned, and open source and open access.
 Depends: R (>= 4.1.0)
-Imports: dplyr, sf, sftime, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringi, testthat (>= 3.0.0), parallelly, stars, future, future.apply, tidyr, rlang, rstac, nhdplusTools, archive, collapse, Rdpack
+Imports: dplyr, sf, sftime, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringi, testthat (>= 3.0.0), parallelly, stars, future, future.apply, tidyr, rlang, nhdplusTools, archive, collapse, Rdpack
 Suggests: covr, withr, knitr, rmarkdown, lwgeom, FNN, doRNG, devtools, stringr
 RdMacros: Rdpack
 Encoding: UTF-8
+VignetteBuilder: knitr, rmarkdown
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Config/Needs/website: tidyverse/tidytemplate
