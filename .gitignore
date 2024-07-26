@@ -37,6 +37,7 @@
 
 # pkgdown site
 docs/
+doc/
 
 # translation temp files
 po/*~
@@ -50,3 +51,6 @@ rsconnect/
 
 # custom linter dev
 \.github/linters
+/doc/
+/Meta/
+inst/doc

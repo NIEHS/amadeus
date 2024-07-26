@@ -17,5 +17,9 @@ pkgdown
 output
 manuscript
 input
-tests
-vignettes/epa_download.Rmd
+test
+^doc$
+^Meta$
+docs/
+help/
+^vignettes/
