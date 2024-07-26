@@ -19,5 +19,3 @@ testthat::test_that("process_olm", {
   )
 })
 # nolint end
-
-

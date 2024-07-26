@@ -1,8 +1,9 @@
 
-testthat::test_that("list_stac_files returns a character vector of file links", {
+testthat::test_that("list_stac_files returns character vector of file links", {
   withr::local_package("rstac")
   # Set up test data
-  stac_json <- "https://s3.eu-central-1.wasabisys.com/stac/openlandmap/catalog.json"
+  stac_json <-
+    "https://s3.eu-central-1.wasabisys.com/stac/openlandmap/catalog.json"
   format <- "tif"
   which <- 35
 

@@ -276,5 +276,3 @@ process_olm <-
     olm <- terra::rast(path, win = extent)
     return(olm)
   }
-
-
