@@ -1824,7 +1824,7 @@ testthat::test_that("calc_covariates wrapper works", {
       "gmted", "narr", "geos",
       "sedac_population", "population", "nlcd",
       "merra", "MERRA", "merra2", "MERRA2",
-      "tri", "nei")
+      "tri", "nei", "prism", "huc", "cdl")
   for (cand in candidates) {
     testthat::expect_error(
       calc_covariates(covariate = cand)

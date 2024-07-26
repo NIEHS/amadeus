@@ -9,7 +9,7 @@ process_covariates(
     "koeppen-geiger", "koppen", "koeppen", "geos", "dummies", "gmted", "hms", "smoke",
     "sedac_population", "population", "sedac_groads", "groads", "roads", "nlcd", "tri",
     "narr", "nei", "ecoregions", "ecoregion", "merra", "merra2", "gridmet",
-    "terraclimate", "huc", "cropscape", "cdl", "prism", "olm", "openlandmap"),
+    "terraclimate", "huc", "cropscape", "cdl", "prism"),
   path = NULL,
   ...
 )
@@ -66,7 +66,6 @@ narr <- process_covariates(
 \item \code{\link{process_huc}}: "huc", "HUC"
 \item \code{\link{process_cropscape}}: "cropscape", "cdl"
 \item \code{\link{process_prism}}: "prism", "PRISM"
-\item \code{\link{process_olm}}: "olm", "openlandmap"
 }
 }
 \author{
