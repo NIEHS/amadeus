@@ -6,8 +6,7 @@ testthat::test_that("Error when acknowledgement = FALSE", {
                          "nlcd", "noaa", "sedac_groads",
                          "sedac_population", "groads", "population",
                          "hms", "smoke", "gridmet",
-                         "terraclimate", "huc", "cropscape", "cdl", "prism",
-                         "olm", "openlandmap")
+                         "terraclimate", "huc", "cropscape", "cdl", "prism")
   for (d in seq_along(download_datasets)) {
     expect_error(
       download_data(dataset_name = download_datasets[d],
@@ -24,8 +23,7 @@ testthat::test_that("Error when one parameter is NULL.", {
                          "nlcd", "noaa", "sedac_groads",
                          "sedac_population", "groads", "population",
                          "hms", "smoke", "gridmet",
-                         "terraclimate", "huc", "cropscape", "cdl", "prism",
-                         "olm", "openlandmap")
+                         "terraclimate", "huc", "cropscape", "cdl", "prism")
   for (d in seq_along(download_datasets)) {
     expect_error(
       download_data(dataset_name = download_datasets[d],
@@ -1667,36 +1665,6 @@ testthat::test_that("download_prism downloads the correct data files", {
 })
 
 
-testthat::test_that("list_stac_files returns a character vector of file links", {
-  withr::local_package("rstac")
-  # Set up test data
-  stac_json <- "https://s3.eu-central-1.wasabisys.com/stac/openlandmap/catalog.json"
-  format <- "tif"
-  which <- 35
-
-  # Call the function
-  testthat::expect_message(
-    result <- list_stac_files(stac_json, format, which)
-  )
-  # Check the return type
-  testthat::expect_true(is.character(result))
-  # Check if all elements end with the specified format
-  testthat::expect_true(all(grepl(sprintf("%s$", format), result)))
-
-  # string search keyword
-  keyword <- "bulkdens"
-  testthat::expect_message(
-    result1 <- list_stac_files(stac_json, format, keyword)
-  )
-  testthat::expect_true(is.character(result1))
-
-  # retrieve ids only
-  testthat::expect_no_error(
-    result2 <- list_stac_files(stac_json, format, keyword, id_only = TRUE)
-  )
-  testthat::expect_true(is.character(result2))
-
-})
 
 
 testthat::test_that("download_huc works",
@@ -1756,55 +1724,6 @@ testthat::test_that("download_huc works",
       unlink(directory_to_save, recursive = TRUE)
   })
 
-
-testthat::test_that(
-  "Download OpenLandMap using STAC",
-  {
-    withr::local_package("rstac")
-    links <-
-      readRDS(
-        system.file("extdata", "openlandmap_assets.rds", package = "amadeus")
-      )
-    product <- "no2_s5p.l3.trop.tmwm"
-    format <- "p50_p90_2km*.*tif"
-    directory_to_save <- testthat::test_path("..", "testdata", "olm_temp/")
-    acknowledgement <- TRUE
-    download <- FALSE
-
-    testthat::expect_no_error(
-      download_olm(
-        product = product,
-        format = format,
-        directory_to_save = directory_to_save,
-        acknowledgement = acknowledgement,
-        download = download,
-        remove_command = FALSE
-      )
-    )
-
-    commands_path <- paste0(
-      directory_to_save,
-      "OLM_queried_",
-      product,
-      "_",
-      Sys.Date(),
-      "_wget_commands.txt"
-    )
-    # import commands
-    commands <- read_commands(commands_path = commands_path)
-    # extract urls
-    urls <- extract_urls(commands = commands, position = 5)
-    # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
-    # implement unit tests
-    test_download_functions(directory_to_save = directory_to_save,
-                            commands_path = commands_path,
-                            url_status = url_status)
-    # remove file with commands after test
-    file.remove(commands_path)
-    unlink(directory_to_save, recursive = TRUE)
-  }
-)
 
 testthat::test_that("download_sink test", {
   testfile <- testthat::test_path("../testdata", "sink_test.txt")

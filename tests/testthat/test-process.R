@@ -74,7 +74,7 @@ testthat::test_that("test generic process_covariates", {
                    "sedac_groads", "groads", "roads",
                    "nlcd", "narr", "nei",
                    "ecoregions", "ecoregion", "huc", "cropscape", "cdl",
-                   "prism", "olm", "openlandmap", "terraclimate", "gridmet")
+                   "prism", "terraclimate", "gridmet")
   for (cty in covar_types) {
     testthat::expect_error(
       process_covariates(
@@ -1757,26 +1757,6 @@ testthat::test_that("process_huc",
   }
 )
 
-# test OpenLandMap ####
-# nolint start
-testthat::test_that("process_olm", {
-  withr::local_package("terra")
-  tmwm <- testthat::test_path("..", "testdata", "openlandmap",
-    "no2_s5p.l3.trop.tmwm.p50_p90_2km_a_20180501_20221130_go_epsg.4326_v20221219_test.tif")
-  testthat::expect_no_error(
-    olm <- process_olm(path = tmwm)
-  )
-  testthat::expect_s4_class(olm, "SpatRaster")
-  testthat::expect_error(
-    process_olm(path = 1L)
-  )
-
-  # test with cropping extent
-  testthat::expect_no_error(
-    olm_ext <- process_olm(path = tmwm, extent = terra::ext(olm))
-  )
-})
-# nolint end
 
 # AUX tests ####
 testthat::test_that("loc_radius tests", {

@@ -17,9 +17,6 @@ pkgdown
 output
 manuscript
 input
-test
-^doc$
-^Meta$
-docs/
-help/
-^vignettes/
+tests
+vignettes/epa_download.Rmd
+R/olm_functions.R
