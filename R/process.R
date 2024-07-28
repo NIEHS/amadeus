@@ -32,7 +32,6 @@
 #' * \code{\link{process_huc}}: "huc", "HUC"
 #' * \code{\link{process_cropscape}}: "cropscape", "cdl"
 #' * \code{\link{process_prism}}: "prism", "PRISM"
-#' * \code{\link{process_olm}}: "olm", "openlandmap"
 #' @return `SpatVector`, `SpatRaster`, `sf`, or `character` depending on
 #' covariate type and selections.
 #' @author Insang Song
@@ -60,7 +59,7 @@ process_covariates <-
                   "nlcd", "tri", "narr", "nei",
                   "ecoregions", "ecoregion",
                   "merra", "merra2", "gridmet", "terraclimate",
-                  "huc", "cropscape", "cdl", "prism", "olm", "openlandmap"),
+                  "huc", "cropscape", "cdl", "prism"),
     path = NULL,
     ...
   ) {
@@ -98,9 +97,7 @@ process_covariates <-
       huc = process_huc,
       cropscape = process_cropscape,
       cdl = process_cropscape,
-      prism = process_prism,
-      olm = process_olm,
-      openlandmap = process_olm
+      prism = process_prism
     )
 
     res_covariate <-
@@ -2939,36 +2936,3 @@ process_prism <-
     return(prism)
   }
 # nolint end
-
-
-#' Process OpenLandMap data
-#' @param path character giving OpenLandMap data path
-#' @param extent numeric(4) or SpatExtent giving the extent of the raster
-#'   if `NULL` (default), the entire raster is loaded
-#' @param ... Placeholders.
-#' @return a `SpatRaster` object
-#' @author Insang Song
-#' @importFrom terra rast
-#' @examples
-#' \dontrun{
-#' olm <- process_olm(
-#'   path = paste0(
-#'     "./data/no2_s5p.l3.trop.tmwm.p50_p90_2km_a_",
-#'     "20180501_20221130_go_epsg.4326_v20221219.tif"
-#'  )
-#' )
-#' }
-#' @export
-process_olm <-
-  function(
-    path = NULL,
-    extent = NULL,
-    ...
-  ) {
-    # check inputs
-    if (!is.character(path) || is.null(path)) {
-      stop("path is not a character.")
-    }
-    olm <- terra::rast(path, win = extent)
-    return(olm)
-  }

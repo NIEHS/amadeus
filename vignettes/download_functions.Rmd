@@ -9,13 +9,19 @@ date: "2024-07-09"
 author: "Mitchell Manware"
 ---
 
-```{r, echo = FALSE, warning = FALSE, message = FALSE, results = "hide"}
+```{r, include = FALSE}
 # packages
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
 library(knitr)
 library(testthat)
 library(devtools)
-# source functions
-devtools::load_all("../")
+```
+
+```{r setup}
+library(amadeus)
 ```
 
 ## Motivation
@@ -86,7 +92,7 @@ link <- c(
   "https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/",
   "https://psl.noaa.gov/data/gridded/data.narr.html",
   "https://www.mrlc.gov/data",
-  "https://www.ospo.noaa.gov/Products/land/hms.html#0",
+  "https://www.ospo.noaa.gov/products/land/hms.html#0",
   paste0(
     "https://sedac.ciesin.columbia.edu/data/set/groads-",
     "global-roads-open-access-v1/data-download"

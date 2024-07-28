@@ -20,7 +20,7 @@ This vignette will demonstrate how to create and log into a NASA EarthData Accou
 
 ## NASA EarthData Account
 
-Visit [https://urs.earthdata.nasa.gov/](http://urs.earthdata.nasa.gov) to register for or log into a NASA EarthData account.
+Visit [https://urs.earthdata.nasa.gov/](https://urs.earthdata.nasa.gov/) to register for or log into a NASA EarthData account.
 
 ![NASA EarthData Account Landing Page](images/NASA_EarthData_login.png)
 
