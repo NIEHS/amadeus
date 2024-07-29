@@ -56,8 +56,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>download_data</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>download_data</h1>
                         <h4 data-toc-skip class="author">Mitchell
 Manware</h4>
             
@@ -69,6 +68,8 @@ Manware</h4>
 
     
     
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/NIEHS/amadeus" class="external-link">amadeus</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
@@ -163,7 +164,7 @@ SEDAC UN WPP-Adjusted Population Density</a></td>
 <tr class="even">
 <td align="left">9</td>
 <td align="left">download_hms</td>
-<td align="left"><a href="https://www.ospo.noaa.gov/Products/land/hms.html#0" class="external-link">NOAA Hazard
+<td align="left"><a href="https://www.ospo.noaa.gov/products/land/hms.html#0" class="external-link">NOAA Hazard
 Mapping System Fire and Smoke Product</a></td>
 </tr>
 <tr class="odd">
@@ -233,15 +234,14 @@ messages produced by each differ slightly.</p>
 <p>User-defined parameters differ based on the data source. Required
 parameters for each source can be checked with
 <code>names(formals())</code>.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_hms</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "data_format"       "date"              "directory_to_save"</span></span>
-<span><span class="co">## [4] "acknowledgement"   "download"          "remove_command"   </span></span>
-<span><span class="co">## [7] "unzip"             "remove_zip"</span></span></code></pre>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_narr</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "variables"         "year"              "directory_to_save"</span></span>
-<span><span class="co">## [4] "acknowledgement"   "download"          "remove_command"</span></span></code></pre>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_hms</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "data_format"       "date"              "directory_to_save"</span></span>
+<span><span class="co">#&gt; [4] "acknowledgement"   "download"          "remove_command"   </span></span>
+<span><span class="co">#&gt; [7] "unzip"             "remove_zip"</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_narr</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "variables"         "year"              "directory_to_save"</span></span>
+<span><span class="co">#&gt; [4] "acknowledgement"   "download"          "remove_command"</span></span></code></pre></div>
 <p>The two functions have different required parameters because
 <code>download_hms</code> uses a daily temporal resolution while
 <code>download_narr</code> uses yearly, but they share some common,
@@ -321,18 +321,18 @@ parameters themselves and the desired URL to be created. A common
 parameter cleaning step is creating a date-time sequence based on a
 given temporal range and required format, in this case
 <code>YYYYMMDD</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># user defined parameters</span></span>
 <span><span class="va">dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2023-12-28"</span>, <span class="st">"2024-01-02"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">date_sequence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">dates</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, format <span class="op">=</span> <span class="st">"%Y-%m-%d"</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">dates</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, format <span class="op">=</span> <span class="st">"%Y-%m-%d"</span><span class="op">)</span>,</span>
 <span>  <span class="st">"day"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">date_sequence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"-"</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">date_sequence</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">date_sequence</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "20231228" "20231229" "20231230" "20231231" "20240101" "20240102"</span></span></code></pre>
+<span><span class="va">date_sequence</span></span>
+<span><span class="co">#&gt; [1] "20231228" "20231229" "20231230" "20231231" "20240101" "20240102"</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="generate-download-urls">2. Generate download URLs<a class="anchor" aria-label="anchor" href="#generate-download-urls"></a>
@@ -341,11 +341,11 @@ given temporal range and required format, in this case
 download link on the source-specific web page. <code>download_hms</code>
 utilizes the year, month, date, and data format to generate the download
 url.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># user defined parameters</span></span>
 <span><span class="va">data_format</span> <span class="op">&lt;-</span> <span class="st">"Shapefile"</span></span>
 <span><span class="va">suffix</span> <span class="op">&lt;-</span> <span class="st">".zip"</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">urls</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">d</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">date_sequence</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">year</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">date_sequence</span><span class="op">[</span><span class="va">d</span><span class="op">]</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span></span>
@@ -364,13 +364,13 @@ url.</p>
 <span>  <span class="op">)</span></span>
 <span>  <span class="va">urls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">urls</span>, <span class="va">url</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="va">urls</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231228.zip"</span></span>
-<span><span class="co">## [2] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231229.zip"</span></span>
-<span><span class="co">## [3] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231230.zip"</span></span>
-<span><span class="co">## [4] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231231.zip"</span></span>
-<span><span class="co">## [5] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2024/01/hms_smoke20240101.zip"</span></span>
-<span><span class="co">## [6] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2024/01/hms_smoke20240102.zip"</span></span></code></pre>
+<span><span class="va">urls</span></span>
+<span><span class="co">#&gt; [1] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231228.zip"</span></span>
+<span><span class="co">#&gt; [2] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231229.zip"</span></span>
+<span><span class="co">#&gt; [3] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231230.zip"</span></span>
+<span><span class="co">#&gt; [4] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231231.zip"</span></span>
+<span><span class="co">#&gt; [5] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2024/01/hms_smoke20240101.zip"</span></span>
+<span><span class="co">#&gt; [6] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2024/01/hms_smoke20240102.zip"</span></span></code></pre></div>
 <p>A download URL is created for each date in <code>date_sequence</code>
 based on the fixed pattern.</p>
 </div>
@@ -383,10 +383,10 @@ name, spatiotemporal characteristic, data type, and, if applicable,
 specific variable name. Unlike the download URLs, the download file
 names can be defined in any way by the writer of the function, but using
 the previously defined characteristics is useful for identification.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># user defined parameters</span></span>
 <span><span class="va">directory_to_download</span> <span class="op">&lt;-</span> <span class="st">"./data/"</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">download_file_names</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">d</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">date_sequence</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">download_file_name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
@@ -399,13 +399,13 @@ the previously defined characteristics is useful for identification.</p>
 <span>  <span class="op">)</span></span>
 <span>  <span class="va">download_file_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">download_file_names</span>, <span class="va">download_file_name</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="va">download_file_names</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "./data/hms_smoke_Shapefile_20231228.zip"</span></span>
-<span><span class="co">## [2] "./data/hms_smoke_Shapefile_20231229.zip"</span></span>
-<span><span class="co">## [3] "./data/hms_smoke_Shapefile_20231230.zip"</span></span>
-<span><span class="co">## [4] "./data/hms_smoke_Shapefile_20231231.zip"</span></span>
-<span><span class="co">## [5] "./data/hms_smoke_Shapefile_20240101.zip"</span></span>
-<span><span class="co">## [6] "./data/hms_smoke_Shapefile_20240102.zip"</span></span></code></pre>
+<span><span class="va">download_file_names</span></span>
+<span><span class="co">#&gt; [1] "./data/hms_smoke_Shapefile_20231228.zip"</span></span>
+<span><span class="co">#&gt; [2] "./data/hms_smoke_Shapefile_20231229.zip"</span></span>
+<span><span class="co">#&gt; [3] "./data/hms_smoke_Shapefile_20231230.zip"</span></span>
+<span><span class="co">#&gt; [4] "./data/hms_smoke_Shapefile_20231231.zip"</span></span>
+<span><span class="co">#&gt; [5] "./data/hms_smoke_Shapefile_20240101.zip"</span></span>
+<span><span class="co">#&gt; [6] "./data/hms_smoke_Shapefile_20240102.zip"</span></span></code></pre></div>
 <p>A download URL is created for each date in <code>date_sequence</code>
 based on the fixed pattern.</p>
 </div>
@@ -432,7 +432,7 @@ download allows for unit testing and URL checking (more on this in <a href="#uni
 </ul>
 <p>The text file containing the download commands is named based on the
 dataset, temporal range, and data transfer method.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">commands_txt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
 <span>  <span class="va">directory_to_download</span>,</span>
 <span>  <span class="st">"hms_smoke_"</span>,</span>
@@ -442,7 +442,7 @@ dataset, temporal range, and data transfer method.</p>
 <span>  <span class="st">"_curl_commands.txt"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Create and sink the text file.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span><span class="va">commands_txt</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -460,7 +460,7 @@ two data transfer methods utilized by the data download functions, see
 <p>The <code><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat()</a></code> function will store each of the download
 commands written in the <code>for</code> loop to the previously sunk
 commands text file (<code>commands_txt</code>).</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">d</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">date_sequence</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">download_comamnd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
 <span>    <span class="st">"curl -s -o "</span>,</span>
@@ -478,7 +478,7 @@ commands text file (<code>commands_txt</code>).</p>
 <p>After the download commands have been concatenated to the commands
 text file, a second <code>sink</code> command is run to finalize the
 file and stop the appending of R output.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -489,21 +489,21 @@ commands stored in the commands text file. In bash script,
 <code>.</code> indicates to run all of the commands within a given
 script. In this case, we will run all of the commands within the
 commands text file.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">system_command</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
 <span>  <span class="st">". "</span>,</span>
 <span>  <span class="va">commands_txt</span>,</span>
 <span>  <span class="st">"\n"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">system_command</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] ". ./data/hms_smoke_20231228_20240102_curl_commands.txt\n"</span></span></code></pre>
+<span><span class="va">system_command</span></span>
+<span><span class="co">#&gt; [1] ". ./data/hms_smoke_20231228_20240102_curl_commands.txt\n"</span></span></code></pre></div>
 <p>Running the <code>system_command</code> deploys an “auxiliary”
 function, <code>download_run</code>, a function created to reduce
 repeated code across the source-specific download functions. The
 function takes two parameters, <code>system_command</code>, which
 indicates the command to be run, and <code>download</code>, a
 user-defined logical parameter.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">download_run</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>    <span class="va">download</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    <span class="va">system_command</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span></span>
@@ -518,18 +518,18 @@ user-defined logical parameter.</p>
 <span><span class="op">}</span></span></code></pre></div>
 <p>The data download is initiated by running <code>download_run</code>
 with the system command identified and <code>download = TRUE</code>.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/download_run.html">download_run</a></span><span class="op">(</span></span>
 <span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  system_command <span class="op">=</span> <span class="va">system_command</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Checking the download directory shows that all of the requested files
 have been downloaded.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">directory_to_download</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "hms_smoke_Shapefile_20231228.zip" "hms_smoke_Shapefile_20231229.zip"</span></span>
-<span><span class="co">## [3] "hms_smoke_Shapefile_20231230.zip" "hms_smoke_Shapefile_20231231.zip"</span></span>
-<span><span class="co">## [5] "hms_smoke_Shapefile_20240101.zip" "hms_smoke_Shapefile_20240102.zip"</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; [1] "hms_smoke_Shapefile_20231228.zip" "hms_smoke_Shapefile_20231229.zip"</span></span>
+<span><span class="co">#&gt; [3] "hms_smoke_Shapefile_20231230.zip" "hms_smoke_Shapefile_20231231.zip"</span></span>
+<span><span class="co">#&gt; [5] "hms_smoke_Shapefile_20240101.zip" "hms_smoke_Shapefile_20240102.zip"</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="zip-files-if-applicable">8. Zip files (if applicable)<a class="anchor" aria-label="anchor" href="#zip-files-if-applicable"></a>
@@ -543,7 +543,7 @@ are run by the user-defined <code>unzip</code> and
 <p><code>download_unzip</code> inflates zip files if
 <code>unzip = TRUE</code>, and skips inflation if
 <code>unzip = FALSE</code>.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">download_unzip</span> <span class="op">&lt;-</span></span>
 <span>  <span class="kw">function</span><span class="op">(</span><span class="va">file_name</span>,</span>
 <span>           <span class="va">directory_to_unzip</span>,</span>
@@ -565,7 +565,7 @@ are run by the user-defined <code>unzip</code> and
 <p><code>download_remove_zips</code> removes the downloaded zip files if
 <code>remove = TRUE</code>, and skips removal if
 <code>remove = FALSE</code>.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">download_remove_zips</span> <span class="op">&lt;-</span></span>
 <span>  <span class="kw">function</span><span class="op">(</span><span class="va">remove</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>           <span class="va">download_name</span><span class="op">)</span> <span class="op">{</span></span>
@@ -577,7 +577,7 @@ are run by the user-defined <code>unzip</code> and
 <span>  <span class="op">}</span></span></code></pre></div>
 <p>For this demonstration we will unzip (inflate) the downloaded zip
 files but we will not delete them.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">f</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">download_file_names</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/download_unzip.html">download_unzip</a></span><span class="op">(</span></span>
 <span>    file_name <span class="op">=</span> <span class="va">download_file_names</span><span class="op">[</span><span class="va">f</span><span class="op">]</span>,</span>
@@ -589,37 +589,37 @@ files but we will not delete them.</p>
 <span>  download_name <span class="op">=</span> <span class="va">download_file_names</span>,</span>
 <span>  remove <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Unzipping files...</span></span>
-<span><span class="co">## Files unzipped and saved in ./data/.</span></span>
-<span><span class="co">## Unzipping files...</span></span>
-<span><span class="co">## Files unzipped and saved in ./data/.</span></span>
-<span><span class="co">## Unzipping files...</span></span>
-<span><span class="co">## Files unzipped and saved in ./data/.</span></span>
-<span><span class="co">## Unzipping files...</span></span>
-<span><span class="co">## Files unzipped and saved in ./data/.</span></span>
-<span><span class="co">## Unzipping files...</span></span>
-<span><span class="co">## Files unzipped and saved in ./data/.</span></span>
-<span><span class="co">## Unzipping files...</span></span>
-<span><span class="co">## Files unzipped and saved in ./data/.</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Unzipping files...</span></span>
+<span><span class="co">#&gt; Files unzipped and saved in ./data/.</span></span>
+<span><span class="co">#&gt; Unzipping files...</span></span>
+<span><span class="co">#&gt; Files unzipped and saved in ./data/.</span></span>
+<span><span class="co">#&gt; Unzipping files...</span></span>
+<span><span class="co">#&gt; Files unzipped and saved in ./data/.</span></span>
+<span><span class="co">#&gt; Unzipping files...</span></span>
+<span><span class="co">#&gt; Files unzipped and saved in ./data/.</span></span>
+<span><span class="co">#&gt; Unzipping files...</span></span>
+<span><span class="co">#&gt; Files unzipped and saved in ./data/.</span></span>
+<span><span class="co">#&gt; Unzipping files...</span></span>
+<span><span class="co">#&gt; Files unzipped and saved in ./data/.</span></span></code></pre>
 <p>Listing the files again shows that the contents of the zip files have
 been inflated and the zip files have been retained.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">directory_to_download</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "hms_smoke_Shapefile_20231228.zip" "hms_smoke_Shapefile_20231229.zip"</span></span>
-<span><span class="co">##  [3] "hms_smoke_Shapefile_20231230.zip" "hms_smoke_Shapefile_20231231.zip"</span></span>
-<span><span class="co">##  [5] "hms_smoke_Shapefile_20240101.zip" "hms_smoke_Shapefile_20240102.zip"</span></span>
-<span><span class="co">##  [7] "hms_smoke20231228.dbf"            "hms_smoke20231228.prj"           </span></span>
-<span><span class="co">##  [9] "hms_smoke20231228.shp"            "hms_smoke20231228.shx"           </span></span>
-<span><span class="co">## [11] "hms_smoke20231229.dbf"            "hms_smoke20231229.prj"           </span></span>
-<span><span class="co">## [13] "hms_smoke20231229.shp"            "hms_smoke20231229.shx"           </span></span>
-<span><span class="co">## [15] "hms_smoke20231230.dbf"            "hms_smoke20231230.prj"           </span></span>
-<span><span class="co">## [17] "hms_smoke20231230.shp"            "hms_smoke20231230.shx"           </span></span>
-<span><span class="co">## [19] "hms_smoke20231231.dbf"            "hms_smoke20231231.prj"           </span></span>
-<span><span class="co">## [21] "hms_smoke20231231.shp"            "hms_smoke20231231.shx"           </span></span>
-<span><span class="co">## [23] "hms_smoke20240101.dbf"            "hms_smoke20240101.prj"           </span></span>
-<span><span class="co">## [25] "hms_smoke20240101.shp"            "hms_smoke20240101.shx"           </span></span>
-<span><span class="co">## [27] "hms_smoke20240102.dbf"            "hms_smoke20240102.prj"           </span></span>
-<span><span class="co">## [29] "hms_smoke20240102.shp"            "hms_smoke20240102.shx"</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;  [1] "hms_smoke_Shapefile_20231228.zip" "hms_smoke_Shapefile_20231229.zip"</span></span>
+<span><span class="co">#&gt;  [3] "hms_smoke_Shapefile_20231230.zip" "hms_smoke_Shapefile_20231231.zip"</span></span>
+<span><span class="co">#&gt;  [5] "hms_smoke_Shapefile_20240101.zip" "hms_smoke_Shapefile_20240102.zip"</span></span>
+<span><span class="co">#&gt;  [7] "hms_smoke20231228.dbf"            "hms_smoke20231228.prj"           </span></span>
+<span><span class="co">#&gt;  [9] "hms_smoke20231228.shp"            "hms_smoke20231228.shx"           </span></span>
+<span><span class="co">#&gt; [11] "hms_smoke20231229.dbf"            "hms_smoke20231229.prj"           </span></span>
+<span><span class="co">#&gt; [13] "hms_smoke20231229.shp"            "hms_smoke20231229.shx"           </span></span>
+<span><span class="co">#&gt; [15] "hms_smoke20231230.dbf"            "hms_smoke20231230.prj"           </span></span>
+<span><span class="co">#&gt; [17] "hms_smoke20231230.shp"            "hms_smoke20231230.shx"           </span></span>
+<span><span class="co">#&gt; [19] "hms_smoke20231231.dbf"            "hms_smoke20231231.prj"           </span></span>
+<span><span class="co">#&gt; [21] "hms_smoke20231231.shp"            "hms_smoke20231231.shx"           </span></span>
+<span><span class="co">#&gt; [23] "hms_smoke20240101.dbf"            "hms_smoke20240101.prj"           </span></span>
+<span><span class="co">#&gt; [25] "hms_smoke20240101.shp"            "hms_smoke20240101.shx"           </span></span>
+<span><span class="co">#&gt; [27] "hms_smoke20240102.dbf"            "hms_smoke20240102.prj"           </span></span>
+<span><span class="co">#&gt; [29] "hms_smoke20240102.shp"            "hms_smoke20240102.shx"</span></span></code></pre>
 <p>The download function was structured successfully.</p>
 </div>
 </div>
@@ -639,7 +639,7 @@ and accessible. Like the download functions, the unit tests rely on
 </h3>
 <p><code>read_commands</code> imports the commands text file and
 converts the data frame to a vector.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">read_commands</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>    <span class="va">commands_path</span> <span class="op">=</span> <span class="va">commands_path</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">commands</span> <span class="op">&lt;-</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">commands_path</span>, header <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -650,7 +650,7 @@ converts the data frame to a vector.</p>
 of commands. The <code>position</code> of the URL within the download
 command is determined in <a href="#concatenate-download-commands">5.
 Concatenate download commands</a>.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># function to extract URLs from vector</span></span>
 <span><span class="va">extract_urls</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>    <span class="va">commands</span> <span class="op">=</span> <span class="va">commands</span>,</span>
@@ -675,7 +675,7 @@ value to indicate whether the URL returns HTTP status 200
 (<code>TRUE</code>) or not (<code>FALSE</code>). For more information on
 HTTP status’, see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status" class="external-link">HTTP
 response status codes</a>.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">check_url_status</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>    <span class="va">url</span>,</span>
 <span>    <span class="va">method</span> <span class="op">=</span> <span class="st">"HEAD"</span><span class="op">)</span> <span class="op">{</span></span>
@@ -693,7 +693,7 @@ random sample of URLs extracted by <code>extract_urls</code>. The sample
 size will vary based on the dataset and spatio-temporal parameters being
 tested. The function returns a logical vector containing the output from
 <code>check_url_status</code>.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">check_urls</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>    <span class="va">urls</span> <span class="op">=</span> <span class="va">urls</span>,</span>
 <span>    <span class="va">size</span> <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -719,7 +719,7 @@ tested. The function returns a logical vector containing the output from
 <p>To demonstrate a test in action, test the URLs generated by
 <code>download_data</code> for the NOAA HMS Smoke dataset.</p>
 <p>For more information see <a href="https://testthat.r-lib.org/" class="external-link">testthat</a>.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org" class="external-link">testthat</a></span><span class="op">)</span></span>
 <span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Valid dates return HTTP response status = 200."</span>,</span>
@@ -756,7 +756,7 @@ tested. The function returns a logical vector containing the output from
 <span>    <span class="fu"><a href="https://testthat.r-lib.org/reference/logical-expectations.html" class="external-link">expect_true</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">url_status</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🎊</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🎊</span></span></code></pre>
 <p>Although the <code>testthat::test_that(...)</code> chunk contains 32
 lines of code, the unit test is performed by
 <code>expect_true(all(url_status))</code>. In words, this line is
@@ -769,7 +769,7 @@ exist, we expect the function will fail. This test utilizes
 <code><a href="https://testthat.r-lib.org/reference/expect_error.html" class="external-link">expect_error()</a></code> because the <code>download_data</code>
 wrapper function returns an error message if the underlying
 source-specific download function returns an error.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Invalid dates cause function to fail."</span>,</span>
 <span>  <span class="op">{</span></span>
@@ -793,19 +793,19 @@ source-specific download function returns an error.</p>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## &lt;simpleError in what_to_run(directory_to_save = directory_to_save, acknowledgement = acknowledgement,     ...): unused argument (directory_to_download = "../inst/extdata/")&gt;</span></span>
-<span><span class="co">## function (data_format = "Shapefile", date = c("2018-01-01", "2018-01-01"), </span></span>
-<span><span class="co">##     directory_to_save = NULL, acknowledgement = FALSE, download = FALSE, </span></span>
-<span><span class="co">##     remove_command = FALSE, unzip = TRUE, remove_zip = FALSE) </span></span>
-<span><span class="co">## NULL</span></span>
-<span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🎊</span></span></code></pre>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;simpleError in what_to_run(directory_to_save = directory_to_save, acknowledgement = acknowledgement,     ...): unused argument (directory_to_download = "../inst/extdata/")&gt;</span></span>
+<span><span class="co">#&gt; function (data_format = "Shapefile", date = c("2018-01-01", "2018-01-01"), </span></span>
+<span><span class="co">#&gt;     directory_to_save = NULL, acknowledgement = FALSE, download = FALSE, </span></span>
+<span><span class="co">#&gt;     remove_command = FALSE, unzip = TRUE, remove_zip = FALSE) </span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🎊</span></span></code></pre></div>
 <p>This test utilizes <code><a href="https://testthat.r-lib.org/reference/expect_error.html" class="external-link">testthat::expect_error</a></code> because the
 <code>download_data</code> wrapper function returns an error message if
 the underlying source-specific download function returns an error. If we
 directly used the <code>download_hms</code> function, we would expect
 and receive an error.</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Invalid dates cause function to fail."</span>,</span>
 <span>  <span class="op">{</span></span>
@@ -828,8 +828,8 @@ and receive an error.</p>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #00BB00;">Test passed</span> 🌈</span></span></code></pre>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🌈</span></span></code></pre></div>
 <p>As expected, the test passes because the NOAA HMS Smoke dataset does
 not contain data for January 1-2, 1800.</p>
 <p>These unit tests are just two of many implemented on
@@ -844,13 +844,13 @@ code.</p>
 <p>With the function structure outlined and the unit tests in place, we
 can now perform a data download. To begin, check the parameters required
 by the source-specific data download function.</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_hms</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "data_format"       "date"              "directory_to_save"</span></span>
-<span><span class="co">## [4] "acknowledgement"   "download"          "remove_command"   </span></span>
-<span><span class="co">## [7] "unzip"             "remove_zip"</span></span></code></pre>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_hms</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "data_format"       "date"              "directory_to_save"</span></span>
+<span><span class="co">#&gt; [4] "acknowledgement"   "download"          "remove_command"   </span></span>
+<span><span class="co">#&gt; [7] "unzip"             "remove_zip"</span></span></code></pre></div>
 <p>Define the parameters.</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2023-12-28"</span>, <span class="st">"2024-01-02"</span><span class="op">)</span></span>
 <span><span class="va">data_format</span> <span class="op">&lt;-</span> <span class="st">"Shapefile"</span></span>
 <span><span class="va">data_directory</span> <span class="op">&lt;-</span> <span class="st">"./download_example/"</span></span>
@@ -860,7 +860,7 @@ by the source-specific data download function.</p>
 <span><span class="va">unzip</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># inflate (unzip) downloaded zip files</span></span>
 <span><span class="va">remove_zip</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> <span class="co"># retain downloaded zip files</span></span></code></pre></div>
 <p>Download the data.</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/download_data.html">download_data</a></span><span class="op">(</span></span>
 <span>  dataset_name <span class="op">=</span> <span class="st">"hms"</span>,</span>
 <span>  date <span class="op">=</span> <span class="va">dates</span>,</span>
@@ -871,40 +871,40 @@ by the source-specific data download function.</p>
 <span>  unzip <span class="op">=</span> <span class="va">unzip</span>,</span>
 <span>  remove_zip <span class="op">=</span> <span class="va">remove_zip</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Downloading requested files...</span></span>
-<span><span class="co">## Requested files have been downloaded.</span></span></code></pre>
-<pre><code><span><span class="co">## Unzipping files...</span></span>
-<span><span class="co">## Files unzipped and saved in ./download_example/.</span></span>
-<span><span class="co">## Unzipping files...</span></span>
-<span><span class="co">## Files unzipped and saved in ./download_example/.</span></span>
-<span><span class="co">## Unzipping files...</span></span>
-<span><span class="co">## Files unzipped and saved in ./download_example/.</span></span>
-<span><span class="co">## Unzipping files...</span></span>
-<span><span class="co">## Files unzipped and saved in ./download_example/.</span></span>
-<span><span class="co">## Unzipping files...</span></span>
-<span><span class="co">## Files unzipped and saved in ./download_example/.</span></span>
-<span><span class="co">## Unzipping files...</span></span>
-<span><span class="co">## Files unzipped and saved in ./download_example/.</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Downloading requested files...</span></span>
+<span><span class="co">#&gt; Requested files have been downloaded.</span></span>
+<span><span class="co">#&gt; Unzipping files...</span></span>
+<span><span class="co">#&gt; Files unzipped and saved in ./download_example/.</span></span>
+<span><span class="co">#&gt; Unzipping files...</span></span>
+<span><span class="co">#&gt; Files unzipped and saved in ./download_example/.</span></span>
+<span><span class="co">#&gt; Unzipping files...</span></span>
+<span><span class="co">#&gt; Files unzipped and saved in ./download_example/.</span></span>
+<span><span class="co">#&gt; Unzipping files...</span></span>
+<span><span class="co">#&gt; Files unzipped and saved in ./download_example/.</span></span>
+<span><span class="co">#&gt; Unzipping files...</span></span>
+<span><span class="co">#&gt; Files unzipped and saved in ./download_example/.</span></span>
+<span><span class="co">#&gt; Unzipping files...</span></span>
+<span><span class="co">#&gt; Files unzipped and saved in ./download_example/.</span></span></code></pre>
 <p>Checking the directory shows that all of our desired data has been
 downloaded and inflated, and the original zip files have been
 retained.</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">data_directory</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "hms_smoke_Shapefile_20231228.zip" "hms_smoke_Shapefile_20231229.zip"</span></span>
-<span><span class="co">##  [3] "hms_smoke_Shapefile_20231230.zip" "hms_smoke_Shapefile_20231231.zip"</span></span>
-<span><span class="co">##  [5] "hms_smoke_Shapefile_20240101.zip" "hms_smoke_Shapefile_20240102.zip"</span></span>
-<span><span class="co">##  [7] "hms_smoke20231228.dbf"            "hms_smoke20231228.prj"           </span></span>
-<span><span class="co">##  [9] "hms_smoke20231228.shp"            "hms_smoke20231228.shx"           </span></span>
-<span><span class="co">## [11] "hms_smoke20231229.dbf"            "hms_smoke20231229.prj"           </span></span>
-<span><span class="co">## [13] "hms_smoke20231229.shp"            "hms_smoke20231229.shx"           </span></span>
-<span><span class="co">## [15] "hms_smoke20231230.dbf"            "hms_smoke20231230.prj"           </span></span>
-<span><span class="co">## [17] "hms_smoke20231230.shp"            "hms_smoke20231230.shx"           </span></span>
-<span><span class="co">## [19] "hms_smoke20231231.dbf"            "hms_smoke20231231.prj"           </span></span>
-<span><span class="co">## [21] "hms_smoke20231231.shp"            "hms_smoke20231231.shx"           </span></span>
-<span><span class="co">## [23] "hms_smoke20240101.dbf"            "hms_smoke20240101.prj"           </span></span>
-<span><span class="co">## [25] "hms_smoke20240101.shp"            "hms_smoke20240101.shx"           </span></span>
-<span><span class="co">## [27] "hms_smoke20240102.dbf"            "hms_smoke20240102.prj"           </span></span>
-<span><span class="co">## [29] "hms_smoke20240102.shp"            "hms_smoke20240102.shx"</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;  [1] "hms_smoke_Shapefile_20231228.zip" "hms_smoke_Shapefile_20231229.zip"</span></span>
+<span><span class="co">#&gt;  [3] "hms_smoke_Shapefile_20231230.zip" "hms_smoke_Shapefile_20231231.zip"</span></span>
+<span><span class="co">#&gt;  [5] "hms_smoke_Shapefile_20240101.zip" "hms_smoke_Shapefile_20240102.zip"</span></span>
+<span><span class="co">#&gt;  [7] "hms_smoke20231228.dbf"            "hms_smoke20231228.prj"           </span></span>
+<span><span class="co">#&gt;  [9] "hms_smoke20231228.shp"            "hms_smoke20231228.shx"           </span></span>
+<span><span class="co">#&gt; [11] "hms_smoke20231229.dbf"            "hms_smoke20231229.prj"           </span></span>
+<span><span class="co">#&gt; [13] "hms_smoke20231229.shp"            "hms_smoke20231229.shx"           </span></span>
+<span><span class="co">#&gt; [15] "hms_smoke20231230.dbf"            "hms_smoke20231230.prj"           </span></span>
+<span><span class="co">#&gt; [17] "hms_smoke20231230.shp"            "hms_smoke20231230.shx"           </span></span>
+<span><span class="co">#&gt; [19] "hms_smoke20231231.dbf"            "hms_smoke20231231.prj"           </span></span>
+<span><span class="co">#&gt; [21] "hms_smoke20231231.shp"            "hms_smoke20231231.shx"           </span></span>
+<span><span class="co">#&gt; [23] "hms_smoke20240101.dbf"            "hms_smoke20240101.prj"           </span></span>
+<span><span class="co">#&gt; [25] "hms_smoke20240101.shp"            "hms_smoke20240101.shx"           </span></span>
+<span><span class="co">#&gt; [27] "hms_smoke20240102.dbf"            "hms_smoke20240102.prj"           </span></span>
+<span><span class="co">#&gt; [29] "hms_smoke20240102.shp"            "hms_smoke20240102.shx"</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="download_hms-function-code">
@@ -912,149 +912,81 @@ retained.</p>
 </h2>
 <p>The following is the entire R code used to create
 <code>download_hms</code>.</p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">download_hms</span></span></code></pre></div>
-<pre><code><span><span class="co">## function(</span></span>
-<span><span class="co">##     data_format = "Shapefile",</span></span>
-<span><span class="co">##     date = c("2018-01-01", "2018-01-01"),</span></span>
-<span><span class="co">##     directory_to_save = NULL,</span></span>
-<span><span class="co">##     acknowledgement = FALSE,</span></span>
-<span><span class="co">##     download = FALSE,</span></span>
-<span><span class="co">##     remove_command = FALSE,</span></span>
-<span><span class="co">##     unzip = TRUE,</span></span>
-<span><span class="co">##     remove_zip = FALSE) {</span></span>
-<span><span class="co">##   #### 1. check for data download acknowledgement</span></span>
-<span><span class="co">##   download_permit(acknowledgement = acknowledgement)</span></span>
-<span><span class="co">##   #### 2. check for null parameters</span></span>
-<span><span class="co">##   check_for_null_parameters(mget(ls()))</span></span>
-<span><span class="co">##   #### check dates</span></span>
-<span><span class="co">##   stopifnot(length(date) == 2)</span></span>
-<span><span class="co">##   date &lt;- date[order(as.Date(date))]</span></span>
-<span><span class="co">##   #### 3. directory setup</span></span>
-<span><span class="co">##   directory_original &lt;- download_sanitize_path(directory_to_save)</span></span>
-<span><span class="co">##   directories &lt;- download_setup_dir(directory_original, zip = TRUE)</span></span>
-<span><span class="co">##   directory_to_download &lt;- directories[1]</span></span>
-<span><span class="co">##   directory_to_save &lt;- directories[2]</span></span>
-<span><span class="co">##   #### 4. check for unzip == FALSE &amp;&amp; remove_zip == TRUE</span></span>
-<span><span class="co">##   if (unzip == FALSE &amp;&amp; remove_zip == TRUE) {</span></span>
-<span><span class="co">##     stop(paste0(</span></span>
-<span><span class="co">##       "Arguments unzip = FALSE and remove_zip = TRUE are not ",</span></span>
-<span><span class="co">##       "acceptable together. Please change one.\n"</span></span>
-<span><span class="co">##     ))</span></span>
-<span><span class="co">##   }</span></span>
-<span><span class="co">##   #### 5. define date sequence</span></span>
-<span><span class="co">##   date_sequence &lt;- generate_date_sequence(</span></span>
-<span><span class="co">##     date[1],</span></span>
-<span><span class="co">##     date[2],</span></span>
-<span><span class="co">##     sub_hyphen = TRUE</span></span>
-<span><span class="co">##   )</span></span>
-<span><span class="co">##   #### 6. define URL base</span></span>
-<span><span class="co">##   base &lt;- "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/"</span></span>
-<span><span class="co">##   #### 7. initiate "..._curl_commands.txt"</span></span>
-<span><span class="co">##   commands_txt &lt;- paste0(</span></span>
-<span><span class="co">##     directory_original,</span></span>
-<span><span class="co">##     "hms_smoke_",</span></span>
-<span><span class="co">##     utils::head(date_sequence, n = 1),</span></span>
-<span><span class="co">##     "_",</span></span>
-<span><span class="co">##     utils::tail(date_sequence, n = 1),</span></span>
-<span><span class="co">##     "_curl_commands.txt"</span></span>
-<span><span class="co">##   )</span></span>
-<span><span class="co">##   download_sink(commands_txt)</span></span>
-<span><span class="co">##   #### 8. concatenate and print download commands to "..._curl_commands.txt"</span></span>
-<span><span class="co">##   download_names &lt;- NULL</span></span>
-<span><span class="co">##   for (f in seq_along(date_sequence)) {</span></span>
-<span><span class="co">##     year &lt;- substr(date_sequence[f], 1, 4)</span></span>
-<span><span class="co">##     month &lt;- substr(date_sequence[f], 5, 6)</span></span>
-<span><span class="co">##     if (tolower(data_format) == "shapefile") {</span></span>
-<span><span class="co">##       data_format &lt;- "Shapefile"</span></span>
-<span><span class="co">##       suffix &lt;- ".zip"</span></span>
-<span><span class="co">##       directory_to_cat &lt;- directory_to_download</span></span>
-<span><span class="co">##     } else if (tolower(data_format) == "kml") {</span></span>
-<span><span class="co">##       data_format &lt;- "KML"</span></span>
-<span><span class="co">##       suffix &lt;- ".kml"</span></span>
-<span><span class="co">##       directory_to_cat &lt;- directory_to_save</span></span>
-<span><span class="co">##     }</span></span>
-<span><span class="co">##     url &lt;- paste0(</span></span>
-<span><span class="co">##       base,</span></span>
-<span><span class="co">##       data_format,</span></span>
-<span><span class="co">##       "/",</span></span>
-<span><span class="co">##       year,</span></span>
-<span><span class="co">##       "/",</span></span>
-<span><span class="co">##       month,</span></span>
-<span><span class="co">##       "/hms_smoke",</span></span>
-<span><span class="co">##       date_sequence[f],</span></span>
-<span><span class="co">##       suffix</span></span>
-<span><span class="co">##     )</span></span>
-<span><span class="co">##     if (f == 1) {</span></span>
-<span><span class="co">##       if (!(check_url_status(url))) {</span></span>
-<span><span class="co">##         sink()</span></span>
-<span><span class="co">##         file.remove(commands_txt)</span></span>
-<span><span class="co">##         stop(paste0(</span></span>
-<span><span class="co">##           "Invalid date returns HTTP code 404. ",</span></span>
-<span><span class="co">##           "Check `date` parameter.\n"</span></span>
-<span><span class="co">##         ))</span></span>
-<span><span class="co">##       }</span></span>
-<span><span class="co">##     }</span></span>
-<span><span class="co">##     destfile &lt;- paste0(</span></span>
-<span><span class="co">##       directory_to_cat,</span></span>
-<span><span class="co">##       "hms_smoke_",</span></span>
-<span><span class="co">##       data_format,</span></span>
-<span><span class="co">##       "_",</span></span>
-<span><span class="co">##       date_sequence[f],</span></span>
-<span><span class="co">##       suffix</span></span>
-<span><span class="co">##     )</span></span>
-<span><span class="co">##     download_names &lt;- c(download_names, destfile)</span></span>
-<span><span class="co">##     command &lt;- paste0(</span></span>
-<span><span class="co">##       "curl -s -o ",</span></span>
-<span><span class="co">##       destfile,</span></span>
-<span><span class="co">##       " --url ",</span></span>
-<span><span class="co">##       url,</span></span>
-<span><span class="co">##       "\n"</span></span>
-<span><span class="co">##     )</span></span>
-<span><span class="co">##     if (!file.exists(destfile)) {</span></span>
-<span><span class="co">##       #### cat command only if file does not already exist</span></span>
-<span><span class="co">##       cat(command)</span></span>
-<span><span class="co">##     }</span></span>
-<span><span class="co">##   }</span></span>
-<span><span class="co">##   #### 9. finish "..._curl_commands.txt"</span></span>
-<span><span class="co">##   sink()</span></span>
-<span><span class="co">##   #### 10. build system command</span></span>
-<span><span class="co">##   system_command &lt;- paste0(</span></span>
-<span><span class="co">##     ". ",</span></span>
-<span><span class="co">##     commands_txt,</span></span>
-<span><span class="co">##     "\n"</span></span>
-<span><span class="co">##   )</span></span>
-<span><span class="co">##   #### 11. download data</span></span>
-<span><span class="co">##   download_run(</span></span>
-<span><span class="co">##     download = download,</span></span>
-<span><span class="co">##     system_command = system_command</span></span>
-<span><span class="co">##   )</span></span>
-<span><span class="co">##   #### 12. remove command file</span></span>
-<span><span class="co">##   download_remove_command(</span></span>
-<span><span class="co">##     remove = remove_command,</span></span>
-<span><span class="co">##     commands_txt = commands_txt</span></span>
-<span><span class="co">##   )</span></span>
-<span><span class="co">##   #### 13. end if data_format == "KML"</span></span>
-<span><span class="co">##   if (data_format == "KML") {</span></span>
-<span><span class="co">##     unlink(directory_to_download, recursive = TRUE)</span></span>
-<span><span class="co">##     message(paste0("KML files cannot be unzipped.\n"))</span></span>
-<span><span class="co">##     return(TRUE)</span></span>
-<span><span class="co">##   }</span></span>
-<span><span class="co">##   #### 14. unzip downloaded zip files</span></span>
-<span><span class="co">##   for (d in seq_along(download_names)) {</span></span>
-<span><span class="co">##     download_unzip(</span></span>
-<span><span class="co">##       file_name = download_names[d],</span></span>
-<span><span class="co">##       directory_to_unzip = directory_to_save,</span></span>
-<span><span class="co">##       unzip = unzip</span></span>
-<span><span class="co">##     )</span></span>
-<span><span class="co">##   }</span></span>
-<span><span class="co">##   #### 15. remove zip files</span></span>
-<span><span class="co">##   download_remove_zips(</span></span>
-<span><span class="co">##     remove = remove_zip,</span></span>
-<span><span class="co">##     download_name = download_names</span></span>
-<span><span class="co">##   )</span></span>
-<span><span class="co">## }</span></span>
-<span><span class="co">## &lt;environment: namespace:amadeus&gt;</span></span></code></pre>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">download_hms</span></span>
+<span><span class="co">#&gt; function (data_format = "Shapefile", date = c("2018-01-01", "2018-01-01"), </span></span>
+<span><span class="co">#&gt;     directory_to_save = NULL, acknowledgement = FALSE, download = FALSE, </span></span>
+<span><span class="co">#&gt;     remove_command = FALSE, unzip = TRUE, remove_zip = FALSE) </span></span>
+<span><span class="co">#&gt; {</span></span>
+<span><span class="co">#&gt;     download_permit(acknowledgement = acknowledgement)</span></span>
+<span><span class="co">#&gt;     check_for_null_parameters(mget(ls()))</span></span>
+<span><span class="co">#&gt;     stopifnot(length(date) == 2)</span></span>
+<span><span class="co">#&gt;     date &lt;- date[order(as.Date(date))]</span></span>
+<span><span class="co">#&gt;     directory_original &lt;- download_sanitize_path(directory_to_save)</span></span>
+<span><span class="co">#&gt;     directories &lt;- download_setup_dir(directory_original, zip = TRUE)</span></span>
+<span><span class="co">#&gt;     directory_to_download &lt;- directories[1]</span></span>
+<span><span class="co">#&gt;     directory_to_save &lt;- directories[2]</span></span>
+<span><span class="co">#&gt;     if (unzip == FALSE &amp;&amp; remove_zip == TRUE) {</span></span>
+<span><span class="co">#&gt;         stop(paste0("Arguments unzip = FALSE and remove_zip = TRUE are not ", </span></span>
+<span><span class="co">#&gt;             "acceptable together. Please change one.\n"))</span></span>
+<span><span class="co">#&gt;     }</span></span>
+<span><span class="co">#&gt;     date_sequence &lt;- generate_date_sequence(date[1], date[2], </span></span>
+<span><span class="co">#&gt;         sub_hyphen = TRUE)</span></span>
+<span><span class="co">#&gt;     base &lt;- "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/"</span></span>
+<span><span class="co">#&gt;     commands_txt &lt;- paste0(directory_original, "hms_smoke_", </span></span>
+<span><span class="co">#&gt;         utils::head(date_sequence, n = 1), "_", utils::tail(date_sequence, </span></span>
+<span><span class="co">#&gt;             n = 1), "_curl_commands.txt")</span></span>
+<span><span class="co">#&gt;     download_sink(commands_txt)</span></span>
+<span><span class="co">#&gt;     download_names &lt;- NULL</span></span>
+<span><span class="co">#&gt;     for (f in seq_along(date_sequence)) {</span></span>
+<span><span class="co">#&gt;         year &lt;- substr(date_sequence[f], 1, 4)</span></span>
+<span><span class="co">#&gt;         month &lt;- substr(date_sequence[f], 5, 6)</span></span>
+<span><span class="co">#&gt;         if (tolower(data_format) == "shapefile") {</span></span>
+<span><span class="co">#&gt;             data_format &lt;- "Shapefile"</span></span>
+<span><span class="co">#&gt;             suffix &lt;- ".zip"</span></span>
+<span><span class="co">#&gt;             directory_to_cat &lt;- directory_to_download</span></span>
+<span><span class="co">#&gt;         }</span></span>
+<span><span class="co">#&gt;         else if (tolower(data_format) == "kml") {</span></span>
+<span><span class="co">#&gt;             data_format &lt;- "KML"</span></span>
+<span><span class="co">#&gt;             suffix &lt;- ".kml"</span></span>
+<span><span class="co">#&gt;             directory_to_cat &lt;- directory_to_save</span></span>
+<span><span class="co">#&gt;         }</span></span>
+<span><span class="co">#&gt;         url &lt;- paste0(base, data_format, "/", year, "/", month, </span></span>
+<span><span class="co">#&gt;             "/hms_smoke", date_sequence[f], suffix)</span></span>
+<span><span class="co">#&gt;         if (f == 1) {</span></span>
+<span><span class="co">#&gt;             if (!(check_url_status(url))) {</span></span>
+<span><span class="co">#&gt;                 sink()</span></span>
+<span><span class="co">#&gt;                 file.remove(commands_txt)</span></span>
+<span><span class="co">#&gt;                 stop(paste0("Invalid date returns HTTP code 404. ", </span></span>
+<span><span class="co">#&gt;                   "Check `date` parameter.\n"))</span></span>
+<span><span class="co">#&gt;             }</span></span>
+<span><span class="co">#&gt;         }</span></span>
+<span><span class="co">#&gt;         destfile &lt;- paste0(directory_to_cat, "hms_smoke_", data_format, </span></span>
+<span><span class="co">#&gt;             "_", date_sequence[f], suffix)</span></span>
+<span><span class="co">#&gt;         download_names &lt;- c(download_names, destfile)</span></span>
+<span><span class="co">#&gt;         command &lt;- paste0("curl -s -o ", destfile, " --url ", </span></span>
+<span><span class="co">#&gt;             url, "\n")</span></span>
+<span><span class="co">#&gt;         if (!file.exists(destfile)) {</span></span>
+<span><span class="co">#&gt;             cat(command)</span></span>
+<span><span class="co">#&gt;         }</span></span>
+<span><span class="co">#&gt;     }</span></span>
+<span><span class="co">#&gt;     sink()</span></span>
+<span><span class="co">#&gt;     system_command &lt;- paste0(". ", commands_txt, "\n")</span></span>
+<span><span class="co">#&gt;     download_run(download = download, system_command = system_command)</span></span>
+<span><span class="co">#&gt;     download_remove_command(remove = remove_command, commands_txt = commands_txt)</span></span>
+<span><span class="co">#&gt;     if (data_format == "KML") {</span></span>
+<span><span class="co">#&gt;         unlink(directory_to_download, recursive = TRUE)</span></span>
+<span><span class="co">#&gt;         message(paste0("KML files cannot be unzipped.\n"))</span></span>
+<span><span class="co">#&gt;         return(TRUE)</span></span>
+<span><span class="co">#&gt;     }</span></span>
+<span><span class="co">#&gt;     for (d in seq_along(download_names)) {</span></span>
+<span><span class="co">#&gt;         download_unzip(file_name = download_names[d], directory_to_unzip = directory_to_save, </span></span>
+<span><span class="co">#&gt;             unzip = unzip)</span></span>
+<span><span class="co">#&gt;     }</span></span>
+<span><span class="co">#&gt;     download_remove_zips(remove = remove_zip, download_name = download_names)</span></span>
+<span><span class="co">#&gt; }</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x557382124c20&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: namespace:amadeus&gt;</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
