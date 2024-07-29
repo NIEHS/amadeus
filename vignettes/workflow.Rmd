@@ -19,11 +19,11 @@ library(amadeus)
 ```
 
 The following vignette will demonstrate how to download, process, and calculate covariates using `amadeus` functions.
-The examples will utilize air temperature at 2m height (air.2m) data from the NOAA North American Regional Reanalysis (NARR) dataset.\insertRef{web_NARRabout}
+The examples will utilize air temperature at 2m height ("air.2m") data from the NOAA North American Regional Reanalysis (NARR) dataset.\insertRef{web_NARRabout}
 
 ## Download
 
-Download data for the years 2021 and 2022 with the `download_data` function.
+Download data for years 2021 and 2022 with `download_data`.
 
 ```{r, eval = FALSE}
 download_data(
@@ -37,7 +37,7 @@ download_data(
 )
 ```
 
-Check for downlaoded files
+Check for downloaded files
 
 ```{r, eval = FALSE}
 list.files("./inst/extdata/air.2m")
@@ -48,14 +48,22 @@ cat('[1] "air.2m.2021.nc" "air.2m.2022.nc"\n')
 
 ## Process
 
-Process data for all dates from December 28, 2021 to January 3, 2022.
+Process data for all dates from December 28, 2021 to January 3, 2022 with `process_covariates`.
 
-```{r}
+```{r, eval = FALSE}
 temp_process <- process_covariates(
   covariate = "narr",
   variable = "air.2m",
   date = c("2021-12-28", "2022-01-03"),
   path = "./inst/extdata/air.2m"
+)
+```
+```{r, echo = FALSE}
+temp_process <- process_covariates(
+  covariate = "narr",
+  variable = "air.2m",
+  date = c("2021-12-28", "2022-01-03"),
+  path = system.file("extdata", "air.2m", package = "amadeus")
 )
 ```
 
@@ -67,8 +75,8 @@ temp_process
 
 ## Calculate covariates
 
-Calculate covariates for North Carolina county boundaries.
-County boundaries are accessed with the `tigris::counties` function.\insertRef{pacakge_tigris}
+Calculate covariates for North Carolina county boundaries with `calc_covariates`.
+County boundaries are accessed with the `tigris::counties` function.\insertRef{package_tigris}
 `geom = TRUE` will return the covariates as a `SpatVector` object.
 
 ```{r}
