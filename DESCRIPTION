@@ -1,6 +1,6 @@
 Package: amadeus
 Title: A Machine for Data, Environments, and User Setup for Common Environmental and Climate Health Datasets
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: c(
     person("Mitchell", "Manware", role = c("aut", "ctb"), comment = c(ORCID = "0009-0003-6440-6106")),
     person("Insang", "Song", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-8732-3256")),
@@ -9,10 +9,15 @@ Authors@R: c(
     person("Kyle", "Messier", role = c("aut", "cre"), email = "kyle.messier@nih.gov", comment = c(ORCID = "0000-0001-9508-9623"))
     )
 Maintainer: Kyle Messier <kyle.messier@nih.gov>
-Description: Functions are designed to facilitate access to and utility with large scale, publicly available environmental data in R. The package contains functions for downloading (download_data()) raw data files from web URLs, processing (process_covariates()) the raw data files into clean spatial objects, and extracting values (calc_covariates()) from the spatial data objects at point and polygon locations. These functions call a series of source-specific functions which are tailored to each data sources/datasets particular URL structure, data format, and spatial/temporal resolution. The functions are tested, versioned, and open source and open access.
+Description: Functions are designed to facilitate access to and utility with large scale, publicly available environmental data in R.
+    The package contains functions for downloading raw data files from web URLs (download_data()) , processing the raw data files into
+    clean spatial objects (process_covariates()), and extracting values from the spatial data objects at point and polygon locations
+    (calc_covariates()). These functions call a series of source-specific functions which are tailored to each data sources/datasets
+    particular URL structure, data format, and spatial/temporal resolution. The functions are tested, versioned, and open source and
+    open access.
 Depends: R (>= 4.1.0)
 Imports: dplyr, sf, sftime, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringi, testthat (>= 3.0.0), parallelly, stars, future, future.apply, tidyr, rlang, nhdplusTools, archive, collapse, Rdpack
-Suggests: covr, withr, knitr, rmarkdown, lwgeom, FNN, doRNG, devtools, stringr
+Suggests: covr, withr, knitr, rmarkdown, lwgeom, FNN, doRNG, devtools, stringr, tigris
 RdMacros: Rdpack
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown

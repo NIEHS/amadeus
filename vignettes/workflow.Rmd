@@ -1,0 +1,88 @@
+---
+title: "amadeus workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{amadeus workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "2024-07-29"
+author: "Mitchell Manware"
+---
+
+```{r setup, include = FALSE}
+# packages
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(amadeus)
+```
+
+The following vignette will demonstrate how to download, process, and calculate covariates using `amadeus` functions.
+The examples will utilize air temperature at 2m height (air.2m) data from the NOAA North American Regional Reanalysis (NARR) dataset.\insertRef{web_NARRabout}
+
+## Download
+
+Download data for the years 2021 and 2022 with the `download_data` function.
+
+```{r, eval = FALSE}
+download_data(
+  dataset_name = "narr",
+  variable = "air.2m",
+  year = c(2021, 2022),
+  directory_to_save = "./inst/extdata",
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE
+)
+```
+
+Check for downlaoded files
+
+```{r, eval = FALSE}
+list.files("./inst/extdata/air.2m")
+```
+```{r, echo = FALSE}
+cat('[1] "air.2m.2021.nc" "air.2m.2022.nc"\n')
+```
+
+## Process
+
+Process data for all dates from December 28, 2021 to January 3, 2022.
+
+```{r}
+temp_process <- process_covariates(
+  covariate = "narr",
+  variable = "air.2m",
+  date = c("2021-12-28", "2022-01-03"),
+  path = "./inst/extdata/air.2m"
+)
+```
+
+Check the `SpatVector` object.
+
+```{r}
+temp_process
+```
+
+## Calculate covariates
+
+Calculate covariates for North Carolina county boundaries.
+County boundaries are accessed with the `tigris::counties` function.\insertRef{pacakge_tigris}
+`geom = TRUE` will return the covariates as a `SpatVector` object.
+
+```{r}
+library(tigris)
+temp_covar <- calc_covariates(
+  covariate = "narr",
+  from = temp_process,
+  locs = tigris::counties("NC", year = 2021),
+  locs_id = "NAME",
+  radius = 0,
+  geom = TRUE
+)
+```
+
+```{r}
+temp_covar
+```

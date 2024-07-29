@@ -18,5 +18,7 @@ output
 manuscript
 input
 tests
-vignettes/epa_download.Rmd
 R/olm_functions.R
+vignettes/download_functions.Rmd
+vignettes/epa_download.Rmd
+vignettes/protected_datasets.Rmd

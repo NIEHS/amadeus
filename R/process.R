@@ -1861,39 +1861,39 @@ process_narr <- function(
   for (p in seq_along(data_paths_ym)) {
     #### import data
     data_year <- terra::rast(data_paths_ym[p], win = extent)
-    message(paste0(
-      "Cleaning ",
-      variable,
-      " data for ",
-      month.name[
-        as.numeric(
-          substr(
-            gsub(
-              "-",
-              "",
-              terra::time(data_year)[1]
-            ),
-            5,
-            6
-          )
-        )
-      ],
-      ", ",
-      substr(
-        gsub(
-          "-",
-          "",
-          terra::time(data_year)[1]
-        ),
-        1,
-        4
-      ),
-      "...\n"
-    ))
     #### check for mono or pressure levels
     if (grepl("level", names(data_year)[1])) {
       #### pressure levels data
       message(paste0("Detected pressure levels data...\n"))
+      message(paste0(
+        "Cleaning ",
+        variable,
+        " data for ",
+        month.name[
+          as.numeric(
+            substr(
+              gsub(
+                "-",
+                "",
+                terra::time(data_year)[1]
+              ),
+              5,
+              6
+            )
+          )
+        ],
+        ", ",
+        substr(
+          gsub(
+            "-",
+            "",
+            terra::time(data_year)[1]
+          ),
+          1,
+          4
+        ),
+        "...\n"
+      ))
       days <- sapply(
         strsplit(
           names(data_year),
@@ -1941,6 +1941,22 @@ process_narr <- function(
     } else {
       #### mono level data
       message(paste0("Detected monolevel data...\n"))
+      message(paste0(
+        "Cleaning ",
+        variable,
+        " data for ",
+        substr(
+          gsub(
+            "-",
+            "",
+            terra::time(data_year)[1]
+          ),
+          1,
+          4
+        ),
+        "...\n"
+      ))
+
       names(data_year) <- paste0(
         variable,
         "_",
