@@ -1146,14 +1146,14 @@ calc_temporal_dummies <-
 #' nc <- terra::project(nc, "EPSG:5070")
 #' pnt_locs <- terra::centroids(nc, inside = TRUE)
 #' pnt_locs <- pnt_locs[, "NAME"]
-#' pnt_from <- terra::spatSample(nc, 100L)
-#' pnt_from$pid <- seq(1, 100)
+#' pnt_from <- terra::spatSample(nc, 10L)
+#' pnt_from$pid <- seq(1, 10)
 #' pnt_from <- pnt_from[, "pid"]
-#' pnt_from$val1 <- rgamma(100L, 1, 0.05)
-#' pnt_from$val2 <- rgamma(100L, 2, 1)
+#' pnt_from$val1 <- rgamma(10L, 1, 0.05)
+#' pnt_from$val2 <- rgamma(10L, 2, 1)
 #'
 #' vals <- c("val1", "val2")
-#' calc_sedc(pnt_locs, pnt_from, "NAME", 1e5, vals)
+#' calc_sedc(pnt_locs, pnt_from, "NAME", 1e4, vals)
 #' @importFrom dplyr as_tibble
 #' @importFrom dplyr left_join
 #' @importFrom dplyr summarize
