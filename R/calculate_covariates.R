@@ -1153,7 +1153,7 @@ calc_temporal_dummies <-
 #' pnt_from$val2 <- rgamma(10L, 2, 1)
 #'
 #' vals <- c("val1", "val2")
-#' calc_sedc(pnt_locs, pnt_from, "NAME", 1e3, vals)
+#' calc_sedc(pnt_locs, pnt_from, "NAME", 1e4, vals)
 #' @importFrom dplyr as_tibble
 #' @importFrom dplyr left_join
 #' @importFrom dplyr summarize

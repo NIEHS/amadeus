@@ -13,7 +13,7 @@ author: "Mitchell Manware"
 # packages
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = ""
 )
 library(amadeus)
 ```
@@ -37,7 +37,7 @@ download_data(
 )
 ```
 
-Check for downloaded files
+Check for the downloaded files.
 
 ```{r, eval = FALSE}
 list.files("./inst/extdata/air.2m")
@@ -59,7 +59,7 @@ temp_process <- process_covariates(
 )
 ```
 
-Check the `SpatVector` object.
+Check the processed `SpatRaster` object.
 
 ```{r, eval = FALSE}
 temp_process
@@ -98,6 +98,8 @@ temp_covar <- calc_covariates(
   geom = TRUE
 )
 ```
+
+Check the calculated covariates `SpatVector` object.
 
 ```{r, eval = FALSE}
 temp_covar
