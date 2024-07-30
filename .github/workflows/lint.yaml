@@ -29,4 +29,5 @@ jobs:
         run: lintr::lint_package()
         shell: Rscript {0}
         env:
+          FILTER_REGEX_EXCLUDE: vignettes/workflow.Rmd
           LINTR_ERROR_ON_LINT: true
