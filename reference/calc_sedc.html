@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/download_functions.html">download_data</a></li>
     <li><a class="dropdown-item" href="../articles/epa_download.html">Downloading EPA Daily Data</a></li>
     <li><a class="dropdown-item" href="../articles/protected_datasets.html">Protected Data Sources</a></li>
+    <li><a class="dropdown-item" href="../articles/workflow.html">amadeus workflow</a></li>
   </ul></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -133,118 +134,26 @@ Wiesner C (????).
 <span class="r-in"><span><span class="va">nc</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/project.html" class="external-link">project</a></span><span class="op">(</span><span class="va">nc</span>, <span class="st">"EPSG:5070"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">pnt_locs</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/centroids.html" class="external-link">centroids</a></span><span class="op">(</span><span class="va">nc</span>, inside <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">pnt_locs</span> <span class="op">&lt;-</span> <span class="va">pnt_locs</span><span class="op">[</span>, <span class="st">"NAME"</span><span class="op">]</span></span></span>
-<span class="r-in"><span><span class="va">pnt_from</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/sample.html" class="external-link">spatSample</a></span><span class="op">(</span><span class="va">nc</span>, <span class="fl">100L</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">pnt_from</span><span class="op">$</span><span class="va">pid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pnt_from</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/sample.html" class="external-link">spatSample</a></span><span class="op">(</span><span class="va">nc</span>, <span class="fl">10L</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pnt_from</span><span class="op">$</span><span class="va">pid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">pnt_from</span> <span class="op">&lt;-</span> <span class="va">pnt_from</span><span class="op">[</span>, <span class="st">"pid"</span><span class="op">]</span></span></span>
-<span class="r-in"><span><span class="va">pnt_from</span><span class="op">$</span><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">100L</span>, <span class="fl">1</span>, <span class="fl">0.05</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">pnt_from</span><span class="op">$</span><span class="va">val2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">100L</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pnt_from</span><span class="op">$</span><span class="va">val1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">10L</span>, <span class="fl">1</span>, <span class="fl">0.05</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pnt_from</span><span class="op">$</span><span class="va">val2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">10L</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"val1"</span>, <span class="st">"val2"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">calc_sedc</span><span class="op">(</span><span class="va">pnt_locs</span>, <span class="va">pnt_from</span>, <span class="st">"NAME"</span>, <span class="fl">1e5</span>, <span class="va">vals</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">calc_sedc</span><span class="op">(</span><span class="va">pnt_locs</span>, <span class="va">pnt_from</span>, <span class="st">"NAME"</span>, <span class="fl">1e4</span>, <span class="va">vals</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(from_id)`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(to_id)`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(from_id, to_id)`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             NAME       val1       val2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       Alamance  66.306697  6.7116902</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2      Alexander  97.987170 11.6645958</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3      Alleghany 135.316205  8.5703397</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4          Anson  50.005415  5.2276410</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5           Ashe 143.015620  8.4157319</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6          Avery  76.088990  8.7578666</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7       Beaufort  58.759937  6.2939195</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8         Bertie  70.112408  7.8469177</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9         Bladen  79.513358  6.8157166</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10     Brunswick  54.292706  5.3356971</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11      Buncombe  57.603317  9.6687275</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12         Burke  91.378099 13.5219825</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13      Cabarrus  64.421536  7.2742864</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14      Caldwell 103.478357 11.6921332</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15        Camden  77.730226  4.5635043</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16      Carteret  45.586379  6.0638371</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17       Caswell  46.799679  4.7822705</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18       Catawba  77.542299 12.2965447</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19       Chatham  81.981947  8.1190512</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20      Cherokee   3.915403  0.9588335</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21        Chowan  64.504924  6.0186155</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22          Clay   9.749667  2.4724810</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23     Cleveland  67.458061  9.8771979</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24      Columbus  48.414701  5.1153279</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25        Craven  61.597042  4.9988722</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26    Cumberland  96.540752  8.2064850</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27     Currituck  63.140911  4.0256414</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28          Dare  41.540511  3.4968348</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29      Davidson  87.860462 12.1240335</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30         Davie  90.343496 13.6229310</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31        Duplin  68.001564  5.3855035</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32        Durham  79.049439  6.2339198</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 33     Edgecombe  70.147137  6.9895227</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34       Forsyth  71.195554 13.3624413</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 35      Franklin  66.157171  6.4014195</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 36        Gaston  48.671028  7.6455348</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37         Gates  64.098198  5.5317312</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38        Graham   7.198239  1.6872974</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 39     Granville  49.656550  4.7207362</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 40        Greene  90.485199  5.7627158</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 41      Guilford  57.173967  8.4095114</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 42       Halifax  73.885565  7.7264226</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 43       Harnett  98.976569  8.5364366</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 44       Haywood  38.540767  6.6754283</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 45     Henderson  53.566765  6.8870803</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 46      Hertford  76.272095  7.1651027</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 47          Hoke 103.981765  8.3039185</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 48          Hyde  67.876877  6.0577500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 49       Iredell  80.189217 11.8598788</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 50       Jackson  21.292017  6.0767266</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 51      Johnston  93.203340  7.1667761</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52         Jones  66.025083  4.9071098</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 53           Lee  97.560011  9.4921343</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 54        Lenoir  77.550455  5.1551243</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 55       Lincoln  63.939958  9.9774137</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 56         Macon  15.059649  4.2463505</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 57       Madison  70.241627 10.2826394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 58        Martin  66.537364  7.5693036</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 59      McDowell  67.787551 10.2585459</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60   Mecklenburg  50.862565  7.7914928</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 61      Mitchell  65.031353  8.5814715</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 62    Montgomery  59.749763  6.0405602</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63         Moore  78.615922  7.3924314</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64          Nash  64.385415  6.4241311</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 65   New Hanover  67.931926  4.6333534</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 66   Northampton 118.738765  9.2546833</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 67        Onslow  77.084563  5.0114996</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 68        Orange  72.966060  6.0369847</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 69       Pamlico  50.073396  5.3901503</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70    Pasquotank  74.974591  4.7458824</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71        Pender  79.062124  5.6213647</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 72    Perquimans  66.431520  5.0567758</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 73        Person  52.598860  4.1839645</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 74          Pitt  79.072691  5.8360247</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 75          Polk  50.487473  7.5159326</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 76      Randolph  70.147697  7.7840601</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 77      Richmond  61.478506  6.1899525</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 78       Robeson  86.300294  6.6178460</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 79    Rockingham  44.705144  8.4209078</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 80         Rowan  76.998697 10.2729658</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 81    Rutherford  62.626215 10.1472106</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 82       Sampson  70.487687  6.6277097</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 83      Scotland  76.605109  6.8632094</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 84        Stanly  62.852360  6.4087924</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 85        Stokes  62.166361 16.0572751</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 86         Surry  81.764284 12.2180431</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 87         Swain  13.035910  2.6972329</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 88  Transylvania  30.106402  5.9152072</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 89       Tyrrell  67.837730  5.6893818</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 90         Union  40.905040  5.1267190</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 91         Vance  47.201872  5.9009680</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 92          Wake 102.424634  7.3683230</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 93        Warren  41.919319  6.5553331</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 94    Washington  59.440806  5.7795964</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 95       Watauga 108.967001 10.6908618</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 96         Wayne  87.168169  6.2273127</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 97        Wilkes 143.398693 11.2777982</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 98        Wilson  74.670837  6.1711863</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 99        Yadkin  95.006796 14.9158944</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 100       Yancey  62.559665  9.3954516</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         NAME       val1        val2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Currituck 0.39651678 0.119400641</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   Franklin 0.00767532 0.000963305</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    Madison 0.00858568 0.003998301</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       Polk 0.06034160 0.003668522</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   Randolph 0.03433355 0.046817979</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 Rutherford 0.11657394 0.007087217</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7     Stokes 0.04433759 0.004935366</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     Yancey 0.05592440 0.026043667</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
