@@ -25,6 +25,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Config/Needs/website: tidyverse/tidytemplate
 Config/testhat/edition: 3
-License: MIT + file LICENSE
+License: MIT
 URL: https://github.com/NIEHS/amadeus, 
 BugReports: https://github.com/NIEHS/amadeus/issues
