@@ -23,3 +23,4 @@ vignettes/download_functions.Rmd
 vignettes/epa_download.Rmd
 vignettes/protected_datasets.Rmd
 inst/extdata/air.2m
+LICENSE.md

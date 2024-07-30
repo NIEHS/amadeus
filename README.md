@@ -58,7 +58,7 @@ Utilize [Issues](https://github.com/NIEHS/amadeus/issues) to notify the authors 
 | [US EPA National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories) | CSV | Emissions |
 | [US EPA Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present) | CSV | Chemicals<br>Pollution |
 | [USGS[^6] Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation |
-| [USGS National Hydrography Dataset (NHD)](https://www.sciencebase.gov/catalog/item/4f5545cce4b018de15819ca9) | Geopackage<br>Geodatabase | Hydrography |
+| [USGS National Hydrography Dataset (NHD)](https://www.usgs.gov/national-hydrography) | Geopackage<br>Geodatabase | Hydrography |
 
 See the "[download_data](https://niehs.github.io/amadeus/articles/download_functions.html)" vignette for a detailed description of source-specific download functions.
 
