@@ -216,6 +216,17 @@ testthat::test_that("Ecoregion download URLs have HTTP status 200.", {
       epa_certificate_path = certificate
     )
   )
+  testthat::expect_true(
+    dir.exists(paste0(directory_to_save, "/data_files"))
+  )
+  testthat::expect_equal(
+    length(
+      list.files(
+        directory_to_save, recursive = TRUE, include.dirs = TRUE
+      )
+    ),
+    1
+  )
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -313,6 +324,11 @@ testthat::test_that("GMTED download URLs have HTTP status 200.", {
       file.path(filename),
       recursive = TRUE
     )
+    file.create(
+      file.path(
+        paste0(directory_to_save, "/data_files/test.txt")
+      )
+    )
     # remove file with commands after test
     # remove temporary gmted
     testthat::expect_no_error(
@@ -325,6 +341,17 @@ testthat::test_that("GMTED download URLs have HTTP status 200.", {
                     remove_zip = TRUE,
                     remove_command = TRUE,
                     download = FALSE)
+    )
+    testthat::expect_true(
+      dir.exists(paste0(directory_to_save, "/data_files"))
+    )
+    testthat::expect_equal(
+      length(
+        list.files(
+          directory_to_save, recursive = TRUE, include.dirs = TRUE
+        )
+      ),
+      2
     )
     unlink(directory_to_save, recursive = TRUE)
   }
@@ -1736,11 +1763,27 @@ testthat::test_that("download_sink test", {
 })
 
 testthat::test_that("download_remove_zips test", {
-  testfile <-
+  testfile1 <-
     testthat::test_path("..", "testdata", "yellowstone/barren", "coyote.zip")
-  dir.create(dirname(testfile), recursive = TRUE)
-  file.create(testfile, recursive = TRUE)
+  dir.create(dirname(testfile1), recursive = TRUE)
+  file.create(testfile1, recursive = TRUE)
+  testfile2 <-
+    testthat::test_path("..", "testdata", "yellowstone/retain", "retain")
+  dir.create(dirname(testfile2), recursive = TRUE)
+  file.create(testfile2, recursive = TRUE)
   testthat::expect_no_error(
-    download_remove_zips(remove = TRUE, testfile)
+    download_remove_zips(remove = TRUE, testfile1)
   )
+  # expect only the testfile1 directory to be removed
+  testthat::expect_equal(
+    length(
+      list.files(
+        testthat::test_path("..", "testdata", "yellowstone"),
+        recursive = TRUE,
+        include.dirs = TRUE
+      )
+    ),
+    2
+  )
+  unlink(testthat::test_path("..", "testdata", "yellowstone"))
 })
