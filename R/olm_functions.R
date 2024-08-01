@@ -104,7 +104,7 @@
 #' download_olm(
 #'   product = "no2_s5p.l3.trop.tmwm",
 #'   format = "tif",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE

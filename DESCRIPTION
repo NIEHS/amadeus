@@ -1,6 +1,6 @@
 Package: amadeus
-Title: A Machine for Data, Environments, and User Setup for Common Environmental and Climate Health Datasets
-Version: 1.0.2
+Title: Accessing and Analyzing Large-Scale Environmental Data in R
+Version: 1.0.3
 Authors@R: c(
     person(given = "Mitchell", family = "Manware", role = c("aut", "ctb"), comment = c(ORCID = "0009-0003-6440-6106")),
     person(given = "Insang", family = "Song", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-8732-3256")),

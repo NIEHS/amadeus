@@ -44,7 +44,7 @@
 #'   dataset_name = "narr",
 #'   variables = "weasd",
 #'   year = c(2023, 2023),
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_commands = TRUE
@@ -157,7 +157,7 @@ download_data <-
 #'   parameter_code = 88101,
 #'   resolution_temporal = "daily",
 #'   year = c(2022, 2023),
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -328,7 +328,7 @@ download_aqs <-
 #' @examples
 #' \dontrun{
 #' download_ecoregion(
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -459,7 +459,7 @@ download_ecoregion <- function(
 #' download_geos(
 #'   collection = "aqc_tavg_1hr_g1440x721_v1",
 #'   date = c("2024-01-01", "2024-01-05"),
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -636,7 +636,7 @@ download_geos <- function(
 #' download_gmted(
 #'   statistic = "Breakline Emphasis",
 #'   resolution = "7.5 arc-seconds",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -880,7 +880,7 @@ download_gmted <- function(
 #' download_merra2(
 #'   collection = "inst1_2d_int_Nx",
 #'   date = c("2024-01-01", "2024-01-05"),
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -1199,7 +1199,7 @@ download_merra2 <- function(
 #' download_narr(
 #'   variables = c("weasd", "omega"),
 #'   year = c(2022, 2023),
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -1352,7 +1352,7 @@ download_narr <- function(
 #' download_nlcd(
 #'   collection = "Coterminous United States",
 #'   year = 2021,
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -1510,7 +1510,7 @@ download_nlcd <- function(
 #' download_sedac_groads(
 #'   data_region = "Americas",
 #'   data_format = "Shapefile",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -1669,7 +1669,7 @@ download_sedac_groads <- function(
 #'   data_resolution = "30 second",
 #'   data_format = "GeoTIFF",
 #'   year = "2020",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -1862,7 +1862,7 @@ download_sedac_population <- function(
 #' download_hms(
 #'   data_format = "Shapefile",
 #'   date = c("2024-01-01", "2024-01-05"),
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -2052,7 +2052,7 @@ download_hms <- function(
 #' download_koppen_geiger(
 #'   data_resolution = "0.0083",
 #'   time_period = "Present",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -2214,7 +2214,7 @@ download_koppen_geiger <- function(
 #'   vertical_tiles = c(4, 5),
 #'   date = c("2024-01-01", "2024-01-10"),
 #'   nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
-#'   directory_to_save = "./data/mod09ga",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -2228,7 +2228,7 @@ download_koppen_geiger <- function(
 #'   mod06_links = "~/LAADS_query.2024-07-15T12_17.csv",
 #'   date = c("2024-01-01", "2024-01-10"),
 #'   nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
-#'   directory_to_save = "./data/mod06l2",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -2241,7 +2241,7 @@ download_koppen_geiger <- function(
 #'   vertical_tiles = c(4, 5),
 #'   date = c("2024-01-01", "2024-01-10"),
 #'   nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
-#'   directory_to_save = "./data/vnp46a2",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -2588,7 +2588,7 @@ download_modis <- function(
 #' \dontrun{
 #' download_tri(
 #'   year = c(2020L, 2021L),
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -2711,7 +2711,7 @@ download_tri <- function(
 #' \dontrun{
 #' download_nei(
 #'   year = c(2017L, 2020L),
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -2847,7 +2847,7 @@ download_nei <- function(
 #' the text file containing download commands.
 #' @param unzip logical(1). Unzip the downloaded compressed files.
 #' Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.
-#' @return NULL. Downloaded files will be stored in \code{directory_to_save}.
+#' @return NULL; Downloaded files will be stored in \code{directory_to_save}.
 #' @author Insang Song
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2857,7 +2857,7 @@ download_nei <- function(
 #' download_huc(
 #'   region = "Lower48",
 #'   type = "Seamless",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -3004,7 +3004,7 @@ download_huc <-
 #' download_cropscape(
 #'   year = 2020,
 #'   source = "USDA",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -3157,7 +3157,7 @@ download_cropscape <- function(
 #'   element = "ppt",
 #'   data_type = "ts",
 #'   format = "nc",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -3291,7 +3291,7 @@ download_prism <- function(
 #' download_gridmet(
 #'   variables = "Precipitation",
 #'   year = c(2023, 2024),
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
@@ -3433,7 +3433,7 @@ download_gridmet <- function(
 #' download_terraclimate(
 #'   variables = "Precipitation",
 #'   year = c(2023, 2024),
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = TRUE,
 #'   remove_command = TRUE
