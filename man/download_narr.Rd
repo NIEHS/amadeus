@@ -45,16 +45,14 @@ The \code{download_narr} function accesses and downloads daily meteorological da
 "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
 }
 \examples{
-\dontrun{
 download_narr(
   variables = c("weasd", "omega"),
-  year = c(2022, 2023),
-  directory_to_save = "./data",
+  year = c(2023, 2023),
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
+  download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )
-}
 }
 \references{
 \insertRef{mesinger_north_2006}{amadeus}

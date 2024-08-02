@@ -17,6 +17,9 @@ calc_message(dataset, variable, time, time_type, level)
 
 \item{level}{placeholder}
 }
+\value{
+NULL; provides progress messages to R console.
+}
 \description{
 Send messages updating covariate extraction progress.
 }

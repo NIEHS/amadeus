@@ -77,7 +77,7 @@ download_sanitize_path <-
 #' The \code{acknowledgement} parameter is designed to help users avoid
 #' accidentally initiating a very large data download that may take a very long
 #' time to run or exceed machine capabilities.
-#' @return NULL
+#' @return NULL; returns a stop error if the acknowledgement is FALSE
 #' @keywords internal
 #' @export
 download_permit <-
@@ -101,7 +101,8 @@ download_permit <-
 #'  skip (\code{FALSE}) download.
 #' @param system_command character(1). Linux command to execute downloads.
 #' Inherited from data download function.
-#' @return NULL
+#' @return NULL; runs download commands with shell (Unix/Linux) or
+#' command prompt (Windows)
 #' @keywords internal
 #' @export
 download_run <- function(
@@ -124,7 +125,7 @@ download_run <- function(
 #' @param commands_txt character(1). Path of download commands
 #' @param remove logical(1). Remove (\code{TRUE}) or
 #'  keep (\code{FALSE}) commands
-#' @return NULL
+#' @return NULL; removes .txt file storing all download commands.
 #' @keywords internal
 #' @export
 download_remove_command <-
@@ -140,7 +141,8 @@ download_remove_command <-
 #' @description
 #' Open connection to \code{command_txt} file to store download commands.
 #' @param command_txt character(1). file path to export commands.
-#' @return NULL
+#' @return NULL; creates and opens connection to text file to store
+#' download commands
 #' @keywords internal
 #' @export
 download_sink <-
@@ -159,7 +161,7 @@ download_sink <-
 #' @param directory_to_unzip character(1). Directory to unzip
 #' data
 #' @param unzip logical(1). Unzip (\code{TRUE}) or not.
-#' @return NULL
+#' @return NULL; unzips downloaded zip files
 #' @keywords internal
 #' @export
 download_unzip <-
@@ -193,7 +195,7 @@ download_unzip <-
 #' If \code{remove = TRUE}, ensure that \code{unzip = TRUE}. Choosing to remove
 #' ".zip" files without unzipping will retain none of the downloaded data.
 #' then it will remove all files in the second higher level directory.
-#' @return NULL
+#' @return NULL; removes downloaded zip files after they are unzipped
 #' @keywords internal
 #' @export
 download_remove_zips <-
@@ -216,7 +218,8 @@ download_remove_zips <-
 #' Check that all parameters have been assigned a value.
 #' @param parameters parameters passed to function (called by
 #' \code{mget(ls())}.)
-#' @return NULL
+#' @return NULL; returns a stop error if one or more function
+#' parameters other than 'extent' are NULL
 #' @keywords internal
 #' @export
 check_for_null_parameters <-
@@ -434,7 +437,7 @@ check_urls <- function(
 #' @param commands_path file path with download commands
 #' @param url_status logical vector for URL status = 200
 #' @importFrom testthat expect_true
-#' @return NULL
+#' @return NULL; returns stop error if one or more tests fail
 #' @keywords internal
 #' @export
 test_download_functions <- function(

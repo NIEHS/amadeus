@@ -9,6 +9,10 @@ check_mysftime(x)
 \arguments{
 \item{x}{an \code{sftime} object}
 }
+\value{
+NULL; returns stop error if \code{x} does not match class
+and column expectations
+}
 \description{
 Check an \code{sftime} object for its class, \code{$time} column,
 \code{$geometry} column, and geometry class.

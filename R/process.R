@@ -37,11 +37,11 @@
 #' @author Insang Song
 #' @examples
 #' \dontrun{
-#' narr <- process_covariates(
+#' process_covariates(
 #'   covariate = "narr",
-#'   date = c("2023-01-01", "2023-01-10"),
+#'   date = c("2018-01-01", "2018-01-01"),
 #'   variable = "weasd",
-#'   path = "./data/weasd"
+#'   path = system.file("extdata", "examples", "narr", "weasd")
 #' )
 #' }
 #' @export
@@ -1777,10 +1777,10 @@ process_gmted <- function(
 #' @importFrom stringi stri_pad
 #' @examples
 #' \dontrun{
-#' narr <- process_narr(
-#'   date = c("2022-01-01", "2022-01-10"),
+#' process_narr(
+#'   date = c("2018-01-01", "2018-01-01"),
 #'   variable = "weasd",
-#'   path = "./data/weasd"
+#'   path = "./tests/testdata/narr/weasd"
 #' )
 #' }
 #' @export

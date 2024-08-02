@@ -13,6 +13,10 @@ skip (\code{FALSE}) download.}
 \item{system_command}{character(1). Linux command to execute downloads.
 Inherited from data download function.}
 }
+\value{
+NULL; runs download commands with shell (Unix/Linux) or
+command prompt (Windows)
+}
 \description{
 Execute or skip the commands listed in the ...wget/curl_commands.txt file
 produced by one of the data download functions.

@@ -17,6 +17,9 @@ test_download_functions(
 
 \item{url_status}{logical vector for URL status = 200}
 }
+\value{
+NULL; returns stop error if one or more tests fail
+}
 \description{
 Implement directory, file, and download URL unit tests.
 }

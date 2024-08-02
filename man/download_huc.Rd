@@ -38,7 +38,7 @@ the text file containing download commands.}
 Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.}
 }
 \value{
-NULL. Downloaded files will be stored in \code{directory_to_save}.
+NULL; Downloaded files will be stored in \code{directory_to_save}.
 }
 \description{
 NHDPlus data provides the most comprehensive and high-resolution
@@ -52,16 +52,15 @@ For whom wants to download a specific region,
 please visit \href{https://www.epa.gov/waterdata/get-nhdplus-national-hydrography-dataset-plus-data#ListofAreas}{Get NHDPlus Data}
 }
 \examples{
-\dontrun{
 download_huc(
   region = "Lower48",
   type = "Seamless",
-  directory_to_save = "./data",
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE
+  download = FALSE, # NOTE: download skipped for examples,
+  remove_command = TRUE,
+  unzip = FALSE
 )
-}
 }
 \references{
 \insertRef{data_usgs2023nhd}{amadeus}

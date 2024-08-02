@@ -26,6 +26,11 @@ large and use lots of machine storage and memory.}
 
 \item{...}{Arguments passed to each download function.}
 }
+\value{
+NULL; Data files will be downloaded and stored in respective
+sub-directories within \code{directory_to_save}. File format and
+sub-directory names depend on data source and dataset of interest.
+}
 \description{
 The \code{download_data()} function accesses and downloads atmospheric, meteorological, and environmental data from various open-access data sources.
 }
@@ -35,17 +40,15 @@ The \code{download_data()} function accesses and downloads atmospheric, meteorol
 }
 }
 \examples{
-\dontrun{
 download_data(
   dataset_name = "narr",
   variables = "weasd",
   year = c(2023, 2023),
-  directory_to_save = "./data",
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
-  remove_commands = TRUE
+  download = FALSE, # NOTE: download skipped for examples,
+  remove_command = TRUE
 )
-}
 }
 \seealso{
 For details of each download function per dataset,

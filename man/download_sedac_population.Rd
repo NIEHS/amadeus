@@ -57,17 +57,16 @@ The \code{download_sedac_population()} function accesses and downloads
 population density data from \href{https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11}{NASA's UN WPP-Adjusted Population Density, v4.11}.
 }
 \examples{
-\dontrun{
 download_sedac_population(
   data_resolution = "30 second",
   data_format = "GeoTIFF",
   year = "2020",
-  directory_to_save = "./data",
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE
+  download = FALSE, # NOTE: download skipped for examples,
+  remove_command = TRUE,
+  unzip = FALSE
 )
-}
 }
 \references{
 \insertRef{data_ciesin2017gpwv4}{amadeus}
