@@ -1286,15 +1286,15 @@ download_narr <- function(
   #### 9. finish "..._curl_commands.txt"
   sink()
   #### 10. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
+  # system_command <- paste0(
+  #   ". ",
+  #   commands_txt,
+  #   "\n"
+  # )
   #### 11. download data
   download_run(
     download = download,
-    system_command = system_command
+    commands_txt = commands_txt
   )
   #### 12. remove command text file
   download_remove_command(

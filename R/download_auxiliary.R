@@ -99,15 +99,21 @@ download_permit <-
 #' produced by one of the data download functions.
 #' @param download logical(1). Execute (\code{TRUE}) or
 #'  skip (\code{FALSE}) download.
-#' @param system_command character(1). Linux command to execute downloads.
-#' Inherited from data download function.
+#' @param commands_txt character(1). Path of download commands
 #' @return NULL; runs download commands with shell (Unix/Linux) or
 #' command prompt (Windows)
 #' @keywords internal
 #' @export
 download_run <- function(
     download = FALSE,
-    system_command = NULL) {
+    commands_txt = NULL) {
+  if (.Platform$OS.type == "windows") {
+    runner <- ""
+    commands_txt <- gsub(".txt", "bat", commands_txt)
+  } else {
+    runner <- ". "
+  }
+  system_command <- paste0(runner, commands_txt, "\n")
   if (download == TRUE) {
     message(paste0("Downloading requested files...\n"))
     system(command = system_command)
