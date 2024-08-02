@@ -109,7 +109,7 @@ download_run <- function(
     commands_txt = NULL) {
   if (.Platform$OS.type == "windows") {
     runner <- ""
-    commands_txt <- gsub(".txt", "bat", commands_txt)
+    commands_txt <- gsub(".txt", ".bat", commands_txt)
   } else {
     runner <- ". "
   }
