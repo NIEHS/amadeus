@@ -109,12 +109,11 @@ download_run <- function(
     commands_txt = NULL) {
   if (.Platform$OS.type == "windows") {
     runner <- ""
-    post <- "|cmd"
+    commands_txt <- gsub(".txt", ".bat", commands_txt)
   } else {
     runner <- ". "
-    post <- ""
   }
-  system_command <- paste0(runner, commands_txt, post, "\n")
+  system_command <- paste0(runner, commands_txt, "\n")
   if (download == TRUE) {
     message(paste0("Downloading requested files...\n"))
     system(command = system_command)
