@@ -107,9 +107,12 @@ download_permit <-
 download_run <- function(
     download = FALSE,
     commands_txt = NULL) {
-  if (.Platform$OS.type == "windows") {
+  if (tolower(.Platform$OS.type) == "windows") {
+    message("Running downloads on Windows OS...\n")
     runner <- ""
-    commands_txt <- gsub(".txt", ".bat", commands_txt)
+    commands_bat <- gsub(".txt", ".bat", commands_txt)
+    file.copy(commands_txt, commands_bat, overwrite = TRUE)
+    commands_txt <- commands_bat
   } else {
     runner <- ". "
   }
