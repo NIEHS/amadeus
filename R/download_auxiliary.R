@@ -100,7 +100,8 @@ download_permit <-
 #' @param download logical(1). Execute (\code{TRUE}) or
 #'  skip (\code{FALSE}) download.
 #' @param commands_txt character(1). Path of download commands
-#' @return NULL; runs download commands with shell (Unix/Linux) or
+#' @return Path to commands (will change from ".txt" to ".bat" if running
+#' on Windows OS); runs download commands with shell (Unix/Linux) or
 #' command prompt (Windows)
 #' @keywords internal
 #' @export
@@ -111,7 +112,7 @@ download_run <- function(
     message("Running downloads on Windows OS...\n")
     runner <- ""
     commands_bat <- gsub(".txt", ".bat", commands_txt)
-    file.copy(commands_txt, commands_bat, overwrite = TRUE)
+    file.rename(commands_txt, commands_bat)
     commands_txt <- commands_bat
   } else {
     runner <- ". "
@@ -123,8 +124,8 @@ download_run <- function(
     message(paste0("Requested files have been downloaded.\n"))
   } else {
     message(paste0("Skipping data download.\n"))
-    return(NULL)
   }
+  return(commands_txt)
 }
 
 

@@ -1292,13 +1292,13 @@ download_narr <- function(
   #   "\n"
   # )
   #### 11. download data
-  download_run(
+  commands_new <- download_run(
     download = download,
     commands_txt = commands_txt
   )
   #### 12. remove command text file
   download_remove_command(
-    commands_txt = commands_txt,
+    commands_txt = commands_new,
     remove = remove_command
   )
 }
