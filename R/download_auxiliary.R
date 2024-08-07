@@ -109,7 +109,6 @@ download_run <- function(
     download = FALSE,
     commands_txt = NULL) {
   if (tolower(.Platform$OS.type) == "windows") {
-    message("Running downloads on Windows OS...\n")
     runner <- ""
     commands_bat <- gsub(".txt", ".bat", commands_txt)
     file.rename(commands_txt, commands_bat)
@@ -117,7 +116,7 @@ download_run <- function(
   } else {
     runner <- ". "
   }
-  system_command <- paste0(runner, commands_txt, "\n")
+  system_command <- paste0(runner, commands_txt)
   if (download == TRUE) {
     message(paste0("Downloading requested files...\n"))
     system(command = system_command)
