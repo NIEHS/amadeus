@@ -1807,6 +1807,96 @@ testthat::test_that("calc_lagged returns as expected.", {
   }
 })
 
+## lagged variables with geometry
+testthat::test_that("calc_lagged(geom = TRUE) works", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  # expect function
+  testthat::expect_true(
+    is.function(calc_lagged)
+  )
+  narr <- process_narr(
+    date = c("2018-01-01", "2018-01-10"),
+    variable = "weasd",
+    path =
+      testthat::test_path(
+        "..",
+        "testdata",
+        "narr",
+        "weasd"
+      )
+  )
+  narr_covariate <-
+    calc_narr(
+      from = narr,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean"
+    )
+  # set column names
+  narr_covariate <- calc_setcolumns(
+    from = narr_covariate,
+    lag = 0,
+    dataset = "narr",
+    locs_id = "site_id"
+  )
+
+  # expect error with geom = TRUE and locs as data.frame
+  testthat::expect_error(
+    calc_lagged(
+      from = narr_covariate,
+      date = c("2018-01-02", "2018-01-04"),
+      lag = 1,
+      geom = TRUE
+    )
+  )
+
+  # enable geom for covariates
+  narr_covariate_geom <-
+    calc_narr(
+      from = narr,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  # set column names
+  narr_covariate_geom <- calc_setcolumns(
+    from = narr_covariate_geom,
+    lag = 0,
+    dataset = "narr",
+    locs_id = "site_id"
+  )
+
+  # expect no error with geom = TRUE and locs as SpatVector
+  testthat::expect_no_error(
+    narr_lag_geom <- calc_lagged(
+      from = narr_covariate_geom,
+      date = c("2018-01-02", "2018-01-04"),
+      lag = 1,
+      locs_id = "site_id",
+      geom = TRUE
+    )
+  )
+  testthat::expect_no_error(
+    narr_lag_geom <- calc_setcolumns(
+      from = narr_lag_geom,
+      lag = 1,
+      dataset = "narr",
+      locs_id = "site_id"
+    )
+  )
+  testthat::expect_true(methods::is(narr_lag_geom, "SpatVector"))
+  # expect lag day
+  testthat::expect_true(grepl("_[0-9]{1}$", names(narr_lag_geom)[3]))
+  # expect no NA
+  testthat::expect_true(all(!is.na(narr_lag_geom)))
+})
+
 ## 19. Wrapper ####
 testthat::test_that("calc_covariates wrapper works", {
 
