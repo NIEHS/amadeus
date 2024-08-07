@@ -13,7 +13,7 @@ download_remove_command(commands_txt = NULL, remove = FALSE)
 keep (\code{FALSE}) commands}
 }
 \value{
-NULL; removes .txt file storing all download commands.
+NULL; removes .txt/.bat file storing all download commands.
 }
 \description{
 Remove or retain the .txt file storing all download commands.

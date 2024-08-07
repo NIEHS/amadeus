@@ -100,19 +100,24 @@ download_permit <-
 #' @param download logical(1). Execute (\code{TRUE}) or
 #'  skip (\code{FALSE}) download.
 #' @param commands_txt character(1). Path of download commands
-#' @return Path to commands (will change from ".txt" to ".bat" if running
-#' on Windows OS); runs download commands with shell (Unix/Linux) or
-#' command prompt (Windows)
+#' @param remove logical(1). Remove (\code{TRUE}) or
+#'  keep (\code{FALSE}) command. Passed to \code(download_remove_commands).
+#' @return NULL; runs download commands with shell (Unix/Linux) or
+#' command prompt (Windows) and removes \code(commands_txt) file if
+#' \code(remove = TRUE).
 #' @keywords internal
 #' @export
 download_run <- function(
     download = FALSE,
-    commands_txt = NULL) {
+    commands_txt = NULL,
+    remove = FALSE) {
   if (tolower(.Platform$OS.type) == "windows") {
+    # nocov start
     runner <- ""
     commands_bat <- gsub(".txt", ".bat", commands_txt)
     file.rename(commands_txt, commands_bat)
     commands_txt <- commands_bat
+    # nocov end
   } else {
     runner <- ". "
   }
@@ -124,7 +129,10 @@ download_run <- function(
   } else {
     message(paste0("Skipping data download.\n"))
   }
-  return(commands_txt)
+  download_remove_command(
+    commands_txt = commands_txt,
+    remove = remove
+  )
 }
 
 
@@ -134,7 +142,7 @@ download_run <- function(
 #' @param commands_txt character(1). Path of download commands
 #' @param remove logical(1). Remove (\code{TRUE}) or
 #'  keep (\code{FALSE}) commands
-#' @return NULL; removes .txt file storing all download commands.
+#' @return NULL; removes .txt/.bat file storing all download commands.
 #' @keywords internal
 #' @export
 download_remove_command <-

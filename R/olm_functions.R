@@ -160,21 +160,13 @@ download_olm <- function(
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
-  #### 8. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 9. download data
-  download_run(download = download,
-               system_command = system_command)
-
+  download_run(
+    download = download,
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
   message("Requests were processed.\n")
-  #### 10. remove download commands
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
-
 }
 
 
