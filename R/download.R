@@ -252,16 +252,11 @@ download_aqs <-
     cat(download_commands)
     #### 9. finish "..._curl_commands.txt" file
     sink()
-    #### 10. build system command
-    system_command <- paste0(
-      ". ",
-      commands_txt,
-      "\n"
-    )
     #### 11. download data
     download_run(
       download = download,
-      system_command = system_command
+      commands_txt = commands_txt,
+      remove = remove_command
     )
     #### 12. unzip data
     sapply(
@@ -273,11 +268,6 @@ download_aqs <-
     download_remove_zips(
       remove = remove_zip,
       download_name = download_names
-    )
-    #### 13. remove command file
-    download_remove_command(
-      commands_txt = commands_txt,
-      remove = remove_command
     )
   }
 
@@ -398,20 +388,12 @@ download_ecoregion <- function(
   }
   #### 11. finish "...curl_commands.txt" file
   sink()
-  #### 12. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 13. download data
   download_run(
     download = download,
-    system_command = system_command
+    commands_txt = commands_txt,
+    remove = remove_command
   )
-  #### 14. remove download command
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
   #### 15. unzip files
   download_unzip(
     file_name = download_name,
@@ -577,18 +559,9 @@ download_geos <- function(
   }
   #### 9. finish "..._wget_commands.txt" file
   sink()
-  #### 10. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 11. download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
@@ -725,19 +698,9 @@ download_gmted <- function(
   }
   #### 14. finish "..._curl_commands.txt" file
   sink()
-  #### 15. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 16. download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### 17. Remove command file
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
@@ -1143,19 +1106,9 @@ download_merra2 <- function(
   }
   #### finish "..._wget_commands.txt"
   sink()
-  #### build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### Remove command file
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
@@ -1285,19 +1238,9 @@ download_narr <- function(
   }
   #### 9. finish "..._curl_commands.txt"
   sink()
-  #### 10. build system command
-  # system_command <- paste0(
-  #   ". ",
-  #   commands_txt,
-  #   "\n"
-  # )
   #### 11. download data
   download_run(
     download = download,
-    commands_txt = commands_txt
-  )
-  #### 12. remove command text file
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
@@ -1436,16 +1379,11 @@ download_nlcd <- function(
   }
   #### 13. finish "..._curl_command.txt"
   sink()
-  #### 14. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 15. download data
   download_run(
     download = download,
-    system_command = system_command
+    commands_txt = commands_txt,
+    remove = remove_command
   )
   #### 16. end if unzip == FALSE
   download_unzip(
@@ -1457,11 +1395,6 @@ download_nlcd <- function(
   download_remove_zips(
     remove = remove_zip,
     download_name = download_name
-  )
-  #### 18. remove command text
-  download_remove_command(
-    commands_txt = commands_txt,
-    remove = remove_command
   )
 }
 
@@ -1589,27 +1522,17 @@ download_sedac_groads <- function(
   }
   #### 13. finish "..._curl_commands.txt" file
   sink()
-  #### 14. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 15. download data
   download_run(
     download = download,
-    system_command = system_command
+    commands_txt = commands_txt,
+    remove = remove_command
   )
   #### 16. end if unzip == FALSE
   download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
-  )
-  #### 17. Remove command file
-  download_remove_command(
-    commands_txt = commands_txt,
-    remove = remove_command
   )
   #### 18. remove zip files
   download_remove_zips(
@@ -1780,27 +1703,17 @@ download_sedac_population <- function(
   }
   #### 14. finish "..._curl_commands.txt" file
   sink()
-  #### 15. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 16. download data
   download_run(
     download = download,
-    system_command = system_command
+    commands_txt = commands_txt,
+    remove = remove_command
   )
   #### 17. end if unzip == FALSE
   download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
-  )
-  #### 18. Remove command file
-  download_remove_command(
-    commands_txt = commands_txt,
-    remove = remove_command
   )
   #### 19. remove zip files
   download_remove_zips(
@@ -1961,21 +1874,11 @@ download_hms <- function(
   }
   #### 9. finish "..._curl_commands.txt"
   sink()
-  #### 10. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 11. download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### 12. remove command file
-  download_remove_command(
-    remove = remove_command,
-    commands_txt = commands_txt
+    commands_txt = commands_txt,
+    remove = remove_command
   )
   #### 13. end if data_format == "KML"
   if (data_format == "KML") {
@@ -2112,19 +2015,9 @@ download_koppen_geiger <- function(
     cat(download_command)
   }
   sink()
-  #### 14. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 15. download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### 17. Remove command file
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
@@ -2402,22 +2295,13 @@ download_modis <- function(
     cat(download_command)
     sink()
 
-    system_command <- paste0(
-      ". ",
-      commands_txt,
-      "\n"
-    )
     download_run(
       download = download,
-      system_command = system_command
-    )
-
-    message("Requests were processed.\n")
-
-    download_remove_command(
       commands_txt = commands_txt,
       remove = remove_command
     )
+
+    message("Requests were processed.\n")
     return(NULL)
   }
 
@@ -2535,21 +2419,12 @@ download_modis <- function(
   sink(file = NULL)
 
   #### 17.
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   download_run(
     download = download,
-    system_command = system_command
+    commands_txt = commands_txt,
+    remove = remove_command
   )
-
   message("Requests were processed.\n")
-
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
-
 }
 
 
@@ -2638,19 +2513,13 @@ download_tri <- function(
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
-  #### 8. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 9. download data
-  download_run(download = download,
-               system_command = system_command)
+  download_run(
+    download = download,
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
   message("Requests were processed.\n")
-  #### 10. remove download commands
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
 
 }
 
@@ -2776,15 +2645,12 @@ download_nei <- function(
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
-  #### 8. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 9. download data
-  download_run(download = download,
-               system_command = system_command)
+  download_run(
+    download = download,
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
 
   #### 10. unzip data
   # note that this part does not utilize download_unzip
@@ -2801,10 +2667,6 @@ download_nei <- function(
     }
   }
   message("Requests were processed.\n")
-  #### 10. remove download commands
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
-
 }
 
 
@@ -2924,15 +2786,12 @@ download_huc <-
     writeLines(download_commands)
     #### 7. finish "..._curl_commands.txt" file
     sink()
-    #### 8. build system command
-    system_command <- paste0(
-      ". ",
-      commands_txt,
-      "\n"
-    )
     #### 9. download data
-    download_run(download = download,
-                 system_command = system_command)
+    download_run(
+      download = download,
+      commands_txt = commands_txt,
+      remove = remove_command
+    )
 
     #### 10. unzip data
     # note that this part does not utilize download_unzip
@@ -2950,10 +2809,6 @@ download_huc <-
       }
     }
     message("Requests were processed.\n")
-    #### 10. remove download commands
-    download_remove_command(commands_txt = commands_txt,
-                            remove = remove_command)
-
   }
 # nolint end
 
@@ -3063,15 +2918,12 @@ download_cropscape <- function(
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
-  #### 8. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 9. download data
-  download_run(download = download,
-               system_command = system_command)
+  download_run(
+    download = download,
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
 
   #### 10. unzip data
   # note that this part does not utilize download_unzip
@@ -3088,9 +2940,6 @@ download_cropscape <- function(
     # nocov end
   }
   message("Requests were processed.\n")
-  #### 10. remove download commands
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
 }
 # nolint end
 
@@ -3228,21 +3077,13 @@ download_prism <- function(
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
-  #### 8. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 9. download data
-  download_run(download = download,
-               system_command = system_command)
-
+  download_run(
+    download = download,
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
   message("Requests were processed.\n")
-  #### 10. remove download commands
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
-
 }
 
 # nolint start
@@ -3368,19 +3209,9 @@ download_gridmet <- function(
   }
   #### finish "..._curl_commands.txt"
   sink()
-  #### build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### remove command text file
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
@@ -3509,19 +3340,9 @@ download_terraclimate <- function(
   }
   #### finish "..._curl_commands.txt"
   sink()
-  #### build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### remove command text file
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
