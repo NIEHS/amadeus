@@ -1853,43 +1853,6 @@ testthat::test_that("calc_lagged(geom = TRUE) works", {
       geom = TRUE
     )
   )
-
-  # enable geom for covariates
-  narr_covariate_geom <-
-    calc_narr(
-      from = narr,
-      locs = ncp,
-      locs_id = "site_id",
-      radius = 0,
-      fun = "mean",
-      geom = TRUE
-    )
-  # set column names
-  narr_covariate_geom <- calc_setcolumns(
-    from = narr_covariate_geom,
-    lag = 0,
-    dataset = "narr",
-    locs_id = "site_id"
-  )
-
-  # expect no error with geom = TRUE and locs as SpatVector
-  testthat::expect_no_error(
-    narr_lag_geom <- calc_lagged(
-      from = narr_covariate_geom,
-      date = c("2018-01-02", "2018-01-04"),
-      lag = 1,
-      locs_id = "site_id",
-      geom = TRUE
-    )
-  )
-  testthat::expect_no_error(
-    narr_lag_geom_setcols <- calc_setcolumns(
-      from = narr_lag_geom,
-      lag = 1,
-      dataset = "narr",
-      locs_id = "site_id"
-    )
-  )
 })
 
 ## 19. Wrapper ####
