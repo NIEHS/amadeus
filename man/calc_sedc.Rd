@@ -73,6 +73,7 @@ calc_sedc(pnt_locs, pnt_from, "NAME", 1e4, vals)
 }
 \references{
 \insertRef{messier2012integrating}{amadeus}
+
 \insertRef{web_sedctutorial_package}{amadeus}
 }
 \author{

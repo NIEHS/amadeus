@@ -101,10 +101,10 @@ download_permit <-
 #'  skip (\code{FALSE}) download.
 #' @param commands_txt character(1). Path of download commands
 #' @param remove logical(1). Remove (\code{TRUE}) or
-#'  keep (\code{FALSE}) command. Passed to \code(download_remove_commands).
+#'  keep (\code{FALSE}) command. Passed to \code{download_remove_commands}.
 #' @return NULL; runs download commands with shell (Unix/Linux) or
-#' command prompt (Windows) and removes \code(commands_txt) file if
-#' \code(remove = TRUE).
+#' command prompt (Windows) and removes \code{commands_txt} file if
+#' \code{remove = TRUE}.
 #' @keywords internal
 #' @export
 download_run <- function(

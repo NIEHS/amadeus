@@ -13,12 +13,12 @@ skip (\code{FALSE}) download.}
 \item{commands_txt}{character(1). Path of download commands}
 
 \item{remove}{logical(1). Remove (\code{TRUE}) or
-keep (\code{FALSE}) command. Passed to \code(download_remove_commands).}
+keep (\code{FALSE}) command. Passed to \code{download_remove_commands}.}
 }
 \value{
 NULL; runs download commands with shell (Unix/Linux) or
-command prompt (Windows) and removes \code(commands_txt) file if
-\code(remove = TRUE).
+command prompt (Windows) and removes \code{commands_txt} file if
+\code{remove = TRUE}.
 }
 \description{
 Execute or skip the commands listed in the ...wget/curl_commands.txt file
