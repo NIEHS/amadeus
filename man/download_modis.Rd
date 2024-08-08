@@ -31,7 +31,7 @@ One of \code{c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2"
 \code{c({start}, {end})}. Default is \code{c(3, 6)}.}
 
 \item{mod06_links}{character(1). CSV file path to MOD06_L2 download links
-from NASA LPDAAC. Default is \code{NULL}.}
+from \href{https://ladsweb.modaps.eosdis.nasa.gov/search/order/2/MOD06_L2--61}{NASA LAADS MOD06_L2}. Default is \code{NULL}.}
 
 \item{nasa_earth_data_token}{character(1).
 Token for downloading data from NASA. Should be set before
