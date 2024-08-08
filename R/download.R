@@ -1371,8 +1371,7 @@ download_narr <- function(
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
-#' \insertRef{dewitz_national_2023}{amadeus}
-#' 
+#' \insertRef{dewitz_national_2023}{amadeus}<br/>
 #' \insertRef{dewitz_national_2024}{amadeus}
 #' @examples
 #' download_nlcd(
