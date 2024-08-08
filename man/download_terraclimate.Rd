@@ -42,16 +42,14 @@ folder within \code{directory_to_save}.
 The \code{download_terraclimate} function accesses and downloads climate and water balance data from the \href{https://www.climatologylab.org/terraclimate.html}{University of California Merced Climatology Lab's TerraClimate dataset}.
 }
 \examples{
-\dontrun{
 download_terraclimate(
   variables = "Precipitation",
-  year = c(2023, 2024),
-  directory_to_save = "./data",
+  year = c(2023, 2023),
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
+  download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )
-}
 }
 \references{
 \insertRef{article_abatzoglou2018terraclimate}{amadeus}

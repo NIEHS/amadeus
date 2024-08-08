@@ -46,16 +46,14 @@ The \code{download_geos()} function accesses and downloads various
 atmospheric composition collections from \href{https://gmao.gsfc.nasa.gov/GEOS_systems/}{NASA's Global Earth Observing System (GEOS) model}.
 }
 \examples{
-\dontrun{
 download_geos(
   collection = "aqc_tavg_1hr_g1440x721_v1",
-  date = c("2024-01-01", "2024-01-05"),
-  directory_to_save = "./data",
+  date = c("2024-01-01", "2024-01-01"),
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
+  download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )
-}
 }
 \references{
 \insertRef{keller_description_2021}{amadeus}

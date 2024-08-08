@@ -26,11 +26,12 @@ The examples will utilize air temperature at 2m height ("air.2m") data from the 
 Download data for years 2021 and 2022 with `download_data`.
 
 ```{r, eval = FALSE}
+dir <- tempdir()
 download_data(
   dataset_name = "narr",
   variable = "air.2m",
   year = c(2021, 2022),
-  directory_to_save = "./inst/extdata",
+  directory_to_save = dir,
   acknowledgement = TRUE,
   download = TRUE,
   remove_command = TRUE
@@ -40,7 +41,7 @@ download_data(
 Check for the downloaded files.
 
 ```{r, eval = FALSE}
-list.files("./inst/extdata/air.2m")
+list.files(paste0(dir, "/air.2m"))
 ```
 ```{r, echo = FALSE}
 cat('[1] "air.2m.2021.nc" "air.2m.2022.nc"\n')
@@ -55,7 +56,7 @@ temp_process <- process_covariates(
   covariate = "narr",
   variable = "air.2m",
   date = c("2021-12-28", "2022-01-03"),
-  path = "./inst/extdata/air.2m"
+  path = paste0(dir, "/air.2m")
 )
 ```
 

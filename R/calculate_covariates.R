@@ -1136,6 +1136,7 @@ calc_temporal_dummies <-
 #' @author Insang Song
 #' @references
 #' \insertRef{messier2012integrating}{amadeus}
+#' 
 #' \insertRef{web_sedctutorial_package}{amadeus}
 #' @examples
 #' library(terra)

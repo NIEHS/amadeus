@@ -55,3 +55,4 @@ rsconnect/
 /Meta/
 inst/doc
 inst/extdata/air.2m
+inst/extdata/nasa/token.txt

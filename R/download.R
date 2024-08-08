@@ -37,19 +37,19 @@
 #' * \code{\link{download_huc}}: `"huc"`
 #' * \code{\link{download_cropscape}}: `"cropscape"`, `"cdl"`
 #' * \code{\link{download_prism}}: `"prism"`
-#' @return NULL
+#' @return NULL; Data files will be downloaded and stored in respective
+#' sub-directories within \code{directory_to_save}. File format and
+#' sub-directory names depend on data source and dataset of interest.
 #' @examples
-#' \dontrun{
 #' download_data(
 #'   dataset_name = "narr",
 #'   variables = "weasd",
 #'   year = c(2023, 2023),
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
-#'   remove_commands = TRUE
+#'   download = FALSE, # NOTE: download skipped for examples,
+#'   remove_command = TRUE
 #' )
-#' }
 #' @export
 download_data <-
   function(
@@ -152,17 +152,16 @@ download_data <-
 #' @references
 #' \insertRef{data_usepa2023airdata}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_aqs(
 #'   parameter_code = 88101,
 #'   resolution_temporal = "daily",
-#'   year = c(2022, 2023),
-#'   directory_to_save = "./data",
+#'   year = c(2023, 2023),
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
-#'   remove_command = TRUE
+#'   download = FALSE, # NOTE: download skipped for examples,
+#'   remove_command = TRUE,
+#'   unzip = FALSE
 #' )
-#' }
 # nolint end
 #' @export
 download_aqs <-
@@ -253,16 +252,11 @@ download_aqs <-
     cat(download_commands)
     #### 9. finish "..._curl_commands.txt" file
     sink()
-    #### 10. build system command
-    system_command <- paste0(
-      ". ",
-      commands_txt,
-      "\n"
-    )
     #### 11. download data
     download_run(
       download = download,
-      system_command = system_command
+      commands_txt = commands_txt,
+      remove = remove_command
     )
     #### 12. unzip data
     sapply(
@@ -274,11 +268,6 @@ download_aqs <-
     download_remove_zips(
       remove = remove_zip,
       download_name = download_names
-    )
-    #### 13. remove command file
-    download_remove_command(
-      commands_txt = commands_txt,
-      remove = remove_command
     )
   }
 
@@ -326,14 +315,13 @@ download_aqs <-
 #' @references
 #' \insertRef{article_omernik2014ecoregions}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_ecoregion(
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
-#'   remove_command = TRUE
+#'   download = FALSE, # NOTE: download skipped for examples,
+#'   remove_command = TRUE,
+#'   unzip = FALSE
 #' )
-#' }
 #' @export
 download_ecoregion <- function(
   epa_certificate_path =
@@ -400,20 +388,12 @@ download_ecoregion <- function(
   }
   #### 11. finish "...curl_commands.txt" file
   sink()
-  #### 12. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 13. download data
   download_run(
     download = download,
-    system_command = system_command
+    commands_txt = commands_txt,
+    remove = remove_command
   )
-  #### 14. remove download command
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
   #### 15. unzip files
   download_unzip(
     file_name = download_name,
@@ -455,16 +435,14 @@ download_ecoregion <- function(
 #' @references
 #' \insertRef{keller_description_2021}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_geos(
 #'   collection = "aqc_tavg_1hr_g1440x721_v1",
-#'   date = c("2024-01-01", "2024-01-05"),
-#'   directory_to_save = "./data",
+#'   date = c("2024-01-01", "2024-01-01"),
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
+#'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
-#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -581,18 +559,9 @@ download_geos <- function(
   }
   #### 9. finish "..._wget_commands.txt" file
   sink()
-  #### 10. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 11. download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
@@ -632,16 +601,15 @@ download_geos <- function(
 #' @references
 #' \insertRef{danielson_global_2011}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_gmted(
 #'   statistic = "Breakline Emphasis",
 #'   resolution = "7.5 arc-seconds",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
-#'   remove_command = TRUE
+#'   download = FALSE, # NOTE: download skipped for examples,
+#'   remove_command = TRUE,
+#'   unzip = FALSE
 #' )
-#' }
 #' @export
 download_gmted <- function(
   statistic = c(
@@ -730,19 +698,9 @@ download_gmted <- function(
   }
   #### 14. finish "..._curl_commands.txt" file
   sink()
-  #### 15. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 16. download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### 17. Remove command file
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
@@ -783,109 +741,199 @@ download_gmted <- function(
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_gmao_merra-inst1_2d_asm_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-inst1_2d_int_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-inst1_2d_lfo_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-inst3_3d_asm_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-inst3_3d_aer_Nv}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-inst3_3d_asm_Nv}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-inst3_3d_chm_Nv}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-inst3_3d_gas_Nv}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-inst3_2d_gas_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-inst6_3d_ana_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-inst6_3d_ana_Nv}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-statD_2d_slv_Nx_m}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-statD_2d_slv_Nx_d}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg1_2d_adg_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg1_2d_aer_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg1_2d_chm_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg1_2d_csp_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg1_2d_flx_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg1_2d_int_Nx}{amadeus}
+#' 
 #' \insertRef{pawson_merra-2_2020}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg1_2d_lnd_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg1_2d_ocn_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg1_2d_rad_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg1_2d_slv_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_mst_Ne}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_trb_Ne}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_nav_Ne}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_cld_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_mst_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_rad_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_tdt_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_trb_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_udt_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_odt_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_qdt_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_asm_Nv}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_cld_Nv}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_mst_Nv}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_3d_rad_Nv}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavg3_2d_glc_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-instM_2d_asm_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-instM_2d_int_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-instM_2d_lfo_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-instM_2d_gas_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-instM_3d_asm_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-instM_3d_ana_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_2d_adg_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_2d_aer_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_2d_chm_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_2d_csp_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_2d_flx_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_2d_int_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_2d_lfo_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_2d_lnd_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_2d_ocn_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_2d_rad_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_2d_slv_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_2d_glc_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_3d_cld_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_3d_mst_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_3d_rad_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_3d_tdt_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_3d_trb_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_3d_udt_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_3d_odt_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgM_3d_qdt_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-const_2d_asm_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-instU_2d_asm_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-instU_2d_int_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-instU_2d_lfo_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-instU_2d_gas_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-instU_3d_asm_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-instU_3d_ana_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_2d_adg_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_2d_aer_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_2d_chm_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_2d_csp_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_2d_flx_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_2d_int_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_2d_lfo_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_2d_lnd_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_2d_ocn_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_2d_rad_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_2d_slv_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_2d_glc_Nx}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_3d_cld_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_3d_mst_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_3d_rad_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_3d_tdt_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_3d_trb_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_3d_udt_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_3d_odt_Np}{amadeus}
+#' 
 #' \insertRef{data_gmao_merra-tavgU_3d_qdt_Np}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_merra2(
 #'   collection = "inst1_2d_int_Nx",
-#'   date = c("2024-01-01", "2024-01-05"),
-#'   directory_to_save = "./data",
+#'   date = c("2024-01-01", "2024-01-01"),
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
+#'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
-#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -1150,19 +1198,9 @@ download_merra2 <- function(
   }
   #### finish "..._wget_commands.txt"
   sink()
-  #### build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### Remove command file
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
@@ -1195,16 +1233,14 @@ download_merra2 <- function(
 #' @references
 #' \insertRef{mesinger_north_2006}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_narr(
 #'   variables = c("weasd", "omega"),
-#'   year = c(2022, 2023),
-#'   directory_to_save = "./data",
+#'   year = c(2023, 2023),
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
+#'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
-#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -1294,19 +1330,9 @@ download_narr <- function(
   }
   #### 9. finish "..._curl_commands.txt"
   sink()
-  #### 10. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 11. download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### 12. remove command text file
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
@@ -1345,19 +1371,18 @@ download_narr <- function(
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
-#' \insertRef{dewitz_national_2023}{amadeus}
+#' \insertRef{dewitz_national_2023}{amadeus}<br/>
 #' \insertRef{dewitz_national_2024}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_nlcd(
 #'   collection = "Coterminous United States",
 #'   year = 2021,
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
-#'   remove_command = TRUE
+#'   download = FALSE, # NOTE: download skipped for examples,
+#'   remove_command = TRUE,
+#'   unzip = FALSE
 #' )
-#' }
 #' @export
 download_nlcd <- function(
   collection = "Coterminous United States",
@@ -1446,16 +1471,11 @@ download_nlcd <- function(
   }
   #### 13. finish "..._curl_command.txt"
   sink()
-  #### 14. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 15. download data
   download_run(
     download = download,
-    system_command = system_command
+    commands_txt = commands_txt,
+    remove = remove_command
   )
   #### 16. end if unzip == FALSE
   download_unzip(
@@ -1467,11 +1487,6 @@ download_nlcd <- function(
   download_remove_zips(
     remove = remove_zip,
     download_name = download_name
-  )
-  #### 18. remove command text
-  download_remove_command(
-    commands_txt = commands_txt,
-    remove = remove_command
   )
 }
 
@@ -1506,16 +1521,15 @@ download_nlcd <- function(
 #' @references
 #' \insertRef{data_ciesin2013groads}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_sedac_groads(
 #'   data_region = "Americas",
 #'   data_format = "Shapefile",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
-#'   remove_command = TRUE
+#'   download = FALSE, # NOTE: download skipped for examples,
+#'   remove_command = TRUE,
+#'   unzip = FALSE
 #' )
-#' }
 #' @export
 download_sedac_groads <- function(
     data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
@@ -1600,27 +1614,17 @@ download_sedac_groads <- function(
   }
   #### 13. finish "..._curl_commands.txt" file
   sink()
-  #### 14. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 15. download data
   download_run(
     download = download,
-    system_command = system_command
+    commands_txt = commands_txt,
+    remove = remove_command
   )
   #### 16. end if unzip == FALSE
   download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
-  )
-  #### 17. Remove command file
-  download_remove_command(
-    commands_txt = commands_txt,
-    remove = remove_command
   )
   #### 18. remove zip files
   download_remove_zips(
@@ -1664,17 +1668,16 @@ download_sedac_groads <- function(
 #' @references
 #' \insertRef{data_ciesin2017gpwv4}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_sedac_population(
 #'   data_resolution = "30 second",
 #'   data_format = "GeoTIFF",
 #'   year = "2020",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
-#'   remove_command = TRUE
+#'   download = FALSE, # NOTE: download skipped for examples,
+#'   remove_command = TRUE,
+#'   unzip = FALSE
 #' )
-#' }
 #' @export
 download_sedac_population <- function(
   data_resolution = "60 minute",
@@ -1792,27 +1795,17 @@ download_sedac_population <- function(
   }
   #### 14. finish "..._curl_commands.txt" file
   sink()
-  #### 15. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 16. download data
   download_run(
     download = download,
-    system_command = system_command
+    commands_txt = commands_txt,
+    remove = remove_command
   )
   #### 17. end if unzip == FALSE
   download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
-  )
-  #### 18. Remove command file
-  download_remove_command(
-    commands_txt = commands_txt,
-    remove = remove_command
   )
   #### 19. remove zip files
   download_remove_zips(
@@ -1858,16 +1851,15 @@ download_sedac_population <- function(
 #' @references
 #' \insertRef{web_HMSabout}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_hms(
 #'   data_format = "Shapefile",
-#'   date = c("2024-01-01", "2024-01-05"),
-#'   directory_to_save = "./data",
+#'   date = c("2024-01-01", "2024-01-01"),
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
-#'   remove_command = TRUE
+#'   download = FALSE, # NOTE: download skipped for examples,
+#'   remove_command = TRUE,
+#'   unzip = FALSE
 #' )
-#' }
 #' @export
 # nolint start: cyclocomp
 download_hms <- function(
@@ -1974,21 +1966,11 @@ download_hms <- function(
   }
   #### 9. finish "..._curl_commands.txt"
   sink()
-  #### 10. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 11. download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### 12. remove command file
-  download_remove_command(
-    remove = remove_command,
-    commands_txt = commands_txt
+    commands_txt = commands_txt,
+    remove = remove_command
   )
   #### 13. end if data_format == "KML"
   if (data_format == "KML") {
@@ -2046,18 +2028,18 @@ download_hms <- function(
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{article_beck2023koppen}{amadeus}
+#' 
 #' \insertRef{article_beck2018present}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_koppen_geiger(
 #'   data_resolution = "0.0083",
 #'   time_period = "Present",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
-#'   remove_command = TRUE
+#'   download = FALSE, # NOTE: download skipped for examples,
+#'   remove_command = TRUE,
+#'   unzip = FALSE
 #' )
-#' }
 # nolint end
 #' @export
 download_koppen_geiger <- function(
@@ -2126,19 +2108,9 @@ download_koppen_geiger <- function(
     cat(download_command)
   }
   sink()
-  #### 14. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 15. download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### 17. Remove command file
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
@@ -2180,7 +2152,7 @@ download_koppen_geiger <- function(
 #'  Token for downloading data from NASA. Should be set before
 #'  trying running the function.
 #' @param mod06_links character(1). CSV file path to MOD06_L2 download links
-#' from NASA LPDAAC. Default is `NULL`.
+#' from [NASA LAADS MOD06_L2](https://ladsweb.modaps.eosdis.nasa.gov/search/order/2/MOD06_L2--61). Default is `NULL`.
 #' @param date character(2). length of 10 each. Start/end date for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`). Note: ignored if
 #' \code{product == "MOD06_L2"}.
@@ -2198,55 +2170,65 @@ download_koppen_geiger <- function(
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_mcd19a22021}{amadeus}
+#' 
 #' \insertRef{data_mod06l2_2017}{amadeus}
+#' 
 #' \insertRef{data_mod09ga2021}{amadeus}
+#' 
 #' \insertRef{data_mod11a12021}{amadeus}
+#' 
 #' \insertRef{data_mod13a22021}{amadeus}
+#' 
 #' \insertRef{article_roman2018vnp46}{amadeus}
-# nolint end
 #' @examples
-#' \dontrun{
-#' # example with MOD0GA product
+#' # example with MOD09GA product
 #' download_modis(
 #'   product = "MOD09GA",
 #'   version = "61",
-#'   horizontal_tiles = c(8, 10),
-#'   vertical_tiles = c(4, 5),
-#'   date = c("2024-01-01", "2024-01-10"),
-#'   nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
-#'   directory_to_save = "./data/mod09ga",
+#'   horizontal_tiles = c(8, 8),
+#'   vertical_tiles = c(4, 4),
+#'   date = c("2024-01-01", "2024-01-01"),
+#'   nasa_earth_data_token =
+#'     system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
+#'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
 #' # example with MOD06_L2 product
 #' download_modis(
 #'   product = "MOD06_L2",
 #'   version = "61",
-#'   horizontal_tiles = c(8, 10),
-#'   vertical_tiles = c(4, 5),
-#'   mod06_links = "~/LAADS_query.2024-07-15T12_17.csv",
-#'   date = c("2024-01-01", "2024-01-10"),
-#'   nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
-#'   directory_to_save = "./data/mod06l2",
+#'   horizontal_tiles = c(8, 8),
+#'   vertical_tiles = c(4, 4),
+#'   date = c("2024-01-01", "2024-01-01"),
+#'   mod06_links =
+#'     system.file(
+#'       "extdata", "nasa", "LAADS_query.2024-08-02T12_49.csv",
+#'       package = "amadeus"
+#'     ),
+#'   nasa_earth_data_token =
+#'     system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
+#'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
 #' # example with VNP46A2 product
 #' download_modis(
 #'   product = "VNP46A2",
 #'   version = "61",
-#'   horizontal_tiles = c(8, 10),
-#'   vertical_tiles = c(4, 5),
-#'   date = c("2024-01-01", "2024-01-10"),
-#'   nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
-#'   directory_to_save = "./data/vnp46a2",
+#'   horizontal_tiles = c(8, 8),
+#'   vertical_tiles = c(4, 4),
+#'   date = c("2024-01-01", "2024-01-01"),
+#'   nasa_earth_data_token =
+#'     system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
+#'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
-#' }
+# nolint end
 #' @export
 download_modis <- function(
     product = c(
@@ -2411,22 +2393,13 @@ download_modis <- function(
     cat(download_command)
     sink()
 
-    system_command <- paste0(
-      ". ",
-      commands_txt,
-      "\n"
-    )
     download_run(
       download = download,
-      system_command = system_command
-    )
-
-    message("Requests were processed.\n")
-
-    download_remove_command(
       commands_txt = commands_txt,
       remove = remove_command
     )
+
+    message("Requests were processed.\n")
     return(NULL)
   }
 
@@ -2544,21 +2517,12 @@ download_modis <- function(
   sink(file = NULL)
 
   #### 17.
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   download_run(
     download = download,
-    system_command = system_command
+    commands_txt = commands_txt,
+    remove = remove_command
   )
-
   message("Requests were processed.\n")
-
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
-
 }
 
 
@@ -2585,15 +2549,13 @@ download_modis <- function(
 #' @references
 #' \insertRef{web_usepa2024tri}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_tri(
-#'   year = c(2020L, 2021L),
-#'   directory_to_save = "./data",
+#'   year = c(2021L, 2021L),
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
+#'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
-#' }
 #' @export
 download_tri <- function(
   year = c(2018L, 2022L),
@@ -2649,19 +2611,13 @@ download_tri <- function(
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
-  #### 8. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 9. download data
-  download_run(download = download,
-               system_command = system_command)
+  download_run(
+    download = download,
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
   message("Requests were processed.\n")
-  #### 10. remove download commands
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
 
 }
 
@@ -2708,15 +2664,14 @@ download_tri <- function(
 #' @references
 #' \insertRef{web_usepa2024nei}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_nei(
 #'   year = c(2017L, 2020L),
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
-#'   remove_command = TRUE
+#'   download = FALSE, # NOTE: download skipped for examples,
+#'   remove_command = TRUE,
+#'   unzip = FALSE
 #' )
-#' }
 #' @export
 download_nei <- function(
   epa_certificate_path =
@@ -2788,15 +2743,12 @@ download_nei <- function(
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
-  #### 8. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 9. download data
-  download_run(download = download,
-               system_command = system_command)
+  download_run(
+    download = download,
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
 
   #### 10. unzip data
   # note that this part does not utilize download_unzip
@@ -2813,10 +2765,6 @@ download_nei <- function(
     }
   }
   message("Requests were processed.\n")
-  #### 10. remove download commands
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
-
 }
 
 
@@ -2847,22 +2795,21 @@ download_nei <- function(
 #' the text file containing download commands.
 #' @param unzip logical(1). Unzip the downloaded compressed files.
 #' Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.
-#' @return NULL. Downloaded files will be stored in \code{directory_to_save}.
+#' @return NULL; Downloaded files will be stored in \code{directory_to_save}.
 #' @author Insang Song
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_usgs2023nhd}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_huc(
 #'   region = "Lower48",
 #'   type = "Seamless",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
-#'   remove_command = TRUE
+#'   download = FALSE, # NOTE: download skipped for examples,
+#'   remove_command = TRUE,
+#'   unzip = FALSE
 #' )
-#' }
 #' @export
 # @importFrom archive archive_extract
 download_huc <-
@@ -2937,15 +2884,12 @@ download_huc <-
     writeLines(download_commands)
     #### 7. finish "..._curl_commands.txt" file
     sink()
-    #### 8. build system command
-    system_command <- paste0(
-      ". ",
-      commands_txt,
-      "\n"
-    )
     #### 9. download data
-    download_run(download = download,
-                 system_command = system_command)
+    download_run(
+      download = download,
+      commands_txt = commands_txt,
+      remove = remove_command
+    )
 
     #### 10. unzip data
     # note that this part does not utilize download_unzip
@@ -2963,10 +2907,6 @@ download_huc <-
       }
     }
     message("Requests were processed.\n")
-    #### 10. remove download commands
-    download_remove_command(commands_txt = commands_txt,
-                            remove = remove_command)
-
   }
 # nolint end
 
@@ -3000,16 +2940,15 @@ download_huc <-
 #' @return NULL; Yearly comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @examples
-#' \dontrun{
 #' download_cropscape(
 #'   year = 2020,
 #'   source = "USDA",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
-#'   remove_command = TRUE
+#'   download = FALSE, # NOTE: download skipped for examples,
+#'   remove_command = TRUE,
+#'   unzip = FALSE
 #' )
-#' }
 #' @importFrom archive archive_extract
 #' @export
 download_cropscape <- function(
@@ -3077,15 +3016,12 @@ download_cropscape <- function(
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
-  #### 8. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 9. download data
-  download_run(download = download,
-               system_command = system_command)
+  download_run(
+    download = download,
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
 
   #### 10. unzip data
   # note that this part does not utilize download_unzip
@@ -3102,9 +3038,6 @@ download_cropscape <- function(
     # nocov end
   }
   message("Requests were processed.\n")
-  #### 10. remove download commands
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
 }
 # nolint end
 
@@ -3151,18 +3084,16 @@ download_cropscape <- function(
 #' @references
 #' \insertRef{article_daly2000prism}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_prism(
 #'   time = "202104",
 #'   element = "ppt",
 #'   data_type = "ts",
 #'   format = "nc",
-#'   directory_to_save = "./data",
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
+#'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
-#' }
 #' @references
 #' * [PRISM Climate Group](https://prism.oregonstate.edu/)
 #' * [PRISM Web Service Guide](https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf)
@@ -3244,21 +3175,13 @@ download_prism <- function(
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
-  #### 8. build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### 9. download data
-  download_run(download = download,
-               system_command = system_command)
-
+  download_run(
+    download = download,
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
   message("Requests were processed.\n")
-  #### 10. remove download commands
-  download_remove_command(commands_txt = commands_txt,
-                          remove = remove_command)
-
 }
 
 # nolint start
@@ -3287,16 +3210,14 @@ download_prism <- function(
 #' @references
 #' \insertRef{article_abatzoglou2013development}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_gridmet(
 #'   variables = "Precipitation",
-#'   year = c(2023, 2024),
-#'   directory_to_save = "./data",
+#'   year = c(2023, 2023),
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
+#'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
-#' }
 #' @export
 # nolint end
 download_gridmet <- function(
@@ -3386,19 +3307,9 @@ download_gridmet <- function(
   }
   #### finish "..._curl_commands.txt"
   sink()
-  #### build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### remove command text file
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )
@@ -3429,16 +3340,14 @@ download_gridmet <- function(
 #' @references
 #' \insertRef{article_abatzoglou2018terraclimate}{amadeus}
 #' @examples
-#' \dontrun{
 #' download_terraclimate(
 #'   variables = "Precipitation",
-#'   year = c(2023, 2024),
-#'   directory_to_save = "./data",
+#'   year = c(2023, 2023),
+#'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = TRUE,
+#'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
-#' }
 #' @export
 # nolint end
 download_terraclimate <- function(
@@ -3529,19 +3438,9 @@ download_terraclimate <- function(
   }
   #### finish "..._curl_commands.txt"
   sink()
-  #### build system command
-  system_command <- paste0(
-    ". ",
-    commands_txt,
-    "\n"
-  )
   #### download data
   download_run(
     download = download,
-    system_command = system_command
-  )
-  #### remove command text file
-  download_remove_command(
     commands_txt = commands_txt,
     remove = remove_command
   )

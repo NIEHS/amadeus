@@ -14,6 +14,9 @@ data}
 
 \item{unzip}{logical(1). Unzip (\code{TRUE}) or not.}
 }
+\value{
+NULL; unzips downloaded zip files
+}
 \description{
 Unzip (inflate) downloaded ".zip" files.
 }

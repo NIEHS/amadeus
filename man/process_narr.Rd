@@ -40,10 +40,10 @@ pressure level, and date.
 }
 \examples{
 \dontrun{
-narr <- process_narr(
-  date = c("2022-01-01", "2022-01-10"),
+process_narr(
+  date = c("2018-01-01", "2018-01-01"),
   variable = "weasd",
-  path = "./data/weasd"
+  path = "./tests/testdata/narr/weasd"
 )
 }
 }

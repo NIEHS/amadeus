@@ -10,6 +10,9 @@ download_permit(acknowledgement)
 \item{acknowledgement}{logical(1). Whether to
 start downloading}
 }
+\value{
+NULL; returns a stop error if the acknowledgement is FALSE
+}
 \description{
 Return an error if the \code{acknowledgement = FALSE}.
 }

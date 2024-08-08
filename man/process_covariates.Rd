@@ -35,11 +35,11 @@ data files before passing to \code{process_covariates}}.
 }
 \examples{
 \dontrun{
-narr <- process_covariates(
+process_covariates(
   covariate = "narr",
-  date = c("2023-01-01", "2023-01-10"),
+  date = c("2018-01-01", "2018-01-01"),
   variable = "weasd",
-  path = "./data/weasd"
+  path = system.file("extdata", "examples", "narr", "weasd")
 )
 }
 }

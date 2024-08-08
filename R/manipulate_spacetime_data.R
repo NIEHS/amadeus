@@ -6,7 +6,8 @@
 #' @import sftime
 #' @author Eva Marques
 #' @keywords spacetime
-#' @return NULL
+#' @return NULL; returns stop error if \code{x} does not match class
+#' and column expectations
 #' @export
 check_mysftime <- function(x) {
   stopifnot(
@@ -29,7 +30,8 @@ check_mysftime <- function(x) {
 #' @import sf
 #' @author Eva Marques
 #' @keywords spacetime
-#' @return NULL
+#' @return NULL; returns stop error if \code{x} does not match class
+#' and/or column expectations
 #' @export
 check_mysf <- function(x) {
   stopifnot(

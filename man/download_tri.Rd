@@ -36,15 +36,13 @@ NULL; Comma-separated value (CSV) files will be stored in
 The \code{download_tri()} function accesses and downloads toxic release data from the \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-action-0}{U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program}.
 }
 \examples{
-\dontrun{
 download_tri(
-  year = c(2020L, 2021L),
-  directory_to_save = "./data",
+  year = c(2021L, 2021L),
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
+  download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )
-}
 }
 \references{
 \insertRef{web_usepa2024tri}{amadeus}

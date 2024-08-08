@@ -60,17 +60,16 @@ NULL; Zip and/or data files will be downloaded and stored in
 The \code{download_aqs()} function accesses and downloads Air Quality System (AQS) data from the \href{https://aqs.epa.gov/aqsweb/airdata/download_files.html}{U.S. Environmental Protection Agency's (EPA) Pre-Generated Data Files}.
 }
 \examples{
-\dontrun{
 download_aqs(
   parameter_code = 88101,
   resolution_temporal = "daily",
-  year = c(2022, 2023),
-  directory_to_save = "./data",
+  year = c(2023, 2023),
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE
+  download = FALSE, # NOTE: download skipped for examples,
+  remove_command = TRUE,
+  unzip = FALSE
 )
-}
 }
 \references{
 \insertRef{data_usepa2023airdata}{amadeus}

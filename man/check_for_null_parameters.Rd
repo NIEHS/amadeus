@@ -10,6 +10,10 @@ check_for_null_parameters(parameters)
 \item{parameters}{parameters passed to function (called by
 \code{mget(ls())}.)}
 }
+\value{
+NULL; returns a stop error if one or more function
+parameters other than 'extent' are NULL
+}
 \description{
 Check that all parameters have been assigned a value.
 }

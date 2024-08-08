@@ -9,6 +9,10 @@ check_mysf(x)
 \arguments{
 \item{x}{an \code{sf} object}
 }
+\value{
+NULL; returns stop error if \code{x} does not match class
+and/or column expectations
+}
 \description{
 Check an \code{sf} object for its class, \code{$geometry} column, and
 geometry class.

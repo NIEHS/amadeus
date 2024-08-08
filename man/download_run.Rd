@@ -4,14 +4,21 @@
 \alias{download_run}
 \title{Run download commands}
 \usage{
-download_run(download = FALSE, system_command = NULL)
+download_run(download = FALSE, commands_txt = NULL, remove = FALSE)
 }
 \arguments{
 \item{download}{logical(1). Execute (\code{TRUE}) or
 skip (\code{FALSE}) download.}
 
-\item{system_command}{character(1). Linux command to execute downloads.
-Inherited from data download function.}
+\item{commands_txt}{character(1). Path of download commands}
+
+\item{remove}{logical(1). Remove (\code{TRUE}) or
+keep (\code{FALSE}) command. Passed to \code{download_remove_commands}.}
+}
+\value{
+NULL; runs download commands with shell (Unix/Linux) or
+command prompt (Windows) and removes \code{commands_txt} file if
+\code{remove = TRUE}.
 }
 \description{
 Execute or skip the commands listed in the ...wget/curl_commands.txt file

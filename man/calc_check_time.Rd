@@ -13,6 +13,9 @@ calc_check_time(covar, POSIXt = TRUE)
 \code{POSIXt}? If \code{FALSE}, the time values will be checked for integer class
 (year and year-month).}
 }
+\value{
+NULL; returns a stop error if \code{time} is wrong class
+}
 \description{
 Check the time values within calculated covariates \code{data.frame}
 }

@@ -66,15 +66,14 @@ certificate updates in the future.
 }
 }
 \examples{
-\dontrun{
 download_nei(
   year = c(2017L, 2020L),
-  directory_to_save = "./data",
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE
+  download = FALSE, # NOTE: download skipped for examples,
+  remove_command = TRUE,
+  unzip = FALSE
 )
-}
 }
 \references{
 \insertRef{web_usepa2024nei}{amadeus}
