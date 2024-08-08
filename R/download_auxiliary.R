@@ -124,7 +124,7 @@ download_run <- function(
   system_command <- paste0(runner, commands_txt)
   if (download == TRUE) {
     message(paste0("Downloading requested files...\n"))
-    system(command = system_command)
+    system(command = system_command, intern = TRUE)
     message(paste0("Requested files have been downloaded.\n"))
   } else {
     message(paste0("Skipping data download.\n"))
