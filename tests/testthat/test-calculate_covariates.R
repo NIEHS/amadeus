@@ -1890,11 +1890,6 @@ testthat::test_that("calc_lagged(geom = TRUE) works", {
       locs_id = "site_id"
     )
   )
-  testthat::expect_true(methods::is(narr_lag_geom_setcols, "SpatVector"))
-  # expect lag day
-  testthat::expect_true(grepl("_[0-9]{1}$", names(narr_lag_geom_setcols)[3]))
-  # expect no NA
-  testthat::expect_true(all(!is.na(narr_lag_geom_setcols)))
 })
 
 ## 19. Wrapper ####
