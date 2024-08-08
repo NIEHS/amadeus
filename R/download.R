@@ -2152,7 +2152,7 @@ download_koppen_geiger <- function(
 #'  Token for downloading data from NASA. Should be set before
 #'  trying running the function.
 #' @param mod06_links character(1). CSV file path to MOD06_L2 download links
-#' from NASA LPDAAC. Default is `NULL`.
+#' from [NASA LAADS MOD06_L2](https://ladsweb.modaps.eosdis.nasa.gov/search/order/2/MOD06_L2--61). Default is `NULL`.
 #' @param date character(2). length of 10 each. Start/end date for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`). Note: ignored if
 #' \code{product == "MOD06_L2"}.
