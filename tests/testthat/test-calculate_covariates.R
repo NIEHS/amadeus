@@ -1883,18 +1883,18 @@ testthat::test_that("calc_lagged(geom = TRUE) works", {
     )
   )
   testthat::expect_no_error(
-    narr_lag_geom <- calc_setcolumns(
+    narr_lag_geom_setcols <- calc_setcolumns(
       from = narr_lag_geom,
       lag = 1,
       dataset = "narr",
       locs_id = "site_id"
     )
   )
-  testthat::expect_true(methods::is(narr_lag_geom, "SpatVector"))
+  testthat::expect_true(methods::is(narr_lag_geom_setcols, "SpatVector"))
   # expect lag day
-  testthat::expect_true(grepl("_[0-9]{1}$", names(narr_lag_geom)[3]))
+  testthat::expect_true(grepl("_[0-9]{1}$", names(narr_lag_geom_setcols)[3]))
   # expect no NA
-  testthat::expect_true(all(!is.na(narr_lag_geom)))
+  testthat::expect_true(all(!is.na(narr_lag_geom_setcols)))
 })
 
 ## 19. Wrapper ####
