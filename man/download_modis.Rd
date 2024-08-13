@@ -31,7 +31,7 @@ One of \code{c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2"
 \code{c({start}, {end})}. Default is \code{c(3, 6)}.}
 
 \item{mod06_links}{character(1). CSV file path to MOD06_L2 download links
-from NASA LPDAAC. Default is \code{NULL}.}
+from \href{https://ladsweb.modaps.eosdis.nasa.gov/search/order/2/MOD06_L2--61}{NASA LAADS MOD06_L2}. Default is \code{NULL}.}
 
 \item{nasa_earth_data_token}{character(1).
 Token for downloading data from NASA. Should be set before
@@ -70,55 +70,65 @@ Directory structure looks like
 input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
 }
 \examples{
-\dontrun{
-# example with MOD0GA product
+# example with MOD09GA product
 download_modis(
   product = "MOD09GA",
   version = "61",
-  horizontal_tiles = c(8, 10),
-  vertical_tiles = c(4, 5),
-  date = c("2024-01-01", "2024-01-10"),
-  nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
-  directory_to_save = "./data/mod09ga",
+  horizontal_tiles = c(8, 8),
+  vertical_tiles = c(4, 4),
+  date = c("2024-01-01", "2024-01-01"),
+  nasa_earth_data_token =
+    system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
+  download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )
 # example with MOD06_L2 product
 download_modis(
   product = "MOD06_L2",
   version = "61",
-  horizontal_tiles = c(8, 10),
-  vertical_tiles = c(4, 5),
-  mod06_links = "~/LAADS_query.2024-07-15T12_17.csv",
-  date = c("2024-01-01", "2024-01-10"),
-  nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
-  directory_to_save = "./data/mod06l2",
+  horizontal_tiles = c(8, 8),
+  vertical_tiles = c(4, 4),
+  date = c("2024-01-01", "2024-01-01"),
+  mod06_links =
+    system.file(
+      "extdata", "nasa", "LAADS_query.2024-08-02T12_49.csv",
+      package = "amadeus"
+    ),
+  nasa_earth_data_token =
+    system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
+  download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )
 # example with VNP46A2 product
 download_modis(
   product = "VNP46A2",
   version = "61",
-  horizontal_tiles = c(8, 10),
-  vertical_tiles = c(4, 5),
-  date = c("2024-01-01", "2024-01-10"),
-  nasa_earth_data_token = readLines("~/pre_generated_token.txt"),
-  directory_to_save = "./data/vnp46a2",
+  horizontal_tiles = c(8, 8),
+  vertical_tiles = c(4, 4),
+  date = c("2024-01-01", "2024-01-01"),
+  nasa_earth_data_token =
+    system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
+  download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )
 }
-}
 \references{
 \insertRef{data_mcd19a22021}{amadeus}
+
 \insertRef{data_mod06l2_2017}{amadeus}
+
 \insertRef{data_mod09ga2021}{amadeus}
+
 \insertRef{data_mod11a12021}{amadeus}
+
 \insertRef{data_mod13a22021}{amadeus}
+
 \insertRef{article_roman2018vnp46}{amadeus}
 }
 \author{

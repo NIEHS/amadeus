@@ -9,7 +9,7 @@ testthat::test_that(
       )
     product <- "no2_s5p.l3.trop.tmwm"
     format <- "p50_p90_2km*.*tif"
-    directory_to_save <- testthat::test_path("..", "testdata", "olm_temp/")
+    directory_to_save <- paste0(tempdir(), "/olm")
     acknowledgement <- TRUE
     download <- FALSE
 
@@ -26,7 +26,7 @@ testthat::test_that(
 
     commands_path <- paste0(
       directory_to_save,
-      "OLM_queried_",
+      "/OLM_queried_",
       product,
       "_",
       Sys.Date(),

@@ -9,6 +9,10 @@ download_sink(command_txt)
 \arguments{
 \item{command_txt}{character(1). file path to export commands.}
 }
+\value{
+NULL; creates and opens connection to text file to store
+download commands
+}
 \description{
 Open connection to \code{command_txt} file to store download commands.
 }

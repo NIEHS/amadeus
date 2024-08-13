@@ -11,6 +11,9 @@ download_remove_zips(remove = FALSE, download_name)
 
 \item{download_name}{character. Full zip file path}
 }
+\value{
+NULL; removes downloaded zip files after they are unzipped
+}
 \description{
 Remove downloaded ".zip" files.
 }

@@ -27,6 +27,7 @@ jobs:
             extra-packages: |
               any::pak
               any::covr
+              any::rstac
             needs: coverage
 
       - name: Cache C++ and R dependencies

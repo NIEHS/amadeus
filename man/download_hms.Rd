@@ -55,16 +55,15 @@ The \code{download_hms()} function accesses and downloads
 wildfire smoke plume coverage data from \href{https://www.ospo.noaa.gov/products/land/hms.html#0}{NOAA's Hazard Mapping System Fire and Smoke Product}.
 }
 \examples{
-\dontrun{
 download_hms(
   data_format = "Shapefile",
-  date = c("2024-01-01", "2024-01-05"),
-  directory_to_save = "./data",
+  date = c("2024-01-01", "2024-01-01"),
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE
+  download = FALSE, # NOTE: download skipped for examples,
+  remove_command = TRUE,
+  unzip = FALSE
 )
-}
 }
 \references{
 \insertRef{web_HMSabout}{amadeus}

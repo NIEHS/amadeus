@@ -54,19 +54,18 @@ land cover data from the
 \href{https://www.mrlc.gov/data}{Multi-Resolution Land Characteristics (MRLC) Consortium's National Land Cover Database (NLCD) products data base}.
 }
 \examples{
-\dontrun{
 download_nlcd(
   collection = "Coterminous United States",
   year = 2021,
-  directory_to_save = "./data",
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE
+  download = FALSE, # NOTE: download skipped for examples,
+  remove_command = TRUE,
+  unzip = FALSE
 )
 }
-}
 \references{
-\insertRef{dewitz_national_2023}{amadeus}
+\insertRef{dewitz_national_2023}{amadeus}\if{html}{\out{<br/>}}
 \insertRef{dewitz_national_2024}{amadeus}
 }
 \author{

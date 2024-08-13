@@ -12,6 +12,9 @@ download_remove_command(commands_txt = NULL, remove = FALSE)
 \item{remove}{logical(1). Remove (\code{TRUE}) or
 keep (\code{FALSE}) commands}
 }
+\value{
+NULL; removes .txt/.bat file storing all download commands.
+}
 \description{
 Remove or retain the .txt file storing all download commands.
 }

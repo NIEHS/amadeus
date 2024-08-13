@@ -77,7 +77,7 @@ download_sanitize_path <-
 #' The \code{acknowledgement} parameter is designed to help users avoid
 #' accidentally initiating a very large data download that may take a very long
 #' time to run or exceed machine capabilities.
-#' @return NULL
+#' @return NULL; returns a stop error if the acknowledgement is FALSE
 #' @keywords internal
 #' @export
 download_permit <-
@@ -99,22 +99,40 @@ download_permit <-
 #' produced by one of the data download functions.
 #' @param download logical(1). Execute (\code{TRUE}) or
 #'  skip (\code{FALSE}) download.
-#' @param system_command character(1). Linux command to execute downloads.
-#' Inherited from data download function.
-#' @return NULL
+#' @param commands_txt character(1). Path of download commands
+#' @param remove logical(1). Remove (\code{TRUE}) or
+#'  keep (\code{FALSE}) command. Passed to \code{download_remove_commands}.
+#' @return NULL; runs download commands with shell (Unix/Linux) or
+#' command prompt (Windows) and removes \code{commands_txt} file if
+#' \code{remove = TRUE}.
 #' @keywords internal
 #' @export
 download_run <- function(
     download = FALSE,
-    system_command = NULL) {
+    commands_txt = NULL,
+    remove = FALSE) {
+  if (tolower(.Platform$OS.type) == "windows") {
+    # nocov start
+    runner <- ""
+    commands_bat <- gsub(".txt", ".bat", commands_txt)
+    file.rename(commands_txt, commands_bat)
+    commands_txt <- commands_bat
+    # nocov end
+  } else {
+    runner <- ". "
+  }
+  system_command <- paste0(runner, commands_txt)
   if (download == TRUE) {
     message(paste0("Downloading requested files...\n"))
-    system(command = system_command)
+    system(command = system_command, intern = TRUE)
     message(paste0("Requested files have been downloaded.\n"))
   } else {
     message(paste0("Skipping data download.\n"))
-    return(NULL)
   }
+  download_remove_command(
+    commands_txt = commands_txt,
+    remove = remove
+  )
 }
 
 
@@ -124,7 +142,7 @@ download_run <- function(
 #' @param commands_txt character(1). Path of download commands
 #' @param remove logical(1). Remove (\code{TRUE}) or
 #'  keep (\code{FALSE}) commands
-#' @return NULL
+#' @return NULL; removes .txt/.bat file storing all download commands.
 #' @keywords internal
 #' @export
 download_remove_command <-
@@ -140,7 +158,8 @@ download_remove_command <-
 #' @description
 #' Open connection to \code{command_txt} file to store download commands.
 #' @param command_txt character(1). file path to export commands.
-#' @return NULL
+#' @return NULL; creates and opens connection to text file to store
+#' download commands
 #' @keywords internal
 #' @export
 download_sink <-
@@ -159,7 +178,7 @@ download_sink <-
 #' @param directory_to_unzip character(1). Directory to unzip
 #' data
 #' @param unzip logical(1). Unzip (\code{TRUE}) or not.
-#' @return NULL
+#' @return NULL; unzips downloaded zip files
 #' @keywords internal
 #' @export
 download_unzip <-
@@ -193,7 +212,7 @@ download_unzip <-
 #' If \code{remove = TRUE}, ensure that \code{unzip = TRUE}. Choosing to remove
 #' ".zip" files without unzipping will retain none of the downloaded data.
 #' then it will remove all files in the second higher level directory.
-#' @return NULL
+#' @return NULL; removes downloaded zip files after they are unzipped
 #' @keywords internal
 #' @export
 download_remove_zips <-
@@ -205,7 +224,7 @@ download_remove_zips <-
       file.remove(download_name)
       # oftentimes zipfiles are stored in zip_files under
       # directory_to_save in download functions.
-      unlink(dirname(dirname(download_name)), recursive = TRUE)
+      unlink(dirname(download_name), recursive = TRUE)
       message(paste0("Download files removed.\n"))
     }
   }
@@ -216,7 +235,8 @@ download_remove_zips <-
 #' Check that all parameters have been assigned a value.
 #' @param parameters parameters passed to function (called by
 #' \code{mget(ls())}.)
-#' @return NULL
+#' @return NULL; returns a stop error if one or more function
+#' parameters other than 'extent' are NULL
 #' @keywords internal
 #' @export
 check_for_null_parameters <-
@@ -434,7 +454,7 @@ check_urls <- function(
 #' @param commands_path file path with download commands
 #' @param url_status logical vector for URL status = 200
 #' @importFrom testthat expect_true
-#' @return NULL
+#' @return NULL; returns stop error if one or more tests fail
 #' @keywords internal
 #' @export
 test_download_functions <- function(

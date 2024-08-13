@@ -132,7 +132,7 @@ calc_setcolumns <- function(
 #' @param time placeholder
 #' @param time_type placeholder
 #' @param level placeholder
-#' @return NULL
+#' @return NULL; provides progress messages to R console.
 #' @keywords internal
 #' @export
 calc_message <- function(
@@ -299,7 +299,7 @@ calc_time <- function(
 #' @param POSIXt logical(1). Should the time values in `covar` be of class
 #' `POSIXt`? If `FALSE`, the time values will be checked for integer class
 #' (year and year-month).
-#' @return NULL
+#' @return NULL; returns a stop error if `time` is wrong class
 #' @keywords internal
 #' @export
 # nolint start

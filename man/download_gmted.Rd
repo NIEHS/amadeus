@@ -55,16 +55,15 @@ Multi-resolution Terrain Elevation Data (GMTED2010) from
 \href{https://www.usgs.gov/coastal-changes-and-impacts/gmted2010}{U.S. Geological Survey and National Geospatial-Intelligence Agency}.
 }
 \examples{
-\dontrun{
 download_gmted(
   statistic = "Breakline Emphasis",
   resolution = "7.5 arc-seconds",
-  directory_to_save = "./data",
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE
+  download = FALSE, # NOTE: download skipped for examples,
+  remove_command = TRUE,
+  unzip = FALSE
 )
-}
 }
 \references{
 \insertRef{danielson_global_2011}{amadeus}
