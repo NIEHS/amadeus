@@ -29,6 +29,7 @@ jobs:
               any::devtools
               any::DT
               any::htmltools
+              any::rstac
             needs: coverage
 
       - name: Cache C++ and R dependencies
