@@ -11,7 +11,7 @@ U.S. Geological Survey and National Geospatial-Intelligence Agency."><meta prope
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -130,16 +130,17 @@ Series: Open-File Report, <a href="https://doi.org/10.3133/ofr20111073" class="e
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="fu">download_gmted</span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">download_gmted</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  statistic <span class="op">=</span> <span class="st">"Breakline Emphasis"</span>,</span></span>
 <span class="r-in"><span>  resolution <span class="op">=</span> <span class="st">"7.5 arc-seconds"</span>,</span></span>
-<span class="r-in"><span>  directory_to_save <span class="op">=</span> <span class="st">"./data"</span>,</span></span>
+<span class="r-in"><span>  directory_to_save <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  download <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># NOTE: download skipped for examples,</span></span></span>
+<span class="r-in"><span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  unzip <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Skipping data download.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Downloaded files will not be unzipped.</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
