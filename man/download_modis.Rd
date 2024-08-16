@@ -70,6 +70,7 @@ Directory structure looks like
 input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
 }
 \examples{
+\dontrun{
 # example with MOD09GA product
 download_modis(
   product = "MOD09GA",
@@ -77,8 +78,7 @@ download_modis(
   horizontal_tiles = c(8, 8),
   vertical_tiles = c(4, 4),
   date = c("2024-01-01", "2024-01-01"),
-  nasa_earth_data_token =
-    system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+  nasa_earth_data_token = "./pathtotoken/token.txt",
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
   download = FALSE, # NOTE: download skipped for examples,
@@ -96,8 +96,7 @@ download_modis(
       "extdata", "nasa", "LAADS_query.2024-08-02T12_49.csv",
       package = "amadeus"
     ),
-  nasa_earth_data_token =
-    system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+  nasa_earth_data_token = "./pathtotoken/token.txt",
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
   download = FALSE, # NOTE: download skipped for examples,
@@ -110,13 +109,13 @@ download_modis(
   horizontal_tiles = c(8, 8),
   vertical_tiles = c(4, 4),
   date = c("2024-01-01", "2024-01-01"),
-  nasa_earth_data_token =
-    system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+  nasa_earth_data_token = "./pathtotoken/token.txt",
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
   download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )
+}
 }
 \references{
 \insertRef{data_mcd19a22021}{amadeus}

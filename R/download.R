@@ -2181,6 +2181,7 @@ download_koppen_geiger <- function(
 #' 
 #' \insertRef{article_roman2018vnp46}{amadeus}
 #' @examples
+#' \dontrun{
 #' # example with MOD09GA product
 #' download_modis(
 #'   product = "MOD09GA",
@@ -2188,8 +2189,7 @@ download_koppen_geiger <- function(
 #'   horizontal_tiles = c(8, 8),
 #'   vertical_tiles = c(4, 4),
 #'   date = c("2024-01-01", "2024-01-01"),
-#'   nasa_earth_data_token =
-#'     system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+#'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
@@ -2207,8 +2207,7 @@ download_koppen_geiger <- function(
 #'       "extdata", "nasa", "LAADS_query.2024-08-02T12_49.csv",
 #'       package = "amadeus"
 #'     ),
-#'   nasa_earth_data_token =
-#'     system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+#'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
@@ -2221,13 +2220,13 @@ download_koppen_geiger <- function(
 #'   horizontal_tiles = c(8, 8),
 #'   vertical_tiles = c(4, 4),
 #'   date = c("2024-01-01", "2024-01-01"),
-#'   nasa_earth_data_token =
-#'     system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+#'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 # nolint end
 #' @export
 download_modis <- function(
