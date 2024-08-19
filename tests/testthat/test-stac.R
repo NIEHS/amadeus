@@ -1,5 +1,9 @@
+################################################################################
+##### unit and integration tests for rstac listing functions
 
-testthat::test_that("list_stac_files returns character vector of file links", {
+################################################################################
+##### list_stac_files
+testthat::test_that("list_stac_files", {
   withr::local_package("rstac")
   # Set up test data
   stac_json <-

@@ -1,3 +1,8 @@
+################################################################################
+##### unit and integration tests for spacetime manipulation functions
+
+################################################################################
+##### check_mysftime
 testthat::test_that("check_mysftime works as expected", {
   withr::local_package("data.table")
   withr::local_package("sf")
@@ -70,8 +75,9 @@ testthat::test_that("check_mysftime works as expected", {
   )
 })
 
-
-testthat::test_that("check_mysf works as expected", {
+################################################################################
+##### check_mysf
+testthat::test_that("check_mysf", {
   withr::local_package("data.table")
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
@@ -128,7 +134,9 @@ testthat::test_that("check_mysf works as expected", {
   )
 })
 
-testthat::test_that("rename_time works as expected", {
+################################################################################
+##### rename_time
+testthat::test_that("rename_time", {
   withr::local_package("data.table")
   withr::local_package("sf")
   withr::local_package("sftime")
@@ -154,7 +162,9 @@ testthat::test_that("rename_time works as expected", {
   )
 })
 
-testthat::test_that("dt_as_mysftime works as expected", {
+################################################################################
+##### dt_as_mysftime
+testthat::test_that("dt_as_mysftime", {
   # open testing data
   stdata <- data.table::fread(paste0(
     testthat::test_path("..", "testdata/", ""),
@@ -197,7 +207,9 @@ testthat::test_that("dt_as_mysftime works as expected", {
   )
 })
 
-testthat::test_that("as_mysftime works as expected", {
+################################################################################
+##### as_mysftime
+testthat::test_that("as_mysftime", {
   withr::local_package("terra")
   withr::local_package("data.table")
   # open testing data
@@ -329,8 +341,9 @@ testthat::test_that("as_mysftime works as expected", {
   )
 })
 
-
-testthat::test_that("sftime_as_spatvector as expected", {
+################################################################################
+##### sftime_as_spatvector
+testthat::test_that("sftime_as_spatvector", {
   # open testing data
   stdata <- data.table::fread(paste0(
     testthat::test_path("..", "testdata/", ""),
@@ -350,7 +363,9 @@ testthat::test_that("sftime_as_spatvector as expected", {
   testthat::expect_error(sftime_as_spatvector(stdata))
 })
 
-testthat::test_that("sf_as_mysftime works as expected", {
+################################################################################
+##### sf_as_mysftime
+testthat::test_that("sf_as_mysftime", {
   withr::local_package("data.table")
   withr::local_package("sf")
   withr::local_package("sftime")
@@ -373,7 +388,9 @@ testthat::test_that("sf_as_mysftime works as expected", {
   )
 })
 
-testthat::test_that("sftime_as_mysftime works as expected", {
+################################################################################
+##### sftime_as_mysftime
+testthat::test_that("sftime_as_mysftime", {
   withr::local_package("data.table")
   withr::local_package("sf")
   withr::local_package("sftime")
@@ -403,8 +420,9 @@ testthat::test_that("sftime_as_mysftime works as expected", {
   )
 })
 
-
-testthat::test_that("spatraster_as_sftime works as expected", {
+################################################################################
+##### spatraster_as_sftime
+testthat::test_that("spatraster_as_sftime", {
   withr::local_package("terra")
   withr::local_package("sftime")
   withr::local_options(list(sf_use_s2 = FALSE))
@@ -431,8 +449,9 @@ testthat::test_that("spatraster_as_sftime works as expected", {
   )
 })
 
-
-testthat::test_that("spatrds_as_sftime works as expected", {
+################################################################################
+##### spatrds_as_sftime
+testthat::test_that("spatrds_as_sftime", {
   withr::local_package("terra")
   withr::local_package("sftime")
   withr::local_options(list(sf_use_s2 = FALSE))
@@ -471,8 +490,9 @@ testthat::test_that("spatrds_as_sftime works as expected", {
   testthat::expect_equal(attributes(mysft)$time, "date")
 })
 
-
-testthat::test_that("sftime_as_sf works as expected", {
+################################################################################
+##### sftime_as_sf
+testthat::test_that("sftime_as_sf", {
   withr::local_package("data.table")
   withr::local_package("sf")
   withr::local_package("sftime")
@@ -503,7 +523,9 @@ testthat::test_that("sftime_as_sf works as expected", {
   )
 })
 
-testthat::test_that("sftime_as_sf works as expected", {
+################################################################################
+##### sftime_as_sf
+testthat::test_that("sftime_as_sf", {
   withr::local_package("data.table")
   withr::local_package("sf")
   withr::local_package("sftime")
@@ -533,8 +555,9 @@ testthat::test_that("sftime_as_sf works as expected", {
   )
 })
 
-
-testthat::test_that("sftime_as_spatraster works as expected", {
+################################################################################
+##### sftime_as_spatraster
+testthat::test_that("sftime_as_spatraster", {
   withr::local_package("terra")
   withr::local_package("sftime")
   withr::local_options(list(sf_use_s2 = FALSE))
@@ -556,8 +579,9 @@ testthat::test_that("sftime_as_spatraster works as expected", {
   )
 })
 
-
-testthat::test_that("sftime_as_spatrds works as expected", {
+################################################################################
+##### sftime_as_spatrds
+testthat::test_that("sftime_as_spatrds", {
   withr::local_package("terra")
   withr::local_package("sftime")
   withr::local_options(list(sf_use_s2 = FALSE))
