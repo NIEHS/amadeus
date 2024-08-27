@@ -33,6 +33,6 @@ RoxygenNote: 7.3.2
 Config/Needs/website: tidyverse/tidytemplate
 Config/testhat/edition: 3
 License: MIT + file LICENSE
-URL: https://github.com/NIEHS/amadeus
+URL: https://niehs.github.io/amadeus/
 BugReports: https://github.com/NIEHS/amadeus/issues
 Language: en-US
