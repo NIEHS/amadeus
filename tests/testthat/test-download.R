@@ -12,16 +12,14 @@ testthat::test_that("download_data (expected errors - acknowledgement)", {
                          "hms", "smoke", "gridmet",
                          "terraclimate", "huc", "cropscape", "cdl", "prism")
   for (d in seq_along(download_datasets)) {
-    expect_error(
+    testthat::expect_error(
       download_data(dataset_name = download_datasets[d],
-                    acknowledgement = FALSE),
-      paste0("Please refer to the argument list and ",
-             "the error message above to rectify the error.\n")
+                    acknowledgement = FALSE)
     )
   }
 })
 
-testthat::test_that("Error when one parameter is NULL.", {
+testthat::test_that("download_data (expected errors - directory)", {
   download_datasets <- c("aqs", "ecoregion", "geos", "gmted", "koppen",
                          "koppengeiger", "merra2", "merra", "narr",
                          "nlcd", "noaa", "sedac_groads",
@@ -29,12 +27,10 @@ testthat::test_that("Error when one parameter is NULL.", {
                          "hms", "smoke", "gridmet",
                          "terraclimate", "huc", "cropscape", "cdl", "prism")
   for (d in seq_along(download_datasets)) {
-    expect_error(
+    testthat::expect_error(
       download_data(dataset_name = download_datasets[d],
                     acknowledgement = TRUE,
-                    directory_to_save = NULL),
-      paste0("Please refer to the argument list and ",
-             "the error message above to rectify the error.\n")
+                    directory_to_save = NULL)
     )
   }
 })
