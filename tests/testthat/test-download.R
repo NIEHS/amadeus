@@ -37,7 +37,7 @@ testthat::test_that("download_data (expected errors - directory)", {
 
 testthat::test_that("download_data (expected errors - temporal range)", {
   withr::with_tempdir({
-    expect_error(
+    testthat::expect_error(
       download_geos(
       date = c("1900-01-01", "2018-01-01"),
       collection = "aqc_tavg_1hr_g1440x721_v1",
@@ -45,14 +45,14 @@ testthat::test_that("download_data (expected errors - temporal range)", {
       directory_to_save = "."
       )
     )
-    expect_error(
+    testthat::expect_error(
       download_aqs(
       year = c(1900, 2022),
       acknowledgement = TRUE,
       directory_to_save = "."
       )
     )
-    expect_error(
+    testthat::expect_error(
       download_narr(
         year = c(1900, 2022),
         variables = "air.sfc",
@@ -60,7 +60,7 @@ testthat::test_that("download_data (expected errors - temporal range)", {
         directory_to_save = "."
       )
     )
-    expect_error(
+    testthat::expect_error(
       download_merra2(
         date = c("1900-01-01", "2023-09-01"),
         collection = "inst1_2d_asm_Nx",
@@ -70,14 +70,14 @@ testthat::test_that("download_data (expected errors - temporal range)", {
       )
     )
     sink()
-    expect_error(
+    testthat::expect_error(
       download_hms(
         date = c("1900-01-01", "2018-01-01"),
         directory_to_save = ".",
         acknowledgement = TRUE
       )
     )
-    expect_error(
+    testthat::expect_error(
       download_gridmet(
         year = c(1900, 2022),
         variables = "Precipitation",
@@ -85,7 +85,7 @@ testthat::test_that("download_data (expected errors - temporal range)", {
         directory_to_save = "."
       )
     )
-    expect_error(
+    testthat::expect_error(
       download_terraclimate(
         year = c(1900, 2022),
         variables = "Wind Speed",

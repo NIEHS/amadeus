@@ -109,10 +109,16 @@ download_data <-
         )
       },
       error = function(e) {
-        message(e)
-        message(args(what_to_run))
-        stop(paste0("Please refer to the argument list and ",
-                    "the error message above to rectify the error.\n"))
+        stop(
+          paste0(
+            e,
+            "\n",
+            paste0(deparse(args(what_to_run)), collapse = "\n"),
+            "\n",
+            "Please refer to the argument list and ",
+            "the error message above to rectify the error.\n"
+          )
+        )
       }
     )
   }
