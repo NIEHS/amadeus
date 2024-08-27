@@ -27,6 +27,8 @@ This fix will ensure that the EPA air quality monitoring sites
 will be located within the ecoregion.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 ecoregion <- process_ecoregion(
   path = "./data/epa_ecoregion.gpkg"

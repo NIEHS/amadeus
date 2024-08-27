@@ -71,6 +71,8 @@ input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
 }
 \examples{
 \dontrun{
+## NOTE: Examples are wrapped in `/dontrun{}` to avoid sharing sensitive
+##       NASA EarthData tokden information.
 # example with MOD09GA product
 download_modis(
   product = "MOD09GA",

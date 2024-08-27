@@ -42,6 +42,8 @@ dataset. For more information, see
 \url{https://www.nature.com/articles/sdata2018214}.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 calc_koppen_geiger(

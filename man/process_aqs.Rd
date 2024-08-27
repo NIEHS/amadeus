@@ -58,6 +58,8 @@ resulting in a long processing time or even a crash if data is too large
 for your computing environment to process.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 aqs <- process_aqs(
   path = "./data/aqs_daily_example.csv",

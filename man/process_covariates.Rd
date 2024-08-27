@@ -34,6 +34,8 @@ operate on the raw data files. To avoid errors, \strong{do not edit the raw
 data files before passing to \code{process_covariates}}.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 process_covariates(
   covariate = "narr",

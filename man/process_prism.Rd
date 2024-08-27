@@ -31,6 +31,8 @@ returning a single \code{SpatRaster} object.
 Reads time series or 30-year normal PRISM data.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 prism <- process_prism(
   path = "./data/PRISM_ppt_stable_4kmM3_202104_nc.nc",

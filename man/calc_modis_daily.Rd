@@ -61,10 +61,12 @@ swaths or tiles, so it is strongly recommended to check and pre-filter
 the file names at users' discretion.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
 calc_modis_daily(
-  from = mod06l2_warp,
+  from = mod06l2_warp, # dervied from process_modis() example
   locs = locs,
   locs_id = "id",
   radius = 0,

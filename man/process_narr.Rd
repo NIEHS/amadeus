@@ -39,6 +39,8 @@ Layer names of the returned \code{SpatRaster} object contain the variable acrony
 pressure level, and date.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 process_narr(
   date = c("2018-01-01", "2018-01-01"),

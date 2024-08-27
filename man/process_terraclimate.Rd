@@ -42,6 +42,8 @@ TerraClimate data has monthly temporal resolution, so the first day of each mont
 is used as a placeholder temporal value.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 terraclimate <- process_terraclimate(
   date = c("2023-01-01", "2023-01-10"),

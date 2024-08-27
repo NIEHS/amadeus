@@ -50,6 +50,8 @@ Users need to select a subdataset to process. The full path looks like
 the full path to the hdf file.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 mod06l2_swath <- process_modis_swath(
   path = list.files(

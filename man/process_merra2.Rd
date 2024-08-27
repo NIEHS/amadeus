@@ -38,6 +38,8 @@ names are taken directly from raw data and are not edited to retain
 pressure level information.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 merra2 <- process_merra2(
   date = c("2024-01-01", "2024-01-10"),

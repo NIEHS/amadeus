@@ -44,6 +44,8 @@ grid points.
 This function handles one file at a time.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 mod06l2_warp <- process_modis_warp(
   path = paste0(

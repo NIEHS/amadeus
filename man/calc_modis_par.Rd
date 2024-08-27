@@ -115,6 +115,8 @@ insufficient tiles.
 }
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
 locs <- terra::vect(locs, geom = c("lon", "lat"), crs = "EPSG:4326")

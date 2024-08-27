@@ -39,6 +39,8 @@ list of sub-datasets in the input file then consult the documentation
 of MODIS product.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 mod09ga_flatten <- process_flatten_sds(
   path =

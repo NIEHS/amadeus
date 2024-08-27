@@ -27,10 +27,12 @@ a data.frame or SpatVector object
 Calculate road emissions covariates
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 calc_nei(
-  from = nei, # derived from process_nei example,
+  from = nei, # derived from process_nei example
   locs = loc,
   locs_id = "id"
 )

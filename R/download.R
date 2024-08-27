@@ -109,8 +109,8 @@ download_data <-
         )
       },
       error = function(e) {
-        print(e)
-        print(args(what_to_run))
+        message(e)
+        message(args(what_to_run))
         stop(paste0("Please refer to the argument list and ",
                     "the error message above to rectify the error.\n"))
       }
@@ -1016,7 +1016,7 @@ download_merra2 <- function(
   identifiers_df <- as.data.frame(identifiers)
   colnames(identifiers_df) <- c("collection_id", "estd_name", "DOI")
   if (!all(collection %in% identifiers_df$collection_id)) {
-    print(identifiers_df)
+    message(identifiers_df)
     stop(paste0("Requested collection is not recognized.\n
     Please refer to the table above to find a proper collection.\n"))
   }
@@ -2182,6 +2182,8 @@ download_koppen_geiger <- function(
 #' \insertRef{article_roman2018vnp46}{amadeus}
 #' @examples
 #' \dontrun{
+#' ## NOTE: Examples are wrapped in `/dontrun{}` to avoid sharing sensitive
+#' ##       NASA EarthData tokden information.
 #' # example with MOD09GA product
 #' download_modis(
 #'   product = "MOD09GA",

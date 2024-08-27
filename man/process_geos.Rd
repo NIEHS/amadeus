@@ -36,6 +36,8 @@ Layer names of the returned \code{SpatRaster} object contain the variable,
 pressure level, date, and hour.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 geos <- process_geos(
   date = c("2024-01-01", "2024-01-10"),

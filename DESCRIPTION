@@ -1,6 +1,6 @@
 Package: amadeus
-Title: Accessing and Analyzing Large-Scale Environmental Data in R
-Version: 1.0.5
+Title: Accessing and Analyzing Large-Scale Environmental Data
+Version: 1.0.6
 Authors@R: c(
     person(given = "Mitchell", family = "Manware", role = c("aut", "ctb"), comment = c(ORCID = "0009-0003-6440-6106")),
     person(given = "Insang", family = "Song", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-8732-3256")),
@@ -10,7 +10,7 @@ Authors@R: c(
     person("Spatiotemporal Exposures and Toxicology Group", role = c("cph"))
     )
 Maintainer: Kyle Messier <kyle.messier@nih.gov>
-Description: Functions are designed to facilitate access to and utility with large scale, publicly available environmental data in R. The package contains functions for downloading raw data files from web URLs (download_data()), processing the raw data files into clean spatial objects (process_covariates()), and extracting values from the spatial data objects at point and polygon locations (calc_covariates()). These functions call a series of source-specific functions which are tailored to each data sources/datasets particular URL structure, data format, and spatial/temporal resolution. The functions are tested, versioned, and open source and open access. For calc_sedc() method details, see <doi:10.1021/es203152a>.
+Description: Functions are designed to facilitate access to and utility with large scale, publicly available environmental data in R. The package contains functions for downloading raw data files from web URLs (download_data()), processing the raw data files into clean spatial objects (process_covariates()), and extracting values from the spatial data objects at point and polygon locations (calc_covariates()). These functions call a series of source-specific functions which are tailored to each data sources/datasets particular URL structure, data format, and spatial/temporal resolution. The functions are tested, versioned, and open source and open access. For calc_sedc() method details, see Messier, Akita, and Serre (2012) <doi:10.1021/es203152a>.
 Depends: R (>= 4.1.0)
 Imports: dplyr, sf, sftime, stats, terra, methods, data.table, httr, rvest, exactextractr, utils, stringi, testthat (>= 3.0.0), parallelly, stars, future, future.apply, tidyr, rlang, nhdplusTools, archive, collapse, Rdpack
 Suggests: 

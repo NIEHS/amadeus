@@ -35,6 +35,8 @@ a \code{SpatVector} object
 Retrieve Hydrologic Unit Code (HUC) data
 }
 \examples{
+## NOTE: Examples are wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 library(terra)
 getf <- "WBD_National_GDB.gdb"

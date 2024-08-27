@@ -42,6 +42,8 @@ MODIS products downloaded by functions in \code{amadeus},
 and \href{https://github.com/rspatial/luna}{luna} are accepted.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 mod09ga_merge <- process_modis_merge(
   path =

@@ -22,6 +22,8 @@ The \code{process_secac_population()} function imports and cleans raw
 population density data, returning a single \code{SpatRaster} object.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 pop <- process_sedac_population(
   path = "./data/sedac_population_example.tif"

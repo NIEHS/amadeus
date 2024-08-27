@@ -37,6 +37,8 @@
 #' @return Calculated covariates as a data.frame or SpatVector object
 #' @author Insang Song
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_covariates(
@@ -106,8 +108,8 @@ calc_covariates <-
           ...
         )
       }, error = function(e) {
-        print(e)
-        print(args(what_to_run))
+        message(e)
+        message(args(what_to_run))
         stop(
           paste0(
             "Please refer to the argument list and the error message above ",
@@ -150,6 +152,8 @@ calc_covariates <-
 #' @importFrom terra merge
 #' @importFrom methods is
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_koppen_geiger(
@@ -307,6 +311,8 @@ calc_koppen_geiger <-
 #' @importFrom future.apply future_Map
 #' @importFrom collapse rowbind
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_nlcd(
@@ -471,6 +477,8 @@ calc_nlcd <- function(from,
 #' @importFrom terra extract
 #' @importFrom data.table year
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_ecoregion(
@@ -598,10 +606,12 @@ calc_ecoregion <-
 #' @importFrom sf st_as_sf
 #' @importFrom sf st_drop_geometry
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
 #' calc_modis_daily(
-#'   from = mod06l2_warp,
+#'   from = mod06l2_warp, # dervied from process_modis() example
 #'   locs = locs,
 #'   locs_id = "id",
 #'   radius = 0,
@@ -812,6 +822,8 @@ calc_modis_daily <- function(
 #' @importFrom future.apply future_lapply
 #' @importFrom parallelly availableWorkers
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
 #' locs <- terra::vect(locs, geom = c("lon", "lat"), crs = "EPSG:4326")
@@ -1026,6 +1038,8 @@ process_modis_swath, or process_blackmarble.")
 #' @importFrom data.table month
 #' @importFrom data.table as.data.table
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_temporal_dummies(
@@ -1308,6 +1322,8 @@ The result may not be accurate.\n",
 #' @importFrom dplyr ungroup
 #' @importFrom dplyr summarize
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_tri(
@@ -1397,10 +1413,12 @@ calc_tri <- function(
 #' @importFrom terra project
 #' @importFrom terra intersect
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_nei(
-#'   from = nei, # derived from process_nei example,
+#'   from = nei, # derived from process_nei example
 #'   locs = loc,
 #'   locs_id = "id"
 #' )
@@ -1459,6 +1477,8 @@ calc_nei <- function(
 #' @importFrom dplyr all_of
 #' @importFrom stats setNames
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_hms(
@@ -1692,6 +1712,8 @@ calc_hms <- function(
 #' @importFrom terra nlyr
 #' @importFrom terra crs
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_gmted(
@@ -1813,6 +1835,8 @@ calc_gmted <- function(
 #' @importFrom terra nlyr
 #' @importFrom terra crs
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_narr(
@@ -1906,6 +1930,8 @@ calc_narr <- function(
 #' @importFrom terra nlyr
 #' @importFrom terra crs
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_geos(
@@ -1983,6 +2009,8 @@ calc_geos <- function(
 #' @return a data.frame or SpatVector object
 #' @importFrom methods is
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_sedac_population(
@@ -2098,6 +2126,8 @@ calc_sedac_population <- function(
 #' @importFrom terra linearUnits
 #' @importFrom methods is
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_sedac_groads(
@@ -2212,6 +2242,8 @@ calc_sedac_groads <- function(
 #' @importFrom terra nlyr
 #' @importFrom terra crs
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_merra2(
@@ -2301,6 +2333,8 @@ calc_merra2 <- function(
 #' @importFrom terra nlyr
 #' @importFrom terra crs
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_gridmet(
@@ -2386,6 +2420,8 @@ calc_gridmet <- function(
 #' @importFrom terra nlyr
 #' @importFrom terra crs
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calc_terraclimate(
@@ -2469,6 +2505,8 @@ calc_terraclimate <- function(
 #' @importFrom dplyr lag
 #' @importFrom dplyr select
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' terracliamte_covar <- calc_terraclimate(
