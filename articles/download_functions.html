@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,7 @@ Manware</h4>
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/NIEHS/amadeus" class="external-link">amadeus</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://niehs.github.io/amadeus/">amadeus</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
@@ -795,11 +795,6 @@ source-specific download function returns an error.</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;simpleError in what_to_run(directory_to_save = directory_to_save, acknowledgement = acknowledgement,     ...): unused argument (directory_to_download = "../inst/extdata/")&gt;</span></span>
-<span><span class="co">#&gt; function (data_format = "Shapefile", date = c("2018-01-01", "2018-01-01"), </span></span>
-<span><span class="co">#&gt;     directory_to_save = NULL, acknowledgement = FALSE, download = FALSE, </span></span>
-<span><span class="co">#&gt;     remove_command = FALSE, unzip = TRUE, remove_zip = FALSE) </span></span>
-<span><span class="co">#&gt; NULL</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🎊</span></span></code></pre></div>
 <p>This test utilizes <code><a href="https://testthat.r-lib.org/reference/expect_error.html" class="external-link">testthat::expect_error</a></code> because the
 <code>download_data</code> wrapper function returns an error message if
@@ -985,7 +980,7 @@ retained.</p>
 <span><span class="co">#&gt;     }</span></span>
 <span><span class="co">#&gt;     download_remove_zips(remove = remove_zip, download_name = download_names)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55ec05950a40&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55ce5a4ad4f0&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:amadeus&gt;</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
