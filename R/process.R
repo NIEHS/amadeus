@@ -36,6 +36,8 @@
 #' covariate type and selections.
 #' @author Insang Song
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' process_covariates(
 #'   covariate = "narr",
@@ -107,12 +109,14 @@ process_covariates <-
           ...
         )
       }, error = function(e) {
-        print(e)
-        print(args(what_to_run))
         stop(
           paste0(
-            "Please refer to the argument list and the error message above to ",
-            "rectify the error.\n"
+            e,
+            "\n",
+            paste0(deparse(args(what_to_run)), collapse = "\n"),
+            "\n",
+            "Please refer to the argument list and ",
+            "the error message above to rectify the error.\n"
           )
         )
       })
@@ -213,6 +217,8 @@ process_modis_sds <-
 #' @importFrom terra tapp
 #' @importFrom terra is.rotated
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' mod09ga_flatten <- process_flatten_sds(
 #'   path =
@@ -297,6 +303,8 @@ the input then flatten it manually.")
 #' @author Insang Song
 #' @return a `SpatRaster` object
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' mod09ga_merge <- process_modis_merge(
 #'   path =
@@ -437,6 +445,8 @@ process_blackmarble_corners <-
 #' @importFrom terra crs
 #' @importFrom terra merge
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' vnp46a2 <- process_blackmarble(
 #'   path =
@@ -528,6 +538,8 @@ process_blackmarble <- function(
 #' @importFrom stars st_warp
 #' @importFrom stars read_stars
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' mod06l2_warp <- process_modis_warp(
 #'   path = paste0(
@@ -607,6 +619,8 @@ process_modis_warp <-
 #' @importFrom terra values
 #' @importFrom terra sprc
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' mod06l2_swath <- process_modis_swath(
 #'   path = list.files(
@@ -725,6 +739,8 @@ process_modis_swath <-
 #' @author Insang Song
 #' @importFrom terra rast
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' kg <- process_koppen_geiger(
 #'   path = "./data/koppen_geiger_data.tif"
@@ -769,6 +785,8 @@ process_koppen_geiger <-
 #' @importFrom tools file_path_sans_ext
 #' @importFrom terra rast metags
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' nlcd <- process_nlcd(
 #'   path = "./data/",
@@ -832,6 +850,8 @@ process_nlcd <-
 #' @importFrom sf st_read st_crs st_as_sfc st_transform st_intersects st_union
 #' @importFrom data.table year
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' ecoregion <- process_ecoregion(
 #'   path = "./data/epa_ecoregion.gpkg"
@@ -910,6 +930,8 @@ process_ecoregion <-
 #' @importFrom tidyr pivot_wider
 #' @importFrom stats setNames
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' tri <- process_tri(
 #'   path = "./data",
@@ -1018,6 +1040,8 @@ process_tri <- function(
 #' @importFrom data.table fread
 #' @importFrom data.table rbindlist
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' nei <- process_nei(
 #'   path = "./data",
@@ -1138,6 +1162,8 @@ process_nei <- function(
 #' resulting in a long processing time or even a crash if data is too large
 #' for your computing environment to process.
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' aqs <- process_aqs(
 #'   path = "./data/aqs_daily_example.csv",
@@ -1317,6 +1343,8 @@ process_aqs <-
 #' @return a `SpatRaster` object
 #' @importFrom terra rast
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' pop <- process_sedac_population(
 #'   path = "./data/sedac_population_example.tif"
@@ -1397,6 +1425,8 @@ process_sedac_population <- function(
 #' @return a `SpatVector` object
 #' @importFrom terra vect
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' groads <- process_sedac_groads(
 #'   path = "./data/groads_example.shp"
@@ -1660,6 +1690,8 @@ process_hms <- function(
 #' @importFrom terra rast
 #' @importFrom terra varnames
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' gmted <- process_gmted(
 #'   variable = c("Breakline Emphasis", "7.5 arc-seconds"),
@@ -1776,6 +1808,8 @@ process_gmted <- function(
 #' @importFrom terra subset
 #' @importFrom stringi stri_pad
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' process_narr(
 #'   date = c("2018-01-01", "2018-01-01"),
@@ -2024,6 +2058,8 @@ process_narr <- function(
 #' @importFrom terra crs
 #' @importFrom terra subset
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' geos <- process_geos(
 #'   date = c("2024-01-01", "2024-01-10"),
@@ -2216,6 +2252,8 @@ process_geos <-
 #' @importFrom terra crs
 #' @importFrom terra subset
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' merra2 <- process_merra2(
 #'   date = c("2024-01-01", "2024-01-10"),
@@ -2404,6 +2442,8 @@ process_merra2 <-
 #' @importFrom terra time
 #' @importFrom terra subset
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' gridmet <- process_gridmet(
 #'   date = c("2023-01-01", "2023-01-10"),
@@ -2571,6 +2611,8 @@ process_gridmet <- function(
 #' @importFrom terra time
 #' @importFrom terra subset
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' terraclimate <- process_terraclimate(
 #'   date = c("2023-01-01", "2023-01-10"),
@@ -2750,6 +2792,8 @@ process_terraclimate <- function(
 #' @importFrom rlang inject
 #' @importFrom nhdplusTools get_huc
 #' @examples
+#' ## NOTE: Examples are wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' library(terra)
 #' getf <- "WBD_National_GDB.gdb"
@@ -2845,6 +2889,8 @@ process_huc <-
 #' @importFrom terra rast
 #' @importFrom terra metags
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' cropscape <- process_cropscape(
 #'   path = "./data/cropscape_example.tif",
@@ -2904,6 +2950,8 @@ process_cropscape <-
 #' @importFrom terra rast
 #' @importFrom terra metags
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' prism <- process_prism(
 #'   path = "./data/PRISM_ppt_stable_4kmM3_202104_nc.nc",

@@ -26,6 +26,8 @@ returning a single \code{SpatRaster} object.
 Reads NLCD file of selected \code{year}.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 nlcd <- process_nlcd(
   path = "./data/",

@@ -49,6 +49,8 @@ will contain the year and month in YYYYMM format (ie. January, 2018 =
 201801).
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 calc_terraclimate(

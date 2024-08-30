@@ -36,6 +36,8 @@ Users should be aware of the coordinate system of census boundary data for
 other analyses.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 nei <- process_nei(
   path = "./data",

@@ -109,10 +109,16 @@ download_data <-
         )
       },
       error = function(e) {
-        print(e)
-        print(args(what_to_run))
-        stop(paste0("Please refer to the argument list and ",
-                    "the error message above to rectify the error.\n"))
+        stop(
+          paste0(
+            e,
+            "\n",
+            paste0(deparse(args(what_to_run)), collapse = "\n"),
+            "\n",
+            "Please refer to the argument list and ",
+            "the error message above to rectify the error.\n"
+          )
+        )
       }
     )
   }
@@ -1016,7 +1022,7 @@ download_merra2 <- function(
   identifiers_df <- as.data.frame(identifiers)
   colnames(identifiers_df) <- c("collection_id", "estd_name", "DOI")
   if (!all(collection %in% identifiers_df$collection_id)) {
-    print(identifiers_df)
+    message(identifiers_df)
     stop(paste0("Requested collection is not recognized.\n
     Please refer to the table above to find a proper collection.\n"))
   }
@@ -2181,6 +2187,9 @@ download_koppen_geiger <- function(
 #' 
 #' \insertRef{article_roman2018vnp46}{amadeus}
 #' @examples
+#' \dontrun{
+#' ## NOTE: Examples are wrapped in `/dontrun{}` to avoid sharing sensitive
+#' ##       NASA EarthData tokden information.
 #' # example with MOD09GA product
 #' download_modis(
 #'   product = "MOD09GA",
@@ -2188,8 +2197,7 @@ download_koppen_geiger <- function(
 #'   horizontal_tiles = c(8, 8),
 #'   vertical_tiles = c(4, 4),
 #'   date = c("2024-01-01", "2024-01-01"),
-#'   nasa_earth_data_token =
-#'     system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+#'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
@@ -2207,8 +2215,7 @@ download_koppen_geiger <- function(
 #'       "extdata", "nasa", "LAADS_query.2024-08-02T12_49.csv",
 #'       package = "amadeus"
 #'     ),
-#'   nasa_earth_data_token =
-#'     system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+#'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
@@ -2221,13 +2228,13 @@ download_koppen_geiger <- function(
 #'   horizontal_tiles = c(8, 8),
 #'   vertical_tiles = c(4, 4),
 #'   date = c("2024-01-01", "2024-01-01"),
-#'   nasa_earth_data_token =
-#'     system.file("extdata", "nasa", "token.txt", package = "amadeus"),
+#'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 # nolint end
 #' @export
 download_modis <- function(

@@ -27,6 +27,8 @@ U.S. context. The returned \code{SpatVector} object contains a
 dataset. For more information, see \url{https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata}.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 groads <- process_sedac_groads(
   path = "./data/groads_example.shp"

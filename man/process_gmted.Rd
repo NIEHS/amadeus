@@ -37,6 +37,8 @@ returning a single \code{SpatRaster} object.
 of release (2010).
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 gmted <- process_gmted(
   variable = c("Breakline Emphasis", "7.5 arc-seconds"),

@@ -62,6 +62,8 @@ but uses more memory as it will account for the partial overlap
 with the buffer.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 calc_nlcd(

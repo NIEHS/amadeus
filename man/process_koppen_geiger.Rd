@@ -23,6 +23,8 @@ The \code{process_koppen_geiger()} function imports and cleans raw climate
 classification data, returning a single \code{SpatRaster} object.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 kg <- process_koppen_geiger(
   path = "./data/koppen_geiger_data.tif"

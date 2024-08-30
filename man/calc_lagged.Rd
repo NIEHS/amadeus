@@ -42,6 +42,8 @@ with geometry features of the same name.
 lag, buffer radius format adopted in \code{calc_setcolumns()}.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 terracliamte_covar <- calc_terraclimate(

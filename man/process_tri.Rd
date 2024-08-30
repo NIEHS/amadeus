@@ -37,6 +37,8 @@ Visit \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-an
 to view the available years and variables.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 tri <- process_tri(
   path = "./data",

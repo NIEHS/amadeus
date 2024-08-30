@@ -36,6 +36,8 @@ Calculate temporal dummy covariates at point locations. Returns a
 value in \code{year}, and month and day of week binary variables.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 calc_temporal_dummies(

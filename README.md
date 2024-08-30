@@ -4,13 +4,19 @@
 [![cov](https://NIEHS.github.io/amadeus/badges/coverage.svg)](https://github.com/NIEHS/amadeus/actions)
 [![lint](https://github.com/NIEHS/amadeus/actions/workflows/lint.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/lint.yaml)
 [![pkgdown](https://github.com/NIEHS/amadeus/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/pkgdown.yaml)
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![CRAN](https://www.r-pkg.org/badges/version/amadeus?color=blue)](https://cran.r-project.org/package=amadeus)
+[![downloads](https://cranlogs.r-pkg.org/badges/grand-total/amadeus)](https://cran.r-project.org/package=amadeus)
 
 `amadeus` is **a** **m**ech**a**nism for **d**ata, **e**nvironments, and **u**ser **s**etup for common environmental and climate health datasets in R. `amadeus` has been developed to improve access to and utility with large scale, publicly available environmental data in R.
 
 ## Installation
 
-`amadeus` is not yet available from CRAN, but it can be installed with the `devtools`, `remotes`, or `pak` packages.
+`amadeus` can be installed from CRAN, or with the `devtools`, `remotes`, or `pak` packages.
+
+```r
+install.packages("amadeus")
+```
 
 ```r
 devtools::install_github("NIEHS/amadeus")

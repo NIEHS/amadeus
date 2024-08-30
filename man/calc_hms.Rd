@@ -33,6 +33,8 @@ for wildfire smoke plume density inherited from \code{from} (0 = point not
 covered by wildfire smoke plume; 1 = point covered by wildfire smoke plume).
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 calc_hms(

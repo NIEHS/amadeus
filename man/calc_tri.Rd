@@ -42,6 +42,8 @@ object containing \code{locs_id} and variables for each chemical in
 U.S. context.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 calc_tri(

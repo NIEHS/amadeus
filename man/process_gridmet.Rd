@@ -40,6 +40,8 @@ Layer names of the returned \code{SpatRaster} object contain the variable acrony
 and date.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 gridmet <- process_gridmet(
   date = c("2023-01-01", "2023-01-10"),

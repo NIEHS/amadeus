@@ -39,6 +39,8 @@ georeferenced h5 files of Black Marble product. Referencing corner coordinates
 are necessary as the original h5 data do not include such information.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 vnp46a2 <- process_blackmarble(
   path =

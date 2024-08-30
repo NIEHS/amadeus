@@ -50,6 +50,8 @@ Unit is km / sq km. The returned \code{data.frame} object contains a
 dataset. For more information, see \url{https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata}.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
 \dontrun{
 loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 calc_sedac_groads(
