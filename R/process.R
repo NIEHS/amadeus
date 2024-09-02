@@ -603,7 +603,7 @@ process_modis_warp <-
 #' @param ... For internal use.
 #' @seealso
 #' * [`process_modis_warp()`], [`stars::read_stars()`], [`stars::st_warp()`]
-#' * [GDAL HDF4 driver documentation](https://gdal.org/drivers/raster/hdf4.html)
+#' * [GDAL HDF4 driver documentation](https://gdal.org/en/latest/drivers/raster/hdf4.html)
 #' * [`terra::describe()`]: to list the full subdataset list with `sds = TRUE`
 #' * [`terra::sprc()`], [`terra::rast()`]
 #' @return
