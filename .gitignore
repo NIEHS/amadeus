@@ -56,3 +56,6 @@ rsconnect/
 inst/doc
 inst/extdata/air.2m
 inst/extdata/nasa/token.txt
+
+# CRAN release
+CRAN-SUBMISSION
