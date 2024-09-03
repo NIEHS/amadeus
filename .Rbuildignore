@@ -25,3 +25,4 @@ vignettes/protected_datasets.Rmd
 inst/extdata/air.2m
 inst/extdata/nasa/token.txt
 LICENSE.md
+^CRAN-SUBMISSION$

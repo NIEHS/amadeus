@@ -69,7 +69,7 @@ mod06l2_swath <- process_modis_swath(
 \seealso{
 \itemize{
 \item \code{\link[=process_modis_warp]{process_modis_warp()}}, \code{\link[stars:read_stars]{stars::read_stars()}}, \code{\link[stars:st_warp]{stars::st_warp()}}
-\item \href{https://gdal.org/drivers/raster/hdf4.html}{GDAL HDF4 driver documentation}
+\item \href{https://gdal.org/en/latest/drivers/raster/hdf4.html}{GDAL HDF4 driver documentation}
 \item \code{\link[terra:describe]{terra::describe()}}: to list the full subdataset list with \code{sds = TRUE}
 \item \code{\link[terra:sprc]{terra::sprc()}}, \code{\link[terra:rast]{terra::rast()}}
 }
