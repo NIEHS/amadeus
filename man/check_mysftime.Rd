@@ -20,4 +20,5 @@ Check an \code{sftime} object for its class, \code{$time} column,
 \author{
 Eva Marques
 }
+\keyword{internal}
 \keyword{spacetime}

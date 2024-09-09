@@ -19,4 +19,5 @@ NULL; returns a stop error if \code{time} is wrong class
 \description{
 Check the time values within calculated covariates \code{data.frame}
 }
+\keyword{auxiliary}
 \keyword{internal}

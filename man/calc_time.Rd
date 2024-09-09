@@ -21,4 +21,5 @@ a \code{Date}, \code{POSIXt}, or \code{integer} object based on \verb{format =}
 Prepare the time values for covariate calculation based on type of time
 value.
 }
+\keyword{auxiliary}
 \keyword{internal}

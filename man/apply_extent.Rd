@@ -21,4 +21,5 @@ sf/terra object with the extent applied.
 \description{
 User-defined extent is used to filter the data.
 }
+\keyword{auxiliary}
 \keyword{internal}

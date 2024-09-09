@@ -22,3 +22,4 @@ vector
 Generate a sequence of dates from \code{date_start} to \code{date_end}.
 }
 \keyword{auxiliary}
+\keyword{internal}

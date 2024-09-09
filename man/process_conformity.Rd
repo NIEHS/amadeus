@@ -26,3 +26,5 @@ Check if all of \code{"lon"}, \code{"lat"}, and \code{"time"}
 \author{
 Insang Song
 }
+\keyword{auxiliary}
+\keyword{internal}

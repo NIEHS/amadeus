@@ -20,4 +20,5 @@ Create circular buffer around locations based on user defined radius.
 Creates a circular buffer around points if \code{radius} is > 0.
 Returns points if \code{radius} is 0.
 }
+\keyword{auxiliary}
 \keyword{internal}

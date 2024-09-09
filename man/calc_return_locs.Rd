@@ -30,3 +30,4 @@ transform \code{data.frame} into a \code{SpatVector} object.
 Mitchell Manware
 }
 \keyword{auxiliary}
+\keyword{internal}

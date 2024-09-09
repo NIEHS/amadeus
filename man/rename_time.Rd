@@ -20,4 +20,5 @@ Rename the \code{$time} column of an \code{sftime} object.
 \author{
 Eva Marques
 }
+\keyword{internal}
 \keyword{spacetime}

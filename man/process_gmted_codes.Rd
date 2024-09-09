@@ -31,3 +31,4 @@ statistic and resolution to/from full string to/from statistic and
 resolution code.
 }
 \keyword{auxiliary}
+\keyword{internal}

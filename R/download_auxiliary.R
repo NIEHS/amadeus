@@ -260,7 +260,7 @@ check_for_null_parameters <-
 #' date sequence as "YYYYMMDD". If `FALSE`, returns date sequence as
 #' "YYYY-MM-DD".
 #' @return vector
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @export
 generate_date_sequence <-
   function(
@@ -328,7 +328,7 @@ download_epa_certificate <-
 #' Typically, 2-dimensional collections (latitude and longitude only) utilize
 #' half hour, and 3-dimensional collections (latitude, longitude, and time)
 #' utilize hour.
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @export
 generate_time_sequence <-
   function(
@@ -353,7 +353,7 @@ generate_time_sequence <-
 #' @importFrom httr HEAD
 #' @importFrom httr GET
 #' @return logical object
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @export
 check_url_status <- function(
     url,
@@ -419,7 +419,7 @@ extract_urls <- function(
 #' @param method httr method to obtain URL (`"HEAD"` or `"GET"`). If set to
 #' `"SKIP"`, the HTTP status will not be checked and returned.
 #' @return logical vector for URL status = 200
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @export
 check_urls <- function(
     urls = urls,
@@ -481,7 +481,7 @@ test_download_functions <- function(
 #' https://downloads.psl.noaa.gov//Datasets/NARR/Dailies/pressure/.
 #' @param variable character(1). User-selected NARR variable
 #' @return list with URL base and vector of months (blank for monolevel)
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @export
 narr_variable <- function(variable) {
   stopifnot(length(variable) == 1)
