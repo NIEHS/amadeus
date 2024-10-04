@@ -142,7 +142,7 @@ download_data <-
 #'  Currently, no value other than `"daily"` works.
 #' @param url_aqs_download character(1).
 #'  URL to the AQS pre-generated datasets.
-#' @param year character(2). length of 4 each. Start/end years for downloading data.
+#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
 #' and the unzipped data files ("/data_files").
@@ -202,6 +202,7 @@ download_aqs <-
     #### 2. check for null parameters
     check_for_null_parameters(mget(ls()))
     #### check years
+    if (length(year) == 1) year <- c(year, year)
     stopifnot(length(year) == 2)
     year <- year[order(year)]
     #### 3. directory setup
@@ -442,7 +443,7 @@ download_ecoregion <- function(
 #' The \code{download_geos()} function accesses and downloads various
 #' atmospheric composition collections from [NASA's Global Earth Observing System (GEOS) model](https://gmao.gsfc.nasa.gov/GEOS_systems/).
 #' @param collection character(1). GEOS-CF data collection file name.
-#' @param date character(2). length of 10 each. Start/end date for downloading data.
+#' @param date character(1 or 2). length of 10. Date or start/end dates for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
 #' @param directory_to_save character(1). Directory to save data.
 #' Sub-directories will be created within \code{directory_to_save} for each
@@ -500,6 +501,7 @@ download_geos <- function(
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### check dates
+  if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### 3. directory setup
@@ -769,7 +771,7 @@ download_gmted <- function(
 #' The \code{download_merra2()} function accesses and downloads various
 #' meteorological and atmospheric collections from [NASA's Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/).
 #' @param collection character(1). MERRA-2 data collection file name.
-#' @param date character(2). length of 10 each. Start/end date for downloading data.
+#' @param date character(1 or 2). length of 10. Date or start/end dates for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -1017,6 +1019,7 @@ download_merra2 <- function(
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
   #### check dates
+  if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### check for null parameters
@@ -1268,7 +1271,7 @@ download_merra2 <- function(
 #' @note "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
 #' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
-#' @param year character(2). length of 4 each. Start/end years for downloading data.
+#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -1317,6 +1320,7 @@ download_narr <- function(
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### check years
+  if (length(year) == 1) year <- c(year, year)
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### 3. directory setup
@@ -1906,8 +1910,8 @@ download_sedac_population <- function(
 #' The \code{download_hms()} function accesses and downloads
 #' wildfire smoke plume coverage data from [NOAA's Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#0).
 #' @param data_format character(1). "Shapefile" or "KML".
-#' @param date character(2). length of 10 each. Start/end date for downloading data.
-# nolint end
+#' @param date character(1 or 2). length of 10. Date or start/end dates for downloading data.
+#' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
 #' @param directory_to_save character(1). Directory to save data. If
 #' `data_format = "Shapefile"`, two sub-directories will be created for the
 #' downloaded zip files ("/zip_files") and the unzipped shapefiles
@@ -1953,6 +1957,7 @@ download_sedac_population <- function(
 #'   unzip = FALSE
 #' )
 #' @export
+# nolint end
 # nolint start: cyclocomp
 download_hms <- function(
     data_format = "Shapefile",
@@ -1969,6 +1974,7 @@ download_hms <- function(
   #### 2. check for null parameters
   check_for_null_parameters(mget(ls()))
   #### check dates
+  if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### 3. directory setup
@@ -2255,7 +2261,7 @@ download_koppen_geiger <- function(
 #'  trying running the function.
 #' @param mod06_links character(1). CSV file path to MOD06_L2 download links
 #' from [NASA LAADS MOD06_L2](https://ladsweb.modaps.eosdis.nasa.gov/search/order/2/MOD06_L2--61). Default is `NULL`.
-#' @param date character(2). length of 10 each. Start/end date for downloading data.
+#' @param date character(1 or 2). length of 10. Date or start/end dates for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`). Note: ignored if
 #' \code{product == "MOD06_L2"}.
 #' @param directory_to_save character(1). Directory to save data.
@@ -2361,6 +2367,7 @@ download_modis <- function(
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
   #### check dates
+  if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
 
@@ -2642,7 +2649,7 @@ download_modis <- function(
 #' Download toxic release data
 #' @description
 #' The \code{download_tri()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-action-0).
-#' @param year character(2). length of 4 each. Start/end years for downloading data.
+#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
 # nolint end
 #' @param directory_to_save character(1). Directory to download files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -2688,6 +2695,7 @@ download_tri <- function(
   download_setup_dir(directory_to_save)
   directory_to_save <- download_sanitize_path(directory_to_save)
   #### check years
+  if (length(year) == 1) year <- c(year, year)
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### 3. define measurement data paths
@@ -3341,7 +3349,7 @@ download_prism <- function(
 #' @param variables character(1). Variable(s) name(s). See [gridMET Generate Wget File](https://www.climatologylab.org/wget-gridmet.html)
 #' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
 #' "Energy Release Component" has code "erc").
-#' @param year character(2). length of 4 each. Start/end years for downloading data.
+#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -3389,6 +3397,7 @@ download_gridmet <- function(
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### check years
+  if (length(year) == 1) year <- c(year, year)
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### directory setup
@@ -3479,7 +3488,7 @@ download_gridmet <- function(
 #' The \code{download_terraclimate} function accesses and downloads climate and water balance data from the [University of California Merced Climatology Lab's TerraClimate dataset](https://www.climatologylab.org/terraclimate.html).
 #' @param variables character(1). Variable(s) name(s). See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
 #' for variable names and acronym codes.
-#' @param year character(2). length of 4 each. Start/end years for downloading data.
+#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -3527,6 +3536,7 @@ download_terraclimate <- function(
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   #### check years
+  if (length(year) == 1) year <- c(year, year)
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### directory setup

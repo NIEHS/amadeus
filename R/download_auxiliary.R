@@ -532,18 +532,17 @@ narr_variable <- function(variable) {
 #' @description
 #' Create \code{rlang::hash_file} of the downloaded files.
 #' @param hash logical(1). Create hash of downloaded files.
-#' @param directory_to_save character(1). Directory path.
-#' @return character(1) code\{rlang::hash} of downloaded files
+#' @param dir character(1). Directory path.
+#' @return character(1) \code{rlang::hash} of downloaded files.
 #' @keywords internal auxiliary
 #' @importFrom rlang hash_file
 #' @export
-download_hash <-
-  function(
-    hash = TRUE,
-    directory_to_save = directory_to_save
-  ) {
-    if (hash) {
-      h <- rlang::hash_file(directory_to_save)
-      return(h)
-    }
+download_hash <- function(
+  hash = TRUE,
+  dir = NULL
+) {
+  if (hash) {
+    h <- rlang::hash_file(dir)
+    return(h)
   }
+}

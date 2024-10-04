@@ -19,7 +19,8 @@ download_hms(
 \arguments{
 \item{data_format}{character(1). "Shapefile" or "KML".}
 
-\item{date}{character(2). length of 10 each. Start/end date for downloading data.}
+\item{date}{character(1 or 2). length of 10. Date or start/end dates for downloading data.
+Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}).}
 
 \item{directory_to_save}{character(1). Directory to save data. If
 \code{data_format = "Shapefile"}, two sub-directories will be created for the

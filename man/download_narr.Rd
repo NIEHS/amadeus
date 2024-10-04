@@ -18,7 +18,7 @@ download_narr(
 \item{variables}{character. Variable(s) name acronym. See \href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{List of Variables in NARR Files}
 for variable names and acronym codes.}
 
-\item{year}{character(2). length of 4 each. Start/end years for downloading data.}
+\item{year}{character(1 or 2). length of 4. Year or start/end years for downloading data.}
 
 \item{directory_to_save}{character(1). Directory(s) to save downloaded data
 files.}

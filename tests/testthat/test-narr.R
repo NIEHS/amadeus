@@ -43,6 +43,23 @@ testthat::test_that("download_narr (no errors)", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that("download_narr (single year)", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  directory_to_save <- paste0(tempdir(), "/narr/")
+  # run download function
+  testthat::expect_no_error(
+    download_data(
+      dataset_name = "narr",
+      year = 2020,
+      variables = "weasd",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    )
+  )
+})
+
 testthat::test_that("download_narr (expected errors)", {
   testthat::expect_error(
     download_data(

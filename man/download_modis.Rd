@@ -38,7 +38,7 @@ from \href{https://ladsweb.modaps.eosdis.nasa.gov/search/order/2/MOD06_L2--61}{N
 Token for downloading data from NASA. Should be set before
 trying running the function.}
 
-\item{date}{character(2). length of 10 each. Start/end date for downloading data.
+\item{date}{character(1 or 2). length of 10. Date or start/end dates for downloading data.
 Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}). Note: ignored if
 \code{product == "MOD06_L2"}.}
 

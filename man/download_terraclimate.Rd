@@ -18,7 +18,7 @@ download_terraclimate(
 \item{variables}{character(1). Variable(s) name(s). See \href{https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php}{TerraClimate Direct Downloads}
 for variable names and acronym codes.}
 
-\item{year}{character(2). length of 4 each. Start/end years for downloading data.}
+\item{year}{character(1 or 2). length of 4. Year or start/end years for downloading data.}
 
 \item{directory_to_save}{character(1). Directory(s) to save downloaded data
 files.}

@@ -14,7 +14,7 @@ download_tri(
 )
 }
 \arguments{
-\item{year}{character(2). length of 4 each. Start/end years for downloading data.}
+\item{year}{character(1 or 2). length of 4. Year or start/end years for downloading data.}
 
 \item{directory_to_save}{character(1). Directory to download files.}
 

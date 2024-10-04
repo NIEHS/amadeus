@@ -4,15 +4,15 @@
 \alias{download_hash}
 \title{Create has of downloaded files.}
 \usage{
-download_hash(hash = TRUE, directory_to_save = directory_to_save)
+download_hash(hash = TRUE, dir = NULL)
 }
 \arguments{
 \item{hash}{logical(1). Create hash of downloaded files.}
 
-\item{directory_to_save}{character(1). Directory path.}
+\item{dir}{character(1). Directory path.}
 }
 \value{
-character(1) code\{rlang::hash} of downloaded files
+character(1) \code{rlang::hash} of downloaded files.
 }
 \description{
 Create \code{rlang::hash_file} of the downloaded files.
