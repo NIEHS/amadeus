@@ -13,7 +13,7 @@ George Mason University website."><meta property="og:image" content="https://nie
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,8 @@ the <a href="https://www.nass.usda.gov/Research_and_Science/Cropland/Release/ind
 <span>  acknowledgement <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  remove_command <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  unzip <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  unzip <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  hash <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -104,12 +105,21 @@ the text file containing download commands.</p></dd>
 <dd><p>logical(1). Unzip the downloaded compressed files.
 Default is <code>FALSE</code>.</p></dd>
 
+
+<dt id="arg-hash">hash<a class="anchor" aria-label="anchor" href="#arg-hash"></a></dt>
+<dd><p>logical(1). By setting <code>TRUE</code> the function will return
+an <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash_file()</a></code> hash character corresponding to the
+downloaded files. Default is <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>NULL; Yearly comma-separated value (CSV) files will be stored in
-<code>directory_to_save</code>.</p>
-    </div>
+
+<ul><li><p>For <code>hash = FALSE</code>, NULL</p></li>
+<li><p>For <code>hash = TRUE</code>, an <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash_file</a></code> character.</p></li>
+<li><p>Yearly comma-separated value (CSV) files will be stored in
+<code>directory_to_save</code>.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p>JSON files should be found at STAC catalog of OpenLandMap</p>
@@ -143,7 +153,7 @@ Default is <code>FALSE</code>.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

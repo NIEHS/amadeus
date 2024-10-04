@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,14 +66,10 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p><code>amadeus</code> can be installed from CRAN, or with the <code>devtools</code>, <code>remotes</code>, or <code>pak</code> packages.</p>
+<p><code>amadeus</code> can be installed from CRAN, or with <code>pak</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"amadeus"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"NIEHS/amadeus"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"NIEHS/amadeus"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"NIEHS/amadeus"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -206,7 +202,7 @@
 </table>
 <p>See the “<a href="https://niehs.github.io/amadeus/articles/download_functions.html">download_data</a>” vignette for a detailed description of source-specific download functions.</p>
 <p>Example use of <code>download_data</code> using NOAA NCEP North American Regional Reanalysis’s (NARR) “weasd” (Daily Accumulated Snow at Surface) variable.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">directory</span> <span class="op">&lt;-</span> <span class="st">"/  EXAMPLE  /  FILE  /  PATH  /"</span></span>
 <span><span class="fu"><a href="reference/download_data.html">download_data</a></span><span class="op">(</span></span>
 <span>  dataset_name <span class="op">=</span> <span class="st">"narr"</span>,</span>
@@ -218,7 +214,7 @@
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code>Downloading requested files...
 Requested files have been downloaded.</code></pre>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"weasd"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>[1] "weasd.2022.nc"</code></pre>
 </div>
@@ -228,7 +224,7 @@ Requested files have been downloaded.</code></pre>
 <p><code>process_covariates</code> imports and cleans raw geospatial data (downloaded with <code>download_data</code>), and returns a single <code>SpatRaster</code> or <code>SpatVector</code> into the user’s R environment. <code>process_covariates</code> “cleans” the data by defining interpretable layer names, ensuring a coordinate reference system is present, and managing `timedata (if applicable).</p>
 <p>To avoid errors when using <code>process_covariates</code>, <strong>do not edit the raw downloaded data files</strong>. Passing user-generated or edited data into <code>process_covariates</code> may result in errors as the underlying functions are adapted to each sources’ raw data file type.</p>
 <p>Example use of <code>process_covariates</code> using the downloaded “weasd” data.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">weasd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/process_covariates.html">process_covariates</a></span><span class="op">(</span></span>
 <span>  covariate <span class="op">=</span> <span class="st">"narr"</span>,</span>
 <span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2022-01-01"</span>, <span class="st">"2022-01-05"</span><span class="op">)</span>,</span>
@@ -239,7 +235,7 @@ Requested files have been downloaded.</code></pre>
 <pre><code>Cleaning weasd data for January, 2022...
 Detected monolevel data...
 Returning daily weasd data from 2022-01-01 to 2022-01-05.</code></pre>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">weasd</span></span></code></pre></div>
 <pre><code>class       : SpatRaster
 dimensions  : 277, 349, 5  (nrow, ncol, nlyr)
@@ -257,7 +253,7 @@ time        : 2022-01-01 to 2022-01-05 UTC</code></pre>
 </h2>
 <p><code>calc_covariates</code> stems from the <a href="https://github.com/NIEHS/beethoven" class="external-link"><code>beethoven</code></a> project’s need for various types of data extracted at precise locations. <code>calc_covariates</code>, therefore, extracts data from the “cleaned” <code>SpatRaster</code> or <code>SpatVector</code> object at user defined locations. Users can choose to buffer the locations. The function returns a <code>data.frame</code> or <code>SpatVector</code> with data extracted at all locations for each layer or row in the <code>SpatRaster</code> or <code>SpatVector</code> object, respectively.</p>
 <p>Example of <code>calc_covariates</code> using processed “weasd” data.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">locs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"001"</span>, lon <span class="op">=</span> <span class="op">-</span><span class="fl">78.8277</span>, lat <span class="op">=</span> <span class="fl">35.95013</span><span class="op">)</span></span>
 <span><span class="va">weasd_covar</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calc_covariates.html">calc_covariates</a></span><span class="op">(</span></span>
 <span>  covariate <span class="op">=</span> <span class="st">"narr"</span>,</span>
@@ -274,7 +270,7 @@ Calculating weasd covariates for 2022-01-03...
 Calculating weasd covariates for 2022-01-04...
 Calculating weasd covariates for 2022-01-05...
 Returning extracted covariates.</code></pre>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">weasd_covar</span></span></code></pre></div>
 <pre><code>    id       time     weasd_0
 1 0001 2022-01-01 0.000000000
@@ -381,7 +377,7 @@ Returning extracted covariates.</code></pre>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

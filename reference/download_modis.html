@@ -17,7 +17,7 @@ every five minutes every day."><meta property="og:image" content="https://niehs.
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,8 @@ every five minutes every day.</p>
 <span>  directory_to_save <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  acknowledgement <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  remove_command <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  remove_command <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  hash <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -109,7 +110,7 @@ trying running the function.</p></dd>
 
 
 <dt id="arg-date">date<a class="anchor" aria-label="anchor" href="#arg-date"></a></dt>
-<dd><p>character(2). length of 10 each. Start/end date for downloading data.
+<dd><p>character(1 or 2). length of 10. Date or start/end dates for downloading data.
 Format "YYYY-MM-DD" (ex. January 1, 2018 = <code>"2018-01-01"</code>). Note: ignored if
 <code>product == "MOD06_L2"</code>.</p></dd>
 
@@ -132,12 +133,21 @@ large and use lots of machine storage and memory.</p></dd>
 <dd><p>logical(1). Remove (<code>TRUE</code>) or keep (<code>FALSE</code>)
 the text file containing download commands.</p></dd>
 
+
+<dt id="arg-hash">hash<a class="anchor" aria-label="anchor" href="#arg-hash"></a></dt>
+<dd><p>logical(1). By setting <code>TRUE</code> the function will return
+an <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash_file()</a></code> hash character corresponding to the
+downloaded files. Default is <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>NULL; HDF (.hdf) files will be stored in
-<code>directory_to_save</code>.</p>
-    </div>
+
+<ul><li><p>For <code>hash = FALSE</code>, NULL</p></li>
+<li><p>For <code>hash = TRUE</code>, an <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash_file</a></code> character.</p></li>
+<li><p>HDF (.hdf) files will be stored in
+<code>directory_to_save</code>.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p>Both dates in <code>date</code> should be in the same year.
@@ -146,31 +156,12 @@ input/modis/raw/{version}/{product}/{year}/{day_of_year}.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Lyapustin A, Wang Y (2022).
-“MODIS/Terra+Aqua Land Aerosol Optical Depth Daily L2G Global 1km SIN Grid V061.”
-<a href="https://doi.org/10.5067/MODIS/MCD19A2.061" class="external-link">doi:10.5067/MODIS/MCD19A2.061</a>
-, <a href="https://lpdaac.usgs.gov/products/mcd19a2v061/" class="external-link">https://lpdaac.usgs.gov/products/mcd19a2v061/</a>.</p>
-<p>MODIS Atmosphere Science Team (2017).
-“MODIS/Terra Clouds 5-Min L2 Swath 1km and 5km.”
-<a href="https://doi.org/10.5067/MODIS/MOD06_L2.061" class="external-link">doi:10.5067/MODIS/MOD06_L2.061</a>
-, <a href="https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/MOD06_L2" class="external-link">https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/MOD06_L2</a>.</p>
-<p>Vermote E, Wolfe R (2021).
-“MODIS/Terra Surface Reflectance Daily L2G Global 1km and 500m SIN Grid V061.”
-<a href="https://doi.org/10.5067/MODIS/MOD09GA.061" class="external-link">doi:10.5067/MODIS/MOD09GA.061</a>
-, <a href="https://lpdaac.usgs.gov/products/mod09gav061/" class="external-link">https://lpdaac.usgs.gov/products/mod09gav061/</a>.</p>
-<p>Wan Z, Hook S, Hulley G (2021).
-“MODIS/Terra Land Surface Temperature/Emissivity Daily L3 Global 1km SIN Grid V061.”
-<a href="https://doi.org/10.5067/MODIS/MOD11A1.061" class="external-link">doi:10.5067/MODIS/MOD11A1.061</a>
-, <a href="https://lpdaac.usgs.gov/products/mod11a1v061/" class="external-link">https://lpdaac.usgs.gov/products/mod11a1v061/</a>.</p>
-<p>Didan K (2021).
-“MODIS/Terra Vegetation Indices 16-Day L3 Global 1km SIN Grid V061.”
-<a href="https://doi.org/10.5067/MODIS/MOD13A2.061" class="external-link">doi:10.5067/MODIS/MOD13A2.061</a>
-, <a href="https://lpdaac.usgs.gov/products/mod13a2v061/" class="external-link">https://lpdaac.usgs.gov/products/mod13a2v061/</a>.</p>
-<p>Román MO, Wang Z, Sun Q, Kalb V, Miller SD, Molthan A, Schultz L, Bell J, Stokes EC, Pandey B, Seto KC, Hall D, Oda T, Wolfe RE, Lin G, Golpayegani N, Devadiga S, Davidson C, Sarkar S, Praderas C, Schmaltz J, Boller R, Stevens J, Ramos González OM, Padilla E, Alonso J, Detrés Y, Armstrong R, Miranda I, Conte Y, Marrero N, MacManus K, Esch T, Masuoka EJ (2018).
-“NASA's Black Marble nighttime lights product suite.”
-<em>Remote Sensing of Environment</em>, <b>210</b>, 113–143.
-ISSN 00344257, <a href="https://doi.org/10.1016/j.rse.2018.03.017" class="external-link">doi:10.1016/j.rse.2018.03.017</a>
-, <a href="https://linkinghub.elsevier.com/retrieve/pii/S003442571830110X" class="external-link">https://linkinghub.elsevier.com/retrieve/pii/S003442571830110X</a>.</p>
+    <p>data_mcd19a22021amadeus</p>
+<p>data_mod06l2_2017amadeus</p>
+<p>data_mod09ga2021amadeus</p>
+<p>data_mod11a12021amadeus</p>
+<p>data_mod13a22021amadeus</p>
+<p>article_roman2018vnp46amadeus</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -238,7 +229,7 @@ ISSN 00344257, <a href="https://doi.org/10.1016/j.rse.2018.03.017" class="extern
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

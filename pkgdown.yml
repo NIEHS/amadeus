@@ -1,12 +1,12 @@
 pandoc: 3.1.11
-pkgdown: 2.1.0
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   download_functions: download_functions.html
   epa_download: epa_download.html
   protected_datasets: protected_datasets.html
   workflow: workflow.html
-last_built: 2024-09-03T12:58Z
+last_built: 2024-10-04T16:11Z
 urls:
   reference: https://niehs.github.io/amadeus/reference
   article: https://niehs.github.io/amadeus/articles

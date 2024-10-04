@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,7 +50,8 @@
 <span>  directory_to_save <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  acknowledgement <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  remove_command <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  remove_command <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  hash <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -65,7 +66,7 @@ for variable names and acronym codes. (Note: variable "Burning Index" has code "
 
 
 <dt id="arg-year">year<a class="anchor" aria-label="anchor" href="#arg-year"></a></dt>
-<dd><p>character(2). length of 4 each. Start/end years for downloading data.</p></dd>
+<dd><p>character(1 or 2). length of 4. Year or start/end years for downloading data.</p></dd>
 
 
 <dt id="arg-directory-to-save">directory_to_save<a class="anchor" aria-label="anchor" href="#arg-directory-to-save"></a></dt>
@@ -90,17 +91,24 @@ will download all of the requested data files.</p></dd>
 Remove (<code>TRUE</code>) or keep (<code>FALSE</code>)
 the text file containing download commands.</p></dd>
 
+
+<dt id="arg-hash">hash<a class="anchor" aria-label="anchor" href="#arg-hash"></a></dt>
+<dd><p>logical(1). By setting <code>TRUE</code> the function will return
+an <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash_file()</a></code> hash character corresponding to the
+downloaded files. Default is <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>NULL; netCDF (.nc) files will be stored in a variable-specific
-folder within <code>directory_to_save</code>.</p>
-    </div>
+
+<ul><li><p>For <code>hash = FALSE</code>, NULL</p></li>
+<li><p>For <code>hash = TRUE</code>, an <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash_file</a></code> character.</p></li>
+<li><p>netCDF (.nc) files will be stored in a variable-specific
+folder within <code>directory_to_save</code>.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Abatzoglou JT (2013).
-“Development of gridded surface meteorological data for ecological applications and modelling.”
-<em>International journal of climatology</em>, <b>33</b>(1), 121–131.</p>
+    <p>article_abatzoglou2013developmentamadeus</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -118,7 +126,6 @@ folder within <code>directory_to_save</code>.</p>
 <span class="r-in"><span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Skipping data download.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -130,7 +137,7 @@ folder within <code>directory_to_save</code>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

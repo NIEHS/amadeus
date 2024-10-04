@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -239,10 +239,11 @@ parameters for each source can be checked with
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_hms</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "data_format"       "date"              "directory_to_save"</span></span>
 <span><span class="co">#&gt; [4] "acknowledgement"   "download"          "remove_command"   </span></span>
-<span><span class="co">#&gt; [7] "unzip"             "remove_zip"</span></span>
+<span><span class="co">#&gt; [7] "unzip"             "remove_zip"        "hash"</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_narr</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "variables"         "year"              "directory_to_save"</span></span>
-<span><span class="co">#&gt; [4] "acknowledgement"   "download"          "remove_command"</span></span></code></pre></div>
+<span><span class="co">#&gt; [4] "acknowledgement"   "download"          "remove_command"   </span></span>
+<span><span class="co">#&gt; [7] "hash"</span></span></code></pre></div>
 <p>The two functions have different required parameters because
 <code>download_hms</code> uses a daily temporal resolution while
 <code>download_narr</code> uses yearly, but they share some common,
@@ -844,7 +845,7 @@ by the source-specific data download function.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_hms</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "data_format"       "date"              "directory_to_save"</span></span>
 <span><span class="co">#&gt; [4] "acknowledgement"   "download"          "remove_command"   </span></span>
-<span><span class="co">#&gt; [7] "unzip"             "remove_zip"</span></span></code></pre></div>
+<span><span class="co">#&gt; [7] "unzip"             "remove_zip"        "hash"</span></span></code></pre></div>
 <p>Define the parameters.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2023-12-28"</span>, <span class="st">"2024-01-02"</span><span class="op">)</span></span>
@@ -912,10 +913,13 @@ retained.</p>
 <code class="sourceCode R"><span><span class="va">download_hms</span></span>
 <span><span class="co">#&gt; function (data_format = "Shapefile", date = c("2018-01-01", "2018-01-01"), </span></span>
 <span><span class="co">#&gt;     directory_to_save = NULL, acknowledgement = FALSE, download = FALSE, </span></span>
-<span><span class="co">#&gt;     remove_command = FALSE, unzip = TRUE, remove_zip = FALSE) </span></span>
+<span><span class="co">#&gt;     remove_command = FALSE, unzip = TRUE, remove_zip = FALSE, </span></span>
+<span><span class="co">#&gt;     hash = FALSE) </span></span>
 <span><span class="co">#&gt; {</span></span>
 <span><span class="co">#&gt;     download_permit(acknowledgement = acknowledgement)</span></span>
 <span><span class="co">#&gt;     check_for_null_parameters(mget(ls()))</span></span>
+<span><span class="co">#&gt;     if (length(date) == 1) </span></span>
+<span><span class="co">#&gt;         date &lt;- c(date, date)</span></span>
 <span><span class="co">#&gt;     stopifnot(length(date) == 2)</span></span>
 <span><span class="co">#&gt;     date &lt;- date[order(as.Date(date))]</span></span>
 <span><span class="co">#&gt;     directory_original &lt;- download_sanitize_path(directory_to_save)</span></span>
@@ -979,8 +983,9 @@ retained.</p>
 <span><span class="co">#&gt;             unzip = unzip)</span></span>
 <span><span class="co">#&gt;     }</span></span>
 <span><span class="co">#&gt;     download_remove_zips(remove = remove_zip, download_name = download_names)</span></span>
+<span><span class="co">#&gt;     return(download_hash(hash, directory_to_save))</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55def1ca49a8&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x562611de6f68&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:amadeus&gt;</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -994,7 +999,7 @@ retained.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

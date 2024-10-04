@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -204,18 +204,6 @@
         <dd>Process Black Marble corners</dd>
       </dl><dl><dt>
 
-          <code><a href="process_collection.html">process_collection()</a></code>
-
-        </dt>
-        <dd>Process GEOS-CF and MERRA2 collection codes</dd>
-      </dl><dl><dt>
-
-          <code><a href="process_conformity.html">process_conformity()</a></code>
-
-        </dt>
-        <dd>Check input assumptions</dd>
-      </dl><dl><dt>
-
           <code><a href="process_cropscape.html">process_cropscape()</a></code>
 
         </dt>
@@ -246,22 +234,10 @@
         <dd>Process elevation data</dd>
       </dl><dl><dt>
 
-          <code><a href="process_gmted_codes.html">process_gmted_codes()</a></code>
-
-        </dt>
-        <dd>Process elevation statistic and resolution codes</dd>
-      </dl><dl><dt>
-
           <code><a href="process_gridmet.html">process_gridmet()</a></code>
 
         </dt>
         <dd>Process gridMET data</dd>
-      </dl><dl><dt>
-
-          <code><a href="process_gridmet_codes.html">process_gridmet_codes()</a></code>
-
-        </dt>
-        <dd>Process gridMET variable codes</dd>
       </dl><dl><dt>
 
           <code><a href="process_hms.html">process_hms()</a></code>
@@ -286,12 +262,6 @@
 
         </dt>
         <dd>Process meteorological and atmospheric data</dd>
-      </dl><dl><dt>
-
-          <code><a href="process_merra2_time.html">process_merra2_time()</a></code>
-
-        </dt>
-        <dd>Process MERRA2 time steps</dd>
       </dl><dl><dt>
 
           <code><a href="process_modis_merge.html">process_modis_merge()</a></code>
@@ -342,12 +312,6 @@
         <dd>Process PRISM data</dd>
       </dl><dl><dt>
 
-          <code><a href="process_sedac_codes.html">process_sedac_codes()</a></code>
-
-        </dt>
-        <dd>Process population resolution code</dd>
-      </dl><dl><dt>
-
           <code><a href="process_sedac_groads.html">process_sedac_groads()</a></code>
 
         </dt>
@@ -366,22 +330,10 @@
         <dd>Process TerraClimate data</dd>
       </dl><dl><dt>
 
-          <code><a href="process_terraclimate_codes.html">process_terraclimate_codes()</a></code>
-
-        </dt>
-        <dd>Process terraClimate variable codes</dd>
-      </dl><dl><dt>
-
           <code><a href="process_tri.html">process_tri()</a></code>
 
         </dt>
         <dd>Process toxic release data</dd>
-      </dl><dl><dt>
-
-          <code><a href="process_variable_codes.html">process_variable_codes()</a></code>
-
-        </dt>
-        <dd>Filter gridMET and terraClimate variable names and variable codes</dd>
       </dl></div><div class="section level2">
 
       <h3 id="covariates">Covariates<a class="anchor" aria-label="anchor" href="#covariates"></a></h3>
@@ -477,12 +429,6 @@
 
         </dt>
         <dd>Calculate land cover covariates</dd>
-      </dl><dl><dt>
-
-          <code><a href="calc_return_locs.html">calc_return_locs()</a></code>
-
-        </dt>
-        <dd>Prepare covariates for return</dd>
       </dl><dl><dt>
 
           <code><a href="calc_sedac_groads.html">calc_sedac_groads()</a></code>
@@ -627,10 +573,52 @@
 
       <dl><dt>
 
+          <code><a href="apply_extent.html">apply_extent()</a></code>
+
+        </dt>
+        <dd>Apply extent to the processed data</dd>
+      </dl><dl><dt>
+
+          <code><a href="calc_check_time.html">calc_check_time()</a></code>
+
+        </dt>
+        <dd>Check time values</dd>
+      </dl><dl><dt>
+
+          <code><a href="calc_message.html">calc_message()</a></code>
+
+        </dt>
+        <dd>Send progress messages</dd>
+      </dl><dl><dt>
+
+          <code><a href="calc_prepare_locs.html">calc_prepare_locs()</a></code>
+
+        </dt>
+        <dd>Prepare extraction locations</dd>
+      </dl><dl><dt>
+
           <code><a href="calc_return_locs.html">calc_return_locs()</a></code>
 
         </dt>
         <dd>Prepare covariates for return</dd>
+      </dl><dl><dt>
+
+          <code><a href="calc_setcolumns.html">calc_setcolumns()</a></code>
+
+        </dt>
+        <dd>Set column names</dd>
+      </dl><dl><dt>
+
+          <code><a href="calc_time.html">calc_time()</a></code>
+
+        </dt>
+        <dd>Prepare time values</dd>
+      </dl><dl><dt>
+
+          <code><a href="calc_worker.html">calc_worker()</a></code>
+
+        </dt>
+        <dd>Perform covariate extraction</dd>
       </dl><dl><dt>
 
           <code><a href="check_url_status.html">check_url_status()</a></code>
@@ -645,6 +633,12 @@
         <dd>Implement <code>check_url_status</code></dd>
       </dl><dl><dt>
 
+          <code><a href="download_hash.html">download_hash()</a></code>
+
+        </dt>
+        <dd>Create has of downloaded files.</dd>
+      </dl><dl><dt>
+
           <code><a href="generate_date_sequence.html">generate_date_sequence()</a></code>
 
         </dt>
@@ -655,6 +649,12 @@
 
         </dt>
         <dd>Generate time sequence</dd>
+      </dl><dl><dt>
+
+          <code><a href="is_date_proper.html">is_date_proper()</a></code>
+
+        </dt>
+        <dd>Check date format</dd>
       </dl><dl><dt>
 
           <code><a href="narr_variable.html">narr_variable()</a></code>
@@ -669,6 +669,12 @@
         <dd>Process GEOS-CF and MERRA2 collection codes</dd>
       </dl><dl><dt>
 
+          <code><a href="process_conformity.html">process_conformity()</a></code>
+
+        </dt>
+        <dd>Check input assumptions</dd>
+      </dl><dl><dt>
+
           <code><a href="process_gmted_codes.html">process_gmted_codes()</a></code>
 
         </dt>
@@ -679,6 +685,18 @@
 
         </dt>
         <dd>Process gridMET variable codes</dd>
+      </dl><dl><dt>
+
+          <code><a href="process_locs_radius.html">process_locs_radius()</a></code>
+
+        </dt>
+        <dd>Process locations buffer</dd>
+      </dl><dl><dt>
+
+          <code><a href="process_locs_vector.html">process_locs_vector()</a></code>
+
+        </dt>
+        <dd>Process locations as <code>SpatVector</code></dd>
       </dl><dl><dt>
 
           <code><a href="process_merra2_time.html">process_merra2_time()</a></code>
@@ -713,7 +731,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

@@ -9,7 +9,7 @@ meteorological and atmospheric collections from NASA's Modern-Era Retrospective 
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +63,8 @@ meteorological and atmospheric collections from <a href="https://gmao.gsfc.nasa.
 <span>  directory_to_save <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  acknowledgement <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  remove_command <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  remove_command <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  hash <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -76,7 +77,7 @@ meteorological and atmospheric collections from <a href="https://gmao.gsfc.nasa.
 
 
 <dt id="arg-date">date<a class="anchor" aria-label="anchor" href="#arg-date"></a></dt>
-<dd><p>character(2). length of 10 each. Start/end date for downloading data.
+<dd><p>character(1 or 2). length of 10. Date or start/end dates for downloading data.
 Format "YYYY-MM-DD" (ex. January 1, 2018 = <code>"2018-01-01"</code>).</p></dd>
 
 
@@ -98,389 +99,119 @@ will download all of the requested data files.</p></dd>
 
 <dt id="arg-remove-command">remove_command<a class="anchor" aria-label="anchor" href="#arg-remove-command"></a></dt>
 <dd><p>logical(1).
-Remove (<code>TRUE</code>) or keep (<code>FALSE</code>)
+Remove (<code>TRUE</code>) or keep (<code>FALSE</code>).</p></dd>
+
+
+<dt id="arg-hash">hash<a class="anchor" aria-label="anchor" href="#arg-hash"></a></dt>
+<dd><p>logical(1). By setting <code>TRUE</code> the function will return
+an <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash_file()</a></code> hash character corresponding to the
+downloaded files. Default is <code>FALSE</code>.
 the text file containing download commands.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>NULL; netCDF (.nc4) files will be stored in a
-collection-specific folder within <code>directory_to_save</code>.</p>
-    </div>
+
+<ul><li><p>For <code>hash = FALSE</code>, NULL</p></li>
+<li><p>For <code>hash = TRUE</code>, an <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash_file</a></code> character.</p></li>
+<li><p>netCDF (.nc4) files will be stored in a
+collection-specific folder within <code>directory_to_save</code>.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 inst1_2d_ asm_ Nx: 2d,3-Hourly,Instantaneous,Single-Level,Assimilation,Single-Level Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/3Z173KIE2TPD" class="external-link">doi:10.5067/3Z173KIE2TPD</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2I1NXASM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2I1NXASM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 inst1_2d_ int_ Nx: 2d,1-Hourly,Instantaneous,Single-Level,Assimilation,Vertically Integrated Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/G0U6NGQ3BLE0" class="external-link">doi:10.5067/G0U6NGQ3BLE0</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2I1NXINT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2I1NXINT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 inst1_2d_ lfo_ Nx: 2d,1-Hourly,Instantaneous,Single-Level,Assimilation,Land Surface Forcings V5.12.4.”
-<a href="https://doi.org/10.5067/RCMZA6TL70BG" class="external-link">doi:10.5067/RCMZA6TL70BG</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2I1NXLFO_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2I1NXLFO_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 inst3_3d_ asm_ Np: 3d,3-Hourly,Instantaneous,Pressure-Level,Assimilation,Assimilated Meteorological Fields V5.12.4.”
-<a href="https://doi.org/10.5067/QBZ6MG944HW0" class="external-link">doi:10.5067/QBZ6MG944HW0</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2I3NPASM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2I3NPASM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 inst3_3d_ aer_ Nv: 3d,3-Hourly,Instantaneous,Model-Level,Assimilation,Aerosol Mixing Ratio V5.12.4.”
-<a href="https://doi.org/10.5067/LTVB4GPCOTK2" class="external-link">doi:10.5067/LTVB4GPCOTK2</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2I3NVAER_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2I3NVAER_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 inst3_3d_ asm_ Nv: 3d,3-Hourly,Instantaneous,Model-Level,Assimilation,Assimilated Meteorological Fields V5.12.4.”
-<a href="https://doi.org/10.5067/WWQSXQ8IVFW8" class="external-link">doi:10.5067/WWQSXQ8IVFW8</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2I3NVASM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2I3NVASM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 inst3_3d_ chm_ Nv: 3d,3-Hourly,Instantaneous,Model-Level,Assimilation,Carbon Monoxide and Ozone Mixing Ratio V5.12.4.”
-<a href="https://doi.org/10.5067/HO9OVZWF3KW2" class="external-link">doi:10.5067/HO9OVZWF3KW2</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2I3NVCHM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2I3NVCHM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 inst3_3d_ gas_ Nv: 3d,3-Hourly,Instantaneous,Model-Level,Assimilation,Aerosol Mixing Ratio Analysis Increments V5.12.4.”
-<a href="https://doi.org/10.5067/96BUID8HGGX5" class="external-link">doi:10.5067/96BUID8HGGX5</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2I3NVGAS_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2I3NVGAS_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 inst3_2d_ gas_ Nx: 2d,3-Hourly,Instantaneous,Single-Level,Assimilation,Aerosol Optical Depth Analysis V5.12.4.”
-<a href="https://doi.org/10.5067/HNGA0EWW0R09" class="external-link">doi:10.5067/HNGA0EWW0R09</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2I3NXGAS_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2I3NXGAS_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 inst6_3d_ ana_ Np: 3d,6-Hourly,Instantaneous,Pressure-Level,Analysis,Analyzed Meteorological Fields V5.12.4.”
-<a href="https://doi.org/10.5067/A7S6XP56VZWS" class="external-link">doi:10.5067/A7S6XP56VZWS</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2I6NPANA_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2I6NPANA_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 inst6_3d_ ana_ Nv: 3d,6-Hourly,Instantaneous,Model-Level,Analysis,Analyzed Meteorological Fields V5.12.4.”
-<a href="https://doi.org/10.5067/IUUF4WB9FT4W" class="external-link">doi:10.5067/IUUF4WB9FT4W</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2I6NVANA_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2I6NVANA_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 statD_2d_ slv_ Nx: 2d,Monthly,Aggregated Statistics,Single-Level,Assimilation,Single-Level Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/KVIMOMCUO83U" class="external-link">doi:10.5067/KVIMOMCUO83U</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2SMNXSLV_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2SMNXSLV_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 statD_2d_ slv_ Nx: 2d,Daily,Aggregated Statistics,Single-Level,Assimilation,Single-Level Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/9SC1VNTWGWV3" class="external-link">doi:10.5067/9SC1VNTWGWV3</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2SDNXSLV_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2SDNXSLV_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg1_2d_ adg_ Nx: 2d,3-Hourly,Time-averaged,Single-Level,Assimilation,Aerosol Diagnostics (extended) V5.12.4.”
-<a href="https://doi.org/10.5067/HM00OHQBHKTP" class="external-link">doi:10.5067/HM00OHQBHKTP</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T1NXADG_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T1NXADG_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg1_2d_ aer_ Nx: 2d,1-Hourly,Time-averaged,Single-Level,Assimilation,Aerosol Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/KLICLTZ8EM9D" class="external-link">doi:10.5067/KLICLTZ8EM9D</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T1NXAER_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T1NXAER_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg1_2d_ chm_ Nx: 2d,3-Hourly,Time-Averaged,Single-Level,Assimilation,Carbon Monoxide and Ozone Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/3RQ5YS674DGQ" class="external-link">doi:10.5067/3RQ5YS674DGQ</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T1NXCHM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T1NXCHM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg1_2d_ csp_ Nx: 2d,1-Hourly,Time-averaged,Single-Level,Assimilation,COSP Satellite Simulator V5.12.4.”
-<a href="https://doi.org/10.5067/H0VVAD8F6MX5" class="external-link">doi:10.5067/H0VVAD8F6MX5</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T1NXCSP_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T1NXCSP_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg1_2d_ flx_ Nx: 2d,1-Hourly,Time-Averaged,Single-Level,Assimilation,Surface Flux Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/7MCPBJ41Y0K6" class="external-link">doi:10.5067/7MCPBJ41Y0K6</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T1NXFLX_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T1NXFLX_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg1_2d_ int_ Nx: 2d,1-Hourly,Time-averaged,Single-Level,Assimilation,Vertically Integrated Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/Q5GVUVUIVGO7" class="external-link">doi:10.5067/Q5GVUVUIVGO7</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T1NXINT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T1NXINT_5.12.4/summary</a>.</p>
-<p>Pawson S (2020).
-“MERRA-2 tavg1_2d_ lfo_ Nx: 2d,1-Hourly,Time-Averaged,Single-Level,Assimilation,Land Surface Forcings V5.12.4.”
-<a href="https://doi.org/10.5067/L0T5GEG1NYFA" class="external-link">doi:10.5067/L0T5GEG1NYFA</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T1NXLFO_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T1NXLFO_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg1_2d_ lnd_ Nx: 2d,1-Hourly,Time-Averaged,Single-Level,Assimilation,Land Surface Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/RKPHT8KC1Y1T" class="external-link">doi:10.5067/RKPHT8KC1Y1T</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T1NXLND_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T1NXLND_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg1_2d_ ocn_ Nx: 2d,1-Hourly,Time-Averaged,Single-Level,Assimilation,Ocean Surface Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/Y67YQ1L3ZZ4R" class="external-link">doi:10.5067/Y67YQ1L3ZZ4R</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T1NXOCN_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T1NXOCN_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg1_2d_ rad_ Nx: 2d,1-Hourly,Time-Averaged,Single-Level,Assimilation,Radiation Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/Q9QMY5PBNV1T" class="external-link">doi:10.5067/Q9QMY5PBNV1T</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T1NXRAD_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T1NXRAD_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg1_2d_ slv_ Nx: 2d,1-Hourly,Time-Averaged,Single-Level,Assimilation,Single-Level Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/VJAFPLI1CSIV" class="external-link">doi:10.5067/VJAFPLI1CSIV</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T1NXSLV_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T1NXSLV_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ mst_ Ne: 3d,3-Hourly,Time-Averaged,Model-Level Edge,Assimilation,Moist Processes Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/JRUZ3SJ3ZJ72" class="external-link">doi:10.5067/JRUZ3SJ3ZJ72</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NEMST_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NEMST_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ trb_ Ne: 3d,3-Hourly,Time-Averaged,Model-Level Edge,Assimilation,Turbulence Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/4I7ZI35QRH8K" class="external-link">doi:10.5067/4I7ZI35QRH8K</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NETRB_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NETRB_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ nav_ Ne: 3d,3-Hourly,Time-Averaged, Vertical Coordinates V5.12.4.”
-<a href="https://doi.org/10.5067/N5WAKNS1UYQN" class="external-link">doi:10.5067/N5WAKNS1UYQN</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NENAV_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NENAV_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ cld_ Np: 3d,3-Hourly,Time-Averaged,Pressure-Level,Assimilation,Cloud Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/TX10URJSKT53" class="external-link">doi:10.5067/TX10URJSKT53</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NPCLD_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NPCLD_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ mst_ Np: 3d,3-Hourly,Time-Averaged,Pressure-Level,Assimilation,Moist Processes Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/0TUFO90Q2PMS" class="external-link">doi:10.5067/0TUFO90Q2PMS</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NPMST_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NPMST_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ rad_ Np: 3d,3-Hourly,Time-Averaged,Pressure-Level,Assimilation,Radiation Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/3UGE8WQXZAOK" class="external-link">doi:10.5067/3UGE8WQXZAOK</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NPRAD_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NPRAD_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ tdt_ Np: 3d,3-Hourly,Time-Averaged,Pressure-Level,Assimilation,Temperature Tendencies V5.12.4.”
-<a href="https://doi.org/10.5067/9NCR9DDDOPFI" class="external-link">doi:10.5067/9NCR9DDDOPFI</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NPTDT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NPTDT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ trb_ Np: 3d,3-Hourly,Time-Averaged,Pressure-Level,Assimilation,Turbulence Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/ZRRJPGWL8AVL" class="external-link">doi:10.5067/ZRRJPGWL8AVL</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NPTRB_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NPTRB_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ udt_ Np: 3d,3-Hourly,Time-Averaged,Pressure-Level,Assimilation,Wind Tendencies V5.12.4.”
-<a href="https://doi.org/10.5067/CWV0G3PPPWFW" class="external-link">doi:10.5067/CWV0G3PPPWFW</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NPUDT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NPUDT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ odt_ Np: 3d,3-Hourly,Time-Averaged,Pressure-Level,Assimilation,Ozone Tendencies V5.12.4.”
-<a href="https://doi.org/10.5067/S0LYTK57786Z" class="external-link">doi:10.5067/S0LYTK57786Z</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NPODT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NPODT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ qdt_ Np: 3d,3-Hourly,Time-Averaged,Pressure-Level,Assimilation,Moist Tendencies V5.12.4.”
-<a href="https://doi.org/10.5067/A9KWADY78YHQ" class="external-link">doi:10.5067/A9KWADY78YHQ</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NPQDT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NPQDT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ asm_ Nv: 3d,3-Hourly,Time-Averaged,Model-Level,Assimilation,Assimilated Meteorological Fields V5.12.4.”
-<a href="https://doi.org/10.5067/SUOQESM06LPK" class="external-link">doi:10.5067/SUOQESM06LPK</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NVASM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NVASM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ cld_ Nv: 3d,3-Hourly,Time-Averaged,Model-Level,Assimilation,Cloud Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/F9353J0FAHIH" class="external-link">doi:10.5067/F9353J0FAHIH</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NVCLD_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NVCLD_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ mst_ Nv: 3d,3-Hourly,Time-Averaged,Model-Level,Assimilation,Moist Processes Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/ZXTJ28TQR1TR" class="external-link">doi:10.5067/ZXTJ28TQR1TR</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NVMST_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NVMST_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_3d_ rad_ Nv: 3d,3-Hourly,Time-Averaged,Model-Level,Assimilation,Radiation Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/7GFQKO1T43RW" class="external-link">doi:10.5067/7GFQKO1T43RW</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NVRAD_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NVRAD_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavg3_2d_ glc_ Nx: 2d,3-Hourly,Time-Averaged,Single-Level,Assimilation,Land Ice Surface Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/9ETB4TT5J6US" class="external-link">doi:10.5067/9ETB4TT5J6US</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2T3NXGLC_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2T3NXGLC_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 instM_2d_ asm_ Nx: 2d,Monthly mean,Single-Level,Assimilation,Single-Level Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/5ESKGQTZG7FO" class="external-link">doi:10.5067/5ESKGQTZG7FO</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2IMNXASM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2IMNXASM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 instM_2d_ int_ Nx: 2d,Monthly mean,Instantaneous,Single-Level,Assimilation,Vertically Integrated Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/KVTU1A8BWFSJ" class="external-link">doi:10.5067/KVTU1A8BWFSJ</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2IMNXINT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2IMNXINT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 instM_2d_ lfo_ Nx: 2d,Monthly mean,Instantaneous,Single-Level,Assimilation,Land Surface Forcings V5.12.4.”
-<a href="https://doi.org/10.5067/11F99Y6TXN99" class="external-link">doi:10.5067/11F99Y6TXN99</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2IMNXLFO_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2IMNXLFO_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 instM_2d_ gas_ Nx: 2d,Monthly mean,Instantaneous,Single-Level,Assimilation,Aerosol Optical Depth Analysis V5.12.4.”
-<a href="https://doi.org/10.5067/XOGNBQEPLUC5" class="external-link">doi:10.5067/XOGNBQEPLUC5</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2IMNXGAS_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2IMNXGAS_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 instM_3d_ asm_ Np: 3d,Monthly mean,Instantaneous,Pressure-Level,Assimilation,Assimilated Meteorological Fields V5.12.4.”
-<a href="https://doi.org/10.5067/2E096JV59PK7" class="external-link">doi:10.5067/2E096JV59PK7</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2IMNPASM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2IMNPASM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 instM_3d_ ana_ Np: 3d,Monthly mean,Instantaneous,Pressure-Level,Analysis,Analyzed Meteorological Fields V5.12.4.”
-<a href="https://doi.org/10.5067/V92O8XZ30XBI" class="external-link">doi:10.5067/V92O8XZ30XBI</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2IMNPANA_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2IMNPANA_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_2d_ adg_ Nx: 2d,Monthly mean,Time-averaged,Single-Level,Assimilation,Aerosol Diagnostics (extended) V5.12.4.”
-<a href="https://doi.org/10.5067/RZIK2TV7PP38" class="external-link">doi:10.5067/RZIK2TV7PP38</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNXADG_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNXADG_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_2d_ aer_ Nx: 2d,Monthly mean,Time-averaged,Single-Level,Assimilation,Aerosol Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/FH9A0MLJPC7N" class="external-link">doi:10.5067/FH9A0MLJPC7N</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNXAER_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNXAER_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_2d_ chm_ Nx: 2d,Monthly mean,Time-Averaged,Single-Level,Assimilation,Carbon Monoxide and Ozone Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/WMT31RKEXK8I" class="external-link">doi:10.5067/WMT31RKEXK8I</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNXCHM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNXCHM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_2d_ csp_ Nx: 2d,Monthly mean,Time-averaged,Single-Level,Assimilation,COSP Satellite Simulator V5.12.4.”
-<a href="https://doi.org/10.5067/BZPOTGJOQKLU" class="external-link">doi:10.5067/BZPOTGJOQKLU</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNXCSP_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNXCSP_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_2d_ flx_ Nx: 2d,Monthly mean,Time-Averaged,Single-Level,Assimilation,Surface Flux Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/0JRLVL8YV2Y4" class="external-link">doi:10.5067/0JRLVL8YV2Y4</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNXFLX_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNXFLX_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_2d_ int_ Nx: 2d,Monthly mean,Time-Averaged,Single-Level,Assimilation,Vertically Integrated Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/FQPTQ4OJ22TL" class="external-link">doi:10.5067/FQPTQ4OJ22TL</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNXINT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNXINT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_2d_ lfo_ Nx: 2d,Monthly mean,Time-Averaged,Single-Level,Assimilation,Land Surface Forcings V5.12.4.”
-<a href="https://doi.org/10.5067/5V7K6LJD44SY" class="external-link">doi:10.5067/5V7K6LJD44SY</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNXLFO_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNXLFO_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_2d_ lnd_ Nx: 2d,Monthly mean,Time-Averaged,Single-Level,Assimilation,Land Surface Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/8S35XF81C28F" class="external-link">doi:10.5067/8S35XF81C28F</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNXLND_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNXLND_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_2d_ ocn_ Nx: 2d,Monthly mean,Time-Averaged,Single-Level,Assimilation,Ocean Surface Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/4IASLIDL8EEC" class="external-link">doi:10.5067/4IASLIDL8EEC</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNXOCN_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNXOCN_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_2d_ rad_ Nx: 2d,Monthly mean,Time-Averaged,Single-Level,Assimilation,Radiation Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/OU3HJDS973O0" class="external-link">doi:10.5067/OU3HJDS973O0</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNXRAD_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNXRAD_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_2d_ slv_ Nx: 2d,Monthly mean,Time-Averaged,Single-Level,Assimilation,Single-Level Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/AP1B0BA5PD2K" class="external-link">doi:10.5067/AP1B0BA5PD2K</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNXSLV_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNXSLV_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_2d_ glc_ Nx: 2d,Monthly mean,Time-Averaged,Single-Level,Assimilation,Land Ice Surface Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/5W8Q3I9WUFGX" class="external-link">doi:10.5067/5W8Q3I9WUFGX</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNXGLC_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNXGLC_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_3d_ cld_ Np: 3d,Monthly mean,Time-Averaged,Pressure-Level,Assimilation,Cloud Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/J9R0LXGH48JR" class="external-link">doi:10.5067/J9R0LXGH48JR</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNPCLD_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNPCLD_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_3d_ mst_ Np: 3d,Monthly mean,Time-Averaged,Pressure-Level,Assimilation,Moist Processes Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/ZRZGD0DCK1CG" class="external-link">doi:10.5067/ZRZGD0DCK1CG</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNPMST_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNPMST_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_3d_ rad_ Np: 3d,Monthly mean,Time-Averaged,Pressure-Level,Assimilation,Radiation Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/H3YGROBVBGFJ" class="external-link">doi:10.5067/H3YGROBVBGFJ</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNPRAD_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNPRAD_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_3d_ tdt_ Np: 3d,Monthly mean,Time-Averaged,Pressure-Level,Assimilation,Temperature Tendencies V5.12.4.”
-<a href="https://doi.org/10.5067/VILT59HI2MOY" class="external-link">doi:10.5067/VILT59HI2MOY</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNPTDT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNPTDT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_3d_ trb_ Np: 3d,Monthly mean,Time-Averaged,Pressure-Level,Assimilation,Turbulence Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/2YOIQB5C3ACN" class="external-link">doi:10.5067/2YOIQB5C3ACN</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNPTRB_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNPTRB_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_3d_ udt_ Np: 3d,Monthly mean,Time-Averaged,Pressure-Level,Assimilation,Wind Tendencies V5.12.4.”
-<a href="https://doi.org/10.5067/YSR6IA5057XX" class="external-link">doi:10.5067/YSR6IA5057XX</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNPUDT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNPUDT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_3d_ odt_ Np: 3d,Monthly mean,Time-Averaged,Pressure-Level,Assimilation,Ozone Tendencies V5.12.4.”
-<a href="https://doi.org/10.5067/Z2KCWAV4GPD2" class="external-link">doi:10.5067/Z2KCWAV4GPD2</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNPODT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNPODT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgM_3d_ qdt_ Np: 3d,Monthly mean,Time-Averaged,Pressure-Level,Assimilation,Moist Tendencies V5.12.4.”
-<a href="https://doi.org/10.5067/2ZTU87V69ATP" class="external-link">doi:10.5067/2ZTU87V69ATP</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TMNPQDT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TMNPQDT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 const_2d_ asm_ Nx: 2d, constants.”
-<a href="https://doi.org/10.5067/ME5QX6Q5IGGU" class="external-link">doi:10.5067/ME5QX6Q5IGGU</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2C0NXASM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2C0NXASM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 instU_2d_ asm_ Nx: 2d,Diurnal,Instantaneous,Single-Level,Assimilation,Single-Level Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/BOJSTZAO2L8R" class="external-link">doi:10.5067/BOJSTZAO2L8R</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2IUNXASM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2IUNXASM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 instU_2d_ int_ Nx: 2d,Diurnal,Instantaneous,Single-Level,Assimilation,Vertically Integrated Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/DGAB3HFEYMLY" class="external-link">doi:10.5067/DGAB3HFEYMLY</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2IUNXINT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2IUNXINT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 instU_2d_ lfo_ Nx: 2d,Diurnal,Instantaneous,Single-Level,Assimilation,Land Surface Forcings V5.12.4.”
-<a href="https://doi.org/10.5067/FC3BVJ88Y8A2" class="external-link">doi:10.5067/FC3BVJ88Y8A2</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2IUNXLFO_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2IUNXLFO_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 instU_2d_ gas_ Nx: 2d,Diurnal,Instantaneous,Single-Level,Assimilation,Aerosol Optical Depth Analysis V5.12.4.”
-<a href="https://doi.org/10.5067/TVJ4MHBED39L" class="external-link">doi:10.5067/TVJ4MHBED39L</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2IUNXGAS_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2IUNXGAS_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 instU_3d_ asm_ Np: 3d,Diurnal,Instantaneous,Pressure-Level,Assimilation,Assimilated Meteorological Fields V5.12.4.”
-<a href="https://doi.org/10.5067/6EGRBNEBMIYS" class="external-link">doi:10.5067/6EGRBNEBMIYS</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2IUNPASM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2IUNPASM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 instU_3d_ ana_ Np: 3d,Diurnal,Instantaneous,Pressure-Level,Analysis,Analyzed Meteorological Fields V5.12.4.”
-<a href="https://doi.org/10.5067/TRD91YO9S6E7" class="external-link">doi:10.5067/TRD91YO9S6E7</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2IUNPANA_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2IUNPANA_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_2d_ adg_ Nx: 2d,Diurnal,Time-averaged,Single-Level,Assimilation,Aerosol Diagnostics (extended) V5.12.4.”
-<a href="https://doi.org/10.5067/YZJJXZTFCX6B" class="external-link">doi:10.5067/YZJJXZTFCX6B</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNXADG_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNXADG_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_2d_ aer_ Nx: 2d,Diurnal,Time-averaged,Single-Level,Assimilation,Aerosol Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/KPUMVXFEQLA1" class="external-link">doi:10.5067/KPUMVXFEQLA1</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNXAER_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNXAER_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_2d_ chm_ Nx: 2d,Diurnal,Time-Averaged,Single-Level,Assimilation,Carbon Monoxide and Ozone Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/5KFZ6GXRHZKN" class="external-link">doi:10.5067/5KFZ6GXRHZKN</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNXCHM_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNXCHM_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_2d_ csp_ Nx: 2d,Diurnal,Time-averaged,Single-Level,Assimilation,COSP Satellite Simulator V5.12.4.”
-<a href="https://doi.org/10.5067/9PH5QU4CL9E8" class="external-link">doi:10.5067/9PH5QU4CL9E8</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNXCSP_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNXCSP_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_2d_ flx_ Nx: 2d,Diurnal,Time-Averaged,Single-Level,Assimilation,Surface Flux Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/LUHPNWAKYIO3" class="external-link">doi:10.5067/LUHPNWAKYIO3</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNXFLX_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNXFLX_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_2d_ int_ Nx: 2d,Diurnal,Time-Averaged,Single-Level,Assimilation,Vertically Integrated Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/R2MPVU4EOSWT" class="external-link">doi:10.5067/R2MPVU4EOSWT</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNXINT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNXINT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_2d_ lfo_ Nx: 2d,Diurnal,Time-Averaged,Single-Level,Assimilation,Land Surface Forcings V5.12.4.”
-<a href="https://doi.org/10.5067/BTSNKAJND3ME" class="external-link">doi:10.5067/BTSNKAJND3ME</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNXLFO_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNXLFO_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_2d_ lnd_ Nx: 2d,Diurnal,Time-Averaged,Single-Level,Assimilation,Land Surface Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/W0J15047CF6N" class="external-link">doi:10.5067/W0J15047CF6N</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNXLND_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNXLND_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_2d_ ocn_ Nx: 2d,Diurnal,Time-Averaged,Single-Level,Assimilation,Ocean Surface Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/KLNAVGAX7J66" class="external-link">doi:10.5067/KLNAVGAX7J66</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNXOCN_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNXOCN_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_2d_ rad_ Nx: 2d,Diurnal,Time-Averaged,Single-Level,Assimilation,Radiation Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/4SDCJYK8P9QU" class="external-link">doi:10.5067/4SDCJYK8P9QU</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNXRAD_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNXRAD_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_2d_ slv_ Nx: 2d,Diurnal,Time-Averaged,Single-Level,Assimilation,Single-Level Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/AFOK0TPEVQEK" class="external-link">doi:10.5067/AFOK0TPEVQEK</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNXSLV_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNXSLV_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_2d_ glc_ Nx: 2d,Diurnal,Time-Averaged,Single-Level,Assimilation,Land Ice Surface Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/7VUPQC736SWX" class="external-link">doi:10.5067/7VUPQC736SWX</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNXGLC_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNXGLC_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_3d_ cld_ Np: 3d,Diurnal,Time-Averaged,Pressure-Level,Assimilation,Cloud Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/EPW7T5UO0C0N" class="external-link">doi:10.5067/EPW7T5UO0C0N</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNPCLD_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNPCLD_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_3d_ mst_ Np: 3d,Diurnal,Time-Averaged,Pressure-Level,Assimilation,Moist Processes Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/ZRSN0JU27DK2" class="external-link">doi:10.5067/ZRSN0JU27DK2</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNPMST_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNPMST_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_3d_ rad_ Np: 3d,Diurnal,Time-Averaged,Pressure-Level,Assimilation,Radiation Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/H140JMDOWB0Y" class="external-link">doi:10.5067/H140JMDOWB0Y</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNPRAD_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNPRAD_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_3d_ tdt_ Np: 3d,Diurnal,Time-Averaged,Pressure-Level,Assimilation,Temperature Tendencies V5.12.4.”
-<a href="https://doi.org/10.5067/QPO9E5TPZ8OF" class="external-link">doi:10.5067/QPO9E5TPZ8OF</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNPTDT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNPTDT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_3d_ trb_ Np: 3d,Diurnal,Time-Averaged,Pressure-Level,Assimilation,Turbulence Diagnostics V5.12.4.”
-<a href="https://doi.org/10.5067/2A99C60CG7WC" class="external-link">doi:10.5067/2A99C60CG7WC</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNPTRB_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNPTRB_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_3d_ udt_ Np: 3d,Diurnal,Time-Averaged,Pressure-Level,Assimilation,Wind Tendencies V5.12.4.”
-<a href="https://doi.org/10.5067/DO715T7T5PG8" class="external-link">doi:10.5067/DO715T7T5PG8</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNPUDT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNPUDT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_3d_ odt_ Np: 3d,Diurnal,Time-Averaged,Pressure-Level,Assimilation,Ozone Tendencies V5.12.4.”
-<a href="https://doi.org/10.5067/M8OJ09GZP23E" class="external-link">doi:10.5067/M8OJ09GZP23E</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNPODT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNPODT_5.12.4/summary</a>.</p>
-<p>Global Modeling And Assimilation Office, Pawson S (2015).
-“MERRA-2 tavgU_3d_ qdt_ Np: 3d,Diurnal,Time-Averaged,Pressure-Level,Assimilation,Moist Tendencies V5.12.4.”
-<a href="https://doi.org/10.5067/S8HJXIR0BFTS" class="external-link">doi:10.5067/S8HJXIR0BFTS</a>
-, <a href="https://disc.gsfc.nasa.gov/datasets/M2TUNPQDT_5.12.4/summary" class="external-link">https://disc.gsfc.nasa.gov/datasets/M2TUNPQDT_5.12.4/summary</a>.</p>
+    <p>data_gmao_merra-inst1_2d_asm_Nxamadeus</p>
+<p>data_gmao_merra-inst1_2d_int_Nxamadeus</p>
+<p>data_gmao_merra-inst1_2d_lfo_Nxamadeus</p>
+<p>data_gmao_merra-inst3_3d_asm_Npamadeus</p>
+<p>data_gmao_merra-inst3_3d_aer_Nvamadeus</p>
+<p>data_gmao_merra-inst3_3d_asm_Nvamadeus</p>
+<p>data_gmao_merra-inst3_3d_chm_Nvamadeus</p>
+<p>data_gmao_merra-inst3_3d_gas_Nvamadeus</p>
+<p>data_gmao_merra-inst3_2d_gas_Nxamadeus</p>
+<p>data_gmao_merra-inst6_3d_ana_Npamadeus</p>
+<p>data_gmao_merra-inst6_3d_ana_Nvamadeus</p>
+<p>data_gmao_merra-statD_2d_slv_Nx_mamadeus</p>
+<p>data_gmao_merra-statD_2d_slv_Nx_damadeus</p>
+<p>data_gmao_merra-tavg1_2d_adg_Nxamadeus</p>
+<p>data_gmao_merra-tavg1_2d_aer_Nxamadeus</p>
+<p>data_gmao_merra-tavg1_2d_chm_Nxamadeus</p>
+<p>data_gmao_merra-tavg1_2d_csp_Nxamadeus</p>
+<p>data_gmao_merra-tavg1_2d_flx_Nxamadeus</p>
+<p>data_gmao_merra-tavg1_2d_int_Nxamadeus</p>
+<p>pawson_merra-2_2020amadeus</p>
+<p>data_gmao_merra-tavg1_2d_lnd_Nxamadeus</p>
+<p>data_gmao_merra-tavg1_2d_ocn_Nxamadeus</p>
+<p>data_gmao_merra-tavg1_2d_rad_Nxamadeus</p>
+<p>data_gmao_merra-tavg1_2d_slv_Nxamadeus</p>
+<p>data_gmao_merra-tavg3_3d_mst_Neamadeus</p>
+<p>data_gmao_merra-tavg3_3d_trb_Neamadeus</p>
+<p>data_gmao_merra-tavg3_3d_nav_Neamadeus</p>
+<p>data_gmao_merra-tavg3_3d_cld_Npamadeus</p>
+<p>data_gmao_merra-tavg3_3d_mst_Npamadeus</p>
+<p>data_gmao_merra-tavg3_3d_rad_Npamadeus</p>
+<p>data_gmao_merra-tavg3_3d_tdt_Npamadeus</p>
+<p>data_gmao_merra-tavg3_3d_trb_Npamadeus</p>
+<p>data_gmao_merra-tavg3_3d_udt_Npamadeus</p>
+<p>data_gmao_merra-tavg3_3d_odt_Npamadeus</p>
+<p>data_gmao_merra-tavg3_3d_qdt_Npamadeus</p>
+<p>data_gmao_merra-tavg3_3d_asm_Nvamadeus</p>
+<p>data_gmao_merra-tavg3_3d_cld_Nvamadeus</p>
+<p>data_gmao_merra-tavg3_3d_mst_Nvamadeus</p>
+<p>data_gmao_merra-tavg3_3d_rad_Nvamadeus</p>
+<p>data_gmao_merra-tavg3_2d_glc_Nxamadeus</p>
+<p>data_gmao_merra-instM_2d_asm_Nxamadeus</p>
+<p>data_gmao_merra-instM_2d_int_Nxamadeus</p>
+<p>data_gmao_merra-instM_2d_lfo_Nxamadeus</p>
+<p>data_gmao_merra-instM_2d_gas_Nxamadeus</p>
+<p>data_gmao_merra-instM_3d_asm_Npamadeus</p>
+<p>data_gmao_merra-instM_3d_ana_Npamadeus</p>
+<p>data_gmao_merra-tavgM_2d_adg_Nxamadeus</p>
+<p>data_gmao_merra-tavgM_2d_aer_Nxamadeus</p>
+<p>data_gmao_merra-tavgM_2d_chm_Nxamadeus</p>
+<p>data_gmao_merra-tavgM_2d_csp_Nxamadeus</p>
+<p>data_gmao_merra-tavgM_2d_flx_Nxamadeus</p>
+<p>data_gmao_merra-tavgM_2d_int_Nxamadeus</p>
+<p>data_gmao_merra-tavgM_2d_lfo_Nxamadeus</p>
+<p>data_gmao_merra-tavgM_2d_lnd_Nxamadeus</p>
+<p>data_gmao_merra-tavgM_2d_ocn_Nxamadeus</p>
+<p>data_gmao_merra-tavgM_2d_rad_Nxamadeus</p>
+<p>data_gmao_merra-tavgM_2d_slv_Nxamadeus</p>
+<p>data_gmao_merra-tavgM_2d_glc_Nxamadeus</p>
+<p>data_gmao_merra-tavgM_3d_cld_Npamadeus</p>
+<p>data_gmao_merra-tavgM_3d_mst_Npamadeus</p>
+<p>data_gmao_merra-tavgM_3d_rad_Npamadeus</p>
+<p>data_gmao_merra-tavgM_3d_tdt_Npamadeus</p>
+<p>data_gmao_merra-tavgM_3d_trb_Npamadeus</p>
+<p>data_gmao_merra-tavgM_3d_udt_Npamadeus</p>
+<p>data_gmao_merra-tavgM_3d_odt_Npamadeus</p>
+<p>data_gmao_merra-tavgM_3d_qdt_Npamadeus</p>
+<p>data_gmao_merra-const_2d_asm_Nxamadeus</p>
+<p>data_gmao_merra-instU_2d_asm_Nxamadeus</p>
+<p>data_gmao_merra-instU_2d_int_Nxamadeus</p>
+<p>data_gmao_merra-instU_2d_lfo_Nxamadeus</p>
+<p>data_gmao_merra-instU_2d_gas_Nxamadeus</p>
+<p>data_gmao_merra-instU_3d_asm_Npamadeus</p>
+<p>data_gmao_merra-instU_3d_ana_Npamadeus</p>
+<p>data_gmao_merra-tavgU_2d_adg_Nxamadeus</p>
+<p>data_gmao_merra-tavgU_2d_aer_Nxamadeus</p>
+<p>data_gmao_merra-tavgU_2d_chm_Nxamadeus</p>
+<p>data_gmao_merra-tavgU_2d_csp_Nxamadeus</p>
+<p>data_gmao_merra-tavgU_2d_flx_Nxamadeus</p>
+<p>data_gmao_merra-tavgU_2d_int_Nxamadeus</p>
+<p>data_gmao_merra-tavgU_2d_lfo_Nxamadeus</p>
+<p>data_gmao_merra-tavgU_2d_lnd_Nxamadeus</p>
+<p>data_gmao_merra-tavgU_2d_ocn_Nxamadeus</p>
+<p>data_gmao_merra-tavgU_2d_rad_Nxamadeus</p>
+<p>data_gmao_merra-tavgU_2d_slv_Nxamadeus</p>
+<p>data_gmao_merra-tavgU_2d_glc_Nxamadeus</p>
+<p>data_gmao_merra-tavgU_3d_cld_Npamadeus</p>
+<p>data_gmao_merra-tavgU_3d_mst_Npamadeus</p>
+<p>data_gmao_merra-tavgU_3d_rad_Npamadeus</p>
+<p>data_gmao_merra-tavgU_3d_tdt_Npamadeus</p>
+<p>data_gmao_merra-tavgU_3d_trb_Npamadeus</p>
+<p>data_gmao_merra-tavgU_3d_udt_Npamadeus</p>
+<p>data_gmao_merra-tavgU_3d_odt_Npamadeus</p>
+<p>data_gmao_merra-tavgU_3d_qdt_Npamadeus</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -495,10 +226,9 @@ collection-specific folder within <code>directory_to_save</code>.</p>
 <span class="r-in"><span>  directory_to_save <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>  download <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># NOTE: download skipped for examples,</span></span></span>
-<span class="r-in"><span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Skipping data download.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -510,7 +240,7 @@ collection-specific folder within <code>directory_to_save</code>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

@@ -9,7 +9,7 @@ atmospheric composition collections from NASA's Global Earth Observing System (G
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,7 +55,8 @@ atmospheric composition collections from <a href="https://gmao.gsfc.nasa.gov/GEO
 <span>  directory_to_save <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  acknowledgement <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  remove_command <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  remove_command <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  hash <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -68,7 +69,7 @@ atmospheric composition collections from <a href="https://gmao.gsfc.nasa.gov/GEO
 
 
 <dt id="arg-date">date<a class="anchor" aria-label="anchor" href="#arg-date"></a></dt>
-<dd><p>character(2). length of 10 each. Start/end date for downloading data.
+<dd><p>character(1 or 2). length of 10. Date or start/end dates for downloading data.
 Format "YYYY-MM-DD" (ex. January 1, 2018 = <code>"2018-01-01"</code>).</p></dd>
 
 
@@ -95,19 +96,24 @@ will download all of the requested data files.</p></dd>
 Remove (<code>TRUE</code>) or keep (<code>FALSE</code>)
 the text file containing download commands.</p></dd>
 
+
+<dt id="arg-hash">hash<a class="anchor" aria-label="anchor" href="#arg-hash"></a></dt>
+<dd><p>logical(1). By setting <code>TRUE</code> the function will return
+an <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash_file()</a></code> hash character corresponding to the
+downloaded files. Default is <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>NULL; netCDF (.nc4) files will be stored in a
-collection-specific folder within <code>directory_to_save</code>.</p>
-    </div>
+
+<ul><li><p>For <code>hash = FALSE</code>, NULL</p></li>
+<li><p>For <code>hash = TRUE</code>, an <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash_file</a></code> character.</p></li>
+<li><p>netCDF (.nc4) files will be stored in a
+collection-specific folder within <code>directory_to_save</code>.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Keller CA, Knowland KE, Duncan BN, Liu J, Anderson DC, Das S, Lucchesi RA, Lundgren EW, Nicely JM, Nielsen E, Ott LE, Saunders E, Strode SA, Wales PA, Jacob DJ, Pawson S (2021).
-“Description of the NASA GEOS Composition Forecast Modeling System GEOS‐CF v1.0.”
-<em>Journal of Advances in Modeling Earth Systems</em>, <b>13</b>(4), e2020MS002413.
-ISSN 1942-2466, 1942-2466, <a href="https://doi.org/10.1029/2020MS002413" class="external-link">doi:10.1029/2020MS002413</a>
-.</p>
+    <p>keller_description_2021amadeus</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -125,7 +131,6 @@ ISSN 1942-2466, 1942-2466, <a href="https://doi.org/10.1029/2020MS002413" class=
 <span class="r-in"><span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Skipping data download.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -137,7 +142,7 @@ ISSN 1942-2466, 1942-2466, <a href="https://doi.org/10.1029/2020MS002413" class=
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>
