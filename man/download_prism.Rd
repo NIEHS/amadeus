@@ -13,7 +13,8 @@ download_prism(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  hash = FALSE
 )
 }
 \arguments{
@@ -61,10 +62,18 @@ will download all of the requested data files.}
 \item{remove_command}{logical(1).
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
 }
 \value{
-NULL; .bil (normals) or single grid files depending on the format
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item .bil (normals) or single grid files depending on the format
 choice will be stored in \code{directory_to_save}.
+}
 }
 \description{
 Accesses and downloads Oregon State University's

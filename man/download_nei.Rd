@@ -13,7 +13,8 @@ download_nei(
   acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
-  unzip = TRUE
+  unzip = TRUE,
+  hash = FALSE
 )
 }
 \arguments{
@@ -45,10 +46,18 @@ the text file containing download commands.}
 
 \item{unzip}{logical(1). Unzip the downloaded zip files.
 Default is \code{FALSE}.}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
 }
 \value{
-NULL; Zip and/or data files will be downloaded and stored in
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item Zip and/or data files will be downloaded and stored in
 respective sub-directories within \code{directory_to_save}.
+}
 }
 \description{
 The \code{download_nei()} function accesses and downloads road emissions data from the \href{https://www.epa.gov/air-emissions-inventories/national-emissions-inventory-nei}{U.S Environmental Protection Agency's (EPA) National Emissions Inventory (NEI)}.

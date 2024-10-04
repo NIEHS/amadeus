@@ -10,6 +10,9 @@
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @param ... Arguments passed to each download function.
 #' @note
 #' - All download function names are in \code{download_*} formats
@@ -37,7 +40,10 @@
 #' * \code{\link{download_huc}}: `"huc"`
 #' * \code{\link{download_cropscape}}: `"cropscape"`, `"cdl"`
 #' * \code{\link{download_prism}}: `"prism"`
-#' @return NULL; Data files will be downloaded and stored in respective
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Data files will be downloaded and stored in respective
 #' sub-directories within \code{directory_to_save}. File format and
 #' sub-directory names depend on data source and dataset of interest.
 #' @examples
@@ -63,6 +69,7 @@ download_data <-
                      "prism"),
     directory_to_save = NULL,
     acknowledgement = FALSE,
+    hash = FALSE,
     ...
   ) {
 
@@ -151,8 +158,14 @@ download_data <-
 #' @param unzip logical(1). Unzip zip files. Default \code{TRUE}.
 #' @param remove_zip logical(1). Remove zip file from directory_to_download.
 #' Default \code{FALSE}.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Mariana Kassien, Insang Song, Mitchell Manware
-#' @return NULL; Zip and/or data files will be downloaded and stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -181,7 +194,8 @@ download_aqs <-
     download = FALSE,
     remove_command = FALSE,
     unzip = TRUE,
-    remove_zip = FALSE
+    remove_zip = FALSE,
+    hash = FALSE
   ) {
     #### 1. check for data download acknowledgement
     download_permit(acknowledgement = acknowledgement)
@@ -275,6 +289,7 @@ download_aqs <-
       remove = remove_zip,
       download_name = download_names
     )
+    return(download_hash(hash, directory_to_save))
   }
 
 
@@ -313,8 +328,14 @@ download_aqs <-
 #' @param unzip logical(1). Unzip zip files. Default \code{TRUE}.
 #' @param remove_zip logical(1). Remove zip file from
 #' \code{directory_to_download}. Default \code{FALSE}.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Insang Song
-#' @return NULL; Zip and/or data files will be downloaded and stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom utils download.file
 #' @importFrom Rdpack reprompt
@@ -340,7 +361,8 @@ download_ecoregion <- function(
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE,
-  remove_zip = FALSE
+  remove_zip = FALSE,
+  hash = FALSE
 ) {
   #### 1. data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -411,6 +433,7 @@ download_ecoregion <- function(
     remove = remove_zip,
     download_name = download_name
   )
+  return(download_hash(hash, directory_to_save))
 }
 
 # nolint start 
@@ -433,8 +456,14 @@ download_ecoregion <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; netCDF (.nc4) files will be stored in a
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
 #' @importFrom utils download.file
 #' @importFrom Rdpack reprompt
@@ -463,7 +492,9 @@ download_geos <- function(
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
-    remove_command = FALSE) {
+    remove_command = FALSE,
+    hash = FALSE
+  ) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
@@ -571,6 +602,7 @@ download_geos <- function(
     commands_txt = commands_txt,
     remove = remove_command
   )
+  return(download_hash(hash, directory_to_save))
 }
 # nolint end: cyclocomp
 
@@ -599,9 +631,15 @@ download_geos <- function(
 #' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
 #' @param remove_zip logical(1). Remove zip file from directory_to_download.
 #' Default is \code{FALSE}.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
-#' @return NULL; Zip and/or data files will be downloaded and stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -630,7 +668,8 @@ download_gmted <- function(
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE,
-  remove_zip = FALSE
+  remove_zip = FALSE,
+  hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -721,6 +760,7 @@ download_gmted <- function(
     remove = remove_zip,
     download_name = download_name
   )
+  return(download_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -739,10 +779,16 @@ download_gmted <- function(
 #' containing all download commands. By setting \code{TRUE} the function
 #' will download all of the requested data files.
 #' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
+#' Remove (\code{TRUE}) or keep (\code{FALSE}).
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' the text file containing download commands.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; netCDF (.nc4) files will be stored in a
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -938,7 +984,7 @@ download_gmted <- function(
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE
+#'   remove_command = TRUE,
 #' )
 #' @export
 # nolint end
@@ -963,7 +1009,8 @@ download_merra2 <- function(
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
-    remove_command = FALSE) {
+    remove_command = FALSE,
+    hash = FALSE) {
   #### check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### directory setup
@@ -1210,6 +1257,7 @@ download_merra2 <- function(
     commands_txt = commands_txt,
     remove = remove_command
   )
+  return(download_hash(hash, directory_to_save))
 }
 # nolint end: cyclocomp
 
@@ -1232,8 +1280,14 @@ download_merra2 <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; netCDF (.nc) files will be stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * netCDF (.nc) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1256,7 +1310,8 @@ download_narr <- function(
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
-    remove_command = FALSE) {
+    remove_command = FALSE,
+    hash = FALSE) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
@@ -1342,6 +1397,7 @@ download_narr <- function(
     commands_txt = commands_txt,
     remove = remove_command
   )
+  return(download_hash(hash, directory_to_save))
 }
 # nolint end: cyclocomp
 
@@ -1372,8 +1428,14 @@ download_narr <- function(
 #' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Zip and/or data files will be downloaded and stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1398,7 +1460,8 @@ download_nlcd <- function(
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE,
-  remove_zip = FALSE
+  remove_zip = FALSE,
+  hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -1494,6 +1557,7 @@ download_nlcd <- function(
     remove = remove_zip,
     download_name = download_name
   )
+  return(download_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -1520,8 +1584,14 @@ download_nlcd <- function(
 #' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Zip and/or data files will be downloaded and stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1545,7 +1615,8 @@ download_sedac_groads <- function(
     download = FALSE,
     remove_command = FALSE,
     unzip = TRUE,
-    remove_zip = FALSE
+    remove_zip = FALSE,
+    hash = FALSE
     ) {
   # nolint end
   #### 1. check for data download acknowledgement
@@ -1637,6 +1708,7 @@ download_sedac_groads <- function(
     remove = remove_zip,
     download_name = download_name
   )
+  return(download_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -1666,9 +1738,15 @@ download_sedac_groads <- function(
 #' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 # nolint end
-#' @return NULL; Zip and/or data files will be downloaded and stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1694,7 +1772,8 @@ download_sedac_population <- function(
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE,
-  remove_zip = FALSE
+  remove_zip = FALSE,
+  hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -1818,6 +1897,7 @@ download_sedac_population <- function(
     remove = remove_zip,
     download_name = download_name
   )
+  return(download_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -1848,10 +1928,16 @@ download_sedac_population <- function(
 #' @param remove_zip logical(1). Remove zip files from
 #' directory_to_download. Default is \code{FALSE}.
 #' (Ignored if \code{data_format = "KML"}.)
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @importFrom utils head
 #' @importFrom utils tail
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Zip and/or data files will be downloaded and stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -1876,7 +1962,8 @@ download_hms <- function(
     download = FALSE,
     remove_command = FALSE,
     unzip = TRUE,
-    remove_zip = FALSE) {
+    remove_zip = FALSE,
+    hash = FALSE) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
@@ -1997,6 +2084,7 @@ download_hms <- function(
     remove = remove_zip,
     download_name = download_names
   )
+  return(download_hash(hash, directory_to_save))
 }
 # nolint end: cyclocomp
 
@@ -2028,8 +2116,14 @@ download_hms <- function(
 #' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
 #' @param remove_zip logical(1). Remove zip files from directory_to_download.
 #' Default is \code{FALSE}.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; Zip and/or data files will be downloaded and stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2056,7 +2150,8 @@ download_koppen_geiger <- function(
     download = FALSE,
     remove_command = FALSE,
     unzip = TRUE,
-    remove_zip = FALSE) {
+    remove_zip = FALSE,
+    hash = FALSE) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
@@ -2132,6 +2227,7 @@ download_koppen_geiger <- function(
     remove = remove_zip,
     download_name = download_name
   )
+  return(download_hash(hash, directory_to_save))
 }
 
 
@@ -2169,9 +2265,15 @@ download_koppen_geiger <- function(
 #' @param download logical(1). Download data or only save wget commands.
 #' @param remove_command logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
 #' @import rvest
-#' @return NULL; HDF (.hdf) files will be stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * HDF (.hdf) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2251,7 +2353,8 @@ download_modis <- function(
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
-    remove_command = FALSE) {
+    remove_command = FALSE,
+    hash = FALSE) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
@@ -2530,6 +2633,7 @@ download_modis <- function(
     remove = remove_command
   )
   message("Requests were processed.\n")
+  return(download_hash(hash, directory_to_save))
 }
 
 
@@ -2549,8 +2653,14 @@ download_modis <- function(
 #' will download all of the requested data files.
 #' @param remove_command logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Mariana Kassien, Insang Song
-#' @return NULL; Comma-separated value (CSV) files will be stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2569,7 +2679,8 @@ download_tri <- function(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -2625,7 +2736,7 @@ download_tri <- function(
     remove = remove_command
   )
   message("Requests were processed.\n")
-
+  return(download_hash(hash, directory_to_save))
 }
 
 
@@ -2655,6 +2766,9 @@ download_tri <- function(
 #' the text file containing download commands.
 #' @param unzip logical(1). Unzip the downloaded zip files.
 #' Default is \code{FALSE}.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Ranadeep Daw, Insang Song
 #' @note
 #' For EPA Data Commons certificate errors, follow the steps below:
@@ -2665,7 +2779,10 @@ download_tri <- function(
 #' Currently we bundle the pre-downloaded crt and its PEM (which is accepted
 #' in wget command) file in ./inst/extdata. The instruction above is for
 #' certificate updates in the future.
-#' @return NULL; Zip and/or data files will be downloaded and stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2691,7 +2808,8 @@ download_nei <- function(
   acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
-  unzip = TRUE
+  unzip = TRUE,
+  hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -2772,6 +2890,7 @@ download_nei <- function(
     }
   }
   message("Requests were processed.\n")
+  return(download_hash(hash, directory_to_save))
 }
 
 
@@ -2802,7 +2921,13 @@ download_nei <- function(
 #' the text file containing download commands.
 #' @param unzip logical(1). Unzip the downloaded compressed files.
 #' Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.
-#' @return NULL; Downloaded files will be stored in \code{directory_to_save}.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Downloaded files will be stored in \code{directory_to_save}.
 #' @author Insang Song
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2827,7 +2952,8 @@ download_huc <-
     acknowledgement = FALSE,
     download = FALSE,
     remove_command = FALSE,
-    unzip = FALSE
+    unzip = FALSE,
+    hash = FALSE
   ) {
     #### 1. check for data download acknowledgement
     download_permit(acknowledgement = acknowledgement)
@@ -2914,6 +3040,7 @@ download_huc <-
       }
     }
     message("Requests were processed.\n")
+    return(download_hash(hash, directory_to_save))
   }
 # nolint end
 
@@ -2942,9 +3069,15 @@ download_huc <-
 #' the text file containing download commands.
 #' @param unzip logical(1). Unzip the downloaded compressed files.
 #' Default is \code{FALSE}.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Insang Song
 #' @note JSON files should be found at STAC catalog of OpenLandMap
-#' @return NULL; Yearly comma-separated value (CSV) files will be stored in
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Yearly comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @examples
 #' download_cropscape(
@@ -2965,7 +3098,8 @@ download_cropscape <- function(
   acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
-  unzip = TRUE
+  unzip = TRUE,
+  hash = FALSE
 ) {
   source <- match.arg(source)
   if (source == "GMU" && year < 1997) {
@@ -3045,6 +3179,7 @@ download_cropscape <- function(
     # nocov end
   }
   message("Requests were processed.\n")
+  return(download_hash(hash, directory_to_save))
 }
 # nolint end
 
@@ -3084,8 +3219,14 @@ download_cropscape <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Insang Song
-#' @return NULL; .bil (normals) or single grid files depending on the format
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * .bil (normals) or single grid files depending on the format
 #' choice will be stored in \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -3116,7 +3257,8 @@ download_prism <- function(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  hash = FALSE
 ) {
   data_type <- match.arg(data_type)
   element <- match.arg(element)
@@ -3189,6 +3331,7 @@ download_prism <- function(
     remove = remove_command
   )
   message("Requests were processed.\n")
+  return(download_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -3210,8 +3353,14 @@ download_prism <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Mitchell Manware
-#' @return NULL; netCDF (.nc) files will be stored in a variable-specific
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -3233,7 +3382,8 @@ download_gridmet <- function(
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
-    remove_command = FALSE) {
+    remove_command = FALSE,
+    hash = FALSE) {
   #### check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### check for null parameters
@@ -3320,6 +3470,7 @@ download_gridmet <- function(
     commands_txt = commands_txt,
     remove = remove_command
   )
+  return(download_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -3340,8 +3491,14 @@ download_gridmet <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#' an \code{rlang::hash_file()} hash character corresponding to the
+#' downloaded files. Default is \code{FALSE}.
 #' @author Mitchell Manware, Insang Song
-#' @return NULL; netCDF (.nc) files will be stored in a variable-specific
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -3363,7 +3520,8 @@ download_terraclimate <- function(
     directory_to_save = NULL,
     acknowledgement = FALSE,
     download = FALSE,
-    remove_command = FALSE) {
+    remove_command = FALSE,
+    hash = FALSE) {
   #### check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### check for null parameters
@@ -3451,4 +3609,5 @@ download_terraclimate <- function(
     commands_txt = commands_txt,
     remove = remove_command
   )
+  return(download_hash(hash, directory_to_save))
 }

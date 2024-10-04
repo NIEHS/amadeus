@@ -1,6 +1,8 @@
 ################################################################################
 ##### unit and integration tests for NASA GEOS-CF functions
+# nolint start
 
+################################################################################
 ##### download_geos
 testthat::test_that("download_geos", {
   withr::local_package("httr")

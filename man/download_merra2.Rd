@@ -20,7 +20,8 @@ download_merra2(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  hash = FALSE
 )
 }
 \arguments{
@@ -40,12 +41,20 @@ containing all download commands. By setting \code{TRUE} the function
 will download all of the requested data files.}
 
 \item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE})
+Remove (\code{TRUE}) or keep (\code{FALSE}).}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.
 the text file containing download commands.}
 }
 \value{
-NULL; netCDF (.nc4) files will be stored in a
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item netCDF (.nc4) files will be stored in a
 collection-specific folder within \code{directory_to_save}.
+}
 }
 \description{
 The \code{download_merra2()} function accesses and downloads various
@@ -58,7 +67,7 @@ download_merra2(
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
   download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE
+  remove_command = TRUE,
 )
 }
 \references{

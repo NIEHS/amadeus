@@ -1,6 +1,8 @@
 ################################################################################
 ##### unit and integration tests for NOAA NARR functions
+# nolint start
 
+################################################################################
 ##### download_narr
 testthat::test_that("download_narr (no errors)", {
   withr::local_package("httr")

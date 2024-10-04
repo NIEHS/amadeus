@@ -9,7 +9,8 @@ download_tri(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  hash = FALSE
 )
 }
 \arguments{
@@ -27,10 +28,18 @@ will download all of the requested data files.}
 
 \item{remove_command}{logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
 }
 \value{
-NULL; Comma-separated value (CSV) files will be stored in
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item Comma-separated value (CSV) files will be stored in
 \code{directory_to_save}.
+}
 }
 \description{
 The \code{download_tri()} function accesses and downloads toxic release data from the \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-action-0}{U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program}.

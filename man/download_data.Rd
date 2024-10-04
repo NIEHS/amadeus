@@ -11,6 +11,7 @@ download_data(
     "terraclimate", "huc", "cropscape", "cdl", "prism"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
+  hash = FALSE,
   ...
 )
 }
@@ -24,12 +25,20 @@ download_data(
 user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
 
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
+
 \item{...}{Arguments passed to each download function.}
 }
 \value{
-NULL; Data files will be downloaded and stored in respective
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item Data files will be downloaded and stored in respective
 sub-directories within \code{directory_to_save}. File format and
 sub-directory names depend on data source and dataset of interest.
+}
 }
 \description{
 The \code{download_data()} function accesses and downloads atmospheric, meteorological, and environmental data from various open-access data sources.

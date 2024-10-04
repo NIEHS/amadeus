@@ -13,7 +13,8 @@ download_ecoregion(
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE,
-  remove_zip = FALSE
+  remove_zip = FALSE,
+  hash = FALSE
 )
 }
 \arguments{
@@ -44,10 +45,18 @@ the text file containing download commands.}
 
 \item{remove_zip}{logical(1). Remove zip file from
 \code{directory_to_download}. Default \code{FALSE}.}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
 }
 \value{
-NULL; Zip and/or data files will be downloaded and stored in
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item Zip and/or data files will be downloaded and stored in
 \code{directory_to_save}.
+}
 }
 \description{
 The \code{download_ecoregion()} function accesses and downloads United States Ecoregions data from the \href{https://www.epa.gov/eco-research/ecoregions}{U.S. Environmental Protection Agency's (EPA) Ecorgions}. Level 3 data, where all pieces of information in the higher levels are included, are downloaded.

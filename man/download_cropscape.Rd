@@ -11,7 +11,8 @@ download_cropscape(
   acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
-  unzip = TRUE
+  unzip = TRUE,
+  hash = FALSE
 )
 }
 \arguments{
@@ -39,10 +40,18 @@ the text file containing download commands.}
 
 \item{unzip}{logical(1). Unzip the downloaded compressed files.
 Default is \code{FALSE}.}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
 }
 \value{
-NULL; Yearly comma-separated value (CSV) files will be stored in
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item Yearly comma-separated value (CSV) files will be stored in
 \code{directory_to_save}.
+}
 }
 \description{
 Accesses and downloads United States Department of Agriculture

@@ -15,7 +15,8 @@ download_modis(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  hash = FALSE
 )
 }
 \arguments{
@@ -51,10 +52,18 @@ large and use lots of machine storage and memory.}
 
 \item{remove_command}{logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
 }
 \value{
-NULL; HDF (.hdf) files will be stored in
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item HDF (.hdf) files will be stored in
 \code{directory_to_save}.
+}
 }
 \description{
 Need maintenance for the directory path change

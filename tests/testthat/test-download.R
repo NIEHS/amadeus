@@ -194,3 +194,37 @@ testthat::test_that("download_remove_zips", {
   unlink(paste0(dir, "/yellowstone"))
 })
 # nolint end
+
+################################################################################
+##### download_hash
+testthat::test_that("download_hash", {
+  dir <- paste0(tempdir(), "/hash/")
+  dir.create(dir, recursive = TRUE)
+  hashfile <- paste0(dir, "hash_test.txt")
+  file.create(hashfile)
+  testthat::expect_true(
+    is.character(download_hash(TRUE, dir))
+  )
+  testthat::expect_true(
+    is.null(download_hash(FALSE, dir))
+  )
+  Sys.sleep(1.5)
+  file.remove(hashfile)
+  unlink(dir, recursive = TRUE)
+})
+
+testthat::test_that("download_hash (LIVE)", {
+  withr::with_tempdir({
+    h <- download_narr(
+      year = c(2010, 2010),
+      variables = "air.sfc",
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      download = TRUE,
+      remove_command = TRUE
+    )
+    testthat::expect_true(
+      is.character(download_hash(TRUE, "."))
+    )
+  })
+})

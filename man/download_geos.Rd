@@ -12,7 +12,8 @@ download_geos(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  hash = FALSE
 )
 }
 \arguments{
@@ -36,10 +37,18 @@ will download all of the requested data files.}
 \item{remove_command}{logical(1).
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
 }
 \value{
-NULL; netCDF (.nc4) files will be stored in a
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item netCDF (.nc4) files will be stored in a
 collection-specific folder within \code{directory_to_save}.
+}
 }
 \description{
 The \code{download_geos()} function accesses and downloads various
