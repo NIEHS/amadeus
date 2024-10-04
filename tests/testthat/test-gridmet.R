@@ -38,6 +38,40 @@ testthat::test_that("download_gridmet (no errors)", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that("download_gridmet (single year)", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  year <- 2020
+  variables <- "Precipitation"
+  directory_to_save <- paste0(tempdir(), "/gridmet/")
+  # run download function
+  download_data(dataset_name = "gridmet",
+                year = year,
+                variables = variables,
+                directory_to_save = directory_to_save,
+                acknowledgement = TRUE,
+                download = FALSE)
+  # define path with commands
+  commands_path <- paste0(directory_to_save,
+                          "/gridmet_",
+                          year, "_", year,
+                          "_curl_commands.txt")
+  # import commands
+  commands <- read_commands(commands_path = commands_path)
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 6)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  # implement unit tests
+  test_download_functions(directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+  # remove file with commands after test
+  file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
+})
+
 testthat::test_that("download_gridmet (expected errors - invalid years)", {
   testthat::expect_error(
     download_data(

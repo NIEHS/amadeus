@@ -101,6 +101,34 @@ testthat::test_that("download_hms (live)", {
   unlink(directory, recursive = TRUE)
 })
 
+testthat::test_that("download_hms (live + single date)", {
+  # function parameters
+  date <- "2018-01-10"
+  directory <- paste0(tempdir(), "/hms/")
+  # run download function
+  download_data(
+    dataset_name = "hms",
+    date = date,
+    directory_to_save = directory,
+    acknowledgement = TRUE,
+    download = TRUE,
+    unzip = TRUE,
+    remove_zip = FALSE,
+    remove_command = FALSE
+  )
+  Sys.sleep(1.5)
+  testthat::expect_true(
+    length(list.files(directory, recursive = TRUE, include.dirs = TRUE)) == 8
+  )
+  commands <- list.files(directory, pattern = ".txt", full.names = TRUE)
+  testthat::expect_true(
+    file.exists(commands)
+  )
+  # remove directory
+  unlink(directory, recursive = TRUE)
+})
+
+
 ################################################################################
 ##### process_hms
 testthat::test_that("process_hms (with polygons)", {

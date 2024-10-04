@@ -56,6 +56,52 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  product <- "MOD09GA"
+  version <- "61"
+  horizontal_tiles <- c(12, 13)
+  vertical_tiles <- c(5, 6)
+  nasa_earth_data_token <- "tOkEnPlAcEhOlDeR"
+  directory_to_save <- paste0(tempdir(), "/mod/")
+  date <- "2021-04-12"
+  download_data(dataset_name = "modis",
+                date = date,
+                product = product,
+                version = version,
+                horizontal_tiles = horizontal_tiles,
+                vertical_tiles = vertical_tiles,
+                nasa_earth_data_token = nasa_earth_data_token,
+                directory_to_save = directory_to_save,
+                acknowledgement = TRUE,
+                download = FALSE,
+                remove_command = FALSE)
+  # define file path with commands
+  commands_path <- paste0(
+    directory_to_save,
+    product,
+    "_",
+    date,
+    "_",
+    date,
+    "_wget_commands.txt"
+  )
+  # import commands
+  commands <- read_commands(commands_path = commands_path)[, 2]
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 4)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 3L, method = "SKIP")
+  # implement unit tests
+  test_download_functions(directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+  # remove file with commands after test
+  file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
+})
 
 testthat::test_that("download_modis (MODIS-MOD06L2)", {
   withr::local_package("httr")

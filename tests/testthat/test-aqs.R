@@ -54,6 +54,56 @@ testthat::test_that("download_aqs", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that("download_aqs (single year)", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  year <- 2018
+  resolution_temporal <- "daily"
+  parameter_code <- 88101
+  directory_to_save <- paste0(tempdir(), "/epa/")
+  # run download function
+  download_data(dataset_name = "aqs",
+                year = year,
+                directory_to_save = directory_to_save,
+                acknowledgement = TRUE,
+                unzip = FALSE,
+                remove_zip = FALSE,
+                download = FALSE,
+                remove_command = FALSE)
+  # expect sub-directories to be created
+  testthat::expect_true(
+    length(
+      list.files(
+        directory_to_save, include.dirs = TRUE
+      )
+    ) == 3
+  )
+  # define file path with commands
+  commands_path <-
+    paste0(
+           download_sanitize_path(directory_to_save),
+           "aqs_",
+           parameter_code,
+           "_",
+           year, "_", year,
+           "_",
+           resolution_temporal,
+           "_curl_commands.txt")
+  # import commands
+  commands <- read_commands(commands_path = commands_path)
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 4)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  # implement unit tets
+  test_download_functions(directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+  # remove file with commands after test
+  unlink(directory_to_save, recursive = TRUE)
+})
+
 ################################################################################
 ##### process_aqs
 testthat::test_that("process_aqs", {

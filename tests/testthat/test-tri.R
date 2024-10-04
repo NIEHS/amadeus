@@ -42,6 +42,48 @@ testthat::test_that("download_tri", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that("download_tri (single year)", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  directory_to_save <- paste0(tempdir(), "/tri/")
+  year <- 2019L
+  # run download function
+  download_data(
+    year = year,
+    dataset_name = "tri",
+    directory_to_save = directory_to_save,
+    acknowledgement = TRUE,
+    download = FALSE,
+    remove_command = FALSE
+  )
+
+  # define file path with commands
+  commands_path <- paste0(
+    directory_to_save,
+    "TRI_",
+    year, "_", year,
+    "_",
+    Sys.Date(),
+    "_curl_commands.txt"
+  )
+
+  # import commands
+  commands <- read_commands(commands_path = commands_path)
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 3)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 1L, method = "SKIP")
+  # implement unit tests
+  test_download_functions(directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+  # remove file with commands after test
+  file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+
 ################################################################################
 ##### process_tri
 testthat::test_that("process_tri", {
