@@ -12,13 +12,15 @@ download_hms(
   download = FALSE,
   remove_command = FALSE,
   unzip = TRUE,
-  remove_zip = FALSE
+  remove_zip = FALSE,
+  hash = FALSE
 )
 }
 \arguments{
 \item{data_format}{character(1). "Shapefile" or "KML".}
 
-\item{date}{character(2). length of 10 each. Start/end date for downloading data.}
+\item{date}{character(1 or 2). length of 10. Date or start/end dates for downloading data.
+Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}).}
 
 \item{directory_to_save}{character(1). Directory to save data. If
 \code{data_format = "Shapefile"}, two sub-directories will be created for the
@@ -45,10 +47,18 @@ if \code{data_format = "KML"}.)}
 \item{remove_zip}{logical(1). Remove zip files from
 directory_to_download. Default is \code{FALSE}.
 (Ignored if \code{data_format = "KML"}.)}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
 }
 \value{
-NULL; Zip and/or data files will be downloaded and stored in
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item Zip and/or data files will be downloaded and stored in
 respective sub-directories within \code{directory_to_save}.
+}
 }
 \description{
 The \code{download_hms()} function accesses and downloads

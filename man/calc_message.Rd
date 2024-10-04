@@ -23,4 +23,5 @@ NULL; provides progress messages to R console.
 \description{
 Send messages updating covariate extraction progress.
 }
+\keyword{auxiliary}
 \keyword{internal}

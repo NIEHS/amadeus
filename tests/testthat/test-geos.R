@@ -1,6 +1,8 @@
 ################################################################################
 ##### unit and integration tests for NASA GEOS-CF functions
+# nolint start
 
+################################################################################
 ##### download_geos
 testthat::test_that("download_geos", {
   withr::local_package("httr")
@@ -43,6 +45,47 @@ testthat::test_that("download_geos", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that("download_geos (single date)", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  date <- "2019-09-09"
+  collections <- c("aqc_tavg_1hr_g1440x721_v1",
+                   "chm_inst_1hr_g1440x721_p23")
+  directory_to_save <- paste0(tempdir(), "/geos/")
+  # run download function
+  testthat::expect_no_error(
+    download_data(dataset_name = "geos",
+                  date = date,
+                  collection = collections,
+                  directory_to_save = directory_to_save,
+                  acknowledgement = TRUE,
+                  download = FALSE)
+  )
+  # define file path with commands
+  commands_path <- paste0(directory_to_save,
+                          "geos_",
+                          date,
+                          "_",
+                          date,
+                          "_wget_commands.txt")
+  # import commands
+  commands <- read_commands(commands_path = commands_path)
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 2)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 2L, method = "HEAD")
+  # implement unit tests
+  test_download_functions(directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+
+  # remove file with commands after test
+  file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+################################################################################
 ##### process_geos
 testthat::test_that("process_geos (no errors)", {
   withr::local_package("terra")
@@ -138,6 +181,7 @@ testthat::test_that("process_geos (expected errors)", {
   )
 })
 
+################################################################################
 ##### calc_geos
 testthat::test_that("calc_geos", {
   withr::local_package("terra")

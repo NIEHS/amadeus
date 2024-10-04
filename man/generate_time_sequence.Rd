@@ -23,3 +23,4 @@ half hour, and 3-dimensional collections (latitude, longitude, and time)
 utilize hour.
 }
 \keyword{auxiliary}
+\keyword{internal}

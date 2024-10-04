@@ -5,7 +5,7 @@
 #' @param x an `sftime` object
 #' @import sftime
 #' @author Eva Marques
-#' @keywords spacetime
+#' @keywords internal spacetime
 #' @return NULL; returns stop error if \code{x} does not match class
 #' and column expectations
 #' @export
@@ -29,7 +29,7 @@ check_mysftime <- function(x) {
 #' @param x an `sf` object
 #' @import sf
 #' @author Eva Marques
-#' @keywords spacetime
+#' @keywords internal spacetime
 #' @return NULL; returns stop error if \code{x} does not match class
 #' and/or column expectations
 #' @export
@@ -52,7 +52,7 @@ check_mysf <- function(x) {
 #' @return an `sftime` object
 #' @import sftime
 #' @author Eva Marques
-#' @keywords spacetime
+#' @keywords internal spacetime
 #' @export
 rename_time <- function(x, newname) {
   stopifnot("x is not a sftime" = class(x)[1] == "sftime")

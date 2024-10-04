@@ -19,3 +19,4 @@ character
 Convert full length resolution name to/from resolution code.
 }
 \keyword{auxiliary}
+\keyword{internal}

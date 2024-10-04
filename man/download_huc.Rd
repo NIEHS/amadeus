@@ -11,7 +11,8 @@ download_huc(
   acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
-  unzip = FALSE
+  unzip = FALSE,
+  hash = FALSE
 )
 }
 \arguments{
@@ -36,9 +37,17 @@ the text file containing download commands.}
 
 \item{unzip}{logical(1). Unzip the downloaded compressed files.
 Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
 }
 \value{
-NULL; Downloaded files will be stored in \code{directory_to_save}.
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item Downloaded files will be stored in \code{directory_to_save}.
+}
 }
 \description{
 NHDPlus data provides the most comprehensive and high-resolution

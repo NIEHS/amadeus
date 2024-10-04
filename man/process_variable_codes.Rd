@@ -20,3 +20,4 @@ character
 Check user defined variables for gridMET and TerraClimate functions.
 }
 \keyword{auxiliary}
+\keyword{internal}

@@ -61,4 +61,5 @@ a \code{data.frame} object
 Extract covariate values from \code{SpatRaster} object passed from
 \code{process_*()}.
 }
+\keyword{auxiliary}
 \keyword{internal}

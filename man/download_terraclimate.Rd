@@ -10,14 +10,15 @@ download_terraclimate(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  hash = FALSE
 )
 }
 \arguments{
 \item{variables}{character(1). Variable(s) name(s). See \href{https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php}{TerraClimate Direct Downloads}
 for variable names and acronym codes.}
 
-\item{year}{character(2). length of 4 each. Start/end years for downloading data.}
+\item{year}{character(1 or 2). length of 4. Year or start/end years for downloading data.}
 
 \item{directory_to_save}{character(1). Directory(s) to save downloaded data
 files.}
@@ -33,10 +34,18 @@ will download all of the requested data files.}
 \item{remove_command}{logical(1).
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
 }
 \value{
-NULL; netCDF (.nc) files will be stored in a variable-specific
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item netCDF (.nc) files will be stored in a variable-specific
 folder within \code{directory_to_save}.
+}
 }
 \description{
 The \code{download_terraclimate} function accesses and downloads climate and water balance data from the \href{https://www.climatologylab.org/terraclimate.html}{University of California Merced Climatology Lab's TerraClimate dataset}.

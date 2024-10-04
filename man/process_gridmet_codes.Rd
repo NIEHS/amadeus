@@ -19,3 +19,4 @@ character
 Convert gridMET variable names to/from variable codes.
 }
 \keyword{auxiliary}
+\keyword{internal}

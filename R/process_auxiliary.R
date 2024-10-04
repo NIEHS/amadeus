@@ -13,6 +13,7 @@
 #' @author Insang Song
 #' @importFrom methods is
 #' @importFrom terra vect
+#' @keywords internal auxiliary
 #' @export
 process_conformity <-
   function(
@@ -54,7 +55,7 @@ process_conformity <-
 #' on provided file path(s).
 #' @param datetime logical(1). Identifies and returns date time sequence
 #' (YYYYMoMoDDHHMiMi) based on provided file path(s).
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @return character
 #' @export
 process_collection <-
@@ -169,7 +170,7 @@ process_collection <-
 #' @param collection character(1). MERRA2 collection name.
 #' @param from SpatRaster(1). Object to extract time values from.
 #' @importFrom stringi stri_pad
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @return character
 #' @export
 process_merra2_time <-
@@ -226,7 +227,7 @@ process_merra2_time <-
 #' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
 #' provides statistic or resolution code, and returns full length statistic
 #' or resolution.
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @return character
 #' @export
 process_gmted_codes <-
@@ -265,7 +266,7 @@ process_gmted_codes <-
 #' @param string character(1). Resolution name or code.
 #' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
 #' provides resolution code, and returns full length resolution.
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @return character
 #' @export
 process_sedac_codes <-
@@ -299,7 +300,7 @@ process_sedac_codes <-
 #' @param radius integer(1). Circular buffer size (meters).
 #' @description Creates a circular buffer around points if `radius` is > 0.
 #' Returns points if `radius` is 0.
-#' @keywords internal
+#' @keywords internal auxiliary
 #' @return a `SpatVector` object
 #' @importFrom terra buffer
 #' @export
@@ -331,7 +332,7 @@ process_locs_radius <-
 #' @param crs Coordinate reference system (CRS) description utilizing
 #' `terra::crs()`.
 #' @param radius integer(1). Circular buffer size (meters).
-#' @keywords internal
+#' @keywords internal auxiliary
 #' @return a `SpatVector` object
 #' @importFrom terra crs
 #' @importFrom terra vect
@@ -398,7 +399,7 @@ process_locs_vector <-
 #' @param string character(1). gridMET variable name or variable code.
 #' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
 #' provides variable code and returns full length variable name.
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @return character
 #' @export
 process_gridmet_codes <-
@@ -441,7 +442,7 @@ process_gridmet_codes <-
 #' @param string character(1). terraClimate variable name or variable code.
 #' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
 #' provides variable code and returns full length variable name.
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @return character
 #' @export
 process_terraclimate_codes <-
@@ -480,7 +481,7 @@ process_terraclimate_codes <-
 #' process_*).
 #' @param source character(1). Data source for selected variables ("gridMET" or
 #' "TerraClimate").
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @return character
 #' @export
 process_variable_codes <-
@@ -525,7 +526,7 @@ process_variable_codes <-
 #' @return No returning value. It stops the function if `instr` doesn't
 #' conform to the `format`.
 #' @author Insang Song
-#' @keywords internal
+#' @keywords internal auxiliary
 #' @export
 is_date_proper <- function(
   instr = NULL,
@@ -552,7 +553,7 @@ is_date_proper <- function(
 #' @importFrom sf st_as_sfc st_bbox st_crs
 #' @importFrom terra ext
 #' @return sf/terra object with the extent applied.
-#' @keywords internal
+#' @keywords internal auxiliary
 #' @export
 apply_extent <-
   function(data, extent, geom) {

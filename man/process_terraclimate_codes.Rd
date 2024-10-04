@@ -19,3 +19,4 @@ character
 Convert terraClimate variable names to/from variable codes.
 }
 \keyword{auxiliary}
+\keyword{internal}

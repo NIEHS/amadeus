@@ -20,4 +20,5 @@ geometry class.
 \author{
 Eva Marques
 }
+\keyword{internal}
 \keyword{spacetime}

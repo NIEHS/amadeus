@@ -41,6 +41,44 @@ testthat::test_that("download_merra2 (no errors)", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that("download_merra2 (single date)", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  date <- "2023-02-14"
+  collections <- c("inst1_2d_asm_Nx", "inst3_3d_asm_Np")
+  directory_to_save <- paste0(tempdir(), "/merra2/")
+  # run download function
+  testthat::expect_no_error(
+    download_data(dataset_name = "merra2",
+                  date = date,
+                  collection = collections,
+                  directory_to_save = directory_to_save,
+                  acknowledgement = TRUE,
+                  download = FALSE)
+  )
+  # define path with commands
+  commands_path <- paste0(directory_to_save,
+                          "merra2_",
+                          date,
+                          "_",
+                          date,
+                          "_wget_commands.txt")
+  # import commands
+  commands <- read_commands(commands_path = commands_path)
+  # extract urls
+  urls <- extract_urls(commands = commands, position = 2)
+  # check HTTP URL status
+  url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
+  # implement unit tests
+  test_download_functions(directory_to_save = directory_to_save,
+                          commands_path = commands_path,
+                          url_status = url_status)
+  # remove file with commands after test
+  file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
+})
+
 testthat::test_that("download_merra2 (expected errors)", {
   # expected error due to unrecognized collection
   # function parameters

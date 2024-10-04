@@ -12,13 +12,14 @@ download_geos(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  hash = FALSE
 )
 }
 \arguments{
 \item{collection}{character(1). GEOS-CF data collection file name.}
 
-\item{date}{character(2). length of 10 each. Start/end date for downloading data.
+\item{date}{character(1 or 2). length of 10. Date or start/end dates for downloading data.
 Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}).}
 
 \item{directory_to_save}{character(1). Directory to save data.
@@ -36,10 +37,18 @@ will download all of the requested data files.}
 \item{remove_command}{logical(1).
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
 }
 \value{
-NULL; netCDF (.nc4) files will be stored in a
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item netCDF (.nc4) files will be stored in a
 collection-specific folder within \code{directory_to_save}.
+}
 }
 \description{
 The \code{download_geos()} function accesses and downloads various

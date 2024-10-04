@@ -35,4 +35,5 @@ values.
 \seealso{
 \code{\link[=process_locs_vector]{process_locs_vector()}}, \code{\link[=check_for_null_parameters]{check_for_null_parameters()}}
 }
+\keyword{auxiliary}
 \keyword{internal}

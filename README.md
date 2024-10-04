@@ -12,20 +12,11 @@
 
 ## Installation
 
-`amadeus` can be installed from CRAN, or with the `devtools`, `remotes`, or `pak` packages.
+`amadeus` can be installed from CRAN, or with `pak`.
 
 ```r
 install.packages("amadeus")
 ```
-
-```r
-devtools::install_github("NIEHS/amadeus")
-```
-
-```r
-remotes::install_github("NIEHS/amadeus")
-```
-
 ```r
 pak::pak("NIEHS/amadeus")
 ```

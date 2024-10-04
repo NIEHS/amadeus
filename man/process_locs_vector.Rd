@@ -25,4 +25,5 @@ Detect \code{SpatVector} object, or convert locations from class \code{sf},
 \code{SpatVector} object, project to coordinate reference system, and apply
 circular buffer.
 }
+\keyword{auxiliary}
 \keyword{internal}

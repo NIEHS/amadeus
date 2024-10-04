@@ -21,3 +21,4 @@ Check if provided URL returns HTTP status 200 or 206.
 Insang Song; Mitchell Manware
 }
 \keyword{auxiliary}
+\keyword{internal}

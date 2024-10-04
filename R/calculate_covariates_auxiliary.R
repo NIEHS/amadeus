@@ -18,7 +18,7 @@
 #' @param dataset character(1). Covariate parent dataset.
 #' @param locs_id character(1). Column containing identifier for each unique
 #' coordinate location.
-#' @keywords internal
+#' @keywords internal auxiliary
 #' @importFrom stringi stri_pad
 #' @return a data.frame or SpatVector object (depending on `from`)
 #' @export
@@ -133,7 +133,7 @@ calc_setcolumns <- function(
 #' @param time_type placeholder
 #' @param level placeholder
 #' @return NULL; provides progress messages to R console.
-#' @keywords internal
+#' @keywords internal auxiliary
 #' @export
 calc_message <- function(
     dataset,
@@ -212,7 +212,7 @@ calc_message <- function(
 #' `data.frame`? Default is `FALSE`.
 #' @return A `list` containing `SpatVector` and `data.frame` objects
 #' @seealso [`process_locs_vector()`], [`check_for_null_parameters()`]
-#' @keywords internal
+#' @keywords internal auxiliary
 #' @importFrom terra as.data.frame
 #' @importFrom terra crs
 #' @export
@@ -261,7 +261,7 @@ calc_prepare_locs <- function(
 #' (ie. GEOS data), "year" (ie. SEDAC population data), or "yearmonth"
 #' (ie. TerraClimate data).
 #' @return a `Date`, `POSIXt`, or `integer` object based on `format =`
-#' @keywords internal
+#' @keywords internal auxiliary
 #' @export
 calc_time <- function(
     time,
@@ -300,7 +300,7 @@ calc_time <- function(
 #' `POSIXt`? If `FALSE`, the time values will be checked for integer class
 #' (year and year-month).
 #' @return NULL; returns a stop error if `time` is wrong class
-#' @keywords internal
+#' @keywords internal auxiliary
 #' @export
 # nolint start
 calc_check_time <- function(
@@ -353,7 +353,7 @@ calc_check_time <- function(
 #' @importFrom exactextractr exact_extract
 #' @importFrom sf st_as_sf
 #' @return a `data.frame` object
-#' @keywords internal
+#' @keywords internal auxiliary
 #' @export
 calc_worker <- function(
     dataset,
@@ -506,7 +506,7 @@ calc_worker <- function(
 #' @param crs terra::crs(1). Coordinate reference system (inherited from
 #' `from`).
 #' @importFrom terra vect
-#' @keywords auxiliary
+#' @keywords internal auxiliary
 #' @author Mitchell Manware
 #' @return a data.frame or SpatVector object (depending on `geom` paramter)
 #' @export

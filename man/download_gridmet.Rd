@@ -10,7 +10,8 @@ download_gridmet(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
-  remove_command = FALSE
+  remove_command = FALSE,
+  hash = FALSE
 )
 }
 \arguments{
@@ -18,7 +19,7 @@ download_gridmet(
 for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
 "Energy Release Component" has code "erc").}
 
-\item{year}{character(2). length of 4 each. Start/end years for downloading data.}
+\item{year}{character(1 or 2). length of 4. Year or start/end years for downloading data.}
 
 \item{directory_to_save}{character(1). Directory(s) to save downloaded data
 files.}
@@ -34,10 +35,18 @@ will download all of the requested data files.}
 \item{remove_command}{logical(1).
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
+
+\item{hash}{logical(1). By setting \code{TRUE} the function will return
+an \code{rlang::hash_file()} hash character corresponding to the
+downloaded files. Default is \code{FALSE}.}
 }
 \value{
-NULL; netCDF (.nc) files will be stored in a variable-specific
+\itemize{
+\item For \code{hash = FALSE}, NULL
+\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+\item netCDF (.nc) files will be stored in a variable-specific
 folder within \code{directory_to_save}.
+}
 }
 \description{
 The \code{download_gridmet} function accesses and downloads gridded surface meteorological data from the \href{https://www.climatologylab.org/gridmet.html}{University of California Merced Climatology Lab's gridMET dataset}.

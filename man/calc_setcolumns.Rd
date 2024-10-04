@@ -35,4 +35,5 @@ padded to 5 digits. If provided a buffer radius greater than 5 digits,
 \code{calc_setcolumns()} will expand to the number of digits. (ie. buffer
 radius of 100km = CCC_CCCCC_I_100000).
 }
+\keyword{auxiliary}
 \keyword{internal}
