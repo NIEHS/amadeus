@@ -2279,7 +2279,7 @@ download_koppen_geiger <- function(
 #' @return
 #' * For \code{hash = FALSE}, NULL
 #' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * HDF (.hdf) files will be stored in
+#' * HDF (.hdf) files will be stored in year/day_of_year sub-directories within
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
@@ -2493,6 +2493,7 @@ download_modis <- function(
       nasa_earth_data_token,
       "\" -O ",
       directory_to_save,
+      splitter,
       download_name,
       "\n"
     )
@@ -2500,9 +2501,18 @@ download_modis <- function(
     #### filter commands to non-existing files
     download_command <- download_command[
       which(
-        !file.exists(paste0(directory_to_save, download_name))
+        !file.exists(paste0(directory_to_save, splitter, download_name))
       )
     ]
+
+    new_dirs <- unique(
+      sprintf("%s%s", directory_to_save, splitter)
+    )
+
+    lapply(
+      new_dirs,
+      function(x) dir.create(x, recursive = TRUE, showWarnings = FALSE)
+    )
 
     # avoid any possible errors by removing existing command files
     download_sink(commands_txt)
