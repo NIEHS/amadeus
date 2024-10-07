@@ -2601,7 +2601,7 @@ download_modis <- function(
       rvest::html_elements("tr") |>
       rvest::html_attr("data-path")
 
-   filelist_sub <-
+    filelist_sub <-
       grep(
         paste0("(", paste(tiles_requested, collapse = "|"), ")"),
         filelist,
