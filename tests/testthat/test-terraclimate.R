@@ -44,7 +44,7 @@ testthat::test_that("download_terraclimate (single year)", {
   # function parameters
   year <- 2019
   variables <- "Precipitation"
-  directory_to_save <- paste0(tempdir(), "/terracclimate/")
+  directory_to_save <- paste0(tempdir(), "/terraclimate/")
   # run download function
   download_data(dataset_name = "terraclimate",
                 year = year,

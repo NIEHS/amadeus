@@ -61,7 +61,7 @@ downloaded files. Default is \code{FALSE}.}
 \itemize{
 \item For \code{hash = FALSE}, NULL
 \item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item HDF (.hdf) files will be stored in
+\item HDF (.hdf) files will be stored in year/day_of_year sub-directories within
 \code{directory_to_save}.
 }
 }
