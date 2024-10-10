@@ -57,7 +57,7 @@ atmospheric composition collections from \href{https://gmao.gsfc.nasa.gov/GEOS_s
 \examples{
 download_geos(
   collection = "aqc_tavg_1hr_g1440x721_v1",
-  date = c("2024-01-01", "2024-01-01"),
+  date = "2024-01-01",
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
   download = FALSE, # NOTE: download skipped for examples,
