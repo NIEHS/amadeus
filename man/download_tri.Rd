@@ -46,7 +46,7 @@ The \code{download_tri()} function accesses and downloads toxic release data fro
 }
 \examples{
 download_tri(
-  year = c(2021L, 2021L),
+  year = 2021L,
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
   download = FALSE, # NOTE: download skipped for examples,

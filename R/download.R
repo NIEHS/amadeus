@@ -50,7 +50,7 @@
 #' download_data(
 #'   dataset_name = "narr",
 #'   variables = "weasd",
-#'   year = c(2023, 2023),
+#'   year = 2023,
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
@@ -174,7 +174,7 @@ download_data <-
 #' download_aqs(
 #'   parameter_code = 88101,
 #'   resolution_temporal = "daily",
-#'   year = c(2023, 2023),
+#'   year = 2023,
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
@@ -473,7 +473,7 @@ download_ecoregion <- function(
 #' @examples
 #' download_geos(
 #'   collection = "aqc_tavg_1hr_g1440x721_v1",
-#'   date = c("2024-01-01", "2024-01-01"),
+#'   date = "2024-01-01",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
@@ -982,7 +982,7 @@ download_gmted <- function(
 #' @examples
 #' download_merra2(
 #'   collection = "inst1_2d_int_Nx",
-#'   date = c("2024-01-01", "2024-01-01"),
+#'   date = "2024-01-01",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
@@ -1298,7 +1298,7 @@ download_merra2 <- function(
 #' @examples
 #' download_narr(
 #'   variables = c("weasd", "omega"),
-#'   year = c(2023, 2023),
+#'   year = 2023,
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
@@ -1949,7 +1949,7 @@ download_sedac_population <- function(
 #' @examples
 #' download_hms(
 #'   data_format = "Shapefile",
-#'   date = c("2024-01-01", "2024-01-01"),
+#'   date = "2024-01-01",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
@@ -2304,7 +2304,7 @@ download_koppen_geiger <- function(
 #'   version = "61",
 #'   horizontal_tiles = c(8, 8),
 #'   vertical_tiles = c(4, 4),
-#'   date = c("2024-01-01", "2024-01-01"),
+#'   date = "2024-01-01",
 #'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
@@ -2317,7 +2317,7 @@ download_koppen_geiger <- function(
 #'   version = "61",
 #'   horizontal_tiles = c(8, 8),
 #'   vertical_tiles = c(4, 4),
-#'   date = c("2024-01-01", "2024-01-01"),
+#'   date = "2024-01-01",
 #'   mod06_links =
 #'     system.file(
 #'       "extdata", "nasa", "LAADS_query.2024-08-02T12_49.csv",
@@ -2335,7 +2335,7 @@ download_koppen_geiger <- function(
 #'   version = "61",
 #'   horizontal_tiles = c(8, 8),
 #'   vertical_tiles = c(4, 4),
-#'   date = c("2024-01-01", "2024-01-01"),
+#'   date = "2024-01-01",
 #'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
@@ -2701,7 +2701,7 @@ download_modis <- function(
 #' \insertRef{web_usepa2024tri}{amadeus}
 #' @examples
 #' download_tri(
-#'   year = c(2021L, 2021L),
+#'   year = 2021L,
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
@@ -3403,7 +3403,7 @@ download_prism <- function(
 #' @examples
 #' download_gridmet(
 #'   variables = "Precipitation",
-#'   year = c(2023, 2023),
+#'   year = 2023,
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
@@ -3542,7 +3542,7 @@ download_gridmet <- function(
 #' @examples
 #' download_terraclimate(
 #'   variables = "Precipitation",
-#'   year = c(2023, 2023),
+#'   year = 2023,
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,

@@ -63,7 +63,7 @@ meteorological and atmospheric collections from \href{https://gmao.gsfc.nasa.gov
 \examples{
 download_merra2(
   collection = "inst1_2d_int_Nx",
-  date = c("2024-01-01", "2024-01-01"),
+  date = "2024-01-01",
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
   download = FALSE, # NOTE: download skipped for examples,

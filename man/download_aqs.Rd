@@ -72,7 +72,7 @@ The \code{download_aqs()} function accesses and downloads Air Quality System (AQ
 download_aqs(
   parameter_code = 88101,
   resolution_temporal = "daily",
-  year = c(2023, 2023),
+  year = 2023,
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
   download = FALSE, # NOTE: download skipped for examples,

@@ -52,7 +52,7 @@ The \code{download_data()} function accesses and downloads atmospheric, meteorol
 download_data(
   dataset_name = "narr",
   variables = "weasd",
-  year = c(2023, 2023),
+  year = 2023,
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
   download = FALSE, # NOTE: download skipped for examples,

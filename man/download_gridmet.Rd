@@ -54,7 +54,7 @@ The \code{download_gridmet} function accesses and downloads gridded surface mete
 \examples{
 download_gridmet(
   variables = "Precipitation",
-  year = c(2023, 2023),
+  year = 2023,
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
   download = FALSE, # NOTE: download skipped for examples,

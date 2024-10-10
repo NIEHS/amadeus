@@ -56,7 +56,7 @@ The \code{download_narr} function accesses and downloads daily meteorological da
 \examples{
 download_narr(
   variables = c("weasd", "omega"),
-  year = c(2023, 2023),
+  year = 2023,
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
   download = FALSE, # NOTE: download skipped for examples,

@@ -88,7 +88,7 @@ download_modis(
   version = "61",
   horizontal_tiles = c(8, 8),
   vertical_tiles = c(4, 4),
-  date = c("2024-01-01", "2024-01-01"),
+  date = "2024-01-01",
   nasa_earth_data_token = "./pathtotoken/token.txt",
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
@@ -101,7 +101,7 @@ download_modis(
   version = "61",
   horizontal_tiles = c(8, 8),
   vertical_tiles = c(4, 4),
-  date = c("2024-01-01", "2024-01-01"),
+  date = "2024-01-01",
   mod06_links =
     system.file(
       "extdata", "nasa", "LAADS_query.2024-08-02T12_49.csv",
@@ -119,7 +119,7 @@ download_modis(
   version = "61",
   horizontal_tiles = c(8, 8),
   vertical_tiles = c(4, 4),
-  date = c("2024-01-01", "2024-01-01"),
+  date = "2024-01-01",
   nasa_earth_data_token = "./pathtotoken/token.txt",
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
