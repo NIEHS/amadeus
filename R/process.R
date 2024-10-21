@@ -908,7 +908,7 @@ process_ecoregion <-
 #' @author Insang Song, Mariana Kassien
 #' @return a `SpatVector` object (points) in `year`
 #' `year` is stored in a field named `"year"`.
-#' @note Visit [TRI Data and Tools]https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox)
+#' @note Visit [TRI Data and Tools](https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox)
 #' to view the available years and variables.
 #' @references
 #' https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox

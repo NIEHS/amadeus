@@ -1,6 +1,6 @@
 Package: amadeus
 Title: Accessing and Analyzing Large-Scale Environmental Data
-Version: 1.1.2
+Version: 1.1.3
 Authors@R: c(
     person(given = "Mitchell", family = "Manware", role = c("aut", "ctb"), comment = c(ORCID = "0009-0003-6440-6106")),
     person(given = "Insang", family = "Song", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-8732-3256")),
