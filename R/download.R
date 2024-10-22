@@ -107,11 +107,12 @@ download_data <-
       prism = download_prism
     )
 
-    tryCatch(
+    return <- tryCatch(
       {
         what_to_run(
           directory_to_save = directory_to_save,
           acknowledgement = acknowledgement,
+          hash = hash,
           ...
         )
       },
@@ -128,6 +129,8 @@ download_data <-
         )
       }
     )
+
+    return(return)
   }
 
 # nolint start
