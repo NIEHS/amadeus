@@ -189,8 +189,8 @@ testthat::test_that("process_sedac_codes", {
 })
 
 ################################################################################
-##### calc_sedac_population
-testthat::test_that("calc_sedac_population", {
+##### calculate_sedac_population
+testthat::test_that("calculate_sedac_population", {
   withr::local_package("terra")
   withr::local_package("data.table")
   paths <- list.files(testthat::test_path(
@@ -201,7 +201,7 @@ testthat::test_that("calc_sedac_population", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_sedac_population)
+    is.function(calculate_sedac_population)
   )
   for (p in seq_along(paths)) {
     path <- paths[p]
@@ -211,7 +211,7 @@ testthat::test_that("calc_sedac_population", {
           path = paths
         )
       pop_covariate <-
-        calc_sedac_population(
+        calculate_sedac_population(
           from = pop,
           locs = data.table::data.table(ncp),
           locs_id = "site_id",
@@ -245,7 +245,7 @@ testthat::test_that("calc_sedac_population", {
   }
   # with included geometry
   testthat::expect_no_error(
-    pop_covariate_geom <- calc_sedac_population(
+    pop_covariate_geom <- calculate_sedac_population(
       from = pop,
       locs = ncp,
       locs_id = "site_id",

@@ -95,8 +95,8 @@ testthat::test_that("process_sedac_groads", {
 })
 
 ################################################################################
-##### calc_sedac_groads
-testthat::test_that("calc_groads", {
+##### calculate_sedac_groads
+testthat::test_that("calculate_groads", {
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
@@ -113,7 +113,7 @@ testthat::test_that("calc_groads", {
   groads <- terra::vect(path_groads)
 
   testthat::expect_no_error(
-    groads_res <- calc_sedac_groads(
+    groads_res <- calculate_sedac_groads(
       from = groads,
       locs = ncp,
       locs_id = "site_id",
@@ -122,7 +122,7 @@ testthat::test_that("calc_groads", {
   )
 
   testthat::expect_error(
-    calc_sedac_groads(
+    calculate_sedac_groads(
       from = groads,
       locs = ncp,
       locs_id = "site_id",
@@ -135,7 +135,7 @@ testthat::test_that("calc_groads", {
 
   # return with geometry
   testthat::expect_no_error(
-    groads_geom <- calc_sedac_groads(
+    groads_geom <- calculate_sedac_groads(
       from = groads,
       locs = ncp,
       locs_id = "site_id",

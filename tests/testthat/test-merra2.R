@@ -178,8 +178,8 @@ testthat::test_that("process_merra2", {
   )
 })
 
-##### calc_merra2
-testthat::test_that("calc_merra2", {
+##### calculate_merra2
+testthat::test_that("calculate_merra2", {
   withr::local_package("terra")
   withr::local_package("data.table")
   #* indicates three dimensional data that has subset to single
@@ -199,7 +199,7 @@ testthat::test_that("calc_merra2", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_merra2)
+    is.function(calculate_merra2)
   )
   for (c in seq_along(collections)) {
     collection <- collections[c]
@@ -218,7 +218,7 @@ testthat::test_that("calc_merra2", {
           )
         )
       merra2_covariate <-
-        calc_merra2(
+        calculate_merra2(
           from = merra2,
           locs = data.table::data.table(ncp),
           locs_id = "site_id",
@@ -263,7 +263,7 @@ testthat::test_that("calc_merra2", {
   }
   # with included geometry
   testthat::expect_no_error(
-    merra2_covariate_geom <- calc_merra2(
+    merra2_covariate_geom <- calculate_merra2(
       from = merra2,
       locs = ncp,
       locs_id = "site_id",

@@ -106,8 +106,8 @@ testthat::test_that("process_tri", {
 })
 
 ################################################################################
-##### calc_tri
-testthat::test_that("calc_tri", {
+##### calculate_tri
+testthat::test_that("calculate_tri", {
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_package("dplyr")
@@ -130,7 +130,7 @@ testthat::test_that("calc_tri", {
   testthat::expect_s4_class(tri_r, "SpatVector")
 
   testthat::expect_no_error(
-    tri_c <- calc_tri(
+    tri_c <- calculate_tri(
       from = tri_r,
       locs = ncpt,
       radius = c(1500L, 50000L)
@@ -140,7 +140,7 @@ testthat::test_that("calc_tri", {
 
   # with geometry
   testthat::expect_no_error(
-    tri_c_geom <- calc_tri(
+    tri_c_geom <- calculate_tri(
       from = tri_r,
       locs = ncpt,
       radius = c(1500L, 50000L),
@@ -150,28 +150,28 @@ testthat::test_that("calc_tri", {
   testthat::expect_s4_class(tri_c_geom, "SpatVector")
 
   testthat::expect_no_error(
-    calc_tri(
+    calculate_tri(
       from = tri_r,
       locs = sf::st_as_sf(ncpt),
       radius = 50000L
     )
   )
   testthat::expect_error(
-    calc_tri(
+    calculate_tri(
       from = tempdir(),
       locs = ncpt,
       radius = 50000L
     )
   )
   testthat::expect_error(
-    calc_tri(
+    calculate_tri(
       from = paste0(tdir, "/tri/"),
       locs = ncpt[, 1:2],
       radius = 50000L
     )
   )
   testthat::expect_error(
-    calc_tri(
+    calculate_tri(
       from = paste0(tdir, "/tri/"),
       locs = ncpt,
       radius = "As far as the Earth's radius"

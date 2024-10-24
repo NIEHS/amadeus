@@ -169,8 +169,8 @@ testthat::test_that("process_nei", {
 })
 
 ################################################################################
-##### calc_nei
-testthat::test_that("calc_nei", {
+##### calculate_nei
+testthat::test_that("calculate_nei", {
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_package("data.table")
@@ -225,7 +225,7 @@ testthat::test_that("calc_nei", {
     process_nei(neipath, nc, year = 2083)
   )
 
-  # calc_nei
+  # calculate_nei
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   ncp$time <- 2018L
@@ -233,7 +233,7 @@ testthat::test_that("calc_nei", {
   nc <- terra::project(nc, "EPSG:4326")
 
   testthat::expect_no_error(
-    neicalced <- calc_nei(
+    neicalced <- calculate_nei(
       locs = ncp,
       from = neiras
     )
@@ -243,7 +243,7 @@ testthat::test_that("calc_nei", {
 
   # with geometry
   testthat::expect_no_error(
-    neicalced_geom <- calc_nei(
+    neicalced_geom <- calculate_nei(
       locs = ncp,
       from = neiras,
       geom = TRUE
@@ -253,7 +253,7 @@ testthat::test_that("calc_nei", {
 
   # more error cases
   testthat::expect_condition(
-    calc_nei(
+    calculate_nei(
       locs = "jittered",
       from = neiras
     )

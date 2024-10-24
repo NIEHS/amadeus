@@ -196,15 +196,15 @@ testthat::test_that("process_hms (absent polygons - 12/31/2018)", {
 })
 
 ################################################################################
-##### calc_hms
-testthat::test_that("calc_hms (no errors)", {
+##### calculate_hms
+testthat::test_that("calculate_hms (no errors)", {
   withr::local_package("terra")
   radii <- c(0, 1000)
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_hms)
+    is.function(calculate_hms)
   )
   for (r in seq_along(radii)) {
     hms <-
@@ -217,7 +217,7 @@ testthat::test_that("calc_hms (no errors)", {
         )
       )
     hms_covariate <-
-      calc_hms(
+      calculate_hms(
         from = hms,
         locs = ncp,
         locs_id = "site_id",
@@ -254,7 +254,7 @@ testthat::test_that("calc_hms (no errors)", {
   }
 })
 
-testthat::test_that("calc_hms (with geometry)", {
+testthat::test_that("calculate_hms (with geometry)", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   hms_dir <- testthat::test_path(
@@ -264,7 +264,7 @@ testthat::test_that("calc_hms (with geometry)", {
     date = c("2022-06-10", "2022-06-13"),
     path = hms_dir
   )
-  hms_covariate_geom <- calc_hms(
+  hms_covariate_geom <- calculate_hms(
     from = hms,
     locs = ncp,
     locs_id = "site_id",
@@ -280,14 +280,14 @@ testthat::test_that("calc_hms (with geometry)", {
   )
 })
 
-testthat::test_that("calc_hms (absent polygons - 12/31/2018)", {
+testthat::test_that("calculate_hms (absent polygons - 12/31/2018)", {
   withr::local_package("terra")
   radii <- c(0, 1000)
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_hms)
+    is.function(calculate_hms)
   )
   # expect function
   testthat::expect_true(
@@ -303,7 +303,7 @@ testthat::test_that("calc_hms (absent polygons - 12/31/2018)", {
       )
     )
   for (r in seq_along(radii)) {
-    hms_covar <- calc_hms(
+    hms_covar <- calculate_hms(
       from = hms,
       locs = ncp,
       locs_id = "site_id",
@@ -316,7 +316,7 @@ testthat::test_that("calc_hms (absent polygons - 12/31/2018)", {
     testthat::expect_equal(ncol(hms_covar), 7)
   }
   for (r in seq_along(radii)) {
-    hms_covar <- calc_hms(
+    hms_covar <- calculate_hms(
       from = hms,
       locs = ncp,
       locs_id = "site_id",

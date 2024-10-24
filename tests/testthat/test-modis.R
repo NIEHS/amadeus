@@ -635,7 +635,7 @@ testthat::test_that("process_modis (expected errors)", {
 
 ################################################################################
 ##### calc_modis*
-testthat::test_that("calc_modis_par", {
+testthat::test_that("calculate_modis_par", {
   withr::local_package("sf")
   withr::local_package("terra")
   withr::local_package("stars")
@@ -681,7 +681,7 @@ testthat::test_that("calc_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod11 <-
-        calc_modis_par(
+        calculate_modis_par(
           from = path_mod11,
           locs = sf::st_as_sf(site_faux),
           preprocess = process_modis_merge,
@@ -698,7 +698,7 @@ testthat::test_that("calc_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod11 <-
-        calc_modis_par(
+        calculate_modis_par(
           from = path_mod11,
           locs = sf::st_as_sf(site_faux),
           preprocess = process_modis_merge,
@@ -715,7 +715,7 @@ testthat::test_that("calc_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod11_geom <-
-        calc_modis_par(
+        calculate_modis_par(
           from = path_mod11,
           locs = sf::st_as_sf(site_faux),
           preprocess = process_modis_merge,
@@ -750,7 +750,7 @@ testthat::test_that("calc_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod06 <-
-        calc_modis_par(
+        calculate_modis_par(
           from = path_mod06,
           locs = site_faux,
           subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
@@ -766,7 +766,7 @@ testthat::test_that("calc_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod06_geom <-
-        calc_modis_par(
+        calculate_modis_par(
           from = path_mod06,
           locs = site_faux,
           subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
@@ -797,7 +797,7 @@ testthat::test_that("calc_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_vnp46 <-
-        calc_modis_par(
+        calculate_modis_par(
           from = path_vnp46,
           locs = site_faux,
           preprocess = process_blackmarble,
@@ -814,7 +814,7 @@ testthat::test_that("calc_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_vnp46_geom_v <-
-        calc_modis_par(
+        calculate_modis_par(
           from = path_vnp46,
           locs = site_faux,
           preprocess = process_blackmarble,
@@ -833,7 +833,7 @@ testthat::test_that("calc_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_vnp46_geom_sf <-
-        calc_modis_par(
+        calculate_modis_par(
           from = path_vnp46,
           locs = sf::st_as_sf(site_faux),
           preprocess = process_blackmarble,
@@ -944,13 +944,13 @@ testthat::test_that("calc_modis_par", {
   testthat::expect_s4_class(calc_mod_geom, "SpatVector")
 
   testthat::expect_error(
-    calc_modis_par(from = site_faux)
+    calculate_modis_par(from = site_faux)
   )
   testthat::expect_error(
-    calc_modis_par(from = path_mod11, product = "MOD11A1", locs = list(1, 2, 3))
+    calculate_modis_par(from = path_mod11, product = "MOD11A1", locs = list(1, 2, 3))
   )
   testthat::expect_error(
-    calc_modis_par(
+    calculate_modis_par(
       from = path_vnp46,
       locs = site_faux,
       preprocess = "fountain",
@@ -960,7 +960,7 @@ testthat::test_that("calc_modis_par", {
     )
   )
   testthat::expect_warning(
-    calc_modis_par(
+    calculate_modis_par(
       from = path_vnp46,
       locs = site_faux,
       preprocess = process_blackmarble,
@@ -971,7 +971,7 @@ testthat::test_that("calc_modis_par", {
     )
   )
   testthat::expect_warning(
-    flushed <- calc_modis_par(
+    flushed <- calculate_modis_par(
       from = path_vnp46,
       locs = site_faux,
       name_covariates = c("MOD_NITLT_0_"),

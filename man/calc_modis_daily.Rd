@@ -81,7 +81,7 @@ calc_modis_daily(
 \itemize{
 \item Preprocessing: \code{\link[=process_modis_merge]{process_modis_merge()}}, \code{\link[=process_modis_swath]{process_modis_swath()}},
 \code{\link[=process_blackmarble]{process_blackmarble()}}
-\item Parallelization: \code{\link[=calc_modis_par]{calc_modis_par()}}
+\item Parallelization: \code{\link[=calculate_modis_par]{calculate_modis_par()}}
 }
 }
 \author{

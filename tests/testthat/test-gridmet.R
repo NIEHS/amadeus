@@ -179,8 +179,8 @@ testthat::test_that("process_gridmet_codes", {
 })
 
 ################################################################################
-##### calc_gridmet
-testthat::test_that("calc_gridmet", {
+##### calculate_gridmet
+testthat::test_that("calculate_gridmet", {
   withr::local_package("terra")
   withr::local_package("data.table")
   radii <- c(0, 1000)
@@ -188,7 +188,7 @@ testthat::test_that("calc_gridmet", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_gridmet)
+    is.function(calculate_gridmet)
   )
   for (r in seq_along(radii)) {
     gridmet <-
@@ -204,7 +204,7 @@ testthat::test_that("calc_gridmet", {
         )
       )
     gridmet_covariate <-
-      calc_gridmet(
+      calculate_gridmet(
         from = gridmet,
         locs = data.table::data.table(ncp),
         locs_id = "site_id",
@@ -237,7 +237,7 @@ testthat::test_that("calc_gridmet", {
   }
   # with included geometry
   testthat::expect_no_error(
-    gridmet_covariate_geom <- calc_gridmet(
+    gridmet_covariate_geom <- calculate_gridmet(
       from = gridmet,
       locs = ncp,
       locs_id = "site_id",

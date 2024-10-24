@@ -152,8 +152,8 @@ testthat::test_that("process_narr", {
   )
 })
 
-##### calc_narr
-testthat::test_that("calc_narr", {
+##### calculate_narr
+testthat::test_that("calculate_narr", {
   withr::local_package("terra")
   variables <- c(
     "weasd",
@@ -164,7 +164,7 @@ testthat::test_that("calc_narr", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_narr)
+    is.function(calculate_narr)
   )
   for (v in seq_along(variables)) {
     variable <- variables[v]
@@ -182,7 +182,7 @@ testthat::test_that("calc_narr", {
           )
         )
       narr_covariate <-
-        calc_narr(
+        calculate_narr(
           from = narr,
           locs = ncp,
           locs_id = "site_id",
@@ -227,7 +227,7 @@ testthat::test_that("calc_narr", {
   }
   # with geometry
   testthat::expect_no_error(
-    narr_covariate_geom <- calc_narr(
+    narr_covariate_geom <- calculate_narr(
       from = narr,
       locs = ncp,
       locs_id = "site_id",

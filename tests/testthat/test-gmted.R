@@ -200,8 +200,8 @@ testthat::test_that("process_gmted_codes (auxiliary)", {
   testthat::expect_equal(resoorig, "7.5 arc-seconds")
 })
 
-##### calc_gmted
-testthat::test_that("calc_gmted", {
+##### calculate_gmted
+testthat::test_that("calculate_gmted", {
   withr::local_package("terra")
   statistics <- c(
     "Breakline Emphasis", "Systematic Subsample"
@@ -214,7 +214,7 @@ testthat::test_that("calc_gmted", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_gmted)
+    is.function(calculate_gmted)
   )
   for (s in seq_along(statistics)) {
     statistic <- statistics[s]
@@ -232,7 +232,7 @@ testthat::test_that("calc_gmted", {
             )
           )
         gmted_covariate <-
-          calc_gmted(
+          calculate_gmted(
             from = gmted,
             locs = ncp,
             locs_id = "site_id",
@@ -270,7 +270,7 @@ testthat::test_that("calc_gmted", {
     )
   )
   testthat::expect_no_error(
-    gmted_geom <- calc_gmted(
+    gmted_geom <- calculate_gmted(
       gmted,
       ncp,
       "site_id",

@@ -179,9 +179,8 @@ testthat::test_that("process_terraclimate_codes", {
 })
 
 ################################################################################
-##### calc_terraclimate
-## 16. TerraClimate ####
-testthat::test_that("calc_terraclimate", {
+##### calculate_terraclimate
+testthat::test_that("calculate_terraclimate", {
   withr::local_package("terra")
   withr::local_package("data.table")
   radii <- c(0, 1000)
@@ -189,7 +188,7 @@ testthat::test_that("calc_terraclimate", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_terraclimate)
+    is.function(calculate_terraclimate)
   )
   for (r in seq_along(radii)) {
     terraclimate <-
@@ -205,7 +204,7 @@ testthat::test_that("calc_terraclimate", {
         )
       )
     terraclimate_covariate <-
-      calc_terraclimate(
+      calculate_terraclimate(
         from = terraclimate,
         locs = data.table::data.table(ncp),
         locs_id = "site_id",
@@ -238,7 +237,7 @@ testthat::test_that("calc_terraclimate", {
   }
   # with included geometry
   testthat::expect_no_error(
-    terraclimate_covariate_geom <- calc_terraclimate(
+    terraclimate_covariate_geom <- calculate_terraclimate(
       from = terraclimate,
       locs = ncp,
       locs_id = "site_id",

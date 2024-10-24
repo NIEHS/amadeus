@@ -182,8 +182,8 @@ testthat::test_that("process_geos (expected errors)", {
 })
 
 ################################################################################
-##### calc_geos
-testthat::test_that("calc_geos", {
+##### calculate_geos
+testthat::test_that("calculate_geos", {
   withr::local_package("terra")
   withr::local_package("data.table")
   collections <- c(
@@ -195,7 +195,7 @@ testthat::test_that("calc_geos", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_geos)
+    is.function(calculate_geos)
   )
   for (c in seq_along(collections)) {
     collection <- collections[c]
@@ -213,7 +213,7 @@ testthat::test_that("calc_geos", {
           )
         )
       geos_covariate <-
-        calc_geos(
+        calculate_geos(
           from = geos,
           locs = data.table::data.table(ncp),
           locs_id = "site_id",
@@ -247,7 +247,7 @@ testthat::test_that("calc_geos", {
   }
   # with included geometry
   testthat::expect_no_error(
-    geos_covariate_geom <- calc_geos(
+    geos_covariate_geom <- calculate_geos(
       from = geos,
       locs = ncp,
       locs_id = "site_id",

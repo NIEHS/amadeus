@@ -18,22 +18,22 @@
 #'  function.
 #' @note `covariate` argument value is converted to lowercase.
 #' @seealso
-#' * \code{\link{calc_modis_par}}: "modis", "MODIS"
-#' * \code{\link{calc_koppen_geiger}}: "koppen-geiger", "koeppen-geiger", "koppen"
-#' * \code{\link{calc_ecoregion}}: "ecoregion", "ecoregions"
-#' * \code{\link{calc_temporal_dummies}}: "dummies", "Dummies"
-#' * \code{\link{calc_hms}}: "hms", "smoke", "HMS"
-#' * \code{\link{calc_gmted}}: "gmted", "GMTED"
-#' * \code{\link{calc_narr}}: "narr", "NARR"
-#' * \code{\link{calc_geos}}: "geos", "geos_cf", "GEOS"
-#' * \code{\link{calc_sedac_population}}: "population", "sedac_population"
-#' * \code{\link{calc_sedac_groads}}: "roads", "groads", "sedac_groads"
-#' * \code{\link{calc_nlcd}}: "nlcd", "NLCD"
-#' * \code{\link{calc_tri}}: "tri", "TRI"
-#' * \code{\link{calc_nei}}: "nei", "NEI"
-#' * \code{\link{calc_merra2}}: "merra", "MERRA", "merra2", "MERRA2"
-#' * \code{\link{calc_gridmet}}: "gridMET", "gridmet"
-#' * \code{\link{calc_terraclimate}}: "terraclimate", "TerraClimate"
+#' * \code{\link{calculate_modis_par}}: "modis", "MODIS"
+#' * \code{\link{calculate_koppen_geiger}}: "koppen-geiger", "koeppen-geiger", "koppen"
+#' * \code{\link{calculate_ecoregion}}: "ecoregion", "ecoregions"
+#' * \code{\link{calculate_temporal_dummies}}: "dummies", "Dummies"
+#' * \code{\link{calculate_hms}}: "hms", "smoke", "HMS"
+#' * \code{\link{calculate_gmted}}: "gmted", "GMTED"
+#' * \code{\link{calculate_narr}}: "narr", "NARR"
+#' * \code{\link{calculate_geos}}: "geos", "geos_cf", "GEOS"
+#' * \code{\link{calculate_sedac_population}}: "population", "sedac_population"
+#' * \code{\link{calculate_sedac_groads}}: "roads", "groads", "sedac_groads"
+#' * \code{\link{calculate_nlcd}}: "nlcd", "NLCD"
+#' * \code{\link{calculate_tri}}: "tri", "TRI"
+#' * \code{\link{calculate_nei}}: "nei", "NEI"
+#' * \code{\link{calculate_merra2}}: "merra", "MERRA", "merra2", "MERRA2"
+#' * \code{\link{calculate_gridmet}}: "gridMET", "gridmet"
+#' * \code{\link{calculate_climate}}: "terraclimate", "TerraClimate"
 #' @return Calculated covariates as a data.frame or SpatVector object
 #' @author Insang Song
 #' @examples
@@ -41,7 +41,7 @@
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_covariates(
+#' calculate_covariates(
 #'   covariate = "narr",
 #'   from = narr, # derived from process_covariates() example
 #'   locs = loc,
@@ -51,7 +51,7 @@
 #' }
 #' @export
 # nolint end
-calc_covariates <-
+calculate_covariates <-
   function(
       covariate = c("modis", "koppen-geiger",
                     "koeppen-geiger", "koppen", "koeppen",
@@ -75,28 +75,28 @@ calc_covariates <-
 
     # select function to run
     what_to_run <- switch(covariate,
-      modis = calc_modis_par,
-      ecoregion = calc_ecoregion,
-      ecoregions = calc_ecoregion,
-      koppen = calc_koppen_geiger,
-      narr = calc_narr,
-      nlcd = calc_nlcd,
-      smoke = calc_hms,
-      hms = calc_hms,
-      sedac_groads = calc_sedac_groads,
-      roads = calc_sedac_groads,
-      groads = calc_sedac_groads,
-      sedac_population = calc_sedac_population,
-      population = calc_sedac_population,
-      nei = calc_nei,
-      tri = calc_tri,
-      geos = calc_geos,
-      gmted = calc_gmted,
-      dummies = calc_temporal_dummies,
-      merra = calc_merra2,
-      merra2 = calc_merra2,
-      gridmet = calc_gridmet,
-      terraclimate = calc_terraclimate
+      modis = calculate_modis_par,
+      ecoregion = calculate_ecoregion,
+      ecoregions = calculate_ecoregion,
+      koppen = calculate_koppen_geiger,
+      narr = calculate_narr,
+      nlcd = calculate_nlcd,
+      smoke = calculate_hms,
+      hms = calculate_hms,
+      sedac_groads = calculate_sedac_groads,
+      roads = calculate_sedac_groads,
+      groads = calculate_sedac_groads,
+      sedac_population = calculate_sedac_population,
+      population = calculate_sedac_population,
+      nei = calculate_nei,
+      tri = calculate_tri,
+      geos = calculate_geos,
+      gmted = calculate_gmted,
+      dummies = calculate_temporal_dummies,
+      merra = calculate_merra2,
+      merra2 = calculate_merra2,
+      gridmet = calculate_gridmet,
+      terraclimate = calculate_climate
     )
 
     res_covariate <-
@@ -158,7 +158,7 @@ calc_covariates <-
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_koppen_geiger(
+#' calculate_koppen_geiger(
 #'   from = kg, # derived from process_koppen_geiger() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -167,7 +167,7 @@ calc_covariates <-
 #' }
 #' @export
 # locs (locs), from (from), locs_id (id_col), variables
-calc_koppen_geiger <-
+calculate_koppen_geiger <-
   function(
       from = NULL,
       locs = NULL,
@@ -317,7 +317,7 @@ calc_koppen_geiger <-
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_nlcd(
+#' calculate_nlcd(
 #'   from = nlcd, # derived from process_nlcd() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -326,7 +326,7 @@ calc_koppen_geiger <-
 #' )
 #' }
 #' @export
-calc_nlcd <- function(from,
+calculate_nlcd <- function(from,
                       locs,
                       locs_id = "site_id",
                       mode = c("exact", "terra"),
@@ -483,7 +483,7 @@ calc_nlcd <- function(from,
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_ecoregion(
+#' calculate_ecoregion(
 #'   from = ecoregion, # derived from process_ecoregion() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -491,7 +491,7 @@ calc_nlcd <- function(from,
 #' )
 #' }
 #' @export
-calc_ecoregion <-
+calculate_ecoregion <-
   function(
     from = NULL,
     locs,
@@ -596,7 +596,7 @@ calc_ecoregion <-
 #' @seealso
 #' * Preprocessing: [process_modis_merge()], [process_modis_swath()],
 #'     [process_blackmarble()]
-#' * Parallelization: [calc_modis_par()]
+#' * Parallelization: [calculate_modis_par()]
 #' @author Insang Song
 #' @return a data.frame or SpatVector object.
 #' @importFrom terra extract
@@ -763,7 +763,7 @@ calc_modis_daily <- function(
 #' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
 #' that of `from.`
 #' @param ... Arguments passed to `preprocess`.
-#' @description `calc_modis_par` essentially runs [`calc_modis_daily`] function
+#' @description `calculate_modis_par` essentially runs [`calc_modis_daily`] function
 #' in each thread (subprocess). Based on daily resolution, each day's workload
 #' will be distributed to each thread. With `product` argument,
 #' the files are processed by a customized function where the unique structure
@@ -829,7 +829,7 @@ calc_modis_daily <- function(
 #' \dontrun{
 #' locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
 #' locs <- terra::vect(locs, geom = c("lon", "lat"), crs = "EPSG:4326")
-#' calc_modis_par(
+#' calculate_modis_par(
 #'   from =
 #'     list.files("./data", pattern = "VNP46A2.", full.names = TRUE),
 #'   locs = locs,
@@ -843,7 +843,7 @@ calc_modis_daily <- function(
 #' )
 #' }
 #' @export
-calc_modis_par <-
+calculate_modis_par <-
   function(
     from = NULL,
     locs = NULL,
@@ -1044,14 +1044,14 @@ process_modis_swath, or process_blackmarble.")
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_temporal_dummies(
+#' calculate_temporal_dummies(
 #'   locs = loc,
 #'   locs_id = "id",
 #'   year = seq(2018L, 2022L)
 #' )
 #' }
 #' @export
-calc_temporal_dummies <-
+calculate_temporal_dummies <-
   function(
     locs,
     locs_id = "site_id",
@@ -1328,7 +1328,7 @@ The result may not be accurate.\n",
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_tri(
+#' calculate_tri(
 #'   from = tri, # derived from process_tri() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -1336,7 +1336,7 @@ The result may not be accurate.\n",
 #' )
 #' }
 #' @export
-calc_tri <- function(
+calculate_tri <- function(
   from = NULL,
   locs,
   locs_id = "site_id",
@@ -1419,14 +1419,14 @@ calc_tri <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_nei(
+#' calculate_nei(
 #'   from = nei, # derived from process_nei example
 #'   locs = loc,
 #'   locs_id = "id"
 #' )
 #' }
 #' @export
-calc_nei <- function(
+calculate_nei <- function(
   from = NULL,
   locs = NULL,
   locs_id = "site_id",
@@ -1483,7 +1483,7 @@ calc_nei <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_hms(
+#' calculate_hms(
 #'   from = hms, # derived from process_hms() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -1492,7 +1492,7 @@ calc_nei <- function(
 #' )
 #' }
 #' @export
-calc_hms <- function(
+calculate_hms <- function(
     from,
     locs,
     locs_id = NULL,
@@ -1718,7 +1718,7 @@ calc_hms <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_gmted(
+#' calculate_gmted(
 #'   from = gmted, # derived from process_gmted() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -1728,7 +1728,7 @@ calc_hms <- function(
 #' )
 #' }
 #' @export
-calc_gmted <- function(
+calculate_gmted <- function(
     from,
     locs,
     locs_id = NULL,
@@ -1841,7 +1841,7 @@ calc_gmted <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_narr(
+#' calculate_narr(
 #'   from = narr, # derived from process_narr() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -1851,7 +1851,7 @@ calc_gmted <- function(
 #' )
 #' }
 #' @export
-calc_narr <- function(
+calculate_narr <- function(
     from,
     locs,
     locs_id = NULL,
@@ -1936,7 +1936,7 @@ calc_narr <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_geos(
+#' calculate_geos(
 #'   from = geos, # derived from process_geos() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -1946,7 +1946,7 @@ calc_narr <- function(
 #' )
 #' }
 #' @export
-calc_geos <- function(
+calculate_geos <- function(
     from,
     locs,
     locs_id = NULL,
@@ -2015,7 +2015,7 @@ calc_geos <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_sedac_population(
+#' calculate_sedac_population(
 #'   from = pop, # derived from process_sedac_population() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -2025,7 +2025,7 @@ calc_geos <- function(
 #' )
 #' }
 #' @export
-calc_sedac_population <- function(
+calculate_sedac_population <- function(
     from,
     locs,
     locs_id = NULL,
@@ -2132,7 +2132,7 @@ calc_sedac_population <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_sedac_groads(
+#' calculate_sedac_groads(
 #'   from = groads, # derived from process_sedac_groads() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -2142,7 +2142,7 @@ calc_sedac_population <- function(
 #' )
 #' }
 #' @export
-calc_sedac_groads <- function(
+calculate_sedac_groads <- function(
     from = NULL,
     locs = NULL,
     locs_id = NULL,
@@ -2234,7 +2234,7 @@ calc_sedac_groads <- function(
 #' that of `from.`
 #' @param ... Placeholders
 #' @author Mitchell Manware
-#' @seealso [calc_geos()], [process_merra2()]
+#' @seealso [calculate_geos()], [process_merra2()]
 #' @return a data.frame or SpatVector object
 #' @importFrom terra vect
 #' @importFrom terra buffer
@@ -2248,7 +2248,7 @@ calc_sedac_groads <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_merra2(
+#' calculate_merra2(
 #'   from = merra2, # derived from process_merra2() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -2258,7 +2258,7 @@ calc_sedac_groads <- function(
 #' )
 #' }
 #' @export
-calc_merra2 <- function(
+calculate_merra2 <- function(
     from,
     locs,
     locs_id = NULL,
@@ -2339,7 +2339,7 @@ calc_merra2 <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_gridmet(
+#' calculate_gridmet(
 #'   from = gridmet, # derived from process_gridmet() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -2349,7 +2349,7 @@ calc_merra2 <- function(
 #' )
 #' }
 #' @export
-calc_gridmet <- function(
+calculate_gridmet <- function(
     from,
     locs,
     locs_id = NULL,
@@ -2426,7 +2426,7 @@ calc_gridmet <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calc_terraclimate(
+#' calculate_climate(
 #'   from = terraclimate, # derived from process_terraclimate() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -2436,7 +2436,7 @@ calc_gridmet <- function(
 #' )
 #' }
 #' @export
-calc_terraclimate <- function(
+calculate_climate <- function(
     from = NULL,
     locs = NULL,
     locs_id = NULL,
@@ -2492,7 +2492,7 @@ calc_terraclimate <- function(
 #' @param geom logical(1). Should the function return a `SpatVector`?
 #' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
 #' that of `from.` To return as a `SpatVector`, `from` must also be a `SpatVector`
-#' @seealso [calc_covariates()]
+#' @seealso [calculate_covariates()]
 #' @note
 #' In order to calculate temporally lagged covariates, `from` must contain at
 #' least the number of lag days before the desired start date. For example, if
@@ -2511,7 +2511,7 @@ calc_terraclimate <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' terracliamte_covar <- calc_terraclimate(
+#' terracliamte_covar <- calculate_climate(
 #'   from = terraclimate, # derived from process_terraclimate() example
 #'   locs = loc,
 #'   locs_id = "id",

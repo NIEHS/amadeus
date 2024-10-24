@@ -87,8 +87,8 @@ testthat::test_that("process_koppen_geiger", {
 })
 
 ################################################################################
-##### calc_koppen_geiger
-testthat::test_that("calc_koppen_geiger", {
+##### calculate_koppen_geiger
+testthat::test_that("calculate_koppen_geiger", {
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_options(
@@ -109,13 +109,13 @@ testthat::test_that("calc_koppen_geiger", {
   )
 
   testthat::expect_no_error(
-    kg_res <- calc_koppen_geiger(
+    kg_res <- calculate_koppen_geiger(
       from = kgras,
       locs = site_faux
     )
   )
   testthat::expect_no_error(
-    kg_res <- calc_koppen_geiger(
+    kg_res <- calculate_koppen_geiger(
       from = kgras,
       locs = sf::st_as_sf(site_faux)
     )
@@ -128,7 +128,7 @@ testthat::test_that("calc_koppen_geiger", {
   testthat::expect_equal(sum(unlist(kg_res[, c(-1, -2)])), 1)
   # with included geometry
   testthat::expect_no_error(
-    kg_geom <- calc_koppen_geiger(
+    kg_geom <- calculate_koppen_geiger(
       from = kgras,
       locs = sf::st_as_sf(site_faux),
       geom = TRUE

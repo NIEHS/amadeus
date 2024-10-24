@@ -1,9 +1,9 @@
 ################################################################################
-##### unit and integration tests for calc_covariates and auxiliary functions
+##### unit and integration tests for calculate_covariates and auxiliary functions
 
 ################################################################################
-##### calc_covariates
-testthat::test_that("calc_covariates (expected errors)", {
+##### calculate_covariates
+testthat::test_that("calculate_covariates (expected errors)", {
   withr::local_package("rlang")
   withr::local_package("terra")
   withr::local_package("sf")
@@ -21,12 +21,12 @@ testthat::test_that("calc_covariates (expected errors)", {
       "tri", "nei", "prism", "huc", "cdl")
   for (cand in candidates) {
     testthat::expect_error(
-      calc_covariates(covariate = cand)
+      calculate_covariates(covariate = cand)
     )
   }
 })
 
-testthat::test_that("calc_covariates (no errors)", {
+testthat::test_that("calculate_covariates (no errors)", {
   withr::local_package("rlang")
   withr::local_package("terra")
   withr::local_package("sf")
@@ -46,7 +46,7 @@ testthat::test_that("calc_covariates (no errors)", {
   )
 
   testthat::expect_no_error(
-    tri_c <- calc_covariates(
+    tri_c <- calculate_covariates(
       covariate = "tri",
       from = tri_r,
       locs = ncpt,
@@ -68,7 +68,7 @@ testthat::test_that("calc_covariates (no errors)", {
       "tri", "nei")
   for (cand in candidates) {
     testthat::expect_error(
-      calc_covariates(covariate = cand)
+      calculate_covariates(covariate = cand)
     )
   }
 })
@@ -99,7 +99,7 @@ testthat::test_that("calc_lagged (geom = FALSE)", {
         )
       )
     narr_covariate <-
-      calc_narr(
+      calculate_narr(
         from = narr,
         locs = ncp,
         locs_id = "site_id",
@@ -174,7 +174,7 @@ testthat::test_that("calc_lagged (geom = TRUE)", {
       )
   )
   narr_covariate <-
-    calc_narr(
+    calculate_narr(
       from = narr,
       locs = ncp,
       locs_id = "site_id",
