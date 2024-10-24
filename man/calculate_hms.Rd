@@ -17,9 +17,9 @@ containing identifier for each unique coordinate location.}
 \item{radius}{integer(1). Circular buffer distance around site locations.
 (Default = 0).}
 
-\item{geom}{logical(1). Should the function return a \code{SpatVector}?
-Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
-that of \code{from.}}
+\item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
+Default is \code{FALSE}, options with geometry are "sf" or "terra". The
+coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
 
 \item{...}{Placeholders.}
 }

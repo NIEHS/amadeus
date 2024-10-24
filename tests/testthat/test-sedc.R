@@ -47,9 +47,34 @@ testthat::test_that("sum_edc", {
     )
   )
 
-  # with geometry
+  # with geometry terra
   testthat::expect_no_error(
-    tri_sedc_geom <- sum_edc(
+    tri_sedc_terra <- sum_edc(
+      locs = ncpt,
+      from = tri_r,
+      locs_id = "site_id",
+      sedc_bandwidth = 30000,
+      target_fields = targcols,
+      geom = "terra"
+    )
+  )
+  testthat::expect_s4_class(tri_sedc_terra, "SpatVector")
+
+  # with geometry sf
+  testthat::expect_no_error(
+    tri_sedc_sf <- sum_edc(
+      locs = ncpt,
+      from = tri_r,
+      locs_id = "site_id",
+      sedc_bandwidth = 30000,
+      target_fields = targcols,
+      geom = "sf"
+    )
+  )
+  testthat::expect_true("sf" %in% class(tri_sedc_sf))
+
+  testthat::expect_error(
+    sum_edc(
       locs = ncpt,
       from = tri_r,
       locs_id = "site_id",
@@ -58,7 +83,6 @@ testthat::test_that("sum_edc", {
       geom = TRUE
     )
   )
-  testthat::expect_s4_class(tri_sedc_geom, "SpatVector")
 
   # warning case: duplicate field names between locs and from
   ncpta <- ncpt

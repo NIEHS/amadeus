@@ -309,19 +309,41 @@ testthat::test_that("calculate_hms (with geometry)", {
     date = c("2022-06-10", "2022-06-13"),
     path = hms_dir
   )
-  hms_covariate_geom <- calculate_hms(
+  hms_covariate_terra <- calculate_hms(
     from = hms,
     locs = ncp,
     locs_id = "site_id",
     radius = 0,
-    geom = TRUE
+    geom = "terra"
   )
   # with geometry will have 5 columns
   testthat::expect_equal(
-    ncol(hms_covariate_geom), 5
+    ncol(hms_covariate_terra), 5
   )
   testthat::expect_s4_class(
-    hms_covariate_geom, "SpatVector"
+    hms_covariate_terra, "SpatVector"
+  )
+  hms_covariate_sf <- calculate_hms(
+    from = hms,
+    locs = ncp,
+    locs_id = "site_id",
+    radius = 0,
+    geom = "sf"
+  )
+  # with geometry will have 6 columns
+  testthat::expect_equal(
+    ncol(hms_covariate_sf), 6
+  )
+  testthat::expect_true("sf" %in% class(hms_covariate_sf))
+
+  testthat::expect_error(
+    calculate_hms(
+      from = hms,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      geom = TRUE
+    )
   )
 })
 
@@ -366,7 +388,7 @@ testthat::test_that("calculate_hms (absent polygons - 12/31/2018)", {
       locs = ncp,
       locs_id = "site_id",
       radius = radii[r],
-      geom = TRUE
+      geom = "terra"
     )
     # SpatVector
     testthat::expect_true(methods::is(hms_covar, "SpatVector"))

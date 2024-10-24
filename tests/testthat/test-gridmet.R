@@ -295,9 +295,44 @@ testthat::test_that("calculate_gridmet", {
       "POSIXt" %in% class(gridmet_covariate$time)
     )
   }
-  # with included geometry
+  # with included geometry terra
   testthat::expect_no_error(
-    gridmet_covariate_geom <- calculate_gridmet(
+    gridmet_covariate_terra <- calculate_gridmet(
+      from = gridmet,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(gridmet_covariate_terra), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(gridmet_covariate_terra)
+  )
+
+  # with included geometry sf
+  testthat::expect_no_error(
+    gridmet_covariate_sf <- calculate_gridmet(
+      from = gridmet,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(gridmet_covariate_sf), 4
+  )
+  testthat::expect_true(
+    "sf" %in% class(gridmet_covariate_sf)
+  )
+
+  testthat::expect_error(
+    calculate_gridmet(
       from = gridmet,
       locs = ncp,
       locs_id = "site_id",
@@ -305,11 +340,5 @@ testthat::test_that("calculate_gridmet", {
       fun = "mean",
       geom = TRUE
     )
-  )
-  testthat::expect_equal(
-    ncol(gridmet_covariate_geom), 3
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(gridmet_covariate_geom)
   )
 })

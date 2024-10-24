@@ -278,18 +278,44 @@ testthat::test_that("calculate_nlcd", {
   testthat::expect_equal(
     ncol(output), 15
   )
-  output_geom <- calculate_nlcd(
+  # example with terra output
+  output_terra <- calculate_nlcd(
     locs = eg_data,
     locs_id = "site_id",
     radius = buf_radius,
     from = nlcdras,
-    geom = TRUE
+    geom = "terra"
   )
-  # with geometry will have 12 columns
+  # with geometry will have 15 columns
   testthat::expect_equal(
-    ncol(output_geom), 15
+    ncol(output_terra), 15
   )
   testthat::expect_true(
-    "SpatVector" %in% class(output_geom)
+    "SpatVector" %in% class(output_terra)
+  )
+  # example with sf output
+  output_sf <- calculate_nlcd(
+    locs = eg_data,
+    locs_id = "site_id",
+    radius = buf_radius,
+    from = nlcdras,
+    geom = "sf"
+  )
+  # with geometry will have 16 columns
+  testthat::expect_equal(
+    ncol(output_sf), 16
+  )
+  testthat::expect_true(
+    "sf" %in% class(output_sf)
+  )
+  # error with TRUE geom
+  testthat::expect_error(
+    calculate_nlcd(
+      locs = eg_data,
+      locs_id = "site_id",
+      radius = buf_radius,
+      from = nlcdras,
+      geom = TRUE
+    )
   )
 })

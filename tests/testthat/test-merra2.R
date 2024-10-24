@@ -347,9 +347,44 @@ testthat::test_that("calculate_merra2", {
       )
     }
   }
-  # with included geometry
+  # with included geometry terra
   testthat::expect_no_error(
-    merra2_covariate_geom <- calculate_merra2(
+    merra2_covariate_terra <- calculate_merra2(
+      from = merra2,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(merra2_covariate_terra), 4
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(merra2_covariate_terra)
+  )
+
+  # with included geometry sf
+  testthat::expect_no_error(
+    merra2_covariate_sf <- calculate_merra2(
+      from = merra2,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(merra2_covariate_sf), 5
+  )
+  testthat::expect_true(
+    "sf" %in% class(merra2_covariate_sf)
+  )
+
+  testthat::expect_error(
+    calculate_merra2(
       from = merra2,
       locs = ncp,
       locs_id = "site_id",
@@ -357,11 +392,5 @@ testthat::test_that("calculate_merra2", {
       fun = "mean",
       geom = TRUE
     )
-  )
-  testthat::expect_equal(
-    ncol(merra2_covariate_geom), 4
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(merra2_covariate_geom)
   )
 })

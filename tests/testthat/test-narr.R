@@ -299,9 +299,43 @@ testthat::test_that("calculate_narr", {
       )
     }
   }
-  # with geometry
+  # with geometry terra
   testthat::expect_no_error(
-    narr_covariate_geom <- calculate_narr(
+    narr_covariate_terra <- calculate_narr(
+      from = narr,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(narr_covariate_terra), 4 # 4 columns because omega has pressure levels
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(narr_covariate_terra)
+  )
+  # with geometry sf
+  testthat::expect_no_error(
+    narr_covariate_sf <- calculate_narr(
+      from = narr,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(narr_covariate_sf), 5 # 5 columns because omega has pressure levels
+  )
+  testthat::expect_true(
+    "sf" %in% class(narr_covariate_sf)
+  )
+
+  testthat::expect_error(
+    calculate_narr(
       from = narr,
       locs = ncp,
       locs_id = "site_id",
@@ -309,11 +343,5 @@ testthat::test_that("calculate_narr", {
       fun = "mean",
       geom = TRUE
     )
-  )
-  testthat::expect_equal(
-    ncol(narr_covariate_geom), 4 # 4 columns because omega has pressure levels
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(narr_covariate_geom)
   )
 })

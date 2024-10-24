@@ -63,9 +63,9 @@ Higher values will expedite processing, but will increase memory usage.
 Maximum possible value is \code{2^31 - 1}.
 See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
 
-\item{geom}{logical(1). Should the function return a \code{SpatVector}?
-Default is \code{FALSE}. The coordinate reference system of the \code{SpatVector} is
-that of \code{from.}}
+\item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
+Default is \code{FALSE}, options with geometry are "sf" or "terra". The
+coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
 
 \item{...}{Arguments passed to \code{preprocess}.}
 }
@@ -78,7 +78,7 @@ not the dates without available tiles.
 }
 }
 \description{
-\code{calculate_modis_par} essentially runs \code{\link{calc_modis_daily}} function
+\code{calculate_modis_par} essentially runs \code{\link{calculate_modis_daily}} function
 in each thread (subprocess). Based on daily resolution, each day's workload
 will be distributed to each thread. With \code{product} argument,
 the files are processed by a customized function where the unique structure
@@ -146,7 +146,7 @@ See details for setting parallelization:
 This function leverages the calculation of single-day MODIS
 covariates:
 \itemize{
-\item \code{\link[=calc_modis_daily]{calc_modis_daily()}}
+\item \code{\link[=calculate_modis_daily]{calculate_modis_daily()}}
 }
 
 Also, for preprocessing, please refer to:

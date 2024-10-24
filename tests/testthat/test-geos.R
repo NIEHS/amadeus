@@ -325,9 +325,44 @@ testthat::test_that("calculate_geos", {
       )
     }
   }
-  # with included geometry
+  # with included geometry terra
   testthat::expect_no_error(
-    geos_covariate_geom <- calculate_geos(
+    geos_covariate_terra <- calculate_geos(
+      from = geos,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(geos_covariate_terra), 4
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(geos_covariate_terra)
+  )
+
+  # with included geometry sf
+  testthat::expect_no_error(
+    geos_covariate_sf <- calculate_geos(
+      from = geos,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(geos_covariate_sf), 5
+  )
+  testthat::expect_true(
+    "sf" %in% class(geos_covariate_sf)
+  )
+
+  testthat::expect_error(
+    calculate_geos(
       from = geos,
       locs = ncp,
       locs_id = "site_id",
@@ -335,11 +370,5 @@ testthat::test_that("calculate_geos", {
       fun = "mean",
       geom = TRUE
     )
-  )
-  testthat::expect_equal(
-    ncol(geos_covariate_geom), 4
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(geos_covariate_geom)
   )
 })

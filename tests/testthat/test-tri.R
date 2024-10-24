@@ -138,16 +138,36 @@ testthat::test_that("calculate_tri", {
   )
   testthat::expect_true(is.data.frame(tri_c))
 
-  # with geometry
+  # with geometry terra
   testthat::expect_no_error(
-    tri_c_geom <- calculate_tri(
+    tri_c_terra <- calculate_tri(
+      from = tri_r,
+      locs = ncpt,
+      radius = c(1500L, 50000L),
+      geom = "terra"
+    )
+  )
+  testthat::expect_s4_class(tri_c_terra, "SpatVector")
+
+  # with geometry sf
+  testthat::expect_no_error(
+    tri_c_sf <- calculate_tri(
+      from = tri_r,
+      locs = ncpt,
+      radius = c(1500L, 50000L),
+      geom = "sf"
+    )
+  )
+  testthat::expect_true("sf" %in% class(tri_c_sf))
+
+  testthat::expect_error(
+    calculate_tri(
       from = tri_r,
       locs = ncpt,
       radius = c(1500L, 50000L),
       geom = TRUE
     )
   )
-  testthat::expect_s4_class(tri_c_geom, "SpatVector")
 
   testthat::expect_no_error(
     calculate_tri(

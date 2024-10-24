@@ -29,13 +29,23 @@ testthat::test_that("calculate_temporal_dummies (no errors)", {
 
   # with geometry
   testthat::expect_no_error(
-    dum_res_geom <- calculate_temporal_dummies(
+    dum_res_terra <- calculate_temporal_dummies(
       locs = site_faux,
       year = seq(2018L, 2022L),
-      geom = TRUE
+      geom = "terra"
     )
   )
-  testthat::expect_s4_class(dum_res_geom, "SpatVector")
+  testthat::expect_s4_class(dum_res_terra, "SpatVector")
+
+  # with geometry
+  testthat::expect_no_error(
+    dum_res_sf <- calculate_temporal_dummies(
+      locs = site_faux,
+      year = seq(2018L, 2022L),
+      geom = "sf"
+    )
+  )
+  testthat::expect_true("sf" %in% class(dum_res_sf))
 
   # error cases
   site_faux_err <- site_faux
@@ -66,6 +76,13 @@ testthat::test_that("calculate_temporal_dummies (expected errors)", {
   testthat::expect_error(
     calculate_temporal_dummies(
       terra::vect(ncp)
+    )
+  )
+  testthat::expect_error(
+    calculate_temporal_dummies(
+      locs = ncp,
+      year = seq(2018L, 2022L),
+      geom = TRUE
     )
   )
 })

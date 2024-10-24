@@ -134,9 +134,9 @@ calculate_covariates <-
 #' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders.
 #' @seealso [`process_koppen_geiger`]
 #' @return a data.frame or SpatVector object
@@ -202,7 +202,7 @@ calculate_koppen_geiger <-
     )
 
     locs_kg_extract[[locs_id]] <- locs_df[, 1]
-    if (geom) {
+    if (geom %in% c("sf", "terra")) {
       locs_kg_extract$geometry <- locs_df[, 2]
     }
     colnames(locs_kg_extract)[2] <- "value"
@@ -247,7 +247,7 @@ calculate_koppen_geiger <-
         df_ae_separated
       )
     names(kg_extracted)[1] <- locs_id
-    if (geom) {
+    if (geom %in% c("sf", "terra")) {
       names(kg_extracted)[2:3] <- c("geometry", "description")
       sites_return <- calc_return_locs(
         covar = kg_extracted,
@@ -282,9 +282,9 @@ calculate_koppen_geiger <-
 #' Maximum possible value is `2^31 - 1`. Only valid when
 #' `mode = "exact"`.
 #' See [`exactextractr::exact_extract`] for details.
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param nthreads integer(1). Number of threads to be used
 #' @param ... Placeholders.
 #' @note NLCD is available in U.S. only. Users should be aware of
@@ -439,7 +439,7 @@ calculate_nlcd <- function(from,
 
   # merge locs_df with nlcd class fractions
   new_data_vect <- cbind(locs_df, as.integer(year), nlcd_at_bufs)
-  if (geom) {
+  if (geom %in% c("sf", "terra")) {
     names(new_data_vect)[1:3] <- c(locs_id, "geometry", "time")
   } else {
     names(new_data_vect)[1:2] <- c(locs_id, "time")
@@ -466,9 +466,9 @@ calculate_nlcd <- function(from,
 #' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders.
 #' @seealso [`process_ecoregion`]
 #' @return a data.frame or SpatVector object object with dummy variables and
@@ -580,9 +580,9 @@ calculate_ecoregion <-
 #' @param max_cells integer(1). Maximum number of cells to be read at once.
 #' Higher values will expedite processing, but will increase memory usage.
 #' Maximum possible value is `2^31 - 1`.
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' See [`exactextractr::exact_extract`] for details.
 #' @param ... Placeholders.
 #' @description The function operates at MODIS/VIIRS products
@@ -612,7 +612,7 @@ calculate_ecoregion <-
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
-#' calc_modis_daily(
+#' calculate_modis_daily(
 #'   from = mod06l2_warp, # dervied from process_modis() example
 #'   locs = locs,
 #'   locs_id = "id",
@@ -624,7 +624,7 @@ calculate_ecoregion <-
 #' )
 #' }
 #' @export
-calc_modis_daily <- function(
+calculate_modis_daily <- function(
   from = NULL,
   locs = NULL,
   locs_id = "site_id",
@@ -694,7 +694,8 @@ calc_modis_daily <- function(
   name_range <- seq(ncol(extracted) - name_offset + 1, ncol(extracted), 1)
   colnames(extracted)[name_range] <- name_extracted
   extracted$time <- as.POSIXlt(date)
-  if (geom) {
+  check_geom(geom)
+  if (geom %in% c("sf", "terra")) {
     # convert to base date, as terra::vect does not like class "POSIXlt"
     extracted$time <- as.Date.POSIXlt(extracted$time)
     # location ID with geometry
@@ -759,11 +760,11 @@ calc_modis_daily <- function(
 #' Higher values will expedite processing, but will increase memory usage.
 #' Maximum possible value is `2^31 - 1`.
 #' See [`exactextractr::exact_extract`] for details.
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Arguments passed to `preprocess`.
-#' @description `calculate_modis_par` essentially runs [`calc_modis_daily`] function
+#' @description `calculate_modis_par` essentially runs [`calculate_modis_daily`] function
 #' in each thread (subprocess). Based on daily resolution, each day's workload
 #' will be distributed to each thread. With `product` argument,
 #' the files are processed by a customized function where the unique structure
@@ -806,7 +807,7 @@ calc_modis_daily <- function(
 #'
 #' This function leverages the calculation of single-day MODIS
 #' covariates:
-#' * [`calc_modis_daily()`]
+#' * [`calculate_modis_daily()`]
 #'
 #' Also, for preprocessing, please refer to:
 #' * [`process_modis_merge()`]
@@ -860,6 +861,7 @@ calculate_modis_par <-
     geom = FALSE,
     ...
   ) {
+    check_geom(geom)
     if (!is.function(preprocess)) {
       stop("preprocess should be one of process_modis_merge,
 process_modis_swath, or process_blackmarble.")
@@ -960,7 +962,7 @@ process_modis_swath, or process_blackmarble.")
                           radius[k])
                 extracted <-
                   try(
-                    calc_modis_daily(
+                    calculate_modis_daily(
                       locs = locs_input,
                       from = vrt_today,
                       locs_id = locs_id,
@@ -1000,14 +1002,14 @@ process_modis_swath, or process_blackmarble.")
         future.seed = TRUE
       )
     calc_results <- do.call(dplyr::bind_rows, calc_results)
-    if (geom) {
+    if (geom %in% c("sf", "terra")) {
       # merge
       calc_results_return <- merge(
-        locs,
+        locs_input,
         calc_results,
         by = locs_id
       )
-      if ("sf" %in% class(calc_results_return)) {
+      if (geom == "terra") {
         calc_results_return <- terra::vect(calc_results_return)
       }
     } else {
@@ -1029,9 +1031,9 @@ process_modis_swath, or process_blackmarble.")
 #'  Default is `"site_id"`.
 #' @param year integer. Year domain to dummify.
 #'  Default is \code{seq(2018L, 2022L)}.
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders.
 #' @return a data.frame or SpatVector object
 #' @author Insang Song
@@ -1059,6 +1061,7 @@ calculate_temporal_dummies <-
     geom = FALSE,
     ...
   ) {
+    check_geom(geom)
     if (!methods::is(locs, "data.frame")) {
       stop("Argument locs is not a data.frame.\n")
     }
@@ -1133,9 +1136,9 @@ calculate_temporal_dummies <-
 #' Distance at which the source concentration is reduced to
 #'  `exp(-3)` (approximately -95 %)
 #' @param target_fields character(varying). Field names in characters.
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @return a data.frame (tibble) or SpatVector object with input field names with
 #'  a suffix \code{"_sedc"} where the sums of EDC are stored.
 #'  Additional attributes are attached for the EDC information.
@@ -1194,6 +1197,7 @@ sum_edc <-
     target_fields = NULL,
     geom = FALSE
   ) {
+    check_geom(geom)
     if (!methods::is(locs, "SpatVector")) {
       locs <- try(terra::vect(locs))
     }
@@ -1265,7 +1269,7 @@ The result may not be accurate.\n",
     names(res_sedc)[idx_air] <-
       sprintf("%s_%05d", names(res_sedc)[idx_air], sedc_bandwidth)
 
-    if (geom) {
+    if (geom %in% c("sf", "terra")) {
       res_sedc <- merge(
         terra::as.data.frame(locs, geom = "WKT")[, c("site_id", "geometry")],
         res_sedc,
@@ -1300,9 +1304,9 @@ The result may not be accurate.\n",
 #'  Default is `"site_id"`.
 #' @param radius Circular buffer radius.
 #' Default is \code{c(1000, 10000, 50000)} (meters)
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders.
 #' @author Insang Song, Mariana Kassien
 #' @return a data.frame or SpatVector object
@@ -1344,6 +1348,7 @@ calculate_tri <- function(
   geom = FALSE,
   ...
 ) {
+  check_geom(geom)
   if (!methods::is(locs, "SpatVector")) {
     if (methods::is(locs, "sf")) {
       locs <- terra::vect(locs)
@@ -1403,9 +1408,9 @@ calculate_tri <- function(
 #' @param locs sf/SpatVector. Locations at NEI values are joined.
 #' @param locs_id character(1). Unique site identifier column name.
 #' Unused but kept for compatibility.
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders.
 #' @author Insang Song, Ranadeep Daw
 #' @seealso [`process_nei`]
@@ -1433,6 +1438,7 @@ calculate_nei <- function(
   geom = FALSE,
   ...
 ) {
+  check_geom(geom)
   if (!methods::is(locs, "SpatVector")) {
     locs <- try(terra::vect(locs))
     if (inherits(locs, "try-error")) {
@@ -1467,9 +1473,9 @@ calculate_nei <- function(
 #' containing identifier for each unique coordinate location.
 #' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0).
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders.
 #' @seealso [process_hms()]
 #' @author Mitchell Manware
@@ -1504,6 +1510,7 @@ calculate_hms <- function(
   #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all densities, locs and dates
   if (is.character(from)) {
+    check_geom(geom)
     message(paste0(
       "Inherited list of dates due to absent smoke plume polygons.\n"
     ))
@@ -1636,7 +1643,7 @@ calculate_hms <- function(
 
   #### define column names
   colname_common <- c(locs_id, "time", binary_colname)
-  if (geom) {
+  if (geom %in% c("sf", "terra")) {
     sites_extracted <-
       merge(sites_extracted,
             sites_id,
@@ -1700,9 +1707,9 @@ calculate_hms <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [`process_gmted()`]
@@ -1788,7 +1795,7 @@ calculate_gmted <- function(
     "_",
     sprintf("%05d", as.integer(radius))
   )
-  if (geom) {
+  if (geom %in% c("sf", "terra")) {
     #### convert integer to numeric
     sites_extracted[, 4] <- as.numeric(sites_extracted[, 4])
     names(sites_extracted) <- c(locs_id, "geometry", "time", variable_name)
@@ -1823,9 +1830,9 @@ calculate_gmted <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [`process_narr`]
@@ -1917,9 +1924,9 @@ calculate_narr <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @seealso [process_geos()]
@@ -2002,9 +2009,9 @@ calculate_geos <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [process_sedac_population()]
@@ -2104,9 +2111,9 @@ calculate_sedac_population <- function(
 #' (Default = 1000).
 #' @param fun function(1). Function used to summarize the length of roads
 #' within sites location buffer (Default is `sum`).
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders.
 # nolint start
 #' @note Unit is km / sq km. The returned `data.frame` object contains a
@@ -2198,7 +2205,7 @@ calculate_sedac_groads <- function(
     )
   #### time period
   from_clip$description <- "1980 - 2010"
-  if (geom) {
+  if (geom %in% c("sf", "terra")) {
     from_clip$geometry <- sites_list[[2]]$geometry
     from_clip_reorder <- from_clip[, c(1, 5, 4, 2, 3)]
   } else {
@@ -2229,9 +2236,9 @@ calculate_sedac_groads <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [calculate_geos()], [process_merra2()]
@@ -2321,9 +2328,9 @@ calculate_merra2 <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @seealso [`process_gridmet()`]
@@ -2404,9 +2411,9 @@ calculate_gridmet <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param geom logical(1). Should the function return a `SpatVector`?
-#' Default is `FALSE`. The coordinate reference system of the `SpatVector` is
-#' that of `from.`
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders.
 #' @note
 #' TerraClimate data has monthly temporal resolution, so the `$time` column
@@ -2536,11 +2543,12 @@ calculate_lagged <- function(
     locs_id,
     time_id = "time",
     geom = FALSE) {
+  check_geom(geom)
   #### check years
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### geom and from
-  if (geom && !("SpatVector" %in% class(from))) {
+  if (geom %in% c("sf", "terra") && !("SpatVector" %in% class(from))) {
     stop(
       paste0(
         "To return with geometry, `from` must be a `SpatVector` object.\n"
@@ -2606,7 +2614,7 @@ calculate_lagged <- function(
     #### merge with other locations
     variables_merge <- rbind(variables_merge, variables_return_date)
   }
-  if (geom) {
+  if (geom %in% c("sf", "terra")) {
     variables_merge <- merge(variables_merge, geoms)
   }
   variables_return <- calc_return_locs(

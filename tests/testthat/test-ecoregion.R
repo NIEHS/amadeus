@@ -208,18 +208,42 @@ testthat::test_that("calculate_ecoregion", {
   )
 
   testthat::expect_no_error(
-    ecor_geom <- calculate_ecoregion(
+    ecor_terra <- calculate_ecoregion(
+      from = erras,
+      locs = site_faux,
+      locs_id = "site_id",
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(ecor_terra), 4
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(ecor_terra)
+  )
+
+  testthat::expect_no_error(
+    ecor_sf <- calculate_ecoregion(
+      from = erras,
+      locs = site_faux,
+      locs_id = "site_id",
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(ecor_sf), 5
+  )
+  testthat::expect_true(
+    "sf" %in% class(ecor_sf)
+  )
+
+  testthat::expect_error(
+    calculate_ecoregion(
       from = erras,
       locs = site_faux,
       locs_id = "site_id",
       geom = TRUE
     )
-  )
-  testthat::expect_equal(
-    ncol(ecor_geom), 4
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(ecor_geom)
   )
 })
 # nolint end

@@ -711,10 +711,10 @@ testthat::test_that("calculate_modis_par", {
     )
   )
 
-  # with geometry
+  # with geometry terra
   testthat::expect_no_error(
     suppressWarnings(
-      calc_mod11_geom <-
+      calc_mod11_terra <-
         calculate_modis_par(
           from = path_mod11,
           locs = sf::st_as_sf(site_faux),
@@ -724,11 +724,45 @@ testthat::test_that("calculate_modis_par", {
           name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
           subdataset = "(LST_)",
           nthreads = 1L,
-          geom = TRUE
+          geom = "terra"
         )
     )
   )
-  testthat::expect_s4_class(calc_mod11_geom, "SpatVector")
+  testthat::expect_s4_class(calc_mod11_terra, "SpatVector")
+
+  # with geometry sf
+  testthat::expect_no_error(
+    suppressWarnings(
+      calc_mod11_sf <-
+        calculate_modis_par(
+          from = path_mod11,
+          locs = sf::st_as_sf(site_faux),
+          preprocess = process_modis_merge,
+          package_list_add = c("MASS"),
+          export_list_add = c("aux"),
+          name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
+          subdataset = "(LST_)",
+          nthreads = 1L,
+          geom = "sf"
+        )
+    )
+  )
+  testthat::expect_true("sf" %in% class(calc_mod11_sf))
+
+  # with geometry error
+  testthat::expect_error(
+      calculate_modis_par(
+        from = path_mod11,
+        locs = sf::st_as_sf(site_faux),
+        preprocess = process_modis_merge,
+        package_list_add = c("MASS"),
+        export_list_add = c("aux"),
+        name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
+        subdataset = "(LST_)",
+        nthreads = 1L,
+        geom = TRUE
+      )
+  )
 
   # case 2: swath mod06l2
   path_mod06 <-
@@ -762,10 +796,10 @@ testthat::test_that("calculate_modis_par", {
   )
   testthat::expect_s3_class(calc_mod06, "data.frame")
 
-  # with geometry
+  # with geometry terra
   testthat::expect_no_error(
     suppressWarnings(
-      calc_mod06_geom <-
+      calc_mod06_terra <-
         calculate_modis_par(
           from = path_mod06,
           locs = site_faux,
@@ -773,11 +807,41 @@ testthat::test_that("calculate_modis_par", {
           preprocess = process_modis_swath,
           name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_"),
           nthreads = 1,
-          geom = TRUE
+          geom = "terra"
         )
     )
   )
-  testthat::expect_s4_class(calc_mod06_geom, "SpatVector")
+  testthat::expect_s4_class(calc_mod06_terra, "SpatVector")
+
+  # with geometry sf
+  testthat::expect_no_error(
+    suppressWarnings(
+      calc_mod06_sf <-
+        calculate_modis_par(
+          from = path_mod06,
+          locs = site_faux,
+          subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+          preprocess = process_modis_swath,
+          name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_"),
+          nthreads = 1,
+          geom = "sf"
+        )
+    )
+  )
+  testthat::expect_true("sf" %in% class(calc_mod06_sf))
+
+  # with geometry error
+  testthat::expect_error(
+    calculate_modis_par(
+      from = path_mod06,
+      locs = site_faux,
+      subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
+      preprocess = process_modis_swath,
+      name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_"),
+      nthreads = 1,
+      geom = TRUE
+    )
+  )
 
   # case 3: VIIRS
   path_vnp46 <-
@@ -810,10 +874,10 @@ testthat::test_that("calculate_modis_par", {
   )
   testthat::expect_s3_class(calc_vnp46, "data.frame")
 
-  # with geometry (as SpatVector)
+  # with geometry terra
   testthat::expect_no_error(
     suppressWarnings(
-      calc_vnp46_geom_v <-
+      calc_vnp46_terra <-
         calculate_modis_par(
           from = path_vnp46,
           locs = site_faux,
@@ -822,17 +886,17 @@ testthat::test_that("calculate_modis_par", {
           subdataset = 3L,
           nthreads = 1,
           tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
-          geom = TRUE
+          geom = "terra"
         )
     )
   )
-  testthat::expect_s4_class(calc_vnp46_geom_v, "SpatVector")
+  testthat::expect_s4_class(calc_vnp46_terra, "SpatVector")
 
 
-  # with geometry (as sf)
+  # with geometry sf
   testthat::expect_no_error(
     suppressWarnings(
-      calc_vnp46_geom_sf <-
+      calc_vnp46_sf <-
         calculate_modis_par(
           from = path_vnp46,
           locs = sf::st_as_sf(site_faux),
@@ -841,11 +905,25 @@ testthat::test_that("calculate_modis_par", {
           subdataset = 3L,
           nthreads = 1,
           tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
-          geom = TRUE
+          geom = "sf"
         )
     )
   )
-  testthat::expect_s4_class(calc_vnp46_geom_sf, "SpatVector")
+  testthat::expect_true("sf" %in% class(calc_vnp46_sf))
+
+  # with geometry error
+  testthat::expect_error(
+    calculate_modis_par(
+      from = path_vnp46,
+      locs = sf::st_as_sf(site_faux),
+      preprocess = process_blackmarble,
+      name_covariates = c("MOD_NITLT_0_"),
+      subdataset = 3L,
+      nthreads = 1,
+      tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
+      geom = TRUE
+    )
+  )
 
   # error cases
   testthat::expect_error(
@@ -869,28 +947,28 @@ testthat::test_that("calculate_modis_par", {
   site_faux_r <- site_faux
   names(site_faux_r)[1] <- "ID"
   testthat::expect_error(
-    calc_modis_daily(
+    calculate_modis_daily(
       from = rast(nrow = 3, ncol = 3),
       date = "2021-08-15",
       locs = site_faux_r
     )
   )
   testthat::expect_error(
-    calc_modis_daily(
+    calculate_modis_daily(
       from = rast(nrow = 3, ncol = 3),
       date = "2021-08-15",
       locs = matrix(c(1, 3, 4, 5), nrow = 2)
     )
   )
   testthat::expect_error(
-    calc_modis_daily(
+    calculate_modis_daily(
       from = rast(nrow = 3, ncol = 3),
       date = "2021-08-15",
       locs = sf::st_as_sf(site_faux)
     )
   )
   testthat::expect_error(
-    calc_modis_daily(
+    calculate_modis_daily(
       from = terra::rast(nrow = 3, ncol = 3, vals = 1:9, names = "a"),
       date = "2021-08-15",
       locs = array(1:12, dim = c(2, 2, 3))
@@ -899,7 +977,7 @@ testthat::test_that("calculate_modis_par", {
   site_faux0 <- site_faux
   names(site_faux0)[2] <- "date"
   testthat::expect_error(
-    calc_modis_daily(
+    calculate_modis_daily(
       from = rast(nrow = 3, ncol = 3),
       date = "2021-08-15",
       locs = sf::st_as_sf(site_faux0)
@@ -921,7 +999,7 @@ testthat::test_that("calculate_modis_par", {
     )
 
   testthat::expect_no_error(
-    calc_modis_daily(
+    calculate_modis_daily(
       from = mcd_merge,
       date = "2021-08-15",
       locs = sf::st_as_sf(site_faux2),
@@ -930,18 +1008,31 @@ testthat::test_that("calculate_modis_par", {
     )
   )
 
-  # test calc_modis_daily directly with geometry
+  # test calculate_modis_daily directly with geometry terra
   testthat::expect_no_error(
-    calc_mod_geom <- calc_modis_daily(
+    calc_mod_terra <- calculate_modis_daily(
       from = mcd_merge,
       date = "2021-08-15",
       locs = sf::st_as_sf(site_faux2),
       radius = 1000,
       name_extracted = "MCD_EXTR_1K_",
-      geom = TRUE
+      geom = "terra"
     )
   )
-  testthat::expect_s4_class(calc_mod_geom, "SpatVector")
+  testthat::expect_s4_class(calc_mod_terra, "SpatVector")
+
+  # test calculate_modis_daily directly with geometry sf
+  testthat::expect_no_error(
+    calc_mod_sf <- calculate_modis_daily(
+      from = mcd_merge,
+      date = "2021-08-15",
+      locs = sf::st_as_sf(site_faux2),
+      radius = 1000,
+      name_extracted = "MCD_EXTR_1K_",
+      geom = "sf"
+    )
+  )
+  testthat::expect_true("sf" %in% class(calc_mod_sf))
 
   testthat::expect_error(
     calculate_modis_par(from = site_faux)

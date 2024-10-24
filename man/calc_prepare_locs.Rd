@@ -21,7 +21,8 @@ Passed from \code{calc_\*()}.}
 (Default = 0). Passed from \code{calc_\*()}.}
 
 \item{geom}{logical(1). Should the geometry of \code{locs} be returned in the
-\code{data.frame}? Default is \code{FALSE}.}
+\code{data.frame}? Default is \code{FALSE}, options "sf" or "terra" will preserve
+geometry, but will use \code{terra} for extraction.}
 }
 \value{
 A \code{list} containing \code{SpatVector} and \code{data.frame} objects

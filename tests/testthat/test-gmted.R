@@ -1,6 +1,7 @@
 ################################################################################
 ##### unit and integration tests for USGS GMTED functions
 
+################################################################################
 ##### download_gmted
 testthat::test_that("download_gmted", {
   withr::local_package("httr")
@@ -85,8 +86,8 @@ testthat::test_that("download_gmted", {
   }
 })
 
+################################################################################
 ##### process_gmted
-# test GMTED ####
 testthat::test_that("process_gmted (no errors)", {
   withr::local_package("terra")
   statistics <- c(
@@ -200,7 +201,8 @@ testthat::test_that("process_gmted_codes (auxiliary)", {
   testthat::expect_equal(resoorig, "7.5 arc-seconds")
 })
 
-##### calculate_gmted
+################################################################################
+##### download_gmted
 testthat::test_that("calculate_gmted", {
   withr::local_package("terra")
   statistics <- c(
@@ -270,17 +272,41 @@ testthat::test_that("calculate_gmted", {
     )
   )
   testthat::expect_no_error(
-    gmted_geom <- calculate_gmted(
+    gmted_terra <- calculate_gmted(
+      gmted,
+      ncp,
+      "site_id",
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(gmted_terra), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(gmted_terra)
+  )
+
+  testthat::expect_no_error(
+    gmted_sf <- calculate_gmted(
+      gmted,
+      ncp,
+      "site_id",
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(gmted_sf), 4
+  )
+  testthat::expect_true(
+    "sf" %in% class(gmted_sf)
+  )
+
+  testthat::expect_error(
+    calculate_gmted(
       gmted,
       ncp,
       "site_id",
       geom = TRUE
     )
-  )
-  testthat::expect_equal(
-    ncol(gmted_geom), 3
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(gmted_geom)
   )
 })

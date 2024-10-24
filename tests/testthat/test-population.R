@@ -243,9 +243,44 @@ testthat::test_that("calculate_sedac_population", {
       )
     }
   }
-  # with included geometry
+  # with included geometry terra
   testthat::expect_no_error(
-    pop_covariate_geom <- calculate_sedac_population(
+    pop_covariate_terra <- calculate_sedac_population(
+      from = pop,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(pop_covariate_terra), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(pop_covariate_terra)
+  )
+
+  # with included geometry sf
+  testthat::expect_no_error(
+    pop_covariate_sf <- calculate_sedac_population(
+      from = pop,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(pop_covariate_sf), 4
+  )
+  testthat::expect_true(
+    "sf" %in% class(pop_covariate_sf)
+  )
+
+  testthat::expect_error(
+    calculate_sedac_population(
       from = pop,
       locs = ncp,
       locs_id = "site_id",
@@ -253,11 +288,5 @@ testthat::test_that("calculate_sedac_population", {
       fun = "mean",
       geom = TRUE
     )
-  )
-  testthat::expect_equal(
-    ncol(pop_covariate_geom), 3
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(pop_covariate_geom)
   )
 })

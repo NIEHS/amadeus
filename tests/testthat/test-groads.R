@@ -133,20 +133,47 @@ testthat::test_that("calculate_groads", {
   # expect data.frame
   testthat::expect_s3_class(groads_res, "data.frame")
 
-  # return with geometry
+  # return with geometry terra
   testthat::expect_no_error(
-    groads_geom <- calculate_sedac_groads(
+    groads_terra <- calculate_sedac_groads(
+      from = groads,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 5000,
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(groads_terra), 4
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(groads_terra)
+  )
+
+  # return with geometry sf
+  testthat::expect_no_error(
+    groads_sf <- calculate_sedac_groads(
+      from = groads,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 5000,
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(groads_sf), 5
+  )
+  testthat::expect_true(
+    "sf" %in% class(groads_sf)
+  )
+
+  testthat::expect_error(
+    calculate_sedac_groads(
       from = groads,
       locs = ncp,
       locs_id = "site_id",
       radius = 5000,
       geom = TRUE
     )
-  )
-  testthat::expect_equal(
-    ncol(groads_geom), 4
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(groads_geom)
   )
 })
