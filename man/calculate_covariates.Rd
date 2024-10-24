@@ -75,7 +75,7 @@ calculate_covariates(
 \item \code{\link{calculate_nei}}: "nei", "NEI"
 \item \code{\link{calculate_merra2}}: "merra", "MERRA", "merra2", "MERRA2"
 \item \code{\link{calculate_gridmet}}: "gridMET", "gridmet"
-\item \code{\link{calculate_climate}}: "terraclimate", "TerraClimate"
+\item \code{\link{calculate_terraclimate}}: "terraclimate", "TerraClimate"
 }
 }
 \author{

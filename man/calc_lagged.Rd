@@ -46,7 +46,7 @@ lag, buffer radius format adopted in \code{calc_setcolumns()}.
 ##       amount of data which is not included in the package.
 \dontrun{
 loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-terracliamte_covar <- calculate_climate(
+terracliamte_covar <- calculate_terraclimate(
   from = terraclimate, # derived from process_terraclimate() example
   locs = loc,
   locs_id = "id",

@@ -33,7 +33,7 @@
 #' * \code{\link{calculate_nei}}: "nei", "NEI"
 #' * \code{\link{calculate_merra2}}: "merra", "MERRA", "merra2", "MERRA2"
 #' * \code{\link{calculate_gridmet}}: "gridMET", "gridmet"
-#' * \code{\link{calculate_climate}}: "terraclimate", "TerraClimate"
+#' * \code{\link{calculate_terraclimate}}: "terraclimate", "TerraClimate"
 #' @return Calculated covariates as a data.frame or SpatVector object
 #' @author Insang Song
 #' @examples
@@ -96,7 +96,7 @@ calculate_covariates <-
       merra = calculate_merra2,
       merra2 = calculate_merra2,
       gridmet = calculate_gridmet,
-      terraclimate = calculate_climate
+      terraclimate = calculate_terraclimate
     )
 
     res_covariate <-
@@ -2426,7 +2426,7 @@ calculate_gridmet <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calculate_climate(
+#' calculate_terraclimate(
 #'   from = terraclimate, # derived from process_terraclimate() example
 #'   locs = loc,
 #'   locs_id = "id",
@@ -2436,7 +2436,7 @@ calculate_gridmet <- function(
 #' )
 #' }
 #' @export
-calculate_climate <- function(
+calculate_terraclimate <- function(
     from = NULL,
     locs = NULL,
     locs_id = NULL,
@@ -2511,7 +2511,7 @@ calculate_climate <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' terracliamte_covar <- calculate_climate(
+#' terracliamte_covar <- calculate_terraclimate(
 #'   from = terraclimate, # derived from process_terraclimate() example
 #'   locs = loc,
 #'   locs_id = "id",
