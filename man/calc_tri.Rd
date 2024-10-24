@@ -55,7 +55,7 @@ calc_tri(
 }
 }
 \seealso{
-\code{\link{calc_sedc}}, \code{\link{process_tri}}
+\code{\link{sum_edc}}, \code{\link{process_tri}}
 }
 \author{
 Insang Song, Mariana Kassien

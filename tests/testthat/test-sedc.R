@@ -2,8 +2,8 @@
 ##### unit and integration tests for Sum of Exponential Decay functions
 
 ################################################################################
-##### calc_sedc
-testthat::test_that("calc_sedc", {
+##### sum_edc
+testthat::test_that("sum_edc", {
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_package("dplyr")
@@ -27,7 +27,7 @@ testthat::test_that("calc_sedc", {
   targcols <- grep("FUGITIVE_", names(tri_r), value = TRUE)
   testthat::expect_no_error(
     tri_sedc <-
-      calc_sedc(
+      sum_edc(
         locs = ncpt,
         from = tri_r,
         locs_id = "site_id",
@@ -38,7 +38,7 @@ testthat::test_that("calc_sedc", {
   testthat::expect_s3_class(tri_sedc, "data.frame")
 
   testthat::expect_no_error(
-    calc_sedc(
+    sum_edc(
       locs = sf::st_as_sf(ncpt),
       from = sf::st_as_sf(tri_r),
       locs_id = "site_id",
@@ -49,7 +49,7 @@ testthat::test_that("calc_sedc", {
 
   # with geometry
   testthat::expect_no_error(
-    tri_sedc_geom <- calc_sedc(
+    tri_sedc_geom <- sum_edc(
       locs = ncpt,
       from = tri_r,
       locs_id = "site_id",
@@ -64,7 +64,7 @@ testthat::test_that("calc_sedc", {
   ncpta <- ncpt
   ncpta$YEAR <- 2018
   testthat::expect_warning(
-    calc_sedc(
+    sum_edc(
       locs = ncpta,
       from = sf::st_as_sf(tri_r),
       locs_id = "site_id",

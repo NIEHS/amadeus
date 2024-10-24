@@ -1170,7 +1170,7 @@ calc_temporal_dummies <-
 #' pnt_from$val2 <- rgamma(10L, 2, 1)
 #'
 #' vals <- c("val1", "val2")
-#' calc_sedc(pnt_locs, pnt_from, "NAME", 1e4, vals)
+#' sum_edc(pnt_locs, pnt_from, "NAME", 1e4, vals)
 #' @importFrom dplyr as_tibble
 #' @importFrom dplyr left_join
 #' @importFrom dplyr summarize
@@ -1185,7 +1185,7 @@ calc_temporal_dummies <-
 #' @importFrom rlang sym
 #' @export
 # nolint end
-calc_sedc <-
+sum_edc <-
   function(
     from = NULL,
     locs = NULL,
@@ -1307,7 +1307,7 @@ The result may not be accurate.\n",
 #' @author Insang Song, Mariana Kassien
 #' @return a data.frame or SpatVector object
 #' @note U.S. context.
-#' @seealso [`calc_sedc`], [`process_tri`]
+#' @seealso [`sum_edc`], [`process_tri`]
 #' @importFrom terra vect
 #' @importFrom terra crs
 #' @importFrom terra nearby
@@ -1365,7 +1365,7 @@ calc_tri <- function(
     Map(
       function(x) {
         locs_tri_s <-
-          calc_sedc(
+          sum_edc(
             locs = locs_re,
             from = from,
             locs_id = locs_id,
