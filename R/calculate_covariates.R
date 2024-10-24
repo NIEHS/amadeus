@@ -2480,7 +2480,7 @@ calculate_terraclimate <- function(
 # nolint start
 #' Calculate temporally lagged covariates
 #' @description
-#' The \code{calc_lagged()} function calculates daily temporal lagged covariates
+#' The \code{calculate_lagged()} function calculates daily temporal lagged covariates
 #' from the output of \code{calculate_covariates()} or \code{calc_*()}.
 #' @param from data.frame(1). A `data.frame` containing calculated covariates
 #' returned from \code{calculate_covariates()} or \code{calc_*()}.
@@ -2498,9 +2498,9 @@ calculate_terraclimate <- function(
 #' least the number of lag days before the desired start date. For example, if
 #' `date = c("2024-01-01", "2024-01-31)` and `lag = 1`, `from` must contain data
 #' starting at 2023-12-31.
-#' If `from` contains geometry features, `calc_lagged` will return a column
+#' If `from` contains geometry features, `calculate_lagged` will return a column
 #' with geometry features of the same name.
-#' \code{calc_lagged()} assumes that all columns other than `time_id`,
+#' \code{calculate_lagged()} assumes that all columns other than `time_id`,
 #' `locs_id`, and fixed columns of "lat" and "lon", follow the genre, variable,
 #' lag, buffer radius format adopted in \code{calc_setcolumns()}.
 #' @return a `data.frame` object
@@ -2519,7 +2519,7 @@ calculate_terraclimate <- function(
 #'   fun = "mean",
 #'   geom = FALSE
 #' )
-#' calc_lagged(
+#' calculate_lagged(
 #'   from = terracliamte_covar,
 #'   locs_id = "id",
 #'   date = c("2023-01-02", "2023-01-10"),
@@ -2529,7 +2529,7 @@ calculate_terraclimate <- function(
 #' }
 # nolint end
 #' @export
-calc_lagged <- function(
+calculate_lagged <- function(
     from,
     date,
     lag,

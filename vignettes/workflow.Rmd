@@ -84,13 +84,13 @@ time        : 2021-12-28 to 2022-01-03 UTC\n"
 
 ## Calculate covariates
 
-Calculate covariates for North Carolina county boundaries with `calc_covariates`.
+Calculate covariates for North Carolina county boundaries with `calculate_covariates`.
 County boundaries are accessed with the `tigris::counties` function.\insertRef{package_tigris}
 `geom = TRUE` will return the covariates as a `SpatVector` object.
 
 ```{r, eval = FALSE}
 library(tigris)
-temp_covar <- calc_covariates(
+temp_covar <- calculate_covariates(
   covariate = "narr",
   from = temp_process,
   locs = tigris::counties("NC", year = 2021),

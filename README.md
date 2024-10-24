@@ -113,13 +113,13 @@ time        : 2022-01-01 to 2022-01-05 UTC
 
 ## Calculate Covariates
 
-`calc_covariates` stems from the [`beethoven`](https://github.com/NIEHS/beethoven) project's need for various types of data extracted at precise locations. `calc_covariates`, therefore, extracts data from the "cleaned" `SpatRaster` or `SpatVector` object at user defined locations. Users can choose to buffer the locations. The function returns a `data.frame` or `SpatVector` with data extracted at all locations for each layer or row in the `SpatRaster` or `SpatVector` object, respectively.
+`calculate_covariates` stems from the [`beethoven`](https://github.com/NIEHS/beethoven) project's need for various types of data extracted at precise locations. `calculate_covariates`, therefore, extracts data from the "cleaned" `SpatRaster` or `SpatVector` object at user defined locations. Users can choose to buffer the locations. The function returns a `data.frame` or `SpatVector` with data extracted at all locations for each layer or row in the `SpatRaster` or `SpatVector` object, respectively.
 
-Example of `calc_covariates` using processed "weasd" data.
+Example of `calculate_covariates` using processed "weasd" data.
 
 ```r
 locs <- data.frame(id = "001", lon = -78.8277, lat = 35.95013)
-weasd_covar <- calc_covariates(
+weasd_covar <- calculate_covariates(
   covariate = "narr",
   from = weasd_process,
   locs = locs,
