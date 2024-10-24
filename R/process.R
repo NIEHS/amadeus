@@ -41,7 +41,7 @@
 #' \dontrun{
 #' process_covariates(
 #'   covariate = "narr",
-#'   date = c("2018-01-01", "2018-01-01"),
+#'   date = c("2018-01-01", "2018-01-10"),
 #'   variable = "weasd",
 #'   path = system.file("extdata", "examples", "narr", "weasd")
 #' )
@@ -1135,7 +1135,7 @@ process_nei <- function(
 #' the internal procedure of this function keeps "Included" if there
 #' are multiple event types per site-time.
 #' @param path character(1). Directory path to daily measurement data.
-#' @param date character(2). Start and end date.
+#' @param date character(1 or 2). Date (1) or start and end dates (2).
 #'  Should be in `"YYYY-MM-DD"` format and sorted.
 #' @param mode character(1). One of
 #'   * "date-location" (all dates * all locations)
@@ -1191,7 +1191,11 @@ process_aqs <-
         stop("date has invalid format(s). Please check the values.")
       }
       if (length(date) != 2) {
-        stop("date should be a character vector of length 2.")
+        if (length(date) == 1) {
+          date <- c(date, date)
+        } else {
+          stop("date should be a character vector of length 1 or 2.")
+        }
       }
     } else {
       stop("date should be defined.")
@@ -1456,8 +1460,7 @@ process_sedac_groads <- function(
 #' @description
 #' The \code{process_hms()} function imports and cleans raw wildfire smoke
 #' plume coverage data, returning a single `SpatVector` object. 
-#' @param date character(2). length of 10 each.
-#' Start/end date of downloaded data.
+#' @param date character(1 or 2). Date (1) or start and end dates (2).
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
 #' @param path character(1). Directory with downloaded NOAA HMS data files.
 #' @param extent numeric(4) or SpatExtent giving the extent of the output
@@ -1484,7 +1487,7 @@ process_sedac_groads <- function(
 #' @importFrom stats na.omit
 #' @export
 process_hms <- function(
-    date = c("2018-01-01", "2018-01-01"),
+    date = "2018-01-01",
     path = NULL,
     extent = NULL,
     ...) {
@@ -1493,6 +1496,7 @@ process_hms <- function(
   #### check for variable
   check_for_null_parameters(mget(ls()))
   #### check dates
+  if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### identify file paths
@@ -1789,8 +1793,7 @@ process_gmted <- function(
 #' @description
 #' The \code{process_narr()} function imports and cleans raw meteorological
 #' data, returning a single `SpatRaster` object.
-#' @param date character(2). length of 10 each.
-#' Start/end date of downloaded data.
+#' @param date character(1 or 2). Date (1) or start and end dates (2).
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
 #' @param variable character(1). Variable name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
@@ -1812,7 +1815,7 @@ process_gmted <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' process_narr(
-#'   date = c("2018-01-01", "2018-01-01"),
+#'   date = c("2018-01-01", "2018-01-10"),
 #'   variable = "weasd",
 #'   path = "./tests/testdata/narr/weasd"
 #' )
@@ -1820,7 +1823,7 @@ process_gmted <- function(
 #' @export
 # nolint end
 process_narr <- function(
-    date = c("2023-09-01", "2023-09-01"),
+    date = "2023-09-01",
     variable = NULL,
     path = NULL,
     extent = NULL,
@@ -1830,6 +1833,7 @@ process_narr <- function(
   #### check for variable
   check_for_null_parameters(mget(ls()))
   #### check dates
+  if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### identify file paths
@@ -2041,7 +2045,8 @@ process_narr <- function(
 #' @description
 #' The \code{process_geos()} function imports and cleans raw atmospheric
 #' composition data, returning a single `SpatRaster` object.
-#' @param date character(2). length of 10. Format "YYYY-MM-DD".
+#' @param date character(1 or 2). Date (1) or start and end dates (2).
+#' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
 #' @param variable character(1). GEOS-CF variable name(s).
 #' @param path character(1). Directory with downloaded netCDF (.nc4) files.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
@@ -2069,7 +2074,7 @@ process_narr <- function(
 #' }
 #' @export
 process_geos <-
-  function(date = c("2018-01-01", "2018-01-01"),
+  function(date = c("2018-01-01", "2018-01-10"),
            variable = NULL,
            path = NULL,
            extent = NULL,
@@ -2079,6 +2084,7 @@ process_geos <-
     #### check for variable
     check_for_null_parameters(mget(ls()))
     #### check dates
+    if (length(date) == 1) date <- c(date, date)
     stopifnot(length(date) == 2)
     date <- date[order(as.Date(date))]
     #### identify file paths
@@ -2233,7 +2239,8 @@ process_geos <-
 #' @description
 #' The \code{process_merra2()} function imports and cleans raw atmospheric
 #' composition data, returning a single `SpatRaster` object.
-#' @param date character(2). length of 10. Format "YYYY-MM-DD".
+#' @param date character(1 or 2). Date (1) or start and end dates (2).
+#' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
 #' @param variable character(1). MERRA2 variable name(s).
 #' @param path character(1). Directory with downloaded netCDF (.nc4) files.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
@@ -2263,7 +2270,7 @@ process_geos <-
 #' }
 #' @export
 process_merra2 <-
-  function(date = c("2018-01-01", "2018-01-01"),
+  function(date = c("2018-01-01", "2018-01-10"),
            variable = NULL,
            path = NULL,
            extent = NULL,
@@ -2273,6 +2280,7 @@ process_merra2 <-
     #### check for variable
     check_for_null_parameters(mget(ls()))
     #### check dates
+    if (length(date) == 1) date <- c(date, date)
     stopifnot(length(date) == 2)
     date <- date[order(as.Date(date))]
     #### identify file paths
@@ -2423,8 +2431,7 @@ process_merra2 <-
 #' @description
 #' The \code{process_gridmet()} function imports and cleans raw gridded surface meteorological
 #' data, returning a single `SpatRaster` object.
-#' @param date character(2). length of 10 each.
-#' Start/end date of downloaded data.
+#' @param date character(1 or 2). Date (1) or start and end dates (2).
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
 #' @param variable character(1). Variable name or acronym code. See [gridMET Generate Wget File](https://www.climatologylab.org/wget-gridmet.html)
 #' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
@@ -2454,7 +2461,7 @@ process_merra2 <-
 #' @export
 # nolint end
 process_gridmet <- function(
-    date = c("2023-09-01", "2023-09-01"),
+    date = c("2023-09-01", "2023-09-10"),
     variable = NULL,
     path = NULL,
     extent = NULL,
@@ -2462,6 +2469,7 @@ process_gridmet <- function(
   #### directory setup
   path <- download_sanitize_path(path)
   #### check dates
+  if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### check for variable
@@ -2590,8 +2598,7 @@ process_gridmet <- function(
 #' @description
 #' The \code{process_terraclimate()} function imports and cleans climate and water balance
 #' data, returning a single `SpatRaster` object.
-#' @param date character(2). length of 10 each.
-#' Start/end date of downloaded data.
+#' @param date character(1 or 2). Date (1) or start and end dates (2).
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
 #' @param variable character(1). Variable name or acronym code. See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
 #' for variable names and acronym codes.
@@ -2623,7 +2630,7 @@ process_gridmet <- function(
 #' @export
 # nolint end
 process_terraclimate <- function(
-    date = c("2023-09-01", "2023-09-01"),
+    date = c("2023-09-01", "2023-09-10"),
     variable = NULL,
     path = NULL,
     extent = NULL,
@@ -2633,6 +2640,7 @@ process_terraclimate <- function(
   #### check for variable
   check_for_null_parameters(mget(ls()))
   #### check dates
+  if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   variable_checked <- process_variable_codes(

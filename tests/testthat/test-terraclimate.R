@@ -158,6 +158,66 @@ testthat::test_that("process_terraclimate", {
   )
 })
 
+testthat::test_that("process_terraclimate (single date)", {
+  withr::local_package("terra")
+  variable <- "ppt"
+  # expect function
+  expect_true(
+    is.function(process_terraclimate)
+  )
+  terraclimate <-
+    process_terraclimate(
+      date = "2018-01-01",
+      variable = variable,
+      path =
+      testthat::test_path(
+        "..",
+        "testdata",
+        "terraclimate",
+        "ppt"
+      )
+    )
+  # expect output is SpatRaster
+  expect_true(
+    class(terraclimate)[1] == "SpatRaster"
+  )
+  # expect values
+  expect_true(
+    terra::hasValues(terraclimate)
+  )
+  # expect non-null coordinate reference system
+  expect_false(
+    is.null(terra::crs(terraclimate))
+  )
+  # expect lon and lat dimensions to be > 1
+  expect_false(
+    any(c(0, 1) %in% dim(terraclimate)[1:2])
+  )
+  # expect non-numeric and non-empty time
+  expect_false(
+    any(c("", 0) %in% terra::time(terraclimate))
+  )
+  # expect dimensions according to levels
+  expect_true(
+    dim(terraclimate)[3] == 1
+  )
+  # test with cropping extent
+  testthat::expect_no_error(
+    terraclimate_ext <- process_terraclimate(
+      date = "2018-01-01",
+      variable = "ppt",
+      path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "terraclimate",
+          "ppt"
+        ),
+      extent = terra::ext(terraclimate)
+    )
+  )
+})
+
 testthat::test_that("process_terraclimate_codes", {
   # terraclimate
   tc1 <- process_terraclimate_codes("all")

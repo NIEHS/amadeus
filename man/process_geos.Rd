@@ -5,7 +5,7 @@
 \title{Process atmospheric composition data}
 \usage{
 process_geos(
-  date = c("2018-01-01", "2018-01-01"),
+  date = c("2018-01-01", "2018-01-10"),
   variable = NULL,
   path = NULL,
   extent = NULL,
@@ -13,7 +13,8 @@ process_geos(
 )
 }
 \arguments{
-\item{date}{character(2). length of 10. Format "YYYY-MM-DD".}
+\item{date}{character(1 or 2). Date (1) or start and end dates (2).
+Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 
 \item{variable}{character(1). GEOS-CF variable name(s).}
 

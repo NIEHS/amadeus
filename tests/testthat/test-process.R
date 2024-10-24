@@ -193,7 +193,7 @@ testthat::test_that("process_locs_vector", {
     )
   # expect error when missing `lat` or `lon`
   expect_error(
-    calc_narr(
+    calculate_narr(
       from = narr,
       locs = subset(
         ncp,
@@ -204,7 +204,7 @@ testthat::test_that("process_locs_vector", {
   )
   # expect error when sites are SpatVector (points)
   expect_no_error(
-    calc_narr(
+    calculate_narr(
       from = narr,
       locs = terra::vect(
         ncp,
@@ -216,7 +216,7 @@ testthat::test_that("process_locs_vector", {
   )
   # expect error when sites are SpatVector (polygons)
   expect_no_error(
-    calc_narr(
+    calculate_narr(
       from = narr,
       locs = terra::buffer(
         terra::vect(
@@ -231,7 +231,7 @@ testthat::test_that("process_locs_vector", {
   )
   # expect error when sites are sf
   expect_no_error(
-    calc_narr(
+    calculate_narr(
       from = narr,
       locs = sf::st_as_sf(
         ncp,

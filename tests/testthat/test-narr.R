@@ -79,6 +79,7 @@ testthat::test_that("narr_variable (expected errors)", {
   )
 })
 
+################################################################################
 ##### process_narr
 testthat::test_that("process_narr", {
   withr::local_package("terra")
@@ -93,7 +94,79 @@ testthat::test_that("process_narr", {
   for (v in seq_along(variables)) {
     narr <-
       process_narr(
-        date = c("2018-01-01", "2018-01-01"),
+        date = c("2018-01-01", "2018-01-05"),
+        variable = variables[v],
+        path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "narr",
+          variables[v]
+        )
+      )
+    # expect output is SpatRaster
+    expect_true(
+      class(narr)[1] == "SpatRaster"
+    )
+    # expect values
+    expect_true(
+      terra::hasValues(narr)
+    )
+    # expect non-null coordinate reference system
+    expect_false(
+      is.null(terra::crs(narr))
+    )
+    # expect lon and lat dimensions to be > 1
+    expect_false(
+      any(c(0, 1) %in% dim(narr)[1:2])
+    )
+    # expect non-numeric and non-empty time
+    expect_false(
+      any(c("", 0) %in% terra::time(narr))
+    )
+    # expect dimensions according to levels
+    if (variables[v] == "weasd") {
+      expect_true(
+        dim(narr)[3] == 5
+      )
+    } else if (variables[v] == "omega") {
+      expect_true(
+        dim(narr)[3] == 145
+      )
+    }
+  }
+  # test with cropping extent
+  testthat::expect_no_error(
+    narr_ext <-
+      process_narr(
+        date = c("2018-01-01", "2018-01-05"),
+        variable = "omega",
+        path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "narr",
+          "omega"
+        ),
+        extent = terra::ext(narr)
+      )
+  )
+})
+
+testthat::test_that("process_narr (single date)", {
+  withr::local_package("terra")
+  variables <- c(
+    "weasd",
+    "omega"
+  )
+  # expect function
+  expect_true(
+    is.function(process_narr)
+  )
+  for (v in seq_along(variables)) {
+    narr <-
+      process_narr(
+        date = "2018-01-01",
         variable = variables[v],
         path =
         testthat::test_path(
@@ -138,7 +211,7 @@ testthat::test_that("process_narr", {
   testthat::expect_no_error(
     narr_ext <-
       process_narr(
-        date = c("2018-01-01", "2018-01-01"),
+        date = "2018-01-01",
         variable = "omega",
         path =
         testthat::test_path(
@@ -152,6 +225,7 @@ testthat::test_that("process_narr", {
   )
 })
 
+################################################################################
 ##### calculate_narr
 testthat::test_that("calculate_narr", {
   withr::local_package("terra")
@@ -171,7 +245,7 @@ testthat::test_that("calculate_narr", {
     for (r in seq_along(radii)) {
       narr <-
         process_narr(
-          date = c("2018-01-01", "2018-01-01"),
+          date = "2018-01-01",
           variable = variable,
           path =
           testthat::test_path(

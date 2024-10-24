@@ -176,6 +176,51 @@ testthat::test_that("process_hms (with polygons)", {
   )
 })
 
+testthat::test_that("process_hms (single date)", {
+  withr::local_package("terra")
+  # expect function
+  testthat::expect_true(
+    is.function(process_hms)
+  )
+  hms <-
+    process_hms(
+      date = "2022-06-10",
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "hms"
+      )
+    )
+  # expect output is a SpatVector or character
+  testthat::expect_true(
+    methods::is(hms, "SpatVector")
+  )
+  # expect non-null coordinate reference system
+  testthat::expect_false(
+    is.null(terra::crs(hms))
+  )
+  # expect two columns
+  testthat::expect_true(
+    ncol(hms) == 2
+  )
+  # expect density and date column
+  testthat::expect_true(
+    all(c("Density", "Date") %in% names(hms))
+  )
+  # test with cropping extent
+  testthat::expect_no_error(
+    hms_ext <- process_hms(
+      date = "2022-06-10",
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "hms"
+      ),
+      extent = terra::ext(hms)
+    )
+  )
+})
+
 testthat::test_that("process_hms (absent polygons - 12/31/2018)", {
   withr::local_package("terra")
   # expect function

@@ -39,7 +39,7 @@ data files before passing to \code{process_covariates}}.
 \dontrun{
 process_covariates(
   covariate = "narr",
-  date = c("2018-01-01", "2018-01-01"),
+  date = c("2018-01-01", "2018-01-10"),
   variable = "weasd",
   path = system.file("extdata", "examples", "narr", "weasd")
 )

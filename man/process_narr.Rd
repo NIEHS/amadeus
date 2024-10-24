@@ -5,7 +5,7 @@
 \title{Process meteorological data}
 \usage{
 process_narr(
-  date = c("2023-09-01", "2023-09-01"),
+  date = "2023-09-01",
   variable = NULL,
   path = NULL,
   extent = NULL,
@@ -13,8 +13,7 @@ process_narr(
 )
 }
 \arguments{
-\item{date}{character(2). length of 10 each.
-Start/end date of downloaded data.
+\item{date}{character(1 or 2). Date (1) or start and end dates (2).
 Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 
 \item{variable}{character(1). Variable name acronym. See \href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{List of Variables in NARR Files}
@@ -43,7 +42,7 @@ pressure level, and date.
 ##       amount of data which is not included in the package.
 \dontrun{
 process_narr(
-  date = c("2018-01-01", "2018-01-01"),
+  date = c("2018-01-01", "2018-01-10"),
   variable = "weasd",
   path = "./tests/testdata/narr/weasd"
 )

@@ -1,6 +1,7 @@
 ################################################################################
 ##### unit and integration tests for NASA MERRA2 functions
 
+################################################################################
 ##### download_merra2
 testthat::test_that("download_merra2 (no errors)", {
   withr::local_package("httr")
@@ -94,6 +95,7 @@ testthat::test_that("download_merra2 (expected errors)", {
   )
 })
 
+################################################################################
 ##### process_merra2
 testthat::test_that("process_merra2", {
   withr::local_package("terra")
@@ -178,6 +180,90 @@ testthat::test_that("process_merra2", {
   )
 })
 
+testthat::test_that("process_merra2 (single date)", {
+  withr::local_package("terra")
+  #* indicates three dimensional data that has subset to single
+  #* pressure level for test data set
+  collection <- c(
+    "inst1_2d_int_Nx", "inst3_2d_gas_Nx", "inst3_3d_chm_Nv", #*
+    "inst6_3d_ana_Np", #*
+    "statD_2d_slv_Nx", "tavg1_2d_chm_Nx", "tavg3_3d_udt_Np" #*
+  )
+  variable <- c(
+    "CPT", "AODANA", "AIRDENS", #*
+    "SLP", #*
+    "HOURNORAIN", "COCL", "DUDTANA" #*
+  )
+  merra2_df <- data.frame(collection, variable)
+  # expect function
+  expect_true(
+    is.function(process_merra2)
+  )
+  for (c in seq_along(merra2_df$collection)) {
+    merra2 <-
+      process_merra2(
+        date = "2018-01-01",
+        variable = merra2_df$variable[c],
+        path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "merra2",
+          merra2_df$collection[c]
+        )
+      )
+    # expect output is SpatRaster
+    expect_true(
+      class(merra2)[1] == "SpatRaster"
+    )
+    # expect values
+    expect_true(
+      terra::hasValues(merra2)
+    )
+    # expect non-null coordinate reference system
+    expect_false(
+      terra::crs(merra2) == ""
+    )
+    # expect lon and lat dimensions to be > 1
+    expect_false(
+      any(c(0, 1) %in% dim(merra2)[1:2])
+    )
+    # expect non-numeric and non-empty time
+    expect_false(
+      any(c("", 0) %in% terra::time(merra2))
+    )
+    # expect time dimension is POSIXt for hourly
+    expect_true(
+      "POSIXt" %in% class(terra::time(merra2))
+    )
+    # expect seconds in time information
+    expect_true(
+      "seconds" %in% terra::timeInfo(merra2)
+    )
+    # expect 8 levels for 3 hourly data
+    expect_true(
+      all(dim(merra2) == c(2, 3, 1))
+    )
+  }
+  class(merra2)
+  # test with cropping extent
+  testthat::expect_no_error(
+    merra2_ext <- process_merra2(
+      date = "2018-01-01",
+      variable = "CPT",
+      path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "merra2",
+          "inst1_2d_int_Nx"
+        ),
+      extent = terra::ext(merra2)
+    )
+  )
+})
+
+################################################################################
 ##### calculate_merra2
 testthat::test_that("calculate_merra2", {
   withr::local_package("terra")

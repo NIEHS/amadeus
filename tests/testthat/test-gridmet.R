@@ -158,6 +158,66 @@ testthat::test_that("process_gridmet", {
   )
 })
 
+testthat::test_that("process_gridmet (single date)", {
+  withr::local_package("terra")
+  variable <- "Precipitation"
+  # expect function
+  expect_true(
+    is.function(process_gridmet)
+  )
+  gridmet <-
+    process_gridmet(
+      date = "2018-01-03",
+      variable = variable,
+      path =
+      testthat::test_path(
+        "..",
+        "testdata",
+        "gridmet",
+        "pr"
+      )
+    )
+  # expect output is SpatRaster
+  expect_true(
+    class(gridmet)[1] == "SpatRaster"
+  )
+  # expect values
+  expect_true(
+    terra::hasValues(gridmet)
+  )
+  # expect non-null coordinate reference system
+  expect_false(
+    is.null(terra::crs(gridmet))
+  )
+  # expect lon and lat dimensions to be > 1
+  expect_false(
+    any(c(0, 1) %in% dim(gridmet)[1:2])
+  )
+  # expect non-numeric and non-empty time
+  expect_false(
+    any(c("", 0) %in% terra::time(gridmet))
+  )
+  # expect dimensions according to levels
+  expect_true(
+    dim(gridmet)[3] == 1
+  )
+  # test with cropping extent
+  testthat::expect_no_error(
+    gridmet_ext <- process_gridmet(
+      date = "2018-01-03",
+      variable = "Precipitation",
+      path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "gridmet",
+          "pr"
+        ),
+      extent = terra::ext(gridmet)
+    )
+  )
+})
+
 testthat::test_that("process_gridmet_codes", {
   # gridmet
   gc1 <- process_gridmet_codes("all")
