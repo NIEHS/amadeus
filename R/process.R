@@ -152,7 +152,7 @@ process_covariates <-
 #' @author Insang Song
 #' @return A character object that conforms to the regular
 #' expression. Details of regular expression in R can be found in [regexp].
-#' @seealso [calc_modis_par]
+#' @seealso [calculate_modis_par]
 #' @examples
 #' process_modis_sds(product = "MOD09GA")
 #' @export
