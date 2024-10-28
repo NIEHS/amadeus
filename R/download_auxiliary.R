@@ -528,12 +528,15 @@ narr_variable <- function(variable) {
   return(list(base, months))
 }
 
-#' Create has of downloaded files.
+#' Create hash of downloaded files.
 #' @description
-#' Create \code{rlang::hash_file} of the downloaded files.
+#' Create a combined SHA-1 hash based on the contents and sizes of files
+#' in a specified directory. System-specific metadata (e.g. full file paths,
+#' access times, or user information) are not tracked, ensuring the hash
+#' remains consistent across different systems, users, and access times.
 #' @param hash logical(1). Create hash of downloaded files.
 #' @param dir character(1). Directory path.
-#' @return character(1) \code{rlang::hash} of downloaded files.
+#' @return character(1) Combined SHA-1 hash of the files' contents and sizes.
 #' @keywords internal auxiliary
 #' @importFrom rlang hash_file
 #' @export
@@ -542,7 +545,18 @@ download_hash <- function(
   dir = NULL
 ) {
   if (hash) {
-    h <- rlang::hash_file(dir)
-    return(h)
+    h_command <- paste0(
+      "(find ",
+      shQuote(dir),
+      " -type f -print0 | sort -z | ",
+      "xargs -0 sha1sum -- | awk '{print $1}'; ",
+      "find ",
+      shQuote(dir),
+      " -type f -print0 | sort -z | ",
+      "xargs -0 stat -c '%s') | sha1sum"
+    )
+    h <- system(h_command, intern = TRUE)
+    h_clean <- sub("  -$", "", h)
+    return(h_clean)
   }
 }

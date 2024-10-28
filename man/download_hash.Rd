@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_auxiliary.R
 \name{download_hash}
 \alias{download_hash}
-\title{Create has of downloaded files.}
+\title{Create hash of downloaded files.}
 \usage{
 download_hash(hash = TRUE, dir = NULL)
 }
@@ -12,10 +12,13 @@ download_hash(hash = TRUE, dir = NULL)
 \item{dir}{character(1). Directory path.}
 }
 \value{
-character(1) \code{rlang::hash} of downloaded files.
+character(1) Combined SHA-1 hash of the files' contents and sizes.
 }
 \description{
-Create \code{rlang::hash_file} of the downloaded files.
+Create a combined SHA-1 hash based on the contents and sizes of files
+in a specified directory. System-specific metadata (e.g. full file paths,
+access times, or user information) are not tracked, ensuring the hash
+remains consistent across different systems, users, and access times.
 }
 \keyword{auxiliary}
 \keyword{internal}

@@ -215,16 +215,46 @@ testthat::test_that("download_hash", {
 
 testthat::test_that("download_hash (LIVE)", {
   withr::with_tempdir({
-    h <- download_narr(
-      year = c(2010, 2010),
+    h_first <- download_narr(
+      year = 2010,
       variables = "air.sfc",
-      directory_to_save = ".",
+      directory_to_save = "./first",
       acknowledgement = TRUE,
       download = TRUE,
-      remove_command = TRUE
+      remove_command = TRUE,
+      hash = TRUE
     )
     testthat::expect_true(
-      is.character(download_hash(TRUE, "."))
+      is.character(h_first)
+    )
+    h_second <- download_data(
+      dataset_name = "narr",
+      year = 2010,
+      variables = "air.sfc",
+      directory_to_save = "./second",
+      acknowledgement = TRUE,
+      download = TRUE,
+      remove_command = TRUE,
+      hash = TRUE
+    )
+    testthat::expect_true(
+      is.character(h_second)
+    )
+    testthat::expect_identical(h_first, h_second)
+    h_third <- download_narr(
+      year = 2011,
+      variables = "air.sfc",
+      directory_to_save = "./third",
+      acknowledgement = TRUE,
+      download = TRUE,
+      remove_command = TRUE,
+      hash = TRUE
+    )
+    testthat::expect_true(
+      is.character(h_third)
+    )
+    testthat::expect_false(
+      identical(h_first, h_third)
     )
   })
 })
