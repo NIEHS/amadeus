@@ -55,19 +55,21 @@ Example use of `download_data` using NOAA NCEP North American Regional Reanalysi
 directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
 download_data(
   dataset_name = "narr",
-  year = c(2022, 2022),
+  year = 2022,
   variable = "weasd",
   directory_to_save = directory,
   acknowledgement = TRUE,
-  download = TRUE
+  download = TRUE,
+  hash = TRUE
 )
 ```
 ```
 Downloading requested files...
 Requested files have been downloaded.
+[1] "5655d4281b76f4d4d5bee234c2938f720cfec879"
 ```
 ```r
-list.files(paste0(directory, "weasd"))
+list.files(file.path(directory, "weasd"))
 ```
 ```
 [1] "weasd.2022.nc"
@@ -82,21 +84,21 @@ To avoid errors when using `process_covariates`, **do not edit the raw downloade
 Example use of `process_covariates` using the downloaded "weasd" data.
 
 ```r
-weasd <- process_covariates(
+weasd_process <- process_covariates(
   covariate = "narr",
   date = c("2022-01-01", "2022-01-05"),
   variable = "weasd",
-  path = paste0(directory, "weasd"),
+  path = file.path(directory, "weasd"),
   extent = NULL
 )
 ```
 ```
-Cleaning weasd data for January, 2022...
 Detected monolevel data...
+Cleaning weasd data for 2022...
 Returning daily weasd data from 2022-01-01 to 2022-01-05.
 ```
 ```r
-weasd
+weasd_process
 ```
 ```
 class       : SpatRaster
@@ -113,7 +115,7 @@ time        : 2022-01-01 to 2022-01-05 UTC
 
 ## Calculate Covariates
 
-`calculate_covariates` stems from the [`beethoven`](https://github.com/NIEHS/beethoven) project's need for various types of data extracted at precise locations. `calculate_covariates`, therefore, extracts data from the "cleaned" `SpatRaster` or `SpatVector` object at user defined locations. Users can choose to buffer the locations. The function returns a `data.frame` or `SpatVector` with data extracted at all locations for each layer or row in the `SpatRaster` or `SpatVector` object, respectively.
+`calculate_covariates` stems from the [`beethoven`](https://github.com/NIEHS/beethoven) project's need for various types of data extracted at precise locations. `calculate_covariates`, therefore, extracts data from the "cleaned" `SpatRaster` or `SpatVector` object at user defined locations. Users can choose to buffer the locations. The function returns a `data.frame`, `sf`, or `SpatVector` with data extracted at all locations for each layer or row in the `SpatRaster` or `SpatVector` object, respectively.
 
 Example of `calculate_covariates` using processed "weasd" data.
 
@@ -125,7 +127,7 @@ weasd_covar <- calculate_covariates(
   locs = locs,
   locs_id = "id",
   radius = 0,
-  geom = FALSE
+  geom = "sf"
 )
 ```
 ```
@@ -141,12 +143,17 @@ Returning extracted covariates.
 weasd_covar
 ```
 ```
-    id       time     weasd_0
-1 0001 2022-01-01 0.000000000
-2 0001 2022-01-02 0.000000000
-3 0001 2022-01-03 0.000000000
-4 0001 2022-01-04 0.000000000
-5 0001 2022-01-05 0.001953125
+Simple feature collection with 5 features and 3 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 8184606 ymin: 3523283 xmax: 8184606 ymax: 3523283
+Projected CRS: unnamed
+   id       time     weasd_0                geometry
+1 001 2022-01-01 0.000000000 POINT (8184606 3523283)
+2 001 2022-01-02 0.000000000 POINT (8184606 3523283)
+3 001 2022-01-03 0.000000000 POINT (8184606 3523283)
+4 001 2022-01-04 0.000000000 POINT (8184606 3523283)
+5 001 2022-01-05 0.001953125 POINT (8184606 3523283)
 ```
 
 ## Additional Resources
