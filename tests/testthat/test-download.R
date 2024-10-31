@@ -258,3 +258,61 @@ testthat::test_that("download_hash (LIVE)", {
     )
   })
 })
+
+################################################################################
+##### check_destfile
+testthat::test_that("check_destfile", {
+  withr::with_tempdir({
+    download_data(
+      dataset_name = "narr",
+      year = c(2010, 2011),
+      variables = "weasd",
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      download = FALSE,
+      hash = FALSE,
+      remove_command = FALSE
+    )
+    c1 <- read_commands(list.files(".", pattern = "narr_2010_2011"))
+    # expect 2 files to download when files do not exist
+    testthat::expect_length(c1, 2)
+
+    years <- seq(2013, 2015, 1)
+    files <- paste0("soilm/soilm.", years, ".nc")
+    dir.create("soilm")
+    lapply(files, file.create)
+    download_data(
+      dataset_name = "narr",
+      year = c(2013, 2015),
+      variables = "soilm",
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      download = FALSE,
+      hash = FALSE,
+      remove_command = FALSE
+    )
+    c2 <- read_commands(list.files(".", pattern = "narr_2013_2015"))
+    # expect 3 files to download when file size = 0
+    testthat::expect_length(c2, 3)
+
+    dir.create("air.sfc")
+    file.create("air.sfc/air.sfc.2020.nc")
+    writeLines(
+      "These lines are to make sure the file size is greater than 0 bytes.",
+      "air.sfc/air.sfc.2020.nc"
+    )
+    download_data(
+      dataset_name = "narr",
+      year = 2020,
+      variables = "air.sfc",
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      download = FALSE,
+      hash = FALSE,
+      remove_command = FALSE
+    )
+    c3 <- readLines(list.files(".", pattern = "narr_2020_2020"))
+    # expect 0 files to download when file exists and file size > 0
+    testthat::expect_length(c3, 0)
+  })
+})

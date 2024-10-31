@@ -560,3 +560,19 @@ download_hash <- function(
     return(h_clean)
   }
 }
+
+#' Check if destination file exists or is 0 bytes.
+#' @description
+#' Check if destination file exists or is 0 bytes. If either condition is
+#' met, the function returns `TRUE` to allow the download to proceed.
+#' @param destfile character(1). Destination file path.
+#' @return logical(1)
+#' @keywords internal auxiliary
+#' @export
+check_destfile <- function(destfile) {
+  if (!file.exists(destfile) || file.size(destfile) == 0) {
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}
