@@ -2429,6 +2429,13 @@ download_modis <- function(
   ladsurl <- "https://ladsweb.modaps.eosdis.nasa.gov/"
   version <- ifelse(startsWith(product, "VNP"), "5000", version)
 
+  #### 11. define date sequence
+  date_sequence <- generate_date_sequence(
+    date[1],
+    date[2],
+    sub_hyphen = FALSE
+  )
+
   #### 10. MOD06_L2 manual input
   if (product == "MOD06_L2") {
     mod06l2_url1 <-
@@ -2450,40 +2457,48 @@ download_modis <- function(
       ))
     }
 
+    date_julian <- format(date_sequence, "%Y%j")
+
     #### 10-1. Parse urls in csv
     file_url <- read.csv(mod06_links)
     file_url <- unlist(file_url[, 2])
     download_url <-
       paste0(
-        substr(ladsurl, 1, nchar(ladsurl) - 1),
+        # substr(ladsurl, 1, nchar(ladsurl) - 1),
         file_url
       )
 
-    #### 10-2. Parse dates from csv
-    file_dates <-
-      regmatches(
-        file_url,
-        regexpr("[2][0-2][0-9]{2,2}[0-3][0-9]{2,2}", file_url)
-      )
-    file_dates <- as.integer(file_dates)
-    date_start <- as.Date(as.character(min(file_dates)), format = "%Y%j")
-    date_end <- as.Date(as.character(max(file_dates)), format = "%Y%j")
+    download_url <- download_url[
+      grep(paste0("A(", paste(date_julian, collapse = "|"), ")"), download_url)
+    ]
 
-    # Extract year and month from file_dates
-    splitter <- paste0(
-      substr(file_dates, 1, 4), "/", substr(file_dates, 5, 7), "/"
-    )
+    #### 10-2. Parse dates from csv
+    # file_dates <-
+    #   regmatches(
+    #     file_url,
+    #     regexpr("[2][0-2][0-9]{2,2}[0-3][0-9]{2,2}", file_url)
+    #   )
+    # file_dates <- as.integer(file_dates)
+    # date_start <- as.Date(as.character(min(file_dates)), format = "%Y%j")
+    # date_end <- as.Date(as.character(max(file_dates)), format = "%Y%j")
+
     # Extract download names from file_url using splitter
-    download_name <- sapply(strsplit(file_url, splitter), `[`, 2)
+    download_name <- sapply(strsplit(download_url, "archives/"), `[`, 2)
+
+    # Create directory structure with julian dates
+    dir_substr <- paste0(
+      substr(download_name, 11, 14), "/",
+      substr(download_name, 15, 17), "/"
+    )
 
     #### 10-3. initiate "..._wget_commands.txt" file
     commands_txt <- paste0(
       directory_to_save,
       product,
       "_",
-      date_start,
+      date_julian[1],
       "_",
-      date_end,
+      date_julian[length(date_julian)],
       "_wget_commands.txt"
     )
 
@@ -2496,7 +2511,7 @@ download_modis <- function(
       nasa_earth_data_token,
       "\" -O ",
       directory_to_save,
-      splitter,
+      dir_substr,
       download_name,
       "\n"
     )
@@ -2504,13 +2519,13 @@ download_modis <- function(
     #### filter commands to non-existing files
     download_command <- download_command[
       which(
-        !file.exists(paste0(directory_to_save, splitter, download_name)) |
-          file.size(paste0(directory_to_save, splitter, download_name)) == 0
+        !file.exists(paste0(directory_to_save, dir_substr, download_name)) |
+          file.size(paste0(directory_to_save, dir_substr, download_name)) == 0
       )
     ]
 
     new_dirs <- unique(
-      sprintf("%s%s", directory_to_save, splitter)
+      sprintf("%s%s", directory_to_save, dir_substr)
     )
 
     lapply(
@@ -2534,13 +2549,6 @@ download_modis <- function(
     return(download_hash(hash, directory_to_save))
   }
 
-
-  #### 11. define date sequence
-  date_sequence <- generate_date_sequence(
-    date[1],
-    date[2],
-    sub_hyphen = FALSE
-  )
   # In a certain year, list all available dates
   year <- as.character(substr(date[1], 1, 4))
   filedir_year_url <-

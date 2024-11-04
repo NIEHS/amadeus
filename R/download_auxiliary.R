@@ -272,7 +272,7 @@ generate_date_sequence <-
       as.Date(date_end, format = "%Y-%m-%d"),
       "day"
     )
-    if (sub_hyphen == TRUE) {
+    if (sub_hyphen) {
       dates_sub_hyphen <- gsub("-", "", as.character(dates_original))
       return(dates_sub_hyphen)
     } else {

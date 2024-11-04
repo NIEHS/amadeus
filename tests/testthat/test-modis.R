@@ -160,14 +160,10 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
                   remove_command = FALSE)
 
   # define file path with commands
-  commands_path <- paste0(
+  commands_path <- list.files(
     directory_to_save,
-    product,
-    "_",
-    date_start,
-    "_",
-    date_end,
-    "_wget_commands.txt"
+    pattern = "_wget_commands.txt",
+    full.names = TRUE
   )
   # import commands
   commands <- read_commands(commands_path = commands_path)[, 2]
