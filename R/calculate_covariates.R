@@ -1521,7 +1521,7 @@ calculate_hms <- function(
       paste0("medium_", radius),
       paste0("heavy_", radius)
     )
-    skip_merge <- merge(locs, skip_df)
+    skip_merge <- merge(locs, skip_df, by = "time")
     skip_return <- calc_return_locs(
       skip_merge,
       POSIXt = TRUE,

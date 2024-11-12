@@ -2091,12 +2091,11 @@ process_geos <-
     paths <- list.files(
       path,
       pattern = "GEOS-CF.v01.rpl",
-      full.names = TRUE
+      full.names = TRUE,
+      recursive = TRUE
     )
-    paths <- paths[grep(
-      ".nc4",
-      paths
-    )]
+    paths <- grep(".nc4$", paths, value = TRUE)
+
     #### identify dates based on user input
     dates_of_interest <- generate_date_sequence(
       date[1],
