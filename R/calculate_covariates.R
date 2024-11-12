@@ -1521,7 +1521,14 @@ calculate_hms <- function(
       paste0("medium_", radius),
       paste0("heavy_", radius)
     )
-    skip_merge <- merge(locs, skip_df, by = "time")
+    # fixed: locs is replicated per the length of from
+    skip_merge <-
+      Reduce(rbind,
+        Map(function(x) {
+          cbind(locs, skip_df[rep(x, nrow(locs)), ])
+        }, seq_len(nrow(skip_df)))
+      )
+    
     skip_return <- calc_return_locs(
       skip_merge,
       POSIXt = TRUE,
