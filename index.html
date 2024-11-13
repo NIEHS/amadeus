@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Accessing and Analyzing Large-Scale Environmental Data">
-<meta name="description" content="Functions are designed to facilitate access to and utility with large scale, publicly available environmental data in R. The package contains functions for downloading raw data files from web URLs (download_data()), processing the raw data files into clean spatial objects (process_covariates()), and extracting values from the spatial data objects at point and polygon locations (calc_covariates()). These functions call a series of source-specific functions which are tailored to each data sources/datasets particular URL structure, data format, and spatial/temporal resolution. The functions are tested, versioned, and open source and open access. For calc_sedc() method details, see Messier, Akita, and Serre (2012) &lt;doi:10.1021/es203152a&gt;.">
-<meta property="og:description" content="Functions are designed to facilitate access to and utility with large scale, publicly available environmental data in R. The package contains functions for downloading raw data files from web URLs (download_data()), processing the raw data files into clean spatial objects (process_covariates()), and extracting values from the spatial data objects at point and polygon locations (calc_covariates()). These functions call a series of source-specific functions which are tailored to each data sources/datasets particular URL structure, data format, and spatial/temporal resolution. The functions are tested, versioned, and open source and open access. For calc_sedc() method details, see Messier, Akita, and Serre (2012) &lt;doi:10.1021/es203152a&gt;.">
+<meta name="description" content="Functions are designed to facilitate access to and utility with large scale, publicly available environmental data in R. The package contains functions for downloading raw data files from web URLs (download_data()), processing the raw data files into clean spatial objects (process_covariates()), and extracting values from the spatial data objects at point and polygon locations (calculate_covariates()). These functions call a series of source-specific functions which are tailored to each data sources/datasets particular URL structure, data format, and spatial/temporal resolution. The functions are tested, versioned, and open source and open access. For sum_edc() method details, see Messier, Akita, and Serre (2012) &lt;doi:10.1021/es203152a&gt;.">
+<meta property="og:description" content="Functions are designed to facilitate access to and utility with large scale, publicly available environmental data in R. The package contains functions for downloading raw data files from web URLs (download_data()), processing the raw data files into clean spatial objects (process_covariates()), and extracting values from the spatial data objects at point and polygon locations (calculate_covariates()). These functions call a series of source-specific functions which are tailored to each data sources/datasets particular URL structure, data format, and spatial/temporal resolution. The functions are tested, versioned, and open source and open access. For sum_edc() method details, see Messier, Akita, and Serre (2012) &lt;doi:10.1021/es203152a&gt;.">
 <meta property="og:image" content="https://niehs.github.io/amadeus/logo.svg">
 </head>
 <body>
@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,15 +71,6 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"amadeus"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"NIEHS/amadeus"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="contribution">Contribution<a class="anchor" aria-label="anchor" href="#contribution"></a>
-</h2>
-<p>To add or edit functionality for new data sources or datasets, open a <a href="https://github.com/NIEHS/amadeus/pulls" class="external-link">Pull request</a> into the main branch with a detailed description of the proposed changes. Pull requests must pass all status checks, and then will be approved or rejected by <code>amadeus</code>’s authors.</p>
-<p>Utilize <a href="https://github.com/NIEHS/amadeus/issues" class="external-link">Issues</a> to notify the authors of bugs, questions, or recommendations. Identify each issue with the appropriate label to help ensure a timely response.</p>
-<div align="center">
-<p><img src="reference/figures/readme_issues.png" style="width: 100%;"></p>
-</div>
 </div>
 <div class="section level2">
 <h2 id="download">Download<a class="anchor" aria-label="anchor" href="#download"></a>
@@ -131,12 +122,12 @@
 </tr>
 <tr class="odd">
 <td align="left">
-<a href="https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11" class="external-link">NASA SEDAC</a><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Socioeconomic Data and Applications Center&lt;/p&gt;"><sup>3</sup></a> UN WPP-Adjusted Population Density</td>
+<a href="https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11" class="external-link">NASA SEDAC</a><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Socioeconomic Data and Applications Center&lt;/p&gt;"><sup>3</sup></a> UN WPP-Adjusted Population Density</td>
 <td align="left">GeoTIFF<br>netCDF</td>
 <td align="left">Population</td>
 </tr>
 <tr class="even">
-<td align="left"><a href="https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download" class="external-link">NASA SEDAC Global Roads Open Access Data Set</a></td>
+<td align="left"><a href="https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00" class="external-link">NASA SEDAC Global Roads Open Access Data Set</a></td>
 <td align="left">Shapefile<br>Geodatabase</td>
 <td align="left">Roadways</td>
 </tr>
@@ -206,16 +197,18 @@
 <code class="sourceCode R"><span><span class="va">directory</span> <span class="op">&lt;-</span> <span class="st">"/  EXAMPLE  /  FILE  /  PATH  /"</span></span>
 <span><span class="fu"><a href="reference/download_data.html">download_data</a></span><span class="op">(</span></span>
 <span>  dataset_name <span class="op">=</span> <span class="st">"narr"</span>,</span>
-<span>  year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2022</span>, <span class="fl">2022</span><span class="op">)</span>,</span>
+<span>  year <span class="op">=</span> <span class="fl">2022</span>,</span>
 <span>  variable <span class="op">=</span> <span class="st">"weasd"</span>,</span>
 <span>  directory_to_save <span class="op">=</span> <span class="va">directory</span>,</span>
 <span>  acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  download <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  hash <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code>Downloading requested files...
-Requested files have been downloaded.</code></pre>
+Requested files have been downloaded.
+[1] "5655d4281b76f4d4d5bee234c2938f720cfec879"</code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"weasd"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"weasd"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code>[1] "weasd.2022.nc"</code></pre>
 </div>
 <div class="section level2">
@@ -225,18 +218,18 @@ Requested files have been downloaded.</code></pre>
 <p>To avoid errors when using <code>process_covariates</code>, <strong>do not edit the raw downloaded data files</strong>. Passing user-generated or edited data into <code>process_covariates</code> may result in errors as the underlying functions are adapted to each sources’ raw data file type.</p>
 <p>Example use of <code>process_covariates</code> using the downloaded “weasd” data.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">weasd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/process_covariates.html">process_covariates</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">weasd_process</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/process_covariates.html">process_covariates</a></span><span class="op">(</span></span>
 <span>  covariate <span class="op">=</span> <span class="st">"narr"</span>,</span>
 <span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2022-01-01"</span>, <span class="st">"2022-01-05"</span><span class="op">)</span>,</span>
 <span>  variable <span class="op">=</span> <span class="st">"weasd"</span>,</span>
-<span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"weasd"</span><span class="op">)</span>,</span>
+<span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">directory</span>, <span class="st">"weasd"</span><span class="op">)</span>,</span>
 <span>  extent <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code>Cleaning weasd data for January, 2022...
-Detected monolevel data...
+<pre><code>Detected monolevel data...
+Cleaning weasd data for 2022...
 Returning daily weasd data from 2022-01-01 to 2022-01-05.</code></pre>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">weasd</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">weasd_process</span></span></code></pre></div>
 <pre><code>class       : SpatRaster
 dimensions  : 277, 349, 5  (nrow, ncol, nlyr)
 resolution  : 32462.99, 32463  (x, y)
@@ -251,17 +244,17 @@ time        : 2022-01-01 to 2022-01-05 UTC</code></pre>
 <div class="section level2">
 <h2 id="calculate-covariates">Calculate Covariates<a class="anchor" aria-label="anchor" href="#calculate-covariates"></a>
 </h2>
-<p><code>calc_covariates</code> stems from the <a href="https://github.com/NIEHS/beethoven" class="external-link"><code>beethoven</code></a> project’s need for various types of data extracted at precise locations. <code>calc_covariates</code>, therefore, extracts data from the “cleaned” <code>SpatRaster</code> or <code>SpatVector</code> object at user defined locations. Users can choose to buffer the locations. The function returns a <code>data.frame</code> or <code>SpatVector</code> with data extracted at all locations for each layer or row in the <code>SpatRaster</code> or <code>SpatVector</code> object, respectively.</p>
-<p>Example of <code>calc_covariates</code> using processed “weasd” data.</p>
+<p><code>calculate_covariates</code> stems from the <a href="https://github.com/NIEHS/beethoven" class="external-link"><code>beethoven</code></a> project’s need for various types of data extracted at precise locations. <code>calculate_covariates</code>, therefore, extracts data from the “cleaned” <code>SpatRaster</code> or <code>SpatVector</code> object at user defined locations. Users can choose to buffer the locations. The function returns a <code>data.frame</code>, <code>sf</code>, or <code>SpatVector</code> with data extracted at all locations for each layer or row in the <code>SpatRaster</code> or <code>SpatVector</code> object, respectively.</p>
+<p>Example of <code>calculate_covariates</code> using processed “weasd” data.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">locs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"001"</span>, lon <span class="op">=</span> <span class="op">-</span><span class="fl">78.8277</span>, lat <span class="op">=</span> <span class="fl">35.95013</span><span class="op">)</span></span>
-<span><span class="va">weasd_covar</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calc_covariates.html">calc_covariates</a></span><span class="op">(</span></span>
+<span><span class="va">weasd_covar</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calculate_covariates.html">calculate_covariates</a></span><span class="op">(</span></span>
 <span>  covariate <span class="op">=</span> <span class="st">"narr"</span>,</span>
 <span>  from <span class="op">=</span> <span class="va">weasd_process</span>,</span>
 <span>  locs <span class="op">=</span> <span class="va">locs</span>,</span>
 <span>  locs_id <span class="op">=</span> <span class="st">"id"</span>,</span>
 <span>  radius <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  geom <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  geom <span class="op">=</span> <span class="st">"sf"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code>Detected `data.frame` extraction locations...
 Calculating weasd covariates for 2022-01-01...
@@ -272,12 +265,22 @@ Calculating weasd covariates for 2022-01-05...
 Returning extracted covariates.</code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">weasd_covar</span></span></code></pre></div>
-<pre><code>    id       time     weasd_0
-1 0001 2022-01-01 0.000000000
-2 0001 2022-01-02 0.000000000
-3 0001 2022-01-03 0.000000000
-4 0001 2022-01-04 0.000000000
-5 0001 2022-01-05 0.001953125</code></pre>
+<pre><code>Simple feature collection with 5 features and 3 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 8184606 ymin: 3523283 xmax: 8184606 ymax: 3523283
+Projected CRS: unnamed
+   id       time     weasd_0                geometry
+1 001 2022-01-01 0.000000000 POINT (8184606 3523283)
+2 001 2022-01-02 0.000000000 POINT (8184606 3523283)
+3 001 2022-01-03 0.000000000 POINT (8184606 3523283)
+4 001 2022-01-04 0.000000000 POINT (8184606 3523283)
+5 001 2022-01-05 0.001953125 POINT (8184606 3523283)</code></pre>
+</div>
+<div class="section level2">
+<h2 id="climate-and-health-outcomes-research-data-systems">Climate and Health Outcomes Research Data Systems<a class="anchor" aria-label="anchor" href="#climate-and-health-outcomes-research-data-systems"></a>
+</h2>
+<p>The <code>amadeus</code> package has been developed as part of the National Institute of Environmental Health Science’s (NIEHS) <a href="https://www.niehs.nih.gov/research/programs/chords" class="external-link">Climate and Health Outcomes Research Data Systems (CHORDS)</a> program. CHORDS aims to “build and strengthen data infrastructure for patient-centered outcomes research on climate change and health” by providing curated data, analysis tools, and educational resources. Visit the CHORDS catalog at <a href="https://niehs.github.io/chords_landing/index.html" class="external-link">https://niehs.github.io/chords_landing/index.html</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="additional-resources">Additional Resources<a class="anchor" aria-label="anchor" href="#additional-resources"></a>
@@ -325,6 +328,12 @@ Returning extracted covariates.</code></pre>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level2">
+<h2 id="contribution">Contribution<a class="anchor" aria-label="anchor" href="#contribution"></a>
+</h2>
+<p>To add or edit functionality for new data sources or datasets, open a <a href="https://github.com/NIEHS/amadeus/pulls" class="external-link">Pull request</a> into the main branch with a detailed description of the proposed changes. Pull requests must pass all status checks, and then will be approved or rejected by <code>amadeus</code>’s authors.</p>
+<p>Utilize <a href="https://github.com/NIEHS/amadeus/issues" class="external-link">Issues</a> to notify the authors of bugs, questions, or recommendations. Identify each issue with the appropriate label to help ensure a timely response.</p>
 </div>
 </div>
 

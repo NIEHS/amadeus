@@ -9,7 +9,7 @@ population density data from NASA's UN WPP-Adjusted Population Density, v4.11.">
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,7 +42,7 @@ population density data from NASA's UN WPP-Adjusted Population Density, v4.11.">
 
     <div class="ref-description section level2">
     <p>The <code>download_sedac_population()</code> function accesses and downloads
-population density data from <a href="https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11" class="external-link">NASA's UN WPP-Adjusted Population Density, v4.11</a>.</p>
+population density data from <a href="https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11" class="external-link">NASA's UN WPP-Adjusted Population Density, v4.11</a>.</p>
     </div>
 
     <div class="section level2">
@@ -139,7 +139,8 @@ respective sub-directories within <code>directory_to_save</code>.</p></li>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">download_sedac_population</span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="fu">download_sedac_population</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  data_resolution <span class="op">=</span> <span class="st">"30 second"</span>,</span></span>
 <span class="r-in"><span>  data_format <span class="op">=</span> <span class="st">"GeoTIFF"</span>,</span></span>
 <span class="r-in"><span>  year <span class="op">=</span> <span class="st">"2020"</span>,</span></span>
@@ -149,8 +150,7 @@ respective sub-directories within <code>directory_to_save</code>.</p></li>
 <span class="r-in"><span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>  unzip <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Skipping data download.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Downloaded files will not be unzipped.</span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

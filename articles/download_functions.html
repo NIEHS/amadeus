@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -966,7 +966,7 @@ retained.</p>
 <span><span class="co">#&gt;         download_names &lt;- c(download_names, destfile)</span></span>
 <span><span class="co">#&gt;         command &lt;- paste0("curl -s -o ", destfile, " --url ", </span></span>
 <span><span class="co">#&gt;             url, "\n")</span></span>
-<span><span class="co">#&gt;         if (!file.exists(destfile)) {</span></span>
+<span><span class="co">#&gt;         if (check_destfile(destfile)) {</span></span>
 <span><span class="co">#&gt;             cat(command)</span></span>
 <span><span class="co">#&gt;         }</span></span>
 <span><span class="co">#&gt;     }</span></span>
@@ -985,7 +985,7 @@ retained.</p>
 <span><span class="co">#&gt;     download_remove_zips(remove = remove_zip, download_name = download_names)</span></span>
 <span><span class="co">#&gt;     return(download_hash(hash, directory_to_save))</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55b9b4c8ec30&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x557d1e69aa50&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:amadeus&gt;</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

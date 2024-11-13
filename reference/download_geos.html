@@ -9,7 +9,7 @@ atmospheric composition collections from NASA's Global Earth Observing System (G
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -122,7 +122,8 @@ collection-specific folder within <code>directory_to_save</code>.</p></li>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">download_geos</span><span class="op">(</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="fu">download_geos</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  collection <span class="op">=</span> <span class="st">"aqc_tavg_1hr_g1440x721_v1"</span>,</span></span>
 <span class="r-in"><span>  date <span class="op">=</span> <span class="st">"2024-01-01"</span>,</span></span>
 <span class="r-in"><span>  directory_to_save <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
@@ -130,7 +131,7 @@ collection-specific folder within <code>directory_to_save</code>.</p></li>
 <span class="r-in"><span>  download <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># NOTE: download skipped for examples,</span></span></span>
 <span class="r-in"><span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Skipping data download.</span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
