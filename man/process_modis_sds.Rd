@@ -48,7 +48,7 @@ Name" = MCD12C1.006, then \code{product = "MCD12C1"}.
 process_modis_sds(product = "MOD09GA")
 }
 \seealso{
-\link{calc_modis_par}
+\link{calculate_modis_par}
 }
 \author{
 Insang Song

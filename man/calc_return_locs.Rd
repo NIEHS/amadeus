@@ -13,8 +13,8 @@ calc_return_locs(covar, POSIXt = TRUE, geom, crs)
 \code{POSIXt}? If \code{FALSE}, the time values will be checked for integer class
 (year and year-month).}
 
-\item{geom}{logical(1). Should \code{covar} be returned as a
-\code{data.frame}? Default is \code{FALSE}.}
+\item{geom}{FALSE/"sf"/"terra". Should \code{covar} be returned as a
+\code{data.frame}? Default is \code{FALSE}, options with geometry are "sf" or "terra".}
 
 \item{crs}{terra::crs(1). Coordinate reference system (inherited from
 \code{from}).}

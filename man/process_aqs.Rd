@@ -17,7 +17,7 @@ process_aqs(
 \arguments{
 \item{path}{character(1). Directory path to daily measurement data.}
 
-\item{date}{character(2). Start and end date.
+\item{date}{character(1 or 2). Date (1) or start and end dates (2).
 Should be in \code{"YYYY-MM-DD"} format and sorted.}
 
 \item{mode}{character(1). One of

@@ -61,6 +61,7 @@ The \code{download_merra2()} function accesses and downloads various
 meteorological and atmospheric collections from \href{https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/}{NASA's Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model}.
 }
 \examples{
+\dontrun{
 download_merra2(
   collection = "inst1_2d_int_Nx",
   date = "2024-01-01",
@@ -69,6 +70,7 @@ download_merra2(
   download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE,
 )
+}
 }
 \references{
 \insertRef{data_gmao_merra-inst1_2d_asm_Nx}{amadeus}

@@ -21,16 +21,6 @@ install.packages("amadeus")
 pak::pak("NIEHS/amadeus")
 ```
 
-## Contribution
-
-To add or edit functionality for new data sources or datasets, open a [Pull request](https://github.com/NIEHS/amadeus/pulls) into the main branch with a detailed description of the proposed changes. Pull requests must pass all status checks, and then will be approved or rejected by `amadeus`'s authors.
-
-Utilize [Issues](https://github.com/NIEHS/amadeus/issues) to notify the authors of bugs, questions, or recommendations. Identify each issue with the appropriate label to help ensure a timely response.
-
-<div align="center">
-  <img src="man/figures/readme_issues.png" style="width: 100%;">
-</div>
-
 ## Download
 
 `download_data` accesses and downloads raw geospatial data from a variety of open source data repositories. The function is a wrapper that calls source-specific download functions, each of which account for the source's unique combination of URL, file naming conventions, and data types. Download functions cover the following sources:
@@ -43,8 +33,8 @@ Utilize [Issues](https://github.com/NIEHS/amadeus/issues) to notify the authors 
 | [MRLC[^1] Consortium National Land Cover Database (NLCD)](https://www.mrlc.gov/data) | GeoTIFF | Land Use |
 | [NASA[^2] Moderate Resolution Imaging Spectroradiometer (MODIS)](https://modis.gsfc.nasa.gov/data/) | HDF | Atmosphere<br>Meteorology<br>Land Use<br>Satellite |
 | [NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://www.nature.com/articles/sdata2018214) | netCDF | Atmosphere<br>Meteorology |
-| [NASA SEDAC[^3] UN WPP-Adjusted Population Density](https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11) | GeoTIFF<br>netCDF | Population |
-| [NASA SEDAC Global Roads Open Access Data Set](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download) | Shapefile<br>Geodatabase | Roadways |
+| [NASA SEDAC[^3] UN WPP-Adjusted Population Density](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11) | GeoTIFF<br>netCDF | Population |
+| [NASA SEDAC Global Roads Open Access Data Set](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00) | Shapefile<br>Geodatabase | Roadways |
 | [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere<br>Meteorology |
 | [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#about) | Shapefile<br>KML | Wildfire Smoke |
 | [NOAA NCEP[^4] North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) | netCDF | Atmosphere<br>Meteorology |
@@ -65,19 +55,21 @@ Example use of `download_data` using NOAA NCEP North American Regional Reanalysi
 directory <- "/  EXAMPLE  /  FILE  /  PATH  /"
 download_data(
   dataset_name = "narr",
-  year = c(2022, 2022),
+  year = 2022,
   variable = "weasd",
   directory_to_save = directory,
   acknowledgement = TRUE,
-  download = TRUE
+  download = TRUE,
+  hash = TRUE
 )
 ```
 ```
 Downloading requested files...
 Requested files have been downloaded.
+[1] "5655d4281b76f4d4d5bee234c2938f720cfec879"
 ```
 ```r
-list.files(paste0(directory, "weasd"))
+list.files(file.path(directory, "weasd"))
 ```
 ```
 [1] "weasd.2022.nc"
@@ -92,21 +84,21 @@ To avoid errors when using `process_covariates`, **do not edit the raw downloade
 Example use of `process_covariates` using the downloaded "weasd" data.
 
 ```r
-weasd <- process_covariates(
+weasd_process <- process_covariates(
   covariate = "narr",
   date = c("2022-01-01", "2022-01-05"),
   variable = "weasd",
-  path = paste0(directory, "weasd"),
+  path = file.path(directory, "weasd"),
   extent = NULL
 )
 ```
 ```
-Cleaning weasd data for January, 2022...
 Detected monolevel data...
+Cleaning weasd data for 2022...
 Returning daily weasd data from 2022-01-01 to 2022-01-05.
 ```
 ```r
-weasd
+weasd_process
 ```
 ```
 class       : SpatRaster
@@ -123,19 +115,19 @@ time        : 2022-01-01 to 2022-01-05 UTC
 
 ## Calculate Covariates
 
-`calc_covariates` stems from the [`beethoven`](https://github.com/NIEHS/beethoven) project's need for various types of data extracted at precise locations. `calc_covariates`, therefore, extracts data from the "cleaned" `SpatRaster` or `SpatVector` object at user defined locations. Users can choose to buffer the locations. The function returns a `data.frame` or `SpatVector` with data extracted at all locations for each layer or row in the `SpatRaster` or `SpatVector` object, respectively.
+`calculate_covariates` stems from the [`beethoven`](https://github.com/NIEHS/beethoven) project's need for various types of data extracted at precise locations. `calculate_covariates`, therefore, extracts data from the "cleaned" `SpatRaster` or `SpatVector` object at user defined locations. Users can choose to buffer the locations. The function returns a `data.frame`, `sf`, or `SpatVector` with data extracted at all locations for each layer or row in the `SpatRaster` or `SpatVector` object, respectively.
 
-Example of `calc_covariates` using processed "weasd" data.
+Example of `calculate_covariates` using processed "weasd" data.
 
 ```r
 locs <- data.frame(id = "001", lon = -78.8277, lat = 35.95013)
-weasd_covar <- calc_covariates(
+weasd_covar <- calculate_covariates(
   covariate = "narr",
   from = weasd_process,
   locs = locs,
   locs_id = "id",
   radius = 0,
-  geom = FALSE
+  geom = "sf"
 )
 ```
 ```
@@ -151,13 +143,22 @@ Returning extracted covariates.
 weasd_covar
 ```
 ```
-    id       time     weasd_0
-1 0001 2022-01-01 0.000000000
-2 0001 2022-01-02 0.000000000
-3 0001 2022-01-03 0.000000000
-4 0001 2022-01-04 0.000000000
-5 0001 2022-01-05 0.001953125
+Simple feature collection with 5 features and 3 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 8184606 ymin: 3523283 xmax: 8184606 ymax: 3523283
+Projected CRS: unnamed
+   id       time     weasd_0                geometry
+1 001 2022-01-01 0.000000000 POINT (8184606 3523283)
+2 001 2022-01-02 0.000000000 POINT (8184606 3523283)
+3 001 2022-01-03 0.000000000 POINT (8184606 3523283)
+4 001 2022-01-04 0.000000000 POINT (8184606 3523283)
+5 001 2022-01-05 0.001953125 POINT (8184606 3523283)
 ```
+
+## Climate and Health Outcomes Research Data Systems 
+
+The `amadeus` package has been developed as part of the National Institute of Environmental Health Science's (NIEHS) [Climate and Health Outcomes Research Data Systems (CHORDS)](https://www.niehs.nih.gov/research/programs/chords) program. CHORDS aims to "build and strengthen data infrastructure for patient-centered outcomes research on climate change and health" by providing curated data, analysis tools, and educational resources. Visit the CHORDS catalog at [https://niehs.github.io/chords_landing/index.html](https://niehs.github.io/chords_landing/index.html).
 
 ## Additional Resources
 
@@ -171,6 +172,12 @@ The following R packages can also be used to access climate and weather data in 
 | [`RClimChange`[^7]](https://github.com/hllauca/RClimChange/) | [NASA Earth Exchange Global Daily Downscaled Projections (NEX-GDDP-CMIP6)](https://www.nccs.nasa.gov/services/data-collections/land-based-products/nex-gddp-cmip6) |
 | [`rNOMADS`](https://cran.r-project.org/package=rNOMADS) | [NOAA Operational Model Archive and Distribution System](https://nomads.ncep.noaa.gov/) |
 | [`sen2r`[^8]](https://github.com/ranghetti/sen2r) | [Sentinel-2](https://sentiwiki.copernicus.eu/web/s2-mission) |
+
+## Contribution
+
+To add or edit functionality for new data sources or datasets, open a [Pull request](https://github.com/NIEHS/amadeus/pulls) into the main branch with a detailed description of the proposed changes. Pull requests must pass all status checks, and then will be approved or rejected by `amadeus`'s authors.
+
+Utilize [Issues](https://github.com/NIEHS/amadeus/issues) to notify the authors of bugs, questions, or recommendations. Identify each issue with the appropriate label to help ensure a timely response.
 
 [^1]: Multi-Resolution Land Characteristics
 [^2]: National Aeronautics and Space Administration

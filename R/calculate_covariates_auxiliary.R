@@ -209,7 +209,8 @@ calc_message <- function(
 #' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0). Passed from \code{calc_\*()}.
 #' @param geom logical(1). Should the geometry of `locs` be returned in the
-#' `data.frame`? Default is `FALSE`.
+#' `data.frame`? Default is `FALSE`, options "sf" or "terra" will preserve
+#' geometry, but will use `terra` for extraction.
 #' @return A `list` containing `SpatVector` and `data.frame` objects
 #' @seealso [`process_locs_vector()`], [`check_for_null_parameters()`]
 #' @keywords internal auxiliary
@@ -236,6 +237,9 @@ calc_prepare_locs <- function(
     radius
   )
   #### site identifiers and geometry
+  # check geom
+  check_geom(geom)
+  if (geom %in% c("sf", "terra")) geom <- TRUE
   if (geom) {
     sites_id <- subset(
       terra::as.data.frame(sites_e, geom = "WKT"),
@@ -501,8 +505,8 @@ calc_worker <- function(
 #' @param POSIXt logical(1). Should the time values in `covar` be of class
 #' `POSIXt`? If `FALSE`, the time values will be checked for integer class
 #' (year and year-month).
-#' @param geom logical(1). Should `covar` be returned as a
-#' `data.frame`? Default is `FALSE`.
+#' @param geom FALSE/"sf"/"terra". Should `covar` be returned as a
+#' `data.frame`? Default is `FALSE`, options with geometry are "sf" or "terra".
 #' @param crs terra::crs(1). Coordinate reference system (inherited from
 #' `from`).
 #' @importFrom terra vect
@@ -523,7 +527,7 @@ calc_return_locs <- function(
   }
   # nolint end
   # if geom, convert to and return SpatVector
-  if (geom) {
+  if (geom %in% c("terra", "sf")) {
     if ("geometry" %in% names(covar)) {
       covar_return <- terra::vect(
         covar,
@@ -537,8 +541,26 @@ calc_return_locs <- function(
         crs = crs
       )
     }
-    return(covar_return)
+    if (geom == "terra") {
+      return(covar_return)
+    } else if (geom == "sf") {
+      return(sf::st_as_sf(covar_return))
+    }
   } else {
     return(data.frame(covar))
+  }
+}
+
+#' Check that `geom` value is one of `FALSE`, `"sf"`, or `"terra"`
+#' @description Check that `geom` value is one of `FALSE`, `"sf"`,
+#' or `"terra"`.
+#' @param geom FALSE/"sf"/"terra".'
+#' @keywords internal auxiliary
+#' @author Mitchell Manware
+#' @return NULL; will stop if `geom` is not one of the three options
+#' @export
+check_geom <- function(geom) {
+  if (!geom %in% c(FALSE, "sf", "terra")) {
+    stop("`geom` must be one of FALSE, 'sf', or 'terra'.")
   }
 }

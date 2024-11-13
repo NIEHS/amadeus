@@ -169,8 +169,8 @@ testthat::test_that("process_nei", {
 })
 
 ################################################################################
-##### calc_nei
-testthat::test_that("calc_nei", {
+##### calculate_nei
+testthat::test_that("calculate_nei", {
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_package("data.table")
@@ -225,7 +225,7 @@ testthat::test_that("calc_nei", {
     process_nei(neipath, nc, year = 2083)
   )
 
-  # calc_nei
+  # calculate_nei
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   ncp$time <- 2018L
@@ -233,7 +233,7 @@ testthat::test_that("calc_nei", {
   nc <- terra::project(nc, "EPSG:4326")
 
   testthat::expect_no_error(
-    neicalced <- calc_nei(
+    neicalced <- calculate_nei(
       locs = ncp,
       from = neiras
     )
@@ -241,21 +241,38 @@ testthat::test_that("calc_nei", {
   testthat::expect_true(any(grepl("NEI", names(neicalced))))
   testthat::expect_equal(neicalced$TRF_NEINP_0_00000, 1579079, tolerance = 1)
 
-  # with geometry
+  # with geometry terra
   testthat::expect_no_error(
-    neicalced_geom <- calc_nei(
+    neicalced_terra <- calculate_nei(
       locs = ncp,
       from = neiras,
-      geom = TRUE
+      geom = "terra"
     )
   )
-  testthat::expect_s4_class(neicalced_geom, "SpatVector")
+  testthat::expect_s4_class(neicalced_terra, "SpatVector")
+
+  # with geometry sf
+  testthat::expect_no_error(
+    neicalced_sf <- calculate_nei(
+      locs = ncp,
+      from = neiras,
+      geom = "sf"
+    )
+  )
+  testthat::expect_true("sf" %in% class(neicalced_sf))
 
   # more error cases
   testthat::expect_condition(
-    calc_nei(
+    calculate_nei(
       locs = "jittered",
       from = neiras
+    )
+  )
+  testthat::expect_error(
+    calculate_nei(
+      locs = ncp,
+      from = neiras,
+      geom = TRUE
     )
   )
 

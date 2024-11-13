@@ -4,16 +4,10 @@
 \alias{process_hms}
 \title{Process wildfire smoke data}
 \usage{
-process_hms(
-  date = c("2018-01-01", "2018-01-01"),
-  path = NULL,
-  extent = NULL,
-  ...
-)
+process_hms(date = "2018-01-01", path = NULL, extent = NULL, ...)
 }
 \arguments{
-\item{date}{character(2). length of 10 each.
-Start/end date of downloaded data.
+\item{date}{character(1 or 2). Date (1) or start and end dates (2).
 Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 
 \item{path}{character(1). Directory with downloaded NOAA HMS data files.}

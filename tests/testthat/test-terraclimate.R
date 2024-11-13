@@ -158,6 +158,66 @@ testthat::test_that("process_terraclimate", {
   )
 })
 
+testthat::test_that("process_terraclimate (single date)", {
+  withr::local_package("terra")
+  variable <- "ppt"
+  # expect function
+  expect_true(
+    is.function(process_terraclimate)
+  )
+  terraclimate <-
+    process_terraclimate(
+      date = "2018-01-01",
+      variable = variable,
+      path =
+      testthat::test_path(
+        "..",
+        "testdata",
+        "terraclimate",
+        "ppt"
+      )
+    )
+  # expect output is SpatRaster
+  expect_true(
+    class(terraclimate)[1] == "SpatRaster"
+  )
+  # expect values
+  expect_true(
+    terra::hasValues(terraclimate)
+  )
+  # expect non-null coordinate reference system
+  expect_false(
+    is.null(terra::crs(terraclimate))
+  )
+  # expect lon and lat dimensions to be > 1
+  expect_false(
+    any(c(0, 1) %in% dim(terraclimate)[1:2])
+  )
+  # expect non-numeric and non-empty time
+  expect_false(
+    any(c("", 0) %in% terra::time(terraclimate))
+  )
+  # expect dimensions according to levels
+  expect_true(
+    dim(terraclimate)[3] == 1
+  )
+  # test with cropping extent
+  testthat::expect_no_error(
+    terraclimate_ext <- process_terraclimate(
+      date = "2018-01-01",
+      variable = "ppt",
+      path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "terraclimate",
+          "ppt"
+        ),
+      extent = terra::ext(terraclimate)
+    )
+  )
+})
+
 testthat::test_that("process_terraclimate_codes", {
   # terraclimate
   tc1 <- process_terraclimate_codes("all")
@@ -179,9 +239,8 @@ testthat::test_that("process_terraclimate_codes", {
 })
 
 ################################################################################
-##### calc_terraclimate
-## 16. TerraClimate ####
-testthat::test_that("calc_terraclimate", {
+##### calculate_terraclimate
+testthat::test_that("calculate_terraclimate", {
   withr::local_package("terra")
   withr::local_package("data.table")
   radii <- c(0, 1000)
@@ -189,7 +248,7 @@ testthat::test_that("calc_terraclimate", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_terraclimate)
+    is.function(calculate_terraclimate)
   )
   for (r in seq_along(radii)) {
     terraclimate <-
@@ -205,7 +264,7 @@ testthat::test_that("calc_terraclimate", {
         )
       )
     terraclimate_covariate <-
-      calc_terraclimate(
+      calculate_terraclimate(
         from = terraclimate,
         locs = data.table::data.table(ncp),
         locs_id = "site_id",
@@ -236,9 +295,44 @@ testthat::test_that("calc_terraclimate", {
       nchar(terraclimate_covariate$time)[1] == 6
     )
   }
-  # with included geometry
+  # with included geometry terra
   testthat::expect_no_error(
-    terraclimate_covariate_geom <- calc_terraclimate(
+    terraclimate_covariate_terra <- calculate_terraclimate(
+      from = terraclimate,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(terraclimate_covariate_terra), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(terraclimate_covariate_terra)
+  )
+
+  # with included geometry sf
+  testthat::expect_no_error(
+    terraclimate_covariate_sf <- calculate_terraclimate(
+      from = terraclimate,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(terraclimate_covariate_sf), 4
+  )
+  testthat::expect_true(
+    "sf" %in% class(terraclimate_covariate_sf)
+  )
+
+  testthat::expect_error(
+    calculate_terraclimate(
       from = terraclimate,
       locs = ncp,
       locs_id = "site_id",
@@ -246,11 +340,5 @@ testthat::test_that("calc_terraclimate", {
       fun = "mean",
       geom = TRUE
     )
-  )
-  testthat::expect_equal(
-    ncol(terraclimate_covariate_geom), 3
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(terraclimate_covariate_geom)
   )
 })

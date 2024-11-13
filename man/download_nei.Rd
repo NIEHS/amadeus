@@ -75,6 +75,7 @@ certificate updates in the future.
 }
 }
 \examples{
+\dontrun{
 download_nei(
   year = c(2017L, 2020L),
   directory_to_save = tempdir(),
@@ -83,6 +84,7 @@ download_nei(
   remove_command = TRUE,
   unzip = FALSE
 )
+}
 }
 \references{
 \insertRef{web_usepa2024nei}{amadeus}

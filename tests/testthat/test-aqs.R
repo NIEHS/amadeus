@@ -223,11 +223,21 @@ testthat::test_that("process_aqs", {
       return_format = "data.table"
     )
   )
+  testthat::expect_no_error(
+    aqslddsd <- process_aqs(
+      path = aqssub,
+      date = "2022-02-04",
+      mode = "location",
+      data_field = "Arithmetic.Mean",
+      return_format = "data.table"
+    )
+  )
   testthat::expect_s3_class(aqsfd, "data.table")
   testthat::expect_s3_class(aqssd, "data.table")
   testthat::expect_s3_class(aqssdd, "data.table")
   testthat::expect_s3_class(aqsld, "data.table")
   testthat::expect_s3_class(aqsldd, "data.table")
+  testthat::expect_s3_class(aqslddsd, "data.table")
 
   testthat::expect_no_error(
     aqssf <- process_aqs(
@@ -261,7 +271,9 @@ testthat::test_that("process_aqs", {
     process_aqs(path = aqssub, date = c("January", "Januar"))
   )
   testthat::expect_error(
-    process_aqs(path = aqssub, date = c("2021-08-15"))
+    process_aqs(
+      path = aqssub, date = c("2021-08-15", "2021-08-16", "2021-08-17")
+    )
   )
   testthat::expect_error(
     process_aqs(path = aqssub, date = NULL)

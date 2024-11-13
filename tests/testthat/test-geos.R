@@ -167,6 +167,86 @@ testthat::test_that("process_geos (no errors)", {
   )
 })
 
+testthat::test_that("process_geos (single date)", {
+  withr::local_package("terra")
+  collections <- c(
+    "a",
+    "c"
+  )
+  # expect function
+  expect_true(
+    is.function(process_geos)
+  )
+  for (c in seq_along(collections)) {
+    collection <- collections[c]
+    geos <-
+      process_geos(
+        date = "2018-01-01",
+        variable = "O3",
+        path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "geos",
+          collection
+        )
+      )
+    # expect output is SpatRaster
+    expect_true(
+      class(geos)[1] == "SpatRaster"
+    )
+    # expect values
+    expect_true(
+      terra::hasValues(geos)
+    )
+    # expect non-null coordinate reference system
+    expect_false(
+      terra::crs(geos) == ""
+    )
+    # expect lon and lat dimensions to be > 1
+    expect_false(
+      any(c(0, 1) %in% dim(geos)[1:2])
+    )
+    # expect non-numeric and non-empty time
+    expect_false(
+      any(c("", 0) %in% terra::time(geos))
+    )
+    # expect time dimension is POSIXt for hourly
+    expect_true(
+      "POSIXt" %in% class(terra::time(geos))
+    )
+    # expect seconds in time information
+    expect_true(
+      "seconds" %in% terra::timeInfo(geos)
+    )
+    # expect dimensions according to collection
+    if (collection == "a") {
+      expect_true(
+        dim(geos)[3] == 1
+      )
+    } else if (collection == "c") {
+      expect_true(
+        dim(geos)[3] == 5
+      )
+    }
+  }
+  # test with cropping extent
+  testthat::expect_no_error(
+    geos_ext <- process_geos(
+      date = "2018-01-01",
+      variable = "O3",
+      path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "geos",
+          "c"
+        ),
+      extent = terra::ext(geos)
+    )
+  )
+})
+
 testthat::test_that("process_geos (expected errors)", {
   # expect error without variable
   expect_error(
@@ -182,8 +262,8 @@ testthat::test_that("process_geos (expected errors)", {
 })
 
 ################################################################################
-##### calc_geos
-testthat::test_that("calc_geos", {
+##### calculate_geos
+testthat::test_that("calculate_geos", {
   withr::local_package("terra")
   withr::local_package("data.table")
   collections <- c(
@@ -195,7 +275,7 @@ testthat::test_that("calc_geos", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_geos)
+    is.function(calculate_geos)
   )
   for (c in seq_along(collections)) {
     collection <- collections[c]
@@ -213,7 +293,7 @@ testthat::test_that("calc_geos", {
           )
         )
       geos_covariate <-
-        calc_geos(
+        calculate_geos(
           from = geos,
           locs = data.table::data.table(ncp),
           locs_id = "site_id",
@@ -245,9 +325,44 @@ testthat::test_that("calc_geos", {
       )
     }
   }
-  # with included geometry
+  # with included geometry terra
   testthat::expect_no_error(
-    geos_covariate_geom <- calc_geos(
+    geos_covariate_terra <- calculate_geos(
+      from = geos,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(geos_covariate_terra), 4
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(geos_covariate_terra)
+  )
+
+  # with included geometry sf
+  testthat::expect_no_error(
+    geos_covariate_sf <- calculate_geos(
+      from = geos,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(geos_covariate_sf), 5
+  )
+  testthat::expect_true(
+    "sf" %in% class(geos_covariate_sf)
+  )
+
+  testthat::expect_error(
+    calculate_geos(
       from = geos,
       locs = ncp,
       locs_id = "site_id",
@@ -255,11 +370,5 @@ testthat::test_that("calc_geos", {
       fun = "mean",
       geom = TRUE
     )
-  )
-  testthat::expect_equal(
-    ncol(geos_covariate_geom), 4
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(geos_covariate_geom)
   )
 })

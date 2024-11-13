@@ -22,8 +22,9 @@ reference:
 - subtitle: Covariates
   desc: Functions which extract data values at user-defined points
 - contents:
-  - calc_covariates
-  - starts_with("calc_")
+  - calculate_covariates
+  - starts_with("calculate_")
+  - sum_edc
 - subtitle: Spatio-Temporal
   desc: Functions which convert to, from, and between spatio-temporal data types
 - contents:

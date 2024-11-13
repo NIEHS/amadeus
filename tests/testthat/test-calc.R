@@ -1,9 +1,9 @@
 ################################################################################
-##### unit and integration tests for calc_covariates and auxiliary functions
+##### unit and integration test for calculate_covariates and auxiliary functions
 
 ################################################################################
-##### calc_covariates
-testthat::test_that("calc_covariates (expected errors)", {
+##### calculate_covariates
+testthat::test_that("calculate_covariates (expected errors)", {
   withr::local_package("rlang")
   withr::local_package("terra")
   withr::local_package("sf")
@@ -21,12 +21,12 @@ testthat::test_that("calc_covariates (expected errors)", {
       "tri", "nei", "prism", "huc", "cdl")
   for (cand in candidates) {
     testthat::expect_error(
-      calc_covariates(covariate = cand)
+      calculate_covariates(covariate = cand)
     )
   }
 })
 
-testthat::test_that("calc_covariates (no errors)", {
+testthat::test_that("calculate_covariates (no errors)", {
   withr::local_package("rlang")
   withr::local_package("terra")
   withr::local_package("sf")
@@ -46,7 +46,7 @@ testthat::test_that("calc_covariates (no errors)", {
   )
 
   testthat::expect_no_error(
-    tri_c <- calc_covariates(
+    tri_c <- calculate_covariates(
       covariate = "tri",
       from = tri_r,
       locs = ncpt,
@@ -68,14 +68,14 @@ testthat::test_that("calc_covariates (no errors)", {
       "tri", "nei")
   for (cand in candidates) {
     testthat::expect_error(
-      calc_covariates(covariate = cand)
+      calculate_covariates(covariate = cand)
     )
   }
 })
 
 ################################################################################
-##### calc_lagged
-testthat::test_that("calc_lagged (geom = FALSE)", {
+##### calculate_lagged
+testthat::test_that("calculate_lagged (geom = FALSE)", {
   withr::local_package("terra")
   withr::local_package("data.table")
   lags <- c(0, 1, 2)
@@ -83,7 +83,7 @@ testthat::test_that("calc_lagged (geom = FALSE)", {
   ncp$site_id <- "3799900018810101"
   # expect function
   testthat::expect_true(
-    is.function(calc_lagged)
+    is.function(calculate_lagged)
   )
   for (l in seq_along(lags)) {
     narr <-
@@ -99,7 +99,7 @@ testthat::test_that("calc_lagged (geom = FALSE)", {
         )
       )
     narr_covariate <-
-      calc_narr(
+      calculate_narr(
         from = narr,
         locs = ncp,
         locs_id = "site_id",
@@ -115,7 +115,7 @@ testthat::test_that("calc_lagged (geom = FALSE)", {
     )
     # expect identical if lag = 0
     if (lags[l] == 0) {
-      narr_lagged <- calc_lagged(
+      narr_lagged <- calculate_lagged(
         from = narr_covariate,
         date = c("2018-01-01", "2018-01-10"),
         lag = lags[l],
@@ -126,7 +126,7 @@ testthat::test_that("calc_lagged (geom = FALSE)", {
     } else {
       # expect error because 2018-01-01 will not have lag data from 2017-12-31
       testthat::expect_error(
-        calc_lagged(
+        calculate_lagged(
           from = narr_covariate,
           date = c("2018-01-01", "2018-01-10"),
           lag = lags[l],
@@ -134,7 +134,7 @@ testthat::test_that("calc_lagged (geom = FALSE)", {
           time_id = "time"
         )
       )
-      narr_lagged <- calc_lagged(
+      narr_lagged <- calculate_lagged(
         from = narr_covariate,
         date = c("2018-01-05", "2018-01-10"),
         lag = lags[l],
@@ -153,14 +153,14 @@ testthat::test_that("calc_lagged (geom = FALSE)", {
   }
 })
 
-testthat::test_that("calc_lagged (geom = TRUE)", {
+testthat::test_that("calculate_lagged (geom = 'sf/terra')", {
   withr::local_package("terra")
   withr::local_package("data.table")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
   testthat::expect_true(
-    is.function(calc_lagged)
+    is.function(calculate_lagged)
   )
   narr <- process_narr(
     date = c("2018-01-01", "2018-01-10"),
@@ -174,7 +174,7 @@ testthat::test_that("calc_lagged (geom = TRUE)", {
       )
   )
   narr_covariate <-
-    calc_narr(
+    calculate_narr(
       from = narr,
       locs = ncp,
       locs_id = "site_id",
@@ -189,13 +189,23 @@ testthat::test_that("calc_lagged (geom = TRUE)", {
     locs_id = "site_id"
   )
 
-  # expect error with geom = TRUE and locs as data.frame
+  # expect error with geom = "terra" and locs as data.frame
   testthat::expect_error(
-    calc_lagged(
+    calculate_lagged(
       from = narr_covariate,
       date = c("2018-01-02", "2018-01-04"),
       lag = 1,
-      geom = TRUE
+      geom = "terra"
+    )
+  )
+
+  # expect error with geom = "sf" and locs as data.frame
+  testthat::expect_error(
+    calculate_lagged(
+      from = narr_covariate,
+      date = c("2018-01-02", "2018-01-04"),
+      lag = 1,
+      geom = "sf"
     )
   )
 })

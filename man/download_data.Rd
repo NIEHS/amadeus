@@ -49,6 +49,7 @@ The \code{download_data()} function accesses and downloads atmospheric, meteorol
 }
 }
 \examples{
+\dontrun{
 download_data(
   dataset_name = "narr",
   variables = "weasd",
@@ -58,6 +59,7 @@ download_data(
   download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )
+}
 }
 \seealso{
 For details of each download function per dataset,

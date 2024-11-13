@@ -5,7 +5,7 @@
 \title{Process gridMET data}
 \usage{
 process_gridmet(
-  date = c("2023-09-01", "2023-09-01"),
+  date = c("2023-09-01", "2023-09-10"),
   variable = NULL,
   path = NULL,
   extent = NULL,
@@ -13,8 +13,7 @@ process_gridmet(
 )
 }
 \arguments{
-\item{date}{character(2). length of 10 each.
-Start/end date of downloaded data.
+\item{date}{character(1 or 2). Date (1) or start and end dates (2).
 Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 
 \item{variable}{character(1). Variable name or acronym code. See \href{https://www.climatologylab.org/wget-gridmet.html}{gridMET Generate Wget File}

@@ -2,8 +2,8 @@
 ##### unit and integration tests for Temporal Dummy functions
 
 ################################################################################
-##### calc_temporal_dummies
-testthat::test_that("calc_temporal_dummies (no errors)", {
+##### calculate_temporal_dummies
+testthat::test_that("calculate_temporal_dummies (no errors)", {
 
   site_faux <-
     data.frame(
@@ -14,7 +14,7 @@ testthat::test_that("calc_temporal_dummies (no errors)", {
     )
 
   testthat::expect_no_error(
-    dum_res <- calc_temporal_dummies(
+    dum_res <- calculate_temporal_dummies(
       locs = site_faux,
       year = seq(2018L, 2022L)
     )
@@ -29,43 +29,60 @@ testthat::test_that("calc_temporal_dummies (no errors)", {
 
   # with geometry
   testthat::expect_no_error(
-    dum_res_geom <- calc_temporal_dummies(
+    dum_res_terra <- calculate_temporal_dummies(
       locs = site_faux,
       year = seq(2018L, 2022L),
-      geom = TRUE
+      geom = "terra"
     )
   )
-  testthat::expect_s4_class(dum_res_geom, "SpatVector")
+  testthat::expect_s4_class(dum_res_terra, "SpatVector")
+
+  # with geometry
+  testthat::expect_no_error(
+    dum_res_sf <- calculate_temporal_dummies(
+      locs = site_faux,
+      year = seq(2018L, 2022L),
+      geom = "sf"
+    )
+  )
+  testthat::expect_true("sf" %in% class(dum_res_sf))
 
   # error cases
   site_faux_err <- site_faux
   colnames(site_faux_err)[4] <- "date"
   testthat::expect_error(
-    dum_res <- calc_temporal_dummies(
+    dum_res <- calculate_temporal_dummies(
       locs = site_faux_err
     )
   )
 
   testthat::expect_error(
-    dum_res <- calc_temporal_dummies(
+    dum_res <- calculate_temporal_dummies(
       locs = as.matrix(site_faux_err)
     )
   )
 
 })
 
-testthat::test_that("calc_temporal_dummies (expected errors)", {
+testthat::test_that("calculate_temporal_dummies (expected errors)", {
   withr::local_package("terra")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   testthat::expect_error(
-    calc_temporal_dummies(
+    calculate_temporal_dummies(
       ncp
     )
   )
   testthat::expect_error(
-    calc_temporal_dummies(
+    calculate_temporal_dummies(
       terra::vect(ncp)
+    )
+  )
+  testthat::expect_error(
+    calculate_temporal_dummies(
+      locs = ncp,
+      year = seq(2018L, 2022L),
+      geom = TRUE
     )
   )
 })

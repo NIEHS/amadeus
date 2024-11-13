@@ -95,8 +95,8 @@ testthat::test_that("process_sedac_groads", {
 })
 
 ################################################################################
-##### calc_sedac_groads
-testthat::test_that("calc_groads", {
+##### calculate_sedac_groads
+testthat::test_that("calculate_groads", {
   withr::local_package("terra")
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
@@ -113,7 +113,7 @@ testthat::test_that("calc_groads", {
   groads <- terra::vect(path_groads)
 
   testthat::expect_no_error(
-    groads_res <- calc_sedac_groads(
+    groads_res <- calculate_sedac_groads(
       from = groads,
       locs = ncp,
       locs_id = "site_id",
@@ -122,7 +122,7 @@ testthat::test_that("calc_groads", {
   )
 
   testthat::expect_error(
-    calc_sedac_groads(
+    calculate_sedac_groads(
       from = groads,
       locs = ncp,
       locs_id = "site_id",
@@ -133,20 +133,47 @@ testthat::test_that("calc_groads", {
   # expect data.frame
   testthat::expect_s3_class(groads_res, "data.frame")
 
-  # return with geometry
+  # return with geometry terra
   testthat::expect_no_error(
-    groads_geom <- calc_sedac_groads(
+    groads_terra <- calculate_sedac_groads(
+      from = groads,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 5000,
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(groads_terra), 4
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(groads_terra)
+  )
+
+  # return with geometry sf
+  testthat::expect_no_error(
+    groads_sf <- calculate_sedac_groads(
+      from = groads,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 5000,
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(groads_sf), 5
+  )
+  testthat::expect_true(
+    "sf" %in% class(groads_sf)
+  )
+
+  testthat::expect_error(
+    calculate_sedac_groads(
       from = groads,
       locs = ncp,
       locs_id = "site_id",
       radius = 5000,
       geom = TRUE
     )
-  )
-  testthat::expect_equal(
-    ncol(groads_geom), 4
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(groads_geom)
   )
 })

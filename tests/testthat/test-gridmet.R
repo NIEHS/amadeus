@@ -158,6 +158,66 @@ testthat::test_that("process_gridmet", {
   )
 })
 
+testthat::test_that("process_gridmet (single date)", {
+  withr::local_package("terra")
+  variable <- "Precipitation"
+  # expect function
+  expect_true(
+    is.function(process_gridmet)
+  )
+  gridmet <-
+    process_gridmet(
+      date = "2018-01-03",
+      variable = variable,
+      path =
+      testthat::test_path(
+        "..",
+        "testdata",
+        "gridmet",
+        "pr"
+      )
+    )
+  # expect output is SpatRaster
+  expect_true(
+    class(gridmet)[1] == "SpatRaster"
+  )
+  # expect values
+  expect_true(
+    terra::hasValues(gridmet)
+  )
+  # expect non-null coordinate reference system
+  expect_false(
+    is.null(terra::crs(gridmet))
+  )
+  # expect lon and lat dimensions to be > 1
+  expect_false(
+    any(c(0, 1) %in% dim(gridmet)[1:2])
+  )
+  # expect non-numeric and non-empty time
+  expect_false(
+    any(c("", 0) %in% terra::time(gridmet))
+  )
+  # expect dimensions according to levels
+  expect_true(
+    dim(gridmet)[3] == 1
+  )
+  # test with cropping extent
+  testthat::expect_no_error(
+    gridmet_ext <- process_gridmet(
+      date = "2018-01-03",
+      variable = "Precipitation",
+      path =
+        testthat::test_path(
+          "..",
+          "testdata",
+          "gridmet",
+          "pr"
+        ),
+      extent = terra::ext(gridmet)
+    )
+  )
+})
+
 testthat::test_that("process_gridmet_codes", {
   # gridmet
   gc1 <- process_gridmet_codes("all")
@@ -179,8 +239,8 @@ testthat::test_that("process_gridmet_codes", {
 })
 
 ################################################################################
-##### calc_gridmet
-testthat::test_that("calc_gridmet", {
+##### calculate_gridmet
+testthat::test_that("calculate_gridmet", {
   withr::local_package("terra")
   withr::local_package("data.table")
   radii <- c(0, 1000)
@@ -188,7 +248,7 @@ testthat::test_that("calc_gridmet", {
   ncp$site_id <- "3799900018810101"
   # expect function
   expect_true(
-    is.function(calc_gridmet)
+    is.function(calculate_gridmet)
   )
   for (r in seq_along(radii)) {
     gridmet <-
@@ -204,7 +264,7 @@ testthat::test_that("calc_gridmet", {
         )
       )
     gridmet_covariate <-
-      calc_gridmet(
+      calculate_gridmet(
         from = gridmet,
         locs = data.table::data.table(ncp),
         locs_id = "site_id",
@@ -235,9 +295,44 @@ testthat::test_that("calc_gridmet", {
       "POSIXt" %in% class(gridmet_covariate$time)
     )
   }
-  # with included geometry
+  # with included geometry terra
   testthat::expect_no_error(
-    gridmet_covariate_geom <- calc_gridmet(
+    gridmet_covariate_terra <- calculate_gridmet(
+      from = gridmet,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(gridmet_covariate_terra), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(gridmet_covariate_terra)
+  )
+
+  # with included geometry sf
+  testthat::expect_no_error(
+    gridmet_covariate_sf <- calculate_gridmet(
+      from = gridmet,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(gridmet_covariate_sf), 4
+  )
+  testthat::expect_true(
+    "sf" %in% class(gridmet_covariate_sf)
+  )
+
+  testthat::expect_error(
+    calculate_gridmet(
       from = gridmet,
       locs = ncp,
       locs_id = "site_id",
@@ -245,11 +340,5 @@ testthat::test_that("calc_gridmet", {
       fun = "mean",
       geom = TRUE
     )
-  )
-  testthat::expect_equal(
-    ncol(gridmet_covariate_geom), 3
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(gridmet_covariate_geom)
   )
 })

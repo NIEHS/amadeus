@@ -47,6 +47,7 @@
 #' sub-directories within \code{directory_to_save}. File format and
 #' sub-directory names depend on data source and dataset of interest.
 #' @examples
+#' \dontrun{
 #' download_data(
 #'   dataset_name = "narr",
 #'   variables = "weasd",
@@ -56,6 +57,7 @@
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @export
 download_data <-
   function(
@@ -107,11 +109,12 @@ download_data <-
       prism = download_prism
     )
 
-    tryCatch(
+    return <- tryCatch(
       {
         what_to_run(
           directory_to_save = directory_to_save,
           acknowledgement = acknowledgement,
+          hash = hash,
           ...
         )
       },
@@ -128,6 +131,8 @@ download_data <-
         )
       }
     )
+
+    return(return)
   }
 
 # nolint start
@@ -171,6 +176,7 @@ download_data <-
 #' @references
 #' \insertRef{data_usepa2023airdata}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_aqs(
 #'   parameter_code = 88101,
 #'   resolution_temporal = "daily",
@@ -181,6 +187,7 @@ download_data <-
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 # nolint end
 #' @export
 download_aqs <-
@@ -254,7 +261,7 @@ download_aqs <-
     #### filter commands to non-existing files
     download_commands <- download_commands[
       which(
-        !file.exists(download_names)
+        !file.exists(download_names) | file.size(download_names) == 0
       )
     ]
     #### 7. initiate "..._curl_commands.txt"
@@ -343,6 +350,7 @@ download_aqs <-
 #' @references
 #' \insertRef{article_omernik2014ecoregions}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_ecoregion(
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
@@ -350,6 +358,7 @@ download_aqs <-
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 download_ecoregion <- function(
   epa_certificate_path =
@@ -409,7 +418,7 @@ download_ecoregion <- function(
   )
   #### 9. concatenate
   download_sink(commands_txt)
-  if (!file.exists(download_name)) {
+  if (check_destfile(download_name)) {
     #### 10. concatenate and print download commands to "..._wget_commands.txt"
     #### cat command only file does not already exist or
     #### if size does not match URL size
@@ -471,6 +480,7 @@ download_ecoregion <- function(
 #' @references
 #' \insertRef{keller_description_2021}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_geos(
 #'   collection = "aqc_tavg_1hr_g1440x721_v1",
 #'   date = "2024-01-01",
@@ -479,6 +489,7 @@ download_ecoregion <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -589,7 +600,7 @@ download_geos <- function(
           download_folder_name,
           "\n"
         )
-        if (!file.exists(download_folder_name)) {
+        if (check_destfile(download_folder_name)) {
           #### cat command only if file does not already exist
           cat(download_command)
         }
@@ -647,6 +658,7 @@ download_geos <- function(
 #' @references
 #' \insertRef{danielson_global_2011}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_gmted(
 #'   statistic = "Breakline Emphasis",
 #'   resolution = "7.5 arc-seconds",
@@ -656,6 +668,7 @@ download_geos <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 download_gmted <- function(
   statistic = c(
@@ -739,7 +752,7 @@ download_gmted <- function(
   )
   download_sink(commands_txt)
   #### 13. concatenate and print download command to "..._curl_commands.txt"
-  if (!file.exists(download_name)) {
+  if (check_destfile(download_name)) {
     #### cat command only if file does not already exist
     cat(download_command)
   }
@@ -980,6 +993,7 @@ download_gmted <- function(
 #' 
 #' \insertRef{data_gmao_merra-tavgU_3d_qdt_Np}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_merra2(
 #'   collection = "inst1_2d_int_Nx",
 #'   date = "2024-01-01",
@@ -988,6 +1002,7 @@ download_gmted <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE,
 #' )
+#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -1213,7 +1228,7 @@ download_merra2 <- function(
         download_name,
         "\n"
       )
-      if (!file.exists(download_name)) {
+      if (check_destfile(download_name)) {
         #### cat command only if file does not already exist
         cat(download_command)
       }
@@ -1246,7 +1261,7 @@ download_merra2 <- function(
         download_name_metadata,
         "\n"
       )
-      if (!file.exists(download_name_metadata)) {
+      if (check_destfile(download_name_metadata)) {
         #### cat command only if file does not already exist
         cat(download_command_metadata)
       }
@@ -1296,6 +1311,7 @@ download_merra2 <- function(
 #' @references
 #' \insertRef{mesinger_north_2006}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_narr(
 #'   variables = c("weasd", "omega"),
 #'   year = 2023,
@@ -1304,6 +1320,7 @@ download_merra2 <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -1385,9 +1402,9 @@ download_narr <- function(
           url,
           "\n"
         )
-        if (!file.exists(destfile)) {
+        if (check_destfile(destfile)) {
           #### cat command if file does not already exist or if local file size
-          #### and the HTTP length (url file size) do not match
+          #### is 0 bytes
           cat(command)
         }
       }
@@ -1446,6 +1463,7 @@ download_narr <- function(
 #' \insertRef{dewitz_national_2023}{amadeus}<br/>
 #' \insertRef{dewitz_national_2024}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_nlcd(
 #'   collection = "Coterminous United States",
 #'   year = 2021,
@@ -1455,6 +1473,7 @@ download_narr <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 download_nlcd <- function(
   collection = "Coterminous United States",
@@ -1538,7 +1557,7 @@ download_nlcd <- function(
   )
   download_sink(commands_txt)
   #### 12. concatenate and print download command to "..._curl_commands.txt"
-  if (!file.exists(download_name)) {
+  if (check_destfile(download_name)) {
     #### cat command only if file does not already exist
     cat(download_command)
   }
@@ -1568,7 +1587,7 @@ download_nlcd <- function(
 #' Download roads data
 #' @description
 #' The \code{download_sedac_groads()} function accesses and downloads
-#' roads data from [NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download).
+#' roads data from [NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00).
 #' @param data_region character(1). Data can be downloaded for `"Global"`,
 #' `"Africa"`, `"Asia"`, `"Europe"`, `"Americas"`, `"Oceania East"`, and `"Oceania West"`.
 #' @param data_format character(1). Data can be downloaded as `"Shapefile"` or
@@ -1601,6 +1620,7 @@ download_nlcd <- function(
 #' @references
 #' \insertRef{data_ciesin2013groads}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_sedac_groads(
 #'   data_region = "Americas",
 #'   data_format = "Shapefile",
@@ -1610,6 +1630,7 @@ download_nlcd <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 download_sedac_groads <- function(
     data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
@@ -1688,7 +1709,7 @@ download_sedac_groads <- function(
     "_curl_command.txt"
   )
   download_sink(commands_txt)
-  if (!file.exists(download_name)) {
+  if (check_destfile(download_name)) {
     #### 12. concatenate and print download command to "..._curl_commands.txt"
     #### cat command if file does not already exist or is incomplete
     cat(download_command)
@@ -1719,7 +1740,7 @@ download_sedac_groads <- function(
 #' Download population density data
 #' @description
 #' The \code{download_sedac_population()} function accesses and downloads
-#' population density data from [NASA's UN WPP-Adjusted Population Density, v4.11](https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11).
+#' population density data from [NASA's UN WPP-Adjusted Population Density, v4.11](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11).
 #' @param data_resolution character(1). Available resolutions are 30 second
 #' (approx. 1 km), 2.5 minute (approx. 5 km), 15 minute (approx. 30 km),
 #' 30 minute (approx. 55 km), and 60 minute (approx. 110 km).
@@ -1756,6 +1777,7 @@ download_sedac_groads <- function(
 #' @references
 #' \insertRef{data_ciesin2017gpwv4}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_sedac_population(
 #'   data_resolution = "30 second",
 #'   data_format = "GeoTIFF",
@@ -1766,6 +1788,7 @@ download_sedac_groads <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 download_sedac_population <- function(
   data_resolution = "60 minute",
@@ -1877,7 +1900,7 @@ download_sedac_population <- function(
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
-  if (!file.exists(download_name)) {
+  if (check_destfile(download_name)) {
     #### 13. concatenate and print download command to "..._curl_commands.txt"
     #### cat command if file does not already exist or is incomplete
     cat(download_command)
@@ -1947,6 +1970,7 @@ download_sedac_population <- function(
 #' @references
 #' \insertRef{web_HMSabout}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_hms(
 #'   data_format = "Shapefile",
 #'   date = "2024-01-01",
@@ -1956,6 +1980,7 @@ download_sedac_population <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -2058,7 +2083,7 @@ download_hms <- function(
       url,
       "\n"
     )
-    if (!file.exists(destfile)) {
+    if (check_destfile(destfile)) {
       #### cat command only if file does not already exist
       cat(command)
     }
@@ -2137,6 +2162,7 @@ download_hms <- function(
 #' 
 #' \insertRef{article_beck2018present}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_koppen_geiger(
 #'   data_resolution = "0.0083",
 #'   time_period = "Present",
@@ -2146,6 +2172,7 @@ download_hms <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 # nolint end
 #' @export
 download_koppen_geiger <- function(
@@ -2209,7 +2236,7 @@ download_koppen_geiger <- function(
     "_wget_command.txt"
   )
   download_sink(commands_txt)
-  if (!file.exists(download_name)) {
+  if (check_destfile(download_name)) {
     #### 12. concatenate and print download command to "..._wget_commands.txt"
     #### cat command if file does not already exist or is incomplete
     cat(download_command)
@@ -2426,6 +2453,13 @@ download_modis <- function(
   ladsurl <- "https://ladsweb.modaps.eosdis.nasa.gov/"
   version <- ifelse(startsWith(product, "VNP"), "5000", version)
 
+  #### 11. define date sequence
+  date_sequence <- generate_date_sequence(
+    date[1],
+    date[2],
+    sub_hyphen = FALSE
+  )
+
   #### 10. MOD06_L2 manual input
   if (product == "MOD06_L2") {
     mod06l2_url1 <-
@@ -2447,40 +2481,48 @@ download_modis <- function(
       ))
     }
 
+    date_julian <- format(date_sequence, "%Y%j")
+
     #### 10-1. Parse urls in csv
     file_url <- read.csv(mod06_links)
     file_url <- unlist(file_url[, 2])
     download_url <-
       paste0(
-        substr(ladsurl, 1, nchar(ladsurl) - 1),
+        # substr(ladsurl, 1, nchar(ladsurl) - 1),
         file_url
       )
 
-    #### 10-2. Parse dates from csv
-    file_dates <-
-      regmatches(
-        file_url,
-        regexpr("[2][0-2][0-9]{2,2}[0-3][0-9]{2,2}", file_url)
-      )
-    file_dates <- as.integer(file_dates)
-    date_start <- as.Date(as.character(min(file_dates)), format = "%Y%j")
-    date_end <- as.Date(as.character(max(file_dates)), format = "%Y%j")
+    download_url <- download_url[
+      grep(paste0("A(", paste(date_julian, collapse = "|"), ")"), download_url)
+    ]
 
-    # Extract year and month from file_dates
-    splitter <- paste0(
-      substr(file_dates, 1, 4), "/", substr(file_dates, 5, 7), "/"
-    )
+    #### 10-2. Parse dates from csv
+    # file_dates <-
+    #   regmatches(
+    #     file_url,
+    #     regexpr("[2][0-2][0-9]{2,2}[0-3][0-9]{2,2}", file_url)
+    #   )
+    # file_dates <- as.integer(file_dates)
+    # date_start <- as.Date(as.character(min(file_dates)), format = "%Y%j")
+    # date_end <- as.Date(as.character(max(file_dates)), format = "%Y%j")
+
     # Extract download names from file_url using splitter
-    download_name <- sapply(strsplit(file_url, splitter), `[`, 2)
+    download_name <- sapply(strsplit(download_url, "archives/"), `[`, 2)
+
+    # Create directory structure with julian dates
+    dir_substr <- paste0(
+      substr(download_name, 11, 14), "/",
+      substr(download_name, 15, 17), "/"
+    )
 
     #### 10-3. initiate "..._wget_commands.txt" file
     commands_txt <- paste0(
       directory_to_save,
       product,
       "_",
-      date_start,
+      date_julian[1],
       "_",
-      date_end,
+      date_julian[length(date_julian)],
       "_wget_commands.txt"
     )
 
@@ -2493,7 +2535,7 @@ download_modis <- function(
       nasa_earth_data_token,
       "\" -O ",
       directory_to_save,
-      splitter,
+      dir_substr,
       download_name,
       "\n"
     )
@@ -2501,12 +2543,13 @@ download_modis <- function(
     #### filter commands to non-existing files
     download_command <- download_command[
       which(
-        !file.exists(paste0(directory_to_save, splitter, download_name))
+        !file.exists(paste0(directory_to_save, dir_substr, download_name)) |
+          file.size(paste0(directory_to_save, dir_substr, download_name)) == 0
       )
     ]
 
     new_dirs <- unique(
-      sprintf("%s%s", directory_to_save, splitter)
+      sprintf("%s%s", directory_to_save, dir_substr)
     )
 
     lapply(
@@ -2530,13 +2573,6 @@ download_modis <- function(
     return(download_hash(hash, directory_to_save))
   }
 
-
-  #### 11. define date sequence
-  date_sequence <- generate_date_sequence(
-    date[1],
-    date[2],
-    sub_hyphen = FALSE
-  )
   # In a certain year, list all available dates
   year <- as.character(substr(date[1], 1, 4))
   filedir_year_url <-
@@ -2646,9 +2682,8 @@ download_modis <- function(
     #### filter commands to non-existing files
     download_command <- download_command[
       which(
-        !file.exists(
-          paste0(directory_to_save, dir_substr, download_name)
-        )
+        !file.exists(paste0(directory_to_save, dir_substr, download_name)) |
+          file.size(paste0(directory_to_save, dir_substr, download_name)) == 0
       )
     ]
 
@@ -2700,6 +2735,7 @@ download_modis <- function(
 #' @references
 #' \insertRef{web_usepa2024tri}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_tri(
 #'   year = 2021L,
 #'   directory_to_save = tempdir(),
@@ -2707,6 +2743,7 @@ download_modis <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @export
 download_tri <- function(
   year = c(2018L, 2022L),
@@ -2747,7 +2784,7 @@ download_tri <- function(
   #### filter commands to non-existing files
   download_commands <- download_commands[
     which(
-      !file.exists(download_names)
+      !file.exists(download_names) | file.size(download_names) == 0
     )
   ]
   #### 5. initiate "..._curl_commands.txt"
@@ -2823,6 +2860,7 @@ download_tri <- function(
 #' @references
 #' \insertRef{web_usepa2024nei}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_nei(
 #'   year = c(2017L, 2020L),
 #'   directory_to_save = tempdir(),
@@ -2831,6 +2869,7 @@ download_tri <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 download_nei <- function(
   epa_certificate_path =
@@ -2886,7 +2925,7 @@ download_nei <- function(
   #### filter commands to non-existing files
   download_commands <- download_commands[
     which(
-      !file.exists(download_names)
+      !file.exists(download_names) | file.size(download_names) == 0
     )
   ]
   #### 5. initiate "..._curl_commands.txt"
@@ -2968,6 +3007,7 @@ download_nei <- function(
 #' @references
 #' \insertRef{data_usgs2023nhd}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_huc(
 #'   region = "Lower48",
 #'   type = "Seamless",
@@ -2977,6 +3017,7 @@ download_nei <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 # @importFrom archive archive_extract
 download_huc <-
@@ -3115,6 +3156,7 @@ download_huc <-
 #' * Yearly comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @examples
+#' \dontrun{
 #' download_cropscape(
 #'   year = 2020,
 #'   source = "USDA",
@@ -3124,6 +3166,7 @@ download_huc <-
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @importFrom archive archive_extract
 #' @export
 download_cropscape <- function(
@@ -3267,6 +3310,7 @@ download_cropscape <- function(
 #' @references
 #' \insertRef{article_daly2000prism}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_prism(
 #'   time = "202104",
 #'   element = "ppt",
@@ -3277,6 +3321,7 @@ download_cropscape <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @references
 #' * [PRISM Climate Group](https://prism.oregonstate.edu/)
 #' * [PRISM Web Service Guide](https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf)
@@ -3401,6 +3446,7 @@ download_prism <- function(
 #' @references
 #' \insertRef{article_abatzoglou2013development}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_gridmet(
 #'   variables = "Precipitation",
 #'   year = 2023,
@@ -3409,6 +3455,7 @@ download_prism <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @export
 # nolint end
 download_gridmet <- function(
@@ -3492,7 +3539,7 @@ download_gridmet <- function(
         url,
         "\n"
       )
-      if (!file.exists(destfile)) {
+      if (check_destfile(destfile)) {
         #### cat command only if file does not already exist
         cat(command)
       }
@@ -3540,6 +3587,7 @@ download_gridmet <- function(
 #' @references
 #' \insertRef{article_abatzoglou2018terraclimate}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_terraclimate(
 #'   variables = "Precipitation",
 #'   year = 2023,
@@ -3548,6 +3596,7 @@ download_gridmet <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @export
 # nolint end
 download_terraclimate <- function(
@@ -3632,7 +3681,7 @@ download_terraclimate <- function(
         url,
         "\n"
       )
-      if (!file.exists(destfile)) {
+      if (check_destfile(destfile)) {
         #### cat command only if file does not already exist
         cat(command)
       }

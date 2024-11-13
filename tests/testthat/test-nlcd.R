@@ -117,8 +117,8 @@ testthat::test_that("process_nlcd", {
 })
 
 ################################################################################
-##### calc_nlcd
-testthat::test_that("calc_nlcd", {
+##### calculate_nlcd
+testthat::test_that("calculate_nlcd", {
   withr::local_package("terra")
   withr::local_package("exactextractr")
   withr::local_package("sf")
@@ -149,52 +149,66 @@ testthat::test_that("calc_nlcd", {
   testthat::expect_s4_class(nlcdras, "SpatRaster")
 
   testthat::expect_error(
-    calc_nlcd(locs = eg_data,
-              from = nlcdras,
-              radius = "1000"),
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      radius = "1000"
+    ),
     "radius is not a numeric."
   )
   testthat::expect_error(
-    calc_nlcd(locs = eg_data,
-              from = nlcdras,
-              mode = "whatnot",
-              radius = 1000)
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      mode = "whatnot",
+      radius = 1000
+    )
   )
   # -- buf_radius has likely value
   testthat::expect_error(
-    calc_nlcd(locs = eg_data,
-              from = nlcdras,
-              radius = -3),
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      radius = -3
+    ),
     "radius has not a likely value."
   )
 
   # -- two modes work properly
   testthat::expect_no_error(
-    calc_nlcd(locs = sf::st_as_sf(eg_data),
-              from = nlcdras,
-              mode = "exact",
-              radius = 1000)
+    calculate_nlcd(
+      locs = sf::st_as_sf(eg_data),
+      from = nlcdras,
+      mode = "exact",
+      radius = 1000
+    )
   )
   testthat::expect_no_error(
-    calc_nlcd(locs = eg_data,
-              from = nlcdras,
-              mode = "terra",
-              radius = 300)
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      mode = "terra",
+      radius = 300
+    )
   )
   # -- multicore mode works properly
   testthat::expect_no_error(
-    calc_nlcd(locs = eg_data,
-              from = nlcdras,
-              mode = "exact",
-              radius = 1000,
-              nthreads = 2L)
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      mode = "exact",
+      radius = 1000,
+      nthreads = 2L
+    )
   )
   testthat::expect_no_error(
-    calc_nlcd(locs = eg_data,
-              from = nlcdras,
-              mode = "terra",
-              radius = 1000,
-              nthreads = 2L)
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      mode = "terra",
+      radius = 1000,
+      nthreads = 2L
+    )
   )
 
 
@@ -215,13 +229,17 @@ testthat::test_that("calc_nlcd", {
     "NLCD data not available for this year."
   )
   testthat::expect_error(
-    calc_nlcd(locs = 12,
-              locs_id = "site_id",
-              from = nlcdras)
+    calculate_nlcd(
+      locs = 12,
+      locs_id = "site_id",
+      from = nlcdras
+    )
   )
   testthat::expect_error(
-    calc_nlcd(locs = eg_data,
-              from = 12)
+    calculate_nlcd(
+      locs = eg_data,
+      from = 12
+    )
   )
   # -- nlcd_path is not a character
   testthat::expect_error(
@@ -241,14 +259,14 @@ testthat::test_that("calc_nlcd", {
   year <- 2021
   buf_radius <- 3000
   testthat::expect_no_error(
-    calc_nlcd(
+    calculate_nlcd(
       locs = eg_data,
       locs_id = "site_id",
       from = nlcdras,
       radius = buf_radius
     )
   )
-  output <- calc_nlcd(
+  output <- calculate_nlcd(
     locs = eg_data,
     locs_id = "site_id",
     radius = buf_radius,
@@ -278,18 +296,44 @@ testthat::test_that("calc_nlcd", {
   testthat::expect_equal(
     ncol(output), 15
   )
-  output_geom <- calc_nlcd(
+  # example with terra output
+  output_terra <- calculate_nlcd(
     locs = eg_data,
     locs_id = "site_id",
     radius = buf_radius,
     from = nlcdras,
-    geom = TRUE
+    geom = "terra"
   )
-  # with geometry will have 12 columns
+  # with geometry will have 15 columns
   testthat::expect_equal(
-    ncol(output_geom), 15
+    ncol(output_terra), 15
   )
   testthat::expect_true(
-    "SpatVector" %in% class(output_geom)
+    "SpatVector" %in% class(output_terra)
+  )
+  # example with sf output
+  output_sf <- calculate_nlcd(
+    locs = eg_data,
+    locs_id = "site_id",
+    radius = buf_radius,
+    from = nlcdras,
+    geom = "sf"
+  )
+  # with geometry will have 16 columns
+  testthat::expect_equal(
+    ncol(output_sf), 16
+  )
+  testthat::expect_true(
+    "sf" %in% class(output_sf)
+  )
+  # error with TRUE geom
+  testthat::expect_error(
+    calculate_nlcd(
+      locs = eg_data,
+      locs_id = "site_id",
+      radius = buf_radius,
+      from = nlcdras,
+      geom = TRUE
+    )
   )
 })

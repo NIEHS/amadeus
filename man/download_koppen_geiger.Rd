@@ -65,6 +65,7 @@ Köppen-Geiger climate classification maps at
 1-km resolution}(\href{https://www.nature.com/articles/sdata2018214}{link for article}; \href{https://figshare.com/articles/dataset/Present_and_future_K_ppen-Geiger_climate_classification_maps_at_1-km_resolution/6396959/2}{link for data}).
 }
 \examples{
+\dontrun{
 download_koppen_geiger(
   data_resolution = "0.0083",
   time_period = "Present",
@@ -74,6 +75,7 @@ download_koppen_geiger(
   remove_command = TRUE,
   unzip = FALSE
 )
+}
 }
 \references{
 \insertRef{article_beck2023koppen}{amadeus}
