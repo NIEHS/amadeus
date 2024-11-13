@@ -1,5 +1,5 @@
 ################################################################################
-##### unit and integration tests for calculate_covariates and auxiliary functions
+##### unit and integration test for calculate_covariates and auxiliary functions
 
 ################################################################################
 ##### calculate_covariates
