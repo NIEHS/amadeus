@@ -1132,9 +1132,10 @@ calculate_temporal_dummies <-
 
 # nolint start
 #' Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates
-#' @param from `SpatVector` object. Locations where each SEDC is calculated. 
-#' @param locs `SpatVector` object. Locations where
-#'  the sum of SEDCs are calculated.
+#' @param from `SpatVector`(1). Point locations which contain point-source
+#' covariate data.
+#' @param locs sf/SpatVector(1). Locations where the sum of exponentially
+#' decaying contributions are calculated.
 #' @param locs_id character(1). Name of the unique id field in `point_to`.
 #' @param sedc_bandwidth numeric(1).
 #' Distance at which the source concentration is reduced to

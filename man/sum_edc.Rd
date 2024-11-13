@@ -14,10 +14,11 @@ sum_edc(
 )
 }
 \arguments{
-\item{from}{\code{SpatVector} object. Locations where each SEDC is calculated.}
+\item{from}{\code{SpatVector}(1). Point locations which contain point-source
+covariate data.}
 
-\item{locs}{\code{SpatVector} object. Locations where
-the sum of SEDCs are calculated.}
+\item{locs}{sf/SpatVector(1). Locations where the sum of exponentially
+decaying contributions are calculated.}
 
 \item{locs_id}{character(1). Name of the unique id field in \code{point_to}.}
 
