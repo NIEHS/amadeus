@@ -326,15 +326,17 @@ calculate_koppen_geiger <-
 #' )
 #' }
 #' @export
-calculate_nlcd <- function(from,
-                      locs,
-                      locs_id = "site_id",
-                      mode = c("exact", "terra"),
-                      radius = 1000,
-                      max_cells = 5e7,
-                      geom = FALSE,
-                      nthreads = 1L,
-                      ...) {
+calculate_nlcd <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  mode = c("exact", "terra"),
+  radius = 1000,
+  max_cells = 5e7,
+  geom = FALSE,
+  nthreads = 1L,
+  ...
+) {
   # check inputs
   mode <- match.arg(mode)
   if (!is.numeric(radius)) {
@@ -764,6 +766,7 @@ calculate_modis_daily <- function(
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Arguments passed to `preprocess`.
+# nolint start
 #' @description `calculate_modis_par` essentially runs [`calculate_modis_daily`] function
 #' in each thread (subprocess). Based on daily resolution, each day's workload
 #' will be distributed to each thread. With `product` argument,
@@ -772,6 +775,7 @@ calculate_modis_daily <- function(
 #' argument should be carefully selected in consideration of the machine's
 #' CPU and memory capacities as products have their own memory pressure.
 #' `locs` should be `sf` object as it is exportable to parallel workers.
+# nolint end
 #' @note Overall, this function and dependent routines assume that the file
 #' system can handle concurrent access to the (network) disk by multiple
 #' processes. File system characteristics, package versions, and hardware
