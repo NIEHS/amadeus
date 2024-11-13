@@ -63,6 +63,7 @@ the \href{https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.
 JSON files should be found at STAC catalog of OpenLandMap
 }
 \examples{
+\dontrun{
 download_cropscape(
   year = 2020,
   source = "USDA",
@@ -72,6 +73,7 @@ download_cropscape(
   remove_command = TRUE,
   unzip = FALSE
 )
+}
 }
 \author{
 Insang Song

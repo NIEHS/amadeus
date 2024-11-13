@@ -74,6 +74,7 @@ certificate updates in the future.
 }
 }
 \examples{
+\dontrun{
 download_ecoregion(
   directory_to_save = tempdir(),
   acknowledgement = TRUE,
@@ -81,6 +82,7 @@ download_ecoregion(
   remove_command = TRUE,
   unzip = FALSE
 )
+}
 }
 \references{
 \insertRef{article_omernik2014ecoregions}{amadeus}

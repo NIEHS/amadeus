@@ -1147,7 +1147,7 @@ calculate_temporal_dummies <-
 #'    - `attr(result, "sedc_threshold")``: the threshold distance
 #'  at which emission source points are excluded beyond that
 #' @note The function is originally from
-#' [chopin](https://github.com/NIEHS/chopin)
+#' [chopin](https://github.com/ropensci/chopin)
 #' Distance calculation is done with terra functions internally.
 #'  Thus, the function internally converts sf objects in
 #'  \code{point_*} arguments to terra.
@@ -1158,8 +1158,6 @@ calculate_temporal_dummies <-
 #' 
 #' \insertRef{web_sedctutorial_package}{amadeus}
 #' @examples
-#' library(terra)
-#' library(sf)
 #' set.seed(101)
 #' ncpath <- system.file("gpkg/nc.gpkg", package = "sf")
 #' nc <- terra::vect(ncpath)
@@ -2118,7 +2116,7 @@ calculate_sedac_population <- function(
 # nolint start
 #' @note Unit is km / sq km. The returned `data.frame` object contains a
 #' `$time` column to represent the temporal range covered by the
-#' dataset. For more information, see <https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata>.
+#' dataset. For more information, see <https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00>.
 # nolint end
 #' @author Insang Song
 #' @seealso [`process_sedac_groads`]

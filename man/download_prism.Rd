@@ -80,6 +80,7 @@ Accesses and downloads Oregon State University's
 PRISM data from the PRISM Climate Group Web Service
 }
 \examples{
+\dontrun{
 download_prism(
   time = "202104",
   element = "ppt",
@@ -90,6 +91,7 @@ download_prism(
   download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )
+}
 }
 \references{
 \insertRef{article_daly2000prism}{amadeus}

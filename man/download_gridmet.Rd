@@ -52,6 +52,7 @@ folder within \code{directory_to_save}.
 The \code{download_gridmet} function accesses and downloads gridded surface meteorological data from the \href{https://www.climatologylab.org/gridmet.html}{University of California Merced Climatology Lab's gridMET dataset}.
 }
 \examples{
+\dontrun{
 download_gridmet(
   variables = "Precipitation",
   year = 2023,
@@ -60,6 +61,7 @@ download_gridmet(
   download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )
+}
 }
 \references{
 \insertRef{article_abatzoglou2013development}{amadeus}

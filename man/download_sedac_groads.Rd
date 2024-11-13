@@ -59,9 +59,10 @@ respective sub-directories within \code{directory_to_save}.
 }
 \description{
 The \code{download_sedac_groads()} function accesses and downloads
-roads data from \href{https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download}{NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)}.
+roads data from \href{https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00}{NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)}.
 }
 \examples{
+\dontrun{
 download_sedac_groads(
   data_region = "Americas",
   data_format = "Shapefile",
@@ -71,6 +72,7 @@ download_sedac_groads(
   remove_command = TRUE,
   unzip = FALSE
 )
+}
 }
 \references{
 \insertRef{data_ciesin2013groads}{amadeus}

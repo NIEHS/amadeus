@@ -61,6 +61,7 @@ For whom wants to download a specific region,
 please visit \href{https://www.epa.gov/waterdata/get-nhdplus-national-hydrography-dataset-plus-data#ListofAreas}{Get NHDPlus Data}
 }
 \examples{
+\dontrun{
 download_huc(
   region = "Lower48",
   type = "Seamless",
@@ -70,6 +71,7 @@ download_huc(
   remove_command = TRUE,
   unzip = FALSE
 )
+}
 }
 \references{
 \insertRef{data_usgs2023nhd}{amadeus}

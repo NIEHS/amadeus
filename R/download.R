@@ -47,6 +47,7 @@
 #' sub-directories within \code{directory_to_save}. File format and
 #' sub-directory names depend on data source and dataset of interest.
 #' @examples
+#' \dontrun{
 #' download_data(
 #'   dataset_name = "narr",
 #'   variables = "weasd",
@@ -56,6 +57,7 @@
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @export
 download_data <-
   function(
@@ -174,6 +176,7 @@ download_data <-
 #' @references
 #' \insertRef{data_usepa2023airdata}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_aqs(
 #'   parameter_code = 88101,
 #'   resolution_temporal = "daily",
@@ -184,6 +187,7 @@ download_data <-
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 # nolint end
 #' @export
 download_aqs <-
@@ -346,6 +350,7 @@ download_aqs <-
 #' @references
 #' \insertRef{article_omernik2014ecoregions}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_ecoregion(
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
@@ -353,6 +358,7 @@ download_aqs <-
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 download_ecoregion <- function(
   epa_certificate_path =
@@ -474,6 +480,7 @@ download_ecoregion <- function(
 #' @references
 #' \insertRef{keller_description_2021}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_geos(
 #'   collection = "aqc_tavg_1hr_g1440x721_v1",
 #'   date = "2024-01-01",
@@ -482,6 +489,7 @@ download_ecoregion <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -650,6 +658,7 @@ download_geos <- function(
 #' @references
 #' \insertRef{danielson_global_2011}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_gmted(
 #'   statistic = "Breakline Emphasis",
 #'   resolution = "7.5 arc-seconds",
@@ -659,6 +668,7 @@ download_geos <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 download_gmted <- function(
   statistic = c(
@@ -983,6 +993,7 @@ download_gmted <- function(
 #' 
 #' \insertRef{data_gmao_merra-tavgU_3d_qdt_Np}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_merra2(
 #'   collection = "inst1_2d_int_Nx",
 #'   date = "2024-01-01",
@@ -991,6 +1002,7 @@ download_gmted <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE,
 #' )
+#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -1299,6 +1311,7 @@ download_merra2 <- function(
 #' @references
 #' \insertRef{mesinger_north_2006}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_narr(
 #'   variables = c("weasd", "omega"),
 #'   year = 2023,
@@ -1307,6 +1320,7 @@ download_merra2 <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -1449,6 +1463,7 @@ download_narr <- function(
 #' \insertRef{dewitz_national_2023}{amadeus}<br/>
 #' \insertRef{dewitz_national_2024}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_nlcd(
 #'   collection = "Coterminous United States",
 #'   year = 2021,
@@ -1458,6 +1473,7 @@ download_narr <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 download_nlcd <- function(
   collection = "Coterminous United States",
@@ -1571,7 +1587,7 @@ download_nlcd <- function(
 #' Download roads data
 #' @description
 #' The \code{download_sedac_groads()} function accesses and downloads
-#' roads data from [NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)](https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download).
+#' roads data from [NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00).
 #' @param data_region character(1). Data can be downloaded for `"Global"`,
 #' `"Africa"`, `"Asia"`, `"Europe"`, `"Americas"`, `"Oceania East"`, and `"Oceania West"`.
 #' @param data_format character(1). Data can be downloaded as `"Shapefile"` or
@@ -1604,6 +1620,7 @@ download_nlcd <- function(
 #' @references
 #' \insertRef{data_ciesin2013groads}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_sedac_groads(
 #'   data_region = "Americas",
 #'   data_format = "Shapefile",
@@ -1613,6 +1630,7 @@ download_nlcd <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 download_sedac_groads <- function(
     data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
@@ -1722,7 +1740,7 @@ download_sedac_groads <- function(
 #' Download population density data
 #' @description
 #' The \code{download_sedac_population()} function accesses and downloads
-#' population density data from [NASA's UN WPP-Adjusted Population Density, v4.11](https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11).
+#' population density data from [NASA's UN WPP-Adjusted Population Density, v4.11](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11).
 #' @param data_resolution character(1). Available resolutions are 30 second
 #' (approx. 1 km), 2.5 minute (approx. 5 km), 15 minute (approx. 30 km),
 #' 30 minute (approx. 55 km), and 60 minute (approx. 110 km).
@@ -1759,6 +1777,7 @@ download_sedac_groads <- function(
 #' @references
 #' \insertRef{data_ciesin2017gpwv4}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_sedac_population(
 #'   data_resolution = "30 second",
 #'   data_format = "GeoTIFF",
@@ -1769,6 +1788,7 @@ download_sedac_groads <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 download_sedac_population <- function(
   data_resolution = "60 minute",
@@ -1950,6 +1970,7 @@ download_sedac_population <- function(
 #' @references
 #' \insertRef{web_HMSabout}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_hms(
 #'   data_format = "Shapefile",
 #'   date = "2024-01-01",
@@ -1959,6 +1980,7 @@ download_sedac_population <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 # nolint end
 # nolint start: cyclocomp
@@ -2140,6 +2162,7 @@ download_hms <- function(
 #' 
 #' \insertRef{article_beck2018present}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_koppen_geiger(
 #'   data_resolution = "0.0083",
 #'   time_period = "Present",
@@ -2149,6 +2172,7 @@ download_hms <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 # nolint end
 #' @export
 download_koppen_geiger <- function(
@@ -2711,6 +2735,7 @@ download_modis <- function(
 #' @references
 #' \insertRef{web_usepa2024tri}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_tri(
 #'   year = 2021L,
 #'   directory_to_save = tempdir(),
@@ -2718,6 +2743,7 @@ download_modis <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @export
 download_tri <- function(
   year = c(2018L, 2022L),
@@ -2834,6 +2860,7 @@ download_tri <- function(
 #' @references
 #' \insertRef{web_usepa2024nei}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_nei(
 #'   year = c(2017L, 2020L),
 #'   directory_to_save = tempdir(),
@@ -2842,6 +2869,7 @@ download_tri <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 download_nei <- function(
   epa_certificate_path =
@@ -2979,6 +3007,7 @@ download_nei <- function(
 #' @references
 #' \insertRef{data_usgs2023nhd}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_huc(
 #'   region = "Lower48",
 #'   type = "Seamless",
@@ -2988,6 +3017,7 @@ download_nei <- function(
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @export
 # @importFrom archive archive_extract
 download_huc <-
@@ -3126,6 +3156,7 @@ download_huc <-
 #' * Yearly comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @examples
+#' \dontrun{
 #' download_cropscape(
 #'   year = 2020,
 #'   source = "USDA",
@@ -3135,6 +3166,7 @@ download_huc <-
 #'   remove_command = TRUE,
 #'   unzip = FALSE
 #' )
+#' }
 #' @importFrom archive archive_extract
 #' @export
 download_cropscape <- function(
@@ -3278,6 +3310,7 @@ download_cropscape <- function(
 #' @references
 #' \insertRef{article_daly2000prism}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_prism(
 #'   time = "202104",
 #'   element = "ppt",
@@ -3288,6 +3321,7 @@ download_cropscape <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @references
 #' * [PRISM Climate Group](https://prism.oregonstate.edu/)
 #' * [PRISM Web Service Guide](https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf)
@@ -3412,6 +3446,7 @@ download_prism <- function(
 #' @references
 #' \insertRef{article_abatzoglou2013development}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_gridmet(
 #'   variables = "Precipitation",
 #'   year = 2023,
@@ -3420,6 +3455,7 @@ download_prism <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @export
 # nolint end
 download_gridmet <- function(
@@ -3551,6 +3587,7 @@ download_gridmet <- function(
 #' @references
 #' \insertRef{article_abatzoglou2018terraclimate}{amadeus}
 #' @examples
+#' \dontrun{
 #' download_terraclimate(
 #'   variables = "Precipitation",
 #'   year = 2023,
@@ -3559,6 +3596,7 @@ download_gridmet <- function(
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
+#' }
 #' @export
 # nolint end
 download_terraclimate <- function(
