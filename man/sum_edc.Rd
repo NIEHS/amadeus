@@ -14,10 +14,11 @@ sum_edc(
 )
 }
 \arguments{
-\item{from}{\code{SpatVector} object. Locations where each SEDC is calculated.}
+\item{from}{\code{SpatVector}(1). Point locations which contain point-source
+covariate data.}
 
-\item{locs}{\code{SpatVector} object. Locations where
-the sum of SEDCs are calculated.}
+\item{locs}{sf/SpatVector(1). Locations where the sum of exponentially
+decaying contributions are calculated.}
 
 \item{locs_id}{character(1). Name of the unique id field in \code{point_to}.}
 
@@ -47,15 +48,13 @@ Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates
 }
 \note{
 The function is originally from
-\href{https://github.com/NIEHS/chopin}{chopin}
+\href{https://github.com/ropensci/chopin}{chopin}
 Distance calculation is done with terra functions internally.
 Thus, the function internally converts sf objects in
 \code{point_*} arguments to terra.
 The threshold should be carefully chosen by users.
 }
 \examples{
-library(terra)
-library(sf)
 set.seed(101)
 ncpath <- system.file("gpkg/nc.gpkg", package = "sf")
 nc <- terra::vect(ncpath)

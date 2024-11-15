@@ -1424,7 +1424,7 @@ process_sedac_population <- function(
 #' @param ... Placeholders.
 #' @note U.S. context. The returned `SpatVector` object contains a
 #' `$description` column to represent the temporal range covered by the
-#' dataset. For more information, see <https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata>.
+#' dataset. For more information, see <https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00>.
 #' @author Insang Song
 #' @return a `SpatVector` object
 #' @importFrom terra vect

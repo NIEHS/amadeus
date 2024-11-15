@@ -69,6 +69,7 @@ downloaded files. Default is \code{FALSE}.}
 The \code{download_aqs()} function accesses and downloads Air Quality System (AQS) data from the \href{https://aqs.epa.gov/aqsweb/airdata/download_files.html}{U.S. Environmental Protection Agency's (EPA) Pre-Generated Data Files}.
 }
 \examples{
+\dontrun{
 download_aqs(
   parameter_code = 88101,
   resolution_temporal = "daily",
@@ -79,6 +80,7 @@ download_aqs(
   remove_command = TRUE,
   unzip = FALSE
 )
+}
 }
 \references{
 \insertRef{data_usepa2023airdata}{amadeus}

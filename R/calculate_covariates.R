@@ -326,15 +326,17 @@ calculate_koppen_geiger <-
 #' )
 #' }
 #' @export
-calculate_nlcd <- function(from,
-                      locs,
-                      locs_id = "site_id",
-                      mode = c("exact", "terra"),
-                      radius = 1000,
-                      max_cells = 5e7,
-                      geom = FALSE,
-                      nthreads = 1L,
-                      ...) {
+calculate_nlcd <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  mode = c("exact", "terra"),
+  radius = 1000,
+  max_cells = 5e7,
+  geom = FALSE,
+  nthreads = 1L,
+  ...
+) {
   # check inputs
   mode <- match.arg(mode)
   if (!is.numeric(radius)) {
@@ -764,6 +766,7 @@ calculate_modis_daily <- function(
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Arguments passed to `preprocess`.
+# nolint start
 #' @description `calculate_modis_par` essentially runs [`calculate_modis_daily`] function
 #' in each thread (subprocess). Based on daily resolution, each day's workload
 #' will be distributed to each thread. With `product` argument,
@@ -772,6 +775,7 @@ calculate_modis_daily <- function(
 #' argument should be carefully selected in consideration of the machine's
 #' CPU and memory capacities as products have their own memory pressure.
 #' `locs` should be `sf` object as it is exportable to parallel workers.
+# nolint end
 #' @note Overall, this function and dependent routines assume that the file
 #' system can handle concurrent access to the (network) disk by multiple
 #' processes. File system characteristics, package versions, and hardware
@@ -1128,9 +1132,10 @@ calculate_temporal_dummies <-
 
 # nolint start
 #' Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates
-#' @param from `SpatVector` object. Locations where each SEDC is calculated. 
-#' @param locs `SpatVector` object. Locations where
-#'  the sum of SEDCs are calculated.
+#' @param from `SpatVector`(1). Point locations which contain point-source
+#' covariate data.
+#' @param locs sf/SpatVector(1). Locations where the sum of exponentially
+#' decaying contributions are calculated.
 #' @param locs_id character(1). Name of the unique id field in `point_to`.
 #' @param sedc_bandwidth numeric(1).
 #' Distance at which the source concentration is reduced to
@@ -1147,7 +1152,7 @@ calculate_temporal_dummies <-
 #'    - `attr(result, "sedc_threshold")``: the threshold distance
 #'  at which emission source points are excluded beyond that
 #' @note The function is originally from
-#' [chopin](https://github.com/NIEHS/chopin)
+#' [chopin](https://github.com/ropensci/chopin)
 #' Distance calculation is done with terra functions internally.
 #'  Thus, the function internally converts sf objects in
 #'  \code{point_*} arguments to terra.
@@ -1158,8 +1163,6 @@ calculate_temporal_dummies <-
 #' 
 #' \insertRef{web_sedctutorial_package}{amadeus}
 #' @examples
-#' library(terra)
-#' library(sf)
 #' set.seed(101)
 #' ncpath <- system.file("gpkg/nc.gpkg", package = "sf")
 #' nc <- terra::vect(ncpath)
@@ -2125,7 +2128,7 @@ calculate_sedac_population <- function(
 # nolint start
 #' @note Unit is km / sq km. The returned `data.frame` object contains a
 #' `$time` column to represent the temporal range covered by the
-#' dataset. For more information, see <https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/metadata>.
+#' dataset. For more information, see <https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00>.
 # nolint end
 #' @author Insang Song
 #' @seealso [`process_sedac_groads`]

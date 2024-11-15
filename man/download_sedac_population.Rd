@@ -63,9 +63,10 @@ respective sub-directories within \code{directory_to_save}.
 }
 \description{
 The \code{download_sedac_population()} function accesses and downloads
-population density data from \href{https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11}{NASA's UN WPP-Adjusted Population Density, v4.11}.
+population density data from \href{https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11}{NASA's UN WPP-Adjusted Population Density, v4.11}.
 }
 \examples{
+\dontrun{
 download_sedac_population(
   data_resolution = "30 second",
   data_format = "GeoTIFF",
@@ -76,6 +77,7 @@ download_sedac_population(
   remove_command = TRUE,
   unzip = FALSE
 )
+}
 }
 \references{
 \insertRef{data_ciesin2017gpwv4}{amadeus}

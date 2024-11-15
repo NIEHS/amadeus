@@ -149,52 +149,66 @@ testthat::test_that("calculate_nlcd", {
   testthat::expect_s4_class(nlcdras, "SpatRaster")
 
   testthat::expect_error(
-    calculate_nlcd(locs = eg_data,
-              from = nlcdras,
-              radius = "1000"),
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      radius = "1000"
+    ),
     "radius is not a numeric."
   )
   testthat::expect_error(
-    calculate_nlcd(locs = eg_data,
-              from = nlcdras,
-              mode = "whatnot",
-              radius = 1000)
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      mode = "whatnot",
+      radius = 1000
+    )
   )
   # -- buf_radius has likely value
   testthat::expect_error(
-    calculate_nlcd(locs = eg_data,
-              from = nlcdras,
-              radius = -3),
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      radius = -3
+    ),
     "radius has not a likely value."
   )
 
   # -- two modes work properly
   testthat::expect_no_error(
-    calculate_nlcd(locs = sf::st_as_sf(eg_data),
-              from = nlcdras,
-              mode = "exact",
-              radius = 1000)
+    calculate_nlcd(
+      locs = sf::st_as_sf(eg_data),
+      from = nlcdras,
+      mode = "exact",
+      radius = 1000
+    )
   )
   testthat::expect_no_error(
-    calculate_nlcd(locs = eg_data,
-              from = nlcdras,
-              mode = "terra",
-              radius = 300)
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      mode = "terra",
+      radius = 300
+    )
   )
   # -- multicore mode works properly
   testthat::expect_no_error(
-    calculate_nlcd(locs = eg_data,
-              from = nlcdras,
-              mode = "exact",
-              radius = 1000,
-              nthreads = 2L)
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      mode = "exact",
+      radius = 1000,
+      nthreads = 2L
+    )
   )
   testthat::expect_no_error(
-    calculate_nlcd(locs = eg_data,
-              from = nlcdras,
-              mode = "terra",
-              radius = 1000,
-              nthreads = 2L)
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      mode = "terra",
+      radius = 1000,
+      nthreads = 2L
+    )
   )
 
 
@@ -215,13 +229,17 @@ testthat::test_that("calculate_nlcd", {
     "NLCD data not available for this year."
   )
   testthat::expect_error(
-    calculate_nlcd(locs = 12,
-              locs_id = "site_id",
-              from = nlcdras)
+    calculate_nlcd(
+      locs = 12,
+      locs_id = "site_id",
+      from = nlcdras
+    )
   )
   testthat::expect_error(
-    calculate_nlcd(locs = eg_data,
-              from = 12)
+    calculate_nlcd(
+      locs = eg_data,
+      from = 12
+    )
   )
   # -- nlcd_path is not a character
   testthat::expect_error(
