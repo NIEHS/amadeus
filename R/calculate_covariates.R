@@ -1528,7 +1528,7 @@ calculate_hms <- function(
           cbind(locs, skip_df[rep(x, nrow(locs)), ])
         }, seq_len(nrow(skip_df)))
       )
-    
+
     skip_return <- calc_return_locs(
       skip_merge,
       POSIXt = TRUE,
