@@ -564,3 +564,163 @@ check_geom <- function(geom) {
     stop("`geom` must be one of FALSE, 'sf', or 'terra'.")
   }
 }
+
+
+#' A single-date MODIS worker
+#' @param from SpatRaster. Preprocessed objects.
+#' @param locs SpatVector/sf/sftime object. Locations where MODIS values
+#' are summarized.
+#' @param locs_id character(1). Field name where unique site identifiers
+#' are stored. Default is `"site_id"`
+#' @param radius numeric. Radius to generate circular buffers.
+#' @param date Date(1). date to query.
+#' @param name_extracted character. Names of calculated covariates.
+#' @param fun_summary function. Summary function for
+#' multilayer rasters. Passed to `foo`. See [`exactextractr::exact_extract`]
+#' for details.
+#' @param max_cells integer(1). Maximum number of cells to be read at once.
+#' Higher values will expedite processing, but will increase memory usage.
+#' Maximum possible value is `2^31 - 1`.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' See [`exactextractr::exact_extract`] for details.
+#' @param ... Placeholders.
+#' @description The function operates at MODIS/VIIRS products
+#' on a daily basis. Given that the raw hdf files are downloaded from
+#' NASA, standard file names include a data retrieval date flag starting
+#' with letter "A". Leveraging that piece of information, the function will
+#' select files of scope on the date of interest.
+#' Please note that this function does not provide a function to filter
+#' swaths or tiles, so it is strongly recommended to check and pre-filter
+#' the file names at users' discretion.
+#' @seealso
+#' * Preprocessing: [process_modis_merge()], [process_modis_swath()],
+#'     [process_blackmarble()]
+#' @keywords auxiliary
+#' @author Insang Song
+#' @return a data.frame or SpatVector object.
+#' @importFrom terra extract project vect nlyr describe
+#' @importFrom methods is
+#' @importFrom sf st_as_sf st_drop_geometry
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
+#' calculate_modis_daily(
+#'   from = mod06l2_warp, # dervied from process_modis() example
+#'   locs = locs,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   date = "2024-01-01",
+#'   name_extracted = "cloud_fraction_0",
+#'   fun_summary = "mean",
+#'   max_cells = 3e7
+#' )
+#' }
+#' @export
+calculate_modis_daily <- function(
+  from = NULL,
+  locs = NULL,
+  locs_id = "site_id",
+  radius = 0L,
+  date = NULL,
+  name_extracted = NULL,
+  fun_summary = "mean",
+  max_cells = 3e7,
+  geom = FALSE,
+  ...
+) {
+  if (!methods::is(locs, "SpatVector")) {
+    locs <- try(terra::vect(locs))
+    if (inherits(locs, "try-error")) {
+      stop("locs should be a SpatVector or convertible object.")
+    }
+  }
+  if (!locs_id %in% names(locs)) {
+    stop(sprintf("locs should include columns named %s.\n",
+                 locs_id))
+  }
+
+  extract_with_buffer <- function(
+    points,
+    surf,
+    radius,
+    id,
+    func = "mean",
+    maxcells = NULL
+  ) {
+    # generate buffers
+    if (radius == 0) radius <- 1e-6 # approximately 1 meter in degree
+    bufs <- terra::buffer(points, width = radius, quadsegs = 180L)
+    bufs <- terra::project(bufs, terra::crs(surf))
+    # extract raster values
+    surf_at_bufs <-
+      exactextractr::exact_extract(
+        x = surf,
+        y = sf::st_as_sf(bufs),
+        fun = func,
+        force_df = TRUE,
+        stack_apply = TRUE,
+        append_cols = id,
+        progress = FALSE,
+        max_cells_in_memory = maxcells
+      )
+    return(surf_at_bufs)
+  }
+
+  ## NaN to NA
+  from[is.nan(from)] <- NA
+
+  # raster used to be vrt_today
+  extracted <-
+    extract_with_buffer(
+      points = locs,
+      surf = from,
+      id = locs_id,
+      radius = radius,
+      func = fun_summary,
+      maxcells = max_cells
+    )
+  # cleaning names
+  # assuming that extracted is a data.frame
+  name_offset <- terra::nlyr(from)
+  # multiple columns will get proper names
+  name_range <- seq(ncol(extracted) - name_offset + 1, ncol(extracted), 1)
+  colnames(extracted)[name_range] <- name_extracted
+  extracted$time <- as.POSIXlt(date)
+  check_geom(geom)
+  if (geom %in% c("sf", "terra")) {
+    # convert to base date, as terra::vect does not like class "POSIXlt"
+    extracted$time <- as.Date.POSIXlt(extracted$time)
+    # location ID with geometry
+    locs_geom_id <- suppressMessages(calc_prepare_locs(
+      from = from,
+      locs = locs,
+      locs_id = locs_id,
+      radius = radius,
+      geom = geom
+    )[[2]]
+    )
+    # merge
+    extracted_merge <- merge(
+      locs_geom_id,
+      extracted,
+      by = locs_id
+    )
+    # re-convert to POSIXlt after creating the vect
+    extracted_merge$time <- as.POSIXlt(extracted_merge$time)
+    extracted_return <- calc_return_locs(
+      covar = extracted_merge,
+      POSIXt = TRUE,
+      geom = geom,
+      crs = terra::crs(from)
+    )
+  } else {
+    calc_check_time(covar = extracted, POSIXt = TRUE)
+    extracted_return <- extracted
+  }
+  gc()
+  return(extracted_return)
+}

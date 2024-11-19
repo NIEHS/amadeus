@@ -631,15 +631,14 @@ testthat::test_that("process_modis (expected errors)", {
 
 ################################################################################
 ##### calc_modis*
-testthat::test_that("calculate_modis_par", {
+testthat::test_that("calculate_modis", {
   withr::local_package("sf")
   withr::local_package("terra")
   withr::local_package("stars")
   withr::local_package("lwgeom")
   withr::local_options(
     list(
-      sf_use_s2 = FALSE,
-      future.resolve.recursive = 2L
+      sf_use_s2 = FALSE
     )
   )
 
@@ -677,13 +676,12 @@ testthat::test_that("calculate_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod11 <-
-        calculate_modis_par(
+        calculate_modis(
           from = path_mod11,
           locs = sf::st_as_sf(site_faux),
           preprocess = process_modis_merge,
           name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
-          subdataset = "(LST_)",
-          nthreads = 1L
+          subdataset = "(LST_)"
         )
     )
   )
@@ -694,15 +692,14 @@ testthat::test_that("calculate_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod11 <-
-        calculate_modis_par(
+        calculate_modis(
           from = path_mod11,
           locs = sf::st_as_sf(site_faux),
           preprocess = process_modis_merge,
           package_list_add = c("MASS"),
           export_list_add = c("aux"),
           name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
-          subdataset = "(LST_)",
-          nthreads = 1L
+          subdataset = "(LST_)"
         )
     )
   )
@@ -711,7 +708,7 @@ testthat::test_that("calculate_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod11_terra <-
-        calculate_modis_par(
+        calculate_modis(
           from = path_mod11,
           locs = sf::st_as_sf(site_faux),
           preprocess = process_modis_merge,
@@ -719,7 +716,6 @@ testthat::test_that("calculate_modis_par", {
           export_list_add = c("aux"),
           name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
           subdataset = "(LST_)",
-          nthreads = 1L,
           geom = "terra"
         )
     )
@@ -730,7 +726,7 @@ testthat::test_that("calculate_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod11_sf <-
-        calculate_modis_par(
+        calculate_modis(
           from = path_mod11,
           locs = sf::st_as_sf(site_faux),
           preprocess = process_modis_merge,
@@ -738,7 +734,6 @@ testthat::test_that("calculate_modis_par", {
           export_list_add = c("aux"),
           name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
           subdataset = "(LST_)",
-          nthreads = 1L,
           geom = "sf"
         )
     )
@@ -747,7 +742,7 @@ testthat::test_that("calculate_modis_par", {
 
   # with geometry error
   testthat::expect_error(
-      calculate_modis_par(
+      calculate_modis(
         from = path_mod11,
         locs = sf::st_as_sf(site_faux),
         preprocess = process_modis_merge,
@@ -755,7 +750,6 @@ testthat::test_that("calculate_modis_par", {
         export_list_add = c("aux"),
         name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
         subdataset = "(LST_)",
-        nthreads = 1L,
         geom = TRUE
       )
   )
@@ -780,13 +774,12 @@ testthat::test_that("calculate_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod06 <-
-        calculate_modis_par(
+        calculate_modis(
           from = path_mod06,
           locs = site_faux,
           subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
           preprocess = process_modis_swath,
-          name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_"),
-          nthreads = 1
+          name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_")
         )
     )
   )
@@ -796,13 +789,12 @@ testthat::test_that("calculate_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod06_terra <-
-        calculate_modis_par(
+        calculate_modis(
           from = path_mod06,
           locs = site_faux,
           subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
           preprocess = process_modis_swath,
           name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_"),
-          nthreads = 1,
           geom = "terra"
         )
     )
@@ -813,13 +805,12 @@ testthat::test_that("calculate_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_mod06_sf <-
-        calculate_modis_par(
+        calculate_modis(
           from = path_mod06,
           locs = site_faux,
           subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
           preprocess = process_modis_swath,
           name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_"),
-          nthreads = 1,
           geom = "sf"
         )
     )
@@ -828,13 +819,12 @@ testthat::test_that("calculate_modis_par", {
 
   # with geometry error
   testthat::expect_error(
-    calculate_modis_par(
+    calculate_modis(
       from = path_mod06,
       locs = site_faux,
       subdataset = c("Cloud_Fraction_Day", "Cloud_Fraction_Night"),
       preprocess = process_modis_swath,
       name_covariates = c("MOD_CLFRN_0_", "MOD_CLFRD_0_"),
-      nthreads = 1,
       geom = TRUE
     )
   )
@@ -857,13 +847,12 @@ testthat::test_that("calculate_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_vnp46 <-
-        calculate_modis_par(
+        calculate_modis(
           from = path_vnp46,
           locs = site_faux,
           preprocess = process_blackmarble,
           name_covariates = c("MOD_NITLT_0_"),
           subdataset = 3L,
-          nthreads = 1,
           tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
         )
     )
@@ -874,13 +863,12 @@ testthat::test_that("calculate_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_vnp46_terra <-
-        calculate_modis_par(
+        calculate_modis(
           from = path_vnp46,
           locs = site_faux,
           preprocess = process_blackmarble,
           name_covariates = c("MOD_NITLT_0_"),
           subdataset = 3L,
-          nthreads = 1,
           tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
           geom = "terra"
         )
@@ -893,13 +881,12 @@ testthat::test_that("calculate_modis_par", {
   testthat::expect_no_error(
     suppressWarnings(
       calc_vnp46_sf <-
-        calculate_modis_par(
+        calculate_modis(
           from = path_vnp46,
           locs = sf::st_as_sf(site_faux),
           preprocess = process_blackmarble,
           name_covariates = c("MOD_NITLT_0_"),
           subdataset = 3L,
-          nthreads = 1,
           tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
           geom = "sf"
         )
@@ -909,13 +896,12 @@ testthat::test_that("calculate_modis_par", {
 
   # with geometry error
   testthat::expect_error(
-    calculate_modis_par(
+    calculate_modis(
       from = path_vnp46,
       locs = sf::st_as_sf(site_faux),
       preprocess = process_blackmarble,
       name_covariates = c("MOD_NITLT_0_"),
       subdataset = 3L,
-      nthreads = 1,
       tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
       geom = TRUE
     )
@@ -1031,40 +1017,37 @@ testthat::test_that("calculate_modis_par", {
   testthat::expect_true("sf" %in% class(calc_mod_sf))
 
   testthat::expect_error(
-    calculate_modis_par(from = site_faux)
+    calculate_modis(from = site_faux)
   )
   testthat::expect_error(
-    calculate_modis_par(from = path_mod11, product = "MOD11A1", locs = list(1, 2, 3))
+    calculate_modis(from = path_mod11, product = "MOD11A1", locs = list(1, 2, 3))
   )
   testthat::expect_error(
-    calculate_modis_par(
+    calculate_modis(
       from = path_vnp46,
       locs = site_faux,
       preprocess = "fountain",
       name_covariates = c("MOD_NITLT_0_", "MOD_K1_"),
-      subdataset = 3L,
-      nthreads = 1
+      subdataset = 3L
     )
   )
   testthat::expect_warning(
-    calculate_modis_par(
+    calculate_modis(
       from = path_vnp46,
       locs = site_faux,
       preprocess = process_blackmarble,
       name_covariates = c("MOD_NITLT_0_", "MOD_K1_"),
       subdataset = 3L,
-      nthreads = 2,
       tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
     )
   )
   testthat::expect_warning(
-    flushed <- calculate_modis_par(
+    flushed <- calculate_modis(
       from = path_vnp46,
       locs = site_faux,
       name_covariates = c("MOD_NITLT_0_"),
       preprocess = process_blackmarble,
       subdataset = 3L,
-      nthreads = 1,
       radius = c(-1000, 0L)
     )
   )

@@ -122,10 +122,8 @@ testthat::test_that("calculate_nlcd", {
   withr::local_package("terra")
   withr::local_package("exactextractr")
   withr::local_package("sf")
-  withr::local_package("future")
-  withr::local_package("future.apply")
   withr::local_options(
-    list(sf_use_s2 = FALSE, future.resolve.recursive = 2L)
+    list(sf_use_s2 = FALSE)
   )
 
   point_us1 <- cbind(lon = -114.7, lat = 38.9, site_id = 1)
@@ -191,26 +189,6 @@ testthat::test_that("calculate_nlcd", {
       radius = 300
     )
   )
-  # -- multicore mode works properly
-  testthat::expect_no_error(
-    calculate_nlcd(
-      locs = eg_data,
-      from = nlcdras,
-      mode = "exact",
-      radius = 1000,
-      nthreads = 2L
-    )
-  )
-  testthat::expect_no_error(
-    calculate_nlcd(
-      locs = eg_data,
-      from = nlcdras,
-      mode = "terra",
-      radius = 1000,
-      nthreads = 2L
-    )
-  )
-
 
   # -- year is numeric
   testthat::expect_error(

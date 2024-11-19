@@ -12,7 +12,6 @@ calculate_nlcd(
   radius = 1000,
   max_cells = 5e+07,
   geom = FALSE,
-  nthreads = 1L,
   ...
 )
 }
@@ -39,8 +38,6 @@ See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
-
-\item{nthreads}{integer(1). Number of threads to be used}
 
 \item{...}{Placeholders.}
 }
