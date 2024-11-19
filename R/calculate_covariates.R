@@ -584,10 +584,7 @@ calculate_ecoregion <-
 #' in each thread (subprocess). Based on daily resolution, each day's workload
 #' will be distributed to each thread. With `product` argument,
 #' the files are processed by a customized function where the unique structure
-#' and/or characteristics of the products are considered. `nthreads`
-#' argument should be carefully selected in consideration of the machine's
-#' CPU and memory capacities as products have their own memory pressure.
-#' `locs` should be `sf` object as it is exportable to parallel workers.
+#' and/or characteristics of the products are considered.
 # nolint end
 #' @note Overall, this function and dependent routines assume that the file
 #' system can handle concurrent access to the (network) disk by multiple
