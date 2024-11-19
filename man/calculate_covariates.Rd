@@ -60,7 +60,7 @@ calculate_covariates(
 }
 \seealso{
 \itemize{
-\item \code{\link{calculate_modis_par}}: "modis", "MODIS"
+\item \code{\link{calculate_modis}}: "modis", "MODIS"
 \item \code{\link{calculate_koppen_geiger}}: "koppen-geiger", "koeppen-geiger", "koppen"
 \item \code{\link{calculate_ecoregion}}: "ecoregion", "ecoregions"
 \item \code{\link{calculate_temporal_dummies}}: "dummies", "Dummies"
