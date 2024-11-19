@@ -9,6 +9,7 @@
 <url><loc>https://niehs.github.io/amadeus/articles/workflow.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/authors.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/index.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/news/index.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/apply_extent.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/as_mysftime.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calc_check_time.html</loc></url>
@@ -27,8 +28,8 @@
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_koppen_geiger.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_lagged.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_merra2.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/calculate_modis.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_modis_daily.html</loc></url>
-<url><loc>https://niehs.github.io/amadeus/reference/calculate_modis_par.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_narr.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_nei.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_nlcd.html</loc></url>
