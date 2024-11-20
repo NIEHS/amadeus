@@ -1310,9 +1310,9 @@ calculate_hms <- function(
     skip_df <- data.frame(as.POSIXlt(from), 0, 0, 0)
     colnames(skip_df) <- c(
       "time",
-      paste0("light_", radius),
-      paste0("medium_", radius),
-      paste0("heavy_", radius)
+      paste0("light_", sprintf("%05d", radius)),
+      paste0("medium_", sprintf("%05d", radius)),
+      paste0("heavy_", sprintf("%05d", radius))
     )
     # fixed: locs is replicated per the length of from
     skip_merge <-
