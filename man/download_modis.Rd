@@ -5,7 +5,9 @@
 \title{Download MODIS product files}
 \usage{
 download_modis(
-  product = c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2"),
+  product = c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2",
+    "MOD13A3", "MOD13C1", "MOD13C2", "MYD13Q1", "MYD13A1", "MYD13A2", "MYD13A3",
+    "MYD13C1", "MYD13C2", "MOD13Q1", "MOD13A1"),
   version = "61",
   horizontal_tiles = c(7, 13),
   vertical_tiles = c(3, 6),
