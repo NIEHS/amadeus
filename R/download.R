@@ -2653,7 +2653,9 @@ download_modis <- function(
     )
 
     dir_str_julian <-
-      lapply(download_name, function(x) strsplit(x, ".A")[[1]][3])
+      lapply(
+        download_name, function(x) strsplit(x, paste0(product, ".A"))[[1]][2]
+      )
 
     dir_substr <- paste0(
       substr(dir_str_julian, 1, 4), "/",
