@@ -24,8 +24,8 @@
 #' * \code{\link{process_aqs}}: "aqs", "AQS"
 #' * \code{\link{process_hms}}: "hms", "smoke", "HMS"
 #' * \code{\link{process_narr}}: "narr", "NARR"
-#' * \code{\link{process_sedac_groads}}: "sedac_groads", "roads", "groads"
-#' * \code{\link{process_sedac_population}}: "sedac_population", "population"
+#' * \code{\link{process_groads}}: "sedac_groads", "roads", "groads"
+#' * \code{\link{process_population}}: "sedac_population", "population"
 #' * \code{\link{process_merra2}}: "merra", "merra2", "MERRA2"
 #' * \code{\link{process_gridmet}}: "gridmet", "gridMET"
 #' * \code{\link{process_terraclimate}}: "terraclimate", "TerraClimate"
@@ -83,11 +83,11 @@ process_covariates <-
       nlcd = process_nlcd,
       smoke = process_hms,
       hms = process_hms,
-      sedac_groads = process_sedac_groads,
-      roads = process_sedac_groads,
-      groads = process_sedac_groads,
-      sedac_population = process_sedac_population,
-      population = process_sedac_population,
+      sedac_groads = process_groads,
+      roads = process_groads,
+      groads = process_groads,
+      sedac_population = process_population,
+      population = process_population,
       nei = process_nei,
       tri = process_tri,
       geos = process_geos,
@@ -1350,13 +1350,13 @@ process_aqs <-
 #' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
-#' pop <- process_sedac_population(
+#' pop <- process_population(
 #'   path = "./data/sedac_population_example.tif"
 #' )
 #' }
 #' @export
 # nolint end
-process_sedac_population <- function(
+process_population <- function(
     path = NULL,
     extent = NULL,
     ...) {
@@ -1416,7 +1416,7 @@ process_sedac_population <- function(
 # nolint start
 #' Process roads data
 #' @description
-#' The \code{process_sedac_groads()} function imports and cleans raw road data,
+#' The \code{process_groads()} function imports and cleans raw road data,
 #' returning a single `SpatVector` object.
 #' @param path character(1). Path to geodatabase or shapefiles.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
@@ -1432,13 +1432,13 @@ process_sedac_population <- function(
 #' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
-#' groads <- process_sedac_groads(
+#' groads <- process_groads(
 #'   path = "./data/groads_example.shp"
 #' )
 #' }
 #' @export
 # nolint end
-process_sedac_groads <- function(
+process_groads <- function(
     path = NULL,
     extent = NULL,
     ...) {

@@ -2,8 +2,8 @@
 ##### unit and integration tests for NASA SEDAC gRoads functions
 
 ################################################################################
-##### download_sedac_groads
-testthat::test_that("download_sedac_groads", {
+##### download_groads
+testthat::test_that("download_groads", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
@@ -69,13 +69,13 @@ testthat::test_that("download_sedac_groads", {
 })
 
 ################################################################################
-##### process_sedac_groads
-testthat::test_that("process_sedac_groads", {
+##### process_groads
+testthat::test_that("process_groads", {
   withr::local_package("terra")
 
   # main test
   testthat::expect_no_error(
-    groads <- process_sedac_groads(
+    groads <- process_groads(
       path = testthat::test_path("../testdata/groads_test.shp")
     )
   )
@@ -83,11 +83,11 @@ testthat::test_that("process_sedac_groads", {
   testthat::expect_s4_class(groads, "SpatVector")
   # error cases
   testthat::expect_error(
-    process_sedac_groads(path = 1L)
+    process_groads(path = 1L)
   )
   # test with cropping extent
   testthat::expect_no_error(
-    groads_ext <- process_sedac_groads(
+    groads_ext <- process_groads(
       path = testthat::test_path("../testdata/groads_test.shp"),
       extent = terra::ext(groads)
     )
@@ -95,7 +95,7 @@ testthat::test_that("process_sedac_groads", {
 })
 
 ################################################################################
-##### calculate_sedac_groads
+##### calculate_groads
 testthat::test_that("calculate_groads", {
   withr::local_package("terra")
   withr::local_package("sf")
@@ -113,7 +113,7 @@ testthat::test_that("calculate_groads", {
   groads <- terra::vect(path_groads)
 
   testthat::expect_no_error(
-    groads_res <- calculate_sedac_groads(
+    groads_res <- calculate_groads(
       from = groads,
       locs = ncp,
       locs_id = "site_id",
@@ -122,7 +122,7 @@ testthat::test_that("calculate_groads", {
   )
 
   testthat::expect_error(
-    calculate_sedac_groads(
+    calculate_groads(
       from = groads,
       locs = ncp,
       locs_id = "site_id",
@@ -135,7 +135,7 @@ testthat::test_that("calculate_groads", {
 
   # return with geometry terra
   testthat::expect_no_error(
-    groads_terra <- calculate_sedac_groads(
+    groads_terra <- calculate_groads(
       from = groads,
       locs = ncp,
       locs_id = "site_id",
@@ -152,7 +152,7 @@ testthat::test_that("calculate_groads", {
 
   # return with geometry sf
   testthat::expect_no_error(
-    groads_sf <- calculate_sedac_groads(
+    groads_sf <- calculate_groads(
       from = groads,
       locs = ncp,
       locs_id = "site_id",
@@ -168,7 +168,7 @@ testthat::test_that("calculate_groads", {
   )
 
   testthat::expect_error(
-    calculate_sedac_groads(
+    calculate_groads(
       from = groads,
       locs = ncp,
       locs_id = "site_id",

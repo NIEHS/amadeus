@@ -29,8 +29,8 @@
 #' * \code{\link{download_narr}}: `"narr"`
 #' * \code{\link{download_nlcd}}: `"nlcd"`, `"NLCD"`
 #' * \code{\link{download_hms}}: `"noaa"`, `"smoke"`, `"hms"`
-#' * \code{\link{download_sedac_groads}}: `"sedac_groads"`, `"groads"`
-#' * \code{\link{download_sedac_population}}: `"sedac_population"`,
+#' * \code{\link{download_groads}}: `"sedac_groads"`, `"groads"`
+#' * \code{\link{download_population}}: `"sedac_population"`,
 #'   `"population"`
 #' * \code{\link{download_modis}}: `"modis"`, `"MODIS"`
 #' * \code{\link{download_tri}}: `"tri"`, `"TRI"`
@@ -94,10 +94,10 @@ download_data <-
       noaa = download_hms,
       smoke = download_hms,
       hms = download_hms,
-      sedac_groads = download_sedac_groads,
-      groads = download_sedac_groads,
-      sedac_population = download_sedac_population,
-      population = download_sedac_population,
+      sedac_groads = download_groads,
+      groads = download_groads,
+      sedac_population = download_population,
+      population = download_population,
       modis = download_modis,
       tri = download_tri,
       nei = download_nei,
@@ -1586,7 +1586,7 @@ download_nlcd <- function(
 # nolint start
 #' Download roads data
 #' @description
-#' The \code{download_sedac_groads()} function accesses and downloads
+#' The \code{download_groads()} function accesses and downloads
 #' roads data from [NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00).
 #' @param data_region character(1). Data can be downloaded for `"Global"`,
 #' `"Africa"`, `"Asia"`, `"Europe"`, `"Americas"`, `"Oceania East"`, and `"Oceania West"`.
@@ -1621,7 +1621,7 @@ download_nlcd <- function(
 #' \insertRef{data_ciesin2013groads}{amadeus}
 #' @examples
 #' \dontrun{
-#' download_sedac_groads(
+#' download_groads(
 #'   data_region = "Americas",
 #'   data_format = "Shapefile",
 #'   directory_to_save = tempdir(),
@@ -1632,7 +1632,7 @@ download_nlcd <- function(
 #' )
 #' }
 #' @export
-download_sedac_groads <- function(
+download_groads <- function(
     data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
     data_format = c("Shapefile", "Geodatabase"),
     directory_to_save = NULL,
@@ -1739,7 +1739,7 @@ download_sedac_groads <- function(
 # nolint start
 #' Download population density data
 #' @description
-#' The \code{download_sedac_population()} function accesses and downloads
+#' The \code{download_population()} function accesses and downloads
 #' population density data from [NASA's UN WPP-Adjusted Population Density, v4.11](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11).
 #' @param data_resolution character(1). Available resolutions are 30 second
 #' (approx. 1 km), 2.5 minute (approx. 5 km), 15 minute (approx. 30 km),
@@ -1778,7 +1778,7 @@ download_sedac_groads <- function(
 #' \insertRef{data_ciesin2017gpwv4}{amadeus}
 #' @examples
 #' \dontrun{
-#' download_sedac_population(
+#' download_population(
 #'   data_resolution = "30 second",
 #'   data_format = "GeoTIFF",
 #'   year = "2020",
@@ -1790,7 +1790,7 @@ download_sedac_groads <- function(
 #' )
 #' }
 #' @export
-download_sedac_population <- function(
+download_population <- function(
   data_resolution = "60 minute",
   data_format = c("GeoTIFF", "ASCII", "netCDF"),
   year = "2020",
