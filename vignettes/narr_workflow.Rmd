@@ -1,0 +1,116 @@
+---
+title: "North American Regional Reanalysis (NARR)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{North American Regional Reanalysis (NARR)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "`r Sys.Date()`"
+author: "Mitchell Manware"
+---
+
+```{r setup, include = FALSE}
+# packages
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ""
+)
+library(amadeus)
+```
+
+This vignette demonstrates how to download, process, and calculate covariates from the [NOAA North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) dataset using `amadeus` functions.
+Details are provided for each function's parameters and outputs.
+The examples utilize daily air temperature at 2m height ("air.2m") data.
+The messages returned by `amadeus` functions have been omitted for brevity.
+
+## Download
+
+Start by downloading the netCDF data files with `download_data`.
+
+### Parameters:
+* `dataset_name = "narr"`: NARR dataset acronym.
+* `variable = "air.2m"`: air temperature at 2m height variable code.
+* `year = c(2021, 2022)`: years of interest.
+* `directory_to_save = dir`: directory to save the downloaded files.
+* `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
+* `download = TRUE`: download the data files.
+* `remove_command = TRUE`: remove the temporary command file used to download the data.
+* `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
+
+```{r, message = FALSE}
+dir <- tempdir()
+download_data(
+  dataset_name = "narr",
+  variable = "air.2m",
+  year = c(2021, 2022),
+  directory_to_save = dir,
+  acknowledgement = TRUE,
+  download = TRUE,
+  remove_command = TRUE,
+  hash = TRUE
+)
+```
+
+Check the downloaded netCDF files.
+
+```{r}
+list.files(dir, recursive = TRUE, pattern = "air.2m")
+```
+
+## Process
+
+Import and process the downloaded netCDF files with `process_covariates`.
+
+Parameters:
+
+* `covariate = "narr"`: NARR dataset acronym.
+* `variable = "air.2m"`: air temperature at 2m height variable code.
+* `date = c("2021-12-28", "2022-01-03")`: date range of interest.
+* `path = paste0(dir, "/air.2m")`: directory containing the downloaded files.
+
+```{r, message = FALSE}
+air2m_process <- process_covariates(
+  covariate = "narr",
+  variable = "air.2m",
+  date = c("2021-12-28", "2022-01-03"),
+  path = file.path(dir, "/air.2m")
+)
+```
+
+Check the processed `SpatRaster` object.
+
+```{r}
+air2m_process
+```
+
+## Calculate covariates
+
+Calculate covariates for North Carolina county boundaries with `calculate_covariates`.
+County boundaries are accessed with the `tigris::counties` function.\insertRef{package_tigris}
+
+Parameters:
+
+* `covariate = "narr"`: NARR dataset acronym.
+* `from = air2m_process`: processed `SpatRaster` object.
+* `locs = tigris::counties("NC", year = 2021)`: North Carolina county boundaries.
+* `locs_id = "NAME"`: county name identifier.
+* `radius = 0`: size of buffer radius around each county.
+* `geom = "terra"`: return covariates as a `SpatVector` object.
+
+```{r, message = FALSE}
+library(tigris)
+air2m_covar <- calculate_covariates(
+  covariate = "narr",
+  from = air2m_process,
+  locs = tigris::counties("NC", year = 2021),
+  locs_id = "NAME",
+  radius = 0,
+  geom = "terra"
+)
+```
+
+Check the calculated covariates `SpatVector` object.
+
+```{r}
+air2m_covar
+```
