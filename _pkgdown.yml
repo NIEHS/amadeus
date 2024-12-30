@@ -33,3 +33,14 @@ reference:
   desc: Functions which support the download, process, and covariate calculation functions
 - contents:
   - has_keyword("auxiliary")
+
+articles:
+- title: Articles
+  navbar: ~
+  contents:
+  - download_functions
+  - protected_datasets
+  - terraclimate_workflow
+  - gridmet_workflow
+  - narr_workflow
+  - epa_download
