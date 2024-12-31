@@ -29,7 +29,9 @@ testthat::test_that("list_stac_files", {
 
   # retrieve ids only
   testthat::expect_no_error(
-    result2 <- amadeus:::list_stac_files(stac_json, format, keyword, id_only = TRUE)
+    result2 <- amadeus:::list_stac_files(
+      stac_json, format, keyword, id_only = TRUE
+    )
   )
   testthat::expect_true(is.character(result2))
 
