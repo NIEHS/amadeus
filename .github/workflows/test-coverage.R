@@ -4,7 +4,7 @@ ghworkspace <- args[[2]]
 
 dir.create(file.path(runnertemp, "package"), showWarnings = FALSE, recursive = TRUE)
 sink(paste0(runnertemp, '/package/testthat.Rout.res'))
-cov <- covr::package_coverage()
+cov <- covr::package_coverage(quiet = FALSE)
 sink()
 covd <- covr::coverage_to_list(cov)$totalcoverage
 write.table(
