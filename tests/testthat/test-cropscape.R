@@ -47,7 +47,7 @@ testthat::test_that("download_cropscape (no errors - GMU)", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
-test_that("download_cropscape (no errors - USDA)", {
+testthat::test_that("download_cropscape (no errors - USDA)", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # Set up test data

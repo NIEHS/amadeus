@@ -248,7 +248,7 @@ testthat::test_that("calculate_hms (no errors)", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(calculate_hms)
   )
   for (r in seq_along(radii)) {
@@ -277,23 +277,23 @@ testthat::test_that("calculate_hms (no errors)", {
       locs_id = "site_id"
     )
     # expect output is data.frame
-    expect_true(
+    testthat::expect_true(
       class(hms_covariate) == "data.frame"
     )
     # expect 3 columns
-    expect_true(
+    testthat::expect_true(
       ncol(hms_covariate) == 5
     )
     # expect 2 rows
-    expect_true(
+    testthat::expect_true(
       nrow(hms_covariate) == 2
     )
     # expect integer for binary value
-    expect_true(
+    testthat::expect_true(
       is.integer(hms_covariate[, 3])
     )
     # expect binary
-    expect_true(
+    testthat::expect_true(
       all(unique(hms_covariate[, 3]) %in% c(0, 1))
     )
   }
@@ -353,7 +353,7 @@ testthat::test_that("calculate_hms (absent polygons - 12/31/2018)", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(calculate_hms)
   )
   # expect function

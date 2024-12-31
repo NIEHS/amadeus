@@ -16,7 +16,7 @@ testthat::test_that("download_olm", {
   download <- FALSE
 
   testthat::expect_no_error(
-    download_olm(
+    amadeus:::download_olm(
       product = product,
       format = format,
       directory_to_save = directory_to_save,
@@ -60,15 +60,15 @@ testthat::test_that("process_olm", {
     )
   )
   testthat::expect_no_error(
-    olm <- process_olm(path = tmwm)
+    olm <- amadeus:::process_olm(path = tmwm)
   )
   testthat::expect_s4_class(olm, "SpatRaster")
   testthat::expect_error(
-    process_olm(path = 1L)
+    amadeus:::process_olm(path = 1L)
   )
 
   # test with cropping extent
   testthat::expect_no_error(
-    olm_ext <- process_olm(path = tmwm, extent = terra::ext(olm))
+    olm_ext <- amadeus:::process_olm(path = tmwm, extent = terra::ext(olm))
   )
 })

@@ -570,7 +570,7 @@ testthat::test_that("process_blackmarble*", {
     process_blackmarble_corners(hrange = c(99, 104))
   )
 
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     vnp46_proc <- process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
@@ -580,7 +580,7 @@ testthat::test_that("process_blackmarble*", {
   testthat::expect_s4_class(vnp46_proc, "SpatRaster")
   testthat::expect_equal(terra::nlyr(vnp46_proc), 1L)
 
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     vnp46_proc2 <- process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
@@ -897,7 +897,7 @@ testthat::test_that("calculate_modis", {
       "VNP46",
       full.names = TRUE
     )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     base_vnp <- process_blackmarble(
       path = path_vnp46,
       date = "2018-08-13",
@@ -1102,7 +1102,7 @@ testthat::test_that("calculate_modis", {
       tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
     )
   )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     flushed <- calculate_modis(
       from = path_vnp46,
       locs = site_faux,

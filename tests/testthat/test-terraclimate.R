@@ -102,7 +102,7 @@ testthat::test_that("process_terraclimate", {
   withr::local_package("terra")
   variable <- "ppt"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_terraclimate)
   )
   terraclimate <-
@@ -118,27 +118,27 @@ testthat::test_that("process_terraclimate", {
       )
     )
   # expect output is SpatRaster
-  expect_true(
+  testthat::expect_true(
     class(terraclimate)[1] == "SpatRaster"
   )
   # expect values
-  expect_true(
+  testthat::expect_true(
     terra::hasValues(terraclimate)
   )
   # expect non-null coordinate reference system
-  expect_false(
+  testthat::expect_false(
     is.null(terra::crs(terraclimate))
   )
   # expect lon and lat dimensions to be > 1
-  expect_false(
+  testthat::expect_false(
     any(c(0, 1) %in% dim(terraclimate)[1:2])
   )
   # expect non-numeric and non-empty time
-  expect_false(
+  testthat::expect_false(
     any(c("", 0) %in% terra::time(terraclimate))
   )
   # expect dimensions according to levels
-  expect_true(
+  testthat::expect_true(
     dim(terraclimate)[3] == 1
   )
   # test with cropping extent
@@ -162,7 +162,7 @@ testthat::test_that("process_terraclimate (single date)", {
   withr::local_package("terra")
   variable <- "ppt"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_terraclimate)
   )
   terraclimate <-
@@ -178,27 +178,27 @@ testthat::test_that("process_terraclimate (single date)", {
       )
     )
   # expect output is SpatRaster
-  expect_true(
+  testthat::expect_true(
     class(terraclimate)[1] == "SpatRaster"
   )
   # expect values
-  expect_true(
+  testthat::expect_true(
     terra::hasValues(terraclimate)
   )
   # expect non-null coordinate reference system
-  expect_false(
+  testthat::expect_false(
     is.null(terra::crs(terraclimate))
   )
   # expect lon and lat dimensions to be > 1
-  expect_false(
+  testthat::expect_false(
     any(c(0, 1) %in% dim(terraclimate)[1:2])
   )
   # expect non-numeric and non-empty time
-  expect_false(
+  testthat::expect_false(
     any(c("", 0) %in% terra::time(terraclimate))
   )
   # expect dimensions according to levels
-  expect_true(
+  testthat::expect_true(
     dim(terraclimate)[3] == 1
   )
   # test with cropping extent
@@ -221,19 +221,19 @@ testthat::test_that("process_terraclimate (single date)", {
 testthat::test_that("process_terraclimate_codes", {
   # terraclimate
   tc1 <- process_terraclimate_codes("all")
-  expect_true(ncol(tc1) == 2)
+  testthat::expect_true(ncol(tc1) == 2)
   tc2 <- process_terraclimate_codes("aet", invert = TRUE)
-  expect_true(class(tc2) == "character")
-  expect_true(nchar(tc2) > 7)
+  testthat::expect_true(class(tc2) == "character")
+  testthat::expect_true(nchar(tc2) > 7)
   tc3 <- process_terraclimate_codes("Actual Evapotranspiration")
-  expect_true(class(tc3) == "character")
-  expect_true(nchar(tc3) < 7)
+  testthat::expect_true(class(tc3) == "character")
+  testthat::expect_true(nchar(tc3) < 7)
   # process_variable_codes
-  expect_no_error(process_variable_codes("aet", "terraclimate"))
-  expect_no_error(
+  testthat::expect_no_error(process_variable_codes("aet", "terraclimate"))
+  testthat::expect_no_error(
     process_variable_codes("Actual Evapotranspiration", "terraclimate")
   )
-  expect_error(
+  testthat::expect_error(
     process_variable_codes("error", "terraclimate")
   )
 })
@@ -247,7 +247,7 @@ testthat::test_that("calculate_terraclimate", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(calculate_terraclimate)
   )
   for (r in seq_along(radii)) {
@@ -279,19 +279,19 @@ testthat::test_that("calculate_terraclimate", {
       locs_id = "site_id"
     )
     # expect output is data.frame
-    expect_true(
+    testthat::expect_true(
       class(terraclimate_covariate) == "data.frame"
     )
     # expect 3 columns
-    expect_true(
+    testthat::expect_true(
       ncol(terraclimate_covariate) == 3
     )
     # expect numeric value
-    expect_true(
+    testthat::expect_true(
       class(terraclimate_covariate[, 3]) == "numeric"
     )
     # expect date and time column
-    expect_true(
+    testthat::expect_true(
       nchar(terraclimate_covariate$time)[1] == 6
     )
   }

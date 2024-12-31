@@ -102,7 +102,7 @@ testthat::test_that("process_gridmet", {
   withr::local_package("terra")
   variable <- "Precipitation"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_gridmet)
   )
   gridmet <-
@@ -118,27 +118,27 @@ testthat::test_that("process_gridmet", {
       )
     )
   # expect output is SpatRaster
-  expect_true(
+  testthat::expect_true(
     class(gridmet)[1] == "SpatRaster"
   )
   # expect values
-  expect_true(
+  testthat::expect_true(
     terra::hasValues(gridmet)
   )
   # expect non-null coordinate reference system
-  expect_false(
+  testthat::expect_false(
     is.null(terra::crs(gridmet))
   )
   # expect lon and lat dimensions to be > 1
-  expect_false(
+  testthat::expect_false(
     any(c(0, 1) %in% dim(gridmet)[1:2])
   )
   # expect non-numeric and non-empty time
-  expect_false(
+  testthat::expect_false(
     any(c("", 0) %in% terra::time(gridmet))
   )
   # expect dimensions according to levels
-  expect_true(
+  testthat::expect_true(
     dim(gridmet)[3] == 1
   )
   # test with cropping extent
@@ -162,7 +162,7 @@ testthat::test_that("process_gridmet (single date)", {
   withr::local_package("terra")
   variable <- "Precipitation"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_gridmet)
   )
   gridmet <-
@@ -178,27 +178,27 @@ testthat::test_that("process_gridmet (single date)", {
       )
     )
   # expect output is SpatRaster
-  expect_true(
+  testthat::expect_true(
     class(gridmet)[1] == "SpatRaster"
   )
   # expect values
-  expect_true(
+  testthat::expect_true(
     terra::hasValues(gridmet)
   )
   # expect non-null coordinate reference system
-  expect_false(
+  testthat::expect_false(
     is.null(terra::crs(gridmet))
   )
   # expect lon and lat dimensions to be > 1
-  expect_false(
+  testthat::expect_false(
     any(c(0, 1) %in% dim(gridmet)[1:2])
   )
   # expect non-numeric and non-empty time
-  expect_false(
+  testthat::expect_false(
     any(c("", 0) %in% terra::time(gridmet))
   )
   # expect dimensions according to levels
-  expect_true(
+  testthat::expect_true(
     dim(gridmet)[3] == 1
   )
   # test with cropping extent
@@ -221,19 +221,19 @@ testthat::test_that("process_gridmet (single date)", {
 testthat::test_that("process_gridmet_codes", {
   # gridmet
   gc1 <- process_gridmet_codes("all")
-  expect_true(ncol(gc1) == 2)
+  testthat::expect_true(ncol(gc1) == 2)
   gc2 <- process_gridmet_codes("sph", invert = TRUE)
-  expect_true(class(gc2) == "character")
-  expect_true(nchar(gc2) > 7)
+  testthat::expect_true(class(gc2) == "character")
+  testthat::expect_true(nchar(gc2) > 7)
   gc3 <- process_gridmet_codes("Near-Surface Specific Humidity")
-  expect_true(class(gc3) == "character")
-  expect_true(nchar(gc3) < 7)
+  testthat::expect_true(class(gc3) == "character")
+  testthat::expect_true(nchar(gc3) < 7)
   # process_variable_codes
-  expect_no_error(process_variable_codes("sph", "gridmet"))
-  expect_no_error(
+  testthat::expect_no_error(process_variable_codes("sph", "gridmet"))
+  testthat::expect_no_error(
     process_variable_codes("Near-Surface Specific Humidity", "gridmet")
   )
-  expect_error(
+  testthat::expect_error(
     process_variable_codes("error", "gridmet")
   )
 })
@@ -247,7 +247,7 @@ testthat::test_that("calculate_gridmet", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(calculate_gridmet)
   )
   for (r in seq_along(radii)) {
@@ -279,19 +279,19 @@ testthat::test_that("calculate_gridmet", {
       locs_id = "site_id"
     )
     # expect output is data.frame
-    expect_true(
+    testthat::expect_true(
       class(gridmet_covariate) == "data.frame"
     )
     # expect 3 columns
-    expect_true(
+    testthat::expect_true(
       ncol(gridmet_covariate) == 3
     )
     # expect numeric value
-    expect_true(
+    testthat::expect_true(
       class(gridmet_covariate[, 3]) == "numeric"
     )
     # expect $time is class Date
-    expect_true(
+    testthat::expect_true(
       "POSIXt" %in% class(gridmet_covariate$time)
     )
   }

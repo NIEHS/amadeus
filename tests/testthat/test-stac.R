@@ -13,7 +13,7 @@ testthat::test_that("list_stac_files", {
 
   # Call the function
   testthat::expect_message(
-    result <- list_stac_files(stac_json, format, which)
+    result <- amadeus:::list_stac_files(stac_json, format, which)
   )
   # Check the return type
   testthat::expect_true(is.character(result))
@@ -23,13 +23,13 @@ testthat::test_that("list_stac_files", {
   # string search keyword
   keyword <- "bulkdens"
   testthat::expect_message(
-    result1 <- list_stac_files(stac_json, format, keyword)
+    result1 <- amadeus:::list_stac_files(stac_json, format, keyword)
   )
   testthat::expect_true(is.character(result1))
 
   # retrieve ids only
   testthat::expect_no_error(
-    result2 <- list_stac_files(stac_json, format, keyword, id_only = TRUE)
+    result2 <- amadeus:::list_stac_files(stac_json, format, keyword, id_only = TRUE)
   )
   testthat::expect_true(is.character(result2))
 

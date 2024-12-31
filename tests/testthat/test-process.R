@@ -43,7 +43,7 @@ testthat::test_that("process_covariates", {
     )
 
   corn <- process_blackmarble_corners()
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     bm_proc <- process_covariates(
       covariate = "blackmarble",
       path = path_vnp46[1],
@@ -51,7 +51,7 @@ testthat::test_that("process_covariates", {
       date = "2018-08-13"
     )
   )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     process_covariates(
       covariate = "Blackmarble",
       path = path_vnp46[1],
@@ -59,7 +59,7 @@ testthat::test_that("process_covariates", {
       date = "2018-08-13"
     )
   )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     process_covariates(
       covariate = "BLACKMARBLE",
       path = path_vnp46[1],
@@ -145,7 +145,7 @@ testthat::test_that("process_collection", {
     ),
     full.names = TRUE
   )
-  expect_error(
+  testthat::expect_error(
     process_collection(
       path = path,
       source = "geos",
@@ -160,7 +160,7 @@ testthat::test_that("process_collection", {
     date = TRUE
   )
   # expect YYYYMMDD dates
-  expect_true(
+  testthat::expect_true(
     unique(nchar(path_split_d)) == 8
   )
   path_split_dt <- process_collection(
@@ -169,7 +169,7 @@ testthat::test_that("process_collection", {
     datetime = TRUE
   )
   # expect YYYYMMDD dates
-  expect_true(
+  testthat::expect_true(
     unique(nchar(path_split_dt)) == 12
   )
 })
@@ -192,7 +192,7 @@ testthat::test_that("process_locs_vector", {
       )
     )
   # expect error when missing `lat` or `lon`
-  expect_error(
+  testthat::expect_error(
     calculate_narr(
       from = narr,
       locs = subset(
@@ -203,7 +203,7 @@ testthat::test_that("process_locs_vector", {
     )
   )
   # expect error when sites are SpatVector (points)
-  expect_no_error(
+  testthat::expect_no_error(
     calculate_narr(
       from = narr,
       locs = terra::vect(
@@ -215,7 +215,7 @@ testthat::test_that("process_locs_vector", {
     )
   )
   # expect error when sites are SpatVector (polygons)
-  expect_no_error(
+  testthat::expect_no_error(
     calculate_narr(
       from = narr,
       locs = terra::buffer(
@@ -230,7 +230,7 @@ testthat::test_that("process_locs_vector", {
     )
   )
   # expect error when sites are sf
-  expect_no_error(
+  testthat::expect_no_error(
     calculate_narr(
       from = narr,
       locs = sf::st_as_sf(
@@ -245,12 +245,12 @@ testthat::test_that("process_locs_vector", {
   ncpp <- data.frame(long = -78.8277, lat = 35.95013)
   ncpp$site_id <- "3799900018810101"
 
-  expect_error(
+  testthat::expect_error(
     process_locs_vector(
       locs = ncpp, crs = "EPSG:4326", 0
     )
   )
-  expect_error(
+  testthat::expect_error(
     process_locs_vector(array(1))
   )
 })

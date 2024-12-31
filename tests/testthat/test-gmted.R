@@ -97,7 +97,7 @@ testthat::test_that("process_gmted (no errors)", {
     "7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"
   )
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_gmted)
   )
   for (s in seq_along(statistics)) {
@@ -128,19 +128,19 @@ testthat::test_that("process_gmted (no errors)", {
           )
         )
       # expect output is a SpatRaster
-      expect_true(
+      testthat::expect_true(
         class(gmted)[1] == "SpatRaster"
       )
       # expect values
-      expect_true(
+      testthat::expect_true(
         terra::hasValues(gmted)
       )
       # expect non-null coordinate reference system
-      expect_false(
+      testthat::expect_false(
         is.null(terra::crs(gmted))
       )
       # expect lon and lat dimensions to be > 1
-      expect_false(
+      testthat::expect_false(
         any(c(0, 1) %in% dim(gmted)[1:2])
       )
     }
@@ -164,7 +164,7 @@ testthat::test_that("process_gmted (no errors)", {
 
 testthat::test_that("process_gmted (expected errors)", {
   # expect errors due to non-vector variable
-  expect_error(
+  testthat::expect_error(
     gmted <-
       process_gmted(
         variable <- "Breakline Emphasis; 7.5 arc-seconds",
@@ -215,7 +215,7 @@ testthat::test_that("calculate_gmted", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(calculate_gmted)
   )
   for (s in seq_along(statistics)) {
@@ -249,15 +249,15 @@ testthat::test_that("calculate_gmted", {
           locs_id = "site_id"
         )
         # expect output is data.frame
-        expect_true(
+        testthat::expect_true(
           class(gmted_covariate) == "data.frame"
         )
         # expect 2 columns
-        expect_true(
+        testthat::expect_true(
           ncol(gmted_covariate) == 3
         )
         # expect numeric value
-        expect_true(
+        testthat::expect_true(
           class(gmted_covariate[, 3]) == "numeric"
         )
       }

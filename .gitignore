@@ -62,3 +62,6 @@ CRAN-SUBMISSION
 
 # local pkgdown site
 /pkgdown/
+
+# containerized tests
+/tests/container/*sif
