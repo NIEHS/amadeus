@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,10 +18,14 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/download_functions.html">download_data</a></li>
-    <li><a class="dropdown-item" href="../articles/epa_download.html">Downloading EPA Daily Data</a></li>
-    <li><a class="dropdown-item" href="../articles/protected_datasets.html">Protected Data Sources</a></li>
-    <li><a class="dropdown-item" href="../articles/workflow.html">amadeus workflow</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Miscellaneous</h6></li>
+    <li><a class="dropdown-item" href="../articles/download_functions.html">download_data Function</a></li>
+    <li><a class="dropdown-item" href="../articles/protected_datasets.html">Protected Datasets</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Source-Specific Workflows</h6></li>
+    <li><a class="dropdown-item" href="../articles/terraclimate_workflow.html">Climatology Lab TerraClimate</a></li>
+    <li><a class="dropdown-item" href="../articles/gridmet_workflow.html">Climatology Lab GridMET</a></li>
+    <li><a class="dropdown-item" href="../articles/narr_workflow.html">North American Regional Reanalysis (NARR)</a></li>
+    <li><a class="dropdown-item" href="../articles/epa_download.html">US EPA Air Quality System (AQS)</a></li>
   </ul></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -135,15 +139,15 @@ The threshold should be carefully chosen by users.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(from_id)`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(to_id)`</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(from_id, to_id)`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         NAME       val1        val2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Currituck 0.39651678 0.119400641</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   Franklin 0.00767532 0.000963305</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    Madison 0.00858568 0.003998301</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       Polk 0.06034160 0.003668522</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   Randolph 0.03433355 0.046817979</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 Rutherford 0.11657394 0.007087217</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7     Stokes 0.04433759 0.004935366</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8     Yancey 0.05592440 0.026043667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         NAME        val1         val2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Currituck 0.396806821 0.1194879800</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   Franklin 0.007670679 0.0009627225</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    Madison 0.008587220 0.0039990182</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       Polk 0.060334402 0.0036680841</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   Randolph 0.034332984 0.0468172020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 Rutherford 0.116429976 0.0070784648</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7     Stokes 0.044323594 0.0049338077</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     Yancey 0.055883024 0.0260243982</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
