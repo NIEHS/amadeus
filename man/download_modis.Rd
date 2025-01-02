@@ -5,7 +5,10 @@
 \title{Download MODIS product files}
 \usage{
 download_modis(
-  product = c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2"),
+  product = c("MOD09GA", "MYD09GA", "MOD09GQ", "MYD09GQ", "MOD09A1", "MYD09A1",
+    "MOD09Q1", "MYD09Q1", "MOD11A1", "MYD11A1", "MOD11A2", "MYD11A2", "MOD11B1",
+    "MYD11B1", "MOD13A1", "MYD13A1", "MOD13A2", "MYD13A2", "MOD13A3", "MYD13A3",
+    "MOD06_L2", "MCD19A2", "VNP46A2"),
   version = "61",
   horizontal_tiles = c(7, 13),
   vertical_tiles = c(3, 6),
@@ -122,7 +125,7 @@ download_modis(
   date = "2024-01-01",
   nasa_earth_data_token = "./pathtotoken/token.txt",
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
+  acknowledgement = TRUE,MOD09GA
   download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )

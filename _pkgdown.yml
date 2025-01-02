@@ -7,6 +7,24 @@ navbar:
   structure:
     left:  [reference, articles, search]
     right: [github]
+  components:
+    articles:
+      text: Articles
+      menu:
+        - text: Miscellaneous
+        - text: download_data Function
+          href: articles/download_functions.html
+        - text: Protected Datasets
+          href: articles/protected_datasets.html
+        - text: Source-Specific Workflows
+        - text: Climatology Lab TerraClimate
+          href: articles/terraclimate_workflow.html
+        - text: Climatology Lab GridMET
+          href: articles/gridmet_workflow.html
+        - text: North American Regional Reanalysis (NARR)
+          href: articles/narr_workflow.html
+        - text: US EPA Air Quality System (AQS)
+          href: articles/epa_download.html
 
 reference:
 - subtitle: Download
@@ -33,3 +51,14 @@ reference:
   desc: Functions which support the download, process, and covariate calculation functions
 - contents:
   - has_keyword("auxiliary")
+
+articles:
+- title: Articles
+  navbar: ~
+  contents:
+  - download_functions
+  - protected_datasets
+  - terraclimate_workflow
+  - gridmet_workflow
+  - narr_workflow
+  - epa_download

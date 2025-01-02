@@ -26,8 +26,8 @@
 #' * \code{\link{calculate_gmted}}: "gmted", "GMTED"
 #' * \code{\link{calculate_narr}}: "narr", "NARR"
 #' * \code{\link{calculate_geos}}: "geos", "geos_cf", "GEOS"
-#' * \code{\link{calculate_sedac_population}}: "population", "sedac_population"
-#' * \code{\link{calculate_sedac_groads}}: "roads", "groads", "sedac_groads"
+#' * \code{\link{calculate_population}}: "population", "sedac_population"
+#' * \code{\link{calculate_groads}}: "roads", "groads", "sedac_groads"
 #' * \code{\link{calculate_nlcd}}: "nlcd", "NLCD"
 #' * \code{\link{calculate_tri}}: "tri", "TRI"
 #' * \code{\link{calculate_nei}}: "nei", "NEI"
@@ -83,11 +83,11 @@ calculate_covariates <-
       nlcd = calculate_nlcd,
       smoke = calculate_hms,
       hms = calculate_hms,
-      sedac_groads = calculate_sedac_groads,
-      roads = calculate_sedac_groads,
-      groads = calculate_sedac_groads,
-      sedac_population = calculate_sedac_population,
-      population = calculate_sedac_population,
+      sedac_groads = calculate_groads,
+      roads = calculate_groads,
+      groads = calculate_groads,
+      sedac_population = calculate_population,
+      population = calculate_population,
       nei = calculate_nei,
       tri = calculate_tri,
       geos = calculate_geos,
@@ -1310,9 +1310,9 @@ calculate_hms <- function(
     skip_df <- data.frame(as.POSIXlt(from), 0, 0, 0)
     colnames(skip_df) <- c(
       "time",
-      paste0("light_", radius),
-      paste0("medium_", radius),
-      paste0("heavy_", radius)
+      paste0("light_", sprintf("%05d", radius)),
+      paste0("medium_", sprintf("%05d", radius)),
+      paste0("heavy_", sprintf("%05d", radius))
     )
     # fixed: locs is replicated per the length of from
     skip_merge <-
@@ -1801,7 +1801,7 @@ calculate_geos <- function(
 #' \code{data.frame} object containing \code{locs_id}, year, and population
 #' density variable. Population density variable column name reflects
 #' spatial resolution of \code{from} and circular buffer radius.
-#' @param from SpatRaster(1). Output of \code{process_sedac_population()}.
+#' @param from SpatRaster(1). Output of \code{process_population()}.
 #' @param locs data.frame, characater to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
 #' containing identifier for each unique coordinate location.
@@ -1814,7 +1814,7 @@ calculate_geos <- function(
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders
 #' @author Mitchell Manware
-#' @seealso [process_sedac_population()]
+#' @seealso [process_population()]
 #' @return a data.frame or SpatVector object
 #' @importFrom methods is
 #' @examples
@@ -1822,8 +1822,8 @@ calculate_geos <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calculate_sedac_population(
-#'   from = pop, # derived from process_sedac_population() example
+#' calculate_population(
+#'   from = pop, # derived from process_population() example
 #'   locs = loc,
 #'   locs_id = "id",
 #'   radius = 0,
@@ -1832,7 +1832,7 @@ calculate_geos <- function(
 #' )
 #' }
 #' @export
-calculate_sedac_population <- function(
+calculate_population <- function(
     from,
     locs,
     locs_id = NULL,
@@ -1903,7 +1903,7 @@ calculate_sedac_population <- function(
 #' Then the density of the roads is calculated by dividing
 #' the total length from the area of the buffer. `terra::linearUnits()`
 #' is used to convert the unit of length to meters.
-#' @param from SpatVector(1). Output of `process_sedac_groads`.
+#' @param from SpatVector(1). Output of `process_groads`.
 #' @param locs data.frame, characater to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
 #' containing identifier for each unique coordinate location.
@@ -1921,7 +1921,7 @@ calculate_sedac_population <- function(
 #' dataset. For more information, see <https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00>.
 # nolint end
 #' @author Insang Song
-#' @seealso [`process_sedac_groads`]
+#' @seealso [`process_groads`]
 #' @return a data.frame or SpatVector object
 #' @importFrom terra vect
 #' @importFrom stats aggregate
@@ -1939,8 +1939,8 @@ calculate_sedac_population <- function(
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calculate_sedac_groads(
-#'   from = groads, # derived from process_sedac_groads() example
+#' calculate_groads(
+#'   from = groads, # derived from process_groads() example
 #'   locs = loc,
 #'   locs_id = "id",
 #'   radius = 1000,
@@ -1949,7 +1949,7 @@ calculate_sedac_population <- function(
 #' )
 #' }
 #' @export
-calculate_sedac_groads <- function(
+calculate_groads <- function(
     from = NULL,
     locs = NULL,
     locs_id = NULL,

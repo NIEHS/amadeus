@@ -29,8 +29,8 @@
 #' * \code{\link{download_narr}}: `"narr"`
 #' * \code{\link{download_nlcd}}: `"nlcd"`, `"NLCD"`
 #' * \code{\link{download_hms}}: `"noaa"`, `"smoke"`, `"hms"`
-#' * \code{\link{download_sedac_groads}}: `"sedac_groads"`, `"groads"`
-#' * \code{\link{download_sedac_population}}: `"sedac_population"`,
+#' * \code{\link{download_groads}}: `"sedac_groads"`, `"groads"`
+#' * \code{\link{download_population}}: `"sedac_population"`,
 #'   `"population"`
 #' * \code{\link{download_modis}}: `"modis"`, `"MODIS"`
 #' * \code{\link{download_tri}}: `"tri"`, `"TRI"`
@@ -94,10 +94,10 @@ download_data <-
       noaa = download_hms,
       smoke = download_hms,
       hms = download_hms,
-      sedac_groads = download_sedac_groads,
-      groads = download_sedac_groads,
-      sedac_population = download_sedac_population,
-      population = download_sedac_population,
+      sedac_groads = download_groads,
+      groads = download_groads,
+      sedac_population = download_population,
+      population = download_population,
       modis = download_modis,
       tri = download_tri,
       nei = download_nei,
@@ -1586,7 +1586,7 @@ download_nlcd <- function(
 # nolint start
 #' Download roads data
 #' @description
-#' The \code{download_sedac_groads()} function accesses and downloads
+#' The \code{download_groads()} function accesses and downloads
 #' roads data from [NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00).
 #' @param data_region character(1). Data can be downloaded for `"Global"`,
 #' `"Africa"`, `"Asia"`, `"Europe"`, `"Americas"`, `"Oceania East"`, and `"Oceania West"`.
@@ -1621,7 +1621,7 @@ download_nlcd <- function(
 #' \insertRef{data_ciesin2013groads}{amadeus}
 #' @examples
 #' \dontrun{
-#' download_sedac_groads(
+#' download_groads(
 #'   data_region = "Americas",
 #'   data_format = "Shapefile",
 #'   directory_to_save = tempdir(),
@@ -1632,7 +1632,7 @@ download_nlcd <- function(
 #' )
 #' }
 #' @export
-download_sedac_groads <- function(
+download_groads <- function(
     data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
     data_format = c("Shapefile", "Geodatabase"),
     directory_to_save = NULL,
@@ -1739,7 +1739,7 @@ download_sedac_groads <- function(
 # nolint start
 #' Download population density data
 #' @description
-#' The \code{download_sedac_population()} function accesses and downloads
+#' The \code{download_population()} function accesses and downloads
 #' population density data from [NASA's UN WPP-Adjusted Population Density, v4.11](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11).
 #' @param data_resolution character(1). Available resolutions are 30 second
 #' (approx. 1 km), 2.5 minute (approx. 5 km), 15 minute (approx. 30 km),
@@ -1778,7 +1778,7 @@ download_sedac_groads <- function(
 #' \insertRef{data_ciesin2017gpwv4}{amadeus}
 #' @examples
 #' \dontrun{
-#' download_sedac_population(
+#' download_population(
 #'   data_resolution = "30 second",
 #'   data_format = "GeoTIFF",
 #'   year = "2020",
@@ -1790,7 +1790,7 @@ download_sedac_groads <- function(
 #' )
 #' }
 #' @export
-download_sedac_population <- function(
+download_population <- function(
   data_resolution = "60 minute",
   data_format = c("GeoTIFF", "ASCII", "netCDF"),
   year = "2020",
@@ -2365,7 +2365,7 @@ download_koppen_geiger <- function(
 #'   date = "2024-01-01",
 #'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
+#'   acknowledgement = TRUE,MOD09GA
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
@@ -2374,8 +2374,10 @@ download_koppen_geiger <- function(
 #' @export
 download_modis <- function(
     product = c(
-      "MOD09GA", "MOD11A1", "MOD06_L2",
-      "MCD19A2", "MOD13A2", "VNP46A2"
+      "MOD09GA", "MYD09GA", "MOD09GQ", "MYD09GQ", "MOD09A1", "MYD09A1",
+      "MOD09Q1", "MYD09Q1", "MOD11A1", "MYD11A1", "MOD11A2", "MYD11A2",
+      "MOD11B1", "MYD11B1", "MOD13A1", "MYD13A1", "MOD13A2", "MYD13A2",
+      "MOD13A3", "MYD13A3", "MOD06_L2", "MCD19A2", "VNP46A2"
     ),
     version = "61",
     horizontal_tiles = c(7, 13),
@@ -2488,7 +2490,7 @@ download_modis <- function(
     file_url <- unlist(file_url[, 2])
     download_url <-
       paste0(
-        # substr(ladsurl, 1, nchar(ladsurl) - 1),
+        substr(ladsurl, 1, nchar(ladsurl) - 1),
         file_url
       )
 
@@ -2507,7 +2509,7 @@ download_modis <- function(
     # date_end <- as.Date(as.character(max(file_dates)), format = "%Y%j")
 
     # Extract download names from file_url using splitter
-    download_name <- sapply(strsplit(download_url, "archives/"), `[`, 2)
+    download_name <- sapply(strsplit(download_url, "/"), `[`, 10)
 
     # Create directory structure with julian dates
     dir_substr <- paste0(
@@ -2649,7 +2651,9 @@ download_modis <- function(
     )
 
     dir_str_julian <-
-      lapply(download_name, function(x) strsplit(x, ".A")[[1]][3])
+      lapply(
+        download_name, function(x) strsplit(x, paste0(product, ".A"))[[1]][2]
+      )
 
     dir_substr <- paste0(
       substr(dir_str_julian, 1, 4), "/",

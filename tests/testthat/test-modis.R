@@ -45,7 +45,7 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
     # extract urls
     urls <- extract_urls(commands = commands, position = 4)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 3L, method = "SKIP")
+    url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
     # implement unit tests
     test_download_functions(directory_to_save = directory_to_save,
                             commands_path = commands_path,
@@ -93,7 +93,7 @@ testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 3L, method = "SKIP")
+  url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
@@ -170,7 +170,7 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "SKIP")
+  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
@@ -301,13 +301,74 @@ testthat::test_that("download_modis (expected errors)", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L, method = "SKIP")
+  url_status <- check_urls(urls = urls, size = 2L, method = "HEAD")
   # implement unit tests
   test_download_functions(directory_to_save = directory_to_save,
                           commands_path = commands_path,
                           url_status = url_status)
   # remove file with commands after test
   file.remove(commands_path)
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("download_modis (MOD + MYD products)", {
+  withr::local_package("httr")
+  withr::local_package("stringr")
+  # function parameters
+  products <- c(
+    "MOD09GA", "MYD09GA", "MOD09GQ", "MYD09GQ", "MOD09A1", "MYD09A1",
+    "MOD09Q1", "MYD09Q1", "MOD11A1", "MYD11A1", "MOD11A2", "MYD11A2",
+    "MOD11B1", "MYD11B1", "MOD13A1", "MYD13A1", "MOD13A2", "MYD13A2",
+    "MOD13A3", "MYD13A3"
+  )
+  version <- "61"
+  horizontal_tiles <- c(10, 10)
+  vertical_tiles <- c(4, 5)
+  nasa_earth_data_token <- "tOkEnPlAcEhOlDeR"
+  directory_to_save <- paste0(tempdir(), "/mod/")
+  date_start <- "2021-06-01"
+  date_end <- "2021-06-30"
+  for (p in seq_along(products)) {
+    cat("Testing product:", products[p], "\n")
+    # run download function
+    download_data(
+      dataset_name = "modis",
+      date = c(date_start, date_end),
+      product = products[p],
+      version = version,
+      horizontal_tiles = horizontal_tiles,
+      vertical_tiles = vertical_tiles,
+      nasa_earth_data_token = nasa_earth_data_token,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE
+    )
+    # define file path with commands
+    commands_path <- paste0(
+      directory_to_save,
+      products[p],
+      "_",
+      date_start,
+      "_",
+      date_end,
+      "_wget_commands.txt"
+    )
+    # import commands
+    commands <- read_commands(commands_path = commands_path)[, 2]
+    # extract urls
+    urls <- extract_urls(commands = commands, position = 4)
+    # check HTTP URL status
+    url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
+    # implement unit tests
+    test_download_functions(
+      directory_to_save = directory_to_save,
+      commands_path = commands_path,
+      url_status = url_status
+    )
+    # remove file with commands after test
+    file.remove(commands_path)
+  }
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -509,7 +570,7 @@ testthat::test_that("process_blackmarble*", {
     process_blackmarble_corners(hrange = c(99, 104))
   )
 
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     vnp46_proc <- process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
@@ -519,7 +580,7 @@ testthat::test_that("process_blackmarble*", {
   testthat::expect_s4_class(vnp46_proc, "SpatRaster")
   testthat::expect_equal(terra::nlyr(vnp46_proc), 1L)
 
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     vnp46_proc2 <- process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
@@ -836,7 +897,7 @@ testthat::test_that("calculate_modis", {
       "VNP46",
       full.names = TRUE
     )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     base_vnp <- process_blackmarble(
       path = path_vnp46,
       date = "2018-08-13",
@@ -1041,7 +1102,7 @@ testthat::test_that("calculate_modis", {
       tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
     )
   )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     flushed <- calculate_modis(
       from = path_vnp46,
       locs = site_faux,

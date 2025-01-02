@@ -195,7 +195,7 @@ testthat::test_that("dt_as_mysftime", {
     ),
     "Some of lon, lat, time columns missing or mispelled"
   )
-  expect_error(
+  testthat::expect_error(
     dt_as_mysftime(
       x = stdata[, lat := NULL],
       lonname = "lon",

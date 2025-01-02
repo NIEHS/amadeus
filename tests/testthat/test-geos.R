@@ -94,7 +94,7 @@ testthat::test_that("process_geos (no errors)", {
     "c"
   )
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_geos)
   )
   for (c in seq_along(collections)) {
@@ -112,40 +112,40 @@ testthat::test_that("process_geos (no errors)", {
         )
       )
     # expect output is SpatRaster
-    expect_true(
+    testthat::expect_true(
       class(geos)[1] == "SpatRaster"
     )
     # expect values
-    expect_true(
+    testthat::expect_true(
       terra::hasValues(geos)
     )
     # expect non-null coordinate reference system
-    expect_false(
+    testthat::expect_false(
       terra::crs(geos) == ""
     )
     # expect lon and lat dimensions to be > 1
-    expect_false(
+    testthat::expect_false(
       any(c(0, 1) %in% dim(geos)[1:2])
     )
     # expect non-numeric and non-empty time
-    expect_false(
+    testthat::expect_false(
       any(c("", 0) %in% terra::time(geos))
     )
     # expect time dimension is POSIXt for hourly
-    expect_true(
+    testthat::expect_true(
       "POSIXt" %in% class(terra::time(geos))
     )
     # expect seconds in time information
-    expect_true(
+    testthat::expect_true(
       "seconds" %in% terra::timeInfo(geos)
     )
     # expect dimensions according to collection
     if (collection == "a") {
-      expect_true(
+      testthat::expect_true(
         dim(geos)[3] == 1
       )
     } else if (collection == "c") {
-      expect_true(
+      testthat::expect_true(
         dim(geos)[3] == 5
       )
     }
@@ -174,7 +174,7 @@ testthat::test_that("process_geos (single date)", {
     "c"
   )
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_geos)
   )
   for (c in seq_along(collections)) {
@@ -192,40 +192,40 @@ testthat::test_that("process_geos (single date)", {
         )
       )
     # expect output is SpatRaster
-    expect_true(
+    testthat::expect_true(
       class(geos)[1] == "SpatRaster"
     )
     # expect values
-    expect_true(
+    testthat::expect_true(
       terra::hasValues(geos)
     )
     # expect non-null coordinate reference system
-    expect_false(
+    testthat::expect_false(
       terra::crs(geos) == ""
     )
     # expect lon and lat dimensions to be > 1
-    expect_false(
+    testthat::expect_false(
       any(c(0, 1) %in% dim(geos)[1:2])
     )
     # expect non-numeric and non-empty time
-    expect_false(
+    testthat::expect_false(
       any(c("", 0) %in% terra::time(geos))
     )
     # expect time dimension is POSIXt for hourly
-    expect_true(
+    testthat::expect_true(
       "POSIXt" %in% class(terra::time(geos))
     )
     # expect seconds in time information
-    expect_true(
+    testthat::expect_true(
       "seconds" %in% terra::timeInfo(geos)
     )
     # expect dimensions according to collection
     if (collection == "a") {
-      expect_true(
+      testthat::expect_true(
         dim(geos)[3] == 1
       )
     } else if (collection == "c") {
-      expect_true(
+      testthat::expect_true(
         dim(geos)[3] == 5
       )
     }
@@ -249,14 +249,14 @@ testthat::test_that("process_geos (single date)", {
 
 testthat::test_that("process_geos (expected errors)", {
   # expect error without variable
-  expect_error(
+  testthat::expect_error(
     process_geos()
   )
   # expect error on directory without data
-  expect_error(
+  testthat::expect_error(
     process_geos(
       variable = "O3",
-      path = "./"
+      path = "./empty/directory"
     )
   )
 })
@@ -274,7 +274,7 @@ testthat::test_that("calculate_geos", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(calculate_geos)
   )
   for (c in seq_along(collections)) {
@@ -308,19 +308,19 @@ testthat::test_that("calculate_geos", {
         locs_id = "site_id"
       )
       # expect output is data.frame
-      expect_true(
+      testthat::expect_true(
         class(geos_covariate) == "data.frame"
       )
       # expect 4 columns
-      expect_true(
+      testthat::expect_true(
         ncol(geos_covariate) == 4
       )
       # expect numeric value
-      expect_true(
+      testthat::expect_true(
         class(geos_covariate[, 4]) == "numeric"
       )
       # expect $time is class POSIXt
-      expect_true(
+      testthat::expect_true(
         "POSIXt" %in% class(geos_covariate$time)
       )
     }

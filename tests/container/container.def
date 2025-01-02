@@ -1,0 +1,48 @@
+BootStrap: docker
+From: rocker/geospatial:latest
+
+%post
+    # Update package list
+    apt-get update
+
+    # Install locales and generate the necessary locale
+    apt-get install -y locales
+    locale-gen en_US.UTF-8
+
+    # Install fonts for Unicode support
+    apt-get install -y fonts-dejavu fonts-liberation fonts-noto \
+        fonts-unifont
+
+    # Install SSL certificates and curl
+    apt-get update && apt-get install -y \
+      libcurl4-openssl-dev \
+      libssl-dev \
+      ca-certificates \
+      curl
+
+    # Set locale for the environment
+    echo "LANG=en_US.UTF-8" >> /etc/default/locale
+    echo "LC_ALL=en_US.UTF-8" >> /etc/default/locale
+    export LANG=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+
+    # Create directories
+    mkdir /pipeline
+    mkdir /input
+    mkdir /opt/_targets
+
+    # Install R packages
+    Rscript -e "install.packages(c('pak', 'rstac', 'testthat', 'covr', 'nanonext'))"
+    Rscript -e "pak::pak('NIEHS/amadeus@1.2.1')"
+
+%environment
+    # Set locale for the container environment
+    export LANG=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+    export TERM=xterm-256color
+
+%runscript
+
+%labels
+    basic geospatial with targets and crew plus unicode text so the target \
+    progress prints nicely

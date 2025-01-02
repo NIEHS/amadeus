@@ -3,5 +3,7 @@ linters: linters_with_defaults(
   )
 exclusions: list(
     "tests/testthat/test-download_functions.R",
-    "vignettes/workflow.Rmd"
+    "vignettes/terraclimate_workflow.Rmd",
+    "vignettes/gridmet_workflow.Rmd",
+    "vignettes/narr_workflow.Rmd"
   )

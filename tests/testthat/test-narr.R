@@ -88,7 +88,7 @@ testthat::test_that("process_narr", {
     "omega"
   )
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_narr)
   )
   for (v in seq_along(variables)) {
@@ -105,32 +105,32 @@ testthat::test_that("process_narr", {
         )
       )
     # expect output is SpatRaster
-    expect_true(
+    testthat::expect_true(
       class(narr)[1] == "SpatRaster"
     )
     # expect values
-    expect_true(
+    testthat::expect_true(
       terra::hasValues(narr)
     )
     # expect non-null coordinate reference system
-    expect_false(
+    testthat::expect_false(
       is.null(terra::crs(narr))
     )
     # expect lon and lat dimensions to be > 1
-    expect_false(
+    testthat::expect_false(
       any(c(0, 1) %in% dim(narr)[1:2])
     )
     # expect non-numeric and non-empty time
-    expect_false(
+    testthat::expect_false(
       any(c("", 0) %in% terra::time(narr))
     )
     # expect dimensions according to levels
     if (variables[v] == "weasd") {
-      expect_true(
+      testthat::expect_true(
         dim(narr)[3] == 5
       )
     } else if (variables[v] == "omega") {
-      expect_true(
+      testthat::expect_true(
         dim(narr)[3] == 145
       )
     }
@@ -160,7 +160,7 @@ testthat::test_that("process_narr (single date)", {
     "omega"
   )
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_narr)
   )
   for (v in seq_along(variables)) {
@@ -177,32 +177,32 @@ testthat::test_that("process_narr (single date)", {
         )
       )
     # expect output is SpatRaster
-    expect_true(
+    testthat::expect_true(
       class(narr)[1] == "SpatRaster"
     )
     # expect values
-    expect_true(
+    testthat::expect_true(
       terra::hasValues(narr)
     )
     # expect non-null coordinate reference system
-    expect_false(
+    testthat::expect_false(
       is.null(terra::crs(narr))
     )
     # expect lon and lat dimensions to be > 1
-    expect_false(
+    testthat::expect_false(
       any(c(0, 1) %in% dim(narr)[1:2])
     )
     # expect non-numeric and non-empty time
-    expect_false(
+    testthat::expect_false(
       any(c("", 0) %in% terra::time(narr))
     )
     # expect dimensions according to levels
     if (variables[v] == "weasd") {
-      expect_true(
+      testthat::expect_true(
         dim(narr)[3] == 1
       )
     } else if (variables[v] == "omega") {
-      expect_true(
+      testthat::expect_true(
         dim(narr)[3] == 29
       )
     }
@@ -237,7 +237,7 @@ testthat::test_that("calculate_narr", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(calculate_narr)
   )
   for (v in seq_along(variables)) {
@@ -271,30 +271,30 @@ testthat::test_that("calculate_narr", {
         locs_id = "site_id"
       )
       # expect output is data.frame
-      expect_true(
+      testthat::expect_true(
         class(narr_covariate) == "data.frame"
       )
       if (variable == "weasd") {
         # expect 3 columns (no pressure level)
-        expect_true(
+        testthat::expect_true(
           ncol(narr_covariate) == 3
         )
         # expect numeric value
-        expect_true(
+        testthat::expect_true(
           class(narr_covariate[, 3]) == "numeric"
         )
       } else {
         # expect 4 columns
-        expect_true(
+        testthat::expect_true(
           ncol(narr_covariate) == 4
         )
         # expect numeric value
-        expect_true(
+        testthat::expect_true(
           class(narr_covariate[, 4]) == "numeric"
         )
       }
       # expect $time is class Date
-      expect_true(
+      testthat::expect_true(
         "POSIXct" %in% class(narr_covariate$time)
       )
     }

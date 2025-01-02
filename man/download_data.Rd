@@ -74,8 +74,8 @@ Please refer to:
 \item \code{\link{download_narr}}: \code{"narr"}
 \item \code{\link{download_nlcd}}: \code{"nlcd"}, \code{"NLCD"}
 \item \code{\link{download_hms}}: \code{"noaa"}, \code{"smoke"}, \code{"hms"}
-\item \code{\link{download_sedac_groads}}: \code{"sedac_groads"}, \code{"groads"}
-\item \code{\link{download_sedac_population}}: \code{"sedac_population"},
+\item \code{\link{download_groads}}: \code{"sedac_groads"}, \code{"groads"}
+\item \code{\link{download_population}}: \code{"sedac_population"},
 \code{"population"}
 \item \code{\link{download_modis}}: \code{"modis"}, \code{"MODIS"}
 \item \code{\link{download_tri}}: \code{"tri"}, \code{"TRI"}

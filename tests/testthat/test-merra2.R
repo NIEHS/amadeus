@@ -113,7 +113,7 @@ testthat::test_that("process_merra2", {
   )
   merra2_df <- data.frame(collection, variable)
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_merra2)
   )
   for (c in seq_along(merra2_df$collection)) {
@@ -130,35 +130,35 @@ testthat::test_that("process_merra2", {
         )
       )
     # expect output is SpatRaster
-    expect_true(
+    testthat::expect_true(
       class(merra2)[1] == "SpatRaster"
     )
     # expect values
-    expect_true(
+    testthat::expect_true(
       terra::hasValues(merra2)
     )
     # expect non-null coordinate reference system
-    expect_false(
+    testthat::expect_false(
       terra::crs(merra2) == ""
     )
     # expect lon and lat dimensions to be > 1
-    expect_false(
+    testthat::expect_false(
       any(c(0, 1) %in% dim(merra2)[1:2])
     )
     # expect non-numeric and non-empty time
-    expect_false(
+    testthat::expect_false(
       any(c("", 0) %in% terra::time(merra2))
     )
     # expect time dimension is POSIXt for hourly
-    expect_true(
+    testthat::expect_true(
       "POSIXt" %in% class(terra::time(merra2))
     )
     # expect seconds in time information
-    expect_true(
+    testthat::expect_true(
       "seconds" %in% terra::timeInfo(merra2)
     )
     # expect 8 levels for 3 hourly data
-    expect_true(
+    testthat::expect_true(
       all(dim(merra2) == c(2, 3, 1))
     )
   }
@@ -196,7 +196,7 @@ testthat::test_that("process_merra2 (single date)", {
   )
   merra2_df <- data.frame(collection, variable)
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(process_merra2)
   )
   for (c in seq_along(merra2_df$collection)) {
@@ -213,35 +213,35 @@ testthat::test_that("process_merra2 (single date)", {
         )
       )
     # expect output is SpatRaster
-    expect_true(
+    testthat::expect_true(
       class(merra2)[1] == "SpatRaster"
     )
     # expect values
-    expect_true(
+    testthat::expect_true(
       terra::hasValues(merra2)
     )
     # expect non-null coordinate reference system
-    expect_false(
+    testthat::expect_false(
       terra::crs(merra2) == ""
     )
     # expect lon and lat dimensions to be > 1
-    expect_false(
+    testthat::expect_false(
       any(c(0, 1) %in% dim(merra2)[1:2])
     )
     # expect non-numeric and non-empty time
-    expect_false(
+    testthat::expect_false(
       any(c("", 0) %in% terra::time(merra2))
     )
     # expect time dimension is POSIXt for hourly
-    expect_true(
+    testthat::expect_true(
       "POSIXt" %in% class(terra::time(merra2))
     )
     # expect seconds in time information
-    expect_true(
+    testthat::expect_true(
       "seconds" %in% terra::timeInfo(merra2)
     )
     # expect 8 levels for 3 hourly data
-    expect_true(
+    testthat::expect_true(
       all(dim(merra2) == c(2, 3, 1))
     )
   }
@@ -284,7 +284,7 @@ testthat::test_that("calculate_merra2", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
-  expect_true(
+  testthat::expect_true(
     is.function(calculate_merra2)
   )
   for (c in seq_along(collections)) {
@@ -319,30 +319,30 @@ testthat::test_that("calculate_merra2", {
         locs_id = "site_id"
       )
       # expect output is data.frame
-      expect_true(
+      testthat::expect_true(
         class(merra2_covariate) == "data.frame"
       )
       if (grepl("lev", names(merra2)[1])) {
         # expect 4 columns
-        expect_true(
+        testthat::expect_true(
           ncol(merra2_covariate) == 4
         )
         # expect numeric value
-        expect_true(
+        testthat::expect_true(
           class(merra2_covariate[, 4]) == "numeric"
         )
       } else {
         # expect 3 columns
-        expect_true(
+        testthat::expect_true(
           ncol(merra2_covariate) == 3
         )
         # expect numeric value
-        expect_true(
+        testthat::expect_true(
           class(merra2_covariate[, 3]) == "numeric"
         )
       }
       # expect $time is class Date
-      expect_true(
+      testthat::expect_true(
         "POSIXt" %in% class(merra2_covariate$time)
       )
     }

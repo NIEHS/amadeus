@@ -2,8 +2,8 @@
 ##### unit and integration tests for NASA SEDAC population functions
 
 ################################################################################
-##### download_sedac_population
-testthat::test_that("download_sedac_population", {
+##### download_population
+testthat::test_that("download_population", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
@@ -74,7 +74,7 @@ testthat::test_that("download_sedac_population", {
   }
 })
 
-testthat::test_that("download_sedac_population (coerce data types)", {
+testthat::test_that("download_population (coerce data types)", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
@@ -118,8 +118,8 @@ testthat::test_that("download_sedac_population (coerce data types)", {
 })
 
 ################################################################################
-##### process_sedac_population
-testthat::test_that("process_sedac_population (no errors)", {
+##### process_population
+testthat::test_that("process_population (no errors)", {
   withr::local_package("terra")
   paths <- list.files(
     testthat::test_path(
@@ -131,43 +131,43 @@ testthat::test_that("process_sedac_population (no errors)", {
     full.names = TRUE
   )
   # expect function
-  expect_true(
-    is.function(process_sedac_population)
+  testthat::expect_true(
+    is.function(process_population)
   )
   for (p in seq_along(paths)) {
     pop <-
-      process_sedac_population(
+      process_population(
         path = paths[p]
       )
     # expect output is a SpatRaster
-    expect_true(
+    testthat::expect_true(
       class(pop)[1] == "SpatRaster"
     )
     # expect values
-    expect_true(
+    testthat::expect_true(
       terra::hasValues(pop)
     )
     # expect non-null coordinate reference system
-    expect_false(
+    testthat::expect_false(
       is.null(terra::crs(pop))
     )
     # expect lon and lat dimensions to be > 1
-    expect_false(
+    testthat::expect_false(
       any(c(0, 1) %in% dim(pop)[1:2])
     )
   }
   # test with cropping extent
   testthat::expect_no_error(
-    pop_ext <- process_sedac_population(
+    pop_ext <- process_population(
       paths[1],
       extent = terra::ext(pop)
     )
   )
 })
 
-testthat::test_that("process_sedac_population (expect null)", {
+testthat::test_that("process_population (expect null)", {
   pop <-
-    process_sedac_population(
+    process_population(
       testthat::test_path(
         "..",
         "testdata",
@@ -175,7 +175,7 @@ testthat::test_that("process_sedac_population (expect null)", {
         "pLaCeHoLdEr.nc"
       )
     )
-  expect_true(
+  testthat::expect_true(
     is.null(pop)
   )
 })
@@ -189,8 +189,8 @@ testthat::test_that("process_sedac_codes", {
 })
 
 ################################################################################
-##### calculate_sedac_population
-testthat::test_that("calculate_sedac_population", {
+##### calculate_population
+testthat::test_that("calculate_population", {
   withr::local_package("terra")
   withr::local_package("data.table")
   paths <- list.files(testthat::test_path(
@@ -200,18 +200,18 @@ testthat::test_that("calculate_sedac_population", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   # expect function
-  expect_true(
-    is.function(calculate_sedac_population)
+  testthat::expect_true(
+    is.function(calculate_population)
   )
   for (p in seq_along(paths)) {
     path <- paths[p]
     for (r in seq_along(radii)) {
       pop <-
-        process_sedac_population(
+        process_population(
           path = paths
         )
       pop_covariate <-
-        calculate_sedac_population(
+        calculate_population(
           from = pop,
           locs = data.table::data.table(ncp),
           locs_id = "site_id",
@@ -226,26 +226,26 @@ testthat::test_that("calculate_sedac_population", {
         locs_id = "site_id"
       )
       # expect output is data.frame
-      expect_true(
+      testthat::expect_true(
         class(pop_covariate) == "data.frame"
       )
       # expect 4 columns
-      expect_true(
+      testthat::expect_true(
         ncol(pop_covariate) == 3
       )
       # expect numeric value
-      expect_true(
+      testthat::expect_true(
         class(pop_covariate[, 3]) == "numeric"
       )
       # expect $time is class integer for year
-      expect_true(
+      testthat::expect_true(
         "integer" %in% class(pop_covariate$time)
       )
     }
   }
   # with included geometry terra
   testthat::expect_no_error(
-    pop_covariate_terra <- calculate_sedac_population(
+    pop_covariate_terra <- calculate_population(
       from = pop,
       locs = ncp,
       locs_id = "site_id",
@@ -263,7 +263,7 @@ testthat::test_that("calculate_sedac_population", {
 
   # with included geometry sf
   testthat::expect_no_error(
-    pop_covariate_sf <- calculate_sedac_population(
+    pop_covariate_sf <- calculate_population(
       from = pop,
       locs = ncp,
       locs_id = "site_id",
@@ -280,7 +280,7 @@ testthat::test_that("calculate_sedac_population", {
   )
 
   testthat::expect_error(
-    calculate_sedac_population(
+    calculate_population(
       from = pop,
       locs = ncp,
       locs_id = "site_id",

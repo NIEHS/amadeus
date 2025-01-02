@@ -59,3 +59,9 @@ inst/extdata/nasa/token.txt
 
 # CRAN release
 CRAN-SUBMISSION
+
+# local pkgdown site
+/pkgdown/
+
+# containerized tests
+/tests/container/*sif
