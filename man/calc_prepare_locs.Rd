@@ -4,7 +4,7 @@
 \alias{calc_prepare_locs}
 \title{Prepare extraction locations}
 \usage{
-calc_prepare_locs(from, locs, locs_id, radius, geom = FALSE)
+calc_prepare_locs(from, locs, locs_id, radius, geom = FALSE, retain = FALSE)
 }
 \arguments{
 \item{from}{SpatRaster(1) or SpatVector(1). Output from
@@ -23,6 +23,9 @@ Passed from \code{calc_\*()}.}
 \item{geom}{logical(1). Should the geometry of \code{locs} be returned in the
 \code{data.frame}? Default is \code{FALSE}, options "sf" or "terra" will preserve
 geometry, but will use \code{terra} for extraction.}
+
+\item{retain}{logical(1). Should all columns in \code{locs} be retained in the
+returned \code{data.frame}? Default is \code{FALSE}.}
 }
 \value{
 A \code{list} containing \code{SpatVector} and \code{data.frame} objects
