@@ -211,7 +211,7 @@ calc_message <- function(
 #' @param geom logical(1). Should the geometry of `locs` be returned in the
 #' `data.frame`? Default is `FALSE`, options "sf" or "terra" will preserve
 #' geometry, but will use `terra` for extraction.
-#' @param retain logical(1). Should all columns in `locs` be retained in the
+#' @param keep_cols logical(1). Should all columns in `locs` be retained in the
 #' returned `data.frame`? Default is `FALSE`.
 #' @return A `list` containing `SpatVector` and `data.frame` objects
 #' @seealso [`process_locs_vector()`], [`check_for_null_parameters()`]
@@ -225,7 +225,7 @@ calc_prepare_locs <- function(
     locs_id,
     radius,
     geom = FALSE,
-    retain = FALSE) {
+    keep_cols = FALSE) {
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   if (!locs_id %in% names(locs)) {
@@ -246,27 +246,27 @@ calc_prepare_locs <- function(
   if (geom %in% c("sf", "terra")) geom <- TRUE
 
   #### retaine or drop columns
-  stopifnot(methods::is(retain, "logical"))
-  if (retain) {
-    retain_cols <- names(locs)
+  stopifnot(methods::is(keep_cols, "logical"))
+  if (keep_cols) {
+    keep_names <- names(locs)
   } else {
-    retain_cols <- locs_id
+    keep_names <- locs_id
   }
 
   #### site identifiers and geometry
   if (geom) {
     sites_id <- subset(
       terra::as.data.frame(sites_e, geom = "WKT"),
-      select = c(retain_cols, "geometry")
+      select = c(keep_names, "geometry")
     )
   } else {
     #### site identifiers only
     sites_id <- subset(
       terra::as.data.frame(sites_e),
-      select = retain_cols
+      select = keep_names
     )
   }
-  
+
   return(list(sites_e, sites_id))
 }
 
