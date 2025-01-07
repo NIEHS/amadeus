@@ -396,7 +396,7 @@ calc_worker <- function(
     if (!is.null(level)) {
       data_level <- data_split[level]
     } else {
-      data_level <- ""
+      data_level <- NULL
     }
     #### message
     calc_message(
