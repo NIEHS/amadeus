@@ -334,6 +334,7 @@ testthat::test_that("calculate_narr", {
     "sf" %in% class(narr_covariate_sf)
   )
 
+  # expect error due to unrecognized geometry
   testthat::expect_error(
     calculate_narr(
       from = narr,
@@ -344,4 +345,72 @@ testthat::test_that("calculate_narr", {
       geom = TRUE
     )
   )
+
+  # retain previous columns
+  ncp$keep1 <- "keepthiscolumm"
+  ncp$keep2 <- "keepthiscolumntoo"
+  
+  testthat::expect_no_error(
+    narr_covariate_terra_keep <- calculate_narr(
+      from = narr,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "terra",
+      keep_cols = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(narr_covariate_terra_keep), 8
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(narr_covariate_terra_keep)
+  )
+  testthat::expect_true(
+    all(c("keep1", "keep2") %in% names(narr_covariate_terra_keep))
+  )
+
+  testthat::expect_no_error(
+    narr_covariate_sf_keep <- calculate_narr(
+      from = narr,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = "sf",
+      keep_cols = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(narr_covariate_sf_keep), 9
+  )
+  testthat::expect_true(
+    "sf" %in% class(narr_covariate_sf_keep)
+  )
+  testthat::expect_true(
+    all(c("keep1", "keep2") %in% names(narr_covariate_sf_keep))
+  )
+
+  testthat::expect_no_error(
+    narr_covariate_dt_keep <- calculate_narr(
+      from = narr,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean",
+      geom = FALSE,
+      keep_cols = TRUE
+    )
+  )
+  testthat::expect_equal(
+    ncol(narr_covariate_dt_keep), 8
+  )
+  testthat::expect_true(
+    "data.frame" %in% class(narr_covariate_dt_keep)
+  )
+  testthat::expect_true(
+    all(c("keep1", "keep2") %in% names(narr_covariate_dt_keep))
+  )
 })
+# nolint end

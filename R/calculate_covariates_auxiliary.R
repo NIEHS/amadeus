@@ -229,8 +229,11 @@ calc_prepare_locs <- function(
   #### check for null parameters
   check_for_null_parameters(mget(ls()))
   if (!locs_id %in% names(locs)) {
-    stop(sprintf("locs should include columns named %s.\n",
-                 locs_id)
+    stop(
+      sprintf(
+        "locs should include columns named %s.\n",
+        locs_id
+      )
     )
   }
 
@@ -248,7 +251,7 @@ calc_prepare_locs <- function(
   #### retaine or drop columns
   stopifnot(methods::is(keep_cols, "logical"))
   if (keep_cols) {
-    keep_names <- names(locs)
+    keep_names <- names(locs) |> setdiff(c("geometry", "time"))
   } else {
     keep_names <- locs_id
   }
@@ -600,6 +603,8 @@ check_geom <- function(geom) {
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' See [`exactextractr::exact_extract`] for details.
+#' @param keep_cols logical(1). Should all columns in `locs` be retained in the
+#' returned `data.frame`? Default is `FALSE`.
 #' @param ... Placeholders.
 #' @description The function operates at MODIS/VIIRS products
 #' on a daily basis. Given that the raw hdf files are downloaded from
@@ -645,6 +650,7 @@ calculate_modis_daily <- function(
   fun_summary = "mean",
   max_cells = 3e7,
   geom = FALSE,
+  keep_cols = FALSE,
   ...
 ) {
   if (!methods::is(locs, "SpatVector")) {
@@ -715,7 +721,8 @@ calculate_modis_daily <- function(
       locs = locs,
       locs_id = locs_id,
       radius = radius,
-      geom = geom
+      geom = geom,
+      keep_cols = keep_cols
     )[[2]]
     )
     # merge

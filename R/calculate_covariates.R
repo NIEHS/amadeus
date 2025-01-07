@@ -1633,6 +1633,8 @@ calculate_gmted <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param keep_cols logical(1). Should all columns in `locs` be retained in the
+#' returned `data.frame`? Default is `FALSE`.
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [`process_narr`]
@@ -1665,6 +1667,7 @@ calculate_narr <- function(
     radius = 0,
     fun = "mean",
     geom = FALSE,
+    keep_cols = FALSE,
     ...) {
   #### prepare locations list
   sites_list <- calc_prepare_locs(
@@ -1672,7 +1675,8 @@ calculate_narr <- function(
     locs = locs,
     locs_id = locs_id,
     radius = radius,
-    geom = geom
+    geom = geom,
+    keep_cols = keep_cols
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
