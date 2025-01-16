@@ -544,7 +544,7 @@ download_hash <- function(
     h_command <- paste0(
       "find ",
       shQuote(dir),
-      " -type f -exec md5sum {} + | sort -k 2 | md5sum"
+      " -type f -exec md5sum {} + | awk '{print $1}' | sort -k 2 | md5sum"
     )
     h <- system(h_command, intern = TRUE)
     h_clean <- sub("  -$", "", h)
