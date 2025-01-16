@@ -34,9 +34,9 @@ coordinate reference system of the \code{sf} or \code{SpatVector} is that of \co
 a data.frame or SpatVector object
 }
 \description{
-Extract toxic release values at point locations. Returns a \code{data.frame}
-object containing \code{locs_id} and variables for each chemical in
-\code{from}.
+Calculate toxic release values for polygons or isotropic buffer point
+locations. Returns a \code{data.frame} object containing \code{locs_id}
+and variables for each chemical in \code{from}.
 }
 \note{
 U.S. context.

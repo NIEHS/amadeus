@@ -920,7 +920,7 @@ calculate_temporal_dummies <-
 
 
 # nolint start
-#' Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates
+#' Calculate isotropic Sum of Exponentially Decaying Contributions (SEDC) covariates
 #' @param from `SpatVector`(1). Point locations which contain point-source
 #' covariate data.
 #' @param locs sf/SpatVector(1). Locations where the sum of exponentially
@@ -1087,9 +1087,9 @@ The result may not be accurate.\n",
 
 #' Calculate toxic release covariates
 #' @description
-#' Extract toxic release values at point locations. Returns a \code{data.frame}
-#' object containing \code{locs_id} and variables for each chemical in
-#' \code{from}.
+#' Calculate toxic release values for polygons or isotropic buffer point
+#' locations. Returns a \code{data.frame} object containing \code{locs_id}
+#' and variables for each chemical in \code{from}.
 #' @param from SpatVector(1). Output of \code{process_tri()}.
 #' @param locs sf/SpatVector. Locations where TRI variables are calculated.
 #' @param locs_id character(1). Unique site identifier column name.
