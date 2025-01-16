@@ -41,7 +41,8 @@ a data.frame or SpatVector object
 Extract TerraClimate values at point locations. Returns a \code{data.frame}
 object containing \code{locs_id} and TerraClimate variable. TerraClimate
 variable column name reflects the TerraClimate variable and
-circular buffer radius.
+circular buffer radius. The \verb{$time} column will contain the year and month
+("YYYYMM") as TerraClimate products have monthly temporal resolution.
 }
 \note{
 TerraClimate data has monthly temporal resolution, so the \verb{$time} column

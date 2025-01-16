@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{sum_edc}
 \alias{sum_edc}
-\title{Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates}
+\title{Calculate isotropic Sum of Exponentially Decaying Contributions (SEDC) covariates}
 \usage{
 sum_edc(
   from = NULL,
@@ -44,7 +44,7 @@ at which emission source points are excluded beyond that
 }
 }
 \description{
-Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates
+Calculate isotropic Sum of Exponentially Decaying Contributions (SEDC) covariates
 }
 \note{
 The function is originally from

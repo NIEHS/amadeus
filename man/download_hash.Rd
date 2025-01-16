@@ -12,13 +12,10 @@ download_hash(hash = TRUE, dir = NULL)
 \item{dir}{character(1). Directory path.}
 }
 \value{
-character(1) Combined SHA-1 hash of the files' contents and sizes.
+character(1) Combined 128-bit md5sum of download files.
 }
 \description{
-Create a combined SHA-1 hash based on the contents and sizes of files
-in a specified directory. System-specific metadata (e.g. full file paths,
-access times, or user information) are not tracked, ensuring the hash
-remains consistent across different systems, users, and access times.
+Create a combined md5sum hash based on the files in a specified directory.
 }
 \keyword{auxiliary}
 \keyword{internal}

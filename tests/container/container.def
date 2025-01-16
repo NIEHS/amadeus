@@ -33,7 +33,7 @@ From: rocker/geospatial:latest
 
     # Install R packages
     Rscript -e "install.packages(c('pak', 'rstac', 'testthat', 'covr', 'nanonext'))"
-    Rscript -e "pak::pak('NIEHS/amadeus@1.2.1')"
+    Rscript -e "pak::pak('NIEHS/amadeus@1.2.3')"
 
 %environment
     # Set locale for the container environment

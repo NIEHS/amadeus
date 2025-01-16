@@ -530,15 +530,11 @@ narr_variable <- function(variable) {
 
 #' Create hash of downloaded files.
 #' @description
-#' Create a combined SHA-1 hash based on the contents and sizes of files
-#' in a specified directory. System-specific metadata (e.g. full file paths,
-#' access times, or user information) are not tracked, ensuring the hash
-#' remains consistent across different systems, users, and access times.
+#' Create a combined md5sum hash based on the files in a specified directory.
 #' @param hash logical(1). Create hash of downloaded files.
 #' @param dir character(1). Directory path.
-#' @return character(1) Combined SHA-1 hash of the files' contents and sizes.
+#' @return character(1) Combined 128-bit md5sum of download files.
 #' @keywords internal auxiliary
-#' @importFrom rlang hash_file
 #' @export
 download_hash <- function(
   hash = TRUE,
@@ -546,14 +542,9 @@ download_hash <- function(
 ) {
   if (hash) {
     h_command <- paste0(
-      "(find ",
-      shQuote(dir),
-      " -type f -print0 | sort -z | ",
-      "xargs -0 sha1sum -- | awk '{print $1}'; ",
       "find ",
       shQuote(dir),
-      " -type f -print0 | sort -z | ",
-      "xargs -0 stat -c '%s') | sha1sum"
+      " -type f -exec md5sum {} + | awk '{print $1}' | sort -k 2 | md5sum"
     )
     h <- system(h_command, intern = TRUE)
     h_clean <- sub("  -$", "", h)

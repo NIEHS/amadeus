@@ -274,9 +274,9 @@ calculate_koppen_geiger <-
 #' @param locs_id character(1). Unique identifier of locations
 #' @param mode character(1). One of `"exact"`
 #'   (using [`exactextractr::exact_extract()`])
-#'   or `"terra"` (using [`terra::freq()`]).
+#'   or `"terra"` (using [`terra::freq()`]). Ignored if `locs` are points.
 #' @param radius numeric (non-negative) giving the
-#' radius of buffer around points
+#' radius of buffer around points.
 #' @param max_cells integer(1). Maximum number of cells to be read at once.
 #' Higher values may expedite processing, but will increase memory usage.
 #' Maximum possible value is `2^31 - 1`. Only valid when
@@ -331,16 +331,15 @@ calculate_nlcd <- function(
   if (!is.numeric(radius)) {
     stop("radius is not a numeric.")
   }
-  if (radius <= 0 && terra::geomtype(locs) == "points") {
+  if (radius < 0) {
     stop("radius has not a likely value.")
   }
-
   if (!methods::is(from, "SpatRaster")) {
     stop("from is not a SpatRaster.")
   }
 
   # prepare locations
-  locs_prepared <- calc_prepare_locs(
+  locs_prepared <- amadeus::calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
@@ -354,88 +353,112 @@ calculate_nlcd <- function(
   # select points within mainland US and reproject on nlcd crs if necessary
   data_vect_b <-
     terra::project(locs_vector, y = terra::crs(from))
-  # create circle buffers with buf_radius
-  bufs_pol <- terra::buffer(data_vect_b, width = radius)
   cfpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
   nlcd_classes <- utils::read.csv(cfpath)
 
-  if (mode == "terra") {
-    # terra mode
-    class_query <- "names"
-    # extract land cover class in each buffer
-    nlcd_at_bufs <- Map(
-      function(i) {
-        terra::freq(
-          from,
-          zones = bufs_pol[i, ],
-          wide = TRUE
-        )
-      }, seq_len(nrow(bufs_pol))
+  if (radius <= 0 && terra::geomtype(locs) == "points") {
+    message(
+      paste0(
+        "Calculating NLCD Land Cover Class covariates for ", year, "..."
+      )
     )
-    nlcd_at_bufs <- collapse::rowbind(nlcd_at_bufs, fill = TRUE)
-    nlcd_at_bufs <- nlcd_at_bufs[, -seq(1, 2)]
-    nlcd_cellcnt <- nlcd_at_bufs[, seq(1, ncol(nlcd_at_bufs), 1)]
-    nlcd_cellcnt <- nlcd_cellcnt / rowSums(nlcd_cellcnt, na.rm = TRUE)
-    nlcd_at_bufs[, seq(1, ncol(nlcd_at_bufs), 1)] <- nlcd_cellcnt
+    new_data_vect <- suppressMessages(
+      amadeus::calc_worker(
+        dataset = "nlcd",
+        from = from,
+        locs_vector = data_vect_b,
+        locs_df = locs_df,
+        fun = "mean",
+        variable = 1,
+        time = 2,
+        time_type = "year",
+        radius = 0,
+        level = NULL
+      )
+    )
+    new_data_vect$time <- year
+    names(new_data_vect)[grep("NLCD", names(new_data_vect))] <- sprintf(
+      "LDU_0_%05d", radius
+    )
   } else {
-    class_query <- "value"
-    # ratio of each nlcd class per buffer
-    bufs_polx <- bufs_pol[terra::ext(from), ] |>
-      sf::st_as_sf()
+    # create circle buffers with buf_radius
+    bufs_pol <- terra::buffer(data_vect_b, width = radius)
+    if (mode == "terra") {
+      # terra mode
+      class_query <- "names"
+      # extract land cover class in each buffer
+      nlcd_at_bufs <- Map(
+        function(i) {
+          terra::freq(
+            from,
+            zones = bufs_pol[i, ],
+            wide = TRUE
+          )
+        }, seq_len(nrow(bufs_pol))
+      )
+      nlcd_at_bufs <- collapse::rowbind(nlcd_at_bufs, fill = TRUE)
+      nlcd_at_bufs <- nlcd_at_bufs[, -seq(1, 2)]
+      nlcd_cellcnt <- nlcd_at_bufs[, seq(1, ncol(nlcd_at_bufs), 1)]
+      nlcd_cellcnt <- nlcd_cellcnt / rowSums(nlcd_cellcnt, na.rm = TRUE)
+      nlcd_at_bufs[, seq(1, ncol(nlcd_at_bufs), 1)] <- nlcd_cellcnt
+    } else {
+      class_query <- "value"
+      # ratio of each nlcd class per buffer
+      bufs_polx <- bufs_pol[terra::ext(from), ] |>
+        sf::st_as_sf()
 
-    nlcd_at_bufs <- Map(
-      function(i) {
-        exactextractr::exact_extract(
-          from,
-          bufs_polx[i, ],
-          fun = "frac",
-          force_df = TRUE,
-          progress = FALSE,
-          append_cols = locs_id,
-          max_cells_in_memory = max_cells
-        )
-      }, seq_len(nrow(bufs_polx))
-    )
-    nlcd_at_bufs <- collapse::rowbind(nlcd_at_bufs, fill = TRUE)
-    # select only the columns of interest
-    nlcd_at_buf_names <- names(nlcd_at_bufs)
-    nlcd_val_cols <-
-      grep("^frac_", nlcd_at_buf_names)
-    nlcd_at_bufs <- nlcd_at_bufs[, nlcd_val_cols]
+      nlcd_at_bufs <- Map(
+        function(i) {
+          exactextractr::exact_extract(
+            from,
+            bufs_polx[i, ],
+            fun = "frac",
+            force_df = TRUE,
+            progress = FALSE,
+            append_cols = locs_id,
+            max_cells_in_memory = max_cells
+          )
+        }, seq_len(nrow(bufs_polx))
+      )
+      nlcd_at_bufs <- collapse::rowbind(nlcd_at_bufs, fill = TRUE)
+      # select only the columns of interest
+      nlcd_at_buf_names <- names(nlcd_at_bufs)
+      nlcd_val_cols <-
+        grep("^frac_", nlcd_at_buf_names)
+      nlcd_at_bufs <- nlcd_at_bufs[, nlcd_val_cols]
+    }
+    # fill NAs
+    nlcd_at_bufs[is.na(nlcd_at_bufs)] <- 0
+    # change column names
+    nlcd_names <- names(nlcd_at_bufs)
+    nlcd_names <- sub(pattern = "frac_", replacement = "", x = nlcd_names)
+    nlcd_names <-
+      switch(
+        mode,
+        exact = as.numeric(nlcd_names),
+        terra = nlcd_names
+      )
+    nlcd_names <-
+      nlcd_classes$class[match(nlcd_names, nlcd_classes[[class_query]])]
+    new_names <- sprintf("LDU_%s_0_%05d", nlcd_names, radius)
+    names(nlcd_at_bufs) <- new_names
+    # merge locs_df with nlcd class fractions
+    new_data_vect <- cbind(locs_df, as.integer(year), nlcd_at_bufs)
   }
-  # fill NAs
-  nlcd_at_bufs[is.na(nlcd_at_bufs)] <- 0
 
-  # change column names
-  nlcd_names <- names(nlcd_at_bufs)
-  nlcd_names <- sub(pattern = "frac_", replacement = "", x = nlcd_names)
-  nlcd_names <-
-    switch(
-      mode,
-      exact = as.numeric(nlcd_names),
-      terra = nlcd_names
-    )
-  nlcd_names <-
-    nlcd_classes$class[match(nlcd_names, nlcd_classes[[class_query]])]
-  new_names <- sprintf("LDU_%s_0_%05d", nlcd_names, radius)
-  names(nlcd_at_bufs) <- new_names
-
-  # merge locs_df with nlcd class fractions
-  new_data_vect <- cbind(locs_df, as.integer(year), nlcd_at_bufs)
   if (geom %in% c("sf", "terra")) {
     names(new_data_vect)[1:3] <- c(locs_id, "geometry", "time")
   } else {
     names(new_data_vect)[1:2] <- c(locs_id, "time")
   }
-  new_data_vect <- calc_return_locs(
+  new_data_return <- amadeus::calc_return_locs(
     covar = new_data_vect,
     POSIXt = FALSE,
     geom = geom,
     crs = terra::crs(from)
   )
-  return(new_data_vect)
+  return(new_data_return)
 }
-
 
 
 #' Calculate ecoregions covariates
@@ -627,7 +650,6 @@ calculate_ecoregion <-
 #' @importFrom terra nlyr
 #' @importFrom dplyr bind_rows left_join
 #' @importFrom rlang inject
-#' @importFrom parallelly availableWorkers
 #' @examples
 #' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
 #' ##       amount of data which is not included in the package.
@@ -921,7 +943,7 @@ calculate_temporal_dummies <-
 
 
 # nolint start
-#' Calculate Sum of Exponentially Decaying Contributions (SEDC) covariates
+#' Calculate isotropic Sum of Exponentially Decaying Contributions (SEDC) covariates
 #' @param from `SpatVector`(1). Point locations which contain point-source
 #' covariate data.
 #' @param locs sf/SpatVector(1). Locations where the sum of exponentially
@@ -1088,9 +1110,9 @@ The result may not be accurate.\n",
 
 #' Calculate toxic release covariates
 #' @description
-#' Extract toxic release values at point locations. Returns a \code{data.frame}
-#' object containing \code{locs_id} and variables for each chemical in
-#' \code{from}.
+#' Calculate toxic release values for polygons or isotropic buffer point
+#' locations. Returns a \code{data.frame} object containing \code{locs_id}
+#' and variables for each chemical in \code{from}.
 #' @param from SpatVector(1). Output of \code{process_tri()}.
 #' @param locs sf/SpatVector. Locations where TRI variables are calculated.
 #' @param locs_id character(1). Unique site identifier column name.
@@ -2202,7 +2224,8 @@ calculate_gridmet <- function(
 #' Extract TerraClimate values at point locations. Returns a \code{data.frame}
 #' object containing \code{locs_id} and TerraClimate variable. TerraClimate
 #' variable column name reflects the TerraClimate variable and
-#' circular buffer radius.
+#' circular buffer radius. The `$time` column will contain the year and month
+#' ("YYYYMM") as TerraClimate products have monthly temporal resolution.
 #' @param from SpatRaster(1). Output from \code{process_terraclimate()}.
 #' @param locs data.frame. character to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
