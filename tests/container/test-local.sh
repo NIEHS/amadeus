@@ -12,5 +12,4 @@ apptainer exec \
   tests/container/container.sif Rscript -e \
   ".libPaths(); \
    library(amadeus); \
-   testthat::test_dir('/mnt/tests/testthat'); \
-   # covr::package_coverage(quiet = FALSE)"
+   covr::package_coverage(quiet = FALSE)"
