@@ -314,4 +314,58 @@ testthat::test_that("calculate_nlcd", {
       geom = TRUE
     )
   )
+
+  ##### point extractions (radius = 0)
+  # point extraction (sf)
+  testthat::expect_no_error(
+    out_points_sf <- calculate_nlcd(
+      locs = eg_data,
+      locs_id = "site_id",
+      from = nlcdras,
+      radius = 0,
+      mode = "exact",
+      geom = "sf"
+    )
+  )
+  # with geometry will have 4 columns
+  testthat::expect_equal(
+    ncol(out_points_sf), 4
+  )
+  testthat::expect_true(
+    "sf" %in% class(out_points_sf)
+  )
+  # point extraction (terra)
+  testthat::expect_no_error(
+    out_points_t <- calculate_nlcd(
+      locs = eg_data,
+      locs_id = "site_id",
+      from = nlcdras,
+      radius = 0,
+      mode = "exact",
+      geom = "terra"
+    )
+  )
+  # with geometry will have 4 columns
+  testthat::expect_equal(
+    ncol(out_points_t), 3
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(out_points_t)
+  )
+  # point extraction (data frame)
+  testthat::expect_no_error(
+    out_points_df <- calculate_nlcd(
+      locs = eg_data,
+      locs_id = "site_id",
+      from = nlcdras,
+      radius = 0,
+      mode = "exact",
+      geom = FALSE
+    )
+  )
+  # with geometry will have 3 columns
+  testthat::expect_equal(
+    ncol(out_points_df), 3
+  )
+  testthat::expect_true(is.data.frame(out_points_df))
 })

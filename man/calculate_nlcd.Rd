@@ -24,10 +24,10 @@ calculate_nlcd(
 
 \item{mode}{character(1). One of \code{"exact"}
 (using \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract()}})
-or \code{"terra"} (using \code{\link[terra:freq]{terra::freq()}}).}
+or \code{"terra"} (using \code{\link[terra:freq]{terra::freq()}}). Ignored if \code{locs} are points.}
 
 \item{radius}{numeric (non-negative) giving the
-radius of buffer around points}
+radius of buffer around points.}
 
 \item{max_cells}{integer(1). Maximum number of cells to be read at once.
 Higher values may expedite processing, but will increase memory usage.
