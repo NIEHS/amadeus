@@ -533,7 +533,7 @@ narr_variable <- function(variable) {
 #' Create a combined md5sum hash based on the files in a specified directory.
 #' @param hash logical(1). Create hash of downloaded files.
 #' @param dir character(1). Directory path.
-#' @return character(1) Combined md5sum hash of the files' contents and sizes.
+#' @return character(1) Combined 128-bit md5sum of download files.
 #' @keywords internal auxiliary
 #' @export
 download_hash <- function(

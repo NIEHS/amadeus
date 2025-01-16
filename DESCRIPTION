@@ -27,7 +27,6 @@ Imports:
     utils,
     stringi,
     testthat (>= 3.0.0),
-    parallelly,
     stars,
     tidyr,
     rlang,
@@ -35,7 +34,7 @@ Imports:
     archive,
     collapse,
     Rdpack
-Suggests: 
+Suggests:
     covr,
     withr,
     knitr,

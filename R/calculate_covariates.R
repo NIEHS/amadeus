@@ -627,7 +627,6 @@ calculate_ecoregion <-
 #' @importFrom terra nlyr
 #' @importFrom dplyr bind_rows left_join
 #' @importFrom rlang inject
-#' @importFrom parallelly availableWorkers
 #' @examples
 #' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
 #' ##       amount of data which is not included in the package.
