@@ -2201,7 +2201,8 @@ calculate_gridmet <- function(
 #' Extract TerraClimate values at point locations. Returns a \code{data.frame}
 #' object containing \code{locs_id} and TerraClimate variable. TerraClimate
 #' variable column name reflects the TerraClimate variable and
-#' circular buffer radius.
+#' circular buffer radius. The `$time` column will contain the year and month
+#' ("YYYYMM") as TerraClimate products have monthly temporal resolution.
 #' @param from SpatRaster(1). Output from \code{process_terraclimate()}.
 #' @param locs data.frame. character to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
