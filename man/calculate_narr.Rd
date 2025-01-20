@@ -11,6 +11,7 @@ calculate_narr(
   radius = 0,
   fun = "mean",
   geom = FALSE,
+  keep_cols = FALSE,
   ...
 )
 }
@@ -31,6 +32,9 @@ within sites location buffer (Default = \code{mean}).}
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
+
+\item{keep_cols}{logical(1). Should all columns in \code{locs} be retained in the
+returned \code{data.frame}? Default is \code{FALSE}.}
 
 \item{...}{Placeholders}
 }

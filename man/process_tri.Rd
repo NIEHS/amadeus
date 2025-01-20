@@ -35,6 +35,8 @@ returning a single \code{SpatVector} (points) object for the selected \code{year
 \note{
 Visit \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox}{TRI Data and Tools}
 to view the available years and variables.
+Column indices of variables may change by year. The default value is defined
+from 2018-2022 data.
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
@@ -45,6 +47,10 @@ tri <- process_tri(
   year = 2020,
   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49)
 )
+# If one wants to limit the chemicals, use TRI_CHEMICAL_COMPOUND_ID
+# field of the result object of process_tri.
+# Example below filters rows with ethylbenzene values.
+tri_ethbenz <- tri[tri$TRI_CHEMICAL_COMPOUND_ID == "100-41-4", ]
 }
 }
 \references{

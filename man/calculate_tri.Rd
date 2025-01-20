@@ -16,7 +16,7 @@ calculate_tri(
 \arguments{
 \item{from}{SpatVector(1). Output of \code{process_tri()}.}
 
-\item{locs}{sf/SpatVector. Locations where TRI variables are calculated.}
+\item{locs}{sf/SpatVector. Point locations where TRI variables are calculated.}
 
 \item{locs_id}{character(1). Unique site identifier column name.
 Default is \code{"site_id"}.}
@@ -34,7 +34,10 @@ coordinate reference system of the \code{sf} or \code{SpatVector} is that of \co
 a data.frame or SpatVector object
 }
 \description{
-Extract toxic release values at point locations. Returns a \code{data.frame}
+Extract the sum of exponentially decaying contributions (EDC) of
+toxic release values at input point locations. This function is for users'
+convenience by running reprojection function in \code{terra}
+(\link[terra:project]{terra::project}) and \link{\code{sum_edc}}. Returns a \code{data.frame}
 object containing \code{locs_id} and variables for each chemical in
 \code{from}.
 }

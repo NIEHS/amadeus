@@ -1088,11 +1088,15 @@ The result may not be accurate.\n",
 
 #' Calculate toxic release covariates
 #' @description
-#' Extract toxic release values at point locations. Returns a \code{data.frame}
+#' Extract the sum of exponentially decaying contributions (EDC) of
+#' toxic release values at input point locations. This function is for users'
+#' convenience by running reprojection function in \code{terra}
+#' ([terra::project]) and [\code{sum_edc}]. Returns a \code{data.frame}
 #' object containing \code{locs_id} and variables for each chemical in
 #' \code{from}.
 #' @param from SpatVector(1). Output of \code{process_tri()}.
-#' @param locs sf/SpatVector. Locations where TRI variables are calculated.
+#' @param locs sf/SpatVector.
+#'   Point locations where TRI variables are calculated.
 #' @param locs_id character(1). Unique site identifier column name.
 #'  Default is `"site_id"`.
 #' @param radius Circular buffer radius.

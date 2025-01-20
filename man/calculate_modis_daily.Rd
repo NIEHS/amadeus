@@ -14,6 +14,7 @@ calculate_modis_daily(
   fun_summary = "mean",
   max_cells = 3e+07,
   geom = FALSE,
+  keep_cols = FALSE,
   ...
 )
 }
@@ -44,6 +45,9 @@ Maximum possible value is \code{2^31 - 1}.}
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}
 See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
+
+\item{keep_cols}{logical(1). Should all columns in \code{locs} be retained in the
+returned \code{data.frame}? Default is \code{FALSE}.}
 
 \item{...}{Placeholders.}
 }

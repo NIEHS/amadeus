@@ -910,6 +910,8 @@ process_ecoregion <-
 #' `year` is stored in a field named `"year"`.
 #' @note Visit [TRI Data and Tools](https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox)
 #' to view the available years and variables.
+#' Column indices of variables may change by year. The default value is defined
+#' from 2018-2022 data.
 #' @references
 #' https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox
 #' @importFrom terra vect
@@ -938,6 +940,10 @@ process_ecoregion <-
 #'   year = 2020,
 #'   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49)
 #' )
+#' # If one wants to limit the chemicals, use TRI_CHEMICAL_COMPOUND_ID
+#' # field of the result object of process_tri.
+#' # Example below filters rows with ethylbenzene values.
+#' tri_ethbenz <- tri[tri$TRI_CHEMICAL_COMPOUND_ID == "100-41-4", ]
 #' }
 # nolint end
 #' @export
@@ -953,7 +959,7 @@ process_tri <- function(
     list.files(path = path, pattern = "*.csv$", full.names = TRUE)
   csvs_tri <- lapply(csvs_tri_from, read.csv)
   col_sel <- variables
-  csvs_tri <- data.table::rbindlist(csvs_tri)
+  csvs_tri <- data.table::rbindlist(csvs_tri, fill = TRUE)
   dt_tri <- csvs_tri[, col_sel, with = FALSE]
 
   # column name readjustment
