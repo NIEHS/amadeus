@@ -47,10 +47,13 @@ tri <- process_tri(
   year = 2020,
   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49)
 )
-# If one wants to limit the chemicals, use TRI_CHEMICAL_COMPOUND_ID
-# field of the result object of process_tri.
-# Example below filters rows with ethylbenzene values.
-tri_ethbenz <- tri[tri$TRI_CHEMICAL_COMPOUND_ID == "100-41-4", ]
+# If one wants to limit the chemicals, use field names
+# to filter selected chemicals
+# Example below filters columns with ethylbenzene in stack air.
+# TRI chemical/compound id is padded with zeros to length 10.
+# Since TRI ID of ethylbenzene is 100414, the correctly padded string
+# should be 0000100414. Stack or fugitive air is prefixed in field names.
+tri_ethbenz_stack <- tri[, "STACK_AIR_0000100414"]
 }
 }
 \references{

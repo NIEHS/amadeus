@@ -16,7 +16,8 @@ calculate_tri(
 \arguments{
 \item{from}{SpatVector(1). Output of \code{process_tri()}.}
 
-\item{locs}{sf/SpatVector. Point locations where TRI variables are calculated.}
+\item{locs}{sf/SpatVector.
+Point locations where TRI variables are calculated.}
 
 \item{locs_id}{character(1). Unique site identifier column name.
 Default is \code{"site_id"}.}
