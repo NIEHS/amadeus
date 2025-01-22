@@ -929,7 +929,8 @@ calculate_temporal_dummies <-
 #' @param locs_id character(1). Name of the unique id field in `point_to`.
 #' @param sedc_bandwidth numeric(1).
 #' Distance at which the source concentration is reduced to
-#'  `exp(-3)` (approximately -95 %)
+#'  `exp(-3)` (approximately -95 %). For efficiency, target points in
+#'  `sedc_bandwidth * 2` will be selected beforehand.
 #' @param target_fields character(varying). Field names in characters.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
@@ -1099,8 +1100,10 @@ The result may not be accurate.\n",
 #'   Point locations where TRI variables are calculated.
 #' @param locs_id character(1). Unique site identifier column name.
 #'  Default is `"site_id"`.
-#' @param radius Circular buffer radius.
-#' Default is \code{c(1000, 10000, 50000)} (meters)
+#' @param dist_decay Decay distance.
+#' Distance at which the source concentration is reduced to
+#'  `exp(-3)` (approximately -95 %). This argument value is passed to
+#'  `sedc_bandwidth` in [`sum_edc`].
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -1109,21 +1112,12 @@ The result may not be accurate.\n",
 #' @return a data.frame or SpatVector object
 #' @note U.S. context.
 #' @seealso [`sum_edc`], [`process_tri`]
-#' @importFrom terra vect
-#' @importFrom terra crs
-#' @importFrom terra nearby
+#' @importFrom terra vect crs nearby
 #' @importFrom methods is
-#' @importFrom data.table .SD
+#' @importFrom data.table .SD rbindlist
 #' @importFrom utils read.csv
-#' @importFrom data.table rbindlist
-#' @importFrom dplyr filter
-#' @importFrom dplyr mutate
-#' @importFrom dplyr across
-#' @importFrom dplyr ends_with
-#' @importFrom dplyr all_of
-#' @importFrom dplyr group_by
-#' @importFrom dplyr ungroup
-#' @importFrom dplyr summarize
+#' @importFrom dplyr filter mutate across summarize
+#' @importFrom dplyr ends_with all_of group_by ungroup
 #' @examples
 #' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
 #' ##       amount of data which is not included in the package.
@@ -1133,7 +1127,7 @@ The result may not be accurate.\n",
 #'   from = tri, # derived from process_tri() example
 #'   locs = loc,
 #'   locs_id = "id",
-#'   radius = c(1e3L, 1e4L, 5e4L)
+#'   dist_decay = c(1e3L, 1e4L, 5e4L)
 #' )
 #' }
 #' @export
@@ -1141,7 +1135,7 @@ calculate_tri <- function(
   from = NULL,
   locs,
   locs_id = "site_id",
-  radius = c(1e3L, 1e4L, 5e4L),
+  dist_decay = c(1e3L, 1e4L, 5e4L),
   geom = FALSE,
   ...
 ) {
@@ -1151,8 +1145,8 @@ calculate_tri <- function(
       locs <- terra::vect(locs)
     }
   }
-  if (!is.numeric(radius)) {
-    stop("radius should be numeric.\n")
+  if (!is.numeric(dist_decay)) {
+    stop("dist_decay should be numeric.\n")
   }
   locs_re <- terra::project(locs, terra::crs(from))
 
@@ -1162,7 +1156,7 @@ calculate_tri <- function(
   tri_cols <- sub(" ", "_", tri_cols)
 
   # inner lapply
-  list_radius <- split(radius, radius)
+  list_dist <- split(dist_decay, dist_decay)
   list_locs_tri <-
     Map(
       function(x) {
@@ -1177,7 +1171,7 @@ calculate_tri <- function(
           )
         return(locs_tri_s)
       },
-      list_radius
+      list_dist
     )
 
   # bind element data.frames into one
