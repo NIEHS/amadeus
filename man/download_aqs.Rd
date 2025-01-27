@@ -82,9 +82,6 @@ download_aqs(
 )
 }
 }
-\references{
-\insertRef{data_usepa2023airdata}{amadeus}
-}
 \author{
 Mariana Kassien, Insang Song, Mitchell Manware
 }

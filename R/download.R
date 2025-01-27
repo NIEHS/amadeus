@@ -173,8 +173,6 @@ download_data <-
 #' * Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{data_usepa2023airdata}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_aqs(
@@ -347,8 +345,6 @@ download_aqs <-
 #' \code{directory_to_save}.
 #' @importFrom utils download.file
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{article_omernik2014ecoregions}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_ecoregion(
@@ -477,8 +473,6 @@ download_ecoregion <- function(
 #' collection-specific folder within \code{directory_to_save}.
 #' @importFrom utils download.file
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{keller_description_2021}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_geos(
@@ -655,8 +649,6 @@ download_geos <- function(
 #' * Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{danielson_global_2011}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_gmted(
@@ -806,192 +798,6 @@ download_gmted <- function(
 #' * netCDF (.nc4) files will be stored in a
 #' collection-specific folder within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{data_gmao_merra-inst1_2d_asm_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-inst1_2d_int_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-inst1_2d_lfo_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-inst3_3d_asm_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-inst3_3d_aer_Nv}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-inst3_3d_asm_Nv}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-inst3_3d_chm_Nv}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-inst3_3d_gas_Nv}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-inst3_2d_gas_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-inst6_3d_ana_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-inst6_3d_ana_Nv}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-statD_2d_slv_Nx_m}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-statD_2d_slv_Nx_d}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg1_2d_adg_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg1_2d_aer_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg1_2d_chm_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg1_2d_csp_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg1_2d_flx_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg1_2d_int_Nx}{amadeus}
-#' 
-#' \insertRef{pawson_merra-2_2020}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg1_2d_lnd_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg1_2d_ocn_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg1_2d_rad_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg1_2d_slv_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_mst_Ne}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_trb_Ne}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_nav_Ne}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_cld_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_mst_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_rad_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_tdt_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_trb_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_udt_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_odt_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_qdt_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_asm_Nv}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_cld_Nv}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_mst_Nv}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_3d_rad_Nv}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavg3_2d_glc_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-instM_2d_asm_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-instM_2d_int_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-instM_2d_lfo_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-instM_2d_gas_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-instM_3d_asm_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-instM_3d_ana_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_2d_adg_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_2d_aer_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_2d_chm_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_2d_csp_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_2d_flx_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_2d_int_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_2d_lfo_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_2d_lnd_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_2d_ocn_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_2d_rad_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_2d_slv_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_2d_glc_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_3d_cld_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_3d_mst_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_3d_rad_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_3d_tdt_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_3d_trb_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_3d_udt_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_3d_odt_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgM_3d_qdt_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-const_2d_asm_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-instU_2d_asm_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-instU_2d_int_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-instU_2d_lfo_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-instU_2d_gas_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-instU_3d_asm_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-instU_3d_ana_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_2d_adg_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_2d_aer_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_2d_chm_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_2d_csp_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_2d_flx_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_2d_int_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_2d_lfo_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_2d_lnd_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_2d_ocn_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_2d_rad_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_2d_slv_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_2d_glc_Nx}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_3d_cld_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_3d_mst_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_3d_rad_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_3d_tdt_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_3d_trb_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_3d_udt_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_3d_odt_Np}{amadeus}
-#' 
-#' \insertRef{data_gmao_merra-tavgU_3d_qdt_Np}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_merra2(
@@ -1308,8 +1114,6 @@ download_merra2 <- function(
 #' * netCDF (.nc) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{mesinger_north_2006}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_narr(
@@ -1459,9 +1263,6 @@ download_narr <- function(
 #' * Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{dewitz_national_2023}{amadeus}<br/>
-#' \insertRef{dewitz_national_2024}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_nlcd(
@@ -1617,8 +1418,6 @@ download_nlcd <- function(
 #' * Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{data_ciesin2013groads}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_groads(
@@ -1774,8 +1573,6 @@ download_groads <- function(
 #' * Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{data_ciesin2017gpwv4}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_population(
@@ -1967,8 +1764,6 @@ download_population <- function(
 #' * Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{web_HMSabout}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_hms(
@@ -2157,10 +1952,6 @@ download_hms <- function(
 #' * Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{article_beck2023koppen}{amadeus}
-#' 
-#' \insertRef{article_beck2018present}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_koppen_geiger(
@@ -2309,18 +2100,6 @@ download_koppen_geiger <- function(
 #' * HDF (.hdf) files will be stored in year/day_of_year sub-directories within
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{data_mcd19a22021}{amadeus}
-#' 
-#' \insertRef{data_mod06l2_2017}{amadeus}
-#' 
-#' \insertRef{data_mod09ga2021}{amadeus}
-#' 
-#' \insertRef{data_mod11a12021}{amadeus}
-#' 
-#' \insertRef{data_mod13a22021}{amadeus}
-#' 
-#' \insertRef{article_roman2018vnp46}{amadeus}
 #' @examples
 #' \dontrun{
 #' ## NOTE: Examples are wrapped in `/dontrun{}` to avoid sharing sensitive
@@ -2736,8 +2515,6 @@ download_modis <- function(
 #' * Comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{web_usepa2024tri}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_tri(
@@ -2861,8 +2638,6 @@ download_tri <- function(
 #' * Zip and/or data files will be downloaded and stored in
 #' respective sub-directories within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{web_usepa2024nei}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_nei(
@@ -3008,8 +2783,6 @@ download_nei <- function(
 #' * Downloaded files will be stored in \code{directory_to_save}.
 #' @author Insang Song
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{data_usgs2023nhd}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_huc(
@@ -3311,8 +3084,6 @@ download_cropscape <- function(
 #' * .bil (normals) or single grid files depending on the format
 #' choice will be stored in \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{article_daly2000prism}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_prism(
@@ -3447,8 +3218,6 @@ download_prism <- function(
 #' * netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{article_abatzoglou2013development}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_gridmet(
@@ -3588,8 +3357,6 @@ download_gridmet <- function(
 #' * netCDF (.nc) files will be stored in a variable-specific
 #' folder within \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{article_abatzoglou2018terraclimate}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_terraclimate(

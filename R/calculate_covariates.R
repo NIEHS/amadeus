@@ -1091,7 +1091,7 @@ The result may not be accurate.\n",
 #' @description
 #' Extract the sum of exponentially decaying contributions (EDC) of
 #' toxic release values at input point locations. This function is for users'
-#' convenience by running reprojection function in \code{terra}
+#' convenience by running reprojection function in in \code{terra}
 #' ([terra::project]) and [\code{sum_edc}]. Returns a \code{data.frame}
 #' object containing \code{locs_id} and variables for each chemical in
 #' \code{from}.
@@ -1673,8 +1673,8 @@ calculate_narr <- function(
     locs = locs,
     locs_id = locs_id,
     radius = radius,
-    geom = geom,
-    keep_cols = keep_cols
+    geom = geom
+    # keep_cols = keep_cols
   )
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]

@@ -75,10 +75,6 @@ download_nlcd(
 )
 }
 }
-\references{
-\insertRef{dewitz_national_2023}{amadeus}\if{html}{\out{<br/>}}
-\insertRef{dewitz_national_2024}{amadeus}
-}
 \author{
 Mitchell Manware, Insang Song
 }

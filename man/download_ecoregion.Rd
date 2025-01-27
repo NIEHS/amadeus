@@ -84,9 +84,6 @@ download_ecoregion(
 )
 }
 }
-\references{
-\insertRef{article_omernik2014ecoregions}{amadeus}
-}
 \author{
 Insang Song
 }

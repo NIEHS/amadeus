@@ -73,9 +73,6 @@ download_huc(
 )
 }
 }
-\references{
-\insertRef{data_usgs2023nhd}{amadeus}
-}
 \author{
 Insang Song
 }

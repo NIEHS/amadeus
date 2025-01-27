@@ -76,9 +76,6 @@ download_gmted(
 )
 }
 }
-\references{
-\insertRef{danielson_global_2011}{amadeus}
-}
 \author{
 Mitchell Manware, Insang Song
 }
