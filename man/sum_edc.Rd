@@ -24,7 +24,8 @@ decaying contributions are calculated.}
 
 \item{sedc_bandwidth}{numeric(1).
 Distance at which the source concentration is reduced to
-\code{exp(-3)} (approximately -95 \%)}
+\code{exp(-3)} (approximately -95 \%). For efficiency, target points in
+\code{sedc_bandwidth * 2} will be selected beforehand.}
 
 \item{target_fields}{character(varying). Field names in characters.}
 

@@ -35,6 +35,8 @@ returning a single \code{SpatVector} (points) object for the selected \code{year
 \note{
 Visit \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox}{TRI Data and Tools}
 to view the available years and variables.
+Column indices of variables may change by year. The default value is defined
+from 2018-2022 data.
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
@@ -45,6 +47,13 @@ tri <- process_tri(
   year = 2020,
   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49)
 )
+# If one wants to limit the chemicals, use field names
+# to filter selected chemicals
+# Example below filters columns with ethylbenzene in stack air.
+# TRI chemical/compound id is padded with zeros to length 10.
+# Since TRI ID of ethylbenzene is 100414, the correctly padded string
+# should be 0000100414. Stack or fugitive air is prefixed in field names.
+tri_ethbenz_stack <- tri[, "STACK_AIR_0000100414"]
 }
 }
 \references{

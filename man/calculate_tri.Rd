@@ -8,7 +8,7 @@ calculate_tri(
   from = NULL,
   locs,
   locs_id = "site_id",
-  radius = c(1000L, 10000L, 50000L),
+  dist_decay = c(1000L, 10000L, 50000L),
   geom = FALSE,
   ...
 )
@@ -16,13 +16,16 @@ calculate_tri(
 \arguments{
 \item{from}{SpatVector(1). Output of \code{process_tri()}.}
 
-\item{locs}{sf/SpatVector. Locations where TRI variables are calculated.}
+\item{locs}{sf/SpatVector.
+Point locations where TRI variables are calculated.}
 
 \item{locs_id}{character(1). Unique site identifier column name.
 Default is \code{"site_id"}.}
 
-\item{radius}{Circular buffer radius.
-Default is \code{c(1000, 10000, 50000)} (meters)}
+\item{dist_decay}{Decay distance.
+Distance at which the source concentration is reduced to
+\code{exp(-3)} (approximately -95 \%). This argument value is passed to
+\code{sedc_bandwidth} in \code{\link{sum_edc}}.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
@@ -34,7 +37,10 @@ coordinate reference system of the \code{sf} or \code{SpatVector} is that of \co
 a data.frame or SpatVector object
 }
 \description{
-Extract toxic release values at point locations. Returns a \code{data.frame}
+Extract the sum of exponentially decaying contributions (EDC) of
+toxic release values at input point locations. This function is for users'
+convenience by running reprojection function in \code{terra}
+(\link[terra:project]{terra::project}) and \link{\code{sum_edc}}. Returns a \code{data.frame}
 object containing \code{locs_id} and variables for each chemical in
 \code{from}.
 }
@@ -50,7 +56,7 @@ calculate_tri(
   from = tri, # derived from process_tri() example
   locs = loc,
   locs_id = "id",
-  radius = c(1e3L, 1e4L, 5e4L)
+  dist_decay = c(1e3L, 1e4L, 5e4L)
 )
 }
 }

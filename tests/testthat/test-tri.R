@@ -133,7 +133,7 @@ testthat::test_that("calculate_tri", {
     tri_c <- calculate_tri(
       from = tri_r,
       locs = ncpt,
-      radius = c(1500L, 50000L)
+      dist_decay = c(1500L, 50000L)
     )
   )
   testthat::expect_true(is.data.frame(tri_c))
@@ -143,7 +143,7 @@ testthat::test_that("calculate_tri", {
     tri_c_terra <- calculate_tri(
       from = tri_r,
       locs = ncpt,
-      radius = c(1500L, 50000L),
+      dist_decay = c(1500L, 50000L),
       geom = "terra"
     )
   )
@@ -154,7 +154,7 @@ testthat::test_that("calculate_tri", {
     tri_c_sf <- calculate_tri(
       from = tri_r,
       locs = ncpt,
-      radius = c(1500L, 50000L),
+      dist_decay = c(1500L, 50000L),
       geom = "sf"
     )
   )
@@ -164,7 +164,7 @@ testthat::test_that("calculate_tri", {
     calculate_tri(
       from = tri_r,
       locs = ncpt,
-      radius = c(1500L, 50000L),
+      dist_decay = c(1500L, 50000L),
       geom = TRUE
     )
   )
@@ -173,28 +173,28 @@ testthat::test_that("calculate_tri", {
     calculate_tri(
       from = tri_r,
       locs = sf::st_as_sf(ncpt),
-      radius = 50000L
+      dist_decay = 50000L
     )
   )
   testthat::expect_error(
     calculate_tri(
       from = tempdir(),
       locs = ncpt,
-      radius = 50000L
+      dist_decay = 50000L
     )
   )
   testthat::expect_error(
     calculate_tri(
       from = paste0(tdir, "/tri/"),
       locs = ncpt[, 1:2],
-      radius = 50000L
+      dist_decay = 50000L
     )
   )
   testthat::expect_error(
     calculate_tri(
       from = paste0(tdir, "/tri/"),
       locs = ncpt,
-      radius = "As far as the Earth's radius"
+      dist_decay = "As far as the Earth's radius"
     )
   )
 })
