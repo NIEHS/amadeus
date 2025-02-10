@@ -245,5 +245,7 @@ testthat::test_that("calculate_ecoregion", {
       geom = TRUE
     )
   )
+  # Ensure that unmatched locations are handled properly
+  testthat::expect_true(nrow(ecor_res) == nrow(site_faux))
 })
 # nolint end
