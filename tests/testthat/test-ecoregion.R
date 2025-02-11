@@ -245,7 +245,46 @@ testthat::test_that("calculate_ecoregion", {
       geom = TRUE
     )
   )
-  # Ensure that unmatched locations are handled properly
-  testthat::expect_true(nrow(ecor_res) == nrow(site_faux))
+  
+  # Test unmatched locations are correctly reintroduced with NA values in ecoregion columns
+  site_unmatched <- 
+  data.frame(
+    site_id = "99999999999999",
+    lon = -999.999,
+    lat = -99.999,
+    date = as.Date("2022-01-01")
+  )
+  site_unmatched <-
+    terra::vect(
+                site_unmatched,
+                geom = c("lon", "lat"),
+                keepgeom = TRUE,
+                crs = "EPSG:4326")
+  site_unmatched <- terra::project(site_unmatched, "EPSG:5070")
+
+  site_combined <- rbind(sf::st_drop_geometry(site_faux), site_unmatched)
+  site_combined <- sf::st_as_sf(site_combined, coords = c("lon", "lat"), crs = "EPSG:4326")
+
+  ecor_res2 <- calculate_ecoregion(
+    from = erras,
+    locs = site_combined,
+    locs_id = "site_id"
+  )
+
+  testthat::expect_true("99999999999999" %in% ecor_res2$site_id, 
+  info = "Unmatched site should be present.")
+
+  extra_cols <- setdiff(colnames(ecor_res2), colnames(sf::st_drop_geometry(site_combined)))
+  unmatched_row <- ecor_res2[ecor_res2$site_id == "99999999999999", ]
+
+  testthat::expect_true(all(is.na(unmatched_row[, extra_cols])), 
+  info = "Unmatched locations should have NA in ecoregion-related columns.")
+
+  # Ensure the warning message appears when unmatched locations exist
+  testthat::expect_message(
+    calculate_ecoregion(from = erras, locs = site_combined, locs_id = "site_id"),
+    "Warning: only .* locations provided had matching ecoregions.",
+    fixed = FALSE
+  )
 })
 # nolint end
