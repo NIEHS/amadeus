@@ -156,9 +156,9 @@ Projected CRS: unnamed
 5 001 2022-01-05 0.001953125 POINT (8184606 3523283)
 ```
 
-## Climate and Health Outcomes Research Data Systems 
+## Connecting Health Outcomes Research Data Systems 
 
-The `amadeus` package has been developed as part of the National Institute of Environmental Health Science's (NIEHS) [Climate and Health Outcomes Research Data Systems (CHORDS)](https://www.niehs.nih.gov/research/programs/chords) program. CHORDS aims to "build and strengthen data infrastructure for patient-centered outcomes research on climate change and health" by providing curated data, analysis tools, and educational resources. Visit the CHORDS catalog at [https://niehs.github.io/chords_landing/index.html](https://niehs.github.io/chords_landing/index.html).
+The `amadeus` package has been developed as part of the National Institute of Environmental Health Science's (NIEHS) Connecting Health Outcomes Research Data Systems (CHORDS) program. CHORDS aims to "build and strengthen data infrastructure for patient-centered outcomes research on environment and health" by providing curated data, analysis tools, and educational resources.
 
 ## Additional Resources
 
