@@ -553,10 +553,21 @@ calculate_ecoregion <-
     colnames(df_lv3) <- key3_num_unique
 
     locs_ecoreg <- cbind(
-      locs_df,
+      locs_df[(locs_df[, 1] %in% extracted[[locs_id]][, 1]), ],
       paste0("1997 - ", data.table::year(Sys.Date())),
       df_lv2, df_lv3
     )
+    colnames(locs_ecoreg)[1] <- locs_id
+
+    # Catch and patch for sites with no matching ecoregions
+    if (nrow(locs_ecoreg) != nrow(locs)) {
+      message("Warning: only ", nrow(locs_ecoreg), " of the ", nrow(locs),
+              " locations provided had matching ecoregions. ",
+              nrow(locs) - nrow(locs_ecoreg),
+              " unmatched locations will present NAs.")
+      # Introduce missing sites back to dataframe
+      locs_ecoreg <- merge(locs_df, locs_ecoreg, by = locs_id, all.x = TRUE)
+    }
     locs_return <- calc_return_locs(
       covar = locs_ecoreg,
       POSIXt = FALSE,
