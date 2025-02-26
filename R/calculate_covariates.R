@@ -2371,16 +2371,23 @@ calculate_terraclimate <- function(
 # nolint end
 #' @export
 calculate_lagged <- function(
-    from,
-    date,
-    lag,
-    locs_id,
-    time_id = "time",
-    geom = FALSE) {
-  check_geom(geom)
+  from,
+  date,
+  lag,
+  locs_id = "site_id",
+  time_id = "time",
+  geom = FALSE
+) {
+  amadeus::check_geom(geom)
   #### check years
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
+  #### identify dates of interest
+  dateseqout <- amadeus::generate_date_sequence(
+    date[1],
+    date[2],
+    sub_hyphen = FALSE
+  )
   #### geom and from
   if (geom %in% c("sf", "terra") && !("SpatVector" %in% class(from))) {
     stop(
@@ -2416,6 +2423,7 @@ calculate_lagged <- function(
   }
   unique_locs <- unique(from[[locs_id]])
   variables_merge <- NULL
+
   for (u in seq_along(unique_locs)) {
     from_u <- subset(
       from,
@@ -2423,7 +2431,7 @@ calculate_lagged <- function(
     )
     time_u <- from_u[[time_id]]
     #### extract variables
-    variables <- from_u[
+    variables <- data.frame(from_u)[
       , !(names(from_u) %in% c(locs_id, time_id)),
       drop = FALSE
     ]
@@ -2437,21 +2445,17 @@ calculate_lagged <- function(
     #### create the return dataframe
     variables_return <- cbind(from_u[[locs_id]], time_u, variables_lag)
     colnames(variables_return)[1:2] <- c(locs_id, time_id)
-    #### identify dates of interest
-    date_sequence <- generate_date_sequence(
-      date[1],
-      date[2],
-      sub_hyphen = FALSE
-    )
     #### filter to dates of interest
-    variables_return_date <- variables_return[time_u %in% date_sequence, ]
+    variables_return_date <- variables_return[
+      as.Date(variables_return[[time_id]]) %in% dateseqout,
+    ]
     #### merge with other locations
     variables_merge <- rbind(variables_merge, variables_return_date)
   }
   if (geom %in% c("sf", "terra")) {
     variables_merge <- merge(variables_merge, geoms)
   }
-  variables_return <- calc_return_locs(
+  variables_return <- amadeus::calc_return_locs(
     covar = variables_merge,
     POSIXt = TRUE,
     geom = geom,
