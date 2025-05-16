@@ -40,6 +40,7 @@
 #' * \code{\link{download_huc}}: `"huc"`
 #' * \code{\link{download_cropscape}}: `"cropscape"`, `"cdl"`
 #' * \code{\link{download_prism}}: `"prism"`
+#'  * \code{\link{download_edgar}}: `"edgar"`, `"EDGAR"`
 #' @return
 #' * For \code{hash = FALSE}, NULL
 #' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
@@ -61,25 +62,47 @@
 #' @export
 download_data <-
   function(
-    dataset_name = c("aqs", "ecoregion", "ecoregions",
-                     "geos", "gmted", "koppen",
-                     "koppengeiger", "merra2", "merra",
-                     "modis", "narr", "nlcd", "noaa", "sedac_groads",
-                     "sedac_population", "groads", "population",
-                     "hms", "smoke", "tri", "nei",
-                     "gridmet", "terraclimate", "huc", "cropscape", "cdl",
-                     "prism"),
+    dataset_name = c(
+      "aqs",
+      "ecoregion",
+      "ecoregions",
+      "geos",
+      "gmted",
+      "koppen",
+      "koppengeiger",
+      "merra2",
+      "merra",
+      "modis",
+      "narr",
+      "nlcd",
+      "noaa",
+      "sedac_groads",
+      "sedac_population",
+      "groads",
+      "population",
+      "hms",
+      "smoke",
+      "tri",
+      "nei",
+      "gridmet",
+      "terraclimate",
+      "huc",
+      "cropscape",
+      "cdl",
+      "prism",
+      "edgar"
+    ),
     directory_to_save = NULL,
     acknowledgement = FALSE,
     hash = FALSE,
     ...
   ) {
-
     dataset_name <- tolower(dataset_name)
     dataset_name <- match.arg(dataset_name)
 
     # determine whether the data exist and deter proceeding?
-    what_to_run <- switch(dataset_name,
+    what_to_run <- switch(
+      dataset_name,
       aqs = download_aqs,
       ecoregion = download_ecoregion,
       ecoregions = download_ecoregion,
@@ -106,7 +129,8 @@ download_data <-
       huc = download_huc,
       cropscape = download_cropscape,
       cdl = download_cropscape,
-      prism = download_prism
+      prism = download_prism,
+      edgar = download_edgar
     )
 
     return <- tryCatch(
@@ -221,7 +245,8 @@ download_aqs <-
     year_sequence <- seq(year[1], year[2], 1)
     #### 5. build URLs
     download_urls <- sprintf(
-      paste(url_aqs_download,
+      paste(
+        url_aqs_download,
         resolution_temporal,
         "_",
         parameter_code,
@@ -270,7 +295,9 @@ download_aqs <-
       "aqs_",
       parameter_code,
       "_",
-      year[1], "_", year[2],
+      year[1],
+      "_",
+      year[2],
       "_",
       resolution_temporal,
       "_curl_commands.txt"
@@ -299,7 +326,6 @@ download_aqs <-
     )
     return(download_hash(hash, directory_to_save))
   }
-
 
 
 # nolint start
@@ -361,11 +387,11 @@ download_aqs <-
 #' }
 #' @export
 download_ecoregion <- function(
-  epa_certificate_path =
-    system.file("extdata/cacert_gaftp_epa.pem",
-                package = "amadeus"),
-  certificate_url =
-    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  epa_certificate_path = system.file(
+    "extdata/cacert_gaftp_epa.pem",
+    package = "amadeus"
+  ),
+  certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -446,7 +472,7 @@ download_ecoregion <- function(
   return(download_hash(hash, directory_to_save))
 }
 
-# nolint start 
+# nolint start
 #' Download atmospheric composition data
 #' @description
 #' The \code{download_geos()} function accesses and downloads various
@@ -494,19 +520,21 @@ download_ecoregion <- function(
 # nolint end
 # nolint start: cyclocomp
 download_geos <- function(
-    collection =
-        c(
-          "aqc_tavg_1hr_g1440x721_v1", "chm_tavg_1hr_g1440x721_v1",
-          "met_tavg_1hr_g1440x721_x1", "xgc_tavg_1hr_g1440x721_x1",
-          "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"
-        ),
-    date = c("2018-01-01", "2018-01-01"),
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    hash = FALSE
-  ) {
+  collection = c(
+    "aqc_tavg_1hr_g1440x721_v1",
+    "chm_tavg_1hr_g1440x721_v1",
+    "met_tavg_1hr_g1440x721_x1",
+    "xgc_tavg_1hr_g1440x721_x1",
+    "chm_inst_1hr_g1440x721_p23",
+    "met_inst_1hr_g1440x721_p23"
+  ),
+  date = c("2018-01-01", "2018-01-01"),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  hash = FALSE
+) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
@@ -672,9 +700,12 @@ download_geos <- function(
 #' @export
 download_gmted <- function(
   statistic = c(
-    "Breakline Emphasis", "Systematic Subsample",
-    "Median Statistic", "Minimum Statistic",
-    "Mean Statistic", "Maximum Statistic",
+    "Breakline Emphasis",
+    "Systematic Subsample",
+    "Median Statistic",
+    "Minimum Statistic",
+    "Mean Statistic",
+    "Maximum Statistic",
     "Standard Deviation Statistic"
   ),
   resolution = c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"),
@@ -808,189 +839,189 @@ download_gmted <- function(
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_gmao_merra-inst1_2d_asm_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-inst1_2d_int_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-inst1_2d_lfo_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-inst3_3d_asm_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-inst3_3d_aer_Nv}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-inst3_3d_asm_Nv}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-inst3_3d_chm_Nv}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-inst3_3d_gas_Nv}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-inst3_2d_gas_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-inst6_3d_ana_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-inst6_3d_ana_Nv}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-statD_2d_slv_Nx_m}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-statD_2d_slv_Nx_d}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg1_2d_adg_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg1_2d_aer_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg1_2d_chm_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg1_2d_csp_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg1_2d_flx_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg1_2d_int_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{pawson_merra-2_2020}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg1_2d_lnd_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg1_2d_ocn_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg1_2d_rad_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg1_2d_slv_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_mst_Ne}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_trb_Ne}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_nav_Ne}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_cld_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_mst_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_rad_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_tdt_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_trb_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_udt_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_odt_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_qdt_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_asm_Nv}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_cld_Nv}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_mst_Nv}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_3d_rad_Nv}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavg3_2d_glc_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-instM_2d_asm_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-instM_2d_int_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-instM_2d_lfo_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-instM_2d_gas_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-instM_3d_asm_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-instM_3d_ana_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_2d_adg_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_2d_aer_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_2d_chm_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_2d_csp_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_2d_flx_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_2d_int_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_2d_lfo_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_2d_lnd_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_2d_ocn_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_2d_rad_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_2d_slv_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_2d_glc_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_3d_cld_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_3d_mst_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_3d_rad_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_3d_tdt_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_3d_trb_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_3d_udt_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_3d_odt_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgM_3d_qdt_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-const_2d_asm_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-instU_2d_asm_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-instU_2d_int_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-instU_2d_lfo_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-instU_2d_gas_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-instU_3d_asm_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-instU_3d_ana_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_2d_adg_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_2d_aer_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_2d_chm_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_2d_csp_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_2d_flx_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_2d_int_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_2d_lfo_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_2d_lnd_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_2d_ocn_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_2d_rad_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_2d_slv_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_2d_glc_Nx}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_3d_cld_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_3d_mst_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_3d_rad_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_3d_tdt_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_3d_trb_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_3d_udt_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_3d_odt_Np}{amadeus}
-#' 
+#'
 #' \insertRef{data_gmao_merra-tavgU_3d_qdt_Np}{amadeus}
 #' @examples
 #' \dontrun{
@@ -1007,27 +1038,54 @@ download_gmted <- function(
 # nolint end
 # nolint start: cyclocomp
 download_merra2 <- function(
-    collection = c(
-      "inst1_2d_asm_Nx", "inst1_2d_int_Nx", "inst1_2d_lfo_Nx",
-      "inst3_3d_asm_Np", "inst3_3d_aer_Nv", "inst3_3d_asm_Nv",
-      "inst3_3d_chm_Nv", "inst3_3d_gas_Nv", "inst3_2d_gas_Nx",
-      "inst6_3d_ana_Np", "inst6_3d_ana_Nv", "statD_2d_slv_Nx",
-      "tavg1_2d_adg_Nx", "tavg1_2d_aer_Nx", "tavg1_2d_chm_Nx",
-      "tavg1_2d_csp_Nx", "tavg1_2d_flx_Nx", "tavg1_2d_int_Nx",
-      "tavg1_2d_lfo_Nx", "tavg1_2d_lnd_Nx", "tavg1_2d_ocn_Nx",
-      "tavg1_2d_rad_Nx", "tavg1_2d_slv_Nx", "tavg3_3d_mst_Ne",
-      "tavg3_3d_trb_Ne", "tavg3_3d_nav_Ne", "tavg3_3d_cld_Np",
-      "tavg3_3d_mst_Np", "tavg3_3d_rad_Np", "tavg3_3d_tdt_Np",
-      "tavg3_3d_trb_Np", "tavg3_3d_udt_Np", "tavg3_3d_odt_Np",
-      "tavg3_3d_qdt_Np", "tavg3_3d_asm_Nv", "tavg3_3d_cld_Nv",
-      "tavg3_3d_mst_Nv", "tavg3_3d_rad_Nv", "tavg3_2d_glc_Nx"
-    ),
-    date = c("2018-01-01", "2018-01-01"),
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    hash = FALSE) {
+  collection = c(
+    "inst1_2d_asm_Nx",
+    "inst1_2d_int_Nx",
+    "inst1_2d_lfo_Nx",
+    "inst3_3d_asm_Np",
+    "inst3_3d_aer_Nv",
+    "inst3_3d_asm_Nv",
+    "inst3_3d_chm_Nv",
+    "inst3_3d_gas_Nv",
+    "inst3_2d_gas_Nx",
+    "inst6_3d_ana_Np",
+    "inst6_3d_ana_Nv",
+    "statD_2d_slv_Nx",
+    "tavg1_2d_adg_Nx",
+    "tavg1_2d_aer_Nx",
+    "tavg1_2d_chm_Nx",
+    "tavg1_2d_csp_Nx",
+    "tavg1_2d_flx_Nx",
+    "tavg1_2d_int_Nx",
+    "tavg1_2d_lfo_Nx",
+    "tavg1_2d_lnd_Nx",
+    "tavg1_2d_ocn_Nx",
+    "tavg1_2d_rad_Nx",
+    "tavg1_2d_slv_Nx",
+    "tavg3_3d_mst_Ne",
+    "tavg3_3d_trb_Ne",
+    "tavg3_3d_nav_Ne",
+    "tavg3_3d_cld_Np",
+    "tavg3_3d_mst_Np",
+    "tavg3_3d_rad_Np",
+    "tavg3_3d_tdt_Np",
+    "tavg3_3d_trb_Np",
+    "tavg3_3d_udt_Np",
+    "tavg3_3d_odt_Np",
+    "tavg3_3d_qdt_Np",
+    "tavg3_3d_asm_Nv",
+    "tavg3_3d_cld_Nv",
+    "tavg3_3d_mst_Nv",
+    "tavg3_3d_rad_Nv",
+    "tavg3_2d_glc_Nx"
+  ),
+  date = c("2018-01-01", "2018-01-01"),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  hash = FALSE
+) {
   #### check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### directory setup
@@ -1088,8 +1146,10 @@ download_merra2 <- function(
   colnames(identifiers_df) <- c("collection_id", "estd_name", "DOI")
   if (!all(collection %in% identifiers_df$collection_id)) {
     message(identifiers_df)
-    stop(paste0("Requested collection is not recognized.\n
-    Please refer to the table above to find a proper collection.\n"))
+    stop(paste0(
+      "Requested collection is not recognized.\n
+    Please refer to the table above to find a proper collection.\n"
+    ))
   }
   #### define date sequence
   date_sequence <- generate_date_sequence(
@@ -1122,19 +1182,47 @@ download_merra2 <- function(
     ####       https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/ \&
     ####       https://goldsmr5.gesdisc.eosdis.nasa.gov/data/MERRA2/
     esdt_name_4 <- c(
-      "M2I1NXASM", "M2I1NXINT", "M2I1NXLFO", "M2I3NXGAS",
-      "M2SDNXSLV", "M2T1NXADG", "M2T1NXAER", "M2T1NXCHM",
-      "M2T1NXCSP", "M2T1NXFLX", "M2T1NXINT", "M2T1NXLFO",
-      "M2T1NXLND", "M2T1NXOCN", "M2T1NXRAD", "M2T1NXSLV",
+      "M2I1NXASM",
+      "M2I1NXINT",
+      "M2I1NXLFO",
+      "M2I3NXGAS",
+      "M2SDNXSLV",
+      "M2T1NXADG",
+      "M2T1NXAER",
+      "M2T1NXCHM",
+      "M2T1NXCSP",
+      "M2T1NXFLX",
+      "M2T1NXINT",
+      "M2T1NXLFO",
+      "M2T1NXLND",
+      "M2T1NXOCN",
+      "M2T1NXRAD",
+      "M2T1NXSLV",
       "M2T3NXGLC"
     )
     esdt_name_5 <- c(
-      "M2I3NPASM", "M2I3NVAER", "M2I3NVASM", "M2I3NVCHM",
-      "M2I3NVGAS", "M2I6NPANA", "M2I6NVANA", "M2T3NEMST",
-      "M2T3NENAV", "M2T3NETRB", "M2T3NPCLD", "M2T3NPMST",
-      "M2T3NPODT", "M2T3NPQDT", "M2T3NPRAD", "M2T3NPTDT",
-      "M2T3NPTRB", "M2T3NPUDT", "M2T3NVASM", "M2T3NVCLD",
-      "M2T3NVMST", "M2T3NVRAD"
+      "M2I3NPASM",
+      "M2I3NVAER",
+      "M2I3NVASM",
+      "M2I3NVCHM",
+      "M2I3NVGAS",
+      "M2I6NPANA",
+      "M2I6NVANA",
+      "M2T3NEMST",
+      "M2T3NENAV",
+      "M2T3NETRB",
+      "M2T3NPCLD",
+      "M2T3NPMST",
+      "M2T3NPODT",
+      "M2T3NPQDT",
+      "M2T3NPRAD",
+      "M2T3NPTDT",
+      "M2T3NPTRB",
+      "M2T3NPUDT",
+      "M2T3NVASM",
+      "M2T3NVCLD",
+      "M2T3NVMST",
+      "M2T3NVRAD"
     )
     if (esdt_name %in% esdt_name_4) {
       base <- "https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/"
@@ -1182,8 +1270,10 @@ download_merra2 <- function(
       list_urls <- c(list_urls, list_urls_month)
     }
     #### match list_urls to date sequence
-    list_urls_date_sequence <- list_urls[substr(list_urls, 28, 35) %in%
-                                           date_sequence]
+    list_urls_date_sequence <- list_urls[
+      substr(list_urls, 28, 35) %in%
+        date_sequence
+    ]
     #### separate data and metadata
     list_urls_data <- list_urls_date_sequence[grep(
       "*.xml",
@@ -1325,13 +1415,14 @@ download_merra2 <- function(
 # nolint end
 # nolint start: cyclocomp
 download_narr <- function(
-    variables = NULL,
-    year = c(2018, 2022),
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    hash = FALSE) {
+  variables = NULL,
+  year = c(2018, 2022),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  hash = FALSE
+) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
@@ -1360,7 +1451,9 @@ download_narr <- function(
   commands_txt <- paste0(
     directory_to_save,
     "narr_",
-    year[1], "_", year[2],
+    year[1],
+    "_",
+    year[2],
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
@@ -1633,16 +1726,24 @@ download_nlcd <- function(
 #' }
 #' @export
 download_groads <- function(
-    data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East", "Oceania West"),
-    data_format = c("Shapefile", "Geodatabase"),
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE,
-    hash = FALSE
-    ) {
+  data_region = c(
+    "Americas",
+    "Global",
+    "Africa",
+    "Asia",
+    "Europe",
+    "Oceania East",
+    "Oceania West"
+  ),
+  data_format = c("Shapefile", "Geodatabase"),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
+  hash = FALSE
+) {
   # nolint end
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
@@ -1985,15 +2086,16 @@ download_population <- function(
 # nolint end
 # nolint start: cyclocomp
 download_hms <- function(
-    data_format = "Shapefile",
-    date = c("2018-01-01", "2018-01-01"),
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE,
-    hash = FALSE) {
+  data_format = "Shapefile",
+  date = c("2018-01-01", "2018-01-01"),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
+  hash = FALSE
+) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
@@ -2159,7 +2261,7 @@ download_hms <- function(
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{article_beck2023koppen}{amadeus}
-#' 
+#'
 #' \insertRef{article_beck2018present}{amadeus}
 #' @examples
 #' \dontrun{
@@ -2176,15 +2278,16 @@ download_hms <- function(
 # nolint end
 #' @export
 download_koppen_geiger <- function(
-    data_resolution = c("0.0083", "0.083", "0.5"),
-    time_period = c("Present", "Future"),
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE,
-    hash = FALSE) {
+  data_resolution = c("0.0083", "0.083", "0.5"),
+  time_period = c("Present", "Future"),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
+  hash = FALSE
+) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
@@ -2264,7 +2367,6 @@ download_koppen_geiger <- function(
 }
 
 
-
 #' Download MODIS product files
 # nolint start
 #' @description Need maintenance for the directory path change
@@ -2311,15 +2413,15 @@ download_koppen_geiger <- function(
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_mcd19a22021}{amadeus}
-#' 
+#'
 #' \insertRef{data_mod06l2_2017}{amadeus}
-#' 
+#'
 #' \insertRef{data_mod09ga2021}{amadeus}
-#' 
+#'
 #' \insertRef{data_mod11a12021}{amadeus}
-#' 
+#'
 #' \insertRef{data_mod13a22021}{amadeus}
-#' 
+#'
 #' \insertRef{article_roman2018vnp46}{amadeus}
 #' @examples
 #' \dontrun{
@@ -2373,23 +2475,43 @@ download_koppen_geiger <- function(
 # nolint end
 #' @export
 download_modis <- function(
-    product = c(
-      "MOD09GA", "MYD09GA", "MOD09GQ", "MYD09GQ", "MOD09A1", "MYD09A1",
-      "MOD09Q1", "MYD09Q1", "MOD11A1", "MYD11A1", "MOD11A2", "MYD11A2",
-      "MOD11B1", "MYD11B1", "MOD13A1", "MYD13A1", "MOD13A2", "MYD13A2",
-      "MOD13A3", "MYD13A3", "MOD06_L2", "MCD19A2", "VNP46A2"
-    ),
-    version = "61",
-    horizontal_tiles = c(7, 13),
-    vertical_tiles = c(3, 6),
-    mod06_links = NULL,
-    nasa_earth_data_token = NULL,
-    date = c("2023-09-01", "2023-09-01"),
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    hash = FALSE) {
+  product = c(
+    "MOD09GA",
+    "MYD09GA",
+    "MOD09GQ",
+    "MYD09GQ",
+    "MOD09A1",
+    "MYD09A1",
+    "MOD09Q1",
+    "MYD09Q1",
+    "MOD11A1",
+    "MYD11A1",
+    "MOD11A2",
+    "MYD11A2",
+    "MOD11B1",
+    "MYD11B1",
+    "MOD13A1",
+    "MYD13A1",
+    "MOD13A2",
+    "MYD13A2",
+    "MOD13A3",
+    "MYD13A3",
+    "MOD06_L2",
+    "MCD19A2",
+    "VNP46A2"
+  ),
+  version = "61",
+  horizontal_tiles = c(7, 13),
+  vertical_tiles = c(3, 6),
+  mod06_links = NULL,
+  nasa_earth_data_token = NULL,
+  date = c("2023-09-01", "2023-09-01"),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  hash = FALSE
+) {
   #### 1. check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
@@ -2478,7 +2600,8 @@ download_modis <- function(
     if (is.null(mod06_links)) {
       stop(paste(
         "Please provide a CSV file path to MOD06_L2 download links.
-                 You may download it from the link:\n", mod06l2_full,
+                 You may download it from the link:\n",
+        mod06l2_full,
         "\nTime length up to one month is recommended.\n"
       ))
     }
@@ -2513,8 +2636,10 @@ download_modis <- function(
 
     # Create directory structure with julian dates
     dir_substr <- paste0(
-      substr(download_name, 11, 14), "/",
-      substr(download_name, 15, 17), "/"
+      substr(download_name, 11, 14),
+      "/",
+      substr(download_name, 15, 17),
+      "/"
     )
 
     #### 10-3. initiate "..._wget_commands.txt" file
@@ -2606,10 +2731,10 @@ download_modis <- function(
 
   message(sprintf(
     "%d / %d days of data available in the queried dates.\n",
-    sum(date_sequence_in), length(date_range_julian)
+    sum(date_sequence_in),
+    length(date_range_julian)
   ))
   date_sequence <- date_sequence[date_sequence_in]
-
 
   #### 13. initiate "..._wget_commands.txt" file
   commands_txt <- paste0(
@@ -2647,17 +2772,22 @@ download_modis <- function(
       )
 
     download_name <- sapply(
-      strsplit(filelist_sub, paste0("/", day, "/")), `[`, 2
+      strsplit(filelist_sub, paste0("/", day, "/")),
+      `[`,
+      2
     )
 
     dir_str_julian <-
       lapply(
-        download_name, function(x) strsplit(x, paste0(product, ".A"))[[1]][2]
+        download_name,
+        function(x) strsplit(x, paste0(product, ".A"))[[1]][2]
       )
 
     dir_substr <- paste0(
-      substr(dir_str_julian, 1, 4), "/",
-      substr(dir_str_julian, 5, 7), "/"
+      substr(dir_str_julian, 1, 4),
+      "/",
+      substr(dir_str_julian, 5, 7),
+      "/"
     )
 
     new_dirs <- unique(
@@ -2708,7 +2838,6 @@ download_modis <- function(
   message("Requests were processed.\n")
   return(download_hash(hash, directory_to_save))
 }
-
 
 
 # nolint start
@@ -2775,16 +2904,16 @@ download_tri <- function(
     year_sequence
   )
   download_names <-
-    sprintf(paste0(directory_to_save,
-                   "tri_raw_%.0f.csv"),
-            year_sequence)
+    sprintf(paste0(directory_to_save, "tri_raw_%.0f.csv"), year_sequence)
 
   #### 4. build download command
-  download_commands <- paste0("curl -L ",
-                              download_urls,
-                              " --output ",
-                              download_names,
-                              "\n")
+  download_commands <- paste0(
+    "curl -L ",
+    download_urls,
+    " --output ",
+    download_names,
+    "\n"
+  )
   #### filter commands to non-existing files
   download_commands <- download_commands[
     which(
@@ -2795,7 +2924,9 @@ download_tri <- function(
   commands_txt <- paste0(
     directory_to_save,
     "TRI_",
-    year[1], "_", year[2],
+    year[1],
+    "_",
+    year[2],
     "_",
     Sys.Date(),
     "_curl_commands.txt"
@@ -2876,11 +3007,11 @@ download_tri <- function(
 #' }
 #' @export
 download_nei <- function(
-  epa_certificate_path =
-    system.file("extdata/cacert_gaftp_epa.pem",
-                package = "amadeus"),
-  certificate_url =
-    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  epa_certificate_path = system.file(
+    "extdata/cacert_gaftp_epa.pem",
+    package = "amadeus"
+  ),
+  certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   year = c(2017L, 2020L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -2906,26 +3037,26 @@ download_nei <- function(
   #### 3. define measurement data paths
   url_download_base <- "https://gaftp.epa.gov/air/nei/%d/data_summaries/"
   url_download_remain <-
-    c("2017v1/2017neiApr_onroad_byregions.zip",
-      "2020nei_onroad_byregion.zip")
+    c("2017v1/2017neiApr_onroad_byregions.zip", "2020nei_onroad_byregion.zip")
   download_urls <-
     paste0(
       sprintf(url_download_base, year),
       url_download_remain
     )
   download_names_file <-
-    c("2017neiApr_onroad_byregions.zip",
-      "2020nei_onroad_byregion.zip")
+    c("2017neiApr_onroad_byregions.zip", "2020nei_onroad_byregion.zip")
   download_names <- paste0(directory_to_download, download_names_file)
   #### 4. build download command
   download_commands <-
-    paste0("wget --ca-certificate=",
-           epa_certificate_path,
-           " ",
-           download_urls,
-           " -O ",
-           download_names,
-           "\n")
+    paste0(
+      "wget --ca-certificate=",
+      epa_certificate_path,
+      " ",
+      download_urls,
+      " -O ",
+      download_names,
+      "\n"
+    )
   #### filter commands to non-existing files
   download_commands <- download_commands[
     which(
@@ -2970,7 +3101,6 @@ download_nei <- function(
   message("Requests were processed.\n")
   return(download_hash(hash, directory_to_save))
 }
-
 
 
 # nolint start
@@ -3109,7 +3239,9 @@ download_huc <-
     # as duplicate file names are across multiple zip files
     if (download) {
       if (unzip) {
-        stop("Unzipping is not supported for 7z files. Please do it manually with 7-zip program")
+        stop(
+          "Unzipping is not supported for 7z files. Please do it manually with 7-zip program"
+        )
         # dir_unzip <- gsub("(\\.7z)", "", download_names)
         # for (fn in seq_along(dir_unzip)) {
         #   archive::archive_extract(
@@ -3124,14 +3256,12 @@ download_huc <-
   }
 # nolint end
 
-
-
 # nolint start
 #' Download CropScape data
 #' @description
 #' Accesses and downloads United States Department of Agriculture
-#' CropScape Cropland Data Layer data from 
-#' the [USDA National Agricultural Statistics Service](https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.php) or the 
+#' CropScape Cropland Data Layer data from
+#' the [USDA National Agricultural Statistics Service](https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.php) or the
 #' [George Mason University website](https://nassgeodata.gmu.edu/CropScape/).
 #' @param year integer(1). Year of the data to download.
 #' @param source character(1). Data source, one of `c("USDA", "GMU")`.
@@ -3216,12 +3346,14 @@ download_cropscape <- function(
 
   #### 4. build download command
   download_commands <-
-    paste0("wget -e robots=off -np",
-           " ",
-           download_urls,
-           " -O ",
-           download_names,
-           "\n")
+    paste0(
+      "wget -e robots=off -np",
+      " ",
+      download_urls,
+      " -O ",
+      download_names,
+      "\n"
+    )
 
   #### 5. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
@@ -3333,9 +3465,19 @@ download_cropscape <- function(
 # nolint end
 download_prism <- function(
   time,
-  element = c("ppt", "tmin", "tmax", "tmean", "tdmean",
-              "vpdmin", "vpdmax",
-              "solslope", "soltotal", "solclear", "soltrans"),
+  element = c(
+    "ppt",
+    "tmin",
+    "tmax",
+    "tmean",
+    "tdmean",
+    "vpdmin",
+    "vpdmax",
+    "solslope",
+    "soltotal",
+    "solclear",
+    "soltrans"
+  ),
   data_type = c("ts", "normals_800", "normals"),
   format = c("nc", "asc", "grib2"),
   directory_to_save = NULL,
@@ -3365,10 +3507,12 @@ download_prism <- function(
   url_middle <-
     # ts: element-date-format
     # normals: element-date
-    switch(data_type,
-           "ts" = "4km/%s/%s?format=%s",
-           "normals_800" = "normals/800m/%s/%s",
-           "normals" = "normals/4km/%s/%s")
+    switch(
+      data_type,
+      "ts" = "4km/%s/%s?format=%s",
+      "normals_800" = "normals/800m/%s/%s",
+      "normals" = "normals/4km/%s/%s"
+    )
   #### 3. define measurement data paths
   url_download_template <-
     file.path(
@@ -3377,27 +3521,33 @@ download_prism <- function(
     )
 
   download_urls <-
-    ifelse(data_type == "ts",
-           sprintf(url_download_template, element, time, format),
-           sprintf(url_download_template, element, time))
+    ifelse(
+      data_type == "ts",
+      sprintf(url_download_template, element, time, format),
+      sprintf(url_download_template, element, time)
+    )
 
   #### 4. build download command
   # --content-disposition flag is for web service retrieval
   # when using the URL does not end with the file name
   download_commands <-
-    paste0("wget -e robots=off -np ",
-           "--content-disposition ",
-           download_urls,
-           " -P ",
-           directory_to_save,
-           "\n")
+    paste0(
+      "wget -e robots=off -np ",
+      "--content-disposition ",
+      download_urls,
+      " -P ",
+      directory_to_save,
+      "\n"
+    )
 
   #### 5. initiate "..._curl_commands.txt"
   commands_txt <- paste0(
     directory_to_save,
     "PRISM_",
-    element, "_",
-    data_type, "_",
+    element,
+    "_",
+    data_type,
+    "_",
     time,
     "_",
     Sys.Date(),
@@ -3463,13 +3613,14 @@ download_prism <- function(
 #' @export
 # nolint end
 download_gridmet <- function(
-    variables = NULL,
-    year = c(2018, 2022),
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    hash = FALSE) {
+  variables = NULL,
+  year = c(2018, 2022),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  hash = FALSE
+) {
   #### check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### check for null parameters
@@ -3497,7 +3648,9 @@ download_gridmet <- function(
   commands_txt <- paste0(
     directory_to_save,
     "gridmet_",
-    year[1], "_", year[2],
+    year[1],
+    "_",
+    year[2],
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
@@ -3604,13 +3757,14 @@ download_gridmet <- function(
 #' @export
 # nolint end
 download_terraclimate <- function(
-    variables = NULL,
-    year = c(2018, 2022),
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = FALSE,
-    remove_command = FALSE,
-    hash = FALSE) {
+  variables = NULL,
+  year = c(2018, 2022),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  hash = FALSE
+) {
   #### check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
   #### check for null parameters
@@ -3639,7 +3793,9 @@ download_terraclimate <- function(
   commands_txt <- paste0(
     directory_to_save,
     "terraclimate_",
-    year[1], "_", year[2],
+    year[1],
+    "_",
+    year[2],
     "_curl_commands.txt"
   )
   download_sink(commands_txt)
@@ -3698,6 +3854,419 @@ download_terraclimate <- function(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
+  )
+  return(download_hash(hash, directory_to_save))
+}
+
+#nolint start
+#' Download EDGAR Emissions Data
+#'
+#' Constructs and optionally downloads EDGAR emissions data URLs based on
+#' user-specified inputs including species, temporal resolution, emission
+#' sectors, and file formats.
+#'
+#' @param species Character vector. One or more species to download.
+#'  Supported values: "BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10",
+#'  "PM2.5", "SO2". Input is case-insensitive and supports "pm2.5" or "pm25".
+#' @param version Character. EDGAR data version. Supported values: "8.1" for
+#'  most recent version data or "8.1_voc" for VOC speciation data.
+#' @param temp_res Character. Temporal resolution for specification with
+#'  version 8.1. One of "yearly", "monthly", or "timeseries". temp_res is not
+#'  needed for version=8.1_voc and will be ignored if specified.
+#' @param sector_yearly Character vector or NULL. Emission sectors for yearly
+#'  data. If NULL, totals will be used. Possible values include:
+#'  "AGS", "AWB", "CHE", "ENE", "IND", "MNM", "NMM", "PRU_SOL", "RCO",
+#'  "REF_TRF", "SWD_INC", "SWD_LDF", "TNR_Aviation_CDS", "TNR_Aviation_CRS",
+#'  "TNR_Aviation_LTO", "TNR_Aviation_SPS", "TNR_Other", "TNR_Ship", "TRO", "WWT"
+#' @param sector_monthly Character vector or NULL. Emission sectors for monthly
+#'  data and VOC speciation data. If NULL, the function will use full-species
+#'  files (not sector-specific). Supported values: "AGRICULTURE", "BUILDINGS",
+#'  "FUEL_EXPLOITATION", "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY",
+#'  "TRANSPORT", "WASTE".
+#' @param output Character. Output type. Supported values include "emi" for
+#'  emissions and "flx" for fluxes.
+#' @param format Character. File format to download. Typically "nc" (NetCDF)
+#'  or "txt". Flux output and monthly outputs are only supported in .nc format
+#' @param year_range Numeric vector of length 2 or NULL. Year range, e.g.,
+#'  c(2021, 2022). If NULL, uses all available years (1970-2022 for yearly data,
+#'  2000-2022 for monthly and VOC speciation data)
+#' @param voc Integer vector or NULL. Used for VOC speciation in version
+#'  "8.1_voc". Accepts integers from 1 to 25. See:
+#'  https://edgar.jrc.ec.europa.eu/dataset_ap81_VOC_spec#p3  for reference on
+#'  speciation groups and VOC numbers.
+#' @return A list of download URLs (character). Optionally downloads available
+#'  files and warns about missing ones.
+#' @param directory_to_save character(1). Directory to save data. Two
+#'  sub-directories will be created for the downloaded zip files ("/zip_files")
+#'  and the unzipped data files ("/data_files").
+#' @param acknowledgement logical(1). By setting \code{TRUE} the
+#'  user acknowledges that the data downloaded using this function may be very
+#'  large and use lots of machine storage and memory.
+#' @param download logical(1). \code{FALSE} will generate a *.txt file
+#'  containing all download commands. By setting \code{TRUE} the function
+#'  will download all of the requested data files.
+#' @param remove_command logical(1).
+#'  Remove (\code{TRUE}) or keep (\code{FALSE})
+#'  the text file containing download commands. Default is FALSE.
+#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip file from directory_to_download.
+#'  Default is \code{FALSE}.
+#' @param hash logical(1). By setting \code{TRUE} the function will return
+#'  an \code{rlang::hash_file()} hash character corresponding to the
+#'  downloaded files. Default is \code{FALSE}.
+#' @author Mariana Alifa Kassien
+#' @return
+#' * For \code{hash = FALSE}, NULL
+#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * Zip and/or data files will be downloaded and stored in
+#' \code{directory_to_save}.
+#' @examples
+#' download_edgar(species = "CO", temp_res = "yearly", sector_yearly = "ENE", year_range = c(2021, 2022))
+#' download_edgar(species = "PM2.5", temp_res = "monthly", sector_monthly = c("TRANSPORT", "WASTE"))
+#' download_edgar(species = "SO2", temp_res = "timeseries")
+#' @export
+# nolint end
+download_edgar <- function(
+  species = c("BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10", "PM2.5", "SO2"),
+  version = "8.1",
+  temp_res = NULL,
+  sector_yearly = NULL,
+  sector_monthly = NULL,
+  format = "nc",
+  output = "emi",
+  year_range = NULL,
+  voc = NULL,
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
+  hash = FALSE
+) {
+  library(httr)
+
+  # check for data download acknowledgement
+  download_permit(acknowledgement = acknowledgement)
+
+  # directory setup
+  directory_original <- download_sanitize_path(directory_to_save)
+  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- directories[1]
+  directory_to_save <- directories[2]
+
+  durl <- "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/"
+
+  # Normalize species input
+  species <- toupper(species)
+  species_folder <- gsub("(?i)pm2\\.5|pm25", "PM2.5", species, perl = TRUE)
+  species_file <- gsub("(?i)pm2\\.5|pm25", "PM25", species, perl = TRUE)
+  species_folder <- gsub("NOX", "NOx", species_folder)
+  species_file <- gsub("NOX", "NOx", species_file)
+
+  # Check for invalid combinations
+  if (any(output == "flx" & format == "txt")) {
+    stop("Output 'flux' is only supported for format 'nc'.")
+  }
+  if (any(temp_res == "monthly" & format == "txt")) {
+    stop("Monthly resolution is only supported for format 'nc'.")
+  }
+
+  if (!is.null(year_range)) {
+    yearsvec <- seq(year_range[1], year_range[2])
+  }
+
+  urls <- character()
+
+  if (version == "8.1") {
+    vers <- "v81_FT2022_AP_new/"
+    vers_file <- "v8.1_FT2022_AP"
+
+    grid_species <- data.frame(species = species, stringsAsFactors = FALSE)
+    grid_species$folder <- gsub(
+      "(?i)pm2\\.5|pm25",
+      "PM2.5",
+      grid_species$species,
+      perl = TRUE
+    )
+    grid_species$folder <- gsub("NOX", "NOx", grid_species$folder)
+    grid_species$file <- gsub(
+      "(?i)pm2\\.5|pm25",
+      "PM25",
+      grid_species$species,
+      perl = TRUE
+    )
+    grid_species$file <- gsub("NOX", "NOx", grid_species$file)
+
+    if (temp_res == "timeseries") {
+      urls <- paste0(durl, vers, "EDGAR_", grid_species$file, "_1970_2022.zip")
+      urls <- ifelse(
+        grid_species$file == "SO2",
+        gsub("2022.zip$", "2022_v2.zip", urls),
+        urls
+      )
+    } else if (temp_res == "yearly") {
+      if (!is.null(sector_yearly)) {
+        grid <- expand.grid(
+          species_idx = seq_len(nrow(grid_species)),
+          sector = sector_yearly,
+          year = if (!is.null(year_range)) yearsvec else NA,
+          stringsAsFactors = FALSE
+        )
+
+        urls <- if (!is.null(year_range)) {
+          paste0(
+            durl,
+            vers,
+            grid_species$folder[grid$species_idx],
+            "/",
+            grid$sector,
+            "/",
+            output,
+            "_",
+            format,
+            "/",
+            vers_file,
+            "_",
+            grid_species$species[grid$species_idx],
+            "_",
+            grid$year,
+            "_",
+            grid$sector,
+            "_",
+            output,
+            "_",
+            format,
+            ".zip"
+          )
+        } else {
+          paste0(
+            durl,
+            vers,
+            grid_species$folder[grid$species_idx],
+            "/",
+            grid$sector,
+            "/",
+            grid$sector,
+            "_",
+            output,
+            "_",
+            format,
+            ".zip"
+          )
+        }
+      } else {
+        grid <- expand.grid(
+          species_idx = seq_len(nrow(grid_species)),
+          year = if (!is.null(year_range)) yearsvec else NA,
+          stringsAsFactors = FALSE
+        )
+
+        urls <- if (!is.null(year_range)) {
+          paste0(
+            durl,
+            vers,
+            grid_species$folder[grid$species_idx],
+            "/TOTALS/",
+            output,
+            "_",
+            format,
+            "/",
+            vers_file,
+            "_",
+            grid_species$species[grid$species_idx],
+            "_",
+            grid$year,
+            "_TOTALS_",
+            output,
+            "_",
+            format,
+            ".zip"
+          )
+        } else {
+          paste0(
+            durl,
+            vers,
+            grid_species$folder,
+            "/TOTALS/TOTALS_",
+            output,
+            "_",
+            format,
+            ".zip"
+          )
+        }
+      }
+    } else if (temp_res == "monthly") {
+      if (!is.null(sector_monthly)) {
+        grid <- expand.grid(
+          species_idx = seq_len(nrow(grid_species)),
+          sector = sector_monthly,
+          stringsAsFactors = FALSE
+        )
+        urls <- paste0(
+          durl,
+          vers,
+          "monthly/",
+          grid_species$folder[grid$species_idx],
+          "/bkl_",
+          grid$sector,
+          "/bkl_",
+          grid$sector,
+          "_",
+          output,
+          "_",
+          format,
+          ".zip"
+        )
+      } else {
+        urls <- paste0(
+          durl,
+          vers,
+          "monthly/EDGAR_",
+          grid_species$file,
+          "_m_2000_2022.zip"
+        )
+        urls <- ifelse(
+          grid_species$file == "SO2",
+          gsub("2022.zip$", "2022_v2.zip", urls),
+          urls
+        )
+      }
+    } else {
+      stop("Unsupported temp_res value")
+    }
+  } else if (version == "8.1_voc") {
+    vers <- "v81_FT2022_VOC_spec/"
+    vers_file <- "v8.1_FT2022_VOC_spec"
+
+    if (!is.null(sector_monthly)) {
+      grid <- expand.grid(
+        voc = voc,
+        sector = sector_monthly,
+        year = if (!is.null(year_range)) yearsvec else NA,
+        stringsAsFactors = FALSE
+      )
+
+      urls <- if (!is.null(year_range)) {
+        paste0(
+          durl,
+          vers,
+          "voc",
+          grid$voc,
+          "/bkl_",
+          grid$sector,
+          "/",
+          output,
+          "_",
+          format,
+          "/",
+          vers_file,
+          "_voc",
+          grid$voc,
+          "_",
+          grid$year,
+          "_bkl_",
+          grid$sector,
+          "_",
+          output,
+          "_",
+          format,
+          ".zip"
+        )
+      } else {
+        paste0(
+          durl,
+          vers,
+          "voc",
+          voc,
+          "/bkl_",
+          sector_monthly,
+          "/bkl_",
+          sector_monthly,
+          "_",
+          output,
+          "_",
+          format,
+          ".zip"
+        )
+      }
+    } else {
+      urls <- paste0(durl, vers, "EDGAR_voc", voc, "_1970_2022.zip")
+    }
+  } else {
+    stop("Unsupported version")
+  }
+
+  # Validate and download
+  download_urls <- c()
+  missing_urls <- c()
+
+  for (u in urls) {
+    if (!(check_url_status(u))) {
+      missing_urls <- c(missing_urls, u)
+    } else {
+      download_urls <- c(download_urls, u)
+    }
+  }
+  # Issue warning message for URLs not found
+  if (length(missing_urls)) {
+    warning(
+      "Some URLs could not be accessed:",
+      paste(missing_urls, collapse = "\n")
+    )
+  }
+
+  #### 5. build download file name
+  download_names <- paste0(
+    directory_to_download,
+    "edgar_",
+    temp_res,
+    "_",
+    basename(download_urls)
+  )
+
+  #### build download command
+  download_commands <- paste0(
+    "curl -s --url ",
+    download_urls,
+    " --output ",
+    download_names,
+    "\n"
+  )
+  #### filter commands to non-existing files
+  download_commands <- download_commands[
+    which(
+      !file.exists(download_names) | file.size(download_names) == 0
+    )
+  ]
+  #### 7. initiate "..._curl_commands.txt"
+  commands_txt <- paste0(
+    directory_original,
+    "edgar_",
+    temp_res,
+    "_curl_commands.txt"
+  )
+  download_sink(commands_txt)
+  #### 8. concatenate and print download commands to "..._curl_commands.txt"
+  cat(download_commands)
+  #### 9. finish "..._curl_commands.txt" file
+  sink()
+  #### 11. download data
+  download_run(
+    download = download,
+    commands_txt = commands_txt,
+    remove = remove_command
+  )
+  #### 12. unzip data
+  sapply(
+    download_names,
+    download_unzip,
+    directory_to_unzip = directory_to_save,
+    unzip = unzip
+  )
+  download_remove_zips(
+    remove = remove_zip,
+    download_name = download_names
   )
   return(download_hash(hash, directory_to_save))
 }
