@@ -391,7 +391,8 @@ download_ecoregion <- function(
     "extdata/cacert_gaftp_epa.pem",
     package = "amadeus"
   ),
-  certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  certificate_url = 
+  "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -3011,7 +3012,8 @@ download_nei <- function(
     "extdata/cacert_gaftp_epa.pem",
     package = "amadeus"
   ),
-  certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  certificate_url = 
+  "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   year = c(2017L, 2020L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
