@@ -40,7 +40,7 @@
 #' * \code{\link{download_huc}}: `"huc"`
 #' * \code{\link{download_cropscape}}: `"cropscape"`, `"cdl"`
 #' * \code{\link{download_prism}}: `"prism"`
-#'  * \code{\link{download_edgar}}: `"edgar"`, `"EDGAR"`
+#' * \code{\link{download_edgar}}: `"edgar"`, `"EDGAR"`
 #' @return
 #' * For \code{hash = FALSE}, NULL
 #' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
@@ -3920,6 +3920,10 @@ download_terraclimate <- function(
 #' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
 #' * Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
+#' @importFrom Rdpack reprompt
+#' @references
+#' \insertRef{web_edgarv8.1ap}{amadeus}
+#' \insertRef{web_edgarv8.1voc}{amadeus}
 #' @examples
 #' download_edgar(species = "CO", temp_res = "yearly", sector_yearly = "ENE", year_range = c(2021, 2022))
 #' download_edgar(species = "PM2.5", temp_res = "monthly", sector_monthly = c("TRANSPORT", "WASTE"))

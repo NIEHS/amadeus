@@ -1,6 +1,7 @@
 ################################################################################
 ##### unit and integration tests for EDGAR functions
 # nolint start
+
 ################################################################################
 ##### download_edgar
 testthat::test_that("download_edgar (no errors, yearly with sectors)", {
@@ -192,3 +193,4 @@ testthat::test_that("download_edgar (missing acknowledgement triggers error)", {
         )
     )
 })
+#nolint end
