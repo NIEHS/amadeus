@@ -155,9 +155,9 @@ testthat::test_that("process_hms (with polygons)", {
     is.null(terra::crs(hms))
   )
   # expect two columns
-  testthat::expect_true(
-    ncol(hms) == 2
-  )
+  testthat::expect_true(ncol(hms) == 2)
+  # expect three row
+  testthat;:expect_true(nrow(hms) == 3)
   # expect density and date column
   testthat::expect_true(
     all(c("Density", "Date") %in% names(hms))
@@ -200,9 +200,9 @@ testthat::test_that("process_hms (single date)", {
     is.null(terra::crs(hms))
   )
   # expect two columns
-  testthat::expect_true(
-    ncol(hms) == 2
-  )
+  testthat::expect_true(ncol(hms) == 2)
+  # expect one row
+  testthat;:expect_true(nrow(hms) == 1)
   # expect density and date column
   testthat::expect_true(
     all(c("Density", "Date") %in% names(hms))
@@ -238,6 +238,53 @@ testthat::test_that("process_hms (absent polygons - 12/31/2018)", {
     )
   # expect character
   testthat::expect_true(is.character(hms))
+})
+
+testthat::test_that("process_hms (aggregate = FALSE)", {
+  withr::local_package("terra")
+  # expect function
+  testthat::expect_true(
+    is.function(process_hms)
+  )
+  hms_af <-
+    process_hms(
+      date = c("2022-06-10", "2022-06-13"),
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "hms"
+      ),
+      aggregate = FALSE
+    )
+  # expect output is a SpatVector or character
+  testthat::expect_true(
+    methods::is(hms_af, "SpatVector")
+  )
+  # expect non-null coordinate reference system
+  testthat::expect_false(
+    is.null(terra::crs(hms_af))
+  )
+  # expect five columns (satelite direction, hour start + stop)
+  testthat::expect_true(ncol(hms_af) == 5)
+  # expect rows (non-aggregated polygons)
+  testthat::expect_true(nrow(hms_af) == 5)
+  # expect density and date column
+  testthat::expect_true(
+    all(c("Density", "Date", "Start", "End", "Satellite") %in% names(hms_af))
+  )
+  # test with cropping extent
+  testthat::expect_no_error(
+    hms_ext <- process_hms(
+      date = c("2022-06-10", "2022-06-11"),
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "hms"
+      ),
+      extent = terra::ext(hms_af),
+      aggregate = FALSE
+    )
+  )
 })
 
 ################################################################################
@@ -396,4 +443,63 @@ testthat::test_that("calculate_hms (absent polygons - 12/31/2018)", {
     testthat::expect_equal(ncol(hms_covar), 5)
   }
 })
+
+testthat::test_that("calculate_hms (non-aggregated)", {
+  withr::local_package("terra")
+  radii <- c(0, 1000)
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  # expect function
+  testthat::expect_true(
+    is.function(calculate_hms)
+  )
+  for (r in seq_along(radii)) {
+    hms <-
+      process_hms(
+        date = c("2022-06-10", "2022-06-11"),
+        path = testthat::test_path(
+          "..",
+          "testdata",
+          "hms"
+        ),
+        aggregate = FALSE
+      )
+    hms_covariate <-
+      calculate_hms(
+        from = hms,
+        locs = ncp,
+        locs_id = "site_id",
+        radius = radii[r],
+        geom = FALSE
+      )
+    # set column names
+    hms_covariate <- calc_setcolumns(
+      from = hms_covariate,
+      lag = 0,
+      dataset = "hms",
+      locs_id = "site_id"
+    )
+    # expect output is data.frame
+    testthat::expect_true(
+      class(hms_covariate) == "data.frame"
+    )
+    # expect 3 columns
+    testthat::expect_true(
+      ncol(hms_covariate) == 5
+    )
+    # expect 2 rows
+    testthat::expect_true(
+      nrow(hms_covariate) == 2
+    )
+    # expect integer for binary value
+    testthat::expect_true(
+      is.integer(hms_covariate[, 3])
+    )
+    # expect binary
+    testthat::expect_true(
+      all(unique(hms_covariate[, 3]) %in% c(0, 1))
+    )
+  }
+})
+
 # nolint end

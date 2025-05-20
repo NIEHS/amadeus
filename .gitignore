@@ -71,3 +71,9 @@ CRAN-SUBMISSION
 
 # local testing output
 **/cov
+
+# development files
+interactive.sh
+data/
+R/dev.R
+tests/testthat/test-dev.R

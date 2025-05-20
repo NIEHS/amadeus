@@ -4,7 +4,14 @@
 \alias{calculate_lagged}
 \title{Calculate temporally lagged covariates}
 \usage{
-calculate_lagged(from, date, lag, locs_id, time_id = "time", geom = FALSE)
+calculate_lagged(
+  from,
+  date,
+  lag,
+  locs_id = "site_id",
+  time_id = "time",
+  geom = FALSE
+)
 }
 \arguments{
 \item{from}{data.frame(1). A \code{data.frame} containing calculated covariates

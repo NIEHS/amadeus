@@ -4,7 +4,13 @@
 \alias{process_hms}
 \title{Process wildfire smoke data}
 \usage{
-process_hms(date = "2018-01-01", path = NULL, extent = NULL, ...)
+process_hms(
+  date = "2018-01-01",
+  path = NULL,
+  extent = NULL,
+  aggregate = TRUE,
+  ...
+)
 }
 \arguments{
 \item{date}{character(1 or 2). Date (1) or start and end dates (2).
@@ -14,6 +20,11 @@ Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 
 \item{extent}{numeric(4) or SpatExtent giving the extent of the output
 if \code{NULL} (default), the entire data is returned}
+
+\item{aggregate}{logical(1). Should polygons with the same smoke density
+be aggregated and unioned to one multi-polygon per date/density? Default
+is \code{TRUE}. If \code{FALSE}, full data columns (e.g. "Satellite" direction,
+measurement hour start and end) will be returned.}
 
 \item{...}{Placeholders.}
 }

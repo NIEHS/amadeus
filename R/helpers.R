@@ -11,7 +11,7 @@ test <- function(pattern = NULL) {
     paste(
       c(
         "apptainer exec --bind $PWD:/mnt --bind /tmp:/opt/tmp ",
-        "containers.sif Rscript --no-init-file -e \"",
+        "container.sif Rscript --no-init-file -e \"",
         ".libPaths(grep(paste0('biotools|', Sys.getenv('USER')), .libPaths(), ",
         "value = TRUE, invert = TRUE)); devtools::load_all('/mnt'); ",
         "library(dplyr); library(testthat); ",
@@ -46,5 +46,13 @@ cov <- function() {
       collapse = ""
     )
   )
+}
+
+#' Open interactive session with `container.sif` container.
+#' @return NULL
+#' @keywords Miscellaneous
+interactive <- function(dir = ".") {
+  file <- file.path(dir, "interactive.sh")
+  system(paste0(". ", file))
 }
 # nocov end

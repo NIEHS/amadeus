@@ -1465,6 +1465,10 @@ process_groads <- function(
 #' @param path character(1). Directory with downloaded NOAA HMS data files.
 #' @param extent numeric(4) or SpatExtent giving the extent of the output
 #'   if `NULL` (default), the entire data is returned
+#' @param aggregate logical(1). Should polygons with the same smoke density
+#' be aggregated and unioned to one multi-polygon per date/density? Default
+#' is `TRUE`. If `FALSE`, full data columns (e.g. "Satellite" direction,
+#' measurement hour start and end) will be returned.
 #' @param ... Placeholders.
 #' @note
 #' \code{process_hms()} will return a character object if there are no wildfire
@@ -1490,6 +1494,7 @@ process_hms <- function(
     date = "2018-01-01",
     path = NULL,
     extent = NULL,
+    aggregate = TRUE,
     ...) {
   #### directory setup
   path <- download_sanitize_path(path)
@@ -1532,6 +1537,9 @@ process_hms <- function(
       value = TRUE
     )
   )
+
+  if (!aggregate) message("Skipping aggregation; returning raw polygons.")
+
   #### process data
   data_return <- terra::vect()
   for (d in seq_along(data_paths)) {
@@ -1572,66 +1580,84 @@ process_hms <- function(
         data_density,
         width = 0
       )
-      # add dummy polygons
-      poly_dummy <-
-        "POLYGON((-180 -86,-179.99 -86,-179.99 -85.99,-180 -85.99,-180 -86))"
-      poly_dummy <- terra::vect(poly_dummy)
-      poly_dummy <- rbind(poly_dummy, poly_dummy, poly_dummy)
-      poly_dummy <- terra::set.crs(poly_dummy, terra::crs(data_0_buffer))
-      poly_dummy$Density <- c("Heavy", "Medium", "Light")
-      poly_dummy$.hmsdummy <- 1
-      data_0_buffer_a <- rbind(data_0_buffer, poly_dummy)
-      data_0_buffer_a$.hmsdummy <-
-        ifelse(
-          is.nan(data_0_buffer_a$.hmsdummy),
-          NA,
-          data_0_buffer_a$.hmsdummy
-        )
-      #### aggregate polygons
-      data_aggregate <- terra::aggregate(
-        data_0_buffer_a,
-        by = "Density",
-        dissolve = TRUE
-      )
 
-      # Density index sorting to Heavy-Medium-Light
-      sort_index <- data_aggregate$Density
-      sort_index <-
-        match(
-          c("Heavy", "Medium", "Light"),
-          sort_index
+      if (!aggregate) {
+        data_hours <- lapply(
+          terra::as.data.frame(data_0_buffer[, c("Start", "End")]),
+          FUN = function(x) substr(x, 9, 12)
         )
-      sort_index <- stats::na.omit(sort_index)
-      data_aggregate <- data_aggregate[sort_index, ]
-
-      # union polygons. Heavy-Medium-Light are 1, 2, 3, respectively.
-      data_aggregate <- terra::union(data_aggregate)
-      data_aggregate$indx <-
-        as.numeric(
-          paste0(
-            data_aggregate$id_1,
-            data_aggregate$id_2,
-            data_aggregate$id_3
+        data_0_buffer$Start <- as.integer(data_hours$Start)
+        data_0_buffer$End <- as.integer(data_hours$End)
+        data_0_buffer$Date <- date
+        data_return <- rbind(
+          data_return,
+          data_0_buffer[
+            , c("Density", "Date", "Start", "End", "Satellite")
+          ]
+        )
+      } else {
+        # add dummy polygons
+        poly_dummy <-
+          "POLYGON((-180 -86,-179.99 -86,-179.99 -85.99,-180 -85.99,-180 -86))"
+        poly_dummy <- terra::vect(poly_dummy)
+        poly_dummy <- rbind(poly_dummy, poly_dummy, poly_dummy)
+        poly_dummy <- terra::set.crs(poly_dummy, terra::crs(data_0_buffer))
+        poly_dummy$Density <- c("Heavy", "Medium", "Light")
+        poly_dummy$.hmsdummy <- 1
+        data_0_buffer_a <- rbind(data_0_buffer, poly_dummy)
+        data_0_buffer_a$.hmsdummy <-
+          ifelse(
+            is.nan(data_0_buffer_a$.hmsdummy),
+            NA,
+            data_0_buffer_a$.hmsdummy
           )
+
+        #### aggregate polygons
+        data_aggregate <- terra::aggregate(
+          data_0_buffer_a,
+          by = "Density",
+          dissolve = TRUE
         )
-      # cut integers into three classes, assign labels
-      data_aggregate$Density <-
-        cut(
-          data_aggregate$indx,
-          c(0, 10, 100, 1000),
-          labels = c("Light", "Medium", "Heavy"),
-          right = FALSE
-        )
-      # reaggregate to dissolve polygons
-      data_aggregate <- terra::aggregate(data_aggregate, by = "Density")
-      data_aggregate$Date <- date
-      #### factorize
-      #### select "Density" and "Date"
-      data_aggregate <- data_aggregate[, c("Density", "Date")]
-      #### merge with other data
-      data_return <- rbind(data_return, data_aggregate)
-      reext <- terra::ext(c(-180, 180, -65, 85))
-      data_return <- terra::crop(data_return, reext)
+
+        # Density index sorting to Heavy-Medium-Light
+        sort_index <- data_aggregate$Density
+        sort_index <-
+          match(
+            c("Heavy", "Medium", "Light"),
+            sort_index
+          )
+        sort_index <- stats::na.omit(sort_index)
+        data_aggregate <- data_aggregate[sort_index, ]
+
+        # union polygons. Heavy-Medium-Light are 1, 2, 3, respectively.
+        data_aggregate <- terra::union(data_aggregate)
+        data_aggregate$indx <-
+          as.numeric(
+            paste0(
+              data_aggregate$id_1,
+              data_aggregate$id_2,
+              data_aggregate$id_3
+            )
+          )
+        # cut integers into three classes, assign labels
+        data_aggregate$Density <-
+          cut(
+            data_aggregate$indx,
+            c(0, 10, 100, 1000),
+            labels = c("Light", "Medium", "Heavy"),
+            right = FALSE
+          )
+        # reaggregate to dissolve polygons
+        data_aggregate <- terra::aggregate(data_aggregate, by = "Density")
+        data_aggregate$Date <- date
+        #### factorize
+        #### select "Density" and "Date"
+        data_aggregate <- data_aggregate[, c("Density", "Date")]
+        #### merge with other data
+        data_return <- rbind(data_return, data_aggregate)
+        reext <- terra::ext(c(-180, 180, -65, 85))
+        data_return <- terra::crop(data_return, reext)
+      }
     }
   }
   #### if no polygons

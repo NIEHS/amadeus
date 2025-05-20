@@ -26,13 +26,9 @@ From: rocker/geospatial:latest
     export LANG=en_US.UTF-8
     export LC_ALL=en_US.UTF-8
 
-    # Create directories
-    mkdir /pipeline
-    mkdir /input
-    mkdir /opt/_targets
-
     # Install R packages
-    Rscript -e "install.packages(c('pak', 'rstac', 'testthat', 'covr', 'nanonext'))"
+    Rscript -e "install.packages(c('pak', 'rstac', 'testthat', \
+        'covr', 'nanonext', 'devtools', 'tigris'))"
     Rscript -e "pak::pak('NIEHS/amadeus@1.2.4')"
 
 %environment
