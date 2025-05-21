@@ -391,8 +391,7 @@ download_ecoregion <- function(
     "extdata/cacert_gaftp_epa.pem",
     package = "amadeus"
   ),
-  certificate_url = 
-  "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -3012,8 +3011,7 @@ download_nei <- function(
     "extdata/cacert_gaftp_epa.pem",
     package = "amadeus"
   ),
-  certificate_url = 
-  "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   year = c(2017L, 2020L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -3881,17 +3879,20 @@ download_terraclimate <- function(
 #'  "REF_TRF", "SWD_INC", "SWD_LDF", "TNR_Aviation_CDS", "TNR_Aviation_CRS",
 #'  "TNR_Aviation_LTO", "TNR_Aviation_SPS", "TNR_Other", "TNR_Ship", "TRO", "WWT"
 #' @param sector_monthly Character vector or NULL. Emission sectors for monthly
-#'  data and VOC speciation data. If NULL, the function will use full-species
-#'  files (not sector-specific). Supported values: "AGRICULTURE", "BUILDINGS",
-#'  "FUEL_EXPLOITATION", "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY",
-#'  "TRANSPORT", "WASTE".
+#'  data. If NULL, the function will use full-species files (not sector-specific).
+#'  Supported values: "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
+#' "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY", "TRANSPORT", "WASTE".
+#' @param sector_voc Character vector or NULL. Emission sectors for VOC speciation
+#'  data. If NULL, the function will use full-species files (not sector-specific).
+#'  Supported values: "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
+#' "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY", "TRANSPORT", "WASTE".
 #' @param output Character. Output type. Supported values include "emi" for
 #'  emissions and "flx" for fluxes.
 #' @param format Character. File format to download. Typically "nc" (NetCDF)
 #'  or "txt". Flux output and monthly outputs are only supported in .nc format
-#' @param year_range Numeric vector of length 2 or NULL. Year range, e.g.,
-#'  c(2021, 2022). If NULL, uses all available years (1970-2022 for yearly data,
-#'  2000-2022 for monthly and VOC speciation data)
+#' @param year_range Numeric vector of length 1, 2 or NULL. Year range, e.g.,
+#' 2021, or c(2021, 2022). If NULL, uses all available years (1970-2022 for
+#' yearly data, 2000-2022 for monthly and VOC speciation data)
 #' @param voc Integer vector or NULL. Used for VOC speciation in version
 #'  "8.1_voc". Accepts integers from 1 to 25. See:
 #'  https://edgar.jrc.ec.europa.eu/dataset_ap81_VOC_spec#p3  for reference on
@@ -3938,6 +3939,7 @@ download_edgar <- function(
   temp_res = NULL,
   sector_yearly = NULL,
   sector_monthly = NULL,
+  sector_voc = NULL,
   format = "nc",
   output = "emi",
   year_range = NULL,
@@ -3950,8 +3952,6 @@ download_edgar <- function(
   remove_zip = FALSE,
   hash = FALSE
 ) {
-  library(httr)
-
   # check for data download acknowledgement
   download_permit(acknowledgement = acknowledgement)
 
@@ -3965,10 +3965,9 @@ download_edgar <- function(
 
   # Normalize species input
   species <- toupper(species)
+  species <- gsub("NOX", "NOx", species)
   species_folder <- gsub("(?i)pm2\\.5|pm25", "PM2.5", species, perl = TRUE)
   species_file <- gsub("(?i)pm2\\.5|pm25", "PM25", species, perl = TRUE)
-  species_folder <- gsub("NOX", "NOx", species_folder)
-  species_file <- gsub("NOX", "NOx", species_file)
 
   # Check for invalid combinations
   if (any(output == "flx" & format == "txt")) {
@@ -3979,7 +3978,13 @@ download_edgar <- function(
   }
 
   if (!is.null(year_range)) {
-    yearsvec <- seq(year_range[1], year_range[2])
+    if (length(year_range) == 1) {
+      yearsvec <- year_range
+    } else if (length(year_range) == 2) {
+      yearsvec <- seq(year_range[1], year_range[2])
+    } else {
+      stop("year_range must be of length 1 or 2")
+    }
   }
 
   urls <- character()
@@ -3995,14 +4000,12 @@ download_edgar <- function(
       grid_species$species,
       perl = TRUE
     )
-    grid_species$folder <- gsub("NOX", "NOx", grid_species$folder)
     grid_species$file <- gsub(
       "(?i)pm2\\.5|pm25",
       "PM25",
       grid_species$species,
       perl = TRUE
     )
-    grid_species$file <- gsub("NOX", "NOx", grid_species$file)
 
     if (temp_res == "timeseries") {
       urls <- paste0(durl, vers, "EDGAR_", grid_species$file, "_1970_2022.zip")
@@ -4145,10 +4148,10 @@ download_edgar <- function(
     vers <- "v81_FT2022_VOC_spec/"
     vers_file <- "v8.1_FT2022_VOC_spec"
 
-    if (!is.null(sector_monthly)) {
+    if (!is.null(sector_voc)) {
       grid <- expand.grid(
         voc = voc,
-        sector = sector_monthly,
+        sector = sector_voc,
         year = if (!is.null(year_range)) yearsvec else NA,
         stringsAsFactors = FALSE
       )
@@ -4186,9 +4189,9 @@ download_edgar <- function(
           "voc",
           voc,
           "/bkl_",
-          sector_monthly,
+          sector_voc,
           "/bkl_",
-          sector_monthly,
+          sector_voc,
           "_",
           output,
           "_",
@@ -4202,6 +4205,8 @@ download_edgar <- function(
   } else {
     stop("Unsupported version")
   }
+  # Check constructed urls
+  message("Constructed URL(s): ", paste(urls, collapse = "\n"))
 
   # Validate and download
   download_urls <- c()
@@ -4213,6 +4218,10 @@ download_edgar <- function(
     } else {
       download_urls <- c(download_urls, u)
     }
+  }
+  # Stop function if no valid urls were created
+  if (is.null(download_urls) || length(download_urls) == 0) {
+    stop("No valid URLs were constructed.")
   }
   # Issue warning message for URLs not found
   if (length(missing_urls)) {
