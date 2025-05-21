@@ -3930,9 +3930,9 @@ download_terraclimate <- function(
 #' \insertRef{web_edgarv8.1ap}{amadeus}
 #' \insertRef{web_edgarv8.1voc}{amadeus}
 #' @examples
-#' download_edgar(species = "CO", temp_res = "yearly", sector_yearly = "ENE", year_range = c(2021, 2022))
-#' download_edgar(species = "PM2.5", temp_res = "monthly", sector_monthly = c("TRANSPORT", "WASTE"))
-#' download_edgar(species = "SO2", temp_res = "timeseries")
+#' download_edgar(species = "CO", acknowledgement = TRUE, temp_res = "yearly", sector_yearly = "ENE", year_range = c(2021, 2022))
+#' download_edgar(species = "PM2.5", acknowledgement = TRUE, temp_res = "monthly", sector_monthly = c("TRANSPORT", "WASTE"))
+#' download_edgar(species = "SO2", acknowledgement = TRUE, temp_res = "timeseries")                        
 #' @export
 # nolint end
 download_edgar <- function(
