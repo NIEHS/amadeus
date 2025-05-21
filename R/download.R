@@ -391,7 +391,8 @@ download_ecoregion <- function(
     "extdata/cacert_gaftp_epa.pem",
     package = "amadeus"
   ),
-  certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  certificate_url = 
+    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -3011,7 +3012,8 @@ download_nei <- function(
     "extdata/cacert_gaftp_epa.pem",
     package = "amadeus"
   ),
-  certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  certificate_url = 
+    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   year = c(2017L, 2020L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -3966,8 +3968,6 @@ download_edgar <- function(
   # Normalize species input
   species <- toupper(species)
   species <- gsub("NOX", "NOx", species)
-  species_folder <- gsub("(?i)pm2\\.5|pm25", "PM2.5", species, perl = TRUE)
-  species_file <- gsub("(?i)pm2\\.5|pm25", "PM25", species, perl = TRUE)
 
   # Check for invalid combinations
   if (any(output == "flx" & format == "txt")) {
