@@ -1,6 +1,5 @@
 ################################################################################
 ##### unit and integration tests for EDGAR functions
-# nolint start
 
 testthat::test_that("download_edgar (no errors, yearly with sectors)", {
   withr::local_package("httr")
@@ -206,5 +205,3 @@ testthat::test_that("download_edgar (missing acknowledgement triggers error)", {
     regexp = "acknowledge"
   )
 })
-
-# nolint end

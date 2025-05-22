@@ -391,8 +391,7 @@ download_ecoregion <- function(
     "extdata/cacert_gaftp_epa.pem",
     package = "amadeus"
   ),
-  certificate_url = 
-    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -3012,8 +3011,7 @@ download_nei <- function(
     "extdata/cacert_gaftp_epa.pem",
     package = "amadeus"
   ),
-  certificate_url = 
-    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   year = c(2017L, 2020L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -3927,14 +3925,35 @@ download_terraclimate <- function(
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
 #' @references
-#' \insertRef{web_edgarv8.1ap}{amadeus}
-#' \insertRef{web_edgarv8.1voc}{amadeus}
+#' \insertRef{web_edgarv8_1ap}{amadeus}
+#' \insertRef{web_edgarv8_1voc}{amadeus}
+#' # nolint end
 #' @examples
-#' download_edgar(species = "CO", acknowledgement = TRUE, temp_res = "yearly", sector_yearly = "ENE", year_range = c(2021, 2022))
-#' download_edgar(species = "PM2.5", acknowledgement = TRUE, temp_res = "monthly", sector_monthly = c("TRANSPORT", "WASTE"))
-#' download_edgar(species = "SO2", acknowledgement = TRUE, temp_res = "timeseries")                        
+#' \dontrun{
+#' download_edgar(
+#' species = "CO",
+#' acknowledgement = TRUE,
+#' temp_res = "yearly",
+#' sector_yearly = "ENE",
+#' year_range = c(2021, 2022)
+#' )
+#' }
+#' \dontrun{
+#' download_edgar(
+#' species = "PM2.5",
+#' acknowledgement = TRUE,
+#' temp_res = "monthly",
+#' sector_monthly = c("TRANSPORT", "WASTE")
+#' )
+#' }
+#' \dontrun{
+#' download_edgar(
+#' species = "SO2",
+#' acknowledgement = TRUE,
+#' temp_res = "timeseries"
+#' )
+#' }
 #' @export
-# nolint end
 download_edgar <- function(
   species = c("BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10", "PM2.5", "SO2"),
   version = "8.1",

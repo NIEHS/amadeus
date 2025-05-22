@@ -109,13 +109,34 @@ user-specified inputs including species, temporal resolution, emission
 sectors, and file formats.
 }
 \examples{
-download_edgar(species = "CO", temp_res = "yearly", sector_yearly = "ENE", year_range = c(2021, 2022))
-download_edgar(species = "PM2.5", temp_res = "monthly", sector_monthly = c("TRANSPORT", "WASTE"))
-download_edgar(species = "SO2", temp_res = "timeseries")
+\dontrun{
+download_edgar(
+species = "CO",
+acknowledgement = TRUE,
+temp_res = "yearly",
+sector_yearly = "ENE",
+year_range = c(2021, 2022)
+)
+}
+\dontrun{
+download_edgar(
+species = "PM2.5",
+acknowledgement = TRUE,
+temp_res = "monthly",
+sector_monthly = c("TRANSPORT", "WASTE")
+)
+}
+\dontrun{
+download_edgar(
+species = "SO2",
+acknowledgement = TRUE,
+temp_res = "timeseries"
+)
+}
 }
 \references{
-\insertRef{web_edgarv8.1ap}{amadeus}
-\insertRef{web_edgarv8.1voc}{amadeus}
+\insertRef{web_edgarv8_1ap}{amadeus}
+\insertRef{web_edgarv8_1voc}{amadeus}nolint end
 }
 \author{
 Mariana Alifa Kassien
