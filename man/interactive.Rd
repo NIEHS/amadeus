@@ -6,6 +6,9 @@
 \usage{
 interactive(dir = ".")
 }
+\arguments{
+\item{dir}{character(1). Directory with \code{interactive.sh}}
+}
 \description{
 Open interactive session with \code{container.sif} container.
 }

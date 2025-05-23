@@ -27,3 +27,5 @@ inst/extdata/nasa/token.txt
 LICENSE.md
 ^CRAN-SUBMISSION$
 ^tests/container/
+air.toml
+interactive.sh

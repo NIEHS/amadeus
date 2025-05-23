@@ -349,7 +349,9 @@ calculate_nlcd <- function(
   locs_vector <- locs_prepared[[1]]
   locs_df <- locs_prepared[[2]]
 
-  year <- try(as.integer(terra::metags(from, name = "year")))
+  year <- as.integer(strsplit(names(from), "_")[[1]][4])
+  stopifnot(year %in% 1985:2023L)
+
   # select points within mainland US and reproject on nlcd crs if necessary
   data_vect_b <-
     terra::project(locs_vector, y = terra::crs(from))
@@ -370,14 +372,14 @@ calculate_nlcd <- function(
         locs_df = locs_df,
         fun = "mean",
         variable = 1,
-        time = 2,
+        time = 4,
         time_type = "year",
         radius = 0,
         level = NULL
       )
     )
     new_data_vect$time <- year
-    names(new_data_vect)[grep("NLCD", names(new_data_vect))] <- sprintf(
+    names(new_data_vect)[grep("Annual", names(new_data_vect))] <- sprintf(
       "LDU_0_%05d", radius
     )
   } else {
@@ -396,11 +398,14 @@ calculate_nlcd <- function(
           )
         }, seq_len(nrow(bufs_pol))
       )
-      nlcd_at_bufs <- collapse::rowbind(nlcd_at_bufs, fill = TRUE)
-      nlcd_at_bufs <- nlcd_at_bufs[, -seq(1, 2)]
-      nlcd_cellcnt <- nlcd_at_bufs[, seq(1, ncol(nlcd_at_bufs), 1)]
+      nlcd_at_bufs_fill <- amadeus::collapse_nlcd(
+        data = nlcd_at_bufs,
+        mode = mode
+      )
+      nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, -seq(1, 2)]
+      nlcd_cellcnt <- nlcd_at_bufs_fill[, seq(1, ncol(nlcd_at_bufs_fill), 1)]
       nlcd_cellcnt <- nlcd_cellcnt / rowSums(nlcd_cellcnt, na.rm = TRUE)
-      nlcd_at_bufs[, seq(1, ncol(nlcd_at_bufs), 1)] <- nlcd_cellcnt
+      nlcd_at_bufs_fill[, seq(1, ncol(nlcd_at_bufs_fill), 1)] <- nlcd_cellcnt
     } else {
       class_query <- "value"
       # ratio of each nlcd class per buffer
@@ -420,17 +425,22 @@ calculate_nlcd <- function(
           )
         }, seq_len(nrow(bufs_polx))
       )
-      nlcd_at_bufs <- collapse::rowbind(nlcd_at_bufs, fill = TRUE)
+
+      nlcd_at_bufs_fill <- amadeus::collapse_nlcd(
+        data = nlcd_at_bufs,
+        mode = mode,
+        locs = bufs_pol
+      )
       # select only the columns of interest
-      nlcd_at_buf_names <- names(nlcd_at_bufs)
+      nlcd_at_buf_names <- names(nlcd_at_bufs_fill)
       nlcd_val_cols <-
         grep("^frac_", nlcd_at_buf_names)
-      nlcd_at_bufs <- nlcd_at_bufs[, nlcd_val_cols]
+      nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, nlcd_val_cols]
     }
     # fill NAs
-    nlcd_at_bufs[is.na(nlcd_at_bufs)] <- 0
+    nlcd_at_bufs_fill[is.na(nlcd_at_bufs_fill)] <- 0
     # change column names
-    nlcd_names <- names(nlcd_at_bufs)
+    nlcd_names <- names(nlcd_at_bufs_fill)
     nlcd_names <- sub(pattern = "frac_", replacement = "", x = nlcd_names)
     nlcd_names <-
       switch(
@@ -441,9 +451,10 @@ calculate_nlcd <- function(
     nlcd_names <-
       nlcd_classes$class[match(nlcd_names, nlcd_classes[[class_query]])]
     new_names <- sprintf("LDU_%s_0_%05d", nlcd_names, radius)
-    names(nlcd_at_bufs) <- new_names
+    names(nlcd_at_bufs_fill) <- new_names
+
     # merge locs_df with nlcd class fractions
-    new_data_vect <- cbind(locs_df, as.integer(year), nlcd_at_bufs)
+    new_data_vect <- cbind(locs_df, as.integer(year), nlcd_at_bufs_fill)
   }
 
   if (geom %in% c("sf", "terra")) {

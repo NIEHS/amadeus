@@ -254,12 +254,13 @@ testthat::test_that("calculate_nlcd", {
   # -- initial names are still in the output data.frame
   testthat::expect_true(all(names(eg_data) %in% names(output)))
   # -- check the value of some of the points in the US
+  testthat::expect_true(all(eg_data$site_id %in% output$site_id))
   # the value has changed. What affected this behavior?
   testthat::expect_equal(
-    output$LDU_TEFOR_0_03000[1], 0.8119843, tolerance = 1e-7
+    output$LDU_TEFOR_0_03000[1], 0.09010682, tolerance = 1e-7
   )
   testthat::expect_equal(
-    output$LDU_TSHRB_0_03000[2], 0.9630467, tolerance = 1e-7
+    output$LDU_TSHRB_0_03000[2], 0.01047932, tolerance = 1e-7
   )
   # -- class fraction rows should sum to 1
   testthat::expect_equal(
@@ -267,9 +268,9 @@ testthat::test_that("calculate_nlcd", {
     rep(1, 2),
     tolerance = 1e-7
   )
-  # without geometry will have 11 columns
+  # without geometry will have 17 columns
   testthat::expect_equal(
-    ncol(output), 15
+    ncol(output), 17
   )
   # example with terra output
   output_terra <- calculate_nlcd(
@@ -279,9 +280,9 @@ testthat::test_that("calculate_nlcd", {
     from = nlcdras,
     geom = "terra"
   )
-  # with geometry will have 15 columns
+  # with geometry will have 17 columns
   testthat::expect_equal(
-    ncol(output_terra), 15
+    ncol(output_terra), 17
   )
   testthat::expect_true(
     "SpatVector" %in% class(output_terra)
@@ -294,9 +295,9 @@ testthat::test_that("calculate_nlcd", {
     from = nlcdras,
     geom = "sf"
   )
-  # with geometry will have 16 columns
+  # with geometry will have 18 columns
   testthat::expect_equal(
-    ncol(output_sf), 16
+    ncol(output_sf), 18
   )
   testthat::expect_true(
     "sf" %in% class(output_sf)
