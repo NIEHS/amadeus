@@ -4,7 +4,7 @@
 \alias{interactive}
 \title{Open interactive session with \code{container.sif} container.}
 \usage{
-interactive(dir = ".")
+interactive(dir = "./tests/container")
 }
 \description{
 Open interactive session with \code{container.sif} container.
