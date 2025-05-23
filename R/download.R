@@ -1519,14 +1519,14 @@ download_narr <- function(
 #' Download land cover data
 #' @description
 #' The \code{download_nlcd()} function accesses and downloads
-#' land cover data from the
-#' [Multi-Resolution Land Characteristics (MRLC) Consortium's National Land Cover Database (NLCD) products data base](https://www.mrlc.gov/data).
+#' annual land cover data from the
+#' [Multi-Resolution Land Characteristics (MRLC) Consortium's National Land Cover Database (NLCD) products data base](https://www.mrlc.gov/data/project/annual-nlcd).
 # nolint end
-#' @param collection character(1). `"Coterminous United States"` or `"Alaska"`.
-#' @param year integer(1). Available years for Coterminous United States
-#' include `2001`, `2004`, `2006`, `2008`, `2011`, `2013`, `2016`,
-#' `2019`, and `2021`.
-#' Available years for Alaska include `2001`, `2011`, and `2016`.
+#' @param product character(1). "Land Cover", "Land Cover Change", "Land Cover Confidence",
+#' "Fractional Impervious Surface", "Impervious Descriptor", or
+#' "Spectral Change Day of Year ".
+#' @param year integer(1). Available years for Coterminous United States range
+#' from 1985 to 2023.
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
 #' and the unzipped shapefiles ("/data_files").
@@ -1539,9 +1539,6 @@ download_narr <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip files from directory_to_download.
-#' Default is \code{FALSE}.
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #' an \code{rlang::hash_file()} hash character corresponding to the
 #' downloaded files. Default is \code{FALSE}.
@@ -1558,80 +1555,66 @@ download_narr <- function(
 #' @examples
 #' \dontrun{
 #' download_nlcd(
-#'   collection = "Coterminous United States",
+#'   product = "Land Cover",
 #'   year = 2021,
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE,
-#'   unzip = FALSE
+#'   download = FALSE # NOTE: download skipped for examples
 #' )
 #' }
 #' @export
 download_nlcd <- function(
-  collection = "Coterminous United States",
+  product = "Land Cover",
   year = 2021,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
-  unzip = TRUE,
-  remove_zip = FALSE,
   hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  directory_original <- download_sanitize_path(directory_to_save)
-  directories <- download_setup_dir(directory_original, zip = TRUE)
-  directory_to_download <- directories[1]
-  directory_to_save <- directories[2]
+  amadeus::download_setup_dir(directory_to_save)
+  directory_to_save <- download_sanitize_path(directory_to_save)
   #### 4. check for valid years
-  valid_years <- c(2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019, 2021)
-  if (!(year %in% valid_years)) {
+  valid_years <- 1985:2023L
+  if (!(as.integer(year) %in% valid_years)) {
     stop(paste0("Requested year is not recognized.\n"))
   }
   #### 5. define URL base
-  base <- "https://s3-us-west-2.amazonaws.com/mrlc/"
+  base <- paste0(
+    "https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/",
+    "data-bundles/Annual_NLCD_"
+  )
   #### 6. define collection code
-  if (collection == "Coterminous United States") {
-    collection_code <- paste0(
-      "nlcd_",
-      as.character(year),
-      "_land_cover_l48_"
-    )
-  } else if (collection == "Alaska") {
-    collection_code <- paste0(
-      "NLCD_",
-      as.character(year),
-      "_Land_Cover_AK_"
-    )
-  }
-  #### 7. define release date
-  #### NOTE: release dates identified by inspecting URLs on from
-  ####       https://www.mrlc.gov/data?f%5B0%5D=category%3ALand%20Cover
-  if (year == 2021 && collection == "Coterminous United States") {
-    release_date <- "20230630"
-  } else if (!(year == 2021) && collection == "Coterminous United States") {
-    release_date <- "20210604"
-  } else if (collection == "Alaska") {
-    release_date <- "20200724"
-  }
+  collection_code <- switch(
+    tolower(product),
+    "land cover" = "LndCov",
+    "land cover change" = "LndChg",
+    "land cover confidence" = "LndCnf",
+    "fractional impervious surface" = "FctImp",
+    "impervious descriptor" = "ImpDsc",
+    "spectral change day of year" = "SpcChg"
+  )
   #### 8. build URL
   download_url <- paste0(
     base,
     collection_code,
-    release_date,
-    ".zip"
+    "_",
+    year,
+    "_CU_C1V0.tif"
   )
   #### 9. build download file name
   download_name <- paste0(
-    directory_to_download,
-    tolower(collection_code),
-    release_date,
-    ".zip"
+    directory_to_save,
+    "Annual_NLCD_",
+    collection_code,
+    "_",
+    year,
+    "_CU_C1V0.tif"
   )
   #### 10. build system command
   download_command <- paste0(
@@ -1643,37 +1626,30 @@ download_nlcd <- function(
   )
   #### 11. initiate "..._curl_command.txt"
   commands_txt <- paste0(
-    directory_original,
+    directory_to_save,
+    "nlcd_",
     tolower(collection_code),
+    "_",
+    year,
+    "_",
     Sys.Date(),
     "_curl_command.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### 12. concatenate and print download command to "..._curl_commands.txt"
-  if (check_destfile(download_name)) {
+  if (amadeus::check_destfile(download_name)) {
     #### cat command only if file does not already exist
     cat(download_command)
   }
   #### 13. finish "..._curl_command.txt"
   sink()
   #### 15. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
-  #### 16. end if unzip == FALSE
-  download_unzip(
-    file_name = download_name,
-    directory_to_unzip = directory_to_save,
-    unzip = unzip
-  )
-  #### 17. remove zip files
-  download_remove_zips(
-    remove = remove_zip,
-    download_name = download_name
-  )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 
 # nolint start

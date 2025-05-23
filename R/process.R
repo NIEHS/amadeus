@@ -811,11 +811,20 @@ process_nlcd <-
     if (!is.numeric(year)) {
       stop("year is not a numeric.")
     }
+    product_codes <- c(
+      "LndCov", "LndChg", "LndCnf", "FctImp", "ImpDsc", "SpcChg"
+    )
     # open nlcd file corresponding to the year
     nlcd_file <-
       list.files(
         path,
-        pattern = paste0("nlcd_", year, "_.*.(tif|img)$"),
+        pattern = paste0(
+          "Annual_NLCD_(",
+          paste(product_codes, collapse = "|"),
+          ")_",
+          year,
+          "_.*.tif$"
+        ),
         full.names = TRUE
       )
     # check if name without extension is duplicated
@@ -828,7 +837,6 @@ process_nlcd <-
       stop("NLCD data not available for this year.")
     }
     nlcd <- terra::rast(nlcd_file, win = extent)
-    terra::metags(nlcd) <- c(year = year)
     return(nlcd)
   }
 

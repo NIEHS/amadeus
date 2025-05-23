@@ -7,37 +7,40 @@ testthat::test_that("download_nlcd", {
   withr::local_package("httr")
   withr::local_package("stringr")
   # function parameters
-  years <- c(2021, 2019, 2016)
-  collections <- c(rep("Coterminous United States", 2), "Alaska")
-  collection_codes <- c(rep("l48", 2), "ak")
+  years <- sample(1985:2023L, size = 2)
+  products <- c(
+    "Land Cover", "Land Cover Change", "Land Cover Confidence",
+    "Fractional Impervious Surface", "Impervious Descriptor",
+    "Spectral Change Day of Year"
+  )
+  product_codes <- c(
+    "LndCov", "LndChg", "LndCnf", "FctImp", "ImpDsc", "SpcChg"
+  )
   directory_to_save <- paste0(tempdir(), "/nlcd/")
   # run download function
   for (y in seq_along(years)) {
-    download_data(dataset_name = "nlcd",
-                  year = years[y],
-                  collection = collections[y],
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  remove_command = FALSE,
-                  unzip = FALSE,
-                  remove_zip = FALSE)
+    p <- sample(seq_len(length(products)), size = 1L)
+    download_data(
+      dataset_name = "nlcd",
+      year = years[y],
+      product = products[p],
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE
+    )
     # define file path with commands
     commands_path <- paste0(download_sanitize_path(directory_to_save),
                             "nlcd_",
+                            tolower(product_codes[p]),
+                            "_",
                             years[y],
-                            "_land_cover_",
-                            collection_codes[y],
                             "_",
                             Sys.Date(),
                             "_curl_command.txt")
     # expect sub-directories to be created
     testthat::expect_true(
-      length(
-        list.files(
-          directory_to_save, include.dirs = TRUE
-        )
-      ) == 3
+      length(list.files(directory_to_save, include.dirs = TRUE)) == 1
     )
     # import commands
     commands <- read_commands(commands_path = commands_path)
@@ -54,8 +57,8 @@ testthat::test_that("download_nlcd", {
   }
   testthat::expect_error(
     download_data(dataset_name = "nlcd",
-                  year = 2000,
-                  collection = "Coterminous United States",
+                  year = 1900,
+                  product = "land cover",
                   directory_to_save = directory_to_save,
                   acknowledgement = TRUE,
                   download = FALSE,
@@ -72,25 +75,22 @@ testthat::test_that("download_nlcd", {
 testthat::test_that("process_nlcd", {
   withr::local_package("terra")
 
-  path_nlcd19 <-
-    testthat::test_path(
-      "..",
-      "testdata"
-    )
+  path_nlcd21 <- testthat::test_path("..", "testdata", "nlcd")
 
   testthat::expect_no_error(
-    nlcd19 <- process_nlcd(path = path_nlcd19, year = 2019)
+    nlcd21 <- process_nlcd(path = path_nlcd21, year = 2021)
   )
   # test with extent cropping
   testthat::expect_no_error(
-    nlcd19_ext <- process_nlcd(
-      path = path_nlcd19,
-      year = 2019,
-      extent = terra::ext(-1580000, -1520000, 1920000, 1980000)
+    nlcd21_ext <- process_nlcd(
+      path = path_nlcd21,
+      year = 2021,
+      extent = terra::ext(
+        1510241.32304443, 1536875.51988709, 1558885.5313357, 1603354.11202184
+      )
     )
   )
-  testthat::expect_s4_class(nlcd19, "SpatRaster")
-  testthat::expect_equal(unname(terra::metags(nlcd19, name = "year")), "2019")
+  testthat::expect_s4_class(nlcd21, "SpatRaster")
 
   # error cases
   testthat::expect_error(
@@ -100,18 +100,18 @@ testthat::test_that("process_nlcd", {
     process_nlcd(path = "/universe/galaxy/solarsys/earth/usa.nc")
   )
   testthat::expect_error(
-    process_nlcd(path_nlcd19, "nineteen eighty-four")
+    process_nlcd(path_nlcd21, "nineteen eighty-four")
   )
   testthat::expect_error(
-    process_nlcd(path_nlcd19, year = 2020)
+    process_nlcd(path_nlcd21, year = 2020)
   )
   # make duplicate with tif and img
   tdir <- tempdir()
   dir.create(paste0(tdir, "/nlcd_all"))
-  file.create(paste0(tdir, "/nlcd_all/nlcd_2019_land_cover_20240624.tif"))
-  file.create(paste0(tdir, "/nlcd_all/nlcd_2019_land_cover_20240624.img"))
+  file.create(paste0(tdir, "/nlcd_all/Annual_NLCD_LndC0v_2021_CU_C1V0.tif"))
+  file.create(paste0(tdir, "/nlcd_all/Annual_NLCD_LndC0v_2021_CU_C1V0.img"))
   testthat::expect_error(
-    process_nlcd(path = paste0(tdir, "/nlcd_all"), year = 2019)
+    process_nlcd(path = paste0(tdir, "/nlcd_all"), year = 2021)
   )
 
 })
@@ -126,23 +126,20 @@ testthat::test_that("calculate_nlcd", {
     list(sf_use_s2 = FALSE)
   )
 
-  point_us1 <- cbind(lon = -114.7, lat = 38.9, site_id = 1)
-  point_us2 <- cbind(lon = -114, lat = 39, site_id = 2)
+  point_us1 <- cbind(lon = -78.85, lat = 36.09, site_id = 1)
+  point_us2 <- cbind(lon = -78.73, lat = 35.96, site_id = 2)
   point_ak <- cbind(lon = -155.997, lat = 69.3884, site_id = 3) # alaska
   point_fr <- cbind(lon = 2.957, lat = 43.976, site_id = 4) # france
   eg_data <- rbind(point_us1, point_us2, point_ak, point_fr) |>
     as.data.frame() |>
     terra::vect(crs = "EPSG:4326")
 
-  path_testdata <-
-    testthat::test_path(
-      "..",
-      "testdata"
-    )
+  path_testdata <- testthat::test_path("..", "testdata", "nlcd")
+
   # CHECK INPUT (error message)
   # -- buf_radius is numeric
   testthat::expect_no_error(
-    nlcdras <- process_nlcd(path = path_testdata)
+    nlcdras <- process_nlcd(path = path_testdata, year = 2021)
   )
   testthat::expect_s4_class(nlcdras, "SpatRaster")
 
