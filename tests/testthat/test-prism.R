@@ -118,8 +118,13 @@ testthat::test_that("process_prism", {
   testthat::expect_true(inherits(result2, "SpatRaster"))
 
   # Check the metadata
-  testthat::expect_equal(unname(terra::metags(result)["time"]), time)
-  testthat::expect_equal(unname(terra::metags(result)["element"]), element)
+  testthat::expect_equal(
+    unname(terra::metags(result)[terra::metags(result)$name == "time", 2]), time
+  )
+  testthat::expect_equal(
+    unname(terra::metags(result)[terra::metags(result)$name == "element", 2]),
+    element
+  )
 
   # Set up test data
   path_bad <- "/path/to/nonexistent/folder"

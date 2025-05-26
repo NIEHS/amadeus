@@ -332,7 +332,7 @@ process_modis_merge <- function(
          that is accepted in terra::tapp.\n")
   }
   # date format check
-  is_date_proper(instr = date)
+  amadeus::is_date_proper(instr = date)
 
   # interpret date
   today <- as.character(date)
@@ -469,7 +469,7 @@ process_blackmarble <- function(
   crs = "EPSG:4326",
   ...
 ) {
-  is_date_proper(instr = date)
+  amadeus::is_date_proper(instr = date)
   # interpret date from paths
   datejul <- strftime(as.Date(date), format = "%Y%j")
   stdtile <- tile_df$tile
@@ -647,7 +647,7 @@ process_modis_swath <-
     ...
   ) {
     # check date format
-    is_date_proper(instr = date)
+    amadeus::is_date_proper(instr = date)
     header <- "HDF4_EOS:EOS_SWATH:"
     ras_mod06 <- vector("list", length = length(subdataset))
     datejul <- strftime(date, format = "%Y%j")
@@ -1377,7 +1377,7 @@ process_population <- function(
     return()
   }
   #### check for variable
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### import data
   data <- terra::rast(path, win = extent)
   #### identify names
@@ -1402,7 +1402,7 @@ process_population <- function(
     )
     message(paste0(
       "Cleaning ",
-      process_sedac_codes(
+      amadeus::process_sedac_codes(
         paste0(
           split2[2],
           "_",
@@ -1451,7 +1451,7 @@ process_groads <- function(
     extent = NULL,
     ...) {
   #### check for variable
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   if (!grepl("(shp|gdb)$", path)) {
     stop("Input is not in expected format.\n")
   }
@@ -1500,9 +1500,9 @@ process_hms <- function(
     extent = NULL,
     ...) {
   #### directory setup
-  path <- download_sanitize_path(path)
+  path <- amadeus::download_sanitize_path(path)
   #### check for variable
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
   if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
@@ -1518,13 +1518,13 @@ process_hms <- function(
     paths
   )]
   #### identify dates based on user input
-  dates_of_interest <- generate_date_sequence(
+  dates_of_interest <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = TRUE
   )
   #### dates of interest with hyphen for return in 0 polygon case
-  dates_no_polygon <- generate_date_sequence(
+  dates_no_polygon <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = FALSE
@@ -1717,9 +1717,9 @@ process_gmted <- function(
     extent = NULL,
     ...) {
   #### directory setup
-  path <- download_sanitize_path(path)
+  path <- amadeus::download_sanitize_path(path)
   #### check for variable
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### check for length of variable
   if (!(length(variable) == 2)) {
     stop(
@@ -1730,13 +1730,13 @@ process_gmted <- function(
   }
   #### identify statistic and resolution
   statistic <- variable[1]
-  statistic_code <- process_gmted_codes(
+  statistic_code <- amadeus::process_gmted_codes(
     statistic,
     statistic = TRUE,
     invert = FALSE
   )
   resolution <- variable[2]
-  resolution_code <- process_gmted_codes(
+  resolution_code <- amadeus::process_gmted_codes(
     resolution,
     resolution = TRUE,
     invert = FALSE
@@ -1837,9 +1837,9 @@ process_narr <- function(
     extent = NULL,
     ...) {
   #### directory setup
-  path <- download_sanitize_path(path)
+  path <- amadeus::download_sanitize_path(path)
   #### check for variable
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
   if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
@@ -1857,7 +1857,7 @@ process_narr <- function(
     value = TRUE
   )
   #### define date sequence
-  date_sequence <- generate_date_sequence(
+  date_sequence <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = TRUE
@@ -2088,9 +2088,9 @@ process_geos <-
            extent = NULL,
            ...) {
     #### directory setup
-    path <- download_sanitize_path(path)
+    path <- amadeus::download_sanitize_path(path)
     #### check for variable
-    check_for_null_parameters(mget(ls()))
+    amadeus::check_for_null_parameters(mget(ls()))
     #### check dates
     if (length(date) == 1) date <- c(date, date)
     stopifnot(length(date) == 2)
@@ -2105,7 +2105,7 @@ process_geos <-
     paths <- grep(".nc4$", paths, value = TRUE)
 
     #### identify dates based on user input
-    dates_of_interest <- generate_date_sequence(
+    dates_of_interest <- amadeus::generate_date_sequence(
       date[1],
       date[2],
       sub_hyphen = TRUE
@@ -2122,7 +2122,7 @@ process_geos <-
       )
     )
     #### identify collection
-    collection <- process_collection(
+    collection <- amadeus::process_collection(
       data_paths[1],
       source = "geos",
       collection = TRUE
@@ -2139,7 +2139,7 @@ process_geos <-
     for (p in seq_along(data_paths)) {
       #### import .nc4 data
       data_raw <- terra::rast(data_paths[p])
-      data_datetime <- process_collection(
+      data_datetime <- amadeus::process_collection(
         data_paths[p],
         source = "geos",
         datetime = TRUE
@@ -2283,9 +2283,9 @@ process_merra2 <-
            extent = NULL,
            ...) {
     #### directory setup
-    path <- download_sanitize_path(path)
+    path <- amadeus::download_sanitize_path(path)
     #### check for variable
-    check_for_null_parameters(mget(ls()))
+    amadeus::check_for_null_parameters(mget(ls()))
     #### check dates
     if (length(date) == 1) date <- c(date, date)
     stopifnot(length(date) == 2)
@@ -2301,7 +2301,7 @@ process_merra2 <-
       paths
     )]
     #### identify dates based on user input
-    dates_of_interest <- generate_date_sequence(
+    dates_of_interest <- amadeus::generate_date_sequence(
       date[1],
       date[2],
       sub_hyphen = TRUE
@@ -2318,7 +2318,7 @@ process_merra2 <-
       )
     )
     #### identify collection
-    collection <- process_collection(
+    collection <- amadeus::process_collection(
       data_paths[1],
       source = "merra2",
       collection = TRUE
@@ -2335,7 +2335,7 @@ process_merra2 <-
     for (p in seq_along(data_paths)) {
       #### import .nc4 data
       data_raw <- terra::rast(data_paths[p], win = extent)
-      data_date <- process_collection(
+      data_date <- amadeus::process_collection(
         data_paths[p],
         source = "merra2",
         date = TRUE
@@ -2361,7 +2361,7 @@ process_merra2 <-
         )
       )
       #### identify time step
-      times <- process_merra2_time(
+      times <- amadeus::process_merra2_time(
         collection = collection,
         from = data_variable
       )
@@ -2474,18 +2474,18 @@ process_gridmet <- function(
     extent = NULL,
     ...) {
   #### directory setup
-  path <- download_sanitize_path(path)
+  path <- amadeus::download_sanitize_path(path)
   #### check dates
   if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### check for variable
-  check_for_null_parameters(mget(ls()))
-  variable_checked <- process_variable_codes(
+  amadeus::check_for_null_parameters(mget(ls()))
+  variable_checked <- amadeus::process_variable_codes(
     variables = variable,
     source = "gridmet"
   )
-  variable_checked_long <- process_gridmet_codes(
+  variable_checked_long <- amadeus::process_gridmet_codes(
     variable_checked,
     invert = TRUE
   )
@@ -2500,7 +2500,7 @@ process_gridmet <- function(
     data_paths
   )]
   #### define date sequence
-  date_sequence <- generate_date_sequence(
+  date_sequence <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = TRUE
@@ -2643,18 +2643,18 @@ process_terraclimate <- function(
     extent = NULL,
     ...) {
   #### directory setup
-  path <- download_sanitize_path(path)
+  path <- amadeus::download_sanitize_path(path)
   #### check for variable
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
   if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
-  variable_checked <- process_variable_codes(
+  variable_checked <- amadeus::process_variable_codes(
     variables = variable,
     source = "terraclimate"
   )
-  variable_checked_long <- process_terraclimate_codes(
+  variable_checked_long <- amadeus::process_terraclimate_codes(
     variable_checked,
     invert = TRUE
   )
@@ -2669,7 +2669,7 @@ process_terraclimate <- function(
     data_paths
   )]
   #### define date sequence
-  date_sequence <- generate_date_sequence(
+  date_sequence <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = TRUE
@@ -3011,7 +3011,9 @@ process_prism <-
       prism_file <- path
     }
     prism <- terra::rast(prism_file, win = extent)
-    terra::metags(prism) <- c(time = time, element = element)
+    terra::metags(prism) <- cbind(
+      c("time", "element"), c(time, element)
+    )
     return(prism)
   }
 # nolint end

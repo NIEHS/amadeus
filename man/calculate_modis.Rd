@@ -9,7 +9,7 @@ calculate_modis(
   locs = NULL,
   locs_id = "site_id",
   radius = c(0L, 1000L, 10000L, 50000L),
-  preprocess = process_modis_merge,
+  preprocess = amadeus::process_modis_merge,
   name_covariates = NULL,
   subdataset = NULL,
   fun_summary = "mean",

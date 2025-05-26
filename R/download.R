@@ -229,16 +229,16 @@ download_aqs <-
     hash = FALSE
   ) {
     #### 1. check for data download acknowledgement
-    download_permit(acknowledgement = acknowledgement)
+    amadeus::download_permit(acknowledgement = acknowledgement)
     #### 2. check for null parameters
-    check_for_null_parameters(mget(ls()))
+    amadeus::check_for_null_parameters(mget(ls()))
     #### check years
     if (length(year) == 1) year <- c(year, year)
     stopifnot(length(year) == 2)
     year <- year[order(year)]
     #### 3. directory setup
-    directory_original <- download_sanitize_path(directory_to_save)
-    directories <- download_setup_dir(directory_original, zip = TRUE)
+    directory_original <- amadeus::download_sanitize_path(directory_to_save)
+    directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
     directory_to_download <- directories[1]
     directory_to_save <- directories[2]
     #### 4. define year sequence
@@ -256,7 +256,7 @@ download_aqs <-
       year_sequence
     )
     #### 6. check for valid URL
-    if (!(check_url_status(download_urls[1]))) {
+    if (!(amadeus::check_url_status(download_urls[1]))) {
       stop(paste0(
         "Invalid year returns HTTP code 404. ",
         "Check `year` parameter.\n"
@@ -302,13 +302,13 @@ download_aqs <-
       resolution_temporal,
       "_curl_commands.txt"
     )
-    download_sink(commands_txt)
+    amadeus::download_sink(commands_txt)
     #### 8. concatenate and print download commands to "..._curl_commands.txt"
     cat(download_commands)
     #### 9. finish "..._curl_commands.txt" file
     sink()
     #### 11. download data
-    download_run(
+    amadeus::download_run(
       download = download,
       commands_txt = commands_txt,
       remove = remove_command
@@ -316,15 +316,15 @@ download_aqs <-
     #### 12. unzip data
     sapply(
       download_names,
-      download_unzip,
+      amadeus::download_unzip,
       directory_to_unzip = directory_to_save,
       unzip = unzip
     )
-    download_remove_zips(
+    amadeus::download_remove_zips(
       remove = remove_zip,
       download_name = download_names
     )
-    return(download_hash(hash, directory_to_save))
+    return(amadeus::download_hash(hash, directory_to_save))
   }
 
 
@@ -401,16 +401,16 @@ download_ecoregion <- function(
   hash = FALSE
 ) {
   #### 1. data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  directory_original <- download_sanitize_path(directory_to_save)
-  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_original <- amadeus::download_sanitize_path(directory_to_save)
+  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
   #### 5. define download URL
-  download_epa_certificate(
+  amadeus::download_epa_certificate(
     epa_certificate_path = epa_certificate_path,
     certificate_url = certificate_url
   )
@@ -443,8 +443,8 @@ download_ecoregion <- function(
     "_wget_command.txt"
   )
   #### 9. concatenate
-  download_sink(commands_txt)
-  if (check_destfile(download_name)) {
+  amadeus::download_sink(commands_txt)
+  if (amadeus::check_destfile(download_name)) {
     #### 10. concatenate and print download commands to "..._wget_commands.txt"
     #### cat command only file does not already exist or
     #### if size does not match URL size
@@ -453,23 +453,23 @@ download_ecoregion <- function(
   #### 11. finish "...curl_commands.txt" file
   sink()
   #### 13. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
   #### 15. unzip files
-  download_unzip(
+  amadeus::download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
   #### 16. remove zip files
-  download_remove_zips(
+  amadeus::download_remove_zips(
     remove = remove_zip,
     download_name = download_name
   )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -536,16 +536,16 @@ download_geos <- function(
   hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
   if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### 3. directory setup
-  download_setup_dir(directory_to_save)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  amadeus::download_setup_dir(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### 4. match collection
   collection <- match.arg(collection, several.ok = TRUE)
   #### 5. define date sequence
@@ -565,7 +565,7 @@ download_geos <- function(
     date[2],
     "_wget_commands.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### 9. concatenate and print download commands to "..._wget_commands.txt"
   for (c in seq_along(collection)) {
     collection_loop <- collection[c]
@@ -582,7 +582,7 @@ download_geos <- function(
       year <- substr(date, 1, 4)
       month <- substr(date, 5, 6)
       day <- substr(date, 7, 8)
-      time_sequence <- generate_time_sequence(collection_loop)
+      time_sequence <- amadeus::generate_time_sequence(collection_loop)
       for (t in seq_along(time_sequence)) {
         download_url_base <- paste0(
           base,
@@ -608,7 +608,7 @@ download_geos <- function(
           download_name
         )
         if (t == 1) {
-          if (!(check_url_status(download_url))) {
+          if (!(amadeus::check_url_status(download_url))) {
             sink()
             file.remove(commands_txt)
             stop(paste0(
@@ -628,7 +628,7 @@ download_geos <- function(
           download_folder_name,
           "\n"
         )
-        if (check_destfile(download_folder_name)) {
+        if (amadeus::check_destfile(download_folder_name)) {
           #### cat command only if file does not already exist
           cat(download_command)
         }
@@ -638,12 +638,12 @@ download_geos <- function(
   #### 9. finish "..._wget_commands.txt" file
   sink()
   #### 11. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 # nolint end: cyclocomp
 
@@ -718,12 +718,12 @@ download_gmted <- function(
   hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  directory_original <- download_sanitize_path(directory_to_save)
-  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_original <- amadeus::download_sanitize_path(directory_to_save)
+  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
   #### 4. check for valid statistic
@@ -736,13 +736,13 @@ download_gmted <- function(
     "/downloads/GMTED/Grid_ZipFiles/"
   )
   #### 7. define URL statistic code
-  statistic_code <- process_gmted_codes(
+  statistic_code <- amadeus::process_gmted_codes(
     statistic,
     statistic = TRUE,
     invert = FALSE
   )
   #### 8. define URL resolution code
-  resolution_code <- process_gmted_codes(
+  resolution_code <- amadeus::process_gmted_codes(
     resolution,
     resolution = TRUE,
     invert = FALSE
@@ -781,32 +781,32 @@ download_gmted <- function(
     Sys.Date(),
     "_curl_command.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### 13. concatenate and print download command to "..._curl_commands.txt"
-  if (check_destfile(download_name)) {
+  if (amadeus::check_destfile(download_name)) {
     #### cat command only if file does not already exist
     cat(download_command)
   }
   #### 14. finish "..._curl_commands.txt" file
   sink()
   #### 16. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
   #### 18. end if unzip == FALSE
-  download_unzip(
+  amadeus::download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
   #### 19. remove zip files
-  download_remove_zips(
+  amadeus::download_remove_zips(
     remove = remove_zip,
     download_name = download_name
   )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -1087,16 +1087,16 @@ download_merra2 <- function(
   hash = FALSE
 ) {
   #### check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### directory setup
-  download_setup_dir(directory_to_save)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  amadeus::download_setup_dir(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### check dates
   if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### check if collection is recognized
   identifiers <- c(
     "inst1_2d_asm_Nx M2I1NXASM 10.5067/3Z173KIE2TPD",
@@ -1152,7 +1152,7 @@ download_merra2 <- function(
     ))
   }
   #### define date sequence
-  date_sequence <- generate_date_sequence(
+  date_sequence <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = TRUE
@@ -1168,7 +1168,7 @@ download_merra2 <- function(
     date[2],
     "_wget_commands.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   for (c in seq_along(collection)) {
     collection_loop <- collection[c]
     #### define ESDT name and DOI
@@ -1244,7 +1244,7 @@ download_merra2 <- function(
           month,
           "/"
         )
-        if (!(check_url_status(base_url))) {
+        if (!(amadeus::check_url_status(base_url))) {
           stop(paste0(
             "Invalid date returns HTTP code 404. ",
             "Check `date` parameter.\n"
@@ -1318,7 +1318,7 @@ download_merra2 <- function(
         download_name,
         "\n"
       )
-      if (check_destfile(download_name)) {
+      if (amadeus::check_destfile(download_name)) {
         #### cat command only if file does not already exist
         cat(download_command)
       }
@@ -1351,7 +1351,7 @@ download_merra2 <- function(
         download_name_metadata,
         "\n"
       )
-      if (check_destfile(download_name_metadata)) {
+      if (amadeus::check_destfile(download_name_metadata)) {
         #### cat command only if file does not already exist
         cat(download_command_metadata)
       }
@@ -1360,12 +1360,12 @@ download_merra2 <- function(
   #### finish "..._wget_commands.txt"
   sink()
   #### download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 # nolint end: cyclocomp
 
@@ -1424,16 +1424,16 @@ download_narr <- function(
   hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### check years
   if (length(year) == 1) year <- c(year, year)
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### 3. directory setup
-  download_setup_dir(directory_to_save)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  amadeus::download_setup_dir(directory_to_save)
+  directory_to_save <-amadeus:: download_sanitize_path(directory_to_save)
   #### 4. define years and months sequence
   if (any(nchar(year[1]) != 4, nchar(year[2]) != 4)) {
     stop("years should be 4-digit integers.\n")
@@ -1456,14 +1456,14 @@ download_narr <- function(
     year[2],
     "_curl_commands.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### 8. concatenate and print download commands to "..._curl_commands.txt"
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
     folder <- paste0(directory_to_save, variable, "/")
     # implement variable sorting function
-    base <- narr_variable(variable)[[1]]
-    months <- narr_variable(variable)[[2]]
+    base <- amadeus::narr_variable(variable)[[1]]
+    months <- namadeus::arr_variable(variable)[[2]]
     if (!dir.exists(folder)) {
       dir.create(folder, recursive = TRUE)
     }
@@ -1495,7 +1495,7 @@ download_narr <- function(
           url,
           "\n"
         )
-        if (check_destfile(destfile)) {
+        if (amadeus::check_destfile(destfile)) {
           #### cat command if file does not already exist or if local file size
           #### is 0 bytes
           cat(command)
@@ -1506,12 +1506,12 @@ download_narr <- function(
   #### 9. finish "..._curl_commands.txt"
   sink()
   #### 11. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::ownload_hash(hash, directory_to_save))
 }
 # nolint end: cyclocomp
 
@@ -1578,7 +1578,7 @@ download_nlcd <- function(
   amadeus::check_for_null_parameters(mget(ls()))
   #### 3. directory setup
   amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### 4. check for valid years
   valid_years <- 1985:2023L
   if (!(as.integer(year) %in% valid_years)) {
@@ -1722,12 +1722,12 @@ download_groads <- function(
 ) {
   # nolint end
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  directory_original <- download_sanitize_path(directory_to_save)
-  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_original <- amadeus::download_sanitize_path(directory_to_save)
+  directories <-amadeus:: download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
   #### 4. check if region is valid
@@ -1785,8 +1785,8 @@ download_groads <- function(
     Sys.Date(),
     "_curl_command.txt"
   )
-  download_sink(commands_txt)
-  if (check_destfile(download_name)) {
+  amadeus::download_sink(commands_txt)
+  if (amadeus::check_destfile(download_name)) {
     #### 12. concatenate and print download command to "..._curl_commands.txt"
     #### cat command if file does not already exist or is incomplete
     cat(download_command)
@@ -1794,23 +1794,23 @@ download_groads <- function(
   #### 13. finish "..._curl_commands.txt" file
   sink()
   #### 15. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
   #### 16. end if unzip == FALSE
-  download_unzip(
+  amadeus::download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
   #### 18. remove zip files
-  download_remove_zips(
+  amadeus::download_remove_zips(
     remove = remove_zip,
     download_name = download_name
   )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -1880,12 +1880,12 @@ download_population <- function(
   hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  directory_original <- download_sanitize_path(directory_to_save)
-  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_original <- amadeus::download_sanitize_path(directory_to_save)
+  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
   #### 4. define URL base
@@ -1893,7 +1893,7 @@ download_population <- function(
   #### 5. define year
   year <- ifelse(year == "all", "totpop", as.character(year))
   #### 6. define data resolution
-  resolution <- process_sedac_codes(data_resolution)
+  resolution <- amadeus::process_sedac_codes(data_resolution)
   #### 7. 30 second resolution not available for all years
   if (year == "totpop" && resolution == "30_sec") {
     resolution <- "2pt5_min"
@@ -1976,8 +1976,8 @@ download_population <- function(
     Sys.Date(),
     "_curl_commands.txt"
   )
-  download_sink(commands_txt)
-  if (check_destfile(download_name)) {
+  amadeus::download_sink(commands_txt)
+  if (amadeus::check_destfile(download_name)) {
     #### 13. concatenate and print download command to "..._curl_commands.txt"
     #### cat command if file does not already exist or is incomplete
     cat(download_command)
@@ -1985,23 +1985,23 @@ download_population <- function(
   #### 14. finish "..._curl_commands.txt" file
   sink()
   #### 16. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
   #### 17. end if unzip == FALSE
-  download_unzip(
+  amadeus::download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
   #### 19. remove zip files
-  download_remove_zips(
+  amadeus::download_remove_zips(
     remove = remove_zip,
     download_name = download_name
   )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::ownload_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -2073,16 +2073,16 @@ download_hms <- function(
   hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
   if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### 3. directory setup
-  directory_original <- download_sanitize_path(directory_to_save)
-  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_original <- amadeus::download_sanitize_path(directory_to_save)
+  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
   #### 4. check for unzip == FALSE && remove_zip == TRUE
@@ -2093,7 +2093,7 @@ download_hms <- function(
     ))
   }
   #### 5. define date sequence
-  date_sequence <- generate_date_sequence(
+  date_sequence <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = TRUE
@@ -2109,7 +2109,7 @@ download_hms <- function(
     utils::tail(date_sequence, n = 1),
     "_curl_commands.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### 8. concatenate and print download commands to "..._curl_commands.txt"
   download_names <- NULL
   for (f in seq_along(date_sequence)) {
@@ -2136,7 +2136,7 @@ download_hms <- function(
       suffix
     )
     if (f == 1) {
-      if (!(check_url_status(url))) {
+      if (!(amadeus::check_url_status(url))) {
         sink()
         file.remove(commands_txt)
         stop(paste0(
@@ -2161,7 +2161,7 @@ download_hms <- function(
       url,
       "\n"
     )
-    if (check_destfile(destfile)) {
+    if (amadeus::check_destfile(destfile)) {
       #### cat command only if file does not already exist
       cat(command)
     }
@@ -2169,7 +2169,7 @@ download_hms <- function(
   #### 9. finish "..._curl_commands.txt"
   sink()
   #### 11. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
@@ -2182,18 +2182,18 @@ download_hms <- function(
   }
   #### 14. unzip downloaded zip files
   for (d in seq_along(download_names)) {
-    download_unzip(
+    amadeus::download_unzip(
       file_name = download_names[d],
       directory_to_unzip = directory_to_save,
       unzip = unzip
     )
   }
   #### 15. remove zip files
-  download_remove_zips(
+  amadeus::download_remove_zips(
     remove = remove_zip,
     download_name = download_names
   )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 # nolint end: cyclocomp
 
@@ -2265,12 +2265,12 @@ download_koppen_geiger <- function(
   hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### 3. directory setup
-  directory_original <- download_sanitize_path(directory_to_save)
-  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_original <- amadeus::download_sanitize_path(directory_to_save)
+  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
   #### 4. check for data resolution
@@ -2314,32 +2314,32 @@ download_koppen_geiger <- function(
     Sys.Date(),
     "_wget_command.txt"
   )
-  download_sink(commands_txt)
-  if (check_destfile(download_name)) {
+  amadeus::download_sink(commands_txt)
+  if (amadeus::heck_destfile(download_name)) {
     #### 12. concatenate and print download command to "..._wget_commands.txt"
     #### cat command if file does not already exist or is incomplete
     cat(download_command)
   }
   sink()
   #### 15. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
   #### 18. end if unzip == FALSE
-  download_unzip(
+  amadeus::download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
 
   #### 19. remove zip files
-  download_remove_zips(
+  amadeus::download_remove_zips(
     remove = remove_zip,
     download_name = download_name
   )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 
 
@@ -2489,10 +2489,10 @@ download_modis <- function(
   hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
-  download_setup_dir(directory_to_save)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  amadeus::download_setup_dir(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### check dates
   if (length(date) == 1) date <- c(date, date)
   stopifnot(length(date) == 2)
@@ -2554,7 +2554,7 @@ download_modis <- function(
   version <- ifelse(startsWith(product, "VNP"), "5000", version)
 
   #### 11. define date sequence
-  date_sequence <- generate_date_sequence(
+  date_sequence <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = FALSE
@@ -2661,19 +2661,19 @@ download_modis <- function(
     )
 
     # avoid any possible errors by removing existing command files
-    download_sink(commands_txt)
+    amadeus::download_sink(commands_txt)
     #### cat command only if file does not already exist
     cat(download_command)
     sink()
 
-    download_run(
+    amadeus::download_run(
       download = download,
       commands_txt = commands_txt,
       remove = remove_command
     )
 
     message("Requests were processed.\n")
-    return(download_hash(hash, directory_to_save))
+    return(amadeus::download_hash(hash, directory_to_save))
   }
 
   # In a certain year, list all available dates
@@ -2724,7 +2724,7 @@ download_modis <- function(
   )
 
   # avoid any possible errors by removing existing command files
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### 14. append download commands to text file
   for (d in seq_along(date_sequence)) {
     day <- date_sequence[d]
@@ -2806,13 +2806,13 @@ download_modis <- function(
   sink(file = NULL)
 
   #### 17.
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
   message("Requests were processed.\n")
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 
 
@@ -2863,10 +2863,10 @@ download_tri <- function(
   hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
-  download_setup_dir(directory_to_save)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  amadeus::download_setup_dir(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### check years
   if (length(year) == 1) year <- c(year, year)
   stopifnot(length(year) == 2)
@@ -2907,19 +2907,19 @@ download_tri <- function(
     Sys.Date(),
     "_curl_commands.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### 6. concatenate and print download commands to "..._curl_commands.txt"
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
   #### 9. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
   message("Requests were processed.\n")
-  return(download_hash(hash, directory_to_save))
+  return(damadeus::ownload_hash(hash, directory_to_save))
 }
 
 
@@ -2997,15 +2997,15 @@ download_nei <- function(
   hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
-  directory_original <- download_sanitize_path(directory_to_save)
-  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_original <- amadeus::download_sanitize_path(directory_to_save)
+  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
 
   #### 5. define download URL
-  download_epa_certificate(
+  amadeus::download_epa_certificate(
     epa_certificate_path = epa_certificate_path,
     certificate_url = certificate_url
   )
@@ -3048,13 +3048,13 @@ download_nei <- function(
     Sys.Date(),
     "_wget_commands.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### 6. concatenate and print download commands to "..._curl_commands.txt"
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
   #### 9. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
@@ -3075,7 +3075,7 @@ download_nei <- function(
     }
   }
   message("Requests were processed.\n")
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 
 
@@ -3142,10 +3142,10 @@ download_huc <-
     hash = FALSE
   ) {
     #### 1. check for data download acknowledgement
-    download_permit(acknowledgement = acknowledgement)
+    amadeus::download_permit(acknowledgement = acknowledgement)
     #### 2. directory setup
-    download_setup_dir(directory_to_save)
-    directory_to_save <- download_sanitize_path(directory_to_save)
+    amadeus::download_setup_dir(directory_to_save)
+    directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
 
     region <- match.arg(region)
     type <- match.arg(type)
@@ -3198,13 +3198,13 @@ download_huc <-
       Sys.Date(),
       "_wget_commands.txt"
     )
-    download_sink(commands_txt)
+    amadeus::download_sink(commands_txt)
     #### 6. concatenate and print download commands to "..._curl_commands.txt"
     writeLines(download_commands)
     #### 7. finish "..._curl_commands.txt" file
     sink()
     #### 9. download data
-    download_run(
+    amadeus::download_run(
       download = download,
       commands_txt = commands_txt,
       remove = remove_command
@@ -3228,7 +3228,7 @@ download_huc <-
       }
     }
     message("Requests were processed.\n")
-    return(download_hash(hash, directory_to_save))
+    return(damadeus::ownload_hash(hash, directory_to_save))
   }
 # nolint end
 
@@ -3297,10 +3297,10 @@ download_cropscape <- function(
     stop("Year should be equal to or greater than 2008.")
   }
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
-  download_setup_dir(directory_to_save)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  amadeus::download_setup_dir(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
 
   #### 3. define measurement data paths
   url_download_base <- switch(
@@ -3342,13 +3342,13 @@ download_cropscape <- function(
     Sys.Date(),
     "_wget_commands.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### 6. concatenate and print download commands to "..._curl_commands.txt"
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
   #### 9. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
@@ -3369,7 +3369,7 @@ download_cropscape <- function(
     # nocov end
   }
   message("Requests were processed.\n")
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 # nolint end
 
@@ -3475,10 +3475,10 @@ download_prism <- function(
   }
 
   #### 1. check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
-  download_setup_dir(directory_to_save)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  amadeus::download_setup_dir(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
 
   url_middle <-
     # ts: element-date-format
@@ -3529,19 +3529,19 @@ download_prism <- function(
     Sys.Date(),
     "_wget_commands.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### 6. concatenate and print download commands to "..._curl_commands.txt"
   writeLines(download_commands)
   #### 7. finish "..._curl_commands.txt" file
   sink()
   #### 9. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
   message("Requests were processed.\n")
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -3598,23 +3598,23 @@ download_gridmet <- function(
   hash = FALSE
 ) {
   #### check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### check years
   if (length(year) == 1) year <- c(year, year)
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### directory setup
-  download_setup_dir(directory_to_save)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  amadeus::download_setup_dir(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### define years sequence
   if (any(nchar(year[1]) != 4, nchar(year[1]) != 4)) {
     stop("years should be 4-digit integers.\n")
   }
   years <- seq(year[1], year[2], 1)
   #### define variables
-  variables_list <- process_variable_codes(
+  variables_list <- amadeus::process_variable_codes(
     variables = variables,
     source = "gridmet"
   )
@@ -3629,7 +3629,7 @@ download_gridmet <- function(
     year[2],
     "_curl_commands.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### concatenate and print download commands to "..._curl_commands.txt"
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
@@ -3647,7 +3647,7 @@ download_gridmet <- function(
         ".nc"
       )
       if (y == 1) {
-        if (!(check_url_status(url))) {
+        if (!(amadeus::check_url_status(url))) {
           sink()
           file.remove(commands_txt)
           stop(paste0(
@@ -3672,7 +3672,7 @@ download_gridmet <- function(
         url,
         "\n"
       )
-      if (check_destfile(destfile)) {
+      if (amadeus::check_destfile(destfile)) {
         #### cat command only if file does not already exist
         cat(command)
       }
@@ -3681,12 +3681,12 @@ download_gridmet <- function(
   #### finish "..._curl_commands.txt"
   sink()
   #### download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -3742,23 +3742,23 @@ download_terraclimate <- function(
   hash = FALSE
 ) {
   #### check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### check years
   if (length(year) == 1) year <- c(year, year)
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### directory setup
-  download_setup_dir(directory_to_save)
-  directory_to_save <- download_sanitize_path(directory_to_save)
+  amadeus::download_setup_dir(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### define years sequence
   if (any(nchar(year[1]) != 4, nchar(year[2]) != 4)) {
     stop("years should be 4-digit integers.\n")
   }
   years <- seq(year[1], year[2], 1)
   #### define variables
-  variables_list <- process_variable_codes(
+  variables_list <- amadeus::process_variable_codes(
     variables = variables,
     source = "terraclimate"
   )
@@ -3774,7 +3774,7 @@ download_terraclimate <- function(
     year[2],
     "_curl_commands.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### concatenate and print download commands to "..._curl_commands.txt"
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
@@ -3792,7 +3792,7 @@ download_terraclimate <- function(
         ".nc"
       )
       if (y == 1) {
-        if (!(check_url_status(url))) {
+        if (!(amadeus::check_url_status(url))) {
           sink()
           file.remove(commands_txt)
           stop(paste0(
@@ -3817,7 +3817,7 @@ download_terraclimate <- function(
         url,
         "\n"
       )
-      if (check_destfile(destfile)) {
+      if (amadeus::check_destfile(destfile)) {
         #### cat command only if file does not already exist
         cat(command)
       }
@@ -3826,12 +3826,12 @@ download_terraclimate <- function(
   #### finish "..._curl_commands.txt"
   sink()
   #### download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
   )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 
 #nolint start
@@ -3950,11 +3950,11 @@ download_edgar <- function(
   hash = FALSE
 ) {
   # check for data download acknowledgement
-  download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
 
   # directory setup
-  directory_original <- download_sanitize_path(directory_to_save)
-  directories <- download_setup_dir(directory_original, zip = TRUE)
+  directory_original <- amadeus::download_sanitize_path(directory_to_save)
+  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
 
@@ -4208,7 +4208,7 @@ download_edgar <- function(
   missing_urls <- c()
 
   for (u in urls) {
-    if (!(check_url_status(u))) {
+    if (!(amadeus::check_url_status(u))) {
       missing_urls <- c(missing_urls, u)
     } else {
       download_urls <- c(download_urls, u)
@@ -4256,13 +4256,13 @@ download_edgar <- function(
     temp_res,
     "_curl_commands.txt"
   )
-  download_sink(commands_txt)
+  amadeus::download_sink(commands_txt)
   #### 8. concatenate and print download commands to "..._curl_commands.txt"
   cat(download_commands)
   #### 9. finish "..._curl_commands.txt" file
   sink()
   #### 11. download data
-  download_run(
+  amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
@@ -4270,13 +4270,13 @@ download_edgar <- function(
   #### 12. unzip data
   sapply(
     download_names,
-    download_unzip,
+    amadeus::download_unzip,
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
-  download_remove_zips(
+  amadeus::download_remove_zips(
     remove = remove_zip,
     download_name = download_names
   )
-  return(download_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }

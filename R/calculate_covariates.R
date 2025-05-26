@@ -75,28 +75,28 @@ calculate_covariates <-
 
     # select function to run
     what_to_run <- switch(covariate,
-      modis = calculate_modis,
-      ecoregion = calculate_ecoregion,
-      ecoregions = calculate_ecoregion,
-      koppen = calculate_koppen_geiger,
-      narr = calculate_narr,
-      nlcd = calculate_nlcd,
-      smoke = calculate_hms,
-      hms = calculate_hms,
-      sedac_groads = calculate_groads,
-      roads = calculate_groads,
-      groads = calculate_groads,
-      sedac_population = calculate_population,
-      population = calculate_population,
-      nei = calculate_nei,
-      tri = calculate_tri,
-      geos = calculate_geos,
-      gmted = calculate_gmted,
-      dummies = calculate_temporal_dummies,
-      merra = calculate_merra2,
-      merra2 = calculate_merra2,
-      gridmet = calculate_gridmet,
-      terraclimate = calculate_terraclimate
+      modis = amadeus::calculate_modis,
+      ecoregion = amadeus::calculate_ecoregion,
+      ecoregions = amadeus::calculate_ecoregion,
+      koppen = amadeus::calculate_koppen_geiger,
+      narr = amadeus::calculate_narr,
+      nlcd = amadeus::calculate_nlcd,
+      smoke = amadeus::calculate_hms,
+      hms = amadeus::calculate_hms,
+      sedac_groads = amadeus::calculate_groads,
+      roads = amadeus::calculate_groads,
+      groads = amadeus::calculate_groads,
+      sedac_population = amadeus::calculate_population,
+      population = amadeus::calculate_population,
+      nei = amadeus::calculate_nei,
+      tri = amadeus::calculate_tri,
+      geos = amadeus::calculate_geos,
+      gmted = amadeus::calculate_gmted,
+      dummies = amadeus::calculate_temporal_dummies,
+      merra = amadeus::calculate_merra2,
+      merra2 = amadeus::calculate_merra2,
+      gridmet = amadeus::calculate_gridmet,
+      terraclimate = amadeus::calculate_terraclimate
     )
 
     res_covariate <-
@@ -175,7 +175,7 @@ calculate_koppen_geiger <-
       geom = FALSE,
       ...) {
     # prepare locations
-    locs_prepared <- calc_prepare_locs(
+    locs_prepared <- amadeus::calc_prepare_locs(
       from = from,
       locs = locs,
       locs_id = locs_id,
@@ -249,7 +249,7 @@ calculate_koppen_geiger <-
     names(kg_extracted)[1] <- locs_id
     if (geom %in% c("sf", "terra")) {
       names(kg_extracted)[2:3] <- c("geometry", "description")
-      sites_return <- calc_return_locs(
+      sites_return <- amadeus::calc_return_locs(
         covar = kg_extracted,
         POSIXt = FALSE,
         geom = geom,
@@ -516,7 +516,7 @@ calculate_ecoregion <-
     ...
   ) {
     # prepare locations
-    locs_prepared <- calc_prepare_locs(
+    locs_prepared <- amadeus::calc_prepare_locs(
       from = from,
       locs = locs,
       locs_id = locs_id,
@@ -579,7 +579,7 @@ calculate_ecoregion <-
       # Introduce missing sites back to dataframe
       locs_ecoreg <- merge(locs_df, locs_ecoreg, by = locs_id, all.x = TRUE)
     }
-    locs_return <- calc_return_locs(
+    locs_return <- amadeus::calc_return_locs(
       covar = locs_ecoreg,
       POSIXt = FALSE,
       geom = geom,
@@ -697,7 +697,7 @@ calculate_modis <-
     locs = NULL,
     locs_id = "site_id",
     radius = c(0L, 1e3L, 1e4L, 5e4L),
-    preprocess = process_modis_merge,
+    preprocess = amadeus::process_modis_merge,
     name_covariates = NULL,
     subdataset = NULL,
     fun_summary = "mean",
@@ -707,7 +707,7 @@ calculate_modis <-
     geom = FALSE,
     ...
   ) {
-    check_geom(geom)
+    amadeus::check_geom(geom)
     if (!is.function(preprocess)) {
       stop("preprocess should be one of process_modis_merge,
 process_modis_swath, or process_blackmarble.")
@@ -801,7 +801,7 @@ process_modis_swath, or process_blackmarble.")
                           radius[k])
                 extracted <-
                   try(
-                    calculate_modis_daily(
+                    amadeus::calculate_modis_daily(
                       locs = locs_input,
                       from = vrt_today,
                       locs_id = locs_id,
@@ -899,7 +899,7 @@ calculate_temporal_dummies <-
     geom = FALSE,
     ...
   ) {
-    check_geom(geom)
+    amadeus::check_geom(geom)
     if (!methods::is(locs, "data.frame")) {
       stop("Argument locs is not a data.frame.\n")
     }
@@ -919,7 +919,7 @@ calculate_temporal_dummies <-
       return(dt_dum)
     }
 
-    calc_check_time(covar = locs, POSIXt = TRUE)
+    amadeus::calc_check_time(covar = locs, POSIXt = TRUE)
     # year
     vec_year <- data.table::year(locs$time)
     dt_year_dum <- dummify(vec_year, year)
@@ -954,7 +954,7 @@ calculate_temporal_dummies <-
       )
 
     # geom
-    locs_return <- calc_return_locs(
+    locs_return <- amadeus::calc_return_locs(
       covar = locs_dums,
       POSIXt = TRUE,
       geom = geom,
@@ -1034,7 +1034,7 @@ sum_edc <-
     target_fields = NULL,
     geom = FALSE
   ) {
-    check_geom(geom)
+    amadeus::check_geom(geom)
     if (!methods::is(locs, "SpatVector")) {
       locs <- try(terra::vect(locs))
     }
@@ -1114,7 +1114,7 @@ The result may not be accurate.\n",
       )
     }
 
-    res_sedc_return <- calc_return_locs(
+    res_sedc_return <- amadeus::calc_return_locs(
       covar = res_sedc,
       POSIXt = TRUE,
       geom = geom,
@@ -1185,7 +1185,7 @@ calculate_tri <- function(
   geom = FALSE,
   ...
 ) {
-  check_geom(geom)
+  amadeus::check_geom(geom)
   if (!methods::is(locs, "SpatVector")) {
     if (methods::is(locs, "sf")) {
       locs <- terra::vect(locs)
@@ -1226,7 +1226,7 @@ calculate_tri <- function(
     df_tri <- dplyr::left_join(as.data.frame(locs), df_tri)
   }
 
-  df_tri_return <- calc_return_locs(
+  df_tri_return <- amadeus::calc_return_locs(
     covar = df_tri,
     POSIXt = FALSE,
     geom = geom,
@@ -1275,7 +1275,7 @@ calculate_nei <- function(
   geom = FALSE,
   ...
 ) {
-  check_geom(geom)
+  amadeus::check_geom(geom)
   if (!methods::is(locs, "SpatVector")) {
     locs <- try(terra::vect(locs))
     if (inherits(locs, "try-error")) {
@@ -1287,7 +1287,7 @@ calculate_nei <- function(
   locs_re <- terra::intersect(locs_re, from)
   locs_re <- as.data.frame(locs_re)
 
-  locs_return <- calc_return_locs(
+  locs_return <- amadeus::calc_return_locs(
     covar = locs_re,
     POSIXt = FALSE,
     geom = geom,
@@ -1343,11 +1343,11 @@ calculate_hms <- function(
     geom = FALSE,
     ...) {
   #### check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all densities, locs and dates
   if (is.character(from)) {
-    check_geom(geom)
+    amadeus::check_geom(geom)
     message(paste0(
       "Inherited list of dates due to absent smoke plume polygons.\n"
     ))
@@ -1366,7 +1366,7 @@ calculate_hms <- function(
         }, seq_len(nrow(skip_df)))
       )
 
-    skip_return <- calc_return_locs(
+    skip_return <- amadeus::calc_return_locs(
       skip_merge,
       POSIXt = TRUE,
       geom = geom,
@@ -1375,7 +1375,7 @@ calculate_hms <- function(
     return(skip_return)
   }
   #### prepare locations list
-  sites_list <- calc_prepare_locs(
+  sites_list <- amadeus::calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
@@ -1386,7 +1386,7 @@ calculate_hms <- function(
   sites_id <- sites_list[[2]]
 
   #### generate date sequence for missing polygon patch
-  date_sequence <- generate_date_sequence(
+  date_sequence <- amadeus::generate_date_sequence(
     date_start = as.Date(
       from$Date[1],
       format = "%Y%m%d"
@@ -1525,7 +1525,7 @@ calculate_hms <- function(
     sites_extracted[order(sites_extracted$time), ]
   )
   message("Returning smoke intensity covariates.")
-  sites_extracted_ordered <- calc_return_locs(
+  sites_extracted_ordered <- amadeus::calc_return_locs(
     covar = sites_extracted,
     POSIXt = TRUE,
     geom = geom,
@@ -1588,7 +1588,7 @@ calculate_gmted <- function(
     geom = FALSE,
     ...) {
   #### prepare locations list
-  sites_list <- calc_prepare_locs(
+  sites_list <- amadeus::calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
@@ -1598,7 +1598,7 @@ calculate_gmted <- function(
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
   #### perform extraction
-  sites_extracted <- calc_worker(
+  sites_extracted <- amadeus::calc_worker(
     dataset = "gmted",
     from = from,
     locs_vector = sites_e,
@@ -1648,7 +1648,7 @@ calculate_gmted <- function(
     sites_extracted[, 3] <- as.numeric(sites_extracted[, 3])
     names(sites_extracted) <- c(locs_id, "time", variable_name)
   }
-  sites_return <- calc_return_locs(
+  sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
     POSIXt = FALSE,
     geom = geom,
@@ -1711,7 +1711,7 @@ calculate_narr <- function(
     geom = FALSE,
     ...) {
   #### prepare locations list
-  sites_list <- calc_prepare_locs(
+  sites_list <- amadeus::calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
@@ -1729,7 +1729,7 @@ calculate_narr <- function(
     narr_level <- NULL
   }
   #### perform extraction
-  sites_extracted <- calc_worker(
+  sites_extracted <- amadeus::calc_worker(
     dataset = "narr",
     from = from,
     locs_vector = sites_e,
@@ -1742,7 +1742,7 @@ calculate_narr <- function(
     level = narr_level,
     ...
   )
-  sites_return <- calc_return_locs(
+  sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
     POSIXt = TRUE,
     geom = geom,
@@ -1806,7 +1806,7 @@ calculate_geos <- function(
     geom = FALSE,
     ...) {
   #### prepare locations list
-  sites_list <- calc_prepare_locs(
+  sites_list <- amadeus::calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
@@ -1816,7 +1816,7 @@ calculate_geos <- function(
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
   #### perform extraction
-  sites_extracted <- calc_worker(
+  sites_extracted <- amadeus::calc_worker(
     dataset = "geos",
     from = from,
     locs_vector = sites_e,
@@ -1829,7 +1829,7 @@ calculate_geos <- function(
     level = 2,
     ...
   )
-  sites_return <- calc_return_locs(
+  sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
     POSIXt = TRUE,
     geom = geom,
@@ -1885,7 +1885,7 @@ calculate_population <- function(
     geom = FALSE,
     ...) {
   #### prepare locations list
-  sites_list <- calc_prepare_locs(
+  sites_list <- amadeus::calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
@@ -1904,7 +1904,7 @@ calculate_population <- function(
       "Calculating population covariates for ",
       name_split[4],
       " at ",
-      process_sedac_codes(
+      amadeus::process_sedac_codes(
         paste0(
           name_split[5],
           "_",
@@ -1916,7 +1916,7 @@ calculate_population <- function(
     )
   )
   #### perform extraction
-  sites_extracted <- calc_worker(
+  sites_extracted <- amadeus::calc_worker(
     dataset = "skip",
     from = from,
     locs_vector = sites_e,
@@ -1928,7 +1928,7 @@ calculate_population <- function(
     time_type = "year",
     ...
   )
-  sites_return <- calc_return_locs(
+  sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
     POSIXt = FALSE,
     geom = geom,
@@ -2006,7 +2006,7 @@ calculate_groads <- function(
     stop("radius should be greater than 0.\n")
   }
   #### prepare locations list
-  sites_list <- calc_prepare_locs(
+  sites_list <- amadeus::calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
@@ -2056,7 +2056,7 @@ calculate_groads <- function(
     #### reorder
     from_clip_reorder <- from_clip[, c(1, 4, 2, 3)]
   }
-  sites_return <- calc_return_locs(
+  sites_return <- amadeus::calc_return_locs(
     covar = from_clip_reorder,
     POSIXt = TRUE,
     geom = geom,
@@ -2118,7 +2118,7 @@ calculate_merra2 <- function(
     geom = FALSE,
     ...) {
   #### prepare locations list
-  sites_list <- calc_prepare_locs(
+  sites_list <- amadeus::calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
@@ -2136,7 +2136,7 @@ calculate_merra2 <- function(
     merra2_level <- NULL
   }
   #### perform extraction
-  sites_extracted <- calc_worker(
+  sites_extracted <- amadeus::calc_worker(
     dataset = "merra2",
     from = from,
     locs_vector = sites_e,
@@ -2149,7 +2149,7 @@ calculate_merra2 <- function(
     level = merra2_level,
     ...
   )
-  sites_return <- calc_return_locs(
+  sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
     POSIXt = TRUE,
     geom = geom,
@@ -2209,7 +2209,7 @@ calculate_gridmet <- function(
     geom = FALSE,
     ...) {
   #### prepare locations list
-  sites_list <- calc_prepare_locs(
+  sites_list <- amadeus::calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
@@ -2219,7 +2219,7 @@ calculate_gridmet <- function(
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
   #### perform extraction
-  sites_extracted <- calc_worker(
+  sites_extracted <- amadeus::calc_worker(
     dataset = "gridmet",
     from = from,
     locs_vector = sites_e,
@@ -2231,7 +2231,7 @@ calculate_gridmet <- function(
     time_type = "date",
     ...
   )
-  sites_return <- calc_return_locs(
+  sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
     POSIXt = TRUE,
     geom = geom,
@@ -2297,7 +2297,7 @@ calculate_terraclimate <- function(
     geom = FALSE,
     ...) {
   #### prepare locations list
-  sites_list <- calc_prepare_locs(
+  sites_list <- amadeus::calc_prepare_locs(
     from = from,
     locs = locs,
     locs_id = locs_id,
@@ -2307,7 +2307,7 @@ calculate_terraclimate <- function(
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
   #### perform extraction
-  sites_extracted <- calc_worker(
+  sites_extracted <- amadeus::calc_worker(
     dataset = "terraclimate",
     from = from,
     locs_vector = sites_e,
@@ -2319,7 +2319,7 @@ calculate_terraclimate <- function(
     time_type = "yearmonth",
     ...
   )
-  sites_return <- calc_return_locs(
+  sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
     POSIXt = FALSE,
     geom = geom,
@@ -2388,7 +2388,7 @@ calculate_lagged <- function(
     locs_id,
     time_id = "time",
     geom = FALSE) {
-  check_geom(geom)
+  amadeus::check_geom(geom)
   #### check years
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
@@ -2449,7 +2449,7 @@ calculate_lagged <- function(
     variables_return <- cbind(from_u[[locs_id]], time_u, variables_lag)
     colnames(variables_return)[1:2] <- c(locs_id, time_id)
     #### identify dates of interest
-    date_sequence <- generate_date_sequence(
+    date_sequence <- amadeus::generate_date_sequence(
       date[1],
       date[2],
       sub_hyphen = FALSE
@@ -2462,7 +2462,7 @@ calculate_lagged <- function(
   if (geom %in% c("sf", "terra")) {
     variables_merge <- merge(variables_merge, geoms)
   }
-  variables_return <- calc_return_locs(
+  variables_return <- amadeus::calc_return_locs(
     covar = variables_merge,
     POSIXt = TRUE,
     geom = geom,

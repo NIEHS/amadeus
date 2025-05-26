@@ -132,7 +132,7 @@ testthat::test_that("process_cropscape", {
 
   # Check the metadata
   testthat::expect_equal(
-    unname(terra::metags(result)["year"]),
+    unname(terra::metags(result)[2, 2]), # manual index to 'year' metags
     as.character(year)
   )
 
