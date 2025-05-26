@@ -243,7 +243,7 @@ calculate_koppen_geiger <-
     kg_extracted <-
       cbind(
         locs_id = locs_df,
-        as.character(terra::metags(from)),
+        as.character(terra::metags(from)$value[2]),
         df_ae_separated
       )
     names(kg_extracted)[1] <- locs_id
