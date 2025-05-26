@@ -148,7 +148,7 @@ calc_message <- function(
   if (dataset == "gmted") {
     return_message <- paste0(
       "Calculating ",
-      process_gmted_codes(
+      amadeus::process_gmted_codes(
         substr(
           variable,
           1,
@@ -158,7 +158,7 @@ calc_message <- function(
         invert = TRUE
       ),
       " covariates with ",
-      process_gmted_codes(
+      amadeus::process_gmted_codes(
         substr(
           variable,
           3,
@@ -224,21 +224,21 @@ calc_prepare_locs <- function(
     radius,
     geom = FALSE) {
   #### check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   if (!locs_id %in% names(locs)) {
     stop(sprintf("locs should include columns named %s.\n",
                  locs_id)
     )
   }
   #### prepare sites
-  sites_e <- process_locs_vector(
+  sites_e <- amadeus::process_locs_vector(
     locs,
     terra::crs(from),
     radius
   )
   #### site identifiers and geometry
   # check geom
-  check_geom(geom)
+  amadeus::check_geom(geom)
   if (geom %in% c("sf", "terra")) geom <- TRUE
   if (geom) {
     sites_id <- subset(

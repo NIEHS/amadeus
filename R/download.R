@@ -1463,7 +1463,7 @@ download_narr <- function(
     folder <- paste0(directory_to_save, variable, "/")
     # implement variable sorting function
     base <- amadeus::narr_variable(variable)[[1]]
-    months <- namadeus::arr_variable(variable)[[2]]
+    months <- amadeus::narr_variable(variable)[[2]]
     if (!dir.exists(folder)) {
       dir.create(folder, recursive = TRUE)
     }
@@ -1511,7 +1511,7 @@ download_narr <- function(
     commands_txt = commands_txt,
     remove = remove_command
   )
-  return(amadeus::ownload_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 # nolint end: cyclocomp
 
@@ -1727,7 +1727,7 @@ download_groads <- function(
   amadeus::check_for_null_parameters(mget(ls()))
   #### 3. directory setup
   directory_original <- amadeus::download_sanitize_path(directory_to_save)
-  directories <-amadeus:: download_setup_dir(directory_original, zip = TRUE)
+  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
   #### 4. check if region is valid
@@ -2001,7 +2001,7 @@ download_population <- function(
     remove = remove_zip,
     download_name = download_name
   )
-  return(amadeus::ownload_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 
 # nolint start
@@ -2315,7 +2315,7 @@ download_koppen_geiger <- function(
     "_wget_command.txt"
   )
   amadeus::download_sink(commands_txt)
-  if (amadeus::heck_destfile(download_name)) {
+  if (amadeus::check_destfile(download_name)) {
     #### 12. concatenate and print download command to "..._wget_commands.txt"
     #### cat command if file does not already exist or is incomplete
     cat(download_command)
@@ -2919,7 +2919,7 @@ download_tri <- function(
     remove = remove_command
   )
   message("Requests were processed.\n")
-  return(damadeus::ownload_hash(hash, directory_to_save))
+  return(amadeus::download_hash(hash, directory_to_save))
 }
 
 
@@ -3228,7 +3228,7 @@ download_huc <-
       }
     }
     message("Requests were processed.\n")
-    return(damadeus::ownload_hash(hash, directory_to_save))
+    return(amadeus::download_hash(hash, directory_to_save))
   }
 # nolint end
 

@@ -121,7 +121,7 @@ download_olm <- function(
   remove_command = FALSE
 ) {
   #### 1. check for data download acknowledgement
- amadeus:: download_permit(acknowledgement = acknowledgement)
+  amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
