@@ -18,18 +18,18 @@ download_setup_dir <-
       dir.create(directory, recursive = TRUE)
     }
     if (zip) {
-      directory_zip <- download_sanitize_path(
+      directory_zip <- amadeus::download_sanitize_path(
         paste0(
-          download_sanitize_path(directory),
+          amadeus::download_sanitize_path(directory),
           "zip_files"
         )
       )
       if (!dir.exists(directory_zip)) {
         dir.create(directory_zip, recursive = TRUE)
       }
-      directory_data <- download_sanitize_path(
+      directory_data <- amadeus::download_sanitize_path(
         paste0(
-          download_sanitize_path(directory),
+          amadeus::download_sanitize_path(directory),
           "data_files"
         )
       )
@@ -129,7 +129,7 @@ download_run <- function(
   } else {
     message(paste0("Skipping data download.\n"))
   }
-  download_remove_command(
+  amadeus::download_remove_command(
     commands_txt = commands_txt,
     remove = remove
   )

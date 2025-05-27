@@ -1,6 +1,7 @@
 linters: linters_with_defaults(
     commented_code_linter = NULL,
-    return_linter = NULL
+    return_linter = NULL,
+    line_length_linter(100)
   )
 exclusions: list(
     "tests/testthat/test-download_functions.R",

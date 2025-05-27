@@ -421,7 +421,8 @@ testthat::test_that("process_flatten_sds", {
   )
 
   # main test: mcd19
-  testthat::expect_no_error(
+  # expect warning for new strict terra/GDAL HDF4 warning
+  testthat::expect_warning(
     mcdaggr <-
       process_flatten_sds(
         path = mcd19,
@@ -479,7 +480,7 @@ testthat::test_that("process_modis_merge", {
       "../testdata/modis/",
       "MOD11A1.A2021227.h11v05.061.2021228105320.hdf"
     )
-  testthat::expect_no_error(
+  testthat::expect_warning(
     process_modis_merge(
       path = path_mod11,
       date = "2021-08-15",
@@ -492,7 +493,7 @@ testthat::test_that("process_modis_merge", {
       "../testdata/modis/",
       "MOD13A2.A2021225.h11v05.061.2021320163751.hdf"
     )
-  testthat::expect_no_error(
+  testthat::expect_warning(
     process_modis_merge(
       path = path_mod13,
       date = "2021-08-13",
@@ -506,7 +507,7 @@ testthat::test_that("process_modis_merge", {
       "../testdata/modis/",
       "MCD19A2.A2021227.h11v05.061.2023149160635.hdf"
     )
-  testthat::expect_no_error(
+  testthat::expect_warning(
     process_modis_merge(
       path = path_mcd19,
       date = "2021-08-15",
@@ -520,7 +521,7 @@ testthat::test_that("process_modis_merge", {
       "../testdata/modis/",
       "MOD09GA.A2021227.h11v05.061.2021229035936.hdf"
     )
-  testthat::expect_no_error(
+  testthat::expect_warning(
     process_modis_merge(
       path = path_mod09,
       date = "2021-08-15",
@@ -534,7 +535,7 @@ testthat::test_that("process_modis_merge", {
     pattern = "MOD13A2",
     full.names = TRUE
   )
-  testthat::expect_no_error(
+  testthat::expect_warning(
     process_modis_merge(
       path = paths_mod13,
       date = "2021-08-13",
@@ -723,7 +724,7 @@ testthat::test_that("calculate_modis", {
       "../testdata/modis/",
       "MOD11A1.A2021227.h11v05.061.2021228105320.hdf"
     )
-  testthat::expect_no_error(
+  testthat::expect_warning(
     base_mod11 <-
       process_modis_merge(
         path = path_mod11,
@@ -1034,12 +1035,14 @@ testthat::test_that("calculate_modis", {
       "../testdata/modis/",
       "MCD19A2.A2021227.h11v05.061.2023149160635.hdf"
     )
-  mcd_merge <-
-    process_modis_merge(
-      path = path_mcd19,
-      date = "2021-08-15",
-      subdataset = "(Optical_Depth)"
-    )
+  testthat::expect_warning(
+    mcd_merge <-
+      process_modis_merge(
+        path = path_mcd19,
+        date = "2021-08-15",
+        subdataset = "(Optical_Depth)"
+      )
+  )
 
   testthat::expect_no_error(
     calculate_modis_daily(
@@ -1052,7 +1055,7 @@ testthat::test_that("calculate_modis", {
   )
 
   # test calculate_modis_daily directly with geometry terra
-  testthat::expect_no_error(
+  testthat::expect_no_error( 
     calc_mod_terra <- calculate_modis_daily(
       from = mcd_merge,
       date = "2021-08-15",

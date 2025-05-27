@@ -148,7 +148,7 @@ calc_message <- function(
   if (dataset == "gmted") {
     return_message <- paste0(
       "Calculating ",
-      process_gmted_codes(
+      amadeus::process_gmted_codes(
         substr(
           variable,
           1,
@@ -158,7 +158,7 @@ calc_message <- function(
         invert = TRUE
       ),
       " covariates with ",
-      process_gmted_codes(
+      amadeus::process_gmted_codes(
         substr(
           variable,
           3,
@@ -224,21 +224,21 @@ calc_prepare_locs <- function(
     radius,
     geom = FALSE) {
   #### check for null parameters
-  check_for_null_parameters(mget(ls()))
+  amadeus::check_for_null_parameters(mget(ls()))
   if (!locs_id %in% names(locs)) {
     stop(sprintf("locs should include columns named %s.\n",
                  locs_id)
     )
   }
   #### prepare sites
-  sites_e <- process_locs_vector(
+  sites_e <- amadeus::process_locs_vector(
     locs,
     terra::crs(from),
     radius
   )
   #### site identifiers and geometry
   # check geom
-  check_geom(geom)
+  amadeus::check_geom(geom)
   if (geom %in% c("sf", "terra")) geom <- TRUE
   if (geom) {
     sites_id <- subset(
@@ -723,4 +723,44 @@ calculate_modis_daily <- function(
   }
   gc()
   return(extracted_return)
+}
+
+#' Collapse listed NLCD values while filling in NA for sites outside data.
+#' @param data Buffered values from NLCD data.
+#' @param mode "exact" or "terra"
+#' @param locs extraction locations.
+#' @keywords internal auxiliary
+#' @importFrom collapse rowbind
+#' @export
+collapse_nlcd <- function(
+  data,
+  mode = c("terra", "extract"),
+  locs = NULL
+) {
+  data_nonnull <- Filter(Negate(is.null), data)
+  data_rbind <- collapse::rowbind(data_nonnull, fill = TRUE)
+  if (mode == "terra") {
+
+    # Create a single-row NA data frame with the same structure
+    na_row <- data_rbind[1, , drop = FALSE]
+    na_row[] <- NA
+
+    # Replace all NULL elements with the NA row
+    data_na <- lapply(data, function(x) if (is.null(x)) na_row else x)
+
+    # Combine into a single data frame
+    data_filled <- collapse::rowbind(data_na, fill = TRUE)
+
+  } else {
+    stopifnot(!is.null(locs))
+
+    sites_wdata <- unlist(lapply(data, function(x) x$site_id))
+    sites_missing <- locs$site_id[!locs$site_id %in% sites_wdata]
+
+    df_missing <- data.frame(site_id = sites_missing)
+
+    data_filled <- collapse::rowbind(data_rbind, df_missing, fill = TRUE)
+  }
+
+  return(data_filled)
 }

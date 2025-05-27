@@ -65,3 +65,17 @@ CRAN-SUBMISSION
 
 # containerized tests
 /tests/container/*sif
+
+# containers
+*sif
+
+# all slurm output
+**slurm*
+
+# local testing output
+**/cov
+
+# development files
+data/
+R/dev.R
+tests/testthat/test-dev.R

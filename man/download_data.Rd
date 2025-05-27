@@ -8,7 +8,7 @@ download_data(
   dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "gmted", "koppen",
     "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd", "noaa", "sedac_groads",
     "sedac_population", "groads", "population", "hms", "smoke", "tri", "nei", "gridmet",
-    "terraclimate", "huc", "cropscape", "cdl", "prism"),
+    "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   hash = FALSE,
@@ -85,6 +85,7 @@ Please refer to:
 \item \code{\link{download_huc}}: \code{"huc"}
 \item \code{\link{download_cropscape}}: \code{"cropscape"}, \code{"cdl"}
 \item \code{\link{download_prism}}: \code{"prism"}
+\item \code{\link{download_edgar}}: \code{"edgar"}, \code{"EDGAR"}
 }
 }
 \author{
