@@ -50,18 +50,39 @@
 # nolint end
 process_covariates <-
   function(
-    covariate = c("modis_swath", "modis_merge",
-                  "koppen-geiger",
-                  "blackmarble",
-                  "koeppen-geiger", "koppen", "koeppen",
-                  "geos", "dummies", "gmted",
-                  "hms", "smoke",
-                  "sedac_population", "population",
-                  "sedac_groads", "groads", "roads",
-                  "nlcd", "tri", "narr", "nei",
-                  "ecoregions", "ecoregion",
-                  "merra", "merra2", "gridmet", "terraclimate",
-                  "huc", "cropscape", "cdl", "prism"),
+    covariate = c(
+      "modis_swath",
+      "modis_merge",
+      "koppen-geiger",
+      "blackmarble",
+      "koeppen-geiger",
+      "koppen",
+      "koeppen",
+      "geos",
+      "dummies",
+      "gmted",
+      "hms",
+      "smoke",
+      "sedac_population",
+      "population",
+      "sedac_groads",
+      "groads",
+      "roads",
+      "nlcd",
+      "tri",
+      "narr",
+      "nei",
+      "ecoregions",
+      "ecoregion",
+      "merra",
+      "merra2",
+      "gridmet",
+      "terraclimate",
+      "huc",
+      "cropscape",
+      "cdl",
+      "prism"
+    ),
     path = NULL,
     ...
   ) {
@@ -72,7 +93,8 @@ process_covariates <-
     }
 
     # select function to run
-    what_to_run <- switch(covariate,
+    what_to_run <- switch(
+      covariate,
       modis_merge = process_modis_merge,
       modis_swath = process_modis_swath,
       blackmarble = process_blackmarble,
@@ -103,23 +125,26 @@ process_covariates <-
     )
 
     res_covariate <-
-      tryCatch({
-        what_to_run(
-          path = path,
-          ...
-        )
-      }, error = function(e) {
-        stop(
-          paste0(
-            e,
-            "\n",
-            paste0(deparse(args(what_to_run)), collapse = "\n"),
-            "\n",
-            "Please refer to the argument list and ",
-            "the error message above to rectify the error.\n"
+      tryCatch(
+        {
+          what_to_run(
+            path = path,
+            ...
           )
-        )
-      })
+        },
+        error = function(e) {
+          stop(
+            paste0(
+              e,
+              "\n",
+              paste0(deparse(args(what_to_run)), collapse = "\n"),
+              "\n",
+              "Please refer to the argument list and ",
+              "the error message above to rectify the error.\n"
+            )
+          )
+        }
+      )
 
     return(res_covariate)
   }
@@ -168,7 +193,8 @@ process_modis_sds <-
     } else {
       product <- match.arg(product)
       modis_sds <-
-        switch(product,
+        switch(
+          product,
           MOD11A1 = "(LST_)",
           MOD13A2 = "(NDVI)",
           MOD09GA = "(sur_refl_b0)",
@@ -240,8 +266,10 @@ process_flatten_sds <-
     status_curv <-
       suppressWarnings(terra::is.rotated(terra::rast(path)))
     if (any(status_curv)) {
-      stop("The raster is curvilinear. Please rectify or warp
-the input then flatten it manually.")
+      stop(
+        "The raster is curvilinear. Please rectify or warp
+the input then flatten it manually."
+      )
     }
 
     # describe provides subdataset information
@@ -268,10 +296,7 @@ the input then flatten it manually.")
       # if there are multiple layers in a subdataset,
       # aggregate overlapping pixel values
       sds_agg <-
-        terra::tapp(sds_read,
-                    index = sds_aggindex,
-                    fun = fun_agg,
-                    na.rm = TRUE)
+        terra::tapp(sds_read, index = sds_aggindex, fun = fun_agg, na.rm = TRUE)
     }
     # restore names
     names(sds_agg) <- sds_varn
@@ -318,18 +343,20 @@ the input then flatten it manually.")
 # nolint end
 # previously modis_get_vrt
 process_modis_merge <- function(
-    path = NULL,
-    date = NULL,
-    subdataset = NULL,
-    fun_agg = "mean",
-    ...) {
-
+  path = NULL,
+  date = NULL,
+  subdataset = NULL,
+  fun_agg = "mean",
+  ...
+) {
   if (!is.character(path)) {
     stop("Argument path should be a list of hdf files (character).\n")
   }
   if (!(is.character(fun_agg) || is.function(fun_agg))) {
-    stop("Argument fun_agg should be a function or name of a function
-         that is accepted in terra::tapp.\n")
+    stop(
+      "Argument fun_agg should be a function or name of a function
+         that is accepted in terra::tapp.\n"
+    )
   }
   # date format check
   amadeus::is_date_proper(instr = date)
@@ -341,14 +368,13 @@ process_modis_merge <- function(
 
   # get layer information
   layer_target <-
-    lapply(ftarget,
-           function(x) {
-             process_flatten_sds(
-               x,
-               subdataset = subdataset,
-               fun_agg = fun_agg
-             )
-           })
+    lapply(ftarget, function(x) {
+      process_flatten_sds(
+        x,
+        subdataset = subdataset,
+        fun_agg = fun_agg
+      )
+    })
   # Merge multiple rasters into one
   # do.call(f, l) is equivalent to f(l[[1]], ... , l[[length(l)]])
   if (length(path) > 1) {
@@ -479,14 +505,19 @@ process_blackmarble <- function(
   filepaths_today <-
     grep(
       paste0(
-        "(", paste(stdtile, collapse = "|"), ")"
+        "(",
+        paste(stdtile, collapse = "|"),
+        ")"
       ),
-      filepaths_today, value = TRUE
+      filepaths_today,
+      value = TRUE
     )
 
   filepaths_today_tiles <-
-    regmatches(filepaths_today,
-               regexpr("h([0-2][0-9]|[3][0-6])v([0-1][0-9])", filepaths_today))
+    regmatches(
+      filepaths_today,
+      regexpr("h([0-2][0-9]|[3][0-6])v([0-1][0-9])", filepaths_today)
+    )
 
   vnp_today <- unname(split(filepaths_today, filepaths_today))
   filepaths_today_tiles_list <-
@@ -495,14 +526,19 @@ process_blackmarble <- function(
   # assign corner coordinates then merge
   # Subdataset 3 is BRDF-corrected nighttime light
   vnp_assigned <-
-    mapply(function(vnp, tile_in) {
-      vnp_ <- terra::rast(vnp, subds = subdataset)
-      tile_ext <- tile_df[tile_df$tile == tile_in, -1]
+    mapply(
+      function(vnp, tile_in) {
+        vnp_ <- terra::rast(vnp, subds = subdataset)
+        tile_ext <- tile_df[tile_df$tile == tile_in, -1]
 
-      terra::crs(vnp_) <- terra::crs(crs)
-      terra::ext(vnp_) <- unlist(tile_ext)
-      return(vnp_)
-    }, vnp_today, filepaths_today_tiles_list, SIMPLIFY = FALSE)
+        terra::crs(vnp_) <- terra::crs(crs)
+        terra::ext(vnp_) <- unlist(tile_ext)
+        return(vnp_)
+      },
+      vnp_today,
+      filepaths_today_tiles_list,
+      SIMPLIFY = FALSE
+    )
   if (length(filepaths_today) > 1) {
     vnp_all <- do.call(terra::merge, vnp_assigned)
   } else {
@@ -812,7 +848,12 @@ process_nlcd <-
       stop("year is not a numeric.")
     }
     product_codes <- c(
-      "LndCov", "LndChg", "LndCnf", "FctImp", "ImpDsc", "SpcChg"
+      "LndCov",
+      "LndChg",
+      "LndCnf",
+      "FctImp",
+      "ImpDsc",
+      "SpcChg"
     )
     # open nlcd file corresponding to the year
     nlcd_file <-
@@ -823,7 +864,7 @@ process_nlcd <-
           paste(product_codes, collapse = "|"),
           ")_",
           year,
-          "_.*.tif$"
+          "_.*.tif|img$"
         ),
         full.names = TRUE
       )
@@ -890,7 +931,8 @@ process_ecoregion <-
       ecoreg <- rbind(ecoreg_else, ecoreg_edit)
     }
     ecoreg$time <- paste0(
-      "1997 - ", data.table::year(Sys.time())
+      "1997 - ",
+      data.table::year(Sys.time())
     )
     ecoreg <- terra::vect(ecoreg)
     if (!is.null(extent)) {
@@ -956,7 +998,6 @@ process_tri <- function(
   extent = NULL,
   ...
 ) {
-
   csvs_tri_from <-
     list.files(path = path, pattern = "*.csv$", full.names = TRUE)
   csvs_tri <- lapply(csvs_tri_from, read.csv)
@@ -979,20 +1020,20 @@ process_tri <- function(
   LONGITUDE <- NULL
   LATITUDE <- NULL
   TRI_CHEMICAL_COMPOUND_ID <- NULL
-   
+
   dt_tri_x <-
     dt_tri |>
     dplyr::mutate(
       dplyr::across(
         dplyr::ends_with("_AIR"),
-        ~ifelse(UNIT_OF_MEASURE == "Pounds", . * (453.592 / 1e3), . / 1e3)
+        ~ ifelse(UNIT_OF_MEASURE == "Pounds", . * (453.592 / 1e3), . / 1e3)
       )
     ) |>
     dplyr::group_by(YEAR, LONGITUDE, LATITUDE, TRI_CHEMICAL_COMPOUND_ID) |>
     dplyr::summarize(
       dplyr::across(
         dplyr::ends_with("_AIR"),
-        ~sum(., na.rm = TRUE)
+        ~ sum(., na.rm = TRUE)
       )
     ) |>
     dplyr::ungroup() |>
@@ -1005,12 +1046,14 @@ process_tri <- function(
   names(dt_tri_x) <- sub(" ", "_", names(dt_tri_x))
 
   spvect_tri <-
-    terra::vect(dt_tri_x,
-                geom = c("LONGITUDE", "LATITUDE"),
-                crs = "EPSG:4269", # all are NAD83
-                keepgeom = TRUE)
+    terra::vect(
+      dt_tri_x,
+      geom = c("LONGITUDE", "LATITUDE"),
+      crs = "EPSG:4269", # all are NAD83
+      keepgeom = TRUE
+    )
   attr(spvect_tri, "tri_year") <- year
-  if(!is.null(extent)) {
+  if (!is.null(extent)) {
     tri_final <- apply_extent(spvect_tri, extent)
     return(tri_final)
   } else {
@@ -1018,7 +1061,6 @@ process_tri <- function(
   }
 }
 # nolint end
-
 
 # nolint start
 #' Process road emissions data
@@ -1114,10 +1156,12 @@ process_nei <- function(
   # yearabbr <- substr(year, 3, 4)
   csvs_nei$geoid <- sprintf("%05d", as.integer(csvs_nei$geoid))
   csvs_nei <-
-    csvs_nei[, list(
-      TRF_NEINP_0_00000 = sum(emissions_total_ton, na.rm = TRUE)
-    ),
-    by = geoid]
+    csvs_nei[,
+      list(
+        TRF_NEINP_0_00000 = sum(emissions_total_ton, na.rm = TRUE)
+      ),
+      by = geoid
+    ]
   csvs_nei$time <- as.integer(year)
 
   # read county vector
@@ -1127,7 +1171,6 @@ process_nei <- function(
   cnty_vect <- merge(county, as.data.frame(csvs_nei), by = "geoid")
   cnty_vect <- cnty_vect[, c("geoid", "time", "TRF_NEINP_0_00000")]
   return(cnty_vect)
-
 }
 
 # nolint start
@@ -1215,7 +1258,7 @@ process_aqs <-
         full.names = TRUE
       )
     }
-    
+
     if (length(path) == 0) {
       stop("path does not contain csv files.")
     }
@@ -1225,11 +1268,13 @@ process_aqs <-
 
     ## get unique sites
     sites$site_id <-
-      sprintf("%02d%03d%04d%05d",
-              as.integer(sites$State.Code),
-              as.integer(sites$County.Code),
-              as.integer(sites$Site.Num),
-              as.integer(sites$Parameter.Code))
+      sprintf(
+        "%02d%03d%04d%05d",
+        as.integer(sites$State.Code),
+        as.integer(sites$County.Code),
+        as.integer(sites$Site.Num),
+        as.integer(sites$Parameter.Code)
+      )
 
     site_id <- NULL
     Datum <- NULL
@@ -1270,7 +1315,8 @@ process_aqs <-
         dplyr::ungroup()
       sites_v <-
         dplyr::anti_join(
-          sites_v, sites_vdup,
+          sites_v,
+          sites_vdup,
           by = c("site_id", "time", "Event.Type")
         )
     }
@@ -1294,9 +1340,14 @@ process_aqs <-
     sites_v_nad <- as.data.frame(sites_v_nad)
     sites_v_wgs <- sites_v[sites_v$Datum == "WGS84"]
     final_sites <- data.table::rbindlist(
-      list(sites_v_wgs, sites_v_nad), fill = TRUE)
+      list(sites_v_wgs, sites_v_nad),
+      fill = TRUE
+    )
     final_sites <-
-      final_sites[, grep("Datum", names(final_sites), invert = TRUE), with = FALSE]
+      final_sites[,
+        grep("Datum", names(final_sites), invert = TRUE),
+        with = FALSE
+      ]
 
     if (mode == "date-location") {
       final_sites <-
@@ -1315,14 +1366,12 @@ process_aqs <-
     final_sites <-
       switch(
         return_format,
-        terra =
-        terra::vect(
+        terra = terra::vect(
           final_sites,
           keepgeom = TRUE,
           crs = "EPSG:4326"
         ),
-        sf =
-        sf::st_as_sf(
+        sf = sf::st_as_sf(
           final_sites,
           remove = FALSE,
           dim = "XY",
@@ -1333,7 +1382,9 @@ process_aqs <-
       )
     if (!is.null(extent)) {
       if (return_format == "data.table") {
-        warning("Extent is not applicable for data.table. Returning data.table...\n")
+        warning(
+          "Extent is not applicable for data.table. Returning data.table...\n"
+        )
         return(final_sites)
       }
       final_sites <- apply_extent(final_sites, extent)
@@ -1365,9 +1416,10 @@ process_aqs <-
 #' @export
 # nolint end
 process_population <- function(
-    path = NULL,
-    extent = NULL,
-    ...) {
+  path = NULL,
+  extent = NULL,
+  ...
+) {
   if (substr(path, nchar(path) - 2, nchar(path)) == ".nc") {
     message(
       paste0(
@@ -1447,9 +1499,10 @@ process_population <- function(
 #' @export
 # nolint end
 process_groads <- function(
-    path = NULL,
-    extent = NULL,
-    ...) {
+  path = NULL,
+  extent = NULL,
+  ...
+) {
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   if (!grepl("(shp|gdb)$", path)) {
@@ -1467,7 +1520,7 @@ process_groads <- function(
 #' Process wildfire smoke data
 #' @description
 #' The \code{process_hms()} function imports and cleans raw wildfire smoke
-#' plume coverage data, returning a single `SpatVector` object. 
+#' plume coverage data, returning a single `SpatVector` object.
 #' @param date character(1 or 2). Date (1) or start and end dates (2).
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
 #' @param path character(1). Directory with downloaded NOAA HMS data files.
@@ -1495,10 +1548,11 @@ process_groads <- function(
 #' @importFrom stats na.omit
 #' @export
 process_hms <- function(
-    date = "2018-01-01",
-    path = NULL,
-    extent = NULL,
-    ...) {
+  date = "2018-01-01",
+  path = NULL,
+  extent = NULL,
+  ...
+) {
   #### directory setup
   path <- amadeus::download_sanitize_path(path)
   #### check for variable
@@ -1712,10 +1766,11 @@ process_hms <- function(
 #' }
 #' @export
 process_gmted <- function(
-    variable = NULL,
-    path = NULL,
-    extent = NULL,
-    ...) {
+  variable = NULL,
+  path = NULL,
+  extent = NULL,
+  ...
+) {
   #### directory setup
   path <- amadeus::download_sanitize_path(path)
   #### check for variable
@@ -1831,11 +1886,12 @@ process_gmted <- function(
 #' @export
 # nolint end
 process_narr <- function(
-    date = "2023-09-01",
-    variable = NULL,
-    path = NULL,
-    extent = NULL,
-    ...) {
+  date = "2023-09-01",
+  variable = NULL,
+  path = NULL,
+  extent = NULL,
+  ...
+) {
   #### directory setup
   path <- amadeus::download_sanitize_path(path)
   #### check for variable
@@ -2027,7 +2083,8 @@ process_narr <- function(
         names(data_full),
         nchar(names(data_full)) - 7,
         nchar(names(data_full))
-      ) %in% date_sequence
+      ) %in%
+        date_sequence
     )
   )
   message(paste0(
@@ -2082,11 +2139,13 @@ process_narr <- function(
 #' }
 #' @export
 process_geos <-
-  function(date = c("2018-01-01", "2018-01-10"),
-           variable = NULL,
-           path = NULL,
-           extent = NULL,
-           ...) {
+  function(
+    date = c("2018-01-01", "2018-01-10"),
+    variable = NULL,
+    path = NULL,
+    extent = NULL,
+    ...
+  ) {
     #### directory setup
     path <- amadeus::download_sanitize_path(path)
     #### check for variable
@@ -2201,9 +2260,11 @@ process_geos <-
         names(data_variable),
         "_",
         gsub(
-          ":", "",
+          ":",
+          "",
           gsub(
-            "-", "",
+            "-",
+            "",
             gsub(" ", "_", terra::time(data_variable))
           )
         )
@@ -2277,11 +2338,13 @@ process_geos <-
 #' }
 #' @export
 process_merra2 <-
-  function(date = c("2018-01-01", "2018-01-10"),
-           variable = NULL,
-           path = NULL,
-           extent = NULL,
-           ...) {
+  function(
+    date = c("2018-01-01", "2018-01-10"),
+    variable = NULL,
+    path = NULL,
+    extent = NULL,
+    ...
+  ) {
     #### directory setup
     path <- amadeus::download_sanitize_path(path)
     #### check for variable
@@ -2468,11 +2531,12 @@ process_merra2 <-
 #' @export
 # nolint end
 process_gridmet <- function(
-    date = c("2023-09-01", "2023-09-10"),
-    variable = NULL,
-    path = NULL,
-    extent = NULL,
-    ...) {
+  date = c("2023-09-01", "2023-09-10"),
+  variable = NULL,
+  path = NULL,
+  extent = NULL,
+  ...
+) {
   #### directory setup
   path <- amadeus::download_sanitize_path(path)
   #### check dates
@@ -2509,7 +2573,8 @@ process_gridmet <- function(
   yoi <- unique(
     substr(
       date_sequence,
-      1, 4
+      1,
+      4
     )
   )
   #### subset file paths to only dates of interest
@@ -2578,7 +2643,8 @@ process_gridmet <- function(
         names(data_full),
         nchar(names(data_full)) - 7,
         nchar(names(data_full))
-      ) %in% date_sequence
+      ) %in%
+        date_sequence
     )
   )
   message(paste0(
@@ -2637,11 +2703,12 @@ process_gridmet <- function(
 #' @export
 # nolint end
 process_terraclimate <- function(
-    date = c("2023-09-01", "2023-09-10"),
-    variable = NULL,
-    path = NULL,
-    extent = NULL,
-    ...) {
+  date = c("2023-09-01", "2023-09-10"),
+  variable = NULL,
+  path = NULL,
+  extent = NULL,
+  ...
+) {
   #### directory setup
   path <- amadeus::download_sanitize_path(path)
   #### check for variable
@@ -2678,14 +2745,16 @@ process_terraclimate <- function(
   yoi <- unique(
     substr(
       date_sequence,
-      1, 4
+      1,
+      4
     )
   )
   #### year-months of interest
   ymoi <- unique(
     substr(
       date_sequence,
-      1, 6
+      1,
+      6
     )
   )
   #### subset file paths to only dates of interest
@@ -2744,7 +2813,8 @@ process_terraclimate <- function(
         names(data_full),
         nchar(names(data_full)) - 5,
         nchar(names(data_full))
-      ) %in% ymoi
+      ) %in%
+        ymoi
     )
   )
   message(paste0(
@@ -2787,7 +2857,6 @@ process_terraclimate <- function(
   #### return SpatRaster
   return(data_return)
 }
-
 
 
 #' Retrieve Hydrologic Unit Code (HUC) data
@@ -2858,8 +2927,12 @@ process_huc <-
     if (file.exists(path) || dir.exists(path)) {
       if (!is.null(huc_header)) {
         querybase <-
-          sprintf("SELECT * FROM %s WHERE %s LIKE '%s%%'",
-                  layer_name, huc_level, huc_header)
+          sprintf(
+            "SELECT * FROM %s WHERE %s LIKE '%s%%'",
+            layer_name,
+            huc_level,
+            huc_header
+          )
       } else {
         querybase <-
           sprintf("SELECT * FROM %s", layer_name)
@@ -2885,7 +2958,6 @@ process_huc <-
     }
     return(hucpoly)
   }
-
 
 
 #' Process CropScape data
@@ -2985,10 +3057,22 @@ process_prism <-
     ...
   ) {
     # check inputs
-    if (!element %in%
-          c("ppt", "tmin", "tmax", "tmean", "tdmean",
-            "vpdmin", "vpdmax",
-            "solslope", "soltotal", "solclear", "soltrans")) {
+    if (
+      !element %in%
+        c(
+          "ppt",
+          "tmin",
+          "tmax",
+          "tmean",
+          "tdmean",
+          "vpdmin",
+          "vpdmax",
+          "solslope",
+          "soltotal",
+          "solclear",
+          "soltrans"
+        )
+    ) {
       stop("element is not a valid PRISM element.")
     }
     if (!is.character(path) || is.null(path)) {
@@ -3012,7 +3096,8 @@ process_prism <-
     }
     prism <- terra::rast(prism_file, win = extent)
     terra::metags(prism) <- cbind(
-      c("time", "element"), c(time, element)
+      c("time", "element"),
+      c(time, element)
     )
     return(prism)
   }

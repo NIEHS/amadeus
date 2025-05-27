@@ -9,12 +9,20 @@ testthat::test_that("download_nlcd", {
   # function parameters
   years <- sample(1985:2023L, size = 2)
   products <- c(
-    "Land Cover", "Land Cover Change", "Land Cover Confidence",
-    "Fractional Impervious Surface", "Impervious Descriptor",
+    "Land Cover",
+    "Land Cover Change",
+    "Land Cover Confidence",
+    "Fractional Impervious Surface",
+    "Impervious Descriptor",
     "Spectral Change Day of Year"
   )
   product_codes <- c(
-    "LndCov", "LndChg", "LndCnf", "FctImp", "ImpDsc", "SpcChg"
+    "LndCov",
+    "LndChg",
+    "LndCnf",
+    "FctImp",
+    "ImpDsc",
+    "SpcChg"
   )
   directory_to_save <- paste0(tempdir(), "/nlcd/")
   # run download function
@@ -30,14 +38,16 @@ testthat::test_that("download_nlcd", {
       remove_command = FALSE
     )
     # define file path with commands
-    commands_path <- paste0(download_sanitize_path(directory_to_save),
-                            "nlcd_",
-                            tolower(product_codes[p]),
-                            "_",
-                            years[y],
-                            "_",
-                            Sys.Date(),
-                            "_curl_command.txt")
+    commands_path <- paste0(
+      download_sanitize_path(directory_to_save),
+      "nlcd_",
+      tolower(product_codes[p]),
+      "_",
+      years[y],
+      "_",
+      Sys.Date(),
+      "_curl_command.txt"
+    )
     # expect sub-directories to be created
     testthat::expect_true(
       length(list.files(directory_to_save, include.dirs = TRUE)) == 1
@@ -49,22 +59,24 @@ testthat::test_that("download_nlcd", {
     # check HTTP URL status
     url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
     # implement unit tests
-    test_download_functions(directory_to_save = directory_to_save,
-                            commands_path = commands_path,
-                            url_status = url_status)
+    test_download_functions(
+      directory_to_save = directory_to_save,
+      commands_path = commands_path,
+      url_status = url_status
+    )
     # remove file with commands after test
     file.remove(commands_path)
   }
   testthat::expect_error(
-    download_data(dataset_name = "nlcd",
-                  year = 1900,
-                  product = "land cover",
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  remove_command = TRUE,
-                  unzip = FALSE,
-                  remove_zip = FALSE)
+    download_data(
+      dataset_name = "nlcd",
+      year = 1900,
+      product = "land cover",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = TRUE
+    )
   )
   # remove temporary nlcd
   unlink(directory_to_save, recursive = TRUE)
@@ -86,7 +98,10 @@ testthat::test_that("process_nlcd", {
       path = path_nlcd21,
       year = 2021,
       extent = terra::ext(
-        1510241.32304443, 1536875.51988709, 1558885.5313357, 1603354.11202184
+        1510241.32304443,
+        1536875.51988709,
+        1558885.5313357,
+        1603354.11202184
       )
     )
   )
@@ -108,12 +123,11 @@ testthat::test_that("process_nlcd", {
   # make duplicate with tif and img
   tdir <- tempdir()
   dir.create(paste0(tdir, "/nlcd_all"))
-  file.create(paste0(tdir, "/nlcd_all/Annual_NLCD_LndC0v_2021_CU_C1V0.tif"))
-  file.create(paste0(tdir, "/nlcd_all/Annual_NLCD_LndC0v_2021_CU_C1V0.img"))
+  file.create(paste0(tdir, "/nlcd_all/Annual_NLCD_LndCov_2021_CU_C1V0.tif"))
+  file.create(paste0(tdir, "/nlcd_all/Annual_NLCD_LndCov_2021_CU_C1V0.img"))
   testthat::expect_error(
     process_nlcd(path = paste0(tdir, "/nlcd_all"), year = 2021)
   )
-
 })
 
 ################################################################################
@@ -194,13 +208,11 @@ testthat::test_that("calculate_nlcd", {
   )
   # -- year has likely value
   testthat::expect_error(
-    process_nlcd(path = path_testdata,
-                 year = 2032),
+    process_nlcd(path = path_testdata, year = 2032),
     "NLCD data not available for this year."
   )
   testthat::expect_error(
-    process_nlcd(path = path_testdata,
-                 year = 1789),
+    process_nlcd(path = path_testdata, year = 1789),
     "NLCD data not available for this year."
   )
   testthat::expect_error(
@@ -218,15 +230,15 @@ testthat::test_that("calculate_nlcd", {
   )
   # -- nlcd_path is not a character
   testthat::expect_error(
-    process_nlcd(path = 3,
-                 year = 2),
+    process_nlcd(path = 3, year = 2),
     "path is not a character."
   )
   # -- nlcd_path does not exist
   nice_sentence <- "That's one small step for a man, a giant leap for mankind."
   testthat::expect_error(
     process_nlcd(
-                 path = nice_sentence),
+      path = nice_sentence
+    ),
     "path does not exist."
   )
 
@@ -257,10 +269,14 @@ testthat::test_that("calculate_nlcd", {
   testthat::expect_true(all(eg_data$site_id %in% output$site_id))
   # the value has changed. What affected this behavior?
   testthat::expect_equal(
-    output$LDU_TEFOR_0_03000[1], 0.09010682, tolerance = 1e-7
+    output$LDU_TEFOR_0_03000[1],
+    0.09010682,
+    tolerance = 1e-7
   )
   testthat::expect_equal(
-    output$LDU_TSHRB_0_03000[2], 0.01047932, tolerance = 1e-7
+    output$LDU_TSHRB_0_03000[2],
+    0.01047932,
+    tolerance = 1e-7
   )
   # -- class fraction rows should sum to 1
   testthat::expect_equal(
@@ -270,7 +286,8 @@ testthat::test_that("calculate_nlcd", {
   )
   # without geometry will have 17 columns
   testthat::expect_equal(
-    ncol(output), 17
+    ncol(output),
+    17
   )
   # example with terra output
   output_terra <- calculate_nlcd(
@@ -282,7 +299,8 @@ testthat::test_that("calculate_nlcd", {
   )
   # with geometry will have 17 columns
   testthat::expect_equal(
-    ncol(output_terra), 17
+    ncol(output_terra),
+    17
   )
   testthat::expect_true(
     "SpatVector" %in% class(output_terra)
@@ -297,7 +315,8 @@ testthat::test_that("calculate_nlcd", {
   )
   # with geometry will have 18 columns
   testthat::expect_equal(
-    ncol(output_sf), 18
+    ncol(output_sf),
+    18
   )
   testthat::expect_true(
     "sf" %in% class(output_sf)
@@ -327,7 +346,8 @@ testthat::test_that("calculate_nlcd", {
   )
   # with geometry will have 4 columns
   testthat::expect_equal(
-    ncol(out_points_sf), 4
+    ncol(out_points_sf),
+    4
   )
   testthat::expect_true(
     "sf" %in% class(out_points_sf)
@@ -345,7 +365,8 @@ testthat::test_that("calculate_nlcd", {
   )
   # with geometry will have 4 columns
   testthat::expect_equal(
-    ncol(out_points_t), 3
+    ncol(out_points_t),
+    3
   )
   testthat::expect_true(
     "SpatVector" %in% class(out_points_t)
@@ -363,7 +384,8 @@ testthat::test_that("calculate_nlcd", {
   )
   # with geometry will have 3 columns
   testthat::expect_equal(
-    ncol(out_points_df), 3
+    ncol(out_points_df),
+    3
   )
   testthat::expect_true(is.data.frame(out_points_df))
 })
