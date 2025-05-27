@@ -20,4 +20,4 @@ with the \code{container.sif} container.
 \seealso{
 \code{\link[testthat:test_file]{testthat::test_file()}}
 }
-\keyword{Miscellaneous}
+\keyword{internal}

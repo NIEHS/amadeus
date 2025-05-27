@@ -12,4 +12,4 @@ interactive(dir = ".")
 \description{
 Open interactive session with \code{container.sif} container.
 }
-\keyword{Miscellaneous}
+\keyword{internal}

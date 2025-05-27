@@ -17,4 +17,4 @@ Calculate code coverage of the \code{beethoven} package with the
 \seealso{
 \code{\link[covr:package_coverage]{covr::package_coverage()}}; \code{\link[covr:coverage_to_list]{covr::coverage_to_list()}}
 }
-\keyword{Miscellaneous}
+\keyword{internal}
