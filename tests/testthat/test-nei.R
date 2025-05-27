@@ -9,25 +9,30 @@ testthat::test_that("download_nei", {
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- paste0(tempdir(), "/nei/")
-  certificate <- system.file("extdata/cacert_gaftp_epa.pem",
-                             package = "amadeus")
+  certificate <- system.file(
+    "extdata/cacert_gaftp_epa.pem",
+    package = "amadeus"
+  )
   # run download function
   year <- c(2017L, 2020L)
-  download_data(dataset_name = "nei",
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                download = FALSE,
-                year = year,
-                remove_command = FALSE,
-                epa_certificate_path = certificate
-                )
+  download_data(
+    dataset_name = "nei",
+    directory_to_save = directory_to_save,
+    acknowledgement = TRUE,
+    download = FALSE,
+    year = year,
+    remove_command = FALSE,
+    epa_certificate_path = certificate
+  )
   # expect sub-directories to be created
   testthat::expect_true(
     length(
       list.files(
-        directory_to_save, include.dirs = TRUE
+        directory_to_save,
+        include.dirs = TRUE
       )
-    ) == 3
+    ) ==
+      3
   )
   # define file path with commands
   commands_path <- paste0(
@@ -48,9 +53,11 @@ testthat::test_that("download_nei", {
     httr::HEAD(urls[1], config = httr::config(cainfo = certificate))
   url_status <- url_status$status_code
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   # remove temporary nei
@@ -62,29 +69,34 @@ testthat::test_that("download_nei (live)", {
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- paste0(tempdir(), "/nei/")
-  certificate <- system.file("extdata/cacert_gaftp_epa.pem",
-                             package = "amadeus")
+  certificate <- system.file(
+    "extdata/cacert_gaftp_epa.pem",
+    package = "amadeus"
+  )
   # run download function
   year <- c(2017L, 2020L)
   testthat::expect_no_error(
-    download_data(dataset_name = "nei",
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                download = TRUE,
-                year = year,
-                remove_command = FALSE,
-                epa_certificate_path = certificate,
-                unzip = TRUE
-                )
+    download_data(
+      dataset_name = "nei",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = TRUE,
+      year = year,
+      remove_command = FALSE,
+      epa_certificate_path = certificate,
+      unzip = TRUE
+    )
   )
   testthat::expect_equal(
-    length(list.files(paste0(directory_to_save, "/zip_files"))), 2
+    length(list.files(paste0(directory_to_save, "/zip_files"))),
+    2
   )
   testthat::expect_equal(
     length(list.files(
       paste0(directory_to_save, "/data_files"),
-      recursive = TRUE)
-    ), 12
+      recursive = TRUE
+    )),
+    12
   )
   # remove temporary nei
   unlink(directory_to_save, recursive = TRUE)
@@ -107,14 +119,15 @@ testthat::test_that("download_nei (expected errors)", {
   # run download function
   year <- c(2017L)
   testthat::expect_message(
-    download_data(dataset_name = "nei",
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  year = year,
-                  remove_command = FALSE,
-                  epa_certificate_path = certificate
-                  )
+    download_data(
+      dataset_name = "nei",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      year = year,
+      remove_command = FALSE,
+      epa_certificate_path = certificate
+    )
   )
   # define file path with commands
   commands_path <- paste0(
@@ -159,12 +172,12 @@ testthat::test_that("process_nei", {
   testthat::expect_error(
     process_nei(path_nei, year = 2020, county = array(1, 2))
   )
+  testthat::expect_error(
+    process_nei("./EmPtY/pAtH", year = 2020, county = path_cnty)
+  )
   names(path_cnty)[which(names(path_cnty) == "GEOID")] <- "COUNTYID"
   testthat::expect_error(
     process_nei(path_nei, year = 2020, county = path_cnty)
-  )
-  testthat::expect_error(
-    process_nei("./EmPtY/pAtH", year = 2020, county = path_cnty)
   )
 })
 
@@ -275,6 +288,5 @@ testthat::test_that("calculate_nei", {
       geom = TRUE
     )
   )
-
 })
 # nolint end

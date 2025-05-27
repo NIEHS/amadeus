@@ -10,15 +10,38 @@ testthat::test_that("calculate_covariates (expected errors)", {
   withr::local_options(list(sf_use_s2 = FALSE))
 
   candidates <-
-    c("modis", "koppen-geiger",
-      "koeppen-geiger", "koppen", "koeppen",
-      "geos", "dummies", "gmted",
-      "sedac_groads", "groads", "roads",
-      "ecoregions", "ecoregion", "hms", "smoke",
-      "gmted", "narr", "geos",
-      "sedac_population", "population", "nlcd",
-      "merra", "MERRA", "merra2", "MERRA2",
-      "tri", "nei", "prism", "huc", "cdl")
+    c(
+      "modis",
+      "koppen-geiger",
+      "koeppen-geiger",
+      "koppen",
+      "koeppen",
+      "geos",
+      "dummies",
+      "gmted",
+      "sedac_groads",
+      "groads",
+      "roads",
+      "ecoregions",
+      "ecoregion",
+      "hms",
+      "smoke",
+      "gmted",
+      "narr",
+      "geos",
+      "sedac_population",
+      "population",
+      "nlcd",
+      "merra",
+      "MERRA",
+      "merra2",
+      "MERRA2",
+      "tri",
+      "nei",
+      "prism",
+      "huc",
+      "cdl"
+    )
   for (cand in candidates) {
     testthat::expect_error(
       calculate_covariates(covariate = cand)
@@ -36,8 +59,7 @@ testthat::test_that("calculate_covariates (no errors)", {
   ncp$site_id <- "3799900018810101"
   ncp$time <- 2018
   ncpt <-
-    terra::vect(ncp, geom = c("lon", "lat"),
-                keepgeom = TRUE, crs = "EPSG:4326")
+    terra::vect(ncp, geom = c("lon", "lat"), keepgeom = TRUE, crs = "EPSG:4326")
   ncpt$time <- c(2018)
   path_tri <- testthat::test_path("..", "testdata", "tri")
 
@@ -56,16 +78,35 @@ testthat::test_that("calculate_covariates (no errors)", {
   testthat::expect_true(is.data.frame(tri_c))
 
   candidates <-
-    c("modis", "koppen-geiger",
-      "koeppen-geiger", "koppen", "koeppen",
-      "geos", "dummies", "gmted",
-      "sedac_groads", "groads", "roads",
-      "ecoregions", "ecoregion", "hms", "smoke",
-      "gmted", "narr", "geos",
-      "sedac_population", "population", "nlcd",
-      "merra", "merra2",
-      "gridmet", "terraclimate",
-      "tri", "nei")
+    c(
+      "modis",
+      "koppen-geiger",
+      "koeppen-geiger",
+      "koppen",
+      "koeppen",
+      "geos",
+      "dummies",
+      "gmted",
+      "sedac_groads",
+      "groads",
+      "roads",
+      "ecoregions",
+      "ecoregion",
+      "hms",
+      "smoke",
+      "gmted",
+      "narr",
+      "geos",
+      "sedac_population",
+      "population",
+      "nlcd",
+      "merra",
+      "merra2",
+      "gridmet",
+      "terraclimate",
+      "tri",
+      "nei"
+    )
   for (cand in candidates) {
     testthat::expect_error(
       calculate_covariates(covariate = cand)
@@ -90,8 +131,7 @@ testthat::test_that("calculate_lagged (geom = FALSE)", {
       process_narr(
         date = c("2018-01-01", "2018-01-10"),
         variable = "weasd",
-        path =
-        testthat::test_path(
+        path = testthat::test_path(
           "..",
           "testdata",
           "narr",
@@ -165,13 +205,12 @@ testthat::test_that("calculate_lagged (geom = 'sf/terra')", {
   narr <- process_narr(
     date = c("2018-01-01", "2018-01-10"),
     variable = "weasd",
-    path =
-      testthat::test_path(
-        "..",
-        "testdata",
-        "narr",
-        "weasd"
-      )
+    path = testthat::test_path(
+      "..",
+      "testdata",
+      "narr",
+      "weasd"
+    )
   )
   narr_covariate <-
     calculate_narr(
@@ -179,33 +218,29 @@ testthat::test_that("calculate_lagged (geom = 'sf/terra')", {
       locs = ncp,
       locs_id = "site_id",
       radius = 0,
-      fun = "mean"
+      fun = "mean",
+      geom = "terra"
     )
-  # set column names
-  narr_covariate <- calc_setcolumns(
-    from = narr_covariate,
-    lag = 0,
-    dataset = "narr",
-    locs_id = "site_id"
-  )
 
   # expect error with geom = "terra" and locs as data.frame
   testthat::expect_error(
     calculate_lagged(
-      from = narr_covariate,
+      from = data.frame(narr_covariate),
       date = c("2018-01-02", "2018-01-04"),
       lag = 1,
-      geom = "terra"
+      geom = "terra",
+      locs_id = "site_id"
     )
   )
 
   # expect error with geom = "sf" and locs as data.frame
   testthat::expect_error(
     calculate_lagged(
-      from = narr_covariate,
+      from = data.frame(narr_covariate),
       date = c("2018-01-02", "2018-01-04"),
       lag = 1,
-      geom = "sf"
+      geom = "sf",
+      locs_id = "site_id"
     )
   )
 })
@@ -228,16 +263,14 @@ testthat::test_that("calc_check_time", {
 
 ################################################################################
 ##### calc_message
-testthat::test_that("calc_message",
-  {
-    testthat::expect_no_error(
-      calc_message("gmted", "mean", "2020", "year", NULL)
-    )
-    testthat::expect_no_error(
-      calc_message("narr", "shum", 2000, "year", NULL)
-    )
-  }
-)
+testthat::test_that("calc_message", {
+  testthat::expect_no_error(
+    calc_message("gmted", "mean", "2020", "year", NULL)
+  )
+  testthat::expect_no_error(
+    calc_message("narr", "shum", 2000, "year", NULL)
+  )
+})
 
 ################################################################################
 ##### calc_time
@@ -259,8 +292,7 @@ testthat::test_that("calc_worker", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013, time = "boundless")
   ncp$site_id <- "3799900018810101"
   ncpt <-
-    terra::vect(ncp, geom = c("lon", "lat"),
-                keepgeom = TRUE, crs = "EPSG:4326")
+    terra::vect(ncp, geom = c("lon", "lat"), keepgeom = TRUE, crs = "EPSG:4326")
   nc <- system.file("gpkg/nc.gpkg", package = "sf")
   nc <- terra::vect(nc)
   nc <- terra::project(nc, "EPSG:4326")
