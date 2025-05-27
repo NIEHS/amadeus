@@ -47,10 +47,13 @@
 <url><loc>https://niehs.github.io/amadeus/reference/check_mysftime.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/check_url_status.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/check_urls.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/collapse_nlcd.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/cov.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_aqs.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_cropscape.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_data.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_ecoregion.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/download_edgar.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_epa_certificate.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_geos.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_gmted.html</loc></url>
@@ -82,6 +85,7 @@
 <url><loc>https://niehs.github.io/amadeus/reference/generate_date_sequence.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/generate_time_sequence.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/index.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/interactive.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/is_date_proper.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/narr_variable.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/process_aqs.html</loc></url>
@@ -132,6 +136,7 @@
 <url><loc>https://niehs.github.io/amadeus/reference/spatrds_as_sftime.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/spatvector_as_sftime.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/sum_edc.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/test.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/test_download_functions.html</loc></url>
 </urlset>
 
