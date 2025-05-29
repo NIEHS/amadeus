@@ -868,6 +868,24 @@ process_nlcd <-
         ),
         full.names = TRUE
       )
+    if (length(nlcd_file) == 0) {
+      message("No NLCD files detected. Trying deprecated file names...")
+      nlcd_file <-
+        list.files(
+          path,
+          pattern = paste0("nlcd_", year, "_.*.(tif|img)$"),
+          full.names = TRUE
+        )
+      if (length(nlcd_file > 1)) {
+        message(
+          paste0(
+            "Deprecated file paths detected. Data still imported, but ",
+            "see https://www.mrlc.gov/data/project/annual-nlcd for updated ",
+            "NLCD documentation and availability."
+          )
+        )
+      }
+    }
     # check if name without extension is duplicated
     nlcd_file_base <- basename(nlcd_file)
     nlcd_file_base <- tools::file_path_sans_ext(nlcd_file_base)
@@ -878,6 +896,7 @@ process_nlcd <-
       stop("NLCD data not available for this year.")
     }
     nlcd <- terra::rast(nlcd_file, win = extent)
+    terra::metags(nlcd) <- c(year = year)
     return(nlcd)
   }
 

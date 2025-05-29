@@ -130,6 +130,21 @@ testthat::test_that("process_nlcd", {
   )
 })
 
+testthat::test_that("process_nlcd (deprecated path structure.)", {
+  withr::local_package("terra")
+
+  path_nlcd21 <- testthat::test_path("..", "testdata")
+
+  testthat::expect_message(
+    nlcd21 <- process_nlcd(path = path_nlcd21, year = 2021)
+  )
+  # test with extent cropping
+  testthat::expect_no_error(
+    nlcd19 <- process_nlcd(path = path_nlcd21, year = 2019)
+  )
+  testthat::expect_s4_class(nlcd21, "SpatRaster")
+})
+
 ################################################################################
 ##### calculate_nlcd
 testthat::test_that("calculate_nlcd", {
@@ -370,6 +385,42 @@ testthat::test_that("calculate_nlcd", {
   )
   testthat::expect_true(
     "SpatVector" %in% class(out_points_t)
+  )
+  # point extraction (data frame)
+  testthat::expect_no_error(
+    out_points_df <- calculate_nlcd(
+      locs = eg_data,
+      locs_id = "site_id",
+      from = nlcdras,
+      radius = 0,
+      mode = "exact",
+      geom = FALSE
+    )
+  )
+  # with geometry will have 3 columns
+  testthat::expect_equal(
+    ncol(out_points_df),
+    3
+  )
+  testthat::expect_true(is.data.frame(out_points_df))
+})
+
+
+testthat::test_that("calculate_nlcd (deprecated path stucture)", {
+  withr::local_package("terra")
+
+  point_us1 <- cbind(lon = -114.7, lat = 38.9, site_id = 1)
+  point_us2 <- cbind(lon = -114, lat = 39, site_id = 2)
+  point_ak <- cbind(lon = -155.997, lat = 69.3884, site_id = 3) # alaska
+  point_fr <- cbind(lon = 2.957, lat = 43.976, site_id = 4) # france
+  eg_data <- rbind(point_us1, point_us2, point_ak, point_fr) |>
+    as.data.frame() |>
+    terra::vect(crs = "EPSG:4326")
+
+  path_nlcd <- testthat::test_path("..", "testdata")
+
+  testthat::expect_message(
+    nlcdras <- process_nlcd(path = path_nlcd, year = 2021)
   )
   # point extraction (data frame)
   testthat::expect_no_error(

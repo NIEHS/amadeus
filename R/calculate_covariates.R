@@ -401,7 +401,17 @@ calculate_nlcd <- function(
   locs_vector <- locs_prepared[[1]]
   locs_df <- locs_prepared[[2]]
 
-  year <- as.integer(strsplit(names(from), "_")[[1]][4])
+  # detect new or deprecated file path stucture
+  if (names(from) == "NLCD Land Cover Class") {
+    message(
+      paste0(
+        "Deprecated data format detected. Data still analyzed, but ",
+        "see https://www.mrlc.gov/data/project/annual-nlcd for updated ",
+        "NLCD documentation and availability."
+      )
+    )
+  }
+  year <- as.integer(terra::metags(from)[2, 2])
   stopifnot(year %in% 1985:2023L)
 
   # select points within mainland US and reproject on nlcd crs if necessary
