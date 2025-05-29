@@ -133,16 +133,17 @@ testthat::test_that("process_nlcd", {
 testthat::test_that("process_nlcd (deprecated path structure.)", {
   withr::local_package("terra")
 
-  path_nlcd21 <- testthat::test_path("..", "testdata")
+  path_nlcd <- testthat::test_path("..", "testdata")
 
   testthat::expect_message(
-    nlcd21 <- process_nlcd(path = path_nlcd21, year = 2021)
-  )
-  # test with extent cropping
-  testthat::expect_no_error(
-    nlcd19 <- process_nlcd(path = path_nlcd21, year = 2019)
+    nlcd21 <- process_nlcd(path = path_nlcd, year = 2021)
   )
   testthat::expect_s4_class(nlcd21, "SpatRaster")
+
+  testthat::expect_no_error(
+    nlcd19 <- process_nlcd(path = path_nlcd, year = 2019)
+  )
+  testthat::expect_s4_class(nlcd19, "SpatRaster")
 })
 
 ################################################################################
