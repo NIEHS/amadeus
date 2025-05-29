@@ -130,6 +130,22 @@ testthat::test_that("process_nlcd", {
   )
 })
 
+testthat::test_that("process_nlcd (deprecated path structure.)", {
+  withr::local_package("terra")
+
+  path_nlcd <- testthat::test_path("..", "testdata")
+
+  testthat::expect_message(
+    nlcd21 <- process_nlcd(path = path_nlcd, year = 2021)
+  )
+  testthat::expect_s4_class(nlcd21, "SpatRaster")
+
+  testthat::expect_no_error(
+    nlcd19 <- process_nlcd(path = path_nlcd, year = 2019)
+  )
+  testthat::expect_s4_class(nlcd19, "SpatRaster")
+})
+
 ################################################################################
 ##### calculate_nlcd
 testthat::test_that("calculate_nlcd", {
@@ -388,4 +404,70 @@ testthat::test_that("calculate_nlcd", {
     3
   )
   testthat::expect_true(is.data.frame(out_points_df))
+})
+
+
+testthat::test_that("calculate_nlcd (deprecated path stucture)", {
+  withr::local_package("terra")
+
+  point_us1 <- cbind(lon = -114.7, lat = 38.9, SI = 1)
+  point_us2 <- cbind(lon = -114, lat = 39, SI = 2)
+  point_ak <- cbind(lon = -155.997, lat = 69.3884, SI = 3) # alaska
+  point_fr <- cbind(lon = 2.957, lat = 43.976, SI = 4) # france
+  eg_data <- rbind(point_us1, point_us2, point_ak, point_fr) |>
+    as.data.frame() |>
+    terra::vect(crs = "EPSG:4326")
+
+  path_nlcd <- testthat::test_path("..", "testdata")
+
+  testthat::expect_message(
+    nlcdras <- process_nlcd(path = path_nlcd, year = 2021)
+  )
+  # point extraction (data frame)
+  testthat::expect_no_error(
+    out_points_df <- calculate_nlcd(
+      locs = eg_data,
+      locs_id = "SI",
+      from = nlcdras,
+      radius = 0,
+      mode = "exact",
+      geom = FALSE
+    )
+  )
+  # with geometry will have 3 columns
+  testthat::expect_equal(
+    ncol(out_points_df),
+    3
+  )
+  testthat::expect_true(is.data.frame(out_points_df))
+})
+
+
+testthat::test_that("calculate_nlcd (error for 2 layers)", {
+  withr::local_package("terra")
+
+  point_us1 <- cbind(lon = -114.7, lat = 38.9, SI = 1)
+  point_us2 <- cbind(lon = -114, lat = 39, SI = 2)
+  point_ak <- cbind(lon = -155.997, lat = 69.3884, SI = 3) # alaska
+  point_fr <- cbind(lon = 2.957, lat = 43.976, SI = 4) # france
+  eg_data <- rbind(point_us1, point_us2, point_ak, point_fr) |>
+    as.data.frame() |>
+    terra::vect(crs = "EPSG:4326")
+
+  path_nlcd <- testthat::test_path("..", "testdata", "nlcd")
+
+  testthat::expect_no_error(
+    nlcdras <- process_nlcd(path = path_nlcd, year = 2021)
+  )
+  # point extraction (data frame)
+  testthat::expect_error(
+    calculate_nlcd(
+      locs = eg_data,
+      locs_id = "SI",
+      from = terra::rast(c(nlcdras, nlcdras)),
+      radius = 0,
+      mode = "exact",
+      geom = FALSE
+    )
+  )
 })

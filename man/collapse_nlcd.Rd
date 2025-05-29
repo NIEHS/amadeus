@@ -4,7 +4,12 @@
 \alias{collapse_nlcd}
 \title{Collapse listed NLCD values while filling in NA for sites outside data.}
 \usage{
-collapse_nlcd(data, mode = c("terra", "extract"), locs = NULL)
+collapse_nlcd(
+  data,
+  mode = c("terra", "extract"),
+  locs = NULL,
+  locs_id = "site_id"
+)
 }
 \arguments{
 \item{data}{Buffered values from NLCD data.}
@@ -12,6 +17,8 @@ collapse_nlcd(data, mode = c("terra", "extract"), locs = NULL)
 \item{mode}{"exact" or "terra"}
 
 \item{locs}{extraction locations.}
+
+\item{locs_id}{character(1). Name of unique identifier.}
 }
 \description{
 Collapse listed NLCD values while filling in NA for sites outside data.

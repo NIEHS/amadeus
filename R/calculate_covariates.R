@@ -390,6 +390,16 @@ calculate_nlcd <- function(
     stop("from is not a SpatRaster.")
   }
 
+  # currently only handles 1 year
+  if (terra::nlyr(from) > 1) {
+    stop(
+      paste0(
+        "`from` contains more than one data layer. Current version ",
+        "only processes one year worth of NLCD data."
+      )
+    )
+  }
+
   # prepare locations
   locs_prepared <- amadeus::calc_prepare_locs(
     from = from,
@@ -401,7 +411,17 @@ calculate_nlcd <- function(
   locs_vector <- locs_prepared[[1]]
   locs_df <- locs_prepared[[2]]
 
-  year <- as.integer(strsplit(names(from), "_")[[1]][4])
+  # detect new or deprecated file path stucture
+  if (names(from) == "NLCD Land Cover Class") {
+    message(
+      paste0(
+        "Deprecated data format detected. Data still analyzed, but ",
+        "see https://www.mrlc.gov/data/project/annual-nlcd for updated ",
+        "NLCD documentation and availability."
+      )
+    )
+  }
+  year <- as.integer(terra::metags(from)[2, 2])
   stopifnot(year %in% 1985:2023L)
 
   # select points within mainland US and reproject on nlcd crs if necessary
@@ -456,7 +476,8 @@ calculate_nlcd <- function(
       )
       nlcd_at_bufs_fill <- amadeus::collapse_nlcd(
         data = nlcd_at_bufs,
-        mode = mode
+        mode = mode,
+        locs_id = locs_id
       )
       nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, -seq(1, 2)]
       nlcd_cellcnt <- nlcd_at_bufs_fill[, seq(1, ncol(nlcd_at_bufs_fill), 1)]
@@ -482,11 +503,11 @@ calculate_nlcd <- function(
         },
         seq_len(nrow(bufs_polx))
       )
-
       nlcd_at_bufs_fill <- amadeus::collapse_nlcd(
         data = nlcd_at_bufs,
         mode = mode,
-        locs = bufs_pol
+        locs = bufs_pol,
+        locs_id = locs_id
       )
       # select only the columns of interest
       nlcd_at_buf_names <- names(nlcd_at_bufs_fill)
