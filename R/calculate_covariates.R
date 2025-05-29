@@ -390,6 +390,16 @@ calculate_nlcd <- function(
     stop("from is not a SpatRaster.")
   }
 
+  # currently only handles 1 year
+  if (terra::nlyr(from) > 1) {
+    stop(
+      paste0(
+        "`from` contains more than one data layer. Current version ",
+        "only processes one year worth of NLCD data."
+      )
+    )
+  }
+
   # prepare locations
   locs_prepared <- amadeus::calc_prepare_locs(
     from = from,
