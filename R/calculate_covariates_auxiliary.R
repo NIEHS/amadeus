@@ -23,10 +23,11 @@
 #' @return a data.frame or SpatVector object (depending on `from`)
 #' @export
 calc_setcolumns <- function(
-    from,
-    lag,
-    dataset,
-    locs_id) {
+  from,
+  lag,
+  dataset,
+  locs_id
+) {
   #### check from is data.frame
   stopifnot(class(from) %in% c("data.frame", "SpatVector"))
   #### original names
@@ -67,18 +68,39 @@ calc_setcolumns <- function(
   names_return[level_index] <- "level"
   #### dataset and genre
   datasets <- c(
-    "aqs", "ecoregions", "geos", "gmted", "koppen geiger", "merra2", "modis",
-    "narr", "nlcd", "hms", "groads", "pop", "tri", "nei", "gridmet",
+    "aqs",
+    "ecoregions",
+    "geos",
+    "gmted",
+    "koppen geiger",
+    "merra2",
+    "modis",
+    "narr",
+    "nlcd",
+    "hms",
+    "groads",
+    "pop",
+    "tri",
+    "nei",
+    "gridmet",
     "terraclimate"
   )
   stopifnot(dataset %in% datasets)
   genre <- substr(dataset, 1, 3)
   #### covariates
   cov_index <- which(
-    !(c(names_from %in% c(
-      locs_id, "geometry", "time", "lat", "lon", "level", "description"
+    !(c(
+      names_from %in%
+        c(
+          locs_id,
+          "geometry",
+          "time",
+          "lat",
+          "lon",
+          "level",
+          "description"
+        )
     ))
-    )
   )
   for (c in seq_along(cov_index)) {
     name_covariate <- names_return[cov_index[c]]
@@ -136,11 +158,12 @@ calc_setcolumns <- function(
 #' @keywords internal auxiliary
 #' @export
 calc_message <- function(
-    dataset,
-    variable,
-    time,
-    time_type,
-    level) {
+  dataset,
+  variable,
+  time,
+  time_type,
+  level
+) {
   message_time <- calc_time(time, time_type)
   if (dataset == "skip") {
     return()
@@ -218,17 +241,16 @@ calc_message <- function(
 #' @importFrom terra crs
 #' @export
 calc_prepare_locs <- function(
-    from,
-    locs,
-    locs_id,
-    radius,
-    geom = FALSE) {
+  from,
+  locs,
+  locs_id,
+  radius,
+  geom = FALSE
+) {
   #### check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
   if (!locs_id %in% names(locs)) {
-    stop(sprintf("locs should include columns named %s.\n",
-                 locs_id)
-    )
+    stop(sprintf("locs should include columns named %s.\n", locs_id))
   }
   #### prepare sites
   sites_e <- amadeus::process_locs_vector(
@@ -268,8 +290,9 @@ calc_prepare_locs <- function(
 #' @keywords internal auxiliary
 #' @export
 calc_time <- function(
-    time,
-    format) {
+  time,
+  format
+) {
   if (format == "timeless") {
     return(time)
   } else if (format == "date") {
@@ -360,18 +383,19 @@ calc_check_time <- function(
 #' @keywords internal auxiliary
 #' @export
 calc_worker <- function(
-    dataset,
-    from,
-    locs_vector,
-    locs_df,
-    fun,
-    variable = 1,
-    time,
-    time_type = c("date", "hour", "year", "yearmonth", "timeless"),
-    radius,
-    level = NULL,
-    max_cells = 1e8,
-    ...) {
+  dataset,
+  from,
+  locs_vector,
+  locs_df,
+  fun,
+  variable = 1,
+  time,
+  time_type = c("date", "hour", "year", "yearmonth", "timeless"),
+  radius,
+  level = NULL,
+  max_cells = 1e8,
+  ...
+) {
   #### empty location data.frame
   sites_extracted <- NULL
   time_type <- match.arg(time_type)
@@ -639,8 +663,7 @@ calculate_modis_daily <- function(
     }
   }
   if (!locs_id %in% names(locs)) {
-    stop(sprintf("locs should include columns named %s.\n",
-                 locs_id))
+    stop(sprintf("locs should include columns named %s.\n", locs_id))
   }
 
   extract_with_buffer <- function(
@@ -701,8 +724,7 @@ calculate_modis_daily <- function(
       locs_id = locs_id,
       radius = radius,
       geom = geom
-    )[[2]]
-    )
+    )[[2]])
     # merge
     extracted_merge <- merge(
       locs_geom_id,
@@ -729,18 +751,19 @@ calculate_modis_daily <- function(
 #' @param data Buffered values from NLCD data.
 #' @param mode "exact" or "terra"
 #' @param locs extraction locations.
+#' @param locs_id character(1). Name of unique identifier.
 #' @keywords internal auxiliary
 #' @importFrom collapse rowbind
 #' @export
 collapse_nlcd <- function(
   data,
   mode = c("terra", "extract"),
-  locs = NULL
+  locs = NULL,
+  locs_id = "site_id"
 ) {
   data_nonnull <- Filter(Negate(is.null), data)
   data_rbind <- collapse::rowbind(data_nonnull, fill = TRUE)
   if (mode == "terra") {
-
     # Create a single-row NA data frame with the same structure
     na_row <- data_rbind[1, , drop = FALSE]
     na_row[] <- NA
@@ -750,14 +773,13 @@ collapse_nlcd <- function(
 
     # Combine into a single data frame
     data_filled <- collapse::rowbind(data_na, fill = TRUE)
-
   } else {
     stopifnot(!is.null(locs))
 
-    sites_wdata <- unlist(lapply(data, function(x) x$site_id))
-    sites_missing <- locs$site_id[!locs$site_id %in% sites_wdata]
+    sites_wdata <- unlist(lapply(data, function(x) x[[locs_id]]))
+    sites_missing <- locs[which(!(locs[[locs_id]] %in% sites_wdata))][[locs_id]]
 
-    df_missing <- data.frame(site_id = sites_missing)
+    df_missing <- data.frame(locs_id = sites_missing)
 
     data_filled <- collapse::rowbind(data_rbind, df_missing, fill = TRUE)
   }

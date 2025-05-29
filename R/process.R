@@ -864,7 +864,7 @@ process_nlcd <-
           paste(product_codes, collapse = "|"),
           ")_",
           year,
-          "_.*.tif|img$"
+          "_.*\\.(tif|img)$"
         ),
         full.names = TRUE
       )

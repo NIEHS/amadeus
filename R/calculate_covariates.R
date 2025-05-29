@@ -466,7 +466,8 @@ calculate_nlcd <- function(
       )
       nlcd_at_bufs_fill <- amadeus::collapse_nlcd(
         data = nlcd_at_bufs,
-        mode = mode
+        mode = mode,
+        locs_id = locs_id
       )
       nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, -seq(1, 2)]
       nlcd_cellcnt <- nlcd_at_bufs_fill[, seq(1, ncol(nlcd_at_bufs_fill), 1)]
@@ -496,7 +497,8 @@ calculate_nlcd <- function(
       nlcd_at_bufs_fill <- amadeus::collapse_nlcd(
         data = nlcd_at_bufs,
         mode = mode,
-        locs = bufs_pol
+        locs = bufs_pol,
+        locs_id = locs_id
       )
       # select only the columns of interest
       nlcd_at_buf_names <- names(nlcd_at_bufs_fill)
