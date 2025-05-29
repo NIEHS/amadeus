@@ -777,9 +777,10 @@ collapse_nlcd <- function(
     stopifnot(!is.null(locs))
 
     sites_wdata <- unlist(lapply(data, function(x) x[[locs_id]]))
-    sites_missing <- locs[which(!(locs[[locs_id]] %in% sites_wdata))][[locs_id]]
 
-    df_missing <- data.frame(locs_id = sites_missing)
+    sites_missing <- setdiff(unlist(locs[[locs_id]]), sites_wdata)
+
+    df_missing <- data.frame(setNames(list(sites_missing), locs_id))
 
     data_filled <- collapse::rowbind(data_rbind, df_missing, fill = TRUE)
   }

@@ -410,10 +410,10 @@ testthat::test_that("calculate_nlcd", {
 testthat::test_that("calculate_nlcd (deprecated path stucture)", {
   withr::local_package("terra")
 
-  point_us1 <- cbind(lon = -114.7, lat = 38.9, site_id = 1)
-  point_us2 <- cbind(lon = -114, lat = 39, site_id = 2)
-  point_ak <- cbind(lon = -155.997, lat = 69.3884, site_id = 3) # alaska
-  point_fr <- cbind(lon = 2.957, lat = 43.976, site_id = 4) # france
+  point_us1 <- cbind(lon = -114.7, lat = 38.9, SI = 1)
+  point_us2 <- cbind(lon = -114, lat = 39, SI = 2)
+  point_ak <- cbind(lon = -155.997, lat = 69.3884, SI = 3) # alaska
+  point_fr <- cbind(lon = 2.957, lat = 43.976, SI = 4) # france
   eg_data <- rbind(point_us1, point_us2, point_ak, point_fr) |>
     as.data.frame() |>
     terra::vect(crs = "EPSG:4326")
@@ -427,7 +427,7 @@ testthat::test_that("calculate_nlcd (deprecated path stucture)", {
   testthat::expect_no_error(
     out_points_df <- calculate_nlcd(
       locs = eg_data,
-      locs_id = "site_id",
+      locs_id = "SI",
       from = nlcdras,
       radius = 0,
       mode = "exact",

@@ -493,7 +493,6 @@ calculate_nlcd <- function(
         },
         seq_len(nrow(bufs_polx))
       )
-
       nlcd_at_bufs_fill <- amadeus::collapse_nlcd(
         data = nlcd_at_bufs,
         mode = mode,
