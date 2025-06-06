@@ -11,6 +11,8 @@ download_nlcd(
   acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
   hash = FALSE
 )
 }
@@ -37,6 +39,11 @@ will download all of the requested data files.}
 \item{remove_command}{logical(1).
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
+
+\item{unzip}{logical(1). Unzip zip files. Default is \code{TRUE}.}
+
+\item{remove_zip}{logical(1). Remove zip file from directory_to_download.
+Default is \code{FALSE}.}
 
 \item{hash}{logical(1). By setting \code{TRUE} the function will return
 an \code{rlang::hash_file()} hash character corresponding to the
