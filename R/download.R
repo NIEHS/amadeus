@@ -1433,7 +1433,7 @@ download_narr <- function(
   year <- year[order(year)]
   #### 3. directory setup
   amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <-amadeus:: download_sanitize_path(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### 4. define years and months sequence
   if (any(nchar(year[1]) != 4, nchar(year[2]) != 4)) {
     stop("years should be 4-digit integers.\n")
@@ -1539,6 +1539,9 @@ download_narr <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip file from directory_to_download.
+#'  Default is \code{FALSE}.
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #' an \code{rlang::hash_file()} hash character corresponding to the
 #' downloaded files. Default is \code{FALSE}.
@@ -1570,6 +1573,8 @@ download_nlcd <- function(
   acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
   hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
@@ -1648,6 +1653,17 @@ download_nlcd <- function(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
+  )
+  #### 16. unzip data
+  sapply(
+    download_name,
+    download_unzip,
+    directory_to_unzip = directory_to_save,
+    unzip = unzip
+  )
+  download_remove_zips(
+    remove = remove_zip,
+    download_name = download_name
   )
   return(amadeus::download_hash(hash, directory_to_save))
 }
