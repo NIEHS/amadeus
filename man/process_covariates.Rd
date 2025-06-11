@@ -68,6 +68,7 @@ process_covariates(
 \item \code{\link{process_huc}}: "huc", "HUC"
 \item \code{\link{process_cropscape}}: "cropscape", "cdl"
 \item \code{\link{process_prism}}: "prism", "PRISM"
+\item \code{\link{process_edgar}}: "edgar", "EDGAR"
 }
 }
 \author{
