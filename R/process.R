@@ -3134,7 +3134,7 @@ process_prism <-
     )
     return(prism)
   }
-# nolint start
+
 #' Process EDGAR data
 #' @description
 #' The \code{process_edgar()} function imports and cleans EDGAR inventory
@@ -3253,11 +3253,19 @@ process_edgar <- function(
     }
 
     # Construct standardized layer name
-    layer_name <- paste0(voc_number, sector_matched, "_", year_extracted)
+    layer_name <- paste0(
+      voc_number,
+      gsub("_", "", sector_matched),
+      "_",
+      year_extracted
+    )
     names(data_year) <- layer_name
 
     # Add metadata
-    terra::varnames(data_year) <- paste0(voc_number, sector_matched)
+    terra::varnames(data_year) <- paste0(
+      voc_number,
+      gsub("_", "", sector_matched)
+    )
     terra::longnames(data_year) <- paste(
       gsub("_", " ", layer_name)
     )
@@ -3269,4 +3277,3 @@ process_edgar <- function(
   # Return stacked SpatRaster with layers named according to voc, sector, year
   return(data_full)
 }
-# nolint end

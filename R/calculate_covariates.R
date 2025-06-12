@@ -34,6 +34,7 @@
 #' * \code{\link{calculate_merra2}}: "merra", "MERRA", "merra2", "MERRA2"
 #' * \code{\link{calculate_gridmet}}: "gridMET", "gridmet"
 #' * \code{\link{calculate_terraclimate}}: "terraclimate", "TerraClimate"
+#' #' * \code{\link{calculate_edgar}}: "edgar", "EDGAR"
 #' @return Calculated covariates as a data.frame or SpatVector object
 #' @author Insang Song
 #' @examples
@@ -80,7 +81,8 @@ calculate_covariates <-
       "gridmet",
       "terraclimate",
       "tri",
-      "nei"
+      "nei",
+      "edgar"
     ),
     from,
     locs,
@@ -117,7 +119,8 @@ calculate_covariates <-
       merra = amadeus::calculate_merra2,
       merra2 = amadeus::calculate_merra2,
       gridmet = amadeus::calculate_gridmet,
-      terraclimate = amadeus::calculate_terraclimate
+      terraclimate = amadeus::calculate_terraclimate,
+      edgar = amadeus::calculate_edgar
     )
 
     res_covariate <-
@@ -2587,4 +2590,91 @@ calculate_lagged <- function(
     crs = terra::crs(from)
   )
   return(variables_return)
+}
+#' Calculate EDGAR covariates
+#' @description
+#' Extract EDGAR yearly sector VOC values at point locations. Returns a
+#' \code{data.frame} object containing \code{locs_id} and EDGAR voc variables.
+#' variable column names reflect the VOC number and circular buffer radius.
+#' sector column reflects the sector generating the VOC emissions.
+#' @param from SpatRaster(1). Output from \code{process_edgar()}.
+#' @param locs data.frame. character to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param fun character(1). Function used to summarize multiple raster cells
+#' within sites location buffer (Default = `mean`).
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param ... Placeholders.
+#' @author Mariana Alifa Kassien
+#' @seealso [`process_edgar()`]
+#' @return a data.frame or SpatVector object
+#' @importFrom terra vect
+#' @importFrom terra as.data.frame
+#' @importFrom terra time
+#' @importFrom terra extract
+#' @importFrom terra nlyr
+#' @importFrom terra crs
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_edgar(
+#'   from = edgar, # derived from process_gridmet() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_edgar <- function(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  fun = "mean",
+  geom = FALSE,
+  ...
+) {
+  #### prepare locations list
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### perform extraction
+  sites_extracted <- amadeus::calc_worker(
+    dataset = "edgar",
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
+    fun = fun,
+    variable = 1,
+    level = 2,
+    time = 3,
+    time_type = "year",
+    ...
+  )
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  #### change level column to "sector" name
+  colnames(sites_return)[3] = "sector"
+
+  #### return data.frame
+  return(sites_return)
 }

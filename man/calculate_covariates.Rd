@@ -8,7 +8,7 @@ calculate_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
     "dummies", "gmted", "sedac_groads", "groads", "roads", "ecoregions", "ecoregion",
     "hms", "smoke", "gmted", "narr", "geos", "sedac_population", "population", "nlcd",
-    "merra", "merra2", "gridmet", "terraclimate", "tri", "nei"),
+    "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "edgar"),
   from,
   locs,
   locs_id = "site_id",
@@ -76,6 +76,7 @@ calculate_covariates(
 \item \code{\link{calculate_merra2}}: "merra", "MERRA", "merra2", "MERRA2"
 \item \code{\link{calculate_gridmet}}: "gridMET", "gridmet"
 \item \code{\link{calculate_terraclimate}}: "terraclimate", "TerraClimate"
+#' * \code{\link{calculate_edgar}}: "edgar", "EDGAR"
 }
 }
 \author{
