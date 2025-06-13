@@ -2673,7 +2673,7 @@ calculate_edgar <- function(
     crs = terra::crs(from)
   )
   #### change level column to "sector" name
-  colnames(sites_return)[3] <- "sector"
+  names(sites_return)[3] <- "sector"
 
   #### return data.frame
   return(sites_return)
