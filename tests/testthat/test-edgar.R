@@ -625,3 +625,98 @@ testthat::test_that("process_edgar works with a single year", {
   testthat::expect_s4_class(edgar, "SpatRaster")
   testthat::expect_true(all(grepl("^voc2_BUILDINGS_2018$", names(edgar))))
 })
+################################################################################
+##### calculate_edgar
+testthat::test_that("calculate_edgar", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  radii <- c(0, 1000)
+  site <- data.frame(lon = -96.8601, lat = 32.8201, AMA_SITE_CODE = "481130069")
+  # expect function
+  testthat::expect_true(
+    is.function(calculate_edgar)
+  )
+  for (r in seq_along(radii)) {
+    edgar <-
+      process_edgar(
+        year = c(2018, 2019),
+        voc = 1,
+        sector_voc = c("BUILDINGS", "FUEL_EXPLOITATION"),
+        path = testthat::test_path("..", "testdata", "edgar", "voc")
+      )
+    edgar_covariate <-
+      calculate_edgar(
+        from = edgar,
+        locs = data.table::data.table(site),
+        locs_id = "AMA_SITE_CODE",
+        radius = radii[r]
+      )
+    # set column names
+    edgar_covariate <- calc_setcolumns(
+      from = edgar_covariate,
+      lag = 0,
+      dataset = "edgar",
+      locs_id = "AMA_SITE_CODE"
+    )
+    # expect output is data.frame
+    testthat::expect_true(
+      class(edgar_covariate) == "data.frame"
+    )
+    # expect 4 columns
+    testthat::expect_true(
+      ncol(edgar_covariate) == 4
+    )
+    # expect numeric value
+    testthat::expect_true(
+      class(edgar_covariate[, 4]) == "numeric"
+    )
+  }
+  # with included geometry terra
+  testthat::expect_no_error(
+    edgar_covariate_terra <- calculate_edgar(
+      from = edgar,
+      locs = site,
+      locs_id = "AMA_SITE_CODE",
+      radius = 0,
+      fun = "mean",
+      geom = "terra"
+    )
+  )
+  testthat::expect_equal(
+    ncol(edgar_covariate_terra),
+    4
+  )
+  testthat::expect_true(
+    "SpatVector" %in% class(edgar_covariate_terra)
+  )
+
+  # with included geometry sf
+  testthat::expect_no_error(
+    edgar_covariate_sf <- calculate_edgar(
+      from = edgar,
+      locs = site,
+      locs_id = "AMA_SITE_CODE",
+      radius = 0,
+      fun = "mean",
+      geom = "sf"
+    )
+  )
+  testthat::expect_equal(
+    ncol(edgar_covariate_sf),
+    5
+  )
+  testthat::expect_true(
+    "sf" %in% class(edgar_covariate_sf)
+  )
+
+  testthat::expect_error(
+    calculate_edgar(
+      from = edgar,
+      locs = site,
+      locs_id = "AMA_SITE_CODE",
+      radius = 0,
+      fun = "mean",
+      geom = TRUE
+    )
+  )
+})

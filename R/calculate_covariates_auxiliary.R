@@ -83,7 +83,8 @@ calc_setcolumns <- function(
     "tri",
     "nei",
     "gridmet",
-    "terraclimate"
+    "terraclimate",
+    "edgar"
   )
   stopifnot(dataset %in% datasets)
   genre <- substr(dataset, 1, 3)
@@ -261,7 +262,9 @@ calc_prepare_locs <- function(
   #### site identifiers and geometry
   # check geom
   amadeus::check_geom(geom)
-  if (geom %in% c("sf", "terra")) geom <- TRUE
+  if (geom %in% c("sf", "terra")) {
+    geom <- TRUE
+  }
   if (geom) {
     sites_id <- subset(
       terra::as.data.frame(sites_e, geom = "WKT"),
@@ -675,7 +678,9 @@ calculate_modis_daily <- function(
     maxcells = NULL
   ) {
     # generate buffers
-    if (radius == 0) radius <- 1e-6 # approximately 1 meter in degree
+    if (radius == 0) {
+      radius <- 1e-6
+    } # approximately 1 meter in degree
     bufs <- terra::buffer(points, width = radius, quadsegs = 180L)
     bufs <- terra::project(bufs, terra::crs(surf))
     # extract raster values
