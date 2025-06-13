@@ -3196,7 +3196,7 @@ process_edgar <- function(
   #### check years
   stopifnot(length(year) == 1 | length(year) == 2)
   if (length(year) == 2) {
-    year = seq(year[1], year[2])
+    year <- seq(year[1], year[2])
   }
   #### check for voc
   check_for_null_parameters(mget(ls()))
