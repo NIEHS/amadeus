@@ -2617,13 +2617,6 @@ calculate_lagged <- function(
 #' @importFrom terra extract
 #' @importFrom terra nlyr
 #' @importFrom terra crs
-#' @importFrom dplyr matches
-#' @importFrom dplyr rename
-#' @importFrom dplyr mutate
-#' @importFrom dplyr select
-#' @importFrom tidyr pivot_wider
-#' @importFrom stringr str_extract
-#' @importFrom rlang .data
 #' @examples
 #' ## NOTE: Current function only supports one VOC number in 'from' SpatRaster.
 #' ##       User should process and calculate each VOC number separately.
@@ -2676,25 +2669,36 @@ calculate_edgar <- function(
   )
 
   #### pivot to wide dataframe by sector
-  voc_col <- names(sites_extracted)[4]
-
-  sites_transformed <- sites_extracted |>
-    dplyr::rename(value = dplyr::matches("^voc\\d+_\\d+$")) |>
-    dplyr::mutate(
-      species = stringr::str_extract(voc_col, "^voc\\d+"),
-      radius = stringr::str_extract(voc_col, "\\d+$")
-    ) |>
-    dplyr::mutate(
-      variable = paste0(.data$species, "_", .data$level, "_", .data$radius)
-    ) |>
-    dplyr::select(-.data$level, -.data$species, -.data$radius) |>
-    tidyr::pivot_wider(
-      names_from = .data$variable,
-      values_from = .data$value
-    )
+  voc_col <- names(sites_extracted)[ncol(sites_extracted)]
+  species <- sub("_.*", "", voc_col)
+  radius <- sub(".*_", "", voc_col)
+  # Create the pivot key
+  sites_extracted$variable <- paste0(
+    species,
+    "_",
+    sites_extracted$level,
+    "_",
+    radius
+  )
+  # Rename the VOC value column to 'value' for use in reshape
+  names(sites_extracted)[ncol(sites_extracted) - 1] <- "value"
+  # Drop 'level' column
+  sites_extracted$level <- NULL
+  # reshape to wide format
+  idvar <- names(sites_extracted)[
+    names(sites_extracted) %in% c(locs_id, "time", "geometry")
+  ]
+  sites_wide <- reshape(
+    sites_extracted,
+    idvar = idvar,
+    timevar = "variable",
+    direction = "wide"
+  )
+  # clean up names
+  names(sites_wide) <- sub("^value\\.", "", names(sites_wide))
 
   sites_return <- amadeus::calc_return_locs(
-    covar = sites_transformed,
+    covar = sites_wide,
     POSIXt = FALSE,
     geom = geom,
     crs = terra::crs(from)
