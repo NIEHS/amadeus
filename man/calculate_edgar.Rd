@@ -39,11 +39,12 @@ a data.frame or SpatVector object
 }
 \description{
 Extract EDGAR yearly sector VOC values at point locations. Returns a
-\code{data.frame} object containing \code{locs_id} and EDGAR voc variables.
+\code{data.frame} object containing \code{locs_id} and EDGAR voc variable.
 variable column names reflect the VOC number and circular buffer radius.
-sector column reflects the sector generating the VOC emissions.
 }
 \examples{
+## NOTE: Current function only supports one VOC number in 'from' SpatRaster.
+##       User should process and calculate each VOC number separately.
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
 ##       amount of data which is not included in the package.
 \dontrun{

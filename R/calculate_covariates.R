@@ -2594,9 +2594,8 @@ calculate_lagged <- function(
 #' Calculate EDGAR covariates
 #' @description
 #' Extract EDGAR yearly sector VOC values at point locations. Returns a
-#' \code{data.frame} object containing \code{locs_id} and EDGAR voc variables.
+#' \code{data.frame} object containing \code{locs_id} and EDGAR voc variable.
 #' variable column names reflect the VOC number and circular buffer radius.
-#' sector column reflects the sector generating the VOC emissions.
 #' @param from SpatRaster(1). Output from \code{process_edgar()}.
 #' @param locs data.frame. character to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
@@ -2618,7 +2617,13 @@ calculate_lagged <- function(
 #' @importFrom terra extract
 #' @importFrom terra nlyr
 #' @importFrom terra crs
+#' @importFrom dplyr matches
+#' @importFrom dplyr rename
+#' @importFrom tidyr pivot_wider
+#' @importFrom stringr str_extract
 #' @examples
+#' ## NOTE: Current function only supports one VOC number in 'from' SpatRaster.
+#' ##       User should process and calculate each VOC number separately.
 #' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
 #' ##       amount of data which is not included in the package.
 #' \dontrun{
@@ -2666,14 +2671,27 @@ calculate_edgar <- function(
     time_type = "year",
     ...
   )
+
+  #### pivot to wide dataframe by sector
+  sites_transformed <- sites_extracted %>%
+    # Rename VOC column to a generic name for easier manipulation
+    dplyr::rename(value = dplyr::matches("^voc\\d+_\\d+$")) %>%
+    # Extract species and radius from the VOC column name
+    mutate(
+      species = str_extract(names(sites_extracted)[4], "^voc\\d+"),
+      radius = str_extract(names(sites_extracted)[4], "\\d+$"),
+      variable = paste0(species, "_", level, "_", radius)
+    ) %>%
+    # Drop unneeded columns and pivot
+    select(-level, -species, -radius) %>%
+    pivot_wider(names_from = variable, values_from = value)
+
   sites_return <- amadeus::calc_return_locs(
-    covar = sites_extracted,
+    covar = sites_transformed,
     POSIXt = FALSE,
     geom = geom,
     crs = terra::crs(from)
   )
-  #### change level column to "sector" name
-  names(sites_return)[3] <- "sector"
 
   #### return data.frame
   return(sites_return)
