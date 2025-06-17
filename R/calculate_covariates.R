@@ -2678,9 +2678,9 @@ calculate_edgar <- function(
     dplyr::rename(value = dplyr::matches("^voc\\d+_\\d+$")) %>%
     # Extract species and radius from the VOC column name
     mutate(
-      species = str_extract(names(sites_extracted)[4], "^voc\\d+"),
-      radius = str_extract(names(sites_extracted)[4], "\\d+$"),
-      variable = paste0(species, "_", level, "_", radius)
+      species <- str_extract(names(sites_extracted)[4], "^voc\\d+"),
+      radius <- str_extract(names(sites_extracted)[4], "\\d+$"),
+      variable <- paste0(species, "_", level, "_", radius)
     ) %>%
     # Drop unneeded columns and pivot
     select(-level, -species, -radius) %>%
