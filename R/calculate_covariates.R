@@ -2619,8 +2619,11 @@ calculate_lagged <- function(
 #' @importFrom terra crs
 #' @importFrom dplyr matches
 #' @importFrom dplyr rename
+#' @importFrom dplyr mutate
+#' @importFrom dplyr select
 #' @importFrom tidyr pivot_wider
 #' @importFrom stringr str_extract
+#' @importFrom rlang .data
 #' @examples
 #' ## NOTE: Current function only supports one VOC number in 'from' SpatRaster.
 #' ##       User should process and calculate each VOC number separately.
@@ -2673,18 +2676,22 @@ calculate_edgar <- function(
   )
 
   #### pivot to wide dataframe by sector
-  sites_transformed <- sites_extracted %>%
-    # Rename VOC column to a generic name for easier manipulation
-    dplyr::rename(value = dplyr::matches("^voc\\d+_\\d+$")) %>%
-    # Extract species and radius from the VOC column name
-    mutate(
-      species <- str_extract(names(sites_extracted)[4], "^voc\\d+"),
-      radius <- str_extract(names(sites_extracted)[4], "\\d+$"),
-      variable <- paste0(species, "_", level, "_", radius)
-    ) %>%
-    # Drop unneeded columns and pivot
-    select(-level, -species, -radius) %>%
-    pivot_wider(names_from = variable, values_from = value)
+  voc_col <- names(sites_extracted)[4]
+
+  sites_transformed <- sites_extracted |>
+    dplyr::rename(value = dplyr::matches("^voc\\d+_\\d+$")) |>
+    dplyr::mutate(
+      species = stringr::str_extract(voc_col, "^voc\\d+"),
+      radius = stringr::str_extract(voc_col, "\\d+$")
+    ) |>
+    dplyr::mutate(
+      variable = paste0(.data$species, "_", .data$level, "_", .data$radius)
+    ) |>
+    dplyr::select(-.data$level, -.data$species, -.data$radius) |>
+    tidyr::pivot_wider(
+      names_from = .data$variable,
+      values_from = .data$value
+    )
 
   sites_return <- amadeus::calc_return_locs(
     covar = sites_transformed,
