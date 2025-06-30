@@ -233,7 +233,9 @@ download_aqs <-
     #### 2. check for null parameters
     amadeus::check_for_null_parameters(mget(ls()))
     #### check years
-    if (length(year) == 1) year <- c(year, year)
+    if (length(year) == 1) {
+      year <- c(year, year)
+    }
     stopifnot(length(year) == 2)
     year <- year[order(year)]
     #### 3. directory setup
@@ -540,7 +542,9 @@ download_geos <- function(
   #### 2. check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) date <- c(date, date)
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### 3. directory setup
@@ -1092,7 +1096,9 @@ download_merra2 <- function(
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### check dates
-  if (length(date) == 1) date <- c(date, date)
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### check for null parameters
@@ -1428,7 +1434,9 @@ download_narr <- function(
   #### 2. check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
   #### check years
-  if (length(year) == 1) year <- c(year, year)
+  if (length(year) == 1) {
+    year <- c(year, year)
+  }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### 3. directory setup
@@ -2093,7 +2101,9 @@ download_hms <- function(
   #### 2. check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) date <- c(date, date)
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### 3. directory setup
@@ -2510,7 +2520,9 @@ download_modis <- function(
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### check dates
-  if (length(date) == 1) date <- c(date, date)
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
 
@@ -2884,7 +2896,9 @@ download_tri <- function(
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### check years
-  if (length(year) == 1) year <- c(year, year)
+  if (length(year) == 1) {
+    year <- c(year, year)
+  }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### 3. define measurement data paths
@@ -3618,7 +3632,9 @@ download_gridmet <- function(
   #### check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
   #### check years
-  if (length(year) == 1) year <- c(year, year)
+  if (length(year) == 1) {
+    year <- c(year, year)
+  }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### directory setup
@@ -3762,7 +3778,9 @@ download_terraclimate <- function(
   #### check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
   #### check years
-  if (length(year) == 1) year <- c(year, year)
+  if (length(year) == 1) {
+    year <- c(year, year)
+  }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### directory setup
