@@ -35,7 +35,8 @@ testthat::test_that("download_nlcd", {
       directory_to_save = directory_to_save,
       acknowledgement = TRUE,
       download = FALSE,
-      remove_command = FALSE
+      remove_command = FALSE,
+      unzip = FALSE
     )
     # define file path with commands
     commands_path <- paste0(
