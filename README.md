@@ -10,6 +10,11 @@
 
 `amadeus` is **a** **m**ech**a**nism for **d**ata, **e**nvironments, and **u**ser **s**etup for common environmental and climate health datasets in R. `amadeus` has been developed to improve access to and utility with large scale, publicly available environmental data in R.
 
+See the peer-reviewed publication, [Amadeus: Accessing and analyzing large scale environmental data in R](https://www.sciencedirect.com/science/article/pii/S1364815225000362), for full description and details.
+
+Cite `amadeus` as:
+Manware, M., Song, I., Marques, E. S., Kassien, M. A., Clark, L. P., & Messier, K. P. (2025). Amadeus: Accessing and analyzing large scale environmental data in R. Environmental Modelling & Software, 186, 106352.
+
 ## Installation
 
 `amadeus` can be installed from CRAN, or with `pak`.
