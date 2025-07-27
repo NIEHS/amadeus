@@ -472,3 +472,87 @@ testthat::test_that("calculate_nlcd (error for 2 layers)", {
     )
   )
 })
+
+################################################################################
+##### integration for new data version
+testthat::test_that("integration across *_nlcd functions", {
+  withr::local_package("terra")
+  withr::local_package("exactextractr")
+  withr::local_package("sf")
+  withr::local_options(
+    list(sf_use_s2 = FALSE)
+  )
+
+  ##############################################################################
+  # live download
+  directory <- paste0(tempdir(), "/hms/")
+  testthat::expect_no_error(
+    amadeus::download_nlcd(
+      product = "Land Cover",
+      year = 1985,
+      directory_to_save = directory,
+      acknowledgement = TRUE,
+      download = TRUE,
+      hash = TRUE
+    )
+  )
+
+  ##############################################################################
+  # Import
+  testthat::expect_no_error(
+    nlcd_c1v1 <- amadeus::process_nlcd(path = dir, year = 1985)
+  )
+  testthat::expect_identical(terra::metags(nlcd_c1v1)[2, 2], "1985")
+
+  ##############################################################################
+  nc <- terra::project(
+    terra::vect(system.file("shape/nc.shp", package = "sf")),
+    terra::crs(nlcd_c1v1)
+  )
+
+  ##############################################################################
+  mat_nlcd_val <- unique(terra::values(terra::crop(nlcd_c1v1, nc)))
+  testthat::expect_true(NA %in% mat_nlcd_val)
+  testthat::expect_false(NaN %in% mat_nlcd_val)
+
+  ##############################################################################
+  # points have integer values
+  testthat::expect_no_error(
+    df_nlcd_0 <- amadeus::calculate_nlcd(
+      locs = terra::centroids(nc[1:5, ]),
+      locs_id = "NAME",
+      from = nlcd_c1v1,
+      mode = "terra",
+      radius = 0
+    )
+  )
+  testthat::expect_true(all(dim(df_nlcd_0) == c(5, 3)))
+  testthat::expect_true(is.integer(df_nlcd_0[, 3]))
+
+  ##############################################################################
+  # polygons have decimal values
+  testthat::expect_no_error(
+    df_nlcd_1000 <- amadeus::calculate_nlcd(
+      locs = terra::centroids(nc[1:5, ]),
+      locs_id = "NAME",
+      from = nlcd_c1v1,
+      mode = "terra",
+      radius = 1000
+    )
+  )
+  testthat::expect_true(all(dim(df_nlcd_1000) == c(5, 17)))
+  # polygons have proper column names
+  testthat::expect_true(
+    all(
+      as.logical(
+        grep(
+          paste0(
+            "TWATR|TDVOS|TDVLO|TDVMI|TDVHI|TBARN|TDFOR|TEFOR|",
+            "TMFOR|THERB|TPAST|TWDWT|THWEM|TPLNT|TSHRB"
+          ),
+          names(df_nlcd_1000)
+        )
+      )
+    )
+  )
+})
