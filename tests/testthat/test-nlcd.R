@@ -500,7 +500,7 @@ testthat::test_that("integration across *_nlcd functions", {
   ##############################################################################
   # Import
   testthat::expect_no_error(
-    nlcd_c1v1 <- amadeus::process_nlcd(path = dir, year = 1985)
+    nlcd_c1v1 <- amadeus::process_nlcd(path = directory, year = 1985)
   )
   testthat::expect_identical(terra::metags(nlcd_c1v1)[2, 2], "1985")
 
