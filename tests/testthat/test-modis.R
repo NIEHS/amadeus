@@ -19,17 +19,19 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
     date_start <- paste0(years[y], "-06-20")
     date_end <- paste0(years[y], "-06-24")
     # run download function
-    download_data(dataset_name = "modis",
-                  date = c(date_start, date_end),
-                  product = product,
-                  version = version,
-                  horizontal_tiles = horizontal_tiles,
-                  vertical_tiles = vertical_tiles,
-                  nasa_earth_data_token = nasa_earth_data_token,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  remove_command = FALSE)
+    download_data(
+      dataset_name = "modis",
+      date = c(date_start, date_end),
+      product = product,
+      version = version,
+      horizontal_tiles = horizontal_tiles,
+      vertical_tiles = vertical_tiles,
+      nasa_earth_data_token = nasa_earth_data_token,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE
+    )
     # define file path with commands
     commands_path <- paste0(
       directory_to_save,
@@ -47,9 +49,11 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
     # check HTTP URL status
     url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
     # implement unit tests
-    test_download_functions(directory_to_save = directory_to_save,
-                            commands_path = commands_path,
-                            url_status = url_status)
+    test_download_functions(
+      directory_to_save = directory_to_save,
+      commands_path = commands_path,
+      url_status = url_status
+    )
     # remove file with commands after test
     file.remove(commands_path)
   }
@@ -67,17 +71,19 @@ testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
   nasa_earth_data_token <- "tOkEnPlAcEhOlDeR"
   directory_to_save <- paste0(tempdir(), "/mod/")
   date <- "2021-04-12"
-  download_data(dataset_name = "modis",
-                date = date,
-                product = product,
-                version = version,
-                horizontal_tiles = horizontal_tiles,
-                vertical_tiles = vertical_tiles,
-                nasa_earth_data_token = nasa_earth_data_token,
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                download = FALSE,
-                remove_command = FALSE)
+  download_data(
+    dataset_name = "modis",
+    date = date,
+    product = product,
+    version = version,
+    horizontal_tiles = horizontal_tiles,
+    vertical_tiles = vertical_tiles,
+    nasa_earth_data_token = nasa_earth_data_token,
+    directory_to_save = directory_to_save,
+    acknowledgement = TRUE,
+    download = FALSE,
+    remove_command = FALSE
+  )
   # define file path with commands
   commands_path <- paste0(
     directory_to_save,
@@ -95,9 +101,11 @@ testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
@@ -117,47 +125,53 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
   directory_to_save <- paste0(tempdir(), "/mod/")
 
   testthat::expect_error(
-    kax <- download_data(dataset_name = "modis",
-                    date = c(date_start, date_end),
-                    product = product,
-                    version = version,
-                    horizontal_tiles = horizontal_tiles,
-                    vertical_tiles = vertical_tiles,
-                    nasa_earth_data_token = nasa_earth_data_token,
-                    directory_to_save = directory_to_save,
-                    acknowledgement = TRUE,
-                    download = FALSE,
-                    mod06_links = NULL,
-                    remove_command = FALSE)
+    kax <- download_data(
+      dataset_name = "modis",
+      date = c(date_start, date_end),
+      product = product,
+      version = version,
+      horizontal_tiles = horizontal_tiles,
+      vertical_tiles = vertical_tiles,
+      nasa_earth_data_token = nasa_earth_data_token,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      mod06_links = NULL,
+      remove_command = FALSE
+    )
   )
   # link check
   tdir <- tempdir()
   faux_urls <-
     rbind(
-      c(4387858920,
+      c(
+        4387858920,
         paste0(
           "/archive/allData/61/MOD06_L2/2019/049/",
           "MOD06_L2.A2019049.0720.061.2019049194350.hdf"
         ),
-        28267915)
+        28267915
+      )
     )
 
   faux_urls <- data.frame(faux_urls)
   mod06_scenes <- paste0(tdir, "/mod06_example.csv")
   write.csv(faux_urls, mod06_scenes, row.names = FALSE)
 
-  download_data(dataset_name = "modis",
-                  date = c(date_start, date_end),
-                  product = product,
-                  version = version,
-                  horizontal_tiles = horizontal_tiles,
-                  vertical_tiles = vertical_tiles,
-                  nasa_earth_data_token = nasa_earth_data_token,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  mod06_links = mod06_scenes,
-                  remove_command = FALSE)
+  download_data(
+    dataset_name = "modis",
+    date = c(date_start, date_end),
+    product = product,
+    version = version,
+    horizontal_tiles = horizontal_tiles,
+    vertical_tiles = vertical_tiles,
+    nasa_earth_data_token = nasa_earth_data_token,
+    directory_to_save = directory_to_save,
+    acknowledgement = TRUE,
+    download = FALSE,
+    mod06_links = mod06_scenes,
+    remove_command = FALSE
+  )
 
   # define file path with commands
   commands_path <- list.files(
@@ -172,9 +186,11 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
@@ -198,92 +214,104 @@ testthat::test_that("download_modis (expected errors)", {
 
   # no token
   testthat::expect_no_error(
-    download_data(dataset_name = "modis",
-                  date = c(date_start, date_end),
-                  product = product,
-                  version = version,
-                  horizontal_tiles = horizontal_tiles,
-                  vertical_tiles = vertical_tiles,
-                  nasa_earth_data_token = nasa_earth_data_token,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  remove_command = FALSE)
+    download_data(
+      dataset_name = "modis",
+      date = c(date_start, date_end),
+      product = product,
+      version = version,
+      horizontal_tiles = horizontal_tiles,
+      vertical_tiles = vertical_tiles,
+      nasa_earth_data_token = nasa_earth_data_token,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE
+    )
   )
 
   # no token
   testthat::expect_error(
-    download_data(dataset_name = "modis",
-                  date = c(date_start, date_end),
-                  product = product,
-                  version = version,
-                  horizontal_tiles = horizontal_tiles,
-                  vertical_tiles = vertical_tiles,
-                  nasa_earth_data_token = NULL,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  remove_command = FALSE)
+    download_data(
+      dataset_name = "modis",
+      date = c(date_start, date_end),
+      product = product,
+      version = version,
+      horizontal_tiles = horizontal_tiles,
+      vertical_tiles = vertical_tiles,
+      nasa_earth_data_token = NULL,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE
+    )
   )
 
   # year difference between date_start and date_end
   testthat::expect_error(
-    download_data(dataset_name = "modis",
-                  date = c(date_start, "2024-03-28"),
-                  product = "MOD11A1",
-                  version = version,
-                  horizontal_tiles = horizontal_tiles,
-                  vertical_tiles = vertical_tiles,
-                  nasa_earth_data_token = nasa_earth_data_token,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  remove_command = FALSE)
+    download_data(
+      dataset_name = "modis",
+      date = c(date_start, "2024-03-28"),
+      product = "MOD11A1",
+      version = version,
+      horizontal_tiles = horizontal_tiles,
+      vertical_tiles = vertical_tiles,
+      nasa_earth_data_token = nasa_earth_data_token,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE
+    )
   )
 
   # null version
   testthat::expect_error(
-    download_data(dataset_name = "modis",
-                  date = c(date_start, date_end),
-                  product = product,
-                  version = NULL,
-                  horizontal_tiles = horizontal_tiles,
-                  vertical_tiles = vertical_tiles,
-                  nasa_earth_data_token = nasa_earth_data_token,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  remove_command = FALSE)
+    download_data(
+      dataset_name = "modis",
+      date = c(date_start, date_end),
+      product = product,
+      version = NULL,
+      horizontal_tiles = horizontal_tiles,
+      vertical_tiles = vertical_tiles,
+      nasa_earth_data_token = nasa_earth_data_token,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE
+    )
   )
 
   # invalid tile range (horizontal)
   testthat::expect_error(
-    download_data(dataset_name = "modis",
-                  date = c(date_start, date_end),
-                  product = product,
-                  version = "61",
-                  horizontal_tiles = c(-13, -3),
-                  vertical_tiles = vertical_tiles,
-                  nasa_earth_data_token = nasa_earth_data_token,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  remove_command = FALSE)
+    download_data(
+      dataset_name = "modis",
+      date = c(date_start, date_end),
+      product = product,
+      version = "61",
+      horizontal_tiles = c(-13, -3),
+      vertical_tiles = vertical_tiles,
+      nasa_earth_data_token = nasa_earth_data_token,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE
+    )
   )
 
   # invalid tile range (horizontal)
   testthat::expect_error(
-    download_data(dataset_name = "modis",
-                  date = c(date_start, date_end),
-                  product = product,
-                  version = "61",
-                  horizontal_tiles = horizontal_tiles,
-                  vertical_tiles = c(100, 102),
-                  nasa_earth_data_token = nasa_earth_data_token,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  remove_command = FALSE)
+    download_data(
+      dataset_name = "modis",
+      date = c(date_start, date_end),
+      product = product,
+      version = "61",
+      horizontal_tiles = horizontal_tiles,
+      vertical_tiles = c(100, 102),
+      nasa_earth_data_token = nasa_earth_data_token,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE
+    )
   )
 
   # define file path with commands
@@ -303,9 +331,11 @@ testthat::test_that("download_modis (expected errors)", {
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 2L, method = "HEAD")
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
@@ -316,10 +346,26 @@ testthat::test_that("download_modis (MOD + MYD products)", {
   withr::local_package("stringr")
   # function parameters
   products <- c(
-    "MOD09GA", "MYD09GA", "MOD09GQ", "MYD09GQ", "MOD09A1", "MYD09A1",
-    "MOD09Q1", "MYD09Q1", "MOD11A1", "MYD11A1", "MOD11A2", "MYD11A2",
-    "MOD11B1", "MYD11B1", "MOD13A1", "MYD13A1", "MOD13A2", "MYD13A2",
-    "MOD13A3", "MYD13A3"
+    "MOD09GA",
+    "MYD09GA",
+    "MOD09GQ",
+    "MYD09GQ",
+    "MOD09A1",
+    "MYD09A1",
+    "MOD09Q1",
+    "MYD09Q1",
+    "MOD11A1",
+    "MYD11A1",
+    "MOD11A2",
+    "MYD11A2",
+    "MOD11B1",
+    "MYD11B1",
+    "MOD13A1",
+    "MYD13A1",
+    "MOD13A2",
+    "MYD13A2",
+    "MOD13A3",
+    "MYD13A3"
   )
   version <- "61"
   horizontal_tiles <- c(10, 10)
@@ -390,21 +436,22 @@ testthat::test_that("process_modis_sds", {
     mcdtest <- process_modis_sds("MCD19A2")
   )
   testthat::expect_equal(
-    mcdtest, "(Optical_Depth)"
+    mcdtest,
+    "(Optical_Depth)"
   )
   testthat::expect_no_error(
     process_modis_sds("MCD19A2", "(cos|RelAZ|Angle)")
   )
   for (i in 1:3) {
     testthat::expect_equal(
-      process_modis_sds(txt_products[i]), txt_exp_output[i]
+      process_modis_sds(txt_products[i]),
+      txt_exp_output[i]
     )
   }
   testthat::expect_no_error(
     filt_other <- process_modis_sds("ignored", "(cos)")
   )
   testthat::expect_equal(filt_other, "(cos)")
-
 })
 
 
@@ -414,15 +461,21 @@ testthat::test_that("process_flatten_sds", {
   withr::local_options(list(sf_use_s2 = FALSE))
 
   mcd19 <- testthat::test_path(
-    "..", "testdata", "modis", "MCD19A2.A2021227.h11v05.061.2023149160635.hdf"
+    "..",
+    "testdata",
+    "modis",
+    "MCD19A2.A2021227.h11v05.061.2023149160635.hdf"
   )
   mod09 <- testthat::test_path(
-    "..", "testdata", "modis", "MOD09GA.A2021227.h11v05.061.2021229035936.hdf"
+    "..",
+    "testdata",
+    "modis",
+    "MOD09GA.A2021227.h11v05.061.2021229035936.hdf"
   )
 
   # main test: mcd19
   # expect warning for new strict terra/GDAL HDF4 warning
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     mcdaggr <-
       process_flatten_sds(
         path = mcd19,
@@ -440,7 +493,9 @@ testthat::test_that("process_flatten_sds", {
   # flatten error
   path_mod06 <-
     testthat::test_path(
-      "..", "testdata", "modis",
+      "..",
+      "testdata",
+      "modis",
       "MOD06_L2.A2021227.0320.061.2021227134022.hdf"
     )
 
@@ -480,7 +535,7 @@ testthat::test_that("process_modis_merge", {
       "../testdata/modis/",
       "MOD11A1.A2021227.h11v05.061.2021228105320.hdf"
     )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     process_modis_merge(
       path = path_mod11,
       date = "2021-08-15",
@@ -493,7 +548,7 @@ testthat::test_that("process_modis_merge", {
       "../testdata/modis/",
       "MOD13A2.A2021225.h11v05.061.2021320163751.hdf"
     )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     process_modis_merge(
       path = path_mod13,
       date = "2021-08-13",
@@ -507,7 +562,7 @@ testthat::test_that("process_modis_merge", {
       "../testdata/modis/",
       "MCD19A2.A2021227.h11v05.061.2023149160635.hdf"
     )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     process_modis_merge(
       path = path_mcd19,
       date = "2021-08-15",
@@ -521,7 +576,7 @@ testthat::test_that("process_modis_merge", {
       "../testdata/modis/",
       "MOD09GA.A2021227.h11v05.061.2021229035936.hdf"
     )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     process_modis_merge(
       path = path_mod09,
       date = "2021-08-15",
@@ -535,7 +590,7 @@ testthat::test_that("process_modis_merge", {
     pattern = "MOD13A2",
     full.names = TRUE
   )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     process_modis_merge(
       path = paths_mod13,
       date = "2021-08-13",
@@ -550,7 +605,6 @@ testthat::test_that("process_modis_merge", {
       fun_agg = 3L
     )
   )
-
 })
 
 
@@ -600,7 +654,6 @@ testthat::test_that("process_blackmarble*", {
       date = "2018~08~13"
     )
   )
-
 })
 
 
@@ -611,7 +664,9 @@ testthat::test_that("process_modis_warp + process_modis_swath", {
 
   path_mod06 <-
     testthat::test_path(
-      "..", "testdata", "modis",
+      "..",
+      "testdata",
+      "modis",
       "MOD06_L2.A2021227.0320.061.2021227134022.hdf"
     )
   path_mod06 <-
@@ -624,7 +679,9 @@ testthat::test_that("process_modis_warp + process_modis_swath", {
   )
   testthat::expect_s3_class(warped, "stars")
   testthat::expect_equal(
-    unname(stars::st_res(warped)[1]), 0.1, tolerance = 1e-6
+    unname(stars::st_res(warped)[1]),
+    0.1,
+    tolerance = 1e-6
   )
 
   path_mod06s <-
@@ -642,8 +699,6 @@ testthat::test_that("process_modis_warp + process_modis_swath", {
     )
   )
   testthat::expect_s4_class(warped4, "SpatRaster")
-
-
 })
 
 
@@ -653,7 +708,9 @@ testthat::test_that("process_modis (expected errors)", {
   withr::local_options(list(sf_use_s2 = FALSE))
   path_mod06 <-
     testthat::test_path(
-      "..", "testdata", "modis",
+      "..",
+      "testdata",
+      "modis",
       "MOD06_L2.A2021227.0320.061.2021227134022.hdf"
     )
   path_mod06e <-
@@ -713,10 +770,11 @@ testthat::test_that("calculate_modis", {
     )
   site_faux <-
     terra::vect(
-                site_faux,
-                geom = c("lon", "lat"),
-                keepgeom = FALSE,
-                crs = "EPSG:4326")
+      site_faux,
+      geom = c("lon", "lat"),
+      keepgeom = FALSE,
+      crs = "EPSG:4326"
+    )
 
   # case 1: standard mod11a1
   path_mod11 <-
@@ -724,7 +782,7 @@ testthat::test_that("calculate_modis", {
       "../testdata/modis/",
       "MOD11A1.A2021227.h11v05.061.2021228105320.hdf"
     )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     base_mod11 <-
       process_modis_merge(
         path = path_mod11,
@@ -804,16 +862,16 @@ testthat::test_that("calculate_modis", {
 
   # with geometry error
   testthat::expect_error(
-      calculate_modis(
-        from = path_mod11,
-        locs = sf::st_as_sf(site_faux),
-        preprocess = process_modis_merge,
-        package_list_add = c("MASS"),
-        export_list_add = c("aux"),
-        name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
-        subdataset = "(LST_)",
-        geom = TRUE
-      )
+    calculate_modis(
+      from = path_mod11,
+      locs = sf::st_as_sf(site_faux),
+      preprocess = process_modis_merge,
+      package_list_add = c("MASS"),
+      export_list_add = c("aux"),
+      name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
+      subdataset = "(LST_)",
+      geom = TRUE
+    )
   )
 
   # case 2: swath mod06l2
@@ -938,7 +996,6 @@ testthat::test_that("calculate_modis", {
   )
   testthat::expect_s4_class(calc_vnp46_terra, "SpatVector")
 
-
   # with geometry sf
   testthat::expect_no_error(
     suppressWarnings(
@@ -1035,7 +1092,7 @@ testthat::test_that("calculate_modis", {
       "../testdata/modis/",
       "MCD19A2.A2021227.h11v05.061.2023149160635.hdf"
     )
-  testthat::expect_warning(
+  testthat::expect_no_warning(
     mcd_merge <-
       process_modis_merge(
         path = path_mcd19,
@@ -1055,7 +1112,7 @@ testthat::test_that("calculate_modis", {
   )
 
   # test calculate_modis_daily directly with geometry terra
-  testthat::expect_no_error( 
+  testthat::expect_no_error(
     calc_mod_terra <- calculate_modis_daily(
       from = mcd_merge,
       date = "2021-08-15",
@@ -1084,7 +1141,11 @@ testthat::test_that("calculate_modis", {
     calculate_modis(from = site_faux)
   )
   testthat::expect_error(
-    calculate_modis(from = path_mod11, product = "MOD11A1", locs = list(1, 2, 3))
+    calculate_modis(
+      from = path_mod11,
+      product = "MOD11A1",
+      locs = list(1, 2, 3)
+    )
   )
   testthat::expect_error(
     calculate_modis(
@@ -1117,6 +1178,5 @@ testthat::test_that("calculate_modis", {
   )
   testthat::expect_s3_class(flushed, "data.frame")
   testthat::expect_true(unlist(flushed[, 2]) == -99999)
-
 })
 # nolint end

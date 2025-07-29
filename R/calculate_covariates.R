@@ -430,14 +430,15 @@ calculate_nlcd <- function(
   cfpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
   nlcd_classes <- utils::read.csv(cfpath)
 
-  if (radius <= 0 && terra::geomtype(locs) == "points") {
-    message(
-      paste0(
-        "Calculating NLCD Land Cover Class covariates for ",
-        year,
-        "..."
-      )
+  message(
+    paste0(
+      "Calculating NLCD Land Cover Class covariates for ",
+      year,
+      "..."
     )
+  )
+
+  if (radius <= 0 && terra::geomtype(locs) == "points") {
     new_data_vect <- suppressMessages(
       amadeus::calc_worker(
         dataset = "nlcd",
@@ -462,7 +463,7 @@ calculate_nlcd <- function(
     bufs_pol <- terra::buffer(data_vect_b, width = radius)
     if (mode == "terra") {
       # terra mode
-      class_query <- "names"
+      # class_query <- "names"
       # extract land cover class in each buffer
       nlcd_at_bufs <- Map(
         function(i) {
@@ -484,7 +485,7 @@ calculate_nlcd <- function(
       nlcd_cellcnt <- nlcd_cellcnt / rowSums(nlcd_cellcnt, na.rm = TRUE)
       nlcd_at_bufs_fill[, seq(1, ncol(nlcd_at_bufs_fill), 1)] <- nlcd_cellcnt
     } else {
-      class_query <- "value"
+      # class_query <- "value"
       # ratio of each nlcd class per buffer
       bufs_polx <- bufs_pol[terra::ext(from), ] |>
         sf::st_as_sf()
@@ -515,6 +516,7 @@ calculate_nlcd <- function(
         grep("^frac_", nlcd_at_buf_names)
       nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, nlcd_val_cols]
     }
+
     # fill NAs
     nlcd_at_bufs_fill[is.na(nlcd_at_bufs_fill)] <- 0
     # change column names
@@ -527,7 +529,7 @@ calculate_nlcd <- function(
         terra = nlcd_names
       )
     nlcd_names <-
-      nlcd_classes$class[match(nlcd_names, nlcd_classes[[class_query]])]
+      nlcd_classes$class[match(nlcd_names, nlcd_classes$value)]
     new_names <- sprintf("LDU_%s_0_%05d", nlcd_names, radius)
     names(nlcd_at_bufs_fill) <- new_names
 

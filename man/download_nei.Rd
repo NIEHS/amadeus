@@ -25,7 +25,7 @@ for EPA DataCommons. Default is
 \item{certificate_url}{character(1). URL to certificate file. See notes for
 details.}
 
-\item{year}{Available years of NEI data.
+\item{year}{integer(1) Available years of NEI data.
 Default is \code{c(2017L, 2020L)}.}
 
 \item{directory_to_save}{character(1). Directory to save data. Two

@@ -9,7 +9,4 @@ export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 apptainer exec \
   --bind $PWD:/mnt \
   --bind /tmp:/opt/tmp \
-  tests/container/container.sif Rscript -e \
-  ".libPaths(); \
-   library(amadeus); \
-   covr::package_coverage(quiet = FALSE)"
+  container.sif Rscript test-coverage.R

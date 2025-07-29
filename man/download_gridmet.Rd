@@ -19,7 +19,7 @@ download_gridmet(
 for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
 "Energy Release Component" has code "erc").}
 
-\item{year}{character(1 or 2). length of 4. Year or start/end years for downloading data.}
+\item{year}{integer(1 or 2). length of 4. Year or start/end years for downloading data.}
 
 \item{directory_to_save}{character(1). Directory(s) to save downloaded data
 files.}

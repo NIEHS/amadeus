@@ -27,7 +27,7 @@ EPA pollutant parameter code. For details, please refer to
 Name of column containing POC values.
 Currently, no value other than \code{"daily"} works.}
 
-\item{year}{character(1 or 2). length of 4. Year or start/end years for downloading data.}
+\item{year}{integer(1 or 2). length of 4. Year or start/end years for downloading data.}
 
 \item{url_aqs_download}{character(1).
 URL to the AQS pre-generated datasets.}

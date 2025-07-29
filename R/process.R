@@ -895,6 +895,33 @@ process_nlcd <-
     if (length(nlcd_file) == 0) {
       stop("NLCD data not available for this year.")
     }
+    # NLCD C1V1 bug
+    # `.aux.xml` metadata file was causing `NA` values to be read as `NaN`,
+    # corrupting the factor/integer data values when used downstream.
+    # File is hidden with preceding `._` for retention but exlcusion in
+    # metadata definitions.
+    chr_aux_xml_path <- list.files(
+      path,
+      pattern = paste0(
+        "Annual_NLCD_(",
+        paste(product_codes, collapse = "|"),
+        ")_",
+        year,
+        "_.*\\.aux.xml"
+      ),
+      full.names = FALSE
+    )
+    chr_aux_xml_hide <- file.path(
+      amadeus::download_sanitize_path(path),
+      paste0("._", chr_aux_xml_path)
+    )
+    if (length(chr_aux_xml_path) == 1) {
+      message(paste0("Hiding corrupt ", chr_aux_xml_path, " metadata file."))
+      file.rename(
+        file.path(amadeus::download_sanitize_path(path), chr_aux_xml_path),
+        chr_aux_xml_hide
+      )
+    }
     nlcd <- terra::rast(nlcd_file, win = extent)
     terra::metags(nlcd) <- c(year = year)
     return(nlcd)
@@ -1577,7 +1604,9 @@ process_hms <- function(
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) date <- c(date, date)
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### identify file paths
@@ -1916,7 +1945,9 @@ process_narr <- function(
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) date <- c(date, date)
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### identify file paths
@@ -2170,7 +2201,9 @@ process_geos <-
     #### check for variable
     amadeus::check_for_null_parameters(mget(ls()))
     #### check dates
-    if (length(date) == 1) date <- c(date, date)
+    if (length(date) == 1) {
+      date <- c(date, date)
+    }
     stopifnot(length(date) == 2)
     date <- date[order(as.Date(date))]
     #### identify file paths
@@ -2369,7 +2402,9 @@ process_merra2 <-
     #### check for variable
     amadeus::check_for_null_parameters(mget(ls()))
     #### check dates
-    if (length(date) == 1) date <- c(date, date)
+    if (length(date) == 1) {
+      date <- c(date, date)
+    }
     stopifnot(length(date) == 2)
     date <- date[order(as.Date(date))]
     #### identify file paths
@@ -2559,7 +2594,9 @@ process_gridmet <- function(
   #### directory setup
   path <- amadeus::download_sanitize_path(path)
   #### check dates
-  if (length(date) == 1) date <- c(date, date)
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### check for variable
@@ -2733,7 +2770,9 @@ process_terraclimate <- function(
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) date <- c(date, date)
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   variable_checked <- amadeus::process_variable_codes(

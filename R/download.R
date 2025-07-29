@@ -171,7 +171,7 @@ download_data <-
 #'  Currently, no value other than `"daily"` works.
 #' @param url_aqs_download character(1).
 #'  URL to the AQS pre-generated datasets.
-#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
+#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
 #' and the unzipped data files ("/data_files").
@@ -233,7 +233,9 @@ download_aqs <-
     #### 2. check for null parameters
     amadeus::check_for_null_parameters(mget(ls()))
     #### check years
-    if (length(year) == 1) year <- c(year, year)
+    if (length(year) == 1) {
+      year <- c(year, year)
+    }
     stopifnot(length(year) == 2)
     year <- year[order(year)]
     #### 3. directory setup
@@ -540,7 +542,9 @@ download_geos <- function(
   #### 2. check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) date <- c(date, date)
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### 3. directory setup
@@ -1092,7 +1096,9 @@ download_merra2 <- function(
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### check dates
-  if (length(date) == 1) date <- c(date, date)
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### check for null parameters
@@ -1376,7 +1382,7 @@ download_merra2 <- function(
 #' @note "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
 #' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
-#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
+#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -1428,12 +1434,14 @@ download_narr <- function(
   #### 2. check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
   #### check years
-  if (length(year) == 1) year <- c(year, year)
+  if (length(year) == 1) {
+    year <- c(year, year)
+  }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### 3. directory setup
   amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <-amadeus:: download_sanitize_path(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### 4. define years and months sequence
   if (any(nchar(year[1]) != 4, nchar(year[2]) != 4)) {
     stop("years should be 4-digit integers.\n")
@@ -1539,6 +1547,9 @@ download_narr <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip files from directory_to_download.
+#' Default is \code{FALSE}.
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #' an \code{rlang::hash_file()} hash character corresponding to the
 #' downloaded files. Default is \code{FALSE}.
@@ -1570,6 +1581,8 @@ download_nlcd <- function(
   acknowledgement = FALSE,
   download = FALSE,
   remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
   hash = FALSE
 ) {
   #### 1. check for data download acknowledgement
@@ -1605,7 +1618,7 @@ download_nlcd <- function(
     collection_code,
     "_",
     year,
-    "_CU_C1V0.tif"
+    "_CU_C1V1.zip"
   )
   #### 9. build download file name
   download_name <- paste0(
@@ -1614,7 +1627,7 @@ download_nlcd <- function(
     collection_code,
     "_",
     year,
-    "_CU_C1V0.tif"
+    "_CU_C1V1.zip"
   )
   #### 10. build system command
   download_command <- paste0(
@@ -1648,6 +1661,17 @@ download_nlcd <- function(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
+  )
+  #### 16. end if unzip == FALSE
+  amadeus::download_unzip(
+    file_name = download_name,
+    directory_to_unzip = directory_to_save,
+    unzip = unzip
+  )
+  #### 18. remove zip files
+  amadeus::download_remove_zips(
+    remove = remove_zip,
+    download_name = download_name
   )
   return(amadeus::download_hash(hash, directory_to_save))
 }
@@ -2077,7 +2101,9 @@ download_hms <- function(
   #### 2. check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) date <- c(date, date)
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### 3. directory setup
@@ -2494,7 +2520,9 @@ download_modis <- function(
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### check dates
-  if (length(date) == 1) date <- c(date, date)
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
 
@@ -2820,7 +2848,7 @@ download_modis <- function(
 #' Download toxic release data
 #' @description
 #' The \code{download_tri()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-action-0).
-#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
+#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
 # nolint end
 #' @param directory_to_save character(1). Directory to download files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -2868,7 +2896,9 @@ download_tri <- function(
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### check years
-  if (length(year) == 1) year <- c(year, year)
+  if (length(year) == 1) {
+    year <- c(year, year)
+  }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### 3. define measurement data paths
@@ -2933,7 +2963,7 @@ download_tri <- function(
 #' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
 #' @param certificate_url character(1). URL to certificate file. See notes for
 #' details.
-#' @param year Available years of NEI data.
+#' @param year integer(1) Available years of NEI data.
 #' Default is \code{c(2017L, 2020L)}.
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
@@ -3551,7 +3581,7 @@ download_prism <- function(
 #' @param variables character(1). Variable(s) name(s). See [gridMET Generate Wget File](https://www.climatologylab.org/wget-gridmet.html)
 #' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
 #' "Energy Release Component" has code "erc").
-#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
+#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -3602,7 +3632,9 @@ download_gridmet <- function(
   #### check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
   #### check years
-  if (length(year) == 1) year <- c(year, year)
+  if (length(year) == 1) {
+    year <- c(year, year)
+  }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### directory setup
@@ -3695,7 +3727,7 @@ download_gridmet <- function(
 #' The \code{download_terraclimate} function accesses and downloads climate and water balance data from the [University of California Merced Climatology Lab's TerraClimate dataset](https://www.climatologylab.org/terraclimate.html).
 #' @param variables character(1). Variable(s) name(s). See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
 #' for variable names and acronym codes.
-#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
+#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -3746,7 +3778,9 @@ download_terraclimate <- function(
   #### check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
   #### check years
-  if (length(year) == 1) year <- c(year, year)
+  if (length(year) == 1) {
+    year <- c(year, year)
+  }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   #### directory setup
