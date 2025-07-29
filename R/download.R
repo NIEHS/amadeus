@@ -171,7 +171,7 @@ download_data <-
 #'  Currently, no value other than `"daily"` works.
 #' @param url_aqs_download character(1).
 #'  URL to the AQS pre-generated datasets.
-#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
+#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
 #' and the unzipped data files ("/data_files").
@@ -1382,7 +1382,7 @@ download_merra2 <- function(
 #' @note "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
 #' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
-#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
+#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -2848,7 +2848,7 @@ download_modis <- function(
 #' Download toxic release data
 #' @description
 #' The \code{download_tri()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-action-0).
-#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
+#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
 # nolint end
 #' @param directory_to_save character(1). Directory to download files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -2963,7 +2963,7 @@ download_tri <- function(
 #' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
 #' @param certificate_url character(1). URL to certificate file. See notes for
 #' details.
-#' @param year Available years of NEI data.
+#' @param year integer(1) Available years of NEI data.
 #' Default is \code{c(2017L, 2020L)}.
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
@@ -3581,7 +3581,7 @@ download_prism <- function(
 #' @param variables character(1). Variable(s) name(s). See [gridMET Generate Wget File](https://www.climatologylab.org/wget-gridmet.html)
 #' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
 #' "Energy Release Component" has code "erc").
-#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
+#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -3727,7 +3727,7 @@ download_gridmet <- function(
 #' The \code{download_terraclimate} function accesses and downloads climate and water balance data from the [University of California Merced Climatology Lab's TerraClimate dataset](https://www.climatologylab.org/terraclimate.html).
 #' @param variables character(1). Variable(s) name(s). See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
 #' for variable names and acronym codes.
-#' @param year character(1 or 2). length of 4. Year or start/end years for downloading data.
+#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory(s) to save downloaded data
 #' files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
