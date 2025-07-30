@@ -14,22 +14,26 @@ testthat::test_that("download_hms (no errors)", {
   data_formats <- c("Shapefile", "KML")
   for (d in seq_along(data_formats)) {
     # run download function
-    download_data(dataset_name = "smoke",
-                  date = c(date_start, date_end),
-                  data_format = data_formats[d],
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  remove_command = FALSE,
-                  unzip = FALSE,
-                  remove_zip = FALSE)
+    download_data(
+      dataset_name = "smoke",
+      date = c(date_start, date_end),
+      data_format = data_formats[d],
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE,
+      unzip = FALSE,
+      remove_zip = FALSE
+    )
     # define file path with commands
-    commands_path <- paste0(download_sanitize_path(directory_to_save),
-                            "hms_smoke_",
-                            gsub("-", "", date_start),
-                            "_",
-                            gsub("-", "", date_end),
-                            "_curl_commands.txt")
+    commands_path <- paste0(
+      download_sanitize_path(directory_to_save),
+      "hms_smoke_",
+      gsub("-", "", date_start),
+      "_",
+      gsub("-", "", date_end),
+      "_curl_commands.txt"
+    )
     # expect sub-directories to be created
     if (data_formats[d] == "Shapefile") {
       expected_folders <- 3
@@ -39,9 +43,11 @@ testthat::test_that("download_hms (no errors)", {
     testthat::expect_true(
       length(
         list.files(
-          directory_to_save, include.dirs = TRUE
-          )
-        ) == expected_folders
+          directory_to_save,
+          include.dirs = TRUE
+        )
+      ) ==
+        expected_folders
     )
     # import commands
     commands <- read_commands(commands_path = commands_path)
@@ -50,9 +56,11 @@ testthat::test_that("download_hms (no errors)", {
     # check HTTP URL status
     url_status <- check_urls(urls = urls, size = 10L, method = "HEAD")
     # implement unit tests
-    test_download_functions(directory_to_save = directory_to_save,
-                            commands_path = commands_path,
-                            url_status = url_status)
+    test_download_functions(
+      directory_to_save = directory_to_save,
+      commands_path = commands_path,
+      url_status = url_status
+    )
     # remove file with commands after test
     file.remove(commands_path)
     # remove temporary hms
@@ -68,6 +76,18 @@ testthat::test_that("download_hms (expected errors)", {
       acknowledgement = TRUE,
       directory_to_save = error_directory,
       unzip = FALSE,
+      remove_zip = TRUE
+    )
+  )
+
+  old_date <- "2005-05-01"
+  testthat::expect_error(
+    download_data(
+      dataset_name = "hms",
+      date = old_date,
+      acknowledgement = TRUE,
+      directory_to_save = error_directory,
+      unzip = TRUE,
       remove_zip = TRUE
     )
   )
@@ -303,9 +323,11 @@ testthat::test_that("calculate_hms (with geometry)", {
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
   hms_dir <- testthat::test_path(
-    "..", "testdata", "hms"
+    "..",
+    "testdata",
+    "hms"
   )
-  hms <-  process_hms(
+  hms <- process_hms(
     date = c("2022-06-10", "2022-06-13"),
     path = hms_dir
   )
@@ -318,10 +340,12 @@ testthat::test_that("calculate_hms (with geometry)", {
   )
   # with geometry will have 5 columns
   testthat::expect_equal(
-    ncol(hms_covariate_terra), 5
+    ncol(hms_covariate_terra),
+    5
   )
   testthat::expect_s4_class(
-    hms_covariate_terra, "SpatVector"
+    hms_covariate_terra,
+    "SpatVector"
   )
   hms_covariate_sf <- calculate_hms(
     from = hms,
@@ -332,7 +356,8 @@ testthat::test_that("calculate_hms (with geometry)", {
   )
   # with geometry will have 6 columns
   testthat::expect_equal(
-    ncol(hms_covariate_sf), 6
+    ncol(hms_covariate_sf),
+    6
   )
   testthat::expect_true("sf" %in% class(hms_covariate_sf))
 
