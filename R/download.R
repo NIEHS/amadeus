@@ -2036,6 +2036,8 @@ download_population <- function(
 #' @param data_format character(1). "Shapefile" or "KML".
 #' @param date character(1 or 2). length of 10. Date or start/end dates for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
+#' NOAA HMS data is available from August 5, 2005 through present day. Data is
+#' unavailable for August 10, 2005.
 #' @param directory_to_save character(1). Directory to save data. If
 #' `data_format = "Shapefile"`, two sub-directories will be created for the
 #' downloaded zip files ("/zip_files") and the unzipped shapefiles
@@ -2106,6 +2108,9 @@ download_hms <- function(
   }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
+  if (as.Date(date[1]) < as.Date("2005-08-05")) {
+    stop("NOAA HMS wildfire smoke data begins at August 05, 2005.")
+  }
   #### 3. directory setup
   directory_original <- amadeus::download_sanitize_path(directory_to_save)
   directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
