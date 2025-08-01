@@ -91,6 +91,18 @@ testthat::test_that("download_hms (expected errors)", {
       remove_zip = TRUE
     )
   )
+
+  future_date <- "2041-05-01"
+  testthat::expect_error(
+    download_data(
+      dataset_name = "hms",
+      date = future_date,
+      acknowledgement = TRUE,
+      directory_to_save = error_directory,
+      unzip = TRUE,
+      remove_zip = TRUE
+    )
+  )
   unlink(error_directory, recursive = TRUE)
 })
 
