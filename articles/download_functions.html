@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -927,6 +927,9 @@ retained.</p>
 <span><span class="co">#&gt;     }</span></span>
 <span><span class="co">#&gt;     stopifnot(length(date) == 2)</span></span>
 <span><span class="co">#&gt;     date &lt;- date[order(as.Date(date))]</span></span>
+<span><span class="co">#&gt;     if (as.Date(date[1]) &lt; as.Date("2005-08-05")) {</span></span>
+<span><span class="co">#&gt;         stop("NOAA HMS wildfire smoke data begins at August 05, 2005.")</span></span>
+<span><span class="co">#&gt;     }</span></span>
 <span><span class="co">#&gt;     directory_original &lt;- amadeus::download_sanitize_path(directory_to_save)</span></span>
 <span><span class="co">#&gt;     directories &lt;- amadeus::download_setup_dir(directory_original, </span></span>
 <span><span class="co">#&gt;         zip = TRUE)</span></span>
@@ -991,7 +994,7 @@ retained.</p>
 <span><span class="co">#&gt;     amadeus::download_remove_zips(remove = remove_zip, download_name = download_names)</span></span>
 <span><span class="co">#&gt;     return(amadeus::download_hash(hash, directory_to_save))</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x5607562c9e68&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x562ed140bc80&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:amadeus&gt;</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
