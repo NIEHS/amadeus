@@ -86,4 +86,4 @@ calculate_modis_daily(
 \author{
 Insang Song
 }
-\keyword{auxiliary}
+\keyword{internal}
