@@ -32,20 +32,20 @@ pak::pak("NIEHS/amadeus")
 
 | Data Source | File Type | Data Genre | Spatial Extent | Function Suffix |
 | :---- | :-- | :--- | :--- | :--- |
-| [Climatology Lab TerraClimate](https://www.climatologylab.org/terraclimate.html) | netCDF | Meteorology | Global | \code{_terraclimate} |
-| [Climatology Lab GridMet](https://www.climatologylab.org/gridmet.html) | netCDF | Climate<br>Water | Contiguous United States | \code{_gridmet} |
-| [Köppen-Geiger Climate Classification](https://www.nature.com/articles/sdata2018214) | GeoTIFF | Climate Classification | Global | \code{_koppen_geiger} |
-| [MRLC[^1] Consortium National Land Cover Database (NLCD)](https://www.mrlc.gov/data) | GeoTIFF | Land Use | United States | \code{_nlcd} |
-| [NASA[^2] Moderate Resolution Imaging Spectroradiometer (MODIS)](https://modis.gsfc.nasa.gov/data/) | HDF | Atmosphere<br>Meteorology<br>Land Use<br>Satellite | Global | \code{_modis} |
-| [NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://www.nature.com/articles/sdata2018214) | netCDF | Atmosphere<br>Meteorology | Global | \code{_merra2} |
-| [NASA SEDAC[^3] UN WPP-Adjusted Population Density](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11) | GeoTIFF<br>netCDF | Population | Global | \code{_population} |
-| [NASA SEDAC Global Roads Open Access Data Set](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00) | Shapefile<br>Geodatabase | Roadways | Global | \code{_groads} |
-| [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere<br>Meteorology | Global | \code{_geos} |
-| [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#about) | Shapefile<br>KML | Wildfire Smoke | North America | \code{_hms} |
-| [NOAA NCEP[^4] North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) | netCDF | Atmosphere<br>Meteorology | North America | \code{_narr} |
-| [US EPA[^5] Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV | Air Pollution | United States | \code{_aqs} |
-| [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregions) | Shapefile | Climate Regions | North America | \code{_ecoregions} |
-| [US EPA National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories) | CSV | Emissions | United States | \code{_nei} |
+| [Climatology Lab TerraClimate](https://www.climatologylab.org/terraclimate.html) | netCDF | Meteorology | Global | `_terraclimate` |
+| [Climatology Lab GridMet](https://www.climatologylab.org/gridmet.html) | netCDF | Climate<br>Water | Contiguous United States | `_gridmet` |
+| [Köppen-Geiger Climate Classification](https://www.nature.com/articles/sdata2018214) | GeoTIFF | Climate Classification | Global | `_koppen_geiger` |
+| [MRLC[^1] Consortium National Land Cover Database (NLCD)](https://www.mrlc.gov/data) | GeoTIFF | Land Use | United States | `_nlcd` |
+| [NASA[^2] Moderate Resolution Imaging Spectroradiometer (MODIS)](https://modis.gsfc.nasa.gov/data/) | HDF | Atmosphere<br>Meteorology<br>Land Use<br>Satellite | Global | `_modis` |
+| [NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://www.nature.com/articles/sdata2018214) | netCDF | Atmosphere<br>Meteorology | Global | `_merra2` |
+| [NASA SEDAC[^3] UN WPP-Adjusted Population Density](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11) | GeoTIFF<br>netCDF | Population | Global | `_population` |
+| [NASA SEDAC Global Roads Open Access Data Set](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00) | Shapefile<br>Geodatabase | Roadways | Global | `_groads` |
+| [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere<br>Meteorology | Global | `_geos` |
+| [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#about) | Shapefile<br>KML | Wildfire Smoke | North America | `_hms` |
+| [NOAA NCEP[^4] North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) | netCDF | Atmosphere<br>Meteorology | North America | `_narr` |
+| [US EPA[^5] Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV | Air Pollution | United States | `_aqs` |
+| [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregions) | Shapefile | Climate Regions | North America | `_ecoregions` |
+| [US EPA National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories) | CSV | Emissions | United States | `_nei` |
 | [US EPA Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present) | CSV | Chemicals<br>Pollution | United States | `_tri` |
 | [USGS[^6] Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation | Global | `_gmted` |
 
