@@ -33,7 +33,7 @@ From: rocker/geospatial:latest
 
     # Install R packages
     Rscript -e "install.packages(c('pak', 'rstac', 'testthat', 'covr', 'nanonext'))"
-    Rscript -e "install.packages('terra')"
+    Rscript -e "install.packages(c('terra', 'tigris'))"
     Rscript -e "pak::pak('NIEHS/amadeus')"
 
 %environment

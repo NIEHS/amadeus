@@ -1,0 +1,178 @@
+---
+title: "Moderate Resolution Imaging Spectroradiometer (MODIS)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{NASA Moderate Resolution Imaging Spectroradiometer (MODIS)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "`r Sys.Date()`"
+author: "Mitchell Manware"
+---
+
+```{r setup, include = FALSE}
+# packages
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ""
+)
+library(amadeus)
+```
+
+This vignette demonstrates how to download, process, and calculate covariates from the NASA's Moderate Resolution Imaging Spectroradiometer (MODIS) products using `amadeus` functions.
+Examples are provided for the `MOD11A1` (land surface temperature), `MOD06_L2` (clouds 5-m L2 swath), and `VNP46A2` (VIIRS nightime lights) products.
+The messages returned by `amadeus` functions have been omitted for brevity.
+
+### MODIS Grids
+MODIS product data files are separated based on tile grid numbers.
+To download data for a specific geographic area, users must first identify which tile grids correspond to the area of interest.
+The area of interest for these vignettes will be the contiguous United States, corresponding to horizontal tiles 7 to 13 and vertical tiles 3 to 6.
+See [MODIS Grids](https://modis-land.gsfc.nasa.gov/MODLAND_grid.html) for further details.
+
+### NASA Earthdata Token
+To download NASA MODIS files, users must first register for a NASA EarthData account and generate a user-specific token.
+For instructions, see the [Protected Data Sources](https://niehs.github.io/amadeus/articles/protected_datasets.html) vignette.
+
+### MOD11A1 - Land Surface Temperature
+The [MOD11A1](https://www.earthdata.nasa.gov/data/catalog/lpcloud-mod11a1-061) product provides daily, global land surface temperature (LST) estimates at 1km resolution.
+
+Downloaded data files are Hierarchical Data Format (HDF), with the extension `.hdf`
+
+* `dataset_name = "modis"`: MODIS dataset name.
+* `version =  "61"`: Version 6.1 (most recent release as of 08/07/2025).
+* `horizontal_tiles = c(7, 13)`: Horizontal sinusoidal tiles.
+* `vertical_tiles = c(3, 6)`: Vertical sinusoidal tiles.
+* `date = c("2019-09-01", "2019-09-02")`: Dates of interest.
+* `nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN")`: User-specific NASA credentials.
+* `directory_to_save = dir`: directory to save the downloaded files.
+* `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
+* `download = TRUE`: download the data files.
+* `remove_command = TRUE`: remove the temporary command file used to download the data.
+* `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
+
+```{r, message = FALSE}
+dir <- file.path(tempdir(), "modis")
+amadeus::download_data(
+  dataset_name = "modis",
+  product = "MOD11A1",
+  horizontal_tiles = c(7, 13),
+  vertical_tiles = c(3, 6),
+  date = c("2019-09-01", "2019-09-02"),
+  nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+  directory_to_save = dir,
+  acknowledge = TRUE,
+  download = TRUE,
+  remove_command = TRUE,
+  hash = TRUE
+)
+```
+
+Check that the downloaded files correspond to the requested tiles and dates.
+
+```{r}
+list.files(dir, recursive = TRUE)
+```
+
+Unlike other `amadeus`-supported datasets, **users do not need to directly call the `process_modis_merge` function.**
+This function is passed to the `calculate_covariates` function based on the `preprocess` parameter.
+Within `calculate_covariates,` the `process_modis_merge` function imports the downloaded files and merges them according to their tile position.
+
+Check the available layers from the product.
+The first file is used to identify the available layers.
+
+```{r}
+terra::describe(
+  list.files(dir, full.names = TRUE, recursive = TRUE)[1],
+  sds = TRUE
+)$var
+```
+
+For the example, we are interested in the `LST_Day_1km` variable for daytime land surface temperature.
+
+Process, inspect, and plot the LST data from September 01, 2019.
+**Note**, when calling `process_modis_merge` directly, users can only process one day per function call.
+
+```{r}
+rast_mod11a1 <- amadeus::process_modis_merge(
+  path = list.files(dir, full.names = TRUE, recursive = TRUE),
+  date = "2019-09-01",
+  subdataset = "LST_Day_1km"
+)
+rast_mod11a1
+```
+
+```{r}
+terra::plot(rast_mod11a1$LST_Day_1km)
+```
+
+The raw LST values need to be scaled according to the scale factor, in this case 0.02, and converted from Kelvin to Celsius for interpretation (see [https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf]).
+**It is crucial that users read the technical documentation of the MODIS product which they are using to apply the appropriate scale factor.**
+
+```{r}
+rast_mod11a1_c <- rast_mod11a1 * 0.02 - 273.15
+```
+
+As mentioned before, this processing is not part of the `amadeus` workflow for MODIS products.
+To calculate covariates for MODIS products, the preprocess function and layer selections are passed as parameters to `calculate_covariates`.
+The following code will calculate mean LST for Connecticut's counties for September 01 and 02, 2019.
+
+* `dataset_name = "modis"`: MODIS dataset name.
+* `from = list.files(dir, full.names = TRUE, recursive = TRUE)`: MOD11A1 file paths. The dates of data available in these file paths will determine the dates in the output.
+* `locs = tigris::counties("CT", year = 2019, cb = TRUE)`: Connecticut county polygons.
+* `locs_id = "NAME"`: Use `NAME` column for unique county identifiers.
+* `radius = 0L`: Apply 0m buffer to plygons.
+* `preprocess = amadeus::process_modis_merge`: Preprocess `.hdf` files with the merging function.
+* `subdataset = "LST_Day_1km"`: Daytime LST variable code.
+* `name_covariates = "LST_"`: Prefix for column name for calculated covariates.
+* `fun_summary = "mean"`: Calculate `mean` LST.
+* `geom = FALSE`: Do not return with spatial geometries (ie. return as `data.frame`).
+* `scale = "* 0.02 - 273.15"`: Multiply values by 0.02 and subtract 273.15. 
+
+The `scale` parameter is extremely important, as it scales the values from those stored in the `.hdf` files to the scientifically interpretable values.
+The scale factor for each MODIS product can be found in the technical documentation (sometimes called User Guide).
+The scale factor for MOD11A1 is 0.02 (see [https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf] Table 3. The SDSs in the MOD11_L2 product).
+This scale factor converts the values to Kelvin, which are then converted to Celsius with the additional `- 273.15` expression.
+
+```{r, message = FALSE}
+df_mod11a1 <- amadeus::calculate_covariates(
+  dataset_name = "modis",
+  from = list.files(dir, full.names = TRUE, recursive = TRUE),
+  locs = tigris::counties("CT", year = 2019),
+  locs_id = "NAME",
+  radius = 0L,
+  preprocess = amadeus::process_modis_merge,
+  subdataset = "LST_Day_1km",
+  name_covariates = "LST_",
+  fun_summary = "mean",
+  geom = FALSE,
+  scale = "* 0.02 - 273.15"
+)
+```
+
+```{r}
+df_mod11a1
+```
+
+In the `data.frame`, mean LST values for each county are calculated for September 01 and 02, 2019, the same dates originally passed to `download_data`.
+The column containing the mean LST variables is `LST_00000`, which reflects our manually set `name_covariates = "LST_"` prefix **and the buffer radius (padded to 5 digits)**.
+The `LST_00000` column contains LST values in Celsius, per the `scale` parameter.
+
+If we were to calculate mean LST at the centroid of each Connecticut county with a 100m buffer, the covariate column name would be `LST_00100`.
+
+```{r, message = FALSE}
+amadeus::calculate_covariates(
+  dataset_name = "modis",
+  from = list.files(dir, full.names = TRUE, recursive = TRUE),
+  # county centroids
+  locs = sf::st_centroid( # centroids of each county
+    tigris::counties("CT", year = 2019, cb = TRUE)
+  ),
+  locs_id = "NAME",
+  radius = 100L, # 100 meter circular buffer
+  preprocess = amadeus::process_modis_merge,
+  subdataset = "LST_Day_1km",
+  name_covariates = "LST_",
+  fun_summary = "mean",
+  geom = FALSE,
+  scale = "* 0.02 - 273.15"
+)
+```

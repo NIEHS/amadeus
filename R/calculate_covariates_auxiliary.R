@@ -611,6 +611,12 @@ check_geom <- function(geom) {
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' See [`exactextractr::exact_extract`] for details.
+#' @param scale character(1). Scale expression to be applied to the raw values.
+#' It is crucial that users review the technical documentatio of the MODIS product
+#' they are using to ensure proper scale.
+#' An example for the MOD11A1 product's LST_Day_1km variable (land surface temperature)
+#' would be `scale = "* 0.02"`.
+#' Default is `NULL`, which applies no scale.
 #' @param ... Placeholders.
 #' @description The function operates at MODIS/VIIRS products
 #' on a daily basis. Given that the raw hdf files are downloaded from
@@ -656,6 +662,7 @@ calculate_modis_daily <- function(
   fun_summary = "mean",
   max_cells = 3e7,
   geom = FALSE,
+  scale = NULL,
   ...
 ) {
   if (!methods::is(locs, "SpatVector")) {
@@ -700,11 +707,16 @@ calculate_modis_daily <- function(
   ## NaN to NA
   from[is.nan(from)] <- NA
 
+  # apply scale as expression to `from` values
+  chr_scale <- paste0("from ", scale)
+  # Evaluate the scale expression
+  from_scale <- eval(parse(text = chr_scale)[[1]])
+
   # raster used to be vrt_today
   extracted <-
     extract_with_buffer(
       points = locs,
-      surf = from,
+      surf = from_scale,
       id = locs_id,
       radius = radius,
       func = fun_summary,

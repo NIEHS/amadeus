@@ -21,6 +21,8 @@ navbar:
           href: articles/terraclimate_workflow.html
         - text: Climatology Lab GridMET
           href: articles/gridmet_workflow.html
+        - text: NASA Moderate Resolution Imaging Spectroradiometer (MODIS)
+          href: articles/modis_workflow.html
         - text: North American Regional Reanalysis (NARR)
           href: articles/narr_workflow.html
         - text: US EPA Air Quality System (AQS)
@@ -60,5 +62,6 @@ articles:
   - protected_datasets
   - terraclimate_workflow
   - gridmet_workflow
+  - modis_workflow
   - narr_workflow
   - epa_download
