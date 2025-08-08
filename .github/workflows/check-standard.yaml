@@ -35,6 +35,9 @@ jobs:
         run: |
           echo "Token is set: ${EARTHDATA_TOKEN:+yes}"
 
+      - name: Print environment variable (R)
+        run: Rscript -e "Sys.getenv('EARTHDATA_TOKEN')"
+
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2

@@ -1188,13 +1188,14 @@ testthat::test_that("calculate_modis", {
   testthat::expect_true("sf" %in% class(calc_mod_sf))
 
   testthat::expect_error(
-    calculate_modis(from = site_faux)
+    calculate_modis(from = site_faux, scale = "* 1")
   )
   testthat::expect_error(
     calculate_modis(
       from = path_mod11,
       product = "MOD11A1",
-      locs = list(1, 2, 3)
+      locs = list(1, 2, 3),
+      scale = "* 1"
     )
   )
   testthat::expect_error(
@@ -1223,7 +1224,8 @@ testthat::test_that("calculate_modis", {
       name_covariates = c("MOD_NITLT_0_"),
       preprocess = process_blackmarble,
       subdataset = 3L,
-      radius = c(-1000, 0L)
+      radius = c(-1000, 0L),
+      scale = "* 1"
     )
   )
   testthat::expect_s3_class(flushed, "data.frame")
