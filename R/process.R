@@ -225,6 +225,7 @@ process_modis_sds <-
 #' Should be acceptable to [terra::tapp].
 #' @param ... Placeholders.
 #' @return a `SpatRaster` object
+#' @keywords internal
 #' @author Insang Song
 #' @seealso [terra::tapp], [terra::rast], [terra::describe]
 #' @description Some MODIS products consist of multi-layer subdatasets.
@@ -398,6 +399,7 @@ process_modis_merge <- function(
 #' This function generates a `data.frame` of corner coordinates for assignment.
 #' @return `data.frame` with xmin, xmax, ymin, and ymax fields
 #' @author Insang Song
+#' @keywords internal
 #' @references
 #' - [Wang, Z. (2022). Black Marble User Guide (Version 1.3). NASA.](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf)
 #' @examples
@@ -571,6 +573,7 @@ process_blackmarble <- function(
 #' @return a `stars` object
 #' @author Insang Song
 #' @seealso [`terra::rectify`]
+#' @keywords internal
 #' @importFrom stars st_warp
 #' @importFrom stars read_stars
 #' @examples

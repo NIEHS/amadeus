@@ -104,13 +104,6 @@ rast_mod11a1
 terra::plot(rast_mod11a1$LST_Day_1km)
 ```
 
-The raw LST values need to be scaled according to the scale factor, in this case 0.02, and converted from Kelvin to Celsius for interpretation (see [https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf]).
-**It is crucial that users read the technical documentation of the MODIS product which they are using to apply the appropriate scale factor.**
-
-```{r}
-rast_mod11a1_c <- rast_mod11a1 * 0.02 - 273.15
-```
-
 As mentioned before, this processing is not part of the `amadeus` workflow for MODIS products.
 To calculate covariates for MODIS products, the preprocess function and layer selections are passed as parameters to `calculate_covariates`.
 The following code will calculate mean LST for Connecticut's counties for September 01 and 02, 2019.
@@ -127,8 +120,8 @@ The following code will calculate mean LST for Connecticut's counties for Septem
 * `geom = FALSE`: Do not return with spatial geometries (ie. return as `data.frame`).
 * `scale = "* 0.02 - 273.15"`: Multiply values by 0.02 and subtract 273.15. 
 
-The `scale` parameter is extremely important, as it scales the values from those stored in the `.hdf` files to the scientifically interpretable values.
-The scale factor for each MODIS product can be found in the technical documentation (sometimes called User Guide).
+The `scale` parameter is crucial as it scales the values stored in the `.hdf` files to the scientifically interpretable values.
+The scale factor for each MODIS product can be found in the technical documentation (also called User Guide).
 The scale factor for MOD11A1 is 0.02 (see [https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf] Table 3. The SDSs in the MOD11_L2 product).
 This scale factor converts the values to Kelvin, which are then converted to Celsius with the additional `- 273.15` expression.
 

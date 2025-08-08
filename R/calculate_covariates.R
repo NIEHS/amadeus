@@ -807,6 +807,9 @@ calculate_modis <-
 process_modis_swath, or process_blackmarble."
       )
     }
+    if (!is.null(scale)) {
+      stopifnot(is.character(scale))
+    }
     if (is.null(scale)) {
       warning(
         paste0(

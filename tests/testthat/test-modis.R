@@ -764,8 +764,8 @@ testthat::test_that("calculate_modis", {
   site_faux <-
     data.frame(
       site_id = "37999904288101",
-      lon = -78.87,
-      lat = 35.8734,
+      lon = -89.87,
+      lat = 39.8734,
       time = as.Date("2021-08-15")
     )
   site_faux <-
@@ -801,11 +801,16 @@ testthat::test_that("calculate_modis", {
           locs = sf::st_as_sf(site_faux),
           preprocess = process_modis_merge,
           name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
-          subdataset = "(LST_)"
+          subdataset = "(LST_)",
+          scale = NULL
         )
     )
   )
   testthat::expect_s3_class(calc_mod11, "data.frame")
+  # all values are >14000 (unscaled values)
+  testthat::expect_true(
+    all(calc_mod11[, grep("MOD", names(calc_mod11))] > 14000)
+  )
 
   # ... _add arguments test
   aux <- 0L
@@ -819,7 +824,8 @@ testthat::test_that("calculate_modis", {
           package_list_add = c("MASS"),
           export_list_add = c("aux"),
           name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
-          subdataset = "(LST_)"
+          subdataset = "(LST_)",
+          scale = "* 1"
         )
     )
   )
@@ -836,7 +842,8 @@ testthat::test_that("calculate_modis", {
           export_list_add = c("aux"),
           name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
           subdataset = "(LST_)",
-          geom = "terra"
+          geom = "terra",
+          scale = "* 1"
         )
     )
   )
@@ -854,7 +861,8 @@ testthat::test_that("calculate_modis", {
           export_list_add = c("aux"),
           name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
           subdataset = "(LST_)",
-          geom = "sf"
+          geom = "sf",
+          scale = "* 1"
         )
     )
   )
@@ -870,8 +878,47 @@ testthat::test_that("calculate_modis", {
       export_list_add = c("aux"),
       name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
       subdataset = "(LST_)",
-      geom = TRUE
+      geom = TRUE,
+      scale = "* 1"
     )
+  )
+
+  # no error with scale and convert to C
+  testthat::expect_no_error(
+    suppressWarnings(
+      calc_mod11_scale <-
+        calculate_modis(
+          from = path_mod11,
+          locs = sf::st_as_sf(site_faux),
+          preprocess = process_modis_merge,
+          package_list_add = c("MASS"),
+          export_list_add = c("aux"),
+          name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
+          subdataset = "(LST_)",
+          geom = FALSE,
+          scale = "* 0.02 - 273.15"
+        )
+    )
+  )
+  # all values below 27 C (manually inspected) to ensure proper scaled
+  testthat::expect_true(
+    all(calc_mod11_scale[, grep("MOD", names(calc_mod11_scale))] < 27)
+  )
+
+  # warning with scale = NULL
+  testthat::expect_warning(
+    calc_mod11_scalew <-
+      calculate_modis(
+        from = path_mod11,
+        locs = sf::st_as_sf(site_faux),
+        preprocess = process_modis_merge,
+        package_list_add = c("MASS"),
+        export_list_add = c("aux"),
+        name_covariates = c("MOD_LSTNT_0_", "MOD_LSTDY_0_"),
+        subdataset = "(LST_)",
+        geom = FALSE,
+        scale = NULL
+      )
   )
 
   # case 2: swath mod06l2
@@ -990,7 +1037,8 @@ testthat::test_that("calculate_modis", {
           name_covariates = c("MOD_NITLT_0_"),
           subdataset = 3L,
           tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
-          geom = "terra"
+          geom = "terra",
+          scale = "* 1"
         )
     )
   )
@@ -1007,7 +1055,8 @@ testthat::test_that("calculate_modis", {
           name_covariates = c("MOD_NITLT_0_"),
           subdataset = 3L,
           tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
-          geom = "sf"
+          geom = "sf",
+          scale = "* 1"
         )
     )
   )
@@ -1022,7 +1071,8 @@ testthat::test_that("calculate_modis", {
       name_covariates = c("MOD_NITLT_0_"),
       subdataset = 3L,
       tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
-      geom = TRUE
+      geom = TRUE,
+      scale = "* 1"
     )
   )
 
@@ -1178,5 +1228,17 @@ testthat::test_that("calculate_modis", {
   )
   testthat::expect_s3_class(flushed, "data.frame")
   testthat::expect_true(unlist(flushed[, 2]) == -99999)
+
+  testthat::expect_error(
+    calculate_modis(
+      from = path_vnp46,
+      locs = site_faux,
+      name_covariates = c("MOD_NITLT_0_"),
+      preprocess = process_blackmarble,
+      subdataset = 3L,
+      radius = c(-1000, 0L),
+      scale = 0.01
+    )
+  )
 })
 # nolint end
