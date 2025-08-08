@@ -49,6 +49,8 @@ jobs:
         shell: Rscript {0}
         env:
           R_ENVIRON_USER: "${{ github.workspace }}/.Renviron"
+          CURL_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt
+          SSL_CERT_FILE: /etc/ssl/certs/ca-certificates.crt
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'

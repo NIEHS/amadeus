@@ -74,3 +74,5 @@ jobs:
           args: '--no-manual'
         env:
           R_ENVIRON_USER: "${{ github.workspace }}/.Renviron"
+          CURL_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt
+          SSL_CERT_FILE: /etc/ssl/certs/ca-certificates.crt
