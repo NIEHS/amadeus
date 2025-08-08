@@ -66,7 +66,7 @@ jobs:
 
       - name: Make EARTHDATA_TOKEN available during vignette build
         run: |
-          echo "EARTHDATA_TOKEN=${EARTHDATA_TOKEN}" > .Renviron
+          echo "EARTHDATA_TOKEN=${EARTHDATA_TOKEN}" > .Renviron; cat .Renviron
 
       - uses: r-lib/actions/check-r-package@v2
         with:
