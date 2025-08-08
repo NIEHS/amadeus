@@ -28,7 +28,6 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
 
     steps:
       - name: Print environment variable (masked)
@@ -64,15 +63,6 @@ jobs:
             any::rmarkdown
           needs: check
 
-      - name: Make EARTHDATA_TOKEN available during vignette build
-        run: |
-          echo "EARTHDATA_TOKEN=${EARTHDATA_TOKEN}" > .Renviron; cat .Renviron
-
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          args: '--no-manual'
-        env:
-          R_ENVIRON_USER: "${{ github.workspace }}/.Renviron"
-          CURL_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt
-          SSL_CERT_FILE: /etc/ssl/certs/ca-certificates.crt

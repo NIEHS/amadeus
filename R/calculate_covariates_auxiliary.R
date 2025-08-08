@@ -712,6 +712,8 @@ calculate_modis_daily <- function(
   # Evaluate the scale expression
   from_scale <- eval(parse(text = chr_scale)[[1]])
 
+  # from_scale[is.nan(from_scale)] <- NA
+
   # raster used to be vrt_today
   extracted <-
     extract_with_buffer(

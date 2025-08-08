@@ -19,7 +19,6 @@ jobs:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
     permissions:
       contents: write
     steps:
@@ -40,17 +39,11 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
 
-      - name: Export EARTHDATA_TOKEN to .Renviron
-        run: |
-          echo "EARTHDATA_TOKEN=${EARTHDATA_TOKEN}" > ~/.Renviron
-
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
         env:
           R_ENVIRON_USER: "${{ github.workspace }}/.Renviron"
-          CURL_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt
-          SSL_CERT_FILE: /etc/ssl/certs/ca-certificates.crt
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
