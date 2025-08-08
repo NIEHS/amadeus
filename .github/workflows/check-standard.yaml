@@ -28,9 +28,13 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      EARTHDATA_TOKEN: ${{ vars.EARTHDATA_TOKEN }}
+      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
 
     steps:
+      - name: Print environment variable (masked)
+        run: |
+          echo "Token is set: ${EARTHDATA_TOKEN:+yes}"
+
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2

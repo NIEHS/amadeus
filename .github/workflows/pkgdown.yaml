@@ -19,10 +19,14 @@ jobs:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      EARTHDATA_TOKEN: ${{ vars.EARTHDATA_TOKEN }}
+      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
     permissions:
       contents: write
     steps:
+      - name: Print environment variable (masked)
+        run: |
+          echo "Token is set: ${EARTHDATA_TOKEN:+yes}"
+
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
