@@ -146,7 +146,7 @@ Within `calculate_covariates,` the `process_modis_merge` function imports the do
 Check the available layers from the product.
 The first file is used to identify the available layers.
 
-```{r}
+```{r, eval = FALSE}
 terra::describe(
   list.files(dir, full.names = TRUE, recursive = TRUE)[1],
   sds = TRUE
