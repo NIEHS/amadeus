@@ -13,7 +13,7 @@
 See the peer-reviewed publication, [Amadeus: Accessing and analyzing large scale environmental data in R](https://www.sciencedirect.com/science/article/pii/S1364815225000362), for full description and details.
 
 Cite `amadeus` as:
-Manware, M., Song, I., Marques, E. S., Kassien, M. A., Clark, L. P., & Messier, K. P. (2025). Amadeus: Accessing and analyzing large scale environmental data in R. Environmental Modelling & Software, 186, 106352.
+> Manware, M., Song, I., Marques, E. S., Kassien, M. A., Clark, L. P., & Messier, K. P. (2025). Amadeus: Accessing and analyzing large scale environmental data in R. Environmental Modelling & Software, 186, 106352.
 
 ## Installation
 
@@ -30,26 +30,24 @@ pak::pak("NIEHS/amadeus")
 
 `download_data` accesses and downloads raw geospatial data from a variety of open source data repositories. The function is a wrapper that calls source-specific download functions, each of which account for the source's unique combination of URL, file naming conventions, and data types. Download functions cover the following sources:
 
-| Data Source | File Type | Data Genre | Spatial Extent |
-| :---- | :-- | :--- | :--- |
-| [Climatology Lab TerraClimate](https://www.climatologylab.org/terraclimate.html) | netCDF | Meteorology | Global |
-| [Climatology Lab GridMet](https://www.climatologylab.org/gridmet.html) | netCDF | Climate<br>Water | Contiguous United States |
-| [Köppen-Geiger Climate Classification](https://www.nature.com/articles/sdata2018214) | GeoTIFF | Climate Classification | Global |
-| [MRLC[^1] Consortium National Land Cover Database (NLCD)](https://www.mrlc.gov/data) | GeoTIFF | Land Use | United States |
-| [NASA[^2] Moderate Resolution Imaging Spectroradiometer (MODIS)](https://modis.gsfc.nasa.gov/data/) | HDF | Atmosphere<br>Meteorology<br>Land Use<br>Satellite | Global |
-| [NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://www.nature.com/articles/sdata2018214) | netCDF | Atmosphere<br>Meteorology | Global |
-| [NASA SEDAC[^3] UN WPP-Adjusted Population Density](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11) | GeoTIFF<br>netCDF | Population | Global |
-| [NASA SEDAC Global Roads Open Access Data Set](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00) | Shapefile<br>Geodatabase | Roadways | Global |
-| [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere<br>Meteorology | Global |
-| [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#about) | Shapefile<br>KML | Wildfire Smoke | North America |
-| [NOAA NCEP[^4] North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) | netCDF | Atmosphere<br>Meteorology | North America |
-| [Parameter Elevation Regression on Independent Slopes Model (PRISM)](https://elibrary.asabe.org/abstract.asp??JID=3&AID=3101&CID=t2000&v=43&i=6&T=1) | BIL<br>ASCII | Climate | United States |
-| [US EPA[^5] Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV | Air Pollution | United States |
-| [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregions) | Shapefile | Climate Regions | North America |
-| [US EPA National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories) | CSV | Emissions | United States |
-| [US EPA Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present) | CSV | Chemicals<br>Pollution | United States |
-| [USGS[^6] Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation | Global |
-| [USGS National Hydrography Dataset (NHD)](https://www.usgs.gov/national-hydrography) | Geopackage<br>Geodatabase | Hydrography | United States |
+| Data Source | File Type | Data Genre | Spatial Extent | Function Suffix |
+| :---- | :-- | :--- | :--- | :--- |
+| [Climatology Lab TerraClimate](https://www.climatologylab.org/terraclimate.html) | netCDF | Meteorology | Global | `_terraclimate` |
+| [Climatology Lab GridMet](https://www.climatologylab.org/gridmet.html) | netCDF | Climate<br>Water | Contiguous United States | `_gridmet` |
+| [Köppen-Geiger Climate Classification](https://www.nature.com/articles/sdata2018214) | GeoTIFF | Climate Classification | Global | `_koppen_geiger` |
+| [MRLC[^1] Consortium National Land Cover Database (NLCD)](https://www.mrlc.gov/data) | GeoTIFF | Land Use | United States | `_nlcd` |
+| [NASA[^2] Moderate Resolution Imaging Spectroradiometer (MODIS)](https://modis.gsfc.nasa.gov/data/) | HDF | Atmosphere<br>Meteorology<br>Land Use<br>Satellite | Global | `_modis` |
+| [NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://www.nature.com/articles/sdata2018214) | netCDF | Atmosphere<br>Meteorology | Global | `_merra2` |
+| [NASA SEDAC[^3] UN WPP-Adjusted Population Density](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11) | GeoTIFF<br>netCDF | Population | Global | `_population` |
+| [NASA SEDAC Global Roads Open Access Data Set](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00) | Shapefile<br>Geodatabase | Roadways | Global | `_groads` |
+| [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere<br>Meteorology | Global | `_geos` |
+| [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#about) | Shapefile<br>KML | Wildfire Smoke | North America | `_hms` |
+| [NOAA NCEP[^4] North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) | netCDF | Atmosphere<br>Meteorology | North America | `_narr` |
+| [US EPA[^5] Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV | Air Pollution | United States | `_aqs` |
+| [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregions) | Shapefile | Climate Regions | North America | `_ecoregions` |
+| [US EPA National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories) | CSV | Emissions | United States | `_nei` |
+| [US EPA Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present) | CSV | Chemicals<br>Pollution | United States | `_tri` |
+| [USGS[^6] Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation | Global | `_gmted` |
 
 See the "[download_data](https://niehs.github.io/amadeus/articles/download_functions.html)" vignette for a detailed description of source-specific download functions.
 

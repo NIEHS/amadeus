@@ -709,6 +709,12 @@ calculate_ecoregion <-
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param scale character(1). Scale expression to be applied to the raw values.
+#' It is crucial that users review the technical documentatio of the MODIS product
+#' they are using to ensure proper scale.
+#' An example for the MOD11A1 product's LST_Day_1km variable (land surface temperature)
+#' would be `scale = "* 0.02"`.
+#' Default is `NULL`, which applies no scale.
 #' @param ... Arguments passed to `preprocess`.
 # nolint start
 #' @description `calculate_modis` essentially runs [`calculate_modis_daily`] function
@@ -791,6 +797,7 @@ calculate_modis <-
     export_list_add = NULL,
     max_cells = 3e7,
     geom = FALSE,
+    scale = NULL,
     ...
   ) {
     amadeus::check_geom(geom)
@@ -799,6 +806,18 @@ calculate_modis <-
         "preprocess should be one of process_modis_merge,
 process_modis_swath, or process_blackmarble."
       )
+    }
+    if (!is.null(scale)) {
+      stopifnot(is.character(scale))
+    }
+    if (is.null(scale)) {
+      warning(
+        paste0(
+          "`scale` parameter not defined. Review technical documentation ",
+          "to apply proper scale. Calculation proceeding with unscaled values."
+        )
+      )
+      scale <- "* 1"
     }
     # read all arguments
     # nolint start
@@ -908,7 +927,8 @@ process_modis_swath, or process_blackmarble."
                     name_extracted = name_radius,
                     radius = radius[k],
                     max_cells = max_cells,
-                    geom = FALSE
+                    geom = FALSE,
+                    scale = scale
                   )
                 )
               if (inherits(extracted, "try-error")) {

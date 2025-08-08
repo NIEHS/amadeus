@@ -1,0 +1,301 @@
+---
+title: "Moderate Resolution Imaging Spectroradiometer (MODIS)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{NASA Moderate Resolution Imaging Spectroradiometer (MODIS)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "`r Sys.Date()`"
+author: "Mitchell Manware"
+---
+
+```{r setup, include = FALSE}
+# packages
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ""
+)
+library(amadeus)
+```
+
+This vignette demonstrates how to download, process, and calculate covariates from the NASA's Moderate Resolution Imaging Spectroradiometer (MODIS) products using `amadeus` functions.
+Examples are provided for the `MOD11A1` (land surface temperature), `MOD06_L2` (clouds 5-m L2 swath), and `VNP46A2` (VIIRS nightime lights) products.
+The messages returned by `amadeus` functions have been omitted for brevity.
+
+### MODIS Grids
+MODIS product data files are separated based on tile grid numbers.
+To download data for a specific geographic area, users must first identify which tile grids correspond to the area of interest.
+The area of interest for these vignettes will be the contiguous United States, corresponding to horizontal tiles 7 to 13 and vertical tiles 3 to 6.
+See [MODIS Grids](https://modis-land.gsfc.nasa.gov/MODLAND_grid.html) for further details.
+
+### NASA Earthdata Token
+To download NASA MODIS files, users must first register for a NASA EarthData account and generate a user-specific token.
+For instructions, see the [Protected Data Sources](https://niehs.github.io/amadeus/articles/protected_datasets.html) vignette.
+
+### MOD11A1 - Land Surface Temperature
+The [MOD11A1](https://www.earthdata.nasa.gov/data/catalog/lpcloud-mod11a1-061) product provides daily, global land surface temperature (LST) estimates at 1km resolution.
+
+Downloaded data files are Hierarchical Data Format (HDF), with the extension `.hdf`
+
+* `dataset_name = "modis"`: MODIS dataset name.
+* `version =  "61"`: Version 6.1 (most recent release as of 08/07/2025).
+* `horizontal_tiles = c(7, 13)`: Horizontal sinusoidal tiles.
+* `vertical_tiles = c(3, 6)`: Vertical sinusoidal tiles.
+* `date = c("2019-09-01", "2019-09-02")`: Dates of interest.
+* `nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN")`: User-specific NASA credentials.
+* `directory_to_save = dir`: directory to save the downloaded files.
+* `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
+* `download = TRUE`: download the data files.
+* `remove_command = TRUE`: remove the temporary command file used to download the data.
+* `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
+
+```{r, eval = FALSE}
+dir <- file.path(tempdir(), "modis")
+amadeus::download_data(
+  dataset_name = "modis",
+  product = "MOD11A1",
+  horizontal_tiles = c(7, 13),
+  vertical_tiles = c(3, 6),
+  date = c("2019-08-15", "2019-08-16"),
+  nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+  directory_to_save = dir,
+  acknowledge = TRUE,
+  download = TRUE,
+  remove_command = TRUE,
+  hash = TRUE
+)
+```
+
+```{r, echo = FALSE}
+cat("2 / 2 days of data available in the queried dates.
+
+Downloading requested files...
+
+[`wget` DOWNLOAD OUTPUT OMITTED]
+
+Requested files have been downloaded.
+
+Requests were processed.
+
+[1] \"bbbd6812cf686d9dac059a6aab27293d\"
+")
+```
+
+Check that the downloaded files correspond to the requested tiles and dates.
+
+```{r, eval = FALSE}
+list.files(dir, recursive = TRUE)
+```
+
+```{r, echo = FALSE}
+cat(" [1] \"2019/244/MOD11A1.A2019244.h07v03.061.2020359040222.hdf\"
+ [2] \"2019/244/MOD11A1.A2019244.h07v05.061.2020359040223.hdf\"
+ [3] \"2019/244/MOD11A1.A2019244.h07v06.061.2020359040210.hdf\"
+ [4] \"2019/244/MOD11A1.A2019244.h08v03.061.2020359040215.hdf\"
+ [5] \"2019/244/MOD11A1.A2019244.h08v04.061.2020359040147.hdf\"
+ [6] \"2019/244/MOD11A1.A2019244.h08v05.061.2020359040228.hdf\"
+ [7] \"2019/244/MOD11A1.A2019244.h08v06.061.2020359040221.hdf\"
+ [8] \"2019/244/MOD11A1.A2019244.h09v03.061.2020359040130.hdf\"
+ [9] \"2019/244/MOD11A1.A2019244.h09v04.061.2020359040211.hdf\"
+[10] \"2019/244/MOD11A1.A2019244.h09v05.061.2020359040208.hdf\"
+[11] \"2019/244/MOD11A1.A2019244.h09v06.061.2020359040116.hdf\"
+[12] \"2019/244/MOD11A1.A2019244.h10v03.061.2020359040202.hdf\"
+[13] \"2019/244/MOD11A1.A2019244.h10v04.061.2020359040203.hdf\"
+[14] \"2019/244/MOD11A1.A2019244.h10v05.061.2020359040223.hdf\"
+[15] \"2019/244/MOD11A1.A2019244.h10v06.061.2020359040146.hdf\"
+[16] \"2019/244/MOD11A1.A2019244.h11v03.061.2020359040221.hdf\"
+[17] \"2019/244/MOD11A1.A2019244.h11v04.061.2020359040244.hdf\"
+[18] \"2019/244/MOD11A1.A2019244.h11v05.061.2020359040135.hdf\"
+[19] \"2019/244/MOD11A1.A2019244.h11v06.061.2020359040057.hdf\"
+[20] \"2019/244/MOD11A1.A2019244.h12v03.061.2020359040138.hdf\"
+[21] \"2019/244/MOD11A1.A2019244.h12v04.061.2020359040148.hdf\"
+[22] \"2019/244/MOD11A1.A2019244.h12v05.061.2020359040131.hdf\"
+[23] \"2019/244/MOD11A1.A2019244.h13v03.061.2020359040116.hdf\"
+[24] \"2019/244/MOD11A1.A2019244.h13v04.061.2020359040145.hdf\"
+[25] \"2019/245/MOD11A1.A2019245.h07v03.061.2020359055441.hdf\"
+[26] \"2019/245/MOD11A1.A2019245.h07v05.061.2020359055458.hdf\"
+[27] \"2019/245/MOD11A1.A2019245.h07v06.061.2020359055458.hdf\"
+[28] \"2019/245/MOD11A1.A2019245.h08v03.061.2020359055537.hdf\"
+[29] \"2019/245/MOD11A1.A2019245.h08v04.061.2020359055634.hdf\"
+[30] \"2019/245/MOD11A1.A2019245.h08v05.061.2020359055658.hdf\"
+[31] \"2019/245/MOD11A1.A2019245.h08v06.061.2020359055704.hdf\"
+[32] \"2019/245/MOD11A1.A2019245.h09v03.061.2020359055648.hdf\"
+[33] \"2019/245/MOD11A1.A2019245.h09v04.061.2020359055602.hdf\"
+[34] \"2019/245/MOD11A1.A2019245.h09v05.061.2020359055715.hdf\"
+[35] \"2019/245/MOD11A1.A2019245.h09v06.061.2020359055649.hdf\"
+[36] \"2019/245/MOD11A1.A2019245.h10v03.061.2020359055611.hdf\"
+[37] \"2019/245/MOD11A1.A2019245.h10v04.061.2020359055559.hdf\"
+[38] \"2019/245/MOD11A1.A2019245.h10v05.061.2020359055531.hdf\"
+[39] \"2019/245/MOD11A1.A2019245.h10v06.061.2020359055702.hdf\"
+[40] \"2019/245/MOD11A1.A2019245.h11v03.061.2020359055542.hdf\"
+[41] \"2019/245/MOD11A1.A2019245.h11v04.061.2020359055542.hdf\"
+[42] \"2019/245/MOD11A1.A2019245.h11v05.061.2020359055613.hdf\"
+[43] \"2019/245/MOD11A1.A2019245.h11v06.061.2020359055445.hdf\"
+[44] \"2019/245/MOD11A1.A2019245.h12v03.061.2020359055532.hdf\"
+[45] \"2019/245/MOD11A1.A2019245.h12v04.061.2020359055524.hdf\"
+[46] \"2019/245/MOD11A1.A2019245.h12v05.061.2020359055454.hdf\"
+[47] \"2019/245/MOD11A1.A2019245.h13v03.061.2020359055516.hdf\"
+[48] \"2019/245/MOD11A1.A2019245.h13v04.061.2020359055521.hdf\"
+")
+```
+
+Unlike other `amadeus`-supported datasets, **users do not need to directly call the `process_modis_merge` function.**
+This function is passed to the `calculate_covariates` function based on the `preprocess` parameter.
+Within `calculate_covariates,` the `process_modis_merge` function imports the downloaded files and merges them according to their tile position.
+
+Check the available layers from the product.
+The first file is used to identify the available layers.
+
+```{r, eval = FALSE}
+terra::describe(
+  list.files(dir, full.names = TRUE, recursive = TRUE)[1],
+  sds = TRUE
+)$var
+```
+
+```{r, echo = FALSE}
+cat(" [1] \"LST_Day_1km\"     \"QC_Day\"          \"Day_view_time\"   \"Day_view_angl\"
+ [5] \"LST_Night_1km\"   \"QC_Night\"        \"Night_view_time\" \"Night_view_angl\"
+ [9] \"Emis_31\"         \"Emis_32\"         \"Clear_day_cov\"   \"Clear_night_cov\"
+")
+```
+
+For the example, we are interested in the `LST_Day_1km` variable for daytime land surface temperature.
+
+Process, inspect, and plot the LST data from August 15, 2019.
+**Note**, when calling `process_modis_merge` directly, users can only process one day per function call.
+
+```{r, eval = FALSE}
+rast_mod11a1 <- amadeus::process_modis_merge(
+  path = list.files(dir, full.names = TRUE, recursive = TRUE),
+  date = "2019-08-15",
+  subdataset = "LST_Day_1km"
+)
+rast_mod11a1
+```
+
+
+```{r, echo = FALSE}
+cat("class       : SpatRaster
+size        : 4800, 8400, 1  (nrow, ncol, nlyr)
+resolution  : 926.6254, 926.6254  (x, y)
+extent      : -12231456, -4447802, 2223901, 6671703  (xmin, xmax, ymin, ymax)
+coord. ref. : +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs
+source(s)   : memory
+varname     : MOD11A1.A2019244.h07v03.061.2020359040222
+name        : LST_Day_1km
+min value   :       12609
+max value   :       16886
+")
+```
+
+```{r, eval = FALSE}
+terra::plot(rast_mod11a1$LST_Day_1km)
+```
+
+![](images/mod11a1.png){style="display: block; margin-left: auto; margin-right: auto;"}
+
+As mentioned before, this processing is not part of the `amadeus` workflow for MODIS products.
+To calculate covariates for MODIS products, the preprocess function and layer selections are passed as parameters to `calculate_covariates`.
+The following code will calculate mean LST for Connecticut's counties for August 15 and 16, 2019.
+
+* `dataset_name = "modis"`: MODIS dataset name.
+* `from = list.files(dir, full.names = TRUE, recursive = TRUE)`: MOD11A1 file paths. The dates of data available in these file paths will determine the dates in the output.
+* `locs = tigris::counties("CT", year = 2019, cb = TRUE)`: Connecticut county polygons.
+* `locs_id = "NAME"`: Use `NAME` column for unique county identifiers.
+* `radius = 0L`: Apply 0m buffer to plygons.
+* `preprocess = amadeus::process_modis_merge`: Preprocess `.hdf` files with the merging function.
+* `subdataset = "LST_Day_1km"`: Daytime LST variable code.
+* `name_covariates = "LST_"`: Prefix for column name for calculated covariates.
+* `fun_summary = "mean"`: Calculate `mean` LST.
+* `geom = FALSE`: Do not return with spatial geometries (ie. return as `data.frame`).
+* `scale = "* 0.02 - 273.15"`: Multiply values by 0.02 and subtract 273.15. 
+
+The `scale` parameter is crucial as it scales the values stored in the `.hdf` files to the scientifically interpretable values.
+The scale factor for each MODIS product can be found in the technical documentation (also called User Guide).
+The scale factor for MOD11A1 is 0.02 (see [https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf] Table 3. The SDSs in the MOD11_L2 product).
+This scale factor converts the values to Kelvin, which are then converted to Celsius with the additional `- 273.15` expression.
+
+```{r, eval = FALSE}
+df_mod11a1 <- amadeus::calculate_covariates(
+  dataset_name = "modis",
+  from = list.files(dir, full.names = TRUE, recursive = TRUE),
+  locs = tigris::counties("CT", year = 2019),
+  locs_id = "NAME",
+  radius = 0L,
+  preprocess = amadeus::process_modis_merge,
+  subdataset = "LST_Day_1km",
+  name_covariates = "LST_",
+  fun_summary = "mean",
+  geom = FALSE,
+  scale = "* 0.02 - 273.15"
+)
+df_mod11a1
+```
+
+```{r, echo = FALSE}
+cat("         NAME LST_00000       time
+1   Middlesex  28.06504 2019-08-15
+2  New London  27.04361 2019-08-15
+3   New Haven  28.30738 2019-08-15
+4     Tolland  27.73284 2019-08-15
+5    Hartford  28.19241 2019-08-15
+6     Windham  26.81317 2019-08-15
+7   Fairfield  27.98380 2019-08-15
+8  Litchfield  26.95756 2019-08-15
+9   Middlesex  24.12254 2019-08-16
+10 New London  24.15377 2019-08-16
+11  New Haven  25.04651 2019-08-16
+12    Tolland  24.82655 2019-08-16
+13   Hartford  26.15234 2019-08-16
+14    Windham  22.61115 2019-08-16
+15  Fairfield  24.45862 2019-08-16
+16 Litchfield  24.06681 2019-08-16
+")
+```
+
+In the `data.frame`, mean LST values for each county are calculated for August 15 and 16, 2019, the same dates originally passed to `download_data`.
+The column containing the mean LST variables is `LST_00000`, which reflects our manually set `name_covariates = "LST_"` prefix **and the buffer radius (padded to 5 digits)**.
+The `LST_00000` column contains LST values in Celsius, per the `scale` parameter.
+
+If we were to calculate mean LST at the centroid of each Connecticut county with a 100m buffer, the covariate column name would be `LST_00100`.
+
+```{r, eval = FALSE}
+df_mod11a1_centroids <- amadeus::calculate_covariates(
+  dataset_name = "modis",
+  from = list.files(dir, full.names = TRUE, recursive = TRUE),
+  locs = sf::st_centroid( # centroids of each county
+    tigris::counties("CT", year = 2019)
+  ),
+  locs_id = "NAME",
+  radius = 100L, # 100 meter circular buffer
+  preprocess = amadeus::process_modis_merge,
+  subdataset = "LST_Day_1km",
+  name_covariates = "LST_",
+  fun_summary = "mean",
+  geom = FALSE,
+  scale = "* 0.02 - 273.15"
+)
+df_mod11a1_centroids
+```
+
+```{r, echo = FALSE}
+cat("         NAME LST_00100       time
+1   Middlesex  26.19000 2019-08-15
+2  New London  27.40616 2019-08-15
+3   New Haven  32.71462 2019-08-15
+4     Tolland  27.31000 2019-08-15
+5    Hartford  32.75000 2019-08-15
+6     Windham  26.47000 2019-08-15
+7   Fairfield  28.18088 2019-08-15
+8  Litchfield  22.83000 2019-08-15
+9   Middlesex  23.51000 2019-08-16
+10 New London  23.73023 2019-08-16
+11  New Haven  28.45154 2019-08-16
+12    Tolland  25.13000 2019-08-16
+13   Hartford  29.47000 2019-08-16
+14    Windham  24.43000 2019-08-16
+15  Fairfield  22.41000 2019-08-16
+16 Litchfield  21.07516 2019-08-16
+")
+```

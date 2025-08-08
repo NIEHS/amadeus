@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
   
 name: pkgdown
-  
+
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
@@ -22,6 +22,10 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Print environment variable (masked)
+        run: |
+          echo "Token is set: ${EARTHDATA_TOKEN:+yes}"
+
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
@@ -38,6 +42,8 @@ jobs:
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
+        env:
+          R_ENVIRON_USER: "${{ github.workspace }}/.Renviron"
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'

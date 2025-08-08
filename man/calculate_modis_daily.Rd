@@ -14,6 +14,7 @@ calculate_modis_daily(
   fun_summary = "mean",
   max_cells = 3e+07,
   geom = FALSE,
+  scale = NULL,
   ...
 )
 }
@@ -44,6 +45,13 @@ Maximum possible value is \code{2^31 - 1}.}
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}
 See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
+
+\item{scale}{character(1). Scale expression to be applied to the raw values.
+It is crucial that users review the technical documentatio of the MODIS product
+they are using to ensure proper scale.
+An example for the MOD11A1 product's LST_Day_1km variable (land surface temperature)
+would be \code{scale = "* 0.02"}.
+Default is \code{NULL}, which applies no scale.}
 
 \item{...}{Placeholders.}
 }
@@ -86,4 +94,4 @@ calculate_modis_daily(
 \author{
 Insang Song
 }
-\keyword{auxiliary}
+\keyword{internal}

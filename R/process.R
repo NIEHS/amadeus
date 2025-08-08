@@ -225,6 +225,7 @@ process_modis_sds <-
 #' Should be acceptable to [terra::tapp].
 #' @param ... Placeholders.
 #' @return a `SpatRaster` object
+#' @keywords internal
 #' @author Insang Song
 #' @seealso [terra::tapp], [terra::rast], [terra::describe]
 #' @description Some MODIS products consist of multi-layer subdatasets.
@@ -398,6 +399,7 @@ process_modis_merge <- function(
 #' This function generates a `data.frame` of corner coordinates for assignment.
 #' @return `data.frame` with xmin, xmax, ymin, and ymax fields
 #' @author Insang Song
+#' @keywords internal
 #' @references
 #' - [Wang, Z. (2022). Black Marble User Guide (Version 1.3). NASA.](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.3_Sep_2022.pdf)
 #' @examples
@@ -571,6 +573,7 @@ process_blackmarble <- function(
 #' @return a `stars` object
 #' @author Insang Song
 #' @seealso [`terra::rectify`]
+#' @keywords internal
 #' @importFrom stars st_warp
 #' @importFrom stars read_stars
 #' @examples
@@ -2915,248 +2918,3 @@ process_terraclimate <- function(
   #### return SpatRaster
   return(data_return)
 }
-
-
-#' Retrieve Hydrologic Unit Code (HUC) data
-#' @author Insang Song
-#' @param path character. Path to the file or the directory containing HUC data.
-#' @param layer_name character(1). Layer name in the `path`
-#' @param huc_level character(1). Field name of HUC level
-#' @param huc_header character(1). The upper level HUC code header to extract
-#'  lower level HUCs.
-#' @param extent numeric(4) or SpatExtent giving the extent of the raster
-#'   if `NULL` (default), the entire raster is loaded
-#' @param ... Arguments passed to `nhdplusTools::get_huc()`
-#' @return a `SpatVector` object
-#' @seealso [`nhdplusTools::get_huc`]
-#' @importFrom terra vect
-#' @importFrom terra vector_layers
-#' @importFrom rlang inject
-#' @importFrom nhdplusTools get_huc
-#' @examples
-#' ## NOTE: Examples are wrapped in `\dontrun{}` as function requires a large
-#' ##       amount of data which is not included in the package.
-#' \dontrun{
-#' library(terra)
-#' getf <- "WBD_National_GDB.gdb"
-#' # check the layer name to read
-#' terra::vector_layers(getf)
-#' test1 <- process_huc(
-#'   getf,
-#'   layer_name = "WBDHU8",
-#'   huc_level = "huc8"
-#' )
-#' test2 <- process_huc(
-#'   getf,
-#'   layer_name = "WBDHU8",
-#'   huc_level = "huc8"
-#' )
-#' test3 <- process_huc(
-#'   "",
-#'   layer_name = NULL,
-#'   huc_level = NULL,
-#'   huc_header = NULL,
-#'   id = "030202",
-#'   type = "huc06"
-#' )
-#' }
-#' @export
-process_huc <-
-  function(
-    path,
-    layer_name = NULL,
-    huc_level = NULL,
-    huc_header = NULL,
-    extent = NULL,
-    ...
-  ) {
-    # exclude the coverage due to write permission related to memoization
-    #nocov start
-    if (missing(path) || (!file.exists(path) && !dir.exists(path))) {
-      hucpoly <- try(
-        rlang::inject(nhdplusTools::get_huc(!!!list(...)))
-      )
-      if (inherits(hucpoly, "try-error")) {
-        stop("HUC data was not found.")
-      }
-      hucpoly <- terra::vect(hucpoly)
-    }
-    #nocov end
-    if (file.exists(path) || dir.exists(path)) {
-      if (!is.null(huc_header)) {
-        querybase <-
-          sprintf(
-            "SELECT * FROM %s WHERE %s LIKE '%s%%'",
-            layer_name,
-            huc_level,
-            huc_header
-          )
-      } else {
-        querybase <-
-          sprintf("SELECT * FROM %s", layer_name)
-      }
-      if (!layer_name %in% terra::vector_layers(path)) {
-        stop(
-          paste0(
-            "Layer ",
-            layer_name,
-            " not found in ",
-            path
-          )
-        )
-      }
-
-      hucpoly <- try(
-        terra::vect(
-          path,
-          query = querybase,
-          extent = extent
-        )
-      )
-    }
-    return(hucpoly)
-  }
-
-
-#' Process CropScape data
-#' @description
-#' This function imports and cleans raw CropScape data,
-#' returning a single `SpatRaster` object.
-#' @param path character giving CropScape data path
-#' @param year numeric giving the year of CropScape data used
-#' @param extent numeric(4) or SpatExtent giving the extent of the raster
-#'   if `NULL` (default), the entire raster is loaded
-#' @param ... Placeholders.
-#' @description Reads CropScape file of selected `year`.
-#' @return a `SpatRaster` object
-#' @author Insang Song
-#' @importFrom utils read.csv
-#' @importFrom terra rast
-#' @importFrom terra metags
-#' @examples
-#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
-#' ##       amount of data which is not included in the package.
-#' \dontrun{
-#' cropscape <- process_cropscape(
-#'   path = "./data/cropscape_example.tif",
-#'   year = 2020
-#' )
-#' }
-#' @export
-process_cropscape <-
-  function(
-    path = NULL,
-    year = 2021,
-    extent = NULL,
-    ...
-  ) {
-    # check inputs
-    if (!is.character(path) || is.null(path)) {
-      stop("path is not a character.")
-    }
-    if (!is.numeric(year)) {
-      stop("year is not a numeric.")
-    }
-    # open cdl file corresponding to the year
-    if (dir.exists(path)) {
-      cdl_file <-
-        list.files(
-          path,
-          pattern = paste0("cdl_30m_*.*", year, "_*.*.tif$"),
-          full.names = TRUE
-        )
-    } else {
-      cdl_file <- path
-    }
-    cdl <- terra::rast(cdl_file, win = extent)
-    terra::metags(cdl) <- c(year = year)
-    return(cdl)
-  }
-
-
-#' Process PRISM data
-#' @description
-#' This function imports and cleans raw PRISM data,
-#' returning a single `SpatRaster` object.
-#' @param path character giving PRISM data path
-#' Both file and directory path are acceptable.
-#' @param element character(1). PRISM element name
-#' @param time character(1). PRISM time name.
-#' Should be character in length of 2, 4, 6, or 8.
-#' "annual" is acceptable.
-#' @param extent numeric(4) or SpatExtent giving the extent of the raster
-#'   if `NULL` (default), the entire raster is loaded
-#' @param ... Placeholders.
-#' @description Reads time series or 30-year normal PRISM data.
-#' @return a `SpatRaster` object with metadata of time and element.
-#' @seealso [`terra::rast`], [`terra::metags`]
-#' @author Insang Song
-#' @importFrom utils read.csv
-#' @importFrom terra rast
-#' @importFrom terra metags
-#' @examples
-#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
-#' ##       amount of data which is not included in the package.
-#' \dontrun{
-#' prism <- process_prism(
-#'   path = "./data/PRISM_ppt_stable_4kmM3_202104_nc.nc",
-#'   element = "ppt",
-#'   time = "202104"
-#' )
-#' }
-#' @export
-# nolint start
-process_prism <-
-  function(
-    path = NULL,
-    element = NULL,
-    time = NULL,
-    extent = NULL,
-    ...
-  ) {
-    # check inputs
-    if (
-      !element %in%
-        c(
-          "ppt",
-          "tmin",
-          "tmax",
-          "tmean",
-          "tdmean",
-          "vpdmin",
-          "vpdmax",
-          "solslope",
-          "soltotal",
-          "solclear",
-          "soltrans"
-        )
-    ) {
-      stop("element is not a valid PRISM element.")
-    }
-    if (!is.character(path) || is.null(path)) {
-      stop("path is not a character.")
-    }
-    if (!nchar(time) %in% seq(2, 8, 2)) {
-      stop("time does not have valid length.")
-    }
-
-    if (dir.exists(path)) {
-      pattern <- "PRISM_%s*.*_%s_*.*(bil|nc|grib2|asc)$"
-      pattern <- sprintf(pattern, element, time)
-      prism_file <-
-        list.files(
-          path,
-          pattern = pattern,
-          full.names = TRUE
-        )
-    } else {
-      prism_file <- path
-    }
-    prism <- terra::rast(prism_file, win = extent)
-    terra::metags(prism) <- cbind(
-      c("time", "element"),
-      c(time, element)
-    )
-    return(prism)
-  }
-# nolint end

@@ -32,3 +32,4 @@ process_blackmarble_corners(hrange = c(1, 2), vrange = c(1, 2))
 \author{
 Insang Song
 }
+\keyword{internal}

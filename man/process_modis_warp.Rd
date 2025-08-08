@@ -69,3 +69,4 @@ mod06l2_warp <- process_modis_warp(
 \author{
 Insang Song
 }
+\keyword{internal}
