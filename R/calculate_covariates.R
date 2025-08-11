@@ -961,7 +961,7 @@ process_modis_swath, or process_blackmarble."
     if (geom %in% c("sf", "terra")) {
       # merge
       calc_results_return <- merge(
-        locs_input,
+        locs_input[, locs_id],
         calc_results,
         by = locs_id
       )
