@@ -1,4 +1,4 @@
-# amadeus <a href="https://niehs.github.io/amadeus/"><img src="man/figures/logo.svg" align="right" height="139" alt="amadeus website" /></a>
+# amadeus <a href="https://niehs.github.io/amadeus/"><img src="man/figures/logo.svg" align="right" width="168" alt="amadeus website" /></a>
 
 [![R-CMD-check](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/NIEHS/amadeus/actions/workflows/check-standard.yaml)
 [![cov](https://NIEHS.github.io/amadeus/badges/coverage.svg)](https://github.com/NIEHS/amadeus/actions)
@@ -17,7 +17,7 @@ Cite `amadeus` as:
 
 ## Installation
 
-`amadeus` can be installed from CRAN, or with `pak`.
+`amadeus` can be installed from CRAN with `install.packages` or from GitHub with `pak`.
 
 ```r
 install.packages("amadeus")
