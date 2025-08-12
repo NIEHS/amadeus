@@ -2639,7 +2639,10 @@ download_modis <- function(
     # Extract download names from file_url using splitter
     # download_name <- sapply(strsplit(download_url, "/"), `[`, 10)
     download_name <- unlist(
-      lapply(download_url, function(x) strsplit(x, "/")[[1]][8])
+      lapply(
+        download_url,
+        function(x) strsplit(x, "/")[[1]][8]
+      )
     )
 
     # Create directory structure with julian dates
