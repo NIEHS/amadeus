@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Moderate Resolution Imaging Spectroradiometer (MODIS) • amadeus</title>
+<title>NASA Moderate Resolution Imaging Spectroradiometer (MODIS) • amadeus</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Moderate Resolution Imaging Spectroradiometer (MODIS)">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="NASA Moderate Resolution Imaging Spectroradiometer (MODIS)">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +40,7 @@
     <li><a class="dropdown-item" href="../articles/terraclimate_workflow.html">Climatology Lab TerraClimate</a></li>
     <li><a class="dropdown-item" href="../articles/gridmet_workflow.html">Climatology Lab GridMET</a></li>
     <li><a class="dropdown-item" href="../articles/modis_workflow.html">NASA Moderate Resolution Imaging Spectroradiometer (MODIS)</a></li>
-    <li><a class="dropdown-item" href="../articles/narr_workflow.html">North American Regional Reanalysis (NARR)</a></li>
+    <li><a class="dropdown-item" href="../articles/narr_workflow.html">NOAA North American Regional Reanalysis (NARR)</a></li>
     <li><a class="dropdown-item" href="../articles/epa_download.html">US EPA Air Quality System (AQS)</a></li>
   </ul>
 </li>
@@ -62,11 +62,11 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.svg" class="logo" alt=""><h1>Moderate Resolution Imaging Spectroradiometer (MODIS)</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>NASA Moderate Resolution Imaging Spectroradiometer (MODIS)</h1>
                         <h4 data-toc-skip class="author">Mitchell
 Manware</h4>
             
-            <h4 data-toc-skip class="date">2025-08-08</h4>
+            <h4 data-toc-skip class="date">2025-08-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/NIEHS/amadeus/blob/main/vignettes/modis_workflow.Rmd" class="external-link"><code>vignettes/modis_workflow.Rmd</code></a></small>
       <div class="d-none name"><code>modis_workflow.Rmd</code></div>
@@ -101,16 +101,19 @@ see the <a href="https://niehs.github.io/amadeus/articles/protected_datasets.htm
 Data Sources</a> vignette.</p>
 </div>
 <div class="section level3">
-<h3 id="mod11a1---land-surface-temperature">MOD11A1 - Land Surface Temperature<a class="anchor" aria-label="anchor" href="#mod11a1---land-surface-temperature"></a>
+<h3 id="mod11a1---land-surface-temperature-lst">MOD11A1 - Land Surface Temperature (LST)<a class="anchor" aria-label="anchor" href="#mod11a1---land-surface-temperature-lst"></a>
 </h3>
-<p>The <a href="https://www.earthdata.nasa.gov/data/catalog/lpcloud-mod11a1-061" class="external-link">MOD11A1</a>
-product provides daily, global land surface temperature (LST) estimates
-at 1km resolution.</p>
+<p>The <a href="https://www.earthdata.nasa.gov/data/catalog/lpcloud-mod11a1-061" class="external-link">MOD11A1
+- MODIS/Terra Land Surface Temperature/Emissivity Daily L3 Global 1km
+SIN Grid V061</a> product provides daily, global land surface
+temperature (LST) estimates at 1km resolution.</p>
 <p>Downloaded data files are Hierarchical Data Format (HDF), with the
 extension <code>.hdf</code></p>
 <ul>
 <li>
 <code>dataset_name = "modis"</code>: MODIS dataset name.</li>
+<li>
+<code>product = "MOD11A1"</code>: MODIS product name.</li>
 <li>
 <code>version =  "61"</code>: Version 6.1 (most recent release as of
 08/07/2025).</li>
@@ -127,7 +130,7 @@ interest.</li>
 <code>nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN")</code>:
 User-specific NASA credentials.</li>
 <li>
-<code>directory_to_save = dir</code>: directory to save the
+<code>directory_to_save = dir_mod11a1</code>: directory to save the
 downloaded files.</li>
 <li>
 <code>acknowledgement = TRUE</code>: acknowledge that the raw data
@@ -142,15 +145,16 @@ file used to download the data.</li>
 downloaded files.</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"modis"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">dir_mod11a1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"mod11a1"</span><span class="op">)</span></span>
 <span><span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/download_data.html">download_data</a></span><span class="op">(</span></span>
 <span>  dataset_name <span class="op">=</span> <span class="st">"modis"</span>,</span>
 <span>  product <span class="op">=</span> <span class="st">"MOD11A1"</span>,</span>
+<span>  version <span class="op">=</span> <span class="st">"61"</span>,</span>
 <span>  horizontal_tiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">13</span><span class="op">)</span>,</span>
 <span>  vertical_tiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span><span class="op">)</span>,</span>
 <span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2019-08-15"</span>, <span class="st">"2019-08-16"</span><span class="op">)</span>,</span>
 <span>  nasa_earth_data_token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"EARTHDATA_TOKEN"</span><span class="op">)</span>,</span>
-<span>  directory_to_save <span class="op">=</span> <span class="va">dir</span>,</span>
+<span>  directory_to_save <span class="op">=</span> <span class="va">dir_mod11a1</span>,</span>
 <span>  acknowledge <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -170,7 +174,7 @@ Requests were processed.
 <p>Check that the downloaded files correspond to the requested tiles and
 dates.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod11a1</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code> [1] "2019/244/MOD11A1.A2019244.h07v03.061.2020359040222.hdf"
  [2] "2019/244/MOD11A1.A2019244.h07v05.061.2020359040223.hdf"
  [3] "2019/244/MOD11A1.A2019244.h07v06.061.2020359040210.hdf"
@@ -231,7 +235,7 @@ tile position.</p>
 to identify the available layers.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/describe.html" class="external-link">describe</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod11a1</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
 <span>  sds <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span><span class="op">$</span><span class="va">var</span></span></code></pre></div>
 <pre><code> [1] "LST_Day_1km"     "QC_Day"          "Day_view_time"   "Day_view_angl"
@@ -244,7 +248,7 @@ variable for daytime land surface temperature.</p>
 directly, users can only process one day per function call.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rast_mod11a1</span> <span class="op">&lt;-</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/process_modis_merge.html">process_modis_merge</a></span><span class="op">(</span></span>
-<span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod11a1</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  date <span class="op">=</span> <span class="st">"2019-08-15"</span>,</span>
 <span>  subdataset <span class="op">=</span> <span class="st">"LST_Day_1km"</span></span>
 <span><span class="op">)</span></span>
@@ -272,7 +276,7 @@ mean LST for Connecticut’s counties for August 15 and 16, 2019.</p>
 <li>
 <code>dataset_name = "modis"</code>: MODIS dataset name.</li>
 <li>
-<code>from = list.files(dir, full.names = TRUE, recursive = TRUE)</code>:
+<code>from = list.files(dir_mod11a1, full.names = TRUE, recursive = TRUE)</code>:
 MOD11A1 file paths. The dates of data available in these file paths will
 determine the dates in the output.</li>
 <li>
@@ -293,8 +297,7 @@ code.</li>
 <code>name_covariates = "LST_"</code>: Prefix for column name for
 calculated covariates.</li>
 <li>
-<code>fun_summary = "mean"</code>: Calculate <code>mean</code>
-LST.</li>
+<code>fun_summary = "mean"</code>: Calculate mean LST value.</li>
 <li>
 <code>geom = FALSE</code>: Do not return with spatial geometries
 (ie. return as <code>data.frame</code>).</li>
@@ -306,14 +309,14 @@ subtract 273.15.</li>
 stored in the <code>.hdf</code> files to the scientifically
 interpretable values. The scale factor for each MODIS product can be
 found in the technical documentation (also called User Guide). The scale
-factor for MOD11A1 is 0.02 (see [<a href="https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf" class="external-link uri">https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf</a>]
+factor for <code>MOD11A1</code> is 0.02 (see [<a href="https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf" class="external-link uri">https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf</a>]
 Table 3. The SDSs in the MOD11_L2 product). This scale factor converts
 the values to Kelvin, which are then converted to Celsius with the
 additional <code>- 273.15</code> expression.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df_mod11a1</span> <span class="op">&lt;-</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/calculate_covariates.html">calculate_covariates</a></span><span class="op">(</span></span>
 <span>  dataset_name <span class="op">=</span> <span class="st">"modis"</span>,</span>
-<span>  from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod11a1</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  locs <span class="op">=</span> <span class="fu">tigris</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tigris/man/counties.html" class="external-link">counties</a></span><span class="op">(</span><span class="st">"CT"</span>, year <span class="op">=</span> <span class="fl">2019</span><span class="op">)</span>,</span>
 <span>  locs_id <span class="op">=</span> <span class="st">"NAME"</span>,</span>
 <span>  radius <span class="op">=</span> <span class="fl">0L</span>,</span>
@@ -356,7 +359,7 @@ county with a 100m buffer, the covariate column name would be
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df_mod11a1_centroids</span> <span class="op">&lt;-</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/calculate_covariates.html">calculate_covariates</a></span><span class="op">(</span></span>
 <span>  dataset_name <span class="op">=</span> <span class="st">"modis"</span>,</span>
-<span>  from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod11a1</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  locs <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">st_centroid</a></span><span class="op">(</span> <span class="co"># centroids of each county</span></span>
 <span>    <span class="fu">tigris</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tigris/man/counties.html" class="external-link">counties</a></span><span class="op">(</span><span class="st">"CT"</span>, year <span class="op">=</span> <span class="fl">2019</span><span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
@@ -387,6 +390,638 @@ county with a 100m buffer, the covariate column name would be
 14    Windham  24.43000 2019-08-16
 15  Fairfield  22.41000 2019-08-16
 16 Litchfield  21.07516 2019-08-16</code></pre>
+</div>
+<div class="section level3">
+<h3 id="vnp46a2---nighttime-lights-ntl">VNP46A2 - Nighttime Lights (NTL)<a class="anchor" aria-label="anchor" href="#vnp46a2---nighttime-lights-ntl"></a>
+</h3>
+<p>The <a href="https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A2/" class="external-link">VNP46A2
+- VIIRS/NPP Gap-Filled Lunar BRDF-Adjusted Nighttime Lights Daily L3
+Global 500m Linear Lat Lon Grid</a> product provides “global, daily
+measurements of nocturnal visible and near-infrared (NIR) light that are
+suitable for Earth system science and applications”.</p>
+<p>Downloaded data files are Hierarchical Data Format version 5 (HDF5),
+with the extension <code>.h5</code></p>
+<ul>
+<li>
+<code>dataset_name = "modis"</code>: MODIS dataset name.</li>
+<li>
+<code>product = "VNP46A2"</code>: MODIS product name.</li>
+<li>
+<code>version =  "61"</code>: Version 6.1 (most recent release as of
+08/07/2025).</li>
+<li>
+<code>horizontal_tiles = c(7, 13)</code>: Horizontal sinusoidal
+tiles.</li>
+<li>
+<code>vertical_tiles = c(3, 6)</code>: Vertical sinusoidal
+tiles.</li>
+<li>
+<code>date = c("2019-09-01", "2019-09-02")</code>: Dates of
+interest.</li>
+<li>
+<code>nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN")</code>:
+User-specific NASA credentials.</li>
+<li>
+<code>directory_to_save = dir_vnp46a2</code>: directory to save the
+downloaded files.</li>
+<li>
+<code>acknowledgement = TRUE</code>: acknowledge that the raw data
+files are large and may consume lots of local storage.</li>
+<li>
+<code>download = TRUE</code>: download the data files.</li>
+<li>
+<code>remove_command = TRUE</code>: remove the temporary command
+file used to download the data.</li>
+<li>
+<code>hash = TRUE</code>: generate unique SHA-1 hash for the
+downloaded files.</li>
+</ul>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dir_vnp46a2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"vnp46a2"</span><span class="op">)</span></span>
+<span><span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/download_data.html">download_data</a></span><span class="op">(</span></span>
+<span>  dataset_name <span class="op">=</span> <span class="st">"modis"</span>,</span>
+<span>  product <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
+<span>  version <span class="op">=</span> <span class="st">"61"</span>,</span>
+<span>  horizontal_tiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">13</span><span class="op">)</span>,</span>
+<span>  vertical_tiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span><span class="op">)</span>,</span>
+<span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2019-08-15"</span>, <span class="st">"2019-08-16"</span><span class="op">)</span>,</span>
+<span>  nasa_earth_data_token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"EARTHDATA_TOKEN"</span><span class="op">)</span>,</span>
+<span>  directory_to_save <span class="op">=</span> <span class="va">dir_vnp46a2</span>,</span>
+<span>  acknowledge <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  hash <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code>2 / 2 days of data available in the queried dates.
+
+Downloading requested files...
+
+[`wget` DOWNLOAD OUTPUT OMITTED]
+
+Requested files have been downloaded.
+
+Requests were processed.
+
+[1] "c7ada546dd471eedcce3266fd860c8fe"</code></pre>
+<p>Check that the downloaded files correspond to the requested tiles and
+dates.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_vnp46a2</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<pre><code> [1] "2019/227/VNP46A2.A2019227.h07v03.001.2021028023053.h5"
+ [2] "2019/227/VNP46A2.A2019227.h07v04.001.2021034095643.h5"
+ [3] "2019/227/VNP46A2.A2019227.h07v05.001.2021034103316.h5"
+ [4] "2019/227/VNP46A2.A2019227.h07v06.001.2021034065004.h5"
+ [5] "2019/227/VNP46A2.A2019227.h08v03.001.2021028011018.h5"
+ [6] "2019/227/VNP46A2.A2019227.h08v04.001.2021034074618.h5"
+ [7] "2019/227/VNP46A2.A2019227.h08v05.001.2021034053658.h5"
+ [8] "2019/227/VNP46A2.A2019227.h08v06.001.2021033195730.h5"
+ [9] "2019/227/VNP46A2.A2019227.h09v03.001.2021027223658.h5"
+[10] "2019/227/VNP46A2.A2019227.h09v04.001.2021034071039.h5"
+[11] "2019/227/VNP46A2.A2019227.h09v05.001.2021034063949.h5"
+[12] "2019/227/VNP46A2.A2019227.h09v06.001.2021033151848.h5"
+[13] "2019/227/VNP46A2.A2019227.h10v03.001.2021028020730.h5"
+[14] "2019/227/VNP46A2.A2019227.h10v04.001.2021034051503.h5"
+[15] "2019/227/VNP46A2.A2019227.h10v05.001.2021033165400.h5"
+[16] "2019/227/VNP46A2.A2019227.h10v06.001.2021033140014.h5"
+[17] "2019/227/VNP46A2.A2019227.h11v03.001.2021028020226.h5"
+[18] "2019/227/VNP46A2.A2019227.h11v04.001.2021033204459.h5"
+[19] "2019/227/VNP46A2.A2019227.h11v05.001.2021033095716.h5"
+[20] "2019/227/VNP46A2.A2019227.h12v03.001.2021027174719.h5"
+[21] "2019/227/VNP46A2.A2019227.h12v04.001.2021033162849.h5"
+[22] "2019/228/VNP46A2.A2019228.h07v03.001.2021028030331.h5"
+[23] "2019/228/VNP46A2.A2019228.h07v04.001.2021034113626.h5"
+[24] "2019/228/VNP46A2.A2019228.h07v05.001.2021034115815.h5"
+[25] "2019/228/VNP46A2.A2019228.h07v06.001.2021034080708.h5"
+[26] "2019/228/VNP46A2.A2019228.h08v03.001.2021028014406.h5"
+[27] "2019/228/VNP46A2.A2019228.h08v04.001.2021034092243.h5"
+[28] "2019/228/VNP46A2.A2019228.h08v05.001.2021034065601.h5"
+[29] "2019/228/VNP46A2.A2019228.h08v06.001.2021033202639.h5"
+[30] "2019/228/VNP46A2.A2019228.h09v03.001.2021027230113.h5"
+[31] "2019/228/VNP46A2.A2019228.h09v04.001.2021034083500.h5"
+[32] "2019/228/VNP46A2.A2019228.h09v05.001.2021034075715.h5"
+[33] "2019/228/VNP46A2.A2019228.h09v06.001.2021033154608.h5"
+[34] "2019/228/VNP46A2.A2019228.h10v03.001.2021028024419.h5"
+[35] "2019/228/VNP46A2.A2019228.h10v04.001.2021034064406.h5"
+[36] "2019/228/VNP46A2.A2019228.h10v05.001.2021033174505.h5"
+[37] "2019/228/VNP46A2.A2019228.h10v06.001.2021033144003.h5"
+[38] "2019/228/VNP46A2.A2019228.h11v03.001.2021028023944.h5"
+[39] "2019/228/VNP46A2.A2019228.h11v04.001.2021033213449.h5"
+[40] "2019/228/VNP46A2.A2019228.h11v05.001.2021033101041.h5"
+[41] "2019/228/VNP46A2.A2019228.h12v03.001.2021027180253.h5"
+[42] "2019/228/VNP46A2.A2019228.h12v04.001.2021033170017.h5"</code></pre>
+<p>The processing function associated with the <code>VNP46A2</code>
+product is <code>process_blackmarble</code>, designed to accomodate the
+<code>.h5</code> file type. Again, <strong>users do not need to directly
+call the <code>process_modis_merge</code> function.</strong>, this
+function is passed to the <code>calculate_covariates</code> function
+based on the <code>preprocess</code> parameter. The following
+“processing” steps are for demonstration only.</p>
+<p>Check the available layers from the product. The first file is used
+to identify the available layers.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/describe.html" class="external-link">describe</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_vnp46a2</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  sds <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span><span class="op">$</span><span class="va">var</span></span></code></pre></div>
+<pre><code>[1] "//HDFEOS/GRIDS/VNP_Grid_DNB/Data_Fields/DNB_BRDF-Corrected_NTL"
+[2] "//HDFEOS/GRIDS/VNP_Grid_DNB/Data_Fields/DNB_Lunar_Irradiance"
+[3] "//HDFEOS/GRIDS/VNP_Grid_DNB/Data_Fields/Gap_Filled_DNB_BRDF-Corrected_NTL"
+[4] "//HDFEOS/GRIDS/VNP_Grid_DNB/Data_Fields/Latest_High_Quality_Retrieval"
+[5] "//HDFEOS/GRIDS/VNP_Grid_DNB/Data_Fields/Mandatory_Quality_Flag"
+[6] "//HDFEOS/GRIDS/VNP_Grid_DNB/Data_Fields/QF_Cloud_Mask"
+[7] "//HDFEOS/GRIDS/VNP_Grid_DNB/Data_Fields/Snow_Flag"</code></pre>
+<p>We are interested in the subdataset
+<code>//HDFEOS/GRIDS/VNP_Grid_DNB/Data_Fields/Gap_Filled_DNB_BRDF-Corrected_NTL</code>,
+which contains the gap-filled Day-Night Band, Corrected Nighttime Lights
+data. The variable string associated with the <code>.h5</code> file type
+is long and complex, so we can identify the subset of interest with the
+index value. In this case, <code>subdataset = 3L</code> because
+<code>Gap_Filled_DNB_BRDF-Corrected_NTL</code> is the third subdataset
+in the file. The <code>tile_df</code> parameter is unique to the
+<code>process_blackmarble</code> processing function, and is set to the
+output of the <code>process_blackmarble_corners</code> function.
+<code>process_blackmarble_corners</code> generates a
+<code>data.frame</code> of corner coordinates based on the sinuosidal
+grid tiles because the HDF5 format are read without georeference.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rast_vnp46a2</span> <span class="op">&lt;-</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/process_blackmarble.html">process_blackmarble</a></span><span class="op">(</span></span>
+<span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_vnp46a2</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  date <span class="op">=</span> <span class="st">"2019-08-15"</span>,</span>
+<span>  tile_df <span class="op">=</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/process_blackmarble_corners.html">process_blackmarble_corners</a></span><span class="op">(</span></span>
+<span>    hrange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">13</span><span class="op">)</span>,</span>
+<span>    vrange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  subdataset <span class="op">=</span> <span class="fl">3L</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">rast_vnp46a2</span></span></code></pre></div>
+<pre><code>class       : SpatRaster
+size        : 9600, 14400, 1  (nrow, ncol, nlyr)
+resolution  : 0.004166667, 0.004166667  (x, y)
+extent      : -110, -50, 20, 60  (xmin, xmax, ymin, ymax)
+coord. ref. : lon/lat WGS 84 (EPSG:4326)
+source(s)   : memory
+varname     : Gap_Filled_DNB_BRDF-Corrected_NTL
+name        : DNB_BRDF-Corrected_NTL
+min value   :                      0
+max value   :                  49993</code></pre>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">rast_vnp46a2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/vnp46a2.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>The following code will calculate maximum NTL values for
+Connecticut’s counties for August 15 and 16, 2019.</p>
+<ul>
+<li>
+<code>dataset_name = "modis"</code>: MODIS dataset name.</li>
+<li>
+<code>from = list.files(dir_mod11a1, full.names = TRUE, recursive = TRUE)</code>:
+MOD11A1 file paths. The dates of data available in these file paths will
+determine the dates in the output.</li>
+<li>
+<code>locs = tigris::counties("CT", year = 2019, cb = TRUE)</code>:
+Connecticut county polygons.</li>
+<li>
+<code>locs_id = "NAME"</code>: Use <code>NAME</code> column for
+unique county identifiers.</li>
+<li>
+<code>radius = 0L</code>: Apply 0m buffer to plygons.</li>
+<li>
+<code>preprocess = amadeus::process_blackmarble</code>: Preprocess
+<code>.h5</code> files with merging function.</li>
+<li>
+<code>tile_df = amadeus::process_blackmarble_corners(hrange = c(7, 13), vrange = c(3, 6)))</code>:
+Process combination of horizontal tiles 7 to 13 and vertical tiles 3 to
+6.</li>
+<li>
+<code>subdataset = 3L</code>: Third subdataset for NTL variable
+(<code>Gap_Filled_DNB_BRDF-Corrected_NTL</code>).</li>
+<li>
+<code>name_covariates = "NTL_"</code>: Prefix for column name for
+calculated covariates.</li>
+<li>
+<code>fun_summary = "max"</code>: Calculate maximum NTL value.</li>
+<li>
+<code>geom = "terra"</code>: Return as a <code>terra</code>
+<code>SpatVector</code> object.</li>
+<li>
+<code>scale = "* 1.0</code>: Multiply values by 1.0.</li>
+</ul>
+<p>The scale factor for <code>VNP46A2</code> is 1.0 (see [<a href="https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/Black-Marble_v2.0_UG_2024.pdf" class="external-link uri">https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/Black-Marble_v2.0_UG_2024.pdf</a>]
+Table 8. Scientific datasets included in VNP46A2/VJI46A2 daily
+moonlight-adjusted NTL product).</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">vect_vnp46a2</span> <span class="op">&lt;-</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/calculate_covariates.html">calculate_covariates</a></span><span class="op">(</span></span>
+<span>  covariate <span class="op">=</span> <span class="st">"modis"</span>,</span>
+<span>  from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_vnp46a2</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  locs <span class="op">=</span> <span class="fu">tigris</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tigris/man/counties.html" class="external-link">counties</a></span><span class="op">(</span><span class="st">"CT"</span>, year <span class="op">=</span> <span class="fl">2019</span><span class="op">)</span>,</span>
+<span>  locs_id <span class="op">=</span> <span class="st">"NAME"</span>,</span>
+<span>  radius <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  preprocess <span class="op">=</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="va"><a href="../reference/process_blackmarble.html">process_blackmarble</a></span>,</span>
+<span>  tile_df <span class="op">=</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/process_blackmarble_corners.html">process_blackmarble_corners</a></span><span class="op">(</span></span>
+<span>    hrange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">13</span><span class="op">)</span>, vrange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  subdataset <span class="op">=</span> <span class="fl">3L</span>,</span>
+<span>  name_covariates <span class="op">=</span> <span class="st">"NTL_"</span>,</span>
+<span>  fun_summary <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  geom <span class="op">=</span> <span class="st">"terra"</span>,</span>
+<span>  scale <span class="op">=</span> <span class="st">"* 1.0"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">vect_vnp46a2</span></span></code></pre></div>
+<pre><code> class       : SpatVector
+ geometry    : polygons
+ dimensions  : 16, 3  (geometries, attributes)
+ extent      : -73.72777, -71.78724, 40.95094, 42.05051  (xmin, xmax, ymin, ymax)
+ coord. ref. : lon/lat NAD83 (EPSG:4269)
+ names       :      NAME NTL_00000       time
+ type        :     &lt;chr&gt;     &lt;num&gt;   &lt;POSIXt&gt;
+ values      : Fairfield       855 2019-08-15
+               Fairfield       670 2019-08-16
+                Hartford       380 2019-08-15</code></pre>
+<p>The function returns a <code>SpatVector</code>, a spatially-enabled
+tabular data form from the <code>terra</code> package. The column names
+and data values are the same as if returned as a
+<code>data.frame</code>, only that each row has associated polygon(s) to
+define the county boundary. In the <code>SpatVector</code>, maximum NTL
+values for each county are calculated for August 15 and 16, 2019, the
+same dates originally passed to <code>download_data</code>. The column
+containing the NTL variables is <code>NTL_00000</code>, which reflects
+our manually set <code>name_covariates = "NTL_"</code> prefix
+<strong>and the buffer radius (padded to 5 digits)</strong>.</p>
+</div>
+<div class="section level3">
+<h3 id="mod06_l2---cloud-coverage">MOD06_L2 - Cloud Coverage<a class="anchor" aria-label="anchor" href="#mod06_l2---cloud-coverage"></a>
+</h3>
+<p>The <a href="https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/MOD06_L2" class="external-link">MOD06_L2
+- MODIS/Terra Clouds 5-Min L2 Swath 1km and 5km</a> product contains
+“cloud optical and physical parameters”.</p>
+<p>To download <code>MOD06_L2</code> product files, users must manually
+generate a <code>.csv</code> file containing download links from the
+NASA’s <a href="https://ladsweb.modaps.eosdis.nasa.gov/search/order/2/MOD06_L2--61" class="external-link">Level-1
+and Atmosphere Archive &amp; Distribution System (LAADS) Distributed
+Active Archive Center (DAAC) portal</a>. This <code>.csv</code> file
+must be saved in a directory which is accessible from the current
+working session. Generate the <code>.csv</code> file for the same dates
+as previous two examples, August 15 and 16, 2019, for “Day” coverage.
+For this example, a custom bounding box is drawn around the contiguous
+United States.</p>
+<p><img src="images/mod06l2_bbox.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>Selecting “Next” will list all of the available <code>.hdf</code>
+files associated with the spatial and temporal selections. Then,
+selecting “csv” will generate the <code>.csv</code> file which contains
+the necessary download links.</p>
+<p><img src="images/mod06l2_csv.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>This file is manually moved to the <code>vignettes/data/</code>
+folder.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"data"</span><span class="op">)</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<ul>
+<li>
+<code>dataset_name = "modis"</code>: MODIS dataset name.</li>
+<li>
+<code>product = "MOD06_L2"</code>: MODIS product name.</li>
+<li>
+<code>version =  "61"</code>: Version 6.1 (most recent release as of
+08/07/2025).</li>
+<li>
+<code>horizontal_tiles = c(7, 13)</code>: Horizontal sinusoidal
+tiles.</li>
+<li>
+<code>vertical_tiles = c(3, 6)</code>: Vertical sinusoidal
+tiles.</li>
+<li>
+<code>date = c("2019-09-01", "2019-09-02")</code>: Dates of
+interest.</li>
+<li>
+<code>nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN")</code>:
+User-specific NASA credentials.</li>
+<li>
+<code>mod06_links = "vignettes/data/LAADS_query.2025-08-12T14_29.csv"</code>:
+Manually downloaded CSV file with MOD06_L2 links.</li>
+<li>
+<code>directory_to_save = dir_mod06l2</code>: directory to save the
+downloaded files.</li>
+<li>
+<code>acknowledgement = TRUE</code>: acknowledge that the raw data
+files are large and may consume lots of local storage.</li>
+<li>
+<code>download = TRUE</code>: download the data files.</li>
+<li>
+<code>remove_command = TRUE</code>: remove the temporary command
+file used to download the data.</li>
+<li>
+<code>hash = TRUE</code>: generate unique SHA-1 hash for the
+downloaded files.</li>
+</ul>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dir_mod06l2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"mod06l2"</span><span class="op">)</span></span>
+<span><span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/download_data.html">download_data</a></span><span class="op">(</span></span>
+<span>  dataset_name <span class="op">=</span> <span class="st">"modis"</span>,</span>
+<span>  product <span class="op">=</span> <span class="st">"MOD06_L2"</span>,</span>
+<span>  version <span class="op">=</span> <span class="st">"61"</span>,</span>
+<span>  horizontal_tiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">13</span><span class="op">)</span>,</span>
+<span>  vertical_tiles <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span><span class="op">)</span>,</span>
+<span>  mod06_links <span class="op">=</span> <span class="st">"vignettes/data/LAADS_query.2025-08-12T14_29.csv"</span>,</span>
+<span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2019-08-15"</span>, <span class="st">"2019-08-16"</span><span class="op">)</span>,</span>
+<span>  nasa_earth_data_token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"EARTHDATA_TOKEN"</span><span class="op">)</span>,</span>
+<span>  directory_to_save <span class="op">=</span> <span class="va">dir_mod06l2</span>,</span>
+<span>  acknowledge <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  hash <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code>2 / 2 days of data available in the queried dates.
+
+Downloading requested files...
+
+[`wget` DOWNLOAD OUTPUT OMITTED]
+
+Requested files have been downloaded.
+
+Requests were processed.
+
+[1] "f43bdc3f850a734d5263a274762379e9"</code></pre>
+<p>Check that the downloaded files correspond to the requested tiles and
+dates.</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod06l2</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<pre><code> [1] "2019/227/MOD06_L2.A2019227.1355.061.2019228034420.hdf"
+ [2] "2019/227/MOD06_L2.A2019227.1400.061.2019228034841.hdf"
+ [3] "2019/227/MOD06_L2.A2019227.1405.061.2019228031931.hdf"
+ [4] "2019/227/MOD06_L2.A2019227.1410.061.2019228034018.hdf"
+ [5] "2019/227/MOD06_L2.A2019227.1535.061.2019228040729.hdf"
+ [6] "2019/227/MOD06_L2.A2019227.1540.061.2019228042901.hdf"
+ [7] "2019/227/MOD06_L2.A2019227.1545.061.2019228041453.hdf"
+ [8] "2019/227/MOD06_L2.A2019227.1550.061.2019228034852.hdf"
+ [9] "2019/227/MOD06_L2.A2019227.1715.061.2019228034600.hdf"
+[10] "2019/227/MOD06_L2.A2019227.1720.061.2019228032806.hdf"
+[11] "2019/227/MOD06_L2.A2019227.1725.061.2019228033727.hdf"
+[12] "2019/227/MOD06_L2.A2019227.1855.061.2019228093012.hdf"
+[13] "2019/227/MOD06_L2.A2019227.1900.061.2019228095925.hdf"
+[14] "2019/227/MOD06_L2.A2019227.1905.061.2019228093102.hdf"
+[15] "2019/227/MOD06_L2.A2019227.2030.061.2019228100212.hdf"
+[16] "2019/227/MOD06_L2.A2019227.2035.061.2019228100208.hdf"
+[17] "2019/227/MOD06_L2.A2019227.2040.061.2019228102930.hdf"
+[18] "2019/227/MOD06_L2.A2019227.2210.061.2019228100421.hdf"
+[19] "2019/228/MOD06_L2.A2019228.1440.061.2019229013924.hdf"
+[20] "2019/228/MOD06_L2.A2019228.1445.061.2019229014222.hdf"
+[21] "2019/228/MOD06_L2.A2019228.1450.061.2019229013756.hdf"
+[22] "2019/228/MOD06_L2.A2019228.1455.061.2019229013623.hdf"
+[23] "2019/228/MOD06_L2.A2019228.1620.061.2019229013909.hdf"
+[24] "2019/228/MOD06_L2.A2019228.1625.061.2019229014711.hdf"
+[25] "2019/228/MOD06_L2.A2019228.1630.061.2019229013623.hdf"
+[26] "2019/228/MOD06_L2.A2019228.1800.061.2019229074055.hdf"
+[27] "2019/228/MOD06_L2.A2019228.1805.061.2019229073242.hdf"
+[28] "2019/228/MOD06_L2.A2019228.1810.061.2019229073728.hdf"
+[29] "2019/228/MOD06_L2.A2019228.1935.061.2019229074033.hdf"
+[30] "2019/228/MOD06_L2.A2019228.1940.061.2019229074120.hdf"
+[31] "2019/228/MOD06_L2.A2019228.1945.061.2019229074028.hdf"
+[32] "2019/228/MOD06_L2.A2019228.1950.061.2019229074707.hdf"
+[33] "2019/228/MOD06_L2.A2019228.2115.061.2019229074046.hdf"
+[34] "2019/228/MOD06_L2.A2019228.2120.061.2019229074147.hdf"</code></pre>
+<p>The processing function associated with the <code>MOD06_L2</code>
+product is <code>process_modis_merge</code>. Again, <strong>users do not
+need to directly call the <code>process_modis_merge</code>
+function.</strong>, this function is passed to the
+<code>calculate_covariates</code> function based on the
+<code>preprocess</code> parameter. The following “processing” steps are
+for demonstration only.</p>
+<p>Check the available layers from the product. The first file is used
+to identify the available layers.</p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/describe.html" class="external-link">describe</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod06l2</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  sds <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span><span class="op">$</span><span class="va">var</span></span></code></pre></div>
+<pre><code>  [1] "Scan_Start_Time"
+  [2] "Solar_Zenith"
+  [3] "Solar_Zenith_Day"
+  [4] "Solar_Zenith_Night"
+  [5] "Solar_Azimuth"
+  [6] "Solar_Azimuth_Day"
+  [7] "Solar_Azimuth_Night"
+  [8] "Sensor_Zenith"
+  [9] "Sensor_Zenith_Day"
+ [10] "Sensor_Zenith_Night"
+ [11] "Sensor_Azimuth"
+ [12] "Sensor_Azimuth_Day"
+ [13] "Sensor_Azimuth_Night"
+ [14] "Brightness_Temperature"
+ [15] "Surface_Temperature"
+ [16] "Surface_Pressure"
+ [17] "Cloud_Height_Method"
+ [18] "Cloud_Top_Height"
+ [19] "Cloud_Top_Height_Nadir"
+ [20] "Cloud_Top_Height_Nadir_Day"
+ [21] "Cloud_Top_Height_Nadir_Night"
+ [22] "Cloud_Top_Pressure"
+ [23] "Cloud_Top_Pressure_Nadir"
+ [24] "Cloud_Top_Pressure_Night"
+ [25] "Cloud_Top_Pressure_Nadir_Night"
+ [26] "Cloud_Top_Pressure_Day"
+ [27] "Cloud_Top_Pressure_Nadir_Day"
+ [28] "Cloud_Top_Temperature"
+ [29] "Cloud_Top_Temperature_Nadir"
+ [30] "Cloud_Top_Temperature_Night"
+ [31] "Cloud_Top_Temperature_Nadir_Night"
+ [32] "Cloud_Top_Temperature_Day"
+ [33] "Cloud_Top_Temperature_Nadir_Day"
+ [34] "Tropopause_Height"
+ [35] "Cloud_Fraction"
+ [36] "Cloud_Fraction_Nadir"
+ [37] "Cloud_Fraction_Night"
+ [38] "Cloud_Fraction_Nadir_Night"
+ [39] "Cloud_Fraction_Day"
+ [40] "Cloud_Fraction_Nadir_Day"
+ [41] "Cloud_Effective_Emissivity"
+ [42] "Cloud_Effective_Emissivity_Nadir"
+ [43] "Cloud_Effective_Emissivity_Night"
+ [44] "Cloud_Effective_Emissivity_Nadir_Night"
+ [45] "Cloud_Effective_Emissivity_Day"
+ [46] "Cloud_Effective_Emissivity_Nadir_Day"
+ [47] "Cloud_Top_Pressure_Infrared"
+ [48] "Spectral_Cloud_Forcing"
+ [49] "Cloud_Top_Pressure_From_Ratios"
+ [50] "Radiance_Variance"
+ [51] "Cloud_Phase_Infrared"
+ [52] "Cloud_Phase_Infrared_Night"
+ [53] "Cloud_Phase_Infrared_Day"
+ [54] "Cloud_Phase_Infrared_1km"
+ [55] "IRP_CTH_Consistency_Flag_1km"
+ [56] "os_top_flag_1km"
+ [57] "cloud_top_pressure_1km"
+ [58] "cloud_top_height_1km"
+ [59] "cloud_top_temperature_1km"
+ [60] "cloud_emissivity_1km"
+ [61] "cloud_top_method_1km"
+ [62] "surface_temperature_1km"
+ [63] "cloud_emiss11_1km"
+ [64] "cloud_emiss12_1km"
+ [65] "cloud_emiss13_1km"
+ [66] "cloud_emiss85_1km"
+ [67] "Cloud_Effective_Radius"
+ [68] "Cloud_Effective_Radius_PCL"
+ [69] "Cloud_Effective_Radius_16"
+ [70] "Cloud_Effective_Radius_16_PCL"
+ [71] "Cloud_Effective_Radius_37"
+ [72] "Cloud_Effective_Radius_37_PCL"
+ [73] "Cloud_Optical_Thickness"
+ [74] "Cloud_Optical_Thickness_PCL"
+ [75] "Cloud_Optical_Thickness_16"
+ [76] "Cloud_Optical_Thickness_16_PCL"
+ [77] "Cloud_Optical_Thickness_37"
+ [78] "Cloud_Optical_Thickness_37_PCL"
+ [79] "Cloud_Effective_Radius_1621"
+ [80] "Cloud_Effective_Radius_1621_PCL"
+ [81] "Cloud_Optical_Thickness_1621"
+ [82] "Cloud_Optical_Thickness_1621_PCL"
+ [83] "Cloud_Water_Path"
+ [84] "Cloud_Water_Path_PCL"
+ [85] "Cloud_Water_Path_1621"
+ [86] "Cloud_Water_Path_1621_PCL"
+ [87] "Cloud_Water_Path_16"
+ [88] "Cloud_Water_Path_16_PCL"
+ [89] "Cloud_Water_Path_37"
+ [90] "Cloud_Water_Path_37_PCL"
+ [91] "Cloud_Effective_Radius_Uncertainty"
+ [92] "Cloud_Effective_Radius_Uncertainty_16"
+ [93] "Cloud_Effective_Radius_Uncertainty_37"
+ [94] "Cloud_Optical_Thickness_Uncertainty"
+ [95] "Cloud_Optical_Thickness_Uncertainty_16"
+ [96] "Cloud_Optical_Thickness_Uncertainty_37"
+ [97] "Cloud_Water_Path_Uncertainty"
+ [98] "Cloud_Effective_Radius_Uncertainty_1621"
+ [99] "Cloud_Optical_Thickness_Uncertainty_1621"
+[100] "Cloud_Water_Path_Uncertainty_1621"
+[101] "Cloud_Water_Path_Uncertainty_16"
+[102] "Cloud_Water_Path_Uncertainty_37"
+[103] "Above_Cloud_Water_Vapor_094"
+[104] "IRW_Low_Cloud_Temperature_From_COP"
+[105] "Cloud_Phase_Optical_Properties"
+[106] "Cloud_Multi_Layer_Flag"
+[107] "Cirrus_Reflectance"
+[108] "Cirrus_Reflectance_Flag"
+[109] "Cloud_Mask_5km"
+[110] "Quality_Assurance_5km"
+[111] "Cloud_Mask_1km"
+[112] "Extinction_Efficiency_Ice"
+[113] "Asymmetry_Parameter_Ice"
+[114] "Single_Scatter_Albedo_Ice"
+[115] "Extinction_Efficiency_Liq"
+[116] "Asymmetry_Parameter_Liq"
+[117] "Single_Scatter_Albedo_Liq"
+[118] "Cloud_Mask_SPI"
+[119] "Retrieval_Failure_Metric"
+[120] "Retrieval_Failure_Metric_16"
+[121] "Retrieval_Failure_Metric_37"
+[122] "Retrieval_Failure_Metric_1621"
+[123] "Atm_Corr_Refl"
+[124] "Quality_Assurance_1km"</code></pre>
+<p>The L2 (level 2) product has lots of subdatasets because it has
+undergone fewer processing steps than a level 3 (L3) product like the
+<code>MOD11A1</code> or <code>VNP46A2</code> examples. We are interested
+in the <code>Cloud_Fraction_Day</code> subdataset, which contains the
+daytime cloud fraction coverage. The processing function for the MODIS
+swath products is <code>process_modis_swath</code>. This function
+internally warps each of inputs then mosaics these warped images into
+one <code>SpatRaster</code>.</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rast_mod06l2</span> <span class="op">&lt;-</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/process_modis_swath.html">process_modis_swath</a></span><span class="op">(</span></span>
+<span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod06l2</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  date <span class="op">=</span> <span class="st">"2019-08-15"</span>,</span>
+<span>  subdataset <span class="op">=</span> <span class="st">"Cloud_Fraction_Day"</span>,</span>
+<span>  suffix <span class="op">=</span> <span class="st">":mod06:"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">rast_mod06l2</span></span></code></pre></div>
+<pre><code>class       : SpatRaster
+size        : 640, 1280, 1  (nrow, ncol, nlyr)
+resolution  : 0.05, 0.05  (x, y)
+extent      : -127.9999, -63.99994, 20.00654, 52.00654  (xmin, xmax, ymin, ymax)
+coord. ref. : lon/lat WGS 84 (EPSG:4326)
+source(s)   : memory
+name        : Cloud_Fraction_Day
+min value   :                  0
+max value   :                  1</code></pre>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">rast_mod06l2</span><span class="op">$</span><span class="va">Cloud_Fraction_Day</span><span class="op">)</span></span></code></pre></div>
+<p><img src="images/mod06l2.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
+<p>The following code will calculate median daytime cloud fraction
+coverage for Connecticut’s counties for August 15 and 16, 2019.</p>
+<ul>
+<li>
+<code>dataset_name = "modis"</code>: MODIS dataset name.</li>
+<li>
+<code>from = list.files(dir_mod06l2, full.names = TRUE, recursive = TRUE)</code>:
+MOD06_L2 file paths. The dates of data available in these file paths
+will determine the dates in the output.</li>
+<li>
+<code>locs = tigris::counties("CT", year = 2019, cb = TRUE)</code>:
+Connecticut county polygons.</li>
+<li>
+<code>locs_id = "NAME"</code>: Use <code>NAME</code> column for
+unique county identifiers.</li>
+<li>
+<code>radius = 0L</code>: Apply 0m buffer to plygons.</li>
+<li>
+<code>preprocess = amadeus::process_modis_swath</code>: Preprocess
+swath datasets as mosaiac.</li>
+<li>
+<code>subdataset = "Cloud_Fraction_Day"</code>: Daytime cloud
+fraction coverage variable.</li>
+<li>
+<code>name_covariates = "CLFRD_"</code>: Prefix for column name for
+calculated covariates.</li>
+<li>
+<code>fun_summary = "median"</code>: Calculate median daytime cloud
+fraction coverage value.</li>
+<li>
+<code>geom = "sf"</code>: Return as an <code>sf</code> object.</li>
+<li>
+<code>scale = "* 1.0</code>: Multiply values by 1.0.</li>
+</ul>
+<p>The scale factor for <code>MOD06_L2</code> is 0.009999999776482582
+(see [<a href="https://atmosphere-imager.gsfc.nasa.gov/sites/default/files/ModAtmo/MOD06_L2_CDL_fs.txt" class="external-link uri">https://atmosphere-imager.gsfc.nasa.gov/sites/default/files/ModAtmo/MOD06_L2_CDL_fs.txt</a>]).</p>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sf_mod06l2</span> <span class="op">&lt;-</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/calculate_covariates.html">calculate_covariates</a></span><span class="op">(</span></span>
+<span>  covariate <span class="op">=</span> <span class="st">"modis"</span>,</span>
+<span>  from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod06l2</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  locs <span class="op">=</span> <span class="fu">tigris</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tigris/man/counties.html" class="external-link">counties</a></span><span class="op">(</span><span class="st">"CT"</span>, year <span class="op">=</span> <span class="fl">2019</span><span class="op">)</span>,</span>
+<span>  locs_id <span class="op">=</span> <span class="st">"NAME"</span>,</span>
+<span>  radius <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  preprocess <span class="op">=</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="va"><a href="../reference/process_modis_swath.html">process_modis_swath</a></span>,</span>
+<span>  subdataset <span class="op">=</span> <span class="st">"Cloud_Fraction_Day"</span>,</span>
+<span>  name_covariates <span class="op">=</span> <span class="st">"CLFRD_"</span>,</span>
+<span>  fun_summary <span class="op">=</span> <span class="st">"median"</span>,</span>
+<span>  geom <span class="op">=</span> <span class="st">"sf"</span>,</span>
+<span>  scale <span class="op">=</span> <span class="st">"* 0.009999999776482582"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">sf_mod06l2</span></span></code></pre></div>
+<pre><code>Simple feature collection with 16 features and 3 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -73.72777 ymin: 40.95094 xmax: -71.78724 ymax: 42.05051
+Geodetic CRS:  NAD83
+First 10 features:
+         NAME  CLFRD_00000       time                       geometry
+1   Fairfield 0.0002085408 2019-08-15 MULTIPOLYGON (((-73.54362 4...
+2   Fairfield 0.0019240546 2019-08-16 MULTIPOLYGON (((-73.54362 4...
+3    Hartford 0.0002000000 2019-08-15 MULTIPOLYGON (((-72.94902 4...
+4    Hartford 0.0002125713 2019-08-16 MULTIPOLYGON (((-72.94902 4...
+5  Litchfield 0.0002936930 2019-08-15 MULTIPOLYGON (((-73.50793 4...
+6  Litchfield 0.0004076930 2019-08-16 MULTIPOLYGON (((-73.50793 4...
+7   Middlesex 0.0002000000 2019-08-15 MULTIPOLYGON (((-72.65367 4...
+8   Middlesex 0.0018688483 2019-08-16 MULTIPOLYGON (((-72.65367 4...
+9   New Haven 0.0002000000 2019-08-15 MULTIPOLYGON (((-73.14755 4...
+10  New Haven 0.0006629100 2019-08-16 MULTIPOLYGON (((-73.14755 4...</code></pre>
+<p>The function returns an <code>sf</code> object, a spatially-enabled
+tabular data form from the <code>sf</code> package. The column names and
+data values are the same as if returned as a <code>data.frame</code>,
+only that each row has associated polygon(s) to define the county
+boundary. In the <code>sf</code> object, median daytime cloud fraction
+coverage values for each county are calculated for August 15 and 16,
+2019, the same dates originally passed to <code>download_data</code>.
+The column containing the cloud variables is <code>CLFRD_00000</code>,
+which reflects our manually set <code>name_covariates = "CLFRD_"</code>
+prefix <strong>and the buffer radius (padded to 5 digits)</strong>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

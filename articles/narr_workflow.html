@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>North American Regional Reanalysis (NARR) • amadeus</title>
+<title>NOAA North American Regional Reanalysis (NARR) • amadeus</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="North American Regional Reanalysis (NARR)">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="NOAA North American Regional Reanalysis (NARR)">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +40,7 @@
     <li><a class="dropdown-item" href="../articles/terraclimate_workflow.html">Climatology Lab TerraClimate</a></li>
     <li><a class="dropdown-item" href="../articles/gridmet_workflow.html">Climatology Lab GridMET</a></li>
     <li><a class="dropdown-item" href="../articles/modis_workflow.html">NASA Moderate Resolution Imaging Spectroradiometer (MODIS)</a></li>
-    <li><a class="dropdown-item" href="../articles/narr_workflow.html">North American Regional Reanalysis (NARR)</a></li>
+    <li><a class="dropdown-item" href="../articles/narr_workflow.html">NOAA North American Regional Reanalysis (NARR)</a></li>
     <li><a class="dropdown-item" href="../articles/epa_download.html">US EPA Air Quality System (AQS)</a></li>
   </ul>
 </li>
@@ -62,11 +62,11 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.svg" class="logo" alt=""><h1>North American Regional Reanalysis (NARR)</h1>
+      <img src="../logo.svg" class="logo" alt=""><h1>NOAA North American Regional Reanalysis (NARR)</h1>
                         <h4 data-toc-skip class="author">Mitchell
 Manware</h4>
             
-            <h4 data-toc-skip class="date">2025-08-08</h4>
+            <h4 data-toc-skip class="date">2025-08-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/NIEHS/amadeus/blob/main/vignettes/narr_workflow.Rmd" class="external-link"><code>vignettes/narr_workflow.Rmd</code></a></small>
       <div class="d-none name"><code>narr_workflow.Rmd</code></div>
@@ -155,18 +155,18 @@ downloaded files.</li>
 <p>Check the processed <code>SpatRaster</code> object.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">air2m_process</span></span></code></pre></div>
-<pre><code>class       : SpatRaster 
+<pre><code>class       : SpatRaster
 dimensions  : 277, 349, 7  (nrow, ncol, nlyr)
 resolution  : 32462.99, 32463  (x, y)
 extent      : -16231.49, 11313351, -16231.5, 8976020  (xmin, xmax, ymin, ymax)
-coord. ref. : +proj=lcc +lat_0=50 +lon_0=-107 +lat_1=50 +lat_2=50 +x_0=5632642.22547 +y_0=4612545.65137 +datum=WGS84 +units=m +no_defs 
-sources     : air.2m.2021.nc:air  (4 layers) 
-              air.2m.2022.nc:air  (3 layers) 
-varnames    : air (Daily Air Temperature at 2 m) 
-              air (Daily Air Temperature at 2 m) 
-names       : air.2~11228, air.2~11229, air.2~11230, air.2~11231, air.2~20101, air.2~20102, ... 
-unit        :           K,           K,           K,           K,           K,           K, ... 
-time        : 2021-12-28 to 2022-01-03 UTC </code></pre>
+coord. ref. : +proj=lcc +lat_0=50 +lon_0=-107 +lat_1=50 +lat_2=50 +x_0=5632642.22547 +y_0=4612545.65137 +datum=WGS84 +units=m +no_defs
+sources     : air.2m.2021.nc:air  (4 layers)
+              air.2m.2022.nc:air  (3 layers)
+varnames    : air (Daily Air Temperature at 2 m)
+              air (Daily Air Temperature at 2 m)
+names       : air.2~11228, air.2~11229, air.2~11230, air.2~11231, air.2~20101, air.2~20102, ...
+unit        :           K,           K,           K,           K,           K,           K, ...
+time        : 2021-12-28 to 2022-01-03 UTC</code></pre>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">air2m_process</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p><img src="images/air2m_process.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
@@ -208,11 +208,11 @@ county.</li>
 <p>Check the calculated covariates <code>SpatVector</code> object.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">air2m_covar</span></span></code></pre></div>
-<pre><code>class       : SpatVector 
-geometry    : polygons 
+<pre><code>class       : SpatVector
+geometry    : polygons
 dimensions  : 700, 3  (geometries, attributes)
 extent      : 7731783, 8506154, 3248490, 3694532  (xmin, xmax, ymin, ymax)
-coord. ref. : +proj=lcc +lat_0=50 +lon_0=-107 +lat_1=50 +lat_2=50 +x_0=5632642.22547 +y_0=4612545.65137 +datum=WGS84 +units=m +no_defs 
+coord. ref. : +proj=lcc +lat_0=50 +lon_0=-107 +lat_1=50 +lat_2=50 +x_0=5632642.22547 +y_0=4612545.65137 +datum=WGS84 +units=m +no_defs
 names       :     NAME       time air.2m_0
 type        :    &lt;chr&gt;   &lt;POSIXt&gt;    &lt;num&gt;
 values      :  Chatham 2021-12-28    289.3
