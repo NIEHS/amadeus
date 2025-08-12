@@ -1,5 +1,5 @@
 ---
-title: "Moderate Resolution Imaging Spectroradiometer (MODIS)"
+title: "NASA Moderate Resolution Imaging Spectroradiometer (MODIS)"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{NASA Moderate Resolution Imaging Spectroradiometer (MODIS)}
@@ -32,7 +32,7 @@ See [MODIS Grids](https://modis-land.gsfc.nasa.gov/MODLAND_grid.html) for furthe
 To download NASA MODIS files, users must first register for a NASA EarthData account and generate a user-specific token.
 For instructions, see the [Protected Data Sources](https://niehs.github.io/amadeus/articles/protected_datasets.html) vignette.
 
-### MOD11A1 - Land Surface Temperature
+### MOD11A1 - Land Surface Temperature (LST)
 The [MOD11A1 - MODIS/Terra Land Surface Temperature/Emissivity Daily L3 Global 1km SIN Grid V061](https://www.earthdata.nasa.gov/data/catalog/lpcloud-mod11a1-061) product provides daily, global land surface temperature (LST) estimates at 1km resolution.
 
 Downloaded data files are Hierarchical Data Format (HDF), with the extension `.hdf`
@@ -214,7 +214,7 @@ The following code will calculate mean LST for Connecticut's counties for August
 
 The `scale` parameter is crucial as it scales the values stored in the `.hdf` files to the scientifically interpretable values.
 The scale factor for each MODIS product can be found in the technical documentation (also called User Guide).
-The scale factor for MOD11A1 is 0.02 (see [https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf] Table 3. The SDSs in the MOD11_L2 product).
+The scale factor for `MOD11A1` is 0.02 (see [https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf] Table 3. The SDSs in the MOD11_L2 product).
 This scale factor converts the values to Kelvin, which are then converted to Celsius with the additional `- 273.15` expression.
 
 ```{r, eval = FALSE}
@@ -301,8 +301,8 @@ cat("         NAME LST_00100       time
 ")
 ```
 
-### VNP46A2 - Nighttime Lights
-The [VNP46A2 - VIIRS/NPP Gap-Filled Lunar BRDF-Adjusted Nighttime Lights Daily L3 Global 500m Linear Lat Lon Grid](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A2/) provides "global, daily measurements of nocturnal visible and near-infrared (NIR) light that are suitable for Earth system science and applications".
+### VNP46A2 - Nighttime Lights (NTL)
+The [VNP46A2 - VIIRS/NPP Gap-Filled Lunar BRDF-Adjusted Nighttime Lights Daily L3 Global 500m Linear Lat Lon Grid](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A2/) product provides "global, daily measurements of nocturnal visible and near-infrared (NIR) light that are suitable for Earth system science and applications".
 
 Downloaded data files are Hierarchical Data Format version 5 (HDF5), with the extension `.h5`
 
@@ -429,7 +429,7 @@ cat("[1] \"//HDFEOS/GRIDS/VNP_Grid_DNB/Data_Fields/DNB_BRDF-Corrected_NTL\"
 ")
 ```
 
-We are interested in the subdataset `//HDFEOS/GRIDS/VNP_Grid_DNB/Data_Fields/Gap_Filled_DNB_BRDF-Corrected_NTL`, which contains the gap-filled Day-Night Band, Corrected Nighttime Lights (NTL) data.
+We are interested in the subdataset `//HDFEOS/GRIDS/VNP_Grid_DNB/Data_Fields/Gap_Filled_DNB_BRDF-Corrected_NTL`, which contains the gap-filled Day-Night Band, Corrected Nighttime Lights data.
 The variable string associated with the `.h5` file type is long and complex, so we can identify the subset of interest with the index value.
 In this case, `subdataset = 3L` because `Gap_Filled_DNB_BRDF-Corrected_NTL` is the third subdataset in the file.
 The `tile_df` parameter is unique to the `process_blackmarble` processing function, and is set to the output of the `process_blackmarble_corners` function.
@@ -483,7 +483,7 @@ The following code will calculate maximum NTL values for Connecticut's counties 
 * `geom = "terra"`: Return as a `terra` `SpatVector` object.
 * `scale = "* 1.0`: Multiply values by 1.0.
 
-The scale factor for VNP46A2 is 1.0 (see [https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/Black-Marble_v2.0_UG_2024.pdf] Table 8. Scientific datasets included in VNP46A2/VJI46A2 daily moonlight-adjusted NTL product).
+The scale factor for `VNP46A2` is 1.0 (see [https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/Black-Marble_v2.0_UG_2024.pdf] Table 8. Scientific datasets included in VNP46A2/VJI46A2 daily moonlight-adjusted NTL product).
 
 ```{r, eval = FALSE}
 vect_vnp46a2 <- amadeus::calculate_covariates(
@@ -518,3 +518,358 @@ cat(" class       : SpatVector
                 Hartford       380 2019-08-15
 ")
 ```
+
+The function returns a `SpatVector`, a spatially-enabled tabular data form from the `terra` package.
+The column names and data values are the same as if returned as a `data.frame`, only that each row has associated polygon(s) to define the county boundary.
+In the `SpatVector`, maximum NTL values for each county are calculated for August 15 and 16, 2019, the same dates originally passed to `download_data`.
+The column containing the NTL variables is `NTL_00000`, which reflects our manually set `name_covariates = "NTL_"` prefix **and the buffer radius (padded to 5 digits)**.
+
+### MOD06_L2 - Cloud Coverage
+The [MOD06_L2 - MODIS/Terra Clouds 5-Min L2 Swath 1km and 5km](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/MOD06_L2) product contains "cloud optical and physical parameters".
+
+To download `MOD06_L2` product files, users must manually generate a `.csv` file containing download links from the NASA's [Level-1 and Atmosphere Archive & Distribution System (LAADS) Distributed Active Archive Center (DAAC) portal](https://ladsweb.modaps.eosdis.nasa.gov/search/order/2/MOD06_L2--61).
+This `.csv` file must be saved in a directory which is accessible from the current working session.
+Generate the `.csv` file for the same dates as previous two examples, August 15 and 16, 2019, for "Day" coverage.
+For this example, a custom bounding box is drawn around the contiguous United States.
+
+![](images/mod06l2_bbox.png){style="display: block; margin-left: auto; margin-right: auto;"}
+
+Selecting "Next" will list all of the available `.hdf` files associated with the spatial and temporal selections.
+Then, selecting "csv" will generate the `.csv` file which contains the necessary download links.
+
+![](images/mod06l2_csv.png){style="display: block; margin-left: auto; margin-right: auto;"}
+
+This file is manually moved to the `vignettes/data/` folder.
+
+```{r}
+list.files(file.path("vignettes", "data"), full.names = TRUE)
+```
+
+* `dataset_name = "modis"`: MODIS dataset name.
+* `product = "MOD06_L2"`: MODIS product name.
+* `version =  "61"`: Version 6.1 (most recent release as of 08/07/2025).
+* `horizontal_tiles = c(7, 13)`: Horizontal sinusoidal tiles.
+* `vertical_tiles = c(3, 6)`: Vertical sinusoidal tiles.
+* `date = c("2019-09-01", "2019-09-02")`: Dates of interest.
+* `nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN")`: User-specific NASA credentials.
+* `mod06_links = "vignettes/data/LAADS_query.2025-08-12T14_29.csv"`: Manually downloaded CSV file with MOD06_L2 links.
+* `directory_to_save = dir_mod06l2`: directory to save the downloaded files.
+* `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
+* `download = TRUE`: download the data files.
+* `remove_command = TRUE`: remove the temporary command file used to download the data.
+* `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
+
+```{r, eval = FALSE}
+dir_mod06l2 <- file.path(tempdir(), "mod06l2")
+amadeus::download_data(
+  dataset_name = "modis",
+  product = "MOD06_L2",
+  version = "61",
+  horizontal_tiles = c(7, 13),
+  vertical_tiles = c(3, 6),
+  mod06_links = "vignettes/data/LAADS_query.2025-08-12T14_29.csv",
+  date = c("2019-08-15", "2019-08-16"),
+  nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+  directory_to_save = dir_mod06l2,
+  acknowledge = TRUE,
+  download = TRUE,
+  remove_command = TRUE,
+  hash = TRUE
+)
+```
+
+```{r, echo = FALSE}
+cat("2 / 2 days of data available in the queried dates.
+
+Downloading requested files...
+
+[`wget` DOWNLOAD OUTPUT OMITTED]
+
+Requested files have been downloaded.
+
+Requests were processed.
+
+[1] \"f43bdc3f850a734d5263a274762379e9\"
+")
+```
+
+Check that the downloaded files correspond to the requested tiles and dates.
+
+```{r, eval = FALSE}
+list.files(dir_mod06l2, recursive = TRUE)
+```
+
+```{r, echo = FALSE}
+cat(" [1] \"2019/227/MOD06_L2.A2019227.1355.061.2019228034420.hdf\"
+ [2] \"2019/227/MOD06_L2.A2019227.1400.061.2019228034841.hdf\"
+ [3] \"2019/227/MOD06_L2.A2019227.1405.061.2019228031931.hdf\"
+ [4] \"2019/227/MOD06_L2.A2019227.1410.061.2019228034018.hdf\"
+ [5] \"2019/227/MOD06_L2.A2019227.1535.061.2019228040729.hdf\"
+ [6] \"2019/227/MOD06_L2.A2019227.1540.061.2019228042901.hdf\"
+ [7] \"2019/227/MOD06_L2.A2019227.1545.061.2019228041453.hdf\"
+ [8] \"2019/227/MOD06_L2.A2019227.1550.061.2019228034852.hdf\"
+ [9] \"2019/227/MOD06_L2.A2019227.1715.061.2019228034600.hdf\"
+[10] \"2019/227/MOD06_L2.A2019227.1720.061.2019228032806.hdf\"
+[11] \"2019/227/MOD06_L2.A2019227.1725.061.2019228033727.hdf\"
+[12] \"2019/227/MOD06_L2.A2019227.1855.061.2019228093012.hdf\"
+[13] \"2019/227/MOD06_L2.A2019227.1900.061.2019228095925.hdf\"
+[14] \"2019/227/MOD06_L2.A2019227.1905.061.2019228093102.hdf\"
+[15] \"2019/227/MOD06_L2.A2019227.2030.061.2019228100212.hdf\"
+[16] \"2019/227/MOD06_L2.A2019227.2035.061.2019228100208.hdf\"
+[17] \"2019/227/MOD06_L2.A2019227.2040.061.2019228102930.hdf\"
+[18] \"2019/227/MOD06_L2.A2019227.2210.061.2019228100421.hdf\"
+[19] \"2019/228/MOD06_L2.A2019228.1440.061.2019229013924.hdf\"
+[20] \"2019/228/MOD06_L2.A2019228.1445.061.2019229014222.hdf\"
+[21] \"2019/228/MOD06_L2.A2019228.1450.061.2019229013756.hdf\"
+[22] \"2019/228/MOD06_L2.A2019228.1455.061.2019229013623.hdf\"
+[23] \"2019/228/MOD06_L2.A2019228.1620.061.2019229013909.hdf\"
+[24] \"2019/228/MOD06_L2.A2019228.1625.061.2019229014711.hdf\"
+[25] \"2019/228/MOD06_L2.A2019228.1630.061.2019229013623.hdf\"
+[26] \"2019/228/MOD06_L2.A2019228.1800.061.2019229074055.hdf\"
+[27] \"2019/228/MOD06_L2.A2019228.1805.061.2019229073242.hdf\"
+[28] \"2019/228/MOD06_L2.A2019228.1810.061.2019229073728.hdf\"
+[29] \"2019/228/MOD06_L2.A2019228.1935.061.2019229074033.hdf\"
+[30] \"2019/228/MOD06_L2.A2019228.1940.061.2019229074120.hdf\"
+[31] \"2019/228/MOD06_L2.A2019228.1945.061.2019229074028.hdf\"
+[32] \"2019/228/MOD06_L2.A2019228.1950.061.2019229074707.hdf\"
+[33] \"2019/228/MOD06_L2.A2019228.2115.061.2019229074046.hdf\"
+[34] \"2019/228/MOD06_L2.A2019228.2120.061.2019229074147.hdf\"
+")
+```
+
+The processing function associated with the `MOD06_L2` product is `process_modis_merge`.
+Again, **users do not need to directly call the `process_modis_merge` function.**, this function is passed to the `calculate_covariates` function based on the `preprocess` parameter.
+The following "processing" steps are for demonstration only.
+
+Check the available layers from the product.
+The first file is used to identify the available layers.
+
+```{r, eval = FALSE}
+terra::describe(
+  list.files(dir_mod06l2, full.names = TRUE, recursive = TRUE)[1],
+  sds = TRUE
+)$var
+```
+
+```{r, echo = FALSE}
+cat(
+  "  [1] \"Scan_Start_Time\"
+  [2] \"Solar_Zenith\"
+  [3] \"Solar_Zenith_Day\"
+  [4] \"Solar_Zenith_Night\"
+  [5] \"Solar_Azimuth\"
+  [6] \"Solar_Azimuth_Day\"
+  [7] \"Solar_Azimuth_Night\"
+  [8] \"Sensor_Zenith\"
+  [9] \"Sensor_Zenith_Day\"
+ [10] \"Sensor_Zenith_Night\"
+ [11] \"Sensor_Azimuth\"
+ [12] \"Sensor_Azimuth_Day\"
+ [13] \"Sensor_Azimuth_Night\"
+ [14] \"Brightness_Temperature\"
+ [15] \"Surface_Temperature\"
+ [16] \"Surface_Pressure\"
+ [17] \"Cloud_Height_Method\"
+ [18] \"Cloud_Top_Height\"
+ [19] \"Cloud_Top_Height_Nadir\"
+ [20] \"Cloud_Top_Height_Nadir_Day\"
+ [21] \"Cloud_Top_Height_Nadir_Night\"
+ [22] \"Cloud_Top_Pressure\"
+ [23] \"Cloud_Top_Pressure_Nadir\"
+ [24] \"Cloud_Top_Pressure_Night\"
+ [25] \"Cloud_Top_Pressure_Nadir_Night\"
+ [26] \"Cloud_Top_Pressure_Day\"
+ [27] \"Cloud_Top_Pressure_Nadir_Day\"
+ [28] \"Cloud_Top_Temperature\"
+ [29] \"Cloud_Top_Temperature_Nadir\"
+ [30] \"Cloud_Top_Temperature_Night\"
+ [31] \"Cloud_Top_Temperature_Nadir_Night\"
+ [32] \"Cloud_Top_Temperature_Day\"
+ [33] \"Cloud_Top_Temperature_Nadir_Day\"
+ [34] \"Tropopause_Height\"
+ [35] \"Cloud_Fraction\"
+ [36] \"Cloud_Fraction_Nadir\"
+ [37] \"Cloud_Fraction_Night\"
+ [38] \"Cloud_Fraction_Nadir_Night\"
+ [39] \"Cloud_Fraction_Day\"
+ [40] \"Cloud_Fraction_Nadir_Day\"
+ [41] \"Cloud_Effective_Emissivity\"
+ [42] \"Cloud_Effective_Emissivity_Nadir\"
+ [43] \"Cloud_Effective_Emissivity_Night\"
+ [44] \"Cloud_Effective_Emissivity_Nadir_Night\"
+ [45] \"Cloud_Effective_Emissivity_Day\"
+ [46] \"Cloud_Effective_Emissivity_Nadir_Day\"
+ [47] \"Cloud_Top_Pressure_Infrared\"
+ [48] \"Spectral_Cloud_Forcing\"
+ [49] \"Cloud_Top_Pressure_From_Ratios\"
+ [50] \"Radiance_Variance\"
+ [51] \"Cloud_Phase_Infrared\"
+ [52] \"Cloud_Phase_Infrared_Night\"
+ [53] \"Cloud_Phase_Infrared_Day\"
+ [54] \"Cloud_Phase_Infrared_1km\"
+ [55] \"IRP_CTH_Consistency_Flag_1km\"
+ [56] \"os_top_flag_1km\"
+ [57] \"cloud_top_pressure_1km\"
+ [58] \"cloud_top_height_1km\"
+ [59] \"cloud_top_temperature_1km\"
+ [60] \"cloud_emissivity_1km\"
+ [61] \"cloud_top_method_1km\"
+ [62] \"surface_temperature_1km\"
+ [63] \"cloud_emiss11_1km\"
+ [64] \"cloud_emiss12_1km\"
+ [65] \"cloud_emiss13_1km\"
+ [66] \"cloud_emiss85_1km\"
+ [67] \"Cloud_Effective_Radius\"
+ [68] \"Cloud_Effective_Radius_PCL\"
+ [69] \"Cloud_Effective_Radius_16\"
+ [70] \"Cloud_Effective_Radius_16_PCL\"
+ [71] \"Cloud_Effective_Radius_37\"
+ [72] \"Cloud_Effective_Radius_37_PCL\"
+ [73] \"Cloud_Optical_Thickness\"
+ [74] \"Cloud_Optical_Thickness_PCL\"
+ [75] \"Cloud_Optical_Thickness_16\"
+ [76] \"Cloud_Optical_Thickness_16_PCL\"
+ [77] \"Cloud_Optical_Thickness_37\"
+ [78] \"Cloud_Optical_Thickness_37_PCL\"
+ [79] \"Cloud_Effective_Radius_1621\"
+ [80] \"Cloud_Effective_Radius_1621_PCL\"
+ [81] \"Cloud_Optical_Thickness_1621\"
+ [82] \"Cloud_Optical_Thickness_1621_PCL\"
+ [83] \"Cloud_Water_Path\"
+ [84] \"Cloud_Water_Path_PCL\"
+ [85] \"Cloud_Water_Path_1621\"
+ [86] \"Cloud_Water_Path_1621_PCL\"
+ [87] \"Cloud_Water_Path_16\"
+ [88] \"Cloud_Water_Path_16_PCL\"
+ [89] \"Cloud_Water_Path_37\"
+ [90] \"Cloud_Water_Path_37_PCL\"
+ [91] \"Cloud_Effective_Radius_Uncertainty\"
+ [92] \"Cloud_Effective_Radius_Uncertainty_16\"
+ [93] \"Cloud_Effective_Radius_Uncertainty_37\"
+ [94] \"Cloud_Optical_Thickness_Uncertainty\"
+ [95] \"Cloud_Optical_Thickness_Uncertainty_16\"
+ [96] \"Cloud_Optical_Thickness_Uncertainty_37\"
+ [97] \"Cloud_Water_Path_Uncertainty\"
+ [98] \"Cloud_Effective_Radius_Uncertainty_1621\"
+ [99] \"Cloud_Optical_Thickness_Uncertainty_1621\"
+[100] \"Cloud_Water_Path_Uncertainty_1621\"
+[101] \"Cloud_Water_Path_Uncertainty_16\"
+[102] \"Cloud_Water_Path_Uncertainty_37\"
+[103] \"Above_Cloud_Water_Vapor_094\"
+[104] \"IRW_Low_Cloud_Temperature_From_COP\"
+[105] \"Cloud_Phase_Optical_Properties\"
+[106] \"Cloud_Multi_Layer_Flag\"
+[107] \"Cirrus_Reflectance\"
+[108] \"Cirrus_Reflectance_Flag\"
+[109] \"Cloud_Mask_5km\"
+[110] \"Quality_Assurance_5km\"
+[111] \"Cloud_Mask_1km\"
+[112] \"Extinction_Efficiency_Ice\"
+[113] \"Asymmetry_Parameter_Ice\"
+[114] \"Single_Scatter_Albedo_Ice\"
+[115] \"Extinction_Efficiency_Liq\"
+[116] \"Asymmetry_Parameter_Liq\"
+[117] \"Single_Scatter_Albedo_Liq\"
+[118] \"Cloud_Mask_SPI\"
+[119] \"Retrieval_Failure_Metric\"
+[120] \"Retrieval_Failure_Metric_16\"
+[121] \"Retrieval_Failure_Metric_37\"
+[122] \"Retrieval_Failure_Metric_1621\"
+[123] \"Atm_Corr_Refl\"
+[124] \"Quality_Assurance_1km\"
+"
+)
+```
+
+The L2 (level 2) product has lots of subdatasets because it has undergone fewer processing steps than a level 3 (L3) product like the `MOD11A1` or `VNP46A2` examples.
+We are interested in the `Cloud_Fraction_Day` subdataset, which contains the daytime cloud fraction coverage.
+The processing function for the MODIS swath products is `process_modis_swath`.
+This function internally warps each of inputs then mosaics these warped images into one `SpatRaster`.
+
+```{r, eval = FALSE}
+rast_mod06l2 <- amadeus::process_modis_swath(
+  path = list.files(dir_mod06l2, full.names = TRUE, recursive = TRUE),
+  date = "2019-08-15",
+  subdataset = "Cloud_Fraction_Day",
+  suffix = ":mod06:"
+)
+rast_mod06l2
+```
+
+```{r, echo = FALSE}
+cat("class       : SpatRaster
+size        : 640, 1280, 1  (nrow, ncol, nlyr)
+resolution  : 0.05, 0.05  (x, y)
+extent      : -127.9999, -63.99994, 20.00654, 52.00654  (xmin, xmax, ymin, ymax)
+coord. ref. : lon/lat WGS 84 (EPSG:4326)
+source(s)   : memory
+name        : Cloud_Fraction_Day
+min value   :                  0
+max value   :                  1
+")
+```
+
+```{r, eval = FALSE}
+terra::plot(rast_mod06l2$Cloud_Fraction_Day)
+```
+
+![](images/mod06l2.png){style="display: block; margin-left: auto; margin-right: auto;"}
+
+The following code will calculate median daytime cloud fraction coverage for Connecticut's counties for August 15 and 16, 2019.
+
+* `dataset_name = "modis"`: MODIS dataset name.
+* `from = list.files(dir_mod06l2, full.names = TRUE, recursive = TRUE)`: MOD06_L2 file paths. The dates of data available in these file paths will determine the dates in the output.
+* `locs = tigris::counties("CT", year = 2019, cb = TRUE)`: Connecticut county polygons.
+* `locs_id = "NAME"`: Use `NAME` column for unique county identifiers.
+* `radius = 0L`: Apply 0m buffer to plygons.
+* `preprocess = amadeus::process_modis_swath`: Preprocess swath datasets as mosaiac.
+* `subdataset = "Cloud_Fraction_Day"`: Daytime cloud fraction coverage variable.
+* `name_covariates = "CLFRD_"`: Prefix for column name for calculated covariates.
+* `fun_summary = "median"`: Calculate median daytime cloud fraction coverage value.
+* `geom = "sf"`: Return as an `sf` object.
+* `scale = "* 1.0`: Multiply values by 1.0.
+
+The scale factor for `MOD06_L2` is 0.009999999776482582 (see [https://atmosphere-imager.gsfc.nasa.gov/sites/default/files/ModAtmo/MOD06_L2_CDL_fs.txt]).
+
+```{r, eval = FALSE}
+sf_mod06l2 <- amadeus::calculate_covariates(
+  covariate = "modis",
+  from = list.files(dir_mod06l2, full.names = TRUE, recursive = TRUE),
+  locs = tigris::counties("CT", year = 2019),
+  locs_id = "NAME",
+  radius = 0L,
+  preprocess = amadeus::process_modis_swath,
+  subdataset = "Cloud_Fraction_Day",
+  name_covariates = "CLFRD_",
+  fun_summary = "median",
+  geom = "sf",
+  scale = "* 0.009999999776482582"
+)
+sf_mod06l2
+```
+
+```{r, echo = FALSE}
+cat("Simple feature collection with 16 features and 3 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -73.72777 ymin: 40.95094 xmax: -71.78724 ymax: 42.05051
+Geodetic CRS:  NAD83
+First 10 features:
+         NAME  CLFRD_00000       time                       geometry
+1   Fairfield 0.0002085408 2019-08-15 MULTIPOLYGON (((-73.54362 4...
+2   Fairfield 0.0019240546 2019-08-16 MULTIPOLYGON (((-73.54362 4...
+3    Hartford 0.0002000000 2019-08-15 MULTIPOLYGON (((-72.94902 4...
+4    Hartford 0.0002125713 2019-08-16 MULTIPOLYGON (((-72.94902 4...
+5  Litchfield 0.0002936930 2019-08-15 MULTIPOLYGON (((-73.50793 4...
+6  Litchfield 0.0004076930 2019-08-16 MULTIPOLYGON (((-73.50793 4...
+7   Middlesex 0.0002000000 2019-08-15 MULTIPOLYGON (((-72.65367 4...
+8   Middlesex 0.0018688483 2019-08-16 MULTIPOLYGON (((-72.65367 4...
+9   New Haven 0.0002000000 2019-08-15 MULTIPOLYGON (((-73.14755 4...
+10  New Haven 0.0006629100 2019-08-16 MULTIPOLYGON (((-73.14755 4...
+")
+```
+
+The function returns an `sf` object, a spatially-enabled tabular data form from the `sf` package.
+The column names and data values are the same as if returned as a `data.frame`, only that each row has associated polygon(s) to define the county boundary.
+In the `sf` object, median daytime cloud fraction coverage values for each county are calculated for August 15 and 16, 2019, the same dates originally passed to `download_data`.
+The column containing the cloud variables is `CLFRD_00000`, which reflects our manually set `name_covariates = "CLFRD_"` prefix **and the buffer radius (padded to 5 digits)**.

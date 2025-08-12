@@ -23,7 +23,7 @@ navbar:
           href: articles/gridmet_workflow.html
         - text: NASA Moderate Resolution Imaging Spectroradiometer (MODIS)
           href: articles/modis_workflow.html
-        - text: North American Regional Reanalysis (NARR)
+        - text: NOAA North American Regional Reanalysis (NARR)
           href: articles/narr_workflow.html
         - text: US EPA Air Quality System (AQS)
           href: articles/epa_download.html
