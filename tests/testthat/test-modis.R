@@ -147,7 +147,7 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
       c(
         4387858920,
         paste0(
-          "/archive/allData/61/MOD06_L2/2019/049/",
+          "https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/",
           "MOD06_L2.A2019049.0720.061.2019049194350.hdf"
         ),
         28267915

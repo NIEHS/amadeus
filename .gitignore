@@ -76,6 +76,5 @@ CRAN-SUBMISSION
 **/cov
 
 # development files
-data/
 R/dev.R
 tests/testthat/test-dev.R

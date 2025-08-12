@@ -2620,11 +2620,7 @@ download_modis <- function(
     #### 10-1. Parse urls in csv
     file_url <- read.csv(mod06_links)
     file_url <- unlist(file_url[, 2])
-    download_url <-
-      paste0(
-        substr(ladsurl, 1, nchar(ladsurl) - 1),
-        file_url
-      )
+    download_url <- gsub("^/", "", file_url)
 
     download_url <- download_url[
       grep(paste0("A(", paste(date_julian, collapse = "|"), ")"), download_url)
@@ -2641,7 +2637,13 @@ download_modis <- function(
     # date_end <- as.Date(as.character(max(file_dates)), format = "%Y%j")
 
     # Extract download names from file_url using splitter
-    download_name <- sapply(strsplit(download_url, "/"), `[`, 10)
+    # download_name <- sapply(strsplit(download_url, "/"), `[`, 10)
+    download_name <- unlist(
+      lapply(
+        download_url,
+        function(x) strsplit(x, "/")[[1]][8]
+      )
+    )
 
     # Create directory structure with julian dates
     dir_substr <- paste0(
