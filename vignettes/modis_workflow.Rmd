@@ -214,7 +214,7 @@ The following code will calculate mean LST for Connecticut's counties for August
 
 The `scale` parameter is crucial as it scales the values stored in the `.hdf` files to the scientifically interpretable values.
 The scale factor for each MODIS product can be found in the technical documentation (also called User Guide).
-The scale factor for `MOD11A1` is 0.02 (see [https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf] Table 3. The SDSs in the MOD11_L2 product).
+The scale factor for `MOD11A1` is 0.02 (see https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf Table 3. The SDSs in the MOD11_L2 product).
 This scale factor converts the values to Kelvin, which are then converted to Celsius with the additional `- 273.15` expression.
 
 ```{r, eval = FALSE}
@@ -483,7 +483,7 @@ The following code will calculate maximum NTL values for Connecticut's counties 
 * `geom = "terra"`: Return as a `terra` `SpatVector` object.
 * `scale = "* 1.0`: Multiply values by 1.0.
 
-The scale factor for `VNP46A2` is 1.0 (see [https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/Black-Marble_v2.0_UG_2024.pdf] Table 8. Scientific datasets included in VNP46A2/VJI46A2 daily moonlight-adjusted NTL product).
+The scale factor for `VNP46A2` is 1.0 (see https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/Black-Marble_v2.0_UG_2024.pdf Table 8. Scientific datasets included in VNP46A2/VJI46A2 daily moonlight-adjusted NTL product).
 
 ```{r, eval = FALSE}
 vect_vnp46a2 <- amadeus::calculate_covariates(
@@ -541,8 +541,12 @@ Then, selecting "csv" will generate the `.csv` file which contains the necessary
 
 This file is manually moved to the `vignettes/data/` folder.
 
-```{r}
+```{r, eval = FALSE}
 list.files(file.path("vignettes", "data"), full.names = TRUE)
+```
+
+```{r, echo = TRUE}
+cat("[1] \"vignettes/data/LAADS_query.2025-08-12T14_29.csv\"\n")
 ```
 
 * `dataset_name = "modis"`: MODIS dataset name.
@@ -829,7 +833,7 @@ The following code will calculate median daytime cloud fraction coverage for Con
 * `geom = "sf"`: Return as an `sf` object.
 * `scale = "* 1.0`: Multiply values by 1.0.
 
-The scale factor for `MOD06_L2` is 0.009999999776482582 (see [https://atmosphere-imager.gsfc.nasa.gov/sites/default/files/ModAtmo/MOD06_L2_CDL_fs.txt]).
+The scale factor for `MOD06_L2` is 0.009999999776482582 (see https://atmosphere-imager.gsfc.nasa.gov/sites/default/files/ModAtmo/MOD06_L2_CDL_fs.txt).
 
 ```{r, eval = FALSE}
 sf_mod06l2 <- amadeus::calculate_covariates(
