@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,7 @@
                         <h4 data-toc-skip class="author">Mitchell
 Manware</h4>
             
-            <h4 data-toc-skip class="date">2025-08-12</h4>
+            <h4 data-toc-skip class="date">2025-08-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/NIEHS/amadeus/blob/main/vignettes/modis_workflow.Rmd" class="external-link"><code>vignettes/modis_workflow.Rmd</code></a></small>
       <div class="d-none name"><code>modis_workflow.Rmd</code></div>
@@ -309,7 +309,7 @@ subtract 273.15.</li>
 stored in the <code>.hdf</code> files to the scientifically
 interpretable values. The scale factor for each MODIS product can be
 found in the technical documentation (also called User Guide). The scale
-factor for <code>MOD11A1</code> is 0.02 (see [<a href="https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf" class="external-link uri">https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf</a>]
+factor for <code>MOD11A1</code> is 0.02 (see <a href="https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf" class="external-link uri">https://lpdaac.usgs.gov/documents/715/MOD11_User_Guide_V61.pdf</a>
 Table 3. The SDSs in the MOD11_L2 product). This scale factor converts
 the values to Kelvin, which are then converted to Celsius with the
 additional <code>- 273.15</code> expression.</p>
@@ -605,7 +605,7 @@ calculated covariates.</li>
 <li>
 <code>scale = "* 1.0</code>: Multiply values by 1.0.</li>
 </ul>
-<p>The scale factor for <code>VNP46A2</code> is 1.0 (see [<a href="https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/Black-Marble_v2.0_UG_2024.pdf" class="external-link uri">https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/Black-Marble_v2.0_UG_2024.pdf</a>]
+<p>The scale factor for <code>VNP46A2</code> is 1.0 (see <a href="https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/Black-Marble_v2.0_UG_2024.pdf" class="external-link uri">https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/Black-Marble_v2.0_UG_2024.pdf</a>
 Table 8. Scientific datasets included in VNP46A2/VJI46A2 daily
 moonlight-adjusted NTL product).</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
@@ -672,8 +672,9 @@ the necessary download links.</p>
 <p>This file is manually moved to the <code>vignettes/data/</code>
 folder.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"data"</span><span class="op">)</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"vignettes"</span>, <span class="st">"data"</span><span class="op">)</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"[1] </span><span class="sc">\"</span><span class="st">vignettes/data/LAADS_query.2025-08-12T14_29.csv</span><span class="sc">\"\n</span><span class="st">"</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>[<span class="dv">1</span>] <span class="st">"vignettes/data/LAADS_query.2025-08-12T14_29.csv"</span></span></code></pre></div>
 <ul>
 <li>
 <code>dataset_name = "modis"</code>: MODIS dataset name.</li>
@@ -712,7 +713,7 @@ file used to download the data.</li>
 <code>hash = TRUE</code>: generate unique SHA-1 hash for the
 downloaded files.</li>
 </ul>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dir_mod06l2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"mod06l2"</span><span class="op">)</span></span>
 <span><span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/download_data.html">download_data</a></span><span class="op">(</span></span>
 <span>  dataset_name <span class="op">=</span> <span class="st">"modis"</span>,</span>
@@ -742,7 +743,7 @@ Requests were processed.
 [1] "f43bdc3f850a734d5263a274762379e9"</code></pre>
 <p>Check that the downloaded files correspond to the requested tiles and
 dates.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod06l2</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code> [1] "2019/227/MOD06_L2.A2019227.1355.061.2019228034420.hdf"
  [2] "2019/227/MOD06_L2.A2019227.1400.061.2019228034841.hdf"
@@ -787,7 +788,7 @@ function.</strong>, this function is passed to the
 for demonstration only.</p>
 <p>Check the available layers from the product. The first file is used
 to identify the available layers.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/describe.html" class="external-link">describe</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod06l2</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
 <span>  sds <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -924,7 +925,7 @@ daytime cloud fraction coverage. The processing function for the MODIS
 swath products is <code>process_modis_swath</code>. This function
 internally warps each of inputs then mosaics these warped images into
 one <code>SpatRaster</code>.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rast_mod06l2</span> <span class="op">&lt;-</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/process_modis_swath.html">process_modis_swath</a></span><span class="op">(</span></span>
 <span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod06l2</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  date <span class="op">=</span> <span class="st">"2019-08-15"</span>,</span>
@@ -941,7 +942,7 @@ source(s)   : memory
 name        : Cloud_Fraction_Day
 min value   :                  0
 max value   :                  1</code></pre>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">rast_mod06l2</span><span class="op">$</span><span class="va">Cloud_Fraction_Day</span><span class="op">)</span></span></code></pre></div>
 <p><img src="images/mod06l2.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
 <p>The following code will calculate median daytime cloud fraction
@@ -979,8 +980,8 @@ fraction coverage value.</li>
 <code>scale = "* 1.0</code>: Multiply values by 1.0.</li>
 </ul>
 <p>The scale factor for <code>MOD06_L2</code> is 0.009999999776482582
-(see [<a href="https://atmosphere-imager.gsfc.nasa.gov/sites/default/files/ModAtmo/MOD06_L2_CDL_fs.txt" class="external-link uri">https://atmosphere-imager.gsfc.nasa.gov/sites/default/files/ModAtmo/MOD06_L2_CDL_fs.txt</a>]).</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+(see <a href="https://atmosphere-imager.gsfc.nasa.gov/sites/default/files/ModAtmo/MOD06_L2_CDL_fs.txt" class="external-link uri">https://atmosphere-imager.gsfc.nasa.gov/sites/default/files/ModAtmo/MOD06_L2_CDL_fs.txt</a>).</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sf_mod06l2</span> <span class="op">&lt;-</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/calculate_covariates.html">calculate_covariates</a></span><span class="op">(</span></span>
 <span>  covariate <span class="op">=</span> <span class="st">"modis"</span>,</span>
 <span>  from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir_mod06l2</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>

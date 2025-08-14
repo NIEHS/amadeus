@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,7 @@
                         <h4 data-toc-skip class="author">Mitchell
 Manware</h4>
             
-            <h4 data-toc-skip class="date">2025-08-12</h4>
+            <h4 data-toc-skip class="date">2025-08-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/NIEHS/amadeus/blob/main/vignettes/narr_workflow.Rmd" class="external-link"><code>vignettes/narr_workflow.Rmd</code></a></small>
       <div class="d-none name"><code>narr_workflow.Rmd</code></div>
@@ -121,7 +121,7 @@ downloaded files.</li>
 <span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  hash <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code>[1] "e839448db9634a6534f89f5e8a1d18525dc3b206"</code></pre>
+<pre><code>[1] "3a382ac1c383c1d048f4044214cb450f"</code></pre>
 <p>Check the downloaded netCDF files.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, pattern <span class="op">=</span> <span class="st">"air.2m"</span><span class="op">)</span></span></code></pre></div>
@@ -218,6 +218,28 @@ type        :    &lt;chr&gt;   &lt;POSIXt&gt;    &lt;num&gt;
 values      :  Chatham 2021-12-28    289.3
               Alamance 2021-12-28    288.8
               Davidson 2021-12-28    289.1</code></pre>
+</div>
+<div class="section level3">
+<h3 id="temporal-summaries">Temporal summaries<a class="anchor" aria-label="anchor" href="#temporal-summaries"></a>
+</h3>
+<p>The <code>aggregate</code> function can be used to calculate a
+summary statistic for each unique spatial point or polygon. In the
+following example, average <code>air.2m_0</code> is calculated for each
+county for the time period December 28, 2021 to January 3, 2022.
+<code>air.2m_0 ~ NAME</code> directs the function to summarize
+<code>air.2m_0</code> values per unique <code>NAME</code>. The
+<code>FUN = mean</code> directs the function to take the mean value. The
+<code><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head()</a></code> function is applied to show only the first few
+entries, as the entire <code>data.frame</code> is 100 rows long.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">air.2m_0</span> <span class="op">~</span> <span class="va">NAME</span>, data <span class="op">=</span> <span class="va">air2m_covar</span>, FUN <span class="op">=</span> <span class="va">mean</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code>       NAME air.2m_0
+1  Alamance 289.5930
+2 Alexander 289.1961
+3 Alleghany 286.9486
+4     Anson 290.5306
+5      Ashe 285.5771
+6     Avery 285.2288</code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
