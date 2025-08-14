@@ -50,7 +50,7 @@ amadeus::download_data(
 )
 ```
 ```{r, echo = FALSE}
-cat('[1] "e839448db9634a6534f89f5e8a1d18525dc3b206"')
+cat('[1] "3a382ac1c383c1d048f4044214cb450f"')
 ```
 
 Check the downloaded netCDF files.
@@ -150,5 +150,29 @@ type        :    <chr>   <POSIXt>    <num>
 values      :  Chatham 2021-12-28    289.3
               Alamance 2021-12-28    288.8
               Davidson 2021-12-28    289.1
+")
+```
+
+
+### Temporal summaries
+
+The `aggregate` function can be used to calculate a summary statistic for each unique spatial point or polygon.
+In the following example, average `air.2m_0` is calculated for each county for the time period December 28, 2021 to January 3, 2022.
+`air.2m_0 ~ NAME` directs the function to summarize `air.2m_0` values per unique `NAME`.
+The `FUN = mean` directs the function to take the mean value.
+The `head()` function is applied to show only the first few entries, as the entire `data.frame` is 100 rows long.
+
+```{r, eval = FALSE}
+head(aggregate(air.2m_0 ~ NAME, data = air2m_covar, FUN = mean))
+```
+
+```{r, echo = FALSE}
+cat("       NAME air.2m_0
+1  Alamance 289.5930
+2 Alexander 289.1961
+3 Alleghany 286.9486
+4     Anson 290.5306
+5      Ashe 285.5771
+6     Avery 285.2288
 ")
 ```
