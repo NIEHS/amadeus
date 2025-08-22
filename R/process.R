@@ -169,7 +169,7 @@ process_covariates <-
 #'
 #' For a full list of available
 #' MODIS product codes, see the "Short Name" column at
-#' [NASA LP DAAC Search Data Catalog](https://lpdaac.usgs.gov/product_search/?collections=Combined+MODIS&collections=Terra+MODIS&collections=Aqua+MODIS&view=list).
+#' [NASA LP DAAC Search Data Catalog](https://www.earthdata.nasa.gov/centers/lp-daac).
 #' When utilizing a product code from this "Short Name" column, \strong{do
 #' not include} the version number following the period. For example, if "Short
 #' Name" = MCD12C1.006, then `product = "MCD12C1"`.
@@ -1533,7 +1533,7 @@ process_population <- function(
 #' @param ... Placeholders.
 #' @note U.S. context. The returned `SpatVector` object contains a
 #' `$description` column to represent the temporal range covered by the
-#' dataset. For more information, see <https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00>.
+#' dataset. For more information, see <https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1>.
 #' @author Insang Song
 #' @return a `SpatVector` object
 #' @importFrom terra vect

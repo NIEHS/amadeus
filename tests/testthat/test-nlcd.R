@@ -134,7 +134,7 @@ testthat::test_that("process_nlcd", {
 testthat::test_that("process_nlcd (deprecated path structure.)", {
   withr::local_package("terra")
 
-  path_nlcd <- testthat::test_path("..", "testdata")
+  path_nlcd <- testthat::test_path("..", "testdata", "nlcd", "dep")
 
   testthat::expect_message(
     nlcd21 <- process_nlcd(path = path_nlcd, year = 2021)
@@ -419,7 +419,7 @@ testthat::test_that("calculate_nlcd (deprecated path stucture)", {
     as.data.frame() |>
     terra::vect(crs = "EPSG:4326")
 
-  path_nlcd <- testthat::test_path("..", "testdata")
+  path_nlcd <- testthat::test_path("..", "testdata", "nlcd", "dep")
 
   testthat::expect_message(
     nlcdras <- process_nlcd(path = path_nlcd, year = 2021)

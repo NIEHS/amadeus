@@ -59,7 +59,7 @@ respective sub-directories within \code{directory_to_save}.
 }
 \description{
 The \code{download_groads()} function accesses and downloads
-roads data from \href{https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00}{NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)}.
+roads data from \href{https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1}{NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)}.
 }
 \examples{
 \dontrun{
