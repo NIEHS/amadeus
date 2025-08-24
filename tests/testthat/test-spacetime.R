@@ -10,11 +10,12 @@ testthat::test_that("check_mysftime works as expected", {
   withr::local_options(list(sf_use_s2 = FALSE))
 
   # open testing data
-  stdata <- data.table::fread(paste0(
-    testthat::test_path("..", "testdata/", ""),
+  stdata <- data.table::fread(file.path(
+    testthat::test_path("..", "testdata", "spacetime"),
     "spacetime_table.csv"
   ))
-  mysft <- sftime::st_as_sftime(stdata,
+  mysft <- sftime::st_as_sftime(
+    stdata,
     coords = c("lon", "lat"),
     crs = 4326,
     time_column_name = "time"
@@ -25,7 +26,8 @@ testthat::test_that("check_mysftime works as expected", {
 
   # check that error messages work well
   testthat::expect_error(check_mysftime(stdata), "x is not a sftime")
-  mysft <- sftime::st_as_sftime(as.data.frame(stdata),
+  mysft <- sftime::st_as_sftime(
+    as.data.frame(stdata),
     coords = c("lon", "lat"),
     crs = 4326,
     time_column_name = "time"
@@ -42,7 +44,8 @@ testthat::test_that("check_mysftime works as expected", {
       time_column_name = "date"
     )
   testthat::expect_error(
-    check_mysftime(mysft), "time column should be called time"
+    check_mysftime(mysft),
+    "time column should be called time"
   )
   mysft <- stdata |>
     sftime::st_as_sftime(
@@ -55,7 +58,8 @@ testthat::test_that("check_mysftime works as expected", {
     check_mysftime(mysft),
     "geometry column should be called geometry"
   )
-  mysft <- sftime::st_as_sftime(stdata,
+  mysft <- sftime::st_as_sftime(
+    stdata,
     coords = c("lon", "lat"),
     crs = 4326,
     time_column_name = "time"
@@ -83,21 +87,19 @@ testthat::test_that("check_mysf", {
   withr::local_options(list(sf_use_s2 = FALSE))
 
   # open testing data
-  stdata <- data.table::fread(paste0(
-    testthat::test_path("..", "testdata/", ""),
+  stdata <- data.table::fread(file.path(
+    testthat::test_path("..", "testdata", "spacetime"),
     "spacetime_table.csv"
   ))
-  mysf <- sf::st_as_sf(stdata,
-    coords = c("lon", "lat"),
-    crs = 4326
-  )
+  mysf <- sf::st_as_sf(stdata, coords = c("lon", "lat"), crs = 4326)
 
   # should work
   testthat::expect_no_error(check_mysf(x = mysf))
 
   # check that error messages work well
   testthat::expect_error(check_mysf(stdata), "x is not a sf")
-  mysf <- sf::st_as_sf(as.data.frame(stdata),
+  mysf <- sf::st_as_sf(
+    as.data.frame(stdata),
     coords = c("lon", "lat"),
     crs = 4326
   )
@@ -115,10 +117,7 @@ testthat::test_that("check_mysf", {
     check_mysf(mysf),
     "geometry column should be called geometry"
   )
-  mysf <- sf::st_as_sf(stdata,
-    coords = c("lon", "lat"),
-    crs = 4326
-  )
+  mysf <- sf::st_as_sf(stdata, coords = c("lon", "lat"), crs = 4326)
   pol <- cbind(
     c(39.35, 39.36, 39.36, 39.35, 39.35),
     c(-81.43, -81.43, -81.42, -81.42, -81.43)
@@ -142,11 +141,12 @@ testthat::test_that("rename_time", {
   withr::local_package("sftime")
   withr::local_options(list(sf_use_s2 = FALSE))
   # open testing data
-  stdata <- data.table::fread(paste0(
-    testthat::test_path("..", "testdata/", ""),
+  stdata <- data.table::fread(file.path(
+    testthat::test_path("..", "testdata", "spacetime"),
     "spacetime_table.csv"
   ))
-  mysft <- sftime::st_as_sftime(stdata,
+  mysft <- sftime::st_as_sftime(
+    stdata,
     coords = c("lon", "lat"),
     crs = 4326,
     time_column_name = "time"
@@ -166,8 +166,8 @@ testthat::test_that("rename_time", {
 ##### dt_as_mysftime
 testthat::test_that("dt_as_mysftime", {
   # open testing data
-  stdata <- data.table::fread(paste0(
-    testthat::test_path("..", "testdata/", ""),
+  stdata <- data.table::fread(file.path(
+    testthat::test_path("..", "testdata", "spacetime"),
     "spacetime_table.csv"
   ))
   # should work
@@ -213,8 +213,8 @@ testthat::test_that("as_mysftime", {
   withr::local_package("terra")
   withr::local_package("data.table")
   # open testing data
-  stdata <- data.table::fread(paste0(
-    testthat::test_path("..", "testdata/", ""),
+  stdata <- data.table::fread(file.path(
+    testthat::test_path("..", "testdata", "spacetime"),
     "spacetime_table.csv"
   ))
   # with data.table
@@ -252,17 +252,15 @@ testthat::test_that("as_mysftime", {
     crs = 4326
   )))
   # with sf
-  mysf <- sf::st_as_sf(stdata,
-    coords = c("lon", "lat"),
-    crs = 4326
-  )
+  mysf <- sf::st_as_sf(stdata, coords = c("lon", "lat"), crs = 4326)
   testthat::expect_no_error(as_mysftime(mysf, "time"))
   b <- mysf |>
     dplyr::rename("date" = "time")
   testthat::expect_no_error(as_mysftime(b, "date"))
   testthat::expect_no_error(check_mysftime(as_mysftime(b, "date")))
   # with sftime
-  mysft <- sftime::st_as_sftime(stdata,
+  mysft <- sftime::st_as_sftime(
+    stdata,
     coords = c("lon", "lat"),
     crs = 4326,
     time_column_name = "time"
@@ -345,11 +343,12 @@ testthat::test_that("as_mysftime", {
 ##### sftime_as_spatvector
 testthat::test_that("sftime_as_spatvector", {
   # open testing data
-  stdata <- data.table::fread(paste0(
-    testthat::test_path("..", "testdata/", ""),
+  stdata <- data.table::fread(file.path(
+    testthat::test_path("..", "testdata", "spacetime"),
     "spacetime_table.csv"
   ))
-  mysftime <- sftime::st_as_sftime(stdata,
+  mysftime <- sftime::st_as_sftime(
+    stdata,
     coords = c("lon", "lat"),
     time_column_name = "time",
     crs = 4326
@@ -372,8 +371,8 @@ testthat::test_that("sf_as_mysftime", {
   withr::local_options(list(sf_use_s2 = FALSE))
 
   # open testing data
-  stdata <- data.table::fread(paste0(
-    testthat::test_path("..", "testdata/", ""),
+  stdata <- data.table::fread(file.path(
+    testthat::test_path("..", "testdata", "spacetime"),
     "spacetime_table.csv"
   ))
   mysf <- sf::st_as_sf(stdata, coords = c("lon", "lat"), crs = 4326)
@@ -397,11 +396,12 @@ testthat::test_that("sftime_as_mysftime", {
   withr::local_options(list(sf_use_s2 = FALSE))
 
   # open testing data
-  stdata <- data.table::fread(paste0(
-    testthat::test_path("..", "testdata/", ""),
+  stdata <- data.table::fread(file.path(
+    testthat::test_path("..", "testdata", "spacetime"),
     "spacetime_table.csv"
   ))
-  mysft <- sftime::st_as_sftime(stdata,
+  mysft <- sftime::st_as_sftime(
+    stdata,
     coords = c("lon", "lat"),
     time_column_name = "time",
     crs = 4326
@@ -498,13 +498,13 @@ testthat::test_that("sftime_as_sf", {
   withr::local_package("sftime")
   withr::local_options(list(sf_use_s2 = FALSE))
 
-
   # open testing data
-  stdata <- data.table::fread(paste0(
-    testthat::test_path("..", "testdata/", ""),
+  stdata <- data.table::fread(file.path(
+    testthat::test_path("..", "testdata", "spacetime"),
     "spacetime_table.csv"
   ))
-  mysftime <- sftime::st_as_sftime(stdata,
+  mysftime <- sftime::st_as_sftime(
+    stdata,
     coords = c("lon", "lat"),
     time_column_name = "time",
     crs = 4326
@@ -513,7 +513,8 @@ testthat::test_that("sftime_as_sf", {
   testthat::expect_no_error(sftime_as_sf(mysftime, keeptime = FALSE))
   testthat::expect_equal(class(sftime_as_sf(mysftime))[1], "sf")
   testthat::expect_equal(
-    class(sftime_as_sf(mysftime, keeptime = FALSE))[1], "sf"
+    class(sftime_as_sf(mysftime, keeptime = FALSE))[1],
+    "sf"
   )
   testthat::expect_true(
     "time" %in% colnames(sftime_as_sf(mysftime, keeptime = TRUE))
@@ -532,11 +533,12 @@ testthat::test_that("sftime_as_sf", {
   withr::local_options(list(sf_use_s2 = FALSE))
 
   # open testing data
-  stdata <- data.table::fread(paste0(
-    testthat::test_path("..", "testdata/", ""),
+  stdata <- data.table::fread(file.path(
+    testthat::test_path("..", "testdata", "spacetime"),
     "spacetime_table.csv"
   ))
-  mysftime <- sftime::st_as_sftime(stdata,
+  mysftime <- sftime::st_as_sftime(
+    stdata,
     coords = c("lon", "lat"),
     time_column_name = "time",
     crs = 4326
@@ -545,7 +547,8 @@ testthat::test_that("sftime_as_sf", {
   testthat::expect_no_error(sftime_as_sf(mysftime, keeptime = FALSE))
   testthat::expect_equal(class(sftime_as_sf(mysftime))[1], "sf")
   testthat::expect_equal(
-    class(sftime_as_sf(mysftime, keeptime = FALSE))[1], "sf"
+    class(sftime_as_sf(mysftime, keeptime = FALSE))[1],
+    "sf"
   )
   testthat::expect_true(
     "time" %in% colnames(sftime_as_sf(mysftime, keeptime = TRUE))

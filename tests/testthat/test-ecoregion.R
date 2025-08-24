@@ -274,8 +274,8 @@ testthat::test_that("calculate_ecoregion", {
   site_unmatched <-
     data.frame(
       site_id = "99999999999999",
-      lon = -999.999,
-      lat = -99.999,
+      lon = -179.99,
+      lat = -79.99,
       date = as.Date("2022-01-01")
     )
   site_unmatched <-
