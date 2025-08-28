@@ -13,33 +13,40 @@ testthat::test_that("download_aqs", {
   parameter_code <- 88101
   directory_to_save <- paste0(tempdir(), "/epa/")
   # run download function
-  download_data(dataset_name = "aqs",
-                year = c(year_start, year_end),
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                unzip = FALSE,
-                remove_zip = FALSE,
-                download = FALSE,
-                remove_command = FALSE)
+  download_data(
+    dataset_name = "aqs",
+    year = c(year_start, year_end),
+    directory_to_save = directory_to_save,
+    acknowledgement = TRUE,
+    unzip = FALSE,
+    remove_zip = FALSE,
+    download = FALSE,
+    remove_command = FALSE
+  )
   # expect sub-directories to be created
   testthat::expect_true(
     length(
       list.files(
-        directory_to_save, include.dirs = TRUE
+        directory_to_save,
+        include.dirs = TRUE
       )
-    ) == 3
+    ) ==
+      3
   )
   # define file path with commands
   commands_path <-
     paste0(
-           download_sanitize_path(directory_to_save),
-           "aqs_",
-           parameter_code,
-           "_",
-           year_start, "_", year_end,
-           "_",
-           resolution_temporal,
-           "_curl_commands.txt")
+      download_sanitize_path(directory_to_save),
+      "aqs_",
+      parameter_code,
+      "_",
+      year_start,
+      "_",
+      year_end,
+      "_",
+      resolution_temporal,
+      "_curl_commands.txt"
+    )
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
@@ -47,9 +54,11 @@ testthat::test_that("download_aqs", {
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
   # implement unit tets
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   unlink(directory_to_save, recursive = TRUE)
 })
@@ -63,33 +72,40 @@ testthat::test_that("download_aqs (single year)", {
   parameter_code <- 88101
   directory_to_save <- paste0(tempdir(), "/epa/")
   # run download function
-  download_data(dataset_name = "aqs",
-                year = year,
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                unzip = FALSE,
-                remove_zip = FALSE,
-                download = FALSE,
-                remove_command = FALSE)
+  download_data(
+    dataset_name = "aqs",
+    year = year,
+    directory_to_save = directory_to_save,
+    acknowledgement = TRUE,
+    unzip = FALSE,
+    remove_zip = FALSE,
+    download = FALSE,
+    remove_command = FALSE
+  )
   # expect sub-directories to be created
   testthat::expect_true(
     length(
       list.files(
-        directory_to_save, include.dirs = TRUE
+        directory_to_save,
+        include.dirs = TRUE
       )
-    ) == 3
+    ) ==
+      3
   )
   # define file path with commands
   commands_path <-
     paste0(
-           download_sanitize_path(directory_to_save),
-           "aqs_",
-           parameter_code,
-           "_",
-           year, "_", year,
-           "_",
-           resolution_temporal,
-           "_curl_commands.txt")
+      download_sanitize_path(directory_to_save),
+      "aqs_",
+      parameter_code,
+      "_",
+      year,
+      "_",
+      year,
+      "_",
+      resolution_temporal,
+      "_curl_commands.txt"
+    )
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
@@ -97,9 +113,11 @@ testthat::test_that("download_aqs (single year)", {
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
   # implement unit tets
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   unlink(directory_to_save, recursive = TRUE)
 })
@@ -116,10 +134,13 @@ testthat::test_that("process_aqs", {
   aqssub <- testthat::test_path(
     "..",
     "testdata",
+    "aqs",
     "aqs_daily_88101_triangle.csv"
   )
   testd <- testthat::test_path(
-    "..", "testdata"
+    "..",
+    "testdata",
+    "aqs"
   )
 
   # main test
@@ -272,7 +293,8 @@ testthat::test_that("process_aqs", {
   )
   testthat::expect_error(
     process_aqs(
-      path = aqssub, date = c("2021-08-15", "2021-08-16", "2021-08-17")
+      path = aqssub,
+      date = c("2021-08-15", "2021-08-16", "2021-08-17")
     )
   )
   testthat::expect_error(
@@ -280,22 +302,28 @@ testthat::test_that("process_aqs", {
   )
   testthat::expect_no_error(
     process_aqs(
-      path = aqssub, date = c("2022-02-04", "2022-02-28"),
-      mode = "available-data", return_format = "sf",
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "available-data",
+      return_format = "sf",
       extent = c(-79, 33, -78, 36)
     )
   )
   testthat::expect_no_error(
     process_aqs(
-      path = aqssub, date = c("2022-02-04", "2022-02-28"),
-      mode = "available-data", return_format = "sf",
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "available-data",
+      return_format = "sf",
       extent = c(-79, 33, -78, 36)
     )
   )
   testthat::expect_warning(
     process_aqs(
-      path = aqssub, date = c("2022-02-04", "2022-02-28"),
-      mode = "available-data", return_format = "data.table",
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "available-data",
+      return_format = "data.table",
       extent = c(-79, -78, 33, 36)
     ),
     "Extent is not applicable for data.table. Returning data.table..."

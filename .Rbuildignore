@@ -29,3 +29,8 @@ LICENSE.md
 ^tests/container/
 air.toml
 interactive.sh
+container.sif
+vignettes/modis_workflow.Rmd
+vignettes/data
+vignettes/images/mod*
+vignettes/images/vnp*

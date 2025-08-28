@@ -47,7 +47,7 @@ is used to convert the unit of length to meters.
 \note{
 Unit is km / sq km. The returned \code{data.frame} object contains a
 \verb{$time} column to represent the temporal range covered by the
-dataset. For more information, see \url{https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00}.
+dataset. For more information, see \url{https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1}.
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large

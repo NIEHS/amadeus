@@ -14,33 +14,37 @@ testthat::test_that("download_koppen_geiger", {
   for (p in seq_along(time_periods)) {
     time_period <- time_periods[p]
     for (d in seq_along(data_resolutions)) {
-      download_data(dataset_name = "koppen",
-                    time_period = time_period,
-                    data_resolution = data_resolutions[d],
-                    directory_to_save = directory_to_save,
-                    acknowledgement = TRUE,
-                    unzip = FALSE,
-                    remove_zip = FALSE,
-                    download = FALSE,
-                    remove_command = FALSE)
+      download_data(
+        dataset_name = "koppen",
+        time_period = time_period,
+        data_resolution = data_resolutions[d],
+        directory_to_save = directory_to_save,
+        acknowledgement = TRUE,
+        unzip = FALSE,
+        remove_zip = FALSE,
+        download = FALSE,
+        remove_command = FALSE
+      )
       # define file path with commands
-      commands_path <- paste0(download_sanitize_path(directory_to_save),
-                              "koppen_geiger_",
-                              time_period,
-                              "_",
-                              gsub("\\.",
-                                   "p",
-                                   data_resolutions[d]),
-                              "_",
-                              Sys.Date(),
-                              "_wget_command.txt")
+      commands_path <- paste0(
+        download_sanitize_path(directory_to_save),
+        "koppen_geiger_",
+        time_period,
+        "_",
+        gsub("\\.", "p", data_resolutions[d]),
+        "_",
+        Sys.Date(),
+        "_wget_command.txt"
+      )
       # expect sub-directories to be created
       testthat::expect_true(
         length(
           list.files(
-            directory_to_save, include.dirs = TRUE
+            directory_to_save,
+            include.dirs = TRUE
           )
-        ) == 3
+        ) ==
+          3
       )
       # import commands
       commands <- read_commands(commands_path = commands_path)
@@ -49,9 +53,11 @@ testthat::test_that("download_koppen_geiger", {
       # check HTTP URL status
       url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
       # implement unit tests
-      test_download_functions(directory_to_save = directory_to_save,
-                              commands_path = commands_path,
-                              url_status = url_status)
+      test_download_functions(
+        directory_to_save = directory_to_save,
+        commands_path = commands_path,
+        url_status = url_status
+      )
       # remove file with commands after test
       file.remove(commands_path)
     }
@@ -64,7 +70,7 @@ testthat::test_that("download_koppen_geiger", {
 testthat::test_that("process_koppen_geiger", {
   withr::local_package("terra")
   path_kgeiger <-
-    testthat::test_path("../testdata", "koppen_subset.tif")
+    testthat::test_path("../testdata", "koppen_geiger", "koppen_subset.tif")
 
   testthat::expect_no_error(
     kgeiger <- process_koppen_geiger(path_kgeiger)
@@ -80,7 +86,11 @@ testthat::test_that("process_koppen_geiger", {
   testthat::expect_s4_class(kgeiger, "SpatRaster")
 
   path_kgeiger_f <-
-    testthat::test_path("../testdata", "kop", "Beck_KG_V1_future_0p5.tif")
+    testthat::test_path(
+      "../testdata",
+      "koppen_geiger",
+      "Beck_KG_V1_future_0p5.tif"
+    )
   testthat::expect_no_error(
     kgeiger_f <- process_koppen_geiger(path_kgeiger_f)
   )
@@ -102,7 +112,12 @@ testthat::test_that("calculate_koppen_geiger", {
       lat = 35.97
     )
   site_faux <- terra::vect(site_faux, crs = "EPSG:4326", keepgeom = TRUE)
-  kp_path <- testthat::test_path("..", "testdata", "koppen_subset.tif")
+  kp_path <- testthat::test_path(
+    "..",
+    "testdata",
+    "koppen_geiger",
+    "koppen_subset.tif"
+  )
 
   testthat::expect_no_error(
     kgras <- process_koppen_geiger(path = kp_path)

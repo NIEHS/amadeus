@@ -44,7 +44,7 @@ testthat::test_that("calculate_covariates (expected errors)", {
     )
   for (cand in candidates) {
     testthat::expect_error(
-      calculate_covariates(covariate = cand)
+      suppressWarnings(calculate_covariates(covariate = cand))
     )
   }
 })
@@ -109,7 +109,7 @@ testthat::test_that("calculate_covariates (no errors)", {
     )
   for (cand in candidates) {
     testthat::expect_error(
-      calculate_covariates(covariate = cand)
+      suppressWarnings(calculate_covariates(covariate = cand))
     )
   }
 })

@@ -545,7 +545,7 @@ This file is manually moved to the `vignettes/data/` folder.
 list.files(file.path("vignettes", "data"), full.names = TRUE)
 ```
 
-```{r, echo = TRUE}
+```{r, echo = FALSE}
 cat("[1] \"vignettes/data/LAADS_query.2025-08-12T14_29.csv\"\n")
 ```
 

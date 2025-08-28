@@ -14,30 +14,36 @@ testthat::test_that("download_groads", {
   for (r in seq_along(data_regions)) {
     data_region <- data_regions[r]
     for (f in seq_along(data_formats)) {
-      download_data(dataset_name = "sedac_groads",
-                    directory_to_save = directory_to_save,
-                    acknowledgement = TRUE,
-                    data_format = data_formats[f],
-                    data_region = data_region,
-                    download = FALSE,
-                    unzip = FALSE,
-                    remove_zip = FALSE,
-                    remove_command = FALSE)
+      download_data(
+        dataset_name = "sedac_groads",
+        directory_to_save = directory_to_save,
+        acknowledgement = TRUE,
+        data_format = data_formats[f],
+        data_region = data_region,
+        download = FALSE,
+        unzip = FALSE,
+        remove_zip = FALSE,
+        remove_command = FALSE
+      )
       # expect sub-directories to be created
       testthat::expect_true(
         length(
           list.files(
-            directory_to_save, include.dirs = TRUE
+            directory_to_save,
+            include.dirs = TRUE
           )
-        ) == 3
+        ) ==
+          3
       )
       # define file path with commands
-      commands_path <- paste0(download_sanitize_path(directory_to_save),
-                              "sedac_groads_",
-                              gsub(" ", "_", tolower(data_region)),
-                              "_",
-                              Sys.Date(),
-                              "_curl_command.txt")
+      commands_path <- paste0(
+        download_sanitize_path(directory_to_save),
+        "sedac_groads_",
+        gsub(" ", "_", tolower(data_region)),
+        "_",
+        Sys.Date(),
+        "_curl_command.txt"
+      )
       # import commands
       commands <- read_commands(commands_path = commands_path)
       # extract urls
@@ -45,24 +51,28 @@ testthat::test_that("download_groads", {
       # check HTTP URL status
       url_status <- check_urls(urls = urls, size = 1L, method = "GET")
       # implement unit tests
-      test_download_functions(directory_to_save = directory_to_save,
-                              commands_path = commands_path,
-                              url_status = url_status)
+      test_download_functions(
+        directory_to_save = directory_to_save,
+        commands_path = commands_path,
+        url_status = url_status
+      )
       # remove file with commands after test
       file.remove(commands_path)
     }
   }
 
   testthat::expect_message(
-    download_data(dataset_name = "sedac_groads",
-                  data_format = "Shapefile",
-                  data_region = "Global",
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  unzip = FALSE,
-                  remove_zip = FALSE,
-                  remove_command = TRUE)
+    download_data(
+      dataset_name = "sedac_groads",
+      data_format = "Shapefile",
+      data_region = "Global",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      unzip = FALSE,
+      remove_zip = FALSE,
+      remove_command = TRUE
+    )
   )
   # remove temporary groads
   unlink(directory_to_save, recursive = TRUE)
@@ -76,7 +86,7 @@ testthat::test_that("process_groads", {
   # main test
   testthat::expect_no_error(
     groads <- process_groads(
-      path = testthat::test_path("../testdata/groads_test.shp")
+      path = testthat::test_path("../testdata/groads/groads_test.shp")
     )
   )
   # expect
@@ -88,7 +98,7 @@ testthat::test_that("process_groads", {
   # test with cropping extent
   testthat::expect_no_error(
     groads_ext <- process_groads(
-      path = testthat::test_path("../testdata/groads_test.shp"),
+      path = testthat::test_path("../testdata/groads/groads_test.shp"),
       extent = terra::ext(groads)
     )
   )
@@ -109,7 +119,12 @@ testthat::test_that("calculate_groads", {
     time = c(2022, 2022)
   )
   # ncp <- terra::vect(ncp, keepgeom = TRUE, crs = "EPSG:4326")
-  path_groads <- testthat::test_path("..", "testdata", "groads_test.shp")
+  path_groads <- testthat::test_path(
+    "..",
+    "testdata",
+    "groads",
+    "groads_test.shp"
+  )
   groads <- terra::vect(path_groads)
 
   testthat::expect_no_error(
@@ -144,7 +159,8 @@ testthat::test_that("calculate_groads", {
     )
   )
   testthat::expect_equal(
-    ncol(groads_terra), 4
+    ncol(groads_terra),
+    4
   )
   testthat::expect_true(
     "SpatVector" %in% class(groads_terra)
@@ -161,7 +177,8 @@ testthat::test_that("calculate_groads", {
     )
   )
   testthat::expect_equal(
-    ncol(groads_sf), 5
+    ncol(groads_sf),
+    5
   )
   testthat::expect_true(
     "sf" %in% class(groads_sf)

@@ -2095,7 +2095,7 @@ calculate_population <- function(
 # nolint start
 #' @note Unit is km / sq km. The returned `data.frame` object contains a
 #' `$time` column to represent the temporal range covered by the
-#' dataset. For more information, see <https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00>.
+#' dataset. For more information, see <https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1>.
 # nolint end
 #' @author Insang Song
 #' @seealso [`process_groads`]

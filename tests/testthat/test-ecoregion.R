@@ -9,24 +9,30 @@ testthat::test_that("download_ecoregion", {
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- paste0(tempdir(), "/eco/")
-  certificate <- system.file("extdata/cacert_gaftp_epa.pem",
-                             package = "amadeus")
+  certificate <- system.file(
+    "extdata/cacert_gaftp_epa.pem",
+    package = "amadeus"
+  )
   # run download function
-  download_data(dataset_name = "ecoregion",
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                unzip = FALSE,
-                remove_zip = FALSE,
-                download = FALSE,
-                remove_command = FALSE,
-                epa_certificate_path = certificate)
+  download_data(
+    dataset_name = "ecoregion",
+    directory_to_save = directory_to_save,
+    acknowledgement = TRUE,
+    unzip = FALSE,
+    remove_zip = FALSE,
+    download = FALSE,
+    remove_command = FALSE,
+    epa_certificate_path = certificate
+  )
   # expect sub-directories to be created
   testthat::expect_true(
     length(
       list.files(
-        directory_to_save, include.dirs = TRUE
+        directory_to_save,
+        include.dirs = TRUE
       )
-    ) == 3
+    ) ==
+      3
   )
   # define file path with commands
   commands_path <- paste0(
@@ -44,13 +50,14 @@ testthat::test_that("download_ecoregion", {
     httr::HEAD(urls, config = httr::config(cainfo = certificate))
   url_status <- url_status$status_code
   # implement unit tets
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
 
   file.create(
-    file.path(directory_to_save, "zip_files",
-              "us_eco_l3_state_boundaries.zip"),
+    file.path(directory_to_save, "zip_files", "us_eco_l3_state_boundaries.zip"),
     recursive = TRUE
   )
   testthat::expect_no_error(
@@ -71,7 +78,9 @@ testthat::test_that("download_ecoregion", {
   testthat::expect_equal(
     length(
       list.files(
-        directory_to_save, recursive = TRUE, include.dirs = TRUE
+        directory_to_save,
+        recursive = TRUE,
+        include.dirs = TRUE
       )
     ),
     1
@@ -96,15 +105,16 @@ testthat::test_that("download_ecoregion (expected errors)", {
   # run download function
 
   testthat::expect_message(
-    download_data(dataset_name = "ecoregion",
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  remove_command = FALSE,
-                  unzip = FALSE,
-                  remove_zip = FALSE,
-                  epa_certificate_path = certificate
-                  )
+    download_data(
+      dataset_name = "ecoregion",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = FALSE,
+      unzip = FALSE,
+      remove_zip = FALSE,
+      epa_certificate_path = certificate
+    )
   )
   # unlink dir
   unlink(tdir)
@@ -130,7 +140,12 @@ testthat::test_that("process_ecoregion", {
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
 
-  path_eco <- testthat::test_path("..", "testdata", "eco_l3_clip.gpkg")
+  path_eco <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
   testthat::expect_no_error(
     eco <- process_ecoregion(path_eco)
   )
@@ -161,7 +176,12 @@ testthat::test_that("calculate_ecoregion", {
   withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
 
-  ecol3 <- testthat::test_path("..", "testdata", "eco_l3_clip.gpkg")
+  ecol3 <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
   site_faux <-
     data.frame(
       site_id = "37999109988101",
@@ -171,10 +191,11 @@ testthat::test_that("calculate_ecoregion", {
     )
   site_faux <-
     terra::vect(
-                site_faux,
-                geom = c("lon", "lat"),
-                keepgeom = TRUE,
-                crs = "EPSG:4326")
+      site_faux,
+      geom = c("lon", "lat"),
+      keepgeom = TRUE,
+      crs = "EPSG:4326"
+    )
   site_faux <- terra::project(site_faux, "EPSG:5070")
 
   testthat::expect_no_error(
@@ -204,7 +225,8 @@ testthat::test_that("calculate_ecoregion", {
   # should have each of the indicator groups
   dum_cn <- grep("DUM_", colnames(ecor_res))
   testthat::expect_equal(
-    sum(unlist(ecor_res[, dum_cn])), 2L
+    sum(unlist(ecor_res[, dum_cn])),
+    2L
   )
 
   testthat::expect_no_error(
@@ -216,7 +238,8 @@ testthat::test_that("calculate_ecoregion", {
     )
   )
   testthat::expect_equal(
-    ncol(ecor_terra), 4
+    ncol(ecor_terra),
+    4
   )
   testthat::expect_true(
     "SpatVector" %in% class(ecor_terra)
@@ -231,7 +254,8 @@ testthat::test_that("calculate_ecoregion", {
     )
   )
   testthat::expect_equal(
-    ncol(ecor_sf), 5
+    ncol(ecor_sf),
+    5
   )
   testthat::expect_true(
     "sf" %in% class(ecor_sf)
@@ -245,25 +269,30 @@ testthat::test_that("calculate_ecoregion", {
       geom = TRUE
     )
   )
-  
+
   # Test unmatched locations are correctly reintroduced with NA values in ecoregion columns
-  site_unmatched <- 
-  data.frame(
-    site_id = "99999999999999",
-    lon = -999.999,
-    lat = -99.999,
-    date = as.Date("2022-01-01")
-  )
+  site_unmatched <-
+    data.frame(
+      site_id = "99999999999999",
+      lon = -179.99,
+      lat = -79.99,
+      date = as.Date("2022-01-01")
+    )
   site_unmatched <-
     terra::vect(
-                site_unmatched,
-                geom = c("lon", "lat"),
-                keepgeom = TRUE,
-                crs = "EPSG:4326")
+      site_unmatched,
+      geom = c("lon", "lat"),
+      keepgeom = TRUE,
+      crs = "EPSG:4326"
+    )
   site_unmatched <- terra::project(site_unmatched, "EPSG:5070")
 
   site_combined <- rbind(sf::st_drop_geometry(site_faux), site_unmatched)
-  site_combined <- sf::st_as_sf(site_combined, coords = c("lon", "lat"), crs = "EPSG:4326")
+  site_combined <- sf::st_as_sf(
+    site_combined,
+    coords = c("lon", "lat"),
+    crs = "EPSG:4326"
+  )
 
   ecor_res2 <- calculate_ecoregion(
     from = erras,
@@ -271,18 +300,29 @@ testthat::test_that("calculate_ecoregion", {
     locs_id = "site_id"
   )
 
-  testthat::expect_true("99999999999999" %in% ecor_res2$site_id, 
-  info = "Unmatched site should be present.")
+  testthat::expect_true(
+    "99999999999999" %in% ecor_res2$site_id,
+    info = "Unmatched site should be present."
+  )
 
-  extra_cols <- setdiff(colnames(ecor_res2), colnames(sf::st_drop_geometry(site_combined)))
+  extra_cols <- setdiff(
+    colnames(ecor_res2),
+    colnames(sf::st_drop_geometry(site_combined))
+  )
   unmatched_row <- ecor_res2[ecor_res2$site_id == "99999999999999", ]
 
-  testthat::expect_true(all(is.na(unmatched_row[, extra_cols])), 
-  info = "Unmatched locations should have NA in ecoregion-related columns.")
+  testthat::expect_true(
+    all(is.na(unmatched_row[, extra_cols])),
+    info = "Unmatched locations should have NA in ecoregion-related columns."
+  )
 
   # Ensure the warning message appears when unmatched locations exist
   testthat::expect_message(
-    calculate_ecoregion(from = erras, locs = site_combined, locs_id = "site_id"),
+    calculate_ecoregion(
+      from = erras,
+      locs = site_combined,
+      locs_id = "site_id"
+    ),
     "Warning: only .* locations provided had matching ecoregions.",
     fixed = FALSE
   )

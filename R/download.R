@@ -1680,7 +1680,7 @@ download_nlcd <- function(
 #' Download roads data
 #' @description
 #' The \code{download_groads()} function accesses and downloads
-#' roads data from [NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00).
+#' roads data from [NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)](https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1).
 #' @param data_region character(1). Data can be downloaded for `"Global"`,
 #' `"Africa"`, `"Asia"`, `"Europe"`, `"Americas"`, `"Oceania East"`, and `"Oceania West"`.
 #' @param data_format character(1). Data can be downloaded as `"Shapefile"` or
