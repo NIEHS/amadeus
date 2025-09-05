@@ -8,7 +8,7 @@
 [![CRAN](https://www.r-pkg.org/badges/version/amadeus?color=blue)](https://cran.r-project.org/package=amadeus)
 [![downloads](https://cranlogs.r-pkg.org/badges/grand-total/amadeus)](https://cran.r-project.org/package=amadeus)
 
-`amadeus` is **a** **m**ech**a**nism for **d**ata, **e**nvironments, and **u**ser **s**etup for common environmental and climate health datasets in R. `amadeus` has been developed to improve access to and utility with large scale, publicly available environmental data in R.
+`amadeus` is **a** **m**ech**a**nism for **d**ata, **e**nvironments, and **u**ser **s**etup for common environmental and weather datasets in R. `amadeus` has been developed to improve access to and utility with large scale, publicly available environmental data in R.
 
 See the peer-reviewed publication, [Amadeus: Accessing and analyzing large scale environmental data in R](https://www.sciencedirect.com/science/article/pii/S1364815225000362), for full description and details.
 
@@ -164,14 +164,13 @@ The `amadeus` package has been developed as part of the National Institute of En
 
 ## Additional Resources
 
-The following R packages can also be used to access climate and weather data in R, but each differs from `amadeus` in the data sources covered or type of functionality provided.
+The following R packages can also be used to access environmental and weather data in R, but each differs from `amadeus` in the data sources covered or type of functionality provided.
 
 | Package | Source |
 | :--- | :----- |
 | [`dataRetrieval`](https://cran.r-project.org/package=dataRetrieval) | [USGS Hydrological Data](https://www.usgs.gov/mission-areas/water-resources/data) and [EPA Water Quality Data](https://www.epa.gov/waterdata/water-quality-data) |
 | [`daymetr`](https://cran.r-project.org/package=daymetr) | [Daymet](https://daac.ornl.gov/cgi-bin/dataset_lister.pl?p=32) |
 | [`ecmwfr`](https://cran.r-project.org/package=ecmwfr) | [ECMWF Reanalysis v5 (ERA5)](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) |
-| [`RClimChange`[^7]](https://github.com/hllauca/RClimChange/) | [NASA Earth Exchange Global Daily Downscaled Projections (NEX-GDDP-CMIP6)](https://www.nccs.nasa.gov/services/data-collections/land-based-products/nex-gddp-cmip6) |
 | [`rNOMADS`](https://cran.r-project.org/package=rNOMADS) | [NOAA Operational Model Archive and Distribution System](https://nomads.ncep.noaa.gov/) |
 | [`sen2r`[^8]](https://github.com/ranghetti/sen2r) | [Sentinel-2](https://sentiwiki.copernicus.eu/web/s2-mission) |
 
