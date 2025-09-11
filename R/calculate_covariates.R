@@ -421,7 +421,7 @@ calculate_nlcd <- function(
       )
     )
   }
-  year <- as.integer(terra::metags(from)[2, 2])
+  year <- as.integer(terra::metags(from)$value[nrow(terra::metags(from))])
   stopifnot(year %in% 1985:2023L)
 
   # select points within mainland US and reproject on nlcd crs if necessary
