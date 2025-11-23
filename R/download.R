@@ -2641,7 +2641,7 @@ download_modis <- function(
     download_name <- unlist(
       lapply(
         download_url,
-        function(x) strsplit(x, "/")[[1]][8]
+        function(x) tail(strsplit(x, "/")[[1]], 1)
       )
     )
 
