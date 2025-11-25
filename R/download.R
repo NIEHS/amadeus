@@ -2584,7 +2584,7 @@ download_modis <- function(
 
   #### 9. Reuse ladsweb home url
   ladsurl <- "https://ladsweb.modaps.eosdis.nasa.gov/"
-  version <- ifelse(startsWith(product, "VNP"), "5000", version)
+  version <- ifelse(startsWith(product, "VNP"), "5200", version)
 
   #### 11. define date sequence
   date_sequence <- amadeus::generate_date_sequence(
