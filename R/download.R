@@ -418,7 +418,7 @@ download_ecoregion <- function(
   )
 
   download_url <- paste0(
-    "https://gaftp.epa.gov/EPADataCommons/ORD/Ecoregions/us/",
+    "https://dmap-prod-oms-edc.s3.us-east-1.amazonaws.com/ORD/Ecoregions/us/",
     "us_eco_l3_state_boundaries.zip"
   )
   #### 6. build download file name
