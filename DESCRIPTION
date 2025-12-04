@@ -50,7 +50,7 @@ RdMacros: Rdpack
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Config/Needs/website: tidyverse/tidytemplate
 Config/testhat/edition: 3
 License: MIT + file LICENSE
