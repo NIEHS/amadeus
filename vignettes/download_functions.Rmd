@@ -94,11 +94,13 @@ link <- c(
   "https://www.mrlc.gov/data",
   "https://www.ospo.noaa.gov/products/land/hms.html#0",
   paste0(
-    "https://sedac.ciesin.columbia.edu/data/set/groads-",
-    "global-roads-open-access-v1/data-download"
+    "https://data.earthdata.nasa.gov/nasa-earth/",
+    "human-dimensions/sedac-root/downloads/data/groads/",
+    "groads-global-roads-open-access-v1"
   ),
   paste0(
-    "https://sedac.ciesin.columbia.edu/data/set/gpw-v4-",
+    "https://data.earthdata.nasa.gov/nasa-earth/",
+    "human-dimensions/sedac-root/downloads/data/gpw-v4/",
     "population-density-adjusted-to-2015-unwpp-country-",
     "totals-rev11"
   ),
@@ -367,8 +369,9 @@ Running the `system_command` deploys an "auxiliary" function, `download_run`, a 
 
 ```{r}
 download_run <- function(
-    download = FALSE,
-    system_command = NULL) {
+  download = FALSE,
+  system_command = NULL
+) {
   if (download == TRUE) {
     cat(paste0("Downloading requested files...\n"))
     system(command = system_command)
@@ -501,7 +504,8 @@ The previous outline successfully cleaned parameters, generated URLs, and downlo
 
 ```{r}
 read_commands <- function(
-    commands_path = commands_path) {
+  commands_path = commands_path
+) {
   commands <- utils::read.csv(commands_path, header = FALSE)
   commands <- commands[seq_len(nrow(commands)), ]
   return(commands)
@@ -513,8 +517,9 @@ read_commands <- function(
 ```{r}
 # function to extract URLs from vector
 extract_urls <- function(
-    commands = commands,
-    position = NULL) {
+  commands = commands,
+  position = NULL
+) {
   if (is.null(position)) {
     cat(paste0("URL position in command is not defined.\n"))
     return(NULL)
@@ -532,8 +537,9 @@ extract_urls <- function(
 
 ```{r}
 check_url_status <- function(
-    url,
-    method = "HEAD") {
+  url,
+  method = "HEAD"
+) {
   http_status_ok <- 200
   if (method == "HEAD") {
     hd <- httr::HEAD(url)
@@ -549,9 +555,10 @@ check_url_status <- function(
 
 ```{r}
 check_urls <- function(
-    urls = urls,
-    size = NULL,
-    method = "HEAD") {
+  urls = urls,
+  size = NULL,
+  method = "HEAD"
+) {
   if (is.null(size)) {
     cat(paste0("URL sample size is not defined.\n"))
     return(NULL)

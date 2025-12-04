@@ -1759,7 +1759,8 @@ download_groads <- function(
   data_region <- match.arg(data_region)
   #### 5. define URL base
   base <- paste0(
-    "https://sedac.ciesin.columbia.edu/downloads/data/groads/",
+    "https://data.earthdata.nasa.gov/nasa-earth/",
+    "human-dimensions/sedac-root/downloads/data/groads/",
     "groads-global-roads-open-access-v1/",
     "groads-v1-"
   )
@@ -1913,7 +1914,7 @@ download_population <- function(
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
   #### 4. define URL base
-  base <- paste0("https://sedac.ciesin.columbia.edu/downloads/data/gpw-v4/")
+  base <- paste0("https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/")
   #### 5. define year
   year <- ifelse(year == "all", "totpop", as.character(year))
   #### 6. define data resolution
