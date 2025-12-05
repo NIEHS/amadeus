@@ -626,7 +626,7 @@ download_geos <- function(
           download_name
         )
         download_command <- paste0(
-          "curl ",
+          "curl -L --fail --retry 10 --retry-delay 5 --retry-max-time 0  --speed-limit 1000 --speed-time 30 ",
           download_url,
           " -o ",
           download_folder_name,
@@ -2659,7 +2659,7 @@ download_modis <- function(
     #### 10-4. write download_command
     download_command <- paste0(
       "wget -e robots=off -np -R .html,.tmp ",
-      "-nH --cut-dirs=3 \"",
+      "-nH --cut-dirs=3 --tries=10 --retry-connrefused --waitretry=10 -timeout=30 \"",
       download_url,
       "\" --header \"Authorization: Bearer ",
       nasa_earth_data_token,
@@ -2805,7 +2805,7 @@ download_modis <- function(
     # Main wget run
     download_command <- paste0(
       "wget -e robots=off -np -R .html,.tmp ",
-      "-nH --cut-dirs=3 \"",
+      "-nH --cut-dirs=3  --tries=10 --retry-connrefused --waitretry=10 -timeout=30 \"",
       filelist_sub,
       "\" --header \"Authorization: Bearer ",
       nasa_earth_data_token,
