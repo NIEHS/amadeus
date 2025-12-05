@@ -1593,7 +1593,7 @@ download_nlcd <- function(
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
   #### 4. check for valid years
-  valid_years <- 1985:2023L
+  valid_years <- 1985:2024L
   if (!(as.integer(year) %in% valid_years)) {
     stop(paste0("Requested year is not recognized.\n"))
   }
@@ -1661,17 +1661,6 @@ download_nlcd <- function(
     download = download,
     commands_txt = commands_txt,
     remove = remove_command
-  )
-  #### 16. end if unzip == FALSE
-  amadeus::download_unzip(
-    file_name = download_name,
-    directory_to_unzip = directory_to_save,
-    unzip = unzip
-  )
-  #### 18. remove zip files
-  amadeus::download_remove_zips(
-    remove = remove_zip,
-    download_name = download_name
   )
   return(amadeus::download_hash(hash, directory_to_save))
 }
@@ -1914,7 +1903,9 @@ download_population <- function(
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
   #### 4. define URL base
-  base <- paste0("https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/")
+  base <- paste0(
+    "https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/"
+  )
   #### 5. define year
   year <- ifelse(year == "all", "totpop", as.character(year))
   #### 6. define data resolution
