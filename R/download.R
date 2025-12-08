@@ -626,20 +626,20 @@ download_geos <- function(
           download_name
         )
         download_command <- paste(
-          "wget",
-          "-e robots=off -np -R .html,.tmp",
-          "--no-verbose",
-          "--continue",
-          "--tries=20",
-          "--retry-connrefused",
-          "--waitretry=30",
-          "--timeout=60",
-          "--retry-on-http-error=500,502,503,504",
-          "--limit-rate=10M",
-          "--random-wait",
-          "--wait=2",
-          "--no-clobber",
-          "--keep-session-cookies",
+          "wget ",
+          "-e robots=off -np -R .html,.tmp ",
+          "--no-verbose ",
+          "--continue ",
+          "--tries=20 ",
+          "--retry-connrefused ",
+          "--waitretry=30 ",
+          "--timeout=60 ",
+          "--retry-on-http-error=500,502,503,504 ",
+          "--limit-rate=10M ",
+          "--random-wait ",
+          "--wait=2 ",
+          "--no-clobber ",
+          "--keep-session-cookies \"",
           download_url,
           "-o",
           download_folder_name
@@ -2677,7 +2677,7 @@ download_modis <- function(
     )
 
     #### 10-4. write download_command
-    download_command <- paste0(
+    download_command <- paste(
       "wget ",
       "-e robots=off -np -R .html,.tmp ",
       "-nH --cut-dirs=3 ",
@@ -2692,17 +2692,14 @@ download_modis <- function(
       "--random-wait ",
       "--wait=2 ",
       "--no-clobber ",
-      "--keep-session-cookies ",
-      "--header='Authorization: Bearer ",
-      nasa_earth_data_token,
-      "' ",
+      "--keep-session-cookies \"",
       download_url,
-      " ",
-      "-O '",
+      "\" --header \"Authorization: Bearer ",
+      nasa_earth_data_token,
+      "\" -O ",
       directory_to_save,
       dir_substr,
       download_name,
-      "'",
       "\n"
     )
 
