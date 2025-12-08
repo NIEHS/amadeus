@@ -625,13 +625,26 @@ download_geos <- function(
           download_folder,
           download_name
         )
-        download_command <- paste0(
-          "curl -L --fail --retry 10 --retry-delay 5 --retry-max-time 0  --speed-limit 1000 --speed-time 30 ",
+        download_command <- paste(
+          "wget",
+          "-e robots=off -np -R .html,.tmp",
+          "--no-verbose",
+          "--continue",
+          "--tries=20",
+          "--retry-connrefused",
+          "--waitretry=30",
+          "--timeout=60",
+          "--retry-on-http-error=500,502,503,504",
+          "--limit-rate=10M",
+          "--random-wait",
+          "--wait=2",
+          "--no-clobber",
+          "--keep-session-cookies",
           download_url,
-          " -o ",
-          download_folder_name,
-          "\n"
+          "-o",
+          download_folder_name
         )
+
         if (amadeus::check_destfile(download_folder_name)) {
           #### cat command only if file does not already exist
           cat(download_command)
@@ -2657,9 +2670,22 @@ download_modis <- function(
     )
 
     #### 10-4. write download_command
-    download_command <- paste0(
-      "wget -e robots=off -np -R .html,.tmp ",
-      "-nH --cut-dirs=3 --tries=10 --retry-connrefused --waitretry=10 -timeout=30 \"",
+    download_command <- paste(
+      "wget",
+      "-e robots=off -np -R .html,.tmp",
+      "-nH --cut-dirs=3",
+      "--no-verbose",
+      "--continue",
+      "--tries=20",
+      "--retry-connrefused",
+      "--waitretry=30",
+      "--timeout=60",
+      "--retry-on-http-error=500,502,503,504",
+      "--limit-rate=10M",
+      "--random-wait",
+      "--wait=2",
+      "--no-clobber",
+      "--keep-session-cookies",
       download_url,
       "\" --header \"Authorization: Bearer ",
       nasa_earth_data_token,
