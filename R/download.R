@@ -1675,6 +1675,13 @@ download_nlcd <- function(
     commands_txt = commands_txt,
     remove = remove_command
   )
+
+  #### 16. end if unzip == FALSE
+  amadeus::download_unzip(
+    file_name = download_name,
+    directory_to_unzip = directory_to_save,
+    unzip = unzip
+  )
   return(amadeus::download_hash(hash, directory_to_save))
 }
 
@@ -2670,29 +2677,32 @@ download_modis <- function(
     )
 
     #### 10-4. write download_command
-    download_command <- paste(
-      "wget",
-      "-e robots=off -np -R .html,.tmp",
-      "-nH --cut-dirs=3",
-      "--no-verbose",
-      "--continue",
-      "--tries=20",
-      "--retry-connrefused",
-      "--waitretry=30",
-      "--timeout=60",
-      "--retry-on-http-error=500,502,503,504",
-      "--limit-rate=10M",
-      "--random-wait",
-      "--wait=2",
-      "--no-clobber",
-      "--keep-session-cookies",
-      download_url,
-      "\" --header \"Authorization: Bearer ",
+    download_command <- paste0(
+      "wget ",
+      "-e robots=off -np -R .html,.tmp ",
+      "-nH --cut-dirs=3 ",
+      "--no-verbose ",
+      "--continue ",
+      "--tries=20 ",
+      "--retry-connrefused ",
+      "--waitretry=30 ",
+      "--timeout=60 ",
+      "--retry-on-http-error=500,502,503,504 ",
+      "--limit-rate=10M ",
+      "--random-wait ",
+      "--wait=2 ",
+      "--no-clobber ",
+      "--keep-session-cookies ",
+      "--header='Authorization: Bearer ",
       nasa_earth_data_token,
-      "\" -O ",
+      "' ",
+      download_url,
+      " ",
+      "-O '",
       directory_to_save,
       dir_substr,
       download_name,
+      "'",
       "\n"
     )
 
