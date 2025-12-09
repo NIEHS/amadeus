@@ -625,7 +625,7 @@ download_geos <- function(
           download_folder,
           download_name
         )
-        download_command <- paste(
+        download_command <- paste0(
           "wget ",
           "-e robots=off -np -R .html,.tmp ",
           "--no-verbose ",
@@ -639,10 +639,14 @@ download_geos <- function(
           "--random-wait ",
           "--wait=2 ",
           "--no-clobber ",
-          "--keep-session-cookies \"",
+          "--keep-session-cookies ",
+          "'",
           download_url,
-          "-o",
-          download_folder_name
+          "' ",
+          "-O '",
+          download_folder_name,
+          "'",
+          "\n" # Add newline at the end
         )
 
         if (amadeus::check_destfile(download_folder_name)) {
