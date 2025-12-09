@@ -530,6 +530,7 @@ download_geos <- function(
     "chm_inst_1hr_g1440x721_p23",
     "met_inst_1hr_g1440x721_p23"
   ),
+  nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -640,6 +641,9 @@ download_geos <- function(
           "--wait=2 ",
           "--no-clobber ",
           "--keep-session-cookies ",
+          "--header='Authorization: Bearer ",
+          nasa_earth_data_token,
+          "' ",
           "'",
           download_url,
           "' ",
