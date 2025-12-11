@@ -20,6 +20,10 @@ download_geos(
 \arguments{
 \item{collection}{character(1). GEOS-CF data collection file name.}
 
+\item{nasa_earth_data_token}{character(1).
+Token for downloading data from NASA. Should be set before
+trying running the function.}
+
 \item{date}{character(1 or 2). length of 10. Date or start/end dates for downloading data.
 Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}).}
 

@@ -479,6 +479,9 @@ download_ecoregion <- function(
 #' @description
 #' The \code{download_geos()} function accesses and downloads various
 #' atmospheric composition collections from [NASA's Global Earth Observing System (GEOS) model](https://gmao.gsfc.nasa.gov/GEOS_systems/).
+#' @param nasa_earth_data_token character(1).
+#'  Token for downloading data from NASA. Should be set before
+#'  trying running the function.
 #' @param collection character(1). GEOS-CF data collection file name.
 #' @param date character(1 or 2). length of 10. Date or start/end dates for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
