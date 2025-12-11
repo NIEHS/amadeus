@@ -8,6 +8,7 @@ download_geos(
   collection = c("aqc_tavg_1hr_g1440x721_v1", "chm_tavg_1hr_g1440x721_v1",
     "met_tavg_1hr_g1440x721_x1", "xgc_tavg_1hr_g1440x721_x1",
     "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"),
+  nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
