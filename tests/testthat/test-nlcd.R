@@ -27,7 +27,7 @@ testthat::test_that("download_nlcd", {
   directory_to_save <- paste0(tempdir(), "/nlcd/")
   # run download function
   for (y in seq_along(years)) {
-    p <- sample(seq_len(length(products)), size = 1L)
+    p <- sample(seq_along(products), size = 1L)
     download_data(
       dataset_name = "nlcd",
       year = years[y],
