@@ -9,10 +9,7 @@ testthat::test_that("download_ecoregion", {
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- paste0(tempdir(), "/eco/")
-  certificate <- system.file(
-    "extdata/cacert_gaftp_epa.pem",
-    package = "amadeus"
-  )
+
   # run download function
   download_data(
     dataset_name = "ecoregion",
@@ -21,8 +18,7 @@ testthat::test_that("download_ecoregion", {
     unzip = FALSE,
     remove_zip = FALSE,
     download = FALSE,
-    remove_command = FALSE,
-    epa_certificate_path = certificate
+    remove_command = FALSE
   )
   # expect sub-directories to be created
   testthat::expect_true(
@@ -44,10 +40,10 @@ testthat::test_that("download_ecoregion", {
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
-  urls <- extract_urls(commands = commands, position = 3)
+  urls <- extract_urls(commands = commands, position = 2)
   # check HTTP URL status
   url_status <-
-    httr::HEAD(urls, config = httr::config(cainfo = certificate))
+    httr::HEAD(urls, config = httr::config())
   url_status <- url_status$status_code
   # implement unit tets
   test_download_functions(
@@ -68,8 +64,7 @@ testthat::test_that("download_ecoregion", {
       unzip = FALSE,
       remove_zip = TRUE,
       download = FALSE,
-      remove_command = TRUE,
-      epa_certificate_path = certificate
+      remove_command = TRUE
     )
   )
   testthat::expect_true(
@@ -95,7 +90,6 @@ testthat::test_that("download_ecoregion (expected errors)", {
   # function parameters
   tdir <- tempdir(check = TRUE)
   directory_to_save <- paste0(tempdir(), "/epa/")
-  certificate <- file.path(tdir, "cacert_gaftp_epa.pem")
   # remove if there is a preexisting file
   if (file.exists(certificate)) {
     file.remove(certificate)
@@ -113,7 +107,6 @@ testthat::test_that("download_ecoregion (expected errors)", {
       remove_command = FALSE,
       unzip = FALSE,
       remove_zip = FALSE,
-      epa_certificate_path = certificate
     )
   )
   # unlink dir

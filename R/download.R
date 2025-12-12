@@ -333,20 +333,6 @@ download_aqs <-
 #' @description
 #' The \code{download_ecoregion()} function accesses and downloads United States Ecoregions data from the [U.S. Environmental Protection Agency's (EPA) Ecorgions](https://www.epa.gov/eco-research/ecoregions). Level 3 data, where all pieces of information in the higher levels are included, are downloaded.
 # nolint end
-#' @note
-#' For EPA Data Commons certificate errors, follow the steps below:
-#' 1. Click Lock icon in the address bar at https://gaftp.epa.gov
-#' 2. Click Show Certificate
-#' 3. Access Details
-#' 4. Find URL with *.crt extension
-#' Currently we bundle the pre-downloaded crt and its PEM (which is accepted
-#' in wget command) file in ./inst/extdata. The instruction above is for
-#' certificate updates in the future.
-#' @param epa_certificate_path character(1). Path to the certificate file
-#' for EPA DataCommons. Default is
-#' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
-#' @param certificate_url character(1). URL to certificate file. See notes for
-#' details.
 #' @param directory_to_save character(1). Directory to save data. Two
 #' sub-directories will be created for the downloaded zip files ("/zip_files")
 #' and the unzipped data files ("/data_files").
@@ -387,11 +373,6 @@ download_aqs <-
 #' }
 #' @export
 download_ecoregion <- function(
-  epa_certificate_path = system.file(
-    "extdata/cacert_gaftp_epa.pem",
-    package = "amadeus"
-  ),
-  certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -410,11 +391,6 @@ download_ecoregion <- function(
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
   #### 5. define download URL
-  amadeus::download_epa_certificate(
-    epa_certificate_path = epa_certificate_path,
-    certificate_url = certificate_url
-  )
-
   download_url <- paste0(
     "https://dmap-prod-oms-edc.s3.us-east-1.amazonaws.com/ORD/Ecoregions/us/",
     "us_eco_l3_state_boundaries.zip"
@@ -427,8 +403,7 @@ download_ecoregion <- function(
   #### 7. build download command
   download_command <-
     paste0(
-      "wget --ca-certificate=",
-      epa_certificate_path,
+      "wget",
       " ",
       download_url,
       " -O ",
@@ -630,7 +605,6 @@ download_geos <- function(
         download_command <- paste0(
           "wget ",
           "-e robots=off -np -R .html,.tmp ",
-          "--no-verbose ",
           "--continue ",
           "--tries=20 ",
           "--retry-connrefused ",
@@ -2690,7 +2664,6 @@ download_modis <- function(
       "wget ",
       "-e robots=off -np -R .html,.tmp ",
       "-nH --cut-dirs=3 ",
-      "--no-verbose ",
       "--continue ",
       "--tries=20 ",
       "--retry-connrefused ",
@@ -2853,7 +2826,6 @@ download_modis <- function(
       "wget ",
       "-e robots=off -np -R .html,.tmp ",
       "-nH --cut-dirs=3 ",
-      "--no-verbose ",
       "--continue ",
       "--tries=20 ",
       "--retry-connrefused ",
