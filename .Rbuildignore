@@ -34,4 +34,3 @@ vignettes/modis_workflow.Rmd
 vignettes/data
 vignettes/images/mod*
 vignettes/images/vnp*
-R/development.R

@@ -333,6 +333,7 @@ process_huc <-
 #' * Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
+#'
 #' # nolint end
 #' @examples
 #' \dontrun{
