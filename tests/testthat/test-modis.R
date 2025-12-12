@@ -13,7 +13,7 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
   version <- "61"
   horizontal_tiles <- c(12, 13)
   vertical_tiles <- c(5, 6)
-  nasa_earth_data_token <- "tOkEnPlAcEhOlDeR"
+  nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
   directory_to_save <- paste0(tempdir(), "/mod/")
   for (y in seq_along(years)) {
     date_start <- paste0(years[y], "-06-20")
@@ -68,7 +68,7 @@ testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
   version <- "61"
   horizontal_tiles <- c(12, 13)
   vertical_tiles <- c(5, 6)
-  nasa_earth_data_token <- "tOkEnPlAcEhOlDeR"
+  nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
   directory_to_save <- paste0(tempdir(), "/mod/")
   date <- "2021-04-12"
   download_data(
@@ -119,7 +119,7 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
   version <- "61"
   date_start <- "2019-02-18"
   date_end <- "2019-02-18"
-  nasa_earth_data_token <- "tOkEnPlAcEhOlDeR"
+  nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
   horizontal_tiles <- c(8, 10)
   vertical_tiles <- c(4, 5)
   directory_to_save <- paste0(tempdir(), "/mod/")
@@ -207,7 +207,7 @@ testthat::test_that("download_modis (expected errors)", {
   version <- "61"
   horizontal_tiles <- c(12, 13)
   vertical_tiles <- c(5, 6)
-  nasa_earth_data_token <- "tOkEnPlAcEhOlDeR"
+  nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
   directory_to_save <- paste0(tempdir(), "/mod/")
   date_start <- paste0(years, "-06-25")
   date_end <- paste0(years, "-06-28")
@@ -370,7 +370,7 @@ testthat::test_that("download_modis (MOD + MYD products)", {
   version <- "61"
   horizontal_tiles <- c(10, 10)
   vertical_tiles <- c(4, 5)
-  nasa_earth_data_token <- "tOkEnPlAcEhOlDeR"
+  nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
   directory_to_save <- paste0(tempdir(), "/mod/")
   date_start <- "2021-06-01"
   date_end <- "2021-06-30"

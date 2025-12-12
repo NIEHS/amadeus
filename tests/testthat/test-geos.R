@@ -7,6 +7,7 @@
 testthat::test_that("download_geos", {
   withr::local_package("httr")
   withr::local_package("stringr")
+  nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
   # function parameters
   date_start <- "2019-09-09"
   date_end <- "2019-09-09"
@@ -18,7 +19,7 @@ testthat::test_that("download_geos", {
       dataset_name = "geos",
       date = c(date_start, date_end),
       collection = collections,
-      nasa_earth_data_token = "my_token",
+      nasa_earth_data_token = nasa_earth_data_token,
       directory_to_save = directory_to_save,
       acknowledgement = TRUE,
       download = FALSE
