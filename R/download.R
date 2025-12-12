@@ -89,8 +89,7 @@ download_data <-
       "huc",
       "cropscape",
       "cdl",
-      "prism",
-      "edgar"
+      "prism"
     ),
     directory_to_save = NULL,
     acknowledgement = FALSE,
@@ -129,8 +128,7 @@ download_data <-
       huc = download_huc,
       cropscape = download_cropscape,
       cdl = download_cropscape,
-      prism = download_prism,
-      edgar = download_edgar
+      prism = download_prism
     )
 
     return <- tryCatch(

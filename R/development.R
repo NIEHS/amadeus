@@ -333,9 +333,6 @@ process_huc <-
 #' * Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{web_edgarv8_1ap}{amadeus}
-#' \insertRef{web_edgarv8_1voc}{amadeus}
 #' # nolint end
 #' @examples
 #' \dontrun{
