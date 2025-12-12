@@ -40,7 +40,7 @@ This wrapper function calls source-specific data download functions, each utiliz
 functions <- c(
   "download_aqs",
   "download_ecoregion",
-  "download_geos_data",
+  "download_geos",
   "download_gmted",
   "download_koppen_geiger",
   "download_merra2",

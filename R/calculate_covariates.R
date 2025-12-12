@@ -1125,6 +1125,9 @@ calculate_temporal_dummies <-
 #'
 #' \insertRef{web_sedctutorial_package}{amadeus}
 #' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
 #' set.seed(101)
 #' ncpath <- system.file("gpkg/nc.gpkg", package = "sf")
 #' nc <- terra::vect(ncpath)
@@ -1139,6 +1142,7 @@ calculate_temporal_dummies <-
 #'
 #' vals <- c("val1", "val2")
 #' sum_edc(pnt_locs, pnt_from, "NAME", 1e4, vals)
+#' }
 #' @importFrom dplyr as_tibble
 #' @importFrom dplyr left_join
 #' @importFrom dplyr summarize
