@@ -1,4 +1,4 @@
-## 1.3
+# 1.3
 - Fixed depcreated file paths for NLCD, MODIS, and Ecoregions datasets
 - Removed the certificate verification from ecoregion download which is not needed anymore
 - For NASA datasets MODIS, VIIRS, and Geos-CF, added additional options to prevent API throttling 
