@@ -90,11 +90,6 @@ testthat::test_that("download_ecoregion (expected errors)", {
   # function parameters
   tdir <- tempdir(check = TRUE)
   directory_to_save <- paste0(tempdir(), "/epa/")
-  # remove if there is a preexisting file
-  if (file.exists(certificate)) {
-    file.remove(certificate)
-    file.remove(gsub("pem", "crt", certificate))
-  }
 
   # run download function
 
