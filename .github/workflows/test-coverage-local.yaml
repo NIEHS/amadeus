@@ -6,6 +6,10 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  schedule:
+    # Runs daily at 2 AM UTC (adjust timezone as needed)
+    - cron: '0 7 * * *'
+  workflow_dispatch:
 
 name: test-coverage-local
 
