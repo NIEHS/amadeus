@@ -37,7 +37,9 @@ testthat::test_that("download_geos", {
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
-  urls <- extract_urls(commands = commands, position = 2)
+  urls <- extract_urls(commands = commands, position = 10)[[5]] %>%
+    gsub("'", "", .)
+
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 2L, method = "HEAD")
   # implement unit tests
@@ -52,6 +54,8 @@ testthat::test_that("download_geos", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
+
 testthat::test_that("download_geos (single date)", {
   withr::local_package("httr")
   withr::local_package("stringr")
@@ -64,6 +68,7 @@ testthat::test_that("download_geos (single date)", {
     download_data(
       dataset_name = "geos",
       date = date,
+      nasa_earth_data_token = nasa_earth_data_token,
       collection = collections,
       directory_to_save = directory_to_save,
       acknowledgement = TRUE,
@@ -82,7 +87,8 @@ testthat::test_that("download_geos (single date)", {
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
-  urls <- extract_urls(commands = commands, position = 2)
+  urls <- extract_urls(commands = commands, position = 10)[[5]] %>%
+    gsub("'", "", .)
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 2L, method = "HEAD")
   # implement unit tests

@@ -43,9 +43,10 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
       "_wget_commands.txt"
     )
     # import commands
-    commands <- read_commands(commands_path = commands_path)[, 2]
+    commands <- read_commands(commands_path = commands_path)[[5]]
     # extract urls
-    urls <- extract_urls(commands = commands, position = 4)
+    urls <- extract_urls(commands = commands, position = 10)[[1]] %>%
+      gsub("'", "", .)
     # check HTTP URL status
     url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
     # implement unit tests
@@ -95,9 +96,11 @@ testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
     "_wget_commands.txt"
   )
   # import commands
-  commands <- read_commands(commands_path = commands_path)[, 2]
+  commands <- read_commands(commands_path = commands_path)[[5]]
   # extract urls
-  urls <- extract_urls(commands = commands, position = 4)
+  urls <- extract_urls(commands = commands, position = 10)[[1]] %>%
+    gsub("'", "", .)
+
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
   # implement unit tests
@@ -180,9 +183,10 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
     full.names = TRUE
   )
   # import commands
-  commands <- read_commands(commands_path = commands_path)[, 2]
+  commands <- read_commands(commands_path = commands_path)[[5]]
   # extract urls
-  urls <- extract_urls(commands = commands, position = 4)
+  urls <- extract_urls(commands = commands, position = 10)[[1]] %>%
+    gsub("'", "", .)
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
   # implement unit tests
@@ -325,9 +329,10 @@ testthat::test_that("download_modis (expected errors)", {
     "_wget_commands.txt"
   )
   # import commands
-  commands <- read_commands(commands_path = commands_path)[, 2]
+  commands <- read_commands(commands_path = commands_path)[[5]]
   # extract urls
-  urls <- extract_urls(commands = commands, position = 4)
+  urls <- extract_urls(commands = commands, position = 10)[[1]] %>%
+    gsub("'", "", .)
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 2L, method = "HEAD")
   # implement unit tests
@@ -401,9 +406,10 @@ testthat::test_that("download_modis (MOD + MYD products)", {
       "_wget_commands.txt"
     )
     # import commands
-    commands <- read_commands(commands_path = commands_path)[, 2]
+    commands <- read_commands(commands_path = commands_path)[[5]]
     # extract urls
-    urls <- extract_urls(commands = commands, position = 4)
+    urls <- extract_urls(commands = commands, position = 10)[[1]] %>%
+      gsub("'", "", .)
     # check HTTP URL status
     url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
     # implement unit tests
