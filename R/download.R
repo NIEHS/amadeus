@@ -597,6 +597,7 @@ download_geos <- function(
             sink()
             file.remove(commands_txt)
             stop(paste0(
+              download_url,
               "Invalid date returns HTTP code 404. ",
               "Check `date` parameter.\n"
             ))
