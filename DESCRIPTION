@@ -21,7 +21,7 @@ Imports:
     terra (>= 1.8-50),
     methods,
     data.table,
-    httr,
+    httr2,
     rvest,
     exactextractr,
     utils,
