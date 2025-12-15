@@ -146,7 +146,7 @@ testthat::test_that("check_urls returns NULL undefined size.", {
     "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/",
     "Shapefile/2023/09/hms_smoke20230901.zip"
   )
-  url_status <- check_urls(urls = urls, method = "HEAD")
+  url_status <- check_urls(urls = urls)
   testthat::expect_true(
     is.null(url_status)
   )
@@ -158,7 +158,7 @@ testthat::test_that("check_urls handles size > length(urls)", {
     "Shapefile/2023/09/hms_smoke20230901.zip"
   )
   testthat::expect_no_error(
-    url_status <- check_urls(urls = urls, size = 10, method = "HEAD")
+    url_status <- check_urls(urls = urls, size = 10)
   )
   testthat::expect_length(url_status, 1)
 })

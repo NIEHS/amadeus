@@ -41,7 +41,7 @@ testthat::test_that("download_geos", {
     gsub("'", "", .)
 
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 2L)
   # implement unit tests
   test_download_functions(
     directory_to_save = directory_to_save,
@@ -90,7 +90,7 @@ testthat::test_that("download_geos (single date)", {
   urls <- extract_urls(commands = commands, position = 10)[[5]] %>%
     gsub("'", "", .)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 2L)
   # implement unit tests
   test_download_functions(
     directory_to_save = directory_to_save,

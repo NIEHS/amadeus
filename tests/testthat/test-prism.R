@@ -6,8 +6,7 @@
 testthat::test_that("download_prism", {
   # Set up test data
   time <- seq(201005, 201012, by = 1)
-  element <- c("ppt", "tmin", "tmax", "tmean", "tdmean",
-               "vpdmin", "vpdmax")
+  element <- c("ppt", "tmin", "tmax", "tmean", "tdmean", "vpdmin", "vpdmax")
   # in case of multiple test runs
   # note that PRISM download for the same data element
   # is allowed up to twice a day. IP address could be blocked
@@ -63,11 +62,13 @@ testthat::test_that("download_prism", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 6)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 1L)
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
 
@@ -101,10 +102,15 @@ testthat::test_that("process_prism", {
   # Set up test data
   withr::local_package("terra")
   path <- testthat::test_path(
-    "..", "testdata", "prism", "PRISM_tmin_30yr_normal_4kmD1_0228_bil_test.nc"
+    "..",
+    "testdata",
+    "prism",
+    "PRISM_tmin_30yr_normal_4kmD1_0228_bil_test.nc"
   )
   path_dir <- testthat::test_path(
-    "..", "testdata", "prism"
+    "..",
+    "testdata",
+    "prism"
   )
   element <- "tmin"
   time <- "0228"
@@ -119,7 +125,8 @@ testthat::test_that("process_prism", {
 
   # Check the metadata
   testthat::expect_equal(
-    unname(terra::metags(result)[terra::metags(result)$name == "time", 2]), time
+    unname(terra::metags(result)[terra::metags(result)$name == "time", 2]),
+    time
   )
   testthat::expect_equal(
     unname(terra::metags(result)[terra::metags(result)$name == "element", 2]),

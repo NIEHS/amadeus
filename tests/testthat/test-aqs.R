@@ -52,7 +52,7 @@ testthat::test_that("download_aqs", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 1L)
   # implement unit tets
   test_download_functions(
     directory_to_save = directory_to_save,
@@ -111,7 +111,7 @@ testthat::test_that("download_aqs (single year)", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 1L)
   # implement unit tets
   test_download_functions(
     directory_to_save = directory_to_save,

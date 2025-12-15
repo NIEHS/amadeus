@@ -37,11 +37,13 @@ testthat::test_that("download_cropscape (no errors - GMU)", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 5)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 1L)
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
@@ -81,11 +83,13 @@ testthat::test_that("download_cropscape (no errors - USDA)", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 5)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 1L)
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
@@ -123,7 +127,9 @@ testthat::test_that("process_cropscape", {
   # test with cropping extent
   testthat::expect_no_error(
     result_ext <- process_cropscape(
-      filepath, year, extent = terra::ext(result)
+      filepath,
+      year,
+      extent = terra::ext(result)
     )
   )
 

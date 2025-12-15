@@ -4,15 +4,14 @@
 \alias{check_urls}
 \title{Implement \code{check_url_status}}
 \usage{
-check_urls(urls = urls, size = NULL, method = c("HEAD", "GET", "SKIP"))
+check_urls(urls = urls, size = NULL, method = NULL)
 }
 \arguments{
 \item{urls}{character vector of URLs}
 
 \item{size}{number of observations to be sampled from \code{urls}}
 
-\item{method}{httr method to obtain URL (\code{"HEAD"} or \code{"GET"}). If set to
-\code{"SKIP"}, the HTTP status will not be checked and returned.}
+\item{method}{If set to \code{"SKIP"}, the HTTP status will not be checked and returned.}
 }
 \value{
 logical vector for URL status = 200

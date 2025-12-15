@@ -54,7 +54,7 @@ testthat::test_that("download_hms (no errors)", {
     # extract urls
     urls <- extract_urls(commands = commands, position = 6)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 10L, method = "HEAD")
+    url_status <- check_urls(urls = urls, size = 10L)
     # implement unit tests
     test_download_functions(
       directory_to_save = directory_to_save,

@@ -344,25 +344,19 @@ generate_time_sequence <-
 #' @description
 #' Check if provided URL returns HTTP status 200 or 206.
 #' @param url Download URL to be checked.
-#' @param method httr method to obtain URL (`"HEAD"` or `"GET"`)
-#' @author Insang Song; Mitchell Manware
-#' @importFrom httr HEAD
-#' @importFrom httr GET
+#' @author Insang Song; Mitchell Manware; Kyle Messier
+#' @importFrom httr2 request req_perform resp_status
 #' @return logical object
 #' @keywords internal auxiliary
 #' @export
 check_url_status <- function(
-  url,
-  method = c("HEAD", "GET")
+  url
 ) {
-  method <- match.arg(method)
   http_status_ok <- c(200, 206)
-  if (method == "HEAD") {
-    hd <- httr::HEAD(url)
-  } else if (method == "GET") {
-    hd <- httr::GET(url)
-  }
-  status <- hd$status_code
+  status <- url |>
+    httr2::request() |>
+    httr2::req_perform() |>
+    httr2::resp_status()
   Sys.sleep(1)
   return(status %in% http_status_ok)
 }
@@ -415,15 +409,14 @@ extract_urls <- function(
 #' Apply \code{check_url_status()} function to a sample of download URLs.
 #' @param urls character vector of URLs
 #' @param size number of observations to be sampled from \code{urls}
-#' @param method httr method to obtain URL (`"HEAD"` or `"GET"`). If set to
-#' `"SKIP"`, the HTTP status will not be checked and returned.
+#' @param method If set to `"SKIP"`, the HTTP status will not be checked and returned.
 #' @return logical vector for URL status = 200
 #' @keywords internal auxiliary
 #' @export
 check_urls <- function(
   urls = urls,
   size = NULL,
-  method = c("HEAD", "GET", "SKIP")
+  method = NULL
 ) {
   if (is.null(size)) {
     message(paste0("URL sample size is not defined.\n"))
@@ -432,16 +425,14 @@ check_urls <- function(
   if (length(urls) < size) {
     size <- length(urls)
   }
-  method <- match.arg(method)
-  if (method == "SKIP") {
+  if (!is.null(method) && toupper(method) == "SKIP") {
     message(paste0("Skipping HTTP status check...\n"))
     return(NULL)
   } else {
     url_sample <- sample(urls, size, replace = FALSE)
     url_status <- sapply(
       url_sample,
-      check_url_status,
-      method = method
+      check_url_status
     )
     return(url_status)
   }

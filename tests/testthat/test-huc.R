@@ -13,7 +13,8 @@ testthat::test_that("download_huc", {
     for (type in alltypes) {
       testthat::expect_no_error(
         download_huc(
-          region, type,
+          region,
+          type,
           directory_to_save,
           acknowledgement = TRUE,
           download = FALSE,
@@ -35,18 +36,21 @@ testthat::test_that("download_huc", {
       # extract urls
       urls <- extract_urls(commands = commands, position = 5)
       # check HTTP URL status
-      url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+      url_status <- check_urls(urls = urls, size = 1L)
       # implement unit tests
-      test_download_functions(directory_to_save = directory_to_save,
-                              commands_path = commands_path,
-                              url_status = url_status)
+      test_download_functions(
+        directory_to_save = directory_to_save,
+        commands_path = commands_path,
+        url_status = url_status
+      )
       # remove file with commands after test
       file.remove(commands_path)
     }
   }
   testthat::expect_error(
     download_huc(
-      "Lower48", "OceanCatchment",
+      "Lower48",
+      "OceanCatchment",
       tempdir(),
       acknowledgement = TRUE,
       download = TRUE,
@@ -66,7 +70,10 @@ testthat::test_that("process_huc", {
   withr::local_options(list(sf_use_s2 = FALSE))
   # Set up test data
   path <- testthat::test_path(
-    "..", "testdata", "huc12", "NHDPlus_test.gpkg"
+    "..",
+    "testdata",
+    "huc12",
+    "NHDPlus_test.gpkg"
   )
 
   # Call the function
@@ -105,7 +112,9 @@ testthat::test_that("process_huc", {
 
   # Set up test data
   path2 <- testthat::test_path(
-    "..", "testdata", "huc12"
+    "..",
+    "testdata",
+    "huc12"
   )
 
   # Call the function and expect an error
