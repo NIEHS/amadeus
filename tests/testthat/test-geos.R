@@ -5,7 +5,7 @@
 ################################################################################
 ##### download_geos
 testthat::test_that("download_geos", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
   # function parameters
@@ -57,7 +57,7 @@ testthat::test_that("download_geos", {
 nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
 
 testthat::test_that("download_geos (single date)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date <- "2019-09-09"

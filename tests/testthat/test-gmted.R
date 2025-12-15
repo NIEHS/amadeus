@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_gmted
 testthat::test_that("download_gmted", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   # function parameters
   statistics <- c("Breakline Emphasis", "Standard Deviation Statistic")
   resolution <- "7.5 arc-seconds"

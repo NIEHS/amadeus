@@ -5,7 +5,7 @@
 ################################################################################
 ##### download_hms
 testthat::test_that("download_hms (no errors)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date_start <- "2022-08-12"

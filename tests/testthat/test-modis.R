@@ -5,7 +5,7 @@
 ################################################################################
 ##### download_modis
 testthat::test_that("download_modis (MODIS-MOD09GA)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   years <- 2020
@@ -48,7 +48,7 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
     urls <- extract_urls(commands = commands, position = 10)[[1]] %>%
       gsub("'", "", .)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
+    url_status <- check_urls(urls = urls, size = 3L)
     # implement unit tests
     test_download_functions(
       directory_to_save = directory_to_save,
@@ -62,7 +62,7 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
 })
 
 testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   product <- "MOD09GA"
@@ -102,7 +102,7 @@ testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
     gsub("'", "", .)
 
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 3L)
   # implement unit tests
   test_download_functions(
     directory_to_save = directory_to_save,
@@ -115,7 +115,7 @@ testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
 })
 
 testthat::test_that("download_modis (MODIS-MOD06L2)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   product <- "MOD06_L2"
@@ -188,7 +188,7 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
   urls <- extract_urls(commands = commands, position = 10)[[1]] %>%
     gsub("'", "", .)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 1L)
   # implement unit tests
   test_download_functions(
     directory_to_save = directory_to_save,
@@ -202,7 +202,7 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
 
 
 testthat::test_that("download_modis (expected errors)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   years <- 2020
@@ -334,7 +334,7 @@ testthat::test_that("download_modis (expected errors)", {
   urls <- extract_urls(commands = commands, position = 10)[[1]] %>%
     gsub("'", "", .)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 2L)
   # implement unit tests
   test_download_functions(
     directory_to_save = directory_to_save,
@@ -347,7 +347,7 @@ testthat::test_that("download_modis (expected errors)", {
 })
 
 testthat::test_that("download_modis (MOD + MYD products)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   products <- c(
@@ -411,7 +411,7 @@ testthat::test_that("download_modis (MOD + MYD products)", {
     urls <- extract_urls(commands = commands, position = 10)[[1]] %>%
       gsub("'", "", .)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
+    url_status <- check_urls(urls = urls, size = 3L)
     # implement unit tests
     test_download_functions(
       directory_to_save = directory_to_save,

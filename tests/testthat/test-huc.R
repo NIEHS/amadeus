@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_huc
 testthat::test_that("download_huc", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   directory_to_save <- paste0(tempdir(), "/huc/")
   allregions <- c("Lower48", "Islands")
   alltypes <- c("Seamless", "OceanCatchment")

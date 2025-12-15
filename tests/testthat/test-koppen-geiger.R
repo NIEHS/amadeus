@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_koppen_geiger
 testthat::test_that("download_koppen_geiger", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   time_periods <- c("Present", "Future")

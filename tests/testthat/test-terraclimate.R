@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_terraclimate
 testthat::test_that("download_terraclimate (no errors)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year_start <- 2018
@@ -47,7 +47,7 @@ testthat::test_that("download_terraclimate (no errors)", {
 })
 
 testthat::test_that("download_terraclimate (single year)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year <- 2019

@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_merra2
 testthat::test_that("download_merra2 (no errors)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date_start <- "2022-02-14"
@@ -49,7 +49,7 @@ testthat::test_that("download_merra2 (no errors)", {
 })
 
 testthat::test_that("download_merra2 (single date)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date <- "2023-02-14"

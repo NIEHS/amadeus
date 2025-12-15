@@ -5,7 +5,7 @@
 ################################################################################
 ##### download_ecoregion
 testthat::test_that("download_ecoregion", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- paste0(tempdir(), "/eco/")
@@ -85,7 +85,7 @@ testthat::test_that("download_ecoregion", {
 
 testthat::test_that("download_ecoregion (expected errors)", {
   # expected errors due to invalid certificate
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   tdir <- tempdir(check = TRUE)

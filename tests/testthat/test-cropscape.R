@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_cropscape
 testthat::test_that("download_cropscape (no errors - GMU)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # Set up test data
   year <- 2010
@@ -50,7 +50,7 @@ testthat::test_that("download_cropscape (no errors - GMU)", {
 })
 
 testthat::test_that("download_cropscape (no errors - USDA)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # Set up test data
   year <- 2010

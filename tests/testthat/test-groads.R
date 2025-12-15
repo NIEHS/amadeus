@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_groads
 testthat::test_that("download_groads", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   data_regions <- c("Americas", "Global")

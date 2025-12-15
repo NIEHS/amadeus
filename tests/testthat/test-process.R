@@ -69,17 +69,36 @@ testthat::test_that("process_covariates", {
   )
   testthat::expect_s4_class(bm_proc, "SpatRaster")
 
-  covar_types <- c("modis_swath", "modis_merge",
-                   "koppen-geiger",
-                   "blackmarble",
-                   "koeppen-geiger", "koppen", "koeppen",
-                   "geos", "dummies", "gmted",
-                   "hms", "smoke",
-                   "sedac_population", "population",
-                   "sedac_groads", "groads", "roads",
-                   "nlcd", "narr", "nei",
-                   "ecoregions", "ecoregion", "huc", "cropscape", "cdl",
-                   "prism", "terraclimate", "gridmet")
+  covar_types <- c(
+    "modis_swath",
+    "modis_merge",
+    "koppen-geiger",
+    "blackmarble",
+    "koeppen-geiger",
+    "koppen",
+    "koeppen",
+    "geos",
+    "dummies",
+    "gmted",
+    "hms",
+    "smoke",
+    "sedac_population",
+    "population",
+    "sedac_groads",
+    "groads",
+    "roads",
+    "nlcd",
+    "narr",
+    "nei",
+    "ecoregions",
+    "ecoregion",
+    "huc",
+    "cropscape",
+    "cdl",
+    "prism",
+    "terraclimate",
+    "gridmet"
+  )
   for (cty in covar_types) {
     testthat::expect_error(
       process_covariates(
@@ -130,7 +149,6 @@ testthat::test_that("process_conformity", {
   testthat::expect_error(
     process_conformity(locs = dfe, check_time = TRUE)
   )
-
 })
 
 ################################################################################
@@ -247,7 +265,9 @@ testthat::test_that("process_locs_vector", {
 
   testthat::expect_error(
     process_locs_vector(
-      locs = ncpp, crs = "EPSG:4326", 0
+      locs = ncpp,
+      crs = "EPSG:4326",
+      0
     )
   )
   testthat::expect_error(

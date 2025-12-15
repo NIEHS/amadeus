@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_population
 testthat::test_that("download_population", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   years <- c("2020", "all")
@@ -82,7 +82,7 @@ testthat::test_that("download_population", {
 })
 
 testthat::test_that("download_population (coerce data types)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year <- c("all")

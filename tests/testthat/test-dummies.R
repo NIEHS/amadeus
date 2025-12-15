@@ -4,7 +4,6 @@
 ################################################################################
 ##### calculate_temporal_dummies
 testthat::test_that("calculate_temporal_dummies (no errors)", {
-
   site_faux <-
     data.frame(
       site_id = "37031000188101",
@@ -61,7 +60,6 @@ testthat::test_that("calculate_temporal_dummies (no errors)", {
       locs = as.matrix(site_faux_err)
     )
   )
-
 })
 
 testthat::test_that("calculate_temporal_dummies (expected errors)", {

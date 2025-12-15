@@ -5,7 +5,7 @@
 ################################################################################
 ##### download_nei
 testthat::test_that("download_nei", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- paste0(tempdir(), "/nei/")
@@ -65,7 +65,7 @@ testthat::test_that("download_nei", {
 })
 
 testthat::test_that("download_nei (live)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- paste0(tempdir(), "/nei/")
@@ -104,7 +104,7 @@ testthat::test_that("download_nei (live)", {
 
 testthat::test_that("download_nei (expected errors)", {
   # expected errors due to invalid certificate
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   tdir <- tempdir()

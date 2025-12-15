@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_epa
 testthat::test_that("download_aqs", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year_start <- 2018
@@ -64,7 +64,7 @@ testthat::test_that("download_aqs", {
 })
 
 testthat::test_that("download_aqs (single year)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year <- 2018
