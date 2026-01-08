@@ -2390,7 +2390,7 @@ download_koppen_geiger <- function(
 #'  input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
 #' @param product character(1).
 #' One of `c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2")`
-#' @param version character(1). Default is `"61"`, meaning v061.
+#' @param version character(1). Default is `"061"`, meaning v061.
 #' @param horizontal_tiles integer(2). Horizontal tile numbers
 #' `c({start}, {end})`. Default is `c(7, 13)`.
 #' @param vertical_tiles integer(2). Vertical tile numbers
@@ -2398,11 +2398,13 @@ download_koppen_geiger <- function(
 #' @param nasa_earth_data_token character(1).
 #'  Token for downloading data from NASA. Should be set before
 #'  trying running the function.
-#' @param mod06_links character(1). CSV file path to MOD06_L2 download links
-#' from [NASA LAADS MOD06_L2](https://ladsweb.modaps.eosdis.nasa.gov/search/order/2/MOD06_L2--61). Default is `NULL`.
 #' @param date character(1 or 2). length of 10. Date or start/end dates for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`). Note: ignored if
 #' \code{product == "MOD06_L2"}.
+#' @param extent numeric(4). Bounding box for downloading data.
+#' Format is `c(min_lon, max_lon, min_lat, max_lat)`.
+#' Default is `c(-125, 22, -64, 50)`, approximately covering the
+#' continental United States.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -2437,13 +2439,15 @@ download_koppen_geiger <- function(
 #' \dontrun{
 #' ## NOTE: Examples are wrapped in `/dontrun{}` to avoid sharing sensitive
 #' ##       NASA EarthData tokden information.
+#' vec_extent <- c(-80, 35, -75, 40)
 #' # example with MOD09GA product
 #' download_modis(
 #'   product = "MOD09GA",
-#'   version = "61",
+#'   version = "061",
 #'   horizontal_tiles = c(8, 8),
 #'   vertical_tiles = c(4, 4),
 #'   date = "2024-01-01",
+#'   extent = vec_extent,
 #'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
@@ -2453,15 +2457,11 @@ download_koppen_geiger <- function(
 #' # example with MOD06_L2 product
 #' download_modis(
 #'   product = "MOD06_L2",
-#'   version = "61",
+#'   version = "6.1",
 #'   horizontal_tiles = c(8, 8),
 #'   vertical_tiles = c(4, 4),
+#'   extent = vec_extent,
 #'   date = "2024-01-01",
-#'   mod06_links =
-#'     system.file(
-#'       "extdata", "nasa", "LAADS_query.2024-08-02T12_49.csv",
-#'       package = "amadeus"
-#'     ),
 #'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,
@@ -2471,10 +2471,11 @@ download_koppen_geiger <- function(
 #' # example with VNP46A2 product
 #' download_modis(
 #'   product = "VNP46A2",
-#'   version = "61",
+#'   version = "5200",
 #'   horizontal_tiles = c(8, 8),
 #'   vertical_tiles = c(4, 4),
 #'   date = "2024-01-01",
+#'   extent = vec_extent,
 #'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE,MOD09GA
@@ -2510,12 +2511,12 @@ download_modis <- function(
     "MCD19A2",
     "VNP46A2"
   ),
-  version = "61",
+  version = "061",
   horizontal_tiles = c(7, 13),
   vertical_tiles = c(3, 6),
-  mod06_links = NULL,
   nasa_earth_data_token = NULL,
   date = c("2023-09-01", "2023-09-01"),
+  extent = c(-125, 22, -64, 50),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = FALSE,
@@ -2547,12 +2548,12 @@ download_modis <- function(
     }
   }
 
-  #### 5. check for version
+  #### 5. check for version -- may not be necessary in 1.3.2+
   if (is.null(version)) {
     stop("Please select a data version.\n")
   }
 
-  #### 6. check for valid horizontal tiles
+  #### 6. check for valid horizontal tiles -- to be deprecated
   if (!all(horizontal_tiles %in% seq(0, 35))) {
     stop("Horizontal tiles are not in the proper range [0, 35].\n")
   }
@@ -2577,185 +2578,71 @@ download_modis <- function(
   tiles_vertical <-
     sprintf("v%02d", tiles_vertical)
 
-  #### 8. define requested tiles
+  #### 8. define requested tiles -- to be deprecated
   tiles_df <- expand.grid(
     h = tiles_horizontal,
     v = tiles_vertical
   )
-  tiles_requested <-
-    paste0(tiles_df$h, tiles_df$v)
 
-  #### 9. Reuse ladsweb home url
-  ladsurl <- "https://ladsweb.modaps.eosdis.nasa.gov/"
-  version <- ifelse(startsWith(product, "VNP"), "5200", version)
-
-  #### 11. define date sequence
+  #### 9. define date sequence
   date_sequence <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = FALSE
   )
 
-  #### 10. MOD06_L2 manual input
-  if (product == "MOD06_L2") {
-    mod06l2_url1 <-
-      "https://ladsweb.modaps.eosdis.nasa.gov/"
-    mod06l2_url2 <-
-      "search/order/4/MOD06_L2--61/"
-    mod06l2_url3 <-
-      "%s..%s/DNB/-130,52,-60,20"
-    mod06l2_url_template <-
-      paste0(mod06l2_url1, mod06l2_url2, mod06l2_url3)
-    mod06l2_full <-
-      sprintf(mod06l2_url_template, date[1], date[2])
-
-    if (is.null(mod06_links)) {
-      stop(paste(
-        "Please provide a CSV file path to MOD06_L2 download links.
-                 You may download it from the link:\n",
-        mod06l2_full,
-        "\nTime length up to one month is recommended.\n"
-      ))
-    }
-
-    date_julian <- format(date_sequence, "%Y%j")
-
-    #### 10-1. Parse urls in csv
-    file_url <- read.csv(mod06_links)
-    file_url <- unlist(file_url[, 2])
-    download_url <- gsub("^/", "", file_url)
-
-    download_url <- download_url[
-      grep(paste0("A(", paste(date_julian, collapse = "|"), ")"), download_url)
-    ]
-
-    #### 10-2. Parse dates from csv
-    # file_dates <-
-    #   regmatches(
-    #     file_url,
-    #     regexpr("[2][0-2][0-9]{2,2}[0-3][0-9]{2,2}", file_url)
-    #   )
-    # file_dates <- as.integer(file_dates)
-    # date_start <- as.Date(as.character(min(file_dates)), format = "%Y%j")
-    # date_end <- as.Date(as.character(max(file_dates)), format = "%Y%j")
-
-    # Extract download names from file_url using splitter
-    # download_name <- sapply(strsplit(download_url, "/"), `[`, 10)
-    download_name <- unlist(
-      lapply(
-        download_url,
-        function(x) tail(strsplit(x, "/")[[1]], 1)
-      )
+  #### 10. warning message for excessive query (CMR limit)
+  dt_date <- as.Date(date)
+  if (diff(dt_date) > 31) {
+    warning(
+      "Date range is greater than 31 days.",
+      "The results may not include all dates in the range."
     )
-
-    # Create directory structure with julian dates
-    dir_substr <- paste0(
-      substr(download_name, 11, 14),
-      "/",
-      substr(download_name, 15, 17),
-      "/"
-    )
-
-    #### 10-3. initiate "..._wget_commands.txt" file
-    commands_txt <- paste0(
-      directory_to_save,
-      product,
-      "_",
-      date_julian[1],
-      "_",
-      date_julian[length(date_julian)],
-      "_wget_commands.txt"
-    )
-
-    #### 10-4. write download_command
-    download_command <- paste0(
-      "wget ",
-      "-e robots=off -np -R .html,.tmp ",
-      "-nH --cut-dirs=3 ",
-      "--continue ",
-      "--tries=20 ",
-      "--retry-connrefused ",
-      "--waitretry=30 ",
-      "--timeout=60 ",
-      "--retry-on-http-error=500,502,503,504 ",
-      "--limit-rate=10M ",
-      "--random-wait ",
-      "--wait=2 ",
-      "--no-clobber ",
-      "--keep-session-cookies ",
-      "--header='Authorization: Bearer ",
-      nasa_earth_data_token,
-      "' ",
-      "'",
-      download_url,
-      "' ",
-      "-O '",
-      directory_to_save,
-      dir_substr,
-      download_name,
-      "'",
-      "\n"
-    )
-
-    #### filter commands to non-existing files
-    download_command <- download_command[
-      which(
-        !file.exists(paste0(directory_to_save, dir_substr, download_name)) |
-          file.size(paste0(directory_to_save, dir_substr, download_name)) == 0
-      )
-    ]
-
-    new_dirs <- unique(
-      sprintf("%s%s", directory_to_save, dir_substr)
-    )
-
-    lapply(
-      new_dirs,
-      function(x) dir.create(x, recursive = TRUE, showWarnings = FALSE)
-    )
-
-    # avoid any possible errors by removing existing command files
-    amadeus::download_sink(commands_txt)
-    #### cat command only if file does not already exist
-    cat(download_command)
-    sink()
-
-    amadeus::download_run(
-      download = download,
-      commands_txt = commands_txt,
-      remove = remove_command
-    )
-
-    message("Requests were processed.\n")
-    return(amadeus::download_hash(hash, directory_to_save))
   }
 
-  # In a certain year, list all available dates
-  year <- as.character(substr(date[1], 1, 4))
-  filedir_year_url <-
-    paste0(
-      ladsurl,
-      "archive/allData/",
-      version,
-      "/",
-      product,
-      "/",
-      year
-    )
+  #### 11. version fix
+  if (product == "MOD06_L2") {
+    str_version <- "6.1"
+  } else if (product == "VNP46A2") {
+    str_version <- NULL
+  } else {
+    str_version <- version
+  }
 
-  list_available_d <-
-    rvest::read_html(filedir_year_url) |>
-    rvest::html_elements("tr") |>
-    rvest::html_attr("data-name")
-  # no conditional assignment at this moment.
+  #### 12. Query CMR
+  chr_extent <- paste(extent, collapse = ",")
+  resp <-
+    httr2::request(
+      "https://cmr.earthdata.nasa.gov/search/granules.json"
+    ) |>
+    httr2::req_url_query(
+      short_name = product,
+      version = str_version,
+      temporal = paste(date[1], date[2], sep = ","),
+      bounding_box = chr_extent,
+      page_size = 2000
+    ) |>
+    httr2::req_perform()
+  granules <- resp |> httr2::resp_body_json()
+
+  # Extract data URLs
+  urls <- sapply(granules$feed$entry, function(g) {
+    links <- g$links
+    data_link <- Filter(function(l) grepl("data#", l$rel), links)
+    if (length(data_link) > 0) data_link[[1]]$href else NA
+  })
+  urls <- urls[!is.na(urls)]
+
+  list_available_d <- stringi::stri_extract(urls, regex = "A2[0-9]{6,6}")
+  list_available_d <- unique(gsub("A", "", list_available_d))
 
   # remove NAs
-  # 12. Queried year's available days
+  # 13. Queried year's available days
   date_sequence <- list_available_d[!is.na(list_available_d)]
   date_sequence_i <- as.integer(date_sequence)
   # Queried dates to integer range
-  date_start_i <- as.integer(strftime(date[1], "%j"))
-  date_end_i <- as.integer(strftime(date[2], "%j"))
+  date_start_i <- as.integer(strftime(date[1], "%Y%j"))
+  date_end_i <- as.integer(strftime(date[2], "%Y%j"))
   date_range_julian <- seq(date_start_i, date_end_i)
   date_sequence_in <- (date_sequence_i %in% date_range_julian)
 
@@ -2766,7 +2653,7 @@ download_modis <- function(
   ))
   date_sequence <- date_sequence[date_sequence_in]
 
-  #### 13. initiate "..._wget_commands.txt" file
+  #### 14. initiate "..._wget_commands.txt" file
   commands_txt <- paste0(
     directory_to_save,
     product,
@@ -2779,103 +2666,55 @@ download_modis <- function(
 
   # avoid any possible errors by removing existing command files
   amadeus::download_sink(commands_txt)
-  #### 14. append download commands to text file
-  for (d in seq_along(date_sequence)) {
-    day <- date_sequence[d]
-    filedir_url <-
-      paste0(
-        filedir_year_url,
-        "/",
-        day
-      )
+  #### 15. append download commands to text file
+  download_name <- basename(urls)
+  # Main wget run
+  download_command <- paste0(
+    "wget ",
+    "-e robots=off -np -R .html,.tmp ",
+    "-nH --cut-dirs=3 ",
+    "--continue ",
+    "--tries=20 ",
+    "--retry-connrefused ",
+    "--waitretry=30 ",
+    "--timeout=60 ",
+    "--retry-on-http-error=500,502,503,504 ",
+    "--limit-rate=10M ",
+    "--random-wait ",
+    "--wait=2 ",
+    "--no-clobber ",
+    "--keep-session-cookies ",
+    "--header='Authorization: Bearer ",
+    nasa_earth_data_token,
+    "' ",
+    "'",
+    urls,
+    # filelist_sub,
+    "' ",
+    "-O '",
+    directory_to_save,
+    # dir_substr,
+    download_name,
+    "'",
+    "\n"
+  )
 
-    filelist <-
-      rvest::read_html(filedir_url) |>
-      rvest::html_elements("tr") |>
-      rvest::html_attr("data-path")
-
-    filelist_sub <-
-      grep(
-        paste0("(", paste(tiles_requested, collapse = "|"), ")"),
-        filelist,
-        value = TRUE
-      )
-
-    download_name <- sapply(
-      strsplit(filelist_sub, paste0("/", day, "/")),
-      `[`,
-      2
+  #### filter commands to non-existing files
+  download_command <- download_command[
+    which(
+      !file.exists(paste0(directory_to_save, download_name)) |
+        file.size(paste0(directory_to_save, download_name)) == 0
     )
+  ]
 
-    dir_str_julian <-
-      lapply(
-        download_name,
-        function(x) strsplit(x, paste0(product, ".A"))[[1]][2]
-      )
+  #### 16. concatenate and print download commands to "..._wget_commands.txt"
+  #### cat command only if file does not already exist
+  cat(download_command)
 
-    dir_substr <- paste0(
-      substr(dir_str_julian, 1, 4),
-      "/",
-      substr(dir_str_julian, 5, 7),
-      "/"
-    )
-
-    new_dirs <- unique(
-      sprintf("%s%s", directory_to_save, dir_substr)
-    )
-
-    lapply(
-      new_dirs,
-      function(x) dir.create(x, recursive = TRUE, showWarnings = FALSE)
-    )
-
-    # Main wget run
-    download_command <- paste0(
-      "wget ",
-      "-e robots=off -np -R .html,.tmp ",
-      "-nH --cut-dirs=3 ",
-      "--continue ",
-      "--tries=20 ",
-      "--retry-connrefused ",
-      "--waitretry=30 ",
-      "--timeout=60 ",
-      "--retry-on-http-error=500,502,503,504 ",
-      "--limit-rate=10M ",
-      "--random-wait ",
-      "--wait=2 ",
-      "--no-clobber ",
-      "--keep-session-cookies ",
-      "--header='Authorization: Bearer ",
-      nasa_earth_data_token,
-      "' ",
-      "'",
-      filelist_sub,
-      "' ",
-      "-O '",
-      directory_to_save,
-      dir_substr,
-      download_name,
-      "'",
-      "\n"
-    )
-
-    #### filter commands to non-existing files
-    download_command <- download_command[
-      which(
-        !file.exists(paste0(directory_to_save, dir_substr, download_name)) |
-          file.size(paste0(directory_to_save, dir_substr, download_name)) == 0
-      )
-    ]
-
-    #### 15. concatenate and print download commands to "..._wget_commands.txt"
-    #### cat command only if file does not already exist
-    cat(download_command)
-  }
-
-  #### 16. finish "..._wget_commands.txt"
+  #### 17. finish "..._wget_commands.txt"
   sink(file = NULL)
 
-  #### 17.
+  #### 18.
   amadeus::download_run(
     download = download,
     commands_txt = commands_txt,
