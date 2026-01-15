@@ -438,7 +438,7 @@ calculate_nlcd <- function(
     )
   )
 
-  if (radius <= 0 && terra::geomtype(locs) == "points") {
+  if (radius <= 0 && terra::geomtype(locs_vector) == "points") {
     new_data_vect <- suppressMessages(
       amadeus::calc_worker(
         dataset = "nlcd",
