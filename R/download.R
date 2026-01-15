@@ -2578,12 +2578,6 @@ download_modis <- function(
   tiles_vertical <-
     sprintf("v%02d", tiles_vertical)
 
-  #### 8. define requested tiles -- to be deprecated
-  tiles_df <- expand.grid(
-    h = tiles_horizontal,
-    v = tiles_vertical
-  )
-
   #### 9. define date sequence
   date_sequence <- amadeus::generate_date_sequence(
     date[1],
