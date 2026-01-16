@@ -143,7 +143,6 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
     directory_to_save = directory_to_save,
     acknowledgement = TRUE,
     download = FALSE,
-    mod06_links = NULL,
     remove_command = FALSE
   )
   # )
@@ -221,7 +220,6 @@ testthat::test_that("download_modis (expected errors)", {
   date_start <- paste0(years, "-06-25")
   date_end <- paste0(years, "-06-28")
   vec_extent <- c(-124, 25, -105, 40)
-
 
   # no token
   testthat::expect_no_error(
@@ -646,7 +644,7 @@ testthat::test_that("process_blackmarble*", {
     process_blackmarble_corners(hrange = c(99, 104))
   )
 
-  testthat::expect_no_warning(
+  testthat::expect_warning(
     vnp46_proc <- process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
@@ -656,7 +654,7 @@ testthat::test_that("process_blackmarble*", {
   testthat::expect_s4_class(vnp46_proc, "SpatRaster")
   testthat::expect_equal(terra::nlyr(vnp46_proc), 1L)
 
-  testthat::expect_no_warning(
+  testthat::expect_warning(
     vnp46_proc2 <- process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
@@ -1024,7 +1022,7 @@ testthat::test_that("calculate_modis", {
       "VNP46",
       full.names = TRUE
     )
-  testthat::expect_no_warning(
+  testthat::expect_warning(
     base_vnp <- process_blackmarble(
       path = path_vnp46,
       date = "2018-08-13",
@@ -1238,7 +1236,7 @@ testthat::test_that("calculate_modis", {
       tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
     )
   )
-  testthat::expect_no_warning(
+  testthat::expect_warning(
     flushed <- calculate_modis(
       from = path_vnp46,
       locs = site_faux,

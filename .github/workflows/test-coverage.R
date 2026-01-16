@@ -1,120 +1,137 @@
-# test/testthat/test_coverage.R
 args <- commandArgs(trailingOnly = TRUE)
 runnertemp <- args[[1]]
 ghworkspace <- args[[2]]
 
-# Validate arguments
-if (is.na(runnertemp) || is.na(ghworkspace)) {
-  stop("Missing required arguments: runnertemp and/or ghworkspace")
-}
-
+message("=== Starting Coverage Script ===")
 message("Runner temp: ", runnertemp)
 message("Workspace: ", ghworkspace)
-message("Current directory: ", getwd())
+message("Working directory: ", getwd())
 
-# Ensure we're in the right directory
+# Ensure we're in the package root
 setwd(ghworkspace)
 
 # Create output directory
 pkg_dir <- file.path(runnertemp, "package")
-dir.create(
-  pkg_dir,
-  showWarnings = FALSE,
-  recursive = TRUE
+dir.create(pkg_dir, showWarnings = FALSE, recursive = TRUE)
+
+# First, try running tests directly to see what fails
+message("\n=== Running Tests Directly First ===")
+test_results <- tryCatch(
+  {
+    testthat::test_local(
+      path = ghworkspace,
+      reporter = testthat::ProgressReporter$new(max_failures = Inf),
+      stop_on_failure = FALSE,
+      load_package = "source"
+    )
+  },
+  error = function(e) {
+    message("!!! Test execution failed !!!")
+    message("Error: ", conditionMessage(e))
+    print(e)
+    return(NULL)
+  }
 )
 
-message("Created package directory: ", pkg_dir)
+# Show test results
+if (!is.null(test_results)) {
+  message("\n=== Test Summary ===")
+  print(test_results)
 
-# Run coverage with error handling
+  if (any(test_results$failed > 0)) {
+    message("\n!!! TESTS FAILED !!!")
+    message("Failed: ", sum(test_results$failed))
+    message("Warnings: ", sum(test_results$warning))
+    message("Skipped: ", sum(test_results$skipped))
+  }
+}
+
+# Now try coverage
+message("\n=== Starting Coverage Calculation ===")
 tryCatch(
   {
-    message("Starting coverage calculation...")
-    message("R version: ", R.version.string)
-    message("covr version: ", packageVersion("covr"))
-
-    # Check if package can be loaded
-    message("Checking if package loads...")
     library(amadeus)
-    message("Package loaded successfully")
 
-    # Create sink file for detailed output
-    sink_file <- file.path(pkg_dir, "testthat.Rout.res")
-    message("Sink file: ", sink_file)
-
-    # Run coverage (DON'T sink stderr, only stdout)
-    sink(sink_file, split = TRUE) # split=TRUE shows output in console too
-
+    # Try coverage with more verbose output
     cov <- covr::package_coverage(
       type = "all",
       quiet = FALSE,
       clean = FALSE,
       install_path = pkg_dir,
-      pre_clean = FALSE
+      pre_clean = FALSE,
+      code = c(
+        'options(warn = 2)', # Turn warnings into errors
+        'library(testthat)',
+        'library(amadeus)'
+      )
     )
 
-    sink()
+    message("Coverage calculation successful")
 
-    message("Coverage calculation complete")
-
-    # Extract coverage percentage
+    # Extract coverage
     covd <- covr::coverage_to_list(cov)$totalcoverage
 
     if (is.null(covd) || length(covd) == 0) {
-      warning("No coverage data generated")
       covd <- 0
     } else {
       covd <- covd[length(covd)]
-      message("Coverage: ", covd, "%")
     }
 
-    # Write coverage to file
+    message("Coverage: ", covd, "%")
+
+    # Write coverage
     output_file <- file.path(ghworkspace, "local_cov.Rout")
-    write.table(
-      covd,
-      file = output_file,
-      row.names = FALSE,
-      col.names = FALSE
-    )
+    write.table(covd, file = output_file, row.names = FALSE, col.names = FALSE)
 
     message("Coverage written to: ", output_file)
-    message("Contents: ", readLines(output_file))
-
-    # Also print coverage summary to console
-    message("\n=== Coverage Summary ===")
-    print(cov)
-
-    # Show files with low coverage
-    zero_cov <- covr::zero_coverage(cov)
-    if (length(zero_cov) > 0) {
-      message("\n=== Files with Zero Coverage ===")
-      print(names(zero_cov))
-    }
   },
   error = function(e) {
-    # Make sure sink is closed
-    while (sink.number() > 0) {
-      sink()
-    }
-
     message("\n!!! ERROR during coverage calculation !!!")
     message("Error message: ", conditionMessage(e))
-    message("\nTraceback:")
-    traceback()
 
-    # Write 0 coverage so workflow doesn't fail on missing file
-    output_file <- file.path(ghworkspace, "local_cov.Rout")
-    write.table(
-      0,
-      file = output_file,
-      row.names = FALSE,
-      col.names = FALSE
+    # Try to find and display the test failure file
+    fail_files <- list.files(
+      runnertemp,
+      pattern = "testthat.Rout.fail",
+      recursive = TRUE,
+      full.names = TRUE
     )
 
-    message("Wrote 0 to coverage file due to error")
+    if (length(fail_files) > 0) {
+      message("\n=== Content of ", fail_files[1], " ===")
+      cat(readLines(fail_files[1]), sep = "\n")
+    }
 
-    # Exit with error code
+    # Look for any .Rout files
+    rout_files <- list.files(
+      runnertemp,
+      pattern = "\\.Rout",
+      recursive = TRUE,
+      full.names = TRUE
+    )
+
+    if (length(rout_files) > 0) {
+      message("\n=== Found .Rout files ===")
+      for (rf in rout_files) {
+        message("\nFile: ", rf)
+        message("Content:")
+        tryCatch(
+          {
+            cat(readLines(rf, n = 100), sep = "\n") # First 100 lines
+          },
+          error = function(e2) {
+            message("Could not read file: ", conditionMessage(e2))
+          }
+        )
+      }
+    }
+
+    # Write 0 coverage
+    output_file <- file.path(ghworkspace, "local_cov.Rout")
+    write.table(0, file = output_file, row.names = FALSE, col.names = FALSE)
+
     quit(save = "no", status = 1)
   }
 )
 
-message("\n=== Coverage calculation completed successfully ===")
+message("\n=== Coverage completed successfully ===")
