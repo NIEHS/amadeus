@@ -5,7 +5,7 @@
 \title{Download road emissions data}
 \usage{
 download_nei(
-  epa_certificate_path = system.file("extdata/cacert_gaftp_epa.pem", package = "amadeus"),
+  epa_certificate_path = NULL,
   certificate_url =
     "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   year = c(2017L, 2020L),
@@ -18,12 +18,16 @@ download_nei(
 )
 }
 \arguments{
-\item{epa_certificate_path}{character(1). Path to the certificate file
-for EPA DataCommons. Default is
-'extdata/cacert_gaftp_epa.pem' under the package installation path.}
+\item{epa_certificate_path}{\if{html}{\out{<TO BE DEPRECATED>}} character(1).
+Path to the certificate file for EPA DataCommons. Default is
+'extdata/cacert_gaftp_epa.pem' under the package installation path.
+Use \code{system.file()} to get the full path.}
 
-\item{certificate_url}{character(1). URL to certificate file. See notes for
-details.}
+\item{certificate_url}{\if{html}{\out{
+<TO BE DEPRECATED>
+character(1). URL to certificate file. See notes for
+details.
+}}}
 
 \item{year}{integer(1) Available years of NEI data.
 Default is \code{c(2017L, 2020L)}.}
