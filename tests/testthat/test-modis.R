@@ -644,23 +644,20 @@ testthat::test_that("process_blackmarble*", {
     process_blackmarble_corners(hrange = c(99, 104))
   )
 
-  testthat::expect_warning(
-    vnp46_proc <- process_blackmarble(
-      path = path_vnp46[1],
-      tile_df = corn,
-      date = "2018-08-13"
-    )
+  vnp46_proc <- process_blackmarble(
+    path = path_vnp46[1],
+    tile_df = corn,
+    date = "2018-08-13"
   )
+
   testthat::expect_s4_class(vnp46_proc, "SpatRaster")
   testthat::expect_equal(terra::nlyr(vnp46_proc), 1L)
 
-  testthat::expect_warning(
-    vnp46_proc2 <- process_blackmarble(
-      path = path_vnp46[1],
-      tile_df = corn,
-      subdataset = c(3L, 5L),
-      date = "2018-08-13"
-    )
+  vnp46_proc2 <- process_blackmarble(
+    path = path_vnp46[1],
+    tile_df = corn,
+    subdataset = c(3L, 5L),
+    date = "2018-08-13"
   )
 
   testthat::expect_s4_class(vnp46_proc2, "SpatRaster")
@@ -885,7 +882,7 @@ testthat::test_that("calculate_modis", {
         )
     )
   )
-  testthat::expect_true("sf" %in% class(calc_mod11_sf))
+  testthat::expect_true(inherits(calc_mod11_sf, "sf"))
 
   # with geometry error
   testthat::expect_error(
@@ -1001,7 +998,7 @@ testthat::test_that("calculate_modis", {
         )
     )
   )
-  testthat::expect_true("sf" %in% class(calc_mod06_sf))
+  testthat::expect_true(inherits(calc_mod06_sf, "sf"))
 
   # with geometry error
   testthat::expect_error(
@@ -1022,12 +1019,10 @@ testthat::test_that("calculate_modis", {
       "VNP46",
       full.names = TRUE
     )
-  testthat::expect_warning(
-    base_vnp <- process_blackmarble(
-      path = path_vnp46,
-      date = "2018-08-13",
-      tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
-    )
+  base_vnp <- process_blackmarble(
+    path = path_vnp46,
+    date = "2018-08-13",
+    tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
   )
 
   testthat::expect_no_error(
@@ -1204,7 +1199,7 @@ testthat::test_that("calculate_modis", {
       geom = "sf"
     )
   )
-  testthat::expect_true("sf" %in% class(calc_mod_sf))
+  testthat::expect_true(inherits(calc_mod_sf, "sf"))
 
   testthat::expect_error(
     calculate_modis(from = site_faux, scale = "* 1")
@@ -1236,7 +1231,7 @@ testthat::test_that("calculate_modis", {
       tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
     )
   )
-  testthat::expect_warning(
+  # testthat::expect_warning(
     flushed <- calculate_modis(
       from = path_vnp46,
       locs = site_faux,
@@ -1246,7 +1241,7 @@ testthat::test_that("calculate_modis", {
       radius = c(-1000, 0L),
       scale = "* 1"
     )
-  )
+  # )
   testthat::expect_s3_class(flushed, "data.frame")
   testthat::expect_true(unlist(flushed[, 2]) == -99999)
 

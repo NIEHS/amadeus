@@ -6,7 +6,7 @@
 \usage{
 collapse_nlcd(
   data,
-  mode = c("terra", "extract"),
+  mode = c("terra", "exact"),
   locs = NULL,
   locs_id = "site_id"
 )

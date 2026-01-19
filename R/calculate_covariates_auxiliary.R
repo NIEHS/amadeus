@@ -776,7 +776,7 @@ calculate_modis_daily <- function(
 # In R/calculate_covariates.R, starting at line 1148
 collapse_nlcd <- function(
   data,
-  mode = c("terra", "extract"),
+  mode = c("terra", "exact"),
   locs = NULL,
   locs_id = "site_id"
 ) {

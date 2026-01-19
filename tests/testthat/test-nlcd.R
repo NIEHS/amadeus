@@ -506,7 +506,7 @@ testthat::test_that("integration across *_nlcd functions", {
 
   ##############################################################################
   nc <- terra::project(
-    terra::vect(system.file("shape/nc.shp", package = "sf")),
+    ncv,
     terra::crs(nlcd_c1v1)
   )
 
