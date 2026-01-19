@@ -535,7 +535,7 @@ process_blackmarble <- function(
 
         terra::crs(vnp_) <- terra::crs(crs)
         terra::ext(vnp_) <- unlist(tile_ext)
-        return(vnp_)
+        vnp_
       },
       vnp_today,
       filepaths_today_tiles_list,
