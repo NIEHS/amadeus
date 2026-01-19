@@ -1,8 +1,9 @@
 # 1.3
-- Fixed depcreated file paths for NLCD, MODIS, and Ecoregions datasets
+- Fixed deprecated file paths for NLCD, MODIS, and Ecoregions datasets
 - Removed the certificate verification from ecoregion download which is not needed anymore
 - For NASA datasets MODIS, VIIRS, and Geos-CF, added additional options to prevent API throttling 
-- httr upgraded to httr2 
+- httr upgraded to httr2
+- Modified internal URL status check function for general use
 
 # 1.2
 - `future` and `future.apply` dependencies were removed

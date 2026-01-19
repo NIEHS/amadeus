@@ -2833,10 +2833,12 @@ download_tri <- function(
 #' @description
 #' The \code{download_nei()} function accesses and downloads road emissions data from the [U.S Environmental Protection Agency's (EPA) National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories/national-emissions-inventory-nei).
 # nolint end
-#' @param epa_certificate_path character(1). Path to the certificate file
-#' for EPA DataCommons. Default is
+#' @param epa_certificate_path <TO BE DEPRECATED> character(1).
+#' Path to the certificate file for EPA DataCommons. Default is
 #' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
-#' @param certificate_url character(1). URL to certificate file. See notes for
+#' Use `system.file()` to get the full path.
+#' @param certificate_url <TO BE DEPRECATED>
+#' character(1). URL to certificate file. See notes for
 #' details.
 #' @param year integer(1) Available years of NEI data.
 #' Default is \code{c(2017L, 2020L)}.
@@ -2888,10 +2890,7 @@ download_tri <- function(
 #' }
 #' @export
 download_nei <- function(
-  epa_certificate_path = system.file(
-    "extdata/cacert_gaftp_epa.pem",
-    package = "amadeus"
-  ),
+  epa_certificate_path = NULL,
   certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
   year = c(2017L, 2020L),
   directory_to_save = NULL,
@@ -2910,10 +2909,11 @@ download_nei <- function(
   directory_to_save <- directories[2]
 
   #### 5. define download URL
-  amadeus::download_epa_certificate(
-    epa_certificate_path = epa_certificate_path,
-    certificate_url = certificate_url
-  )
+  # DEPRECATED: certificate download step
+  # amadeus::download_epa_certificate(
+  #   epa_certificate_path = epa_certificate_path,
+  #   certificate_url = certificate_url
+  # )
 
   #### 3. define measurement data paths
   url_download_base <- "https://gaftp.epa.gov/air/nei/%d/data_summaries/"
@@ -2928,16 +2928,24 @@ download_nei <- function(
     c("2017neiApr_onroad_byregions.zip", "2020nei_onroad_byregion.zip")
   download_names <- paste0(directory_to_download, download_names_file)
   #### 4. build download command
+  # 1.3.1.1: use curl
   download_commands <-
     paste0(
-      "wget --ca-certificate=",
-      epa_certificate_path,
-      " ",
-      download_urls,
-      " -O ",
+      "curl -s -o ",
       download_names,
+      " --url ",
+      download_urls,
       "\n"
     )
+    # paste0(
+    #   "wget --ca-certificate=",
+    #   epa_certificate_path,
+    #   " ",
+    #   download_urls,
+    #   " -O ",
+    #   download_names,
+    #   "\n"
+    # )
   #### filter commands to non-existing files
   download_commands <- download_commands[
     which(
@@ -2951,7 +2959,7 @@ download_nei <- function(
     paste(year, collapse = "-"),
     "_",
     Sys.Date(),
-    "_wget_commands.txt"
+    "_curl_commands.txt"
   )
   amadeus::download_sink(commands_txt)
   #### 6. concatenate and print download commands to "..._curl_commands.txt"

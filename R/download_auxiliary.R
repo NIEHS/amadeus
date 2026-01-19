@@ -357,17 +357,21 @@ check_url_status <- function(
   http_status_ok <- c(200, 206)
   if (!is.null(earthdata_token)) {
     earthdata_token <- Sys.getenv("EARTHDATA_TOKEN")
-    if (is.null(earthdata_token) || earthdata_token == "") {
-      stop("Earthdata token is not defined.\n")
-    }
+    status <- url |>
+      httr2::request() |>
+      httr2::req_method("HEAD") |>
+      httr2::req_headers(Authorization = paste0("Bearer ", earthdata_token)) |>
+      httr2::req_error(is_error = \(resp) FALSE) |>
+      httr2::req_perform() |>
+      httr2::resp_status()
+  } else {
+    status <- url |>
+      httr2::request() |>
+      httr2::req_method("HEAD") |>
+      httr2::req_error(is_error = \(resp) FALSE) |>
+      httr2::req_perform() |>
+      httr2::resp_status()
   }
-  status <- url |>
-    httr2::request() |>
-    httr2::req_method("HEAD") |>
-    httr2::req_headers(Authorization = paste0("Bearer ", earthdata_token)) |>
-    httr2::req_error(is_error = \(resp) FALSE) |>
-    httr2::req_perform() |>
-    httr2::resp_status()
   Sys.sleep(1)
   return(status %in% http_status_ok)
 }

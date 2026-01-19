@@ -505,6 +505,8 @@ testthat::test_that("integration across *_nlcd functions", {
   testthat::expect_identical(terra::metags(nlcd_c1v1)[2, 2], "1985")
 
   ##############################################################################
+  ncpath <- system.file("gpkg/nc.gpkg", package = "sf")
+  ncv <- terra::vect(ncpath)
   nc <- terra::project(
     ncv,
     terra::crs(nlcd_c1v1)
