@@ -2937,15 +2937,7 @@ download_nei <- function(
       download_urls,
       "\n"
     )
-    # paste0(
-    #   "wget --ca-certificate=",
-    #   epa_certificate_path,
-    #   " ",
-    #   download_urls,
-    #   " -O ",
-    #   download_names,
-    #   "\n"
-    # )
+
   #### filter commands to non-existing files
   download_commands <- download_commands[
     which(
