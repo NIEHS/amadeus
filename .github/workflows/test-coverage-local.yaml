@@ -6,10 +6,6 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
-  schedule:
-    # Runs daily at 2 AM UTC (adjust timezone as needed)
-    - cron: '0 7 * * *'
-  workflow_dispatch:
 
 name: test-coverage-local
 
@@ -18,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +28,6 @@ jobs:
               any::pak
               any::covr
               any::rstac
-              any::testthat
             needs: coverage
 
       - name: Cache C++ and R dependencies
@@ -46,153 +40,32 @@ jobs:
           restore-keys: |
             dependencies-${{ runner.os }}-
 
-      - name: Session info
-        run: |
-          options(width = 100)
-          pkgs <- installed.packages()[, "Package"]
-          sessioninfo::session_info(pkgs, include_base = TRUE)
-        shell: Rscript {0}
-
       - name: Test coverage
-        id: coverage
-        continue-on-error: true
         run: |
           Rscript ${{ github.workspace }}/.github/workflows/test-coverage.R ${{ runner.temp }} ${{ github.workspace }}
         shell: bash
 
-      - name: Show comprehensive test output
+      - name: Show testthat output
         if: always()
         run: |
-          echo "========================================"
-          echo "SEARCHING FOR ALL TEST OUTPUT FILES"
-          echo "========================================"
-          
-          echo ""
-          echo "=== Files in runner.temp ==="
-          find ${{ runner.temp }} -type f -name "*.Rout*" 2>/dev/null || echo "No .Rout files found"
-          
-          echo ""
-          echo "=== Files in workspace ==="
-          find ${{ github.workspace }} -type f -name "*.Rout*" 2>/dev/null || echo "No .Rout files found"
-          
-          echo ""
-          echo "========================================"
-          echo "CONTENT OF FAILURE FILE"
-          echo "========================================"
-          FAIL_FILE=$(find ${{ runner.temp }} -name "testthat.Rout.fail" -type f 2>/dev/null | head -1)
-          if [ -n "$FAIL_FILE" ]; then
-            echo "Found failure file: $FAIL_FILE"
-            echo "--- START OF FILE ---"
-            cat "$FAIL_FILE"
-            echo "--- END OF FILE ---"
-          else
-            echo "No testthat.Rout.fail file found"
-          fi
-          
-          echo ""
-          echo "========================================"
-          echo "CONTENT OF SUCCESS FILE"
-          echo "========================================"
-          SUCCESS_FILE=$(find ${{ runner.temp }} -name "testthat.Rout" -type f 2>/dev/null | head -1)
-          if [ -n "$SUCCESS_FILE" ]; then
-            echo "Found success file: $SUCCESS_FILE"
-            echo "--- START OF FILE ---"
-            cat "$SUCCESS_FILE"
-            echo "--- END OF FILE ---"
-          else
-            echo "No testthat.Rout file found"
-          fi
-          
-          echo ""
-          echo "========================================"
-          echo "CONTENT OF RES FILES"
-          echo "========================================"
-          find ${{ runner.temp }} -name "*.Rout.res" -type f 2>/dev/null | while read -r file; do
-            echo "File: $file"
-            echo "--- START ---"
-            cat "$file"
-            echo "--- END ---"
-            echo ""
-          done || echo "No .Rout.res files found"
-          
-          echo ""
-          echo "========================================"
-          echo "PACKAGE DIRECTORY STRUCTURE"
-          echo "========================================"
-          echo "Contents of ${{ runner.temp }}/package:"
-          ls -laR ${{ runner.temp }}/package 2>/dev/null || echo "Directory not found"
-          
-          echo ""
-          echo "========================================"
-          echo "COVERAGE OUTPUT FILE"
-          echo "========================================"
-          if [ -f "${{ github.workspace }}/local_cov.Rout" ]; then
-            echo "Coverage file exists:"
-            cat ${{ github.workspace }}/local_cov.Rout
-          else
-            echo "Coverage file NOT found at ${{ github.workspace }}/local_cov.Rout"
-          fi
-          
-          echo ""
-          echo "========================================"
-          echo "ALL .Rout FILES CONTENT"
-          echo "========================================"
-          find ${{ runner.temp }} -type f -name "*.Rout*" 2>/dev/null | while read -r file; do
-            echo ""
-            echo "========== FILE: $file =========="
-            head -n 200 "$file" 2>/dev/null || echo "Could not read file"
-            if [ $(wc -l < "$file" 2>/dev/null || echo 0) -gt 200 ]; then
-              echo "... (file truncated, showing first 200 lines) ..."
-            fi
-          done || echo "No .Rout files to display"
-        shell: bash
-
-      - name: Check if coverage file exists
-        id: check-coverage-file
-        if: always()
-        run: |
-          if [ -f "${{ github.workspace }}/local_cov.Rout" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "Coverage file exists"
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-            echo "Coverage file does NOT exist - creating with 0"
-            echo "0" > ${{ github.workspace }}/local_cov.Rout
-          fi
+          ## --------------------------------------------------------------------
+          find ${{ runner.temp }}/package -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
 
       - name: Get Values
         id: get-values
-        if: always()
         shell: bash
         run: |
-          if [ -f "${{ github.workspace }}/local_cov.Rout" ]; then
-            COV=$(cat ${{ github.workspace }}/local_cov.Rout | tr -d '[:space:]')
-            if [ -z "$COV" ]; then
-              echo "Coverage file is empty, using 0"
-              COV="0"
-            fi
-          else
-            echo "Coverage file not found, using 0"
-            COV="0"
-          fi
+          COV=$(cat ${{ github.workspace }}/local_cov.Rout)
           echo "Patch coverage read from local_cov.Rout: $COV"
           echo "coverage=$COV" >> $GITHUB_OUTPUT
 
-      - name: Fail if coverage calculation failed
-        if: steps.coverage.outcome == 'failure'
-        run: |
-          echo "::error::Coverage calculation failed. Check the test output above for details."
-          exit 1
-
       - name: Checkout gh-pages
-        if: steps.coverage.outcome == 'success'
         uses: actions/checkout@v4
         with:
           ref: gh-pages
 
       - name: Patch comparison
-        if: steps.coverage.outcome == 'success'
         id: patch-comparison
         shell: bash
         run: |
@@ -203,53 +76,33 @@ jobs:
           cov_patch="${{ steps.get-values.outputs.coverage }}"
           cov_current=$(cat cov_current.Rout)
           echo "Current coverage: $cov_current"
-          echo "Patch coverage: $cov_patch"
 
           if (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
             echo "Patch coverage ($cov_patch) is greater than or equal to current coverage ($cov_current)."
             echo "cov_update=$cov_patch" >> $GITHUB_OUTPUT
-          else
-            echo "::warning::Patch coverage ($cov_patch) is less than current coverage ($cov_current)."
-            echo "::warning::This may indicate that new code is not adequately tested."
-            # Don't fail on coverage decrease for now, just warn
-            # exit 1
-            echo "cov_update=$cov_patch" >> $GITHUB_OUTPUT
+           else
+            echo "Patch coverage ($cov_patch) is less than current coverage ($cov_current)."
+            exit 1
           fi
 
       - name: Overwrite cov_current.Rout
-        if: ${{ github.event_name == 'push' && steps.coverage.outcome == 'success' }}
+        if: ${{ github.event_name == 'push' }}
         shell: bash
         run: |
           cov_update="${{ steps.patch-comparison.outputs.cov_update }}"
           touch cov_current.Rout
           echo "$cov_update" > cov_current.Rout
-          echo "Updated cov_current.Rout with: $cov_update"
 
       - name: Create Badges
-        if: steps.coverage.outcome == 'success'
         shell: bash
         run: |
           npm i -g badgen-cli
           export COV=${{ steps.get-values.outputs.coverage }}
-          echo "Creating badge with coverage: $COV%"
-          
-          # Determine color based on coverage
-          if (( $(echo "$COV >= 95" | bc -l) )); then
-            COLOR="green"
-          elif (( $(echo "$COV >= 80" | bc -l) )); then
-            COLOR="yellow"
-          elif (( $(echo "$COV >= 60" | bc -l) )); then
-            COLOR="orange"
-          else
-            COLOR="red"
-          fi
-          
-          echo "Badge color: $COLOR"
+          COLOR=$(node -p '+process.env.COV >= 95 ? `green` : `yellow`')
           mkdir -p badges
-          badgen -j coverage -s "$COV%" -c "$COLOR" > badges/coverage.svg
+          badgen -j coverage -s $COV% -c $COLOR > badges/coverage.svg
   
       - name: Deploy Badges
-        if: steps.coverage.outcome == 'success'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Update badges [skip ci] & cov_current.Rout"
@@ -257,28 +110,10 @@ jobs:
           skip_fetch: true
           skip_checkout: true
   
+      # Without this, will get Error:
+      # Can't find 'action.yml', 'action.yaml' or 'Dockerfile' under '/home/runner/work/coverage-badge-action/coverage-badge-action/action.yml'.
+      # Did you forget to run actions/checkout before running your local action?
       - name: Checkout Back
-        if: always()
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }}
-
-      - name: Final Summary
-        if: always()
-        run: |
-          echo "========================================"
-          echo "WORKFLOW SUMMARY"
-          echo "========================================"
-          echo "Coverage calculation: ${{ steps.coverage.outcome }}"
-          echo "Coverage value: ${{ steps.get-values.outputs.coverage }}%"
-          echo "Coverage file exists: ${{ steps.check-coverage-file.outputs.exists }}"
-          
-          if [ "${{ steps.coverage.outcome }}" == "failure" ]; then
-            echo ""
-            echo "❌ Coverage calculation FAILED"
-            echo "Please review the test output above to identify the failing tests"
-          else
-            echo ""
-            echo "✅ Coverage calculation SUCCEEDED"
-          fi
-        shell: bash
+          ref: ${{ github.ref }}  
