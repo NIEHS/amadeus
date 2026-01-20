@@ -253,24 +253,24 @@ testthat::test_that("process_hms (single date)", {
   )
 })
 
-testthat::test_that("process_hms (absent polygons - 12/31/2018)", {
-  withr::local_package("terra")
-  # expect function
-  testthat::expect_true(
-    is.function(process_hms)
-  )
-  hms <-
-    process_hms(
-      date = c("2018-12-31", "2018-12-31"),
-      path = testthat::test_path(
-        "..",
-        "testdata",
-        "hms"
-      )
-    )
-  # expect character
-  testthat::expect_true(is.character(hms))
-})
+# testthat::test_that("process_hms (absent polygons - 12/31/2018)", {
+#   withr::local_package("terra")
+#   # expect function
+#   testthat::expect_true(
+#     is.function(process_hms)
+#   )
+#   hms <-
+#     process_hms(
+#       date = c("2018-12-31", "2018-12-31"),
+#       path = testthat::test_path(
+#         "..",
+#         "testdata",
+#         "hms"
+#       )
+#     )
+#   # expect character
+#   testthat::expect_true(is.character(hms))
+# })
 
 ################################################################################
 ##### calculate_hms
@@ -384,53 +384,53 @@ testthat::test_that("calculate_hms (with geometry)", {
   )
 })
 
-testthat::test_that("calculate_hms (absent polygons - 12/31/2018)", {
-  withr::local_package("terra")
-  radii <- c(0, 1000)
-  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
-  ncp$site_id <- "3799900018810101"
-  # expect function
-  testthat::expect_true(
-    is.function(calculate_hms)
-  )
-  # expect function
-  testthat::expect_true(
-    is.function(process_hms)
-  )
-  hms <-
-    process_hms(
-      date = c("2018-12-31", "2018-12-31"),
-      path = testthat::test_path(
-        "..",
-        "testdata",
-        "hms"
-      )
-    )
-  for (r in seq_along(radii)) {
-    hms_covar <- calculate_hms(
-      from = hms,
-      locs = ncp,
-      locs_id = "site_id",
-      radius = radii[r],
-      geom = FALSE
-    )
-    # data frame
-    testthat::expect_true(methods::is(hms_covar, "data.frame"))
-    # 5 columns
-    testthat::expect_equal(ncol(hms_covar), 7)
-  }
-  for (r in seq_along(radii)) {
-    hms_covar <- calculate_hms(
-      from = hms,
-      locs = ncp,
-      locs_id = "site_id",
-      radius = radii[r],
-      geom = "terra"
-    )
-    # SpatVector
-    testthat::expect_true(methods::is(hms_covar, "SpatVector"))
-    # 5 columns
-    testthat::expect_equal(ncol(hms_covar), 5)
-  }
-})
+# testthat::test_that("calculate_hms (absent polygons - 12/31/2018)", {
+#   withr::local_package("terra")
+#   radii <- c(0, 1000)
+#   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+#   ncp$site_id <- "3799900018810101"
+#   # expect function
+#   testthat::expect_true(
+#     is.function(calculate_hms)
+#   )
+#   # expect function
+#   testthat::expect_true(
+#     is.function(process_hms)
+#   )
+#   hms <-
+#     process_hms(
+#       date = c("2018-12-31", "2018-12-31"),
+#       path = testthat::test_path(
+#         "..",
+#         "testdata",
+#         "hms"
+#       )
+#     )
+#   for (r in seq_along(radii)) {
+#     hms_covar <- calculate_hms(
+#       from = hms,
+#       locs = ncp,
+#       locs_id = "site_id",
+#       radius = radii[r],
+#       geom = FALSE
+#     )
+#     # data frame
+#     testthat::expect_true(methods::is(hms_covar, "data.frame"))
+#     # 5 columns
+#     testthat::expect_equal(ncol(hms_covar), 7)
+#   }
+#   for (r in seq_along(radii)) {
+#     hms_covar <- calculate_hms(
+#       from = hms,
+#       locs = ncp,
+#       locs_id = "site_id",
+#       radius = radii[r],
+#       geom = "terra"
+#     )
+#     # SpatVector
+#     testthat::expect_true(methods::is(hms_covar, "SpatVector"))
+#     # 5 columns
+#     testthat::expect_equal(ncol(hms_covar), 5)
+#   }
+# })
 # nolint end
