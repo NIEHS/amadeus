@@ -163,6 +163,34 @@ testthat::test_that("check_urls handles size > length(urls)", {
   testthat::expect_length(url_status, 1)
 })
 
+testthat::test_that("check_urls returns TRUE for valid URL", {
+  urls <- "https://google.com"
+  testthat::expect_no_error(
+    url_status <- check_urls(urls = urls, size = 1)
+  )
+  testthat::expect_length(url_status, 1)
+  testthat::expect_true(url_status)
+})
+
+testthat::test_that("check_url_status with valid URL", {
+  urls <- "https://google.com"
+  testthat::expect_no_error(
+    url_status <- check_url_status(url = urls)
+  )
+  testthat::expect_length(url_status, 1)
+  testthat::expect_true(url_status)
+})
+
+testthat::test_that("check_url_status with valid NASA file endpoint", {
+  urls <- "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP46A2/VNP46A2.A2023030.h30v05.002.2025135232534.h5"
+  testthat::expect_no_error(
+    url_status <- check_url_status(url = urls)
+  )
+  testthat::expect_length(url_status, 1)
+  testthat::expect_true(url_status)
+})
+
+
 ################################################################################
 ##### download_sink
 testthat::test_that("download_sink", {

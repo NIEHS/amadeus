@@ -148,3 +148,41 @@ testthat::test_that("process_cropscape", {
     process_cropscape(path = "/home/some/path", year = "MILLENNIUM")
   )
 })
+
+## calculate_cropscape
+testthat::test_that("calculate_cropscape", {
+  # Set up test data
+  withr::local_package("terra")
+  filepath <-
+    testthat::test_path("..", "testdata/cropscape/cdl_30m_r_nc_2019_sub.tif")
+  dirpath <- testthat::test_path("..", "testdata/cropscape")
+  year <- 2019
+
+  # Call the function
+  testthat::expect_no_error(crop_rast <- process_cropscape(filepath, year))
+
+  # Check the return type
+  testthat::expect_true(inherits(crop_rast, "SpatRaster"))
+
+  # Calculation
+  # make a faux location
+  locs <- data.frame(site_id = "001", lon = -78.90, lat = 35.97)
+  locs_v <- terra::vect(locs, geom = c("lon", "lat"), crs = "epsg:4326")
+  testthat::expect_no_error(
+    crop_df <- calculate_cropscape(
+      crop_rast,
+      locs = locs_v,
+      locs_id = "site_id",
+      radius = 300
+    )
+  )
+
+  # Check the return type
+  testthat::expect_true(inherits(crop_df, "data.frame"))
+
+  # error cases
+  testthat::expect_error(
+    calculate_cropscape(locs_v, locs = locs_v, locs_id = "site_id"),
+    "`from` must be a SpatRaster object."
+  )
+})

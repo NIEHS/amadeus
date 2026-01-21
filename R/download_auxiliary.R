@@ -344,34 +344,22 @@ generate_time_sequence <-
 #' @description
 #' Check if provided URL returns HTTP status 200 or 206.
 #' @param url Download URL to be checked.
-#' @param earthdata_token Earthdata token for authentication.
 #' @author Insang Song; Mitchell Manware; Kyle Messier
 #' @importFrom httr2 request req_perform resp_status
 #' @return logical object
 #' @keywords internal auxiliary
 #' @export
 check_url_status <- function(
-  url,
-  earthdata_token = NULL
+  url
 ) {
   http_status_ok <- c(200, 206)
-  if (!is.null(earthdata_token)) {
-    earthdata_token <- Sys.getenv("EARTHDATA_TOKEN")
-    status <- url |>
-      httr2::request() |>
-      httr2::req_method("HEAD") |>
-      httr2::req_headers(Authorization = paste0("Bearer ", earthdata_token)) |>
-      httr2::req_error(is_error = \(resp) FALSE) |>
-      httr2::req_perform() |>
-      httr2::resp_status()
-  } else {
-    status <- url |>
-      httr2::request() |>
-      httr2::req_method("HEAD") |>
-      httr2::req_error(is_error = \(resp) FALSE) |>
-      httr2::req_perform() |>
-      httr2::resp_status()
-  }
+  status <- url |>
+    httr2::request() |>
+    httr2::req_method("HEAD") |>
+    httr2::req_error(is_error = \(resp) FALSE) |>
+    httr2::req_perform() |>
+    httr2::resp_status()
+
   Sys.sleep(1)
   return(status %in% http_status_ok)
 }
