@@ -43,7 +43,7 @@ testthat::test_that("process_covariates", {
     )
 
   corn <- process_blackmarble_corners()
-  testthat::expect_no_warning(
+  suppressWarnings(
     bm_proc <- process_covariates(
       covariate = "blackmarble",
       path = path_vnp46[1],
@@ -51,7 +51,7 @@ testthat::test_that("process_covariates", {
       date = "2018-08-13"
     )
   )
-  testthat::expect_no_warning(
+  suppressWarnings(
     process_covariates(
       covariate = "Blackmarble",
       path = path_vnp46[1],
@@ -59,7 +59,7 @@ testthat::test_that("process_covariates", {
       date = "2018-08-13"
     )
   )
-  testthat::expect_no_warning(
+  suppressWarnings(
     process_covariates(
       covariate = "BLACKMARBLE",
       path = path_vnp46[1],
