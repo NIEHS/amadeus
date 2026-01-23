@@ -2391,10 +2391,6 @@ download_koppen_geiger <- function(
 #' @param product character(1).
 #' One of `c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2")`
 #' @param version character(1). Default is `"061"`, meaning v061.
-#' @param horizontal_tiles integer(2). Horizontal tile numbers
-#' `c({start}, {end})`. Default is `c(7, 13)`.
-#' @param vertical_tiles integer(2). Vertical tile numbers
-#' `c({start}, {end})`. Default is `c(3, 6)`.
 #' @param nasa_earth_data_token character(1).
 #'  Token for downloading data from NASA. Should be set before
 #'  trying running the function.
@@ -2444,8 +2440,6 @@ download_koppen_geiger <- function(
 #' download_modis(
 #'   product = "MOD09GA",
 #'   version = "061",
-#'   horizontal_tiles = c(8, 8),
-#'   vertical_tiles = c(4, 4),
 #'   date = "2024-01-01",
 #'   extent = vec_extent,
 #'   nasa_earth_data_token = "./pathtotoken/token.txt",
@@ -2458,8 +2452,6 @@ download_koppen_geiger <- function(
 #' download_modis(
 #'   product = "MOD06_L2",
 #'   version = "6.1",
-#'   horizontal_tiles = c(8, 8),
-#'   vertical_tiles = c(4, 4),
 #'   extent = vec_extent,
 #'   date = "2024-01-01",
 #'   nasa_earth_data_token = "./pathtotoken/token.txt",
@@ -2472,13 +2464,11 @@ download_koppen_geiger <- function(
 #' download_modis(
 #'   product = "VNP46A2",
 #'   version = "5200",
-#'   horizontal_tiles = c(8, 8),
-#'   vertical_tiles = c(4, 4),
 #'   date = "2024-01-01",
 #'   extent = vec_extent,
 #'   nasa_earth_data_token = "./pathtotoken/token.txt",
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,MOD09GA
+#'   acknowledgement = TRUE,
 #'   download = FALSE, # NOTE: download skipped for examples,
 #'   remove_command = TRUE
 #' )
@@ -2512,8 +2502,6 @@ download_modis <- function(
     "VNP46A2"
   ),
   version = "061",
-  horizontal_tiles = c(7, 13),
-  vertical_tiles = c(3, 6),
   nasa_earth_data_token = NULL,
   date = c("2023-09-01", "2023-09-01"),
   extent = c(-125, 22, -64, 50),
@@ -2553,30 +2541,6 @@ download_modis <- function(
     stop("Please select a data version.\n")
   }
 
-  #### 6. check for valid horizontal tiles -- to be deprecated
-  if (!all(horizontal_tiles %in% seq(0, 35))) {
-    stop("Horizontal tiles are not in the proper range [0, 35].\n")
-  }
-  if (!all(vertical_tiles %in% seq(0, 17))) {
-    stop("Vertical tiles are not in the proper range [0, 17].\n")
-  }
-
-  #### 7. define horizontal and vertical tiles
-  tiles_horizontal <-
-    seq(
-      horizontal_tiles[1],
-      horizontal_tiles[2]
-    )
-  tiles_horizontal <-
-    sprintf("h%02d", tiles_horizontal)
-
-  tiles_vertical <-
-    seq(
-      vertical_tiles[1],
-      vertical_tiles[2]
-    )
-  tiles_vertical <-
-    sprintf("v%02d", tiles_vertical)
 
   #### 9. define date sequence
   date_sequence <- amadeus::generate_date_sequence(
@@ -4050,12 +4014,13 @@ download_prism <- function(
     remove = remove_command
   )
   message("Requests were processed.\n")
-  return(amadeus::download_hash(hash, directory_to_save))
+  return(
+    amadeus::download_hash(hash, directory_to_save)
+  )
 }
-# nolint end
 
 
-################################################################################
+###############################################################################
 # 4. USDA Cropscape
 # nolint start
 #' Download CropScape data

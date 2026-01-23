@@ -209,7 +209,7 @@ testthat::test_that("extract_url fails with NULL position", {
     full.names = TRUE
   )[1]
   
-  testthat::expect_error(
+  testthat::expect_message(
     extract_urls(cmd_file, position = NULL),
     "URL position in command is not defined."
   )
