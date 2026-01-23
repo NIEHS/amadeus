@@ -312,6 +312,7 @@ generate_time_sequence <-
 #' @param url Download URL to be checked.
 #' @author Insang Song; Mitchell Manware; Kyle Messier
 #' @importFrom httr2 request req_perform resp_status
+#' @importFrom httr2 req_method req_error
 #' @return logical object
 #' @keywords internal auxiliary
 #' @export

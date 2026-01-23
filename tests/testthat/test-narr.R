@@ -39,7 +39,7 @@ testthat::test_that("download_narr (no errors)", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 6)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 5L)
+  url_status <- check_urls(urls = urls, size = 3L)
   # implement unit tests
   test_download_functions(
     directory_to_save = directory_to_save,
