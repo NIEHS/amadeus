@@ -278,40 +278,6 @@ generate_date_sequence <-
   }
 
 
-#' Check EPA certificate
-#' @param epa_certificate_path character(1).
-#' Full path of a converted certificate of EPA.
-#' Should end with `.pem`
-#' @param certificate_url character(1).
-#' URL of the original certificate.
-#' @return A file designated in `epa_certificate_path`
-#' @author Insang Song
-#' @importFrom utils download.file
-#' @keywords internal
-#' @export
-download_epa_certificate <-
-  function(
-    epa_certificate_path = "cacert_gaftp_epa.pem",
-    certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
-  ) {
-    if (!endsWith(epa_certificate_path, ".pem")) {
-      stop("Path should end with .pem .\n")
-    }
-    if (!file.exists(epa_certificate_path)) {
-      download_crt_target <- gsub("pem", "crt", epa_certificate_path)
-      utils::download.file(certificate_url, download_crt_target)
-      system(paste(
-        "openssl x509",
-        "-inform DER",
-        "-outform PEM",
-        "-in",
-        download_crt_target,
-        "-out",
-        epa_certificate_path
-      ))
-      message("Certificate conversion completed.\n")
-    }
-  }
 
 #' Generate time sequence
 #' @description
@@ -344,34 +310,22 @@ generate_time_sequence <-
 #' @description
 #' Check if provided URL returns HTTP status 200 or 206.
 #' @param url Download URL to be checked.
-#' @param earthdata_token Earthdata token for authentication.
 #' @author Insang Song; Mitchell Manware; Kyle Messier
 #' @importFrom httr2 request req_perform resp_status
 #' @return logical object
 #' @keywords internal auxiliary
 #' @export
 check_url_status <- function(
-  url,
-  earthdata_token = NULL
+  url
 ) {
   http_status_ok <- c(200, 206)
-  if (!is.null(earthdata_token)) {
-    earthdata_token <- Sys.getenv("EARTHDATA_TOKEN")
-    status <- url |>
-      httr2::request() |>
-      httr2::req_method("HEAD") |>
-      httr2::req_headers(Authorization = paste0("Bearer ", earthdata_token)) |>
-      httr2::req_error(is_error = \(resp) FALSE) |>
-      httr2::req_perform() |>
-      httr2::resp_status()
-  } else {
-    status <- url |>
-      httr2::request() |>
-      httr2::req_method("HEAD") |>
-      httr2::req_error(is_error = \(resp) FALSE) |>
-      httr2::req_perform() |>
-      httr2::resp_status()
-  }
+  status <- url |>
+    httr2::request() |>
+    httr2::req_method("HEAD") |>
+    httr2::req_error(is_error = \(resp) FALSE) |>
+    httr2::req_perform() |>
+    httr2::resp_status()
+
   Sys.sleep(1)
   return(status %in% http_status_ok)
 }
@@ -405,7 +359,7 @@ extract_urls <- function(
   position = NULL
 ) {
   if (is.null(position)) {
-    message(paste0("URL position in command is not defined.\n"))
+    message("URL position in command is not defined.")
     return(NULL)
   }
   urls <- sapply(

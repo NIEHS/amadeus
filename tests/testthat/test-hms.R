@@ -433,4 +433,31 @@ testthat::test_that("calculate_hms (with geometry)", {
 #     testthat::expect_equal(ncol(hms_covar), 5)
 #   }
 # })
+
+testthat::test_that("Character input in calculate_hms returns 1-row df", {
+  withr::local_package("terra")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  hms_covariate <-
+    calculate_hms(
+      from = "2018-12-31",
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      geom = FALSE
+    )
+  # expect output is data.frame
+  testthat::expect_s3_class(
+    hms_covariate, "data.frame"
+  )
+  # expect 3 columns
+  testthat::expect_equal(
+    ncol(hms_covariate), 7L
+  )
+  # expect 1 row
+  testthat::expect_equal(
+    nrow(hms_covariate), 1L
+  )
+})
+
 # nolint end

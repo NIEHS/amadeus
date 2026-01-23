@@ -158,3 +158,65 @@ testthat::test_that("process_prism", {
     )
   )
 })
+
+testthat::test_that("calculate_prism", {
+  withr::local_package("terra")
+  withr::local_package("exactextractr")
+  withr::local_package("sf")
+
+  path <- testthat::test_path(
+    "..",
+    "testdata",
+    "prism",
+    "PRISM_tmin_30yr_normal_4kmD1_0228_bil_test.nc"
+  )
+  path_dir <- testthat::test_path(
+    "..",
+    "testdata",
+    "prism"
+  )
+  element <- "tmin"
+  time <- "0228"
+
+  proc <- process_prism(path, element, time)
+  locs <- data.frame(
+    site_id = "001",
+    lon = -78.90,
+    lat = 35.97
+  )
+  locs <- terra::vect(locs, geom = c("lon", "lat"), crs = "epsg:4326")
+
+  testthat::expect_message(
+    {
+      result <- calculate_prism(proc, locs)
+    },
+    "Calculating PRISM covariates with 0 meters radius..."
+  )
+  testthat::expect_true(inherits(result, "data.frame"))
+  testthat::expect_equal(nrow(result), 1)
+  testthat::expect_equal(ncol(result), 2)
+  testthat::expect_equal(result$site_id, "001")
+  testthat::expect_equal(result[, 2], 0.8952, tolerance = 0.00005)
+
+  testthat::expect_message(
+    {
+      result_r <- calculate_prism(proc, locs, radius = 1000)
+    },
+    "Calculating PRISM covariates with 1000 meters radius..."
+  )
+
+  locs_sf <- sf::st_as_sf(locs)
+  testthat::expect_message(
+    {
+      result_r_sf <- calculate_prism(proc, locs_sf, radius = 1000)
+    },
+    "Calculating PRISM covariates with 1000 meters radius..."
+  )
+
+
+  # error cases
+  testthat::expect_error(
+    calculate_prism(list(), locs),
+    "`from` must be a SpatRaster object."
+  )
+})

@@ -4,12 +4,10 @@
 \alias{check_url_status}
 \title{Check HTTP status}
 \usage{
-check_url_status(url, earthdata_token = NULL)
+check_url_status(url)
 }
 \arguments{
 \item{url}{Download URL to be checked.}
-
-\item{earthdata_token}{Earthdata token for authentication.}
 }
 \value{
 logical object

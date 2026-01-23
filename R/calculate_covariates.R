@@ -34,6 +34,9 @@
 #' * \code{\link{calculate_merra2}}: "merra", "MERRA", "merra2", "MERRA2"
 #' * \code{\link{calculate_gridmet}}: "gridMET", "gridmet"
 #' * \code{\link{calculate_terraclimate}}: "terraclimate", "TerraClimate"
+#' * \code{\link{calculate_prism}}: "prism", "PRISM"
+#' * \code{\link{calculate_cropscape}}: "cropscape", "cdl"
+#' * \code{\link{calculate_huc}}: "huc", "HUC"
 #' @return Calculated covariates as a data.frame or SpatVector object
 #' @author Insang Song
 #' @examples
@@ -80,7 +83,11 @@ calculate_covariates <-
       "gridmet",
       "terraclimate",
       "tri",
-      "nei"
+      "nei",
+      "prism",
+      "cropscape",
+      "cdl",
+      "huc"
     ),
     from,
     locs,
@@ -117,7 +124,11 @@ calculate_covariates <-
       merra = amadeus::calculate_merra2,
       merra2 = amadeus::calculate_merra2,
       gridmet = amadeus::calculate_gridmet,
-      terraclimate = amadeus::calculate_terraclimate
+      terraclimate = amadeus::calculate_terraclimate,
+      prism = amadeus::calculate_prism,
+      cropscape = amadeus::calculate_cropscape,
+      cdl = amadeus::calculate_cropscape,
+      huc = amadeus::calculate_huc
     )
 
     res_covariate <-
@@ -2613,4 +2624,317 @@ calculate_lagged <- function(
     crs = terra::crs(from)
   )
   return(variables_return)
+}
+
+# prism, cropscape, huc
+#' Calculate PRISM covariates
+#' @description
+#' Extract PRISM values at point locations. Returns a \code{data.frame}
+#' object containing \code{locs_id} and PRISM variable. PRISM
+#' variable column name reflects the PRISM variable and
+#' circular buffer radius.
+#' @param from SpatRaster(1). Output from \code{process_prism()}.
+#' @param locs data.frame. character to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param ... Placeholders.
+#' @author Insang Song
+#' @seealso [`process_prism()`]
+#' @return a data.frame or SpatVector object
+#' @importFrom terra vect
+#' @importFrom terra as.data.frame
+#' @importFrom terra time
+#' @importFrom terra extract
+#' @importFrom terra nlyr
+#' @importFrom terra crs
+#' @importFrom exactextractr exact_extract
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_prism(
+#'   from = prism, # derived from process_prism() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_prism <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  geom = FALSE,
+  ...
+) {
+  # check input class
+  if (!inherits(from, "SpatRaster")) {
+    stop("`from` must be a SpatRaster object.")
+  }
+  #### prepare locations list
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### perform extraction
+
+  message(
+    sprintf(
+      "Calculating PRISM covariates with %d meters radius...",
+      radius
+    )
+  )
+
+  # extract
+  if (radius == 0) {
+    # use terra::extract
+    sites_extracted <- terra::extract(from, sites_e)
+    sites_extracted <- sites_extracted[, -1, drop = FALSE]
+  } else {
+    # use exactextractr::exact_extract
+    if (inherits(sites_e, "SpatVector")) {
+      sites_e_sf <- sf::st_as_sf(sites_e)
+    } else {
+      sites_e_sf <- sites_e
+    }
+    # Buffer points
+    sites_e_buf <- sf::st_buffer(sites_e_sf, dist = radius)
+    sites_extracted <- exactextractr::exact_extract(
+      from,
+      sites_e_buf,
+      fun = "mean",
+      force_df = TRUE,
+      progress = FALSE,
+      ...
+    )
+  }
+
+  # clean up names if they are from exact_extract (prefix "mean.")
+  if (radius > 0) {
+    colnames(sites_extracted) <- gsub(
+      "^mean\\.",
+      "",
+      colnames(sites_extracted)
+    )
+  }
+
+  # append radius
+  new_names <- sprintf("%s_%d", colnames(sites_extracted), radius)
+  colnames(sites_extracted) <- new_names
+
+  # Combine with IDs
+  sites_extracted[[locs_id]] <- sites_id[, 1]
+  # reorder to put ID first
+  sites_extracted <- sites_extracted[, c(
+    locs_id,
+    setdiff(names(sites_extracted), locs_id)
+  )]
+
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  #### return data.frame
+  return(sites_return)
+}
+
+#' Calculate Cropscape covariates
+#' @description
+#' Extract Cropscape (CDL) values at point locations.
+#' Returns a \code{data.frame}
+#' object containing \code{locs_id} and crop specific cell fractions.
+#' @param from SpatRaster(1). Output from \code{process_cropscape()}.
+#' @param locs data.frame. character to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param ... Placeholders.
+#' @author Insang Song
+#' @seealso [`process_cropscape()`]
+#' @return a data.frame or SpatVector object
+#' @importFrom terra vect
+#' @importFrom terra extract
+#' @importFrom terra crs
+#' @importFrom sf st_as_sf st_buffer
+#' @importFrom exactextractr exact_extract
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_cropscape(
+#'   from = cropscape, # derived from process_cropscape() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_cropscape <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  geom = FALSE,
+  ...
+) {
+  #### prepare locations list
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+
+  if (!inherits(from, "SpatRaster")) {
+    stop("`from` must be a SpatRaster object.")
+  }
+
+  message(
+    sprintf(
+      "Calculating Cropscape covariates with %d meters radius...",
+      radius
+    )
+  )
+
+  # extract
+  if (radius == 0) {
+    # terra::extract for point
+    sites_extracted <- terra::extract(from, sites_e)
+    sites_extracted <- sites_extracted[, -1, drop = FALSE]
+    # rename
+    colnames(sites_extracted) <- paste0("cropscape_", radius)
+  } else {
+    if (inherits(sites_e, "SpatVector")) {
+      sites_e_sf <- sf::st_as_sf(sites_e)
+    } else {
+      sites_e_sf <- sites_e
+    }
+    sites_e_buf <- sf::st_buffer(sites_e_sf, dist = radius)
+
+    # fractions
+    sites_extracted <- exactextractr::exact_extract(
+      from,
+      sites_e_buf,
+      fun = "frac",
+      force_df = TRUE,
+      progress = FALSE,
+      ...
+    )
+
+    colnames(sites_extracted) <- gsub(
+      "frac_",
+      sprintf("cropscape_%d_", radius),
+      colnames(sites_extracted)
+    )
+  }
+
+  sites_extracted[[locs_id]] <- sites_id[, 1]
+  sites_extracted <- sites_extracted[, c(
+    locs_id,
+    setdiff(names(sites_extracted), locs_id)
+  )]
+
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  return(sites_return)
+}
+
+#' Calculate HUC covariates
+#' @description
+#' Extract HUC IDs at point locations. Returns a \code{data.frame}
+#' object containing \code{locs_id} and HUC IDs.
+#' @param from SpatVector(1). Output from \code{process_huc()}.
+#' @param locs data.frame. character to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param ... Placeholders.
+#' @author Insang Song
+#' @seealso [`process_huc()`]
+#' @return a data.frame or SpatVector object
+#' @importFrom terra vect
+#' @importFrom terra intersect
+#' @importFrom terra crs
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_huc(
+#'   from = huc, # derived from process_huc() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_huc <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  geom = FALSE,
+  ...
+) {
+
+  if (!inherits(from, "SpatVector")) {
+    stop("`from` must be the output of process_huc().")
+  }
+
+  #### prepare locations list
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = 0, # radius irrelevant for point-in-poly usually, or treated as 0
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+
+  message("Calculating HUC covariates...")
+
+  # intersect
+  sites_extracted <- terra::intersect(sites_e, from)
+  sites_df <- terra::as.data.frame(sites_extracted)
+
+  # Remove valid geometry columns if present
+  cols_to_keep <- c(locs_id, setdiff(names(sites_df), locs_id))
+  sites_df <- sites_df[, cols_to_keep, drop = FALSE]
+
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_df,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  return(sites_return)
 }

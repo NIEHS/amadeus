@@ -163,6 +163,61 @@ testthat::test_that("check_urls handles size > length(urls)", {
   testthat::expect_length(url_status, 1)
 })
 
+testthat::test_that("check_urls returns TRUE for valid URL", {
+  urls <- "https://google.com"
+  testthat::expect_no_error(
+    url_status <- check_urls(urls = urls, size = 1)
+  )
+  testthat::expect_length(url_status, 1)
+  testthat::expect_true(url_status)
+})
+
+testthat::test_that("check_url_status with valid URL", {
+  urls <- "https://google.com"
+  testthat::expect_no_error(
+    url_status <- check_url_status(url = urls)
+  )
+  testthat::expect_length(url_status, 1)
+  testthat::expect_true(url_status)
+})
+
+testthat::test_that("check_url_status with valid NASA file endpoint", {
+  urls <- "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP46A2/VNP46A2.A2023030.h30v05.002.2025135232534.h5"
+  testthat::expect_no_error(
+    url_status <- check_url_status(url = urls)
+  )
+  testthat::expect_length(url_status, 1)
+  testthat::expect_true(url_status)
+})
+
+
+# test covering two lines
+testthat::test_that("extract_url fails with NULL position", {
+  # generate txt with download commands
+  tdir <- tempdir()
+  download_koppen_geiger(
+    data_resolution = "0.5",
+    time_period = "Present",
+    directory_to_save = tdir,
+    acknowledgement = TRUE,
+    unzip = FALSE
+  )
+
+  cmd_file <- list.files(
+    tdir,
+    pattern = "koppen_geiger_.*\\.txt$",
+    full.names = TRUE
+  )[1]
+  
+  testthat::expect_error(
+    extract_urls(cmd_file, position = NULL),
+    "URL position in command is not defined."
+  )
+})
+
+
+
+
 ################################################################################
 ##### download_sink
 testthat::test_that("download_sink", {
