@@ -162,6 +162,7 @@ testthat::test_that("process_prism", {
 testthat::test_that("calculate_prism", {
   withr::local_package("terra")
   withr::local_package("exactextractr")
+  withr::local_package("sf")
 
   path <- testthat::test_path(
     "..",
@@ -196,4 +197,26 @@ testthat::test_that("calculate_prism", {
   testthat::expect_equal(ncol(result), 2)
   testthat::expect_equal(result$site_id, "001")
   testthat::expect_equal(result[, 2], 0.8952, tolerance = 0.00005)
+
+  testthat::expect_message(
+    {
+      result_r <- calculate_prism(proc, locs, radius = 1000)
+    },
+    "Calculating PRISM covariates with 1000 meters radius..."
+  )
+
+  locs_sf <- sf::st_as_sf(locs)
+  testthat::expect_message(
+    {
+      result_r_sf <- calculate_prism(proc, locs_sf, radius = 1000)
+    },
+    "Calculating PRISM covariates with 1000 meters radius..."
+  )
+
+
+  # error cases
+  testthat::expect_error(
+    calculate_prism(list(), locs),
+    "`from` must be a SpatRaster object."
+  )
 })

@@ -2675,6 +2675,10 @@ calculate_prism <- function(
   geom = FALSE,
   ...
 ) {
+  # check input class
+  if (!inherits(from, "SpatRaster")) {
+    stop("`from` must be a SpatRaster object.")
+  }
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
     from = from,
@@ -2686,10 +2690,6 @@ calculate_prism <- function(
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
   #### perform extraction
-  # check input class
-  if (!inherits(from, "SpatRaster")) {
-    stop("`from` must be a SpatRaster object.")
-  }
 
   message(
     sprintf(
@@ -2905,6 +2905,11 @@ calculate_huc <- function(
   geom = FALSE,
   ...
 ) {
+
+  if (!inherits(from, "SpatVector")) {
+    stop("`from` must be the output of process_huc().")
+  }
+
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
     from = from,
@@ -2914,10 +2919,6 @@ calculate_huc <- function(
     geom = geom
   )
   sites_e <- sites_list[[1]]
-
-  if (!inherits(from, "SpatVector")) {
-    stop("`from` must be a SpatVector object.")
-  }
 
   message("Calculating HUC covariates...")
 

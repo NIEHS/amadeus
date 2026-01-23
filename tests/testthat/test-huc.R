@@ -130,4 +130,55 @@ testthat::test_that("process_huc", {
       extent = terra::ext(result)
     )
   )
+
+})
+
+
+################################################################################
+##### calculate_huc
+testthat::test_that("calculate_huc", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_package("nhdplusTools")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  # Set up test data
+  path <- testthat::test_path(
+    "..",
+    "testdata",
+    "huc12",
+    "NHDPlus_test.gpkg"
+  )
+  huc_vect <- process_huc(
+    path,
+    layer_name = "NHDPlus_test",
+    huc_level = "HUC_12",
+    huc_header = "030202"
+  )
+
+  # faux loc
+  locs_v <- data.frame(
+    site_id = c("loc1", "loc2", "loc3"),
+    lon = c(-77.0365, -77.0434, -77.0283),
+    lat = c(38.8977, 38.9097, 38.8895)
+  )
+  locs_v <-
+    terra::vect(locs_v, geom = c("lon", "lat"), crs = "epsg:4326")
+
+  # runs ok
+  testthat::expect_message(
+    huc_df <- calculate_huc(
+      huc_vect,
+      locs = locs_v,
+      locs_id = "site_id"
+    ),
+    "Calculating HUC covariates..."
+  )
+
+  # error 1 - invalid from object
+  testthat::expect_error(
+    calculate_huc(from = 0, locs = locs_v, locs_id = "site_id"),
+    "`from` must be the output of process_huc()."
+  )
+
 })

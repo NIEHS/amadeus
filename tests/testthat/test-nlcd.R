@@ -473,6 +473,38 @@ testthat::test_that("calculate_nlcd (error for 2 layers)", {
   )
 })
 
+
+## collapse_nlcd warning
+testthat::test_that("collapse_nlcd warning", {
+  withr::local_package("terra")
+  withr::local_package("collapse")
+
+
+  # test list data
+  lst_nlcd_200 <- list(
+    id1 = data.frame(ID = 1, T1 = 0.1),
+    id2 = NULL,
+    id3 = data.frame(ID = 3, T1 = 0.3)
+  )
+
+  lst_nlcd_allnull <- list(
+    id1 = NULL,
+    id2 = NULL,
+    id3 = NULL
+  )
+
+  testthat::expect_warning(
+    {cnlcd <- collapse_nlcd(data = lst_nlcd_allnull)},
+    "No non-null data provided to collapse_nlcd"
+  )
+
+  testthat::expect_s3_class(cnlcd, "data.frame")
+  testthat::expect_equal(nrow(cnlcd), 0L)
+  # line 800-801 cannot be tested if all non-null data are provided
+})
+
+
+
 ################################################################################
 ##### integration for new data version
 testthat::test_that("integration across *_nlcd functions", {

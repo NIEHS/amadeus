@@ -153,6 +153,8 @@ testthat::test_that("process_cropscape", {
 testthat::test_that("calculate_cropscape", {
   # Set up test data
   withr::local_package("terra")
+  withr::local_package("sf")
+
   filepath <-
     testthat::test_path("..", "testdata/cropscape/cdl_30m_r_nc_2019_sub.tif")
   dirpath <- testthat::test_path("..", "testdata/cropscape")
@@ -172,6 +174,27 @@ testthat::test_that("calculate_cropscape", {
     crop_df <- calculate_cropscape(
       crop_rast,
       locs = locs_v,
+      locs_id = "site_id",
+      radius = 300
+    )
+  )
+
+  # zero radius
+  testthat::expect_no_error(
+    crop_df <- calculate_cropscape(
+      crop_rast,
+      locs = locs_v,
+      locs_id = "site_id",
+      radius = 0
+    )
+  )
+
+  # sf input
+  locs_s <- sf::st_as_sf(locs_v)
+  testthat::expect_no_error(
+    crop_df <- calculate_cropscape(
+      crop_rast,
+      locs = locs_s,
       locs_id = "site_id",
       radius = 300
     )
