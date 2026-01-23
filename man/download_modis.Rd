@@ -10,8 +10,6 @@ download_modis(
     "MYD11B1", "MOD13A1", "MYD13A1", "MOD13A2", "MYD13A2", "MOD13A3", "MYD13A3",
     "MOD06_L2", "MCD19A2", "VNP46A2"),
   version = "061",
-  horizontal_tiles = c(7, 13),
-  vertical_tiles = c(3, 6),
   nasa_earth_data_token = NULL,
   date = c("2023-09-01", "2023-09-01"),
   extent = c(-125, 22, -64, 50),
@@ -27,12 +25,6 @@ download_modis(
 One of \code{c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2")}}
 
 \item{version}{character(1). Default is \code{"061"}, meaning v061.}
-
-\item{horizontal_tiles}{integer(2). Horizontal tile numbers
-\code{c({start}, {end})}. Default is \code{c(7, 13)}.}
-
-\item{vertical_tiles}{integer(2). Vertical tile numbers
-\code{c({start}, {end})}. Default is \code{c(3, 6)}.}
 
 \item{nasa_earth_data_token}{character(1).
 Token for downloading data from NASA. Should be set before
@@ -96,8 +88,6 @@ vec_extent <- c(-80, 35, -75, 40)
 download_modis(
   product = "MOD09GA",
   version = "061",
-  horizontal_tiles = c(8, 8),
-  vertical_tiles = c(4, 4),
   date = "2024-01-01",
   extent = vec_extent,
   nasa_earth_data_token = "./pathtotoken/token.txt",
@@ -110,8 +100,6 @@ download_modis(
 download_modis(
   product = "MOD06_L2",
   version = "6.1",
-  horizontal_tiles = c(8, 8),
-  vertical_tiles = c(4, 4),
   extent = vec_extent,
   date = "2024-01-01",
   nasa_earth_data_token = "./pathtotoken/token.txt",
@@ -124,13 +112,11 @@ download_modis(
 download_modis(
   product = "VNP46A2",
   version = "5200",
-  horizontal_tiles = c(8, 8),
-  vertical_tiles = c(4, 4),
   date = "2024-01-01",
   extent = vec_extent,
   nasa_earth_data_token = "./pathtotoken/token.txt",
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,MOD09GA
+  acknowledgement = TRUE,
   download = FALSE, # NOTE: download skipped for examples,
   remove_command = TRUE
 )
