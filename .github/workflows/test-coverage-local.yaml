@@ -186,8 +186,10 @@ jobs:
           exit 1
 
       - name: Checkout gh-pages
+        id: checkout-gh-pages
         if: steps.coverage.outcome == 'success'
         uses: actions/checkout@v4
+        continue-on-error: true
         with:
           ref: gh-pages
 
@@ -196,24 +198,30 @@ jobs:
         id: patch-comparison
         shell: bash
         run: |
-          if ( ! test -f cov_current.Rout ); then
-            echo "0" >> cov_current.Rout
-          fi
-
           cov_patch="${{ steps.get-values.outputs.coverage }}"
-          cov_current=$(cat cov_current.Rout)
-          echo "Current coverage: $cov_current"
+          
+          # Check if gh-pages checkout succeeded and file exists
+          if [[ "${{ steps.checkout-gh-pages.outcome }}" == "success" ]] && test -f cov_current.Rout; then
+            cov_current=$(cat cov_current.Rout)
+            echo "Current coverage: $cov_current"
+          else
+            echo "No gh-pages branch or cov_current.Rout found. Setting current coverage to 0."
+            cov_current=0
+          fi
+          
           echo "Patch coverage: $cov_patch"
-
-          if (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
-            echo "Patch coverage ($cov_patch) is greater than or equal to current coverage ($cov_current)."
+          
+          # Pass if coverage is > 99% OR >= current coverage
+          if (( $(echo "$cov_patch > 99" | bc -l) )); then
+            echo "✓ Patch coverage ($cov_patch%) exceeds 99% threshold."
+            echo "cov_update=$cov_patch" >> $GITHUB_OUTPUT
+          elif (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
+            echo "✓ Patch coverage ($cov_patch%) is greater than or equal to current coverage ($cov_current%)."
             echo "cov_update=$cov_patch" >> $GITHUB_OUTPUT
           else
-            echo "::warning::Patch coverage ($cov_patch) is less than current coverage ($cov_current)."
-            echo "::warning::This may indicate that new code is not adequately tested."
-            # Don't fail on coverage decrease for now, just warn
-            # exit 1
-            echo "cov_update=$cov_patch" >> $GITHUB_OUTPUT
+            echo "::error::Patch coverage ($cov_patch%) is less than current coverage ($cov_current%) and does not exceed 99%."
+            echo "::error::This indicates that new code is not adequately tested or existing coverage was reduced."
+            exit 1
           fi
 
       - name: Overwrite cov_current.Rout
@@ -256,6 +264,7 @@ jobs:
           branch: gh-pages
           skip_fetch: true
           skip_checkout: true
+          create_branch: true
   
       - name: Checkout Back
         if: always()
