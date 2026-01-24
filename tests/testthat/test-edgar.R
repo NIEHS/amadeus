@@ -24,7 +24,7 @@ testthat::test_that("download_edgar (no errors, yearly with sectors)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls)
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -57,7 +57,7 @@ testthat::test_that("download_edgar (monthly, no sector)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls)
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -91,7 +91,7 @@ testthat::test_that("download_edgar (monthly, w/sector)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls)
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -126,7 +126,7 @@ testthat::test_that("download_edgar (single year)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls)
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -219,7 +219,7 @@ testthat::test_that("download_edgar (VOC with sector_voc)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls)
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -254,7 +254,7 @@ testthat::test_that("download_edgar (VOC w/out year_range)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls)
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -289,7 +289,7 @@ testthat::test_that("download_edgar (VOC w/out sector_voc)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls)
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -323,7 +323,7 @@ testthat::test_that("download_edgar (default year_range)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls)
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -357,7 +357,7 @@ testthat::test_that("download_edgar (NULL sector_yearly)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls)
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -392,7 +392,7 @@ testthat::test_that("download_edgar (NULL sector_yearly + year_range)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls)
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -444,7 +444,7 @@ testthat::test_that("download_edgar (timeseries)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls)
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,

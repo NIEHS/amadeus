@@ -12,8 +12,6 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
   years <- 2020
   product <- "MOD09GA"
   version <- "061"
-  horizontal_tiles <- c(12, 13)
-  vertical_tiles <- c(5, 6)
   nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
   directory_to_save <- paste0(tempdir(), "/mod/")
   for (y in seq_along(years)) {
@@ -25,8 +23,6 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
       date = c(date_start, date_end),
       product = product,
       version = version,
-      horizontal_tiles = horizontal_tiles,
-      vertical_tiles = vertical_tiles,
       extent = c(-124, 25, -105, 40),
       nasa_earth_data_token = nasa_earth_data_token,
       directory_to_save = directory_to_save,
@@ -69,8 +65,6 @@ testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
   # function parameters
   product <- "MOD09GA"
   version <- "061"
-  horizontal_tiles <- c(12, 13)
-  vertical_tiles <- c(5, 6)
   nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
   directory_to_save <- paste0(tempdir(), "/mod/")
   date <- "2021-04-12"
@@ -79,8 +73,6 @@ testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
     date = date,
     product = product,
     version = version,
-    horizontal_tiles = horizontal_tiles,
-    vertical_tiles = vertical_tiles,
     extent = c(-124, 25, -105, 40),
     nasa_earth_data_token = nasa_earth_data_token,
     directory_to_save = directory_to_save,
@@ -126,8 +118,6 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
   date_start <- "2019-02-18"
   date_end <- "2019-02-28"
   nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
-  horizontal_tiles <- c(8, 10)
-  vertical_tiles <- c(4, 5)
   directory_to_save <- paste0(tempdir(), "/mod/")
 
   # testthat::expect_error(
@@ -136,8 +126,6 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
     date = c(date_start, date_end),
     product = product,
     version = version,
-    horizontal_tiles = horizontal_tiles,
-    vertical_tiles = vertical_tiles,
     extent = c(-124, 25, -105, 40),
     nasa_earth_data_token = nasa_earth_data_token,
     directory_to_save = directory_to_save,
@@ -169,8 +157,6 @@ testthat::test_that("download_modis (MODIS-MOD06L2)", {
     date = c(date_start, date_end),
     product = product,
     version = version,
-    horizontal_tiles = horizontal_tiles,
-    vertical_tiles = vertical_tiles,
     extent = c(-124, 25, -105, 40),
     nasa_earth_data_token = nasa_earth_data_token,
     directory_to_save = directory_to_save,
@@ -213,12 +199,10 @@ testthat::test_that("download_modis (expected errors)", {
   product <- c("MOD09GA", "MOD11A1", "MOD13A2", "MCD19A2")
   product <- sample(product, 1L)
   version <- "061"
-  horizontal_tiles <- c(12, 13)
-  vertical_tiles <- c(5, 6)
   nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
   directory_to_save <- paste0(tempdir(), "/mod/")
   date_start <- paste0(years, "-06-25")
-  date_end <- paste0(years, "-06-28")
+  date_end <- paste0(years, "-06-30")
   vec_extent <- c(-124, 25, -105, 40)
 
   # no token
@@ -228,8 +212,6 @@ testthat::test_that("download_modis (expected errors)", {
       date = c(date_start, date_end),
       product = product,
       version = version,
-      horizontal_tiles = horizontal_tiles,
-      vertical_tiles = vertical_tiles,
       extent = vec_extent,
       nasa_earth_data_token = nasa_earth_data_token,
       directory_to_save = directory_to_save,
@@ -246,8 +228,6 @@ testthat::test_that("download_modis (expected errors)", {
       date = c(date_start, date_end),
       product = product,
       version = version,
-      horizontal_tiles = horizontal_tiles,
-      vertical_tiles = vertical_tiles,
       extent = vec_extent,
       nasa_earth_data_token = NULL,
       directory_to_save = directory_to_save,
@@ -264,8 +244,6 @@ testthat::test_that("download_modis (expected errors)", {
       date = c(date_start, "2024-03-28"),
       product = "MOD11A1",
       version = version,
-      horizontal_tiles = horizontal_tiles,
-      vertical_tiles = vertical_tiles,
       extent = vec_extent,
       nasa_earth_data_token = nasa_earth_data_token,
       directory_to_save = directory_to_save,
@@ -282,44 +260,6 @@ testthat::test_that("download_modis (expected errors)", {
       date = c(date_start, date_end),
       product = product,
       version = NULL,
-      horizontal_tiles = horizontal_tiles,
-      vertical_tiles = vertical_tiles,
-      extent = vec_extent,
-      nasa_earth_data_token = nasa_earth_data_token,
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE,
-      remove_command = FALSE
-    )
-  )
-
-  # invalid tile range (horizontal)
-  testthat::expect_error(
-    download_data(
-      dataset_name = "modis",
-      date = c(date_start, date_end),
-      product = product,
-      version = "61",
-      horizontal_tiles = c(-13, -3),
-      vertical_tiles = vertical_tiles,
-      extent = vec_extent,
-      nasa_earth_data_token = nasa_earth_data_token,
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE,
-      remove_command = FALSE
-    )
-  )
-
-  # invalid tile range (horizontal)
-  testthat::expect_error(
-    download_data(
-      dataset_name = "modis",
-      date = c(date_start, date_end),
-      product = product,
-      version = "61",
-      horizontal_tiles = horizontal_tiles,
-      vertical_tiles = c(100, 102),
       extent = vec_extent,
       nasa_earth_data_token = nasa_earth_data_token,
       directory_to_save = directory_to_save,
@@ -384,8 +324,6 @@ testthat::test_that("download_modis (MOD + MYD products)", {
     "MYD13A3"
   )
   version <- "061"
-  horizontal_tiles <- c(10, 10)
-  vertical_tiles <- c(4, 5)
   nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
   directory_to_save <- paste0(tempdir(), "/mod/")
   date_start <- "2021-06-01"
@@ -399,8 +337,6 @@ testthat::test_that("download_modis (MOD + MYD products)", {
       date = c(date_start, date_end),
       product = products[p],
       version = version,
-      horizontal_tiles = horizontal_tiles,
-      vertical_tiles = vertical_tiles,
       extent = vec_extent,
       nasa_earth_data_token = nasa_earth_data_token,
       directory_to_save = directory_to_save,
