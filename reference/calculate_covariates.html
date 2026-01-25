@@ -19,7 +19,7 @@ calculate_covariates()."><meta property="og:image" content="https://niehs.github
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,6 +40,7 @@ calculate_covariates()."><meta property="og:image" content="https://niehs.github
     <li><a class="dropdown-item" href="../articles/narr_workflow.html">NOAA North American Regional Reanalysis (NARR)</a></li>
     <li><a class="dropdown-item" href="../articles/epa_download.html">US EPA Air Quality System (AQS)</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/NIEHS/amadeus/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -71,7 +72,8 @@ SpatRaster or SpatVector objects before passing to
 <span>  covariate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"modis"</span>, <span class="st">"koppen-geiger"</span>, <span class="st">"koeppen-geiger"</span>, <span class="st">"koppen"</span>, <span class="st">"koeppen"</span>, <span class="st">"geos"</span>,</span>
 <span>    <span class="st">"dummies"</span>, <span class="st">"gmted"</span>, <span class="st">"sedac_groads"</span>, <span class="st">"groads"</span>, <span class="st">"roads"</span>, <span class="st">"ecoregions"</span>, <span class="st">"ecoregion"</span>,</span>
 <span>    <span class="st">"hms"</span>, <span class="st">"smoke"</span>, <span class="st">"gmted"</span>, <span class="st">"narr"</span>, <span class="st">"geos"</span>, <span class="st">"sedac_population"</span>, <span class="st">"population"</span>, <span class="st">"nlcd"</span>,</span>
-<span>    <span class="st">"merra"</span>, <span class="st">"merra2"</span>, <span class="st">"gridmet"</span>, <span class="st">"terraclimate"</span>, <span class="st">"tri"</span>, <span class="st">"nei"</span><span class="op">)</span>,</span>
+<span>    <span class="st">"merra"</span>, <span class="st">"merra2"</span>, <span class="st">"gridmet"</span>, <span class="st">"terraclimate"</span>, <span class="st">"tri"</span>, <span class="st">"nei"</span>, <span class="st">"prism"</span>, <span class="st">"cropscape"</span>,</span>
+<span>    <span class="st">"cdl"</span>, <span class="st">"huc"</span><span class="op">)</span>,</span>
 <span>  <span class="va">from</span>,</span>
 <span>  <span class="va">locs</span>,</span>
 <span>  locs_id <span class="op">=</span> <span class="st">"site_id"</span>,</span>
@@ -133,6 +135,9 @@ function.</p></dd>
 <li><p><code><a href="calculate_merra2.html">calculate_merra2</a></code>: "merra", "MERRA", "merra2", "MERRA2"</p></li>
 <li><p><code><a href="calculate_gridmet.html">calculate_gridmet</a></code>: "gridMET", "gridmet"</p></li>
 <li><p><code><a href="calculate_terraclimate.html">calculate_terraclimate</a></code>: "terraclimate", "TerraClimate"</p></li>
+<li><p><code><a href="calculate_prism.html">calculate_prism</a></code>: "prism", "PRISM"</p></li>
+<li><p><code><a href="calculate_cropscape.html">calculate_cropscape</a></code>: "cropscape", "cdl"</p></li>
+<li><p><code><a href="calculate_huc.html">calculate_huc</a></code>: "huc", "HUC"</p></li>
 </ul></div>
     </div>
     <div class="section level2">
@@ -165,7 +170,7 @@ function.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

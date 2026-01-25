@@ -23,12 +23,14 @@
 <url><loc>https://niehs.github.io/amadeus/reference/calc_time.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calc_worker.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_covariates.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/calculate_cropscape.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_ecoregion.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_geos.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_gmted.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_gridmet.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_groads.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_hms.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/calculate_huc.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_koppen_geiger.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_lagged.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_merra2.html</loc></url>
@@ -38,6 +40,7 @@
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_nei.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_nlcd.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_population.html</loc></url>
+<url><loc>https://niehs.github.io/amadeus/reference/calculate_prism.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_temporal_dummies.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_terraclimate.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/calculate_tri.html</loc></url>
@@ -55,7 +58,6 @@
 <url><loc>https://niehs.github.io/amadeus/reference/download_data.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_ecoregion.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_edgar.html</loc></url>
-<url><loc>https://niehs.github.io/amadeus/reference/download_epa_certificate.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_geos.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_gmted.html</loc></url>
 <url><loc>https://niehs.github.io/amadeus/reference/download_gridmet.html</loc></url>

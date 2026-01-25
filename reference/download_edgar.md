@@ -1,0 +1,181 @@
+# Download EDGAR Emissions Data
+
+Constructs and optionally downloads EDGAR emissions data URLs based on
+user-specified inputs including species, temporal resolution, emission
+sectors, and file formats.
+
+## Usage
+
+``` r
+download_edgar(
+  species = c("BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10", "PM2.5", "SO2"),
+  version = "8.1",
+  temp_res = NULL,
+  sector_yearly = NULL,
+  sector_monthly = NULL,
+  sector_voc = NULL,
+  format = "nc",
+  output = "emi",
+  year_range = NULL,
+  voc = NULL,
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = FALSE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
+  hash = FALSE
+)
+```
+
+## Arguments
+
+- species:
+
+  Character vector. One or more species to download. Supported values:
+  "BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10", "PM2.5", "SO2". Input
+  is case-insensitive and supports "pm2.5" or "pm25".
+
+- version:
+
+  Character. EDGAR data version. Supported values: "8.1" for most recent
+  version data or "8.1_voc" for VOC speciation data.
+
+- temp_res:
+
+  Character. Temporal resolution for specification with version 8.1. One
+  of "yearly", "monthly", or "timeseries". temp_res is not needed for
+  version=8.1_voc and will be ignored if specified.
+
+- sector_yearly:
+
+  Character vector or NULL. Emission sectors for yearly data. If NULL,
+  totals will be used. Possible values include: "AGS", "AWB", "CHE",
+  "ENE", "IND", "MNM", "NMM", "PRU_SOL", "RCO", "REF_TRF", "SWD_INC",
+  "SWD_LDF", "TNR_Aviation_CDS", "TNR_Aviation_CRS", "TNR_Aviation_LTO",
+  "TNR_Aviation_SPS", "TNR_Other", "TNR_Ship", "TRO", "WWT"
+
+- sector_monthly:
+
+  Character vector or NULL. Emission sectors for monthly data. If NULL,
+  the function will use full-species files (not sector-specific).
+  Supported values: "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
+  "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY", "TRANSPORT",
+  "WASTE".
+
+- sector_voc:
+
+  Character vector or NULL. Emission sectors for VOC speciation data. If
+  NULL, the function will use full-species files (not sector-specific).
+  Supported values: "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
+  "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY", "TRANSPORT",
+  "WASTE".
+
+- format:
+
+  Character. File format to download. Typically "nc" (NetCDF) or "txt".
+  Flux output and monthly outputs are only supported in .nc format
+
+- output:
+
+  Character. Output type. Supported values include "emi" for emissions
+  and "flx" for fluxes.
+
+- year_range:
+
+  Numeric vector of length 1, 2 or NULL. Year range, e.g., 2021, or
+  c(2021, 2022). If NULL, uses all available years (1970-2022 for yearly
+  data, 2000-2022 for monthly and VOC speciation data)
+
+- voc:
+
+  Integer vector or NULL. Used for VOC speciation in version "8.1_voc".
+  Accepts integers from 1 to 25. See:
+  https://edgar.jrc.ec.europa.eu/dataset_ap81_VOC_spec#p3 for reference
+  on speciation groups and VOC numbers.
+
+- directory_to_save:
+
+  character(1). Directory to save data. Two sub-directories will be
+  created for the downloaded zip files ("/zip_files") and the unzipped
+  data files ("/data_files").
+
+- acknowledgement:
+
+  logical(1). By setting `TRUE` the user acknowledges that the data
+  downloaded using this function may be very large and use lots of
+  machine storage and memory.
+
+- download:
+
+  logical(1). `FALSE` will generate a \*.txt file containing all
+  download commands. By setting `TRUE` the function will download all of
+  the requested data files.
+
+- remove_command:
+
+  logical(1). Remove (`TRUE`) or keep (`FALSE`) the text file containing
+  download commands. Default is FALSE.
+
+- unzip:
+
+  logical(1). Unzip zip files. Default is `TRUE`.
+
+- remove_zip:
+
+  logical(1). Remove zip file from directory_to_download. Default is
+  `FALSE`.
+
+- hash:
+
+  logical(1). By setting `TRUE` the function will return an
+  [`rlang::hash_file()`](https://rlang.r-lib.org/reference/hash.html)
+  hash character corresponding to the downloaded files. Default is
+  `FALSE`.
+
+## Value
+
+A list of download URLs (character). Optionally downloads available
+files and warns about missing ones.
+
+- For `hash = FALSE`, NULL
+
+- For `hash = TRUE`, an
+  [`rlang::hash_file`](https://rlang.r-lib.org/reference/hash.html)
+  character.
+
+- Zip and/or data files will be downloaded and stored in
+  `directory_to_save`.
+
+## Author
+
+Mariana Alifa Kassien
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+download_edgar(
+species = "CO",
+acknowledgement = TRUE,
+temp_res = "yearly",
+sector_yearly = "ENE",
+year_range = c(2021, 2022)
+)
+} # }
+if (FALSE) { # \dontrun{
+download_edgar(
+species = "PM2.5",
+acknowledgement = TRUE,
+temp_res = "monthly",
+sector_monthly = c("TRANSPORT", "WASTE")
+)
+} # }
+if (FALSE) { # \dontrun{
+download_edgar(
+species = "SO2",
+acknowledgement = TRUE,
+temp_res = "timeseries"
+)
+} # }
+```

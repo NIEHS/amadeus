@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +44,7 @@
     <li><a class="dropdown-item" href="../articles/epa_download.html">US EPA Air Quality System (AQS)</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
@@ -137,7 +138,7 @@ National Land Cover Database (NLCD)</a></td>
 </tr>
 <tr class="odd">
 <td align="left">3</td>
-<td align="left">download_geos_data</td>
+<td align="left">download_geos</td>
 <td align="left"><a href="https://gmao.gsfc.nasa.gov/GEOS_systems/" class="external-link">NASA
 Goddard Earth Observing System Composition Forecasting
 (GEOS-CF)</a></td>
@@ -158,13 +159,13 @@ Retrospective analysis for Research and Applications, Version 2
 <tr class="even">
 <td align="left">10</td>
 <td align="left">download_sedac_groads</td>
-<td align="left"><a href="https://sedac.ciesin.columbia.edu/data/set/groads-global-roads-open-access-v1/data-download" class="external-link">NASA
+<td align="left"><a href="https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/groads/groads-global-roads-open-access-v1" class="external-link">NASA
 SEDAC Global Roads Open Access Data Set</a></td>
 </tr>
 <tr class="odd">
 <td align="left">11</td>
 <td align="left">download_sedac_population</td>
-<td align="left"><a href="https://sedac.ciesin.columbia.edu/data/set/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11" class="external-link">NASA
+<td align="left"><a href="https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/population-density-adjusted-to-2015-unwpp-country-totals-rev11" class="external-link">NASA
 SEDAC UN WPP-Adjusted Population Density</a></td>
 </tr>
 <tr class="even">
@@ -512,8 +513,9 @@ indicates the command to be run, and <code>download</code>, a
 user-defined logical parameter.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">download_run</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
-<span>    <span class="va">download</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>    <span class="va">system_command</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">download</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">system_command</span> <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="va">download</span> <span class="op">==</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Downloading requested files...\n"</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/system.html" class="external-link">system</a></span><span class="op">(</span>command <span class="op">=</span> <span class="va">system_command</span><span class="op">)</span></span>
@@ -648,7 +650,8 @@ and accessible. Like the download functions, the unit tests rely on
 converts the data frame to a vector.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">read_commands</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
-<span>    <span class="va">commands_path</span> <span class="op">=</span> <span class="va">commands_path</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">commands_path</span> <span class="op">=</span> <span class="va">commands_path</span></span>
+<span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">commands</span> <span class="op">&lt;-</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">commands_path</span>, header <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span>  <span class="va">commands</span> <span class="op">&lt;-</span> <span class="va">commands</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">commands</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">commands</span><span class="op">)</span></span>
@@ -660,8 +663,9 @@ Concatenate download commands</a>.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># function to extract URLs from vector</span></span>
 <span><span class="va">extract_urls</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
-<span>    <span class="va">commands</span> <span class="op">=</span> <span class="va">commands</span>,</span>
-<span>    <span class="va">position</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">commands</span> <span class="op">=</span> <span class="va">commands</span>,</span>
+<span>  <span class="va">position</span> <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">position</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"URL position in command is not defined.\n"</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
@@ -684,8 +688,9 @@ HTTP status’, see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/S
 response status codes</a>.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">check_url_status</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
-<span>    <span class="va">url</span>,</span>
-<span>    <span class="va">method</span> <span class="op">=</span> <span class="st">"HEAD"</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">url</span>,</span>
+<span>  <span class="va">method</span> <span class="op">=</span> <span class="st">"HEAD"</span></span>
+<span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">http_status_ok</span> <span class="op">&lt;-</span> <span class="fl">200</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="va">method</span> <span class="op">==</span> <span class="st">"HEAD"</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">hd</span> <span class="op">&lt;-</span> <span class="fu">httr</span><span class="fu">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/HEAD.html" class="external-link">HEAD</a></span><span class="op">(</span><span class="va">url</span><span class="op">)</span></span>
@@ -702,9 +707,10 @@ tested. The function returns a logical vector containing the output from
 <code>check_url_status</code>.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">check_urls</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
-<span>    <span class="va">urls</span> <span class="op">=</span> <span class="va">urls</span>,</span>
-<span>    <span class="va">size</span> <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>    <span class="va">method</span> <span class="op">=</span> <span class="st">"HEAD"</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">urls</span> <span class="op">=</span> <span class="va">urls</span>,</span>
+<span>  <span class="va">size</span> <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">method</span> <span class="op">=</span> <span class="st">"HEAD"</span></span>
+<span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">size</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"URL sample size is not defined.\n"</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
@@ -763,7 +769,7 @@ tested. The function returns a logical vector containing the output from
 <span>    <span class="fu"><a href="https://testthat.r-lib.org/reference/logical-expectations.html" class="external-link">expect_true</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">url_status</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🎊</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; <span style="font-weight: bold;">Test passed with 1 success 🎊</span>.</span></span></code></pre>
 <p>Although the <code>testthat::test_that(...)</code> chunk contains 32
 lines of code, the unit test is performed by
 <code>expect_true(all(url_status))</code>. In words, this line is
@@ -801,7 +807,7 @@ source-specific download function returns an error.</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🎊</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Test passed with 1 success 🎊</span>.</span></span></code></pre></div>
 <p>This test utilizes <code><a href="https://testthat.r-lib.org/reference/expect_error.html" class="external-link">testthat::expect_error</a></code> because the
 <code>download_data</code> wrapper function returns an error message if
 the underlying source-specific download function returns an error. If we
@@ -831,7 +837,7 @@ and receive an error.</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🌈</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Test passed with 1 success 🌈</span>.</span></span></code></pre></div>
 <p>As expected, the test passes because the NOAA HMS Smoke dataset does
 not contain data for January 1-2, 1800.</p>
 <p>These unit tests are just two of many implemented on
@@ -995,7 +1001,7 @@ retained.</p>
 <span><span class="co">#&gt;     amadeus::download_remove_zips(remove = remove_zip, download_name = download_names)</span></span>
 <span><span class="co">#&gt;     return(amadeus::download_hash(hash, directory_to_save))</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55b508dbc318&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x5623de245f20&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:amadeus&gt;</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -1009,7 +1015,7 @@ retained.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

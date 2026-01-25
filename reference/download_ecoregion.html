@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,6 +28,7 @@
     <li><a class="dropdown-item" href="../articles/narr_workflow.html">NOAA North American Regional Reanalysis (NARR)</a></li>
     <li><a class="dropdown-item" href="../articles/epa_download.html">US EPA Air Quality System (AQS)</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/NIEHS/amadeus/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -50,9 +51,6 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">download_ecoregion</span><span class="op">(</span></span>
-<span>  epa_certificate_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/cacert_gaftp_epa.pem"</span>, package <span class="op">=</span> <span class="st">"amadeus"</span><span class="op">)</span>,</span>
-<span>  certificate_url <span class="op">=</span></span>
-<span>    <span class="st">"http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"</span>,</span>
 <span>  directory_to_save <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  acknowledgement <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -67,18 +65,7 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-epa-certificate-path">epa_certificate_path<a class="anchor" aria-label="anchor" href="#arg-epa-certificate-path"></a></dt>
-<dd><p>character(1). Path to the certificate file
-for EPA DataCommons. Default is
-'extdata/cacert_gaftp_epa.pem' under the package installation path.</p></dd>
-
-
-<dt id="arg-certificate-url">certificate_url<a class="anchor" aria-label="anchor" href="#arg-certificate-url"></a></dt>
-<dd><p>character(1). URL to certificate file. See notes for
-details.</p></dd>
-
-
-<dt id="arg-directory-to-save">directory_to_save<a class="anchor" aria-label="anchor" href="#arg-directory-to-save"></a></dt>
+<dl><dt id="arg-directory-to-save">directory_to_save<a class="anchor" aria-label="anchor" href="#arg-directory-to-save"></a></dt>
 <dd><p>character(1). Directory to save data. Two
 sub-directories will be created for the downloaded zip files ("/zip_files")
 and the unzipped data files ("/data_files").</p></dd>
@@ -126,16 +113,6 @@ downloaded files. Default is <code>FALSE</code>.</p></dd>
 <code>directory_to_save</code>.</p></li>
 </ul></div>
     <div class="section level2">
-    <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>For EPA Data Commons certificate errors, follow the steps below:</p><ol><li><p>Click Lock icon in the address bar at https://gaftp.epa.gov</p></li>
-<li><p>Click Show Certificate</p></li>
-<li><p>Access Details</p></li>
-<li><p>Find URL with *.crt extension
-Currently we bundle the pre-downloaded crt and its PEM (which is accepted
-in wget command) file in ./inst/extdata. The instruction above is for
-certificate updates in the future.</p></li>
-</ol></div>
-    <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Omernik JM, Griffith GE (2014).
 “Ecoregions of the Conterminous United States: Evolution of a Hierarchical Spatial Framework.”
@@ -170,7 +147,7 @@ ISSN 0364-152X, 1432-1009, <a href="https://doi.org/10.1007/s00267-014-0364-1" c
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
