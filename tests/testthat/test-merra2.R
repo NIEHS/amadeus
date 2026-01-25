@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_merra2
 testthat::test_that("download_merra2 (no errors)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date_start <- "2022-02-14"
@@ -13,37 +13,43 @@ testthat::test_that("download_merra2 (no errors)", {
   directory_to_save <- paste0(tempdir(), "/merra2/")
   # run download function
   testthat::expect_no_error(
-    download_data(dataset_name = "merra2",
-                  date = c(date_start, date_end),
-                  collection = collections,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE)
+    download_data(
+      dataset_name = "merra2",
+      date = c(date_start, date_end),
+      collection = collections,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    )
   )
   # define path with commands
-  commands_path <- paste0(directory_to_save,
-                          "merra2_",
-                          date_start,
-                          "_",
-                          date_end,
-                          "_wget_commands.txt")
+  commands_path <- paste0(
+    directory_to_save,
+    "merra2_",
+    date_start,
+    "_",
+    date_end,
+    "_wget_commands.txt"
+  )
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
   urls <- extract_urls(commands = commands, position = 2)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 3L)
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_merra2 (single date)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date <- "2023-02-14"
@@ -51,30 +57,36 @@ testthat::test_that("download_merra2 (single date)", {
   directory_to_save <- paste0(tempdir(), "/merra2/")
   # run download function
   testthat::expect_no_error(
-    download_data(dataset_name = "merra2",
-                  date = date,
-                  collection = collections,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE)
+    download_data(
+      dataset_name = "merra2",
+      date = date,
+      collection = collections,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    )
   )
   # define path with commands
-  commands_path <- paste0(directory_to_save,
-                          "merra2_",
-                          date,
-                          "_",
-                          date,
-                          "_wget_commands.txt")
+  commands_path <- paste0(
+    directory_to_save,
+    "merra2_",
+    date,
+    "_",
+    date,
+    "_wget_commands.txt"
+  )
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
   urls <- extract_urls(commands = commands, position = 2)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 3L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 3L)
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
@@ -102,14 +114,22 @@ testthat::test_that("process_merra2", {
   #* indicates three dimensional data that has subset to single
   #* pressure level for test data set
   collection <- c(
-    "inst1_2d_int_Nx", "inst3_2d_gas_Nx", "inst3_3d_chm_Nv", #*
+    "inst1_2d_int_Nx",
+    "inst3_2d_gas_Nx",
+    "inst3_3d_chm_Nv", #*
     "inst6_3d_ana_Np", #*
-    "statD_2d_slv_Nx", "tavg1_2d_chm_Nx", "tavg3_3d_udt_Np" #*
+    "statD_2d_slv_Nx",
+    "tavg1_2d_chm_Nx",
+    "tavg3_3d_udt_Np" #*
   )
   variable <- c(
-    "CPT", "AODANA", "AIRDENS", #*
+    "CPT",
+    "AODANA",
+    "AIRDENS", #*
     "SLP", #*
-    "HOURNORAIN", "COCL", "DUDTANA" #*
+    "HOURNORAIN",
+    "COCL",
+    "DUDTANA" #*
   )
   merra2_df <- data.frame(collection, variable)
   # expect function
@@ -121,8 +141,7 @@ testthat::test_that("process_merra2", {
       process_merra2(
         date = c("2018-01-01", "2018-01-01"),
         variable = merra2_df$variable[c],
-        path =
-        testthat::test_path(
+        path = testthat::test_path(
           "..",
           "testdata",
           "merra2",
@@ -168,13 +187,12 @@ testthat::test_that("process_merra2", {
     merra2_ext <- process_merra2(
       date = c("2018-01-01", "2018-01-01"),
       variable = "CPT",
-      path =
-        testthat::test_path(
-          "..",
-          "testdata",
-          "merra2",
-          "inst1_2d_int_Nx"
-        ),
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "merra2",
+        "inst1_2d_int_Nx"
+      ),
       extent = terra::ext(merra2)
     )
   )
@@ -185,14 +203,22 @@ testthat::test_that("process_merra2 (single date)", {
   #* indicates three dimensional data that has subset to single
   #* pressure level for test data set
   collection <- c(
-    "inst1_2d_int_Nx", "inst3_2d_gas_Nx", "inst3_3d_chm_Nv", #*
+    "inst1_2d_int_Nx",
+    "inst3_2d_gas_Nx",
+    "inst3_3d_chm_Nv", #*
     "inst6_3d_ana_Np", #*
-    "statD_2d_slv_Nx", "tavg1_2d_chm_Nx", "tavg3_3d_udt_Np" #*
+    "statD_2d_slv_Nx",
+    "tavg1_2d_chm_Nx",
+    "tavg3_3d_udt_Np" #*
   )
   variable <- c(
-    "CPT", "AODANA", "AIRDENS", #*
+    "CPT",
+    "AODANA",
+    "AIRDENS", #*
     "SLP", #*
-    "HOURNORAIN", "COCL", "DUDTANA" #*
+    "HOURNORAIN",
+    "COCL",
+    "DUDTANA" #*
   )
   merra2_df <- data.frame(collection, variable)
   # expect function
@@ -204,8 +230,7 @@ testthat::test_that("process_merra2 (single date)", {
       process_merra2(
         date = "2018-01-01",
         variable = merra2_df$variable[c],
-        path =
-        testthat::test_path(
+        path = testthat::test_path(
           "..",
           "testdata",
           "merra2",
@@ -251,13 +276,12 @@ testthat::test_that("process_merra2 (single date)", {
     merra2_ext <- process_merra2(
       date = "2018-01-01",
       variable = "CPT",
-      path =
-        testthat::test_path(
-          "..",
-          "testdata",
-          "merra2",
-          "inst1_2d_int_Nx"
-        ),
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "merra2",
+        "inst1_2d_int_Nx"
+      ),
       extent = terra::ext(merra2)
     )
   )
@@ -271,14 +295,22 @@ testthat::test_that("calculate_merra2", {
   #* indicates three dimensional data that has subset to single
   #* pressure level for test data set
   collections <- c(
-    "inst1_2d_int_Nx", "inst3_2d_gas_Nx", "inst3_3d_chm_Nv", #*
+    "inst1_2d_int_Nx",
+    "inst3_2d_gas_Nx",
+    "inst3_3d_chm_Nv", #*
     "inst6_3d_ana_Np", #*
-    "statD_2d_slv_Nx", "tavg1_2d_chm_Nx", "tavg3_3d_udt_Np" #*
+    "statD_2d_slv_Nx",
+    "tavg1_2d_chm_Nx",
+    "tavg3_3d_udt_Np" #*
   )
   variables <- c(
-    "CPT", "AODANA", "AIRDENS", #*
+    "CPT",
+    "AODANA",
+    "AIRDENS", #*
     "SLP", #*
-    "HOURNORAIN", "COCL", "DUDTANA" #*
+    "HOURNORAIN",
+    "COCL",
+    "DUDTANA" #*
   )
   radii <- c(0, 1000)
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
@@ -295,8 +327,7 @@ testthat::test_that("calculate_merra2", {
         process_merra2(
           date = c("2018-01-01", "2018-01-01"),
           variable = variable,
-          path =
-          testthat::test_path(
+          path = testthat::test_path(
             "..",
             "testdata",
             "merra2",
@@ -359,7 +390,8 @@ testthat::test_that("calculate_merra2", {
     )
   )
   testthat::expect_equal(
-    ncol(merra2_covariate_terra), 4
+    ncol(merra2_covariate_terra),
+    4
   )
   testthat::expect_true(
     "SpatVector" %in% class(merra2_covariate_terra)
@@ -377,7 +409,8 @@ testthat::test_that("calculate_merra2", {
     )
   )
   testthat::expect_equal(
-    ncol(merra2_covariate_sf), 5
+    ncol(merra2_covariate_sf),
+    5
   )
   testthat::expect_true(
     "sf" %in% class(merra2_covariate_sf)

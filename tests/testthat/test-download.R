@@ -5,32 +5,74 @@
 ################################################################################
 ##### download_data
 testthat::test_that("download_data (expected errors - acknowledgement)", {
-  download_datasets <- c("aqs", "ecoregion", "geos", "gmted", "koppen",
-                         "koppengeiger", "merra2", "merra", "narr",
-                         "nlcd", "noaa", "sedac_groads",
-                         "sedac_population", "groads", "population",
-                         "hms", "smoke", "gridmet",
-                         "terraclimate", "huc", "cropscape", "cdl", "prism")
+  download_datasets <- c(
+    "aqs",
+    "ecoregion",
+    "geos",
+    "gmted",
+    "koppen",
+    "koppengeiger",
+    "merra2",
+    "merra",
+    "narr",
+    "nlcd",
+    "noaa",
+    "sedac_groads",
+    "sedac_population",
+    "groads",
+    "population",
+    "hms",
+    "smoke",
+    "gridmet",
+    "terraclimate",
+    "huc",
+    "cropscape",
+    "cdl",
+    "prism"
+  )
   for (d in seq_along(download_datasets)) {
     testthat::expect_error(
-      download_data(dataset_name = download_datasets[d],
-                    acknowledgement = FALSE)
+      download_data(
+        dataset_name = download_datasets[d],
+        acknowledgement = FALSE
+      )
     )
   }
 })
 
 testthat::test_that("download_data (expected errors - directory)", {
-  download_datasets <- c("aqs", "ecoregion", "geos", "gmted", "koppen",
-                         "koppengeiger", "merra2", "merra", "narr",
-                         "nlcd", "noaa", "sedac_groads",
-                         "sedac_population", "groads", "population",
-                         "hms", "smoke", "gridmet",
-                         "terraclimate", "huc", "cropscape", "cdl", "prism")
+  download_datasets <- c(
+    "aqs",
+    "ecoregion",
+    "geos",
+    "gmted",
+    "koppen",
+    "koppengeiger",
+    "merra2",
+    "merra",
+    "narr",
+    "nlcd",
+    "noaa",
+    "sedac_groads",
+    "sedac_population",
+    "groads",
+    "population",
+    "hms",
+    "smoke",
+    "gridmet",
+    "terraclimate",
+    "huc",
+    "cropscape",
+    "cdl",
+    "prism"
+  )
   for (d in seq_along(download_datasets)) {
     testthat::expect_error(
-      download_data(dataset_name = download_datasets[d],
-                    acknowledgement = TRUE,
-                    directory_to_save = NULL)
+      download_data(
+        dataset_name = download_datasets[d],
+        acknowledgement = TRUE,
+        directory_to_save = NULL
+      )
     )
   }
 })
@@ -39,17 +81,17 @@ testthat::test_that("download_data (expected errors - temporal range)", {
   withr::with_tempdir({
     testthat::expect_error(
       download_geos(
-      date = c("1900-01-01", "2018-01-01"),
-      collection = "aqc_tavg_1hr_g1440x721_v1",
-      acknowledgement = TRUE,
-      directory_to_save = "."
+        date = c("1900-01-01", "2018-01-01"),
+        collection = "aqc_tavg_1hr_g1440x721_v1",
+        acknowledgement = TRUE,
+        directory_to_save = "."
       )
     )
     testthat::expect_error(
       download_aqs(
-      year = c(1900, 2022),
-      acknowledgement = TRUE,
-      directory_to_save = "."
+        year = c(1900, 2022),
+        acknowledgement = TRUE,
+        directory_to_save = "."
       )
     )
     testthat::expect_error(
@@ -96,36 +138,6 @@ testthat::test_that("download_data (expected errors - temporal range)", {
   })
 })
 
-################################################################################
-##### download_epa_certificate
-testthat::test_that("download_epa_certificate", {
-  testthat::expect_error(
-    download_epa_certificate("file.txt")
-  )
-  testthat::expect_no_error(
-    download_epa_certificate(file.path(tempdir(), "file.pem"))
-  )
-  testthat::expect_no_error(
-    download_epa_certificate(
-      system.file("extdata/cacert_gaftp_epa.pem", package = "amadeus")
-    )
-  )
-})
-
-################################################################################
-##### extract_urls
-testthat::test_that("extract_urls", {
-  commands <- paste0(
-    "curl -s -o ",
-    "/PATH/hms_smoke_Shapefile_20230901.zip --url ",
-    "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/",
-    "Shapefile/2023/09/hms_smoke20230901.zip"
-    )
-  urls <- extract_urls(commands = commands)
-  testthat::expect_true(
-    is.null(urls)
-  )
-})
 
 ################################################################################
 ##### check_urls
@@ -134,7 +146,7 @@ testthat::test_that("check_urls returns NULL undefined size.", {
     "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/",
     "Shapefile/2023/09/hms_smoke20230901.zip"
   )
-  url_status <- check_urls(urls = urls, method = "HEAD")
+  url_status <- check_urls(urls = urls)
   testthat::expect_true(
     is.null(url_status)
   )
@@ -146,10 +158,65 @@ testthat::test_that("check_urls handles size > length(urls)", {
     "Shapefile/2023/09/hms_smoke20230901.zip"
   )
   testthat::expect_no_error(
-    url_status <- check_urls(urls = urls, size = 10, method = "HEAD")
+    url_status <- check_urls(urls = urls, size = 10)
   )
   testthat::expect_length(url_status, 1)
 })
+
+testthat::test_that("check_urls returns TRUE for valid URL", {
+  urls <- "https://google.com"
+  testthat::expect_no_error(
+    url_status <- check_urls(urls = urls, size = 1)
+  )
+  testthat::expect_length(url_status, 1)
+  testthat::expect_true(url_status)
+})
+
+testthat::test_that("check_url_status with valid URL", {
+  urls <- "https://google.com"
+  testthat::expect_no_error(
+    url_status <- check_url_status(url = urls)
+  )
+  testthat::expect_length(url_status, 1)
+  testthat::expect_true(url_status)
+})
+
+testthat::test_that("check_url_status with valid NASA file endpoint", {
+  urls <- "https://data.laadsdaac.earthdatacloud.nasa.gov/prod-lads/VNP46A2/VNP46A2.A2023030.h30v05.002.2025135232534.h5"
+  testthat::expect_no_error(
+    url_status <- check_url_status(url = urls)
+  )
+  testthat::expect_length(url_status, 1)
+  testthat::expect_true(url_status)
+})
+
+
+# test covering two lines
+testthat::test_that("extract_url fails with NULL position", {
+  # generate txt with download commands
+  tdir <- tempdir()
+  download_koppen_geiger(
+    data_resolution = "0.5",
+    time_period = "Present",
+    directory_to_save = tdir,
+    acknowledgement = TRUE,
+    unzip = FALSE
+  )
+
+  cmd_file <- list.files(
+    tdir,
+    pattern = "koppen_geiger_.*\\.txt$",
+    full.names = TRUE
+  )[1]
+  
+  testthat::expect_message(
+    extract_urls(cmd_file, position = NULL),
+    "URL position in command is not defined."
+  )
+})
+
+
+
 
 ################################################################################
 ##### download_sink

@@ -4,12 +4,10 @@
 \alias{check_url_status}
 \title{Check HTTP status}
 \usage{
-check_url_status(url, method = c("HEAD", "GET"))
+check_url_status(url)
 }
 \arguments{
 \item{url}{Download URL to be checked.}
-
-\item{method}{httr method to obtain URL (\code{"HEAD"} or \code{"GET"})}
 }
 \value{
 logical object
@@ -18,7 +16,7 @@ logical object
 Check if provided URL returns HTTP status 200 or 206.
 }
 \author{
-Insang Song; Mitchell Manware
+Insang Song; Mitchell Manware; Kyle Messier
 }
 \keyword{auxiliary}
 \keyword{internal}

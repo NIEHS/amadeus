@@ -53,16 +53,16 @@ download_sanitize_path <-
   function(directory) {
     #### 1. directory setup
     chars_dir <- nchar(directory)
-    if (substr(
-      directory,
-      chars_dir,
-      chars_dir
-    ) != "/") {
+    if (
+      substr(
+        directory,
+        chars_dir,
+        chars_dir
+      ) !=
+        "/"
+    ) {
       directory <-
-        paste(directory,
-          "/",
-          sep = ""
-        )
+        paste(directory, "/", sep = "")
     }
     return(directory)
   }
@@ -108,9 +108,10 @@ download_permit <-
 #' @keywords internal
 #' @export
 download_run <- function(
-    download = FALSE,
-    commands_txt = NULL,
-    remove = FALSE) {
+  download = FALSE,
+  commands_txt = NULL,
+  remove = FALSE
+) {
   if (tolower(.Platform$OS.type) == "windows") {
     # nocov start
     runner <- ""
@@ -146,8 +147,7 @@ download_run <- function(
 #' @keywords internal
 #' @export
 download_remove_command <-
-  function(commands_txt = NULL,
-           remove = FALSE) {
+  function(commands_txt = NULL, remove = FALSE) {
     if (remove) {
       file.remove(commands_txt)
     }
@@ -182,18 +182,14 @@ download_sink <-
 #' @keywords internal
 #' @export
 download_unzip <-
-  function(file_name,
-           directory_to_unzip,
-           unzip = TRUE) {
+  function(file_name, directory_to_unzip, unzip = TRUE) {
     if (!unzip) {
       message(paste0("Downloaded files will not be unzipped.\n"))
       return(NULL)
     }
 
     message(paste0("Unzipping files...\n"))
-    unzip(file_name,
-      exdir = directory_to_unzip
-    )
+    unzip(file_name, exdir = directory_to_unzip)
     message(paste0(
       "Files unzipped and saved in ",
       directory_to_unzip,
@@ -216,8 +212,7 @@ download_unzip <-
 #' @keywords internal
 #' @export
 download_remove_zips <-
-  function(remove = FALSE,
-           download_name) {
+  function(remove = FALSE, download_name) {
     #### remove zip files
     if (remove) {
       message(paste0("Removing download files...\n"))
@@ -241,7 +236,8 @@ download_remove_zips <-
 #' @export
 check_for_null_parameters <-
   function(
-      parameters) {
+    parameters
+  ) {
     if ("extent" %in% names(parameters)) {
       parameters <- parameters[-grep("extent", names(parameters))]
     }
@@ -264,9 +260,10 @@ check_for_null_parameters <-
 #' @export
 generate_date_sequence <-
   function(
-      date_start,
-      date_end,
-      sub_hyphen = TRUE) {
+    date_start,
+    date_end,
+    sub_hyphen = TRUE
+  ) {
     dates_original <- seq(
       as.Date(date_start, format = "%Y-%m-%d"),
       as.Date(date_end, format = "%Y-%m-%d"),
@@ -281,41 +278,6 @@ generate_date_sequence <-
   }
 
 
-#' Check EPA certificate
-#' @param epa_certificate_path character(1).
-#' Full path of a converted certificate of EPA.
-#' Should end with `.pem`
-#' @param certificate_url character(1).
-#' URL of the original certificate.
-#' @return A file designated in `epa_certificate_path`
-#' @author Insang Song
-#' @importFrom utils download.file
-#' @keywords internal
-#' @export
-download_epa_certificate <-
-  function(
-    epa_certificate_path = "cacert_gaftp_epa.pem",
-    certificate_url =
-    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
-  ) {
-    if (!endsWith(epa_certificate_path, ".pem")) {
-      stop("Path should end with .pem .\n")
-    }
-    if (!file.exists(epa_certificate_path)) {
-      download_crt_target <- gsub("pem", "crt", epa_certificate_path)
-      utils::download.file(certificate_url, download_crt_target)
-      system(paste(
-        "openssl x509",
-        "-inform DER",
-        "-outform PEM",
-        "-in",
-        download_crt_target,
-        "-out",
-        epa_certificate_path
-      ))
-      message("Certificate conversion completed.\n")
-    }
-  }
 
 #' Generate time sequence
 #' @description
@@ -348,24 +310,23 @@ generate_time_sequence <-
 #' @description
 #' Check if provided URL returns HTTP status 200 or 206.
 #' @param url Download URL to be checked.
-#' @param method httr method to obtain URL (`"HEAD"` or `"GET"`)
-#' @author Insang Song; Mitchell Manware
-#' @importFrom httr HEAD
-#' @importFrom httr GET
+#' @author Insang Song; Mitchell Manware; Kyle Messier
+#' @importFrom httr2 request req_perform resp_status
+#' @importFrom httr2 req_method req_error
 #' @return logical object
 #' @keywords internal auxiliary
 #' @export
 check_url_status <- function(
-    url,
-    method = c("HEAD", "GET")) {
-  method <- match.arg(method)
+  url
+) {
   http_status_ok <- c(200, 206)
-  if (method == "HEAD") {
-    hd <- httr::HEAD(url)
-  } else if (method == "GET") {
-    hd <- httr::GET(url)
-  }
-  status <- hd$status_code
+  status <- url |>
+    httr2::request() |>
+    httr2::req_method("HEAD") |>
+    httr2::req_error(is_error = \(resp) FALSE) |>
+    httr2::req_perform() |>
+    httr2::resp_status()
+
   Sys.sleep(1)
   return(status %in% http_status_ok)
 }
@@ -379,7 +340,8 @@ check_url_status <- function(
 #' @keywords internal
 #' @export
 read_commands <- function(
-    commands_path = commands_path) {
+  commands_path = commands_path
+) {
   commands <- utils::read.csv(commands_path, header = FALSE)
   commands <- commands[seq_len(nrow(commands)), ]
   return(commands)
@@ -394,10 +356,11 @@ read_commands <- function(
 #' @keywords internal
 #' @export
 extract_urls <- function(
-    commands = commands,
-    position = NULL) {
+  commands = commands,
+  position = NULL
+) {
   if (is.null(position)) {
-    message(paste0("URL position in command is not defined.\n"))
+    message("URL position in command is not defined.")
     return(NULL)
   }
   urls <- sapply(
@@ -416,15 +379,15 @@ extract_urls <- function(
 #' Apply \code{check_url_status()} function to a sample of download URLs.
 #' @param urls character vector of URLs
 #' @param size number of observations to be sampled from \code{urls}
-#' @param method httr method to obtain URL (`"HEAD"` or `"GET"`). If set to
-#' `"SKIP"`, the HTTP status will not be checked and returned.
+#' @param method If set to `"SKIP"`, the HTTP status will not be checked and returned.
 #' @return logical vector for URL status = 200
 #' @keywords internal auxiliary
 #' @export
 check_urls <- function(
-    urls = urls,
-    size = NULL,
-    method = c("HEAD", "GET", "SKIP")) {
+  urls = urls,
+  size = NULL,
+  method = NULL
+) {
   if (is.null(size)) {
     message(paste0("URL sample size is not defined.\n"))
     return(NULL)
@@ -432,16 +395,14 @@ check_urls <- function(
   if (length(urls) < size) {
     size <- length(urls)
   }
-  method <- match.arg(method)
-  if (method == "SKIP") {
+  if (!is.null(method) && toupper(method) == "SKIP") {
     message(paste0("Skipping HTTP status check...\n"))
     return(NULL)
   } else {
     url_sample <- sample(urls, size, replace = FALSE)
     url_status <- sapply(
       url_sample,
-      check_url_status,
-      method = method
+      check_url_status
     )
     return(url_status)
   }
@@ -458,9 +419,10 @@ check_urls <- function(
 #' @keywords internal
 #' @export
 test_download_functions <- function(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status) {
+  directory_to_save = directory_to_save,
+  commands_path = commands_path,
+  url_status = url_status
+) {
   # test that directory_to_save exists
   testthat::expect_true(dir.exists(directory_to_save))
   # test that commands_path exists
@@ -486,22 +448,83 @@ test_download_functions <- function(
 narr_variable <- function(variable) {
   stopifnot(length(variable) == 1)
   mono <- c(
-    "acpcp", "air.2m", "air.sfc", "albedo", "apcp",
-    "bgrun", "bmixl.hl1", "cape", "ccond", "cdcon",
-    "cdlyr", "cfrzr", "cicep", "cin", "cnwat",
-    "crain", "csnow", "dlwrf", "dpt.2m", "dswrf",
-    "evap", "gflux", "hcdc", "hgt.tropo", "hlcy",
-    "hpbl", "lcdc", "lftx4", "lhtfl", "mcdc",
-    "mconv.hl1", "mslet", "mstav", "pevap", "pottmp.hl1",
-    "pottmp.sfc", "prate", "pres.sfc", "pres.tropo", "prmsl",
-    "pr_wtr", "rcq", "rcs", "rcsol", "rct",
-    "rhum.2m", "shtfl", "shum.2m", "snod", "snohf",
-    "snom", "snowc", "soilm", "ssrun", "tcdc",
-    "tke.hl1", "ulwrf.ntat", "ulwrf.sfc", "ustm", "uswrf.ntat",
-    "uswrf.sfc", "uwnd.10m", "veg", "vis", "vstm",
-    "vvel.hl1", "vwnd.10m", "vwsh.tropo", "wcconv", "wcinc",
-    "wcuflx", "wcvflx", "weasd", "wvconv", "wvinc",
-    "wvuflx", "wvvflx"
+    "acpcp",
+    "air.2m",
+    "air.sfc",
+    "albedo",
+    "apcp",
+    "bgrun",
+    "bmixl.hl1",
+    "cape",
+    "ccond",
+    "cdcon",
+    "cdlyr",
+    "cfrzr",
+    "cicep",
+    "cin",
+    "cnwat",
+    "crain",
+    "csnow",
+    "dlwrf",
+    "dpt.2m",
+    "dswrf",
+    "evap",
+    "gflux",
+    "hcdc",
+    "hgt.tropo",
+    "hlcy",
+    "hpbl",
+    "lcdc",
+    "lftx4",
+    "lhtfl",
+    "mcdc",
+    "mconv.hl1",
+    "mslet",
+    "mstav",
+    "pevap",
+    "pottmp.hl1",
+    "pottmp.sfc",
+    "prate",
+    "pres.sfc",
+    "pres.tropo",
+    "prmsl",
+    "pr_wtr",
+    "rcq",
+    "rcs",
+    "rcsol",
+    "rct",
+    "rhum.2m",
+    "shtfl",
+    "shum.2m",
+    "snod",
+    "snohf",
+    "snom",
+    "snowc",
+    "soilm",
+    "ssrun",
+    "tcdc",
+    "tke.hl1",
+    "ulwrf.ntat",
+    "ulwrf.sfc",
+    "ustm",
+    "uswrf.ntat",
+    "uswrf.sfc",
+    "uwnd.10m",
+    "veg",
+    "vis",
+    "vstm",
+    "vvel.hl1",
+    "vwnd.10m",
+    "vwsh.tropo",
+    "wcconv",
+    "wcinc",
+    "wcuflx",
+    "wcvflx",
+    "weasd",
+    "wvconv",
+    "wvinc",
+    "wvuflx",
+    "wvvflx"
   )
   pressure <- c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd")
   soil <- c("soill", "soilw", "tsoil")

@@ -4,50 +4,57 @@
 ################################################################################
 ##### download_gmted
 testthat::test_that("download_gmted", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   # function parameters
-  statistics <- c("Breakline Emphasis",
-                  "Standard Deviation Statistic")
+  statistics <- c("Breakline Emphasis", "Standard Deviation Statistic")
   resolution <- "7.5 arc-seconds"
   directory_to_save <- paste0(tempdir(), "/gmted/")
   for (s in seq_along(statistics)) {
     # run download function
-    download_data(dataset_name = "gmted",
-                  statistic = statistics[s],
-                  resolution = resolution,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  unzip = FALSE,
-                  remove_zip = FALSE,
-                  download = FALSE)
+    download_data(
+      dataset_name = "gmted",
+      statistic = statistics[s],
+      resolution = resolution,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      unzip = FALSE,
+      remove_zip = FALSE,
+      download = FALSE
+    )
     # expect sub-directories to be created
     testthat::expect_true(
       length(
         list.files(
-          directory_to_save, include.dirs = TRUE
+          directory_to_save,
+          include.dirs = TRUE
         )
-      ) == 3
+      ) ==
+        3
     )
     # define file path with commands
-    commands_path <- paste0(download_sanitize_path(directory_to_save),
-                            "gmted_",
-                            gsub(" ", "", statistics[s]),
-                            "_",
-                            gsub(" ", "", resolution),
-                            "_",
-                            Sys.Date(),
-                            "_curl_command.txt")
+    commands_path <- paste0(
+      download_sanitize_path(directory_to_save),
+      "gmted_",
+      gsub(" ", "", statistics[s]),
+      "_",
+      gsub(" ", "", resolution),
+      "_",
+      Sys.Date(),
+      "_curl_command.txt"
+    )
     # import commands
     commands <- read_commands(commands_path = commands_path)
     # extract urls
     urls <- extract_urls(commands = commands, position = 6)
     filename <- extract_urls(commands = commands, position = 4)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+    url_status <- check_urls(urls = urls, size = 1L)
     # implement unit tests
-    test_download_functions(directory_to_save = directory_to_save,
-                            commands_path = commands_path,
-                            url_status = url_status)
+    test_download_functions(
+      directory_to_save = directory_to_save,
+      commands_path = commands_path,
+      url_status = url_status
+    )
 
     file.create(
       file.path(filename),
@@ -61,15 +68,17 @@ testthat::test_that("download_gmted", {
     # remove file with commands after test
     # remove temporary gmted
     testthat::expect_no_error(
-      download_data(dataset_name = "gmted",
-                    statistic = statistics[s],
-                    resolution = resolution,
-                    directory_to_save = directory_to_save,
-                    acknowledgement = TRUE,
-                    unzip = FALSE,
-                    remove_zip = TRUE,
-                    remove_command = TRUE,
-                    download = FALSE)
+      download_data(
+        dataset_name = "gmted",
+        statistic = statistics[s],
+        resolution = resolution,
+        directory_to_save = directory_to_save,
+        acknowledgement = TRUE,
+        unzip = FALSE,
+        remove_zip = TRUE,
+        remove_command = TRUE,
+        download = FALSE
+      )
     )
     testthat::expect_true(
       dir.exists(paste0(directory_to_save, "/data_files"))
@@ -77,7 +86,9 @@ testthat::test_that("download_gmted", {
     testthat::expect_equal(
       length(
         list.files(
-          directory_to_save, recursive = TRUE, include.dirs = TRUE
+          directory_to_save,
+          recursive = TRUE,
+          include.dirs = TRUE
         )
       ),
       2
@@ -91,10 +102,13 @@ testthat::test_that("download_gmted", {
 testthat::test_that("process_gmted (no errors)", {
   withr::local_package("terra")
   statistics <- c(
-    "Breakline Emphasis", "Systematic Subsample"
+    "Breakline Emphasis",
+    "Systematic Subsample"
   )
   resolutions <- c(
-    "7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"
+    "7.5 arc-seconds",
+    "15 arc-seconds",
+    "30 arc-seconds"
   )
   # expect function
   testthat::expect_true(
@@ -107,8 +121,7 @@ testthat::test_that("process_gmted (no errors)", {
       gmted <-
         process_gmted(
           variable = c(statistic, resolution),
-          path =
-          testthat::test_path(
+          path = testthat::test_path(
             "..",
             "testdata",
             "gmted",
@@ -150,8 +163,7 @@ testthat::test_that("process_gmted (no errors)", {
     gmted_ext <-
       process_gmted(
         variable = c("Breakline Emphasis", "7.5 arc-seconds"),
-        path =
-        testthat::test_path(
+        path = testthat::test_path(
           "..",
           "testdata",
           "gmted",
@@ -206,10 +218,13 @@ testthat::test_that("process_gmted_codes (auxiliary)", {
 testthat::test_that("calculate_gmted", {
   withr::local_package("terra")
   statistics <- c(
-    "Breakline Emphasis", "Systematic Subsample"
+    "Breakline Emphasis",
+    "Systematic Subsample"
   )
   resolutions <- c(
-    "7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"
+    "7.5 arc-seconds",
+    "15 arc-seconds",
+    "30 arc-seconds"
   )
   radii <- c(0, 1000)
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
@@ -226,8 +241,7 @@ testthat::test_that("calculate_gmted", {
         gmted <-
           process_gmted(
             variable = c(statistic, resolution),
-            path =
-            testthat::test_path(
+            path = testthat::test_path(
               "..",
               "testdata",
               "gmted"
@@ -267,7 +281,10 @@ testthat::test_that("calculate_gmted", {
     gmted <- process_gmted(
       variable = c("Breakline Emphasis", "7.5 arc-seconds"),
       testthat::test_path(
-        "..", "testdata", "gmted", "be75_grd"
+        "..",
+        "testdata",
+        "gmted",
+        "be75_grd"
       )
     )
   )
@@ -280,7 +297,8 @@ testthat::test_that("calculate_gmted", {
     )
   )
   testthat::expect_equal(
-    ncol(gmted_terra), 3
+    ncol(gmted_terra),
+    3
   )
   testthat::expect_true(
     "SpatVector" %in% class(gmted_terra)
@@ -295,7 +313,8 @@ testthat::test_that("calculate_gmted", {
     )
   )
   testthat::expect_equal(
-    ncol(gmted_sf), 4
+    ncol(gmted_sf),
+    4
   )
   testthat::expect_true(
     "sf" %in% class(gmted_sf)

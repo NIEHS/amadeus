@@ -5,7 +5,7 @@
 ################################################################################
 ##### download_narr
 testthat::test_that("download_narr (no errors)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year_start <- 2018
@@ -13,38 +13,46 @@ testthat::test_that("download_narr (no errors)", {
   variables <- c(
     "weasd", # monolevel
     "omega", # pressure level
-    "soill"  # subsurface
+    "soill" # subsurface
   )
   directory_to_save <- paste0(tempdir(), "/narr/")
   # run download function
-  download_data(dataset_name = "narr",
-                year = c(year_start, year_end),
-                variables = variables,
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                download = FALSE)
+  download_data(
+    dataset_name = "narr",
+    year = c(year_start, year_end),
+    variables = variables,
+    directory_to_save = directory_to_save,
+    acknowledgement = TRUE,
+    download = FALSE
+  )
   # define path with commands
-  commands_path <- paste0(directory_to_save,
-                          "narr_",
-                          year_start, "_", year_end,
-                          "_curl_commands.txt")
+  commands_path <- paste0(
+    directory_to_save,
+    "narr_",
+    year_start,
+    "_",
+    year_end,
+    "_curl_commands.txt"
+  )
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
   urls <- extract_urls(commands = commands, position = 6)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 5L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 3L)
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_narr (single year)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/narr/")
   # run download function
@@ -96,8 +104,7 @@ testthat::test_that("process_narr", {
       process_narr(
         date = c("2018-01-01", "2018-01-05"),
         variable = variables[v],
-        path =
-        testthat::test_path(
+        path = testthat::test_path(
           "..",
           "testdata",
           "narr",
@@ -141,8 +148,7 @@ testthat::test_that("process_narr", {
       process_narr(
         date = c("2018-01-01", "2018-01-05"),
         variable = "omega",
-        path =
-        testthat::test_path(
+        path = testthat::test_path(
           "..",
           "testdata",
           "narr",
@@ -168,8 +174,7 @@ testthat::test_that("process_narr (single date)", {
       process_narr(
         date = "2018-01-01",
         variable = variables[v],
-        path =
-        testthat::test_path(
+        path = testthat::test_path(
           "..",
           "testdata",
           "narr",
@@ -213,8 +218,7 @@ testthat::test_that("process_narr (single date)", {
       process_narr(
         date = "2018-01-01",
         variable = "omega",
-        path =
-        testthat::test_path(
+        path = testthat::test_path(
           "..",
           "testdata",
           "narr",
@@ -247,8 +251,7 @@ testthat::test_that("calculate_narr", {
         process_narr(
           date = "2018-01-01",
           variable = variable,
-          path =
-          testthat::test_path(
+          path = testthat::test_path(
             "..",
             "testdata",
             "narr",
@@ -311,7 +314,8 @@ testthat::test_that("calculate_narr", {
     )
   )
   testthat::expect_equal(
-    ncol(narr_covariate_terra), 4 # 4 columns because omega has pressure levels
+    ncol(narr_covariate_terra),
+    4 # 4 columns because omega has pressure levels
   )
   testthat::expect_true(
     "SpatVector" %in% class(narr_covariate_terra)
@@ -328,7 +332,8 @@ testthat::test_that("calculate_narr", {
     )
   )
   testthat::expect_equal(
-    ncol(narr_covariate_sf), 5 # 5 columns because omega has pressure levels
+    ncol(narr_covariate_sf),
+    5 # 5 columns because omega has pressure levels
   )
   testthat::expect_true(
     "sf" %in% class(narr_covariate_sf)

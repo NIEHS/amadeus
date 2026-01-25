@@ -80,3 +80,5 @@ R/dev.R
 tests/testthat/test-dev.R
 /.quarto/
 README_files/
+
+tutorials/

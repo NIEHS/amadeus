@@ -1,7 +1,7 @@
 ################################################################################
 ##### unit and integration tests for EDGAR functions
 testthat::test_that("download_edgar (no errors, yearly with sectors)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_no_error(
@@ -24,8 +24,7 @@ testthat::test_that("download_edgar (no errors, yearly with sectors)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls),
-    method = "HEAD"
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -37,7 +36,7 @@ testthat::test_that("download_edgar (no errors, yearly with sectors)", {
 })
 
 testthat::test_that("download_edgar (monthly, no sector)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_no_error(
@@ -58,8 +57,7 @@ testthat::test_that("download_edgar (monthly, no sector)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls),
-    method = "HEAD"
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -71,7 +69,7 @@ testthat::test_that("download_edgar (monthly, no sector)", {
 })
 
 testthat::test_that("download_edgar (monthly, w/sector)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_no_error(
@@ -93,8 +91,7 @@ testthat::test_that("download_edgar (monthly, w/sector)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls),
-    method = "HEAD"
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -106,7 +103,7 @@ testthat::test_that("download_edgar (monthly, w/sector)", {
 })
 
 testthat::test_that("download_edgar (single year)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_no_error(
@@ -129,8 +126,7 @@ testthat::test_that("download_edgar (single year)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls),
-    method = "HEAD"
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -200,7 +196,7 @@ testthat::test_that("download_edgar (incompatible output-format)", {
 })
 
 testthat::test_that("download_edgar (VOC with sector_voc)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_no_error(
@@ -223,8 +219,7 @@ testthat::test_that("download_edgar (VOC with sector_voc)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls),
-    method = "HEAD"
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -236,7 +231,7 @@ testthat::test_that("download_edgar (VOC with sector_voc)", {
 })
 
 testthat::test_that("download_edgar (VOC w/out year_range)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_no_error(
@@ -259,8 +254,7 @@ testthat::test_that("download_edgar (VOC w/out year_range)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls),
-    method = "HEAD"
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -272,7 +266,7 @@ testthat::test_that("download_edgar (VOC w/out year_range)", {
 })
 
 testthat::test_that("download_edgar (VOC w/out sector_voc)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_no_error(
@@ -295,8 +289,7 @@ testthat::test_that("download_edgar (VOC w/out sector_voc)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls),
-    method = "HEAD"
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -308,7 +301,7 @@ testthat::test_that("download_edgar (VOC w/out sector_voc)", {
 })
 
 testthat::test_that("download_edgar (default year_range)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_no_error(
@@ -330,8 +323,7 @@ testthat::test_that("download_edgar (default year_range)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls),
-    method = "HEAD"
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -343,7 +335,7 @@ testthat::test_that("download_edgar (default year_range)", {
 })
 
 testthat::test_that("download_edgar (NULL sector_yearly)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_no_error(
@@ -365,8 +357,7 @@ testthat::test_that("download_edgar (NULL sector_yearly)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls),
-    method = "HEAD"
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -378,7 +369,7 @@ testthat::test_that("download_edgar (NULL sector_yearly)", {
 })
 
 testthat::test_that("download_edgar (NULL sector_yearly + year_range)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_no_error(
@@ -401,8 +392,7 @@ testthat::test_that("download_edgar (NULL sector_yearly + year_range)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls),
-    method = "HEAD"
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -414,7 +404,7 @@ testthat::test_that("download_edgar (NULL sector_yearly + year_range)", {
 })
 
 testthat::test_that("download_edgar (NULL sector_yearly + year_range)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_warning(
@@ -432,7 +422,7 @@ testthat::test_that("download_edgar (NULL sector_yearly + year_range)", {
 })
 
 testthat::test_that("download_edgar (timeseries)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_no_error(
@@ -454,8 +444,7 @@ testthat::test_that("download_edgar (timeseries)", {
   urls <- amadeus::extract_urls(commands = commands, position = 4)
   url_status <- amadeus::check_urls(
     urls = urls,
-    size = length(urls),
-    method = "HEAD"
+    size = 1L
   )
   amadeus::test_download_functions(
     directory_to_save = directory_to_save,
@@ -479,7 +468,7 @@ testthat::test_that("download_edgar (missing acknowledgement triggers error)", {
 })
 
 testthat::test_that("download_edgar (bad version)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_error(
@@ -497,7 +486,7 @@ testthat::test_that("download_edgar (bad version)", {
 })
 
 testthat::test_that("download_edgar (bad year)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_error(
@@ -515,7 +504,7 @@ testthat::test_that("download_edgar (bad year)", {
 })
 
 testthat::test_that("download_edgar (bad temp_res)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/edgar/")
   testthat::expect_error(

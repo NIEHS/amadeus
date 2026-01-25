@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_koppen_geiger
 testthat::test_that("download_koppen_geiger", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   time_periods <- c("Present", "Future")
@@ -51,7 +51,7 @@ testthat::test_that("download_koppen_geiger", {
       # extract urls
       urls <- extract_urls(commands = commands, position = 2)
       # check HTTP URL status
-      url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+      url_status <- check_urls(urls = urls, size = 1L)
       # implement unit tests
       test_download_functions(
         directory_to_save = directory_to_save,

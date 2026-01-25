@@ -1,6 +1,6 @@
 Package: amadeus
 Title: Accessing and Analyzing Large-Scale Environmental Data
-Version: 1.2.4.9
+Version: 1.3.2
 Authors@R: c(
     person(given = "Mitchell", family = "Manware", role = c("aut", "ctb"), comment = c(ORCID = "0009-0003-6440-6106")),
     person(given = "Insang", family = "Song", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-8732-3256")),
@@ -21,7 +21,7 @@ Imports:
     terra (>= 1.8-50),
     methods,
     data.table,
-    httr,
+    httr2,
     rvest,
     exactextractr,
     utils,
@@ -33,7 +33,8 @@ Imports:
     nhdplusTools,
     archive,
     collapse,
-    Rdpack
+    Rdpack,
+    jsonlite
 Suggests:
     covr,
     withr,
@@ -50,7 +51,7 @@ RdMacros: Rdpack
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Config/Needs/website: tidyverse/tidytemplate
 Config/testhat/edition: 3
 License: MIT + file LICENSE

@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_epa
 testthat::test_that("download_aqs", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year_start <- 2018
@@ -52,7 +52,7 @@ testthat::test_that("download_aqs", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 1L)
   # implement unit tets
   test_download_functions(
     directory_to_save = directory_to_save,
@@ -64,7 +64,7 @@ testthat::test_that("download_aqs", {
 })
 
 testthat::test_that("download_aqs (single year)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year <- 2018
@@ -111,7 +111,7 @@ testthat::test_that("download_aqs (single year)", {
   # extract urls
   urls <- extract_urls(commands = commands, position = 4)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 1L)
   # implement unit tets
   test_download_functions(
     directory_to_save = directory_to_save,

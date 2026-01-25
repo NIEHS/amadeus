@@ -5,80 +5,98 @@
 ################################################################################
 ##### download_geos
 testthat::test_that("download_geos", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
+  nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
   # function parameters
   date_start <- "2019-09-09"
   date_end <- "2019-09-09"
-  collections <- c("aqc_tavg_1hr_g1440x721_v1",
-                   "chm_inst_1hr_g1440x721_p23")
+  collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
   directory_to_save <- paste0(tempdir(), "/geos/")
   # run download function
   testthat::expect_no_error(
-    download_data(dataset_name = "geos",
-                  date = c(date_start, date_end),
-                  collection = collections,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE)
+    download_data(
+      dataset_name = "geos",
+      date = c(date_start, date_end),
+      collection = collections,
+      nasa_earth_data_token = nasa_earth_data_token,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    )
   )
   # define file path with commands
-  commands_path <- paste0(directory_to_save,
-                          "geos_",
-                          date_start,
-                          "_",
-                          date_end,
-                          "_wget_commands.txt")
+  commands_path <- paste0(
+    directory_to_save,
+    "geos_",
+    date_start,
+    "_",
+    date_end,
+    "_wget_commands.txt"
+  )
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
-  urls <- extract_urls(commands = commands, position = 2)
+  urls <- extract_urls(commands = commands, position = 10)[[5]] %>%
+    gsub("'", "", .)
+
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 2L)
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
 
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
 })
 
+nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
+
 testthat::test_that("download_geos (single date)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date <- "2019-09-09"
-  collections <- c("aqc_tavg_1hr_g1440x721_v1",
-                   "chm_inst_1hr_g1440x721_p23")
+  collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
   directory_to_save <- paste0(tempdir(), "/geos/")
   # run download function
   testthat::expect_no_error(
-    download_data(dataset_name = "geos",
-                  date = date,
-                  collection = collections,
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE)
+    download_data(
+      dataset_name = "geos",
+      date = date,
+      nasa_earth_data_token = nasa_earth_data_token,
+      collection = collections,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    )
   )
   # define file path with commands
-  commands_path <- paste0(directory_to_save,
-                          "geos_",
-                          date,
-                          "_",
-                          date,
-                          "_wget_commands.txt")
+  commands_path <- paste0(
+    directory_to_save,
+    "geos_",
+    date,
+    "_",
+    date,
+    "_wget_commands.txt"
+  )
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
-  urls <- extract_urls(commands = commands, position = 2)
+  urls <- extract_urls(commands = commands, position = 10)[[5]] %>%
+    gsub("'", "", .)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 2L)
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
 
   # remove file with commands after test
   file.remove(commands_path)
@@ -103,8 +121,7 @@ testthat::test_that("process_geos (no errors)", {
       process_geos(
         date = c("2018-01-01", "2018-01-01"),
         variable = "O3",
-        path =
-        testthat::test_path(
+        path = testthat::test_path(
           "..",
           "testdata",
           "geos",
@@ -155,13 +172,12 @@ testthat::test_that("process_geos (no errors)", {
     geos_ext <- process_geos(
       date = c("2018-01-01", "2018-01-01"),
       variable = "O3",
-      path =
-        testthat::test_path(
-          "..",
-          "testdata",
-          "geos",
-          "c"
-        ),
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "geos",
+        "c"
+      ),
       extent = terra::ext(geos)
     )
   )
@@ -183,8 +199,7 @@ testthat::test_that("process_geos (single date)", {
       process_geos(
         date = "2018-01-01",
         variable = "O3",
-        path =
-        testthat::test_path(
+        path = testthat::test_path(
           "..",
           "testdata",
           "geos",
@@ -235,13 +250,12 @@ testthat::test_that("process_geos (single date)", {
     geos_ext <- process_geos(
       date = "2018-01-01",
       variable = "O3",
-      path =
-        testthat::test_path(
-          "..",
-          "testdata",
-          "geos",
-          "c"
-        ),
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "geos",
+        "c"
+      ),
       extent = terra::ext(geos)
     )
   )
@@ -284,8 +298,7 @@ testthat::test_that("calculate_geos", {
         process_geos(
           date = c("2018-01-01", "2018-01-01"),
           variable = "O3",
-          path =
-          testthat::test_path(
+          path = testthat::test_path(
             "..",
             "testdata",
             "geos",
@@ -337,7 +350,8 @@ testthat::test_that("calculate_geos", {
     )
   )
   testthat::expect_equal(
-    ncol(geos_covariate_terra), 4
+    ncol(geos_covariate_terra),
+    4
   )
   testthat::expect_true(
     "SpatVector" %in% class(geos_covariate_terra)
@@ -355,7 +369,8 @@ testthat::test_that("calculate_geos", {
     )
   )
   testthat::expect_equal(
-    ncol(geos_covariate_sf), 5
+    ncol(geos_covariate_sf),
+    5
   )
   testthat::expect_true(
     "sf" %in% class(geos_covariate_sf)
@@ -372,3 +387,4 @@ testthat::test_that("calculate_geos", {
     )
   )
 })
+# nolint end

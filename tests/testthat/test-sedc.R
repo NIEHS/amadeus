@@ -15,8 +15,7 @@ testthat::test_that("sum_edc", {
   ncp$site_id <- "3799900018810101"
   ncp$time <- 2018L
   ncpt <-
-    terra::vect(ncp, geom = c("lon", "lat"),
-                keepgeom = TRUE, crs = "EPSG:4326")
+    terra::vect(ncp, geom = c("lon", "lat"), keepgeom = TRUE, crs = "EPSG:4326")
   path_tri <- testthat::test_path("..", "testdata", "tri")
 
   testthat::expect_no_error(
@@ -96,5 +95,4 @@ testthat::test_that("sum_edc", {
       target_fields = targcols
     )
   )
-
 })

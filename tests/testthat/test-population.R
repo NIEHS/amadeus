@@ -4,13 +4,12 @@
 ################################################################################
 ##### download_population
 testthat::test_that("download_population", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   years <- c("2020", "all")
   data_formats <- c("GeoTIFF", "ASCII")
-  data_resolutions <- cbind(c("30 second"),
-                            c("30_sec"))
+  data_resolutions <- cbind(c("30 second"), c("30_sec"))
   directory_to_save <- paste0(tempdir(), "/pop/")
   for (f in seq_along(data_formats)) {
     data_format <- data_formats[f]
@@ -18,23 +17,27 @@ testthat::test_that("download_population", {
       year <- years[y]
       for (r in seq_len(nrow(data_resolutions))) {
         # run download function
-        download_data(dataset_name = "sedac_population",
-                      year = year,
-                      data_format = data_format,
-                      data_resolution = data_resolutions[r, 1],
-                      directory_to_save = directory_to_save,
-                      acknowledgement = TRUE,
-                      download = FALSE,
-                      unzip = FALSE,
-                      remove_zip = FALSE,
-                      remove_command = FALSE)
+        download_data(
+          dataset_name = "sedac_population",
+          year = year,
+          data_format = data_format,
+          data_resolution = data_resolutions[r, 1],
+          directory_to_save = directory_to_save,
+          acknowledgement = TRUE,
+          download = FALSE,
+          unzip = FALSE,
+          remove_zip = FALSE,
+          remove_command = FALSE
+        )
         # expect sub-directories to be created
         testthat::expect_true(
           length(
             list.files(
-              directory_to_save, include.dirs = TRUE
+              directory_to_save,
+              include.dirs = TRUE
             )
-          ) == 3
+          ) ==
+            3
         )
         # define file path with commands
         if (year == "all") {
@@ -47,24 +50,28 @@ testthat::test_that("download_population", {
         } else {
           resolution <- data_resolutions[r, 2]
         }
-        commands_path <- paste0(download_sanitize_path(directory_to_save),
-                                "sedac_population_",
-                                year,
-                                "_",
-                                resolution,
-                                "_",
-                                Sys.Date(),
-                                "_curl_commands.txt")
+        commands_path <- paste0(
+          download_sanitize_path(directory_to_save),
+          "sedac_population_",
+          year,
+          "_",
+          resolution,
+          "_",
+          Sys.Date(),
+          "_curl_commands.txt"
+        )
         # import commands
         commands <- read_commands(commands_path = commands_path)
         # extract urls
         urls <- extract_urls(commands = commands, position = 11)
         # check HTTP URL status
-        url_status <- check_urls(urls = urls, size = 1L, method = "GET")
+        url_status <- check_urls(urls = urls, size = 1L)
         # implement unit tests
-        test_download_functions(directory_to_save = directory_to_save,
-                                commands_path = commands_path,
-                                url_status = url_status)
+        test_download_functions(
+          directory_to_save = directory_to_save,
+          commands_path = commands_path,
+          url_status = url_status
+        )
         # remove file with commands after test
         file.remove(commands_path)
         # remove temporary population
@@ -75,7 +82,7 @@ testthat::test_that("download_population", {
 })
 
 testthat::test_that("download_population (coerce data types)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year <- c("all")
@@ -83,34 +90,40 @@ testthat::test_that("download_population (coerce data types)", {
   data_resolutions <- c("30 second", "2pt5_min")
   directory_to_save <- paste0(tempdir(), "/pop/")
   for (f in seq_along(data_formats)) {
-    download_data(dataset_name = "sedac_population",
-                  year = year,
-                  data_format = data_formats[f],
-                  data_resolution = data_resolutions[1],
-                  directory_to_save = directory_to_save,
-                  acknowledgement = TRUE,
-                  download = FALSE,
-                  unzip = FALSE,
-                  remove_zip = FALSE,
-                  remove_command = FALSE)
-    commands_path <- paste0(directory_to_save,
-                            "sedac_population_",
-                            "totpop",
-                            "_",
-                            data_resolutions[2],
-                            "_",
-                            Sys.Date(),
-                            "_curl_commands.txt")
+    download_data(
+      dataset_name = "sedac_population",
+      year = year,
+      data_format = data_formats[f],
+      data_resolution = data_resolutions[1],
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      unzip = FALSE,
+      remove_zip = FALSE,
+      remove_command = FALSE
+    )
+    commands_path <- paste0(
+      directory_to_save,
+      "sedac_population_",
+      "totpop",
+      "_",
+      data_resolutions[2],
+      "_",
+      Sys.Date(),
+      "_curl_commands.txt"
+    )
     # import commands
     commands <- read_commands(commands_path = commands_path)
     # extract urls
     urls <- extract_urls(commands = commands, position = 11)
     # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 1L, method = "GET")
+    url_status <- check_urls(urls = urls, size = 1L)
     # implement unit tests
-    test_download_functions(directory_to_save = directory_to_save,
-                            commands_path = commands_path,
-                            url_status = url_status)
+    test_download_functions(
+      directory_to_save = directory_to_save,
+      commands_path = commands_path,
+      url_status = url_status
+    )
     # remove file with commands after test
     file.remove(commands_path)
     unlink(directory_to_save, recursive = TRUE)
@@ -193,9 +206,14 @@ testthat::test_that("process_sedac_codes", {
 testthat::test_that("calculate_population", {
   withr::local_package("terra")
   withr::local_package("data.table")
-  paths <- list.files(testthat::test_path(
-    "..", "testdata", "population"
-  ), full.names = TRUE)
+  paths <- list.files(
+    testthat::test_path(
+      "..",
+      "testdata",
+      "population"
+    ),
+    full.names = TRUE
+  )
   radii <- c(0, 1000)
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
@@ -255,7 +273,8 @@ testthat::test_that("calculate_population", {
     )
   )
   testthat::expect_equal(
-    ncol(pop_covariate_terra), 3
+    ncol(pop_covariate_terra),
+    3
   )
   testthat::expect_true(
     "SpatVector" %in% class(pop_covariate_terra)
@@ -273,7 +292,8 @@ testthat::test_that("calculate_population", {
     )
   )
   testthat::expect_equal(
-    ncol(pop_covariate_sf), 4
+    ncol(pop_covariate_sf),
+    4
   )
   testthat::expect_true(
     "sf" %in% class(pop_covariate_sf)

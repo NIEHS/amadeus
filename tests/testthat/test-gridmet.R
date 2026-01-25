@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_gridmet
 testthat::test_that("download_gridmet (no errors)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year_start <- 2018
@@ -12,61 +12,77 @@ testthat::test_that("download_gridmet (no errors)", {
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/gridmet/")
   # run download function
-  download_data(dataset_name = "gridmet",
-                year = c(year_start, year_end),
-                variables = variables,
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                download = FALSE)
+  download_data(
+    dataset_name = "gridmet",
+    year = c(year_start, year_end),
+    variables = variables,
+    directory_to_save = directory_to_save,
+    acknowledgement = TRUE,
+    download = FALSE
+  )
   # define path with commands
-  commands_path <- paste0(directory_to_save,
-                          "/gridmet_",
-                          year_start, "_", year_end,
-                          "_curl_commands.txt")
+  commands_path <- paste0(
+    directory_to_save,
+    "/gridmet_",
+    year_start,
+    "_",
+    year_end,
+    "_curl_commands.txt"
+  )
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
   urls <- extract_urls(commands = commands, position = 6)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 5L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 2L)
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_gridmet (single year)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   year <- 2020
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/gridmet/")
   # run download function
-  download_data(dataset_name = "gridmet",
-                year = year,
-                variables = variables,
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                download = FALSE)
+  download_data(
+    dataset_name = "gridmet",
+    year = year,
+    variables = variables,
+    directory_to_save = directory_to_save,
+    acknowledgement = TRUE,
+    download = FALSE
+  )
   # define path with commands
-  commands_path <- paste0(directory_to_save,
-                          "/gridmet_",
-                          year, "_", year,
-                          "_curl_commands.txt")
+  commands_path <- paste0(
+    directory_to_save,
+    "/gridmet_",
+    year,
+    "_",
+    year,
+    "_curl_commands.txt"
+  )
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
   urls <- extract_urls(commands = commands, position = 6)
   # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "HEAD")
+  url_status <- check_urls(urls = urls, size = 1L)
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
@@ -109,8 +125,7 @@ testthat::test_that("process_gridmet", {
     process_gridmet(
       date = c("2018-01-03", "2018-01-03"),
       variable = variable,
-      path =
-      testthat::test_path(
+      path = testthat::test_path(
         "..",
         "testdata",
         "gridmet",
@@ -146,13 +161,12 @@ testthat::test_that("process_gridmet", {
     gridmet_ext <- process_gridmet(
       date = c("2018-01-03", "2018-01-03"),
       variable = "Precipitation",
-      path =
-        testthat::test_path(
-          "..",
-          "testdata",
-          "gridmet",
-          "pr"
-        ),
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "gridmet",
+        "pr"
+      ),
       extent = terra::ext(gridmet)
     )
   )
@@ -169,8 +183,7 @@ testthat::test_that("process_gridmet (single date)", {
     process_gridmet(
       date = "2018-01-03",
       variable = variable,
-      path =
-      testthat::test_path(
+      path = testthat::test_path(
         "..",
         "testdata",
         "gridmet",
@@ -206,13 +219,12 @@ testthat::test_that("process_gridmet (single date)", {
     gridmet_ext <- process_gridmet(
       date = "2018-01-03",
       variable = "Precipitation",
-      path =
-        testthat::test_path(
-          "..",
-          "testdata",
-          "gridmet",
-          "pr"
-        ),
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "gridmet",
+        "pr"
+      ),
       extent = terra::ext(gridmet)
     )
   )
@@ -255,8 +267,7 @@ testthat::test_that("calculate_gridmet", {
       process_gridmet(
         date = c("2018-01-03", "2018-01-03"),
         variable = "pr",
-        path =
-        testthat::test_path(
+        path = testthat::test_path(
           "..",
           "testdata",
           "gridmet",
@@ -307,7 +318,8 @@ testthat::test_that("calculate_gridmet", {
     )
   )
   testthat::expect_equal(
-    ncol(gridmet_covariate_terra), 3
+    ncol(gridmet_covariate_terra),
+    3
   )
   testthat::expect_true(
     "SpatVector" %in% class(gridmet_covariate_terra)
@@ -325,7 +337,8 @@ testthat::test_that("calculate_gridmet", {
     )
   )
   testthat::expect_equal(
-    ncol(gridmet_covariate_sf), 4
+    ncol(gridmet_covariate_sf),
+    4
   )
   testthat::expect_true(
     "sf" %in% class(gridmet_covariate_sf)

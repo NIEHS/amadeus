@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_groads
 testthat::test_that("download_groads", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   data_regions <- c("Americas", "Global")
@@ -49,7 +49,7 @@ testthat::test_that("download_groads", {
       # extract urls
       urls <- extract_urls(commands = commands, position = 11)
       # check HTTP URL status
-      url_status <- check_urls(urls = urls, size = 1L, method = "GET")
+      url_status <- check_urls(urls = urls, size = 1L)
       # implement unit tests
       test_download_functions(
         directory_to_save = directory_to_save,

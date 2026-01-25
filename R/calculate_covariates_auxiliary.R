@@ -775,14 +775,33 @@ calculate_modis_daily <- function(
 #' @export
 collapse_nlcd <- function(
   data,
-  mode = c("terra", "extract"),
+  mode = c("terra", "exact"),
   locs = NULL,
   locs_id = "site_id"
 ) {
+  # Add mode matching
+  mode <- match.arg(mode)
+
+  # Filter NULL values
   data_nonnull <- Filter(Negate(is.null), data)
+
+  # Check for empty data
+  if (length(data_nonnull) == 0) {
+    warning("No non-null data provided to collapse_nlcd")
+    return(data.frame())
+  }
+
+  # Combine data
   data_rbind <- collapse::rowbind(data_nonnull, fill = TRUE)
+
+  # Check if result is empty
+  if (is.null(data_rbind) || nrow(data_rbind) == 0) {
+    warning("Row binding resulted in empty data frame")
+    return(data.frame())
+  }
+
   if (mode == "terra") {
-    # Create a single-row NA data frame with the same structure
+    # Now safe to create NA row
     na_row <- data_rbind[1, , drop = FALSE]
     na_row[] <- NA
 
@@ -795,7 +814,6 @@ collapse_nlcd <- function(
     stopifnot(!is.null(locs))
 
     sites_wdata <- unlist(lapply(data, function(x) x[[locs_id]]))
-
     sites_missing <- setdiff(unlist(locs[[locs_id]]), sites_wdata)
 
     df_missing <- data.frame(setNames(list(sites_missing), locs_id))

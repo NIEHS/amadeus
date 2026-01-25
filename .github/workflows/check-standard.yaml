@@ -19,7 +19,7 @@ jobs:
       matrix:
         config:
           - {os: macos-latest,   r: 'release'}
-          - {os: macos-13-xlarge,   r: 'release'}
+          - {os: macos-latest-xlarge,   r: 'release'}
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
@@ -27,6 +27,7 @@ jobs:
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
 
     steps:

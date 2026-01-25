@@ -5,14 +5,14 @@
 ################################################################################
 ##### download_nei
 testthat::test_that("download_nei", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- paste0(tempdir(), "/nei/")
-  certificate <- system.file(
-    "extdata/cacert_gaftp_epa.pem",
-    package = "amadeus"
-  )
+  # certificate <- system.file(
+  #   "extdata/cacert_gaftp_epa.pem",
+  #   package = "amadeus"
+  # )
   # run download function
   year <- c(2017L, 2020L)
   download_data(
@@ -22,7 +22,7 @@ testthat::test_that("download_nei", {
     download = FALSE,
     year = year,
     remove_command = FALSE,
-    epa_certificate_path = certificate
+    # epa_certificate_path = certificate
   )
   # expect sub-directories to be created
   testthat::expect_true(
@@ -41,16 +41,16 @@ testthat::test_that("download_nei", {
     paste(year, collapse = "-"),
     "_",
     Sys.Date(),
-    "_wget_commands.txt"
+    "_curl_commands.txt"
   )
 
   # import commands
   commands <- read_commands(commands_path = commands_path)
   # extract urls
-  urls <- extract_urls(commands = commands, position = 3)
+  urls <- extract_urls(commands = commands, position = 6)
   # check HTTP URL status
   url_status <-
-    httr::HEAD(urls[1], config = httr::config(cainfo = certificate))
+    httr::HEAD(urls[1])#, config = httr::config(cainfo = certificate))
   url_status <- url_status$status_code
   # implement unit tests
   test_download_functions(
@@ -65,14 +65,14 @@ testthat::test_that("download_nei", {
 })
 
 testthat::test_that("download_nei (live)", {
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   directory_to_save <- paste0(tempdir(), "/nei/")
-  certificate <- system.file(
-    "extdata/cacert_gaftp_epa.pem",
-    package = "amadeus"
-  )
+  # certificate <- system.file(
+  #   "extdata/cacert_gaftp_epa.pem",
+  #   package = "amadeus"
+  # )
   # run download function
   year <- c(2017L, 2020L)
   testthat::expect_no_error(
@@ -83,7 +83,7 @@ testthat::test_that("download_nei (live)", {
       download = TRUE,
       year = year,
       remove_command = FALSE,
-      epa_certificate_path = certificate,
+      # epa_certificate_path = certificate,
       unzip = TRUE
     )
   )
@@ -104,17 +104,17 @@ testthat::test_that("download_nei (live)", {
 
 testthat::test_that("download_nei (expected errors)", {
   # expected errors due to invalid certificate
-  withr::local_package("httr")
+  withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   tdir <- tempdir()
   directory_to_save <- paste0(tempdir(), "/epa/")
-  certificate <- file.path(tdir, "cacert_gaftp_epa.pem")
+  # certificate <- file.path(tdir, "cacert_gaftp_epa.pem")
   # remove if there is a preexisting file
-  if (file.exists(certificate)) {
-    file.remove(certificate)
-    file.remove(gsub("pem", "crt", certificate))
-  }
+  # if (file.exists(certificate)) {
+  #   file.remove(certificate)
+  #   file.remove(gsub("pem", "crt", certificate))
+  # }
 
   # run download function
   year <- c(2017L)
@@ -125,8 +125,7 @@ testthat::test_that("download_nei (expected errors)", {
       acknowledgement = TRUE,
       download = FALSE,
       year = year,
-      remove_command = FALSE,
-      epa_certificate_path = certificate
+      remove_command = FALSE
     )
   )
   # define file path with commands
@@ -136,7 +135,7 @@ testthat::test_that("download_nei (expected errors)", {
     paste(year, collapse = "-"),
     "_",
     Sys.Date(),
-    "_wget_commands.txt"
+    "_curl_commands.txt"
   )
   # remove file with commands after test
   testthat::expect_true(file.exists(commands_path))

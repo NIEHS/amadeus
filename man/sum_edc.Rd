@@ -55,6 +55,9 @@ Thus, the function internally converts sf objects in
 The threshold should be carefully chosen by users.
 }
 \examples{
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
+\dontrun{
 set.seed(101)
 ncpath <- system.file("gpkg/nc.gpkg", package = "sf")
 nc <- terra::vect(ncpath)
@@ -69,6 +72,7 @@ pnt_from$val2 <- rgamma(10L, 2, 1)
 
 vals <- c("val1", "val2")
 sum_edc(pnt_locs, pnt_from, "NAME", 1e4, vals)
+}
 }
 \references{
 \insertRef{messier2012integrating}{amadeus}
