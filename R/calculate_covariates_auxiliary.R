@@ -773,7 +773,6 @@ calculate_modis_daily <- function(
 #' @keywords internal auxiliary
 #' @importFrom collapse rowbind
 #' @export
-# In R/calculate_covariates.R, starting at line 1148
 collapse_nlcd <- function(
   data,
   mode = c("terra", "exact"),
