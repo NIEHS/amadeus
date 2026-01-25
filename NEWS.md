@@ -1,9 +1,12 @@
-# 1.3
+# 1.3.2
 - Fixed deprecated file paths for NLCD, MODIS, and Ecoregions datasets
 - Removed the certificate verification from ecoregion download which is not needed anymore
-- For NASA datasets MODIS, VIIRS, and Geos-CF, added additional options to prevent API throttling 
+- For NASA datasets MODIS, VIIRS, and Geos-CF, added additional tags in the wget scripts to prevent API throttling 
 - httr upgraded to httr2
 - Modified internal URL status check function for general use
+- Added the news function to display the NEWS.md content within R pkgdown site
+- Improved the reporting in the GitHub Actions workflows
+
 
 # 1.2
 - `future` and `future.apply` dependencies were removed
