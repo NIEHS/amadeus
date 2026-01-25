@@ -31,7 +31,7 @@ an `sftime` object with constrained time column name
 [check_mysftime](https://niehs.github.io/amadeus/reference/check_mysftime.md),
 [sf_as_mysftime](https://niehs.github.io/amadeus/reference/sf_as_mysftime.md),
 [data.frame](https://rdrr.io/r/base/data.frame.html),
-[data.table::data.table](https://rdatatable.gitlab.io/data.table/reference/data.table.html),
+[data.table::data.table](https://rdrr.io/pkg/data.table/man/data.table.html),
 [terra::rast](https://rspatial.github.io/terra/reference/rast.html),
 [terra::sds](https://rspatial.github.io/terra/reference/sds.html),
 [terra::vect](https://rspatial.github.io/terra/reference/vect.html)
