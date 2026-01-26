@@ -18,16 +18,14 @@ download_nei(
 )
 }
 \arguments{
-\item{epa_certificate_path}{\if{html}{\out{<TO BE DEPRECATED>}} character(1).
+\item{epa_certificate_path}{TO BE DEPRECATED character(1).
 Path to the certificate file for EPA DataCommons. Default is
 'extdata/cacert_gaftp_epa.pem' under the package installation path.
 Use \code{system.file()} to get the full path.}
 
-\item{certificate_url}{\if{html}{\out{
-<TO BE DEPRECATED>
+\item{certificate_url}{TO BE DEPRECATED
 character(1). URL to certificate file. See notes for
-details.
-}}}
+details.}
 
 \item{year}{integer(1) Available years of NEI data.
 Default is \code{c(2017L, 2020L)}.}
