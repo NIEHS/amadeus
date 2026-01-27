@@ -2541,7 +2541,6 @@ download_modis <- function(
     stop("Please select a data version.\n")
   }
 
-
   #### 9. define date sequence
   date_sequence <- amadeus::generate_date_sequence(
     date[1],
@@ -2797,11 +2796,11 @@ download_tri <- function(
 #' @description
 #' The \code{download_nei()} function accesses and downloads road emissions data from the [U.S Environmental Protection Agency's (EPA) National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories/national-emissions-inventory-nei).
 # nolint end
-#' @param epa_certificate_path <TO BE DEPRECATED> character(1).
+#' @param epa_certificate_path TO BE DEPRECATED character(1).
 #' Path to the certificate file for EPA DataCommons. Default is
 #' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
 #' Use `system.file()` to get the full path.
-#' @param certificate_url <TO BE DEPRECATED>
+#' @param certificate_url TO BE DEPRECATED
 #' character(1). URL to certificate file. See notes for
 #' details.
 #' @param year integer(1) Available years of NEI data.
@@ -3393,8 +3392,6 @@ download_huc <-
     return(amadeus::download_hash(hash, directory_to_save))
   }
 # nolint end
-
-
 
 ################################################################################
 # 2. Emissions Database for Global Atmospheric Research (EDGAR)
