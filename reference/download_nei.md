@@ -26,15 +26,16 @@ download_nei(
 
 - epa_certificate_path:
 
-  character(1). Path to the certificate file for EPA DataCommons.
-  Default is 'extdata/cacert_gaftp_epa.pem' under the package
-  installation path. Use
+  TO BE DEPRECATED character(1). Path to the certificate file for EPA
+  DataCommons. Default is 'extdata/cacert_gaftp_epa.pem' under the
+  package installation path. Use
   [`system.file()`](https://rdrr.io/r/base/system.file.html) to get the
   full path.
 
 - certificate_url:
 
-  character(1). URL to certificate file. See notes for details.
+  TO BE DEPRECATED character(1). URL to certificate file. See notes for
+  details.
 
 - year:
 
