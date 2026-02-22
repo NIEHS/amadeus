@@ -327,37 +327,21 @@ download_aqs <-
     return(amadeus::download_hash(hash, directory_to_save))
   }
 
-
-# nolint start
 #' Download ecoregion data
 #' @description
-#' The \code{download_ecoregion()} function accesses and downloads United States Ecoregions data from the [U.S. Environmental Protection Agency's (EPA) Ecorgions](https://www.epa.gov/eco-research/ecoregions). Level 3 data, where all pieces of information in the higher levels are included, are downloaded.
-# nolint end
-#' @param directory_to_save character(1). Directory to save data. Two
-#' sub-directories will be created for the downloaded zip files ("/zip_files")
-#' and the unzipped data files ("/data_files").
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param unzip logical(1). Unzip zip files. Default \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip file from
-#' \code{directory_to_download}. Default \code{FALSE}.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' The \code{download_ecoregion()} function accesses and downloads United States Ecoregions data from the U.S. Environmental Protection Agency's (EPA) Ecoregions.
+#' @note Ecoregion data does not require authentication.
+#' @param directory_to_save character(1). Directory to save data.
+#' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param unzip logical(1). Unzip zip files (default TRUE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @author Insang Song
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Zip and/or data files will be downloaded and stored in
-#' \code{directory_to_save}.
-#' @importFrom utils download.file
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{article_omernik2014ecoregions}{amadeus}
@@ -365,125 +349,124 @@ download_aqs <-
 #' \dontrun{
 #' download_ecoregion(
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE,
-#'   unzip = FALSE
+#'   acknowledgement = TRUE
 #' )
 #' }
 #' @export
 download_ecoregion <- function(
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20
 ) {
-  #### 1. data download acknowledgement
+  #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### 2. check for null parameters
+
+  #### Check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
-  #### 3. directory setup
+
+  #### Directory setup
   directory_original <- amadeus::download_sanitize_path(directory_to_save)
   directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
-  #### 5. define download URL
+
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return after discovering files.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### Define download URL
   download_url <- paste0(
     "https://dmap-prod-oms-edc.s3.us-east-1.amazonaws.com/ORD/Ecoregions/us/",
     "us_eco_l3_state_boundaries.zip"
   )
-  #### 6. build download file name
+
+  #### Build download file name
   download_name <- file.path(
     directory_to_download,
     "us_eco_l3_state_boundaries.zip"
   )
-  #### 7. build download command
-  download_command <-
-    paste0(
-      "wget",
-      " ",
-      download_url,
-      " -O ",
-      download_name,
-      "\n"
-    )
-  #### 8. initiate "..._curl_commands.txt" file
-  commands_txt <- paste0(
-    directory_original,
-    "us_eco_l3_state_boundaries_",
-    Sys.Date(),
-    "_wget_command.txt"
-  )
-  #### 9. concatenate
-  amadeus::download_sink(commands_txt)
-  if (amadeus::check_destfile(download_name)) {
-    #### 10. concatenate and print download commands to "..._wget_commands.txt"
-    #### cat command only file does not already exist or
-    #### if size does not match URL size
-    cat(download_command)
+
+  #### Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message("Skipping download.\n")
+    return(invisible(list(
+      urls = download_url,
+      destfiles = download_name,
+      n_files = 1
+    )))
   }
-  #### 11. finish "...curl_commands.txt" file
-  sink()
-  #### 13. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
-  )
-  #### 15. unzip files
+
+  #### Download file using httr2
+  if (amadeus::check_destfile(download_name)) {
+    download_result <- amadeus::download_run_method(
+      urls = download_url,
+      destfiles = download_name,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = 2
+    )
+  } else {
+    message("File already exists. Skipping download.\n")
+  }
+
+  #### Unzip files
   amadeus::download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
-  #### 16. remove zip files
+
+  #### Remove zip files
   amadeus::download_remove_zips(
     remove = remove_zip,
     download_name = download_name
   )
-  return(amadeus::download_hash(hash, directory_to_save))
-}
 
-# nolint start
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(NULL))
+  }
+}
 #' Download atmospheric composition data
 #' @description
 #' The \code{download_geos()} function accesses and downloads various
-#' atmospheric composition collections from [NASA's Global Earth Observing System (GEOS)
-#' compositional forecast model](https://gmao.gsfc.nasa.gov/gmao-products/geos-cf/).
-#' @note Due to NASA data access policies, the download scripts generated by this function
-#' require a valid NASA Earthdata token for authentication and include options to slow down the
-#' download speed to avoid server overload and potential blocking of access.
-#' @param nasa_earth_data_token character(1).
-#'  Token for downloading data from NASA. Should be set before
-#'  trying running the function.
+#' atmospheric composition collections from NASA's Global Earth Observing System (GEOS)
+#' compositional forecast model.
+#' @note Due to NASA data access policies, downloads require a valid NASA
+#' Earthdata token for authentication. Use \code{setup_nasa_token()} for setup.
 #' @param collection character(1). GEOS-CF data collection file name.
-#' @param date character(1 or 2). length of 10. Date or start/end dates for downloading data.
-#' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
+#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData authentication token.
+#' @param date character(1 or 2). Date range "YYYY-MM-DD" format
 #' @param directory_to_save character(1). Directory to save data.
-#' Sub-directories will be created within \code{directory_to_save} for each
-#' GEOS-CF collection.
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * netCDF (.nc4) files will be stored in a
-#' collection-specific folder within \code{directory_to_save}.
-#' @importFrom utils download.file
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{keller_description_2021}{amadeus}
@@ -493,14 +476,10 @@ download_ecoregion <- function(
 #'   collection = "aqc_tavg_1hr_g1440x721_v1",
 #'   date = "2024-01-01",
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE
+#'   acknowledgement = TRUE
 #' )
 #' }
 #' @export
-# nolint end
-# nolint start: cyclocomp
 download_geos <- function(
   collection = c(
     "aqc_tavg_1hr_g1440x721_v1",
@@ -514,60 +493,84 @@ download_geos <- function(
   date = c("2018-01-01", "2018-01-01"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 ) {
-  #### 1. check for data download acknowledgement
+  #### 1. Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### 2. check for null parameters
+
+  #### 2. Check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
-  #### check dates
+
+  #### 3. Check dates
   if (length(date) == 1) {
     date <- c(date, date)
   }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
-  #### 3. directory setup
+
+  #### 4. Directory setup
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-  #### 4. match collection
+
+  #### 5. Check and retrieve NASA token
+  nasa_earth_data_token <- amadeus::get_token(
+    token = nasa_earth_data_token,
+    env_var = "NASA_EARTHDATA_TOKEN"
+  )
+
+  #### 6. Match collection
   collection <- match.arg(collection, several.ok = TRUE)
-  #### 5. define date sequence
-  date_sequence <- generate_date_sequence(
+
+  #### 7. Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return after discovering files.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### 8. Define date sequence
+  date_sequence <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = TRUE
   )
-  #### 7. define URL base
+
+  #### 9. Define URL base
   base <- "https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/"
-  #### 8. initiate "..._wget_commands.txt" file
-  commands_txt <- paste0(
-    directory_to_save,
-    "geos_",
-    date[1],
-    "_",
-    date[2],
-    "_wget_commands.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  #### 9. concatenate and print download commands to "..._wget_commands.txt"
+
+  #### 10. Collect all URLs and destination files
+  all_urls <- character()
+  all_destfiles <- character()
+
   for (c in seq_along(collection)) {
     collection_loop <- collection[c]
-    download_folder <- paste0(
-      directory_to_save,
-      collection_loop,
-      "/"
-    )
+    download_folder <- paste0(directory_to_save, collection_loop, "/")
+
     if (!dir.exists(download_folder)) {
       dir.create(download_folder, recursive = TRUE)
     }
+
     for (d in seq_along(date_sequence)) {
-      date <- date_sequence[d]
-      year <- substr(date, 1, 4)
-      month <- substr(date, 5, 6)
-      day <- substr(date, 7, 8)
+      date_str <- date_sequence[d]
+      year <- substr(date_str, 1, 4)
+      month <- substr(date_str, 5, 6)
+      day <- substr(date_str, 7, 8)
       time_sequence <- amadeus::generate_time_sequence(collection_loop)
+
       for (t in seq_along(time_sequence)) {
         download_url_base <- paste0(
           base,
@@ -583,110 +586,84 @@ download_geos <- function(
           "GEOS-CF.v01.rpl.",
           collection_loop,
           ".",
-          date,
+          date_str,
           "_",
           time_sequence[t],
           "z.nc4"
         )
-        download_url <- paste0(
-          download_url_base,
-          download_name
-        )
-        if (t == 1) {
-          if (!(amadeus::check_url_status(download_url))) {
-            sink()
-            file.remove(commands_txt)
+        download_url <- paste0(download_url_base, download_name)
+
+        # Validate first URL only
+        if (c == 1 && d == 1 && t == 1) {
+          if (!amadeus::check_url_status(download_url)) {
             stop(paste0(
               download_url,
-              "Invalid date returns HTTP code 404. ",
+              " Invalid date returns HTTP code 404. ",
               "Check `date` parameter.\n"
             ))
           }
         }
-        download_folder_name <- paste0(
-          download_folder,
-          download_name
-        )
-        download_command <- paste0(
-          "wget ",
-          "-e robots=off -np -R .html,.tmp ",
-          "--continue ",
-          "--tries=20 ",
-          "--retry-connrefused ",
-          "--waitretry=30 ",
-          "--timeout=60 ",
-          "--retry-on-http-error=500,502,503,504 ",
-          "--limit-rate=10M ",
-          "--random-wait ",
-          "--wait=2 ",
-          "--no-clobber ",
-          "--keep-session-cookies ",
-          "--header='Authorization: Bearer ",
-          nasa_earth_data_token,
-          "' ",
-          "'",
-          download_url,
-          "' ",
-          "-O '",
-          download_folder_name,
-          "'",
-          "\n"
-        )
+
+        download_folder_name <- paste0(download_folder, download_name)
 
         if (amadeus::check_destfile(download_folder_name)) {
-          #### cat command only if file does not already exist
-          cat(download_command)
+          all_urls <- c(all_urls, download_url)
+          all_destfiles <- c(all_destfiles, download_folder_name)
         }
       }
     }
   }
-  #### 9. finish "..._wget_commands.txt" file
-  sink()
-  #### 11. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
-  )
-  return(amadeus::download_hash(hash, directory_to_save))
-}
-# nolint end: cyclocomp
 
-# nolint start
+  #### 11. Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message(sprintf(
+      "Skipping download. Found %d files available for download.\n",
+      length(all_urls)
+    ))
+    return(invisible(list(
+      urls = all_urls,
+      destfiles = all_destfiles,
+      n_files = length(all_urls)
+    )))
+  }
+
+  #### 12. Download files using httr2
+  download_result <- amadeus::download_run_method(
+    urls = all_urls,
+    destfiles = all_destfiles,
+    token = nasa_earth_data_token,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(download_result))
+  }
+}
+
+
 #' Download elevation data
 #' @description
 #' The \code{download_gmted()} function accesses and downloads Global
-#' Multi-resolution Terrain Elevation Data (GMTED2010) from
-#' [U.S. Geological Survey and National Geospatial-Intelligence Agency](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010).
-#' @param statistic character(1). Available statistics include `"Breakline Emphasis"`, `"Systematic Subsample"`, `"Median Statistic"`,
-#' `"Minimum Statistic"`, `"Mean Statistic"`, `"Maximum Statistic"`, and
-#' `"Standard Deviation Statistic"`.
-#' @param resolution character(1). Available resolutions include `"7.5 arc-seconds"`, `"15 arc-seconds"`, and `"30 arc-seconds"`.
-#' @param directory_to_save character(1). Directory to save data. Two
-#' sub-directories will be created for the downloaded zip files ("/zip_files")
-#' and the unzipped data files ("/data_files").
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands. Default is FALSE.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip file from directory_to_download.
-#' Default is \code{FALSE}.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' Multi-resolution Terrain Elevation Data (GMTED2010) from U.S. Geological Survey.
+#' @note GMTED data does not require authentication.
+#' @param statistic character(1). Available statistics.
+#' @param resolution character(1). Available resolutions.
+#' @param directory_to_save character(1). Directory to save data.
+#' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param unzip logical(1). Unzip zip files (default TRUE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song
-# nolint end
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Zip and/or data files will be downloaded and stored in
-#' \code{directory_to_save}.
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{danielson_global_2011}{amadeus}
@@ -696,10 +673,7 @@ download_geos <- function(
 #'   statistic = "Breakline Emphasis",
 #'   resolution = "7.5 arc-seconds",
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE,
-#'   unzip = FALSE
+#'   acknowledgement = TRUE
 #' )
 #' }
 #' @export
@@ -716,50 +690,77 @@ download_gmted <- function(
   resolution = c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 ) {
-  #### 1. check for data download acknowledgement
+  #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### 2. check for null parameters
+
+  #### Check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
-  #### 3. directory setup
+
+  #### Directory setup
   directory_original <- amadeus::download_sanitize_path(directory_to_save)
   directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
-  #### 4. check for valid statistic
+
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### Check for valid statistic
   statistic <- match.arg(statistic)
-  #### 5. check for valid resolution
+
+  #### Check for valid resolution
   resolution <- match.arg(resolution)
-  #### 6. define URL base
+
+  #### Define URL base
   base <- paste0(
     "https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo",
     "/downloads/GMTED/Grid_ZipFiles/"
   )
-  #### 7. define URL statistic code
+
+  #### Define URL statistic code
   statistic_code <- amadeus::process_gmted_codes(
     statistic,
     statistic = TRUE,
     invert = FALSE
   )
-  #### 8. define URL resolution code
+
+  #### Define URL resolution code
   resolution_code <- amadeus::process_gmted_codes(
     resolution,
     resolution = TRUE,
     invert = FALSE
   )
-  #### 9. build url
+
+  #### Build url
   download_url <- paste0(
     base,
     statistic_code,
     resolution_code,
     "_grd.zip"
   )
-  #### 10. build download file name
+
+  #### Build download file name
   download_name <- paste0(
     directory_to_download,
     "gmted2010_",
@@ -767,53 +768,50 @@ download_gmted <- function(
     resolution_code,
     "_grd.zip"
   )
-  #### 11. build download command
-  download_command <- paste0(
-    "curl -s -o ",
-    download_name,
-    " --url ",
-    download_url,
-    "\n"
-  )
-  #### 12. initiate "..._curl_commands.txt"
-  commands_txt <- paste0(
-    directory_original,
-    "gmted_",
-    gsub(" ", "", statistic),
-    "_",
-    gsub(" ", "", resolution),
-    "_",
-    Sys.Date(),
-    "_curl_command.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  #### 13. concatenate and print download command to "..._curl_commands.txt"
-  if (amadeus::check_destfile(download_name)) {
-    #### cat command only if file does not already exist
-    cat(download_command)
+
+  #### Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message("Skipping download.\n")
+    return(invisible(list(
+      urls = download_url,
+      destfiles = download_name,
+      n_files = 1
+    )))
   }
-  #### 14. finish "..._curl_commands.txt" file
-  sink()
-  #### 16. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
-  )
-  #### 18. end if unzip == FALSE
+
+  #### Download file using httr2
+  if (amadeus::check_destfile(download_name)) {
+    download_result <- amadeus::download_run_method(
+      urls = download_url,
+      destfiles = download_name,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = rate_limit
+    )
+  } else {
+    message("File already exists. Skipping download.\n")
+  }
+
+  #### Unzip
   amadeus::download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
-  #### 19. remove zip files
+
+  #### Remove zip files
   amadeus::download_remove_zips(
     remove = remove_zip,
     download_name = download_name
   )
-  return(amadeus::download_hash(hash, directory_to_save))
-}
 
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(NULL))
+  }
+}
 # nolint start
 #' Download meteorological and atmospheric data
 #' @description
@@ -1376,34 +1374,27 @@ download_merra2 <- function(
 }
 # nolint end: cyclocomp
 
-# nolint start
 #' Download meteorological data
 #' @description
-#' The \code{download_narr} function accesses and downloads daily meteorological data from [NOAA's North American Regional Reanalysis (NARR) model](https://psl.noaa.gov/data/gridded/data.narr.html).
-#' @note "Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
-#' @param variables character. Variable(s) name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
+#' The \code{download_narr} function accesses and downloads daily meteorological
+#' data from NOAA's North American Regional Reanalysis (NARR) model.
+#' @note "Pressure levels" variables contain variable values at 29 atmospheric
+#' levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be
+#' downloaded for each variable.
+#' @param variables character. Variable(s) name acronym. See
+#' [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
 #' for variable names and acronym codes.
-#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
-#' @param directory_to_save character(1). Directory(s) to save downloaded data
-#' files.
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
-#' @author Mitchell Manware, Insang Song
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * netCDF (.nc) files will be stored in
-#' \code{directory_to_save}.
+#' @param year integer(1 or 2). Year or start/end years for downloading data.
+#' @param directory_to_save character(1). Directory to save downloaded data files.
+#' @param acknowledgement logical(1). Must be TRUE to proceed with download.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). DEPRECATED, ignored.
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum download retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @author Mitchell Manware, Insang Song, Kyle Messier
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{mesinger_north_2006}{amadeus}
@@ -1413,37 +1404,64 @@ download_merra2 <- function(
 #'   variables = c("weasd", "omega"),
 #'   year = 2023,
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE
+#'   acknowledgement = TRUE
+#' )
+#'
+#' # Multiple years
+#' download_narr(
+#'   variables = c("air.2m", "rhum.2m"),
+#'   year = c(2020, 2022),
+#'   directory_to_save = tempdir(),
+#'   acknowledgement = TRUE
 #' )
 #' }
 #' @export
-# nolint end
-# nolint start: cyclocomp
 download_narr <- function(
   variables = NULL,
   year = c(2018, 2022),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 ) {
-  #### 1. check for data download acknowledgement
+  #### 1. Check for data download acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### 2. check for null parameters
+
+  #### 2. Check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
-  #### check years
+
+  #### 3. Check years
   if (length(year) == 1) {
     year <- c(year, year)
   }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
-  #### 3. directory setup
+
+  #### 4. Directory setup
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-  #### 4. define years and months sequence
+
+  #### 5. Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return after discovering files.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### 6. Define years sequence
   if (any(nchar(year[1]) != 4, nchar(year[2]) != 4)) {
     stop("years should be 4-digit integers.\n")
   }
@@ -1454,28 +1472,26 @@ download_narr <- function(
     )
   )
   years <- seq(year[1], year[2], 1)
-  #### 5. define variables
+
+  #### 7. Define variables
   variables_list <- as.vector(variables)
-  #### 7. initiate "..._curl_commands.txt"
-  commands_txt <- paste0(
-    directory_to_save,
-    "narr_",
-    year[1],
-    "_",
-    year[2],
-    "_curl_commands.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  #### 8. concatenate and print download commands to "..._curl_commands.txt"
+
+  #### 8. Collect all URLs and destination files
+  all_urls <- character()
+  all_destfiles <- character()
+
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
     folder <- paste0(directory_to_save, variable, "/")
-    # implement variable sorting function
+
+    # Implement variable sorting function
     base <- amadeus::narr_variable(variable)[[1]]
     months <- amadeus::narr_variable(variable)[[2]]
+
     if (!dir.exists(folder)) {
       dir.create(folder, recursive = TRUE)
     }
+
     for (y in seq_along(years)) {
       year_l <- years[y]
       for (m in seq_along(months)) {
@@ -1497,32 +1513,45 @@ download_narr <- function(
           months[m],
           ".nc"
         )
-        command <- paste0(
-          "curl -s -o ",
-          destfile,
-          " --url ",
-          url,
-          "\n"
-        )
+
+        # Only add if file doesn't exist or is 0 bytes
         if (amadeus::check_destfile(destfile)) {
-          #### cat command if file does not already exist or if local file size
-          #### is 0 bytes
-          cat(command)
+          all_urls <- c(all_urls, url)
+          all_destfiles <- c(all_destfiles, destfile)
         }
       }
     }
   }
-  #### 9. finish "..._curl_commands.txt"
-  sink()
-  #### 11. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
+
+  #### 9. Exit early if download=FALSE (deprecated behavior)
+  if (!isTRUE(download)) {
+    message(sprintf(
+      "Skipping download. Found %d files available for download.\n",
+      length(all_urls)
+    ))
+    return(invisible(list(
+      urls = all_urls,
+      destfiles = all_destfiles,
+      n_files = length(all_urls)
+    )))
+  }
+
+  #### 10. Download files using httr2
+  download_result <- amadeus::download_run_method(
+    urls = all_urls,
+    destfiles = all_destfiles,
+    token = NULL, # NARR doesn't use token authentication
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
   )
-  return(amadeus::download_hash(hash, directory_to_save))
+
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(download_result))
+  }
 }
-# nolint end: cyclocomp
 
 # nolint start
 #' Download land cover data
@@ -1673,39 +1702,24 @@ download_nlcd <- function(
   return(amadeus::download_hash(hash, directory_to_save))
 }
 
-# nolint start
 #' Download roads data
 #' @description
 #' The \code{download_groads()} function accesses and downloads
-#' roads data from [NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)](https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1).
-#' @param data_region character(1). Data can be downloaded for `"Global"`,
-#' `"Africa"`, `"Asia"`, `"Europe"`, `"Americas"`, `"Oceania East"`, and `"Oceania West"`.
-#' @param data_format character(1). Data can be downloaded as `"Shapefile"` or
-#' `"Geodatabase"`. (Only `"Geodatabase"` available for `"Global"` region).
-#' @param directory_to_save character(1). Directory to save data. Two
-#' sub-directories will be created for the downloaded zip files ("/zip_files")
-#' and the unzipped shapefiles ("/data_files").
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip files from directory_to_download.
-#' Default is \code{FALSE}.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' roads data from NASA's Global Roads Open Access Data Set (gROADS).
+#' @note gROADS data may require NASA EarthData authentication depending on access method.
+#' @param data_region character(1). Data region.
+#' @param data_format character(1). "Shapefile" or "Geodatabase".
+#' @param directory_to_save character(1). Directory to save data.
+#' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param unzip logical(1). Unzip zip files (default TRUE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @author Mitchell Manware, Insang Song
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Zip and/or data files will be downloaded and stored in
-#' respective sub-directories within \code{directory_to_save}.
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_ciesin2013groads}{amadeus}
@@ -1715,10 +1729,7 @@ download_nlcd <- function(
 #'   data_region = "Americas",
 #'   data_format = "Shapefile",
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE,
-#'   unzip = FALSE
+#'   acknowledgement = TRUE
 #' )
 #' }
 #' @export
@@ -1735,33 +1746,54 @@ download_groads <- function(
   data_format = c("Shapefile", "Geodatabase"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20
 ) {
-  # nolint end
-  #### 1. check for data download acknowledgement
+  #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### 2. check for null parameters
+
+  #### Check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
-  #### 3. directory setup
+
+  #### Directory setup
   directory_original <- amadeus::download_sanitize_path(directory_to_save)
   directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
-  #### 4. check if region is valid
+
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### Check if region is valid
   data_format <- match.arg(data_format)
   data_region <- match.arg(data_region)
-  #### 5. define URL base
+
+  #### Define URL base
   base <- paste0(
     "https://data.earthdata.nasa.gov/nasa-earth/",
     "human-dimensions/sedac-root/downloads/data/groads/",
     "groads-global-roads-open-access-v1/",
     "groads-v1-"
   )
-  #### 6. define data format
+
+  #### Define data format
   if (data_format == "Shapefile" && data_region == "Global") {
     message("Geodatabase format utilized for 'Global' dataset.\n")
     format <- "gdb"
@@ -1770,9 +1802,11 @@ download_groads <- function(
   } else if (data_format == "Geodatabase") {
     format <- "gdb"
   }
-  #### 7. coerce region to lower case
+
+  #### Coerce region to lower case
   region <- tolower(data_region)
-  #### 8. build download URL
+
+  #### Build download URL
   download_url <- paste0(
     base,
     gsub(" ", "-", region),
@@ -1780,7 +1814,8 @@ download_groads <- function(
     format,
     ".zip"
   )
-  #### 9. build download file name
+
+  #### Build download file name
   download_name <- paste0(
     directory_to_download,
     "groads_v1_",
@@ -1789,89 +1824,70 @@ download_groads <- function(
     format,
     ".zip"
   )
-  #### 10. build system command
-  download_command <- paste0(
-    "curl -n -c ~/.urs_cookies -b ~/.urs_cookies -LJ",
-    " -o ",
-    download_name,
-    " --url ",
-    download_url,
-    "\n"
-  )
-  #### 11. initiate "..._curl_commands.txt"
-  commands_txt <- paste0(
-    directory_original,
-    "sedac_groads_",
-    gsub(" ", "_", region),
-    "_",
-    Sys.Date(),
-    "_curl_command.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  if (amadeus::check_destfile(download_name)) {
-    #### 12. concatenate and print download command to "..._curl_commands.txt"
-    #### cat command if file does not already exist or is incomplete
-    cat(download_command)
+
+  #### Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message("Skipping download.\n")
+    return(invisible(list(
+      urls = download_url,
+      destfiles = download_name,
+      n_files = 1
+    )))
   }
-  #### 13. finish "..._curl_commands.txt" file
-  sink()
-  #### 15. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
-  )
-  #### 16. end if unzip == FALSE
+
+  #### Download file using httr2
+  if (amadeus::check_destfile(download_name)) {
+    download_result <- amadeus::download_run_method(
+      urls = download_url,
+      destfiles = download_name,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = 2
+    )
+  } else {
+    message("File already exists. Skipping download.\n")
+  }
+
+  #### Unzip
   amadeus::download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
-  #### 18. remove zip files
+
+  #### Remove zip files
   amadeus::download_remove_zips(
     remove = remove_zip,
     download_name = download_name
   )
-  return(amadeus::download_hash(hash, directory_to_save))
+
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(NULL))
+  }
 }
 
-# nolint start
 #' Download population density data
 #' @description
 #' The \code{download_population()} function accesses and downloads
-#' population density data from [NASA's UN WPP-Adjusted Population Density, v4.11](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11).
-#' @param data_resolution character(1). Available resolutions are 30 second
-#' (approx. 1 km), 2.5 minute (approx. 5 km), 15 minute (approx. 30 km),
-#' 30 minute (approx. 55 km), and 60 minute (approx. 110 km).
-#' @param data_format character(1). Individual year data can be downloaded as
-#' `"ASCII"` or `"GeoTIFF"`. "all" years is downloaded as `"netCDF"`.
-#' @param year character(1). Available years are `2000`, `2005`, `2010`, `2015`, and
-#' `2020`, or `"all"` for all years.
-#' @param directory_to_save character(1). Directory to save data. Two
-#' sub-directories will be created for the downloaded zip files ("/zip_files")
-#' and the unzipped shapefiles ("/data_files").
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip files from directory_to_download.
-#' Default is \code{FALSE}.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' population density data from NASA's UN WPP-Adjusted Population Density.
+#' @note Population data may require NASA EarthData authentication depending on access method.
+#' @param data_resolution character(1). Available resolutions.
+#' @param data_format character(1). "ASCII", "GeoTIFF", or "netCDF".
+#' @param year character(1). Available years or "all".
+#' @param directory_to_save character(1). Directory to save data.
+#' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param unzip logical(1). Unzip zip files (default TRUE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @author Mitchell Manware, Insang Song
-# nolint end
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Zip and/or data files will be downloaded and stored in
-#' respective sub-directories within \code{directory_to_save}.
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_ciesin2017gpwv4}{amadeus}
@@ -1882,10 +1898,7 @@ download_groads <- function(
 #'   data_format = "GeoTIFF",
 #'   year = "2020",
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE,
-#'   unzip = FALSE
+#'   acknowledgement = TRUE
 #' )
 #' }
 #' @export
@@ -1895,30 +1908,53 @@ download_population <- function(
   year = "2020",
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20
 ) {
-  #### 1. check for data download acknowledgement
+  #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### 2. check for null parameters
+
+  #### Check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
-  #### 3. directory setup
+
+  #### Directory setup
   directory_original <- amadeus::download_sanitize_path(directory_to_save)
   directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
-  #### 4. define URL base
+
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### Define URL base
   base <- paste0(
     "https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/"
   )
-  #### 5. define year
+
+  #### Define year
   year <- ifelse(year == "all", "totpop", as.character(year))
-  #### 6. define data resolution
+
+  #### Define data resolution
   resolution <- amadeus::process_sedac_codes(data_resolution)
-  #### 7. 30 second resolution not available for all years
+
+  #### 30 second resolution not available for all years
   if (year == "totpop" && resolution == "30_sec") {
     resolution <- "2pt5_min"
     message(paste0(
@@ -1928,7 +1964,8 @@ download_population <- function(
   }
 
   data_format <- match.arg(data_format)
-  #### 8. define data format
+
+  #### Define data format
   if (data_format == "GeoTIFF") {
     if (year != "totpop") {
       format <- "tif"
@@ -1939,8 +1976,7 @@ download_population <- function(
         "Data will be downloaded as netCDF.\n"
       ))
     }
-  }
-  if (data_format == "ASCII") {
+  } else if (data_format == "ASCII") {
     if (year != "totpop") {
       format <- "asc"
     } else {
@@ -1950,11 +1986,11 @@ download_population <- function(
         "Data will be downloaded as netCDF.\n"
       ))
     }
-  }
-  if (data_format == "netCDF") {
+  } else if (data_format == "netCDF") {
     format <- "nc"
   }
-  #### 9. build download URL
+
+  #### Build download URL
   download_url <- paste0(
     base,
     "gpw-v4-population-density-adjusted-to-2015-unwpp-",
@@ -1968,7 +2004,8 @@ download_population <- function(
     format,
     ".zip"
   )
-  #### 10. build download file name
+
+  #### Build download file name
   download_name <- paste0(
     directory_to_download,
     "gpw_v4_population_density_adjusted_to_2015_unwpp_",
@@ -1980,95 +2017,71 @@ download_population <- function(
     format,
     ".zip"
   )
-  #### 11. build system command
-  download_command <- paste0(
-    "curl -n -c ~/.urs_cookies -b ~/.urs_cookies -LJ",
-    " -o ",
-    download_name,
-    " --url ",
-    download_url,
-    "\n"
-  )
-  #### 12. initiate "..._curl_command.txt"
-  commands_txt <- paste0(
-    directory_original,
-    "sedac_population_",
-    year,
-    "_",
-    resolution,
-    "_",
-    Sys.Date(),
-    "_curl_commands.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  if (amadeus::check_destfile(download_name)) {
-    #### 13. concatenate and print download command to "..._curl_commands.txt"
-    #### cat command if file does not already exist or is incomplete
-    cat(download_command)
+
+  #### Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message("Skipping download.\n")
+    return(invisible(list(
+      urls = download_url,
+      destfiles = download_name,
+      n_files = 1
+    )))
   }
-  #### 14. finish "..._curl_commands.txt" file
-  sink()
-  #### 16. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
-  )
-  #### 17. end if unzip == FALSE
+
+  #### Download file using httr2
+  if (amadeus::check_destfile(download_name)) {
+    download_result <- amadeus::download_run_method(
+      urls = download_url,
+      destfiles = download_name,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = 2
+    )
+  } else {
+    message("File already exists. Skipping download.\n")
+  }
+
+  #### Unzip
   amadeus::download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
-  #### 19. remove zip files
+
+  #### Remove zip files
   amadeus::download_remove_zips(
     remove = remove_zip,
     download_name = download_name
   )
-  return(amadeus::download_hash(hash, directory_to_save))
+
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(NULL))
+  }
 }
 
-# nolint start
 #' Download wildfire smoke data
 #' @description
 #' The \code{download_hms()} function accesses and downloads
-#' wildfire smoke plume coverage data from [NOAA's Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#0).
+#' wildfire smoke plume coverage data from NOAA's Hazard Mapping System Fire and Smoke Product.
+#' @note HMS data does not require authentication.
 #' @param data_format character(1). "Shapefile" or "KML".
-#' @param date character(1 or 2). length of 10. Date or start/end dates for downloading data.
-#' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
-#' NOAA HMS data is available from August 5, 2005 through present day. Data is
-#' unavailable for August 10, 2005.
-#' @param directory_to_save character(1). Directory to save data. If
-#' `data_format = "Shapefile"`, two sub-directories will be created for the
-#' downloaded zip files ("/zip_files") and the unzipped shapefiles
-#' ("/data_files"). If `data_format = "KML"`, a single sub-directory
-#' ("/data_files") will be created.
-#' @param acknowledgement logical(1).
-#' By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}. (Ignored
-#' if \code{data_format = "KML"}.)
-#' @param remove_zip logical(1). Remove zip files from
-#' directory_to_download. Default is \code{FALSE}.
-#' (Ignored if \code{data_format = "KML"}.)
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
-#' @importFrom utils head
-#' @importFrom utils tail
+#' @param date character(1 or 2). Date range "YYYY-MM-DD" format
+#' @param directory_to_save character(1). Directory to save data.
+#' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param unzip logical(1). Unzip zip files (default TRUE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Zip and/or data files will be downloaded and stored in
-#' respective sub-directories within \code{directory_to_save}.
+#' @return invisible list with download results; or hash character if hash=TRUE
+#' @importFrom utils head tail
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{web_HMSabout}{amadeus}
@@ -2078,31 +2091,31 @@ download_population <- function(
 #'   data_format = "Shapefile",
 #'   date = "2024-01-01",
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE,
-#'   unzip = FALSE
+#'   acknowledgement = TRUE
 #' )
 #' }
 #' @export
-# nolint end
-# nolint start: cyclocomp
 download_hms <- function(
   data_format = "Shapefile",
   date = c("2018-01-01", "2018-01-01"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 ) {
-  #### 1. check for data download acknowledgement
+  #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### 2. check for null parameters
+
+  #### Check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
-  #### check dates
+
+  #### Check dates
   if (length(date) == 1) {
     date <- c(date, date)
   }
@@ -2111,41 +2124,54 @@ download_hms <- function(
   if (as.Date(date[1]) < as.Date("2005-08-05")) {
     stop("NOAA HMS wildfire smoke data begins at August 05, 2005.")
   }
-  #### 3. directory setup
+
+  #### Directory setup
   directory_original <- amadeus::download_sanitize_path(directory_to_save)
   directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
-  #### 4. check for unzip == FALSE && remove_zip == TRUE
+
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### Check for unzip/remove_zip conflict
   if (unzip == FALSE && remove_zip == TRUE) {
     stop(paste0(
       "Arguments unzip = FALSE and remove_zip = TRUE are not ",
       "acceptable together. Please change one.\n"
     ))
   }
-  #### 5. define date sequence
+
+  #### Define date sequence
   date_sequence <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = TRUE
   )
-  #### 6. define URL base
+
+  #### Define URL base
   base <- "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/"
-  #### 7. initiate "..._curl_commands.txt"
-  commands_txt <- paste0(
-    directory_original,
-    "hms_smoke_",
-    utils::head(date_sequence, n = 1),
-    "_",
-    utils::tail(date_sequence, n = 1),
-    "_curl_commands.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  #### 8. concatenate and print download commands to "..._curl_commands.txt"
-  download_names <- NULL
+
+  #### Collect all URLs and destination files
+  all_urls <- character()
+  all_destfiles <- character()
+
   for (f in seq_along(date_sequence)) {
     year <- substr(date_sequence[f], 1, 4)
     month <- substr(date_sequence[f], 5, 6)
+
     if (tolower(data_format) == "shapefile") {
       data_format <- "Shapefile"
       suffix <- ".zip"
@@ -2155,6 +2181,7 @@ download_hms <- function(
       suffix <- ".kml"
       directory_to_cat <- directory_to_save
     }
+
     url <- paste0(
       base,
       data_format,
@@ -2166,16 +2193,17 @@ download_hms <- function(
       date_sequence[f],
       suffix
     )
+
+    # Validate first URL only
     if (f == 1) {
-      if (!(amadeus::check_url_status(url))) {
-        sink()
-        file.remove(commands_txt)
+      if (!amadeus::check_url_status(url)) {
         stop(paste0(
           "Invalid date returns HTTP code 404. ",
           "Check `date` parameter.\n"
         ))
       }
     }
+
     destfile <- paste0(
       directory_to_cat,
       "hms_smoke_",
@@ -2184,91 +2212,90 @@ download_hms <- function(
       date_sequence[f],
       suffix
     )
-    download_names <- c(download_names, destfile)
-    command <- paste0(
-      "curl -s -o ",
-      destfile,
-      " --url ",
-      url,
-      "\n"
-    )
+
     if (amadeus::check_destfile(destfile)) {
-      #### cat command only if file does not already exist
-      cat(command)
+      all_urls <- c(all_urls, url)
+      all_destfiles <- c(all_destfiles, destfile)
     }
   }
-  #### 9. finish "..._curl_commands.txt"
-  sink()
-  #### 11. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
+
+  #### Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message(sprintf(
+      "Skipping download. Found %d files available for download.\n",
+      length(all_urls)
+    ))
+    return(invisible(list(
+      urls = all_urls,
+      destfiles = all_destfiles,
+      n_files = length(all_urls)
+    )))
+  }
+
+  #### Download files using httr2
+  download_result <- amadeus::download_run_method(
+    urls = all_urls,
+    destfiles = all_destfiles,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
   )
-  #### 13. end if data_format == "KML"
+
+  #### Handle KML (no unzipping needed)
   if (data_format == "KML") {
     unlink(directory_to_download, recursive = TRUE)
-    message(paste0("KML files cannot be unzipped.\n"))
-    return(TRUE)
+    message("KML files cannot be unzipped.\n")
+    if (hash) {
+      return(amadeus::download_hash(hash = TRUE, directory_to_save))
+    } else {
+      return(invisible(download_result))
+    }
   }
-  #### 14. unzip downloaded zip files
-  for (d in seq_along(download_names)) {
+
+  #### Unzip downloaded zip files
+  for (d in seq_along(all_destfiles)) {
     amadeus::download_unzip(
-      file_name = download_names[d],
+      file_name = all_destfiles[d],
       directory_to_unzip = directory_to_save,
       unzip = unzip
     )
   }
-  #### 15. remove zip files
+
+  #### Remove zip files
   amadeus::download_remove_zips(
     remove = remove_zip,
-    download_name = download_names
+    download_name = all_destfiles
   )
-  return(amadeus::download_hash(hash, directory_to_save))
-}
-# nolint end: cyclocomp
 
-# nolint start
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(download_result))
+  }
+}
+
 #' Download climate classification data
 #' @description
 #' The \code{download_koppen_geiger()} function accesses and downloads
-#' climate classification data from the \emph{Present and future
-#' Köppen-Geiger climate classification maps at
-#' 1-km resolution}([link for article](https://www.nature.com/articles/sdata2018214); [link for data](https://figshare.com/articles/dataset/Present_and_future_K_ppen-Geiger_climate_classification_maps_at_1-km_resolution/6396959/2)).
-#' @param data_resolution character(1). Available resolutions are `"0.0083"`
-#' degrees (approx. 1 km), `"0.083"` degrees (approx. 10 km), and
-#' `"0.5"` degrees (approx. 50 km).
-#' @param time_period character(1). Available times are `"Present"` (1980-2016)
-#' and `"Future"` (2071-2100). ("Future" classifications are based on scenario
-#' RCP8.5).
-#' @param directory_to_save character(1). Directory to save data. Two
-#' sub-directories will be created for the downloaded zip files ("/zip_files")
-#' and the unzipped shapefiles ("/data_files").
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param unzip logical(1). Unzip zip files. Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip files from directory_to_download.
-#' Default is \code{FALSE}.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' climate classification data.
+#' @note Köppen-Geiger data does not require authentication.
+#' @param data_resolution character(1). Available resolutions.
+#' @param time_period character(1). "Present" (1980-2016) or "Future" (2071-2100).
+#' @param directory_to_save character(1). Directory to save data.
+#' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param unzip logical(1). Unzip zip files (default TRUE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @author Mitchell Manware, Insang Song
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Zip and/or data files will be downloaded and stored in
-#' respective sub-directories within \code{directory_to_save}.
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{article_beck2023koppen}{amadeus}
-#'
 #' \insertRef{article_beck2018present}{amadeus}
 #' @examples
 #' \dontrun{
@@ -2276,48 +2303,69 @@ download_hms <- function(
 #'   data_resolution = "0.0083",
 #'   time_period = "Present",
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE,
-#'   unzip = FALSE
+#'   acknowledgement = TRUE
 #' )
 #' }
-# nolint end
 #' @export
 download_koppen_geiger <- function(
   data_resolution = c("0.0083", "0.083", "0.5"),
   time_period = c("Present", "Future"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20
 ) {
-  #### 1. check for data download acknowledgement
+  #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### 2. check for null parameters
+
+  #### Check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
-  #### 3. directory setup
+
+  #### Directory setup
   directory_original <- amadeus::download_sanitize_path(directory_to_save)
   directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
-  #### 4. check for data resolution
+
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### Check for data resolution
   data_resolution <- match.arg(data_resolution)
-  #### 5. check for valid time period
+
+  #### Check for valid time period
   time_period <- match.arg(time_period)
-  #### 6. define time period
+
+  #### Define time period
   period <- tolower(time_period)
-  #### 7. define data resolution
+
+  #### Define data resolution
   data_resolution <- gsub("\\.", "p", data_resolution)
-  #### 8 define download URL
+
+  #### Define download URL
   download_url <- paste0(
     "https://s3-eu-west-1.amazonaws.com/",
     "pfigshare-u-files/12407516/Beck_KG_V1.zip"
   )
-  #### 9 build download file name
+
+  #### Build download file name
   download_name <- paste0(
     directory_to_download,
     "koppen_geiger_",
@@ -2326,154 +2374,136 @@ download_koppen_geiger <- function(
     data_resolution,
     ".zip"
   )
-  #### 10. build download command
-  download_command <- paste0(
-    "wget ",
-    download_url,
-    " -O ",
-    download_name,
-    "\n"
-  )
-  #### 11. initiate "..._wget_commands.txt"
-  commands_txt <- paste0(
-    directory_original,
-    "koppen_geiger_",
-    time_period,
-    "_",
-    data_resolution,
-    "_",
-    Sys.Date(),
-    "_wget_command.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  if (amadeus::check_destfile(download_name)) {
-    #### 12. concatenate and print download command to "..._wget_commands.txt"
-    #### cat command if file does not already exist or is incomplete
-    cat(download_command)
+
+  #### Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message("Skipping download.\n")
+    return(invisible(list(
+      urls = download_url,
+      destfiles = download_name,
+      n_files = 1
+    )))
   }
-  sink()
-  #### 15. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
-  )
-  #### 18. end if unzip == FALSE
+
+  #### Download file using httr2
+  if (amadeus::check_destfile(download_name)) {
+    download_result <- amadeus::download_run_method(
+      urls = download_url,
+      destfiles = download_name,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = 2
+    )
+  } else {
+    message("File already exists. Skipping download.\n")
+  }
+
+  #### Unzip
   amadeus::download_unzip(
     file_name = download_name,
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
 
-  #### 19. remove zip files
+  #### Remove zip files
   amadeus::download_remove_zips(
     remove = remove_zip,
     download_name = download_name
   )
-  return(amadeus::download_hash(hash, directory_to_save))
+
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(NULL))
+  }
 }
-
-
 #' Download MODIS product files
-# nolint start
-#' @description Need maintenance for the directory path change
-#' in NASA EOSDIS. This function first retrieves the all hdf download links
-#' on a certain day, then only selects the relevant tiles from the retrieved
-#' links. Download is only done at the queried horizontal-vertical tile number
-#' combinations. An exception is MOD06_L2 product, which is produced
-#' every five minutes every day.
-#' @note Due to NASA data access policies, the download scripts generated by this function
-#' require a valid NASA Earthdata token for authentication and include options to slow down the
-#' download speed to avoid server overload and potential blocking of access.
+#' @description Downloads MODIS data using httr2 with robust retry logic and
+#' rate limiting. This function queries NASA's CMR API for available granules
+#' and downloads relevant tiles based on the specified extent.
+#' @note Due to NASA data access policies, downloads require a valid NASA
+#' Earthdata token for authentication. For security, it's recommended to store
+#' your token in an environment variable or file rather than in your code.
+#' Use \code{setup_nasa_token()} for easy, secure token setup.
 #' @note Both dates in \code{date} should be in the same year.
-#'  Directory structure looks like
-#'  input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
-#' @param product character(1).
-#' One of `c("MOD09GA", "MOD11A1", "MOD06_L2", "MCD19A2", "MOD13A2", "VNP46A2")`
+#'  Directory structure: input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
+#' @param product character(1). MODIS product code
 #' @param version character(1). Default is `"061"`, meaning v061.
-#' @param nasa_earth_data_token character(1).
-#'  Token for downloading data from NASA. Should be set before
-#'  trying running the function.
-#' @param date character(1 or 2). length of 10. Date or start/end dates for downloading data.
-#' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`). Note: ignored if
-#' \code{product == "MOD06_L2"}.
-#' @param extent numeric(4). Bounding box for downloading data.
-#' Format is `c(min_lon, max_lon, min_lat, max_lat)`.
-#' Default is `c(-125, 22, -64, 50)`, approximately covering the
-#' continental United States.
+#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData authentication token.
+#'   For security, recommended options (in priority order):
+#'   \itemize{
+#'     \item NULL (default): Reads from NASA_EARTHDATA_TOKEN environment variable
+#'     \item File path: e.g., "~/.nasa_earthdata_token"
+#'     \item Token string: Direct token (not recommended for scripts)
+#'   }
+#'   Use \code{setup_nasa_token()} for interactive setup.
+#' @param date character(1 or 2). Date range "YYYY-MM-DD" format
+#' @param extent numeric(4). Bounding box `c(min_lon, max_lon, min_lat, max_lat)`.
+#' Default covers continental US: `c(-125, 22, -64, 50)`.
 #' @param directory_to_save character(1). Directory to save data.
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). Download data or only save wget commands.
-#' @param remove_command logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with download
+#' @param download logical(1). DEPRECATED. Downloads now happen automatically.
+#'   Set to FALSE to skip downloading (generates file list only).
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum download retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song
-#' @import rvest
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * HDF (.hdf) files will be stored in year/day_of_year sub-directories within
-#' \code{directory_to_save}.
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_mcd19a22021}{amadeus}
-#'
 #' \insertRef{data_mod06l2_2017}{amadeus}
-#'
 #' \insertRef{data_mod09ga2021}{amadeus}
-#'
 #' \insertRef{data_mod11a12021}{amadeus}
-#'
 #' \insertRef{data_mod13a22021}{amadeus}
-#'
 #' \insertRef{article_roman2018vnp46}{amadeus}
 #' @examples
 #' \dontrun{
-#' ## NOTE: Examples are wrapped in `/dontrun{}` to avoid sharing sensitive
-#' ##       NASA EarthData tokden information.
-#' vec_extent <- c(-80, 35, -75, 40)
-#' # example with MOD09GA product
+#' # RECOMMENDED: Set up token once (persists across sessions)
+#' setup_nasa_token()
+#'
+#' # Then download without specifying token
 #' download_modis(
 #'   product = "MOD09GA",
 #'   version = "061",
 #'   date = "2024-01-01",
-#'   extent = vec_extent,
-#'   nasa_earth_data_token = "./pathtotoken/token.txt",
+#'   extent = c(-80, 35, -75, 40),
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE
+#'   acknowledgement = TRUE
 #' )
-#' # example with MOD06_L2 product
+#'
+#' # ALTERNATIVE: Token from file
 #' download_modis(
-#'   product = "MOD06_L2",
-#'   version = "6.1",
-#'   extent = vec_extent,
+#'   product = "MOD09GA",
+#'   version = "061",
 #'   date = "2024-01-01",
-#'   nasa_earth_data_token = "./pathtotoken/token.txt",
+#'   extent = c(-80, 35, -75, 40),
+#'   nasa_earth_data_token = "~/.nasa_earthdata_token",
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE
+#'   acknowledgement = TRUE
 #' )
-#' # example with VNP46A2 product
+#'
+#' # ALTERNATIVE: Set token for current session
+#' Sys.setenv(NASA_EARTHDATA_TOKEN = "your_token_here")
 #' download_modis(
-#'   product = "VNP46A2",
-#'   version = "5200",
+#'   product = "MOD09GA",
 #'   date = "2024-01-01",
-#'   extent = vec_extent,
-#'   nasa_earth_data_token = "./pathtotoken/token.txt",
+#'   acknowledgement = TRUE
+#' )
+#'
+#' # Date range
+#' download_modis(
+#'   product = "MOD09GA",
+#'   version = "061",
+#'   date = c("2024-01-01", "2024-01-07"),
+#'   extent = c(-80, 35, -75, 40),
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE
+#'   acknowledgement = TRUE
 #' )
 #' }
-# nolint end
 #' @export
 download_modis <- function(
   product = c(
@@ -2507,27 +2537,34 @@ download_modis <- function(
   extent = c(-125, 22, -64, 50),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 ) {
-  #### 1. check for data download acknowledgement
+  #### 1. Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### 2. directory setup
+
+  #### 2. Directory setup
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-  #### check dates
+
+  #### 3. Check dates
   if (length(date) == 1) {
     date <- c(date, date)
   }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
 
-  #### 3. check for NASA earth data token
-  if (is.null(nasa_earth_data_token)) {
-    stop("Please provide NASA EarthData Login token.\n")
-  }
-  #### 4. check for product
+  #### 4. Check and retrieve NASA token (REQUIRED for MODIS)
+  nasa_earth_data_token <- amadeus::get_token(
+    token = nasa_earth_data_token,
+    env_var = "NASA_EARTHDATA_TOKEN"
+  )
+
+  #### 5. Check product
   product <- match.arg(product)
 
   if (substr(date[1], 1, 4) != substr(date[2], 1, 4)) {
@@ -2536,28 +2573,45 @@ download_modis <- function(
     }
   }
 
-  #### 5. check for version -- may not be necessary in 1.3.2+
+  #### 6. Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return after querying available files.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### 7. Check version
   if (is.null(version)) {
     stop("Please select a data version.\n")
   }
 
-  #### 9. define date sequence
+  #### 8. Date sequence
   date_sequence <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = FALSE
   )
 
-  #### 10. warning message for excessive query (CMR limit)
+  #### 9. Warning for excessive query
   dt_date <- as.Date(date)
   if (diff(dt_date) > 31) {
     warning(
-      "Date range is greater than 31 days.",
-      "The results may not include all dates in the range."
+      "Date range is greater than 31 days. ",
+      "The results may not include all dates in the range.",
+      call. = FALSE
     )
   }
 
-  #### 11. version fix
+  #### 10. Version fix
   if (product == "MOD06_L2") {
     str_version <- "6.1"
   } else if (product == "VNP46A2") {
@@ -2566,7 +2620,8 @@ download_modis <- function(
     str_version <- version
   }
 
-  #### 12. Query CMR
+  #### 11. Query CMR
+  message("Querying NASA CMR for available granules...\n")
   chr_extent <- paste(extent, collapse = ",")
   resp <-
     httr2::request(
@@ -2582,130 +2637,95 @@ download_modis <- function(
     httr2::req_perform()
   granules <- resp |> httr2::resp_body_json()
 
-  # Extract data URLs
+  # Extract data URLs (HDF files only)
   urls <- sapply(granules$feed$entry, function(g) {
     links <- g$links
-    data_link <- Filter(function(l) grepl("data#", l$rel), links)
-    if (length(data_link) > 0) data_link[[1]]$href else NA
+    # Filter for data links only (exclude metadata, browse images, etc.)
+    data_links <- Filter(
+      function(l) {
+        grepl("data#", l$rel) && grepl("\\.hdf$", l$href, ignore.case = TRUE)
+      },
+      links
+    )
+    if (length(data_links) > 0) data_links[[1]]$href else NA
   })
   urls <- urls[!is.na(urls)]
 
+  if (length(urls) == 0) {
+    stop("No granules found for the specified query parameters.\n")
+  }
+
+  #### 12. Filter by date range
   list_available_d <- stringi::stri_extract(urls, regex = "A2[0-9]{6,6}")
   list_available_d <- unique(gsub("A", "", list_available_d))
-
-  # remove NAs
-  # 13. Queried year's available days
   date_sequence <- list_available_d[!is.na(list_available_d)]
   date_sequence_i <- as.integer(date_sequence)
-  # Queried dates to integer range
+
   date_start_i <- as.integer(strftime(date[1], "%Y%j"))
   date_end_i <- as.integer(strftime(date[2], "%Y%j"))
   date_range_julian <- seq(date_start_i, date_end_i)
   date_sequence_in <- (date_sequence_i %in% date_range_julian)
 
   message(sprintf(
-    "%d / %d days of data available in the queried dates.\n",
+    "Found %d / %d days of data in the queried date range.\n",
     sum(date_sequence_in),
     length(date_range_julian)
   ))
+
   date_sequence <- date_sequence[date_sequence_in]
 
-  #### 14. initiate "..._wget_commands.txt" file
-  commands_txt <- paste0(
-    directory_to_save,
-    product,
-    "_",
-    date[1],
-    "_",
-    date[2],
-    "_wget_commands.txt"
+  #### 13. Prepare download paths
+  download_names <- basename(urls)
+  destfiles <- paste0(directory_to_save, download_names)
+
+  #### 14. Exit early if download=FALSE (deprecated behavior)
+  if (!isTRUE(download)) {
+    message(sprintf(
+      "Skipping download. Found %d files available for download.\n",
+      length(urls)
+    ))
+    return(invisible(list(
+      urls = urls,
+      destfiles = destfiles,
+      n_files = length(urls)
+    )))
+  }
+
+  #### 15. Download files using httr2
+  download_result <- amadeus::download_run_method(
+    urls = urls,
+    destfiles = destfiles,
+    token = nasa_earth_data_token,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
   )
 
-  # avoid any possible errors by removing existing command files
-  amadeus::download_sink(commands_txt)
-  #### 15. append download commands to text file
-  download_name <- basename(urls)
-  # Main wget run
-  download_command <- paste0(
-    "wget ",
-    "-e robots=off -np -R .html,.tmp ",
-    "-nH --cut-dirs=3 ",
-    "--continue ",
-    "--tries=20 ",
-    "--retry-connrefused ",
-    "--waitretry=30 ",
-    "--timeout=60 ",
-    "--retry-on-http-error=500,502,503,504 ",
-    "--limit-rate=10M ",
-    "--random-wait ",
-    "--wait=2 ",
-    "--no-clobber ",
-    "--keep-session-cookies ",
-    "--header='Authorization: Bearer ",
-    nasa_earth_data_token,
-    "' ",
-    "'",
-    urls,
-    # filelist_sub,
-    "' ",
-    "-O '",
-    directory_to_save,
-    # dir_substr,
-    download_name,
-    "'",
-    "\n"
-  )
+  message("Download process complete.\n")
 
-  #### filter commands to non-existing files
-  download_command <- download_command[
-    which(
-      !file.exists(paste0(directory_to_save, download_name)) |
-        file.size(paste0(directory_to_save, download_name)) == 0
-    )
-  ]
-
-  #### 16. concatenate and print download commands to "..._wget_commands.txt"
-  #### cat command only if file does not already exist
-  cat(download_command)
-
-  #### 17. finish "..._wget_commands.txt"
-  sink(file = NULL)
-
-  #### 18.
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
-  )
-  message("Requests were processed.\n")
-  return(amadeus::download_hash(hash, directory_to_save))
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(download_result))
+  }
 }
 
 
-# nolint start
 #' Download toxic release data
 #' @description
-#' The \code{download_tri()} function accesses and downloads toxic release data from the [U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-action-0).
-#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
-# nolint end
+#' The \code{download_tri()} function accesses and downloads toxic release data from the U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program.
+#' @note TRI data does not require authentication.
+#' @param year integer(1 or 2). Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory to download files.
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mariana Kassien, Insang Song
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Comma-separated value (CSV) files will be stored in
-#' \code{directory_to_save}.
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{web_usepa2024tri}{amadeus}
@@ -2714,9 +2734,7 @@ download_modis <- function(
 #' download_tri(
 #'   year = 2021L,
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE
+#'   acknowledgement = TRUE
 #' )
 #' }
 #' @export
@@ -2724,73 +2742,91 @@ download_tri <- function(
   year = c(2018L, 2022L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 ) {
-  #### 1. check for data download acknowledgement
+  #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### 2. directory setup
+
+  #### Directory setup
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-  #### check years
+
+  #### Check years
   if (length(year) == 1) {
     year <- c(year, year)
   }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
-  #### 3. define measurement data paths
-  url_download <-
-    "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/"
+
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return after discovering files.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### Define measurement data paths
+  url_download <- "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/"
   year_sequence <- seq(year[1], year[2], 1)
   download_urls <- sprintf(
     paste(url_download, "%.0f", "_US/csv", sep = ""),
     year_sequence
   )
-  download_names <-
-    sprintf(paste0(directory_to_save, "tri_raw_%.0f.csv"), year_sequence)
+  download_names <- sprintf(
+    paste0(directory_to_save, "tri_raw_%.0f.csv"),
+    year_sequence
+  )
 
-  #### 4. build download command
-  download_commands <- paste0(
-    "curl -L ",
-    download_urls,
-    " --output ",
-    download_names,
-    "\n"
+  #### Filter to files that need downloading
+  needs_download <- sapply(download_names, amadeus::check_destfile)
+  download_urls_filtered <- download_urls[needs_download]
+  download_names_filtered <- download_names[needs_download]
+
+  #### Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message(sprintf(
+      "Skipping download. Found %d files available for download.\n",
+      length(download_urls_filtered)
+    ))
+    return(invisible(list(
+      urls = download_urls_filtered,
+      destfiles = download_names_filtered,
+      n_files = length(download_urls_filtered)
+    )))
+  }
+
+  #### Download files using httr2
+  download_result <- amadeus::download_run_method(
+    urls = download_urls_filtered,
+    destfiles = download_names_filtered,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
   )
-  #### filter commands to non-existing files
-  download_commands <- download_commands[
-    which(
-      !file.exists(download_names) | file.size(download_names) == 0
-    )
-  ]
-  #### 5. initiate "..._curl_commands.txt"
-  commands_txt <- paste0(
-    directory_to_save,
-    "TRI_",
-    year[1],
-    "_",
-    year[2],
-    "_",
-    Sys.Date(),
-    "_curl_commands.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  #### 6. concatenate and print download commands to "..._curl_commands.txt"
-  writeLines(download_commands)
-  #### 7. finish "..._curl_commands.txt" file
-  sink()
-  #### 9. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
-  )
+
   message("Requests were processed.\n")
-  return(amadeus::download_hash(hash, directory_to_save))
+
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(download_result))
+  }
 }
-
-
 # nolint start
 #' Download road emissions data
 #' @description
@@ -2946,120 +2982,122 @@ download_nei <- function(
   return(amadeus::download_hash(hash, directory_to_save))
 }
 
-# nolint start
+
 #' Download gridMET data
 #' @description
-#' The \code{download_gridmet} function accesses and downloads gridded surface meteorological data from the [University of California Merced Climatology Lab's gridMET dataset](https://www.climatologylab.org/gridmet.html).
-#' @param variables character(1). Variable(s) name(s). See [gridMET Generate Wget File](https://www.climatologylab.org/wget-gridmet.html)
-#' for variable names and acronym codes. (Note: variable "Burning Index" has code "bi" and variable
-#' "Energy Release Component" has code "erc").
-#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
-#' @param directory_to_save character(1). Directory(s) to save downloaded data
-#' files.
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' The \code{download_gridmet} function accesses and downloads gridded surface meteorological data from the University of California Merced Climatology Lab's gridMET dataset.
+#' @note gridMET data does not require authentication.
+#' @param variables character. Variable(s) name(s).
+#' @param year integer(1 or 2). Year or start/end years for downloading data.
+#' @param directory_to_save character(1). Directory to save data.
+#' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * netCDF (.nc) files will be stored in a variable-specific
-#' folder within \code{directory_to_save}.
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{article_abatzoglou2013development}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_gridmet(
-#'   variables = "Precipitation",
+#'   variables = "pr",
 #'   year = 2023,
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE
+#'   acknowledgement = TRUE
 #' )
 #' }
 #' @export
-# nolint end
 download_gridmet <- function(
   variables = NULL,
   year = c(2018, 2022),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 ) {
-  #### check for data download acknowledgement
+  #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### check for null parameters
+
+  #### Check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
-  #### check years
+
+  #### Check years
   if (length(year) == 1) {
     year <- c(year, year)
   }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
-  #### directory setup
+
+  #### Directory setup
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-  #### define years sequence
-  if (any(nchar(year[1]) != 4, nchar(year[1]) != 4)) {
+
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return after discovering files.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### Define years sequence
+  if (any(nchar(year[1]) != 4, nchar(year[2]) != 4)) {
     stop("years should be 4-digit integers.\n")
   }
   years <- seq(year[1], year[2], 1)
-  #### define variables
+
+  #### Define variables
   variables_list <- amadeus::process_variable_codes(
     variables = variables,
     source = "gridmet"
   )
-  #### define URL base
+
+  #### Define URL base
   base <- "https://www.northwestknowledge.net/metdata/data/"
-  #### initiate "..._curl_commands.txt"
-  commands_txt <- paste0(
-    directory_to_save,
-    "gridmet_",
-    year[1],
-    "_",
-    year[2],
-    "_curl_commands.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  #### concatenate and print download commands to "..._curl_commands.txt"
+
+  #### Collect all URLs and destination files
+  all_urls <- character()
+  all_destfiles <- character()
+
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
     folder <- paste0(directory_to_save, variable, "/")
-    if (!(file.exists(folder))) {
-      dir.create(folder)
+
+    if (!dir.exists(folder)) {
+      dir.create(folder, recursive = TRUE)
     }
+
     for (y in seq_along(years)) {
       year_l <- years[y]
-      url <- paste0(
-        base,
-        variable,
-        "_",
-        year_l,
-        ".nc"
-      )
-      if (y == 1) {
-        if (!(amadeus::check_url_status(url))) {
-          sink()
-          file.remove(commands_txt)
+      url <- paste0(base, variable, "_", year_l, ".nc")
+
+      # Validate first URL only
+      if (v == 1 && y == 1) {
+        if (!amadeus::check_url_status(url)) {
           stop(paste0(
             "Invalid year returns HTTP code 404. ",
             "Check `year` parameter.\n"
           ))
         }
       }
+
       destfile <- paste0(
         directory_to_save,
         variable,
@@ -3069,144 +3107,159 @@ download_gridmet <- function(
         year_l,
         ".nc"
       )
-      command <- paste0(
-        "curl -s -o ",
-        destfile,
-        " --url ",
-        url,
-        "\n"
-      )
+
       if (amadeus::check_destfile(destfile)) {
-        #### cat command only if file does not already exist
-        cat(command)
+        all_urls <- c(all_urls, url)
+        all_destfiles <- c(all_destfiles, destfile)
       }
     }
   }
-  #### finish "..._curl_commands.txt"
-  sink()
-  #### download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
+
+  #### Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message(sprintf(
+      "Skipping download. Found %d files available for download.\n",
+      length(all_urls)
+    ))
+    return(invisible(list(
+      urls = all_urls,
+      destfiles = all_destfiles,
+      n_files = length(all_urls)
+    )))
+  }
+
+  #### Download files using httr2
+  download_result <- amadeus::download_run_method(
+    urls = all_urls,
+    destfiles = all_destfiles,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
   )
-  return(amadeus::download_hash(hash, directory_to_save))
+
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(download_result))
+  }
 }
 
-# nolint start
 #' Download TerraClimate data
 #' @description
-#' The \code{download_terraclimate} function accesses and downloads climate and water balance data from the [University of California Merced Climatology Lab's TerraClimate dataset](https://www.climatologylab.org/terraclimate.html).
-#' @param variables character(1). Variable(s) name(s). See [TerraClimate Direct Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
-#' for variable names and acronym codes.
-#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
-#' @param directory_to_save character(1). Directory(s) to save downloaded data
-#' files.
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' The \code{download_terraclimate} function accesses and downloads climate and water balance data from the University of California Merced Climatology Lab's TerraClimate dataset.
+#' @note TerraClimate data does not require authentication.
+#' @param variables character. Variable(s) name(s).
+#' @param year integer(1 or 2). Year or start/end years for downloading data.
+#' @param directory_to_save character(1). Directory to save data.
+#' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * netCDF (.nc) files will be stored in a variable-specific
-#' folder within \code{directory_to_save}.
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{article_abatzoglou2018terraclimate}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_terraclimate(
-#'   variables = "Precipitation",
+#'   variables = "ppt",
 #'   year = 2023,
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE
+#'   acknowledgement = TRUE
 #' )
 #' }
 #' @export
-# nolint end
 download_terraclimate <- function(
   variables = NULL,
   year = c(2018, 2022),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 ) {
-  #### check for data download acknowledgement
+  #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### check for null parameters
+
+  #### Check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
-  #### check years
+
+  #### Check years
   if (length(year) == 1) {
     year <- c(year, year)
   }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
-  #### directory setup
+
+  #### Directory setup
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-  #### define years sequence
+
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return after discovering files.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### Define years sequence
   if (any(nchar(year[1]) != 4, nchar(year[2]) != 4)) {
     stop("years should be 4-digit integers.\n")
   }
   years <- seq(year[1], year[2], 1)
-  #### define variables
+
+  #### Define variables
   variables_list <- amadeus::process_variable_codes(
     variables = variables,
     source = "terraclimate"
   )
-  #### define URL base
-  base <-
-    "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_"
-  #### 7. initiate "..._curl_commands.txt"
-  commands_txt <- paste0(
-    directory_to_save,
-    "terraclimate_",
-    year[1],
-    "_",
-    year[2],
-    "_curl_commands.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  #### concatenate and print download commands to "..._curl_commands.txt"
+
+  #### Define URL base
+  base <- "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_"
+
+  #### Collect all URLs and destination files
+  all_urls <- character()
+  all_destfiles <- character()
+
   for (v in seq_along(variables_list)) {
     variable <- variables_list[v]
     folder <- paste0(directory_to_save, variable, "/")
-    if (!(file.exists(folder))) {
-      dir.create(folder)
+
+    if (!dir.exists(folder)) {
+      dir.create(folder, recursive = TRUE)
     }
+
     for (y in seq_along(years)) {
       year_l <- years[y]
-      url <- paste0(
-        base,
-        variable,
-        "_",
-        year_l,
-        ".nc"
-      )
-      if (y == 1) {
-        if (!(amadeus::check_url_status(url))) {
-          sink()
-          file.remove(commands_txt)
+      url <- paste0(base, variable, "_", year_l, ".nc")
+
+      # Validate first URL only
+      if (v == 1 && y == 1) {
+        if (!amadeus::check_url_status(url)) {
           stop(paste0(
             "Invalid year returns HTTP code 404. ",
             "Check `year` parameter.\n"
           ))
         }
       }
+
       destfile <- paste0(
         directory_to_save,
         variable,
@@ -3216,28 +3269,42 @@ download_terraclimate <- function(
         year_l,
         ".nc"
       )
-      command <- paste0(
-        "curl -s -o ",
-        destfile,
-        " --url ",
-        url,
-        "\n"
-      )
+
       if (amadeus::check_destfile(destfile)) {
-        #### cat command only if file does not already exist
-        cat(command)
+        all_urls <- c(all_urls, url)
+        all_destfiles <- c(all_destfiles, destfile)
       }
     }
   }
-  #### finish "..._curl_commands.txt"
-  sink()
-  #### download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
+
+  #### Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message(sprintf(
+      "Skipping download. Found %d files available for download.\n",
+      length(all_urls)
+    ))
+    return(invisible(list(
+      urls = all_urls,
+      destfiles = all_destfiles,
+      n_files = length(all_urls)
+    )))
+  }
+
+  #### Download files using httr2
+  download_result <- amadeus::download_run_method(
+    urls = all_urls,
+    destfiles = all_destfiles,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
   )
-  return(amadeus::download_hash(hash, directory_to_save))
+
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(download_result))
+  }
 }
 
 # nolint start
@@ -4158,4 +4225,3 @@ download_cropscape <- function(
   message("Requests were processed.\n")
   return(amadeus::download_hash(hash, directory_to_save))
 }
-# nolint end

@@ -82,3 +82,4 @@ tests/testthat/test-dev.R
 README_files/
 
 tutorials/
+inst/migration-to-httr-guide.R

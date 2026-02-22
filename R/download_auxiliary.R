@@ -92,16 +92,279 @@ download_permit <-
     }
   }
 
-
-#' Run download commands
+#' Get authentication token from various sources
 #' @description
+#' Retrieves authentication token from environment variable, file, or direct input.
+#' Priority order: 1) Environment variable, 2) File path, 3) Direct token string.
+#' This function helps prevent accidental token exposure in code or logs.
+#' @param token character(1) or NULL. Can be:
+#'   - NULL: reads from environment variable (recommended)
+#'   - File path: reads token from file
+#'   - Token string: uses directly (not recommended for scripts)
+#' @param env_var character(1). Name of environment variable containing token.
+#'   Default is "NASA_EARTHDATA_TOKEN"
+#' @return character(1). The authentication token
+#' @keywords internal
+#' @export
+get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
+  # Priority 1: Check environment variable
+  token_env <- Sys.getenv(env_var, unset = NA)
+  if (!is.na(token_env) && nzchar(token_env)) {
+    message(sprintf("Using token from environment variable: %s\n", env_var))
+    return(trimws(token_env))
+  }
+
+  # Priority 2: If token provided, check if it's a file path
+  if (!is.null(token)) {
+    if (length(token) == 1 && file.exists(token)) {
+      message(sprintf("Reading token from file: %s\n", token))
+      token_file <- trimws(readLines(token, n = 1, warn = FALSE))
+      if (length(token_file) == 0 || !nzchar(token_file)) {
+        stop(sprintf("Token file '%s' is empty.\n", token))
+      }
+      return(token_file)
+    }
+
+    # Priority 3: Use token string directly (warn if looks like it's being hard-coded)
+    if (length(token) == 1 && nzchar(token)) {
+      # Don't show the actual token in any messages!
+      message("Using provided token string.\n")
+      return(trimws(token))
+    }
+  }
+
+  # No token found
+  stop(
+    "No authentication token found. Please provide a token using one of:\n",
+    sprintf(
+      "  1. Set environment variable: Sys.setenv(%s = 'your_token')\n",
+      env_var
+    ),
+    sprintf("  2. Create ~/.nasa_earthdata_token file with your token\n"),
+    sprintf(
+      "  3. Pass token file path: nasa_earth_data_token = '~/.nasa_earthdata_token'\n"
+    ),
+    "  4. Pass token directly: nasa_earth_data_token = 'your_token' (not recommended)\n",
+    sprintf(
+      "\nTo set up for all R sessions, add to ~/.Renviron:\n  %s=your_token_here\n",
+      env_var
+    ),
+    call. = FALSE
+  )
+}
+
+
+#' Download files using httr2
+#' @description
+#' Execute downloads using httr2 with robust retry logic and rate limiting.
+#' This function handles authentication, retries, progress tracking, and
+#' streams files directly to disk.
+#' Retry time is based on exponential backoff with jitter, the default behavior of httr2
+#' @param urls character vector. URLs to download
+#' @param destfiles character vector. Destination file paths (same length as urls)
+#' @param token character(1). Authentication token (optional, e.g., for NASA EarthData)
+#' @param show_progress logical(1). Show download progress bars (default TRUE)
+#' @param max_tries integer(1). Maximum number of retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @param timeout numeric(1). Timeout in seconds for each request (default 3600 = 1 hour)
+#' @return invisible list with success and failure counts
+#' @importFrom httr2 request req_headers req_perform req_retry req_throttle
+#' @importFrom httr2 req_error req_progress req_timeout resp_status
+#' @keywords internal
+#' @export
+download_run_method <- function(
+  urls = NULL,
+  destfiles = NULL,
+  token = NULL,
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2,
+  timeout = 3600
+) {
+  # Validate inputs
+  if (is.null(urls) || length(urls) == 0) {
+    stop("No URLs provided for download.\n")
+  }
+  if (is.null(destfiles) || length(destfiles) != length(urls)) {
+    stop("destfiles must have same length as urls.\n")
+  }
+
+  # Filter to only files that need downloading
+  needs_download <- sapply(destfiles, amadeus::check_destfile)
+  urls_filtered <- urls[needs_download]
+  destfiles_filtered <- destfiles[needs_download]
+
+  if (length(urls_filtered) == 0) {
+    message("All files already exist. Nothing to download.\n")
+    return(invisible(list(success = 0, failed = 0, skipped = length(urls))))
+  }
+
+  message(sprintf(
+    "Downloading %d files using httr2 (skipped %d existing files)...\n",
+    length(urls_filtered),
+    sum(!needs_download)
+  ))
+
+  n_files <- length(urls_filtered)
+  n_success <- 0
+  n_failed <- 0
+  failed_urls <- character(0)
+  failed_files <- character(0)
+
+  for (i in seq_along(urls_filtered)) {
+    url <- urls_filtered[i]
+    destfile <- destfiles_filtered[i]
+
+    # Create directory if needed
+    destdir <- dirname(destfile)
+    if (!dir.exists(destdir)) {
+      dir.create(destdir, recursive = TRUE)
+    }
+
+    if (show_progress) {
+      message(sprintf(
+        "[%d/%d] Downloading: %s",
+        i,
+        n_files,
+        basename(destfile)
+      ))
+    }
+
+    tryCatch(
+      {
+        # Build request
+        req <- httr2::request(url)
+
+        # Add authentication if token provided
+        if (!is.null(token)) {
+          req <- req |>
+            httr2::req_headers(Authorization = paste("Bearer", token))
+        }
+
+        # Configure retry, throttle, and timeout
+        resp <- req |>
+          httr2::req_retry(
+            max_tries = max_tries,
+            is_transient = \(resp) {
+              # Retry on server errors and rate limiting
+              httr2::resp_status(resp) %in% c(429, 500, 502, 503, 504)
+            }
+          ) |>
+          httr2::req_timeout(timeout) |> # Socket timeout
+          httr2::req_throttle(rate = 1 / rate_limit) |> # Rate limiting
+          httr2::req_error(is_error = \(resp) {
+            status <- httr2::resp_status(resp)
+            # Don't error on transient failures (let retry handle them)
+            status >= 400 && !(status %in% c(429, 500, 502, 503, 504))
+          }) |>
+          httr2::req_progress(type = if (show_progress) "down" else "none") |>
+          httr2::req_perform(path = destfile)
+
+        # Verify file was created and has content
+        if (file.exists(destfile) && file.size(destfile) > 0) {
+          n_success <- n_success + 1
+          if (show_progress) {
+            message(sprintf(
+              " ✓ Success (%s)",
+              format_file_size(file.size(destfile))
+            ))
+          }
+        } else {
+          n_failed <- n_failed + 1
+          failed_urls <- c(failed_urls, url)
+          failed_files <- c(failed_files, basename(destfile))
+          if (file.exists(destfile)) {
+            file.remove(destfile)
+          }
+          if (show_progress) {
+            message(" ✗ Failed (0 bytes)")
+          }
+        }
+
+        # Brief pause between downloads (rate limiting is primary control)
+        if (i < n_files) {
+          Sys.sleep(runif(1, 0.5, 1.5))
+        }
+      },
+      error = function(e) {
+        n_failed <<- n_failed + 1
+        failed_urls <<- c(failed_urls, url)
+        failed_files <<- c(failed_files, basename(destfile))
+
+        error_msg <- conditionMessage(e)
+        if (show_progress) {
+          message(sprintf(" ✗ Failed: %s", error_msg))
+        } else {
+          message(sprintf(
+            "Failed to download %s: %s\n",
+            basename(destfile),
+            error_msg
+          ))
+        }
+
+        # Clean up failed download
+        if (file.exists(destfile)) {
+          file.remove(destfile)
+        }
+      }
+    )
+  }
+
+  # Summary message
+  message(sprintf(
+    "\n=== Download Summary ===\n%d succeeded, %d failed, %d skipped\n",
+    n_success,
+    n_failed,
+    sum(!needs_download)
+  ))
+
+  if (n_failed > 0) {
+    warning(
+      sprintf(
+        "%d file(s) failed to download:\n  %s\n",
+        n_failed,
+        paste(failed_files, collapse = "\n  ")
+      ),
+      call. = FALSE
+    )
+  }
+
+  invisible(list(
+    success = n_success,
+    failed = n_failed,
+    skipped = sum(!needs_download),
+    failed_urls = failed_urls,
+    failed_files = failed_files
+  ))
+}
+
+
+#' Format file size for display
+#' @keywords internal
+#' @noRd
+format_file_size <- function(bytes) {
+  if (bytes < 1024) {
+    return(sprintf("%d B", bytes))
+  } else if (bytes < 1024^2) {
+    return(sprintf("%.1f KB", bytes / 1024))
+  } else if (bytes < 1024^3) {
+    return(sprintf("%.1f MB", bytes / 1024^2))
+  } else {
+    return(sprintf("%.1f GB", bytes / 1024^3))
+  }
+}
+
+
+#' Legacy download_run function for backwards compatibility
+#' @description
+#' **DEPRECATED**: This function is maintained for backwards compatibility.
+#' New code should use `download_run_method()` directly.
+#'
 #' Execute or skip the commands listed in the ...wget/curl_commands.txt file
 #' produced by one of the data download functions.
-#' @param download logical(1). Execute (\code{TRUE}) or
-#'  skip (\code{FALSE}) download.
+#' @param download logical(1). Execute (\code{TRUE}) or skip (\code{FALSE}) download.
 #' @param commands_txt character(1). Path of download commands
-#' @param remove logical(1). Remove (\code{TRUE}) or
-#'  keep (\code{FALSE}) command. Passed to \code{download_remove_commands}.
+#' @param remove logical(1). Remove (\code{TRUE}) or keep (\code{FALSE}) command.
 #' @return NULL; runs download commands with shell (Unix/Linux) or
 #' command prompt (Windows) and removes \code{commands_txt} file if
 #' \code{remove = TRUE}.
@@ -112,6 +375,17 @@ download_run <- function(
   commands_txt = NULL,
   remove = FALSE
 ) {
+  # Show deprecation warning once per session
+  if (!isTRUE(getOption("amadeus.download_run.warned"))) {
+    warning(
+      "download_run() is deprecated. Use download_run_method() instead.\n",
+      "  Old: download_modis(..., download = TRUE)\n",
+      "  New: download_modis(...) uses httr2 by default\n",
+      call. = FALSE
+    )
+    options(amadeus.download_run.warned = TRUE)
+  }
+
   if (tolower(.Platform$OS.type) == "windows") {
     # nocov start
     runner <- ""
@@ -135,7 +409,6 @@ download_run <- function(
     remove = remove
   )
 }
-
 
 #' Remove download commands
 #' @description
@@ -276,7 +549,6 @@ generate_date_sequence <-
       return(dates_original)
     }
   }
-
 
 
 #' Generate time sequence

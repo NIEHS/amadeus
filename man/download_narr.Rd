@@ -9,49 +9,48 @@ download_narr(
   year = c(2018, 2022),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
-\item{variables}{character. Variable(s) name acronym. See \href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{List of Variables in NARR Files}
+\item{variables}{character. Variable(s) name acronym. See
+\href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{List of Variables in NARR Files}
 for variable names and acronym codes.}
 
-\item{year}{integer(1 or 2). length of 4. Year or start/end years for downloading data.}
+\item{year}{integer(1 or 2). Year or start/end years for downloading data.}
 
-\item{directory_to_save}{character(1). Directory(s) to save downloaded data
-files.}
+\item{directory_to_save}{character(1). Directory to save downloaded data files.}
 
-\item{acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledges that the data downloaded using this function may be very
-large and use lots of machine storage and memory.}
+\item{acknowledgement}{logical(1). Must be TRUE to proceed with download.}
 
-\item{download}{logical(1). \code{FALSE} will generate a *.txt file
-containing all download commands. By setting \code{TRUE} the function
-will download all of the requested data files.}
+\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
 
-\item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE})
-the text file containing download commands.}
+\item{remove_command}{logical(1). DEPRECATED, ignored.}
 
-\item{hash}{logical(1). By setting \code{TRUE} the function will return
-an \code{rlang::hash_file()} hash character corresponding to the
-downloaded files. Default is \code{FALSE}.}
+\item{show_progress}{logical(1). Show download progress (default TRUE)}
+
+\item{hash}{logical(1). Return hash of downloaded files (default FALSE)}
+
+\item{max_tries}{integer(1). Maximum download retry attempts (default 20)}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
-\itemize{
-\item For \code{hash = FALSE}, NULL
-\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item netCDF (.nc) files will be stored in
-\code{directory_to_save}.
-}
+invisible list with download results; or hash character if hash=TRUE
 }
 \description{
-The \code{download_narr} function accesses and downloads daily meteorological data from \href{https://psl.noaa.gov/data/gridded/data.narr.html}{NOAA's North American Regional Reanalysis (NARR) model}.
+The \code{download_narr} function accesses and downloads daily meteorological
+data from NOAA's North American Regional Reanalysis (NARR) model.
 }
 \note{
-"Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
+"Pressure levels" variables contain variable values at 29 atmospheric
+levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be
+downloaded for each variable.
 }
 \examples{
 \dontrun{
@@ -59,9 +58,15 @@ download_narr(
   variables = c("weasd", "omega"),
   year = 2023,
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE
+  acknowledgement = TRUE
+)
+
+# Multiple years
+download_narr(
+  variables = c("air.2m", "rhum.2m"),
+  year = c(2020, 2022),
+  directory_to_save = tempdir(),
+  acknowledgement = TRUE
 )
 }
 }
@@ -69,5 +74,5 @@ download_narr(
 \insertRef{mesinger_north_2006}{amadeus}
 }
 \author{
-Mitchell Manware, Insang Song
+Mitchell Manware, Insang Song, Kyle Messier
 }
