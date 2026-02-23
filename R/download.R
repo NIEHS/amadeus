@@ -157,43 +157,27 @@ download_data <-
     return(return)
   }
 
-# nolint start
+
 #' Download air quality data
 #' @description
-#' The \code{download_aqs()} function accesses and downloads Air Quality System (AQS) data from the [U.S. Environmental Protection Agency's (EPA) Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html).
-#' @param parameter_code integer(1). length of 5.
-#'  EPA pollutant parameter code. For details, please refer to
-#'  [AQS parameter codes](https://aqs.epa.gov/aqsweb/documents/codetables/parameters.html)
-#' @param resolution_temporal character(1).
-#'  Name of column containing POC values.
-#'  Currently, no value other than `"daily"` works.
-#' @param url_aqs_download character(1).
-#'  URL to the AQS pre-generated datasets.
-#' @param year integer(1 or 2). length of 4. Year or start/end years for downloading data.
-#' @param directory_to_save character(1). Directory to save data. Two
-#' sub-directories will be created for the downloaded zip files ("/zip_files")
-#' and the unzipped data files ("/data_files").
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands. Default is FALSE.
-#' @param unzip logical(1). Unzip zip files. Default \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip file from directory_to_download.
-#' Default \code{FALSE}.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' The \code{download_aqs()} function accesses and downloads Air Quality System (AQS) data from the U.S. Environmental Protection Agency's (EPA) Pre-Generated Data Files.
+#' @note AQS data does not require authentication.
+#' @param parameter_code integer(1). EPA pollutant parameter code.
+#' @param resolution_temporal character(1). Currently only "daily" is supported.
+#' @param url_aqs_download character(1). URL to the AQS pre-generated datasets.
+#' @param year integer(1 or 2). Year or start/end years for downloading data.
+#' @param directory_to_save character(1). Directory to save data.
+#' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param unzip logical(1). Unzip zip files (default TRUE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mariana Kassien, Insang Song, Mitchell Manware
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Zip and/or data files will be downloaded and stored in
-#' \code{directory_to_save}.
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_usepa2023airdata}{amadeus}
@@ -204,13 +188,9 @@ download_data <-
 #'   resolution_temporal = "daily",
 #'   year = 2023,
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE,
-#'   unzip = FALSE
+#'   acknowledgement = TRUE
 #' )
 #' }
-# nolint end
 #' @export
 download_aqs <-
   function(
@@ -220,30 +200,54 @@ download_aqs <-
     url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
     directory_to_save = NULL,
     acknowledgement = FALSE,
-    download = FALSE,
+    download = TRUE,
     remove_command = FALSE,
     unzip = TRUE,
     remove_zip = FALSE,
-    hash = FALSE
+    show_progress = TRUE,
+    hash = FALSE,
+    max_tries = 20,
+    rate_limit = 2
   ) {
-    #### 1. check for data download acknowledgement
+    #### Check acknowledgement
     amadeus::download_permit(acknowledgement = acknowledgement)
-    #### 2. check for null parameters
+
+    #### Check for null parameters
     amadeus::check_for_null_parameters(mget(ls()))
-    #### check years
+
+    #### Check years
     if (length(year) == 1) {
       year <- c(year, year)
     }
     stopifnot(length(year) == 2)
     year <- year[order(year)]
-    #### 3. directory setup
+
+    #### Directory setup
     directory_original <- amadeus::download_sanitize_path(directory_to_save)
     directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
     directory_to_download <- directories[1]
     directory_to_save <- directories[2]
-    #### 4. define year sequence
+
+    #### Handle deprecated parameters
+    if (!isTRUE(download)) {
+      warning(
+        "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+        "To skip downloading, the function will return after discovering files.\n",
+        call. = FALSE
+      )
+    }
+
+    if (remove_command != FALSE) {
+      warning(
+        "Parameter 'remove_command' is deprecated and ignored.\n",
+        call. = FALSE
+      )
+    }
+
+    #### Define year sequence
     year_sequence <- seq(year[1], year[2], 1)
-    #### 5. build URLs
+
+    #### Build URLs
     download_urls <- sprintf(
       paste(
         url_aqs_download,
@@ -255,14 +259,16 @@ download_aqs <-
       ),
       year_sequence
     )
-    #### 6. check for valid URL
-    if (!(amadeus::check_url_status(download_urls[1]))) {
+
+    #### Check for valid URL
+    if (!amadeus::check_url_status(download_urls[1])) {
       stop(paste0(
         "Invalid year returns HTTP code 404. ",
         "Check `year` parameter.\n"
       ))
     }
-    #### 5. build download file name
+
+    #### Build download file names
     download_names <- sprintf(
       paste(
         directory_to_download,
@@ -275,56 +281,62 @@ download_aqs <-
       ),
       year_sequence
     )
-    #### 6. build download command
-    download_commands <- paste0(
-      "curl -s --url ",
-      download_urls,
-      " --output ",
-      download_names,
-      "\n"
-    )
-    #### filter commands to non-existing files
-    download_commands <- download_commands[
-      which(
-        !file.exists(download_names) | file.size(download_names) == 0
+
+    #### Filter to files that need downloading
+    needs_download <- sapply(download_names, amadeus::check_destfile)
+    download_urls_filtered <- download_urls[needs_download]
+    download_names_filtered <- download_names[needs_download]
+
+    #### Exit early if download=FALSE
+    if (!isTRUE(download)) {
+      message(sprintf(
+        "Skipping download. Found %d files available for download.\n",
+        length(download_urls_filtered)
+      ))
+      return(invisible(list(
+        urls = download_urls_filtered,
+        destfiles = download_names_filtered,
+        n_files = length(download_urls_filtered)
+      )))
+    }
+
+    #### Download files using httr2
+    if (length(download_urls_filtered) > 0) {
+      download_result <- amadeus::download_run_method(
+        urls = download_urls_filtered,
+        destfiles = download_names_filtered,
+        token = NULL,
+        show_progress = show_progress,
+        max_tries = max_tries,
+        rate_limit = rate_limit
       )
-    ]
-    #### 7. initiate "..._curl_commands.txt"
-    commands_txt <- paste0(
-      directory_original,
-      "aqs_",
-      parameter_code,
-      "_",
-      year[1],
-      "_",
-      year[2],
-      "_",
-      resolution_temporal,
-      "_curl_commands.txt"
-    )
-    amadeus::download_sink(commands_txt)
-    #### 8. concatenate and print download commands to "..._curl_commands.txt"
-    cat(download_commands)
-    #### 9. finish "..._curl_commands.txt" file
-    sink()
-    #### 11. download data
-    amadeus::download_run(
-      download = download,
-      commands_txt = commands_txt,
-      remove = remove_command
-    )
-    #### 12. unzip data
+    } else {
+      message("All files already exist. Nothing to download.\n")
+      download_result <- list(
+        success = 0,
+        failed = 0,
+        skipped = length(download_names)
+      )
+    }
+
+    #### Unzip data
     sapply(
       download_names,
       amadeus::download_unzip,
       directory_to_unzip = directory_to_save,
       unzip = unzip
     )
+
     amadeus::download_remove_zips(
       remove = remove_zip,
       download_name = download_names
     )
-    return(amadeus::download_hash(hash, directory_to_save))
+
+    if (hash) {
+      return(amadeus::download_hash(hash = TRUE, directory_to_save))
+    } else {
+      return(invisible(download_result))
+    }
   }
 
 #' Download ecoregion data
@@ -2827,52 +2839,25 @@ download_tri <- function(
     return(invisible(download_result))
   }
 }
-# nolint start
+
 #' Download road emissions data
 #' @description
-#' The \code{download_nei()} function accesses and downloads road emissions data from the [U.S Environmental Protection Agency's (EPA) National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories/national-emissions-inventory-nei).
-# nolint end
-#' @param epa_certificate_path TO BE DEPRECATED character(1).
-#' Path to the certificate file for EPA DataCommons. Default is
-#' 'extdata/cacert_gaftp_epa.pem' under the package installation path.
-#' Use `system.file()` to get the full path.
-#' @param certificate_url TO BE DEPRECATED
-#' character(1). URL to certificate file. See notes for
-#' details.
-#' @param year integer(1) Available years of NEI data.
-#' Default is \code{c(2017L, 2020L)}.
-#' @param directory_to_save character(1). Directory to save data. Two
-#' sub-directories will be created for the downloaded zip files ("/zip_files")
-#' and the unzipped data files ("/data_files").
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param unzip logical(1). Unzip the downloaded zip files.
-#' Default is \code{FALSE}.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#' The \code{download_nei()} function accesses and downloads road emissions data from the U.S Environmental Protection Agency's (EPA) National Emissions Inventory (NEI).
+#' @note NEI data does not require authentication.
+#' @param epa_certificate_path TO BE DEPRECATED. Certificate path.
+#' @param certificate_url TO BE DEPRECATED. Certificate URL.
+#' @param year integer(1). Available years of NEI data.
+#' @param directory_to_save character(1). Directory to save data.
+#' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param unzip logical(1). Unzip zip files (default TRUE).
+#' @param show_progress logical(1). Show download progress (default TRUE)
+#' @param hash logical(1). Return hash of downloaded files (default FALSE)
+#' @param max_tries integer(1). Maximum retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Ranadeep Daw, Insang Song
-#' @note
-#' For EPA Data Commons certificate errors, follow the steps below:
-#' 1. Click Lock icon in the address bar at https://gaftp.epa.gov
-#' 2. Click Show Certificate
-#' 3. Access Details
-#' 4. Find URL with *.crt extension
-#' Currently we bundle the pre-downloaded crt and its PEM (which is accepted
-#' in wget command) file in ./inst/extdata. The instruction above is for
-#' certificate updates in the future.
-#' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Zip and/or data files will be downloaded and stored in
-#' respective sub-directories within \code{directory_to_save}.
+#' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{web_usepa2024nei}{amadeus}
@@ -2881,10 +2866,7 @@ download_tri <- function(
 #' download_nei(
 #'   year = c(2017L, 2020L),
 #'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE,
-#'   unzip = FALSE
+#'   acknowledgement = TRUE
 #' )
 #' }
 #' @export
@@ -2894,27 +2876,52 @@ download_nei <- function(
   year = c(2017L, 2020L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 ) {
-  #### 1. check for data download acknowledgement
+  #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
-  #### 2. directory setup
+
+  #### Directory setup
   directory_original <- amadeus::download_sanitize_path(directory_to_save)
   directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
   directory_to_download <- directories[1]
   directory_to_save <- directories[2]
 
-  #### 5. define download URL
-  # DEPRECATED: certificate download step
-  # amadeus::download_epa_certificate(
-  #   epa_certificate_path = epa_certificate_path,
-  #   certificate_url = certificate_url
-  # )
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return after discovering files.\n",
+      call. = FALSE
+    )
+  }
 
-  #### 3. define measurement data paths
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  if (
+    !is.null(epa_certificate_path) ||
+      certificate_url !=
+        "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
+  ) {
+    warning(
+      "Parameters 'epa_certificate_path' and 'certificate_url' are deprecated.\n",
+      "SSL certificates are now handled automatically by httr2.\n",
+      call. = FALSE
+    )
+  }
+
+  #### Define measurement data paths
   url_download_base <- "https://gaftp.epa.gov/air/nei/%d/data_summaries/"
   url_download_remain <-
     c("2017v1/2017neiApr_onroad_byregions.zip", "2020nei_onroad_byregion.zip")
@@ -2926,62 +2933,77 @@ download_nei <- function(
   download_names_file <-
     c("2017neiApr_onroad_byregions.zip", "2020nei_onroad_byregion.zip")
   download_names <- paste0(directory_to_download, download_names_file)
-  #### 4. build download command
-  # 1.3.1.1: use curl
-  download_commands <-
-    paste0(
-      "curl -s -o ",
-      download_names,
-      " --url ",
-      download_urls,
-      "\n"
-    )
 
-  #### filter commands to non-existing files
-  download_commands <- download_commands[
-    which(
-      !file.exists(download_names) | file.size(download_names) == 0
-    )
-  ]
-  #### 5. initiate "..._curl_commands.txt"
-  commands_txt <- paste0(
-    directory_original,
-    "NEI_AADT_",
-    paste(year, collapse = "-"),
-    "_",
-    Sys.Date(),
-    "_curl_commands.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  #### 6. concatenate and print download commands to "..._curl_commands.txt"
-  writeLines(download_commands)
-  #### 7. finish "..._curl_commands.txt" file
-  sink()
-  #### 9. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
-  )
+  #### Filter to files that need downloading
+  needs_download <- sapply(download_names, amadeus::check_destfile)
+  download_urls_filtered <- download_urls[needs_download]
+  download_names_filtered <- download_names[needs_download]
 
-  #### 10. unzip data
-  # note that this part does not utilize download_unzip
-  # as duplicate file names are across multiple zip files
-  if (download) {
-    if (unzip) {
-      dir_unzip <- paste0(
-        directory_to_save,
-        sub(".zip", "", download_names_file)
-      )
-      for (fn in seq_along(dir_unzip)) {
+  #### Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message(sprintf(
+      "Skipping download. Found %d files available for download.\n",
+      length(download_urls_filtered)
+    ))
+    return(invisible(list(
+      urls = download_urls_filtered,
+      destfiles = download_names_filtered,
+      n_files = length(download_urls_filtered)
+    )))
+  }
+
+  #### Download files using httr2
+  if (length(download_urls_filtered) > 0) {
+    download_result <- amadeus::download_run_method(
+      urls = download_urls_filtered,
+      destfiles = download_names_filtered,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = rate_limit
+    )
+  } else {
+    message("All files already exist. Nothing to download.\n")
+    download_result <- list(
+      success = 0,
+      failed = 0,
+      skipped = length(download_names)
+    )
+  }
+
+  #### Unzip data (custom unzipping to separate directories per file)
+  if (unzip) {
+    dir_unzip <- paste0(
+      directory_to_save,
+      sub(".zip", "", download_names_file)
+    )
+    for (fn in seq_along(dir_unzip)) {
+      if (file.exists(download_names[fn])) {
+        if (!dir.exists(dir_unzip[fn])) {
+          dir.create(dir_unzip[fn], recursive = TRUE)
+        }
         utils::unzip(zipfile = download_names[fn], exdir = dir_unzip[fn])
       }
     }
   }
-  message("Requests were processed.\n")
-  return(amadeus::download_hash(hash, directory_to_save))
-}
 
+  #### Remove zip files
+  if (remove_zip) {
+    for (fn in download_names) {
+      if (file.exists(fn)) {
+        file.remove(fn)
+      }
+    }
+  }
+
+  message("Requests were processed.\n")
+
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(download_result))
+  }
+}
 
 #' Download gridMET data
 #' @description
