@@ -19,9 +19,12 @@ download_merra2(
   date = c("2018-01-01", "2018-01-01"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  hash = FALSE,
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
@@ -36,25 +39,22 @@ Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}).}
 user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
 
-\item{download}{logical(1). \code{FALSE} will generate a *.txt file
-containing all download commands. By setting \code{TRUE} the function
-will download all of the requested data files.}
+\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
 
-\item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE}).}
+\item{remove_command}{logical(1). Deprecated, ignored.}
 
 \item{hash}{logical(1). By setting \code{TRUE} the function will return
 an \code{rlang::hash_file()} hash character corresponding to the
-downloaded files. Default is \code{FALSE}.
-the text file containing download commands.}
+downloaded files. Default is \code{FALSE}.}
+
+\item{show_progress}{logical(1). Show download progress (default TRUE)}
+
+\item{max_tries}{integer(1). Maximum retry attempts (default 20)}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
-\itemize{
-\item For \code{hash = FALSE}, NULL
-\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item netCDF (.nc4) files will be stored in a
-collection-specific folder within \code{directory_to_save}.
-}
+invisible list with download results; or hash character if hash=TRUE
 }
 \description{
 The \code{download_merra2()} function accesses and downloads various
@@ -66,9 +66,7 @@ download_merra2(
   collection = "inst1_2d_int_Nx",
   date = "2024-01-01",
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE,
+  acknowledgement = TRUE
 )
 }
 }

@@ -221,11 +221,12 @@ download_run_method <- function(
       dir.create(destdir, recursive = TRUE)
     }
 
+    # Progress message: only show file number when progress is on
+    progress_prefix <- sprintf("[%d/%d] ", i, n_files)
     if (show_progress) {
       message(sprintf(
-        "[%d/%d] Downloading: %s",
-        i,
-        n_files,
+        "%sDownloading: %s",
+        progress_prefix,
         basename(destfile)
       ))
     }
@@ -241,47 +242,66 @@ download_run_method <- function(
             httr2::req_headers(Authorization = paste("Bearer", token))
         }
 
-        # Configure retry, throttle, and timeout
-        resp <- req |>
+        # Configure retry, throttle, timeout, and error handling
+        req <- req |>
           httr2::req_retry(
             max_tries = max_tries,
             is_transient = \(resp) {
-              # Retry on server errors and rate limiting
               httr2::resp_status(resp) %in% c(429, 500, 502, 503, 504)
             }
           ) |>
-          httr2::req_timeout(timeout) |> # Socket timeout
-          httr2::req_throttle(rate = 1 / rate_limit) |> # Rate limiting
+          httr2::req_timeout(timeout) |>
+          httr2::req_throttle(rate = 1 / rate_limit) |>
           httr2::req_error(is_error = \(resp) {
             status <- httr2::resp_status(resp)
-            # Don't error on transient failures (let retry handle them)
             status >= 400 && !(status %in% c(429, 500, 502, 503, 504))
-          }) |>
-          httr2::req_progress(type = if (show_progress) "down" else "none") |>
-          httr2::req_perform(path = destfile)
+          })
+
+        # Add progress only if requested
+        if (show_progress) {
+          req <- req |> httr2::req_progress(type = "down")
+        }
+
+        # Perform the request
+        resp <- req |> httr2::req_perform(path = destfile)
 
         # Verify file was created and has content
         if (file.exists(destfile) && file.size(destfile) > 0) {
           n_success <- n_success + 1
-          if (show_progress) {
-            message(sprintf(
-              " ✓ Success (%s)",
-              format_file_size(file.size(destfile))
-            ))
-          }
+          # Success message: format with or without progress prefix
+          success_msg <- sprintf(
+            "Success: %s (%s)",
+            basename(destfile),
+            format_file_size(file.size(destfile))
+          )
+          message(sprintf(
+            "%s%s\n",
+            if (show_progress) " ✓ " else "",
+            success_msg
+          ))
         } else {
+          # File failed validation
           n_failed <- n_failed + 1
           failed_urls <- c(failed_urls, url)
           failed_files <- c(failed_files, basename(destfile))
+
           if (file.exists(destfile)) {
             file.remove(destfile)
           }
-          if (show_progress) {
-            message(" ✗ Failed (0 bytes)")
-          }
+
+          # Failure message: always show, format based on progress mode
+          failure_msg <- sprintf(
+            "Failed: %s (0 bytes)",
+            basename(destfile)
+          )
+          message(sprintf(
+            "%s%s\n",
+            if (show_progress) " ✗ " else "",
+            failure_msg
+          ))
         }
 
-        # Brief pause between downloads (rate limiting is primary control)
+        # Brief pause between downloads
         if (i < n_files) {
           Sys.sleep(runif(1, 0.5, 1.5))
         }
@@ -291,16 +311,17 @@ download_run_method <- function(
         failed_urls <<- c(failed_urls, url)
         failed_files <<- c(failed_files, basename(destfile))
 
-        error_msg <- conditionMessage(e)
-        if (show_progress) {
-          message(sprintf(" ✗ Failed: %s", error_msg))
-        } else {
-          message(sprintf(
-            "Failed to download %s: %s\n",
-            basename(destfile),
-            error_msg
-          ))
-        }
+        # Error message: always show
+        error_msg <- sprintf(
+          "Failed: %s - %s",
+          basename(destfile),
+          conditionMessage(e)
+        )
+        message(sprintf(
+          "%s%s\n",
+          if (show_progress) " ✗ " else "",
+          error_msg
+        ))
 
         # Clean up failed download
         if (file.exists(destfile)) {
@@ -338,6 +359,21 @@ download_run_method <- function(
   ))
 }
 
+
+#' Format file size for display
+#' @keywords internal
+#' @noRd
+format_file_size <- function(bytes) {
+  if (bytes < 1024) {
+    return(sprintf("%d B", bytes))
+  } else if (bytes < 1024^2) {
+    return(sprintf("%.1f KB", bytes / 1024))
+  } else if (bytes < 1024^3) {
+    return(sprintf("%.1f MB", bytes / 1024^2))
+  } else {
+    return(sprintf("%.1f GB", bytes / 1024^3))
+  }
+}
 
 #' Format file size for display
 #' @keywords internal
@@ -592,15 +628,24 @@ check_url_status <- function(
   url
 ) {
   http_status_ok <- c(200, 206)
-  status <- url |>
-    httr2::request() |>
-    httr2::req_method("HEAD") |>
-    httr2::req_error(is_error = \(resp) FALSE) |>
-    httr2::req_perform() |>
-    httr2::resp_status()
 
-  Sys.sleep(1)
-  return(status %in% http_status_ok)
+  tryCatch(
+    {
+      status <- url |>
+        httr2::request() |>
+        httr2::req_method("HEAD") |>
+        httr2::req_error(is_error = \(resp) FALSE) |>
+        httr2::req_perform() |>
+        httr2::resp_status()
+
+      Sys.sleep(1)
+      return(status %in% http_status_ok)
+    },
+    error = function(e) {
+      # Return FALSE for any errors (network, DNS, SSL, etc.)
+      return(FALSE)
+    }
+  )
 }
 
 #' Import download commands
