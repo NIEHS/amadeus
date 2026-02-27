@@ -5,102 +5,74 @@
 ################################################################################
 ##### download_geos
 testthat::test_that("download_geos", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
-  # function parameters
-  date_start <- "2019-09-09"
-  date_end <- "2019-09-09"
-  collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
-  directory_to_save <- paste0(tempdir(), "/geos/")
-  # run download function
-  testthat::expect_no_error(
-    download_data(
-      dataset_name = "geos",
-      date = c(date_start, date_end),
-      collection = collections,
-      nasa_earth_data_token = nasa_earth_data_token,
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE
+  skip_if(
+    Sys.getenv("EARTHDATA_TOKEN") == "",
+    message = "No NASA token available"
+  )
+
+  withr::with_tempdir({
+    # function parameters
+    date_start <- "2019-09-09"
+    date_end <- "2019-09-09"
+    collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
+
+    # Suppress deprecation warning for download=FALSE
+    result <- suppressWarnings(
+      download_geos(
+        date = c(date_start, date_end),
+        collection = collections,
+        nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
     )
-  )
-  # define file path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "geos_",
-    date_start,
-    "_",
-    date_end,
-    "_wget_commands.txt"
-  )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 10)[[5]] %>%
-    gsub("'", "", .)
 
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
+    # Check return structure (new httr2 pattern)
+    testthat::expect_type(result, "list")
+    testthat::expect_named(result, c("urls", "destfiles", "n_files"))
 
-  # remove file with commands after test
-  file.remove(commands_path)
-  unlink(directory_to_save, recursive = TRUE)
+    # Check that files were found
+    testthat::expect_gt(result$n_files, 0)
+
+    # Check URLs are valid format
+    testthat::expect_true(all(grepl("^https?://", result$urls)))
+  })
 })
 
-nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
-
 testthat::test_that("download_geos (single date)", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
-  date <- "2019-09-09"
-  collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
-  directory_to_save <- paste0(tempdir(), "/geos/")
-  # run download function
-  testthat::expect_no_error(
-    download_data(
-      dataset_name = "geos",
-      date = date,
-      nasa_earth_data_token = nasa_earth_data_token,
-      collection = collections,
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE
-    )
-  )
-  # define file path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "geos_",
-    date,
-    "_",
-    date,
-    "_wget_commands.txt"
-  )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 10)[[5]] %>%
-    gsub("'", "", .)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
+  skip_if(
+    Sys.getenv("EARTHDATA_TOKEN") == "",
+    message = "No NASA token available"
   )
 
-  # remove file with commands after test
-  file.remove(commands_path)
-  unlink(directory_to_save, recursive = TRUE)
+  withr::with_tempdir({
+    # function parameters
+    date <- "2019-09-09"
+    collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
+
+    # Suppress deprecation warning
+    result <- suppressWarnings(
+      download_geos(
+        date = date,
+        collection = collections,
+        nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+
+    # Check return structure (new httr2 pattern)
+    testthat::expect_type(result, "list")
+    testthat::expect_named(result, c("urls", "destfiles", "n_files"))
+
+    # Check that files were found
+    testthat::expect_gt(result$n_files, 0)
+
+    # Check URLs contain date
+    testthat::expect_true(any(grepl("20190909", result$urls)))
+  })
 })
 
 ################################################################################

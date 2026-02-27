@@ -2,124 +2,176 @@
 ##### unit and integration tests for U.S. EPA AQS functions
 
 ################################################################################
-##### download_epa
-testthat::test_that("download_aqs", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
-  year_start <- 2018
-  year_end <- 2022
-  resolution_temporal <- "daily"
-  parameter_code <- 88101
-  directory_to_save <- paste0(tempdir(), "/epa/")
-  # run download function
-  download_data(
-    dataset_name = "aqs",
-    year = c(year_start, year_end),
-    directory_to_save = directory_to_save,
-    acknowledgement = TRUE,
-    unzip = FALSE,
-    remove_zip = FALSE,
-    download = FALSE,
-    remove_command = FALSE
-  )
-  # expect sub-directories to be created
-  testthat::expect_true(
-    length(
-      list.files(
-        directory_to_save,
-        include.dirs = TRUE
+##### download_aqs
+testthat::test_that("download_aqs returns proper URL list", {
+  withr::with_tempdir({
+    year_start <- 2018
+    year_end <- 2022
+
+    # Suppress deprecation warning for download=FALSE
+    result <- suppressWarnings(
+      download_aqs(
+        year = c(year_start, year_end),
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
       )
-    ) ==
-      3
-  )
-  # define file path with commands
-  commands_path <-
-    paste0(
-      download_sanitize_path(directory_to_save),
-      "aqs_",
-      parameter_code,
-      "_",
-      year_start,
-      "_",
-      year_end,
-      "_",
-      resolution_temporal,
-      "_curl_commands.txt"
     )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 4)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L)
-  # implement unit tets
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  unlink(directory_to_save, recursive = TRUE)
+
+    # Check return structure
+    testthat::expect_type(result, "list")
+    testthat::expect_named(result, c("urls", "destfiles", "n_files"))
+    testthat::expect_equal(length(result$urls), length(result$destfiles))
+    testthat::expect_equal(result$n_files, length(result$urls))
+
+    # Check URLs are valid format
+    testthat::expect_true(all(grepl("^https?://", result$urls)))
+
+    # Check destfiles have proper extension
+    testthat::expect_true(all(grepl("\\.zip$", result$destfiles)))
+
+    # Check expected number of files (5 years)
+    testthat::expect_equal(result$n_files, 5)
+  })
 })
 
 testthat::test_that("download_aqs (single year)", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
-  year <- 2018
-  resolution_temporal <- "daily"
-  parameter_code <- 88101
-  directory_to_save <- paste0(tempdir(), "/epa/")
-  # run download function
-  download_data(
-    dataset_name = "aqs",
-    year = year,
-    directory_to_save = directory_to_save,
-    acknowledgement = TRUE,
-    unzip = FALSE,
-    remove_zip = FALSE,
-    download = FALSE,
-    remove_command = FALSE
-  )
-  # expect sub-directories to be created
-  testthat::expect_true(
-    length(
-      list.files(
-        directory_to_save,
-        include.dirs = TRUE
+  withr::with_tempdir({
+    year <- 2018
+
+    # Suppress deprecation warning
+    result <- suppressWarnings(
+      download_aqs(
+        year = year,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
       )
-    ) ==
-      3
-  )
-  # define file path with commands
-  commands_path <-
-    paste0(
-      download_sanitize_path(directory_to_save),
-      "aqs_",
-      parameter_code,
-      "_",
-      year,
-      "_",
-      year,
-      "_",
-      resolution_temporal,
-      "_curl_commands.txt"
     )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 4)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L)
-  # implement unit tets
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  unlink(directory_to_save, recursive = TRUE)
+
+    # Check return structure
+    testthat::expect_type(result, "list")
+    testthat::expect_named(result, c("urls", "destfiles", "n_files"))
+
+    # Check single year returns single file
+    testthat::expect_equal(result$n_files, 1)
+
+    # Check URL is valid
+    testthat::expect_true(grepl("^https?://", result$urls))
+    testthat::expect_true(grepl("2018", result$urls))
+    testthat::expect_true(grepl("\\.zip$", result$destfiles))
+  })
+})
+
+testthat::test_that("download_aqs validates URLs", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::with_tempdir({
+    # Get URLs for a recent year
+    result <- suppressWarnings(
+      download_aqs(
+        year = 2022,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+
+    # Check first URL is accessible
+    testthat::expect_true(check_url_status(result$urls[1]))
+  })
+})
+
+testthat::test_that("download_aqs creates proper directory structure", {
+  withr::with_tempdir({
+    suppressWarnings(
+      download_aqs(
+        year = 2020,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+
+    # Check directories were created
+    testthat::expect_true(dir.exists("zip_files"))
+    testthat::expect_true(dir.exists("data_files"))
+  })
+})
+
+testthat::test_that("download_aqs handles parameter_code correctly", {
+  withr::with_tempdir({
+    # Test with specific parameter code
+    result <- suppressWarnings(
+      download_aqs(
+        year = 2020,
+        parameter_code = 88502, # Different parameter
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+
+    # Check parameter code is in URLs
+    testthat::expect_true(any(grepl("88502", result$urls)))
+  })
+})
+
+testthat::test_that("download_aqs handles temporal resolution", {
+  withr::with_tempdir({
+    # Test with hourly data
+    result <- suppressWarnings(
+      download_aqs(
+        year = 2020,
+        resolution_temporal = "hourly",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+
+    testthat::expect_type(result, "list")
+    testthat::expect_true(result$n_files > 0)
+  })
+})
+
+testthat::test_that("download_aqs validates year range", {
+  withr::with_tempdir({
+    # Test that invalid years are rejected
+    testthat::expect_error(
+      download_aqs(
+        year = c(1900, 1901),
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      ),
+      "year"
+    )
+  })
+})
+
+testthat::test_that("download_aqs (LIVE - small download)", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::with_tempdir({
+    # Download one recent year
+    result <- download_aqs(
+      year = 2022,
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      download = TRUE,
+      unzip = FALSE
+    )
+
+    # Check files were downloaded
+    zip_files <- list.files("zip_files", pattern = "\\.zip$")
+    testthat::expect_true(length(zip_files) > 0)
+
+    # Check file sizes are reasonable
+    zip_paths <- list.files("zip_files", pattern = "\\.zip$", full.names = TRUE)
+    testthat::expect_true(all(file.size(zip_paths) > 1000))
+  })
 })
 
 ################################################################################
@@ -328,4 +380,44 @@ testthat::test_that("process_aqs", {
     ),
     "Extent is not applicable for data.table. Returning data.table..."
   )
+})
+
+testthat::test_that("download_aqs -> process_aqs integration (basic)", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::with_tempdir({
+    # Download one recent year
+    result <- download_aqs(
+      year = 2022,
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      download = TRUE,
+      unzip = TRUE
+    )
+
+    # Check that download succeeded
+    data_dir <- "./data_files"
+    testthat::expect_true(dir.exists(data_dir))
+
+    csv_files <- list.files(
+      data_dir,
+      pattern = "\\.csv$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
+    testthat::expect_true(
+      length(csv_files) > 0,
+      info = "At least one CSV file should be downloaded"
+    )
+
+    # Verify files have content
+    if (length(csv_files) > 0) {
+      file_sizes <- file.size(csv_files)
+      testthat::expect_true(
+        all(file_sizes > 100),
+        info = "Downloaded CSV files should have content"
+      )
+    }
+  })
 })

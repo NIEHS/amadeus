@@ -4,121 +4,113 @@
 
 ################################################################################
 ##### download_ecoregion
-testthat::test_that("download_ecoregion", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
-  directory_to_save <- paste0(tempdir(), "/eco/")
-
-  # run download function
-  download_data(
-    dataset_name = "ecoregion",
-    directory_to_save = directory_to_save,
-    acknowledgement = TRUE,
-    unzip = FALSE,
-    remove_zip = FALSE,
-    download = FALSE,
-    remove_command = FALSE
-  )
-  # expect sub-directories to be created
-  testthat::expect_true(
-    length(
-      list.files(
-        directory_to_save,
-        include.dirs = TRUE
+testthat::test_that("download_ecoregion returns proper URL list", {
+  withr::with_tempdir({
+    # Suppress deprecation warning
+    result <- suppressWarnings(
+      download_ecoregion(
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
       )
-    ) ==
-      3
-  )
-  # define file path with commands
-  commands_path <- paste0(
-    download_sanitize_path(directory_to_save),
-    "us_eco_l3_state_boundaries_",
-    Sys.Date(),
-    "_wget_command.txt"
-  )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 2)
-  # check HTTP URL status
-  url_status <-
-    httr::HEAD(urls, config = httr::config())
-  url_status <- url_status$status_code
-  # implement unit tets
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-
-  file.create(
-    file.path(directory_to_save, "zip_files", "us_eco_l3_state_boundaries.zip"),
-    recursive = TRUE
-  )
-  testthat::expect_no_error(
-    download_data(
-      dataset_name = "ecoregion",
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      unzip = FALSE,
-      remove_zip = TRUE,
-      download = FALSE,
-      remove_command = TRUE
     )
-  )
-  testthat::expect_true(
-    dir.exists(paste0(directory_to_save, "/data_files"))
-  )
-  testthat::expect_equal(
-    length(
-      list.files(
-        directory_to_save,
-        recursive = TRUE,
-        include.dirs = TRUE
-      )
-    ),
-    1
-  )
-  unlink(directory_to_save, recursive = TRUE)
+
+    # Check return structure
+    testthat::expect_type(result, "list")
+    testthat::expect_named(result, c("urls", "destfiles", "n_files"))
+    testthat::expect_equal(length(result$urls), length(result$destfiles))
+    testthat::expect_equal(result$n_files, length(result$urls))
+
+    # Check single file expected
+    testthat::expect_equal(result$n_files, 1)
+
+    # Check URL is valid format
+    testthat::expect_true(grepl("^https?://", result$urls))
+    testthat::expect_true(grepl("\\.zip$", result$destfiles))
+  })
 })
 
-testthat::test_that("download_ecoregion (expected errors)", {
-  # expected errors due to invalid certificate
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
-  tdir <- tempdir(check = TRUE)
-  directory_to_save <- paste0(tempdir(), "/epa/")
+testthat::test_that("download_ecoregion validates URL", {
+  skip_on_cran()
+  skip_if_offline()
 
-  # run download function
-
-  testthat::expect_message(
-    download_data(
-      dataset_name = "ecoregion",
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE,
-      remove_command = FALSE,
-      unzip = FALSE,
-      remove_zip = FALSE,
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      download_ecoregion(
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
     )
-  )
-  # unlink dir
-  unlink(tdir)
 
-  # define file path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "us_eco_l3_state_boundaries_",
-    Sys.Date(),
-    "_wget_command.txt"
-  )
+    # Check URL is accessible
+    testthat::expect_true(check_url_status(result$urls))
+  })
+})
 
-  # remove file with commands after test
-  testthat::expect_true(file.exists(commands_path))
-  file.remove(commands_path)
-  unlink(directory_to_save, recursive = TRUE)
+testthat::test_that("download_ecoregion creates proper directory structure", {
+  withr::with_tempdir({
+    suppressWarnings(
+      download_ecoregion(
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+
+    # Check directories were created
+    testthat::expect_true(dir.exists("zip_files"))
+    testthat::expect_true(dir.exists("data_files"))
+  })
+})
+
+testthat::test_that("download_ecoregion skips existing files", {
+  withr::with_tempdir({
+    # Create existing file with content (more than 0 bytes)
+    dir.create("zip_files", recursive = TRUE)
+    zip_path <- "zip_files/us_eco_l3_state_boundaries.zip"
+    # Write actual binary content to simulate a real zip file
+    writeBin(raw(1000), zip_path)
+
+    result <- suppressWarnings(
+      download_ecoregion(
+        directory_to_save = d1,
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+
+    # Should skip existing file
+    testthat::expect_equal(result$n_files, 1)
+
+    # Verify original file still exists and has content
+    testthat::expect_true(file.exists(zip_path))
+    testthat::expect_gt(file.size(zip_path), 0)
+  })
+})
+
+testthat::test_that("download_ecoregion (LIVE - small download)", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::with_tempdir({
+    result <- download_ecoregion(
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      download = TRUE,
+      unzip = FALSE
+    )
+
+    # Check file was downloaded
+    zip_files <- list.files("zip_files", pattern = "\\.zip$")
+    testthat::expect_true(length(zip_files) > 0)
+
+    # Check file size is reasonable
+    zip_path <- list.files("zip_files", pattern = "\\.zip$", full.names = TRUE)[
+      1
+    ]
+    testthat::expect_gt(file.size(zip_path), 1000)
+  })
 })
 
 ################################################################################
@@ -151,10 +143,51 @@ testthat::test_that("process_ecoregion", {
   addpoly <- sf::st_transform(addpoly, sf::st_crs(ecotemp))
   ecotemp[1, "geom"] <- addpoly
   tdir <- tempdir()
-  sf::st_write(ecotemp, paste0(tdir, "/ecoregions.gpkg"), append = FALSE)
+  sf::st_write(
+    ecotemp,
+    paste0(tdir, "/ecoregions.gpkg"),
+    append = FALSE,
+    quiet = TRUE
+  )
   testthat::expect_no_error(
     suppressWarnings(process_ecoregion(paste0(tdir, "/ecoregions.gpkg")))
   )
+})
+
+testthat::test_that("process_ecoregion validates inputs", {
+  # Test with invalid path
+  testthat::expect_error(
+    process_ecoregion("/invalid/path/to/file.gpkg"),
+    "path"
+  )
+
+  # Test with non-spatial file
+  withr::with_tempdir({
+    writeLines("not a spatial file", "test.txt")
+    testthat::expect_error(
+      process_ecoregion("test.txt")
+    )
+  })
+})
+
+testthat::test_that("process_ecoregion returns SpatVector", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  path_eco <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
+
+  eco <- process_ecoregion(path_eco)
+
+  testthat::expect_s4_class(eco, "SpatVector")
+  # is.valid() returns a logical vector (one per feature)
+  testthat::expect_true(all(terra::is.valid(eco)))
+  testthat::expect_gt(terra::nrow(eco), 0)
 })
 
 ################################################################################
@@ -315,4 +348,80 @@ testthat::test_that("calculate_ecoregion", {
     fixed = FALSE
   )
 })
+
+testthat::test_that("calculate_ecoregion validates inputs", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  ecol3 <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
+  erras <- process_ecoregion(ecol3)
+
+  # Test with invalid locs
+  testthat::expect_error(
+    calculate_ecoregion(
+      from = erras,
+      locs = "not a spatial object",
+      locs_id = "site_id"
+    )
+  )
+
+  # Test with missing locs_id
+  site_faux <- data.frame(
+    lon = -77.576,
+    lat = 39.40
+  )
+  site_faux <- terra::vect(
+    site_faux,
+    geom = c("lon", "lat"),
+    crs = "EPSG:4326"
+  )
+
+  testthat::expect_error(
+    calculate_ecoregion(
+      from = erras,
+      locs = site_faux,
+      locs_id = "nonexistent_id"
+    )
+  )
+})
+
+################################################################################
+##### Integration test: download -> process -> calculate workflow
+testthat::test_that("download_ecoregion integration (basic)", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::with_tempdir({
+    # Download ecoregion data
+    result <- download_ecoregion(
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      download = TRUE,
+      unzip = TRUE
+    )
+
+    # Check that download succeeded
+    data_dir <- "./data_files"
+    testthat::expect_true(dir.exists(data_dir))
+
+    # Check for shapefile or geopackage
+    spatial_files <- list.files(
+      data_dir,
+      pattern = "\\.(shp|gpkg)$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
+    testthat::expect_true(
+      length(spatial_files) > 0,
+      info = "At least one spatial file should be extracted"
+    )
+  })
+})
+
 # nolint end
