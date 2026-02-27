@@ -1,6 +1,5 @@
 ################################################################################
 ##### unit and integration tests for download_data and auxiliary functions
-# nolint start
 
 ################################################################################
 ##### download_data

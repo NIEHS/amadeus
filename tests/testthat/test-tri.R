@@ -9,11 +9,13 @@ testthat::test_that("download_tri", {
   # function parameters
   directory_to_save <- paste0(tempdir(), "/tri/")
   # run download function
-  download_data(dataset_name = "tri",
-                directory_to_save = directory_to_save,
-                acknowledgement = TRUE,
-                download = FALSE,
-                remove_command = FALSE)
+  download_data(
+    dataset_name = "tri",
+    directory_to_save = directory_to_save,
+    acknowledgement = TRUE,
+    download = FALSE,
+    remove_command = FALSE
+  )
   year_start <- 2018L
   year_end <- 2022L
 
@@ -21,7 +23,9 @@ testthat::test_that("download_tri", {
   commands_path <- paste0(
     directory_to_save,
     "TRI_",
-    year_start, "_", year_end,
+    year_start,
+    "_",
+    year_end,
     "_",
     Sys.Date(),
     "_curl_commands.txt"
@@ -34,9 +38,11 @@ testthat::test_that("download_tri", {
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 1L, method = "SKIP")
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
@@ -62,7 +68,9 @@ testthat::test_that("download_tri (single year)", {
   commands_path <- paste0(
     directory_to_save,
     "TRI_",
-    year, "_", year,
+    year,
+    "_",
+    year,
     "_",
     Sys.Date(),
     "_curl_commands.txt"
@@ -75,9 +83,11 @@ testthat::test_that("download_tri (single year)", {
   # check HTTP URL status
   url_status <- check_urls(urls = urls, size = 1L, method = "SKIP")
   # implement unit tests
-  test_download_functions(directory_to_save = directory_to_save,
-                          commands_path = commands_path,
-                          url_status = url_status)
+  test_download_functions(
+    directory_to_save = directory_to_save,
+    commands_path = commands_path,
+    url_status = url_status
+  )
   # remove file with commands after test
   file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
@@ -119,8 +129,7 @@ testthat::test_that("calculate_tri", {
   ncp$site_id <- c("3799900018810101", "3799900018819999")
   ncp$time <- 2018L
   ncpt <-
-    terra::vect(ncp, geom = c("lon", "lat"),
-                keepgeom = TRUE, crs = "EPSG:4326")
+    terra::vect(ncp, geom = c("lon", "lat"), keepgeom = TRUE, crs = "EPSG:4326")
   ncpt$time <- 2018L
   path_tri <- testthat::test_path("..", "testdata", "tri")
 
