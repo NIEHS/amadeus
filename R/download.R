@@ -4240,3 +4240,4 @@ download_cropscape <- function(
   message("Requests were processed.\n")
   return(amadeus::download_hash(hash, directory_to_save))
 }
+# nolint end

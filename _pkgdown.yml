@@ -14,8 +14,6 @@ navbar:
         - text: Miscellaneous
         - text: download_data Function
           href: articles/download_functions.html
-        - text: Protected Datasets
-          href: articles/protected_datasets.html
         - text: Source-Specific Workflows
         - text: Climatology Lab TerraClimate
           href: articles/terraclimate_workflow.html
