@@ -515,25 +515,25 @@ download_geos <- function(
   #### 1. Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
 
-  #### 2. Check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### 3. Check dates
+  #### 2. Check dates
   if (length(date) == 1) {
     date <- c(date, date)
   }
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
 
-  #### 4. Directory setup
+  #### 3. Directory setup
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
 
-  #### 5. Check and retrieve NASA token
+  #### 4. Check and retrieve NASA token
   nasa_earth_data_token <- amadeus::get_token(
     token = nasa_earth_data_token,
     env_var = "NASA_EARTHDATA_TOKEN"
   )
+
+  #### 5. Check for null parameters (AFTER token retrieval)
+  amadeus::check_for_null_parameters(mget(ls()))
 
   #### 6. Match collection
   collection <- match.arg(collection, several.ok = TRUE)
@@ -830,7 +830,10 @@ download_gmted <- function(
 #' @description
 #' The \code{download_merra2()} function accesses and downloads various
 #' meteorological and atmospheric collections from [NASA's Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/).
+#' @note Due to NASA data access policies, downloads require a valid NASA
+#' Earthdata token for authentication. Use \code{setup_nasa_token()} for setup.
 #' @param collection character(1). MERRA-2 data collection file name.
+#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData authentication token.
 #' @param date character(1 or 2). length of 10. Date or start/end dates for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
 #' @param directory_to_save character(1). Directory to save data.
@@ -1087,6 +1090,7 @@ download_merra2 <- function(
     "tavg3_3d_rad_Nv",
     "tavg3_2d_glc_Nx"
   ),
+  nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -1100,7 +1104,7 @@ download_merra2 <- function(
   #### 1. Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
 
-  #### 2. Directory setup
+  #### 2. Directory setup (can be done early)
   amadeus::download_setup_dir(directory_to_save)
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
 
@@ -1111,10 +1115,16 @@ download_merra2 <- function(
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
 
-  #### 4. Check for null parameters
+  #### 4. Check and retrieve NASA token (BEFORE null check)
+  nasa_earth_data_token <- amadeus::get_token(
+    token = nasa_earth_data_token,
+    env_var = "NASA_EARTHDATA_TOKEN"
+  )
+
+  #### 5. Now check for null parameters - token is now set
   amadeus::check_for_null_parameters(mget(ls()))
 
-  #### 5. Handle deprecated parameters
+  #### 6. Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
       "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
@@ -1130,7 +1140,7 @@ download_merra2 <- function(
     )
   }
 
-  #### 6. Check if collection is recognized
+  #### 7. Check if collection is recognized
   identifiers <- c(
     "inst1_2d_asm_Nx M2I1NXASM 10.5067/3Z173KIE2TPD",
     "inst1_2d_int_Nx M2I1NXINT 10.5067/G0U6NGQ3BLE0",
@@ -1186,17 +1196,17 @@ download_merra2 <- function(
     ))
   }
 
-  #### 7. Define date sequence
+  #### 8. Define date sequence
   date_sequence <- amadeus::generate_date_sequence(
     date[1],
     date[2],
     sub_hyphen = TRUE
   )
 
-  #### 8. Define year + month sequence
+  #### 9. Define year + month sequence
   yearmonth_sequence <- unique(substr(date_sequence, 1, 6))
 
-  #### 9. Collect all URLs and destination files
+  #### 10. Collect all URLs and destination files
   all_urls <- character()
   all_destfiles <- character()
 
@@ -1362,7 +1372,7 @@ download_merra2 <- function(
     }
   }
 
-  #### 10. Exit early if download=FALSE
+  #### 11. Exit early if download=FALSE
   if (!isTRUE(download)) {
     message(sprintf(
       "Skipping download. Found %d files available for download.\n",
@@ -1375,12 +1385,12 @@ download_merra2 <- function(
     )))
   }
 
-  #### 11. Download files using httr2
+  #### 12. Download files using httr2
   if (length(all_urls) > 0) {
     download_result <- amadeus::download_run_method(
       urls = all_urls,
       destfiles = all_destfiles,
-      token = NULL, # MERRA2 doesn't require token authentication
+      token = nasa_earth_data_token, # Now passing the NASA token!
       show_progress = show_progress,
       max_tries = max_tries,
       rate_limit = rate_limit
@@ -2563,13 +2573,16 @@ download_modis <- function(
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
 
-  #### 4. Check and retrieve NASA token (REQUIRED for MODIS)
+  #### 4. Check and retrieve NASA token (BEFORE null check)
   nasa_earth_data_token <- amadeus::get_token(
     token = nasa_earth_data_token,
     env_var = "NASA_EARTHDATA_TOKEN"
   )
 
-  #### 5. Check product
+  #### 5. Check for null parameters (AFTER token retrieval)
+  amadeus::check_for_null_parameters(mget(ls()))
+
+  #### 6. Check product
   product <- match.arg(product)
 
   if (substr(date[1], 1, 4) != substr(date[2], 1, 4)) {
@@ -2578,7 +2591,7 @@ download_modis <- function(
     }
   }
 
-  #### 6. Handle deprecated parameters
+  #### 7. Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
       "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
@@ -2594,17 +2607,10 @@ download_modis <- function(
     )
   }
 
-  #### 7. Check version
+  #### 8. Check version
   if (is.null(version)) {
     stop("Please select a data version.\n")
   }
-
-  #### 8. Date sequence
-  date_sequence <- amadeus::generate_date_sequence(
-    date[1],
-    date[2],
-    sub_hyphen = FALSE
-  )
 
   #### 9. Warning for excessive query
   dt_date <- as.Date(date)

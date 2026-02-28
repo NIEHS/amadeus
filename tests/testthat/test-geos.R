@@ -6,7 +6,7 @@
 ##### download_geos
 testthat::test_that("download_geos", {
   skip_if(
-    Sys.getenv("EARTHDATA_TOKEN") == "",
+    Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
     message = "No NASA token available"
   )
 
@@ -21,7 +21,7 @@ testthat::test_that("download_geos", {
       download_geos(
         date = c(date_start, date_end),
         collection = collections,
-        nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+        nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
         directory_to_save = ".",
         acknowledgement = TRUE,
         download = FALSE
@@ -42,7 +42,7 @@ testthat::test_that("download_geos", {
 
 testthat::test_that("download_geos (single date)", {
   skip_if(
-    Sys.getenv("EARTHDATA_TOKEN") == "",
+    Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
     message = "No NASA token available"
   )
 
@@ -56,7 +56,7 @@ testthat::test_that("download_geos (single date)", {
       download_geos(
         date = date,
         collection = collections,
-        nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+        nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
         directory_to_save = ".",
         acknowledgement = TRUE,
         download = FALSE

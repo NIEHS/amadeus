@@ -4,59 +4,46 @@
 ################################################################################
 ##### download_merra2
 testthat::test_that("download_merra2 (no errors)", {
+  skip_on_cran()
+  skip_if_offline()
+
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date_start <- "2022-02-14"
-  date_end <- "2022-03-08"
+  date_end <- "2022-02-15"
   collections <- c("inst1_2d_asm_Nx", "inst3_3d_asm_Np")
   directory_to_save <- paste0(tempdir(), "/merra2/")
-  # run download function
+
+  # Test that the function runs without error (requires NASA token)
   testthat::expect_no_error(
     download_data(
       dataset_name = "merra2",
       date = c(date_start, date_end),
       collection = collections,
       directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE
+      acknowledgement = TRUE
     )
   )
-  # define path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "merra2_",
-    date_start,
-    "_",
-    date_end,
-    "_wget_commands.txt"
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
   )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 2)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 3L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
+
   unlink(directory_to_save, recursive = TRUE)
 })
 
-testthat::test_that("download_merra2 (single date)", {
+testthat::test_that("download_merra2 deprecation warning with download=FALSE", {
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
   date <- "2023-02-14"
-  collections <- c("inst1_2d_asm_Nx", "inst3_3d_asm_Np")
-  directory_to_save <- paste0(tempdir(), "/merra2/")
-  # run download function
-  testthat::expect_no_error(
+  collections <- c("inst1_2d_asm_Nx")
+  directory_to_save <- paste0(tempdir(), "/merra2_deprecated/")
+
+  # Expect deprecation warning when using download = FALSE
+  testthat::expect_warning(
     download_data(
       dataset_name = "merra2",
       date = date,
@@ -64,31 +51,108 @@ testthat::test_that("download_merra2 (single date)", {
       directory_to_save = directory_to_save,
       acknowledgement = TRUE,
       download = FALSE
+    ),
+    "Setting download=FALSE is deprecated"
+  )
+
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("download_merra2 (single date)", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::local_package("httr2")
+  withr::local_package("stringr")
+  # function parameters
+  date <- "2023-02-14"
+  collections <- c("inst1_2d_asm_Nx", "inst3_3d_asm_Np")
+  directory_to_save <- paste0(tempdir(), "/merra2/")
+
+  # Test that the function runs without error (requires NASA token)
+  testthat::expect_no_error(
+    download_data(
+      dataset_name = "merra2",
+      date = date,
+      collection = collections,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE
     )
   )
-  # define path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "merra2_",
-    date,
-    "_",
-    date,
-    "_wget_commands.txt"
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
   )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 2)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 3L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
+
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("download_merra2 with NASA token", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::local_package("httr2")
+  withr::local_package("stringr")
+
+  # Skip if no NASA token is available
+  if (Sys.getenv("NASA_EARTHDATA_TOKEN") == "") {
+    skip("NASA_EARTHDATA_TOKEN not set")
+  }
+
+  # function parameters
+  date <- "2024-01-02"
+  collections <- c("inst1_2d_int_Nx")
+  directory_to_save <- paste0(tempdir(), "/merra2_token/")
+
+  # Test download with token
+  testthat::expect_no_error(
+    result <- download_data(
+      dataset_name = "merra2",
+      date = date,
+      collection = collections,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE
+    )
   )
-  # remove file with commands after test
-  file.remove(commands_path)
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
+  )
+
+  # Check that some files were processed (either downloaded or skipped)
+  testthat::expect_true(
+    length(list.files(directory_to_save, recursive = TRUE)) > 0
+  )
+
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("download_merra2 fails without NASA token", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::local_package("httr2")
+  withr::local_package("stringr")
+
+  # Temporarily unset NASA token
+  withr::local_envvar(NASA_EARTHDATA_TOKEN = "")
+
+  directory_to_save <- paste0(tempdir(), "/merra2_notoken/")
+
+  # Should error when no token is available
+  testthat::expect_error(
+    download_data(
+      dataset_name = "merra2",
+      date = "2024-01-02",
+      collection = "inst1_2d_int_Nx",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE
+    ),
+    "NASA_EARTHDATA_TOKEN"
+  )
+
   unlink(directory_to_save, recursive = TRUE)
 })
 

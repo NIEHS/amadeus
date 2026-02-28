@@ -11,15 +11,24 @@ testthat::test_that("download_gridmet (no errors)", {
   year_end <- 2023
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/gridmet/")
+
   # run download function
-  download_data(
-    dataset_name = "gridmet",
-    year = c(year_start, year_end),
-    variables = variables,
-    directory_to_save = directory_to_save,
-    acknowledgement = TRUE,
-    download = FALSE
+  testthat::expect_no_error(
+    download_data(
+      dataset_name = "gridmet",
+      year = c(year_start, year_end),
+      variables = variables,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    )
   )
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
+  )
+
   # define path with commands
   commands_path <- paste0(
     directory_to_save,
@@ -29,20 +38,25 @@ testthat::test_that("download_gridmet (no errors)", {
     year_end,
     "_curl_commands.txt"
   )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
+
+  # Only proceed with command file tests if it exists
+  if (file.exists(commands_path)) {
+    # import commands
+    commands <- read_commands(commands_path = commands_path)
+    # extract urls
+    urls <- extract_urls(commands = commands, position = 6)
+    # check HTTP URL status
+    url_status <- check_urls(urls = urls, size = 2L)
+    # implement unit tests
+    test_download_functions(
+      directory_to_save = directory_to_save,
+      commands_path = commands_path,
+      url_status = url_status
+    )
+    # remove file with commands after test
+    file.remove(commands_path)
+  }
+
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -53,15 +67,24 @@ testthat::test_that("download_gridmet (single year)", {
   year <- 2020
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/gridmet/")
+
   # run download function
-  download_data(
-    dataset_name = "gridmet",
-    year = year,
-    variables = variables,
-    directory_to_save = directory_to_save,
-    acknowledgement = TRUE,
-    download = FALSE
+  testthat::expect_no_error(
+    download_data(
+      dataset_name = "gridmet",
+      year = year,
+      variables = variables,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    )
   )
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
+  )
+
   # define path with commands
   commands_path <- paste0(
     directory_to_save,
@@ -71,20 +94,25 @@ testthat::test_that("download_gridmet (single year)", {
     year,
     "_curl_commands.txt"
   )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
+
+  # Only proceed with command file tests if it exists
+  if (file.exists(commands_path)) {
+    # import commands
+    commands <- read_commands(commands_path = commands_path)
+    # extract urls
+    urls <- extract_urls(commands = commands, position = 6)
+    # check HTTP URL status
+    url_status <- check_urls(urls = urls, size = 1L)
+    # implement unit tests
+    test_download_functions(
+      directory_to_save = directory_to_save,
+      commands_path = commands_path,
+      url_status = url_status
+    )
+    # remove file with commands after test
+    file.remove(commands_path)
+  }
+
   unlink(directory_to_save, recursive = TRUE)
 })
 

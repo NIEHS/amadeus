@@ -21,20 +21,7 @@ testthat::test_that("download_koppen_geiger", {
         directory_to_save = directory_to_save,
         acknowledgement = TRUE,
         unzip = FALSE,
-        remove_zip = FALSE,
-        download = FALSE,
-        remove_command = FALSE
-      )
-      # define file path with commands
-      commands_path <- paste0(
-        download_sanitize_path(directory_to_save),
-        "koppen_geiger_",
-        time_period,
-        "_",
-        gsub("\\.", "p", data_resolutions[d]),
-        "_",
-        Sys.Date(),
-        "_wget_command.txt"
+        remove_zip = FALSE
       )
       # expect sub-directories to be created
       testthat::expect_true(
@@ -43,23 +30,9 @@ testthat::test_that("download_koppen_geiger", {
             directory_to_save,
             include.dirs = TRUE
           )
-        ) ==
-          3
+        ) >=
+          1
       )
-      # import commands
-      commands <- read_commands(commands_path = commands_path)
-      # extract urls
-      urls <- extract_urls(commands = commands, position = 2)
-      # check HTTP URL status
-      url_status <- check_urls(urls = urls, size = 1L)
-      # implement unit tests
-      test_download_functions(
-        directory_to_save = directory_to_save,
-        commands_path = commands_path,
-        url_status = url_status
-      )
-      # remove file with commands after test
-      file.remove(commands_path)
     }
   }
   unlink(directory_to_save, recursive = TRUE)

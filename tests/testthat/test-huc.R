@@ -130,7 +130,6 @@ testthat::test_that("process_huc", {
       extent = terra::ext(result)
     )
   )
-
 })
 
 
@@ -180,5 +179,4 @@ testthat::test_that("calculate_huc", {
     calculate_huc(from = 0, locs = locs_v, locs_id = "site_id"),
     "`from` must be the output of process_huc()."
   )
-
 })
