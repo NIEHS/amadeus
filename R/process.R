@@ -859,6 +859,7 @@ process_nlcd <-
       "SpcChg"
     )
     # open nlcd file corresponding to the year
+    # Try new naming convention (with recursive search for subdirectories)
     nlcd_file <-
       list.files(
         path,
@@ -869,17 +870,23 @@ process_nlcd <-
           year,
           "_.*\\.(tif|img)$"
         ),
-        full.names = TRUE
+        full.names = TRUE,
+        recursive = TRUE, # ADD THIS - files may be in subdirectories
+        ignore.case = TRUE # ADD THIS - for robustness
       )
+
     if (length(nlcd_file) == 0) {
       message("No NLCD files detected. Trying deprecated file names...")
       nlcd_file <-
         list.files(
           path,
-          pattern = paste0("nlcd_", year, "_.*.(tif|img)$"),
-          full.names = TRUE
+          pattern = paste0("nlcd_", year, "_.*\\.(tif|img)$"),
+          full.names = TRUE,
+          recursive = TRUE, # ADD THIS
+          ignore.case = TRUE # ADD THIS
         )
-      if (length(nlcd_file > 1)) {
+      if (length(nlcd_file) > 0) {
+        # FIXED: was > 1, should be > 0
         message(
           paste0(
             "Deprecated file paths detected. Data still imported, but ",
@@ -889,6 +896,7 @@ process_nlcd <-
         )
       }
     }
+
     # check if name without extension is duplicated
     nlcd_file_base <- basename(nlcd_file)
     nlcd_file_base <- tools::file_path_sans_ext(nlcd_file_base)
@@ -898,10 +906,11 @@ process_nlcd <-
     if (length(nlcd_file) == 0) {
       stop("NLCD data not available for this year.")
     }
+
     # NLCD C1V1 bug
     # `.aux.xml` metadata file was causing `NA` values to be read as `NaN`,
     # corrupting the factor/integer data values when used downstream.
-    # File is hidden with preceding `._` for retention but exlcusion in
+    # File is hidden with preceding `._` for retention but exclusion in
     # metadata definitions.
     chr_aux_xml_path <- list.files(
       path,
@@ -910,26 +919,37 @@ process_nlcd <-
         paste(product_codes, collapse = "|"),
         ")_",
         year,
-        "_.*\\.aux.xml"
+        "_.*\\.aux\\.xml$" # FIXED: escaped the dot before xml
       ),
-      full.names = FALSE
+      full.names = FALSE,
+      recursive = TRUE, # ADD THIS
+      ignore.case = TRUE # ADD THIS
     )
-    chr_aux_xml_hide <- file.path(
-      amadeus::download_sanitize_path(path),
-      paste0("._", chr_aux_xml_path)
-    )
-    if (length(chr_aux_xml_path) == 1) {
-      message(paste0("Hiding corrupt ", chr_aux_xml_path, " metadata file."))
-      file.rename(
-        file.path(amadeus::download_sanitize_path(path), chr_aux_xml_path),
-        chr_aux_xml_hide
-      )
+
+    if (length(chr_aux_xml_path) > 0) {
+      # FIXED: handle multiple files
+      for (aux_file in chr_aux_xml_path) {
+        chr_aux_xml_hide <- file.path(
+          dirname(file.path(path, aux_file)),
+          paste0("._", basename(aux_file))
+        )
+        chr_aux_xml_full <- file.path(path, aux_file)
+
+        if (file.exists(chr_aux_xml_full) && !file.exists(chr_aux_xml_hide)) {
+          message(paste0(
+            "Hiding corrupt ",
+            basename(aux_file),
+            " metadata file."
+          ))
+          file.rename(chr_aux_xml_full, chr_aux_xml_hide)
+        }
+      }
     }
+
     nlcd <- terra::rast(nlcd_file, win = extent)
-    terra::metags(nlcd) <- c(year = year)
+    terra::metags(nlcd) <- c(Year = as.character(year)) # Changed to capital Y
     return(nlcd)
   }
-
 
 #' Process ecoregion data
 #' @description
@@ -3005,8 +3025,6 @@ process_prism <-
     return(prism)
   }
 # nolint end
-
-
 
 #' Process CropScape data
 #' @description

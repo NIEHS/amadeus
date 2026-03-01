@@ -1426,17 +1426,20 @@ calculate_nei <- function(
   # spatial join
   locs_re <- terra::project(locs, terra::crs(from))
   locs_re <- terra::intersect(locs_re, from)
-  locs_re <- as.data.frame(locs_re)
 
-  locs_return <- amadeus::calc_return_locs(
-    covar = locs_re,
-    POSIXt = FALSE,
-    geom = geom,
-    crs = terra::crs(from)
-  )
-  return(locs_return)
+  # If returning geometry, keep as SpatVector
+  if (geom %in% c("terra", "sf")) {
+    if (geom == "terra") {
+      return(locs_re)
+    } else if (geom == "sf") {
+      return(sf::st_as_sf(locs_re))
+    }
+  } else {
+    # Only convert to data.frame if geom = FALSE
+    locs_re <- as.data.frame(locs_re)
+    return(locs_re)
+  }
 }
-
 
 #' Calculate wildfire smoke covariates
 #' @description
@@ -2905,7 +2908,6 @@ calculate_huc <- function(
   geom = FALSE,
   ...
 ) {
-
   if (!inherits(from, "SpatVector")) {
     stop("`from` must be the output of process_huc().")
   }

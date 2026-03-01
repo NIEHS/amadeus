@@ -1590,6 +1590,57 @@ download_narr <- function(
   }
 }
 
+#' Download National Land Cover Database (NLCD) data
+#' @description
+#' Downloads NLCD data products from the Multi-Resolution Land Characteristics
+#' (MRLC) Consortium. NLCD provides nationwide land cover and land cover change
+#' information for the United States at a 30m resolution.
+#' @param product character(1). NLCD product type. One of:
+#' \itemize{
+#'   \item "Land Cover" (default)
+#'   \item "Land Cover Change"
+#'   \item "Land Cover Confidence"
+#'   \item "Fractional Impervious Surface"
+#'   \item "Impervious Descriptor"
+#'   \item "Spectral Change Day of Year"
+#' }
+#' @param year integer(1). Year of NLCD data (1985-2024). Default is 2021.
+#' @param directory_to_save character(1). Directory to save downloaded files.
+#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with download.
+#' @param download logical(1). DEPRECATED. Downloads now happen automatically.
+#'   Set to FALSE to skip downloading (generates file list only).
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param unzip logical(1). Unzip downloaded files? Default is \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip files after extraction? Default is \code{FALSE}.
+#' @param show_progress logical(1). Show download progress? Default is \code{TRUE}.
+#' @param hash logical(1). Return hash of downloaded files? Default is \code{FALSE}.
+#' @param max_tries integer(1). Maximum download retry attempts. Default is 20.
+#' @author Mitchell Manware, Insang Song, Kyle Messier
+#' @return invisible NULL; or hash character if hash=TRUE
+#' @importFrom Rdpack reprompt
+#' @references
+#' \insertRef{data_mrlc_nlcd2021}{amadeus}
+#' @examples
+#' \dontrun{
+#' # Download 2021 Land Cover
+#' download_nlcd(
+#'   product = "Land Cover",
+#'   year = 2021,
+#'   directory_to_save = tempdir(),
+#'   acknowledgement = TRUE
+#' )
+#'
+#' # Download Land Cover Change for 2019
+#' download_nlcd(
+#'   product = "Land Cover Change",
+#'   year = 2019,
+#'   directory_to_save = tempdir(),
+#'   acknowledgement = TRUE,
+#'   unzip = TRUE,
+#'   remove_zip = TRUE
+#' )
+#' }
+#' @export
 download_nlcd <- function(
   product = "Land Cover",
   year = 2021,
@@ -2851,6 +2902,7 @@ download_tri <- function(
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
@@ -2878,6 +2930,7 @@ download_nei <- function(
   download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
+  remove_zip = FALSE,
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,

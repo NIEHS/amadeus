@@ -16,6 +16,7 @@ download_merra2(
     "tavg3_3d_mst_Np", "tavg3_3d_rad_Np", "tavg3_3d_tdt_Np", "tavg3_3d_trb_Np",
     "tavg3_3d_udt_Np", "tavg3_3d_odt_Np", "tavg3_3d_qdt_Np", "tavg3_3d_asm_Nv",
     "tavg3_3d_cld_Nv", "tavg3_3d_mst_Nv", "tavg3_3d_rad_Nv", "tavg3_2d_glc_Nx"),
+  nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -29,6 +30,8 @@ download_merra2(
 }
 \arguments{
 \item{collection}{character(1). MERRA-2 data collection file name.}
+
+\item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData authentication token.}
 
 \item{date}{character(1 or 2). length of 10. Date or start/end dates for downloading data.
 Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}).}
@@ -59,6 +62,10 @@ invisible list with download results; or hash character if hash=TRUE
 \description{
 The \code{download_merra2()} function accesses and downloads various
 meteorological and atmospheric collections from \href{https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/}{NASA's Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model}.
+}
+\note{
+Due to NASA data access policies, downloads require a valid NASA
+Earthdata token for authentication. Use \code{setup_nasa_token()} for setup.
 }
 \examples{
 \dontrun{

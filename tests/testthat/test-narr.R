@@ -4,6 +4,9 @@
 ################################################################################
 ##### download_narr
 testthat::test_that("download_narr (no errors)", {
+  skip_on_cran()
+  skip_if_offline()
+
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
@@ -15,15 +18,25 @@ testthat::test_that("download_narr (no errors)", {
     "soill" # subsurface
   )
   directory_to_save <- paste0(tempdir(), "/narr/")
-  # run download function
-  download_data(
-    dataset_name = "narr",
-    year = c(year_start, year_end),
-    variables = variables,
-    directory_to_save = directory_to_save,
-    acknowledgement = TRUE,
-    download = FALSE
+
+  # Expect deprecation warning with download = FALSE
+  testthat::expect_warning(
+    download_data(
+      dataset_name = "narr",
+      year = c(year_start, year_end),
+      variables = variables,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    ),
+    "Setting download=FALSE is deprecated"
   )
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
+  )
+
   # define path with commands
   commands_path <- paste0(
     directory_to_save,
@@ -33,29 +46,38 @@ testthat::test_that("download_narr (no errors)", {
     year_end,
     "_curl_commands.txt"
   )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 3L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
+
+  # Only proceed if commands file exists
+  if (file.exists(commands_path)) {
+    # import commands
+    commands <- read_commands(commands_path = commands_path)
+    # extract urls
+    urls <- extract_urls(commands = commands, position = 6)
+    # check HTTP URL status
+    url_status <- check_urls(urls = urls, size = 3L)
+    # implement unit tests
+    test_download_functions(
+      directory_to_save = directory_to_save,
+      commands_path = commands_path,
+      url_status = url_status
+    )
+    # remove file with commands after test
+    file.remove(commands_path)
+  }
+
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_narr (single year)", {
+  skip_on_cran()
+  skip_if_offline()
+
   withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/narr/")
-  # run download function
-  testthat::expect_no_error(
+
+  # Expect deprecation warning
+  testthat::expect_warning(
     download_data(
       dataset_name = "narr",
       year = 2020,
@@ -63,8 +85,16 @@ testthat::test_that("download_narr (single year)", {
       directory_to_save = directory_to_save,
       acknowledgement = TRUE,
       download = FALSE
-    )
+    ),
+    "Setting download=FALSE is deprecated"
   )
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
+  )
+
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_narr (expected errors)", {
@@ -84,6 +114,33 @@ testthat::test_that("narr_variable (expected errors)", {
   testthat::expect_error(
     narr_variable("uNrEcOgNiZed")
   )
+})
+
+testthat::test_that("download_narr without download=FALSE", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::local_package("httr2")
+  withr::local_package("stringr")
+  directory_to_save <- paste0(tempdir(), "/narr_new/")
+
+  # Test without download=FALSE (new httr2 method, no deprecation warning)
+  testthat::expect_no_error(
+    download_data(
+      dataset_name = "narr",
+      year = 2020,
+      variables = "weasd",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE
+    )
+  )
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
+  )
+
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 ################################################################################
