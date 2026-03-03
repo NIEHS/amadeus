@@ -199,6 +199,50 @@ testthat::test_that("download_nei mock download with hash", {
   })
 })
 
+testthat::test_that("download_nei epa_certificate_path deprecation warning", {
+  skip_on_cran()
+
+  withr::with_tempdir({
+    testthat::local_mocked_bindings(
+      check_url_status = function(...) TRUE,
+      check_destfile = function(...) FALSE,
+      download_run_method = function(...) {
+        invisible(list(success = 0, failed = 0, skipped = 2))
+      },
+      download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+      .package = "amadeus"
+    )
+
+    # epa_certificate_path != NULL should trigger deprecation warning
+    testthat::expect_warning(
+      suppressMessages(
+        download_nei(
+          year = 2020,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE,
+          epa_certificate_path = "/fake/cert.pem"
+        )
+      ),
+      "epa_certificate_path.*deprecated|deprecated.*epa_certificate"
+    )
+
+    # certificate_url != default should also trigger warning
+    testthat::expect_warning(
+      suppressMessages(
+        download_nei(
+          year = 2020,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE,
+          certificate_url = "https://other.cert.url/cert.crt"
+        )
+      ),
+      "certificate_url.*deprecated|deprecated.*certificate_url"
+    )
+  })
+})
+
 ################################################################################
 ##### process_nei
 testthat::test_that("process_nei", {

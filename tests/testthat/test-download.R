@@ -1682,3 +1682,56 @@ testthat::test_that("download_run_method 0-byte with show_progress=TRUE", {
     testthat::expect_false(file.exists(destfile))
   })
 })
+
+################################################################################
+##### download_run_method show_progress=TRUE success path (" OK " prefix)
+
+testthat::test_that(
+  "download_run_method show_progress=TRUE success shows OK prefix",
+  {
+    skip_on_cran()
+
+    withr::with_tempdir({
+      testthat::local_mocked_bindings(
+        req_perform = function(req, path = NULL, ...) {
+          if (!is.null(path)) {
+            writeBin(charToRaw("fake file data"), path)
+          }
+          structure(
+            list(
+              status_code = 200L,
+              headers = list(`Content-Type` = "application/octet-stream"),
+              body = charToRaw("fake file data")
+            ),
+            class = "httr2_response"
+          )
+        },
+        .package = "httr2"
+      )
+
+      msgs <- character(0)
+      withCallingHandlers(
+        {
+          result <- download_run_method(
+            urls = c(
+              "https://example.com/file1.bin",
+              "https://example.com/file2.bin"
+            ),
+            destfiles = c("file1.bin", "file2.bin"),
+            show_progress = TRUE,
+            max_tries = 1,
+            rate_limit = 0
+          )
+        },
+        message = function(m) {
+          msgs <<- c(msgs, conditionMessage(m))
+          invokeRestart("muffleMessage")
+        }
+      )
+
+      testthat::expect_equal(result$success, 2)
+      testthat::expect_equal(result$failed, 0)
+      testthat::expect_true(any(grepl(" OK ", msgs)))
+    })
+  }
+)
