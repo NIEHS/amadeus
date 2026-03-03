@@ -143,16 +143,15 @@ get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
       "  1. Set environment variable: Sys.setenv(%s = 'your_token')\n",
       env_var
     ),
-    sprintf("  2. Create ~/.nasa_earthdata_token file with your token\n"),
-    sprintf(
+    "  2. Create ~/.nasa_earthdata_token file with your token\n",
+    paste0(
       "  3. Pass token file path:",
       " nasa_earth_data_token = '~/.nasa_earthdata_token'\n"
     ),
     "  4. Pass token directly:",
     " nasa_earth_data_token = 'your_token' (not recommended)\n",
     sprintf(
-      "\nTo set up for all R sessions,",
-      " add to ~/.Renviron:\n  %s=your_token_here\n",
+      "\nTo set up for all R sessions, add to ~/.Renviron:\n  %s=your_token_here\n",
       env_var
     ),
     call. = FALSE
@@ -375,21 +374,6 @@ download_run_method <- function(
   ))
 }
 
-
-#' Format file size for display
-#' @keywords internal
-#' @noRd
-format_file_size <- function(bytes) {
-  if (bytes < 1024) {
-    return(sprintf("%d B", bytes))
-  } else if (bytes < 1024^2) {
-    return(sprintf("%.1f KB", bytes / 1024))
-  } else if (bytes < 1024^3) {
-    return(sprintf("%.1f MB", bytes / 1024^2))
-  } else {
-    return(sprintf("%.1f GB", bytes / 1024^3))
-  }
-}
 
 #' Format file size for display
 #' @keywords internal
