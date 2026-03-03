@@ -278,6 +278,83 @@ testthat::test_that("download_modis with NASA token", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that("download_modis remove_command warning and hash=TRUE (mock)", {
+  skip_on_cran()
+
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) {
+      invisible(list(success = 1, failed = 0, skipped = 0))
+    },
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      list(
+        feed = list(
+          entry = list(
+            list(
+              links = list(
+                list(
+                  rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                  href = paste0(
+                    "https://e4ftl01.cr.usgs.gov/MOLT/MOD09GA.061/",
+                    "2023.01.01/MOD09GA.A2023001.h10v05.061.hdf"
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    },
+    .package = "httr2"
+  )
+
+  withr::with_tempdir({
+    # Test remove_command=TRUE warning
+    testthat::expect_warning(
+      suppressMessages(
+        download_modis(
+          date = "2023-01-01",
+          product = "MOD09GA",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          remove_command = TRUE,
+          hash = FALSE
+        )
+      ),
+      "remove_command.*deprecated"
+    )
+
+    # Test hash=TRUE return
+    result <- suppressWarnings(
+      suppressMessages(
+        download_modis(
+          date = "2023-01-01",
+          product = "MOD09GA",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
 ################################################################################
 ##### process_modis*
 testthat::test_that("process_modis_sds", {

@@ -1045,11 +1045,17 @@ testthat::test_that("download_run_method respects rate limiting", {
 
 
 testthat::test_that("format_file_size formats correctly", {
-  testthat::expect_equal(format_file_size(500), "500 B")
-  testthat::expect_equal(format_file_size(1024), "1.0 KB")
-  testthat::expect_equal(format_file_size(1024 * 1024), "1.0 MB")
-  testthat::expect_equal(format_file_size(1024 * 1024 * 1024), "1.0 GB")
-  testthat::expect_equal(format_file_size(2560), "2.5 KB")
+  testthat::expect_equal(amadeus:::format_file_size(500), "500 B")
+  testthat::expect_equal(amadeus:::format_file_size(1024), "1.0 KB")
+  testthat::expect_equal(amadeus:::format_file_size(1024 * 1024), "1.0 MB")
+  testthat::expect_equal(
+    amadeus:::format_file_size(1024 * 1024 * 1024), "1.0 GB"
+  )
+  testthat::expect_equal(amadeus:::format_file_size(2560), "2.5 KB")
+  # GB branch: bytes >= 1024^3
+  testthat::expect_equal(
+    amadeus:::format_file_size(2 * 1024^3), "2.0 GB"
+  )
 })
 
 
