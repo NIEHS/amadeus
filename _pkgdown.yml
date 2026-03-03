@@ -51,6 +51,7 @@ reference:
   desc: Functions which support the download, process, and covariate calculation functions
 - contents:
   - has_keyword("auxiliary")
+  - setup_nasa_token
 
 articles:
 - title: Articles
