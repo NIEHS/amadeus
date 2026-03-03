@@ -1144,8 +1144,9 @@ download_merra2 <- function(
       " after discovering files.\n",
       call. = FALSE
     )
-    return(invisible(list(urls = character(0), destfiles = character(0),
-      n_files = 0L)))
+    return(invisible(list(urls = character(0),
+                          destfiles = character(0),
+                          n_files = 0L)))
   }
 
   if (remove_command != FALSE) {
