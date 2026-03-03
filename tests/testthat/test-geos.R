@@ -75,6 +75,52 @@ testthat::test_that("download_geos (single date)", {
   })
 })
 
+testthat::test_that("download_geos remove_command deprecation warning", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+        download_geos(
+          date = "2019-09-09",
+          collection = "aqc_tavg_1hr_g1440x721_v1",
+          nasa_earth_data_token = "fake_token",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE,
+          remove_command = TRUE
+      ),
+      regexp = "remove_command.*deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_geos mock download with hash", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_geos(
+          date = "2019-09-09",
+          collection = "aqc_tavg_1hr_g1440x721_v1",
+          nasa_earth_data_token = "fake_token",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
 ################################################################################
 ##### process_geos
 testthat::test_that("process_geos (no errors)", {

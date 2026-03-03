@@ -140,6 +140,50 @@ testthat::test_that("download_gridmet (expected errors - invalid variables)", {
   )
 })
 
+testthat::test_that("download_gridmet remove_command deprecation warning", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      download_gridmet(
+        variables = "Precipitation",
+        year = c(2018, 2018),
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = TRUE
+      ),
+      regexp = "remove_command.*deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_gridmet mock download with hash", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_gridmet(
+          variables = "Precipitation",
+          year = c(2018, 2018),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
 ################################################################################
 ##### process_gridmet
 testthat::test_that("process_gridmet", {

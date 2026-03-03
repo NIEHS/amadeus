@@ -94,6 +94,67 @@ testthat::test_that("download_prism (expected errors)", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that(
+  "download_prism mock download (unzip + remove_zip + hash)",
+  {
+    testthat::local_mocked_bindings(
+      download_run_method = function(...) invisible(NULL),
+      download_unzip = function(...) invisible(NULL),
+      download_hash = function(hash, dir) {
+        if (isTRUE(hash)) "fakehash" else NULL
+      },
+      .package = "amadeus"
+    )
+    withr::with_tempdir({
+      result <- suppressWarnings(
+        suppressMessages(
+          download_prism(
+            time = "201005",
+            element = "ppt",
+            data_type = "ts",
+            format = "nc",
+            directory_to_save = ".",
+            acknowledgement = TRUE,
+            download = TRUE,
+            unzip = TRUE,
+            remove_zip = TRUE,
+            hash = TRUE
+          )
+        )
+      )
+      testthat::expect_equal(result, "fakehash")
+    })
+  }
+)
+
+testthat::test_that("download_prism mock download (hash = FALSE)", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) invisible(NULL),
+    download_unzip = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_prism(
+          time = "201005",
+          element = "ppt",
+          data_type = "ts",
+          format = "nc",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          remove_zip = FALSE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_null(result)
+  })
+})
+
 ################################################################################
 ##### process_prism
 testthat::test_that("process_prism", {

@@ -38,6 +38,51 @@ testthat::test_that("download_koppen_geiger", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that(
+  "download_koppen_geiger remove_command deprecation warning",
+  {
+    withr::with_tempdir({
+      testthat::expect_warning(
+        download_koppen_geiger(
+          data_resolution = "0.5",
+          time_period = "Present",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE,
+          remove_command = TRUE
+        ),
+        regexp = "remove_command.*deprecated"
+      )
+    })
+  }
+)
+
+testthat::test_that("download_koppen_geiger mock download with hash", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) invisible(NULL),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_koppen_geiger(
+          data_resolution = "0.5",
+          time_period = "Present",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
 ################################################################################
 ##### process_koppen_geiger
 testthat::test_that("process_koppen_geiger", {

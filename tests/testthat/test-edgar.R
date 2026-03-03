@@ -344,3 +344,33 @@ testthat::test_that("download_edgar (bad temp_res)", {
     )
   )
 })
+
+
+testthat::test_that("download_edgar mock download with hash", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) invisible(NULL),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_edgar(
+          species = "CO",
+          temp_res = "yearly",
+          sector_yearly = "ENE",
+          year_range = c(2021, 2021),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})

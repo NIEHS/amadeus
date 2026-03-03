@@ -91,6 +91,31 @@ testthat::test_that("download_cropscape (expected errors)", {
 })
 
 
+testthat::test_that("download_cropscape mock download with hash", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) invisible(NULL),
+    download_unzip = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_cropscape(
+          year = 2020,
+          source = "GMU",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
 ################################################################################
 ##### process_cropscape
 testthat::test_that("process_cropscape", {

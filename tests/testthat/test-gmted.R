@@ -155,6 +155,48 @@ testthat::test_that("download_gmted with download_data function", {
 })
 
 
+testthat::test_that("download_gmted remove_command deprecation warning", {
+  withr::with_tempdir({
+    testthat::expect_warning(
+      download_gmted(
+        statistic = "Breakline Emphasis",
+        resolution = "7.5 arc-seconds",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = TRUE
+      ),
+      regexp = "remove_command.*deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_gmted mock download with hash", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) invisible(NULL),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_gmted(
+          statistic = "Breakline Emphasis",
+          resolution = "7.5 arc-seconds",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
 ################################################################################
 ##### process_gmted
 testthat::test_that("process_gmted (no errors)", {

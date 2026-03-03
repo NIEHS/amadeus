@@ -215,6 +215,53 @@ testthat::test_that("download_hms (live + single date)", {
 })
 
 ################################################################################
+##### download_hms additional coverage tests
+testthat::test_that("download_hms remove_command deprecation warning", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+        download_hms(
+          date = c("2018-01-01", "2018-01-01"),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE,
+          remove_command = TRUE
+      ),
+      regexp = "remove_command.*deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_hms mock download with hash", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) invisible(NULL),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_hms(
+          date = c("2018-01-01", "2018-01-01"),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
+################################################################################
 ##### process_hms
 testthat::test_that("process_hms (with polygons)", {
   withr::local_package("terra")

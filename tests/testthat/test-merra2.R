@@ -179,6 +179,81 @@ testthat::test_that("download_merra2 (expected errors)", {
   )
 })
 
+testthat::test_that("download_merra2 remove_command deprecation warning", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    check_destfile = function(...) FALSE,
+    download_run_method = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      download_merra2(
+        collection = "inst1_2d_asm_Nx",
+        date = c("2022-02-14", "2022-02-14"),
+        nasa_earth_data_token = "fake_token",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        remove_command = TRUE
+      ),
+      regexp = "remove_command.*deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_merra2 all files exist branch", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    check_destfile = function(...) FALSE,
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_merra2(
+          collection = "inst1_2d_asm_Nx",
+          date = c("2022-02-14", "2022-02-14"),
+          nasa_earth_data_token = "fake_token",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 0)
+  })
+})
+
+testthat::test_that("download_merra2 hash = TRUE path", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    check_destfile = function(...) FALSE,
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_merra2(
+          collection = "inst1_2d_asm_Nx",
+          date = c("2022-02-14", "2022-02-14"),
+          nasa_earth_data_token = "fake_token",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
 ################################################################################
 ##### process_merra2
 testthat::test_that("process_merra2", {

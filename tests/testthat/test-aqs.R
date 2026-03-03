@@ -382,6 +382,78 @@ testthat::test_that("process_aqs", {
   )
 })
 
+testthat::test_that("download_aqs remove_command deprecation warning", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      download_aqs(
+        year = 2022,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = TRUE
+      ),
+      regexp = "remove_command.*deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_aqs all files exist branch", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    check_destfile = function(...) FALSE,
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_aqs(
+          year = 2022,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 0)
+    testthat::expect_equal(result$skipped, 1)
+  })
+})
+
+testthat::test_that("download_aqs hash = TRUE path", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    check_destfile = function(...) FALSE,
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_aqs(
+          year = 2022,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
 testthat::test_that("download_aqs -> process_aqs integration (basic)", {
   skip_on_cran()
   skip_if_offline()

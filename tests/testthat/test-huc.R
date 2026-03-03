@@ -70,6 +70,29 @@ testthat::test_that("download_huc deprecation warnings", {
 })
 
 
+testthat::test_that("download_huc mock download with hash", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_huc(
+          region = "Lower48",
+          type = "Seamless",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
 ################################################################################
 ##### process_huc
 testthat::test_that("process_huc", {

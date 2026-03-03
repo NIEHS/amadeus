@@ -143,6 +143,45 @@ testthat::test_that("download_narr without download=FALSE", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that("download_narr remove_command deprecation warning", {
+  withr::with_tempdir({
+    testthat::expect_warning(
+      download_narr(
+        year = 2020,
+        variables = "weasd",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = TRUE
+      ),
+      regexp = "remove_command.*deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_narr mock download with hash", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = "weasd",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
 ################################################################################
 ##### process_narr
 testthat::test_that("process_narr", {
