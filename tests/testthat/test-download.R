@@ -1479,3 +1479,200 @@ testthat::test_that("check_for_null_parameters passes with no nulls", {
     check_for_null_parameters(params)
   )
 })
+
+################################################################################
+##### setup_nasa_token - renviron and file method coverage
+
+testthat::test_that("setup_nasa_token renviron method writes token to .Renviron", {
+  skip_on_cran()
+
+  withr::with_tempdir({
+    renviron_path <- file.path(getwd(), ".Renviron")
+    withr::local_envvar(HOME = getwd())
+
+    testthat::expect_message(
+      setup_nasa_token(method = "renviron", token = "myrenvirontoken"),
+      "Token saved"
+    )
+
+    testthat::expect_true(file.exists(renviron_path))
+    lines <- readLines(renviron_path)
+    testthat::expect_true(
+      any(grepl("NASA_EARTHDATA_TOKEN=myrenvirontoken", lines))
+    )
+  })
+})
+
+testthat::test_that("setup_nasa_token renviron method updates existing token", {
+  skip_on_cran()
+
+  withr::with_tempdir({
+    renviron_path <- file.path(getwd(), ".Renviron")
+    withr::local_envvar(HOME = getwd())
+
+    # Pre-populate with old token
+    writeLines(
+      c("OTHER_VAR=1", "NASA_EARTHDATA_TOKEN=oldtoken"),
+      renviron_path
+    )
+
+    suppressMessages(
+      setup_nasa_token(method = "renviron", token = "newtoken")
+    )
+
+    lines <- readLines(renviron_path)
+    testthat::expect_true(any(grepl("NASA_EARTHDATA_TOKEN=newtoken", lines)))
+    testthat::expect_false(any(grepl("oldtoken", lines)))
+    testthat::expect_true(any(grepl("OTHER_VAR=1", lines)))
+  })
+})
+
+testthat::test_that("setup_nasa_token file method writes token to file", {
+  skip_on_cran()
+
+  withr::with_tempdir({
+    token_path <- file.path(getwd(), ".nasa_earthdata_token")
+    withr::local_envvar(HOME = getwd())
+
+    testthat::expect_message(
+      setup_nasa_token(method = "file", token = "myfiletoken"),
+      "Token saved"
+    )
+
+    testthat::expect_true(file.exists(token_path))
+    testthat::expect_equal(trimws(readLines(token_path)), "myfiletoken")
+  })
+})
+
+testthat::test_that("setup_nasa_token errors in non-interactive mode with NULL token", {
+  skip_on_cran()
+
+  testthat::expect_error(
+    setup_nasa_token(method = "renviron", token = NULL),
+    "non-interactive"
+  )
+})
+
+################################################################################
+##### download_run_method with token (Bearer auth header path)
+
+testthat::test_that("download_run_method with token adds Bearer auth header", {
+  skip_on_cran()
+
+  withr::with_tempdir({
+    fake_response <- structure(
+      list(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/octet-stream"),
+        body = charToRaw("fake content")
+      ),
+      class = "httr2_response"
+    )
+
+    testthat::local_mocked_bindings(
+      req_perform = function(req, path = NULL, ...) {
+        if (!is.null(path)) {
+          writeBin(charToRaw("fake file content"), path)
+        }
+        fake_response
+      },
+      .package = "httr2"
+    )
+
+    destfile <- "token_test.bin"
+    result <- suppressMessages(
+      download_run_method(
+        urls = "https://example.com/data.bin",
+        destfiles = destfile,
+        token = "test_bearer_token_123",
+        show_progress = FALSE,
+        max_tries = 1
+      )
+    )
+
+    testthat::expect_equal(result$success, 1)
+    testthat::expect_equal(result$failed, 0)
+  })
+})
+
+################################################################################
+##### download_run_method 0-byte file failure branch
+
+testthat::test_that("download_run_method handles 0-byte file after download", {
+  skip_on_cran()
+
+  withr::with_tempdir({
+    fake_response <- structure(
+      list(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/octet-stream"),
+        body = charToRaw("")
+      ),
+      class = "httr2_response"
+    )
+
+    testthat::local_mocked_bindings(
+      req_perform = function(req, path = NULL, ...) {
+        if (!is.null(path)) {
+          # Write empty (0-byte) file to trigger failure branch
+          writeBin(raw(0), path)
+        }
+        fake_response
+      },
+      .package = "httr2"
+    )
+
+    destfile <- "zero_byte_test.bin"
+    result <- suppressMessages(
+      download_run_method(
+        urls = "https://example.com/data.bin",
+        destfiles = destfile,
+        show_progress = FALSE,
+        max_tries = 1
+      )
+    )
+
+    testthat::expect_equal(result$success, 0)
+    testthat::expect_equal(result$failed, 1)
+    testthat::expect_false(file.exists(destfile))
+  })
+})
+
+testthat::test_that("download_run_method 0-byte with show_progress=TRUE", {
+  skip_on_cran()
+
+  withr::with_tempdir({
+    fake_response <- structure(
+      list(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/octet-stream"),
+        body = charToRaw("")
+      ),
+      class = "httr2_response"
+    )
+
+    testthat::local_mocked_bindings(
+      req_perform = function(req, path = NULL, ...) {
+        if (!is.null(path)) {
+          writeBin(raw(0), path)
+        }
+        fake_response
+      },
+      .package = "httr2"
+    )
+
+    destfile <- "zero_byte_progress.bin"
+    result <- suppressMessages(
+      download_run_method(
+        urls = "https://example.com/data.bin",
+        destfiles = destfile,
+        show_progress = TRUE,
+        max_tries = 1
+      )
+    )
+
+    testthat::expect_equal(result$success, 0)
+    testthat::expect_equal(result$failed, 1)
+    testthat::expect_false(file.exists(destfile))
+  })
+})
