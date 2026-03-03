@@ -74,7 +74,7 @@ testthat::test_that("download_ecoregion skips existing files", {
 
     result <- suppressWarnings(
       download_ecoregion(
-        directory_to_save = d1,
+        directory_to_save = ".",
         acknowledgement = TRUE,
         download = FALSE
       )

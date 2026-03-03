@@ -14,6 +14,8 @@ download_prism(
   acknowledgement = FALSE,
   download = TRUE,
   remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
   hash = FALSE,
   show_progress = TRUE,
   max_tries = 20,
@@ -72,6 +74,14 @@ will download all of the requested data files.}
 \item{remove_command}{logical(1).
 Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
+
+\item{unzip}{logical(1). Unzip the downloaded zip file to extract the
+data files (nc, grib2, etc.) into \code{directory_to_save}.
+Default is \code{TRUE}. The PRISM API always returns a zip
+regardless of the requested format.}
+
+\item{remove_zip}{logical(1). Remove the zip file after unzipping.
+Default is \code{FALSE}. Only applies when \code{unzip = TRUE}.}
 
 \item{hash}{logical(1). By setting \code{TRUE} the function will return
 an \code{rlang::hash_file()} hash character corresponding to the

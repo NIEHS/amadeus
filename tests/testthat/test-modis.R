@@ -485,27 +485,25 @@ testthat::test_that("process_blackmarble*", {
     process_blackmarble_corners(hrange = c(99, 104))
   )
 
-  # Expect terra "unknown extent" warning for VNP46 HDF files
-  testthat::expect_warning(
+  # terra no longer produces "unknown extent" for VNP46 HDF files in newer versions
+  testthat::expect_no_error(
     vnp46_proc <- process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
       date = "2018-08-13"
-    ),
-    "unknown extent"
+    )
   )
 
   testthat::expect_s4_class(vnp46_proc, "SpatRaster")
   testthat::expect_equal(terra::nlyr(vnp46_proc), 1L)
 
-  testthat::expect_warning(
+  testthat::expect_no_error(
     vnp46_proc2 <- process_blackmarble(
       path = path_vnp46[1],
       tile_df = corn,
       subdataset = c(3L, 5L),
       date = "2018-08-13"
-    ),
-    "unknown extent"
+    )
   )
 
   testthat::expect_s4_class(vnp46_proc2, "SpatRaster")
@@ -868,16 +866,15 @@ testthat::test_that("calculate_modis", {
       full.names = TRUE
     )
 
-  testthat::expect_warning(
+  testthat::expect_no_error(
     base_vnp <- process_blackmarble(
       path = path_vnp46,
       date = "2018-08-13",
       tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
-    ),
-    "unknown extent"
+    )
   )
 
-  testthat::expect_warning(
+  testthat::expect_no_error(
     calc_vnp46 <-
       calculate_modis(
         from = path_vnp46,
@@ -885,14 +882,14 @@ testthat::test_that("calculate_modis", {
         preprocess = process_blackmarble,
         name_covariates = c("MOD_NITLT_0_"),
         subdataset = 3L,
-        tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
-      ),
-    "unknown extent"
+        tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
+        scale = "* 1"
+      )
   )
   testthat::expect_s3_class(calc_vnp46, "data.frame")
 
   # with geometry terra
-  testthat::expect_warning(
+  testthat::expect_no_error(
     calc_vnp46_terra <-
       calculate_modis(
         from = path_vnp46,
@@ -903,13 +900,12 @@ testthat::test_that("calculate_modis", {
         tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
         geom = "terra",
         scale = "* 1"
-      ),
-    "unknown extent"
+      )
   )
   testthat::expect_s4_class(calc_vnp46_terra, "SpatVector")
 
   # with geometry sf
-  testthat::expect_warning(
+  testthat::expect_no_error(
     calc_vnp46_sf <-
       calculate_modis(
         from = path_vnp46,
@@ -920,8 +916,7 @@ testthat::test_that("calculate_modis", {
         tile_df = process_blackmarble_corners(c(9, 10), c(5, 5)),
         geom = "sf",
         scale = "* 1"
-      ),
-    "unknown extent"
+      )
   )
   testthat::expect_true("sf" %in% class(calc_vnp46_sf))
 
@@ -1071,7 +1066,7 @@ testthat::test_that("calculate_modis", {
     )
   )
 
-  # Test expects name_covariates warning (may also get unknown extent)
+  # Test expects name_covariates warning (may also get scale or unknown extent)
   testthat::expect_warning(
     calculate_modis(
       from = path_vnp46,
@@ -1081,11 +1076,11 @@ testthat::test_that("calculate_modis", {
       subdataset = 3L,
       tile_df = process_blackmarble_corners(c(9, 10), c(5, 5))
     ),
-    "name_covariates|unknown extent"
+    "name_covariates|unknown extent|scale"
   )
 
-  # Test with negative radius (expect unknown extent warning)
-  testthat::expect_warning(
+  # Test with negative radius
+  testthat::expect_no_error(
     flushed <- calculate_modis(
       from = path_vnp46,
       locs = site_faux,
@@ -1094,8 +1089,7 @@ testthat::test_that("calculate_modis", {
       subdataset = 3L,
       radius = c(-1000, 0L),
       scale = "* 1"
-    ),
-    "unknown extent"
+    )
   )
   testthat::expect_s3_class(flushed, "data.frame")
   testthat::expect_true(unlist(flushed[, 2]) == -99999)

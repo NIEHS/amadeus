@@ -6,6 +6,10 @@
 testthat::test_that("download_merra2 (no errors)", {
   skip_on_cran()
   skip_if_offline()
+  skip_if(
+    Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
+    "NASA_EARTHDATA_TOKEN not set"
+  )
 
   withr::local_package("httr2")
   withr::local_package("stringr")
@@ -61,6 +65,10 @@ testthat::test_that("download_merra2 deprecation warning with download=FALSE", {
 testthat::test_that("download_merra2 (single date)", {
   skip_on_cran()
   skip_if_offline()
+  skip_if(
+    Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
+    "NASA_EARTHDATA_TOKEN not set"
+  )
 
   withr::local_package("httr2")
   withr::local_package("stringr")

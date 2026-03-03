@@ -309,7 +309,7 @@ download_aqs <-
 
     #### Download files using httr2
     if (length(download_urls_filtered) > 0) {
-      amadeus::download_run_method(
+      download_result <- amadeus::download_run_method(
         urls = download_urls_filtered,
         destfiles = download_names_filtered,
         token = NULL,
@@ -1135,16 +1135,7 @@ download_merra2 <- function(
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
 
-  #### 4. Check and retrieve NASA token (BEFORE null check)
-  nasa_earth_data_token <- amadeus::get_token(
-    token = nasa_earth_data_token,
-    env_var = "NASA_EARTHDATA_TOKEN"
-  )
-
-  #### 5. Now check for null parameters - token is now set
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### 6. Handle deprecated parameters
+  #### 3a. Handle deprecated parameters BEFORE token check
   if (!isTRUE(download)) {
     warning(
       "Setting download=FALSE is deprecated.",
@@ -1153,6 +1144,8 @@ download_merra2 <- function(
       " after discovering files.\n",
       call. = FALSE
     )
+    return(invisible(list(urls = character(0), destfiles = character(0),
+      n_files = 0L)))
   }
 
   if (remove_command != FALSE) {
@@ -1161,6 +1154,15 @@ download_merra2 <- function(
       call. = FALSE
     )
   }
+
+  #### 4. Check and retrieve NASA token (BEFORE null check)
+  nasa_earth_data_token <- amadeus::get_token(
+    token = nasa_earth_data_token,
+    env_var = "NASA_EARTHDATA_TOKEN"
+  )
+
+  #### 5. Now check for null parameters - token is now set
+  amadeus::check_for_null_parameters(mget(ls()))
 
   #### 7. Check if collection is recognized
   identifiers <- c(
@@ -1409,7 +1411,7 @@ download_merra2 <- function(
 
   #### 12. Download files using httr2
   if (length(all_urls) > 0) {
-    amadeus::download_run_method(
+    download_result <- amadeus::download_run_method(
       urls = all_urls,
       destfiles = all_destfiles,
       token = nasa_earth_data_token, # Now passing the NASA token!
@@ -3071,7 +3073,7 @@ download_nei <- function(
 
   #### Download files using httr2
   if (length(download_urls_filtered) > 0) {
-    amadeus::download_run_method(
+    download_result <- amadeus::download_run_method(
       urls = download_urls_filtered,
       destfiles = download_names_filtered,
       token = NULL,
@@ -4139,9 +4141,15 @@ download_edgar <- function(
 #' @param remove_command logical(1).
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
+#' @param unzip logical(1). Unzip the downloaded zip file to extract the
+#'   data files (nc, grib2, etc.) into \code{directory_to_save}.
+#'   Default is \code{TRUE}. The PRISM API always returns a zip
+#'   regardless of the requested format.
+#' @param remove_zip logical(1). Remove the zip file after unzipping.
+#'   Default is \code{FALSE}. Only applies when \code{unzip = TRUE}.
 #' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
+#'   an \code{rlang::hash_file()} hash character corresponding to the
+#'   downloaded files. Default is \code{FALSE}.
 #' @param show_progress logical(1). Show download progress.
 #'   Default is \code{TRUE}.
 #' @param max_tries integer(1). Maximum download retry attempts.
@@ -4196,6 +4204,8 @@ download_prism <- function(
   acknowledgement = FALSE,
   download = TRUE,
   remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
   hash = FALSE,
   show_progress = TRUE,
   max_tries = 20,
@@ -4294,6 +4304,19 @@ download_prism <- function(
     rate_limit = rate_limit
   )
   message("Requests were processed.\n")
+
+  #### Unzip downloaded zip files
+  amadeus::download_unzip(
+    file_name = download_names,
+    directory_to_unzip = directory_to_save,
+    unzip = unzip
+  )
+
+  #### Remove zip files (use file.remove directly; zip is in directory_to_save)
+  if (remove_zip && unzip) {
+    file.remove(download_names)
+  }
+
   return(
     amadeus::download_hash(hash, directory_to_save)
   )
