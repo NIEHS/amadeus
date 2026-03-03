@@ -69,6 +69,12 @@ the text file containing download commands.}
 \item{hash}{logical(1). By setting \code{TRUE} the function will return
 an \code{rlang::hash_file()} hash character corresponding to the
 downloaded files. Default is \code{FALSE}.}
+
+\item{show_progress}{logical(1). Show download progress. Default is \code{TRUE}.}
+
+\item{max_tries}{integer(1). Maximum download retry attempts. Default is \code{20}.}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests. Default is \code{2}.}
 }
 \value{
 \itemize{

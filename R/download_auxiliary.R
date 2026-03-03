@@ -170,6 +170,7 @@ get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
 #' @return invisible list with success and failure counts
 #' @importFrom httr2 request req_headers req_perform req_retry req_throttle
 #' @importFrom httr2 req_error req_progress req_timeout resp_status
+#' @importFrom stats runif
 #' @keywords internal
 #' @export
 download_run_method <- function(
@@ -280,7 +281,7 @@ download_run_method <- function(
           )
           message(sprintf(
             "%s%s\n",
-            if (show_progress) " ✓ " else "",
+            if (show_progress) " OK " else "",
             success_msg
           ))
         } else {
@@ -300,7 +301,7 @@ download_run_method <- function(
           )
           message(sprintf(
             "%s%s\n",
-            if (show_progress) " ✗ " else "",
+            if (show_progress) " FAIL " else "",
             failure_msg
           ))
         }
@@ -323,7 +324,7 @@ download_run_method <- function(
         )
         message(sprintf(
           "%s%s\n",
-          if (show_progress) " ✗ " else "",
+          if (show_progress) " FAIL " else "",
           error_msg
         ))
 
@@ -984,7 +985,7 @@ setup_nasa_token <- function(
       writeLines(renviron_lines, renviron_path)
 
       message(sprintf(
-        "✓ Token saved to %s\n",
+        "Token saved to %s\n",
         renviron_path
       ))
       message(
@@ -1001,7 +1002,7 @@ setup_nasa_token <- function(
         Sys.chmod(token_path, mode = "0600")
       }
 
-      message(sprintf("✓ Token saved to %s\n", token_path))
+      message(sprintf("Token saved to %s\n", token_path))
       message(
         "  Use in functions: nasa_earth_data_token = '~/.nasa_earthdata_token'\n"
       )
@@ -1009,7 +1010,7 @@ setup_nasa_token <- function(
 
     session = {
       Sys.setenv(NASA_EARTHDATA_TOKEN = token)
-      message("✓ Token set for current R session\n")
+      message("Token set for current R session\n")
       message(
         "  This will be lost when you close R. Use method='renviron' for permanent setup.\n"
       )

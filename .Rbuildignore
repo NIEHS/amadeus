@@ -34,3 +34,4 @@ vignettes/modis_workflow.Rmd
 vignettes/data
 vignettes/images/mod*
 vignettes/images/vnp*
+^agent\.md$

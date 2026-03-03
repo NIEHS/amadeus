@@ -3410,6 +3410,9 @@ download_terraclimate <- function(
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #' an \code{rlang::hash_file()} hash character corresponding to the
 #' downloaded files. Default is \code{FALSE}.
+#' @param show_progress logical(1). Show download progress. Default is \code{TRUE}.
+#' @param max_tries integer(1). Maximum download retry attempts. Default is \code{20}.
+#' @param rate_limit numeric(1). Minimum seconds between requests. Default is \code{2}.
 #' @return
 #' * For \code{hash = FALSE}, NULL
 #' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
@@ -3588,6 +3591,9 @@ download_huc <-
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #'  an \code{rlang::hash_file()} hash character corresponding to the
 #'  downloaded files. Default is \code{FALSE}.
+#' @param show_progress logical(1). Show download progress. Default is \code{TRUE}.
+#' @param max_tries integer(1). Maximum download retry attempts. Default is \code{20}.
+#' @param rate_limit numeric(1). Minimum seconds between requests. Default is \code{2}.
 #' @author Mariana Alifa Kassien
 #' @return
 #' * For \code{hash = FALSE}, NULL
@@ -4035,6 +4041,9 @@ download_edgar <- function(
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #' an \code{rlang::hash_file()} hash character corresponding to the
 #' downloaded files. Default is \code{FALSE}.
+#' @param show_progress logical(1). Show download progress. Default is \code{TRUE}.
+#' @param max_tries integer(1). Maximum download retry attempts. Default is \code{20}.
+#' @param rate_limit numeric(1). Minimum seconds between requests. Default is \code{2}.
 #' @author Insang Song
 #' @return
 #' * For \code{hash = FALSE}, NULL
@@ -4213,6 +4222,9 @@ download_prism <- function(
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #' an \code{rlang::hash_file()} hash character corresponding to the
 #' downloaded files. Default is \code{FALSE}.
+#' @param show_progress logical(1). Show download progress. Default is \code{TRUE}.
+#' @param max_tries integer(1). Maximum download retry attempts. Default is \code{20}.
+#' @param rate_limit numeric(1). Minimum seconds between requests. Default is \code{2}.
 #' @author Insang Song
 #' @note JSON files should be found at STAC catalog of OpenLandMap
 #' @return
