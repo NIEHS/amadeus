@@ -27,7 +27,8 @@ download_ecoregion(
 
 \item{unzip}{logical(1). Unzip zip files (default TRUE).}
 
-\item{remove_zip}{logical(1). Remove zip files after unzipping (default FALSE).}
+\item{remove_zip}{logical(1). Remove zip files after unzipping (default
+FALSE).}
 
 \item{show_progress}{logical(1). Show download progress (default TRUE)}
 
@@ -39,7 +40,9 @@ download_ecoregion(
 invisible list with download results; or hash character if hash=TRUE
 }
 \description{
-The \code{download_ecoregion()} function accesses and downloads United States Ecoregions data from the U.S. Environmental Protection Agency's (EPA) Ecoregions.
+The \code{download_ecoregion()} function accesses and downloads United
+States Ecoregions data from the U.S. Environmental Protection Agency's (EPA)
+Ecoregions.
 }
 \note{
 Ecoregion data does not require authentication.

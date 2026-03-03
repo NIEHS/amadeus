@@ -7,11 +7,13 @@
 download_run(download = FALSE, commands_txt = NULL, remove = FALSE)
 }
 \arguments{
-\item{download}{logical(1). Execute (\code{TRUE}) or skip (\code{FALSE}) download.}
+\item{download}{logical(1). Execute (\code{TRUE}) or skip (\code{FALSE})
+download.}
 
 \item{commands_txt}{character(1). Path of download commands}
 
-\item{remove}{logical(1). Remove (\code{TRUE}) or keep (\code{FALSE}) command.}
+\item{remove}{logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
+command.}
 }
 \value{
 NULL; runs download commands with shell (Unix/Linux) or

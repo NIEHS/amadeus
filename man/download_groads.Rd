@@ -34,7 +34,8 @@ download_groads(
 
 \item{unzip}{logical(1). Unzip zip files (default TRUE).}
 
-\item{remove_zip}{logical(1). Remove zip files after unzipping (default FALSE).}
+\item{remove_zip}{logical(1). Remove zip files after unzipping (default
+FALSE).}
 
 \item{show_progress}{logical(1). Show download progress (default TRUE)}
 
@@ -50,7 +51,8 @@ The \code{download_groads()} function accesses and downloads
 roads data from NASA's Global Roads Open Access Data Set (gROADS).
 }
 \note{
-gROADS data may require NASA EarthData authentication depending on access method.
+gROADS data may require NASA EarthData authentication depending on
+access method.
 }
 \examples{
 \dontrun{

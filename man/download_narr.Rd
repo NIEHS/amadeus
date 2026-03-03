@@ -19,12 +19,13 @@ download_narr(
 }
 \arguments{
 \item{variables}{character. Variable(s) name acronym. See
-\href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{List of Variables in NARR Files}
+\url{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}
 for variable names and acronym codes.}
 
 \item{year}{integer(1 or 2). Year or start/end years for downloading data.}
 
-\item{directory_to_save}{character(1). Directory to save downloaded data files.}
+\item{directory_to_save}{character(1). Directory to save downloaded data
+files.}
 
 \item{acknowledgement}{logical(1). Must be TRUE to proceed with download.}
 

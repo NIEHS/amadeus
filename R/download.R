@@ -2,7 +2,9 @@
 #' Download raw data wrapper function
 # nolint start
 #' @description
-#' The \code{download_data()} function accesses and downloads atmospheric, meteorological, and environmental data from various open-access data sources.
+#' The \code{download_data()} function accesses and downloads atmospheric,
+#' meteorological, and environmental data from various open-access data
+#' sources.
 # nolint end
 #' @param dataset_name character(1). Dataset to download.
 #' @param directory_to_save character(1). Directory to save / unzip
@@ -160,7 +162,9 @@ download_data <-
 
 #' Download air quality data
 #' @description
-#' The \code{download_aqs()} function accesses and downloads Air Quality System (AQS) data from the U.S. Environmental Protection Agency's (EPA) Pre-Generated Data Files.
+#' The \code{download_aqs()} function accesses and downloads Air Quality
+#' System (AQS) data from the U.S. Environmental Protection Agency's (EPA)
+#' Pre-Generated Data Files.
 #' @note AQS data does not require authentication.
 #' @param parameter_code integer(1). EPA pollutant parameter code.
 #' @param resolution_temporal character(1). Currently only "daily" is supported.
@@ -171,7 +175,8 @@ download_data <-
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
-#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default
+#' FALSE).
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
@@ -231,8 +236,10 @@ download_aqs <-
     #### Handle deprecated parameters
     if (!isTRUE(download)) {
       warning(
-        "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-        "To skip downloading, the function will return after discovering files.\n",
+        "Setting download=FALSE is deprecated.",
+        " Downloads now use httr2 by default.\n",
+        "To skip downloading, the function will return",
+        " after discovering files.\n",
         call. = FALSE
       )
     }
@@ -302,7 +309,7 @@ download_aqs <-
 
     #### Download files using httr2
     if (length(download_urls_filtered) > 0) {
-      download_result <- amadeus::download_run_method(
+      amadeus::download_run_method(
         urls = download_urls_filtered,
         destfiles = download_names_filtered,
         token = NULL,
@@ -341,14 +348,17 @@ download_aqs <-
 
 #' Download ecoregion data
 #' @description
-#' The \code{download_ecoregion()} function accesses and downloads United States Ecoregions data from the U.S. Environmental Protection Agency's (EPA) Ecoregions.
+#' The \code{download_ecoregion()} function accesses and downloads United
+#' States Ecoregions data from the U.S. Environmental Protection Agency's (EPA)
+#' Ecoregions.
 #' @note Ecoregion data does not require authentication.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
-#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default
+#' FALSE).
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
@@ -391,8 +401,10 @@ download_ecoregion <- function(
   #### Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after discovering files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
       call. = FALSE
     )
   }
@@ -428,7 +440,7 @@ download_ecoregion <- function(
 
   #### Download file using httr2
   if (amadeus::check_destfile(download_name)) {
-    download_result <- amadeus::download_run_method(
+    amadeus::download_run_method(
       urls = download_url,
       destfiles = download_name,
       token = NULL,
@@ -462,12 +474,14 @@ download_ecoregion <- function(
 #' Download atmospheric composition data
 #' @description
 #' The \code{download_geos()} function accesses and downloads various
-#' atmospheric composition collections from NASA's Global Earth Observing System (GEOS)
+#' atmospheric composition collections from NASA's Global Earth Observing
+#' System (GEOS)
 #' compositional forecast model.
 #' @note Due to NASA data access policies, downloads require a valid NASA
 #' Earthdata token for authentication. Use \code{setup_nasa_token()} for setup.
 #' @param collection character(1). GEOS-CF data collection file name.
-#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData authentication token.
+#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
+#' authentication token.
 #' @param date character(1 or 2). Date range "YYYY-MM-DD" format
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be \code{TRUE} to proceed
@@ -541,8 +555,10 @@ download_geos <- function(
   #### 7. Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after discovering files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
       call. = FALSE
     )
   }
@@ -660,7 +676,8 @@ download_geos <- function(
 #' Download elevation data
 #' @description
 #' The \code{download_gmted()} function accesses and downloads Global
-#' Multi-resolution Terrain Elevation Data (GMTED2010) from U.S. Geological Survey.
+#' Multi-resolution Terrain Elevation Data (GMTED2010) from U.S. Geological
+#' Survey.
 #' @note GMTED data does not require authentication.
 #' @param statistic character(1). Available statistics.
 #' @param resolution character(1). Available resolutions.
@@ -669,7 +686,8 @@ download_geos <- function(
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
-#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default
+#' FALSE).
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
@@ -793,7 +811,7 @@ download_gmted <- function(
 
   #### Download file using httr2
   if (amadeus::check_destfile(download_name)) {
-    download_result <- amadeus::download_run_method(
+    amadeus::download_run_method(
       urls = download_url,
       destfiles = download_name,
       token = NULL,
@@ -833,8 +851,10 @@ download_gmted <- function(
 #' @note Due to NASA data access policies, downloads require a valid NASA
 #' Earthdata token for authentication. Use \code{setup_nasa_token()} for setup.
 #' @param collection character(1). MERRA-2 data collection file name.
-#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData authentication token.
-#' @param date character(1 or 2). length of 10. Date or start/end dates for downloading data.
+#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
+#'   authentication token.
+#' @param date character(1 or 2). length of 10. Date or start/end dates
+#'   for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -1127,8 +1147,10 @@ download_merra2 <- function(
   #### 6. Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after discovering files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
       call. = FALSE
     )
   }
@@ -1308,13 +1330,13 @@ download_merra2 <- function(
           nc4_pattern <- 'href="([^"]*\\.nc4)"'
           nc4_matches <- gregexpr(nc4_pattern, html_content, perl = TRUE)
           list_urls_month <- regmatches(html_content, nc4_matches)[[1]]
-          list_urls_month <- gsub('href="|"', '', list_urls_month)
+          list_urls_month <- gsub('href="|"', "", list_urls_month)
 
           # Also get .xml files
           xml_pattern <- 'href="([^"]*\\.nc4\\.xml)"'
           xml_matches <- gregexpr(xml_pattern, html_content, perl = TRUE)
           list_xml_month <- regmatches(html_content, xml_matches)[[1]]
-          list_xml_month <- gsub('href="|"', '', list_xml_month)
+          list_xml_month <- gsub('href="|"', "", list_xml_month)
 
           # Filter by date sequence
           list_urls_date_sequence <- list_urls_month[
@@ -1387,7 +1409,7 @@ download_merra2 <- function(
 
   #### 12. Download files using httr2
   if (length(all_urls) > 0) {
-    download_result <- amadeus::download_run_method(
+    amadeus::download_run_method(
       urls = all_urls,
       destfiles = all_destfiles,
       token = nasa_earth_data_token, # Now passing the NASA token!
@@ -1419,10 +1441,11 @@ download_merra2 <- function(
 #' levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be
 #' downloaded for each variable.
 #' @param variables character. Variable(s) name acronym. See
-#' [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
+#' <https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf>
 #' for variable names and acronym codes.
 #' @param year integer(1 or 2). Year or start/end years for downloading data.
-#' @param directory_to_save character(1). Directory to save downloaded data files.
+#' @param directory_to_save character(1). Directory to save downloaded data
+#' files.
 #' @param acknowledgement logical(1). Must be TRUE to proceed with download.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). DEPRECATED, ignored.
@@ -1485,8 +1508,10 @@ download_narr <- function(
   #### 5. Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after discovering files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
       call. = FALSE
     )
   }
@@ -1606,14 +1631,18 @@ download_narr <- function(
 #' }
 #' @param year integer(1). Year of NLCD data (1985-2024). Default is 2021.
 #' @param directory_to_save character(1). Directory to save downloaded files.
-#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with download.
+#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with
+#' download.
 #' @param download logical(1). DEPRECATED. Downloads now happen automatically.
 #'   Set to FALSE to skip downloading (generates file list only).
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip downloaded files? Default is \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip files after extraction? Default is \code{FALSE}.
-#' @param show_progress logical(1). Show download progress? Default is \code{TRUE}.
-#' @param hash logical(1). Return hash of downloaded files? Default is \code{FALSE}.
+#' @param remove_zip logical(1). Remove zip files after extraction? Default is
+#' \code{FALSE}.
+#' @param show_progress logical(1). Show download progress? Default is
+#' \code{TRUE}.
+#' @param hash logical(1). Return hash of downloaded files? Default is
+#' \code{FALSE}.
 #' @param max_tries integer(1). Maximum download retry attempts. Default is 20.
 #' @author Mitchell Manware, Insang Song, Kyle Messier
 #' @return invisible NULL; or hash character if hash=TRUE
@@ -1669,8 +1698,10 @@ download_nlcd <- function(
   #### Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after discovering files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
       call. = FALSE
     )
   }
@@ -1736,7 +1767,7 @@ download_nlcd <- function(
 
   #### Download file using httr2
   if (amadeus::check_destfile(download_name)) {
-    download_result <- amadeus::download_run_method(
+    amadeus::download_run_method(
       urls = download_url,
       destfiles = download_name,
       token = NULL,
@@ -1772,7 +1803,8 @@ download_nlcd <- function(
 #' @description
 #' The \code{download_groads()} function accesses and downloads
 #' roads data from NASA's Global Roads Open Access Data Set (gROADS).
-#' @note gROADS data may require NASA EarthData authentication depending on access method.
+#' @note gROADS data may require NASA EarthData authentication depending on
+#' access method.
 #' @param data_region character(1). Data region.
 #' @param data_format character(1). "Shapefile" or "Geodatabase".
 #' @param directory_to_save character(1). Directory to save data.
@@ -1780,7 +1812,8 @@ download_nlcd <- function(
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
-#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default
+#' FALSE).
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
@@ -1903,7 +1936,7 @@ download_groads <- function(
 
   #### Download file using httr2
   if (amadeus::check_destfile(download_name)) {
-    download_result <- amadeus::download_run_method(
+    amadeus::download_run_method(
       urls = download_url,
       destfiles = download_name,
       token = NULL,
@@ -1939,7 +1972,8 @@ download_groads <- function(
 #' @description
 #' The \code{download_population()} function accesses and downloads
 #' population density data from NASA's UN WPP-Adjusted Population Density.
-#' @note Population data may require NASA EarthData authentication depending on access method.
+#' @note Population data may require NASA EarthData authentication depending on
+#' access method.
 #' @param data_resolution character(1). Available resolutions.
 #' @param data_format character(1). "ASCII", "GeoTIFF", or "netCDF".
 #' @param year character(1). Available years or "all".
@@ -1948,7 +1982,8 @@ download_groads <- function(
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
-#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default
+#' FALSE).
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
@@ -2011,7 +2046,10 @@ download_population <- function(
 
   #### Define URL base
   base <- paste0(
-    "https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/"
+    paste0(
+      "https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/",
+      "sedac-root/downloads/data/gpw-v4/"
+    )
   )
 
   #### Define year
@@ -2096,7 +2134,7 @@ download_population <- function(
 
   #### Download file using httr2
   if (amadeus::check_destfile(download_name)) {
-    download_result <- amadeus::download_run_method(
+    amadeus::download_run_method(
       urls = download_url,
       destfiles = download_name,
       token = NULL,
@@ -2131,7 +2169,8 @@ download_population <- function(
 #' Download wildfire smoke data
 #' @description
 #' The \code{download_hms()} function accesses and downloads
-#' wildfire smoke plume coverage data from NOAA's Hazard Mapping System Fire and Smoke Product.
+#' wildfire smoke plume coverage data from NOAA's Hazard Mapping System Fire
+#' and Smoke Product.
 #' @note HMS data does not require authentication.
 #' @param data_format character(1). "Shapefile" or "KML".
 #' @param date character(1 or 2). Date range "YYYY-MM-DD" format
@@ -2140,7 +2179,8 @@ download_population <- function(
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
-#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default
+#' FALSE).
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
@@ -2347,13 +2387,15 @@ download_hms <- function(
 #' climate classification data.
 #' @note Köppen-Geiger data does not require authentication.
 #' @param data_resolution character(1). Available resolutions.
-#' @param time_period character(1). "Present" (1980-2016) or "Future" (2071-2100).
+#' @param time_period character(1). "Present" (1980-2016) or "Future"
+#' (2071-2100).
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
-#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default
+#' FALSE).
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
@@ -2453,7 +2495,7 @@ download_koppen_geiger <- function(
 
   #### Download file using httr2
   if (amadeus::check_destfile(download_name)) {
-    download_result <- amadeus::download_run_method(
+    amadeus::download_run_method(
       urls = download_url,
       destfiles = download_name,
       token = NULL,
@@ -2493,22 +2535,27 @@ download_koppen_geiger <- function(
 #' your token in an environment variable or file rather than in your code.
 #' Use \code{setup_nasa_token()} for easy, secure token setup.
 #' @note Both dates in \code{date} should be in the same year.
-#'  Directory structure: input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
+#'  Directory structure:
+#'  input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
 #' @param product character(1). MODIS product code
 #' @param version character(1). Default is `"061"`, meaning v061.
-#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData authentication token.
+#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
+#' authentication token.
 #'   For security, recommended options (in priority order):
 #'   \itemize{
-#'     \item NULL (default): Reads from NASA_EARTHDATA_TOKEN environment variable
+#'     \item NULL (default): Reads from NASA_EARTHDATA_TOKEN environment
+#'     variable
 #'     \item File path: e.g., "~/.nasa_earthdata_token"
 #'     \item Token string: Direct token (not recommended for scripts)
 #'   }
 #'   Use \code{setup_nasa_token()} for interactive setup.
 #' @param date character(1 or 2). Date range "YYYY-MM-DD" format
-#' @param extent numeric(4). Bounding box `c(min_lon, max_lon, min_lat, max_lat)`.
+#' @param extent numeric(4). Bounding box `c(min_lon, max_lon, min_lat,
+#' max_lat)`.
 #' Default covers continental US: `c(-125, 22, -64, 50)`.
 #' @param directory_to_save character(1). Directory to save data.
-#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with download
+#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with
+#' download
 #' @param download logical(1). DEPRECATED. Downloads now happen automatically.
 #'   Set to FALSE to skip downloading (generates file list only).
 #' @param remove_command logical(1). Deprecated, ignored.
@@ -2645,8 +2692,10 @@ download_modis <- function(
   #### 7. Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after querying available files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after querying available files.\n",
       call. = FALSE
     )
   }
@@ -2775,7 +2824,9 @@ download_modis <- function(
 
 #' Download toxic release data
 #' @description
-#' The \code{download_tri()} function accesses and downloads toxic release data from the U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program.
+#' The \code{download_tri()} function accesses and downloads toxic release
+#' data from the U.S. Environmental Protection Agency's (EPA) Toxic Release
+#' Inventory (TRI) Program.
 #' @note TRI data does not require authentication.
 #' @param year integer(1 or 2). Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory to download files.
@@ -2828,8 +2879,10 @@ download_tri <- function(
   #### Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after discovering files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
       call. = FALSE
     )
   }
@@ -2842,7 +2895,10 @@ download_tri <- function(
   }
 
   #### Define measurement data paths
-  url_download <- "https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/"
+  url_download <- paste0( # nolint: line_length_linter.
+    "https://data.epa.gov/efservice/downloads/tri/",
+    "mv_tri_basic_download/"
+  )
   year_sequence <- seq(year[1], year[2], 1)
   download_urls <- sprintf(
     paste(url_download, "%.0f", "_US/csv", sep = ""),
@@ -2892,7 +2948,9 @@ download_tri <- function(
 
 #' Download road emissions data
 #' @description
-#' The \code{download_nei()} function accesses and downloads road emissions data from the U.S Environmental Protection Agency's (EPA) National Emissions Inventory (NEI).
+#' The \code{download_nei()} function accesses and downloads road emissions
+#' data from the U.S Environmental Protection Agency's (EPA) National
+#' Emissions Inventory (NEI).
 #' @note NEI data does not require authentication.
 #' @param epa_certificate_path TO BE DEPRECATED. Certificate path.
 #' @param certificate_url TO BE DEPRECATED. Certificate URL.
@@ -2902,7 +2960,8 @@ download_tri <- function(
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
-#' @param remove_zip logical(1). Remove zip files after unzipping (default FALSE).
+#' @param remove_zip logical(1). Remove zip files after unzipping (default
+#' FALSE).
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
@@ -2923,7 +2982,10 @@ download_tri <- function(
 #' @export
 download_nei <- function(
   epa_certificate_path = NULL,
-  certificate_url = "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  certificate_url = paste0( # nolint: line_length_linter.
+    "http://cacerts.digicert.com/",
+    "DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
+  ),
   year = c(2017L, 2020L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -2948,8 +3010,10 @@ download_nei <- function(
   #### Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after discovering files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
       call. = FALSE
     )
   }
@@ -2967,7 +3031,8 @@ download_nei <- function(
         "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
   ) {
     warning(
-      "Parameters 'epa_certificate_path' and 'certificate_url' are deprecated.\n",
+      "Parameters 'epa_certificate_path' and 'certificate_url'",
+      " are deprecated.\n",
       "SSL certificates are now handled automatically by httr2.\n",
       call. = FALSE
     )
@@ -3006,7 +3071,7 @@ download_nei <- function(
 
   #### Download files using httr2
   if (length(download_urls_filtered) > 0) {
-    download_result <- amadeus::download_run_method(
+    amadeus::download_run_method(
       urls = download_urls_filtered,
       destfiles = download_names_filtered,
       token = NULL,
@@ -3059,7 +3124,9 @@ download_nei <- function(
 
 #' Download gridMET data
 #' @description
-#' The \code{download_gridmet} function accesses and downloads gridded surface meteorological data from the University of California Merced Climatology Lab's gridMET dataset.
+#' The \code{download_gridmet} function accesses and downloads gridded
+#' surface meteorological data from the University of California Merced
+#' Climatology Lab's gridMET dataset.
 #' @note gridMET data does not require authentication.
 #' @param variables character. Variable(s) name(s).
 #' @param year integer(1 or 2). Year or start/end years for downloading data.
@@ -3118,8 +3185,10 @@ download_gridmet <- function(
   #### Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after discovering files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
       call. = FALSE
     )
   }
@@ -3221,7 +3290,9 @@ download_gridmet <- function(
 
 #' Download TerraClimate data
 #' @description
-#' The \code{download_terraclimate} function accesses and downloads climate and water balance data from the University of California Merced Climatology Lab's TerraClimate dataset.
+#' The \code{download_terraclimate} function accesses and downloads climate
+#' and water balance data from the University of California Merced
+#' Climatology Lab's TerraClimate dataset.
 #' @note TerraClimate data does not require authentication.
 #' @param variables character. Variable(s) name(s).
 #' @param year integer(1 or 2). Year or start/end years for downloading data.
@@ -3280,8 +3351,10 @@ download_terraclimate <- function(
   #### Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after discovering files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
       call. = FALSE
     )
   }
@@ -3306,7 +3379,10 @@ download_terraclimate <- function(
   )
 
   #### Define URL base
-  base <- "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_"
+  base <- paste0(
+    "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/",
+    "TerraClimate_"
+  )
 
   #### Collect all URLs and destination files
   all_urls <- character()
@@ -3393,7 +3469,8 @@ download_terraclimate <- function(
 #' For whom wants to download a specific region,
 #' please visit [Get NHDPlus Data](https://www.epa.gov/waterdata/get-nhdplus-national-hydrography-dataset-plus-data#ListofAreas)
 #' @param region character(1). One of `c("Lower48", "Islands")`.
-#' When `"Islands"` is selected, the data will be downloaded for Hawaii, Puerto Rico, and Virgin Islands.
+#' When `"Islands"` is selected, the data will be downloaded for Hawaii,
+#' Puerto Rico, and Virgin Islands.
 #' @param type character(1). One of `c("Seamless", "OceanCatchment")`.
 #' @param directory_to_save character(1). Directory to download files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
@@ -3406,13 +3483,17 @@ download_terraclimate <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @param unzip logical(1). Unzip the downloaded compressed files.
-#' Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.
+#' Default is \code{FALSE}. Not working for this function since HUC data
+#' is in 7z format.
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #' an \code{rlang::hash_file()} hash character corresponding to the
 #' downloaded files. Default is \code{FALSE}.
-#' @param show_progress logical(1). Show download progress. Default is \code{TRUE}.
-#' @param max_tries integer(1). Maximum download retry attempts. Default is \code{20}.
-#' @param rate_limit numeric(1). Minimum seconds between requests. Default is \code{2}.
+#' @param show_progress logical(1). Show download progress.
+#'   Default is \code{TRUE}.
+#' @param max_tries integer(1). Maximum download retry attempts.
+#'   Default is \code{20}.
+#' @param rate_limit numeric(1). Minimum seconds between requests.
+#'   Default is \code{2}.
 #' @return
 #' * For \code{hash = FALSE}, NULL
 #' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
@@ -3461,8 +3542,10 @@ download_huc <-
     #### Handle deprecated parameters
     if (!isTRUE(download)) {
       warning(
-        "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-        "To skip downloading, the function will return after discovering files.\n",
+        "Setting download=FALSE is deprecated.",
+        " Downloads now use httr2 by default.\n",
+        "To skip downloading, the function will return",
+        " after discovering files.\n",
         call. = FALSE
       )
     }
@@ -3474,7 +3557,8 @@ download_huc <-
     }
     if (!isFALSE(unzip)) {
       warning(
-        "Parameter 'unzip' is deprecated. HUC data is in 7z format and cannot be unzipped automatically.\n",
+        "Parameter 'unzip' is deprecated.",
+        " HUC data is in 7z format and cannot be unzipped automatically.\n",
         call. = FALSE
       )
     }
@@ -3516,7 +3600,7 @@ download_huc <-
     }
 
     #### Download using httr2
-    download_result <- amadeus::download_run_method(
+    amadeus::download_run_method(
       urls = download_urls,
       destfiles = download_names,
       token = NULL,
@@ -3551,13 +3635,17 @@ download_huc <-
 #'  data. If NULL, totals will be used. Possible values include:
 #'  "AGS", "AWB", "CHE", "ENE", "IND", "MNM", "NMM", "PRU_SOL", "RCO",
 #'  "REF_TRF", "SWD_INC", "SWD_LDF", "TNR_Aviation_CDS", "TNR_Aviation_CRS",
-#'  "TNR_Aviation_LTO", "TNR_Aviation_SPS", "TNR_Other", "TNR_Ship", "TRO", "WWT"
+#'  "TNR_Aviation_LTO", "TNR_Aviation_SPS", "TNR_Other",
+#'  "TNR_Ship", "TRO", "WWT"
 #' @param sector_monthly Character vector or NULL. Emission sectors for monthly
-#'  data. If NULL, the function will use full-species files (not sector-specific).
+#'  data. If NULL, the function will use full-species files
+#'  (not sector-specific).
 #'  Supported values: "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
 #' "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY", "TRANSPORT", "WASTE".
-#' @param sector_voc Character vector or NULL. Emission sectors for VOC speciation
-#'  data. If NULL, the function will use full-species files (not sector-specific).
+#' @param sector_voc Character vector or NULL. Emission sectors for VOC
+#'   speciation
+#'  data. If NULL, the function will use full-species files
+#'  (not sector-specific).
 #'  Supported values: "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
 #' "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY", "TRANSPORT", "WASTE".
 #' @param output Character. Output type. Supported values include "emi" for
@@ -3591,9 +3679,12 @@ download_huc <-
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #'  an \code{rlang::hash_file()} hash character corresponding to the
 #'  downloaded files. Default is \code{FALSE}.
-#' @param show_progress logical(1). Show download progress. Default is \code{TRUE}.
-#' @param max_tries integer(1). Maximum download retry attempts. Default is \code{20}.
-#' @param rate_limit numeric(1). Minimum seconds between requests. Default is \code{2}.
+#' @param show_progress logical(1). Show download progress.
+#'   Default is \code{TRUE}.
+#' @param max_tries integer(1). Maximum download retry attempts.
+#'   Default is \code{20}.
+#' @param rate_limit numeric(1). Minimum seconds between requests.
+#'   Default is \code{2}.
 #' @author Mariana Alifa Kassien
 #' @return
 #' * For \code{hash = FALSE}, NULL
@@ -3657,8 +3748,10 @@ download_edgar <- function(
   # Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after discovering files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
       call. = FALSE
     )
   }
@@ -3969,7 +4062,8 @@ download_edgar <- function(
   }
 
   #### Filter to files that need downloading
-  needs_download <- !file.exists(download_names_valid) | file.size(download_names_valid) == 0
+  needs_download <- !file.exists(download_names_valid) |
+    file.size(download_names_valid) == 0
   download_urls_dl <- download_urls[needs_download]
   download_names_dl <- download_names_valid[needs_download]
 
@@ -4012,22 +4106,29 @@ download_edgar <- function(
 #' acceptable formats include (disclaimer: the following is a direct quote;
 #' minimal formatting is applied):
 #' __Time Series__:
-#' * `YYYYMMDD` for daily data (between yesterday and January 1st, 1981) – returns a single grid in a .zip file
-#' * `YYYYMM` for monthly data (between last month and January 1981) – returns a single grid in a .zip file
-#' * `YYYY` for annual data (between last year and 1981) - returns a single grid in a .zip file
-#' * `YYYY` for historical data (between 1980 and 1895) - returns a single zip file containing 12 monthly grids for `YYYY` plus the annual.
+#' * `YYYYMMDD` for daily data (between yesterday and January 1st, 1981)
+#'   – returns a single grid in a .zip file
+#' * `YYYYMM` for monthly data (between last month and January 1981)
+#'   – returns a single grid in a .zip file
+#' * `YYYY` for annual data (between last year and 1981) - returns a single
+#'   grid in a .zip file
+#' * `YYYY` for historical data (between 1980 and 1895) - returns a single
+#'   zip file containing 12 monthly grids for `YYYY` plus the annual.
 #'
 #' __Normals__:
-#' * Monthly normal: date is `MM` (i.e., 04 for April) or the value 14, which returns the annual normal
+#' * Monthly normal: date is `MM` (i.e., 04 for April) or the value 14,
+#'   which returns the annual normal
 #' * Daily normal: date is `MMDD` (i.e., 0430 for April 30)
 #' @param element character(1). Data element.
 #' One of `c("ppt", "tmin", "tmax", "tmean", "tdmean", "vpdmin", "vpdmax")`
-#' For normals, `c("solslope", "soltotal", "solclear", "soltrans")` are also accepted.
+#' For normals, `c("solslope", "soltotal", "solclear", "soltrans")`
+#' are also accepted.
 #' @param data_type character(1). Data type.
 #' * `"ts"`: 4km resolution time series.
 #' * `"normals_800"`: 800m resolution normals.
 #' * `"normals"`: 4km resolution normals.
-#' @param format character(1). Data format. Only applicable for `data_type = "ts"`.
+#' @param format character(1). Data format. Only applicable for
+#'   `data_type = "ts"`.
 #' @param directory_to_save character(1). Directory to download files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -4041,9 +4142,12 @@ download_edgar <- function(
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #' an \code{rlang::hash_file()} hash character corresponding to the
 #' downloaded files. Default is \code{FALSE}.
-#' @param show_progress logical(1). Show download progress. Default is \code{TRUE}.
-#' @param max_tries integer(1). Maximum download retry attempts. Default is \code{20}.
-#' @param rate_limit numeric(1). Minimum seconds between requests. Default is \code{2}.
+#' @param show_progress logical(1). Show download progress.
+#'   Default is \code{TRUE}.
+#' @param max_tries integer(1). Maximum download retry attempts.
+#'   Default is \code{20}.
+#' @param rate_limit numeric(1). Minimum seconds between requests.
+#'   Default is \code{2}.
 #' @author Insang Song
 #' @return
 #' * For \code{hash = FALSE}, NULL
@@ -4112,8 +4216,10 @@ download_prism <- function(
   #### Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after discovering files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
       call. = FALSE
     )
   }
@@ -4177,7 +4283,7 @@ download_prism <- function(
   }
 
   #### Download using httr2
-  # PRISM returns the file with a server-determined name via Content-Disposition.
+  # PRISM returns file with server-determined name via Content-Disposition.
   # We use a constructed destfile; the zip contents are identical regardless.
   amadeus::download_run_method(
     urls = download_urls,
@@ -4205,8 +4311,10 @@ download_prism <- function(
 #' [George Mason University website](https://nassgeodata.gmu.edu/CropScape/).
 #' @param year integer(1). Year of the data to download.
 #' @param source character(1). Data source, one of `c("USDA", "GMU")`.
-#' * `"USDA"` will download the national data from the USDA website (available in 2008-last year).
-#' * `"GMU"` will download the data from the George Mason University website (available in 1997-last year).
+#' * `"USDA"` will download the national data from the USDA website
+#'   (available in 2008-last year).
+#' * `"GMU"` will download the data from the George Mason University
+#'   website (available in 1997-last year).
 #' @param directory_to_save character(1). Directory to download files.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -4222,9 +4330,12 @@ download_prism <- function(
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #' an \code{rlang::hash_file()} hash character corresponding to the
 #' downloaded files. Default is \code{FALSE}.
-#' @param show_progress logical(1). Show download progress. Default is \code{TRUE}.
-#' @param max_tries integer(1). Maximum download retry attempts. Default is \code{20}.
-#' @param rate_limit numeric(1). Minimum seconds between requests. Default is \code{2}.
+#' @param show_progress logical(1). Show download progress.
+#'   Default is \code{TRUE}.
+#' @param max_tries integer(1). Maximum download retry attempts.
+#'   Default is \code{20}.
+#' @param rate_limit numeric(1). Minimum seconds between requests.
+#'   Default is \code{2}.
 #' @author Insang Song
 #' @note JSON files should be found at STAC catalog of OpenLandMap
 #' @return
@@ -4269,8 +4380,10 @@ download_cropscape <- function(
   #### Handle deprecated parameters
   if (!isTRUE(download)) {
     warning(
-      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return after discovering files.\n",
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
       call. = FALSE
     )
   }

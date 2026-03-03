@@ -89,7 +89,8 @@ testthat::test_that("download_nlcd", {
 
     # Test error case with invalid year
     # This should produce BOTH warnings (download=FALSE and remove_command=TRUE)
-    # AND an error. We need to capture the warnings while still expecting the error.
+    # AND an error. We need to capture the warnings
+    # while still expecting the error.
     testthat::expect_error(
       testthat::expect_warning(
         testthat::expect_warning(

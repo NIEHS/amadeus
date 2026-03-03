@@ -39,7 +39,9 @@ download_tri(
 invisible list with download results; or hash character if hash=TRUE
 }
 \description{
-The \code{download_tri()} function accesses and downloads toxic release data from the U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program.
+The \code{download_tri()} function accesses and downloads toxic release
+data from the U.S. Environmental Protection Agency's (EPA) Toxic Release
+Inventory (TRI) Program.
 }
 \note{
 TRI data does not require authentication.

@@ -1,11 +1,13 @@
 linters: linters_with_defaults(
     commented_code_linter = NULL,
     return_linter = NULL,
-    line_length_linter(100)
+    line_length_linter(80)
   )
 exclusions: list(
     "tests/testthat/test-download_functions.R",
+    "tests/testthat/test-download.R",
     "vignettes/terraclimate_workflow.Rmd",
     "vignettes/gridmet_workflow.Rmd",
-    "vignettes/narr_workflow.Rmd"
+    "vignettes/narr_workflow.Rmd",
+    "vignettes/modis_workflow.Rmd"
   )

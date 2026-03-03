@@ -36,7 +36,8 @@ download_population(
 
 \item{unzip}{logical(1). Unzip zip files (default TRUE).}
 
-\item{remove_zip}{logical(1). Remove zip files after unzipping (default FALSE).}
+\item{remove_zip}{logical(1). Remove zip files after unzipping (default
+FALSE).}
 
 \item{show_progress}{logical(1). Show download progress (default TRUE)}
 
@@ -52,7 +53,8 @@ The \code{download_population()} function accesses and downloads
 population density data from NASA's UN WPP-Adjusted Population Density.
 }
 \note{
-Population data may require NASA EarthData authentication depending on access method.
+Population data may require NASA EarthData authentication depending on
+access method.
 }
 \examples{
 \dontrun{

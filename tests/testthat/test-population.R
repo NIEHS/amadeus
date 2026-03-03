@@ -544,7 +544,8 @@ testthat::test_that("calculate_population error handling", {
     )
   )
 
-  # Test with invalid fun parameter (radius > 0 uses exactextractr which validates fun)
+  # Test with invalid fun parameter
+  # (radius > 0 uses exactextractr which validates fun)
   testthat::expect_error(
     calculate_population(
       from = pop,

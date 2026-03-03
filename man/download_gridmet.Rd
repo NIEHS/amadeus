@@ -42,7 +42,9 @@ download_gridmet(
 invisible list with download results; or hash character if hash=TRUE
 }
 \description{
-The \code{download_gridmet} function accesses and downloads gridded surface meteorological data from the University of California Merced Climatology Lab's gridMET dataset.
+The \code{download_gridmet} function accesses and downloads gridded
+surface meteorological data from the University of California Merced
+Climatology Lab's gridMET dataset.
 }
 \note{
 gridMET data does not require authentication.

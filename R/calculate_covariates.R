@@ -721,9 +721,11 @@ calculate_ecoregion <-
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param scale character(1). Scale expression to be applied to the raw values.
-#' It is crucial that users review the technical documentatio of the MODIS product
+#' It is crucial that users review the technical documentatio of the MODIS
+#' product
 #' they are using to ensure proper scale.
-#' An example for the MOD11A1 product's LST_Day_1km variable (land surface temperature)
+#' An example for the MOD11A1 product's LST_Day_1km variable (land surface
+#' temperature)
 #' would be `scale = "* 0.02"`.
 #' Default is `NULL`, which applies no scale.
 #' @param ... Arguments passed to `preprocess`.

@@ -17,9 +17,11 @@ download_run_method(
 \arguments{
 \item{urls}{character vector. URLs to download}
 
-\item{destfiles}{character vector. Destination file paths (same length as urls)}
+\item{destfiles}{character vector. Destination file paths (same length as
+urls)}
 
-\item{token}{character(1). Authentication token (optional, e.g., for NASA EarthData)}
+\item{token}{character(1). Authentication token (optional, e.g., for NASA
+EarthData)}
 
 \item{show_progress}{logical(1). Show download progress bars (default TRUE)}
 
@@ -27,7 +29,8 @@ download_run_method(
 
 \item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 
-\item{timeout}{numeric(1). Timeout in seconds for each request (default 3600 = 1 hour)}
+\item{timeout}{numeric(1). Timeout in seconds for each request (default 3600
+= 1 hour)}
 }
 \value{
 invisible list with success and failure counts
@@ -36,6 +39,7 @@ invisible list with success and failure counts
 Execute downloads using httr2 with robust retry logic and rate limiting.
 This function handles authentication, retries, progress tracking, and
 streams files directly to disk.
-Retry time is based on exponential backoff with jitter, the default behavior of httr2
+Retry time is based on exponential backoff with jitter, the default behavior
+of httr2
 }
 \keyword{internal}

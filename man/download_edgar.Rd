@@ -43,15 +43,19 @@ needed for version=8.1_voc and will be ignored if specified.}
 data. If NULL, totals will be used. Possible values include:
 "AGS", "AWB", "CHE", "ENE", "IND", "MNM", "NMM", "PRU_SOL", "RCO",
 "REF_TRF", "SWD_INC", "SWD_LDF", "TNR_Aviation_CDS", "TNR_Aviation_CRS",
-"TNR_Aviation_LTO", "TNR_Aviation_SPS", "TNR_Other", "TNR_Ship", "TRO", "WWT"}
+"TNR_Aviation_LTO", "TNR_Aviation_SPS", "TNR_Other",
+"TNR_Ship", "TRO", "WWT"}
 
 \item{sector_monthly}{Character vector or NULL. Emission sectors for monthly
-data. If NULL, the function will use full-species files (not sector-specific).
+data. If NULL, the function will use full-species files
+(not sector-specific).
 Supported values: "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
 "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY", "TRANSPORT", "WASTE".}
 
-\item{sector_voc}{Character vector or NULL. Emission sectors for VOC speciation
-data. If NULL, the function will use full-species files (not sector-specific).
+\item{sector_voc}{Character vector or NULL. Emission sectors for VOC
+speciation
+data. If NULL, the function will use full-species files
+(not sector-specific).
 Supported values: "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
 "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY", "TRANSPORT", "WASTE".}
 
@@ -95,11 +99,14 @@ Default is \code{FALSE}.}
 an \code{rlang::hash_file()} hash character corresponding to the
 downloaded files. Default is \code{FALSE}.}
 
-\item{show_progress}{logical(1). Show download progress. Default is \code{TRUE}.}
+\item{show_progress}{logical(1). Show download progress.
+Default is \code{TRUE}.}
 
-\item{max_tries}{integer(1). Maximum download retry attempts. Default is \code{20}.}
+\item{max_tries}{integer(1). Maximum download retry attempts.
+Default is \code{20}.}
 
-\item{rate_limit}{numeric(1). Minimum seconds between requests. Default is \code{2}.}
+\item{rate_limit}{numeric(1). Minimum seconds between requests.
+Default is \code{2}.}
 }
 \value{
 A list of download URLs (character). Optionally downloads available

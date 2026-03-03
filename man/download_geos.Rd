@@ -23,7 +23,8 @@ download_geos(
 \arguments{
 \item{collection}{character(1). GEOS-CF data collection file name.}
 
-\item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData authentication token.}
+\item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData
+authentication token.}
 
 \item{date}{character(1 or 2). Date range "YYYY-MM-DD" format}
 
@@ -48,7 +49,8 @@ invisible list with download results; or hash character if hash=TRUE
 }
 \description{
 The \code{download_geos()} function accesses and downloads various
-atmospheric composition collections from NASA's Global Earth Observing System (GEOS)
+atmospheric composition collections from NASA's Global Earth Observing
+System (GEOS)
 compositional forecast model.
 }
 \note{

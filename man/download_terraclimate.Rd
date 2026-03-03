@@ -42,7 +42,9 @@ download_terraclimate(
 invisible list with download results; or hash character if hash=TRUE
 }
 \description{
-The \code{download_terraclimate} function accesses and downloads climate and water balance data from the University of California Merced Climatology Lab's TerraClimate dataset.
+The \code{download_terraclimate} function accesses and downloads climate
+and water balance data from the University of California Merced
+Climatology Lab's TerraClimate dataset.
 }
 \note{
 TerraClimate data does not require authentication.

@@ -33,7 +33,8 @@ download_nlcd(
 
 \item{directory_to_save}{character(1). Directory to save downloaded files.}
 
-\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed with download.}
+\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed with
+download.}
 
 \item{download}{logical(1). DEPRECATED. Downloads now happen automatically.
 Set to FALSE to skip downloading (generates file list only).}
@@ -42,11 +43,14 @@ Set to FALSE to skip downloading (generates file list only).}
 
 \item{unzip}{logical(1). Unzip downloaded files? Default is \code{TRUE}.}
 
-\item{remove_zip}{logical(1). Remove zip files after extraction? Default is \code{FALSE}.}
+\item{remove_zip}{logical(1). Remove zip files after extraction? Default is
+\code{FALSE}.}
 
-\item{show_progress}{logical(1). Show download progress? Default is \code{TRUE}.}
+\item{show_progress}{logical(1). Show download progress? Default is
+\code{TRUE}.}
 
-\item{hash}{logical(1). Return hash of downloaded files? Default is \code{FALSE}.}
+\item{hash}{logical(1). Return hash of downloaded files? Default is
+\code{FALSE}.}
 
 \item{max_tries}{integer(1). Maximum download retry attempts. Default is 20.}
 }

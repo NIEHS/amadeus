@@ -36,7 +36,8 @@ download_gmted(
 
 \item{unzip}{logical(1). Unzip zip files (default TRUE).}
 
-\item{remove_zip}{logical(1). Remove zip files after unzipping (default FALSE).}
+\item{remove_zip}{logical(1). Remove zip files after unzipping (default
+FALSE).}
 
 \item{show_progress}{logical(1). Show download progress (default TRUE)}
 
@@ -51,7 +52,8 @@ invisible list with download results; or hash character if hash=TRUE
 }
 \description{
 The \code{download_gmted()} function accesses and downloads Global
-Multi-resolution Terrain Elevation Data (GMTED2010) from U.S. Geological Survey.
+Multi-resolution Terrain Elevation Data (GMTED2010) from U.S. Geological
+Survey.
 }
 \note{
 GMTED data does not require authentication.

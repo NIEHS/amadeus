@@ -34,7 +34,8 @@ download_hms(
 
 \item{unzip}{logical(1). Unzip zip files (default TRUE).}
 
-\item{remove_zip}{logical(1). Remove zip files after unzipping (default FALSE).}
+\item{remove_zip}{logical(1). Remove zip files after unzipping (default
+FALSE).}
 
 \item{show_progress}{logical(1). Show download progress (default TRUE)}
 
@@ -49,7 +50,8 @@ invisible list with download results; or hash character if hash=TRUE
 }
 \description{
 The \code{download_hms()} function accesses and downloads
-wildfire smoke plume coverage data from NOAA's Hazard Mapping System Fire and Smoke Product.
+wildfire smoke plume coverage data from NOAA's Hazard Mapping System Fire
+and Smoke Product.
 }
 \note{
 HMS data does not require authentication.

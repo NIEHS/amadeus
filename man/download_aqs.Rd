@@ -40,7 +40,8 @@ download_aqs(
 
 \item{unzip}{logical(1). Unzip zip files (default TRUE).}
 
-\item{remove_zip}{logical(1). Remove zip files after unzipping (default FALSE).}
+\item{remove_zip}{logical(1). Remove zip files after unzipping (default
+FALSE).}
 
 \item{show_progress}{logical(1). Show download progress (default TRUE)}
 
@@ -54,7 +55,9 @@ download_aqs(
 invisible list with download results; or hash character if hash=TRUE
 }
 \description{
-The \code{download_aqs()} function accesses and downloads Air Quality System (AQS) data from the U.S. Environmental Protection Agency's (EPA) Pre-Generated Data Files.
+The \code{download_aqs()} function accesses and downloads Air Quality
+System (AQS) data from the U.S. Environmental Protection Agency's (EPA)
+Pre-Generated Data Files.
 }
 \note{
 AQS data does not require authentication.

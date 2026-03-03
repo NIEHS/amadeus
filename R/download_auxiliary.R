@@ -94,8 +94,10 @@ download_permit <-
 
 #' Get authentication token from various sources
 #' @description
-#' Retrieves authentication token from environment variable, file, or direct input.
-#' Priority order: 1) Environment variable, 2) File path, 3) Direct token string.
+#' Retrieves authentication token from environment variable, file, or direct
+#' input.
+#' Priority order: 1) Environment variable, 2) File path, 3) Direct token
+#' string.
 #' This function helps prevent accidental token exposure in code or logs.
 #' @param token character(1) or NULL. Can be:
 #'   - NULL: reads from environment variable (recommended)
@@ -125,7 +127,8 @@ get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
       return(token_file)
     }
 
-    # Priority 3: Use token string directly (warn if looks like it's being hard-coded)
+    # Priority 3: Use token string directly
+    # (warn if looks like it's being hard-coded)
     if (length(token) == 1 && nzchar(token)) {
       # Don't show the actual token in any messages!
       message("Using provided token string.\n")
@@ -142,11 +145,14 @@ get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
     ),
     sprintf("  2. Create ~/.nasa_earthdata_token file with your token\n"),
     sprintf(
-      "  3. Pass token file path: nasa_earth_data_token = '~/.nasa_earthdata_token'\n"
+      "  3. Pass token file path:",
+      " nasa_earth_data_token = '~/.nasa_earthdata_token'\n"
     ),
-    "  4. Pass token directly: nasa_earth_data_token = 'your_token' (not recommended)\n",
+    "  4. Pass token directly:",
+    " nasa_earth_data_token = 'your_token' (not recommended)\n",
     sprintf(
-      "\nTo set up for all R sessions, add to ~/.Renviron:\n  %s=your_token_here\n",
+      "\nTo set up for all R sessions,",
+      " add to ~/.Renviron:\n  %s=your_token_here\n",
       env_var
     ),
     call. = FALSE
@@ -159,14 +165,18 @@ get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
 #' Execute downloads using httr2 with robust retry logic and rate limiting.
 #' This function handles authentication, retries, progress tracking, and
 #' streams files directly to disk.
-#' Retry time is based on exponential backoff with jitter, the default behavior of httr2
+#' Retry time is based on exponential backoff with jitter, the default behavior
+#' of httr2
 #' @param urls character vector. URLs to download
-#' @param destfiles character vector. Destination file paths (same length as urls)
-#' @param token character(1). Authentication token (optional, e.g., for NASA EarthData)
+#' @param destfiles character vector. Destination file paths (same length as
+#' urls)
+#' @param token character(1). Authentication token (optional, e.g., for NASA
+#' EarthData)
 #' @param show_progress logical(1). Show download progress bars (default TRUE)
 #' @param max_tries integer(1). Maximum number of retry attempts (default 20)
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
-#' @param timeout numeric(1). Timeout in seconds for each request (default 3600 = 1 hour)
+#' @param timeout numeric(1). Timeout in seconds for each request (default 3600
+#' = 1 hour)
 #' @return invisible list with success and failure counts
 #' @importFrom httr2 request req_headers req_perform req_retry req_throttle
 #' @importFrom httr2 req_error req_progress req_timeout resp_status
@@ -244,7 +254,8 @@ download_run_method <- function(
         }
 
         # Configure retry, throttle, timeout, and error handling.
-        # Note: 500 is excluded from is_transient because some APIs (e.g. EPA TRI)
+        # Note: 500 is excluded from is_transient because some APIs
+        # (e.g. EPA TRI)
         # return HTTP 500 with valid response bodies on every request. Retrying
         # would make redundant requests. 502/503/504 are gateway errors that
         # are genuinely transient.
@@ -268,7 +279,7 @@ download_run_method <- function(
         }
 
         # Perform the request
-        resp <- req |> httr2::req_perform(path = destfile)
+        req |> httr2::req_perform(path = destfile)
 
         # Verify file was created and has content
         if (file.exists(destfile) && file.size(destfile) > 0) {
@@ -403,9 +414,11 @@ format_file_size <- function(bytes) {
 #'
 #' Execute or skip the commands listed in the ...wget/curl_commands.txt file
 #' produced by one of the data download functions.
-#' @param download logical(1). Execute (\code{TRUE}) or skip (\code{FALSE}) download.
+#' @param download logical(1). Execute (\code{TRUE}) or skip (\code{FALSE})
+#' download.
 #' @param commands_txt character(1). Path of download commands
-#' @param remove logical(1). Remove (\code{TRUE}) or keep (\code{FALSE}) command.
+#' @param remove logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
+#' command.
 #' @return NULL; runs download commands with shell (Unix/Linux) or
 #' command prompt (Windows) and removes \code{commands_txt} file if
 #' \code{remove = TRUE}.
@@ -701,7 +714,8 @@ extract_urls <- function(
 #' Apply \code{check_url_status()} function to a sample of download URLs.
 #' @param urls character vector of URLs
 #' @param size number of observations to be sampled from \code{urls}
-#' @param method If set to `"SKIP"`, the HTTP status will not be checked and returned.
+#' @param method If set to `"SKIP"`, the HTTP status will not be checked and
+#' returned.
 #' @return logical vector for URL status = 200
 #' @keywords internal auxiliary
 #' @export
@@ -989,7 +1003,8 @@ setup_nasa_token <- function(
         renviron_path
       ))
       message(
-        "  Restart R for changes to take effect, or run: readRenviron('~/.Renviron')\n"
+        "  Restart R for changes to take effect,",
+        " or run: readRenviron('~/.Renviron')\n"
       )
     },
 
@@ -1004,7 +1019,8 @@ setup_nasa_token <- function(
 
       message(sprintf("Token saved to %s\n", token_path))
       message(
-        "  Use in functions: nasa_earth_data_token = '~/.nasa_earthdata_token'\n"
+        "  Use in functions:",
+        " nasa_earth_data_token = '~/.nasa_earthdata_token'\n"
       )
     },
 
@@ -1012,7 +1028,8 @@ setup_nasa_token <- function(
       Sys.setenv(NASA_EARTHDATA_TOKEN = token)
       message("Token set for current R session\n")
       message(
-        "  This will be lost when you close R. Use method='renviron' for permanent setup.\n"
+        "  This will be lost when you close R.",
+        " Use method='renviron' for permanent setup.\n"
       )
     }
   )

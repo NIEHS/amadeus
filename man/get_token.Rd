@@ -21,8 +21,10 @@ Default is "NASA_EARTHDATA_TOKEN"}
 character(1). The authentication token
 }
 \description{
-Retrieves authentication token from environment variable, file, or direct input.
-Priority order: 1) Environment variable, 2) File path, 3) Direct token string.
+Retrieves authentication token from environment variable, file, or direct
+input.
+Priority order: 1) Environment variable, 2) File path, 3) Direct token
+string.
 This function helps prevent accidental token exposure in code or logs.
 }
 \keyword{internal}

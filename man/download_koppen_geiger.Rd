@@ -21,7 +21,8 @@ download_koppen_geiger(
 \arguments{
 \item{data_resolution}{character(1). Available resolutions.}
 
-\item{time_period}{character(1). "Present" (1980-2016) or "Future" (2071-2100).}
+\item{time_period}{character(1). "Present" (1980-2016) or "Future"
+(2071-2100).}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
@@ -33,7 +34,8 @@ download_koppen_geiger(
 
 \item{unzip}{logical(1). Unzip zip files (default TRUE).}
 
-\item{remove_zip}{logical(1). Remove zip files after unzipping (default FALSE).}
+\item{remove_zip}{logical(1). Remove zip files after unzipping (default
+FALSE).}
 
 \item{show_progress}{logical(1). Show download progress (default TRUE)}
 

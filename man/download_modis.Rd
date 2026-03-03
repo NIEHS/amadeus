@@ -28,10 +28,12 @@ download_modis(
 
 \item{version}{character(1). Default is \code{"061"}, meaning v061.}
 
-\item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData authentication token.
+\item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData
+authentication token.
 For security, recommended options (in priority order):
 \itemize{
-\item NULL (default): Reads from NASA_EARTHDATA_TOKEN environment variable
+\item NULL (default): Reads from NASA_EARTHDATA_TOKEN environment
+variable
 \item File path: e.g., "~/.nasa_earthdata_token"
 \item Token string: Direct token (not recommended for scripts)
 }
@@ -44,7 +46,8 @@ Default covers continental US: \code{c(-125, 22, -64, 50)}.}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
-\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed with download}
+\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed with
+download}
 
 \item{download}{logical(1). DEPRECATED. Downloads now happen automatically.
 Set to FALSE to skip downloading (generates file list only).}
@@ -74,7 +77,8 @@ your token in an environment variable or file rather than in your code.
 Use \code{setup_nasa_token()} for easy, secure token setup.
 
 Both dates in \code{date} should be in the same year.
-Directory structure: input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
+Directory structure:
+input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
 }
 \examples{
 \dontrun{

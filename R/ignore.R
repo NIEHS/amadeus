@@ -210,7 +210,10 @@ download_olm <- function(
 #' @importFrom rstac links
 list_stac_files <-
   function(
-    stac_json = "https://s3.eu-central-1.wasabisys.com/stac/openlandmap/catalog.json",
+    stac_json = paste0( # nolint: line_length_linter.
+      "https://s3.eu-central-1.wasabisys.com/stac/",
+      "openlandmap/catalog.json"
+    ),
     format = "tif",
     which = NULL,
     id_only = FALSE

@@ -6,8 +6,8 @@
 \usage{
 download_nei(
   epa_certificate_path = NULL,
-  certificate_url =
-    "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt",
+  certificate_url = paste0("http://cacerts.digicert.com/",
+    "DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"),
   year = c(2017L, 2020L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -38,7 +38,8 @@ download_nei(
 
 \item{unzip}{logical(1). Unzip zip files (default TRUE).}
 
-\item{remove_zip}{logical(1). Remove zip files after unzipping (default FALSE).}
+\item{remove_zip}{logical(1). Remove zip files after unzipping (default
+FALSE).}
 
 \item{show_progress}{logical(1). Show download progress (default TRUE)}
 
@@ -52,7 +53,9 @@ download_nei(
 invisible list with download results; or hash character if hash=TRUE
 }
 \description{
-The \code{download_nei()} function accesses and downloads road emissions data from the U.S Environmental Protection Agency's (EPA) National Emissions Inventory (NEI).
+The \code{download_nei()} function accesses and downloads road emissions
+data from the U.S Environmental Protection Agency's (EPA) National
+Emissions Inventory (NEI).
 }
 \note{
 NEI data does not require authentication.
