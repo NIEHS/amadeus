@@ -1,0 +1,19 @@
+name: amadeus Test Agent
+description: >
+  Specialist for writing, fixing, and extending testthat unit and integration
+  tests for the amadeus R package. Knows skip patterns, testdata structure,
+  the three-tier test pattern, and withr conventions.
+version: "1.0"
+suggested_model: claude-sonnet
+domains:
+  - all
+files:
+  - tests/testthat/
+  - tests/testdata/
+  - tests/testskip/
+tools:
+  - read_files
+  - search_code
+  - run_tests
+  - run_linter
+  - run_coverage
