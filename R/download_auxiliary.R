@@ -151,7 +151,10 @@ get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
     "  4. Pass token directly:",
     " nasa_earth_data_token = 'your_token' (not recommended)\n",
     sprintf(
-      "\nTo set up for all R sessions, add to ~/.Renviron:\n  %s=your_token_here\n",
+      paste0(
+        "\nTo set up for all R sessions,",
+        " add to ~/.Renviron:\n  %s=your_token_here\n"
+      ),
       env_var
     ),
     call. = FALSE

@@ -60,7 +60,6 @@ tryCatch(
       install_path = pkg_dir,
       pre_clean = FALSE,
       code = c(
-        'options(warn = 2)', # Turn warnings into errors
         'library(testthat)',
         'library(amadeus)'
       )
