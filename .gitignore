@@ -83,3 +83,6 @@ README_files/
 
 tutorials/
 inst/migration-to-httr-guide.R
+
+# testthat auto-generated problem files
+tests/testthat/_problems/

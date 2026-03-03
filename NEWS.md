@@ -1,3 +1,19 @@
+# amadeus 1.3.3
+- Completed migration of all `download_*` functions from `httr`/`wget`/`curl`
+  command-line calls to `httr2` for all network requests
+- Deprecated `download` parameter (use default `download = TRUE`) and
+  `remove_command` parameter across all download functions; both now emit
+  informative warnings and are ignored
+- Added `hash` parameter to all `download_*` functions for optional SHA-256
+  file integrity verification via `download_hash()`
+- Added `unzip` and `remove_zip` parameters to `download_prism()` for
+  post-download archive handling
+- Added `download_run_method()` internal helper for unified httr2-based
+  file retrieval with progress reporting, retry logic, and rate limiting
+- Improved `check_url_status()` for general-purpose URL validation
+- Expanded unit test coverage with mock-based tests for all download
+  functions covering deprecation warnings, hash paths, and file-exists branches
+
 # amadeus 1.3.2
 - Fixed deprecated file paths for NLCD, MODIS, and Ecoregions datasets
 - Removed the certificate verification from ecoregion download which is not needed anymore
