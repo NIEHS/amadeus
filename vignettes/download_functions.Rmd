@@ -590,29 +590,16 @@ testthat::test_that(
     test_start <- "2023-12-28"
     test_end <- "2024-01-02"
     test_directory <- "./data/"
-    # download
-    download_data(
+    # download = FALSE returns a list with $urls (no file written)
+    result <- download_data(
       dataset_name = "hms",
       date = c(test_start, test_end),
       data_format = "Shapefile",
       directory_to_save = test_directory,
       acknowledgement = TRUE,
-      download = FALSE,
-      remove_command = FALSE,
-      unzip = FALSE,
-      remove_zip = FALSE
+      download = FALSE
     )
-    commands_path <- paste0(
-      test_directory,
-      "hms_smoke_",
-      gsub("-", "", test_start),
-      "_",
-      gsub("-", "", test_end),
-      "_curl_commands.txt"
-    )
-    # helpers
-    commands <- read_commands(commands_path = commands_path)
-    urls <- extract_urls(commands = commands, position = 6)
+    urls <- result$urls
     url_status <- check_urls(urls = urls, size = 6, method = "HEAD")
     # test for true
     expect_true(all(url_status))
@@ -629,39 +616,24 @@ testthat::test_that(
     test_start <- "2023-12-28"
     test_end <- "2024-01-02"
     test_directory <- "../inst/extdata/"
-    # download
-    download_data(
+    # download = FALSE returns a list with $urls (no file written)
+    result <- suppressWarnings(download_data(
       dataset_name = "hms",
       date = c(test_start, test_end),
       data_format = "Shapefile",
       directory_to_save = test_directory,
       acknowledgement = TRUE,
-      download = FALSE,
-      remove_command = FALSE,
-      unzip = FALSE,
-      remove_zip = FALSE
-    )
-    commands_path <- paste0(
-      test_directory,
-      "hms_smoke_",
-      gsub("-", "", test_start),
-      "_",
-      gsub("-", "", test_end),
-      "_curl_commands.txt"
-    )
-    # helpers
-    commands <- read_commands(commands_path = commands_path)
-    urls <- extract_urls(commands = commands, position = 6)
+      download = FALSE
+    ))
+    urls <- result$urls
     url_status <- check_urls(urls = urls, size = 6, method = "HEAD")
     # test for true
     expect_true(all(url_status))
-    # remove after test
-    file.remove(commands_path)
   }
 )
 ```
 
-Although the `testthat::test_that(...)` chunk contains 32 lines of code, the unit test is performed by `expect_true(all(url_status))`. In words, this line is expecting (`expect_true`) that all (`all`) of the sampled URLs return HTTP response status 200 (`url_status`). Since this expectation was met, the test passed!
+Although the `testthat::test_that(...)` chunk contains code to download and check URLs, the unit test is performed by `expect_true(all(url_status))`. In words, this line is expecting (`expect_true`) that all (`all`) of the sampled URLs return HTTP response status 200 (`url_status`). Since this expectation was met, the test passed!
 
 For an alternate example, we can use a start and end date that are known to not have data. As the URLs associated with these dates do not exist, we expect the function will fail. This test utilizes `expect_error()` because the `download_data` wrapper function returns an error message if the underlying source-specific download function returns an error.
 
