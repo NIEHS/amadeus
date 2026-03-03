@@ -1619,7 +1619,7 @@ download_narr <- function(
 #' @return invisible NULL; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references
-#' \insertRef{data_mrlc_nlcd2021}{amadeus}
+#' \insertRef{dewitz_national_2023}{amadeus}
 #' @examples
 #' \dontrun{
 #' # Download 2021 Land Cover
@@ -3438,10 +3438,13 @@ download_huc <-
     type = c("Seamless", "OceanCatchment"),
     directory_to_save = NULL,
     acknowledgement = FALSE,
-    download = FALSE,
+    download = TRUE,
     remove_command = FALSE,
     unzip = FALSE,
-    hash = FALSE
+    hash = FALSE,
+    show_progress = TRUE,
+    max_tries = 20,
+    rate_limit = 2
   ) {
     #### 1. check for data download acknowledgement
     amadeus::download_permit(acknowledgement = acknowledgement)
@@ -3451,6 +3454,27 @@ download_huc <-
 
     region <- match.arg(region)
     type <- match.arg(type)
+
+    #### Handle deprecated parameters
+    if (!isTRUE(download)) {
+      warning(
+        "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+        "To skip downloading, the function will return after discovering files.\n",
+        call. = FALSE
+      )
+    }
+    if (!isFALSE(remove_command)) {
+      warning(
+        "Parameter 'remove_command' is deprecated and ignored.\n",
+        call. = FALSE
+      )
+    }
+    if (!isFALSE(unzip)) {
+      warning(
+        "Parameter 'unzip' is deprecated. HUC data is in 7z format and cannot be unzipped automatically.\n",
+        call. = FALSE
+      )
+    }
 
     url_base <-
       "https://dmap-data-commons-ow.s3.amazonaws.com/NHDPlusV21/Data/NationalData/"
@@ -3478,57 +3502,26 @@ download_huc <-
     download_urls <- paste0(url_base, url_template_nat)
     download_names <- paste0(directory_to_save, url_template_nat)
 
-    #### 4. build download command
-    download_commands <-
-      paste0(
-        "wget -e robots=off -np",
-        " ",
-        download_urls,
-        " -O ",
-        download_names,
-        "\n"
-      )
-
-    #### 5. initiate "..._curl_commands.txt"
-    commands_txt <- paste0(
-      directory_to_save,
-      "USGS_NHD_",
-      region,
-      "_",
-      type,
-      "_",
-      Sys.Date(),
-      "_wget_commands.txt"
-    )
-    amadeus::download_sink(commands_txt)
-    #### 6. concatenate and print download commands to "..._curl_commands.txt"
-    writeLines(download_commands)
-    #### 7. finish "..._curl_commands.txt" file
-    sink()
-    #### 9. download data
-    amadeus::download_run(
-      download = download,
-      commands_txt = commands_txt,
-      remove = remove_command
-    )
-
-    #### 10. unzip data
-    # note that this part does not utilize download_unzip
-    # as duplicate file names are across multiple zip files
-    if (download) {
-      if (unzip) {
-        stop(
-          "Unzipping is not supported for 7z files. Please do it manually with 7-zip program"
-        )
-        # dir_unzip <- gsub("(\\.7z)", "", download_names)
-        # for (fn in seq_along(dir_unzip)) {
-        #   archive::archive_extract(
-        #     archive = download_names[fn],
-        #     dir = dir_unzip[fn]
-        #   )
-        # }
-      }
+    #### Exit early if download=FALSE
+    if (!isTRUE(download)) {
+      message("Skipping download.\n")
+      return(invisible(list(
+        urls = download_urls,
+        destfiles = download_names,
+        n_files = 1
+      )))
     }
+
+    #### Download using httr2
+    download_result <- amadeus::download_run_method(
+      urls = download_urls,
+      destfiles = download_names,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = rate_limit
+    )
+
     message("Requests were processed.\n")
     return(amadeus::download_hash(hash, directory_to_save))
   }
@@ -3643,14 +3636,32 @@ download_edgar <- function(
   voc = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  hash = FALSE,
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2
 ) {
   # check for data download acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
+
+  # Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return after discovering files.\n",
+      call. = FALSE
+    )
+  }
+  if (!isFALSE(remove_command)) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
 
   # directory setup
   directory_original <- amadeus::download_sanitize_path(directory_to_save)
@@ -3903,15 +3914,40 @@ download_edgar <- function(
   # Check constructed urls
   message("Constructed URL(s): ", paste(urls, collapse = "\n"))
 
+  #### 5. build download file name
+  download_names <- paste0(
+    directory_to_download,
+    "edgar_",
+    temp_res,
+    "_",
+    basename(urls)
+  )
+
+  #### Exit early if download=FALSE (return unvalidated URL list)
+  if (!isTRUE(download)) {
+    message(sprintf(
+      "Skipping download. Found %d files available for download.\n",
+      length(urls)
+    ))
+    return(invisible(list(
+      urls = urls,
+      destfiles = download_names,
+      n_files = length(urls)
+    )))
+  }
+
   # Validate and download
   download_urls <- c()
+  download_names_valid <- c()
   missing_urls <- c()
 
-  for (u in urls) {
+  for (i in seq_along(urls)) {
+    u <- urls[i]
     if (!(amadeus::check_url_status(u))) {
       missing_urls <- c(missing_urls, u)
     } else {
       download_urls <- c(download_urls, u)
+      download_names_valid <- c(download_names_valid, download_names[i])
     }
   }
   # Stop function if no valid urls were created
@@ -3926,57 +3962,33 @@ download_edgar <- function(
     )
   }
 
-  #### 5. build download file name
-  download_names <- paste0(
-    directory_to_download,
-    "edgar_",
-    temp_res,
-    "_",
-    basename(download_urls)
-  )
+  #### Filter to files that need downloading
+  needs_download <- !file.exists(download_names_valid) | file.size(download_names_valid) == 0
+  download_urls_dl <- download_urls[needs_download]
+  download_names_dl <- download_names_valid[needs_download]
 
-  #### build download command
-  download_commands <- paste0(
-    "curl -s --url ",
-    download_urls,
-    " --output ",
-    download_names,
-    "\n"
-  )
-  #### filter commands to non-existing files
-  download_commands <- download_commands[
-    which(
-      !file.exists(download_names) | file.size(download_names) == 0
+  #### Download using httr2
+  if (length(download_urls_dl) > 0) {
+    amadeus::download_run_method(
+      urls = download_urls_dl,
+      destfiles = download_names_dl,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = rate_limit
     )
-  ]
-  #### 7. initiate "..._curl_commands.txt"
-  commands_txt <- paste0(
-    directory_original,
-    "edgar_",
-    temp_res,
-    "_curl_commands.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  #### 8. concatenate and print download commands to "..._curl_commands.txt"
-  cat(download_commands)
-  #### 9. finish "..._curl_commands.txt" file
-  sink()
-  #### 11. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
-  )
-  #### 12. unzip data
+  }
+
+  #### Unzip data
   sapply(
-    download_names,
+    download_names_valid,
     amadeus::download_unzip,
     directory_to_unzip = directory_to_save,
     unzip = unzip
   )
   amadeus::download_remove_zips(
     remove = remove_zip,
-    download_name = download_names
+    download_name = download_names_valid
   )
   return(amadeus::download_hash(hash, directory_to_save))
 }
@@ -4069,9 +4081,12 @@ download_prism <- function(
   format = c("nc", "asc", "grib2"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  hash = FALSE,
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2
 ) {
   data_type <- match.arg(data_type)
   element <- match.arg(element)
@@ -4083,6 +4098,21 @@ download_prism <- function(
     }
   } else {
     message("format is ignored for normals data type.")
+  }
+
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return after discovering files.\n",
+      call. = FALSE
+    )
+  }
+  if (!isFALSE(remove_command)) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
   }
 
   #### 1. check for data download acknowledgement
@@ -4114,21 +4144,8 @@ download_prism <- function(
       sprintf(url_download_template, element, time)
     )
 
-  #### 4. build download command
-  # --content-disposition flag is for web service retrieval
-  # when using the URL does not end with the file name
-  download_commands <-
-    paste0(
-      "wget -e robots=off -np ",
-      "--content-disposition ",
-      download_urls,
-      " -P ",
-      directory_to_save,
-      "\n"
-    )
-
-  #### 5. initiate "..._curl_commands.txt"
-  commands_txt <- paste0(
+  #### 4. build destination file name
+  download_names <- paste0(
     directory_to_save,
     "PRISM_",
     element,
@@ -4136,20 +4153,30 @@ download_prism <- function(
     data_type,
     "_",
     time,
-    "_",
-    Sys.Date(),
-    "_wget_commands.txt"
+    ifelse(data_type == "ts", paste0("_", format), ""),
+    ".zip"
   )
-  amadeus::download_sink(commands_txt)
-  #### 6. concatenate and print download commands to "..._curl_commands.txt"
-  writeLines(download_commands)
-  #### 7. finish "..._curl_commands.txt" file
-  sink()
-  #### 9. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
+
+  #### Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message("Skipping download.\n")
+    return(invisible(list(
+      urls = download_urls,
+      destfiles = download_names,
+      n_files = length(download_urls)
+    )))
+  }
+
+  #### Download using httr2
+  # PRISM returns the file with a server-determined name via Content-Disposition.
+  # We use a constructed destfile; the zip contents are identical regardless.
+  amadeus::download_run_method(
+    urls = download_urls,
+    destfiles = download_names,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
   )
   message("Requests were processed.\n")
   return(
@@ -4212,10 +4239,13 @@ download_cropscape <- function(
   source = c("USDA", "GMU"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
-  hash = FALSE
+  hash = FALSE,
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2
 ) {
   source <- match.arg(source)
   if (source == "GMU" && year < 1997) {
@@ -4223,6 +4253,20 @@ download_cropscape <- function(
   }
   if (source == "USDA" && year < 2008) {
     stop("Year should be equal to or greater than 2008.")
+  }
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated. Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return after discovering files.\n",
+      call. = FALSE
+    )
+  }
+  if (!isFALSE(remove_command)) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
   }
   #### 1. check for data download acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
@@ -4248,54 +4292,36 @@ download_cropscape <- function(
   download_names_file <- sprintf(filename_template, year)
   download_names <- paste0(directory_to_save, download_names_file)
 
-  #### 4. build download command
-  download_commands <-
-    paste0(
-      "wget -e robots=off -np",
-      " ",
-      download_urls,
-      " -O ",
-      download_names,
-      "\n"
-    )
-
-  #### 5. initiate "..._curl_commands.txt"
-  commands_txt <- paste0(
-    directory_to_save,
-    "CropScape_CDL_",
-    source,
-    "_",
-    year,
-    "_",
-    Sys.Date(),
-    "_wget_commands.txt"
-  )
-  amadeus::download_sink(commands_txt)
-  #### 6. concatenate and print download commands to "..._curl_commands.txt"
-  writeLines(download_commands)
-  #### 7. finish "..._curl_commands.txt" file
-  sink()
-  #### 9. download data
-  amadeus::download_run(
-    download = download,
-    commands_txt = commands_txt,
-    remove = remove_command
-  )
-
-  #### 10. unzip data
-  # note that this part does not utilize download_unzip
-  # as duplicate file names are across multiple zip files
-  if (download) {
-    # nocov start
-    if (unzip) {
-      extension <- ifelse(source == "USDA", "\\.zip", "(\\.tar|\\.tar\\.gz)")
-      dir_unzip <- gsub(extension, "", download_names)
-      for (fn in seq_along(dir_unzip)) {
-        archive::archive_extract(download_names[fn], exdir = dir_unzip[fn])
-      }
-    }
-    # nocov end
+  #### Exit early if download=FALSE
+  if (!isTRUE(download)) {
+    message("Skipping download.\n")
+    return(invisible(list(
+      urls = download_urls,
+      destfiles = download_names,
+      n_files = length(download_urls)
+    )))
   }
+
+  #### Download using httr2
+  amadeus::download_run_method(
+    urls = download_urls,
+    destfiles = download_names,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+
+  #### Unzip data
+  # nocov start
+  if (unzip) {
+    extension <- ifelse(source == "USDA", "\\.zip", "(\\.tar|\\.tar\\.gz)")
+    dir_unzip <- gsub(extension, "", download_names)
+    for (fn in seq_along(dir_unzip)) {
+      archive::archive_extract(download_names[fn], exdir = dir_unzip[fn])
+    }
+  }
+  # nocov end
   message("Requests were processed.\n")
   return(amadeus::download_hash(hash, directory_to_save))
 }

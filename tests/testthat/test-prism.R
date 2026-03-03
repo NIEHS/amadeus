@@ -3,96 +3,94 @@
 
 ################################################################################
 ##### download_prism
-testthat::test_that("download_prism", {
-  # Set up test data
-  time <- seq(201005, 201012, by = 1)
-  element <- c("ppt", "tmin", "tmax", "tmean", "tdmean", "vpdmin", "vpdmax")
-  # in case of multiple test runs
-  # note that PRISM download for the same data element
-  # is allowed up to twice a day. IP address could be blocked
-  # if the limit is exceeded
-  time <- sample(time, 1)
-  element <- sample(element, 1)
+testthat::test_that("download_prism (url discovery, no download)", {
+  directory_to_save <- paste0(tempdir(), "/prism/")
+  time <- "201005"
+  element <- "ppt"
   data_type <- "ts"
   format <- "nc"
-  directory_to_save <- paste0(tempdir(), "/prism/")
-  acknowledgement <- TRUE
-  download <- FALSE
-  remove_command <- FALSE
 
-  # Call the function
-  download_prism(
+  result <- suppressWarnings(download_prism(
     time = time,
     element = element,
     data_type = data_type,
     format = format,
     directory_to_save = directory_to_save,
-    acknowledgement = acknowledgement,
-    download = download,
-    remove_command = remove_command
+    acknowledgement = TRUE,
+    download = FALSE
+  ))
+  testthat::expect_true(is.list(result))
+  testthat::expect_true(grepl("^https://", result$urls))
+  testthat::expect_equal(result$n_files, 1)
+
+  # normals path (format is ignored, message expected)
+  suppressWarnings(
+    testthat::expect_message(
+      result2 <- download_prism(
+        time = "0228",
+        element = "ppt",
+        data_type = "normals",
+        format = "asc",
+        directory_to_save = directory_to_save,
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+  )
+  testthat::expect_true(grepl("^https://", result2$urls))
+
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("download_prism deprecation warnings", {
+  directory_to_save <- paste0(tempdir(), "/prism_dep/")
+
+  testthat::expect_warning(
+    download_prism(
+      time = "201005",
+      element = "ppt",
+      data_type = "ts",
+      format = "nc",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    ),
+    regexp = "download=FALSE is deprecated"
   )
 
-  testthat::expect_message(
+  testthat::expect_warning(
     download_prism(
-      time = time,
+      time = "201005",
       element = "ppt",
-      data_type = "normals",
-      format = "asc",
+      data_type = "ts",
+      format = "nc",
       directory_to_save = directory_to_save,
-      acknowledgement = acknowledgement,
-      download = download,
+      acknowledgement = TRUE,
+      download = FALSE,
       remove_command = TRUE
+    ),
+    regexp = "remove_command.*deprecated"
+  )
+
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("download_prism (expected errors)", {
+  directory_to_save <- paste0(tempdir(), "/prism/")
+
+  # sol* elements not valid for ts data_type
+  testthat::expect_error(
+    download_prism(
+      time = "202105",
+      element = "soltotal",
+      data_type = "ts",
+      format = "nc",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
     )
   )
 
-  commands_path <- paste0(
-    directory_to_save,
-    "PRISM_",
-    element,
-    "_",
-    data_type,
-    "_",
-    time,
-    "_",
-    Sys.Date(),
-    "_wget_commands.txt"
-  )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
-
-  # Set up test data
-  time <- "202105"
-  element <- "soltotal"
-  data_type <- "ts"
-  format <- "nc"
-  directory_to_save <- paste0(tempdir(), "/prism/")
-  acknowledgement <- TRUE
-  download <- FALSE
-  remove_command <- FALSE
-
-  # Call the function and expect an error
-  testthat::expect_error(download_prism(
-    time = time,
-    element = element,
-    data_type = data_type,
-    format = format,
-    directory_to_save = directory_to_save,
-    acknowledgement = acknowledgement,
-    download = download,
-    remove_command = remove_command
-  ))
   unlink(directory_to_save, recursive = TRUE)
 })
 

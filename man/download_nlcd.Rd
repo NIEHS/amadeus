@@ -80,7 +80,7 @@ download_nlcd(
 }
 }
 \references{
-\insertRef{data_mrlc_nlcd2021}{amadeus}
+\insertRef{dewitz_national_2023}{amadeus}
 }
 \author{
 Mitchell Manware, Insang Song, Kyle Messier

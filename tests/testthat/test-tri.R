@@ -3,93 +3,69 @@
 
 ################################################################################
 ##### download_tri
-testthat::test_that("download_tri", {
-  withr::local_package("httr")
-  withr::local_package("stringr")
-  # function parameters
+testthat::test_that("download_tri (url discovery)", {
   directory_to_save <- paste0(tempdir(), "/tri/")
-  # run download function
-  download_data(
+
+  result <- suppressWarnings(download_data(
     dataset_name = "tri",
     directory_to_save = directory_to_save,
     acknowledgement = TRUE,
     download = FALSE,
     remove_command = FALSE
-  )
-  year_start <- 2018L
-  year_end <- 2022L
+  ))
 
-  # define file path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "TRI_",
-    year_start,
-    "_",
-    year_end,
-    "_",
-    Sys.Date(),
-    "_curl_commands.txt"
-  )
+  # 5 years (2018-2022) → 5 files
+  testthat::expect_equal(result$n_files, 5L)
+  testthat::expect_true(all(grepl("^https://", result$urls)))
+  testthat::expect_true(all(grepl("tri/mv_tri_basic_download", result$urls)))
 
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 3)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "SKIP")
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
 })
 
-testthat::test_that("download_tri (single year)", {
-  withr::local_package("httr")
-  withr::local_package("stringr")
-  # function parameters
+testthat::test_that("download_tri (single year, url discovery)", {
   directory_to_save <- paste0(tempdir(), "/tri/")
   year <- 2019L
-  # run download function
-  download_data(
+
+  result <- suppressWarnings(download_data(
     year = year,
     dataset_name = "tri",
     directory_to_save = directory_to_save,
     acknowledgement = TRUE,
     download = FALSE,
     remove_command = FALSE
+  ))
+
+  testthat::expect_equal(result$n_files, 1L)
+  testthat::expect_true(grepl("2019", result$urls))
+  testthat::expect_true(grepl("^https://", result$urls))
+
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("download_tri deprecation warnings", {
+  directory_to_save <- paste0(tempdir(), "/tri_dep/")
+
+  testthat::expect_warning(
+    download_tri(
+      year = c(2020L, 2020L),
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    ),
+    regexp = "download=FALSE is deprecated"
   )
 
-  # define file path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "TRI_",
-    year,
-    "_",
-    year,
-    "_",
-    Sys.Date(),
-    "_curl_commands.txt"
+  testthat::expect_warning(
+    download_tri(
+      year = c(2020L, 2020L),
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = TRUE
+    ),
+    regexp = "remove_command.*deprecated"
   )
 
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 3)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L, method = "SKIP")
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
 })
 

@@ -12,9 +12,12 @@ download_prism(
   format = c("nc", "asc", "grib2"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  hash = FALSE,
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{

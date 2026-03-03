@@ -5,105 +5,86 @@
 ##### download_cropscape
 testthat::test_that("download_cropscape (no errors - GMU)", {
   withr::local_package("httr2")
-  withr::local_package("stringr")
-  # Set up test data
   year <- 2010
   directory_to_save <- paste0(tempdir(), "/cps/")
 
-  # Call the function
-  testthat::expect_no_error(
+  result <- suppressWarnings(
     download_cropscape(
       year = year,
       source = "GMU",
       directory_to_save = directory_to_save,
       acknowledgement = TRUE,
-      download = FALSE,
-      remove_command = FALSE
+      download = FALSE
     )
   )
-  commands_path <- paste0(
-    directory_to_save,
-    "CropScape_CDL_",
-    "GMU",
-    "_",
-    year,
-    "_",
-    Sys.Date(),
-    "_wget_commands.txt"
-  )
+  testthat::expect_true(is.list(result))
+  testthat::expect_equal(result$n_files, 1)
+  testthat::expect_true(grepl("^https://", result$urls))
+  testthat::expect_true(grepl(as.character(year), result$urls))
 
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 5)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_cropscape (no errors - USDA)", {
   withr::local_package("httr2")
-  withr::local_package("stringr")
-  # Set up test data
   year <- 2010
   directory_to_save <- paste0(tempdir(), "/cps/")
 
-  # Call the function
-  testthat::expect_no_error(
+  result <- suppressWarnings(
     download_cropscape(
       year = year,
       source = "USDA",
       directory_to_save = directory_to_save,
       acknowledgement = TRUE,
-      download = FALSE,
-      remove_command = FALSE
+      download = FALSE
     )
   )
-  commands_path <- paste0(
-    directory_to_save,
-    "CropScape_CDL_",
-    "USDA",
-    "_",
-    year,
-    "_",
-    Sys.Date(),
-    "_wget_commands.txt"
+  testthat::expect_true(is.list(result))
+  testthat::expect_equal(result$n_files, 1)
+  testthat::expect_true(grepl("^https://", result$urls))
+  testthat::expect_true(grepl(as.character(year), result$urls))
+
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("download_cropscape deprecation warnings", {
+  withr::local_package("httr2")
+  directory_to_save <- paste0(tempdir(), "/cps_dep/")
+
+  testthat::expect_warning(
+    download_cropscape(
+      year = 2010,
+      source = "GMU",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    ),
+    regexp = "download=FALSE is deprecated"
   )
 
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 5)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
+  testthat::expect_warning(
+    download_cropscape(
+      year = 2010,
+      source = "USDA",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = TRUE
+    ),
+    regexp = "remove_command.*deprecated"
   )
-  # remove file with commands after test
-  file.remove(commands_path)
+
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_cropscape (expected errors)", {
-  # expected errors due to invalid years
-  # Set up test data
-  invalid_year <- 1996
+  # invalid source
   testthat::expect_error(download_cropscape(year = 2020, source = "CMU"))
-  # Call the function and expect an error
+  # GMU year too early
   testthat::expect_error(
-    download_cropscape(year = invalid_year, source = "GMU")
+    download_cropscape(year = 1996, source = "GMU")
   )
+  # USDA year too early
   testthat::expect_error(
     download_cropscape(year = 2000, source = "USDA")
   )

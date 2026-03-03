@@ -3,88 +3,47 @@
 
 ################################################################################
 ##### download_terraclimate
-testthat::test_that("download_terraclimate (no errors)", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
+testthat::test_that("download_terraclimate (url discovery)", {
   year_start <- 2018
   year_end <- 2023
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/terracclimate/")
-  # run download function
-  download_data(
+
+  result <- suppressWarnings(download_data(
     dataset_name = "terraclimate",
     year = c(year_start, year_end),
     variables = variables,
     directory_to_save = directory_to_save,
     acknowledgement = TRUE,
     download = FALSE
-  )
-  # define path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "/terraclimate_",
-    year_start,
-    "_",
-    year_end,
-    "_curl_commands.txt"
-  )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 3L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
+  ))
+
+  # 6 years × 1 variable = 6 files
+  testthat::expect_equal(result$n_files, 6L)
+  testthat::expect_true(all(grepl("^https://", result$urls)))
+  testthat::expect_true(all(grepl("TerraClimate_ppt", result$urls)))
+
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_terraclimate (single year)", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
   year <- 2019
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/terraclimate/")
-  # run download function
-  download_data(
+
+  result <- suppressWarnings(download_data(
     dataset_name = "terraclimate",
     year = year,
     variables = variables,
     directory_to_save = directory_to_save,
     acknowledgement = TRUE,
     download = FALSE
-  )
-  # define path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "/terraclimate_",
-    year,
-    "_",
-    year,
-    "_curl_commands.txt"
-  )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 5L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
+  ))
+
+  testthat::expect_equal(result$n_files, 1L)
+  testthat::expect_true(grepl("2019", result$urls))
+  testthat::expect_true(grepl("^https://", result$urls))
+
   unlink(directory_to_save, recursive = TRUE)
 })
 

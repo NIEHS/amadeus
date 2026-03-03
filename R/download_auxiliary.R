@@ -242,12 +242,16 @@ download_run_method <- function(
             httr2::req_headers(Authorization = paste("Bearer", token))
         }
 
-        # Configure retry, throttle, timeout, and error handling
+        # Configure retry, throttle, timeout, and error handling.
+        # Note: 500 is excluded from is_transient because some APIs (e.g. EPA TRI)
+        # return HTTP 500 with valid response bodies on every request. Retrying
+        # would make redundant requests. 502/503/504 are gateway errors that
+        # are genuinely transient.
         req <- req |>
           httr2::req_retry(
             max_tries = max_tries,
             is_transient = \(resp) {
-              httr2::resp_status(resp) %in% c(429, 500, 502, 503, 504)
+              httr2::resp_status(resp) %in% c(429, 502, 503, 504)
             }
           ) |>
           httr2::req_timeout(timeout) |>

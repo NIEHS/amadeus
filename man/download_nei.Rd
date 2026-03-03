@@ -14,6 +14,7 @@ download_nei(
   download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
+  remove_zip = FALSE,
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
@@ -36,6 +37,8 @@ download_nei(
 \item{remove_command}{logical(1). Deprecated, ignored.}
 
 \item{unzip}{logical(1). Unzip zip files (default TRUE).}
+
+\item{remove_zip}{logical(1). Remove zip files after unzipping (default FALSE).}
 
 \item{show_progress}{logical(1). Show download progress (default TRUE)}
 

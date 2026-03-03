@@ -3,7 +3,7 @@
 
 ################################################################################
 ##### download_huc
-testthat::test_that("download_huc", {
+testthat::test_that("download_huc (no errors, url discovery)", {
   withr::local_package("httr2")
   directory_to_save <- paste0(tempdir(), "/huc/")
   allregions <- c("Lower48", "Islands")
@@ -11,52 +11,61 @@ testthat::test_that("download_huc", {
 
   for (region in allregions) {
     for (type in alltypes) {
-      testthat::expect_no_error(
-        download_huc(
-          region,
-          type,
-          directory_to_save,
-          acknowledgement = TRUE,
-          download = FALSE,
-          unzip = FALSE
-        )
-      )
-      commands_path <- paste0(
-        directory_to_save,
-        "USGS_NHD_",
+      result <- suppressWarnings(download_huc(
         region,
-        "_",
         type,
-        "_",
-        Sys.Date(),
-        "_wget_commands.txt"
-      )
-      # import commands
-      commands <- read_commands(commands_path = commands_path)
-      # extract urls
-      urls <- extract_urls(commands = commands, position = 5)
-      # check HTTP URL status
-      url_status <- check_urls(urls = urls, size = 1L)
-      # implement unit tests
-      test_download_functions(
-        directory_to_save = directory_to_save,
-        commands_path = commands_path,
-        url_status = url_status
-      )
-      # remove file with commands after test
-      file.remove(commands_path)
+        directory_to_save,
+        acknowledgement = TRUE,
+        download = FALSE
+      ))
+      testthat::expect_true(is.list(result))
+      testthat::expect_true(!is.null(result$urls))
+      testthat::expect_equal(result$n_files, 1)
+      testthat::expect_true(grepl("^https://", result$urls))
     }
   }
-  testthat::expect_error(
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("download_huc deprecation warnings", {
+  withr::local_package("httr2")
+  directory_to_save <- paste0(tempdir(), "/huc_dep/")
+
+  testthat::expect_warning(
     download_huc(
       "Lower48",
-      "OceanCatchment",
-      tempdir(),
+      "Seamless",
+      directory_to_save,
       acknowledgement = TRUE,
-      download = TRUE,
-      unzip = TRUE
-    )
+      download = FALSE
+    ),
+    regexp = "download=FALSE is deprecated"
   )
+
+  testthat::expect_warning(
+    download_huc(
+      "Lower48",
+      "Seamless",
+      directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      remove_command = TRUE
+    ),
+    regexp = "remove_command.*deprecated"
+  )
+
+  testthat::expect_warning(
+    download_huc(
+      "Lower48",
+      "Seamless",
+      directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE,
+      unzip = TRUE
+    ),
+    regexp = "unzip.*deprecated"
+  )
+
   unlink(directory_to_save, recursive = TRUE)
 })
 
