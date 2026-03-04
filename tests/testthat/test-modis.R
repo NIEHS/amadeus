@@ -1364,9 +1364,7 @@ testthat::test_that("download_modis no granules found path (no skip)", {
 ################################################################################
 ##### download_modis remove_command warning (covers lines 2707-2710)
 
-testthat::test_that(
-  "download_modis remove_command deprecated warning (no skip)",
-  {
+testthat::test_that("download_modis remove_command deprecated warning (no skip)", {
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
     download_run_method = function(...) {
@@ -1529,9 +1527,7 @@ testthat::test_that("download_modis hash=TRUE returns fakehash (no skip)", {
 ################################################################################
 ##### download_modis cross-year dates stop (covers lines 2690-2691)
 
-testthat::test_that(
-  "download_modis cross-year dates non-MOD06_L2 stops",
-  {
+testthat::test_that("download_modis cross-year dates non-MOD06_L2 stops", {
   testthat::expect_error(
     suppressMessages(
       download_modis(
@@ -1549,9 +1545,7 @@ testthat::test_that(
 ################################################################################
 ##### download_modis version=NULL stop (covers line 2715)
 
-testthat::test_that(
-  "download_modis version=NULL stops with message",
-  {
+testthat::test_that("download_modis version=NULL stops with message", {
   testthat::local_mocked_bindings(
     check_for_null_parameters = function(...) invisible(NULL),
     get_token = function(...) "fake_token",
@@ -1576,9 +1570,7 @@ testthat::test_that(
 ################################################################################
 ##### download_modis product=MOD06_L2 str_version (covers line 2730)
 
-testthat::test_that(
-  "download_modis MOD06_L2 uses version 6.1 (no skip)",
-  {
+testthat::test_that("download_modis MOD06_L2 uses version 6.1 (no skip)", {
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
     download_run_method = function(...) {
@@ -1633,9 +1625,7 @@ testthat::test_that(
 ################################################################################
 ##### download_modis product=VNP46A2 str_version=NULL (covers line 2732)
 
-testthat::test_that(
-  "download_modis VNP46A2 sets str_version to NULL (no skip)",
-  {
+testthat::test_that("download_modis VNP46A2 sets str_version to NULL (no skip)", {
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
     download_run_method = function(...) {
