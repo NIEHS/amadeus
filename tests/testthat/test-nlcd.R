@@ -613,7 +613,6 @@ testthat::test_that("integration across *_nlcd functions", {
 
   withr::local_package("terra")
   withr::local_package("exactextractr")
-  withr::local_package("sf")
   withr::local_options(
     list(sf_use_s2 = FALSE)
   )
@@ -632,24 +631,25 @@ testthat::test_that("integration across *_nlcd functions", {
   testthat::expect_true(year_found)
 
   ##########################################################################
-  ncpath <- system.file("gpkg/nc.gpkg", package = "sf")
-  ncv <- terra::vect(ncpath)
-  nc <- terra::project(
-    ncv,
-    terra::crs(nlcd_c1v1)
+  # Use 5 points within the testdata tile extent (centered around -78.84, 36.04)
+  locs_wgs84 <- data.frame(
+    id = paste0("pt", 1:5),
+    lon = c(-78.98003, -78.91213, -78.84426, -78.77640, -78.70856),
+    lat = c(36.05975, 36.04993, 36.04008, 36.03018, 36.02025)
   )
-
-  ##########################################################################
-  mat_nlcd_val <- unique(terra::values(terra::crop(nlcd_c1v1, nc)))
-  testthat::expect_true(NA %in% mat_nlcd_val || !anyNA(mat_nlcd_val))
-  testthat::expect_false(NaN %in% mat_nlcd_val)
+  locs_vect <- terra::vect(
+    locs_wgs84,
+    geom = c("lon", "lat"),
+    crs = "EPSG:4326"
+  )
+  locs_proj <- terra::project(locs_vect, terra::crs(nlcd_c1v1))
 
   ##########################################################################
   # points have integer values
   testthat::expect_no_error(
     df_nlcd_0 <- calculate_nlcd(
-      locs = terra::centroids(nc[1:5, ]),
-      locs_id = "NAME",
+      locs = locs_proj,
+      locs_id = "id",
       from = nlcd_c1v1,
       mode = "terra",
       radius = 0
@@ -663,8 +663,8 @@ testthat::test_that("integration across *_nlcd functions", {
   # polygons have decimal values
   testthat::expect_no_error(
     df_nlcd_1000 <- calculate_nlcd(
-      locs = terra::centroids(nc[1:5, ]),
-      locs_id = "NAME",
+      locs = locs_proj,
+      locs_id = "id",
       from = nlcd_c1v1,
       mode = "terra",
       radius = 1000
@@ -712,20 +712,28 @@ testthat::test_that("integration - debug column names", {
 
   withr::local_package("terra")
   withr::local_package("exactextractr")
-  withr::local_package("sf")
   withr::local_options(list(sf_use_s2 = FALSE))
 
   path_testdata <- testthat::test_path("..", "testdata", "nlcd")
 
   nlcd_c1v1 <- process_nlcd(path = path_testdata, year = 2021)
 
-  ncpath <- system.file("gpkg/nc.gpkg", package = "sf")
-  ncv <- terra::vect(ncpath)
-  nc <- terra::project(ncv, terra::crs(nlcd_c1v1))
+  # Use 5 points within the testdata tile extent
+  locs_wgs84 <- data.frame(
+    id = paste0("pt", 1:5),
+    lon = c(-78.98003, -78.91213, -78.84426, -78.77640, -78.70856),
+    lat = c(36.05975, 36.04993, 36.04008, 36.03018, 36.02025)
+  )
+  locs_vect <- terra::vect(
+    locs_wgs84,
+    geom = c("lon", "lat"),
+    crs = "EPSG:4326"
+  )
+  locs_proj <- terra::project(locs_vect, terra::crs(nlcd_c1v1))
 
   df_nlcd_1000 <- calculate_nlcd(
-    locs = terra::centroids(nc[1:5, ]),
-    locs_id = "NAME",
+    locs = locs_proj,
+    locs_id = "id",
     from = nlcd_c1v1,
     mode = "terra",
     radius = 1000
