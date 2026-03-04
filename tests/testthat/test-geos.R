@@ -406,3 +406,31 @@ testthat::test_that("calculate_geos", {
   )
 })
 # nolint end
+
+################################################################################
+##### download_geos hash=FALSE branch
+
+testthat::test_that("download_geos mock download hash=FALSE", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_geos(
+          date = "2019-09-09",
+          collection = "aqc_tavg_1hr_g1440x721_v1",
+          nasa_earth_data_token = "fake_token",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 1)
+  })
+})

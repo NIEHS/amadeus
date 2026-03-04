@@ -574,3 +574,32 @@ testthat::test_that("calculate_merra2", {
     )
   )
 })
+
+################################################################################
+##### download_merra2 esdt_name_5 (goldsmr5) branch
+
+testthat::test_that("download_merra2 esdt_name_5 branch (goldsmr5)", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    check_destfile = function(...) FALSE,
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_merra2(
+          collection = "tavg3_3d_cld_Np",
+          date = c("2022-02-14", "2022-02-14"),
+          nasa_earth_data_token = "fake_token",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 0)
+  })
+})

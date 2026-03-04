@@ -493,3 +493,62 @@ testthat::test_that("download_aqs -> process_aqs integration (basic)", {
     }
   })
 })
+
+################################################################################
+##### download_aqs download_run_method branch (files need downloading)
+
+testthat::test_that("download_aqs mock download with download_run_method", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_aqs(
+          year = c(2018, 2018),
+          resolution_temporal = "daily",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
+testthat::test_that("download_aqs all files exist path", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) FALSE,
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    withCallingHandlers(
+      suppressWarnings(
+        download_aqs(
+          year = c(2018, 2018),
+          resolution_temporal = "daily",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("already exist", msgs)))
+  })
+})

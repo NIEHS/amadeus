@@ -1249,3 +1249,64 @@ testthat::test_that("calculate_modis", {
   )
 })
 # nolint end
+
+################################################################################
+##### download_modis single-date and hash=FALSE branches (no skip_on_cran)
+
+testthat::test_that("download_modis single date branch (mock, no skip)", {
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) {
+      invisible(list(success = 1, failed = 0, skipped = 0))
+    },
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      list(
+        feed = list(
+          entry = list(
+            list(
+              links = list(
+                list(
+                  rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                  href = paste0(
+                    "https://e4ftl01.cr.usgs.gov/MOLT/MOD09GA.061/",
+                    "2023.01.01/MOD09GA.A2023001.h10v05.061.hdf"
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_modis(
+          date = "2023-01-01",
+          product = "MOD09GA",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 1)
+  })
+})

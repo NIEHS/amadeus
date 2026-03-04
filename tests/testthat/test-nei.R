@@ -402,3 +402,59 @@ testthat::test_that("calculate_nei", {
   )
 })
 # nolint end
+
+################################################################################
+##### download_nei all-files-exist and hash=FALSE branches
+
+testthat::test_that("download_nei all files already exist path", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) FALSE,
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    withCallingHandlers(
+      suppressWarnings(
+        download_nei(
+          year = c(2017, 2020),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("already exist", msgs)))
+  })
+})
+
+testthat::test_that("download_nei mock download hash=FALSE", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_nei(
+          year = c(2017, 2020),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 1)
+  })
+})

@@ -374,3 +374,39 @@ testthat::test_that("download_edgar mock download with hash", {
     testthat::expect_equal(result, "fakehash")
   })
 })
+
+################################################################################
+##### download_edgar missing URL warning branch (some URLs return FALSE)
+
+testthat::test_that("download_edgar missing URL warning path", {
+  call_idx <- 0L
+  testthat::local_mocked_bindings(
+    check_url_status = function(u, ...) {
+      call_idx <<- call_idx + 1L
+      call_idx > 1L  # First URL is invalid (FALSE), rest are valid (TRUE)
+    },
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      suppressMessages(
+        download_edgar(
+          species = c("CO", "CH4"),
+          temp_res = "yearly",
+          sector_yearly = "ENE",
+          year_range = c(2021, 2021),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      "Some URLs could not be accessed"
+    )
+  })
+})

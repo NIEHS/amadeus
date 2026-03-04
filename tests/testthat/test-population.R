@@ -705,3 +705,188 @@ testthat::test_that("population integration test", {
     }
   })
 })
+
+################################################################################
+##### download_population format, hash, and file-exists branches
+
+testthat::test_that("download_population ASCII format year branch", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_population(
+          year = 2020,
+          data_format = "ASCII",
+          data_resolution = "60 minute",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_type(result, "character")
+  })
+})
+
+testthat::test_that("download_population ASCII format totpop (year=all) branch", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    withCallingHandlers(
+      suppressWarnings(
+        download_population(
+          year = "all",
+          data_format = "ASCII",
+          data_resolution = "60 minute",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("netCDF", msgs)))
+  })
+})
+
+testthat::test_that("download_population GeoTIFF totpop branch", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    withCallingHandlers(
+      suppressWarnings(
+        download_population(
+          year = "all",
+          data_format = "GeoTIFF",
+          data_resolution = "60 minute",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("netCDF", msgs)))
+  })
+})
+
+testthat::test_that("download_population netCDF format branch", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_population(
+          year = 2020,
+          data_format = "netCDF",
+          data_resolution = "60 minute",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_null(result)
+  })
+})
+
+testthat::test_that("download_population year=all 30_sec resolution warning", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    withCallingHandlers(
+      suppressWarnings(
+        download_population(
+          year = "all",
+          data_format = "GeoTIFF",
+          data_resolution = "30 second",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("30 second resolution", msgs)))
+  })
+})
+
+testthat::test_that("download_population file already exists path", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) FALSE,
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    withCallingHandlers(
+      suppressWarnings(
+        download_population(
+          year = 2020,
+          data_format = "GeoTIFF",
+          data_resolution = "60 minute",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("already exists", msgs)))
+  })
+})

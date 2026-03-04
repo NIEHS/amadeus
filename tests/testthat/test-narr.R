@@ -445,3 +445,30 @@ testthat::test_that("calculate_narr", {
     )
   )
 })
+
+################################################################################
+##### download_narr hash=FALSE branch
+
+testthat::test_that("download_narr mock download hash=FALSE", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = "weasd",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 1)
+  })
+})

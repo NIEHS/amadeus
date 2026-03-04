@@ -205,3 +205,30 @@ testthat::test_that("calculate_tri", {
     )
   )
 })
+
+################################################################################
+##### download_tri hash=FALSE branch
+
+testthat::test_that("download_tri mock download hash=FALSE", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_tri(
+          year = c(2018, 2018),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 1)
+  })
+})

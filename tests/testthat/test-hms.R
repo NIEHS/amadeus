@@ -353,24 +353,26 @@ testthat::test_that("process_hms (single date)", {
   )
 })
 
-# testthat::test_that("process_hms (absent polygons - 12/31/2018)", {
-#   withr::local_package("terra")
-#   # expect function
-#   testthat::expect_true(
-#     is.function(process_hms)
-#   )
-#   hms <-
-#     process_hms(
-#       date = c("2018-12-31", "2018-12-31"),
-#       path = testthat::test_path(
-#         "..",
-#         "testdata",
-#         "hms"
-#       )
-#     )
-#   # expect character
-#   testthat::expect_true(is.character(hms))
-# })
+testthat::test_that("process_hms (absent polygons - 12/31/2018)", {
+  withr::local_package("terra")
+  # expect function
+  testthat::expect_true(
+    is.function(process_hms)
+  )
+  hms <-
+    suppressMessages(
+      process_hms(
+        date = c("2018-12-31", "2018-12-31"),
+        path = testthat::test_path(
+          "..",
+          "testdata",
+          "hms"
+        )
+      )
+    )
+  # expect character (absent polygons path returns vector of dates)
+  testthat::expect_true(is.character(hms))
+})
 
 ################################################################################
 ##### calculate_hms
@@ -564,3 +566,90 @@ testthat::test_that("Character input in calculate_hms returns 1-row df", {
 })
 
 # nolint end
+
+################################################################################
+##### download_hms KML format and hash=FALSE branches
+
+testthat::test_that("download_hms KML format mock download", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    result <- withCallingHandlers(
+      suppressWarnings(
+        download_hms(
+          date = c("2018-01-01", "2018-01-01"),
+          data_format = "KML",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("KML", msgs)))
+    testthat::expect_type(result, "list")
+  })
+})
+
+testthat::test_that("download_hms KML format mock download hash=TRUE", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_hms(
+          date = c("2018-01-01", "2018-01-01"),
+          data_format = "KML",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
+testthat::test_that("download_hms Shapefile mock download hash=FALSE", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_hms(
+          date = c("2018-01-01", "2018-01-01"),
+          data_format = "Shapefile",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 1)
+  })
+})

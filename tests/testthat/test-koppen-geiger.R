@@ -180,3 +180,37 @@ testthat::test_that("calculate_koppen_geiger", {
   testthat::expect_equal(ncol(kg_sf), 8)
   testthat::expect_true("sf" %in% class(kg_sf))
 })
+
+################################################################################
+##### download_koppen_geiger file-already-exists branch
+
+testthat::test_that("download_koppen_geiger file already exists path", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) FALSE,
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    withCallingHandlers(
+      suppressWarnings(
+        download_koppen_geiger(
+          data_resolution = "0.0083",
+          time_period = "Present",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("already exists", msgs)))
+  })
+})

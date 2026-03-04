@@ -1735,3 +1735,138 @@ testthat::test_that(
     })
   }
 )
+
+################################################################################
+##### download_run_method tryCatch error handler (req_perform throws)
+
+testthat::test_that(
+  "download_run_method tryCatch error handler when req_perform throws",
+  {
+    skip_on_cran()
+
+    withr::with_tempdir({
+      testthat::local_mocked_bindings(
+        req_perform = function(req, path = NULL, ...) {
+          stop("Simulated network error")
+        },
+        .package = "httr2"
+      )
+
+      msgs <- character(0)
+      result <- suppressWarnings(
+        withCallingHandlers(
+          download_run_method(
+            urls = "https://example.com/data.bin",
+            destfiles = "error_test.bin",
+            show_progress = FALSE,
+            max_tries = 1
+          ),
+          message = function(m) {
+            msgs <<- c(msgs, conditionMessage(m))
+            invokeRestart("muffleMessage")
+          }
+        )
+      )
+
+      testthat::expect_equal(result$failed, 1)
+      testthat::expect_equal(result$success, 0)
+      testthat::expect_false(file.exists("error_test.bin"))
+      testthat::expect_true(any(grepl("Failed", msgs)))
+    })
+  }
+)
+
+testthat::test_that(
+  "download_run_method tryCatch error handler show_progress=TRUE",
+  {
+    skip_on_cran()
+
+    withr::with_tempdir({
+      testthat::local_mocked_bindings(
+        req_perform = function(req, path = NULL, ...) {
+          stop("Simulated network error for progress test")
+        },
+        .package = "httr2"
+      )
+
+      msgs <- character(0)
+      result <- suppressWarnings(
+        withCallingHandlers(
+          download_run_method(
+            urls = "https://example.com/data.bin",
+            destfiles = "error_progress_test.bin",
+            show_progress = TRUE,
+            max_tries = 1
+          ),
+          message = function(m) {
+            msgs <<- c(msgs, conditionMessage(m))
+            invokeRestart("muffleMessage")
+          }
+        )
+      )
+
+      testthat::expect_equal(result$failed, 1)
+      testthat::expect_true(any(grepl(" FAIL ", msgs)))
+    })
+  }
+)
+
+################################################################################
+##### setup_nasa_token: session, renviron, and file methods (no skip_on_cran)
+
+testthat::test_that("setup_nasa_token session method (no skip)", {
+  withr::local_envvar(NASA_EARTHDATA_TOKEN = "")
+  testthat::expect_no_error(
+    suppressMessages(
+      setup_nasa_token(method = "session", token = "test_token_abc")
+    )
+  )
+  testthat::expect_equal(Sys.getenv("NASA_EARTHDATA_TOKEN"), "test_token_abc")
+})
+
+testthat::test_that("setup_nasa_token renviron method, no existing .Renviron", {
+  withr::with_tempdir({
+    withr::local_envvar(HOME = getwd())
+    testthat::expect_no_error(
+      suppressMessages(
+        setup_nasa_token(method = "renviron", token = "renviron_token_1")
+      )
+    )
+    renviron_path <- file.path(getwd(), ".Renviron")
+    testthat::expect_true(file.exists(renviron_path))
+    contents <- readLines(renviron_path)
+    testthat::expect_true(
+      any(grepl("NASA_EARTHDATA_TOKEN=renviron_token_1", contents))
+    )
+  })
+})
+
+testthat::test_that("setup_nasa_token renviron method, existing .Renviron", {
+  withr::with_tempdir({
+    withr::local_envvar(HOME = getwd())
+    writeLines(c("SOME_VAR=value"), ".Renviron")
+    testthat::expect_no_error(
+      suppressMessages(
+        setup_nasa_token(method = "renviron", token = "renviron_token_2")
+      )
+    )
+    contents <- readLines(".Renviron")
+    testthat::expect_true(
+      any(grepl("NASA_EARTHDATA_TOKEN=renviron_token_2", contents))
+    )
+  })
+})
+
+testthat::test_that("setup_nasa_token file method (no skip)", {
+  withr::with_tempdir({
+    withr::local_envvar(HOME = getwd())
+    testthat::expect_no_error(
+      suppressMessages(
+        setup_nasa_token(method = "file", token = "file_token_1")
+      )
+    )
+    token_path <- file.path(getwd(), ".nasa_earthdata_token")
+    testthat::expect_true(file.exists(token_path))
+    testthat::expect_equal(readLines(token_path), "file_token_1")
+  })
+})

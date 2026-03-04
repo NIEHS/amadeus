@@ -429,3 +429,63 @@ testthat::test_that("calculate_gmted", {
     )
   )
 })
+
+################################################################################
+##### download_gmted hash=FALSE and file-already-exists branches
+
+testthat::test_that("download_gmted mock download hash=FALSE", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_gmted(
+          statistic = "Breakline Emphasis",
+          resolution = "7.5 arc-seconds",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_null(result)
+  })
+})
+
+testthat::test_that("download_gmted file already exists path", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) FALSE,
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    withCallingHandlers(
+      suppressWarnings(
+        download_gmted(
+          statistic = "Breakline Emphasis",
+          resolution = "7.5 arc-seconds",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("already exists", msgs)))
+  })
+})

@@ -817,3 +817,63 @@ testthat::test_that("integration - debug column names", {
     testthat::succeed("Debug test - check output above")
   })
 })
+
+################################################################################
+##### download_nlcd file-already-exists and hash=FALSE branches
+
+testthat::test_that("download_nlcd file already exists path", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) FALSE,
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    withCallingHandlers(
+      suppressWarnings(
+        download_nlcd(
+          year = 2021,
+          product = "land cover",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("already exists", msgs)))
+  })
+})
+
+testthat::test_that("download_nlcd mock download hash=FALSE", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_nlcd(
+          year = 2021,
+          product = "land cover",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_null(result)
+  })
+})
