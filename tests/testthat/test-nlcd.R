@@ -881,7 +881,7 @@ testthat::test_that("download_nlcd mock download hash=FALSE", {
 ################################################################################
 ##### download_nlcd deprecated params, download=FALSE, and remove_command paths
 
-testthat::test_that("download_nlcd download=FALSE deprecated warning + early return", {
+testthat::test_that("download_nlcd download=FALSE deprecated warning", {
   withr::with_tempdir({
     testthat::expect_warning(
       suppressMessages(

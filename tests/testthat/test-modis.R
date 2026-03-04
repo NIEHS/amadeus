@@ -1364,7 +1364,7 @@ testthat::test_that("download_modis no granules found path (no skip)", {
 ################################################################################
 ##### download_modis remove_command warning (covers lines 2707-2710)
 
-testthat::test_that("download_modis remove_command deprecated warning (no skip)", {
+testthat::test_that("download_modis remove_command deprecated warning", {
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
     download_run_method = function(...) {
@@ -1625,7 +1625,7 @@ testthat::test_that("download_modis MOD06_L2 uses version 6.1 (no skip)", {
 ################################################################################
 ##### download_modis product=VNP46A2 str_version=NULL (covers line 2732)
 
-testthat::test_that("download_modis VNP46A2 sets str_version to NULL (no skip)", {
+testthat::test_that("download_modis VNP46A2 sets str_version to NULL", {
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
     download_run_method = function(...) {
