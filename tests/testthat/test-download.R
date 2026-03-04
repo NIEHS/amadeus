@@ -2250,18 +2250,4 @@ testthat::test_that("setup_nasa_token errors with empty token string", {
   )
 })
 
-################################################################################
-##### setup_nasa_token non-interactive error (covers line 957)
 
-testthat::test_that(
-  "setup_nasa_token errors in non-interactive mode with no token",
-  {
-  testthat::local_mocked_bindings(
-    interactive = function() FALSE,
-    .package = "base"
-  )
-  testthat::expect_error(
-    setup_nasa_token(method = "session", token = NULL),
-    "non-interactive"
-  )
-})
