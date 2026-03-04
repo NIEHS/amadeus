@@ -877,3 +877,50 @@ testthat::test_that("download_nlcd mock download hash=FALSE", {
     testthat::expect_null(result)
   })
 })
+
+################################################################################
+##### download_nlcd deprecated params, download=FALSE, and remove_command paths
+
+testthat::test_that("download_nlcd download=FALSE deprecated warning + early return", {
+  withr::with_tempdir({
+    testthat::expect_warning(
+      suppressMessages(
+        download_nlcd(
+          year = 2021,
+          product = "land cover",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE,
+          hash = FALSE
+        )
+      ),
+      "deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_nlcd remove_command deprecated warning", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      suppressMessages(
+        download_nlcd(
+          year = 2021,
+          product = "land cover",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          remove_command = TRUE,
+          hash = FALSE
+        )
+      ),
+      "deprecated"
+    )
+  })
+})

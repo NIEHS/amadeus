@@ -1310,3 +1310,49 @@ testthat::test_that("download_modis single date branch (mock, no skip)", {
     testthat::expect_equal(result$success, 1)
   })
 })
+
+################################################################################
+##### download_modis remove_command, 31-day warning, no granules (no skip_on_cran)
+
+testthat::test_that("download_modis no granules found path (no skip)", {
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) {
+      invisible(list(success = 1, failed = 0, skipped = 0))
+    },
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      list(feed = list(entry = list()))  # Empty entry list -> no granules
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    testthat::expect_error(
+      suppressWarnings(
+        suppressMessages(
+          download_modis(
+            date = "2023-01-01",
+            product = "MOD09GA",
+            directory_to_save = ".",
+            acknowledgement = TRUE,
+            hash = FALSE
+          )
+        )
+      ),
+      "No granules found"
+    )
+  })
+})

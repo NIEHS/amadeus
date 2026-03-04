@@ -1551,8 +1551,6 @@ testthat::test_that("setup_nasa_token file method writes token to file", {
 })
 
 testthat::test_that("setup_nasa_token errors in non-interactive mode with NULL token", {
-  skip_on_cran()
-
   testthat::expect_error(
     setup_nasa_token(method = "renviron", token = NULL),
     "non-interactive"
@@ -1742,8 +1740,6 @@ testthat::test_that(
 testthat::test_that(
   "download_run_method tryCatch error handler when req_perform throws",
   {
-    skip_on_cran()
-
     withr::with_tempdir({
       testthat::local_mocked_bindings(
         req_perform = function(req, path = NULL, ...) {
@@ -1779,8 +1775,6 @@ testthat::test_that(
 testthat::test_that(
   "download_run_method tryCatch error handler show_progress=TRUE",
   {
-    skip_on_cran()
-
     withr::with_tempdir({
       testthat::local_mocked_bindings(
         req_perform = function(req, path = NULL, ...) {
@@ -1868,5 +1862,104 @@ testthat::test_that("setup_nasa_token file method (no skip)", {
     token_path <- file.path(getwd(), ".nasa_earthdata_token")
     testthat::expect_true(file.exists(token_path))
     testthat::expect_equal(readLines(token_path), "file_token_1")
+  })
+})
+
+################################################################################
+##### setup_nasa_token NULL token in non-interactive mode
+
+testthat::test_that("setup_nasa_token NULL token non-interactive errors", {
+  testthat::expect_error(
+    setup_nasa_token(method = "session", token = NULL),
+    "Token must be provided"
+  )
+})
+
+################################################################################
+##### download_run_method tests WITHOUT skip_on_cran
+
+testthat::test_that("download_run_method success path (no skip)", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      if (!is.null(path)) {
+        writeBin(charToRaw("fake file data"), path)
+      }
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/octet-stream"),
+          body = charToRaw("fake file data")
+        ),
+        class = "httr2_response"
+      )
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    result <- suppressMessages(
+      download_run_method(
+        urls = "https://example.com/file1.bin",
+        destfiles = "file1.bin",
+        show_progress = TRUE,
+        max_tries = 1,
+        rate_limit = 0
+      )
+    )
+    testthat::expect_equal(result$success, 1)
+    testthat::expect_equal(result$failed, 0)
+  })
+})
+
+testthat::test_that("download_run_method error handler path (no skip)", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      stop("Simulated network error")
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    result <- suppressMessages(suppressWarnings(
+      download_run_method(
+        urls = "https://example.com/data.bin",
+        destfiles = "error_test.bin",
+        show_progress = FALSE,
+        max_tries = 1,
+        rate_limit = 0
+      )
+    ))
+    testthat::expect_equal(result$failed, 1)
+    testthat::expect_equal(result$success, 0)
+  })
+})
+
+testthat::test_that("download_run_method subdirectory creation (no skip)", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      if (!is.null(path)) {
+        writeBin(charToRaw("fake data"), path)
+      }
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/octet-stream"),
+          body = charToRaw("fake data")
+        ),
+        class = "httr2_response"
+      )
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    result <- suppressMessages(
+      download_run_method(
+        urls = "https://example.com/file.bin",
+        destfiles = "subdir/nested/file.bin",
+        show_progress = FALSE,
+        max_tries = 1,
+        rate_limit = 0
+      )
+    )
+    testthat::expect_true(file.exists("subdir/nested/file.bin"))
+    testthat::expect_equal(result$success, 1)
   })
 })

@@ -458,3 +458,31 @@ testthat::test_that("download_nei mock download hash=FALSE", {
     testthat::expect_equal(result$success, 1)
   })
 })
+
+################################################################################
+##### download_nei epa_certificate_path deprecation and unzip paths
+
+testthat::test_that("download_nei epa_certificate_path deprecation warning", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      suppressMessages(
+        download_nei(
+          year = c(2017, 2020),
+          epa_certificate_path = "/fake/cert.pem",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      "deprecated"
+    )
+  })
+})

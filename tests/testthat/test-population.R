@@ -890,3 +890,52 @@ testthat::test_that("download_population file already exists path", {
     testthat::expect_true(any(grepl("already exists", msgs)))
   })
 })
+
+################################################################################
+##### download_population deprecated parameters and download=FALSE branches
+
+testthat::test_that("download_population download=FALSE deprecated warning + early return", {
+  withr::with_tempdir({
+    testthat::expect_warning(
+      suppressMessages(
+        download_population(
+          year = 2020,
+          data_format = "GeoTIFF",
+          data_resolution = "60 minute",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE,
+          hash = FALSE
+        )
+      ),
+      "deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_population remove_command deprecated warning", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      suppressMessages(
+        download_population(
+          year = 2020,
+          data_format = "GeoTIFF",
+          data_resolution = "60 minute",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          remove_command = TRUE,
+          hash = FALSE
+        )
+      ),
+      "deprecated"
+    )
+  })
+})
