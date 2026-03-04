@@ -6,7 +6,7 @@
 testthat::test_that("download_gridmet (no errors)", {
   withr::local_package("httr2")
   withr::local_package("stringr")
-  withr::local_mocked_bindings(
+  testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
     .package = "amadeus"
   )
@@ -67,7 +67,7 @@ testthat::test_that("download_gridmet (no errors)", {
 testthat::test_that("download_gridmet (single year)", {
   withr::local_package("httr2")
   withr::local_package("stringr")
-  withr::local_mocked_bindings(
+  testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
     .package = "amadeus"
   )

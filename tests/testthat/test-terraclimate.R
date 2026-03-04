@@ -4,7 +4,7 @@
 ################################################################################
 ##### download_terraclimate
 testthat::test_that("download_terraclimate (url discovery)", {
-  withr::local_mocked_bindings(
+  testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
     .package = "amadeus"
   )
@@ -31,7 +31,7 @@ testthat::test_that("download_terraclimate (url discovery)", {
 })
 
 testthat::test_that("download_terraclimate (single year)", {
-  withr::local_mocked_bindings(
+  testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
     .package = "amadeus"
   )
