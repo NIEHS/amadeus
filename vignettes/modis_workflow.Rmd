@@ -43,11 +43,9 @@ Downloaded data files are Hierarchical Data Format (HDF), with the extension `.h
 * `horizontal_tiles = c(7, 13)`: Horizontal sinusoidal tiles.
 * `vertical_tiles = c(3, 6)`: Vertical sinusoidal tiles.
 * `date = c("2019-09-01", "2019-09-02")`: Dates of interest.
-* `nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN")`: User-specific NASA credentials.
+* `nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN")`: User-specific NASA credentials.
 * `directory_to_save = dir_mod11a1`: directory to save the downloaded files.
 * `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
-* `download = TRUE`: download the data files.
-* `remove_command = TRUE`: remove the temporary command file used to download the data.
 * `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
 
 ```{r, eval = FALSE}
@@ -59,11 +57,9 @@ amadeus::download_data(
   horizontal_tiles = c(7, 13),
   vertical_tiles = c(3, 6),
   date = c("2019-08-15", "2019-08-16"),
-  nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+  nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
   directory_to_save = dir_mod11a1,
-  acknowledge = TRUE,
-  download = TRUE,
-  remove_command = TRUE,
+  acknowledgement = TRUE,
   hash = TRUE
 )
 ```
@@ -72,8 +68,6 @@ amadeus::download_data(
 cat("2 / 2 days of data available in the queried dates.
 
 Downloading requested files...
-
-[`wget` DOWNLOAD OUTPUT OMITTED]
 
 Requested files have been downloaded.
 
@@ -312,11 +306,9 @@ Downloaded data files are Hierarchical Data Format version 5 (HDF5), with the ex
 * `horizontal_tiles = c(7, 13)`: Horizontal sinusoidal tiles.
 * `vertical_tiles = c(3, 6)`: Vertical sinusoidal tiles.
 * `date = c("2019-09-01", "2019-09-02")`: Dates of interest.
-* `nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN")`: User-specific NASA credentials.
+* `nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN")`: User-specific NASA credentials.
 * `directory_to_save = dir_vnp46a2`: directory to save the downloaded files.
 * `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
-* `download = TRUE`: download the data files.
-* `remove_command = TRUE`: remove the temporary command file used to download the data.
 * `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
 
 ```{r, eval = FALSE}
@@ -328,11 +320,9 @@ amadeus::download_data(
   horizontal_tiles = c(7, 13),
   vertical_tiles = c(3, 6),
   date = c("2019-08-15", "2019-08-16"),
-  nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+  nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
   directory_to_save = dir_vnp46a2,
-  acknowledge = TRUE,
-  download = TRUE,
-  remove_command = TRUE,
+  acknowledgement = TRUE,
   hash = TRUE
 )
 ```
@@ -341,8 +331,6 @@ amadeus::download_data(
 cat("2 / 2 days of data available in the queried dates.
 
 Downloading requested files...
-
-[`wget` DOWNLOAD OUTPUT OMITTED]
 
 Requested files have been downloaded.
 
@@ -555,12 +543,10 @@ cat("[1] \"vignettes/data/LAADS_query.2025-08-12T14_29.csv\"\n")
 * `horizontal_tiles = c(7, 13)`: Horizontal sinusoidal tiles.
 * `vertical_tiles = c(3, 6)`: Vertical sinusoidal tiles.
 * `date = c("2019-09-01", "2019-09-02")`: Dates of interest.
-* `nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN")`: User-specific NASA credentials.
+* `nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN")`: User-specific NASA credentials.
 * `mod06_links = "vignettes/data/LAADS_query.2025-08-12T14_29.csv"`: Manually downloaded CSV file with MOD06_L2 links.
 * `directory_to_save = dir_mod06l2`: directory to save the downloaded files.
 * `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
-* `download = TRUE`: download the data files.
-* `remove_command = TRUE`: remove the temporary command file used to download the data.
 * `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
 
 ```{r, eval = FALSE}
@@ -573,11 +559,9 @@ amadeus::download_data(
   vertical_tiles = c(3, 6),
   mod06_links = "vignettes/data/LAADS_query.2025-08-12T14_29.csv",
   date = c("2019-08-15", "2019-08-16"),
-  nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+  nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
   directory_to_save = dir_mod06l2,
-  acknowledge = TRUE,
-  download = TRUE,
-  remove_command = TRUE,
+  acknowledgement = TRUE,
   hash = TRUE
 )
 ```
@@ -586,8 +570,6 @@ amadeus::download_data(
 cat("2 / 2 days of data available in the queried dates.
 
 Downloading requested files...
-
-[`wget` DOWNLOAD OUTPUT OMITTED]
 
 Requested files have been downloaded.
 

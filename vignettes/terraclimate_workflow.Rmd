@@ -33,8 +33,6 @@ Start by downloading the netCDF data files with `download_data`.
 * `year = c(2021, 2022)`: years of interest.
 * `directory_to_save = dir`: directory to save the downloaded files.
 * `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
-* `download = TRUE`: download the data files.
-* `remove_command = TRUE`: remove the temporary command file used to download the data.
 * `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
 
 ```{r, eval = FALSE}
@@ -45,8 +43,6 @@ amadeus::download_data(
   year = c(2021, 2022),
   directory_to_save = dir,
   acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE,
   hash = TRUE
 )
 ```
