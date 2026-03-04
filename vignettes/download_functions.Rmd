@@ -39,85 +39,88 @@ This wrapper function calls source-specific data download functions, each utiliz
 ```{r, echo = FALSE}
 functions <- c(
   "download_aqs",
+  "download_cropscape",
   "download_ecoregion",
+  "download_edgar",
   "download_geos",
   "download_gmted",
+  "download_gridmet",
+  "download_groads",
+  "download_hms",
+  "download_huc",
   "download_koppen_geiger",
   "download_merra2",
-  "download_narr",
-  "download_nlcd",
-  "download_hms",
-  "download_sedac_groads",
-  "download_sedac_population",
   "download_modis",
-  "download_terraclimate",
-  "download_gridmet",
-  "download_osm",
-  "download_prism",
+  "download_narr",
   "download_nei",
-  "download_tri",
-  "download_huc"
+  "download_nlcd",
+  "download_population",
+  "download_prism",
+  "download_terraclimate",
+  "download_tri"
 )
 source <- c(
   "US EPA Air Data Pre-Generated Data Files",
+  "USDA National Agricultural Statistics Service CropScape (Cropland Data Layer)",
   "US EPA Ecoregions",
+  "EU JRC Emissions Database for Global Atmospheric Research (EDGAR)",
   "NASA Goddard Earth Observing System Composition Forecasting (GEOS-CF)",
   "USGS Global Multi-resolution Terrain Elevation Data (GMTED2010)",
+  "Climatology Lab GridMET",
+  "NASA SEDAC Global Roads Open Access Data Set",
+  "NOAA Hazard Mapping System Fire and Smoke Product",
+  "USGS National Hydrography Dataset (NHD)",
   "Köppen-Geiger Climate Classification (Beck et al., 2018)",
   paste0(
     "NASA Modern-Era Retrospective analysis for Research and ",
     "Applications, Version 2 (MERRA-2)"
   ),
-  "NOAA NCEP North American Regional Reanalysis (NARR)",
-  "MRLC Consortium National Land Cover Database (NLCD)",
-  "NOAA Hazard Mapping System Fire and Smoke Product",
-  "NASA SEDAC Global Roads Open Access Data Set",
-  "NASA SEDAC UN WPP-Adjusted Population Density",
   "NASA Moderate Resolution Imaging Spectroradiometer (MODIS)",
-  "Climatology Lab TerraClimate",
-  "Climatology Lab GridMet",
-  "OpenGeoHub Foundation OpenLandMap",
-  "Parameter Elevation Regression on Independent Slopes Model (PRISM)",
+  "NOAA NCEP North American Regional Reanalysis (NARR)",
   "US EPA National Emissions Inventory (NEI)",
-  "US EPA Toxic Release Inventory (TRI) Program",
-  "USGS National Hydrography Dataset (NHD)"
+  "MRLC Consortium National Land Cover Database (NLCD)",
+  "NASA SEDAC UN WPP-Adjusted Population Density",
+  "Parameter Elevation Regression on Independent Slopes Model (PRISM)",
+  "Climatology Lab TerraClimate",
+  "US EPA Toxic Release Inventory (TRI) Program"
 )
 
 link <- c(
   "https://aqs.epa.gov/aqsweb/airdata/download_files.html",
+  "https://nassgeodata.gmu.edu/CropScape/",
   "https://www.epa.gov/eco-research/ecoregions",
+  "https://edgar.jrc.ec.europa.eu/",
   "https://gmao.gsfc.nasa.gov/GEOS_systems/",
   "https://www.usgs.gov/coastal-changes-and-impacts/gmted2010",
-  "https://www.nature.com/articles/sdata2018214",
-  "https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/",
-  "https://psl.noaa.gov/data/gridded/data.narr.html",
-  "https://www.mrlc.gov/data",
-  "https://www.ospo.noaa.gov/products/land/hms.html#0",
+  "https://www.climatologylab.org/gridmet.html",
   paste0(
     "https://data.earthdata.nasa.gov/nasa-earth/",
     "human-dimensions/sedac-root/downloads/data/groads/",
     "groads-global-roads-open-access-v1"
   ),
+  "https://www.ospo.noaa.gov/products/land/hms.html#0",
+  "https://www.sciencebase.gov/catalog/item/4f5545cce4b018de15819ca9",
+  "https://www.nature.com/articles/sdata2018214",
+  "https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/",
+  "https://modis.gsfc.nasa.gov/data/",
+  "https://psl.noaa.gov/data/gridded/data.narr.html",
+  "https://www.epa.gov/air-emissions-inventories",
+  "https://www.mrlc.gov/data",
   paste0(
     "https://data.earthdata.nasa.gov/nasa-earth/",
     "human-dimensions/sedac-root/downloads/data/gpw-v4/",
     "population-density-adjusted-to-2015-unwpp-country-",
     "totals-rev11"
   ),
-  "https://modis.gsfc.nasa.gov/data/",
-  "https://www.climatologylab.org/terraclimate.html",
-  "https://www.climatologylab.org/gridmet.html",
-  "https://opengeohub.org/about-openlandmap/",
   paste0(
     "https://elibrary.asabe.org/abstract.asp??JID=3&",
     "AID=3101&CID=t2000&v=43&i=6&T=1"
   ),
-  "https://www.epa.gov/air-emissions-inventories",
+  "https://www.climatologylab.org/terraclimate.html",
   paste0(
     "https://www.epa.gov/toxics-release-inventory-tri-program/",
     "tri-basic-data-files-calendar-years-1987-present"
-  ),
-  "https://www.sciencebase.gov/catalog/item/4f5545cce4b018de15819ca9"
+  )
 )
 
 source <- paste0(
@@ -152,16 +155,15 @@ The two functions have different required parameters because `download_hms` uses
 
 #### Standard parameters
 
-Four parameters are included in all of the data download functions.
+Three parameters are included in all of the data download functions.
 
 ```{r, echo = FALSE}
 parameter <- c(
   "directory_to_save",
   "acknowledgement",
-  "download",
-  "remove_command"
+  "download"
 )
-type <- c("Character", "Logical", "Logical", "Logical")
+type <- c("Character", "Logical", "Logical")
 description <- c(
   paste0(
     "There must be a directory to save downloaded ",
@@ -169,18 +171,14 @@ description <- c(
   ),
   paste0(
     "User must acknowledge that downloading geospatial ",
-    "data can be very lage and may use lots of machine ",
+    "data can be very large and may use lots of machine ",
     "storage and memory."
   ),
   paste0(
-    "Run or skip the data download. Utilized primarily ",
-    "for unit tests (see [Unit Tests])."
-  ),
-  paste0(
-    "Remove or retain the text file containing the ",
-    "generated download commands. Utilized primarily ",
-    "for unit tests (see [Unit Tests] and [4. Initiate ",
-    "\"...commands.txt\"])."
+    "DEPRECATED. Downloads now use httr2 by default. ",
+    "When FALSE, the function returns early with a list ",
+    "of URLs and destination file paths (useful for ",
+    "unit tests — see [Unit Tests])."
   )
 )
 parameter_descriptions <- data.frame(parameter, type, description)
@@ -196,19 +194,13 @@ Although each source-specific download function is unique, they all follow the s
 
 [1. Clean Parameters]
 
-[2. Generate Download URLs]
+[2. Generate Download URLs and destination file paths]
 
-[3. Generate download file names]
+[3. Validate URLs]
 
-[4. Initiate "...commands.txt"]
+[4. Download files with httr2]
 
-[5. Concatenate download commands]
-
-[6. Finalize "...commands.txt"]
-
-[7. Run commands in "...commands.txt"]
-
-[8. Zip files (if applicable)](#zip-files-if-applicable)
+[5. Zip files (if applicable)](#zip-files-if-applicable)
 
 #### 1. Clean parameters
 
@@ -229,18 +221,21 @@ date_sequence <- gsub("-", "", as.character(date_sequence))
 date_sequence
 ```
 
-#### 2. Generate download URLs
+#### 2. Generate download URLs and destination file paths
 
-The URL base and pattern are identified by manually inspecting the download link on the source-specific web page. `download_hms` utilizes the year, month, date, and data format to generate the download url.
+The URL base and pattern are identified by manually inspecting the download link on the source-specific web page. `download_hms` utilizes the year, month, date, and data format to generate the download URL and a corresponding destination file path.
 
 ```{r}
 # user defined parameters
 data_format <- "Shapefile"
 suffix <- ".zip"
+directory_to_save <- "./data/"
 ```
 
 ```{r}
-urls <- NULL
+all_urls <- character()
+all_destfiles <- character()
+
 for (d in seq_along(date_sequence)) {
   year <- substr(date_sequence[d], 1, 4)
   month <- substr(date_sequence[d], 5, 6)
@@ -256,158 +251,68 @@ for (d in seq_along(date_sequence)) {
     date_sequence[d],
     suffix
   )
-  urls <- c(urls, url)
-}
-urls
-```
-
-A download URL is created for each date in `date_sequence` based on the fixed pattern.
-
-#### 3. Generate download file names
-
-The generation of download file names also follows a fixed pattern, typically a combination of the user-defined download directory, dataset name, spatiotemporal characteristic, data type, and, if applicable, specific variable name. Unlike the download URLs, the download file names can be defined in any way by the writer of the function, but using the previously defined characteristics is useful for identification.
-
-```{r}
-# user defined parameters
-directory_to_download <- "./data/"
-```
-
-```{r}
-download_file_names <- NULL
-for (d in seq_along(date_sequence)) {
-  download_file_name <- paste0(
-    directory_to_download,
+  destfile <- paste0(
+    directory_to_save,
     "hms_smoke_",
     data_format,
     "_",
     date_sequence[d],
     suffix
   )
-  download_file_names <- c(download_file_names, download_file_name)
+  all_urls <- c(all_urls, url)
+  all_destfiles <- c(all_destfiles, destfile)
 }
-download_file_names
+all_urls
 ```
 
-A download URL is created for each date in `date_sequence` based on the fixed pattern.
+A URL and destination file path are created for each date in `date_sequence` based on fixed patterns.
 
-#### 4. Initiate "...commands.txt"
+#### 3. Validate URLs
 
-An important aspect of the data download function is its `sink...cat...sink` structure. Rather than using the `utils::download.file` function, a text file is created to store all of the download commands generated from the URLs and file names.
-
-This structure is utilized for several reasons:
-
-- Consistent structure for all the source-specific download functions.
-
-- The `download.file` function cannot accept vectors of URLs and destination files for downloading. An additional `for` loop to download data will increase function complexity and may reduce performance.
-
-- Writing commands in Bash (Unix shell) script allows for specific arguments and flags.
-
-- Storing the download URLs without immediately running the download allows for unit testing and URL checking (more on this in [Unit Tests]).
-
-The text file containing the download commands is named based on the dataset, temporal range, and data transfer method.
-
-```{r}
-commands_txt <- paste0(
-  directory_to_download,
-  "hms_smoke_",
-  head(date_sequence, n = 1),
-  "_",
-  tail(date_sequence, n = 1),
-  "_curl_commands.txt"
-)
-```
-
-Create and sink the text file.
+Before initiating downloads the first URL in the list is validated with `check_url_status()`. This guards against common user errors such as invalid dates or unsupported data formats.
 
 ```{r, eval = FALSE}
-sink(commands_txt)
-```
-
-#### 5. Concatenate download commands
-
-The Linux-based download commands are written according to the data transfer method, download URL, download file name, and additional arguments. Which additional arguments are included, and their order, depend on the data transfer method and URL type.
-
-For more information on `curl` and `wget`, the two data transfer methods utilized by the data download functions, see [curl.1 the man page](https://curl.se/docs/manpage.html) and [GNU Wget 1.21.1-dirty Manual](https://www.gnu.org/software/wget/manual/wget.html) (latest version as of January 8, 2024).
-
-The `cat()` function will store each of the download commands written in the `for` loop to the previously sunk commands text file (`commands_txt`).
-
-```{r, eval = FALSE}
-for (d in seq_along(date_sequence)) {
-  download_comamnd <- paste0(
-    "curl -s -o ",
-    download_file_names[d],
-    " --url ",
-    urls[d],
-    "\n"
-  )
-  cat(download_comamnd)
+if (!amadeus::check_url_status(all_urls[1])) {
+  stop("Invalid date returns HTTP code 404. Check `date` parameter.\n")
 }
 ```
 
-#### 6. Finalize "...commands.txt"
+#### 4. Download files with httr2
 
-After the download commands have been concatenated to the commands text file, a second `sink` command is run to finalize the file and stop the appending of R output.
-
-```{r, eval = FALSE}
-sink()
-```
-
-#### 7. Run commands in "...commands.txt"
-
-A "system command" must be created to run all of the download commands stored in the commands text file. In bash script, `.` indicates to run all of the commands within a given script. In this case, we will run all of the commands within the commands text file.
-
-```{r}
-system_command <- paste0(
-  ". ",
-  commands_txt,
-  "\n"
-)
-system_command
-```
-
-Running the `system_command` deploys an "auxiliary" function, `download_run`, a function created to reduce repeated code across the source-specific download functions. The function takes two parameters, `system_command`, which indicates the command to be run, and `download`, a user-defined logical parameter.
-
-```{r}
-download_run <- function(
-  download = FALSE,
-  system_command = NULL
-) {
-  if (download == TRUE) {
-    cat(paste0("Downloading requested files...\n"))
-    system(command = system_command)
-    cat(paste0("Requested files have been downloaded.\n"))
-  } else {
-    cat(paste0("Skipping data download.\n"))
-    return(NULL)
-  }
-}
-```
-
-The data download is initiated by running `download_run` with the system command identified and `download = TRUE`.
+All source-specific download functions now use `download_run_method()`, which wraps `httr2` to provide robust retry logic, rate-limiting, token-based authentication (for NASA datasets), and streaming downloads directly to disk. The function accepts parallel vectors of URLs and destination file paths.
 
 ```{r, eval = FALSE}
-download_run(
-  download = TRUE,
-  system_command = system_command
+download_result <- amadeus::download_run_method(
+  urls = all_urls,
+  destfiles = all_destfiles,
+  token = NULL,          # set to NASA_EARTHDATA_TOKEN for NASA datasets
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2         # seconds between requests
 )
 ```
 
-Checking the download directory shows that all of the requested files have been downloaded.
+When `download = FALSE` is passed to a source-specific function (or `download_data()`), the function returns early with a named list instead of downloading:
 
 ```{r, eval = FALSE}
-list.files(path = directory_to_download)
+result <- download_data(
+  dataset_name = "hms",
+  date = c("2023-12-28", "2024-01-02"),
+  data_format = "Shapefile",
+  directory_to_save = "./data/",
+  acknowledgement = TRUE,
+  download = FALSE
+)
+# result$urls       — character vector of download URLs
+# result$destfiles  — character vector of destination paths
+# result$n_files    — integer count
 ```
 
-```{r, echo = FALSE}
-paste0("hms_smoke_Shapefile_", date_sequence, ".zip")
-```
-
-
-#### 8. Zip files (if applicable) {#zip-files-if-applicable}
+#### 5. Zip files (if applicable) {#zip-files-if-applicable}
 
 All of the source-specific data download functions follow this general pattern, but those functions which download zip files require additional steps to inflate and remove the downloaded zip files, if desired. Each of these two steps are run by helper functions, and they are run by the user-defined `unzip` and `remove_zip` parameters in `download_data`.
 
-`download_unzip` inflates zip files if `unzip = TRUE`, and skips inflation if `unzip = FALSE`. 
+`download_unzip` inflates zip files if `unzip = TRUE`, and skips inflation if `unzip = FALSE`.
 
 ```{r}
 download_unzip <-
@@ -447,35 +352,34 @@ download_remove_zips <-
 For this demonstration we will unzip (inflate) the downloaded zip files but we will not delete them.
 
 ```{r, eval = FALSE}
-for (f in seq_along(download_file_names)) {
+for (f in seq_along(all_destfiles)) {
   download_unzip(
-    file_name = download_file_names[f],
-    directory_to_unzip = directory_to_download,
+    file_name = all_destfiles[f],
+    directory_to_unzip = directory_to_save,
     unzip = TRUE
   )
 }
 download_remove_zips(
-  download_name = download_file_names,
+  download_name = all_destfiles,
   remove = FALSE
 )
 ```
 
 ```{r, echo = FALSE}
-for (f in seq_along(download_file_names)) {
+for (f in seq_along(date_sequence)) {
   cat(paste0("Unzipping files...\n"))
   cat(paste0(
     "Files unzipped and saved in ",
-    directory_to_download,
+    directory_to_save,
     ".\n"
   ))
 }
 ```
 
-
 Listing the files again shows that the contents of the zip files have been inflated and the zip files have been retained.
 
 ```{r, eval = FALSE}
-list.files(path = directory_to_download)
+list.files(path = directory_to_save)
 ```
 
 ```{r, echo = FALSE}
@@ -496,68 +400,22 @@ The download function was structured successfully.
 
 ## Unit Tests
 
-The previous outline successfully cleaned parameters, generated URLs, and downloaded data, but how can we be sure that it will continue to work with different temporal ranges and data types? To this end, unit tests have been implemented to ensure that each data download function runs properly and that URLs produced by [2. Generate download URLs] are valid and accessible. Like the download functions, the unit tests rely on "helper" functions to reduce repeated code across the tests.
+The previous outline successfully cleaned parameters, generated URLs, and downloaded data, but how can we be sure that it will continue to work with different temporal ranges and data types? To this end, unit tests have been implemented to ensure that each data download function runs properly and that the URLs it generates are valid and accessible. Like the download functions, the unit tests rely on helper functions to reduce repeated code across the tests.
 
 ### Helper functions
 
-`read_commands` imports the commands text file and converts the data frame to a vector.
+`check_url_status` is the most important of the download test helper functions. This function is part of the `amadeus` package and uses `httr2` to check the HTTP response status of a given URL. The desired HTTP response status is 200, which means the URL is valid and accessible. `check_url_status` returns a logical value indicating whether the URL returns HTTP status 200 (`TRUE`) or not (`FALSE`). For more information on HTTP status codes, see [HTTP response status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
 
-```{r}
-read_commands <- function(
-  commands_path = commands_path
-) {
-  commands <- utils::read.csv(commands_path, header = FALSE)
-  commands <- commands[seq_len(nrow(commands)), ]
-  return(commands)
-}
+```{r, eval = FALSE}
+amadeus::check_url_status(url)
 ```
 
-`extract_urls` extracts each download URL from the vector of commands. The `position` of the URL within the download command is determined in [5. Concatenate download commands].
-
-```{r}
-# function to extract URLs from vector
-extract_urls <- function(
-  commands = commands,
-  position = NULL
-) {
-  if (is.null(position)) {
-    cat(paste0("URL position in command is not defined.\n"))
-    return(NULL)
-  }
-  url_list <- NULL
-  for (c in seq_along(commands)) {
-    url <- stringr::str_split_i(commands[c], " ", position)
-    url_list <- c(url_list, url)
-  }
-  return(url_list)
-}
-```
-
-`check_url_status` is the most important of the download test "helper" functions. This function utilizes `httr::HEAD` and `httr::GET` to check the HTTP response status of a given URL. The desired HTTP response status is 200, which means the URL is valid and accessible. `check_url_status` returns a logical value to indicate whether the URL returns HTTP status 200 (`TRUE`) or not (`FALSE`). For more information on HTTP status', see [HTTP response status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
-
-```{r}
-check_url_status <- function(
-  url,
-  method = "HEAD"
-) {
-  http_status_ok <- 200
-  if (method == "HEAD") {
-    hd <- httr::HEAD(url)
-  } else if (method == "GET") {
-    hd <- httr::GET(url)
-  }
-  status <- hd$status_code
-  return(status == http_status_ok)
-}
-```
-
-`check_urls` applies `check_url_status` to a random sample of URLs extracted by `extract_urls`. The sample size will vary based on the dataset and spatio-temporal parameters being tested. The function returns a logical vector containing the output from `check_url_status`.
+`check_urls` applies `check_url_status` to a random sample of URLs. The sample size will vary based on the dataset and spatio-temporal parameters being tested. The function returns a logical vector containing the output from `check_url_status`.
 
 ```{r}
 check_urls <- function(
   urls = urls,
-  size = NULL,
-  method = "HEAD"
+  size = NULL
 ) {
   if (is.null(size)) {
     cat(paste0("URL sample size is not defined.\n"))
@@ -567,17 +425,14 @@ check_urls <- function(
     size <- length(urls)
   }
   url_sample <- sample(urls, size, replace = FALSE)
-  url_status <- sapply(url_sample,
-    check_url_status,
-    method = method
-  )
+  url_status <- sapply(url_sample, amadeus::check_url_status)
   return(url_status)
 }
 ```
 
 ### testthat
 
-To demonstrate a test in action, test the URLs generated by `download_data` for the NOAA HMS Smoke dataset. 
+To demonstrate a test in action, test the URLs generated by `download_data` for the NOAA HMS Smoke dataset. When called with `download = FALSE`, functions return a list with `$urls`, `$destfiles`, and `$n_files` — no files are written and no system commands are executed.
 
 For more information see [testthat](https://testthat.r-lib.org/).
 
@@ -590,7 +445,7 @@ testthat::test_that(
     test_start <- "2023-12-28"
     test_end <- "2024-01-02"
     test_directory <- "./data/"
-    # download = FALSE returns a list with $urls (no file written)
+    # download = FALSE returns a list with $urls (no files downloaded)
     result <- download_data(
       dataset_name = "hms",
       date = c(test_start, test_end),
@@ -600,7 +455,7 @@ testthat::test_that(
       download = FALSE
     )
     urls <- result$urls
-    url_status <- check_urls(urls = urls, size = 6, method = "HEAD")
+    url_status <- check_urls(urls = urls, size = 6)
     # test for true
     expect_true(all(url_status))
   }
@@ -616,7 +471,7 @@ testthat::test_that(
     test_start <- "2023-12-28"
     test_end <- "2024-01-02"
     test_directory <- "../inst/extdata/"
-    # download = FALSE returns a list with $urls (no file written)
+    # download = FALSE returns a list with $urls (no files downloaded)
     result <- suppressWarnings(download_data(
       dataset_name = "hms",
       date = c(test_start, test_end),
@@ -626,14 +481,14 @@ testthat::test_that(
       download = FALSE
     ))
     urls <- result$urls
-    url_status <- check_urls(urls = urls, size = 6, method = "HEAD")
+    url_status <- check_urls(urls = urls, size = 6)
     # test for true
     expect_true(all(url_status))
   }
 )
 ```
 
-Although the `testthat::test_that(...)` chunk contains code to download and check URLs, the unit test is performed by `expect_true(all(url_status))`. In words, this line is expecting (`expect_true`) that all (`all`) of the sampled URLs return HTTP response status 200 (`url_status`). Since this expectation was met, the test passed!
+Although the `testthat::test_that(...)` chunk contains code to generate and check URLs, the unit test is performed by `expect_true(all(url_status))`. In words, this line is expecting (`expect_true`) that all (`all`) of the sampled URLs return HTTP response status 200 (`url_status`). Since this expectation was met, the test passed!
 
 For an alternate example, we can use a start and end date that are known to not have data. As the URLs associated with these dates do not exist, we expect the function will fail. This test utilizes `expect_error()` because the `download_data` wrapper function returns an error message if the underlying source-specific download function returns an error.
 
@@ -651,11 +506,9 @@ testthat::test_that(
         dataset_name = "hms",
         date = c(test_start, test_end),
         data_format = "Shapefile",
-        directory_to_download = test_directory,
         directory_to_save = test_directory,
         acknowledgement = TRUE,
         download = FALSE,
-        remove_command = FALSE,
         unzip = FALSE,
         remove_zip = FALSE
       )
@@ -680,21 +533,15 @@ testthat::test_that(
       download_hms(
         date = c(test_start, test_end),
         data_format = "Shapefile",
-        directory_to_download = test_directory,
         directory_to_save = test_directory,
         acknowledgement = TRUE,
         download = FALSE,
-        remove_command = FALSE,
         unzip = FALSE,
         remove_zip = FALSE
       )
     )
   }
 )
-```
-
-```{r, echo = FALSE, include = FALSE}
-file.remove(commands_txt)
 ```
 
 As expected, the test passes because the NOAA HMS Smoke dataset does not contain data for January 1-2, 1800.
@@ -716,8 +563,6 @@ dates <- c("2023-12-28", "2024-01-02")
 data_format <- "Shapefile"
 data_directory <- "./download_example/"
 acknowledgement <- TRUE
-download <- TRUE # run data download
-remove_command <- TRUE # delete "...commands.txt" file
 unzip <- TRUE # inflate (unzip) downloaded zip files
 remove_zip <- FALSE # retain downloaded zip files
 ```
@@ -728,10 +573,9 @@ Download the data.
 download_data(
   dataset_name = "hms",
   date = dates,
+  data_format = data_format,
   directory_to_save = data_directory,
   acknowledgement = acknowledgement,
-  download = download,
-  remove_command = remove_command,
   unzip = unzip,
   remove_zip = remove_zip
 )
@@ -744,7 +588,7 @@ to_cat <-
     "Requested files have been downloaded.\n"
   )
 cat(to_cat)
-for (f in seq_along(download_file_names)) {
+for (f in seq_along(date_sequence)) {
   cat(paste0("Unzipping files...\n"))
   cat(paste0(
     "Files unzipped and saved in ",
