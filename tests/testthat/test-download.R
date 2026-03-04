@@ -2012,6 +2012,12 @@ testthat::test_that("check_urls with method=NULL uses check_url_status", {
   testthat::expect_true(all(result))
 })
 
+testthat::test_that("check_urls method=SKIP returns NULL (covers lines 722-723)", {
+  urls <- c("https://example.com/a.bin", "https://example.com/b.bin")
+  result <- suppressMessages(check_urls(urls = urls, size = 2, method = "SKIP"))
+  testthat::expect_null(result)
+})
+
 ################################################################################
 ##### download_run download=TRUE path (covers lines 442-444)
 
@@ -2241,5 +2247,21 @@ testthat::test_that("setup_nasa_token errors with empty token string", {
   testthat::expect_error(
     setup_nasa_token(method = "session", token = ""),
     "empty"
+  )
+})
+
+################################################################################
+##### setup_nasa_token non-interactive error (covers line 957)
+
+testthat::test_that(
+  "setup_nasa_token errors in non-interactive mode with no token",
+  {
+  testthat::local_mocked_bindings(
+    interactive = function() FALSE,
+    .package = "base"
+  )
+  testthat::expect_error(
+    setup_nasa_token(method = "session", token = NULL),
+    "non-interactive"
   )
 })

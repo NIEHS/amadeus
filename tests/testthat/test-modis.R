@@ -1525,3 +1525,164 @@ testthat::test_that("download_modis hash=TRUE returns fakehash (no skip)", {
     testthat::expect_equal(result, "fakehash")
   })
 })
+
+################################################################################
+##### download_modis cross-year dates stop (covers lines 2690-2691)
+
+testthat::test_that(
+  "download_modis cross-year dates non-MOD06_L2 stops",
+  {
+  testthat::expect_error(
+    suppressMessages(
+      download_modis(
+        date = c("2022-12-01", "2023-01-01"),
+        product = "MOD09GA",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        version = "061"
+      )
+    ),
+    "same year"
+  )
+})
+
+################################################################################
+##### download_modis version=NULL stop (covers line 2715)
+
+testthat::test_that(
+  "download_modis version=NULL stops with message",
+  {
+  testthat::local_mocked_bindings(
+    check_for_null_parameters = function(...) invisible(NULL),
+    get_token = function(...) "fake_token",
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_error(
+      suppressMessages(
+        download_modis(
+          date = c("2023-01-01", "2023-01-01"),
+          product = "MOD09GA",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          version = NULL
+        )
+      ),
+      "Please select a data version"
+    )
+  })
+})
+
+################################################################################
+##### download_modis product=MOD06_L2 str_version (covers line 2730)
+
+testthat::test_that(
+  "download_modis MOD06_L2 uses version 6.1 (no skip)",
+  {
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) {
+      list(success = 1, failed = 0, skipped = 0)
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      list(feed = list(entry = list(
+        list(links = list(list(
+          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+          href = paste0(
+            "https://example.com/",
+            "MOD06_L2.A2023001.hdf"
+          )
+        )))
+      )))
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_modis(
+          date = "2023-01-01",
+          product = "MOD06_L2",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          version = "006",
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+  })
+})
+
+################################################################################
+##### download_modis product=VNP46A2 str_version=NULL (covers line 2732)
+
+testthat::test_that(
+  "download_modis VNP46A2 sets str_version to NULL (no skip)",
+  {
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) {
+      list(success = 1, failed = 0, skipped = 0)
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      list(feed = list(entry = list(
+        list(links = list(list(
+          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+          href = paste0(
+            "https://example.com/",
+            "VNP46A2.A2023001.h08v05.001.hdf"
+          )
+        )))
+      )))
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_modis(
+          date = "2023-01-01",
+          product = "VNP46A2",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          version = "001",
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+  })
+})

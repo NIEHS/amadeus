@@ -971,3 +971,40 @@ testthat::test_that("download_nlcd stops with invalid year", {
     "not recognized"
   )
 })
+
+################################################################################
+##### process_nlcd aux.xml hiding (covers lines 931-944)
+
+testthat::test_that(
+  "process_nlcd hides .aux.xml metadata file (no skip)",
+  {
+  withr::local_package("terra")
+  withr::with_tempdir({
+    directory <- getwd()
+    # Create a minimal NLCD-named TIF file
+    r <- terra::rast(
+      nrow = 5,
+      ncol = 5,
+      xmin = -84,
+      xmax = -82,
+      ymin = 34,
+      ymax = 36
+    )
+    terra::crs(r) <- "EPSG:4326"
+    terra::values(r) <- 1L
+    tif_name <- "Annual_NLCD_LndCov_2021_fake.tif"
+    terra::writeRaster(r, tif_name, overwrite = TRUE)
+    # Create a matching .aux.xml file
+    aux_name <- paste0(tif_name, ".aux.xml")
+    writeLines("<PAMDataset></PAMDataset>", aux_name)
+    testthat::expect_true(file.exists(aux_name))
+    # process_nlcd should hide the aux.xml
+    suppressMessages(
+      nlcd <- process_nlcd(path = directory, year = 2021)
+    )
+    # The aux.xml should be renamed to ._aux.xml
+    hidden_name <- paste0("._", aux_name)
+    testthat::expect_true(file.exists(hidden_name))
+    testthat::expect_false(file.exists(aux_name))
+  })
+})
