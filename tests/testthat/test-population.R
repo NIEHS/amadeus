@@ -736,7 +736,9 @@ testthat::test_that("download_population ASCII format year branch", {
   })
 })
 
-testthat::test_that("download_population ASCII format totpop (year=all) branch", {
+testthat::test_that(
+  "download_population ASCII format totpop (year=all) branch",
+  {
   testthat::local_mocked_bindings(
     download_run_method = function(...) list(success = 1, failed = 0),
     download_unzip = function(...) invisible(NULL),
@@ -894,7 +896,9 @@ testthat::test_that("download_population file already exists path", {
 ################################################################################
 ##### download_population deprecated parameters and download=FALSE branches
 
-testthat::test_that("download_population download=FALSE deprecated warning + early return", {
+testthat::test_that(
+  "download_population download=FALSE deprecated warning + early return",
+  {
   withr::with_tempdir({
     testthat::expect_warning(
       suppressMessages(

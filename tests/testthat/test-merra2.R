@@ -605,13 +605,17 @@ testthat::test_that("download_merra2 esdt_name_5 branch (goldsmr5)", {
 })
 
 ################################################################################
-##### download_merra2 with actual download path (httr2 mock returns file listing)
+##### download_merra2 with actual download path (httr2 mock returns listing)
 
 testthat::test_that("download_merra2 actual download path via httr2 mock", {
   testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
-    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
-    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    download_run_method = function(...) {
+      list(success = 1, failed = 0, skipped = 0)
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
     .package = "amadeus"
   )
   # The MERRA2 nc4 file name format has date at positions 28-35 of basename
@@ -658,13 +662,17 @@ testthat::test_that("download_merra2 actual download path via httr2 mock", {
 })
 
 ################################################################################
-##### download_merra2 req_perform error triggers warning (covers lines 1387-1394)
+##### download_merra2 req_perform error triggers warning (lines 1387-1394)
 
 testthat::test_that("download_merra2 handles req_perform error with warning", {
   testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
-    download_run_method = function(...) list(success = 0, failed = 0, skipped = 0),
-    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    download_run_method = function(...) {
+      list(success = 0, failed = 0, skipped = 0)
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
     .package = "amadeus"
   )
   testthat::local_mocked_bindings(
@@ -698,17 +706,27 @@ testthat::test_that("download_merra2 handles req_perform error with warning", {
 testthat::test_that("download_merra2 download=FALSE returns url list", {
   testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
-    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
-    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    download_run_method = function(...) {
+      list(success = 1, failed = 0, skipped = 0)
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
     .package = "amadeus"
   )
   fake_nc4 <- "MERRA2_400.inst1_2d_asm_Nx.20220214.nc4"
-  fake_html <- sprintf('<html><a href="%s">%s</a></html>', fake_nc4, fake_nc4)
+  fake_html <- sprintf(
+    '<html><a href="%s">%s</a></html>',
+    fake_nc4, fake_nc4
+  )
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
       structure(
-        list(status_code = 200L, headers = list(`Content-Type` = "text/html"),
-             body = charToRaw(fake_html)),
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "text/html"),
+          body = charToRaw(fake_html)
+        ),
         class = "httr2_response"
       )
     },

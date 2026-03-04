@@ -278,7 +278,9 @@ testthat::test_that("download_modis with NASA token", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
-testthat::test_that("download_modis remove_command warning and hash=TRUE (mock)", {
+testthat::test_that(
+  "download_modis remove_command warning and hash=TRUE (mock)",
+  {
   skip_on_cran()
 
   testthat::local_mocked_bindings(
@@ -365,7 +367,9 @@ testthat::test_that(
       download_run_method = function(...) {
         invisible(list(success = 1, failed = 0, skipped = 0))
       },
-      download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+      download_hash = function(hash, dir) {
+        if (isTRUE(hash)) "fakehash" else NULL
+      },
       .package = "amadeus"
     )
 
@@ -627,7 +631,7 @@ testthat::test_that("process_blackmarble*", {
     process_blackmarble_corners(hrange = c(99, 104))
   )
 
-  # terra no longer produces "unknown extent" for VNP46 HDF files in newer versions
+  # terra no longer produces "unknown extent" for VNP46 in newer versions
   testthat::expect_no_error(
     vnp46_proc <- process_blackmarble(
       path = path_vnp46[1],
@@ -1312,7 +1316,7 @@ testthat::test_that("download_modis single date branch (mock, no skip)", {
 })
 
 ################################################################################
-##### download_modis remove_command, 31-day warning, no granules (no skip_on_cran)
+##### download_modis remove_command, 31-day warning, no granules (no skip)
 
 testthat::test_that("download_modis no granules found path (no skip)", {
   testthat::local_mocked_bindings(
@@ -1360,27 +1364,39 @@ testthat::test_that("download_modis no granules found path (no skip)", {
 ################################################################################
 ##### download_modis remove_command warning (covers lines 2707-2710)
 
-testthat::test_that("download_modis remove_command deprecated warning (no skip)", {
+testthat::test_that(
+  "download_modis remove_command deprecated warning (no skip)",
+  {
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
-    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
-    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    download_run_method = function(...) {
+      list(success = 1, failed = 0, skipped = 0)
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
     .package = "amadeus"
   )
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
       structure(
-        list(status_code = 200L, headers = list(`Content-Type` = "application/json"),
-             body = charToRaw("{}")),
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
         class = "httr2_response"
       )
     },
     resp_body_json = function(resp, ...) {
       list(feed = list(entry = list(
-        list(links = list(
-          list(rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-               href = "https://example.com/MOD09GA.A2023001.h08v04.006.hdf")
-        ))
+        list(links = list(list(
+          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+          href = paste0(
+            "https://example.com/",
+            "MOD09GA.A2023001.h08v04.006.hdf"
+          )
+        )))
       )))
     },
     .package = "httr2"
@@ -1408,24 +1424,34 @@ testthat::test_that("download_modis remove_command deprecated warning (no skip)"
 testthat::test_that("download_modis 31-day range warning (no skip)", {
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
-    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
-    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    download_run_method = function(...) {
+      list(success = 1, failed = 0, skipped = 0)
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
     .package = "amadeus"
   )
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
       structure(
-        list(status_code = 200L, headers = list(`Content-Type` = "application/json"),
-             body = charToRaw("{}")),
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
         class = "httr2_response"
       )
     },
     resp_body_json = function(resp, ...) {
       list(feed = list(entry = list(
-        list(links = list(
-          list(rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-               href = "https://example.com/MOD09GA.A2023001.h08v04.006.hdf")
-        ))
+        list(links = list(list(
+          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+          href = paste0(
+            "https://example.com/",
+            "MOD09GA.A2023001.h08v04.006.hdf"
+          )
+        )))
       )))
     },
     .package = "httr2"
@@ -1452,24 +1478,34 @@ testthat::test_that("download_modis 31-day range warning (no skip)", {
 testthat::test_that("download_modis hash=TRUE returns fakehash (no skip)", {
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
-    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
-    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    download_run_method = function(...) {
+      list(success = 1, failed = 0, skipped = 0)
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
     .package = "amadeus"
   )
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
       structure(
-        list(status_code = 200L, headers = list(`Content-Type` = "application/json"),
-             body = charToRaw("{}")),
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
         class = "httr2_response"
       )
     },
     resp_body_json = function(resp, ...) {
       list(feed = list(entry = list(
-        list(links = list(
-          list(rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-               href = "https://example.com/MOD09GA.A2023001.h08v04.006.hdf")
-        ))
+        list(links = list(list(
+          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+          href = paste0(
+            "https://example.com/",
+            "MOD09GA.A2023001.h08v04.006.hdf"
+          )
+        )))
       )))
     },
     .package = "httr2"

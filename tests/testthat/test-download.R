@@ -2013,15 +2013,15 @@ testthat::test_that("check_urls with method=NULL uses check_url_status", {
 })
 
 ################################################################################
-##### download_run_commands download=TRUE path (covers lines 442-444)
+##### download_run download=TRUE path (covers lines 442-444)
 
-testthat::test_that("download_run_commands download=TRUE executes commands", {
+testthat::test_that("download_run download=TRUE executes commands", {
   withr::with_tempdir({
     cmds_file <- "cmds.txt"
     writeLines("#!/bin/bash\n# empty", cmds_file)
     Sys.chmod(cmds_file, "755")
     suppressMessages(suppressWarnings(
-      download_run_commands(
+      download_run(
         commands_txt = cmds_file,
         download = TRUE,
         remove = FALSE
