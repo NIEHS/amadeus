@@ -6,6 +6,10 @@
 testthat::test_that("download_gridmet (no errors)", {
   withr::local_package("httr2")
   withr::local_package("stringr")
+  withr::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
   # function parameters
   year_start <- 2018
   year_end <- 2023
@@ -63,6 +67,10 @@ testthat::test_that("download_gridmet (no errors)", {
 testthat::test_that("download_gridmet (single year)", {
   withr::local_package("httr2")
   withr::local_package("stringr")
+  withr::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
   # function parameters
   year <- 2020
   variables <- "Precipitation"
