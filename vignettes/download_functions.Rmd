@@ -61,7 +61,10 @@ functions <- c(
 )
 source <- c(
   "US EPA Air Data Pre-Generated Data Files",
-  "USDA National Agricultural Statistics Service CropScape (Cropland Data Layer)",
+  paste0(
+    "USDA National Agricultural Statistics Service ",
+    "CropScape (Cropland Data Layer)"
+  ),
   "US EPA Ecoregions",
   "EU JRC Emissions Database for Global Atmospheric Research (EDGAR)",
   "NASA Goddard Earth Observing System Composition Forecasting (GEOS-CF)",
