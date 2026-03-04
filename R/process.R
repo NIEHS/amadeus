@@ -1686,10 +1686,7 @@ process_hms <- function(
         ),
         ". Returning empty SpatVector.\n"
       ))
-      data_missing <- data_density
-      data_missing$Density <- ""
-      data_missing$Date <- ""
-      data_return <- rbind(data_return, data_missing)
+      next
     } else {
       date <- as.Date(
         substr(data_density$Start[1], 1, 7),
