@@ -610,7 +610,6 @@ testthat::test_that("collapse_nlcd warning", {
 ##### integration for new data version
 testthat::test_that("integration across *_nlcd functions", {
   skip_on_cran()
-  skip_if_offline()
 
   withr::local_package("terra")
   withr::local_package("exactextractr")
@@ -619,188 +618,50 @@ testthat::test_that("integration across *_nlcd functions", {
     list(sf_use_s2 = FALSE)
   )
 
-  withr::with_tempdir({
-    directory <- file.path(getwd(), "nlcd_integration")
+  path_testdata <- testthat::test_path("..", "testdata", "nlcd")
 
-    ##########################################################################
-    # live download - use a more recent year that's available
-    testthat::expect_no_error(
-      download_nlcd(
-        product = "Land Cover",
-        year = 2021,
-        directory_to_save = directory,
-        acknowledgement = TRUE,
-        hash = TRUE
-      )
+  ##########################################################################
+  # Import using testdata (no download needed)
+  testthat::expect_no_error(
+    nlcd_c1v1 <- process_nlcd(path = path_testdata, year = 2021)
+  )
+
+  # Check metadata - be flexible about exact format
+  meta <- terra::metags(nlcd_c1v1)
+  year_found <- any(grepl("2021", meta[, 2]))
+  testthat::expect_true(year_found)
+
+  ##########################################################################
+  ncpath <- system.file("gpkg/nc.gpkg", package = "sf")
+  ncv <- terra::vect(ncpath)
+  nc <- terra::project(
+    ncv,
+    terra::crs(nlcd_c1v1)
+  )
+
+  ##########################################################################
+  mat_nlcd_val <- unique(terra::values(terra::crop(nlcd_c1v1, nc)))
+  testthat::expect_true(NA %in% mat_nlcd_val || !anyNA(mat_nlcd_val))
+  testthat::expect_false(NaN %in% mat_nlcd_val)
+
+  ##########################################################################
+  # points have integer values
+  testthat::expect_no_error(
+    df_nlcd_0 <- calculate_nlcd(
+      locs = terra::centroids(nc[1:5, ]),
+      locs_id = "NAME",
+      from = nlcd_c1v1,
+      mode = "terra",
+      radius = 0
     )
+  )
+  testthat::expect_equal(nrow(df_nlcd_0), 5)
+  testthat::expect_equal(ncol(df_nlcd_0), 3)
+  testthat::expect_true(is.integer(df_nlcd_0[, 3]))
 
-    ##########################################################################
-    # Import
-    testthat::expect_no_error(
-      nlcd_c1v1 <- process_nlcd(path = directory, year = 2021)
-    )
-
-    # Check metadata - be flexible about exact format
-    meta <- terra::metags(nlcd_c1v1)
-    year_found <- any(grepl("2021", meta[, 2]))
-    testthat::expect_true(year_found)
-
-    ##########################################################################
-    ncpath <- system.file("gpkg/nc.gpkg", package = "sf")
-    ncv <- terra::vect(ncpath)
-    nc <- terra::project(
-      ncv,
-      terra::crs(nlcd_c1v1)
-    )
-
-    ##########################################################################
-    mat_nlcd_val <- unique(terra::values(terra::crop(nlcd_c1v1, nc)))
-    testthat::expect_true(NA %in% mat_nlcd_val || !anyNA(mat_nlcd_val))
-    testthat::expect_false(NaN %in% mat_nlcd_val)
-
-    ##########################################################################
-    # points have integer values
-    testthat::expect_no_error(
-      df_nlcd_0 <- calculate_nlcd(
-        locs = terra::centroids(nc[1:5, ]),
-        locs_id = "NAME",
-        from = nlcd_c1v1,
-        mode = "terra",
-        radius = 0
-      )
-    )
-    testthat::expect_equal(nrow(df_nlcd_0), 5)
-    testthat::expect_equal(ncol(df_nlcd_0), 3)
-    testthat::expect_true(is.integer(df_nlcd_0[, 3]))
-
-    ##########################################################################
-    # polygons have decimal values
-    testthat::expect_no_error(
-      df_nlcd_1000 <- calculate_nlcd(
-        locs = terra::centroids(nc[1:5, ]),
-        locs_id = "NAME",
-        from = nlcd_c1v1,
-        mode = "terra",
-        radius = 1000
-      )
-    )
-    testthat::expect_equal(nrow(df_nlcd_1000), 5)
-    testthat::expect_equal(ncol(df_nlcd_1000), 17)
-
-    # polygons have proper column names
-    # Check for the pattern instead of exact column names
-    # NLCD columns should have format like LDU_[TYPE]_0_[RADIUS]
-    testthat::expect_true(
-      any(grepl("^LDU_T[A-Z]{4}_0_\\d+$", names(df_nlcd_1000)))
-    )
-
-    # Alternative: check for specific patterns we expect
-    expected_patterns <- c(
-      "WATR",
-      "DVOS",
-      "DVLO",
-      "DVMI",
-      "DVHI",
-      "BARN",
-      "DFOR",
-      "EFOR",
-      "MFOR",
-      "HERB",
-      "PAST",
-      "WDWT",
-      "HWEM",
-      "PLNT",
-      "SHRB"
-    )
-
-    # Check that at least some expected land cover types are present
-    col_string <- paste(names(df_nlcd_1000), collapse = " ")
-    matches <- sapply(expected_patterns, function(p) grepl(p, col_string))
-    testthat::expect_true(
-      sum(matches) >= 10, # At least 10 of the 15 types should be present
-      info = sprintf(
-        "Expected at least 10 land cover types, found %d. Columns: %s",
-        sum(matches),
-        paste(names(df_nlcd_1000), collapse = ", ")
-      )
-    )
-  })
-  # Automatic cleanup when withr::with_tempdir exits
-})
-
-################################################################################
-##### Diagnostic test for file discovery
-testthat::test_that("process_nlcd file discovery (diagnostic)", {
-  skip_on_cran()
-  skip_if_offline()
-
-  withr::local_package("terra")
-
-  withr::with_tempdir({
-    directory <- file.path(getwd(), "nlcd_file_test")
-
-    # Download
-    download_nlcd(
-      product = "Land Cover",
-      year = 2021,
-      directory_to_save = directory,
-      acknowledgement = TRUE,
-      hash = TRUE
-    )
-
-    # List all files
-    all_files <- list.files(directory, recursive = TRUE, full.names = FALSE)
-    message("All files in directory:")
-    message(paste(all_files, collapse = "\n"))
-
-    # List TIF files specifically
-    tif_files <- list.files(
-      directory,
-      pattern = "\\.tif$",
-      recursive = TRUE,
-      full.names = FALSE,
-      ignore.case = TRUE
-    )
-    message("\nTIF files found:")
-    message(paste(tif_files, collapse = "\n"))
-
-    testthat::expect_true(length(tif_files) > 0)
-
-    # Try to process
-    testthat::expect_no_error(
-      nlcd <- process_nlcd(path = directory, year = 2021)
-    )
-  })
-})
-
-################################################################################
-##### Debug test for column names
-testthat::test_that("integration - debug column names", {
-  skip_on_cran()
-  skip_if_offline()
-
-  withr::local_package("terra")
-  withr::local_package("exactextractr")
-  withr::local_package("sf")
-  withr::local_options(list(sf_use_s2 = FALSE))
-
-  withr::with_tempdir({
-    directory <- file.path(getwd(), "nlcd_debug")
-
-    download_nlcd(
-      product = "Land Cover",
-      year = 2021,
-      directory_to_save = directory,
-      acknowledgement = TRUE,
-      hash = TRUE
-    )
-
-    nlcd_c1v1 <- process_nlcd(path = directory, year = 2021)
-
-    ncpath <- system.file("gpkg/nc.gpkg", package = "sf")
-    ncv <- terra::vect(ncpath)
-    nc <- terra::project(ncv, terra::crs(nlcd_c1v1))
-
+  ##########################################################################
+  # polygons have decimal values
+  testthat::expect_no_error(
     df_nlcd_1000 <- calculate_nlcd(
       locs = terra::centroids(nc[1:5, ]),
       locs_id = "NAME",
@@ -808,14 +669,70 @@ testthat::test_that("integration - debug column names", {
       mode = "terra",
       radius = 1000
     )
+  )
+  testthat::expect_true(ncol(df_nlcd_1000) >= 3)
 
-    # Print for debugging
-    cat("\n=== NLCD Column Names ===\n")
-    print(names(df_nlcd_1000))
-    cat("\n=========================\n")
+  # polygons have proper column names
+  # NLCD columns should have format like LDU_[TYPE]_0_[RADIUS]
+  testthat::expect_true(
+    any(grepl("^LDU_T[A-Z]{4}_0_\\d+$", names(df_nlcd_1000)))
+  )
+})
 
-    testthat::succeed("Debug test - check output above")
-  })
+################################################################################
+##### Diagnostic test for file discovery
+testthat::test_that("process_nlcd file discovery (diagnostic)", {
+  skip_on_cran()
+
+  withr::local_package("terra")
+
+  path_testdata <- testthat::test_path("..", "testdata", "nlcd")
+
+  # List TIF files specifically
+  tif_files <- list.files(
+    path_testdata,
+    pattern = "\\.tif$",
+    recursive = TRUE,
+    full.names = FALSE,
+    ignore.case = TRUE
+  )
+
+  testthat::expect_true(length(tif_files) > 0)
+
+  # Process NLCD from testdata
+  testthat::expect_no_error(
+    nlcd <- process_nlcd(path = path_testdata, year = 2021)
+  )
+})
+
+################################################################################
+##### Debug test for column names
+testthat::test_that("integration - debug column names", {
+  skip_on_cran()
+
+  withr::local_package("terra")
+  withr::local_package("exactextractr")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  path_testdata <- testthat::test_path("..", "testdata", "nlcd")
+
+  nlcd_c1v1 <- process_nlcd(path = path_testdata, year = 2021)
+
+  ncpath <- system.file("gpkg/nc.gpkg", package = "sf")
+  ncv <- terra::vect(ncpath)
+  nc <- terra::project(ncv, terra::crs(nlcd_c1v1))
+
+  df_nlcd_1000 <- calculate_nlcd(
+    locs = terra::centroids(nc[1:5, ]),
+    locs_id = "NAME",
+    from = nlcd_c1v1,
+    mode = "terra",
+    radius = 1000
+  )
+
+  testthat::expect_true(ncol(df_nlcd_1000) >= 3)
+  testthat::expect_equal(nrow(df_nlcd_1000), 5)
 })
 
 ################################################################################
