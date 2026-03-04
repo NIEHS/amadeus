@@ -1963,3 +1963,283 @@ testthat::test_that("download_run_method subdirectory creation (no skip)", {
     testthat::expect_equal(result$success, 1)
   })
 })
+
+################################################################################
+##### download_unzip actual unzip (no skip_on_cran)
+
+testthat::test_that("download_unzip actual unzip path (no skip)", {
+  withr::with_tempdir({
+    test_file <- "content.txt"
+    writeLines("hello", test_file)
+    zip_file <- "archive.zip"
+    utils::zip(zip_file, test_file)
+    file.remove(test_file)
+    unzip_dir <- "unzipped"
+    dir.create(unzip_dir)
+    suppressMessages(
+      download_unzip(
+        file_name = zip_file,
+        directory_to_unzip = unzip_dir,
+        unzip = TRUE
+      )
+    )
+    testthat::expect_true(file.exists(file.path(unzip_dir, test_file)))
+  })
+})
+
+################################################################################
+##### check_urls without skip_on_cran (mocked check_url_status)
+
+testthat::test_that("check_urls size > length(urls) without skip", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
+  urls <- "https://example.com/file.bin"
+  result <- suppressMessages(check_urls(urls = urls, size = 100))
+  testthat::expect_length(result, 1)
+  testthat::expect_true(result)
+})
+
+testthat::test_that("check_urls with method=NULL uses check_url_status", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
+  urls <- c("https://example.com/a.bin", "https://example.com/b.bin")
+  result <- suppressMessages(check_urls(urls = urls, size = 2, method = NULL))
+  testthat::expect_length(result, 2)
+  testthat::expect_true(all(result))
+})
+
+################################################################################
+##### download_run_commands download=TRUE path (covers lines 442-444)
+
+testthat::test_that("download_run_commands download=TRUE executes commands", {
+  withr::with_tempdir({
+    cmds_file <- "cmds.txt"
+    writeLines("#!/bin/bash\n# empty", cmds_file)
+    Sys.chmod(cmds_file, "755")
+    suppressMessages(suppressWarnings(
+      download_run_commands(
+        commands_txt = cmds_file,
+        download = TRUE,
+        remove = FALSE
+      )
+    ))
+    testthat::expect_true(file.exists(cmds_file))
+  })
+})
+
+################################################################################
+##### download_remove_command remove=TRUE (covers line 466)
+
+testthat::test_that("download_remove_command remove=TRUE deletes file", {
+  withr::with_tempdir({
+    f <- "cmds.txt"
+    file.create(f)
+    testthat::expect_true(file.exists(f))
+    download_remove_command(commands_txt = f, remove = TRUE)
+    testthat::expect_false(file.exists(f))
+  })
+})
+
+################################################################################
+##### test_download_functions (covers lines 750, 752-753, 755)
+
+testthat::test_that("test_download_functions passes with valid inputs", {
+  withr::with_tempdir({
+    f <- "cmds.txt"
+    file.create(f)
+    testthat::expect_no_error(
+      test_download_functions(
+        directory_to_save = ".",
+        commands_path = f,
+        url_status = c(TRUE, TRUE)
+      )
+    )
+  })
+})
+
+################################################################################
+##### download_run_method with token (covers lines 254-255)
+
+testthat::test_that("download_run_method with token adds Bearer auth header", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      if (!is.null(path)) {
+        writeBin(charToRaw("fake content"), path)
+      }
+      structure(
+        list(status_code = 200L, headers = list(), body = charToRaw("")),
+        class = "httr2_response"
+      )
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    result <- suppressMessages(
+      download_run_method(
+        urls = "https://example.com/data.bin",
+        destfiles = "data.bin",
+        token = "my_bearer_token",
+        show_progress = FALSE,
+        max_tries = 1,
+        rate_limit = 0
+      )
+    )
+    testthat::expect_equal(result$success, 1)
+  })
+})
+
+################################################################################
+##### download_run_method 0-byte file failure path (covers lines 302-319)
+
+testthat::test_that("download_run_method 0-byte file triggers failure path", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      if (!is.null(path)) file.create(path)  # Create 0-byte file
+      structure(
+        list(status_code = 200L, headers = list(), body = charToRaw("")),
+        class = "httr2_response"
+      )
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    result <- suppressWarnings(withCallingHandlers(
+      download_run_method(
+        urls = "https://example.com/data.bin",
+        destfiles = "zero_byte.bin",
+        show_progress = FALSE,
+        max_tries = 1,
+        rate_limit = 0
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    ))
+    testthat::expect_equal(result$failed, 1)
+    testthat::expect_true(any(grepl("Failed", msgs)))
+    testthat::expect_false(file.exists("zero_byte.bin"))
+  })
+})
+
+testthat::test_that("download_run_method 0-byte show_progress=TRUE triggers FAIL prefix", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      if (!is.null(path)) file.create(path)  # Create 0-byte file
+      structure(
+        list(status_code = 200L, headers = list(), body = charToRaw("")),
+        class = "httr2_response"
+      )
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    result <- suppressWarnings(withCallingHandlers(
+      download_run_method(
+        urls = "https://example.com/data.bin",
+        destfiles = "zero_progress.bin",
+        show_progress = TRUE,
+        max_tries = 1,
+        rate_limit = 0
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    ))
+    testthat::expect_equal(result$failed, 1)
+    testthat::expect_true(any(grepl("FAIL", msgs)))
+  })
+})
+
+################################################################################
+##### download_run_method multiple files triggers Sys.sleep (covers line 324)
+
+testthat::test_that("download_run_method multiple files triggers sleep", {
+  call_count <- 0L
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      call_count <<- call_count + 1L
+      if (!is.null(path)) writeBin(charToRaw("content"), path)
+      structure(
+        list(status_code = 200L, headers = list(), body = charToRaw("")),
+        class = "httr2_response"
+      )
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    result <- suppressMessages(
+      download_run_method(
+        urls = c("https://example.com/a.bin", "https://example.com/b.bin"),
+        destfiles = c("a.bin", "b.bin"),
+        show_progress = FALSE,
+        max_tries = 1,
+        rate_limit = 0
+      )
+    )
+    testthat::expect_equal(result$success, 2)
+    testthat::expect_equal(call_count, 2L)
+  })
+})
+
+################################################################################
+##### download_run_method error handler cleans up existing file (covers line 346)
+
+testthat::test_that("download_run_method error cleanup removes pre-existing file", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      if (!is.null(path)) file.create(path)  # Create file before erroring
+      stop("Simulated error after file creation")
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    result <- suppressWarnings(withCallingHandlers(
+      download_run_method(
+        urls = "https://example.com/data.bin",
+        destfiles = "error_cleanup.bin",
+        show_progress = FALSE,
+        max_tries = 1,
+        rate_limit = 0
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    ))
+    testthat::expect_equal(result$failed, 1)
+    testthat::expect_false(file.exists("error_cleanup.bin"))
+  })
+})
+
+################################################################################
+##### check_url_status error handler returns FALSE (covers line 651)
+
+testthat::test_that("check_url_status returns FALSE on network error", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      stop("Simulated DNS failure")
+    },
+    .package = "httr2"
+  )
+  result <- check_url_status("https://nonexistent.invalid/file.bin")
+  testthat::expect_false(result)
+})
+
+################################################################################
+##### setup_nasa_token empty token error (covers line 962)
+
+testthat::test_that("setup_nasa_token errors with empty token string", {
+  testthat::expect_error(
+    setup_nasa_token(method = "session", token = ""),
+    "empty"
+  )
+})

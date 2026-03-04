@@ -486,3 +486,39 @@ testthat::test_that("download_nei epa_certificate_path deprecation warning", {
     )
   })
 })
+
+################################################################################
+##### download_nei unzip and remove_zip paths (covers lines 3096-3114)
+
+testthat::test_that("download_nei unzip and remove_zip path executes", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(urls, destfiles, ...) {
+      for (f in destfiles) {
+        dir.create(dirname(f), recursive = TRUE, showWarnings = FALSE)
+        tmp <- tempfile(fileext = ".txt")
+        writeLines("fake content", tmp)
+        utils::zip(f, tmp)
+        file.remove(tmp)
+      }
+      list(success = length(destfiles), failed = 0, skipped = 0)
+    },
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressMessages(
+      download_nei(
+        year = c(2017, 2020),
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = TRUE,
+        remove_zip = TRUE,
+        hash = FALSE
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 2)
+  })
+})

@@ -617,9 +617,10 @@ testthat::test_that("download_merra2 actual download path via httr2 mock", {
   # The MERRA2 nc4 file name format has date at positions 28-35 of basename
   # e.g., MERRA2_400.inst1_2d_asm_Nx.20220214.nc4
   fake_nc4 <- "MERRA2_400.inst1_2d_asm_Nx.20220214.nc4"
+  fake_xml <- "MERRA2_400.inst1_2d_asm_Nx.20220214.nc4.xml"
   fake_html <- sprintf(
-    '<html><a href="%s">%s</a></html>',
-    fake_nc4, fake_nc4
+    '<html><a href="%s">%s</a><a href="%s">%s</a></html>',
+    fake_nc4, fake_nc4, fake_xml, fake_xml
   )
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
@@ -653,5 +654,82 @@ testthat::test_that("download_merra2 actual download path via httr2 mock", {
     )
     testthat::expect_type(result, "list")
     testthat::expect_equal(result$success, 1)
+  })
+})
+
+################################################################################
+##### download_merra2 req_perform error triggers warning (covers lines 1387-1394)
+
+testthat::test_that("download_merra2 handles req_perform error with warning", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 0, failed = 0, skipped = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      stop("Simulated MERRA2 listing error")
+    },
+    resp_body_string = function(resp, ...) rawToChar(resp$body),
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      suppressMessages(
+        download_merra2(
+          collection = "inst1_2d_asm_Nx",
+          date = c("2022-02-14", "2022-02-14"),
+          nasa_earth_data_token = "fake_token",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      ),
+      "Failed to get directory listing"
+    )
+  })
+})
+
+################################################################################
+##### download_merra2 download=FALSE early return (covers lines 1401-1410)
+
+testthat::test_that("download_merra2 download=FALSE returns url list", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  fake_nc4 <- "MERRA2_400.inst1_2d_asm_Nx.20220214.nc4"
+  fake_html <- sprintf('<html><a href="%s">%s</a></html>', fake_nc4, fake_nc4)
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(status_code = 200L, headers = list(`Content-Type` = "text/html"),
+             body = charToRaw(fake_html)),
+        class = "httr2_response"
+      )
+    },
+    resp_body_string = function(resp, ...) rawToChar(resp$body),
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_merra2(
+          collection = "inst1_2d_asm_Nx",
+          date = c("2022-02-14", "2022-02-14"),
+          nasa_earth_data_token = "fake_token",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_true(is.list(result))
+    testthat::expect_true("urls" %in% names(result))
   })
 })

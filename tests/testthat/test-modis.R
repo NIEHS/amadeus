@@ -1356,3 +1356,136 @@ testthat::test_that("download_modis no granules found path (no skip)", {
     )
   })
 })
+
+################################################################################
+##### download_modis remove_command warning (covers lines 2707-2710)
+
+testthat::test_that("download_modis remove_command deprecated warning (no skip)", {
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(status_code = 200L, headers = list(`Content-Type` = "application/json"),
+             body = charToRaw("{}")),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      list(feed = list(entry = list(
+        list(links = list(
+          list(rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+               href = "https://example.com/MOD09GA.A2023001.h08v04.006.hdf")
+        ))
+      )))
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      suppressMessages(
+        download_modis(
+          date = "2023-01-01",
+          product = "MOD09GA",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          remove_command = TRUE,
+          hash = FALSE
+        )
+      ),
+      "remove_command.*deprecated"
+    )
+  })
+})
+
+################################################################################
+##### download_modis 31-day warning (covers lines 2722-2724)
+
+testthat::test_that("download_modis 31-day range warning (no skip)", {
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(status_code = 200L, headers = list(`Content-Type` = "application/json"),
+             body = charToRaw("{}")),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      list(feed = list(entry = list(
+        list(links = list(
+          list(rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+               href = "https://example.com/MOD09GA.A2023001.h08v04.006.hdf")
+        ))
+      )))
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      suppressMessages(
+        download_modis(
+          date = c("2023-01-01", "2023-03-01"),
+          product = "MOD09GA",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          hash = FALSE
+        )
+      ),
+      "31 days"
+    )
+  })
+})
+
+################################################################################
+##### download_modis hash=TRUE (covers line 2821)
+
+testthat::test_that("download_modis hash=TRUE returns fakehash (no skip)", {
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(status_code = 200L, headers = list(`Content-Type` = "application/json"),
+             body = charToRaw("{}")),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      list(feed = list(entry = list(
+        list(links = list(
+          list(rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+               href = "https://example.com/MOD09GA.A2023001.h08v04.006.hdf")
+        ))
+      )))
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_modis(
+          date = "2023-01-01",
+          product = "MOD09GA",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})

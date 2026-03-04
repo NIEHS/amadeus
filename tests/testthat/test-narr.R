@@ -472,3 +472,52 @@ testthat::test_that("download_narr mock download hash=FALSE", {
     testthat::expect_equal(result$success, 1)
   })
 })
+
+################################################################################
+##### download_narr pressure and subsurface variables (covers lines 861, 863)
+
+testthat::test_that("download_narr pressure variable (omega) branch", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = "omega",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+  })
+})
+
+testthat::test_that("download_narr subsurface variable (soill) branch", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = "soill",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+  })
+})

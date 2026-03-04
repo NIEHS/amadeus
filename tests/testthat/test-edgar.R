@@ -410,3 +410,30 @@ testthat::test_that("download_edgar missing URL warning path", {
     )
   })
 })
+
+################################################################################
+##### download_edgar all-URLs-invalid error (covers line 4057)
+
+testthat::test_that("download_edgar stops when all URLs invalid", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) FALSE,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_error(
+      suppressMessages(
+        download_edgar(
+          species = "CO",
+          temp_res = "yearly",
+          sector_yearly = "ENE",
+          year_range = c(2021, 2022),
+          acknowledgement = TRUE,
+          download = TRUE,
+          directory_to_save = ".",
+          unzip = FALSE
+        )
+      ),
+      "No valid URLs were constructed"
+    )
+  })
+})

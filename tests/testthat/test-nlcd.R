@@ -924,3 +924,48 @@ testthat::test_that("download_nlcd remove_command deprecated warning", {
     )
   })
 })
+
+################################################################################
+##### download_nlcd hash=TRUE (covers line 1799)
+
+testthat::test_that("download_nlcd hash=TRUE returns hash", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_nlcd(
+          year = 2021,
+          product = "land cover",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
+################################################################################
+##### download_nlcd invalid year (covers line 1722)
+
+testthat::test_that("download_nlcd stops with invalid year", {
+  testthat::expect_error(
+    suppressWarnings(
+      download_nlcd(
+        year = 1800,
+        product = "land cover",
+        directory_to_save = tempdir(),
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    ),
+    "not recognized"
+  )
+})
