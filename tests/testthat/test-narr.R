@@ -474,6 +474,155 @@ testthat::test_that("download_narr mock download hash=FALSE", {
 })
 
 ################################################################################
+##### narr_variable: all variables return correct URL category
+
+testthat::test_that("narr_variable mono variables return monolevel URL", {
+  mono <- c(
+    "acpcp", "air.2m", "air.sfc", "albedo", "apcp", "bgrun",
+    "bmixl.hl1", "cape", "ccond", "cdcon", "cdlyr", "cfrzr",
+    "cicep", "cin", "cnwat", "crain", "csnow", "dlwrf", "dpt.2m",
+    "dswrf", "evap", "gflux", "hcdc", "hgt.tropo", "hlcy", "hpbl",
+    "lcdc", "lftx4", "lhtfl", "mcdc", "mconv.hl1", "mslet", "mstav",
+    "pevap", "pottmp.hl1", "pottmp.sfc", "prate", "pres.sfc",
+    "pres.tropo", "prmsl", "pr_wtr", "rcq", "rcs", "rcsol", "rct",
+    "rhum.2m", "shtfl", "shum.2m", "snod", "snohf", "snom", "snowc",
+    "soilm", "ssrun", "tcdc", "tke.hl1", "ulwrf.ntat", "ulwrf.sfc",
+    "ustm", "uswrf.ntat", "uswrf.sfc", "uwnd.10m", "veg", "vis",
+    "vstm", "vvel.hl1", "vwnd.10m", "vwsh.tropo", "wcconv", "wcinc",
+    "wcuflx", "wcvflx", "weasd", "wvconv", "wvinc", "wvuflx", "wvvflx"
+  )
+  for (v in mono) {
+    result <- narr_variable(v)
+    testthat::expect_true(
+      grepl("monolevel", result[[1]]),
+      label = paste0("narr_variable('", v, "') should return monolevel URL")
+    )
+    testthat::expect_equal(
+      result[[2]], "",
+      label = paste0("narr_variable('", v, "') months should be empty string")
+    )
+  }
+})
+
+testthat::test_that("narr_variable pressure variables return pressure URL", {
+  pressure <- c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd")
+  for (v in pressure) {
+    result <- narr_variable(v)
+    testthat::expect_true(
+      grepl("pressure", result[[1]]),
+      label = paste0("narr_variable('", v, "') should return pressure URL")
+    )
+    testthat::expect_equal(
+      length(result[[2]]), 12L,
+      label = paste0("narr_variable('", v, "') should return 12 months")
+    )
+  }
+})
+
+testthat::test_that("narr_variable soil variables return subsurface URL", {
+  soil <- c("soill", "soilw", "tsoil")
+  for (v in soil) {
+    result <- narr_variable(v)
+    testthat::expect_true(
+      grepl("subsurface", result[[1]]),
+      label = paste0("narr_variable('", v, "') should return subsurface URL")
+    )
+    testthat::expect_equal(
+      length(result[[2]]), 12L,
+      label = paste0("narr_variable('", v, "') should return 12 months")
+    )
+  }
+})
+
+################################################################################
+##### download_narr: mock-based download test for all variables
+
+testthat::test_that("download_narr mock download all mono variables", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  mono <- c(
+    "acpcp", "air.2m", "air.sfc", "albedo", "apcp", "bgrun",
+    "bmixl.hl1", "cape", "ccond", "cdcon", "cdlyr", "cfrzr",
+    "cicep", "cin", "cnwat", "crain", "csnow", "dlwrf", "dpt.2m",
+    "dswrf", "evap", "gflux", "hcdc", "hgt.tropo", "hlcy", "hpbl",
+    "lcdc", "lftx4", "lhtfl", "mcdc", "mconv.hl1", "mslet", "mstav",
+    "pevap", "pottmp.hl1", "pottmp.sfc", "prate", "pres.sfc",
+    "pres.tropo", "prmsl", "pr_wtr", "rcq", "rcs", "rcsol", "rct",
+    "rhum.2m", "shtfl", "shum.2m", "snod", "snohf", "snom", "snowc",
+    "soilm", "ssrun", "tcdc", "tke.hl1", "ulwrf.ntat", "ulwrf.sfc",
+    "ustm", "uswrf.ntat", "uswrf.sfc", "uwnd.10m", "veg", "vis",
+    "vstm", "vvel.hl1", "vwnd.10m", "vwsh.tropo", "wcconv", "wcinc",
+    "wcuflx", "wcvflx", "weasd", "wvconv", "wvinc", "wvuflx", "wvvflx"
+  )
+  withr::with_tempdir({
+    for (v in mono) {
+      result <- suppressWarnings(suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = v,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      ))
+      testthat::expect_type(result, "list")
+    }
+  })
+})
+
+testthat::test_that("download_narr mock download all pressure variables", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  pressure <- c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd")
+  withr::with_tempdir({
+    for (v in pressure) {
+      result <- suppressWarnings(suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = v,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      ))
+      testthat::expect_type(result, "list")
+    }
+  })
+})
+
+testthat::test_that("download_narr mock download all soil variables", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  soil <- c("soill", "soilw", "tsoil")
+  withr::with_tempdir({
+    for (v in soil) {
+      result <- suppressWarnings(suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = v,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      ))
+      testthat::expect_type(result, "list")
+    }
+  })
+})
+
+################################################################################
 ##### download_narr pressure and subsurface variables (covers lines 861, 863)
 
 testthat::test_that("download_narr pressure variable (omega) branch", {
