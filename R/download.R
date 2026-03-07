@@ -42,7 +42,7 @@
 #' * \code{\link{download_huc}}: `"huc"`
 #' * \code{\link{download_cropscape}}: `"cropscape"`, `"cdl"`
 #' * \code{\link{download_prism}}: `"prism"`
-#' * \code{\link{download_edgar}}: `"edgar"`, `"EDGAR"`
+#' * \code{\link{download_edgar}}: `"edgar"`
 #' @return
 #' * For \code{hash = FALSE}, NULL
 #' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
@@ -91,7 +91,8 @@ download_data <-
       "huc",
       "cropscape",
       "cdl",
-      "prism"
+      "prism",
+      "edgar"
     ),
     directory_to_save = NULL,
     acknowledgement = FALSE,
@@ -130,7 +131,8 @@ download_data <-
       huc = download_huc,
       cropscape = download_cropscape,
       cdl = download_cropscape,
-      prism = download_prism
+      prism = download_prism,
+      edgar = download_edgar
     )
 
     return <- tryCatch(
@@ -1443,9 +1445,115 @@ download_merra2 <- function(
 #' @note "Pressure levels" variables contain variable values at 29 atmospheric
 #' levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be
 #' downloaded for each variable.
-#' @param variables character. Variable(s) name acronym. See
-#' <https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf>
-#' for variable names and acronym codes.
+#' @param variables character. Variable(s) name acronym. See the
+#' \emph{Available NARR Variables} section below or
+#' \href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{the NARR variable table}
+#' for the full list.
+#' @section Available NARR Variables:
+#' The \code{variables} argument accepts one or more of the following
+#' abbreviations. Variables are grouped into three categories that determine
+#' the source URL path used for download.
+#'
+#' \strong{Monolevel variables} (single vertical level, surface / near-surface
+#' fields):
+#' \describe{
+#'   \item{\code{acpcp}}{Convective precipitation}
+#'   \item{\code{air.2m}}{Air temperature at 2 m}
+#'   \item{\code{air.sfc}}{Air temperature at surface}
+#'   \item{\code{albedo}}{Surface albedo}
+#'   \item{\code{apcp}}{Total accumulated precipitation}
+#'   \item{\code{bgrun}}{Baseflow-groundwater runoff}
+#'   \item{\code{bmixl.hl1}}{Blackadar mixing length scale at hybrid level 1}
+#'   \item{\code{cape}}{Convective available potential energy}
+#'   \item{\code{ccond}}{Canopy conductance}
+#'   \item{\code{cdcon}}{Convective cloud cover}
+#'   \item{\code{cdlyr}}{Non-convective cloud cover}
+#'   \item{\code{cfrzr}}{Categorical freezing rain}
+#'   \item{\code{cicep}}{Categorical ice pellets}
+#'   \item{\code{cin}}{Convective inhibition}
+#'   \item{\code{cnwat}}{Plant canopy surface water}
+#'   \item{\code{crain}}{Categorical rain}
+#'   \item{\code{csnow}}{Categorical snow}
+#'   \item{\code{dlwrf}}{Downward longwave radiation flux}
+#'   \item{\code{dpt.2m}}{Dew point temperature at 2 m}
+#'   \item{\code{dswrf}}{Downward shortwave radiation flux}
+#'   \item{\code{evap}}{Evaporation}
+#'   \item{\code{gflux}}{Ground heat flux}
+#'   \item{\code{hcdc}}{High cloud cover}
+#'   \item{\code{hgt.tropo}}{Geopotential height at tropopause}
+#'   \item{\code{hlcy}}{Storm relative helicity}
+#'   \item{\code{hpbl}}{Planetary boundary layer height}
+#'   \item{\code{lcdc}}{Low cloud cover}
+#'   \item{\code{lftx4}}{Best (4-layer) lifted index}
+#'   \item{\code{lhtfl}}{Latent heat net flux}
+#'   \item{\code{mcdc}}{Mid-cloud cover}
+#'   \item{\code{mconv.hl1}}{Horizontal moisture divergence at hybrid level 1}
+#'   \item{\code{mslet}}{Mean sea level pressure (ETA model reduction)}
+#'   \item{\code{mstav}}{Moisture availability}
+#'   \item{\code{pevap}}{Potential evaporation}
+#'   \item{\code{pottmp.hl1}}{Potential temperature at hybrid level 1}
+#'   \item{\code{pottmp.sfc}}{Potential temperature at surface}
+#'   \item{\code{prate}}{Precipitation rate}
+#'   \item{\code{pres.sfc}}{Surface pressure}
+#'   \item{\code{pres.tropo}}{Pressure at tropopause}
+#'   \item{\code{prmsl}}{Pressure reduced to mean sea level}
+#'   \item{\code{pr_wtr}}{Precipitable water}
+#'   \item{\code{rcq}}{Specific humidity tendency from all physics}
+#'   \item{\code{rcs}}{Snowfall water equivalent tendency}
+#'   \item{\code{rcsol}}{Solar radiative heating rates}
+#'   \item{\code{rct}}{Temperature tendency from all physics}
+#'   \item{\code{rhum.2m}}{Relative humidity at 2 m}
+#'   \item{\code{shtfl}}{Sensible heat net flux}
+#'   \item{\code{shum.2m}}{Specific humidity at 2 m}
+#'   \item{\code{snod}}{Snow depth}
+#'   \item{\code{snohf}}{Snow phase-change heat flux}
+#'   \item{\code{snom}}{Snow melt}
+#'   \item{\code{snowc}}{Snow cover}
+#'   \item{\code{soilm}}{Soil moisture content (0–200 cm layer)}
+#'   \item{\code{ssrun}}{Storm surface runoff}
+#'   \item{\code{tcdc}}{Total cloud cover}
+#'   \item{\code{tke.hl1}}{Turbulent kinetic energy at hybrid level 1}
+#'   \item{\code{ulwrf.ntat}}{Upward longwave radiation flux at nominal top of atmosphere}
+#'   \item{\code{ulwrf.sfc}}{Upward longwave radiation flux at surface}
+#'   \item{\code{ustm}}{U-component of storm motion}
+#'   \item{\code{uswrf.ntat}}{Upward shortwave radiation flux at nominal top of atmosphere}
+#'   \item{\code{uswrf.sfc}}{Upward shortwave radiation flux at surface}
+#'   \item{\code{uwnd.10m}}{U-component of wind at 10 m}
+#'   \item{\code{veg}}{Vegetation fraction}
+#'   \item{\code{vis}}{Visibility}
+#'   \item{\code{vstm}}{V-component of storm motion}
+#'   \item{\code{vvel.hl1}}{Vertical velocity at hybrid level 1}
+#'   \item{\code{vwnd.10m}}{V-component of wind at 10 m}
+#'   \item{\code{vwsh.tropo}}{Vertical wind shear at tropopause}
+#'   \item{\code{wcconv}}{Convective wetting of vegetation canopy}
+#'   \item{\code{wcinc}}{Wetting of vegetation canopy}
+#'   \item{\code{wcuflx}}{U-component of convective canopy moisture flux}
+#'   \item{\code{wcvflx}}{V-component of convective canopy moisture flux}
+#'   \item{\code{weasd}}{Water-equivalent accumulated snow depth}
+#'   \item{\code{wvconv}}{Convective column moisture convergence}
+#'   \item{\code{wvinc}}{Column moisture increase}
+#'   \item{\code{wvuflx}}{U-component of vertically-integrated moisture flux}
+#'   \item{\code{wvvflx}}{V-component of vertically-integrated moisture flux}
+#' }
+#'
+#' \strong{Pressure level variables} (29 atmospheric pressure levels from
+#' 1000 to 100 hPa; all levels are downloaded together):
+#' \describe{
+#'   \item{\code{air}}{Air temperature}
+#'   \item{\code{hgt}}{Geopotential height}
+#'   \item{\code{omega}}{Vertical velocity (pressure / omega)}
+#'   \item{\code{shum}}{Specific humidity}
+#'   \item{\code{tke}}{Turbulent kinetic energy}
+#'   \item{\code{uwnd}}{U-component of wind}
+#'   \item{\code{vwnd}}{V-component of wind}
+#' }
+#'
+#' \strong{Subsurface (soil) variables} (4 soil layers):
+#' \describe{
+#'   \item{\code{soill}}{Liquid volumetric soil moisture (non-frozen fraction)}
+#'   \item{\code{soilw}}{Volumetric soil moisture content}
+#'   \item{\code{tsoil}}{Soil temperature}
+#' }
 #' @param year integer(1 or 2). Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory to save downloaded data
 #' files.
