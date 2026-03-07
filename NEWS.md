@@ -13,6 +13,14 @@
 - Improved `check_url_status()` for general-purpose URL validation
 - Expanded unit test coverage with mock-based tests for all download
   functions covering deprecation warnings, hash paths, and file-exists branches
+- Added full variable reference to `download_narr()` documentation, listing
+  all 88 available NARR variable abbreviations with descriptions grouped by
+  category (monolevel, pressure level, subsurface); resolves
+  [#194](https://github.com/NIEHS/amadeus/issues/194)
+- Added `download_narr()` tests covering every variable abbreviation across
+  all three variable categories
+- Fixed `download_data()` dispatch to include `"edgar"` so
+  `download_edgar()` is reachable via the wrapper function
 
 # amadeus 1.3.2
 - Fixed deprecated file paths for NLCD, MODIS, and Ecoregions datasets
