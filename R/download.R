@@ -1441,16 +1441,23 @@ download_merra2 <- function(
 #' Download meteorological data
 #' @description
 #' The \code{download_narr} function accesses and downloads daily meteorological
-#' data from NOAA's North American Regional Reanalysis (NARR) model.
+#' data from NOAA's North American Regional Reanalysis (NARR) model via the
+#' NOAA Physical Sciences Laboratory (PSL) NARR Dailies server
+#' (\url{https://downloads.psl.noaa.gov/Datasets/NARR/Dailies/}).
 #' @note "Pressure levels" variables contain variable values at 29 atmospheric
 #' levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be
 #' downloaded for each variable.
+#' @note The 88 variables supported by this function represent the complete set
+#' of variables available as individual NetCDF files on the PSL NARR Dailies
+#' server. The NARR archive also contains additional variables (e.g., cloud
+#' water mixing ratio, ice mixing ratio, surface friction velocity, momentum
+#' fluxes, and static land/soil properties) that are only present in the raw
+#' merged GRIB files (\code{merged_AWIP32.YYYYMMDDHH}) available at
+#' \url{https://ftp.cpc.ncep.noaa.gov/NARR/}. Those variables cannot be
+#' downloaded with this function.
 #' @param variables character. Variable(s) name acronym. See the
-#' \emph{Available NARR Variables} section below or the
-# nolint start
-#' \href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{NARR variable table}
-# nolint end
-#' for the full list.
+#' \emph{Available NARR Variables} section below for the complete list of
+#' supported abbreviations.
 #' @section Available NARR Variables:
 #' The \code{variables} argument accepts one or more of the following
 #' abbreviations. Variables are grouped into three categories that determine
