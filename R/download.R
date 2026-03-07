@@ -1446,8 +1446,10 @@ download_merra2 <- function(
 #' levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be
 #' downloaded for each variable.
 #' @param variables character. Variable(s) name acronym. See the
-#' \emph{Available NARR Variables} section below or
-#' \href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{the NARR variable table}
+#' \emph{Available NARR Variables} section below or the
+# nolint start
+#' \href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{NARR variable table}
+# nolint end
 #' for the full list.
 #' @section Available NARR Variables:
 #' The \code{variables} argument accepts one or more of the following
@@ -1513,10 +1515,12 @@ download_merra2 <- function(
 #'   \item{\code{ssrun}}{Storm surface runoff}
 #'   \item{\code{tcdc}}{Total cloud cover}
 #'   \item{\code{tke.hl1}}{Turbulent kinetic energy at hybrid level 1}
-#'   \item{\code{ulwrf.ntat}}{Upward longwave radiation flux at nominal top of atmosphere}
+#'   \item{\code{ulwrf.ntat}}{Upward longwave radiation flux at nominal
+#'     top of atmosphere}
 #'   \item{\code{ulwrf.sfc}}{Upward longwave radiation flux at surface}
 #'   \item{\code{ustm}}{U-component of storm motion}
-#'   \item{\code{uswrf.ntat}}{Upward shortwave radiation flux at nominal top of atmosphere}
+#'   \item{\code{uswrf.ntat}}{Upward shortwave radiation flux at nominal
+#'     top of atmosphere}
 #'   \item{\code{uswrf.sfc}}{Upward shortwave radiation flux at surface}
 #'   \item{\code{uwnd.10m}}{U-component of wind at 10 m}
 #'   \item{\code{veg}}{Vegetation fraction}
