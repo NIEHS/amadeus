@@ -2250,4 +2250,138 @@ testthat::test_that("setup_nasa_token errors with empty token string", {
   )
 })
 
+################################################################################
+##### download_data wrapper: new explicit parameters
+
+testthat::test_that("download_data has nasa_earth_data_token and rate_limit params", {
+  params <- names(formals(download_data))
+  testthat::expect_true("nasa_earth_data_token" %in% params)
+  testthat::expect_true("rate_limit" %in% params)
+  testthat::expect_null(formals(download_data)$nasa_earth_data_token)
+  testthat::expect_equal(formals(download_data)$rate_limit, 2)
+})
+
+testthat::test_that("download_data passes nasa_earth_data_token only to NASA functions", {
+  # NASA functions should accept it; non-NASA functions should not receive it
+  # (the wrapper uses formals() check to conditionally pass the token)
+  nasa_fns <- c("download_geos", "download_merra2", "download_modis")
+  non_nasa_fns <- c(
+    "download_aqs", "download_ecoregion", "download_nlcd",
+    "download_groads", "download_population", "download_koppen_geiger",
+    "download_hms", "download_gmted", "download_narr", "download_tri",
+    "download_nei", "download_gridmet", "download_terraclimate",
+    "download_huc", "download_cropscape", "download_prism", "download_edgar"
+  )
+
+  for (fn_name in nasa_fns) {
+    fn <- get(fn_name, envir = asNamespace("amadeus"))
+    testthat::expect_true(
+      "nasa_earth_data_token" %in% names(formals(fn)),
+      label = paste(fn_name, "should accept nasa_earth_data_token")
+    )
+  }
+
+  for (fn_name in non_nasa_fns) {
+    fn <- get(fn_name, envir = asNamespace("amadeus"))
+    testthat::expect_false(
+      "nasa_earth_data_token" %in% names(formals(fn)),
+      label = paste(fn_name, "should NOT accept nasa_earth_data_token")
+    )
+  }
+})
+
+testthat::test_that("download_data forwards nasa_earth_data_token without error for non-NASA datasets", {
+  # Passing nasa_earth_data_token to a non-NASA dataset should not error on the
+  # argument itself (it is silently ignored by the wrapper's formals() check)
+  withr::with_tempdir({
+    testthat::expect_error(
+      suppressWarnings(
+        download_data(
+          dataset_name = "ecoregion",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          nasa_earth_data_token = "dummy_token",
+          download = FALSE
+        )
+      ),
+      NA  # no error expected
+    )
+  })
+})
+
+testthat::test_that("download_data forwards rate_limit to underlying functions", {
+  # Verify the wrapper accepts rate_limit and routes it without error
+  withr::with_tempdir({
+    testthat::expect_error(
+      suppressWarnings(
+        download_data(
+          dataset_name = "ecoregion",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          rate_limit = 5,
+          download = FALSE
+        )
+      ),
+      NA
+    )
+  })
+})
+
+################################################################################
+##### rate_limit parameter present on all previously-missing functions
+
+testthat::test_that("download_ecoregion has rate_limit parameter with default 2", {
+  params <- formals(download_ecoregion)
+  testthat::expect_true("rate_limit" %in% names(params))
+  testthat::expect_equal(params$rate_limit, 2)
+})
+
+testthat::test_that("download_nlcd has rate_limit parameter with default 2", {
+  params <- formals(download_nlcd)
+  testthat::expect_true("rate_limit" %in% names(params))
+  testthat::expect_equal(params$rate_limit, 2)
+})
+
+testthat::test_that("download_groads has rate_limit parameter with default 2", {
+  params <- formals(download_groads)
+  testthat::expect_true("rate_limit" %in% names(params))
+  testthat::expect_equal(params$rate_limit, 2)
+})
+
+testthat::test_that("download_population has rate_limit parameter with default 2", {
+  params <- formals(download_population)
+  testthat::expect_true("rate_limit" %in% names(params))
+  testthat::expect_equal(params$rate_limit, 2)
+})
+
+testthat::test_that("download_koppen_geiger has rate_limit parameter with default 2", {
+  params <- formals(download_koppen_geiger)
+  testthat::expect_true("rate_limit" %in% names(params))
+  testthat::expect_equal(params$rate_limit, 2)
+})
+
+testthat::test_that("all download functions have rate_limit parameter", {
+  fns <- list(
+    download_aqs, download_ecoregion, download_geos, download_gmted,
+    download_merra2, download_narr, download_nlcd, download_groads,
+    download_population, download_hms, download_koppen_geiger, download_modis,
+    download_tri, download_nei, download_gridmet, download_terraclimate,
+    download_huc, download_prism, download_edgar, download_cropscape
+  )
+  fn_names <- c(
+    "download_aqs", "download_ecoregion", "download_geos", "download_gmted",
+    "download_merra2", "download_narr", "download_nlcd", "download_groads",
+    "download_population", "download_hms", "download_koppen_geiger",
+    "download_modis", "download_tri", "download_nei", "download_gridmet",
+    "download_terraclimate", "download_huc", "download_prism", "download_edgar",
+    "download_cropscape"
+  )
+  for (i in seq_along(fns)) {
+    testthat::expect_true(
+      "rate_limit" %in% names(formals(fns[[i]])),
+      label = paste(fn_names[i], "should have rate_limit param")
+    )
+  }
+})
+
 

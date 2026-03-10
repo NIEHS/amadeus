@@ -15,7 +15,14 @@
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #' an \code{rlang::hash_file()} hash character corresponding to the
 #' downloaded files. Default is \code{FALSE}.
-#' @param ... Arguments passed to each download function.
+#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
+#' authentication token. Required for NASA datasets (`"geos"`, `"merra2"`,
+#' `"modis"`). Can be a token string, a path to a file containing the token,
+#' or \code{NULL} to read from the \code{NASA_EARTHDATA_TOKEN} environment
+#' variable. Ignored for non-NASA datasets.
+#' @param rate_limit numeric(1). Minimum seconds between HTTP requests
+#' (default 2). Passed to the underlying download function.
+#' @param ... Additional arguments passed to each download function.
 #' @note
 #' - All download function names are in \code{download_*} formats
 #' @author Insang Song
@@ -97,6 +104,8 @@ download_data <-
     directory_to_save = NULL,
     acknowledgement = FALSE,
     hash = FALSE,
+    nasa_earth_data_token = NULL,
+    rate_limit = 2,
     ...
   ) {
     dataset_name <- tolower(dataset_name)
@@ -135,14 +144,24 @@ download_data <-
       edgar = download_edgar
     )
 
+    call_args <- c(
+      list(
+        directory_to_save = directory_to_save,
+        acknowledgement = acknowledgement,
+        hash = hash,
+        rate_limit = rate_limit
+      ),
+      list(...)
+    )
+
+    # Only pass nasa_earth_data_token to functions that accept it
+    if ("nasa_earth_data_token" %in% names(formals(what_to_run))) {
+      call_args$nasa_earth_data_token <- nasa_earth_data_token
+    }
+
     return <- tryCatch(
       {
-        what_to_run(
-          directory_to_save = directory_to_save,
-          acknowledgement = acknowledgement,
-          hash = hash,
-          ...
-        )
+        do.call(what_to_run, call_args)
       },
       error = function(e) {
         stop(
@@ -364,6 +383,7 @@ download_aqs <-
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Insang Song
 #' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
@@ -386,7 +406,8 @@ download_ecoregion <- function(
   remove_zip = FALSE,
   show_progress = TRUE,
   hash = FALSE,
-  max_tries = 20
+  max_tries = 20,
+  rate_limit = 2
 ) {
   #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
@@ -448,7 +469,7 @@ download_ecoregion <- function(
       token = NULL,
       show_progress = show_progress,
       max_tries = max_tries,
-      rate_limit = 2
+      rate_limit = rate_limit
     )
   } else {
     message("File already exists. Skipping download.\n")
@@ -1766,6 +1787,7 @@ download_narr <- function(
 #' @param hash logical(1). Return hash of downloaded files? Default is
 #' \code{FALSE}.
 #' @param max_tries integer(1). Maximum download retry attempts. Default is 20.
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song, Kyle Messier
 #' @return invisible NULL; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
@@ -1803,7 +1825,8 @@ download_nlcd <- function(
   remove_zip = FALSE,
   show_progress = TRUE,
   hash = FALSE,
-  max_tries = 20
+  max_tries = 20,
+  rate_limit = 2
 ) {
   #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
@@ -1895,7 +1918,7 @@ download_nlcd <- function(
       token = NULL,
       show_progress = show_progress,
       max_tries = max_tries,
-      rate_limit = 2
+      rate_limit = rate_limit
     )
   } else {
     message("File already exists. Skipping download.\n")
@@ -1939,6 +1962,7 @@ download_nlcd <- function(
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song
 #' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
@@ -1973,7 +1997,8 @@ download_groads <- function(
   remove_zip = FALSE,
   show_progress = TRUE,
   hash = FALSE,
-  max_tries = 20
+  max_tries = 20,
+  rate_limit = 2
 ) {
   #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
@@ -2064,7 +2089,7 @@ download_groads <- function(
       token = NULL,
       show_progress = show_progress,
       max_tries = max_tries,
-      rate_limit = 2
+      rate_limit = rate_limit
     )
   } else {
     message("File already exists. Skipping download.\n")
@@ -2109,6 +2134,7 @@ download_groads <- function(
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song
 #' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
@@ -2137,7 +2163,8 @@ download_population <- function(
   remove_zip = FALSE,
   show_progress = TRUE,
   hash = FALSE,
-  max_tries = 20
+  max_tries = 20,
+  rate_limit = 2
 ) {
   #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
@@ -2262,7 +2289,7 @@ download_population <- function(
       token = NULL,
       show_progress = show_progress,
       max_tries = max_tries,
-      rate_limit = 2
+      rate_limit = rate_limit
     )
   } else {
     message("File already exists. Skipping download.\n")
@@ -2521,6 +2548,7 @@ download_hms <- function(
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
+#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song
 #' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
@@ -2548,7 +2576,8 @@ download_koppen_geiger <- function(
   remove_zip = FALSE,
   show_progress = TRUE,
   hash = FALSE,
-  max_tries = 20
+  max_tries = 20,
+  rate_limit = 2
 ) {
   #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
@@ -2623,7 +2652,7 @@ download_koppen_geiger <- function(
       token = NULL,
       show_progress = show_progress,
       max_tries = max_tries,
-      rate_limit = 2
+      rate_limit = rate_limit
     )
   } else {
     message("File already exists. Skipping download.\n")
