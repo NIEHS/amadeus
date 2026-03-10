@@ -2899,13 +2899,14 @@ download_modis <- function(
     httr2::req_perform()
   granules <- resp |> httr2::resp_body_json()
 
-  # Extract data URLs (HDF files only)
+  # Extract data URLs (HDF4 .hdf and HDF5 .h5 files, e.g. VIIRS VNP46A2)
   urls <- sapply(granules$feed$entry, function(g) {
     links <- g$links
     # Filter for data links only (exclude metadata, browse images, etc.)
     data_links <- Filter(
       function(l) {
-        grepl("data#", l$rel) && grepl("\\.hdf$", l$href, ignore.case = TRUE)
+        grepl("data#", l$rel) &&
+          grepl("\\.(hdf|h5)$", l$href, ignore.case = TRUE)
       },
       links
     )
