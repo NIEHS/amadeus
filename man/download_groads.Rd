@@ -16,7 +16,8 @@ download_groads(
   remove_zip = FALSE,
   show_progress = TRUE,
   hash = FALSE,
-  max_tries = 20
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
@@ -42,6 +43,8 @@ FALSE).}
 \item{hash}{logical(1). Return hash of downloaded files (default FALSE)}
 
 \item{max_tries}{integer(1). Maximum retry attempts (default 20)}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
 invisible list with download results; or hash character if hash=TRUE

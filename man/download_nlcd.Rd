@@ -15,7 +15,8 @@ download_nlcd(
   remove_zip = FALSE,
   show_progress = TRUE,
   hash = FALSE,
-  max_tries = 20
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ Set to FALSE to skip downloading (generates file list only).}
 \code{FALSE}.}
 
 \item{max_tries}{integer(1). Maximum download retry attempts. Default is 20.}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
 invisible NULL; or hash character if hash=TRUE

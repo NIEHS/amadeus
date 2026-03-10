@@ -12,6 +12,8 @@ download_data(
   directory_to_save = NULL,
   acknowledgement = FALSE,
   hash = FALSE,
+  nasa_earth_data_token = NULL,
+  rate_limit = 2,
   ...
 )
 }
@@ -29,7 +31,16 @@ large and use lots of machine storage and memory.}
 an \code{rlang::hash_file()} hash character corresponding to the
 downloaded files. Default is \code{FALSE}.}
 
-\item{...}{Arguments passed to each download function.}
+\item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData
+authentication token. Required for NASA datasets (\code{"geos"}, \code{"merra2"},
+\code{"modis"}). Can be a token string, a path to a file containing the token,
+or \code{NULL} to read from the \code{NASA_EARTHDATA_TOKEN} environment
+variable. Ignored for non-NASA datasets.}
+
+\item{rate_limit}{numeric(1). Minimum seconds between HTTP requests
+(default 2). Passed to the underlying download function.}
+
+\item{...}{Additional arguments passed to each download function.}
 }
 \value{
 \itemize{
