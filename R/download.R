@@ -13,7 +13,7 @@
 #' user acknowledges that the data downloaded using this function may be very
 #' large and use lots of machine storage and memory.
 #' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
+#' a combined MD5 hash string for the
 #' downloaded files. Default is \code{FALSE}.
 #' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
 #' authentication token. Required for NASA datasets (`"geos"`, `"merra2"`,
@@ -52,7 +52,7 @@
 #' * \code{\link{download_edgar}}: `"edgar"`
 #' @return
 #' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * For \code{hash = TRUE}, a combined MD5 hash string.
 #' * Data files will be downloaded and stored in respective
 #' sub-directories within \code{directory_to_save}. File format and
 #' sub-directory names depend on data source and dataset of interest.
@@ -886,7 +886,7 @@ download_gmted <- function(
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
+#' a combined MD5 hash string for the
 #' downloaded files. Default is \code{FALSE}.
 #' @param show_progress logical(1). Show download progress (default TRUE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
@@ -3699,7 +3699,7 @@ download_terraclimate <- function(
 #' Default is \code{FALSE}. Not working for this function since HUC data
 #' is in 7z format.
 #' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
+#' a combined MD5 hash string for the
 #' downloaded files. Default is \code{FALSE}.
 #' @param show_progress logical(1). Show download progress.
 #'   Default is \code{TRUE}.
@@ -3709,7 +3709,7 @@ download_terraclimate <- function(
 #'   Default is \code{2}.
 #' @return
 #' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * For \code{hash = TRUE}, a combined MD5 hash string.
 #' * Downloaded files will be stored in \code{directory_to_save}.
 #' @author Insang Song
 #' @importFrom Rdpack reprompt
@@ -3890,7 +3890,7 @@ download_huc <-
 #' @param remove_zip logical(1). Remove zip file from directory_to_download.
 #'  Default is \code{FALSE}.
 #' @param hash logical(1). By setting \code{TRUE} the function will return
-#'  an \code{rlang::hash_file()} hash character corresponding to the
+#'  a combined MD5 hash string for the
 #'  downloaded files. Default is \code{FALSE}.
 #' @param show_progress logical(1). Show download progress.
 #'   Default is \code{TRUE}.
@@ -3901,7 +3901,7 @@ download_huc <-
 #' @author Mariana Alifa Kassien
 #' @return
 #' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * For \code{hash = TRUE}, a combined MD5 hash string.
 #' * Zip and/or data files will be downloaded and stored in
 #' \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
@@ -4359,7 +4359,7 @@ download_edgar <- function(
 #' @param remove_zip logical(1). Remove the zip file after unzipping.
 #'   Default is \code{FALSE}. Only applies when \code{unzip = TRUE}.
 #' @param hash logical(1). By setting \code{TRUE} the function will return
-#'   an \code{rlang::hash_file()} hash character corresponding to the
+#'   a combined MD5 hash string for the
 #'   downloaded files. Default is \code{FALSE}.
 #' @param show_progress logical(1). Show download progress.
 #'   Default is \code{TRUE}.
@@ -4370,7 +4370,7 @@ download_edgar <- function(
 #' @author Insang Song
 #' @return
 #' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * For \code{hash = TRUE}, a combined MD5 hash string.
 #' * .bil (normals) or single grid files depending on the format
 #' choice will be stored in \code{directory_to_save}.
 #' @importFrom Rdpack reprompt
@@ -4562,7 +4562,7 @@ download_prism <- function(
 #' @param unzip logical(1). Unzip the downloaded compressed files.
 #' Default is \code{FALSE}.
 #' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
+#' a combined MD5 hash string for the
 #' downloaded files. Default is \code{FALSE}.
 #' @param show_progress logical(1). Show download progress.
 #'   Default is \code{TRUE}.
@@ -4574,7 +4574,7 @@ download_prism <- function(
 #' @note JSON files should be found at STAC catalog of OpenLandMap
 #' @return
 #' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
+#' * For \code{hash = TRUE}, a combined MD5 hash string.
 #' * Yearly comma-separated value (CSV) files will be stored in
 #' \code{directory_to_save}.
 #' @examples
