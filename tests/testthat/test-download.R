@@ -2516,8 +2516,80 @@ testthat::test_that("download_modis CMR query body includes retry and timeout", 
   fn_body <- paste(deparse(body(download_modis)), collapse = "\n")
   testthat::expect_match(fn_body, "req_retry")
   testthat::expect_match(fn_body, "req_timeout")
-  testthat::expect_match(
-    fn_body,
-    "cmr\\.earthdata\\.nasa\\.gov"
+  testthat::expect_match(fn_body, "cmr\\.earthdata\\.nasa\\.gov")
+  testthat::expect_match(fn_body, "connecttimeout")
+  testthat::expect_match(fn_body, "tryCatch")
+  # Timeout should be >= 120 seconds (not 60)
+  testthat::expect_false(
+    grepl("req_timeout\\(60\\)", fn_body),
+    info = "CMR timeout should be >= 120s, not 60s"
   )
+})
+
+testthat::test_that("CMR endpoint is reachable and returns granules for MOD11A1", {
+  testthat::skip_if_offline()
+  testthat::skip_on_cran()
+  resp <- tryCatch(
+    httr2::request(
+      "https://cmr.earthdata.nasa.gov/search/granules.json"
+    ) |>
+    httr2::req_url_query(
+      short_name = "MOD11A1",
+      version = "061",
+      temporal = "2022-01-01,2022-01-01",
+      bounding_box = "-125,24,-66,50",
+      page_size = 5
+    ) |>
+    httr2::req_options(connecttimeout = 30L) |>
+    httr2::req_timeout(60) |>
+    httr2::req_perform(),
+    error = function(e) NULL
+  )
+  testthat::skip_if(
+    is.null(resp),
+    "CMR endpoint unreachable - skipping (network issue)"
+  )
+  testthat::expect_equal(httr2::resp_status(resp), 200L)
+  body <- httr2::resp_body_json(resp)
+  testthat::expect_true(length(body$feed$entry) > 0)
+  # Verify returned URLs contain .hdf files
+  urls <- sapply(body$feed$entry, function(g) {
+    links <- Filter(
+      function(l) grepl("data#", l$rel) && grepl("\\.hdf$", l$href),
+      g$links
+    )
+    if (length(links) > 0) links[[1]]$href else NA_character_
+  })
+  testthat::expect_true(
+    any(!is.na(urls)),
+    info = "At least one .hdf URL should be returned for MOD11A1"
+  )
+})
+
+testthat::test_that("CMR endpoint is reachable and returns granules for MCD19A2", {
+  testthat::skip_if_offline()
+  testthat::skip_on_cran()
+  resp <- tryCatch(
+    httr2::request(
+      "https://cmr.earthdata.nasa.gov/search/granules.json"
+    ) |>
+    httr2::req_url_query(
+      short_name = "MCD19A2",
+      version = "061",
+      temporal = "2022-01-01,2022-01-01",
+      bounding_box = "-125,24,-66,50",
+      page_size = 5
+    ) |>
+    httr2::req_options(connecttimeout = 30L) |>
+    httr2::req_timeout(60) |>
+    httr2::req_perform(),
+    error = function(e) NULL
+  )
+  testthat::skip_if(
+    is.null(resp),
+    "CMR endpoint unreachable - skipping (network issue)"
+  )
+  testthat::expect_equal(httr2::resp_status(resp), 200L)
+  body <- httr2::resp_body_json(resp)
+  testthat::expect_true(length(body$feed$entry) > 0)
 })

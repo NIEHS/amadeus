@@ -2915,7 +2915,7 @@ download_modis <- function(
   #### 11. Query CMR
   message("Querying NASA CMR for available granules...\n")
   chr_extent <- paste(extent, collapse = ",")
-  resp <-
+  resp <- tryCatch(
     httr2::request(
       "https://cmr.earthdata.nasa.gov/search/granules.json"
     ) |>
@@ -2926,9 +2926,19 @@ download_modis <- function(
       bounding_box = chr_extent,
       page_size = 2000
     ) |>
-    httr2::req_retry(retry_on_failure = TRUE, max_tries = 3L) |>
-    httr2::req_timeout(60) |>
-    httr2::req_perform()
+    httr2::req_options(connecttimeout = 30L) |>
+    httr2::req_retry(retry_on_failure = TRUE, max_tries = 5L) |>
+    httr2::req_timeout(120) |>
+    httr2::req_perform(),
+    error = function(e) {
+      stop(
+        "Failed to query NASA CMR (cmr.earthdata.nasa.gov). ",
+        "Check network connectivity and NASA EarthData status at ",
+        "https://status.earthdata.nasa.gov. Original error: ",
+        conditionMessage(e)
+      )
+    }
+  )
   granules <- resp |> httr2::resp_body_json()
 
   # Extract data URLs (HDF4 .hdf and HDF5 .h5 files, e.g. VIIRS VNP46A2)
