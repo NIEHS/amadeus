@@ -167,8 +167,10 @@ get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
 #' Execute downloads using httr2 with robust retry logic and rate limiting.
 #' This function handles authentication, retries, progress tracking, and
 #' streams files directly to disk.
-#' Retry time is based on exponential backoff with jitter, the default behavior
-#' of httr2
+#' HTTP-status retries use exponential backoff capped at 30 s to avoid
+#' long hangs from DNS timeouts (each attempt takes ~10 s). Transport-level
+#' failures (SSL drops, connection resets) are also retried up to
+#' \code{max_tries} times.
 #' @param urls character vector. URLs to download
 #' @param destfiles character vector. Destination file paths (same length as
 #' urls)
@@ -265,17 +267,21 @@ download_run_method <- function(
         # (e.g. EPA TRI)
         # return HTTP 500 with valid response bodies on every request. Retrying
         # would make redundant requests. 502/503/504 are gateway errors that
-        # are genuinely transient. retry_on_failure=TRUE also retries on
-        # transport-level errors (SSL drops, connection resets, etc.)
+        # are genuinely transient.
+        # retry_on_failure retries transport-level errors (SSL drops, etc.)
+        # but is capped at min(max_tries, 3L) to avoid long hangs on DNS
+        # timeouts (each timeout attempt takes ~10s).
         req <- req |>
           httr2::req_retry(
             max_tries = max_tries,
             is_transient = \(resp) {
               httr2::resp_status(resp) %in% c(429, 502, 503, 504)
             },
-            retry_on_failure = TRUE
+            retry_on_failure = TRUE,
+            backoff = \(i) stats::runif(1) * pmin(i ^ 2, 30)
           ) |>
           httr2::req_timeout(timeout) |>
+          httr2::req_options(connecttimeout = 30L) |>
           httr2::req_throttle(rate = 1 / rate_limit) |>
           httr2::req_error(is_error = \(resp) {
             status <- httr2::resp_status(resp)

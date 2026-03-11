@@ -2487,3 +2487,36 @@ testthat::test_that("download_run_method req_retry has retry_on_failure=TRUE", {
     isTRUE(captured_req$policies[["retry_on_failure"]])
   )
 })
+
+testthat::test_that("download_run_method sets connecttimeout = 30L", {
+  captured_req <- NULL
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      captured_req <<- req
+      writeLines("ok", path)
+      invisible(NULL)
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    suppressMessages(
+      download_run_method(
+        urls = "http://example.com/file.txt",
+        destfiles = "file.txt",
+        show_progress = FALSE
+      )
+    )
+  })
+  testthat::expect_false(is.null(captured_req))
+  testthat::expect_equal(captured_req$options[["connecttimeout"]], 30L)
+})
+
+testthat::test_that("download_modis CMR query body includes retry and timeout", {
+  fn_body <- paste(deparse(body(download_modis)), collapse = "\n")
+  testthat::expect_match(fn_body, "req_retry")
+  testthat::expect_match(fn_body, "req_timeout")
+  testthat::expect_match(
+    fn_body,
+    "cmr\\.earthdata\\.nasa\\.gov"
+  )
+})

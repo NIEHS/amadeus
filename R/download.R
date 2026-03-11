@@ -2913,6 +2913,8 @@ download_modis <- function(
       bounding_box = chr_extent,
       page_size = 2000
     ) |>
+    httr2::req_retry(retry_on_failure = TRUE, max_tries = 3L) |>
+    httr2::req_timeout(60) |>
     httr2::req_perform()
   granules <- resp |> httr2::resp_body_json()
 

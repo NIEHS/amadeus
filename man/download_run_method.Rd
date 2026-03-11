@@ -45,7 +45,9 @@ invisible list with success and failure counts
 Execute downloads using httr2 with robust retry logic and rate limiting.
 This function handles authentication, retries, progress tracking, and
 streams files directly to disk.
-Retry time is based on exponential backoff with jitter, the default behavior
-of httr2
+HTTP-status retries use exponential backoff capped at 30 s to avoid
+long hangs from DNS timeouts (each attempt takes ~10 s). Transport-level
+failures (SSL drops, connection resets) are also retried up to
+\code{max_tries} times.
 }
 \keyword{internal}
