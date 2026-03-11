@@ -2919,17 +2919,17 @@ download_modis <- function(
     httr2::request(
       "https://cmr.earthdata.nasa.gov/search/granules.json"
     ) |>
-    httr2::req_url_query(
-      short_name = product,
-      version = str_version,
-      temporal = paste(date[1], date[2], sep = ","),
-      bounding_box = chr_extent,
-      page_size = 2000
-    ) |>
-    httr2::req_options(connecttimeout = 30L) |>
-    httr2::req_retry(retry_on_failure = TRUE, max_tries = 5L) |>
-    httr2::req_timeout(120) |>
-    httr2::req_perform(),
+      httr2::req_url_query(
+        short_name = product,
+        version = str_version,
+        temporal = paste(date[1], date[2], sep = ","),
+        bounding_box = chr_extent,
+        page_size = 2000
+      ) |>
+      httr2::req_options(connecttimeout = 30L) |>
+      httr2::req_retry(retry_on_failure = TRUE, max_tries = 5L) |>
+      httr2::req_timeout(120) |>
+      httr2::req_perform(),
     error = function(e) {
       stop(
         "Failed to query NASA CMR (cmr.earthdata.nasa.gov). ",
