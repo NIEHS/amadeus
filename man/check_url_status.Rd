@@ -4,10 +4,13 @@
 \alias{check_url_status}
 \title{Check HTTP status}
 \usage{
-check_url_status(url)
+check_url_status(url, max_tries = 3L)
 }
 \arguments{
 \item{url}{Download URL to be checked.}
+
+\item{max_tries}{integer(1). Maximum number of retry attempts for
+transient failures (SSL drops, connection resets). Default 3L.}
 }
 \value{
 logical object

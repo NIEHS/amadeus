@@ -634,9 +634,11 @@ generate_time_sequence <-
 #' @description
 #' Check if provided URL returns HTTP status 200 or 206.
 #' @param url Download URL to be checked.
+#' @param max_tries integer(1). Maximum number of retry attempts for
+#'   transient failures (SSL drops, connection resets). Default 3L.
 #' @author Insang Song; Mitchell Manware; Kyle Messier
 #' @importFrom httr2 request req_perform resp_status
-#' @importFrom httr2 req_method req_error
+#' @importFrom httr2 req_method req_error req_retry
 #' @return logical object
 #' @keywords internal auxiliary
 #' @export
