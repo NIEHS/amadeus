@@ -36,7 +36,7 @@ Start by downloading the AQS data files with `download_data`.
 * `acknowledgement = TRUE`: acknowledge that data files may consume local
   storage.
 * `unzip = TRUE`: unzip downloaded zip files (default).
-* `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
+* `hash = TRUE`: generate unique MD5 hash for the downloaded files.
 
 ```{r, eval = FALSE}
 dir <- tempdir()
