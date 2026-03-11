@@ -48,7 +48,7 @@ amadeus::download_data(
 ```
 
 ```{r, echo = FALSE}
-cat('[1] "aa5116525468299d1fc483b108b3e841fc40d7e5"')
+cat('[1] "aa5116525468299d1fc483b108b3e841"')
 ```
 
 Check the downloaded netCDF files.
