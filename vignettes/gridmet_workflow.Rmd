@@ -33,7 +33,7 @@ Start by downloading the netCDF data files with `download_data`.
 * `year = c(2019, 2020)`: years of interest.
 * `directory_to_save = dir`: directory to save the downloaded files.
 * `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
-* `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
+* `hash = TRUE`: generate unique MD5 hash for the downloaded files.
 
 ```{r, eval = FALSE}
 dir <- tempdir()
