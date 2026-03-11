@@ -2276,10 +2276,12 @@ testthat::test_that("download_data has nasa_earth_data_token and rate_limit para
 testthat::test_that("download_data passes nasa_earth_data_token only to NASA functions", {
   # NASA functions should accept it; non-NASA functions should not receive it
   # (the wrapper uses formals() check to conditionally pass the token)
-  nasa_fns <- c("download_geos", "download_merra2", "download_modis")
+  nasa_fns <- c(
+    "download_geos", "download_merra2", "download_modis", "download_groads"
+  )
   non_nasa_fns <- c(
     "download_aqs", "download_ecoregion", "download_nlcd",
-    "download_groads", "download_population", "download_koppen_geiger",
+    "download_population", "download_koppen_geiger",
     "download_hms", "download_gmted", "download_narr", "download_tri",
     "download_nei", "download_gridmet", "download_terraclimate",
     "download_huc", "download_cropscape", "download_prism", "download_edgar"
