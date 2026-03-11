@@ -359,6 +359,18 @@ testthat::test_that("check_url_status handles DNS failures gracefully", {
   testthat::expect_false(url_status)
 })
 
+testthat::test_that("check_url_status has max_tries parameter with default 3", {
+  params <- formals(check_url_status)
+  testthat::expect_true("max_tries" %in% names(params))
+  testthat::expect_equal(params$max_tries, 3L)
+})
+
+testthat::test_that("check_url_status body includes retry_on_failure = TRUE", {
+  fn_body <- paste(deparse(body(check_url_status)), collapse = "\n")
+  testthat::expect_match(fn_body, "retry_on_failure\\s*=\\s*TRUE")
+  testthat::expect_match(fn_body, "req_retry")
+})
+
 ################################################################################
 ##### check_destfile
 testthat::test_that("check_destfile returns TRUE for non-existent file", {

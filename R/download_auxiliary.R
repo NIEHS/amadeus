@@ -641,7 +641,8 @@ generate_time_sequence <-
 #' @keywords internal auxiliary
 #' @export
 check_url_status <- function(
-  url
+  url,
+  max_tries = 3L
 ) {
   http_status_ok <- c(200, 206)
 
@@ -651,6 +652,10 @@ check_url_status <- function(
         httr2::request() |>
         httr2::req_method("HEAD") |>
         httr2::req_error(is_error = \(resp) FALSE) |>
+        httr2::req_retry(
+          max_tries = max_tries,
+          retry_on_failure = TRUE
+        ) |>
         httr2::req_perform() |>
         httr2::resp_status()
 
