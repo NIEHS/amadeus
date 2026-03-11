@@ -612,7 +612,7 @@ check_geom <- function(geom) {
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' See [`exactextractr::exact_extract`] for details.
 #' @param scale character(1). Scale expression to be applied to the raw values.
-#' It is crucial that users review the technical documentatio of the MODIS
+#' It is crucial that users review the technical documentation of the MODIS
 #' product
 #' they are using to ensure proper scale.
 #' An example for the MOD11A1 product's LST_Day_1km variable (land surface
