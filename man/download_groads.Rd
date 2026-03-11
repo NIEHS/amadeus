@@ -8,6 +8,7 @@ download_groads(
   data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East",
     "Oceania West"),
   data_format = c("Shapefile", "Geodatabase"),
+  nasa_earth_data_token = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -24,6 +25,11 @@ download_groads(
 \item{data_region}{character(1). Data region.}
 
 \item{data_format}{character(1). "Shapefile" or "Geodatabase".}
+
+\item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData
+authentication token. Can be a token string, a path to a file
+containing the token, or \code{NULL} to read from the
+\code{NASA_EARTHDATA_TOKEN} environment variable.}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
@@ -54,8 +60,11 @@ The \code{download_groads()} function accesses and downloads
 roads data from NASA's Global Roads Open Access Data Set (gROADS).
 }
 \note{
-gROADS data may require NASA EarthData authentication depending on
-access method.
+gROADS data is hosted on NASA EarthData and requires a valid
+NASA EarthData token for authentication. Set the
+\code{NASA_EARTHDATA_TOKEN} environment variable or pass the token
+directly via \code{nasa_earth_data_token}.
+Use \code{setup_nasa_token()} for setup.
 }
 \examples{
 \dontrun{

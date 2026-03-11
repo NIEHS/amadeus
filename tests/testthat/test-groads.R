@@ -299,3 +299,81 @@ testthat::test_that("download_groads file already exists path", {
     testthat::expect_true(any(grepl("already exists", msgs)))
   })
 })
+
+################################################################################
+##### download_groads: NASA EarthData token authentication
+
+testthat::test_that("download_groads has nasa_earth_data_token parameter", {
+  params <- names(formals(download_groads))
+  testthat::expect_true("nasa_earth_data_token" %in% params)
+  testthat::expect_null(formals(download_groads)$nasa_earth_data_token)
+})
+
+testthat::test_that("download_groads passes token to download_run_method", {
+  captured_token <- NULL
+  testthat::local_mocked_bindings(
+    download_run_method = function(urls, destfiles, token = NULL, ...) {
+      captured_token <<- token
+      writeLines("ok", destfiles)
+      invisible(list(success = 1, failed = 0))
+    },
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    get_token = function(token, env_var) {
+      if (is.null(token)) "mock-token" else token
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    suppressWarnings(suppressMessages(
+      download_groads(
+        data_region = "Americas",
+        data_format = "Geodatabase",
+        nasa_earth_data_token = "test-token-abc",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = FALSE,
+        hash = FALSE
+      )
+    ))
+  })
+  testthat::expect_equal(captured_token, "test-token-abc")
+})
+
+testthat::test_that("download_groads reads token from env var via get_token", {
+  get_token_called_with <- NULL
+  testthat::local_mocked_bindings(
+    download_run_method = function(urls, destfiles, token = NULL, ...) {
+      writeLines("ok", destfiles)
+      invisible(list(success = 1, failed = 0))
+    },
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    get_token = function(token, env_var) {
+      get_token_called_with <<- list(token = token, env_var = env_var)
+      "mock-env-token"
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    suppressWarnings(suppressMessages(
+      download_groads(
+        data_region = "Americas",
+        data_format = "Geodatabase",
+        nasa_earth_data_token = NULL,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = FALSE,
+        hash = FALSE
+      )
+    ))
+  })
+  testthat::expect_equal(
+    get_token_called_with$env_var,
+    "NASA_EARTHDATA_TOKEN"
+  )
+})

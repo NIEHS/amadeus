@@ -1951,8 +1951,15 @@ download_nlcd <- function(
 #' @description
 #' The \code{download_groads()} function accesses and downloads
 #' roads data from NASA's Global Roads Open Access Data Set (gROADS).
-#' @note gROADS data may require NASA EarthData authentication depending on
-#' access method.
+#' @note gROADS data is hosted on NASA EarthData and requires a valid
+#' NASA EarthData token for authentication. Set the
+#' \code{NASA_EARTHDATA_TOKEN} environment variable or pass the token
+#' directly via \code{nasa_earth_data_token}.
+#' Use \code{setup_nasa_token()} for setup.
+#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
+#'   authentication token. Can be a token string, a path to a file
+#'   containing the token, or \code{NULL} to read from the
+#'   \code{NASA_EARTHDATA_TOKEN} environment variable.
 #' @param data_region character(1). Data region.
 #' @param data_format character(1). "Shapefile" or "Geodatabase".
 #' @param directory_to_save character(1). Directory to save data.
@@ -1992,6 +1999,7 @@ download_groads <- function(
     "Oceania West"
   ),
   data_format = c("Shapefile", "Geodatabase"),
+  nasa_earth_data_token = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -2005,6 +2013,12 @@ download_groads <- function(
 ) {
   #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
+
+  #### Retrieve NASA EarthData token (before null parameter check)
+  nasa_earth_data_token <- amadeus::get_token(
+    token = nasa_earth_data_token,
+    env_var = "NASA_EARTHDATA_TOKEN"
+  )
 
   #### Check for null parameters
   amadeus::check_for_null_parameters(mget(ls()))
@@ -2089,7 +2103,7 @@ download_groads <- function(
     amadeus::download_run_method(
       urls = download_url,
       destfiles = download_name,
-      token = NULL,
+      token = nasa_earth_data_token,
       show_progress = show_progress,
       max_tries = max_tries,
       rate_limit = rate_limit
