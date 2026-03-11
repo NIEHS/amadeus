@@ -871,8 +871,8 @@ process_nlcd <-
           "_.*\\.(tif|img)$"
         ),
         full.names = TRUE,
-        recursive = TRUE, # ADD THIS - files may be in subdirectories
-        ignore.case = TRUE # ADD THIS - for robustness
+        recursive = TRUE,
+        ignore.case = TRUE
       )
 
     if (length(nlcd_file) == 0) {
@@ -882,11 +882,10 @@ process_nlcd <-
           path,
           pattern = paste0("nlcd_", year, "_.*\\.(tif|img)$"),
           full.names = TRUE,
-          recursive = TRUE, # ADD THIS
-          ignore.case = TRUE # ADD THIS
+          recursive = TRUE,
+          ignore.case = TRUE
         )
       if (length(nlcd_file) > 0) {
-        # FIXED: was > 1, should be > 0
         message(
           paste0(
             "Deprecated file paths detected. Data still imported, but ",
@@ -919,15 +918,14 @@ process_nlcd <-
         paste(product_codes, collapse = "|"),
         ")_",
         year,
-        "_.*\\.aux\\.xml$" # FIXED: escaped the dot before xml
+        "_.*\\.aux\\.xml$"
       ),
       full.names = FALSE,
-      recursive = TRUE, # ADD THIS
-      ignore.case = TRUE # ADD THIS
+      recursive = TRUE,
+      ignore.case = TRUE
     )
 
     if (length(chr_aux_xml_path) > 0) {
-      # FIXED: handle multiple files
       for (aux_file in chr_aux_xml_path) {
         chr_aux_xml_hide <- file.path(
           dirname(file.path(path, aux_file)),
