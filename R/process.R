@@ -947,7 +947,7 @@ process_nlcd <-
     }
 
     nlcd <- terra::rast(nlcd_file, win = extent)
-    terra::metags(nlcd) <- c(Year = as.character(year)) # Changed to capital Y
+    terra::metags(nlcd) <- c(year = as.character(year))
     return(nlcd)
   }
 
