@@ -2152,6 +2152,9 @@ download_groads <- function(
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @param nasa_earth_data_token character(1). NASA EarthData bearer token.
+#' If NULL (default), reads from the \code{NASA_EARTHDATA_TOKEN} environment
+#' variable via \code{get_token()}.
 #' @author Mitchell Manware, Insang Song
 #' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
@@ -2159,6 +2162,9 @@ download_groads <- function(
 #' \insertRef{data_ciesin2017gpwv4}{amadeus}
 #' @examples
 #' \dontrun{
+#' # RECOMMENDED: Set up token once (persists across sessions)
+#' setup_nasa_token()
+#'
 #' download_population(
 #'   data_resolution = "30 second",
 #'   data_format = "GeoTIFF",
@@ -2181,8 +2187,15 @@ download_population <- function(
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
-  rate_limit = 2
+  rate_limit = 2,
+  nasa_earth_data_token = NULL
 ) {
+  #### Retrieve NASA EarthData token
+  nasa_earth_data_token <- amadeus::get_token(
+    token = nasa_earth_data_token,
+    env_var = "NASA_EARTHDATA_TOKEN"
+  )
+
   #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
 
@@ -2303,7 +2316,7 @@ download_population <- function(
     amadeus::download_run_method(
       urls = download_url,
       destfiles = download_name,
-      token = NULL,
+      token = nasa_earth_data_token,
       show_progress = show_progress,
       max_tries = max_tries,
       rate_limit = rate_limit

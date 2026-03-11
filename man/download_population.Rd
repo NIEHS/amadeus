@@ -17,7 +17,8 @@ download_population(
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
-  rate_limit = 2
+  rate_limit = 2,
+  nasa_earth_data_token = NULL
 )
 }
 \arguments{
@@ -47,6 +48,10 @@ FALSE).}
 \item{max_tries}{integer(1). Maximum retry attempts (default 20)}
 
 \item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
+
+\item{nasa_earth_data_token}{character(1). NASA EarthData bearer token.
+If NULL (default), reads from the \code{NASA_EARTHDATA_TOKEN} environment
+variable via \code{get_token()}.}
 }
 \value{
 invisible list with download results; or hash character if hash=TRUE
@@ -61,6 +66,9 @@ access method.
 }
 \examples{
 \dontrun{
+# RECOMMENDED: Set up token once (persists across sessions)
+setup_nasa_token()
+
 download_population(
   data_resolution = "30 second",
   data_format = "GeoTIFF",
