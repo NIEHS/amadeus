@@ -522,3 +522,103 @@ testthat::test_that("download_nei unzip and remove_zip path executes", {
     testthat::expect_equal(result$success, 2)
   })
 })
+
+################################################################################
+##### download_nei: scalar year URL construction fix
+
+testthat::test_that("download_nei scalar year=2017 constructs correct URL", {
+  captured_urls <- NULL
+  testthat::local_mocked_bindings(
+    download_run_method = function(urls, ...) {
+      captured_urls <<- urls
+      invisible(list(success = 1, failed = 0))
+    },
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    suppressWarnings(suppressMessages(
+      download_nei(
+        year = 2017L,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = FALSE
+      )
+    ))
+  })
+  testthat::expect_length(captured_urls, 1L)
+  testthat::expect_match(
+    captured_urls,
+    "gaftp.epa.gov/air/nei/2017/data_summaries/2017v1/2017neiApr"
+  )
+  testthat::expect_no_match(captured_urls, "/2017/.*2020")
+})
+
+testthat::test_that("download_nei scalar year=2020 constructs correct URL", {
+  captured_urls <- NULL
+  testthat::local_mocked_bindings(
+    download_run_method = function(urls, ...) {
+      captured_urls <<- urls
+      invisible(list(success = 1, failed = 0))
+    },
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    suppressWarnings(suppressMessages(
+      download_nei(
+        year = 2020L,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = FALSE
+      )
+    ))
+  })
+  testthat::expect_length(captured_urls, 1L)
+  testthat::expect_match(
+    captured_urls,
+    "gaftp.epa.gov/air/nei/2020/data_summaries/2020nei_onroad"
+  )
+  testthat::expect_no_match(captured_urls, "/2020/.*2017")
+})
+
+testthat::test_that("download_nei vector year=c(2017,2020) constructs 2 correct URLs", {
+  captured_urls <- NULL
+  testthat::local_mocked_bindings(
+    download_run_method = function(urls, ...) {
+      captured_urls <<- urls
+      invisible(list(success = 2, failed = 0))
+    },
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    suppressWarnings(suppressMessages(
+      download_nei(
+        year = c(2017L, 2020L),
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = FALSE
+      )
+    ))
+  })
+  testthat::expect_length(captured_urls, 2L)
+  testthat::expect_match(captured_urls[1], "/2017/.*2017neiApr")
+  testthat::expect_match(captured_urls[2], "/2020/.*2020nei")
+})
+
+testthat::test_that("download_nei stops on unrecognized year", {
+  testthat::expect_error(
+    suppressMessages(
+      download_nei(
+        year = 2019L,
+        directory_to_save = tempdir(),
+        acknowledgement = TRUE
+      )
+    ),
+    "NEI data is not available for year"
+  )
+})

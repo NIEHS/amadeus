@@ -179,9 +179,13 @@ get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @param timeout numeric(1). Timeout in seconds for each request (default 3600
 #' = 1 hour)
+#' @param http_version integer(1). Force HTTP version via curl's
+#' CURLOPT_HTTP_VERSION: 1L = HTTP/1.0, 2L = HTTP/1.1, 3L = HTTP/2.
+#' NULL (default) lets curl negotiate automatically. Pass 2L for servers
+#' that drop HTTP/2 connections (e.g., www.mrlc.gov for NLCD).
 #' @return invisible list with success and failure counts
-#' @importFrom httr2 request req_headers req_perform req_retry req_throttle
-#' @importFrom httr2 req_error req_progress req_timeout resp_status
+#' @importFrom httr2 request req_headers req_options req_perform req_retry
+#' @importFrom httr2 req_throttle req_error req_progress req_timeout resp_status
 #' @importFrom stats runif
 #' @keywords internal
 #' @export
@@ -192,7 +196,8 @@ download_run_method <- function(
   show_progress = TRUE,
   max_tries = 20,
   rate_limit = 2,
-  timeout = 3600
+  timeout = 3600,
+  http_version = NULL
 ) {
   # Validate inputs
   if (is.null(urls) || length(urls) == 0) {
@@ -260,13 +265,15 @@ download_run_method <- function(
         # (e.g. EPA TRI)
         # return HTTP 500 with valid response bodies on every request. Retrying
         # would make redundant requests. 502/503/504 are gateway errors that
-        # are genuinely transient.
+        # are genuinely transient. retry_on_failure=TRUE also retries on
+        # transport-level errors (SSL drops, connection resets, etc.)
         req <- req |>
           httr2::req_retry(
             max_tries = max_tries,
             is_transient = \(resp) {
               httr2::resp_status(resp) %in% c(429, 502, 503, 504)
-            }
+            },
+            retry_on_failure = TRUE
           ) |>
           httr2::req_timeout(timeout) |>
           httr2::req_throttle(rate = 1 / rate_limit) |>
@@ -274,6 +281,10 @@ download_run_method <- function(
             status <- httr2::resp_status(resp)
             status >= 400 && !(status %in% c(429, 500, 502, 503, 504))
           })
+
+        if (!is.null(http_version)) {
+          req <- req |> httr2::req_options(http_version = http_version)
+        }
 
         # Add progress only if requested
         if (show_progress) {

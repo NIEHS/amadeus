@@ -2385,3 +2385,91 @@ testthat::test_that("all download functions have rate_limit parameter", {
 })
 
 
+
+################################################################################
+##### download_run_method: http_version parameter and retry_on_failure
+
+testthat::test_that("download_run_method has http_version parameter", {
+  params <- names(formals(download_run_method))
+  testthat::expect_true("http_version" %in% params)
+  testthat::expect_null(formals(download_run_method)$http_version)
+})
+
+testthat::test_that("download_run_method passes http_version to req_options", {
+  captured_req <- NULL
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      captured_req <<- req
+      writeLines("ok", path)
+      invisible(NULL)
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    suppressMessages(
+      download_run_method(
+        urls = "http://example.com/file.txt",
+        destfiles = "file.txt",
+        show_progress = FALSE,
+        http_version = 2L
+      )
+    )
+  })
+  testthat::expect_false(is.null(captured_req))
+  curl_opts <- captured_req$options
+  testthat::expect_true(
+    "http_version" %in% names(curl_opts) &&
+      curl_opts$http_version == 2L
+  )
+})
+
+testthat::test_that("download_run_method http_version=NULL skips req_options", {
+  captured_req <- NULL
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      captured_req <<- req
+      writeLines("ok", path)
+      invisible(NULL)
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    suppressMessages(
+      download_run_method(
+        urls = "http://example.com/file.txt",
+        destfiles = "file.txt",
+        show_progress = FALSE,
+        http_version = NULL
+      )
+    )
+  })
+  testthat::expect_false(is.null(captured_req))
+  testthat::expect_false(
+    "http_version" %in% names(captured_req$options)
+  )
+})
+
+testthat::test_that("download_run_method req_retry has retry_on_failure=TRUE", {
+  captured_req <- NULL
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      captured_req <<- req
+      writeLines("ok", path)
+      invisible(NULL)
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    suppressMessages(
+      download_run_method(
+        urls = "http://example.com/file.txt",
+        destfiles = "file.txt",
+        show_progress = FALSE
+      )
+    )
+  })
+  testthat::expect_false(is.null(captured_req))
+  testthat::expect_true(
+    isTRUE(captured_req$policies[["retry_on_failure"]])
+  )
+})

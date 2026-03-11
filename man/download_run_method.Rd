@@ -11,7 +11,8 @@ download_run_method(
   show_progress = TRUE,
   max_tries = 20,
   rate_limit = 2,
-  timeout = 3600
+  timeout = 3600,
+  http_version = NULL
 )
 }
 \arguments{
@@ -31,6 +32,11 @@ EarthData)}
 
 \item{timeout}{numeric(1). Timeout in seconds for each request (default 3600
 = 1 hour)}
+
+\item{http_version}{integer(1). Force HTTP version via curl's
+CURLOPT_HTTP_VERSION: 1L = HTTP/1.0, 2L = HTTP/1.1, 3L = HTTP/2.
+NULL (default) lets curl negotiate automatically. Pass 2L for servers
+that drop HTTP/2 connections (e.g., www.mrlc.gov for NLCD).}
 }
 \value{
 invisible list with success and failure counts

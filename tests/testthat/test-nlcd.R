@@ -929,3 +929,33 @@ testthat::test_that("process_nlcd hides .aux.xml metadata file (no skip)", {
     testthat::expect_false(file.exists(aux_name))
   })
 })
+
+################################################################################
+##### download_nlcd uses http_version = 2L (HTTP/1.1) for MRLC server
+
+testthat::test_that("download_nlcd passes http_version=2L to download_run_method", {
+  captured_http_version <- NULL
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) TRUE,
+    download_run_method = function(...) {
+      args <- list(...)
+      captured_http_version <<- args$http_version
+      invisible(list(success = 1, failed = 0))
+    },
+    download_unzip = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    suppressWarnings(suppressMessages(
+      download_nlcd(
+        year = 2021,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = FALSE
+      )
+    ))
+  })
+  testthat::expect_equal(captured_http_version, 2L)
+})

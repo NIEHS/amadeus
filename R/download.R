@@ -1911,6 +1911,8 @@ download_nlcd <- function(
   }
 
   #### Download file using httr2
+  # http_version = 2L forces HTTP/1.1 to avoid nghttp2 PROTOCOL_ERRORs from
+  # www.mrlc.gov, which drops HTTP/2 connections mid-transfer.
   if (amadeus::check_destfile(download_name)) {
     amadeus::download_run_method(
       urls = download_url,
@@ -1918,7 +1920,8 @@ download_nlcd <- function(
       token = NULL,
       show_progress = show_progress,
       max_tries = max_tries,
-      rate_limit = rate_limit
+      rate_limit = rate_limit,
+      http_version = 2L
     )
   } else {
     message("File already exists. Skipping download.\n")
@@ -3191,16 +3194,35 @@ download_nei <- function(
   }
 
   #### Define measurement data paths
-  url_download_base <- "https://gaftp.epa.gov/air/nei/%d/data_summaries/"
-  url_download_remain <-
-    c("2017v1/2017neiApr_onroad_byregions.zip", "2020nei_onroad_byregion.zip")
-  download_urls <-
-    paste0(
-      sprintf(url_download_base, year),
-      url_download_remain
-    )
-  download_names_file <-
-    c("2017neiApr_onroad_byregions.zip", "2020nei_onroad_byregion.zip")
+  # Each NEI year has a distinct URL path suffix; use a named lookup so the
+  # function works correctly whether `year` is a scalar (as dispatched from
+  # the targets pipeline via pattern = map()) or a full c(2017, 2020) vector.
+  url_download_base <- "https://gaftp.epa.gov/air/nei/%s/data_summaries/"
+  nei_url_map <- c(
+    "2017" = "2017v1/2017neiApr_onroad_byregions.zip",
+    "2020" = "2020nei_onroad_byregion.zip"
+  )
+  nei_file_map <- c(
+    "2017" = "2017neiApr_onroad_byregions.zip",
+    "2020" = "2020nei_onroad_byregion.zip"
+  )
+  year_chr <- as.character(year)
+  unknown <- setdiff(year_chr, names(nei_url_map))
+  if (length(unknown) > 0) {
+    stop(paste0(
+      "NEI data is not available for year(s): ",
+      paste(unknown, collapse = ", "),
+      ". Available years: ",
+      paste(names(nei_url_map), collapse = ", "),
+      ".\n"
+    ))
+  }
+  download_urls <- vapply(
+    year_chr,
+    function(y) paste0(sprintf(url_download_base, y), nei_url_map[y]),
+    character(1)
+  )
+  download_names_file <- unname(nei_file_map[year_chr])
   download_names <- paste0(directory_to_download, download_names_file)
 
   #### Filter to files that need downloading
