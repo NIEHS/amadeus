@@ -51,6 +51,8 @@ pak::pak("NIEHS/amadeus")
 
 See the "[download_data](https://niehs.github.io/amadeus/articles/download_functions.html)" vignette for a detailed description of source-specific download functions.
 
+For TRI, `download_tri()` can retrieve EPA annual basic data files for the nationwide dataset (`jurisdiction = "US"`), individual states or territories (`jurisdiction = "AZ"`, `"NC"`, etc.), and the tribal file (`jurisdiction = "tbl"`).
+
 Example use of `download_data` using NOAA NCEP North American Regional Reanalysis's (NARR) "weasd" (Daily Accumulated Snow at Surface) variable.
 
 ```r

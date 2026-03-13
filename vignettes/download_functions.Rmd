@@ -35,6 +35,7 @@ Finally, function-izing data downloads is useful for repeated code or automated 
 
 `download_data` is acccesses and downloads environmental datasets, collections, and variables from a variety of sources.
 This wrapper function calls source-specific data download functions, each utilizing a unique combination of input parameters, host URL, naming convention, and data formats.
+For example, EPA TRI basic data files are available as nationwide (`jurisdiction = "US"`), state or territory-specific (`jurisdiction = "AZ"`, `"NC"`, etc.), and tribal (`jurisdiction = "tbl"`) annual CSV downloads via `download_tri()`.
 
 ```{r, echo = FALSE}
 functions <- c(
