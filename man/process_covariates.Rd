@@ -6,10 +6,10 @@
 \usage{
 process_covariates(
   covariate = c("modis_swath", "modis_merge", "koppen-geiger", "blackmarble",
-    "koeppen-geiger", "koppen", "koeppen", "geos", "dummies", "gmted", "hms", "smoke",
-    "sedac_population", "population", "sedac_groads", "groads", "roads", "nlcd", "tri",
-    "narr", "nei", "ecoregions", "ecoregion", "merra", "merra2", "gridmet",
-    "terraclimate", "huc", "cropscape", "cdl", "prism"),
+    "koeppen-geiger", "koppen", "koeppen", "geos", "dummies", "gmted", "aqs", "hms",
+    "smoke", "sedac_population", "population", "sedac_groads", "groads", "roads", "nlcd",
+    "tri", "narr", "nei", "ecoregions", "ecoregion", "merra", "merra2", "gridmet",
+    "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar"),
   path = NULL,
   ...
 )
@@ -23,7 +23,7 @@ depending on \code{covariate} value.}
 \item{...}{Arguments passed to each raw data processing function.}
 }
 \value{
-\code{SpatVector}, \code{SpatRaster}, \code{sf}, or \code{character} depending on
+\code{SpatVector}, \code{SpatRaster}, \code{sf}, \code{data.table}, or \code{character} depending on
 covariate type and selections.
 }
 \description{
@@ -58,6 +58,7 @@ process_covariates(
 \item \code{\link{process_geos}}: "geos", "GEOS"
 \item \code{\link{process_gmted}}: "gmted", "GMTED"
 \item \code{\link{process_aqs}}: "aqs", "AQS"
+\item \code{\link{process_edgar}}: "edgar"
 \item \code{\link{process_hms}}: "hms", "smoke", "HMS"
 \item \code{\link{process_narr}}: "narr", "NARR"
 \item \code{\link{process_groads}}: "sedac_groads", "roads", "groads"

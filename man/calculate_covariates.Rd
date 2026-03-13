@@ -9,7 +9,7 @@ calculate_covariates(
     "dummies", "gmted", "sedac_groads", "groads", "roads", "ecoregions", "ecoregion",
     "hms", "smoke", "gmted", "narr", "geos", "sedac_population", "population", "nlcd",
     "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "prism", "cropscape",
-    "cdl", "huc"),
+    "cdl", "huc", "edgar"),
   from,
   locs,
   locs_id = "site_id",
@@ -80,6 +80,7 @@ calculate_covariates(
 \item \code{\link{calculate_prism}}: "prism", "PRISM"
 \item \code{\link{calculate_cropscape}}: "cropscape", "cdl"
 \item \code{\link{calculate_huc}}: "huc", "HUC"
+\item \code{\link{calculate_edgar}}: "edgar"
 }
 }
 \author{

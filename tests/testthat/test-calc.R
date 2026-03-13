@@ -38,6 +38,7 @@ testthat::test_that("calculate_covariates (expected errors)", {
       "MERRA2",
       "tri",
       "nei",
+      "edgar",
       "prism",
       "huc",
       "cdl"
@@ -77,6 +78,33 @@ testthat::test_that("calculate_covariates (no errors)", {
   )
   testthat::expect_true(is.data.frame(tri_c))
 
+  withr::with_tempdir({
+    edgar_raster <- terra::rast(
+      ncols = 3,
+      nrows = 2,
+      xmin = -80,
+      xmax = -77,
+      ymin = 35,
+      ymax = 37,
+      crs = "EPSG:4326"
+    )
+    terra::values(edgar_raster) <- seq_len(terra::ncell(edgar_raster))
+    names(edgar_raster) <- "emi_nox"
+    edgar_path <- file.path(".", "edgar_2021_total_emi.tif")
+    terra::writeRaster(edgar_raster, edgar_path, overwrite = TRUE)
+    edgar_r <- process_edgar(path = edgar_path)
+
+    testthat::expect_no_error(
+      edgar_c <- calculate_covariates(
+        covariate = "edgar",
+        from = edgar_r,
+        locs = ncpt,
+        radius = 0
+      )
+    )
+    testthat::expect_true(is.data.frame(edgar_c))
+  })
+
   candidates <-
     c(
       "modis",
@@ -105,13 +133,16 @@ testthat::test_that("calculate_covariates (no errors)", {
       "gridmet",
       "terraclimate",
       "tri",
-      "nei"
+      "nei",
+      "edgar"
     )
   for (cand in candidates) {
     testthat::expect_error(
       suppressWarnings(calculate_covariates(covariate = cand))
     )
   }
+
+  testthat::expect_error(calculate_covariates(covariate = "aqs"))
 })
 
 ################################################################################

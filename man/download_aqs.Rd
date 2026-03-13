@@ -61,6 +61,9 @@ Pre-Generated Data Files.
 }
 \note{
 AQS data does not require authentication.
+AQS measurements are generally intended for use as dependent variables, so
+the package supports download and processing for AQS but does not expose
+AQS through \code{calculate_covariates()}.
 }
 \examples{
 \dontrun{

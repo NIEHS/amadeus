@@ -35,6 +35,42 @@ testthat::test_that("process_covariates", {
   # expect
   testthat::expect_s4_class(covar, "SpatVector")
 
+  aqs_proc <- process_covariates(
+    covariate = "aqs",
+    path = testthat::test_path(
+      "..",
+      "testdata",
+      "aqs",
+      "aqs_daily_88101_triangle.csv"
+    ),
+    date = c("2022-02-04", "2022-02-28"),
+    mode = "location",
+    return_format = "terra"
+  )
+  testthat::expect_s4_class(aqs_proc, "SpatVector")
+
+  withr::with_tempdir({
+    edgar_raster <- terra::rast(
+      ncols = 3,
+      nrows = 2,
+      xmin = -80,
+      xmax = -77,
+      ymin = 35,
+      ymax = 37,
+      crs = "EPSG:4326"
+    )
+    terra::values(edgar_raster) <- seq_len(terra::ncell(edgar_raster))
+    names(edgar_raster) <- "emi_nox"
+    edgar_path <- file.path(".", "edgar_2021_total_emi.tif")
+    terra::writeRaster(edgar_raster, edgar_path, overwrite = TRUE)
+
+    edgar_proc <- process_covariates(
+      covariate = "edgar",
+      path = edgar_path
+    )
+    testthat::expect_s4_class(edgar_proc, "SpatRaster")
+  })
+
   path_vnp46 <-
     list.files(
       testthat::test_path("..", "testdata", "modis"),
@@ -79,9 +115,10 @@ testthat::test_that("process_covariates", {
     "koeppen",
     "geos",
     "dummies",
-    "gmted",
-    "hms",
-    "smoke",
+      "gmted",
+      "aqs",
+      "hms",
+      "smoke",
     "sedac_population",
     "population",
     "sedac_groads",
@@ -95,10 +132,11 @@ testthat::test_that("process_covariates", {
     "huc",
     "cropscape",
     "cdl",
-    "prism",
-    "terraclimate",
-    "gridmet"
-  )
+      "prism",
+      "terraclimate",
+      "gridmet",
+      "edgar"
+    )
   for (cty in covar_types) {
     testthat::expect_error(
       process_covariates(

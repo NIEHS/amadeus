@@ -37,6 +37,7 @@
 #' * \code{\link{calculate_prism}}: "prism", "PRISM"
 #' * \code{\link{calculate_cropscape}}: "cropscape", "cdl"
 #' * \code{\link{calculate_huc}}: "huc", "HUC"
+#' * \code{\link{calculate_edgar}}: "edgar"
 #' @return Calculated covariates as a data.frame or SpatVector object
 #' @author Insang Song
 #' @examples
@@ -87,7 +88,8 @@ calculate_covariates <-
       "prism",
       "cropscape",
       "cdl",
-      "huc"
+      "huc",
+      "edgar"
     ),
     from,
     locs,
@@ -128,7 +130,8 @@ calculate_covariates <-
       prism = amadeus::calculate_prism,
       cropscape = amadeus::calculate_cropscape,
       cdl = amadeus::calculate_cropscape,
-      huc = amadeus::calculate_huc
+      huc = amadeus::calculate_huc,
+      edgar = amadeus::calculate_edgar
     )
 
     res_covariate <-
@@ -721,7 +724,7 @@ calculate_ecoregion <-
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param scale character(1). Scale expression to be applied to the raw values.
-#' It is crucial that users review the technical documentation of the MODIS
+#' It is crucial that users review the technical documentatio of the MODIS
 #' product
 #' they are using to ensure proper scale.
 #' An example for the MOD11A1 product's LST_Day_1km variable (land surface
@@ -2755,6 +2758,100 @@ calculate_prism <- function(
     crs = terra::crs(from)
   )
   #### return data.frame
+  return(sites_return)
+}
+
+#' Calculate EDGAR covariates
+#' @description
+#' Extract EDGAR gridded emissions values at point locations. For
+#' `radius = 0`, cell values are extracted directly. For `radius > 0`,
+#' means are calculated over a circular buffer around each location.
+#' @param from SpatRaster(1). Output from \code{process_edgar()}.
+#' @param locs data.frame, character to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file containing
+#'   identifier for each unique coordinate location.
+#' @param radius numeric(1). Circular buffer distance around site locations.
+#'   Default is `0`.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param ... Placeholders.
+#' @author Mariana Alifa Kassien, Insang Song
+#' @seealso [`process_edgar()`]
+#' @return a data.frame or SpatVector object
+#' @importFrom terra extract crs
+#' @importFrom sf st_as_sf st_buffer
+#' @importFrom exactextractr exact_extract
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires data that is
+#' ##       not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_edgar(
+#'   from = edgar, # derived from process_edgar() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_edgar <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  geom = FALSE,
+  ...
+) {
+  if (!inherits(from, "SpatRaster")) {
+    stop("`from` must be a SpatRaster object.")
+  }
+  if (!is.numeric(radius) || length(radius) != 1) {
+    stop("`radius` must be numeric(1).")
+  }
+
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+
+  if (radius == 0) {
+    sites_extracted <- terra::extract(from, sites_e)
+    sites_extracted <- sites_extracted[, -1, drop = FALSE]
+  } else {
+    if (inherits(sites_e, "SpatVector")) {
+      sites_e <- sf::st_as_sf(sites_e)
+    }
+    sites_extracted <- exactextractr::exact_extract(
+      from,
+      sites_e,
+      fun = "mean",
+      force_df = TRUE,
+      progress = FALSE,
+      ...
+    )
+    names(sites_extracted) <- gsub("^mean\\.", "", names(sites_extracted))
+  }
+
+  names(sites_extracted) <- sprintf("%s_%d", names(sites_extracted), radius)
+  sites_extracted[[locs_id]] <- sites_id[, 1]
+  sites_extracted <- sites_extracted[, c(
+    locs_id,
+    setdiff(names(sites_extracted), locs_id)
+  )]
+
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
   return(sites_return)
 }
 

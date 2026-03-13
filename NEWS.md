@@ -4,7 +4,7 @@
 - Deprecated `download` parameter (use default `download = TRUE`) and
   `remove_command` parameter across all download functions; both now emit
   informative warnings and are ignored
-- Added `hash` parameter to all `download_*` functions for optional MD5-based
+- Added `hash` parameter to all `download_*` functions for optional SHA-256
   file integrity verification via `download_hash()`
 - Added `unzip` and `remove_zip` parameters to `download_prism()` for
   post-download archive handling

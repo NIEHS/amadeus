@@ -46,7 +46,7 @@ Downloaded data files are Hierarchical Data Format (HDF), with the extension `.h
 * `nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN")`: User-specific NASA credentials.
 * `directory_to_save = dir_mod11a1`: directory to save the downloaded files.
 * `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
-* `hash = TRUE`: generate unique MD5 hash for the downloaded files.
+* `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
 
 ```{r, eval = FALSE}
 dir_mod11a1 <- file.path(tempdir(), "mod11a1")
@@ -309,7 +309,7 @@ Downloaded data files are Hierarchical Data Format version 5 (HDF5), with the ex
 * `nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN")`: User-specific NASA credentials.
 * `directory_to_save = dir_vnp46a2`: directory to save the downloaded files.
 * `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
-* `hash = TRUE`: generate unique MD5 hash for the downloaded files.
+* `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
 
 ```{r, eval = FALSE}
 dir_vnp46a2 <- file.path(tempdir(), "vnp46a2")
@@ -547,7 +547,7 @@ cat("[1] \"vignettes/data/LAADS_query.2025-08-12T14_29.csv\"\n")
 * `mod06_links = "vignettes/data/LAADS_query.2025-08-12T14_29.csv"`: Manually downloaded CSV file with MOD06_L2 links.
 * `directory_to_save = dir_mod06l2`: directory to save the downloaded files.
 * `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
-* `hash = TRUE`: generate unique MD5 hash for the downloaded files.
+* `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
 
 ```{r, eval = FALSE}
 dir_mod06l2 <- file.path(tempdir(), "mod06l2")
