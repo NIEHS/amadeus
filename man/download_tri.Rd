@@ -8,6 +8,7 @@ download_tri(
   year = c(2018L, 2022L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
+  jurisdiction = "US",
   download = TRUE,
   remove_command = FALSE,
   show_progress = TRUE,
@@ -22,6 +23,11 @@ download_tri(
 \item{directory_to_save}{character(1). Directory to download files.}
 
 \item{acknowledgement}{logical(1). Must be TRUE to proceed.}
+
+\item{jurisdiction}{character(1). TRI file variant to download. Use
+\code{"US"} for the nationwide file, a two-letter state or territory code
+such as \code{"AZ"} or \code{"NC"} for a jurisdiction-specific file, or
+\code{"tbl"} for the tribal file. Default is \code{"US"}.}
 
 \item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
 
@@ -41,16 +47,24 @@ invisible list with download results; or hash character if hash=TRUE
 \description{
 The \code{download_tri()} function accesses and downloads toxic release
 data from the U.S. Environmental Protection Agency's (EPA) Toxic Release
-Inventory (TRI) Program.
+Inventory (TRI) Program. The EPA TRI basic data files contain annual,
+facility-reported toxic chemical release and waste management information.
+EPA publishes TRI basic files in multiple annual variants under the same
+service endpoint: a nationwide file (\code{"US"}), state-specific files
+identified by two-letter postal abbreviations (for example \code{"AZ"} or
+\code{"NC"}), and a tribal file (\code{"tbl"}).
 }
 \note{
-TRI data does not require authentication.
+TRI data does not require authentication. State and tribal downloads
+are saved with jurisdiction-specific file names, while the U.S.-wide
+download keeps the historical \code{tri_raw_<year>.csv} naming pattern.
 }
 \examples{
 \dontrun{
 download_tri(
   year = 2021L,
   directory_to_save = tempdir(),
+  jurisdiction = "NC",
   acknowledgement = TRUE
 )
 }

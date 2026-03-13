@@ -3020,11 +3020,22 @@ download_modis <- function(
 #' @description
 #' The \code{download_tri()} function accesses and downloads toxic release
 #' data from the U.S. Environmental Protection Agency's (EPA) Toxic Release
-#' Inventory (TRI) Program.
-#' @note TRI data does not require authentication.
+#' Inventory (TRI) Program. The EPA TRI basic data files contain annual,
+#' facility-reported toxic chemical release and waste management information.
+#' EPA publishes TRI basic files in multiple annual variants under the same
+#' service endpoint: a nationwide file (\code{"US"}), state-specific files
+#' identified by two-letter postal abbreviations (for example \code{"AZ"} or
+#' \code{"NC"}), and a tribal file (\code{"tbl"}).
+#' @note TRI data does not require authentication. State and tribal downloads
+#'   are saved with jurisdiction-specific file names, while the U.S.-wide
+#'   download keeps the historical \code{tri_raw_<year>.csv} naming pattern.
 #' @param year integer(1 or 2). Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory to download files.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param jurisdiction character(1). TRI file variant to download. Use
+#'   \code{"US"} for the nationwide file, a two-letter state or territory code
+#'   such as \code{"AZ"} or \code{"NC"} for a jurisdiction-specific file, or
+#'   \code{"tbl"} for the tribal file. Default is \code{"US"}.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param show_progress logical(1). Show download progress (default TRUE)
@@ -3041,6 +3052,7 @@ download_modis <- function(
 #' download_tri(
 #'   year = 2021L,
 #'   directory_to_save = tempdir(),
+#'   jurisdiction = "NC",
 #'   acknowledgement = TRUE
 #' )
 #' }
@@ -3049,6 +3061,7 @@ download_tri <- function(
   year = c(2018L, 2022L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
+  jurisdiction = "US",
   download = TRUE,
   remove_command = FALSE,
   show_progress = TRUE,
@@ -3069,6 +3082,45 @@ download_tri <- function(
   }
   stopifnot(length(year) == 2)
   year <- year[order(year)]
+
+  #### Check jurisdiction
+  if (!is.character(jurisdiction) ||
+        length(jurisdiction) != 1 ||
+        is.na(jurisdiction)) {
+    stop(
+      "`jurisdiction` must be a single character value such as ",
+      "\"US\", \"AZ\", or \"tbl\".\n",
+      call. = FALSE
+    )
+  }
+  jurisdiction <- trimws(jurisdiction)
+  if (!nzchar(jurisdiction)) {
+    stop(
+      "`jurisdiction` must be \"US\", a two-letter state code, or \"tbl\".\n",
+      call. = FALSE
+    )
+  }
+  jurisdiction_upper <- toupper(jurisdiction)
+  if (identical(jurisdiction_upper, "TBL")) {
+    jurisdiction_url <- "tbl"
+    jurisdiction_suffix <- "_tbl"
+  } else if (
+    identical(jurisdiction_upper, "US") ||
+      grepl("^[A-Z]{2}$", jurisdiction_upper)
+  ) {
+    jurisdiction_url <- jurisdiction_upper
+    jurisdiction_suffix <- if (identical(jurisdiction_upper, "US")) {
+      ""
+    } else {
+      paste0("_", jurisdiction_upper)
+    }
+  } else {
+    stop(
+      "`jurisdiction` must be \"US\", a two-letter state code such as ",
+      "\"AZ\", or \"tbl\".\n",
+      call. = FALSE
+    )
+  }
 
   #### Handle deprecated parameters
   if (!isTRUE(download)) {
@@ -3094,13 +3146,19 @@ download_tri <- function(
     "mv_tri_basic_download/"
   )
   year_sequence <- seq(year[1], year[2], 1)
-  download_urls <- sprintf(
-    paste(url_download, "%.0f", "_US/csv", sep = ""),
-    year_sequence
+  download_urls <- paste0(
+    url_download,
+    year_sequence,
+    "_",
+    jurisdiction_url,
+    "/csv"
   )
-  download_names <- sprintf(
-    paste0(directory_to_save, "tri_raw_%.0f.csv"),
-    year_sequence
+  download_names <- paste0(
+    directory_to_save,
+    "tri_raw_",
+    year_sequence,
+    jurisdiction_suffix,
+    ".csv"
   )
 
   #### Filter to files that need downloading
