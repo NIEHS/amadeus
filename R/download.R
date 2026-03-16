@@ -16,10 +16,12 @@
 #' an \code{rlang::hash_file()} hash character corresponding to the
 #' downloaded files. Default is \code{FALSE}.
 #' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
-#' authentication token. Required for NASA datasets (`"geos"`, `"merra2"`,
-#' `"modis"`). Can be a token string, a path to a file containing the token,
-#' or \code{NULL} to read from the \code{NASA_EARTHDATA_TOKEN} environment
-#' variable. Ignored for non-NASA datasets.
+#' authentication token. Required for NASA EarthData datasets: `"geos"`,
+#' `"merra2"`, `"modis"`, `"sedac_groads"` / `"groads"`, and
+#' `"sedac_population"` / `"population"`. Can be a token string, a path to a
+#' file containing the token, or \code{NULL} to read from the
+#' \code{NASA_EARTHDATA_TOKEN} environment variable. Ignored for datasets that
+#' do not use NASA EarthData authentication.
 #' @param rate_limit numeric(1). Minimum seconds between HTTP requests
 #' (default 2). Passed to the underlying download function.
 #' @param ... Additional arguments passed to each download function.
