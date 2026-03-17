@@ -6,147 +6,166 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "`r Sys.Date()`"
-author: "Mitchell Manware"
+author: "Kyle Messier, with assistance from GitHub Copilot"
 ---
 
 ```{r setup, include = FALSE}
-# packages
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = ""
 )
 library(amadeus)
+library(sf)
+
+live_run <- local({
+  force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
+  on_ci <- nzchar(Sys.getenv("CI")) ||
+    nzchar(Sys.getenv("GITHUB_ACTIONS")) ||
+    identical(tolower(Sys.getenv("IN_PKGDOWN", "")), "true")
+  on_cran <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")) ||
+    identical(tolower(Sys.getenv("NOT_CRAN", "")), "false")
+  force || !(on_ci || on_cran)
+})
+
+example_points <- data.frame(
+  site_id = c("durham_armory", "bahama"),
+  lon = c(-78.9040, -78.8803),
+  lat = c(36.0330, 36.1702)
+)
+example_points_sf <- sf::st_as_sf(
+  example_points,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+durham_hex_path <- system.file(
+  "extdata", "data_files", "durham_h3_res8.rds", package = "amadeus"
+)
+if (durham_hex_path == "") {
+  source_candidates <- c(
+    file.path("inst", "extdata", "data_files", "durham_h3_res8.rds"),
+    file.path("..", "inst", "extdata", "data_files", "durham_h3_res8.rds")
+  )
+  durham_hex_path <- source_candidates[file.exists(source_candidates)][1]
+}
+if (is.na(durham_hex_path) || durham_hex_path == "") {
+  stop("Could not locate inst/extdata/data_files/durham_h3_res8.rds")
+}
+durham_hex <- readRDS(durham_hex_path)
+
+pick_value_column <- function(x) {
+  geom_col <- attr(x, "sf_column")
+  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
+  candidates <- setdiff(names(x), excluded)
+  if (length(candidates) == 0) {
+    stop("No plottable covariate columns found.")
+  }
+  preferred <- candidates[vapply(x[candidates], function(col) {
+    is.numeric(col) || is.character(col) || is.factor(col)
+  }, logical(1))]
+  if (length(preferred) > 0) preferred[1] else candidates[1]
+}
+
+plot_points <- function(x, title) {
+  value_col <- pick_value_column(x)
+  ggplot2::ggplot(x) +
+    ggplot2::geom_sf(ggplot2::aes(color = !!rlang::sym(value_col)), size = 2) +
+    ggplot2::labs(title = title, color = value_col) +
+    ggplot2::theme_minimal()
+}
+
+plot_polygons <- function(x, title) {
+  value_col <- pick_value_column(x)
+  ggplot2::ggplot(x) +
+    ggplot2::geom_sf(ggplot2::aes(fill = !!rlang::sym(value_col)), color = NA) +
+    ggplot2::labs(title = title, fill = value_col) +
+    ggplot2::theme_minimal()
+}
 ```
 
-This vignette demonstrates how to download, process, and calculate covariates from the Climatology Lab's [gridMET](https://www.climatologylab.org/gridmet.html) dataset using `amadeus` functions.
-Details are provided for each function's parameters and outputs.
-The examples utilize daily specific humidity data.
-See https://www.climatologylab.org/wget-gridmet.html for full variable names and acronyms.
-The messages returned by `amadeus` functions have been omitted for brevity.
+This article demonstrates a compact workflow for Climatology Lab `gridMET` data using multiple variables, multiple summaries, and both point and polygon extraction.
 
-### Download
+This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
-Start by downloading the netCDF data files with `download_data`.
+Each workflow uses two small example surfaces: `example_points_sf` for point extraction and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
-* `dataset_name = "gridmet"`: gridMET dataset name.
-* `variable = "Near-Surface Specific Humidity"`: specific humidity variable name.
-* `year = c(2019, 2020)`: years of interest.
-* `directory_to_save = dir`: directory to save the downloaded files.
-* `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
-* `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
+## Download representative requests
 
-```{r, eval = FALSE}
-dir <- tempdir()
-amadeus::download_data(
+```{r download, eval = live_run}
+directory_to_save <- file.path(tempdir(), "gridmet_workflow")
+download_data(
   dataset_name = "gridmet",
-  variable = "Near-Surface Specific Humidity",
-  year = c(2019, 2020),
-  directory_to_save = dir,
-  acknowledgement = TRUE,
-  hash = TRUE
+  variables = c("Precipitation", "Maximum Near-Surface Air Temperature"),
+  year = 2020,
+  directory_to_save = directory_to_save,
+  acknowledgement = TRUE
 )
 ```
 
-```{r, echo = FALSE}
-cat('[1] "aa5116525468299d1fc483b108b3e841fc40d7e5"')
-```
+## Process one workflow-ready data product
 
-Check the downloaded netCDF files.
-
-```{r, eval = FALSE}
-list.files(dir, recursive = TRUE, pattern = "sph")
-```
-
-```{r, echo = FALSE}
-cat('[1] "sph/sph_2019.nc" "sph/sph_2020.nc"')
-```
-
-### Process
-
-Import and process the downloaded netCDF files with `process_covariates`.
-
-* `covariate = "gridmet"`: gridMET dataset name.
-* `variable = "Near-Surface Specific Humidity"`: specific humidity variable name.
-* `date = c("2019-12-13", "2022-01-10")`: date range of interest.
-* `path = paste0(dir, "/sph")`: directory containing the downloaded files.
-
-```{r, eval = FALSE}
-sph_process <- amadeus::process_covariates(
+```{r process, eval = live_run}
+processed_data <- process_covariates(
   covariate = "gridmet",
-  variable = "Near-Surface Specific Humidity",
-  date = c("2019-12-18", "2020-01-10"),
-  path = file.path(dir, "/sph")
+  variable = "Precipitation",
+  date = c("2020-01-03", "2020-01-05"),
+  path = dirname(list.files(
+    directory_to_save,
+    pattern = "\\.nc$",
+    recursive = TRUE,
+    full.names = TRUE
+  )[1]),
+  extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
 )
 ```
 
-Check the processed `SpatRaster` object.
+## Calculate covariates at points
 
-```{r, eval = FALSE}
-sph_process
-```
-
-```{r, echo = FALSE}
-cat('class       : SpatRaster 
-dimensions  : 585, 1386, 24  (nrow, ncol, nlyr)
-resolution  : 0.04166667, 0.04166667  (x, y)
-extent      : -124.7875, -67.0375, 25.04583, 49.42083  (xmin, xmax, ymin, ymax)
-coord. ref. : lon/lat WGS 84 (EPSG:4326) 
-sources     : sph_2019.nc  (14 layers) 
-              sph_2020.nc  (10 layers) 
-varnames    : sph (near-surface specific humidity) 
-              sph (near-surface specific humidity) 
-names       : sph_20191218, sph_20191219, sph_20191220, sph_20191221, sph_20191222, sph_20191223, ... 
-unit        :        kg/kg,        kg/kg,        kg/kg,        kg/kg,        kg/kg,        kg/kg, ... 
-time (days) : 2019-12-18 to 2020-01-10 
-')
-```
-
-```{r, eval = FALSE}
-terra::plot(sph_process[[1]])
-```
-
-![](images/sph_process.png){style="display: block; margin-left: auto; margin-right: auto;"}
-
-### Calculate covariates
-
-Calculate covariates for California county boundaries with `calculate_covariates`.
-County boundaries are accessed with the `tigris::counties` function.\insertRef{package_tigris}
-
-* `covariate = "gridmet"`: gridMET dataset name.
-* `from = sph_process`: processed `SpatRaster` object.
-* `locs = tigris::counties("CA", year = 2019)`: California county boundaries.
-* `locs_id = "NAME"`: county name identifier.
-* `radius = 0`: size of buffer radius around each county.
-* `geom = "sf"`: return covariates as an `sf` object.
-
-```{r, eval = FALSE}
-library(tigris)
-sph_covar <- amadeus::calculate_covariates(
+```{r calculate-points, eval = live_run}
+point_values <- calculate_covariates(
   covariate = "gridmet",
-  from = sph_process,
-  locs = tigris::counties("CA", year = 2019),
-  locs_id = "NAME",
+  from = processed_data,
+  locs = example_points_sf,
+  locs_id = "site_id",
   radius = 0,
-  geom = "terra"
+  fun = "mean",
+  geom = "sf"
+)
+point_values_sum <- calculate_covariates(
+  covariate = "gridmet",
+  from = processed_data,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  fun = "sum",
+  geom = "sf"
 )
 ```
 
-Check the calculated covariates `sf` object.
+## Calculate covariates across Durham County H3 hexagons
 
-```{r, eval = FALSE}
-sph_covar
+```{r calculate-polygons, eval = live_run}
+polygon_values <- calculate_covariates(
+  covariate = "gridmet",
+  from = processed_data,
+  locs = durham_hex,
+  locs_id = "h3_id",
+  radius = 0,
+  fun = "sum",
+  geom = "sf"
+)
 ```
 
-```{r, echo = FALSE}
-cat('class       : SpatVector 
-geometry    : polygons 
-dimensions  : 1392, 3  (geometries, attributes)
-extent      : -124.482, -114.1312, 32.52883, 42.0095  (xmin, xmax, ymin, ymax)
-coord. ref. : lon/lat WGS 84 (EPSG:4326) 
-names       :          NAME       time    sph_0
-type        :         <chr>   <POSIXt>    <num>
-values      :        Sierra 2019-12-18 0.003101
-                 Sacramento 2019-12-18 0.005791
-              Santa Barbara 2019-12-18 0.004594
-')
+## Visualize the point and polygon outputs
+
+```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
+plot_points(point_values, paste0("Climatology Lab gridMET", ": point extraction"))
 ```
+
+```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
+plot_polygons(polygon_values, paste0("Climatology Lab gridMET", ": Durham H3 polygons"))
+```
+
+## Notes
+
+- The download chunk requests two gridMET variables so local runs exercise a true multi-variable request.
+- Point extraction demonstrates both `mean` and `sum`, while the polygon example uses `sum` to summarize accumulated precipitation over each H3 cell.

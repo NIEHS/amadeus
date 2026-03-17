@@ -42,6 +42,7 @@ Suggests:
     FNN,
     doRNG,
     devtools,
+    ggplot2,
     stringr,
     tigris,
     spelling

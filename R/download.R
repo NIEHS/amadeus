@@ -4742,7 +4742,10 @@ download_cropscape <- function(
     extension <- ifelse(source == "USDA", "\\.zip", "(\\.tar|\\.tar\\.gz)")
     dir_unzip <- gsub(extension, "", download_names)
     for (fn in seq_along(dir_unzip)) {
-      archive::archive_extract(download_names[fn], exdir = dir_unzip[fn])
+      if (!dir.exists(dir_unzip[fn])) {
+        dir.create(dir_unzip[fn], recursive = TRUE)
+      }
+      archive::archive_extract(download_names[fn], dir = dir_unzip[fn])
     }
   }
   # nocov end
