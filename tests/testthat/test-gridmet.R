@@ -16,17 +16,15 @@ testthat::test_that("download_gridmet (no errors)", {
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/gridmet/")
 
-  # run download function, capture result
+  # run download function
   result <- suppressWarnings(
-    suppressMessages(
-      download_data(
-        dataset_name = "gridmet",
-        year = c(year_start, year_end),
-        variables = variables,
-        directory_to_save = directory_to_save,
-        acknowledgement = TRUE,
-        download = FALSE
-      )
+    download_data(
+      dataset_name = "gridmet",
+      year = c(year_start, year_end),
+      variables = variables,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
     )
   )
 
@@ -35,17 +33,19 @@ testthat::test_that("download_gridmet (no errors)", {
     dir.exists(directory_to_save)
   )
 
-  # Assert returned list structure
+  # Assert structured return values from httr2-based download discovery
   testthat::expect_type(result, "list")
   testthat::expect_equal(
     result$n_files,
-    length(seq(year_start, year_end, 1))
+    year_end - year_start + 1L
   )
   testthat::expect_true(
-    all(grepl("northwestknowledge.net", result$urls))
-  )
-  testthat::expect_true(
-    all(grepl("pr_", result$urls))
+    all(
+      grepl(
+        "northwestknowledge.net/metdata/data/pr_",
+        result$urls
+      )
+    )
   )
 
   unlink(directory_to_save, recursive = TRUE)
@@ -63,17 +63,15 @@ testthat::test_that("download_gridmet (single year)", {
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/gridmet/")
 
-  # run download function, capture result
+  # run download function
   result <- suppressWarnings(
-    suppressMessages(
-      download_data(
-        dataset_name = "gridmet",
-        year = year,
-        variables = variables,
-        directory_to_save = directory_to_save,
-        acknowledgement = TRUE,
-        download = FALSE
-      )
+    download_data(
+      dataset_name = "gridmet",
+      year = year,
+      variables = variables,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
     )
   )
 
@@ -82,14 +80,14 @@ testthat::test_that("download_gridmet (single year)", {
     dir.exists(directory_to_save)
   )
 
-  # Assert returned list structure
+  # Assert structured return values from httr2-based download discovery
   testthat::expect_type(result, "list")
-  testthat::expect_equal(result$n_files, 1)
+  testthat::expect_equal(result$n_files, 1L)
   testthat::expect_true(
-    all(grepl("northwestknowledge.net", result$urls))
-  )
-  testthat::expect_true(
-    all(grepl(paste0("pr_", year, ".nc"), result$urls))
+    grepl(
+      paste0("northwestknowledge.net/metdata/data/pr_", year, ".nc"),
+      result$urls
+    )
   )
 
   unlink(directory_to_save, recursive = TRUE)
