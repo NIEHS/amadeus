@@ -103,6 +103,23 @@ testthat::test_that("calculate_covariates (no errors)", {
       )
     )
     testthat::expect_true(is.data.frame(edgar_c))
+
+    edgar_polygons <- terra::as.polygons(edgar_raster)
+    edgar_polygons <- sf::st_as_sf(edgar_polygons[1:2, ])
+    edgar_polygons$site_id <- c("poly_1", "poly_2")
+
+    testthat::expect_no_error(
+      edgar_poly_c <- calculate_covariates(
+        covariate = "edgar",
+        from = edgar_r,
+        locs = edgar_polygons,
+        locs_id = "site_id",
+        radius = 0,
+        geom = "sf"
+      )
+    )
+    testthat::expect_s3_class(edgar_poly_c, "sf")
+    testthat::expect_equal(nrow(edgar_poly_c), 2)
   })
 
   candidates <-

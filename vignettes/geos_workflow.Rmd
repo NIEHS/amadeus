@@ -1,8 +1,8 @@
 ---
-title: "Climatology Lab TerraClimate"
+title: "NASA GEOS-CF"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Climatology Lab TerraClimate}
+  %\VignetteIndexEntry{NASA GEOS-CF}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "`r Sys.Date()`"
@@ -82,7 +82,7 @@ plot_polygons <- function(x, title) {
 }
 ```
 
-This article demonstrates a compact workflow for Climatology Lab TerraClimate data.
+This article demonstrates a compact workflow for NASA GEOS-CF data. GEOS-CF downloads require a NASA EarthData token; see `protected_datasets` for setup details.
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
@@ -91,11 +91,11 @@ Each workflow uses two small example surfaces: `example_points_sf` for point ext
 ## Download representative requests
 
 ```{r download, eval = live_run}
-directory_to_save <- file.path(tempdir(), "terraclimate_workflow")
+directory_to_save <- file.path(tempdir(), "geos_workflow")
 download_data(
-  dataset_name = "terraclimate",
-  variables = c("Precipitation", "Maximum Temperature"),
-  year = 2019,
+  dataset_name = "geos",
+  collection = c("chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"),
+  date = "2019-09-09",
   directory_to_save = directory_to_save,
   acknowledgement = TRUE
 )
@@ -105,12 +105,12 @@ download_data(
 
 ```{r process, eval = live_run}
 processed_data <- process_covariates(
-  covariate = "terraclimate",
-  variable = "ppt",
-  date = c("2019-01-01", "2019-02-01"),
+  covariate = "geos",
+  variable = "O3",
+  date = "2019-09-09",
   path = dirname(list.files(
     directory_to_save,
-    pattern = "\\.nc$",
+    pattern = "\\.nc4?$",
     recursive = TRUE,
     full.names = TRUE
   )[1]),
@@ -122,7 +122,7 @@ processed_data <- process_covariates(
 
 ```{r calculate-points, eval = live_run}
 point_values <- calculate_covariates(
-  covariate = "terraclimate",
+  covariate = "geos",
   from = processed_data,
   locs = example_points_sf,
   locs_id = "site_id",
@@ -136,7 +136,7 @@ point_values <- calculate_covariates(
 
 ```{r calculate-polygons, eval = live_run}
 polygon_values <- calculate_covariates(
-  covariate = "terraclimate",
+  covariate = "geos",
   from = processed_data,
   locs = durham_hex,
   locs_id = "h3_id",
@@ -149,14 +149,14 @@ polygon_values <- calculate_covariates(
 ## Visualize the point and polygon outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("Climatology Lab TerraClimate", ": point extraction"))
+plot_points(point_values, paste0("NASA GEOS-CF", ": point extraction"))
 ```
 
 ```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("Climatology Lab TerraClimate", ": Durham H3 polygons"))
+plot_polygons(polygon_values, paste0("NASA GEOS-CF", ": Durham H3 polygons"))
 ```
 
 ## Notes
 
-- The download request now includes both precipitation and maximum temperature so local runs cover more than one TerraClimate variable.
-- Processing still focuses on `ppt` because monthly precipitation remains the clearest minimal working example for the dataset.
+- The download chunk requests both a chemistry and a meteorology collection so local live runs exercise more than one GEOS-CF collection.
+- GEOS-CF examples can create many hourly files, so Durham-sized extents keep local inspection manageable.

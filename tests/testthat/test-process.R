@@ -49,6 +49,20 @@ testthat::test_that("process_covariates", {
   )
   testthat::expect_s4_class(aqs_proc, "SpatVector")
 
+  aqs_proc_sf <- process_covariates(
+    covariate = "aqs",
+    path = testthat::test_path(
+      "..",
+      "testdata",
+      "aqs",
+      "aqs_daily_88101_triangle.csv"
+    ),
+    date = c("2022-02-04", "2022-02-28"),
+    mode = "location",
+    return_format = "sf"
+  )
+  testthat::expect_s3_class(aqs_proc_sf, "sf")
+
   withr::with_tempdir({
     edgar_raster <- terra::rast(
       ncols = 3,

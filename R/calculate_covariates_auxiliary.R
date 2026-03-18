@@ -252,6 +252,7 @@ calc_prepare_locs <- function(
   if (!locs_id %in% names(locs)) {
     stop(sprintf("locs should include columns named %s.\n", locs_id))
   }
+  locs_id_values <- as.data.frame(locs)[[locs_id]]
   #### prepare sites
   sites_e <- amadeus::process_locs_vector(
     locs,
@@ -264,15 +265,31 @@ calc_prepare_locs <- function(
   if (geom %in% c("sf", "terra")) {
     geom <- TRUE
   }
+  sites_df <- if (geom) {
+    terra::as.data.frame(sites_e, geom = "WKT")
+  } else {
+    terra::as.data.frame(sites_e)
+  }
+  if (!locs_id %in% names(sites_df)) {
+    if (nrow(sites_df) != length(locs_id_values)) {
+      stop(
+        paste0(
+          "`locs_id` was not retained in prepared locations and could not ",
+          "be reconstructed because row counts differ."
+        )
+      )
+    }
+    sites_df[[locs_id]] <- locs_id_values
+  }
   if (geom) {
     sites_id <- subset(
-      terra::as.data.frame(sites_e, geom = "WKT"),
+      sites_df,
       select = c(locs_id, "geometry")
     )
   } else {
     #### site identifiers only
     sites_id <- subset(
-      terra::as.data.frame(sites_e),
+      sites_df,
       select = locs_id
     )
   }
@@ -554,12 +571,38 @@ calc_return_locs <- function(
   # nolint end
   # if geom, convert to and return SpatVector
   if (geom %in% c("terra", "sf")) {
+    if (nrow(covar) == 0) {
+      if ("geometry" %in% names(covar)) {
+        covar_sf <- sf::st_as_sf(covar, wkt = "geometry", crs = crs)
+      } else if (all(c("lon", "lat") %in% names(covar))) {
+        covar_sf <- sf::st_as_sf(
+          covar,
+          coords = c("lon", "lat"),
+          crs = crs,
+          remove = FALSE
+        )
+      } else {
+        warning(
+          paste(
+            "`geom` was requested but no geometry columns were found in",
+            "`covar`; returning data.frame."
+          )
+        )
+        return(data.frame(covar))
+      }
+      if (geom == "sf") {
+        return(covar_sf)
+      }
+      return(suppressWarnings(terra::vect(covar_sf)))
+    }
+    covar_return <- NULL
     if ("geometry" %in% names(covar)) {
-      covar_return <- terra::vect(
-        covar,
-        geom = "geometry",
-        crs = crs
-      )
+      covar_sf <- sf::st_as_sf(covar, wkt = "geometry", crs = crs)
+      covar_return <- if (geom == "sf") {
+        covar_sf
+      } else {
+        suppressWarnings(terra::vect(covar_sf))
+      }
     } else if (all(c("lon", "lat") %in% names(covar))) {
       covar_return <- terra::vect(
         covar,
@@ -567,10 +610,19 @@ calc_return_locs <- function(
         crs = crs
       )
     }
+    if (is.null(covar_return)) {
+      warning(
+        paste(
+          "`geom` was requested but no geometry columns were found in",
+          "`covar`; returning data.frame."
+        )
+      )
+      return(data.frame(covar))
+    }
     if (geom == "terra") {
       return(covar_return)
     } else if (geom == "sf") {
-      return(sf::st_as_sf(covar_return))
+      return(if (inherits(covar_return, "sf")) covar_return else sf::st_as_sf(covar_return))
     }
   } else {
     return(data.frame(covar))

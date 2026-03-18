@@ -20,9 +20,6 @@ manuscript
 input
 tests
 R/ignore.R
-vignettes/download_functions.Rmd
-vignettes/epa_download.Rmd
-vignettes/protected_datasets.Rmd
 inst/extdata/air.2m
 inst/extdata/nasa/token.txt
 LICENSE.md
@@ -31,8 +28,11 @@ LICENSE.md
 air.toml
 interactive.sh
 container.sif
-vignettes/modis_workflow.Rmd
 vignettes/data
 vignettes/images/mod*
 vignettes/images/vnp*
 ^agent\.md$
+vignettes/all_datasets_workflow.Rmd
+vignettes/all_datasets_workflow_files
+^doc$
+^Meta$

@@ -1,8 +1,8 @@
 ---
-title: "Climatology Lab TerraClimate"
+title: "US EPA Air Quality System (AQS)"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Climatology Lab TerraClimate}
+  %\VignetteIndexEntry{US EPA Air Quality System (AQS)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "`r Sys.Date()`"
@@ -82,7 +82,7 @@ plot_polygons <- function(x, title) {
 }
 ```
 
-This article demonstrates a compact workflow for Climatology Lab TerraClimate data.
+This article focuses on the `aqs` workflow in `amadeus`. AQS is primarily used to download and process observed monitoring data and site locations, so the polygon covariate example below demonstrates how those site locations can feed into a downstream EDGAR extraction workflow.
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
@@ -91,29 +91,67 @@ Each workflow uses two small example surfaces: `example_points_sf` for point ext
 ## Download representative requests
 
 ```{r download, eval = live_run}
-directory_to_save <- file.path(tempdir(), "terraclimate_workflow")
+aqs_dir <- file.path(tempdir(), "aqs_workflow")
 download_data(
-  dataset_name = "terraclimate",
-  variables = c("Precipitation", "Maximum Temperature"),
-  year = 2019,
-  directory_to_save = directory_to_save,
-  acknowledgement = TRUE
+  dataset_name = "aqs",
+  parameter_code = 88101,
+  resolution_temporal = "daily",
+  year = 2022,
+  directory_to_save = aqs_dir,
+  acknowledgement = TRUE,
+  unzip = TRUE,
+  remove_zip = FALSE
+)
+download_data(
+  dataset_name = "aqs",
+  parameter_code = 42602,
+  resolution_temporal = "daily",
+  year = 2022,
+  directory_to_save = aqs_dir,
+  acknowledgement = TRUE,
+  unzip = TRUE,
+  remove_zip = FALSE
+)
+
+edgar_dir <- file.path(tempdir(), "aqs_edgar_workflow")
+download_data(
+  dataset_name = "edgar",
+  species = c("CO", "NOx"),
+  temp_res = "yearly",
+  sector_yearly = "ENE",
+  year_range = 2021,
+  directory_to_save = edgar_dir,
+  acknowledgement = TRUE,
+  unzip = TRUE,
+  remove_zip = FALSE
 )
 ```
 
 ## Process one workflow-ready data product
 
 ```{r process, eval = live_run}
+aqs_files <- list.files(
+  aqs_dir,
+  pattern = "\\.csv$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+aqs_sites <- process_covariates(
+  covariate = "aqs",
+  path = aqs_files,
+  date = c("2022-01-01", "2022-03-31"),
+  mode = "location",
+  return_format = "sf"
+)
+
 processed_data <- process_covariates(
-  covariate = "terraclimate",
-  variable = "ppt",
-  date = c("2019-01-01", "2019-02-01"),
-  path = dirname(list.files(
-    directory_to_save,
-    pattern = "\\.nc$",
+  covariate = "edgar",
+  path = list.files(
+    edgar_dir,
+    pattern = "\\.(tif|tiff|nc4?|grd|img)$",
     recursive = TRUE,
     full.names = TRUE
-  )[1]),
+  ),
   extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
 )
 ```
@@ -122,12 +160,11 @@ processed_data <- process_covariates(
 
 ```{r calculate-points, eval = live_run}
 point_values <- calculate_covariates(
-  covariate = "terraclimate",
+  covariate = "edgar",
   from = processed_data,
-  locs = example_points_sf,
+  locs = aqs_sites,
   locs_id = "site_id",
   radius = 0,
-  fun = "mean",
   geom = "sf"
 )
 ```
@@ -136,12 +173,11 @@ point_values <- calculate_covariates(
 
 ```{r calculate-polygons, eval = live_run}
 polygon_values <- calculate_covariates(
-  covariate = "terraclimate",
+  covariate = "edgar",
   from = processed_data,
   locs = durham_hex,
   locs_id = "h3_id",
   radius = 0,
-  fun = "mean",
   geom = "sf"
 )
 ```
@@ -149,14 +185,15 @@ polygon_values <- calculate_covariates(
 ## Visualize the point and polygon outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("Climatology Lab TerraClimate", ": point extraction"))
+plot_points(point_values, paste0("US EPA Air Quality System (AQS)", ": point extraction"))
 ```
 
 ```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("Climatology Lab TerraClimate", ": Durham H3 polygons"))
+plot_polygons(polygon_values, paste0("US EPA Air Quality System (AQS)", ": Durham H3 polygons"))
 ```
 
 ## Notes
 
-- The download request now includes both precipitation and maximum temperature so local runs cover more than one TerraClimate variable.
-- Processing still focuses on `ppt` because monthly precipitation remains the clearest minimal working example for the dataset.
+- `process_aqs()` has no direct `calculate_covariates()` companion route; AQS site locations are often reused as inputs to other covariate workflows.
+- The two example downloads use PM2.5 (`88101`) and ozone (`42602`) to show multi-parameter AQS ingestion.
+- The Durham H3 polygons provide a compact polygon extraction example that is small enough to ship with the package.

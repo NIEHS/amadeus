@@ -627,6 +627,80 @@ testthat::test_that("calculate_edgar extracts EDGAR raster values", {
     )
     testthat::expect_true(is.data.frame(edgar_buf))
     testthat::expect_true(any(grepl("_1000$", names(edgar_buf))))
+
+    testthat::expect_no_error(
+      edgar_geom <- calculate_edgar(
+        from = edgar,
+        locs = locs,
+        locs_id = "site_id",
+        radius = 0,
+        geom = "terra"
+      )
+    )
+    testthat::expect_s4_class(edgar_geom, "SpatVector")
+    testthat::expect_equal(terra::nrow(edgar_geom), nrow(locs))
+  })
+})
+
+testthat::test_that("calculate_edgar retains locs_id for sf inputs", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  withr::with_tempdir({
+    raster_path <- file.path(".", "edgar_2021_total_emi.tif")
+    write_edgar_fixture(raster_path)
+    edgar <- process_edgar(path = raster_path)
+
+    locs_df <- data.frame(
+      site_id = c("a", "b"),
+      lon = c(-79.5, -77.5),
+      lat = c(36.5, 35.5)
+    )
+    locs_sf <- sf::st_as_sf(locs_df, coords = c("lon", "lat"), crs = 4326)
+
+    testthat::expect_no_error(
+      out <- calculate_edgar(
+        from = edgar,
+        locs = locs_sf,
+        locs_id = "site_id",
+        radius = 0,
+        geom = "sf"
+      )
+    )
+    testthat::expect_true("site_id" %in% names(out))
+    testthat::expect_equal(nrow(out), 2)
+  })
+})
+
+testthat::test_that("calculate_edgar handles empty sf locations", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  withr::with_tempdir({
+    raster_path <- file.path(".", "edgar_2021_total_emi.tif")
+    write_edgar_fixture(raster_path)
+    edgar <- process_edgar(path = raster_path)
+
+    locs_empty <- data.frame(
+      site_id = character(),
+      lon = numeric(),
+      lat = numeric()
+    )
+    locs_empty <- sf::st_as_sf(locs_empty, coords = c("lon", "lat"), crs = 4326)
+
+    testthat::expect_no_error(
+      out <- calculate_edgar(
+        from = edgar,
+        locs = locs_empty,
+        locs_id = "site_id",
+        radius = 0,
+        geom = "sf"
+      )
+    )
+    testthat::expect_s3_class(out, "sf")
+    testthat::expect_equal(nrow(out), 0)
   })
 })
 
