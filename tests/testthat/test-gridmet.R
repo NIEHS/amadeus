@@ -16,8 +16,8 @@ testthat::test_that("download_gridmet (no errors)", {
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/gridmet/")
 
-  # run download function
-  testthat::expect_no_error(
+  # run download function and capture result
+  result <- suppressWarnings(
     download_data(
       dataset_name = "gridmet",
       year = c(year_start, year_end),
@@ -33,33 +33,18 @@ testthat::test_that("download_gridmet (no errors)", {
     dir.exists(directory_to_save)
   )
 
-  # define path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "/gridmet_",
-    year_start,
-    "_",
-    year_end,
-    "_curl_commands.txt"
+  # Assert URL discovery results
+  testthat::expect_type(result, "list")
+  testthat::expect_equal(
+    result$n_files,
+    year_end - year_start + 1L
   )
-
-  # Only proceed with command file tests if it exists
-  if (file.exists(commands_path)) {
-    # import commands
-    commands <- read_commands(commands_path = commands_path)
-    # extract urls
-    urls <- extract_urls(commands = commands, position = 6)
-    # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 2L)
-    # implement unit tests
-    test_download_functions(
-      directory_to_save = directory_to_save,
-      commands_path = commands_path,
-      url_status = url_status
-    )
-    # remove file with commands after test
-    file.remove(commands_path)
-  }
+  testthat::expect_true(
+    all(grepl(
+      "northwestknowledge.net/metdata/data/pr_",
+      result$urls
+    ))
+  )
 
   unlink(directory_to_save, recursive = TRUE)
 })
@@ -76,8 +61,8 @@ testthat::test_that("download_gridmet (single year)", {
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/gridmet/")
 
-  # run download function
-  testthat::expect_no_error(
+  # run download function and capture result
+  result <- suppressWarnings(
     download_data(
       dataset_name = "gridmet",
       year = year,
@@ -93,33 +78,15 @@ testthat::test_that("download_gridmet (single year)", {
     dir.exists(directory_to_save)
   )
 
-  # define path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "/gridmet_",
-    year,
-    "_",
-    year,
-    "_curl_commands.txt"
-  )
-
-  # Only proceed with command file tests if it exists
-  if (file.exists(commands_path)) {
-    # import commands
-    commands <- read_commands(commands_path = commands_path)
-    # extract urls
-    urls <- extract_urls(commands = commands, position = 6)
-    # check HTTP URL status
-    url_status <- check_urls(urls = urls, size = 1L)
-    # implement unit tests
-    test_download_functions(
-      directory_to_save = directory_to_save,
-      commands_path = commands_path,
-      url_status = url_status
+  # Assert URL discovery results
+  testthat::expect_type(result, "list")
+  testthat::expect_equal(result$n_files, 1L)
+  testthat::expect_true(
+    grepl(
+      paste0("northwestknowledge.net/metdata/data/pr_", year, ".nc"),
+      result$urls[[1]]
     )
-    # remove file with commands after test
-    file.remove(commands_path)
-  }
+  )
 
   unlink(directory_to_save, recursive = TRUE)
 })
