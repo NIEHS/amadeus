@@ -357,6 +357,19 @@ download_aqs <-
       directory_to_unzip = directory_to_save,
       unzip = unzip
     )
+    if (isTRUE(unzip)) {
+      sapply(
+        year_sequence,
+        function(year_i) {
+          download_normalize_aqs_unzip(
+            directory_to_unzip = directory_to_save,
+            resolution_temporal = resolution_temporal,
+            parameter_code = parameter_code,
+            year = year_i
+          )
+        }
+      )
+    }
 
     amadeus::download_remove_zips(
       remove = remove_zip,

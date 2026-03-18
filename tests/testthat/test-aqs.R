@@ -100,6 +100,28 @@ testthat::test_that("download_aqs creates proper directory structure", {
   })
 })
 
+testthat::test_that("download_normalize_aqs_unzip flattens nested AQS output", {
+  withr::with_tempdir({
+    data_dir <- file.path(".", "data_files")
+    nested_dir <- file.path(data_dir, "daily_88101_2022")
+    dir.create(nested_dir, recursive = TRUE, showWarnings = FALSE)
+    nested_csv <- file.path(nested_dir, "daily_88101_2022.csv")
+    writeLines("x,y\n1,2", nested_csv)
+
+    amadeus:::download_normalize_aqs_unzip(
+      directory_to_unzip = data_dir,
+      resolution_temporal = "daily",
+      parameter_code = 88101,
+      year = 2022
+    )
+
+    testthat::expect_false(dir.exists(nested_dir))
+    testthat::expect_true(
+      file.exists(file.path(data_dir, "daily_88101_2022.csv"))
+    )
+  })
+})
+
 testthat::test_that("download_aqs handles parameter_code correctly", {
   withr::with_tempdir({
     # Test with specific parameter code
@@ -382,6 +404,57 @@ testthat::test_that("process_aqs", {
   )
 })
 
+testthat::test_that("process_aqs handles mixed AQS date and duration formats", {
+  withr::local_package("data.table")
+  withr::local_package("sf")
+  withr::local_package("dplyr")
+  withr::with_tempdir({
+    aqs_path <- file.path(".", "aqs_mixed_formats.csv")
+    mixed_aqs <- data.frame(
+      State.Code = c(37, 37),
+      County.Code = c(63, 63),
+      Site.Num = c(15, 15),
+      Parameter.Code = c(88101, 42602),
+      POC = c(1, 1),
+      Latitude = c(36.032955, 35.7796),
+      Longitude = c(-78.904037, -78.6382),
+      Datum = c("WGS84", "WGS84"),
+      Parameter.Name = c("PM2.5 - Local Conditions", "Nitrogen dioxide (NO2)"),
+      Sample.Duration = c("1 HOUR", "24 HOUR"),
+      Pollutant.Standard = c("", ""),
+      Date.Local = c("1/2/2022", "2022-01-03"),
+      Units.of.Measure = c("Micrograms/cubic meter (LC)", "Parts per billion"),
+      Event.Type = c("None", "None"),
+      Observation.Count = c(24, 1),
+      Observation.Percent = c(100, 100),
+      Arithmetic.Mean = c(10.5, 12.1),
+      X1st.Max.Value = c(23, 13),
+      X1st.Max.Hour = c(23, 15),
+      AQI = c(NA, NA),
+      Method.Code = c(170, 600),
+      Method.Name = c("Method A", "Method B"),
+      Local.Site.Name = c("Durham Armory", "Raleigh Site"),
+      Address = c("801 STADIUM DRIVE", "123 MAIN ST"),
+      State.Name = c("North Carolina", "North Carolina"),
+      County.Name = c("Durham", "Wake"),
+      City.Name = c("Durham", "Raleigh"),
+      CBSA.Name = c("Durham-Chapel Hill, NC", "Raleigh-Cary, NC"),
+      Date.of.Last.Change = c("2022-09-26", "2022-09-26")
+    )
+    utils::write.csv(mixed_aqs, aqs_path, row.names = FALSE)
+
+    aqs_processed <- process_aqs(
+      path = aqs_path,
+      date = c("2022-01-01", "2022-01-03"),
+      mode = "available-data",
+      return_format = "data.table"
+    )
+
+    testthat::expect_equal(nrow(aqs_processed), 2)
+    testthat::expect_true(all(aqs_processed$time %in% c("2022-01-02", "2022-01-03")))
+  })
+})
+
 testthat::test_that("process_aqs handles WGS84-only input", {
   withr::local_package("terra")
   withr::local_package("data.table")
@@ -527,6 +600,13 @@ testthat::test_that("download_aqs -> process_aqs integration (basic)", {
         info = "Downloaded CSV files should have content"
       )
     }
+
+    testthat::expect_false(
+      dir.exists(file.path(data_dir, "daily_88101_2022"))
+    )
+    testthat::expect_true(
+      file.exists(file.path(data_dir, "daily_88101_2022.csv"))
+    )
   })
 })
 

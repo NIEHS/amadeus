@@ -529,6 +529,64 @@ download_unzip <-
   }
 
 
+#' Normalize AQS unzip layout
+#' @description
+#' Move files from an AQS archive's nested year directory into the main
+#' `data_files` directory when the archive unpacks into a single folder.
+#' @param directory_to_unzip character(1). Directory where files were unzipped.
+#' @param resolution_temporal character(1). Temporal resolution used in the
+#'   AQS archive name.
+#' @param parameter_code integer(1). AQS parameter code used in the archive
+#'   name.
+#' @param year integer(1). Year represented by the archive.
+#' @return NULL; normalizes the AQS data file layout in place
+#' @keywords internal
+#' @noRd
+download_normalize_aqs_unzip <- function(
+  directory_to_unzip,
+  resolution_temporal,
+  parameter_code,
+  year
+) {
+  nested_dir <- file.path(
+    directory_to_unzip,
+    sprintf("%s_%s_%s", resolution_temporal, parameter_code, year)
+  )
+
+  if (!dir.exists(nested_dir)) {
+    return(invisible(NULL))
+  }
+
+  nested_files <- list.files(
+    nested_dir,
+    full.names = TRUE,
+    recursive = FALSE
+  )
+
+  if (length(nested_files) == 0 || any(dir.exists(nested_files))) {
+    return(invisible(NULL))
+  }
+
+  for (nested_file in nested_files) {
+    target_file <- file.path(directory_to_unzip, basename(nested_file))
+    if (!file.exists(target_file)) {
+      moved <- file.rename(nested_file, target_file)
+      if (!isTRUE(moved)) {
+        stop(sprintf(
+          "Failed to normalize AQS unzip layout for %s.",
+          basename(nested_file)
+        ))
+      }
+    } else {
+      unlink(nested_file)
+    }
+  }
+
+  unlink(nested_dir, recursive = TRUE)
+  invisible(NULL)
+}
+
+
 #' Remove zip files
 #' @description
 #' Remove downloaded ".zip" files.

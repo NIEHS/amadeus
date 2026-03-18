@@ -1357,20 +1357,35 @@ process_aqs <-
     POC <- NULL
     Date.Local <- NULL
     Sample.Duration <- NULL
+    Observation.Count <- NULL
 
     date_start <- as.Date(date[1])
     date_end <- as.Date(date[2])
     date_sequence <- seq(date_start, date_end, "day")
-    date_sequence <- as.character(date_sequence)
+
+    parsed_dates <- as.Date(rep(NA_character_, nrow(sites)))
+    raw_dates <- as.character(sites$Date.Local)
+    slash_idx <- grepl("/", raw_dates, fixed = TRUE)
+    dash_idx <- grepl("-", raw_dates, fixed = TRUE)
+    parsed_dates[slash_idx] <- as.Date(raw_dates[slash_idx], format = "%m/%d/%Y")
+    parsed_dates[dash_idx] <- as.Date(raw_dates[dash_idx], format = "%Y-%m-%d")
+    sites$Date.Local <- parsed_dates
+    duration_keep <- startsWith(as.character(sites$Sample.Duration), "24")
+    if ("Observation.Count" %in% names(sites)) {
+      duration_keep <-
+        duration_keep |
+        (!is.na(sites$Observation.Count) & sites$Observation.Count == 24)
+    }
+    sites$duration_keep <- duration_keep
 
     # select relevant fields only
     sites <- sites |>
       dplyr::as_tibble() |>
-      dplyr::filter(as.character(Date.Local) %in% date_sequence) |>
-      dplyr::filter(startsWith(Sample.Duration, "24")) |>
+      dplyr::filter(Date.Local %in% date_sequence) |>
+      dplyr::filter(duration_keep) |>
       dplyr::group_by(site_id) |>
       dplyr::filter(POC == min(POC)) |>
-      dplyr::mutate(time = Date.Local) |>
+      dplyr::mutate(time = as.character(Date.Local)) |>
       dplyr::ungroup()
     col_sel <- c("site_id", "Longitude", "Latitude", "Datum")
     if (mode != "available-data") {
@@ -1432,7 +1447,7 @@ process_aqs <-
 
     if (mode == "date-location") {
       final_sites <-
-        split(date_sequence, date_sequence) |>
+        split(as.character(date_sequence), as.character(date_sequence)) |>
         lapply(function(x) {
           fs_time <- final_sites
           fs_time$time <- x

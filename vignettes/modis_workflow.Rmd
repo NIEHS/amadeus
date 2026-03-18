@@ -52,6 +52,12 @@ if (is.na(durham_hex_path) || durham_hex_path == "") {
 }
 durham_hex <- readRDS(durham_hex_path)
 
+state_basemap <- NULL
+if (requireNamespace('maps', quietly = TRUE)) {
+  state_basemap <- sf::st_as_sf(maps::map('state', plot = FALSE, fill = TRUE))
+  state_basemap <- sf::st_set_crs(state_basemap, 4326)
+}
+
 pick_value_column <- function(x) {
   geom_col <- attr(x, "sf_column")
   excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
@@ -67,16 +73,44 @@ pick_value_column <- function(x) {
 
 plot_points <- function(x, title) {
   value_col <- pick_value_column(x)
-  ggplot2::ggplot(x) +
-    ggplot2::geom_sf(ggplot2::aes(color = !!rlang::sym(value_col)), size = 2) +
+  p <- ggplot2::ggplot()
+  if (!is.null(state_basemap)) {
+    p <- p + ggplot2::geom_sf(
+      data = state_basemap,
+      inherit.aes = FALSE,
+      fill = 'grey97',
+      color = 'grey80',
+      linewidth = 0.2
+    )
+  }
+  p +
+    ggplot2::geom_sf(
+      data = x,
+      ggplot2::aes(color = !!rlang::sym(value_col)),
+      size = 2
+    ) +
     ggplot2::labs(title = title, color = value_col) +
     ggplot2::theme_minimal()
 }
 
 plot_polygons <- function(x, title) {
   value_col <- pick_value_column(x)
-  ggplot2::ggplot(x) +
-    ggplot2::geom_sf(ggplot2::aes(fill = !!rlang::sym(value_col)), color = NA) +
+  p <- ggplot2::ggplot()
+  if (!is.null(state_basemap)) {
+    p <- p + ggplot2::geom_sf(
+      data = state_basemap,
+      inherit.aes = FALSE,
+      fill = 'grey97',
+      color = 'grey80',
+      linewidth = 0.2
+    )
+  }
+  p +
+    ggplot2::geom_sf(
+      data = x,
+      ggplot2::aes(fill = !!rlang::sym(value_col)),
+      color = NA
+    ) +
     ggplot2::labs(title = title, fill = value_col) +
     ggplot2::theme_minimal()
 }

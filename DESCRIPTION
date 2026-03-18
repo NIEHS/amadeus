@@ -43,6 +43,7 @@ Suggests:
     doRNG,
     devtools,
     ggplot2,
+    maps,
     stringr,
     tigris,
     spelling

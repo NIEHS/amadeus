@@ -15,7 +15,6 @@ knitr::opts_chunk$set(
   comment = ""
 )
 library(amadeus)
-library(sf)
 
 live_run <- local({
   force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
@@ -27,173 +26,164 @@ live_run <- local({
   force || !(on_ci || on_cran)
 })
 
-example_points <- data.frame(
-  site_id = c("durham_armory", "bahama"),
-  lon = c(-78.9040, -78.8803),
-  lat = c(36.0330, 36.1702)
+aqs_parameters <- data.frame(
+  pollutant = c("PM2.5", "NO2"),
+  parameter_code = c(88101, 42602)
 )
-example_points_sf <- sf::st_as_sf(
-  example_points,
-  coords = c("lon", "lat"),
-  crs = 4326
-)
-durham_hex_path <- system.file(
-  "extdata", "data_files", "durham_h3_res8.rds", package = "amadeus"
-)
-if (durham_hex_path == "") {
-  source_candidates <- c(
-    file.path("inst", "extdata", "data_files", "durham_h3_res8.rds"),
-    file.path("..", "inst", "extdata", "data_files", "durham_h3_res8.rds")
-  )
-  durham_hex_path <- source_candidates[file.exists(source_candidates)][1]
-}
-if (is.na(durham_hex_path) || durham_hex_path == "") {
-  stop("Could not locate inst/extdata/data_files/durham_h3_res8.rds")
-}
-durham_hex <- readRDS(durham_hex_path)
 
-pick_value_column <- function(x) {
-  geom_col <- attr(x, "sf_column")
-  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
-  candidates <- setdiff(names(x), excluded)
-  if (length(candidates) == 0) {
-    stop("No plottable covariate columns found.")
-  }
-  preferred <- candidates[vapply(x[candidates], function(col) {
-    is.numeric(col) || is.character(col) || is.factor(col)
-  }, logical(1))]
-  if (length(preferred) > 0) preferred[1] else candidates[1]
-}
+aqs_date_window <- c("2022-01-01", "2022-03-31")
 
-plot_points <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot(x) +
-    ggplot2::geom_sf(ggplot2::aes(color = !!rlang::sym(value_col)), size = 2) +
-    ggplot2::labs(title = title, color = value_col) +
-    ggplot2::theme_minimal()
-}
-
-plot_polygons <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot(x) +
-    ggplot2::geom_sf(ggplot2::aes(fill = !!rlang::sym(value_col)), color = NA) +
-    ggplot2::labs(title = title, fill = value_col) +
-    ggplot2::theme_minimal()
+state_basemap <- NULL
+if (requireNamespace('maps', quietly = TRUE)) {
+  state_basemap <- sf::st_as_sf(maps::map('state', plot = FALSE, fill = TRUE))
+  state_basemap <- sf::st_set_crs(state_basemap, 4326)
 }
 ```
 
-This article focuses on the `aqs` workflow in `amadeus`. AQS is primarily used to download and process observed monitoring data and site locations, so the polygon covariate example below demonstrates how those site locations can feed into a downstream EDGAR extraction workflow.
+This article demonstrates a compact AQS workflow focused on outcome data. Because AQS measurements are typically used as dependent variables, the example uses `download_aqs()` and `process_aqs()` directly rather than routing through `calculate_covariates()`.
 
-This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
+This vignette runs its live workflow when rendered locally. The download, processing, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
-Each workflow uses two small example surfaces: `example_points_sf` for point extraction and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
+## Pollutant parameters used in this example
 
-## Download representative requests
+```{r parameter-table}
+aqs_parameters
+```
+
+## Download PM2.5 and NO2 daily AQS data
 
 ```{r download, eval = live_run}
 aqs_dir <- file.path(tempdir(), "aqs_workflow")
-download_data(
-  dataset_name = "aqs",
-  parameter_code = 88101,
-  resolution_temporal = "daily",
-  year = 2022,
-  directory_to_save = aqs_dir,
-  acknowledgement = TRUE,
-  unzip = TRUE,
-  remove_zip = FALSE
-)
-download_data(
-  dataset_name = "aqs",
-  parameter_code = 42602,
-  resolution_temporal = "daily",
-  year = 2022,
-  directory_to_save = aqs_dir,
-  acknowledgement = TRUE,
-  unzip = TRUE,
-  remove_zip = FALSE
-)
 
-edgar_dir <- file.path(tempdir(), "aqs_edgar_workflow")
-download_data(
-  dataset_name = "edgar",
-  species = c("CO", "NOx"),
-  temp_res = "yearly",
-  sector_yearly = "ENE",
-  year_range = 2021,
-  directory_to_save = edgar_dir,
-  acknowledgement = TRUE,
-  unzip = TRUE,
-  remove_zip = FALSE
-)
+for (i in seq_len(nrow(aqs_parameters))) {
+  download_aqs(
+    parameter_code = aqs_parameters$parameter_code[i],
+    resolution_temporal = "daily",
+    year = 2022,
+    directory_to_save = aqs_dir,
+    acknowledgement = TRUE,
+    unzip = TRUE,
+    remove_zip = FALSE
+  )
+}
 ```
 
-## Process one workflow-ready data product
+## Process PM2.5 and NO2 with `process_aqs()`
 
 ```{r process, eval = live_run}
-aqs_files <- list.files(
-  aqs_dir,
-  pattern = "\\.csv$",
-  recursive = TRUE,
-  full.names = TRUE
-)
-aqs_sites <- process_covariates(
-  covariate = "aqs",
-  path = aqs_files,
-  date = c("2022-01-01", "2022-03-31"),
-  mode = "location",
-  return_format = "sf"
+aqs_processed <- lapply(seq_len(nrow(aqs_parameters)), function(i) {
+  csv_path <- file.path(
+    aqs_dir,
+    "data_files",
+    sprintf("daily_%s_2022.csv", aqs_parameters$parameter_code[i])
+  )
+
+  locations <- process_aqs(
+    path = csv_path,
+    date = aqs_date_window,
+    mode = "location",
+    return_format = "sf"
+  )
+  locations$pollutant <- aqs_parameters$pollutant[i]
+
+  daily_data <- process_aqs(
+    path = csv_path,
+    date = aqs_date_window,
+    mode = "available-data",
+    return_format = "data.table"
+  )
+  daily_data[, pollutant := aqs_parameters$pollutant[i]]
+
+  list(
+    locations = locations,
+    daily = daily_data
+  )
+})
+```
+
+## Plot monitor locations with facets for PM2.5 and NO2
+
+```{r prepare-plot-data, eval = live_run}
+aqs_locations <- do.call(
+  rbind,
+  lapply(aqs_processed, `[[`, "locations")
 )
 
-processed_data <- process_covariates(
-  covariate = "edgar",
-  path = list.files(
-    edgar_dir,
-    pattern = "\\.(tif|tiff|nc4?|grd|img)$",
-    recursive = TRUE,
-    full.names = TRUE
-  ),
-  extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
+aqs_time_series <- data.table::rbindlist(
+  lapply(aqs_processed, `[[`, "daily"),
+  fill = TRUE
 )
 ```
 
-## Calculate covariates at points
+```{r plot-locations, eval = live_run, fig.width = 7, fig.height = 8, out.width = "100%", fig.alt = "Faceted map of AQS monitor locations for PM2.5 and NO2."}
+ggplot2::ggplot() +
+  {if (!is.null(state_basemap)) ggplot2::geom_sf(data = state_basemap, inherit.aes = FALSE, fill = 'grey97', color = 'grey80', linewidth = 0.2)} +
+  ggplot2::geom_sf(data = aqs_locations, color = "#0072B2", size = 0.8, alpha = 0.8) +
+  ggplot2::facet_wrap(~ pollutant, ncol = 2) +
+  ggplot2::coord_sf(datum = NA) +
+  ggplot2::labs(
+    title = "AQS monitor locations for PM2.5 and NO2",
+    subtitle = paste(aqs_date_window[1], "to", aqs_date_window[2]),
+    x = NULL,
+    y = NULL
+  ) +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(
+    panel.spacing = grid::unit(1, "lines")
+  )
+```
 
-```{r calculate-points, eval = live_run}
-point_values <- calculate_covariates(
-  covariate = "edgar",
-  from = processed_data,
-  locs = aqs_sites,
-  locs_id = "site_id",
-  radius = 0,
-  geom = "sf"
+## Show an example time series of the downloaded AQS data
+
+```{r process-time-series, eval = live_run}
+aqs_time_series[, time := as.Date(time)]
+
+example_sites <- aqs_time_series[
+  ,
+  .N,
+  by = .(pollutant, site_id)
+][
+  order(pollutant, -N, site_id)
+][
+  ,
+  .SD[1],
+  by = pollutant
+]
+
+aqs_time_series <- merge(
+  aqs_time_series,
+  example_sites[, .(pollutant, site_id)],
+  by = c("pollutant", "site_id")
 )
 ```
 
-## Calculate covariates across Durham County H3 hexagons
-
-```{r calculate-polygons, eval = live_run}
-polygon_values <- calculate_covariates(
-  covariate = "edgar",
-  from = processed_data,
-  locs = durham_hex,
-  locs_id = "h3_id",
-  radius = 0,
-  geom = "sf"
-)
-```
-
-## Visualize the point and polygon outputs
-
-```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("US EPA Air Quality System (AQS)", ": point extraction"))
-```
-
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("US EPA Air Quality System (AQS)", ": Durham H3 polygons"))
+```{r plot-time-series, eval = live_run, fig.width = 7, fig.height = 7.5, out.width = "100%", fig.alt = "Example daily AQS time series for one PM2.5 site and one NO2 site."}
+ggplot2::ggplot(
+  aqs_time_series,
+  ggplot2::aes(x = time, y = Arithmetic.Mean, group = site_id)
+) +
+  ggplot2::geom_line(color = "#D55E00", linewidth = 0.5) +
+  ggplot2::geom_point(color = "#D55E00", size = 0.8) +
+  ggplot2::facet_wrap(~ pollutant, scales = "free_y", ncol = 2) +
+  ggplot2::scale_x_date(
+    date_breaks = "2 weeks",
+    date_labels = "%b %d"
+  ) +
+  ggplot2::labs(
+    title = "Example AQS daily time series",
+    subtitle = "One site per pollutant, chosen from monitors with available observations in this date window",
+    x = "Date",
+    y = "Arithmetic mean"
+  ) +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(
+    panel.spacing = grid::unit(1, "lines"),
+    axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)
+  )
 ```
 
 ## Notes
 
-- `process_aqs()` has no direct `calculate_covariates()` companion route; AQS site locations are often reused as inputs to other covariate workflows.
-- The two example downloads use PM2.5 (`88101`) and ozone (`42602`) to show multi-parameter AQS ingestion.
-- The Durham H3 polygons provide a compact polygon extraction example that is small enough to ship with the package.
+- This workflow treats AQS as outcome data and therefore uses `download_aqs()` and `process_aqs()` directly.
+- The two explicit pollutant parameters are PM2.5 (`88101`) and NO2 (`42602`).
+- `process_aqs(mode = "location")` is useful for monitor maps, while `process_aqs(mode = "available-data")` is useful for daily observational summaries such as time series.
