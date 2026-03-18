@@ -11,22 +11,54 @@ navbar:
     articles:
       text: Articles
       menu:
-        - text: Miscellaneous
+        - text: General Articles
         - text: download_data Function
           href: articles/download_functions.html
         - text: Protected Data Sources
           href: articles/protected_datasets.html
-        - text: Source-Specific Workflows
+        - text: Downloading EPA Daily Data
+          href: articles/epa_download.html
+        - text: Dataset Workflows
+        - text: US EPA Air Quality System (AQS)
+          href: articles/aqs_workflow.html
+        - text: USDA CropScape
+          href: articles/cropscape_workflow.html
+        - text: EDGAR Emissions
+          href: articles/edgar_workflow.html
+        - text: US EPA Ecoregions
+          href: articles/ecoregion_workflow.html
+        - text: NASA GEOS-CF
+          href: articles/geos_workflow.html
+        - text: USGS GMTED2010
+          href: articles/gmted_workflow.html
+        - text: Climatology Lab gridMET
+          href: articles/gridmet_workflow.html
+        - text: NASA SEDAC gROADS
+          href: articles/groads_workflow.html
+        - text: NOAA HMS Smoke
+          href: articles/hms_workflow.html
+        - text: USGS Hydrologic Unit Codes (HUC)
+          href: articles/huc_workflow.html
+        - text: Koppen-Geiger Climate Classes
+          href: articles/koppen_workflow.html
+        - text: NASA MERRA-2
+          href: articles/merra2_workflow.html
+        - text: NASA MODIS
+          href: articles/modis_workflow.html
+        - text: NOAA NARR
+          href: articles/narr_workflow.html
+        - text: US EPA National Emissions Inventory (NEI)
+          href: articles/nei_workflow.html
+        - text: MRLC National Land Cover Database (NLCD)
+          href: articles/nlcd_workflow.html
+        - text: NASA SEDAC Population Density
+          href: articles/population_workflow.html
+        - text: PRISM Climate Data
+          href: articles/prism_workflow.html
         - text: Climatology Lab TerraClimate
           href: articles/terraclimate_workflow.html
-        - text: Climatology Lab GridMET
-          href: articles/gridmet_workflow.html
-        - text: NASA Moderate Resolution Imaging Spectroradiometer (MODIS)
-          href: articles/modis_workflow.html
-        - text: NOAA North American Regional Reanalysis (NARR)
-          href: articles/narr_workflow.html
-        - text: US EPA Air Quality System (AQS)
-          href: articles/epa_download.html
+        - text: US EPA Toxic Release Inventory (TRI)
+          href: articles/tri_workflow.html
 
 reference:
 - subtitle: Download
@@ -61,8 +93,24 @@ articles:
   contents:
   - download_functions
   - protected_datasets
-  - terraclimate_workflow
+  - epa_download
+  - aqs_workflow
+  - cropscape_workflow
+  - edgar_workflow
+  - ecoregion_workflow
+  - geos_workflow
+  - gmted_workflow
   - gridmet_workflow
+  - groads_workflow
+  - hms_workflow
+  - huc_workflow
+  - koppen_workflow
+  - merra2_workflow
   - modis_workflow
   - narr_workflow
-  - epa_download
+  - nei_workflow
+  - nlcd_workflow
+  - population_workflow
+  - prism_workflow
+  - terraclimate_workflow
+  - tri_workflow

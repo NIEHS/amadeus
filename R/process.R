@@ -1405,15 +1405,20 @@ process_aqs <-
     # NAD83 to WGS84
     sites_v_nad <-
       sites_v[sites_v$Datum == "NAD83", ]
-    sites_v_nad <-
-      terra::vect(
+    if (nrow(sites_v_nad) > 0) {
+      sites_v_nad <- sf::st_as_sf(
         sites_v_nad,
-        keepgeom = TRUE,
+        remove = FALSE,
+        coords = c("lon", "lat"),
         crs = "EPSG:4269"
       )
-    sites_v_nad <- terra::project(sites_v_nad, "EPSG:4326")
+      sites_v_nad <- sf::st_transform(sites_v_nad, "EPSG:4326")
+      sites_v_nad$lon <- sf::st_coordinates(sites_v_nad)[, 1]
+      sites_v_nad$lat <- sf::st_coordinates(sites_v_nad)[, 2]
+      sites_v_nad <- sf::st_drop_geometry(sites_v_nad)
+      sites_v_nad <- data.table::as.data.table(sites_v_nad)
+    }
     # postprocessing: combine WGS84 and new WGS84 records
-    sites_v_nad <- as.data.frame(sites_v_nad)
     sites_v_wgs <- sites_v[sites_v$Datum == "WGS84"]
     final_sites <- data.table::rbindlist(
       list(sites_v_wgs, sites_v_nad),
@@ -1570,7 +1575,11 @@ process_edgar <- function(
       }
 
       if (terra::nlyr(data) == 1) {
-        year_gregexpr <- gregexpr("(?<!\\d)\\d{4}(?!\\d)", basename(pth), perl = TRUE)[[1]]
+        year_gregexpr <- gregexpr(
+          "(?<!\\d)\\d{4}(?!\\d)",
+          basename(pth),
+          perl = TRUE
+        )[[1]]
         if (year_gregexpr[1] != -1) {
           year_match <- regmatches(
             basename(pth),

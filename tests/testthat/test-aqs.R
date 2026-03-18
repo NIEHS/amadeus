@@ -382,6 +382,42 @@ testthat::test_that("process_aqs", {
   )
 })
 
+testthat::test_that("process_aqs handles WGS84-only input", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  withr::local_package("sf")
+  withr::local_package("dplyr")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  withr::with_tempdir({
+    aqs_wgs84 <- data.frame(
+      State.Code = c(37, 37),
+      County.Code = c(63, 63),
+      Site.Num = c(1, 2),
+      Parameter.Code = c(88101, 88101),
+      Date.Local = c("2022-02-10", "2022-02-11"),
+      Sample.Duration = c("24-HR BLK AVG", "24-HR BLK AVG"),
+      POC = c(1, 1),
+      Longitude = c(-78.9040, -78.8803),
+      Latitude = c(36.0330, 36.1702),
+      Datum = c("WGS84", "WGS84")
+    )
+    csv_path <- file.path(".", "aqs_wgs84_only.csv")
+    utils::write.csv(aqs_wgs84, csv_path, row.names = FALSE)
+
+    testthat::expect_no_error(
+      out_sf <- process_aqs(
+        path = csv_path,
+        date = c("2022-02-01", "2022-02-28"),
+        mode = "location",
+        return_format = "sf"
+      )
+    )
+    testthat::expect_s3_class(out_sf, "sf")
+    testthat::expect_equal(nrow(out_sf), 2)
+  })
+})
+
 testthat::test_that("download_aqs remove_command deprecation warning", {
   testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,

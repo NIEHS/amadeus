@@ -1,8 +1,8 @@
 ---
-title: "Climatology Lab TerraClimate"
+title: "USGS GMTED2010"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Climatology Lab TerraClimate}
+  %\VignetteIndexEntry{USGS GMTED2010}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "`r Sys.Date()`"
@@ -82,7 +82,7 @@ plot_polygons <- function(x, title) {
 }
 ```
 
-This article demonstrates a compact workflow for Climatology Lab TerraClimate data.
+This article demonstrates a compact workflow for GMTED2010 terrain products.
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
@@ -91,29 +91,36 @@ Each workflow uses two small example surfaces: `example_points_sf` for point ext
 ## Download representative requests
 
 ```{r download, eval = live_run}
-directory_to_save <- file.path(tempdir(), "terraclimate_workflow")
+directory_to_save <- file.path(tempdir(), "gmted_workflow")
 download_data(
-  dataset_name = "terraclimate",
-  variables = c("Precipitation", "Maximum Temperature"),
-  year = 2019,
+  dataset_name = "gmted",
+  statistic = "Breakline Emphasis",
+  resolution = "7.5 arc-seconds",
   directory_to_save = directory_to_save,
-  acknowledgement = TRUE
+  acknowledgement = TRUE,
+  unzip = TRUE,
+  remove_zip = FALSE
+)
+download_data(
+  dataset_name = "gmted",
+  statistic = "Mean Statistic",
+  resolution = "15 arc-seconds",
+  directory_to_save = file.path(directory_to_save, "mean_15s"),
+  acknowledgement = TRUE,
+  unzip = TRUE,
+  remove_zip = FALSE
 )
 ```
 
 ## Process one workflow-ready data product
 
 ```{r process, eval = live_run}
+gmted_dirs <- list.dirs(directory_to_save, recursive = TRUE, full.names = TRUE)
+gmted_path <- gmted_dirs[grepl("be75_grd$", gmted_dirs)][1]
 processed_data <- process_covariates(
-  covariate = "terraclimate",
-  variable = "ppt",
-  date = c("2019-01-01", "2019-02-01"),
-  path = dirname(list.files(
-    directory_to_save,
-    pattern = "\\.nc$",
-    recursive = TRUE,
-    full.names = TRUE
-  )[1]),
+  covariate = "gmted",
+  variable = c("Breakline Emphasis", "7.5 arc-seconds"),
+  path = gmted_path,
   extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
 )
 ```
@@ -122,7 +129,7 @@ processed_data <- process_covariates(
 
 ```{r calculate-points, eval = live_run}
 point_values <- calculate_covariates(
-  covariate = "terraclimate",
+  covariate = "gmted",
   from = processed_data,
   locs = example_points_sf,
   locs_id = "site_id",
@@ -136,7 +143,7 @@ point_values <- calculate_covariates(
 
 ```{r calculate-polygons, eval = live_run}
 polygon_values <- calculate_covariates(
-  covariate = "terraclimate",
+  covariate = "gmted",
   from = processed_data,
   locs = durham_hex,
   locs_id = "h3_id",
@@ -149,14 +156,14 @@ polygon_values <- calculate_covariates(
 ## Visualize the point and polygon outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("Climatology Lab TerraClimate", ": point extraction"))
+plot_points(point_values, paste0("USGS GMTED2010", ": point extraction"))
 ```
 
 ```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("Climatology Lab TerraClimate", ": Durham H3 polygons"))
+plot_polygons(polygon_values, paste0("USGS GMTED2010", ": Durham H3 polygons"))
 ```
 
 ## Notes
 
-- The download request now includes both precipitation and maximum temperature so local runs cover more than one TerraClimate variable.
-- Processing still focuses on `ppt` because monthly precipitation remains the clearest minimal working example for the dataset.
+- GMTED download requests are shown for two statistic/resolution combinations so the vignette covers more than one terrain surface.
+- Processing still focuses on the 7.5 arc-second breakline product because it is the most detailed of the two example requests.

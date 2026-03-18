@@ -724,7 +724,7 @@ calculate_ecoregion <-
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param scale character(1). Scale expression to be applied to the raw values.
-#' It is crucial that users review the technical documentatio of the MODIS
+#' It is crucial that users review the technical documentation of the MODIS
 #' product
 #' they are using to ensure proper scale.
 #' An example for the MOD11A1 product's LST_Day_1km variable (land surface
@@ -2707,19 +2707,24 @@ calculate_prism <- function(
   )
 
   # extract
-  if (radius == 0) {
-    # use terra::extract
+  is_polygon_locs <- inherits(sites_e, "SpatVector") &&
+    !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
+  if (radius == 0 && !is_polygon_locs) {
+    # use terra::extract for point locations
     sites_extracted <- terra::extract(from, sites_e)
     sites_extracted <- sites_extracted[, -1, drop = FALSE]
   } else {
-    # use exactextractr::exact_extract
+    # use exactextractr::exact_extract for polygon locations and buffered points
     if (inherits(sites_e, "SpatVector")) {
       sites_e_sf <- sf::st_as_sf(sites_e)
     } else {
       sites_e_sf <- sites_e
     }
-    # Buffer points
-    sites_e_buf <- sf::st_buffer(sites_e_sf, dist = radius)
+    sites_e_buf <- if (radius > 0) {
+      sf::st_buffer(sites_e_sf, dist = radius)
+    } else {
+      sites_e_sf
+    }
     sites_extracted <- exactextractr::exact_extract(
       from,
       sites_e_buf,
@@ -2731,12 +2736,14 @@ calculate_prism <- function(
   }
 
   # clean up names if they are from exact_extract (prefix "mean.")
-  if (radius > 0) {
-    colnames(sites_extracted) <- gsub(
-      "^mean\\.",
-      "",
-      colnames(sites_extracted)
-    )
+  if (radius > 0 || is_polygon_locs) {
+    exact_names <- colnames(sites_extracted)
+    if (length(exact_names) == 1 && identical(exact_names, "mean")) {
+      exact_names <- names(from)[1]
+    } else {
+      exact_names <- gsub("^mean\\.", "", exact_names)
+    }
+    colnames(sites_extracted) <- exact_names
   }
 
   # append radius
@@ -2745,10 +2752,16 @@ calculate_prism <- function(
 
   # Combine with IDs
   sites_extracted[[locs_id]] <- sites_id[, 1]
+  if (
+    "geometry" %in% names(sites_id) && !"geometry" %in% names(sites_extracted)
+  ) {
+    sites_extracted$geometry <- sites_id$geometry
+  }
   # reorder to put ID first
   sites_extracted <- sites_extracted[, c(
     locs_id,
-    setdiff(names(sites_extracted), locs_id)
+    if ("geometry" %in% names(sites_extracted)) "geometry",
+    setdiff(names(sites_extracted), c(locs_id, "geometry"))
   )]
 
   sites_return <- amadeus::calc_return_locs(
@@ -2821,7 +2834,9 @@ calculate_edgar <- function(
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
 
-  if (radius == 0) {
+  is_polygon_locs <- inherits(sites_e, "SpatVector") &&
+    !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
+  if (radius == 0 && !is_polygon_locs) {
     sites_extracted <- terra::extract(from, sites_e)
     sites_extracted <- sites_extracted[, -1, drop = FALSE]
   } else {
@@ -2836,15 +2851,28 @@ calculate_edgar <- function(
       progress = FALSE,
       ...
     )
-    names(sites_extracted) <- gsub("^mean\\.", "", names(sites_extracted))
+    exact_names <- names(sites_extracted)
+    if (length(exact_names) == 1 && identical(exact_names, "mean")) {
+      exact_names <- names(from)[1]
+    } else {
+      exact_names <- gsub("^mean\\.", "", exact_names)
+    }
+    names(sites_extracted) <- exact_names
   }
 
   names(sites_extracted) <- sprintf("%s_%d", names(sites_extracted), radius)
   sites_extracted[[locs_id]] <- sites_id[, 1]
-  sites_extracted <- sites_extracted[, c(
+  if (
+    "geometry" %in% names(sites_id) && !"geometry" %in% names(sites_extracted)
+  ) {
+    sites_extracted$geometry <- sites_id$geometry
+  }
+  ordered_cols <- c(
     locs_id,
-    setdiff(names(sites_extracted), locs_id)
-  )]
+    if ("geometry" %in% names(sites_extracted)) "geometry",
+    setdiff(names(sites_extracted), c(locs_id, "geometry"))
+  )
+  sites_extracted <- sites_extracted[, ordered_cols]
 
   sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
@@ -2923,8 +2951,10 @@ calculate_cropscape <- function(
   )
 
   # extract
-  if (radius == 0) {
-    # terra::extract for point
+  is_polygon_locs <- inherits(sites_e, "SpatVector") &&
+    !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
+  if (radius == 0 && !is_polygon_locs) {
+    # terra::extract for point locations
     sites_extracted <- terra::extract(from, sites_e)
     sites_extracted <- sites_extracted[, -1, drop = FALSE]
     # rename
@@ -2935,7 +2965,11 @@ calculate_cropscape <- function(
     } else {
       sites_e_sf <- sites_e
     }
-    sites_e_buf <- sf::st_buffer(sites_e_sf, dist = radius)
+    sites_e_buf <- if (radius > 0) {
+      sf::st_buffer(sites_e_sf, dist = radius)
+    } else {
+      sites_e_sf
+    }
 
     # fractions
     sites_extracted <- exactextractr::exact_extract(
@@ -2955,9 +2989,15 @@ calculate_cropscape <- function(
   }
 
   sites_extracted[[locs_id]] <- sites_id[, 1]
+  if (
+    "geometry" %in% names(sites_id) && !"geometry" %in% names(sites_extracted)
+  ) {
+    sites_extracted$geometry <- sites_id$geometry
+  }
   sites_extracted <- sites_extracted[, c(
     locs_id,
-    setdiff(names(sites_extracted), locs_id)
+    if ("geometry" %in% names(sites_extracted)) "geometry",
+    setdiff(names(sites_extracted), c(locs_id, "geometry"))
   )]
 
   sites_return <- amadeus::calc_return_locs(

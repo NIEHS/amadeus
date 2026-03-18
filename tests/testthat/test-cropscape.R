@@ -116,6 +116,46 @@ testthat::test_that("download_cropscape mock download with hash", {
   })
 })
 
+testthat::test_that("download_cropscape extracts archives into per-file directories", {
+  extracted <- list()
+  testthat::local_mocked_bindings(
+    archive_extract = function(archive, file = NULL, dir = ".", ...) {
+      extracted[[length(extracted) + 1]] <<- list(archive = archive, dir = dir)
+      invisible(NULL)
+    },
+    .package = "archive"
+  )
+  testthat::local_mocked_bindings(
+    download_run_method = function(urls, destfiles, ...) {
+      vapply(destfiles, file.create, logical(1))
+      invisible(NULL)
+    },
+    download_hash = function(hash, dir) NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    suppressWarnings(
+      suppressMessages(
+        download_cropscape(
+          year = 2020,
+          source = "GMU",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          unzip = TRUE,
+          show_progress = FALSE
+        )
+      )
+    )
+    testthat::expect_length(extracted, 1)
+    testthat::expect_true(dir.exists(extracted[[1]]$dir))
+    testthat::expect_match(
+      basename(extracted[[1]]$archive),
+      "2020_cdls\\.tar\\.gz$"
+    )
+    testthat::expect_match(basename(extracted[[1]]$dir), "2020_cdls$")
+  })
+})
+
 ################################################################################
 ##### process_cropscape
 testthat::test_that("process_cropscape", {

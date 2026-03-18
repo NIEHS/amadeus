@@ -1,8 +1,8 @@
 ---
-title: "Climatology Lab TerraClimate"
+title: "US EPA Toxic Release Inventory (TRI)"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Climatology Lab TerraClimate}
+  %\VignetteIndexEntry{US EPA Toxic Release Inventory (TRI)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "`r Sys.Date()`"
@@ -82,7 +82,7 @@ plot_polygons <- function(x, title) {
 }
 ```
 
-This article demonstrates a compact workflow for Climatology Lab TerraClimate data.
+This article demonstrates a compact workflow for EPA TRI facility emissions data.
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
@@ -91,12 +91,19 @@ Each workflow uses two small example surfaces: `example_points_sf` for point ext
 ## Download representative requests
 
 ```{r download, eval = live_run}
-directory_to_save <- file.path(tempdir(), "terraclimate_workflow")
+directory_to_save <- file.path(tempdir(), "tri_workflow")
 download_data(
-  dataset_name = "terraclimate",
-  variables = c("Precipitation", "Maximum Temperature"),
-  year = 2019,
+  dataset_name = "tri",
+  year = c(2023L, 2024L),
+  jurisdiction = "US",
   directory_to_save = directory_to_save,
+  acknowledgement = TRUE
+)
+download_data(
+  dataset_name = "tri",
+  year = 2024L,
+  jurisdiction = "NC",
+  directory_to_save = file.path(directory_to_save, "nc_only"),
   acknowledgement = TRUE
 )
 ```
@@ -105,15 +112,9 @@ download_data(
 
 ```{r process, eval = live_run}
 processed_data <- process_covariates(
-  covariate = "terraclimate",
-  variable = "ppt",
-  date = c("2019-01-01", "2019-02-01"),
-  path = dirname(list.files(
-    directory_to_save,
-    pattern = "\\.nc$",
-    recursive = TRUE,
-    full.names = TRUE
-  )[1]),
+  covariate = "tri",
+  path = directory_to_save,
+  year = 2024,
   extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
 )
 ```
@@ -122,12 +123,11 @@ processed_data <- process_covariates(
 
 ```{r calculate-points, eval = live_run}
 point_values <- calculate_covariates(
-  covariate = "terraclimate",
+  covariate = "tri",
   from = processed_data,
   locs = example_points_sf,
   locs_id = "site_id",
-  radius = 0,
-  fun = "mean",
+  radius = 5000,
   geom = "sf"
 )
 ```
@@ -136,12 +136,11 @@ point_values <- calculate_covariates(
 
 ```{r calculate-polygons, eval = live_run}
 polygon_values <- calculate_covariates(
-  covariate = "terraclimate",
+  covariate = "tri",
   from = processed_data,
   locs = durham_hex,
   locs_id = "h3_id",
-  radius = 0,
-  fun = "mean",
+  radius = 5000,
   geom = "sf"
 )
 ```
@@ -149,14 +148,14 @@ polygon_values <- calculate_covariates(
 ## Visualize the point and polygon outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("Climatology Lab TerraClimate", ": point extraction"))
+plot_points(point_values, paste0("US EPA Toxic Release Inventory (TRI)", ": point extraction"))
 ```
 
 ```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("Climatology Lab TerraClimate", ": Durham H3 polygons"))
+plot_polygons(polygon_values, paste0("US EPA Toxic Release Inventory (TRI)", ": Durham H3 polygons"))
 ```
 
 ## Notes
 
-- The download request now includes both precipitation and maximum temperature so local runs cover more than one TerraClimate variable.
-- Processing still focuses on `ppt` because monthly precipitation remains the clearest minimal working example for the dataset.
+- The vignette now shows both a multi-year national TRI request and a state-specific download for North Carolina.
+- TRI calculations usually benefit from positive buffer radii so nearby facilities contribute to the local summary.
