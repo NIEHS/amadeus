@@ -34,8 +34,8 @@ downloaded files. Default is \code{FALSE}.}
 \item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData
 authentication token. Required for NASA EarthData datasets: \code{"geos"},
 \code{"merra2"}, \code{"modis"}, \code{"sedac_groads"} / \code{"groads"}, and
-\code{"sedac_population"} / \code{"population"}. Can be a token string, a path
-to a file containing the token, or \code{NULL} to read from the
+\code{"sedac_population"} / \code{"population"}. Can be a token string, a path to a
+file containing the token, or \code{NULL} to read from the
 \code{NASA_EARTHDATA_TOKEN} environment variable. Ignored for datasets that
 do not use NASA EarthData authentication.}
 

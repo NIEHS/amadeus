@@ -35,7 +35,7 @@ aqs_sample_path <- aqs_sample_path[file.exists(aqs_sample_path)][1]
 if (is.na(aqs_sample_path) || aqs_sample_path == "") {
   stop("Could not locate tests/testdata/aqs/aqs-location-sample.rds")
 }
-example_points_sf <- sf::st_as_sf(readRDS(aqs_sample_path))
+example_points_sf <- sf::st_transform(sf::st_as_sf(readRDS(aqs_sample_path)), 4326)
 durham_hex_path <- system.file(
   "extdata", "data_files", "durham_h3_res8.rds", package = "amadeus"
 )
@@ -50,11 +50,11 @@ if (is.na(durham_hex_path) || durham_hex_path == "") {
   stop("Could not locate inst/extdata/data_files/durham_h3_res8.rds")
 }
 durham_hex <- readRDS(durham_hex_path)
-durham_hex_sf <- sf::st_as_sf(durham_hex)
+durham_hex_sf <- sf::st_transform(sf::st_as_sf(durham_hex), 4326)
 
 workflow_bbox <- sf::st_bbox(c(
   sf::st_geometry(example_points_sf),
-  sf::st_geometry(sf::st_transform(durham_hex_sf, 4326))
+  sf::st_geometry(durham_hex_sf)
 ))
 workflow_extent_wgs84 <- sf::st_as_sfc(sf::st_bbox(c(
   xmin = workflow_bbox[["xmin"]] - 0.15,
