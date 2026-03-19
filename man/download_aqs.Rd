@@ -22,7 +22,8 @@ download_aqs(
 )
 }
 \arguments{
-\item{parameter_code}{integer(1). EPA pollutant parameter code.}
+\item{parameter_code}{integer(1). EPA pollutant parameter code. See
+Details for a short list of common codes.}
 
 \item{resolution_temporal}{character(1). Currently only "daily" is supported.}
 
@@ -59,6 +60,21 @@ The \code{download_aqs()} function accesses and downloads Air Quality
 System (AQS) data from the U.S. Environmental Protection Agency's (EPA)
 Pre-Generated Data Files.
 }
+\details{
+Common AQS parameter codes include:
+\itemize{
+\item \code{88101} — PM2.5 - Local Conditions
+\item \code{88502} — Acceptable PM2.5 AQI & Speciation Mass
+\item \code{81102} — PM10 Total 0-10um STP
+\item \code{44201} — Ozone
+\item \code{42602} — Nitrogen dioxide (NO2)
+\item \code{42401} — Sulfur dioxide (SO2)
+\item \code{42101} — Carbon monoxide
+}
+
+This list is not exhaustive; for the full official table, see the linked EPA
+AQS parameter code table.
+}
 \note{
 AQS data does not require authentication.
 AQS measurements are generally intended for use as dependent variables, so
@@ -78,6 +94,9 @@ download_aqs(
 }
 \references{
 \insertRef{data_usepa2023airdata}{amadeus}
+}
+\seealso{
+\href{https://aqs.epa.gov/aqsweb/documents/codetables/parameters.csv}{EPA AQS Parameter Codes}
 }
 \author{
 Mariana Kassien, Insang Song, Mitchell Manware

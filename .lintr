@@ -5,8 +5,26 @@ linters: linters_with_defaults(
   )
 exclusions: list(
     "tests/testthat/",
+    "inst/migration-to-httr-guide.R",
+    "vignettes/",
+    "vignettes/aqs_workflow.Rmd",
+    "vignettes/cropscape_workflow.Rmd",
+    "vignettes/ecoregion_workflow.Rmd",
+    "vignettes/edgar_workflow.Rmd",
+    "vignettes/geos_workflow.Rmd",
+    "vignettes/gmted_workflow.Rmd",
     "vignettes/terraclimate_workflow.Rmd",
     "vignettes/gridmet_workflow.Rmd",
     "vignettes/narr_workflow.Rmd",
-    "vignettes/modis_workflow.Rmd"
+    "vignettes/groads_workflow.Rmd",
+    "vignettes/hms_workflow.Rmd",
+    "vignettes/huc_workflow.Rmd",
+    "vignettes/koppen_workflow.Rmd",
+    "vignettes/merra2_workflow.Rmd",
+    "vignettes/modis_workflow.Rmd",
+    "vignettes/nei_workflow.Rmd",
+    "vignettes/nlcd_workflow.Rmd",
+    "vignettes/population_workflow.Rmd",
+    "vignettes/prism_workflow.Rmd",
+    "vignettes/tri_workflow.Rmd"
   )

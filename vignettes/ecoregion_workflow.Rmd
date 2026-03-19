@@ -27,100 +27,24 @@ live_run <- local({
   force || !(on_ci || on_cran)
 })
 
-example_points <- data.frame(
-  site_id = c("durham_armory", "bahama"),
-  lon = c(-78.9040, -78.8803),
-  lat = c(36.0330, 36.1702)
+aqs_sample_path <- c(
+  file.path("tests", "testdata", "aqs", "aqs-location-sample.rds"),
+  file.path("..", "tests", "testdata", "aqs", "aqs-location-sample.rds")
 )
-example_points_sf <- sf::st_as_sf(
-  example_points,
-  coords = c("lon", "lat"),
-  crs = 4326
-)
-durham_hex_path <- system.file(
-  "extdata", "data_files", "durham_h3_res8.rds", package = "amadeus"
-)
-if (durham_hex_path == "") {
-  source_candidates <- c(
-    file.path("inst", "extdata", "data_files", "durham_h3_res8.rds"),
-    file.path("..", "inst", "extdata", "data_files", "durham_h3_res8.rds")
-  )
-  durham_hex_path <- source_candidates[file.exists(source_candidates)][1]
+aqs_sample_path <- aqs_sample_path[file.exists(aqs_sample_path)][1]
+if (is.na(aqs_sample_path) || aqs_sample_path == "") {
+  stop("Could not locate tests/testdata/aqs/aqs-location-sample.rds")
 }
-if (is.na(durham_hex_path) || durham_hex_path == "") {
-  stop("Could not locate inst/extdata/data_files/durham_h3_res8.rds")
-}
-durham_hex <- readRDS(durham_hex_path)
+example_points_sf <- sf::st_as_sf(readRDS(aqs_sample_path))
 
-state_basemap <- NULL
-if (requireNamespace('maps', quietly = TRUE)) {
-  state_basemap <- sf::st_as_sf(maps::map('state', plot = FALSE, fill = TRUE))
-  state_basemap <- sf::st_set_crs(state_basemap, 4326)
-}
 
-pick_value_column <- function(x) {
-  geom_col <- attr(x, "sf_column")
-  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
-  candidates <- setdiff(names(x), excluded)
-  if (length(candidates) == 0) {
-    stop("No plottable covariate columns found.")
-  }
-  preferred <- candidates[vapply(x[candidates], function(col) {
-    is.numeric(col) || is.character(col) || is.factor(col)
-  }, logical(1))]
-  if (length(preferred) > 0) preferred[1] else candidates[1]
-}
-
-plot_points <- function(x, title) {
-  value_col <- pick_value_column(x)
-  p <- ggplot2::ggplot()
-  if (!is.null(state_basemap)) {
-    p <- p + ggplot2::geom_sf(
-      data = state_basemap,
-      inherit.aes = FALSE,
-      fill = 'grey97',
-      color = 'grey80',
-      linewidth = 0.2
-    )
-  }
-  p +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(color = !!rlang::sym(value_col)),
-      size = 2
-    ) +
-    ggplot2::labs(title = title, color = value_col) +
-    ggplot2::theme_minimal()
-}
-
-plot_polygons <- function(x, title) {
-  value_col <- pick_value_column(x)
-  p <- ggplot2::ggplot()
-  if (!is.null(state_basemap)) {
-    p <- p + ggplot2::geom_sf(
-      data = state_basemap,
-      inherit.aes = FALSE,
-      fill = 'grey97',
-      color = 'grey80',
-      linewidth = 0.2
-    )
-  }
-  p +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(fill = !!rlang::sym(value_col)),
-      color = NA
-    ) +
-    ggplot2::labs(title = title, fill = value_col) +
-    ggplot2::theme_minimal()
-}
 ```
 
 This article demonstrates a compact workflow for the US EPA ecoregion layers distributed through `amadeus`. The download is a single national layer that contains the multiple ecoregion levels used during point and polygon extraction.
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
-Each workflow uses two small example surfaces: `example_points_sf` for point extraction and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
+Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
 ## Download representative requests
 
@@ -138,23 +62,22 @@ download_data(
 ## Process one workflow-ready data product
 
 ```{r process, eval = live_run}
+ecoregion_path <- list.files(
+  directory_to_save,
+  pattern = "\\.(gpkg|shp)$",
+  recursive = TRUE,
+  full.names = TRUE
+)[1]
 processed_data <- process_covariates(
   covariate = "ecoregion",
-  path = list.files(
-    directory_to_save,
-    pattern = "\\.(gpkg|shp)$",
-    recursive = TRUE,
-    full.names = TRUE
-  )[1],
-  extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
+  path = ecoregion_path
 )
 ```
 
 ## Calculate covariates at points
 
 ```{r calculate-points, eval = live_run}
-point_values <- calculate_covariates(
-  covariate = "ecoregion",
+point_values <- calculate_ecoregion(
   from = processed_data,
   locs = example_points_sf,
   locs_id = "site_id",
@@ -162,29 +85,18 @@ point_values <- calculate_covariates(
 )
 ```
 
-## Calculate covariates across Durham County H3 hexagons
 
-```{r calculate-polygons, eval = live_run}
-polygon_values <- calculate_covariates(
-  covariate = "ecoregion",
-  from = processed_data,
-  locs = durham_hex,
-  locs_id = "h3_id",
-  geom = "sf"
-)
+
+## Visualize the outputs
+Print the output from calculate_ecoregion. The result is a binary(dummy) variable where each location is 1 if it falls in the specified ecoregion, and 0 otherwise. 
+
+```{r calculated data, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
+print(point_values)
+
 ```
 
-## Visualize the point and polygon outputs
-
-```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("US EPA Ecoregions", ": point extraction"))
-```
-
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("US EPA Ecoregions", ": Durham H3 polygons"))
-```
 
 ## Notes
 
 - EPA ecoregions are distributed as a single vector layer, so one download covers both the level-2 and level-3 classifications used downstream.
-- Cropping during `process_covariates()` keeps the working layer small and makes local live renders easier to manage.
+- The example points come from a small saved subset of AQS monitor locations. Pass an `extent` argument to `process_covariates()` if you want to restrict processing to a smaller region around those sites.

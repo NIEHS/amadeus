@@ -122,6 +122,72 @@ testthat::test_that("download_normalize_aqs_unzip flattens nested AQS output", {
   })
 })
 
+testthat::test_that("download_normalize_aqs_unzip no-ops when nested dir is absent", {
+  withr::with_tempdir({
+    data_dir <- file.path(".", "data_files")
+    dir.create(data_dir, recursive = TRUE, showWarnings = FALSE)
+
+    testthat::expect_invisible(
+      amadeus:::download_normalize_aqs_unzip(
+        directory_to_unzip = data_dir,
+        resolution_temporal = "daily",
+        parameter_code = 88101,
+        year = 2022
+      )
+    )
+    testthat::expect_false(
+      dir.exists(file.path(data_dir, "daily_88101_2022"))
+    )
+  })
+})
+
+testthat::test_that("download_normalize_aqs_unzip no-ops without nested files", {
+  withr::with_tempdir({
+    data_dir <- file.path(".", "data_files")
+    dir.create(data_dir, recursive = TRUE, showWarnings = FALSE)
+    nested_dir <- file.path(data_dir, "daily_88101_2022")
+    dir.create(file.path(nested_dir, "subdir"), recursive = TRUE, showWarnings = FALSE)
+
+    testthat::expect_invisible(
+      amadeus:::download_normalize_aqs_unzip(
+        directory_to_unzip = data_dir,
+        resolution_temporal = "daily",
+        parameter_code = 88101,
+        year = 2022
+      )
+    )
+
+    testthat::expect_true(dir.exists(nested_dir))
+    testthat::expect_true(dir.exists(file.path(nested_dir, "subdir")))
+  })
+})
+
+testthat::test_that("download_normalize_aqs_unzip skips existing target files", {
+  withr::with_tempdir({
+    data_dir <- file.path(".", "data_files")
+    nested_dir <- file.path(data_dir, "daily_88101_2022")
+    dir.create(nested_dir, recursive = TRUE, showWarnings = FALSE)
+    target_csv <- file.path(data_dir, "daily_88101_2022.csv")
+    nested_csv <- file.path(nested_dir, "daily_88101_2022.csv")
+    writeLines("existing", target_csv)
+    writeLines("nested", nested_csv)
+
+    testthat::expect_invisible(
+      amadeus:::download_normalize_aqs_unzip(
+        directory_to_unzip = data_dir,
+        resolution_temporal = "daily",
+        parameter_code = 88101,
+        year = 2022
+      )
+    )
+
+    testthat::expect_true(file.exists(target_csv))
+    testthat::expect_false(file.exists(nested_csv))
+    testthat::expect_false(dir.exists(nested_dir))
+    testthat::expect_equal(readLines(target_csv), "existing")
+  })
+})
+
 testthat::test_that("download_aqs handles parameter_code correctly", {
   withr::with_tempdir({
     # Test with specific parameter code
