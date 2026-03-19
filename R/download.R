@@ -379,7 +379,7 @@ download_aqs <-
       sapply(
         year_sequence,
         function(year_i) {
-          amadeus:::download_normalize_aqs_unzip(
+          download_normalize_aqs_unzip( # nolint: object_usage_linter
             directory_to_unzip = directory_to_save,
             resolution_temporal = resolution_temporal,
             parameter_code = parameter_code,

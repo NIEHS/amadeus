@@ -33,11 +33,6 @@ aqs_parameters <- data.frame(
 
 aqs_date_window <- c("2022-01-01", "2022-03-31")
 
-state_basemap <- NULL
-if (requireNamespace('maps', quietly = TRUE)) {
-  state_basemap <- sf::st_as_sf(maps::map('state', plot = FALSE, fill = TRUE))
-  state_basemap <- sf::st_set_crs(state_basemap, 4326)
-}
 ```
 
 This article demonstrates a compact AQS workflow focused on outcome data. Because AQS measurements are typically used as dependent variables, the example uses `download_aqs()` and `process_aqs()` directly rather than routing through `calculate_covariates()`.
@@ -117,7 +112,6 @@ aqs_time_series <- data.table::rbindlist(
 
 ```{r plot-locations, eval = live_run, fig.width = 7, fig.height = 8, out.width = "100%", fig.alt = "Faceted map of AQS monitor locations for PM2.5 and NO2."}
 ggplot2::ggplot() +
-  {if (!is.null(state_basemap)) ggplot2::geom_sf(data = state_basemap, inherit.aes = FALSE, fill = 'grey97', color = 'grey80', linewidth = 0.2)} +
   ggplot2::geom_sf(data = aqs_locations, color = "#0072B2", size = 0.8, alpha = 0.8) +
   ggplot2::facet_wrap(~ pollutant, ncol = 2) +
   ggplot2::coord_sf(datum = NA) +

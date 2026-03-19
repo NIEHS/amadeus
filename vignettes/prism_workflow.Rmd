@@ -27,16 +27,15 @@ live_run <- local({
   force || !(on_ci || on_cran)
 })
 
-example_points <- data.frame(
-  site_id = c("durham_armory", "bahama"),
-  lon = c(-78.9040, -78.8803),
-  lat = c(36.0330, 36.1702)
+aqs_sample_path <- c(
+  file.path("tests", "testdata", "aqs", "aqs-location-sample.rds"),
+  file.path("..", "tests", "testdata", "aqs", "aqs-location-sample.rds")
 )
-example_points_sf <- sf::st_as_sf(
-  example_points,
-  coords = c("lon", "lat"),
-  crs = 4326
-)
+aqs_sample_path <- aqs_sample_path[file.exists(aqs_sample_path)][1]
+if (is.na(aqs_sample_path) || aqs_sample_path == "") {
+  stop("Could not locate tests/testdata/aqs/aqs-location-sample.rds")
+}
+example_points_sf <- sf::st_as_sf(readRDS(aqs_sample_path))
 durham_hex_path <- system.file(
   "extdata", "data_files", "durham_h3_res8.rds", package = "amadeus"
 )
@@ -52,11 +51,6 @@ if (is.na(durham_hex_path) || durham_hex_path == "") {
 }
 durham_hex <- readRDS(durham_hex_path)
 
-state_basemap <- NULL
-if (requireNamespace('maps', quietly = TRUE)) {
-  state_basemap <- sf::st_as_sf(maps::map('state', plot = FALSE, fill = TRUE))
-  state_basemap <- sf::st_set_crs(state_basemap, 4326)
-}
 
 pick_value_column <- function(x) {
   geom_col <- attr(x, "sf_column")
@@ -71,46 +65,41 @@ pick_value_column <- function(x) {
   if (length(preferred) > 0) preferred[1] else candidates[1]
 }
 
+coord_local_sf <- function(x) {
+  x_wgs84 <- sf::st_transform(sf::st_as_sf(x), 4326)
+  bbox <- sf::st_bbox(x_wgs84)
+  pad_x <- max((bbox[["xmax"]] - bbox[["xmin"]]) * 0.08, 0.05)
+  pad_y <- max((bbox[["ymax"]] - bbox[["ymin"]]) * 0.08, 0.05)
+  ggplot2::coord_sf(
+    xlim = c(bbox[["xmin"]] - pad_x, bbox[["xmax"]] + pad_x),
+    ylim = c(bbox[["ymin"]] - pad_y, bbox[["ymax"]] + pad_y),
+    expand = FALSE,
+    datum = NA
+  )
+}
+
 plot_points <- function(x, title) {
   value_col <- pick_value_column(x)
-  p <- ggplot2::ggplot()
-  if (!is.null(state_basemap)) {
-    p <- p + ggplot2::geom_sf(
-      data = state_basemap,
-      inherit.aes = FALSE,
-      fill = 'grey97',
-      color = 'grey80',
-      linewidth = 0.2
-    )
-  }
-  p +
+  ggplot2::ggplot() +
     ggplot2::geom_sf(
       data = x,
       ggplot2::aes(color = !!rlang::sym(value_col)),
       size = 2
     ) +
+    coord_local_sf(x) +
     ggplot2::labs(title = title, color = value_col) +
     ggplot2::theme_minimal()
 }
 
 plot_polygons <- function(x, title) {
   value_col <- pick_value_column(x)
-  p <- ggplot2::ggplot()
-  if (!is.null(state_basemap)) {
-    p <- p + ggplot2::geom_sf(
-      data = state_basemap,
-      inherit.aes = FALSE,
-      fill = 'grey97',
-      color = 'grey80',
-      linewidth = 0.2
-    )
-  }
-  p +
+  ggplot2::ggplot() +
     ggplot2::geom_sf(
       data = x,
       ggplot2::aes(fill = !!rlang::sym(value_col)),
       color = NA
     ) +
+    coord_local_sf(x) +
     ggplot2::labs(title = title, fill = value_col) +
     ggplot2::theme_minimal()
 }
@@ -120,7 +109,7 @@ This article demonstrates a compact workflow for PRISM climate rasters.
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
-Each workflow uses two small example surfaces: `example_points_sf` for point extraction and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
+Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
 ## Download representative requests
 
