@@ -622,7 +622,13 @@ calc_return_locs <- function(
     if (geom == "terra") {
       return(covar_return)
     } else if (geom == "sf") {
-      return(if (inherits(covar_return, "sf")) covar_return else sf::st_as_sf(covar_return))
+      return(
+        if (inherits(covar_return, "sf")) {
+          covar_return
+        } else {
+          sf::st_as_sf(covar_return)
+        }
+      )
     }
   } else {
     return(data.frame(covar))

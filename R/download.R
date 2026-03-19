@@ -192,7 +192,19 @@ download_data <-
 #' AQS measurements are generally intended for use as dependent variables, so
 #' the package supports download and processing for AQS but does not expose
 #' AQS through `calculate_covariates()`.
-#' @param parameter_code integer(1). EPA pollutant parameter code.
+#' @details Common AQS parameter codes include:
+#' * `88101` — PM2.5 - Local Conditions
+#' * `88502` — Acceptable PM2.5 AQI & Speciation Mass
+#' * `81102` — PM10 Total 0-10um STP
+#' * `44201` — Ozone
+#' * `42602` — Nitrogen dioxide (NO2)
+#' * `42401` — Sulfur dioxide (SO2)
+#' * `42101` — Carbon monoxide
+#'
+#' This list is not exhaustive; for the full official table, see the linked EPA
+#' AQS parameter code table.
+#' @param parameter_code integer(1). EPA pollutant parameter code. See
+#'   Details for a short list of common codes.
 #' @param resolution_temporal character(1). Currently only "daily" is supported.
 #' @param url_aqs_download character(1). URL to the AQS pre-generated datasets.
 #' @param year integer(1 or 2). Year or start/end years for downloading data.
@@ -210,6 +222,10 @@ download_data <-
 #' @author Mariana Kassien, Insang Song, Mitchell Manware
 #' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
+#' @seealso
+#'   [EPA AQS Parameter Codes](
+#'     https://aqs.epa.gov/aqsweb/documents/codetables/parameters.csv
+#'   )
 #' @references
 #' \insertRef{data_usepa2023airdata}{amadeus}
 #' @examples
@@ -363,7 +379,7 @@ download_aqs <-
       sapply(
         year_sequence,
         function(year_i) {
-          download_normalize_aqs_unzip(
+          amadeus:::download_normalize_aqs_unzip(
             directory_to_unzip = directory_to_save,
             resolution_temporal = resolution_temporal,
             parameter_code = parameter_code,

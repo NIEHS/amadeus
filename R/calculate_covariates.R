@@ -576,6 +576,9 @@ calculate_nlcd <- function(
 #' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
+#' @param colnames character(1). Naming convention for ecoregion indicator
+#'   columns. Default is `"coded"` for the existing numeric key-based names.
+#'   Use `"full_ecoregion"` to emit sanitized full ecoregion names.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -597,6 +600,7 @@ calculate_nlcd <- function(
 #'   from = ecoregion, # derived from process_ecoregion() example
 #'   locs = loc,
 #'   locs_id = "id",
+#'   colnames = "coded",
 #'   geom = FALSE
 #' )
 #' }
@@ -606,9 +610,63 @@ calculate_ecoregion <-
     from = NULL,
     locs,
     locs_id = "site_id",
+    colnames = c("coded", "full_ecoregion"),
     geom = FALSE,
     ...
   ) {
+    sanitize_ecoregion_name <- function(x) {
+      x <- iconv(x, to = "ASCII//TRANSLIT")
+      x[is.na(x)] <- "UNKNOWN"
+      x <- toupper(x)
+      x <- gsub("[^A-Z0-9]+", "_", x)
+      x <- gsub("_+", "_", x)
+      x <- gsub("^_|_$", "", x)
+      x[x == ""] <- "UNKNOWN"
+      x
+    }
+    build_ecoregion_lookup <- function(keys, labels, prefix, naming_mode) {
+      lookup <- unique(data.frame(
+        key = as.character(keys),
+        label = as.character(labels),
+        stringsAsFactors = FALSE
+      ))
+      if (naming_mode == "coded") {
+        if (prefix == "E2") {
+          key_num <- regmatches(
+            lookup$key,
+            regexpr("\\d{1,2}\\.[1-9]", lookup$key)
+          )
+          key_num <- sprintf(
+            "DUM_%s%03d_0_00000",
+            prefix,
+            as.integer(10 * as.numeric(key_num))
+          )
+        } else {
+          key_num <- regmatches(
+            lookup$key,
+            regexpr("\\d{1,3}", lookup$key)
+          )
+          key_num <- sprintf(
+            "DUM_%s%03d_0_00000",
+            prefix,
+            as.integer(as.numeric(key_num))
+          )
+        }
+        lookup$column_name <- key_num
+      } else {
+        safe_label <- sanitize_ecoregion_name(lookup$label)
+        lookup$column_name <- paste0(
+          "DUM_",
+          prefix,
+          "_",
+          safe_label,
+          "_0_00000"
+        )
+        lookup$column_name <- make.unique(lookup$column_name, sep = "_")
+      }
+      lookup
+    }
+    colnames <- match.arg(colnames)
     # prepare locations
     locs_prepared <- amadeus::calc_prepare_locs(
       from = from,
@@ -626,18 +684,29 @@ calculate_ecoregion <-
     # Generate field names from extracted ecoregion keys
     # TODO: if we keep all-zero fields, the initial reference
     # should be the ecoregion polygon, not the extracted data
-    key2_sorted <- unlist(extracted[[grep("L2", names(extracted))]])
-    key2_num <-
-      regmatches(key2_sorted, regexpr("\\d{1,2}\\.[1-9]", key2_sorted))
-    key2_num <- as.integer(10 * as.numeric(key2_num))
-    key2_num <- sprintf("DUM_E2%03d_0_00000", key2_num)
+    key2_sorted <- as.character(extracted$L2_KEY)
+    key2_lookup <- build_ecoregion_lookup(
+      keys = from$L2_KEY,
+      labels = from$NA_L2NAME,
+      prefix = "E2",
+      naming_mode = colnames
+    )
+    key2_num <- key2_lookup$column_name[match(key2_sorted, key2_lookup$key)]
     key2_num_unique <- sort(unique(key2_num))
 
-    key3_sorted <- unlist(extracted[[grep("L3", names(extracted))]])
-    key3_num <-
-      regmatches(key3_sorted, regexpr("\\d{1,3}", key3_sorted))
-    key3_num <- as.integer(as.numeric(key3_num))
-    key3_num <- sprintf("DUM_E3%03d_0_00000", key3_num)
+    key3_sorted <- as.character(extracted$L3_KEY)
+    key3_labels <- if ("US_L3NAME" %in% names(from)) {
+      from$US_L3NAME
+    } else {
+      from$NA_L3NAME
+    }
+    key3_lookup <- build_ecoregion_lookup(
+      keys = from$L3_KEY,
+      labels = key3_labels,
+      prefix = "E3",
+      naming_mode = colnames
+    )
+    key3_num <- key3_lookup$column_name[match(key3_sorted, key3_lookup$key)]
     key3_num_unique <- sort(unique(key3_num))
 
     df_lv2 <-

@@ -4,7 +4,14 @@
 \alias{calculate_ecoregion}
 \title{Calculate ecoregions covariates}
 \usage{
-calculate_ecoregion(from = NULL, locs, locs_id = "site_id", geom = FALSE, ...)
+calculate_ecoregion(
+  from = NULL,
+  locs,
+  locs_id = "site_id",
+  colnames = c("coded", "full_ecoregion"),
+  geom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{from}{SpatVector(1). Output of \code{\link{process_ecoregion}}.}
@@ -13,6 +20,10 @@ calculate_ecoregion(from = NULL, locs, locs_id = "site_id", geom = FALSE, ...)
 a unique identifier field named \code{locs_id}}
 
 \item{locs_id}{character(1). Name of unique identifier.}
+
+\item{colnames}{character(1). Naming convention for ecoregion indicator
+columns. Default is \code{"coded"} for the existing numeric key-based names.
+Use \code{"full_ecoregion"} to emit sanitized full ecoregion names.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
@@ -43,6 +54,7 @@ calculate_ecoregion(
   from = ecoregion, # derived from process_ecoregion() example
   locs = loc,
   locs_id = "id",
+  colnames = "coded",
   geom = FALSE
 )
 }

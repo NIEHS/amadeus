@@ -996,7 +996,13 @@ process_ecoregion <-
     poly_tukey <- sf::st_transform(poly_tukey, sf::st_crs(ecoreg))
 
     # nolint end
-    ecoreg <- ecoreg[, grepl("^(L2_KEY|L3_KEY)", names(ecoreg))]
+    ecoreg <- ecoreg[
+      ,
+      grepl(
+        "^(L2_KEY|L3_KEY|NA_L2NAME|US_L3NAME|NA_L3NAME)",
+        names(ecoreg)
+      )
+    ]
     ecoreg_edit_idx <- sf::st_intersects(ecoreg, poly_tukey, sparse = FALSE)
     ecoreg_edit_idx <- vapply(ecoreg_edit_idx, function(x) any(x), logical(1))
     if (!all(ecoreg_edit_idx == 0)) {

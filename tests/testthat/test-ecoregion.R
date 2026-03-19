@@ -249,6 +249,26 @@ testthat::test_that("calculate_ecoregion", {
     sum(unlist(ecor_res[, dum_cn])),
     2L
   )
+  testthat::expect_equal(
+    colnames(ecor_res)[-(1:2)],
+    c("DUM_E2083_0_00000", "DUM_E3064_0_00000")
+  )
+
+  testthat::expect_no_error(
+    ecor_res_full <- calculate_ecoregion(
+      from = erras,
+      locs = site_faux,
+      locs_id = "site_id",
+      colnames = "full_ecoregion"
+    )
+  )
+  testthat::expect_equal(
+    colnames(ecor_res_full)[-(1:2)],
+    c(
+      "DUM_E2_SOUTHEASTERN_USA_PLAINS_0_00000",
+      "DUM_E3_NORTHERN_PIEDMONT_0_00000"
+    )
+  )
 
   testthat::expect_no_error(
     ecor_terra <- calculate_ecoregion(
@@ -280,6 +300,15 @@ testthat::test_that("calculate_ecoregion", {
   )
   testthat::expect_true(
     "sf" %in% class(ecor_sf)
+  )
+
+  testthat::expect_error(
+    calculate_ecoregion(
+      from = erras,
+      locs = site_faux,
+      locs_id = "site_id",
+      colnames = "unsupported"
+    )
   )
 
   testthat::expect_error(
@@ -389,6 +418,231 @@ testthat::test_that("calculate_ecoregion validates inputs", {
       locs_id = "nonexistent_id"
     )
   )
+})
+
+testthat::test_that("calculate_ecoregion full_ecoregion falls back to NA_L3NAME", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  ecol3 <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
+  erras <- process_ecoregion(ecol3)
+  testthat::expect_true(
+    all(c("NA_L2NAME", "US_L3NAME", "NA_L3NAME") %in% names(erras))
+  )
+
+  erras_no_us <- erras[, setdiff(names(erras), "US_L3NAME")]
+
+  site_faux <-
+    data.frame(
+      site_id = "37999109988101",
+      lon = -77.576,
+      lat = 39.40,
+      date = as.Date("2022-01-01")
+    )
+  site_faux <-
+    terra::vect(
+      site_faux,
+      geom = c("lon", "lat"),
+      keepgeom = TRUE,
+      crs = "EPSG:4326"
+    )
+  site_faux <- terra::project(site_faux, "EPSG:5070")
+
+  testthat::expect_no_error(
+    ecor_res <- calculate_ecoregion(
+      from = erras_no_us,
+      locs = site_faux,
+      locs_id = "site_id",
+      colnames = "full_ecoregion"
+    )
+  )
+  testthat::expect_equal(
+    colnames(ecor_res)[-(1:2)],
+    c(
+      "DUM_E2_SOUTHEASTERN_USA_PLAINS_0_00000",
+      "DUM_E3_NORTHERN_PIEDMONT_0_00000"
+    )
+  )
+})
+
+testthat::test_that("calculate_ecoregion full_ecoregion sanitizes missing names", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  ecol3 <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
+  erras <- process_ecoregion(ecol3)
+  erras$NA_L2NAME[erras$L2_KEY == "8.3  SOUTHEASTERN USA PLAINS"] <- NA_character_
+  erras$US_L3NAME[erras$L3_KEY == "64  Northern Piedmont"] <- "Northern/Piedmont"
+
+  site_faux <-
+    data.frame(
+      site_id = "37999109988101",
+      lon = -77.576,
+      lat = 39.40,
+      date = as.Date("2022-01-01")
+    )
+  site_faux <-
+    terra::vect(
+      site_faux,
+      geom = c("lon", "lat"),
+      keepgeom = TRUE,
+      crs = "EPSG:4326"
+    )
+  site_faux <- terra::project(site_faux, "EPSG:5070")
+
+  testthat::expect_no_error(
+    ecor_res <- calculate_ecoregion(
+      from = erras,
+      locs = site_faux,
+      locs_id = "site_id",
+      colnames = "full_ecoregion"
+    )
+  )
+  testthat::expect_equal(
+    colnames(ecor_res)[-(1:2)],
+    c(
+      "DUM_E2_UNKNOWN_0_00000",
+      "DUM_E3_NORTHERN_PIEDMONT_0_00000"
+    )
+  )
+})
+
+testthat::test_that("calculate_ecoregion full_ecoregion disambiguates duplicates", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  ecol3 <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
+  erras <- process_ecoregion(ecol3)
+
+  unique_idx <- !duplicated(erras$L3_KEY)
+  erras_unique <- erras[unique_idx, ]
+  erras_unique$US_L3NAME[1:2] <- "Duplicate Name"
+
+  locs <- sf::st_point_on_surface(sf::st_as_sf(erras_unique[1:2, ]))
+  locs <- terra::vect(locs)
+  locs$site_id <- c("dup_1", "dup_2")
+
+  testthat::expect_no_error(
+    ecor_res <- calculate_ecoregion(
+      from = erras_unique,
+      locs = locs,
+      locs_id = "site_id",
+      colnames = "full_ecoregion"
+    )
+  )
+  testthat::expect_true(
+    all(c(
+      "DUM_E3_DUPLICATE_NAME_0_00000",
+      "DUM_E3_DUPLICATE_NAME_0_00000_1"
+    ) %in% colnames(ecor_res))
+  )
+})
+
+testthat::test_that("calc_return_locs covers geometry return branches", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+
+  empty_wkt <- data.frame(
+    site_id = character(),
+    geometry = character(),
+    stringsAsFactors = FALSE
+  )
+  empty_xy <- data.frame(
+    site_id = character(),
+    lon = numeric(),
+    lat = numeric(),
+    stringsAsFactors = FALSE
+  )
+  empty_plain <- data.frame(site_id = character(), stringsAsFactors = FALSE)
+
+  testthat::expect_s3_class(
+    amadeus:::calc_return_locs(
+      covar = empty_wkt,
+      POSIXt = FALSE,
+      geom = "sf",
+      crs = "EPSG:4326"
+    ),
+    "sf"
+  )
+  testthat::expect_s4_class(
+    amadeus:::calc_return_locs(
+      covar = empty_xy,
+      POSIXt = FALSE,
+      geom = "terra",
+      crs = "EPSG:4326"
+    ),
+    "SpatVector"
+  )
+  testthat::expect_warning(
+    empty_plain_out <- amadeus:::calc_return_locs(
+      covar = empty_plain,
+      POSIXt = FALSE,
+      geom = "sf",
+      crs = "EPSG:4326"
+    ),
+    "no geometry columns were found"
+  )
+  testthat::expect_s3_class(empty_plain_out, "data.frame")
+
+  wkt_df <- data.frame(
+    site_id = "site_1",
+    geometry = "POINT(-78 35)",
+    stringsAsFactors = FALSE
+  )
+  xy_df <- data.frame(
+    site_id = "site_2",
+    lon = -78,
+    lat = 35,
+    stringsAsFactors = FALSE
+  )
+  plain_df <- data.frame(site_id = "site_3", stringsAsFactors = FALSE)
+
+  testthat::expect_s4_class(
+    amadeus:::calc_return_locs(
+      covar = wkt_df,
+      POSIXt = FALSE,
+      geom = "terra",
+      crs = "EPSG:4326"
+    ),
+    "SpatVector"
+  )
+  testthat::expect_s3_class(
+    amadeus:::calc_return_locs(
+      covar = xy_df,
+      POSIXt = FALSE,
+      geom = "sf",
+      crs = "EPSG:4326"
+    ),
+    "sf"
+  )
+  testthat::expect_warning(
+    plain_out <- amadeus:::calc_return_locs(
+      covar = plain_df,
+      POSIXt = FALSE,
+      geom = "terra",
+      crs = "EPSG:4326"
+    ),
+    "no geometry columns were found"
+  )
+  testthat::expect_s3_class(plain_out, "data.frame")
 })
 
 testthat::test_that("download_ecoregion remove_command deprecation warning", {
