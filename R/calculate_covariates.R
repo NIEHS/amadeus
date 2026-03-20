@@ -666,6 +666,18 @@ calculate_ecoregion <-
       }
       lookup
     }
+    get_extracted_field <- function(x, field) {
+      candidate_names <- c(field, paste0(field, "_2"), paste0(field, ".1"))
+      match_name <- candidate_names[candidate_names %in% names(x)][1]
+      if (is.na(match_name) || length(match_name) == 0) {
+        stop("Required ecoregion field missing from intersection output: ", field)
+      }
+      values <- x[[match_name]]
+      if (is.matrix(values) || is.data.frame(values)) {
+        values <- values[, 1, drop = TRUE]
+      }
+      values
+    }
     colnames <- match.arg(colnames)
     # prepare locations
     locs_prepared <- amadeus::calc_prepare_locs(
@@ -684,7 +696,7 @@ calculate_ecoregion <-
     # Generate field names from extracted ecoregion keys
     # TODO: if we keep all-zero fields, the initial reference
     # should be the ecoregion polygon, not the extracted data
-    key2_sorted <- as.character(extracted$L2_KEY)
+    key2_sorted <- as.character(get_extracted_field(extracted, "L2_KEY"))
     key2_lookup <- build_ecoregion_lookup(
       keys = from$L2_KEY,
       labels = from$NA_L2NAME,
@@ -694,7 +706,7 @@ calculate_ecoregion <-
     key2_num <- key2_lookup$column_name[match(key2_sorted, key2_lookup$key)]
     key2_num_unique <- sort(unique(key2_num))
 
-    key3_sorted <- as.character(extracted$L3_KEY)
+    key3_sorted <- as.character(get_extracted_field(extracted, "L3_KEY"))
     key3_labels <- if ("US_L3NAME" %in% names(from)) {
       from$US_L3NAME
     } else {
