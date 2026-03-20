@@ -670,7 +670,10 @@ calculate_ecoregion <-
       candidate_names <- c(field, paste0(field, "_2"), paste0(field, ".1"))
       match_name <- candidate_names[candidate_names %in% names(x)][1]
       if (is.na(match_name) || length(match_name) == 0) {
-        stop("Required ecoregion field missing from intersection output: ", field)
+        stop(
+          "Required ecoregion field missing from intersection output: ",
+          field
+        )
       }
       values <- x[[match_name]]
       if (is.matrix(values) || is.data.frame(values)) {
