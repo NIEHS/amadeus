@@ -1900,7 +1900,9 @@ testthat::test_that(
     )
 
     testthat::local_mocked_bindings(
-      calculate_modis_daily = function(...) stop("forced extract failure"),
+      calculate_modis_daily = function(...) {
+        structure("forced extract failure", class = "try-error")
+      },
       .package = "amadeus"
     )
 
