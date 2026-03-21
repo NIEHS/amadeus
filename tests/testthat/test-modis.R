@@ -666,6 +666,183 @@ testthat::test_that("download_modis accepts MCD14DL text files (mock)", {
 })
 
 
+testthat::test_that("download_modis fire products allow cross-year filtering", {
+  mock_product <- NULL
+
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) {
+      invisible(list(success = 1, failed = 0, skipped = 0))
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
+    .package = "amadeus"
+  )
+
+  testthat::local_mocked_bindings(
+    request = function(url) list(url = url),
+    req_url_query = function(req, ...) req,
+    req_options = function(req, ...) req,
+    req_retry = function(req, ...) req,
+    req_timeout = function(req, ...) req,
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      hrefs <- switch(
+        mock_product,
+        MOD14CM1 = c(
+          "https://example.com/MOD14CM1.200012.005.01.hdf",
+          "https://example.com/MOD14CM1.200101.005.01.hdf"
+        ),
+        MCD14DL = c(
+          "https://example.com/MODIS_C6_1_Global_MCD14DL_NRT_2026365.txt",
+          "https://example.com/MODIS_C6_1_Global_MCD14DL_NRT_2027001.txt"
+        )
+      )
+      list(feed = list(entry = lapply(hrefs, function(href) {
+        list(links = list(list(
+          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+          href = href
+        )))
+      })))
+    },
+    .package = "httr2"
+  )
+
+  withr::with_tempdir({
+    mock_product <- "MOD14CM1"
+    monthly_result <- suppressWarnings(
+      suppressMessages(
+        download_modis(
+          date = c("2000-12-15", "2001-01-15"),
+          product = mock_product,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE
+        )
+      )
+    )
+    testthat::expect_equal(monthly_result$n_files, 2L)
+
+    mock_product <- "MCD14DL"
+    txt_result <- suppressWarnings(
+      suppressMessages(
+        download_modis(
+          date = c("2026-12-31", "2027-01-01"),
+          product = mock_product,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE
+        )
+      )
+    )
+    testthat::expect_equal(txt_result$n_files, 2L)
+    testthat::expect_true(all(grepl("\\.txt$", txt_result$urls)))
+  })
+
+})
+
+
+testthat::test_that("MODIS temporal helpers cover daily monthly and text patterns", {
+  daily_path <- "MOD14A1.A2021227.h11v05.061.2021234567890.hdf"
+  txt_path <- "MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt"
+  monthly_path <- "MOD14CM1.200011.005.01.hdf"
+  unknown_path <- "unsupported.file"
+
+  testthat::expect_equal(modis_extract_temporal_key(daily_path), "2021227")
+  testthat::expect_equal(modis_extract_temporal_key(txt_path), "2026074")
+  testthat::expect_equal(modis_extract_temporal_key(monthly_path), "200011")
+  testthat::expect_true(is.na(modis_extract_temporal_key(unknown_path)))
+
+  testthat::expect_equal(modis_extract_temporal_scale(daily_path), "daily")
+  testthat::expect_equal(modis_extract_temporal_scale(txt_path), "daily")
+  testthat::expect_equal(modis_extract_temporal_scale(monthly_path), "monthly")
+  testthat::expect_true(is.na(modis_extract_temporal_scale(unknown_path)))
+
+  parsed_dates <- modis_key_to_date(
+    key = c("2021227", "200011"),
+    scale = c("daily", "monthly")
+  )
+  testthat::expect_equal(
+    as.character(parsed_dates),
+    c("2021-08-15", "2000-11-01")
+  )
+  testthat::expect_equal(
+    as.character(modis_key_to_date(c("2021227", "2021230"), "daily")),
+    c("2021-08-15", "2021-08-18")
+  )
+  testthat::expect_true(is.na(modis_key_to_date(NA_character_, NA_character_)))
+  testthat::expect_error(
+    modis_key_to_date("2021227", "weekly"),
+    "Unsupported MODIS temporal scale"
+  )
+  testthat::expect_error(
+    modis_key_to_date(c("2021227", "2021230"), c("daily", "monthly", "daily"))
+  )
+})
+
+
+testthat::test_that("modis_filter_paths_by_date covers helper branches", {
+  daily_paths <- c(
+    "MOD14A1.A2021227.h11v05.061.2021234567890.hdf",
+    "MOD14A1.A2021230.h11v05.061.2021234567890.hdf"
+  )
+  monthly_paths <- c(
+    "MOD14CM1.200011.005.01.hdf",
+    "MOD14CM1.200012.005.01.hdf"
+  )
+  txt_paths <- c(
+    "MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt",
+    "MODIS_C6_1_Global_MCD14DL_NRT_2026075.txt"
+  )
+
+  testthat::expect_identical(
+    modis_filter_paths_by_date(character(0), "2021-08-15"),
+    character(0)
+  )
+  testthat::expect_identical(
+    modis_filter_paths_by_date("unsupported.file", "2021-08-15"),
+    character(0)
+  )
+  testthat::expect_equal(
+    modis_filter_paths_by_date(daily_paths, "2021-08-15"),
+    daily_paths[1]
+  )
+  testthat::expect_identical(
+    modis_filter_paths_by_date(daily_paths, c("2021-09-01", "2021-09-02")),
+    character(0)
+  )
+  testthat::expect_equal(
+    modis_filter_paths_by_date(monthly_paths, c("2000-11-15", "2000-12-15")),
+    monthly_paths
+  )
+  testthat::expect_identical(
+    modis_filter_paths_by_date(monthly_paths, "2001-01-15"),
+    character(0)
+  )
+  testthat::expect_equal(
+    modis_filter_paths_by_date(txt_paths, "2026-03-16"),
+    txt_paths[2]
+  )
+  testthat::expect_error(
+    modis_filter_paths_by_date(
+      c(daily_paths[1], monthly_paths[1]),
+      "2021-08-15"
+    ),
+    "mixed or unsupported temporal patterns"
+  )
+})
+
+
 testthat::test_that("process_flatten_sds", {
   withr::local_package("terra")
   withr::local_package("stars")
@@ -852,6 +1029,58 @@ testthat::test_that("process_modis_merge handles monthly MOD14CM1 names", {
   )
   testthat::expect_s4_class(monthly_result, "SpatRaster")
   testthat::expect_equal(terra::nlyr(monthly_result), 1L)
+})
+
+
+testthat::test_that("process_mcd14dl covers directory filtering and error branches", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+
+  testthat::expect_error(process_mcd14dl(), "path is required")
+
+  withr::with_tempdir({
+    txt_one <- file.path(".", "MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt")
+    txt_two <- file.path(".", "MODIS_C6_1_Global_MCD14DL_NRT_2026075.txt")
+    bad_txt <- file.path(".", "bad_mcd14dl.txt")
+
+    data.table::fwrite(
+      data.frame(
+        latitude = c(35.95013, 40),
+        longitude = c(-78.8277, -120),
+        acq_date = c("2026-03-15", "2026-03-16"),
+        acq_time = c(1230, 45)
+      ),
+      txt_one
+    )
+    data.table::fwrite(
+      data.frame(
+        latitude = 35.951,
+        longitude = -78.826,
+        acq_date = "2026-03-16",
+        acq_time = 30,
+        frp = 7.5
+      ),
+      txt_two
+    )
+    data.table::fwrite(data.frame(latitude = 35), bad_txt)
+
+    proc <- process_mcd14dl(
+      path = ".",
+      date = c("2026-03-15", "2026-03-16"),
+      extent = c(-79, 35.9, -78.7, 36.0)
+    )
+    testthat::expect_s4_class(proc, "SpatVector")
+    testthat::expect_equal(nrow(proc), 2)
+    testthat::expect_true(all(proc$fire_count == 1L))
+    testthat::expect_equal(proc$time, c(20260315L, 20260316L))
+    testthat::expect_true(is.na(proc$frp[1]))
+    testthat::expect_equal(proc$frp[2], 7.5)
+
+    testthat::expect_error(
+      process_mcd14dl(path = bad_txt),
+      "missing one or more required columns"
+    )
+  })
 })
 
 

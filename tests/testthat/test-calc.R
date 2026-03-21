@@ -153,6 +153,55 @@ testthat::test_that("calculate_covariates (no errors)", {
     testthat::expect_equal(mcd14dl_c$fire_count_00000, 1)
   })
 
+  withr::with_tempdir({
+    fire_points <- terra::vect(
+      data.frame(
+        longitude = c(-78.8277, -78.82),
+        latitude = c(35.95013, 35.955),
+        time = c(20260315L, 20260315L),
+        fire_count = c(1L, 1L),
+        frp = c(11.5, 5)
+      ),
+      geom = c("longitude", "latitude"),
+      keepgeom = TRUE,
+      crs = "EPSG:4326"
+    )
+    locs_sf <- sf::st_as_sf(
+      data.frame(
+        site_id = "site_1",
+        lon = -78.8277,
+        lat = 35.95013
+      ),
+      coords = c("lon", "lat"),
+      crs = 4326
+    )
+
+    direct_calc <- calculate_mcd14dl(
+      from = fire_points,
+      locs = locs_sf,
+      locs_id = "site_id",
+      radius = c(0L, 1000L),
+      geom = "sf"
+    )
+    testthat::expect_s3_class(direct_calc, "sf")
+    testthat::expect_equal(direct_calc$fire_count_00000, 1)
+    testthat::expect_equal(direct_calc$fire_count_01000, 2)
+    testthat::expect_equal(direct_calc$frp_01000, 16.5)
+
+    testthat::expect_error(
+      calculate_mcd14dl(from = terra::rast(), locs = locs_sf),
+      "SpatVector returned by process_mcd14dl"
+    )
+    testthat::expect_error(
+      calculate_mcd14dl(from = fire_points[, c("time", "fire_count")], locs = locs_sf),
+      "missing required MCD14DL fields"
+    )
+    testthat::expect_error(
+      calculate_mcd14dl(from = fire_points, locs = list()),
+      "convertible to sf"
+    )
+  })
+
   candidates <-
     c(
       "modis",
