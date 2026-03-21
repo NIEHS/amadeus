@@ -2,20 +2,24 @@
 ##### unit and integration tests for NASA MODIS functions
 # nolint start
 
+skip_if_not_local_modis_live <- function() {
+  testthat::skip_on_cran()
+  testthat::skip_on_ci()
+  testthat::skip_if_offline()
+
+  if (Sys.getenv("NASA_EARTHDATA_TOKEN") == "") {
+    testthat::skip("NASA_EARTHDATA_TOKEN not set")
+  }
+}
+
 ################################################################################
 ##### download_modis
 testthat::test_that("download_modis (MODIS-MOD09GA)", {
-  skip_on_cran()
-  skip_if_offline()
+  skip_if_not_local_modis_live()
 
   withr::local_package("httr2")
   withr::local_package("stringi")
   withr::local_package("jsonlite")
-
-  # Skip if no NASA token
-  if (Sys.getenv("NASA_EARTHDATA_TOKEN") == "") {
-    skip("NASA_EARTHDATA_TOKEN not set")
-  }
 
   # function parameters
   years <- 2020
@@ -49,16 +53,10 @@ testthat::test_that("download_modis (MODIS-MOD09GA)", {
 })
 
 testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
-  skip_on_cran()
-  skip_if_offline()
+  skip_if_not_local_modis_live()
 
   withr::local_package("httr2")
   withr::local_package("stringr")
-
-  # Skip if no NASA token
-  if (Sys.getenv("NASA_EARTHDATA_TOKEN") == "") {
-    skip("NASA_EARTHDATA_TOKEN not set")
-  }
 
   # function parameters
   product <- "MOD09GA"
@@ -86,16 +84,10 @@ testthat::test_that("download_modis (MODIS-MOD09GA + single date)", {
 })
 
 testthat::test_that("download_modis (MODIS-MOD06L2)", {
-  skip_on_cran()
-  skip_if_offline()
+  skip_if_not_local_modis_live()
 
   withr::local_package("httr2")
   withr::local_package("stringr")
-
-  # Skip if no NASA token
-  if (Sys.getenv("NASA_EARTHDATA_TOKEN") == "") {
-    skip("NASA_EARTHDATA_TOKEN not set")
-  }
 
   # function parameters
   product <- "MOD06_L2"
@@ -138,7 +130,7 @@ testthat::test_that("download_modis (expected errors)", {
   vec_extent <- c(-124, 25, -105, 40)
 
   # with token (if available) - should work
-  if (Sys.getenv("NASA_EARTHDATA_TOKEN") != "") {
+  if (Sys.getenv("CI") != "true" && Sys.getenv("NASA_EARTHDATA_TOKEN") != "") {
     testthat::expect_warning(
       download_data(
         dataset_name = "modis",
@@ -206,16 +198,10 @@ testthat::test_that("download_modis (expected errors)", {
 })
 
 testthat::test_that("download_modis (MOD + MYD products)", {
-  skip_on_cran()
-  skip_if_offline()
+  skip_if_not_local_modis_live()
 
   withr::local_package("httr2")
   withr::local_package("stringr")
-
-  # Skip if no NASA token
-  if (Sys.getenv("NASA_EARTHDATA_TOKEN") == "") {
-    skip("NASA_EARTHDATA_TOKEN not set")
-  }
 
   # function parameters
   products <- c(
@@ -254,12 +240,7 @@ testthat::test_that("download_modis (MOD + MYD products)", {
 })
 
 testthat::test_that("download_modis with NASA token", {
-  skip_on_cran()
-  skip_if_offline()
-
-  if (Sys.getenv("NASA_EARTHDATA_TOKEN") == "") {
-    skip("NASA_EARTHDATA_TOKEN not set")
-  }
+  skip_if_not_local_modis_live()
 
   directory_to_save <- paste0(tempdir(), "/mod_token/")
 
