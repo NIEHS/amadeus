@@ -926,6 +926,29 @@ testthat::test_that("modis_filter_paths_by_date covers helper branches", {
 })
 
 
+testthat::test_that("calculate_modis errors on mixed temporal patterns", {
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+
+  testthat::expect_error(
+    calculate_modis(
+      from = c(
+        "MOD09GA.A2021001.h10v05.061.2021001000000.hdf",
+        "MOD14CM1.200101.005.01.hdf"
+      ),
+      locs = locs,
+      locs_id = "site_id",
+      name_covariates = "mock_cov_",
+      preprocess = function(...) terra::rast()
+    ),
+    "mixed or unsupported temporal patterns"
+  )
+})
+
+
 testthat::test_that("process_modis_sds returns fire mask regex for fire products", {
   testthat::expect_equal(process_modis_sds(product = "MOD14A1"), "(FireMask)")
   testthat::expect_equal(process_modis_sds(product = "MYD14A1"), "(FireMask)")
@@ -1859,6 +1882,63 @@ testthat::test_that("calculate_modis handles monthly MOD14CM1 filenames", {
     c("2000-11-01", "2000-12-01")
   )
 })
+
+
+testthat::test_that(
+  "calculate_modis drops insufficient dates and fills try-error extracts",
+  {
+    locs <- sf::st_as_sf(
+      data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
+      coords = c("lon", "lat"),
+      crs = 4326
+    )
+
+    fake_from <- c(
+      "MOD09GA.A2021001.h10v05.061.2021001000000.hdf",
+      "MOD09GA.A2021001.h11v05.061.2021001000001.hdf",
+      "MOD09GA.A2021002.h10v05.061.2021002000000.hdf"
+    )
+
+    testthat::local_mocked_bindings(
+      calculate_modis_daily = function(...) stop("forced extract failure"),
+      .package = "amadeus"
+    )
+
+    fake_preprocess <- function(path, date, ...) {
+      out <- terra::rast(
+        ncols = 1,
+        nrows = 1,
+        xmin = -79,
+        xmax = -78,
+        ymin = 35,
+        ymax = 36,
+        crs = "EPSG:4326"
+      )
+      terra::values(out) <- 1
+      names(out) <- "mock_layer"
+      out
+    }
+
+    testthat::expect_message(
+      result <- calculate_modis(
+        from = fake_from,
+        locs = locs,
+        locs_id = "site_id",
+        name_covariates = "mock_cov_",
+        preprocess = fake_preprocess,
+        radius = c(0L, 1000L),
+        scale = "* 1"
+      ),
+      "insufficient"
+    )
+
+    testthat::expect_equal(nrow(result), 1)
+    testthat::expect_equal(as.character(result$time), "2021-01-01")
+    testthat::expect_equal(result$mock_cov_00000, -99999)
+    testthat::expect_equal(result$mock_cov_01000, -99999)
+  }
+)
+
 # nolint end
 
 ################################################################################
@@ -1964,6 +2044,30 @@ testthat::test_that("download_modis no granules found path (no skip)", {
         )
       ),
       "No granules found"
+    )
+  })
+})
+
+testthat::test_that("download_modis surfaces CMR query failures", {
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
+    req_perform = function(...) stop("mock cmr outage"),
+    .package = "httr2"
+  )
+
+  withr::with_tempdir({
+    testthat::expect_error(
+      download_modis(
+        date = "2023-01-01",
+        product = "MOD14A1",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      ),
+      "Failed to query NASA CMR"
     )
   })
 })
