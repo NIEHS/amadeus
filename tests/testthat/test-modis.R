@@ -752,6 +752,108 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
 })
 
 
+testthat::test_that(
+  "download_modis fire products use product-specific versions and data links",
+  {
+    mock_product <- NULL
+
+    testthat::local_mocked_bindings(
+      get_token = function(...) "fake_token",
+      download_run_method = function(...) {
+        invisible(list(success = 1, failed = 0, skipped = 0))
+      },
+      download_hash = function(hash, dir) {
+        if (isTRUE(hash)) "fakehash" else NULL
+      },
+      .package = "amadeus"
+    )
+
+    testthat::local_mocked_bindings(
+      request = function(url) list(url = url),
+      req_url_query = function(req, ...) req,
+      req_options = function(req, ...) req,
+      req_retry = function(req, ...) req,
+      req_timeout = function(req, ...) req,
+      req_perform = function(req, path = NULL, ...) {
+        structure(
+          list(
+            status_code = 200L,
+            headers = list(`Content-Type` = "application/json"),
+            body = charToRaw("{}")
+          ),
+          class = "httr2_response"
+        )
+      },
+      resp_body_json = function(resp, ...) {
+        hrefs <- switch(
+          mock_product,
+          MOD14A1 = c(
+            "https://example.com/metadata.xml",
+            "https://example.com/MOD14A1.A2021227.h11v05.061.2021234567890.h5"
+          ),
+          MYD14CM1 = c(
+            "https://example.com/browse.jpg",
+            "https://example.com/MYD14CM1.200207.005.01.hdf"
+          ),
+          MCD14DL = c(
+            "https://example.com/ignore.hdf",
+            "https://example.com/MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt"
+          )
+        )
+        list(feed = list(entry = lapply(hrefs, function(href) {
+          list(links = list(list(
+            rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+            href = href
+          )))
+        })))
+      },
+      .package = "httr2"
+    )
+
+    cases <- list(
+      list(
+        product = "MOD14A1",
+        date = "2021-08-15",
+        expected_version = "061",
+        expected_pattern = "\\.h5$"
+      ),
+      list(
+        product = "MYD14CM1",
+        date = "2002-07-15",
+        expected_version = "005",
+        expected_pattern = "MYD14CM1\\.200207"
+      ),
+      list(
+        product = "MCD14DL",
+        date = "2026-03-15",
+        expected_version = "6.1NRT",
+        expected_pattern = "\\.txt$"
+      )
+    )
+
+    withr::with_tempdir({
+      for (i in seq_along(cases)) {
+        mock_product <- cases[[i]]$product
+        result <- suppressWarnings(
+          suppressMessages(
+            download_modis(
+              date = cases[[i]]$date,
+              product = mock_product,
+              directory_to_save = ".",
+              acknowledgement = TRUE,
+              download = FALSE
+            )
+          )
+        )
+
+        testthat::expect_equal(result$n_files, 1L)
+        testthat::expect_match(result$urls[[1]], cases[[i]]$expected_pattern)
+      }
+    })
+  }
+)
+
+
 testthat::test_that("MODIS temporal helpers cover daily monthly and text patterns", {
   daily_path <- "MOD14A1.A2021227.h11v05.061.2021234567890.hdf"
   txt_path <- "MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt"
@@ -840,6 +942,12 @@ testthat::test_that("modis_filter_paths_by_date covers helper branches", {
     ),
     "mixed or unsupported temporal patterns"
   )
+})
+
+
+testthat::test_that("process_modis_sds returns fire mask regex for fire products", {
+  testthat::expect_equal(process_modis_sds(product = "MOD14A1"), "(FireMask)")
+  testthat::expect_equal(process_modis_sds(product = "MYD14A1"), "(FireMask)")
 })
 
 
@@ -1875,6 +1983,57 @@ testthat::test_that("download_modis no granules found path (no skip)", {
         )
       ),
       "No granules found"
+    )
+  })
+})
+
+testthat::test_that("download_modis no in-range granules found after filtering", {
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) {
+      invisible(list(success = 1, failed = 0, skipped = 0))
+    },
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      list(feed = list(entry = list(
+        list(links = list(list(
+          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+          href = paste0(
+            "https://example.com/",
+            "MOD14A1.A2021230.h11v05.061.2021234567890.hdf"
+          )
+        )))
+      )))
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    testthat::expect_error(
+      suppressWarnings(
+        suppressMessages(
+          download_modis(
+            date = "2021-08-15",
+            product = "MOD14A1",
+            directory_to_save = ".",
+            acknowledgement = TRUE,
+            download = FALSE
+          )
+        )
+      ),
+      "No granules matched the requested date range"
     )
   })
 })
