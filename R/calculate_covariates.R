@@ -85,6 +85,7 @@ calculate_covariates <-
       "terraclimate",
       "tri",
       "nei",
+      "mcd14dl",
       "prism",
       "cropscape",
       "cdl",
@@ -119,6 +120,7 @@ calculate_covariates <-
       sedac_population = amadeus::calculate_population,
       population = amadeus::calculate_population,
       nei = amadeus::calculate_nei,
+      mcd14dl = calculate_mcd14dl,
       tri = amadeus::calculate_tri,
       geos = amadeus::calculate_geos,
       gmted = amadeus::calculate_gmted,
@@ -924,9 +926,16 @@ process_modis_swath, or process_blackmarble."
     hdf_args <- c(as.list(environment()), list(...))
     # nolint end
     dates_available_m <-
-      regmatches(from, regexpr("A20\\d{2,2}[0-3]\\d{2,2}", from))
+      vapply(from, modis_extract_temporal_key, character(1))
+    date_scales <-
+      vapply(from, modis_extract_temporal_scale, character(1))
+    date_scale_unique <- unique(stats::na.omit(date_scales))
+    if (length(date_scale_unique) != 1L) {
+      stop(
+        "MODIS input files contain mixed or unsupported temporal patterns.\n"
+      )
+    }
     dates_available <- sort(unique(dates_available_m))
-    dates_available <- sub("A", "", dates_available)
 
     # When multiple dates are concerned,
     # the number of tiles are expected to be the same.
@@ -940,7 +949,10 @@ process_modis_swath, or process_blackmarble."
 
     if (length(summary_available_insuf) > 0) {
       dates_insuf <-
-        as.Date(dates_available[summary_available_insuf], "%Y%j")
+        modis_key_to_date(
+          dates_available[summary_available_insuf],
+          date_scale_unique
+        )
       message(
         paste0(
           "The number of tiles on the following dates are insufficient: ",
@@ -994,7 +1006,7 @@ process_modis_swath, or process_blackmarble."
           # nolint start
           day_to_pick <- dates_available[datei]
           # nolint end
-          day_to_pick <- as.Date(day_to_pick, format = "%Y%j")
+          day_to_pick <- modis_key_to_date(day_to_pick, date_scale_unique)
 
           radiusindex <- seq_along(radius)
           radiusindexlist <- split(radiusindex, radiusindex)
@@ -1075,6 +1087,134 @@ process_modis_swath, or process_blackmarble."
     Sys.sleep(1L)
     return(calc_results_return)
   }
+
+
+calculate_mcd14dl <- function(
+  from = NULL,
+  locs = NULL,
+  locs_id = "site_id",
+  radius = c(0L, 1e3L, 1e4L, 5e4L),
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_geom(geom)
+  if (!methods::is(from, "SpatVector")) {
+    stop("from should be a SpatVector returned by process_mcd14dl.\n")
+  }
+  if (!all(c("time", "fire_count", "frp") %in% names(from))) {
+    stop("from is missing required MCD14DL fields.\n")
+  }
+
+  locs_input <- try(sf::st_as_sf(locs), silent = TRUE)
+  if (inherits(locs_input, "try-error")) {
+    stop("locs cannot be convertible to sf.\n")
+  }
+
+  locs_base <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs_input,
+    locs_id = locs_id,
+    radius = 0L,
+    geom = geom
+  )
+  locs_points <- locs_base[[1]]
+  locs_return <- locs_base[[2]]
+  loc_index <- seq_len(nrow(locs_points))
+
+  date_keys <- sort(unique(as.integer(from$time)))
+  results_by_day <- lapply(date_keys, function(day_key) {
+    from_day <- from[from$time == day_key, ]
+    results_by_radius <- lapply(radius, function(radius_i) {
+      col_count <- sprintf("fire_count_%05d", radius_i)
+      col_frp <- sprintf("frp_%05d", radius_i)
+
+      if (nrow(from_day) == 0) {
+        result_empty <- data.frame(
+          loc_index = loc_index,
+          fire_count = 0,
+          frp = 0
+        )
+      } else {
+        dist_matrix <- terra::distance(locs_points, from_day)
+        dist_df <- data.frame(
+          expand.grid(
+            loc_index = loc_index,
+            from_index = seq_len(nrow(from_day))
+          ),
+          distance = as.vector(dist_matrix)
+        )
+        if (radius_i == 0L) {
+          dist_df <- dist_df[dist_df$distance == 0, ]
+        } else {
+          dist_df <- dist_df[dist_df$distance <= radius_i, ]
+        }
+
+        if (nrow(dist_df) == 0) {
+          result_empty <- data.frame(
+            loc_index = loc_index,
+            fire_count = 0,
+            frp = 0
+          )
+        } else {
+          dist_df$fire_count <- from_day$fire_count[dist_df$from_index]
+          dist_df$frp <- from_day$frp[dist_df$from_index]
+          result_empty <-
+            stats::aggregate(
+              cbind(fire_count, frp) ~ loc_index,
+              data = dist_df,
+              FUN = sum,
+              na.rm = TRUE
+            )
+          result_empty <-
+            merge(
+              data.frame(loc_index = loc_index),
+              result_empty,
+              by = "loc_index",
+              all.x = TRUE
+            )
+          result_empty$fire_count[is.na(result_empty$fire_count)] <- 0
+          result_empty$frp[is.na(result_empty$frp)] <- 0
+        }
+      }
+
+      names(result_empty)[names(result_empty) == "fire_count"] <- col_count
+      names(result_empty)[names(result_empty) == "frp"] <- col_frp
+      result_empty
+    })
+
+    result_day <- Reduce(
+      function(x, y) merge(x, y, by = "loc_index", all = TRUE),
+      results_by_radius
+    )
+    result_day[[locs_id]] <- locs_return[[locs_id]]
+    result_day$time <- as.POSIXlt(
+      as.character(day_key),
+      format = "%Y%m%d",
+      tz = "UTC"
+    )
+    ordered_cols <- c(
+      locs_id,
+      "time",
+      setdiff(names(result_day), c("loc_index", locs_id, "time"))
+    )
+    result_day[, ordered_cols]
+  })
+
+  result_all <- do.call(rbind, results_by_day)
+
+  if (geom %in% c("sf", "terra")) {
+    result_all <- merge(locs_return, result_all, by = locs_id)
+  }
+
+  return(
+    amadeus::calc_return_locs(
+      covar = result_all,
+      POSIXt = TRUE,
+      geom = geom,
+      crs = terra::crs(from)
+    )
+  )
+}
 
 
 #' Calculate temporal dummy covariates

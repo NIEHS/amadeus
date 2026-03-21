@@ -68,6 +68,125 @@ download_sanitize_path <-
   }
 
 
+modis_extract_temporal_key <- function(path) {
+  filename <- basename(path)
+
+  key_daily <- regmatches(
+    filename,
+    regexpr("A20\\d{5}", filename)
+  )
+  if (length(key_daily) > 0 && nzchar(key_daily)) {
+    return(sub("^A", "", key_daily))
+  }
+
+  key_txt <- regmatches(
+    filename,
+    regexpr("_[12][0-9]{6}", filename)
+  )
+  if (length(key_txt) > 0 && nzchar(key_txt)) {
+    return(sub("^_", "", key_txt))
+  }
+
+  key_monthly <- regmatches(
+    filename,
+    regexpr("\\.20[0-9]{4}\\.", filename)
+  )
+  if (length(key_monthly) > 0 && nzchar(key_monthly)) {
+    return(gsub("\\.", "", key_monthly))
+  }
+
+  return(NA_character_)
+}
+
+
+modis_extract_temporal_scale <- function(path) {
+  filename <- basename(path)
+
+  if (grepl("A20\\d{5}", filename)) {
+    return("daily")
+  }
+  if (grepl("_[12][0-9]{6}", filename)) {
+    return("daily")
+  }
+  if (grepl("\\.20[0-9]{4}\\.", filename)) {
+    return("monthly")
+  }
+
+  return(NA_character_)
+}
+
+
+modis_key_to_date <- function(
+  key,
+  scale
+) {
+  if (length(scale) == 1L) {
+    scale <- rep(scale, length(key))
+  }
+  stopifnot(length(key) == length(scale))
+
+  as_date <- mapply(
+    function(key_i, scale_i) {
+      if (is.na(key_i) || is.na(scale_i)) {
+        return(as.Date(NA))
+      }
+      if (scale_i == "daily") {
+        return(as.Date(key_i, format = "%Y%j"))
+      }
+      if (scale_i == "monthly") {
+        return(as.Date(paste0(key_i, "01"), format = "%Y%m%d"))
+      }
+      stop("Unsupported MODIS temporal scale.\n")
+    },
+    key,
+    scale,
+    SIMPLIFY = TRUE,
+    USE.NAMES = FALSE
+  )
+
+  return(as.Date(as_date, origin = "1970-01-01"))
+}
+
+
+modis_filter_paths_by_date <- function(
+  paths,
+  date
+) {
+  if (length(paths) == 0) {
+    return(paths)
+  }
+  if (length(date) == 1L) {
+    date <- rep(date, 2L)
+  }
+
+  keys <- vapply(paths, modis_extract_temporal_key, character(1))
+  scales <- vapply(paths, modis_extract_temporal_scale, character(1))
+
+  if (all(is.na(keys)) || all(is.na(scales))) {
+    return(character(0))
+  }
+
+  scales_unique <- unique(stats::na.omit(scales))
+  if (length(scales_unique) != 1L) {
+    stop("MODIS paths contain mixed or unsupported temporal patterns.\n")
+  }
+
+  scale_target <- scales_unique[[1]]
+  if (scale_target == "monthly") {
+    month_start <- as.Date(format(as.Date(date[1]), "%Y-%m-01"))
+    month_end <- as.Date(format(as.Date(date[2]), "%Y-%m-01"))
+    month_sequence <- seq(month_start, month_end, by = "month")
+    target_keys <- format(month_sequence, "%Y%m")
+    keep <- keys %in% target_keys
+  } else {
+    parsed_dates <- modis_key_to_date(keys, scales)
+    keep <- parsed_dates >= as.Date(date[1]) & parsed_dates <= as.Date(date[2])
+  }
+
+  return(paths[keep])
+}
+
+
 #' Check data download acknowledgement
 #' @description
 #' Return an error if the \code{acknowledgement = FALSE}.

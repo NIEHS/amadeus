@@ -7,6 +7,7 @@
 testthat::test_that("process_covariates", {
   withr::local_package("terra")
   withr::local_package("sf")
+  withr::local_package("data.table")
   withr::local_options(list(sf_use_s2 = FALSE))
 
   # main test
@@ -119,9 +120,31 @@ testthat::test_that("process_covariates", {
   )
   testthat::expect_s4_class(bm_proc, "SpatRaster")
 
+  withr::with_tempdir({
+    mcd14dl_path <- file.path(".", "MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt")
+    data.table::fwrite(
+      data.frame(
+        latitude = 35.95013,
+        longitude = -78.8277,
+        acq_date = "2026-03-15",
+        acq_time = 1230,
+        frp = 11.5
+      ),
+      mcd14dl_path
+    )
+
+    mcd14dl_proc <- process_covariates(
+      covariate = "mcd14dl",
+      path = mcd14dl_path,
+      date = "2026-03-15"
+    )
+    testthat::expect_s4_class(mcd14dl_proc, "SpatVector")
+  })
+
   covar_types <- c(
     "modis_swath",
     "modis_merge",
+    "mcd14dl",
     "koppen-geiger",
     "blackmarble",
     "koeppen-geiger",

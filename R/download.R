@@ -2855,7 +2855,12 @@ download_modis <- function(
     "MYD13A2",
     "MOD13A3",
     "MYD13A3",
+    "MOD14A1",
+    "MYD14A1",
+    "MOD14CM1",
+    "MYD14CM1",
     "MOD06_L2",
+    "MCD14DL",
     "MCD19A2",
     "VNP46A2"
   ),
@@ -2899,7 +2904,7 @@ download_modis <- function(
   product <- match.arg(product)
 
   if (substr(date[1], 1, 4) != substr(date[2], 1, 4)) {
-    if (product != "MOD06_L2") {
+    if (!product %in% c("MOD06_L2", "MOD14CM1", "MYD14CM1", "MCD14DL")) {
       stop("dates should be in the same year.\n")
     }
   }
@@ -2940,6 +2945,10 @@ download_modis <- function(
   #### 10. Version fix
   if (product == "MOD06_L2") {
     str_version <- "6.1"
+  } else if (product %in% c("MOD14CM1", "MYD14CM1")) {
+    str_version <- "005"
+  } else if (product == "MCD14DL") {
+    str_version <- "6.1NRT"
   } else if (product == "VNP46A2") {
     str_version <- NULL
   } else {
@@ -2975,14 +2984,18 @@ download_modis <- function(
   )
   granules <- resp |> httr2::resp_body_json()
 
-  # Extract data URLs (HDF4 .hdf and HDF5 .h5 files, e.g. VIIRS VNP46A2)
+  # Extract product data URLs
   urls <- sapply(granules$feed$entry, function(g) {
     links <- g$links
     # Filter for data links only (exclude metadata, browse images, etc.)
     data_links <- Filter(
       function(l) {
         grepl("data#", l$rel) &&
-          grepl("\\.(hdf|h5)$", l$href, ignore.case = TRUE)
+          if (product == "MCD14DL") {
+            grepl("\\.txt$", l$href, ignore.case = TRUE)
+          } else {
+            grepl("\\.(hdf|h5)$", l$href, ignore.case = TRUE)
+          }
       },
       links
     )
@@ -2995,23 +3008,36 @@ download_modis <- function(
   }
 
   #### 12. Filter by date range
-  list_available_d <- stringi::stri_extract(urls, regex = "A2[0-9]{6,6}")
-  list_available_d <- unique(gsub("A", "", list_available_d))
-  date_sequence <- list_available_d[!is.na(list_available_d)]
-  date_sequence_i <- as.integer(date_sequence)
+  urls <- modis_filter_paths_by_date(urls, date = date)
+  if (length(urls) == 0) {
+    stop("No granules matched the requested date range.\n")
+  }
 
-  date_start_i <- as.integer(strftime(date[1], "%Y%j"))
-  date_end_i <- as.integer(strftime(date[2], "%Y%j"))
-  date_range_julian <- seq(date_start_i, date_end_i)
-  date_sequence_in <- (date_sequence_i %in% date_range_julian)
+  scale_detected <- modis_extract_temporal_scale(urls[1])
+  if (scale_detected == "monthly") {
+    month_start <- as.Date(format(as.Date(date[1]), "%Y-%m-01"))
+    month_end <- as.Date(format(as.Date(date[2]), "%Y-%m-01"))
+    month_sequence <- seq(month_start, month_end, by = "month")
+    message(sprintf(
+      "Found %d / %d monthly files in the queried date range.\n",
+      length(urls),
+      length(month_sequence)
+    ))
+  } else {
+    date_sequence <- vapply(urls, modis_extract_temporal_key, character(1))
+    date_sequence <- unique(date_sequence[!is.na(date_sequence)])
+    date_start_i <- as.integer(strftime(date[1], "%Y%j"))
+    date_end_i <- as.integer(strftime(date[2], "%Y%j"))
+    date_range_julian <- seq(date_start_i, date_end_i)
+    date_sequence_i <- as.integer(date_sequence)
+    date_sequence_in <- date_sequence_i %in% date_range_julian
 
-  message(sprintf(
-    "Found %d / %d days of data in the queried date range.\n",
-    sum(date_sequence_in),
-    length(date_range_julian)
-  ))
-
-  date_sequence <- date_sequence[date_sequence_in]
+    message(sprintf(
+      "Found %d / %d days of data in the queried date range.\n",
+      sum(date_sequence_in),
+      length(date_range_julian)
+    ))
+  }
 
   #### 13. Prepare download paths
   download_names <- basename(urls)

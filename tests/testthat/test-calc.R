@@ -7,6 +7,7 @@ testthat::test_that("calculate_covariates (expected errors)", {
   withr::local_package("rlang")
   withr::local_package("terra")
   withr::local_package("sf")
+  withr::local_package("data.table")
   withr::local_options(list(sf_use_s2 = FALSE))
 
   candidates <-
@@ -38,6 +39,7 @@ testthat::test_that("calculate_covariates (expected errors)", {
       "MERRA2",
       "tri",
       "nei",
+      "mcd14dl",
       "edgar",
       "prism",
       "huc",
@@ -54,6 +56,7 @@ testthat::test_that("calculate_covariates (no errors)", {
   withr::local_package("rlang")
   withr::local_package("terra")
   withr::local_package("sf")
+  withr::local_package("data.table")
   withr::local_options(list(sf_use_s2 = FALSE))
 
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
@@ -122,6 +125,34 @@ testthat::test_that("calculate_covariates (no errors)", {
     testthat::expect_equal(nrow(edgar_poly_c), 2)
   })
 
+  withr::with_tempdir({
+    mcd14dl_path <- file.path(".", "MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt")
+    data.table::fwrite(
+      data.frame(
+        latitude = 35.95013,
+        longitude = -78.8277,
+        acq_date = "2026-03-15",
+        acq_time = 1230,
+        frp = 11.5
+      ),
+      mcd14dl_path
+    )
+    mcd14dl_r <- process_mcd14dl(
+      path = mcd14dl_path,
+      date = "2026-03-15"
+    )
+
+    mcd14dl_c <- calculate_covariates(
+      covariate = "mcd14dl",
+      from = mcd14dl_r,
+      locs = ncpt,
+      locs_id = "site_id",
+      radius = 0
+    )
+    testthat::expect_true(is.data.frame(mcd14dl_c))
+    testthat::expect_equal(mcd14dl_c$fire_count_00000, 1)
+  })
+
   candidates <-
     c(
       "modis",
@@ -151,6 +182,7 @@ testthat::test_that("calculate_covariates (no errors)", {
       "terraclimate",
       "tri",
       "nei",
+      "mcd14dl",
       "edgar"
     )
   for (cand in candidates) {

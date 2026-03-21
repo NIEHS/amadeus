@@ -54,6 +54,7 @@ process_covariates <-
     covariate = c(
       "modis_swath",
       "modis_merge",
+      "mcd14dl",
       "koppen-geiger",
       "blackmarble",
       "koeppen-geiger",
@@ -100,6 +101,7 @@ process_covariates <-
       covariate,
       modis_merge = process_modis_merge,
       modis_swath = process_modis_swath,
+      mcd14dl = process_mcd14dl,
       blackmarble = process_blackmarble,
       ecoregion = process_ecoregion,
       ecoregions = process_ecoregion,
@@ -189,7 +191,14 @@ process_covariates <-
 # previously modis_prefilter_sds
 process_modis_sds <-
   function(
-    product = c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2"),
+    product = c(
+      "MOD11A1",
+      "MOD13A2",
+      "MOD09GA",
+      "MCD19A2",
+      "MOD14A1",
+      "MYD14A1"
+    ),
     custom_sel = NULL,
     ...
   ) {
@@ -203,7 +212,9 @@ process_modis_sds <-
           MOD11A1 = "(LST_)",
           MOD13A2 = "(NDVI)",
           MOD09GA = "(sur_refl_b0)",
-          MCD19A2 = "(Optical_Depth)"
+          MCD19A2 = "(Optical_Depth)",
+          MOD14A1 = "(FireMask)",
+          MYD14A1 = "(FireMask)"
         )
       if (product == "MCD19A2") {
         message(
@@ -368,9 +379,10 @@ process_modis_merge <- function(
   amadeus::is_date_proper(instr = date)
 
   # interpret date
-  today <- as.character(date)
-  dayjul <- strftime(today, "%Y%j")
-  ftarget <- grep(sprintf("A%s", dayjul), path, value = TRUE)
+  ftarget <- modis_filter_paths_by_date(path, date = date)
+  if (length(ftarget) == 0) {
+    stop("No MODIS files matched the requested date.\n")
+  }
 
   # get layer information
   layer_target <-
@@ -383,13 +395,82 @@ process_modis_merge <- function(
     })
   # Merge multiple rasters into one
   # do.call(f, l) is equivalent to f(l[[1]], ... , l[[length(l)]])
-  if (length(path) > 1) {
+  if (length(ftarget) > 1) {
     result_merged <- do.call(terra::merge, layer_target)
     gc()
   } else {
     result_merged <- layer_target[[1]]
   }
   return(result_merged)
+}
+
+
+process_mcd14dl <- function(
+  path = NULL,
+  date = NULL,
+  extent = NULL,
+  ...
+) {
+  if (is.null(path)) {
+    stop("path is required.\n")
+  }
+
+  if (length(path) == 1L && dir.exists(path)) {
+    path <- list.files(
+      path = path,
+      pattern = "\\.txt$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
+  }
+
+  path <- path[grepl("\\.txt$", path, ignore.case = TRUE)]
+  if (length(path) == 0) {
+    stop("No MCD14DL text files were found.\n")
+  }
+
+  txt_list <- lapply(path, data.table::fread)
+  txt_data <- data.table::rbindlist(txt_list, fill = TRUE)
+  names(txt_data) <- tolower(names(txt_data))
+
+  required_cols <- c("latitude", "longitude", "acq_date")
+  if (!all(required_cols %in% names(txt_data))) {
+    stop("MCD14DL input is missing one or more required columns.\n")
+  }
+
+  if (!is.null(date)) {
+    if (length(date) == 1L) {
+      date <- c(date, date)
+    }
+    amadeus::is_date_proper(instr = date)
+    txt_data$acq_date <- as.Date(txt_data$acq_date)
+    txt_data <- txt_data[
+      txt_data$acq_date >= as.Date(date[1]) &
+        txt_data$acq_date <= as.Date(date[2])
+    ]
+  } else {
+    txt_data$acq_date <- as.Date(txt_data$acq_date)
+  }
+
+  if (!"frp" %in% names(txt_data)) {
+    txt_data$frp <- NA_real_
+  }
+  txt_data$frp <- as.numeric(txt_data$frp)
+  txt_data$fire_count <- 1L
+  txt_data$time <- as.integer(format(txt_data$acq_date, "%Y%m%d"))
+
+  txt_vect <- terra::vect(
+    as.data.frame(txt_data),
+    geom = c("longitude", "latitude"),
+    crs = "EPSG:4326",
+    keepgeom = TRUE
+  )
+
+  if (!is.null(extent)) {
+    txt_vect <- apply_extent(txt_vect, extent)
+  }
+
+  return(txt_vect)
 }
 
 
