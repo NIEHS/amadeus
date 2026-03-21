@@ -1896,7 +1896,11 @@ testthat::test_that(
     fake_from <- c(
       "MOD09GA.A2021001.h10v05.061.2021001000000.hdf",
       "MOD09GA.A2021001.h11v05.061.2021001000001.hdf",
-      "MOD09GA.A2021002.h10v05.061.2021002000000.hdf"
+      "MOD09GA.A2021001.h12v05.061.2021001000002.hdf",
+      "MOD09GA.A2021002.h10v05.061.2021002000000.hdf",
+      "MOD09GA.A2021002.h11v05.061.2021002000001.hdf",
+      "MOD09GA.A2021002.h12v05.061.2021002000002.hdf",
+      "MOD09GA.A2021003.h10v05.061.2021003000000.hdf"
     )
 
     testthat::local_mocked_bindings(
@@ -1934,10 +1938,17 @@ testthat::test_that(
       "insufficient"
     )
 
-    testthat::expect_equal(nrow(result), 1)
-    testthat::expect_equal(as.character(result$time), "2021-01-01")
-    testthat::expect_equal(result$mock_cov_00000, -99999)
-    testthat::expect_equal(result$mock_cov_01000, -99999)
+    testthat::expect_equal(
+      as.character(attr(result, "dates_dropped")),
+      "2021-01-03"
+    )
+    testthat::expect_equal(nrow(result), 2)
+    testthat::expect_equal(
+      as.character(result$time),
+      c("2021-01-01", "2021-01-02")
+    )
+    testthat::expect_true(all(result$mock_cov_00000 == -99999))
+    testthat::expect_true(all(result$mock_cov_01000 == -99999))
   }
 )
 
