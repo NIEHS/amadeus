@@ -137,7 +137,7 @@ testthat::test_that("calculate_covariates (no errors)", {
       ),
       mcd14dl_path
     )
-    mcd14dl_r <- process_mcd14dl(
+    mcd14dl_r <- amadeus:::process_mcd14dl(
       path = mcd14dl_path,
       date = "2026-03-15"
     )
@@ -176,7 +176,7 @@ testthat::test_that("calculate_covariates (no errors)", {
       crs = 4326
     )
 
-    direct_calc <- calculate_mcd14dl(
+    direct_calc <- amadeus:::calculate_mcd14dl(
       from = fire_points,
       locs = locs_sf,
       locs_id = "site_id",
@@ -189,15 +189,18 @@ testthat::test_that("calculate_covariates (no errors)", {
     testthat::expect_equal(direct_calc$frp_01000, 16.5)
 
     testthat::expect_error(
-      calculate_mcd14dl(from = terra::rast(), locs = locs_sf),
+      amadeus:::calculate_mcd14dl(from = terra::rast(), locs = locs_sf),
       "SpatVector returned by process_mcd14dl"
     )
     testthat::expect_error(
-      calculate_mcd14dl(from = fire_points[, c("time", "fire_count")], locs = locs_sf),
+      amadeus:::calculate_mcd14dl(
+        from = fire_points[, c("time", "fire_count")],
+        locs = locs_sf
+      ),
       "missing required MCD14DL fields"
     )
     testthat::expect_error(
-      calculate_mcd14dl(from = fire_points, locs = list()),
+      amadeus:::calculate_mcd14dl(from = fire_points, locs = list()),
       "convertible to sf"
     )
   })

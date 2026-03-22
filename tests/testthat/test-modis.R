@@ -1148,7 +1148,7 @@ testthat::test_that("process_mcd14dl covers directory filtering and error branch
   withr::local_package("terra")
   withr::local_package("data.table")
 
-  testthat::expect_error(process_mcd14dl(), "path is required")
+  testthat::expect_error(amadeus:::process_mcd14dl(), "path is required")
 
   withr::with_tempdir({
     txt_one <- file.path(".", "MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt")
@@ -1176,7 +1176,7 @@ testthat::test_that("process_mcd14dl covers directory filtering and error branch
     )
     data.table::fwrite(data.frame(latitude = 35), bad_txt)
 
-    proc <- process_mcd14dl(
+    proc <- amadeus:::process_mcd14dl(
       path = ".",
       date = c("2026-03-15", "2026-03-16"),
       extent = c(-79, 35.9, -78.7, 36.0)
@@ -1189,7 +1189,7 @@ testthat::test_that("process_mcd14dl covers directory filtering and error branch
     testthat::expect_equal(proc$frp[2], 7.5)
 
     testthat::expect_error(
-      process_mcd14dl(path = bad_txt),
+      amadeus:::process_mcd14dl(path = bad_txt),
       "missing one or more required columns"
     )
   })
