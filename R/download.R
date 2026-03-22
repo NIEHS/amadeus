@@ -699,20 +699,7 @@ download_geos <- function(
     }
   }
 
-  #### 11. Exit early if download=FALSE
-  if (!isTRUE(download)) {
-    message(sprintf(
-      "Skipping download. Found %d files available for download.\n",
-      length(all_urls)
-    ))
-    return(invisible(list(
-      urls = all_urls,
-      destfiles = all_destfiles,
-      n_files = length(all_urls)
-    )))
-  }
-
-  #### 12. Download files using httr2
+  #### 11. Download files using httr2
   download_result <- amadeus::download_run_method(
     urls = all_urls,
     destfiles = all_destfiles,
@@ -2970,12 +2957,7 @@ download_modis <- function(
     )
   }
 
-  #### 8. Check version
-  if (is.null(version)) {
-    stop("Please select a data version.\n")
-  }
-
-  #### 9. Warning for excessive query
+  #### 8. Warning for excessive query
   dt_date <- as.Date(date)
   if (diff(dt_date) > 31) {
     warning(
@@ -2985,7 +2967,7 @@ download_modis <- function(
     )
   }
 
-  #### 10. Version fix
+  #### 9. Version fix
   if (product == "MOD06_L2") {
     str_version <- "6.1"
   } else if (product %in% c("MOD14CM1", "MYD14CM1")) {
@@ -2998,7 +2980,7 @@ download_modis <- function(
     str_version <- version
   }
 
-  #### 11. Query CMR
+  #### 10. Query CMR
   message("Querying NASA CMR for available granules...\n")
   chr_extent <- paste(extent, collapse = ",")
   resp <- tryCatch(

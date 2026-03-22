@@ -1128,53 +1128,45 @@ calculate_mcd14dl <- function(
       col_count <- sprintf("fire_count_%05d", radius_i)
       col_frp <- sprintf("frp_%05d", radius_i)
 
-      if (nrow(from_day) == 0) {
+      dist_matrix <- terra::distance(locs_points, from_day)
+      dist_df <- data.frame(
+        expand.grid(
+          loc_index = loc_index,
+          from_index = seq_len(nrow(from_day))
+        ),
+        distance = as.vector(dist_matrix)
+      )
+      if (radius_i == 0L) {
+        dist_df <- dist_df[dist_df$distance == 0, ]
+      } else {
+        dist_df <- dist_df[dist_df$distance <= radius_i, ]
+      }
+
+      if (nrow(dist_df) == 0) {
         result_empty <- data.frame(
           loc_index = loc_index,
           fire_count = 0,
           frp = 0
         )
       } else {
-        dist_matrix <- terra::distance(locs_points, from_day)
-        dist_df <- data.frame(
-          expand.grid(
-            loc_index = loc_index,
-            from_index = seq_len(nrow(from_day))
-          ),
-          distance = as.vector(dist_matrix)
-        )
-        if (radius_i == 0L) {
-          dist_df <- dist_df[dist_df$distance == 0, ]
-        } else {
-          dist_df <- dist_df[dist_df$distance <= radius_i, ]
-        }
-
-        if (nrow(dist_df) == 0) {
-          result_empty <- data.frame(
-            loc_index = loc_index,
-            fire_count = 0,
-            frp = 0
+        dist_df$fire_count <- from_day$fire_count[dist_df$from_index]
+        dist_df$frp <- from_day$frp[dist_df$from_index]
+        result_empty <-
+          stats::aggregate(
+            cbind(fire_count, frp) ~ loc_index,
+            data = dist_df,
+            FUN = sum,
+            na.rm = TRUE
           )
-        } else {
-          dist_df$fire_count <- from_day$fire_count[dist_df$from_index]
-          dist_df$frp <- from_day$frp[dist_df$from_index]
-          result_empty <-
-            stats::aggregate(
-              cbind(fire_count, frp) ~ loc_index,
-              data = dist_df,
-              FUN = sum,
-              na.rm = TRUE
-            )
-          result_empty <-
-            merge(
-              data.frame(loc_index = loc_index),
-              result_empty,
-              by = "loc_index",
-              all.x = TRUE
-            )
-          result_empty$fire_count[is.na(result_empty$fire_count)] <- 0
-          result_empty$frp[is.na(result_empty$frp)] <- 0
-        }
+        result_empty <-
+          merge(
+            data.frame(loc_index = loc_index),
+            result_empty,
+            by = "loc_index",
+            all.x = TRUE
+          )
+        result_empty$fire_count[is.na(result_empty$fire_count)] <- 0
+        result_empty$frp[is.na(result_empty$frp)] <- 0
       }
 
       names(result_empty)[names(result_empty) == "fire_count"] <- col_count
@@ -2946,11 +2938,7 @@ calculate_prism <- function(
     sites_extracted <- sites_extracted[, -1, drop = FALSE]
   } else {
     # use exactextractr::exact_extract for polygon locations and buffered points
-    if (inherits(sites_e, "SpatVector")) {
-      sites_e_sf <- sf::st_as_sf(sites_e)
-    } else {
-      sites_e_sf <- sites_e
-    }
+    sites_e_sf <- sf::st_as_sf(sites_e)
     sites_e_buf <- if (radius > 0) {
       sf::st_buffer(sites_e_sf, dist = radius)
     } else {
@@ -3191,11 +3179,7 @@ calculate_cropscape <- function(
     # rename
     colnames(sites_extracted) <- paste0("cropscape_", radius)
   } else {
-    if (inherits(sites_e, "SpatVector")) {
-      sites_e_sf <- sf::st_as_sf(sites_e)
-    } else {
-      sites_e_sf <- sites_e
-    }
+    sites_e_sf <- sf::st_as_sf(sites_e)
     sites_e_buf <- if (radius > 0) {
       sf::st_buffer(sites_e_sf, dist = radius)
     } else {
