@@ -904,10 +904,18 @@ download_gmted <- function(
 #' Download meteorological and atmospheric data
 #' @description
 #' The \code{download_merra2()} function accesses and downloads various
-#' meteorological and atmospheric collections from [NASA's Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/).
-#' @note Due to NASA data access policies, downloads require a valid NASA
-#' Earthdata token for authentication. Use \code{setup_nasa_token()} for setup.
-#' @param collection character(1). MERRA-2 data collection file name.
+#' meteorological and atmospheric collections from [NASA's Modern-Era
+#' Retrospective analysis for Research and Applications, Version 2
+#' (MERRA-2) model](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/), and the
+#' daily corrected Global Fire Weather Index (FWI) product derived from MERRA-2
+#' weather inputs.
+#' @note Due to NASA data access policies, standard MERRA-2 GES DISC downloads
+#' require a valid NASA Earthdata token for authentication. Use
+#' \code{setup_nasa_token()} for setup. The `"fwi"` collection is hosted on the
+#' public GlobalFWI portal and does not require Earthdata authentication.
+#' @param collection character(1). MERRA-2 data collection file name, or
+#'   `"fwi"` for the daily corrected Global Fire Weather Index product
+#'   (`MERRA2.CORRECTED`).
 #' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
 #'   authentication token.
 #' @param date character(1 or 2). length of 10. Date or start/end dates
@@ -1165,7 +1173,8 @@ download_merra2 <- function(
     "tavg3_3d_cld_Nv",
     "tavg3_3d_mst_Nv",
     "tavg3_3d_rad_Nv",
-    "tavg3_2d_glc_Nx"
+    "tavg3_2d_glc_Nx",
+    "fwi"
   ),
   nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
@@ -1213,14 +1222,21 @@ download_merra2 <- function(
     )
   }
 
-  #### 4. Check and retrieve NASA token (BEFORE null check)
-  nasa_earth_data_token <- amadeus::get_token(
-    token = nasa_earth_data_token,
-    env_var = "NASA_EARTHDATA_TOKEN"
-  )
+  #### 4. Check and retrieve NASA token for standard MERRA-2 collections only
+  standard_collection <- collection != "fwi"
+  if (any(standard_collection)) {
+    nasa_earth_data_token <- amadeus::get_token(
+      token = nasa_earth_data_token,
+      env_var = "NASA_EARTHDATA_TOKEN"
+    )
+  }
 
-  #### 5. Now check for null parameters - token is now set
-  amadeus::check_for_null_parameters(mget(ls()))
+  #### 5. Now check for null parameters
+  parameters <- mget(ls())
+  if (!any(standard_collection)) {
+    parameters$nasa_earth_data_token <- ""
+  }
+  amadeus::check_for_null_parameters(parameters)
 
   #### 7. Check if collection is recognized
   identifiers <- c(
@@ -1270,7 +1286,7 @@ download_merra2 <- function(
   identifiers_df <- as.data.frame(identifiers)
   colnames(identifiers_df) <- c("collection_id", "esdt_name", "DOI")
 
-  if (!all(collection %in% identifiers_df$collection_id)) {
+  if (!all(collection[standard_collection] %in% identifiers_df$collection_id)) {
     message(identifiers_df)
     stop(paste0(
       "Requested collection is not recognized.\n",
@@ -1294,6 +1310,33 @@ download_merra2 <- function(
 
   for (c in seq_along(collection)) {
     collection_loop <- collection[c]
+
+    if (collection_loop == "fwi") {
+      base <- paste0(
+        "https://portal.nccs.nasa.gov/datashare/GlobalFWI/v2.0/",
+        "fwiCalcs.MERRA2/Default/MERRA2.CORRECTED/"
+      )
+      download_folder <- paste0(directory_to_save, collection_loop)
+      if (!dir.exists(download_folder)) {
+        dir.create(download_folder, recursive = TRUE)
+      }
+      for (d in seq_along(date_sequence)) {
+        date_loop <- date_sequence[d]
+        year <- substr(date_loop, 1, 4)
+        file_name <- paste0(
+          "FWI.MERRA2.CORRECTED.Daily.Default.",
+          date_loop,
+          ".nc"
+        )
+        download_url <- paste0(base, year, "/", file_name)
+        download_name <- paste0(download_folder, "/", file_name)
+        if (amadeus::check_destfile(download_name)) {
+          all_urls <- c(all_urls, download_url)
+          all_destfiles <- c(all_destfiles, download_name)
+        }
+      }
+      next
+    }
 
     #### Define ESDT name
     identifiers_df_requested <- subset(

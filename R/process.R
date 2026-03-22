@@ -2615,20 +2615,26 @@ process_geos <-
 
 #' Process meteorological and atmospheric data
 #' @description
-#' The \code{process_merra2()} function imports and cleans raw atmospheric
-#' composition data, returning a single `SpatRaster` object.
+#' The \code{process_merra2()} function imports and cleans raw atmospheric,
+#' meteorological, and MERRA2-based Fire Weather Index data, returning a single
+#' `SpatRaster` object.
 #' @param date character(1 or 2). Date (1) or start and end dates (2).
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
-#' @param variable character(1). MERRA2 variable name(s).
-#' @param path character(1). Directory with downloaded netCDF (.nc4) files.
+#' @param variable character(1). MERRA2 variable name(s). For daily corrected
+#'   Fire Weather Index files (`collection = "fwi"` during download), use one
+#'   of `"DC"`, `"DMC"`, `"FFMC"`, `"ISI"`, `"BUI"`, or `"FWI"` (or the full raw
+#'   layer name).
+#' @param path character(1). Directory with downloaded netCDF (`.nc4` or `.nc`)
+#'   files.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable,
-#' pressure level, date, and hour. Pressure level values utilized for layer
-#' names are taken directly from raw data and are not edited to retain
-#' pressure level information.
+#' pressure level, date, and hour for standard MERRA-2 collections. For daily
+#' Fire Weather Index files, layer names contain the variable and date only.
+#' Pressure level values utilized for layer names are taken directly from raw
+#' data and are not edited to retain pressure level information.
 #' @author Mitchell Manware
 #' @return a `SpatRaster` object;
 #' @importFrom terra rast
@@ -2668,11 +2674,11 @@ process_merra2 <-
     #### identify file paths
     paths <- list.files(
       path,
-      pattern = "MERRA2_400",
+      pattern = "MERRA2_400|^FWI\\.",
       full.names = TRUE
     )
     paths <- paths[grep(
-      ".nc4",
+      "\\.nc4?$",
       paths
     )]
     #### identify dates based on user input
@@ -2692,6 +2698,9 @@ process_merra2 <-
         value = TRUE
       )
     )
+    if (length(data_paths) == 0) {
+      stop("No MERRA2 files matching the requested date were found.\n")
+    }
     #### identify collection
     collection <- amadeus::process_collection(
       data_paths[1],
@@ -2728,68 +2737,111 @@ process_merra2 <-
         )
       )
       #### subset to user-selected variable
-      data_variable <- terra::subset(
-        data_raw,
-        subset = grep(
+      data_variable_index <- grep(
+        variable,
+        names(data_raw),
+        fixed = TRUE
+      )
+      if (length(data_variable_index) == 0) {
+        data_variable_index <- grep(
           variable,
           names(data_raw)
         )
-      )
-      #### identify time step
-      times <- amadeus::process_merra2_time(
-        collection = collection,
-        from = data_variable
-      )
-      #### identify unique pressure levels
-      levels <-
-        unique(
-          grep(
-            "lev=",
-            unlist(
-              strsplit(names(data_variable), "_")
-            ),
-            value = TRUE
+      }
+      if (length(data_variable_index) == 0) {
+        stop(
+          paste0(
+            "Requested variable ",
+            variable,
+            " was not found in ",
+            basename(data_paths[p]),
+            ".\n"
           )
         )
-      #### empty `levels` if 2 dimensional data
-      if (length(levels) == 0) {
-        levels <- ""
       }
-      #### merge levels and times
-      leveltimes <- merge(levels, times)
-      #### set layer names
-      names(data_variable) <- gsub(
-        "__",
-        "_",
-        paste0(
-          variable,
+      data_variable <- terra::subset(
+        data_raw,
+        subset = data_variable_index
+      )
+      if (collection == "fwi") {
+        #### set layer names for daily GlobalFWI files
+        names(data_variable) <- paste0(
+          gsub("_", ".", names(data_variable)),
           "_",
-          leveltimes[, 1],
-          "_",
-          data_date,
-          "_",
-          leveltimes[, 2]
+          data_date
         )
-      )
-      #### set layer times
-      terra::time(data_variable) <- ISOdatetime(
-        year = substr(data_date, 1, 4),
-        month = substr(data_date, 5, 6),
-        day = substr(data_date, 7, 8),
-        hour = substr(leveltimes[, 2], 1, 2),
-        min = substr(leveltimes[, 2], 3, 4),
-        sec = substr(leveltimes[, 2], 5, 6),
-        tz = "UTC"
-      )
+        #### set layer times
+        terra::time(data_variable) <- ISOdatetime(
+          year = substr(data_date, 1, 4),
+          month = substr(data_date, 5, 6),
+          day = substr(data_date, 7, 8),
+          hour = 0,
+          min = 0,
+          sec = 0,
+          tz = "UTC"
+        )
+      } else {
+        #### identify time step
+        times <- amadeus::process_merra2_time(
+          collection = collection,
+          from = data_variable
+        )
+        #### identify unique pressure levels
+        levels <-
+          unique(
+            grep(
+              "lev=",
+              unlist(
+                strsplit(names(data_variable), "_")
+              ),
+              value = TRUE
+            )
+          )
+        #### empty `levels` if 2 dimensional data
+        if (length(levels) == 0) {
+          levels <- ""
+        }
+        #### merge levels and times
+        leveltimes <- merge(levels, times)
+        #### set layer names
+        names(data_variable) <- gsub(
+          "__",
+          "_",
+          paste0(
+            variable,
+            "_",
+            leveltimes[, 1],
+            "_",
+            data_date,
+            "_",
+            leveltimes[, 2]
+          )
+        )
+        #### set layer times
+        terra::time(data_variable) <- ISOdatetime(
+          year = substr(data_date, 1, 4),
+          month = substr(data_date, 5, 6),
+          day = substr(data_date, 7, 8),
+          hour = substr(leveltimes[, 2], 1, 2),
+          min = substr(leveltimes[, 2], 3, 4),
+          sec = substr(leveltimes[, 2], 5, 6),
+          tz = "UTC"
+        )
+      }
       data_return <- c(
         data_return,
         data_variable,
         warn = FALSE
       )
     }
-    terra::crs(data_return) <- "EPSG:4267"
+    if (collection == "fwi") {
+      terra::crs(data_return) <- "EPSG:4326"
+    } else {
+      terra::crs(data_return) <- "EPSG:4267"
+    }
     message(paste0(
-      "Returning hourly ",
+      "Returning ",
+      ifelse(collection == "fwi", "daily ", "hourly "),
       variable,
       " data from ",
       as.Date(

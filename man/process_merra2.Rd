@@ -16,9 +16,13 @@ process_merra2(
 \item{date}{character(1 or 2). Date (1) or start and end dates (2).
 Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 
-\item{variable}{character(1). MERRA2 variable name(s).}
+\item{variable}{character(1). MERRA2 variable name(s). For daily corrected
+Fire Weather Index files (\code{collection = "fwi"} during download), use one
+of \code{"DC"}, \code{"DMC"}, \code{"FFMC"}, \code{"ISI"}, \code{"BUI"}, or \code{"FWI"} (or the full raw
+layer name).}
 
-\item{path}{character(1). Directory with downloaded netCDF (.nc4) files.}
+\item{path}{character(1). Directory with downloaded netCDF (\code{.nc4} or \code{.nc})
+files.}
 
 \item{extent}{numeric(4) or SpatExtent giving the extent of the raster
 if \code{NULL} (default), the entire raster is loaded}
@@ -29,14 +33,16 @@ if \code{NULL} (default), the entire raster is loaded}
 a \code{SpatRaster} object;
 }
 \description{
-The \code{process_merra2()} function imports and cleans raw atmospheric
-composition data, returning a single \code{SpatRaster} object.
+The \code{process_merra2()} function imports and cleans raw atmospheric,
+meteorological, and MERRA2-based Fire Weather Index data, returning a single
+\code{SpatRaster} object.
 }
 \note{
 Layer names of the returned \code{SpatRaster} object contain the variable,
-pressure level, date, and hour. Pressure level values utilized for layer
-names are taken directly from raw data and are not edited to retain
-pressure level information.
+pressure level, date, and hour for standard MERRA-2 collections. For daily
+Fire Weather Index files, layer names contain the variable and date only.
+Pressure level values utilized for layer names are taken directly from raw
+data and are not edited to retain pressure level information.
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large

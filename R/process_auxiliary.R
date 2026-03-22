@@ -77,6 +77,24 @@ process_collection <-
     #### source names
     geos <- c("geos", "GEOS", "geos-cf", "GEOS-CF")
     merra2 <- c("merra", "merra2", "MERRA", "MERRA2")
+    #### handle GlobalFWI daily corrected MERRA2 files
+    if (source %in% merra2 && grepl("^FWI\\.", basename(path))) {
+      split_period <- unlist(
+        strsplit(
+          basename(path),
+          "\\."
+        )
+      )
+      if (collection == TRUE) {
+        return("fwi")
+      }
+      if (date == TRUE) {
+        return(split_period[length(split_period) - 1])
+      }
+      if (datetime == TRUE) {
+        return(split_period[length(split_period) - 1])
+      }
+    }
     #### string split point
     if (source %in% merra2) {
       code <- "MERRA2_400."
@@ -189,6 +207,8 @@ process_merra2_time <-
       step <- seq(from = 0030, to = 2330, by = 100)
     } else if (code == "tavg3") {
       step <- seq(from = 0130, to = 2330, by = 300)
+    } else if (collection == "fwi") {
+      step <- 0000
     }
     pad_l <- stringi::stri_pad(step, side = "left", width = 4, pad = 0)
     pad_r <- stringi::stri_pad(pad_l, side = "right", width = 6, pad = 0)

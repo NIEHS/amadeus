@@ -111,6 +111,17 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
+## Available inputs and data availability
+
+`download_data(dataset_name = "merra2", ...)` wraps `download_merra2()`.
+
+- `collection` accepts a large set of MERRA-2 collection IDs across instantaneous (`inst*`), time-averaged (`tavg*`), and daily-statistic (`statD*`) families for 2-D and 3-D meteorology and chemistry fields; examples include `inst1_2d_asm_Nx`, `tavg1_2d_slv_Nx`, and `tavg3_3d_mst_Np`. It also accepts `"fwi"` for the daily corrected Global Fire Weather Index product (`MERRA2.CORRECTED`).
+- `date` can be a single day or a start/end range, and requests return daily `.nc4` files for each selected collection.
+- For `collection = "fwi"`, downloads return daily `.nc` files from the public GlobalFWI portal rather than GES DISC.
+- Downloads are global only; clip to a study area during processing rather than at download time.
+- NASA EarthData authentication is required for standard GES DISC collections, but not for `collection = "fwi"`.
+- `amadeus` validates collection IDs against its built-in MERRA-2 table, routes requests to the correct GES DISC server automatically, and also saves companion `.xml` metadata files under each collection's `metadata/` folder.
+
 ## Download representative requests
 
 ```{r download, eval = live_run}

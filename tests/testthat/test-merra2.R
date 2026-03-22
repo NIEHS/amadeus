@@ -1,6 +1,98 @@
 ################################################################################
 ##### unit and integration tests for NASA MERRA2 functions
 
+make_merra2_fwi_fixture <- function(
+  path,
+  date = "20240811"
+) {
+  build_layer <- function(offset) {
+    layer <- terra::rast(
+      nrows = 2,
+      ncols = 3,
+      xmin = -180.3125,
+      xmax = -178.4375,
+      ymin = -58.25,
+      ymax = -57.25,
+      crs = "EPSG:4326"
+    )
+    terra::values(layer) <- seq_len(terra::ncell(layer)) + offset
+    layer
+  }
+
+  fwi_layers <- terra::sds(
+    build_layer(0),
+    build_layer(10),
+    build_layer(20),
+    build_layer(30),
+    build_layer(40),
+    build_layer(50)
+  )
+  names(fwi_layers) <- c(
+    "MERRA2.CORRECTED_DC",
+    "MERRA2.CORRECTED_DMC",
+    "MERRA2.CORRECTED_FFMC",
+    "MERRA2.CORRECTED_ISI",
+    "MERRA2.CORRECTED_BUI",
+    "MERRA2.CORRECTED_FWI"
+  )
+
+  fixture_path <- file.path(
+    path,
+    paste0("FWI.MERRA2.CORRECTED.Daily.Default.", date, ".nc")
+  )
+  terra::writeCDF(
+    fwi_layers,
+    fixture_path,
+    overwrite = TRUE
+  )
+
+  invisible(fixture_path)
+}
+
+################################################################################
+##### helper coverage for FWI parsing
+
+testthat::test_that("process_collection parses FWI file metadata", {
+  fwi_path <- file.path(
+    tempdir(),
+    "FWI.MERRA2.CORRECTED.Daily.Default.20240811.nc"
+  )
+
+  testthat::expect_equal(
+    process_collection(fwi_path, source = "merra2", collection = TRUE),
+    "fwi"
+  )
+  testthat::expect_equal(
+    process_collection(fwi_path, source = "MERRA2", date = TRUE),
+    "20240811"
+  )
+  testthat::expect_equal(
+    process_collection(fwi_path, source = "merra", datetime = TRUE),
+    "20240811"
+  )
+})
+
+testthat::test_that("process_merra2_time supports FWI daily timestamps", {
+  withr::local_package("terra")
+
+  fwi_raster <- terra::rast(
+    nrows = 1,
+    ncols = 1,
+    xmin = 0,
+    xmax = 1,
+    ymin = 0,
+    ymax = 1,
+    crs = "EPSG:4326"
+  )
+  terra::values(fwi_raster) <- 1
+  terra::time(fwi_raster) <- as.POSIXct("2024-08-11 00:00:00", tz = "UTC")
+
+  testthat::expect_equal(
+    process_merra2_time(collection = "fwi", from = fwi_raster),
+    "000000"
+  )
+})
+
 ################################################################################
 ##### download_merra2
 testthat::test_that("download_merra2 (no errors)", {
@@ -255,6 +347,104 @@ testthat::test_that("download_merra2 hash = TRUE path", {
 })
 
 ################################################################################
+##### download_merra2 FWI
+
+testthat::test_that("download_merra2 FWI builds GlobalFWI URLs", {
+  captured <- new.env(parent = emptyenv())
+  testthat::local_mocked_bindings(
+    download_run_method = function(urls, destfiles, token, ...) {
+      captured$urls <- urls
+      captured$destfiles <- destfiles
+      captured$token <- token
+      list(success = length(urls), failed = 0, skipped = 0)
+    },
+    .package = "amadeus"
+  )
+
+  withr::with_tempdir({
+    result <- suppressMessages(
+      download_merra2(
+        collection = "fwi",
+        date = c("2024-08-11", "2024-08-12"),
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      )
+    )
+
+    expected_files <- c(
+      "FWI.MERRA2.CORRECTED.Daily.Default.20240811.nc",
+      "FWI.MERRA2.CORRECTED.Daily.Default.20240812.nc"
+    )
+    expected_urls <- paste0(
+      "https://portal.nccs.nasa.gov/datashare/GlobalFWI/v2.0/",
+      "fwiCalcs.MERRA2/Default/MERRA2.CORRECTED/2024/",
+      expected_files
+    )
+
+    testthat::expect_equal(result$success, 2)
+    testthat::expect_null(captured$token)
+    testthat::expect_equal(captured$urls, expected_urls)
+    testthat::expect_equal(basename(captured$destfiles), expected_files)
+    testthat::expect_true(all(grepl("/fwi/", captured$destfiles, fixed = TRUE)))
+  })
+})
+
+testthat::test_that("download_merra2 supports mixed FWI and standard requests", {
+  captured <- new.env(parent = emptyenv())
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(urls, destfiles, token, ...) {
+      captured$urls <- urls
+      captured$destfiles <- destfiles
+      captured$token <- token
+      list(success = length(urls), failed = 0, skipped = 0)
+    },
+    .package = "amadeus"
+  )
+  fake_nc4 <- "MERRA2_400.inst1_2d_asm_Nx.20240811.nc4"
+  fake_xml <- paste0(fake_nc4, ".xml")
+  fake_html <- sprintf(
+    '<html><a href="%s">%s</a><a href="%s">%s</a></html>',
+    fake_nc4, fake_nc4, fake_xml, fake_xml
+  )
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "text/html"),
+          body = charToRaw(fake_html)
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_string = function(resp, ...) {
+      rawToChar(resp$body)
+    },
+    .package = "httr2"
+  )
+
+  withr::with_tempdir({
+    result <- suppressMessages(
+      download_merra2(
+        collection = c("fwi", "inst1_2d_asm_Nx"),
+        date = "2024-08-11",
+        nasa_earth_data_token = "fake_token",
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      )
+    )
+
+    testthat::expect_true(is.character(captured$token))
+    testthat::expect_true(nzchar(captured$token))
+    testthat::expect_equal(result$success, 3)
+    testthat::expect_true(any(grepl("GlobalFWI", captured$urls, fixed = TRUE)))
+    testthat::expect_true(any(grepl("\\.nc4$", captured$destfiles)))
+    testthat::expect_true(any(grepl("\\.xml$", captured$destfiles)))
+  })
+})
+
+################################################################################
 ##### process_merra2
 testthat::test_that("process_merra2", {
   withr::local_package("terra")
@@ -343,6 +533,83 @@ testthat::test_that("process_merra2", {
       extent = terra::ext(merra2)
     )
   )
+})
+
+testthat::test_that("process_merra2 supports FWI daily corrected files", {
+  withr::local_package("terra")
+
+  withr::with_tempdir({
+    make_merra2_fwi_fixture(".")
+    fwi_variables <- c("DC", "DMC", "FFMC", "ISI", "BUI", "FWI")
+
+    for (fwi_variable in fwi_variables) {
+      merra2_fwi <- process_merra2(
+        date = "2024-08-11",
+        variable = fwi_variable,
+        path = "."
+      )
+
+      testthat::expect_true(class(merra2_fwi)[1] == "SpatRaster")
+      testthat::expect_true(terra::hasValues(merra2_fwi))
+      testthat::expect_equal(dim(merra2_fwi), c(2, 3, 1))
+      testthat::expect_true("POSIXt" %in% class(terra::time(merra2_fwi)))
+      testthat::expect_match(
+        names(merra2_fwi),
+        paste0("MERRA2\\.CORRECTED\\.", fwi_variable, "_20240811")
+      )
+      testthat::expect_false(terra::crs(merra2_fwi) == "")
+    }
+  })
+})
+
+testthat::test_that("process_merra2 supports multi-day and raw-name FWI requests", {
+  withr::local_package("terra")
+
+  withr::with_tempdir({
+    make_merra2_fwi_fixture(".", date = "20240811")
+    make_merra2_fwi_fixture(".", date = "20240812")
+
+    merra2_fwi <- process_merra2(
+      date = c("2024-08-11", "2024-08-12"),
+      variable = "MERRA2.CORRECTED_FWI",
+      path = "."
+    )
+
+    testthat::expect_equal(terra::nlyr(merra2_fwi), 2)
+    testthat::expect_equal(
+      names(merra2_fwi),
+      c("MERRA2.CORRECTED.FWI_20240811", "MERRA2.CORRECTED.FWI_20240812")
+    )
+    testthat::expect_equal(
+      as.character(as.Date(terra::time(merra2_fwi))),
+      c("2024-08-11", "2024-08-12")
+    )
+  })
+})
+
+testthat::test_that("process_merra2 returns informative FWI errors", {
+  withr::local_package("terra")
+
+  withr::with_tempdir({
+    testthat::expect_error(
+      process_merra2(
+        date = "2024-08-11",
+        variable = "FWI",
+        path = "."
+      ),
+      "No MERRA2 files matching the requested date"
+    )
+
+    make_merra2_fwi_fixture(".")
+    testthat::expect_error(
+      process_merra2(
+        date = "2024-08-11",
+        variable = "NOT_A_VAR",
+        path = "."
+      ),
+      "Requested variable NOT_A_VAR was not found"
+    )
+  })
 })
 
 testthat::test_that("process_merra2 (single date)", {
@@ -573,6 +840,41 @@ testthat::test_that("calculate_merra2", {
       geom = TRUE
     )
   )
+})
+
+testthat::test_that("calculate_merra2 supports FWI daily corrected outputs", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+
+  withr::with_tempdir({
+    make_merra2_fwi_fixture(".")
+    merra2_fwi <- process_merra2(
+      date = "2024-08-11",
+      variable = "FWI",
+      path = "."
+    )
+    ncp <- data.frame(lon = -179.7, lat = -57.8)
+    ncp$site_id <- "site-1"
+
+    merra2_fwi_covariate <- calculate_merra2(
+      from = merra2_fwi,
+      locs = data.table::data.table(ncp),
+      locs_id = "site_id",
+      radius = 0,
+      fun = "mean"
+    )
+    merra2_fwi_covariate <- calc_setcolumns(
+      from = merra2_fwi_covariate,
+      lag = 0,
+      dataset = "merra2",
+      locs_id = "site_id"
+    )
+
+    testthat::expect_true(class(merra2_fwi_covariate) == "data.frame")
+    testthat::expect_equal(ncol(merra2_fwi_covariate), 3)
+    testthat::expect_true("POSIXt" %in% class(merra2_fwi_covariate$time))
+    testthat::expect_true(is.numeric(merra2_fwi_covariate[[3]]))
+  })
 })
 
 ################################################################################

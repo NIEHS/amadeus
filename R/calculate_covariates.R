@@ -2512,12 +2512,19 @@ calculate_merra2 <- function(
   sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
   #### identify pressure level or monolevel data
+  merra2_name <- strsplit(names(from)[1], "_")[[1]]
   if (grepl("lev", names(from)[1])) {
     merra2_time <- c(3, 4)
     merra2_level <- 2
+    merra2_time_type <- "hour"
+  } else if (length(merra2_name) == 2) {
+    merra2_time <- 2
+    merra2_level <- NULL
+    merra2_time_type <- "date"
   } else {
     merra2_time <- c(2, 3)
     merra2_level <- NULL
+    merra2_time_type <- "hour"
   }
   #### perform extraction
   sites_extracted <- amadeus::calc_worker(
@@ -2529,7 +2536,7 @@ calculate_merra2 <- function(
     fun = fun,
     variable = 1,
     time = merra2_time,
-    time_type = "hour",
+    time_type = merra2_time_type,
     level = merra2_level,
     ...
   )
