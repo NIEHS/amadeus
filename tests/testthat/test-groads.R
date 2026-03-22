@@ -6,6 +6,7 @@
 testthat::test_that("download_groads", {
   withr::local_package("httr2")
   withr::local_package("stringr")
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   # function parameters
   data_regions <- c("Americas", "Global")
   data_formats <- c("Geodatabase", "Shapefile")
@@ -98,6 +99,7 @@ testthat::test_that("download_groads", {
 })
 
 testthat::test_that("download_groads mock download with hash", {
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   testthat::local_mocked_bindings(
     download_run_method = function(...) invisible(NULL),
     download_unzip = function(...) invisible(NULL),
@@ -244,6 +246,7 @@ testthat::test_that("calculate_groads", {
 ##### download_groads hash=FALSE and file-already-exists branches
 
 testthat::test_that("download_groads mock download hash=FALSE", {
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   testthat::local_mocked_bindings(
     download_run_method = function(...) list(success = 1, failed = 0),
     download_unzip = function(...) invisible(NULL),
@@ -270,6 +273,7 @@ testthat::test_that("download_groads mock download hash=FALSE", {
 })
 
 testthat::test_that("download_groads file already exists path", {
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   testthat::local_mocked_bindings(
     check_destfile = function(...) FALSE,
     download_unzip = function(...) invisible(NULL),

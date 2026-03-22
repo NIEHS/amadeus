@@ -2310,7 +2310,8 @@ testthat::test_that("download_modis cross-year dates non-MOD06_L2 stops", {
         product = "MOD09GA",
         directory_to_save = ".",
         acknowledgement = TRUE,
-        version = "061"
+        version = "061",
+        nasa_earth_data_token = "mock-token"
       )
     ),
     "same year"
@@ -2318,14 +2319,9 @@ testthat::test_that("download_modis cross-year dates non-MOD06_L2 stops", {
 })
 
 ################################################################################
-##### download_modis version=NULL stop (covers line 2715)
+##### download_modis NULL version is rejected before token lookup
 
-testthat::test_that("download_modis version=NULL stops with message", {
-  testthat::local_mocked_bindings(
-    check_for_null_parameters = function(...) invisible(NULL),
-    get_token = function(...) "fake_token",
-    .package = "amadeus"
-  )
+testthat::test_that("download_modis version=NULL is rejected by null-parameter checks", {
   withr::with_tempdir({
     testthat::expect_error(
       suppressMessages(
@@ -2334,10 +2330,11 @@ testthat::test_that("download_modis version=NULL stops with message", {
           product = "MOD09GA",
           directory_to_save = ".",
           acknowledgement = TRUE,
-          version = NULL
+          version = NULL,
+          nasa_earth_data_token = "mock-token"
         )
       ),
-      "Please select a data version"
+      "null|NULL"
     )
   })
 })

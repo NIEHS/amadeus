@@ -197,6 +197,7 @@ testthat::test_that("download_population parameter validation", {
 })
 
 testthat::test_that("download_population mock download with hash", {
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   testthat::local_mocked_bindings(
     download_run_method = function(...) invisible(NULL),
     download_unzip = function(...) invisible(NULL),
@@ -710,6 +711,7 @@ testthat::test_that("population integration test", {
 ##### download_population format, hash, and file-exists branches
 
 testthat::test_that("download_population ASCII format year branch", {
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   testthat::local_mocked_bindings(
     download_run_method = function(...) list(success = 1, failed = 0),
     download_unzip = function(...) invisible(NULL),
@@ -737,6 +739,7 @@ testthat::test_that("download_population ASCII format year branch", {
 })
 
 testthat::test_that("download_population ASCII totpop year=all branch", {
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   testthat::local_mocked_bindings(
     download_run_method = function(...) list(success = 1, failed = 0),
     download_unzip = function(...) invisible(NULL),
@@ -769,6 +772,7 @@ testthat::test_that("download_population ASCII totpop year=all branch", {
 })
 
 testthat::test_that("download_population GeoTIFF totpop branch", {
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   testthat::local_mocked_bindings(
     download_run_method = function(...) list(success = 1, failed = 0),
     download_unzip = function(...) invisible(NULL),
@@ -801,6 +805,7 @@ testthat::test_that("download_population GeoTIFF totpop branch", {
 })
 
 testthat::test_that("download_population netCDF format branch", {
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   testthat::local_mocked_bindings(
     download_run_method = function(...) list(success = 1, failed = 0),
     download_unzip = function(...) invisible(NULL),
@@ -828,6 +833,7 @@ testthat::test_that("download_population netCDF format branch", {
 })
 
 testthat::test_that("download_population year=all 30_sec resolution warning", {
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   testthat::local_mocked_bindings(
     download_run_method = function(...) list(success = 1, failed = 0),
     download_unzip = function(...) invisible(NULL),
@@ -860,6 +866,7 @@ testthat::test_that("download_population year=all 30_sec resolution warning", {
 })
 
 testthat::test_that("download_population file already exists path", {
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   testthat::local_mocked_bindings(
     check_destfile = function(...) FALSE,
     download_unzip = function(...) invisible(NULL),
@@ -895,6 +902,7 @@ testthat::test_that("download_population file already exists path", {
 ##### download_population deprecated parameters and download=FALSE branches
 
 testthat::test_that("download_population download=FALSE deprecated warning", {
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   withr::with_tempdir({
     testthat::expect_warning(
       suppressMessages(
@@ -914,6 +922,7 @@ testthat::test_that("download_population download=FALSE deprecated warning", {
 })
 
 testthat::test_that("download_population remove_command deprecated warning", {
+  withr::local_envvar(c(NASA_EARTHDATA_TOKEN = "mock-token"))
   testthat::local_mocked_bindings(
     download_run_method = function(...) list(success = 1, failed = 0),
     download_unzip = function(...) invisible(NULL),
