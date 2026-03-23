@@ -57,6 +57,8 @@ jobs:
       - name: Test coverage
         id: coverage
         continue-on-error: true
+        env:
+          NOT_CRAN: "false"
         run: |
           Rscript ${{ github.workspace }}/.github/workflows/test-coverage.R ${{ runner.temp }} ${{ github.workspace }}
         shell: bash

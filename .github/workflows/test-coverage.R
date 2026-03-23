@@ -10,6 +10,12 @@ message("Working directory: ", getwd())
 # Ensure we're in the package root
 setwd(ghworkspace)
 
+# Coverage CI should exercise deterministic tests only. GitHub Actions sets
+# NOT_CRAN=true by default, which enables live/network integration tests marked
+# with skip_on_cran(); those are appropriate for dedicated integration jobs but
+# make coverage runs flaky.
+Sys.setenv(NOT_CRAN = "false")
+
 # Create output directory
 pkg_dir <- file.path(runnertemp, "package")
 dir.create(pkg_dir, showWarnings = FALSE, recursive = TRUE)
