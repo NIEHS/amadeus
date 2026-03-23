@@ -15,6 +15,7 @@ setwd(ghworkspace)
 # with skip_on_cran(); those are appropriate for dedicated integration jobs but
 # make coverage runs flaky.
 Sys.setenv(NOT_CRAN = "false")
+Sys.setenv(AMADEUS_COVERAGE_CI = "true")
 
 # Create output directory
 pkg_dir <- file.path(runnertemp, "package")
