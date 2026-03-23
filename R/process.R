@@ -1400,7 +1400,7 @@ process_aqs <-
     mode <- match.arg(mode)
     return_format <- match.arg(return_format)
     if (!is.null(date)) {
-      date <- try(as.Date(date))
+      date <- try(as.Date(date), silent = TRUE)
       if (inherits(date, "try-error")) {
         stop("date has invalid format(s). Please check the values.")
       }

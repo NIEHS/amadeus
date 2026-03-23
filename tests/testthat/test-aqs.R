@@ -429,7 +429,8 @@ testthat::test_that("process_aqs", {
     process_aqs(path = 1L)
   )
   testthat::expect_error(
-    process_aqs(path = aqssub, date = c("January", "Januar"))
+    process_aqs(path = aqssub, date = c("January", "Januar")),
+    "date has invalid format"
   )
   testthat::expect_error(
     process_aqs(
