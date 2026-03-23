@@ -4,6 +4,7 @@
 ################################################################################
 ##### download_gridmet
 testthat::test_that("download_gridmet (no errors)", {
+  testthat::skip_if_offline()
   withr::local_package("httr2")
   withr::local_package("stringr")
   testthat::local_mocked_bindings(
@@ -52,6 +53,7 @@ testthat::test_that("download_gridmet (no errors)", {
 })
 
 testthat::test_that("download_gridmet (single year)", {
+  testthat::skip_if_offline()
   withr::local_package("httr2")
   withr::local_package("stringr")
   testthat::local_mocked_bindings(

@@ -4,6 +4,7 @@
 ################################################################################
 ##### download_terraclimate
 testthat::test_that("download_terraclimate (url discovery)", {
+  testthat::skip_if_offline()
   testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
     .package = "amadeus"
@@ -31,6 +32,7 @@ testthat::test_that("download_terraclimate (url discovery)", {
 })
 
 testthat::test_that("download_terraclimate (single year)", {
+  testthat::skip_if_offline()
   testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
     .package = "amadeus"
