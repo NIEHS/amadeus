@@ -572,8 +572,11 @@ download_run <- function(
     # nocov end
   } else {
     runner <- ". "
+    if (!grepl("(^/|^\\./|^\\.\\./)", commands_txt)) {
+      commands_txt <- paste0("./", commands_txt)
+    }
   }
-  system_command <- paste0(runner, commands_txt)
+  system_command <- paste0(runner, shQuote(commands_txt))
   if (download == TRUE) {
     message(paste0("Downloading requested files...\n"))
     system(command = system_command, intern = TRUE)
