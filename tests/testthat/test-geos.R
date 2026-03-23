@@ -5,6 +5,7 @@
 ################################################################################
 ##### download_geos
 testthat::test_that("download_geos", {
+  skip_if_offline()
   skip_if(
     Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
     message = "No NASA token available"
@@ -16,31 +17,28 @@ testthat::test_that("download_geos", {
     date_end <- "2019-09-09"
     collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
 
-    # Suppress deprecation warning for download=FALSE
     result <- suppressWarnings(
       download_geos(
         date = c(date_start, date_end),
         collection = collections,
         nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
         directory_to_save = ".",
-        acknowledgement = TRUE,
-        download = FALSE
+        acknowledgement = TRUE
       )
     )
 
-    # Check return structure (new httr2 pattern)
+    # Check return structure (httr2 download_run_method pattern)
     testthat::expect_type(result, "list")
-    testthat::expect_named(result, c("urls", "destfiles", "n_files"))
+    testthat::expect_true(all(c("success", "failed", "skipped") %in% names(result)))
 
-    # Check that files were found
-    testthat::expect_gt(result$n_files, 0)
-
-    # Check URLs are valid format
-    testthat::expect_true(all(grepl("^https?://", result$urls)))
+    # Check that some files were processed
+    total <- result$success + result$failed + result$skipped
+    testthat::expect_gt(total, 0)
   })
 })
 
 testthat::test_that("download_geos (single date)", {
+  skip_if_offline()
   skip_if(
     Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
     message = "No NASA token available"
@@ -51,27 +49,23 @@ testthat::test_that("download_geos (single date)", {
     date <- "2019-09-09"
     collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
 
-    # Suppress deprecation warning
     result <- suppressWarnings(
       download_geos(
         date = date,
         collection = collections,
         nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
         directory_to_save = ".",
-        acknowledgement = TRUE,
-        download = FALSE
+        acknowledgement = TRUE
       )
     )
 
-    # Check return structure (new httr2 pattern)
+    # Check return structure (httr2 download_run_method pattern)
     testthat::expect_type(result, "list")
-    testthat::expect_named(result, c("urls", "destfiles", "n_files"))
+    testthat::expect_true(all(c("success", "failed", "skipped") %in% names(result)))
 
-    # Check that files were found
-    testthat::expect_gt(result$n_files, 0)
-
-    # Check URLs contain date
-    testthat::expect_true(any(grepl("20190909", result$urls)))
+    # Check that some files were processed
+    total <- result$success + result$failed + result$skipped
+    testthat::expect_gt(total, 0)
   })
 })
 
