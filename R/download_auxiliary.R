@@ -1253,7 +1253,8 @@ setup_nasa_token <- function(
 #'   \item{lon}{integer(2). Start and end longitude indices (0-based).}
 #' }
 #' @author Kyle Messier
-#' @seealso \code{\link{extent_to_geos_indices}}, \code{\link{build_opendap_url}}
+#' @seealso \code{\link{extent_to_geos_indices}},
+#'   \code{\link{build_opendap_url}}
 #' @examples
 #' extent_to_merra2_indices(c(-125, 22, -64, 50))
 #' @keywords internal auxiliary opendap
@@ -1276,10 +1277,18 @@ extent_to_merra2_indices <- function(extent) {
   lat_n <- 361L
   lon_n <- 576L
 
-  lat_start <- as.integer(max(0L, floor((extent[2] - lat_min_grid) / lat_step)))
-  lat_end   <- as.integer(min(lat_n - 1L, ceiling((extent[4] - lat_min_grid) / lat_step)))
-  lon_start <- as.integer(max(0L, floor((extent[1] - lon_min_grid) / lon_step)))
-  lon_end   <- as.integer(min(lon_n - 1L, ceiling((extent[3] - lon_min_grid) / lon_step)))
+  lat_start <- as.integer(
+    max(0L, floor((extent[2] - lat_min_grid) / lat_step))
+  )
+  lat_end <- as.integer(
+    min(lat_n - 1L, ceiling((extent[4] - lat_min_grid) / lat_step))
+  )
+  lon_start <- as.integer(
+    max(0L, floor((extent[1] - lon_min_grid) / lon_step))
+  )
+  lon_end <- as.integer(
+    min(lon_n - 1L, ceiling((extent[3] - lon_min_grid) / lon_step))
+  )
 
   list(lat = c(lat_start, lat_end), lon = c(lon_start, lon_end))
 }
@@ -1305,7 +1314,8 @@ extent_to_merra2_indices <- function(extent) {
 #'   \item{lon}{integer(2). Start and end longitude indices (0-based).}
 #' }
 #' @author Kyle Messier
-#' @seealso \code{\link{extent_to_merra2_indices}}, \code{\link{build_opendap_url}}
+#' @seealso \code{\link{extent_to_merra2_indices}},
+#'   \code{\link{build_opendap_url}}
 #' @examples
 #' extent_to_geos_indices(c(-125, 22, -64, 50))
 #' @keywords internal auxiliary opendap
@@ -1328,10 +1338,18 @@ extent_to_geos_indices <- function(extent) {
   lat_n <- 721L
   lon_n <- 1440L
 
-  lat_start <- as.integer(max(0L, floor((extent[2] - lat_min_grid) / lat_step)))
-  lat_end   <- as.integer(min(lat_n - 1L, ceiling((extent[4] - lat_min_grid) / lat_step)))
-  lon_start <- as.integer(max(0L, floor((extent[1] - lon_min_grid) / lon_step)))
-  lon_end   <- as.integer(min(lon_n - 1L, ceiling((extent[3] - lon_min_grid) / lon_step)))
+  lat_start <- as.integer(
+    max(0L, floor((extent[2] - lat_min_grid) / lat_step))
+  )
+  lat_end <- as.integer(
+    min(lat_n - 1L, ceiling((extent[4] - lat_min_grid) / lat_step))
+  )
+  lon_start <- as.integer(
+    max(0L, floor((extent[1] - lon_min_grid) / lon_step))
+  )
+  lon_end <- as.integer(
+    min(lon_n - 1L, ceiling((extent[3] - lon_min_grid) / lon_step))
+  )
 
   list(lat = c(lat_start, lat_end), lon = c(lon_start, lon_end))
 }
@@ -1380,7 +1398,9 @@ extent_to_modis_tiles <- function(extent) {
   bounds_file <- system.file(
     "extdata", "sn_bound_10deg.txt", package = "amadeus"
   )
-  stopifnot("sn_bound_10deg.txt not found in inst/extdata/" = nzchar(bounds_file))
+  stopifnot(
+    "sn_bound_10deg.txt not found in inst/extdata/" = nzchar(bounds_file)
+  )
 
   lines <- readLines(bounds_file, warn = FALSE)
   data_lines <- grep("^ *[0-9]", lines, value = TRUE)
@@ -1392,15 +1412,17 @@ extent_to_modis_tiles <- function(extent) {
   # Drop fill tiles (lon_min == -999)
   tiles_df <- tiles_df[tiles_df$lon_min > -900, ]
 
-  xmin <- extent[1]; ymin <- extent[2]
-  xmax <- extent[3]; ymax <- extent[4]
+  xmin <- extent[1]
+  ymin <- extent[2]
+  xmax <- extent[3]
+  ymax <- extent[4]
 
   # Bounding-box overlap: tile overlaps query if
   #   tile_lon_max >= xmin  AND  tile_lon_min <= xmax
   #   tile_lat_max >= ymin  AND  tile_lat_min <= ymax
   hits <- tiles_df[
     tiles_df$lon_max >= xmin & tiles_df$lon_min <= xmax &
-    tiles_df$lat_max >= ymin & tiles_df$lat_min <= ymax,
+      tiles_df$lat_max >= ymin & tiles_df$lat_min <= ymax,
   ]
 
   sprintf("h%02dv%02d", hits$ih, hits$iv)
@@ -1483,8 +1505,11 @@ build_opendap_constraint <- function(
   }
 
   dim_str <- function(idx) {
-    if (is.null(idx)) "" else sprintf("[%d:%d]", as.integer(idx[1]),
-                                                  as.integer(idx[2]))
+    if (is.null(idx)) {
+      ""
+    } else {
+      sprintf("[%d:%d]", as.integer(idx[1]), as.integer(idx[2]))
+    }
   }
 
   time_part <- dim_str(time_idx)

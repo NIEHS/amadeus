@@ -640,8 +640,8 @@ download_geos <- function(
     }
     opendap_constraint <- amadeus::build_opendap_constraint(
       variables = variables,
-      lat_idx   = if (!is.null(opendap_grid_idx)) opendap_grid_idx$lat else NULL,
-      lon_idx   = if (!is.null(opendap_grid_idx)) opendap_grid_idx$lon else NULL
+      lat_idx   = opendap_grid_idx$lat,
+      lon_idx   = opendap_grid_idx$lon
     )
   }
 
@@ -1306,8 +1306,8 @@ download_merra2 <- function(
     }
     opendap_constraint <- amadeus::build_opendap_constraint(
       variables = variables,
-      lat_idx   = if (!is.null(opendap_grid_idx)) opendap_grid_idx$lat else NULL,
-      lon_idx   = if (!is.null(opendap_grid_idx)) opendap_grid_idx$lon else NULL
+      lat_idx   = opendap_grid_idx$lat,
+      lon_idx   = opendap_grid_idx$lon
     )
   }
 
