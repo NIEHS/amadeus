@@ -420,13 +420,7 @@ download_data(
   extent = opendap_extent,
   variables = c("T2M", "U10M")
 )
-nc4_files <- list.files(
-  directory_to_save_opendap,
-  pattern = "\\.nc4$",
-  recursive = TRUE,
-  full.names = TRUE
-)
-nc4_files
+list.files(directory_to_save_opendap, pattern = "\\.nc4$", recursive = TRUE)
 ```
 
 ```{r merra2-opendap-bbox, eval = live_run, fig.width = 8, fig.height = 5, fig.alt = "Map showing the CONUS bounding box used for the MERRA-2 OPeNDAP spatial subset."}
@@ -444,12 +438,11 @@ terra::plot(
 ```
 
 ```{r merra2-opendap-process, eval = live_run}
-opendap_nc4 <- nc4_files[grep("inst1_2d_int_Nx", nc4_files)][1]
 processed_opendap <- process_covariates(
   covariate = "merra2",
   variable = "T2M",
   date = "2024-08-11",
-  path = dirname(opendap_nc4)
+  path = find_merra2_collection_dir(directory_to_save_opendap, "inst1_2d_int_Nx")
 )
 processed_opendap
 ```

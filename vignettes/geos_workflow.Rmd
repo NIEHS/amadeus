@@ -160,13 +160,7 @@ download_data(
   extent = geos_opendap_extent,
   variables = c("O3", "NO2")
 )
-geos_nc4_files <- list.files(
-  directory_to_save_opendap,
-  pattern = "\\.nc4?$",
-  recursive = TRUE,
-  full.names = TRUE
-)
-geos_nc4_files
+list.files(directory_to_save_opendap, pattern = "\\.nc4?$", recursive = TRUE)
 ```
 
 ```{r geos-opendap-bbox, eval = live_run, fig.width = 7, fig.height = 5, fig.alt = "Map showing the US Mid-Atlantic bounding box used for the GEOS-CF OPeNDAP spatial subset."}
@@ -186,11 +180,15 @@ terra::plot(
 ```
 
 ```{r geos-opendap-process, eval = live_run}
+geos_opendap_dir <- file.path(
+  directory_to_save_opendap,
+  "chm_inst_1hr_g1440x721_p23"
+)
 processed_opendap_geos <- process_covariates(
   covariate = "geos",
   variable = "O3",
   date = "2019-09-09",
-  path = dirname(geos_nc4_files[1])
+  path = geos_opendap_dir
 )
 processed_opendap_geos
 ```
