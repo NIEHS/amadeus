@@ -1233,6 +1233,44 @@ setup_nasa_token <- function(
 # OPeNDAP utility functions
 ################################################################################
 
+#' Number of time steps per MERRA-2 daily file
+#' @description
+#' Returns the number of time steps (array index count) stored in a single
+#' MERRA-2 daily file for the given collection.  Used to build the correct
+#' OPeNDAP \code{[time_start:time_end]} dimension when constructing a
+#' constraint expression.
+#' @param collection character(1). MERRA-2 collection identifier, e.g.
+#'   \code{"inst1_2d_int_Nx"} or \code{"statD_2d_slv_Nx"}.
+#' @return integer(1). Number of time steps in one daily file.
+#' @details
+#' Time-step counts by temporal resolution:
+#' \itemize{
+#'   \item \code{inst1_} / \code{tavg1_} (1-hourly): 24 steps
+#'   \item \code{inst3_} / \code{tavg3_} (3-hourly): 8 steps
+#'   \item \code{statD_} (daily statistics): 1 step
+#'   \item \code{inst6_} / \code{tavg6_} (6-hourly): 4 steps
+#' }
+#' Collections not matching any prefix default to 24 steps.
+#' @author Kyle Messier
+#' @seealso \code{\link{build_opendap_constraint}}
+#' @examples
+#' merra2_collection_ntimes("inst1_2d_int_Nx")  # 24
+#' merra2_collection_ntimes("statD_2d_slv_Nx")  # 1
+#' @keywords internal auxiliary opendap
+#' @export
+merra2_collection_ntimes <- function(collection) {
+  stopifnot(
+    "collection must be character(1)" =
+      is.character(collection) && length(collection) == 1
+  )
+  if (grepl("^(inst1_|tavg1_)", collection)) return(24L)
+  if (grepl("^(inst3_|tavg3_)", collection)) return(8L)
+  if (grepl("^statD_", collection)) return(1L)
+  if (grepl("^(inst6_|tavg6_)", collection)) return(4L)
+  24L
+}
+
+
 #' Convert spatial extent to MERRA-2 grid indices
 #' @description
 #' Converts a lat/lon bounding box into integer array-index ranges for the

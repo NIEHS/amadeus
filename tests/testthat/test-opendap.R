@@ -150,6 +150,41 @@ testthat::test_that("extent_to_modis_tiles: input validation", {
 })
 
 ################################################################################
+# merra2_collection_ntimes
+################################################################################
+
+testthat::test_that("merra2_collection_ntimes: 1-hourly collections return 24", {
+  testthat::expect_equal(merra2_collection_ntimes("inst1_2d_int_Nx"), 24L)
+  testthat::expect_equal(merra2_collection_ntimes("inst1_2d_asm_Nx"), 24L)
+  testthat::expect_equal(merra2_collection_ntimes("tavg1_2d_slv_Nx"), 24L)
+  testthat::expect_equal(merra2_collection_ntimes("tavg1_2d_aer_Nx"), 24L)
+})
+
+testthat::test_that("merra2_collection_ntimes: 3-hourly collections return 8", {
+  testthat::expect_equal(merra2_collection_ntimes("inst3_2d_gas_Nx"), 8L)
+  testthat::expect_equal(merra2_collection_ntimes("inst3_3d_asm_Np"), 8L)
+  testthat::expect_equal(merra2_collection_ntimes("tavg3_3d_tro_Nv"), 8L)
+})
+
+testthat::test_that("merra2_collection_ntimes: daily statistics collections return 1", {
+  testthat::expect_equal(merra2_collection_ntimes("statD_2d_slv_Nx"), 1L)
+})
+
+testthat::test_that("merra2_collection_ntimes: 6-hourly collections return 4", {
+  testthat::expect_equal(merra2_collection_ntimes("inst6_3d_ana_Np"), 4L)
+  testthat::expect_equal(merra2_collection_ntimes("tavg6_3d_dyn_Np"), 4L)
+})
+
+testthat::test_that("merra2_collection_ntimes: unknown prefix defaults to 24", {
+  testthat::expect_equal(merra2_collection_ntimes("monthly_2d_xyz"), 24L)
+})
+
+testthat::test_that("merra2_collection_ntimes: input validation", {
+  testthat::expect_error(merra2_collection_ntimes(123))
+  testthat::expect_error(merra2_collection_ntimes(c("a", "b")))
+})
+
+################################################################################
 # build_opendap_constraint
 ################################################################################
 
@@ -292,8 +327,10 @@ testthat::test_that("build_opendap_url: input validation", {
 
 testthat::test_that("MERRA2 extent + constraint + URL pipeline produces valid URL", {
   idx <- extent_to_merra2_indices(c(-80, 35, -75, 40))
+  n_times <- merra2_collection_ntimes("tavg1_2d_slv_Nx")
   constraint <- build_opendap_constraint(
     variables = c("T2M", "U10M"),
+    time_idx  = c(0L, n_times - 1L),
     lat_idx   = idx$lat,
     lon_idx   = idx$lon
   )
@@ -305,6 +342,7 @@ testthat::test_that("MERRA2 extent + constraint + URL pipeline produces valid UR
   testthat::expect_true(grepl("^https://goldsmr4", url))
   testthat::expect_true(grepl("\\?T2M", url))
   testthat::expect_true(grepl("U10M", url))
+  testthat::expect_true(grepl("\\[0:23\\]", url))
   testthat::expect_true(grepl("\\[", url))
 })
 
@@ -312,6 +350,7 @@ testthat::test_that("GEOS-CF extent + constraint + URL pipeline produces valid U
   idx <- extent_to_geos_indices(c(-80, 35, -75, 40))
   constraint <- build_opendap_constraint(
     variables = "CO",
+    time_idx  = c(0L, 0L),
     lat_idx   = idx$lat,
     lon_idx   = idx$lon
   )
@@ -321,6 +360,7 @@ testthat::test_that("GEOS-CF extent + constraint + URL pipeline produces valid U
     constraint = constraint
   )
   testthat::expect_true(grepl("\\?CO", url))
+  testthat::expect_true(grepl("\\[0:0\\]", url))
   testthat::expect_true(grepl("\\[", url))
 })
 
@@ -402,6 +442,8 @@ testthat::test_that("download_merra2 use_opendap=TRUE builds OPeNDAP URLs (mocke
     if (length(captured_urls) > 0) {
       testthat::expect_true(all(grepl("opendap", captured_urls)))
       testthat::expect_true(all(grepl("\\?T2M", captured_urls)))
+      # time dimension [0:23] must appear before lat/lon brackets
+      testthat::expect_true(all(grepl("\\[0:23\\]", captured_urls)))
     }
   })
 })

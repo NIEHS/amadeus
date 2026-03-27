@@ -34,7 +34,8 @@ Returned indices are clamped to valid bounds.
 extent_to_geos_indices(c(-125, 22, -64, 50))
 }
 \seealso{
-\code{\link{extent_to_merra2_indices}}, \code{\link{build_opendap_url}}
+\code{\link{extent_to_merra2_indices}},
+\code{\link{build_opendap_url}}
 }
 \author{
 Kyle Messier

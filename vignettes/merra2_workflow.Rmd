@@ -409,6 +409,7 @@ for a single day — roughly 1/40th the size of the equivalent global file.
 
 ```{r merra2-opendap, eval = live_run}
 directory_to_save_opendap <- file.path(tempdir(), "merra2_opendap")
+opendap_extent <- c(-125, 22, -64, 50)
 download_data(
   dataset_name = "merra2",
   collection = "inst1_2d_int_Nx",
@@ -416,15 +417,54 @@ download_data(
   directory_to_save = directory_to_save_opendap,
   acknowledgement = TRUE,
   use_opendap = TRUE,
-  extent = c(-125, 22, -64, 50),
+  extent = opendap_extent,
   variables = c("T2M", "U10M")
 )
-list.files(directory_to_save_opendap, pattern = "\\.nc4$", recursive = TRUE)
+nc4_files <- list.files(
+  directory_to_save_opendap,
+  pattern = "\\.nc4$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+nc4_files
 ```
 
-The downloaded file is a NetCDF4 subset that can be opened with `terra::rast()`
-or `ncdf4::nc_open()` and processed with `process_covariates()` just like a
-full-globe MERRA-2 file.
+```{r merra2-opendap-bbox, eval = live_run, fig.width = 8, fig.height = 5, fig.alt = "Map showing the CONUS bounding box used for the MERRA-2 OPeNDAP spatial subset."}
+bbox_poly <- terra::vect(
+  terra::ext(opendap_extent[1], opendap_extent[3],
+             opendap_extent[2], opendap_extent[4]),
+  crs = "EPSG:4326"
+)
+terra::plot(
+  bbox_poly,
+  border = "red",
+  lwd = 2,
+  main = "MERRA-2 OPeNDAP spatial subset (red = requested extent)"
+)
+```
+
+```{r merra2-opendap-process, eval = live_run}
+opendap_nc4 <- nc4_files[grep("inst1_2d_int_Nx", nc4_files)][1]
+processed_opendap <- process_covariates(
+  covariate = "merra2",
+  variable = "T2M",
+  date = "2024-08-11",
+  path = dirname(opendap_nc4)
+)
+processed_opendap
+```
+
+```{r merra2-opendap-plot, eval = live_run, fig.width = 10, fig.height = 6, fig.alt = "Map of 2 m air temperature (T2M) from the MERRA-2 OPeNDAP spatial subset over CONUS for 2024-08-11."}
+terra::plot(
+  processed_opendap[[1]],
+  main = "MERRA-2 T2M via OPeNDAP subset — 2024-08-11 00:00 UTC",
+  col = grDevices::hcl.colors(64, "Spectral", rev = TRUE)
+)
+terra::plot(bbox_poly, border = "red", lwd = 2, add = TRUE)
+```
+
+The downloaded file is a NetCDF4 subset that can be processed with
+`process_covariates()` just like a full-globe MERRA-2 file.
 
 ## Process six workflow-ready data products
 

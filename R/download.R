@@ -640,6 +640,7 @@ download_geos <- function(
     }
     opendap_constraint <- amadeus::build_opendap_constraint(
       variables = variables,
+      time_idx  = c(0L, 0L),
       lat_idx   = opendap_grid_idx$lat,
       lon_idx   = opendap_grid_idx$lon
     )
@@ -1288,7 +1289,7 @@ download_merra2 <- function(
   parameters <- parameters[!names(parameters) %in% c("extent", "variables")]
   amadeus::check_for_null_parameters(parameters)
 
-  #### 6. Validate OPeNDAP parameters and pre-compute grid indices / constraint
+  #### 6. Validate OPeNDAP parameters and pre-compute grid indices
   opendap_grid_idx <- NULL
   opendap_constraint <- ""
   if (use_opendap) {
@@ -1304,11 +1305,6 @@ download_merra2 <- function(
         "Accessing full global files via OPeNDAP (no subsetting benefit).\n"
       )
     }
-    opendap_constraint <- amadeus::build_opendap_constraint(
-      variables = variables,
-      lat_idx   = opendap_grid_idx$lat,
-      lon_idx   = opendap_grid_idx$lon
-    )
   }
 
   #### 7. Check if collection is recognized
@@ -1417,6 +1413,17 @@ download_merra2 <- function(
       subset = identifiers_df$collection_id == collection_loop
     )
     esdt_name <- identifiers_df_requested[, 2]
+
+    #### Build OPeNDAP constraint for this collection (includes time dimension)
+    if (use_opendap) {
+      n_times <- amadeus::merra2_collection_ntimes(collection_loop)
+      opendap_constraint <- amadeus::build_opendap_constraint(
+        variables = variables,
+        time_idx  = c(0L, n_times - 1L),
+        lat_idx   = opendap_grid_idx$lat,
+        lon_idx   = opendap_grid_idx$lon
+      )
+    }
 
     #### Define URL base (goldsmr4 vs goldsmr5)
     esdt_name_4 <- c(

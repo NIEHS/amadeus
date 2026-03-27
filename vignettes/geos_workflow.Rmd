@@ -148,6 +148,7 @@ The example below retrieves ozone (`O3`) and nitrogen dioxide (`NO2`) from the
 day — a small fraction of the full-globe file.
 
 ```{r geos-opendap, eval = live_run}
+geos_opendap_extent <- c(-85, 33, -75, 42)
 directory_to_save_opendap <- file.path(tempdir(), "geos_opendap")
 download_data(
   dataset_name = "geos",
@@ -156,14 +157,55 @@ download_data(
   directory_to_save = directory_to_save_opendap,
   acknowledgement = TRUE,
   use_opendap = TRUE,
-  extent = c(-85, 33, -75, 42),
+  extent = geos_opendap_extent,
   variables = c("O3", "NO2")
 )
-list.files(directory_to_save_opendap, pattern = "\\.nc4?$", recursive = TRUE)
+geos_nc4_files <- list.files(
+  directory_to_save_opendap,
+  pattern = "\\.nc4?$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+geos_nc4_files
 ```
 
-The downloaded file is a NetCDF4 spatial subset that can be processed with
-`process_covariates()` just like a full-globe GEOS-CF file. Downstream
+```{r geos-opendap-bbox, eval = live_run, fig.width = 7, fig.height = 5, fig.alt = "Map showing the US Mid-Atlantic bounding box used for the GEOS-CF OPeNDAP spatial subset."}
+geos_bbox_poly <- terra::vect(
+  terra::ext(
+    geos_opendap_extent[1], geos_opendap_extent[3],
+    geos_opendap_extent[2], geos_opendap_extent[4]
+  ),
+  crs = "EPSG:4326"
+)
+terra::plot(
+  geos_bbox_poly,
+  border = "blue",
+  lwd = 2,
+  main = "GEOS-CF OPeNDAP spatial subset (blue = requested extent)"
+)
+```
+
+```{r geos-opendap-process, eval = live_run}
+processed_opendap_geos <- process_covariates(
+  covariate = "geos",
+  variable = "O3",
+  date = "2019-09-09",
+  path = dirname(geos_nc4_files[1])
+)
+processed_opendap_geos
+```
+
+```{r geos-opendap-plot, eval = live_run, fig.width = 9, fig.height = 6, fig.alt = "Map of surface ozone (O3) from the GEOS-CF OPeNDAP spatial subset over the US Mid-Atlantic for 2019-09-09."}
+terra::plot(
+  processed_opendap_geos[[1]],
+  main = "GEOS-CF O3 via OPeNDAP subset — 2019-09-09 00:00 UTC",
+  col = grDevices::hcl.colors(64, "YlOrRd")
+)
+terra::plot(geos_bbox_poly, border = "blue", lwd = 2, add = TRUE)
+```
+
+The downloaded files are NetCDF4 spatial subsets that can be processed with
+`process_covariates()` just like full-globe GEOS-CF files. Downstream
 processing clips to `extent` as usual.
 
 ## Process one workflow-ready data product
