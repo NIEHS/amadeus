@@ -10,6 +10,7 @@ download_geos(
     "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"),
   nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
+  extent = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -17,7 +18,9 @@ download_geos(
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
-  rate_limit = 2
+  rate_limit = 2,
+  use_opendap = FALSE,
+  variables = NULL
 )
 }
 \arguments{
@@ -27,6 +30,11 @@ download_geos(
 authentication token.}
 
 \item{date}{character(1 or 2). Date range "YYYY-MM-DD" format}
+
+\item{extent}{numeric(4) or NULL. Bounding box \code{c(xmin, ymin, xmax,
+  ymax)} in decimal degrees (EPSG:4326) for OPeNDAP spatial subsetting.
+Only used when \code{use_opendap = TRUE}. \code{NULL} downloads the full
+global grid.}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
@@ -43,6 +51,15 @@ authentication token.}
 \item{max_tries}{integer(1). Maximum retry attempts (default 20)}
 
 \item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
+
+\item{use_opendap}{logical(1). If \code{TRUE}, appends an OPeNDAP constraint
+expression to the download URL for server-side spatial and variable
+subsetting. Requires a valid NASA EarthData token. Default \code{FALSE}
+preserves existing direct-download behavior.}
+
+\item{variables}{character or NULL. Variable names to subset via OPeNDAP.
+Only used when \code{use_opendap = TRUE}. \code{NULL} downloads all
+variables.}
 }
 \value{
 invisible list with download results; or hash character if hash=TRUE

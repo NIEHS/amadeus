@@ -18,6 +18,7 @@ download_merra2(
     "tavg3_3d_cld_Nv", "tavg3_3d_mst_Nv", "tavg3_3d_rad_Nv", "tavg3_2d_glc_Nx", "fwi"),
   nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
+  extent = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -25,7 +26,9 @@ download_merra2(
   hash = FALSE,
   show_progress = TRUE,
   max_tries = 20,
-  rate_limit = 2
+  rate_limit = 2,
+  use_opendap = FALSE,
+  variables = NULL
 )
 }
 \arguments{
@@ -39,6 +42,11 @@ authentication token.}
 \item{date}{character(1 or 2). length of 10. Date or start/end dates
 for downloading data.
 Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}).}
+
+\item{extent}{numeric(4) or NULL. Bounding box \code{c(xmin, ymin, xmax,
+  ymax)} in decimal degrees (EPSG:4326) for OPeNDAP spatial subsetting.
+Only used when \code{use_opendap = TRUE}. \code{NULL} downloads the full
+global grid.}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
@@ -59,6 +67,16 @@ downloaded files. Default is \code{FALSE}.}
 \item{max_tries}{integer(1). Maximum retry attempts (default 20)}
 
 \item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
+
+\item{use_opendap}{logical(1). If \code{TRUE}, use the NASA GES DISC
+OPeNDAP server for server-side spatial and variable subsetting, which can
+substantially reduce download size. Requires a valid NASA EarthData token
+(same as direct downloads). Not supported for the \code{"fwi"} collection.
+Default \code{FALSE} preserves existing direct-download behavior.}
+
+\item{variables}{character or NULL. Variable names to subset via OPeNDAP
+(e.g. \code{c("T2M", "U10M")}). Only used when \code{use_opendap = TRUE}.
+\code{NULL} downloads all variables in the file.}
 }
 \value{
 invisible list with download results; or hash character if hash=TRUE

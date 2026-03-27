@@ -540,6 +540,17 @@ download_ecoregion <- function(
 #' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
 #' authentication token.
 #' @param date character(1 or 2). Date range "YYYY-MM-DD" format
+#' @param extent numeric(4) or NULL. Bounding box \code{c(xmin, ymin, xmax,
+#'   ymax)} in decimal degrees (EPSG:4326) for OPeNDAP spatial subsetting.
+#'   Only used when \code{use_opendap = TRUE}. \code{NULL} downloads the full
+#'   global grid.
+#' @param use_opendap logical(1). If \code{TRUE}, appends an OPeNDAP constraint
+#'   expression to the download URL for server-side spatial and variable
+#'   subsetting. Requires a valid NASA EarthData token. Default \code{FALSE}
+#'   preserves existing direct-download behavior.
+#' @param variables character or NULL. Variable names to subset via OPeNDAP.
+#'   Only used when \code{use_opendap = TRUE}. \code{NULL} downloads all
+#'   variables.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be \code{TRUE} to proceed
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
@@ -574,6 +585,7 @@ download_geos <- function(
   ),
   nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
+  extent = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -581,7 +593,9 @@ download_geos <- function(
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
-  rate_limit = 2
+  rate_limit = 2,
+  use_opendap = FALSE,
+  variables = NULL
 ) {
   #### 1. Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
@@ -604,7 +618,32 @@ download_geos <- function(
   )
 
   #### 5. Check for null parameters (AFTER token retrieval)
-  amadeus::check_for_null_parameters(mget(ls()))
+  params_to_check <- mget(ls())
+  params_to_check <- params_to_check[
+    !names(params_to_check) %in% c("extent", "variables")
+  ]
+  amadeus::check_for_null_parameters(params_to_check)
+  opendap_grid_idx <- NULL
+  opendap_constraint <- ""
+  if (use_opendap) {
+    if (!is.null(extent)) {
+      stopifnot(
+        "extent must be numeric(4)" = is.numeric(extent) && length(extent) == 4
+      )
+      opendap_grid_idx <- amadeus::extent_to_geos_indices(extent)
+    }
+    if (is.null(extent) && is.null(variables)) {
+      message(
+        "use_opendap = TRUE but neither extent nor variables specified. ",
+        "Accessing full global files via OPeNDAP (no subsetting benefit).\n"
+      )
+    }
+    opendap_constraint <- amadeus::build_opendap_constraint(
+      variables = variables,
+      lat_idx   = if (!is.null(opendap_grid_idx)) opendap_grid_idx$lat else NULL,
+      lon_idx   = if (!is.null(opendap_grid_idx)) opendap_grid_idx$lon else NULL
+    )
+  }
 
   #### 6. Match collection
   collection <- match.arg(collection, several.ok = TRUE)
@@ -676,7 +715,15 @@ download_geos <- function(
           time_sequence[t],
           "z.nc4"
         )
-        download_url <- paste0(download_url_base, download_name)
+        download_url <- if (use_opendap) {
+          amadeus::build_opendap_url(
+            base       = download_url_base,
+            filename   = download_name,
+            constraint = opendap_constraint
+          )
+        } else {
+          paste0(download_url_base, download_name)
+        }
 
         # Validate first URL only
         if (c == 1 && d == 1 && t == 1) {
@@ -908,6 +955,18 @@ download_gmted <- function(
 #' @param date character(1 or 2). length of 10. Date or start/end dates
 #'   for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
+#' @param extent numeric(4) or NULL. Bounding box \code{c(xmin, ymin, xmax,
+#'   ymax)} in decimal degrees (EPSG:4326) for OPeNDAP spatial subsetting.
+#'   Only used when \code{use_opendap = TRUE}. \code{NULL} downloads the full
+#'   global grid.
+#' @param use_opendap logical(1). If \code{TRUE}, use the NASA GES DISC
+#'   OPeNDAP server for server-side spatial and variable subsetting, which can
+#'   substantially reduce download size. Requires a valid NASA EarthData token
+#'   (same as direct downloads). Not supported for the \code{"fwi"} collection.
+#'   Default \code{FALSE} preserves existing direct-download behavior.
+#' @param variables character or NULL. Variable names to subset via OPeNDAP
+#'   (e.g. \code{c("T2M", "U10M")}). Only used when \code{use_opendap = TRUE}.
+#'   \code{NULL} downloads all variables in the file.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -1165,6 +1224,7 @@ download_merra2 <- function(
   ),
   nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
+  extent = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -1172,7 +1232,9 @@ download_merra2 <- function(
   hash = FALSE,
   show_progress = TRUE,
   max_tries = 20,
-  rate_limit = 2
+  rate_limit = 2,
+  use_opendap = FALSE,
+  variables = NULL
 ) {
   #### 1. Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
@@ -1223,7 +1285,31 @@ download_merra2 <- function(
   if (!any(standard_collection)) {
     parameters$nasa_earth_data_token <- ""
   }
+  parameters <- parameters[!names(parameters) %in% c("extent", "variables")]
   amadeus::check_for_null_parameters(parameters)
+
+  #### 6. Validate OPeNDAP parameters and pre-compute grid indices / constraint
+  opendap_grid_idx <- NULL
+  opendap_constraint <- ""
+  if (use_opendap) {
+    if (!is.null(extent)) {
+      stopifnot(
+        "extent must be numeric(4)" = is.numeric(extent) && length(extent) == 4
+      )
+      opendap_grid_idx <- amadeus::extent_to_merra2_indices(extent)
+    }
+    if (is.null(extent) && is.null(variables)) {
+      message(
+        "use_opendap = TRUE but neither extent nor variables specified. ",
+        "Accessing full global files via OPeNDAP (no subsetting benefit).\n"
+      )
+    }
+    opendap_constraint <- amadeus::build_opendap_constraint(
+      variables = variables,
+      lat_idx   = if (!is.null(opendap_grid_idx)) opendap_grid_idx$lat else NULL,
+      lon_idx   = if (!is.null(opendap_grid_idx)) opendap_grid_idx$lon else NULL
+    )
+  }
 
   #### 7. Check if collection is recognized
   identifiers <- c(
@@ -1382,6 +1468,11 @@ download_merra2 <- function(
     } else if (esdt_name %in% esdt_name_5) {
       base <- "https://goldsmr5.gesdisc.eosdis.nasa.gov/data/MERRA2/"
     }
+    opendap_base_root <- if (use_opendap && collection_loop != "fwi") {
+      gsub("/data/", "/opendap/", base, fixed = TRUE)
+    } else {
+      NULL
+    }
 
     #### Get file listings using httr2
     for (y in seq_along(yearmonth_sequence)) {
@@ -1397,6 +1488,11 @@ download_merra2 <- function(
         month,
         "/"
       )
+      opendap_base_url <- if (!is.null(opendap_base_root)) {
+        paste0(opendap_base_root, esdt_name, ".5.12.4/", year, "/", month, "/")
+      } else {
+        NULL
+      }
 
       # Validate first URL only
       if (c == 1 && y == 1) {
@@ -1450,7 +1546,15 @@ download_merra2 <- function(
 
           # Build URLs and destination files for data
           for (f in list_urls_date_sequence) {
-            download_url <- paste0(base_url, f)
+            download_url <- if (!is.null(opendap_base_url)) {
+              amadeus::build_opendap_url(
+                base       = opendap_base_url,
+                filename   = paste0(f, ".nc4"),
+                constraint = opendap_constraint
+              )
+            } else {
+              paste0(base_url, f)
+            }
             download_name <- paste0(download_folder, "/", f)
 
             if (amadeus::check_destfile(download_name)) {
@@ -2798,6 +2902,13 @@ download_koppen_geiger <- function(
 #' @param extent numeric(4). Bounding box `c(min_lon, max_lon, min_lat,
 #' max_lat)`.
 #' Default covers continental US: `c(-125, 22, -64, 50)`.
+#' @param use_opendap logical(1). If \code{TRUE}, converts CMR-returned
+#'   download URLs to NASA LP DAAC OPeNDAP URLs and appends a variable
+#'   constraint expression. Tile/granule selection via CMR is unchanged.
+#'   Default \code{FALSE} preserves existing behavior.
+#' @param variables character or NULL. Variable (dataset) names to subset via
+#'   OPeNDAP (e.g. \code{c("sur_refl_b01_1", "sur_refl_b02_1")}). Only used
+#'   when \code{use_opendap = TRUE}. \code{NULL} downloads all variables.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with
 #' download
@@ -2905,7 +3016,9 @@ download_modis <- function(
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
-  rate_limit = 2
+  rate_limit = 2,
+  use_opendap = FALSE,
+  variables = NULL
 ) {
   #### 1. Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
@@ -2928,9 +3041,11 @@ download_modis <- function(
   )
 
   #### 5. Check for null parameters (AFTER token retrieval)
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### 6. Check product
+  params_to_check <- mget(ls())
+  params_to_check <- params_to_check[
+    !names(params_to_check) %in% c("variables")
+  ]
+  amadeus::check_for_null_parameters(params_to_check)
   product <- match.arg(product)
 
   if (substr(date[1], 1, 4) != substr(date[2], 1, 4)) {
@@ -3036,6 +3151,32 @@ download_modis <- function(
   urls <- modis_filter_paths_by_date(urls, date = date)
   if (length(urls) == 0) {
     stop("No granules matched the requested date range.\n")
+  }
+
+  #### 12a. Convert to OPeNDAP URLs if requested
+  if (use_opendap) {
+    if (is.null(variables)) {
+      message(
+        "use_opendap = TRUE but variables = NULL. ",
+        "MODIS spatial subsetting is already handled by CMR tile selection. ",
+        "Provide variables to subset specific datasets within each granule.\n"
+      )
+    }
+    urls <- vapply(urls, function(url) {
+      fname <- basename(url)
+      granule_name <- sub("\\.(hdf|h5)$", "", fname, ignore.case = TRUE)
+      opendap_base <- paste0(
+        "https://opendap.earthdata.nasa.gov/providers/LPDAAC_ECS/",
+        "collections/", product, "_V",
+        gsub("\\.", "", str_version), "/granules/"
+      )
+      constraint <- amadeus::build_opendap_constraint(variables = variables)
+      amadeus::build_opendap_url(
+        base       = opendap_base,
+        filename   = granule_name,
+        constraint = constraint
+      )
+    }, character(1))
   }
 
   scale_detected <- modis_extract_temporal_scale(urls[1])

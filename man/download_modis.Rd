@@ -21,7 +21,9 @@ download_modis(
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
-  rate_limit = 2
+  rate_limit = 2,
+  use_opendap = FALSE,
+  variables = NULL
 )
 }
 \arguments{
@@ -62,6 +64,15 @@ Set to FALSE to skip downloading (generates file list only).}
 \item{max_tries}{integer(1). Maximum download retry attempts (default 20)}
 
 \item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
+
+\item{use_opendap}{logical(1). If \code{TRUE}, converts CMR-returned
+download URLs to NASA LP DAAC OPeNDAP URLs and appends a variable
+constraint expression. Tile/granule selection via CMR is unchanged.
+Default \code{FALSE} preserves existing behavior.}
+
+\item{variables}{character or NULL. Variable (dataset) names to subset via
+OPeNDAP (e.g. \code{c("sur_refl_b01_1", "sur_refl_b02_1")}). Only used
+when \code{use_opendap = TRUE}. \code{NULL} downloads all variables.}
 }
 \value{
 invisible list with download results; or hash character if hash=TRUE

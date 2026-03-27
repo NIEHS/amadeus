@@ -1227,3 +1227,319 @@ setup_nasa_token <- function(
 
   invisible(NULL)
 }
+
+
+################################################################################
+# OPeNDAP utility functions
+################################################################################
+
+#' Convert spatial extent to MERRA-2 grid indices
+#' @description
+#' Converts a lat/lon bounding box into integer array-index ranges for the
+#' MERRA-2 global grid (0.5 degree latitude x 0.625 degree longitude).
+#' @details
+#' MERRA-2 grid specifications:
+#' \itemize{
+#'   \item Latitude: -90 to 90 in 0.5 degree steps -- 361 points (index 0-360)
+#'   \item Longitude: -180 to 179.375 in 0.625 degree steps -- 576 points
+#'     (index 0-575)
+#' }
+#' Returned indices are clamped to valid bounds.
+#' @param extent numeric(4). Bounding box \code{c(xmin, ymin, xmax, ymax)}
+#'   in decimal degrees (EPSG:4326).
+#' @return A named list with elements:
+#' \describe{
+#'   \item{lat}{integer(2). Start and end latitude indices (0-based).}
+#'   \item{lon}{integer(2). Start and end longitude indices (0-based).}
+#' }
+#' @author Kyle Messier
+#' @seealso \code{\link{extent_to_geos_indices}}, \code{\link{build_opendap_url}}
+#' @examples
+#' extent_to_merra2_indices(c(-125, 22, -64, 50))
+#' @keywords internal auxiliary opendap
+#' @export
+extent_to_merra2_indices <- function(extent) {
+  stopifnot(
+    "extent must be numeric(4)" = is.numeric(extent) && length(extent) == 4,
+    "extent[1] (xmin) must be >= -180" = extent[1] >= -180,
+    "extent[3] (xmax) must be <= 180" = extent[3] <= 180,
+    "extent[2] (ymin) must be >= -90" = extent[2] >= -90,
+    "extent[4] (ymax) must be <= 90" = extent[4] <= 90,
+    "xmin must be < xmax" = extent[1] < extent[3],
+    "ymin must be < ymax" = extent[2] < extent[4]
+  )
+
+  lat_step <- 0.5
+  lon_step <- 0.625
+  lat_min_grid <- -90.0
+  lon_min_grid <- -180.0
+  lat_n <- 361L
+  lon_n <- 576L
+
+  lat_start <- as.integer(max(0L, floor((extent[2] - lat_min_grid) / lat_step)))
+  lat_end   <- as.integer(min(lat_n - 1L, ceiling((extent[4] - lat_min_grid) / lat_step)))
+  lon_start <- as.integer(max(0L, floor((extent[1] - lon_min_grid) / lon_step)))
+  lon_end   <- as.integer(min(lon_n - 1L, ceiling((extent[3] - lon_min_grid) / lon_step)))
+
+  list(lat = c(lat_start, lat_end), lon = c(lon_start, lon_end))
+}
+
+
+#' Convert spatial extent to GEOS-CF grid indices
+#' @description
+#' Converts a lat/lon bounding box into integer array-index ranges for the
+#' GEOS-CF global grid (0.25 degree latitude x 0.25 degree longitude).
+#' @details
+#' GEOS-CF grid specifications:
+#' \itemize{
+#'   \item Latitude: -90 to 90 in 0.25 degree steps -- 721 points (index 0-720)
+#'   \item Longitude: -180 to 179.75 in 0.25 degree steps -- 1440 points
+#'     (index 0-1439)
+#' }
+#' Returned indices are clamped to valid bounds.
+#' @param extent numeric(4). Bounding box \code{c(xmin, ymin, xmax, ymax)}
+#'   in decimal degrees (EPSG:4326).
+#' @return A named list with elements:
+#' \describe{
+#'   \item{lat}{integer(2). Start and end latitude indices (0-based).}
+#'   \item{lon}{integer(2). Start and end longitude indices (0-based).}
+#' }
+#' @author Kyle Messier
+#' @seealso \code{\link{extent_to_merra2_indices}}, \code{\link{build_opendap_url}}
+#' @examples
+#' extent_to_geos_indices(c(-125, 22, -64, 50))
+#' @keywords internal auxiliary opendap
+#' @export
+extent_to_geos_indices <- function(extent) {
+  stopifnot(
+    "extent must be numeric(4)" = is.numeric(extent) && length(extent) == 4,
+    "extent[1] (xmin) must be >= -180" = extent[1] >= -180,
+    "extent[3] (xmax) must be <= 180" = extent[3] <= 180,
+    "extent[2] (ymin) must be >= -90" = extent[2] >= -90,
+    "extent[4] (ymax) must be <= 90" = extent[4] <= 90,
+    "xmin must be < xmax" = extent[1] < extent[3],
+    "ymin must be < ymax" = extent[2] < extent[4]
+  )
+
+  lat_step <- 0.25
+  lon_step <- 0.25
+  lat_min_grid <- -90.0
+  lon_min_grid <- -180.0
+  lat_n <- 721L
+  lon_n <- 1440L
+
+  lat_start <- as.integer(max(0L, floor((extent[2] - lat_min_grid) / lat_step)))
+  lat_end   <- as.integer(min(lat_n - 1L, ceiling((extent[4] - lat_min_grid) / lat_step)))
+  lon_start <- as.integer(max(0L, floor((extent[1] - lon_min_grid) / lon_step)))
+  lon_end   <- as.integer(min(lon_n - 1L, ceiling((extent[3] - lon_min_grid) / lon_step)))
+
+  list(lat = c(lat_start, lat_end), lon = c(lon_start, lon_end))
+}
+
+
+#' Convert spatial extent to MODIS sinusoidal tile codes
+#' @description
+#' Returns the set of MODIS sinusoidal grid tile codes (e.g. \code{"h08v04"})
+#' whose geographic footprint overlaps the supplied bounding box.
+#' @details
+#' The MODIS sinusoidal grid divides the globe into 18 x 36 tiles, each
+#' nominally covering 10 degrees of latitude. Because the sinusoidal projection
+#' compresses longitude at high latitudes, the geographic lon/lat bounding
+#' boxes of tiles are \emph{not} simple 10-degree squares — they can be
+#' significantly wider in geographic longitude near the poles.
+#'
+#' This function uses the official NASA MODLAND sinusoidal tile bounding
+#' coordinates table (\code{sn_bound_10deg.txt},
+#' \url{https://modis-land.gsfc.nasa.gov/pdf/sn_bound_10deg.txt}) bundled in
+#' \code{inst/extdata/}. It returns every non-fill tile whose geographic
+#' bounding box overlaps the requested extent.
+#'
+#' Horizontal tile numbers (h) range from 0 to 35 (west to east); vertical
+#' tile numbers (v) range from 0 to 17 (north to south).
+#' @param extent numeric(4). Bounding box \code{c(xmin, ymin, xmax, ymax)}
+#'   in decimal degrees (EPSG:4326).
+#' @return character vector of tile codes in \code{"hXXvYY"} format, ordered
+#'   by increasing v then h.
+#' @author Kyle Messier
+#' @seealso \code{\link{download_modis}}
+#' @examples
+#' extent_to_modis_tiles(c(-125, 22, -64, 50))
+#' @keywords internal auxiliary opendap
+#' @export
+extent_to_modis_tiles <- function(extent) {
+  stopifnot(
+    "extent must be numeric(4)" = is.numeric(extent) && length(extent) == 4,
+    "extent[1] (xmin) must be >= -180" = extent[1] >= -180,
+    "extent[3] (xmax) must be <= 180" = extent[3] <= 180,
+    "extent[2] (ymin) must be >= -90" = extent[2] >= -90,
+    "extent[4] (ymax) must be <= 90" = extent[4] <= 90,
+    "xmin must be < xmax" = extent[1] < extent[3],
+    "ymin must be < ymax" = extent[2] < extent[4]
+  )
+
+  bounds_file <- system.file(
+    "extdata", "sn_bound_10deg.txt", package = "amadeus"
+  )
+  stopifnot("sn_bound_10deg.txt not found in inst/extdata/" = nzchar(bounds_file))
+
+  lines <- readLines(bounds_file, warn = FALSE)
+  data_lines <- grep("^ *[0-9]", lines, value = TRUE)
+  tiles_df <- utils::read.table(
+    text    = paste(data_lines, collapse = "\n"),
+    col.names = c("iv", "ih", "lon_min", "lon_max", "lat_min", "lat_max")
+  )
+
+  # Drop fill tiles (lon_min == -999)
+  tiles_df <- tiles_df[tiles_df$lon_min > -900, ]
+
+  xmin <- extent[1]; ymin <- extent[2]
+  xmax <- extent[3]; ymax <- extent[4]
+
+  # Bounding-box overlap: tile overlaps query if
+  #   tile_lon_max >= xmin  AND  tile_lon_min <= xmax
+  #   tile_lat_max >= ymin  AND  tile_lat_min <= ymax
+  hits <- tiles_df[
+    tiles_df$lon_max >= xmin & tiles_df$lon_min <= xmax &
+    tiles_df$lat_max >= ymin & tiles_df$lat_min <= ymax,
+  ]
+
+  sprintf("h%02dv%02d", hits$ih, hits$iv)
+}
+
+
+#' Build an OPeNDAP constraint expression
+#' @description
+#' Constructs an OPeNDAP constraint expression string suitable for appending
+#' to a base \code{.nc4} URL to request a spatial (and optionally temporal and
+#' variable) subset from a NASA GES DISC or NCCS OPeNDAP server.
+#' @details
+#' The constraint string takes the form
+#' \code{var1[t0:t1][lat0:lat1][lon0:lon1],var2[...],...}.
+#' When \code{variables} is \code{NULL} the expression is empty (all variables
+#' and the full grid are returned), which is equivalent to a plain file
+#' download.
+#'
+#' \strong{Index convention}: all indices are 0-based integers matching the
+#' OPeNDAP Array convention used by GES DISC and NCCS servers.
+#' @param variables character or NULL. Variable names to subset (e.g.
+#'   \code{c("T2M", "U10M")}). \code{NULL} returns an empty string (all
+#'   variables).
+#' @param time_idx integer(2) or NULL. Start and end time indices (0-based).
+#'   \code{NULL} selects all time steps.
+#' @param lat_idx integer(2) or NULL. Start and end latitude indices (0-based).
+#'   \code{NULL} selects the full latitude range.
+#' @param lon_idx integer(2) or NULL. Start and end longitude indices (0-based).
+#'   \code{NULL} selects the full longitude range.
+#' @return character(1). OPeNDAP constraint expression string (empty string if
+#'   all arguments are \code{NULL}).
+#' @author Kyle Messier
+#' @seealso \code{\link{build_opendap_url}},
+#'   \code{\link{extent_to_merra2_indices}},
+#'   \code{\link{extent_to_geos_indices}}
+#' @examples
+#' build_opendap_constraint(
+#'   variables = c("T2M", "U10M"),
+#'   time_idx  = c(0L, 23L),
+#'   lat_idx   = c(64L, 120L),
+#'   lon_idx   = c(88L, 185L)
+#' )
+#' @keywords internal auxiliary opendap
+#' @export
+build_opendap_constraint <- function(
+  variables = NULL,
+  time_idx  = NULL,
+  lat_idx   = NULL,
+  lon_idx   = NULL
+) {
+  if (is.null(variables)) {
+    return("")
+  }
+
+  stopifnot(
+    "variables must be a character vector" = is.character(variables),
+    "variables must be non-empty" = length(variables) > 0
+  )
+
+  if (!is.null(time_idx)) {
+    stopifnot(
+      "time_idx must be length-2 numeric" =
+        is.numeric(time_idx) && length(time_idx) == 2,
+      "time_idx[1] must be <= time_idx[2]" = time_idx[1] <= time_idx[2]
+    )
+  }
+  if (!is.null(lat_idx)) {
+    stopifnot(
+      "lat_idx must be length-2 numeric" =
+        is.numeric(lat_idx) && length(lat_idx) == 2,
+      "lat_idx[1] must be <= lat_idx[2]" = lat_idx[1] <= lat_idx[2]
+    )
+  }
+  if (!is.null(lon_idx)) {
+    stopifnot(
+      "lon_idx must be length-2 numeric" =
+        is.numeric(lon_idx) && length(lon_idx) == 2,
+      "lon_idx[1] must be <= lon_idx[2]" = lon_idx[1] <= lon_idx[2]
+    )
+  }
+
+  dim_str <- function(idx) {
+    if (is.null(idx)) "" else sprintf("[%d:%d]", as.integer(idx[1]),
+                                                  as.integer(idx[2]))
+  }
+
+  time_part <- dim_str(time_idx)
+  lat_part  <- dim_str(lat_idx)
+  lon_part  <- dim_str(lon_idx)
+
+  parts <- vapply(
+    variables,
+    function(v) paste0(v, time_part, lat_part, lon_part),
+    character(1)
+  )
+  paste(parts, collapse = ",")
+}
+
+
+#' Build a complete OPeNDAP request URL
+#' @description
+#' Assembles a complete OPeNDAP HTTP request URL from a base path, a filename,
+#' and an optional constraint expression.
+#' @details
+#' If \code{constraint} is a non-empty string it is appended after \code{?}.
+#' If \code{constraint} is \code{""} or \code{NULL} the URL is returned
+#' unchanged (plain file download without subsetting).
+#' @param base character(1). Base OPeNDAP server URL including trailing slash.
+#' @param filename character(1). NetCDF filename (e.g.
+#'   \code{"MERRA2_400.tavg1_2d_slv_Nx.20240101.nc4"}).
+#' @param constraint character(1) or NULL. OPeNDAP constraint expression as
+#'   returned by \code{\link{build_opendap_constraint}}. An empty string or
+#'   \code{NULL} results in a plain file URL (no subsetting).
+#' @return character(1). Full URL suitable for use with
+#'   \code{\link{download_run_method}}.
+#' @author Kyle Messier
+#' @seealso \code{\link{build_opendap_constraint}},
+#'   \code{\link{extent_to_merra2_indices}}
+#' @examples
+#' # nolint start
+#' build_opendap_url(
+#'   base       = "https://goldsmr4.gesdisc.eosdis.nasa.gov/opendap/MERRA2/M2T1NXSLV.5.12.4/2024/01/",
+#'   filename   = "MERRA2_400.tavg1_2d_slv_Nx.20240101.nc4",
+#'   constraint = "T2M[0:23][64:120][88:185]"
+#' )
+#' # nolint end
+#' @keywords internal auxiliary opendap
+#' @export
+build_opendap_url <- function(base, filename, constraint = NULL) {
+  stopifnot(
+    "base must be character(1)" = is.character(base) && length(base) == 1,
+    "filename must be character(1)" =
+      is.character(filename) && length(filename) == 1
+  )
+
+  url <- paste0(base, filename)
+
+  if (!is.null(constraint) && nzchar(constraint)) {
+    url <- paste0(url, "?", constraint)
+  }
+  url
+}
