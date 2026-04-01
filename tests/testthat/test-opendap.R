@@ -56,6 +56,15 @@ testthat::test_that("extent_to_merra2_indices: small extent single tile region",
   testthat::expect_true(result$lon[1] >= 0L && result$lon[2] <= 575L)
 })
 
+testthat::test_that("extent_to_merra2_indices: different areas map to different index windows", {
+  west_us <- extent_to_merra2_indices(c(-125, 32, -114, 42))
+  europe <- extent_to_merra2_indices(c(5, 45, 15, 55))
+  testthat::expect_false(identical(west_us$lat, europe$lat))
+  testthat::expect_false(identical(west_us$lon, europe$lon))
+  testthat::expect_true(all(west_us$lat >= 0L & west_us$lat <= 360L))
+  testthat::expect_true(all(europe$lon >= 0L & europe$lon <= 575L))
+})
+
 testthat::test_that("extent_to_merra2_indices: input validation", {
   testthat::expect_error(extent_to_merra2_indices(c(-80, 35, -75)))
   testthat::expect_error(extent_to_merra2_indices(c(-80, 35, -75, "40")))
@@ -99,6 +108,15 @@ testthat::test_that("extent_to_geos_indices: finer resolution than MERRA2", {
     diff(r_geos$lat),
     diff(r_merra$lat)
   )
+})
+
+testthat::test_that("extent_to_geos_indices: different areas map to different index windows", {
+  east_us <- extent_to_geos_indices(c(-80, 35, -75, 40))
+  south_america <- extent_to_geos_indices(c(-70, -35, -60, -25))
+  testthat::expect_false(identical(east_us$lat, south_america$lat))
+  testthat::expect_false(identical(east_us$lon, south_america$lon))
+  testthat::expect_true(all(east_us$lat >= 0L & east_us$lat <= 720L))
+  testthat::expect_true(all(south_america$lon >= 0L & south_america$lon <= 1439L))
 })
 
 testthat::test_that("extent_to_geos_indices: input validation", {
@@ -808,6 +826,51 @@ testthat::test_that("download_merra2 OPeNDAP live download (small extent, 1 day)
   })
 })
 
+testthat::test_that("download_merra2 OPeNDAP live download works for two different areas", {
+  skip_if_not_live_opendap()
+  extents <- list(
+    c(-80, 35, -75, 40), # Eastern US
+    c(5, 45, 15, 55) # Europe
+  )
+
+  for (i in seq_along(extents)) {
+    withr::with_tempdir({
+      result <- download_merra2(
+        collection        = "tavg1_2d_slv_Nx",
+        date              = "2020-06-15",
+        extent            = extents[[i]],
+        directory_to_save = ".",
+        acknowledgement   = TRUE,
+        use_opendap       = TRUE,
+        variables         = c("T2M")
+      )
+      testthat::expect_type(result, "list")
+      testthat::expect_true(result$success >= 1L)
+      nc4_files <- list.files(".", pattern = "\\.nc4$", recursive = TRUE)
+      testthat::expect_gt(length(nc4_files), 0)
+    })
+  }
+})
+
+testthat::test_that("download_merra2 OPeNDAP live download supports extent=NULL", {
+  skip_if_not_live_opendap()
+  withr::with_tempdir({
+    result <- download_merra2(
+      collection        = "tavg1_2d_slv_Nx",
+      date              = "2020-06-15",
+      extent            = NULL,
+      directory_to_save = ".",
+      acknowledgement   = TRUE,
+      use_opendap       = TRUE,
+      variables         = c("T2M")
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_true(result$success >= 1L)
+    nc4_files <- list.files(".", pattern = "\\.nc4$", recursive = TRUE)
+    testthat::expect_gt(length(nc4_files), 0)
+  })
+})
+
 testthat::test_that("download_geos OPeNDAP live download (small extent, 1 date)", {
   skip_if_not_live_opendap()
   withr::with_tempdir({
@@ -824,6 +887,51 @@ testthat::test_that("download_geos OPeNDAP live download (small extent, 1 date)"
     testthat::expect_true(
       all(c("success", "failed", "skipped") %in% names(result))
     )
+    nc4_files <- list.files(".", pattern = "\\.nc4$", recursive = TRUE)
+    testthat::expect_gt(length(nc4_files), 0)
+  })
+})
+
+testthat::test_that("download_geos OPeNDAP live download works for two different areas", {
+  skip_if_not_live_opendap()
+  extents <- list(
+    c(-80, 35, -75, 40), # Eastern US
+    c(120, -10, 130, 0) # Maritime Southeast Asia
+  )
+
+  for (i in seq_along(extents)) {
+    withr::with_tempdir({
+      result <- download_geos(
+        collection        = "aqc_tavg_1hr_g1440x721_v1",
+        date              = "2019-09-09",
+        extent            = extents[[i]],
+        directory_to_save = ".",
+        acknowledgement   = TRUE,
+        use_opendap       = TRUE,
+        variables         = c("CO")
+      )
+      testthat::expect_type(result, "list")
+      testthat::expect_true(result$success >= 1L)
+      nc4_files <- list.files(".", pattern = "\\.nc4$", recursive = TRUE)
+      testthat::expect_gt(length(nc4_files), 0)
+    })
+  }
+})
+
+testthat::test_that("download_geos OPeNDAP live download supports extent=NULL", {
+  skip_if_not_live_opendap()
+  withr::with_tempdir({
+    result <- download_geos(
+      collection        = "aqc_tavg_1hr_g1440x721_v1",
+      date              = "2019-09-09",
+      extent            = NULL,
+      directory_to_save = ".",
+      acknowledgement   = TRUE,
+      use_opendap       = TRUE,
+      variables         = c("CO")
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_true(result$success >= 1L)
     nc4_files <- list.files(".", pattern = "\\.nc4$", recursive = TRUE)
     testthat::expect_gt(length(nc4_files), 0)
   })
