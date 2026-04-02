@@ -59,7 +59,10 @@ testthat::test_that("download_tri supports state and tribal jurisdictions", {
 
   testthat::expect_equal(state_result$n_files, 1L)
   testthat::expect_match(state_result$urls, "2024_AZ/csv$")
-  testthat::expect_match(basename(state_result$destfiles), "^tri_raw_2024_AZ\\.csv$")
+  testthat::expect_match(
+    basename(state_result$destfiles),
+    "^tri_raw_2024_AZ\\.csv$"
+  )
 
   tribal_result <- suppressWarnings(download_tri(
     year = 2024L,
@@ -90,6 +93,86 @@ testthat::test_that("download_tri validates jurisdiction input", {
         download = FALSE
       ),
       regexp = "jurisdiction"
+    )
+  })
+})
+
+testthat::test_that("download_tri rejects empty, NA, and non-scalar jurisdictions", {
+  withr::with_tempdir({
+    testthat::expect_error(
+      download_tri(
+        year = 2024L,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        jurisdiction = "",
+        download = FALSE
+      ),
+      regexp = "jurisdiction"
+    )
+    testthat::expect_error(
+      download_tri(
+        year = 2024L,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        jurisdiction = NA_character_,
+        download = FALSE
+      ),
+      regexp = "jurisdiction"
+    )
+    testthat::expect_error(
+      download_tri(
+        year = 2024L,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        jurisdiction = c("US", "AZ"),
+        download = FALSE
+      ),
+      regexp = "jurisdiction"
+    )
+    testthat::expect_error(
+      download_tri(
+        year = 2024L,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        jurisdiction = 42,
+        download = FALSE
+      ),
+      regexp = "jurisdiction"
+    )
+  })
+})
+
+testthat::test_that("download_tri normalizes jurisdiction and filters existing files", {
+  download_urls_seen <- NULL
+  destfiles_seen <- NULL
+
+  testthat::local_mocked_bindings(
+    check_destfile = function(path) !grepl("2021_NC", path),
+    download_run_method = function(urls, destfiles, ...) {
+      download_urls_seen <<- urls
+      destfiles_seen <<- destfiles
+      list(success = length(urls), failed = 0)
+    },
+    .package = "amadeus"
+  )
+
+  withr::with_tempdir({
+    result <- suppressMessages(download_tri(
+      year = c(2020L, 2021L),
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      jurisdiction = " nc ",
+      download = TRUE,
+      show_progress = FALSE,
+      rate_limit = 0
+    ))
+
+    testthat::expect_equal(result$success, 1L)
+    testthat::expect_length(download_urls_seen, 1L)
+    testthat::expect_match(download_urls_seen, "2020_NC/csv$")
+    testthat::expect_match(
+      basename(destfiles_seen),
+      "^tri_raw_2020_NC\\.csv$"
     )
   })
 })

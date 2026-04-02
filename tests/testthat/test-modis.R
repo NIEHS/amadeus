@@ -1046,6 +1046,166 @@ testthat::test_that("calculate_modis errors on mixed temporal patterns", {
   )
 })
 
+testthat::test_that("calculate_modis supports from_secondary fusion methods", {
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+  from_primary <- "MOD09GA.A2021001.h10v05.061.2021001000000.hdf"
+  from_secondary <- "MYD09GA.A2021001.h10v05.061.2021001000000.hdf"
+
+  mock_preprocess <- function(path, date, ...) {
+    is_secondary <- grepl("^MYD", basename(path[1]))
+    out <- terra::rast(nrows = 1, ncols = 1, vals = if (is_secondary) 3 else 1)
+    terra::ext(out) <- c(-79, -78, 35, 36)
+    terra::crs(out) <- "EPSG:4326"
+    names(out) <- "mock_layer"
+    out
+  }
+
+  testthat::local_mocked_bindings(
+    calculate_modis_daily = function(
+      from,
+      locs,
+      locs_id,
+      date,
+      name_extracted,
+      ...
+    ) {
+      out <- data.frame(
+        site_id = as.character(locs[[locs_id]][1]),
+        time = as.Date(date)
+      )
+      out[[name_extracted]] <- as.numeric(terra::values(from)[1])
+      out
+    },
+    .package = "amadeus"
+  )
+
+  result_mean <- calculate_modis(
+    from = from_primary,
+    from_secondary = from_secondary,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0L,
+    preprocess = mock_preprocess,
+    name_covariates = "cov_",
+    subdataset = "mock",
+    scale = "* 1",
+    fusion_method = "mean"
+  )
+  testthat::expect_equal(result_mean$cov_00000, 2)
+
+  result_primary <- calculate_modis(
+    from = from_primary,
+    from_secondary = from_secondary,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0L,
+    preprocess = mock_preprocess,
+    name_covariates = "cov_",
+    subdataset = "mock",
+    scale = "* 1",
+    fusion_method = "primary_first"
+  )
+  testthat::expect_equal(result_primary$cov_00000, 1)
+
+  result_secondary <- calculate_modis(
+    from = from_primary,
+    from_secondary = from_secondary,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0L,
+    preprocess = mock_preprocess,
+    name_covariates = "cov_",
+    subdataset = "mock",
+    scale = "* 1",
+    fusion_method = "secondary_first"
+  )
+  testthat::expect_equal(result_secondary$cov_00000, 3)
+})
+
+testthat::test_that("calculate_modis from_secondary errors on incompatible geometry", {
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+  from_primary <- "MOD09GA.A2021001.h10v05.061.2021001000000.hdf"
+  from_secondary <- "MYD09GA.A2021001.h10v05.061.2021001000000.hdf"
+
+  mock_preprocess <- function(path, date, ...) {
+    is_secondary <- grepl("^MYD", basename(path[1]))
+    out <- terra::rast(nrows = 1, ncols = 1, vals = if (is_secondary) 3 else 1)
+    if (is_secondary) {
+      terra::ext(out) <- c(-79, -77, 35, 36)
+    } else {
+      terra::ext(out) <- c(-79, -78, 35, 36)
+    }
+    terra::crs(out) <- "EPSG:4326"
+    names(out) <- "mock_layer"
+    out
+  }
+
+  testthat::expect_error(
+    calculate_modis(
+      from = from_primary,
+      from_secondary = from_secondary,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0L,
+      preprocess = mock_preprocess,
+      name_covariates = "cov_",
+      subdataset = "mock",
+      scale = "* 1",
+      fusion_method = "mean"
+    ),
+    "incompatible geometry"
+  )
+})
+
+testthat::test_that("calculate_modis from_secondary errors on layer mismatch", {
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+  from_primary <- "MOD09GA.A2021001.h10v05.061.2021001000000.hdf"
+  from_secondary <- "MYD09GA.A2021001.h10v05.061.2021001000000.hdf"
+
+  mock_preprocess <- function(path, date, ...) {
+    is_secondary <- grepl("^MYD", basename(path[1]))
+    if (is_secondary) {
+      out <- terra::rast(nrows = 1, ncols = 1, nlyrs = 2)
+      terra::values(out) <- c(3, 4)
+      names(out) <- c("mock_layer_1", "mock_layer_2")
+    } else {
+      out <- terra::rast(nrows = 1, ncols = 1, vals = 1)
+      names(out) <- "mock_layer_1"
+    }
+    terra::ext(out) <- c(-79, -78, 35, 36)
+    terra::crs(out) <- "EPSG:4326"
+    out
+  }
+
+  testthat::expect_error(
+    calculate_modis(
+      from = from_primary,
+      from_secondary = from_secondary,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0L,
+      preprocess = mock_preprocess,
+      name_covariates = "cov_",
+      subdataset = "mock",
+      scale = "* 1",
+      fusion_method = "mean"
+    ),
+    "different layer counts"
+  )
+})
+
 
 testthat::test_that("process_modis_sds returns fire mask regex for fire products", {
   testthat::expect_equal(process_modis_sds(product = "MOD14A1"), "(FireMask)")
@@ -1097,6 +1257,77 @@ testthat::test_that("process_modis_merge supports secondary path fusion", {
     fusion_method = "secondary_first"
   )
   testthat::expect_equal(as.numeric(terra::values(fused_secondary)[1]), 3)
+})
+
+testthat::test_that("process_modis_merge validates secondary fusion inputs and geometry", {
+  r_primary <- terra::rast(nrows = 1, ncols = 1, vals = 1)
+  terra::ext(r_primary) <- c(0, 1, 0, 1)
+  terra::crs(r_primary) <- "EPSG:4326"
+
+  testthat::expect_error(
+    process_modis_merge(
+      path = "primary.hdf",
+      path_secondary = 1L,
+      date = "2023-01-01",
+      subdataset = "mock"
+    ),
+    "path_secondary"
+  )
+
+  testthat::local_mocked_bindings(
+    modis_filter_paths_by_date = function(paths, date) paths,
+    process_flatten_sds = function(path, subdataset, fun_agg) {
+      if (grepl("secondary", path)) {
+        r_secondary <- terra::rast(nrows = 1, ncols = 1, vals = 3)
+        terra::ext(r_secondary) <- c(0, 2, 0, 1)
+        terra::crs(r_secondary) <- "EPSG:4326"
+        return(r_secondary)
+      }
+      r_primary
+    },
+    .package = "amadeus"
+  )
+
+  testthat::expect_error(
+    process_modis_merge(
+      path = "primary.hdf",
+      path_secondary = "secondary.hdf",
+      date = "2023-01-01",
+      subdataset = "mock",
+      fusion_method = "mean"
+    ),
+    "incompatible geometry"
+  )
+})
+
+testthat::test_that("process_modis_merge errors when secondary layer counts differ", {
+  r_primary <- terra::rast(nrows = 1, ncols = 1, vals = 1)
+  terra::ext(r_primary) <- c(0, 1, 0, 1)
+  terra::crs(r_primary) <- "EPSG:4326"
+
+  r_secondary <- terra::rast(nrows = 1, ncols = 1, nlyrs = 2)
+  terra::values(r_secondary) <- c(3, 4)
+  terra::ext(r_secondary) <- c(0, 1, 0, 1)
+  terra::crs(r_secondary) <- "EPSG:4326"
+
+  testthat::local_mocked_bindings(
+    modis_filter_paths_by_date = function(paths, date) paths,
+    process_flatten_sds = function(path, subdataset, fun_agg) {
+      if (grepl("secondary", path)) r_secondary else r_primary
+    },
+    .package = "amadeus"
+  )
+
+  testthat::expect_error(
+    process_modis_merge(
+      path = "primary.hdf",
+      path_secondary = "secondary.hdf",
+      date = "2023-01-01",
+      subdataset = "mock",
+      fusion_method = "mean"
+    ),
+    "different layer counts"
+  )
 })
 
 

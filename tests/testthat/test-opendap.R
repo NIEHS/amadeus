@@ -740,6 +740,67 @@ testthat::test_that("download_modis use_opendap=TRUE converts to LP DAAC OPeNDAP
   })
 })
 
+testthat::test_that("download_modis use_opendap=TRUE handles VNP46A2 with NULL version", {
+  captured_urls <- character(0)
+  granule_url <- paste0(
+    "https://example.com/",
+    "VNP46A2.A2023001.h08v05.001.hdf"
+  )
+  testthat::local_mocked_bindings(
+    download_permit           = function(...) invisible(NULL),
+    download_setup_dir        = function(...) invisible(NULL),
+    download_sanitize_path    = function(x) paste0(x, "/"),
+    get_token                 = function(...) "fake_token",
+    check_for_null_parameters = function(...) invisible(NULL),
+    check_destfile            = function(...) TRUE,
+    download_run_method       = function(urls, destfiles, ...) {
+      captured_urls <<- urls
+      list(success = length(urls), failed = 0L, skipped = 0L)
+    },
+    .package = "amadeus"
+  )
+  fake_resp <- list(
+    feed = list(
+      entry = list(
+        list(links = list(
+          list(
+            rel  = "http://esipfed.org/ns/fedsearch/1.1/data#",
+            href = granule_url
+          )
+        ))
+      )
+    )
+  )
+  testthat::local_mocked_bindings(
+    request        = function(url) structure(list(url = url), class = "httr2_request"),
+    req_url_query  = function(req, ...) req,
+    req_options    = function(req, ...) req,
+    req_retry      = function(req, ...) req,
+    req_timeout    = function(req, ...) req,
+    req_perform    = function(req) structure(list(), class = "httr2_response"),
+    resp_body_json = function(resp) fake_resp,
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    result <- download_modis(
+      product           = "VNP46A2",
+      date              = "2023-01-01",
+      extent            = c(-125, 22, -64, 50),
+      directory_to_save = ".",
+      acknowledgement   = TRUE,
+      use_opendap       = TRUE,
+      variables         = c("DNB_BRDF-Corrected_NTL")
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_length(captured_urls, 1L)
+    testthat::expect_match(
+      captured_urls,
+      "opendap\\.earthdata\\.nasa\\.gov/providers/LPDAAC_ECS/collections/VNP46A2_V/granules/"
+    )
+    testthat::expect_match(captured_urls, "DNB_BRDF-Corrected_NTL")
+  })
+})
+
 testthat::test_that("download_modis use_opendap=TRUE without variables warns (mocked)", {
   granule_url <- paste0(
     "https://e4ftl01.cr.usgs.gov/MOLT/MOD09GA.061/2024.01.01/",
