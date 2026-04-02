@@ -849,6 +849,11 @@ calculate_ecoregion <-
 #'   e.g., `c("Cloud_Fraction_Day", "Cloud_Fraction_Night")`
 #' * `process_blackmarble()`: Subdataset number.
 #'   e.g., for VNP46A2 product, 3L.
+#'
+#' For MOD13/MYD13 families, Terra and Aqua composites are 16-day phased
+#' products offset by 8 days; combining both can improve effective temporal
+#' coverage. This behavior aligns with NASA MOD13 product guidance:
+#' <https://modis.gsfc.nasa.gov/data/dataprod/mod13.php>
 #' Dates with less than 80 percent of the expected number of tiles,
 #' which are determined by the mode of the number of tiles, are removed.
 #' Users will be informed of the dates with insufficient tiles.

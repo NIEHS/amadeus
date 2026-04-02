@@ -462,10 +462,14 @@ process_modis_merge <- function(
         result_secondary,
         stopOnError = FALSE
       ))) {
-        stop("Primary and secondary MODIS rasters have incompatible geometry.\n")
+        stop(
+          "Primary and secondary MODIS rasters have incompatible geometry.\n"
+        )
       }
       if (terra::nlyr(result_merged) != terra::nlyr(result_secondary)) {
-        stop("Primary and secondary MODIS rasters have different layer counts.\n")
+        stop(
+          "Primary and secondary MODIS rasters have different layer counts.\n"
+        )
       }
 
       if (fusion_method == "primary_first") {

@@ -120,17 +120,17 @@ e.g., \code{"^LST_"}
 e.g., \code{c("Cloud_Fraction_Day", "Cloud_Fraction_Night")}
 \item \code{process_blackmarble()}: Subdataset number.
 e.g., for VNP46A2 product, 3L.
+}
+
+For MOD13/MYD13 families, Terra and Aqua composites are 16-day phased
+products offset by 8 days; combining both can improve effective temporal
+coverage. This behavior aligns with NASA MOD13 product guidance:
+\url{https://modis.gsfc.nasa.gov/data/dataprod/mod13.php}
 Dates with less than 80 percent of the expected number of tiles,
 which are determined by the mode of the number of tiles, are removed.
 Users will be informed of the dates with insufficient tiles.
 The result data.frame will have an attribute with the dates with
 insufficient tiles.
-
-For MOD13/MYD13 families, Terra and Aqua composites are 16-day phased products
-offset by 8 days; combining both can improve effective temporal coverage.
-This behavior aligns with NASA MOD13 product guidance:
-\url{https://modis.gsfc.nasa.gov/data/dataprod/mod13.php}
-}
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large

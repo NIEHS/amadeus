@@ -1088,6 +1088,15 @@ testthat::test_that("process_modis_merge supports secondary path fusion", {
     fusion_method = "primary_first"
   )
   testthat::expect_equal(as.numeric(terra::values(fused_primary)[1]), 1)
+
+  fused_secondary <- process_modis_merge(
+    path = "primary.hdf",
+    path_secondary = "secondary.hdf",
+    date = "2023-01-01",
+    subdataset = "mock",
+    fusion_method = "secondary_first"
+  )
+  testthat::expect_equal(as.numeric(terra::values(fused_secondary)[1]), 3)
 })
 
 
