@@ -5,7 +5,9 @@
 \title{Process MODIS sub-datasets}
 \usage{
 process_modis_sds(
-  product = c("MOD11A1", "MOD13A2", "MOD09GA", "MCD19A2", "MOD14A1", "MYD14A1"),
+  product = c("MOD11A1", "MOD13A2", "MOD13Q1", "MYD13Q1", "MOD09GA", "MCD19A2",
+    "MOD14A1", "MYD14A1", "MOD14A2", "MYD14A2", "MOD16A2", "MYD16A2", "MCD64A1",
+    "MCD64CMQ", "MCD12Q1", "VNP64A1"),
   custom_sel = NULL,
   ...
 )

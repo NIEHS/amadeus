@@ -414,19 +414,39 @@ testthat::test_that("process_modis_sds", {
   txt_products <- c(
     "MOD11A1",
     "MOD13A2",
+    "MOD13Q1",
+    "MYD13Q1",
     "MOD09GA",
     "MCD19A2",
     "MOD14A1",
-    "MYD14A1"
+    "MYD14A1",
+    "MOD14A2",
+    "MYD14A2",
+    "MOD16A2",
+    "MYD16A2",
+    "MCD64A1",
+    "MCD64CMQ",
+    "MCD12Q1",
+    "VNP64A1"
   )
   txt_exp_output <-
     c(
       MOD11A1 = "(LST_)",
       MOD13A2 = "(NDVI)",
+      MOD13Q1 = "250m 16 days (NDVI|EVI)",
+      MYD13Q1 = "250m 16 days (NDVI|EVI)",
       MOD09GA = "(sur_refl_b0)",
       MCD19A2 = "(Optical_Depth)",
       MOD14A1 = "(FireMask)",
-      MYD14A1 = "(FireMask)"
+      MYD14A1 = "(FireMask)",
+      MOD14A2 = "(FireMask)",
+      MYD14A2 = "(FireMask)",
+      MOD16A2 = "(ET_500m|PET_500m)",
+      MYD16A2 = "(ET_500m|PET_500m)",
+      MCD64A1 = "(Burn Date|BurnDate)",
+      MCD64CMQ = "(Burn Date|BurnDate)",
+      MCD12Q1 = "(LC_Type)",
+      VNP64A1 = "(BurnDate)"
     )
   txt_exp_output <- unname(txt_exp_output)
   # expect
@@ -440,7 +460,11 @@ testthat::test_that("process_modis_sds", {
   testthat::expect_no_error(
     process_modis_sds("MCD19A2", "(cos|RelAZ|Angle)")
   )
-  for (i in c(1:3, 5:6)) {
+  testthat::expect_message(
+    process_modis_sds("MCD12Q1"),
+    "LC_Type"
+  )
+  for (i in c(1:5, 7:length(txt_products))) {
     testthat::expect_equal(
       process_modis_sds(txt_products[i]),
       txt_exp_output[i]
@@ -684,6 +708,18 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
           "https://example.com/MOD14CM1.200012.005.01.hdf",
           "https://example.com/MOD14CM1.200101.005.01.hdf"
         ),
+        MCD64CMQ = c(
+          "https://example.com/MCD64CMQ.200012.006.01.hdf",
+          "https://example.com/MCD64CMQ.200101.006.01.hdf"
+        ),
+        MCD64A1 = c(
+          "https://example.com/MCD64A1.A2026365.h11v05.061.2027001000000.hdf",
+          "https://example.com/MCD64A1.A2027001.h11v05.061.2027002000000.hdf"
+        ),
+        VNP64A1 = c(
+          "https://example.com/VNP64A1.A2026365.h11v05.001.2027001000000.h5",
+          "https://example.com/VNP64A1.A2027001.h11v05.001.2027002000000.h5"
+        ),
         MCD14DL = c(
           "https://example.com/MODIS_C6_1_Global_MCD14DL_NRT_2026365.txt",
           "https://example.com/MODIS_C6_1_Global_MCD14DL_NRT_2027001.txt"
@@ -713,6 +749,48 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
       )
     )
     testthat::expect_equal(monthly_result$n_files, 2L)
+
+    mock_product <- "MCD64CMQ"
+    cmq_result <- suppressWarnings(
+      suppressMessages(
+        download_modis(
+          date = c("2000-12-15", "2001-01-15"),
+          product = mock_product,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE
+        )
+      )
+    )
+    testthat::expect_equal(cmq_result$n_files, 2L)
+
+    mock_product <- "MCD64A1"
+    burned_result <- suppressWarnings(
+      suppressMessages(
+        download_modis(
+          date = c("2026-12-31", "2027-01-01"),
+          product = mock_product,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE
+        )
+      )
+    )
+    testthat::expect_equal(burned_result$n_files, 2L)
+
+    mock_product <- "VNP64A1"
+    viirs_burned_result <- suppressWarnings(
+      suppressMessages(
+        download_modis(
+          date = c("2026-12-31", "2027-01-01"),
+          product = mock_product,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE
+        )
+      )
+    )
+    testthat::expect_equal(viirs_burned_result$n_files, 2L)
 
     mock_product <- "MCD14DL"
     txt_result <- suppressWarnings(
@@ -779,6 +857,14 @@ testthat::test_that(
           MCD14DL = c(
             "https://example.com/ignore.hdf",
             "https://example.com/MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt"
+          ),
+          MCD64CMQ = c(
+            "https://example.com/preview.png",
+            "https://example.com/MCD64CMQ.200011.006.01.hdf"
+          ),
+          VNP64A1 = c(
+            "https://example.com/metadata.xml",
+            "https://example.com/VNP64A1.A2023001.h08v05.001.2023002000000.h5"
           )
         )
         list(feed = list(entry = lapply(hrefs, function(href) {
@@ -809,6 +895,18 @@ testthat::test_that(
         date = "2026-03-15",
         expected_version = "6.1NRT",
         expected_pattern = "\\.txt$"
+      ),
+      list(
+        product = "MCD64CMQ",
+        date = "2000-11-15",
+        expected_version = "006",
+        expected_pattern = "MCD64CMQ\\.200011"
+      ),
+      list(
+        product = "VNP64A1",
+        date = "2023-01-01",
+        expected_version = NULL,
+        expected_pattern = "\\.h5$"
       )
     )
 
@@ -952,6 +1050,44 @@ testthat::test_that("calculate_modis errors on mixed temporal patterns", {
 testthat::test_that("process_modis_sds returns fire mask regex for fire products", {
   testthat::expect_equal(process_modis_sds(product = "MOD14A1"), "(FireMask)")
   testthat::expect_equal(process_modis_sds(product = "MYD14A1"), "(FireMask)")
+  testthat::expect_equal(process_modis_sds(product = "MOD14A2"), "(FireMask)")
+  testthat::expect_equal(process_modis_sds(product = "MYD14A2"), "(FireMask)")
+})
+
+
+testthat::test_that("process_modis_merge supports secondary path fusion", {
+  r_primary <- terra::rast(nrows = 1, ncols = 1, vals = 1)
+  r_secondary <- terra::rast(nrows = 1, ncols = 1, vals = 3)
+  terra::ext(r_primary) <- c(0, 1, 0, 1)
+  terra::ext(r_secondary) <- c(0, 1, 0, 1)
+  terra::crs(r_primary) <- "EPSG:4326"
+  terra::crs(r_secondary) <- "EPSG:4326"
+
+  testthat::local_mocked_bindings(
+    modis_filter_paths_by_date = function(paths, date) paths,
+    process_flatten_sds = function(path, subdataset, fun_agg) {
+      if (grepl("secondary", path)) r_secondary else r_primary
+    },
+    .package = "amadeus"
+  )
+
+  fused_mean <- process_modis_merge(
+    path = "primary.hdf",
+    path_secondary = "secondary.hdf",
+    date = "2023-01-01",
+    subdataset = "mock",
+    fusion_method = "mean"
+  )
+  testthat::expect_equal(as.numeric(terra::values(fused_mean)[1]), 2)
+
+  fused_primary <- process_modis_merge(
+    path = "primary.hdf",
+    path_secondary = "secondary.hdf",
+    date = "2023-01-01",
+    subdataset = "mock",
+    fusion_method = "primary_first"
+  )
+  testthat::expect_equal(as.numeric(terra::values(fused_primary)[1]), 1)
 })
 
 

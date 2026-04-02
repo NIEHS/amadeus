@@ -1531,13 +1531,13 @@ download_merra2 <- function(
           list_xml_month <- regmatches(html_content, xml_matches)[[1]]
           list_xml_month <- gsub('href="|"', "", list_xml_month)
 
-          # Filter by date sequence
-          list_urls_date_sequence <- list_urls_month[
+          # Filter by date sequence and remove duplicate links from HTML listing
+          list_urls_date_sequence <- unique(list_urls_month[
             substr(basename(list_urls_month), 28, 35) %in% date_sequence
-          ]
-          list_xml_date_sequence <- list_xml_month[
+          ])
+          list_xml_date_sequence <- unique(list_xml_month[
             substr(basename(list_xml_month), 28, 35) %in% date_sequence
-          ]
+          ])
 
           # Create download folder
           download_folder <- paste0(directory_to_save, collection_loop)
@@ -3001,16 +3001,26 @@ download_modis <- function(
     "MYD13A1",
     "MOD13A2",
     "MYD13A2",
+    "MOD13Q1",
+    "MYD13Q1",
     "MOD13A3",
     "MYD13A3",
+    "MCD12Q1",
     "MOD14A1",
     "MYD14A1",
+    "MOD14A2",
+    "MYD14A2",
     "MOD14CM1",
     "MYD14CM1",
+    "MOD16A2",
+    "MYD16A2",
+    "MCD64A1",
+    "MCD64CMQ",
     "MOD06_L2",
     "MCD14DL",
     "MCD19A2",
-    "VNP46A2"
+    "VNP46A2",
+    "VNP64A1"
   ),
   version = "061",
   nasa_earth_data_token = NULL,
@@ -3056,7 +3066,12 @@ download_modis <- function(
   product <- match.arg(product)
 
   if (substr(date[1], 1, 4) != substr(date[2], 1, 4)) {
-    if (!product %in% c("MOD06_L2", "MOD14CM1", "MYD14CM1", "MCD14DL")) {
+    if (
+      !product %in% c(
+        "MOD06_L2", "MOD14CM1", "MYD14CM1", "MCD14DL",
+        "MCD64A1", "MCD64CMQ", "VNP64A1"
+      )
+    ) {
       stop("dates should be in the same year.\n")
     }
   }
@@ -3094,9 +3109,11 @@ download_modis <- function(
     str_version <- "6.1"
   } else if (product %in% c("MOD14CM1", "MYD14CM1")) {
     str_version <- "005"
+  } else if (product == "MCD64CMQ") {
+    str_version <- "006"
   } else if (product == "MCD14DL") {
     str_version <- "6.1NRT"
-  } else if (product == "VNP46A2") {
+  } else if (product %in% c("VNP46A2", "VNP64A1")) {
     str_version <- NULL
   } else {
     str_version <- version
@@ -3171,7 +3188,6 @@ download_modis <- function(
     }
     urls <- vapply(urls, function(url) {
       fname <- basename(url)
-      granule_name <- sub("\\.(hdf|h5)$", "", fname, ignore.case = TRUE)
       opendap_base <- paste0(
         "https://opendap.earthdata.nasa.gov/providers/LPDAAC_ECS/",
         "collections/", product, "_V",
@@ -3180,7 +3196,7 @@ download_modis <- function(
       constraint <- amadeus::build_opendap_constraint(variables = variables)
       amadeus::build_opendap_url(
         base       = opendap_base,
-        filename   = granule_name,
+        filename   = fname,
         constraint = constraint
       )
     }, character(1))

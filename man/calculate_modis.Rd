@@ -6,6 +6,7 @@
 \usage{
 calculate_modis(
   from = NULL,
+  from_secondary = NULL,
   locs = NULL,
   locs_id = "site_id",
   radius = c(0L, 1000L, 10000L, 50000L),
@@ -18,11 +19,15 @@ calculate_modis(
   max_cells = 3e+07,
   geom = FALSE,
   scale = NULL,
+  fusion_method = c("mean", "primary_first", "secondary_first"),
   ...
 )
 }
 \arguments{
 \item{from}{character. List of paths to MODIS/VIIRS files.}
+
+\item{from_secondary}{character. Optional secondary file list (e.g., Aqua
+files when \code{from} contains Terra files) used for fused temporal coverage.}
 
 \item{locs}{sf/SpatVector object. Unique locs where covariates
 will be calculated.}
@@ -73,6 +78,11 @@ temperature)
 would be \code{scale = "* 0.02"}.
 Default is \code{NULL}, which applies no scale.}
 
+\item{fusion_method}{character(1). Fusion method used only when
+\code{from_secondary} is provided. Options are \code{"mean"} (pixel-wise mean with
+\code{na.rm = TRUE}), \code{"primary_first"} (use \code{from} first), and
+\code{"secondary_first"} (use \code{from_secondary} first).}
+
 \item{...}{Arguments passed to \code{preprocess}.}
 }
 \value{
@@ -115,6 +125,11 @@ which are determined by the mode of the number of tiles, are removed.
 Users will be informed of the dates with insufficient tiles.
 The result data.frame will have an attribute with the dates with
 insufficient tiles.
+
+For MOD13/MYD13 families, Terra and Aqua composites are 16-day phased products
+offset by 8 days; combining both can improve effective temporal coverage.
+This behavior aligns with NASA MOD13 product guidance:
+\url{https://modis.gsfc.nasa.gov/data/dataprod/mod13.php}
 }
 }
 \examples{

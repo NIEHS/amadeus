@@ -59,10 +59,26 @@ pick_value_column <- function(x) {
   if (length(candidates) == 0) {
     stop("No plottable covariate columns found.")
   }
-  preferred <- candidates[vapply(x[candidates], function(col) {
-    is.numeric(col) || is.character(col) || is.factor(col)
-  }, logical(1))]
-  if (length(preferred) > 0) preferred[1] else candidates[1]
+  numeric_candidates <- candidates[vapply(x[candidates], is.numeric, logical(1))]
+  ranked <- if (length(numeric_candidates) > 0) numeric_candidates else candidates
+  non_missing_share <- vapply(ranked, function(col) {
+    mean(!is.na(x[[col]]))
+  }, numeric(1))
+  ranked[which.max(non_missing_share)]
+}
+
+pick_numeric_covariate_column <- function(x) {
+  geom_col <- attr(x, "sf_column")
+  excluded <- c(
+    "site_id", "h3_id", "resolution", "area_km2",
+    "name", "NAME", "time", geom_col
+  )
+  candidates <- setdiff(names(x), excluded)
+  numeric_candidates <- candidates[vapply(x[candidates], is.numeric, logical(1))]
+  if (length(numeric_candidates) == 0) {
+    stop("No numeric covariate columns found for histogram plotting.")
+  }
+  numeric_candidates[1]
 }
 
 coord_local_sf <- function(x) {
@@ -88,7 +104,15 @@ plot_points <- function(x, title) {
     ) +
     coord_local_sf(x) +
     ggplot2::labs(title = title, color = value_col) +
-    ggplot2::theme_minimal()
+    ggplot2::guides(
+      color = ggplot2::guide_colorbar(title.position = "top")
+    ) +
+    ggplot2::theme_minimal(base_size = 13) +
+    ggplot2::theme(
+      legend.position = "bottom",
+      legend.key.width = grid::unit(2, "cm"),
+      legend.title = ggplot2::element_text(face = "bold")
+    )
 }
 
 plot_polygons <- function(x, title) {
@@ -101,42 +125,432 @@ plot_polygons <- function(x, title) {
     ) +
     coord_local_sf(x) +
     ggplot2::labs(title = title, fill = value_col) +
-    ggplot2::theme_minimal()
+    ggplot2::guides(
+      fill = ggplot2::guide_colorbar(title.position = "top")
+    ) +
+    ggplot2::theme_minimal(base_size = 13) +
+    ggplot2::theme(
+      legend.position = "bottom",
+      legend.key.width = grid::unit(2, "cm"),
+      legend.title = ggplot2::element_text(face = "bold")
+    )
 }
+
+plot_histogram_points <- function(x, title) {
+  value_col <- pick_numeric_covariate_column(x)
+  x_hist <- sf::st_drop_geometry(sf::st_as_sf(x))
+  ggplot2::ggplot(
+    x_hist,
+    ggplot2::aes(x = !!rlang::sym(value_col))
+  ) +
+    ggplot2::geom_histogram(bins = 20, fill = "steelblue", color = "white") +
+    ggplot2::labs(title = title, x = value_col, y = "Count") +
+    ggplot2::theme_minimal(base_size = 13)
+}
+
+summarize_na_counts <- function(x, value_pattern) {
+  data <- sf::st_drop_geometry(sf::st_as_sf(x))
+  value_cols <- grep(value_pattern, names(data), value = TRUE)
+  if (length(value_cols) == 0) {
+    stop("No covariate columns matched ", value_pattern, ".")
+  }
+  data.frame(
+    variable = value_cols,
+    missing_values = vapply(data[value_cols], function(col) sum(is.na(col)), integer(1)),
+    stringsAsFactors = FALSE
+  )
+}
+
+average_modis_window <- function(paths, dates, preprocess, ...) {
+  rasters <- lapply(dates, function(date_i) {
+    rlang::exec(preprocess, path = paths, date = date_i, ...)
+  })
+  if (length(rasters) == 0) {
+    stop("No rasters were created for the requested averaging window.")
+  }
+  if (length(rasters) == 1) {
+    return(rasters[[1]])
+  }
+  raster_stack <- do.call(c, rasters)
+  terra::app(raster_stack, mean, na.rm = TRUE)
+}
+
+average_covariates_over_time <- function(x, id_col) {
+  x_sf <- sf::st_as_sf(x)
+  geom_col <- attr(x_sf, "sf_column")
+  x_tbl <- sf::st_drop_geometry(x_sf)
+  numeric_cols <- setdiff(
+    names(x_tbl)[vapply(x_tbl, is.numeric, logical(1))],
+    "time"
+  )
+  if (length(numeric_cols) == 0) {
+    stop("No numeric covariate columns found for time averaging.")
+  }
+  x_avg <- stats::aggregate(
+    x_tbl[numeric_cols],
+    by = list(x_tbl[[id_col]]),
+    FUN = function(value) mean(value, na.rm = TRUE)
+  )
+  names(x_avg)[1] <- id_col
+  x_geom <- x_sf[!duplicated(x_sf[[id_col]]), c(id_col, geom_col)]
+  dplyr::left_join(x_geom, x_avg, by = id_col)
+}
+
+modis_workflow_path <- function(product, process_step, calculate_step) {
+  download_step <- sprintf(
+    '`download_data(dataset_name = "modis", product = "%s", ...)`',
+    product
+  )
+  paste(download_step, process_step, calculate_step, sep = "<br>")
+}
+
+workflow_merge <- function(product) {
+  modis_workflow_path(
+    product = product,
+    process_step = "`process_modis_merge(...)`",
+    calculate_step =
+      "`calculate_covariates(covariate = \"modis\", preprocess = process_modis_merge, ...)`"
+  )
+}
+
+workflow_swath <- function(product) {
+  modis_workflow_path(
+    product = product,
+    process_step = "`process_modis_swath(...)`",
+    calculate_step =
+      "`calculate_covariates(covariate = \"modis\", preprocess = process_modis_swath, ...)`"
+  )
+}
+
+workflow_blackmarble <- function(product) {
+  modis_workflow_path(
+    product = product,
+    process_step = "`process_blackmarble(...)`",
+    calculate_step =
+      "`calculate_covariates(covariate = \"modis\", preprocess = process_blackmarble, ...)`"
+  )
+}
+
+workflow_mcd14dl <- function(product) {
+  modis_workflow_path(
+    product = product,
+    process_step = "`process_mcd14dl(...)`",
+    calculate_step =
+      "`calculate_covariates(covariate = \"mcd14dl\", ...)`"
+  )
+}
+
+modis_reference <- data.frame(
+  family = c(
+    "Surface reflectance", "Surface reflectance",
+    "Surface reflectance", "Surface reflectance",
+    "Surface reflectance", "Surface reflectance",
+    "Surface reflectance", "Surface reflectance",
+    "Land surface temperature", "Land surface temperature",
+    "Land surface temperature", "Land surface temperature",
+    "Land surface temperature", "Land surface temperature",
+    "Vegetation indices", "Vegetation indices",
+    "Vegetation indices", "Vegetation indices",
+    "Vegetation indices", "Vegetation indices",
+    "Vegetation indices", "Vegetation indices",
+    "Land cover",
+    "Fire grids", "Fire grids", "Fire grids", "Fire grids",
+    "Fire grids", "Fire grids",
+    "Burned area", "Burned area", "Burned area",
+    "Evapotranspiration", "Evapotranspiration",
+    "Cloud swaths",
+    "Active fire detections",
+    "MAIAC aerosol",
+    "Nighttime lights"
+  ),
+  product = c(
+    "MOD09GA", "MYD09GA",
+    "MOD09GQ", "MYD09GQ",
+    "MOD09A1", "MYD09A1",
+    "MOD09Q1", "MYD09Q1",
+    "MOD11A1", "MYD11A1",
+    "MOD11A2", "MYD11A2",
+    "MOD11B1", "MYD11B1",
+    "MOD13A1", "MYD13A1",
+    "MOD13A2", "MYD13A2",
+    "MOD13A3", "MYD13A3",
+    "MOD13Q1", "MYD13Q1",
+    "MCD12Q1",
+    "MOD14A1", "MYD14A1",
+    "MOD14A2", "MYD14A2",
+    "MOD14CM1", "MYD14CM1",
+    "MCD64A1", "MCD64CMQ", "VNP64A1",
+    "MOD16A2", "MYD16A2",
+    "MOD06_L2",
+    "MCD14DL",
+    "MCD19A2",
+    "VNP46A2"
+  ),
+  level = c(
+    "L2G", "L2G", "L2G", "L2G",
+    "L3", "L3", "L3", "L3",
+    "L3", "L3", "L3", "L3", "L3", "L3",
+    "L3", "L3", "L3", "L3", "L3", "L3", "L3", "L3",
+    "L3",
+    "L3", "L3", "L3", "L3", "L3", "L3",
+    "L3", "L3", "L3 (VIIRS)",
+    "L4", "L4",
+    "L2",
+    "L2 (derived NRT)",
+    "L2G",
+    "L3 (VIIRS)"
+  ),
+  platform = c(
+    "Terra", "Aqua", "Terra", "Aqua",
+    "Terra", "Aqua", "Terra", "Aqua",
+    "Terra", "Aqua", "Terra", "Aqua", "Terra", "Aqua",
+    "Terra", "Aqua", "Terra", "Aqua",
+    "Terra", "Aqua", "Terra", "Aqua",
+    "Terra + Aqua",
+    "Terra", "Aqua", "Terra", "Aqua", "Terra", "Aqua",
+    "Terra + Aqua", "Terra + Aqua", "Suomi-NPP (VIIRS)",
+    "Terra", "Aqua",
+    "Terra",
+    "Terra + Aqua",
+    "Terra + Aqua",
+    "Suomi-NPP (VIIRS)"
+  ),
+  description = c(
+    "Terra daily surface reflectance grid",
+    "Aqua daily surface reflectance grid",
+    "Terra daily 250 m surface reflectance grid",
+    "Aqua daily 250 m surface reflectance grid",
+    "Terra 8-day surface reflectance composite",
+    "Aqua 8-day surface reflectance composite",
+    "Terra 8-day 250 m surface reflectance composite",
+    "Aqua 8-day 250 m surface reflectance composite",
+    "Terra daily land surface temperature and emissivity",
+    "Aqua daily land surface temperature and emissivity",
+    "Terra 8-day land surface temperature and emissivity",
+    "Aqua 8-day land surface temperature and emissivity",
+    "Terra daily land surface temperature and emissivity",
+    "Aqua daily land surface temperature and emissivity",
+    "Terra 16-day vegetation indices",
+    "Aqua 16-day vegetation indices",
+    "Terra 16-day vegetation indices",
+    "Aqua 16-day vegetation indices",
+    "Terra monthly vegetation indices",
+    "Aqua monthly vegetation indices",
+    "Terra 16-day vegetation indices at 250 m",
+    "Aqua 16-day vegetation indices at 250 m",
+    "Combined MODIS annual global land cover",
+    "Terra daily thermal anomalies / fire mask grid",
+    "Aqua daily thermal anomalies / fire mask grid",
+    "Terra 8-day thermal anomalies / fire mask grid",
+    "Aqua 8-day thermal anomalies / fire mask grid",
+    "Terra monthly fire climate modeling grid",
+    "Aqua monthly fire climate modeling grid",
+    "Combined MODIS monthly burned area",
+    "Combined MODIS monthly climate-model burned area",
+    "VIIRS monthly burned area",
+    "Terra 8-day evapotranspiration and potential ET",
+    "Aqua 8-day evapotranspiration and potential ET",
+    "Terra cloud swath granules",
+    "Combined MODIS active fire detections text feed",
+    "Combined MODIS MAIAC aerosol optical depth product",
+    "VIIRS Black Marble nighttime lights"
+  ),
+  cadence = c(
+    rep("Daily", 4),
+    rep("Once every 8 days", 4),
+    rep("Daily", 2),
+    rep("Once every 8 days", 2),
+    rep("Daily", 2),
+    rep("Once every 16 days", 6),
+    rep("Monthly", 2),
+    "Yearly",
+    rep("Daily", 2),
+    rep("Once every 8 days", 2),
+    rep("Monthly", 2),
+    rep("Monthly", 3),
+    rep("Once every 8 days", 2),
+    "Daily swath granules",
+    "Daily text feed",
+    "Daily",
+    "Daily"
+  ),
+  spatial_form = c(
+    rep("Tiled gridded", 34),
+    "Swath granules",
+    "Text feed detections",
+    "Tiled gridded",
+    "Tiled gridded"
+  ),
+  native_format = c(
+    rep(".hdf", 32),
+    ".h5",
+    ".hdf",
+    ".hdf",
+    ".txt",
+    ".hdf",
+    ".h5"
+  ),
+  version_handling = c(
+    rep("Uses user/default version (default 061)", 27),
+    "Forces version 005",
+    "Forces version 005",
+    "Uses user/default version (default 061)",
+    "Forces version 006",
+    "No version string sent to CMR",
+    rep("Uses user/default version (default 061)", 2),
+    "Forces version 6.1",
+    "Forces version 6.1NRT",
+    "Uses user/default version (default 061)",
+    "No version string sent to CMR"
+  ),
+  cross_year_range = c(
+    rep("No", 27),
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "No",
+    "No",
+    "Yes",
+    "Yes",
+    "No",
+    "No"
+  ),
+  workflow = c(
+    workflow_merge("MOD09GA"),
+    workflow_merge("MYD09GA"),
+    workflow_merge("MOD09GQ"),
+    workflow_merge("MYD09GQ"),
+    workflow_merge("MOD09A1"),
+    workflow_merge("MYD09A1"),
+    workflow_merge("MOD09Q1"),
+    workflow_merge("MYD09Q1"),
+    workflow_merge("MOD11A1"),
+    workflow_merge("MYD11A1"),
+    workflow_merge("MOD11A2"),
+    workflow_merge("MYD11A2"),
+    workflow_merge("MOD11B1"),
+    workflow_merge("MYD11B1"),
+    workflow_merge("MOD13A1"),
+    workflow_merge("MYD13A1"),
+    workflow_merge("MOD13A2"),
+    workflow_merge("MYD13A2"),
+    workflow_merge("MOD13A3"),
+    workflow_merge("MYD13A3"),
+    workflow_merge("MOD13Q1"),
+    workflow_merge("MYD13Q1"),
+    workflow_merge("MCD12Q1"),
+    workflow_merge("MOD14A1"),
+    workflow_merge("MYD14A1"),
+    workflow_merge("MOD14A2"),
+    workflow_merge("MYD14A2"),
+    workflow_merge("MOD14CM1"),
+    workflow_merge("MYD14CM1"),
+    workflow_merge("MCD64A1"),
+    workflow_merge("MCD64CMQ"),
+    workflow_merge("VNP64A1"),
+    workflow_merge("MOD16A2"),
+    workflow_merge("MYD16A2"),
+    workflow_swath("MOD06_L2"),
+    workflow_mcd14dl("MCD14DL"),
+    workflow_merge("MCD19A2"),
+    workflow_blackmarble("VNP46A2")
+  ),
+  stringsAsFactors = FALSE
+)
 ```
 
-This article demonstrates a compact workflow for MODIS grid products through `download_data()`, `process_modis_merge()`, and `calculate_covariates()`. MODIS downloads require a NASA EarthData token.
+This article demonstrates how MODIS, combined MODIS, and VIIRS-style products move through `amadeus` via `download_data()`, `process_modis_merge()`, `process_modis_swath()`, `process_blackmarble()`, `process_mcd14dl()`, and `calculate_covariates()`. MODIS downloads require a NASA EarthData token.
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
-## Download representative requests
+## Available inputs and data availability
+
+`download_data(dataset_name = "modis", ...)` wraps `download_modis()`.
+
+```{r modis-product-reference, echo = FALSE, results = "asis"}
+knitr::kable(
+  modis_reference,
+  col.names = c(
+    "Family",
+    "Product",
+    "NASA level",
+    "Platform",
+    "Description",
+    "Temporal cadence",
+    "Spatial form",
+    "Native file",
+    "Version handling",
+    "Cross-year date range",
+    "Workflow in amadeus"
+  ),
+  escape = FALSE
+)
+```
+
+- `version` defaults to `"061"`, but `download_modis()` internally rewrites `MOD06_L2` to `6.1`, `MOD14CM1` / `MYD14CM1` to `005`, `MCD64CMQ` to `006`, `MCD14DL` to `6.1NRT`, and omits the version string for `VNP46A2` and `VNP64A1`.
+- `date` can be a single day or a range. Most products must stay within one calendar year; cross-year ranges are supported for `MOD06_L2`, `MOD14CM1`, `MYD14CM1`, `MCD14DL`, `MCD64A1`, `MCD64CMQ`, and `VNP64A1`.
+- `extent` limits the NASA CMR query to a study-area bounding box so only intersecting tiles are downloaded.
+- Downloads are saved as raw `.hdf` or `.h5` granules, except `MCD14DL`, which is saved as `.txt`. For gridded products, use `terra::describe(path, sds = TRUE)` to inspect available subdatasets and `process_modis_sds()` where presets exist.
+
+### Terra+Aqua fusion for better temporal coverage
+
+`process_modis_merge()` and `calculate_modis()` support optional Terra+Aqua fusion through `path_secondary` / `from_secondary` and `fusion_method`.
+
+For paired products (for example `MOD13Q1` + `MYD13Q1`), this allows:
+
+- pixel-wise mean blending where both products exist (`fusion_method = "mean"`)
+- fallback to whichever product is available on a date
+- optional priority fallback (`"primary_first"` / `"secondary_first"`)
+
+## Live representative workflow: `MOD11A1`
+
+The evaluated chunks below keep one compact, end-to-end `MOD11A1` land-surface temperature example that still exercises the download, process, calculate, and plotting stages. The later sections document the full product surface with additional workflow templates.
 
 ```{r download, eval = live_run}
-directory_to_save <- file.path(tempdir(), "modis_workflow")
+directory_to_save <- file.path(tempdir(), "modis_workflow", "mod11a1")
 modis_extent <- c(-79.2, 35.8, -78.6, 36.3)
 download_data(
   dataset_name = "modis",
   product = "MOD11A1",
   version = "061",
-  date = c("2019-08-15", "2019-08-16"),
+  date = "2019-08-15",
   extent = modis_extent,
   directory_to_save = directory_to_save,
   acknowledgement = TRUE
 )
+```
+
+## Download with OPeNDAP for `MOD11A1` variable subsetting
+
+`download_modis()` exposes `use_opendap = TRUE` and `variables` for
+server-side variable constraints. MODIS tile selection is still handled through
+CMR via `extent`; OPeNDAP reduces data transfer to only requested variables.
+
+This OPeNDAP chunk is intentionally shown with `eval = FALSE`: endpoint
+availability and authentication redirects can be intermittently unreliable in
+automated runs, so the vignette keeps a truthful runnable template without
+making render success depend on external service uptime.
+
+```{r modis-opendap, eval = FALSE}
+directory_to_save_opendap <- file.path(tempdir(), "modis_workflow", "mod11a1_opendap")
 download_data(
   dataset_name = "modis",
-  product = "MOD13A2",
+  product = "MOD11A1",
   version = "061",
-  date = c("2019-08-15", "2019-08-16"),
+  date = "2019-08-15",
   extent = modis_extent,
-  directory_to_save = file.path(directory_to_save, "ndvi"),
-  acknowledgement = TRUE
+  directory_to_save = directory_to_save_opendap,
+  acknowledgement = TRUE,
+  use_opendap = TRUE,
+  variables = c("LST_Day_1km")
 )
 ```
 
-## Process one workflow-ready data product
+## Process one workflow-ready land-surface temperature product
 
 ```{r process, eval = live_run}
 modis_files <- list.files(
@@ -149,6 +563,13 @@ processed_data <- process_modis_merge(
   path = modis_files,
   date = "2019-08-15",
   subdataset = "LST_Day_1km"
+)
+```
+
+```{r plot-processed-raster, eval = live_run, fig.alt = "Raster plot of the processed MOD11A1 land-surface temperature surface for the example date."}
+terra::plot(
+  processed_data,
+  main = "MOD11A1 LST_Day_1km on 2019-08-15"
 )
 ```
 
@@ -188,6 +609,22 @@ polygon_values <- calculate_covariates(
 )
 ```
 
+```{r modis-na-summary, eval = live_run}
+point_na_summary <- summarize_na_counts(point_values, "^LST_")
+polygon_na_summary <- summarize_na_counts(polygon_values, "^LST_")
+knitr::kable(point_na_summary, col.names = c("Variable", "Point missing values"))
+knitr::kable(polygon_na_summary, col.names = c("Variable", "Polygon missing values"))
+```
+
+## Histogram of the point calculations
+
+```{r plot-point-histogram, eval = live_run, fig.alt = "Histogram of point-based MOD11A1 covariate values extracted for the example date."}
+plot_histogram_points(
+  point_values,
+  "MOD11A1 point covariate histogram"
+)
+```
+
 ## Visualize the point and polygon outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
@@ -198,7 +635,437 @@ plot_points(point_values, paste0("NASA MODIS", ": point extraction"))
 plot_polygons(polygon_values, paste0("NASA MODIS", ": Durham H3 polygons"))
 ```
 
+## Live non-daily composite example: `MOD13A2` averaged over 17 days
+
+For non-daily products, a short averaging window is more robust than a single composite date. The `MOD13A2` example below downloads two 16-day NDVI composites, averages their processed rasters, then averages the extracted point and H3 values over the same 17-day window.
+
+```{r vegetation-download-window, eval = live_run}
+vegetation_dir_live <- file.path(tempdir(), "modis_workflow", "mod13a2")
+vegetation_window <- c("2019-08-13", "2019-08-29")
+vegetation_dates <- c("2019-08-13", "2019-08-29")
+download_data(
+  dataset_name = "modis",
+  product = "MOD13A2",
+  version = "061",
+  date = vegetation_window,
+  extent = modis_extent,
+  directory_to_save = vegetation_dir_live,
+  acknowledgement = TRUE
+)
+
+vegetation_files_live <- list.files(
+  vegetation_dir_live,
+  pattern = "\\.hdf$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+```
+
+```{r vegetation-process-window, eval = live_run}
+vegetation_raster_mean <- average_modis_window(
+  paths = vegetation_files_live,
+  dates = vegetation_dates,
+  preprocess = amadeus::process_modis_merge,
+  subdataset = process_modis_sds("MOD13A2")
+)
+```
+
+```{r vegetation-calculate-window-points, eval = live_run}
+vegetation_points_raw <- calculate_covariates(
+  covariate = "modis",
+  from = vegetation_files_live,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  preprocess = amadeus::process_modis_merge,
+  subdataset = process_modis_sds("MOD13A2"),
+  name_covariates = "ndvi_",
+  fun_summary = "mean",
+  geom = "sf",
+  scale = "* 0.0001"
+)
+vegetation_points_mean <- average_covariates_over_time(
+  vegetation_points_raw,
+  id_col = "site_id"
+)
+```
+
+```{r vegetation-calculate-window-polygons, eval = live_run}
+vegetation_polygons_raw <- calculate_covariates(
+  covariate = "modis",
+  from = vegetation_files_live,
+  locs = durham_hex,
+  locs_id = "h3_id",
+  radius = 0,
+  preprocess = amadeus::process_modis_merge,
+  subdataset = process_modis_sds("MOD13A2"),
+  name_covariates = "ndvi_",
+  fun_summary = "mean",
+  geom = "sf",
+  scale = "* 0.0001"
+)
+vegetation_polygons_mean <- average_covariates_over_time(
+  vegetation_polygons_raw,
+  id_col = "h3_id"
+)
+```
+
+```{r vegetation-plot-raster, eval = live_run, fig.alt = "Raster plot of a 17-day average MOD13A2 NDVI surface."}
+terra::plot(
+  vegetation_raster_mean,
+  main = "MOD13A2 17-day average NDVI"
+)
+```
+
+```{r vegetation-plot-histogram, eval = live_run, fig.alt = "Histogram of 17-day average MOD13A2 NDVI values extracted at the example points."}
+plot_histogram_points(
+  vegetation_points_mean,
+  "MOD13A2 17-day average point histogram"
+)
+```
+
+```{r vegetation-plot-points, eval = live_run, fig.alt = "Map of 17-day average MOD13A2 NDVI values extracted at the example points."}
+plot_points(
+  vegetation_points_mean,
+  "MOD13A2 17-day average: point extraction"
+)
+```
+
+```{r vegetation-plot-polygons, eval = live_run, fig.alt = "Map of 17-day average MOD13A2 NDVI values extracted across Durham County H3 polygons."}
+plot_polygons(
+  vegetation_polygons_mean,
+  "MOD13A2 17-day average: Durham H3 polygons"
+)
+```
+
+## Workflow templates for the remaining supported product families
+
+The table above covers every product accepted by `download_modis()`. The chunks below show the download -> process -> calculate pattern for each remaining helper family. Swap Terra / Aqua product codes within the same family to move between `MOD*` and `MYD*` variants while keeping the same `amadeus` helper path.
+
+### Surface reflectance grids: `MOD09*` and `MYD09*`
+
+```{r reflectance-template, eval = FALSE}
+reflectance_dir <- file.path(tempdir(), "modis_workflow", "reflectance")
+download_data(
+  dataset_name = "modis",
+  product = "MOD09GA",
+  version = "061",
+  date = "2019-08-15",
+  extent = modis_extent,
+  directory_to_save = reflectance_dir,
+  acknowledgement = TRUE
+)
+
+reflectance_files <- list.files(
+  reflectance_dir,
+  pattern = "\\.hdf$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+
+reflectance_raster <- process_modis_merge(
+  path = reflectance_files,
+  date = "2019-08-15",
+  subdataset = process_modis_sds("MOD09GA")
+)
+
+reflectance_points <- calculate_covariates(
+  covariate = "modis",
+  from = reflectance_files,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  preprocess = amadeus::process_modis_merge,
+  subdataset = process_modis_sds("MOD09GA"),
+  name_covariates = "reflectance_",
+  fun_summary = "mean",
+  geom = "sf"
+)
+
+terra::plot(reflectance_raster, main = "MOD09GA processed raster")
+plot_histogram_points(reflectance_points, "MOD09GA point covariate histogram")
+```
+
+For `MOD09GQ` and `MYD09GQ`, keep the same daily request pattern. For the 8-day composites `MOD09A1`, `MYD09A1`, `MOD09Q1`, and `MYD09Q1`, switch to a short multi-composite window such as `date = c("2019-08-13", "2019-08-29")`, then average the processed rasters and extracted values with `average_modis_window()` and `average_covariates_over_time()`.
+
+### Vegetation indices: `MOD13*` and `MYD13*`
+
+```{r vegetation-template, eval = FALSE}
+vegetation_dir <- file.path(tempdir(), "modis_workflow", "vegetation")
+vegetation_window <- c("2019-08-13", "2019-08-29")
+vegetation_dates <- c("2019-08-13", "2019-08-29")
+download_data(
+  dataset_name = "modis",
+  product = "MOD13A2",
+  version = "061",
+  date = vegetation_window,
+  extent = modis_extent,
+  directory_to_save = vegetation_dir,
+  acknowledgement = TRUE
+)
+
+vegetation_files <- list.files(
+  vegetation_dir,
+  pattern = "\\.hdf$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+
+vegetation_raster <- average_modis_window(
+  paths = vegetation_files,
+  dates = vegetation_dates,
+  preprocess = amadeus::process_modis_merge,
+  subdataset = process_modis_sds("MOD13A2")
+)
+
+vegetation_points_raw <- calculate_covariates(
+  covariate = "modis",
+  from = vegetation_files,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  preprocess = amadeus::process_modis_merge,
+  subdataset = process_modis_sds("MOD13A2"),
+  name_covariates = "ndvi_",
+  fun_summary = "mean",
+  geom = "sf",
+  scale = "* 0.0001"
+)
+vegetation_points <- average_covariates_over_time(vegetation_points_raw, "site_id")
+
+terra::plot(vegetation_raster, main = "MOD13A2 processed raster")
+plot_histogram_points(vegetation_points, "MOD13A2 point covariate histogram")
+```
+
+This same averaging pattern applies to `MOD13A1`, `MYD13A1`, and `MYD13A2` when you use a short window that spans two valid 16-day composites. For the monthly products `MOD13A3` and `MYD13A3`, request a date range covering the target month so the monthly granule is included.
+
+### Fire grids: `MOD14A1`, `MYD14A1`, `MOD14CM1`, and `MYD14CM1`
+
+```{r fire-grid-template, eval = FALSE}
+fire_grid_dir <- file.path(tempdir(), "modis_workflow", "fire_grid")
+download_data(
+  dataset_name = "modis",
+  product = "MOD14A1",
+  version = "061",
+  date = "2019-08-15",
+  extent = modis_extent,
+  directory_to_save = fire_grid_dir,
+  acknowledgement = TRUE
+)
+
+fire_grid_files <- list.files(
+  fire_grid_dir,
+  pattern = "\\.hdf$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+
+fire_grid_raster <- process_modis_merge(
+  path = fire_grid_files,
+  date = "2019-08-15",
+  subdataset = process_modis_sds("MOD14A1")
+)
+
+fire_grid_points <- calculate_covariates(
+  covariate = "modis",
+  from = fire_grid_files,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  preprocess = amadeus::process_modis_merge,
+  subdataset = process_modis_sds("MOD14A1"),
+  name_covariates = "firemask_",
+  fun_summary = "mean",
+  geom = "sf"
+)
+
+terra::plot(fire_grid_raster, main = "MOD14A1 processed raster")
+plot_histogram_points(fire_grid_points, "MOD14A1 point covariate histogram")
+```
+
+The monthly climate-modeling grids `MOD14CM1` and `MYD14CM1` use the same merge-and-calculate pattern, but their filenames are monthly. Request a date inside the target month, such as `"2019-08-15"`, and `download_modis()` will automatically request the correct internal version (`005`).
+
+### MAIAC aerosol: `MCD19A2`
+
+```{r maiac-template, eval = FALSE}
+maiac_dir <- file.path(tempdir(), "modis_workflow", "maiac")
+download_data(
+  dataset_name = "modis",
+  product = "MCD19A2",
+  version = "061",
+  date = "2019-08-15",
+  extent = modis_extent,
+  directory_to_save = maiac_dir,
+  acknowledgement = TRUE
+)
+
+maiac_files <- list.files(
+  maiac_dir,
+  pattern = "\\.hdf$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+
+maiac_raster <- process_modis_merge(
+  path = maiac_files,
+  date = "2019-08-15",
+  subdataset = "Optical_Depth_047"
+)
+
+maiac_points <- calculate_covariates(
+  covariate = "modis",
+  from = maiac_files,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  preprocess = amadeus::process_modis_merge,
+  subdataset = "Optical_Depth_047",
+  name_covariates = "aod_047_",
+  fun_summary = "mean",
+  geom = "sf"
+)
+
+terra::plot(maiac_raster, main = "MCD19A2 processed raster")
+plot_histogram_points(maiac_points, "MCD19A2 point covariate histogram")
+```
+
+### Cloud swaths: `MOD06_L2`
+
+```{r cloud-template, eval = FALSE}
+cloud_dir <- file.path(tempdir(), "modis_workflow", "cloud")
+download_data(
+  dataset_name = "modis",
+  product = "MOD06_L2",
+  version = "061",
+  date = "2019-08-15",
+  extent = modis_extent,
+  directory_to_save = cloud_dir,
+  acknowledgement = TRUE
+)
+
+cloud_files <- list.files(
+  cloud_dir,
+  pattern = "\\.hdf$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+
+cloud_raster <- process_modis_swath(
+  path = cloud_files,
+  date = "2019-08-15",
+  subdataset = "Cloud_Fraction",
+  suffix = ":mod06:",
+  resolution = 0.05
+)
+
+cloud_points <- calculate_covariates(
+  covariate = "modis",
+  from = cloud_files,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  preprocess = amadeus::process_modis_swath,
+  subdataset = "Cloud_Fraction",
+  suffix = ":mod06:",
+  resolution = 0.05,
+  name_covariates = "cloud_fraction_",
+  fun_summary = "mean",
+  geom = "sf"
+)
+
+terra::plot(cloud_raster, main = "MOD06_L2 processed raster")
+plot_histogram_points(cloud_points, "MOD06_L2 point covariate histogram")
+```
+
+### Active fire detections: `MCD14DL`
+
+```{r mcd14dl-template, eval = FALSE}
+fire_txt_dir <- file.path(tempdir(), "modis_workflow", "mcd14dl")
+download_data(
+  dataset_name = "modis",
+  product = "MCD14DL",
+  date = "2019-08-15",
+  extent = modis_extent,
+  directory_to_save = fire_txt_dir,
+  acknowledgement = TRUE
+)
+
+fire_txt_files <- list.files(
+  fire_txt_dir,
+  pattern = "\\.txt$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+
+fire_detections <- process_mcd14dl(
+  path = fire_txt_files,
+  date = "2019-08-15",
+  extent = modis_extent
+)
+
+fire_counts <- calculate_covariates(
+  covariate = "mcd14dl",
+  from = fire_detections,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = c(0L, 1000L),
+  geom = "sf"
+)
+
+plot_points(fire_detections, "MCD14DL processed detections")
+plot_histogram_points(fire_counts, "MCD14DL point covariate histogram")
+```
+
+### Nighttime lights: `VNP46A2`
+
+```{r blackmarble-template, eval = FALSE}
+blackmarble_dir <- file.path(tempdir(), "modis_workflow", "blackmarble")
+download_data(
+  dataset_name = "modis",
+  product = "VNP46A2",
+  date = "2019-08-15",
+  extent = modis_extent,
+  directory_to_save = blackmarble_dir,
+  acknowledgement = TRUE
+)
+
+blackmarble_files <- list.files(
+  blackmarble_dir,
+  pattern = "\\.h5$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+
+blackmarble_raster <- process_blackmarble(
+  path = blackmarble_files,
+  date = "2019-08-15",
+  tile_df = process_blackmarble_corners(hrange = c(8, 10), vrange = c(4, 5)),
+  subdataset = 3L,
+  crs = "EPSG:4326"
+)
+
+blackmarble_points <- calculate_covariates(
+  covariate = "modis",
+  from = blackmarble_files,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  preprocess = amadeus::process_blackmarble,
+  tile_df = process_blackmarble_corners(hrange = c(8, 10), vrange = c(4, 5)),
+  subdataset = 3L,
+  name_covariates = "blackmarble_",
+  fun_summary = "mean",
+  geom = "sf"
+)
+
+terra::plot(blackmarble_raster, main = "VNP46A2 processed raster")
+plot_histogram_points(blackmarble_points, "VNP46A2 point covariate histogram")
+```
+
 ## Notes
 
-- The download section requests both a land-surface temperature product (`MOD11A1`) and a vegetation product (`MOD13A2`) so the local workflow exercises more than one MODIS product family.
-- The extraction example still focuses on `LST_Day_1km`, which is the most direct match to the current `process_modis_merge()` example.
+- `calculate_covariates(covariate = "modis", ...)` always receives the raw file list in `from =`; the preprocessing helper named in `preprocess =` is what turns those files into a day-specific raster during extraction.
+- `MCD14DL` is the main exception in the MODIS family: it downloads as text, preprocesses with `process_mcd14dl()`, and then extracts with `calculate_covariates(covariate = "mcd14dl", ...)`.
+- Because `process_mcd14dl()` returns detections as points rather than a raster, its template plots the processed detections and a histogram of extracted counts instead of a processed raster.
+- The example dates are intentionally chosen to align with each representative product cadence: daily products use a single day, while non-daily products are handled with short 15-30 day windows so the plotted rasters and extracted point / H3 summaries are averaged over available composites instead of relying on a single sparse date.
+- Apply product-specific scale factors from the NASA product documentation when you move from these templates to analysis-ready covariates. The `MOD11A1` example includes a temperature conversion because that scale is already well established in the package examples.

@@ -194,10 +194,20 @@ process_modis_sds <-
     product = c(
       "MOD11A1",
       "MOD13A2",
+      "MOD13Q1",
+      "MYD13Q1",
       "MOD09GA",
       "MCD19A2",
       "MOD14A1",
-      "MYD14A1"
+      "MYD14A1",
+      "MOD14A2",
+      "MYD14A2",
+      "MOD16A2",
+      "MYD16A2",
+      "MCD64A1",
+      "MCD64CMQ",
+      "MCD12Q1",
+      "VNP64A1"
     ),
     custom_sel = NULL,
     ...
@@ -211,16 +221,33 @@ process_modis_sds <-
           product,
           MOD11A1 = "(LST_)",
           MOD13A2 = "(NDVI)",
+          MOD13Q1 = "250m 16 days (NDVI|EVI)",
+          MYD13Q1 = "250m 16 days (NDVI|EVI)",
           MOD09GA = "(sur_refl_b0)",
           MCD19A2 = "(Optical_Depth)",
           MOD14A1 = "(FireMask)",
-          MYD14A1 = "(FireMask)"
+          MYD14A1 = "(FireMask)",
+          MOD14A2 = "(FireMask)",
+          MYD14A2 = "(FireMask)",
+          MOD16A2 = "(ET_500m|PET_500m)",
+          MYD16A2 = "(ET_500m|PET_500m)",
+          MCD64A1 = "(Burn Date|BurnDate)",
+          MCD64CMQ = "(Burn Date|BurnDate)",
+          MCD12Q1 = "(LC_Type)",
+          VNP64A1 = "(BurnDate)"
         )
       if (product == "MCD19A2") {
         message(
           sprintf(
             "For MCD19A2, use %s for 5km resolution sub-datasets.\n",
             "(cos|RelAZ|Angle)"
+          )
+        )
+      } else if (product == "MCD12Q1") {
+        message(
+          sprintf(
+            "For MCD12Q1, use %s to select a specific land cover layer.\n",
+            "(LC_Type1|LC_Type2|LC_Type3|LC_Type4|LC_Type5)"
           )
         )
       }
@@ -336,6 +363,10 @@ the input then flatten it manually."
 #' which subdatasets will be imported.
 #' @param fun_agg Function name or custom function to aggregate overlapping
 #' cell values. See `fun` description in [`terra::tapp`] for details.
+#' @param path_secondary character. Optional secondary list of HDF/H5 paths
+#' (e.g., Aqua files) to fuse with `path` for improved temporal coverage.
+#' @param fusion_method character(1). Fusion method when `path_secondary` is
+#' provided: `"mean"`, `"primary_first"`, `"secondary_first"`.
 #' @param ... For internal use.
 #' @note Curvilinear products (i.e., swaths) will not be accepted.
 #' MODIS products downloaded by functions in `amadeus`,
@@ -364,10 +395,16 @@ process_modis_merge <- function(
   date = NULL,
   subdataset = NULL,
   fun_agg = "mean",
+  path_secondary = NULL,
+  fusion_method = c("mean", "primary_first", "secondary_first"),
   ...
 ) {
+  fusion_method <- match.arg(fusion_method)
   if (!is.character(path)) {
     stop("Argument path should be a list of hdf files (character).\n")
+  }
+  if (!is.null(path_secondary) && !is.character(path_secondary)) {
+    stop("Argument path_secondary should be a list of hdf files (character).\n")
   }
   if (!(is.character(fun_agg) || is.function(fun_agg))) {
     stop(
@@ -400,6 +437,53 @@ process_modis_merge <- function(
     gc()
   } else {
     result_merged <- layer_target[[1]]
+  }
+
+  if (!is.null(path_secondary)) {
+    ftarget_secondary <- modis_filter_paths_by_date(path_secondary, date = date)
+    if (length(ftarget_secondary) > 0) {
+      layer_target_secondary <-
+        lapply(ftarget_secondary, function(x) {
+          process_flatten_sds(
+            x,
+            subdataset = subdataset,
+            fun_agg = fun_agg
+          )
+        })
+
+      if (length(ftarget_secondary) > 1) {
+        result_secondary <- do.call(terra::merge, layer_target_secondary)
+      } else {
+        result_secondary <- layer_target_secondary[[1]]
+      }
+
+      if (!isTRUE(terra::compareGeom(
+        result_merged,
+        result_secondary,
+        stopOnError = FALSE
+      ))) {
+        stop("Primary and secondary MODIS rasters have incompatible geometry.\n")
+      }
+      if (terra::nlyr(result_merged) != terra::nlyr(result_secondary)) {
+        stop("Primary and secondary MODIS rasters have different layer counts.\n")
+      }
+
+      if (fusion_method == "primary_first") {
+        result_merged <- terra::cover(result_merged, result_secondary)
+      } else if (fusion_method == "secondary_first") {
+        result_merged <- terra::cover(result_secondary, result_merged)
+      } else {
+        idx_layers <- seq_len(terra::nlyr(result_merged))
+        fused <- lapply(idx_layers, function(k) {
+          terra::app(
+            c(result_merged[[k]], result_secondary[[k]]),
+            mean,
+            na.rm = TRUE
+          )
+        })
+        result_merged <- do.call(c, fused)
+      }
+    }
   }
   return(result_merged)
 }

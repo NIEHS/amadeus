@@ -780,6 +780,8 @@ calculate_ecoregion <-
 
 #' Calculate MODIS product covariates in multiple CPU threads
 #' @param from character. List of paths to MODIS/VIIRS files.
+#' @param from_secondary character. Optional secondary file list (e.g., Aqua
+#' files when `from` contains Terra files) used for fused temporal coverage.
 #' @param locs sf/SpatVector object. Unique locs where covariates
 #' will be calculated.
 #' @param locs_id character(1). Site identifier. Default is `"site_id"`
@@ -817,6 +819,10 @@ calculate_ecoregion <-
 #' temperature)
 #' would be `scale = "* 0.02"`.
 #' Default is `NULL`, which applies no scale.
+#' @param fusion_method character(1). Fusion method used only when
+#' `from_secondary` is provided. Options are `"mean"` (pixel-wise mean with
+#' `na.rm = TRUE`), `"primary_first"` (use `from` first), and
+#' `"secondary_first"` (use `from_secondary` first).
 #' @param ... Arguments passed to `preprocess`.
 # nolint start
 #' @description `calculate_modis` essentially runs [`calculate_modis_daily`] function
@@ -888,6 +894,7 @@ calculate_ecoregion <-
 calculate_modis <-
   function(
     from = NULL,
+    from_secondary = NULL,
     locs = NULL,
     locs_id = "site_id",
     radius = c(0L, 1e3L, 1e4L, 5e4L),
@@ -900,9 +907,14 @@ calculate_modis <-
     max_cells = 3e7,
     geom = FALSE,
     scale = NULL,
+    fusion_method = c("mean", "primary_first", "secondary_first"),
     ...
   ) {
     amadeus::check_geom(geom)
+    fusion_method <- match.arg(fusion_method)
+    if (!is.null(from_secondary) && !is.character(from_secondary)) {
+      stop("from_secondary should be a character vector of file paths.\n")
+    }
     if (!is.function(preprocess)) {
       stop(
         "preprocess should be one of process_modis_merge,
@@ -925,10 +937,16 @@ process_modis_swath, or process_blackmarble."
     # nolint start
     hdf_args <- c(as.list(environment()), list(...))
     # nolint end
-    dates_available_m <-
-      vapply(from, modis_extract_temporal_key, character(1))
-    date_scales <-
-      vapply(from, modis_extract_temporal_scale, character(1))
+    dates_available_m <- vapply(from, modis_extract_temporal_key, character(1))
+    date_scales <- vapply(from, modis_extract_temporal_scale, character(1))
+    if (!is.null(from_secondary)) {
+      dates_secondary_m <-
+        vapply(from_secondary, modis_extract_temporal_key, character(1))
+      date_scales_secondary <-
+        vapply(from_secondary, modis_extract_temporal_scale, character(1))
+      dates_available_m <- c(dates_available_m, dates_secondary_m)
+      date_scales <- c(date_scales, date_scales_secondary)
+    }
     date_scale_unique <- unique(stats::na.omit(date_scales))
     if (length(date_scale_unique) != 1L) {
       stop(
@@ -937,31 +955,35 @@ process_modis_swath, or process_blackmarble."
     }
     dates_available <- sort(unique(dates_available_m))
 
-    # When multiple dates are concerned,
-    # the number of tiles are expected to be the same.
-    # Exceptions could exist, so here the number of tiles are checked.
-    summary_available <- table(dates_available_m)
-    summary_available_mode <-
-      sort(table(summary_available), decreasing = TRUE)[1]
-    summary_available_mode <- as.numeric(names(summary_available_mode))
-    summary_available_insuf <-
-      which(summary_available < floor(summary_available_mode * 0.8))
+    if (is.null(from_secondary)) {
+      # When multiple dates are concerned,
+      # the number of tiles are expected to be the same.
+      # Exceptions could exist, so here the number of tiles are checked.
+      summary_available <- table(dates_available_m)
+      summary_available_mode <-
+        sort(table(summary_available), decreasing = TRUE)[1]
+      summary_available_mode <- as.numeric(names(summary_available_mode))
+      summary_available_insuf <-
+        which(summary_available < floor(summary_available_mode * 0.8))
 
-    if (length(summary_available_insuf) > 0) {
-      dates_insuf <-
-        modis_key_to_date(
-          dates_available[summary_available_insuf],
-          date_scale_unique
+      if (length(summary_available_insuf) > 0) {
+        dates_insuf <-
+          modis_key_to_date(
+            dates_available[summary_available_insuf],
+            date_scale_unique
+          )
+        message(
+          paste0(
+            "The number of tiles on the following dates are insufficient: ",
+            paste(dates_insuf, collapse = ", "),
+            ".\n"
+          )
         )
-      message(
-        paste0(
-          "The number of tiles on the following dates are insufficient: ",
-          paste(dates_insuf, collapse = ", "),
-          ".\n"
-        )
-      )
-      # finally it removes the dates with insufficient tiles
-      dates_available <- dates_available[-summary_available_insuf]
+        # finally it removes the dates with insufficient tiles
+        dates_available <- dates_available[-summary_available_insuf]
+      } else {
+        dates_insuf <- NA
+      }
     } else {
       dates_insuf <- NA
     }
@@ -1012,10 +1034,75 @@ process_modis_swath, or process_blackmarble."
           radiusindexlist <- split(radiusindex, radiusindex)
 
           hdf_args <- c(hdf_args, list(date = day_to_pick))
-          hdf_args <- c(hdf_args, list(path = hdf_args$from))
-          # unified interface with rlang::inject
-          vrt_today <-
-            rlang::inject(preprocess(!!!hdf_args))
+          if (is.null(from_secondary)) {
+            hdf_args <- c(hdf_args, list(path = hdf_args$from))
+            # unified interface with rlang::inject
+            vrt_today <- rlang::inject(preprocess(!!!hdf_args))
+          } else {
+            day_key <- dates_available[datei]
+            has_primary <- day_key %in% vapply(
+              hdf_args$from,
+              modis_extract_temporal_key,
+              character(1)
+            )
+            has_secondary <- day_key %in% vapply(
+              hdf_args$from_secondary,
+              modis_extract_temporal_key,
+              character(1)
+            )
+            if (!has_primary && !has_secondary) {
+              stop("No MODIS files found for selected fusion date.\n")
+            }
+
+            raster_primary <- NULL
+            raster_secondary <- NULL
+
+            if (has_primary) {
+              hdf_args_primary <- hdf_args
+              hdf_args_primary$path <- hdf_args$from
+              hdf_args_primary$from_secondary <- NULL
+              raster_primary <- rlang::inject(preprocess(!!!hdf_args_primary))
+            }
+            if (has_secondary) {
+              hdf_args_secondary <- hdf_args
+              hdf_args_secondary$path <- hdf_args$from_secondary
+              hdf_args_secondary$from_secondary <- NULL
+              raster_secondary <- rlang::inject(preprocess(!!!hdf_args_secondary))
+            }
+
+            if (is.null(raster_primary)) {
+              vrt_today <- raster_secondary
+            } else if (is.null(raster_secondary)) {
+              vrt_today <- raster_primary
+            } else {
+              if (!isTRUE(terra::compareGeom(
+                raster_primary,
+                raster_secondary,
+                stopOnError = FALSE
+              ))) {
+                stop("Primary and secondary MODIS rasters have incompatible geometry.\n")
+              }
+              if (terra::nlyr(raster_primary) != terra::nlyr(raster_secondary)) {
+                stop("Primary and secondary MODIS rasters have different layer counts.\n")
+              }
+              if (fusion_method == "primary_first") {
+                vrt_today <- terra::cover(raster_primary, raster_secondary)
+              } else if (fusion_method == "secondary_first") {
+                vrt_today <- terra::cover(raster_secondary, raster_primary)
+              } else {
+                idx_layers <- seq_len(terra::nlyr(raster_primary))
+                fused <- lapply(idx_layers, function(k) {
+                  terra::app(
+                    c(raster_primary[[k]], raster_secondary[[k]]),
+                    mean,
+                    na.rm = TRUE
+                  )
+                })
+                vrt_today <- do.call(c, fused)
+                names(vrt_today) <- names(raster_primary)
+              }
+            }
+          }
 
           if (sum(terra::nlyr(vrt_today)) != length(name_covariates)) {
             message(
