@@ -1067,7 +1067,8 @@ process_modis_swath, or process_blackmarble."
               hdf_args_secondary <- hdf_args
               hdf_args_secondary$path <- hdf_args$from_secondary
               hdf_args_secondary$from_secondary <- NULL
-              raster_secondary <- rlang::inject(preprocess(!!!hdf_args_secondary))
+              raster_secondary <-
+                rlang::inject(preprocess(!!!hdf_args_secondary))
             }
 
             if (is.null(raster_primary)) {
@@ -1080,10 +1081,19 @@ process_modis_swath, or process_blackmarble."
                 raster_secondary,
                 stopOnError = FALSE
               ))) {
-                stop("Primary and secondary MODIS rasters have incompatible geometry.\n")
+                stop(
+                  "Primary and secondary MODIS rasters have incompatible ",
+                  "geometry.\n"
+                )
               }
-              if (terra::nlyr(raster_primary) != terra::nlyr(raster_secondary)) {
-                stop("Primary and secondary MODIS rasters have different layer counts.\n")
+              if (
+                terra::nlyr(raster_primary) !=
+                  terra::nlyr(raster_secondary)
+              ) {
+                stop(
+                  "Primary and secondary MODIS rasters have different ",
+                  "layer counts.\n"
+                )
               }
               if (fusion_method == "primary_first") {
                 vrt_today <- terra::cover(raster_primary, raster_secondary)
