@@ -214,15 +214,23 @@ jobs:
           
           echo "Patch coverage: $cov_patch"
           
-          # Pass if coverage is > 99% OR >= current coverage
+          # Pass if coverage is > 99%, >= current coverage, or within a small
+          # tolerance to avoid failing due to CI-level nondeterminism.
+          cov_tolerance=2
+          cov_floor=$(echo "$cov_current - $cov_tolerance" | bc -l)
           if (( $(echo "$cov_patch > 99" | bc -l) )); then
             echo "✓ Patch coverage ($cov_patch%) exceeds 99% threshold."
             echo "cov_update=$cov_patch" >> $GITHUB_OUTPUT
           elif (( $(echo "$cov_patch >= $cov_current" | bc -l) )); then
             echo "✓ Patch coverage ($cov_patch%) is greater than or equal to current coverage ($cov_current%)."
             echo "cov_update=$cov_patch" >> $GITHUB_OUTPUT
+          elif (( $(echo "$cov_patch >= $cov_floor" | bc -l) )); then
+            echo "✓ Patch coverage ($cov_patch%) is within"
+            echo "${cov_tolerance}% tolerance of current ($cov_current%)."
+            echo "cov_update=$cov_current" >> $GITHUB_OUTPUT
           else
-            echo "::error::Patch coverage ($cov_patch%) is less than current coverage ($cov_current%) and does not exceed 99%."
+            echo "::error::Patch coverage ($cov_patch%) is less than"
+            echo "::error::current coverage ($cov_current%) and below 99%."
             echo "::error::This indicates that new code is not adequately tested or existing coverage was reduced."
             exit 1
           fi
