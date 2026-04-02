@@ -1206,6 +1206,79 @@ testthat::test_that("calculate_modis from_secondary errors on layer mismatch", {
   )
 })
 
+testthat::test_that("calculate_modis validates from_secondary type", {
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+
+  testthat::expect_error(
+    calculate_modis(
+      from = "MOD09GA.A2021001.h10v05.061.2021001000000.hdf",
+      from_secondary = 1L,
+      locs = locs,
+      locs_id = "site_id",
+      preprocess = function(...) terra::rast(),
+      name_covariates = "cov_",
+      scale = "* 1"
+    ),
+    "from_secondary should be a character vector"
+  )
+})
+
+testthat::test_that("calculate_modis uses single-source fusion days", {
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+
+  mock_preprocess <- function(path, date, ...) {
+    is_secondary <- grepl("^MYD", basename(path[1]))
+    out <- terra::rast(nrows = 1, ncols = 1, vals = if (is_secondary) 3 else 1)
+    terra::ext(out) <- c(-79, -78, 35, 36)
+    terra::crs(out) <- "EPSG:4326"
+    names(out) <- "mock_layer"
+    out
+  }
+
+  testthat::local_mocked_bindings(
+    calculate_modis_daily = function(
+      from,
+      locs,
+      locs_id,
+      date,
+      name_extracted,
+      ...
+    ) {
+      out <- data.frame(
+        site_id = as.character(locs[[locs_id]][1]),
+        time = as.Date(date)
+      )
+      out[[name_extracted]] <- as.numeric(terra::values(from)[1])
+      out
+    },
+    .package = "amadeus"
+  )
+
+  result <- calculate_modis(
+    from = "MOD09GA.A2021001.h10v05.061.2021001000000.hdf",
+    from_secondary = "MYD09GA.A2021002.h10v05.061.2021002000000.hdf",
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0L,
+    preprocess = mock_preprocess,
+    name_covariates = "cov_",
+    subdataset = "mock",
+    scale = "* 1",
+    fusion_method = "mean"
+  )
+
+  testthat::expect_equal(nrow(result), 2L)
+  testthat::expect_equal(result$cov_00000, c(1, 3))
+})
+
 
 testthat::test_that("process_modis_sds returns fire mask regex for fire products", {
   testthat::expect_equal(process_modis_sds(product = "MOD14A1"), "(FireMask)")
@@ -1328,6 +1401,55 @@ testthat::test_that("process_modis_merge errors when secondary layer counts diff
     ),
     "different layer counts"
   )
+})
+
+testthat::test_that("process_modis_merge errors when no files match requested date", {
+  testthat::local_mocked_bindings(
+    modis_filter_paths_by_date = function(paths, date) character(0),
+    .package = "amadeus"
+  )
+
+  testthat::expect_error(
+    process_modis_merge(
+      path = "primary.hdf",
+      date = "2023-01-01",
+      subdataset = "mock"
+    ),
+    "No MODIS files matched the requested date"
+  )
+})
+
+testthat::test_that("process_modis_merge merges multiple secondary rasters", {
+  r_primary <- terra::rast(nrows = 1, ncols = 1, vals = 1)
+  terra::ext(r_primary) <- c(0, 1, 0, 1)
+  terra::crs(r_primary) <- "EPSG:4326"
+
+  r_secondary_a <- terra::rast(nrows = 1, ncols = 1, vals = 3)
+  terra::ext(r_secondary_a) <- c(0, 1, 0, 1)
+  terra::crs(r_secondary_a) <- "EPSG:4326"
+  r_secondary_b <- terra::rast(nrows = 1, ncols = 1, vals = 5)
+  terra::ext(r_secondary_b) <- c(0, 1, 0, 1)
+  terra::crs(r_secondary_b) <- "EPSG:4326"
+
+  testthat::local_mocked_bindings(
+    modis_filter_paths_by_date = function(paths, date) paths,
+    process_flatten_sds = function(path, subdataset, fun_agg) {
+      if (path == "secondary_a.hdf") return(r_secondary_a)
+      if (path == "secondary_b.hdf") return(r_secondary_b)
+      r_primary
+    },
+    .package = "amadeus"
+  )
+
+  result <- process_modis_merge(
+    path = "primary.hdf",
+    path_secondary = c("secondary_a.hdf", "secondary_b.hdf"),
+    date = "2023-01-01",
+    subdataset = "mock",
+    fusion_method = "secondary_first"
+  )
+
+  testthat::expect_s4_class(result, "SpatRaster")
 })
 
 

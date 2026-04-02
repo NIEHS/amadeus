@@ -466,6 +466,45 @@ testthat::test_that("download_merra2 use_opendap=TRUE builds OPeNDAP URLs (mocke
   })
 })
 
+testthat::test_that("download_merra2 use_opendap=TRUE download=FALSE returns discovered list", {
+  testthat::local_mocked_bindings(
+    download_permit = function(...) invisible(NULL),
+    download_setup_dir = function(...) invisible(NULL),
+    download_sanitize_path = function(x) paste0(x, "/"),
+    get_token = function(...) "fake_token",
+    check_for_null_parameters = function(...) invisible(NULL),
+    check_url_status = function(...) TRUE,
+    check_destfile = function(...) TRUE,
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
+    request = function(url) structure(list(url = url), class = "httr2_request"),
+    req_perform = function(req) structure(list(body = charToRaw(
+      paste0(
+        '<a href="MERRA2_400.tavg1_2d_slv_Nx.20180101.nc4"></a>',
+        '<a href="MERRA2_400.tavg1_2d_slv_Nx.20180102.nc4"></a>'
+      )
+    )), class = "httr2_response"),
+    resp_body_string = function(resp) rawToChar(resp$body),
+    .package = "httr2"
+  )
+
+  withr::with_tempdir({
+    result <- suppressWarnings(download_merra2(
+      collection = "tavg1_2d_slv_Nx",
+      date = c("2018-01-01", "2018-01-02"),
+      extent = c(-80, 35, -75, 40),
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      use_opendap = TRUE,
+      variables = c("T2M"),
+      download = FALSE
+    ))
+    testthat::expect_equal(result$n_files, 2L)
+    testthat::expect_true(all(grepl("opendap", result$urls)))
+  })
+})
+
 testthat::test_that("download_merra2 use_opendap=TRUE extent=NULL warns about no benefit (mocked)", {
   testthat::local_mocked_bindings(
     download_permit           = function(...) invisible(NULL),
