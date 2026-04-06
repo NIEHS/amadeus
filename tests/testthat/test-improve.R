@@ -557,3 +557,52 @@ testthat::test_that("download_improve returns early when files present", {
   )
   testthat::expect_true(is.list(result) || is.null(result))
 })
+
+testthat::test_that("process_improve single-date string expands correctly", {
+  withr::local_package("data.table")
+  result_single <- process_improve(
+    path = improve_path,
+    product = "raw",
+    date = "2022-01-02",
+    return_format = "data.table"
+  )
+  result_pair <- process_improve(
+    path = improve_path,
+    product = "raw",
+    date = c("2022-01-02", "2022-01-02"),
+    return_format = "data.table"
+  )
+  testthat::expect_equal(nrow(result_single), nrow(result_pair))
+})
+
+testthat::test_that("download_improve returns hash when files present and hash=TRUE", {
+  tmp <- withr::local_tempdir()
+  writeLines("x", file.path(tmp, "IMPAER_2022.txt"))
+  writeLines("x", file.path(tmp, "improve_sites.txt"))
+  testthat::local_mocked_bindings(
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  result <- download_improve(
+    year = 2022,
+    product = "raw",
+    directory_to_save = tmp,
+    acknowledgement = TRUE,
+    include_sites = TRUE,
+    hash = TRUE
+  )
+  testthat::expect_equal(result, "fakehash")
+})
+
+testthat::test_that("download_improve include_sites=FALSE skips sites file", {
+  tmp <- withr::local_tempdir()
+  writeLines("x", file.path(tmp, "IMPAER_2022.txt"))
+  result <- download_improve(
+    year = 2022,
+    product = "raw",
+    directory_to_save = tmp,
+    acknowledgement = TRUE,
+    include_sites = FALSE
+  )
+  testthat::expect_true(is.list(result) || is.null(result))
+})

@@ -675,3 +675,33 @@ testthat::test_that("calculate_goes dispatch via calculate_covariates", {
 })
 
 # nolint end
+
+testthat::test_that("download_goes empty S3 listing returns early", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          body = charToRaw("<ListBucketResult></ListBucketResult>")
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_string = function(resp, ...) rawToChar(resp$body),
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    out <- suppressMessages(
+      download_goes(
+        date = "2018-01-01",
+        satellite = "16",
+        product = "ADP-C",
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      )
+    )
+    testthat::expect_true(is.list(out))
+    testthat::expect_equal(out$success, 0)
+    testthat::expect_equal(out$skipped, 0)
+  })
+})
