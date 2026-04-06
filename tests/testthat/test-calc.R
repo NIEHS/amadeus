@@ -43,7 +43,10 @@ testthat::test_that("calculate_covariates (expected errors)", {
       "edgar",
       "prism",
       "huc",
-      "cdl"
+      "cdl",
+      "goes",
+      "goes_adp",
+      "GOES"
     )
   for (cand in candidates) {
     testthat::expect_error(
@@ -445,4 +448,209 @@ testthat::test_that("calc_worker", {
       )
   )
   testthat::expect_s3_class(cwres, "data.frame")
+})
+
+################################################################################
+##### calc_summarize_temporal
+testthat::test_that("calc_summarize_temporal returns input when NULL", {
+  df <- data.frame(
+    site_id = c("A", "A", "B"),
+    time = as.POSIXct(
+      c("2020-01-01 06:00", "2020-01-01 18:00", "2020-01-01 06:00"),
+      tz = "UTC"
+    ),
+    pm25_0 = c(10, 20, 5)
+  )
+  result <- calc_summarize_temporal(df, fun_temporal = NULL)
+  testthat::expect_identical(result, df)
+})
+
+testthat::test_that("calc_summarize_temporal daily mean", {
+  df <- data.frame(
+    site_id = c("A", "A", "B", "B"),
+    time = as.POSIXct(
+      c(
+        "2020-01-01 06:00",
+        "2020-01-01 18:00",
+        "2020-01-02 06:00",
+        "2020-01-02 18:00"
+      ),
+      tz = "UTC"
+    ),
+    pm25_0 = c(10, 20, 5, 15)
+  )
+  result <- calc_summarize_temporal(
+    df,
+    fun_temporal = "mean",
+    locs_id = "site_id"
+  )
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_equal(nrow(result), 2L)
+  testthat::expect_true("site_id" %in% names(result))
+  testthat::expect_true("time" %in% names(result))
+  testthat::expect_true("pm25_0" %in% names(result))
+  testthat::expect_equal(
+    result[result$site_id == "A", "pm25_0"],
+    15
+  )
+  testthat::expect_equal(
+    result[result$site_id == "B", "pm25_0"],
+    10
+  )
+  testthat::expect_s3_class(result$time, "Date")
+})
+
+testthat::test_that("calc_summarize_temporal preserves geometry", {
+  df <- data.frame(
+    site_id = c("A", "A"),
+    time = as.POSIXct(
+      c("2020-06-01 00:00", "2020-06-01 12:00"),
+      tz = "UTC"
+    ),
+    pm25_0 = c(8, 12),
+    geometry = c(
+      "POINT (-80 35)",
+      "POINT (-80 35)"
+    )
+  )
+  result <- calc_summarize_temporal(
+    df,
+    fun_temporal = "mean",
+    locs_id = "site_id"
+  )
+  testthat::expect_equal(nrow(result), 1L)
+  testthat::expect_true("geometry" %in% names(result))
+  testthat::expect_equal(result$geometry, "POINT (-80 35)")
+  testthat::expect_equal(result$pm25_0, 10)
+})
+
+testthat::test_that("calc_summarize_temporal group_cols_extra", {
+  df <- data.frame(
+    site_id = c("A", "A", "A", "A"),
+    time = as.POSIXct(
+      c(
+        "2020-01-01 06:00",
+        "2020-01-01 18:00",
+        "2020-01-01 06:00",
+        "2020-01-01 18:00"
+      ),
+      tz = "UTC"
+    ),
+    level = c("850", "850", "500", "500"),
+    pm_0 = c(10, 20, 30, 40)
+  )
+  result <- calc_summarize_temporal(
+    df,
+    fun_temporal = "mean",
+    locs_id = "site_id",
+    group_cols_extra = "level"
+  )
+  testthat::expect_equal(nrow(result), 2L)
+  testthat::expect_true("level" %in% names(result))
+  lev850 <- result[result$level == "850", "pm_0"]
+  lev500 <- result[result$level == "500", "pm_0"]
+  testthat::expect_equal(lev850, 15)
+  testthat::expect_equal(lev500, 35)
+})
+
+testthat::test_that("calc_summarize_temporal time_bucket month", {
+  df <- data.frame(
+    site_id = c("A", "A"),
+    time = as.POSIXct(
+      c("2020-01-10", "2020-01-20"),
+      tz = "UTC"
+    ),
+    v_0 = c(4, 8)
+  )
+  result <- calc_summarize_temporal(
+    df,
+    fun_temporal = "sum",
+    locs_id = "site_id",
+    time_bucket = "month"
+  )
+  testthat::expect_equal(nrow(result), 1L)
+  testthat::expect_equal(result$v_0, 12)
+})
+
+testthat::test_that("calc_summarize_temporal time_bucket week", {
+  df <- data.frame(
+    site_id = c("A", "A"),
+    time = as.POSIXct(
+      c("2020-06-01", "2020-06-03"),
+      tz = "UTC"
+    ),
+    v_0 = c(2, 8)
+  )
+  result <- calc_summarize_temporal(
+    df,
+    fun_temporal = "mean",
+    locs_id = "site_id",
+    time_bucket = "week"
+  )
+  # Both dates fall in the same ISO week → 1 row
+  testthat::expect_equal(nrow(result), 1L)
+  testthat::expect_equal(result$v_0, 5)
+})
+
+testthat::test_that("calc_summarize_temporal time_bucket year", {
+  df <- data.frame(
+    site_id = c("A", "A"),
+    time = as.POSIXct(
+      c("2020-03-15", "2020-09-20"),
+      tz = "UTC"
+    ),
+    v_0 = c(4, 8)
+  )
+  result <- calc_summarize_temporal(
+    df,
+    fun_temporal = "sum",
+    locs_id = "site_id",
+    time_bucket = "year"
+  )
+  # Both dates in the same year → 1 row
+  testthat::expect_equal(nrow(result), 1L)
+  testthat::expect_equal(result$v_0, 12)
+})
+
+testthat::test_that("calc_summarize_temporal single-row input returns 1 row", {
+  df <- data.frame(
+    site_id = "A",
+    time = as.POSIXct("2020-01-01 06:00", tz = "UTC"),
+    v_0 = 7
+  )
+  result <- calc_summarize_temporal(
+    df,
+    fun_temporal = "mean",
+    locs_id = "site_id"
+  )
+  testthat::expect_equal(nrow(result), 1L)
+  testthat::expect_equal(result$v_0, 7)
+})
+
+testthat::test_that("calc_summarize_temporal errors on bad args", {
+  df <- data.frame(
+    site_id = "A",
+    time = Sys.time(),
+    v = 1
+  )
+  testthat::expect_error(
+    calc_summarize_temporal(df, "mean", locs_id = "missing_col"),
+    regexp = "locs_id"
+  )
+  testthat::expect_error(
+    calc_summarize_temporal(df, "mean", time_col = "no_such"),
+    regexp = "time_col"
+  )
+  testthat::expect_error(
+    calc_summarize_temporal(
+      df, "mean",
+      group_cols_extra = "not_a_col"
+    ),
+    regexp = "not_a_col"
+  )
+  df_nocov <- data.frame(site_id = "A", time = Sys.time())
+  testthat::expect_error(
+    calc_summarize_temporal(df_nocov, "mean"),
+    regexp = "No covariate"
+  )
 })

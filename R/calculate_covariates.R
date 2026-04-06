@@ -26,6 +26,7 @@
 #' * \code{\link{calculate_gmted}}: "gmted", "GMTED"
 #' * \code{\link{calculate_narr}}: "narr", "NARR"
 #' * \code{\link{calculate_geos}}: "geos", "geos_cf", "GEOS"
+#' * \code{\link{calculate_goes}}: "goes", "goes_adp", "GOES"
 #' * \code{\link{calculate_population}}: "population", "sedac_population"
 #' * \code{\link{calculate_groads}}: "roads", "groads", "sedac_groads"
 #' * \code{\link{calculate_nlcd}}: "nlcd", "NLCD"
@@ -90,7 +91,11 @@ calculate_covariates <-
       "cropscape",
       "cdl",
       "huc",
-      "edgar"
+      "edgar",
+      "improve",
+      "goes",
+      "goes_adp",
+      "GOES"
     ),
     from,
     locs,
@@ -133,7 +138,10 @@ calculate_covariates <-
       cropscape = amadeus::calculate_cropscape,
       cdl = amadeus::calculate_cropscape,
       huc = amadeus::calculate_huc,
-      edgar = amadeus::calculate_edgar
+      edgar = amadeus::calculate_edgar,
+      improve = amadeus::calculate_improve,
+      goes = amadeus::calculate_goes,
+      goes_adp = amadeus::calculate_goes
     )
 
     res_covariate <-
@@ -3504,4 +3512,271 @@ calculate_huc <- function(
     crs = terra::crs(from)
   )
   return(sites_return)
+}
+
+################################################################################
+# nolint start
+#' Calculate NOAA GOES ADP covariates
+#' @description
+#' Extract NOAA GOES Aerosol Detection Product (ADP) values at point
+#' locations from a \code{SpatRaster} returned by \code{process_goes()}.
+#' Returns a \code{data.frame} (or \code{SpatVector} / \code{sf}) containing
+#' \code{locs_id}, \code{time}, and the extracted variable column
+#' (\code{{variable}_{radius}}).
+#' @param from SpatRaster(1). Output from \code{process_goes()}.
+#' @param locs data.frame, character file path, \code{SpatVector}, or
+#'   \code{sf} object with point locations.
+#' @param locs_id character(1). Column name for unique location identifier.
+#' @param radius integer(1). Circular buffer radius in metres around each
+#'   site (default 0 = point extraction).
+#' @param fun character(1). Summary function for buffered extractions
+#'   (default \code{"mean"}).
+#' @param fun_temporal character(1) or \code{NULL}. Temporal aggregation
+#'   function applied after spatial extraction: \code{"mean"},
+#'   \code{"max"}, \code{"min"}, or \code{"sum"}. \code{NULL} (default)
+#'   returns all time steps unchanged.
+#' @param time_bucket character(1). Temporal grouping unit used when
+#'   \code{fun_temporal} is not \code{NULL}: \code{"day"} (default),
+#'   \code{"week"}, \code{"month"}, or \code{"year"}.
+#' @param geom \code{FALSE}/\code{"sf"}/\code{"terra"}. Return geometry with
+#'   results. Default \code{FALSE}. The CRS is inherited from \code{from}.
+#' @param ... Placeholders.
+#' @seealso \code{\link{process_goes}}
+#' @author Mitchell Manware
+#' @return a \code{data.frame} or \code{SpatVector} object.
+#' @importFrom terra crs
+#' @importFrom terra nlyr
+#' @importFrom terra time
+#' @importFrom terra vect
+#' @importFrom terra as.data.frame
+#' @importFrom terra extract
+#' @importFrom methods is
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires downloaded
+#' ##       and processed data.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -95.0, lat = 34.5)
+#' calculate_goes(
+#'   from = goes,  # derived from process_goes() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean"
+#' )
+#' }
+#' @export
+# nolint end
+calculate_goes <- function(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  fun = "mean",
+  fun_temporal = NULL,
+  time_bucket = "day",
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_fun_temporal(fun_temporal)
+  #### prepare locations list
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_e  <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### perform extraction
+  sites_extracted <- amadeus::calc_worker(
+    dataset = "goes",
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
+    fun = fun,
+    variable = 1,
+    time = c(2, 3),
+    time_type = "hour",
+    level = NULL,
+    ...
+  )
+  #### optional temporal summarisation
+  sites_extracted <- amadeus::calc_summarize_temporal(
+    covar = sites_extracted,
+    fun_temporal = fun_temporal,
+    locs_id = locs_id,
+    time_bucket = time_bucket,
+    group_cols_extra = NULL
+  )
+  if (!is.null(fun_temporal) && "time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+  }
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  return(sites_return)
+}
+
+################################################################################
+# nolint start
+#' Calculate IMPROVE aerosol monitoring covariates
+#' @description
+#' Extract IMPROVE (Interagency Monitoring of Protected Visual Environments)
+#' aerosol measurements for user-supplied point locations by performing a
+#' nearest-station spatial join. For each location in \code{locs}, the
+#' function finds all IMPROVE monitors within \code{radius} metres
+#' (default 50 000 m / 50 km) and returns the monitor measurements joined
+#' to the queried location. Only the single nearest monitor is returned
+#' when \code{nearest_only = TRUE} (default).
+#' @param from SpatVector(1). Output of \code{process_improve()} called with
+#'   \code{return_format = "terra"}.
+#' @param locs data.frame, \code{SpatVector}, or \code{sf} object.  Must
+#'   contain at minimum the column named by \code{locs_id}.
+#' @param locs_id character(1). Column name for unique location identifier.
+#'   Default \code{"site_id"}.
+#' @param radius numeric(1). Search radius in metres. Default 50000 (50 km).
+#' @param nearest_only logical(1). When \code{TRUE} (default), keep only
+#'   the closest IMPROVE monitor per query location per measurement date.
+#'   When \code{FALSE}, all monitors within \code{radius} are returned.
+#' @param geom FALSE/\code{"sf"}/\code{"terra"}. Return geometry.
+#'   Default \code{FALSE}.
+#' @param ... Placeholders.
+#' @seealso \code{\link{process_improve}}, \code{\link{download_improve}}
+#' @author Insang Song, Mitchell Manware
+#' @return a \code{data.frame} or \code{SpatVector} object.  Contains all
+#'   columns from \code{from} joined to the \code{locs_id} column.  When
+#'   \code{nearest_only = TRUE} the result has at most one row per
+#'   location × measurement-date combination.
+#' @importFrom terra vect crs project nearby as.data.frame
+#' @importFrom methods is
+#' @importFrom dplyr left_join
+#' @examples
+#' locs <- data.frame(
+#'   site_id = c("S1", "S2"),
+#'   lon = c(-68.3, -103.2),
+#'   lat = c(44.4,   29.3)
+#' )
+#' improve <- process_improve(
+#'   path = system.file("testdata/improve", package = "amadeus"),
+#'   product = "raw",
+#'   return_format = "terra"
+#' )
+#' result <- calculate_improve(
+#'   from = improve,
+#'   locs = locs,
+#'   locs_id = "site_id"
+#' )
+#' @export
+# nolint end
+calculate_improve <- function(
+  from = NULL,
+  locs,
+  locs_id = "site_id",
+  radius = 50000,
+  nearest_only = TRUE,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_geom(geom)
+
+  #### Validate from
+  if (is.null(from)) {
+    stop("`from` must be a SpatVector from process_improve().\n")
+  }
+  if (!methods::is(from, "SpatVector")) {
+    stop("`from` must be a SpatVector. ",
+         "Use process_improve(return_format = 'terra').\n")
+  }
+
+  #### Coerce locs to SpatVector
+  if (!methods::is(locs, "SpatVector")) {
+    if (methods::is(locs, "sf")) {
+      locs <- terra::vect(locs)
+    } else if (is.data.frame(locs)) {
+      locs <- try(terra::vect(locs, crs = "EPSG:4326"), silent = TRUE)
+      if (inherits(locs, "try-error")) {
+        stop(
+          "`locs` could not be converted to SpatVector. ",
+          "Ensure it contains 'lon' and 'lat' columns.\n"
+        )
+      }
+    } else {
+      stop(
+        "`locs` must be a data.frame, SpatVector, or sf object.\n"
+      )
+    }
+  }
+
+  #### Check locs_id column
+  if (!locs_id %in% names(locs)) {
+    stop(sprintf(
+      "`locs_id` column '%s' not found in `locs`.\n",
+      locs_id
+    ))
+  }
+
+  #### Project locs to CRS of from
+  from_crs <- terra::crs(from)
+  locs_prj <- terra::project(locs, from_crs)
+
+  #### Find nearest IMPROVE monitors within radius
+  nb <- terra::nearby(locs_prj, from, distance = radius)
+
+  if (nrow(nb) == 0 || all(is.na(nb[, 2]))) {
+    warning(
+      "No IMPROVE monitors found within the specified radius ",
+      "for any of the query locations.\n",
+      call. = FALSE
+    )
+    empty_df <- as.data.frame(locs)[, locs_id, drop = FALSE]
+    return(empty_df)
+  }
+
+  #### Build data.frame from IMPROVE records that matched
+  from_df <- terra::as.data.frame(from)
+  locs_df <- as.data.frame(locs)[, locs_id, drop = FALSE]
+
+  #### nb columns: [query_idx, from_idx, distance]
+  nb_df <- as.data.frame(nb)
+  colnames(nb_df) <- c("query_idx", "from_idx", "distance_m")
+
+  #### Keep only nearest monitor per query when nearest_only = TRUE
+  if (isTRUE(nearest_only)) {
+    nb_df <- nb_df[
+      ave(nb_df$distance_m, nb_df$query_idx,
+          FUN = function(x) x == min(x, na.rm = TRUE)) == 1, ,
+      drop = FALSE
+    ]
+  }
+
+  #### Remove NA matches
+  nb_df <- nb_df[!is.na(nb_df$from_idx), , drop = FALSE]
+
+  #### Join query locs and IMPROVE data
+  result <- data.frame(
+    locs_df[nb_df$query_idx, , drop = FALSE],
+    from_df[nb_df$from_idx, , drop = FALSE],
+    distance_m = nb_df$distance_m,
+    row.names = NULL
+  )
+
+  #### Return geometry if requested
+  if (geom %in% c("terra", "sf")) {
+    result_sv <- terra::vect(
+      result,
+      geom = c("Longitude", "Latitude"),
+      crs = "EPSG:4326"
+    )
+    if (geom == "sf") {
+      return(sf::st_as_sf(result_sv))
+    }
+    return(result_sv)
+  }
+
+  return(result)
 }

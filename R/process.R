@@ -20,9 +20,11 @@
 #' * \code{\link{process_tri}}: "tri", "TRI"
 #' * \code{\link{process_nei}}: "nei", "NEI"
 #' * \code{\link{process_geos}}: "geos", "GEOS"
+#' * \code{\link{process_goes}}: "goes", "goes_adp", "GOES"
 #' * \code{\link{process_gmted}}: "gmted", "GMTED"
 #' * \code{\link{process_aqs}}: "aqs", "AQS"
 #' * \code{\link{process_edgar}}: "edgar"
+#' * \code{\link{process_improve}}: "improve", "IMPROVE"
 #' * \code{\link{process_hms}}: "hms", "smoke", "HMS"
 #' * \code{\link{process_narr}}: "narr", "NARR"
 #' * \code{\link{process_groads}}: "sedac_groads", "roads", "groads"
@@ -61,6 +63,9 @@ process_covariates <-
       "koppen",
       "koeppen",
       "geos",
+      "goes",
+      "goes_adp",
+      "GOES",
       "dummies",
       "gmted",
       "aqs",
@@ -85,7 +90,8 @@ process_covariates <-
       "cropscape",
       "cdl",
       "prism",
-      "edgar"
+      "edgar",
+      "improve"
     ),
     path = NULL,
     ...
@@ -118,6 +124,8 @@ process_covariates <-
       nei = process_nei,
       tri = process_tri,
       geos = process_geos,
+      goes = process_goes,
+      goes_adp = process_goes,
       gmted = process_gmted,
       aqs = process_aqs,
       merra = process_merra2,
@@ -128,7 +136,8 @@ process_covariates <-
       cropscape = process_cropscape,
       cdl = process_cropscape,
       prism = process_prism,
-      edgar = process_edgar
+      edgar = process_edgar,
+      improve = process_improve
     )
 
     res_covariate <-
@@ -3660,3 +3669,379 @@ process_huc <-
     }
     return(hucpoly)
   }
+
+################################################################################
+# nolint start
+#' Process NOAA GOES ADP data
+#' @description
+#' The \code{process_goes()} function imports and cleans NOAA GOES-16/18
+#' Aerosol Detection Product (ADP) NetCDF files downloaded by
+#' \code{download_goes()}, returning a single \code{SpatRaster} object with
+#' CRS \code{EPSG:4326}.
+#' @param date character(1 or 2). Date (YYYY-MM-DD) or start and end dates.
+#' @param variable character(1). Variable name to extract: \code{"Smoke"}
+#'   or \code{"Dust"}.
+#' @param path character(1). Directory with downloaded GOES ADP NetCDF files.
+#' @param extent numeric(4) or SpatExtent. Crop extent
+#'   (\code{xmin, xmax, ymin, ymax} in EPSG:4326). Default \code{NULL} loads
+#'   the full raster.
+#' @param ... Placeholders.
+#' @note
+#' \itemize{
+#'   \item Layer names follow the convention
+#'     \code{{variable}_{YYYYMMDD}_{HHMMSS}}, e.g.
+#'     \code{"Smoke_20240101_000000"}.
+#'   \item \code{terra::time()} is set to POSIXct UTC for each layer.
+#'   \item Files with GOES geostationary projection are reprojected to
+#'     EPSG:4326.
+#' }
+#' @author Mitchell Manware
+#' @return a \code{SpatRaster} object
+#' @importFrom terra rast
+#' @importFrom terra crs
+#' @importFrom terra project
+#' @importFrom terra crop
+#' @importFrom terra subset
+#' @importFrom terra time
+#' @importFrom terra nlyr
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires downloaded
+#' ##       data files.
+#' \dontrun{
+#' goes <- process_goes(
+#'   date = c("2024-01-01", "2024-01-01"),
+#'   variable = "Smoke",
+#'   path = "./data/goes/"
+#' )
+#' }
+#' @export
+# nolint end
+process_goes <- function(
+  date = c("2024-01-01", "2024-01-01"),
+  variable = NULL,
+  path = NULL,
+  extent = NULL,
+  ...
+) {
+  #### directory setup
+  path <- amadeus::download_sanitize_path(path)
+  #### check for variable
+  amadeus::check_for_null_parameters(mget(ls()))
+  #### check dates
+  if (length(date) == 1) {
+    date <- c(date, date)
+  }
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
+  #### identify file paths matching GOES ADP naming convention
+  paths <- list.files(
+    path,
+    pattern = "^OR_ADP",
+    full.names = TRUE,
+    recursive = TRUE
+  )
+  paths <- grep("\\.nc$", paths, value = TRUE)
+  if (length(paths) == 0) {
+    stop(
+      paste0(
+        "No GOES ADP NetCDF files found in: ", path,
+        "\nFiles must match pattern '^OR_ADP.*\\.nc$'.\n"
+      )
+    )
+  }
+  #### parse start datetime from each filename and filter to date range
+  date_from <- as.Date(date[1])
+  date_to   <- as.Date(date[2])
+  file_dates <- vapply(paths, function(p) {
+    tryCatch(
+      {
+        as.Date(goes_parse_start_datetime(p))
+      },
+      error = function(e) {
+        as.Date(NA)
+      }
+    )
+  }, FUN.VALUE = as.Date(NA))
+  mask <- !is.na(file_dates) &
+    file_dates >= date_from &
+    file_dates <= date_to
+  data_paths <- paths[mask]
+  if (length(data_paths) == 0) {
+    stop(paste0(
+      "No GOES ADP files matching the requested date range were found.\n",
+      "Date range: ", date[1], " to ", date[2], "\n"
+    ))
+  }
+  #### initiate loop over files
+  data_return <- terra::rast()
+  for (p in seq_along(data_paths)) {
+    #### parse datetime from filename
+    dt <- goes_parse_start_datetime(data_paths[p])
+    date_str <- format(dt, "%Y%m%d")
+    time_str <- format(dt, "%H%M%S")
+    message(paste0(
+      "Cleaning ", variable, " data for ",
+      format(dt, "%Y-%m-%d %H:%M:%S UTC"),
+      "...\n"
+    ))
+    #### load NetCDF
+    data_raw <- terra::rast(data_paths[p])
+    #### reproject to EPSG:4326 if file uses geostationary projection
+    crs_proj <- terra::crs(data_raw, proj = TRUE)
+    if (!is.na(crs_proj) && grepl("\\+proj=geos", crs_proj)) {
+      data_raw <- terra::project(data_raw, "EPSG:4326")
+    } else if (is.na(terra::crs(data_raw)) || terra::crs(data_raw) == "") {
+      terra::crs(data_raw) <- "EPSG:4326"
+    }
+    #### subset to requested variable
+    var_idx <- grep(
+      paste0("^", variable, "$"),
+      names(data_raw)
+    )
+    if (length(var_idx) == 0) {
+      var_idx <- grep(variable, names(data_raw))
+    }
+    if (length(var_idx) == 0) {
+      stop(paste0(
+        "Requested variable '", variable,
+        "' was not found in ", basename(data_paths[p]), ".\n"
+      ))
+    }
+    data_variable <- terra::subset(data_raw, subset = var_idx)
+    #### crop to extent (applied after reprojection)
+    if (!is.null(extent)) {
+      data_variable <- terra::crop(data_variable, extent)
+    }
+    #### set layer name: {variable}_{YYYYMMDD}_{HHMMSS}
+    names(data_variable) <- paste0(variable, "_", date_str, "_", time_str)
+    #### set time
+    terra::time(data_variable) <- dt
+    #### combine
+    data_return <- c(data_return, data_variable, warn = FALSE)
+  }
+  #### ensure EPSG:4326
+  terra::crs(data_return) <- "EPSG:4326"
+  message(paste0(
+    "Returning ", variable, " data from ",
+    date[1], " to ", date[2], ".\n"
+  ))
+  return(data_return)
+}
+
+#' Parse GOES start datetime from filename
+#' @description
+#' Extracts the scan start datetime from a GOES-R series ADP filename.
+#' The start timestamp field uses the format \code{sYYYYDDDHHMMSSf}
+#' where \code{DDD} is the day of year (1--366).
+#' @param path character(1). Full or base file path.
+#' @return POSIXct scalar (UTC).
+#' @keywords internal auxiliary
+#' @export
+goes_parse_start_datetime <- function(path) {
+  fname <- basename(path)
+  m <- regmatches(fname, regexpr("_s([0-9]{14})_", fname))
+  if (length(m) == 0 || nchar(m) < 16) {
+    stop(paste0(
+      "Cannot parse GOES start datetime from filename: ", fname, "\n"
+    ))
+  }
+  ts   <- substr(m, 3, 16)
+  year <- as.integer(substr(ts, 1, 4))
+  doy  <- as.integer(substr(ts, 5, 7))
+  hour <- as.integer(substr(ts, 8, 9))
+  min  <- as.integer(substr(ts, 10, 11))
+  sec  <- as.integer(substr(ts, 12, 13))
+  base_date <- as.Date(
+    paste0(year, sprintf("%03d", doy)),
+    format = "%Y%j"
+  )
+  ISOdatetime(
+    year  = year,
+    month = as.integer(format(base_date, "%m")),
+    day   = as.integer(format(base_date, "%d")),
+    hour  = hour,
+    min   = min,
+    sec   = sec,
+    tz    = "UTC"
+  )
+}
+
+################################################################################
+# nolint start
+#' Process IMPROVE aerosol monitoring data
+#' @description
+#' The \code{process_improve()} function reads pipe-delimited IMPROVE
+#' (Interagency Monitoring of Protected Visual Environments) measurement
+#' files downloaded by \code{download_improve()} and joins them with a site
+#' metadata file to attach geographic coordinates. Returns a
+#' \code{SpatVector}, \code{sf}, or \code{data.table} object.
+#' @details
+#' Three product types are supported via \code{product}:
+#' \describe{
+#'   \item{\code{"raw"}}{IMPAER speciated aerosol mass concentrations.
+#'     Key columns: \code{SiteCode}, \code{FactDate}, \code{ParamCode},
+#'     \code{FactValue}, \code{Units}.}
+#'   \item{\code{"rhr2"}}{IMPRHR2 Regional Haze Rule II light extinction
+#'     (\code{bext}, \eqn{Mm^{-1}}).}
+#'   \item{\code{"rhr3"}}{IMPRHR3 Regional Haze Rule III deciview index
+#'     (\code{dv}).}
+#' }
+#' Measurement values are \strong{not} filtered by \code{Status}; callers
+#' may apply their own validity flags (e.g., keep only \code{Status == "V0"}).
+#' @param path character(1). Directory containing downloaded IMPROVE
+#'   \code{.txt} files.
+#' @param product character(1). Product type: \code{"raw"} (default),
+#'   \code{"rhr2"}, or \code{"rhr3"}.
+#' @param date character(1 or 2). Date (\code{"YYYY-MM-DD"}) or start/end
+#'   date pair to filter measurements. Defaults to no filtering when
+#'   \code{NULL}.
+#' @param sites_file character(1) or \code{NULL}. Path to the site metadata
+#'   file. When \code{NULL} (default), the function looks for a file named
+#'   \code{improve_sites.txt} inside \code{path}.
+#' @param return_format character(1). Return object type: \code{"terra"},
+#'   \code{"sf"}, or \code{"data.table"}.
+#' @param extent numeric(4) or \code{NULL}. Optional crop extent
+#'   \code{c(xmin, xmax, ymin, ymax)} in WGS84 / EPSG:4326. Applied only
+#'   when \code{return_format} is \code{"terra"} or \code{"sf"}.
+#' @param ... Placeholders.
+#' @seealso \code{\link{download_improve}}, \code{\link{calculate_improve}}
+#' @return a \code{SpatVector}, \code{sf}, or \code{data.table} object
+#'   depending on \code{return_format}.
+#' @note IMPROVE data are measured on an every-third-day sampling schedule.
+#'   Gaps between measurement dates are expected.
+#' @importFrom data.table fread rbindlist as.data.table setnames
+#' @importFrom terra vect crop ext project
+#' @importFrom sf st_as_sf
+#' @examples
+#' improve <- process_improve(
+#'   path = system.file("testdata/improve", package = "amadeus"),
+#'   product = "raw",
+#'   date = c("2022-01-01", "2022-01-31"),
+#'   return_format = "data.table"
+#' )
+#' @export
+# nolint end
+process_improve <- function(
+  path = NULL,
+  product = c("raw", "rhr2", "rhr3"),
+  date = NULL,
+  sites_file = NULL,
+  return_format = c("terra", "sf", "data.table"),
+  extent = NULL,
+  ...
+) {
+  product <- match.arg(product)
+  return_format <- match.arg(return_format)
+
+  #### Validate path
+  if (is.null(path) || !dir.exists(path)) {
+    stop("`path` must be a valid directory path.\n")
+  }
+  path <- amadeus::download_sanitize_path(path)
+
+  #### Resolve file prefix from product
+  prefix_map <- c(raw = "IMPAER", rhr2 = "IMPRHR2", rhr3 = "IMPRHR3")
+  prefix <- prefix_map[[product]]
+
+  #### Find measurement files
+  meas_files <- list.files(
+    path,
+    pattern = paste0("^", prefix, "_[0-9]{4}\\.txt$"),
+    full.names = TRUE
+  )
+  if (length(meas_files) == 0) {
+    stop(sprintf(
+      "No %s_YYYY.txt files found in '%s'.\n",
+      prefix, path
+    ))
+  }
+
+  #### Read and bind measurement files
+  meas_list <- lapply(meas_files, function(f) {
+    dt <- data.table::fread(f, sep = "|", header = TRUE,
+                            showProgress = FALSE, data.table = TRUE)
+    dt
+  })
+  meas <- data.table::rbindlist(meas_list, fill = TRUE)
+
+  #### Standardise date column
+  meas[, FactDate := as.Date(FactDate)]
+
+  #### Filter by date if provided
+  if (!is.null(date)) {
+    if (length(date) == 1) {
+      date <- c(date, date)
+    }
+    stopifnot(length(date) == 2)
+    d_start <- as.Date(date[1])
+    d_end   <- as.Date(date[2])
+    FactDate <- NULL   # avoid R CMD CHECK note
+    meas <- meas[FactDate >= d_start & FactDate <= d_end, ]
+    if (nrow(meas) == 0) {
+      warning(
+        "No IMPROVE measurements found for the specified date range.\n",
+        call. = FALSE
+      )
+      return(meas)
+    }
+  }
+
+  #### Resolve site metadata file
+  if (is.null(sites_file)) {
+    candidate <- file.path(path, "improve_sites.txt")
+    if (file.exists(candidate)) {
+      sites_file <- candidate
+    }
+  }
+
+  #### Merge site coordinates if available
+  if (!is.null(sites_file) && file.exists(sites_file)) {
+    sites <- data.table::fread(
+      sites_file, sep = "|", header = TRUE,
+      showProgress = FALSE, data.table = TRUE
+    )
+    #### Keep only coordinate columns needed
+    coord_cols <- c("SiteCode", "Latitude", "Longitude")
+    coord_cols_present <- coord_cols[coord_cols %in% names(sites)]
+    if (length(coord_cols_present) < 3) {
+      warning(
+        "Sites file is missing Latitude and/or Longitude columns.\n",
+        call. = FALSE
+      )
+    } else {
+      sites_sub <- sites[, coord_cols_present, with = FALSE]
+      meas <- merge(meas, sites_sub, by = "SiteCode", all.x = TRUE)
+    }
+  }
+
+  #### Return early as data.table if requested or no coordinates
+  has_coords <- all(c("Latitude", "Longitude") %in% names(meas))
+  if (return_format == "data.table" || !has_coords) {
+    if (!has_coords && return_format != "data.table") {
+      warning(
+        "No site coordinates available; returning data.table.\n",
+        call. = FALSE
+      )
+    }
+    return(meas)
+  }
+
+  #### Build spatial object
+  meas_complete <- meas[!is.na(Latitude) & !is.na(Longitude), ]
+  sv <- terra::vect(
+    meas_complete,
+    geom = c("Longitude", "Latitude"),
+    crs = "EPSG:4326"
+  )
+
+  #### Apply optional extent crop
+  if (!is.null(extent)) {
+    sv <- terra::crop(sv, terra::ext(extent))
+  }
+
+  if (return_format == "terra") {
+    return(sv)
+  } else {
+    return(sf::st_as_sf(sv))
+  }
+}

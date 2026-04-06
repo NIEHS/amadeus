@@ -5,10 +5,11 @@
 \title{Download raw data wrapper function}
 \usage{
 download_data(
-  dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "gmted", "koppen",
-    "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd", "noaa", "sedac_groads",
-    "sedac_population", "groads", "population", "hms", "smoke", "tri", "nei", "gridmet",
-    "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar"),
+  dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "goes", "goes_adp", "gmted",
+    "koppen", "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd", "noaa",
+    "sedac_groads", "sedac_population", "groads", "population", "hms", "smoke", "tri",
+    "nei", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
+    "improve"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   hash = FALSE,
@@ -83,6 +84,7 @@ Please refer to:
 \item \code{\link{download_aqs}}: \code{"aqs"}, \code{"AQS"}
 \item \code{\link{download_ecoregion}}: \code{"ecoregions"}, \code{"ecoregion"}
 \item \code{\link{download_geos}}: \code{"geos"}
+\item \code{\link{download_goes}}: \code{"goes"}, \code{"goes_adp"}, \code{"GOES"}
 \item \code{\link{download_gmted}}: \code{"gmted"}, \code{"GMTED"}
 \item \code{\link{download_koppen_geiger}}: \code{"koppen"}, \code{"koppengeiger"}
 \item \code{\link{download_merra2}}: "merra2", \code{"merra"}, \code{"MERRA"}, \code{"MERRA2"}
@@ -101,6 +103,7 @@ Please refer to:
 \item \code{\link{download_cropscape}}: \code{"cropscape"}, \code{"cdl"}
 \item \code{\link{download_prism}}: \code{"prism"}
 \item \code{\link{download_edgar}}: \code{"edgar"}
+\item \code{\link{download_improve}}: \code{"improve"}, \code{"IMPROVE"}
 }
 }
 \author{
