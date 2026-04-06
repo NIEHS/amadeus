@@ -1,0 +1,3 @@
+SiteCode|SiteName|Latitude|Longitude|State|Elevation
+ACAD1|Acadia|44.3771|-68.2608|ME|158
+BIBE1|Big Bend|29.3025|-103.1774|TX|1079
