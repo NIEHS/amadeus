@@ -606,3 +606,25 @@ testthat::test_that("download_improve include_sites=FALSE skips sites file", {
   )
   testthat::expect_true(is.list(result) || is.null(result))
 })
+
+testthat::test_that("calculate_improve adds coords when missing from from_df", {
+  withr::local_package("terra")
+  # Create a SpatVector WITHOUT Latitude/Longitude in data attributes
+  from_no_coords <- terra::vect(
+    cbind(-68.26, 44.38),
+    crs = "EPSG:4326"
+  )
+  from_no_coords$SiteCode <- "MEF"
+  from_no_coords$FactDate <- as.Date("2022-01-02")
+  from_no_coords$ParamCode <- "MF"
+  from_no_coords$FactValue <- 5.2
+  locs <- data.frame(site_id = "S1", lon = -68.26, lat = 44.38)
+  result <- calculate_improve(
+    from = from_no_coords,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 1000
+  )
+  testthat::expect_true("Longitude" %in% names(result))
+  testthat::expect_true("Latitude" %in% names(result))
+})
