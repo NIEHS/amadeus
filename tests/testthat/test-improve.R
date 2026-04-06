@@ -646,3 +646,21 @@ testthat::test_that("download_improve hash=TRUE returns hash after download", {
     testthat::expect_equal(result, "fakehash")
   })
 })
+
+testthat::test_that("download_improve hash=FALSE returns download_result", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- download_improve(
+      year = 2022,
+      product = "raw",
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      hash = FALSE
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 1)
+  })
+})
