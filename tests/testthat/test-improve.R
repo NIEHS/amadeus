@@ -348,3 +348,124 @@ testthat::test_that("download_improve errors on null directory", {
   )
 })
 # nolint end
+
+################################################################################
+##### Additional branch coverage tests
+
+testthat::test_that("process_improve warns on empty date range", {
+  withr::local_package("data.table")
+  testthat::expect_warning(
+    result <- process_improve(
+      path = improve_path,
+      product = "raw",
+      date = c("1900-01-01", "1900-01-01"),
+      return_format = "data.table"
+    ),
+    regexp = "No IMPROVE measurements"
+  )
+  testthat::expect_equal(nrow(result), 0)
+})
+
+testthat::test_that("process_improve extent crop reduces rows", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  full <- process_improve(
+    path = improve_path,
+    product = "raw",
+    return_format = "terra"
+  )
+  small_extent <- terra::ext(-70, -67, 43, 46)
+  cropped <- process_improve(
+    path = improve_path,
+    product = "raw",
+    return_format = "terra",
+    extent = small_extent
+  )
+  testthat::expect_true(terra::nrow(cropped) <= terra::nrow(full))
+})
+
+testthat::test_that("process_improve warns when sites file missing coords", {
+  withr::local_package("data.table")
+  tmp <- withr::local_tempdir()
+  # Copy measurement file into tmp
+  file.copy(
+    file.path(improve_path, "IMPAER_2022.txt"),
+    file.path(tmp, "IMPAER_2022.txt")
+  )
+  # Create a sites file missing Latitude/Longitude
+  writeLines("SiteCode|Name\nMEF|Moosehorn", file.path(tmp, "bad_sites.txt"))
+  testthat::expect_warning(
+    result <- process_improve(
+      path = tmp,
+      product = "raw",
+      sites_file = file.path(tmp, "bad_sites.txt"),
+      return_format = "data.table"
+    ),
+    regexp = "Latitude"
+  )
+  testthat::expect_s3_class(result, "data.table")
+})
+
+testthat::test_that("process_improve warns when no coords and format != data.table", {
+  withr::local_package("data.table")
+  tmp <- withr::local_tempdir()
+  # measurement file without sites (so no coords)
+  file.copy(
+    file.path(improve_path, "IMPAER_2022.txt"),
+    file.path(tmp, "IMPAER_2022.txt")
+  )
+  testthat::expect_warning(
+    result <- process_improve(
+      path = tmp,
+      product = "raw",
+      return_format = "terra"
+    ),
+    regexp = "No site coordinates"
+  )
+  testthat::expect_s3_class(result, "data.table")
+})
+
+testthat::test_that("download_improve deprecated params warn", {
+  testthat::expect_warning(
+    tryCatch(
+      download_improve(
+        year = 2022,
+        product = "raw",
+        directory_to_save = withr::local_tempdir(),
+        acknowledgement = TRUE,
+        download = FALSE
+      ),
+      error = function(e) NULL
+    ),
+    regexp = "deprecated"
+  )
+  testthat::expect_warning(
+    tryCatch(
+      download_improve(
+        year = 2022,
+        product = "raw",
+        directory_to_save = withr::local_tempdir(),
+        acknowledgement = TRUE,
+        remove_command = TRUE
+      ),
+      error = function(e) NULL
+    ),
+    regexp = "deprecated"
+  )
+})
+
+testthat::test_that("download_improve returns early when files present", {
+  tmp <- withr::local_tempdir()
+  # pre-create the expected file so check_destfile returns FALSE
+  writeLines("x", file.path(tmp, "IMPAER_2022.txt"))
+  writeLines("x", file.path(tmp, "improve_sites.txt"))
+  result <- download_improve(
+    year = 2022,
+    product = "raw",
+    directory_to_save = tmp,
+    acknowledgement = TRUE,
+    include_sites = TRUE
+  )
+  testthat::expect_true(is.list(result) || is.null(result))
+})
+

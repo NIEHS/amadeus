@@ -44,14 +44,16 @@ us_bbox_polygon <- sf::st_as_sfc(
   sf::st_bbox(c(xmin = -125, ymin = 24, xmax = -66, ymax = 50), crs = 4326)
 )
 us_h3_resolution <- 4L
-us_h3_ids <- unlist(h3jsr::polygon_to_cells(
-  us_bbox_polygon,
-  res = us_h3_resolution,
-  simple = TRUE
-), use.names = FALSE)
-us_hex <- h3jsr::cell_to_polygon(us_h3_ids, simple = FALSE)
-us_hex$h3_id <- as.character(us_hex$h3_address)
-
+us_hex <- NULL
+if (requireNamespace("h3jsr", quietly = TRUE)) {
+  us_h3_ids <- unlist(h3jsr::polygon_to_cells(
+    us_bbox_polygon,
+    res = us_h3_resolution,
+    simple = TRUE
+  ), use.names = FALSE)
+  us_hex <- h3jsr::cell_to_polygon(us_h3_ids, simple = FALSE)
+  us_hex$h3_id <- as.character(us_hex$h3_address)
+}
 
 pick_value_column <- function(x) {
   geom_col <- attr(x, "sf_column")

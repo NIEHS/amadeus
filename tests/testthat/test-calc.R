@@ -656,3 +656,32 @@ testthat::test_that("calc_summarize_temporal errors on bad args", {
     regexp = "No covariate"
   )
 })
+
+##### check_fun_temporal
+
+testthat::test_that("check_fun_temporal accepts NULL and valid strings", {
+  testthat::expect_null(check_fun_temporal(NULL))
+  testthat::expect_null(check_fun_temporal("mean"))
+  testthat::expect_null(check_fun_temporal("median"))
+  testthat::expect_null(check_fun_temporal("sum"))
+  testthat::expect_null(check_fun_temporal("max"))
+  testthat::expect_null(check_fun_temporal("min"))
+})
+
+testthat::test_that("check_fun_temporal errors on non-character input", {
+  testthat::expect_error(
+    check_fun_temporal(42),
+    regexp = "single"
+  )
+  testthat::expect_error(
+    check_fun_temporal(c("mean", "sum")),
+    regexp = "single"
+  )
+})
+
+testthat::test_that("check_fun_temporal errors on unknown function name", {
+  testthat::expect_error(
+    check_fun_temporal("variance"),
+    regexp = "must be one of"
+  )
+})
