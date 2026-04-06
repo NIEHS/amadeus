@@ -1,0 +1,5 @@
+SiteCode|POC|FactDate|ParamCode|MethodID|Units|FactValue|HGroup|Status|ProviderStatus|good_year|PatchedOrSubbedFlag|n_dv|missing
+ACAD1|1|2022-01-02|bext|3002|1/Mm|12.3|50|V0|NM|1|REG|122|5
+ACAD1|1|2022-01-05|bext|3002|1/Mm|14.7|50|V0|NM|1|REG|122|5
+BIBE1|1|2022-01-02|bext|3002|1/Mm|8.9|30|V0|NM|1|REG|118|8
+BIBE1|1|2022-01-05|bext|3002|1/Mm|9.2|30|V0|NM|1|REG|118|8

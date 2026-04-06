@@ -3741,21 +3741,35 @@ calculate_improve <- function(
   from_df <- terra::as.data.frame(from)
   locs_df <- as.data.frame(locs)[, locs_id, drop = FALSE]
 
-  #### nb columns: [query_idx, from_idx, distance]
+  #### terra::nearby() returns 2-column matrix: [from_id, to_id]
   nb_df <- as.data.frame(nb)
-  colnames(nb_df) <- c("query_idx", "from_idx", "distance_m")
+  colnames(nb_df) <- c("query_idx", "from_idx")
 
-  #### Keep only nearest monitor per query when nearest_only = TRUE
-  if (isTRUE(nearest_only)) {
+  #### Remove NA matches
+  nb_df <- nb_df[!is.na(nb_df$from_idx), , drop = FALSE]
+
+  #### Compute distances and keep only nearest monitor per query when needed
+  if (isTRUE(nearest_only) && nrow(nb_df) > 0L) {
+    locs_coords <- terra::crds(locs_prj)
+    from_coords  <- terra::crds(terra::project(from, from_crs))
+    dist_vec <- vapply(
+      seq_len(nrow(nb_df)),
+      function(i) {
+        q_xy <- locs_coords[nb_df$query_idx[i], , drop = FALSE]
+        f_xy <- from_coords[nb_df$from_idx[i],  , drop = FALSE]
+        sqrt((q_xy[1] - f_xy[1])^2 + (q_xy[2] - f_xy[2])^2)
+      },
+      numeric(1)
+    )
+    nb_df$distance_m <- dist_vec
     nb_df <- nb_df[
       ave(nb_df$distance_m, nb_df$query_idx,
           FUN = function(x) x == min(x, na.rm = TRUE)) == 1, ,
       drop = FALSE
     ]
+  } else {
+    nb_df$distance_m <- NA_real_
   }
-
-  #### Remove NA matches
-  nb_df <- nb_df[!is.na(nb_df$from_idx), , drop = FALSE]
 
   #### Join query locs and IMPROVE data
   result <- data.frame(
