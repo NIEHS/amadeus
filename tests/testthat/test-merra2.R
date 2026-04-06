@@ -1195,3 +1195,65 @@ testthat::test_that("calculate_merra2 fun_temporal interface", {
     regexp = "fun_temporal"
   )
 })
+
+################################################################################
+##### calculate_merra2 time_bucket and fun_temporal wiring
+
+testthat::test_that("calculate_merra2 time_bucket in formals", {
+  testthat::expect_true(
+    "time_bucket" %in% names(formals(calculate_merra2))
+  )
+  testthat::expect_equal(
+    formals(calculate_merra2)[["time_bucket"]],
+    "day"
+  )
+})
+
+testthat::test_that("calculate_merra2 fun_temporal wiring aggregates rows", {
+  withr::local_package("terra")
+  from_rast <- terra::rast(nrows = 2, ncols = 2, vals = 5)
+  terra::ext(from_rast) <- c(-80, -78, 34, 36)
+  terra::crs(from_rast) <- "EPSG:4326"
+  names(from_rast) <- "SO4_20200101_000000"
+  locs_df <- data.frame(site_id = "A", lon = -79, lat = 35)
+  fake_extracted <- data.frame(
+    site_id = c("A", "A"),
+    time = as.POSIXlt(
+      c("2020-01-01 00:00:00", "2020-01-01 06:00:00"),
+      tz = "UTC"
+    ),
+    so4_0 = c(4.0, 8.0)
+  )
+  testthat::local_mocked_bindings(
+    calc_prepare_locs = function(from, locs, locs_id, radius, geom) {
+      sv <- terra::vect(locs_df, geom = c("lon", "lat"), crs = "EPSG:4326")
+      list(sv, data.frame(site_id = "A"))
+    },
+    calc_worker = function(...) fake_extracted,
+    .package = "amadeus"
+  )
+  result_null <- suppressMessages(
+    calculate_merra2(
+      from = from_rast,
+      locs = locs_df,
+      locs_id = "site_id",
+      radius = 0,
+      fun_temporal = NULL,
+      geom = FALSE
+    )
+  )
+  testthat::expect_equal(nrow(result_null), 2L)
+  result_mean <- suppressMessages(
+    calculate_merra2(
+      from = from_rast,
+      locs = locs_df,
+      locs_id = "site_id",
+      radius = 0,
+      fun_temporal = "mean",
+      geom = FALSE
+    )
+  )
+  testthat::expect_equal(nrow(result_mean), 1L)
+  testthat::expect_equal(result_mean$so4_0, 6)
+  testthat::expect_s3_class(result_mean$time, "POSIXct")
+})

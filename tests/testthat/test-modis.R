@@ -1279,6 +1279,102 @@ testthat::test_that("calculate_modis uses single-source fusion days", {
   testthat::expect_equal(result$cov_00000, c(1, 3))
 })
 
+################################################################################
+##### calculate_modis fun_temporal wiring
+
+testthat::test_that("calculate_modis time_bucket in formals", {
+  testthat::expect_true(
+    "time_bucket" %in% names(formals(calculate_modis))
+  )
+  testthat::expect_equal(
+    formals(calculate_modis)[["time_bucket"]],
+    "day"
+  )
+})
+
+testthat::test_that("calculate_modis fun_temporal interface", {
+  testthat::expect_true(
+    "fun_temporal" %in% names(formals(calculate_modis))
+  )
+  testthat::expect_null(
+    formals(calculate_modis)[["fun_temporal"]]
+  )
+  testthat::expect_no_error(amadeus::check_fun_temporal(NULL))
+  for (fn in c("mean", "median", "sum", "max", "min")) {
+    testthat::expect_no_error(amadeus::check_fun_temporal(fn))
+  }
+  testthat::expect_error(
+    amadeus::check_fun_temporal("sd"),
+    regexp = "fun_temporal"
+  )
+})
+
+testthat::test_that("calculate_modis fun_temporal wiring aggregates multi-day rows", {
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+  # Two files on the same day produce two per-day rows in mock
+  from_files <- c(
+    "MOD09GA.A2021001.h10v05.061.2021001000000.hdf",
+    "MOD09GA.A2021002.h10v05.061.2021002000000.hdf"
+  )
+  call_count <- 0L
+  testthat::local_mocked_bindings(
+    calculate_modis_daily = function(from, locs, locs_id, date, name_extracted, ...) {
+      call_count <<- call_count + 1L
+      data.frame(
+        site_id = "site_1",
+        time = as.Date(date),
+        cov_00000 = as.numeric(call_count) * 10
+      )
+    },
+    .package = "amadeus"
+  )
+  mock_preprocess <- function(path, date, ...) {
+    r <- terra::rast(nrows = 1, ncols = 1, vals = 1)
+    terra::ext(r) <- c(-79, -78, 35, 36)
+    terra::crs(r) <- "EPSG:4326"
+    names(r) <- "mock_layer"
+    r
+  }
+  # NULL: backward compat — 2 rows (one per day)
+  call_count <- 0L
+  result_null <- suppressMessages(
+    calculate_modis(
+      from = from_files,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0L,
+      preprocess = mock_preprocess,
+      name_covariates = "cov_",
+      subdataset = "mock",
+      scale = "* 1",
+      fun_temporal = NULL
+    )
+  )
+  testthat::expect_equal(nrow(result_null), 2L)
+  # mean over 2 days → 1 row
+  call_count <- 0L
+  result_mean <- suppressMessages(
+    calculate_modis(
+      from = from_files,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0L,
+      preprocess = mock_preprocess,
+      name_covariates = "cov_",
+      subdataset = "mock",
+      scale = "* 1",
+      fun_temporal = "mean",
+      time_bucket = "week"
+    )
+  )
+  testthat::expect_equal(nrow(result_mean), 1L)
+  testthat::expect_equal(result_mean$cov_00000, 15)
+})
+
 
 testthat::test_that("process_modis_sds returns fire mask regex for fire products", {
   testthat::expect_equal(process_modis_sds(product = "MOD14A1"), "(FireMask)")

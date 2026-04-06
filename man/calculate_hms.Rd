@@ -4,7 +4,16 @@
 \alias{calculate_hms}
 \title{Calculate wildfire smoke covariates}
 \usage{
-calculate_hms(from, locs, locs_id = NULL, radius = 0, geom = FALSE, ...)
+calculate_hms(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  fun_temporal = NULL,
+  time_bucket = "day",
+  geom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{from}{SpatVector(1). Output of \code{process_hms()}.}
@@ -17,6 +26,18 @@ containing identifier for each unique coordinate location.}
 \item{radius}{integer(1). Circular buffer distance around site locations.
 (Default = 0).}
 
+\item{fun_temporal}{NULL or character(1). Temporal summary
+function applied after per-date extraction. One of
+\code{"mean"}, \code{"median"}, \code{"sum"},
+\code{"max"}, or \code{"min"}. Default (\code{NULL})
+returns per-date values without temporal aggregation,
+preserving existing behavior.}
+
+\item{time_bucket}{character(1). Temporal resolution to aggregate to
+when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
+(default), \code{"week"}, \code{"month"}, or \code{"year"}.
+Ignored when \code{fun_temporal} is \code{NULL}.}
+
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
@@ -24,7 +45,9 @@ coordinate reference system of the \code{sf} or \code{SpatVector} is that of \co
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame or SpatVector object
+a data.frame or SpatVector object. When \code{fun_temporal} is
+non-\code{NULL}, rows are aggregated to the \code{time_bucket}
+resolution using \code{fun_temporal}.
 }
 \description{
 Extract wildfire smoke plume values at point locations. Returns a

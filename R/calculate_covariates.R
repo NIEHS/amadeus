@@ -798,6 +798,16 @@ calculate_ecoregion <-
 #' Find detail usage of the argument in notes.
 #' @param fun_summary character or function. Function to summarize
 #'  extracted raster values.
+#' @param fun_temporal NULL or character(1). Temporal summary
+#'   function applied after per-date covariate extraction. One
+#'   of \code{"mean"}, \code{"median"}, \code{"sum"},
+#'   \code{"max"}, or \code{"min"}. Default (\code{NULL})
+#'   returns per-date values without temporal aggregation,
+#'   preserving existing behavior.
+#' @param time_bucket character(1). Temporal resolution to aggregate to
+#'   when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
+#'   (default), \code{"week"}, \code{"month"}, or \code{"year"}.
+#'   Ignored when \code{fun_temporal} is \code{NULL}.
 #' @param package_list_add character. A vector with package names to load
 #'  these in each thread. Note that `sf`, `terra`, `exactextractr`,
 #' `doParallel`, `parallelly` and `dplyr` are the default packages to be
@@ -863,6 +873,8 @@ calculate_ecoregion <-
 #' * `attr(., "dates_dropped")`: Dates with insufficient tiles.
 #'   Note that the dates mean the dates with insufficient tiles,
 #'   not the dates without available tiles.
+#'   When \code{fun_temporal} is non-\code{NULL}, rows are aggregated to
+#'   the \code{time_bucket} resolution using \code{fun_temporal}.
 #' @seealso
 #' This function leverages the calculation of single-day MODIS
 #' covariates:
@@ -907,6 +919,8 @@ calculate_modis <-
     name_covariates = NULL,
     subdataset = NULL,
     fun_summary = "mean",
+    fun_temporal = NULL,
+    time_bucket = "day",
     package_list_add = NULL,
     export_list_add = NULL,
     max_cells = 3e7,
@@ -916,6 +930,7 @@ calculate_modis <-
     ...
   ) {
     amadeus::check_geom(geom)
+    amadeus::check_fun_temporal(fun_temporal)
     fusion_method <- match.arg(fusion_method)
     if (!is.null(from_secondary) && !is.character(from_secondary)) {
       stop("from_secondary should be a character vector of file paths.\n")
@@ -1172,6 +1187,13 @@ process_modis_swath, or process_blackmarble."
         }
       )
     calc_results <- do.call(dplyr::bind_rows, calc_results)
+    #### temporal summarization (no-op when fun_temporal is NULL)
+    calc_results <- amadeus::calc_summarize_temporal(
+      covar = calc_results,
+      fun_temporal = fun_temporal,
+      locs_id = locs_id,
+      time_bucket = time_bucket
+    )
     if (geom %in% c("sf", "terra")) {
       # merge
       calc_results_return <- merge(
@@ -1776,13 +1798,25 @@ calculate_nei <- function(
 #' containing identifier for each unique coordinate location.
 #' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0).
+#' @param fun_temporal NULL or character(1). Temporal summary
+#'   function applied after per-date extraction. One of
+#'   \code{"mean"}, \code{"median"}, \code{"sum"},
+#'   \code{"max"}, or \code{"min"}. Default (\code{NULL})
+#'   returns per-date values without temporal aggregation,
+#'   preserving existing behavior.
+#' @param time_bucket character(1). Temporal resolution to aggregate to
+#'   when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
+#'   (default), \code{"week"}, \code{"month"}, or \code{"year"}.
+#'   Ignored when \code{fun_temporal} is \code{NULL}.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders.
 #' @seealso [process_hms()]
 #' @author Mitchell Manware
-#' @return a data.frame or SpatVector object
+#' @return a data.frame or SpatVector object. When \code{fun_temporal} is
+#'   non-\code{NULL}, rows are aggregated to the \code{time_bucket}
+#'   resolution using \code{fun_temporal}.
 #' @importFrom terra vect as.data.frame time extract crs
 #' @importFrom tidyr pivot_wider
 #' @importFrom dplyr all_of
@@ -1806,11 +1840,16 @@ calculate_hms <- function(
   locs,
   locs_id = NULL,
   radius = 0,
+  fun_temporal = NULL,
+  time_bucket = "day",
   geom = FALSE,
   ...
 ) {
-  #### check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
+  #### check for null parameters (fun_temporal and time_bucket are optional)
+  params_check <- mget(ls())
+  params_check[c("fun_temporal", "time_bucket")] <- NULL
+  amadeus::check_for_null_parameters(params_check)
+  amadeus::check_fun_temporal(fun_temporal)
   #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all densities, locs and dates
   if (is.character(from)) {
@@ -1837,6 +1876,15 @@ calculate_hms <- function(
         )
       )
 
+    skip_merge <- amadeus::calc_summarize_temporal(
+      covar = skip_merge,
+      fun_temporal = fun_temporal,
+      locs_id = locs_id,
+      time_bucket = time_bucket
+    )
+    if (!is.null(fun_temporal) && "time" %in% names(skip_merge)) {
+      skip_merge$time <- as.POSIXct(skip_merge$time, tz = "UTC")
+    }
     skip_return <- amadeus::calc_return_locs(
       skip_merge,
       POSIXt = TRUE,
@@ -1976,9 +2024,17 @@ calculate_hms <- function(
   # Filling NAs to 0 (explicit integer)
   sites_extracted[is.na(sites_extracted)] <- 0L
 
+  #### temporal summarization (no-op when fun_temporal is NULL)
+  sites_extracted <- amadeus::calc_summarize_temporal(
+    covar = sites_extracted,
+    fun_temporal = fun_temporal,
+    locs_id = locs_id,
+    time_bucket = time_bucket
+  )
+
   # Messaging
   timevals <- sites_extracted[["time"]]
-  intensities <- sites_extracted[, binary_colname]
+  intensities <- sites_extracted[, binary_colname, drop = FALSE]
   intensities <- apply(intensities, 1, sum)
   time_allzero <- unique(timevals[intensities == 0])
   time_allzero_c <- paste(time_allzero, collapse = "\n")
@@ -2242,13 +2298,25 @@ calculate_narr <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param fun_temporal NULL or character(1). Temporal summary
+#'   function applied after per-layer extraction. One of
+#'   \code{"mean"}, \code{"median"}, \code{"sum"},
+#'   \code{"max"}, or \code{"min"}. Default (\code{NULL})
+#'   returns per-layer values without temporal aggregation,
+#'   preserving existing behavior.
+#' @param time_bucket character(1). Temporal resolution to aggregate to
+#'   when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
+#'   (default), \code{"week"}, \code{"month"}, or \code{"year"}.
+#'   Ignored when \code{fun_temporal} is \code{NULL}.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @seealso [process_geos()]
-#' @return a data.frame or SpatVector object
+#' @return a data.frame or SpatVector object. When \code{fun_temporal} is
+#'   non-\code{NULL}, rows are aggregated to the \code{time_bucket}
+#'   resolution using \code{fun_temporal}.
 #' @importFrom terra vect
 #' @importFrom terra buffer
 #' @importFrom terra as.data.frame
@@ -2277,9 +2345,12 @@ calculate_geos <- function(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  fun_temporal = NULL,
+  time_bucket = "day",
   geom = FALSE,
   ...
 ) {
+  amadeus::check_fun_temporal(fun_temporal)
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
     from = from,
@@ -2304,6 +2375,17 @@ calculate_geos <- function(
     level = 2,
     ...
   )
+  #### temporal summarization (no-op when fun_temporal is NULL)
+  sites_extracted <- amadeus::calc_summarize_temporal(
+    covar = sites_extracted,
+    fun_temporal = fun_temporal,
+    locs_id = locs_id,
+    time_bucket = time_bucket,
+    group_cols_extra = "level"
+  )
+  if (!is.null(fun_temporal) && "time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+  }
   sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
     POSIXt = TRUE,
@@ -2557,13 +2639,25 @@ calculate_groads <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param fun_temporal NULL or character(1). Temporal summary
+#'   function applied after per-layer extraction. One of
+#'   \code{"mean"}, \code{"median"}, \code{"sum"},
+#'   \code{"max"}, or \code{"min"}. Default (\code{NULL})
+#'   returns per-layer values without temporal aggregation,
+#'   preserving existing behavior.
+#' @param time_bucket character(1). Temporal resolution to aggregate to
+#'   when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
+#'   (default), \code{"week"}, \code{"month"}, or \code{"year"}.
+#'   Ignored when \code{fun_temporal} is \code{NULL}.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [calculate_geos()], [process_merra2()]
-#' @return a data.frame or SpatVector object
+#' @return a data.frame or SpatVector object. When \code{fun_temporal} is
+#'   non-\code{NULL}, rows are aggregated to the \code{time_bucket}
+#'   resolution using \code{fun_temporal}.
 #' @importFrom terra vect
 #' @importFrom terra buffer
 #' @importFrom terra as.data.frame
@@ -2592,9 +2686,12 @@ calculate_merra2 <- function(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  fun_temporal = NULL,
+  time_bucket = "day",
   geom = FALSE,
   ...
 ) {
+  amadeus::check_fun_temporal(fun_temporal)
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
     from = from,
@@ -2634,6 +2731,18 @@ calculate_merra2 <- function(
     level = merra2_level,
     ...
   )
+  #### temporal summarization (no-op when fun_temporal is NULL)
+  merra2_group_extra <- if (!is.null(merra2_level)) "level" else NULL
+  sites_extracted <- amadeus::calc_summarize_temporal(
+    covar = sites_extracted,
+    fun_temporal = fun_temporal,
+    locs_id = locs_id,
+    time_bucket = time_bucket,
+    group_cols_extra = merra2_group_extra
+  )
+  if (!is.null(fun_temporal) && "time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+  }
   sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
     POSIXt = TRUE,
