@@ -3780,6 +3780,11 @@ calculate_improve <- function(
     distance_m = nb_df$distance_m,
     row.names = NULL
   )
+  if (!all(c("Longitude", "Latitude") %in% names(result))) {
+    monitor_coords <- terra::crds(from)[nb_df$from_idx, , drop = FALSE]
+    result$Longitude <- monitor_coords[, 1]
+    result$Latitude <- monitor_coords[, 2]
+  }
 
   #### Return geometry if requested
   if (geom %in% c("terra", "sf")) {

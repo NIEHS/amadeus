@@ -262,6 +262,95 @@ testthat::test_that("calculate_improve errors on NULL from", {
   )
 })
 
+testthat::test_that("calculate_improve errors on non-SpatVector from", {
+  locs <- data.frame(site_id = "S1", lon = -68.26, lat = 44.38)
+  testthat::expect_error(
+    calculate_improve(from = data.frame(a = 1), locs = locs),
+    regexp = "must be a SpatVector"
+  )
+})
+
+testthat::test_that("calculate_improve accepts sf locs", {
+  withr::local_package("sf")
+  withr::local_package("terra")
+  from <- process_improve(
+    path = improve_path,
+    product = "raw",
+    return_format = "terra"
+  )
+  locs_sf <- sf::st_as_sf(
+    data.frame(site_id = "S1", lon = -68.26, lat = 44.38),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+  result <- calculate_improve(
+    from = from,
+    locs = locs_sf,
+    locs_id = "site_id",
+    radius = 200000
+  )
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_true(nrow(result) > 0L)
+})
+
+testthat::test_that("calculate_improve errors when data.frame locs lacks lon/lat", {
+  withr::local_package("terra")
+  from <- process_improve(
+    path = improve_path,
+    product = "raw",
+    return_format = "terra"
+  )
+  bad_locs <- data.frame(site_id = "S1", note = "not_a_point")
+  testthat::expect_error(
+    calculate_improve(from = from, locs = bad_locs, locs_id = "site_id"),
+    regexp = "could not be converted"
+  )
+})
+
+testthat::test_that("calculate_improve errors for unsupported locs class", {
+  withr::local_package("terra")
+  from <- process_improve(
+    path = improve_path,
+    product = "raw",
+    return_format = "terra"
+  )
+  testthat::expect_error(
+    calculate_improve(from = from, locs = list(site_id = "S1"), locs_id = "site_id"),
+    regexp = "must be a data.frame, SpatVector, or sf"
+  )
+})
+
+testthat::test_that("calculate_improve returns geometry objects when requested", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  from <- process_improve(
+    path = improve_path,
+    product = "raw",
+    return_format = "terra"
+  )
+  locs <- data.frame(
+    site_id = "S1",
+    lon = -68.26,
+    lat = 44.38
+  )
+  terra_res <- calculate_improve(
+    from = from,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 200000,
+    geom = "terra"
+  )
+  sf_res <- calculate_improve(
+    from = from,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 200000,
+    geom = "sf"
+  )
+  testthat::expect_s4_class(terra_res, "SpatVector")
+  testthat::expect_true("sf" %in% class(sf_res))
+})
+
 testthat::test_that("calculate_improve nearest_only=FALSE returns more rows", {
   withr::local_package("terra")
   withr::local_package("data.table")
@@ -468,4 +557,3 @@ testthat::test_that("download_improve returns early when files present", {
   )
   testthat::expect_true(is.list(result) || is.null(result))
 })
-

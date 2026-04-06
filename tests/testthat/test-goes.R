@@ -171,6 +171,118 @@ testthat::test_that("download_goes dispatch via download_data", {
   }
 })
 
+testthat::test_that("download_goes single-date + download=FALSE returns listing", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          body = charToRaw(
+            paste0(
+              "<ListBucketResult>",
+              "<Key>ADP-C/2018/001/OR_ADP-C3C02_G16_",
+              "s20180010000000_e20180010001000_c20180010002000.nc</Key>",
+              "</ListBucketResult>"
+            )
+          )
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_string = function(resp, ...) {
+      rawToChar(resp$body)
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      out <- suppressMessages(
+        download_goes(
+          date = "2018-01-01",
+          satellite = "16",
+          product = "ADP-C",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE
+        )
+      ),
+      regexp = "download=FALSE.*deprecated"
+    )
+    testthat::expect_true(is.list(out))
+    testthat::expect_equal(out$n_files, 1L)
+    testthat::expect_true(length(out$urls) == 1L)
+  })
+})
+
+testthat::test_that("download_goes warns when listing fails for one day", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      stop("synthetic listing failure")
+    },
+    .package = "httr2"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      out <- suppressMessages(
+        download_goes(
+          date = "2018-01-01",
+          satellite = "16",
+          product = "ADP-C",
+          directory_to_save = ".",
+          acknowledgement = TRUE
+        )
+      ),
+      regexp = "Failed to list GOES files"
+    )
+    testthat::expect_true(is.list(out))
+  })
+})
+
+testthat::test_that("download_goes hash=FALSE returns download result", {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          body = charToRaw(
+            paste0(
+              "<ListBucketResult>",
+              "<Key>ADP-C/2018/001/OR_ADP-C3C02_G16_",
+              "s20180010000000_e20180010001000_c20180010002000.nc</Key>",
+              "</ListBucketResult>"
+            )
+          )
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_string = function(resp, ...) {
+      rawToChar(resp$body)
+    },
+    .package = "httr2"
+  )
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) {
+      list(success = 1, failed = 0, skipped = 0)
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    out <- suppressMessages(
+      download_goes(
+        date = "2018-01-01",
+        satellite = "16",
+        product = "ADP-C",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        hash = FALSE
+      )
+    )
+    testthat::expect_equal(out$success, 1)
+    testthat::expect_equal(out$failed, 0)
+  })
+})
+
 ################################################################################
 ##### process_goes
 testthat::test_that("process_goes errors with no matching files", {
@@ -196,6 +308,23 @@ testthat::test_that("process_goes errors when date range has no matches", {
     ),
     regexp = "No GOES ADP files matching"
   )
+})
+
+testthat::test_that("process_goes handles unparseable filenames in date parser", {
+  src_dir <- testthat::test_path("..", "testdata", "goes")
+  withr::with_tempdir({
+    ok <- list.files(src_dir, pattern = "OR_ADP.*\\.nc$", full.names = TRUE)
+    file.copy(ok[1], ".", overwrite = TRUE)
+    file.create("OR_ADP-C3C02_G16_badstamp.nc")
+    testthat::expect_error(
+      process_goes(
+        date = c("2018-01-01", "2018-01-01"),
+        variable = "Smoke",
+        path = "."
+      ),
+      regexp = "matching the requested date range"
+    )
+  })
 })
 
 testthat::test_that("process_goes returns SpatRaster for Smoke", {

@@ -45,7 +45,7 @@ us_bbox_polygon <- sf::st_as_sfc(
 )
 us_h3_resolution <- 4L
 us_hex <- NULL
-if (requireNamespace("h3jsr", quietly = TRUE)) {
+if (isTRUE(live_run) && requireNamespace("h3jsr", quietly = TRUE)) {
   us_h3_ids <- unlist(h3jsr::polygon_to_cells(
     us_bbox_polygon,
     res = us_h3_resolution,
@@ -54,6 +54,7 @@ if (requireNamespace("h3jsr", quietly = TRUE)) {
   us_hex <- h3jsr::cell_to_polygon(us_h3_ids, simple = FALSE)
   us_hex$h3_id <- as.character(us_hex$h3_address)
 }
+merra2_h3_ready <- !is.null(us_hex)
 
 pick_value_column <- function(x) {
   geom_col <- attr(x, "sf_column")
@@ -622,7 +623,7 @@ terra::plot(
 
 
 
-```{r calculate-bceman-daily, eval = live_run && merra2_live_ready}
+```{r calculate-bceman-daily, eval = live_run && merra2_live_ready && merra2_h3_ready}
 bceman_point_values <- calculate_covariates(
   covariate = "merra2",
   from = bceman_daily,
@@ -647,7 +648,7 @@ knitr::kable(head(sf::st_drop_geometry(bceman_polygon_values)))
 
 ## Calculate covariates at points with dense-coverage FWI layers
 
-```{r calculate-points, eval = live_run && merra2_live_ready}
+```{r calculate-points, eval = live_run && merra2_live_ready && merra2_h3_ready}
 point_ffmc <- calculate_covariates(
   covariate = "merra2",
   from = processed_examples$FFMC,
@@ -711,7 +712,7 @@ merra2_has_fwi_plot <- any(grepl("FWI", names(point_fwi))) &&
 plot_points(point_fwi, paste0("NASA MERRA-2", ": FWI point extraction"))
 ```
 
-```{r plot-polygons, eval = live_run && merra2_live_ready && merra2_has_fwi_plot, fig.width = 12, fig.height = 8, fig.alt = "Map of polygon-based extraction results for the daily Fire Weather Index layer across contiguous-US H3 hexagons at resolution 4."}
+```{r plot-polygons, eval = live_run && merra2_live_ready && merra2_h3_ready && merra2_has_fwi_plot, fig.width = 12, fig.height = 8, fig.alt = "Map of polygon-based extraction results for the daily Fire Weather Index layer across contiguous-US H3 hexagons at resolution 4."}
 plot_polygons(polygon_fwi, paste0("NASA MERRA-2", ": FWI contiguous-US H3 polygons (res 4)"))
 ```
 

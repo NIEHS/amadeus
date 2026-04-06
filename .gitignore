@@ -91,3 +91,5 @@ tests/testthat/testthat-problems.rds
 .vscode/
 vignettes/local_run.sh
 inst/extdata/presentations/*
+local_cov.Rout
+coverage-repro.log
