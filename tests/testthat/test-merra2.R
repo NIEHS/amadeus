@@ -702,6 +702,120 @@ testthat::test_that("process_merra2 (single date)", {
 })
 
 ################################################################################
+##### process_merra2 daily_agg
+
+make_merra2_hourly_fixture <- function(path, n_hours = 3) {
+  build_layer <- function(offset) {
+    layer <- terra::rast(
+      nrows = 2,
+      ncols = 3,
+      xmin = -180.3125,
+      xmax = -178.4375,
+      ymin = -3.25,
+      ymax = -1.25,
+      crs = "EPSG:4267"
+    )
+    terra::values(layer) <- seq_len(terra::ncell(layer)) + offset
+    layer
+  }
+
+  layers <- do.call(c, lapply(seq_len(n_hours), function(i) build_layer(i * 10)))
+  terra::time(layers) <- as.POSIXct(
+    paste0("2018-01-01 0", seq(0, n_hours - 1), ":00:00"),
+    format = "%Y-%m-%d %H:%M:%S",
+    tz = "UTC"
+  )
+
+  # Write directly into path; use varname="CPT" so terra reads layer names
+  # with the correct variable name prefix for process_merra2 grep matching
+  dir.create(path, showWarnings = FALSE, recursive = TRUE)
+  fixture_path <- file.path(path, "MERRA2_400.inst1_2d_int_Nx.20180101.nc4")
+  suppressWarnings(
+    terra::writeCDF(layers, fixture_path, varname = "CPT", overwrite = TRUE)
+  )
+  invisible(fixture_path)
+}
+
+testthat::test_that("process_merra2 daily_agg=FALSE default is unchanged", {
+  withr::local_package("terra")
+  merra2_default <- suppressMessages(
+    process_merra2(
+      date = "2018-01-01",
+      variable = "CPT",
+      path = testthat::test_path("..", "testdata", "merra2", "inst1_2d_int_Nx")
+    )
+  )
+  merra2_explicit_false <- suppressMessages(
+    process_merra2(
+      date = "2018-01-01",
+      variable = "CPT",
+      path = testthat::test_path("..", "testdata", "merra2", "inst1_2d_int_Nx"),
+      daily_agg = FALSE
+    )
+  )
+  testthat::expect_equal(terra::nlyr(merra2_default), terra::nlyr(merra2_explicit_false))
+  testthat::expect_equal(terra::values(merra2_default), terra::values(merra2_explicit_false))
+})
+
+testthat::test_that("process_merra2 daily_agg collapses sub-daily layers", {
+  withr::local_package("terra")
+
+  withr::with_tempdir({
+    tmpdir <- getwd()
+    make_merra2_hourly_fixture(tmpdir, n_hours = 3)
+
+    merra2_sub <- suppressMessages(
+      process_merra2(date = "2018-01-01", variable = "CPT", path = tmpdir)
+    )
+    merra2_daily_mean <- suppressMessages(
+      process_merra2(date = "2018-01-01", variable = "CPT", path = tmpdir,
+                     daily_agg = TRUE, fun = "mean")
+    )
+    merra2_daily_max <- suppressMessages(
+      process_merra2(date = "2018-01-01", variable = "CPT", path = tmpdir,
+                     daily_agg = TRUE, fun = "max")
+    )
+
+    # 3 sub-daily layers
+    testthat::expect_equal(terra::nlyr(merra2_sub), 3)
+    # Daily agg collapses to 1 layer for 2D single-variable data
+    testthat::expect_equal(terra::nlyr(merra2_daily_mean), 1)
+    # CRS is preserved (EPSG:4267 for standard MERRA-2)
+    testthat::expect_false(terra::crs(merra2_daily_mean) == "")
+    # Time is set to midnight UTC of the aggregated date
+    testthat::expect_true("POSIXt" %in% class(terra::time(merra2_daily_mean)))
+    testthat::expect_true(all(
+      format(as.Date(terra::time(merra2_daily_mean)), "%Y%m%d") == "20180101"
+    ))
+    # max >= mean for aggregation across identical cells
+    testthat::expect_equal(terra::nlyr(merra2_daily_max), 1)
+    testthat::expect_true(all(
+      terra::values(merra2_daily_max) >= terra::values(merra2_daily_mean),
+      na.rm = TRUE
+    ))
+  })
+})
+
+testthat::test_that("process_merra2 daily_agg silently skipped for FWI", {
+  withr::local_package("terra")
+
+  withr::with_tempdir({
+    tmpdir <- getwd()
+    make_merra2_fwi_fixture(tmpdir)
+    merra2_fwi_default <- suppressMessages(
+      process_merra2(date = "2024-08-11", variable = "FWI", path = tmpdir)
+    )
+    merra2_fwi_agg <- suppressMessages(
+      process_merra2(date = "2024-08-11", variable = "FWI", path = tmpdir,
+                     daily_agg = TRUE)
+    )
+    # FWI is already daily; daily_agg should not change the output
+    testthat::expect_equal(terra::nlyr(merra2_fwi_default), terra::nlyr(merra2_fwi_agg))
+    testthat::expect_equal(terra::values(merra2_fwi_default), terra::values(merra2_fwi_agg))
+  })
+})
+
+################################################################################
 ##### calculate_merra2
 testthat::test_that("calculate_merra2", {
   withr::local_package("terra")
@@ -1052,4 +1166,32 @@ testthat::test_that("download_merra2 download=FALSE returns url list", {
     testthat::expect_true(is.list(result))
     testthat::expect_true("urls" %in% names(result))
   })
+})
+
+################################################################################
+##### calculate_merra2 fun_temporal interface
+
+testthat::test_that("calculate_merra2 fun_temporal interface", {
+  testthat::expect_true(
+    "fun_temporal" %in% names(formals(calculate_merra2))
+  )
+  testthat::expect_null(
+    formals(calculate_merra2)[["fun_temporal"]]
+  )
+  testthat::expect_no_error(
+    amadeus::check_fun_temporal(NULL)
+  )
+  for (fn in c("mean", "median", "sum", "max", "min")) {
+    testthat::expect_no_error(
+      amadeus::check_fun_temporal(fn)
+    )
+  }
+  testthat::expect_error(
+    amadeus::check_fun_temporal("sd"),
+    regexp = "fun_temporal"
+  )
+  testthat::expect_error(
+    amadeus::check_fun_temporal(1L),
+    regexp = "fun_temporal"
+  )
 })

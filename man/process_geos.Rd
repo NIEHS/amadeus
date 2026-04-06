@@ -9,6 +9,8 @@ process_geos(
   variable = NULL,
   path = NULL,
   extent = NULL,
+  daily_agg = FALSE,
+  fun = "mean",
   ...
 )
 }
@@ -23,6 +25,16 @@ Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 \item{extent}{numeric(4) or SpatExtent giving the extent of the raster
 if \code{NULL} (default), the entire raster is loaded}
 
+\item{daily_agg}{logical(1). If \code{TRUE}, aggregate sub-daily layers to daily
+values using \code{fun}. Default \code{FALSE} preserves the original hourly output.
+Aggregation groups layers by variable/level and date so that pressure-level
+structure is preserved. Not meaningful for collections that are already
+daily.}
+
+\item{fun}{character(1). Aggregation function passed to \code{\link[terra:tapp]{terra::tapp()}}
+(e.g. \code{"mean"}, \code{"max"}, \code{"min"}, \code{"sum"}). Ignored when
+\code{daily_agg = FALSE}.}
+
 \item{...}{Placeholders.}
 }
 \value{
@@ -34,7 +46,9 @@ composition data, returning a single \code{SpatRaster} object.
 }
 \note{
 Layer names of the returned \code{SpatRaster} object contain the variable,
-pressure level, date, and hour.
+pressure level, date, and hour when \code{daily_agg = FALSE} (default). When
+\code{daily_agg = TRUE}, layer names contain the variable, pressure level, and
+date only, and \code{terra::time()} is set to midnight UTC of each date.
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
@@ -44,6 +58,14 @@ geos <- process_geos(
   date = c("2024-01-01", "2024-01-10"),
   variable = "O3",
   path = "./data/aqc_tavg_1hr_g1440x721_v1"
+)
+## daily mean across all sub-daily layers per variable/level
+geos_daily <- process_geos(
+  date = c("2024-01-01", "2024-01-10"),
+  variable = "O3",
+  path = "./data/aqc_tavg_1hr_g1440x721_v1",
+  daily_agg = TRUE,
+  fun = "mean"
 )
 }
 }

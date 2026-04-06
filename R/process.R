@@ -2512,13 +2512,24 @@ process_narr <- function(
 #' @param path character(1). Directory with downloaded netCDF (.nc4) files.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
+#' @param daily_agg logical(1). If `TRUE`, aggregate sub-daily layers to daily
+#'   values using `fun`. Default `FALSE` preserves the original hourly output.
+#'   Aggregation groups layers by variable/level and date so that pressure-level
+#'   structure is preserved. Not meaningful for collections that are already
+#'   daily.
+#' @param fun character(1). Aggregation function passed to [terra::tapp()]
+#'   (e.g. `"mean"`, `"max"`, `"min"`, `"sum"`). Ignored when
+#'   `daily_agg = FALSE`.
 #' @param ... Placeholders.
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable,
-#' pressure level, date, and hour.
+#' pressure level, date, and hour when `daily_agg = FALSE` (default). When
+#' `daily_agg = TRUE`, layer names contain the variable, pressure level, and
+#' date only, and `terra::time()` is set to midnight UTC of each date.
 #' @author Mitchell Manware
 #' @return a `SpatRaster` object;
 #' @importFrom terra rast
+#' @importFrom terra tapp
 #' @importFrom terra time
 #' @importFrom terra varnames
 #' @importFrom terra crs
@@ -2532,6 +2543,14 @@ process_narr <- function(
 #'   variable = "O3",
 #'   path = "./data/aqc_tavg_1hr_g1440x721_v1"
 #' )
+#' ## daily mean across all sub-daily layers per variable/level
+#' geos_daily <- process_geos(
+#'   date = c("2024-01-01", "2024-01-10"),
+#'   variable = "O3",
+#'   path = "./data/aqc_tavg_1hr_g1440x721_v1",
+#'   daily_agg = TRUE,
+#'   fun = "mean"
+#' )
 #' }
 #' @export
 process_geos <-
@@ -2540,6 +2559,8 @@ process_geos <-
     variable = NULL,
     path = NULL,
     extent = NULL,
+    daily_agg = FALSE,
+    fun = "mean",
     ...
   ) {
     #### directory setup
@@ -2682,8 +2703,37 @@ process_geos <-
     }
     #### set coordinate reference system
     terra::crs(data_return) <- "EPSG:4326"
+    #### optional daily aggregation
+    if (isTRUE(daily_agg)) {
+      t <- terra::time(data_return)
+      if (!anyNA(t) && length(t) == terra::nlyr(data_return)) {
+        date_str <- format(as.Date(t), "%Y%m%d")
+      } else {
+        date_str <- regmatches(
+          names(data_return),
+          regexpr("(?<![0-9])[0-9]{8}(?![0-9])", names(data_return), perl = TRUE)
+        )
+        if (length(date_str) != terra::nlyr(data_return)) {
+          stop("daily_agg: cannot determine dates from layer times or names.\n")
+        }
+      }
+      var_prefix <- sub("_[0-9]{8}.*$", "", names(data_return))
+      tapp_index <- paste(var_prefix, date_str, sep = "_")
+      data_return <- terra::tapp(data_return, tapp_index, fun = fun, na.rm = TRUE)
+      terra::crs(data_return) <- "EPSG:4326"
+      out_dates <- regmatches(
+        names(data_return),
+        regexpr("[0-9]{8}$", names(data_return))
+      )
+      terra::time(data_return) <- as.POSIXct(
+        paste0(out_dates, " 00:00:00"),
+        format = "%Y%m%d %H:%M:%S",
+        tz = "UTC"
+      )
+    }
     message(paste0(
-      "Returning hourly ",
+      "Returning ",
+      ifelse(isTRUE(daily_agg), "daily ", "hourly "),
       variable,
       " data from ",
       as.Date(
@@ -2716,16 +2766,27 @@ process_geos <-
 #'   files.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
+#' @param daily_agg logical(1). If `TRUE`, aggregate sub-daily layers to daily
+#'   values using `fun`. Default `FALSE` preserves the original sub-daily
+#'   output. Aggregation groups layers by variable/level and date. Silently
+#'   ignored for FWI collections, which are already daily.
+#' @param fun character(1). Aggregation function passed to [terra::tapp()]
+#'   (e.g. `"mean"`, `"max"`, `"min"`, `"sum"`). Ignored when
+#'   `daily_agg = FALSE`.
 #' @param ... Placeholders.
 #' @note
 #' Layer names of the returned `SpatRaster` object contain the variable,
-#' pressure level, date, and hour for standard MERRA-2 collections. For daily
-#' Fire Weather Index files, layer names contain the variable and date only.
+#' pressure level, date, and hour for standard MERRA-2 collections when
+#' `daily_agg = FALSE` (default). When `daily_agg = TRUE`, layer names contain
+#' the variable, pressure level, and date only, and `terra::time()` is set to
+#' midnight UTC of each date. For daily Fire Weather Index files, layer names
+#' contain the variable and date only regardless of `daily_agg`.
 #' Pressure level values utilized for layer names are taken directly from raw
 #' data and are not edited to retain pressure level information.
 #' @author Mitchell Manware
 #' @return a `SpatRaster` object;
 #' @importFrom terra rast
+#' @importFrom terra tapp
 #' @importFrom terra time
 #' @importFrom terra names
 #' @importFrom terra crs
@@ -2739,6 +2800,14 @@ process_geos <-
 #'   variable = "CPT",
 #'   path = "./data/inst1_2d_int_Nx"
 #' )
+#' ## daily mean CPT
+#' merra2_daily <- process_merra2(
+#'   date = c("2024-01-01", "2024-01-10"),
+#'   variable = "CPT",
+#'   path = "./data/inst1_2d_int_Nx",
+#'   daily_agg = TRUE,
+#'   fun = "mean"
+#' )
 #' }
 #' @export
 process_merra2 <-
@@ -2747,6 +2816,8 @@ process_merra2 <-
     variable = NULL,
     path = NULL,
     extent = NULL,
+    daily_agg = FALSE,
+    fun = "mean",
     ...
   ) {
     #### directory setup
@@ -2927,9 +2998,42 @@ process_merra2 <-
     } else {
       terra::crs(data_return) <- "EPSG:4267"
     }
+    #### optional daily aggregation (not applicable to already-daily FWI)
+    if (isTRUE(daily_agg) && collection != "fwi") {
+      t <- terra::time(data_return)
+      if (!anyNA(t) && length(t) == terra::nlyr(data_return)) {
+        date_str <- format(as.Date(t), "%Y%m%d")
+      } else {
+        date_str <- regmatches(
+          names(data_return),
+          regexpr("(?<![0-9])[0-9]{8}(?![0-9])", names(data_return), perl = TRUE)
+        )
+        if (length(date_str) != terra::nlyr(data_return)) {
+          stop("daily_agg: cannot determine dates from layer times or names.\n")
+        }
+      }
+      var_prefix <- sub("_[0-9]{8}.*$", "", names(data_return))
+      tapp_index <- paste(var_prefix, date_str, sep = "_")
+      saved_crs <- terra::crs(data_return)
+      data_return <- terra::tapp(data_return, tapp_index, fun = fun, na.rm = TRUE)
+      terra::crs(data_return) <- saved_crs
+      out_dates <- regmatches(
+        names(data_return),
+        regexpr("[0-9]{8}$", names(data_return))
+      )
+      terra::time(data_return) <- as.POSIXct(
+        paste0(out_dates, " 00:00:00"),
+        format = "%Y%m%d %H:%M:%S",
+        tz = "UTC"
+      )
+    }
     message(paste0(
       "Returning ",
-      ifelse(collection == "fwi", "daily ", "hourly "),
+      ifelse(
+        collection == "fwi" || isTRUE(daily_agg),
+        "daily ",
+        "hourly "
+      ),
       variable,
       " data from ",
       as.Date(

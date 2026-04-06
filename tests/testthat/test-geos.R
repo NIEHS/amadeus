@@ -288,7 +288,74 @@ testthat::test_that("process_geos (expected errors)", {
 })
 
 ################################################################################
-##### calculate_geos
+##### process_geos daily_agg
+testthat::test_that("process_geos daily_agg=FALSE default is unchanged", {
+  withr::local_package("terra")
+  # Default (daily_agg=FALSE) must return same result as before
+  geos_default <- process_geos(
+    date = "2018-01-01",
+    variable = "O3",
+    path = testthat::test_path("..", "testdata", "geos", "c")
+  )
+  geos_explicit_false <- process_geos(
+    date = "2018-01-01",
+    variable = "O3",
+    path = testthat::test_path("..", "testdata", "geos", "c"),
+    daily_agg = FALSE
+  )
+  testthat::expect_equal(terra::nlyr(geos_default), terra::nlyr(geos_explicit_false))
+  testthat::expect_equal(terra::values(geos_default), terra::values(geos_explicit_false))
+})
+
+testthat::test_that("process_geos daily_agg collapses sub-daily layers", {
+  withr::local_package("terra")
+  src_file <- testthat::test_path(
+    "..", "testdata", "geos", "c",
+    "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4"
+  )
+  # Make src_file absolute before entering withr::with_tempdir
+  src_file <- normalizePath(src_file, mustWork = TRUE)
+
+  withr::with_tempdir({
+    tmpdir <- getwd()
+    # Two files: 0000z and 0100z for the same day
+    file.copy(src_file, file.path(tmpdir, "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4"))
+    file.copy(src_file, file.path(tmpdir, "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0100z.nc4"))
+
+    geos_sub <- suppressMessages(
+      process_geos(date = "2018-01-01", variable = "O3", path = tmpdir)
+    )
+    geos_daily_mean <- suppressMessages(
+      process_geos(date = "2018-01-01", variable = "O3", path = tmpdir,
+                   daily_agg = TRUE, fun = "mean")
+    )
+    geos_daily_max <- suppressMessages(
+      process_geos(date = "2018-01-01", variable = "O3", path = tmpdir,
+                   daily_agg = TRUE, fun = "max")
+    )
+
+    # Two files × 5 pressure levels = 10 sub-daily layers
+    testthat::expect_equal(terra::nlyr(geos_sub), 10)
+    # Daily agg preserves pressure level structure: 5 output layers
+    testthat::expect_equal(terra::nlyr(geos_daily_mean), 5)
+    # CRS is preserved
+    testthat::expect_false(terra::crs(geos_daily_mean) == "")
+    testthat::expect_match(terra::crs(geos_daily_mean, describe = TRUE)$code, "4326")
+    # Time is set to midnight UTC of the aggregated date
+    testthat::expect_true("POSIXt" %in% class(terra::time(geos_daily_mean)))
+    testthat::expect_true(all(
+      format(as.Date(terra::time(geos_daily_mean)), "%Y%m%d") == "20180101"
+    ))
+    # max >= mean (both files are identical, so max == mean == values)
+    testthat::expect_equal(terra::nlyr(geos_daily_max), 5)
+    testthat::expect_true(all(
+      terra::values(geos_daily_max) >= terra::values(geos_daily_mean),
+      na.rm = TRUE
+    ))
+  })
+})
+
+
 testthat::test_that("calculate_geos", {
   withr::local_package("terra")
   withr::local_package("data.table")
@@ -402,7 +469,30 @@ testthat::test_that("calculate_geos", {
 # nolint end
 
 ################################################################################
-##### download_geos hash=FALSE branch
+##### calculate_geos fun_temporal interface
+
+testthat::test_that("calculate_geos fun_temporal interface", {
+  testthat::expect_true(
+    "fun_temporal" %in% names(formals(calculate_geos))
+  )
+  testthat::expect_null(
+    formals(calculate_geos)[["fun_temporal"]]
+  )
+  testthat::expect_no_error(
+    amadeus::check_fun_temporal(NULL)
+  )
+  testthat::expect_no_error(
+    amadeus::check_fun_temporal("mean")
+  )
+  testthat::expect_error(
+    amadeus::check_fun_temporal("variance"),
+    regexp = "fun_temporal"
+  )
+  testthat::expect_error(
+    amadeus::check_fun_temporal(42L),
+    regexp = "fun_temporal"
+  )
+})
 
 testthat::test_that("download_geos mock download hash=FALSE", {
   testthat::local_mocked_bindings(

@@ -9,6 +9,8 @@ process_merra2(
   variable = NULL,
   path = NULL,
   extent = NULL,
+  daily_agg = FALSE,
+  fun = "mean",
   ...
 )
 }
@@ -27,6 +29,15 @@ files.}
 \item{extent}{numeric(4) or SpatExtent giving the extent of the raster
 if \code{NULL} (default), the entire raster is loaded}
 
+\item{daily_agg}{logical(1). If \code{TRUE}, aggregate sub-daily layers to daily
+values using \code{fun}. Default \code{FALSE} preserves the original sub-daily
+output. Aggregation groups layers by variable/level and date. Silently
+ignored for FWI collections, which are already daily.}
+
+\item{fun}{character(1). Aggregation function passed to \code{\link[terra:tapp]{terra::tapp()}}
+(e.g. \code{"mean"}, \code{"max"}, \code{"min"}, \code{"sum"}). Ignored when
+\code{daily_agg = FALSE}.}
+
 \item{...}{Placeholders.}
 }
 \value{
@@ -39,8 +50,11 @@ meteorological, and MERRA2-based Fire Weather Index data, returning a single
 }
 \note{
 Layer names of the returned \code{SpatRaster} object contain the variable,
-pressure level, date, and hour for standard MERRA-2 collections. For daily
-Fire Weather Index files, layer names contain the variable and date only.
+pressure level, date, and hour for standard MERRA-2 collections when
+\code{daily_agg = FALSE} (default). When \code{daily_agg = TRUE}, layer names contain
+the variable, pressure level, and date only, and \code{terra::time()} is set to
+midnight UTC of each date. For daily Fire Weather Index files, layer names
+contain the variable and date only regardless of \code{daily_agg}.
 Pressure level values utilized for layer names are taken directly from raw
 data and are not edited to retain pressure level information.
 }
@@ -52,6 +66,14 @@ merra2 <- process_merra2(
   date = c("2024-01-01", "2024-01-10"),
   variable = "CPT",
   path = "./data/inst1_2d_int_Nx"
+)
+## daily mean CPT
+merra2_daily <- process_merra2(
+  date = c("2024-01-01", "2024-01-10"),
+  variable = "CPT",
+  path = "./data/inst1_2d_int_Nx",
+  daily_agg = TRUE,
+  fun = "mean"
 )
 }
 }
