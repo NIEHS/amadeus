@@ -1789,6 +1789,35 @@ testthat::test_that("process_mcd14dl covers directory filtering and error branch
   })
 })
 
+testthat::test_that("process_mcd14dl handles no txt files and missing frp/date", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+
+  withr::with_tempdir({
+    file.create("not_mcd14dl.csv")
+    testthat::expect_error(
+      amadeus:::process_mcd14dl(path = "."),
+      "No MCD14DL text files were found"
+    )
+  })
+
+  withr::with_tempdir({
+    txt_path <- file.path(".", "MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt")
+    data.table::fwrite(
+      data.frame(
+        latitude = 35.95013,
+        longitude = -78.8277,
+        acq_date = "2026-03-15",
+        acq_time = 1230
+      ),
+      txt_path
+    )
+    proc <- amadeus:::process_mcd14dl(path = txt_path)
+    testthat::expect_s4_class(proc, "SpatVector")
+    testthat::expect_true(all(is.na(proc$frp)))
+  })
+})
+
 
 testthat::test_that("process_blackmarble*", {
   withr::local_package("terra")

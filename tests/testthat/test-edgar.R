@@ -590,6 +590,41 @@ testthat::test_that("process_edgar rejects unsupported text-only inputs", {
   })
 })
 
+testthat::test_that("process_edgar validates empty and unsupported non-raster paths", {
+  testthat::expect_error(
+    process_edgar(path = character(0)),
+    "path does not contain files"
+  )
+
+  withr::with_tempdir({
+    csv_path <- file.path(".", "edgar_totals.csv")
+    write.csv(data.frame(x = 1), csv_path, row.names = FALSE)
+    testthat::expect_error(
+      process_edgar(path = csv_path),
+      "supported EDGAR raster files"
+    )
+  })
+})
+
+testthat::test_that("process_edgar prefixes informative multi-layer names", {
+  withr::local_package("terra")
+
+  withr::with_tempdir({
+    r1 <- terra::rast(ncols = 2, nrows = 2, xmin = -80, xmax = -78, ymin = 35, ymax = 37, crs = "EPSG:4326")
+    r2 <- terra::rast(ncols = 2, nrows = 2, xmin = -80, xmax = -78, ymin = 35, ymax = 37, crs = "EPSG:4326")
+    terra::values(r1) <- 1:4
+    terra::values(r2) <- 5:8
+    rr <- c(r1, r2)
+    names(rr) <- c("nox_total", "so2_total")
+    raster_path <- file.path(".", "edgar_named_layers_2021.tif")
+    terra::writeRaster(rr, raster_path, overwrite = TRUE)
+
+    edgar <- process_edgar(path = raster_path)
+    testthat::expect_true(all(grepl("^edgar_", names(edgar))))
+    testthat::expect_true(all(names(edgar) == c("edgar_nox_total", "edgar_so2_total")))
+  })
+})
+
 testthat::test_that("calculate_edgar extracts EDGAR raster values", {
   withr::local_package("terra")
   withr::local_package("sf")

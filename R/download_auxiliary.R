@@ -694,10 +694,12 @@ download_normalize_aqs_unzip <- function(
     if (!file.exists(target_file)) {
       moved <- file.rename(nested_file, target_file)
       if (!isTRUE(moved)) {
+        # nocov start
         stop(sprintf(
           "Failed to normalize AQS unzip layout for %s.",
           basename(nested_file)
         ))
+        # nocov end
       }
     } else {
       unlink(nested_file)

@@ -279,3 +279,22 @@ testthat::test_that("calculate_prism", {
     "`from` must be a SpatRaster object."
   )
 })
+
+testthat::test_that("calculate_prism strips exactextractr mean. prefix on multi-layer output", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_package("exactextractr")
+
+  r1 <- terra::rast(ncols = 2, nrows = 2, xmin = -80, xmax = -78, ymin = 35, ymax = 37, crs = "EPSG:4326")
+  r2 <- terra::rast(ncols = 2, nrows = 2, xmin = -80, xmax = -78, ymin = 35, ymax = 37, crs = "EPSG:4326")
+  terra::values(r1) <- 1:4
+  terra::values(r2) <- 5:8
+  rr <- c(r1, r2)
+  names(rr) <- c("ppt", "tmin")
+  terra::time(rr) <- as.POSIXct(c("2020-01-01", "2020-01-01"), tz = "UTC")
+
+  locs <- data.frame(site_id = "001", lon = -79, lat = 36)
+
+  res <- calculate_prism(rr, locs, locs_id = "site_id", radius = 1000)
+  testthat::expect_true(all(c("ppt_1000", "tmin_1000") %in% colnames(res)))
+})
