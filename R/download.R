@@ -5375,7 +5375,9 @@ download_improve <- function(
     if (hash) {
       return(amadeus::download_hash(hash = TRUE, directory_to_save))
     }
-    return(invisible(list(success = 0, failed = 0, skipped = length(download_names))))
+    return(invisible(list(
+      success = 0, failed = 0, skipped = length(download_names)
+    )))
   }
 
   #### Download files

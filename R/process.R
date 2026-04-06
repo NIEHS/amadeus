@@ -2721,7 +2721,11 @@ process_geos <-
       } else {
         date_str <- regmatches(
           names(data_return),
-          regexpr("(?<![0-9])[0-9]{8}(?![0-9])", names(data_return), perl = TRUE)
+          regexpr(
+            "(?<![0-9])[0-9]{8}(?![0-9])",
+            names(data_return),
+            perl = TRUE
+          )
         )
         if (length(date_str) != terra::nlyr(data_return)) {
           stop("daily_agg: cannot determine dates from layer times or names.\n")
@@ -2729,7 +2733,9 @@ process_geos <-
       }
       var_prefix <- sub("_[0-9]{8}.*$", "", names(data_return))
       tapp_index <- paste(var_prefix, date_str, sep = "_")
-      data_return <- terra::tapp(data_return, tapp_index, fun = fun, na.rm = TRUE)
+      data_return <- terra::tapp(
+        data_return, tapp_index, fun = fun, na.rm = TRUE
+      )
       terra::crs(data_return) <- "EPSG:4326"
       out_dates <- regmatches(
         names(data_return),
@@ -3016,7 +3022,11 @@ process_merra2 <-
       } else {
         date_str <- regmatches(
           names(data_return),
-          regexpr("(?<![0-9])[0-9]{8}(?![0-9])", names(data_return), perl = TRUE)
+          regexpr(
+            "(?<![0-9])[0-9]{8}(?![0-9])",
+            names(data_return),
+            perl = TRUE
+          )
         )
         if (length(date_str) != terra::nlyr(data_return)) {
           stop("daily_agg: cannot determine dates from layer times or names.\n")
@@ -3025,7 +3035,9 @@ process_merra2 <-
       var_prefix <- sub("_[0-9]{8}.*$", "", names(data_return))
       tapp_index <- paste(var_prefix, date_str, sep = "_")
       saved_crs <- terra::crs(data_return)
-      data_return <- terra::tapp(data_return, tapp_index, fun = fun, na.rm = TRUE)
+      data_return <- terra::tapp(
+        data_return, tapp_index, fun = fun, na.rm = TRUE
+      )
       terra::crs(data_return) <- saved_crs
       out_dates <- regmatches(
         names(data_return),
@@ -3966,7 +3978,7 @@ process_improve <- function(
   meas <- data.table::rbindlist(meas_list, fill = TRUE)
 
   #### Standardise date column
-  meas[, FactDate := as.Date(FactDate)]
+  meas[, FactDate := as.Date(FactDate)] # nolint: object_usage_linter.
 
   #### Filter by date if provided
   if (!is.null(date)) {
@@ -3976,7 +3988,7 @@ process_improve <- function(
     stopifnot(length(date) == 2)
     d_start <- as.Date(date[1])
     d_end   <- as.Date(date[2])
-    FactDate <- NULL   # avoid R CMD CHECK note
+    FactDate <- NULL   # nolint: object_name_linter. avoid R CMD CHECK note
     meas <- meas[FactDate >= d_start & FactDate <= d_end, ]
     if (nrow(meas) == 0) {
       warning(
@@ -4028,7 +4040,9 @@ process_improve <- function(
   }
 
   #### Build spatial object
+  # nolint start: object_usage_linter.
   meas_complete <- meas[!is.na(Latitude) & !is.na(Longitude), ]
+  # nolint end
   sv <- terra::vect(
     meas_complete,
     geom = c("Longitude", "Latitude"),
