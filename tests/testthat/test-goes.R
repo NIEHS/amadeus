@@ -311,19 +311,22 @@ testthat::test_that("process_goes errors when date range has no matches", {
 })
 
 testthat::test_that("process_goes handles unparseable filenames in date parser", {
+  withr::local_package("terra")
   src_dir <- testthat::test_path("..", "testdata", "goes")
   withr::with_tempdir({
     ok <- list.files(src_dir, pattern = "OR_ADP.*\\.nc$", full.names = TRUE)
     file.copy(ok[1], ".", overwrite = TRUE)
     file.create("OR_ADP-C3C02_G16_badstamp.nc")
-    testthat::expect_error(
+    # Bad-stamp file is silently skipped; valid DOY-001 file is still processed
+    result <- suppressMessages(
       process_goes(
         date = c("2018-01-01", "2018-01-01"),
         variable = "Smoke",
         path = "."
-      ),
-      regexp = "matching the requested date range"
+      )
     )
+    testthat::expect_s4_class(result, "SpatRaster")
+    testthat::expect_gte(terra::nlyr(result), 1L)
   })
 })
 
