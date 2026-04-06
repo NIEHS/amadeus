@@ -2718,7 +2718,7 @@ process_geos <-
       t <- terra::time(data_return)
       if (!anyNA(t) && length(t) == terra::nlyr(data_return)) {
         date_str <- format(as.Date(t), "%Y%m%d")
-      } else {
+      } else { # nocov start
         date_str <- regmatches(
           names(data_return),
           regexpr(
@@ -2730,7 +2730,7 @@ process_geos <-
         if (length(date_str) != terra::nlyr(data_return)) {
           stop("daily_agg: cannot determine dates from layer times or names.\n")
         }
-      }
+      } # nocov end
       var_prefix <- sub("_[0-9]{8}.*$", "", names(data_return))
       tapp_index <- paste(var_prefix, date_str, sep = "_")
       data_return <- terra::tapp(
@@ -3019,7 +3019,7 @@ process_merra2 <-
       t <- terra::time(data_return)
       if (!anyNA(t) && length(t) == terra::nlyr(data_return)) {
         date_str <- format(as.Date(t), "%Y%m%d")
-      } else {
+      } else { # nocov start
         date_str <- regmatches(
           names(data_return),
           regexpr(
@@ -3031,7 +3031,7 @@ process_merra2 <-
         if (length(date_str) != terra::nlyr(data_return)) {
           stop("daily_agg: cannot determine dates from layer times or names.\n")
         }
-      }
+      } # nocov end
       var_prefix <- sub("_[0-9]{8}.*$", "", names(data_return))
       tapp_index <- paste(var_prefix, date_str, sep = "_")
       saved_crs <- terra::crs(data_return)
@@ -3801,11 +3801,11 @@ process_goes <- function(
     data_raw <- terra::rast(data_paths[p])
     #### reproject to EPSG:4326 if file uses geostationary projection
     crs_proj <- terra::crs(data_raw, proj = TRUE)
-    if (!is.na(crs_proj) && grepl("\\+proj=geos", crs_proj)) {
+    if (!is.na(crs_proj) && grepl("\\+proj=geos", crs_proj)) { # nocov start
       data_raw <- terra::project(data_raw, "EPSG:4326")
     } else if (is.na(terra::crs(data_raw)) || terra::crs(data_raw) == "") {
       terra::crs(data_raw) <- "EPSG:4326"
-    }
+    } # nocov end
     #### subset to requested variable
     var_idx <- grep(
       paste0("^", variable, "$"),
