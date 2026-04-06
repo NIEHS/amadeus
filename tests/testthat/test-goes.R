@@ -705,3 +705,19 @@ testthat::test_that("download_goes empty S3 listing returns early", {
     testthat::expect_equal(out$skipped, 0)
   })
 })
+
+testthat::test_that("process_goes uses partial match fallback for variable name", {
+  withr::local_package("terra")
+  goes_dir <- testthat::test_path("..", "testdata", "goes")
+  # DOY 004 = 2018-01-04, file has 'SmokeFlag' variable
+  # Using variable = "Smoke" triggers partial-match fallback at line 3815
+  result <- suppressMessages(
+    process_goes(
+      date = c("2018-01-04", "2018-01-04"),
+      variable = "Smoke",
+      path = goes_dir
+    )
+  )
+  testthat::expect_s4_class(result, "SpatRaster")
+  testthat::expect_equal(terra::nlyr(result), 1L)
+})

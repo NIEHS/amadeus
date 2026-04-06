@@ -628,3 +628,21 @@ testthat::test_that("calculate_improve adds coords when missing from from_df", {
   testthat::expect_true("Longitude" %in% names(result))
   testthat::expect_true("Latitude" %in% names(result))
 })
+
+testthat::test_that("download_improve hash=TRUE returns hash after download", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- download_improve(
+      year = 2022,
+      product = "raw",
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      hash = TRUE
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
