@@ -724,3 +724,23 @@ testthat::test_that("process_goes uses partial match fallback for variable name"
   testthat::expect_s4_class(result, "SpatRaster")
   testthat::expect_equal(terra::nlyr(result), 1L)
 })
+
+testthat::test_that("process_goes single-date string expands to range", {
+  withr::local_package("terra")
+  goes_dir <- testthat::test_path("..", "testdata", "goes")
+  result_single <- suppressMessages(
+    process_goes(
+      date = "2018-01-01",
+      variable = "Smoke",
+      path = goes_dir
+    )
+  )
+  result_pair <- suppressMessages(
+    process_goes(
+      date = c("2018-01-01", "2018-01-01"),
+      variable = "Smoke",
+      path = goes_dir
+    )
+  )
+  testthat::expect_equal(terra::nlyr(result_single), terra::nlyr(result_pair))
+})
