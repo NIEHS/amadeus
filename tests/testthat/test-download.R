@@ -27,7 +27,12 @@ testthat::test_that("download_data (expected errors - acknowledgement)", {
     "huc",
     "cropscape",
     "cdl",
-    "prism"
+    "prism",
+    "goes",
+    "goes_adp",
+    "GOES",
+    "improve",
+    "IMPROVE"
   )
   for (d in seq_along(download_datasets)) {
     testthat::expect_error(
@@ -63,7 +68,12 @@ testthat::test_that("download_data (expected errors - directory)", {
     "huc",
     "cropscape",
     "cdl",
-    "prism"
+    "prism",
+    "goes",
+    "goes_adp",
+    "GOES",
+    "improve",
+    "IMPROVE"
   )
   for (d in seq_along(download_datasets)) {
     testthat::expect_error(

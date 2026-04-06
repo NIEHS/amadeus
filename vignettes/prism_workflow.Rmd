@@ -111,6 +111,23 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
+## Available inputs and data availability
+
+`download_data(dataset_name = "prism", ...)` combines `time`, `element`, and `data_type`.
+
+| `data_type` | Resolution | Supported `element` values | `time` expectations |
+| --- | --- | --- | --- |
+| `ts` | 4 km time series | `ppt`, `tmin`, `tmax`, `tmean`, `tdmean`, `vpdmin`, `vpdmax` | `YYYYMMDD` for daily data (1981-01-01 through yesterday), `YYYYMM` for monthly data (1981-01 through last month), or `YYYY` for annual data (1981 through last year) |
+| `normals_800` | 800 m normals | `ppt`, `tmin`, `tmax`, `tmean`, `tdmean`, `vpdmin`, `vpdmax`, `solslope`, `soltotal`, `solclear`, `soltrans` | Monthly normals use `MM` or `14` for annual normal; daily normals use `MMDD` |
+| `normals` | 4 km normals | `ppt`, `tmin`, `tmax`, `tmean`, `tdmean`, `vpdmin`, `vpdmax`, `solslope`, `soltotal`, `solclear`, `soltrans` | Monthly normals use `MM` or `14` for annual normal; daily normals use `MMDD` |
+
+- Historical PRISM bundles also accept `time = "YYYY"` for years 1895-1980 and return a zip file containing 12 monthly grids plus the annual grid.
+- `format` is only used for `data_type = "ts"` and can be `nc`, `asc`, or `grib2`.
+- Major constraints:
+  - `sol*` elements are available for normals only, not for `ts`.
+  - For normals, `format` is ignored.
+  - The PRISM API always returns a zip file, even when a time-series format is requested.
+
 ## Download representative requests
 
 ```{r download, eval = live_run}

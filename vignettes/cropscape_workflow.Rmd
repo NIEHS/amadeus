@@ -27,15 +27,29 @@ live_run <- local({
   force || !(on_ci || on_cran)
 })
 
-aqs_sample_path <- c(
-  file.path("tests", "testdata", "aqs", "aqs-location-sample.rds"),
-  file.path("..", "tests", "testdata", "aqs", "aqs-location-sample.rds")
+triangle_aqs_path <- c(
+  file.path("tests", "testdata", "aqs", "aqs_daily_88101_triangle.csv"),
+  file.path("..", "tests", "testdata", "aqs", "aqs_daily_88101_triangle.csv")
 )
-aqs_sample_path <- aqs_sample_path[file.exists(aqs_sample_path)][1]
-if (is.na(aqs_sample_path) || aqs_sample_path == "") {
-  stop("Could not locate tests/testdata/aqs/aqs-location-sample.rds")
+triangle_aqs_path <- triangle_aqs_path[file.exists(triangle_aqs_path)][1]
+if (is.na(triangle_aqs_path) || triangle_aqs_path == "") {
+  stop("Could not locate tests/testdata/aqs/aqs_daily_88101_triangle.csv")
 }
-example_points_sf <- sf::st_transform(sf::st_as_sf(readRDS(aqs_sample_path)), 4326)
+triangle_aqs <- unique(utils::read.csv(triangle_aqs_path)[
+  c("State.Code", "County.Code", "Site.Num", "Latitude", "Longitude")
+])
+triangle_aqs$site_id <- paste(
+  triangle_aqs$State.Code,
+  triangle_aqs$County.Code,
+  triangle_aqs$Site.Num,
+  sep = "-"
+)
+example_points_sf <- sf::st_as_sf(
+  triangle_aqs[c("site_id", "Longitude", "Latitude")],
+  coords = c("Longitude", "Latitude"),
+  crs = 4269
+)
+example_points_sf <- sf::st_transform(example_points_sf, 4326)
 durham_hex_path <- system.file(
   "extdata", "data_files", "durham_h3_res8.rds", package = "amadeus"
 )
@@ -77,6 +91,43 @@ pick_value_column <- function(x) {
   if (length(preferred) > 0) preferred[1] else candidates[1]
 }
 
+pick_fraction_columns <- function(x, n = 4) {
+  geom_col <- attr(x, "sf_column")
+  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
+  candidates <- setdiff(names(x), excluded)
+  numeric_candidates <- candidates[vapply(x[candidates], is.numeric, logical(1))]
+  numeric_candidates <- numeric_candidates[grepl("^cropscape_", numeric_candidates)]
+  if (length(numeric_candidates) == 0) {
+    stop("No numeric CropScape fraction columns found.")
+  }
+
+  means <- vapply(numeric_candidates, function(col) {
+    mean(x[[col]], na.rm = TRUE)
+  }, numeric(1))
+  means[is.na(means)] <- -Inf
+  numeric_candidates <- numeric_candidates[means > 0]
+  if (length(numeric_candidates) == 0) {
+    numeric_candidates <- names(sort(means, decreasing = TRUE))
+  } else {
+    numeric_candidates <- names(sort(means[numeric_candidates], decreasing = TRUE))
+  }
+
+  head(numeric_candidates, n)
+}
+
+make_fraction_plot_data <- function(x, n = 4) {
+  selected_cols <- pick_fraction_columns(x, n = n)
+  plot_df <- do.call(rbind, lapply(selected_cols, function(col) {
+    data.frame(
+      fraction = x[[col]],
+      variable = gsub("^cropscape_\\d+_", "", col),
+      stringsAsFactors = FALSE
+    )
+  }))
+  geometry <- do.call(c, rep(list(sf::st_geometry(x)), length(selected_cols)))
+  sf::st_sf(plot_df, geometry = geometry, crs = sf::st_crs(x))
+}
+
 coord_local_sf <- function(x) {
   x_wgs84 <- sf::st_transform(sf::st_as_sf(x), 4326)
   bbox <- sf::st_bbox(x_wgs84)
@@ -91,29 +142,49 @@ coord_local_sf <- function(x) {
 }
 
 plot_points <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
+  plot_data <- make_fraction_plot_data(x, n = 4)
+  ggplot2::ggplot(plot_data) +
     ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(color = !!rlang::sym(value_col)),
-      size = 2
+      ggplot2::aes(color = fraction),
+      size = 1.6
     ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, color = value_col) +
-    ggplot2::theme_minimal()
+    ggplot2::facet_wrap(~ variable, ncol = 2) +
+    coord_local_sf(plot_data) +
+    ggplot2::scale_color_viridis_c(
+      limits = c(0, 1),
+      option = "C",
+      labels = scales::label_percent(accuracy = 1)
+    ) +
+    ggplot2::labs(title = title, color = "fraction") +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      legend.position = "bottom",
+      legend.key.width = grid::unit(1.5, "cm"),
+      strip.text = ggplot2::element_text(face = "bold")
+    )
 }
 
 plot_polygons <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
+  plot_data <- make_fraction_plot_data(x, n = 4)
+  ggplot2::ggplot(plot_data) +
     ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(fill = !!rlang::sym(value_col)),
+      ggplot2::aes(fill = fraction),
       color = NA
     ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, fill = value_col) +
-    ggplot2::theme_minimal()
+    ggplot2::facet_wrap(~ variable, ncol = 2) +
+    coord_local_sf(plot_data) +
+    ggplot2::scale_fill_viridis_c(
+      limits = c(0, 1),
+      option = "C",
+      labels = scales::label_percent(accuracy = 1)
+    ) +
+    ggplot2::labs(title = title, fill = "fraction") +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      legend.position = "bottom",
+      legend.key.width = grid::unit(1.5, "cm"),
+      strip.text = ggplot2::element_text(face = "bold")
+    )
 }
 ```
 
@@ -121,7 +192,148 @@ This article demonstrates a compact workflow for USDA CropScape (Cropland Data L
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
-Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
+Each workflow uses two small example surfaces: `example_points_sf`, a set of real Triangle-region AQS monitoring locations derived from `tests/testdata/aqs/aqs_daily_88101_triangle.csv`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
+
+## Available inputs and data availability
+
+- `download_data(dataset_name = "cropscape", ...)` accepts a `year` and `source = "USDA"` or `"GMU"`.
+- CropScape is an annual 30 m Cropland Data Layer product: USDA downloads are available from 2008 through the latest release, while GMU extends back to 1997.
+- File formats depend on source: USDA serves yearly ZIP archives and GMU serves yearly `.tar.gz` archives.
+- CropScape values are categorical crop/land-use classes. Covariate calculation are a fraction of each land cover class within the specified radius or areal unit.
+
+The table below reproduces the crop and related land-use classes listed in the
+official USDA CDL metadata used by CropScape; see the
+[2024 CDL metadata](https://www.nass.usda.gov/Research_and_Science/Cropland/metadata/metadata_CDL24_FGDC-STD-001-1998.htm)
+for the complete legend and additional class details.
+
+```{r cropscape-class-reference, echo = FALSE}
+cropscape_classes <- read.delim(
+  text = paste(
+    c(
+      "code\tclass",
+      "1\tCorn",
+      "2\tCotton",
+      "3\tRice",
+      "4\tSorghum",
+      "5\tSoybeans",
+      "6\tSunflower",
+      "10\tPeanuts",
+      "11\tTobacco",
+      "12\tSweet Corn",
+      "13\tPop or Orn Corn",
+      "14\tMint",
+      "21\tBarley",
+      "22\tDurum Wheat",
+      "23\tSpring Wheat",
+      "24\tWinter Wheat",
+      "25\tOther Small Grains",
+      "26\tDbl Crop WinWht/Soybeans",
+      "27\tRye",
+      "28\tOats",
+      "29\tMillet",
+      "30\tSpeltz",
+      "31\tCanola",
+      "32\tFlaxseed",
+      "33\tSafflower",
+      "34\tRape Seed",
+      "35\tMustard",
+      "36\tAlfalfa",
+      "37\tOther Hay/Non Alfalfa",
+      "38\tCamelina",
+      "39\tBuckwheat",
+      "41\tSugarbeets",
+      "42\tDry Beans",
+      "43\tPotatoes",
+      "44\tOther Crops",
+      "45\tSugarcane",
+      "46\tSweet Potatoes",
+      "47\tMisc Vegs & Fruits",
+      "48\tWatermelons",
+      "49\tOnions",
+      "50\tCucumbers",
+      "51\tChick Peas",
+      "52\tLentils",
+      "53\tPeas",
+      "54\tTomatoes",
+      "55\tCaneberries",
+      "56\tHops",
+      "57\tHerbs",
+      "58\tClover/Wildflowers",
+      "59\tSod/Grass Seed",
+      "60\tSwitchgrass",
+      "61\tFallow/Idle Cropland",
+      "64\tShrubland",
+      "66\tCherries",
+      "67\tPeaches",
+      "68\tApples",
+      "69\tGrapes",
+      "70\tChristmas Trees",
+      "71\tOther Tree Crops",
+      "72\tCitrus",
+      "74\tPecans",
+      "75\tAlmonds",
+      "76\tWalnuts",
+      "77\tPears",
+      "92\tAquaculture",
+      "204\tPistachios",
+      "205\tTriticale",
+      "206\tCarrots",
+      "207\tAsparagus",
+      "208\tGarlic",
+      "209\tCantaloupes",
+      "210\tPrunes",
+      "211\tOlives",
+      "212\tOranges",
+      "213\tHoneydew Melons",
+      "214\tBroccoli",
+      "215\tAvocados",
+      "216\tPeppers",
+      "217\tPomegranates",
+      "218\tNectarines",
+      "219\tGreens",
+      "220\tPlums",
+      "221\tStrawberries",
+      "222\tSquash",
+      "223\tApricots",
+      "224\tVetch",
+      "225\tDbl Crop WinWht/Corn",
+      "226\tDbl Crop Oats/Corn",
+      "227\tLettuce",
+      "228\tDbl Crop Triticale/Corn",
+      "229\tPumpkins",
+      "230\tDbl Crop Lettuce/Durum Wht",
+      "231\tDbl Crop Lettuce/Cantaloupe",
+      "232\tDbl Crop Lettuce/Cotton",
+      "233\tDbl Crop Lettuce/Barley",
+      "236\tDbl Crop WinWht/Sorghum",
+      "237\tDbl Crop Barley/Corn",
+      "238\tDbl Crop WinWht/Cotton",
+      "239\tDbl Crop Soybeans/Cotton",
+      "240\tDbl Crop Soybeans/Oats",
+      "241\tDbl Crop Corn/Soybeans",
+      "242\tBlueberries",
+      "243\tCabbage",
+      "244\tCauliflower",
+      "245\tCelery",
+      "246\tRadishes",
+      "247\tTurnips",
+      "248\tEggplants",
+      "249\tGourds",
+      "250\tCranberries",
+      "254\tDbl Crop Barley/Soybeans"
+    ),
+    collapse = "\n"
+  ),
+  stringsAsFactors = FALSE,
+  check.names = FALSE
+)
+
+knitr::kable(
+  cropscape_classes,
+  col.names = c("CDL code", "cropland class"),
+  align = c("r", "l")
+)
+```
 
 ## Download representative requests
 
@@ -149,19 +361,21 @@ download_data(
 
 ```{r process, eval = live_run}
 cropscape_path <- list.files(
-  directory_to_save,
-  pattern = "cdl_30m_.*2019.*\\.tif$",
+  file.path(directory_to_save, "usda_2020"),
+  pattern = "2020.*\\.tif$",
   recursive = TRUE,
   full.names = TRUE
 )[1]
 cropscape_reference <- terra::rast(cropscape_path)
-processing_extent <- terra::ext(
-  terra::project(terra::vect(workflow_extent_wgs84), terra::crs(cropscape_reference))
+points_projected <- terra::project(
+  terra::vect(example_points_sf),
+  terra::crs(cropscape_reference)
 )
+processing_extent <- terra::ext(points_projected)
 processed_data <- process_covariates(
   covariate = "cropscape",
   path = cropscape_path,
-  year = 2019,
+  year = 2020,
   extent = processing_extent
 )
 ```
@@ -174,7 +388,7 @@ point_values <- calculate_covariates(
   from = processed_data,
   locs = example_points_sf,
   locs_id = "site_id",
-  radius = 300,
+  radius = 0,
   geom = "sf"
 )
 ```
@@ -187,18 +401,18 @@ polygon_values <- calculate_covariates(
   from = processed_data,
   locs = durham_hex,
   locs_id = "h3_id",
-  radius = 300,
+  radius = 0,
   geom = "sf"
 )
 ```
 
 ## Visualize the point and polygon outputs
 
-```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
+```{r plot-points, eval = live_run, fig.width = 10, fig.height = 8, fig.alt = "Faceted point maps showing fractional CropScape class values for a few common classes."}
 plot_points(point_values, paste0("USDA CropScape", ": point extraction"))
 ```
 
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
+```{r plot-polygons, eval = live_run, fig.width = 10, fig.height = 8, fig.alt = "Faceted polygon maps showing fractional CropScape class values across Durham County H3 hexagons for a few common classes."}
 plot_polygons(polygon_values, paste0("USDA CropScape", ": Durham H3 polygons"))
 ```
 
@@ -206,5 +420,7 @@ plot_polygons(polygon_values, paste0("USDA CropScape", ": Durham H3 polygons"))
 
 - The download section demonstrates both GMU and USDA CropScape sources so local runs cover more than one source configuration.
 - CropScape uses categorical raster classes, so polygon summaries are best interpreted as class composition rather than a continuous surface.
-- This workflow crops the source raster with a Durham-area window that is
-  transformed from WGS84 into the CropScape raster CRS before processing.
+- This workflow processes the USDA raster example and crops it using the
+  projected bounding extent of the example points before processing.
+- The example points are limited to Triangle-region AQS sites so the crop window
+  stays compact and live vignette runs remain reasonably fast.

@@ -5,11 +5,11 @@
 \title{Download raw data wrapper function}
 \usage{
 download_data(
-  dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "goes", "goes_adp", "gmted",
-    "koppen", "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd", "noaa",
-    "sedac_groads", "sedac_population", "groads", "population", "hms", "smoke", "tri",
-    "nei", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
-    "improve"),
+  dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "goes", "goes_adp", "GOES",
+    "gmted", "koppen", "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd",
+    "noaa", "sedac_groads", "sedac_population", "groads", "population", "hms", "smoke",
+    "tri", "nei", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
+    "improve", "IMPROVE"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   hash = FALSE,

@@ -650,6 +650,182 @@ check_geom <- function(geom) {
 }
 
 
+#' Validate the `fun_temporal` parameter
+#' @description
+#' Validates the `fun_temporal` argument used by covariate
+#' extraction functions.  When \code{NULL} (the default), no
+#' temporal aggregation is applied and existing per-layer
+#' extraction behavior is preserved.  When non-\code{NULL},
+#' the value must be one of \code{"mean"}, \code{"median"},
+#' \code{"sum"}, \code{"max"}, or \code{"min"}.
+#' @param fun_temporal NULL or character(1). Name of the
+#'   temporal summary function. \code{NULL} means no temporal
+#'   aggregation (default / backward-compatible behavior).
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return \code{NULL} invisibly; stops with an informative
+#'   error if the value is invalid.
+#' @export
+check_fun_temporal <- function(fun_temporal) {
+  if (is.null(fun_temporal)) {
+    return(invisible(NULL))
+  }
+  allowed <- c("mean", "median", "sum", "max", "min")
+  if (
+    !is.character(fun_temporal) ||
+      length(fun_temporal) != 1L
+  ) {
+    stop(
+      paste0(
+        "`fun_temporal` must be NULL or a single ",
+        "character string.\n"
+      )
+    )
+  }
+  if (!fun_temporal %in% allowed) {
+    stop(
+      sprintf(
+        paste0(
+          "`fun_temporal` must be one of: %s.\n"
+        ),
+        paste(allowed, collapse = ", ")
+      )
+    )
+  }
+  invisible(NULL)
+}
+
+
+#' Summarize extracted covariates by temporal bucket
+#' @description
+#' Applies a named summary function across covariate columns
+#' after bucketing the \code{time} column to a coarser temporal
+#' resolution (daily by default).  When \code{fun_temporal} is
+#' \code{NULL}, the input is returned unchanged
+#' (backward-compatible default).  A WKT \code{"geometry"} column
+#' produced by \code{calc_prepare_locs()} is preserved by
+#' carrying forward the first observed geometry per group.
+#' @param covar data.frame. Extracted covariate table, typically
+#'   the output of \code{calc_worker()} or a
+#'   \code{calculate_*()} function before the
+#'   \code{calc_return_locs()} call. Must contain the columns
+#'   named by \code{locs_id} and \code{time_col}.
+#' @param fun_temporal NULL or character(1). Name of the summary
+#'   function.  One of \code{"mean"}, \code{"median"},
+#'   \code{"sum"}, \code{"max"}, \code{"min"}, or \code{NULL}
+#'   (no aggregation; backward-compatible default).
+#' @param locs_id character(1). Name of the location-identifier
+#'   column in \code{covar}. Default \code{"site_id"}.
+#' @param time_col character(1). Name of the time column in
+#'   \code{covar}. Default \code{"time"}.
+#' @param time_bucket character(1). Temporal resolution to
+#'   summarise to.  One of \code{"day"} (default),
+#'   \code{"week"}, \code{"month"}, or \code{"year"}.
+#' @param group_cols_extra character or NULL. Additional column
+#'   names to include in the grouping key (e.g. \code{"level"}
+#'   for pressure-level data). Default \code{NULL}.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return a data.frame.  When \code{fun_temporal} is
+#'   \code{NULL}, \code{covar} is returned as-is.  Otherwise
+#'   each row represents one unique group / time-bucket
+#'   combination with covariate columns aggregated by
+#'   \code{fun_temporal}.
+#' @importFrom dplyr across all_of group_by summarize left_join
+#' @export
+calc_summarize_temporal <- function(
+  covar,
+  fun_temporal,
+  locs_id = "site_id",
+  time_col = "time",
+  time_bucket = "day",
+  group_cols_extra = NULL
+) {
+  if (is.null(fun_temporal)) {
+    return(covar)
+  }
+  stopifnot(is.data.frame(covar))
+  if (!locs_id %in% names(covar)) {
+    stop(sprintf(
+      "`locs_id` column '%s' not found in `covar`.",
+      locs_id
+    ))
+  }
+  if (!time_col %in% names(covar)) {
+    stop(sprintf(
+      "`time_col` column '%s' not found in `covar`.",
+      time_col
+    ))
+  }
+  if (!is.null(group_cols_extra)) {
+    missing_extra <- setdiff(group_cols_extra, names(covar))
+    if (length(missing_extra) > 0L) {
+      stop(sprintf(
+        paste0(
+          "Extra grouping column(s) not found in `covar`: %s."
+        ),
+        paste(missing_extra, collapse = ", ")
+      ))
+    }
+  }
+  time_bucket <- match.arg(
+    time_bucket,
+    c("day", "week", "month", "year")
+  )
+  grp_cols <- c(locs_id, group_cols_extra, time_col)
+  skip_cols <- c(grp_cols, "geometry")
+  cov_cols <- setdiff(names(covar), skip_cols)
+  has_geom <- "geometry" %in% names(covar)
+  if (length(cov_cols) == 0L) {
+    stop(paste0(
+      "No covariate columns found in `covar` to summarize."
+    ))
+  }
+  covar2 <- covar
+  covar2[[time_col]] <- switch(
+    time_bucket,
+    day = as.Date(covar[[time_col]]),
+    week = as.Date(
+      cut(as.Date(covar[[time_col]]), breaks = "week")
+    ),
+    month = as.Date(
+      cut(as.Date(covar[[time_col]]), breaks = "month")
+    ),
+    year = as.Date(
+      cut(as.Date(covar[[time_col]]), breaks = "year")
+    )
+  )
+  fun_r <- match.fun(fun_temporal)
+  force(fun_r)
+  summary_df <- covar2 |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(grp_cols))) |>
+    dplyr::summarize(
+      dplyr::across(
+        dplyr::all_of(cov_cols),
+        \(x) fun_r(x, na.rm = TRUE)
+      ),
+      .groups = "drop"
+    )
+  if (has_geom) {
+    geom_first <- covar2[
+      !duplicated(covar2[, grp_cols, drop = FALSE]),
+      c(grp_cols, "geometry"),
+      drop = FALSE
+    ]
+    summary_df <- dplyr::left_join(
+      summary_df,
+      geom_first,
+      by = grp_cols
+    )
+  }
+  col_order <- c(grp_cols, cov_cols)
+  if (has_geom) {
+    col_order <- c(col_order, "geometry")
+  }
+  data.frame(summary_df[, col_order, drop = FALSE])
+}
+
+
 #' A single-date MODIS worker
 #' @param from SpatRaster. Preprocessed objects.
 #' @param locs SpatVector/sf/sftime object. Locations where MODIS values

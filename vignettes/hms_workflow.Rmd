@@ -111,6 +111,16 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
+## Available inputs and data availability
+
+`download_hms()` exposes the main choices that determine what NOAA smoke files are available:
+
+- `date` accepts a single day or a start/end range in `YYYY-MM-DD` format, with availability beginning on `2005-08-05`.
+- HMS smoke products are daily files, so multi-day requests download one plume file per day in the requested window.
+- `data_format` supports `"Shapefile"` and `"KML"`.
+- Shapefile requests download zipped archives that can be unzipped automatically; KML requests download raw `.kml` files directly.
+- HMS does not require authentication, and availability is determined by the NOAA daily smoke-product archive for the dates requested.
+
 ## Download representative requests
 
 ```{r download, eval = live_run}

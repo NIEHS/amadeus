@@ -1257,3 +1257,53 @@ testthat::test_that("calculate_merra2 fun_temporal wiring aggregates rows", {
   testthat::expect_equal(result_mean$so4_0, 6)
   testthat::expect_s3_class(result_mean$time, "POSIXct")
 })
+
+################################################################################
+##### calculate_merra2 level-aware temporal grouping
+
+testthat::test_that("calculate_merra2 fun_temporal level-aware grouping", {
+  withr::local_package("terra")
+  # "lev" in the layer name triggers merra2_level = 2 in calculate_merra2,
+  # which propagates group_cols_extra = "level" to calc_summarize_temporal.
+  from_rast <- terra::rast(nrows = 2, ncols = 2, vals = 5)
+  terra::ext(from_rast) <- c(-80, -78, 34, 36)
+  terra::crs(from_rast) <- "EPSG:4326"
+  names(from_rast) <- "SO4_lev001_20200101_000000"
+  locs_df <- data.frame(site_id = "A", lon = -79, lat = 35)
+  # Two pressure levels (1 and 2), each with two hourly rows
+  fake_extracted <- data.frame(
+    site_id = c("A", "A", "A", "A"),
+    time = as.POSIXlt(
+      rep(c("2020-01-01 00:00:00", "2020-01-01 06:00:00"), 2),
+      tz = "UTC"
+    ),
+    level = c("1", "1", "2", "2"),
+    so4_0 = c(10.0, 20.0, 30.0, 40.0)
+  )
+  testthat::local_mocked_bindings(
+    calc_prepare_locs = function(from, locs, locs_id, radius, geom) {
+      sv <- terra::vect(locs_df, geom = c("lon", "lat"), crs = "EPSG:4326")
+      list(sv, data.frame(site_id = "A"))
+    },
+    calc_worker = function(...) fake_extracted,
+    .package = "amadeus"
+  )
+  result_mean <- suppressMessages(
+    calculate_merra2(
+      from = from_rast,
+      locs = locs_df,
+      locs_id = "site_id",
+      radius = 0,
+      fun_temporal = "mean",
+      geom = FALSE
+    )
+  )
+  # Grouping by (site_id, level, day) → 2 rows (one per level)
+  testthat::expect_equal(nrow(result_mean), 2L)
+  testthat::expect_true("level" %in% names(result_mean))
+  lev1 <- result_mean[result_mean$level == "1", "so4_0"]
+  lev2 <- result_mean[result_mean$level == "2", "so4_0"]
+  testthat::expect_equal(lev1, 15)
+  testthat::expect_equal(lev2, 35)
+  testthat::expect_s3_class(result_mean$time, "POSIXct")
+})

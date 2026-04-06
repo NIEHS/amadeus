@@ -111,6 +111,16 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
+## Available inputs and data availability
+
+`download_nei()` is intentionally narrow and currently targets EPA on-road NEI summary releases:
+
+- `year` is the main selector and currently supports the two NEI releases wired into `amadeus`: `2017` and `2020`.
+- Requests can include one year or both available years, yielding one annual on-road summary file per year requested.
+- NEI downloads arrive as zip archives and can be unzipped automatically with `unzip = TRUE`; the workflow then processes the extracted annual summary tables.
+- No jurisdiction argument is needed because the source files are EPA by-region summaries rather than state-by-state download variants.
+- NEI does not require authentication. Temporal resolution is annual.
+
 ## Download representative requests
 
 ```{r download, eval = live_run}

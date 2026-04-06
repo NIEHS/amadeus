@@ -452,4 +452,23 @@ testthat::test_that("apply_extent", {
   testthat::expect_s3_class(dfsftr, "sf")
   testthat::expect_s4_class(dfdftr, "SpatVector")
 })
+
+testthat::test_that("process_covariates dispatches goes and improve", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  withr::with_tempdir({
+    # "goes", "goes_adp", "GOES" all route to process_goes
+    for (alias in c("goes", "goes_adp", "GOES")) {
+      testthat::expect_error(
+        process_covariates(covariate = alias, path = ".")
+      )
+    }
+    # "improve" and "IMPROVE" route to process_improve (no-files error)
+    for (alias in c("improve", "IMPROVE")) {
+      testthat::expect_error(
+        process_covariates(covariate = alias, path = ".")
+      )
+    }
+  })
+})
 # nolint end

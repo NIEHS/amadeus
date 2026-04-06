@@ -111,6 +111,13 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
+## Available inputs and data availability
+
+- `download_data(dataset_name = "huc", ...)` accepts `region = "Lower48"` or `"Islands"`; the `"Islands"` option covers Hawaii, Puerto Rico, and the Virgin Islands.
+- The `type` argument is `"Seamless"` or `"OceanCatchment"` for the two national NHDPlus v2.1 delivery types exposed by the wrapper.
+- HUC data are static reference boundaries rather than time-varying products, and downloads arrive as large `.7z` geodatabase archives; automatic unzip is not supported by this wrapper.
+- For HUC boundaries, the wrapper docs note that `type = "Seamless"` is the right choice because it contains the HUC12 layer, which can then be aggregated to HUC6, HUC8, HUC10, and similar levels.
+
 ## Download representative requests
 
 ```{r download, eval = live_run}

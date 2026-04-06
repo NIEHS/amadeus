@@ -662,6 +662,27 @@ testthat::test_that("calculate_hms character skip path respects fun_temporal", {
   testthat::expect_s3_class(hms_skip$time, "POSIXct")
 })
 
+testthat::test_that("calculate_hms character single-date fun_temporal non-NULL is no-op", {
+  withr::local_package("terra")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  # Single absent date; any fun_temporal on a 1-row table should still return 1 row
+  hms_skip <- suppressMessages(
+    calculate_hms(
+      from = "2018-12-31",
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      fun_temporal = "mean",
+      time_bucket = "day",
+      geom = FALSE
+    )
+  )
+  testthat::expect_s3_class(hms_skip, "data.frame")
+  testthat::expect_equal(nrow(hms_skip), 1L)
+  testthat::expect_s3_class(hms_skip$time, "POSIXct")
+})
+
 # nolint end
 
 ################################################################################

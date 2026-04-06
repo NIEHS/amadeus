@@ -10,7 +10,7 @@ process_covariates(
     "gmted", "aqs", "hms", "smoke", "sedac_population", "population", "sedac_groads",
     "groads", "roads", "nlcd", "tri", "narr", "nei", "ecoregions", "ecoregion", "merra",
     "merra2", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
-    "improve"),
+    "improve", "IMPROVE"),
   path = NULL,
   ...
 )

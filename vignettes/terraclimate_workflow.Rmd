@@ -111,6 +111,32 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
+## Available inputs and data availability
+
+`download_data(dataset_name = "terraclimate", ...)` accepts either the full variable names below or their TerraClimate codes.
+
+| Code | Variable |
+| --- | --- |
+| `aet` | Actual Evapotranspiration |
+| `def` | Climate Water Deficit |
+| `pet` | Potential evapotranspiration |
+| `ppt` | Precipitation |
+| `q` | Runoff |
+| `soil` | Soil Moisture |
+| `srad` | Downward surface shortwave radiation |
+| `swe` | Snow water equivalent - at end of month |
+| `tmax` | Max Temperature |
+| `tmin` | Min Temperature |
+| `vap` | Vapor pressure |
+| `ws` | Wind speed |
+| `vpd` | Vapor Pressure Deficit |
+| `PDSI` | Palmer Drought Severity Index |
+
+- Temporal resolution: monthly; each download is an annual NetCDF file containing monthly layers for one variable.
+- Year input: use a single year or a start/end pair such as `c(2018, 2022)`.
+- Availability check: the wrapper validates the first requested variable-year URL and stops if that request returns HTTP 404.
+- Major constraint: TerraClimate downloads do not require authentication.
+
 ## Download representative requests
 
 ```{r download, eval = live_run}

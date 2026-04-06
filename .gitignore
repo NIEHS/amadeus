@@ -89,3 +89,5 @@ tests/testthat/_problems/
 tests/testthat/testthat-problems.rds
 
 .vscode/
+vignettes/local_run.sh
+inst/extdata/presentations/*

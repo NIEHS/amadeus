@@ -111,6 +111,13 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
+## Available inputs and data availability
+
+- `download_data(dataset_name = "gmted", ...)` accepts `statistic` values of `"Breakline Emphasis"`, `"Systematic Subsample"`, `"Median Statistic"`, `"Minimum Statistic"`, `"Mean Statistic"`, `"Maximum Statistic"`, and `"Standard Deviation Statistic"`.
+- Available `resolution` values are `"7.5 arc-seconds"`, `"15 arc-seconds"`, and `"30 arc-seconds"`.
+- GMTED2010 is a static terrain reference, so the wrapper has no year or scenario arguments; downloads arrive as zipped elevation grid bundles.
+- Pick the statistic intentionally: each layer represents a different summary of elevation, so values from different statistics should not be treated as interchangeable.
+
 ## Download representative requests
 
 ```{r download, eval = live_run}

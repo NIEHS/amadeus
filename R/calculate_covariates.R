@@ -27,6 +27,7 @@
 #' * \code{\link{calculate_narr}}: "narr", "NARR"
 #' * \code{\link{calculate_geos}}: "geos", "geos_cf", "GEOS"
 #' * \code{\link{calculate_goes}}: "goes", "goes_adp", "GOES"
+#' * \code{\link{calculate_improve}}: "improve", "IMPROVE"
 #' * \code{\link{calculate_population}}: "population", "sedac_population"
 #' * \code{\link{calculate_groads}}: "roads", "groads", "sedac_groads"
 #' * \code{\link{calculate_nlcd}}: "nlcd", "NLCD"
@@ -93,6 +94,7 @@ calculate_covariates <-
       "huc",
       "edgar",
       "improve",
+      "IMPROVE",
       "goes",
       "goes_adp",
       "GOES"

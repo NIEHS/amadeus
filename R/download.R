@@ -82,6 +82,7 @@ download_data <-
       "geos",
       "goes",
       "goes_adp",
+      "GOES",
       "gmted",
       "koppen",
       "koppengeiger",
@@ -106,7 +107,8 @@ download_data <-
       "cdl",
       "prism",
       "edgar",
-      "improve"
+      "improve",
+      "IMPROVE"
     ),
     directory_to_save = NULL,
     acknowledgement = FALSE,

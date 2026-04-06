@@ -46,6 +46,13 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
+## Available inputs and data availability
+
+- `download_data(dataset_name = "ecoregion", ...)` does not take product, year, scenario, or region arguments; it downloads the EPA U.S. ecoregion distribution used by the package.
+- This is a static national vector layer with no temporal dimension.
+- Downloads arrive as a zipped vector-data bundle that can be processed into workflow-ready ecoregion boundaries and identifiers.
+- Interpret the result as categorical region membership or boundary data, not as a continuous surface.
+
 ## Download representative requests
 
 ```{r download, eval = live_run}

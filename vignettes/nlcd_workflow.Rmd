@@ -111,6 +111,13 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
+## Available inputs and data availability
+
+- `download_data(dataset_name = "nlcd", ...)` accepts `product` values of `"Land Cover"`, `"Land Cover Change"`, `"Land Cover Confidence"`, `"Fractional Impervious Surface"`, `"Impervious Descriptor"`, and `"Spectral Change Day of Year"`.
+- NLCD is a nationwide U.S. product at 30 m resolution, with `year` values available from 1985 through 2024.
+- Downloads arrive as zipped MRLC raster bundles.
+- Interpretation depends on the product: land-cover-style layers are class/code rasters, fractional impervious surface is a continuous percent-style surface, and spectral change day of year encodes the timing of detected change.
+
 ## Download representative requests
 
 ```{r download, eval = live_run}

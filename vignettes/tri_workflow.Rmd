@@ -111,6 +111,16 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
+## Available inputs and data availability
+
+`download_tri()` works with EPA's annual TRI basic data files and exposes a small set of high-value selectors:
+
+- `jurisdiction` supports the nationwide file (`"US"`), any two-letter state or territory code such as `"NC"`, or the tribal file (`"tbl"`).
+- `year` accepts a single year or a start/end pair, so multi-year requests download one annual TRI file per year.
+- TRI downloads are delivered directly as CSV files rather than zip archives.
+- Output names reflect the jurisdiction requested: U.S.-wide files keep the historical `tri_raw_<year>.csv` pattern, while state and tribal requests append a jurisdiction suffix such as `_NC` or `_tbl`.
+- TRI does not require authentication. Because these are annual facility-reported releases and waste-management totals, temporal resolution is yearly.
+
 ## Download representative requests
 
 ```{r download, eval = live_run}

@@ -39,6 +39,16 @@ This article demonstrates a compact AQS workflow focused on outcome data. Becaus
 
 This vignette runs its live workflow when rendered locally. The download, processing, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
+## Available inputs and data availability
+
+`download_aqs()` exposes the key availability choices for AQS downloads:
+
+- `parameter_code` selects the EPA pollutant parameter. Common examples documented in `amadeus` include PM2.5 (`88101` and `88502`), PM10 (`81102`), ozone (`44201`), NO2 (`42602`), SO2 (`42401`), and CO (`42101`).
+- `resolution_temporal` currently supports only `"daily"`, so the downloadable files are daily monitor observations rather than hourly or annual summaries.
+- `year` accepts a single year or a start/end pair, downloading one pre-generated EPA archive per year requested.
+- AQS downloads arrive as zipped annual files and can be unzipped automatically with `unzip = TRUE`; the workflow then reads the extracted daily CSV files.
+- AQS does not require authentication, but it is mainly intended for outcome modeling, so `amadeus` supports download and processing only and does not expose AQS through `calculate_covariates()`.
+
 ## Pollutant parameters used in this example
 
 ```{r parameter-table}

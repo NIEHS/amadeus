@@ -111,6 +111,16 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
+## Available inputs and data availability
+
+`download_data(dataset_name = "sedac_groads", ...)` wraps `download_groads()`.
+
+- `data_region` accepts `"Americas"`, `"Global"`, `"Africa"`, `"Asia"`, `"Europe"`, `"Oceania East"`, or `"Oceania West"`.
+- `data_format` accepts `"Shapefile"` or `"Geodatabase"`, but the global release is only served as a geodatabase; if you request `data_region = "Global"` with `"Shapefile"`, `amadeus` automatically switches to geodatabase output.
+- gROADS is a static road-network product, so there are no date or version arguments in the download wrapper.
+- Downloads are packaged by region rather than by bounding box; use `process_covariates()` to clip to a local study area.
+- NASA EarthData authentication is required, and each request downloads one zip archive that can be unzipped automatically and optionally deleted afterward.
+
 ## Download representative requests
 
 ```{r download, eval = live_run}

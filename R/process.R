@@ -91,7 +91,8 @@ process_covariates <-
       "cdl",
       "prism",
       "edgar",
-      "improve"
+      "improve",
+      "IMPROVE"
     ),
     path = NULL,
     ...

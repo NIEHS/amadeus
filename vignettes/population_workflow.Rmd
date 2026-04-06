@@ -111,6 +111,16 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 
 Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
+## Available inputs and data availability
+
+`download_data(dataset_name = "sedac_population", ...)` wraps `download_population()`.
+
+- Inputs are global GPW population-density rasters keyed by `year`; request a single year or `year = "all"` for the all-years product.
+- `data_resolution` supports `"30 second"`, `"2.5 minute"`, `"15 minute"`, `"30 minute"`, and `"60 minute"`. The all-years product is not available at 30-second resolution, so `amadeus` automatically falls back to 2.5-minute resolution in that case.
+- `data_format` accepts `"GeoTIFF"`, `"ASCII"`, or `"netCDF"`. The all-years product is only available as netCDF and will be downloaded that way even if another format is requested.
+- Downloads are global rather than extent-based; crop to your study area during processing.
+- Files arrive as zip archives, with `unzip` and `remove_zip` controlling archive handling. Access may require NASA EarthData authentication, and `amadeus` will use `NASA_EARTHDATA_TOKEN` when needed.
+
 ## Download representative requests
 
 ```{r download, eval = live_run}
