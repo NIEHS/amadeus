@@ -12,6 +12,8 @@ calculate_geos(
   fun = "mean",
   fun_temporal = NULL,
   time_bucket = "day",
+  .by = NULL,
+  .by_time = NULL,
   geom = FALSE,
   ...
 )
@@ -41,6 +43,12 @@ preserving existing behavior.}
 when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
 (default), \code{"week"}, \code{"month"}, or \code{"year"}.
 Ignored when \code{fun_temporal} is \code{NULL}.}
+
+\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
+Optional post-extraction summarization target.}
+
+\item{.by_time}{NULL or character(1). Optional time grouping key used
+with \code{.by} for space-time summaries.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

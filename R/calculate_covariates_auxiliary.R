@@ -927,7 +927,8 @@ bucket_time_by_unit <- function(time_vals, unit) {
 #' @author Insang Song
 #' @return a data.frame.
 #' @importFrom dplyr across all_of group_by summarize left_join
-#' @importFrom sf st_as_sf st_drop_geometry st_as_text st_geometry st_crs st_join st_transform
+#' @importFrom sf st_as_sf st_drop_geometry st_as_text st_geometry
+#'   st_crs st_join st_transform
 #' @export
 calc_summarize_by <- function(
   covar,
@@ -1027,7 +1028,12 @@ calc_summarize_by <- function(
     ) {
       covar_sf <- sf::st_transform(covar_sf, sf::st_crs(by_sf))
     }
-    joined <- sf::st_join(covar_sf, by_only, left = FALSE, join = sf::st_intersects)
+    joined <- sf::st_join(
+      covar_sf,
+      by_only,
+      left = FALSE,
+      join = sf::st_intersects
+    )
     covar2 <- sf::st_drop_geometry(joined)
     group_cols <- c(by_id, group_cols_extra)
     by_time_out <- append_by_time(covar2, group_cols)

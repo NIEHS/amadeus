@@ -16,6 +16,8 @@ calculate_modis(
   fun_summary = "mean",
   fun_temporal = NULL,
   time_bucket = "day",
+  .by = NULL,
+  .by_time = NULL,
   package_list_add = NULL,
   export_list_add = NULL,
   max_cells = 3e+07,
@@ -65,6 +67,13 @@ preserving existing behavior.}
 when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
 (default), \code{"week"}, \code{"month"}, or \code{"year"}.
 Ignored when \code{fun_temporal} is \code{NULL}.}
+
+\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
+Optional post-extraction summarization target. Supports time-unit,
+grouping-column, and spatial-object semantics.}
+
+\item{.by_time}{NULL or character(1). Optional time grouping key used
+with \code{.by} for space-time summaries.}
 
 \item{package_list_add}{character. A vector with package names to load
 these in each thread. Note that \code{sf}, \code{terra}, \code{exactextractr},

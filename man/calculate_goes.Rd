@@ -12,6 +12,8 @@ calculate_goes(
   fun = "mean",
   fun_temporal = NULL,
   time_bucket = "day",
+  .by = NULL,
+  .by_time = NULL,
   geom = FALSE,
   ...
 )
@@ -38,6 +40,12 @@ returns all time steps unchanged.}
 \item{time_bucket}{character(1). Temporal grouping unit used when
 \code{fun_temporal} is not \code{NULL}: \code{"day"} (default),
 \code{"week"}, \code{"month"}, or \code{"year"}.}
+
+\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
+Optional post-extraction summarization target.}
+
+\item{.by_time}{NULL or character(1). Optional time grouping key used
+with \code{.by} for space-time summaries.}
 
 \item{geom}{\code{FALSE}/\code{"sf"}/\code{"terra"}. Return geometry with
 results. Default \code{FALSE}. The CRS is inherited from \code{from}.}

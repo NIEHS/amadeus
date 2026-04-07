@@ -13,6 +13,8 @@ calculate_covariates(
   from,
   locs,
   locs_id = "site_id",
+  .by = NULL,
+  .by_time = NULL,
   ...
 )
 }
@@ -26,6 +28,28 @@ a unique identifier field named \code{locs_id}}
 
 \item{locs_id}{character(1). Name of unique identifier.
 Default is \code{"site_id"}.}
+
+\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
+Optional summarization specification applied after extraction.
+Accepted forms:
+\itemize{
+\item \code{NULL} (default) — no extra summarization; each extracted
+row is returned as-is (backward-compatible).
+\item Time-unit string — temporal bucketing to a coarser resolution.
+Recognised tokens (singular and plural): \code{"minute"},
+\code{"hour"}, \code{"day"}, \code{"week"}, \code{"month"},
+\code{"quarter"}, \code{"year"}.
+\item Column-name string — group-by summarization over a named column
+in the extracted \code{data.frame}.
+\item \code{sf} or \code{SpatVector} — spatial-overlay grouping.
+}
+\strong{Note:} full wiring of \code{.by} across all covariate routes
+is in progress; currently the argument is validated and reserved for
+future use.}
+
+\item{.by_time}{NULL or character(1). Name of the time column to use
+when \code{.by} is a time-unit string.  \code{NULL} (default) defers
+to the child function's default (typically \code{"time"}).}
 
 \item{...}{Arguments passed to each covariate calculation
 function.}

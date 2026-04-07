@@ -126,8 +126,8 @@ calculate_covariates <-
     .by_time = NULL,
     ...
   ) {
-    check_by(.by, .by_time)
-    check_by_time(.by_time)
+    amadeus::check_by(.by, .by_time)
+    amadeus::check_by_time(.by_time)
     covariate <- tolower(covariate)
     covariate <- match.arg(covariate)
     if (startsWith(covariate, "ko")) {
@@ -1243,7 +1243,7 @@ process_modis_swath, or process_blackmarble."
       )
     } else {
       fun_by <- if (is.null(fun_temporal)) "mean" else fun_temporal
-      calc_results <- calc_summarize_by(
+      calc_results <- amadeus::calc_summarize_by(
         covar = calc_results,
         .by = .by,
         .by_time = .by_time,
@@ -1915,7 +1915,7 @@ calculate_hms <- function(
   if (is.null(.by)) {
     amadeus::check_fun_temporal(fun_temporal)
   } else {
-    check_by(.by, .by_time)
+    amadeus::check_by(.by, .by_time)
   }
   #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all densities, locs and dates
@@ -1953,7 +1953,7 @@ calculate_hms <- function(
       did_summarize <- !is.null(fun_temporal)
     } else {
       fun_by <- if (is.null(fun_temporal)) "mean" else fun_temporal
-      skip_merge <- calc_summarize_by(
+      skip_merge <- amadeus::calc_summarize_by(
         covar = skip_merge,
         .by = .by,
         .by_time = .by_time,
@@ -2115,7 +2115,7 @@ calculate_hms <- function(
     did_summarize <- !is.null(fun_temporal)
   } else {
     fun_by <- if (is.null(fun_temporal)) "mean" else fun_temporal
-    sites_extracted <- calc_summarize_by(
+    sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
       .by = .by,
       .by_time = .by_time,
@@ -2454,7 +2454,7 @@ calculate_geos <- function(
   if (is.null(.by)) {
     amadeus::check_fun_temporal(fun_temporal)
   } else {
-    check_by(.by, .by_time)
+    amadeus::check_by(.by, .by_time)
   }
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
@@ -2492,7 +2492,7 @@ calculate_geos <- function(
     did_summarize <- !is.null(fun_temporal)
   } else {
     fun_by <- if (is.null(fun_temporal)) "mean" else fun_temporal
-    sites_extracted <- calc_summarize_by(
+    sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
       .by = .by,
       .by_time = .by_time,
@@ -2819,7 +2819,7 @@ calculate_merra2 <- function(
   if (is.null(.by)) {
     amadeus::check_fun_temporal(fun_temporal)
   } else {
-    check_by(.by, .by_time)
+    amadeus::check_by(.by, .by_time)
   }
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
@@ -2873,7 +2873,7 @@ calculate_merra2 <- function(
     did_summarize <- !is.null(fun_temporal)
   } else {
     fun_by <- if (is.null(fun_temporal)) "mean" else fun_temporal
-    sites_extracted <- calc_summarize_by(
+    sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
       .by = .by,
       .by_time = .by_time,
@@ -3721,7 +3721,7 @@ calculate_goes <- function(
   if (is.null(.by)) {
     amadeus::check_fun_temporal(fun_temporal)
   } else {
-    check_by(.by, .by_time)
+    amadeus::check_by(.by, .by_time)
   }
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
@@ -3759,7 +3759,7 @@ calculate_goes <- function(
     did_summarize <- !is.null(fun_temporal)
   } else {
     fun_by <- if (is.null(fun_temporal)) "mean" else fun_temporal
-    sites_extracted <- calc_summarize_by(
+    sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
       .by = .by,
       .by_time = .by_time,
