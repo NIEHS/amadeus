@@ -556,7 +556,7 @@ testthat::test_that("calculate_goes geom='sf' returns sf", {
   testthat::expect_true("sf" %in% class(result))
 })
 
-testthat::test_that("calculate_goes fun_temporal aggregates rows", {
+testthat::test_that("calculate_goes .by aggregates rows", {
   withr::local_package("terra")
   goes_dir <- testthat::test_path("..", "testdata", "goes")
   # 3 files: 2 on 2018-01-01 and 1 on 2018-01-02
@@ -578,8 +578,7 @@ testthat::test_that("calculate_goes fun_temporal aggregates rows", {
       locs = ncp,
       locs_id = "site_id",
       radius = 0,
-      fun_temporal = "mean",
-      time_bucket = "day",
+      .by = "day",
       geom = FALSE
     )
   )
@@ -589,7 +588,7 @@ testthat::test_that("calculate_goes fun_temporal aggregates rows", {
   testthat::expect_s3_class(result_daily$time, "POSIXct")
 })
 
-testthat::test_that("calculate_goes fun_temporal=NULL backward compatible", {
+testthat::test_that("calculate_goes default .by NULL backward compatible", {
   withr::local_package("terra")
   goes_dir <- testthat::test_path("..", "testdata", "goes")
   goes_r <- suppressMessages(
@@ -610,7 +609,6 @@ testthat::test_that("calculate_goes fun_temporal=NULL backward compatible", {
       locs = ncp,
       locs_id = "site_id",
       radius = 0,
-      fun_temporal = NULL,
       geom = FALSE
     )
   )
@@ -619,7 +617,7 @@ testthat::test_that("calculate_goes fun_temporal=NULL backward compatible", {
   testthat::expect_gte(nrow(result), 2L)
 })
 
-testthat::test_that("calculate_goes invalid fun_temporal errors", {
+testthat::test_that("calculate_goes invalid .by errors", {
   withr::local_package("terra")
   goes_dir <- testthat::test_path("..", "testdata", "goes")
   goes_r <- suppressMessages(
@@ -635,9 +633,9 @@ testthat::test_that("calculate_goes invalid fun_temporal errors", {
       from = goes_r,
       locs = ncp,
       locs_id = "site_id",
-      fun_temporal = "variance"
+      .by = "variance"
     ),
-    regexp = "fun_temporal"
+    regexp = "not found in `data`"
   )
 })
 

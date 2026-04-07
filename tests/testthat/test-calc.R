@@ -46,9 +46,7 @@ testthat::test_that("calculate_covariates (expected errors)", {
       "cdl",
       "goes",
       "goes_adp",
-      "GOES",
-      "improve",
-      "IMPROVE"
+      "GOES"
     )
   for (cand in candidates) {
     testthat::expect_error(

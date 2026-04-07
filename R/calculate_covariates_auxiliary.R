@@ -890,7 +890,16 @@ bucket_time_by_unit <- function(time_vals, unit) {
     breaks <- if (unit_norm == "minute") "min" else "hour"
     return(as.POSIXct(cut(as.POSIXct(time_vals, tz = "UTC"), breaks = breaks)))
   }
-  time_date <- as.Date(time_vals)
+  time_vals_chr <- as.character(time_vals)
+  if (all(grepl("^[0-9]{8}$", time_vals_chr))) {
+    time_date <- as.Date(time_vals_chr, format = "%Y%m%d")
+  } else if (all(grepl("^[0-9]{6}$", time_vals_chr))) {
+    time_date <- as.Date(paste0(time_vals_chr, "01"), format = "%Y%m%d")
+  } else if (all(grepl("^[0-9]{4}$", time_vals_chr))) {
+    time_date <- as.Date(paste0(time_vals_chr, "-01-01"))
+  } else {
+    time_date <- as.Date(time_vals)
+  }
   switch(
     unit_norm,
     day = time_date,

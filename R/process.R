@@ -3932,7 +3932,7 @@ goes_parse_start_datetime <- function(path) {
 #'   \code{c(xmin, xmax, ymin, ymax)} in WGS84 / EPSG:4326. Applied only
 #'   when \code{return_format} is \code{"terra"} or \code{"sf"}.
 #' @param ... Placeholders.
-#' @seealso \code{\link{download_improve}}, \code{\link{calculate_improve}}
+#' @seealso \code{\link{download_improve}}
 #' @return a \code{SpatVector}, \code{sf}, or \code{data.table} object
 #'   depending on \code{return_format}.
 #' @note IMPROVE data are measured on an every-third-day sampling schedule.

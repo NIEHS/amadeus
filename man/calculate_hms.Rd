@@ -9,8 +9,6 @@ calculate_hms(
   locs,
   locs_id = NULL,
   radius = 0,
-  fun_temporal = NULL,
-  time_bucket = "day",
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -28,18 +26,6 @@ containing identifier for each unique coordinate location.}
 \item{radius}{integer(1). Circular buffer distance around site locations.
 (Default = 0).}
 
-\item{fun_temporal}{NULL or character(1). Temporal summary
-function applied after per-date extraction. One of
-\code{"mean"}, \code{"median"}, \code{"sum"},
-\code{"max"}, or \code{"min"}. Default (\code{NULL})
-returns per-date values without temporal aggregation,
-preserving existing behavior.}
-
-\item{time_bucket}{character(1). Temporal resolution to aggregate to
-when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
-(default), \code{"week"}, \code{"month"}, or \code{"year"}.
-Ignored when \code{fun_temporal} is \code{NULL}.}
-
 \item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
 Optional post-extraction summarization target.}
 
@@ -53,9 +39,8 @@ coordinate reference system of the \code{sf} or \code{SpatVector} is that of \co
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame or SpatVector object. When \code{fun_temporal} is
-non-\code{NULL}, rows are aggregated to the \code{time_bucket}
-resolution using \code{fun_temporal}.
+a data.frame or SpatVector object. When \code{.by} is provided,
+rows are aggregated using \code{calc_summarize_by()}.
 }
 \description{
 Extract wildfire smoke plume values at point locations. Returns a

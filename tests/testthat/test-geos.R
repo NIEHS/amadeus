@@ -469,42 +469,9 @@ testthat::test_that("calculate_geos", {
 # nolint end
 
 ################################################################################
-##### calculate_geos fun_temporal interface
+##### calculate_geos .by interface
 
-testthat::test_that("calculate_geos fun_temporal interface", {
-  testthat::expect_true(
-    "fun_temporal" %in% names(formals(calculate_geos))
-  )
-  testthat::expect_null(
-    formals(calculate_geos)[["fun_temporal"]]
-  )
-  testthat::expect_no_error(
-    amadeus::check_fun_temporal(NULL)
-  )
-  testthat::expect_no_error(
-    amadeus::check_fun_temporal("mean")
-  )
-  testthat::expect_error(
-    amadeus::check_fun_temporal("variance"),
-    regexp = "fun_temporal"
-  )
-  testthat::expect_error(
-    amadeus::check_fun_temporal(42L),
-    regexp = "fun_temporal"
-  )
-})
-
-testthat::test_that("calculate_geos time_bucket in formals", {
-  testthat::expect_true(
-    "time_bucket" %in% names(formals(calculate_geos))
-  )
-  testthat::expect_equal(
-    formals(calculate_geos)[["time_bucket"]],
-    "day"
-  )
-})
-
-testthat::test_that("calculate_geos fun_temporal wiring aggregates rows", {
+testthat::test_that("calculate_geos .by wiring aggregates rows", {
   withr::local_package("terra")
   from_rast <- terra::rast(nrows = 2, ncols = 2, vals = 5)
   terra::ext(from_rast) <- c(-80, -78, 34, 36)
@@ -534,7 +501,6 @@ testthat::test_that("calculate_geos fun_temporal wiring aggregates rows", {
       locs = locs_df,
       locs_id = "site_id",
       radius = 0,
-      fun_temporal = NULL,
       geom = FALSE
     )
   )
@@ -545,7 +511,7 @@ testthat::test_that("calculate_geos fun_temporal wiring aggregates rows", {
       locs = locs_df,
       locs_id = "site_id",
       radius = 0,
-      fun_temporal = "mean",
+      .by = "day",
       geom = FALSE
     )
   )
@@ -582,7 +548,7 @@ testthat::test_that("download_geos mock download hash=FALSE", {
 ################################################################################
 ##### calculate_geos backward compatibility
 
-testthat::test_that("calculate_geos fun_temporal NULL default is backward-compat", {
+testthat::test_that("calculate_geos default .by NULL is backward-compatible", {
   withr::local_package("terra")
   from_rast <- terra::rast(nrows = 2, ncols = 2, vals = 5)
   terra::ext(from_rast) <- c(-80, -78, 34, 36)
@@ -606,7 +572,7 @@ testthat::test_that("calculate_geos fun_temporal NULL default is backward-compat
     calc_worker = function(...) fake_extracted,
     .package = "amadeus"
   )
-  # Default (fun_temporal = NULL) must return all rows unchanged
+  # Default (.by = NULL) returns all rows unchanged
   result_default <- suppressMessages(
     calculate_geos(
       from = from_rast,

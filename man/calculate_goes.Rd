@@ -10,8 +10,6 @@ calculate_goes(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
-  fun_temporal = NULL,
-  time_bucket = "day",
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -31,15 +29,6 @@ site (default 0 = point extraction).}
 
 \item{fun}{character(1). Summary function for buffered extractions
 (default \code{"mean"}).}
-
-\item{fun_temporal}{character(1) or \code{NULL}. Temporal aggregation
-function applied after spatial extraction: \code{"mean"},
-\code{"max"}, \code{"min"}, or \code{"sum"}. \code{NULL} (default)
-returns all time steps unchanged.}
-
-\item{time_bucket}{character(1). Temporal grouping unit used when
-\code{fun_temporal} is not \code{NULL}: \code{"day"} (default),
-\code{"week"}, \code{"month"}, or \code{"year"}.}
 
 \item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
 Optional post-extraction summarization target.}

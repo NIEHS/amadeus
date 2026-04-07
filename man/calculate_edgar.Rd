@@ -4,7 +4,16 @@
 \alias{calculate_edgar}
 \title{Calculate EDGAR covariates}
 \usage{
-calculate_edgar(from, locs, locs_id = "site_id", radius = 0, geom = FALSE, ...)
+calculate_edgar(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  .by = NULL,
+  .by_time = NULL,
+  geom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{from}{SpatRaster(1). Output from \code{process_edgar()}.}
@@ -16,6 +25,12 @@ identifier for each unique coordinate location.}
 
 \item{radius}{numeric(1). Circular buffer distance around site locations.
 Default is \code{0}.}
+
+\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
+Optional post-extraction summarization target.}
+
+\item{.by_time}{NULL or character(1). Optional time grouping key used
+with \code{.by} for space-time summaries.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

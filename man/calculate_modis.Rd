@@ -14,8 +14,6 @@ calculate_modis(
   name_covariates = NULL,
   subdataset = NULL,
   fun_summary = "mean",
-  fun_temporal = NULL,
-  time_bucket = "day",
   .by = NULL,
   .by_time = NULL,
   package_list_add = NULL,
@@ -55,18 +53,6 @@ Find detail usage of the argument in notes.}
 
 \item{fun_summary}{character or function. Function to summarize
 extracted raster values.}
-
-\item{fun_temporal}{NULL or character(1). Temporal summary
-function applied after per-date covariate extraction. One
-of \code{"mean"}, \code{"median"}, \code{"sum"},
-\code{"max"}, or \code{"min"}. Default (\code{NULL})
-returns per-date values without temporal aggregation,
-preserving existing behavior.}
-
-\item{time_bucket}{character(1). Temporal resolution to aggregate to
-when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
-(default), \code{"week"}, \code{"month"}, or \code{"year"}.
-Ignored when \code{fun_temporal} is \code{NULL}.}
 
 \item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
 Optional post-extraction summarization target. Supports time-unit,
@@ -113,9 +99,8 @@ A data.frame or SpatVector with an attribute:
 \itemize{
 \item \code{attr(., "dates_dropped")}: Dates with insufficient tiles.
 Note that the dates mean the dates with insufficient tiles,
-not the dates without available tiles.
-When \code{fun_temporal} is non-\code{NULL}, rows are aggregated to
-the \code{time_bucket} resolution using \code{fun_temporal}.
+not the dates without available tiles. When \code{.by} is provided,
+rows are summarized with \code{calc_summarize_by()} semantics.
 }
 }
 \description{

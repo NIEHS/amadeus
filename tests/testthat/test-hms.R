@@ -566,35 +566,9 @@ testthat::test_that("Character input in calculate_hms returns 1-row df", {
 })
 
 ################################################################################
-##### calculate_hms fun_temporal and time_bucket wiring
+##### calculate_hms .by wiring
 
-testthat::test_that("calculate_hms time_bucket in formals", {
-  testthat::expect_true(
-    "time_bucket" %in% names(formals(calculate_hms))
-  )
-  testthat::expect_equal(
-    formals(calculate_hms)[["time_bucket"]],
-    "day"
-  )
-})
-
-testthat::test_that("calculate_hms fun_temporal interface", {
-  testthat::expect_true(
-    "fun_temporal" %in% names(formals(calculate_hms))
-  )
-  testthat::expect_null(
-    formals(calculate_hms)[["fun_temporal"]]
-  )
-  for (fn in c("mean", "median", "sum", "max", "min")) {
-    testthat::expect_no_error(amadeus::check_fun_temporal(fn))
-  }
-  testthat::expect_error(
-    amadeus::check_fun_temporal("variance"),
-    regexp = "fun_temporal"
-  )
-})
-
-testthat::test_that("calculate_hms fun_temporal aggregates daily rows to weekly", {
+testthat::test_that("calculate_hms .by aggregates daily rows to weekly", {
   withr::local_package("terra")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
@@ -602,15 +576,14 @@ testthat::test_that("calculate_hms fun_temporal aggregates daily rows to weekly"
     date = c("2022-06-10", "2022-06-11"),
     path = testthat::test_path("..", "testdata", "hms")
   )
-  # 2 dates in same week → fun_temporal + time_bucket = "week" → 1 row
+  # 2 dates in same week → .by = "week" → 1 row
   hms_weekly <- suppressMessages(
     calculate_hms(
       from = hms,
       locs = ncp,
       locs_id = "site_id",
       radius = 0,
-      fun_temporal = "max",
-      time_bucket = "week",
+      .by = "week",
       geom = FALSE
     )
   )
@@ -619,7 +592,7 @@ testthat::test_that("calculate_hms fun_temporal aggregates daily rows to weekly"
   testthat::expect_s3_class(hms_weekly$time, "POSIXct")
 })
 
-testthat::test_that("calculate_hms fun_temporal NULL is backward-compat", {
+testthat::test_that("calculate_hms default .by NULL is backward-compat", {
   withr::local_package("terra")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
@@ -633,7 +606,6 @@ testthat::test_that("calculate_hms fun_temporal NULL is backward-compat", {
       locs = ncp,
       locs_id = "site_id",
       radius = 0,
-      fun_temporal = NULL,
       geom = FALSE
     )
   )
@@ -641,19 +613,18 @@ testthat::test_that("calculate_hms fun_temporal NULL is backward-compat", {
   testthat::expect_equal(nrow(hms_df), 2L)
 })
 
-testthat::test_that("calculate_hms character skip path respects fun_temporal", {
+testthat::test_that("calculate_hms character skip path supports .by summarization", {
   withr::local_package("terra")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
-  # supply two dates in same week (Monday + Tuesday); sum → 1 row
+  # supply two dates in same week (Monday + Tuesday) -> .by week -> 1 row
   hms_skip <- suppressMessages(
     calculate_hms(
       from = c("2018-06-11", "2018-06-12"),
       locs = ncp,
       locs_id = "site_id",
       radius = 0,
-      fun_temporal = "sum",
-      time_bucket = "week",
+      .by = "week",
       geom = FALSE
     )
   )
@@ -662,19 +633,18 @@ testthat::test_that("calculate_hms character skip path respects fun_temporal", {
   testthat::expect_s3_class(hms_skip$time, "POSIXct")
 })
 
-testthat::test_that("calculate_hms character single-date fun_temporal non-NULL is no-op", {
+testthat::test_that("calculate_hms character single-date .by is no-op", {
   withr::local_package("terra")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
-  # Single absent date; any fun_temporal on a 1-row table should still return 1 row
+  # Single absent date; `.by` on a 1-row table should still return 1 row
   hms_skip <- suppressMessages(
     calculate_hms(
       from = "2018-12-31",
       locs = ncp,
       locs_id = "site_id",
       radius = 0,
-      fun_temporal = "mean",
-      time_bucket = "day",
+      .by = "day",
       geom = FALSE
     )
   )

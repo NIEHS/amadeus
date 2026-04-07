@@ -1280,36 +1280,14 @@ testthat::test_that("calculate_modis uses single-source fusion days", {
 })
 
 ################################################################################
-##### calculate_modis fun_temporal wiring
+##### calculate_modis .by wiring
 
-testthat::test_that("calculate_modis time_bucket in formals", {
-  testthat::expect_true(
-    "time_bucket" %in% names(formals(calculate_modis))
-  )
-  testthat::expect_equal(
-    formals(calculate_modis)[["time_bucket"]],
-    "day"
-  )
+testthat::test_that("calculate_modis no longer exposes legacy temporal args", {
+  testthat::expect_false("fun_temporal" %in% names(formals(calculate_modis)))
+  testthat::expect_false("time_bucket" %in% names(formals(calculate_modis)))
 })
 
-testthat::test_that("calculate_modis fun_temporal interface", {
-  testthat::expect_true(
-    "fun_temporal" %in% names(formals(calculate_modis))
-  )
-  testthat::expect_null(
-    formals(calculate_modis)[["fun_temporal"]]
-  )
-  testthat::expect_no_error(amadeus::check_fun_temporal(NULL))
-  for (fn in c("mean", "median", "sum", "max", "min")) {
-    testthat::expect_no_error(amadeus::check_fun_temporal(fn))
-  }
-  testthat::expect_error(
-    amadeus::check_fun_temporal("sd"),
-    regexp = "fun_temporal"
-  )
-})
-
-testthat::test_that("calculate_modis fun_temporal wiring aggregates multi-day rows", {
+testthat::test_that("calculate_modis .by wiring aggregates multi-day rows", {
   locs <- sf::st_as_sf(
     data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
     coords = c("lon", "lat"),
@@ -1350,8 +1328,7 @@ testthat::test_that("calculate_modis fun_temporal wiring aggregates multi-day ro
       preprocess = mock_preprocess,
       name_covariates = "cov_",
       subdataset = "mock",
-      scale = "* 1",
-      fun_temporal = NULL
+      scale = "* 1"
     )
   )
   testthat::expect_equal(nrow(result_null), 2L)
@@ -1367,8 +1344,7 @@ testthat::test_that("calculate_modis fun_temporal wiring aggregates multi-day ro
       name_covariates = "cov_",
       subdataset = "mock",
       scale = "* 1",
-      fun_temporal = "mean",
-      time_bucket = "week"
+      .by = "week"
     )
   )
   testthat::expect_equal(nrow(result_mean), 1L)

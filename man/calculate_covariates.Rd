@@ -9,8 +9,8 @@ calculate_covariates(
     "dummies", "gmted", "sedac_groads", "groads", "roads", "ecoregions", "ecoregion",
     "hms", "smoke", "gmted", "narr", "geos", "sedac_population", "population", "nlcd",
     "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "mcd14dl", "prism",
-    "cropscape", "cdl", "huc", "edgar", "improve", "IMPROVE", "goes", "goes_adp", "GOES",
-    "drought", "spei", "eddi", "usdm"),
+    "cropscape", "cdl", "huc", "edgar", "goes", "goes_adp", "GOES", "drought", "spei",
+    "eddi", "usdm"),
   from,
   locs,
   locs_id = "site_id",
@@ -95,7 +95,6 @@ calculate_covariates(
 \item \code{\link{calculate_narr}}: "narr", "NARR"
 \item \code{\link{calculate_geos}}: "geos", "geos_cf", "GEOS"
 \item \code{\link{calculate_goes}}: "goes", "goes_adp", "GOES"
-\item \code{\link{calculate_improve}}: "improve", "IMPROVE"
 \item \code{\link{calculate_population}}: "population", "sedac_population"
 \item \code{\link{calculate_groads}}: "roads", "groads", "sedac_groads"
 \item \code{\link{calculate_nlcd}}: "nlcd", "NLCD"

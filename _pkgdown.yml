@@ -14,6 +14,8 @@ navbar:
         - text: General Articles
         - text: download_data Function
           href: articles/download_functions.html
+        - text: Time grouping in calculate_* functions
+          href: articles/calculate_time_grouping.html
         - text: Protected Data Sources
           href: articles/protected_datasets.html
         - text: Downloading EPA Daily Data
@@ -81,10 +83,9 @@ reference:
   desc: Functions which convert to, from, and between spatio-temporal data types
 - contents:
   - has_keyword("spacetime")
-- subtitle: Auxiliary
-  desc: Functions which support the download, process, and covariate calculation functions
+- subtitle: Utilities
+  desc: Utility helpers intended for direct user workflows
 - contents:
-  - has_keyword("auxiliary")
   - setup_nasa_token
 
 articles:
@@ -92,6 +93,7 @@ articles:
   navbar: ~
   contents:
   - download_functions
+  - calculate_time_grouping
   - protected_datasets
   - epa_download
   - aqs_workflow

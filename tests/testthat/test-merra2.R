@@ -1169,47 +1169,9 @@ testthat::test_that("download_merra2 download=FALSE returns url list", {
 })
 
 ################################################################################
-##### calculate_merra2 fun_temporal interface
+##### calculate_merra2 .by wiring
 
-testthat::test_that("calculate_merra2 fun_temporal interface", {
-  testthat::expect_true(
-    "fun_temporal" %in% names(formals(calculate_merra2))
-  )
-  testthat::expect_null(
-    formals(calculate_merra2)[["fun_temporal"]]
-  )
-  testthat::expect_no_error(
-    amadeus::check_fun_temporal(NULL)
-  )
-  for (fn in c("mean", "median", "sum", "max", "min")) {
-    testthat::expect_no_error(
-      amadeus::check_fun_temporal(fn)
-    )
-  }
-  testthat::expect_error(
-    amadeus::check_fun_temporal("sd"),
-    regexp = "fun_temporal"
-  )
-  testthat::expect_error(
-    amadeus::check_fun_temporal(1L),
-    regexp = "fun_temporal"
-  )
-})
-
-################################################################################
-##### calculate_merra2 time_bucket and fun_temporal wiring
-
-testthat::test_that("calculate_merra2 time_bucket in formals", {
-  testthat::expect_true(
-    "time_bucket" %in% names(formals(calculate_merra2))
-  )
-  testthat::expect_equal(
-    formals(calculate_merra2)[["time_bucket"]],
-    "day"
-  )
-})
-
-testthat::test_that("calculate_merra2 fun_temporal wiring aggregates rows", {
+testthat::test_that("calculate_merra2 .by wiring aggregates rows", {
   withr::local_package("terra")
   from_rast <- terra::rast(nrows = 2, ncols = 2, vals = 5)
   terra::ext(from_rast) <- c(-80, -78, 34, 36)
@@ -1238,7 +1200,6 @@ testthat::test_that("calculate_merra2 fun_temporal wiring aggregates rows", {
       locs = locs_df,
       locs_id = "site_id",
       radius = 0,
-      fun_temporal = NULL,
       geom = FALSE
     )
   )
@@ -1249,7 +1210,7 @@ testthat::test_that("calculate_merra2 fun_temporal wiring aggregates rows", {
       locs = locs_df,
       locs_id = "site_id",
       radius = 0,
-      fun_temporal = "mean",
+      .by = "day",
       geom = FALSE
     )
   )
@@ -1259,12 +1220,12 @@ testthat::test_that("calculate_merra2 fun_temporal wiring aggregates rows", {
 })
 
 ################################################################################
-##### calculate_merra2 level-aware temporal grouping
+##### calculate_merra2 level-aware .by grouping
 
-testthat::test_that("calculate_merra2 fun_temporal level-aware grouping", {
+testthat::test_that("calculate_merra2 .by level-aware grouping", {
   withr::local_package("terra")
   # "lev" in the layer name triggers merra2_level = 2 in calculate_merra2,
-  # which propagates group_cols_extra = "level" to calc_summarize_temporal.
+  # which propagates group_cols_extra = "level" to calc_summarize_by.
   from_rast <- terra::rast(nrows = 2, ncols = 2, vals = 5)
   terra::ext(from_rast) <- c(-80, -78, 34, 36)
   terra::crs(from_rast) <- "EPSG:4326"
@@ -1294,7 +1255,7 @@ testthat::test_that("calculate_merra2 fun_temporal level-aware grouping", {
       locs = locs_df,
       locs_id = "site_id",
       radius = 0,
-      fun_temporal = "mean",
+      .by = "day",
       geom = FALSE
     )
   )

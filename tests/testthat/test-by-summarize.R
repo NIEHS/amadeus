@@ -134,8 +134,7 @@ testthat::test_that("calculate_covariates wrapper handles .by modes", {
     locs = locs,
     locs_id = "site_id",
     radius = 0,
-    .by = "site_id",
-    fun_temporal = "mean"
+    .by = "site_id"
   )
   testthat::expect_equal(nrow(res_id), 2L)
 
@@ -145,8 +144,7 @@ testthat::test_that("calculate_covariates wrapper handles .by modes", {
     locs = locs,
     locs_id = "site_id",
     radius = 0,
-    .by = "day",
-    fun_temporal = "sum"
+    .by = "day"
   )
   testthat::expect_equal(nrow(res_temporal), 4L)
 
@@ -157,8 +155,7 @@ testthat::test_that("calculate_covariates wrapper handles .by modes", {
     locs_id = "site_id",
     radius = 0,
     .by = "site_id",
-    .by_time = "day",
-    fun_temporal = "sum"
+    .by_time = "day"
   )
   testthat::expect_equal(nrow(res_id_time), 4L)
 
@@ -169,8 +166,7 @@ testthat::test_that("calculate_covariates wrapper handles .by modes", {
     locs_id = "site_id",
     radius = 0,
     geom = "sf",
-    .by = regions_sf,
-    fun_temporal = "mean"
+    .by = regions_sf
   )
   testthat::expect_true("region_id" %in% names(res_sf))
   testthat::expect_equal(nrow(res_sf), 2L)
@@ -183,8 +179,7 @@ testthat::test_that("calculate_covariates wrapper handles .by modes", {
     radius = 0,
     geom = "sf",
     .by = regions_terra,
-    .by_time = "day",
-    fun_temporal = "sum"
+    .by_time = "day"
   )
   testthat::expect_true("region_id" %in% names(res_terra))
   testthat::expect_equal(nrow(res_terra), 4L)
@@ -241,8 +236,7 @@ testthat::test_that("dataset-specific .by tests for GOES GEOS MERRA2", {
       locs = locs,
       locs_id = "site_id",
       radius = 0,
-      .by = "day",
-      fun_temporal = "sum"
+      .by = "day"
     )
     testthat::expect_equal(length(unique(res_time$time)), 2L)
 
@@ -251,8 +245,7 @@ testthat::test_that("dataset-specific .by tests for GOES GEOS MERRA2", {
       locs = locs,
       locs_id = "site_id",
       radius = 0,
-      .by = "site_id",
-      fun_temporal = "mean"
+      .by = "site_id"
     )
     testthat::expect_equal(nrow(res_id), 2L)
 
@@ -263,8 +256,7 @@ testthat::test_that("dataset-specific .by tests for GOES GEOS MERRA2", {
       radius = 0,
       geom = "sf",
       .by = regions_sf,
-      .by_time = "day",
-      fun_temporal = "sum"
+      .by_time = "day"
     )
     testthat::expect_true("region_id" %in% names(res_sf))
     testthat::expect_equal(nrow(res_sf), 4L)
@@ -275,8 +267,7 @@ testthat::test_that("dataset-specific .by tests for GOES GEOS MERRA2", {
       locs_id = "site_id",
       radius = 0,
       geom = "sf",
-      .by = regions_terra,
-      fun_temporal = "mean"
+      .by = regions_terra
     )
     testthat::expect_true("region_id" %in% names(res_terra))
     testthat::expect_equal(nrow(res_terra), 2L)
@@ -311,8 +302,7 @@ testthat::test_that("calculate_hms supports .by combinations and defaults", {
     locs = locs,
     locs_id = "site_id",
     radius = 0,
-    .by = "day",
-    fun_temporal = "sum"
+    .by = "day"
   )
   testthat::expect_true("time" %in% names(res_time))
 
@@ -322,8 +312,7 @@ testthat::test_that("calculate_hms supports .by combinations and defaults", {
     locs_id = "site_id",
     radius = 0,
     .by = "site_id",
-    .by_time = "day",
-    fun_temporal = "sum"
+    .by_time = "day"
   )
   testthat::expect_equal(nrow(res_id_time), 4L)
 
@@ -333,8 +322,7 @@ testthat::test_that("calculate_hms supports .by combinations and defaults", {
     locs = data.frame(site_id = c("s1", "s2"), lon = c(0.1, 1.1), lat = c(0.2, 0.2)),
     locs_id = "site_id",
     radius = 0,
-    .by = "day",
-    fun_temporal = "sum"
+    .by = "day"
   )
   testthat::expect_true(is.data.frame(res_no_smoke))
 })
@@ -367,7 +355,6 @@ testthat::test_that("calculate_modis supports .by options and errors", {
     name_covariates = "cloud_fraction_",
     subdataset = "Cloud_Fraction",
     fun_summary = "mean",
-    fun_temporal = "mean",
     .by = "day",
     geom = FALSE,
     scale = "* 1"
@@ -385,12 +372,11 @@ testthat::test_that("calculate_modis supports .by options and errors", {
       name_covariates = "cloud_fraction_",
       subdataset = "Cloud_Fraction",
       fun_summary = "mean",
-      fun_temporal = "not_a_function",
-      .by = "day",
+      .by = "not_a_function",
       geom = FALSE,
       scale = "* 1"
     ),
-    regexp = "must be one of"
+    regexp = "not found in `data`"
   )
 })
 
@@ -552,8 +538,7 @@ testthat::test_that("backend compatibility: targets tar_script", {
               locs = locs_obj,
               locs_id = "site_id",
               radius = 0,
-              .by = "day",
-              fun_temporal = "sum"
+              .by = "day"
             )
           },
           format = "rds"

@@ -10,6 +10,8 @@ calculate_terraclimate(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  .by = NULL,
+  .by_time = NULL,
   geom = FALSE,
   ...
 )
