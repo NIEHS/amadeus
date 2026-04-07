@@ -37,7 +37,7 @@ pak::pak("NIEHS/amadeus")
 | [Köppen-Geiger Climate Classification](https://www.nature.com/articles/sdata2018214) | GeoTIFF | Climate Classification | Global | `_koppen_geiger` |
 | [MRLC[^1] Consortium National Land Cover Database (NLCD)](https://www.mrlc.gov/data) | GeoTIFF | Land Use | United States | `_nlcd` |
 | [NASA[^2] Moderate Resolution Imaging Spectroradiometer (MODIS)](https://modis.gsfc.nasa.gov/data/) | HDF | Atmosphere<br>Meteorology<br>Land Use<br>Satellite | Global | `_modis` |
-| [NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://www.nature.com/articles/sdata2018214) | netCDF | Atmosphere<br>Meteorology | Global | `_merra2` |
+| [NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/) | netCDF | Atmosphere<br>Meteorology | Global | `_merra2` |
 | [NASA SEDAC[^3] UN WPP-Adjusted Population Density](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11) | GeoTIFF<br>netCDF | Population | Global | `_population` |
 | [NASA SEDAC Global Roads Open Access Data Set](https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1) | Shapefile<br>Geodatabase | Roadways | Global | `_groads` |
 | [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere<br>Meteorology | Global | `_geos` |
