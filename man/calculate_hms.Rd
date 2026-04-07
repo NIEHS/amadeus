@@ -26,6 +26,12 @@ containing identifier for each unique coordinate location.}
 \item{radius}{integer(1). Circular buffer distance around site locations.
 (Default = 0).}
 
+\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
+Optional grouping key(s) for aggregating extracted values.}
+
+\item{.by_time}{NULL or character(1). Optional time grouping key used
+when \code{.by} is provided.}
+
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
