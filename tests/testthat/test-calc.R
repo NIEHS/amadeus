@@ -685,3 +685,114 @@ testthat::test_that("check_fun_temporal errors on unknown function name", {
     regexp = "must be one of"
   )
 })
+
+##### .by helpers
+
+testthat::test_that("classify_by recognizes supported .by types", {
+  testthat::expect_equal(classify_by(NULL), "null")
+  testthat::expect_equal(classify_by("day"), "time_unit")
+  testthat::expect_equal(classify_by("region_id"), "col_name")
+
+  by_sf <- sf::st_as_sf(
+    data.frame(id = "a", wkt = "POINT (0 0)"),
+    wkt = "wkt",
+    crs = 4326
+  )
+  testthat::expect_equal(classify_by(by_sf), "spatial_obj")
+})
+
+testthat::test_that("check_by_time validates expected values", {
+  testthat::expect_null(check_by_time(NULL))
+  testthat::expect_null(check_by_time("time"))
+  testthat::expect_error(check_by_time(1), regexp = "single character")
+})
+
+##### calc_summarize_by
+
+testthat::test_that("calc_summarize_by returns input when .by is NULL", {
+  df <- data.frame(
+    site_id = c("A", "A"),
+    time = as.POSIXct(c("2020-01-01 00:00", "2020-01-01 12:00"), tz = "UTC"),
+    value = c(1, 3)
+  )
+  testthat::expect_identical(calc_summarize_by(df, .by = NULL), df)
+})
+
+testthat::test_that("calc_summarize_by supports temporal .by units", {
+  df <- data.frame(
+    site_id = c("A", "A"),
+    time = as.POSIXct(c("2020-01-01 00:00", "2020-01-01 12:00"), tz = "UTC"),
+    value = c(1, 3)
+  )
+  out <- calc_summarize_by(
+    covar = df,
+    .by = "day",
+    fun_summary = "mean",
+    locs_id = "site_id"
+  )
+  testthat::expect_equal(nrow(out), 1L)
+  testthat::expect_equal(out$value, 2)
+  testthat::expect_s3_class(out$time, "Date")
+})
+
+testthat::test_that("calc_summarize_by supports id and time grouping", {
+  df <- data.frame(
+    region = c("R1", "R1", "R2", "R2"),
+    time = as.POSIXct(
+      c("2020-01-01 01:00", "2020-01-01 18:00", "2020-01-01 02:00", "2020-01-01 22:00"),
+      tz = "UTC"
+    ),
+    value = c(1, 3, 5, 7)
+  )
+  out <- calc_summarize_by(
+    covar = df,
+    .by = "region",
+    .by_time = "day",
+    fun_summary = "sum"
+  )
+  testthat::expect_equal(nrow(out), 2L)
+  testthat::expect_equal(out$value[out$region == "R1"], 4)
+  testthat::expect_equal(out$value[out$region == "R2"], 12)
+})
+
+testthat::test_that("calc_summarize_by supports spatial and space-time grouping", {
+  covar <- data.frame(
+    site_id = c("s1", "s2", "s3"),
+    time = as.POSIXct(
+      c("2020-01-01 02:00", "2020-01-01 06:00", "2020-01-02 06:00"),
+      tz = "UTC"
+    ),
+    value = c(2, 5, 7),
+    geometry = c("POINT (0.5 0.5)", "POINT (1.5 0.5)", "POINT (0.5 0.5)")
+  )
+  by_sf <- sf::st_as_sf(
+    data.frame(
+      region_id = c("west", "east"),
+      wkt = c(
+        "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))",
+        "POLYGON ((1 0, 2 0, 2 1, 1 1, 1 0))"
+      )
+    ),
+    wkt = "wkt",
+    crs = 4326
+  )
+  out <- calc_summarize_by(
+    covar = covar,
+    .by = by_sf,
+    .by_time = "day",
+    fun_summary = "sum"
+  )
+  testthat::expect_true(all(c("region_id", "time", "value", "geometry") %in% names(out)))
+  testthat::expect_equal(
+    out$value[out$region_id == "west" & as.character(out$time) == "2020-01-01"],
+    2
+  )
+  testthat::expect_equal(
+    out$value[out$region_id == "west" & as.character(out$time) == "2020-01-02"],
+    7
+  )
+  testthat::expect_equal(
+    out$value[out$region_id == "east" & as.character(out$time) == "2020-01-01"],
+    5
+  )
+})

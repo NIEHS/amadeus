@@ -14,6 +14,26 @@
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
 #'  Default is `"site_id"`.
+#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
+#'   Optional summarization specification applied after extraction.
+#'   Accepted forms:
+#'   \itemize{
+#'     \item \code{NULL} (default) — no extra summarization; each extracted
+#'       row is returned as-is (backward-compatible).
+#'     \item Time-unit string — temporal bucketing to a coarser resolution.
+#'       Recognised tokens (singular and plural): \code{"minute"},
+#'       \code{"hour"}, \code{"day"}, \code{"week"}, \code{"month"},
+#'       \code{"quarter"}, \code{"year"}.
+#'     \item Column-name string — group-by summarization over a named column
+#'       in the extracted \code{data.frame}.
+#'     \item \code{sf} or \code{SpatVector} — spatial-overlay grouping.
+#'   }
+#'   \strong{Note:} full wiring of \code{.by} across all covariate routes
+#'   is in progress; currently the argument is validated and reserved for
+#'   future use.
+#' @param .by_time NULL or character(1). Name of the time column to use
+#'   when \code{.by} is a time-unit string.  \code{NULL} (default) defers
+#'   to the child function's default (typically \code{"time"}).
 #' @param ... Arguments passed to each covariate calculation
 #'  function.
 #' @note `covariate` argument value is converted to lowercase.
@@ -102,8 +122,12 @@ calculate_covariates <-
     from,
     locs,
     locs_id = "site_id",
+    .by = NULL,
+    .by_time = NULL,
     ...
   ) {
+    check_by(.by, .by_time)
+    check_by_time(.by_time)
     covariate <- tolower(covariate)
     covariate <- match.arg(covariate)
     if (startsWith(covariate, "ko")) {
@@ -149,12 +173,17 @@ calculate_covariates <-
     res_covariate <-
       tryCatch(
         {
-          what_to_run(
-            from = from,
-            locs = locs,
-            locs_id = locs_id,
-            ...
+          calc_args <- c(
+            list(from = from, locs = locs, locs_id = locs_id),
+            list(...)
           )
+          if (!is.null(.by)) {
+            calc_args$.by <- .by
+          }
+          if (!is.null(.by_time)) {
+            calc_args$.by_time <- .by_time
+          }
+          do.call(what_to_run, calc_args)
         },
         error = function(e) {
           stop(
@@ -818,6 +847,11 @@ calculate_ecoregion <-
 #'   when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
 #'   (default), \code{"week"}, \code{"month"}, or \code{"year"}.
 #'   Ignored when \code{fun_temporal} is \code{NULL}.
+#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
+#'   Optional post-extraction summarization target. Supports time-unit,
+#'   grouping-column, and spatial-object semantics.
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#'   with \code{.by} for space-time summaries.
 #' @param package_list_add character. A vector with package names to load
 #'  these in each thread. Note that `sf`, `terra`, `exactextractr`,
 #' `doParallel`, `parallelly` and `dplyr` are the default packages to be
@@ -931,6 +965,8 @@ calculate_modis <-
     fun_summary = "mean",
     fun_temporal = NULL,
     time_bucket = "day",
+    .by = NULL,
+    .by_time = NULL,
     package_list_add = NULL,
     export_list_add = NULL,
     max_cells = 3e7,
@@ -1197,13 +1233,24 @@ process_modis_swath, or process_blackmarble."
         }
       )
     calc_results <- do.call(dplyr::bind_rows, calc_results)
-    #### temporal summarization (no-op when fun_temporal is NULL)
-    calc_results <- amadeus::calc_summarize_temporal(
-      covar = calc_results,
-      fun_temporal = fun_temporal,
-      locs_id = locs_id,
-      time_bucket = time_bucket
-    )
+    if (is.null(.by)) {
+      #### temporal summarization (no-op when fun_temporal is NULL)
+      calc_results <- amadeus::calc_summarize_temporal(
+        covar = calc_results,
+        fun_temporal = fun_temporal,
+        locs_id = locs_id,
+        time_bucket = time_bucket
+      )
+    } else {
+      fun_by <- if (is.null(fun_temporal)) "mean" else fun_temporal
+      calc_results <- calc_summarize_by(
+        covar = calc_results,
+        .by = .by,
+        .by_time = .by_time,
+        fun_summary = fun_by,
+        locs_id = locs_id
+      )
+    }
     if (geom %in% c("sf", "terra")) {
       # merge
       calc_results_return <- merge(
@@ -1818,6 +1865,10 @@ calculate_nei <- function(
 #'   when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
 #'   (default), \code{"week"}, \code{"month"}, or \code{"year"}.
 #'   Ignored when \code{fun_temporal} is \code{NULL}.
+#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
+#'   Optional post-extraction summarization target.
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#'   with \code{.by} for space-time summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -1852,14 +1903,20 @@ calculate_hms <- function(
   radius = 0,
   fun_temporal = NULL,
   time_bucket = "day",
+  .by = NULL,
+  .by_time = NULL,
   geom = FALSE,
   ...
 ) {
   #### check for null parameters (fun_temporal and time_bucket are optional)
   params_check <- mget(ls())
-  params_check[c("fun_temporal", "time_bucket")] <- NULL
+  params_check[c("fun_temporal", "time_bucket", ".by", ".by_time")] <- NULL
   amadeus::check_for_null_parameters(params_check)
-  amadeus::check_fun_temporal(fun_temporal)
+  if (is.null(.by)) {
+    amadeus::check_fun_temporal(fun_temporal)
+  } else {
+    check_by(.by, .by_time)
+  }
   #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all densities, locs and dates
   if (is.character(from)) {
@@ -1886,13 +1943,26 @@ calculate_hms <- function(
         )
       )
 
-    skip_merge <- amadeus::calc_summarize_temporal(
-      covar = skip_merge,
-      fun_temporal = fun_temporal,
-      locs_id = locs_id,
-      time_bucket = time_bucket
-    )
-    if (!is.null(fun_temporal) && "time" %in% names(skip_merge)) {
+    if (is.null(.by)) {
+      skip_merge <- amadeus::calc_summarize_temporal(
+        covar = skip_merge,
+        fun_temporal = fun_temporal,
+        locs_id = locs_id,
+        time_bucket = time_bucket
+      )
+      did_summarize <- !is.null(fun_temporal)
+    } else {
+      fun_by <- if (is.null(fun_temporal)) "mean" else fun_temporal
+      skip_merge <- calc_summarize_by(
+        covar = skip_merge,
+        .by = .by,
+        .by_time = .by_time,
+        fun_summary = fun_by,
+        locs_id = locs_id
+      )
+      did_summarize <- TRUE
+    }
+    if (did_summarize && "time" %in% names(skip_merge)) {
       skip_merge$time <- as.POSIXct(skip_merge$time, tz = "UTC")
     }
     skip_return <- amadeus::calc_return_locs(
@@ -2034,13 +2104,26 @@ calculate_hms <- function(
   # Filling NAs to 0 (explicit integer)
   sites_extracted[is.na(sites_extracted)] <- 0L
 
-  #### temporal summarization (no-op when fun_temporal is NULL)
-  sites_extracted <- amadeus::calc_summarize_temporal(
-    covar = sites_extracted,
-    fun_temporal = fun_temporal,
-    locs_id = locs_id,
-    time_bucket = time_bucket
-  )
+  if (is.null(.by)) {
+    #### temporal summarization (no-op when fun_temporal is NULL)
+    sites_extracted <- amadeus::calc_summarize_temporal(
+      covar = sites_extracted,
+      fun_temporal = fun_temporal,
+      locs_id = locs_id,
+      time_bucket = time_bucket
+    )
+    did_summarize <- !is.null(fun_temporal)
+  } else {
+    fun_by <- if (is.null(fun_temporal)) "mean" else fun_temporal
+    sites_extracted <- calc_summarize_by(
+      covar = sites_extracted,
+      .by = .by,
+      .by_time = .by_time,
+      fun_summary = fun_by,
+      locs_id = locs_id
+    )
+    did_summarize <- TRUE
+  }
 
   # Messaging
   timevals <- sites_extracted[["time"]]
@@ -2054,7 +2137,9 @@ calculate_hms <- function(
   ))
 
   #### date to POSIXct
-  sites_extracted$time <- as.POSIXct(sites_extracted$time)
+  if ("time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time)
+  }
   #### order by date
   sites_extracted_ordered <- as.data.frame(
     sites_extracted[order(sites_extracted$time), ]
@@ -2318,6 +2403,10 @@ calculate_narr <- function(
 #'   when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
 #'   (default), \code{"week"}, \code{"month"}, or \code{"year"}.
 #'   Ignored when \code{fun_temporal} is \code{NULL}.
+#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
+#'   Optional post-extraction summarization target.
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#'   with \code{.by} for space-time summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2357,10 +2446,16 @@ calculate_geos <- function(
   fun = "mean",
   fun_temporal = NULL,
   time_bucket = "day",
+  .by = NULL,
+  .by_time = NULL,
   geom = FALSE,
   ...
 ) {
-  amadeus::check_fun_temporal(fun_temporal)
+  if (is.null(.by)) {
+    amadeus::check_fun_temporal(fun_temporal)
+  } else {
+    check_by(.by, .by_time)
+  }
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
     from = from,
@@ -2385,15 +2480,29 @@ calculate_geos <- function(
     level = 2,
     ...
   )
-  #### temporal summarization (no-op when fun_temporal is NULL)
-  sites_extracted <- amadeus::calc_summarize_temporal(
-    covar = sites_extracted,
-    fun_temporal = fun_temporal,
-    locs_id = locs_id,
-    time_bucket = time_bucket,
-    group_cols_extra = "level"
-  )
-  if (!is.null(fun_temporal) && "time" %in% names(sites_extracted)) {
+  if (is.null(.by)) {
+    #### temporal summarization (no-op when fun_temporal is NULL)
+    sites_extracted <- amadeus::calc_summarize_temporal(
+      covar = sites_extracted,
+      fun_temporal = fun_temporal,
+      locs_id = locs_id,
+      time_bucket = time_bucket,
+      group_cols_extra = "level"
+    )
+    did_summarize <- !is.null(fun_temporal)
+  } else {
+    fun_by <- if (is.null(fun_temporal)) "mean" else fun_temporal
+    sites_extracted <- calc_summarize_by(
+      covar = sites_extracted,
+      .by = .by,
+      .by_time = .by_time,
+      fun_summary = fun_by,
+      locs_id = locs_id,
+      group_cols_extra = "level"
+    )
+    did_summarize <- TRUE
+  }
+  if (did_summarize && "time" %in% names(sites_extracted)) {
     sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
   sites_return <- amadeus::calc_return_locs(
@@ -2659,6 +2768,10 @@ calculate_groads <- function(
 #'   when \code{fun_temporal} is non-\code{NULL}. One of \code{"day"}
 #'   (default), \code{"week"}, \code{"month"}, or \code{"year"}.
 #'   Ignored when \code{fun_temporal} is \code{NULL}.
+#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
+#'   Optional post-extraction summarization target.
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#'   with \code{.by} for space-time summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2698,10 +2811,16 @@ calculate_merra2 <- function(
   fun = "mean",
   fun_temporal = NULL,
   time_bucket = "day",
+  .by = NULL,
+  .by_time = NULL,
   geom = FALSE,
   ...
 ) {
-  amadeus::check_fun_temporal(fun_temporal)
+  if (is.null(.by)) {
+    amadeus::check_fun_temporal(fun_temporal)
+  } else {
+    check_by(.by, .by_time)
+  }
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
     from = from,
@@ -2741,16 +2860,30 @@ calculate_merra2 <- function(
     level = merra2_level,
     ...
   )
-  #### temporal summarization (no-op when fun_temporal is NULL)
+  #### temporal summarization (legacy) or generic `.by` summarization
   merra2_group_extra <- if (!is.null(merra2_level)) "level" else NULL
-  sites_extracted <- amadeus::calc_summarize_temporal(
-    covar = sites_extracted,
-    fun_temporal = fun_temporal,
-    locs_id = locs_id,
-    time_bucket = time_bucket,
-    group_cols_extra = merra2_group_extra
-  )
-  if (!is.null(fun_temporal) && "time" %in% names(sites_extracted)) {
+  if (is.null(.by)) {
+    sites_extracted <- amadeus::calc_summarize_temporal(
+      covar = sites_extracted,
+      fun_temporal = fun_temporal,
+      locs_id = locs_id,
+      time_bucket = time_bucket,
+      group_cols_extra = merra2_group_extra
+    )
+    did_summarize <- !is.null(fun_temporal)
+  } else {
+    fun_by <- if (is.null(fun_temporal)) "mean" else fun_temporal
+    sites_extracted <- calc_summarize_by(
+      covar = sites_extracted,
+      .by = .by,
+      .by_time = .by_time,
+      fun_summary = fun_by,
+      locs_id = locs_id,
+      group_cols_extra = merra2_group_extra
+    )
+    did_summarize <- TRUE
+  }
+  if (did_summarize && "time" %in% names(sites_extracted)) {
     sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
   sites_return <- amadeus::calc_return_locs(
@@ -3540,6 +3673,10 @@ calculate_huc <- function(
 #' @param time_bucket character(1). Temporal grouping unit used when
 #'   \code{fun_temporal} is not \code{NULL}: \code{"day"} (default),
 #'   \code{"week"}, \code{"month"}, or \code{"year"}.
+#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
+#'   Optional post-extraction summarization target.
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#'   with \code{.by} for space-time summaries.
 #' @param geom \code{FALSE}/\code{"sf"}/\code{"terra"}. Return geometry with
 #'   results. Default \code{FALSE}. The CRS is inherited from \code{from}.
 #' @param ... Placeholders.
@@ -3576,10 +3713,16 @@ calculate_goes <- function(
   fun = "mean",
   fun_temporal = NULL,
   time_bucket = "day",
+  .by = NULL,
+  .by_time = NULL,
   geom = FALSE,
   ...
 ) {
-  amadeus::check_fun_temporal(fun_temporal)
+  if (is.null(.by)) {
+    amadeus::check_fun_temporal(fun_temporal)
+  } else {
+    check_by(.by, .by_time)
+  }
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
     from = from,
@@ -3604,15 +3747,28 @@ calculate_goes <- function(
     level = NULL,
     ...
   )
-  #### optional temporal summarisation
-  sites_extracted <- amadeus::calc_summarize_temporal(
-    covar = sites_extracted,
-    fun_temporal = fun_temporal,
-    locs_id = locs_id,
-    time_bucket = time_bucket,
-    group_cols_extra = NULL
-  )
-  if (!is.null(fun_temporal) && "time" %in% names(sites_extracted)) {
+  #### optional temporal or `.by` summarisation
+  if (is.null(.by)) {
+    sites_extracted <- amadeus::calc_summarize_temporal(
+      covar = sites_extracted,
+      fun_temporal = fun_temporal,
+      locs_id = locs_id,
+      time_bucket = time_bucket,
+      group_cols_extra = NULL
+    )
+    did_summarize <- !is.null(fun_temporal)
+  } else {
+    fun_by <- if (is.null(fun_temporal)) "mean" else fun_temporal
+    sites_extracted <- calc_summarize_by(
+      covar = sites_extracted,
+      .by = .by,
+      .by_time = .by_time,
+      fun_summary = fun_by,
+      locs_id = locs_id
+    )
+    did_summarize <- TRUE
+  }
+  if (did_summarize && "time" %in% names(sites_extracted)) {
     sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
   sites_return <- amadeus::calc_return_locs(

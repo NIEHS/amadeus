@@ -696,6 +696,394 @@ check_fun_temporal <- function(fun_temporal) {
 }
 
 
+#' Classify the type of a `.by` summarization argument
+#' @description
+#' Internal helper used by \code{check_by()} to determine which dispatch
+#' branch the \code{.by} value falls into.  The four recognised classes are:
+#' \describe{
+#'   \item{\code{"null"}}{No additional summarization (\code{.by = NULL}).}
+#'   \item{\code{"time_unit"}}{Temporal bucketing: \code{.by} is a single
+#'     character string naming a calendar unit such as \code{"day"},
+#'     \code{"week"}, \code{"month"}, \code{"quarter"}, or \code{"year"}
+#'     (singular and plural forms accepted, plus \code{"hour"} /
+#'     \code{"minute"} for sub-daily data).}
+#'   \item{\code{"col_name"}}{Group-by column: \code{.by} is a single
+#'     character string that is \emph{not} a recognised time-unit token, and
+#'     is therefore interpreted as the name of a grouping column in the
+#'     extracted covariate \code{data.frame}.}
+#'   \item{\code{"spatial_obj"}}{Spatial grouping: \code{.by} is an \code{sf}
+#'     or \code{SpatVector} object used to spatially aggregate results.}
+#' }
+#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
+#'   The \code{.by} value to classify.
+#' @keywords internal
+#' @author Insang Song
+#' @return character(1). One of \code{"null"}, \code{"time_unit"},
+#'   \code{"col_name"}, or \code{"spatial_obj"}.
+#' @export
+classify_by <- function(.by) {
+  if (is.null(.by)) {
+    return("null")
+  }
+  if (inherits(.by, c("sf", "SpatVector"))) {
+    return("spatial_obj")
+  }
+  if (is.character(.by) && length(.by) == 1L) {
+    time_units <- c(
+      "minute", "minutes",
+      "hour",   "hours",
+      "day",    "days",
+      "week",   "weeks",
+      "month",  "months",
+      "quarter", "quarters",
+      "year",   "years"
+    )
+    if (.by %in% time_units) {
+      return("time_unit")
+    }
+    return("col_name")
+  }
+  stop(
+    paste0(
+      "`.by` must be NULL, a single character string (time unit or column ",
+      "name), or an sf/SpatVector object for spatial grouping.\n"
+    )
+  )
+}
+
+
+#' Validate the `.by` summarization argument
+#' @description
+#' Checks that the \code{.by} argument conforms to the expected contract
+#' for optional summarization in covariate calculation functions:
+#' \describe{
+#'   \item{\code{NULL}}{No additional summarization (backward-compatible
+#'     default).  Returned invisibly as \code{"null"}.}
+#'   \item{Time-unit string}{A single character string naming a recognised
+#'     calendar unit.  Accepted tokens (singular and plural):
+#'     \code{"minute"}/\code{"minutes"},
+#'     \code{"hour"}/\code{"hours"},
+#'     \code{"day"}/\code{"days"},
+#'     \code{"week"}/\code{"weeks"},
+#'     \code{"month"}/\code{"months"},
+#'     \code{"quarter"}/\code{"quarters"},
+#'     \code{"year"}/\code{"years"}.
+#'     When \code{.by} is a time-unit string, \code{.by_time} may optionally
+#'     name the time column to bucket (default falls back to \code{"time"}).}
+#'   \item{Column-name string}{A single character string that is \emph{not}
+#'     a recognised time-unit token.  Interpreted as the name of a grouping
+#'     column in the extracted covariate \code{data.frame}.  When \code{data}
+#'     is supplied the column is validated to exist.}
+#'   \item{Spatial object}{An \code{sf} or \code{SpatVector} object used
+#'     for spatial-overlay grouping of extracted values.}
+#' }
+#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
+#'   Summarization specification.  See Description for accepted forms.
+#' @param .by_time NULL or character(1). Name of the time column in the
+#'   extracted covariate table.  Only meaningful when \code{.by} is a
+#'   time-unit string.  \code{NULL} (default) defers column lookup to the
+#'   calling function (typically \code{"time"}).
+#' @param data NULL or data.frame. When provided and \code{.by} is a
+#'   column-name string, the column is validated to exist in \code{data}.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return character(1) invisibly — the \code{classify_by()} result for
+#'   \code{.by}.  Stops with an informative error on invalid input.
+#' @seealso \code{\link{classify_by}}, \code{\link{check_by_time}}
+#' @export
+check_by <- function(.by, .by_time = NULL, data = NULL) {
+  kind <- classify_by(.by)
+  if (kind == "col_name" && !is.null(data)) {
+    if (!is.data.frame(data)) {
+      stop("`data` must be a data.frame when provided to `check_by()`.\n")
+    }
+    if (!.by %in% names(data)) {
+      stop(sprintf(
+        "`.by` column '%s' not found in `data`.\n",
+        .by
+      ))
+    }
+  }
+  if (!is.null(.by_time) && kind == "null") {
+    warning(
+      "`.by_time` is ignored when `.by` is NULL.\n"
+    )
+  }
+  invisible(kind)
+}
+
+
+#' Validate the `.by_time` explicit time-column argument
+#' @description
+#' Validates the \code{.by_time} argument used alongside \code{.by} in
+#' covariate extraction functions.  When non-\code{NULL}, \code{.by_time}
+#' must be a single character string naming the time column in the extracted
+#' covariate \code{data.frame}.  A \code{NULL} value (the default) defers
+#' time-column selection to the calling function (typically \code{"time"}).
+#' @param .by_time NULL or character(1). Name of the time column.
+#'   \code{NULL} means use the default time column inferred by the
+#'   calling function.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return \code{NULL} invisibly; stops with an informative error if the
+#'   value is invalid.
+#' @seealso \code{\link{check_by}}
+#' @export
+check_by_time <- function(.by_time) {
+  if (is.null(.by_time)) {
+    return(invisible(NULL))
+  }
+  if (!is.character(.by_time) || length(.by_time) != 1L) {
+    stop(
+      paste0(
+        "`.by_time` must be NULL or a single character string naming ",
+        "the time column.\n"
+      )
+    )
+  }
+  invisible(NULL)
+}
+
+#' Normalize `.by` time-unit aliases
+#' @description Internal helper that maps singular/plural `.by` tokens
+#' to canonical units.
+#' @param unit character(1). Time-unit alias.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return character(1). Canonical unit.
+#' @export
+normalize_by_time_unit <- function(unit) {
+  aliases <- c(
+    minute = "minute",
+    minutes = "minute",
+    hour = "hour",
+    hours = "hour",
+    day = "day",
+    days = "day",
+    week = "week",
+    weeks = "week",
+    month = "month",
+    months = "month",
+    quarter = "quarter",
+    quarters = "quarter",
+    year = "year",
+    years = "year"
+  )
+  if (!is.character(unit) || length(unit) != 1L || !unit %in% names(aliases)) {
+    stop("`unit` must be one valid `.by` time-unit token.\n")
+  }
+  aliases[[unit]]
+}
+
+
+#' Bucket a time column to a `.by` unit
+#' @description Buckets time values to one of the supported `.by` units.
+#' @param time_vals vector. Time values to bucket.
+#' @param unit character(1). A valid `.by` time-unit token.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return vector. Bucketed values as POSIXct (minute/hour) or Date.
+#' @export
+bucket_time_by_unit <- function(time_vals, unit) {
+  unit_norm <- normalize_by_time_unit(unit)
+  if (unit_norm %in% c("minute", "hour")) {
+    breaks <- if (unit_norm == "minute") "min" else "hour"
+    return(as.POSIXct(cut(as.POSIXct(time_vals, tz = "UTC"), breaks = breaks)))
+  }
+  time_date <- as.Date(time_vals)
+  switch(
+    unit_norm,
+    day = time_date,
+    week = as.Date(cut(time_date, breaks = "week")),
+    month = as.Date(cut(time_date, breaks = "month")),
+    quarter = as.Date(cut(time_date, breaks = "quarter")),
+    year = as.Date(cut(time_date, breaks = "year"))
+  )
+}
+
+
+#' Summarize extracted covariates using `.by` semantics
+#' @description
+#' Generic summarizer following `chopin::summarize_st`-style `.by`
+#' semantics for covariate tables.
+#' @param covar data.frame. Extracted covariates.
+#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
+#'   Summarization mode:
+#'   \itemize{
+#'     \item \code{NULL}: no-op
+#'     \item time-unit character: summarize by \code{locs_id} and bucketed
+#'       time
+#'     \item column-name character: summarize by that column
+#'     \item \code{sf}/\code{SpatVector}: summarize by overlay target feature
+#'   }
+#' @param fun_summary character(1) or function. Summary function
+#'   (e.g., \code{"mean"}, \code{"sum"}).
+#' @param locs_id character(1). Location-id column.
+#' @param time_col character(1). Time column in `covar`.
+#' @param .by_time NULL or character(1). Optional time grouping spec:
+#'   either a column name in `covar` or a time-unit token.
+#' @param group_cols_extra character or NULL. Extra grouping columns.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return a data.frame.
+#' @importFrom dplyr across all_of group_by summarize left_join
+#' @importFrom sf st_as_sf st_drop_geometry st_as_text st_geometry st_crs st_join st_transform
+#' @export
+calc_summarize_by <- function(
+  covar,
+  .by = NULL,
+  fun_summary = "mean",
+  locs_id = "site_id",
+  time_col = "time",
+  .by_time = NULL,
+  group_cols_extra = NULL
+) {
+  if (is.null(.by)) {
+    return(covar)
+  }
+  stopifnot(is.data.frame(covar))
+  check_by_time(.by_time)
+  by_kind <- check_by(.by, .by_time, data = covar)
+
+  if (is.character(fun_summary)) {
+    if (length(fun_summary) != 1L) {
+      stop("`fun_summary` must be a single function name.\n")
+    }
+    fun_r <- match.fun(fun_summary)
+  } else if (is.function(fun_summary)) {
+    fun_r <- fun_summary
+  } else {
+    stop("`fun_summary` must be a character string or function.\n")
+  }
+
+  covar2 <- covar
+  has_geom <- "geometry" %in% names(covar2)
+  geom_source <- NULL
+  group_cols <- character(0)
+
+  append_by_time <- function(df, group_cols_now) {
+    if (is.null(.by_time)) {
+      return(list(data = df, group_cols = group_cols_now))
+    }
+    if (.by_time %in% names(df)) {
+      return(list(data = df, group_cols = c(group_cols_now, .by_time)))
+    }
+    unit_aliases <- c(
+      "minute", "minutes", "hour", "hours", "day", "days",
+      "week", "weeks", "month", "months", "quarter", "quarters",
+      "year", "years"
+    )
+    if (.by_time %in% unit_aliases) {
+      if (!time_col %in% names(df)) {
+        stop(sprintf("`time_col` '%s' not found in `covar`.\n", time_col))
+      }
+      df[[time_col]] <- bucket_time_by_unit(df[[time_col]], .by_time)
+      return(list(data = df, group_cols = c(group_cols_now, time_col)))
+    }
+    stop(
+      "`.by_time` must be either a column name in `covar` ",
+      "or a valid time-unit token.\n"
+    )
+  }
+
+  if (by_kind == "time_unit") {
+    if (!locs_id %in% names(covar2)) {
+      stop(sprintf("`locs_id` column '%s' not found in `covar`.\n", locs_id))
+    }
+    time_col_use <- if (is.null(.by_time)) time_col else .by_time
+    if (!time_col_use %in% names(covar2)) {
+      stop(sprintf("time column '%s' not found in `covar`.\n", time_col_use))
+    }
+    covar2[[time_col]] <- bucket_time_by_unit(covar2[[time_col_use]], .by)
+    group_cols <- c(locs_id, time_col, group_cols_extra)
+  } else if (by_kind == "col_name") {
+    group_cols <- c(.by, group_cols_extra)
+    by_time_out <- append_by_time(covar2, group_cols)
+    covar2 <- by_time_out$data
+    group_cols <- by_time_out$group_cols
+  } else if (by_kind == "spatial_obj") {
+    if (!has_geom) {
+      stop(
+        "`covar` must include a `geometry` WKT column when `.by` ",
+        "is an sf/SpatVector object.\n"
+      )
+    }
+    by_sf <- if (inherits(.by, "SpatVector")) sf::st_as_sf(.by) else .by
+    geom_col <- attr(by_sf, "sf_column")
+    by_cols <- setdiff(names(by_sf), geom_col)
+    if (length(by_cols) == 0L) {
+      stop("`.by` spatial object must have at least one identifier column.\n")
+    }
+    by_id <- by_cols[1]
+    by_only <- by_sf[, by_id, drop = FALSE]
+    covar_sf <- sf::st_as_sf(covar2, wkt = "geometry")
+    if (!is.na(sf::st_crs(by_sf)) && is.na(sf::st_crs(covar_sf))) {
+      sf::st_crs(covar_sf) <- sf::st_crs(by_sf)
+    }
+    if (
+      !is.na(sf::st_crs(by_sf)) &&
+        !is.na(sf::st_crs(covar_sf)) &&
+        sf::st_crs(covar_sf) != sf::st_crs(by_sf)
+    ) {
+      covar_sf <- sf::st_transform(covar_sf, sf::st_crs(by_sf))
+    }
+    joined <- sf::st_join(covar_sf, by_only, left = FALSE, join = sf::st_intersects)
+    covar2 <- sf::st_drop_geometry(joined)
+    group_cols <- c(by_id, group_cols_extra)
+    by_time_out <- append_by_time(covar2, group_cols)
+    covar2 <- by_time_out$data
+    group_cols <- by_time_out$group_cols
+    geom_source <- data.frame(
+      stats::setNames(list(by_sf[[by_id]]), by_id),
+      geometry = sf::st_as_text(sf::st_geometry(by_sf)),
+      stringsAsFactors = FALSE
+    )
+    has_geom <- TRUE
+  }
+
+  group_cols <- unique(stats::na.omit(group_cols))
+  missing_group <- setdiff(group_cols, names(covar2))
+  if (length(missing_group) > 0L) {
+    stop(
+      sprintf(
+        "Grouping column(s) not found in `covar`: %s.\n",
+        paste(missing_group, collapse = ", ")
+      )
+    )
+  }
+
+  cov_cols <- names(covar2)[vapply(covar2, is.numeric, logical(1))]
+  cov_cols <- setdiff(cov_cols, group_cols)
+  if (length(cov_cols) == 0L) {
+    stop("No numeric covariate columns found to summarize.\n")
+  }
+
+  summary_df <- covar2 |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(group_cols))) |>
+    dplyr::summarize(
+      dplyr::across(dplyr::all_of(cov_cols), \(x) fun_r(x, na.rm = TRUE)),
+      .groups = "drop"
+    )
+
+  if (by_kind == "spatial_obj" && !is.null(geom_source)) {
+    summary_df <- dplyr::left_join(summary_df, geom_source, by = group_cols[1])
+  } else if (has_geom && "geometry" %in% names(covar2)) {
+    geom_first <- covar2[
+      !duplicated(covar2[, group_cols, drop = FALSE]),
+      c(group_cols, "geometry"),
+      drop = FALSE
+    ]
+    summary_df <- dplyr::left_join(summary_df, geom_first, by = group_cols)
+  }
+
+  col_order <- c(group_cols, cov_cols)
+  if ("geometry" %in% names(summary_df)) {
+    col_order <- c(col_order, "geometry")
+  }
+  data.frame(summary_df[, unique(col_order), drop = FALSE])
+}
+
+
 #' Summarize extracted covariates by temporal bucket
 #' @description
 #' Applies a named summary function across covariate columns
