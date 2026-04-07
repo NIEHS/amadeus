@@ -939,17 +939,17 @@ testthat::test_that("MODIS temporal helpers cover daily monthly and text pattern
   monthly_path <- "MOD14CM1.200011.005.01.hdf"
   unknown_path <- "unsupported.file"
 
-  testthat::expect_equal(modis_extract_temporal_key(daily_path), "2021227")
-  testthat::expect_equal(modis_extract_temporal_key(txt_path), "2026074")
-  testthat::expect_equal(modis_extract_temporal_key(monthly_path), "200011")
-  testthat::expect_true(is.na(modis_extract_temporal_key(unknown_path)))
+  testthat::expect_equal(amadeus:::modis_extract_temporal_key(daily_path), "2021227")
+  testthat::expect_equal(amadeus:::modis_extract_temporal_key(txt_path), "2026074")
+  testthat::expect_equal(amadeus:::modis_extract_temporal_key(monthly_path), "200011")
+  testthat::expect_true(is.na(amadeus:::modis_extract_temporal_key(unknown_path)))
 
-  testthat::expect_equal(modis_extract_temporal_scale(daily_path), "daily")
-  testthat::expect_equal(modis_extract_temporal_scale(txt_path), "daily")
-  testthat::expect_equal(modis_extract_temporal_scale(monthly_path), "monthly")
-  testthat::expect_true(is.na(modis_extract_temporal_scale(unknown_path)))
+  testthat::expect_equal(amadeus:::modis_extract_temporal_scale(daily_path), "daily")
+  testthat::expect_equal(amadeus:::modis_extract_temporal_scale(txt_path), "daily")
+  testthat::expect_equal(amadeus:::modis_extract_temporal_scale(monthly_path), "monthly")
+  testthat::expect_true(is.na(amadeus:::modis_extract_temporal_scale(unknown_path)))
 
-  parsed_dates <- modis_key_to_date(
+  parsed_dates <- amadeus:::modis_key_to_date(
     key = c("2021227", "200011"),
     scale = c("daily", "monthly")
   )
@@ -958,16 +958,16 @@ testthat::test_that("MODIS temporal helpers cover daily monthly and text pattern
     c("2021-08-15", "2000-11-01")
   )
   testthat::expect_equal(
-    as.character(modis_key_to_date(c("2021227", "2021230"), "daily")),
+    as.character(amadeus:::modis_key_to_date(c("2021227", "2021230"), "daily")),
     c("2021-08-15", "2021-08-18")
   )
-  testthat::expect_true(is.na(modis_key_to_date(NA_character_, NA_character_)))
+  testthat::expect_true(is.na(amadeus:::modis_key_to_date(NA_character_, NA_character_)))
   testthat::expect_error(
-    modis_key_to_date("2021227", "weekly"),
+    amadeus:::modis_key_to_date("2021227", "weekly"),
     "Unsupported MODIS temporal scale"
   )
   testthat::expect_error(
-    modis_key_to_date(c("2021227", "2021230"), c("daily", "monthly", "daily"))
+    amadeus:::modis_key_to_date(c("2021227", "2021230"), c("daily", "monthly", "daily"))
   )
 })
 
@@ -987,35 +987,35 @@ testthat::test_that("modis_filter_paths_by_date covers helper branches", {
   )
 
   testthat::expect_identical(
-    modis_filter_paths_by_date(character(0), "2021-08-15"),
+    amadeus:::modis_filter_paths_by_date(character(0), "2021-08-15"),
     character(0)
   )
   testthat::expect_identical(
-    modis_filter_paths_by_date("unsupported.file", "2021-08-15"),
+    amadeus:::modis_filter_paths_by_date("unsupported.file", "2021-08-15"),
     character(0)
   )
   testthat::expect_equal(
-    modis_filter_paths_by_date(daily_paths, "2021-08-15"),
+    amadeus:::modis_filter_paths_by_date(daily_paths, "2021-08-15"),
     daily_paths[1]
   )
   testthat::expect_identical(
-    modis_filter_paths_by_date(daily_paths, c("2021-09-01", "2021-09-02")),
+    amadeus:::modis_filter_paths_by_date(daily_paths, c("2021-09-01", "2021-09-02")),
     character(0)
   )
   testthat::expect_equal(
-    modis_filter_paths_by_date(monthly_paths, c("2000-11-15", "2000-12-15")),
+    amadeus:::modis_filter_paths_by_date(monthly_paths, c("2000-11-15", "2000-12-15")),
     monthly_paths
   )
   testthat::expect_identical(
-    modis_filter_paths_by_date(monthly_paths, "2001-01-15"),
+    amadeus:::modis_filter_paths_by_date(monthly_paths, "2001-01-15"),
     character(0)
   )
   testthat::expect_equal(
-    modis_filter_paths_by_date(txt_paths, "2026-03-16"),
+    amadeus:::modis_filter_paths_by_date(txt_paths, "2026-03-16"),
     txt_paths[2]
   )
   testthat::expect_error(
-    modis_filter_paths_by_date(
+    amadeus:::modis_filter_paths_by_date(
       c(daily_paths[1], monthly_paths[1]),
       "2021-08-15"
     ),
