@@ -35,6 +35,7 @@
 #' * \code{\link{process_huc}}: "huc", "HUC"
 #' * \code{\link{process_cropscape}}: "cropscape", "cdl"
 #' * \code{\link{process_prism}}: "prism", "PRISM"
+#' * \code{\link{process_drought}}: "drought", "spei", "eddi", "usdm"
 #' @return `SpatVector`, `SpatRaster`, `sf`, `data.table`, or `character` depending on
 #' covariate type and selections.
 #' @author Insang Song
@@ -92,7 +93,11 @@ process_covariates <-
       "prism",
       "edgar",
       "improve",
-      "IMPROVE"
+      "IMPROVE",
+      "drought",
+      "spei",
+      "eddi",
+      "usdm"
     ),
     path = NULL,
     ...
@@ -138,7 +143,11 @@ process_covariates <-
       cdl = process_cropscape,
       prism = process_prism,
       edgar = process_edgar,
-      improve = process_improve
+      improve = process_improve,
+      drought = process_drought,
+      spei = function(path, ...) process_drought(path = path, source = "spei", ...),
+      eddi = function(path, ...) process_drought(path = path, source = "eddi", ...),
+      usdm = function(path, ...) process_drought(path = path, source = "usdm", ...)
     )
 
     res_covariate <-
@@ -4059,4 +4068,286 @@ process_improve <- function(
   } else {
     return(sf::st_as_sf(sv))
   }
+}
+
+# nolint start
+#' Process drought index data
+#' @description
+#' The \code{process_drought()} function imports and cleans raw drought index
+#' files returned by \code{download_drought()}, producing a harmonized output
+#' object ready for \code{calculate_drought()}:
+#' \itemize{
+#'   \item \strong{SPEI / EDDI} — returns a \code{SpatRaster} with one layer
+#'     per time step, layer names in \code{"<source>_<timescale>_YYYY-MM-DD"}
+#'     format, CRS set to \code{EPSG:4326}.
+#'   \item \strong{USDM} — returns a \code{SpatVector} (polygon) with columns
+#'     \code{DM} (drought-monitor class, integer 0–4), \code{date}
+#'     (\code{Date}), and \code{source} (\code{"usdm"}), CRS
+#'     \code{EPSG:4326}.
+#' }
+# nolint end
+#' @param source character(1). Drought data source. One of \code{"spei"},
+#'   \code{"eddi"}, or \code{"usdm"}. When called through
+#'   \code{process_covariates(covariate = "spei")} the alias is forwarded
+#'   automatically.
+#' @param path character(1). Directory containing downloaded drought files
+#'   (output of \code{download_drought()}).
+#' @param date character(1 or 2). Single date or start/end dates.
+#'   Format \code{"YYYY-MM-DD"}.
+#' @param timescale integer(1). Accumulation timescale in months (SPEI/EDDI
+#'   only; ignored for USDM). Must match the timescale used in
+#'   \code{download_drought()}. Default \code{1L}.
+#' @param extent numeric(4) or \code{SpatExtent}. Optional spatial crop
+#'   applied before returning. \code{NULL} (default) returns full extent.
+#' @param ... Reserved for future use; currently ignored.
+#' @note
+#' \itemize{
+#'   \item SPEI/EDDI files are expected to follow the naming convention
+#'     produced by \code{download_drought()}: \code{spei<timescale>.nc} /
+#'     \code{eddi<timescale>mn<year>.nc}.
+#'   \item USDM files are expected to be weekly shapefiles named
+#'     \code{USDM_<YYYYMMDD>.shp}.
+#'   \item Layer/column naming is standardised so that
+#'     \code{calculate_drought()} can operate identically regardless of source.
+#' }
+#' @author Insang Song
+#' @return
+#' \itemize{
+#'   \item \code{SpatRaster} for SPEI or EDDI sources.
+#'   \item \code{SpatVector} (polygons) for USDM source.
+#' }
+#' @importFrom terra rast
+#' @importFrom terra vect
+#' @importFrom terra time
+#' @importFrom terra crs
+#' @importFrom terra crop
+#' @importFrom terra subset
+#' @importFrom terra project
+#' @importFrom terra nlyr
+#' @importFrom terra varnames
+#' @seealso \code{\link{download_drought}}, \code{\link{calculate_drought}}
+#' @examples
+# nolint start
+#' \dontrun{
+#' ## SPEI
+#' spei <- process_drought(
+#'   source = "spei",
+#'   path = "./data/drought",
+#'   date = c("2020-01-01", "2020-12-31"),
+#'   timescale = 1L
+#' )
+#' ## USDM
+#' usdm <- process_drought(
+#'   source = "usdm",
+#'   path = "./data/drought",
+#'   date = c("2020-01-07", "2020-03-31")
+#' )
+#' }
+#' @export
+# nolint end
+process_drought <- function(
+  source = c("spei", "eddi", "usdm"),
+  path = NULL,
+  date = c("2020-01-01", "2020-12-31"),
+  timescale = 1L,
+  extent = NULL,
+  ...
+) {
+  #### Validate source
+  source <- match.arg(source)
+
+  #### Sanitize path
+  path <- amadeus::download_sanitize_path(path)
+
+  #### Validate dates
+  if (length(date) == 1L) {
+    date <- c(date, date)
+  }
+  stopifnot(length(date) == 2L)
+  date <- date[order(as.Date(date))]
+
+  #### Check required parameters
+  amadeus::check_for_null_parameters(mget(ls()))
+
+  #### Dispatch to source-specific pathway
+  if (source %in% c("spei", "eddi")) {
+    drought_process_nc(
+      source = source,
+      path = path,
+      date = date,
+      timescale = timescale,
+      extent = extent
+    )
+  } else {
+    drought_process_usdm(
+      path = path,
+      date = date,
+      extent = extent
+    )
+  }
+}
+
+
+#### Internal helper: SPEI / EDDI netCDF pathway
+drought_process_nc <- function(source, path, date, timescale, extent) {
+  ts_fmt <- sprintf("%02d", as.integer(timescale))
+  date_range <- as.Date(date)
+
+  if (source == "spei") {
+    #### Single multi-year file: spei<TS>.nc
+    nc_pattern <- paste0("^spei", ts_fmt, "\\.nc$")
+    nc_files <- list.files(path, pattern = nc_pattern, full.names = TRUE)
+    if (length(nc_files) == 0L) {
+      stop(sprintf(
+        "No SPEI file matching '%s' found in: %s",
+        nc_pattern, path
+      ))
+    }
+    data_full <- terra::rast(nc_files[1], win = extent)
+    data_full <- drought_set_time_nc(data_full, source, ts_fmt, nc_files[1])
+  } else {
+    #### EDDI: one file per year, e.g. eddi01mn2020.nc
+    nc_pattern <- paste0("eddi", ts_fmt, "mn[0-9]{4}\\.nc$")
+    nc_files <- list.files(path, pattern = nc_pattern, full.names = TRUE)
+    if (length(nc_files) == 0L) {
+      stop(sprintf(
+        "No EDDI files matching '%s' found in: %s",
+        nc_pattern, path
+      ))
+    }
+    data_full <- terra::rast()
+    for (f in nc_files) {
+      yr_rast <- terra::rast(f, win = extent)
+      yr_rast <- drought_set_time_nc(yr_rast, source, ts_fmt, f)
+      data_full <- c(data_full, yr_rast, warn = FALSE)
+    }
+  }
+
+  #### Filter layers to requested date range
+  all_times <- as.Date(terra::time(data_full))
+  keep_idx <- which(all_times >= date_range[1] & all_times <= date_range[2])
+  if (length(keep_idx) == 0L) {
+    stop(sprintf(
+      "No %s data found in date range %s to %s.",
+      toupper(source), date[1], date[2]
+    ))
+  }
+  data_return <- terra::subset(data_full, keep_idx)
+
+  #### Ensure EPSG:4326
+  if (is.na(terra::crs(data_return)) || terra::crs(data_return) == "") {
+    terra::crs(data_return) <- "EPSG:4326"
+  }
+
+  if (!is.null(extent)) {
+    data_return <- terra::crop(data_return, extent)
+  }
+
+  message(sprintf(
+    "Returning %s (timescale = %d month%s) data from %s to %s.\n",
+    toupper(source),
+    as.integer(timescale),
+    if (as.integer(timescale) == 1L) "" else "s",
+    date[1],
+    date[2]
+  ))
+  data_return
+}
+
+
+#### Internal helper: assign time metadata and layer names for netCDF rasters
+drought_set_time_nc <- function(r, source, ts_fmt, filepath) {
+  times <- terra::time(r)
+  #### If terra could not read CF time, derive from filename (EDDI only)
+  if (is.null(times) || all(is.na(times))) {
+    yr_str <- regmatches(
+      basename(filepath),
+      regexpr("[0-9]{4}", basename(filepath))
+    )
+    if (length(yr_str) == 0L || is.na(yr_str)) {
+      stop(sprintf(
+        "Cannot determine time coordinates from file: %s",
+        basename(filepath)
+      ))
+    }
+    times <- seq.Date(
+      as.Date(paste0(yr_str, "-01-01")),
+      by = "month",
+      length.out = terra::nlyr(r)
+    )
+    terra::time(r) <- times
+  }
+  names(r) <- paste0(
+    source, "_", ts_fmt, "_",
+    format(as.Date(times), "%Y-%m-%d")
+  )
+  terra::varnames(r) <- source
+  r
+}
+
+
+#### Internal helper: USDM weekly polygon pathway
+drought_process_usdm <- function(path, date, extent) {
+  shp_files <- list.files(
+    path,
+    pattern = "^USDM_[0-9]{8}\\.shp$",
+    full.names = TRUE
+  )
+  if (length(shp_files) == 0L) {
+    stop(sprintf(
+      "No USDM shapefiles matching 'USDM_YYYYMMDD.shp' found in: %s",
+      path
+    ))
+  }
+
+  #### Extract dates from filenames
+  file_dates <- as.Date(
+    regmatches(
+      basename(shp_files),
+      regexpr("[0-9]{8}", basename(shp_files))
+    ),
+    format = "%Y%m%d"
+  )
+
+  #### Subset to requested date range
+  date_range <- as.Date(date)
+  keep_idx <- which(file_dates >= date_range[1] & file_dates <= date_range[2])
+  if (length(keep_idx) == 0L) {
+    stop(sprintf(
+      "No USDM files found in date range %s to %s.",
+      date[1], date[2]
+    ))
+  }
+  shp_files <- shp_files[keep_idx]
+  file_dates <- file_dates[keep_idx]
+
+  #### Read, standardise, and bind
+  vlist <- vector("list", length(shp_files))
+  for (i in seq_along(shp_files)) {
+    v <- terra::vect(shp_files[i])
+    #### Reproject to EPSG:4326
+    if (!is.na(terra::crs(v)) && terra::crs(v) != "") {
+      v <- terra::project(v, "EPSG:4326")
+    } else {
+      terra::crs(v) <- "EPSG:4326"
+    }
+    #### Retain only DM column plus metadata
+    v <- v[, "DM"]
+    v$date <- as.character(file_dates[i])
+    v$source <- "usdm"
+    vlist[[i]] <- v
+  }
+  data_return <- do.call(rbind, vlist)
+
+  if (!is.null(extent)) {
+    data_return <- terra::crop(data_return, extent)
+  }
+
+  message(sprintf(
+    "Returning USDM polygon data from %s to %s (%d file%s).\n",
+    date[1], date[2],
+    length(shp_files),
+    if (length(shp_files) == 1L) "" else "s"
+  ))
+  data_return
 }
