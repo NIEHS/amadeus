@@ -5569,7 +5569,7 @@ download_drought <- function(
     )
     # nolint end
 
-    week_dates <- drought_weekly_dates(date[1], date[2])
+    week_dates <- amadeus::drought_weekly_dates(date[1], date[2])
     if (length(week_dates) == 0) {
       stop(
         "No Tuesday dates found in the specified date range. ",
@@ -5628,7 +5628,7 @@ download_drought <- function(
     base <- "https://droughtmonitor.unl.edu/data/shapefiles_m"
     # nolint end
 
-    week_dates <- drought_weekly_dates(date[1], date[2])
+    week_dates <- amadeus::drought_weekly_dates(date[1], date[2])
     if (length(week_dates) == 0) {
       stop(
         "No Tuesday dates found in the specified date range. ",

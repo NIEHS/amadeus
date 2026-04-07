@@ -145,9 +145,15 @@ process_covariates <-
       edgar = process_edgar,
       improve = process_improve,
       drought = process_drought,
-      spei = function(path, ...) process_drought(path = path, source = "spei", ...),
-      eddi = function(path, ...) process_drought(path = path, source = "eddi", ...),
-      usdm = function(path, ...) process_drought(path = path, source = "usdm", ...)
+      spei = function(path, ...) {
+        process_drought(path = path, source = "spei", ...)
+      },
+      eddi = function(path, ...) {
+        process_drought(path = path, source = "eddi", ...)
+      },
+      usdm = function(path, ...) {
+        process_drought(path = path, source = "usdm", ...)
+      }
     )
 
     res_covariate <-

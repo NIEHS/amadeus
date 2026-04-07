@@ -4095,7 +4095,8 @@ calculate_drought <- function(
     sites_e  <- sites_list[[1]]
     sites_id <- sites_list[[2]]
 
-    #### Derive source and timescale from first layer name (e.g. "spei_01_2020-01-01")
+    #### Derive source and timescale from first layer name
+    #### (e.g. "spei_01_2020-01-01")
     lyr_parts <- strsplit(names(from)[1], "_")[[1]]
     src_name  <- lyr_parts[1]
     ts_fmt    <- lyr_parts[2]
