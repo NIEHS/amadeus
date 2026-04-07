@@ -30,12 +30,6 @@ containing identifier for each unique coordinate location.}
 \item{fun}{character(1). Function used to summarize multiple raster cells
 within sites location buffer (Default = \code{mean}).}
 
-\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
-Optional post-extraction summarization target.}
-
-\item{.by_time}{NULL or character(1). Optional time grouping key used
-with \code{.by} for space-time summaries.}
-
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}

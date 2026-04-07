@@ -1839,10 +1839,6 @@ calculate_nei <- function(
 #' containing identifier for each unique coordinate location.
 #' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target.
-#' @param .by_time NULL or character(1). Optional time grouping key used
-#'   with \code{.by} for space-time summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2124,10 +2120,6 @@ calculate_hms <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target.
-#' @param .by_time NULL or character(1). Optional time grouping key used
-#'   with \code{.by} for space-time summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2255,10 +2247,6 @@ calculate_gmted <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target.
-#' @param .by_time NULL or character(1). Optional time grouping key used
-#'   with \code{.by} for space-time summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2372,10 +2360,6 @@ calculate_narr <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target.
-#' @param .by_time NULL or character(1). Optional time grouping key used
-#'   with \code{.by} for space-time summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2483,10 +2467,6 @@ calculate_geos <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target.
-#' @param .by_time NULL or character(1). Optional time grouping key used
-#'   with \code{.by} for space-time summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2843,6 +2823,10 @@ calculate_merra2 <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
+#'   Optional post-extraction summarization target.
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#'   with \code{.by} for space-time summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2944,6 +2928,10 @@ calculate_gridmet <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
+#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
+#'   Optional post-extraction summarization target.
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#'   with \code{.by} for space-time summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
