@@ -1608,3 +1608,24 @@ build_opendap_url <- function(base, filename, constraint = NULL) {
   }
   url
 }
+
+
+#' Generate weekly Tuesday dates for drought products
+#' @description
+#' Return a character vector of YYYYMMDD strings for each Tuesday falling
+#' within \code{[date_start, date_end]}.  EDDI and USDM are both released on
+#' Tuesdays; this helper centralises the logic.
+#' @param date_start character(1). Start date, \code{"YYYY-MM-DD"}.
+#' @param date_end character(1). End date, \code{"YYYY-MM-DD"}.
+#' @return character vector of \code{"YYYYMMDD"} strings (may be length 0).
+#' @keywords internal
+#' @export
+drought_weekly_dates <- function(date_start, date_end) {
+  all_dates <- seq(
+    as.Date(date_start, format = "%Y-%m-%d"),
+    as.Date(date_end, format = "%Y-%m-%d"),
+    by = "day"
+  )
+  tuesdays <- all_dates[weekdays(all_dates) == "Tuesday"]
+  format(tuesdays, "%Y%m%d")
+}

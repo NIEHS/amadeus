@@ -54,6 +54,7 @@
 #' * \code{\link{download_prism}}: `"prism"`
 #' * \code{\link{download_edgar}}: `"edgar"`
 #' * \code{\link{download_improve}}: `"improve"`, `"IMPROVE"`
+#' * \code{\link{download_drought}}: `"drought"`, `"spei"`, `"eddi"`, `"usdm"`
 #' @return
 #' * For \code{hash = FALSE}, NULL
 #' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
@@ -108,7 +109,11 @@ download_data <-
       "prism",
       "edgar",
       "improve",
-      "IMPROVE"
+      "IMPROVE",
+      "drought",
+      "spei",
+      "eddi",
+      "usdm"
     ),
     directory_to_save = NULL,
     acknowledgement = FALSE,
@@ -153,7 +158,11 @@ download_data <-
       cdl = download_cropscape,
       prism = download_prism,
       edgar = download_edgar,
-      improve = download_improve
+      improve = download_improve,
+      drought = download_drought,
+      spei = download_drought,
+      eddi = download_drought,
+      usdm = download_drought
     )
 
     call_args <- c(
@@ -5394,4 +5403,286 @@ download_improve <- function(
     return(amadeus::download_hash(hash = TRUE, directory_to_save))
   }
   return(invisible(download_result))
+}
+
+# nolint start
+#' Download drought index data
+#' @description
+#' The \code{download_drought()} function downloads drought index data from
+#' publicly available sources. Three source datasets are supported:
+#' \itemize{
+#'   \item \strong{SPEI} (Standardized Precipitation-Evapotranspiration Index):
+#'     Multi-year netCDF files by timescale from
+#'     \url{https://spei.csic.es}.
+#'   \item \strong{EDDI} (Evaporative Demand Drought Index): Multi-year
+#'     netCDF files by timescale from
+#'     \url{https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_Archive/data}.
+#'   \item \strong{USDM} (U.S. Drought Monitor): Weekly drought class
+#'     shapefiles from
+#'     \url{https://droughtmonitor.unl.edu}.
+#' }
+# nolint end
+#' @param source character(1). Drought data source. One of \code{"spei"},
+#'   \code{"eddi"}, or \code{"usdm"}.
+#' @param date character(1 or 2). Single date or start/end dates.
+#'   Format \code{"YYYY-MM-DD"}. For SPEI/EDDI the year component selects
+#'   the annual file(s); for USDM the full date is used to select weekly
+#'   release(s).
+#' @param timescale integer(1). Accumulation timescale in months (SPEI/EDDI
+#'   only; ignored for USDM). Typical values are 1, 3, 6, 12, 24, 48.
+#'   Default is \code{1L}.
+#' @param directory_to_save character(1). Directory to save downloaded data.
+#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed.
+#' @param hash logical(1). Return \code{rlang::hash_file()} hash of
+#'   downloaded files. Default \code{FALSE}.
+#' @param show_progress logical(1). Show download progress bar.
+#'   Default \code{TRUE}.
+#' @param max_tries integer(1). Maximum retry attempts. Default \code{3L}.
+#' @param rate_limit numeric(1). Minimum seconds between HTTP requests.
+#'   Default \code{2}.
+#' @param unzip logical(1). Unzip downloaded zip archives (USDM only).
+#'   Default \code{TRUE}.
+#' @param remove_zip logical(1). Remove zip archives after unzipping
+#'   (USDM only). Default \code{FALSE}.
+#' @param ... Reserved for future use; currently ignored.
+#' @note
+#' \itemize{
+#'   \item SPEI and EDDI are raster products (netCDF); USDM is a polygon
+#'     product (shapefile). Their \code{process_drought()} and
+#'     \code{calculate_drought()} handling differ accordingly.
+#'   \item No authentication is required for any of these sources.
+#' }
+#' @author Insang Song
+#' @return \code{invisible(NULL)} when \code{hash = FALSE}; a character hash
+#'   string when \code{hash = TRUE}.
+#' @seealso \code{\link{process_drought}}, \code{\link{calculate_drought}}
+#' @examples
+#' \dontrun{
+#' download_drought(
+#'   source = "spei",
+#'   date = c("2020-01-01", "2020-12-31"),
+#'   timescale = 1L,
+#'   directory_to_save = "./data/drought",
+#'   acknowledgement = TRUE
+#' )
+#' download_drought(
+#'   source = "usdm",
+#'   date = c("2020-01-07", "2020-03-31"),
+#'   directory_to_save = "./data/drought",
+#'   acknowledgement = TRUE
+#' )
+#' }
+#' @export
+download_drought <- function(
+  source = c("spei", "eddi", "usdm"),
+  date = c("2020-01-01", "2020-12-31"),
+  timescale = 1L,
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  hash = FALSE,
+  show_progress = TRUE,
+  max_tries = 3L,
+  rate_limit = 2,
+  unzip = TRUE,
+  remove_zip = FALSE,
+  ...
+) {
+  #### Check acknowledgement
+  amadeus::download_permit(acknowledgement = acknowledgement)
+
+  #### Validate source
+  source <- match.arg(source)
+
+  #### Check for null parameters
+  amadeus::check_for_null_parameters(mget(ls()))
+
+  #### Validate date
+  if (length(date) == 1L) {
+    date <- c(date, date)
+  }
+  stopifnot(length(date) == 2L)
+  date <- date[order(as.Date(date))]
+
+  #### Validate unzip/remove_zip
+  if (!unzip && remove_zip) {
+    stop(
+      "Arguments unzip = FALSE and remove_zip = TRUE are not ",
+      "acceptable together. Please change one.\n"
+    )
+  }
+
+  #### Validate timescale (SPEI/EDDI only)
+  timescale <- as.integer(timescale)
+  if (source %in% c("spei", "eddi")) {
+    if (is.na(timescale) || timescale < 1L) {
+      stop("`timescale` must be a positive integer (months).\n")
+    }
+  }
+
+  #### Directory setup
+  amadeus::download_setup_dir(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
+
+  #### Source-specific download logic
+
+  if (source == "spei") {
+    # SPEI: one global multi-year netCDF per timescale
+    # nolint start
+    ts_str <- sprintf("%02d", timescale)
+    url <- paste0("https://spei.csic.es/files/spei", ts_str, ".nc")
+    # nolint end
+    destfile <- paste0(directory_to_save, "spei", ts_str, ".nc")
+
+    if (!amadeus::check_destfile(destfile)) {
+      message("SPEI file already exists. Skipping download.\n")
+      if (hash) {
+        return(amadeus::download_hash(hash = TRUE, directory_to_save))
+      }
+      return(invisible(list(success = 0, failed = 0, skipped = 1)))
+    }
+
+    if (!amadeus::check_url_status(url)) {
+      stop(sprintf(
+        "SPEI timescale %s returned HTTP 404. Check `timescale` parameter.\n",
+        ts_str
+      ))
+    }
+
+    download_result <- amadeus::download_run_method(
+      urls = url,
+      destfiles = destfile,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = rate_limit
+    )
+
+    if (hash) {
+      return(amadeus::download_hash(hash = TRUE, directory_to_save))
+    }
+    return(invisible(download_result))
+  }
+
+  if (source == "eddi") {
+    # EDDI: weekly CONUS netCDF files by timescale, organised in year folders
+    # nolint start
+    ts_str <- sprintf("%02d", timescale)
+    base <- paste0(
+      "https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_Archive/data"
+    )
+    # nolint end
+
+    week_dates <- drought_weekly_dates(date[1], date[2])
+    if (length(week_dates) == 0) {
+      stop(
+        "No Tuesday dates found in the specified date range. ",
+        "EDDI is a weekly (Tuesday) product.\n"
+      )
+    }
+
+    all_urls <- character(0)
+    all_destfiles <- character(0)
+
+    for (wd in week_dates) {
+      year_str <- substr(wd, 1, 4)
+      url <- sprintf(
+        "%s/%s/EDDI_ETrs_%smn_%s.nc",
+        base, year_str, ts_str, wd
+      )
+      destfile <- sprintf(
+        "%sEDDI_ETrs_%smn_%s.nc",
+        directory_to_save, ts_str, wd
+      )
+      if (amadeus::check_destfile(destfile)) {
+        all_urls <- c(all_urls, url)
+        all_destfiles <- c(all_destfiles, destfile)
+      }
+    }
+
+    if (length(all_urls) > 0 && !amadeus::check_url_status(all_urls[1])) {
+      stop(
+        "First EDDI URL returned HTTP 404. ",
+        "Check `date` and `timescale` parameters.\n"
+      )
+    }
+
+    download_result <- amadeus::download_run_method(
+      urls = all_urls,
+      destfiles = all_destfiles,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = rate_limit
+    )
+
+    if (hash) {
+      return(amadeus::download_hash(hash = TRUE, directory_to_save))
+    }
+    return(invisible(download_result))
+  }
+
+  if (source == "usdm") {
+    # USDM: weekly CONUS drought-class shapefiles (zip archives, Tuesdays)
+    directories <- amadeus::download_setup_dir(directory_to_save, zip = TRUE)
+    directory_to_download <- directories[1]
+    directory_to_unzip <- directories[2]
+
+    # nolint start
+    base <- "https://droughtmonitor.unl.edu/data/shapefiles_m"
+    # nolint end
+
+    week_dates <- drought_weekly_dates(date[1], date[2])
+    if (length(week_dates) == 0) {
+      stop(
+        "No Tuesday dates found in the specified date range. ",
+        "USDM is a weekly (Tuesday) product.\n"
+      )
+    }
+
+    all_urls <- character(0)
+    all_destfiles <- character(0)
+
+    for (wd in week_dates) {
+      url <- sprintf("%s/USDM_%s_M.zip", base, wd)
+      destfile <- sprintf("%sUSDM_%s_M.zip", directory_to_download, wd)
+      if (amadeus::check_destfile(destfile)) {
+        all_urls <- c(all_urls, url)
+        all_destfiles <- c(all_destfiles, destfile)
+      }
+    }
+
+    if (length(all_urls) > 0 && !amadeus::check_url_status(all_urls[1])) {
+      stop(
+        "First USDM URL returned HTTP 404. ",
+        "Check `date` parameter.\n"
+      )
+    }
+
+    download_result <- amadeus::download_run_method(
+      urls = all_urls,
+      destfiles = all_destfiles,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = rate_limit
+    )
+
+    for (d in seq_along(all_destfiles)) {
+      amadeus::download_unzip(
+        file_name = all_destfiles[d],
+        directory_to_unzip = directory_to_unzip,
+        unzip = unzip
+      )
+    }
+
+    amadeus::download_remove_zips(
+      remove = remove_zip,
+      download_name = all_destfiles
+    )
+
+    if (hash) {
+      return(amadeus::download_hash(hash = TRUE, directory_to_unzip))
+    }
+    return(invisible(download_result))
+  }
 }
