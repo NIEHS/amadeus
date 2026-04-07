@@ -68,21 +68,48 @@ reference:
 - contents:
   - download_data
   - starts_with("download_")
+  - -download_hash
+  - -download_permit
+  - -download_remove_command
+  - -download_remove_zips
+  - -download_run
+  - -download_run_method
+  - -download_sanitize_path
+  - -download_setup_dir
+  - -download_sink
+  - -download_unzip
 - subtitle: Process
   desc: Functions which import and clean raw data
 - contents:
   - process_covariates
   - starts_with("process_")
+  - -apply_extent
+  - -process_collection
+  - -process_conformity
+  - -process_flatten_sds
+  - -process_gmted_codes
+  - -process_gridmet_codes
+  - -process_locs_radius
+  - -process_locs_vector
+  - -process_merra2_time
+  - -process_modis_warp
+  - -process_sedac_codes
+  - -process_terraclimate_codes
+  - -process_variable_codes
 - subtitle: Covariates
   desc: Functions which extract data values at user-defined points
 - contents:
   - calculate_covariates
   - starts_with("calculate_")
+  - -calculate_modis_daily
   - sum_edc
 - subtitle: Spatio-Temporal
   desc: Functions which convert to, from, and between spatio-temporal data types
 - contents:
   - has_keyword("spacetime")
+  - -check_mysf
+  - -check_mysftime
+  - -rename_time
 - subtitle: Utilities
   desc: Utility helpers intended for direct user workflows
 - contents:

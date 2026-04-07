@@ -366,4 +366,4 @@ plot_polygons(polygon_values, paste0("EDGAR Emissions", ": Durham H3 polygons"))
 ## Notes
 
 - This example requests two species (`CO` and `NOx`) to exercise multi-file EDGAR downloads.
-- The recent `calc_return_locs()` fix means geometry-returning EDGAR extractions now work cleanly for both points and polygons.
+- Geometry-returning EDGAR extractions work cleanly for both points and polygons.

@@ -273,28 +273,11 @@ A URL and destination file path are created for each date in `date_sequence` bas
 
 #### 3. Validate URLs
 
-Before initiating downloads the first URL in the list is validated with `check_url_status()`. This guards against common user errors such as invalid dates or unsupported data formats.
-
-```{r, eval = FALSE}
-if (!amadeus::check_url_status(all_urls[1])) {
-  stop("Invalid date returns HTTP code 404. Check `date` parameter.\n")
-}
-```
+Before initiating downloads, the first URL in the list is validated internally. This guards against common user errors such as invalid dates or unsupported data formats — an error is raised early rather than partway through a large download batch.
 
 #### 4. Download files with httr2
 
-All source-specific download functions now use `download_run_method()`, which wraps `httr2` to provide robust retry logic, rate-limiting, token-based authentication (for NASA datasets), and streaming downloads directly to disk. The function accepts parallel vectors of URLs and destination file paths.
-
-```{r, eval = FALSE}
-download_result <- amadeus::download_run_method(
-  urls = all_urls,
-  destfiles = all_destfiles,
-  token = NULL,          # set to NASA_EARTHDATA_TOKEN for NASA datasets
-  show_progress = TRUE,
-  max_tries = 20,
-  rate_limit = 2         # seconds between requests
-)
-```
+All source-specific download functions use `httr2` internally to provide robust retry logic, rate-limiting, token-based authentication (for NASA datasets), and streaming downloads directly to disk.
 
 When `download = FALSE` is passed to a source-specific function (or `download_data()`), the function returns early with a named list instead of downloading:
 
@@ -408,13 +391,7 @@ The previous outline successfully cleaned parameters, generated URLs, and downlo
 
 ### Helper functions
 
-`check_url_status` is the most important of the download test helper functions. This function is part of the `amadeus` package and uses `httr2` to check the HTTP response status of a given URL. The desired HTTP response status is 200, which means the URL is valid and accessible. `check_url_status` returns a logical value indicating whether the URL returns HTTP status 200 (`TRUE`) or not (`FALSE`). For more information on HTTP status codes, see [HTTP response status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status).
-
-```{r, eval = FALSE}
-amadeus::check_url_status(url)
-```
-
-`check_urls` applies `check_url_status` to a random sample of URLs. The sample size will vary based on the dataset and spatio-temporal parameters being tested. The function returns a logical vector containing the output from `check_url_status`.
+URL validation in the unit tests uses `httr2` to check the HTTP response status of a given URL. The desired HTTP response status is 200 (or 206), which means the URL is valid and accessible. A helper `check_urls` applies this check to a random sample of URLs, returning a logical vector.
 
 ```{r}
 check_urls <- function(
@@ -429,7 +406,17 @@ check_urls <- function(
     size <- length(urls)
   }
   url_sample <- sample(urls, size, replace = FALSE)
-  url_status <- sapply(url_sample, amadeus::check_url_status)
+  url_status <- sapply(url_sample, function(url) {
+    tryCatch({
+      status <- httr2::request(url) |>
+        httr2::req_method("HEAD") |>
+        httr2::req_error(is_error = \(resp) FALSE) |>
+        httr2::req_perform() |>
+        httr2::resp_status()
+      Sys.sleep(1)
+      status %in% c(200L, 206L)
+    }, error = function(e) FALSE)
+  })
   return(url_status)
 }
 ```
