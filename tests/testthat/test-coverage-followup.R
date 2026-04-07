@@ -342,3 +342,120 @@ testthat::test_that("targeted calculate branches are exercised", {
     "`radius` must be numeric\\(1\\)"
   )
 })
+
+testthat::test_that("collapse_nlcd returns empty df when rowbind is empty", {
+  # Passing a list with one 0-row data frame produces empty rowbind result
+  empty_df <- data.frame(site_id = character(0), value = numeric(0))
+  testthat::expect_warning(
+    result <- amadeus:::collapse_nlcd(list(empty_df)),
+    "empty data frame"
+  )
+  testthat::expect_equal(nrow(result), 0L)
+})
+
+testthat::test_that("generate_time_sequence handles collection ending in '3'", {
+  ts <- amadeus::generate_time_sequence("aqc_tavg_1hr_g1440x721_v1_collection3")
+  testthat::expect_equal(ts[1], "0000")
+  testthat::expect_equal(length(ts), 24L)
+})
+
+testthat::test_that("setup_nasa_token interactive branch is exercised", {
+  # Mock readline to simulate user entering a token
+  testthat::local_mocked_bindings(
+    readline = function(prompt = "") "interactive_token_123",
+    interactive = function() TRUE,
+    .package = "base"
+  )
+  withr::local_envvar(NASA_EARTHDATA_TOKEN = "")
+  testthat::expect_no_error(
+    suppressMessages(
+      amadeus::setup_nasa_token(method = "session")
+    )
+  )
+  testthat::expect_equal(Sys.getenv("NASA_EARTHDATA_TOKEN"), "interactive_token_123")
+})
+
+testthat::test_that("download_merra2 download=FALSE returns url list", {
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    result <- suppressWarnings(
+      withCallingHandlers(
+        amadeus::download_merra2(
+          collection = "inst1_2d_asm_Nx",
+          date = c("2024-01-01", "2024-01-01"),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE
+        ),
+        message = function(m) {
+          msgs <<- c(msgs, conditionMessage(m))
+          invokeRestart("muffleMessage")
+        }
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_true("urls" %in% names(result))
+    testthat::expect_true("n_files" %in% names(result))
+    testthat::expect_true(any(grepl("Skipping download", msgs)))
+  })
+})
+
+testthat::test_that("download_gridmet scalar year expands to two-element year", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(urls, ...) list(success = length(urls), failed = 0, skipped = 0),
+    download_hash = function(...) NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      amadeus::download_gridmet(
+        variables = "Precipitation",
+        year = 2020L,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$n_files, 1L)
+  })
+})
+
+testthat::test_that("download_terraclimate scalar year expands to two-element year", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(urls, ...) list(success = length(urls), failed = 0, skipped = 0),
+    download_hash = function(...) NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      amadeus::download_terraclimate(
+        variables = "Precipitation",
+        year = 2020L,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$n_files, 1L)
+  })
+})
+
+testthat::test_that("calculate_nei errors when locs cannot be converted to SpatVector", {
+  # A list that terra::vect cannot handle
+  testthat::expect_error(
+    amadeus::calculate_nei(
+      from = terra::vect(data.frame(x = 0, y = 0), geom = c("x", "y"), crs = "EPSG:4326"),
+      locs = list(not_spatial = TRUE)
+    ),
+    "unable to be converted"
+  )
+})

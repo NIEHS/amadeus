@@ -627,3 +627,758 @@ testthat::test_that("download_drought USDM 404 error propagates", {
     )
   })
 })
+
+################################################################################
+##### calculate_drought — SPEI
+
+testthat::test_that("calculate_drought (SPEI baseline)", {
+  withr::local_package("terra")
+
+  spei <- process_drought(
+    source = "spei",
+    path = testdata_spei,
+    date = c("2020-01-01", "2020-03-31"),
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from = spei,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0L
+  ))
+
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_true("site_id" %in% names(result))
+  testthat::expect_true("time" %in% names(result))
+  testthat::expect_true("spei_01_0" %in% names(result))
+  testthat::expect_equal(nrow(result), 3L)
+  testthat::expect_true(inherits(result$time, "POSIXt"))
+})
+
+testthat::test_that("calculate_drought (SPEI .by month)", {
+  withr::local_package("terra")
+
+  spei <- process_drought(
+    source = "spei",
+    path = testdata_spei,
+    date = c("2020-01-01", "2020-03-31"),
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from     = spei,
+    locs     = locs,
+    locs_id  = "site_id",
+    radius   = 0L,
+    .by      = "month"
+  ))
+
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_true("spei_01_0" %in% names(result))
+  testthat::expect_equal(nrow(result), 3L)
+  testthat::expect_true(inherits(result$time, "POSIXt"))
+})
+
+testthat::test_that("calculate_drought (SPEI .by year)", {
+  withr::local_package("terra")
+
+  spei <- process_drought(
+    source = "spei",
+    path = testdata_spei,
+    date = c("2020-01-01", "2020-03-31"),
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from    = spei,
+    locs    = locs,
+    locs_id = "site_id",
+    radius  = 0L,
+    .by     = "year"
+  ))
+
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_equal(nrow(result), 1L)
+})
+
+testthat::test_that("calculate_drought (SPEI geom='sf')", {
+  withr::local_package("terra")
+
+  spei <- process_drought(
+    source = "spei",
+    path = testdata_spei,
+    date = "2020-01-01",
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from    = spei,
+    locs    = locs,
+    locs_id = "site_id",
+    geom    = "sf"
+  ))
+  testthat::expect_true(inherits(result, "sf"))
+})
+
+testthat::test_that("calculate_drought (SPEI geom='terra')", {
+  withr::local_package("terra")
+
+  spei <- process_drought(
+    source = "spei",
+    path = testdata_spei,
+    date = "2020-01-01",
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from    = spei,
+    locs    = locs,
+    locs_id = "site_id",
+    geom    = "terra"
+  ))
+  testthat::expect_s4_class(result, "SpatVector")
+})
+
+################################################################################
+##### calculate_drought — EDDI
+
+testthat::test_that("calculate_drought (EDDI baseline)", {
+  withr::local_package("terra")
+
+  eddi <- process_drought(
+    source = "eddi",
+    path = testdata_eddi,
+    date = c("2020-01-01", "2020-03-31"),
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from    = eddi,
+    locs    = locs,
+    locs_id = "site_id",
+    radius  = 0L
+  ))
+
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_true("eddi_01_0" %in% names(result))
+  testthat::expect_equal(nrow(result), 3L)
+  testthat::expect_true(inherits(result$time, "POSIXt"))
+})
+
+################################################################################
+##### calculate_drought — USDM
+
+testthat::test_that("calculate_drought (USDM baseline)", {
+  withr::local_package("terra")
+
+  usdm <- process_drought(
+    source = "usdm",
+    path = testdata_usdm,
+    date = c("2020-01-07", "2020-01-14")
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from    = usdm,
+    locs    = locs,
+    locs_id = "site_id"
+  ))
+
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_true("site_id" %in% names(result))
+  testthat::expect_true("time" %in% names(result))
+  testthat::expect_true("usdm_dm_0" %in% names(result))
+  testthat::expect_equal(nrow(result), 2L)
+  testthat::expect_true(inherits(result$time, "POSIXt"))
+  testthat::expect_equal(result$usdm_dm_0, c(2, 2))
+})
+
+testthat::test_that("calculate_drought (USDM point outside polygon → NA)", {
+  withr::local_package("terra")
+
+  usdm <- process_drought(
+    source = "usdm",
+    path = testdata_usdm,
+    date = "2020-01-07"
+  )
+  # Point well outside the test polygon extent (-100 to -95, 35 to 40)
+  locs <- data.frame(site_id = "out", lon = -80.0, lat = 25.0)
+
+  result <- suppressMessages(calculate_drought(
+    from    = usdm,
+    locs    = locs,
+    locs_id = "site_id"
+  ))
+
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_equal(nrow(result), 1L)
+  testthat::expect_true(is.na(result$usdm_dm_0))
+})
+
+testthat::test_that("calculate_drought (USDM .by week)", {
+  withr::local_package("terra")
+
+  usdm <- process_drought(
+    source = "usdm",
+    path = testdata_usdm,
+    date = c("2020-01-07", "2020-01-14")
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from    = usdm,
+    locs    = locs,
+    locs_id = "site_id",
+    .by     = "week"
+  ))
+
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_true("usdm_dm_0" %in% names(result))
+  testthat::expect_equal(nrow(result), 2L)
+})
+
+testthat::test_that("calculate_drought (USDM geom='sf')", {
+  withr::local_package("terra")
+
+  usdm <- process_drought(
+    source = "usdm",
+    path = testdata_usdm,
+    date = "2020-01-07"
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from    = usdm,
+    locs    = locs,
+    locs_id = "site_id",
+    geom    = "sf"
+  ))
+  testthat::expect_true(inherits(result, "sf"))
+})
+
+################################################################################
+##### calculate_drought — error handling
+
+testthat::test_that("calculate_drought errors on invalid from type", {
+  testthat::expect_error(
+    calculate_drought(
+      from    = list(a = 1),
+      locs    = data.frame(site_id = "001", lon = -97.5, lat = 37.5),
+      locs_id = "site_id"
+    ),
+    regexp = "SpatRaster.*SpatVector|SpatVector.*SpatRaster"
+  )
+})
+
+testthat::test_that("calculate_drought errors on bad .by value", {
+  withr::local_package("terra")
+
+  spei <- process_drought(
+    source = "spei",
+    path = testdata_spei,
+    date = "2020-01-01",
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  testthat::expect_error(
+    calculate_drought(
+      from    = spei,
+      locs    = locs,
+      locs_id = "site_id",
+      .by     = 123L
+    )
+  )
+})
+
+testthat::test_that("calculate_drought errors on bad geom value", {
+  withr::local_package("terra")
+
+  spei <- process_drought(
+    source = "spei",
+    path = testdata_spei,
+    date = "2020-01-01",
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  testthat::expect_error(
+    calculate_drought(
+      from    = spei,
+      locs    = locs,
+      locs_id = "site_id",
+      geom    = "bad"
+    )
+  )
+})
+
+################################################################################
+##### calculate_drought — .by_time behaviors
+
+testthat::test_that("calculate_drought (SPEI .by site_id + .by_time month)", {
+  withr::local_package("terra")
+
+  spei <- process_drought(
+    source = "spei",
+    path = testdata_spei,
+    date = c("2020-01-01", "2020-03-31"),
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from     = spei,
+    locs     = locs,
+    locs_id  = "site_id",
+    .by      = "site_id",
+    .by_time = "month"
+  ))
+
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_true("spei_01_0" %in% names(result))
+  # one row per site-month combination (3 months × 1 site)
+  testthat::expect_equal(nrow(result), 3L)
+})
+
+testthat::test_that("calculate_drought errors on non-character .by_time", {
+  withr::local_package("terra")
+
+  spei <- process_drought(
+    source = "spei",
+    path = testdata_spei,
+    date = "2020-01-01",
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  testthat::expect_error(
+    calculate_drought(
+      from     = spei,
+      locs     = locs,
+      locs_id  = "site_id",
+      .by      = "site_id",
+      .by_time = 5L
+    ),
+    regexp = "\\.by_time"
+  )
+})
+
+testthat::test_that("calculate_drought warns when .by_time supplied without .by", {
+  withr::local_package("terra")
+
+  spei <- process_drought(
+    source = "spei",
+    path = testdata_spei,
+    date = "2020-01-01",
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  testthat::expect_warning(
+    suppressMessages(calculate_drought(
+      from     = spei,
+      locs     = locs,
+      locs_id  = "site_id",
+      .by      = NULL,
+      .by_time = "month"
+    )),
+    regexp = "\\.by_time.*ignored|ignored.*\\.by_time"
+  )
+})
+
+################################################################################
+##### calculate_drought — EDDI additional coverage
+
+testthat::test_that("calculate_drought (EDDI .by year)", {
+  withr::local_package("terra")
+
+  eddi <- process_drought(
+    source = "eddi",
+    path = testdata_eddi,
+    date = c("2020-01-01", "2020-03-31"),
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from    = eddi,
+    locs    = locs,
+    locs_id = "site_id",
+    .by     = "year"
+  ))
+
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_equal(nrow(result), 1L)
+  testthat::expect_true("eddi_01_0" %in% names(result))
+})
+
+testthat::test_that("calculate_drought (EDDI geom='sf')", {
+  withr::local_package("terra")
+
+  eddi <- process_drought(
+    source = "eddi",
+    path = testdata_eddi,
+    date = "2020-01-01",
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from    = eddi,
+    locs    = locs,
+    locs_id = "site_id",
+    geom    = "sf"
+  ))
+  testthat::expect_true(inherits(result, "sf"))
+})
+
+testthat::test_that("calculate_drought (EDDI geom='terra')", {
+  withr::local_package("terra")
+
+  eddi <- process_drought(
+    source = "eddi",
+    path = testdata_eddi,
+    date = "2020-01-01",
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from    = eddi,
+    locs    = locs,
+    locs_id = "site_id",
+    geom    = "terra"
+  ))
+  testthat::expect_s4_class(result, "SpatVector")
+})
+
+################################################################################
+##### calculate_covariates — drought wrapper routing
+
+testthat::test_that("calculate_covariates routes 'drought' alias", {
+  testthat::local_mocked_bindings(
+    calculate_drought = function(...) "drought_calc_called",
+    .package = "amadeus"
+  )
+  result <- calculate_covariates(
+    covariate = "drought",
+    from      = NULL,
+    locs      = NULL,
+    locs_id   = "site_id"
+  )
+  testthat::expect_equal(result, "drought_calc_called")
+})
+
+testthat::test_that("calculate_covariates routes 'spei' alias", {
+  testthat::local_mocked_bindings(
+    calculate_drought = function(...) "drought_calc_called",
+    .package = "amadeus"
+  )
+  result <- calculate_covariates(
+    covariate = "spei",
+    from      = NULL,
+    locs      = NULL,
+    locs_id   = "site_id"
+  )
+  testthat::expect_equal(result, "drought_calc_called")
+})
+
+testthat::test_that("calculate_covariates routes 'eddi' alias", {
+  testthat::local_mocked_bindings(
+    calculate_drought = function(...) "drought_calc_called",
+    .package = "amadeus"
+  )
+  result <- calculate_covariates(
+    covariate = "eddi",
+    from      = NULL,
+    locs      = NULL,
+    locs_id   = "site_id"
+  )
+  testthat::expect_equal(result, "drought_calc_called")
+})
+
+testthat::test_that("calculate_covariates routes 'usdm' alias", {
+  testthat::local_mocked_bindings(
+    calculate_drought = function(...) "drought_calc_called",
+    .package = "amadeus"
+  )
+  result <- calculate_covariates(
+    covariate = "usdm",
+    from      = NULL,
+    locs      = NULL,
+    locs_id   = "site_id"
+  )
+  testthat::expect_equal(result, "drought_calc_called")
+})
+
+testthat::test_that("calculate_covariates drought .by passes through", {
+  withr::local_package("terra")
+
+  spei <- process_drought(
+    source = "spei",
+    path = testdata_spei,
+    date = c("2020-01-01", "2020-03-31"),
+    timescale = 1L
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_covariates(
+    covariate = "drought",
+    from      = spei,
+    locs      = locs,
+    locs_id   = "site_id",
+    .by       = "year"
+  ))
+
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_equal(nrow(result), 1L)
+})
+
+################################################################################
+##### drought internal helper branch coverage
+
+testthat::test_that("drought_process_nc errors when SPEI file not found", {
+  withr::with_tempdir({
+    testthat::expect_error(
+      amadeus:::drought_process_nc(
+        path = ".",
+        date = c("2020-01-01", "2020-12-31"),
+        timescale = 1L,
+        source = "spei"
+      ),
+      "No SPEI file"
+    )
+  })
+})
+
+testthat::test_that("drought_process_nc errors when EDDI files not found", {
+  withr::with_tempdir({
+    testthat::expect_error(
+      amadeus:::drought_process_nc(
+        path = ".",
+        date = c("2020-01-01", "2020-12-31"),
+        timescale = 1L,
+        source = "eddi"
+      ),
+      "No EDDI files"
+    )
+  })
+})
+
+testthat::test_that("drought_process_nc assigns EPSG:4326 when CRS is empty", {
+  withr::local_package("terra")
+  spei_path <- testthat::test_path("..", "testdata", "drought", "spei")
+
+  # Wrap process to intercept just after CRS assignment
+  r_out <- amadeus:::drought_process_nc(
+    path = spei_path,
+    date = c("2020-01-01", "2020-01-01"),
+    timescale = 1L,
+    source = "spei",
+    extent = NULL
+  )
+  # CRS should be set (EPSG:4326 or equivalent)
+  testthat::expect_false(is.na(terra::crs(r_out, describe = TRUE)$code))
+})
+
+testthat::test_that("drought_set_time_nc derives time from filename when terra time is NA", {
+  withr::local_package("terra")
+  # Create a raster with NA time (as if terra couldn't parse CF metadata)
+  eddi_path <- testthat::test_path("..", "testdata", "drought", "eddi")
+  eddi_files <- list.files(eddi_path, pattern = "eddi.*\\.nc$", full.names = TRUE)
+
+  r <- terra::rast(eddi_files[1])
+  # Force terra time to be NULL via mock
+  testthat::local_mocked_bindings(
+    time = function(x, ...) {
+      if (missing(x)) stop("bad call")
+      NULL
+    },
+    .package = "terra"
+  )
+  result <- amadeus:::drought_set_time_nc(r, "eddi", "01", eddi_files[1])
+  testthat::expect_true(all(grepl("^eddi_01_", names(result))))
+})
+
+testthat::test_that("drought_process_usdm errors when no USDM shapefiles found", {
+  withr::with_tempdir({
+    testthat::expect_error(
+      amadeus:::drought_process_usdm(
+        path = ".",
+        date = c("2020-01-07", "2020-01-14"),
+        extent = NULL
+      ),
+      "No USDM shapefiles"
+    )
+  })
+})
+
+testthat::test_that("drought_process_usdm assigns CRS when shapefile has no CRS", {
+  withr::local_package("terra")
+  usdm_path <- testthat::test_path("..", "testdata", "drought", "usdm")
+
+  # Mock terra::crs on vect result to return "" (empty CRS) so the else branch runs
+  testthat::local_mocked_bindings(
+    crs = function(x, ...) {
+      if (inherits(x, "SpatVector")) ""
+      else terra::crs(x, ...)
+    },
+    .package = "terra"
+  )
+  result <- amadeus:::drought_process_usdm(
+    path = usdm_path,
+    date = c("2020-01-07", "2020-01-14"),
+    extent = NULL
+  )
+  testthat::expect_s4_class(result, "SpatVector")
+})
+
+testthat::test_that("download_drought SPEI file exists returns hash when hash=TRUE", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) FALSE,
+    download_hash = function(hash, directory) if (isTRUE(hash)) "spei-hash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressMessages(
+      amadeus::download_drought(
+        source = "spei",
+        date = "2020-01-01",
+        timescale = 1L,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        hash = TRUE
+      )
+    )
+    testthat::expect_equal(result, "spei-hash")
+  })
+})
+
+testthat::test_that("download_drought SPEI URL 404 raises error", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) TRUE,
+    check_url_status = function(...) FALSE,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_error(
+      amadeus::download_drought(
+        source = "spei",
+        date = "2020-01-01",
+        timescale = 1L,
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      ),
+      "HTTP 404"
+    )
+  })
+})
+
+testthat::test_that("download_drought EDDI returns hash when hash=TRUE", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) TRUE,
+    check_url_status = function(...) TRUE,
+    download_run_method = function(urls, ...) {
+      list(success = length(urls), failed = 0, skipped = 0)
+    },
+    download_hash = function(hash, directory) if (isTRUE(hash)) "eddi-hash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressMessages(
+      amadeus::download_drought(
+        source = "eddi",
+        date = c("2020-01-01", "2020-01-31"),
+        timescale = 1L,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        hash = TRUE
+      )
+    )
+    testthat::expect_equal(result, "eddi-hash")
+  })
+})
+
+testthat::test_that("calculate_drought uses exact_extract for polygon locations", {
+  withr::local_package("terra")
+  testthat::skip_if_not_installed("exactextractr")
+
+  spei <- process_drought(
+    source = "spei",
+    path = testdata_spei,
+    date = "2020-01-01",
+    timescale = 1L
+  )
+
+  # Create a polygon location that overlaps the SPEI raster extent
+  poly_geom <- sf::st_sfc(
+    sf::st_polygon(list(matrix(
+      c(-100, 35, -95, 35, -95, 40, -100, 40, -100, 35),
+      ncol = 2, byrow = TRUE
+    ))),
+    crs = 4326
+  )
+  poly_locs <- sf::st_sf(site_id = "poly1", geometry = poly_geom)
+
+  result <- suppressMessages(
+    calculate_drought(
+      from   = spei,
+      locs   = poly_locs,
+      locs_id = "site_id",
+      radius  = 0L
+    )
+  )
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_true("site_id" %in% names(result))
+  testthat::expect_true(any(grepl("^spei_", names(result))))
+})
+
+testthat::test_that("drought_set_time_nc stops when filename has no year", {
+  withr::local_package("terra")
+  eddi_path <- testthat::test_path("..", "testdata", "drought", "eddi")
+  eddi_files <- list.files(eddi_path, pattern = "eddi.*[.]nc$", full.names = TRUE)
+  r <- terra::rast(eddi_files[1])
+
+  testthat::local_mocked_bindings(
+    time = function(x, ...) NULL,
+    .package = "terra"
+  )
+  testthat::expect_error(
+    amadeus:::drought_set_time_nc(r, "eddi", "01", "eddi_no_year_here.nc"),
+    "Cannot determine time coordinates"
+  )
+})
+
+testthat::test_that("drought_process_nc sets CRS when raster CRS is empty", {
+  withr::local_package("terra")
+  spei_path <- testthat::test_path("..", "testdata", "drought", "spei")
+
+  crs_call_count <- 0L
+  testthat::local_mocked_bindings(
+    crs = function(x, ...) {
+      if (missing(x)) terra::crs(x)
+      crs_call_count <<- crs_call_count + 1L
+      if (crs_call_count == 1L) NA_character_
+      else ""
+    },
+    .package = "terra"
+  )
+  testthat::expect_no_error(
+    suppressMessages(
+      amadeus:::drought_process_nc(
+        path = spei_path,
+        date = c("2020-01-01", "2020-01-01"),
+        timescale = 1L,
+        source = "spei",
+        extent = NULL
+      )
+    )
+  )
+})

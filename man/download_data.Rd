@@ -9,7 +9,7 @@ download_data(
     "gmted", "koppen", "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd",
     "noaa", "sedac_groads", "sedac_population", "groads", "population", "hms", "smoke",
     "tri", "nei", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
-    "improve", "IMPROVE"),
+    "improve", "IMPROVE", "drought", "spei", "eddi", "usdm"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   hash = FALSE,
@@ -104,6 +104,7 @@ Please refer to:
 \item \code{\link{download_prism}}: \code{"prism"}
 \item \code{\link{download_edgar}}: \code{"edgar"}
 \item \code{\link{download_improve}}: \code{"improve"}, \code{"IMPROVE"}
+\item \code{\link{download_drought}}: \code{"drought"}, \code{"spei"}, \code{"eddi"}, \code{"usdm"}
 }
 }
 \author{

@@ -566,3 +566,142 @@ testthat::test_that("backend compatibility: targets tar_script", {
     testthat::expect_true("time" %in% names(tar_out))
   })
 })
+
+################################################################################
+##### additional branch coverage for check_by and calc_summarize_by
+
+testthat::test_that("check_by errors when data is not a data.frame", {
+  testthat::expect_error(
+    check_by("x", data = list(x = 1, y = 2)),
+    "must be a data.frame"
+  )
+})
+
+testthat::test_that("calc_summarize_by missed branches", {
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  df <- data.frame(
+    site_id = c("s1", "s1", "s2", "s2"),
+    time = as.POSIXct(
+      c("2020-01-01 01:00", "2020-01-01 12:00", "2020-01-02 01:00", "2020-01-02 12:00"),
+      tz = "UTC"
+    ),
+    value = c(1, 2, 3, 4),
+    geometry = c(
+      "POINT (0.2 0.5)",
+      "POINT (0.2 0.5)",
+      "POINT (1.2 0.5)",
+      "POINT (1.2 0.5)"
+    )
+  )
+
+  # line 951: fun_summary as character vector of length > 1
+  testthat::expect_error(
+    calc_summarize_by(df, .by = "day", fun_summary = c("mean", "sum"), locs_id = "site_id"),
+    "single function name"
+  )
+
+  # line 955: fun_summary as a function object
+  by_fun <- calc_summarize_by(df, .by = "day", fun_summary = mean, locs_id = "site_id")
+  testthat::expect_s3_class(by_fun, "data.frame")
+  testthat::expect_equal(nrow(by_fun), 2L)
+
+  # line 970: .by_time is an existing column name in covar
+  df2 <- df
+  df2$period <- as.Date(df2$time)
+  by_col_bytime <- calc_summarize_by(df2, .by = "site_id", .by_time = "period",
+                                     fun_summary = "mean")
+  testthat::expect_s3_class(by_col_bytime, "data.frame")
+  testthat::expect_true("period" %in% names(by_col_bytime))
+
+  # line 979: .by_time is a unit alias but time_col not present in covar
+  df3 <- df[, c("site_id", "value")]  # no 'time' column
+  df3$grp <- c("A", "A", "B", "B")
+  testthat::expect_error(
+    calc_summarize_by(df3, .by = "grp", .by_time = "day", fun_summary = "mean"),
+    "time_col"
+  )
+
+  # line 992: by_kind == "time_unit" but locs_id column missing
+  df4 <- df[, c("time", "value")]
+  testthat::expect_error(
+    calc_summarize_by(df4, .by = "day", fun_summary = "mean", locs_id = "site_id"),
+    "locs_id"
+  )
+
+  # line 996: by_kind == "time_unit" but time_col missing
+  df5 <- df[, c("site_id", "value")]
+  testthat::expect_error(
+    calc_summarize_by(df5, .by = "day", fun_summary = "mean",
+                      locs_id = "site_id", time_col = "time"),
+    "time column"
+  )
+
+  # line 1016: spatial .by object with no identifier columns (only geometry)
+  regions_geom_only <- sf::st_sfc(
+    sf::st_polygon(list(matrix(c(0, 0, 1, 0, 1, 1, 0, 1, 0, 0), ncol = 2, byrow = TRUE))),
+    crs = 4326
+  )
+  regions_sf_noattr <- sf::st_sf(geometry = regions_geom_only)
+  testthat::expect_error(
+    calc_summarize_by(df, .by = regions_sf_noattr, fun_summary = "sum"),
+    "identifier column"
+  )
+
+  # line 1029: CRS mismatch triggers st_transform
+  regions_sf_3857 <- sf::st_transform(make_test_regions_sf(), 3857)
+  by_space_crs <- calc_summarize_by(df, .by = regions_sf_3857,
+                                    .by_time = "day", fun_summary = "sum")
+  testthat::expect_true("region_id" %in% names(by_space_crs))
+
+  # lines 1053-1058: missing grouping column via group_cols_extra
+  testthat::expect_error(
+    calc_summarize_by(df, .by = "site_id", fun_summary = "sum",
+                      group_cols_extra = "no_such_col"),
+    "Grouping column"
+  )
+})
+
+testthat::test_that("calc_summarize_by CRS mismatch triggers st_transform", {
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  # Covar with geometry WKT in EPSG:4326
+  df_4326 <- data.frame(
+    site_id = c("s1", "s2"),
+    time = as.POSIXct(c("2020-01-01 00:00", "2020-01-02 00:00"), tz = "UTC"),
+    value = c(1.0, 2.0),
+    geometry = c("POINT (0.25 0.5)", "POINT (1.25 0.5)")
+  )
+
+  # Spatial .by in EPSG:3857 (different CRS)
+  regions_3857 <- sf::st_transform(
+    sf::st_as_sf(
+      data.frame(
+        region_id = "r1",
+        wkt = "POLYGON ((0 0, 2 0, 2 1, 0 1, 0 0))"
+      ),
+      wkt = "wkt", crs = 4326
+    ),
+    3857
+  )
+
+  # Mock sf::st_as_sf so covar gets CRS 4326 (different from regions_3857's 3857)
+  original_st_as_sf <- sf::st_as_sf
+  call_count <- 0L
+  testthat::local_mocked_bindings(
+    st_as_sf = function(x, ...) {
+      call_count <<- call_count + 1L
+      result <- original_st_as_sf(x, ...)
+      # On the first call (covar), set CRS to 4326
+      if (call_count == 1L && inherits(result, "sf")) {
+        sf::st_crs(result) <- 4326
+      }
+      result
+    },
+    .package = "sf"
+  )
+
+  result <- calc_summarize_by(df_4326, .by = regions_3857,
+                               fun_summary = "mean", .by_time = "day")
+  testthat::expect_s3_class(result, "data.frame")
+})

@@ -472,3 +472,29 @@ testthat::test_that("process_covariates dispatches goes and improve", {
   })
 })
 # nolint end
+
+################################################################################
+##### process_modis_swath: all-NA layers branch coverage
+
+testthat::test_that("process_modis_swath emits message when all layers are NA", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+
+  msgs <- character(0)
+  # Pass an empty path so paths_today is empty, making mod06_element empty
+  result <- withCallingHandlers(
+    process_modis_swath(
+      path = character(0),
+      date = as.Date("2020-01-01"),
+      subdataset = "Cloud_Fraction",
+      suffix = ":mod06:",
+      resolution = 0.5
+    ),
+    message = function(m) {
+      msgs <<- c(msgs, conditionMessage(m))
+      invokeRestart("muffleMessage")
+    }
+  )
+  testthat::expect_true(any(grepl("All layers are NA", msgs)))
+  testthat::expect_s4_class(result, "SpatRaster")
+})

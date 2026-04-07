@@ -1,5 +1,25 @@
 # amadeus 1.3.4 (dev)
 
+## Drought Index Support
+
+- Added `download_drought()`, `process_drought()`, and `calculate_drought()`
+  supporting three drought datasets:
+  - **SPEI** (Standardized Precipitation-Evapotranspiration Index): multi-year
+    netCDF files by accumulation timescale from
+    <https://spei.csic.es>
+  - **EDDI** (Evaporative Demand Drought Index): annual netCDF files from
+    NOAA PSL (<https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_Archive/data>)
+  - **USDM** (U.S. Drought Monitor): weekly polygon shapefiles from
+    <https://droughtmonitor.unl.edu>
+- All three datasets are accessible via the top-level wrappers:
+  `download_data()`, `process_covariates()`, and `calculate_covariates()` using
+  aliases `"drought"`, `"spei"`, `"eddi"`, or `"usdm"` for `dataset_name` /
+  `covariate`.
+- `process_drought()` returns a `SpatRaster` (SPEI/EDDI) or `SpatVector`
+  polygons (USDM), both with CRS `EPSG:4326`.
+- `calculate_drought()` supports `.by` / `.by_time` post-extraction
+  summarization consistent with all other `calculate_*()` functions.
+
 ## OPeNDAP Support for NASA Datasets
 
 - Added `use_opendap = FALSE`, `extent = NULL`, and `variables = NULL` parameters

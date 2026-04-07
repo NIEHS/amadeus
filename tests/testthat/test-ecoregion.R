@@ -773,3 +773,48 @@ testthat::test_that("download_ecoregion file already exists path", {
     testthat::expect_true(any(grepl("already exists", msgs)))
   })
 })
+
+################################################################################
+##### calculate_ecoregion missing field coverage
+
+testthat::test_that("calculate_ecoregion errors when required field missing from intersection", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  path_eco <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
+  erras <- process_ecoregion(path_eco)
+
+  site_faux <- data.frame(
+    site_id = "37999109988101",
+    lon = -77.576,
+    lat = 39.40
+  )
+  site_vect <- terra::vect(site_faux, geom = c("lon", "lat"), crs = "EPSG:4326")
+
+  # Mock terra::intersect to return a SpatVector without L2_KEY / L3_KEY fields
+  testthat::local_mocked_bindings(
+    intersect = function(x, y) {
+      sf_obj <- sf::st_as_sf(
+        data.frame(site_id = "37999109988101", some_other_field = 1L,
+                   lon = -77.576, lat = 39.40),
+        coords = c("lon", "lat"), crs = 4326
+      )
+      terra::vect(sf_obj)
+    },
+    .package = "terra"
+  )
+  testthat::expect_error(
+    calculate_ecoregion(
+      from = erras,
+      locs = site_vect,
+      locs_id = "site_id"
+    ),
+    "Required ecoregion field missing"
+  )
+})

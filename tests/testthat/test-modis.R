@@ -3071,3 +3071,45 @@ testthat::test_that("download_modis VNP46A2 sets str_version to NULL", {
     testthat::expect_type(result, "list")
   })
 })
+
+################################################################################
+##### calculate_modis no-files-for-fusion-date coverage
+
+testthat::test_that("calculate_modis errors when no files match selected fusion date key", {
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+  from_primary   <- "MOD09GA.A2021001.h10v05.061.2021001000000.hdf"
+  from_secondary <- "MYD09GA.A2021001.h10v05.061.2021001000000.hdf"
+
+  call_count <- 0L
+  # First two calls (building dates_available) return real key;
+  # subsequent calls (has_primary / has_secondary checks) return a bogus key,
+  # making !has_primary && !has_secondary TRUE.
+  testthat::local_mocked_bindings(
+    modis_extract_temporal_key   = function(x, ...) {
+      call_count <<- call_count + 1L
+      if (call_count <= 2L) "2021001" else "0000000"
+    },
+    modis_extract_temporal_scale = function(x, ...) "daily",
+    .package = "amadeus"
+  )
+
+  testthat::expect_error(
+    calculate_modis(
+      from           = from_primary,
+      from_secondary = from_secondary,
+      locs           = locs,
+      locs_id        = "site_id",
+      radius         = 0L,
+      preprocess     = function(...) terra::rast(),
+      name_covariates = "cov_",
+      subdataset     = "mock",
+      scale          = "* 1",
+      fusion_method  = "mean"
+    ),
+    "No MODIS files found"
+  )
+})
