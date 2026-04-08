@@ -298,3 +298,57 @@ testthat::test_that("calculate_prism strips exactextractr mean. prefix on multi-
   res <- calculate_prism(rr, locs, locs_id = "site_id", radius = 1000)
   testthat::expect_true(all(c("ppt_1000", "tmin_1000") %in% colnames(res)))
 })
+
+testthat::test_that("calculate_prism .by branch derives time and validates inputs", {
+  withr::local_package("terra")
+  from <- terra::rast(ncols = 1, nrows = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326")
+  terra::values(from) <- 5
+  names(from) <- "ppt"
+  locs <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
+
+  testthat::local_mocked_bindings(
+    calc_worker = function(...) data.frame(site_id = "s1", ppt_0 = 5),
+    .package = "amadeus"
+  )
+  terra::time(from) <- as.POSIXct("2020-01-15", tz = "UTC")
+  by_out <- calculate_prism(
+    from = from,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0,
+    .by = "day"
+  )
+  testthat::expect_true("time" %in% names(by_out))
+  testthat::expect_s3_class(by_out$time, "POSIXct")
+
+  testthat::local_mocked_bindings(
+    calc_worker = function(...) data.frame(site_id = "s1", a_0 = 1, b_0 = 2),
+    .package = "amadeus"
+  )
+  testthat::expect_error(
+    calculate_prism(
+      from = from,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "day"
+    ),
+    regexp = "single covariate column"
+  )
+
+  terra::time(from) <- as.POSIXct(NA)
+  testthat::local_mocked_bindings(
+    calc_worker = function(...) data.frame(site_id = "s1", ppt_0 = 5),
+    .package = "amadeus"
+  )
+  testthat::expect_error(
+    calculate_prism(
+      from = from,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "day"
+    ),
+    regexp = "Could not derive PRISM time"
+  )
+})

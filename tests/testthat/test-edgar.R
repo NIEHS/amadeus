@@ -954,6 +954,60 @@ testthat::test_that("all 25 VOC groups feed through process_edgar and calculate_
 ################################################################################
 ##### live EDGAR download integration coverage
 
+testthat::test_that("calculate_edgar .by branch derives time and validates inputs", {
+  withr::local_package("terra")
+  from <- terra::rast(ncols = 1, nrows = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326")
+  terra::values(from) <- 7
+  names(from) <- "edgar_voc_1"
+  locs <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
+
+  testthat::local_mocked_bindings(
+    calc_worker = function(...) data.frame(site_id = "s1", edgar_voc_1_0 = 7),
+    .package = "amadeus"
+  )
+  terra::time(from) <- as.POSIXct("2021-01-01", tz = "UTC")
+  by_out <- calculate_edgar(
+    from = from,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0,
+    .by = "day"
+  )
+  testthat::expect_true("time" %in% names(by_out))
+  testthat::expect_s3_class(by_out$time, "POSIXct")
+
+  testthat::local_mocked_bindings(
+    calc_worker = function(...) data.frame(site_id = "s1", a_0 = 1, b_0 = 2),
+    .package = "amadeus"
+  )
+  testthat::expect_error(
+    calculate_edgar(
+      from = from,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "day"
+    ),
+    regexp = "single covariate column"
+  )
+
+  terra::time(from) <- as.POSIXct(NA)
+  testthat::local_mocked_bindings(
+    calc_worker = function(...) data.frame(site_id = "s1", edgar_voc_1_0 = 7),
+    .package = "amadeus"
+  )
+  testthat::expect_error(
+    calculate_edgar(
+      from = from,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "day"
+    ),
+    regexp = "Could not derive EDGAR time"
+  )
+})
+
 testthat::test_that("live yearly EDGAR download feeds process_edgar and calculate_edgar", {
   skip_on_ci()
   skip_on_cran()

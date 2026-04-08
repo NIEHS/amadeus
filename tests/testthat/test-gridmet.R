@@ -407,6 +407,29 @@ testthat::test_that("calculate_gridmet", {
   )
 })
 
+testthat::test_that("calculate_gridmet supports .by/.by_time summaries", {
+  withr::local_package("terra")
+  locs <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "3799900018810101")
+  gridmet <- process_gridmet(
+    date = c("2018-01-03", "2018-01-03"),
+    variable = "pr",
+    path = testthat::test_path("..", "testdata", "gridmet", "pr")
+  )
+
+  by_time <- calculate_gridmet(
+    from = gridmet,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0,
+    .by = "day",
+    fun = "mean"
+  )
+
+  testthat::expect_true("time" %in% names(by_time))
+  testthat::expect_s3_class(by_time$time, "POSIXct")
+  testthat::expect_true(any(grepl("_0$", names(by_time))))
+})
+
 ################################################################################
 ##### download_gridmet hash=FALSE branch
 
