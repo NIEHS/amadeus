@@ -4,7 +4,14 @@
 \alias{calculate_nei}
 \title{Calculate road emissions covariates}
 \usage{
-calculate_nei(from = NULL, locs = NULL, locs_id = "site_id", geom = FALSE, ...)
+calculate_nei(
+  from = NULL,
+  locs = NULL,
+  locs_id = "site_id",
+  weights = NULL,
+  geom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{from}{SpatVector(1). Output of \code{process_nei()}.}
@@ -13,6 +20,10 @@ calculate_nei(from = NULL, locs = NULL, locs_id = "site_id", geom = FALSE, ...)
 
 \item{locs_id}{character(1). Unique site identifier column name.
 Unused but kept for compatibility.}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

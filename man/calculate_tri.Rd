@@ -9,6 +9,7 @@ calculate_tri(
   locs,
   locs_id = "site_id",
   radius = c(1000L, 10000L, 50000L),
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -23,6 +24,10 @@ Default is \code{"site_id"}.}
 
 \item{radius}{Circular buffer radius.
 Default is \code{c(1000, 10000, 50000)} (meters)}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

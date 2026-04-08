@@ -16,6 +16,7 @@ calculate_covariates(
   locs_id = "site_id",
   .by = NULL,
   .by_time = NULL,
+  weights = NULL,
   ...
 )
 }
@@ -51,6 +52,11 @@ future use.}
 \item{.by_time}{NULL or character(1). Name of the time column to use
 when \code{.by} is a time-unit string.  \code{NULL} (default) defers
 to the child function's default (typically \code{"time"}).}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Passed through to the underlying source-specific function for
+weighted extraction. If \code{NULL} (default), unweighted extraction is
+performed.}
 
 \item{...}{Arguments passed to each covariate calculation
 function.}

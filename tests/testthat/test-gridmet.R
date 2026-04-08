@@ -430,6 +430,96 @@ testthat::test_that("calculate_gridmet supports .by/.by_time summaries", {
   testthat::expect_true(any(grepl("_0$", names(by_time))))
 })
 
+testthat::test_that("calculate_gridmet supports weighted extraction", {
+  withr::local_package("terra")
+  from <- terra::rast(
+    nrows = 2,
+    ncols = 2,
+    xmin = 0,
+    xmax = 2,
+    ymin = 0,
+    ymax = 2,
+    crs = "EPSG:4326"
+  )
+  terra::values(from) <- c(1, 2, 3, 4)
+  names(from) <- "pr_20200101"
+
+  locs <- terra::as.polygons(terra::ext(from), crs = terra::crs(from))
+  locs$site_id <- "poly_1"
+
+  weights <- from
+  terra::values(weights) <- c(1, 1, 1, 10)
+
+  res_unweighted <- calculate_gridmet(
+    from = from,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0
+  )
+  res_weighted <- calculate_gridmet(
+    from = from,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0,
+    weights = weights
+  )
+
+  testthat::expect_true(res_weighted$pr_0 != res_unweighted$pr_0)
+  testthat::expect_no_error({
+    point_res <- calculate_gridmet(
+      from = from,
+      locs = data.frame(lon = 1, lat = 1, site_id = "pt_1"),
+      locs_id = "site_id",
+      radius = 0,
+      weights = weights
+    )
+    testthat::expect_true(is.numeric(point_res$pr_0))
+  })
+})
+
+testthat::test_that("calculate_gridmet accepts polygon weights and validates CRS", {
+  withr::local_package("terra")
+  from <- terra::rast(
+    nrows = 2,
+    ncols = 2,
+    xmin = 0,
+    xmax = 2,
+    ymin = 0,
+    ymax = 2,
+    crs = "EPSG:4326"
+  )
+  terra::values(from) <- c(1, 2, 3, 4)
+  names(from) <- "pr_20200101"
+
+  locs <- terra::as.polygons(terra::ext(from), crs = terra::crs(from))
+  locs$site_id <- "poly_1"
+
+  weight_poly <- terra::as.polygons(from)
+  weight_poly$wt <- c(1, 2, 3, 4)
+  testthat::expect_no_error(
+    calculate_gridmet(
+      from = from,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      weights = weight_poly
+    )
+  )
+
+  bad_weights <- from
+  terra::crs(bad_weights) <- ""
+  testthat::expect_error(
+    calculate_gridmet(
+      from = from,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      weights = bad_weights
+    ),
+    "missing CRS"
+  )
+})
+
 ################################################################################
 ##### download_gridmet hash=FALSE branch
 

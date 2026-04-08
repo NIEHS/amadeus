@@ -12,6 +12,7 @@ calculate_modis_daily(
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
+  weights = NULL,
   max_cells = 3e+07,
   geom = FALSE,
   scale = NULL,
@@ -36,6 +37,10 @@ are stored. Default is \code{"site_id"}}
 \item{fun_summary}{function. Summary function for
 multilayer rasters. Passed to \code{foo}. See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}}
 for details.}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{max_cells}{integer(1). Maximum number of cells to be read at once.
 Higher values will expedite processing, but will increase memory usage.

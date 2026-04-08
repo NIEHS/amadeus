@@ -34,6 +34,10 @@
 #' @param .by_time NULL or character(1). Name of the time column to use
 #'   when \code{.by} is a time-unit string.  \code{NULL} (default) defers
 #'   to the child function's default (typically \code{"time"}).
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Passed through to the underlying source-specific function for
+#'   weighted extraction. If `NULL` (default), unweighted extraction is
+#'   performed.
 #' @param ... Arguments passed to each covariate calculation
 #'  function.
 #' @note `covariate` argument value is converted to lowercase.
@@ -126,6 +130,7 @@ calculate_covariates <-
     locs_id = "site_id",
     .by = NULL,
     .by_time = NULL,
+    weights = NULL,
     ...
   ) {
     amadeus::check_by(.by, .by_time)
@@ -182,6 +187,9 @@ calculate_covariates <-
             list(from = from, locs = locs, locs_id = locs_id),
             list(...)
           )
+          if (!is.null(weights)) {
+            calc_args$weights <- weights
+          }
           if (!is.null(.by)) {
             calc_args$.by <- .by
           }
@@ -221,6 +229,9 @@ calculate_covariates <-
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @seealso [`process_koppen_geiger`]
 #' @return a data.frame or SpatVector object
@@ -256,6 +267,7 @@ calculate_koppen_geiger <-
     from = NULL,
     locs = NULL,
     locs_id = "site_id",
+    weights = NULL,
     geom = FALSE,
     ...
   ) {
@@ -397,6 +409,9 @@ calculate_koppen_geiger <-
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @note NLCD is available in U.S. only. Users should be aware of
 #' the spatial extent of the data. The results are different depending
@@ -434,6 +449,7 @@ calculate_nlcd <- function(
   locs_id = "site_id",
   mode = c("exact", "terra"),
   radius = 1000,
+  weights = NULL,
   max_cells = 5e7,
   geom = FALSE,
   ...
@@ -510,7 +526,8 @@ calculate_nlcd <- function(
         time = 4,
         time_type = "year",
         radius = 0,
-        level = NULL
+        level = NULL,
+        weights = weights
       )
     )
     new_data_vect$time <- year
@@ -628,6 +645,9 @@ calculate_nlcd <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @seealso [`process_ecoregion`]
 #' @return a data.frame or SpatVector object object with dummy variables and
@@ -657,6 +677,7 @@ calculate_ecoregion <-
     locs,
     locs_id = "site_id",
     colnames = c("coded", "full_ecoregion"),
+    weights = NULL,
     geom = FALSE,
     ...
   ) {
@@ -872,6 +893,9 @@ calculate_ecoregion <-
 #' `from_secondary` is provided. Options are `"mean"` (pixel-wise mean with
 #' `na.rm = TRUE`), `"primary_first"` (use `from` first), and
 #' `"secondary_first"` (use `from_secondary` first).
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Arguments passed to `preprocess`.
 # nolint start
 #' @description `calculate_modis` essentially runs [`calculate_modis_daily`] function
@@ -959,6 +983,7 @@ calculate_modis <-
     fun_summary = "mean",
     .by = NULL,
     .by_time = NULL,
+    weights = NULL,
     package_list_add = NULL,
     export_list_add = NULL,
     max_cells = 3e7,
@@ -1194,6 +1219,7 @@ process_modis_swath, or process_blackmarble."
                     fun_summary = fun_summary,
                     name_extracted = name_radius,
                     radius = radius[k],
+                    weights = weights,
                     max_cells = max_cells,
                     geom = FALSE,
                     scale = scale
@@ -1254,11 +1280,49 @@ process_modis_swath, or process_blackmarble."
   }
 
 
+#' Calculate MCD14DL fire location covariates
+#' @description
+#' Aggregate MODIS/VIIRS active fire detection counts and fire radiative
+#' power (FRP) within circular buffers around point locations.
+#' Returns a \code{data.frame} with fire count and mean FRP per buffer radius.
+#' @param from SpatVector(1). Output of \code{process_mcd14dl()}.
+#' @param locs sf/SpatVector. Unique locations. Should include a unique
+#'   identifier field named \code{locs_id}.
+#' @param locs_id character(1). Name of unique identifier. Default
+#'   \code{"site_id"}.
+#' @param radius numeric. Buffer radius (metres) around each location.
+#'   Multiple radii are supported; defaults to
+#'   \code{c(0L, 1e3L, 1e4L, 5e4L)}.
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param geom FALSE/"sf"/"terra". Should the function return with geometry?
+#'   Default is \code{FALSE}.
+#' @param ... Placeholders.
+#' @return a data.frame or SpatVector object.
+#' @author Insang Song
+#' @seealso [`process_mcd14dl()`]
+#' @importFrom methods is
+#' @importFrom sf st_as_sf
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_mcd14dl(
+#'   from = mcd14dl,  # derived from process_mcd14dl() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = c(0L, 1000L)
+#' )
+#' }
+#' @export
 calculate_mcd14dl <- function(
   from = NULL,
   locs = NULL,
   locs_id = "site_id",
   radius = c(0L, 1e3L, 1e4L, 5e4L),
+  weights = NULL,
   geom = FALSE,
   ...
 ) {
@@ -1387,6 +1451,9 @@ calculate_mcd14dl <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @return a data.frame or SpatVector object
 #' @author Insang Song
@@ -1411,6 +1478,7 @@ calculate_temporal_dummies <-
     locs,
     locs_id = "site_id",
     year = seq(2018L, 2022L),
+    weights = NULL,
     geom = FALSE,
     ...
   ) {
@@ -1671,6 +1739,9 @@ The result may not be accurate.\n",
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @author Insang Song, Mariana Kassien
 #' @return a data.frame or SpatVector object
@@ -1709,6 +1780,7 @@ calculate_tri <- function(
   locs,
   locs_id = "site_id",
   radius = c(1e3L, 1e4L, 5e4L),
+  weights = NULL,
   geom = FALSE,
   ...
 ) {
@@ -1775,6 +1847,9 @@ calculate_tri <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @author Insang Song, Ranadeep Daw
 #' @seealso [`process_nei`]
@@ -1799,6 +1874,7 @@ calculate_nei <- function(
   from = NULL,
   locs = NULL,
   locs_id = "site_id",
+  weights = NULL,
   geom = FALSE,
   ...
 ) {
@@ -1846,6 +1922,9 @@ calculate_nei <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @seealso [process_hms()]
 #' @author Mitchell Manware
@@ -1874,6 +1953,7 @@ calculate_hms <- function(
   locs,
   locs_id = NULL,
   radius = 0,
+  weights = NULL,
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -1881,7 +1961,7 @@ calculate_hms <- function(
 ) {
   #### check for null parameters (.by and .by_time are optional)
   params_check <- mget(ls())
-  params_check[c(".by", ".by_time")] <- NULL
+  params_check[c(".by", ".by_time", "weights")] <- NULL
   amadeus::check_for_null_parameters(params_check)
   amadeus::check_by(.by, .by_time)
   amadeus::check_by_time(.by_time)
@@ -2127,6 +2207,9 @@ calculate_hms <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [`process_gmted()`]
@@ -2158,6 +2241,7 @@ calculate_gmted <- function(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   geom = FALSE,
   ...
 ) {
@@ -2181,7 +2265,8 @@ calculate_gmted <- function(
     fun = fun,
     variable = 2,
     time = 3,
-    time_type = "year"
+    time_type = "year",
+    weights = weights
   )
   #### variable column name
   statistic_codes <- c("be", "ds", "md", "mi", "mn", "mx", "sd")
@@ -2258,6 +2343,9 @@ calculate_gmted <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [`process_narr`]
@@ -2289,6 +2377,7 @@ calculate_narr <- function(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -2326,6 +2415,7 @@ calculate_narr <- function(
     time = narr_time,
     time_type = "date",
     level = narr_level,
+    weights = weights,
     ...
   )
   narr_group_extra <- if (!is.null(narr_level)) "level" else NULL
@@ -2375,6 +2465,9 @@ calculate_narr <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @seealso [process_geos()]
@@ -2408,6 +2501,7 @@ calculate_geos <- function(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -2437,6 +2531,7 @@ calculate_geos <- function(
     time = c(3, 4),
     time_type = "hour",
     level = 2,
+    weights = weights,
     ...
   )
   if (!is.null(.by)) {
@@ -2482,6 +2577,9 @@ calculate_geos <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [process_population()]
@@ -2508,6 +2606,7 @@ calculate_population <- function(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   geom = FALSE,
   ...
 ) {
@@ -2553,6 +2652,7 @@ calculate_population <- function(
     variable = 3,
     time = 4,
     time_type = "year",
+    weights = weights,
     ...
   )
   sites_return <- amadeus::calc_return_locs(
@@ -2583,6 +2683,9 @@ calculate_population <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 # nolint start
 #' @note Unit is km / sq km. The returned `data.frame` object contains a
@@ -2624,6 +2727,7 @@ calculate_groads <- function(
   locs_id = NULL,
   radius = 1000,
   fun = "sum",
+  weights = NULL,
   geom = FALSE,
   ...
 ) {
@@ -2715,6 +2819,9 @@ calculate_groads <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [calculate_geos()], [process_merra2()]
@@ -2748,6 +2855,7 @@ calculate_merra2 <- function(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -2792,6 +2900,7 @@ calculate_merra2 <- function(
     time = merra2_time,
     time_type = merra2_time_type,
     level = merra2_level,
+    weights = weights,
     ...
   )
   #### optional `.by` summarization
@@ -2842,6 +2951,9 @@ calculate_merra2 <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @seealso [`process_gridmet()`]
@@ -2873,6 +2985,7 @@ calculate_gridmet <- function(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -2901,6 +3014,7 @@ calculate_gridmet <- function(
     variable = 1,
     time = 2,
     time_type = "date",
+    weights = weights,
     ...
   )
   if (!is.null(.by)) {
@@ -2947,6 +3061,9 @@ calculate_gridmet <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @note
 #' TerraClimate data has monthly temporal resolution, so the `$time` column
@@ -2982,6 +3099,7 @@ calculate_terraclimate <- function(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -3010,6 +3128,7 @@ calculate_terraclimate <- function(
     variable = 1,
     time = 2,
     time_type = "yearmonth",
+    weights = weights,
     ...
   )
   posixt_out <- FALSE
@@ -3199,6 +3318,9 @@ calculate_lagged <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @author Insang Song
 #' @seealso [`process_prism()`]
@@ -3229,6 +3351,7 @@ calculate_prism <- function(
   locs,
   locs_id = "site_id",
   radius = 0,
+  weights = NULL,
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -3262,7 +3385,12 @@ calculate_prism <- function(
   # extract
   is_polygon_locs <- inherits(sites_e, "SpatVector") &&
     !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
-  if (radius == 0 && !is_polygon_locs) {
+  weights_prepared <- amadeus:::calc_prepare_weights(from = from[[1]], weights = weights)
+  fun_extract <- amadeus:::calc_weighted_fun(
+    fun = "mean",
+    weighted = !is.null(weights_prepared)
+  )
+  if (radius == 0 && !is_polygon_locs && is.null(weights_prepared)) {
     # use terra::extract for point locations
     sites_extracted <- terra::extract(from, sites_e)
     sites_extracted <- sites_extracted[, -1, drop = FALSE]
@@ -3274,14 +3402,20 @@ calculate_prism <- function(
     } else {
       sites_e_sf
     }
-    sites_extracted <- exactextractr::exact_extract(
-      from,
-      sites_e_buf,
-      fun = "mean",
-      force_df = TRUE,
-      progress = FALSE,
-      ...
+    extract_args <- c(
+      list(
+        x = from,
+        y = sites_e_buf,
+        fun = fun_extract,
+        force_df = TRUE,
+        progress = FALSE
+      ),
+      list(...)
     )
+    if (!is.null(weights_prepared)) {
+      extract_args$weights <- weights_prepared
+    }
+    sites_extracted <- do.call(exactextractr::exact_extract, extract_args)
   }
 
   # clean up names if they are from exact_extract (prefix "mean.")
@@ -3392,6 +3526,9 @@ calculate_prism <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @author Mariana Alifa Kassien, Insang Song
 #' @seealso [`process_edgar()`]
@@ -3418,6 +3555,7 @@ calculate_edgar <- function(
   locs,
   locs_id = "site_id",
   radius = 0,
+  weights = NULL,
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -3444,21 +3582,32 @@ calculate_edgar <- function(
 
   is_polygon_locs <- inherits(sites_e, "SpatVector") &&
     !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
-  if (radius == 0 && !is_polygon_locs) {
+  weights_prepared <- amadeus:::calc_prepare_weights(from = from[[1]], weights = weights)
+  fun_extract <- amadeus:::calc_weighted_fun(
+    fun = "mean",
+    weighted = !is.null(weights_prepared)
+  )
+  if (radius == 0 && !is_polygon_locs && is.null(weights_prepared)) {
     sites_extracted <- terra::extract(from, sites_e)
     sites_extracted <- sites_extracted[, -1, drop = FALSE]
   } else {
     if (inherits(sites_e, "SpatVector")) {
       sites_e <- sf::st_as_sf(sites_e)
     }
-    sites_extracted <- exactextractr::exact_extract(
-      from,
-      sites_e,
-      fun = "mean",
-      force_df = TRUE,
-      progress = FALSE,
-      ...
+    extract_args <- c(
+      list(
+        x = from,
+        y = sites_e,
+        fun = fun_extract,
+        force_df = TRUE,
+        progress = FALSE
+      ),
+      list(...)
     )
+    if (!is.null(weights_prepared)) {
+      extract_args$weights <- weights_prepared
+    }
+    sites_extracted <- do.call(exactextractr::exact_extract, extract_args)
     exact_names <- names(sites_extracted)
     if (length(exact_names) == 1 && identical(exact_names, "mean")) {
       exact_names <- names(from)[1]
@@ -3541,6 +3690,9 @@ calculate_edgar <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @author Insang Song
 #' @seealso [`process_cropscape()`]
@@ -3569,6 +3721,7 @@ calculate_cropscape <- function(
   locs,
   locs_id = "site_id",
   radius = 0,
+  weights = NULL,
   geom = FALSE,
   ...
 ) {
@@ -3597,7 +3750,8 @@ calculate_cropscape <- function(
   # extract
   is_polygon_locs <- inherits(sites_e, "SpatVector") &&
     !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
-  if (radius == 0 && !is_polygon_locs) {
+  weights_prepared <- amadeus:::calc_prepare_weights(from = from[[1]], weights = weights)
+  if (radius == 0 && !is_polygon_locs && is.null(weights_prepared)) {
     # terra::extract for point locations
     sites_extracted <- terra::extract(from, sites_e)
     sites_extracted <- sites_extracted[, -1, drop = FALSE]
@@ -3612,14 +3766,20 @@ calculate_cropscape <- function(
     }
 
     # fractions
-    sites_extracted <- exactextractr::exact_extract(
-      from,
-      sites_e_buf,
-      fun = "frac",
-      force_df = TRUE,
-      progress = FALSE,
-      ...
+    extract_args <- c(
+      list(
+        x = from,
+        y = sites_e_buf,
+        fun = "frac",
+        force_df = TRUE,
+        progress = FALSE
+      ),
+      list(...)
     )
+    if (!is.null(weights_prepared)) {
+      extract_args$weights <- weights_prepared
+    }
+    sites_extracted <- do.call(exactextractr::exact_extract, extract_args)
 
     colnames(sites_extracted) <- gsub(
       "frac_",
@@ -3660,6 +3820,9 @@ calculate_cropscape <- function(
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @author Insang Song
 #' @seealso [`process_huc()`]
@@ -3684,6 +3847,7 @@ calculate_huc <- function(
   from,
   locs,
   locs_id = "site_id",
+  weights = NULL,
   geom = FALSE,
   ...
 ) {
@@ -3743,6 +3907,9 @@ calculate_huc <- function(
 #'   with \code{.by} for space-time summaries.
 #' @param geom \code{FALSE}/\code{"sf"}/\code{"terra"}. Return geometry with
 #'   results. Default \code{FALSE}. The CRS is inherited from \code{from}.
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @seealso \code{\link{process_goes}}
 #' @author Mitchell Manware
@@ -3775,6 +3942,7 @@ calculate_goes <- function(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -3804,6 +3972,7 @@ calculate_goes <- function(
     time = c(2, 3),
     time_type = "hour",
     level = NULL,
+    weights = weights,
     ...
   )
   #### optional `.by` summarization
@@ -3875,6 +4044,9 @@ calculate_goes <- function(
 #' @param .by_time NULL or character(1). Name of the time column to use
 #'   when \code{.by} is a time-unit string. \code{NULL} defers to
 #'   \code{"time"}.
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Reserved for future use; currently ignored.
 #' @note
 #' \itemize{
@@ -3937,6 +4109,7 @@ calculate_drought <- function(
   locs_id = "site_id",
   radius = 0L,
   fun = "mean",
+  weights = NULL,
   geom = FALSE,
   .by = NULL,
   .by_time = NULL,
@@ -3965,6 +4138,14 @@ calculate_drought <- function(
     src_name  <- lyr_parts[1]
     ts_fmt    <- lyr_parts[2]
     col_name  <- paste0(src_name, "_", ts_fmt, "_", radius)
+    weighted_drought <- amadeus:::calc_prepare_weights(
+      from = from[[1]],
+      weights = weights
+    )
+    drought_fun_extract <- amadeus:::calc_weighted_fun(
+      fun = fun,
+      weighted = !is.null(weighted_drought)
+    )
 
     sites_extracted <- NULL
     for (l in seq_len(terra::nlyr(from))) {
@@ -3972,23 +4153,43 @@ calculate_drought <- function(
       data_time  <- as.POSIXct(as.Date(terra::time(data_layer)), tz = "UTC")
 
       if (terra::geomtype(sites_e) == "polygons") {
-        layer_vals <- exactextractr::exact_extract(
-          data_layer,
-          sf::st_as_sf(sites_e),
-          fun = fun,
+        extract_args <- list(
+          x = data_layer,
+          y = sf::st_as_sf(sites_e),
+          fun = drought_fun_extract,
           progress = FALSE,
           force_df = TRUE,
           max_cells_in_memory = 1e8
         )
+        if (!is.null(weighted_drought)) {
+          extract_args$weights <- weighted_drought
+        }
+        layer_vals <- do.call(exactextractr::exact_extract, extract_args)
       } else {
-        layer_vals <- terra::extract(
-          data_layer,
-          sites_e,
-          method = "simple",
-          ID = FALSE,
-          bind = FALSE,
-          na.rm = TRUE
-        )
+        if (is.null(weighted_drought)) {
+          layer_vals <- terra::extract(
+            data_layer,
+            sites_e,
+            method = "simple",
+            ID = FALSE,
+            bind = FALSE,
+            na.rm = TRUE
+          )
+        } else {
+          weighted_geoms <- amadeus:::calc_prepare_exact_geoms(
+            locs_vector = sites_e,
+            radius = radius
+          )
+          layer_vals <- exactextractr::exact_extract(
+            x = data_layer,
+            y = weighted_geoms,
+            weights = weighted_drought,
+            fun = drought_fun_extract,
+            progress = FALSE,
+            force_df = TRUE,
+            max_cells_in_memory = 1e8
+          )
+        }
       }
 
       row_df <- data.frame(

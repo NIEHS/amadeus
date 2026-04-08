@@ -9,6 +9,7 @@ calculate_hms(
   locs,
   locs_id = NULL,
   radius = 0,
+  weights = NULL,
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -25,6 +26,10 @@ containing identifier for each unique coordinate location.}
 
 \item{radius}{integer(1). Circular buffer distance around site locations.
 (Default = 0).}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
 Optional grouping key(s) for aggregating extracted values.}

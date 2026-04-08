@@ -9,6 +9,7 @@ calculate_edgar(
   locs,
   locs_id = "site_id",
   radius = 0,
+  weights = NULL,
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -25,6 +26,10 @@ identifier for each unique coordinate location.}
 
 \item{radius}{numeric(1). Circular buffer distance around site locations.
 Default is \code{0}.}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
 Optional post-extraction summarization target.}

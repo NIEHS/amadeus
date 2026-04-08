@@ -2372,6 +2372,51 @@ testthat::test_that("calculate_modis", {
   )
   testthat::expect_true(inherits(calc_mod_sf, "sf"))
 
+  testthat::expect_no_error({
+    from_w <- terra::rast(
+      nrows = 2,
+      ncols = 2,
+      xmin = 0,
+      xmax = 2000,
+      ymin = 0,
+      ymax = 2000,
+      crs = "EPSG:3857"
+    )
+    terra::values(from_w) <- c(1, 2, 3, 4)
+    names(from_w) <- "ndvi"
+    locs_w <- terra::vect(
+      data.frame(lon = 1000, lat = 1000, site_id = "001"),
+      geom = c("lon", "lat"),
+      crs = "EPSG:3857",
+      keepgeom = TRUE
+    )
+    weights_w <- from_w
+    terra::values(weights_w) <- c(1, 1, 1, 10)
+
+    mod_unweighted <- calculate_modis_daily(
+      from = from_w,
+      locs = locs_w,
+      locs_id = "site_id",
+      radius = 1200,
+      date = "2021-08-15",
+      name_extracted = "ndvi_01200",
+      scale = "* 1"
+    )
+    mod_weighted <- calculate_modis_daily(
+      from = from_w,
+      locs = locs_w,
+      locs_id = "site_id",
+      radius = 1200,
+      date = "2021-08-15",
+      name_extracted = "ndvi_01200",
+      weights = weights_w,
+      scale = "* 1"
+    )
+    testthat::expect_true(
+      mod_weighted$ndvi_01200 != mod_unweighted$ndvi_01200
+    )
+  })
+
   testthat::expect_error(
     calculate_modis(from = site_faux, scale = "* 1")
   )

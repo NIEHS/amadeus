@@ -16,6 +16,7 @@ calculate_modis(
   fun_summary = "mean",
   .by = NULL,
   .by_time = NULL,
+  weights = NULL,
   package_list_add = NULL,
   export_list_add = NULL,
   max_cells = 3e+07,
@@ -60,6 +61,10 @@ grouping-column, and spatial-object semantics.}
 
 \item{.by_time}{NULL or character(1). Optional time grouping key used
 with \code{.by} for space-time summaries.}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{package_list_add}{character. A vector with package names to load
 these in each thread. Note that \code{sf}, \code{terra}, \code{exactextractr},

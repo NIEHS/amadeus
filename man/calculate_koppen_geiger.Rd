@@ -8,6 +8,7 @@ calculate_koppen_geiger(
   from = NULL,
   locs = NULL,
   locs_id = "site_id",
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -19,6 +20,10 @@ calculate_koppen_geiger(
 a unique identifier field named \code{locs_id}}
 
 \item{locs_id}{character(1). Name of unique identifier.}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

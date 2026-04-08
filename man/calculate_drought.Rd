@@ -10,6 +10,7 @@ calculate_drought(
   locs_id = "site_id",
   radius = 0L,
   fun = "mean",
+  weights = NULL,
   geom = FALSE,
   .by = NULL,
   .by_time = NULL,
@@ -35,6 +36,10 @@ USDM). Default \code{0L}.}
 
 \item{fun}{character(1). Summary function applied to raster cells within
 the buffer (SPEI/EDDI only). Default \code{"mean"}.}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{geom}{\code{FALSE}, \code{"sf"}, or \code{"terra"}. Whether to
 attach geometry to the returned object. Default \code{FALSE}.}

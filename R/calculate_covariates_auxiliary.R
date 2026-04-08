@@ -296,6 +296,170 @@ calc_prepare_locs <- function(
   return(list(sites_e, sites_id))
 }
 
+#' Validate extents overlap
+#' @param x SpatRaster(1)
+#' @param y SpatRaster(1)
+#' @return logical(1)
+#' @keywords internal auxiliary
+#' @export
+calc_extents_overlap <- function(x, y) {
+  ext_x <- as.vector(terra::ext(x))
+  ext_y <- as.vector(terra::ext(y))
+  !(ext_x[2] < ext_y[1] || ext_y[2] < ext_x[1] ||
+    ext_x[4] < ext_y[3] || ext_y[4] < ext_x[3])
+}
+
+#' Prepare optional weighting raster
+#' @param from SpatRaster(1). Template raster.
+#' @param weights NULL, SpatRaster, SpatVector/sf polygon, or file path.
+#' @return NULL or single-layer SpatRaster aligned to `from`.
+#' @keywords internal auxiliary
+#' @export
+calc_prepare_weights <- function(from, weights = NULL) {
+  if (is.null(weights)) {
+    return(NULL)
+  }
+  if (!inherits(from, "SpatRaster")) {
+    stop("`from` must be a SpatRaster when `weights` are supplied.")
+  }
+
+  normalize_vector_weights <- function(vect_weights) {
+    if (terra::geomtype(vect_weights)[1] != "polygons") {
+      stop(
+        "`weights` vector input must contain polygons when supplied as ",
+        "SpatVector/sf."
+      )
+    }
+    from_crs <- terra::crs(from)
+    if (is.na(from_crs) || from_crs == "") {
+      stop("`from` is missing CRS; cannot validate weighted extraction CRS.")
+    }
+    vect_weights <- terra::project(vect_weights, from_crs)
+    val_cols <- names(vect_weights)
+    val_cols <- val_cols[sapply(val_cols, function(x) {
+      is.numeric(vect_weights[[x]])
+    })]
+    if (length(val_cols) == 0L) {
+      vect_weights$.amadeus_weight <- 1
+      val_col <- ".amadeus_weight"
+    } else {
+      val_col <- val_cols[1]
+      if (length(val_cols) > 1L) {
+        message(
+          "Multiple numeric columns found in `weights`; using first column: ",
+          val_col
+        )
+      }
+    }
+    if (any(vect_weights[[val_col]] < 0, na.rm = TRUE)) {
+      stop("`weights` values must be non-negative.")
+    }
+    weights_r <- terra::rasterize(
+      vect_weights,
+      from[[1]],
+      field = val_col,
+      background = NA,
+      touches = TRUE
+    )
+    if (all(is.na(terra::values(weights_r)))) {
+      stop("`weights` polygons do not overlap `from` extent.")
+    }
+    weights_r
+  }
+
+  weights_obj <- weights
+  if (is.character(weights) && length(weights) == 1L) {
+    weights_obj <- try(terra::rast(weights), silent = TRUE)
+    if (inherits(weights_obj, "try-error")) {
+      weights_obj <- try(terra::vect(weights), silent = TRUE)
+      if (inherits(weights_obj, "try-error")) {
+        stop("`weights` path could not be read as raster or vector data.")
+      }
+    }
+  }
+
+  if (inherits(weights_obj, c("sf", "sfc"))) {
+    weights_obj <- terra::vect(weights_obj)
+  }
+
+  if (inherits(weights_obj, "SpatVector")) {
+    return(normalize_vector_weights(weights_obj))
+  }
+  if (!inherits(weights_obj, "SpatRaster")) {
+    stop(
+      "`weights` must be NULL, SpatRaster, polygon SpatVector/sf, ",
+      "or a file path to one of those."
+    )
+  }
+  if (terra::nlyr(weights_obj) != 1L) {
+    stop("`weights` raster must have exactly one layer.")
+  }
+  if (!is.numeric(terra::values(weights_obj)[, 1])) {
+    stop("`weights` raster values must be numeric.")
+  }
+  if (any(terra::values(weights_obj)[, 1] < 0, na.rm = TRUE)) {
+    stop("`weights` values must be non-negative.")
+  }
+
+  from_crs <- terra::crs(from)
+  weights_crs <- terra::crs(weights_obj)
+  if (is.na(from_crs) || from_crs == "") {
+    stop("`from` is missing CRS; cannot validate weighted extraction CRS.")
+  }
+  if (is.na(weights_crs) || weights_crs == "") {
+    stop("`weights` is missing CRS; cannot validate weighted extraction CRS.")
+  }
+
+  weights_re <- terra::project(weights_obj, from[[1]], method = "bilinear")
+  if (!calc_extents_overlap(from[[1]], weights_re)) {
+    stop("`weights` extent does not overlap `from` extent.")
+  }
+  terra::resample(weights_re, from[[1]], method = "bilinear")
+}
+
+#' Convert point extractions to tiny polygons for exact extraction
+#' @param locs_vector SpatVector(1)
+#' @param radius numeric(1)
+#' @return sf object for exactextractr
+#' @keywords internal auxiliary
+#' @export
+calc_prepare_exact_geoms <- function(locs_vector, radius) {
+  geom_type <- terra::geomtype(locs_vector)[1]
+  if (geom_type == "polygons") {
+    return(sf::st_as_sf(locs_vector))
+  }
+  if (geom_type != "points") {
+    stop("Unsupported location geometry for weighted extraction.")
+  }
+  width <- as.numeric(radius)
+  if (!is.finite(width) || width <= 0) {
+    if (terra::is.lonlat(locs_vector)) {
+      width <- 1e-6
+    } else {
+      width <- 1
+    }
+  }
+  sf::st_as_sf(terra::buffer(locs_vector, width = width, quadsegs = 90L))
+}
+
+#' Resolve weighted summary function names for exactextractr
+#' @param fun character(1)
+#' @param weighted logical(1)
+#' @return character(1)
+#' @keywords internal auxiliary
+#' @export
+calc_weighted_fun <- function(fun, weighted = FALSE) {
+  if (!weighted) {
+    return(fun)
+  }
+  switch(
+    fun,
+    mean = "weighted_mean",
+    sum = "weighted_sum",
+    fun
+  )
+}
+
 #' Prepare time values
 #' @description
 #' Prepare the time values for covariate calculation based on type of time
@@ -393,6 +557,8 @@ calc_check_time <- function(
 #' Higher values will expedite processing, but will increase memory usage.
 #' Maximum possible value is `2^31 - 1`.
 #' See [`exactextractr::exact_extract`] for details.
+#' @param weights NULL, SpatRaster, polygon SpatVector/sf, or file path. Optional
+#' weighting surface used for weighted extraction.
 #' @param ... Placeholders.
 #' @importFrom terra nlyr
 #' @importFrom terra extract
@@ -406,18 +572,27 @@ calc_worker <- function(
   from,
   locs_vector,
   locs_df,
-  fun,
+  fun = "mean",
   variable = 1,
   time,
   time_type = c("date", "hour", "year", "yearmonth", "timeless"),
   radius,
   level = NULL,
   max_cells = 1e8,
+  weights = NULL,
   ...
 ) {
   #### empty location data.frame
   sites_extracted <- NULL
   time_type <- match.arg(time_type)
+  weights_prepared <- amadeus:::calc_prepare_weights(
+    from = from[[1]],
+    weights = weights
+  )
+  fun_extract <- amadeus:::calc_weighted_fun(
+    fun = fun,
+    weighted = !is.null(weights_prepared)
+  )
   for (l in seq_len(terra::nlyr(from))) {
     #### select data layer
     data_layer <- from[[l]]
@@ -452,24 +627,44 @@ calc_worker <- function(
     #### extract layer data at sites
     if (terra::geomtype(locs_vector) == "polygons") {
       ### apply exactextractr::exact_extract for polygons
-      sites_extracted_layer <- exactextractr::exact_extract(
-        data_layer,
-        sf::st_as_sf(locs_vector),
+      extract_args <- list(
+        x = data_layer,
+        y = sf::st_as_sf(locs_vector),
         progress = FALSE,
         force_df = TRUE,
-        fun = fun,
+        fun = fun_extract,
         max_cells_in_memory = max_cells
       )
+      if (!is.null(weights_prepared)) {
+        extract_args$weights <- weights_prepared
+      }
+      sites_extracted_layer <- do.call(exactextractr::exact_extract, extract_args)
     } else if (terra::geomtype(locs_vector) == "points") {
-      #### apply terra::extract for points
-      sites_extracted_layer <- terra::extract(
-        data_layer,
-        locs_vector,
-        method = "simple",
-        ID = FALSE,
-        bind = FALSE,
-        na.rm = TRUE
-      )
+      if (is.null(weights_prepared)) {
+        #### apply terra::extract for points
+        sites_extracted_layer <- terra::extract(
+          data_layer,
+          locs_vector,
+          method = "simple",
+          ID = FALSE,
+          bind = FALSE,
+          na.rm = TRUE
+        )
+      } else {
+        weighted_geoms <- amadeus:::calc_prepare_exact_geoms(
+          locs_vector = locs_vector,
+          radius = radius
+        )
+        sites_extracted_layer <- exactextractr::exact_extract(
+          x = data_layer,
+          y = weighted_geoms,
+          weights = weights_prepared,
+          progress = FALSE,
+          force_df = TRUE,
+          fun = fun_extract,
+          max_cells_in_memory = max_cells
+        )
+      }
     }
     # merge with site_id, time, and pressure levels (if applicable)
     if (time_type == "timeless") {
@@ -1256,6 +1451,9 @@ calc_summarize_temporal <- function(
 #' temperature)
 #' would be `scale = "* 0.02"`.
 #' Default is `NULL`, which applies no scale.
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @description The function operates at MODIS/VIIRS products
 #' on a daily basis. Given that the raw hdf files are downloaded from
@@ -1299,6 +1497,7 @@ calculate_modis_daily <- function(
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
+  weights = NULL,
   max_cells = 3e7,
   geom = FALSE,
   scale = NULL,
@@ -1320,6 +1519,7 @@ calculate_modis_daily <- function(
     radius,
     id,
     func = "mean",
+    weights = NULL,
     maxcells = NULL
   ) {
     # generate buffers
@@ -1329,17 +1529,25 @@ calculate_modis_daily <- function(
     bufs <- terra::buffer(points, width = radius, quadsegs = 180L)
     bufs <- terra::project(bufs, terra::crs(surf))
     # extract raster values
-    surf_at_bufs <-
-      exactextractr::exact_extract(
-        x = surf,
-        y = sf::st_as_sf(bufs),
-        fun = func,
-        force_df = TRUE,
-        stack_apply = TRUE,
-        append_cols = id,
-        progress = FALSE,
-        max_cells_in_memory = maxcells
-      )
+    weights_norm <- amadeus:::calc_prepare_weights(from = surf[[1]], weights = weights)
+    func_extract <- amadeus:::calc_weighted_fun(
+      fun = func,
+      weighted = !is.null(weights_norm)
+    )
+    extract_args <- list(
+      x = surf,
+      y = sf::st_as_sf(bufs),
+      fun = func_extract,
+      force_df = TRUE,
+      stack_apply = TRUE,
+      append_cols = id,
+      progress = FALSE,
+      max_cells_in_memory = maxcells
+    )
+    if (!is.null(weights_norm)) {
+      extract_args$weights <- weights_norm
+    }
+    surf_at_bufs <- do.call(exactextractr::exact_extract, extract_args)
     return(surf_at_bufs)
   }
 
@@ -1361,6 +1569,7 @@ calculate_modis_daily <- function(
       id = locs_id,
       radius = radius,
       func = fun_summary,
+      weights = weights,
       maxcells = max_cells
     )
   # cleaning names

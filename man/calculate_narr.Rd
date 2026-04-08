@@ -10,6 +10,7 @@ calculate_narr(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   .by = NULL,
   .by_time = NULL,
   geom = FALSE,
@@ -29,6 +30,10 @@ containing identifier for each unique coordinate location.}
 
 \item{fun}{character(1). Function used to summarize multiple raster cells
 within sites location buffer (Default = \code{mean}).}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
 Optional grouping key(s) for aggregating extracted values.}

@@ -9,6 +9,7 @@ calculate_ecoregion(
   locs,
   locs_id = "site_id",
   colnames = c("coded", "full_ecoregion"),
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -24,6 +25,10 @@ a unique identifier field named \code{locs_id}}
 \item{colnames}{character(1). Naming convention for ecoregion indicator
 columns. Default is \code{"coded"} for the existing numeric key-based names.
 Use \code{"full_ecoregion"} to emit sanitized full ecoregion names.}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
