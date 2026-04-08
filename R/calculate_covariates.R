@@ -3385,7 +3385,9 @@ calculate_prism <- function(
   # extract
   is_polygon_locs <- inherits(sites_e, "SpatVector") &&
     !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
-  weights_prepared <- amadeus:::calc_prepare_weights(from = from[[1]], weights = weights)
+  weights_prepared <- amadeus:::calc_prepare_weights(
+    from = from[[1]], weights = weights
+  )
   fun_extract <- amadeus:::calc_weighted_fun(
     fun = "mean",
     weighted = !is.null(weights_prepared)
@@ -3582,7 +3584,9 @@ calculate_edgar <- function(
 
   is_polygon_locs <- inherits(sites_e, "SpatVector") &&
     !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
-  weights_prepared <- amadeus:::calc_prepare_weights(from = from[[1]], weights = weights)
+  weights_prepared <- amadeus:::calc_prepare_weights(
+    from = from[[1]], weights = weights
+  )
   fun_extract <- amadeus:::calc_weighted_fun(
     fun = "mean",
     weighted = !is.null(weights_prepared)
@@ -3750,7 +3754,9 @@ calculate_cropscape <- function(
   # extract
   is_polygon_locs <- inherits(sites_e, "SpatVector") &&
     !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
-  weights_prepared <- amadeus:::calc_prepare_weights(from = from[[1]], weights = weights)
+  weights_prepared <- amadeus:::calc_prepare_weights(
+    from = from[[1]], weights = weights
+  )
   if (radius == 0 && !is_polygon_locs && is.null(weights_prepared)) {
     # terra::extract for point locations
     sites_extracted <- terra::extract(from, sites_e)

@@ -306,7 +306,7 @@ calc_extents_overlap <- function(x, y) {
   ext_x <- as.vector(terra::ext(x))
   ext_y <- as.vector(terra::ext(y))
   !(ext_x[2] < ext_y[1] || ext_y[2] < ext_x[1] ||
-    ext_x[4] < ext_y[3] || ext_y[4] < ext_x[3])
+      ext_x[4] < ext_y[3] || ext_y[4] < ext_x[3])
 }
 
 #' Prepare optional weighting raster
@@ -557,8 +557,8 @@ calc_check_time <- function(
 #' Higher values will expedite processing, but will increase memory usage.
 #' Maximum possible value is `2^31 - 1`.
 #' See [`exactextractr::exact_extract`] for details.
-#' @param weights NULL, SpatRaster, polygon SpatVector/sf, or file path. Optional
-#' weighting surface used for weighted extraction.
+#' @param weights NULL, SpatRaster, polygon SpatVector/sf, or file path.
+#'   Optional weighting surface used for weighted extraction.
 #' @param ... Placeholders.
 #' @importFrom terra nlyr
 #' @importFrom terra extract
@@ -638,7 +638,9 @@ calc_worker <- function(
       if (!is.null(weights_prepared)) {
         extract_args$weights <- weights_prepared
       }
-      sites_extracted_layer <- do.call(exactextractr::exact_extract, extract_args)
+      sites_extracted_layer <- do.call(
+        exactextractr::exact_extract, extract_args
+      )
     } else if (terra::geomtype(locs_vector) == "points") {
       if (is.null(weights_prepared)) {
         #### apply terra::extract for points
@@ -1529,7 +1531,9 @@ calculate_modis_daily <- function(
     bufs <- terra::buffer(points, width = radius, quadsegs = 180L)
     bufs <- terra::project(bufs, terra::crs(surf))
     # extract raster values
-    weights_norm <- amadeus:::calc_prepare_weights(from = surf[[1]], weights = weights)
+    weights_norm <- amadeus:::calc_prepare_weights(
+      from = surf[[1]], weights = weights
+    )
     func_extract <- amadeus:::calc_weighted_fun(
       fun = func,
       weighted = !is.null(weights_norm)
