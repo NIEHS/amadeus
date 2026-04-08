@@ -459,3 +459,202 @@ testthat::test_that("calculate_nei errors when locs cannot be converted to SpatV
     "unable to be converted"
   )
 })
+
+testthat::test_that("calc_weighted_fun weighted sum and default passthrough", {
+  testthat::expect_equal(
+    amadeus:::calc_weighted_fun("sum", weighted = TRUE),
+    "weighted_sum"
+  )
+  testthat::expect_equal(
+    amadeus:::calc_weighted_fun("min", weighted = TRUE),
+    "min"
+  )
+})
+
+testthat::test_that("calc_prepare_exact_geoms polygon, unsupported geom, projected non-finite radius", {
+  r <- terra::rast(
+    nrows = 2, ncols = 2, xmin = 0, xmax = 2, ymin = 0, ymax = 2, crs = "EPSG:4326"
+  )
+  poly_sv <- terra::as.polygons(r)
+
+  result_poly <- amadeus:::calc_prepare_exact_geoms(poly_sv, radius = 1000)
+  testthat::expect_s3_class(result_poly, "sf")
+
+  line_sv <- terra::vect(sf::st_sf(
+    id = 1L,
+    geometry = sf::st_sfc(
+      sf::st_linestring(matrix(c(0, 0, 1, 1), ncol = 2, byrow = TRUE)),
+      crs = 4326
+    )
+  ))
+  testthat::expect_error(
+    amadeus:::calc_prepare_exact_geoms(line_sv, radius = 1000),
+    "Unsupported location geometry"
+  )
+
+  pts_proj <- terra::vect(
+    data.frame(x = 500000, y = 4000000), geom = c("x", "y"), crs = "EPSG:32618"
+  )
+  result_proj <- amadeus:::calc_prepare_exact_geoms(pts_proj, radius = -1)
+  testthat::expect_s3_class(result_proj, "sf")
+})
+
+testthat::test_that("calc_prepare_weights error and edge-case branches", {
+  from_r <- terra::rast(
+    nrows = 4, ncols = 4, xmin = 0, xmax = 4, ymin = 0, ymax = 4, crs = "EPSG:4326"
+  )
+  terra::values(from_r) <- 1:16
+  names(from_r) <- "val"
+
+  # non-SpatRaster `from` with weights supplied
+  testthat::expect_error(
+    amadeus:::calc_prepare_weights(from = list(), weights = from_r),
+    "must be a SpatRaster"
+  )
+
+  # sf polygon weights converted to SpatVector
+  poly_sf <- sf::st_sf(
+    val = 1.0,
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(matrix(
+        c(0, 0, 2, 0, 2, 2, 0, 2, 0, 0), ncol = 2, byrow = TRUE
+      ))),
+      crs = 4326
+    )
+  )
+  result_sf <- amadeus:::calc_prepare_weights(from = from_r, weights = poly_sf)
+  testthat::expect_s4_class(result_sf, "SpatRaster")
+
+  # invalid weights type (not NULL/SpatRaster/SpatVector/sf/character)
+  testthat::expect_error(
+    amadeus:::calc_prepare_weights(from = from_r, weights = 42L),
+    "must be NULL, SpatRaster, polygon SpatVector"
+  )
+
+  # multi-layer raster weights
+  wt_multi <- c(from_r, from_r)
+  testthat::expect_error(
+    amadeus:::calc_prepare_weights(from = from_r, weights = wt_multi),
+    "exactly one layer"
+  )
+
+  # negative raster weights
+  wt_neg <- from_r
+  terra::values(wt_neg) <- -1
+  testthat::expect_error(
+    amadeus:::calc_prepare_weights(from = from_r, weights = wt_neg),
+    "non-negative"
+  )
+
+  # `from` missing CRS with raster weights
+  from_nocrs <- from_r
+  terra::crs(from_nocrs) <- ""
+  wt_valid <- from_r
+  terra::values(wt_valid) <- 1
+  testthat::expect_error(
+    amadeus:::calc_prepare_weights(from = from_nocrs, weights = wt_valid),
+    "missing CRS"
+  )
+
+  # vector polygon weights with non-polygon (points) geometry
+  pts_sv <- terra::vect(
+    data.frame(x = 1, y = 1), geom = c("x", "y"), crs = "EPSG:4326"
+  )
+  testthat::expect_error(
+    amadeus:::calc_prepare_weights(from = from_r, weights = pts_sv),
+    "must contain polygons"
+  )
+
+  # `from` missing CRS with vector polygon weights
+  poly_sv <- terra::as.polygons(from_r)[1]
+  testthat::expect_error(
+    amadeus:::calc_prepare_weights(from = from_nocrs, weights = poly_sv),
+    "missing CRS"
+  )
+
+  # vector polygon weights that do not overlap `from`
+  poly_far <- terra::vect(sf::st_sf(
+    val = 1.0,
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(matrix(
+        c(100, 50, 102, 50, 102, 52, 100, 52, 100, 50), ncol = 2, byrow = TRUE
+      ))),
+      crs = 4326
+    )
+  ))
+  testthat::expect_error(
+    amadeus:::calc_prepare_weights(from = from_r, weights = poly_far),
+    "do not overlap"
+  )
+})
+
+testthat::test_that("calculate functions pass weights through correctly", {
+  from_r <- terra::rast(
+    nrows = 4, ncols = 4, xmin = 0, xmax = 4, ymin = 0, ymax = 4, crs = "EPSG:4326"
+  )
+  terra::values(from_r) <- 1:16
+  names(from_r) <- "val"
+  weights_r <- terra::rast(
+    nrows = 4, ncols = 4, xmin = 0, xmax = 4, ymin = 0, ymax = 4, crs = "EPSG:4326"
+  )
+  terra::values(weights_r) <- 1
+
+  poly_locs <- sf::st_sf(
+    site_id = "p1",
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(matrix(
+        c(0, 0, 1, 0, 1, 1, 0, 1, 0, 0), ncol = 2, byrow = TRUE
+      ))),
+      crs = 4326
+    )
+  )
+
+  # calculate_covariates dispatches and passes weights (line 191)
+  suppressMessages(
+    res_cc <- amadeus::calculate_covariates(
+      covariate = "edgar",
+      from = from_r,
+      locs = poly_locs,
+      locs_id = "site_id",
+      weights = weights_r
+    )
+  )
+  testthat::expect_equal(nrow(res_cc), 1L)
+
+  # calculate_prism weights passed to exact_extract (line 3416)
+  suppressMessages(
+    res_prism <- amadeus::calculate_prism(
+      from = from_r, locs = poly_locs, locs_id = "site_id",
+      radius = 0, weights = weights_r
+    )
+  )
+  testthat::expect_equal(nrow(res_prism), 1L)
+
+  # calculate_edgar weights passed to exact_extract (line 3608)
+  suppressMessages(
+    res_edgar <- amadeus::calculate_edgar(
+      from = from_r, locs = poly_locs, locs_id = "site_id",
+      radius = 0, weights = weights_r
+    )
+  )
+  testthat::expect_equal(nrow(res_edgar), 1L)
+
+  # calculate_cropscape weights passed to exact_extract (line 3780)
+  suppressMessages(
+    res_cs <- suppressWarnings(amadeus::calculate_cropscape(
+      from = from_r, locs = poly_locs, locs_id = "site_id",
+      radius = 0, weights = weights_r
+    ))
+  )
+  testthat::expect_equal(nrow(res_cs), 1L)
+
+  # calculate_drought polygon locs + weights (line 4165)
+  drought_r <- from_r
+  terra::time(drought_r) <- as.Date("2020-01-01")
+  names(drought_r) <- "spei_01_2020-01-01"
+  res_drought <- amadeus::calculate_drought(
+    from = drought_r, locs = poly_locs, locs_id = "site_id",
+    radius = 0, weights = weights_r
+  )
+  testthat::expect_equal(nrow(res_drought), 1L)
+})
