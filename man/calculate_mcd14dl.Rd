@@ -15,7 +15,7 @@ calculate_mcd14dl(
 )
 }
 \arguments{
-\item{from}{SpatVector(1). Output of \code{process_mcd14dl()}.}
+\item{from}{SpatVector(1). Processed fire detections as a SpatVector.}
 
 \item{locs}{sf/SpatVector. Unique locations. Should include a unique
 identifier field named \code{locs_id}.}
@@ -50,7 +50,7 @@ Returns a \code{data.frame} with fire count and mean FRP per buffer radius.
 \dontrun{
 loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 calculate_mcd14dl(
-  from = mcd14dl,  # derived from process_mcd14dl() example
+  from = mcd14dl,  # derived from process_covariates() example
   locs = loc,
   locs_id = "id",
   radius = c(0L, 1000L)
@@ -58,7 +58,7 @@ calculate_mcd14dl(
 }
 }
 \seealso{
-\code{\link[=process_mcd14dl]{process_mcd14dl()}}
+\code{\link[=process_covariates]{process_covariates()}}
 }
 \author{
 Insang Song

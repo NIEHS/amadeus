@@ -9,7 +9,7 @@ calc_worker(
   from,
   locs_vector,
   locs_df,
-  fun,
+  fun = "mean",
   variable = 1,
   time,
   time_type = c("date", "hour", "year", "yearmonth", "timeless"),
@@ -53,8 +53,8 @@ Higher values will expedite processing, but will increase memory usage.
 Maximum possible value is \code{2^31 - 1}.
 See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
 
-\item{weights}{NULL, SpatRaster, polygon SpatVector/sf, or file path. Optional
-weighting surface used for weighted extraction.}
+\item{weights}{NULL, SpatRaster, polygon SpatVector/sf, or file path.
+Optional weighting surface used for weighted extraction.}
 
 \item{...}{Placeholders.}
 }

@@ -1285,7 +1285,7 @@ process_modis_swath, or process_blackmarble."
 #' Aggregate MODIS/VIIRS active fire detection counts and fire radiative
 #' power (FRP) within circular buffers around point locations.
 #' Returns a \code{data.frame} with fire count and mean FRP per buffer radius.
-#' @param from SpatVector(1). Output of \code{process_mcd14dl()}.
+#' @param from SpatVector(1). Processed fire detections as a SpatVector.
 #' @param locs sf/SpatVector. Unique locations. Should include a unique
 #'   identifier field named \code{locs_id}.
 #' @param locs_id character(1). Name of unique identifier. Default
@@ -1301,7 +1301,7 @@ process_modis_swath, or process_blackmarble."
 #' @param ... Placeholders.
 #' @return a data.frame or SpatVector object.
 #' @author Insang Song
-#' @seealso [`process_mcd14dl()`]
+#' @seealso [process_covariates()]
 #' @importFrom methods is
 #' @importFrom sf st_as_sf
 #' @examples
@@ -1310,7 +1310,7 @@ process_modis_swath, or process_blackmarble."
 #' \dontrun{
 #' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
 #' calculate_mcd14dl(
-#'   from = mcd14dl,  # derived from process_mcd14dl() example
+#'   from = mcd14dl,  # derived from process_covariates() example
 #'   locs = loc,
 #'   locs_id = "id",
 #'   radius = c(0L, 1000L)
