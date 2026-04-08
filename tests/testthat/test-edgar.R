@@ -976,13 +976,12 @@ testthat::test_that("calculate_edgar .by branch derives time and validates input
   testthat::expect_true("time" %in% names(by_out))
   testthat::expect_s3_class(by_out$time, "POSIXct")
 
-  testthat::local_mocked_bindings(
-    calc_worker = function(...) data.frame(site_id = "s1", a_0 = 1, b_0 = 2),
-    .package = "amadeus"
-  )
+  from_multi <- c(from, from)
+  names(from_multi) <- c("edgar_voc_1", "edgar_voc_2")
+  terra::time(from_multi) <- as.POSIXct(c(NA, NA), origin = "1970-01-01", tz = "UTC")
   testthat::expect_error(
     calculate_edgar(
-      from = from,
+      from = from_multi,
       locs = locs,
       locs_id = "site_id",
       radius = 0,
