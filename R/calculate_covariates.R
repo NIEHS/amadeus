@@ -3461,11 +3461,20 @@ calculate_prism <- function(
       }
       prism_time <- NA
       time_vals <- try(terra::time(from), silent = TRUE)
-      if (!inherits(time_vals, "try-error") && length(time_vals) >= 1L) {
+      if (
+        !inherits(time_vals, "try-error") &&
+          length(time_vals) >= 1L &&
+          !is.na(time_vals[1])
+      ) {
         prism_time <- time_vals[1]
-      } else {
+      }
+      if (is.na(prism_time)) {
         meta <- try(terra::metags(from), silent = TRUE)
-        if (!inherits(meta, "try-error") && nrow(meta) > 0) {
+        if (
+          !inherits(meta, "try-error") &&
+            is.data.frame(meta) &&
+            nrow(meta) > 0
+        ) {
           idx_time <- which(meta[, 1] == "time")
           if (length(idx_time) == 1L) {
             time_raw <- meta[idx_time, 2]

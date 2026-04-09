@@ -335,9 +335,10 @@ calc_prepare_weights <- function(from, weights = NULL) {
       stop("`from` is missing CRS; cannot validate weighted extraction CRS.")
     }
     vect_weights <- terra::project(vect_weights, from_crs)
+    vect_df <- terra::as.data.frame(vect_weights)
     val_cols <- names(vect_weights)
     val_cols <- val_cols[sapply(val_cols, function(x) {
-      is.numeric(vect_weights[[x]])
+      is.numeric(vect_df[[x]])
     })]
     if (length(val_cols) == 0L) {
       vect_weights$.amadeus_weight <- 1
@@ -351,7 +352,7 @@ calc_prepare_weights <- function(from, weights = NULL) {
         )
       }
     }
-    if (any(vect_weights[[val_col]] < 0, na.rm = TRUE)) {
+    if (any(vect_df[[val_col]] < 0, na.rm = TRUE)) {
       stop("`weights` values must be non-negative.")
     }
     weights_r <- terra::rasterize(

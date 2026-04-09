@@ -658,3 +658,144 @@ testthat::test_that("calculate functions pass weights through correctly", {
   )
   testthat::expect_equal(nrow(res_drought), 1L)
 })
+
+testthat::test_that("calc_prepare_weights covers vector numeric column and path branches", {
+  from_r <- terra::rast(
+    nrows = 4, ncols = 4, xmin = 0, xmax = 4, ymin = 0, ymax = 4, crs = "EPSG:4326"
+  )
+  terra::values(from_r) <- 1:16
+  names(from_r) <- "val"
+
+  # SpatVector polygon with exactly one numeric column -> lines 346, (347 not triggered)
+  poly_sv_one <- terra::vect(sf::st_sf(
+    val = 2.0,
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(matrix(
+        c(0, 0, 2, 0, 2, 2, 0, 2, 0, 0), ncol = 2, byrow = TRUE
+      ))),
+      crs = 4326
+    )
+  ))
+  result_one <- amadeus:::calc_prepare_weights(from = from_r, weights = poly_sv_one)
+  testthat::expect_s4_class(result_one, "SpatRaster")
+
+  # SpatVector polygon with multiple numeric columns -> lines 347-352 (message)
+  poly_sv_multi <- terra::vect(sf::st_sf(
+    val = 2.0, val2 = 3.0,
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(matrix(
+        c(0, 0, 2, 0, 2, 2, 0, 2, 0, 0), ncol = 2, byrow = TRUE
+      ))),
+      crs = 4326
+    )
+  ))
+  testthat::expect_message(
+    amadeus:::calc_prepare_weights(from = from_r, weights = poly_sv_multi),
+    "Multiple numeric columns"
+  )
+
+  # SpatVector polygon with negative value -> line 355 stop
+  poly_sv_neg <- terra::vect(sf::st_sf(
+    val = -1.0,
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(matrix(
+        c(0, 0, 2, 0, 2, 2, 0, 2, 0, 0), ncol = 2, byrow = TRUE
+      ))),
+      crs = 4326
+    )
+  ))
+  testthat::expect_error(
+    amadeus:::calc_prepare_weights(from = from_r, weights = poly_sv_neg),
+    "non-negative"
+  )
+
+  # Path-based weights: vector file path -> lines 372-374
+  tmpdir <- withr::local_tempdir()
+  shp_path <- file.path(tmpdir, "wt.gpkg")
+  sf::st_write(sf::st_sf(
+    val = 1.0,
+    geometry = sf::st_sfc(
+      sf::st_polygon(list(matrix(
+        c(0, 0, 2, 0, 2, 2, 0, 2, 0, 0), ncol = 2, byrow = TRUE
+      ))),
+      crs = 4326
+    )
+  ), shp_path, quiet = TRUE)
+  result_path_vec <- amadeus:::calc_prepare_weights(from = from_r, weights = shp_path)
+  testthat::expect_s4_class(result_path_vec, "SpatRaster")
+
+  # Path-based weights: invalid path -> line 376 stop
+  testthat::expect_error(
+    amadeus:::calc_prepare_weights(from = from_r, weights = file.path(tmpdir, "no_file.xyz")),
+    "could not be read"
+  )
+})
+
+testthat::test_that("calculate_prism derives time from metags when terra::time returns NA", {
+  from_r <- terra::rast(
+    nrows = 2, ncols = 2, xmin = 0, xmax = 2, ymin = 0, ymax = 2, crs = "EPSG:4326"
+  )
+  terra::values(from_r) <- c(1, 2, 3, 4)
+  names(from_r) <- "ppt"
+
+  locs <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
+
+  # Mock calc_worker so we don't need real data
+  testthat::local_mocked_bindings(
+    calc_worker = function(...) data.frame(site_id = "s1", ppt_0 = 2.5),
+    .package = "amadeus"
+  )
+
+  # 8-digit date in metags (YYYYMMDD -> lines 3472-3473)
+  meta_r8 <- from_r
+  terra::metags(meta_r8) <- data.frame(name = "time", value = "20200115")
+  r8 <- amadeus::calculate_prism(
+    from = meta_r8, locs = locs, locs_id = "site_id",
+    radius = 0, .by = "day"
+  )
+  testthat::expect_true("time" %in% names(r8))
+  testthat::expect_equal(as.character(as.Date(r8$time[1])), "2020-01-15")
+
+  # 6-digit date in metags (YYYYMM -> lines 3474-3475)
+  meta_r6 <- from_r
+  terra::metags(meta_r6) <- data.frame(name = "time", value = "202003")
+  r6 <- amadeus::calculate_prism(
+    from = meta_r6, locs = locs, locs_id = "site_id",
+    radius = 0, .by = "month"
+  )
+  testthat::expect_true("time" %in% names(r6))
+  testthat::expect_equal(as.character(as.Date(r6$time[1])), "2020-03-01")
+
+  # 4-digit year in metags (YYYY -> lines 3476-3477)
+  meta_r4 <- from_r
+  terra::metags(meta_r4) <- data.frame(name = "time", value = "2021")
+  r4 <- amadeus::calculate_prism(
+    from = meta_r4, locs = locs, locs_id = "site_id",
+    radius = 0, .by = "year"
+  )
+  testthat::expect_true("time" %in% names(r4))
+  testthat::expect_equal(as.character(as.Date(r4$time[1])), "2021-01-01")
+})
+
+testthat::test_that("calculate_drought with point locs and weights uses exact_extract path", {
+  from_r <- terra::rast(
+    nrows = 4, ncols = 4, xmin = 0, xmax = 4, ymin = 0, ymax = 4, crs = "EPSG:4326"
+  )
+  terra::values(from_r) <- as.numeric(1:16)
+  terra::time(from_r) <- as.Date("2020-06-01")
+  names(from_r) <- "spei_01_2020-06-01"
+
+  weights_r <- terra::rast(
+    nrows = 4, ncols = 4, xmin = 0, xmax = 4, ymin = 0, ymax = 4, crs = "EPSG:4326"
+  )
+  terra::values(weights_r) <- 1
+
+  # Point locs + weights -> lines 4185-4189 (calc_prepare_exact_geoms + exact_extract)
+  pt_locs <- data.frame(site_id = "p1", lon = 1.0, lat = 1.0)
+  res <- amadeus::calculate_drought(
+    from = from_r, locs = pt_locs, locs_id = "site_id",
+    radius = 10000, weights = weights_r
+  )
+  testthat::expect_equal(nrow(res), 1L)
+  testthat::expect_true(any(grepl("spei", names(res))))
+})
