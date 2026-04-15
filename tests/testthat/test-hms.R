@@ -592,6 +592,32 @@ testthat::test_that("calculate_hms .by aggregates daily rows to weekly", {
   testthat::expect_s3_class(hms_weekly$time, "POSIXct")
 })
 
+testthat::test_that("calculate_hms .by_time defaults to smoke-day sums", {
+  withr::local_package("terra")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  hms <- process_hms(
+    date = c("2022-06-10", "2022-06-13"),
+    path = testthat::test_path("..", "testdata", "hms")
+  )
+  hms_weekly <- suppressMessages(
+    calculate_hms(
+      from = hms,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "site_id",
+      .by_time = "week",
+      geom = FALSE
+    )
+  )
+  testthat::expect_equal(nrow(hms_weekly), 2L)
+  # 2022-06-10/11/12 week has 2 smoke days; 2022-06-13 week has 1 smoke day.
+  testthat::expect_equal(as.integer(hms_weekly$light_00000), c(2L, 1L))
+  testthat::expect_equal(as.integer(hms_weekly$medium_00000), c(0L, 0L))
+  testthat::expect_equal(as.integer(hms_weekly$heavy_00000), c(0L, 0L))
+})
+
 testthat::test_that("calculate_hms default .by NULL is backward-compat", {
   withr::local_package("terra")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
@@ -739,5 +765,35 @@ testthat::test_that("download_hms Shapefile mock download hash=FALSE", {
     )
     testthat::expect_type(result, "list")
     testthat::expect_equal(result$success, 1)
+  })
+})
+
+testthat::test_that("download_hms skips cleanly when all files already exist", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    check_destfile = function(...) FALSE,
+    download_run_method = function(...) stop("download_run_method should not be called"),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_hms(
+          date = c("2018-01-01", "2018-01-02"),
+          data_format = "Shapefile",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 0)
+    testthat::expect_equal(result$failed, 0)
+    testthat::expect_equal(result$skipped, 2)
   })
 })

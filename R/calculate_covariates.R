@@ -1918,7 +1918,8 @@ calculate_nei <- function(
 #' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
 #' Optional grouping key(s) for aggregating extracted values.
 #' @param .by_time NULL or character(1). Optional time grouping key used
-#' when \code{.by} is provided.
+#' when \code{.by} is provided. When supplied, HMS indicators are summarized
+#' by \code{sum} (smoke-day counts) by default.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -1992,11 +1993,12 @@ calculate_hms <- function(
       )
 
     if (!is.null(.by)) {
+      hms_fun_summary <- if (!is.null(.by_time)) "sum" else "mean"
       skip_merge <- amadeus::calc_summarize_by(
         covar = skip_merge,
         .by = .by,
         .by_time = .by_time,
-        fun_summary = "mean",
+        fun_summary = hms_fun_summary,
         locs_id = locs_id
       )
       did_summarize <- TRUE
@@ -2146,11 +2148,12 @@ calculate_hms <- function(
   sites_extracted[is.na(sites_extracted)] <- 0L
 
   if (!is.null(.by)) {
+    hms_fun_summary <- if (!is.null(.by_time)) "sum" else "mean"
     sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
       .by = .by,
       .by_time = .by_time,
-      fun_summary = "mean",
+      fun_summary = hms_fun_summary,
       locs_id = locs_id
     )
     did_summarize <- TRUE

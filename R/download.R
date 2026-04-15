@@ -2708,6 +2708,15 @@ download_hms <- function(
     )))
   }
 
+  if (length(all_urls) == 0L) {
+    message("All requested HMS files already exist. Nothing to download.\n")
+    return(invisible(list(
+      success = 0,
+      failed = 0,
+      skipped = length(date_sequence)
+    )))
+  }
+
   #### Download files using httr2
   download_result <- amadeus::download_run_method(
     urls = all_urls,
