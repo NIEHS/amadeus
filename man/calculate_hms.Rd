@@ -35,7 +35,8 @@ path. Optional weights raster for weighted extraction. If \code{NULL}
 Optional grouping key(s) for aggregating extracted values.}
 
 \item{.by_time}{NULL or character(1). Optional time grouping key used
-when \code{.by} is provided.}
+when \code{.by} is provided. When supplied, HMS indicators are summarized
+by \code{sum} (smoke-day counts) by default.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

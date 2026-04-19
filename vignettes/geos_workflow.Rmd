@@ -162,7 +162,7 @@ Each workflow uses two small example surfaces: `example_points_sf`, a saved subs
 
 - `collection` accepts six hourly GEOS-CF global NetCDF collections: `aqc_tavg_1hr_g1440x721_v1`, `chm_tavg_1hr_g1440x721_v1`, `met_tavg_1hr_g1440x721_x1`, `xgc_tavg_1hr_g1440x721_x1`, `chm_inst_1hr_g1440x721_p23`, and `met_inst_1hr_g1440x721_p23`.
 - `date` can be a single day or a start/end range; each requested day expands to hourly `.nc4` files for every selected collection.
-- Standard downloads retrieve the full 1440×721 global grid; study-area clipping usually happens later in `process_covariates()`. Set `use_opendap = TRUE` with an `extent` to request a server-side spatial subset and reduce transfer size.
+- Standard downloads retrieve the full 1440×721 global grid; study-area clipping usually happens later in `process_covariates()`.
 - NASA EarthData authentication is required; `amadeus` reads `NASA_EARTHDATA_TOKEN` or accepts a token explicitly.
 - The wrapper validates the first requested URL before downloading and stops early when a requested date is unavailable.
 
@@ -189,82 +189,6 @@ geos_live_probe
 
 geos_live_files <- character(0)
 ```
-
-
-## Download with OPeNDAP — server-side spatial and variable subsetting
-
-OPeNDAP enables server-side subsetting for GEOS-CF, so only the grid cells and
-variables you request are transferred instead of the full 1440×721 global grid.
-Set `use_opendap = TRUE`, provide an `extent` (`c(xmin, ymin, xmax, ymax)` in
-WGS-84 degrees), and optionally a `variables` vector. Authentication is handled
-by the same `NASA_EARTHDATA_TOKEN` environment variable used for standard
-downloads.
-
-The example below retrieves ozone (`O3`) and nitrogen dioxide (`NO2`) from the
-`chm_inst_1hr_g1440x721_p23` collection over the US Mid-Atlantic for a single
-day — a small fraction of the full-globe file.
-
-These OPeNDAP chunks are shown as runnable templates (`eval = FALSE`) because
-endpoint latency/availability can vary in automated environments.
-
-```{r geos-opendap, eval = FALSE}
-geos_opendap_extent <- c(-85, 33, -75, 42)
-directory_to_save_opendap <- file.path(tempdir(), "geos_opendap")
-download_data(
-  dataset_name = "geos",
-  collection = "chm_inst_1hr_g1440x721_p23",
-  date = "2019-09-09",
-  directory_to_save = directory_to_save_opendap,
-  acknowledgement = TRUE,
-  use_opendap = TRUE,
-  extent = geos_opendap_extent,
-  variables = c("O3", "NO2")
-)
-list.files(directory_to_save_opendap, pattern = "\\.nc4?$", recursive = TRUE)
-```
-
-```{r geos-opendap-bbox, eval = FALSE, fig.width = 7, fig.height = 5, fig.alt = "Map showing the US Mid-Atlantic bounding box used for the GEOS-CF OPeNDAP spatial subset."}
-geos_bbox_poly <- terra::vect(
-  terra::ext(
-    geos_opendap_extent[1], geos_opendap_extent[3],
-    geos_opendap_extent[2], geos_opendap_extent[4]
-  ),
-  crs = "EPSG:4326"
-)
-terra::plot(
-  geos_bbox_poly,
-  border = "blue",
-  lwd = 2,
-  main = "GEOS-CF OPeNDAP spatial subset (blue = requested extent)"
-)
-```
-
-```{r geos-opendap-process, eval = FALSE}
-geos_opendap_dir <- file.path(
-  directory_to_save_opendap,
-  "chm_inst_1hr_g1440x721_p23"
-)
-processed_opendap_geos <- process_covariates(
-  covariate = "geos",
-  variable = "O3",
-  date = "2019-09-09",
-  path = geos_opendap_dir
-)
-processed_opendap_geos
-```
-
-```{r geos-opendap-plot, eval = FALSE, fig.width = 9, fig.height = 6, fig.alt = "Map of surface ozone (O3) from the GEOS-CF OPeNDAP spatial subset over the US Mid-Atlantic for 2019-09-09."}
-terra::plot(
-  processed_opendap_geos[[1]],
-  main = "GEOS-CF O3 via OPeNDAP subset — 2019-09-09 00:00 UTC",
-  col = grDevices::hcl.colors(64, "YlOrRd")
-)
-terra::plot(geos_bbox_poly, border = "blue", lwd = 2, add = TRUE)
-```
-
-The downloaded files are NetCDF4 spatial subsets that can be processed with
-`process_covariates()` just like full-globe GEOS-CF files. Downstream
-processing clips to `extent` as usual.
 
 ## Process one workflow-ready data product
 
@@ -337,5 +261,4 @@ plot_polygons(polygon_values, paste0("NASA GEOS-CF", ": Durham H3 polygons"))
 
 ## Notes
 
-- The live download chunk validates authenticated GEOS-CF OPeNDAP requests with `download = FALSE`; downstream processing uses downloaded files when present and otherwise falls back to packaged GEOS test files for reproducible rendering.
-- OPeNDAP examples are kept as explicit templates (`eval = FALSE`) to avoid external endpoint instability breaking automated renders.
+- The live download chunk validates authenticated GEOS-CF requests with `download = FALSE`; downstream processing uses downloaded files when present and otherwise falls back to packaged GEOS test files for reproducible rendering.

@@ -45,4 +45,3 @@ Kyle Messier
 }
 \keyword{auxiliary}
 \keyword{internal}
-\keyword{opendap}

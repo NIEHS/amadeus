@@ -146,7 +146,7 @@ Each workflow uses two small example surfaces: `example_points_sf`, a saved subs
 directory_to_save <- file.path(tempdir(), "gridmet_workflow")
 download_data(
   dataset_name = "gridmet",
-  variables = c("Precipitation", "Maximum Near-Surface Air Temperature"),
+  variables = c("tmmx", "pr"),
   year = 2020,
   directory_to_save = directory_to_save,
   acknowledgement = TRUE
@@ -158,14 +158,9 @@ download_data(
 ```{r process, eval = live_run}
 processed_data <- process_covariates(
   covariate = "gridmet",
-  variable = "Precipitation",
+  variable = "tmmx",
   date = c("2020-01-03", "2020-01-05"),
-  path = dirname(list.files(
-    directory_to_save,
-    pattern = "\\.nc$",
-    recursive = TRUE,
-    full.names = TRUE
-  )[1]),
+  path = file.path(directory_to_save, "tmmx"),
   extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
 )
 ```

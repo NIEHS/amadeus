@@ -377,7 +377,7 @@ the input then flatten it manually."
 # nolint start
 #' Process MODIS .hdf files
 #' @description
-#' Get mosaicked or merged raster from multiple MODIS hdf files.
+#' Get mosaic or merged raster from multiple MODIS hdf files.
 #' @param path character. Full list of hdf file paths.
 #'  preferably a recursive search result from [`base::list.files`].
 #' @param date character(1). date to query. Should be in
@@ -482,11 +482,13 @@ process_modis_merge <- function(
         result_secondary <- layer_target_secondary[[1]]
       }
 
-      if (!isTRUE(terra::compareGeom(
-        result_merged,
-        result_secondary,
-        stopOnError = FALSE
-      ))) {
+      if (
+        !isTRUE(terra::compareGeom(
+          result_merged,
+          result_secondary,
+          stopOnError = FALSE
+        ))
+      ) {
         stop(
           "Primary and secondary MODIS rasters have incompatible geometry.\n"
         )
@@ -894,7 +896,7 @@ process_modis_swath <-
     paths_today <- grep(sprintf("A%s", datejul), path, value = TRUE)
 
     # if two or more paths are put in,
-    # these are read into a list then mosaicked
+    # these are read into a list then mosaic
     for (element in seq_along(subdataset)) {
       target_text <-
         sprintf("%s%s%s%s", header, paths_today, suffix, subdataset[element])
@@ -1190,8 +1192,7 @@ process_ecoregion <-
     poly_tukey <- sf::st_transform(poly_tukey, sf::st_crs(ecoreg))
 
     # nolint end
-    ecoreg <- ecoreg[
-      ,
+    ecoreg <- ecoreg[,
       grepl(
         "^(L2_KEY|L3_KEY|NA_L2NAME|US_L3NAME|NA_L3NAME)",
         names(ecoreg)
@@ -1567,7 +1568,10 @@ process_aqs <-
     raw_dates <- as.character(sites$Date.Local)
     slash_idx <- grepl("/", raw_dates, fixed = TRUE)
     dash_idx <- grepl("-", raw_dates, fixed = TRUE)
-    parsed_dates[slash_idx] <- as.Date(raw_dates[slash_idx], format = "%m/%d/%Y")
+    parsed_dates[slash_idx] <- as.Date(
+      raw_dates[slash_idx],
+      format = "%m/%d/%Y"
+    )
     parsed_dates[dash_idx] <- as.Date(raw_dates[dash_idx], format = "%Y-%m-%d")
     sites$Date.Local <- parsed_dates
     duration_keep <- startsWith(as.character(sites$Sample.Duration), "24")
@@ -2733,7 +2737,8 @@ process_geos <-
       t <- terra::time(data_return)
       if (!anyNA(t) && length(t) == terra::nlyr(data_return)) {
         date_str <- format(as.Date(t), "%Y%m%d")
-      } else { # nocov start
+      } else {
+        # nocov start
         date_str <- regmatches(
           names(data_return),
           regexpr(
@@ -2749,7 +2754,10 @@ process_geos <-
       var_prefix <- sub("_[0-9]{8}.*$", "", names(data_return))
       tapp_index <- paste(var_prefix, date_str, sep = "_")
       data_return <- terra::tapp(
-        data_return, tapp_index, fun = fun, na.rm = TRUE
+        data_return,
+        tapp_index,
+        fun = fun,
+        na.rm = TRUE
       )
       terra::crs(data_return) <- "EPSG:4326"
       out_dates <- regmatches(
@@ -3034,7 +3042,8 @@ process_merra2 <-
       t <- terra::time(data_return)
       if (!anyNA(t) && length(t) == terra::nlyr(data_return)) {
         date_str <- format(as.Date(t), "%Y%m%d")
-      } else { # nocov start
+      } else {
+        # nocov start
         date_str <- regmatches(
           names(data_return),
           regexpr(
@@ -3051,7 +3060,10 @@ process_merra2 <-
       tapp_index <- paste(var_prefix, date_str, sep = "_")
       saved_crs <- terra::crs(data_return)
       data_return <- terra::tapp(
-        data_return, tapp_index, fun = fun, na.rm = TRUE
+        data_return,
+        tapp_index,
+        fun = fun,
+        na.rm = TRUE
       )
       terra::crs(data_return) <- saved_crs
       out_dates <- regmatches(
@@ -3772,24 +3784,29 @@ process_goes <- function(
   if (length(paths) == 0) {
     stop(
       paste0(
-        "No GOES ADP NetCDF files found in: ", path,
+        "No GOES ADP NetCDF files found in: ",
+        path,
         "\nFiles must match pattern '^OR_ADP.*\\.nc$'.\n"
       )
     )
   }
   #### parse start datetime from each filename and filter to date range
   date_from <- as.Date(date[1])
-  date_to   <- as.Date(date[2])
-  file_dates <- vapply(paths, function(p) {
-    tryCatch(
-      {
-        as.Date(goes_parse_start_datetime(p))
-      },
-      error = function(e) {
-        as.Date(NA)
-      }
-    )
-  }, FUN.VALUE = as.Date(NA))
+  date_to <- as.Date(date[2])
+  file_dates <- vapply(
+    paths,
+    function(p) {
+      tryCatch(
+        {
+          as.Date(goes_parse_start_datetime(p))
+        },
+        error = function(e) {
+          as.Date(NA)
+        }
+      )
+    },
+    FUN.VALUE = as.Date(NA)
+  )
   mask <- !is.na(file_dates) &
     file_dates >= date_from &
     file_dates <= date_to
@@ -3797,7 +3814,11 @@ process_goes <- function(
   if (length(data_paths) == 0) {
     stop(paste0(
       "No GOES ADP files matching the requested date range were found.\n",
-      "Date range: ", date[1], " to ", date[2], "\n"
+      "Date range: ",
+      date[1],
+      " to ",
+      date[2],
+      "\n"
     ))
   }
   #### initiate loop over files
@@ -3808,7 +3829,9 @@ process_goes <- function(
     date_str <- format(dt, "%Y%m%d")
     time_str <- format(dt, "%H%M%S")
     message(paste0(
-      "Cleaning ", variable, " data for ",
+      "Cleaning ",
+      variable,
+      " data for ",
       format(dt, "%Y-%m-%d %H:%M:%S UTC"),
       "...\n"
     ))
@@ -3816,7 +3839,8 @@ process_goes <- function(
     data_raw <- terra::rast(data_paths[p])
     #### reproject to EPSG:4326 if file uses geostationary projection
     crs_proj <- terra::crs(data_raw, proj = TRUE)
-    if (!is.na(crs_proj) && grepl("\\+proj=geos", crs_proj)) { # nocov start
+    if (!is.na(crs_proj) && grepl("\\+proj=geos", crs_proj)) {
+      # nocov start
       data_raw <- terra::project(data_raw, "EPSG:4326")
     } else if (is.na(terra::crs(data_raw)) || terra::crs(data_raw) == "") {
       terra::crs(data_raw) <- "EPSG:4326"
@@ -3831,8 +3855,11 @@ process_goes <- function(
     }
     if (length(var_idx) == 0) {
       stop(paste0(
-        "Requested variable '", variable,
-        "' was not found in ", basename(data_paths[p]), ".\n"
+        "Requested variable '",
+        variable,
+        "' was not found in ",
+        basename(data_paths[p]),
+        ".\n"
       ))
     }
     data_variable <- terra::subset(data_raw, subset = var_idx)
@@ -3850,8 +3877,13 @@ process_goes <- function(
   #### ensure EPSG:4326
   terra::crs(data_return) <- "EPSG:4326"
   message(paste0(
-    "Returning ", variable, " data from ",
-    date[1], " to ", date[2], ".\n"
+    "Returning ",
+    variable,
+    " data from ",
+    date[1],
+    " to ",
+    date[2],
+    ".\n"
   ))
   return(data_return)
 }
@@ -3870,27 +3902,29 @@ goes_parse_start_datetime <- function(path) {
   m <- regmatches(fname, regexpr("_s([0-9]{14})_", fname))
   if (length(m) == 0 || nchar(m) < 16) {
     stop(paste0(
-      "Cannot parse GOES start datetime from filename: ", fname, "\n"
+      "Cannot parse GOES start datetime from filename: ",
+      fname,
+      "\n"
     ))
   }
-  ts   <- substr(m, 3, 16)
+  ts <- substr(m, 3, 16)
   year <- as.integer(substr(ts, 1, 4))
-  doy  <- as.integer(substr(ts, 5, 7))
+  doy <- as.integer(substr(ts, 5, 7))
   hour <- as.integer(substr(ts, 8, 9))
-  min  <- as.integer(substr(ts, 10, 11))
-  sec  <- as.integer(substr(ts, 12, 13))
+  min <- as.integer(substr(ts, 10, 11))
+  sec <- as.integer(substr(ts, 12, 13))
   base_date <- as.Date(
     paste0(year, sprintf("%03d", doy)),
     format = "%Y%j"
   )
   ISOdatetime(
-    year  = year,
+    year = year,
     month = as.integer(format(base_date, "%m")),
-    day   = as.integer(format(base_date, "%d")),
-    hour  = hour,
-    min   = min,
-    sec   = sec,
-    tz    = "UTC"
+    day = as.integer(format(base_date, "%d")),
+    hour = hour,
+    min = min,
+    sec = sec,
+    tz = "UTC"
   )
 }
 
@@ -3980,14 +4014,20 @@ process_improve <- function(
   if (length(meas_files) == 0) {
     stop(sprintf(
       "No %s_YYYY.txt files found in '%s'.\n",
-      prefix, path
+      prefix,
+      path
     ))
   }
 
   #### Read and bind measurement files
   meas_list <- lapply(meas_files, function(f) {
-    dt <- data.table::fread(f, sep = "|", header = TRUE,
-                            showProgress = FALSE, data.table = TRUE)
+    dt <- data.table::fread(
+      f,
+      sep = "|",
+      header = TRUE,
+      showProgress = FALSE,
+      data.table = TRUE
+    )
     dt
   })
   meas <- data.table::rbindlist(meas_list, fill = TRUE)
@@ -4002,8 +4042,8 @@ process_improve <- function(
     }
     stopifnot(length(date) == 2)
     d_start <- as.Date(date[1])
-    d_end   <- as.Date(date[2])
-    FactDate <- NULL   # nolint: object_name_linter. avoid R CMD CHECK note
+    d_end <- as.Date(date[2])
+    FactDate <- NULL # nolint: object_name_linter. avoid R CMD CHECK note
     meas <- meas[FactDate >= d_start & FactDate <= d_end, ]
     if (nrow(meas) == 0) {
       warning(
@@ -4025,8 +4065,11 @@ process_improve <- function(
   #### Merge site coordinates if available
   if (!is.null(sites_file) && file.exists(sites_file)) {
     sites <- data.table::fread(
-      sites_file, sep = "|", header = TRUE,
-      showProgress = FALSE, data.table = TRUE
+      sites_file,
+      sep = "|",
+      header = TRUE,
+      showProgress = FALSE,
+      data.table = TRUE
     )
     #### Keep only coordinate columns needed
     coord_cols <- c("SiteCode", "Latitude", "Longitude")
@@ -4206,7 +4249,8 @@ drought_process_nc <- function(source, path, date, timescale, extent) {
     if (length(nc_files) == 0L) {
       stop(sprintf(
         "No SPEI file matching '%s' found in: %s",
-        nc_pattern, path
+        nc_pattern,
+        path
       ))
     }
     data_full <- terra::rast(nc_files[1], win = extent)
@@ -4218,7 +4262,8 @@ drought_process_nc <- function(source, path, date, timescale, extent) {
     if (length(nc_files) == 0L) {
       stop(sprintf(
         "No EDDI files matching '%s' found in: %s",
-        nc_pattern, path
+        nc_pattern,
+        path
       ))
     }
     data_full <- terra::rast()
@@ -4235,7 +4280,9 @@ drought_process_nc <- function(source, path, date, timescale, extent) {
   if (length(keep_idx) == 0L) {
     stop(sprintf(
       "No %s data found in date range %s to %s.",
-      toupper(source), date[1], date[2]
+      toupper(source),
+      date[1],
+      date[2]
     ))
   }
   data_return <- terra::subset(data_full, keep_idx)
@@ -4284,7 +4331,10 @@ drought_set_time_nc <- function(r, source, ts_fmt, filepath) {
     terra::time(r) <- times
   }
   names(r) <- paste0(
-    source, "_", ts_fmt, "_",
+    source,
+    "_",
+    ts_fmt,
+    "_",
     format(as.Date(times), "%Y-%m-%d")
   )
   terra::varnames(r) <- source
@@ -4321,7 +4371,8 @@ drought_process_usdm <- function(path, date, extent) {
   if (length(keep_idx) == 0L) {
     stop(sprintf(
       "No USDM files found in date range %s to %s.",
-      date[1], date[2]
+      date[1],
+      date[2]
     ))
   }
   shp_files <- shp_files[keep_idx]
@@ -4351,7 +4402,8 @@ drought_process_usdm <- function(path, date, extent) {
 
   message(sprintf(
     "Returning USDM polygon data from %s to %s (%d file%s).\n",
-    date[1], date[2],
+    date[1],
+    date[2],
     length(shp_files),
     if (length(shp_files) == 1L) "" else "s"
   ))

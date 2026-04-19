@@ -41,7 +41,7 @@ provided: \code{"mean"}, \code{"primary_first"}, \code{"secondary_first"}.}
 a \code{SpatRaster} object
 }
 \description{
-Get mosaicked or merged raster from multiple MODIS hdf files.
+Get mosaic or merged raster from multiple MODIS hdf files.
 }
 \note{
 Curvilinear products (i.e., swaths) will not be accepted.

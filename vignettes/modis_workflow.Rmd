@@ -517,36 +517,10 @@ download_data(
   dataset_name = "modis",
   product = "MOD11A1",
   version = "061",
-  date = "2019-08-15",
   extent = modis_extent,
+  date = "2019-08-15",
   directory_to_save = directory_to_save,
   acknowledgement = TRUE
-)
-```
-
-## Download with OPeNDAP for `MOD11A1` variable subsetting
-
-`download_modis()` exposes `use_opendap = TRUE` and `variables` for
-server-side variable constraints. MODIS tile selection is still handled through
-CMR via `extent`; OPeNDAP reduces data transfer to only requested variables.
-
-This OPeNDAP chunk is intentionally shown with `eval = FALSE`: endpoint
-availability and authentication redirects can be intermittently unreliable in
-automated runs, so the vignette keeps a truthful runnable template without
-making render success depend on external service uptime.
-
-```{r modis-opendap, eval = FALSE}
-directory_to_save_opendap <- file.path(tempdir(), "modis_workflow", "mod11a1_opendap")
-download_data(
-  dataset_name = "modis",
-  product = "MOD11A1",
-  version = "061",
-  date = "2019-08-15",
-  extent = modis_extent,
-  directory_to_save = directory_to_save_opendap,
-  acknowledgement = TRUE,
-  use_opendap = TRUE,
-  variables = c("LST_Day_1km")
 )
 ```
 
@@ -562,7 +536,8 @@ modis_files <- list.files(
 processed_data <- process_modis_merge(
   path = modis_files,
   date = "2019-08-15",
-  subdataset = "LST_Day_1km"
+  subdataset = "LST_Day_1km",
+  fusion_method = "mean"
 )
 ```
 

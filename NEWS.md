@@ -20,37 +20,13 @@
 - `calculate_drought()` supports `.by` / `.by_time` post-extraction
   summarization consistent with all other `calculate_*()` functions.
 
-## OPeNDAP Support for NASA Datasets
+## NASA download API cleanup
 
-- Added `use_opendap = FALSE`, `extent = NULL`, and `variables = NULL` parameters
-  to `download_merra2()`, `download_geos()`, and `download_modis()`. All defaults
-  preserve existing behavior (fully backward compatible).
-- When `use_opendap = TRUE`, requests are routed through NASA OPeNDAP servers
-  enabling server-side spatial and variable subsetting — only the requested
-  region/variables travel over the wire, substantially reducing download sizes
-  for large global datasets (MERRA-2: 576×361, GEOS-CF: 1440×721 global grids).
-- New exported auxiliary functions:
-  - `extent_to_merra2_indices(extent)` — maps a lat/lon bounding box to
-    0-based MERRA-2 grid indices (0.5° grid, 361 lat × 576 lon points)
-  - `extent_to_geos_indices(extent)` — same for GEOS-CF 0.25° grid
-    (721 lat × 1440 lon points)
-  - `extent_to_modis_tiles(extent)` — returns MODIS sinusoidal tile codes
-    (`"hXXvYY"`) overlapping a bounding box using the official NASA MODLAND
-    tile boundary lookup table (`sn_bound_10deg.txt`); correct at all latitudes
-    including high-latitude where the sinusoidal projection makes geographic
-    lon bounds non-uniform
-  - `build_opendap_constraint(variables, time_idx, lat_idx, lon_idx)` — builds
-    a DAP2 constraint expression string for GES DISC / NCCS OPeNDAP servers
-  - `build_opendap_url(base, filename, constraint)` — assembles the final
-    OPeNDAP URL
-- Added `inst/extdata/sn_bound_10deg.txt` — the official NASA MODLAND sinusoidal
-  tile bounding coordinates table (460 non-fill tiles, 18×36 grid)
-- Authentication reuses existing `NASA_EARTHDATA_TOKEN` / `get_token()` mechanism
-  unchanged
-- 100 new unit tests in `tests/testthat/test-opendap.R` covering all five
-  auxiliary functions (pure unit tests), all three download functions
-  (mocked — no network required, runs on CI), and live integration tests
-  (skipped on CI, require `NASA_EARTHDATA_TOKEN`)
+- Removed OPeNDAP support from `download_merra2()`, `download_geos()`, and
+  `download_modis()` as a breaking change.
+- Removed OPeNDAP-only arguments and helper utilities from the public API.
+- Updated tests, vignettes, and CI coverage policy to match direct-download-only
+  behavior.
 
 # amadeus 1.3.3
 - Completed migration of all `download_*` functions from `httr`/`wget`/`curl`

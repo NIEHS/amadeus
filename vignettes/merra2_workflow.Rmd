@@ -28,7 +28,7 @@ live_run <- local({
   force || !(on_ci || on_cran)
 })
 merra2_live_ready <- FALSE
-merra2_opendap_ready <- FALSE
+
 merra2_has_fwi_plot <- FALSE
 
 aqs_sample_path <- c(
@@ -442,102 +442,6 @@ if (!merra2_live_ready) {
 This single request intentionally mixes authenticated GES DISC collections with
 the public `fwi` collection so the vignette demonstrates both download paths in
 the same workflow.
-
-## Download with OPeNDAP — server-side spatial and variable subsetting
-
-OPeNDAP lets `download_merra2()` request a geographic subset and specific
-variables directly from the GES DISC server, so only the pixels and fields you
-need are transferred. Set `use_opendap = TRUE`, supply an `extent` vector
-(`c(xmin, ymin, xmax, ymax)` in WGS-84 degrees), and optionally a `variables`
-character vector. Authentication uses the same `NASA_EARTHDATA_TOKEN`
-environment variable as the standard download path. The `fwi` collection is
-served from a separate portal and does not expose an OPeNDAP endpoint, so only
-GES DISC collections benefit from this option.
-
-The example below requests `T2M` (2 m air temperature) and `U10M` (10 m
-eastward wind) from the `tavg1_2d_slv_Nx` collection over a CONUS bounding box
-for a single day — roughly 1/40th the size of the equivalent global file.
-
-```{r merra2-opendap, eval = live_run}
-directory_to_save_opendap <- file.path(tempdir(), "merra2_opendap")
-opendap_extent <- c(-125, 22, -64, 50)
-merra2_opendap_error <- NULL
-merra2_opendap_result <- tryCatch(
-  {
-    setTimeLimit(elapsed = 600, transient = TRUE)
-    on.exit(setTimeLimit(cpu = Inf, elapsed = Inf, transient = FALSE), add = TRUE)
-    download_data(
-      dataset_name = "merra2",
-      collection = "tavg1_2d_slv_Nx",
-      date = "2024-08-11",
-      directory_to_save = directory_to_save_opendap,
-      acknowledgement = TRUE,
-      use_opendap = TRUE,
-      extent = opendap_extent,
-      variables = c("T2M", "U10M")
-    )
-  },
-  error = function(e) {
-    merra2_opendap_error <<- conditionMessage(e)
-    NULL
-  }
-)
-merra2_opendap_files <- list.files(
-  directory_to_save_opendap,
-  pattern = "\\.nc4$",
-  recursive = TRUE,
-  full.names = TRUE
-)
-merra2_opendap_ready <- !is.null(merra2_opendap_result) &&
-  identical(merra2_opendap_result$failed, 0L) &&
-  length(merra2_opendap_files) > 0
-if (!merra2_opendap_ready) {
-  message(
-    "OPeNDAP subset file download did not complete in this environment",
-    if (!is.null(merra2_opendap_error)) paste0(": ", merra2_opendap_error) else "",
-    "; ",
-    "continuing with the standard workflow example."
-  )
-}
-merra2_opendap_files
-```
-
-```{r merra2-opendap-bbox, eval = live_run, fig.width = 8, fig.height = 5, fig.alt = "Map showing the CONUS bounding box used for the MERRA-2 OPeNDAP spatial subset."}
-bbox_poly <- terra::vect(
-  terra::ext(opendap_extent[1], opendap_extent[3],
-             opendap_extent[2], opendap_extent[4]),
-  crs = "EPSG:4326"
-)
-terra::plot(
-  bbox_poly,
-  border = "red",
-  lwd = 2,
-  main = "MERRA-2 OPeNDAP spatial subset (red = requested extent)"
-)
-```
-
-```{r merra2-opendap-process, eval = live_run && merra2_opendap_ready}
-processed_opendap <- process_covariates(
-  covariate = "merra2",
-  variable = "T2M",
-  date = "2024-08-11",
-  path = find_merra2_collection_dir(directory_to_save_opendap, "tavg1_2d_slv_Nx")
-)
-processed_opendap
-```
-
-```{r merra2-opendap-plot, eval = live_run && merra2_opendap_ready, fig.width = 10, fig.height = 6, fig.alt = "Map of 2 m air temperature (T2M) from the MERRA-2 OPeNDAP spatial subset over CONUS for 2024-08-11."}
-terra::plot(
-  processed_opendap[[1]],
-  main = "MERRA-2 T2M via OPeNDAP subset — 2024-08-11 00:00 UTC",
-  col = grDevices::hcl.colors(64, "Spectral", rev = TRUE)
-)
-terra::plot(bbox_poly, border = "red", lwd = 2, add = TRUE)
-```
-
-The downloaded file is a NetCDF4 subset that can be processed with
-`process_covariates()` just like a full-globe MERRA-2 file.
-
 ## Process six workflow-ready data products
 
 ```{r process, eval = live_run && merra2_live_ready}

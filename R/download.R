@@ -398,7 +398,8 @@ download_aqs <-
       sapply(
         year_sequence,
         function(year_i) {
-          download_normalize_aqs_unzip( # nolint: object_usage_linter
+          download_normalize_aqs_unzip(
+            # nolint: object_usage_linter
             directory_to_unzip = directory_to_save,
             resolution_temporal = resolution_temporal,
             parameter_code = parameter_code,
@@ -559,17 +560,6 @@ download_ecoregion <- function(
 #' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
 #' authentication token.
 #' @param date character(1 or 2). Date range "YYYY-MM-DD" format
-#' @param extent numeric(4) or NULL. Bounding box \code{c(xmin, ymin, xmax,
-#'   ymax)} in decimal degrees (EPSG:4326) for OPeNDAP spatial subsetting.
-#'   Only used when \code{use_opendap = TRUE}. \code{NULL} downloads the full
-#'   global grid.
-#' @param use_opendap logical(1). If \code{TRUE}, appends an OPeNDAP constraint
-#'   expression to the download URL for server-side spatial and variable
-#'   subsetting. Requires a valid NASA EarthData token. Default \code{FALSE}
-#'   preserves existing direct-download behavior.
-#' @param variables character or NULL. Variable names to subset via OPeNDAP.
-#'   Only used when \code{use_opendap = TRUE}. \code{NULL} downloads all
-#'   variables.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be \code{TRUE} to proceed
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
@@ -604,7 +594,6 @@ download_geos <- function(
   ),
   nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
-  extent = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -612,9 +601,7 @@ download_geos <- function(
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
-  rate_limit = 2,
-  use_opendap = FALSE,
-  variables = NULL
+  rate_limit = 2
 ) {
   #### 1. Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
@@ -638,32 +625,8 @@ download_geos <- function(
 
   #### 5. Check for null parameters (AFTER token retrieval)
   params_to_check <- mget(ls())
-  params_to_check <- params_to_check[
-    !names(params_to_check) %in% c("extent", "variables")
-  ]
+  params_to_check <- params_to_check
   amadeus::check_for_null_parameters(params_to_check)
-  opendap_grid_idx <- NULL
-  opendap_constraint <- ""
-  if (use_opendap) {
-    if (!is.null(extent)) {
-      stopifnot(
-        "extent must be numeric(4)" = is.numeric(extent) && length(extent) == 4
-      )
-      opendap_grid_idx <- amadeus::extent_to_geos_indices(extent)
-    }
-    if (is.null(extent) && is.null(variables)) {
-      message(
-        "use_opendap = TRUE but neither extent nor variables specified. ",
-        "Accessing full global files via OPeNDAP (no subsetting benefit).\n"
-      )
-    }
-    opendap_constraint <- amadeus::build_opendap_constraint(
-      variables = variables,
-      time_idx  = c(0L, 0L),
-      lat_idx   = opendap_grid_idx$lat,
-      lon_idx   = opendap_grid_idx$lon
-    )
-  }
 
   #### 6. Match collection
   collection <- match.arg(collection, several.ok = TRUE)
@@ -735,15 +698,7 @@ download_geos <- function(
           time_sequence[t],
           "z.nc4"
         )
-        download_url <- if (use_opendap) {
-          amadeus::build_opendap_url(
-            base       = download_url_base,
-            filename   = download_name,
-            constraint = opendap_constraint
-          )
-        } else {
-          paste0(download_url_base, download_name)
-        }
+        download_url <- paste0(download_url_base, download_name)
 
         # Validate first URL only
         if (c == 1 && d == 1 && t == 1) {
@@ -975,18 +930,6 @@ download_gmted <- function(
 #' @param date character(1 or 2). length of 10. Date or start/end dates
 #'   for downloading data.
 #' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
-#' @param extent numeric(4) or NULL. Bounding box \code{c(xmin, ymin, xmax,
-#'   ymax)} in decimal degrees (EPSG:4326) for OPeNDAP spatial subsetting.
-#'   Only used when \code{use_opendap = TRUE}. \code{NULL} downloads the full
-#'   global grid.
-#' @param use_opendap logical(1). If \code{TRUE}, use the NASA GES DISC
-#'   OPeNDAP server for server-side spatial and variable subsetting, which can
-#'   substantially reduce download size. Requires a valid NASA EarthData token
-#'   (same as direct downloads). Not supported for the \code{"fwi"} collection.
-#'   Default \code{FALSE} preserves existing direct-download behavior.
-#' @param variables character or NULL. Variable names to subset via OPeNDAP
-#'   (e.g. \code{c("T2M", "U10M")}). Only used when \code{use_opendap = TRUE}.
-#'   \code{NULL} downloads all variables in the file.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). By setting \code{TRUE} the
 #' user acknowledges that the data downloaded using this function may be very
@@ -1244,7 +1187,6 @@ download_merra2 <- function(
   ),
   nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
-  extent = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -1252,9 +1194,7 @@ download_merra2 <- function(
   hash = FALSE,
   show_progress = TRUE,
   max_tries = 20,
-  rate_limit = 2,
-  use_opendap = FALSE,
-  variables = NULL
+  rate_limit = 2
 ) {
   #### 1. Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
@@ -1302,26 +1242,8 @@ download_merra2 <- function(
   if (!any(standard_collection)) {
     parameters$nasa_earth_data_token <- ""
   }
-  parameters <- parameters[!names(parameters) %in% c("extent", "variables")]
+  parameters <- parameters
   amadeus::check_for_null_parameters(parameters)
-
-  #### 6. Validate OPeNDAP parameters and pre-compute grid indices
-  opendap_grid_idx <- NULL
-  opendap_constraint <- ""
-  if (use_opendap) {
-    if (!is.null(extent)) {
-      stopifnot(
-        "extent must be numeric(4)" = is.numeric(extent) && length(extent) == 4
-      )
-      opendap_grid_idx <- amadeus::extent_to_merra2_indices(extent)
-    }
-    if (is.null(extent) && is.null(variables)) {
-      message(
-        "use_opendap = TRUE but neither extent nor variables specified. ",
-        "Accessing full global files via OPeNDAP (no subsetting benefit).\n"
-      )
-    }
-  }
 
   #### 7. Check if collection is recognized
   identifiers <- c(
@@ -1430,17 +1352,6 @@ download_merra2 <- function(
     )
     esdt_name <- identifiers_df_requested[, 2]
 
-    #### Build OPeNDAP constraint for this collection (includes time dimension)
-    if (use_opendap) {
-      n_times <- amadeus::merra2_collection_ntimes(collection_loop)
-      opendap_constraint <- amadeus::build_opendap_constraint(
-        variables = variables,
-        time_idx  = c(0L, n_times - 1L),
-        lat_idx   = opendap_grid_idx$lat,
-        lon_idx   = opendap_grid_idx$lon
-      )
-    }
-
     #### Define URL base (goldsmr4 vs goldsmr5)
     esdt_name_4 <- c(
       "M2I1NXASM",
@@ -1491,12 +1402,6 @@ download_merra2 <- function(
     } else if (esdt_name %in% esdt_name_5) {
       base <- "https://goldsmr5.gesdisc.eosdis.nasa.gov/data/MERRA2/"
     }
-    opendap_base_root <- if (use_opendap && collection_loop != "fwi") {
-      gsub("/data/", "/opendap/", base, fixed = TRUE)
-    } else {
-      NULL
-    }
-
     #### Get file listings using httr2
     for (y in seq_along(yearmonth_sequence)) {
       year <- substr(yearmonth_sequence[y], 1, 4)
@@ -1511,12 +1416,6 @@ download_merra2 <- function(
         month,
         "/"
       )
-      opendap_base_url <- if (!is.null(opendap_base_root)) {
-        paste0(opendap_base_root, esdt_name, ".5.12.4/", year, "/", month, "/")
-      } else {
-        NULL
-      }
-
       # Validate first URL only
       if (c == 1 && y == 1) {
         if (!amadeus::check_url_status(base_url)) {
@@ -1569,15 +1468,7 @@ download_merra2 <- function(
 
           # Build URLs and destination files for data
           for (f in list_urls_date_sequence) {
-            download_url <- if (!is.null(opendap_base_url)) {
-              amadeus::build_opendap_url(
-                base       = opendap_base_url,
-                filename   = paste0(f, ".nc4"),
-                constraint = opendap_constraint
-              )
-            } else {
-              paste0(base_url, f)
-            }
+            download_url <- paste0(base_url, f)
             download_name <- paste0(download_folder, "/", f)
 
             if (amadeus::check_destfile(download_name)) {
@@ -2934,13 +2825,6 @@ download_koppen_geiger <- function(
 #' @param extent numeric(4). Bounding box `c(min_lon, max_lon, min_lat,
 #' max_lat)`.
 #' Default covers continental US: `c(-125, 22, -64, 50)`.
-#' @param use_opendap logical(1). If \code{TRUE}, converts CMR-returned
-#'   download URLs to NASA LP DAAC OPeNDAP URLs and appends a variable
-#'   constraint expression. Tile/granule selection via CMR is unchanged.
-#'   Default \code{FALSE} preserves existing behavior.
-#' @param variables character or NULL. Variable (dataset) names to subset via
-#'   OPeNDAP (e.g. \code{c("sur_refl_b01_1", "sur_refl_b02_1")}). Only used
-#'   when \code{use_opendap = TRUE}. \code{NULL} downloads all variables.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with
 #' download
@@ -3058,9 +2942,7 @@ download_modis <- function(
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
-  rate_limit = 2,
-  use_opendap = FALSE,
-  variables = NULL
+  rate_limit = 2
 ) {
   #### 1. Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
@@ -3084,18 +2966,22 @@ download_modis <- function(
 
   #### 5. Check for null parameters (AFTER token retrieval)
   params_to_check <- mget(ls())
-  params_to_check <- params_to_check[
-    !names(params_to_check) %in% c("variables")
-  ]
+  params_to_check <- params_to_check
   amadeus::check_for_null_parameters(params_to_check)
   product <- match.arg(product)
 
   if (substr(date[1], 1, 4) != substr(date[2], 1, 4)) {
     if (
-      !product %in% c(
-        "MOD06_L2", "MOD14CM1", "MYD14CM1", "MCD14DL",
-        "MCD64A1", "MCD64CMQ", "VNP64A1"
-      )
+      !product %in%
+        c(
+          "MOD06_L2",
+          "MOD14CM1",
+          "MYD14CM1",
+          "MCD14DL",
+          "MCD64A1",
+          "MCD64CMQ",
+          "VNP64A1"
+        )
     ) {
       stop("dates should be in the same year.\n")
     }
@@ -3173,61 +3059,46 @@ download_modis <- function(
   )
   granules <- resp |> httr2::resp_body_json()
 
-  # Extract product data URLs
-  urls <- sapply(granules$feed$entry, function(g) {
-    links <- g$links
-    # Filter for data links only (exclude metadata, browse images, etc.)
-    data_links <- Filter(
-      function(l) {
-        grepl("data#", l$rel) &&
-          if (product == "MCD14DL") {
-            grepl("\\.txt$", l$href, ignore.case = TRUE)
-          } else {
-            grepl("\\.(hdf|h5)$", l$href, ignore.case = TRUE)
-          }
-      },
-      links
-    )
-    if (length(data_links) > 0) data_links[[1]]$href else NA
-  })
-  urls <- urls[!is.na(urls)]
+  # Extract product data URLs.
+  granule_entries <- granules$feed$entry
+  urls <- vapply(
+    granule_entries,
+    function(g) {
+      links <- g$links
+      data_links <- Filter(
+        function(l) {
+          grepl("data#", l$rel) &&
+            if (product == "MCD14DL") {
+              grepl("\\.txt$", l$href, ignore.case = TRUE)
+            } else {
+              grepl("\\.(hdf|h5)$", l$href, ignore.case = TRUE)
+            }
+        },
+        links
+      )
+      if (length(data_links) > 0) data_links[[1]]$href else NA_character_
+    },
+    character(1)
+  )
+
+  keep <- !is.na(urls)
+  urls <- urls[keep]
 
   if (length(urls) == 0) {
     stop("No granules found for the specified query parameters.\n")
   }
 
   #### 12. Filter by date range
-  urls <- modis_filter_paths_by_date(urls, date = date)
-  if (length(urls) == 0) {
+  urls_filtered <- modis_filter_paths_by_date(urls, date = date)
+  if (length(urls_filtered) == 0) {
     stop("No granules matched the requested date range.\n")
   }
 
-  #### 12a. Convert to OPeNDAP URLs if requested
-  if (use_opendap) {
-    if (is.null(variables)) {
-      message(
-        "use_opendap = TRUE but variables = NULL. ",
-        "MODIS spatial subsetting is already handled by CMR tile selection. ",
-        "Provide variables to subset specific datasets within each granule.\n"
-      )
-    }
-    urls <- vapply(urls, function(url) {
-      fname <- basename(url)
-      opendap_base <- paste0(
-        "https://opendap.earthdata.nasa.gov/providers/LPDAAC_ECS/",
-        "collections/", product, "_V",
-        gsub("\\.", "", str_version), "/granules/"
-      )
-      constraint <- amadeus::build_opendap_constraint(variables = variables)
-      amadeus::build_opendap_url(
-        base       = opendap_base,
-        filename   = fname,
-        constraint = constraint
-      )
-    }, character(1))
-  }
+  keep_date <- urls %in% urls_filtered
+  urls <- urls[keep_date]
+  download_names <- basename(urls)
 
-  scale_detected <- modis_extract_temporal_scale(urls[1])
+  scale_detected <- modis_extract_temporal_scale(download_names[1])
   if (scale_detected == "monthly") {
     month_start <- as.Date(format(as.Date(date[1]), "%Y-%m-01"))
     month_end <- as.Date(format(as.Date(date[2]), "%Y-%m-01"))
@@ -3238,7 +3109,11 @@ download_modis <- function(
       length(month_sequence)
     ))
   } else {
-    date_sequence <- vapply(urls, modis_extract_temporal_key, character(1))
+    date_sequence <- vapply(
+      download_names,
+      modis_extract_temporal_key,
+      character(1)
+    )
     date_sequence <- unique(date_sequence[!is.na(date_sequence)])
     date_start_i <- as.integer(strftime(date[1], "%Y%j"))
     date_end_i <- as.integer(strftime(date[2], "%Y%j"))
@@ -3254,7 +3129,6 @@ download_modis <- function(
   }
 
   #### 13. Prepare download paths
-  download_names <- basename(urls)
   destfiles <- paste0(directory_to_save, download_names)
 
   #### 14. Exit early if download=FALSE (deprecated behavior)
@@ -3358,9 +3232,11 @@ download_tri <- function(
   year <- year[order(year)]
 
   #### Check jurisdiction
-  if (!is.character(jurisdiction) ||
-        length(jurisdiction) != 1 ||
-        is.na(jurisdiction)) {
+  if (
+    !is.character(jurisdiction) ||
+      length(jurisdiction) != 1 ||
+      is.na(jurisdiction)
+  ) {
     stop(
       "`jurisdiction` must be a single character value such as ",
       "\"US\", \"AZ\", or \"tbl\".\n",
@@ -3415,7 +3291,8 @@ download_tri <- function(
   }
 
   #### Define measurement data paths
-  url_download <- paste0( # nolint: line_length_linter.
+  url_download <- paste0(
+    # nolint: line_length_linter.
     "https://data.epa.gov/efservice/downloads/tri/",
     "mv_tri_basic_download/"
   )
@@ -3508,7 +3385,8 @@ download_tri <- function(
 #' @export
 download_nei <- function(
   epa_certificate_path = NULL,
-  certificate_url = paste0( # nolint: line_length_linter.
+  certificate_url = paste0(
+    # nolint: line_length_linter.
     "http://cacerts.digicert.com/",
     "DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
   ),
@@ -5154,14 +5032,15 @@ download_goes <- function(
 
   for (d in seq_along(dates_seq)) {
     d_date <- dates_seq[d]
-    year   <- format(d_date, "%Y")
-    doy    <- sprintf("%03d", as.integer(format(d_date, "%j")))
+    year <- format(d_date, "%Y")
+    doy <- sprintf("%03d", as.integer(format(d_date, "%j")))
     prefix <- paste0(product, "/", year, "/", doy, "/")
 
     # nolint start
     list_url <- paste0(
       bucket_url,
-      "?list-type=2&prefix=", prefix,
+      "?list-type=2&prefix=",
+      prefix,
       "&max-keys=1000"
     )
     # nolint end
@@ -5178,31 +5057,39 @@ download_goes <- function(
           httr2::req_timeout(60) |>
           httr2::req_perform()
 
-        xml_body  <- httr2::resp_body_string(resp)
+        xml_body <- httr2::resp_body_string(resp)
         key_matches <- gregexpr("<Key>[^<]+\\.nc</Key>", xml_body)
         keys <- regmatches(xml_body, key_matches)[[1]]
         keys <- gsub("<Key>|</Key>", "", keys)
 
         if (length(keys) > 0) {
           for (k in seq_along(keys)) {
-            key       <- keys[k]
-            file_url  <- paste0(bucket_url, key)
-            destfile  <- paste0(directory_to_save, key)
-            all_urls      <- c(all_urls, file_url)
+            key <- keys[k]
+            file_url <- paste0(bucket_url, key)
+            destfile <- paste0(directory_to_save, key)
+            all_urls <- c(all_urls, file_url)
             all_destfiles <- c(all_destfiles, destfile)
           }
         } else {
           message(sprintf(
             "No files found for %s on %s (DOY %s).\n",
-            product, format(d_date, "%Y-%m-%d"), doy
+            product,
+            format(d_date, "%Y-%m-%d"),
+            doy
           ))
         }
       },
       error = function(e) {
-        warning(sprintf(
-          "Failed to list GOES files for %s/%s/%s: %s\n",
-          product, year, doy, conditionMessage(e)
-        ), call. = FALSE)
+        warning(
+          sprintf(
+            "Failed to list GOES files for %s/%s/%s: %s\n",
+            product,
+            year,
+            doy,
+            conditionMessage(e)
+          ),
+          call. = FALSE
+        )
       }
     )
   }
@@ -5302,8 +5189,7 @@ download_goes <- function(
 download_improve <- function(
   year = c(2018, 2022),
   product = c("raw", "rhr2", "rhr3"),
-  url_improve =
-    "https://views.cira.colostate.edu/fed/DataExport/",
+  url_improve = "https://views.cira.colostate.edu/fed/DataExport/",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -5373,16 +5259,16 @@ download_improve <- function(
   #### Optionally add site metadata file
   if (isTRUE(include_sites)) {
     # nolint start
-    sites_url  <- paste0(url_improve, "improve_sites.txt")
+    sites_url <- paste0(url_improve, "improve_sites.txt")
     # nolint end
     sites_dest <- paste0(directory_to_save, "improve_sites.txt")
-    download_urls   <- c(download_urls,  sites_url)
-    download_names  <- c(download_names, sites_dest)
+    download_urls <- c(download_urls, sites_url)
+    download_names <- c(download_names, sites_dest)
   }
 
   #### Filter to files that need downloading
   needs_dl <- vapply(download_names, amadeus::check_destfile, logical(1))
-  download_urls  <- download_urls[needs_dl]
+  download_urls <- download_urls[needs_dl]
   download_names <- download_names[needs_dl]
 
   if (length(download_urls) == 0) {
@@ -5391,7 +5277,9 @@ download_improve <- function(
       return(amadeus::download_hash(hash = TRUE, directory_to_save))
     }
     return(invisible(list(
-      success = 0, failed = 0, skipped = length(download_names)
+      success = 0,
+      failed = 0,
+      skipped = length(download_names)
     )))
   }
 
@@ -5593,11 +5481,16 @@ download_drought <- function(
       year_str <- substr(wd, 1, 4)
       url <- sprintf(
         "%s/%s/EDDI_ETrs_%smn_%s.nc",
-        base, year_str, ts_str, wd
+        base,
+        year_str,
+        ts_str,
+        wd
       )
       destfile <- sprintf(
         "%sEDDI_ETrs_%smn_%s.nc",
-        directory_to_save, ts_str, wd
+        directory_to_save,
+        ts_str,
+        wd
       )
       if (amadeus::check_destfile(destfile)) {
         all_urls <- c(all_urls, url)
