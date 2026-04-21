@@ -583,7 +583,7 @@ process_modis_daily <- function(
 
   for (i in seq_along(date_seq)) {
     day_i <- date_seq[[i]]
-    daily_rasters[[i]] <- tryCatch(
+    daily_rasters[i] <- list(tryCatch(
       process_modis_merge(
         path = path,
         date = day_i,
@@ -605,7 +605,7 @@ process_modis_daily <- function(
         }
         stop(e)
       }
-    )
+    ))
   }
 
   daily_rasters <- daily_rasters[!vapply(daily_rasters, is.null, logical(1))]
@@ -4145,7 +4145,11 @@ process_improve <- function(
   meas <- data.table::rbindlist(meas_list, fill = TRUE)
 
   #### Standardise date column
-  meas[, FactDate := as.Date(FactDate)] # nolint: object_usage_linter.
+  data.table::set(
+    meas,
+    j = "FactDate",
+    value = as.Date(meas[["FactDate"]])
+  )
 
   #### Filter by date if provided
   if (!is.null(date)) {
@@ -4155,8 +4159,9 @@ process_improve <- function(
     stopifnot(length(date) == 2)
     d_start <- as.Date(date[1])
     d_end <- as.Date(date[2])
-    FactDate <- NULL # nolint: object_name_linter. avoid R CMD CHECK note
-    meas <- meas[FactDate >= d_start & FactDate <= d_end, ]
+    meas <- meas[
+      get("FactDate") >= d_start & get("FactDate") <= d_end,
+    ]
     if (nrow(meas) == 0) {
       warning(
         "No IMPROVE measurements found for the specified date range.\n",
@@ -4211,7 +4216,9 @@ process_improve <- function(
 
   #### Build spatial object
   # nolint start: object_usage_linter.
-  meas_complete <- meas[!is.na(Latitude) & !is.na(Longitude), ]
+  meas_complete <- meas[
+    !is.na(get("Latitude")) & !is.na(get("Longitude")),
+  ]
   # nolint end
   sv <- terra::vect(
     meas_complete,

@@ -586,11 +586,11 @@ calc_worker <- function(
   #### empty location data.frame
   sites_extracted <- NULL
   time_type <- match.arg(time_type)
-  weights_prepared <- amadeus:::calc_prepare_weights(
+  weights_prepared <- amadeus::calc_prepare_weights(
     from = from[[1]],
     weights = weights
   )
-  fun_extract <- amadeus:::calc_weighted_fun(
+  fun_extract <- amadeus::calc_weighted_fun(
     fun = fun,
     weighted = !is.null(weights_prepared)
   )
@@ -654,7 +654,7 @@ calc_worker <- function(
           na.rm = TRUE
         )
       } else {
-        weighted_geoms <- amadeus:::calc_prepare_exact_geoms(
+        weighted_geoms <- amadeus::calc_prepare_exact_geoms(
           locs_vector = locs_vector,
           radius = radius
         )
@@ -1532,10 +1532,10 @@ calculate_modis_daily <- function(
     bufs <- terra::buffer(points, width = radius, quadsegs = 180L)
     bufs <- terra::project(bufs, terra::crs(surf))
     # extract raster values
-    weights_norm <- amadeus:::calc_prepare_weights(
+    weights_norm <- amadeus::calc_prepare_weights(
       from = surf[[1]], weights = weights
     )
-    func_extract <- amadeus:::calc_weighted_fun(
+    func_extract <- amadeus::calc_weighted_fun(
       fun = func,
       weighted = !is.null(weights_norm)
     )

@@ -1003,7 +1003,9 @@ calculate_modis <-
     from_is_character <- is.character(from)
     from_is_raster <- inherits(from, "SpatRaster")
     if (!from_is_character && !from_is_raster) {
-      stop("from should be either a character vector of paths or a SpatRaster.\n")
+      stop(
+        "from should be either a character vector of paths or a SpatRaster.\n"
+      )
     }
     if (from_is_character) {
       if (!is.null(from_secondary) && !is.character(from_secondary)) {
@@ -1037,7 +1039,8 @@ process_modis_swath, or process_blackmarble."
     hdf_args <- c(as.list(environment()), list(...))
     # nolint end
     if (from_is_character) {
-      dates_available_m <- vapply(from, modis_extract_temporal_key, character(1))
+      dates_available_m <-
+        vapply(from, modis_extract_temporal_key, character(1))
       date_scales <- vapply(from, modis_extract_temporal_scale, character(1))
       if (!is.null(from_secondary)) {
         dates_secondary_m <-
@@ -1305,7 +1308,11 @@ process_modis_swath, or process_blackmarble."
                 )
                 error_df <- stats::setNames(error_df, c(locs_id, name_radius))
                 error_df[[locs_id]] <- unlist(locs_input[[locs_id]])
-                error_df$time <- as.POSIXlt(calc_time, tz = "UTC")
+                if (is.na(calc_time)) {
+                  error_df$time <- as.POSIXlt(as.Date(NA))
+                } else {
+                  error_df$time <- as.POSIXlt(calc_time, tz = "UTC")
+                }
                 extracted <- error_df
               }
               return(extracted)
@@ -3457,10 +3464,10 @@ calculate_prism <- function(
   # extract
   is_polygon_locs <- inherits(sites_e, "SpatVector") &&
     !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
-  weights_prepared <- amadeus:::calc_prepare_weights(
+  weights_prepared <- amadeus::calc_prepare_weights(
     from = from[[1]], weights = weights
   )
-  fun_extract <- amadeus:::calc_weighted_fun(
+  fun_extract <- amadeus::calc_weighted_fun(
     fun = "mean",
     weighted = !is.null(weights_prepared)
   )
@@ -3665,10 +3672,10 @@ calculate_edgar <- function(
 
   is_polygon_locs <- inherits(sites_e, "SpatVector") &&
     !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
-  weights_prepared <- amadeus:::calc_prepare_weights(
+  weights_prepared <- amadeus::calc_prepare_weights(
     from = from[[1]], weights = weights
   )
-  fun_extract <- amadeus:::calc_weighted_fun(
+  fun_extract <- amadeus::calc_weighted_fun(
     fun = "mean",
     weighted = !is.null(weights_prepared)
   )
@@ -3835,7 +3842,7 @@ calculate_cropscape <- function(
   # extract
   is_polygon_locs <- inherits(sites_e, "SpatVector") &&
     !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
-  weights_prepared <- amadeus:::calc_prepare_weights(
+  weights_prepared <- amadeus::calc_prepare_weights(
     from = from[[1]], weights = weights
   )
   if (radius == 0 && !is_polygon_locs && is.null(weights_prepared)) {
@@ -4225,11 +4232,11 @@ calculate_drought <- function(
     src_name  <- lyr_parts[1]
     ts_fmt    <- lyr_parts[2]
     col_name  <- paste0(src_name, "_", ts_fmt, "_", radius)
-    weighted_drought <- amadeus:::calc_prepare_weights(
+    weighted_drought <- amadeus::calc_prepare_weights(
       from = from[[1]],
       weights = weights
     )
-    drought_fun_extract <- amadeus:::calc_weighted_fun(
+    drought_fun_extract <- amadeus::calc_weighted_fun(
       fun = fun,
       weighted = !is.null(weighted_drought)
     )
@@ -4263,7 +4270,7 @@ calculate_drought <- function(
             na.rm = TRUE
           )
         } else {
-          weighted_geoms <- amadeus:::calc_prepare_exact_geoms(
+          weighted_geoms <- amadeus::calc_prepare_exact_geoms(
             locs_vector = sites_e,
             radius = radius
           )

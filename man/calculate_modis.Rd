@@ -27,10 +27,12 @@ calculate_modis(
 )
 }
 \arguments{
-\item{from}{character. List of paths to MODIS/VIIRS files.}
+\item{from}{character or SpatRaster. Either a list of MODIS/VIIRS file paths
+(raw path mode) or a preprocessed raster (direct raster mode).}
 
-\item{from_secondary}{character. Optional secondary file list (e.g., Aqua
-files when \code{from} contains Terra files) used for fused temporal coverage.}
+\item{from_secondary}{character or SpatRaster. Optional secondary input for
+fused temporal coverage. Type must match \code{from} (\code{character} with
+\code{character}, or \code{SpatRaster} with \code{SpatRaster}).}
 
 \item{locs}{sf/SpatVector object. Unique locs where covariates
 will be calculated.}
@@ -40,7 +42,8 @@ will be calculated.}
 \item{radius}{numeric. Radii to calculate covariates.
 Default is \code{c(0, 1000, 10000, 50000)}.}
 
-\item{preprocess}{function. Function to handle HDF files.}
+\item{preprocess}{function. Function to handle HDF files in raw path mode.
+Ignored when \code{from} is a \code{SpatRaster}.}
 
 \item{name_covariates}{character. Name header of covariates.
 e.g., \code{"MOD_NDVIF_0_"}.

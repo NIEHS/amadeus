@@ -23,7 +23,8 @@ calculate_covariates(
 \arguments{
 \item{covariate}{character(1). Covariate type.}
 
-\item{from}{character. Single or multiple from strings.}
+\item{from}{character, SpatRaster, SpatVector, or data.frame depending on
+the selected \code{covariate} route.}
 
 \item{locs}{sf/SpatVector. Unique locations. Should include
 a unique identifier field named \code{locs_id}}
