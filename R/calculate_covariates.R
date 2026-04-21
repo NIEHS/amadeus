@@ -9,7 +9,8 @@
 #' SpatRaster or SpatVector objects before passing to
 #' \code{calculate_covariates()}}.
 #' @param covariate character(1). Covariate type.
-#' @param from character. Single or multiple from strings.
+#' @param from character, SpatRaster, SpatVector, or data.frame depending on
+#'   the selected `covariate` route.
 #' @param locs sf/SpatVector. Unique locations. Should include
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
@@ -844,15 +845,18 @@ calculate_ecoregion <-
 
 
 #' Calculate MODIS product covariates in multiple CPU threads
-#' @param from character. List of paths to MODIS/VIIRS files.
-#' @param from_secondary character. Optional secondary file list (e.g., Aqua
-#' files when `from` contains Terra files) used for fused temporal coverage.
+#' @param from character or SpatRaster. Either a list of MODIS/VIIRS file paths
+#' (raw path mode) or a preprocessed raster (direct raster mode).
+#' @param from_secondary character or SpatRaster. Optional secondary input for
+#' fused temporal coverage. Type must match `from` (`character` with
+#' `character`, or `SpatRaster` with `SpatRaster`).
 #' @param locs sf/SpatVector object. Unique locs where covariates
 #' will be calculated.
 #' @param locs_id character(1). Site identifier. Default is `"site_id"`
 #' @param radius numeric. Radii to calculate covariates.
 #' Default is `c(0, 1000, 10000, 50000)`.
-#' @param preprocess function. Function to handle HDF files.
+#' @param preprocess function. Function to handle HDF files in raw path mode.
+#' Ignored when `from` is a `SpatRaster`.
 #' @param name_covariates character. Name header of covariates.
 #' e.g., `"MOD_NDVIF_0_"`.
 #' The calculated covariate names will have a form of
@@ -996,10 +1000,21 @@ calculate_modis <-
     amadeus::check_by(.by, .by_time)
     amadeus::check_by_time(.by_time)
     fusion_method <- match.arg(fusion_method)
-    if (!is.null(from_secondary) && !is.character(from_secondary)) {
-      stop("from_secondary should be a character vector of file paths.\n")
+    from_is_character <- is.character(from)
+    from_is_raster <- inherits(from, "SpatRaster")
+    if (!from_is_character && !from_is_raster) {
+      stop("from should be either a character vector of paths or a SpatRaster.\n")
     }
-    if (!is.function(preprocess)) {
+    if (from_is_character) {
+      if (!is.null(from_secondary) && !is.character(from_secondary)) {
+        stop("from_secondary should be a character vector of file paths.\n")
+      }
+    } else {
+      if (!is.null(from_secondary) && !inherits(from_secondary, "SpatRaster")) {
+        stop("from_secondary should be SpatRaster when from is SpatRaster.\n")
+      }
+    }
+    if (from_is_character && !is.function(preprocess)) {
       stop(
         "preprocess should be one of process_modis_merge,
 process_modis_swath, or process_blackmarble."
@@ -1021,54 +1036,60 @@ process_modis_swath, or process_blackmarble."
     # nolint start
     hdf_args <- c(as.list(environment()), list(...))
     # nolint end
-    dates_available_m <- vapply(from, modis_extract_temporal_key, character(1))
-    date_scales <- vapply(from, modis_extract_temporal_scale, character(1))
-    if (!is.null(from_secondary)) {
-      dates_secondary_m <-
-        vapply(from_secondary, modis_extract_temporal_key, character(1))
-      date_scales_secondary <-
-        vapply(from_secondary, modis_extract_temporal_scale, character(1))
-      dates_available_m <- c(dates_available_m, dates_secondary_m)
-      date_scales <- c(date_scales, date_scales_secondary)
-    }
-    date_scale_unique <- unique(stats::na.omit(date_scales))
-    if (length(date_scale_unique) != 1L) {
-      stop(
-        "MODIS input files contain mixed or unsupported temporal patterns.\n"
-      )
-    }
-    dates_available <- sort(unique(dates_available_m))
-
-    if (is.null(from_secondary)) {
-      # When multiple dates are concerned,
-      # the number of tiles are expected to be the same.
-      # Exceptions could exist, so here the number of tiles are checked.
-      summary_available <- table(dates_available_m)
-      summary_available_mode <-
-        sort(table(summary_available), decreasing = TRUE)[1]
-      summary_available_mode <- as.numeric(names(summary_available_mode))
-      summary_available_insuf <-
-        which(summary_available < floor(summary_available_mode * 0.8))
-
-      if (length(summary_available_insuf) > 0) {
-        dates_insuf <-
-          modis_key_to_date(
-            dates_available[summary_available_insuf],
-            date_scale_unique
-          )
-        message(
-          paste0(
-            "The number of tiles on the following dates are insufficient: ",
-            paste(dates_insuf, collapse = ", "),
-            ".\n"
-          )
+    if (from_is_character) {
+      dates_available_m <- vapply(from, modis_extract_temporal_key, character(1))
+      date_scales <- vapply(from, modis_extract_temporal_scale, character(1))
+      if (!is.null(from_secondary)) {
+        dates_secondary_m <-
+          vapply(from_secondary, modis_extract_temporal_key, character(1))
+        date_scales_secondary <-
+          vapply(from_secondary, modis_extract_temporal_scale, character(1))
+        dates_available_m <- c(dates_available_m, dates_secondary_m)
+        date_scales <- c(date_scales, date_scales_secondary)
+      }
+      date_scale_unique <- unique(stats::na.omit(date_scales))
+      if (length(date_scale_unique) != 1L) {
+        stop(
+          "MODIS input files contain mixed or unsupported temporal patterns.\n"
         )
-        # finally it removes the dates with insufficient tiles
-        dates_available <- dates_available[-summary_available_insuf]
+      }
+      dates_available <- sort(unique(dates_available_m))
+
+      if (is.null(from_secondary)) {
+        # When multiple dates are concerned,
+        # the number of tiles are expected to be the same.
+        # Exceptions could exist, so here the number of tiles are checked.
+        summary_available <- table(dates_available_m)
+        summary_available_mode <-
+          sort(table(summary_available), decreasing = TRUE)[1]
+        summary_available_mode <- as.numeric(names(summary_available_mode))
+        summary_available_insuf <-
+          which(summary_available < floor(summary_available_mode * 0.8))
+
+        if (length(summary_available_insuf) > 0) {
+          dates_insuf <-
+            modis_key_to_date(
+              dates_available[summary_available_insuf],
+              date_scale_unique
+            )
+          message(
+            paste0(
+              "The number of tiles on the following dates are insufficient: ",
+              paste(dates_insuf, collapse = ", "),
+              ".\n"
+            )
+          )
+          # finally it removes the dates with insufficient tiles
+          dates_available <- dates_available[-summary_available_insuf]
+        } else {
+          dates_insuf <- NA
+        }
       } else {
         dates_insuf <- NA
       }
     } else {
+      date_scale_unique <- NA_character_
+      dates_available <- NA_character_
       dates_insuf <- NA
     }
 
@@ -1101,65 +1122,113 @@ process_modis_swath, or process_blackmarble."
     }
 
     # make clusters
-    idx_date_available <- seq_along(dates_available)
-    list_date_available <-
-      split(idx_date_available, idx_date_available)
+    if (from_is_character) {
+      idx_date_available <- seq_along(dates_available)
+      list_date_available <-
+        split(idx_date_available, idx_date_available)
+    } else {
+      list_date_available <- list(1L)
+    }
     calc_results <-
       lapply(
         list_date_available,
         FUN = function(datei) {
           options(sf_use_s2 = FALSE)
-          # nolint start
-          day_to_pick <- dates_available[datei]
-          # nolint end
-          day_to_pick <- modis_key_to_date(day_to_pick, date_scale_unique)
-
           radiusindex <- seq_along(radius)
           radiusindexlist <- split(radiusindex, radiusindex)
-
-          hdf_args <- c(hdf_args, list(date = day_to_pick))
-          if (is.null(from_secondary)) {
-            hdf_args <- c(hdf_args, list(path = hdf_args$from))
-            # unified interface with rlang::inject
-            vrt_today <- rlang::inject(preprocess(!!!hdf_args))
-          } else {
-            day_key <- dates_available[datei]
-            has_primary <- day_key %in% vapply(
-              hdf_args$from,
-              modis_extract_temporal_key,
-              character(1)
-            )
-            has_secondary <- day_key %in% vapply(
-              hdf_args$from_secondary,
-              modis_extract_temporal_key,
-              character(1)
-            )
-            if (!has_primary && !has_secondary) {
-              stop("No MODIS files found for selected fusion date.\n")
-            }
-
-            raster_primary <- NULL
-            raster_secondary <- NULL
-
-            if (has_primary) {
-              hdf_args_primary <- hdf_args
-              hdf_args_primary$path <- hdf_args$from
-              hdf_args_primary$from_secondary <- NULL
-              raster_primary <- rlang::inject(preprocess(!!!hdf_args_primary))
-            }
-            if (has_secondary) {
-              hdf_args_secondary <- hdf_args
-              hdf_args_secondary$path <- hdf_args$from_secondary
-              hdf_args_secondary$from_secondary <- NULL
-              raster_secondary <-
-                rlang::inject(preprocess(!!!hdf_args_secondary))
-            }
-
-            if (is.null(raster_primary)) {
-              vrt_today <- raster_secondary
-            } else if (is.null(raster_secondary)) {
-              vrt_today <- raster_primary
+          if (from_is_character) {
+            # nolint start
+            day_to_pick <- dates_available[datei]
+            # nolint end
+            day_to_pick <- modis_key_to_date(day_to_pick, date_scale_unique)
+            calc_time <- as.character(day_to_pick)
+            hdf_args <- c(hdf_args, list(date = day_to_pick))
+            if (is.null(from_secondary)) {
+              hdf_args <- c(hdf_args, list(path = hdf_args$from))
+              # unified interface with rlang::inject
+              vrt_today <- rlang::inject(preprocess(!!!hdf_args))
             } else {
+              day_key <- dates_available[datei]
+              has_primary <- day_key %in% vapply(
+                hdf_args$from,
+                modis_extract_temporal_key,
+                character(1)
+              )
+              has_secondary <- day_key %in% vapply(
+                hdf_args$from_secondary,
+                modis_extract_temporal_key,
+                character(1)
+              )
+              if (!has_primary && !has_secondary) {
+                stop("No MODIS files found for selected fusion date.\n")
+              }
+
+              raster_primary <- NULL
+              raster_secondary <- NULL
+
+              if (has_primary) {
+                hdf_args_primary <- hdf_args
+                hdf_args_primary$path <- hdf_args$from
+                hdf_args_primary$from_secondary <- NULL
+                raster_primary <- rlang::inject(preprocess(!!!hdf_args_primary))
+              }
+              if (has_secondary) {
+                hdf_args_secondary <- hdf_args
+                hdf_args_secondary$path <- hdf_args$from_secondary
+                hdf_args_secondary$from_secondary <- NULL
+                raster_secondary <-
+                  rlang::inject(preprocess(!!!hdf_args_secondary))
+              }
+
+              if (is.null(raster_primary)) {
+                vrt_today <- raster_secondary
+              } else if (is.null(raster_secondary)) {
+                vrt_today <- raster_primary
+              } else {
+                if (!isTRUE(terra::compareGeom(
+                  raster_primary,
+                  raster_secondary,
+                  stopOnError = FALSE
+                ))) {
+                  stop(
+                    "Primary and secondary MODIS rasters have incompatible ",
+                    "geometry.\n"
+                  )
+                }
+                if (
+                  terra::nlyr(raster_primary) !=
+                    terra::nlyr(raster_secondary)
+                ) {
+                  stop(
+                    "Primary and secondary MODIS rasters have different ",
+                    "layer counts.\n"
+                  )
+                }
+                if (fusion_method == "primary_first") {
+                  vrt_today <- terra::cover(raster_primary, raster_secondary)
+                } else if (fusion_method == "secondary_first") {
+                  vrt_today <- terra::cover(raster_secondary, raster_primary)
+                } else {
+                  idx_layers <- seq_len(terra::nlyr(raster_primary))
+                  fused <- lapply(idx_layers, function(k) {
+                    terra::app(
+                      c(raster_primary[[k]], raster_secondary[[k]]),
+                      mean,
+                      na.rm = TRUE
+                    )
+                  })
+                  vrt_today <- do.call(c, fused)
+                  names(vrt_today) <- names(raster_primary)
+                }
+              }
+            }
+          } else {
+            calc_time <- NA_character_
+            if (is.null(from_secondary)) {
+              vrt_today <- from
+            } else {
+              raster_primary <- from
+              raster_secondary <- from_secondary
               if (!isTRUE(terra::compareGeom(
                 raster_primary,
                 raster_secondary,
@@ -1215,7 +1284,7 @@ process_modis_swath, or process_blackmarble."
                     locs = locs_input,
                     from = vrt_today,
                     locs_id = locs_id,
-                    date = as.character(day_to_pick),
+                    date = calc_time,
                     fun_summary = fun_summary,
                     name_extracted = name_radius,
                     radius = radius[k],
@@ -1236,7 +1305,7 @@ process_modis_swath, or process_blackmarble."
                 )
                 error_df <- stats::setNames(error_df, c(locs_id, name_radius))
                 error_df[[locs_id]] <- unlist(locs_input[[locs_id]])
-                error_df$time <- day_to_pick
+                error_df$time <- as.POSIXlt(calc_time, tz = "UTC")
                 extracted <- error_df
               }
               return(extracted)

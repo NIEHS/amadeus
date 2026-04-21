@@ -240,6 +240,171 @@ workflow_mcd14dl <- function(product) {
   )
 }
 
+collapse_subdatasets <- function(x) paste(x, collapse = "<br>")
+
+modis_subdataset_reference <- c(
+  MOD09GA = collapse_subdatasets(c(
+    "num_observations_500m",
+    "sur_refl_b01_1",
+    "sur_refl_b02_1",
+    "sur_refl_b03_1",
+    "sur_refl_b04_1",
+    "sur_refl_b05_1",
+    "sur_refl_b06_1",
+    "sur_refl_b07_1",
+    "QC_500m_1",
+    "obscov_500m_1",
+    "iobs_res_1",
+    "q_scan_1"
+  )),
+  MYD09GA = collapse_subdatasets(c(
+    "num_observations_500m",
+    "sur_refl_b01_1",
+    "sur_refl_b02_1",
+    "sur_refl_b03_1",
+    "sur_refl_b04_1",
+    "sur_refl_b05_1",
+    "sur_refl_b06_1",
+    "sur_refl_b07_1",
+    "QC_500m_1",
+    "obscov_500m_1",
+    "iobs_res_1",
+    "q_scan_1"
+  )),
+  MOD09GQ = "(sur_refl_b0) pattern; inspect full names with terra::describe(path, sds = TRUE)",
+  MYD09GQ = "(sur_refl_b0) pattern; inspect full names with terra::describe(path, sds = TRUE)",
+  MOD09A1 = "(sur_refl_b0) pattern; inspect full names with terra::describe(path, sds = TRUE)",
+  MYD09A1 = "(sur_refl_b0) pattern; inspect full names with terra::describe(path, sds = TRUE)",
+  MOD09Q1 = "(sur_refl_b0) pattern; inspect full names with terra::describe(path, sds = TRUE)",
+  MYD09Q1 = "(sur_refl_b0) pattern; inspect full names with terra::describe(path, sds = TRUE)",
+  MOD11A1 = collapse_subdatasets(c(
+    "LST_Day_1km",
+    "QC_Day",
+    "Day_view_time",
+    "Day_view_angl",
+    "LST_Night_1km",
+    "QC_Night",
+    "Night_view_time",
+    "Night_view_angl",
+    "Emis_31",
+    "Emis_32",
+    "Clear_day_cov",
+    "Clear_night_cov"
+  )),
+  MYD11A1 = collapse_subdatasets(c(
+    "LST_Day_1km",
+    "QC_Day",
+    "Day_view_time",
+    "Day_view_angl",
+    "LST_Night_1km",
+    "QC_Night",
+    "Night_view_time",
+    "Night_view_angl",
+    "Emis_31",
+    "Emis_32",
+    "Clear_day_cov",
+    "Clear_night_cov"
+  )),
+  MOD11A2 = "(LST_) pattern; inspect full names with terra::describe(path, sds = TRUE)",
+  MYD11A2 = "(LST_) pattern; inspect full names with terra::describe(path, sds = TRUE)",
+  MOD11B1 = "(LST_) pattern; inspect full names with terra::describe(path, sds = TRUE)",
+  MYD11B1 = "(LST_) pattern; inspect full names with terra::describe(path, sds = TRUE)",
+  MOD13A1 = "(NDVI/EVI) layers; inspect full names with terra::describe(path, sds = TRUE)",
+  MYD13A1 = "(NDVI/EVI) layers; inspect full names with terra::describe(path, sds = TRUE)",
+  MOD13A2 = collapse_subdatasets(c(
+    "\"1 km 16 days NDVI\"",
+    "\"1 km 16 days EVI\"",
+    "\"1 km 16 days VI Quality\"",
+    "\"1 km 16 days red reflectance\"",
+    "\"1 km 16 days NIR reflectance\"",
+    "\"1 km 16 days blue reflectance\"",
+    "\"1 km 16 days MIR reflectance\"",
+    "\"1 km 16 days view zenith angle\"",
+    "\"1 km 16 days sun zenith angle\"",
+    "\"1 km 16 days relative azimuth angle\"",
+    "\"1 km 16 days composite day of the year\"",
+    "\"1 km 16 days pixel reliability\""
+  )),
+  MYD13A2 = collapse_subdatasets(c(
+    "\"1 km 16 days NDVI\"",
+    "\"1 km 16 days EVI\"",
+    "\"1 km 16 days VI Quality\"",
+    "\"1 km 16 days red reflectance\"",
+    "\"1 km 16 days NIR reflectance\"",
+    "\"1 km 16 days blue reflectance\"",
+    "\"1 km 16 days MIR reflectance\"",
+    "\"1 km 16 days view zenith angle\"",
+    "\"1 km 16 days sun zenith angle\"",
+    "\"1 km 16 days relative azimuth angle\"",
+    "\"1 km 16 days composite day of the year\"",
+    "\"1 km 16 days pixel reliability\""
+  )),
+  MOD13A3 = "(NDVI/EVI) layers; inspect full names with terra::describe(path, sds = TRUE)",
+  MYD13A3 = "(NDVI/EVI) layers; inspect full names with terra::describe(path, sds = TRUE)",
+  MOD13Q1 = "250m 16 days (NDVI|EVI) layers",
+  MYD13Q1 = "250m 16 days (NDVI|EVI) layers",
+  MCD12Q1 = "(LC_Type) layers (e.g., LC_Type1-5)",
+  MOD14A1 = "(FireMask) layers",
+  MYD14A1 = "(FireMask) layers",
+  MOD14A2 = "(FireMask) layers",
+  MYD14A2 = "(FireMask) layers",
+  MOD14CM1 = "(FireMask) layers",
+  MYD14CM1 = "(FireMask) layers",
+  MCD64A1 = "(Burn Date|BurnDate) layers",
+  MCD64CMQ = "(Burn Date|BurnDate) layers",
+  VNP64A1 = "(BurnDate) layers",
+  MOD16A2 = "(ET_500m|PET_500m) layers",
+  MYD16A2 = "(ET_500m|PET_500m) layers",
+  MOD06_L2 = collapse_subdatasets(c(
+    "Cloud_Phase_Infrared_1km",
+    "cloud_top_pressure_1km",
+    "cloud_top_height_1km",
+    "cloud_top_temperature_1km",
+    "Cloud_Effective_Radius",
+    "Cloud_Optical_Thickness",
+    "Cloud_Water_Path",
+    "Cloud_Phase_Optical_Properties",
+    "Cloud_Multi_Layer_Flag",
+    "Cirrus_Reflectance"
+  )),
+  MCD14DL = "N/A (.txt active fire detections)",
+  MCD19A2 = collapse_subdatasets(c(
+    "Optical_Depth_047_1",
+    "Optical_Depth_047_2",
+    "Optical_Depth_047_3",
+    "Optical_Depth_055_1",
+    "Optical_Depth_055_2",
+    "Optical_Depth_055_3",
+    "AOD_Uncertainty_1",
+    "AOD_Uncertainty_2",
+    "AOD_Uncertainty_3",
+    "Column_WV_1",
+    "Column_WV_2",
+    "Column_WV_3",
+    "AngstromExp_470-780_1",
+    "AngstromExp_470-780_2",
+    "AngstromExp_470-780_3",
+    "AOD_QA_1",
+    "AOD_QA_2",
+    "AOD_QA_3",
+    "FineModeFraction_1",
+    "FineModeFraction_2",
+    "FineModeFraction_3",
+    "Injection_Height_1",
+    "Injection_Height_2",
+    "Injection_Height_3"
+  )),
+  VNP46A2 = collapse_subdatasets(c(
+    "DNB_BRDF-Corrected_NTL",
+    "DNB_Lunar_Irradiance",
+    "Gap_Filled_DNB_BRDF-Corrected_NTL",
+    "Latest_High_Quality_Retrieval",
+    "Mandatory_Quality_Flag",
+    "QF_Cloud_Mask",
+    "Snow_Flag"
+  ))
+)
+
 modis_reference <- data.frame(
   family = c(
     "Surface reflectance", "Surface reflectance",
@@ -459,13 +624,17 @@ modis_reference <- data.frame(
   ),
   stringsAsFactors = FALSE
 )
+
+modis_reference$subdatasets <- unname(modis_subdataset_reference[modis_reference$product])
+modis_reference$subdatasets[is.na(modis_reference$subdatasets)] <-
+  "Inspect with terra::describe(path, sds = TRUE)"
 ```
 
 This article demonstrates how MODIS, combined MODIS, and VIIRS-style products move through `amadeus` via `download_data()`, `process_modis_merge()`, `process_modis_swath()`, `process_blackmarble()`, `process_mcd14dl()`, and `calculate_covariates()`. MODIS downloads require a NASA EarthData token.
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
-Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
+Each workflow uses two small example surfaces created within the MODIS example extent: two `sf` points in the upper half of the bounding box for point extraction, and a subset of packaged Durham County Uber H3 resolution-8 hexagons filtered to the same upper-half extent for polygon extraction.
 
 ## Available inputs and data availability
 
@@ -483,6 +652,7 @@ knitr::kable(
     "Temporal cadence",
     "Spatial form",
     "Native file",
+    "Subdataset names",
     "Version handling",
     "Cross-year date range",
     "Workflow in amadeus"
@@ -494,36 +664,27 @@ knitr::kable(
 - `version` defaults to `"061"`, but `download_modis()` internally rewrites `MOD06_L2` to `6.1`, `MOD14CM1` / `MYD14CM1` to `005`, `MCD64CMQ` to `006`, `MCD14DL` to `6.1NRT`, and omits the version string for `VNP46A2` and `VNP64A1`.
 - `date` can be a single day or a range. Most products must stay within one calendar year; cross-year ranges are supported for `MOD06_L2`, `MOD14CM1`, `MYD14CM1`, `MCD14DL`, `MCD64A1`, `MCD64CMQ`, and `VNP64A1`.
 - `extent` limits the NASA CMR query to a study-area bounding box so only intersecting tiles are downloaded.
-- Downloads are saved as raw `.hdf` or `.h5` granules, except `MCD14DL`, which is saved as `.txt`. For gridded products, use `terra::describe(path, sds = TRUE)` to inspect available subdatasets and `process_modis_sds()` where presets exist.
+- Downloads are saved as raw `.hdf` or `.h5` granules, except `MCD14DL`, which is saved as `.txt`. The table now includes a subdataset-name column populated from local granule inspection (`terra::rast(path); names(r)`) where available, plus product-specific selector patterns. Use `terra::describe(path, sds = TRUE)` to inspect the complete subdataset list for your exact files and collection version.
 
-### Terra+Aqua fusion for better temporal coverage
 
-`process_modis_merge()` and `calculate_modis()` support optional Terra+Aqua fusion through `path_secondary` / `from_secondary` and `fusion_method`.
-
-For paired products (for example `MOD13Q1` + `MYD13Q1`), this allows:
-
-- pixel-wise mean blending where both products exist (`fusion_method = "mean"`)
-- fallback to whichever product is available on a date
-- optional priority fallback (`"primary_first"` / `"secondary_first"`)
 
 ## Live representative workflow: `MOD11A1`
 
-The evaluated chunks below keep one compact, end-to-end `MOD11A1` land-surface temperature example that still exercises the download, process, calculate, and plotting stages. The later sections document the full product surface with additional workflow templates.
+The evaluated chunks below keep one compact, end-to-end `MOD11A1` land-surface temperature example that still exercises the download, process, calculate, and plotting stages. We will demonstate downloading, processing with temporal aggregation, processing with daily resolution, covariate calculating with aggregation and daily resolutions, and plotting. The workflow for other products is similar, but the exact subdataset names and processing parameters may differ.
 
 ```{r download, eval = live_run}
-directory_to_save <- file.path(tempdir(), "modis_workflow", "mod11a1")
+directory_to_save <- file.path(tempdir(), "modis_workflow", "MOD11A1")
 modis_extent <- c(-79.2, 35.8, -78.6, 36.3)
 download_data(
   dataset_name = "modis",
   product = "MOD11A1",
   version = "061",
   extent = modis_extent,
-  date = "2019-08-15",
+  date = c("2019-08-15","2019-08-18"),
   directory_to_save = directory_to_save,
   acknowledgement = TRUE
 )
 ```
-
 ## Process one workflow-ready land-surface temperature product
 
 ```{r process, eval = live_run}
@@ -533,24 +694,71 @@ modis_files <- list.files(
   recursive = TRUE,
   full.names = TRUE
 )
-processed_data <- process_modis_merge(
+
+# Process with daily resolution, no temporal aggregation
+processed_daily <- process_modis_daily(
   path = modis_files,
-  date = "2019-08-15",
+  date = c("2019-08-15","2019-08-18"),
+  subdataset = "LST_Day_1km"
+)
+
+# Processs with temporal averaging across the 4-day window
+processed_avg <- process_modis_merge(
+  path = modis_files,
+  date = c("2019-08-15","2019-08-18"),
   subdataset = "LST_Day_1km",
-  fusion_method = "mean"
+  fun_agg = "mean"
 )
 ```
 
-```{r plot-processed-raster, eval = live_run, fig.alt = "Raster plot of the processed MOD11A1 land-surface temperature surface for the example date."}
+```{r plot-processed-rasters, eval = live_run, fig.alt = "Raster plot of the processed MOD11A1 land-surface temperature surface for the example date."}
 terra::plot(
-  processed_data,
-  main = "MOD11A1 LST_Day_1km on 2019-08-15"
+  processed_avg,
+  main = "MOD11A1 LST_Day_1km averaged over 4 Days (2019-08-15 to 2019-08-18)"
+)
+
+terra::plot(
+  processed_daily,
+  main = "MOD11A1 LST_Day_1km daily resolution (2019-08-15 to 2019-08-18)"
 )
 ```
 
-## Calculate covariates at points
+## Calculate covariates at points - demonstating cacluations at points with buffers
 
 ```{r calculate-points, eval = live_run}
+# Build two example points in the upper half of the MODIS extent and
+# subset H3 hexagons to the same upper-half window.
+if (!exists("modis_extent")) {
+  modis_extent <- c(-79.2, 35.8, -78.6, 36.3)
+}
+
+modis_mid_lat <- mean(modis_extent[c(2, 4)])
+example_points_sf <- sf::st_as_sf(
+  data.frame(
+    site_id = c("northwest_point", "northeast_point"),
+    lon = c(-79.05, -78.78),
+    lat = c(36.22, 36.18)
+  ),
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+
+modis_upper_half <- sf::st_as_sfc(sf::st_bbox(
+  c(
+    xmin = modis_extent[1],
+    ymin = modis_mid_lat,
+    xmax = modis_extent[3],
+    ymax = modis_extent[4]
+  ),
+  crs = sf::st_crs(4326)
+))
+
+durham_hex <- sf::st_filter(
+  sf::st_transform(durham_hex, 4326),
+  modis_upper_half,
+  .predicate = sf::st_intersects
+)
+
 point_values <- calculate_covariates(
   covariate = "modis",
   from = modis_files,
@@ -566,7 +774,7 @@ point_values <- calculate_covariates(
 )
 ```
 
-## Calculate covariates across Durham County H3 hexagons
+## Calculate covariates across H3 hexagons - demonstating calculations across polygons 
 
 ```{r calculate-polygons, eval = live_run}
 polygon_values <- calculate_covariates(
@@ -583,6 +791,56 @@ polygon_values <- calculate_covariates(
   scale = "* 0.02 - 273.15"
 )
 ```
+
+```{r process complementary TERRA/AQUA , eval = live_run}
+directory_aqua <- file.path(tempdir(), "modis_workflow", "MYD11A1")
+
+download_data(
+  dataset_name = "modis",
+  product = "MYD11A1",
+  version = "061",
+  extent = modis_extent,
+  date = c("2019-08-15","2019-08-18"),
+  directory_to_save = directory_aqua,
+  acknowledgement = TRUE
+)
+
+aqua_files <- list.files(
+  directory_aqua,
+  pattern = "\\.hdf$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+
+processed_aqua <- process_modis_daily(
+  path = aqua_files,
+  date = c("2019-08-15","2019-08-18"),
+  subdataset = "LST_Day_1km"
+)
+
+processed_comb <- process_modis_daily(
+  path = modis_files,
+  path_secondary = aqua_files,
+  date = c("2019-08-15","2019-08-18"),
+  subdataset = "LST_Day_1km",
+  fun_agg = "mean"
+)
+```
+
+
+
+
+## Terra+Aqua fusion for better temporal coverage
+
+`process_modis_merge()` `process_modis_daily()` and `calculate_modis()` support optional Terra+Aqua fusion through `path_secondary` / `from_secondary` and `fusion_method`.
+
+For paired products (for example `MOD13Q1` + `MYD13Q1`), this allows:
+
+- pixel-wise mean blending where both products exist (`fusion_method = "mean"`)
+- fallback to whichever product is available on a date
+- optional priority fallback (`"primary_first"` / `"secondary_first"`)
+
+
 
 ```{r modis-na-summary, eval = live_run}
 point_na_summary <- summarize_na_counts(point_values, "^LST_")

@@ -261,9 +261,7 @@ testthat::test_that("download_modis with NASA token", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
-testthat::test_that(
-  "download_modis remove_command warning and hash=TRUE (mock)",
-  {
+testthat::test_that("download_modis remove_command warning and hash=TRUE (mock)", {
   skip_on_cran()
 
   testthat::local_mocked_bindings(
@@ -340,72 +338,69 @@ testthat::test_that(
   })
 })
 
-testthat::test_that(
-  "download_modis warns when date range exceeds 31 days (mock)",
-  {
-    skip_on_cran()
+testthat::test_that("download_modis warns when date range exceeds 31 days (mock)", {
+  skip_on_cran()
 
-    testthat::local_mocked_bindings(
-      get_token = function(...) "fake_token",
-      download_run_method = function(...) {
-        invisible(list(success = 1, failed = 0, skipped = 0))
-      },
-      download_hash = function(hash, dir) {
-        if (isTRUE(hash)) "fakehash" else NULL
-      },
-      .package = "amadeus"
-    )
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) {
+      invisible(list(success = 1, failed = 0, skipped = 0))
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
+    .package = "amadeus"
+  )
 
-    testthat::local_mocked_bindings(
-      req_perform = function(req, path = NULL, ...) {
-        structure(
-          list(
-            status_code = 200L,
-            headers = list(`Content-Type` = "application/json"),
-            body = charToRaw("{}")
-          ),
-          class = "httr2_response"
-        )
-      },
-      resp_body_json = function(resp, ...) {
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
         list(
-          feed = list(
-            entry = list(
-              list(
-                links = list(
-                  list(
-                    rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-                    href = paste0(
-                      "https://e4ftl01.cr.usgs.gov/MOLT/MOD09GA.061/",
-                      "2023.01.01/MOD09GA.A2023001.h10v05.061.hdf"
-                    )
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      list(
+        feed = list(
+          entry = list(
+            list(
+              links = list(
+                list(
+                  rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                  href = paste0(
+                    "https://e4ftl01.cr.usgs.gov/MOLT/MOD09GA.061/",
+                    "2023.01.01/MOD09GA.A2023001.h10v05.061.hdf"
                   )
                 )
               )
             )
           )
         )
-      },
-      .package = "httr2"
-    )
-
-    withr::with_tempdir({
-      # date range > 31 days in same year triggers warning
-      testthat::expect_warning(
-        suppressMessages(
-          download_modis(
-            date = c("2023-01-01", "2023-03-15"),
-            product = "MOD09GA",
-            directory_to_save = ".",
-            acknowledgement = TRUE,
-            hash = FALSE
-          )
-        ),
-        "31 days"
       )
-    })
-  }
-)
+    },
+    .package = "httr2"
+  )
+
+  withr::with_tempdir({
+    # date range > 31 days in same year triggers warning
+    testthat::expect_warning(
+      suppressMessages(
+        download_modis(
+          date = c("2023-01-01", "2023-03-15"),
+          product = "MOD09GA",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          hash = FALSE
+        )
+      ),
+      "31 days"
+    )
+  })
+})
 
 ################################################################################
 ##### process_modis*
@@ -476,143 +471,149 @@ testthat::test_that("process_modis_sds", {
   testthat::expect_equal(filt_other, "(cos)")
 })
 
-testthat::test_that(
-  "download_modis accepts MOD14A1 and MYD14A1 with mocked CMR results",
-  {
-    mock_product <- NULL
-    testthat::local_mocked_bindings(
-      get_token = function(...) "fake_token",
-      download_run_method = function(...) {
-        invisible(list(success = 1, failed = 0, skipped = 0))
-      },
-      download_hash = function(hash, dir) {
-        if (isTRUE(hash)) "fakehash" else NULL
-      },
-      .package = "amadeus"
-    )
+testthat::test_that("download_modis accepts MOD14A1 and MYD14A1 with mocked CMR results", {
+  mock_product <- NULL
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) {
+      invisible(list(success = 1, failed = 0, skipped = 0))
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
+    .package = "amadeus"
+  )
 
-    testthat::local_mocked_bindings(
-      req_perform = function(req, path = NULL, ...) {
-        structure(
-          list(
-            status_code = 200L,
-            headers = list(`Content-Type` = "application/json"),
-            body = charToRaw("{}")
-          ),
-          class = "httr2_response"
-        )
-      },
-      resp_body_json = function(resp, ...) {
-        list(feed = list(entry = list(
-          list(links = list(list(
-            rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-            href = paste0(
-              "https://example.com/",
-              mock_product,
-              ".A2023361.h11v05.061.2024001000000.hdf"
-            )
-          )))
-        )))
-      },
-      .package = "httr2"
-    )
-
-    withr::with_tempdir({
-      for (mock_product in c("MOD14A1", "MYD14A1")) {
-        result <- suppressWarnings(
-          suppressMessages(
-            download_modis(
-              date = "2023-12-27",
-              product = mock_product,
-              version = "061",
-              directory_to_save = ".",
-              acknowledgement = TRUE,
-              download = FALSE
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      list(
+        feed = list(
+          entry = list(
+            list(
+              links = list(list(
+                rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                href = paste0(
+                  "https://example.com/",
+                  mock_product,
+                  ".A2023361.h11v05.061.2024001000000.hdf"
+                )
+              ))
             )
           )
         )
+      )
+    },
+    .package = "httr2"
+  )
 
-        testthat::expect_type(result, "list")
-        testthat::expect_equal(result$n_files, 1L)
-        testthat::expect_match(result$urls[[1]], mock_product)
-      }
-    })
-  }
-)
-
-testthat::test_that(
-  "download_modis accepts MOD14CM1 and MYD14CM1 monthly files (mock)",
-  {
-    mock_product <- NULL
-    mock_stamp <- NULL
-    testthat::local_mocked_bindings(
-      get_token = function(...) "fake_token",
-      download_run_method = function(...) {
-        invisible(list(success = 1, failed = 0, skipped = 0))
-      },
-      download_hash = function(hash, dir) {
-        if (isTRUE(hash)) "fakehash" else NULL
-      },
-      .package = "amadeus"
-    )
-
-    testthat::local_mocked_bindings(
-      req_perform = function(req, path = NULL, ...) {
-        structure(
-          list(
-            status_code = 200L,
-            headers = list(`Content-Type` = "application/json"),
-            body = charToRaw("{}")
-          ),
-          class = "httr2_response"
+  withr::with_tempdir({
+    for (mock_product in c("MOD14A1", "MYD14A1")) {
+      result <- suppressWarnings(
+        suppressMessages(
+          download_modis(
+            date = "2023-12-27",
+            product = mock_product,
+            version = "061",
+            directory_to_save = ".",
+            acknowledgement = TRUE,
+            download = FALSE
+          )
         )
-      },
-      resp_body_json = function(resp, ...) {
-        list(feed = list(entry = list(
-          list(links = list(list(
-            rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-            href = paste0(
-              "https://example.com/",
-              mock_product,
-              ".",
-              mock_stamp,
-              ".005.01.hdf"
-            )
-          )))
-        )))
-      },
-      .package = "httr2"
-    )
+      )
 
-    mock_cases <- list(
-      list(product = "MOD14CM1", stamp = "200011", date = "2000-11-15"),
-      list(product = "MYD14CM1", stamp = "200207", date = "2002-07-15")
-    )
+      testthat::expect_type(result, "list")
+      testthat::expect_equal(result$n_files, 1L)
+      testthat::expect_match(result$urls[[1]], mock_product)
+    }
+  })
+})
 
-    withr::with_tempdir({
-      for (mock_case in mock_cases) {
-        mock_product <- mock_case$product
-        mock_stamp <- mock_case$stamp
-        result <- suppressWarnings(
-          suppressMessages(
-            download_modis(
-              date = mock_case$date,
-              product = mock_product,
-              version = "005",
-              directory_to_save = ".",
-              acknowledgement = TRUE,
-              download = FALSE
+testthat::test_that("download_modis accepts MOD14CM1 and MYD14CM1 monthly files (mock)", {
+  mock_product <- NULL
+  mock_stamp <- NULL
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) {
+      invisible(list(success = 1, failed = 0, skipped = 0))
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
+    .package = "amadeus"
+  )
+
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
+        class = "httr2_response"
+      )
+    },
+    resp_body_json = function(resp, ...) {
+      list(
+        feed = list(
+          entry = list(
+            list(
+              links = list(list(
+                rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                href = paste0(
+                  "https://example.com/",
+                  mock_product,
+                  ".",
+                  mock_stamp,
+                  ".005.01.hdf"
+                )
+              ))
             )
           )
         )
+      )
+    },
+    .package = "httr2"
+  )
 
-        testthat::expect_type(result, "list")
-        testthat::expect_equal(result$n_files, 1L)
-        testthat::expect_match(result$urls[[1]], mock_stamp)
-      }
-    })
-  }
-)
+  mock_cases <- list(
+    list(product = "MOD14CM1", stamp = "200011", date = "2000-11-15"),
+    list(product = "MYD14CM1", stamp = "200207", date = "2002-07-15")
+  )
+
+  withr::with_tempdir({
+    for (mock_case in mock_cases) {
+      mock_product <- mock_case$product
+      mock_stamp <- mock_case$stamp
+      result <- suppressWarnings(
+        suppressMessages(
+          download_modis(
+            date = mock_case$date,
+            product = mock_product,
+            version = "005",
+            directory_to_save = ".",
+            acknowledgement = TRUE,
+            download = FALSE
+          )
+        )
+      )
+
+      testthat::expect_type(result, "list")
+      testthat::expect_equal(result$n_files, 1L)
+      testthat::expect_match(result$urls[[1]], mock_stamp)
+    }
+  })
+})
 
 testthat::test_that("download_modis accepts MCD14DL text files (mock)", {
   testthat::local_mocked_bindings(
@@ -638,15 +639,21 @@ testthat::test_that("download_modis accepts MCD14DL text files (mock)", {
       )
     },
     resp_body_json = function(resp, ...) {
-      list(feed = list(entry = list(
-        list(links = list(list(
-          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-          href = paste0(
-            "https://example.com/",
-            "MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt"
+      list(
+        feed = list(
+          entry = list(
+            list(
+              links = list(list(
+                rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                href = paste0(
+                  "https://example.com/",
+                  "MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt"
+                )
+              ))
+            )
           )
-        )))
-      )))
+        )
+      )
     },
     .package = "httr2"
   )
@@ -725,12 +732,18 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
           "https://example.com/MODIS_C6_1_Global_MCD14DL_NRT_2027001.txt"
         )
       )
-      list(feed = list(entry = lapply(hrefs, function(href) {
-        list(links = list(list(
-          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-          href = href
-        )))
-      })))
+      list(
+        feed = list(
+          entry = lapply(hrefs, function(href) {
+            list(
+              links = list(list(
+                rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                href = href
+              ))
+            )
+          })
+        )
+      )
     },
     .package = "httr2"
   )
@@ -807,130 +820,132 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
     testthat::expect_equal(txt_result$n_files, 2L)
     testthat::expect_true(all(grepl("\\.txt$", txt_result$urls)))
   })
-
 })
 
 
-testthat::test_that(
-  "download_modis fire products use product-specific versions and data links",
-  {
-    mock_product <- NULL
+testthat::test_that("download_modis fire products use product-specific versions and data links", {
+  mock_product <- NULL
 
-    testthat::local_mocked_bindings(
-      get_token = function(...) "fake_token",
-      download_run_method = function(...) {
-        invisible(list(success = 1, failed = 0, skipped = 0))
-      },
-      download_hash = function(hash, dir) {
-        if (isTRUE(hash)) "fakehash" else NULL
-      },
-      .package = "amadeus"
-    )
+  testthat::local_mocked_bindings(
+    get_token = function(...) "fake_token",
+    download_run_method = function(...) {
+      invisible(list(success = 1, failed = 0, skipped = 0))
+    },
+    download_hash = function(hash, dir) {
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
+    .package = "amadeus"
+  )
 
-    testthat::local_mocked_bindings(
-      request = function(url) list(url = url),
-      req_url_query = function(req, ...) req,
-      req_options = function(req, ...) req,
-      req_retry = function(req, ...) req,
-      req_timeout = function(req, ...) req,
-      req_perform = function(req, path = NULL, ...) {
-        structure(
-          list(
-            status_code = 200L,
-            headers = list(`Content-Type` = "application/json"),
-            body = charToRaw("{}")
-          ),
-          class = "httr2_response"
-        )
-      },
-      resp_body_json = function(resp, ...) {
-        hrefs <- switch(
-          mock_product,
-          MOD14A1 = c(
-            "https://example.com/metadata.xml",
-            "https://example.com/MOD14A1.A2021227.h11v05.061.2021234567890.h5"
-          ),
-          MYD14CM1 = c(
-            "https://example.com/browse.jpg",
-            "https://example.com/MYD14CM1.200207.005.01.hdf"
-          ),
-          MCD14DL = c(
-            "https://example.com/ignore.hdf",
-            "https://example.com/MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt"
-          ),
-          MCD64CMQ = c(
-            "https://example.com/preview.png",
-            "https://example.com/MCD64CMQ.200011.006.01.hdf"
-          ),
-          VNP64A1 = c(
-            "https://example.com/metadata.xml",
-            "https://example.com/VNP64A1.A2023001.h08v05.001.2023002000000.h5"
-          )
-        )
-        list(feed = list(entry = lapply(hrefs, function(href) {
-          list(links = list(list(
-            rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-            href = href
-          )))
-        })))
-      },
-      .package = "httr2"
-    )
-
-    cases <- list(
-      list(
-        product = "MOD14A1",
-        date = "2021-08-15",
-        expected_version = "061",
-        expected_pattern = "\\.h5$"
-      ),
-      list(
-        product = "MYD14CM1",
-        date = "2002-07-15",
-        expected_version = "005",
-        expected_pattern = "MYD14CM1\\.200207"
-      ),
-      list(
-        product = "MCD14DL",
-        date = "2026-03-15",
-        expected_version = "6.1NRT",
-        expected_pattern = "\\.txt$"
-      ),
-      list(
-        product = "MCD64CMQ",
-        date = "2000-11-15",
-        expected_version = "006",
-        expected_pattern = "MCD64CMQ\\.200011"
-      ),
-      list(
-        product = "VNP64A1",
-        date = "2023-01-01",
-        expected_version = NULL,
-        expected_pattern = "\\.h5$"
+  testthat::local_mocked_bindings(
+    request = function(url) list(url = url),
+    req_url_query = function(req, ...) req,
+    req_options = function(req, ...) req,
+    req_retry = function(req, ...) req,
+    req_timeout = function(req, ...) req,
+    req_perform = function(req, path = NULL, ...) {
+      structure(
+        list(
+          status_code = 200L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw("{}")
+        ),
+        class = "httr2_response"
       )
-    )
-
-    withr::with_tempdir({
-      for (i in seq_along(cases)) {
-        mock_product <- cases[[i]]$product
-        result <- suppressWarnings(
-          suppressMessages(
-            download_modis(
-              date = cases[[i]]$date,
-              product = mock_product,
-              directory_to_save = ".",
-              acknowledgement = TRUE,
-              download = FALSE
+    },
+    resp_body_json = function(resp, ...) {
+      hrefs <- switch(
+        mock_product,
+        MOD14A1 = c(
+          "https://example.com/metadata.xml",
+          "https://example.com/MOD14A1.A2021227.h11v05.061.2021234567890.h5"
+        ),
+        MYD14CM1 = c(
+          "https://example.com/browse.jpg",
+          "https://example.com/MYD14CM1.200207.005.01.hdf"
+        ),
+        MCD14DL = c(
+          "https://example.com/ignore.hdf",
+          "https://example.com/MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt"
+        ),
+        MCD64CMQ = c(
+          "https://example.com/preview.png",
+          "https://example.com/MCD64CMQ.200011.006.01.hdf"
+        ),
+        VNP64A1 = c(
+          "https://example.com/metadata.xml",
+          "https://example.com/VNP64A1.A2023001.h08v05.001.2023002000000.h5"
+        )
+      )
+      list(
+        feed = list(
+          entry = lapply(hrefs, function(href) {
+            list(
+              links = list(list(
+                rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                href = href
+              ))
             )
+          })
+        )
+      )
+    },
+    .package = "httr2"
+  )
+
+  cases <- list(
+    list(
+      product = "MOD14A1",
+      date = "2021-08-15",
+      expected_version = "061",
+      expected_pattern = "\\.h5$"
+    ),
+    list(
+      product = "MYD14CM1",
+      date = "2002-07-15",
+      expected_version = "005",
+      expected_pattern = "MYD14CM1\\.200207"
+    ),
+    list(
+      product = "MCD14DL",
+      date = "2026-03-15",
+      expected_version = "6.1NRT",
+      expected_pattern = "\\.txt$"
+    ),
+    list(
+      product = "MCD64CMQ",
+      date = "2000-11-15",
+      expected_version = "006",
+      expected_pattern = "MCD64CMQ\\.200011"
+    ),
+    list(
+      product = "VNP64A1",
+      date = "2023-01-01",
+      expected_version = NULL,
+      expected_pattern = "\\.h5$"
+    )
+  )
+
+  withr::with_tempdir({
+    for (i in seq_along(cases)) {
+      mock_product <- cases[[i]]$product
+      result <- suppressWarnings(
+        suppressMessages(
+          download_modis(
+            date = cases[[i]]$date,
+            product = mock_product,
+            directory_to_save = ".",
+            acknowledgement = TRUE,
+            download = FALSE
           )
         )
+      )
 
-        testthat::expect_equal(result$n_files, 1L)
-        testthat::expect_match(result$urls[[1]], cases[[i]]$expected_pattern)
-      }
-    })
-  }
-)
+      testthat::expect_equal(result$n_files, 1L)
+      testthat::expect_match(result$urls[[1]], cases[[i]]$expected_pattern)
+    }
+  })
+})
 
 
 testthat::test_that("MODIS temporal helpers cover daily monthly and text patterns", {
@@ -939,15 +954,37 @@ testthat::test_that("MODIS temporal helpers cover daily monthly and text pattern
   monthly_path <- "MOD14CM1.200011.005.01.hdf"
   unknown_path <- "unsupported.file"
 
-  testthat::expect_equal(amadeus:::modis_extract_temporal_key(daily_path), "2021227")
-  testthat::expect_equal(amadeus:::modis_extract_temporal_key(txt_path), "2026074")
-  testthat::expect_equal(amadeus:::modis_extract_temporal_key(monthly_path), "200011")
-  testthat::expect_true(is.na(amadeus:::modis_extract_temporal_key(unknown_path)))
+  testthat::expect_equal(
+    amadeus:::modis_extract_temporal_key(daily_path),
+    "2021227"
+  )
+  testthat::expect_equal(
+    amadeus:::modis_extract_temporal_key(txt_path),
+    "2026074"
+  )
+  testthat::expect_equal(
+    amadeus:::modis_extract_temporal_key(monthly_path),
+    "200011"
+  )
+  testthat::expect_true(is.na(amadeus:::modis_extract_temporal_key(
+    unknown_path
+  )))
 
-  testthat::expect_equal(amadeus:::modis_extract_temporal_scale(daily_path), "daily")
-  testthat::expect_equal(amadeus:::modis_extract_temporal_scale(txt_path), "daily")
-  testthat::expect_equal(amadeus:::modis_extract_temporal_scale(monthly_path), "monthly")
-  testthat::expect_true(is.na(amadeus:::modis_extract_temporal_scale(unknown_path)))
+  testthat::expect_equal(
+    amadeus:::modis_extract_temporal_scale(daily_path),
+    "daily"
+  )
+  testthat::expect_equal(
+    amadeus:::modis_extract_temporal_scale(txt_path),
+    "daily"
+  )
+  testthat::expect_equal(
+    amadeus:::modis_extract_temporal_scale(monthly_path),
+    "monthly"
+  )
+  testthat::expect_true(is.na(amadeus:::modis_extract_temporal_scale(
+    unknown_path
+  )))
 
   parsed_dates <- amadeus:::modis_key_to_date(
     key = c("2021227", "200011"),
@@ -961,13 +998,19 @@ testthat::test_that("MODIS temporal helpers cover daily monthly and text pattern
     as.character(amadeus:::modis_key_to_date(c("2021227", "2021230"), "daily")),
     c("2021-08-15", "2021-08-18")
   )
-  testthat::expect_true(is.na(amadeus:::modis_key_to_date(NA_character_, NA_character_)))
+  testthat::expect_true(is.na(amadeus:::modis_key_to_date(
+    NA_character_,
+    NA_character_
+  )))
   testthat::expect_error(
     amadeus:::modis_key_to_date("2021227", "weekly"),
     "Unsupported MODIS temporal scale"
   )
   testthat::expect_error(
-    amadeus:::modis_key_to_date(c("2021227", "2021230"), c("daily", "monthly", "daily"))
+    amadeus:::modis_key_to_date(
+      c("2021227", "2021230"),
+      c("daily", "monthly", "daily")
+    )
   )
 })
 
@@ -999,11 +1042,17 @@ testthat::test_that("modis_filter_paths_by_date covers helper branches", {
     daily_paths[1]
   )
   testthat::expect_identical(
-    amadeus:::modis_filter_paths_by_date(daily_paths, c("2021-09-01", "2021-09-02")),
+    amadeus:::modis_filter_paths_by_date(
+      daily_paths,
+      c("2021-09-01", "2021-09-02")
+    ),
     character(0)
   )
   testthat::expect_equal(
-    amadeus:::modis_filter_paths_by_date(monthly_paths, c("2000-11-15", "2000-12-15")),
+    amadeus:::modis_filter_paths_by_date(
+      monthly_paths,
+      c("2000-11-15", "2000-12-15")
+    ),
     monthly_paths
   )
   testthat::expect_identical(
@@ -1300,7 +1349,14 @@ testthat::test_that("calculate_modis .by wiring aggregates multi-day rows", {
   )
   call_count <- 0L
   testthat::local_mocked_bindings(
-    calculate_modis_daily = function(from, locs, locs_id, date, name_extracted, ...) {
+    calculate_modis_daily = function(
+      from,
+      locs,
+      locs_id,
+      date,
+      name_extracted,
+      ...
+    ) {
       call_count <<- call_count + 1L
       data.frame(
         site_id = "site_1",
@@ -1506,8 +1562,12 @@ testthat::test_that("process_modis_merge merges multiple secondary rasters", {
   testthat::local_mocked_bindings(
     modis_filter_paths_by_date = function(paths, date) paths,
     process_flatten_sds = function(path, subdataset, fun_agg) {
-      if (path == "secondary_a.hdf") return(r_secondary_a)
-      if (path == "secondary_b.hdf") return(r_secondary_b)
+      if (path == "secondary_a.hdf") {
+        return(r_secondary_a)
+      }
+      if (path == "secondary_b.hdf") {
+        return(r_secondary_b)
+      }
       r_primary
     },
     .package = "amadeus"
@@ -1522,6 +1582,122 @@ testthat::test_that("process_modis_merge merges multiple secondary rasters", {
   )
 
   testthat::expect_s4_class(result, "SpatRaster")
+})
+
+
+testthat::test_that("process_modis_daily returns day-preserving list and stack", {
+  testthat::local_mocked_bindings(
+    process_modis_merge = function(
+      path,
+      date,
+      subdataset,
+      fun_agg = "mean",
+      path_secondary = NULL,
+      fusion_method = "mean",
+      ...
+    ) {
+      day_num <- as.integer(gsub("-", "", date))
+      r <- terra::rast(nrows = 1, ncols = 1, vals = day_num)
+      terra::ext(r) <- c(0, 1, 0, 1)
+      terra::crs(r) <- "EPSG:4326"
+      names(r) <- subdataset
+      r
+    },
+    .package = "amadeus"
+  )
+
+  result_list <- process_modis_daily(
+    path = "primary.hdf",
+    date = c("2023-01-01", "2023-01-03"),
+    subdataset = "mock",
+    return_type = "list"
+  )
+  testthat::expect_named(
+    result_list,
+    c("2023-01-01", "2023-01-02", "2023-01-03")
+  )
+  testthat::expect_length(result_list, 3L)
+  testthat::expect_true(all(vapply(
+    result_list,
+    methods::is,
+    logical(1),
+    "SpatRaster"
+  )))
+
+  result_stack <- process_modis_daily(
+    path = "primary.hdf",
+    date = c("2023-01-01", "2023-01-03"),
+    subdataset = "mock",
+    return_type = "stack"
+  )
+  testthat::expect_s4_class(result_stack, "SpatRaster")
+  testthat::expect_equal(terra::nlyr(result_stack), 3L)
+  testthat::expect_equal(
+    names(result_stack),
+    c("mock_20230101", "mock_20230102", "mock_20230103")
+  )
+})
+
+
+testthat::test_that("process_modis_daily skips unmatched days and errors when all days miss", {
+  testthat::local_mocked_bindings(
+    process_modis_merge = function(
+      path,
+      date,
+      subdataset,
+      fun_agg = "mean",
+      path_secondary = NULL,
+      fusion_method = "mean",
+      ...
+    ) {
+      if (date == "2023-01-02") {
+        stop("No MODIS files matched the requested date.\n")
+      }
+      r <- terra::rast(nrows = 1, ncols = 1, vals = 1)
+      terra::ext(r) <- c(0, 1, 0, 1)
+      terra::crs(r) <- "EPSG:4326"
+      names(r) <- subdataset
+      r
+    },
+    .package = "amadeus"
+  )
+
+  result_stack <- process_modis_daily(
+    path = "primary.hdf",
+    date = c("2023-01-01", "2023-01-03"),
+    subdataset = "mock",
+    return_type = "stack"
+  )
+  testthat::expect_equal(terra::nlyr(result_stack), 2L)
+  testthat::expect_equal(
+    names(result_stack),
+    c("mock_20230101", "mock_20230103")
+  )
+
+  testthat::local_mocked_bindings(
+    process_modis_merge = function(
+      path,
+      date,
+      subdataset,
+      fun_agg = "mean",
+      path_secondary = NULL,
+      fusion_method = "mean",
+      ...
+    ) {
+      stop("No MODIS files matched the requested date.\n")
+    },
+    .package = "amadeus"
+  )
+
+  testthat::expect_error(
+    process_modis_daily(
+      path = "primary.hdf",
+      date = c("2023-01-01", "2023-01-03"),
+      subdataset = "mock",
+      return_type = "list"
+    ),
+    "No MODIS files matched any day"
+  )
 })
 
 
@@ -1681,7 +1857,12 @@ testthat::test_that("process_modis_merge handles monthly MOD14CM1 names", {
   withr::local_package("terra")
 
   testthat::local_mocked_bindings(
-    process_flatten_sds = function(path, subdataset = NULL, fun_agg = "mean", ...) {
+    process_flatten_sds = function(
+      path,
+      subdataset = NULL,
+      fun_agg = "mean",
+      ...
+    ) {
       out <- terra::rast(
         ncols = 1,
         nrows = 1,
@@ -2527,74 +2708,162 @@ testthat::test_that("calculate_modis handles monthly MOD14CM1 filenames", {
   )
 })
 
+testthat::test_that("calculate_modis supports direct SpatRaster mode and type pairing", {
+  withr::local_package("terra")
 
-testthat::test_that(
-  "calculate_modis drops insufficient dates and fills try-error extracts",
-  {
-    locs <- sf::st_as_sf(
-      data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
-      coords = c("lon", "lat"),
-      crs = 4326
-    )
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = 0, lat = 0),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
 
-    fake_from <- c(
-      "MOD09GA.A2021001.h10v05.061.2021001000000.hdf",
-      "MOD09GA.A2021001.h11v05.061.2021001000001.hdf",
-      "MOD09GA.A2021001.h12v05.061.2021001000002.hdf",
-      "MOD09GA.A2021002.h10v05.061.2021002000000.hdf",
-      "MOD09GA.A2021002.h11v05.061.2021002000001.hdf",
-      "MOD09GA.A2021002.h12v05.061.2021002000002.hdf",
-      "MOD09GA.A2021003.h10v05.061.2021003000000.hdf"
-    )
+  r_primary <- terra::rast(
+    ncols = 1,
+    nrows = 1,
+    xmin = -1,
+    xmax = 1,
+    ymin = -1,
+    ymax = 1,
+    crs = "EPSG:4326"
+  )
+  terra::values(r_primary) <- 10
+  names(r_primary) <- "mock_layer"
 
-    testthat::local_mocked_bindings(
-      calculate_modis_daily = function(...) {
-        structure("forced extract failure", class = "try-error")
-      },
-      .package = "amadeus"
-    )
+  r_secondary <- r_primary
+  terra::values(r_secondary) <- 20
 
-    fake_preprocess <- function(path, date, ...) {
-      out <- terra::rast(
-        ncols = 1,
-        nrows = 1,
-        xmin = -79,
-        xmax = -78,
-        ymin = 35,
-        ymax = 36,
-        crs = "EPSG:4326"
-      )
-      terra::values(out) <- 1
-      names(out) <- "mock_layer"
-      out
-    }
+  testthat::expect_no_error(
+    direct_result <- calculate_modis(
+      from = r_primary,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0L,
+      name_covariates = "mock_",
+      preprocess = "ignored_in_raster_mode",
+      scale = "* 1"
+    )
+  )
+  testthat::expect_true(is.data.frame(direct_result))
+  testthat::expect_true("mock_00000" %in% names(direct_result))
+  testthat::expect_true(all(is.na(direct_result$time)))
 
-    testthat::expect_message(
-      result <- calculate_modis(
-        from = fake_from,
-        locs = locs,
-        locs_id = "site_id",
-        name_covariates = "mock_cov_",
-        preprocess = fake_preprocess,
-        radius = c(0L, 1000L),
-        scale = "* 1"
-      ),
-      "insufficient"
-    )
+  fused_primary <- calculate_modis(
+    from = r_primary,
+    from_secondary = r_secondary,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0L,
+    name_covariates = "mock_",
+    fusion_method = "primary_first",
+    scale = "* 1"
+  )
+  fused_secondary <- calculate_modis(
+    from = r_primary,
+    from_secondary = r_secondary,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0L,
+    name_covariates = "mock_",
+    fusion_method = "secondary_first",
+    scale = "* 1"
+  )
+  fused_mean <- calculate_modis(
+    from = r_primary,
+    from_secondary = r_secondary,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0L,
+    name_covariates = "mock_",
+    fusion_method = "mean",
+    scale = "* 1"
+  )
+  testthat::expect_equal(fused_primary$mock_00000, 10)
+  testthat::expect_equal(fused_secondary$mock_00000, 20)
+  testthat::expect_equal(fused_mean$mock_00000, 15, tolerance = 1e-5)
 
-    testthat::expect_equal(
-      as.character(attr(result, "dates_dropped")),
-      "2021-01-03"
+  testthat::expect_error(
+    calculate_modis(
+      from = r_primary,
+      from_secondary = "MOD11A1.A2021001.h11v05.061.1234567890123.hdf",
+      scale = "* 1"
+    ),
+    "from_secondary should be SpatRaster"
+  )
+  testthat::expect_error(
+    calculate_modis(
+      from = "MOD11A1.A2021001.h11v05.061.1234567890123.hdf",
+      from_secondary = r_secondary,
+      scale = "* 1"
+    ),
+    "from_secondary should be a character vector"
+  )
+})
+
+
+testthat::test_that("calculate_modis drops insufficient dates and fills try-error extracts", {
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+
+  fake_from <- c(
+    "MOD09GA.A2021001.h10v05.061.2021001000000.hdf",
+    "MOD09GA.A2021001.h11v05.061.2021001000001.hdf",
+    "MOD09GA.A2021001.h12v05.061.2021001000002.hdf",
+    "MOD09GA.A2021002.h10v05.061.2021002000000.hdf",
+    "MOD09GA.A2021002.h11v05.061.2021002000001.hdf",
+    "MOD09GA.A2021002.h12v05.061.2021002000002.hdf",
+    "MOD09GA.A2021003.h10v05.061.2021003000000.hdf"
+  )
+
+  testthat::local_mocked_bindings(
+    calculate_modis_daily = function(...) {
+      structure("forced extract failure", class = "try-error")
+    },
+    .package = "amadeus"
+  )
+
+  fake_preprocess <- function(path, date, ...) {
+    out <- terra::rast(
+      ncols = 1,
+      nrows = 1,
+      xmin = -79,
+      xmax = -78,
+      ymin = 35,
+      ymax = 36,
+      crs = "EPSG:4326"
     )
-    testthat::expect_equal(nrow(result), 2)
-    testthat::expect_equal(
-      as.character(result$time),
-      c("2021-01-01", "2021-01-02")
-    )
-    testthat::expect_true(all(result$mock_cov_00000 == -99999))
-    testthat::expect_true(all(result$mock_cov_01000 == -99999))
+    terra::values(out) <- 1
+    names(out) <- "mock_layer"
+    out
   }
-)
+
+  testthat::expect_message(
+    result <- calculate_modis(
+      from = fake_from,
+      locs = locs,
+      locs_id = "site_id",
+      name_covariates = "mock_cov_",
+      preprocess = fake_preprocess,
+      radius = c(0L, 1000L),
+      scale = "* 1"
+    ),
+    "insufficient"
+  )
+
+  testthat::expect_equal(
+    as.character(attr(result, "dates_dropped")),
+    "2021-01-03"
+  )
+  testthat::expect_equal(nrow(result), 2)
+  testthat::expect_equal(
+    as.character(result$time),
+    c("2021-01-01", "2021-01-02")
+  )
+  testthat::expect_true(all(result$mock_cov_00000 == -99999))
+  testthat::expect_true(all(result$mock_cov_01000 == -99999))
+})
 
 # nolint end
 
@@ -2683,7 +2952,7 @@ testthat::test_that("download_modis no granules found path (no skip)", {
       )
     },
     resp_body_json = function(resp, ...) {
-      list(feed = list(entry = list()))  # Empty entry list -> no granules
+      list(feed = list(entry = list())) # Empty entry list -> no granules
     },
     .package = "httr2"
   )
@@ -2750,15 +3019,21 @@ testthat::test_that("download_modis no in-range granules found after filtering",
       )
     },
     resp_body_json = function(resp, ...) {
-      list(feed = list(entry = list(
-        list(links = list(list(
-          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-          href = paste0(
-            "https://example.com/",
-            "MOD14A1.A2021230.h11v05.061.2021234567890.hdf"
+      list(
+        feed = list(
+          entry = list(
+            list(
+              links = list(list(
+                rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                href = paste0(
+                  "https://example.com/",
+                  "MOD14A1.A2021230.h11v05.061.2021234567890.hdf"
+                )
+              ))
+            )
           )
-        )))
-      )))
+        )
+      )
     },
     .package = "httr2"
   )
@@ -2806,15 +3081,21 @@ testthat::test_that("download_modis remove_command deprecated warning", {
       )
     },
     resp_body_json = function(resp, ...) {
-      list(feed = list(entry = list(
-        list(links = list(list(
-          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-          href = paste0(
-            "https://example.com/",
-            "MOD09GA.A2023001.h08v04.006.hdf"
+      list(
+        feed = list(
+          entry = list(
+            list(
+              links = list(list(
+                rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                href = paste0(
+                  "https://example.com/",
+                  "MOD09GA.A2023001.h08v04.006.hdf"
+                )
+              ))
+            )
           )
-        )))
-      )))
+        )
+      )
     },
     .package = "httr2"
   )
@@ -2861,15 +3142,21 @@ testthat::test_that("download_modis 31-day range warning (no skip)", {
       )
     },
     resp_body_json = function(resp, ...) {
-      list(feed = list(entry = list(
-        list(links = list(list(
-          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-          href = paste0(
-            "https://example.com/",
-            "MOD09GA.A2023001.h08v04.006.hdf"
+      list(
+        feed = list(
+          entry = list(
+            list(
+              links = list(list(
+                rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                href = paste0(
+                  "https://example.com/",
+                  "MOD09GA.A2023001.h08v04.006.hdf"
+                )
+              ))
+            )
           )
-        )))
-      )))
+        )
+      )
     },
     .package = "httr2"
   )
@@ -2915,15 +3202,21 @@ testthat::test_that("download_modis hash=TRUE returns fakehash (no skip)", {
       )
     },
     resp_body_json = function(resp, ...) {
-      list(feed = list(entry = list(
-        list(links = list(list(
-          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-          href = paste0(
-            "https://example.com/",
-            "MOD09GA.A2023001.h08v04.006.hdf"
+      list(
+        feed = list(
+          entry = list(
+            list(
+              links = list(list(
+                rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                href = paste0(
+                  "https://example.com/",
+                  "MOD09GA.A2023001.h08v04.006.hdf"
+                )
+              ))
+            )
           )
-        )))
-      )))
+        )
+      )
     },
     .package = "httr2"
   )
@@ -3009,15 +3302,21 @@ testthat::test_that("download_modis MOD06_L2 uses version 6.1 (no skip)", {
       )
     },
     resp_body_json = function(resp, ...) {
-      list(feed = list(entry = list(
-        list(links = list(list(
-          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-          href = paste0(
-            "https://example.com/",
-            "MOD06_L2.A2023001.hdf"
+      list(
+        feed = list(
+          entry = list(
+            list(
+              links = list(list(
+                rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                href = paste0(
+                  "https://example.com/",
+                  "MOD06_L2.A2023001.hdf"
+                )
+              ))
+            )
           )
-        )))
-      )))
+        )
+      )
     },
     .package = "httr2"
   )
@@ -3064,15 +3363,21 @@ testthat::test_that("download_modis VNP46A2 sets str_version to NULL", {
       )
     },
     resp_body_json = function(resp, ...) {
-      list(feed = list(entry = list(
-        list(links = list(list(
-          rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
-          href = paste0(
-            "https://example.com/",
-            "VNP46A2.A2023001.h08v05.001.hdf"
+      list(
+        feed = list(
+          entry = list(
+            list(
+              links = list(list(
+                rel = "http://esipfed.org/ns/fedsearch/1.1/data#",
+                href = paste0(
+                  "https://example.com/",
+                  "VNP46A2.A2023001.h08v05.001.hdf"
+                )
+              ))
+            )
           )
-        )))
-      )))
+        )
+      )
     },
     .package = "httr2"
   )
@@ -3102,7 +3407,7 @@ testthat::test_that("calculate_modis errors when no files match selected fusion 
     coords = c("lon", "lat"),
     crs = 4326
   )
-  from_primary   <- "MOD09GA.A2021001.h10v05.061.2021001000000.hdf"
+  from_primary <- "MOD09GA.A2021001.h10v05.061.2021001000000.hdf"
   from_secondary <- "MYD09GA.A2021001.h10v05.061.2021001000000.hdf"
 
   call_count <- 0L
@@ -3110,7 +3415,7 @@ testthat::test_that("calculate_modis errors when no files match selected fusion 
   # subsequent calls (has_primary / has_secondary checks) return a bogus key,
   # making !has_primary && !has_secondary TRUE.
   testthat::local_mocked_bindings(
-    modis_extract_temporal_key   = function(x, ...) {
+    modis_extract_temporal_key = function(x, ...) {
       call_count <<- call_count + 1L
       if (call_count <= 2L) "2021001" else "0000000"
     },
@@ -3120,16 +3425,16 @@ testthat::test_that("calculate_modis errors when no files match selected fusion 
 
   testthat::expect_error(
     calculate_modis(
-      from           = from_primary,
+      from = from_primary,
       from_secondary = from_secondary,
-      locs           = locs,
-      locs_id        = "site_id",
-      radius         = 0L,
-      preprocess     = function(...) terra::rast(),
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0L,
+      preprocess = function(...) terra::rast(),
       name_covariates = "cov_",
-      subdataset     = "mock",
-      scale          = "* 1",
-      fusion_method  = "mean"
+      subdataset = "mock",
+      scale = "* 1",
+      fusion_method = "mean"
     ),
     "No MODIS files found"
   )

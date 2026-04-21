@@ -520,6 +520,118 @@ process_modis_merge <- function(
 }
 
 
+# nolint start
+#' Process MODIS files as daily outputs
+#' @description
+#' Process MODIS HDF/H5 files into day-specific rasters over a requested
+#' date range. This helper preserves daily slices instead of flattening a
+#' multi-day range into one merged result.
+#' @param path character. Full list of HDF/H5 file paths.
+#' @param date character(1:2). Date or date range in `"YYYY-MM-DD"` format.
+#' @param subdataset character(1). Subdataset names to extract.
+#' Should conform to regular expression. See [`base::regex`] for details.
+#' @param fun_agg Function name or custom function to aggregate overlapping
+#' cell values. See `fun` description in [`terra::tapp`] for details.
+#' @param path_secondary character. Optional secondary list of HDF/H5 paths
+#' (for example, Aqua files) to fuse with `path` by date.
+#' @param fusion_method character(1). Fusion method when `path_secondary` is
+#' provided: `"mean"`, `"primary_first"`, or `"secondary_first"`.
+#' @param return_type character(1). Return `"stack"` for a multi-layer
+#' `SpatRaster` (default) or `"list"` for a named list of daily `SpatRaster`
+#' objects.
+#' @param ... Additional arguments passed to [`process_modis_merge`].
+#' @return A day-preserving MODIS result as a `SpatRaster`
+#' (`return_type = "stack"`) or named list (`return_type = "list"`).
+#' @seealso [`process_modis_merge`], [`download_data`]
+#' @author Insang Song
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' mod09ga_daily <- process_modis_daily(
+#'   path = list.files("./data", pattern = "MOD09GA.", full.names = TRUE),
+#'   date = c("2024-01-01", "2024-01-07"),
+#'   subdataset = "sur_refl_b01_1",
+#'   return_type = "list"
+#' )
+#' }
+#' @export
+# nolint end
+process_modis_daily <- function(
+  path = NULL,
+  date = NULL,
+  subdataset = NULL,
+  fun_agg = "mean",
+  path_secondary = NULL,
+  fusion_method = c("mean", "primary_first", "secondary_first"),
+  return_type = c("stack", "list"),
+  ...
+) {
+  return_type <- match.arg(return_type)
+  amadeus::is_date_proper(instr = date)
+
+  if (length(date) == 1L) {
+    date <- rep(date, 2L)
+  }
+
+  date_seq <- format(
+    seq(as.Date(date[1]), as.Date(date[2]), by = "day"),
+    "%Y-%m-%d"
+  )
+  daily_rasters <- vector("list", length(date_seq))
+  names(daily_rasters) <- date_seq
+
+  for (i in seq_along(date_seq)) {
+    day_i <- date_seq[[i]]
+    daily_rasters[[i]] <- tryCatch(
+      process_modis_merge(
+        path = path,
+        date = day_i,
+        subdataset = subdataset,
+        fun_agg = fun_agg,
+        path_secondary = path_secondary,
+        fusion_method = fusion_method,
+        ...
+      ),
+      error = function(e) {
+        if (
+          grepl(
+            "No MODIS files matched the requested date",
+            e$message,
+            fixed = TRUE
+          )
+        ) {
+          return(NULL)
+        }
+        stop(e)
+      }
+    )
+  }
+
+  daily_rasters <- daily_rasters[!vapply(daily_rasters, is.null, logical(1))]
+  if (length(daily_rasters) == 0L) {
+    stop("No MODIS files matched any day in the requested date range.\n")
+  }
+
+  if (return_type == "list") {
+    return(daily_rasters)
+  }
+
+  rasters_named <- mapply(
+    FUN = function(r_i, date_i) {
+      names(r_i) <- paste0(names(r_i), "_", gsub("-", "", date_i))
+      r_i
+    },
+    daily_rasters,
+    names(daily_rasters),
+    SIMPLIFY = FALSE,
+    USE.NAMES = FALSE
+  )
+
+  do.call(c, rasters_named)
+}
+
+
 process_mcd14dl <- function(
   path = NULL,
   date = NULL,
