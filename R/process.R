@@ -3778,6 +3778,13 @@ process_huc <-
     # exclude the coverage due to write permission related to memoization
     #nocov start
     if (missing(path) || (!file.exists(path) && !dir.exists(path))) {
+      if (!requireNamespace("nhdplusTools", quietly = TRUE)) {
+        stop(
+          "Package 'nhdplusTools' is required when fetching HUC data ",
+          "remotely. ",
+          "Please install it and try again."
+        )
+      }
       hucpoly <- try(
         rlang::inject(nhdplusTools::get_huc(!!!list(...)))
       )
