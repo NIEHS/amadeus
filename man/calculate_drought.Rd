@@ -12,7 +12,6 @@ calculate_drought(
   fun = "mean",
   weights = NULL,
   geom = FALSE,
-  .by = NULL,
   .by_time = NULL,
   ...
 )
@@ -44,13 +43,8 @@ path. Optional weights raster for weighted extraction. If \code{NULL}
 \item{geom}{\code{FALSE}, \code{"sf"}, or \code{"terra"}. Whether to
 attach geometry to the returned object. Default \code{FALSE}.}
 
-\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
-Optional post-extraction summarization target following the same
-semantics as other \code{calculate_*()} functions. \code{NULL}
-(default) returns per-row extracted values.}
-
 \item{.by_time}{NULL or character(1). Name of the time column to use
-when \code{.by} is a time-unit string. \code{NULL} defers to
+temporal summarization unit token. \code{NULL} disables
 \code{"time"}.}
 
 \item{...}{Reserved for future use; currently ignored.}
@@ -64,7 +58,7 @@ object (when \code{geom} is set) with columns:
 \code{"YYYY-MM-DD"} character).}
 \item{\code{<value_column>}}{Extracted drought index or class value.}
 }
-When \code{.by} / \code{.by_time} are non-\code{NULL}, rows are
+When \code{.by_time} is non-\code{NULL}, rows are
 aggregated to the specified resolution via \code{calc_summarize_by()}.
 }
 \description{
@@ -82,7 +76,7 @@ class (\code{DM}, integer 0–4) at each location is determined via
 spatial overlay. A \code{time} column of class \code{Date} is
 populated from the \code{date} attribute of \code{from}.
 }
-When \code{.by} or \code{.by_time} are supplied the extracted result is
+When \code{.by_time} is supplied the extracted result is
 passed through \code{calc_summarize_by()} using the same semantics as
 all other \code{calculate_*()} functions in this package.
 }

@@ -299,7 +299,27 @@ testthat::test_that("calculate_prism strips exactextractr mean. prefix on multi-
   testthat::expect_true(all(c("ppt_1000", "tmin_1000") %in% colnames(res)))
 })
 
-testthat::test_that("calculate_prism .by branch derives time and validates inputs", {
+testthat::test_that("calculate_prism errors when deprecated .by is supplied", {
+  withr::local_package("terra")
+  from <- terra::rast(ncols = 1, nrows = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326")
+  terra::values(from) <- 5
+  names(from) <- "ppt"
+  locs <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
+
+  testthat::expect_error(
+    calculate_prism(
+      from = from,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "day"
+    ),
+    regexp = "no longer supported"
+  )
+})
+
+
+testthat::test_that("calculate_prism .by_time branch derives time and validates inputs", {
   withr::local_package("terra")
   from <- terra::rast(ncols = 1, nrows = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326")
   terra::values(from) <- 5
@@ -316,7 +336,7 @@ testthat::test_that("calculate_prism .by branch derives time and validates input
     locs = locs,
     locs_id = "site_id",
     radius = 0,
-    .by = "day"
+    .by_time = "day"
   )
   testthat::expect_true("time" %in% names(by_out))
   testthat::expect_s3_class(by_out$time, "POSIXct")
@@ -330,7 +350,7 @@ testthat::test_that("calculate_prism .by branch derives time and validates input
       locs = locs,
       locs_id = "site_id",
       radius = 0,
-      .by = "day"
+      .by_time = "day"
     ),
     regexp = "single covariate column"
   )
@@ -346,7 +366,7 @@ testthat::test_that("calculate_prism .by branch derives time and validates input
       locs = locs,
       locs_id = "site_id",
       radius = 0,
-      .by = "day"
+      .by_time = "day"
     ),
     regexp = "Could not derive PRISM time"
   )

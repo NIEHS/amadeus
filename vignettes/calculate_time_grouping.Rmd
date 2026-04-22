@@ -15,16 +15,15 @@ library(amadeus)
 library(terra)
 ```
 
-## How `.by` and `.by_time` work
+## How `.by_time` works
 
-`calculate_*()` functions now use `.by` / `.by_time` for optional summarization:
+`calculate_*()` functions use `.by_time` for optional temporal summarization:
 
-- If `.by = NULL` and `.by_time = NULL`, results keep the native processed time rows.
-- If `.by` is set to a time unit (`"day"`, `"week"`, `"month"`, `"year"`), rows are
-  grouped by site and that bucket.
-- If `.by` is set to a column name (for example `"region"`), grouping uses that
-  column. Then `.by_time` can add time grouping (either a time unit or an existing
-  time column name).
+- If `.by_time = NULL`, results keep the native processed time rows.
+- If `.by_time` is a time unit (`"day"`, `"week"`, `"month"`, `"quarter"`, `"year"`),
+  rows are grouped by site and that temporal bucket.
+- Supported sub-daily tokens are also available (`"minute"`, `"hour"`), depending on
+  the underlying dataset time resolution.
 
 ## Minimal reproducible example using `calculate_geos()`
 
@@ -65,7 +64,7 @@ native_rows <- calculate_geos(
 head(native_rows)
 ```
 
-### 2) Time bucketing with `.by`
+### 2) Time bucketing with `.by_time`
 
 ```{r}
 monthly <- calculate_geos(
@@ -73,31 +72,13 @@ monthly <- calculate_geos(
   locs = locs,
   locs_id = "site_id",
   radius = 0,
-  .by = "month",
+  .by_time = "month",
   geom = FALSE
 )
 monthly
 ```
 
-### 3) Group by a column and add time with `.by_time`
-
-```{r}
-site_month <- calculate_geos(
-  from = r,
-  locs = locs,
-  locs_id = "site_id",
-  radius = 0,
-  .by = "site_id",
-  .by_time = "month",
-  geom = FALSE
-)
-site_month
-```
-
 ## Practical guidance
 
-1. Use defaults (`.by = NULL`, `.by_time = NULL`) when you want native temporal
-   output.
-2. Use `.by` for coarser temporal summaries or custom grouping columns.
-3. Use `.by_time` only when `.by` is a non-time column and you also want temporal
-   grouping.
+1. Use default `.by_time = NULL` when you want native temporal output.
+2. Use `.by_time` for coarser temporal summaries at the scale needed for analysis.

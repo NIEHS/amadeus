@@ -11,7 +11,6 @@ calculate_narr(
   radius = 0,
   fun = "mean",
   weights = NULL,
-  .by = NULL,
   .by_time = NULL,
   geom = FALSE,
   ...
@@ -35,11 +34,8 @@ within sites location buffer (Default = \code{mean}).}
 path. Optional weights raster for weighted extraction. If \code{NULL}
 (default), unweighted extraction is performed.}
 
-\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
-Optional grouping key(s) for aggregating extracted values.}
-
 \item{.by_time}{NULL or character(1). Optional time grouping key used
-when \code{.by} is provided.}
+when \code{.by_time} is provided.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

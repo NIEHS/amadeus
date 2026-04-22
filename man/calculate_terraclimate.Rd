@@ -11,7 +11,6 @@ calculate_terraclimate(
   radius = 0,
   fun = "mean",
   weights = NULL,
-  .by = NULL,
   .by_time = NULL,
   geom = FALSE,
   ...
@@ -35,11 +34,8 @@ within sites location buffer (Default = \code{mean}).}
 path. Optional weights raster for weighted extraction. If \code{NULL}
 (default), unweighted extraction is performed.}
 
-\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
-Optional post-extraction summarization target.}
-
 \item{.by_time}{NULL or character(1). Optional time grouping key used
-with \code{.by} for space-time summaries.}
+with \code{.by_time} for temporal summaries.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

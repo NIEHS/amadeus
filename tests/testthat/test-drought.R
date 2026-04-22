@@ -657,7 +657,7 @@ testthat::test_that("calculate_drought (SPEI baseline)", {
   testthat::expect_true(inherits(result$time, "POSIXt"))
 })
 
-testthat::test_that("calculate_drought (SPEI .by month)", {
+testthat::test_that("calculate_drought (SPEI .by_time month)", {
   withr::local_package("terra")
 
   spei <- process_drought(
@@ -673,7 +673,7 @@ testthat::test_that("calculate_drought (SPEI .by month)", {
     locs     = locs,
     locs_id  = "site_id",
     radius   = 0L,
-    .by      = "month"
+    .by_time = "month"
   ))
 
   testthat::expect_s3_class(result, "data.frame")
@@ -682,7 +682,7 @@ testthat::test_that("calculate_drought (SPEI .by month)", {
   testthat::expect_true(inherits(result$time, "POSIXt"))
 })
 
-testthat::test_that("calculate_drought (SPEI .by year)", {
+testthat::test_that("calculate_drought (SPEI .by_time year)", {
   withr::local_package("terra")
 
   spei <- process_drought(
@@ -698,7 +698,7 @@ testthat::test_that("calculate_drought (SPEI .by year)", {
     locs    = locs,
     locs_id = "site_id",
     radius  = 0L,
-    .by     = "year"
+    .by_time = "year"
   ))
 
   testthat::expect_s3_class(result, "data.frame")
@@ -822,7 +822,7 @@ testthat::test_that("calculate_drought (USDM point outside polygon → NA)", {
   testthat::expect_true(is.na(result$usdm_dm_0))
 })
 
-testthat::test_that("calculate_drought (USDM .by week)", {
+testthat::test_that("calculate_drought (USDM .by_time week)", {
   withr::local_package("terra")
 
   usdm <- process_drought(
@@ -836,7 +836,7 @@ testthat::test_that("calculate_drought (USDM .by week)", {
     from    = usdm,
     locs    = locs,
     locs_id = "site_id",
-    .by     = "week"
+    .by_time = "week"
   ))
 
   testthat::expect_s3_class(result, "data.frame")
@@ -877,7 +877,7 @@ testthat::test_that("calculate_drought errors on invalid from type", {
   )
 })
 
-testthat::test_that("calculate_drought errors on bad .by value", {
+testthat::test_that("calculate_drought errors when deprecated .by is supplied", {
   withr::local_package("terra")
 
   spei <- process_drought(
@@ -894,7 +894,8 @@ testthat::test_that("calculate_drought errors on bad .by value", {
       locs    = locs,
       locs_id = "site_id",
       .by     = 123L
-    )
+    ),
+    regexp = "no longer supported"
   )
 })
 
@@ -922,7 +923,7 @@ testthat::test_that("calculate_drought errors on bad geom value", {
 ################################################################################
 ##### calculate_drought — .by_time behaviors
 
-testthat::test_that("calculate_drought (SPEI .by site_id + .by_time month)", {
+testthat::test_that("calculate_drought (SPEI .by_time month)", {
   withr::local_package("terra")
 
   spei <- process_drought(
@@ -937,7 +938,6 @@ testthat::test_that("calculate_drought (SPEI .by site_id + .by_time month)", {
     from     = spei,
     locs     = locs,
     locs_id  = "site_id",
-    .by      = "site_id",
     .by_time = "month"
   ))
 
@@ -963,14 +963,13 @@ testthat::test_that("calculate_drought errors on non-character .by_time", {
       from     = spei,
       locs     = locs,
       locs_id  = "site_id",
-      .by      = "site_id",
-      .by_time = 5L
+        .by_time = 5L
     ),
     regexp = "\\.by_time"
   )
 })
 
-testthat::test_that("calculate_drought warns when .by_time supplied without .by", {
+testthat::test_that("calculate_drought accepts .by_time without deprecated .by", {
   withr::local_package("terra")
 
   spei <- process_drought(
@@ -981,22 +980,20 @@ testthat::test_that("calculate_drought warns when .by_time supplied without .by"
   )
   locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
 
-  testthat::expect_warning(
+  testthat::expect_no_error(
     suppressMessages(calculate_drought(
       from     = spei,
       locs     = locs,
       locs_id  = "site_id",
-      .by      = NULL,
       .by_time = "month"
-    )),
-    regexp = "\\.by_time.*ignored|ignored.*\\.by_time"
+    ))
   )
 })
 
 ################################################################################
 ##### calculate_drought — EDDI additional coverage
 
-testthat::test_that("calculate_drought (EDDI .by year)", {
+testthat::test_that("calculate_drought (EDDI .by_time year)", {
   withr::local_package("terra")
 
   eddi <- process_drought(
@@ -1011,7 +1008,7 @@ testthat::test_that("calculate_drought (EDDI .by year)", {
     from    = eddi,
     locs    = locs,
     locs_id = "site_id",
-    .by     = "year"
+    .by_time = "year"
   ))
 
   testthat::expect_s3_class(result, "data.frame")
@@ -1118,7 +1115,7 @@ testthat::test_that("calculate_covariates routes 'usdm' alias", {
   testthat::expect_equal(result, "drought_calc_called")
 })
 
-testthat::test_that("calculate_covariates drought .by passes through", {
+testthat::test_that("calculate_covariates drought .by_time passes through", {
   withr::local_package("terra")
 
   spei <- process_drought(
@@ -1134,7 +1131,7 @@ testthat::test_that("calculate_covariates drought .by passes through", {
     from      = spei,
     locs      = locs,
     locs_id   = "site_id",
-    .by       = "year"
+    .by_time = "year"
   ))
 
   testthat::expect_s3_class(result, "data.frame")

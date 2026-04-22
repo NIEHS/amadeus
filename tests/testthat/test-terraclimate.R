@@ -372,7 +372,7 @@ testthat::test_that("calculate_terraclimate", {
   )
 })
 
-testthat::test_that("calculate_terraclimate supports .by/.by_time summaries", {
+testthat::test_that("calculate_terraclimate supports .by_time summaries", {
   withr::local_package("terra")
   locs <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "3799900018810101")
   terraclimate <- process_terraclimate(
@@ -386,7 +386,7 @@ testthat::test_that("calculate_terraclimate supports .by/.by_time summaries", {
     locs = locs,
     locs_id = "site_id",
     radius = 0,
-    .by = "month",
+    .by_time = "month",
     fun = "mean"
   )
 
@@ -394,6 +394,29 @@ testthat::test_that("calculate_terraclimate supports .by/.by_time summaries", {
   testthat::expect_s3_class(by_time$time, "POSIXct")
   testthat::expect_true(any(grepl("_0$", names(by_time))))
 })
+
+testthat::test_that("calculate_terraclimate errors when deprecated .by is supplied", {
+  withr::local_package("terra")
+  locs <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "3799900018810101")
+  terraclimate <- process_terraclimate(
+    date = c("2018-01-01", "2018-01-01"),
+    variable = "Precipitation",
+    path = testthat::test_path("..", "testdata", "terraclimate", "ppt")
+  )
+
+  testthat::expect_error(
+    calculate_terraclimate(
+      from = terraclimate,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "day",
+      fun = "mean"
+    ),
+    regexp = "no longer supported"
+  )
+})
+
 
 ################################################################################
 ##### download_terraclimate hash=FALSE branch

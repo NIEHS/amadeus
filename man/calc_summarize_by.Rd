@@ -2,30 +2,20 @@
 % Please edit documentation in R/calculate_covariates_auxiliary.R
 \name{calc_summarize_by}
 \alias{calc_summarize_by}
-\title{Summarize extracted covariates using \code{.by} semantics}
+\title{Summarize extracted covariates by \code{.by_time} temporal unit}
 \usage{
 calc_summarize_by(
   covar,
-  .by = NULL,
   fun_summary = "mean",
   locs_id = "site_id",
   time_col = "time",
   .by_time = NULL,
-  group_cols_extra = NULL
+  group_cols_extra = NULL,
+  ...
 )
 }
 \arguments{
 \item{covar}{data.frame. Extracted covariates.}
-
-\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
-Summarization mode:
-\itemize{
-\item \code{NULL}: no-op
-\item time-unit character: summarize by \code{locs_id} and bucketed
-time
-\item column-name character: summarize by that column
-\item \code{sf}/\code{SpatVector}: summarize by overlay target feature
-}}
 
 \item{fun_summary}{character(1) or function. Summary function
 (e.g., \code{"mean"}, \code{"sum"}).}
@@ -34,17 +24,20 @@ time
 
 \item{time_col}{character(1). Time column in \code{covar}.}
 
-\item{.by_time}{NULL or character(1). Optional time grouping spec:
-either a column name in \code{covar} or a time-unit token.}
+\item{.by_time}{NULL or character(1). Temporal unit token.}
 
 \item{group_cols_extra}{character or NULL. Extra grouping columns.}
+
+\item{...}{Placeholders.}
 }
 \value{
 a data.frame.
 }
 \description{
-Generic summarizer following \code{chopin::summarize_st}-style \code{.by}
-semantics for covariate tables.
+Generic temporal summarizer for covariate tables. When
+\code{.by_time} is \code{NULL}, the input is returned unchanged.
+Otherwise, numeric covariates are summarized by
+\code{locs_id + bucketed time + group_cols_extra}.
 }
 \author{
 Insang Song

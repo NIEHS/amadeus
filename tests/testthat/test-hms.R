@@ -566,9 +566,9 @@ testthat::test_that("Character input in calculate_hms returns 1-row df", {
 })
 
 ################################################################################
-##### calculate_hms .by wiring
+##### calculate_hms .by_time wiring
 
-testthat::test_that("calculate_hms .by aggregates daily rows to weekly", {
+testthat::test_that("calculate_hms .by_time aggregates daily rows to weekly", {
   withr::local_package("terra")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
@@ -576,14 +576,14 @@ testthat::test_that("calculate_hms .by aggregates daily rows to weekly", {
     date = c("2022-06-10", "2022-06-11"),
     path = testthat::test_path("..", "testdata", "hms")
   )
-  # 2 dates in same week → .by = "week" → 1 row
+  # 2 dates in same week → .by_time = "week" → 1 row
   hms_weekly <- suppressMessages(
     calculate_hms(
       from = hms,
       locs = ncp,
       locs_id = "site_id",
       radius = 0,
-      .by = "week",
+      .by_time = "week",
       geom = FALSE
     )
   )
@@ -592,7 +592,7 @@ testthat::test_that("calculate_hms .by aggregates daily rows to weekly", {
   testthat::expect_s3_class(hms_weekly$time, "POSIXct")
 })
 
-testthat::test_that("calculate_hms .by_time defaults to smoke-day sums", {
+testthat::test_that("calculate_hms .by_time weekly summarization sums smoke-day counts", {
   withr::local_package("terra")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
@@ -606,7 +606,6 @@ testthat::test_that("calculate_hms .by_time defaults to smoke-day sums", {
       locs = ncp,
       locs_id = "site_id",
       radius = 0,
-      .by = "site_id",
       .by_time = "week",
       geom = FALSE
     )
@@ -618,7 +617,7 @@ testthat::test_that("calculate_hms .by_time defaults to smoke-day sums", {
   testthat::expect_equal(as.integer(hms_weekly$heavy_00000), c(0L, 0L))
 })
 
-testthat::test_that("calculate_hms default .by NULL is backward-compat", {
+testthat::test_that("calculate_hms default without .by_time is backward-compat", {
   withr::local_package("terra")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
@@ -639,18 +638,18 @@ testthat::test_that("calculate_hms default .by NULL is backward-compat", {
   testthat::expect_equal(nrow(hms_df), 2L)
 })
 
-testthat::test_that("calculate_hms character skip path supports .by summarization", {
+testthat::test_that("calculate_hms character skip path supports .by_time summarization", {
   withr::local_package("terra")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
-  # supply two dates in same week (Monday + Tuesday) -> .by week -> 1 row
+  # supply two dates in same week (Monday + Tuesday) -> .by_time = "week" -> 1 row
   hms_skip <- suppressMessages(
     calculate_hms(
       from = c("2018-06-11", "2018-06-12"),
       locs = ncp,
       locs_id = "site_id",
       radius = 0,
-      .by = "week",
+      .by_time = "week",
       geom = FALSE
     )
   )
@@ -659,18 +658,18 @@ testthat::test_that("calculate_hms character skip path supports .by summarizatio
   testthat::expect_s3_class(hms_skip$time, "POSIXct")
 })
 
-testthat::test_that("calculate_hms character single-date .by is no-op", {
+testthat::test_that("calculate_hms character single-date .by_time is no-op", {
   withr::local_package("terra")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
   ncp$site_id <- "3799900018810101"
-  # Single absent date; `.by` on a 1-row table should still return 1 row
+  # Single absent date; `.by_time` on a 1-row table should still return 1 row
   hms_skip <- suppressMessages(
     calculate_hms(
       from = "2018-12-31",
       locs = ncp,
       locs_id = "site_id",
       radius = 0,
-      .by = "day",
+      .by_time = "day",
       geom = FALSE
     )
   )

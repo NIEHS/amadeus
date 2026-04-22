@@ -14,7 +14,6 @@ calculate_modis(
   name_covariates = NULL,
   subdataset = NULL,
   fun_summary = "mean",
-  .by = NULL,
   .by_time = NULL,
   weights = NULL,
   package_list_add = NULL,
@@ -60,12 +59,8 @@ Find detail usage of the argument in notes.}
 \item{fun_summary}{character or function. Function to summarize
 extracted raster values.}
 
-\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
-Optional post-extraction summarization target. Supports time-unit,
-grouping-column, and spatial-object semantics.}
-
 \item{.by_time}{NULL or character(1). Optional time grouping key used
-with \code{.by} for space-time summaries.}
+with \code{.by_time} for temporal summaries.}
 
 \item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
 path. Optional weights raster for weighted extraction. If \code{NULL}
@@ -109,7 +104,7 @@ A data.frame or SpatVector with an attribute:
 \itemize{
 \item \code{attr(., "dates_dropped")}: Dates with insufficient tiles.
 Note that the dates mean the dates with insufficient tiles,
-not the dates without available tiles. When \code{.by} is provided,
+not the dates without available tiles. When \code{.by_time} is provided,
 rows are summarized with \code{calc_summarize_by()} semantics.
 }
 }
@@ -129,7 +124,7 @@ settings and specification can affect the processing efficiency.
 other class objects that could be converted to \code{sf} can be used.
 In raw path mode, \code{preprocess} is called once per inferred day using a
 single-date value. Temporal aggregation across extracted rows should be done
-with \code{.by} / \code{.by_time}.
+with \code{.by_time}.
 Common arguments in \code{preprocess} functions such as \code{date} and \code{path} are
 automatically detected and passed to the function. Please note that
 \code{locs} here and \code{path} in \code{preprocess} functions are assumed to have a

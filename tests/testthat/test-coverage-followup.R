@@ -824,7 +824,7 @@ testthat::test_that("calculate_prism derives time from metags when terra::time r
   terra::metags(meta_r8) <- data.frame(name = "time", value = "20200115")
   r8 <- amadeus::calculate_prism(
     from = meta_r8, locs = locs, locs_id = "site_id",
-    radius = 0, .by = "day"
+    radius = 0, .by_time = "day"
   )
   testthat::expect_true("time" %in% names(r8))
   testthat::expect_equal(as.character(as.Date(r8$time[1])), "2020-01-15")
@@ -834,7 +834,7 @@ testthat::test_that("calculate_prism derives time from metags when terra::time r
   terra::metags(meta_r6) <- data.frame(name = "time", value = "202003")
   r6 <- amadeus::calculate_prism(
     from = meta_r6, locs = locs, locs_id = "site_id",
-    radius = 0, .by = "month"
+    radius = 0, .by_time = "month"
   )
   testthat::expect_true("time" %in% names(r6))
   testthat::expect_equal(as.character(as.Date(r6$time[1])), "2020-03-01")
@@ -844,7 +844,7 @@ testthat::test_that("calculate_prism derives time from metags when terra::time r
   terra::metags(meta_r4) <- data.frame(name = "time", value = "2021")
   r4 <- amadeus::calculate_prism(
     from = meta_r4, locs = locs, locs_id = "site_id",
-    radius = 0, .by = "year"
+    radius = 0, .by_time = "year"
   )
   testthat::expect_true("time" %in% names(r4))
   testthat::expect_equal(as.character(as.Date(r4$time[1])), "2021-01-01")

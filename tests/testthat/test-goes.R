@@ -556,7 +556,7 @@ testthat::test_that("calculate_goes geom='sf' returns sf", {
   testthat::expect_true("sf" %in% class(result))
 })
 
-testthat::test_that("calculate_goes .by aggregates rows", {
+testthat::test_that("calculate_goes .by_time aggregates rows", {
   withr::local_package("terra")
   goes_dir <- testthat::test_path("..", "testdata", "goes")
   # 3 files: 2 on 2018-01-01 and 1 on 2018-01-02
@@ -578,7 +578,7 @@ testthat::test_that("calculate_goes .by aggregates rows", {
       locs = ncp,
       locs_id = "site_id",
       radius = 0,
-      .by = "day",
+      .by_time = "day",
       geom = FALSE
     )
   )
@@ -588,7 +588,7 @@ testthat::test_that("calculate_goes .by aggregates rows", {
   testthat::expect_s3_class(result_daily$time, "POSIXct")
 })
 
-testthat::test_that("calculate_goes default .by NULL backward compatible", {
+testthat::test_that("calculate_goes default without .by_time is backward compatible", {
   withr::local_package("terra")
   goes_dir <- testthat::test_path("..", "testdata", "goes")
   goes_r <- suppressMessages(
@@ -617,7 +617,7 @@ testthat::test_that("calculate_goes default .by NULL backward compatible", {
   testthat::expect_gte(nrow(result), 2L)
 })
 
-testthat::test_that("calculate_goes invalid .by errors", {
+testthat::test_that("calculate_goes invalid .by_time value errors", {
   withr::local_package("terra")
   goes_dir <- testthat::test_path("..", "testdata", "goes")
   goes_r <- suppressMessages(
@@ -633,11 +633,34 @@ testthat::test_that("calculate_goes invalid .by errors", {
       from = goes_r,
       locs = ncp,
       locs_id = "site_id",
-      .by = "variance"
+      .by_time = "variance"
     ),
-    regexp = "not found in `data`"
+    regexp = "\\.by_time.*must be one of"
   )
 })
+
+testthat::test_that("calculate_goes errors when deprecated .by is supplied", {
+  withr::local_package("terra")
+  goes_dir <- testthat::test_path("..", "testdata", "goes")
+  goes_r <- suppressMessages(
+    process_goes(
+      date = c("2018-01-01", "2018-01-01"),
+      variable = "Smoke",
+      path = goes_dir
+    )
+  )
+  ncp <- data.frame(site_id = "site_A", lon = -97.0, lat = 32.0)
+  testthat::expect_error(
+    calculate_goes(
+      from = goes_r,
+      locs = ncp,
+      locs_id = "site_id",
+      .by = "day"
+    ),
+    regexp = "no longer supported"
+  )
+})
+
 
 testthat::test_that("calculate_goes dispatch via calculate_covariates", {
   withr::local_package("terra")

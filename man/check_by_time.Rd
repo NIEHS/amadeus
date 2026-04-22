@@ -2,28 +2,25 @@
 % Please edit documentation in R/calculate_covariates_auxiliary.R
 \name{check_by_time}
 \alias{check_by_time}
-\title{Validate the \code{.by_time} explicit time-column argument}
+\title{Validate the \code{.by_time} temporal summarization argument}
 \usage{
 check_by_time(.by_time)
 }
 \arguments{
-\item{.by_time}{NULL or character(1). Name of the time column.
-\code{NULL} means use the default time column inferred by the
-calling function.}
+\item{.by_time}{NULL or character(1). Temporal summarization unit.
+\code{NULL} means no temporal summarization.}
 }
 \value{
 \code{NULL} invisibly; stops with an informative error if the
 value is invalid.
 }
 \description{
-Validates the \code{.by_time} argument used alongside \code{.by} in
-covariate extraction functions.  When non-\code{NULL}, \code{.by_time}
-must be a single character string naming the time column in the extracted
-covariate \code{data.frame}.  A \code{NULL} value (the default) defers
-time-column selection to the calling function (typically \code{"time"}).
-}
-\seealso{
-\code{\link{check_by}}
+Validates the \code{.by_time} argument used by covariate extraction
+functions for temporal summarization. When non-\code{NULL},
+\code{.by_time} must be a single character string naming a supported
+temporal unit token (singular or plural): \code{"minute"},
+\code{"hour"}, \code{"day"}, \code{"week"}, \code{"month"},
+\code{"quarter"}, or \code{"year"}.
 }
 \author{
 Insang Song

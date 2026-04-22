@@ -1169,9 +1169,9 @@ testthat::test_that("download_merra2 download=FALSE returns url list", {
 })
 
 ################################################################################
-##### calculate_merra2 .by wiring
+##### calculate_merra2 .by_time wiring
 
-testthat::test_that("calculate_merra2 .by wiring aggregates rows", {
+testthat::test_that("calculate_merra2 .by_time wiring aggregates rows", {
   withr::local_package("terra")
   from_rast <- terra::rast(nrows = 2, ncols = 2, vals = 5)
   terra::ext(from_rast) <- c(-80, -78, 34, 36)
@@ -1210,7 +1210,7 @@ testthat::test_that("calculate_merra2 .by wiring aggregates rows", {
       locs = locs_df,
       locs_id = "site_id",
       radius = 0,
-      .by = "day",
+      .by_time = "day",
       geom = FALSE
     )
   )
@@ -1219,10 +1219,31 @@ testthat::test_that("calculate_merra2 .by wiring aggregates rows", {
   testthat::expect_s3_class(result_mean$time, "POSIXct")
 })
 
-################################################################################
-##### calculate_merra2 level-aware .by grouping
 
-testthat::test_that("calculate_merra2 .by level-aware grouping", {
+testthat::test_that("calculate_merra2 errors when deprecated .by is supplied", {
+  withr::local_package("terra")
+  from_rast <- terra::rast(nrows = 2, ncols = 2, vals = 5)
+  terra::ext(from_rast) <- c(-80, -78, 34, 36)
+  terra::crs(from_rast) <- "EPSG:4326"
+  names(from_rast) <- "SO4_20200101_000000"
+  locs_df <- data.frame(site_id = "A", lon = -79, lat = 35)
+
+  testthat::expect_error(
+    calculate_merra2(
+      from = from_rast,
+      locs = locs_df,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "day"
+    ),
+    regexp = "no longer supported"
+  )
+})
+
+################################################################################
+##### calculate_merra2 level-aware .by_time grouping
+
+testthat::test_that("calculate_merra2 .by_time level-aware grouping", {
   withr::local_package("terra")
   # "lev" in the layer name triggers merra2_level = 2 in calculate_merra2,
   # which propagates group_cols_extra = "level" to calc_summarize_by.
@@ -1255,7 +1276,7 @@ testthat::test_that("calculate_merra2 .by level-aware grouping", {
       locs = locs_df,
       locs_id = "site_id",
       radius = 0,
-      .by = "day",
+      .by_time = "day",
       geom = FALSE
     )
   )

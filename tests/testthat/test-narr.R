@@ -446,7 +446,7 @@ testthat::test_that("calculate_narr", {
   )
 })
 
-testthat::test_that("calculate_narr supports .by/.by_time summaries", {
+testthat::test_that("calculate_narr supports .by_time summaries", {
   withr::local_package("terra")
   locs <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "3799900018810101")
   narr <- process_narr(
@@ -460,7 +460,7 @@ testthat::test_that("calculate_narr supports .by/.by_time summaries", {
     locs = locs,
     locs_id = "site_id",
     radius = 0,
-    .by = "day",
+    .by_time = "day",
     fun = "mean"
   )
 
@@ -468,6 +468,29 @@ testthat::test_that("calculate_narr supports .by/.by_time summaries", {
   testthat::expect_s3_class(by_time$time, "POSIXct")
   testthat::expect_true("level" %in% names(by_time))
 })
+
+testthat::test_that("calculate_narr errors when deprecated .by is supplied", {
+  withr::local_package("terra")
+  locs <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "3799900018810101")
+  narr <- process_narr(
+    date = "2018-01-01",
+    variable = "omega",
+    path = testthat::test_path("..", "testdata", "narr", "omega")
+  )
+
+  testthat::expect_error(
+    calculate_narr(
+      from = narr,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "day",
+      fun = "mean"
+    ),
+    regexp = "no longer supported"
+  )
+})
+
 
 ################################################################################
 ##### download_narr hash=FALSE branch

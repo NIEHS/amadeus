@@ -825,10 +825,8 @@ Here we demonstrate with EVI a monthly temporal aggregation by polygon
 
 ```{r vegetation-template, eval = FALSE}
 vegetation_dir <- file.path(tempdir(), "modis_workflow", "vegetation")
-vegetation_window <- c("2019-01-01", "2019-06-31")
-vegetation_dates <- c("2019-08-13", "2019-")
-download_data(
-  dataset_name = "modis",
+vegetation_window <- c("2019-01-01", "2019-04-30")
+download_modis(
   product = "MOD13A2",
   version = "061",
   date = vegetation_window,
@@ -844,30 +842,41 @@ vegetation_files <- list.files(
   full.names = TRUE
 )
 
-vegetation_raster <- average_modis_window(
-  paths = vegetation_files,
-  dates = vegetation_dates,
-  preprocess = amadeus::process_modis_merge,
-  subdataset = "(NDVI)"
+vegetation_raster <- process_modis_merge(
+  path = vegetation_files,
+  date = vegetation_window,
+  subdataset = "(EVI)",
+  fun_agg = "mean"
 )
 
-vegetation_points_raw <- calculate_covariates(
+plot(vegetation_raster, main = "MOD13A2 processed raster with temporal averaging")
+
+evi_points_monthly <- calculate_covariates(
   covariate = "modis",
   from = vegetation_files,
   locs = example_points_sf,
   locs_id = "site_id",
   radius = 0,
   preprocess = amadeus::process_modis_merge,
-  subdataset = "(NDVI)",
-  name_covariates = "ndvi_",
+  subdataset = "(EVI)",
+  name_covariates = "evi_",
+  .by_time = "month",
   fun_summary = "mean",
   geom = "sf",
   scale = "* 0.0001"
 )
-vegetation_points <- average_covariates_over_time(vegetation_points_raw, "site_id")
 
-terra::plot(vegetation_raster, main = "MOD13A2 processed raster")
-plot_histogram_points(vegetation_points, "MOD13A2 point covariate histogram")
+print(evi_points_monthly)
+
+# Check against a single monthly calculation with the same date range and temporal aggregation in the process step. The result should be the same as the monthly row in the previous calculation.
+
+jan_process <- process_modis_merge(
+  path = vegetation_files,
+  date = c("2019-01-01","2019-01-31"),
+  subdataset = "(EVI)"
+)
+
+
 ```
 
 This same averaging pattern applies to `MOD13A1`, `MYD13A1`, and `MYD13A2` when you use a short window that spans two valid 16-day composites. For the monthly products `MOD13A3` and `MYD13A3`, request a date range covering the target month so the monthly granule is included.
@@ -896,7 +905,7 @@ fire_grid_files <- list.files(
 fire_grid_raster <- process_modis_merge(
   path = fire_grid_files,
   date = "2019-08-15",
-  subdataset = "(FireMask)"
+  subdataset = process_modis_sds("MOD14A1")
 )
 
 fire_grid_points <- calculate_covariates(
@@ -906,7 +915,7 @@ fire_grid_points <- calculate_covariates(
   locs_id = "site_id",
   radius = 0,
   preprocess = amadeus::process_modis_merge,
-  subdataset = "(FireMask)",
+  subdataset = process_modis_sds("MOD14A1"),
   name_covariates = "firemask_",
   fun_summary = "mean",
   geom = "sf"

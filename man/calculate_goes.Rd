@@ -11,7 +11,6 @@ calculate_goes(
   radius = 0,
   fun = "mean",
   weights = NULL,
-  .by = NULL,
   .by_time = NULL,
   geom = FALSE,
   ...
@@ -35,11 +34,8 @@ site (default 0 = point extraction).}
 path. Optional weights raster for weighted extraction. If \code{NULL}
 (default), unweighted extraction is performed.}
 
-\item{.by}{NULL, character(1), \code{sf}, or \code{SpatVector}.
-Optional post-extraction summarization target.}
-
 \item{.by_time}{NULL or character(1). Optional time grouping key used
-with \code{.by} for space-time summaries.}
+with \code{.by_time} for temporal summaries.}
 
 \item{geom}{\code{FALSE}/\code{"sf"}/\code{"terra"}. Return geometry with
 results. Default \code{FALSE}. The CRS is inherited from \code{from}.}

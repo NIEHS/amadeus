@@ -2,20 +2,20 @@
 % Please edit documentation in R/calculate_covariates_auxiliary.R
 \name{bucket_time_by_unit}
 \alias{bucket_time_by_unit}
-\title{Bucket a time column to a \code{.by} unit}
+\title{Bucket a time column to a \code{.by_time} unit}
 \usage{
 bucket_time_by_unit(time_vals, unit)
 }
 \arguments{
 \item{time_vals}{vector. Time values to bucket.}
 
-\item{unit}{character(1). A valid \code{.by} time-unit token.}
+\item{unit}{character(1). A valid \code{.by_time} time-unit token.}
 }
 \value{
 vector. Bucketed values as POSIXct (minute/hour) or Date.
 }
 \description{
-Buckets time values to one of the supported \code{.by} units.
+Buckets time values to one of the supported \code{.by_time} units.
 }
 \author{
 Insang Song

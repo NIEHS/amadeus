@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate_covariates_auxiliary.R
 \name{normalize_by_time_unit}
 \alias{normalize_by_time_unit}
-\title{Normalize \code{.by} time-unit aliases}
+\title{Normalize \code{.by_time} time-unit aliases}
 \usage{
 normalize_by_time_unit(unit)
 }
@@ -13,7 +13,7 @@ normalize_by_time_unit(unit)
 character(1). Canonical unit.
 }
 \description{
-Internal helper that maps singular/plural \code{.by} tokens
+Internal helper that maps singular/plural \code{.by_time} tokens
 to canonical units.
 }
 \author{

@@ -1329,14 +1329,14 @@ testthat::test_that("calculate_modis uses single-source fusion days", {
 })
 
 ################################################################################
-##### calculate_modis .by wiring
+##### calculate_modis .by_time wiring
 
 testthat::test_that("calculate_modis no longer exposes legacy temporal args", {
   testthat::expect_false("fun_temporal" %in% names(formals(calculate_modis)))
   testthat::expect_false("time_bucket" %in% names(formals(calculate_modis)))
 })
 
-testthat::test_that("calculate_modis .by wiring aggregates multi-day rows", {
+testthat::test_that("calculate_modis .by_time wiring aggregates multi-day rows", {
   locs <- sf::st_as_sf(
     data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
     coords = c("lon", "lat"),
@@ -1400,12 +1400,49 @@ testthat::test_that("calculate_modis .by wiring aggregates multi-day rows", {
       name_covariates = "cov_",
       subdataset = "mock",
       scale = "* 1",
-      .by = "week"
+      .by_time = "week"
     )
   )
   testthat::expect_equal(nrow(result_mean), 1L)
   testthat::expect_equal(result_mean$cov_00000, 15)
 })
+
+testthat::test_that("calculate_modis errors when deprecated .by is supplied", {
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+  from_files <- c(
+    "MOD09GA.A2021001.h10v05.061.2021001000000.hdf",
+    "MOD09GA.A2021002.h10v05.061.2021002000000.hdf"
+  )
+  mock_preprocess <- function(path, date, ...) {
+    r <- terra::rast(nrows = 1, ncols = 1, vals = 1)
+    terra::ext(r) <- c(-79, -78, 35, 36)
+    terra::crs(r) <- "EPSG:4326"
+    names(r) <- "mock_layer"
+    r
+  }
+
+  testthat::expect_error(
+    suppressMessages(
+      calculate_modis(
+        from = from_files,
+        locs = locs,
+        locs_id = "site_id",
+        radius = 0L,
+        preprocess = mock_preprocess,
+        name_covariates = "cov_",
+        subdataset = "mock",
+        scale = "* 1",
+        .by = "day"
+      )
+    ),
+    regexp = "no longer supported"
+  )
+})
+
 
 testthat::test_that("calculate_modis uses per-day preprocess before .by_time summarization", {
   locs <- sf::st_as_sf(
@@ -1448,7 +1485,7 @@ testthat::test_that("calculate_modis uses per-day preprocess before .by_time sum
       name_covariates = "cov_",
       subdataset = "mock",
       scale = "* 1",
-      .by = "week"
+      .by_time = "week"
     )
   )
 

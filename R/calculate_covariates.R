@@ -15,26 +15,9 @@
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
 #'  Default is `"site_id"`.
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional summarization specification applied after extraction.
-#'   Accepted forms:
-#'   \itemize{
-#'     \item \code{NULL} (default) — no extra summarization; each extracted
-#'       row is returned as-is (backward-compatible).
-#'     \item Time-unit string — temporal bucketing to a coarser resolution.
-#'       Recognised tokens (singular and plural): \code{"minute"},
-#'       \code{"hour"}, \code{"day"}, \code{"week"}, \code{"month"},
-#'       \code{"quarter"}, \code{"year"}.
-#'     \item Column-name string — group-by summarization over a named column
-#'       in the extracted \code{data.frame}.
-#'     \item \code{sf} or \code{SpatVector} — spatial-overlay grouping.
-#'   }
-#'   \strong{Note:} full wiring of \code{.by} across all covariate routes
-#'   is in progress; currently the argument is validated and reserved for
-#'   future use.
 #' @param .by_time NULL or character(1). Name of the time column to use
-#'   when \code{.by} is a time-unit string.  \code{NULL} (default) defers
-#'   to the child function's default (typically \code{"time"}).
+#'   temporal summarization unit token. \code{NULL} (default) disables
+#'   temporal summarization.
 #' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
 #'   path. Passed through to the underlying source-specific function for
 #'   weighted extraction. If `NULL` (default), unweighted extraction is
@@ -129,12 +112,11 @@ calculate_covariates <-
     from,
     locs,
     locs_id = "site_id",
-    .by = NULL,
     .by_time = NULL,
     weights = NULL,
     ...
   ) {
-    amadeus::check_by(.by, .by_time)
+    amadeus::check_unsupported_by(..., .call = sys.call())
     amadeus::check_by_time(.by_time)
     covariate <- tolower(covariate)
     covariate <- match.arg(covariate)
@@ -190,9 +172,6 @@ calculate_covariates <-
           )
           if (!is.null(weights)) {
             calc_args$weights <- weights
-          }
-          if (!is.null(.by)) {
-            calc_args$.by <- .by
           }
           if (!is.null(.by_time)) {
             calc_args$.by_time <- .by_time
@@ -272,6 +251,7 @@ calculate_koppen_geiger <-
     geom = FALSE,
     ...
   ) {
+    amadeus::check_unsupported_by(..., .call = sys.call())
     # prepare locations
     locs_prepared <- amadeus::calc_prepare_locs(
       from = from,
@@ -455,6 +435,7 @@ calculate_nlcd <- function(
   geom = FALSE,
   ...
 ) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
   # check inputs
   mode <- match.arg(mode)
   if (!is.numeric(radius)) {
@@ -682,6 +663,7 @@ calculate_ecoregion <-
     geom = FALSE,
     ...
   ) {
+    amadeus::check_unsupported_by(..., .call = sys.call())
     sanitize_ecoregion_name <- function(x) {
       x <- iconv(x, to = "ASCII//TRANSLIT")
       x[is.na(x)] <- "UNKNOWN"
@@ -869,11 +851,8 @@ calculate_ecoregion <-
 #' Find detail usage of the argument in notes.
 #' @param fun_summary character or function. Function to summarize
 #'  extracted raster values.
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target. Supports time-unit,
-#'   grouping-column, and spatial-object semantics.
 #' @param .by_time NULL or character(1). Optional time grouping key used
-#'   with \code{.by} for space-time summaries.
+#'   with \code{.by_time} for temporal summaries.
 #' @param package_list_add character. A vector with package names to load
 #'  these in each thread. Note that `sf`, `terra`, `exactextractr`,
 #' `doParallel`, `parallelly` and `dplyr` are the default packages to be
@@ -918,7 +897,7 @@ calculate_ecoregion <-
 #' other class objects that could be converted to `sf` can be used.
 #' In raw path mode, `preprocess` is called once per inferred day using a
 #' single-date value. Temporal aggregation across extracted rows should be done
-#' with `.by` / `.by_time`.
+#' with `.by_time`.
 #' Common arguments in `preprocess` functions such as `date` and `path` are
 #' automatically detected and passed to the function. Please note that
 #' `locs` here and `path` in `preprocess` functions are assumed to have a
@@ -944,7 +923,7 @@ calculate_ecoregion <-
 #' @return A data.frame or SpatVector with an attribute:
 #' * `attr(., "dates_dropped")`: Dates with insufficient tiles.
 #'   Note that the dates mean the dates with insufficient tiles,
-#'   not the dates without available tiles. When \code{.by} is provided,
+#'   not the dates without available tiles. When \code{.by_time} is provided,
 #'   rows are summarized with \code{calc_summarize_by()} semantics.
 #' @seealso
 #' This function leverages the calculation of single-day MODIS
@@ -990,7 +969,6 @@ calculate_modis <-
     name_covariates = NULL,
     subdataset = NULL,
     fun_summary = "mean",
-    .by = NULL,
     .by_time = NULL,
     weights = NULL,
     package_list_add = NULL,
@@ -1002,7 +980,7 @@ calculate_modis <-
     ...
   ) {
     amadeus::check_geom(geom)
-    amadeus::check_by(.by, .by_time)
+    amadeus::check_unsupported_by(..., .call = sys.call())
     amadeus::check_by_time(.by_time)
     fusion_method <- match.arg(fusion_method)
     from_is_character <- is.character(from)
@@ -1116,7 +1094,6 @@ process_modis_swath, or process_blackmarble."
           locs_id = locs_id,
           radius = radius,
           fun_summary = fun_summary,
-          .by = .by,
           .by_time = .by_time,
           geom = geom
         )
@@ -1361,10 +1338,9 @@ process_modis_swath, or process_blackmarble."
         }
       )
     calc_results <- do.call(dplyr::bind_rows, calc_results)
-    if (!is.null(.by)) {
+    if (!is.null(.by_time)) {
       calc_results <- amadeus::calc_summarize_by(
         covar = calc_results,
-        .by = .by,
         .by_time = .by_time,
         fun_summary = fun_summary,
         locs_id = locs_id
@@ -1395,7 +1371,6 @@ calculate_modis_fire_vector <- function(
   locs_id,
   radius,
   fun_summary,
-  .by,
   .by_time,
   geom
 ) {
@@ -1489,10 +1464,9 @@ calculate_modis_fire_vector <- function(
   })
 
   result_all <- do.call(rbind, results_by_day)
-  if (!is.null(.by)) {
+  if (!is.null(.by_time)) {
     result_all <- amadeus::calc_summarize_by(
       covar = result_all,
-      .by = .by,
       .by_time = .by_time,
       fun_summary = fun_summary,
       locs_id = locs_id
@@ -1555,6 +1529,7 @@ calculate_temporal_dummies <-
     geom = FALSE,
     ...
   ) {
+    amadeus::check_unsupported_by(..., .call = sys.call())
     amadeus::check_geom(geom)
     if (!methods::is(locs, "data.frame")) {
       stop("Argument locs is not a data.frame.\n")
@@ -1857,6 +1832,7 @@ calculate_tri <- function(
   geom = FALSE,
   ...
 ) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_geom(geom)
   if (!methods::is(locs, "SpatVector")) {
     if (methods::is(locs, "sf")) {
@@ -1951,6 +1927,7 @@ calculate_nei <- function(
   geom = FALSE,
   ...
 ) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_geom(geom)
   if (!methods::is(locs, "SpatVector")) {
     locs <- try(terra::vect(locs))
@@ -1988,10 +1965,9 @@ calculate_nei <- function(
 #' containing identifier for each unique coordinate location.
 #' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#' Optional grouping key(s) for aggregating extracted values.
 #' @param .by_time NULL or character(1). Optional time grouping key used
-#' when \code{.by} is provided. When supplied, HMS indicators are summarized
+#' when \code{.by_time} is provided. When supplied, HMS indicators are
+#' summarized
 #' by \code{sum} (smoke-day counts) by default.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
@@ -2002,7 +1978,7 @@ calculate_nei <- function(
 #' @param ... Placeholders.
 #' @seealso [process_hms()]
 #' @author Mitchell Manware
-#' @return a data.frame or SpatVector object. When \code{.by} is provided,
+#' @return a data.frame or SpatVector object. When \code{.by_time} is provided,
 #'   rows are aggregated using \code{calc_summarize_by()}.
 #' @importFrom terra vect as.data.frame time extract crs
 #' @importFrom tidyr pivot_wider
@@ -2028,16 +2004,15 @@ calculate_hms <- function(
   locs_id = NULL,
   radius = 0,
   weights = NULL,
-  .by = NULL,
   .by_time = NULL,
   geom = FALSE,
   ...
 ) {
-  #### check for null parameters (.by and .by_time are optional)
+  #### check for null parameters (.by_time is optional)
   params_check <- mget(ls())
-  params_check[c(".by", ".by_time", "weights")] <- NULL
+  params_check[c(".by_time", "weights")] <- NULL
   amadeus::check_for_null_parameters(params_check)
-  amadeus::check_by(.by, .by_time)
+  amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_by_time(.by_time)
   #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all densities, locs and dates
@@ -2065,11 +2040,10 @@ calculate_hms <- function(
         )
       )
 
-    if (!is.null(.by)) {
+    if (!is.null(.by_time)) {
       hms_fun_summary <- if (!is.null(.by_time)) "sum" else "mean"
       skip_merge <- amadeus::calc_summarize_by(
         covar = skip_merge,
-        .by = .by,
         .by_time = .by_time,
         fun_summary = hms_fun_summary,
         locs_id = locs_id
@@ -2220,11 +2194,10 @@ calculate_hms <- function(
   # Filling NAs to 0 (explicit integer)
   sites_extracted[is.na(sites_extracted)] <- 0L
 
-  if (!is.null(.by)) {
+  if (!is.null(.by_time)) {
     hms_fun_summary <- if (!is.null(.by_time)) "sum" else "mean"
     sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
-      .by = .by,
       .by_time = .by_time,
       fun_summary = hms_fun_summary,
       locs_id = locs_id
@@ -2321,6 +2294,7 @@ calculate_gmted <- function(
   geom = FALSE,
   ...
 ) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
     from = from,
@@ -2412,10 +2386,8 @@ calculate_gmted <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#' Optional grouping key(s) for aggregating extracted values.
 #' @param .by_time NULL or character(1). Optional time grouping key used
-#' when \code{.by} is provided.
+#' when \code{.by_time} is provided.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2454,12 +2426,11 @@ calculate_narr <- function(
   radius = 0,
   fun = "mean",
   weights = NULL,
-  .by = NULL,
   .by_time = NULL,
   geom = FALSE,
   ...
 ) {
-  amadeus::check_by(.by, .by_time)
+  amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_by_time(.by_time)
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
@@ -2495,10 +2466,9 @@ calculate_narr <- function(
     ...
   )
   narr_group_extra <- if (!is.null(narr_level)) "level" else NULL
-  if (!is.null(.by)) {
+  if (!is.null(.by_time)) {
     sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
-      .by = .by,
       .by_time = .by_time,
       fun_summary = "mean",
       locs_id = locs_id,
@@ -2534,10 +2504,8 @@ calculate_narr <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#' Optional grouping key(s) for aggregating extracted values.
 #' @param .by_time NULL or character(1). Optional time grouping key used
-#' when \code{.by} is provided.
+#' when \code{.by_time} is provided.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2547,7 +2515,7 @@ calculate_narr <- function(
 #' @param ... Placeholders.
 #' @author Mitchell Manware
 #' @seealso [process_geos()]
-#' @return a data.frame or SpatVector object. When \code{.by} is provided,
+#' @return a data.frame or SpatVector object. When \code{.by_time} is provided,
 #'   rows are aggregated using \code{calc_summarize_by()}.
 #' @importFrom terra vect
 #' @importFrom terra buffer
@@ -2578,12 +2546,11 @@ calculate_geos <- function(
   radius = 0,
   fun = "mean",
   weights = NULL,
-  .by = NULL,
   .by_time = NULL,
   geom = FALSE,
   ...
 ) {
-  amadeus::check_by(.by, .by_time)
+  amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_by_time(.by_time)
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
@@ -2610,10 +2577,9 @@ calculate_geos <- function(
     weights = weights,
     ...
   )
-  if (!is.null(.by)) {
+  if (!is.null(.by_time)) {
     sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
-      .by = .by,
       .by_time = .by_time,
       fun_summary = "mean",
       locs_id = locs_id,
@@ -2686,6 +2652,7 @@ calculate_population <- function(
   geom = FALSE,
   ...
 ) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
     from = from,
@@ -2807,6 +2774,7 @@ calculate_groads <- function(
   geom = FALSE,
   ...
 ) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
   #### check for null parameters
   if (radius <= 0) {
     stop("radius should be greater than 0.\n")
@@ -2888,10 +2856,8 @@ calculate_groads <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target.
 #' @param .by_time NULL or character(1). Optional time grouping key used
-#'   with \code{.by} for space-time summaries.
+#'   with \code{.by_time} for temporal summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2901,7 +2867,7 @@ calculate_groads <- function(
 #' @param ... Placeholders
 #' @author Mitchell Manware
 #' @seealso [calculate_geos()], [process_merra2()]
-#' @return a data.frame or SpatVector object. When \code{.by} is provided,
+#' @return a data.frame or SpatVector object. When \code{.by_time} is provided,
 #'   rows are aggregated using \code{calc_summarize_by()}.
 #' @importFrom terra vect
 #' @importFrom terra buffer
@@ -2932,12 +2898,11 @@ calculate_merra2 <- function(
   radius = 0,
   fun = "mean",
   weights = NULL,
-  .by = NULL,
   .by_time = NULL,
   geom = FALSE,
   ...
 ) {
-  amadeus::check_by(.by, .by_time)
+  amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_by_time(.by_time)
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
@@ -2979,12 +2944,11 @@ calculate_merra2 <- function(
     weights = weights,
     ...
   )
-  #### optional `.by` summarization
+  #### optional `.by_time` summarization
   merra2_group_extra <- if (!is.null(merra2_level)) "level" else NULL
-  if (!is.null(.by)) {
+  if (!is.null(.by_time)) {
     sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
-      .by = .by,
       .by_time = .by_time,
       fun_summary = "mean",
       locs_id = locs_id,
@@ -3020,10 +2984,8 @@ calculate_merra2 <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target.
 #' @param .by_time NULL or character(1). Optional time grouping key used
-#'   with \code{.by} for space-time summaries.
+#'   with \code{.by_time} for temporal summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -3062,12 +3024,11 @@ calculate_gridmet <- function(
   radius = 0,
   fun = "mean",
   weights = NULL,
-  .by = NULL,
   .by_time = NULL,
   geom = FALSE,
   ...
 ) {
-  amadeus::check_by(.by, .by_time)
+  amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_by_time(.by_time)
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
@@ -3093,10 +3054,9 @@ calculate_gridmet <- function(
     weights = weights,
     ...
   )
-  if (!is.null(.by)) {
+  if (!is.null(.by_time)) {
     sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
-      .by = .by,
       .by_time = .by_time,
       fun_summary = "mean",
       locs_id = locs_id
@@ -3130,10 +3090,8 @@ calculate_gridmet <- function(
 #' (Default = 0).
 #' @param fun character(1). Function used to summarize multiple raster cells
 #' within sites location buffer (Default = `mean`).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target.
 #' @param .by_time NULL or character(1). Optional time grouping key used
-#'   with \code{.by} for space-time summaries.
+#'   with \code{.by_time} for temporal summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -3176,12 +3134,11 @@ calculate_terraclimate <- function(
   radius = 0,
   fun = "mean",
   weights = NULL,
-  .by = NULL,
   .by_time = NULL,
   geom = FALSE,
   ...
 ) {
-  amadeus::check_by(.by, .by_time)
+  amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_by_time(.by_time)
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
@@ -3208,10 +3165,9 @@ calculate_terraclimate <- function(
     ...
   )
   posixt_out <- FALSE
-  if (!is.null(.by)) {
+  if (!is.null(.by_time)) {
     sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
-      .by = .by,
       .by_time = .by_time,
       fun_summary = "mean",
       locs_id = locs_id
@@ -3387,10 +3343,8 @@ calculate_lagged <- function(
 #' containing identifier for each unique coordinate location.
 #' @param radius integer(1). Circular buffer distance around site locations.
 #' (Default = 0).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target.
 #' @param .by_time NULL or character(1). Optional time grouping key used
-#'   with \code{.by} for space-time summaries.
+#'   with \code{.by_time} for temporal summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -3428,12 +3382,11 @@ calculate_prism <- function(
   locs_id = "site_id",
   radius = 0,
   weights = NULL,
-  .by = NULL,
   .by_time = NULL,
   geom = FALSE,
   ...
 ) {
-  amadeus::check_by(.by, .by_time)
+  amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_by_time(.by_time)
   # check input class
   if (!inherits(from, "SpatRaster")) {
@@ -3526,12 +3479,12 @@ calculate_prism <- function(
   )]
 
   posixt_out <- FALSE
-  if (!is.null(.by)) {
+  if (!is.null(.by_time)) {
     if (!"time" %in% names(sites_extracted)) {
       value_cols_now <- setdiff(names(sites_extracted), c(locs_id, "geometry"))
       if (length(value_cols_now) != 1L) {
         stop(
-          "PRISM `.by` summarization requires a single covariate column ",
+          "PRISM `.by_time` summarization requires a single covariate column ",
           "or an existing `time` column.\n"
         )
       }
@@ -3566,7 +3519,7 @@ calculate_prism <- function(
       }
       if (is.na(prism_time)) {
         stop(
-          "Could not derive PRISM time for `.by` summarization. ",
+          "Could not derive PRISM time for `.by_time` summarization. ",
           "Provide data with explicit time in layer metadata.\n"
         )
       }
@@ -3574,7 +3527,6 @@ calculate_prism <- function(
     }
     sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
-      .by = .by,
       .by_time = .by_time,
       fun_summary = "mean",
       locs_id = locs_id
@@ -3606,10 +3558,8 @@ calculate_prism <- function(
 #'   identifier for each unique coordinate location.
 #' @param radius numeric(1). Circular buffer distance around site locations.
 #'   Default is `0`.
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target.
 #' @param .by_time NULL or character(1). Optional time grouping key used
-#'   with \code{.by} for space-time summaries.
+#'   with \code{.by_time} for temporal summaries.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -3643,12 +3593,11 @@ calculate_edgar <- function(
   locs_id = "site_id",
   radius = 0,
   weights = NULL,
-  .by = NULL,
   .by_time = NULL,
   geom = FALSE,
   ...
 ) {
-  amadeus::check_by(.by, .by_time)
+  amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_by_time(.by_time)
   if (!inherits(from, "SpatRaster")) {
     stop("`from` must be a SpatRaster object.")
@@ -3721,12 +3670,12 @@ calculate_edgar <- function(
   sites_extracted <- sites_extracted[, ordered_cols]
 
   posixt_out <- FALSE
-  if (!is.null(.by)) {
+  if (!is.null(.by_time)) {
     if (!"time" %in% names(sites_extracted)) {
       value_cols_now <- setdiff(names(sites_extracted), c(locs_id, "geometry"))
       if (length(value_cols_now) != 1L) {
         stop(
-          "EDGAR `.by` summarization requires a single covariate column ",
+          "EDGAR `.by_time` summarization requires a single covariate column ",
           "or an existing `time` column.\n"
         )
       }
@@ -3737,7 +3686,7 @@ calculate_edgar <- function(
       }
       if (is.na(edgar_time)) {
         stop(
-          "Could not derive EDGAR time for `.by` summarization. ",
+          "Could not derive EDGAR time for `.by_time` summarization. ",
           "Provide data with explicit time in layer metadata.\n"
         )
       }
@@ -3745,7 +3694,6 @@ calculate_edgar <- function(
     }
     sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
-      .by = .by,
       .by_time = .by_time,
       fun_summary = "mean",
       locs_id = locs_id
@@ -3814,6 +3762,7 @@ calculate_cropscape <- function(
   geom = FALSE,
   ...
 ) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
     from = from,
@@ -3942,6 +3891,7 @@ calculate_huc <- function(
   geom = FALSE,
   ...
 ) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
   if (!inherits(from, "SpatVector")) {
     stop("`from` must be the output of process_huc().")
   }
@@ -3992,10 +3942,8 @@ calculate_huc <- function(
 #'   site (default 0 = point extraction).
 #' @param fun character(1). Summary function for buffered extractions
 #'   (default \code{"mean"}).
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target.
 #' @param .by_time NULL or character(1). Optional time grouping key used
-#'   with \code{.by} for space-time summaries.
+#'   with \code{.by_time} for temporal summaries.
 #' @param geom \code{FALSE}/\code{"sf"}/\code{"terra"}. Return geometry with
 #'   results. Default \code{FALSE}. The CRS is inherited from \code{from}.
 #' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
@@ -4034,12 +3982,11 @@ calculate_goes <- function(
   radius = 0,
   fun = "mean",
   weights = NULL,
-  .by = NULL,
   .by_time = NULL,
   geom = FALSE,
   ...
 ) {
-  amadeus::check_by(.by, .by_time)
+  amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_by_time(.by_time)
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
@@ -4066,11 +4013,10 @@ calculate_goes <- function(
     weights = weights,
     ...
   )
-  #### optional `.by` summarization
-  if (!is.null(.by)) {
+  #### optional `.by_time` summarization
+  if (!is.null(.by_time)) {
     sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
-      .by = .by,
       .by_time = .by_time,
       fun_summary = "mean",
       locs_id = locs_id
@@ -4108,7 +4054,7 @@ calculate_goes <- function(
 #'     spatial overlay. A \code{time} column of class \code{Date} is
 #'     populated from the \code{date} attribute of \code{from}.
 #' }
-#' When \code{.by} or \code{.by_time} are supplied the extracted result is
+#' When \code{.by_time} is supplied the extracted result is
 #' passed through \code{calc_summarize_by()} using the same semantics as
 #' all other \code{calculate_*()} functions in this package.
 # nolint end
@@ -4128,12 +4074,8 @@ calculate_goes <- function(
 #'   the buffer (SPEI/EDDI only). Default \code{"mean"}.
 #' @param geom \code{FALSE}, \code{"sf"}, or \code{"terra"}. Whether to
 #'   attach geometry to the returned object. Default \code{FALSE}.
-#' @param .by NULL, character(1), \code{sf}, or \code{SpatVector}.
-#'   Optional post-extraction summarization target following the same
-#'   semantics as other \code{calculate_*()} functions. \code{NULL}
-#'   (default) returns per-row extracted values.
 #' @param .by_time NULL or character(1). Name of the time column to use
-#'   when \code{.by} is a time-unit string. \code{NULL} defers to
+#'   temporal summarization unit token. \code{NULL} disables
 #'   \code{"time"}.
 #' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
 #'   path. Optional weights raster for weighted extraction. If `NULL`
@@ -4156,7 +4098,7 @@ calculate_goes <- function(
 #'       \code{"YYYY-MM-DD"} character).}
 #'     \item{\code{<value_column>}}{Extracted drought index or class value.}
 #'   }
-#'   When \code{.by} / \code{.by_time} are non-\code{NULL}, rows are
+#'   When \code{.by_time} is non-\code{NULL}, rows are
 #'   aggregated to the specified resolution via \code{calc_summarize_by()}.
 #' @importFrom terra extract
 #' @importFrom terra time
@@ -4202,12 +4144,11 @@ calculate_drought <- function(
   fun = "mean",
   weights = NULL,
   geom = FALSE,
-  .by = NULL,
   .by_time = NULL,
   ...
 ) {
-  #### Validate .by / .by_time
-  amadeus::check_by(.by, .by_time)
+  #### Validate .by_time
+  amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_by_time(.by_time)
 
   #### Dispatch on input type
@@ -4340,12 +4281,11 @@ calculate_drought <- function(
     stop("`from` must be a SpatRaster (SPEI/EDDI) or SpatVector (USDM).\n")
   }
 
-  #### Optional .by summarization
+  #### Optional .by_time summarization
   did_summarize <- FALSE
-  if (!is.null(.by)) {
+  if (!is.null(.by_time)) {
     sites_extracted <- amadeus::calc_summarize_by(
       covar       = sites_extracted,
-      .by         = .by,
       .by_time    = .by_time,
       fun_summary = fun,
       locs_id     = locs_id
