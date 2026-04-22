@@ -12,7 +12,7 @@ Direct sub-dataset access is supported, for example,
 HDF4_EOS:EOS_GRID:\{filename\}:\{base_grid_information\}:\{sub-dataset\}}
 
 \item{subdataset}{character(1). Exact or regular expression filter of
-sub-dataset. See \link{process_modis_sds} for details.}
+sub-dataset.}
 
 \item{fun_agg}{character(1). Function name to aggregate layers.
 Should be acceptable to \link[terra:tapp]{terra::tapp}.}
@@ -45,7 +45,7 @@ of MODIS product.
 mod09ga_flatten <- process_flatten_sds(
   path =
     list.files("./data", pattern = "MOD09GA.", full.names = TRUE)[1],
-  subdataset = process_modis_sds("MOD09GA"),
+  subdataset = "(sur_refl_b0)",
   fun_agg = "mean"
 )
 }

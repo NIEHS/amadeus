@@ -27,12 +27,14 @@ calculate_modis(
 )
 }
 \arguments{
-\item{from}{character or SpatRaster. Either a list of MODIS/VIIRS file paths
-(raw path mode) or a preprocessed raster (direct raster mode).}
+\item{from}{character, SpatRaster, or SpatVector. Either a list of
+MODIS/VIIRS file paths (raw path mode), a preprocessed raster (direct raster
+mode), or processed MODIS fire detections as a SpatVector with \code{time},
+\code{fire_count}, and \code{frp} fields.}
 
 \item{from_secondary}{character or SpatRaster. Optional secondary input for
-fused temporal coverage. Type must match \code{from} (\code{character} with
-\code{character}, or \code{SpatRaster} with \code{SpatRaster}).}
+fused temporal coverage in raster/path workflows. Type must match \code{from}
+(\code{character} with \code{character}, or \code{SpatRaster} with \code{SpatRaster}).}
 
 \item{locs}{sf/SpatVector object. Unique locs where covariates
 will be calculated.}
@@ -43,7 +45,7 @@ will be calculated.}
 Default is \code{c(0, 1000, 10000, 50000)}.}
 
 \item{preprocess}{function. Function to handle HDF files in raw path mode.
-Ignored when \code{from} is a \code{SpatRaster}.}
+Ignored when \code{from} is a \code{SpatRaster} or \code{SpatVector}.}
 
 \item{name_covariates}{character. Name header of covariates.
 e.g., \code{"MOD_NDVIF_0_"}.
@@ -125,6 +127,9 @@ processes. File system characteristics, package versions, and hardware
 settings and specification can affect the processing efficiency.
 \code{locs} is expected to be convertible to \code{sf} object. \code{sf}, \code{SpatVector}, and
 other class objects that could be converted to \code{sf} can be used.
+In raw path mode, \code{preprocess} is called once per inferred day using a
+single-date value. Temporal aggregation across extracted rows should be done
+with \code{.by} / \code{.by_time}.
 Common arguments in \code{preprocess} functions such as \code{date} and \code{path} are
 automatically detected and passed to the function. Please note that
 \code{locs} here and \code{path} in \code{preprocess} functions are assumed to have a

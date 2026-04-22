@@ -29,7 +29,6 @@ Imports:
     stars,
     tidyr,
     rlang,
-    nhdplusTools,
     archive,
     collapse,
     Rdpack
@@ -44,6 +43,7 @@ Suggests:
     devtools,
     ggplot2,
     maps,
+    nhdplusTools,
     stringr,
     tigris,
     spelling

@@ -210,9 +210,10 @@ process_covariates <-
 #' @return A character object that conforms to the regular
 #' expression. Details of regular expression in R can be found in [regexp].
 #' @seealso [calculate_modis]
+#' @keywords internal
+#' @noRd
 #' @examples
-#' process_modis_sds(product = "MOD09GA")
-#' @export
+#' amadeus:::process_modis_sds(product = "MOD09GA")
 # previously modis_prefilter_sds
 process_modis_sds <-
   function(
@@ -288,7 +289,7 @@ process_modis_sds <-
 #' Direct sub-dataset access is supported, for example,
 #' HDF4_EOS:EOS_GRID:\{filename\}:\{base_grid_information\}:\{sub-dataset\}
 #' @param subdataset character(1). Exact or regular expression filter of
-#' sub-dataset. See [process_modis_sds] for details.
+#' sub-dataset.
 #' @param fun_agg character(1). Function name to aggregate layers.
 #' Should be acceptable to [terra::tapp].
 #' @param ... Placeholders.
@@ -318,7 +319,7 @@ process_modis_sds <-
 #' mod09ga_flatten <- process_flatten_sds(
 #'   path =
 #'     list.files("./data", pattern = "MOD09GA.", full.names = TRUE)[1],
-#'   subdataset = process_modis_sds("MOD09GA"),
+#'   subdataset = "(sur_refl_b0)",
 #'   fun_agg = "mean"
 #' )
 #' }

@@ -446,27 +446,27 @@ testthat::test_that("process_modis_sds", {
   txt_exp_output <- unname(txt_exp_output)
   # expect
   testthat::expect_message(
-    mcdtest <- process_modis_sds("MCD19A2")
+    mcdtest <- amadeus:::process_modis_sds("MCD19A2")
   )
   testthat::expect_equal(
     mcdtest,
     "(Optical_Depth)"
   )
   testthat::expect_no_error(
-    process_modis_sds("MCD19A2", "(cos|RelAZ|Angle)")
+    amadeus:::process_modis_sds("MCD19A2", "(cos|RelAZ|Angle)")
   )
   testthat::expect_message(
-    process_modis_sds("MCD12Q1"),
+    amadeus:::process_modis_sds("MCD12Q1"),
     "LC_Type"
   )
   for (i in c(1:5, 7:length(txt_products))) {
     testthat::expect_equal(
-      process_modis_sds(txt_products[i]),
+      amadeus:::process_modis_sds(txt_products[i]),
       txt_exp_output[i]
     )
   }
   testthat::expect_no_error(
-    filt_other <- process_modis_sds("ignored", "(cos)")
+    filt_other <- amadeus:::process_modis_sds("ignored", "(cos)")
   )
   testthat::expect_equal(filt_other, "(cos)")
 })
@@ -1407,12 +1407,62 @@ testthat::test_that("calculate_modis .by wiring aggregates multi-day rows", {
   testthat::expect_equal(result_mean$cov_00000, 15)
 })
 
+testthat::test_that("calculate_modis uses per-day preprocess before .by_time summarization", {
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = -78.8, lat = 35.9),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+  from_files <- c(
+    "MOD09GA.A2021001.h10v05.061.2021001000000.hdf",
+    "MOD09GA.A2021002.h10v05.061.2021002000000.hdf"
+  )
+  preprocess_dates <- character(0)
+  testthat::local_mocked_bindings(
+    process_modis_merge = function(path, date, subdataset, fun_agg = "mean", ...) {
+      testthat::expect_length(date, 1L)
+      preprocess_dates <<- c(preprocess_dates, as.character(date))
+      r <- terra::rast(nrows = 1, ncols = 1, vals = 1)
+      terra::ext(r) <- c(-79, -78, 35, 36)
+      terra::crs(r) <- "EPSG:4326"
+      names(r) <- "mock_layer"
+      r
+    },
+    calculate_modis_daily = function(from, locs, locs_id, date, name_extracted, ...) {
+      data.frame(
+        site_id = "site_1",
+        time = as.Date(date),
+        cov_00000 = as.numeric(format(as.Date(date), "%d"))
+      )
+    },
+    .package = "amadeus"
+  )
+
+  result <- suppressMessages(
+    calculate_modis(
+      from = from_files,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0L,
+      preprocess = amadeus::process_modis_merge,
+      name_covariates = "cov_",
+      subdataset = "mock",
+      scale = "* 1",
+      .by = "week"
+    )
+  )
+
+  testthat::expect_equal(sort(unique(preprocess_dates)), c("2021-01-01", "2021-01-02"))
+  testthat::expect_equal(nrow(result), 1L)
+  testthat::expect_equal(result$cov_00000, 1.5)
+})
+
 
 testthat::test_that("process_modis_sds returns fire mask regex for fire products", {
-  testthat::expect_equal(process_modis_sds(product = "MOD14A1"), "(FireMask)")
-  testthat::expect_equal(process_modis_sds(product = "MYD14A1"), "(FireMask)")
-  testthat::expect_equal(process_modis_sds(product = "MOD14A2"), "(FireMask)")
-  testthat::expect_equal(process_modis_sds(product = "MYD14A2"), "(FireMask)")
+  testthat::expect_equal(amadeus:::process_modis_sds(product = "MOD14A1"), "(FireMask)")
+  testthat::expect_equal(amadeus:::process_modis_sds(product = "MYD14A1"), "(FireMask)")
+  testthat::expect_equal(amadeus:::process_modis_sds(product = "MOD14A2"), "(FireMask)")
+  testthat::expect_equal(amadeus:::process_modis_sds(product = "MYD14A2"), "(FireMask)")
 })
 
 

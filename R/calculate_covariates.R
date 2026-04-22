@@ -159,7 +159,7 @@ calculate_covariates <-
       sedac_population = amadeus::calculate_population,
       population = amadeus::calculate_population,
       nei = amadeus::calculate_nei,
-      mcd14dl = calculate_mcd14dl,
+      mcd14dl = amadeus::calculate_modis,
       tri = amadeus::calculate_tri,
       geos = amadeus::calculate_geos,
       gmted = amadeus::calculate_gmted,
@@ -845,18 +845,20 @@ calculate_ecoregion <-
 
 
 #' Calculate MODIS product covariates in multiple CPU threads
-#' @param from character or SpatRaster. Either a list of MODIS/VIIRS file paths
-#' (raw path mode) or a preprocessed raster (direct raster mode).
+#' @param from character, SpatRaster, or SpatVector. Either a list of
+#' MODIS/VIIRS file paths (raw path mode), a preprocessed raster (direct raster
+#' mode), or processed MODIS fire detections as a SpatVector with `time`,
+#' `fire_count`, and `frp` fields.
 #' @param from_secondary character or SpatRaster. Optional secondary input for
-#' fused temporal coverage. Type must match `from` (`character` with
-#' `character`, or `SpatRaster` with `SpatRaster`).
+#' fused temporal coverage in raster/path workflows. Type must match `from`
+#' (`character` with `character`, or `SpatRaster` with `SpatRaster`).
 #' @param locs sf/SpatVector object. Unique locs where covariates
 #' will be calculated.
 #' @param locs_id character(1). Site identifier. Default is `"site_id"`
 #' @param radius numeric. Radii to calculate covariates.
 #' Default is `c(0, 1000, 10000, 50000)`.
 #' @param preprocess function. Function to handle HDF files in raw path mode.
-#' Ignored when `from` is a `SpatRaster`.
+#' Ignored when `from` is a `SpatRaster` or `SpatVector`.
 #' @param name_covariates character. Name header of covariates.
 #' e.g., `"MOD_NDVIF_0_"`.
 #' The calculated covariate names will have a form of
@@ -914,6 +916,9 @@ calculate_ecoregion <-
 #' settings and specification can affect the processing efficiency.
 #' `locs` is expected to be convertible to `sf` object. `sf`, `SpatVector`, and
 #' other class objects that could be converted to `sf` can be used.
+#' In raw path mode, `preprocess` is called once per inferred day using a
+#' single-date value. Temporal aggregation across extracted rows should be done
+#' with `.by` / `.by_time`.
 #' Common arguments in `preprocess` functions such as `date` and `path` are
 #' automatically detected and passed to the function. Please note that
 #' `locs` here and `path` in `preprocess` functions are assumed to have a
@@ -1002,37 +1007,28 @@ calculate_modis <-
     fusion_method <- match.arg(fusion_method)
     from_is_character <- is.character(from)
     from_is_raster <- inherits(from, "SpatRaster")
-    if (!from_is_character && !from_is_raster) {
+    from_is_vector <- inherits(from, "SpatVector")
+    if (!from_is_character && !from_is_raster && !from_is_vector) {
       stop(
-        "from should be either a character vector of paths or a SpatRaster.\n"
+        "from should be a character vector of paths, SpatRaster, or SpatVector.\n"
       )
     }
     if (from_is_character) {
       if (!is.null(from_secondary) && !is.character(from_secondary)) {
         stop("from_secondary should be a character vector of file paths.\n")
       }
-    } else {
+    } else if (from_is_raster) {
       if (!is.null(from_secondary) && !inherits(from_secondary, "SpatRaster")) {
         stop("from_secondary should be SpatRaster when from is SpatRaster.\n")
       }
+    } else if (!is.null(from_secondary)) {
+      stop("from_secondary is only supported for character or SpatRaster inputs.\n")
     }
     if (from_is_character && !is.function(preprocess)) {
       stop(
         "preprocess should be one of process_modis_merge,
 process_modis_swath, or process_blackmarble."
       )
-    }
-    if (!is.null(scale)) {
-      stopifnot(is.character(scale))
-    }
-    if (is.null(scale)) {
-      warning(
-        paste0(
-          "`scale` parameter not defined. Review technical documentation ",
-          "to apply proper scale. Calculation proceeding with unscaled values."
-        )
-      )
-      scale <- "* 1"
     }
     # read all arguments
     # nolint start
@@ -1102,6 +1098,35 @@ process_modis_swath, or process_blackmarble."
         "locs cannot be convertible to sf.
       Please convert locs into a sf object to proceed.\n"
       )
+    }
+
+    if (from_is_vector) {
+      calc_results_return <-
+        calculate_modis_fire_vector(
+          from = from,
+          locs_input = locs_input,
+          locs_id = locs_id,
+          radius = radius,
+          fun_summary = fun_summary,
+          .by = .by,
+          .by_time = .by_time,
+          geom = geom
+        )
+      attr(calc_results_return, "dates_dropped") <- NA
+      return(calc_results_return)
+    }
+
+    if (!is.null(scale)) {
+      stopifnot(is.character(scale))
+    }
+    if (is.null(scale)) {
+      warning(
+        paste0(
+          "`scale` parameter not defined. Review technical documentation ",
+          "to apply proper scale. Calculation proceeding with unscaled values."
+        )
+      )
+      scale <- "* 1"
     }
 
     export_list <- c()
@@ -1356,63 +1381,21 @@ process_modis_swath, or process_blackmarble."
   }
 
 
-#' Calculate MCD14DL fire location covariates
-#' @description
-#' Aggregate MODIS/VIIRS active fire detection counts and fire radiative
-#' power (FRP) within circular buffers around point locations.
-#' Returns a \code{data.frame} with fire count and mean FRP per buffer radius.
-#' @param from SpatVector(1). Processed fire detections as a SpatVector.
-#' @param locs sf/SpatVector. Unique locations. Should include a unique
-#'   identifier field named \code{locs_id}.
-#' @param locs_id character(1). Name of unique identifier. Default
-#'   \code{"site_id"}.
-#' @param radius numeric. Buffer radius (metres) around each location.
-#'   Multiple radii are supported; defaults to
-#'   \code{c(0L, 1e3L, 1e4L, 5e4L)}.
-#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
-#'   path. Optional weights raster for weighted extraction. If `NULL`
-#'   (default), unweighted extraction is performed.
-#' @param geom FALSE/"sf"/"terra". Should the function return with geometry?
-#'   Default is \code{FALSE}.
-#' @param ... Placeholders.
-#' @return a data.frame or SpatVector object.
-#' @author Insang Song
-#' @seealso [process_covariates()]
-#' @importFrom methods is
-#' @importFrom sf st_as_sf
-#' @examples
-#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
-#' ##       amount of data which is not included in the package.
-#' \dontrun{
-#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
-#' calculate_mcd14dl(
-#'   from = mcd14dl,  # derived from process_covariates() example
-#'   locs = loc,
-#'   locs_id = "id",
-#'   radius = c(0L, 1000L)
-#' )
-#' }
-#' @export
-calculate_mcd14dl <- function(
-  from = NULL,
-  locs = NULL,
-  locs_id = "site_id",
-  radius = c(0L, 1e3L, 1e4L, 5e4L),
-  weights = NULL,
-  geom = FALSE,
-  ...
+calculate_modis_fire_vector <- function(
+  from,
+  locs_input,
+  locs_id,
+  radius,
+  fun_summary,
+  .by,
+  .by_time,
+  geom
 ) {
-  amadeus::check_geom(geom)
   if (!methods::is(from, "SpatVector")) {
     stop("from should be a SpatVector returned by process_mcd14dl.\n")
   }
   if (!all(c("time", "fire_count", "frp") %in% names(from))) {
     stop("from is missing required MCD14DL fields.\n")
-  }
-
-  locs_input <- try(sf::st_as_sf(locs), silent = TRUE)
-  if (inherits(locs_input, "try-error")) {
-    stop("locs cannot be convertible to sf.\n")
   }
 
   locs_base <- amadeus::calc_prepare_locs(
@@ -1498,18 +1481,24 @@ calculate_mcd14dl <- function(
   })
 
   result_all <- do.call(rbind, results_by_day)
-
+  if (!is.null(.by)) {
+    result_all <- amadeus::calc_summarize_by(
+      covar = result_all,
+      .by = .by,
+      .by_time = .by_time,
+      fun_summary = fun_summary,
+      locs_id = locs_id
+    )
+  }
   if (geom %in% c("sf", "terra")) {
     result_all <- merge(locs_return, result_all, by = locs_id)
   }
 
-  return(
-    amadeus::calc_return_locs(
-      covar = result_all,
-      POSIXt = TRUE,
-      geom = geom,
-      crs = terra::crs(from)
-    )
+  amadeus::calc_return_locs(
+    covar = result_all,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
   )
 }
 

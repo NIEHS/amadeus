@@ -179,12 +179,13 @@ testthat::test_that("calculate_covariates (no errors)", {
       crs = 4326
     )
 
-    direct_calc <- amadeus:::calculate_mcd14dl(
+    direct_calc <- calculate_modis(
       from = fire_points,
       locs = locs_sf,
       locs_id = "site_id",
       radius = c(0L, 1000L),
-      geom = "sf"
+      geom = "sf",
+      fun_summary = "sum"
     )
     testthat::expect_s3_class(direct_calc, "sf")
     testthat::expect_equal(direct_calc$fire_count_00000, 1)
@@ -192,18 +193,19 @@ testthat::test_that("calculate_covariates (no errors)", {
     testthat::expect_equal(direct_calc$frp_01000, 16.5)
 
     testthat::expect_error(
-      amadeus:::calculate_mcd14dl(from = terra::rast(), locs = locs_sf),
-      "SpatVector returned by process_mcd14dl"
+      calculate_modis(from = list(), locs = locs_sf),
+      "character vector of paths, SpatRaster, or SpatVector"
     )
     testthat::expect_error(
-      amadeus:::calculate_mcd14dl(
+      calculate_modis(
         from = fire_points[, c("time", "fire_count")],
-        locs = locs_sf
+        locs = locs_sf,
+        fun_summary = "sum"
       ),
       "missing required MCD14DL fields"
     )
     testthat::expect_error(
-      amadeus:::calculate_mcd14dl(from = fire_points, locs = list()),
+      calculate_modis(from = fire_points, locs = list(), fun_summary = "sum"),
       "convertible to sf"
     )
   })

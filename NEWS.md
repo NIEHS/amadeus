@@ -1,4 +1,28 @@
-# amadeus 1.3.4 (dev)
+# amadeus 2.0.0 (dev)
+## Major updates to code base - breaking changes have been minmized but please report if 1.3.x versions are not working as expected
+
+- Refactored code base to improve maintainability and utilize modern R API designs and best practices
+
+## Spatial and Temporal summarization with `.by` and `.by_time` parameters
+
+- Added `.by` and `.by_time` parameters to all `calculate_*()` functions for consistent spatial and temporal summarization options across all datasets
+- The default behavior of `calculate_*()` functions remains unchanged - i.e., no summarization, returning extracted or summarized values at the temporal resolution of the data -  but users can now specify `.by` for spatial grouping (e.g., by HUC, county, state) and `.by_time` for temporal grouping (e.g., by year, month) to obtain summarized covariate values directly from the calculation step
+
+## Detailed vignettes for each dataset including available variables, spatial and temporal resolution, and example use cases
+
+- workflow vignette for each dataset with detailed information on available variables, spatial and temporal resolution, and example use cases for each dataset
+
+## nhdplusTools use
+
+- Moved nhdplusTools from Imports to Suggests and added `requireNamespace("nhdplusTools")` checks in all functions that use it
+
+## Additional MODIS products
+
+- Added support for additional MODIS products with a focus on the burned area and active fire products
+
+## Finalize data API that were previously in development
+
+- Added or completed the functonality for PRISM, EDGAR, CropScape, and HUC datasets 
 
 ## Drought Index Support
 
@@ -20,15 +44,7 @@
 - `calculate_drought()` supports `.by` / `.by_time` post-extraction
   summarization consistent with all other `calculate_*()` functions.
 
-## NASA download API cleanup
-
-- Removed OPeNDAP support from `download_merra2()`, `download_geos()`, and
-  `download_modis()` as a breaking change.
-- Removed OPeNDAP-only arguments and helper utilities from the public API.
-- Updated tests, vignettes, and CI coverage policy to match direct-download-only
-  behavior.
-
-# amadeus 1.3.3
+## Migrate from wget/curl to httr2 
 - Completed migration of all `download_*` functions from `httr`/`wget`/`curl`
   command-line calls to `httr2` for all network requests
 - Deprecated `download` parameter (use default `download = TRUE`) and

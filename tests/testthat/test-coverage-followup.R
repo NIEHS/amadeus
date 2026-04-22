@@ -233,12 +233,13 @@ testthat::test_that("targeted calculate branches are exercised", {
   )
   locs_vect <- terra::vect(locs, geom = c("lon", "lat"), crs = "EPSG:4326")
 
-  mcd14 <- amadeus:::calculate_mcd14dl(
+  mcd14 <- amadeus::calculate_modis(
     from = fire_vec,
     locs = locs_vect,
     locs_id = "site_id",
     radius = c(0L, 200000L),
-    geom = FALSE
+    geom = FALSE,
+    fun_summary = "sum"
   )
   testthat::expect_equal(nrow(mcd14), 4)
   testthat::expect_equal(
@@ -251,12 +252,13 @@ testthat::test_that("targeted calculate branches are exercised", {
   )
   testthat::expect_true(all(subset(mcd14, site_id == "B")$fire_count_200000 == 0))
 
-  mcd14_geom <- amadeus:::calculate_mcd14dl(
+  mcd14_geom <- amadeus::calculate_modis(
     from = fire_vec,
     locs = locs_vect,
     locs_id = "site_id",
     radius = 0L,
-    geom = "terra"
+    geom = "terra",
+    fun_summary = "sum"
   )
   testthat::expect_s4_class(mcd14_geom, "SpatVector")
 

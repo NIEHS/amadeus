@@ -52,150 +52,6 @@ if (is.na(durham_hex_path) || durham_hex_path == "") {
 durham_hex <- readRDS(durham_hex_path)
 
 
-pick_value_column <- function(x) {
-  geom_col <- attr(x, "sf_column")
-  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
-  candidates <- setdiff(names(x), excluded)
-  if (length(candidates) == 0) {
-    stop("No plottable covariate columns found.")
-  }
-  numeric_candidates <- candidates[vapply(x[candidates], is.numeric, logical(1))]
-  ranked <- if (length(numeric_candidates) > 0) numeric_candidates else candidates
-  non_missing_share <- vapply(ranked, function(col) {
-    mean(!is.na(x[[col]]))
-  }, numeric(1))
-  ranked[which.max(non_missing_share)]
-}
-
-pick_numeric_covariate_column <- function(x) {
-  geom_col <- attr(x, "sf_column")
-  excluded <- c(
-    "site_id", "h3_id", "resolution", "area_km2",
-    "name", "NAME", "time", geom_col
-  )
-  candidates <- setdiff(names(x), excluded)
-  numeric_candidates <- candidates[vapply(x[candidates], is.numeric, logical(1))]
-  if (length(numeric_candidates) == 0) {
-    stop("No numeric covariate columns found for histogram plotting.")
-  }
-  numeric_candidates[1]
-}
-
-coord_local_sf <- function(x) {
-  x_wgs84 <- sf::st_transform(sf::st_as_sf(x), 4326)
-  bbox <- sf::st_bbox(x_wgs84)
-  pad_x <- max((bbox[["xmax"]] - bbox[["xmin"]]) * 0.08, 0.05)
-  pad_y <- max((bbox[["ymax"]] - bbox[["ymin"]]) * 0.08, 0.05)
-  ggplot2::coord_sf(
-    xlim = c(bbox[["xmin"]] - pad_x, bbox[["xmax"]] + pad_x),
-    ylim = c(bbox[["ymin"]] - pad_y, bbox[["ymax"]] + pad_y),
-    expand = FALSE,
-    datum = NA
-  )
-}
-
-plot_points <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(color = !!rlang::sym(value_col)),
-      size = 2
-    ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, color = value_col) +
-    ggplot2::guides(
-      color = ggplot2::guide_colorbar(title.position = "top")
-    ) +
-    ggplot2::theme_minimal(base_size = 13) +
-    ggplot2::theme(
-      legend.position = "bottom",
-      legend.key.width = grid::unit(2, "cm"),
-      legend.title = ggplot2::element_text(face = "bold")
-    )
-}
-
-plot_polygons <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(fill = !!rlang::sym(value_col)),
-      color = NA
-    ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, fill = value_col) +
-    ggplot2::guides(
-      fill = ggplot2::guide_colorbar(title.position = "top")
-    ) +
-    ggplot2::theme_minimal(base_size = 13) +
-    ggplot2::theme(
-      legend.position = "bottom",
-      legend.key.width = grid::unit(2, "cm"),
-      legend.title = ggplot2::element_text(face = "bold")
-    )
-}
-
-plot_histogram_points <- function(x, title) {
-  value_col <- pick_numeric_covariate_column(x)
-  x_hist <- sf::st_drop_geometry(sf::st_as_sf(x))
-  ggplot2::ggplot(
-    x_hist,
-    ggplot2::aes(x = !!rlang::sym(value_col))
-  ) +
-    ggplot2::geom_histogram(bins = 20, fill = "steelblue", color = "white") +
-    ggplot2::labs(title = title, x = value_col, y = "Count") +
-    ggplot2::theme_minimal(base_size = 13)
-}
-
-summarize_na_counts <- function(x, value_pattern) {
-  data <- sf::st_drop_geometry(sf::st_as_sf(x))
-  value_cols <- grep(value_pattern, names(data), value = TRUE)
-  if (length(value_cols) == 0) {
-    stop("No covariate columns matched ", value_pattern, ".")
-  }
-  data.frame(
-    variable = value_cols,
-    missing_values = vapply(data[value_cols], function(col) sum(is.na(col)), integer(1)),
-    stringsAsFactors = FALSE
-  )
-}
-
-average_modis_window <- function(paths, dates, preprocess, ...) {
-  rasters <- lapply(dates, function(date_i) {
-    rlang::exec(preprocess, path = paths, date = date_i, ...)
-  })
-  if (length(rasters) == 0) {
-    stop("No rasters were created for the requested averaging window.")
-  }
-  if (length(rasters) == 1) {
-    return(rasters[[1]])
-  }
-  raster_stack <- do.call(c, rasters)
-  terra::app(raster_stack, mean, na.rm = TRUE)
-}
-
-average_covariates_over_time <- function(x, id_col) {
-  x_sf <- sf::st_as_sf(x)
-  geom_col <- attr(x_sf, "sf_column")
-  x_tbl <- sf::st_drop_geometry(x_sf)
-  numeric_cols <- setdiff(
-    names(x_tbl)[vapply(x_tbl, is.numeric, logical(1))],
-    "time"
-  )
-  if (length(numeric_cols) == 0) {
-    stop("No numeric covariate columns found for time averaging.")
-  }
-  x_avg <- stats::aggregate(
-    x_tbl[numeric_cols],
-    by = list(x_tbl[[id_col]]),
-    FUN = function(value) mean(value, na.rm = TRUE)
-  )
-  names(x_avg)[1] <- id_col
-  x_geom <- x_sf[!duplicated(x_sf[[id_col]]), c(id_col, geom_col)]
-  dplyr::left_join(x_geom, x_avg, by = id_col)
-}
-
 modis_workflow_path <- function(product, process_step, calculate_step) {
   download_step <- sprintf(
     '`download_data(dataset_name = "modis", product = "%s", ...)`',
@@ -642,7 +498,20 @@ Each workflow uses two small example surfaces created within the MODIS example e
 
 ```{r modis-product-reference, echo = FALSE, results = "asis"}
 knitr::kable(
-  modis_reference,
+  modis_reference[, c(
+    "family",
+    "product",
+    "level",
+    "platform",
+    "description",
+    "cadence",
+    "spatial_form",
+    "native_format",
+    "subdatasets",
+    "version_handling",
+    "cross_year_range",
+    "workflow"
+  )],
   col.names = c(
     "Family",
     "Product",
@@ -759,6 +628,22 @@ durham_hex <- sf::st_filter(
   .predicate = sf::st_intersects
 )
 
+# Demonstate calculation at points with the output from the `process` step with daily resolution. The result in a WIDE format sf object
+
+point_values_process <- calculate_covariates(
+  covariate = "modis",
+  from = processed_daily,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  name_covariates = names(processed_daily),
+  fun_summary = "mean",
+  geom = "sf",
+  scale = "* 0.02 - 273.15"
+) |> dplyr::select(-time)
+
+# calculate_modis (or the calculate_covariate version ) can do the process and calculate step all in one. The result is LONG format sf object with a time column. This is the recommended workflow for most users, but the two-step process above allows users to inspect the processed rasters before calculating covariates and to use the same processed rasters for multiple calculate_covariates runs with different parameters.
+
 point_values <- calculate_covariates(
   covariate = "modis",
   from = modis_files,
@@ -769,7 +654,7 @@ point_values <- calculate_covariates(
   subdataset = "LST_Day_1km",
   name_covariates = "LST_",
   fun_summary = "mean",
-  geom = "sf",
+  geom = "terra",
   scale = "* 0.02 - 273.15"
 )
 ```
@@ -792,6 +677,16 @@ polygon_values <- calculate_covariates(
 )
 ```
 
+## Terra+Aqua fusion for better temporal coverage
+
+`process_modis_merge()` `process_modis_daily()` and `calculate_modis()` support optional Terra+Aqua fusion through `path_secondary` / `from_secondary` and `fusion_method`.
+
+For paired products (for example `MOD13Q1` + `MYD13Q1`), this allows:
+
+- pixel-wise mean blending where both products exist (`fusion_method = "mean"`)
+- fallback to whichever product is available on a date
+- optional priority fallback (`"primary_first"` / `"secondary_first"`)
+
 ```{r process complementary TERRA/AQUA , eval = live_run}
 directory_aqua <- file.path(tempdir(), "modis_workflow", "MYD11A1")
 
@@ -812,12 +707,6 @@ aqua_files <- list.files(
   full.names = TRUE
 )
 
-processed_aqua <- process_modis_daily(
-  path = aqua_files,
-  date = c("2019-08-15","2019-08-18"),
-  subdataset = "LST_Day_1km"
-)
-
 processed_comb <- process_modis_daily(
   path = modis_files,
   path_secondary = aqua_files,
@@ -825,208 +714,119 @@ processed_comb <- process_modis_daily(
   subdataset = "LST_Day_1km",
   fun_agg = "mean"
 )
-```
 
-
-
-
-## Terra+Aqua fusion for better temporal coverage
-
-`process_modis_merge()` `process_modis_daily()` and `calculate_modis()` support optional Terra+Aqua fusion through `path_secondary` / `from_secondary` and `fusion_method`.
-
-For paired products (for example `MOD13Q1` + `MYD13Q1`), this allows:
-
-- pixel-wise mean blending where both products exist (`fusion_method = "mean"`)
-- fallback to whichever product is available on a date
-- optional priority fallback (`"primary_first"` / `"secondary_first"`)
-
-
-
-```{r modis-na-summary, eval = live_run}
-point_na_summary <- summarize_na_counts(point_values, "^LST_")
-polygon_na_summary <- summarize_na_counts(polygon_values, "^LST_")
-knitr::kable(point_na_summary, col.names = c("Variable", "Point missing values"))
-knitr::kable(polygon_na_summary, col.names = c("Variable", "Polygon missing values"))
-```
-
-## Histogram of the point calculations
-
-```{r plot-point-histogram, eval = live_run, fig.alt = "Histogram of point-based MOD11A1 covariate values extracted for the example date."}
-plot_histogram_points(
-  point_values,
-  "MOD11A1 point covariate histogram"
-)
-```
-
-## Visualize the point and polygon outputs
-
-```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("NASA MODIS", ": point extraction"))
-```
-
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("NASA MODIS", ": Durham H3 polygons"))
-```
-
-## Live non-daily composite example: `MOD13A2` averaged over 17 days
-
-For non-daily products, a short averaging window is more robust than a single composite date. The `MOD13A2` example below downloads two 16-day NDVI composites, averages their processed rasters, then averages the extracted point and H3 values over the same 17-day window.
-
-```{r vegetation-download-window, eval = live_run}
-vegetation_dir_live <- file.path(tempdir(), "modis_workflow", "mod13a2")
-vegetation_window <- c("2019-08-13", "2019-08-29")
-vegetation_dates <- c("2019-08-13", "2019-08-29")
-download_data(
-  dataset_name = "modis",
-  product = "MOD13A2",
-  version = "061",
-  date = vegetation_window,
-  extent = modis_extent,
-  directory_to_save = vegetation_dir_live,
-  acknowledgement = TRUE
-)
-
-vegetation_files_live <- list.files(
-  vegetation_dir_live,
-  pattern = "\\.hdf$",
-  recursive = TRUE,
-  full.names = TRUE
-)
-```
-
-```{r vegetation-process-window, eval = live_run}
-vegetation_raster_mean <- average_modis_window(
-  paths = vegetation_files_live,
-  dates = vegetation_dates,
-  preprocess = amadeus::process_modis_merge,
-  subdataset = process_modis_sds("MOD13A2")
-)
-```
-
-```{r vegetation-calculate-window-points, eval = live_run}
-vegetation_points_raw <- calculate_covariates(
+# Process and calulate together with fusion in one step with calculate_covariates. The result is LONG format sf object with a time column.
+calculated_comb <- calculate_covariates(
   covariate = "modis",
-  from = vegetation_files_live,
+  from = modis_files,
+  from_secondary = aqua_files,
   locs = example_points_sf,
   locs_id = "site_id",
   radius = 0,
-  preprocess = amadeus::process_modis_merge,
-  subdataset = process_modis_sds("MOD13A2"),
-  name_covariates = "ndvi_",
+  preprocess = amadeus::process_modis_daily,
+  subdataset = "LST_Day_1km",
+  name_covariates = "LST_",
   fun_summary = "mean",
   geom = "sf",
-  scale = "* 0.0001"
+  scale = "* 0.02 - 273.15"
 )
-vegetation_points_mean <- average_covariates_over_time(
-  vegetation_points_raw,
-  id_col = "site_id"
-)
-```
 
-```{r vegetation-calculate-window-polygons, eval = live_run}
-vegetation_polygons_raw <- calculate_covariates(
+# Use the process stage output from the complementary fusion as input to calculate_covariates for a more traditional workflow. The result is LONG format sf object with a time column.
+calculated_comb_process <- calculate_covariates(
   covariate = "modis",
-  from = vegetation_files_live,
-  locs = durham_hex,
-  locs_id = "h3_id",
-  radius = 0,
-  preprocess = amadeus::process_modis_merge,
-  subdataset = process_modis_sds("MOD13A2"),
-  name_covariates = "ndvi_",
-  fun_summary = "mean",
-  geom = "sf",
-  scale = "* 0.0001"
-)
-vegetation_polygons_mean <- average_covariates_over_time(
-  vegetation_polygons_raw,
-  id_col = "h3_id"
-)
-```
-
-```{r vegetation-plot-raster, eval = live_run, fig.alt = "Raster plot of a 17-day average MOD13A2 NDVI surface."}
-terra::plot(
-  vegetation_raster_mean,
-  main = "MOD13A2 17-day average NDVI"
-)
-```
-
-```{r vegetation-plot-histogram, eval = live_run, fig.alt = "Histogram of 17-day average MOD13A2 NDVI values extracted at the example points."}
-plot_histogram_points(
-  vegetation_points_mean,
-  "MOD13A2 17-day average point histogram"
-)
-```
-
-```{r vegetation-plot-points, eval = live_run, fig.alt = "Map of 17-day average MOD13A2 NDVI values extracted at the example points."}
-plot_points(
-  vegetation_points_mean,
-  "MOD13A2 17-day average: point extraction"
-)
-```
-
-```{r vegetation-plot-polygons, eval = live_run, fig.alt = "Map of 17-day average MOD13A2 NDVI values extracted across Durham County H3 polygons."}
-plot_polygons(
-  vegetation_polygons_mean,
-  "MOD13A2 17-day average: Durham H3 polygons"
-)
-```
-
-## Workflow templates for the remaining supported product families
-
-The table above covers every product accepted by `download_modis()`. The chunks below show the download -> process -> calculate pattern for each remaining helper family. Swap Terra / Aqua product codes within the same family to move between `MOD*` and `MYD*` variants while keeping the same `amadeus` helper path.
-
-### Surface reflectance grids: `MOD09*` and `MYD09*`
-
-```{r reflectance-template, eval = FALSE}
-reflectance_dir <- file.path(tempdir(), "modis_workflow", "reflectance")
-download_data(
-  dataset_name = "modis",
-  product = "MOD09GA",
-  version = "061",
-  date = "2019-08-15",
-  extent = modis_extent,
-  directory_to_save = reflectance_dir,
-  acknowledgement = TRUE
-)
-
-reflectance_files <- list.files(
-  reflectance_dir,
-  pattern = "\\.hdf$",
-  recursive = TRUE,
-  full.names = TRUE
-)
-
-reflectance_raster <- process_modis_merge(
-  path = reflectance_files,
-  date = "2019-08-15",
-  subdataset = process_modis_sds("MOD09GA")
-)
-
-reflectance_points <- calculate_covariates(
-  covariate = "modis",
-  from = reflectance_files,
+  from = processed_comb,
   locs = example_points_sf,
   locs_id = "site_id",
   radius = 0,
-  preprocess = amadeus::process_modis_merge,
-  subdataset = process_modis_sds("MOD09GA"),
-  name_covariates = "reflectance_",
+  name_covariates = names(processed_comb),
   fun_summary = "mean",
-  geom = "sf"
-)
-
-terra::plot(reflectance_raster, main = "MOD09GA processed raster")
-plot_histogram_points(reflectance_points, "MOD09GA point covariate histogram")
+  geom = "sf",
+  scale = "* 0.02 - 273.15"
+) |> dplyr::select(-time)
 ```
 
-For `MOD09GQ` and `MYD09GQ`, keep the same daily request pattern. For the 8-day composites `MOD09A1`, `MYD09A1`, `MOD09Q1`, and `MYD09Q1`, switch to a short multi-composite window such as `date = c("2019-08-13", "2019-08-29")`, then average the processed rasters and extracted values with `average_modis_window()` and `average_covariates_over_time()`.
 
-### Vegetation indices: `MOD13*` and `MYD13*`
+## Visualize the process and calculate results
+
+First, we visualize the process daily rasters with the point caclulations overlayed.
+
+```{r plot-daily, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
+r_time <- point_values$time
+
+
+raster_plot_df <- do.call(rbind, lapply(seq_len(terra::nlyr(processed_daily)), function(i) {
+  r_i <- processed_daily[[i]] * 0.02 - 273.15
+  r_i <- terra::aggregate(r_i, fact = 6, fun = mean, na.rm = TRUE)
+  df_i <- terra::as.data.frame(r_i, xy = TRUE, na.rm = TRUE)
+  names(df_i)[3] <- "lst_c"
+  df_i$plot_date <- as.Date(r_time[i])
+  df_i
+}))
+
+point_values_modis <- terra::project(point_values, terra::crs(processed_daily))
+point_df <- cbind(
+  terra::as.data.frame(point_values_modis),
+  terra::geom(point_values_modis)[, c("x", "y")]
+)
+point_value_col <- grep("^LST_|^lst_", names(point_df), value = TRUE)[1]
+point_df$point_value <- point_df[[point_value_col]]
+point_df$plot_date <- as.Date(point_df$time)
+point_df <- point_df[point_df$plot_date %in% unique(raster_plot_df$plot_date), ]
+
+shared_limits <- range(
+  c(raster_plot_df$lst_c, point_df$point_value),
+  na.rm = TRUE,
+  finite = TRUE
+)
+
+ggplot2::ggplot() +
+  ggplot2::geom_raster(
+    data = raster_plot_df,
+    ggplot2::aes(x = x, y = y, fill = lst_c)
+  ) +
+  ggplot2::geom_point(
+    data = point_df,
+    ggplot2::aes(x = x, y = y),
+    shape = 17,
+    size = 4.8,
+    color = "black",
+    alpha = 0.95
+  ) +
+  ggplot2::geom_point(
+    data = point_df,
+    ggplot2::aes(x = x, y = y, color = point_value),
+    shape = 17,
+    size = 3.6,
+    alpha = 0.95
+  ) +
+  ggplot2::facet_wrap(~plot_date, ncol = 2) +
+  ggplot2::coord_equal(expand = FALSE) +
+  ggplot2::scale_fill_viridis_c(option = "C", limits = shared_limits) +
+  ggplot2::scale_color_viridis_c(option = "C", limits = shared_limits) +
+  ggplot2::labs(
+    title = "MOD11A1 daily LST with same-day point covariate overlays",
+    fill = "Raster LST (C)",
+    color = "Point LST (C)"
+  ) +
+  ggplot2::theme_minimal(base_size = 13) +
+  ggplot2::theme(
+    legend.position = "bottom",
+    legend.key.width = grid::unit(2, "cm"),
+    legend.title = ggplot2::element_text(face = "bold")
+  )
+
+```
+
+## Workflow template for using .by_time to create space-time summaries 
+
+Here we demonstrate with EVI a monthly temporal aggregation by polygon 
+
+#### Vegetation indices: `MOD13*` or `MYD13*`
 
 ```{r vegetation-template, eval = FALSE}
 vegetation_dir <- file.path(tempdir(), "modis_workflow", "vegetation")
-vegetation_window <- c("2019-08-13", "2019-08-29")
-vegetation_dates <- c("2019-08-13", "2019-08-29")
+vegetation_window <- c("2019-01-01", "2019-06-31")
+vegetation_dates <- c("2019-08-13", "2019-")
 download_data(
   dataset_name = "modis",
   product = "MOD13A2",
@@ -1048,7 +848,7 @@ vegetation_raster <- average_modis_window(
   paths = vegetation_files,
   dates = vegetation_dates,
   preprocess = amadeus::process_modis_merge,
-  subdataset = process_modis_sds("MOD13A2")
+  subdataset = "(NDVI)"
 )
 
 vegetation_points_raw <- calculate_covariates(
@@ -1058,7 +858,7 @@ vegetation_points_raw <- calculate_covariates(
   locs_id = "site_id",
   radius = 0,
   preprocess = amadeus::process_modis_merge,
-  subdataset = process_modis_sds("MOD13A2"),
+  subdataset = "(NDVI)",
   name_covariates = "ndvi_",
   fun_summary = "mean",
   geom = "sf",
@@ -1096,7 +896,7 @@ fire_grid_files <- list.files(
 fire_grid_raster <- process_modis_merge(
   path = fire_grid_files,
   date = "2019-08-15",
-  subdataset = process_modis_sds("MOD14A1")
+  subdataset = "(FireMask)"
 )
 
 fire_grid_points <- calculate_covariates(
@@ -1106,7 +906,7 @@ fire_grid_points <- calculate_covariates(
   locs_id = "site_id",
   radius = 0,
   preprocess = amadeus::process_modis_merge,
-  subdataset = process_modis_sds("MOD14A1"),
+  subdataset = "(FireMask)",
   name_covariates = "firemask_",
   fun_summary = "mean",
   geom = "sf"
