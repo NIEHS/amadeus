@@ -345,6 +345,77 @@ testthat::test_that("targeted calculate branches are exercised", {
   )
 })
 
+testthat::test_that("calculate_modis handles SpatRaster and SpatVector inputs distinctly", {
+  locs <- sf::st_as_sf(
+    data.frame(site_id = "site_1", lon = 0, lat = 0),
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+
+  modis_raster <- terra::rast(
+    ncols = 1,
+    nrows = 1,
+    xmin = -1,
+    xmax = 1,
+    ymin = -1,
+    ymax = 1,
+    crs = "EPSG:4326"
+  )
+  terra::values(modis_raster) <- 12
+  names(modis_raster) <- "mock_layer"
+
+  raster_result <- amadeus::calculate_modis(
+    from = modis_raster,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0L,
+    name_covariates = "mock_",
+    scale = "* 1"
+  )
+  testthat::expect_true(is.data.frame(raster_result))
+  testthat::expect_true("mock_00000" %in% names(raster_result))
+  testthat::expect_true(all(is.na(raster_result$time)))
+  testthat::expect_true(is.na(attr(raster_result, "dates_dropped")))
+
+  fire_points <- terra::vect(
+    data.frame(
+      lon = 0,
+      lat = 0,
+      time = 20200101L,
+      fire_count = 2L,
+      frp = 10
+    ),
+    geom = c("lon", "lat"),
+    keepgeom = TRUE,
+    crs = "EPSG:4326"
+  )
+
+  vector_result <- amadeus::calculate_modis(
+    from = fire_points,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0L,
+    fun_summary = "sum"
+  )
+  testthat::expect_true(is.data.frame(vector_result))
+  testthat::expect_true(all(c("fire_count_00000", "frp_00000") %in% names(vector_result)))
+  testthat::expect_equal(vector_result$fire_count_00000, 2)
+  testthat::expect_equal(format(vector_result$time, "%Y%m%d"), "20200101")
+  testthat::expect_true(is.na(attr(vector_result, "dates_dropped")))
+
+  testthat::expect_error(
+    amadeus::calculate_modis(
+      from = fire_points,
+      from_secondary = modis_raster,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0L,
+      fun_summary = "sum"
+    ),
+    "from_secondary is only supported for character or SpatRaster inputs"
+  )
+})
+
 testthat::test_that("collapse_nlcd returns empty df when rowbind is empty", {
   # Passing a list with one 0-row data frame produces empty rowbind result
   empty_df <- data.frame(site_id = character(0), value = numeric(0))

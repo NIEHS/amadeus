@@ -31,7 +31,8 @@ Imports:
     rlang,
     archive,
     collapse,
-    Rdpack
+    Rdpack,
+    nhdplusTools
 Suggests:
     covr,
     withr,
@@ -43,7 +44,6 @@ Suggests:
     devtools,
     ggplot2,
     maps,
-    nhdplusTools,
     stringr,
     tigris,
     spelling

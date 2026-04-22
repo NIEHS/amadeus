@@ -3738,7 +3738,6 @@ process_cropscape <-
 #' @importFrom terra vect
 #' @importFrom terra vector_layers
 #' @importFrom rlang inject
-#' @importFrom nhdplusTools get_huc
 #' @examples
 #' ## NOTE: Examples are wrapped in `\dontrun{}` as function requires a large
 #' ##       amount of data which is not included in the package.
