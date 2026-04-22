@@ -1010,7 +1010,10 @@ calculate_modis <-
     from_is_vector <- inherits(from, "SpatVector")
     if (!from_is_character && !from_is_raster && !from_is_vector) {
       stop(
-        "from should be a character vector of paths, SpatRaster, or SpatVector.\n"
+        paste0(
+          "from should be a character vector of paths, SpatRaster, ",
+          "or SpatVector.\n"
+        )
       )
     }
     if (from_is_character) {
@@ -1022,7 +1025,12 @@ calculate_modis <-
         stop("from_secondary should be SpatRaster when from is SpatRaster.\n")
       }
     } else if (!is.null(from_secondary)) {
-      stop("from_secondary is only supported for character or SpatRaster inputs.\n")
+      stop(
+        paste0(
+          "from_secondary is only supported for character ",
+          "or SpatRaster inputs.\n"
+        )
+      )
     }
     if (from_is_character && !is.function(preprocess)) {
       stop(
