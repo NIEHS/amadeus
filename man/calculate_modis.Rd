@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calculate_modis}
 \alias{calculate_modis}
-\title{Calculate MODIS product covariates in multiple CPU threads}
+\title{Calculate MODIS product covariates}
 \usage{
 calculate_modis(
   from = NULL,
@@ -66,13 +66,11 @@ with \code{.by_time} for temporal summaries.}
 path. Optional weights raster for weighted extraction. If \code{NULL}
 (default), unweighted extraction is performed.}
 
-\item{package_list_add}{character. A vector with package names to load
-these in each thread. Note that \code{sf}, \code{terra}, \code{exactextractr},
-\code{doParallel}, \code{parallelly} and \code{dplyr} are the default packages to be
-loaded.}
+\item{package_list_add}{character. Reserved for backward compatibility;
+currently not used by \code{calculate_modis()}.}
 
-\item{export_list_add}{character. A vector with object names to export
-to each thread. It should be minimized to spare memory.}
+\item{export_list_add}{character. Reserved for backward compatibility;
+currently not used by \code{calculate_modis()}.}
 
 \item{max_cells}{integer(1). Maximum number of cells to be read at once.
 Higher values will expedite processing, but will increase memory usage.
@@ -109,17 +107,13 @@ rows are summarized with \code{calc_summarize_by()} semantics.
 }
 }
 \description{
-\code{calculate_modis} essentially runs \code{\link{calculate_modis_daily}} function
-in each thread (subprocess). Based on daily resolution, each day's workload
-will be distributed to each thread. With \code{product} argument,
-the files are processed by a customized function where the unique structure
-and/or characteristics of the products are considered.
+\code{calculate_modis} orchestrates daily extraction using
+\code{\link[=calculate_modis_daily]{calculate_modis_daily()}}. In raw-path mode, files are grouped by inferred
+date, preprocessed for each day, and then extracted over requested radii.
+With product-specific preprocessing, files are handled according to each
+product's structure and naming conventions.
 }
 \note{
-Overall, this function and dependent routines assume that the file
-system can handle concurrent access to the (network) disk by multiple
-processes. File system characteristics, package versions, and hardware
-settings and specification can affect the processing efficiency.
 \code{locs} is expected to be convertible to \code{sf} object. \code{sf}, \code{SpatVector}, and
 other class objects that could be converted to \code{sf} can be used.
 In raw path mode, \code{preprocess} is called once per inferred day using a

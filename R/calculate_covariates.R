@@ -826,7 +826,7 @@ calculate_ecoregion <-
   }
 
 
-#' Calculate MODIS product covariates in multiple CPU threads
+#' Calculate MODIS product covariates
 #' @param from character, SpatRaster, or SpatVector. Either a list of
 #' MODIS/VIIRS file paths (raw path mode), a preprocessed raster (direct raster
 #' mode), or processed MODIS fire detections as a SpatVector with `time`,
@@ -853,12 +853,10 @@ calculate_ecoregion <-
 #'  extracted raster values.
 #' @param .by_time NULL or character(1). Optional time grouping key used
 #'   with \code{.by_time} for temporal summaries.
-#' @param package_list_add character. A vector with package names to load
-#'  these in each thread. Note that `sf`, `terra`, `exactextractr`,
-#' `doParallel`, `parallelly` and `dplyr` are the default packages to be
-#' loaded.
-#' @param export_list_add character. A vector with object names to export
-#'  to each thread. It should be minimized to spare memory.
+#' @param package_list_add character. Reserved for backward compatibility;
+#'   currently not used by `calculate_modis()`.
+#' @param export_list_add character. Reserved for backward compatibility;
+#'   currently not used by `calculate_modis()`.
 #' @param max_cells integer(1). Maximum number of cells to be read at once.
 #' Higher values will expedite processing, but will increase memory usage.
 #' Maximum possible value is `2^31 - 1`.
@@ -883,17 +881,13 @@ calculate_ecoregion <-
 #'   (default), unweighted extraction is performed.
 #' @param ... Arguments passed to `preprocess`.
 # nolint start
-#' @description `calculate_modis` essentially runs [`calculate_modis_daily`] function
-#' in each thread (subprocess). Based on daily resolution, each day's workload
-#' will be distributed to each thread. With `product` argument,
-#' the files are processed by a customized function where the unique structure
-#' and/or characteristics of the products are considered.
+#' @description `calculate_modis` orchestrates daily extraction using
+#' [`calculate_modis_daily()`]. In raw-path mode, files are grouped by inferred
+#' date, preprocessed for each day, and then extracted over requested radii.
+#' With product-specific preprocessing, files are handled according to each
+#' product's structure and naming conventions.
 # nolint end
-#' @note Overall, this function and dependent routines assume that the file
-#' system can handle concurrent access to the (network) disk by multiple
-#' processes. File system characteristics, package versions, and hardware
-#' settings and specification can affect the processing efficiency.
-#' `locs` is expected to be convertible to `sf` object. `sf`, `SpatVector`, and
+#' @note `locs` is expected to be convertible to `sf` object. `sf`, `SpatVector`, and
 #' other class objects that could be converted to `sf` can be used.
 #' In raw path mode, `preprocess` is called once per inferred day using a
 #' single-date value. Temporal aggregation across extracted rows should be done
