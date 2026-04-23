@@ -887,8 +887,9 @@ calculate_ecoregion <-
 #' With product-specific preprocessing, files are handled according to each
 #' product's structure and naming conventions.
 # nolint end
-#' @note `locs` is expected to be convertible to `sf` object. `sf`, `SpatVector`, and
-#' other class objects that could be converted to `sf` can be used.
+#' @note `locs` is expected to be convertible to `sf` object.
+#' `sf`, `SpatVector`, and other class objects that could be converted to
+#' `sf` can be used.
 #' In raw path mode, `preprocess` is called once per inferred day using a
 #' single-date value. Temporal aggregation across extracted rows should be done
 #' with `.by_time`.

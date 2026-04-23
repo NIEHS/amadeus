@@ -33,6 +33,7 @@ jobs:
 
     steps:
       - name: Print environment variable (masked)
+        shell: bash
         run: |
           echo "Token is set: ${EARTHDATA_TOKEN:+yes}"
 
