@@ -853,6 +853,27 @@ testthat::test_that("calc_time parses julian and netcdf day encodings", {
   testthat::expect_equal(as.Date(netcdf_time), as.Date("2018-01-03"))
 })
 
+testthat::test_that("calc_time handles NA year-like tokens without nchar errors", {
+  testthat::expect_error(
+    calc_time(
+      time = NA_character_,
+      format = "year",
+      dataset = "nlcd",
+      layer_name = "NLCD_Land_Cover_Class"
+    ),
+    regexp = "Unable to parse year"
+  )
+  testthat::expect_error(
+    calc_time(
+      time = NA_character_,
+      format = "yearmonth",
+      dataset = "prism",
+      layer_name = "prism_monthly"
+    ),
+    regexp = "Unable to parse year-month"
+  )
+})
+
 testthat::test_that("calc_apply_time_summary uses native time when .by_time is NULL", {
   df <- data.frame(
     site_id = c("A", "A", "A"),
