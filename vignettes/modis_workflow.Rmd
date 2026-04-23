@@ -876,6 +876,17 @@ jan_process <- process_modis_merge(
   subdataset = "(EVI)"
 )
 
+evi_points_jan <- calculate_covariates(
+  covariate = "modis",
+  from = jan_process,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  name_covariates = "evi_",
+  fun_summary = "mean",
+  geom = "sf",
+  scale = "* 0.0001"
+)
 
 ```
 
