@@ -416,6 +416,60 @@ testthat::test_that("calculate_modis handles SpatRaster and SpatVector inputs di
   )
 })
 
+testthat::test_that("legacy .by is rejected across remaining calculate APIs", {
+  locs_df <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
+
+  from_rast <- terra::rast(
+    nrows = 1, ncols = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326"
+  )
+  terra::values(from_rast) <- 1
+  names(from_rast) <- "mock_20200101"
+
+  from_vect <- terra::vect(
+    data.frame(x = 0.5, y = 0.5, id = "a"),
+    geom = c("x", "y"),
+    crs = "EPSG:4326"
+  )
+
+  expect_by_error <- function(expr) {
+    testthat::expect_error(expr, regexp = "no longer supported")
+  }
+
+  expect_by_error(amadeus::calculate_covariates(
+    covariate = "prism", from = from_rast, locs = locs_df, locs_id = "site_id", .by = "day"
+  ))
+  expect_by_error(amadeus::calculate_koppen_geiger(
+    from = from_rast, locs = locs_df, locs_id = "site_id", .by = "day"
+  ))
+  expect_by_error(amadeus::calculate_nlcd(
+    from = from_rast, locs = locs_df, locs_id = "site_id", .by = "day"
+  ))
+  expect_by_error(amadeus::calculate_ecoregion(
+    from = from_vect, locs = locs_df, locs_id = "site_id", .by = "day"
+  ))
+  expect_by_error(amadeus::calculate_tri(
+    from = from_vect, locs = locs_df, locs_id = "site_id", .by = "day"
+  ))
+  expect_by_error(amadeus::calculate_nei(
+    from = from_vect, locs = locs_df, locs_id = "site_id", .by = "day"
+  ))
+  expect_by_error(amadeus::calculate_gmted(
+    from = from_rast, locs = locs_df, locs_id = "site_id", .by = "day"
+  ))
+  expect_by_error(amadeus::calculate_population(
+    from = from_rast, locs = locs_df, locs_id = "site_id", .by = "day"
+  ))
+  expect_by_error(amadeus::calculate_groads(
+    from = from_vect, locs = locs_df, locs_id = "site_id", .by = "day"
+  ))
+  expect_by_error(amadeus::calculate_cropscape(
+    from = from_rast, locs = locs_df, locs_id = "site_id", .by = "day"
+  ))
+  expect_by_error(amadeus::calculate_huc(
+    from = from_vect, locs = locs_df, locs_id = "site_id", .by = "day"
+  ))
+})
+
 testthat::test_that("collapse_nlcd returns empty df when rowbind is empty", {
   # Passing a list with one 0-row data frame produces empty rowbind result
   empty_df <- data.frame(site_id = character(0), value = numeric(0))
