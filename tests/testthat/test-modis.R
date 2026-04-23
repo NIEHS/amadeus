@@ -2884,6 +2884,40 @@ testthat::test_that("calculate_modis supports direct SpatRaster mode and type pa
     ),
     "from_secondary should be a character vector"
   )
+
+  # direct raster fusion guardrails
+  r_mismatch_geom <- terra::rast(
+    ncols = 1, nrows = 1, xmin = 10, xmax = 12, ymin = 10, ymax = 12, crs = "EPSG:4326"
+  )
+  terra::values(r_mismatch_geom) <- 20
+  names(r_mismatch_geom) <- "mock_layer"
+  testthat::expect_error(
+    calculate_modis(
+      from = r_primary,
+      from_secondary = r_mismatch_geom,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0L,
+      name_covariates = "mock_",
+      scale = "* 1"
+    ),
+    "incompatible geometry"
+  )
+
+  r_two_layers <- c(r_secondary, r_secondary)
+  names(r_two_layers) <- c("mock_layer", "mock_layer2")
+  testthat::expect_error(
+    calculate_modis(
+      from = r_primary,
+      from_secondary = r_two_layers,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0L,
+      name_covariates = "mock_",
+      scale = "* 1"
+    ),
+    "different layer counts"
+  )
 })
 
 

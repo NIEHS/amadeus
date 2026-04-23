@@ -193,6 +193,32 @@ testthat::test_that("calculate_covariates (no errors)", {
     testthat::expect_equal(direct_calc$frp_01000, 16.5)
 
     testthat::expect_error(
+      calculate_modis(
+        from = fire_points,
+        locs = locs_sf,
+        locs_id = "site_id",
+        radius = 0L,
+        geom = "sf",
+        fun_summary = "sum",
+        .by_time = "day"
+      ),
+      "POSIXt"
+    )
+
+    testthat::expect_error(
+      amadeus:::calculate_modis_fire_vector(
+        from = 1,
+        locs_input = sf::st_as_sf(locs_sf),
+        locs_id = "site_id",
+        radius = 0L,
+        fun_summary = "sum",
+        .by_time = NULL,
+        geom = FALSE
+      ),
+      "from should be a SpatVector"
+    )
+
+    testthat::expect_error(
       calculate_modis(from = list(), locs = locs_sf),
       "character vector of paths, SpatRaster, or SpatVector"
     )
@@ -734,3 +760,75 @@ testthat::test_that("calc_summarize_by rejects deprecated .by argument clearly",
   )
 })
 
+testthat::test_that("time helper edge cases are validated", {
+  testthat::expect_error(
+    normalize_by_time_unit("fortnight"),
+    regexp = "valid"
+  )
+
+  tm <- as.POSIXct(c("2020-01-01 00:10:00", "2020-01-01 00:40:00"), tz = "UTC")
+  out_min <- bucket_time_by_unit(tm, "minute")
+  out_hr <- bucket_time_by_unit(tm, "hour")
+  out_yyyymm <- bucket_time_by_unit(c(202001L, 202002L), "month")
+  out_year <- bucket_time_by_unit(c(2020L, 2021L), "year")
+
+  testthat::expect_s3_class(out_min, "POSIXct")
+  testthat::expect_s3_class(out_hr, "POSIXct")
+  testthat::expect_s3_class(out_yyyymm, "Date")
+  testthat::expect_s3_class(out_year, "Date")
+})
+
+testthat::test_that("calc_summarize_by validates required columns and fun_summary", {
+  df <- data.frame(
+    site_id = c("A", "A"),
+    time = as.POSIXct(c("2020-01-01 00:00", "2020-01-01 12:00"), tz = "UTC"),
+    value = c(1, 3)
+  )
+
+  testthat::expect_error(
+    calc_summarize_by(df, .by_time = "day", locs_id = "missing_id"),
+    regexp = "locs_id"
+  )
+  testthat::expect_error(
+    calc_summarize_by(df, .by_time = "day", time_col = "missing_time"),
+    regexp = "time_col"
+  )
+  testthat::expect_error(
+    calc_summarize_by(df, .by_time = "day", group_cols_extra = "level"),
+    regexp = "Grouping column"
+  )
+  testthat::expect_error(
+    calc_summarize_by(df, .by_time = "day", fun_summary = c("mean", "sum")),
+    regexp = "single function name"
+  )
+  testthat::expect_error(
+    calc_summarize_by(df, .by_time = "day", fun_summary = 1),
+    regexp = "character string or function"
+  )
+
+  df_nonum <- df[, c("site_id", "time"), drop = FALSE]
+  testthat::expect_error(
+    calc_summarize_by(df_nonum, .by_time = "day"),
+    regexp = "No numeric covariate columns"
+  )
+})
+
+testthat::test_that("calc_summarize_by supports function fun_summary and geometry carry-forward", {
+  df_geom <- data.frame(
+    site_id = c("A", "A"),
+    time = as.POSIXct(c("2020-01-01 00:00", "2020-01-01 12:00"), tz = "UTC"),
+    value = c(1, 3),
+    geometry = c("POINT (0 0)", "POINT (0 0)")
+  )
+
+  out <- calc_summarize_by(
+    covar = df_geom,
+    .by_time = "day",
+    fun_summary = function(x, na.rm = TRUE) max(x, na.rm = na.rm),
+    locs_id = "site_id"
+  )
+
+  testthat::expect_equal(nrow(out), 1L)
+  testthat::expect_equal(out$value, 3)
+  testthat::expect_true("geometry" %in% names(out))
+})
