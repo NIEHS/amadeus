@@ -579,7 +579,10 @@ calc_time <- function(
     }
     stop(
       sprintf(
-        "Unable to parse datetime for dataset '%s' from token '%s' (layer '%s').\n",
+        paste0(
+          "Unable to parse datetime for dataset '%s' from token '%s' ",
+          "(layer '%s').\n"
+        ),
         ifelse(is.null(dataset), "unknown", dataset),
         paste(time, collapse = "_"),
         ifelse(is.null(layer_name), "unknown", layer_name)
@@ -594,7 +597,10 @@ calc_time <- function(
     }
     stop(
       sprintf(
-        "Unable to parse year-month for dataset '%s' from token '%s' (layer '%s').\n",
+        paste0(
+          "Unable to parse year-month for dataset '%s' from token '%s' ",
+          "(layer '%s').\n"
+        ),
         ifelse(is.null(dataset), "unknown", dataset),
         paste(time, collapse = "_"),
         ifelse(is.null(layer_name), "unknown", layer_name)
