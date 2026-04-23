@@ -501,6 +501,13 @@ calc_time <- function(
   to_posixlt_utc <- function(x) {
     as.POSIXlt(as.POSIXct(x, tz = "UTC"))
   }
+  extract_digits <- function(x) {
+    token <- as.character(x)[1]
+    if (is.na(token)) {
+      return("")
+    }
+    gsub("[^0-9]", "", token)
+  }
   has_layer_time <- !is.null(layer_time) && length(layer_time) > 0 &&
     !all(is.na(layer_time))
 
@@ -591,7 +598,7 @@ calc_time <- function(
   }
 
   if (format == "yearmonth") {
-    digits <- gsub("[^0-9]", "", as.character(time[1]))
+    digits <- extract_digits(time)
     if (nchar(digits) >= 6) {
       return(as.integer(substr(digits, 1, 6)))
     }
@@ -609,7 +616,7 @@ calc_time <- function(
   }
 
   if (format == "year") {
-    digits <- gsub("[^0-9]", "", as.character(time[1]))
+    digits <- extract_digits(time)
     if (nchar(digits) >= 4) {
       return(as.integer(substr(digits, 1, 4)))
     }
