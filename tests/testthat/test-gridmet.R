@@ -430,6 +430,28 @@ testthat::test_that("calculate_gridmet supports .by_time summaries", {
   testthat::expect_true(any(grepl("_0$", names(by_time))))
 })
 
+testthat::test_that("calculate_gridmet summarizes at native daily scale when .by_time is NULL", {
+  withr::local_package("terra")
+  r <- terra::rast(nrows = 1, ncols = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1)
+  r <- c(r, r)
+  terra::values(r) <- matrix(c(1, 3), ncol = 2)
+  names(r) <- c("pr_20180103", "pr_20180103_dup")
+  terra::time(r) <- as.Date(c("2018-01-03", "2018-01-03"))
+  locs <- data.frame(lon = 0.5, lat = 0.5, site_id = "s1")
+
+  out <- calculate_gridmet(
+    from = r,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0,
+    fun = "mean"
+  )
+
+  testthat::expect_equal(nrow(out), 1L)
+  testthat::expect_equal(out$pr_0, 2)
+  testthat::expect_s3_class(out$time, "POSIXct")
+})
+
 testthat::test_that("calculate_gridmet errors when deprecated .by is supplied", {
   withr::local_package("terra")
   locs <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "3799900018810101")

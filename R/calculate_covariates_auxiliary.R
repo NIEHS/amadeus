@@ -475,32 +475,149 @@ calc_weighted_fun <- function(fun, weighted = FALSE) {
 #' @export
 calc_time <- function(
   time,
-  format
+  format,
+  dataset = NULL,
+  layer_name = NULL,
+  layer_time = NULL
 ) {
+  parse_gridmet_day_code <- function(x) {
+    x_chr <- as.character(x)
+    if (!grepl("^[0-9]+$", x_chr)) {
+      return(as.Date(NA))
+    }
+    as.Date(as.numeric(x_chr), origin = "1900-01-01")
+  }
+  extract_ymd_from_text <- function(x) {
+    x_chr <- as.character(x)
+    x_digits <- gsub("[^0-9]", "", x_chr)
+    if (grepl("^[0-9]{8}$", x_digits)) {
+      return(as.Date(x_digits, format = "%Y%m%d"))
+    }
+    if (grepl("^[0-9]{7}$", x_digits)) {
+      return(as.Date(x_digits, format = "%Y%j"))
+    }
+    as.Date(NA)
+  }
+  to_posixlt_utc <- function(x) {
+    as.POSIXlt(as.POSIXct(x, tz = "UTC"))
+  }
+  has_layer_time <- !is.null(layer_time) && length(layer_time) > 0 &&
+    !all(is.na(layer_time))
+
   if (format == "timeless") {
     return(time)
-  } else if (format == "date") {
-    return_time <- as.POSIXlt(
-      time,
-      format = "%Y%m%d",
-      tz = "UTC"
-    )
-  } else if (format == "hour") {
-    return_time <- as.POSIXlt(
-      ISOdatetime(
-        year = substr(time[1], 1, 4),
-        month = substr(time[1], 5, 6),
-        day = substr(time[1], 7, 8),
-        hour = substr(time[2], 1, 2),
-        min = substr(time[2], 3, 4),
-        sec = substr(time[2], 5, 6),
-        tz = "UTC"
+  }
+
+  if (has_layer_time) {
+    if (format == "hour") {
+      return(to_posixlt_utc(layer_time[1]))
+    }
+    if (format == "date") {
+      return(to_posixlt_utc(as.Date(layer_time[1])))
+    }
+    if (format == "year") {
+      return(as.integer(format(as.Date(layer_time[1]), "%Y")))
+    }
+    if (format == "yearmonth") {
+      return(as.integer(format(as.Date(layer_time[1]), "%Y%m")))
+    }
+  }
+
+  if (format == "date") {
+    time_chr <- as.character(time[1])
+    parsed <- extract_ymd_from_text(time_chr)
+    if (!is.na(parsed)) {
+      return(to_posixlt_utc(parsed))
+    }
+    if (!is.null(layer_name) && grepl("=[0-9]+$", layer_name)) {
+      day_code <- sub(".*=([0-9]+)$", "\\1", layer_name)
+      parsed <- parse_gridmet_day_code(day_code)
+      if (!is.na(parsed)) {
+        return(to_posixlt_utc(parsed))
+      }
+    }
+    stop(
+      sprintf(
+        "Unable to parse date for dataset '%s' from token '%s' (layer '%s').\n",
+        ifelse(is.null(dataset), "unknown", dataset),
+        paste(time, collapse = "_"),
+        ifelse(is.null(layer_name), "unknown", layer_name)
       )
     )
-  } else if (format %in% c("yearmonth", "year")) {
-    return_time <- as.integer(time)
   }
-  return(return_time)
+
+  if (format == "hour") {
+    time_chr <- as.character(time)
+    if (length(time_chr) >= 2) {
+      date_digits <- gsub("[^0-9]", "", time_chr[1])
+      hour_digits <- gsub("[^0-9]", "", time_chr[2])
+      if (nchar(date_digits) == 8 && nchar(hour_digits) >= 2) {
+        hour_digits <- sprintf("%06d", as.integer(substr(hour_digits, 1, 6)))
+        return(
+          to_posixlt_utc(ISOdatetime(
+            year = substr(date_digits, 1, 4),
+            month = substr(date_digits, 5, 6),
+            day = substr(date_digits, 7, 8),
+            hour = substr(hour_digits, 1, 2),
+            min = substr(hour_digits, 3, 4),
+            sec = substr(hour_digits, 5, 6),
+            tz = "UTC"
+          ))
+        )
+      }
+    }
+    full_digits <- gsub("[^0-9]", "", paste(time_chr, collapse = ""))
+    if (nchar(full_digits) >= 10) {
+      dt <- as.POSIXct(
+        substr(full_digits, 1, 14),
+        format = "%Y%m%d%H%M%S",
+        tz = "UTC"
+      )
+      if (!is.na(dt)) {
+        return(to_posixlt_utc(dt))
+      }
+    }
+    stop(
+      sprintf(
+        "Unable to parse datetime for dataset '%s' from token '%s' (layer '%s').\n",
+        ifelse(is.null(dataset), "unknown", dataset),
+        paste(time, collapse = "_"),
+        ifelse(is.null(layer_name), "unknown", layer_name)
+      )
+    )
+  }
+
+  if (format == "yearmonth") {
+    digits <- gsub("[^0-9]", "", as.character(time[1]))
+    if (nchar(digits) >= 6) {
+      return(as.integer(substr(digits, 1, 6)))
+    }
+    stop(
+      sprintf(
+        "Unable to parse year-month for dataset '%s' from token '%s' (layer '%s').\n",
+        ifelse(is.null(dataset), "unknown", dataset),
+        paste(time, collapse = "_"),
+        ifelse(is.null(layer_name), "unknown", layer_name)
+      )
+    )
+  }
+
+  if (format == "year") {
+    digits <- gsub("[^0-9]", "", as.character(time[1]))
+    if (nchar(digits) >= 4) {
+      return(as.integer(substr(digits, 1, 4)))
+    }
+    stop(
+      sprintf(
+        "Unable to parse year for dataset '%s' from token '%s' (layer '%s').\n",
+        ifelse(is.null(dataset), "unknown", dataset),
+        paste(time, collapse = "_"),
+        ifelse(is.null(layer_name), "unknown", layer_name)
+      )
+    )
+  }
+
+  stop("Unsupported time format.\n")
 }
 
 #' Check time values
@@ -605,10 +722,17 @@ calc_worker <- function(
     #### extract variable
     data_name <- data_split[variable]
     if (!is.null(time)) {
+      layer_time <- try(terra::time(data_layer), silent = TRUE)
+      if (inherits(layer_time, "try-error")) {
+        layer_time <- NULL
+      }
       #### extract time
       data_time <- calc_time(
-        data_split[time],
-        time_type
+        time = data_split[time],
+        format = time_type,
+        dataset = dataset,
+        layer_name = names(data_layer),
+        layer_time = layer_time
       )
     }
     #### extract level (if applicable)
@@ -617,11 +741,12 @@ calc_worker <- function(
     } else {
       data_level <- NULL
     }
+    layer_time_msg <- if (!is.null(time)) data_split[time] else NA_character_
     #### message
     calc_message(
       dataset = dataset,
       variable = data_name,
-      time = data_split[time],
+      time = layer_time_msg,
       time_type = time_type,
       level = data_level
     )
@@ -1030,12 +1155,20 @@ bucket_time_by_unit <- function(time_vals, unit) {
   time_vals_chr <- as.character(time_vals)
   if (all(grepl("^[0-9]{8}$", time_vals_chr))) {
     time_date <- as.Date(time_vals_chr, format = "%Y%m%d")
+  } else if (all(grepl("^[0-9]{7}$", time_vals_chr))) {
+    time_date <- as.Date(time_vals_chr, format = "%Y%j")
   } else if (all(grepl("^[0-9]{6}$", time_vals_chr))) {
     time_date <- as.Date(paste0(time_vals_chr, "01"), format = "%Y%m%d")
   } else if (all(grepl("^[0-9]{4}$", time_vals_chr))) {
     time_date <- as.Date(paste0(time_vals_chr, "-01-01"))
   } else {
-    time_date <- as.Date(time_vals)
+    time_date <- as.Date(time_vals, tz = "UTC")
+    if (any(is.na(time_date))) {
+      stop(
+        "Unable to bucket time values. Provide parseable Date/POSIXct values ",
+        "or recognized numeric encodings (YYYYDDD, YYYYMMDD, YYYYMM, YYYY).\n"
+      )
+    }
   }
   switch(
     unit_norm,
@@ -1144,6 +1277,123 @@ calc_summarize_by <- function(
     col_order <- c(col_order, "geometry")
   }
   data.frame(summary_df[, unique(col_order), drop = FALSE])
+}
+
+#' Summarize extracted covariates at native temporal grain
+#' @description Internal helper that summarizes numeric covariates by
+#' \code{locs_id + time + group_cols_extra} while preserving the original time
+#' representation.
+#' @param covar data.frame. Extracted covariates.
+#' @param fun_summary character(1) or function. Summary function.
+#' @param locs_id character(1). Location-id column.
+#' @param time_col character(1). Time column in \code{covar}.
+#' @param group_cols_extra character or NULL. Extra grouping columns.
+#' @return a data.frame.
+#' @keywords internal auxiliary
+#' @export
+calc_summarize_native_time <- function(
+  covar,
+  fun_summary = "mean",
+  locs_id = "site_id",
+  time_col = "time",
+  group_cols_extra = NULL
+) {
+  stopifnot(is.data.frame(covar))
+  if (!locs_id %in% names(covar)) {
+    stop(sprintf("`locs_id` column '%s' not found in `covar`.\n", locs_id))
+  }
+  if (!time_col %in% names(covar)) {
+    stop(sprintf("`time_col` column '%s' not found in `covar`.\n", time_col))
+  }
+  if (!is.null(group_cols_extra)) {
+    missing_extra <- setdiff(group_cols_extra, names(covar))
+    if (length(missing_extra) > 0L) {
+      stop(
+        sprintf(
+          "Grouping column(s) not found in `covar`: %s.\n",
+          paste(missing_extra, collapse = ", ")
+        )
+      )
+    }
+  }
+  if (is.character(fun_summary)) {
+    if (length(fun_summary) != 1L) {
+      stop("`fun_summary` must be a single function name.\n")
+    }
+    fun_r <- match.fun(fun_summary)
+  } else if (is.function(fun_summary)) {
+    fun_r <- fun_summary
+  } else {
+    stop("`fun_summary` must be a character string or function.\n")
+  }
+
+  group_cols <- unique(stats::na.omit(c(locs_id, time_col, group_cols_extra)))
+  cov_cols <- names(covar)[vapply(covar, is.numeric, logical(1))]
+  cov_cols <- setdiff(cov_cols, group_cols)
+  if (length(cov_cols) == 0L) {
+    stop("No numeric covariate columns found to summarize.\n")
+  }
+
+  summary_df <- covar |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(group_cols))) |>
+    dplyr::summarize(
+      dplyr::across(dplyr::all_of(cov_cols), \(x) fun_r(x, na.rm = TRUE)),
+      .groups = "drop"
+    )
+
+  if ("geometry" %in% names(covar)) {
+    geom_first <- covar[
+      !duplicated(covar[, group_cols, drop = FALSE]),
+      c(group_cols, "geometry"),
+      drop = FALSE
+    ]
+    summary_df <- dplyr::left_join(summary_df, geom_first, by = group_cols)
+  }
+
+  col_order <- c(group_cols, cov_cols)
+  if ("geometry" %in% names(summary_df)) {
+    col_order <- c(col_order, "geometry")
+  }
+  data.frame(summary_df[, unique(col_order), drop = FALSE])
+}
+
+#' Apply default/native or explicit temporal summarization
+#' @param covar data.frame.
+#' @param .by_time NULL or character(1).
+#' @param fun_summary character(1) or function.
+#' @param locs_id character(1).
+#' @param time_col character(1).
+#' @param group_cols_extra character or NULL.
+#' @return data.frame
+#' @keywords internal auxiliary
+#' @export
+calc_apply_time_summary <- function(
+  covar,
+  .by_time = NULL,
+  fun_summary = "mean",
+  locs_id = "site_id",
+  time_col = "time",
+  group_cols_extra = NULL
+) {
+  if (is.null(.by_time)) {
+    return(
+      calc_summarize_native_time(
+        covar = covar,
+        fun_summary = fun_summary,
+        locs_id = locs_id,
+        time_col = time_col,
+        group_cols_extra = group_cols_extra
+      )
+    )
+  }
+  calc_summarize_by(
+    covar = covar,
+    fun_summary = fun_summary,
+    locs_id = locs_id,
+    time_col = time_col,
+    .by_time = .by_time,
+    group_cols_extra = group_cols_extra
+  )
 }
 
 

@@ -1334,7 +1334,7 @@ process_modis_swath, or process_blackmarble."
       )
     calc_results <- do.call(dplyr::bind_rows, calc_results)
     if (!is.null(.by_time)) {
-      calc_results <- amadeus::calc_summarize_by(
+      calc_results <- amadeus::calc_apply_time_summary(
         covar = calc_results,
         .by_time = .by_time,
         fun_summary = fun_summary,
@@ -1460,7 +1460,7 @@ calculate_modis_fire_vector <- function(
 
   result_all <- do.call(rbind, results_by_day)
   if (!is.null(.by_time)) {
-    result_all <- amadeus::calc_summarize_by(
+    result_all <- amadeus::calc_apply_time_summary(
       covar = result_all,
       .by_time = .by_time,
       fun_summary = fun_summary,
@@ -2035,19 +2035,13 @@ calculate_hms <- function(
         )
       )
 
-    if (!is.null(.by_time)) {
-      hms_fun_summary <- if (!is.null(.by_time)) "sum" else "mean"
-      skip_merge <- amadeus::calc_summarize_by(
-        covar = skip_merge,
-        .by_time = .by_time,
-        fun_summary = hms_fun_summary,
-        locs_id = locs_id
-      )
-      did_summarize <- TRUE
-    } else {
-      did_summarize <- FALSE
-    }
-    if (did_summarize && "time" %in% names(skip_merge)) {
+    skip_merge <- amadeus::calc_apply_time_summary(
+      covar = skip_merge,
+      .by_time = .by_time,
+      fun_summary = "sum",
+      locs_id = locs_id
+    )
+    if (!is.null(.by_time) && "time" %in% names(skip_merge)) {
       skip_merge$time <- as.POSIXct(skip_merge$time, tz = "UTC")
     }
     skip_return <- amadeus::calc_return_locs(
@@ -2189,18 +2183,12 @@ calculate_hms <- function(
   # Filling NAs to 0 (explicit integer)
   sites_extracted[is.na(sites_extracted)] <- 0L
 
-  if (!is.null(.by_time)) {
-    hms_fun_summary <- if (!is.null(.by_time)) "sum" else "mean"
-    sites_extracted <- amadeus::calc_summarize_by(
-      covar = sites_extracted,
-      .by_time = .by_time,
-      fun_summary = hms_fun_summary,
-      locs_id = locs_id
-    )
-    did_summarize <- TRUE
-  } else {
-    did_summarize <- FALSE
-  }
+  sites_extracted <- amadeus::calc_apply_time_summary(
+    covar = sites_extracted,
+    .by_time = .by_time,
+    fun_summary = "sum",
+    locs_id = locs_id
+  )
 
   # Messaging
   timevals <- sites_extracted[["time"]]
@@ -2461,17 +2449,15 @@ calculate_narr <- function(
     ...
   )
   narr_group_extra <- if (!is.null(narr_level)) "level" else NULL
-  if (!is.null(.by_time)) {
-    sites_extracted <- amadeus::calc_summarize_by(
-      covar = sites_extracted,
-      .by_time = .by_time,
-      fun_summary = "mean",
-      locs_id = locs_id,
-      group_cols_extra = narr_group_extra
-    )
-    if ("time" %in% names(sites_extracted)) {
-      sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
-    }
+  sites_extracted <- amadeus::calc_apply_time_summary(
+    covar = sites_extracted,
+    .by_time = .by_time,
+    fun_summary = "mean",
+    locs_id = locs_id,
+    group_cols_extra = narr_group_extra
+  )
+  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
   sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
@@ -2572,19 +2558,14 @@ calculate_geos <- function(
     weights = weights,
     ...
   )
-  if (!is.null(.by_time)) {
-    sites_extracted <- amadeus::calc_summarize_by(
-      covar = sites_extracted,
-      .by_time = .by_time,
-      fun_summary = "mean",
-      locs_id = locs_id,
-      group_cols_extra = "level"
-    )
-    did_summarize <- TRUE
-  } else {
-    did_summarize <- FALSE
-  }
-  if (did_summarize && "time" %in% names(sites_extracted)) {
+  sites_extracted <- amadeus::calc_apply_time_summary(
+    covar = sites_extracted,
+    .by_time = .by_time,
+    fun_summary = "mean",
+    locs_id = locs_id,
+    group_cols_extra = "level"
+  )
+  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
     sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
   sites_return <- amadeus::calc_return_locs(
@@ -2941,19 +2922,14 @@ calculate_merra2 <- function(
   )
   #### optional `.by_time` summarization
   merra2_group_extra <- if (!is.null(merra2_level)) "level" else NULL
-  if (!is.null(.by_time)) {
-    sites_extracted <- amadeus::calc_summarize_by(
-      covar = sites_extracted,
-      .by_time = .by_time,
-      fun_summary = "mean",
-      locs_id = locs_id,
-      group_cols_extra = merra2_group_extra
-    )
-    did_summarize <- TRUE
-  } else {
-    did_summarize <- FALSE
-  }
-  if (did_summarize && "time" %in% names(sites_extracted)) {
+  sites_extracted <- amadeus::calc_apply_time_summary(
+    covar = sites_extracted,
+    .by_time = .by_time,
+    fun_summary = "mean",
+    locs_id = locs_id,
+    group_cols_extra = merra2_group_extra
+  )
+  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
     sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
   sites_return <- amadeus::calc_return_locs(
@@ -3049,16 +3025,14 @@ calculate_gridmet <- function(
     weights = weights,
     ...
   )
-  if (!is.null(.by_time)) {
-    sites_extracted <- amadeus::calc_summarize_by(
-      covar = sites_extracted,
-      .by_time = .by_time,
-      fun_summary = "mean",
-      locs_id = locs_id
-    )
-    if ("time" %in% names(sites_extracted)) {
-      sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
-    }
+  sites_extracted <- amadeus::calc_apply_time_summary(
+    covar = sites_extracted,
+    .by_time = .by_time,
+    fun_summary = "mean",
+    locs_id = locs_id
+  )
+  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
   sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
@@ -3159,18 +3133,16 @@ calculate_terraclimate <- function(
     weights = weights,
     ...
   )
+  sites_extracted <- amadeus::calc_apply_time_summary(
+    covar = sites_extracted,
+    .by_time = .by_time,
+    fun_summary = "mean",
+    locs_id = locs_id
+  )
   posixt_out <- FALSE
-  if (!is.null(.by_time)) {
-    sites_extracted <- amadeus::calc_summarize_by(
-      covar = sites_extracted,
-      .by_time = .by_time,
-      fun_summary = "mean",
-      locs_id = locs_id
-    )
-    if ("time" %in% names(sites_extracted)) {
-      sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
-      posixt_out <- TRUE
-    }
+  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+    posixt_out <- TRUE
   }
   sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
@@ -4009,18 +3981,13 @@ calculate_goes <- function(
     ...
   )
   #### optional `.by_time` summarization
-  if (!is.null(.by_time)) {
-    sites_extracted <- amadeus::calc_summarize_by(
-      covar = sites_extracted,
-      .by_time = .by_time,
-      fun_summary = "mean",
-      locs_id = locs_id
-    )
-    did_summarize <- TRUE
-  } else {
-    did_summarize <- FALSE
-  }
-  if (did_summarize && "time" %in% names(sites_extracted)) {
+  sites_extracted <- amadeus::calc_apply_time_summary(
+    covar = sites_extracted,
+    .by_time = .by_time,
+    fun_summary = "mean",
+    locs_id = locs_id
+  )
+  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
     sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
   sites_return <- amadeus::calc_return_locs(
@@ -4277,18 +4244,13 @@ calculate_drought <- function(
   }
 
   #### Optional .by_time summarization
-  did_summarize <- FALSE
-  if (!is.null(.by_time)) {
-    sites_extracted <- amadeus::calc_summarize_by(
-      covar       = sites_extracted,
-      .by_time    = .by_time,
-      fun_summary = fun,
-      locs_id     = locs_id
-    )
-    did_summarize <- TRUE
-  }
-
-  if (did_summarize && "time" %in% names(sites_extracted)) {
+  sites_extracted <- amadeus::calc_apply_time_summary(
+    covar = sites_extracted,
+    .by_time = .by_time,
+    fun_summary = fun,
+    locs_id = locs_id
+  )
+  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
     sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
 

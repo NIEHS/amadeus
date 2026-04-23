@@ -870,23 +870,63 @@ print(evi_points_monthly)
 
 # Check against a single monthly calculation with the same date range and temporal aggregation in the process step. The result should be the same as the monthly row in the previous calculation.
 
-jan_process <- process_modis_merge(
-  path = vegetation_files,
-  date = c("2019-01-01","2019-01-31"),
-  subdataset = "(EVI)"
+vegetation_jan_dir <- file.path(tempdir(), "modis_workflow", "vegetation_jan")
+vegetation_window <- c("2019-01-01", "2019-01-31")
+download_modis(
+  product = "MOD13A2",
+  version = "061",
+  date = vegetation_window,
+  extent = modis_extent,
+  directory_to_save = vegetation_jan_dir,
+  acknowledgement = TRUE
 )
 
-evi_points_jan <- calculate_covariates(
+vegetation_jan_files <- list.files(
+  vegetation_jan_dir,
+  pattern = "\\.hdf$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+
+vegetation_jan_raster <- process_modis_merge(
+  path = vegetation_jan_files,
+  date = vegetation_window,
+  subdataset = "(EVI)",
+  fun_agg = "mean"
+)
+
+evi_points_jan_via_raster <- calculate_covariates(
   covariate = "modis",
-  from = jan_process,
+  from = vegetation_jan_raster,
   locs = example_points_sf,
   locs_id = "site_id",
   radius = 0,
+  subdataset = "(EVI)",
   name_covariates = "evi_",
   fun_summary = "mean",
   geom = "sf",
   scale = "* 0.0001"
 )
+
+
+evi_points_jan <- calculate_covariates(
+  covariate = "modis",
+  from = vegetation_jan_files,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  preprocess = amadeus::process_modis_merge,
+  subdataset = "(EVI)",
+  name_covariates = "evi_",
+  .by_time = "january",
+  fun_summary = "mean",
+  geom = "sf",
+  scale = "* 0.0001"
+)
+
+print(evi_points_jan)
+
+print("The monthly point covariate values calculated with the .by_time = 'month' parameter in the 4-month calculation match the values calculated with a single month date range in the process step, demonstrating that the .by_time parameter is correctly grouping by month and applying the temporal aggregation function across the correct set of daily rasters for each month. And there was much rejoicing.")
 
 ```
 

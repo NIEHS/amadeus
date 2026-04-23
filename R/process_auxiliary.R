@@ -561,6 +561,36 @@ is_date_proper <- function(
   }
 }
 
+#' Parse netCDF day codes from layer names
+#' @description Parse day-code suffixes from netCDF layer names such as
+#' \code{"precipitation_amount_day=43101"} and convert to \code{Date}.
+#' @param layer_names character. Layer names.
+#' @param source character(1). Source label used in error messages.
+#' @param origin character(1). Date origin for numeric day codes.
+#' @return Date vector.
+#' @keywords internal auxiliary
+#' @export
+process_parse_ncdf_day_codes <- function(
+  layer_names,
+  source = "gridmet",
+  origin = "1900-01-01"
+) {
+  stopifnot(is.character(layer_names))
+  day_codes <- sub(".*=([0-9]+)$", "\\1", layer_names)
+  valid_code <- grepl("^[0-9]+$", day_codes)
+  if (!all(valid_code)) {
+    bad_layers <- paste(layer_names[!valid_code], collapse = ", ")
+    stop(
+      sprintf(
+        "Unable to parse %s layer time from: %s.\n",
+        source,
+        bad_layers
+      )
+    )
+  }
+  as.Date(as.numeric(day_codes), origin = origin)
+}
+
 
 #' Apply extent to the processed data
 #' @description

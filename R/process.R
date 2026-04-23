@@ -3330,14 +3330,11 @@ process_gridmet <- function(
       ),
       "...\n"
     ))
-    time_numeric <- sapply(
-      strsplit(
-        names(data_year),
-        "="
-      ),
-      function(x) as.numeric(x[2]) - 25567
+    terra::time(data_year) <- amadeus::process_parse_ncdf_day_codes(
+      layer_names = names(data_year),
+      source = "gridmet",
+      origin = "1900-01-01"
     )
-    terra::time(data_year) <- as.Date(time_numeric)
     names(data_year) <- paste0(
       variable_checked,
       "_",

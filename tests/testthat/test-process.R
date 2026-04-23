@@ -267,6 +267,18 @@ testthat::test_that("process_collection", {
   )
 })
 
+testthat::test_that("process_parse_ncdf_day_codes parses gridmet day codes", {
+  parsed <- process_parse_ncdf_day_codes(
+    c("precipitation_amount_day=43101", "precipitation_amount_day=43102")
+  )
+  testthat::expect_equal(parsed[1], as.Date("2018-01-03"))
+  testthat::expect_equal(parsed[2], as.Date("2018-01-04"))
+  testthat::expect_error(
+    process_parse_ncdf_day_codes("precipitation_amount_day=bad"),
+    regexp = "Unable to parse"
+  )
+})
+
 ################################################################################
 ##### process_locs_vector
 testthat::test_that("process_locs_vector", {

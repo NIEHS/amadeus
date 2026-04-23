@@ -769,11 +769,13 @@ testthat::test_that("time helper edge cases are validated", {
   tm <- as.POSIXct(c("2020-01-01 00:10:00", "2020-01-01 00:40:00"), tz = "UTC")
   out_min <- bucket_time_by_unit(tm, "minute")
   out_hr <- bucket_time_by_unit(tm, "hour")
+  out_julian <- bucket_time_by_unit(c("2019001", "2019002"), "day")
   out_yyyymm <- bucket_time_by_unit(c(202001L, 202002L), "month")
   out_year <- bucket_time_by_unit(c(2020L, 2021L), "year")
 
   testthat::expect_s3_class(out_min, "POSIXct")
   testthat::expect_s3_class(out_hr, "POSIXct")
+  testthat::expect_s3_class(out_julian, "Date")
   testthat::expect_s3_class(out_yyyymm, "Date")
   testthat::expect_s3_class(out_year, "Date")
 })
@@ -831,4 +833,50 @@ testthat::test_that("calc_summarize_by supports function fun_summary and geometr
   testthat::expect_equal(nrow(out), 1L)
   testthat::expect_equal(out$value, 3)
   testthat::expect_true("geometry" %in% names(out))
+})
+
+testthat::test_that("calc_time parses julian and netcdf day encodings", {
+  julian_time <- calc_time(
+    time = "2019001",
+    format = "date",
+    dataset = "modis",
+    layer_name = "MOD13A2.A2019001.h10v05"
+  )
+  testthat::expect_equal(as.Date(julian_time), as.Date("2019-01-01"))
+
+  netcdf_time <- calc_time(
+    time = "amount",
+    format = "date",
+    dataset = "gridmet",
+    layer_name = "precipitation_amount_day=43101"
+  )
+  testthat::expect_equal(as.Date(netcdf_time), as.Date("2018-01-03"))
+})
+
+testthat::test_that("calc_apply_time_summary uses native time when .by_time is NULL", {
+  df <- data.frame(
+    site_id = c("A", "A", "A"),
+    time = as.POSIXct(
+      c("2020-01-01 00:00", "2020-01-01 00:00", "2020-01-01 01:00"),
+      tz = "UTC"
+    ),
+    value = c(1, 3, 4)
+  )
+  out_native <- calc_apply_time_summary(
+    covar = df,
+    .by_time = NULL,
+    fun_summary = "mean",
+    locs_id = "site_id"
+  )
+  out_day <- calc_apply_time_summary(
+    covar = df,
+    .by_time = "day",
+    fun_summary = "mean",
+    locs_id = "site_id"
+  )
+
+  testthat::expect_equal(nrow(out_native), 2L)
+  testthat::expect_equal(out_native$value[1], 2)
+  testthat::expect_s3_class(out_native$time, "POSIXct")
+  testthat::expect_equal(nrow(out_day), 1L)
 })

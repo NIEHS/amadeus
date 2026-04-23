@@ -114,8 +114,9 @@ With product-specific preprocessing, files are handled according to each
 product's structure and naming conventions.
 }
 \note{
-\code{locs} is expected to be convertible to \code{sf} object. \code{sf}, \code{SpatVector}, and
-other class objects that could be converted to \code{sf} can be used.
+\code{locs} is expected to be convertible to \code{sf} object.
+\code{sf}, \code{SpatVector}, and other class objects that could be converted to
+\code{sf} can be used.
 In raw path mode, \code{preprocess} is called once per inferred day using a
 single-date value. Temporal aggregation across extracted rows should be done
 with \code{.by_time}.
