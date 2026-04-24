@@ -1054,3 +1054,93 @@ testthat::test_that("calc_summarize_native_time accepts function summaries", {
   )
   testthat::expect_equal(out$value, 3)
 })
+
+testthat::test_that("calc_time emits clear parse errors for invalid date/hour tokens", {
+  testthat::expect_error(
+    calc_time(
+      time = "not-a-date",
+      format = "date",
+      dataset = "gridmet",
+      layer_name = "layer_without_code"
+    ),
+    regexp = "Unable to parse date"
+  )
+  testthat::expect_error(
+    calc_time(
+      time = "not-a-time",
+      format = "hour",
+      dataset = "geos",
+      layer_name = "layer"
+    ),
+    regexp = "Unable to parse datetime"
+  )
+})
+
+testthat::test_that("bucket_time_by_unit handles all-NA Date input with explicit error", {
+  testthat::expect_error(
+    bucket_time_by_unit(as.Date(c(NA, NA)), "day"),
+    regexp = "Unable to bucket time values"
+  )
+})
+
+testthat::test_that("calc_summarize_native_time validation errors are explicit", {
+  df <- data.frame(
+    site_id = "A",
+    time = as.POSIXct("2020-01-01 00:00", tz = "UTC"),
+    value = 1
+  )
+  testthat::expect_error(
+    calc_summarize_native_time(df, locs_id = "missing"),
+    regexp = "locs_id"
+  )
+  testthat::expect_error(
+    calc_summarize_native_time(df, time_col = "missing"),
+    regexp = "time_col"
+  )
+  testthat::expect_error(
+    calc_summarize_native_time(df, group_cols_extra = "missing_col"),
+    regexp = "Grouping column"
+  )
+  testthat::expect_error(
+    calc_summarize_native_time(df, fun_summary = c("mean", "sum")),
+    regexp = "single function name"
+  )
+  testthat::expect_error(
+    calc_summarize_native_time(df, fun_summary = 1),
+    regexp = "character string or function"
+  )
+  testthat::expect_error(
+    calc_summarize_native_time(df[, c("site_id", "time"), drop = FALSE]),
+    regexp = "No numeric covariate"
+  )
+})
+
+testthat::test_that("calculate_drought supports weighted point extraction", {
+  withr::local_package("terra")
+  withr::local_package("exactextractr")
+
+  from <- terra::rast(
+    ncols = 2, nrows = 2, xmin = -1, xmax = 1, ymin = -1, ymax = 1, crs = "EPSG:4326"
+  )
+  terra::values(from) <- c(1, 2, 3, 4)
+  names(from) <- "spei_01_2020-01-01"
+  terra::time(from) <- as.Date("2020-01-01")
+
+  weights_r <- terra::rast(from)
+  terra::values(weights_r) <- 1
+
+  locs <- data.frame(site_id = "s1", lon = 0, lat = 0)
+  out <- calculate_drought(
+    from = from,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0L,
+    weights = weights_r,
+    geom = FALSE
+  )
+
+  testthat::expect_true(is.data.frame(out))
+  testthat::expect_equal(nrow(out), 1L)
+  testthat::expect_true("time" %in% names(out))
+  testthat::expect_true("spei_01_0" %in% names(out))
+})

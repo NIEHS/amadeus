@@ -510,3 +510,14 @@ testthat::test_that("process_modis_swath emits message when all layers are NA", 
   testthat::expect_true(any(grepl("All layers are NA", msgs)))
   testthat::expect_s4_class(result, "SpatRaster")
 })
+
+testthat::test_that("process_modis_daily expands single date and rethrows unexpected errors", {
+  testthat::expect_error(
+    process_modis_daily(
+      path = 1,
+      date = "2020-01-01",
+      subdataset = "LST_Day_1km",
+      return_type = "list"
+    )
+  )
+})
