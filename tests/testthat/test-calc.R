@@ -901,3 +901,156 @@ testthat::test_that("calc_apply_time_summary uses native time when .by_time is N
   testthat::expect_s3_class(out_native$time, "POSIXct")
   testthat::expect_equal(nrow(out_day), 1L)
 })
+
+testthat::test_that("calc_time honors layer metadata and hour token parsing", {
+  layer_time <- as.POSIXct("2021-07-15 13:00:00", tz = "UTC")
+  out_date <- calc_time(
+    time = "ignore",
+    format = "date",
+    dataset = "gridmet",
+    layer_name = "layer",
+    layer_time = layer_time
+  )
+  out_year <- calc_time(
+    time = "ignore",
+    format = "year",
+    dataset = "nlcd",
+    layer_name = "layer",
+    layer_time = layer_time
+  )
+  out_ym <- calc_time(
+    time = "ignore",
+    format = "yearmonth",
+    dataset = "prism",
+    layer_name = "layer",
+    layer_time = layer_time
+  )
+  out_hour <- calc_time(
+    time = c("20240102", "083000"),
+    format = "hour",
+    dataset = "mcd14dl",
+    layer_name = "layer"
+  )
+
+  testthat::expect_equal(as.Date(out_date), as.Date("2021-07-15"))
+  testthat::expect_equal(out_year, 2021L)
+  testthat::expect_equal(out_ym, 202107L)
+  testthat::expect_equal(as.character(as.POSIXct(out_hour, tz = "UTC")), "2024-01-02 08:30:00")
+})
+
+testthat::test_that("calc_summarize_native_time aggregates with extra groups and geometry", {
+  df <- data.frame(
+    site_id = c("A", "A", "A", "A"),
+    time = as.POSIXct(
+      c("2020-01-01 00:00", "2020-01-01 00:00", "2020-01-01 01:00", "2020-01-01 01:00"),
+      tz = "UTC"
+    ),
+    level = c("850", "850", "500", "500"),
+    value = c(1, 3, 2, 5),
+    geometry = c("POINT (0 0)", "POINT (0 0)", "POINT (0 0)", "POINT (0 0)")
+  )
+
+  out <- calc_summarize_native_time(
+    covar = df,
+    fun_summary = "sum",
+    locs_id = "site_id",
+    group_cols_extra = "level"
+  )
+
+  testthat::expect_equal(nrow(out), 2L)
+  testthat::expect_equal(out$value[out$level == "850"], 4)
+  testthat::expect_equal(out$value[out$level == "500"], 7)
+  testthat::expect_true("geometry" %in% names(out))
+})
+
+testthat::test_that("calc_apply_time_summary supports explicit bucketing with extra groups", {
+  df <- data.frame(
+    site_id = c("A", "A", "A"),
+    time = as.POSIXct(
+      c("2020-01-01 00:00", "2020-01-01 06:00", "2020-01-02 00:00"),
+      tz = "UTC"
+    ),
+    level = c("850", "850", "850"),
+    value = c(1, 5, 2)
+  )
+  out <- calc_apply_time_summary(
+    covar = df,
+    .by_time = "day",
+    fun_summary = "mean",
+    locs_id = "site_id",
+    group_cols_extra = "level"
+  )
+
+  testthat::expect_equal(nrow(out), 2L)
+  testthat::expect_equal(out$value[as.Date(out$time) == as.Date("2020-01-01")], 3)
+  testthat::expect_equal(out$value[as.Date(out$time) == as.Date("2020-01-02")], 2)
+})
+
+testthat::test_that("bucket_time_by_unit supports YYYYMMDD and quarter buckets", {
+  out_ymd <- bucket_time_by_unit(c("20200102", "20200331"), "day")
+  out_quarter <- bucket_time_by_unit(
+    as.Date(c("2020-02-02", "2020-10-10")),
+    "quarter"
+  )
+
+  testthat::expect_equal(out_ymd, as.Date(c("2020-01-02", "2020-03-31")))
+  testthat::expect_equal(out_quarter, as.Date(c("2020-01-01", "2020-10-01")))
+  testthat::expect_error(
+    bucket_time_by_unit(c("2020-13-01", "2020-99-99"), "day"),
+    regexp = "standard unambiguous format|Unable to bucket time values"
+  )
+})
+
+testthat::test_that("calc_time parses collapsed datetime token and rejects bad format", {
+  out_hour <- calc_time(
+    time = "stamp_20240102083000",
+    format = "hour",
+    dataset = "geos",
+    layer_name = "layer"
+  )
+  testthat::expect_equal(
+    as.character(as.POSIXct(out_hour, tz = "UTC")),
+    "2024-01-02 08:30:00"
+  )
+  testthat::expect_error(calc_time("20200101", "invalid"), regexp = "Unsupported")
+})
+
+testthat::test_that("calc_prepare_weights handles vector fallback and overlap checks", {
+  withr::local_package("terra")
+
+  from <- terra::rast(
+    ncols = 2, nrows = 2, xmin = 0, xmax = 2, ymin = 0, ymax = 2, crs = "EPSG:4326"
+  )
+  terra::values(from) <- seq_len(terra::ncell(from))
+
+  w_poly <- terra::vect(
+    data.frame(id = "a", wkt = "POLYGON((0 0,2 0,2 2,0 2,0 0))"),
+    geom = "wkt",
+    crs = "EPSG:4326"
+  )
+  out_vector <- calc_prepare_weights(from = from, weights = w_poly)
+  testthat::expect_s4_class(out_vector, "SpatRaster")
+  testthat::expect_true(any(!is.na(terra::values(out_vector)[, 1])))
+
+  w_far <- terra::rast(
+    ncols = 2, nrows = 2, xmin = 10, xmax = 12, ymin = 10, ymax = 12, crs = "EPSG:4326"
+  )
+  terra::values(w_far) <- 1
+  out_far <- calc_prepare_weights(from = from, weights = w_far)
+  testthat::expect_s4_class(out_far, "SpatRaster")
+  testthat::expect_true(all(is.na(terra::values(out_far)[, 1])))
+})
+
+testthat::test_that("calc_summarize_native_time accepts function summaries", {
+  df <- data.frame(
+    site_id = c("A", "A"),
+    time = as.POSIXct(c("2020-01-01 00:00", "2020-01-01 00:00"), tz = "UTC"),
+    value = c(1, 3)
+  )
+  out <- calc_summarize_native_time(
+    covar = df,
+    fun_summary = function(x, na.rm = TRUE) max(x, na.rm = na.rm),
+    locs_id = "site_id"
+  )
+  testthat::expect_equal(out$value, 3)
+})

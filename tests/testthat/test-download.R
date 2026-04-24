@@ -2603,3 +2603,32 @@ testthat::test_that("CMR endpoint is reachable and returns granules for MCD19A2"
   body <- httr2::resp_body_json(resp)
   testthat::expect_true(length(body$feed$entry) > 0)
 })
+
+testthat::test_that("extent_to_modis_tiles returns expected tile ids", {
+  us_extent <- c(-125, 24, -66, 50)
+  tiles <- extent_to_modis_tiles(us_extent)
+
+  testthat::expect_true(is.character(tiles))
+  testthat::expect_true(length(tiles) > 0)
+  testthat::expect_true(all(grepl("^h[0-9]{2}v[0-9]{2}$", tiles)))
+  testthat::expect_true(length(unique(tiles)) >= 10)
+})
+
+testthat::test_that("extent_to_modis_tiles validates malformed extents", {
+  testthat::expect_error(
+    extent_to_modis_tiles(c(-200, 20, -66, 50)),
+    regexp = "xmin"
+  )
+  testthat::expect_error(
+    extent_to_modis_tiles(c(-125, -95, -66, 50)),
+    regexp = "ymin"
+  )
+  testthat::expect_error(
+    extent_to_modis_tiles(c(-66, 24, -125, 50)),
+    regexp = "xmin must be < xmax"
+  )
+  testthat::expect_error(
+    extent_to_modis_tiles(c(-125, 50, -66, 24)),
+    regexp = "ymin must be < ymax"
+  )
+})
