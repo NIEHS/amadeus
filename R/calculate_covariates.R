@@ -470,7 +470,7 @@ calculate_nlcd <- function(
   locs_df <- locs_prepared[[2]]
 
   # detect new or deprecated file path stucture
-  if (names(from) == "NLCD Land Cover Class") {
+  if (identical(names(from), "NLCD Land Cover Class")) {
     message(
       paste0(
         "Deprecated data format detected. Data still analyzed, but ",
@@ -505,14 +505,28 @@ calculate_nlcd <- function(
         locs_df = locs_df,
         fun = "mean",
         variable = 1,
-        time = 4,
-        time_type = "year",
+        time = NULL,
+        time_type = "timeless",
         radius = 0,
         level = NULL,
         weights = weights
       )
     )
-    new_data_vect$time <- year
+    if ("geometry" %in% names(new_data_vect)) {
+      new_data_vect <- cbind(
+        new_data_vect[, c(locs_id, "geometry"), drop = FALSE],
+        as.integer(year),
+        new_data_vect[, setdiff(names(new_data_vect), c(locs_id, "geometry")),
+          drop = FALSE
+        ]
+      )
+    } else {
+      new_data_vect <- cbind(
+        new_data_vect[, locs_id, drop = FALSE],
+        as.integer(year),
+        new_data_vect[, setdiff(names(new_data_vect), locs_id), drop = FALSE]
+      )
+    }
     names(new_data_vect)[grep("Annual", names(new_data_vect))] <- sprintf(
       "LDU_0_%05d",
       radius
@@ -601,6 +615,7 @@ calculate_nlcd <- function(
   } else {
     names(new_data_vect)[1:2] <- c(locs_id, "time")
   }
+  new_data_vect$time <- as.integer(new_data_vect$time)
   new_data_return <- amadeus::calc_return_locs(
     covar = new_data_vect,
     POSIXt = FALSE,
@@ -3053,16 +3068,15 @@ calculate_gridmet <- function(
     weights = weights,
     ...
   )
-  if (!is.null(.by_time)) {
-    sites_extracted <- amadeus::calc_summarize_by(
-      covar = sites_extracted,
-      .by_time = .by_time,
-      fun_summary = "mean",
-      locs_id = locs_id
-    )
-    if ("time" %in% names(sites_extracted)) {
-      sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
-    }
+  by_time_resolved <- if (is.null(.by_time)) "day" else .by_time
+  sites_extracted <- amadeus::calc_summarize_by(
+    covar = sites_extracted,
+    .by_time = by_time_resolved,
+    fun_summary = "mean",
+    locs_id = locs_id
+  )
+  if ("time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
   sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
