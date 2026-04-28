@@ -70,6 +70,15 @@ jobs:
         if: startsWith(matrix.config.os, 'macos-')
         shell: bash
         run: |
+          proj_db_path="$(Rscript -e 'for (pkg in c(\"terra\", \"sf\")) { p <- system.file(\"proj/proj.db\", package = pkg); if (nzchar(p)) { cat(p); quit(save = \"no\", status = 0) } }; quit(save = \"no\", status = 1)' 2>/dev/null || true)"
+          if [ -n "${proj_db_path}" ] && [ -f "${proj_db_path}" ]; then
+            proj_path="$(dirname "${proj_db_path}")"
+            echo "PROJ_LIB=${proj_path}" >> "${GITHUB_ENV}"
+            echo "PROJ_DATA=${proj_path}" >> "${GITHUB_ENV}"
+            echo "Using PROJ data at ${proj_path}"
+            exit 0
+          fi
+
           for proj_path in /opt/homebrew/share/proj /usr/local/share/proj; do
             if [ -f "${proj_path}/proj.db" ]; then
               echo "PROJ_LIB=${proj_path}" >> "${GITHUB_ENV}"
@@ -78,8 +87,7 @@ jobs:
               exit 0
             fi
           done
-          echo "PROJ data path not found on runner" >&2
-          exit 1
+          echo "PROJ data path not found on runner; continuing without overrides"
 
       - uses: r-lib/actions/check-r-package@v2
         with:
