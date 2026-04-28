@@ -66,6 +66,21 @@ jobs:
             any::rmarkdown
           needs: check
 
+      - name: Set PROJ paths on macOS
+        if: startsWith(matrix.config.os, 'macos-')
+        shell: bash
+        run: |
+          for proj_path in /opt/homebrew/share/proj /usr/local/share/proj; do
+            if [ -f "${proj_path}/proj.db" ]; then
+              echo "PROJ_LIB=${proj_path}" >> "${GITHUB_ENV}"
+              echo "PROJ_DATA=${proj_path}" >> "${GITHUB_ENV}"
+              echo "Using PROJ data at ${proj_path}"
+              exit 0
+            fi
+          done
+          echo "PROJ data path not found on runner" >&2
+          exit 1
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
