@@ -36,8 +36,6 @@ dir.create(pkg_dir, showWarnings = FALSE, recursive = TRUE)
 message("\n=== Starting Coverage Calculation ===")
 tryCatch(
   {
-    library(amadeus)
-
     # Try coverage with more verbose output
     cov <- covr::package_coverage(
       type = "all",
