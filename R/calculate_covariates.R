@@ -470,7 +470,7 @@ calculate_nlcd <- function(
   locs_df <- locs_prepared[[2]]
 
   # detect new or deprecated file path stucture
-  if (identical(names(from), "NLCD Land Cover Class")) {
+  if (names(from) == "NLCD Land Cover Class") {
     message(
       paste0(
         "Deprecated data format detected. Data still analyzed, but ",
@@ -505,28 +505,14 @@ calculate_nlcd <- function(
         locs_df = locs_df,
         fun = "mean",
         variable = 1,
-        time = NULL,
-        time_type = "timeless",
+        time = 4,
+        time_type = "year",
         radius = 0,
         level = NULL,
         weights = weights
       )
     )
-    if ("geometry" %in% names(new_data_vect)) {
-      new_data_vect <- cbind(
-        new_data_vect[, c(locs_id, "geometry"), drop = FALSE],
-        as.integer(year),
-        new_data_vect[, setdiff(names(new_data_vect), c(locs_id, "geometry")),
-          drop = FALSE
-        ]
-      )
-    } else {
-      new_data_vect <- cbind(
-        new_data_vect[, locs_id, drop = FALSE],
-        as.integer(year),
-        new_data_vect[, setdiff(names(new_data_vect), locs_id), drop = FALSE]
-      )
-    }
+    new_data_vect$time <- year
     names(new_data_vect)[grep("Annual", names(new_data_vect))] <- sprintf(
       "LDU_0_%05d",
       radius
@@ -615,7 +601,6 @@ calculate_nlcd <- function(
   } else {
     names(new_data_vect)[1:2] <- c(locs_id, "time")
   }
-  new_data_vect$time <- as.integer(new_data_vect$time)
   new_data_return <- amadeus::calc_return_locs(
     covar = new_data_vect,
     POSIXt = FALSE,
@@ -1172,16 +1157,18 @@ process_modis_swath, or process_blackmarble."
               vrt_today <- rlang::inject(preprocess(!!!hdf_args))
             } else {
               day_key <- dates_available[datei]
-              has_primary <- day_key %in% vapply(
-                hdf_args$from,
-                modis_extract_temporal_key,
-                character(1)
-              )
-              has_secondary <- day_key %in% vapply(
-                hdf_args$from_secondary,
-                modis_extract_temporal_key,
-                character(1)
-              )
+              has_primary <- day_key %in%
+                vapply(
+                  hdf_args$from,
+                  modis_extract_temporal_key,
+                  character(1)
+                )
+              has_secondary <- day_key %in%
+                vapply(
+                  hdf_args$from_secondary,
+                  modis_extract_temporal_key,
+                  character(1)
+                )
               if (!has_primary && !has_secondary) {
                 stop("No MODIS files found for selected fusion date.\n")
               }
@@ -1208,19 +1195,20 @@ process_modis_swath, or process_blackmarble."
               } else if (is.null(raster_secondary)) {
                 vrt_today <- raster_primary
               } else {
-                if (!isTRUE(terra::compareGeom(
-                  raster_primary,
-                  raster_secondary,
-                  stopOnError = FALSE
-                ))) {
+                if (
+                  !isTRUE(terra::compareGeom(
+                    raster_primary,
+                    raster_secondary,
+                    stopOnError = FALSE
+                  ))
+                ) {
                   stop(
                     "Primary and secondary MODIS rasters have incompatible ",
                     "geometry.\n"
                   )
                 }
                 if (
-                  terra::nlyr(raster_primary) !=
-                    terra::nlyr(raster_secondary)
+                  terra::nlyr(raster_primary) != terra::nlyr(raster_secondary)
                 ) {
                   stop(
                     "Primary and secondary MODIS rasters have different ",
@@ -1252,19 +1240,20 @@ process_modis_swath, or process_blackmarble."
             } else {
               raster_primary <- from
               raster_secondary <- from_secondary
-              if (!isTRUE(terra::compareGeom(
-                raster_primary,
-                raster_secondary,
-                stopOnError = FALSE
-              ))) {
+              if (
+                !isTRUE(terra::compareGeom(
+                  raster_primary,
+                  raster_secondary,
+                  stopOnError = FALSE
+                ))
+              ) {
                 stop(
                   "Primary and secondary MODIS rasters have incompatible ",
                   "geometry.\n"
                 )
               }
               if (
-                terra::nlyr(raster_primary) !=
-                  terra::nlyr(raster_secondary)
+                terra::nlyr(raster_primary) != terra::nlyr(raster_secondary)
               ) {
                 stop(
                   "Primary and secondary MODIS rasters have different ",
@@ -1349,7 +1338,7 @@ process_modis_swath, or process_blackmarble."
       )
     calc_results <- do.call(dplyr::bind_rows, calc_results)
     if (!is.null(.by_time)) {
-      calc_results <- amadeus::calc_apply_time_summary(
+      calc_results <- amadeus::calc_summarize_by(
         covar = calc_results,
         .by_time = .by_time,
         fun_summary = fun_summary,
@@ -1475,7 +1464,7 @@ calculate_modis_fire_vector <- function(
 
   result_all <- do.call(rbind, results_by_day)
   if (!is.null(.by_time)) {
-    result_all <- amadeus::calc_apply_time_summary(
+    result_all <- amadeus::calc_summarize_by(
       covar = result_all,
       .by_time = .by_time,
       fun_summary = fun_summary,
@@ -2050,13 +2039,19 @@ calculate_hms <- function(
         )
       )
 
-    skip_merge <- amadeus::calc_apply_time_summary(
-      covar = skip_merge,
-      .by_time = .by_time,
-      fun_summary = "sum",
-      locs_id = locs_id
-    )
-    if (!is.null(.by_time) && "time" %in% names(skip_merge)) {
+    if (!is.null(.by_time)) {
+      hms_fun_summary <- if (!is.null(.by_time)) "sum" else "mean"
+      skip_merge <- amadeus::calc_summarize_by(
+        covar = skip_merge,
+        .by_time = .by_time,
+        fun_summary = hms_fun_summary,
+        locs_id = locs_id
+      )
+      did_summarize <- TRUE
+    } else {
+      did_summarize <- FALSE
+    }
+    if (did_summarize && "time" %in% names(skip_merge)) {
       skip_merge$time <- as.POSIXct(skip_merge$time, tz = "UTC")
     }
     skip_return <- amadeus::calc_return_locs(
@@ -2198,12 +2193,18 @@ calculate_hms <- function(
   # Filling NAs to 0 (explicit integer)
   sites_extracted[is.na(sites_extracted)] <- 0L
 
-  sites_extracted <- amadeus::calc_apply_time_summary(
-    covar = sites_extracted,
-    .by_time = .by_time,
-    fun_summary = "sum",
-    locs_id = locs_id
-  )
+  if (!is.null(.by_time)) {
+    hms_fun_summary <- if (!is.null(.by_time)) "sum" else "mean"
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = hms_fun_summary,
+      locs_id = locs_id
+    )
+    did_summarize <- TRUE
+  } else {
+    did_summarize <- FALSE
+  }
 
   # Messaging
   timevals <- sites_extracted[["time"]]
@@ -2464,15 +2465,17 @@ calculate_narr <- function(
     ...
   )
   narr_group_extra <- if (!is.null(narr_level)) "level" else NULL
-  sites_extracted <- amadeus::calc_apply_time_summary(
-    covar = sites_extracted,
-    .by_time = .by_time,
-    fun_summary = "mean",
-    locs_id = locs_id,
-    group_cols_extra = narr_group_extra
-  )
-  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
-    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+  if (!is.null(.by_time)) {
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = "mean",
+      locs_id = locs_id,
+      group_cols_extra = narr_group_extra
+    )
+    if ("time" %in% names(sites_extracted)) {
+      sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+    }
   }
   sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
@@ -2573,14 +2576,19 @@ calculate_geos <- function(
     weights = weights,
     ...
   )
-  sites_extracted <- amadeus::calc_apply_time_summary(
-    covar = sites_extracted,
-    .by_time = .by_time,
-    fun_summary = "mean",
-    locs_id = locs_id,
-    group_cols_extra = "level"
-  )
-  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
+  if (!is.null(.by_time)) {
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = "mean",
+      locs_id = locs_id,
+      group_cols_extra = "level"
+    )
+    did_summarize <- TRUE
+  } else {
+    did_summarize <- FALSE
+  }
+  if (did_summarize && "time" %in% names(sites_extracted)) {
     sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
   sites_return <- amadeus::calc_return_locs(
@@ -2937,14 +2945,19 @@ calculate_merra2 <- function(
   )
   #### optional `.by_time` summarization
   merra2_group_extra <- if (!is.null(merra2_level)) "level" else NULL
-  sites_extracted <- amadeus::calc_apply_time_summary(
-    covar = sites_extracted,
-    .by_time = .by_time,
-    fun_summary = "mean",
-    locs_id = locs_id,
-    group_cols_extra = merra2_group_extra
-  )
-  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
+  if (!is.null(.by_time)) {
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = "mean",
+      locs_id = locs_id,
+      group_cols_extra = merra2_group_extra
+    )
+    did_summarize <- TRUE
+  } else {
+    did_summarize <- FALSE
+  }
+  if (did_summarize && "time" %in% names(sites_extracted)) {
     sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
   sites_return <- amadeus::calc_return_locs(
@@ -3040,14 +3053,16 @@ calculate_gridmet <- function(
     weights = weights,
     ...
   )
-  sites_extracted <- amadeus::calc_apply_time_summary(
-    covar = sites_extracted,
-    .by_time = .by_time,
-    fun_summary = "mean",
-    locs_id = locs_id
-  )
-  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
-    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+  if (!is.null(.by_time)) {
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = "mean",
+      locs_id = locs_id
+    )
+    if ("time" %in% names(sites_extracted)) {
+      sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+    }
   }
   sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
@@ -3148,16 +3163,18 @@ calculate_terraclimate <- function(
     weights = weights,
     ...
   )
-  sites_extracted <- amadeus::calc_apply_time_summary(
-    covar = sites_extracted,
-    .by_time = .by_time,
-    fun_summary = "mean",
-    locs_id = locs_id
-  )
   posixt_out <- FALSE
-  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
-    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
-    posixt_out <- TRUE
+  if (!is.null(.by_time)) {
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = "mean",
+      locs_id = locs_id
+    )
+    if ("time" %in% names(sites_extracted)) {
+      sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+      posixt_out <- TRUE
+    }
   }
   sites_return <- amadeus::calc_return_locs(
     covar = sites_extracted,
@@ -3397,7 +3414,8 @@ calculate_prism <- function(
   is_polygon_locs <- inherits(sites_e, "SpatVector") &&
     !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
   weights_prepared <- amadeus::calc_prepare_weights(
-    from = from[[1]], weights = weights
+    from = from[[1]],
+    weights = weights
   )
   fun_extract <- amadeus::calc_weighted_fun(
     fun = "mean",
@@ -3601,7 +3619,8 @@ calculate_edgar <- function(
   is_polygon_locs <- inherits(sites_e, "SpatVector") &&
     !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
   weights_prepared <- amadeus::calc_prepare_weights(
-    from = from[[1]], weights = weights
+    from = from[[1]],
+    weights = weights
   )
   fun_extract <- amadeus::calc_weighted_fun(
     fun = "mean",
@@ -3771,7 +3790,8 @@ calculate_cropscape <- function(
   is_polygon_locs <- inherits(sites_e, "SpatVector") &&
     !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
   weights_prepared <- amadeus::calc_prepare_weights(
-    from = from[[1]], weights = weights
+    from = from[[1]],
+    weights = weights
   )
   if (radius == 0 && !is_polygon_locs && is.null(weights_prepared)) {
     # terra::extract for point locations
@@ -3978,7 +3998,7 @@ calculate_goes <- function(
     radius = radius,
     geom = geom
   )
-  sites_e  <- sites_list[[1]]
+  sites_e <- sites_list[[1]]
   sites_id <- sites_list[[2]]
   #### perform extraction
   sites_extracted <- amadeus::calc_worker(
@@ -3996,13 +4016,18 @@ calculate_goes <- function(
     ...
   )
   #### optional `.by_time` summarization
-  sites_extracted <- amadeus::calc_apply_time_summary(
-    covar = sites_extracted,
-    .by_time = .by_time,
-    fun_summary = "mean",
-    locs_id = locs_id
-  )
-  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
+  if (!is.null(.by_time)) {
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = "mean",
+      locs_id = locs_id
+    )
+    did_summarize <- TRUE
+  } else {
+    did_summarize <- FALSE
+  }
+  if (did_summarize && "time" %in% names(sites_extracted)) {
     sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
   sites_return <- amadeus::calc_return_locs(
@@ -4138,15 +4163,15 @@ calculate_drought <- function(
       radius = radius,
       geom = geom
     )
-    sites_e  <- sites_list[[1]]
+    sites_e <- sites_list[[1]]
     sites_id <- sites_list[[2]]
 
     #### Derive source and timescale from first layer name
     #### (e.g. "spei_01_2020-01-01")
     lyr_parts <- strsplit(names(from)[1], "_")[[1]]
-    src_name  <- lyr_parts[1]
-    ts_fmt    <- lyr_parts[2]
-    col_name  <- paste0(src_name, "_", ts_fmt, "_", radius)
+    src_name <- lyr_parts[1]
+    ts_fmt <- lyr_parts[2]
+    col_name <- paste0(src_name, "_", ts_fmt, "_", radius)
     weighted_drought <- amadeus::calc_prepare_weights(
       from = from[[1]],
       weights = weights
@@ -4159,7 +4184,7 @@ calculate_drought <- function(
     sites_extracted <- NULL
     for (l in seq_len(terra::nlyr(from))) {
       data_layer <- from[[l]]
-      data_time  <- as.POSIXct(as.Date(terra::time(data_layer)), tz = "UTC")
+      data_time <- as.POSIXct(as.Date(terra::time(data_layer)), tz = "UTC")
 
       if (terra::geomtype(sites_e) == "polygons") {
         extract_args <- list(
@@ -4204,14 +4229,13 @@ calculate_drought <- function(
       row_df <- data.frame(
         sites_id,
         time = rep(data_time, nrow(sites_id)),
-        val  = layer_vals[[1]],
+        val = layer_vals[[1]],
         stringsAsFactors = FALSE
       )
       colnames(row_df) <- c(colnames(sites_id), "time", col_name)
       sites_extracted <- rbind(sites_extracted, row_df)
     }
     crs_from <- terra::crs(from)
-
   } else if (inherits(from, "SpatVector")) {
     #### USDM polygon overlay (radius not used for point-in-polygon)
     sites_list <- amadeus::calc_prepare_locs(
@@ -4221,20 +4245,20 @@ calculate_drought <- function(
       radius = 0L,
       geom = geom
     )
-    sites_e  <- sites_list[[1]]
+    sites_e <- sites_list[[1]]
     sites_id <- sites_list[[2]]
 
-    col_name  <- "usdm_dm_0"
+    col_name <- "usdm_dm_0"
     dates_unique <- sort(unique(terra::values(from)$date))
 
     result_list <- vector("list", length(dates_unique))
     for (i in seq_along(dates_unique)) {
-      d         <- dates_unique[i]
+      d <- dates_unique[i]
       from_date <- from[terra::values(from)$date == d, ]
-      d_posix   <- as.POSIXct(as.Date(d), tz = "UTC")
+      d_posix <- as.POSIXct(as.Date(d), tz = "UTC")
 
-      extracted  <- terra::extract(from_date, sites_e)
-      dm_values  <- rep(NA_real_, nrow(sites_id))
+      extracted <- terra::extract(from_date, sites_e)
+      dm_values <- rep(NA_real_, nrow(sites_id))
       if (!is.null(extracted) && nrow(extracted) > 0L) {
         #### keep first match per site (polygons should not overlap)
         first_per_site <- !duplicated(extracted$id.y)
@@ -4245,7 +4269,7 @@ calculate_drought <- function(
       row_df <- data.frame(
         sites_id,
         time = rep(d_posix, nrow(sites_id)),
-        dm   = dm_values,
+        dm = dm_values,
         stringsAsFactors = FALSE
       )
       colnames(row_df) <- c(colnames(sites_id), "time", col_name)
@@ -4253,26 +4277,30 @@ calculate_drought <- function(
     }
     sites_extracted <- do.call(rbind, result_list)
     crs_from <- terra::crs(from)
-
   } else {
     stop("`from` must be a SpatRaster (SPEI/EDDI) or SpatVector (USDM).\n")
   }
 
   #### Optional .by_time summarization
-  sites_extracted <- amadeus::calc_apply_time_summary(
-    covar = sites_extracted,
-    .by_time = .by_time,
-    fun_summary = fun,
-    locs_id = locs_id
-  )
-  if (!is.null(.by_time) && "time" %in% names(sites_extracted)) {
+  did_summarize <- FALSE
+  if (!is.null(.by_time)) {
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = fun,
+      locs_id = locs_id
+    )
+    did_summarize <- TRUE
+  }
+
+  if (did_summarize && "time" %in% names(sites_extracted)) {
     sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
   }
 
   amadeus::calc_return_locs(
-    covar  = sites_extracted,
+    covar = sites_extracted,
     POSIXt = TRUE,
-    geom   = geom,
-    crs    = crs_from
+    geom = geom,
+    crs = crs_from
   )
 }
