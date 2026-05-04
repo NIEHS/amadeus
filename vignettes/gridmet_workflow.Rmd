@@ -159,9 +159,17 @@ download_data(
 processed_data <- process_covariates(
   covariate = "gridmet",
   variable = "tmmx",
-  date = c("2020-01-03", "2020-01-05"),
+  date = c("2020-01-01", "2020-01-31"),
   path = file.path(directory_to_save, "tmmx"),
   extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
+)
+
+processed_data <- process_covariates(
+  covariate = "gridmet",
+  variable = "tmmx",
+  date = c("2020-01-01", "2020-01-31"),
+  path = file.path(directory_to_save, "tmmx"),
+  extent = modis_extent
 )
 ```
 
@@ -177,6 +185,29 @@ point_values <- calculate_covariates(
   fun = "mean",
   geom = "sf"
 )
+
+point_values_month <- calculate_covariates(
+  covariate = "gridmet",
+  from = processed_data,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  .by_time = "month",
+  radius = 0,
+  fun = "mean",
+  geom = "sf"
+)
+
+point_values_file_month <- calculate_covariates(
+  covariate = "gridmet",
+  from = file.path(directory_to_save, "tmmx"),
+  locs = example_points_sf,
+  locs_id = "site_id",
+  .by_time = "month",
+  radius = 0,
+  fun = "mean",
+  geom = "sf"
+)
+
 point_values_sum <- calculate_covariates(
   covariate = "gridmet",
   from = processed_data,

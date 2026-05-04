@@ -431,7 +431,7 @@ testthat::test_that("process_modis_sds", {
       MOD13Q1 = "250m 16 days (NDVI|EVI)",
       MYD13Q1 = "250m 16 days (NDVI|EVI)",
       MOD09GA = "(sur_refl_b0)",
-      MCD19A2 = "(Optical_Depth)",
+      MCD19A2 = "(Optical_Depth|Injection_Height)",
       MOD14A1 = "(FireMask)",
       MYD14A1 = "(FireMask)",
       MOD14A2 = "(FireMask)",
@@ -450,7 +450,7 @@ testthat::test_that("process_modis_sds", {
   )
   testthat::expect_equal(
     mcdtest,
-    "(Optical_Depth)"
+    "(Optical_Depth|Injection_Height)"
   )
   testthat::expect_no_error(
     amadeus:::process_modis_sds("MCD19A2", "(cos|RelAZ|Angle)")
@@ -1902,6 +1902,13 @@ testthat::test_that("process_modis_merge", {
       subdataset = "(Optical_Depth)"
     )
   )
+  testthat::expect_no_warning(
+    process_modis_merge(
+      path = path_mcd19,
+      date = "2021-08-15",
+      subdataset = "(Injection_Height)"
+    )
+  )
 
   # case 3: standard mcd19a2
   path_mod09 <-
@@ -2603,6 +2610,14 @@ testthat::test_that("calculate_modis", {
         subdataset = "(Optical_Depth)"
       )
   )
+  testthat::expect_no_warning(
+    mcd_merge_injection <-
+      process_modis_merge(
+        path = path_mcd19,
+        date = "2021-08-15",
+        subdataset = "(Injection_Height)"
+      )
+  )
 
   testthat::expect_no_error(
     calculate_modis_daily(
@@ -2639,6 +2654,15 @@ testthat::test_that("calculate_modis", {
     )
   )
   testthat::expect_true(inherits(calc_mod_sf, "sf"))
+  testthat::expect_no_error(
+    calculate_modis_daily(
+      from = mcd_merge_injection,
+      date = "2021-08-15",
+      locs = sf::st_as_sf(site_faux2),
+      radius = 1000,
+      name_extracted = "MCD_INJECTION_1K_"
+    )
+  )
 
   testthat::expect_no_error({
     from_w <- terra::rast(

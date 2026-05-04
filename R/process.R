@@ -197,7 +197,7 @@ process_covariates <-
 #' * "MOD11A1" - Land surface temperature (LST)
 #' * "MOD13A2" - Normalized Difference Vegetation Index (NDVI)
 #' * "MOD09GA" - Surface reflectance, and
-#' * "MCD19A2" - Aerosol optical depth (AOD).
+#' * "MCD19A2" - Aerosol optical depth (AOD) and plume injection height.
 #'
 #' For a full list of available
 #' MODIS product codes, see the "Short Name" column at
@@ -250,7 +250,7 @@ process_modis_sds <-
           MOD13Q1 = "250m 16 days (NDVI|EVI)",
           MYD13Q1 = "250m 16 days (NDVI|EVI)",
           MOD09GA = "(sur_refl_b0)",
-          MCD19A2 = "(Optical_Depth)",
+          MCD19A2 = "(Optical_Depth|Injection_Height)",
           MOD14A1 = "(FireMask)",
           MYD14A1 = "(FireMask)",
           MOD14A2 = "(FireMask)",

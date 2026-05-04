@@ -925,6 +925,28 @@ calculate_ecoregion <-
 #' products offset by 8 days; combining both can improve effective temporal
 #' coverage. This behavior aligns with NASA MOD13 product guidance:
 #' <https://modis.gsfc.nasa.gov/data/dataprod/mod13.php>
+#'
+#' For MCD19A2 MAIAC, common sub-datasets include both optical depth and
+#' plume injection height layers. Typical selectors are
+#' `"(Optical_Depth|Injection_Height)"` for both families or
+#' `"(Injection_Height)"` when targeting plume height only.
+#'
+#' For MOD14A1/MYD14A1 fire grids, the `FireMask` raw values are commonly
+#' interpreted as:
+#' \tabular{rll}{
+#' Raw value \tab Meaning \tab Binary fire mask?\cr
+#' 0 \tab not processed, missing input \tab NA / no observation\cr
+#' 1 \tab obsolete, not used since Collection 1 \tab NA\cr
+#' 2 \tab not processed, other reason \tab NA\cr
+#' 3 \tab non-fire water pixel \tab 0\cr
+#' 4 \tab cloud, land or water \tab NA or 0, depending on analysis\cr
+#' 5 \tab non-fire land pixel \tab 0\cr
+#' 6 \tab unknown, land or water \tab NA\cr
+#' 7 \tab fire, low confidence \tab 1, or exclude for stricter mask\cr
+#' 8 \tab fire, nominal confidence \tab 1\cr
+#' 9 \tab fire, high confidence \tab 1\cr
+#' }
+#'
 #' Dates with less than 80 percent of the expected number of tiles,
 #' which are determined by the mode of the number of tiles, are removed.
 #' Users will be informed of the dates with insufficient tiles.

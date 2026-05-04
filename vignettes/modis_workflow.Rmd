@@ -12,7 +12,11 @@ author: "Kyle Messier, with assistance from GitHub Copilot"
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = ""
+  comment = "",
+  fig.width = 9,
+  fig.height = 7,
+  out.width = "100%",
+  fig.align = "center"
 )
 library(amadeus)
 library(sf)
@@ -657,6 +661,7 @@ point_values <- calculate_covariates(
   geom = "terra",
   scale = "* 0.02 - 273.15"
 )
+
 ```
 
 ## Calculate covariates across H3 hexagons - demonstating calculations across polygons 
@@ -819,7 +824,7 @@ ggplot2::ggplot() +
 
 ## Workflow template for using .by_time to create space-time summaries 
 
-Here we demonstrate with EVI a monthly temporal aggregation by polygon 
+Here we demonstrate with EVI a monthly temporal aggregation by polygon. For MODIS datasets, it is faster and recommended to do the calculate step directly and provide the process via the `preprocess` input. A demonstration of the recommended approach and the alternative (which requires using terra::tapp) are below.
 
 #### Vegetation indices: `MOD13*` or `MYD13*`
 
@@ -842,25 +847,18 @@ vegetation_files <- list.files(
   full.names = TRUE
 )
 
-vegetation_raster <- process_modis_merge(
-  path = vegetation_files,
-  date = vegetation_window,
-  subdataset = "(EVI)",
-  fun_agg = "mean"
-)
-
-plot(vegetation_raster, main = "MOD13A2 processed raster with temporal averaging")
+For MODIS data, it is faster to do the process and calculate in one step with calculate_covariates and provide the process as the preprocess function.
 
 evi_points_monthly <- calculate_covariates(
   covariate = "modis",
-  from = vegetation_files,
+  from = vegetation_files, # provide the path to the files from download_modis
   locs = example_points_sf,
   locs_id = "site_id",
   radius = 0,
   preprocess = amadeus::process_modis_merge,
   subdataset = "(EVI)",
   name_covariates = "evi_",
-  .by_time = "month",
+  .by_time = "month", # specify the temporal aggregation period for the output points
   fun_summary = "mean",
   geom = "sf",
   scale = "* 0.0001"
@@ -868,65 +866,23 @@ evi_points_monthly <- calculate_covariates(
 
 print(evi_points_monthly)
 
-# Check against a single monthly calculation with the same date range and temporal aggregation in the process step. The result should be the same as the monthly row in the previous calculation.
-
-vegetation_jan_dir <- file.path(tempdir(), "modis_workflow", "vegetation_jan")
-vegetation_window <- c("2019-01-01", "2019-01-31")
-download_modis(
-  product = "MOD13A2",
-  version = "061",
-  date = vegetation_window,
-  extent = modis_extent,
-  directory_to_save = vegetation_jan_dir,
-  acknowledgement = TRUE
-)
-
-vegetation_jan_files <- list.files(
-  vegetation_jan_dir,
-  pattern = "\\.hdf$",
-  recursive = TRUE,
-  full.names = TRUE
-)
-
-vegetation_jan_raster <- process_modis_merge(
-  path = vegetation_jan_files,
+# If we want to view the processed rasters we can use process_modis_merge or process_modis_daily. 
+# process_modis_merge without .by_time will give us one raster with the temporal aggregation across the whole window. process_modis_daily will give us daily rasters that we can then aggregate with terra::tapp or similar functions.
+vegetation_raster <- process_modis_merge(
+  path = vegetation_files,
   date = vegetation_window,
   subdataset = "(EVI)",
   fun_agg = "mean"
 )
 
-evi_points_jan_via_raster <- calculate_covariates(
-  covariate = "modis",
-  from = vegetation_jan_raster,
-  locs = example_points_sf,
-  locs_id = "site_id",
-  radius = 0,
-  subdataset = "(EVI)",
-  name_covariates = "evi_",
-  fun_summary = "mean",
-  geom = "sf",
-  scale = "* 0.0001"
+vegetation_daily_raster <- process_modis_daily(
+  path = vegetation_files,
+  date = vegetation_window,
+  subdataset = "(EVI)"
 )
 
-
-evi_points_jan <- calculate_covariates(
-  covariate = "modis",
-  from = vegetation_jan_files,
-  locs = example_points_sf,
-  locs_id = "site_id",
-  radius = 0,
-  preprocess = amadeus::process_modis_merge,
-  subdataset = "(EVI)",
-  name_covariates = "evi_",
-  .by_time = "january",
-  fun_summary = "mean",
-  geom = "sf",
-  scale = "* 0.0001"
-)
-
-print(evi_points_jan)
-
-print("The monthly point covariate values calculated with the .by_time = 'month' parameter in the 4-month calculation match the values calculated with a single month date range in the process step, demonstrating that the .by_time parameter is correctly grouping by month and applying the temporal aggregation function across the correct set of daily rasters for each month. And there was much rejoicing.")
+plot(vegetation_raster, main = "MOD13A2 EVI averaged over Jan-Apr 2019")
+plot(vegetation_daily_raster)
 
 ```
 
@@ -934,17 +890,59 @@ This same averaging pattern applies to `MOD13A1`, `MYD13A1`, and `MYD13A2` when 
 
 ### Fire grids: `MOD14A1`, `MYD14A1`, `MOD14CM1`, and `MYD14CM1`
 
+When using fire-grid products with the `FireMask` layer, the raw values are typically interpreted as follows.
+
+```{r fire-mask-reference, echo = FALSE, results = "asis"}
+fire_mask_reference <- data.frame(
+  raw_value = 0:9,
+  meaning = c(
+    "not processed, missing input",
+    "obsolete, not used since Collection 1",
+    "not processed, other reason",
+    "non-fire water pixel",
+    "cloud, land or water",
+    "non-fire land pixel",
+    "unknown, land or water",
+    "fire, low confidence",
+    "fire, nominal confidence",
+    "fire, high confidence"
+  ),
+  binary_fire_mask = c(
+    "NA / no observation",
+    "NA",
+    "NA",
+    "0",
+    "NA or 0, depending on analysis",
+    "0",
+    "NA",
+    "1, or exclude for stricter mask",
+    "1",
+    "1"
+  ),
+  stringsAsFactors = FALSE
+)
+
+knitr::kable(
+  fire_mask_reference,
+  col.names = c("Raw value", "Meaning", "Binary fire mask?")
+)
+```
+
+Given the typical interpretation of the `FireMask` layer, users often want to create a binary fire mask where 1 indicates a fire detection and 0 indicates no fire. The exact values to include in the binary fire mask depend on the confidence level you want to include. For example, you might choose to include only high-confidence fires (raw value 9) or to include both nominal and high-confidence fires (raw values 8 and 9). Low-confidence fires (raw value 7) can be included for a more inclusive mask, but they may also include more false positives. To create the binary fire mask from the process or calculate amadeus functions, we simply add a scale argument to recode the raw values to 1s and 0s based on the confidence levels we want to include. For example, if we want to include both nominal and high-confidence fires, we can use `scale = " %in% c(8, 9)"` to recode raw values 8 and 9 to 1 and all other values to 0.
+
 ```{r fire-grid-template, eval = FALSE}
 fire_grid_dir <- file.path(tempdir(), "modis_workflow", "fire_grid")
+fire_grid_window <- c("2019-01-01", "2019-04-30")
 download_data(
   dataset_name = "modis",
   product = "MOD14A1",
   version = "061",
-  date = "2019-08-15",
+  date = fire_grid_window,
   extent = modis_extent,
   directory_to_save = fire_grid_dir,
   acknowledgement = TRUE
 )
+
 
 fire_grid_files <- list.files(
   fire_grid_dir,
@@ -953,11 +951,6 @@ fire_grid_files <- list.files(
   full.names = TRUE
 )
 
-fire_grid_raster <- process_modis_merge(
-  path = fire_grid_files,
-  date = "2019-08-15",
-  subdataset = process_modis_sds("MOD14A1")
-)
 
 fire_grid_points <- calculate_covariates(
   covariate = "modis",
@@ -966,28 +959,41 @@ fire_grid_points <- calculate_covariates(
   locs_id = "site_id",
   radius = 0,
   preprocess = amadeus::process_modis_merge,
-  subdataset = process_modis_sds("MOD14A1"),
+  subdataset =  process_modis_sds("MOD14A1"),
   name_covariates = "firemask_",
   fun_summary = "mean",
-  geom = "sf"
+  geom = "sf",
+  scale = " %in% c(8, 9)" # use c(7, 8, 9) to include low-confidence fires
 )
 
+# Let's also have a looksy at the processed data 
+
+fire_grid_raster <- process_modis_daily(
+  path = fire_grid_files,
+  date = fire_grid_window,
+  subdataset = process_modis_sds("MOD14A1")
+)
+fire_grid_raster <- fire_grid_raster %in% c(8, 9) # use c(7, 8, 9) to include low-confidence fires
+
 terra::plot(fire_grid_raster, main = "MOD14A1 processed raster")
-plot_histogram_points(fire_grid_points, "MOD14A1 point covariate histogram")
 ```
 
-The monthly climate-modeling grids `MOD14CM1` and `MYD14CM1` use the same merge-and-calculate pattern, but their filenames are monthly. Request a date inside the target month, such as `"2019-08-15"`, and `download_modis()` will automatically request the correct internal version (`005`).
+
 
 ### MAIAC aerosol: `MCD19A2`
 
+MAIAC MCD19A2 provides information on daily atmospheric properties, of which the most helpful are likely aerosol optical depth and smoke plume height. 
+
 ```{r maiac-template, eval = FALSE}
 maiac_dir <- file.path(tempdir(), "modis_workflow", "maiac")
+MAIAC_grid_window <- c("2019-05-01", "2019-06-30")
+maiac_extent <- c(-124.5, 32.5, -114.0, 42.0) # California
 download_data(
   dataset_name = "modis",
   product = "MCD19A2",
   version = "061",
-  date = "2019-08-15",
-  extent = modis_extent,
+  date = MAIAC_grid_window,
+  extent = maiac_extent,
   directory_to_save = maiac_dir,
   acknowledgement = TRUE
 )
@@ -999,10 +1005,11 @@ maiac_files <- list.files(
   full.names = TRUE
 )
 
-maiac_raster <- process_modis_merge(
+maiac_raster <- process_modis_daily(
   path = maiac_files,
-  date = "2019-08-15",
-  subdataset = "Optical_Depth_047"
+  date = MAIAC_grid_window,
+  subdataset = "Optical_Depth_047",
+  scale = "* 0.001"
 )
 
 maiac_points <- calculate_covariates(
@@ -1015,23 +1022,34 @@ maiac_points <- calculate_covariates(
   subdataset = "Optical_Depth_047",
   name_covariates = "aod_047_",
   fun_summary = "mean",
-  geom = "sf"
+  geom = "sf", 
+  scale = "* 0.001"
 )
 
-terra::plot(maiac_raster, main = "MCD19A2 processed raster")
-plot_histogram_points(maiac_points, "MCD19A2 point covariate histogram")
+terra::plot(maiac_raster, main = "MCD19A2 AOD processed raster")
+
+maiac_PH <- process_modis_daily(
+  path = maiac_files,
+  date = MAIAC_grid_window,
+  subdataset = "(Injection_Height)"
+)
+
+terra::plot(maiac_PH, main = "MCD19A2 Plume Injection Height processed raster")
+
 ```
 
 ### Cloud swaths: `MOD06_L2`
 
 ```{r cloud-template, eval = FALSE}
 cloud_dir <- file.path(tempdir(), "modis_workflow", "cloud")
+swath_window <- c("2019-05-01", "2019-05-30")
+swath_extent <- c(-124.5, 32.5, -114.0, 42.0) # California
 download_data(
   dataset_name = "modis",
   product = "MOD06_L2",
   version = "061",
-  date = "2019-08-15",
-  extent = modis_extent,
+  date = swath_window,
+  extent = swath_extent,
   directory_to_save = cloud_dir,
   acknowledgement = TRUE
 )
