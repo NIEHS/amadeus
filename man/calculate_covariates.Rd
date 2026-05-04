@@ -8,7 +8,7 @@ calculate_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
     "dummies", "gmted", "sedac_groads", "groads", "roads", "ecoregions", "ecoregion",
     "hms", "smoke", "gmted", "narr", "geos", "sedac_population", "population", "nlcd",
-    "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "mcd14dl", "prism",
+    "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "mcd14ml", "prism",
     "cropscape", "cdl", "huc", "edgar", "goes", "goes_adp", "GOES", "drought", "spei",
     "eddi", "usdm"),
   from,

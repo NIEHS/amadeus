@@ -57,7 +57,7 @@ process_covariates <-
     covariate = c(
       "modis_swath",
       "modis_merge",
-      "mcd14dl",
+      "mcd14ml",
       "koppen-geiger",
       "blackmarble",
       "koeppen-geiger",
@@ -113,7 +113,7 @@ process_covariates <-
       covariate,
       modis_merge = process_modis_merge,
       modis_swath = process_modis_swath,
-      mcd14dl = process_mcd14dl,
+      mcd14ml = process_mcd14ml,
       blackmarble = process_blackmarble,
       ecoregion = process_ecoregion,
       ecoregions = process_ecoregion,
@@ -633,7 +633,7 @@ process_modis_daily <- function(
 }
 
 
-process_mcd14dl <- function(
+process_mcd14ml <- function(
   path = NULL,
   date = NULL,
   extent = NULL,
@@ -654,7 +654,7 @@ process_mcd14dl <- function(
 
   path <- path[grepl("\\.txt$", path, ignore.case = TRUE)]
   if (length(path) == 0) {
-    stop("No MCD14DL text files were found.\n")
+    stop("No MCD14ML text files were found.\n")
   }
 
   txt_list <- lapply(path, data.table::fread)
@@ -663,7 +663,7 @@ process_mcd14dl <- function(
 
   required_cols <- c("latitude", "longitude", "acq_date")
   if (!all(required_cols %in% names(txt_data))) {
-    stop("MCD14DL input is missing one or more required columns.\n")
+    stop("MCD14ML input is missing one or more required columns.\n")
   }
 
   if (!is.null(date)) {

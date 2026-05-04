@@ -2926,7 +2926,7 @@ download_modis <- function(
     "MCD64A1",
     "MCD64CMQ",
     "MOD06_L2",
-    "MCD14DL",
+    "MCD14ML",
     "MCD19A2",
     "VNP46A2",
     "VNP64A1"
@@ -2977,7 +2977,7 @@ download_modis <- function(
           "MOD06_L2",
           "MOD14CM1",
           "MYD14CM1",
-          "MCD14DL",
+          "MCD14ML",
           "MCD64A1",
           "MCD64CMQ",
           "VNP64A1"
@@ -3022,7 +3022,7 @@ download_modis <- function(
     str_version <- "005"
   } else if (product == "MCD64CMQ") {
     str_version <- "006"
-  } else if (product == "MCD14DL") {
+  } else if (product == "MCD14ML") {
     str_version <- "6.1NRT"
   } else if (product %in% c("VNP46A2", "VNP64A1")) {
     str_version <- NULL
@@ -3033,31 +3033,53 @@ download_modis <- function(
   #### 10. Query CMR
   message("Querying NASA CMR for available granules...\n")
   chr_extent <- paste(extent, collapse = ",")
-  resp <- tryCatch(
-    httr2::request(
-      "https://cmr.earthdata.nasa.gov/search/granules.json"
-    ) |>
-      httr2::req_url_query(
-        short_name = product,
-        version = str_version,
-        temporal = paste(date[1], date[2], sep = ","),
-        bounding_box = chr_extent,
-        page_size = 2000
+  query_granules <- function(short_name, version) {
+    resp <- tryCatch(
+      httr2::request(
+        "https://cmr.earthdata.nasa.gov/search/granules.json"
       ) |>
-      httr2::req_options(connecttimeout = 30L) |>
-      httr2::req_retry(retry_on_failure = TRUE, max_tries = 5L) |>
-      httr2::req_timeout(120) |>
-      httr2::req_perform(),
-    error = function(e) {
-      stop(
-        "Failed to query NASA CMR (cmr.earthdata.nasa.gov). ",
-        "Check network connectivity and NASA EarthData status at ",
-        "https://status.earthdata.nasa.gov. Original error: ",
-        conditionMessage(e)
+        httr2::req_url_query(
+          short_name = short_name,
+          version = version,
+          temporal = paste(date[1], date[2], sep = ","),
+          bounding_box = chr_extent,
+          page_size = 2000
+        ) |>
+        httr2::req_options(connecttimeout = 30L) |>
+        httr2::req_retry(retry_on_failure = TRUE, max_tries = 5L) |>
+        httr2::req_timeout(120) |>
+        httr2::req_perform(),
+      error = function(e) {
+        stop(
+          "Failed to query NASA CMR (cmr.earthdata.nasa.gov). ",
+          "Check network connectivity and NASA EarthData status at ",
+          "https://status.earthdata.nasa.gov. Original error: ",
+          conditionMessage(e)
+        )
+      }
+    )
+    resp |> httr2::resp_body_json()
+  }
+  granules <- query_granules(product, str_version)
+
+  if (
+    product %in% c("MOD14CM1", "MYD14CM1") &&
+      length(granules$feed$entry) == 0
+  ) {
+    product_fallback <- switch(
+      product,
+      MOD14CM1 = "MOD14A2",
+      MYD14CM1 = "MYD14A2"
+    )
+    message(
+      sprintf(
+        "No granules found for %s; retrying with %s (v006).\n",
+        product,
+        product_fallback
       )
-    }
-  )
-  granules <- resp |> httr2::resp_body_json()
+    )
+    granules <- query_granules(product_fallback, "006")
+  }
 
   # Extract product data URLs.
   granule_entries <- granules$feed$entry
@@ -3068,7 +3090,7 @@ download_modis <- function(
       data_links <- Filter(
         function(l) {
           grepl("data#", l$rel) &&
-            if (product == "MCD14DL") {
+            if (product == "MCD14ML") {
               grepl("\\.txt$", l$href, ignore.case = TRUE)
             } else {
               grepl("\\.(hdf|h5)$", l$href, ignore.case = TRUE)

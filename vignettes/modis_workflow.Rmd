@@ -91,12 +91,12 @@ workflow_blackmarble <- function(product) {
   )
 }
 
-workflow_mcd14dl <- function(product) {
+workflow_mcd14ml <- function(product) {
   modis_workflow_path(
     product = product,
-    process_step = "`process_mcd14dl(...)`",
+    process_step = "`process_mcd14ml(...)`",
     calculate_step =
-      "`calculate_covariates(covariate = \"mcd14dl\", ...)`"
+      "`calculate_covariates(covariate = \"mcd14ml\", ...)`"
   )
 }
 
@@ -227,7 +227,7 @@ modis_subdataset_reference <- c(
     "Cloud_Multi_Layer_Flag",
     "Cirrus_Reflectance"
   )),
-  MCD14DL = "N/A (.txt active fire detections)",
+  MCD14ML = "N/A (.txt active fire detections)",
   MCD19A2 = collapse_subdatasets(c(
     "Optical_Depth_047_1",
     "Optical_Depth_047_2",
@@ -307,7 +307,7 @@ modis_reference <- data.frame(
     "MCD64A1", "MCD64CMQ", "VNP64A1",
     "MOD16A2", "MYD16A2",
     "MOD06_L2",
-    "MCD14DL",
+    "MCD14ML",
     "MCD19A2",
     "VNP46A2"
   ),
@@ -478,7 +478,7 @@ modis_reference <- data.frame(
     workflow_merge("MOD16A2"),
     workflow_merge("MYD16A2"),
     workflow_swath("MOD06_L2"),
-    workflow_mcd14dl("MCD14DL"),
+    workflow_mcd14ml("MCD14ML"),
     workflow_merge("MCD19A2"),
     workflow_blackmarble("VNP46A2")
   ),
@@ -490,7 +490,7 @@ modis_reference$subdatasets[is.na(modis_reference$subdatasets)] <-
   "Inspect with terra::describe(path, sds = TRUE)"
 ```
 
-This article demonstrates how MODIS, combined MODIS, and VIIRS-style products move through `amadeus` via `download_data()`, `process_modis_merge()`, `process_modis_swath()`, `process_blackmarble()`, `process_mcd14dl()`, and `calculate_covariates()`. MODIS downloads require a NASA EarthData token.
+This article demonstrates how MODIS, combined MODIS, and VIIRS-style products move through `amadeus` via `download_data()`, `process_modis_merge()`, `process_modis_swath()`, `process_blackmarble()`, `process_mcd14ml()`, and `calculate_covariates()`. MODIS downloads require a NASA EarthData token.
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
@@ -534,10 +534,10 @@ knitr::kable(
 )
 ```
 
-- `version` defaults to `"061"`, but `download_modis()` internally rewrites `MOD06_L2` to `6.1`, `MOD14CM1` / `MYD14CM1` to `005`, `MCD64CMQ` to `006`, `MCD14DL` to `6.1NRT`, and omits the version string for `VNP46A2` and `VNP64A1`.
-- `date` can be a single day or a range. Most products must stay within one calendar year; cross-year ranges are supported for `MOD06_L2`, `MOD14CM1`, `MYD14CM1`, `MCD14DL`, `MCD64A1`, `MCD64CMQ`, and `VNP64A1`.
+- `version` defaults to `"061"`, but `download_modis()` internally rewrites `MOD06_L2` to `6.1`, `MOD14CM1` / `MYD14CM1` to `005`, `MCD64CMQ` to `006`, `MCD14ML` to `6.1NRT`, and omits the version string for `VNP46A2` and `VNP64A1`.
+- `date` can be a single day or a range. Most products must stay within one calendar year; cross-year ranges are supported for `MOD06_L2`, `MOD14CM1`, `MYD14CM1`, `MCD14ML`, `MCD64A1`, `MCD64CMQ`, and `VNP64A1`.
 - `extent` limits the NASA CMR query to a study-area bounding box so only intersecting tiles are downloaded.
-- Downloads are saved as raw `.hdf` or `.h5` granules, except `MCD14DL`, which is saved as `.txt`. The table now includes a subdataset-name column populated from local granule inspection (`terra::rast(path); names(r)`) where available, plus product-specific selector patterns. Use `terra::describe(path, sds = TRUE)` to inspect the complete subdataset list for your exact files and collection version.
+- Downloads are saved as raw `.hdf` or `.h5` granules, except `MCD14ML`, which is saved as `.txt`. The table now includes a subdataset-name column populated from local granule inspection (`terra::rast(path); names(r)`) where available, plus product-specific selector patterns. Use `terra::describe(path, sds = TRUE)` to inspect the complete subdataset list for your exact files and collection version.
 
 
 
@@ -1038,94 +1038,6 @@ terra::plot(maiac_PH, main = "MCD19A2 Plume Injection Height processed raster")
 
 ```
 
-### Cloud swaths: `MOD06_L2`
-
-```{r cloud-template, eval = FALSE}
-cloud_dir <- file.path(tempdir(), "modis_workflow", "cloud")
-swath_window <- c("2019-05-01", "2019-05-30")
-swath_extent <- c(-124.5, 32.5, -114.0, 42.0) # California
-download_data(
-  dataset_name = "modis",
-  product = "MOD06_L2",
-  version = "061",
-  date = swath_window,
-  extent = swath_extent,
-  directory_to_save = cloud_dir,
-  acknowledgement = TRUE
-)
-
-cloud_files <- list.files(
-  cloud_dir,
-  pattern = "\\.hdf$",
-  recursive = TRUE,
-  full.names = TRUE
-)
-
-cloud_raster <- process_modis_swath(
-  path = cloud_files,
-  date = "2019-08-15",
-  subdataset = "Cloud_Fraction",
-  suffix = ":mod06:",
-  resolution = 0.05
-)
-
-cloud_points <- calculate_covariates(
-  covariate = "modis",
-  from = cloud_files,
-  locs = example_points_sf,
-  locs_id = "site_id",
-  radius = 0,
-  preprocess = amadeus::process_modis_swath,
-  subdataset = "Cloud_Fraction",
-  suffix = ":mod06:",
-  resolution = 0.05,
-  name_covariates = "cloud_fraction_",
-  fun_summary = "mean",
-  geom = "sf"
-)
-
-terra::plot(cloud_raster, main = "MOD06_L2 processed raster")
-plot_histogram_points(cloud_points, "MOD06_L2 point covariate histogram")
-```
-
-### Active fire detections: `MCD14DL`
-
-```{r mcd14dl-template, eval = FALSE}
-fire_txt_dir <- file.path(tempdir(), "modis_workflow", "mcd14dl")
-download_data(
-  dataset_name = "modis",
-  product = "MCD14DL",
-  date = "2019-08-15",
-  extent = modis_extent,
-  directory_to_save = fire_txt_dir,
-  acknowledgement = TRUE
-)
-
-fire_txt_files <- list.files(
-  fire_txt_dir,
-  pattern = "\\.txt$",
-  recursive = TRUE,
-  full.names = TRUE
-)
-
-fire_detections <- process_mcd14dl(
-  path = fire_txt_files,
-  date = "2019-08-15",
-  extent = modis_extent
-)
-
-fire_counts <- calculate_covariates(
-  covariate = "mcd14dl",
-  from = fire_detections,
-  locs = example_points_sf,
-  locs_id = "site_id",
-  radius = c(0L, 1000L),
-  geom = "sf"
-)
-
-plot_points(fire_detections, "MCD14DL processed detections")
-plot_histogram_points(fire_counts, "MCD14DL point covariate histogram")
-```
 
 ### Nighttime lights: `VNP46A2`
 
@@ -1170,13 +1082,7 @@ blackmarble_points <- calculate_covariates(
 )
 
 terra::plot(blackmarble_raster, main = "VNP46A2 processed raster")
-plot_histogram_points(blackmarble_points, "VNP46A2 point covariate histogram")
+
+print(blackmarble_points)
 ```
 
-## Notes
-
-- `calculate_covariates(covariate = "modis", ...)` always receives the raw file list in `from =`; the preprocessing helper named in `preprocess =` is what turns those files into a day-specific raster during extraction.
-- `MCD14DL` is the main exception in the MODIS family: it downloads as text, preprocesses with `process_mcd14dl()`, and then extracts with `calculate_covariates(covariate = "mcd14dl", ...)`.
-- Because `process_mcd14dl()` returns detections as points rather than a raster, its template plots the processed detections and a histogram of extracted counts instead of a processed raster.
-- The example dates are intentionally chosen to align with each representative product cadence: daily products use a single day, while non-daily products are handled with short 15-30 day windows so the plotted rasters and extracted point / H3 summaries are averaged over available composites instead of relying on a single sparse date.
-- Apply product-specific scale factors from the NASA product documentation when you move from these templates to analysis-ready covariates. The `MOD11A1` example includes a temperature conversion because that scale is already well established in the package examples.

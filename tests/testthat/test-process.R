@@ -121,7 +121,7 @@ testthat::test_that("process_covariates", {
   testthat::expect_s4_class(bm_proc, "SpatRaster")
 
   withr::with_tempdir({
-    mcd14dl_path <- file.path(".", "MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt")
+    mcd14ml_path <- file.path(".", "MODIS_C6_1_Global_MCD14ML_NRT_2026074.txt")
     data.table::fwrite(
       data.frame(
         latitude = 35.95013,
@@ -130,21 +130,21 @@ testthat::test_that("process_covariates", {
         acq_time = 1230,
         frp = 11.5
       ),
-      mcd14dl_path
+      mcd14ml_path
     )
 
-    mcd14dl_proc <- process_covariates(
-      covariate = "mcd14dl",
-      path = mcd14dl_path,
+    mcd14ml_proc <- process_covariates(
+      covariate = "mcd14ml",
+      path = mcd14ml_path,
       date = "2026-03-15"
     )
-    testthat::expect_s4_class(mcd14dl_proc, "SpatVector")
+    testthat::expect_s4_class(mcd14ml_proc, "SpatVector")
   })
 
   covar_types <- c(
     "modis_swath",
     "modis_merge",
-    "mcd14dl",
+    "mcd14ml",
     "koppen-geiger",
     "blackmarble",
     "koeppen-geiger",

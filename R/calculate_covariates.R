@@ -95,7 +95,7 @@ calculate_covariates <-
       "terraclimate",
       "tri",
       "nei",
-      "mcd14dl",
+      "mcd14ml",
       "prism",
       "cropscape",
       "cdl",
@@ -141,7 +141,7 @@ calculate_covariates <-
       sedac_population = amadeus::calculate_population,
       population = amadeus::calculate_population,
       nei = amadeus::calculate_nei,
-      mcd14dl = amadeus::calculate_modis,
+      mcd14ml = amadeus::calculate_modis,
       tri = amadeus::calculate_tri,
       geos = amadeus::calculate_geos,
       gmted = amadeus::calculate_gmted,
@@ -1411,10 +1411,10 @@ calculate_modis_fire_vector <- function(
   geom
 ) {
   if (!methods::is(from, "SpatVector")) {
-    stop("from should be a SpatVector returned by process_mcd14dl.\n")
+    stop("from should be a SpatVector returned by process_mcd14ml.\n")
   }
   if (!all(c("time", "fire_count", "frp") %in% names(from))) {
-    stop("from is missing required MCD14DL fields.\n")
+    stop("from is missing required MCD14ML fields.\n")
   }
 
   locs_base <- amadeus::calc_prepare_locs(

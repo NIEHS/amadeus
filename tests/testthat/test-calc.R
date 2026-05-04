@@ -39,7 +39,7 @@ testthat::test_that("calculate_covariates (expected errors)", {
       "MERRA2",
       "tri",
       "nei",
-      "mcd14dl",
+      "mcd14ml",
       "edgar",
       "prism",
       "huc",
@@ -129,7 +129,7 @@ testthat::test_that("calculate_covariates (no errors)", {
   })
 
   withr::with_tempdir({
-    mcd14dl_path <- file.path(".", "MODIS_C6_1_Global_MCD14DL_NRT_2026074.txt")
+    mcd14ml_path <- file.path(".", "MODIS_C6_1_Global_MCD14ML_NRT_2026074.txt")
     data.table::fwrite(
       data.frame(
         latitude = 35.95013,
@@ -138,22 +138,22 @@ testthat::test_that("calculate_covariates (no errors)", {
         acq_time = 1230,
         frp = 11.5
       ),
-      mcd14dl_path
+      mcd14ml_path
     )
-    mcd14dl_r <- amadeus:::process_mcd14dl(
-      path = mcd14dl_path,
+    mcd14ml_r <- amadeus:::process_mcd14ml(
+      path = mcd14ml_path,
       date = "2026-03-15"
     )
 
-    mcd14dl_c <- calculate_covariates(
-      covariate = "mcd14dl",
-      from = mcd14dl_r,
+    mcd14ml_c <- calculate_covariates(
+      covariate = "mcd14ml",
+      from = mcd14ml_r,
       locs = ncpt,
       locs_id = "site_id",
       radius = 0
     )
-    testthat::expect_true(is.data.frame(mcd14dl_c))
-    testthat::expect_equal(mcd14dl_c$fire_count_00000, 1)
+    testthat::expect_true(is.data.frame(mcd14ml_c))
+    testthat::expect_equal(mcd14ml_c$fire_count_00000, 1)
   })
 
   withr::with_tempdir({
@@ -228,7 +228,7 @@ testthat::test_that("calculate_covariates (no errors)", {
         locs = locs_sf,
         fun_summary = "sum"
       ),
-      "missing required MCD14DL fields"
+      "missing required MCD14ML fields"
     )
     testthat::expect_error(
       calculate_modis(from = fire_points, locs = list(), fun_summary = "sum"),
@@ -265,7 +265,7 @@ testthat::test_that("calculate_covariates (no errors)", {
       "terraclimate",
       "tri",
       "nei",
-      "mcd14dl",
+      "mcd14ml",
       "edgar"
     )
   for (cand in candidates) {
@@ -928,7 +928,7 @@ testthat::test_that("calc_time honors layer metadata and hour token parsing", {
   out_hour <- calc_time(
     time = c("20240102", "083000"),
     format = "hour",
-    dataset = "mcd14dl",
+    dataset = "mcd14ml",
     layer_name = "layer"
   )
 

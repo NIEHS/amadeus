@@ -10,7 +10,7 @@ download_modis(
     "MYD11B1", "MOD13A1", "MYD13A1", "MOD13A2", "MYD13A2", "MOD13Q1", "MYD13Q1",
     "MOD13A3", "MYD13A3", "MCD12Q1", "MOD14A1", "MYD14A1", "MOD14A2", "MYD14A2",
     "MOD14CM1", "MYD14CM1", "MOD16A2", "MYD16A2", "MCD64A1", "MCD64CMQ", "MOD06_L2",
-    "MCD14DL", "MCD19A2", "VNP46A2", "VNP64A1"),
+    "MCD14ML", "MCD19A2", "VNP46A2", "VNP64A1"),
   version = "061",
   nasa_earth_data_token = NULL,
   date = c("2023-09-01", "2023-09-01"),
