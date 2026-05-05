@@ -4051,7 +4051,8 @@ goes_parse_start_datetime <- function(path) {
 #' The \code{process_improve()} function reads pipe-delimited IMPROVE
 #' (Interagency Monitoring of Protected Visual Environments) measurement
 #' files downloaded by \code{download_improve()} and joins them with a site
-#' metadata file to attach geographic coordinates. Returns a
+#' metadata table to attach geographic coordinates and auxiliary site
+#' attributes. Returns a
 #' \code{SpatVector}, \code{sf}, or \code{data.table} object.
 #' @details
 #' Three product types are supported via \code{product}:
@@ -4073,9 +4074,10 @@ goes_parse_start_datetime <- function(path) {
 #' @param date character(1 or 2). Date (\code{"YYYY-MM-DD"}) or start/end
 #'   date pair to filter measurements. Defaults to no filtering when
 #'   \code{NULL}.
-#' @param sites_file character(1) or \code{NULL}. Path to the site metadata
-#'   file. When \code{NULL} (default), the function looks for a file named
-#'   \code{improve_sites.txt} inside \code{path}.
+#' @param sites_file character(1) or \code{NULL}. Path to a site metadata
+#'   file. When \code{NULL} (default), the function first looks for a file
+#'   named \code{improve_sites.txt} inside \code{path}, then falls back to an
+#'   embedded IMPROVE aerosol site table included in \code{amadeus}.
 #' @param return_format character(1). Return object type: \code{"terra"},
 #'   \code{"sf"}, or \code{"data.table"}.
 #' @param extent numeric(4) or \code{NULL}. Optional crop extent
@@ -4175,7 +4177,7 @@ process_improve <- function(
     }
   }
 
-  #### Resolve site metadata file
+  #### Resolve and read site metadata
   if (is.null(sites_file)) {
     candidate <- file.path(path, "improve_sites.txt")
     if (file.exists(candidate)) {
@@ -4183,7 +4185,6 @@ process_improve <- function(
     }
   }
 
-  #### Merge site coordinates if available
   if (!is.null(sites_file) && file.exists(sites_file)) {
     sites <- data.table::fread(
       sites_file,
@@ -4192,7 +4193,22 @@ process_improve <- function(
       showProgress = FALSE,
       data.table = TRUE
     )
-    #### Keep only coordinate columns needed
+  } else {
+    sites <- process_improve_sites_builtin()
+  }
+
+  #### Deduplicate site table and merge all available metadata columns
+  if ("SiteCode" %in% names(sites)) {
+    if (all(c("DataEndDate", "DataStartDate") %in% names(sites))) {
+      sites[, DataEndDate_sort := as.Date(DataEndDate, format = "%m/%d/%y")]
+      sites[, DataStartDate_sort := as.Date(DataStartDate, format = "%m/%d/%y")]
+      data.table::setorder(sites, SiteCode, -DataEndDate_sort, -DataStartDate_sort)
+      sites <- sites[!duplicated(SiteCode)]
+      sites[, c("DataEndDate_sort", "DataStartDate_sort") := NULL]
+    } else {
+      sites <- sites[!duplicated(SiteCode)]
+    }
+
     coord_cols <- c("SiteCode", "Latitude", "Longitude")
     coord_cols_present <- coord_cols[coord_cols %in% names(sites)]
     if (length(coord_cols_present) < 3) {
@@ -4201,9 +4217,24 @@ process_improve <- function(
         call. = FALSE
       )
     } else {
-      sites_sub <- sites[, coord_cols_present, with = FALSE]
-      meas <- merge(meas, sites_sub, by = "SiteCode", all.x = TRUE)
+      meas <- merge(meas, sites, by = "SiteCode", all.x = TRUE)
     }
+  }
+
+  #### Enforce numeric coordinate columns when present
+  if ("Latitude" %in% names(meas)) {
+    data.table::set(
+      meas,
+      j = "Latitude",
+      value = suppressWarnings(as.numeric(meas[["Latitude"]]))
+    )
+  }
+  if ("Longitude" %in% names(meas)) {
+    data.table::set(
+      meas,
+      j = "Longitude",
+      value = suppressWarnings(as.numeric(meas[["Longitude"]]))
+    )
   }
 
   #### Return early as data.table if requested or no coordinates

@@ -7,6 +7,18 @@ improve_path <- testthat::test_path("..", "testdata", "improve")
 ################################################################################
 ##### process_improve
 
+testthat::test_that("process_improve_sites_builtin returns expected metadata table", {
+  withr::local_package("data.table")
+  sites <- process_improve_sites_builtin()
+
+  testthat::expect_s3_class(sites, "data.table")
+  testthat::expect_true(nrow(sites) > 200L)
+  testthat::expect_true(all(c("SiteCode", "Latitude", "Longitude", "ProgramKey") %in% names(sites)))
+  testthat::expect_equal(sum(duplicated(sites$SiteCode)), 0L)
+  testthat::expect_true("IMPROVE" %in% unique(stats::na.omit(sites$ProgramKey)))
+  testthat::expect_true(all(c("ACAD1", "BIBE1", "YOSE1") %in% sites$SiteCode))
+})
+
 testthat::test_that("process_improve raw returns data.table", {
   withr::local_package("data.table")
   result <- process_improve(
@@ -224,26 +236,29 @@ testthat::test_that("process_improve warns when sites file missing coords", {
   testthat::expect_s3_class(result, "data.table")
 })
 
-testthat::test_that("process_improve warns when no coords and format != data.table", {
+testthat::test_that("process_improve uses embedded metadata when sites file missing", {
   withr::local_package("data.table")
+  withr::local_package("terra")
   tmp <- withr::local_tempdir()
-  # measurement file without sites (so no coords)
+  # measurement file without local sites file should still gain coords
   file.copy(
     file.path(improve_path, "IMPAER_2022.txt"),
     file.path(tmp, "IMPAER_2022.txt")
   )
-  testthat::expect_warning(
-    result <- process_improve(
-      path = tmp,
-      product = "raw",
-      return_format = "terra"
-    ),
-    regexp = "No site coordinates"
+  result <- process_improve(
+    path = tmp,
+    product = "raw",
+    return_format = "terra"
   )
-  testthat::expect_s3_class(result, "data.table")
+  testthat::expect_s4_class(result, "SpatVector")
+  testthat::expect_true(terra::nrow(result) > 0L)
 })
 
 testthat::test_that("download_improve deprecated params warn", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
+    .package = "amadeus"
+  )
   testthat::expect_warning(
     tryCatch(
       download_improve(
@@ -276,13 +291,11 @@ testthat::test_that("download_improve returns early when files present", {
   tmp <- withr::local_tempdir()
   # pre-create the expected file so check_destfile returns FALSE
   writeLines("x", file.path(tmp, "IMPAER_2022.txt"))
-  writeLines("x", file.path(tmp, "improve_sites.txt"))
   result <- download_improve(
     year = 2022,
     product = "raw",
     directory_to_save = tmp,
-    acknowledgement = TRUE,
-    include_sites = TRUE
+    acknowledgement = TRUE
   )
   testthat::expect_true(is.list(result) || is.null(result))
 })
@@ -307,7 +320,6 @@ testthat::test_that("process_improve single-date string expands correctly", {
 testthat::test_that("download_improve returns hash when files present and hash=TRUE", {
   tmp <- withr::local_tempdir()
   writeLines("x", file.path(tmp, "IMPAER_2022.txt"))
-  writeLines("x", file.path(tmp, "improve_sites.txt"))
   testthat::local_mocked_bindings(
     download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
     .package = "amadeus"
@@ -317,23 +329,9 @@ testthat::test_that("download_improve returns hash when files present and hash=T
     product = "raw",
     directory_to_save = tmp,
     acknowledgement = TRUE,
-    include_sites = TRUE,
     hash = TRUE
   )
   testthat::expect_equal(result, "fakehash")
-})
-
-testthat::test_that("download_improve include_sites=FALSE skips sites file", {
-  tmp <- withr::local_tempdir()
-  writeLines("x", file.path(tmp, "IMPAER_2022.txt"))
-  result <- download_improve(
-    year = 2022,
-    product = "raw",
-    directory_to_save = tmp,
-    acknowledgement = TRUE,
-    include_sites = FALSE
-  )
-  testthat::expect_true(is.list(result) || is.null(result))
 })
 
 testthat::test_that("download_improve hash=TRUE returns hash after download", {
@@ -355,8 +353,12 @@ testthat::test_that("download_improve hash=TRUE returns hash after download", {
 })
 
 testthat::test_that("download_improve hash=FALSE returns download_result", {
+  captured <- NULL
   testthat::local_mocked_bindings(
-    download_run_method = function(...) list(success = 1, failed = 0, skipped = 0),
+    download_run_method = function(urls, destfiles, ...) {
+      captured <<- list(urls = urls, destfiles = destfiles)
+      list(success = 1, failed = 0, skipped = 0)
+    },
     .package = "amadeus"
   )
   withr::with_tempdir({
@@ -369,5 +371,10 @@ testthat::test_that("download_improve hash=FALSE returns download_result", {
     )
     testthat::expect_type(result, "list")
     testthat::expect_equal(result$success, 1)
+    testthat::expect_true(grepl(
+      "^https://vibe\\.cira\\.colostate\\.edu/data/export/IMPAER/IMPAER_2022\\.txt\\.zip$",
+      captured$urls[1]
+    ))
+    testthat::expect_true(grepl("IMPAER_2022\\.txt\\.zip$", captured$destfiles[1]))
   })
 })

@@ -21,8 +21,8 @@ navbar:
         - text: Downloading EPA Daily Data
           href: articles/epa_download.html
         - text: Dataset Workflows
-        - text: US EPA Air Quality System (AQS)
-          href: articles/aqs_workflow.html
+        - text: Particulate Matter (PM) Networks (AQS + IMPROVE)
+          href: articles/pm_data_workflow.html
         - text: USDA CropScape
           href: articles/cropscape_workflow.html
         - text: EDGAR Emissions
@@ -122,8 +122,8 @@ articles:
   - download_functions
   - calculate_time_grouping
   - protected_datasets
-  - epa_download
-  - aqs_workflow
+  - pm_data_download
+  - pm_data_workflow
   - cropscape_workflow
   - edgar_workflow
   - ecoregion_workflow

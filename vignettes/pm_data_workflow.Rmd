@@ -1,0 +1,305 @@
+---
+title: "Particulate Matter (PM) data network workflows"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Particulate Matter (PM) data network workflows}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "`r Sys.Date()`"
+author: "Kyle Messier, with assistance from GitHub Copilot"
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ""
+)
+library(amadeus)
+
+live_run <- local({
+  force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
+  on_ci <- nzchar(Sys.getenv("CI")) ||
+    nzchar(Sys.getenv("GITHUB_ACTIONS")) ||
+    identical(tolower(Sys.getenv("IN_PKGDOWN", "")), "true")
+  on_cran <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")) ||
+    identical(tolower(Sys.getenv("NOT_CRAN", "")), "false")
+  force || !(on_ci || on_cran)
+})
+
+aqs_parameters <- data.frame(
+  pollutant = c("PM2.5","PM2.5-NonFRM", "NO2"),
+  parameter_code = c(88101, 88502, 42602)
+)
+
+improve_parameters <- data.frame(
+  pollutant = c("PM2.5"),
+  product = "raw",
+  parameter_code = "MF"
+)
+
+aqs_date_window <- c("2022-01-01", "2022-03-31")
+improve_date_window <- c("2022-01-01", "2022-03-31")
+
+```
+
+This article demonstrates compact PM monitoring workflows for AQS and IMPROVE. Because these measurements are typically used as outcome data, the example uses `download_aqs()` / `process_aqs()` and `download_improve()` / `process_improve()` directly rather than routing through `calculate_covariates()`.
+
+This vignette runs its live workflow when rendered locally. The download, processing, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
+
+## Available inputs and data availability
+
+`download_aqs()` and `download_improve()` expose the key availability choices for PM network downloads:
+
+- `parameter_code` selects the EPA pollutant parameter. Common examples documented in `amadeus` include PM2.5 (`88101` and `88502`), PM10 (`81102`), ozone (`44201`), NO2 (`42602`), SO2 (`42401`), and CO (`42101`).
+- `resolution_temporal` currently supports only `"daily"`, so the downloadable files are daily monitor observations rather than hourly or annual summaries.
+- `year` accepts a single year or a start/end pair, downloading one pre-generated EPA archive per year requested.
+- AQS downloads arrive as zipped annual files and can be unzipped automatically with `unzip = TRUE`; the workflow then reads the extracted daily CSV files.
+- IMPROVE supports `product = "raw"`, `"rhr2"`, or `"rhr3"`; this workflow uses `"raw"` and filters to `ParamCode == "FPM"` (fine particulate mass, PM2.5 indicator).
+- Neither AQS nor IMPROVE requires authentication, and both are intended for outcome modeling workflows.
+
+## AQS parameters used in this example
+
+```{r parameter-table}
+aqs_parameters
+```
+
+## IMPROVE parameters used in this example
+
+```{r improve-parameter-table}
+improve_parameters
+```
+
+## Download PM2.5 and NO2 daily AQS data
+
+```{r download, eval = live_run}
+aqs_dir <- file.path(tempdir(), "aqs_workflow")
+
+for (i in seq_len(nrow(aqs_parameters))) {
+  download_aqs(
+    parameter_code = aqs_parameters$parameter_code[i],
+    resolution_temporal = "daily",
+    year = 2022,
+    directory_to_save = aqs_dir,
+    acknowledgement = TRUE,
+    unzip = TRUE,
+    remove_zip = FALSE
+  )
+}
+```
+
+## Process PM2.5 and NO2 with `process_aqs()`
+
+```{r process, eval = live_run}
+aqs_processed <- lapply(seq_len(nrow(aqs_parameters)), function(i) {
+  csv_path <- file.path(
+    aqs_dir,
+    "data_files",
+    sprintf("daily_%s_2022.csv", aqs_parameters$parameter_code[i])
+  )
+
+  locations <- process_aqs(
+    path = csv_path,
+    date = aqs_date_window,
+    mode = "location",
+    return_format = "sf"
+  )
+  locations$pollutant <- aqs_parameters$pollutant[i]
+
+  daily_data <- process_aqs(
+    path = csv_path,
+    date = aqs_date_window,
+    mode = "available-data",
+    return_format = "data.table"
+  )
+  daily_data[, pollutant := aqs_parameters$pollutant[i]]
+
+  list(
+    locations = locations,
+    daily = daily_data
+  )
+})
+```
+
+## Plot monitor locations with facets for PM2.5 and NO2
+
+```{r prepare-plot-data, eval = live_run}
+aqs_locations <- do.call(
+  rbind,
+  lapply(aqs_processed, `[[`, "locations")
+)
+
+aqs_time_series <- data.table::rbindlist(
+  lapply(aqs_processed, `[[`, "daily"),
+  fill = TRUE
+)
+```
+
+```{r plot-locations, eval = live_run, fig.width = 7, fig.height = 8, out.width = "100%", fig.alt = "Faceted map of AQS monitor locations for PM2.5 and NO2."}
+ggplot2::ggplot() +
+  ggplot2::geom_sf(data = aqs_locations, color = "#0072B2", size = 0.8, alpha = 0.8) +
+  ggplot2::facet_wrap(~ pollutant, ncol = 2) +
+  ggplot2::coord_sf(datum = NA) +
+  ggplot2::labs(
+    title = "AQS monitor locations for PM2.5 and NO2",
+    subtitle = paste(aqs_date_window[1], "to", aqs_date_window[2]),
+    x = NULL,
+    y = NULL
+  ) +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(
+    panel.spacing = grid::unit(1, "lines")
+  )
+```
+
+## Show an example time series of the downloaded AQS data
+
+```{r process-time-series, eval = live_run}
+aqs_time_series[, time := as.Date(time)]
+
+example_sites <- aqs_time_series[
+  ,
+  .N,
+  by = .(pollutant, site_id)
+][
+  order(pollutant, -N, site_id)
+][
+  ,
+  .SD[1],
+  by = pollutant
+]
+
+aqs_time_series <- merge(
+  aqs_time_series,
+  example_sites[, .(pollutant, site_id)],
+  by = c("pollutant", "site_id")
+)
+```
+
+```{r plot-time-series, eval = live_run, fig.width = 7, fig.height = 7.5, out.width = "100%", fig.alt = "Example daily AQS time series for one PM2.5 site and one NO2 site."}
+ggplot2::ggplot(
+  aqs_time_series,
+  ggplot2::aes(x = time, y = Arithmetic.Mean, group = site_id)
+) +
+  ggplot2::geom_line(color = "#D55E00", linewidth = 0.5) +
+  ggplot2::geom_point(color = "#D55E00", size = 0.8) +
+  ggplot2::facet_wrap(~ pollutant, scales = "free_y", ncol = 2) +
+  ggplot2::scale_x_date(
+    date_breaks = "2 weeks",
+    date_labels = "%b %d"
+  ) +
+  ggplot2::labs(
+    title = "Example AQS daily time series",
+    subtitle = "One site per pollutant, chosen from monitors with available observations in this date window",
+    x = "Date",
+    y = "Arithmetic mean"
+  ) +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(
+    panel.spacing = grid::unit(1, "lines"),
+    axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)
+  )
+```
+
+## Download IMPROVE daily PM2.5 data (`FPM`, raw product)
+
+```{r download-improve, eval = live_run}
+improve_dir <- file.path(tempdir(), "improve_workflow")
+
+download_improve(
+  year = 2022,
+  product = improve_parameters$product[1],
+  directory_to_save = improve_dir,
+  acknowledgement = TRUE
+)
+```
+
+## Process IMPROVE PM2.5 with `process_improve()`
+
+```{r process-improve, eval = live_run}
+improve_all <- process_improve(
+  path = improve_dir,
+  product = improve_parameters$product[1],
+  date = improve_date_window,
+  return_format = "data.table"
+)
+
+improve_pm25 <- improve_all[
+  ParamCode == improve_parameters$parameter_code[1] & Status == "V0"
+]
+
+improve_locations_raw <- process_improve(
+  path = improve_dir,
+  product = improve_parameters$product[1],
+  date = improve_date_window,
+  return_format = "sf"
+)
+
+improve_locations <- unique(
+  improve_locations_raw[
+    improve_locations_raw$ParamCode == improve_parameters$parameter_code[1] &
+      improve_locations_raw$Status == "V0",
+  ][, c("SiteCode", "ParamCode", "Status")]
+)
+```
+
+## Plot IMPROVE monitor locations
+
+```{r plot-improve-locations, eval = live_run, fig.width = 7, fig.height = 5.5, out.width = "100%", fig.alt = "Map of IMPROVE PM2.5 (FPM) monitor locations."}
+ggplot2::ggplot() +
+  ggplot2::geom_sf(data = improve_locations, color = "#009E73", size = 1, alpha = 0.8) +
+  ggplot2::coord_sf(datum = NA) +
+  ggplot2::labs(
+    title = "IMPROVE PM2.5 (FPM) monitor locations",
+    subtitle = paste(improve_date_window[1], "to", improve_date_window[2]),
+    x = NULL,
+    y = NULL
+  ) +
+  ggplot2::theme_minimal()
+```
+
+## Show an example IMPROVE PM2.5 time series
+
+```{r process-improve-time-series, eval = live_run}
+improve_pm25[, FactDate := as.Date(FactDate)]
+
+example_improve_site <- improve_pm25[
+  ,
+  .N,
+  by = SiteCode
+][
+  order(-N, SiteCode)
+][1, SiteCode]
+
+improve_example_ts <- improve_pm25[SiteCode == example_improve_site]
+```
+
+```{r plot-improve-time-series, eval = live_run, fig.width = 7, fig.height = 4.5, out.width = "100%", fig.alt = "Example IMPROVE PM2.5 time series for one site."}
+ggplot2::ggplot(
+  improve_example_ts,
+  ggplot2::aes(x = FactDate, y = FactValue, group = SiteCode)
+) +
+  ggplot2::geom_line(color = "#0072B2", linewidth = 0.5) +
+  ggplot2::geom_point(color = "#0072B2", size = 0.8) +
+  ggplot2::scale_x_date(
+    date_breaks = "2 weeks",
+    date_labels = "%b %d"
+  ) +
+  ggplot2::labs(
+    title = "Example IMPROVE PM2.5 (FPM) time series",
+    subtitle = paste("Site:", example_improve_site),
+    x = "Date",
+    y = "PM2.5 mass concentration (ug/m^3)"
+  ) +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(
+    axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)
+  )
+```
+
+## Notes
+
+- This workflow treats both AQS and IMPROVE as outcome data and uses direct download/process functions for each network.
+- The explicit AQS pollutant parameters shown are PM2.5 (`88101`, `88502`) and NO2 (`42602`).
+- The IMPROVE example uses `product = "raw"` and `ParamCode = "FPM"` as a PM2.5 indicator with valid records (`Status == "V0"`).
+- `process_aqs(mode = "location")` is useful for monitor maps, while `process_aqs(mode = "available-data")` is useful for daily observational summaries such as time series.
+- `process_improve()` supports `"raw"`, `"rhr2"`, and `"rhr3"` products; IMPROVE sampling is every third day, so gaps are expected in the time series.

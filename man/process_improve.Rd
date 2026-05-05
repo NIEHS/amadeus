@@ -25,9 +25,10 @@ process_improve(
 date pair to filter measurements. Defaults to no filtering when
 \code{NULL}.}
 
-\item{sites_file}{character(1) or \code{NULL}. Path to the site metadata
-file. When \code{NULL} (default), the function looks for a file named
-\code{improve_sites.txt} inside \code{path}.}
+\item{sites_file}{character(1) or \code{NULL}. Path to a site metadata
+file. When \code{NULL} (default), the function first looks for a file
+named \code{improve_sites.txt} inside \code{path}, then falls back to an
+embedded IMPROVE aerosol site table included in \code{amadeus}.}
 
 \item{return_format}{character(1). Return object type: \code{"terra"},
 \code{"sf"}, or \code{"data.table"}.}
@@ -46,7 +47,8 @@ depending on \code{return_format}.
 The \code{process_improve()} function reads pipe-delimited IMPROVE
 (Interagency Monitoring of Protected Visual Environments) measurement
 files downloaded by \code{download_improve()} and joins them with a site
-metadata file to attach geographic coordinates. Returns a
+metadata table to attach geographic coordinates and auxiliary site
+attributes. Returns a
 \code{SpatVector}, \code{sf}, or \code{data.table} object.
 }
 \details{

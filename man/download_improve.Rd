@@ -7,12 +7,11 @@
 download_improve(
   year = c(2018, 2022),
   product = c("raw", "rhr2", "rhr3"),
-  url_improve = "https://views.cira.colostate.edu/fed/DataExport/",
+  url_improve = "https://vibe.cira.colostate.edu/data/export/",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
   remove_command = FALSE,
-  include_sites = TRUE,
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
@@ -26,7 +25,7 @@ download_improve(
 \code{"raw"} (aerosol, default), \code{"rhr2"} (Regional Haze Rule II),
 or \code{"rhr3"} (Regional Haze Rule III).}
 
-\item{url_improve}{character(1). Base URL to the IMPROVE VIEWS data export
+\item{url_improve}{character(1). Base URL to the IMPROVE data export
 service.}
 
 \item{directory_to_save}{character(1). Directory to save downloaded files.}
@@ -36,10 +35,6 @@ service.}
 \item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
 
 \item{remove_command}{logical(1). Deprecated, ignored.}
-
-\item{include_sites}{logical(1). Download the site metadata file
-(\code{improve_sites.txt}) alongside measurement files (default
-\code{TRUE}).}
 
 \item{show_progress}{logical(1). Show download progress (default
 \code{TRUE}).}
@@ -58,9 +53,10 @@ invisible list with download results; or hash character if
 \description{
 The \code{download_improve()} function accesses and downloads IMPROVE
 (Interagency Monitoring of Protected Visual Environments) data files
-from the VIEWS (Visibility Information Exchange Web System) data export
-service hosted at CIRA/CSU. Files are pipe-delimited text files
-containing aerosol measurements at federal-land monitoring stations.
+from the VIEWS/VIBE data export service hosted at CIRA/CSU. Annual files
+are downloaded as \code{.txt.zip} archives and extracted to
+pipe-delimited \code{.txt} files containing aerosol measurements at
+federal-land monitoring stations.
 }
 \note{
 \itemize{
@@ -69,8 +65,8 @@ containing aerosol measurements at federal-land monitoring stations.
 \code{"raw"} (IMPAER — speciated aerosol mass concentrations),
 \code{"rhr2"} (IMPRHR2 — Regional Haze Rule II light extinction),
 \code{"rhr3"} (IMPRHR3 — Regional Haze Rule III deciview index).
-\item Annual site-metadata is downloaded alongside measurement files
-when \code{include_sites = TRUE} (default).
+\item Site metadata is handled by \code{\link{process_improve}} using an
+embedded table; annual downloads include measurement files only.
 \item IMPROVE monitors ~\eqn{1 \mu g / m^3} precision instruments
 deployed at Class I and other federal land areas.
 }

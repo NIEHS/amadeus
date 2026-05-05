@@ -5157,9 +5157,10 @@ download_goes <- function(
 #' @description
 #' The \code{download_improve()} function accesses and downloads IMPROVE
 #' (Interagency Monitoring of Protected Visual Environments) data files
-#' from the VIEWS (Visibility Information Exchange Web System) data export
-#' service hosted at CIRA/CSU. Files are pipe-delimited text files
-#' containing aerosol measurements at federal-land monitoring stations.
+#' from the VIEWS/VIBE data export service hosted at CIRA/CSU. Annual files
+#' are downloaded as \code{.txt.zip} archives and extracted to
+#' pipe-delimited \code{.txt} files containing aerosol measurements at
+#' federal-land monitoring stations.
 #' @note
 #' \itemize{
 #'   \item IMPROVE data does not require authentication.
@@ -5167,8 +5168,8 @@ download_goes <- function(
 #'     \code{"raw"} (IMPAER — speciated aerosol mass concentrations),
 #'     \code{"rhr2"} (IMPRHR2 — Regional Haze Rule II light extinction),
 #'     \code{"rhr3"} (IMPRHR3 — Regional Haze Rule III deciview index).
-#'   \item Annual site-metadata is downloaded alongside measurement files
-#'     when \code{include_sites = TRUE} (default).
+#'   \item Site metadata is handled by \code{\link{process_improve}} using an
+#'     embedded table; annual downloads include measurement files only.
 #'   \item IMPROVE monitors ~\eqn{1 \mu g / m^3} precision instruments
 #'     deployed at Class I and other federal land areas.
 #' }
@@ -5176,15 +5177,12 @@ download_goes <- function(
 #' @param product character(1). Product selector:
 #'   \code{"raw"} (aerosol, default), \code{"rhr2"} (Regional Haze Rule II),
 #'   or \code{"rhr3"} (Regional Haze Rule III).
-#' @param url_improve character(1). Base URL to the IMPROVE VIEWS data export
+#' @param url_improve character(1). Base URL to the IMPROVE data export
 #'   service.
 #' @param directory_to_save character(1). Directory to save downloaded files.
 #' @param acknowledgement logical(1). Must be \code{TRUE} to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
 #' @param remove_command logical(1). Deprecated, ignored.
-#' @param include_sites logical(1). Download the site metadata file
-#'   (\code{improve_sites.txt}) alongside measurement files (default
-#'   \code{TRUE}).
 #' @param show_progress logical(1). Show download progress (default
 #'   \code{TRUE}).
 #' @param hash logical(1). Return hash of downloaded files (default
@@ -5211,12 +5209,11 @@ download_goes <- function(
 download_improve <- function(
   year = c(2018, 2022),
   product = c("raw", "rhr2", "rhr3"),
-  url_improve = "https://views.cira.colostate.edu/fed/DataExport/",
+  url_improve = "https://vibe.cira.colostate.edu/data/export/",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
   remove_command = FALSE,
-  include_sites = TRUE,
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
@@ -5265,8 +5262,9 @@ download_improve <- function(
   #### Build download URLs and destination paths
   # nolint start
   download_urls <- sprintf(
-    "%s%s_%d.txt",
+    "%s%s/%s_%d.txt.zip",
     url_improve,
+    file_prefix,
     file_prefix,
     year_sequence
   )
@@ -5277,16 +5275,6 @@ download_improve <- function(
     file_prefix,
     year_sequence
   )
-
-  #### Optionally add site metadata file
-  if (isTRUE(include_sites)) {
-    # nolint start
-    sites_url <- paste0(url_improve, "improve_sites.txt")
-    # nolint end
-    sites_dest <- paste0(directory_to_save, "improve_sites.txt")
-    download_urls <- c(download_urls, sites_url)
-    download_names <- c(download_names, sites_dest)
-  }
 
   #### Filter to files that need downloading
   needs_dl <- vapply(download_names, amadeus::check_destfile, logical(1))
@@ -5306,14 +5294,33 @@ download_improve <- function(
   }
 
   #### Download files
+  zip_destfiles <- sprintf("%s.zip", download_names)
+  zip_destfiles <- sub("\\.txt\\.zip$", ".txt.zip", zip_destfiles)
+
   download_result <- amadeus::download_run_method(
     urls = download_urls,
-    destfiles = download_names,
+    destfiles = zip_destfiles,
     token = NULL,
     show_progress = show_progress,
     max_tries = max_tries,
     rate_limit = rate_limit
   )
+
+  #### Extract annual IMPROVE zip files to text files
+  zip_targets <- zip_destfiles[grepl("\\.txt\\.zip$", zip_destfiles)]
+  if (length(zip_targets) > 0) {
+    for (zip_file in zip_targets) {
+      if (!file.exists(zip_file)) {
+        next
+      }
+      utils::unzip(
+        zipfile = zip_file,
+        exdir = directory_to_save,
+        overwrite = TRUE
+      )
+      file.remove(zip_file)
+    }
+  }
 
   if (hash) {
     return(amadeus::download_hash(hash = TRUE, directory_to_save))
