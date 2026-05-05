@@ -352,18 +352,10 @@ polygon_values <- calculate_covariates(
 )
 ```
 
-## Visualize the point and polygon outputs
+## Visualize the point outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
 plot_points(point_values, paste0("EDGAR Emissions", ": point extraction"))
 ```
 
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("EDGAR Emissions", ": Durham H3 polygons"))
-```
 
-
-## Notes
-
-- This example requests two species (`CO` and `NOx`) to exercise multi-file EDGAR downloads.
-- Geometry-returning EDGAR extractions work cleanly for both points and polygons.
