@@ -649,6 +649,11 @@ calculate_nlcd <- function(
 #' @seealso [`process_ecoregion`]
 #' @return a data.frame or SpatVector object object with dummy variables and
 #' attributes of:
+#'   - Indicator names are controlled by `colnames`: `"coded"` (default)
+#'   creates key-based names such as `DUM_E2083_0_00000` and
+#'   `DUM_E3064_0_00000`; `"full_ecoregion"` creates sanitized name-based
+#'   columns such as `DUM_E2_SOUTHEASTERN_USA_PLAINS_0_00000` and
+#'   `DUM_E3_NORTHERN_PIEDMONT_0_00000` (duplicates are suffixed, e.g. `_1`).
 #'   - `attr(., "ecoregion2_code")`: Ecoregion lv.2 code and key
 #'   - `attr(., "ecoregion3_code")`: Ecoregion lv.3 code and key
 #' @author Insang Song

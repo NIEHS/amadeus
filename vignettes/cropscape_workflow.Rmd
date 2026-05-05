@@ -375,12 +375,15 @@ processing_extent <- terra::ext(points_projected)
 processed_data <- process_covariates(
   covariate = "cropscape",
   path = cropscape_path,
-  year = 2020,
-  extent = processing_extent
+  year = 2020
 )
+plot(processed_data, main = "Processed CropScape raster")
+
 ```
 
 ## Calculate covariates at points
+
+Note that if no radius is specified, the point extraction will return the value of the raster cell containing each point. In this case, the output columns are binary indicators of whether each CropScape class is present at that location. With a radius specified, the output columns are a fraction of each class within the circular buffer around each point, so values can range from 0 to 1 and multiple classes can be present at the same location with varying proportions.
 
 ```{r calculate-points, eval = live_run}
 point_values <- calculate_covariates(
@@ -391,36 +394,18 @@ point_values <- calculate_covariates(
   radius = 0,
   geom = "sf"
 )
-```
 
-## Calculate covariates across Durham County H3 hexagons
+print(point_values)
 
-```{r calculate-polygons, eval = live_run}
-polygon_values <- calculate_covariates(
+point_proportion_100m <- calculate_covariates(
   covariate = "cropscape",
   from = processed_data,
-  locs = durham_hex,
-  locs_id = "h3_id",
-  radius = 0,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 100,
   geom = "sf"
 )
+
+print(point_proportion_100m)
 ```
 
-## Visualize the point and polygon outputs
-
-```{r plot-points, eval = live_run, fig.width = 10, fig.height = 8, fig.alt = "Faceted point maps showing fractional CropScape class values for a few common classes."}
-plot_points(point_values, paste0("USDA CropScape", ": point extraction"))
-```
-
-```{r plot-polygons, eval = live_run, fig.width = 10, fig.height = 8, fig.alt = "Faceted polygon maps showing fractional CropScape class values across Durham County H3 hexagons for a few common classes."}
-plot_polygons(polygon_values, paste0("USDA CropScape", ": Durham H3 polygons"))
-```
-
-## Notes
-
-- The download section demonstrates both GMU and USDA CropScape sources so local runs cover more than one source configuration.
-- CropScape uses categorical raster classes, so polygon summaries are best interpreted as class composition rather than a continuous surface.
-- This workflow processes the USDA raster example and crops it using the
-  projected bounding extent of the example points before processing.
-- The example points are limited to Triangle-region AQS sites so the crop window
-  stays compact and live vignette runs remain reasonably fast.

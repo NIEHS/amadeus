@@ -847,7 +847,7 @@ vegetation_files <- list.files(
   full.names = TRUE
 )
 
-For MODIS data, it is faster to do the process and calculate in one step with calculate_covariates and provide the process as the preprocess function.
+# For MODIS data, it is faster to do the process and calculate in one step with calculate_covariates and provide the process as the preprocess function.
 
 evi_points_monthly <- calculate_covariates(
   covariate = "modis",
@@ -966,7 +966,7 @@ fire_grid_points <- calculate_covariates(
   scale = " %in% c(8, 9)" # use c(7, 8, 9) to include low-confidence fires
 )
 
-# Let's also have a looksy at the processed data 
+# Let's also have a look at the processed data 
 
 fire_grid_raster <- process_modis_daily(
   path = fire_grid_files,

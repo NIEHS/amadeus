@@ -79,9 +79,18 @@ processed_data <- process_covariates(
   covariate = "ecoregion",
   path = ecoregion_path
 )
+plot(processed_data, main = "Level 3 Ecoregions of the Conterminous United States")
 ```
 
 ## Calculate covariates at points
+
+`calculate_ecoregion()` returns binary (dummy) indicator columns for the
+intersecting level-2 and level-3 ecoregions at each location. By default
+(`colnames = "coded"`), those indicators use key-based names (for example
+`DUM_E2083_0_00000`, `DUM_E3064_0_00000`). If you set
+`colnames = "full_ecoregion"`, indicators use sanitized full names (for
+example `DUM_E2_SOUTHEASTERN_USA_PLAINS_0_00000`), with duplicate names
+automatically disambiguated by suffixes like `_1`.
 
 ```{r calculate-points, eval = live_run}
 point_values <- calculate_ecoregion(
