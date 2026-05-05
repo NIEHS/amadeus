@@ -122,8 +122,9 @@ articles:
   - download_functions
   - calculate_time_grouping
   - protected_datasets
-  - pm_data_download
+  - epa_download
   - pm_data_workflow
+  - aqs_workflow
   - cropscape_workflow
   - edgar_workflow
   - ecoregion_workflow

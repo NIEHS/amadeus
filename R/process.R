@@ -4194,19 +4194,36 @@ process_improve <- function(
       data.table = TRUE
     )
   } else {
-    sites <- process_improve_sites_builtin()
+    sites <- process_improve_sites_builtin() # nolint: object_usage_linter.
   }
 
   #### Deduplicate site table and merge all available metadata columns
   if ("SiteCode" %in% names(sites)) {
+    sites <- data.table::as.data.table(sites)
     if (all(c("DataEndDate", "DataStartDate") %in% names(sites))) {
-      sites[, DataEndDate_sort := as.Date(DataEndDate, format = "%m/%d/%y")]
-      sites[, DataStartDate_sort := as.Date(DataStartDate, format = "%m/%d/%y")]
-      data.table::setorder(sites, SiteCode, -DataEndDate_sort, -DataStartDate_sort)
-      sites <- sites[!duplicated(SiteCode)]
-      sites[, c("DataEndDate_sort", "DataStartDate_sort") := NULL]
+      data.table::set(
+        sites,
+        j = "DataEndDate_sort",
+        value = as.Date(sites[["DataEndDate"]], format = "%m/%d/%y")
+      )
+      data.table::set(
+        sites,
+        j = "DataStartDate_sort",
+        value = as.Date(sites[["DataStartDate"]], format = "%m/%d/%y")
+      )
+      ord <- order(
+        sites[["SiteCode"]],
+        sites[["DataEndDate_sort"]],
+        sites[["DataStartDate_sort"]],
+        decreasing = c(FALSE, TRUE, TRUE),
+        na.last = TRUE
+      )
+      sites <- sites[ord]
+      sites <- sites[!duplicated(sites[["SiteCode"]])]
+      data.table::set(sites, j = "DataEndDate_sort", value = NULL)
+      data.table::set(sites, j = "DataStartDate_sort", value = NULL)
     } else {
-      sites <- sites[!duplicated(SiteCode)]
+      sites <- sites[!duplicated(sites[["SiteCode"]])]
     }
 
     coord_cols <- c("SiteCode", "Latitude", "Longitude")

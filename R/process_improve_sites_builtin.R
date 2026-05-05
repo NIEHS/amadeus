@@ -1,4 +1,5 @@
 process_improve_sites_builtin <- function() {
+  # nolint start: line_length_linter.
   txt <- paste(c(
     "SiteID|SiteCode|SiteName|Country|State|County|AQSCode|Latitude|Longitude|Elevation|StartDate|EndDate|DataStartDate|DataEndDate|DemographicCode|LandUseCode|StreetAddress|LocDesc|Sponsor|ProgramKey",
     "1|ACAD1|Acadia NP|US|ME|23009|230090103|44.3771|-68.261|157|03/02/88||03/02/88|07/30/25||Unknown||Park Headquarters|NPS|IMPROVE",
@@ -239,5 +240,12 @@ process_improve_sites_builtin <- function() {
     "192|ZICA1|Zion Canyon|US|UT|49053|490530130|37.1983|-113.1508|1215|12/01/02||12/01/02|07/30/25||||||IMPROVE",
     "51|ZION1|Zion|US|UT|49053|490539000|37.4591|-113.2243|1545|03/21/00|12/29/04|03/25/00|08/22/04||Unknown|||NPS|IMPROVE"
   ), collapse = "\n")
-  data.table::fread(text = txt, sep = "|", header = TRUE, showProgress = FALSE, data.table = TRUE)
+  # nolint end
+  data.table::fread(
+    text = txt,
+    sep = "|",
+    header = TRUE,
+    showProgress = FALSE,
+    data.table = TRUE
+  )
 }
