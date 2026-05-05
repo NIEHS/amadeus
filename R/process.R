@@ -4216,6 +4216,7 @@ process_improve <- function(
         sites[["DataEndDate_sort"]],
         sites[["DataStartDate_sort"]],
         decreasing = c(FALSE, TRUE, TRUE),
+        method = "radix",
         na.last = TRUE
       )
       sites <- sites[ord]
