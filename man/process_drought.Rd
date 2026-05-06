@@ -57,8 +57,9 @@ format, CRS set to \code{EPSG:4326}.
 \note{
 \itemize{
 \item SPEI/EDDI files are expected to follow the naming convention
-produced by \code{download_drought()}: \code{spei<timescale>.nc} /
-\code{eddi<timescale>mn<year>.nc}.
+produced by \code{download_drought()}: \code{spei<timescale>.nc} and
+either legacy \code{eddi<timescale>mn<year>.nc} or current
+\code{EDDI_ETrs_<timescale>mn_<YYYYMMDD>.asc}.
 \item USDM files are expected to be weekly shapefiles named
 \code{USDM_<YYYYMMDD>.shp}.
 \item Layer/column naming is standardised so that

@@ -29,6 +29,8 @@ navbar:
           href: articles/edgar_workflow.html
         - text: US EPA Ecoregions
           href: articles/ecoregion_workflow.html
+        - text: Drought (SPEI, EDDI, USDM)
+          href: articles/drought_workflow.html
         - text: NASA GEOS-CF
           href: articles/geos_workflow.html
         - text: USGS GMTED2010
@@ -128,6 +130,7 @@ articles:
   - cropscape_workflow
   - edgar_workflow
   - ecoregion_workflow
+  - drought_workflow
   - geos_workflow
   - gmted_workflow
   - gridmet_workflow

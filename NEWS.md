@@ -24,6 +24,10 @@
 
 - Added or completed the functonality for PRISM, EDGAR, CropScape, and HUC datasets 
 
+## Use of GitHub Copilot for code generation and refactoring
+
+- Used GitHub Copilot for help with code generation and refactoring across the code base, including function development, documentation, and unit tests; all generated code was reviewed and edited by the development team to ensure accuracy and consistency with package standards
+
 ## Drought Index Support
 
 - Added `download_drought()`, `process_drought()`, and `calculate_drought()`
@@ -31,8 +35,10 @@
   - **SPEI** (Standardized Precipitation-Evapotranspiration Index): multi-year
     netCDF files by accumulation timescale from
     <https://spei.csic.es>
-  - **EDDI** (Evaporative Demand Drought Index): annual netCDF files from
-    NOAA PSL (<https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_Archive/data>)
+  - **EDDI** (Evaporative Demand Drought Index): weekly files by accumulation
+    timescale from NOAA PSL
+    (<https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data>);
+    legacy netCDF files from the `CONUS_Archive` path are also supported
   - **USDM** (U.S. Drought Monitor): weekly polygon shapefiles from
     <https://droughtmonitor.unl.edu>
 - All three datasets are accessible via the top-level wrappers:

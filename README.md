@@ -36,14 +36,20 @@ pak::pak("NIEHS/amadeus")
 | [Climatology Lab GridMet](https://www.climatologylab.org/gridmet.html) | netCDF | Climate<br>Water | Contiguous United States | `_gridmet` |
 | [Köppen-Geiger Climate Classification](https://www.nature.com/articles/sdata2018214) | GeoTIFF | Climate Classification | Global | `_koppen_geiger` |
 | [MRLC[^1] Consortium National Land Cover Database (NLCD)](https://www.mrlc.gov/data) | GeoTIFF | Land Use | United States | `_nlcd` |
+| [USDA CropScape Cropland Data Layer (CDL)](https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.php) | GeoTIFF | Land Use<br>Agriculture | United States | `_cropscape` |
 | [NASA[^2] Moderate Resolution Imaging Spectroradiometer (MODIS)](https://modis.gsfc.nasa.gov/data/) | HDF | Atmosphere<br>Meteorology<br>Land Use<br>Satellite | Global | `_modis` |
 | [NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/) | netCDF | Atmosphere<br>Meteorology | Global | `_merra2` |
 | [NASA SEDAC[^3] UN WPP-Adjusted Population Density](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11) | GeoTIFF<br>netCDF | Population | Global | `_population` |
 | [NASA SEDAC Global Roads Open Access Data Set](https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1) | Shapefile<br>Geodatabase | Roadways | Global | `_groads` |
 | [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere<br>Meteorology | Global | `_geos` |
+| [EDGAR Emissions Database for Global Atmospheric Research](https://edgar.jrc.ec.europa.eu/) | netCDF<br>TXT | Emissions | Global | `_edgar` |
 | [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#about) | Shapefile<br>KML | Wildfire Smoke | North America | `_hms` |
+| [NOAA GOES Aerosol Detection Product (ADP)](https://www.nesdis.noaa.gov/our-satellites/currently-flying/goes-east-west) | netCDF | Atmosphere<br>Satellite | Americas<br>Pacific | `_goes` |
 | [NOAA NCEP[^4] North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) | netCDF | Atmosphere<br>Meteorology | North America | `_narr` |
+| [PRISM Climate Group](https://prism.oregonstate.edu/) | netCDF<br>ASCII Grid<br>GRIB2 | Meteorology<br>Climate | Contiguous United States | `_prism` |
+| [Drought indices ([SPEI](https://spei.csic.es), [EDDI](https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data), [USDM](https://droughtmonitor.unl.edu))](https://droughtmonitor.unl.edu) | netCDF<br>ASCII Grid<br>Shapefile | Drought | Global<br>Contiguous United States | `_drought` |
 | [US EPA[^5] Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV | Air Pollution | United States | `_aqs` |
+| [IMPROVE aerosol monitoring program](https://vibe.cira.colostate.edu/data/export/) | TXT (pipe-delimited) | Air Pollution<br>Aerosols | United States | `_improve` |
 | [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregions) | Shapefile | Climate Regions | North America | `_ecoregions` |
 | [US EPA National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories) | CSV | Emissions | United States | `_nei` |
 | [US EPA Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present) | CSV | Chemicals<br>Pollution | United States | `_tri` |
@@ -163,6 +169,15 @@ Projected CRS: unnamed
 ## Connecting Health Outcomes Research Data Systems 
 
 The `amadeus` package has been developed as part of the National Institute of Environmental Health Science's (NIEHS) Connecting Health Outcomes Research Data Systems (CHORDS) program. CHORDS aims to "build and strengthen data infrastructure for patient-centered outcomes research on environment and health" by providing curated data, analysis tools, and educational resources.
+
+## Future Development, Maintenance, and Opportunities for Contribution
+
+`amadeus` is being actively developed and maintained by the SET group at NIEHS. Future development will focus on expanding the number of data sources and datasets covered, improving the efficiency of download and processing functions, and adding new functionality for calculating covariates and analyzing data.
+
+1. PI driven datasets: There are many datasets created by individual researchers. To expand the number of datasets covered by `amadeus`, we will be adding functions to access and process datasets created by individual researchers. If you are an environmental health researcher with a dataset that you would like to see added to `amadeus`, please reach out via the `issues` tab on GitHub and add a tag `new dataset` to your issue.
+2. More options for covariate calculations: Developing the best exposure metric for a given research question is an active area of research in environmental health. To support this research, we will be adding new options for calculating covariates from the processed data. If you have a method for calculating covariates that you would like to see added to `amadeus`, please reach out via the `issues` tab on GitHub and add a tag `new covariate calculation` to your issue.
+3. Bug Fixes: As with any software, there may be bugs that arise as users interact with the package. We will be actively monitoring the `issues` tab on GitHub for bug reports and will work to fix any bugs that are reported in a timely manner. If you encounter a bug while using `amadeus`, please report it via the `issues` tab on GitHub and add a tag `bug` to your issue.
+
 
 ## Additional Resources
 
