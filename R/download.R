@@ -5581,7 +5581,11 @@ download_drought <- function(
       if (hash) {
         return(amadeus::download_hash(hash = TRUE, directory_to_save))
       }
-      return(invisible(list(success = 0, failed = 0, skipped = length(week_dates))))
+      return(invisible(list(
+        success = 0,
+        failed = 0,
+        skipped = length(week_dates)
+      )))
     }
 
     download_result <- amadeus::download_run_method(
@@ -5634,7 +5638,11 @@ download_drought <- function(
       if (hash) {
         return(amadeus::download_hash(hash = TRUE, directory_to_unzip))
       }
-      return(invisible(list(success = 0, failed = 0, skipped = length(week_dates))))
+      return(invisible(list(
+        success = 0,
+        failed = 0,
+        skipped = length(week_dates)
+      )))
     }
 
     if (length(all_urls) > 0 && !amadeus::check_url_status(all_urls[1])) {
