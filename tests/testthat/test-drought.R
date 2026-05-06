@@ -438,6 +438,61 @@ testthat::test_that("download_drought SPEI mock download hash=TRUE", {
   })
 })
 
+testthat::test_that("download_drought SPEI prefers current SPEIbase endpoint", {
+  checked_urls <- character(0)
+  captured_urls <- NULL
+  testthat::local_mocked_bindings(
+    check_url_status = function(url) {
+      checked_urls <<- c(checked_urls, url)
+      grepl("spei_database_2_11/nc/spei01\\.nc$", url)
+    },
+    check_destfile = function(...) TRUE,
+    download_run_method = function(urls, ...) {
+      captured_urls <<- urls
+      list(success = 1, failed = 0, skipped = 0)
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    suppressMessages(
+      download_drought(
+        source = "spei",
+        date = "2020-01-01",
+        timescale = 1L,
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      )
+    )
+    testthat::expect_true(any(grepl("spei_database_2_11/nc/spei01\\.nc$", checked_urls)))
+    testthat::expect_equal(captured_urls, "https://spei.csic.es/spei_database_2_11/nc/spei01.nc")
+  })
+})
+
+testthat::test_that("download_drought SPEI falls back to prior SPEIbase endpoint", {
+  captured_urls <- NULL
+  testthat::local_mocked_bindings(
+    check_url_status = function(url) grepl("spei_database_2_10/nc/spei01\\.nc$", url),
+    check_destfile = function(...) TRUE,
+    download_run_method = function(urls, ...) {
+      captured_urls <<- urls
+      list(success = 1, failed = 0, skipped = 0)
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    suppressMessages(
+      download_drought(
+        source = "spei",
+        date = "2020-01-01",
+        timescale = 1L,
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      )
+    )
+    testthat::expect_equal(captured_urls, "https://spei.csic.es/spei_database_2_10/nc/spei01.nc")
+  })
+})
+
 testthat::test_that("download_drought SPEI file already exists skips download", {
   testthat::local_mocked_bindings(
     check_destfile = function(...) FALSE,
@@ -501,6 +556,63 @@ testthat::test_that(
   }
 )
 
+testthat::test_that("download_drought EDDI prefers current CONUS_archive endpoint", {
+  checked_urls <- character(0)
+  captured_urls <- NULL
+  testthat::local_mocked_bindings(
+    check_url_status = function(url) {
+      checked_urls <<- c(checked_urls, url)
+      grepl("CONUS_archive/data/2020/EDDI_ETrs_01mn_20200107\\.asc$", url)
+    },
+    check_destfile = function(...) TRUE,
+    download_run_method = function(urls, ...) {
+      captured_urls <<- urls
+      list(success = length(urls), failed = 0, skipped = 0)
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    suppressMessages(
+      download_drought(
+        source = "eddi",
+        date = c("2020-01-01", "2020-01-31"),
+        timescale = 1L,
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      )
+    )
+    testthat::expect_true(any(grepl("CONUS_archive/data/2020/EDDI_ETrs_01mn_20200107\\.asc$", checked_urls)))
+    testthat::expect_true(all(grepl("CONUS_archive/data/2020/EDDI_ETrs_01mn_2020", captured_urls)))
+    testthat::expect_true(all(grepl("\\.asc$", captured_urls)))
+  })
+})
+
+testthat::test_that("download_drought EDDI falls back to legacy CONUS_Archive endpoint", {
+  captured_urls <- NULL
+  testthat::local_mocked_bindings(
+    check_url_status = function(url) grepl("CONUS_Archive/data/2020/EDDI_ETrs_01mn_20200107\\.nc$", url),
+    check_destfile = function(...) TRUE,
+    download_run_method = function(urls, ...) {
+      captured_urls <<- urls
+      list(success = length(urls), failed = 0, skipped = 0)
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    suppressMessages(
+      download_drought(
+        source = "eddi",
+        date = c("2020-01-01", "2020-01-31"),
+        timescale = 1L,
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      )
+    )
+    testthat::expect_true(all(grepl("CONUS_Archive/data/2020/EDDI_ETrs_01mn_2020", captured_urls)))
+    testthat::expect_true(all(grepl("\\.nc$", captured_urls)))
+  })
+})
+
 testthat::test_that("download_drought EDDI timescale 12 URL has 12mn", {
   captured_urls <- NULL
   testthat::local_mocked_bindings(
@@ -543,6 +655,31 @@ testthat::test_that("download_drought EDDI 404 error propagates", {
       ),
       regexp = "HTTP 404"
     )
+  })
+})
+
+testthat::test_that("download_drought EDDI skips when all files already exist", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) FALSE,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    result <- withCallingHandlers(
+      download_drought(
+        source = "eddi",
+        date = c("2020-01-01", "2020-01-31"),
+        timescale = 1L,
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("already exist|Skipping", msgs)))
+    testthat::expect_equal(result$skipped, 4L)
   })
 })
 
@@ -625,6 +762,30 @@ testthat::test_that("download_drought USDM 404 error propagates", {
       ),
       regexp = "HTTP 404"
     )
+  })
+})
+
+testthat::test_that("download_drought USDM skips when all files already exist", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) FALSE,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    result <- withCallingHandlers(
+      download_drought(
+        source = "usdm",
+        date = c("2020-01-01", "2020-01-31"),
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("already exist|Skipping", msgs)))
+    testthat::expect_equal(result$skipped, 4L)
   })
 })
 
@@ -1169,6 +1330,48 @@ testthat::test_that("drought_process_nc errors when EDDI files not found", {
   })
 })
 
+testthat::test_that("drought_process_nc processes EDDI ASC files from download_drought", {
+  withr::local_package("terra")
+  withr::with_tempdir({
+    r <- terra::rast(
+      nrows = 2, ncols = 2,
+      xmin = -100, xmax = -99, ymin = 39, ymax = 40,
+      crs = "EPSG:4326"
+    )
+    terra::values(r) <- c(1, 2, 3, 4)
+
+    terra::writeRaster(
+      r,
+      "EDDI_ETrs_01mn_20200114.asc",
+      overwrite = TRUE
+    )
+    terra::writeRaster(
+      r,
+      "EDDI_ETrs_01mn_20200107.asc",
+      overwrite = TRUE
+    )
+
+    out <- amadeus:::drought_process_nc(
+      source = "eddi",
+      path = ".",
+      date = c("2020-01-01", "2020-01-31"),
+      timescale = 1L,
+      extent = NULL
+    )
+
+    testthat::expect_s4_class(out, "SpatRaster")
+    testthat::expect_equal(terra::nlyr(out), 2L)
+    testthat::expect_equal(
+      as.character(terra::time(out)),
+      c("2020-01-07", "2020-01-14")
+    )
+    testthat::expect_equal(
+      names(out),
+      c("eddi_01_2020-01-07", "eddi_01_2020-01-14")
+    )
+  })
+})
+
 testthat::test_that("drought_process_nc assigns EPSG:4326 when CRS is empty", {
   withr::local_package("terra")
   spei_path <- testthat::test_path("..", "testdata", "drought", "spei")
@@ -1214,6 +1417,33 @@ testthat::test_that("drought_process_usdm errors when no USDM shapefiles found",
       ),
       "No USDM shapefiles"
     )
+  })
+})
+
+testthat::test_that("drought_process_usdm finds shapefiles in data_files subdir", {
+  withr::local_package("terra")
+  usdm_path <- normalizePath(
+    testthat::test_path("..", "testdata", "drought", "usdm"),
+    mustWork = TRUE
+  )
+  withr::with_tempdir({
+    dir.create("data_files")
+    source_files <- list.files(usdm_path, full.names = TRUE)
+    testthat::expect_gt(length(source_files), 0L)
+    copied <- file.copy(
+      source_files,
+      "data_files",
+      overwrite = TRUE
+    )
+    testthat::expect_true(all(copied))
+
+    result <- amadeus:::drought_process_usdm(
+      path = ".",
+      date = c("2020-01-07", "2020-01-14"),
+      extent = NULL
+    )
+    testthat::expect_s4_class(result, "SpatVector")
+    testthat::expect_equal(length(unique(terra::values(result)$date)), 2L)
   })
 })
 

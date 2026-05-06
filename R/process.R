@@ -4324,8 +4324,9 @@ process_improve <- function(
 #' @note
 #' \itemize{
 #'   \item SPEI/EDDI files are expected to follow the naming convention
-#'     produced by \code{download_drought()}: \code{spei<timescale>.nc} /
-#'     \code{eddi<timescale>mn<year>.nc}.
+#'     produced by \code{download_drought()}: \code{spei<timescale>.nc} and
+#'     either legacy \code{eddi<timescale>mn<year>.nc} or current
+#'     \code{EDDI_ETrs_<timescale>mn_<YYYYMMDD>.asc}.
 #'   \item USDM files are expected to be weekly shapefiles named
 #'     \code{USDM_<YYYYMMDD>.shp}.
 #'   \item Layer/column naming is standardised so that
@@ -4428,21 +4429,50 @@ drought_process_nc <- function(source, path, date, timescale, extent) {
     data_full <- terra::rast(nc_files[1], win = extent)
     data_full <- drought_set_time_nc(data_full, source, ts_fmt, nc_files[1])
   } else {
-    #### EDDI: one file per year, e.g. eddi01mn2020.nc
+    #### EDDI: legacy yearly netCDF (eddi01mn2020.nc) or daily/tuesday ASCII
     nc_pattern <- paste0("eddi", ts_fmt, "mn[0-9]{4}\\.nc$")
+    asc_pattern <- paste0("^EDDI_ETrs_", ts_fmt, "mn_[0-9]{8}\\.asc$")
     nc_files <- list.files(path, pattern = nc_pattern, full.names = TRUE)
-    if (length(nc_files) == 0L) {
+    asc_files <- list.files(path, pattern = asc_pattern, full.names = TRUE)
+
+    if (length(nc_files) == 0L && length(asc_files) == 0L) {
       stop(sprintf(
-        "No EDDI files matching '%s' found in: %s",
+        "No EDDI files matching '%s' or '%s' found in: %s",
         nc_pattern,
+        asc_pattern,
         path
       ))
     }
-    data_full <- terra::rast()
-    for (f in nc_files) {
-      yr_rast <- terra::rast(f, win = extent)
-      yr_rast <- drought_set_time_nc(yr_rast, source, ts_fmt, f)
-      data_full <- c(data_full, yr_rast, warn = FALSE)
+
+    if (length(nc_files) > 0L) {
+      data_full <- terra::rast()
+      for (f in nc_files) {
+        yr_rast <- terra::rast(f, win = extent)
+        yr_rast <- drought_set_time_nc(yr_rast, source, ts_fmt, f)
+        data_full <- c(data_full, yr_rast, warn = FALSE)
+      }
+    } else {
+      asc_dates <- as.Date(
+        sub(".*_([0-9]{8})\\.asc$", "\\1", basename(asc_files)),
+        format = "%Y%m%d"
+      )
+      asc_files <- asc_files[order(asc_dates)]
+      asc_dates <- asc_dates[order(asc_dates)]
+
+      data_full <- terra::rast()
+      for (i in seq_along(asc_files)) {
+        asc_rast <- terra::rast(asc_files[i], win = extent)
+        terra::time(asc_rast) <- asc_dates[i]
+        names(asc_rast) <- paste0(
+          source,
+          "_",
+          ts_fmt,
+          "_",
+          format(asc_dates[i], "%Y-%m-%d")
+        )
+        terra::varnames(asc_rast) <- source
+        data_full <- c(data_full, asc_rast, warn = FALSE)
+      }
     }
   }
 
@@ -4516,11 +4546,24 @@ drought_set_time_nc <- function(r, source, ts_fmt, filepath) {
 
 #### Internal helper: USDM weekly polygon pathway
 drought_process_usdm <- function(path, date, extent) {
-  shp_files <- list.files(
-    path,
-    pattern = "^USDM_[0-9]{8}\\.shp$",
-    full.names = TRUE
+  search_paths <- unique(c(path, file.path(path, "data_files")))
+  shp_files <- unlist(
+    lapply(
+      search_paths,
+      function(dir_path) {
+        if (!dir.exists(dir_path)) {
+          return(character(0))
+        }
+        list.files(
+          dir_path,
+          pattern = "^USDM_[0-9]{8}\\.shp$",
+          full.names = TRUE
+        )
+      }
+    ),
+    use.names = FALSE
   )
+
   if (length(shp_files) == 0L) {
     stop(sprintf(
       "No USDM shapefiles matching 'USDM_YYYYMMDD.shp' found in: %s",
