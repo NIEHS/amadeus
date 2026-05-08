@@ -2656,16 +2656,10 @@ process_narr <- function(
 #' \code{"xgc_tavg_1hr_g1440x721_x1"},
 #' \code{"chm_inst_1hr_g1440x721_p23"}, and
 #' \code{"met_inst_1hr_g1440x721_p23"}.
-#'
-#' During processing, \code{process_geos()} prints a collection/variable
-#' reference table discovered from the files in \code{path}. The
-#' \code{case_sensitive_variable} column gives the canonical variable names in
-#' the file. Variable matching is case-insensitive, so inputs such as
-#' \code{"o3"} and \code{"co"} are accepted when \code{"O3"} and \code{"CO"}
-#' are present.
 #' @param date character(1 or 2). Date (1) or start and end dates (2).
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
-#' @param variable character(1). GEOS-CF variable name(s).
+#' @param variable character(1). GEOS-CF variable name(s). See \emph{Notes}
+#'   for collection-specific variable-name guidance.
 #' @param path character(1). Directory with downloaded netCDF (.nc4) files.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
@@ -2683,6 +2677,22 @@ process_narr <- function(
 #' pressure level, date, and hour when `daily_agg = FALSE` (default). When
 #' `daily_agg = TRUE`, layer names contain the variable, pressure level, and
 #' date only, and `terra::time()` is set to midnight UTC of each date.
+#'
+#' Collection-specific variable names accepted by \code{variable}:
+#' \tabular{ll}{
+#' \strong{Collection}\tab \strong{Variables}\cr
+#' \code{aqc_tavg_1hr_g1440x721_v1}\tab \code{no2}, \code{co}, \code{so2}, \code{pm25_rh35_gcc}, \code{o3}\cr
+#' \code{chm_tavg_1hr_g1440x721_v1}\tab \code{ocpi}, \code{bcpo}, \code{pm25soa_rh35_gc}, \code{dst4}, \code{prpe}, \code{macr}, \code{pm25ss_rh35_gcc}, \code{hno4}, \code{ch4}, \code{nh3}, \code{h2o2}, \code{rcho}, \code{hno3}, \code{dst1}, \code{pan}, \code{pm25oc_rh35_gcc}, \code{c3h8}, \code{soas}, \code{no}, \code{tolu}, \code{mvk}, \code{xyle}, \code{isop}, \code{noy}, \code{sala}, \code{so2}, \code{co}, \code{n2o5}, \code{eoh}, \code{o3}, \code{acet}, \code{c2h6}, \code{mek}, \code{nit}, \code{benz}, \code{soap}, \code{alk4}, \code{ocpo}, \code{ald2}, \code{hcho}, \code{pm25_rh35_gocar}, \code{dst3}, \code{pm25su_rh35_gcc}, \code{pm25_rh35_gcc}, \code{pm25ni_rh35_gcc}, \code{pm25bc_rh35_gcc}, \code{dst2}, \code{pm25du_rh35_gcc}, \code{bcpi}, \code{no2}, \code{salc}, \code{nh4}\cr
+#' \code{met_tavg_1hr_g1440x721_x1}\tab \code{zl}, \code{zpbl}, \code{ps}, \code{v2m}, \code{v}, \code{q2m}, \code{u}, \code{t2m}, \code{troppb}, \code{q}, \code{t}, \code{v10m}, \code{t10m}, \code{u2m}, \code{q10m}, \code{ts}, \code{slp}, \code{cldtt}, \code{phis}, \code{tprec}, \code{u10m}, \code{rh}\cr
+#' \code{xgc_tavg_1hr_g1440x721_x1}\tab \code{wetdepflx_nh4}, \code{aod550_dst6}, \code{wetdepflx_dst1}, \code{tropcol_io}, \code{totcol_o3}, \code{tropcol_hcho}, \code{drydepflx_bcpi}, \code{aod550_cloud}, \code{aod550_dst5}, \code{wetdepflx_hcho}, \code{aod550_salc}, \code{aod550_dust}, \code{wetdepflx_so2}, \code{wetdepflx_salc}, \code{wetdepflx_dst3}, \code{drydepflx_nit}, \code{wetdepflx_so4}, \code{aod550_sala}, \code{aod550_dst1}, \code{tropcol_co}, \code{wetdepflx_bcpi}, \code{drydepflx_sala}, \code{wetdepflx_nh3}, \code{tropcol_no2}, \code{wetdepflx_nit}, \code{aod550_sulfate}, \code{wetdepflx_ocpi}, \code{drydepflx_hcho}, \code{drydepflx_dst4}, \code{tropcol_so2}, \code{drydepflx_ocpi}, \code{tropcol_o3}, \code{drydepflx_nh4}, \code{aod550_dst7}, \code{totcol_co}, \code{totcol_so2}, \code{totcol_io}, \code{drydepflx_nh3}, \code{wetdepflx_sala}, \code{wetdepflx_dst4}, \code{drydepflx_o3}, \code{drydepflx_hno3}, \code{aod550_dst4}, \code{aod550_oc}, \code{totcol_no2}, \code{drydepflx_dst2}, \code{tropcol_bro}, \code{wetdepflx_bcpo}, \code{drydepflx_bcpo}, \code{wetdepflx_dst2}, \code{drydepflx_dst1}, \code{aod550_dst2}, \code{aod550_bc}, \code{aod550_dst3}, \code{wetdepflx_ocpo}, \code{drydepflx_dst3}, \code{drydepflx_salc}, \code{wetdepflx_hno3}, \code{drydepflx_ocpo}, \code{drydepflx_no2}, \code{totcol_hcho}, \code{totcol_bro}\cr
+#' \code{chm_inst_1hr_g1440x721_p23}\tab \code{pm25soa_rh35_gc}, \code{pm25ss_rh35_gcc}, \code{so2}, \code{co}, \code{o3}, \code{pm25oc_rh35_gcc}, \code{pm25du_rh35_gcc}, \code{noy}, \code{no2}, \code{pm25ni_rh35_gcc}, \code{pm25bc_rh35_gcc}, \code{pm25_rh35_gcc}, \code{pm25su_rh35_gcc}\cr
+#' \code{met_inst_1hr_g1440x721_p23}\tab \code{omega}, \code{t}, \code{eth}, \code{q}, \code{epv}, \code{rh}, \code{slp}, \code{airdens}, \code{ps}, \code{h}, \code{th}, \code{v}, \code{u}, \code{airvol_chem}\cr
+#' }
+#'
+#' \code{variable} matching is case-insensitive (for example, \code{"o3"}
+#' matches \code{"O3"}).
+#'
+#' Reference: [NASA GEOS-CF OpenDAP catalog](https://opendap.nccs.nasa.gov/dods/gmao/geos-cf/assim).
 #' @author Mitchell Manware
 #' @return a `SpatRaster` object;
 #' @importFrom terra rast
@@ -2765,36 +2775,6 @@ process_geos <-
       data_paths[1],
       source = "geos",
       collection = TRUE
-    )
-    collections_in_paths <- vapply(
-      data_paths,
-      function(x) {
-        amadeus::process_collection(x, source = "geos", collection = TRUE)
-      },
-      character(1)
-    )
-    geos_collection_reference <- do.call(
-      rbind,
-      lapply(unique(collections_in_paths), function(coll) {
-        sample_path <- data_paths[which(collections_in_paths == coll)[1]]
-        sample_names <- names(terra::rast(sample_path))
-        sample_base <- sort(unique(sub("_lev=.*$", "", sample_names)))
-        data.frame(
-          collection = rep(coll, length(sample_base)),
-          case_sensitive_variable = sample_base,
-          stringsAsFactors = FALSE
-        )
-      })
-    )
-    message(
-      "GEOS collection/variable reference:\n",
-      paste(
-        utils::capture.output(
-          print(geos_collection_reference, row.names = FALSE)
-        ),
-        collapse = "\n"
-      ),
-      "\nVariable matching in process_geos() is case-insensitive.\n"
     )
     message(
       paste0(
