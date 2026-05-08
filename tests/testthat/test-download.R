@@ -1261,6 +1261,13 @@ testthat::test_that("download functions create proper directory structure", {
 })
 
 testthat::test_that("download functions handle nested directories", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) {
+      list(success = 0L, failed = 0L, skipped = 0L)
+    },
+    .package = "amadeus"
+  )
   withr::with_tempdir({
     # Test deeply nested directory creation
     suppressWarnings(

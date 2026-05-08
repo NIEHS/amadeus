@@ -328,16 +328,9 @@ testthat::test_that("calculate_ecoregion", {
       lat = -79.99,
       date = as.Date("2022-01-01")
     )
-  site_unmatched <-
-    terra::vect(
-      site_unmatched,
-      geom = c("lon", "lat"),
-      keepgeom = TRUE,
-      crs = "EPSG:4326"
-    )
-  site_unmatched <- terra::project(site_unmatched, "EPSG:5070")
 
-  site_combined <- rbind(sf::st_drop_geometry(site_faux), site_unmatched)
+  site_base <- sf::st_drop_geometry(sf::st_as_sf(site_faux))
+  site_combined <- rbind(site_base, site_unmatched)
   site_combined <- sf::st_as_sf(
     site_combined,
     coords = c("lon", "lat"),
