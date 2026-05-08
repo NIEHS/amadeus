@@ -44,6 +44,22 @@ a \code{SpatRaster} object;
 The \code{process_geos()} function imports and cleans raw atmospheric
 composition data, returning a single \code{SpatRaster} object.
 }
+\details{
+GEOS-CF netCDF collections currently supported by \code{download_geos()} are:
+\code{"aqc_tavg_1hr_g1440x721_v1"},
+\code{"chm_tavg_1hr_g1440x721_v1"},
+\code{"met_tavg_1hr_g1440x721_x1"},
+\code{"xgc_tavg_1hr_g1440x721_x1"},
+\code{"chm_inst_1hr_g1440x721_p23"}, and
+\code{"met_inst_1hr_g1440x721_p23"}.
+
+During processing, \code{process_geos()} prints a collection/variable
+reference table discovered from the files in \code{path}. The
+\code{case_sensitive_variable} column gives the canonical variable names in
+the file. Variable matching is case-insensitive, so inputs such as
+\code{"o3"} and \code{"co"} are accepted when \code{"O3"} and \code{"CO"}
+are present.
+}
 \note{
 Layer names of the returned \code{SpatRaster} object contain the variable,
 pressure level, date, and hour when \code{daily_agg = FALSE} (default). When

@@ -52,57 +52,6 @@ if (is.na(durham_hex_path) || durham_hex_path == "") {
 durham_hex <- readRDS(durham_hex_path)
 
 
-pick_value_column <- function(x) {
-  geom_col <- attr(x, "sf_column")
-  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
-  candidates <- setdiff(names(x), excluded)
-  if (length(candidates) == 0) {
-    stop("No plottable covariate columns found.")
-  }
-  preferred <- candidates[vapply(x[candidates], function(col) {
-    is.numeric(col) || is.character(col) || is.factor(col)
-  }, logical(1))]
-  if (length(preferred) > 0) preferred[1] else candidates[1]
-}
-
-coord_local_sf <- function(x) {
-  x_wgs84 <- sf::st_transform(sf::st_as_sf(x), 4326)
-  bbox <- sf::st_bbox(x_wgs84)
-  pad_x <- max((bbox[["xmax"]] - bbox[["xmin"]]) * 0.08, 0.05)
-  pad_y <- max((bbox[["ymax"]] - bbox[["ymin"]]) * 0.08, 0.05)
-  ggplot2::coord_sf(
-    xlim = c(bbox[["xmin"]] - pad_x, bbox[["xmax"]] + pad_x),
-    ylim = c(bbox[["ymin"]] - pad_y, bbox[["ymax"]] + pad_y),
-    expand = FALSE,
-    datum = NA
-  )
-}
-
-plot_points <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(color = !!rlang::sym(value_col)),
-      size = 2
-    ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, color = value_col) +
-    ggplot2::theme_minimal()
-}
-
-plot_polygons <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(fill = !!rlang::sym(value_col)),
-      color = NA
-    ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, fill = value_col) +
-    ggplot2::theme_minimal()
-}
 ```
 
 This article demonstrates a compact workflow for GMTED2010 terrain products.

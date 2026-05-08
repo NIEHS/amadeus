@@ -273,6 +273,27 @@ testthat::test_that("process_geos (single date)", {
   )
 })
 
+testthat::test_that("process_geos variable matching is case-insensitive", {
+  withr::local_package("terra")
+  geos_upper <- suppressMessages(
+    process_geos(
+      date = "2018-01-01",
+      variable = "O3",
+      path = testthat::test_path("..", "testdata", "geos", "c")
+    )
+  )
+  geos_lower <- suppressMessages(
+    process_geos(
+      date = "2018-01-01",
+      variable = "o3",
+      path = testthat::test_path("..", "testdata", "geos", "c")
+    )
+  )
+  testthat::expect_equal(terra::nlyr(geos_upper), terra::nlyr(geos_lower))
+  testthat::expect_equal(terra::values(geos_upper), terra::values(geos_lower))
+  testthat::expect_equal(terra::time(geos_upper), terra::time(geos_lower))
+})
+
 testthat::test_that("process_geos (expected errors)", {
   # expect error without variable
   testthat::expect_error(

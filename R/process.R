@@ -2648,6 +2648,21 @@ process_narr <- function(
 #' @description
 #' The \code{process_geos()} function imports and cleans raw atmospheric
 #' composition data, returning a single `SpatRaster` object.
+#' @details
+#' GEOS-CF netCDF collections currently supported by \code{download_geos()} are:
+#' \code{"aqc_tavg_1hr_g1440x721_v1"},
+#' \code{"chm_tavg_1hr_g1440x721_v1"},
+#' \code{"met_tavg_1hr_g1440x721_x1"},
+#' \code{"xgc_tavg_1hr_g1440x721_x1"},
+#' \code{"chm_inst_1hr_g1440x721_p23"}, and
+#' \code{"met_inst_1hr_g1440x721_p23"}.
+#'
+#' During processing, \code{process_geos()} prints a collection/variable
+#' reference table discovered from the files in \code{path}. The
+#' \code{case_sensitive_variable} column gives the canonical variable names in
+#' the file. Variable matching is case-insensitive, so inputs such as
+#' \code{"o3"} and \code{"co"} are accepted when \code{"O3"} and \code{"CO"}
+#' are present.
 #' @param date character(1 or 2). Date (1) or start and end dates (2).
 #' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
 #' @param variable character(1). GEOS-CF variable name(s).
@@ -2709,6 +2724,10 @@ process_geos <-
     path <- amadeus::download_sanitize_path(path)
     #### check for variable
     amadeus::check_for_null_parameters(mget(ls()))
+    if (!is.character(variable) || length(variable) != 1 || !nzchar(variable)) {
+      stop("`variable` must be a single non-empty character string.\n")
+    }
+    variable <- trimws(variable)
     #### check dates
     if (length(date) == 1) {
       date <- c(date, date)
@@ -2746,6 +2765,36 @@ process_geos <-
       data_paths[1],
       source = "geos",
       collection = TRUE
+    )
+    collections_in_paths <- vapply(
+      data_paths,
+      function(x) {
+        amadeus::process_collection(x, source = "geos", collection = TRUE)
+      },
+      character(1)
+    )
+    geos_collection_reference <- do.call(
+      rbind,
+      lapply(unique(collections_in_paths), function(coll) {
+        sample_path <- data_paths[which(collections_in_paths == coll)[1]]
+        sample_names <- names(terra::rast(sample_path))
+        sample_base <- sort(unique(sub("_lev=.*$", "", sample_names)))
+        data.frame(
+          collection = rep(coll, length(sample_base)),
+          case_sensitive_variable = sample_base,
+          stringsAsFactors = FALSE
+        )
+      })
+    )
+    message(
+      "GEOS collection/variable reference:\n",
+      paste(
+        utils::capture.output(
+          print(geos_collection_reference, row.names = FALSE)
+        ),
+        collapse = "\n"
+      ),
+      "\nVariable matching in process_geos() is case-insensitive.\n"
     )
     message(
       paste0(
@@ -2788,13 +2837,35 @@ process_geos <-
         "...\n"
       ))
       #### subset to user-selected variable
+      data_variable_idx <- grep(
+        tolower(variable),
+        tolower(names(data_raw)),
+        fixed = TRUE
+      )
+      if (length(data_variable_idx) == 0) {
+        available_base <- sort(unique(sub("_lev=.*$", "", names(data_raw))))
+        stop(
+          paste0(
+            "Variable '", variable, "' was not found in collection ",
+            collection, ".\n",
+            "Available case-sensitive variables include: ",
+            paste(available_base, collapse = ", "),
+            ".\n"
+          )
+        )
+      }
       data_variable <- terra::subset(
         data_raw,
-        subset = grep(
-          variable,
-          names(data_raw)
-        )
+        subset = data_variable_idx
       )
+      matched_base <- sort(unique(sub("_lev=.*$", "", names(data_variable))))
+      if (!(variable %in% matched_base)) {
+        message(
+          "Requested variable '", variable, "' matched case-sensitive variable(s): ",
+          paste(matched_base, collapse = ", "),
+          ".\n"
+        )
+      }
       #### define variable time
       terra::time(data_variable) <- rep(
         ISOdate(

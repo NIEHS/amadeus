@@ -12,7 +12,11 @@ author: "Kyle Messier, with assistance from GitHub Copilot"
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = ""
+  comment = "",
+  fig.width = 9,
+  fig.height = 7,
+  out.width = "100%",
+  fig.align = "center"
 )
 library(amadeus)
 library(sf)
@@ -27,30 +31,6 @@ live_run <- local({
   force || !(on_ci || on_cran)
 })
 
-aqs_sample_path <- c(
-  file.path("tests", "testdata", "aqs", "aqs-location-sample.rds"),
-  file.path("..", "tests", "testdata", "aqs", "aqs-location-sample.rds")
-)
-aqs_sample_path <- aqs_sample_path[file.exists(aqs_sample_path)][1]
-if (is.na(aqs_sample_path) || aqs_sample_path == "") {
-  stop("Could not locate tests/testdata/aqs/aqs-location-sample.rds")
-}
-example_points_sf <- sf::st_as_sf(readRDS(aqs_sample_path))
-durham_hex_path <- system.file(
-  "extdata", "data_files", "durham_h3_res8.rds", package = "amadeus"
-)
-if (durham_hex_path == "") {
-  source_candidates <- c(
-    file.path("inst", "extdata", "data_files", "durham_h3_res8.rds"),
-    file.path("..", "inst", "extdata", "data_files", "durham_h3_res8.rds")
-  )
-  durham_hex_path <- source_candidates[file.exists(source_candidates)][1]
-}
-if (is.na(durham_hex_path) || durham_hex_path == "") {
-  stop("Could not locate inst/extdata/data_files/durham_h3_res8.rds")
-}
-durham_hex <- readRDS(durham_hex_path)
-
 geos_sample_path <- c(
   file.path("tests", "testdata", "geos", "c"),
   file.path("..", "tests", "testdata", "geos", "c")
@@ -59,102 +39,13 @@ geos_sample_path <- geos_sample_path[dir.exists(geos_sample_path)][1]
 if (is.na(geos_sample_path) || geos_sample_path == "") {
   stop("Could not locate tests/testdata/geos/c")
 }
-
-
-pick_value_column <- function(x) {
-  geom_col <- attr(x, "sf_column")
-  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
-  candidates <- setdiff(names(x), excluded)
-  if (length(candidates) == 0) {
-    stop("No plottable covariate columns found.")
-  }
-  numeric_candidates <- candidates[vapply(x[candidates], is.numeric, logical(1))]
-  ranked <- if (length(numeric_candidates) > 0) numeric_candidates else candidates
-  non_missing_share <- vapply(ranked, function(col) {
-    mean(!is.na(x[[col]]))
-  }, numeric(1))
-  ranked[which.max(non_missing_share)]
-}
-
-coord_local_sf <- function(x) {
-  x_wgs84 <- sf::st_transform(sf::st_as_sf(x), 4326)
-  bbox <- sf::st_bbox(x_wgs84)
-  pad_x <- max((bbox[["xmax"]] - bbox[["xmin"]]) * 0.08, 0.05)
-  pad_y <- max((bbox[["ymax"]] - bbox[["ymin"]]) * 0.08, 0.05)
-  ggplot2::coord_sf(
-    xlim = c(bbox[["xmin"]] - pad_x, bbox[["xmax"]] + pad_x),
-    ylim = c(bbox[["ymin"]] - pad_y, bbox[["ymax"]] + pad_y),
-    expand = FALSE,
-    datum = NA
-  )
-}
-
-plot_points <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(color = !!rlang::sym(value_col)),
-      size = 2
-    ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, color = value_col) +
-    ggplot2::guides(
-      color = ggplot2::guide_colorbar(title.position = "top")
-    ) +
-    ggplot2::theme_minimal(base_size = 13) +
-    ggplot2::theme(
-      legend.position = "bottom",
-      legend.key.width = grid::unit(2, "cm"),
-      legend.title = ggplot2::element_text(face = "bold")
-    )
-}
-
-plot_polygons <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(fill = !!rlang::sym(value_col)),
-      color = NA
-    ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, fill = value_col) +
-    ggplot2::guides(
-      fill = ggplot2::guide_colorbar(title.position = "top")
-    ) +
-    ggplot2::theme_minimal(base_size = 13) +
-    ggplot2::theme(
-      legend.position = "bottom",
-      legend.key.width = grid::unit(2, "cm"),
-      legend.title = ggplot2::element_text(face = "bold")
-    )
-}
-
-summarize_na_counts <- function(x, value_pattern) {
-  data <- sf::st_drop_geometry(sf::st_as_sf(x))
-  value_cols <- grep(value_pattern, names(data), value = TRUE)
-  if (length(value_cols) == 0) {
-    fallback_excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", "time")
-    fallback_cols <- setdiff(names(data), fallback_excluded)
-    value_cols <- fallback_cols[vapply(data[fallback_cols], is.numeric, logical(1))]
-  }
-  if (length(value_cols) == 0) {
-    stop("No covariate columns found for missing-value summary.")
-  }
-  data.frame(
-    variable = value_cols,
-    missing_values = vapply(data[value_cols], function(col) sum(is.na(col)), integer(1)),
-    stringsAsFactors = FALSE
-  )
-}
 ```
 
 This article demonstrates a compact workflow for NASA GEOS-CF data. GEOS-CF downloads require a NASA EarthData token; see `protected_datasets` for setup details.
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
-Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
+Each workflow uses two compact example surfaces created from the processed GEOS extent: two points for point extraction and a small hexagon grid for polygon extraction.
 
 ## Available inputs and data availability
 
@@ -171,35 +62,44 @@ Each workflow uses two small example surfaces: `example_points_sf`, a saved subs
 ```{r download, eval = live_run}
 directory_to_save <- file.path(tempdir(), "geos_workflow")
 geos_live_extent <- c(-79.2, 35.8, -78.6, 36.3)
+geos_demo_collection <- "aqc_tavg_1hr_g1440x721_v1"
+geos_demo_date <- "2019-09-09"
+geos_download_error <- NULL
 
-geos_probe_url <- paste0(
-  "https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/",
-  "Y2019/M09/D09/GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20190909_0000z.nc4"
+
+download_data(
+  dataset_name = "geos",
+  collection = geos_demo_collection,
+  date = geos_demo_date,
+  directory_to_save = directory_to_save,
+  acknowledgement = TRUE
 )
-geos_live_probe <- tryCatch({
-  resp <- httr2::request(geos_probe_url) |>
-    httr2::req_method("HEAD") |>
-    httr2::req_timeout(20) |>
-    httr2::req_perform()
-  httr2::resp_status(resp)
-}, error = function(e) {
-  NA_integer_
-})
-geos_live_probe
 
-geos_live_files <- character(0)
+geos_live_files <- list.files(
+  file.path(directory_to_save, geos_demo_collection),
+  pattern = "\\.nc4$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+geos_live_ready <- length(geos_live_files) > 0
+if (!geos_live_ready) {
+  message(
+    "Using packaged GEOS test files for downstream chunks because live files ",
+    "are unavailable."
+  )
+}
 ```
 
 ## Process one workflow-ready data product
 
 ```{r process, eval = live_run}
-geos_process_path <- if (exists("geos_live_files") && length(geos_live_files) > 0) {
-  dirname(geos_live_files[1])
+geos_process_path <- if (isTRUE(geos_live_ready)) {
+  file.path(directory_to_save, geos_demo_collection)
 } else {
   geos_sample_path
 }
-geos_process_date <- if (exists("geos_live_files") && length(geos_live_files) > 0) {
-  "2019-09-09"
+geos_process_date <- if (isTRUE(geos_live_ready)) {
+  geos_demo_date
 } else {
   "2018-01-01"
 }
@@ -214,11 +114,47 @@ processed_data <- process_covariates(
     geos_live_extent[2], geos_live_extent[4]
   )
 )
+
+processed_extent <- terra::ext(processed_data)
+processed_bbox <- sf::st_bbox(
+  c(
+    xmin = processed_extent[1],
+    ymin = processed_extent[3],
+    xmax = processed_extent[2],
+    ymax = processed_extent[4]
+  ),
+  crs = sf::st_crs(4326)
+)
 ```
 
 ## Calculate covariates at points
 
 ```{r calculate-points, eval = live_run}
+domain_x <- c(processed_bbox[["xmin"]], processed_bbox[["xmax"]])
+domain_y <- c(processed_bbox[["ymin"]], processed_bbox[["ymax"]])
+domain_dx <- diff(domain_x)
+domain_dy <- diff(domain_y)
+
+candidate_xy <- expand.grid(
+  lon = seq(domain_x[1] + 0.12 * domain_dx, domain_x[2] - 0.12 * domain_dx, length.out = 5),
+  lat = seq(domain_y[1] + 0.12 * domain_dy, domain_y[2] - 0.12 * domain_dy, length.out = 5)
+)
+candidate_points_sf <- sf::st_as_sf(
+  candidate_xy,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+candidate_values <- terra::extract(
+  processed_data[[1]],
+  terra::vect(candidate_points_sf)
+)[, 2]
+valid_points <- candidate_points_sf[!is.na(candidate_values), ]
+if (nrow(valid_points) < 2) {
+  stop("Could not find at least two in-domain points with GEOS values.")
+}
+example_points_sf <- valid_points[1:2, ]
+example_points_sf$site_id <- sprintf("geos_point_%d", seq_len(nrow(example_points_sf)))
+
 point_values <- calculate_covariates(
   covariate = "geos",
   from = processed_data,
@@ -230,21 +166,57 @@ point_values <- calculate_covariates(
 )
 ```
 
-## Calculate covariates across Durham County H3 hexagons
+## Calculate covariates across in-domain hexagons
 
 ```{r calculate-polygons, eval = live_run}
+processed_domain <- sf::st_as_sfc(processed_bbox)
+hex_size <- min(domain_dx, domain_dy) / 5
+hex_grid <- sf::st_make_grid(processed_domain, cellsize = hex_size, square = FALSE)
+hex_sf <- sf::st_sf(geometry = hex_grid)
+hex_centroids <- sf::st_centroid(hex_sf)
+hex_values <- terra::extract(processed_data[[1]], terra::vect(hex_centroids))[, 2]
+example_hex_sf <- hex_sf[!is.na(hex_values), ]
+if (nrow(example_hex_sf) == 0) {
+  stop("Could not build in-domain hexagons with GEOS values.")
+}
+example_hex_sf$h3_id <- sprintf("geos_hex_%03d", seq_len(nrow(example_hex_sf)))
+
 polygon_values <- calculate_covariates(
   covariate = "geos",
   from = processed_data,
-  locs = durham_hex,
+  locs = example_hex_sf,
   locs_id = "h3_id",
   radius = 0,
   fun = "mean",
   geom = "sf"
 )
 
-point_na_summary <- summarize_na_counts(point_values, "^O3")
-polygon_na_summary <- summarize_na_counts(polygon_values, "^O3")
+point_data <- sf::st_drop_geometry(point_values)
+point_value_cols <- grep("^O3", names(point_data), value = TRUE)
+if (length(point_value_cols) == 0) {
+  point_value_cols <- names(point_data)[vapply(point_data, is.numeric, logical(1))]
+}
+point_na_summary <- data.frame(
+  variable = point_value_cols,
+  missing_values = vapply(point_data[point_value_cols], function(col) sum(is.na(col)), integer(1)),
+  stringsAsFactors = FALSE
+)
+
+polygon_data <- sf::st_drop_geometry(polygon_values)
+polygon_value_cols <- grep("^O3", names(polygon_data), value = TRUE)
+if (length(polygon_value_cols) == 0) {
+  polygon_value_cols <- names(polygon_data)[vapply(polygon_data, is.numeric, logical(1))]
+}
+polygon_na_summary <- data.frame(
+  variable = polygon_value_cols,
+  missing_values = vapply(
+    polygon_data[polygon_value_cols],
+    function(col) sum(is.na(col)),
+    integer(1)
+  ),
+  stringsAsFactors = FALSE
+)
+
 knitr::kable(point_na_summary, col.names = c("Variable", "Point missing values"))
 knitr::kable(polygon_na_summary, col.names = c("Variable", "Polygon missing values"))
 ```
@@ -252,13 +224,79 @@ knitr::kable(polygon_na_summary, col.names = c("Variable", "Polygon missing valu
 ## Visualize the point and polygon outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("NASA GEOS-CF", ": point extraction"))
+point_plot_col <- grep("^O3", names(point_values), value = TRUE)[1]
+if (is.na(point_plot_col) || point_plot_col == "") {
+  excluded <- c("site_id", "h3_id", attr(point_values, "sf_column"))
+  fallback_cols <- setdiff(names(point_values), excluded)
+  fallback_numeric <- fallback_cols[vapply(point_values[fallback_cols], is.numeric, logical(1))]
+  point_plot_col <- fallback_numeric[1]
+}
+
+point_bbox <- sf::st_bbox(point_values)
+point_pad_x <- max((point_bbox[["xmax"]] - point_bbox[["xmin"]]) * 0.08, 0.03)
+point_pad_y <- max((point_bbox[["ymax"]] - point_bbox[["ymin"]]) * 0.08, 0.03)
+
+ggplot2::ggplot(point_values) +
+  ggplot2::geom_sf(
+    ggplot2::aes(color = .data[[point_plot_col]]),
+    size = 2.2
+  ) +
+  ggplot2::coord_sf(
+    xlim = c(point_bbox[["xmin"]] - point_pad_x, point_bbox[["xmax"]] + point_pad_x),
+    ylim = c(point_bbox[["ymin"]] - point_pad_y, point_bbox[["ymax"]] + point_pad_y),
+    expand = FALSE,
+    datum = NA
+  ) +
+  ggplot2::scale_color_viridis_c(option = "C") +
+  ggplot2::labs(
+    title = "NASA GEOS-CF: point extraction",
+    color = point_plot_col
+  ) +
+  ggplot2::theme_minimal(base_size = 13) +
+  ggplot2::theme(
+    legend.position = "bottom",
+    legend.key.width = grid::unit(2, "cm"),
+    legend.title = ggplot2::element_text(face = "bold")
+  )
 ```
 
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("NASA GEOS-CF", ": Durham H3 polygons"))
+```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across in-domain hexagons for this workflow."}
+polygon_plot_col <- grep("^O3", names(polygon_values), value = TRUE)[1]
+if (is.na(polygon_plot_col) || polygon_plot_col == "") {
+  excluded <- c("site_id", "h3_id", attr(polygon_values, "sf_column"))
+  fallback_cols <- setdiff(names(polygon_values), excluded)
+  fallback_numeric <- fallback_cols[vapply(polygon_values[fallback_cols], is.numeric, logical(1))]
+  polygon_plot_col <- fallback_numeric[1]
+}
+
+polygon_bbox <- sf::st_bbox(polygon_values)
+polygon_pad_x <- max((polygon_bbox[["xmax"]] - polygon_bbox[["xmin"]]) * 0.08, 0.03)
+polygon_pad_y <- max((polygon_bbox[["ymax"]] - polygon_bbox[["ymin"]]) * 0.08, 0.03)
+
+ggplot2::ggplot(polygon_values) +
+  ggplot2::geom_sf(
+    ggplot2::aes(fill = .data[[polygon_plot_col]]),
+    color = NA
+  ) +
+  ggplot2::coord_sf(
+    xlim = c(polygon_bbox[["xmin"]] - polygon_pad_x, polygon_bbox[["xmax"]] + polygon_pad_x),
+    ylim = c(polygon_bbox[["ymin"]] - polygon_pad_y, polygon_bbox[["ymax"]] + polygon_pad_y),
+    expand = FALSE,
+    datum = NA
+  ) +
+  ggplot2::scale_fill_viridis_c(option = "C") +
+  ggplot2::labs(
+    title = "NASA GEOS-CF: in-domain hexagon extraction",
+    fill = polygon_plot_col
+  ) +
+  ggplot2::theme_minimal(base_size = 13) +
+  ggplot2::theme(
+    legend.position = "bottom",
+    legend.key.width = grid::unit(2, "cm"),
+    legend.title = ggplot2::element_text(face = "bold")
+  )
 ```
 
 ## Notes
 
-- The live download chunk validates authenticated GEOS-CF requests with `download = FALSE`; downstream processing uses downloaded files when present and otherwise falls back to packaged GEOS test files for reproducible rendering.
+- The live download chunk uses `download_data(dataset_name = "geos", collection = "aqc_tavg_1hr_g1440x721_v1", ...)`, which dispatches to `download_geos()`. Downstream processing uses downloaded files when present and otherwise falls back to packaged GEOS test files for reproducible rendering.
