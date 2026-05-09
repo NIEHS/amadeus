@@ -166,6 +166,15 @@ Projected CRS: unnamed
 5 001 2022-01-05 0.001953125 POINT (8184606 3523283)
 ```
 
+### Calculate_* buffer radius information
+
+ 1. locs are first projected to crs(from), then buffering uses that projected geometry.
+ 2. radius is interpreted in the geometry CRS distance units
+ 3. Most calc_* docs explicitly describe radius in meters, and output column names often encode that radius (sometimes zero-padded).
+ 4. For radius == 0, many paths do point extraction (no real buffer), but a couple helper paths create a tiny fallback buffer (1 or 1e-6)
+for weighted/exact extraction logic.
+
+
 ## Connecting Health Outcomes Research Data Systems 
 
 The `amadeus` package has been developed as part of the National Institute of Environmental Health Science's (NIEHS) Connecting Health Outcomes Research Data Systems (CHORDS) program. CHORDS aims to "build and strengthen data infrastructure for patient-centered outcomes research on environment and health" by providing curated data, analysis tools, and educational resources.

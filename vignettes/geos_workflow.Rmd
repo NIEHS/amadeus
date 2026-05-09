@@ -118,10 +118,10 @@ processed_data <- process_covariates(
 processed_extent <- terra::ext(processed_data)
 processed_bbox <- sf::st_bbox(
   c(
-    xmin = processed_extent[1],
-    ymin = processed_extent[3],
-    xmax = processed_extent[2],
-    ymax = processed_extent[4]
+    xmin = terra::xmin(processed_extent),
+    ymin = terra::ymin(processed_extent),
+    xmax = terra::xmax(processed_extent),
+    ymax = terra::ymax(processed_extent)
   ),
   crs = sf::st_crs(4326)
 )
@@ -130,8 +130,8 @@ processed_bbox <- sf::st_bbox(
 ## Calculate covariates at points
 
 ```{r calculate-points, eval = live_run}
-domain_x <- c(processed_bbox[["xmin"]], processed_bbox[["xmax"]])
-domain_y <- c(processed_bbox[["ymin"]], processed_bbox[["ymax"]])
+domain_x <- c(terra::xmin(processed_extent), terra::xmax(processed_extent))
+domain_y <- c(terra::ymin(processed_extent), terra::ymax(processed_extent))
 domain_dx <- diff(domain_x)
 domain_dy <- diff(domain_y)
 
@@ -139,89 +139,25 @@ candidate_xy <- expand.grid(
   lon = seq(domain_x[1] + 0.12 * domain_dx, domain_x[2] - 0.12 * domain_dx, length.out = 5),
   lat = seq(domain_y[1] + 0.12 * domain_dy, domain_y[2] - 0.12 * domain_dy, length.out = 5)
 )
-candidate_points_sf <- sf::st_as_sf(
+example_points_sf <- sf::st_as_sf(
   candidate_xy,
   coords = c("lon", "lat"),
   crs = 4326
 )
-candidate_values <- terra::extract(
-  processed_data[[1]],
-  terra::vect(candidate_points_sf)
-)[, 2]
-valid_points <- candidate_points_sf[!is.na(candidate_values), ]
-if (nrow(valid_points) < 2) {
-  stop("Could not find at least two in-domain points with GEOS values.")
-}
-example_points_sf <- valid_points[1:2, ]
-example_points_sf$site_id <- sprintf("geos_point_%d", seq_len(nrow(example_points_sf)))
-
+example_points_sf$site_id <- paste0("site_", seq_len(nrow(example_points_sf)))
 point_values <- calculate_covariates(
   covariate = "geos",
   from = processed_data,
   locs = example_points_sf,
   locs_id = "site_id",
-  radius = 0,
+  radius = 100,
   fun = "mean",
   geom = "sf"
 )
 ```
 
-## Calculate covariates across in-domain hexagons
 
-```{r calculate-polygons, eval = live_run}
-processed_domain <- sf::st_as_sfc(processed_bbox)
-hex_size <- min(domain_dx, domain_dy) / 5
-hex_grid <- sf::st_make_grid(processed_domain, cellsize = hex_size, square = FALSE)
-hex_sf <- sf::st_sf(geometry = hex_grid)
-hex_centroids <- sf::st_centroid(hex_sf)
-hex_values <- terra::extract(processed_data[[1]], terra::vect(hex_centroids))[, 2]
-example_hex_sf <- hex_sf[!is.na(hex_values), ]
-if (nrow(example_hex_sf) == 0) {
-  stop("Could not build in-domain hexagons with GEOS values.")
-}
-example_hex_sf$h3_id <- sprintf("geos_hex_%03d", seq_len(nrow(example_hex_sf)))
-
-polygon_values <- calculate_covariates(
-  covariate = "geos",
-  from = processed_data,
-  locs = example_hex_sf,
-  locs_id = "h3_id",
-  radius = 0,
-  fun = "mean",
-  geom = "sf"
-)
-
-point_data <- sf::st_drop_geometry(point_values)
-point_value_cols <- grep("^O3", names(point_data), value = TRUE)
-if (length(point_value_cols) == 0) {
-  point_value_cols <- names(point_data)[vapply(point_data, is.numeric, logical(1))]
-}
-point_na_summary <- data.frame(
-  variable = point_value_cols,
-  missing_values = vapply(point_data[point_value_cols], function(col) sum(is.na(col)), integer(1)),
-  stringsAsFactors = FALSE
-)
-
-polygon_data <- sf::st_drop_geometry(polygon_values)
-polygon_value_cols <- grep("^O3", names(polygon_data), value = TRUE)
-if (length(polygon_value_cols) == 0) {
-  polygon_value_cols <- names(polygon_data)[vapply(polygon_data, is.numeric, logical(1))]
-}
-polygon_na_summary <- data.frame(
-  variable = polygon_value_cols,
-  missing_values = vapply(
-    polygon_data[polygon_value_cols],
-    function(col) sum(is.na(col)),
-    integer(1)
-  ),
-  stringsAsFactors = FALSE
-)
-
-knitr::kable(point_na_summary, col.names = c("Variable", "Point missing values"))
-knitr::kable(polygon_na_summary, col.names = c("Variable", "Polygon missing values"))
-```
-
-## Visualize the point and polygon outputs
+## Visualize the point outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
 point_plot_col <- grep("^O3", names(point_values), value = TRUE)[1]
@@ -236,8 +172,13 @@ point_bbox <- sf::st_bbox(point_values)
 point_pad_x <- max((point_bbox[["xmax"]] - point_bbox[["xmin"]]) * 0.08, 0.03)
 point_pad_y <- max((point_bbox[["ymax"]] - point_bbox[["ymin"]]) * 0.08, 0.03)
 
-ggplot2::ggplot(point_values) +
+point_basemap <-
+  sf::st_as_sf(maps::map("world", plot = FALSE, fill = TRUE))
+
+ggplot2::ggplot() +
+  ggplot2::geom_sf(data = point_basemap) +
   ggplot2::geom_sf(
+    data = point_values,
     ggplot2::aes(color = .data[[point_plot_col]]),
     size = 2.2
   ) +
@@ -259,44 +200,3 @@ ggplot2::ggplot(point_values) +
     legend.title = ggplot2::element_text(face = "bold")
   )
 ```
-
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across in-domain hexagons for this workflow."}
-polygon_plot_col <- grep("^O3", names(polygon_values), value = TRUE)[1]
-if (is.na(polygon_plot_col) || polygon_plot_col == "") {
-  excluded <- c("site_id", "h3_id", attr(polygon_values, "sf_column"))
-  fallback_cols <- setdiff(names(polygon_values), excluded)
-  fallback_numeric <- fallback_cols[vapply(polygon_values[fallback_cols], is.numeric, logical(1))]
-  polygon_plot_col <- fallback_numeric[1]
-}
-
-polygon_bbox <- sf::st_bbox(polygon_values)
-polygon_pad_x <- max((polygon_bbox[["xmax"]] - polygon_bbox[["xmin"]]) * 0.08, 0.03)
-polygon_pad_y <- max((polygon_bbox[["ymax"]] - polygon_bbox[["ymin"]]) * 0.08, 0.03)
-
-ggplot2::ggplot(polygon_values) +
-  ggplot2::geom_sf(
-    ggplot2::aes(fill = .data[[polygon_plot_col]]),
-    color = NA
-  ) +
-  ggplot2::coord_sf(
-    xlim = c(polygon_bbox[["xmin"]] - polygon_pad_x, polygon_bbox[["xmax"]] + polygon_pad_x),
-    ylim = c(polygon_bbox[["ymin"]] - polygon_pad_y, polygon_bbox[["ymax"]] + polygon_pad_y),
-    expand = FALSE,
-    datum = NA
-  ) +
-  ggplot2::scale_fill_viridis_c(option = "C") +
-  ggplot2::labs(
-    title = "NASA GEOS-CF: in-domain hexagon extraction",
-    fill = polygon_plot_col
-  ) +
-  ggplot2::theme_minimal(base_size = 13) +
-  ggplot2::theme(
-    legend.position = "bottom",
-    legend.key.width = grid::unit(2, "cm"),
-    legend.title = ggplot2::element_text(face = "bold")
-  )
-```
-
-## Notes
-
-- The live download chunk uses `download_data(dataset_name = "geos", collection = "aqc_tavg_1hr_g1440x721_v1", ...)`, which dispatches to `download_geos()`. Downstream processing uses downloaded files when present and otherwise falls back to packaged GEOS test files for reproducible rendering.

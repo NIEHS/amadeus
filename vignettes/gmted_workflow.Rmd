@@ -74,31 +74,23 @@ directory_to_save <- file.path(tempdir(), "gmted_workflow")
 download_data(
   dataset_name = "gmted",
   statistic = "Breakline Emphasis",
-  resolution = "7.5 arc-seconds",
+  resolution = "30 arc-seconds",
   directory_to_save = directory_to_save,
   acknowledgement = TRUE,
   unzip = TRUE,
   remove_zip = FALSE
 )
-download_data(
-  dataset_name = "gmted",
-  statistic = "Mean Statistic",
-  resolution = "15 arc-seconds",
-  directory_to_save = file.path(directory_to_save, "mean_15s"),
-  acknowledgement = TRUE,
-  unzip = TRUE,
-  remove_zip = FALSE
-)
+
 ```
 
 ## Process one workflow-ready data product
 
 ```{r process, eval = live_run}
 gmted_dirs <- list.dirs(directory_to_save, recursive = TRUE, full.names = TRUE)
-gmted_path <- gmted_dirs[grepl("be75_grd$", gmted_dirs)][1]
+gmted_path <- gmted_dirs[grepl("be30_grd$", gmted_dirs)][1]
 processed_data <- process_covariates(
   covariate = "gmted",
-  variable = c("Breakline Emphasis", "7.5 arc-seconds"),
+  variable = c("Breakline Emphasis", "30 arc-seconds"),
   path = gmted_path,
   extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
 )
@@ -107,6 +99,23 @@ processed_data <- process_covariates(
 ## Calculate covariates at points
 
 ```{r calculate-points, eval = live_run}
+
+domain_x <- c(terra::xmin(processed_data), terra::xmax(processed_data))
+domain_y <- c(terra::ymin(processed_data), terra::ymax(processed_data))
+domain_dx <- diff(domain_x)
+domain_dy <- diff(domain_y)
+
+candidate_xy <- expand.grid(
+  lon = seq(domain_x[1] + 0.12 * domain_dx, domain_x[2] - 0.12 * domain_dx, length.out = 5),
+  lat = seq(domain_y[1] + 0.12 * domain_dy, domain_y[2] - 0.12 * domain_dy, length.out = 5)
+)
+example_points_sf <- sf::st_as_sf(
+  candidate_xy,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+example_points_sf$site_id <- paste0("site_", seq_len(nrow(example_points_sf)))
+
 point_values <- calculate_covariates(
   covariate = "gmted",
   from = processed_data,
@@ -130,19 +139,13 @@ polygon_values <- calculate_covariates(
   fun = "mean",
   geom = "sf"
 )
+
+print(polygon_values)
 ```
 
-## Visualize the point and polygon outputs
+## Visualize the point outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("USGS GMTED2010", ": point extraction"))
+ggplot(data = point_values) + geom_sf(aes(color = `_00000`))
 ```
 
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("USGS GMTED2010", ": Durham H3 polygons"))
-```
-
-## Notes
-
-- GMTED download requests are shown for two statistic/resolution combinations so the vignette covers more than one terrain surface.
-- Processing still focuses on the 7.5 arc-second breakline product because it is the most detailed of the two example requests.
