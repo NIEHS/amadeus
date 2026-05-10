@@ -2042,8 +2042,26 @@ process_groads <- function(
 ) {
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
-  if (!grepl("(shp|gdb)$", path)) {
-    stop("Input is not in expected format.\n")
+  if (!is.character(path) || length(path) != 1 || is.na(path)) {
+    stop(
+      "`path` must be a single file path to a .shp or .gdb roads file."
+    )
+  }
+  if (!file.exists(path)) {
+    stop(
+      sprintf(
+        "`path` does not exist: %s",
+        path
+      )
+    )
+  }
+  if (!grepl("\\.(shp|gdb)$", tolower(path))) {
+    stop(
+      paste0(
+        "`path` must point to a .shp or .gdb file. Received: ",
+        path
+      )
+    )
   }
   #### import data
   data <- terra::vect(path, extent = extent)

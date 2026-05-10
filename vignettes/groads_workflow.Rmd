@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 )
 library(amadeus)
 library(sf)
+library(terra)
+library(ggplot2)
 
 live_run <- local({
   force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
@@ -62,14 +64,17 @@ download_data(
 ## Process one workflow-ready data product
 
 ```{r process, eval = live_run}
+path = list.files(
+  directory_to_save,
+  pattern = "\\.(shp)$",
+  recursive = TRUE,
+  full.names = TRUE
+)[1]
+print(path)
+
 processed_data <- process_covariates(
   covariate = "groads",
-  path = list.files(
-    directory_to_save,
-    pattern = "\\.(shp|gpkg)$",
-    recursive = TRUE,
-    full.names = TRUE
-  )[1],
+  path = path,
   extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
 )
 
@@ -110,7 +115,7 @@ point_values <- calculate_covariates(
 
 ## Visualize the point and polygon outputs
 
-```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
+```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow.", fig.width = 10, fig.height = 6, out.width = "90%"}
 sf_process <- sf::st_as_sf(processed_data)
  # create 1-km buffers from points (in a projected CRS, then back to WGS84)
  buffers_1km <- example_points_sf |>
@@ -126,20 +131,20 @@ sf_process <- sf::st_as_sf(processed_data)
    all.x = TRUE
  )
 
- ggplot() +
-   geom_sf(data = sf_process, color = "grey40") +
-   geom_sf(data = buffers_1km, aes(fill = GRD_DENKM_0_01000), alpha = 0.8) +
+  ggplot() +
+    geom_sf(data = sf_process, color = "grey40") +
+    geom_sf(data = buffers_1km, aes(fill = GRD_DENKM_0_01000), alpha = 0.8) +
    scale_fill_gradientn(
      colours = c("#f7f7f7", "#fddbc7", "#ef8a62", "#b2182b"),
      values = scales::rescale(c(0, 0.001, 0.25, 1)),
      breaks = c(0, 0.25, 0.5, 0.75, 1.0),
      labels = c("0 (none)", "0.25", "0.5", "0.75", "1.0"),
      limits = c(0, 1),
-     oob = scales::squish,
-     name = "Road density\n(km / km²)"
-   ) +
-   ggtitle("Road density within 1km of points")
+      oob = scales::squish,
+      name = "Road density\n(km / km²)"
+    ) +
+    ggtitle("Road density within 1km of points") +
+    theme(legend.position = "bottom")
 
 
 ```
-

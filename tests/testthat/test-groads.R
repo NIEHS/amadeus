@@ -140,7 +140,24 @@ testthat::test_that("process_groads", {
   testthat::expect_s4_class(groads, "SpatVector")
   # error cases
   testthat::expect_error(
-    process_groads(path = 1L)
+    process_groads(path = 1L),
+    regexp = "must be a single file path to a \\.shp or \\.gdb roads file"
+  )
+  testthat::expect_error(
+    process_groads(path = "does/not/exist.shp"),
+    regexp = "`path` does not exist"
+  )
+  withr::with_tempdir({
+    bad_path <- file.path(".", "roads.txt")
+    writeLines("not a roads vector file", con = bad_path)
+    testthat::expect_error(
+      process_groads(path = bad_path),
+      regexp = "must point to a \\.shp or \\.gdb file"
+    )
+  })
+  testthat::expect_error(
+    process_groads(path = NA_character_),
+    regexp = "must be a single file path to a \\.shp or \\.gdb roads file"
   )
   # test with cropping extent
   testthat::expect_no_error(
