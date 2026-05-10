@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 )
 library(amadeus)
 library(sf)
+library(ggplot2)
 
 live_run <- local({
   force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
@@ -27,89 +28,11 @@ live_run <- local({
   force || !(on_ci || on_cran)
 })
 
-aqs_sample_path <- c(
-  file.path("tests", "testdata", "aqs", "aqs-location-sample.rds"),
-  file.path("..", "tests", "testdata", "aqs", "aqs-location-sample.rds")
-)
-aqs_sample_path <- aqs_sample_path[file.exists(aqs_sample_path)][1]
-if (is.na(aqs_sample_path) || aqs_sample_path == "") {
-  stop("Could not locate tests/testdata/aqs/aqs-location-sample.rds")
-}
-example_points_sf <- sf::st_as_sf(readRDS(aqs_sample_path))
-durham_hex_path <- system.file(
-  "extdata", "data_files", "durham_h3_res8.rds", package = "amadeus"
-)
-if (durham_hex_path == "") {
-  source_candidates <- c(
-    file.path("inst", "extdata", "data_files", "durham_h3_res8.rds"),
-    file.path("..", "inst", "extdata", "data_files", "durham_h3_res8.rds")
-  )
-  durham_hex_path <- source_candidates[file.exists(source_candidates)][1]
-}
-if (is.na(durham_hex_path) || durham_hex_path == "") {
-  stop("Could not locate inst/extdata/data_files/durham_h3_res8.rds")
-}
-durham_hex <- readRDS(durham_hex_path)
-
-
-pick_value_column <- function(x) {
-  geom_col <- attr(x, "sf_column")
-  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
-  candidates <- setdiff(names(x), excluded)
-  if (length(candidates) == 0) {
-    stop("No plottable covariate columns found.")
-  }
-  preferred <- candidates[vapply(x[candidates], function(col) {
-    is.numeric(col) || is.character(col) || is.factor(col)
-  }, logical(1))]
-  if (length(preferred) > 0) preferred[1] else candidates[1]
-}
-
-coord_local_sf <- function(x) {
-  x_wgs84 <- sf::st_transform(sf::st_as_sf(x), 4326)
-  bbox <- sf::st_bbox(x_wgs84)
-  pad_x <- max((bbox[["xmax"]] - bbox[["xmin"]]) * 0.08, 0.05)
-  pad_y <- max((bbox[["ymax"]] - bbox[["ymin"]]) * 0.08, 0.05)
-  ggplot2::coord_sf(
-    xlim = c(bbox[["xmin"]] - pad_x, bbox[["xmax"]] + pad_x),
-    ylim = c(bbox[["ymin"]] - pad_y, bbox[["ymax"]] + pad_y),
-    expand = FALSE,
-    datum = NA
-  )
-}
-
-plot_points <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(color = !!rlang::sym(value_col)),
-      size = 2
-    ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, color = value_col) +
-    ggplot2::theme_minimal()
-}
-
-plot_polygons <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(fill = !!rlang::sym(value_col)),
-      color = NA
-    ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, fill = value_col) +
-    ggplot2::theme_minimal()
-}
 ```
 
 This article demonstrates a compact workflow for Climatology Lab `gridMET` data using multiple variables, multiple summaries, and both point and polygon extraction.
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
-
-Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
 ## Available inputs and data availability
 
@@ -146,14 +69,14 @@ Each workflow uses two small example surfaces: `example_points_sf`, a saved subs
 directory_to_save <- file.path(tempdir(), "gridmet_workflow")
 download_data(
   dataset_name = "gridmet",
-  variables = c("tmmx", "pr"),
+  variables = c("tmmx"),
   year = 2020,
   directory_to_save = directory_to_save,
   acknowledgement = TRUE
 )
 ```
 
-## Process one workflow-ready data product
+## Process workflow-ready data product
 
 ```{r process, eval = live_run}
 processed_data <- process_covariates(
@@ -164,18 +87,30 @@ processed_data <- process_covariates(
   extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
 )
 
-processed_data <- process_covariates(
-  covariate = "gridmet",
-  variable = "tmmx",
-  date = c("2020-01-01", "2020-01-31"),
-  path = file.path(directory_to_save, "tmmx"),
-  extent = modis_extent
-)
 ```
 
-## Calculate covariates at points
+## Calculate covariates at points using native daily temporal resolution and use .by_time to calculate monthly means
 
-```{r calculate-points, eval = live_run}
+```{r calculate-points-daily, eval = live_run}
+
+
+domain_x <- c(terra::xmin(processed_data), terra::xmax(processed_data))
+domain_y <- c(terra::ymin(processed_data), terra::ymax(processed_data))
+domain_dx <- diff(domain_x)
+domain_dy <- diff(domain_y)
+
+candidate_xy <- expand.grid(
+  lon = seq(domain_x[1] + 0.12 * domain_dx, domain_x[2] - 0.12 * domain_dx, length.out = 5),
+  lat = seq(domain_y[1] + 0.12 * domain_dy, domain_y[2] - 0.12 * domain_dy, length.out = 5)
+)
+example_points_sf <- sf::st_as_sf(
+  candidate_xy,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+example_points_sf$site_id <- paste0("site_", seq_len(nrow(example_points_sf)))
+
+
 point_values <- calculate_covariates(
   covariate = "gridmet",
   from = processed_data,
@@ -197,53 +132,14 @@ point_values_month <- calculate_covariates(
   geom = "sf"
 )
 
-point_values_file_month <- calculate_covariates(
-  covariate = "gridmet",
-  from = file.path(directory_to_save, "tmmx"),
-  locs = example_points_sf,
-  locs_id = "site_id",
-  .by_time = "month",
-  radius = 0,
-  fun = "mean",
-  geom = "sf"
-)
+print(point_values)
+print(point_values_month)
 
-point_values_sum <- calculate_covariates(
-  covariate = "gridmet",
-  from = processed_data,
-  locs = example_points_sf,
-  locs_id = "site_id",
-  radius = 0,
-  fun = "sum",
-  geom = "sf"
-)
 ```
 
-## Calculate covariates across Durham County H3 hexagons
-
-```{r calculate-polygons, eval = live_run}
-polygon_values <- calculate_covariates(
-  covariate = "gridmet",
-  from = processed_data,
-  locs = durham_hex,
-  locs_id = "h3_id",
-  radius = 0,
-  fun = "sum",
-  geom = "sf"
-)
-```
-
-## Visualize the point and polygon outputs
+## Visualize the point outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("Climatology Lab gridMET", ": point extraction"))
+
+ggplot(data = point_values) + geom_sf(aes(color = `tmmx_0`)) + ggtitle("Daily values")
 ```
-
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("Climatology Lab gridMET", ": Durham H3 polygons"))
-```
-
-## Notes
-
-- The download chunk requests two gridMET variables so local runs exercise a true multi-variable request.
-- Point extraction demonstrates both `mean` and `sum`, while the polygon example uses `sum` to summarize accumulated precipitation over each H3 cell.

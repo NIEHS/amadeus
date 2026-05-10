@@ -2764,6 +2764,8 @@ calculate_population <- function(
 #' (Default = 1000).
 #' @param fun function(1). Function used to summarize the length of roads
 #' within sites location buffer (Default is `sum`).
+#' @param drop logical(1). Should locations with zero roads in the extraction
+#' buffer be dropped from results? Default is `FALSE` (retain all locations).
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2811,6 +2813,7 @@ calculate_groads <- function(
   locs_id = NULL,
   radius = 1000,
   fun = "sum",
+  drop = FALSE,
   weights = NULL,
   geom = FALSE,
   ...
@@ -2819,6 +2822,9 @@ calculate_groads <- function(
   #### check for null parameters
   if (radius <= 0) {
     stop("radius should be greater than 0.\n")
+  }
+  if (!is.logical(drop) || length(drop) != 1 || is.na(drop)) {
+    stop("`drop` should be a single logical value (TRUE/FALSE).")
   }
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
@@ -2851,27 +2857,64 @@ calculate_groads <- function(
   if (det_unit == 0) {
     det_unit <- 1
   }
+  total_name <- sprintf("GRD_TOTAL_0_%05d", radius)
+  density_name <- sprintf("GRD_DENKM_0_%05d", radius)
+
   # km / sq km
-  from_clip[["x"]] <- (from_clip[["x"]] * det_unit / 1e3)
-  from_clip$density <-
-    from_clip[["x"]] / (area_buffer * (det_unit^2) / 1e6)
-  from_clip <-
-    setNames(
-      from_clip,
-      c(
-        locs_id,
-        sprintf("GRD_TOTAL_0_%05d", radius),
-        sprintf("GRD_DENKM_0_%05d", radius)
+  if (nrow(from_clip) > 0) {
+    from_clip[["x"]] <- (from_clip[["x"]] * det_unit / 1e3)
+    from_clip$density <-
+      from_clip[["x"]] / (area_buffer * (det_unit^2) / 1e6)
+    from_clip <-
+      setNames(
+        from_clip,
+        c(
+          locs_id,
+          total_name,
+          density_name
+        )
       )
-    )
-  #### time period
+    from_clip <- data.frame(from_clip)
+  } else {
+    from_clip <- data.frame(sites_list[[2]])[0, locs_id, drop = FALSE]
+    from_clip[[total_name]] <- numeric(0)
+    from_clip[[density_name]] <- numeric(0)
+  }
   from_clip$description <- "1980 - 2010"
+
   if (geom %in% c("sf", "terra")) {
-    from_clip$geometry <- sites_list[[2]]$geometry
-    from_clip_reorder <- from_clip[, c(1, 5, 4, 2, 3)]
+    sites_geom <- data.frame(sites_list[[2]])
+    from_clip <- merge(
+      x = sites_geom,
+      y = from_clip[, c(locs_id, "description", total_name, density_name)],
+      by = locs_id,
+      all.x = TRUE,
+      sort = FALSE
+    )
+  } else {
+    sites_id <- data.frame(sites_list[[2]])[, locs_id, drop = FALSE]
+    from_clip <- merge(
+      x = sites_id,
+      y = from_clip[, c(locs_id, "description", total_name, density_name)],
+      by = locs_id,
+      all.x = TRUE,
+      sort = FALSE
+    )
+  }
+
+  from_clip[[total_name]][is.na(from_clip[[total_name]])] <- 0
+  from_clip[[density_name]][is.na(from_clip[[density_name]])] <- 0
+  from_clip$description[is.na(from_clip$description)] <- "1980 - 2010"
+
+  if (drop) {
+    from_clip <- from_clip[from_clip[[total_name]] > 0, , drop = FALSE]
+  }
+
+  if (geom %in% c("sf", "terra")) {
+    from_clip_reorder <- from_clip[, c(locs_id, "geometry", "description", total_name, density_name)]
   } else {
     #### reorder
-    from_clip_reorder <- from_clip[, c(1, 4, 2, 3)]
+    from_clip_reorder <- from_clip[, c(locs_id, "description", total_name, density_name)]
   }
   sites_return <- amadeus::calc_return_locs(
     covar = from_clip_reorder,

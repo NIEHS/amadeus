@@ -231,6 +231,49 @@ testthat::test_that("calculate_groads", {
     "sf" %in% class(groads_sf)
   )
 
+  # sf extraction with a non-overlapping location should still return geometry
+  ncp_sf <- sf::st_as_sf(
+    data.frame(
+      site_id = c("1", "2", "outside"),
+      lon = c(-78.899, -78.643669, -10),
+      lat = c(35.8774, 35.785342, 0),
+      time = c(2022, 2022, 2022)
+    ),
+    coords = c("lon", "lat"),
+    crs = "EPSG:4326",
+    remove = FALSE
+  )
+  testthat::expect_no_error(
+    groads_sf_partial <- calculate_groads(
+      from = groads,
+      locs = ncp_sf,
+      locs_id = "site_id",
+      radius = 5000,
+      geom = "sf"
+    )
+  )
+  testthat::expect_true(
+    "sf" %in% class(groads_sf_partial)
+  )
+  testthat::expect_equal(nrow(groads_sf_partial), 3)
+  testthat::expect_equal(
+    groads_sf_partial$GRD_TOTAL_0_05000[groads_sf_partial$site_id == "outside"],
+    0
+  )
+
+  testthat::expect_no_error(
+    groads_drop <- calculate_groads(
+      from = groads,
+      locs = ncp_sf,
+      locs_id = "site_id",
+      radius = 5000,
+      geom = "sf",
+      drop = TRUE
+    )
+  )
+  testthat::expect_false("outside" %in% groads_drop$site_id)
+  testthat::expect_equal(nrow(groads_drop), 2)
+
   testthat::expect_error(
     calculate_groads(
       from = groads,
@@ -238,6 +281,15 @@ testthat::test_that("calculate_groads", {
       locs_id = "site_id",
       radius = 5000,
       geom = TRUE
+    )
+  )
+  testthat::expect_error(
+    calculate_groads(
+      from = groads,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 5000,
+      drop = NA
     )
   )
 })
