@@ -328,8 +328,8 @@ download_aqs <-
       year_sequence
     )
 
-    #### Check for valid URL
-    if (!amadeus::check_url_status(download_urls[1])) {
+    #### Check for valid URL only when actually downloading
+    if (isTRUE(download) && !amadeus::check_url_status(download_urls[1])) {
       stop(paste0(
         "Invalid year returns HTTP code 404. ",
         "Check `year` parameter.\n"
