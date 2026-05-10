@@ -2911,10 +2911,14 @@ calculate_groads <- function(
   }
 
   if (geom %in% c("sf", "terra")) {
-    from_clip_reorder <- from_clip[, c(locs_id, "geometry", "description", total_name, density_name)]
+    from_clip_reorder <- from_clip[, c(
+      locs_id, "geometry", "description", total_name, density_name
+    )]
   } else {
     #### reorder
-    from_clip_reorder <- from_clip[, c(locs_id, "description", total_name, density_name)]
+    from_clip_reorder <- from_clip[, c(
+      locs_id, "description", total_name, density_name
+    )]
   }
   sites_return <- amadeus::calc_return_locs(
     covar = from_clip_reorder,
