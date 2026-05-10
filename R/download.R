@@ -328,14 +328,6 @@ download_aqs <-
       year_sequence
     )
 
-    #### Check for valid URL only when actually downloading
-    if (isTRUE(download) && !amadeus::check_url_status(download_urls[1])) {
-      stop(paste0(
-        "Invalid year returns HTTP code 404. ",
-        "Check `year` parameter.\n"
-      ))
-    }
-
     #### Build download file names
     download_names <- sprintf(
       paste(
@@ -354,6 +346,18 @@ download_aqs <-
     needs_download <- sapply(download_names, amadeus::check_destfile)
     download_urls_filtered <- download_urls[needs_download]
     download_names_filtered <- download_names[needs_download]
+
+    #### Check for valid URL only when actually downloading new files
+    if (
+      isTRUE(download) &&
+      length(download_urls_filtered) > 0 &&
+      !amadeus::check_url_status(download_urls_filtered[1])
+    ) {
+      stop(paste0(
+        "Invalid year returns HTTP code 404. ",
+        "Check `year` parameter.\n"
+      ))
+    }
 
     #### Exit early if download=FALSE
     if (!isTRUE(download)) {
