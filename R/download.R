@@ -350,8 +350,8 @@ download_aqs <-
     #### Check for valid URL only when actually downloading new files
     if (
       isTRUE(download) &&
-      length(download_urls_filtered) > 0 &&
-      !amadeus::check_url_status(download_urls_filtered[1])
+        length(download_urls_filtered) > 0 &&
+        !amadeus::check_url_status(download_urls_filtered[1])
     ) {
       stop(paste0(
         "Invalid year returns HTTP code 404. ",
