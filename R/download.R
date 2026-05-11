@@ -3932,8 +3932,7 @@ download_terraclimate <- function(
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @param unzip logical(1). Unzip the downloaded compressed files.
-#' Default is \code{FALSE}. Not working for this function since HUC data
-#' is in 7z format.
+#' Default is \code{FALSE}. Supports ".7z" extraction via \pkg{archive}.
 #' @param hash logical(1). By setting \code{TRUE} the function will return
 #' an \code{rlang::hash_file()} hash character corresponding to the
 #' downloaded files. Default is \code{FALSE}.
@@ -4004,14 +4003,6 @@ download_huc <-
         call. = FALSE
       )
     }
-    if (!isFALSE(unzip)) {
-      warning(
-        "Parameter 'unzip' is deprecated.",
-        " HUC data is in 7z format and cannot be unzipped automatically.\n",
-        call. = FALSE
-      )
-    }
-
     url_base <-
       "https://dmap-data-commons-ow.s3.amazonaws.com/NHDPlusV21/Data/NationalData/"
 
@@ -4056,6 +4047,12 @@ download_huc <-
       show_progress = show_progress,
       max_tries = max_tries,
       rate_limit = rate_limit
+    )
+    sapply(
+      download_names,
+      amadeus::download_unzip,
+      directory_to_unzip = directory_to_save,
+      unzip = unzip
     )
 
     message("Requests were processed.\n")

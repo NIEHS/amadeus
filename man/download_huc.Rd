@@ -40,8 +40,7 @@ Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 
 \item{unzip}{logical(1). Unzip the downloaded compressed files.
-Default is \code{FALSE}. Not working for this function since HUC data
-is in 7z format.}
+Default is \code{FALSE}. Supports ".7z" extraction via \pkg{archive}.}
 
 \item{hash}{logical(1). By setting \code{TRUE} the function will return
 an \code{rlang::hash_file()} hash character corresponding to the

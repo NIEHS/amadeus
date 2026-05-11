@@ -1488,6 +1488,52 @@ testthat::test_that("download_unzip respects unzip=FALSE", {
   })
 })
 
+testthat::test_that("download_unzip uses archive for .7z files", {
+  extract_called <- FALSE
+  testthat::local_mocked_bindings(
+    archive_extract = function(...) {
+      extract_called <<- TRUE
+      invisible(NULL)
+    },
+    .package = "archive"
+  )
+  withr::with_tempdir({
+    archive_file <- "test.7z"
+    file.create(archive_file)
+    unzip_dir <- "./unzipped"
+    dir.create(unzip_dir)
+    testthat::expect_no_error(
+      suppressMessages(
+        download_unzip(
+          file_name = archive_file,
+          directory_to_unzip = unzip_dir,
+          unzip = TRUE
+        )
+      )
+    )
+    testthat::expect_true(extract_called)
+  })
+})
+
+testthat::test_that("download_unzip errors on unsupported archive extension", {
+  withr::with_tempdir({
+    archive_file <- "test.rar"
+    file.create(archive_file)
+    unzip_dir <- "./unzipped"
+    dir.create(unzip_dir)
+    testthat::expect_error(
+      suppressMessages(
+        download_unzip(
+          file_name = archive_file,
+          directory_to_unzip = unzip_dir,
+          unzip = TRUE
+        )
+      ),
+      regexp = "Unsupported archive format"
+    )
+  })
+})
+
 ################################################################################
 ##### Test check_for_null_parameters
 testthat::test_that("check_for_null_parameters detects nulls", {

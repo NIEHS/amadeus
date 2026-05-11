@@ -624,14 +624,14 @@ download_sink <-
   }
 
 
-#' Unzip zip files
+#' Extract downloaded archives
 #' @description
-#' Unzip (inflate) downloaded ".zip" files.
-#' @param file_name character(1). Full zip file path
-#' @param directory_to_unzip character(1). Directory to unzip
+#' Extract downloaded ".zip" or ".7z" files.
+#' @param file_name character(1). Full archive file path
+#' @param directory_to_unzip character(1). Directory to extract
 #' data
-#' @param unzip logical(1). Unzip (\code{TRUE}) or not.
-#' @return NULL; unzips downloaded zip files
+#' @param unzip logical(1). Extract (\code{TRUE}) or not.
+#' @return NULL; extracts downloaded archive files
 #' @keywords internal
 #' @export
 download_unzip <-
@@ -640,9 +640,15 @@ download_unzip <-
       message(paste0("Downloaded files will not be unzipped.\n"))
       return(NULL)
     }
-
+    ext <- tolower(tools::file_ext(file_name))
     message(paste0("Unzipping files...\n"))
-    unzip(file_name, exdir = directory_to_unzip)
+    if (ext == "zip") {
+      unzip(file_name, exdir = directory_to_unzip)
+    } else if (ext == "7z") {
+      archive::archive_extract(file_name, dir = directory_to_unzip)
+    } else {
+      stop("Unsupported archive format. Expected .zip or .7z.")
+    }
     message(paste0(
       "Files unzipped and saved in ",
       directory_to_unzip,

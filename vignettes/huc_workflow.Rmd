@@ -27,82 +27,7 @@ live_run <- local({
   force || !(on_ci || on_cran)
 })
 
-aqs_sample_path <- c(
-  file.path("tests", "testdata", "aqs", "aqs-location-sample.rds"),
-  file.path("..", "tests", "testdata", "aqs", "aqs-location-sample.rds")
-)
-aqs_sample_path <- aqs_sample_path[file.exists(aqs_sample_path)][1]
-if (is.na(aqs_sample_path) || aqs_sample_path == "") {
-  stop("Could not locate tests/testdata/aqs/aqs-location-sample.rds")
-}
-example_points_sf <- sf::st_as_sf(readRDS(aqs_sample_path))
-durham_hex_path <- system.file(
-  "extdata", "data_files", "durham_h3_res8.rds", package = "amadeus"
-)
-if (durham_hex_path == "") {
-  source_candidates <- c(
-    file.path("inst", "extdata", "data_files", "durham_h3_res8.rds"),
-    file.path("..", "inst", "extdata", "data_files", "durham_h3_res8.rds")
-  )
-  durham_hex_path <- source_candidates[file.exists(source_candidates)][1]
-}
-if (is.na(durham_hex_path) || durham_hex_path == "") {
-  stop("Could not locate inst/extdata/data_files/durham_h3_res8.rds")
-}
-durham_hex <- readRDS(durham_hex_path)
 
-
-pick_value_column <- function(x) {
-  geom_col <- attr(x, "sf_column")
-  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
-  candidates <- setdiff(names(x), excluded)
-  if (length(candidates) == 0) {
-    stop("No plottable covariate columns found.")
-  }
-  preferred <- candidates[vapply(x[candidates], function(col) {
-    is.numeric(col) || is.character(col) || is.factor(col)
-  }, logical(1))]
-  if (length(preferred) > 0) preferred[1] else candidates[1]
-}
-
-coord_local_sf <- function(x) {
-  x_wgs84 <- sf::st_transform(sf::st_as_sf(x), 4326)
-  bbox <- sf::st_bbox(x_wgs84)
-  pad_x <- max((bbox[["xmax"]] - bbox[["xmin"]]) * 0.08, 0.05)
-  pad_y <- max((bbox[["ymax"]] - bbox[["ymin"]]) * 0.08, 0.05)
-  ggplot2::coord_sf(
-    xlim = c(bbox[["xmin"]] - pad_x, bbox[["xmax"]] + pad_x),
-    ylim = c(bbox[["ymin"]] - pad_y, bbox[["ymax"]] + pad_y),
-    expand = FALSE,
-    datum = NA
-  )
-}
-
-plot_points <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(color = !!rlang::sym(value_col)),
-      size = 2
-    ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, color = value_col) +
-    ggplot2::theme_minimal()
-}
-
-plot_polygons <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(fill = !!rlang::sym(value_col)),
-      color = NA
-    ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, fill = value_col) +
-    ggplot2::theme_minimal()
-}
 ```
 
 This article demonstrates a compact workflow for Hydrologic Unit Code boundaries.
@@ -124,42 +49,25 @@ Each workflow uses two small example surfaces: `example_points_sf`, a saved subs
 directory_to_save <- file.path(tempdir(), "huc_workflow")
 download_data(
   dataset_name = "huc",
-  region = "Lower48",
+  region = "Islands",
   type = "Seamless",
   directory_to_save = directory_to_save,
   acknowledgement = TRUE
 )
-download_data(
-  dataset_name = "huc",
-  region = "Lower48",
-  type = "OceanCatchment",
-  directory_to_save = file.path(directory_to_save, "ocean_catchment"),
-  acknowledgement = TRUE
-)
+
 ```
 
 ## Process one workflow-ready data product
 
 ```{r process, eval = live_run}
+
 huc_path <- list.files(
   directory_to_save,
   pattern = "\\.(7z|gdb|gpkg)$",
   recursive = TRUE,
   full.names = TRUE
 )
-huc_path <- huc_path[grepl("\\.(gdb|gpkg)$", huc_path)][1]
-if (is.na(huc_path)) {
-  huc_dirs <- list.dirs(directory_to_save, recursive = TRUE, full.names = TRUE)
-  huc_path <- huc_dirs[grepl("\\.gdb$", huc_dirs)][1]
-}
-layers <- terra::vector_layers(huc_path)
-for (layer_name in layers) {
-  candidate <- try(terra::vect(huc_path, layer = layer_name), silent = TRUE)
-  if (inherits(candidate, "try-error")) next
-  fields <- names(candidate)
-  huc_field <- fields[grepl("^HUC_?[0-9]{2}$", toupper(fields))][1]
-  if (!is.na(huc_field) && nzchar(huc_field)) break
-}
+
 processed_data <- process_covariates(
   covariate = "huc",
   path = huc_path,
@@ -181,29 +89,9 @@ point_values <- calculate_covariates(
 )
 ```
 
-## Calculate covariates across Durham County H3 hexagons
-
-```{r calculate-polygons, eval = live_run}
-polygon_values <- calculate_covariates(
-  covariate = "huc",
-  from = processed_data,
-  locs = durham_hex,
-  locs_id = "h3_id",
-  geom = "sf"
-)
-```
 
 ## Visualize the point and polygon outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
 plot_points(point_values, paste0("USGS Hydrologic Unit Codes (HUC)", ": point extraction"))
 ```
-
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("USGS Hydrologic Unit Codes (HUC)", ": Durham H3 polygons"))
-```
-
-## Notes
-
-- The two download requests show both the seamless national file geodatabase and the ocean-catchment variant.
-- HUC downloads can be very large, so the vignette keeps the processing extent tightly focused on Durham County.

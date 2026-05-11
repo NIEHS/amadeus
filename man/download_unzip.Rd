@@ -2,22 +2,22 @@
 % Please edit documentation in R/download_auxiliary.R
 \name{download_unzip}
 \alias{download_unzip}
-\title{Unzip zip files}
+\title{Extract downloaded archives}
 \usage{
 download_unzip(file_name, directory_to_unzip, unzip = TRUE)
 }
 \arguments{
-\item{file_name}{character(1). Full zip file path}
+\item{file_name}{character(1). Full archive file path}
 
-\item{directory_to_unzip}{character(1). Directory to unzip
+\item{directory_to_unzip}{character(1). Directory to extract
 data}
 
-\item{unzip}{logical(1). Unzip (\code{TRUE}) or not.}
+\item{unzip}{logical(1). Extract (\code{TRUE}) or not.}
 }
 \value{
-NULL; unzips downloaded zip files
+NULL; extracts downloaded archive files
 }
 \description{
-Unzip (inflate) downloaded ".zip" files.
+Extract downloaded ".zip" or ".7z" files.
 }
 \keyword{internal}

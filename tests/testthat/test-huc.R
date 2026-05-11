@@ -54,18 +54,6 @@ testthat::test_that("download_huc deprecation warnings", {
     regexp = "remove_command.*deprecated"
   )
 
-  testthat::expect_warning(
-    download_huc(
-      "Lower48",
-      "Seamless",
-      directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE,
-      unzip = TRUE
-    ),
-    regexp = "unzip.*deprecated"
-  )
-
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -90,6 +78,35 @@ testthat::test_that("download_huc mock download with hash", {
       )
     )
     testthat::expect_equal(result, "fakehash")
+  })
+})
+
+testthat::test_that("download_huc supports unzip via archive extraction", {
+  unzip_called <- FALSE
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) invisible(NULL),
+    download_unzip = function(file_name, directory_to_unzip, unzip = TRUE) {
+      unzip_called <<- isTRUE(unzip) && grepl("\\.7z$", file_name)
+      invisible(NULL)
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_no_error(
+      suppressWarnings(
+        suppressMessages(
+          download_huc(
+            region = "Lower48",
+            type = "Seamless",
+            directory_to_save = ".",
+            acknowledgement = TRUE,
+            download = TRUE,
+            unzip = TRUE
+          )
+        )
+      )
+    )
+    testthat::expect_true(unzip_called)
   })
 })
 
