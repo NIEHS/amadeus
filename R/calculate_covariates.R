@@ -492,7 +492,9 @@ calculate_nlcd <- function(
   # select points within mainland US and reproject on nlcd crs if necessary
   data_vect_b <-
     terra::project(locs_vector, y = terra::crs(from))
-  is_point_locs <- all(tolower(terra::geomtype(locs_vector)) %in% c("points", "point"))
+  is_point_locs <- all(
+    tolower(terra::geomtype(locs_vector)) %in% c("points", "point")
+  )
 
   message(
     paste0(
@@ -568,7 +570,11 @@ calculate_nlcd <- function(
         nlcd_at_bufs_fill <- data.frame(row.names = seq_len(nrow(locs_df)))
       }
       if (ncol(nlcd_at_bufs_fill) > 0) {
-        nlcd_cellcnt <- nlcd_at_bufs_fill[, seq_len(ncol(nlcd_at_bufs_fill)), drop = FALSE]
+        nlcd_cellcnt <- nlcd_at_bufs_fill[
+          ,
+          seq_len(ncol(nlcd_at_bufs_fill)),
+          drop = FALSE
+        ]
         nlcd_denom <- rowSums(nlcd_cellcnt, na.rm = TRUE)
         nlcd_denom[!is.finite(nlcd_denom) | nlcd_denom == 0] <- 1
         nlcd_cellcnt <- nlcd_cellcnt / nlcd_denom
@@ -582,7 +588,9 @@ calculate_nlcd <- function(
         sf::st_as_sf()
 
       if (nrow(bufs_polx) == 0) {
-        nlcd_at_bufs_fill <- data.frame(setNames(list(locs_df[[locs_id]]), locs_id))
+        nlcd_at_bufs_fill <- data.frame(
+          setNames(list(locs_df[[locs_id]]), locs_id)
+        )
       } else {
         nlcd_at_bufs <- Map(
           function(i) {
@@ -613,7 +621,11 @@ calculate_nlcd <- function(
       if (length(nlcd_val_cols) == 0) {
         nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, locs_id, drop = FALSE]
       } else {
-        nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, c(locs_id, nlcd_val_cols), drop = FALSE]
+        nlcd_at_bufs_fill <- nlcd_at_bufs_fill[
+          ,
+          c(locs_id, nlcd_val_cols),
+          drop = FALSE
+        ]
       }
       new_data_core <- merge(
         x = locs_df,
@@ -656,7 +668,11 @@ calculate_nlcd <- function(
       new_data_vect <- cbind(
         new_data_core[, c(locs_id, "geometry"), drop = FALSE],
         as.integer(year),
-        new_data_core[, setdiff(names(new_data_core), c(locs_id, "geometry")), drop = FALSE]
+        new_data_core[
+          ,
+          setdiff(names(new_data_core), c(locs_id, "geometry")),
+          drop = FALSE
+        ]
       )
     } else {
       new_data_vect <- cbind(
@@ -677,7 +693,11 @@ calculate_nlcd <- function(
     if ("geometry" %in% names(new_data_vect)) {
       fixed_cols <- c(locs_id, "geometry", "time")
     }
-    nlcd_cols <- grep("^NLCD_[0-9]+_[0-9]{5}$", names(new_data_vect), value = TRUE)
+    nlcd_cols <- grep(
+      "^NLCD_[0-9]+_[0-9]{5}$",
+      names(new_data_vect),
+      value = TRUE
+    )
     if (length(nlcd_cols) > 0) {
       keep_cols <- nlcd_cols[vapply(
         nlcd_cols,
