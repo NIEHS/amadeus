@@ -10,6 +10,7 @@ calculate_nlcd(
   locs_id = "site_id",
   mode = c("exact", "terra"),
   radius = 1000,
+  drop = FALSE,
   weights = NULL,
   max_cells = 5e+07,
   geom = FALSE,
@@ -29,6 +30,10 @@ or \code{"terra"} (using \code{\link[terra:freq]{terra::freq()}}). Ignored if \c
 
 \item{radius}{numeric (non-negative) giving the
 radius of buffer around points.}
+
+\item{drop}{logical(1). Default \code{FALSE}. For buffered outputs (\code{radius > 0}),
+retain NLCD class columns even when all values are 0 (\code{drop = FALSE}) or
+remove class columns that are all 0 across all locations (\code{drop = TRUE}).}
 
 \item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
 path. Optional weights raster for weighted extraction. If \code{NULL}

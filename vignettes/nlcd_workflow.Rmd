@@ -60,53 +60,43 @@ download_data(
 ## Process one workflow-ready data product
 
 ```{r process, eval = live_run}
+data_dir <- paste0(directory_to_save, "/data_files")
+
 processed_data <- process_covariates(
   covariate = "nlcd",
-  path = directory_to_save,
-  year = 2021,
-  extent = terra::ext(-115, -102, 31, 42)
+  path = data_dir,
+  year = 2021
 )
 ```
 
 ## Calculate covariates at points
 
 ```{r calculate-points, eval = live_run}
-point_values <- calculate_covariates(
-  covariate = "nlcd",
-  from = processed_data,
-  locs = example_points_sf,
-  locs_id = "site_id",
-  mode = "terra",
-  radius = 300,
-  geom = "sf"
-)
+
+ example_points_terra <- terra::spatSample(
+   processed_data[[1]],
+   size = 25,
+   method = "regular",
+   as.points = TRUE,
+   na.rm = TRUE,
+   values = FALSE
+ )
+ example_points_sf <- sf::st_as_sf(example_points_terra)
+ example_points_sf$site_id <- paste0("site_", seq_len(nrow(example_points_sf)))
+
+ point_values <- calculate_covariates(
+   covariate = "nlcd",
+   from = processed_data,
+   locs = example_points_sf,
+   locs_id = "site_id",
+   mode = "terra",
+   radius = 1000,
+   geom = "sf",
+   drop = FALSE
+ )
+
+print(point_values, n = 25)
 ```
 
-## Calculate covariates across Durham County H3 hexagons
 
-```{r calculate-polygons, eval = live_run}
-polygon_values <- calculate_covariates(
-  covariate = "nlcd",
-  from = processed_data,
-  locs = durham_hex,
-  locs_id = "h3_id",
-  mode = "terra",
-  radius = 300,
-  geom = "sf"
-)
-```
 
-## Visualize the point and polygon outputs
-
-```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("MRLC National Land Cover Database (NLCD)", ": point extraction"))
-```
-
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("MRLC National Land Cover Database (NLCD)", ": Durham H3 polygons"))
-```
-
-## Notes
-
-- The download section now covers both the standard land-cover raster and the fractional impervious surface product.
-- For polygon extraction the vignette keeps the `terra` mode used elsewhere in the package because it is the most practical default for buffered land-cover summaries.

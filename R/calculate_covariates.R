@@ -382,6 +382,9 @@ calculate_koppen_geiger <-
 #'   or `"terra"` (using [`terra::freq()`]). Ignored if `locs` are points.
 #' @param radius numeric (non-negative) giving the
 #' radius of buffer around points.
+#' @param drop logical(1). Default `FALSE`. For buffered outputs (`radius > 0`),
+#'   retain NLCD class columns even when all values are 0 (`drop = FALSE`) or
+#'   remove class columns that are all 0 across all locations (`drop = TRUE`).
 #' @param max_cells integer(1). Maximum number of cells to be read at once.
 #' Higher values may expedite processing, but will increase memory usage.
 #' Maximum possible value is `2^31 - 1`. Only valid when
@@ -430,6 +433,7 @@ calculate_nlcd <- function(
   locs_id = "site_id",
   mode = c("exact", "terra"),
   radius = 1000,
+  drop = FALSE,
   weights = NULL,
   max_cells = 5e7,
   geom = FALSE,
@@ -443,6 +447,9 @@ calculate_nlcd <- function(
   }
   if (radius < 0) {
     stop("radius has not a likely value.")
+  }
+  if (!is.logical(drop) || length(drop) != 1 || is.na(drop)) {
+    stop("`drop` should be a single logical value (TRUE/FALSE).")
   }
   if (!methods::is(from, "SpatRaster")) {
     stop("from is not a SpatRaster.")
@@ -480,13 +487,12 @@ calculate_nlcd <- function(
     )
   }
   year <- as.integer(terra::metags(from)$value[nrow(terra::metags(from))])
-  stopifnot(year %in% 1985:2023L)
+  stopifnot(year %in% 1985:2024L)
 
   # select points within mainland US and reproject on nlcd crs if necessary
   data_vect_b <-
     terra::project(locs_vector, y = terra::crs(from))
-  cfpath <- system.file("extdata", "nlcd_classes.csv", package = "amadeus")
-  nlcd_classes <- utils::read.csv(cfpath)
+  is_point_locs <- all(tolower(terra::geomtype(locs_vector)) %in% c("points", "point"))
 
   message(
     paste0(
@@ -496,7 +502,7 @@ calculate_nlcd <- function(
     )
   )
 
-  if (radius <= 0 && terra::geomtype(locs_vector) == "points") {
+  if (radius <= 0 && is_point_locs) {
     new_data_vect <- suppressMessages(
       amadeus::calc_worker(
         dataset = "nlcd",
@@ -527,10 +533,13 @@ calculate_nlcd <- function(
         new_data_vect[, setdiff(names(new_data_vect), locs_id), drop = FALSE]
       )
     }
-    names(new_data_vect)[grep("Annual", names(new_data_vect))] <- sprintf(
-      "LDU_0_%05d",
-      radius
-    )
+    value_col <- setdiff(names(new_data_vect), c(locs_id, "geometry", "time"))
+    if (length(value_col) == 1L) {
+      names(new_data_vect)[names(new_data_vect) == value_col] <- sprintf(
+        "NLCD_VALUE_%05d",
+        as.integer(radius)
+      )
+    }
   } else {
     # create circle buffers with buf_radius
     bufs_pol <- terra::buffer(data_vect_b, width = radius)
@@ -553,67 +562,130 @@ calculate_nlcd <- function(
         mode = mode,
         locs_id = locs_id
       )
-      nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, -seq(1, 2)]
-      nlcd_cellcnt <- nlcd_at_bufs_fill[, seq(1, ncol(nlcd_at_bufs_fill), 1)]
-      nlcd_cellcnt <- nlcd_cellcnt / rowSums(nlcd_cellcnt, na.rm = TRUE)
-      nlcd_at_bufs_fill[, seq(1, ncol(nlcd_at_bufs_fill), 1)] <- nlcd_cellcnt
+      if (ncol(nlcd_at_bufs_fill) >= 2) {
+        nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, -seq_len(2), drop = FALSE]
+      } else {
+        nlcd_at_bufs_fill <- data.frame(row.names = seq_len(nrow(locs_df)))
+      }
+      if (ncol(nlcd_at_bufs_fill) > 0) {
+        nlcd_cellcnt <- nlcd_at_bufs_fill[, seq_len(ncol(nlcd_at_bufs_fill)), drop = FALSE]
+        nlcd_denom <- rowSums(nlcd_cellcnt, na.rm = TRUE)
+        nlcd_denom[!is.finite(nlcd_denom) | nlcd_denom == 0] <- 1
+        nlcd_cellcnt <- nlcd_cellcnt / nlcd_denom
+        nlcd_cellcnt[!is.finite(as.matrix(nlcd_cellcnt))] <- 0
+        nlcd_at_bufs_fill[, seq_len(ncol(nlcd_at_bufs_fill))] <- nlcd_cellcnt
+      }
     } else {
       # class_query <- "value"
       # ratio of each nlcd class per buffer
       bufs_polx <- bufs_pol[terra::ext(from), ] |>
         sf::st_as_sf()
 
-      nlcd_at_bufs <- Map(
-        function(i) {
-          exactextractr::exact_extract(
-            from,
-            bufs_polx[i, ],
-            fun = "frac",
-            force_df = TRUE,
-            progress = FALSE,
-            append_cols = locs_id,
-            max_cells_in_memory = max_cells
-          )
-        },
-        seq_len(nrow(bufs_polx))
-      )
-      nlcd_at_bufs_fill <- amadeus::collapse_nlcd(
-        data = nlcd_at_bufs,
-        mode = mode,
-        locs = bufs_pol,
-        locs_id = locs_id
-      )
-      # select only the columns of interest
-      nlcd_at_buf_names <- names(nlcd_at_bufs_fill)
-      nlcd_val_cols <-
-        grep("^frac_", nlcd_at_buf_names)
-      nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, nlcd_val_cols]
+      if (nrow(bufs_polx) == 0) {
+        nlcd_at_bufs_fill <- data.frame(setNames(list(locs_df[[locs_id]]), locs_id))
+      } else {
+        nlcd_at_bufs <- Map(
+          function(i) {
+            exactextractr::exact_extract(
+              from,
+              bufs_polx[i, ],
+              fun = "frac",
+              force_df = TRUE,
+              progress = FALSE,
+              append_cols = locs_id,
+              max_cells_in_memory = max_cells
+            )
+          },
+          seq_len(nrow(bufs_polx))
+        )
+        nlcd_at_bufs_fill <- amadeus::collapse_nlcd(
+          data = nlcd_at_bufs,
+          mode = mode,
+          locs = bufs_pol,
+          locs_id = locs_id
+        )
+      }
     }
 
-    # fill NAs
-    nlcd_at_bufs_fill[is.na(nlcd_at_bufs_fill)] <- 0
-    # change column names
-    nlcd_names <- names(nlcd_at_bufs_fill)
-    nlcd_names <- sub(pattern = "frac_", replacement = "", x = nlcd_names)
-    nlcd_names <-
-      switch(
-        mode,
-        exact = as.numeric(nlcd_names),
-        terra = nlcd_names
+    if (mode == "exact") {
+      nlcd_at_buf_names <- names(nlcd_at_bufs_fill)
+      nlcd_val_cols <- grep("^frac_", nlcd_at_buf_names, value = TRUE)
+      if (length(nlcd_val_cols) == 0) {
+        nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, locs_id, drop = FALSE]
+      } else {
+        nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, c(locs_id, nlcd_val_cols), drop = FALSE]
+      }
+      new_data_core <- merge(
+        x = locs_df,
+        y = nlcd_at_bufs_fill,
+        by = locs_id,
+        all.x = TRUE,
+        sort = FALSE
       )
-    nlcd_names <-
-      nlcd_classes$class[match(nlcd_names, nlcd_classes$value)]
-    new_names <- sprintf("LDU_%s_0_%05d", nlcd_names, radius)
-    names(nlcd_at_bufs_fill) <- new_names
+    } else {
+      new_data_core <- cbind(locs_df, nlcd_at_bufs_fill)
+    }
 
-    # merge locs_df with nlcd class fractions
-    new_data_vect <- cbind(locs_df, as.integer(year), nlcd_at_bufs_fill)
+    value_cols <- setdiff(names(new_data_core), c(locs_id, "geometry"))
+    if (length(value_cols) > 0) {
+      new_data_core[, value_cols] <- lapply(
+        new_data_core[, value_cols, drop = FALSE],
+        function(x) {
+          x[is.na(x)] <- 0
+          x
+        }
+      )
+      nlcd_codes <- vapply(
+        value_cols,
+        function(x) {
+          x <- sub("^frac_", "", x)
+          x <- sub("^X", "", x)
+          x <- regmatches(x, regexpr("[0-9]+", x))
+          ifelse(length(x) == 0 || !nzchar(x), "UNK", x)
+        },
+        character(1)
+      )
+      names(new_data_core)[match(value_cols, names(new_data_core))] <- sprintf(
+        "NLCD_%s_%05d",
+        nlcd_codes,
+        as.integer(radius)
+      )
+    }
+
+    if ("geometry" %in% names(new_data_core)) {
+      new_data_vect <- cbind(
+        new_data_core[, c(locs_id, "geometry"), drop = FALSE],
+        as.integer(year),
+        new_data_core[, setdiff(names(new_data_core), c(locs_id, "geometry")), drop = FALSE]
+      )
+    } else {
+      new_data_vect <- cbind(
+        new_data_core[, locs_id, drop = FALSE],
+        as.integer(year),
+        new_data_core[, setdiff(names(new_data_core), locs_id), drop = FALSE]
+      )
+    }
   }
 
   if (geom %in% c("sf", "terra")) {
     names(new_data_vect)[1:3] <- c(locs_id, "geometry", "time")
   } else {
     names(new_data_vect)[1:2] <- c(locs_id, "time")
+  }
+  if (drop && radius > 0) {
+    fixed_cols <- c(locs_id, "time")
+    if ("geometry" %in% names(new_data_vect)) {
+      fixed_cols <- c(locs_id, "geometry", "time")
+    }
+    nlcd_cols <- grep("^NLCD_[0-9]+_[0-9]{5}$", names(new_data_vect), value = TRUE)
+    if (length(nlcd_cols) > 0) {
+      keep_cols <- nlcd_cols[vapply(
+        nlcd_cols,
+        function(x) any(new_data_vect[[x]] > 0, na.rm = TRUE),
+        logical(1)
+      )]
+      new_data_vect <- new_data_vect[, c(fixed_cols, keep_cols), drop = FALSE]
+    }
   }
   new_data_vect$time <- as.integer(new_data_vect$time)
   new_data_return <- amadeus::calc_return_locs(

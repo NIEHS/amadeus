@@ -303,6 +303,13 @@ testthat::test_that("calculate_nlcd", {
     ),
     "radius has not a likely value."
   )
+  testthat::expect_error(
+    calculate_nlcd(
+      locs = eg_data,
+      from = nlcdras,
+      drop = NA
+    )
+  )
 
   # -- two modes work properly
   testthat::expect_no_error(
@@ -390,12 +397,12 @@ testthat::test_that("calculate_nlcd", {
   testthat::expect_true(all(eg_data$site_id %in% output$site_id))
   # the value has changed. What affected this behavior?
   testthat::expect_equal(
-    output$LDU_TEFOR_0_03000[1],
+    output$NLCD_42_03000[1],
     0.09010682,
     tolerance = 1e-7
   )
   testthat::expect_equal(
-    output$LDU_TSHRB_0_03000[2],
+    output$NLCD_52_03000[2],
     0.01047932,
     tolerance = 1e-7
   )
@@ -509,6 +516,24 @@ testthat::test_that("calculate_nlcd", {
     3
   )
   testthat::expect_true(is.data.frame(out_points_df))
+
+  # drop all-zero classes (outside NLCD extent)
+  outside_only <- terra::vect(
+    data.frame(site_id = "outside", lon = 2.957, lat = 43.976),
+    geom = c("lon", "lat"),
+    keepgeom = TRUE,
+    crs = "EPSG:4326"
+  )
+  testthat::expect_no_error(
+    out_drop <- calculate_nlcd(
+      locs = outside_only,
+      locs_id = "site_id",
+      from = nlcdras,
+      radius = buf_radius,
+      drop = TRUE
+    )
+  )
+  testthat::expect_equal(names(out_drop), c("site_id", "time"))
 })
 
 testthat::test_that("calculate_nlcd (deprecated path structure)", {
@@ -673,9 +698,9 @@ testthat::test_that("integration across *_nlcd functions", {
   testthat::expect_true(ncol(df_nlcd_1000) >= 3)
 
   # polygons have proper column names
-  # NLCD columns should have format like LDU_[TYPE]_0_[RADIUS]
+  # NLCD columns should have format NLCD_[CODE]_[RADIUS]
   testthat::expect_true(
-    any(grepl("^LDU_T[A-Z]{4}_0_\\d+$", names(df_nlcd_1000)))
+    any(grepl("^NLCD_[0-9]+_\\d{5}$", names(df_nlcd_1000)))
   )
 })
 
