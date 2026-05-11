@@ -3209,7 +3209,7 @@ download_tri <- function(
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
-#' @author Ranadeep Daw, Insang Song
+#' @author Kyle Messier, Insang Song
 #' @return invisible list with download results; or hash character if hash=TRUE
 #' @importFrom Rdpack reprompt
 #' @references

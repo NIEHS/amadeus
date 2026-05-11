@@ -257,6 +257,10 @@ testthat::test_that("process_nei", {
     neinc <- process_nei(path = path_nei, year = 2017, county = path_cnty)
   )
   testthat::expect_s4_class(neinc, "SpatVector")
+  path_cnty$GEOID20 <- path_cnty$GEOID
+  testthat::expect_no_error(
+    process_nei(path = path_nei, year = 2017, county = path_cnty)
+  )
 
   # error cases
   testthat::expect_error(

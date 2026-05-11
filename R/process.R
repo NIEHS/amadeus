@@ -1553,10 +1553,13 @@ process_nei <- function(
   csvs_nei$time <- as.integer(year)
 
   # read county vector
-  cnty_geoid_guess <- grep("GEOID", names(county))
-  names(county)[cnty_geoid_guess] <- "geoid"
-  county$geoid <- sprintf("%05d", as.integer(county$geoid))
-  cnty_vect <- merge(county, as.data.frame(csvs_nei), by = "geoid")
+  county$GEOID <- sprintf("%05d", as.integer(county$GEOID))
+  csvs_nei_df <- as.data.frame(csvs_nei)
+  county_rows <- match(county$GEOID, csvs_nei_df$geoid)
+  county$time <- csvs_nei_df$time[county_rows]
+  county$TRF_NEINP_0_00000 <- csvs_nei_df$TRF_NEINP_0_00000[county_rows]
+  county$geoid <- county$GEOID
+  cnty_vect <- county[!is.na(county$TRF_NEINP_0_00000), ]
   cnty_vect <- cnty_vect[, c("geoid", "time", "TRF_NEINP_0_00000")]
   return(cnty_vect)
 }
