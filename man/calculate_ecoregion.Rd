@@ -10,6 +10,7 @@ calculate_ecoregion(
   locs_id = "site_id",
   colnames = c("coded", "full_ecoregion"),
   frac = FALSE,
+  radius = 0,
   drop = FALSE,
   weights = NULL,
   geom = FALSE,
@@ -30,6 +31,9 @@ Use \code{"full_ecoregion"} to emit sanitized full ecoregion names.}
 
 \item{frac}{logical(1). Default \code{FALSE}. If \code{FALSE}, returns binary dummy
 indicators (0/1). If \code{TRUE}, returns fractional overlap values.}
+
+\item{radius}{numeric(1). Circular buffer size (meters) around point
+locations. Use \code{0} (default) for exact point extraction.}
 
 \item{drop}{logical(1). Default \code{FALSE}. If \code{TRUE}, remove ecoregion columns
 that are all 0 or \code{NA} across returned locations.}

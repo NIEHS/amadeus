@@ -733,6 +733,8 @@ calculate_nlcd <- function(
 #'   Use `"full_ecoregion"` to emit sanitized full ecoregion names.
 #' @param frac logical(1). Default `FALSE`. If `FALSE`, returns binary dummy
 #'   indicators (0/1). If `TRUE`, returns fractional overlap values.
+#' @param radius numeric(1). Circular buffer size (meters) around point
+#'   locations. Use `0` (default) for exact point extraction.
 #' @param drop logical(1). Default `FALSE`. If `TRUE`, remove ecoregion columns
 #'   that are all 0 or `NA` across returned locations.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
@@ -780,6 +782,7 @@ calculate_ecoregion <-
     locs_id = "site_id",
     colnames = c("coded", "full_ecoregion"),
     frac = FALSE,
+    radius = 0,
     drop = FALSE,
     weights = NULL,
     geom = FALSE,
@@ -866,6 +869,12 @@ calculate_ecoregion <-
     if (!is.logical(frac) || length(frac) != 1L || is.na(frac)) {
       stop("`frac` should be a single logical value (TRUE/FALSE).")
     }
+    if (!is.numeric(radius) || length(radius) != 1L || is.na(radius)) {
+      stop("`radius` should be a single numeric value.")
+    }
+    if (radius < 0) {
+      stop("`radius` should be greater than or equal to 0.")
+    }
     if (!is.logical(drop) || length(drop) != 1L || is.na(drop)) {
       stop("`drop` should be a single logical value (TRUE/FALSE).")
     }
@@ -875,7 +884,7 @@ calculate_ecoregion <-
       from = from,
       locs = locs,
       locs_id = locs_id,
-      radius = 0,
+      radius = radius,
       geom = geom
     )
     # both objects will preserve the row order

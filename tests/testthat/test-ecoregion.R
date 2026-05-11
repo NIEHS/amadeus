@@ -640,6 +640,55 @@ testthat::test_that("calculate_ecoregion frac works for polygon locs with drop",
   )
 })
 
+testthat::test_that(
+  "calculate_ecoregion radius is applied for point frac extraction",
+  {
+    withr::local_package("terra")
+    withr::local_package("sf")
+    withr::local_options(list(sf_use_s2 = FALSE))
+
+    ecol3 <- testthat::test_path(
+      "..",
+      "testdata",
+      "ecoregions",
+      "eco_l3_clip.gpkg"
+    )
+    erras <- process_ecoregion(ecol3)
+
+    loc_pt <- data.frame(
+      site_id = "37999109988101",
+      lon = -77.576,
+      lat = 39.40
+    )
+    loc_pt <- sf::st_as_sf(loc_pt, coords = c("lon", "lat"), crs = 4326)
+    loc_pt <- sf::st_transform(loc_pt, sf::st_crs(terra::crs(erras)))
+
+    loc_poly <- terra::buffer(terra::vect(loc_pt), width = 100000)
+
+    out_radius <- calculate_ecoregion(
+      from = erras,
+      locs = loc_pt,
+      locs_id = "site_id",
+      frac = TRUE,
+      radius = 100000
+    )
+    out_poly <- calculate_ecoregion(
+      from = erras,
+      locs = loc_poly,
+      locs_id = "site_id",
+      frac = TRUE
+    )
+
+    frc_cols <- grep("^FRC_", names(out_radius), value = TRUE)
+    testthat::expect_true(length(frc_cols) > 0)
+    testthat::expect_equal(
+      as.numeric(out_radius[1, frc_cols, drop = TRUE]),
+      as.numeric(out_poly[1, frc_cols, drop = TRUE]),
+      tolerance = 1e-3
+    )
+  }
+)
+
 testthat::test_that("calc_return_locs covers geometry return branches", {
   withr::local_package("terra")
   withr::local_package("sf")
