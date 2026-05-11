@@ -592,6 +592,54 @@ testthat::test_that("calculate_ecoregion full_ecoregion disambiguates duplicates
   )
 })
 
+testthat::test_that("calculate_ecoregion frac works for polygon locs with drop", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  ecol3 <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
+  erras <- process_ecoregion(ecol3)
+
+  site_poly <- data.frame(
+    site_id = "37999109988101",
+    lon = -77.576,
+    lat = 39.40
+  )
+  site_poly <- terra::vect(
+    site_poly,
+    geom = c("lon", "lat"),
+    keepgeom = TRUE,
+    crs = "EPSG:4326"
+  )
+  site_poly <- terra::project(site_poly, "EPSG:5070")
+  site_poly <- terra::buffer(site_poly, width = 5000)
+
+  ecor_frac <- calculate_ecoregion(
+    from = erras,
+    locs = site_poly,
+    locs_id = "site_id",
+    frac = TRUE,
+    drop = TRUE
+  )
+
+  frc_cols <- grep("^FRC_", names(ecor_frac), value = TRUE)
+  testthat::expect_true(length(frc_cols) >= 2)
+  testthat::expect_true(
+    all(vapply(ecor_frac[, frc_cols, drop = FALSE], is.numeric, logical(1)))
+  )
+  testthat::expect_true(
+    all(as.matrix(ecor_frac[, frc_cols, drop = FALSE]) >= 0, na.rm = TRUE)
+  )
+  testthat::expect_true(
+    all(as.matrix(ecor_frac[, frc_cols, drop = FALSE]) <= 1, na.rm = TRUE)
+  )
+})
+
 testthat::test_that("calc_return_locs covers geometry return branches", {
   withr::local_package("terra")
   withr::local_package("sf")

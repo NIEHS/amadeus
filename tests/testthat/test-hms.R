@@ -702,6 +702,31 @@ testthat::test_that("calculate_hms frac with .by_time uses mean summarization", 
   )
 })
 
+testthat::test_that("calculate_hms frac with no plume overlap returns zeros", {
+  withr::local_package("terra")
+  locs_far <- data.frame(lon = -100.0, lat = 0.0)
+  locs_far$site_id <- "far_site"
+  hms <- process_hms(
+    date = c("2022-06-10", "2022-06-11"),
+    path = testthat::test_path("..", "testdata", "hms")
+  )
+  hms_far <- suppressMessages(
+    calculate_hms(
+      from = hms,
+      locs = locs_far,
+      locs_id = "site_id",
+      radius = 1000,
+      frac = TRUE,
+      geom = FALSE
+    )
+  )
+  smoke_cols <- grep("^(light|medium|heavy)_", names(hms_far), value = TRUE)
+  testthat::expect_true(length(smoke_cols) == 3)
+  testthat::expect_true(
+    all(as.matrix(hms_far[, smoke_cols, drop = FALSE]) == 0, na.rm = TRUE)
+  )
+})
+
 testthat::test_that("calculate_hms character skip path supports .by_time summarization", {
   withr::local_package("terra")
   ncp <- data.frame(lon = -78.8277, lat = 35.95013)
