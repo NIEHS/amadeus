@@ -720,10 +720,10 @@ calculate_nlcd <- function(
 
 #' Calculate ecoregions covariates
 #' @description
-#' Extract ecoregions covariates (U.S. EPA Ecoregions Level 2/3) at point
-#' locations. Returns a `data.frame` object containing `locs_id` and
-#' binary (0 = point not in ecoregion; 1 = point in ecoregion) variables for
-#' each ecoregion.
+#' Extract ecoregions covariates (U.S. EPA Ecoregions Level 2/3) at point or
+#' polygon locations. Returns a `data.frame` object containing `locs_id` and
+#' either dummy indicators (`frac = FALSE`) or area fractions (`frac = TRUE`)
+#' for each ecoregion.
 #' @param from SpatVector(1). Output of [`process_ecoregion`].
 #' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named `locs_id`
@@ -731,6 +731,10 @@ calculate_nlcd <- function(
 #' @param colnames character(1). Naming convention for ecoregion indicator
 #'   columns. Default is `"coded"` for the existing numeric key-based names.
 #'   Use `"full_ecoregion"` to emit sanitized full ecoregion names.
+#' @param frac logical(1). Default `FALSE`. If `FALSE`, returns binary dummy
+#'   indicators (0/1). If `TRUE`, returns fractional overlap values.
+#' @param drop logical(1). Default `FALSE`. If `TRUE`, remove ecoregion columns
+#'   that are all 0 or `NA` across returned locations.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -739,13 +743,17 @@ calculate_nlcd <- function(
 #'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @seealso [`process_ecoregion`]
-#' @return a data.frame or SpatVector object object with dummy variables and
-#' attributes of:
+#' @return a data.frame or SpatVector object with ecoregion indicator/fraction
+#' variables and attributes of:
 #'   - Indicator names are controlled by `colnames`: `"coded"` (default)
 #'   creates key-based names such as `DUM_E2083_0_00000` and
-#'   `DUM_E3064_0_00000`; `"full_ecoregion"` creates sanitized name-based
-#'   columns such as `DUM_E2_SOUTHEASTERN_USA_PLAINS_0_00000` and
-#'   `DUM_E3_NORTHERN_PIEDMONT_0_00000` (duplicates are suffixed, e.g. `_1`).
+#'   `DUM_E3064_0_00000` when `frac = FALSE`, or `FRC_E2083_0_00000` and
+#'   `FRC_E3064_0_00000` when `frac = TRUE`; `"full_ecoregion"` creates
+#'   sanitized name-based columns such as
+#'   `DUM_E2_SOUTHEASTERN_USA_PLAINS_0_00000` /
+#'   `FRC_E2_SOUTHEASTERN_USA_PLAINS_0_00000` and
+#'   `DUM_E3_NORTHERN_PIEDMONT_0_00000` /
+#'   `FRC_E3_NORTHERN_PIEDMONT_0_00000` (duplicates are suffixed, e.g. `_1`).
 #'   - `attr(., "ecoregion2_code")`: Ecoregion lv.2 code and key
 #'   - `attr(., "ecoregion3_code")`: Ecoregion lv.3 code and key
 #' @author Insang Song
@@ -771,6 +779,8 @@ calculate_ecoregion <-
     locs,
     locs_id = "site_id",
     colnames = c("coded", "full_ecoregion"),
+    frac = FALSE,
+    drop = FALSE,
     weights = NULL,
     geom = FALSE,
     ...
@@ -786,7 +796,13 @@ calculate_ecoregion <-
       x[x == ""] <- "UNKNOWN"
       x
     }
-    build_ecoregion_lookup <- function(keys, labels, prefix, naming_mode) {
+    build_ecoregion_lookup <- function(
+      keys,
+      labels,
+      prefix,
+      naming_mode,
+      value_prefix
+    ) {
       lookup <- unique(data.frame(
         key = as.character(keys),
         label = as.character(labels),
@@ -799,7 +815,8 @@ calculate_ecoregion <-
             regexpr("\\d{1,2}\\.[1-9]", lookup$key)
           )
           key_num <- sprintf(
-            "DUM_%s%03d_0_00000",
+            "%s_%s%03d_0_00000",
+            value_prefix,
             prefix,
             as.integer(10 * as.numeric(key_num))
           )
@@ -809,7 +826,8 @@ calculate_ecoregion <-
             regexpr("\\d{1,3}", lookup$key)
           )
           key_num <- sprintf(
-            "DUM_%s%03d_0_00000",
+            "%s_%s%03d_0_00000",
+            value_prefix,
             prefix,
             as.integer(as.numeric(key_num))
           )
@@ -818,7 +836,8 @@ calculate_ecoregion <-
       } else {
         safe_label <- sanitize_ecoregion_name(lookup$label)
         lookup$column_name <- paste0(
-          "DUM_",
+          value_prefix,
+          "_",
           prefix,
           "_",
           safe_label,
@@ -844,6 +863,13 @@ calculate_ecoregion <-
       values
     }
     colnames <- match.arg(colnames)
+    if (!is.logical(frac) || length(frac) != 1L || is.na(frac)) {
+      stop("`frac` should be a single logical value (TRUE/FALSE).")
+    }
+    if (!is.logical(drop) || length(drop) != 1L || is.na(drop)) {
+      stop("`drop` should be a single logical value (TRUE/FALSE).")
+    }
+    value_prefix <- if (isTRUE(frac)) "FRC" else "DUM"
     # prepare locations
     locs_prepared <- amadeus::calc_prepare_locs(
       from = from,
@@ -855,23 +881,18 @@ calculate_ecoregion <-
     # both objects will preserve the row order
     locsp <- locs_prepared[[1]]
     locs_df <- locs_prepared[[2]]
+    is_point_locs <- all(
+      tolower(terra::geomtype(locsp)) %in% c("points", "point")
+    )
 
     extracted <- terra::intersect(locsp, from)
-
-    # Generate field names from extracted ecoregion keys
-    # TODO: if we keep all-zero fields, the initial reference
-    # should be the ecoregion polygon, not the extracted data
-    key2_sorted <- as.character(get_extracted_field(extracted, "L2_KEY"))
     key2_lookup <- build_ecoregion_lookup(
       keys = from$L2_KEY,
       labels = from$NA_L2NAME,
       prefix = "E2",
-      naming_mode = colnames
+      naming_mode = colnames,
+      value_prefix = value_prefix
     )
-    key2_num <- key2_lookup$column_name[match(key2_sorted, key2_lookup$key)]
-    key2_num_unique <- sort(unique(key2_num))
-
-    key3_sorted <- as.character(get_extracted_field(extracted, "L3_KEY"))
     key3_labels <- if ("US_L3NAME" %in% names(from)) {
       from$US_L3NAME
     } else {
@@ -881,57 +902,148 @@ calculate_ecoregion <-
       keys = from$L3_KEY,
       labels = key3_labels,
       prefix = "E3",
-      naming_mode = colnames
+      naming_mode = colnames,
+      value_prefix = value_prefix
     )
-    key3_num <- key3_lookup$column_name[match(key3_sorted, key3_lookup$key)]
-    key3_num_unique <- sort(unique(key3_num))
-
-    df_lv2 <-
-      split(key2_num_unique, key2_num_unique) |>
-      lapply(function(x) {
-        as.integer(key2_num == x)
-      }) |>
-      Reduce(f = cbind, x = _) |>
-      as.data.frame()
-    colnames(df_lv2) <- key2_num_unique
-    df_lv3 <-
-      split(key3_num_unique, key3_num_unique) |>
-      lapply(function(x) {
-        as.integer(key3_num == x)
-      }) |>
-      Reduce(f = cbind, x = _) |>
-      as.data.frame()
-    colnames(df_lv3) <- key3_num_unique
-
-    locs_ecoreg <- cbind(
-      locs_df[(locs_df[, 1] %in% extracted[[locs_id]][, 1]), ],
-      paste0("1997 - ", data.table::year(Sys.Date())),
-      df_lv2,
-      df_lv3
+    locs_ecoreg <- data.frame(
+      locs_df[0, , drop = FALSE],
+      description = character(0),
+      stringsAsFactors = FALSE
     )
-    colnames(locs_ecoreg)[1] <- locs_id
+
+    if (nrow(extracted) > 0) {
+      extracted_df <- terra::as.data.frame(extracted)
+      key2_sorted <- as.character(get_extracted_field(extracted_df, "L2_KEY"))
+      key3_sorted <- as.character(get_extracted_field(extracted_df, "L3_KEY"))
+      site_sorted <- as.character(extracted_df[[locs_id]])
+
+      if (is_point_locs || !isTRUE(frac)) {
+        base_value <- rep(1, length(site_sorted))
+      } else {
+        site_areas <- terra::expanse(locsp)
+        site_lookup <- setNames(site_areas, as.character(locsp[[locs_id]]))
+        inter_areas <- terra::expanse(extracted)
+        denom <- as.numeric(site_lookup[site_sorted])
+        denom[!is.finite(denom) | denom <= 0] <- NA_real_
+        base_value <- inter_areas / denom
+        base_value[!is.finite(base_value)] <- 0
+      }
+
+      build_wide <- function(site_ids, keys, lookup_tbl, values) {
+        vals_df <- data.frame(
+          site_id = site_ids,
+          key = as.character(keys),
+          base_value = values,
+          stringsAsFactors = FALSE
+        )
+        vals_df <- stats::aggregate(
+          base_value ~ site_id + key,
+          data = vals_df,
+          FUN = sum
+        )
+        if (!isTRUE(frac)) {
+          vals_df$base_value <- as.integer(vals_df$base_value > 0)
+        } else {
+          vals_df$base_value <- pmin(vals_df$base_value, 1)
+        }
+        vals_df$column_name <- lookup_tbl$column_name[
+          match(vals_df$key, lookup_tbl$key)
+        ]
+        vals_df <- vals_df[!is.na(vals_df$column_name), , drop = FALSE]
+        if (nrow(vals_df) == 0) {
+          return(data.frame(
+            site_id = character(),
+            stringsAsFactors = FALSE
+          ))
+        }
+        tidyr::pivot_wider(
+          vals_df[, c("site_id", "column_name", "base_value"), drop = FALSE],
+          names_from = "column_name",
+          values_from = "base_value",
+          values_fill = list(base_value = 0)
+        )
+      }
+
+      matched_ids <- unique(site_sorted)
+      locs_ecoreg <- cbind(
+        locs_df[locs_df[[locs_id]] %in% matched_ids, , drop = FALSE],
+        description = paste0("1997 - ", data.table::year(Sys.Date()))
+      )
+      df_lv2 <- build_wide(site_sorted, key2_sorted, key2_lookup, base_value)
+      df_lv3 <- build_wide(site_sorted, key3_sorted, key3_lookup, base_value)
+
+      locs_ecoreg <- merge(
+        locs_ecoreg,
+        df_lv2,
+        by.x = locs_id,
+        by.y = "site_id",
+        all.x = TRUE,
+        sort = FALSE
+      )
+      locs_ecoreg <- merge(
+        locs_ecoreg,
+        df_lv3,
+        by.x = locs_id,
+        by.y = "site_id",
+        all.x = TRUE,
+        sort = FALSE
+      )
+    }
 
     # Catch and patch for sites with no matching ecoregions
-    if (nrow(locs_ecoreg) != nrow(locs)) {
+    n_locs <- nrow(locs_df)
+    n_match <- if (nrow(extracted) > 0) {
+      length(unique(as.character(terra::as.data.frame(extracted)[[locs_id]])))
+    } else {
+      0L
+    }
+    if (n_match != n_locs) {
       message(
         "Warning: only ",
-        nrow(locs_ecoreg),
+        n_match,
         " of the ",
-        nrow(locs),
+        n_locs,
         " locations provided had matching ecoregions. ",
-        nrow(locs) - nrow(locs_ecoreg),
+        n_locs - n_match,
         " unmatched locations will present NAs."
       )
-      # Introduce missing sites back to dataframe
       locs_ecoreg <- merge(locs_df, locs_ecoreg, by = locs_id, all.x = TRUE)
     }
+
+    ecoreg_cols <- grep(
+      paste0("^", value_prefix, "_E[23]_"),
+      names(locs_ecoreg),
+      value = TRUE
+    )
+    if (!isTRUE(frac) && length(ecoreg_cols) > 0) {
+      locs_ecoreg[, ecoreg_cols] <- lapply(
+        locs_ecoreg[, ecoreg_cols, drop = FALSE],
+        function(x) {
+          x[!is.na(x)] <- as.integer(x[!is.na(x)] > 0)
+          x
+        }
+      )
+    }
+    if (drop && length(ecoreg_cols) > 0) {
+      keep_cols <- ecoreg_cols[vapply(
+        ecoreg_cols,
+        function(x) any(locs_ecoreg[[x]] > 0, na.rm = TRUE),
+        logical(1)
+      )]
+      fixed_cols <- c(
+        locs_id,
+        if ("geometry" %in% names(locs_ecoreg)) "geometry",
+        "description"
+      )
+      locs_ecoreg <- locs_ecoreg[, c(fixed_cols, keep_cols), drop = FALSE]
+    }
+
     locs_return <- amadeus::calc_return_locs(
       covar = locs_ecoreg,
       POSIXt = FALSE,
       geom = geom,
       crs = terra::crs(from)
     )
-    names(locs_return)[2] <- "description"
     attr(locs_return, "ecoregion2_code") <- sort(unique(from$L2_KEY))
     attr(locs_return, "ecoregion3_code") <- sort(unique(from$L3_KEY))
     return(locs_return)
@@ -2088,10 +2200,10 @@ calculate_nei <- function(
 
 #' Calculate wildfire smoke covariates
 #' @description
-#' Extract wildfire smoke plume values at point locations. Returns a
-#' \code{data.frame} object containing \code{locs_id}, date, and binary variable
-#' for wildfire smoke plume density inherited from \code{from} (0 = point not
-#' covered by wildfire smoke plume; 1 = point covered by wildfire smoke plume).
+#' Extract wildfire smoke plume values at point or buffered locations. Returns a
+#' \code{data.frame} object containing \code{locs_id}, date, and either binary
+#' indicators (`frac = FALSE`) or fractional overlap values (`frac = TRUE`) for
+#' wildfire smoke plume density inherited from \code{from}.
 #' @param from SpatVector(1). Output of \code{process_hms()}.
 #' @param locs data.frame, characater to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
@@ -2100,8 +2212,11 @@ calculate_nei <- function(
 #' (Default = 0).
 #' @param .by_time NULL or character(1). Optional time grouping key used
 #' when \code{.by_time} is provided. When supplied, HMS indicators are
-#' summarized
-#' by \code{sum} (smoke-day counts) by default.
+#' summarized by \code{sum} (smoke-day counts) for `frac = FALSE`, or
+#' \code{mean} for `frac = TRUE`.
+#' @param frac logical(1). Default `FALSE`. If `FALSE`, return binary 0/1 smoke
+#' indicators by density class. If `TRUE`, return fractional overlap by density
+#' class.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2138,6 +2253,7 @@ calculate_hms <- function(
   radius = 0,
   weights = NULL,
   .by_time = NULL,
+  frac = FALSE,
   geom = FALSE,
   ...
 ) {
@@ -2147,6 +2263,9 @@ calculate_hms <- function(
   amadeus::check_for_null_parameters(params_check)
   amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_by_time(.by_time)
+  if (!is.logical(frac) || length(frac) != 1L || is.na(frac)) {
+    stop("`frac` should be a single logical value (TRUE/FALSE).")
+  }
   #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all densities, locs and dates
   if (is.character(from)) {
@@ -2154,7 +2273,13 @@ calculate_hms <- function(
     message(paste0(
       "Inherited list of dates due to absent smoke plume polygons.\n"
     ))
-    skip_df <- data.frame(as.POSIXlt(from), 0, 0, 0)
+    zero_value <- if (isTRUE(frac)) 0 else 0L
+    skip_df <- data.frame(
+      as.POSIXlt(from),
+      zero_value,
+      zero_value,
+      zero_value
+    )
     colnames(skip_df) <- c(
       "time",
       paste0("light_", sprintf("%05d", radius)),
@@ -2174,7 +2299,7 @@ calculate_hms <- function(
       )
 
     if (!is.null(.by_time)) {
-      hms_fun_summary <- if (!is.null(.by_time)) "sum" else "mean"
+      hms_fun_summary <- if (isTRUE(frac)) "mean" else "sum"
       skip_merge <- amadeus::calc_summarize_by(
         covar = skip_merge,
         .by_time = .by_time,
@@ -2242,26 +2367,83 @@ calculate_hms <- function(
     data_template <- stats::setNames(data_template, c(locs_id, "time"))
     from_sub <- from[from$Date %in% date_sequence_split[[i]], ]
 
-    ## Extract values
-    sites_extracted_layer <-
-      terra::extract(from_sub, sites_e)
-    sites_extracted_layer$id.y <-
-      unlist(sites_e[[locs_id]])[sites_extracted_layer$id.y]
-    names(sites_extracted_layer)[
-      names(sites_extracted_layer) == "id.y"
-    ] <- locs_id
-    sites_extracted_layer$value <- 1L
+    is_point_locs <- all(
+      tolower(terra::geomtype(sites_e)) %in% c("points", "point")
+    )
+    if (nrow(from_sub) == 0) {
+      sites_extracted_layer <- data.frame(
+        setNames(list(character(0)), locs_id),
+        Date = character(0),
+        Density = character(0),
+        base_value = numeric(0)
+      )
+    } else if (radius == 0 && is_point_locs) {
+      sites_extracted_layer <- terra::extract(from_sub, sites_e)
+      sites_extracted_layer$id.y <-
+        unlist(sites_e[[locs_id]])[sites_extracted_layer$id.y]
+      names(sites_extracted_layer)[
+        names(sites_extracted_layer) == "id.y"
+      ] <- locs_id
+      sites_extracted_layer$base_value <- 1
+    } else {
+      intersections <- terra::intersect(sites_e, from_sub)
+      if (nrow(intersections) > 0) {
+        inter_area <- terra::expanse(intersections)
+        sites_extracted_layer <- terra::as.data.frame(intersections)
+        if (isTRUE(frac)) {
+          site_area <- terra::expanse(sites_e)
+          site_lookup <- setNames(site_area, as.character(sites_e[[locs_id]]))
+          denom <- as.numeric(
+            site_lookup[as.character(sites_extracted_layer[[locs_id]])]
+          )
+          denom[!is.finite(denom) | denom <= 0] <- NA_real_
+          sites_extracted_layer$base_value <- inter_area / denom
+          sites_extracted_layer$base_value[
+            !is.finite(sites_extracted_layer$base_value)
+          ] <- 0
+        } else {
+          sites_extracted_layer$base_value <- 1
+        }
+      } else {
+        sites_extracted_layer <- data.frame(
+          setNames(list(character(0)), locs_id),
+          Date = character(0),
+          Density = character(0),
+          base_value = numeric(0)
+        )
+      }
+    }
 
-    # remove duplicates
-    sites_extracted_layer <- unique(sites_extracted_layer)
+    # remove duplicates and aggregate by site/date/density
+    if (nrow(sites_extracted_layer) > 0) {
+      sites_extracted_layer <- unique(
+        sites_extracted_layer[, c(locs_id, "Date", "Density", "base_value")]
+      )
+      sites_extracted_layer <- stats::aggregate(
+        base_value ~ .,
+        data = sites_extracted_layer,
+        FUN = sum
+      )
+      if (!isTRUE(frac)) {
+        sites_extracted_layer$base_value <- as.integer(
+          sites_extracted_layer$base_value > 0
+        )
+      } else {
+        sites_extracted_layer$base_value <- pmin(
+          sites_extracted_layer$base_value,
+          1
+        )
+      }
+    }
 
     #### merge with site_id and date
     sites_extracted_layer <-
       tidyr::pivot_wider(
         data = sites_extracted_layer,
         names_from = "Density",
-        values_from = "value",
-        id_cols = dplyr::all_of(c(locs_id, "Date"))
+        values_from = "base_value",
+        id_cols = dplyr::all_of(c(locs_id, "Date")),
+        values_fill = list(base_value = 0)
       )
 
     # Fill in missing columns
@@ -2271,7 +2453,7 @@ calculate_hms <- function(
       setdiff(levels_acceptable, names(sites_extracted_layer))
     # Fill zeros
     if (length(col_tofill) > 0) {
-      sites_extracted_layer[col_tofill] <- 0L
+      sites_extracted_layer[col_tofill] <- if (isTRUE(frac)) 0 else 0L
     }
     col_order <- c(locs_id, "Date", levels_acceptable)
     sites_extracted_layer <- sites_extracted_layer[, col_order]
@@ -2324,11 +2506,14 @@ calculate_hms <- function(
         colname_common
       )
   }
-  # Filling NAs to 0 (explicit integer)
-  sites_extracted[is.na(sites_extracted)] <- 0L
+  # Filling NAs to 0 for smoke columns
+  for (smoke_col in binary_colname) {
+    sites_extracted[[smoke_col]][is.na(sites_extracted[[smoke_col]])] <-
+      if (isTRUE(frac)) 0 else 0L
+  }
 
   if (!is.null(.by_time)) {
-    hms_fun_summary <- if (!is.null(.by_time)) "sum" else "mean"
+    hms_fun_summary <- if (isTRUE(frac)) "mean" else "sum"
     sites_extracted <- amadeus::calc_summarize_by(
       covar = sites_extracted,
       .by_time = .by_time,

@@ -64,12 +64,13 @@ download_data(
 
 ```{r process, eval = live_run}
 county <- tigris::counties("NC", year = 2021, cb = TRUE, class = "sf")
+data_path = paste0(directory_to_save, "/data_files")
 county$FIPS <- county$GEOID
 processed_data <- process_covariates(
   covariate = "nei",
-  path = directory_to_save,
+  path = data_path,
   county = county,
-  year = 2020
+  year = 2021
 )
 ```
 
@@ -78,7 +79,7 @@ processed_data <- process_covariates(
 ```{r calculate-points, eval = live_run}
 point_values <- calculate_covariates(
   covariate = "nei",
-  from = processed_data,
+  from = data_path,
   locs = example_points_sf,
   locs_id = "site_id",
   geom = "sf"
@@ -90,7 +91,7 @@ point_values <- calculate_covariates(
 ```{r calculate-polygons, eval = live_run}
 polygon_values <- calculate_covariates(
   covariate = "nei",
-  from = processed_data,
+  from = data_path,
   locs = durham_hex,
   locs_id = "h3_id",
   geom = "sf"

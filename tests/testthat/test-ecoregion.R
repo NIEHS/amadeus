@@ -271,6 +271,22 @@ testthat::test_that("calculate_ecoregion", {
   )
 
   testthat::expect_no_error(
+    ecor_res_frac <- calculate_ecoregion(
+      from = erras,
+      locs = site_faux,
+      locs_id = "site_id",
+      frac = TRUE
+    )
+  )
+  testthat::expect_equal(
+    colnames(ecor_res_frac)[-(1:2)],
+    c("FRC_E2083_0_00000", "FRC_E3064_0_00000")
+  )
+  testthat::expect_true(
+    all(ecor_res_frac[, -(1:2)] <= 1, na.rm = TRUE)
+  )
+
+  testthat::expect_no_error(
     ecor_terra <- calculate_ecoregion(
       from = erras,
       locs = site_faux,
@@ -317,6 +333,22 @@ testthat::test_that("calculate_ecoregion", {
       locs = site_faux,
       locs_id = "site_id",
       geom = TRUE
+    )
+  )
+  testthat::expect_error(
+    calculate_ecoregion(
+      from = erras,
+      locs = site_faux,
+      locs_id = "site_id",
+      frac = NA
+    )
+  )
+  testthat::expect_error(
+    calculate_ecoregion(
+      from = erras,
+      locs = site_faux,
+      locs_id = "site_id",
+      drop = NA
     )
   )
 
@@ -368,6 +400,17 @@ testthat::test_that("calculate_ecoregion", {
     ),
     "Warning: only .* locations provided had matching ecoregions.",
     fixed = FALSE
+  )
+
+  drop_only <- calculate_ecoregion(
+    from = erras,
+    locs = sf::st_as_sf(site_unmatched, coords = c("lon", "lat"), crs = 4326),
+    locs_id = "site_id",
+    drop = TRUE
+  )
+  testthat::expect_equal(
+    colnames(drop_only),
+    c("site_id", "description")
   )
 })
 

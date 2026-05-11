@@ -484,6 +484,15 @@ testthat::test_that("calculate_hms (with geometry)", {
       geom = TRUE
     )
   )
+  testthat::expect_error(
+    calculate_hms(
+      from = hms,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      frac = NA
+    )
+  )
 })
 
 # testthat::test_that("calculate_hms (absent polygons - 12/31/2018)", {
@@ -636,6 +645,61 @@ testthat::test_that("calculate_hms default without .by_time is backward-compat",
   )
   testthat::expect_s3_class(hms_df, "data.frame")
   testthat::expect_equal(nrow(hms_df), 2L)
+})
+
+testthat::test_that("calculate_hms frac returns fractional smoke overlap", {
+  withr::local_package("terra")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  hms <- process_hms(
+    date = c("2022-06-10", "2022-06-13"),
+    path = testthat::test_path("..", "testdata", "hms")
+  )
+  hms_frac <- suppressMessages(
+    calculate_hms(
+      from = hms,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 1000,
+      frac = TRUE,
+      geom = FALSE
+    )
+  )
+  smoke_cols <- grep("^(light|medium|heavy)_", names(hms_frac), value = TRUE)
+  testthat::expect_true(length(smoke_cols) == 3)
+  testthat::expect_true(
+    all(vapply(hms_frac[, smoke_cols], is.numeric, logical(1)))
+  )
+  testthat::expect_true(
+    all(as.matrix(hms_frac[, smoke_cols]) >= 0, na.rm = TRUE)
+  )
+  testthat::expect_true(
+    all(as.matrix(hms_frac[, smoke_cols]) <= 1, na.rm = TRUE)
+  )
+})
+
+testthat::test_that("calculate_hms frac with .by_time uses mean summarization", {
+  withr::local_package("terra")
+  ncp <- data.frame(lon = -78.8277, lat = 35.95013)
+  ncp$site_id <- "3799900018810101"
+  hms <- process_hms(
+    date = c("2022-06-10", "2022-06-13"),
+    path = testthat::test_path("..", "testdata", "hms")
+  )
+  hms_frac_weekly <- suppressMessages(
+    calculate_hms(
+      from = hms,
+      locs = ncp,
+      locs_id = "site_id",
+      radius = 0,
+      frac = TRUE,
+      .by_time = "week",
+      geom = FALSE
+    )
+  )
+  testthat::expect_true(
+    all(hms_frac_weekly$light_00000 <= 1, na.rm = TRUE)
+  )
 })
 
 testthat::test_that("calculate_hms character skip path supports .by_time summarization", {
