@@ -660,6 +660,7 @@ testthat::test_that("download_drought EDDI 404 error propagates", {
 
 testthat::test_that("download_drought EDDI skips when all files already exist", {
   testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
     check_destfile = function(...) FALSE,
     .package = "amadeus"
   )
