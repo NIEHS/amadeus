@@ -52,7 +52,8 @@ download_data(
   region = "Islands",
   type = "Seamless",
   directory_to_save = directory_to_save,
-  acknowledgement = TRUE
+  acknowledgement = TRUE,
+  unzip = TRUE
 )
 
 ```
@@ -61,25 +62,38 @@ download_data(
 
 ```{r process, eval = live_run}
 
-huc_path <- list.files(
-  directory_to_save,
-  pattern = "\\.(7z|gdb|gpkg)$",
-  recursive = TRUE,
-  full.names = TRUE
-)
+huc_path <- 
+  paste0(directory_to_save,"/NHDPlusNationalData/",
+  "NHDPlusV21_National_Seamless_Flattened_HI_PR_VI_PI.gdb")
 
+huc_field <- "HUC12"
+layers <- sf::st_layers(huc_path)
 processed_data <- process_covariates(
   covariate = "huc",
   path = huc_path,
-  layer_name = layer_name,
-  huc_level = huc_field,
-  extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
+  layer_name = "HUC12",
+  extent =  terra::ext(-162.5, -153.5, 18, 23)
 )
+
+plot(processed_data, main = "HUC12 boundaries for Hawaii")
 ```
 
 ## Calculate covariates at points
 
 ```{r calculate-points, eval = live_run}
+
+df <- data.frame(
+  site_id = c("site_1", "site_2", "site_3","site_4"),
+  lon = c(-157.8583, -155.5319, -155.5828,-159.5),
+  lat = c(21.3069, 19.5, 19.8968, 22.0)
+)
+example_points_sf <- sf::st_as_sf(
+  df,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+
+
 point_values <- calculate_covariates(
   covariate = "huc",
   from = processed_data,
@@ -87,11 +101,6 @@ point_values <- calculate_covariates(
   locs_id = "site_id",
   geom = "sf"
 )
-```
 
-
-## Visualize the point and polygon outputs
-
-```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("USGS Hydrologic Unit Codes (HUC)", ": point extraction"))
+print(point_values)
 ```

@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 )
 library(amadeus)
 library(sf)
-
+library(ggplot2)
 live_run <- local({
   force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
   on_ci <- nzchar(Sys.getenv("CI")) ||
@@ -27,112 +27,6 @@ live_run <- local({
     identical(tolower(Sys.getenv("NOT_CRAN", "")), "false")
   force || !(on_ci || on_cran)
 })
-merra2_live_ready <- FALSE
-
-merra2_has_fwi_plot <- FALSE
-
-aqs_sample_path <- c(
-  file.path("tests", "testdata", "aqs", "aqs-location-sample.rds"),
-  file.path("..", "tests", "testdata", "aqs", "aqs-location-sample.rds")
-)
-aqs_sample_path <- aqs_sample_path[file.exists(aqs_sample_path)][1]
-if (is.na(aqs_sample_path) || aqs_sample_path == "") {
-  stop("Could not locate tests/testdata/aqs/aqs-location-sample.rds")
-}
-example_points_sf <- sf::st_as_sf(readRDS(aqs_sample_path))
-us_bbox_polygon <- sf::st_as_sfc(
-  sf::st_bbox(c(xmin = -125, ymin = 24, xmax = -66, ymax = 50), crs = 4326)
-)
-us_h3_resolution <- 4L
-us_hex <- NULL
-if (isTRUE(live_run) && requireNamespace("h3jsr", quietly = TRUE)) {
-  us_h3_ids <- unlist(h3jsr::polygon_to_cells(
-    us_bbox_polygon,
-    res = us_h3_resolution,
-    simple = TRUE
-  ), use.names = FALSE)
-  us_hex <- h3jsr::cell_to_polygon(us_h3_ids, simple = FALSE)
-  us_hex$h3_id <- as.character(us_hex$h3_address)
-}
-merra2_h3_ready <- !is.null(us_hex)
-
-pick_value_column <- function(x) {
-  geom_col <- attr(x, "sf_column")
-  excluded <- c(
-    "site_id", "h3_id", "resolution", "area_km2",
-    "name", "NAME", "lon", "lat", "time", "date", "hour",
-    "level", "pressure_level", geom_col
-  )
-  candidates <- setdiff(names(x), excluded)
-  if (length(candidates) == 0) {
-    stop("No plottable covariate columns found.")
-  }
-  numeric_candidates <- candidates[vapply(x[candidates], is.numeric, logical(1))]
-  ranked <- if (length(numeric_candidates) > 0) numeric_candidates else candidates
-  non_missing_share <- vapply(ranked, function(col) {
-    mean(!is.na(x[[col]]))
-  }, numeric(1))
-  ranked[which.max(non_missing_share)]
-}
-
-coord_local_sf <- function(x) {
-  x_wgs84 <- sf::st_transform(sf::st_as_sf(x), 4326)
-  bbox <- sf::st_bbox(x_wgs84)
-  pad_x <- max((bbox[["xmax"]] - bbox[["xmin"]]) * 0.08, 0.05)
-  pad_y <- max((bbox[["ymax"]] - bbox[["ymin"]]) * 0.08, 0.05)
-  ggplot2::coord_sf(
-    xlim = c(bbox[["xmin"]] - pad_x, bbox[["xmax"]] + pad_x),
-    ylim = c(bbox[["ymin"]] - pad_y, bbox[["ymax"]] + pad_y),
-    expand = FALSE,
-    datum = NA
-  )
-}
-
-plot_points <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(color = !!rlang::sym(value_col)),
-      size = 2
-    ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, color = value_col) +
-    ggplot2::guides(
-      color = ggplot2::guide_colorbar(
-        title.position = "top",
-        label.theme = ggplot2::element_text(angle = 45, hjust = 1)
-      )
-    ) +
-    ggplot2::theme_minimal(base_size = 14) +
-    ggplot2::theme(
-      legend.position = "bottom",
-      legend.key.width = grid::unit(2, "cm")
-    )
-}
-
-plot_polygons <- function(x, title) {
-  value_col <- pick_value_column(x)
-  ggplot2::ggplot() +
-    ggplot2::geom_sf(
-      data = x,
-      ggplot2::aes(fill = !!rlang::sym(value_col)),
-      color = NA
-    ) +
-    coord_local_sf(x) +
-    ggplot2::labs(title = title, fill = value_col) +
-    ggplot2::guides(
-      fill = ggplot2::guide_colorbar(
-        title.position = "top",
-        label.theme = ggplot2::element_text(angle = 45, hjust = 1)
-      )
-    ) +
-    ggplot2::theme_minimal(base_size = 14) +
-    ggplot2::theme(
-      legend.position = "bottom",
-      legend.key.width = grid::unit(2, "cm")
-    )
-}
 
 find_merra2_collection_dir <- function(root, collection) {
   pattern <- if (collection == "fwi") {
@@ -214,21 +108,6 @@ merra2_demo_variables <- data.frame(
     "Daily fire weather layer used in extraction demos",
     "Daily fire weather layer used in extraction demos"
   ),
-  stringsAsFactors = FALSE
-)
-
-merra2_demo_specs <- data.frame(
-  collection = c(
-    "inst1_2d_int_Nx",
-    "inst3_2d_gas_Nx",
-    "statD_2d_slv_Nx",
-    "tavg1_2d_adg_Nx",
-    "fwi",
-    "fwi"
-  ),
-  variable = c("CPT", "AODANA", "HOURNORAIN", "BCEMAN", "FFMC", "FWI"),
-  date = rep("2024-08-11", 6),
-  use_for_extraction = c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE),
   stringsAsFactors = FALSE
 )
 
@@ -401,42 +280,31 @@ knitr::kable(
 ## Download representative requests
 
 ```{r download, eval = live_run}
-directory_to_save <- file.path(tempdir(), "merra2_workflow")
-merra2_download_error <- NULL
-tryCatch(
-  {
-    setTimeLimit(elapsed = 900, transient = TRUE)
-    on.exit(setTimeLimit(cpu = Inf, elapsed = Inf, transient = FALSE), add = TRUE)
-    download_data(
-      dataset_name = "merra2",
-      collection = unique(merra2_demo_specs$collection),
-      date = "2024-08-11",
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE
-    )
-  },
-  error = function(e) {
-    merra2_download_error <<- conditionMessage(e)
-  }
+
+merra2_demo_specs <- data.frame(
+  collection = c(
+    "inst1_2d_int_Nx",
+    "inst3_2d_gas_Nx",
+    "statD_2d_slv_Nx",
+    "tavg1_2d_adg_Nx",
+    "fwi",
+    "fwi"
+  ),
+  variable = c("CPT", "AODANA", "HOURNORAIN", "BCEMAN", "FFMC", "FWI"),
+  date = rep("2024-08-11", 6),
+  use_for_extraction = c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE),
+  stringsAsFactors = FALSE
 )
-if (!is.null(merra2_download_error)) {
-  message(
-    "Standard MERRA-2/FWI download did not fully complete in this environment: ",
-    merra2_download_error
-  )
-}
-merra2_live_ready <- all(vapply(
-  unique(merra2_demo_specs$collection),
-  has_merra2_collection_files,
-  logical(1),
-  root = directory_to_save
-))
-if (!merra2_live_ready) {
-  message(
-    "Skipping downstream full-workflow chunks because one or more collection ",
-    "downloads are unavailable."
-  )
-}
+
+directory_to_save <- file.path(tempdir(), "merra2_workflow")
+download_data(
+  dataset_name = "merra2",
+  collection = unique(merra2_demo_specs$collection),
+  date = "2024-08-11",
+  directory_to_save = directory_to_save,
+  acknowledgement = TRUE
+)
+
 ```
 
 This single request intentionally mixes authenticated GES DISC collections with
@@ -444,11 +312,30 @@ the public `fwi` collection so the vignette demonstrates both download paths in
 the same workflow.
 ## Process six workflow-ready data products
 
-```{r process, eval = live_run && merra2_live_ready}
+```{r process, eval = live_run}
 processed_examples <- setNames(
   vector("list", nrow(merra2_demo_specs)),
   merra2_demo_specs$variable
 )
+
+find_merra2_collection_dir <- function(root, collection) {
+  pattern <- if (collection == "fwi") {
+    "^FWI\\..*\\.nc$"
+  } else {
+    paste0("^MERRA2_[0-9]{3}\\.", collection, "\\..*\\.nc4$")
+  }
+  files <- list.files(
+    root,
+    pattern = pattern,
+    recursive = TRUE,
+    full.names = TRUE
+  )
+  if (length(files) == 0) {
+    stop("Could not locate files for collection ", collection, ".")
+  }
+  dirname(files[1])
+}
+
 for (i in seq_len(nrow(merra2_demo_specs))) {
   spec <- merra2_demo_specs[i, ]
   processed_examples[[spec$variable]] <- process_covariates(
@@ -480,7 +367,7 @@ knitr::kable(
 
 ## Plot one processed raster
 
-```{r plot-processed-raster, eval = live_run && merra2_live_ready, fig.width = 12, fig.height = 8, fig.alt = "Global map of the processed daily Fire Weather Index raster for the workflow date."}
+```{r plot-processed-raster, eval = live_run, fig.width = 12, fig.height = 8, fig.alt = "Global map of the processed daily Fire Weather Index raster for the workflow date."}
 terra::plot(
   processed_examples$FWI,
   main = "MERRA-2 corrected FWI on 2024-08-11",
@@ -492,7 +379,7 @@ terra::plot(
 
 Many MERRA-2 datasets are at 1, 3, or 6 hour increments. Here, we inspect the hourly timestamps.
 
-```{r bceman-hourly-summary, eval = live_run && merra2_live_ready}
+```{r bceman-hourly-summary, eval = live_run}
 bceman_hourly_layers <- data.frame(
   layer_name = names(processed_examples$BCEMAN),
   time_utc = as.character(terra::time(processed_examples$BCEMAN)),
@@ -510,12 +397,12 @@ knitr::kable(
 
 Process and calculate functions currently return results in the native time resolution of the data. Here, again, that is hourly. To calculate a daily summary we simply use an apply style function from `terra`. 
 
-```{r bceman-daily-summary, eval = live_run && merra2_live_ready}
+```{r bceman-daily-summary, eval = live_run}
 bceman_daily <- terra::app(processed_examples$BCEMAN, mean, na.rm = TRUE)
 names(bceman_daily) <- "BCEMAN_20240811_0000"
 terra::time(bceman_daily) <- as.POSIXct("2024-08-11 00:00:00", tz = "UTC")
 ```
-```{r plot-bceman-daily, eval = live_run && merra2_live_ready, fig.width = 12, fig.height = 8, fig.alt = "Global map of the daily mean BCEMAN raster summarized from hourly MERRA-2 data."}
+```{r plot-bceman-daily, eval = live_run, fig.width = 12, fig.height = 8, fig.alt = "Global map of the daily mean BCEMAN raster summarized from hourly MERRA-2 data."}
 terra::plot(
   bceman_daily,
   main = "Daily mean BCEMAN from tavg1_2d_adg_Nx on 2024-08-11",
@@ -525,9 +412,20 @@ terra::plot(
 
 ## Calculate daily BCEMAN at points 
 
+```{r calculate-bceman-daily, eval = live_run}
 
 
-```{r calculate-bceman-daily, eval = live_run && merra2_live_ready && merra2_h3_ready}
+df <- data.frame(
+  site_id = c("site_1", "site_2", "site_3","site_4"),
+  lon = c(-78.6382, -47.8825, 116.4074, 36.8219),
+  lat = c(35.7796, -15.7942, 39.9042, -1.2921)
+)
+example_points_sf <- sf::st_as_sf(
+  df,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+
 bceman_point_values <- calculate_covariates(
   covariate = "merra2",
   from = bceman_daily,
@@ -537,22 +435,13 @@ bceman_point_values <- calculate_covariates(
   fun = "mean",
   geom = "sf"
 )
-bceman_polygon_values <- calculate_covariates(
-  covariate = "merra2",
-  from = bceman_daily,
-  locs = us_hex,
-  locs_id = "h3_id",
-  radius = 0,
-  fun = "mean",
-  geom = "sf"
-)
-knitr::kable(head(sf::st_drop_geometry(bceman_point_values)))
-knitr::kable(head(sf::st_drop_geometry(bceman_polygon_values)))
+
+print(bceman_point_values)
 ```
 
 ## Calculate covariates at points with dense-coverage FWI layers
 
-```{r calculate-points, eval = live_run && merra2_live_ready && merra2_h3_ready}
+```{r calculate-points, eval = live_run}
 point_ffmc <- calculate_covariates(
   covariate = "merra2",
   from = processed_examples$FFMC,
@@ -577,53 +466,20 @@ point_values <- dplyr::left_join(
   by = c("site_id", "time")
 )
 
-polygon_fwi <- calculate_covariates(
-  covariate = "merra2",
-  from = processed_examples$FWI,
-  locs = us_hex,
-  locs_id = "h3_id",
-  radius = 0,
-  fun = "mean",
-  geom = "sf"
-)
+print(point_values)
 
-point_na_summary <- summarize_na_counts(point_fwi, "FWI")
-polygon_na_summary <- summarize_na_counts(polygon_fwi, "FWI")
-if (nrow(point_na_summary) == 0) {
-  point_na_summary <- data.frame(
-    variable = "FWI columns unavailable for this live run",
-    missing_values = NA_integer_,
-    stringsAsFactors = FALSE
-  )
-}
-if (nrow(polygon_na_summary) == 0) {
-  polygon_na_summary <- data.frame(
-    variable = "FWI columns unavailable for this live run",
-    missing_values = NA_integer_,
-    stringsAsFactors = FALSE
-  )
-}
-knitr::kable(point_na_summary, col.names = c("Variable", "Point missing values"))
-knitr::kable(polygon_na_summary, col.names = c("Variable", "Polygon missing values"))
-merra2_has_fwi_plot <- any(grepl("FWI", names(point_fwi))) &&
-  any(grepl("FWI", names(polygon_fwi)))
 ```
 
 
 ## Visualize the point outputs
 
-```{r plot-points, eval = live_run && merra2_live_ready && merra2_has_fwi_plot, fig.width = 12, fig.height = 8, fig.alt = "Map of point-based extraction results for the daily Fire Weather Index layer used in this workflow."}
-plot_points(point_fwi, paste0("NASA MERRA-2", ": FWI point extraction"))
+```{r plot-points, eval = live_run, fig.width = 12, fig.height = 8, fig.alt = "Map of point-based extraction results for the daily Fire Weather Index layer used in this workflow."}
+
+point_basemap <-
+  sf::st_as_sf(maps::map("world", plot = FALSE, fill = TRUE))
+
+ggplot() + geom_sf(data = point_basemap) + geom_sf(data = point_values,aes(color = `MERRA2.CORRECTED.FWI_0`)) + ggtitle("FWI values at example points on 2024-08-11")
+
+
 ```
 
-```{r plot-polygons, eval = live_run && merra2_live_ready && merra2_h3_ready && merra2_has_fwi_plot, fig.width = 12, fig.height = 8, fig.alt = "Map of polygon-based extraction results for the daily Fire Weather Index layer across contiguous-US H3 hexagons at resolution 4."}
-plot_polygons(polygon_fwi, paste0("NASA MERRA-2", ": FWI contiguous-US H3 polygons (res 4)"))
-```
-
-## Notes
-
-- The live request now spans five collections and processes six variables, including one hourly `BCEMAN` example and two daily FWI layers.
-- Processing deliberately omits an `extent` argument so the workflow shows how to work from the full downloaded raster.
-- The extraction examples use `FFMC` and `FWI` because those daily fire-weather layers should have little to no missingness across the contiguous-US H3 geometries.
-- The NA summary still reports both `FFMC` and `FWI`, but the rendered point and polygon maps now show the cleaner `FWI` surface only.
-- The hourly `BCEMAN` example is summarized to a daily mean raster before extraction so the vignette demonstrates both sub-daily MERRA-2 inputs and a daily covariate workflow.
