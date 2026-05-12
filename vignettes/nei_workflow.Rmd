@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 )
 library(amadeus)
 library(sf)
+library(ggplot2)
 
 live_run <- local({
   force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
@@ -109,7 +110,7 @@ print(point_values, n = 25)
 
 ## Visualize the point and polygon outputs
 
-```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
+```{r plot-points, eval = live_run, fig.width = 10, fig.height = 7, dpi = 150, out.width = "100%", fig.alt = "Map of point-based covariate extraction results for this workflow."}
 
 ggplot() + geom_sf(data = county, color = NA) +
   geom_sf(data = point_values, aes(color = TRF_NEINP_0_00000), size = 2) +

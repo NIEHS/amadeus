@@ -4505,8 +4505,10 @@ download_prism <- function(
   #### 1. check for data download acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
   #### 2. directory setup
-  amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
+  directory_original <- amadeus::download_sanitize_path(directory_to_save)
+  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- directories[1]
+  directory_to_save <- directories[2]
 
   url_middle <-
     # ts: element-date-format
@@ -4520,7 +4522,7 @@ download_prism <- function(
   #### 3. define measurement data paths
   url_download_template <-
     file.path(
-      "https://services.nacse.org/prism/data/public",
+      "https://services.nacse.org/prism/data/get/us",
       url_middle
     )
 
@@ -4533,7 +4535,7 @@ download_prism <- function(
 
   #### 4. build destination file name
   download_names <- paste0(
-    directory_to_save,
+    directory_to_download,
     "PRISM_",
     element,
     "_",
@@ -4574,7 +4576,7 @@ download_prism <- function(
     unzip = unzip
   )
 
-  #### Remove zip files (use file.remove directly; zip is in directory_to_save)
+  #### Remove zip files (stored under directory_to_download/zip_files)
   if (remove_zip && unzip) {
     file.remove(download_names)
   }

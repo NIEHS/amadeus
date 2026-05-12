@@ -643,7 +643,21 @@ download_unzip <-
     ext <- tolower(tools::file_ext(file_name))
     message(paste0("Unzipping files...\n"))
     if (ext == "zip") {
-      unzip(file_name, exdir = directory_to_unzip)
+      # Convert unzip warnings (e.g., invalid/corrupt archives) into hard
+      # errors so callers do not get a false success message.
+      withCallingHandlers(
+        unzip(file_name, exdir = directory_to_unzip),
+        warning = function(w) {
+          stop(
+            sprintf(
+              "Failed to unzip archive '%s': %s",
+              basename(file_name),
+              conditionMessage(w)
+            ),
+            call. = FALSE
+          )
+        }
+      )
     } else if (ext == "7z") {
       archive::archive_extract(file_name, dir = directory_to_unzip)
     } else {

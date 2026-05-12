@@ -21,6 +21,8 @@ testthat::test_that("download_prism (url discovery, no download)", {
   ))
   testthat::expect_true(is.list(result))
   testthat::expect_true(grepl("^https://", result$urls))
+  testthat::expect_true(grepl("/prism/data/get/us/", result$urls))
+  testthat::expect_true(grepl("/zip_files/", result$destfiles))
   testthat::expect_equal(result$n_files, 1)
 
   # normals path (format is ignored, message expected)
@@ -97,10 +99,12 @@ testthat::test_that("download_prism (expected errors)", {
 testthat::test_that(
   "download_prism mock download (unzip + remove_zip + hash)",
   {
+    hash_dir <- NULL
     testthat::local_mocked_bindings(
       download_run_method = function(...) invisible(NULL),
       download_unzip = function(...) invisible(NULL),
       download_hash = function(hash, dir) {
+        hash_dir <<- dir
         if (isTRUE(hash)) "fakehash" else NULL
       },
       .package = "amadeus"
@@ -123,6 +127,7 @@ testthat::test_that(
         )
       )
       testthat::expect_equal(result, "fakehash")
+      testthat::expect_true(grepl("/data_files/$", hash_dir))
     })
   }
 )
