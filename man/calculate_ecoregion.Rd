@@ -10,10 +10,10 @@ calculate_ecoregion(
   locs_id = "site_id",
   colnames = c("coded", "full_ecoregion"),
   frac = FALSE,
-  radius = 0,
   drop = FALSE,
   weights = NULL,
   geom = FALSE,
+  radius = 0,
   ...
 )
 }

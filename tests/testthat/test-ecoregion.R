@@ -689,6 +689,97 @@ testthat::test_that(
   }
 )
 
+testthat::test_that("calculate_ecoregion option combinations stay coherent", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  ecol3 <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
+  erras <- process_ecoregion(ecol3)
+
+  loc_pt <- data.frame(
+    site_id = "37999109988101",
+    lon = -77.576,
+    lat = 39.40
+  )
+  loc_pt <- sf::st_as_sf(loc_pt, coords = c("lon", "lat"), crs = 4326)
+  loc_pt <- sf::st_transform(loc_pt, sf::st_crs(terra::crs(erras)))
+
+  combos <- list(
+    list(frac = FALSE, radius = 0, drop = FALSE, geom = FALSE, colnames = "coded"),
+    list(frac = FALSE, radius = 0, drop = TRUE, geom = "sf", colnames = "full_ecoregion"),
+    list(frac = TRUE, radius = 0, drop = FALSE, geom = FALSE, colnames = "coded"),
+    list(frac = TRUE, radius = 100000, drop = FALSE, geom = FALSE, colnames = "coded"),
+    list(frac = TRUE, radius = 100000, drop = TRUE, geom = "terra", colnames = "full_ecoregion")
+  )
+
+  for (cfg in combos) {
+    out <- do.call(calculate_ecoregion, c(
+      list(from = erras, locs = loc_pt, locs_id = "site_id"),
+      cfg
+    ))
+    out_df <- as.data.frame(out)
+    val_cols <- grep("^(DUM|FRC)_", names(out_df), value = TRUE)
+    testthat::expect_true(length(val_cols) > 0)
+    if (isTRUE(cfg$frac)) {
+      testthat::expect_true(all(startsWith(val_cols, "FRC_")))
+      testthat::expect_true(
+        all(as.matrix(out_df[, val_cols, drop = FALSE]) >= 0, na.rm = TRUE)
+      )
+      testthat::expect_true(
+        all(as.matrix(out_df[, val_cols, drop = FALSE]) <= 1, na.rm = TRUE)
+      )
+    } else {
+      testthat::expect_true(all(startsWith(val_cols, "DUM_")))
+    }
+  }
+})
+
+testthat::test_that("calculate_ecoregion positional args remain valid", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  ecol3 <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
+  erras <- process_ecoregion(ecol3)
+
+  loc_pt <- data.frame(
+    site_id = "37999109988101",
+    lon = -77.576,
+    lat = 39.40
+  )
+  loc_pt <- terra::vect(loc_pt, geom = c("lon", "lat"), crs = "EPSG:4326")
+  loc_pt <- terra::project(loc_pt, terra::crs(erras))
+
+  out <- calculate_ecoregion(
+    erras,
+    loc_pt,
+    "site_id",
+    "coded",
+    TRUE,
+    FALSE,
+    NULL,
+    FALSE,
+    100000
+  )
+  out_df <- as.data.frame(out)
+  val_cols <- grep("^FRC_", names(out_df), value = TRUE)
+  testthat::expect_true(length(val_cols) > 0)
+  testthat::expect_true(
+    any(out_df[1, val_cols, drop = TRUE] > 0 & out_df[1, val_cols, drop = TRUE] < 1)
+  )
+})
+
 testthat::test_that("calc_return_locs covers geometry return branches", {
   withr::local_package("terra")
   withr::local_package("sf")
