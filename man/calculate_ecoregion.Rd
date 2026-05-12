@@ -54,14 +54,14 @@ variables and
 attributes of:
 \itemize{
 \item Indicator names are controlled by \code{colnames}: \code{"coded"} (default)
-creates key-based names such as \code{DUM_E2083_0_00000} and
-\code{DUM_E3064_0_00000} when \code{frac = FALSE}, or \code{FRC_E2083_0_00000} and
-\code{FRC_E3064_0_00000} when \code{frac = TRUE}; \code{"full_ecoregion"} creates
+creates key-based names such as \code{DUM_E2083_00000} and
+\code{DUM_E3064_00000} when \code{frac = FALSE}, or \code{FRC_E2083_00000} and
+\code{FRC_E3064_00000} when \code{frac = TRUE}; \code{"full_ecoregion"} creates
 sanitized name-based columns such as
-\code{DUM_E2_SOUTHEASTERN_USA_PLAINS_0_00000} /
-\code{FRC_E2_SOUTHEASTERN_USA_PLAINS_0_00000} and
-\code{DUM_E3_NORTHERN_PIEDMONT_0_00000} /
-\code{FRC_E3_NORTHERN_PIEDMONT_0_00000} (duplicates are suffixed, e.g. \verb{_1}).
+\code{DUM_E2_SOUTHEASTERN_USA_PLAINS_00000} /
+\code{FRC_E2_SOUTHEASTERN_USA_PLAINS_00000} and
+\code{DUM_E3_NORTHERN_PIEDMONT_00000} /
+\code{FRC_E3_NORTHERN_PIEDMONT_00000} (duplicates are suffixed, e.g. \verb{_1}).
 \item \code{attr(., "ecoregion2_code")}: Ecoregion lv.2 code and key
 \item \code{attr(., "ecoregion3_code")}: Ecoregion lv.3 code and key
 }

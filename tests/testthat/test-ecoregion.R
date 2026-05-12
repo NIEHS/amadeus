@@ -251,7 +251,7 @@ testthat::test_that("calculate_ecoregion", {
   )
   testthat::expect_equal(
     colnames(ecor_res)[-(1:2)],
-    c("DUM_E2083_0_00000", "DUM_E3064_0_00000")
+    c("DUM_E2083_00000", "DUM_E3064_00000")
   )
 
   testthat::expect_no_error(
@@ -265,8 +265,8 @@ testthat::test_that("calculate_ecoregion", {
   testthat::expect_equal(
     colnames(ecor_res_full)[-(1:2)],
     c(
-      "DUM_E2_SOUTHEASTERN_USA_PLAINS_0_00000",
-      "DUM_E3_NORTHERN_PIEDMONT_0_00000"
+      "DUM_E2_SOUTHEASTERN_USA_PLAINS_00000",
+      "DUM_E3_NORTHERN_PIEDMONT_00000"
     )
   )
 
@@ -280,7 +280,7 @@ testthat::test_that("calculate_ecoregion", {
   )
   testthat::expect_equal(
     colnames(ecor_res_frac)[-(1:2)],
-    c("FRC_E2083_0_00000", "FRC_E3064_0_00000")
+    c("FRC_E2083_00000", "FRC_E3064_00000")
   )
   testthat::expect_true(
     all(ecor_res_frac[, -(1:2)] <= 1, na.rm = TRUE)
@@ -501,8 +501,8 @@ testthat::test_that("calculate_ecoregion full_ecoregion falls back to NA_L3NAME"
   testthat::expect_equal(
     colnames(ecor_res)[-(1:2)],
     c(
-      "DUM_E2_SOUTHEASTERN_USA_PLAINS_0_00000",
-      "DUM_E3_NORTHERN_PIEDMONT_0_00000"
+      "DUM_E2_SOUTHEASTERN_USA_PLAINS_00000",
+      "DUM_E3_NORTHERN_PIEDMONT_00000"
     )
   )
 })
@@ -549,8 +549,8 @@ testthat::test_that("calculate_ecoregion full_ecoregion sanitizes missing names"
   testthat::expect_equal(
     colnames(ecor_res)[-(1:2)],
     c(
-      "DUM_E2_UNKNOWN_0_00000",
-      "DUM_E3_NORTHERN_PIEDMONT_0_00000"
+      "DUM_E2_UNKNOWN_00000",
+      "DUM_E3_NORTHERN_PIEDMONT_00000"
     )
   )
 })
@@ -586,8 +586,8 @@ testthat::test_that("calculate_ecoregion full_ecoregion disambiguates duplicates
   )
   testthat::expect_true(
     all(c(
-      "DUM_E3_DUPLICATE_NAME_0_00000",
-      "DUM_E3_DUPLICATE_NAME_0_00000_1"
+      "DUM_E3_DUPLICATE_NAME_00000",
+      "DUM_E3_DUPLICATE_NAME_00000_1"
     ) %in% colnames(ecor_res))
   )
 })
@@ -681,9 +681,11 @@ testthat::test_that(
 
     frc_cols <- grep("^FRC_", names(out_radius), value = TRUE)
     testthat::expect_true(length(frc_cols) > 0)
+    testthat::expect_true(all(grepl("_100000$", frc_cols)))
+    frc_cols_poly <- sub("_100000$", "_00000", frc_cols)
     testthat::expect_equal(
       as.numeric(out_radius[1, frc_cols, drop = TRUE]),
-      as.numeric(out_poly[1, frc_cols, drop = TRUE]),
+      as.numeric(out_poly[1, frc_cols_poly, drop = TRUE]),
       tolerance = 1e-3
     )
   }
@@ -806,6 +808,7 @@ testthat::test_that("calculate_ecoregion frac with radius works for multi-row sf
   out_df <- as.data.frame(out)
   frc_cols <- grep("^FRC_", names(out_df), value = TRUE)
   testthat::expect_true(length(frc_cols) > 0)
+  testthat::expect_true(all(grepl("_100000$", frc_cols)))
   testthat::expect_true(all(rowSums(out_df[, frc_cols, drop = FALSE], na.rm = TRUE) > 0))
 })
 

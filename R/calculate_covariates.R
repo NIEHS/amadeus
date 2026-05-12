@@ -748,14 +748,14 @@ calculate_nlcd <- function(
 #' @return a data.frame or SpatVector object with ecoregion indicator/fraction
 #' variables and attributes of:
 #'   - Indicator names are controlled by `colnames`: `"coded"` (default)
-#'   creates key-based names such as `DUM_E2083_0_00000` and
-#'   `DUM_E3064_0_00000` when `frac = FALSE`, or `FRC_E2083_0_00000` and
-#'   `FRC_E3064_0_00000` when `frac = TRUE`; `"full_ecoregion"` creates
+#'   creates key-based names such as `DUM_E2083_00000` and
+#'   `DUM_E3064_00000` when `frac = FALSE`, or `FRC_E2083_00000` and
+#'   `FRC_E3064_00000` when `frac = TRUE`; `"full_ecoregion"` creates
 #'   sanitized name-based columns such as
-#'   `DUM_E2_SOUTHEASTERN_USA_PLAINS_0_00000` /
-#'   `FRC_E2_SOUTHEASTERN_USA_PLAINS_0_00000` and
-#'   `DUM_E3_NORTHERN_PIEDMONT_0_00000` /
-#'   `FRC_E3_NORTHERN_PIEDMONT_0_00000` (duplicates are suffixed, e.g. `_1`).
+#'   `DUM_E2_SOUTHEASTERN_USA_PLAINS_00000` /
+#'   `FRC_E2_SOUTHEASTERN_USA_PLAINS_00000` and
+#'   `DUM_E3_NORTHERN_PIEDMONT_00000` /
+#'   `FRC_E3_NORTHERN_PIEDMONT_00000` (duplicates are suffixed, e.g. `_1`).
 #'   - `attr(., "ecoregion2_code")`: Ecoregion lv.2 code and key
 #'   - `attr(., "ecoregion3_code")`: Ecoregion lv.3 code and key
 #' @author Insang Song
@@ -817,22 +817,20 @@ calculate_ecoregion <-
             lookup$key,
             regexpr("\\d{1,2}\\.[1-9]", lookup$key)
           )
-          key_num <- sprintf(
-            "%s_%s%03d_0_00000",
-            value_prefix,
-            prefix,
-            as.integer(10 * as.numeric(key_num))
-          )
+          key_num <- sprintf("%s_%s%03d_%s", value_prefix, prefix, as.integer(
+            10 * as.numeric(key_num)
+          ), radius_suffix)
         } else {
           key_num <- regmatches(
             lookup$key,
             regexpr("\\d{1,3}", lookup$key)
           )
           key_num <- sprintf(
-            "%s_%s%03d_0_00000",
+            "%s_%s%03d_%s",
             value_prefix,
             prefix,
-            as.integer(as.numeric(key_num))
+            as.integer(as.numeric(key_num)),
+            radius_suffix
           )
         }
         lookup$column_name <- key_num
@@ -844,7 +842,8 @@ calculate_ecoregion <-
           prefix,
           "_",
           safe_label,
-          "_0_00000"
+          "_",
+          radius_suffix
         )
         lookup$column_name <- make.unique(lookup$column_name, sep = "_")
       }
@@ -882,6 +881,9 @@ calculate_ecoregion <-
     if (radius < 0) {
       stop("`radius` should be greater than or equal to 0.")
     }
+    radius_value <- as.integer(round(radius))
+    width_radius <- max(5L, nchar(as.character(abs(radius_value))))
+    radius_suffix <- sprintf(paste0("%0", width_radius, "d"), radius_value)
     if (!is.logical(drop) || length(drop) != 1L || is.na(drop)) {
       stop("`drop` should be a single logical value (TRUE/FALSE).")
     }
@@ -950,7 +952,7 @@ calculate_ecoregion <-
         vals_df <- data.frame(
           site_id = site_ids,
           key = as.character(keys),
-          base_value = values,
+          base_value = as.numeric(values),
           stringsAsFactors = FALSE
         )
         vals_df <- stats::aggregate(
@@ -977,7 +979,7 @@ calculate_ecoregion <-
           vals_df[, c("site_id", "column_name", "base_value"), drop = FALSE],
           names_from = "column_name",
           values_from = "base_value",
-          values_fill = list(base_value = 0)
+          values_fill = 0
         )
       }
 

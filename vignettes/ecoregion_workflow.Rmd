@@ -50,8 +50,8 @@ This vignette runs its live workflow when rendered locally. The heavy download, 
 - This is a static national vector layer with no temporal dimension.
 - Downloads arrive as a zipped vector-data bundle that can be processed into workflow-ready ecoregion boundaries and identifiers.
 - Ecoregions are a categorical covariate, so we have two options for calculation output: 
-  - Binary (dummy) indicator columns for the intersecting level-2 and level-3 ecoregions at each location, with key-based names (for example `DUM_E2083_0_00000`, `DUM_E3064_0_00000`).
-  - Fraction or proportion of each location that falls in each intersecting level-2 and level-3 ecoregion, with key-based names (for example `FRC_E2083_0_00000`, `FRC_E3064_0_00000`).
+  - Binary (dummy) indicator columns for the intersecting level-2 and level-3 ecoregions at each location, with key-based names (for example `DUM_E2083_00000`, `DUM_E3064_00000`).
+  - Fraction or proportion of each location that falls in each intersecting level-2 and level-3 ecoregion, with key-based names (for example `FRC_E2083_00000`, `FRC_E3064_00000`).
 
 ## Download representative requests
 
@@ -87,9 +87,9 @@ plot(processed_data, main = "Level 3 Ecoregions of the Conterminous United State
 `calculate_ecoregion()` by default returns binary (dummy) indicator columns for the
 intersecting level-2 and level-3 ecoregions at each location. By default
 (`colnames = "coded"`), those indicators use key-based names (for example
-`DUM_E2083_0_00000`, `DUM_E3064_0_00000`). If you set
+`DUM_E2083_00000`, `DUM_E3064_00000`). If you set
 `colnames = "full_ecoregion"`, indicators use sanitized full names (for
-example `DUM_E2_SOUTHEASTERN_USA_PLAINS_0_00000`), with duplicate names
+example `DUM_E2_SOUTHEASTERN_USA_PLAINS_00000`), with duplicate names
 automatically disambiguated by suffixes like `_1`.
 
 ```{r calculate-points, eval = live_run}
@@ -123,9 +123,9 @@ print(point_values)
 `calculate_ecoregion()` can also return fractional (proportion) columns for the
 intersecting level-2 and level-3 ecoregions at each location. By default
 (`colnames = "coded"`), those indicators use key-based names (for example
-`FRC_E2083_0_00000`, `FRC_E3064_0_00000`). If you set
+`FRC_E2083_00000`, `FRC_E3064_00000`). If you set
 `colnames = "full_ecoregion"`, indicators use sanitized full names (for
-example `FRC_E2_SOUTHEASTERN_USA_PLAINS_0_00000`), with duplicate names
+example `FRC_E2_SOUTHEASTERN_USA_PLAINS_00000`), with duplicate names
 automatically disambiguated by suffixes like `_1`.
 
 ```{r calculate-points-fractional, eval = live_run}
@@ -134,11 +134,11 @@ point_values <- calculate_ecoregion(
   locs = example_points_sf,
   locs_id = "site_id",
   geom = "sf",
-  radius = 100000,
-  frac = TRUE
+  radius = 1000,
+  frac = TRUE,
+  drop = TRUE
 )
 
 print(point_values)
 
 ```
-
