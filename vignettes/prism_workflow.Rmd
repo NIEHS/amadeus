@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 library(amadeus)
 library(sf)
-
+library(ggplot2)
 live_run <- local({
   force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
   on_ci <- nzchar(Sys.getenv("CI")) ||
@@ -115,30 +115,17 @@ point_values <- calculate_covariates(
 )
 ```
 
-## Calculate covariates across Durham County H3 hexagons
-
-```{r calculate-polygons, eval = live_run}
-polygon_values <- calculate_covariates(
-  covariate = "prism",
-  from = processed_data,
-  locs = durham_hex,
-  locs_id = "h3_id",
-  radius = 1000,
-  geom = "sf"
-)
-```
-
-## Visualize the point and polygon outputs
+## Visualize the point outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("PRISM Climate Data", ": point extraction"))
+
+point_basemap <-
+  sf::st_as_sf(maps::map("world", plot = FALSE, fill = TRUE))
+
+ggplot() +  
+  geom_sf(data = point_basemap, fill = "gray80", color = "white") +
+  geom_sf(data = point_values, aes(color = tmean_1000), size = 3) +
+  scale_color_viridis_c() + labs(title = "PRISM tmean at example points") +
+  coord_sf(xlim = domain_x, ylim = domain_y) 
+
 ```
-
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("PRISM Climate Data", ": Durham H3 polygons"))
-```
-
-## Notes
-
-- The download section now covers two PRISM elements (`ppt` and `tmax`) for the same monthly time stamp.
-- Pattern-based file discovery is safer than hard-coding extracted PRISM filenames because the zip contents vary by data type and service response.
