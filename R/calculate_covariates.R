@@ -305,7 +305,9 @@ calculate_koppen_geiger <-
       if (is.na(coverage_col) || length(coverage_col) == 0) {
         locs_kg_extract$base_value <- 1
       } else {
-        locs_kg_extract$base_value <- as.numeric(locs_kg_extract[[coverage_col]])
+        locs_kg_extract$base_value <- as.numeric(
+          locs_kg_extract[[coverage_col]]
+        )
         locs_kg_extract$base_value[!is.finite(locs_kg_extract$base_value)] <- 0
       }
     }
@@ -420,7 +422,10 @@ calculate_koppen_geiger <-
         class_values$base_value[!is.finite(class_values$base_value)] <- 0
         class_values$base_value <- pmin(class_values$base_value, 1)
       }
-      class_matrix <- stats::xtabs(base_value ~ site_id + class_kg, data = class_values)
+      class_matrix <- stats::xtabs(
+        base_value ~ site_id + class_kg,
+        data = class_values
+      )
       df_ae_separated <- as.data.frame.matrix(class_matrix)
       df_ae_separated$site_id <- rownames(df_ae_separated)
       rownames(df_ae_separated) <- NULL
@@ -442,7 +447,9 @@ calculate_koppen_geiger <-
       aelabels,
       radius_suffix
     )
-    names(df_ae_separated)[match(aelabels, names(df_ae_separated))] <- column_names
+    names(df_ae_separated)[
+      match(aelabels, names(df_ae_separated))
+    ] <- column_names
     kg_extracted <- merge(
       locs_df,
       df_ae_separated,
@@ -464,7 +471,11 @@ calculate_koppen_geiger <-
       }
     }
     desc_vals <- terra::metags(from)$value
-    description <- if (length(desc_vals) >= 2) as.character(desc_vals[2]) else NA_character_
+    description <- if (length(desc_vals) >= 2) {
+      as.character(desc_vals[2])
+    } else {
+      NA_character_
+    }
     kg_extracted$description <- description
     if (geom %in% c("sf", "terra")) {
       kg_extracted <- kg_extracted[
