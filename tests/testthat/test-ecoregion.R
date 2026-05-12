@@ -780,6 +780,35 @@ testthat::test_that("calculate_ecoregion positional args remain valid", {
   )
 })
 
+testthat::test_that("calculate_ecoregion frac with radius works for multi-row sf input", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  ecol3 <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
+  erras <- process_ecoregion(ecol3)
+
+  locs <- sf::st_as_sf(terra::spatSample(erras, size = 5, method = "random"))
+  locs$site_id <- paste0("site_", seq_len(nrow(locs)))
+
+  out <- calculate_ecoregion(
+    from = erras,
+    locs = locs,
+    locs_id = "site_id",
+    frac = TRUE,
+    radius = 100000
+  )
+  out_df <- as.data.frame(out)
+  frc_cols <- grep("^FRC_", names(out_df), value = TRUE)
+  testthat::expect_true(length(frc_cols) > 0)
+  testthat::expect_true(all(rowSums(out_df[, frc_cols, drop = FALSE], na.rm = TRUE) > 0))
+})
+
 testthat::test_that("calc_return_locs covers geometry return branches", {
   withr::local_package("terra")
   withr::local_package("sf")

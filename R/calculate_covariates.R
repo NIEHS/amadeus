@@ -865,6 +865,13 @@ calculate_ecoregion <-
       }
       values
     }
+    get_spatvector_field <- function(x, field) {
+      vals <- terra::as.data.frame(x)[[field]]
+      if (is.matrix(vals) || is.data.frame(vals)) {
+        vals <- vals[, 1, drop = TRUE]
+      }
+      vals
+    }
     colnames <- match.arg(colnames)
     if (!is.logical(frac) || length(frac) != 1L || is.na(frac)) {
       stop("`frac` should be a single logical value (TRUE/FALSE).")
@@ -930,7 +937,8 @@ calculate_ecoregion <-
         base_value <- rep(1, length(site_sorted))
       } else {
         site_areas <- terra::expanse(locsp)
-        site_lookup <- setNames(site_areas, as.character(locsp[[locs_id]]))
+        site_ids <- as.character(get_spatvector_field(locsp, locs_id))
+        site_lookup <- setNames(site_areas, site_ids)
         inter_areas <- terra::expanse(extracted)
         denom <- as.numeric(site_lookup[site_sorted])
         denom[!is.finite(denom) | denom <= 0] <- NA_real_
