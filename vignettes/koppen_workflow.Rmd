@@ -73,7 +73,7 @@ processed_data <- process_covariates(
 plot(processed_data, main = "Koppen-Geiger Climate Classes (0.5° resolution, 1980-2016)")
 ```
 
-## Calculate covariates at points
+## Calculate covariates at points. Demonstrate the dummy variable and fraction options for categorical covariates.
 
 ```{r calculate-points, eval = live_run}
 
@@ -103,6 +103,19 @@ point_values <- calculate_covariates(
 )
 
 print(point_values, n = 25)
+
+frac_values <- calculate_covariates(
+  covariate = "koppen",
+  from = processed_data,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  frac = TRUE,
+  radius = 100000,
+  geom = "sf"
+)
+
+print(frac_values, n = 25)
+
 ```
 
 
