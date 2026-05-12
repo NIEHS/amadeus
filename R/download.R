@@ -4569,6 +4569,45 @@ download_prism <- function(
   )
   message("Requests were processed.\n")
 
+  #### Validate downloaded archives before unzip
+  for (zip_file in download_names) {
+    zip_ok <- tryCatch(
+      {
+        withCallingHandlers(
+          {
+            utils::unzip(zip_file, list = TRUE)
+            TRUE
+          },
+          warning = function(w) {
+            stop(conditionMessage(w), call. = FALSE)
+          }
+        )
+      },
+      error = function(e) FALSE
+    )
+
+    if (!isTRUE(zip_ok)) {
+      preview <- tryCatch(
+        {
+          paste(readLines(zip_file, n = 3, warn = FALSE), collapse = " ")
+        },
+        error = function(e) ""
+      )
+      stop(
+        sprintf(
+          "Downloaded PRISM archive '%s' is not a valid zip file.%s",
+          basename(zip_file),
+          if (nzchar(preview)) {
+            paste0(" Response preview: ", preview)
+          } else {
+            ""
+          }
+        ),
+        call. = FALSE
+      )
+    }
+  }
+
   #### Unzip downloaded zip files
   amadeus::download_unzip(
     file_name = download_names,

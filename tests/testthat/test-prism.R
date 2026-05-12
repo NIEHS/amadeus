@@ -101,7 +101,13 @@ testthat::test_that(
   {
     hash_dir <- NULL
     testthat::local_mocked_bindings(
-      download_run_method = function(...) invisible(NULL),
+      download_run_method = function(urls, destfiles, ...) {
+        payload <- tempfile(fileext = ".txt")
+        writeLines("prism test payload", payload)
+        utils::zip(destfiles, payload, flags = "-q")
+        unlink(payload)
+        invisible(NULL)
+      },
       download_unzip = function(...) invisible(NULL),
       download_hash = function(hash, dir) {
         hash_dir <<- dir
@@ -134,7 +140,13 @@ testthat::test_that(
 
 testthat::test_that("download_prism mock download (hash = FALSE)", {
   testthat::local_mocked_bindings(
-    download_run_method = function(...) invisible(NULL),
+    download_run_method = function(urls, destfiles, ...) {
+      payload <- tempfile(fileext = ".txt")
+      writeLines("prism test payload", payload)
+      utils::zip(destfiles, payload, flags = "-q")
+      unlink(payload)
+      invisible(NULL)
+    },
     download_unzip = function(...) invisible(NULL),
     download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
     .package = "amadeus"
@@ -157,6 +169,40 @@ testthat::test_that("download_prism mock download (hash = FALSE)", {
       )
     )
     testthat::expect_null(result)
+  })
+})
+
+testthat::test_that("download_prism errors when downloaded archive is invalid", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(urls, destfiles, ...) {
+      writeLines(
+        c(
+          "PRISM web services have been centralized.",
+          "Please update your web service calls."
+        ),
+        con = destfiles
+      )
+      invisible(NULL)
+    },
+    .package = "amadeus"
+  )
+
+  withr::with_tempdir({
+    testthat::expect_error(
+      download_prism(
+        time = "201005",
+        element = "ppt",
+        data_type = "ts",
+        format = "nc",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = TRUE,
+        remove_zip = FALSE,
+        hash = FALSE
+      ),
+      regexp = "not a valid zip file"
+    )
   })
 })
 
@@ -195,6 +241,10 @@ testthat::test_that("process_prism", {
   testthat::expect_equal(
     unname(terra::metags(result)[terra::metags(result)$name == "element", 2]),
     element
+  )
+  testthat::expect_match(
+    names(result)[1],
+    "^tmin$"
   )
 
   # Set up test data
@@ -260,6 +310,9 @@ testthat::test_that("calculate_prism", {
   testthat::expect_equal(nrow(result), 1)
   testthat::expect_equal(ncol(result), 2)
   testthat::expect_equal(result$site_id, "001")
+  testthat::expect_true(
+    "tmin_0" %in% names(result)
+  )
   testthat::expect_equal(result[, 2], 0.8952, tolerance = 0.00005)
 
   testthat::expect_message(

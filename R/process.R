@@ -3735,6 +3735,19 @@ process_prism <-
     extent = NULL,
     ...
   ) {
+    prism_layer_name_from_file <- function(prism_file, fallback_element) {
+      stem <- tools::file_path_sans_ext(basename(prism_file[1]))
+      stem <- gsub("^(?i)prism_", "", stem, perl = TRUE)
+      tokens <- strsplit(stem, "_", fixed = TRUE)[[1]]
+      tokens <- tokens[nzchar(tokens)]
+
+      if (length(tokens) == 0L) {
+        return(tolower(fallback_element))
+      }
+
+      gsub("[^a-z0-9_]", "", tolower(tokens[1]))
+    }
+
     # check inputs
     if (
       !element %in%
@@ -3774,6 +3787,9 @@ process_prism <-
       prism_file <- path
     }
     prism <- terra::rast(prism_file, win = extent)
+    if (terra::nlyr(prism) == 1L) {
+      names(prism) <- prism_layer_name_from_file(prism_file, element)
+    }
     terra::metags(prism) <- cbind(
       c("time", "element"),
       c(time, element)

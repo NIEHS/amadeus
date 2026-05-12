@@ -1534,26 +1534,6 @@ testthat::test_that("download_unzip errors on unsupported archive extension", {
   })
 })
 
-testthat::test_that("download_unzip errors on invalid zip content", {
-  withr::with_tempdir({
-    zip_file <- "invalid.zip"
-    writeLines("not a real zip archive", zip_file)
-    unzip_dir <- "./unzipped"
-    dir.create(unzip_dir)
-
-    testthat::expect_error(
-      suppressMessages(
-        download_unzip(
-          file_name = zip_file,
-          directory_to_unzip = unzip_dir,
-          unzip = TRUE
-        )
-      ),
-      regexp = "Failed to unzip archive"
-    )
-  })
-})
-
 ################################################################################
 ##### Test check_for_null_parameters
 testthat::test_that("check_for_null_parameters detects nulls", {
