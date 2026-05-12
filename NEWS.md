@@ -8,6 +8,15 @@
 - Added `.by` and `.by_time` parameters to all `calculate_*()` functions for consistent spatial and temporal summarization options across all datasets
 - The default behavior of `calculate_*()` functions remains unchanged - i.e., no summarization, returning extracted or summarized values at the temporal resolution of the data -  but users can now specify `.by` for spatial grouping (e.g., by HUC, county, state) and `.by_time` for temporal grouping (e.g., by year, month) to obtain summarized covariate values directly from the calculation step
 
+## 'frac' option for categorical variable covariate calculation 
+
+- `hms`, `koppen`, and `ecoregion` datasets now have optional fraction covariate calculation 
+that returns the fraction of each category in the radius buffer. 
+
+## `drop` options for categorical variable covariate calculation 
+
+- `hms`, `koppen`, and `ecoregion` datasets now have optional `drop` parameter that will drop or exclude categories that don't have any coverage in the radius buffer for a given point, which can help reduce the number of columns returned when many categories are possible but only a few are present in the area around the point.
+
 ## Detailed vignettes for each dataset including available variables, spatial and temporal resolution, and example use cases
 
 - workflow vignette for each dataset with detailed information on available variables, spatial and temporal resolution, and example use cases for each dataset

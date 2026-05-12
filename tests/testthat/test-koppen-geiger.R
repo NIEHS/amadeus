@@ -157,8 +157,38 @@ testthat::test_that("calculate_koppen_geiger", {
   testthat::expect_s3_class(kg_res, "data.frame")
   # ncol is equal to 7
   testthat::expect_equal(ncol(kg_res), 7)
+  kg_dummy_cols <- grep("^DUM_CLRG[A-E]_", names(kg_res), value = TRUE)
+  testthat::expect_equal(
+    kg_dummy_cols,
+    paste0("DUM_CLRG", LETTERS[1:5], "_00000")
+  )
+  testthat::expect_false(any(grepl("_0_", kg_dummy_cols)))
   # should have only one climate zone
   testthat::expect_equal(sum(unlist(kg_res[, c(-1, -2)])), 1)
+  testthat::expect_true(
+    all(unlist(kg_res[, kg_dummy_cols, drop = FALSE]) %in% c(0L, 1L))
+  )
+
+  testthat::expect_no_error(
+    kg_frac <- calculate_koppen_geiger(
+      from = kgras,
+      locs = site_faux,
+      frac = TRUE,
+      radius = 100000
+    )
+  )
+  kg_frac_cols <- grep("^FRC_CLRG[A-E]_", names(kg_frac), value = TRUE)
+  testthat::expect_equal(
+    kg_frac_cols,
+    paste0("FRC_CLRG", LETTERS[1:5], "_100000")
+  )
+  testthat::expect_false(any(grepl("_0_", kg_frac_cols)))
+  testthat::expect_true(
+    all(unlist(kg_frac[, kg_frac_cols, drop = FALSE]) >= 0, na.rm = TRUE)
+  )
+  testthat::expect_true(
+    all(unlist(kg_frac[, kg_frac_cols, drop = FALSE]) <= 1, na.rm = TRUE)
+  )
   # with included geometry (terra)
   testthat::expect_no_error(
     kg_terra <- calculate_koppen_geiger(

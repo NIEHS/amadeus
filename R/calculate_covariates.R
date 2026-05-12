@@ -198,14 +198,19 @@ calculate_covariates <-
 
 #' Calculate climate classification covariates
 #' @description
-#' Extract climate classification values at point locations. Returns a
-#' \code{data.frame} object containing \code{locs_id} and
-#' binary (0 = point not in climate region; 1 = point in climate region)
-#' variables for each climate classification region.
-#' @param from SpatVector(1). Output of \code{process_koppen_geiger()}.
+#' Extract Koppen-Geiger climate classes at point or buffered locations. Returns
+#' a \code{data.frame} with \code{locs_id}, a \code{description} column, and
+#' either binary indicators (\code{frac = FALSE}) or fractional overlap values
+#' (\code{frac = TRUE}) for climate groups A-E.
+#' @param from SpatRaster(1). Output of \code{process_koppen_geiger()}.
 #' @param locs sf/SpatVector. Unique locs. Should include
 #'  a unique identifier field named `locs_id`
 #' @param locs_id character(1). Name of unique identifier.
+#' @param frac logical(1). Default `FALSE`. If `FALSE`, return binary 0/1
+#'   indicators by climate group. If `TRUE`, return fractional overlap in the
+#'   extraction footprint.
+#' @param radius numeric(1). Circular buffer size (meters) around point
+#'   locations. Use `0` (default) for exact point extraction.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -214,7 +219,9 @@ calculate_covariates <-
 #'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @seealso [`process_koppen_geiger`]
-#' @return a data.frame or SpatVector object
+#' @return a data.frame or SpatVector object with climate columns named like
+#'   `DUM_CLRGA_00000` (`frac = FALSE`) or `FRC_CLRGA_100000` (`frac = TRUE`)
+#'   where the suffix reflects the extraction radius.
 #' @note The returned object contains a
 #' `$description` column to represent the temporal range covered by the
 #' dataset. For more information, see
@@ -249,20 +256,70 @@ calculate_koppen_geiger <-
     locs_id = "site_id",
     weights = NULL,
     geom = FALSE,
+    frac = FALSE,
+    radius = 0,
     ...
   ) {
     amadeus::check_unsupported_by(..., .call = sys.call())
+    if (!is.logical(frac) || length(frac) != 1L || is.na(frac)) {
+      stop("`frac` should be a single logical value (TRUE/FALSE).")
+    }
+    if (!is.numeric(radius) || length(radius) != 1L || is.na(radius)) {
+      stop("`radius` should be a single numeric value.")
+    }
+    if (radius < 0) {
+      stop("`radius` should be greater than or equal to 0.")
+    }
+    radius_value <- as.integer(round(radius))
+    width_radius <- max(5L, nchar(as.character(abs(radius_value))))
+    radius_suffix <- sprintf(paste0("%0", width_radius, "d"), radius_value)
+    value_prefix <- if (isTRUE(frac)) "FRC" else "DUM"
+
     # prepare locations
     locs_prepared <- amadeus::calc_prepare_locs(
       from = from,
       locs = locs,
       locs_id = locs_id,
-      radius = 0,
+      radius = radius,
       geom = geom
     )
     locs_kg <- locs_prepared[[1]]
     locs_df <- locs_prepared[[2]]
-    locs_kg_extract <- terra::extract(from, locs_kg)
+    is_point_locs <- all(
+      tolower(terra::geomtype(locs_kg)) %in% c("points", "point")
+    )
+    if (is_point_locs && radius_value == 0L) {
+      locs_kg_extract <- terra::extract(from, locs_kg)
+      locs_kg_extract[[locs_id]] <- locs_df[[locs_id]][locs_kg_extract$ID]
+      locs_kg_extract$base_value <- 1
+    } else {
+      locs_kg_extract <- terra::extract(
+        from,
+        locs_kg,
+        cells = TRUE,
+        weights = TRUE
+      )
+      locs_kg_extract[[locs_id]] <- locs_df[[locs_id]][locs_kg_extract$ID]
+      coverage_col <- c("weight", "weights", "fraction")
+      coverage_col <- coverage_col[coverage_col %in% names(locs_kg_extract)][1]
+      if (is.na(coverage_col) || length(coverage_col) == 0) {
+        locs_kg_extract$base_value <- 1
+      } else {
+        locs_kg_extract$base_value <- as.numeric(locs_kg_extract[[coverage_col]])
+        locs_kg_extract$base_value[!is.finite(locs_kg_extract$base_value)] <- 0
+      }
+    }
+    value_col <- setdiff(
+      names(locs_kg_extract),
+      c("ID", locs_id, "cell", "weight", "weights", "fraction", "base_value")
+    )
+    value_col <- value_col[1]
+    locs_kg_extract <- locs_kg_extract[
+      !is.na(locs_kg_extract[[value_col]]),
+      c(locs_id, value_col, "base_value"),
+      drop = FALSE
+    ]
+    names(locs_kg_extract)[2] <- "value"
 
     # The starting value is NA as the color table has 0 value in it
     kg_class <-
@@ -305,13 +362,13 @@ calculate_koppen_geiger <-
       value = kg_coltab$value,
       class_kg = kg_class
     )
-
-    locs_kg_extract[[locs_id]] <- locs_df[, 1]
-    if (geom %in% c("sf", "terra")) {
-      locs_kg_extract$geometry <- locs_df[, 2]
-    }
-    colnames(locs_kg_extract)[2] <- "value"
-    locs_kg_extract_e <- merge(locs_kg_extract, kg_colclass, by = "value")
+    locs_kg_extract_e <- merge(
+      locs_kg_extract,
+      kg_colclass,
+      by = "value",
+      all.x = TRUE,
+      sort = FALSE
+    )
 
     # "Dfa": 25
     # "BSh": 6
@@ -330,30 +387,91 @@ calculate_koppen_geiger <-
       which(id_search == "33015001488101"),
       "class_kg"
     ] <- "Dfb"
-
-    locs_kg_extract_e$class_kg <-
-      as.factor(substr(locs_kg_extract_e$class_kg, 1, 1))
-    # currently there are no "E" region in locs.
-    # however, E is filled with all zeros at the moment.
+    locs_kg_extract_e$class_kg <- substr(locs_kg_extract_e$class_kg, 1, 1)
     aelabels <- LETTERS[1:5]
-    df_ae_separated <-
-      split(aelabels, aelabels) |>
-      lapply(function(x) {
-        as.integer(locs_kg_extract_e$class_kg == x)
-      }) |>
-      Reduce(f = cbind, x = _) |>
-      as.data.frame()
-    colnames(df_ae_separated) <- sprintf("DUM_CLRG%s_0_00000", aelabels)
-
-    kg_extracted <-
-      cbind(
-        locs_id = locs_df,
-        as.character(terra::metags(from)$value[2]),
-        df_ae_separated
+    class_values <- data.frame(
+      site_id = as.character(locs_kg_extract_e[[locs_id]]),
+      class_kg = as.character(locs_kg_extract_e$class_kg),
+      base_value = as.numeric(locs_kg_extract_e$base_value),
+      stringsAsFactors = FALSE
+    )
+    class_values <- class_values[
+      class_values$class_kg %in% aelabels,
+      ,
+      drop = FALSE
+    ]
+    if (nrow(class_values) > 0) {
+      class_values <- stats::aggregate(
+        base_value ~ site_id + class_kg,
+        data = class_values,
+        FUN = sum
       )
-    names(kg_extracted)[1] <- locs_id
+      if (!isTRUE(frac)) {
+        class_values$base_value <- as.integer(class_values$base_value > 0)
+      } else {
+        totals <- stats::aggregate(
+          base_value ~ site_id,
+          data = class_values,
+          FUN = sum
+        )
+        denom <- totals$base_value[match(class_values$site_id, totals$site_id)]
+        denom[!is.finite(denom) | denom <= 0] <- NA_real_
+        class_values$base_value <- class_values$base_value / denom
+        class_values$base_value[!is.finite(class_values$base_value)] <- 0
+        class_values$base_value <- pmin(class_values$base_value, 1)
+      }
+      class_matrix <- stats::xtabs(base_value ~ site_id + class_kg, data = class_values)
+      df_ae_separated <- as.data.frame.matrix(class_matrix)
+      df_ae_separated$site_id <- rownames(df_ae_separated)
+      rownames(df_ae_separated) <- NULL
+    } else {
+      df_ae_separated <- data.frame(
+        site_id = character(0),
+        stringsAsFactors = FALSE
+      )
+    }
+    for (class_name in aelabels) {
+      if (!class_name %in% names(df_ae_separated)) {
+        df_ae_separated[[class_name]] <- if (isTRUE(frac)) 0 else 0L
+      }
+    }
+    df_ae_separated <- df_ae_separated[, c("site_id", aelabels), drop = FALSE]
+    column_names <- sprintf(
+      "%s_CLRG%s_%s",
+      value_prefix,
+      aelabels,
+      radius_suffix
+    )
+    names(df_ae_separated)[match(aelabels, names(df_ae_separated))] <- column_names
+    kg_extracted <- merge(
+      locs_df,
+      df_ae_separated,
+      by.x = locs_id,
+      by.y = "site_id",
+      all.x = TRUE,
+      sort = FALSE
+    )
+    for (kg_col in column_names) {
+      if (!kg_col %in% names(kg_extracted)) {
+        kg_extracted[[kg_col]] <- if (isTRUE(frac)) 0 else 0L
+      }
+      kg_extracted[[kg_col]][is.na(kg_extracted[[kg_col]])] <-
+        if (isTRUE(frac)) 0 else 0L
+      if (!isTRUE(frac)) {
+        kg_extracted[[kg_col]] <- as.integer(kg_extracted[[kg_col]])
+      } else {
+        kg_extracted[[kg_col]] <- as.numeric(kg_extracted[[kg_col]])
+      }
+    }
+    desc_vals <- terra::metags(from)$value
+    description <- if (length(desc_vals) >= 2) as.character(desc_vals[2]) else NA_character_
+    kg_extracted$description <- description
     if (geom %in% c("sf", "terra")) {
-      names(kg_extracted)[2:3] <- c("geometry", "description")
+      kg_extracted <- kg_extracted[
+        ,
+        c(locs_id, "geometry", "description", column_names),
+        drop = FALSE
+      ]
       sites_return <- amadeus::calc_return_locs(
         covar = kg_extracted,
         POSIXt = FALSE,
@@ -363,7 +481,11 @@ calculate_koppen_geiger <-
       #### return data.frame
       return(sites_return)
     } else {
-      names(kg_extracted)[2] <- "description"
+      kg_extracted <- kg_extracted[
+        ,
+        c(locs_id, "description", column_names),
+        drop = FALSE
+      ]
       return(kg_extracted)
     }
   }
