@@ -274,7 +274,7 @@ testthat::test_that("calculate_groads", {
   )
   testthat::expect_equal(nrow(groads_sf_partial), 3)
   testthat::expect_equal(
-    groads_sf_partial$GRD_TOTAL_0_05000[groads_sf_partial$site_id == "outside"],
+    groads_sf_partial$GRD_TOTAL_05000[groads_sf_partial$site_id == "outside"],
     0
   )
 

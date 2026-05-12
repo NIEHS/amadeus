@@ -3153,8 +3153,8 @@ calculate_groads <- function(
   if (det_unit == 0) {
     det_unit <- 1
   }
-  total_name <- sprintf("GRD_TOTAL_0_%05d", radius)
-  density_name <- sprintf("GRD_DENKM_0_%05d", radius)
+  total_name <- sprintf("GRD_TOTAL_%05d", radius)
+  density_name <- sprintf("GRD_DENKM_%05d", radius)
 
   # km / sq km
   if (nrow(from_clip) > 0) {

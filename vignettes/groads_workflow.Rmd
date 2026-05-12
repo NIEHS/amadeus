@@ -126,14 +126,14 @@ sf_process <- sf::st_as_sf(processed_data)
  # join extracted values so fill matches each site
  buffers_1km <- merge(
    buffers_1km,
-   st_drop_geometry(point_values)[, c("site_id", "GRD_DENKM_0_01000")],
+   st_drop_geometry(point_values)[, c("site_id", "GRD_DENKM_01000")],
    by = "site_id",
    all.x = TRUE
  )
 
   ggplot() +
     geom_sf(data = sf_process, color = "grey40") +
-    geom_sf(data = buffers_1km, aes(fill = GRD_DENKM_0_01000), alpha = 0.8) +
+    geom_sf(data = buffers_1km, aes(fill = GRD_DENKM_01000), alpha = 0.8) +
    scale_fill_gradientn(
      colours = c("#f7f7f7", "#fddbc7", "#ef8a62", "#b2182b"),
      values = scales::rescale(c(0, 0.001, 0.25, 1)),
