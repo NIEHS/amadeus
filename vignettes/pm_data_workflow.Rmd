@@ -295,11 +295,3 @@ ggplot2::ggplot(
     axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)
   )
 ```
-
-## Notes
-
-- This workflow treats both AQS and IMPROVE as outcome data and uses direct download/process functions for each network.
-- The explicit AQS pollutant parameters shown are PM2.5 (`88101`, `88502`) and NO2 (`42602`).
-- The IMPROVE example uses `product = "raw"` and `ParamCode = "FPM"` as a PM2.5 indicator with valid records (`Status == "V0"`).
-- `process_aqs(mode = "location")` is useful for monitor maps, while `process_aqs(mode = "available-data")` is useful for daily observational summaries such as time series.
-- `process_improve()` supports `"raw"`, `"rhr2"`, and `"rhr3"` products; IMPROVE sampling is every third day, so gaps are expected in the time series.
