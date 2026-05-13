@@ -23,7 +23,27 @@ process_tri(
 \item{variables}{character. One or more regular expressions used to select
 TRI release variables by column name after normalization to underscore
 naming (for example, \code{STACK_AIR}, \code{FUGITIVE_AIR}, \code{WATER}). Default is
-\code{"STACK_AIR"}.}
+\code{"STACK_AIR"}. Recommended options include:
+\itemize{
+\item \code{FUGITIVE_AIR}
+\item \code{STACK_AIR}
+\item \code{WATER}
+\item \code{UNDERGROUND}
+\item \code{UNDERGROUND_CL_I}
+\item \code{UNDERGROUND_C_II_V}
+\item \code{LANDFILLS}
+\item \code{RCRA_C_LANDFILL}
+\item \code{OTHER_LANDFILLS}
+\item \code{LAND_TREATMENT}
+\item \code{SURFACE_IMPNDMNT}
+\item \code{RCRA_SURFACE_IM}
+\item \code{OTHER_SURFACE_I}
+\item \code{OTHER_DISPOSAL}
+\item \code{ON_SITE_RELEASE_TOTAL}
+\item \code{POTW_TRNS_RLSE}
+\item \code{POTW_TRNS_TRT}
+\item \code{POTW_TOTAL_TRANSFERS}
+}}
 
 \item{chemical}{\code{NULL} or character. Optional one or more regular
 expressions used to filter chemicals. Patterns are matched against

@@ -760,6 +760,32 @@ testthat::test_that("calculate_tri", {
       decay_range = 50000L
     )
   )
+  testthat::expect_no_warning(
+    tri_cov_sf_mixed <- calculate_covariates(
+      covariate = "tri",
+      from = tri_r_single_field,
+      locs = sf::st_as_sf(ncpt),
+      locs_id = "site_id",
+      decay_range = 50000L,
+      C0 = "STACK_AIR_100",
+      use_threshold = FALSE,
+      geom = "sf"
+    )
+  )
+  testthat::expect_true("sf" %in% class(tri_cov_sf_mixed))
+  testthat::expect_no_warning(
+    tri_cov_terra_mixed <- calculate_covariates(
+      covariate = "tri",
+      from = tri_r_single_field,
+      locs = sf::st_as_sf(ncpt),
+      locs_id = "site_id",
+      decay_range = 50000L,
+      C0 = "STACK_AIR_100",
+      use_threshold = FALSE,
+      geom = "terra"
+    )
+  )
+  testthat::expect_s4_class(tri_cov_terra_mixed, "SpatVector")
   testthat::expect_error(
     calculate_tri(
       from = tempdir(),

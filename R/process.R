@@ -1342,7 +1342,27 @@ process_ecoregion <-
 #' @param variables character. One or more regular expressions used to select
 #'   TRI release variables by column name after normalization to underscore
 #'   naming (for example, `STACK_AIR`, `FUGITIVE_AIR`, `WATER`). Default is
-#'   `"STACK_AIR"`.
+#'   `"STACK_AIR"`. Recommended options include:
+#'   \itemize{
+#'     \item `FUGITIVE_AIR`
+#'     \item `STACK_AIR`
+#'     \item `WATER`
+#'     \item `UNDERGROUND`
+#'     \item `UNDERGROUND_CL_I`
+#'     \item `UNDERGROUND_C_II_V`
+#'     \item `LANDFILLS`
+#'     \item `RCRA_C_LANDFILL`
+#'     \item `OTHER_LANDFILLS`
+#'     \item `LAND_TREATMENT`
+#'     \item `SURFACE_IMPNDMNT`
+#'     \item `RCRA_SURFACE_IM`
+#'     \item `OTHER_SURFACE_I`
+#'     \item `OTHER_DISPOSAL`
+#'     \item `ON_SITE_RELEASE_TOTAL`
+#'     \item `POTW_TRNS_RLSE`
+#'     \item `POTW_TRNS_TRT`
+#'     \item `POTW_TOTAL_TRANSFERS`
+#'   }
 #' @param chemical `NULL` or character. Optional one or more regular
 #'   expressions used to filter chemicals. Patterns are matched against
 #'   `TRI_CHEMICAL_COMPOUND_ID`, `CHEMICAL`, and `CAS`/`CAS.` values. If

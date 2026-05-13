@@ -2436,8 +2436,22 @@ calculate_tri <- function(
 
   # bind element data.frames into one
   df_tri <- Reduce(function(x, y) dplyr::full_join(x, y), list_locs_tri)
-  if (nrow(df_tri) != nrow(locs)) {
-    df_tri <- dplyr::left_join(as.data.frame(locs), df_tri)
+  locs_df <- as.data.frame(locs)
+  if (!locs_id %in% names(locs_df)) {
+    stop("`locs_id` was not found in `locs`.\n")
+  }
+  if (geom %in% c("sf", "terra")) {
+    locs_geom <- terra::as.data.frame(locs_re, geom = "WKT")
+    if (!locs_id %in% names(locs_geom)) {
+      stop("`locs_id` was not found in `locs` after CRS transformation.\n")
+    }
+    df_tri <- dplyr::left_join(
+      locs_geom[, c(locs_id, "geometry"), drop = FALSE],
+      df_tri,
+      by = locs_id
+    )
+  } else if (nrow(df_tri) != nrow(locs)) {
+    df_tri <- dplyr::left_join(locs_df, df_tri, by = locs_id)
   }
 
   df_tri_return <- amadeus::calc_return_locs(

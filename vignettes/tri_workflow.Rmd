@@ -57,18 +57,21 @@ download_data(
 
 ```
 
-## Process one workflow-ready data product
+## Demonstate processing and covariate calculation for a single chemical 
+
+The helper function `get_tri_info()` lists the available chemicals in the downloaded files, which can be used to filter the processing and covariate calculation steps. Here we demonstrate with Polychlorinated biphenyls (PCBs), a group of persistent organic pollutants that were widely used in industrial applications.
 
 ```{r process, eval = live_run}
 
 chems <- get_tri_info(path = directory_to_save, type = "chemicals")
+
 processed_pcb <- process_covariates(
   covariate = "tri",
   path = directory_to_save,
   chemical = c("Polychlorinated biphenyls"),
-  year = 2023,
-  extent = terra::ext(-114.9, -102.0, 31.3, 41.1)
+  year = 2023
 )
+# Note that extent is an option in process_covariates() to limit the domain 
 ```
 
 ## Calculate covariates at points
@@ -96,36 +99,22 @@ point_values_pcb <- calculate_covariates(
   from = processed_pcb,
   locs = example_points_sf,
   locs_id = "site_id",
-  decay_range = 5000,
+  decay_range = 5000, # 5 km decay range for illustrative purposes
   use_threshold = FALSE,
   geom = "sf"
 )
 ```
 
-## Calculate covariates across Durham County H3 hexagons
+## Plot the covariates at points along with the facility locations
 
-```{r calculate-polygons, eval = live_run}
-polygon_values <- calculate_covariates(
-  covariate = "tri",
-  from = processed_pcb,
-  locs = durham_hex,
-  locs_id = "h3_id",
-  decay_range = 5000,
-  geom = "sf"
-)
+```{r plot-points, fig.alt = "Calculated TRI PCB values at sample locations, with facility locations overlaid.", eval = live_run}
+pcb_sf <- sf::st_as_sf(processed_pcb)
+point_basemap <-
+  sf::st_as_sf(maps::map("usa", plot = FALSE, fill = FALSE))
+
+ggplot() + 
+  geom_sf(data = point_basemap, fill = "gray80", color = "white") +
+  geom_sf(data = pcb_sf, color = "red", size = 2) + 
+  geom_sf(data = point_values_pcb, aes(color = STACK_AIR_0001336363_05000), size = 3) 
+
 ```
-
-## Visualize the point and polygon outputs
-
-```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-plot_points(point_values, paste0("US EPA Toxic Release Inventory (TRI)", ": point extraction"))
-```
-
-```{r plot-polygons, eval = live_run, fig.alt = "Map of polygon-based covariate extraction results across Durham County H3 hexagons for this workflow."}
-plot_polygons(polygon_values, paste0("US EPA Toxic Release Inventory (TRI)", ": Durham H3 polygons"))
-```
-
-## Notes
-
-- The vignette now shows both a multi-year national TRI request and a state-specific download for North Carolina.
-- TRI calculations usually benefit from positive buffer radii so nearby facilities contribute to the local summary.
