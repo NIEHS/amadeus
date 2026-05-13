@@ -108,6 +108,17 @@ testthat::test_that("sum_edc", {
     )
   )
   testthat::expect_s3_class(tri_sedc_c0, "data.frame")
+  testthat::expect_no_error(
+    tri_sedc_c0_df <- sum_edc(
+      locs = ncpt,
+      from = tri_r,
+      locs_id = "site_id",
+      decay_range = 30000,
+      target_fields = targcols[1],
+      C0 = data.frame(c0 = tri_r[[targcols[1]]][[1]])
+    )
+  )
+  testthat::expect_s3_class(tri_sedc_c0_df, "data.frame")
 
   testthat::expect_error(
     sum_edc(
@@ -117,6 +128,54 @@ testthat::test_that("sum_edc", {
       decay_range = 30000,
       target_fields = targcols[1],
       C0 = "NOT_A_COLUMN"
+    )
+  )
+  testthat::expect_error(
+    sum_edc(
+      locs = ncpt,
+      from = tri_r,
+      locs_id = "site_id",
+      decay_range = 30000,
+      target_fields = targcols[1],
+      C0 = ""
+    )
+  )
+  testthat::expect_error(
+    sum_edc(
+      locs = ncpt,
+      from = tri_r,
+      locs_id = "site_id",
+      decay_range = 30000,
+      target_fields = targcols[1],
+      C0 = rep(1, nrow(tri_r) - 1)
+    )
+  )
+  testthat::expect_error(
+    sum_edc(
+      locs = ncpt,
+      from = tri_r,
+      locs_id = "site_id",
+      decay_range = 30000,
+      target_fields = 1
+    )
+  )
+  testthat::expect_error(
+    sum_edc(
+      locs = ncpt,
+      from = tri_r,
+      locs_id = "site_id",
+      decay_range = 30000,
+      target_fields = targcols[1],
+      use_threshold = NA
+    )
+  )
+  testthat::expect_error(
+    sum_edc(
+      locs = ncpt,
+      from = tri_r,
+      locs_id = "site_id",
+      decay_range = -10,
+      target_fields = targcols[1]
     )
   )
 
@@ -144,6 +203,17 @@ testthat::test_that("sum_edc", {
   )
   sedc_cols <- setdiff(names(tri_sedc_empty), "site_id")
   testthat::expect_true(all(tri_sedc_empty[, sedc_cols] == 0))
+  testthat::expect_no_error(
+    tri_sedc_empty_sf <- sum_edc(
+      locs = far_locs,
+      from = tri_r,
+      locs_id = "site_id",
+      decay_range = 30000,
+      target_fields = targcols,
+      geom = "sf"
+    )
+  )
+  testthat::expect_true("sf" %in% class(tri_sedc_empty_sf))
 
   outside_locs_df <- data.frame(
     lon = -76.5,

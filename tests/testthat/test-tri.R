@@ -724,6 +724,15 @@ testthat::test_that("calculate_tri", {
     )
   )
   testthat::expect_true(any(grepl("STACK_AIR_", names(tri_c_with_c0_col))))
+  testthat::expect_no_error(
+    tri_c_with_multi_c0 <- calculate_tri(
+      from = tri_r,
+      locs = ncpt,
+      decay_range = 50000L,
+      C0 = attr(tri_r, "tri_target_fields")
+    )
+  )
+  testthat::expect_true(any(grepl("WATER_", names(tri_c_with_multi_c0))))
 
   testthat::expect_no_error(
     tri_c_all_sources <- calculate_tri(
@@ -846,6 +855,44 @@ testthat::test_that("calculate_tri", {
       decay_range = 50000L,
       C0 = "NOT_A_COLUMN"
     )
+  )
+  testthat::expect_error(
+    calculate_tri(
+      from = tri_r,
+      locs = ncpt,
+      decay_range = 50000L,
+      C0 = ""
+    ),
+    regexp = "`C0` must be NULL or a non-empty character vector of column names"
+  )
+  testthat::expect_error(
+    calculate_tri(
+      from = tri_r,
+      locs = ncpt,
+      locs_id = "NOT_A_SITE_ID",
+      decay_range = 50000L
+    )
+  )
+  testthat::expect_error(
+    calculate_tri(
+      from = tri_r,
+      locs = ncpt,
+      decay_range = 50000L,
+      C0 = c("STACK_AIR_100", "STACK_AIR_200")
+    ),
+    regexp = "`C0` must have length 1 or match the number of TRI target fields"
+  )
+
+  tri_r_bad_c0 <- tri_r
+  tri_r_bad_c0$BAD_C0 <- "x"
+  testthat::expect_error(
+    calculate_tri(
+      from = tri_r_bad_c0,
+      locs = ncpt,
+      decay_range = 50000L,
+      C0 = "BAD_C0"
+    ),
+    regexp = "is not numeric"
   )
 })
 
