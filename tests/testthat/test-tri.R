@@ -589,6 +589,31 @@ testthat::test_that("process_tri supports case-sensitive matching and sector-nam
   )
 })
 
+testthat::test_that("process_tri drops rows without TRI signal", {
+  withr::local_package("terra")
+  withr::with_tempdir({
+    write_tri_csv(data.frame(
+      YEAR = c(2018, 2018),
+      LONGITUDE = c(-78.8, -79.2),
+      LATITUDE = c(35.9, 36.1),
+      TRI_CHEMICAL_COMPOUND_ID = c("100", "100"),
+      UNIT_OF_MEASURE = c("Pounds", "Pounds"),
+      STACK_AIR = c(0, 5)
+    ))
+    tri_sig <- process_tri(path = ".", year = 2018, variables = "STACK_AIR")
+    testthat::expect_equal(nrow(tri_sig), 1L)
+    testthat::expect_true(all(tri_sig$STACK_AIR_100 > 0))
+
+    tri_none <- process_tri(
+      path = ".",
+      year = 2018,
+      variables = "STACK_AIR",
+      extent = terra::ext(-78.85, -78.75, 35.85, 35.95)
+    )
+    testthat::expect_equal(nrow(tri_none), 0L)
+  })
+})
+
 ################################################################################
 ##### calculate_tri
 testthat::test_that("calculate_tri", {
@@ -615,6 +640,22 @@ testthat::test_that("calculate_tri", {
       chemical = "benzene|toluene"
     )
   )
+  testthat::expect_no_error(
+    tri_r_one_chem <- process_tri(
+      path = path_tri,
+      year = 2018,
+      variables = c("STACK_AIR", "WATER"),
+      chemical = "benzene"
+    )
+  )
+  testthat::expect_no_error(
+    tri_r_single_field <- process_tri(
+      path = path_tri,
+      year = 2018,
+      variables = "STACK_AIR",
+      chemical = "benzene"
+    )
+  )
   testthat::expect_s4_class(tri_r, "SpatVector")
   testthat::expect_true(any(grepl("^WATER_", names(tri_r))))
 
@@ -622,19 +663,61 @@ testthat::test_that("calculate_tri", {
     tri_c <- calculate_tri(
       from = tri_r,
       locs = ncpt,
-      radius = c(1500L, 50000L)
+      decay_range = c(1500L, 10000L, 50000L)
     )
   )
   testthat::expect_true(is.data.frame(tri_c))
   testthat::expect_true(any(grepl("STACK_AIR_", names(tri_c))))
   testthat::expect_true(any(grepl("WATER_", names(tri_c))))
+  testthat::expect_true(any(grepl("_01500$", names(tri_c))))
+  testthat::expect_true(any(grepl("_10000$", names(tri_c))))
+  testthat::expect_true(any(grepl("_50000$", names(tri_c))))
+
+  testthat::expect_no_error(
+    tri_c_one_chem <- calculate_tri(
+      from = tri_r_one_chem,
+      locs = ncpt,
+      decay_range = 50000L
+    )
+  )
+  testthat::expect_true(any(grepl("_50000$", names(tri_c_one_chem))))
+  testthat::expect_false(any(grepl("_01500$", names(tri_c_one_chem))))
+
+  testthat::expect_warning(
+    calculate_tri(
+      from = tri_r_single_field,
+      locs = ncpt,
+      decay_range = 50000L
+    ),
+    regexp = "`C0` is NULL and only one TRI field is available"
+  )
+
+  testthat::expect_no_error(
+    tri_c_with_c0_col <- calculate_tri(
+      from = tri_r,
+      locs = ncpt,
+      decay_range = 50000L,
+      C0 = "STACK_AIR_100"
+    )
+  )
+  testthat::expect_true(any(grepl("STACK_AIR_", names(tri_c_with_c0_col))))
+
+  testthat::expect_no_error(
+    tri_c_all_sources <- calculate_tri(
+      from = tri_r,
+      locs = ncpt,
+      decay_range = 50000L,
+      use_threshold = FALSE
+    )
+  )
+  testthat::expect_true(any(grepl("STACK_AIR_", names(tri_c_all_sources))))
 
   attr(tri_r, "tri_target_fields") <- NULL
   testthat::expect_no_error(
     tri_c_fallback <- calculate_tri(
       from = tri_r,
       locs = ncpt,
-      radius = 50000L
+      decay_range = 50000L
     )
   )
   testthat::expect_true(any(grepl("WATER_", names(tri_c_fallback))))
@@ -644,7 +727,7 @@ testthat::test_that("calculate_tri", {
     tri_c_terra <- calculate_tri(
       from = tri_r,
       locs = ncpt,
-      radius = c(1500L, 50000L),
+      decay_range = c(1500L, 50000L),
       geom = "terra"
     )
   )
@@ -655,7 +738,7 @@ testthat::test_that("calculate_tri", {
     tri_c_sf <- calculate_tri(
       from = tri_r,
       locs = ncpt,
-      radius = c(1500L, 50000L),
+      decay_range = c(1500L, 50000L),
       geom = "sf"
     )
   )
@@ -665,7 +748,7 @@ testthat::test_that("calculate_tri", {
     calculate_tri(
       from = tri_r,
       locs = ncpt,
-      radius = c(1500L, 50000L),
+      decay_range = c(1500L, 50000L),
       geom = TRUE
     )
   )
@@ -674,28 +757,45 @@ testthat::test_that("calculate_tri", {
     calculate_tri(
       from = tri_r,
       locs = sf::st_as_sf(ncpt),
-      radius = 50000L
+      decay_range = 50000L
     )
   )
   testthat::expect_error(
     calculate_tri(
       from = tempdir(),
       locs = ncpt,
-      radius = 50000L
+      decay_range = 50000L
     )
   )
   testthat::expect_error(
     calculate_tri(
       from = tempdir(),
       locs = ncpt[, 1:2],
-      radius = 50000L
+      decay_range = 50000L
     )
   )
   testthat::expect_error(
     calculate_tri(
       from = tempdir(),
       locs = ncpt,
-      radius = "As far as the Earth's radius"
+      decay_range = "As far as the Earth's radius"
+    )
+  )
+  testthat::expect_error(
+    calculate_tri(
+      from = tri_r,
+      locs = ncpt,
+      decay_range = 50000L,
+      use_threshold = NA
+    ),
+    regexp = "`use_threshold` must be TRUE or FALSE"
+  )
+  testthat::expect_error(
+    calculate_tri(
+      from = tri_r,
+      locs = ncpt,
+      decay_range = 50000L,
+      C0 = "NOT_A_COLUMN"
     )
   )
 })
@@ -719,7 +819,7 @@ testthat::test_that("calculate_tri errors when no TRI target fields are present"
   )
   attr(empty_tri, "tri_target_fields") <- character(0)
   testthat::expect_error(
-    calculate_tri(from = empty_tri, locs = locs, radius = 1000L),
+    calculate_tri(from = empty_tri, locs = locs, decay_range = 1000L),
     regexp = "No TRI target fields found"
   )
 })

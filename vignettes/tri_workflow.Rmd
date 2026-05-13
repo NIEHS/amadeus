@@ -60,11 +60,13 @@ download_data(
 ## Process one workflow-ready data product
 
 ```{r process, eval = live_run}
-processed_data <- process_covariates(
+
+chems <- get_tri_info(path = directory_to_save, type = "chemicals")
+processed_pcb <- process_covariates(
   covariate = "tri",
   path = directory_to_save,
-  year = 2024,
-  variables = c(1, 2, 12, 13, 37, 40, 51),
+  chemical = c("Polychlorinated biphenyls"),
+  year = 2023,
   extent = terra::ext(-114.9, -102.0, 31.3, 41.1)
 )
 ```
@@ -72,8 +74,8 @@ processed_data <- process_covariates(
 ## Calculate covariates at points
 
 ```{r calculate-points, eval = live_run}
-domain_x <- c(terra::xmin(processed_data), terra::xmax(processed_data))
-domain_y <- c(terra::ymin(processed_data), terra::ymax(processed_data))
+domain_x <- c(terra::xmin(processed_pcb), terra::xmax(processed_pcb))
+domain_y <- c(terra::ymin(processed_pcb), terra::ymax(processed_pcb))
 domain_dx <- diff(domain_x)
 domain_dy <- diff(domain_y)
 
@@ -89,12 +91,13 @@ example_points_sf <- sf::st_as_sf(
 example_points_sf$site_id <- paste0("site_", seq_len(nrow(example_points_sf)))
 
 
-point_values <- calculate_covariates(
+point_values_pcb <- calculate_covariates(
   covariate = "tri",
-  from = processed_data,
+  from = processed_pcb,
   locs = example_points_sf,
   locs_id = "site_id",
-  radius = 5000,
+  decay_range = 5000,
+  use_threshold = FALSE,
   geom = "sf"
 )
 ```
@@ -104,10 +107,10 @@ point_values <- calculate_covariates(
 ```{r calculate-polygons, eval = live_run}
 polygon_values <- calculate_covariates(
   covariate = "tri",
-  from = processed_data,
+  from = processed_pcb,
   locs = durham_hex,
   locs_id = "h3_id",
-  radius = 5000,
+  decay_range = 5000,
   geom = "sf"
 )
 ```

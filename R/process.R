@@ -1586,6 +1586,15 @@ process_tri <- function(
     ) |>
     dplyr::filter(!is.na(LONGITUDE) | !is.na(LATITUDE))
   names(dt_tri_x) <- sub(" ", "_", names(dt_tri_x))
+  tri_value_cols <- setdiff(names(dt_tri_x), c("YEAR", "LONGITUDE", "LATITUDE"))
+  if (length(tri_value_cols) > 0L) {
+    tri_value_df <- dt_tri_x[, tri_value_cols, drop = FALSE]
+    has_tri_signal <- rowSums(!is.na(tri_value_df) & tri_value_df != 0) > 0
+    dt_tri_x <- dt_tri_x[has_tri_signal, , drop = FALSE]
+  }
+  if (nrow(dt_tri_x) < 1) {
+    stop("No TRI sites found after filtering missing/zero source values.\n")
+  }
 
   spvect_tri <-
     terra::vect(

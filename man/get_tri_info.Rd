@@ -13,7 +13,8 @@ get_tri_info(
 )
 }
 \arguments{
-\item{path}{character(1). Path to the directory with TRI CSV files.}
+\item{path}{character(1). Path to the directory with TRI CSV files
+(from \code{download_tri}).}
 
 \item{type}{character(1). Lookup table to return. One of \code{"chemicals"}
 (default) or \code{"industries"}.}

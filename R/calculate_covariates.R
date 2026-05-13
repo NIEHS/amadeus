@@ -2009,17 +2009,24 @@ calculate_temporal_dummies <-
 #' @param locs sf/SpatVector(1). Locations where the sum of exponentially
 #' decaying contributions are calculated.
 #' @param locs_id character(1). Name of the unique id field in `point_to`.
-#' @param sedc_bandwidth numeric(1).
+#' @param decay_range numeric(1).
 #' Distance at which the source concentration is reduced to
 #'  `exp(-3)` (approximately -95 %)
 #' @param target_fields character(varying). Field names in characters.
+#' @param C0 `NULL`, character(1), or numeric vector of length `nrow(from)`.
+#' Optional initial source values at pollutant locations. If `NULL`
+#' (default), all source values are set to 1. If character(1), the value
+#' is treated as a column name in `from` and used as source values.
+#' @param use_threshold logical(1). If `TRUE` (default), include only source
+#' points within \code{5 * decay_range} from each target location. If `FALSE`,
+#' include all source points in `from`.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' @return a data.frame (tibble) or SpatVector object with input field names with
 #'  a suffix \code{"_sedc"} where the sums of EDC are stored.
 #'  Additional attributes are attached for the EDC information.
-#'    - `attr(result, "sedc_bandwidth")``: the bandwidth where
+#'    - `attr(result, "decay_range")``: the range where
 #'  concentration reduces to approximately five percent
 #'    - `attr(result, "sedc_threshold")``: the threshold distance
 #'  at which emission source points are excluded beyond that
@@ -2072,8 +2079,10 @@ sum_edc <-
     from = NULL,
     locs = NULL,
     locs_id = NULL,
-    sedc_bandwidth = NULL,
+    decay_range = NULL,
     target_fields = NULL,
+    C0 = NULL,
+    use_threshold = TRUE,
     geom = FALSE
   ) {
     amadeus::check_geom(geom)
@@ -2082,6 +2091,52 @@ sum_edc <-
     }
     if (!methods::is(from, "SpatVector")) {
       from <- try(terra::vect(from))
+    }
+
+    if (!is.numeric(decay_range) || length(decay_range) != 1L ||
+          is.na(decay_range) || decay_range <= 0) {
+      stop("`decay_range` must be a single positive numeric value.\n")
+    }
+    if (!is.character(target_fields) || length(target_fields) < 1L) {
+      stop("`target_fields` must be a non-empty character vector.\n")
+    }
+    if (!is.logical(use_threshold) || length(use_threshold) != 1L ||
+          is.na(use_threshold)) {
+      stop("`use_threshold` must be TRUE or FALSE.\n")
+    }
+    missing_targets <- setdiff(target_fields, names(from))
+    if (length(missing_targets) > 0L) {
+      stop(
+        "The following `target_fields` are missing in `from`: ",
+        paste(missing_targets, collapse = ", "),
+        "\n"
+      )
+    }
+    if (is.null(C0)) {
+      from$C0_source <- rep(1, nrow(from))
+    } else {
+      if (is.character(C0)) {
+        if (length(C0) != 1L || anyNA(C0) || !nzchar(trimws(C0))) {
+          stop("`C0` as character must be a single non-empty column name.\n")
+        }
+        if (!C0 %in% names(from)) {
+          stop("`C0` column `", C0, "` was not found in `from`.\n")
+        }
+        C0 <- from[[C0]]
+      }
+      if (is.data.frame(C0) && ncol(C0) == 1L) {
+        C0 <- C0[[1]]
+      }
+      if (!is.numeric(C0) || length(C0) != nrow(from)) {
+        stop(
+          "`C0` must be NULL, character(1) column name in `from`, ",
+          "or a numeric vector with length `nrow(from)`.\n"
+        )
+      }
+      if (length(target_fields) != 1L) {
+        stop("When `C0` is provided, `target_fields` must have length 1.\n")
+      }
+      from$C0_source <- C0
     }
 
     cn_overlap <- intersect(names(locs), names(from))
@@ -2095,16 +2150,47 @@ The result may not be accurate.\n",
       )
     }
     len_point_locs <- seq_len(nrow(locs))
+    threshold_distance <- if (use_threshold) decay_range * 5 else Inf
 
     locs$from_id <- len_point_locs
-    locs_buf <-
-      terra::buffer(
-        locs,
-        width = sedc_bandwidth * 2,
-        quadsegs = 90
-      )
+    if (use_threshold) {
+      locs_buf <-
+        terra::buffer(
+          locs,
+          width = threshold_distance,
+          quadsegs = 90
+        )
+      from_in <- from[locs_buf, ]
+    } else {
+      from_in <- from
+    }
+    if (nrow(from_in) < 1L) {
+      res_sedc <- data.frame(locs_id = terra::as.data.frame(locs)[[locs_id]])
+      names(res_sedc)[1] <- locs_id
+      for (target_field in target_fields) {
+        res_sedc[[target_field]] <- 0
+      }
+      idx_air <- grep("_AIR_", names(res_sedc))
+      names(res_sedc)[idx_air] <-
+        sprintf("%s_%05d", names(res_sedc)[idx_air], decay_range)
 
-    from_in <- from[locs_buf, ]
+      if (geom %in% c("sf", "terra")) {
+        res_sedc <- merge(
+          terra::as.data.frame(locs, geom = "WKT")[, c(locs_id, "geometry")],
+          res_sedc,
+          locs_id
+        )
+      }
+      res_sedc_return <- amadeus::calc_return_locs(
+        covar = res_sedc,
+        POSIXt = TRUE,
+        geom = geom,
+        crs = terra::crs(from)
+      )
+      attr(res_sedc_return, "decay_range") <- decay_range
+      attr(res_sedc_return, "sedc_threshold") <- threshold_distance
+      return(res_sedc_return)
+    }
     len_point_from <- seq_len(nrow(from_in))
 
     # len point from? len point to?
@@ -2112,9 +2198,16 @@ The result may not be accurate.\n",
     dist <- NULL
 
     # near features with distance argument: only returns integer indices
-    # threshold is set to the twice of sedc_bandwidth
-    res_nearby <-
-      terra::nearby(locs, from_in, distance = sedc_bandwidth * 2)
+    if (use_threshold) {
+      res_nearby <-
+        terra::nearby(locs, from_in, distance = threshold_distance)
+    } else {
+      res_nearby <-
+        expand.grid(
+          from_id = len_point_locs,
+          to_id = len_point_from
+        )
+    }
     # attaching actual distance
     dist_nearby <- terra::distance(locs, from_in)
     dist_nearby_df <- as.vector(dist_nearby)
@@ -2135,24 +2228,24 @@ The result may not be accurate.\n",
       # per the definition in
       # https://mserre.sph.unc.edu/BMElab_web/SEDCtutorial/index.html
       # exp(-3) is about 0.05 * (value at origin)
-      dplyr::mutate(w_sedc = exp((-3 * dist) / sedc_bandwidth)) |>
+      dplyr::mutate(w_sedc = exp((-3 * dist) / decay_range)) |>
       dplyr::group_by(!!rlang::sym(locs_id)) |>
       dplyr::summarize(
         dplyr::across(
           dplyr::all_of(target_fields),
-          ~ sum(w_sedc * ., na.rm = TRUE)
+          ~ sum(w_sedc * C0_source, na.rm = TRUE)
         )
       ) |>
       dplyr::ungroup()
     idx_air <- grep("_AIR_", names(res_sedc))
     names(res_sedc)[idx_air] <-
-      sprintf("%s_%05d", names(res_sedc)[idx_air], sedc_bandwidth)
+      sprintf("%s_%05d", names(res_sedc)[idx_air], decay_range)
 
     if (geom %in% c("sf", "terra")) {
       res_sedc <- merge(
-        terra::as.data.frame(locs, geom = "WKT")[, c("site_id", "geometry")],
+        terra::as.data.frame(locs, geom = "WKT")[, c(locs_id, "geometry")],
         res_sedc,
-        "site_id"
+        locs_id
       )
     }
 
@@ -2163,8 +2256,8 @@ The result may not be accurate.\n",
       crs = terra::crs(from)
     )
 
-    attr(res_sedc_return, "sedc_bandwidth") <- sedc_bandwidth
-    attr(res_sedc_return, "sedc_threshold") <- sedc_bandwidth * 2
+    attr(res_sedc_return, "decay_range") <- decay_range
+    attr(res_sedc_return, "sedc_threshold") <- threshold_distance
 
     return(res_sedc_return)
   }
@@ -2181,8 +2274,16 @@ The result may not be accurate.\n",
 #' @param locs sf/SpatVector. Locations where TRI variables are calculated.
 #' @param locs_id character(1). Unique site identifier column name.
 #'  Default is `"site_id"`.
-#' @param radius Circular buffer radius.
+#' @param decay_range Circular buffer radius.
 #' Default is \code{c(1000, 10000, 50000)} (meters)
+#' @param C0 `NULL` or character vector of column names in `from`.
+#' Optional source-value columns used by `sum_edc()`. If `NULL` and
+#' there is one TRI target field, that field is inferred with a warning.
+#' If `NULL` and there are multiple TRI target fields, each TRI target field
+#' is used as its own source values (for example `STACK_AIR_*`).
+#' @param use_threshold logical(1). Passed to \code{sum_edc()}. If `TRUE`
+#' (default), include only source points within \code{5 * decay_range}.
+#' If `FALSE`, include all source points in `from`.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2218,7 +2319,7 @@ The result may not be accurate.\n",
 #'   from = tri, # derived from process_tri() example
 #'   locs = loc,
 #'   locs_id = "id",
-#'   radius = c(1e3L, 1e4L, 5e4L)
+#'   decay_range = c(1e3L, 1e4L, 5e4L)
 #' )
 #' }
 #' @export
@@ -2226,7 +2327,9 @@ calculate_tri <- function(
   from = NULL,
   locs,
   locs_id = "site_id",
-  radius = c(1e3L, 1e4L, 5e4L),
+  decay_range = c(1e3L, 1e4L, 5e4L),
+  C0 = NULL,
+  use_threshold = TRUE,
   weights = NULL,
   geom = FALSE,
   ...
@@ -2238,8 +2341,17 @@ calculate_tri <- function(
       locs <- terra::vect(locs)
     }
   }
-  if (!is.numeric(radius)) {
-    stop("radius should be numeric.\n")
+  if (!is.numeric(decay_range)) {
+    stop("`decay_range` should be numeric.\n")
+  }
+  if (!is.logical(use_threshold) || length(use_threshold) != 1L ||
+        is.na(use_threshold)) {
+    stop("`use_threshold` must be TRUE or FALSE.\n")
+  }
+  if (!is.null(C0) &&
+        (!is.character(C0) || length(C0) < 1L || anyNA(C0) ||
+         any(!nzchar(trimws(C0))))) {
+    stop("`C0` must be NULL or a non-empty character vector of column names.\n")
   }
   locs_re <- terra::project(locs, terra::crs(from))
 
@@ -2256,24 +2368,70 @@ calculate_tri <- function(
       "Process TRI data using `process_tri()` before calculation.\n"
     )
   }
+  if (is.null(C0)) {
+    if (length(tri_cols) == 1L) {
+      warning(
+        "`C0` is NULL and only one TRI field is available; ",
+        "using `", tri_cols[1], "` as source values.\n"
+      )
+    }
+    c0_cols <- tri_cols
+  } else {
+    missing_c0_cols <- setdiff(C0, names(from))
+    if (length(missing_c0_cols) > 0L) {
+      stop(
+        "The following `C0` columns are missing in `from`: ",
+        paste(missing_c0_cols, collapse = ", "),
+        "\n"
+      )
+    }
+    if (length(C0) == 1L) {
+      c0_cols <- rep(C0, length(tri_cols))
+    } else if (length(C0) == length(tri_cols)) {
+      c0_cols <- C0
+    } else {
+      stop(
+        "`C0` must have length 1 or match the number of TRI target fields (",
+        length(tri_cols),
+        ").\n"
+      )
+    }
+  }
 
   # inner lapply
-  list_radius <- split(radius, radius)
+  list_decay_range <- split(decay_range, decay_range)
   list_locs_tri <-
     Map(
       function(x) {
-        locs_tri_s <-
-          sum_edc(
-            locs = locs_re,
-            from = from,
-            locs_id = locs_id,
-            sedc_bandwidth = x,
-            target_fields = tri_cols,
-            geom = FALSE
+        locs_tri_s <- Reduce(
+          function(df_x, df_y) dplyr::full_join(df_x, df_y, by = locs_id),
+          lapply(
+            seq_along(tri_cols),
+            function(i) {
+              tri_col <- tri_cols[i]
+              tri_col_C0 <- from[[c0_cols[i]]]
+              if (is.data.frame(tri_col_C0) && ncol(tri_col_C0) == 1L) {
+                tri_col_C0 <- tri_col_C0[[1]]
+              }
+              if (!is.numeric(tri_col_C0)) {
+                stop("TRI target field `", tri_col, "` is not numeric.\n")
+              }
+              sum_edc(
+                locs = locs_re,
+                from = from,
+                locs_id = locs_id,
+                decay_range = x,
+                target_fields = tri_col,
+                C0 = tri_col_C0,
+                use_threshold = use_threshold,
+                geom = FALSE
+              )
+            }
           )
+        )
         return(locs_tri_s)
       },
-      list_radius
+      list_decay_range
     )
 
   # bind element data.frames into one
