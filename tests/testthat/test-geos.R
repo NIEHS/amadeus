@@ -299,6 +299,21 @@ testthat::test_that("process_geos (expected errors)", {
   testthat::expect_error(
     process_geos()
   )
+  testthat::expect_error(
+    process_geos(
+      variable = "",
+      path = testthat::test_path("..", "testdata", "geos", "c")
+    ),
+    regexp = "single non-empty character string"
+  )
+  testthat::expect_error(
+    process_geos(
+      date = "2018-01-01",
+      variable = "NOT_A_GEOS_VARIABLE",
+      path = testthat::test_path("..", "testdata", "geos", "c")
+    ),
+    regexp = "Variable 'NOT_A_GEOS_VARIABLE' was not found"
+  )
   # expect error on directory without data
   testthat::expect_error(
     process_geos(

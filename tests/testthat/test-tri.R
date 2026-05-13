@@ -266,6 +266,12 @@ testthat::test_that("download_tri mock download with hash", {
 
 ################################################################################
 ##### get_tri_info helper
+write_tri_csv <- function(df, dir = ".") {
+  out <- file.path(dir, "tri_raw_2018.csv")
+  data.table::fwrite(df, out, na = "NA")
+  out
+}
+
 testthat::test_that("get_tri_info returns TRI lookup tables", {
   path_tri <- testthat::test_path("..", "testdata", "tri_small")
 
@@ -296,6 +302,75 @@ testthat::test_that("get_tri_info returns TRI lookup tables", {
     get_tri_info(path = path_tri, type = "industries", year = NA_real_),
     regexp = "`year`"
   )
+})
+
+testthat::test_that("get_tri_info covers lookup edge cases", {
+  withr::with_tempdir({
+    testthat::expect_error(
+      get_tri_info(path = "."),
+      regexp = "No TRI CSV files"
+    )
+  })
+
+  withr::with_tempdir({
+    write_tri_csv(data.frame(TRI_CHEMICAL_COMPOUND_ID = "100", CHEMICAL = "BENZENE"))
+    testthat::expect_error(
+      get_tri_info(path = ".", year = 2018),
+      regexp = "missing `YEAR`"
+    )
+  })
+
+  withr::with_tempdir({
+    write_tri_csv(data.frame(YEAR = 2018, CAS = "71-43-2"))
+    testthat::expect_error(
+      get_tri_info(path = "."),
+      regexp = "required chemical lookup columns"
+    )
+  })
+
+  withr::with_tempdir({
+    write_tri_csv(data.frame(
+      YEAR = 2018,
+      TRI_CHEMICAL_COMPOUND_ID = "100",
+      CHEMICAL = "BENZENE",
+      CAS = "71-43-2"
+    ))
+    cas_out <- get_tri_info(path = ".")
+    testthat::expect_equal(cas_out$CASN, "71-43-2")
+  })
+
+  withr::with_tempdir({
+    write_tri_csv(data.frame(
+      YEAR = 2018,
+      TRI_CHEMICAL_COMPOUND_ID = "100",
+      CHEMICAL = "BENZENE"
+    ))
+    no_cas <- get_tri_info(path = ".")
+    testthat::expect_true(all(is.na(no_cas$CASN)))
+  })
+
+  withr::with_tempdir({
+    write_tri_csv(data.frame(YEAR = 2018))
+    testthat::expect_error(
+      get_tri_info(path = ".", type = "industries"),
+      regexp = "required industry lookup columns"
+    )
+  })
+})
+
+testthat::test_that("get_tri_info include_na keeps all-missing rows", {
+  withr::with_tempdir({
+    write_tri_csv(data.frame(
+      YEAR = c(2018, 2018),
+      TRI_CHEMICAL_COMPOUND_ID = c(NA, "100"),
+      CHEMICAL = c(NA, "BENZENE"),
+      CAS = c(NA, "71-43-2")
+    ))
+    dropped <- get_tri_info(path = ".", include_na = FALSE)
+    kept <- get_tri_info(path = ".", include_na = TRUE)
+    testthat::expect_equal(nrow(dropped), 1L)
+    testthat::expect_equal(nrow(kept), 2L)
+  })
 })
 
 ################################################################################
@@ -395,6 +470,122 @@ testthat::test_that("process_tri", {
       chemical = "this-will-not-match"
     ),
     regexp = "`chemical` did not match"
+  )
+})
+
+testthat::test_that("process_tri validates and errors on unsupported input paths", {
+  withr::with_tempdir({
+    write_tri_csv(data.frame(
+      YEAR = 2018,
+      LONGITUDE = -78.8,
+      LATITUDE = 35.9,
+      TRI_CHEMICAL_COMPOUND_ID = "100",
+      UNIT_OF_MEASURE = "Pounds",
+      STACK_AIR = 1
+    ))
+    testthat::expect_error(
+      process_tri(path = ".", variables = c("STACK_AIR", " ")),
+      regexp = "empty patterns"
+    )
+    testthat::expect_error(
+      process_tri(path = ".", variables = "STACK_AIR", chemical = 1),
+      regexp = "`chemical` must be NULL or a non-empty character vector"
+    )
+    testthat::expect_error(
+      process_tri(path = ".", variables = "STACK_AIR", chemical = ""),
+      regexp = "`chemical` cannot include empty patterns"
+    )
+    testthat::expect_error(
+      process_tri(path = ".", variables = "STACK_AIR", ignore_case = NA),
+      regexp = "`ignore_case` must be TRUE or FALSE"
+    )
+    testthat::expect_error(
+      process_tri(path = ".", variables = "NOT_A_TRI_VARIABLE"),
+      regexp = "`variables` did not match any TRI variable columns"
+    )
+    testthat::expect_error(
+      process_tri(path = ".", year = 2030, variables = "STACK_AIR"),
+      regexp = "No TRI rows found for requested `year`"
+    )
+  })
+
+  withr::with_tempdir({
+    write_tri_csv(data.frame(
+      YEAR = 2018,
+      LONGITUDE = -78.8,
+      LATITUDE = 35.9,
+      TRI_CHEMICAL_COMPOUND_ID = "100",
+      STACK_AIR = 1
+    ))
+    testthat::expect_error(
+      process_tri(path = ".", variables = "STACK_AIR"),
+      regexp = "missing required columns"
+    )
+  })
+
+  withr::with_tempdir({
+    write_tri_csv(data.frame(
+      YEAR = 2018,
+      LONGITUDE = -78.8,
+      LATITUDE = 35.9,
+      TRI_CHEMICAL_COMPOUND_ID = "100",
+      UNIT_OF_MEASURE = "Pounds",
+      STACK_AIR = 1
+    ))
+    testthat::expect_error(
+      process_tri(path = ".", variables = "STACK_AIR", industry_group = "industry_sector"),
+      regexp = "missing industry grouping columns"
+    )
+  })
+
+  withr::with_tempdir({
+    write_tri_csv(data.frame(
+      YEAR = 2018,
+      LONGITUDE = -78.8,
+      LATITUDE = 35.9,
+      TRI_CHEMICAL_COMPOUND_ID = "100",
+      UNIT_OF_MEASURE = "Pounds",
+      STACK_AIR = "not-a-number"
+    ))
+    testthat::expect_error(
+      process_tri(path = ".", variables = "STACK_AIR"),
+      regexp = "is not numeric"
+    )
+  })
+})
+
+testthat::test_that("process_tri supports case-sensitive matching and sector-name grouping", {
+  withr::local_package("terra")
+  path_tri <- testthat::test_path("..", "testdata", "tri_small")
+
+  testthat::expect_error(
+    process_tri(
+      path = path_tri,
+      year = 2018,
+      variables = "stack_air",
+      ignore_case = FALSE
+    ),
+    regexp = "`variables` did not match any TRI variable columns"
+  )
+
+  tri_sector_name <- process_tri(
+    path = path_tri,
+    year = 2018,
+    variables = "STACK_AIR",
+    industry_group = "industry_sector"
+  )
+  testthat::expect_true(
+    "STACK_AIR_CHEMICAL_MANUFACTURING_100" %in% names(tri_sector_name)
+  )
+
+  tri_multi_chem <- process_tri(
+    path = path_tri,
+    year = 2018,
+    variables = "STACK_AIR",
+    chemical = c("BENZENE", "TOLUENE")
+  )
+  testthat::expect_true(
+    all(c("STACK_AIR_100", "STACK_AIR_200") %in% names(tri_multi_chem))
   )
 })
 

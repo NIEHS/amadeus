@@ -1493,13 +1493,6 @@ process_tri <- function(
     names(dt_tri)
   )
 
-  if (!is.null(chemical) && length(tri_chemical_fields) < 1) {
-    stop(
-      "TRI chemical filtering requires at least one of: ",
-      "`TRI_CHEMICAL_COMPOUND_ID`, `CHEMICAL`, `CAS`.\n"
-    )
-  }
-
   selected_cols <- unique(c(
     required_cols,
     selected_variable_cols,

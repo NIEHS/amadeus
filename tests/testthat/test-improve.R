@@ -236,6 +236,26 @@ testthat::test_that("process_improve warns when sites file missing coords", {
   testthat::expect_s3_class(result, "data.table")
 })
 
+testthat::test_that("process_improve falls back to data.table when coords unavailable", {
+  withr::local_package("data.table")
+  tmp <- withr::local_tempdir()
+  file.copy(
+    file.path(improve_path, "IMPAER_2022.txt"),
+    file.path(tmp, "IMPAER_2022.txt")
+  )
+  writeLines("SiteCode|Name\nMEF|Moosehorn", file.path(tmp, "bad_sites.txt"))
+  testthat::expect_warning(
+    result <- process_improve(
+      path = tmp,
+      product = "raw",
+      sites_file = file.path(tmp, "bad_sites.txt"),
+      return_format = "terra"
+    ),
+    regexp = "No site coordinates available"
+  )
+  testthat::expect_s3_class(result, "data.table")
+})
+
 testthat::test_that("process_improve uses embedded metadata when sites file missing", {
   withr::local_package("data.table")
   withr::local_package("terra")
