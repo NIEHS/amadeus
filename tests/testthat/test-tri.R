@@ -700,6 +700,30 @@ testthat::test_that("calculate_tri", {
   )
 })
 
+testthat::test_that("calculate_tri errors when no TRI target fields are present", {
+  withr::local_package("terra")
+  locs <- terra::vect(
+    data.frame(site_id = "a", lon = -78.8277, lat = 35.95013),
+    geom = c("lon", "lat"),
+    crs = "EPSG:4326"
+  )
+  empty_tri <- terra::vect(
+    data.frame(
+      YEAR = 2018L,
+      LONGITUDE = -78.8277,
+      LATITUDE = 35.95013
+    ),
+    geom = c("LONGITUDE", "LATITUDE"),
+    crs = "EPSG:4326",
+    keepgeom = TRUE
+  )
+  attr(empty_tri, "tri_target_fields") <- character(0)
+  testthat::expect_error(
+    calculate_tri(from = empty_tri, locs = locs, radius = 1000L),
+    regexp = "No TRI target fields found"
+  )
+})
+
 ################################################################################
 ##### download_tri hash=FALSE branch
 
