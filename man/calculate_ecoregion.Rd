@@ -32,9 +32,6 @@ Use \code{"full_ecoregion"} to emit sanitized full ecoregion names.}
 \item{frac}{logical(1). Default \code{FALSE}. If \code{FALSE}, returns binary dummy
 indicators (0/1). If \code{TRUE}, returns fractional overlap values.}
 
-\item{radius}{numeric(1). Circular buffer size (meters) around point
-locations. Use \code{0} (default) for exact point extraction.}
-
 \item{drop}{logical(1). Default \code{FALSE}. If \code{TRUE}, remove ecoregion columns
 that are all 0 or \code{NA} across returned locations.}
 
@@ -46,12 +43,14 @@ path. Optional weights raster for weighted extraction. If \code{NULL}
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
 
+\item{radius}{numeric(1). Circular buffer size (meters) around point
+locations. Use \code{0} (default) for exact point extraction.}
+
 \item{...}{Placeholders.}
 }
 \value{
 a data.frame or SpatVector object with ecoregion indicator/fraction
-variables and
-attributes of:
+variables and attributes of:
 \itemize{
 \item Indicator names are controlled by \code{colnames}: \code{"coded"} (default)
 creates key-based names such as \code{DUM_E2083_00000} and

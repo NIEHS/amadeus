@@ -1339,7 +1339,19 @@ process_ecoregion <-
 #' returning a single `SpatVector` (points) object for the selected `year`.
 #' @param path character(1). Path to the directory with TRI CSV files
 #' @param year integer(1). Single year to select.
-#' @param variables integer. Column index of TRI data.
+#' @param variables character. One or more regular expressions used to select
+#'   TRI release variables by column name after normalization to underscore
+#'   naming (for example, `STACK_AIR`, `FUGITIVE_AIR`, `WATER`). Default is
+#'   `"STACK_AIR"`.
+#' @param chemical `NULL` or character. Optional one or more regular
+#'   expressions used to filter chemicals. Patterns are matched against
+#'   `TRI_CHEMICAL_COMPOUND_ID`, `CHEMICAL`, and `CAS`/`CAS.` values. If
+#'   `NULL` (default), all chemicals are retained.
+#' @param industry_group character(1). Optional additional grouping level.
+#'   One of `"none"` (default), `"industry_sector"`,
+#'   `"industry_sector_code"`, or `"both"`.
+#' @param ignore_case logical(1). If `TRUE` (default), regular expression
+#'   matching in `variables` and `chemical` is case-insensitive.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
@@ -1347,7 +1359,9 @@ process_ecoregion <-
 #' @return a `SpatVector` object (points) in `year`
 #' `year` is stored in a field named `"year"`.
 #' @note Visit [TRI Data and Tools](https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox)
-#' to view the available years and variables.
+#' to view the available years and variables. Use [get_tri_info()] to inspect
+#' available TRI chemical IDs/names/CAS numbers and industry sector codes in
+#' local TRI files.
 #' @references
 #' https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox
 #' @importFrom terra vect
@@ -1374,7 +1388,9 @@ process_ecoregion <-
 #' tri <- process_tri(
 #'   path = "./data",
 #'   year = 2020,
-#'   variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49)
+#'   variables = c("STACK_AIR", "FUGITIVE_AIR"),
+#'   chemical = "benzene",
+#'   industry_group = "industry_sector"
 #' )
 #' }
 # nolint end
@@ -1382,52 +1398,177 @@ process_ecoregion <-
 process_tri <- function(
   path = NULL,
   year = 2018,
-  variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49),
+  variables = "STACK_AIR",
+  chemical = NULL,
+  industry_group = c("none", "industry_sector", "industry_sector_code", "both"),
+  ignore_case = TRUE,
   extent = NULL,
   ...
 ) {
-  csvs_tri_from <-
-    list.files(path = path, pattern = "*.csv$", full.names = TRUE)
-  csvs_tri <- lapply(csvs_tri_from, read.csv)
-  col_sel <- variables
-  csvs_tri <- data.table::rbindlist(csvs_tri)
-  dt_tri <- csvs_tri[, col_sel, with = FALSE]
+  if (!is.character(variables) || length(variables) < 1 || anyNA(variables)) {
+    stop("`variables` must be a non-empty character vector of regex patterns.\n")
+  }
+  if (length(variables) > 0 && any(!nzchar(trimws(variables)))) {
+    stop("`variables` cannot include empty patterns.\n")
+  }
+  if (!is.null(chemical)) {
+    if (!is.character(chemical) || length(chemical) < 1 || anyNA(chemical)) {
+      stop("`chemical` must be NULL or a non-empty character vector.\n")
+    }
+    if (any(!nzchar(trimws(chemical)))) {
+      stop("`chemical` cannot include empty patterns.\n")
+    }
+  }
+  if (!is.logical(ignore_case) || length(ignore_case) != 1 || is.na(ignore_case)) {
+    stop("`ignore_case` must be TRUE or FALSE.\n")
+  }
+  industry_group <- match.arg(industry_group)
 
-  # column name readjustment
-  tri_cns <- colnames(dt_tri)
-  tri_cns <- sub(".*?\\.\\.", "", tri_cns)
-  tri_cns <- sub("^[^A-Za-z]*", "", tri_cns)
-  tri_cns <- gsub("\\.", "_", tri_cns)
-  dt_tri <- stats::setNames(dt_tri, tri_cns)
+  dt_tri <- tri_read_raw(path = path)
+
+  required_cols <- c(
+    "YEAR",
+    "LONGITUDE",
+    "LATITUDE",
+    "TRI_CHEMICAL_COMPOUND_ID",
+    "UNIT_OF_MEASURE"
+  )
+  missing_required <- setdiff(required_cols, names(dt_tri))
+  if (length(missing_required) > 0) {
+    stop(
+      "TRI input is missing required columns: ",
+      paste(missing_required, collapse = ", "),
+      "\n"
+    )
+  }
+
+  select_by_pattern <- function(column_names, patterns) {
+    unique(unlist(
+      lapply(
+        patterns,
+        function(pat) grep(pat, column_names, ignore.case = ignore_case, value = TRUE)
+      )
+    ))
+  }
+
+  selected_variable_cols <- select_by_pattern(names(dt_tri), variables)
+  selected_variable_cols <- setdiff(selected_variable_cols, required_cols)
+  if (length(selected_variable_cols) < 1) {
+    stop("`variables` did not match any TRI variable columns.\n")
+  }
+
+  industry_cols <- switch(
+    industry_group,
+    none = character(0),
+    industry_sector = "INDUSTRY_SECTOR",
+    industry_sector_code = "INDUSTRY_SECTOR_CODE",
+    both = c("INDUSTRY_SECTOR_CODE", "INDUSTRY_SECTOR")
+  )
+  missing_industry <- setdiff(industry_cols, names(dt_tri))
+  if (length(missing_industry) > 0) {
+    stop(
+      "TRI input is missing industry grouping columns: ",
+      paste(missing_industry, collapse = ", "),
+      "\n"
+    )
+  }
+
+  tri_chemical_fields <- intersect(
+    c("TRI_CHEMICAL_COMPOUND_ID", "CHEMICAL", "CAS", "CAS_"),
+    names(dt_tri)
+  )
+
+  if (!is.null(chemical) && length(tri_chemical_fields) < 1) {
+    stop(
+      "TRI chemical filtering requires at least one of: ",
+      "`TRI_CHEMICAL_COMPOUND_ID`, `CHEMICAL`, `CAS`.\n"
+    )
+  }
+
+  selected_cols <- unique(c(required_cols, selected_variable_cols, tri_chemical_fields, industry_cols))
+  dt_tri <- dt_tri[, selected_cols, drop = FALSE]
   dt_tri <- dt_tri[dt_tri$YEAR == year, ]
+  if (nrow(dt_tri) < 1) {
+    stop("No TRI rows found for requested `year`.\n")
+  }
+
+  if (!is.null(chemical)) {
+    chemical_filter <- rep(FALSE, nrow(dt_tri))
+    for (field in tri_chemical_fields) {
+      field_vals <- as.character(dt_tri[[field]])
+      field_hits <- Reduce(
+        `|`,
+        lapply(
+          chemical,
+          function(pat) grepl(pat, field_vals, ignore.case = ignore_case)
+        )
+      )
+      chemical_filter <- chemical_filter | field_hits
+    }
+    dt_tri <- dt_tri[chemical_filter, , drop = FALSE]
+    if (nrow(dt_tri) < 1) {
+      stop("`chemical` did not match any TRI rows for requested year.\n")
+    }
+  }
+
+  for (col_nm in selected_variable_cols) {
+    original_col <- dt_tri[[col_nm]]
+    numeric_col <- suppressWarnings(as.numeric(original_col))
+    if (any(!is.na(original_col) & is.na(numeric_col))) {
+      stop("Selected TRI variable column `", col_nm, "` is not numeric.\n")
+    }
+    dt_tri[[col_nm]] <- numeric_col
+  }
 
   # depending on the way the chemicals are summarized
   # Unit is kilogram
   # nolint start
-  YEAR <- NULL
-  LONGITUDE <- NULL
-  LATITUDE <- NULL
-  TRI_CHEMICAL_COMPOUND_ID <- NULL
-
+  unit_to_kg <- function(value, unit) {
+    ifelse(
+      unit == "Pounds",
+      value * (453.592 / 1e3),
+      ifelse(
+        unit %in% c("Grams", "Gram"),
+        value / 1e3,
+        value
+      )
+    )
+  }
+  group_fields <- c(
+    "YEAR",
+    "LONGITUDE",
+    "LATITUDE",
+    "TRI_CHEMICAL_COMPOUND_ID",
+    industry_cols
+  )
+  names_from_cols <- c(industry_cols, "TRI_CHEMICAL_COMPOUND_ID")
+  tri_name_prefix <- if (length(selected_variable_cols) == 1) {
+    paste0(selected_variable_cols, "_")
+  } else {
+    ""
+  }
   dt_tri_x <-
     dt_tri |>
     dplyr::mutate(
       dplyr::across(
-        dplyr::ends_with("_AIR"),
-        ~ ifelse(UNIT_OF_MEASURE == "Pounds", . * (453.592 / 1e3), . / 1e3)
+        dplyr::all_of(selected_variable_cols),
+        ~ unit_to_kg(., UNIT_OF_MEASURE)
       )
     ) |>
-    dplyr::group_by(YEAR, LONGITUDE, LATITUDE, TRI_CHEMICAL_COMPOUND_ID) |>
+    dplyr::group_by(
+      dplyr::across(dplyr::all_of(group_fields))
+    ) |>
     dplyr::summarize(
       dplyr::across(
-        dplyr::ends_with("_AIR"),
+        dplyr::all_of(selected_variable_cols),
         ~ sum(., na.rm = TRUE)
-      )
+      ),
+      .groups = "drop"
     ) |>
-    dplyr::ungroup() |>
     tidyr::pivot_wider(
-      values_from = c("FUGITIVE_AIR", "STACK_AIR"),
-      names_from = "TRI_CHEMICAL_COMPOUND_ID",
+      values_from = dplyr::all_of(selected_variable_cols),
+      names_from = dplyr::all_of(names_from_cols),
+      names_prefix = tri_name_prefix,
       names_sep = "_"
     ) |>
     dplyr::filter(!is.na(LONGITUDE) | !is.na(LATITUDE))
@@ -1441,6 +1582,11 @@ process_tri <- function(
       keepgeom = TRUE
     )
   attr(spvect_tri, "tri_year") <- year
+  tri_target_fields <- setdiff(names(spvect_tri), c("YEAR", "LONGITUDE", "LATITUDE"))
+  attr(spvect_tri, "tri_target_fields") <- tri_target_fields
+  attr(spvect_tri, "tri_grouping") <- names_from_cols
+  attr(spvect_tri, "tri_variables") <- selected_variable_cols
+  attr(spvect_tri, "tri_chemical_selector") <- chemical
   if (!is.null(extent)) {
     tri_final <- apply_extent(spvect_tri, extent)
     return(tri_final)

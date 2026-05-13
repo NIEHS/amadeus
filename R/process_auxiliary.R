@@ -17,9 +17,10 @@
 #' @export
 process_conformity <-
   function(
-      locs = NULL,
-      check_time = FALSE,
-      locs_epsg = "EPSG:4326") {
+    locs = NULL,
+    check_time = FALSE,
+    locs_epsg = "EPSG:4326"
+  ) {
     keyword <- c("lon", "lat", "time")
     if (!check_time) {
       keyword <- keyword[-3]
@@ -60,11 +61,12 @@ process_conformity <-
 #' @export
 process_collection <-
   function(
-      path,
-      source,
-      collection = FALSE,
-      date = FALSE,
-      datetime = FALSE) {
+    path,
+    source,
+    collection = FALSE,
+    date = FALSE,
+    datetime = FALSE
+  ) {
     #### check for more than one true
     parameters <- c(collection, date, datetime)
     if (length(parameters[parameters == TRUE]) > 1) {
@@ -252,14 +254,18 @@ process_merra2_time <-
 #' @export
 process_gmted_codes <-
   function(
-      string,
-      statistic = FALSE,
-      resolution = FALSE,
-      invert = FALSE) {
+    string,
+    statistic = FALSE,
+    resolution = FALSE,
+    invert = FALSE
+  ) {
     statistics <- c(
-      "Breakline Emphasis", "Systematic Subsample",
-      "Median Statistic", "Minimum Statistic",
-      "Mean Statistic", "Maximum Statistic",
+      "Breakline Emphasis",
+      "Systematic Subsample",
+      "Median Statistic",
+      "Minimum Statistic",
+      "Mean Statistic",
+      "Maximum Statistic",
       "Standard Deviation Statistic"
     )
     statistic_codes <- c("be", "ds", "md", "mi", "mn", "mx", "sd")
@@ -291,16 +297,23 @@ process_gmted_codes <-
 #' @export
 process_sedac_codes <-
   function(
-      string,
-      invert = FALSE) {
+    string,
+    invert = FALSE
+  ) {
     resolution_namecodes <- cbind(
       c(
-        "60 minute", "30 second", "2.5 minute",
-        "15 minute", "30 minute"
+        "60 minute",
+        "30 second",
+        "2.5 minute",
+        "15 minute",
+        "30 minute"
       ),
       c(
-        "1_deg", "30_sec", "2pt5_min",
-        "15_min", "30_min"
+        "1_deg",
+        "30_sec",
+        "2pt5_min",
+        "15_min",
+        "30_min"
       )
     )
     if (invert == FALSE) {
@@ -326,8 +339,9 @@ process_sedac_codes <-
 #' @export
 process_locs_radius <-
   function(
-      locs,
-      radius) {
+    locs,
+    radius
+  ) {
     if (radius == 0) {
       return(locs)
     } else if (radius > 0) {
@@ -424,24 +438,46 @@ process_locs_vector <-
 #' @export
 process_gridmet_codes <-
   function(
-      string,
-      invert = FALSE) {
+    string,
+    invert = FALSE
+  ) {
     names <- c(
-      "Near-Surface Specific Humidity", "Mean Vapor Pressure Deficit",
-      "Precipitation", "Minimum Near-Surface Relative Humidity",
+      "Near-Surface Specific Humidity",
+      "Mean Vapor Pressure Deficit",
+      "Precipitation",
+      "Minimum Near-Surface Relative Humidity",
       "Maximum Near-Surface Relative Humidity",
       "Surface Downwelling Solar Radiation",
       "Minimum Near-Surface Air Temperature",
       "Maximum Near-Surface Air Temperature",
-      "Wind speed at 10 m", "Wind direction at 10 m",
-      "Palmer Drought Severity Index", "Reference grass evaportranspiration",
-      "Reference alfalfa evaportranspiration", "Energy Release Component",
-      "Burning Index", "100-hour dead fuel moisture",
+      "Wind speed at 10 m",
+      "Wind direction at 10 m",
+      "Palmer Drought Severity Index",
+      "Reference grass evaportranspiration",
+      "Reference alfalfa evaportranspiration",
+      "Energy Release Component",
+      "Burning Index",
+      "100-hour dead fuel moisture",
       "1000-hour dead fuel moisture"
     )
     codes <- c(
-      "sph", "vpd", "pr", "rmin", "rmax", "srad", "tmmn", "tmmx", "vs",
-      "th", "pdsi", "pet", "etr", "ERC", "BI", "FM100", "FM1000"
+      "sph",
+      "vpd",
+      "pr",
+      "rmin",
+      "rmax",
+      "srad",
+      "tmmn",
+      "tmmx",
+      "vs",
+      "th",
+      "pdsi",
+      "pet",
+      "etr",
+      "ERC",
+      "BI",
+      "FM100",
+      "FM1000"
     )
     names_codes <- cbind(tolower(names), codes)
     if (string == "all") {
@@ -467,19 +503,40 @@ process_gridmet_codes <-
 #' @export
 process_terraclimate_codes <-
   function(
-      string,
-      invert = FALSE) {
+    string,
+    invert = FALSE
+  ) {
     names <- c(
-      "Actual Evapotranspiration", "Climate Water Deficit",
-      "Potential evapotranspiration", "Precipitation", "Runoff",
-      "Soil Moisture", "Downward surface shortwave radiation",
-      "Snow water equivalent - at end of month", "Max Temperature",
-      "Min Temperature", "Vapor pressure", "Wind speed",
-      "Vapor Pressure Deficit", "Palmer Drought Severity Index"
+      "Actual Evapotranspiration",
+      "Climate Water Deficit",
+      "Potential evapotranspiration",
+      "Precipitation",
+      "Runoff",
+      "Soil Moisture",
+      "Downward surface shortwave radiation",
+      "Snow water equivalent - at end of month",
+      "Max Temperature",
+      "Min Temperature",
+      "Vapor pressure",
+      "Wind speed",
+      "Vapor Pressure Deficit",
+      "Palmer Drought Severity Index"
     )
     codes <- c(
-      "aet", "def", "pet", "ppt", "q", "soil", "srad", "swe", "tmax", "tmin",
-      "vap", "ws", "vpd", "PDSI"
+      "aet",
+      "def",
+      "pet",
+      "ppt",
+      "q",
+      "soil",
+      "srad",
+      "swe",
+      "tmax",
+      "tmin",
+      "vap",
+      "ws",
+      "vpd",
+      "PDSI"
     )
     names_codes <- cbind(tolower(names), codes)
     if (string == "all") {
@@ -506,8 +563,9 @@ process_terraclimate_codes <-
 #' @export
 process_variable_codes <-
   function(
-      variables,
-      source = c("gridmet", "terraclimate")) {
+    variables,
+    source = c("gridmet", "terraclimate")
+  ) {
     if (tolower(source) == "gridmet") {
       code_function <- process_gridmet_codes
     } else if (tolower(source) == "terraclimate") {
@@ -535,6 +593,144 @@ process_variable_codes <-
     }
   }
 
+# Internal TRI helper: read and normalize TRI csv column names
+tri_read_raw <- function(path = NULL) {
+  csvs_tri_from <-
+    list.files(path = path, pattern = "*.csv$", full.names = TRUE)
+  if (length(csvs_tri_from) < 1) {
+    stop("No TRI CSV files found in `path`.\n")
+  }
+  csvs_tri <- lapply(csvs_tri_from, read.csv)
+  dt_tri <- data.table::rbindlist(csvs_tri)
+  tri_cns <- colnames(dt_tri)
+  tri_cns <- sub(".*?\\.\\.", "", tri_cns)
+  tri_cns <- sub("^[^A-Za-z]*", "", tri_cns)
+  tri_cns <- gsub("\\.", "_", tri_cns)
+  dt_tri <- stats::setNames(dt_tri, tri_cns)
+  dt_tri <- as.data.frame(dt_tri, stringsAsFactors = FALSE)
+  return(dt_tri)
+}
+
+#' Get TRI lookup information for chemicals or industries
+#' @description
+#' Returns a lookup table from local TRI files. By default it returns chemical
+#' information (`TRI_CHEMICAL_COMPOUND_ID`, `CHEMICAL`, `CASN`). Set
+#' `type = "industries"` to return industry sector information
+#' (`INDUSTRY_SECTOR_CODE`, `INDUSTRY_SECTOR`).
+#' @param path character(1). Path to the directory with TRI CSV files (from `download_tri`).
+#' @param type character(1). Lookup table to return. One of `"chemicals"`
+#'   (default) or `"industries"`.
+#' @param year `NULL` or integer(1). Optional single year filter. If `NULL`
+#'   (default), all years in `path` are included.
+#' @param include_na logical(1). If `FALSE` (default), rows where lookup fields
+#'   are all missing are removed.
+#' @param ... Placeholders.
+#' @return a `data.frame` containing the requested TRI lookup table.
+#' @author Kyle Messier
+#' @examples
+#' \dontrun{
+#' get_tri_info(path = "./data")
+#' get_tri_info(path = "./data", type = "industries")
+#' get_tri_info(path = "./data", year = 2020)
+#' }
+#' @export
+get_tri_info <- function(
+  path = NULL,
+  type = c("chemicals", "industries"),
+  year = NULL,
+  include_na = FALSE,
+  ...
+) {
+  type <- match.arg(type)
+  dt_tri <- tri_read_raw(path = path)
+  if (!is.null(year)) {
+    if (!is.numeric(year) || length(year) != 1 || is.na(year)) {
+      stop("`year` must be NULL or a single numeric value.\n")
+    }
+    if (!("YEAR" %in% names(dt_tri))) {
+      stop("TRI input is missing `YEAR` column needed for filtering.\n")
+    }
+    dt_tri <- dt_tri[dt_tri$YEAR == year, , drop = FALSE]
+  }
+
+  if (type == "chemicals") {
+    required_cols <- c("TRI_CHEMICAL_COMPOUND_ID", "CHEMICAL")
+    missing_cols <- setdiff(required_cols, names(dt_tri))
+    if (length(missing_cols) > 0) {
+      stop(
+        "TRI input is missing required chemical lookup columns: ",
+        paste(missing_cols, collapse = ", "),
+        "\n"
+      )
+    }
+    cas_col <- if ("CAS" %in% names(dt_tri)) {
+      "CAS"
+    } else if ("CAS_" %in% names(dt_tri)) {
+      "CAS_"
+    } else {
+      NULL
+    }
+    cas_vals <- if (is.null(cas_col)) {
+      rep(NA_character_, nrow(dt_tri))
+    } else {
+      as.character(dt_tri[[cas_col]])
+    }
+    out <- data.frame(
+      TRI_CHEMICAL_COMPOUND_ID = as.character(dt_tri$TRI_CHEMICAL_COMPOUND_ID),
+      CHEMICAL = as.character(dt_tri$CHEMICAL),
+      CASN = cas_vals,
+      stringsAsFactors = FALSE
+    )
+    if (!include_na) {
+      out <- out[
+        !(is.na(out$TRI_CHEMICAL_COMPOUND_ID) &
+          is.na(out$CHEMICAL) &
+          is.na(out$CASN)),
+        ,
+        drop = FALSE
+      ]
+    }
+    out <- unique(out)
+    out <- out[
+      order(out$CHEMICAL, out$TRI_CHEMICAL_COMPOUND_ID, out$CASN),
+      ,
+      drop = FALSE
+    ]
+  } else {
+    required_cols <- c("INDUSTRY_SECTOR_CODE", "INDUSTRY_SECTOR")
+    missing_cols <- setdiff(required_cols, names(dt_tri))
+    if (length(missing_cols) > 0) {
+      stop(
+        "TRI input is missing required industry lookup columns: ",
+        paste(missing_cols, collapse = ", "),
+        "\n"
+      )
+    }
+    out <- data.frame(
+      INDUSTRY_SECTOR_CODE = as.character(dt_tri$INDUSTRY_SECTOR_CODE),
+      INDUSTRY_SECTOR = as.character(dt_tri$INDUSTRY_SECTOR),
+      stringsAsFactors = FALSE
+    )
+    if (!include_na) {
+      out <- out[
+        !(is.na(out$INDUSTRY_SECTOR_CODE) &
+          is.na(out$INDUSTRY_SECTOR)),
+        ,
+        drop = FALSE
+      ]
+    }
+    out <- unique(out)
+    out <- out[
+      order(out$INDUSTRY_SECTOR_CODE, out$INDUSTRY_SECTOR),
+      ,
+      drop = FALSE
+    ]
+  }
+
+  rownames(out) <- NULL
+  return(out)
+}
+
 
 #' Check date format
 #' @description
@@ -556,8 +752,11 @@ is_date_proper <- function(
   argnames <- mget(ls())
   datestr <- try(strftime(instr, format = format))
   if (inherits(datestr, "try-error")) {
-    stop(sprintf("%s does not conform to the required format
-         \"YYYY-MM-DD\".\n", names(argnames)[2]))
+    stop(sprintf(
+      "%s does not conform to the required format
+         \"YYYY-MM-DD\".\n",
+      names(argnames)[2]
+    ))
   }
 }
 

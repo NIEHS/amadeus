@@ -265,24 +265,137 @@ testthat::test_that("download_tri mock download with hash", {
 })
 
 ################################################################################
+##### get_tri_info helper
+testthat::test_that("get_tri_info returns TRI lookup tables", {
+  path_tri <- testthat::test_path("..", "testdata", "tri_small")
+
+  chems <- get_tri_info(path = path_tri)
+  testthat::expect_s3_class(chems, "data.frame")
+  testthat::expect_true(
+    all(c("TRI_CHEMICAL_COMPOUND_ID", "CHEMICAL", "CASN") %in% names(chems))
+  )
+  testthat::expect_true(any(chems$CHEMICAL == "BENZENE"))
+  testthat::expect_true(any(chems$CASN == "108-88-3"))
+
+  chems_2019 <- get_tri_info(path = path_tri, year = 2019)
+  testthat::expect_true(all(chems_2019$CHEMICAL == "BENZENE"))
+
+  inds <- get_tri_info(path = path_tri, type = "industries")
+  testthat::expect_s3_class(inds, "data.frame")
+  testthat::expect_true(
+    all(c("INDUSTRY_SECTOR_CODE", "INDUSTRY_SECTOR") %in% names(inds))
+  )
+  testthat::expect_true(any(inds$INDUSTRY_SECTOR_CODE == "324"))
+  testthat::expect_true(any(inds$INDUSTRY_SECTOR == "CHEMICAL MANUFACTURING"))
+
+  testthat::expect_error(
+    get_tri_info(path = path_tri, year = c(2018, 2019)),
+    regexp = "`year`"
+  )
+  testthat::expect_error(
+    get_tri_info(path = path_tri, type = "industries", year = NA_real_),
+    regexp = "`year`"
+  )
+})
+
+################################################################################
 ##### process_tri
 testthat::test_that("process_tri", {
   withr::local_package("terra")
-  path_tri <- testthat::test_path("../testdata", "tri", "")
+  path_tri <- testthat::test_path("..", "testdata", "tri_small")
 
   testthat::expect_no_error(
-    tri_r <- process_tri(path = path_tri)
+    tri_r <- process_tri(path = path_tri, year = 2018)
   )
   testthat::expect_s4_class(tri_r, "SpatVector")
+  testthat::expect_true("STACK_AIR_100" %in% names(tri_r))
+  testthat::expect_true("STACK_AIR_200" %in% names(tri_r))
+  testthat::expect_false(any(grepl("^FUGITIVE_AIR_", names(tri_r))))
+  testthat::expect_equal(attr(tri_r, "tri_variables"), "STACK_AIR")
+  testthat::expect_true(
+    identical(attr(tri_r, "tri_target_fields"), c("STACK_AIR_100", "STACK_AIR_200"))
+  )
+
+  testthat::expect_no_error(
+    tri_multi <- process_tri(
+      path = path_tri,
+      year = 2018,
+      variables = c("STACK_AIR", "FUGITIVE_AIR")
+    )
+  )
+  testthat::expect_true(any(grepl("^STACK_AIR_", names(tri_multi))))
+  testthat::expect_true(any(grepl("^FUGITIVE_AIR_", names(tri_multi))))
+
+  testthat::expect_no_error(
+    tri_benzene <- process_tri(
+      path = path_tri,
+      year = 2018,
+      variables = "STACK_AIR",
+      chemical = "benzene"
+    )
+  )
+  testthat::expect_true(all(grepl("_100$", attr(tri_benzene, "tri_target_fields"))))
+
+  testthat::expect_no_error(
+    tri_cas <- process_tri(
+      path = path_tri,
+      year = 2018,
+      variables = "STACK_AIR",
+      chemical = "108-88-3"
+    )
+  )
+  testthat::expect_true(all(grepl("_200$", attr(tri_cas, "tri_target_fields"))))
+
+  testthat::expect_no_error(
+    tri_sector <- process_tri(
+      path = path_tri,
+      year = 2018,
+      variables = "STACK_AIR",
+      industry_group = "industry_sector_code"
+    )
+  )
+  testthat::expect_true("STACK_AIR_325_100" %in% names(tri_sector))
+  testthat::expect_true("STACK_AIR_324_200" %in% names(tri_sector))
+
+  testthat::expect_no_error(
+    tri_sector_both <- process_tri(
+      path = path_tri,
+      year = 2018,
+      variables = "STACK_AIR",
+      industry_group = "both"
+    )
+  )
+  testthat::expect_true(
+    "STACK_AIR_325_CHEMICAL_MANUFACTURING_100" %in% names(tri_sector_both)
+  )
 
   # test with cropping extent
   testthat::expect_no_error(
     tri_r_ext <- process_tri(
       path = path_tri,
+      year = 2018,
       extent = terra::ext(tri_r)
     )
   )
   testthat::expect_s4_class(tri_r, "SpatVector")
+
+  testthat::expect_error(
+    process_tri(
+      path = path_tri,
+      year = 2018,
+      variables = 49
+    ),
+    regexp = "`variables`"
+  )
+  testthat::expect_error(
+    process_tri(
+      path = path_tri,
+      year = 2018,
+      variables = "STACK_AIR",
+      chemical = "this-will-not-match"
+    ),
+    regexp = "`chemical` did not match"
+  )
 })
 
 ################################################################################
@@ -295,18 +408,24 @@ testthat::test_that("calculate_tri", {
   withr::local_package("data.table")
   withr::local_options(sf_use_s2 = FALSE)
 
-  ncp <- data.frame(lon = c(-78.8277, -78.0000), lat = c(35.95013, 80.000))
+  ncp <- data.frame(lon = c(-78.8277, -79.0000), lat = c(35.95013, 36.10000))
   ncp$site_id <- c("3799900018810101", "3799900018819999")
   ncp$time <- 2018L
   ncpt <-
     terra::vect(ncp, geom = c("lon", "lat"), keepgeom = TRUE, crs = "EPSG:4326")
   ncpt$time <- 2018L
-  path_tri <- testthat::test_path("..", "testdata", "tri")
+  path_tri <- testthat::test_path("..", "testdata", "tri_small")
 
   testthat::expect_no_error(
-    tri_r <- process_tri(path = path_tri, year = 2018)
+    tri_r <- process_tri(
+      path = path_tri,
+      year = 2018,
+      variables = c("STACK_AIR", "WATER"),
+      chemical = "benzene|toluene"
+    )
   )
   testthat::expect_s4_class(tri_r, "SpatVector")
+  testthat::expect_true(any(grepl("^WATER_", names(tri_r))))
 
   testthat::expect_no_error(
     tri_c <- calculate_tri(
@@ -316,6 +435,18 @@ testthat::test_that("calculate_tri", {
     )
   )
   testthat::expect_true(is.data.frame(tri_c))
+  testthat::expect_true(any(grepl("STACK_AIR_", names(tri_c))))
+  testthat::expect_true(any(grepl("WATER_", names(tri_c))))
+
+  attr(tri_r, "tri_target_fields") <- NULL
+  testthat::expect_no_error(
+    tri_c_fallback <- calculate_tri(
+      from = tri_r,
+      locs = ncpt,
+      radius = 50000L
+    )
+  )
+  testthat::expect_true(any(grepl("WATER_", names(tri_c_fallback))))
 
   # with geometry terra
   testthat::expect_no_error(
@@ -364,14 +495,14 @@ testthat::test_that("calculate_tri", {
   )
   testthat::expect_error(
     calculate_tri(
-      from = paste0(tdir, "/tri/"),
+      from = tempdir(),
       locs = ncpt[, 1:2],
       radius = 50000L
     )
   )
   testthat::expect_error(
     calculate_tri(
-      from = paste0(tdir, "/tri/"),
+      from = tempdir(),
       locs = ncpt,
       radius = "As far as the Earth's radius"
     )

@@ -41,7 +41,9 @@ a data.frame or SpatVector object
 \description{
 Calculate toxic release values for polygons or isotropic buffer point
 locations. Returns a \code{data.frame} object containing \code{locs_id}
-and variables for each chemical in \code{from}.
+and variables for each processed TRI field in \code{from}. Target fields are
+derived from metadata attached by \code{process_tri()}, with a fallback to
+non-coordinate columns in \code{from}.
 }
 \note{
 U.S. context.

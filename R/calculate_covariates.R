@@ -2174,7 +2174,9 @@ The result may not be accurate.\n",
 #' @description
 #' Calculate toxic release values for polygons or isotropic buffer point
 #' locations. Returns a \code{data.frame} object containing \code{locs_id}
-#' and variables for each chemical in \code{from}.
+#' and variables for each processed TRI field in \code{from}. Target fields are
+#' derived from metadata attached by \code{process_tri()}, with a fallback to
+#' non-coordinate columns in \code{from}.
 #' @param from SpatVector(1). Output of \code{process_tri()}.
 #' @param locs sf/SpatVector. Locations where TRI variables are calculated.
 #' @param locs_id character(1). Unique site identifier column name.
@@ -2242,9 +2244,18 @@ calculate_tri <- function(
   locs_re <- terra::project(locs, terra::crs(from))
 
   # split by year: locs and tri locations
-  tri_cols <- grep("_AIR", names(from), value = TRUE)
+  tri_cols <- attr(from, "tri_target_fields")
+  if (is.null(tri_cols) || length(tri_cols) < 1) {
+    tri_cols <- setdiff(names(from), c("YEAR", "LONGITUDE", "LATITUDE"))
+  }
   # error fix: no whitespace
   tri_cols <- sub(" ", "_", tri_cols)
+  if (length(tri_cols) < 1) {
+    stop(
+      "No TRI target fields found in `from`. ",
+      "Process TRI data using `process_tri()` before calculation.\n"
+    )
+  }
 
   # inner lapply
   list_radius <- split(radius, radius)

@@ -7,7 +7,10 @@
 process_tri(
   path = NULL,
   year = 2018,
-  variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49),
+  variables = "STACK_AIR",
+  chemical = NULL,
+  industry_group = c("none", "industry_sector", "industry_sector_code", "both"),
+  ignore_case = TRUE,
   extent = NULL,
   ...
 )
@@ -17,7 +20,22 @@ process_tri(
 
 \item{year}{integer(1). Single year to select.}
 
-\item{variables}{integer. Column index of TRI data.}
+\item{variables}{character. One or more regular expressions used to select
+TRI release variables by column name after normalization to underscore
+naming (for example, \code{STACK_AIR}, \code{FUGITIVE_AIR}, \code{WATER}). Default is
+\code{"STACK_AIR"}.}
+
+\item{chemical}{\code{NULL} or character. Optional one or more regular
+expressions used to filter chemicals. Patterns are matched against
+\code{TRI_CHEMICAL_COMPOUND_ID}, \code{CHEMICAL}, and \code{CAS}/\code{CAS.} values. If
+\code{NULL} (default), all chemicals are retained.}
+
+\item{industry_group}{character(1). Optional additional grouping level.
+One of \code{"none"} (default), \code{"industry_sector"},
+\code{"industry_sector_code"}, or \code{"both"}.}
+
+\item{ignore_case}{logical(1). If \code{TRUE} (default), regular expression
+matching in \code{variables} and \code{chemical} is case-insensitive.}
 
 \item{extent}{numeric(4) or SpatExtent giving the extent of the raster
 if \code{NULL} (default), the entire raster is loaded}
@@ -34,7 +52,9 @@ returning a single \code{SpatVector} (points) object for the selected \code{year
 }
 \note{
 Visit \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox}{TRI Data and Tools}
-to view the available years and variables.
+to view the available years and variables. Use \code{\link[=get_tri_info]{get_tri_info()}} to inspect
+available TRI chemical IDs/names/CAS numbers and industry sector codes in
+local TRI files.
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
@@ -43,7 +63,9 @@ to view the available years and variables.
 tri <- process_tri(
   path = "./data",
   year = 2020,
-  variables = c(1, 13, 12, 14, 20, 34, 36, 47, 48, 49)
+  variables = c("STACK_AIR", "FUGITIVE_AIR"),
+  chemical = "benzene",
+  industry_group = "industry_sector"
 )
 }
 }

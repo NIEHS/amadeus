@@ -51,7 +51,7 @@ a data.frame or SpatVector object. When \code{.by_time} is provided,
 rows are aggregated using \code{calc_summarize_by()}.
 }
 \description{
-Extract wildfire smoke plume values at point locations. Returns a
+Extract wildfire smoke plume values at point or buffered locations. Returns a
 \code{data.frame} object containing \code{locs_id}, date, and either binary
 indicators (\code{frac = FALSE}) or fractional overlap values (\code{frac = TRUE}) for
 wildfire smoke plume density inherited from \code{from}.
