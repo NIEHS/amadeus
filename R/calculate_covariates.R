@@ -2081,7 +2081,7 @@ sum_edc <-
     locs_id = NULL,
     decay_range = NULL,
     target_fields = NULL,
-    C0 = NULL,
+    C0 = NULL, # nolint: object_name_linter
     use_threshold = TRUE,
     geom = FALSE
   ) {
@@ -2112,22 +2112,24 @@ sum_edc <-
         "\n"
       )
     }
-    if (is.null(C0)) {
+    c0_values <- C0
+    if (is.null(c0_values)) {
       from$C0_source <- rep(1, nrow(from))
     } else {
-      if (is.character(C0)) {
-        if (length(C0) != 1L || anyNA(C0) || !nzchar(trimws(C0))) {
+      if (is.character(c0_values)) {
+        if (length(c0_values) != 1L || anyNA(c0_values) ||
+              !nzchar(trimws(c0_values))) {
           stop("`C0` as character must be a single non-empty column name.\n")
         }
-        if (!C0 %in% names(from)) {
-          stop("`C0` column `", C0, "` was not found in `from`.\n")
+        if (!c0_values %in% names(from)) {
+          stop("`C0` column `", c0_values, "` was not found in `from`.\n")
         }
-        C0 <- from[[C0]]
+        c0_values <- from[[c0_values]]
       }
-      if (is.data.frame(C0) && ncol(C0) == 1L) {
-        C0 <- C0[[1]]
+      if (is.data.frame(c0_values) && ncol(c0_values) == 1L) {
+        c0_values <- c0_values[[1]]
       }
-      if (!is.numeric(C0) || length(C0) != nrow(from)) {
+      if (!is.numeric(c0_values) || length(c0_values) != nrow(from)) {
         stop(
           "`C0` must be NULL, character(1) column name in `from`, ",
           "or a numeric vector with length `nrow(from)`.\n"
@@ -2136,7 +2138,7 @@ sum_edc <-
       if (length(target_fields) != 1L) {
         stop("When `C0` is provided, `target_fields` must have length 1.\n")
       }
-      from$C0_source <- C0
+      from$C0_source <- c0_values
     }
 
     cn_overlap <- intersect(names(locs), names(from))
@@ -2328,7 +2330,7 @@ calculate_tri <- function(
   locs,
   locs_id = "site_id",
   decay_range = c(1e3L, 1e4L, 5e4L),
-  C0 = NULL,
+  C0 = NULL, # nolint: object_name_linter
   use_threshold = TRUE,
   weights = NULL,
   geom = FALSE,
@@ -2348,9 +2350,11 @@ calculate_tri <- function(
         is.na(use_threshold)) {
     stop("`use_threshold` must be TRUE or FALSE.\n")
   }
-  if (!is.null(C0) &&
-        (!is.character(C0) || length(C0) < 1L || anyNA(C0) ||
-         any(!nzchar(trimws(C0))))) {
+  c0_input <- C0
+  if (!is.null(c0_input) &&
+        (!is.character(c0_input) || length(c0_input) < 1L ||
+           anyNA(c0_input) ||
+           any(!nzchar(trimws(c0_input))))) {
     stop("`C0` must be NULL or a non-empty character vector of column names.\n")
   }
   locs_re <- terra::project(locs, terra::crs(from))
@@ -2368,7 +2372,7 @@ calculate_tri <- function(
       "Process TRI data using `process_tri()` before calculation.\n"
     )
   }
-  if (is.null(C0)) {
+  if (is.null(c0_input)) {
     if (length(tri_cols) == 1L) {
       warning(
         "`C0` is NULL and only one TRI field is available; ",
@@ -2377,7 +2381,7 @@ calculate_tri <- function(
     }
     c0_cols <- tri_cols
   } else {
-    missing_c0_cols <- setdiff(C0, names(from))
+    missing_c0_cols <- setdiff(c0_input, names(from))
     if (length(missing_c0_cols) > 0L) {
       stop(
         "The following `C0` columns are missing in `from`: ",
@@ -2385,10 +2389,10 @@ calculate_tri <- function(
         "\n"
       )
     }
-    if (length(C0) == 1L) {
-      c0_cols <- rep(C0, length(tri_cols))
-    } else if (length(C0) == length(tri_cols)) {
-      c0_cols <- C0
+    if (length(c0_input) == 1L) {
+      c0_cols <- rep(c0_input, length(tri_cols))
+    } else if (length(c0_input) == length(tri_cols)) {
+      c0_cols <- c0_input
     } else {
       stop(
         "`C0` must have length 1 or match the number of TRI target fields (",
@@ -2409,11 +2413,11 @@ calculate_tri <- function(
             seq_along(tri_cols),
             function(i) {
               tri_col <- tri_cols[i]
-              tri_col_C0 <- from[[c0_cols[i]]]
-              if (is.data.frame(tri_col_C0) && ncol(tri_col_C0) == 1L) {
-                tri_col_C0 <- tri_col_C0[[1]]
+              tri_col_c0 <- from[[c0_cols[i]]]
+              if (is.data.frame(tri_col_c0) && ncol(tri_col_c0) == 1L) {
+                tri_col_c0 <- tri_col_c0[[1]]
               }
-              if (!is.numeric(tri_col_C0)) {
+              if (!is.numeric(tri_col_c0)) {
                 stop("TRI target field `", tri_col, "` is not numeric.\n")
               }
               sum_edc(
@@ -2422,7 +2426,7 @@ calculate_tri <- function(
                 locs_id = locs_id,
                 decay_range = x,
                 target_fields = tri_col,
-                C0 = tri_col_C0,
+                C0 = tri_col_c0,
                 use_threshold = use_threshold,
                 geom = FALSE
               )
