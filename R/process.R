@@ -1400,13 +1400,20 @@ process_tri <- function(
   year = 2018,
   variables = "STACK_AIR",
   chemical = NULL,
-  industry_group = c("none", "industry_sector", "industry_sector_code", "both"),
+  industry_group = c(
+    "none",
+    "industry_sector",
+    "industry_sector_code",
+    "both"
+  ),
   ignore_case = TRUE,
   extent = NULL,
   ...
 ) {
   if (!is.character(variables) || length(variables) < 1 || anyNA(variables)) {
-    stop("`variables` must be a non-empty character vector of regex patterns.\n")
+    stop(
+      "`variables` must be a non-empty character vector of regex patterns.\n"
+    )
   }
   if (length(variables) > 0 && any(!nzchar(trimws(variables)))) {
     stop("`variables` cannot include empty patterns.\n")
@@ -1419,12 +1426,13 @@ process_tri <- function(
       stop("`chemical` cannot include empty patterns.\n")
     }
   }
-  if (!is.logical(ignore_case) || length(ignore_case) != 1 || is.na(ignore_case)) {
+  if (!is.logical(ignore_case) || length(ignore_case) != 1 ||
+        is.na(ignore_case)) {
     stop("`ignore_case` must be TRUE or FALSE.\n")
   }
   industry_group <- match.arg(industry_group)
 
-  dt_tri <- tri_read_raw(path = path)
+  dt_tri <- amadeus:::tri_read_raw(path = path)
 
   required_cols <- c(
     "YEAR",
@@ -1446,7 +1454,14 @@ process_tri <- function(
     unique(unlist(
       lapply(
         patterns,
-        function(pat) grep(pat, column_names, ignore.case = ignore_case, value = TRUE)
+        function(pat) {
+          grep(
+            pat,
+            column_names,
+            ignore.case = ignore_case,
+            value = TRUE
+          )
+        }
       )
     ))
   }
@@ -1485,7 +1500,12 @@ process_tri <- function(
     )
   }
 
-  selected_cols <- unique(c(required_cols, selected_variable_cols, tri_chemical_fields, industry_cols))
+  selected_cols <- unique(c(
+    required_cols,
+    selected_variable_cols,
+    tri_chemical_fields,
+    industry_cols
+  ))
   dt_tri <- dt_tri[, selected_cols, drop = FALSE]
   dt_tri <- dt_tri[dt_tri$YEAR == year, ]
   if (nrow(dt_tri) < 1) {

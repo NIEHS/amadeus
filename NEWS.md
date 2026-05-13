@@ -2,6 +2,7 @@
 ## Major updates to code base - breaking changes have been minmized but please report if 1.3.x versions are not working as expected
 
 - Refactored code base to improve maintainability and utilize modern R API designs and best practices
+- The only breaking change that should affect previous version users is the `process_tri()` and `calculate_tri()` series. 
 
 ## Spatial and Temporal summarization with `.by` and `.by_time` parameters
 

@@ -116,6 +116,7 @@ reference:
   desc: Utility helpers intended for direct user workflows
 - contents:
   - setup_nasa_token
+  - get_tri_info
 
 articles:
 - title: Articles

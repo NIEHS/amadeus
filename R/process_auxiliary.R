@@ -617,7 +617,8 @@ tri_read_raw <- function(path = NULL) {
 #' information (`TRI_CHEMICAL_COMPOUND_ID`, `CHEMICAL`, `CASN`). Set
 #' `type = "industries"` to return industry sector information
 #' (`INDUSTRY_SECTOR_CODE`, `INDUSTRY_SECTOR`).
-#' @param path character(1). Path to the directory with TRI CSV files (from `download_tri`).
+#' @param path character(1). Path to the directory with TRI CSV files
+#'   (from `download_tri`).
 #' @param type character(1). Lookup table to return. One of `"chemicals"`
 #'   (default) or `"industries"`.
 #' @param year `NULL` or integer(1). Optional single year filter. If `NULL`
@@ -684,8 +685,8 @@ get_tri_info <- function(
     if (!include_na) {
       out <- out[
         !(is.na(out$TRI_CHEMICAL_COMPOUND_ID) &
-          is.na(out$CHEMICAL) &
-          is.na(out$CASN)),
+            is.na(out$CHEMICAL) &
+            is.na(out$CASN)),
         ,
         drop = FALSE
       ]
@@ -714,7 +715,7 @@ get_tri_info <- function(
     if (!include_na) {
       out <- out[
         !(is.na(out$INDUSTRY_SECTOR_CODE) &
-          is.na(out$INDUSTRY_SECTOR)),
+            is.na(out$INDUSTRY_SECTOR)),
         ,
         drop = FALSE
       ]
