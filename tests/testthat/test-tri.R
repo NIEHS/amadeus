@@ -387,6 +387,9 @@ testthat::test_that("process_tri", {
   testthat::expect_true("STACK_AIR_200" %in% names(tri_r))
   testthat::expect_false(any(grepl("^FUGITIVE_AIR_", names(tri_r))))
   testthat::expect_equal(attr(tri_r, "tri_variables"), "STACK_AIR")
+  testthat::expect_false(
+    any(is.na(as.data.frame(tri_r)[, attr(tri_r, "tri_target_fields"), drop = FALSE]))
+  )
   testthat::expect_true(
     identical(attr(tri_r, "tri_target_fields"), c("STACK_AIR_100", "STACK_AIR_200"))
   )
@@ -587,6 +590,26 @@ testthat::test_that("process_tri supports case-sensitive matching and sector-nam
   testthat::expect_true(
     all(c("STACK_AIR_100", "STACK_AIR_200") %in% names(tri_multi_chem))
   )
+})
+
+testthat::test_that("process_tri variables supports normalized fallback labels", {
+  withr::with_tempdir({
+    write_tri_csv(data.frame(
+      YEAR = 2018,
+      LONGITUDE = -78.8,
+      LATITUDE = 35.9,
+      TRI_CHEMICAL_COMPOUND_ID = "100",
+      UNIT_OF_MEASURE = "Pounds",
+      ON_SITE_RELEASE_TOTAL = 10
+    ))
+    tri_norm <- process_tri(
+      path = ".",
+      year = 2018,
+      variables = "ON-SITE RELEASE TOTAL"
+    )
+    testthat::expect_s4_class(tri_norm, "SpatVector")
+    testthat::expect_true("ON_SITE_RELEASE_TOTAL_100" %in% names(tri_norm))
+  })
 })
 
 testthat::test_that("process_tri drops rows without TRI signal", {

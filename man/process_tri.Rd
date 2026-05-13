@@ -23,7 +23,10 @@ process_tri(
 \item{variables}{character. One or more regular expressions used to select
 TRI release variables by column name after normalization to underscore
 naming (for example, \code{STACK_AIR}, \code{FUGITIVE_AIR}, \code{WATER}). Default is
-\code{"STACK_AIR"}. Recommended options include:
+\code{"STACK_AIR"}. Matching first uses raw TRI column names, then falls back
+to a normalized match where punctuation and spaces are converted to
+underscores (for example, \code{"ON-SITE RELEASE TOTAL"} matches
+\code{ON_SITE_RELEASE_TOTAL}). Recommended options include:
 \itemize{
 \item \code{FUGITIVE_AIR}
 \item \code{STACK_AIR}

@@ -118,3 +118,16 @@ ggplot() +
   geom_sf(data = point_values_pcb, aes(color = STACK_AIR_0001336363_05000), size = 3) 
 
 ```
+
+## Demonstate with multiple chemicals and a total emissions
+
+```{r process-chems, eval = live_run}
+
+
+processed_chems <- process_covariates(
+  covariate = "tri",
+  path = directory_to_save,
+  year = 2023,
+  variables = "ON-SITE RELEASE TOTAL"
+)
+```

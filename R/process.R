@@ -1342,7 +1342,10 @@ process_ecoregion <-
 #' @param variables character. One or more regular expressions used to select
 #'   TRI release variables by column name after normalization to underscore
 #'   naming (for example, `STACK_AIR`, `FUGITIVE_AIR`, `WATER`). Default is
-#'   `"STACK_AIR"`. Recommended options include:
+#'   `"STACK_AIR"`. Matching first uses raw TRI column names, then falls back
+#'   to a normalized match where punctuation and spaces are converted to
+#'   underscores (for example, `"ON-SITE RELEASE TOTAL"` matches
+#'   `ON_SITE_RELEASE_TOTAL`). Recommended options include:
 #'   \itemize{
 #'     \item `FUGITIVE_AIR`
 #'     \item `STACK_AIR`
@@ -1485,8 +1488,40 @@ process_tri <- function(
       )
     ))
   }
+  normalize_name <- function(x) {
+    x <- gsub("[^[:alnum:]]+", "_", x)
+    x <- gsub("^_+|_+$", "", x)
+    x
+  }
+  select_by_normalized_pattern <- function(column_names, patterns) {
+    normalized_names <- normalize_name(column_names)
+    if (ignore_case) {
+      normalized_names <- tolower(normalized_names)
+    }
+    matched_idx <- unique(unlist(
+      lapply(
+        patterns,
+        function(pat) {
+          pat_norm <- normalize_name(pat)
+          if (ignore_case) {
+            pat_norm <- tolower(pat_norm)
+          }
+          grep(
+            pat_norm,
+            normalized_names,
+            fixed = TRUE
+          )
+        }
+      )
+    ))
+    column_names[matched_idx]
+  }
 
   selected_variable_cols <- select_by_pattern(names(dt_tri), variables)
+  if (length(selected_variable_cols) < 1) {
+    selected_variable_cols <-
+      select_by_normalized_pattern(names(dt_tri), variables)
+  }
   selected_variable_cols <- setdiff(selected_variable_cols, required_cols)
   if (length(selected_variable_cols) < 1) {
     stop("`variables` did not match any TRI variable columns.\n")
@@ -1602,7 +1637,8 @@ process_tri <- function(
       values_from = dplyr::all_of(selected_variable_cols),
       names_from = dplyr::all_of(names_from_cols),
       names_prefix = tri_name_prefix,
-      names_sep = "_"
+      names_sep = "_",
+      values_fill = 0
     ) |>
     dplyr::filter(!is.na(LONGITUDE) | !is.na(LATITUDE))
   names(dt_tri_x) <- sub(" ", "_", names(dt_tri_x))
