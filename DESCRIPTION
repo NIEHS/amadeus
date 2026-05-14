@@ -46,7 +46,8 @@ Suggests:
     nhdplusTools,
     stringr,
     tigris,
-    spelling
+    spelling,
+    patrick
 RdMacros: Rdpack
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown

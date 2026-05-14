@@ -1,0 +1,509 @@
+---
+title: "amadeus Test Suite Report"
+author: "Automated report"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+root <- normalizePath(file.path(getwd(), "tests"), mustWork = TRUE)
+testthat_dir <- file.path(root, "testthat")
+r_dir <- normalizePath(file.path(getwd(), "R"), mustWork = TRUE)
+
+all_test_files <- sort(c(
+  list.files(testthat_dir, pattern = "^test-.*\\.R$", full.names = TRUE),
+  file.path(root, "testthat.R")
+))
+all_test_files <- all_test_files[file.exists(all_test_files)]
+
+helper_files <- sort(list.files(
+  testthat_dir, pattern = "^helper-.*\\.R$", full.names = TRUE
+))
+
+r_files <- sort(list.files(r_dir, pattern = "\\.R$", full.names = TRUE))
+
+read_safely <- function(path) {
+  x <- try(readLines(path, warn = FALSE), silent = TRUE)
+  if (inherits(x, "try-error")) return(character(0))
+  x
+}
+
+count_pattern <- function(lines, pattern, perl = TRUE) {
+  sum(grepl(pattern, lines, perl = perl))
+}
+
+extract_tokens <- function(lines, pattern) {
+  reg <- gregexpr(pattern, lines, perl = TRUE)
+  m <- regmatches(lines, reg)
+  unlist(m, use.names = FALSE)
+}
+
+rel_to_root <- function(path) {
+  sub(paste0("^", normalizePath(getwd()), "/?"), "", normalizePath(path))
+}
+```
+
+# Executive summary
+
+This report analyzes `tests/` and surfaces structure, assertion styles,
+skip and mocking patterns, **assertion-quality smells**, **test-naming
+specificity**, **portability issues**, and **CI alignment**. It complements
+the per-PR `covr` coverage metric — coverage tells you *how much* code is
+exercised; this report tells you *how well* the tests that do exist are
+written.
+
+```{r summary-numbers}
+test_df <- do.call(rbind, lapply(all_test_files, function(path) {
+  lines <- read_safely(path)
+  data.frame(
+    file = rel_to_root(path),
+    n_lines = length(lines),
+    test_that_blocks = count_pattern(lines, "testthat::test_that\\s*\\("),
+    expect_calls = count_pattern(lines, "(testthat::)?expect_[A-Za-z0-9_]+\\s*\\("),
+    is_live = grepl("-live\\.R$", path),
+    stringsAsFactors = FALSE
+  )
+}))
+
+total_files <- nrow(test_df)
+total_tests <- sum(test_df$test_that_blocks)
+total_expect <- sum(test_df$expect_calls)
+live_files <- sum(test_df$is_live)
+n_helpers <- length(helper_files)
+
+knitr::kable(data.frame(
+  metric = c(
+    "Test files",
+    "Live-only test files (test-*-live.R)",
+    "test_that blocks",
+    "expect_* calls",
+    "Helper files (helper-*.R)"
+  ),
+  value = c(total_files, live_files, total_tests, total_expect, n_helpers)
+), align = "lr")
+```
+
+# Folder structure
+
+```{r folders}
+folder_structure <- data.frame(
+  folder = c("tests/testthat", "tests/testdata", "tests/test_report"),
+  files = c(
+    length(list.files(testthat_dir, full.names = TRUE)),
+    length(list.files(file.path(root, "testdata"), full.names = TRUE)),
+    length(list.files(file.path(root, "test_report"), full.names = TRUE))
+  ),
+  purpose = c(
+    "Unit/integration tests + helper-*.R + test-*-live.R (live network tests)",
+    "Static fixtures and local sample data",
+    "This report"
+  ),
+  stringsAsFactors = FALSE
+)
+knitr::kable(folder_structure, align = "lcl")
+```
+
+# Test inventory
+
+## Top files by `test_that` blocks
+
+```{r top-blocks}
+knitr::kable(
+  head(test_df[order(test_df$test_that_blocks, decreasing = TRUE),
+               c("file", "test_that_blocks", "expect_calls", "n_lines")], 15),
+  align = "lccc"
+)
+```
+
+## File size hot list (LOC > 800)
+
+```{r hot-files}
+hot <- test_df[test_df$n_lines > 800, c("file", "n_lines", "test_that_blocks", "expect_calls")]
+hot <- hot[order(hot$n_lines, decreasing = TRUE), ]
+if (nrow(hot) > 0) {
+  knitr::kable(hot, align = "lccc",
+               caption = "Candidates for splitting along download/process/calc axes.")
+} else {
+  cat("No test files exceed 800 LOC. ✅")
+}
+```
+
+# Assertion types used
+
+```{r expect-types}
+expect_tokens <- unlist(lapply(all_test_files, function(path) {
+  lines <- read_safely(path)
+  toks <- extract_tokens(lines, "(?:testthat::)?expect_[A-Za-z0-9_]+\\s*\\(")
+  sub("\\s*\\($", "", gsub("^testthat::", "", toks))
+}), use.names = FALSE)
+expect_counts <- sort(table(expect_tokens), decreasing = TRUE)
+expect_df <- data.frame(
+  expectation = names(expect_counts),
+  count = as.integer(expect_counts),
+  pct = sprintf("%.1f%%", 100 * as.integer(expect_counts) / sum(expect_counts)),
+  stringsAsFactors = FALSE
+)
+knitr::kable(head(expect_df, 40), align = "lcc")
+```
+
+# Assertion-quality scorecard
+
+Weak assertions silently pass more often than typed ones. The scorecard below
+flags common smells per file. Lower numbers are better.
+
+```{r quality-scorecard}
+weak_patterns <- list(
+  expect_no_error_calls    = "(?:testthat::)?expect_no_error\\s*\\(",
+  expect_true_inherits     = "expect_true\\s*\\(\\s*inherits\\s*\\(",
+  expect_true_file_exists  = "expect_true\\s*\\(\\s*file\\.exists\\s*\\(",
+  expect_true_length_gt    = "expect_true\\s*\\(\\s*length\\s*\\([^)]+\\)\\s*>",
+  expect_true_nrow_gt      = "expect_true\\s*\\(\\s*nrow\\s*\\([^)]+\\)\\s*>",
+  expect_true_is_dot       = "expect_true\\s*\\(\\s*is\\.",
+  for_in_test_that         = "^\\s*for\\s*\\("
+)
+
+quality_df <- do.call(rbind, lapply(all_test_files, function(path) {
+  lines <- read_safely(path)
+  totals <- vapply(weak_patterns, function(p) count_pattern(lines, p), integer(1))
+  totals[["expect_true_total"]] <-
+    count_pattern(lines, "(?:testthat::)?expect_true\\s*\\(")
+  totals[["expect_total"]] <-
+    count_pattern(lines, "(?:testthat::)?expect_[A-Za-z0-9_]+\\s*\\(")
+  weak_total <- sum(totals[c(
+    "expect_no_error_calls", "expect_true_inherits",
+    "expect_true_file_exists", "expect_true_length_gt",
+    "expect_true_nrow_gt", "expect_true_is_dot"
+  )])
+  pct <- if (totals[["expect_total"]] > 0) {
+    round(100 * weak_total / totals[["expect_total"]], 1)
+  } else 0
+  data.frame(
+    file = rel_to_root(path),
+    expect_total = totals[["expect_total"]],
+    weak_total = weak_total,
+    weak_pct = pct,
+    expect_no_error = totals[["expect_no_error_calls"]],
+    true_inherits = totals[["expect_true_inherits"]],
+    true_file_exists = totals[["expect_true_file_exists"]],
+    true_length_gt = totals[["expect_true_length_gt"]],
+    true_nrow_gt = totals[["expect_true_nrow_gt"]],
+    true_is_dot = totals[["expect_true_is_dot"]],
+    loops_in_tests = totals[["for_in_test_that"]],
+    stringsAsFactors = FALSE
+  )
+}))
+quality_df <- quality_df[order(quality_df$weak_pct, decreasing = TRUE), ]
+knitr::kable(quality_df, align = "lccccccccc",
+             caption = "weak_pct = (expect_no_error + weak expect_true variants) / expect_total. Files with weak_pct > 25% should be reviewed.")
+```
+
+## Suggested rewrites
+
+| Pattern | Replace with |
+|---|---|
+| `expect_true(inherits(x, "SpatRaster"))` | `expect_s4_class(x, "SpatRaster")` |
+| `expect_true(inherits(x, "data.frame"))` | `expect_s3_class(x, "data.frame")` |
+| `expect_true(file.exists(p))` | keep, plus `expect_gt(file.info(p)$size, 0)` |
+| `expect_true(length(x) > 0)` | `expect_gt(length(x), 0)` or `expect_length(x, n)` |
+| `expect_true(nrow(df) > 0)` | `expect_gt(nrow(df), 0)` |
+| `expect_no_error(f(...))` | assign the result and assert on its class/value |
+
+# Skip taxonomy
+
+```{r skip-taxonomy}
+skip_patterns <- c(
+  skip_on_cran          = "(?:testthat::)?skip_on_cran\\s*\\(",
+  skip_if_offline       = "(?:testthat::)?skip_if_offline\\s*\\(",
+  skip_if_not           = "(?:testthat::)?skip_if_not\\s*\\(",
+  skip_if               = "(?:testthat::)?skip_if\\s*\\(",
+  skip                  = "(?:testthat::)?skip\\s*\\(",
+  skip_if_no_live_tests = "skip_if_no_live_tests\\s*\\(",
+  skip_if_no_credentials = "skip_if_no_credentials\\s*\\(",
+  skip_if_pkg_missing   = "skip_if_pkg_missing\\s*\\("
+)
+
+skip_df <- do.call(rbind, lapply(all_test_files, function(path) {
+  lines <- read_safely(path)
+  row <- as.list(vapply(skip_patterns, function(p) count_pattern(lines, p), integer(1)))
+  row$file <- rel_to_root(path)
+  as.data.frame(row, stringsAsFactors = FALSE)
+}))
+skip_df$total <- rowSums(skip_df[, names(skip_patterns)])
+skip_df <- skip_df[skip_df$total > 0, c("file", "total", names(skip_patterns))]
+skip_df <- skip_df[order(skip_df$total, decreasing = TRUE), ]
+knitr::kable(skip_df, align = "lc")
+```
+
+# Mocking and stubbing assessment
+
+```{r mocking-overview}
+mock_files <- vapply(all_test_files, function(path) {
+  any(grepl("local_mocked_bindings|local_download_mocks|local_token_mocks",
+            read_safely(path)))
+}, logical(1))
+n_mock_files <- sum(mock_files)
+cat(sprintf("Files using mocking: **%d** of %d.\n\n", n_mock_files, total_files))
+```
+
+## Most frequently mocked symbols
+
+```{r mock-symbols}
+mock_pat <- "(?<=\\s)([a-z_][a-zA-Z0-9_.]*)\\s*=\\s*function"
+mocked_names <- unlist(lapply(all_test_files, function(path) {
+  lines <- read_safely(path)
+  in_block <- FALSE
+  depth <- 0
+  out <- character()
+  for (ln in lines) {
+    if (grepl("local_mocked_bindings\\s*\\(|local_download_mocks\\s*\\(|mocks_download_stack\\s*\\(", ln)) {
+      in_block <- TRUE
+    }
+    if (in_block) {
+      m <- regmatches(ln, regexpr(mock_pat, ln, perl = TRUE))
+      if (length(m) && nzchar(m)) {
+        sym <- sub("\\s*=\\s*function$", "", m)
+        out <- c(out, sym)
+      }
+      depth <- depth + lengths(regmatches(ln, gregexpr("\\(", ln))) -
+        lengths(regmatches(ln, gregexpr("\\)", ln)))
+      if (depth <= 0) in_block <- FALSE
+    }
+  }
+  out
+}))
+mock_tab <- sort(table(mocked_names), decreasing = TRUE)
+mock_top <- data.frame(
+  mocked_symbol = names(mock_tab),
+  occurrences = as.integer(mock_tab),
+  stringsAsFactors = FALSE
+)
+if (nrow(mock_top) > 0) {
+  knitr::kable(head(mock_top, 25), align = "lc",
+               caption = "Top mocked internal symbols. Candidates for `helper-mocks-*.R` factories.")
+} else {
+  cat("(no mocked symbols detected)")
+}
+```
+
+# Test-name specificity audit
+
+Tests should encode the input combination under test in the description.
+The recommended form is `"<fn>(<arg=value>, ...): <expected behavior>"`. The
+audit below flags `test_that` titles that are too short or missing
+parenthesized argument hints.
+
+```{r naming-audit}
+title_pat <- "test_that\\s*\\(\\s*[\"']([^\"']+)[\"']"
+titles_df <- do.call(rbind, lapply(all_test_files, function(path) {
+  lines <- read_safely(path)
+  m <- regmatches(lines, regexec(title_pat, lines, perl = TRUE))
+  hits <- vapply(m, function(x) if (length(x) > 1) x[[2]] else NA_character_, character(1))
+  hits <- hits[!is.na(hits)]
+  if (!length(hits)) return(NULL)
+  data.frame(
+    file = rel_to_root(path),
+    title = hits,
+    has_args = grepl("\\(", hits) & grepl("\\)", hits),
+    short = nchar(hits) < 30,
+    stringsAsFactors = FALSE
+  )
+}))
+n_titles <- nrow(titles_df)
+n_no_args <- sum(!titles_df$has_args)
+n_short <- sum(titles_df$short)
+cat(sprintf(
+  "Total test_that titles: **%d**. Missing parenthesized args: **%d** (%.0f%%). Short (<30 chars): **%d** (%.0f%%).\n\n",
+  n_titles, n_no_args, 100 * n_no_args / n_titles,
+  n_short, 100 * n_short / n_titles
+))
+
+by_file <- aggregate(
+  cbind(titles = 1, no_args = !titles_df$has_args, short = titles_df$short) ~ file,
+  data = titles_df, FUN = sum
+)
+by_file$no_args_pct <- round(100 * by_file$no_args / by_file$titles, 1)
+by_file <- by_file[order(by_file$no_args_pct, decreasing = TRUE), ]
+knitr::kable(head(by_file, 20), align = "lcccc",
+             caption = "Top files by percentage of titles lacking argument hints.")
+```
+
+# Untested `R/` files
+
+Heuristic: an `R/*.R` file is considered "covered by tests" if there is a
+`tests/testthat/test-<stem>.R` (with the leading `process_`, `download_`,
+`calc_` etc. stripped) **or** if any exported symbol declared in that file
+is referenced (by name) somewhere in the test suite.
+
+```{r untested-r-files}
+test_text <- unlist(lapply(all_test_files, read_safely))
+
+r_summary <- do.call(rbind, lapply(r_files, function(p) {
+  src <- read_safely(p)
+  exports <- extract_tokens(
+    src, "^[a-z_][a-zA-Z0-9_.]*\\s*<-\\s*function"
+  )
+  exports <- sub("\\s*<-\\s*function$", "", exports)
+  exports <- sub("\\s+$", "", exports)
+  any_ref <- any(vapply(exports, function(sym) {
+    any(grepl(paste0("\\b", sym, "\\b"), test_text))
+  }, logical(1)))
+  data.frame(
+    file = rel_to_root(p),
+    functions = length(exports),
+    any_referenced = any_ref,
+    stringsAsFactors = FALSE
+  )
+}))
+untested <- r_summary[!r_summary$any_referenced & r_summary$functions > 0, ]
+if (nrow(untested) > 0) {
+  knitr::kable(untested, align = "lcc",
+               caption = "R/ files whose top-level functions are not referenced by any test file.")
+} else {
+  cat("All `R/` files with top-level functions are referenced by at least one test. ✅")
+}
+```
+
+# Portability lint
+
+```{r portability}
+port_patterns <- c(
+  hardcoded_home    = "(?:/Users/|/home/[a-z]+/|C:[\\\\/])",
+  raw_tempdir       = "\\btempdir\\s*\\(\\)",
+  withr_tempdir     = "withr::local_tempdir\\s*\\(",
+  unlink_no_recur   = "\\bunlink\\s*\\([^)]*\\)"
+)
+port_df <- do.call(rbind, lapply(all_test_files, function(path) {
+  lines <- read_safely(path)
+  data.frame(
+    file = rel_to_root(path),
+    hardcoded_home = count_pattern(lines, port_patterns[["hardcoded_home"]]),
+    raw_tempdir = count_pattern(lines, port_patterns[["raw_tempdir"]]),
+    withr_tempdir = count_pattern(lines, port_patterns[["withr_tempdir"]]),
+    unlink_calls = count_pattern(lines, port_patterns[["unlink_no_recur"]]),
+    stringsAsFactors = FALSE
+  )
+}))
+port_df <- port_df[
+  port_df$hardcoded_home > 0 | port_df$raw_tempdir > 0,
+]
+if (nrow(port_df) > 0) {
+  knitr::kable(port_df[order(port_df$hardcoded_home + port_df$raw_tempdir,
+                              decreasing = TRUE), ],
+               align = "lcccc",
+               caption = "Files using non-portable paths or raw tempdir() (prefer withr::local_tempdir()).")
+} else {
+  cat("No portability issues detected. ✅")
+}
+```
+
+# Namespacing consistency
+
+```{r namespacing}
+ns_df <- do.call(rbind, lapply(all_test_files, function(path) {
+  lines <- read_safely(path)
+  ns_q <- count_pattern(lines, "testthat::expect_[A-Za-z0-9_]+\\s*\\(")
+  total <- count_pattern(lines, "(?:testthat::)?expect_[A-Za-z0-9_]+\\s*\\(")
+  unq <- total - ns_q
+  data.frame(
+    file = rel_to_root(path),
+    qualified = ns_q,
+    unqualified = unq,
+    mixed = ns_q > 0 & unq > 0,
+    stringsAsFactors = FALSE
+  )
+}))
+mixed <- ns_df[ns_df$mixed, ]
+if (nrow(mixed) > 0) {
+  knitr::kable(mixed[order(mixed$unqualified, decreasing = TRUE), ],
+               align = "lccc",
+               caption = "Files mixing testthat::expect_* and bare expect_*. Pick one style.")
+} else {
+  cat("All files use consistent namespacing. ✅")
+}
+```
+
+# CI alignment
+
+The repository ships these workflows touching tests:
+
+```{r ci-audit, results = "asis"}
+wf_dir <- normalizePath(file.path(getwd(), ".github/workflows"), mustWork = FALSE)
+if (dir.exists(wf_dir)) {
+  wfs <- list.files(wf_dir, pattern = "\\.ya?ml$", full.names = TRUE)
+  knitr::kable(
+    data.frame(workflow = basename(wfs), stringsAsFactors = FALSE),
+    align = "l"
+  )
+}
+```
+
+- `check-standard.yaml` — mac/win/linux × release/devel/oldrel. Mocked tests
+  only (live tests skip because `AMADEUS_LIVE_TESTS` is unset).
+- `test-coverage-local.yaml` — daily coverage. Excludes live tests.
+- `test-live.yaml` — weekly + `workflow_dispatch`. Runs **only**
+  `test-*-live.R`. Requires `EARTHDATA_TOKEN` secret.
+
+# Best-practice assessment
+
+## What is working well
+
+1. Broad assertion coverage across dataset-specific test files.
+2. Consistent use of `testthat::local_mocked_bindings(..., .package = "amadeus")`
+   as the single mocking idiom.
+3. Folder layout cleanly separates fixtures (`testdata/`) from tests
+   (`testthat/`).
+4. Live network tests are now isolated into `test-*-live.R` files and gated
+   by `skip_if_no_live_tests()`.
+
+## File-specific recommendations
+
+Generated automatically from the scorecards above. Highest-leverage items
+first.
+
+```{r recommendations, results = "asis"}
+recs <- character()
+big_files <- test_df[test_df$n_lines > 800 & !test_df$is_live, ]
+for (i in seq_len(nrow(big_files))) {
+  recs <- c(recs, sprintf(
+    "- **Split `%s`** (%d LOC, %d expect_*). Split along download / process / calc axes.",
+    big_files$file[i], big_files$n_lines[i], big_files$expect_calls[i]
+  ))
+}
+weak_top <- quality_df[quality_df$weak_pct > 25, ]
+for (i in seq_len(nrow(weak_top))) {
+  recs <- c(recs, sprintf(
+    "- **Strengthen assertions in `%s`** (weak_pct=%.1f%%, %d `expect_no_error`, %d weak `expect_true(...)`).",
+    weak_top$file[i], weak_top$weak_pct[i],
+    weak_top$expect_no_error[i],
+    weak_top$true_inherits[i] + weak_top$true_file_exists[i] +
+      weak_top$true_length_gt[i] + weak_top$true_nrow_gt[i] +
+      weak_top$true_is_dot[i]
+  ))
+}
+loop_files <- quality_df[quality_df$loops_in_tests > 2, ]
+for (i in seq_len(nrow(loop_files))) {
+  recs <- c(recs, sprintf(
+    "- **Replace for-loops in `%s`** (%d loops) with `patrick::with_parameters_test_that()`.",
+    loop_files$file[i], loop_files$loops_in_tests[i]
+  ))
+}
+if (!length(recs)) {
+  cat("No high-priority items detected.\n")
+} else {
+  cat(paste(recs, collapse = "\n"), "\n")
+}
+```
+
+# Reproducibility
+
+Regenerate this report with:
+
+```bash
+Rscript tests/test_report/render_report.R
+```

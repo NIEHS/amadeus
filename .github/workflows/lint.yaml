@@ -31,3 +31,7 @@ jobs:
         env:
           FILTER_REGEX_EXCLUDE: vignettes/.*_workflow\\.Rmd
           LINTR_ERROR_ON_LINT: true
+
+      - name: Test assertion-quality lint (advisory)
+        run: Rscript tests/lint_tests.R
+        continue-on-error: true

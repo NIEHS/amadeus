@@ -1,0 +1,175 @@
+---
+title: "Testing amadeus"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Testing amadeus}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+This vignette documents the testing layout and conventions used by
+`amadeus`. It is intended for contributors adding tests for an existing
+dataset or wiring up tests for a new one.
+
+# Layout
+
+```
+tests/
+  testthat.R
+  testthat/
+    helper-fixtures.R          # canonical AOIs, sample dates, tiny rasters
+    helper-mocks-download.R    # check_url_status, download_run_method, ...
+    helper-mocks-process.R     # terra/sf canned objects, file-listing mocks
+    helper-skips.R             # skip_if_no_live_tests, skip_if_no_credentials
+    test-<dataset>.R           # mocked / fixture-driven (CRAN/CI safe)
+    test-<dataset>-live.R      # live API tests (scheduled CI only)
+  testdata/                    # static fixtures
+  test_report/                 # quality-scorecard rmd
+```
+
+Helper files are auto-loaded by `testthat` (any file starting with `helper-`
+in `tests/testthat/`).
+
+# Two tiers of tests
+
+## Mocked / fixture tests (`test-<dataset>.R`)
+
+- Run on every PR via `check-standard.yaml` and in `test-coverage-local.yaml`.
+- Must be CRAN-safe: no network calls, no external credentials.
+- Use the helpers in `helper-mocks-*.R` to intercept download/IO internals.
+- Should cover dispatch logic, branching, error paths, and input validation.
+
+## Live tests (`test-<dataset>-live.R`)
+
+- Run only on the scheduled `test-live` workflow (weekly + `workflow_dispatch`)
+  or locally with `AMADEUS_LIVE_TESTS=true`.
+- Exercise the real upstream API: one minimal real download per function,
+  asserting the file is reachable, non-empty, and (where cheap) parseable.
+- Each test must start with `skip_if_no_live_tests()` and any required
+  `skip_if_no_credentials("EARTHDATA_TOKEN")` calls.
+
+# Mocking conventions
+
+Use `testthat::local_mocked_bindings(..., .package = "amadeus")` as the only
+mocking idiom. Reusable mocks live in `helper-mocks-*.R` as **factory
+functions** returning named lists of bindings.
+
+```{r}
+testthat::test_that(
+  "download_aqs(hash=TRUE, unzip=TRUE): returns hash string",
+  {
+    local_download_mocks(hash_value = "hash-ok")
+    res <- amadeus::download_aqs(
+      resolution_temporal = "daily",
+      parameter_code = "88101",
+      year = 2020,
+      directory_to_save = withr::local_tempdir(),
+      acknowledgement = TRUE,
+      unzip = TRUE,
+      hash = TRUE
+    )
+    testthat::expect_identical(res, "hash-ok")
+  }
+)
+```
+
+To extend or override a factory:
+
+```{r}
+local_download_mocks(success = 0L, failed = 1L, url_ok = FALSE)
+```
+
+Dataset-specific bindings used in only one file (e.g.
+`download_normalize_aqs_unzip`) can be defined inline at the call site.
+
+# Skip conventions
+
+All conditional skipping goes through `helper-skips.R`:
+
+| Helper | When to use |
+|---|---|
+| `skip_if_no_live_tests()` | Top of every `test-*-live.R` test_that block |
+| `skip_if_no_credentials("EARTHDATA_TOKEN")` | Live tests requiring credentials |
+| `skip_if_pkg_missing("rstac")` | Tests depending on optional Suggests |
+
+Do not use bare `testthat::skip_on_cran()` in test bodies — that is the job
+of the live/mocked split.
+
+# Assertion conventions
+
+- Always namespace: `testthat::expect_*`.
+- Prefer typed expectations:
+
+| Avoid | Prefer |
+|---|---|
+| `expect_true(inherits(x, "SpatRaster"))` | `expect_s4_class(x, "SpatRaster")` |
+| `expect_true(inherits(x, "data.frame"))` | `expect_s3_class(x, "data.frame")` |
+| `expect_true(file.exists(p))` | keep + `expect_gt(file.info(p)$size, 0)` |
+| `expect_true(length(x) > 0)` | `expect_gt(length(x), 0)` or `expect_length` |
+| `expect_no_error(f(...))` | assign result and assert on its class/value |
+
+A static check is shipped in `tests/lint_tests.R`. It reports occurrences of
+the patterns in the "Avoid" column. Run it locally with:
+
+```bash
+Rscript tests/lint_tests.R           # advisory (always exits 0)
+Rscript tests/lint_tests.R --strict  # fail build on any hit
+```
+
+The CI `lint` workflow runs this script in advisory mode. As legacy weak
+assertions are migrated, contributors should aim to keep the count strictly
+decreasing.
+
+# Test naming
+
+Test descriptions must encode the input combination under test:
+
+```
+test_that("<fn>(<arg=value>, ...): <expected behavior>", { ... })
+```
+
+Examples:
+
+- `"download_aqs(resolution_temporal='daily', hash=TRUE): returns hash string"`
+- `"download_geos(collection=<bad>, acknowledgement=TRUE): errors on bad collection"`
+- `"process_modis_swath(path=<missing>): errors on non-existent path"`
+
+For matrix-style cases (e.g. "all datasets reject `acknowledgement = FALSE`")
+use `patrick::with_parameters_test_that()` so each parameter row appears as a
+separate test in failure output.
+
+# Adding tests for a new dataset
+
+Follow this checklist (mirroring the dataset-addition workflow in
+`AGENTS.md`):
+
+1. Create `tests/testthat/test-<dataset>.R` with:
+   - One block per input-combination branch in `download_<dataset>()`.
+   - Acknowledgement and directory validation tests.
+   - Mock-based success path using `local_download_mocks(...)`.
+2. Create `tests/testthat/test-<dataset>-live.R` with one minimal real
+   download. Gate with `skip_if_no_live_tests()` and any credential helpers.
+3. Add mocked tests for `process_<dataset>()` and (if applicable)
+   `calc_<dataset>()` in the same file.
+4. Make sure `download_data(dataset_name = "<dataset>")` is exercised by
+   `test-download.R` (or `test-download-dispatch.R` once split).
+
+# Running tests
+
+```bash
+# Mocked tests only (default)
+Rscript -e "devtools::test()"
+
+# A filter
+Rscript -e "devtools::test(filter = 'aqs')"
+
+# Live tests only
+AMADEUS_LIVE_TESTS=true Rscript -e "devtools::test(filter = '-live$')"
+
+# Regenerate test_report.html
+Rscript tests/test_report/render_report.R
+```

@@ -22,17 +22,19 @@
 - Tests use `testthat` (edition 3) with `testthat::test_that()` wrappers
 
 ## Testing
-- Test files live in `tests/testthat/` named `test-<dataset>.R`
-- Each dataset has dedicated tests; `test-download.R`, `test-process.R`, `test-calc.R` cover wrapper functions
-- Run tests with `devtools::test()` or `Rscript -e "testthat::test_dir('tests/testthat/')"`
-- Many download tests are skipped in CI (require credentials/network); see `tests/testskip/`
+- Test files live in `tests/testthat/` named `test-<dataset>.R`. Live API tests live alongside as `test-<dataset>-live.R` and are gated by `skip_if_no_live_tests()`.
+- Shared mock/fixture helpers live in `tests/testthat/helper-*.R` (auto-loaded by testthat): `helper-mocks-download.R`, `helper-mocks-process.R`, `helper-fixtures.R`, `helper-skips.R`.
+- Run mocked tests with `devtools::test()`; run live tests with `AMADEUS_LIVE_TESTS=true devtools::test(filter = "-live$")`. The scheduled workflow `.github/workflows/test-live.yaml` runs live tests weekly.
+- Test descriptions must use the form `"<fn>(<arg=value>, ...): <expected behavior>"` so failures identify the input combination under test.
+- Prefer typed expectations (`expect_s4_class`, `expect_gt`, `expect_length`) over `expect_true(inherits(...))`, `expect_true(length(x) > 0)`, or `expect_no_error()` wrappers.
+- See `vignettes/testing.Rmd` for full conventions and the `tests/test_report/test_report.html` quality scorecard.
 
 ## Adding a New Dataset
 1. Add a `download_<name>()` function in `download_auxiliary.R`
 2. Add the dataset name string(s) to the dispatch block in `download_data()` in `download.R`
 3. Repeat for `process_<name>()` / `process_covariates()` and `calc_<name>()` / `calculate_covariates()` as needed
 4. Export new functions in `NAMESPACE` (via `@export` roxygen tag + `devtools::document()`)
-5. Add a `test-<name>.R` test file
+5. Add `test-<name>.R` (mocked, CRAN-safe) using the `helper-mocks-*` factories, and `test-<name>-live.R` (gated by `skip_if_no_live_tests()`) for real-API verification
 
 ## Common Pitfalls
 - `terra` objects are not serializable across parallel workers — use file paths, not in-memory objects, across workers
