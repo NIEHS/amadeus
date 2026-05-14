@@ -4,7 +4,7 @@ linters: linters_with_defaults(
     line_length_linter(80)
   )
 exclusions: list(
-    "tests/testthat/",
+    "tests/",
     "inst/migration-to-httr-guide.R",
     "vignettes/",
     "vignettes/aqs_workflow.Rmd",
