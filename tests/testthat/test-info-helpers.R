@@ -79,3 +79,56 @@ testthat::test_that(
     })
   }
 )
+
+testthat::test_that(
+  "get_*_info(include_file=<invalid>): rejects invalid include_file inputs",
+  {
+    geos_path <- testthat::test_path("..", "testdata", "geos")
+    merra_path <- testthat::test_path("..", "testdata", "merra2")
+    modis_path <- testthat::test_path("..", "testdata", "modis")
+
+    testthat::expect_error(
+      get_geos_info(path = geos_path, include_file = "yes"),
+      regexp = "single logical value"
+    )
+    testthat::expect_error(
+      get_merra2_info(path = merra_path, include_file = NA),
+      regexp = "single logical value"
+    )
+    testthat::expect_error(
+      get_modis_info(path = modis_path, include_file = c(TRUE, FALSE)),
+      regexp = "single logical value"
+    )
+  }
+)
+
+testthat::test_that(
+  "get_*_info(path=<invalid>): rejects non-character path inputs",
+  {
+    testthat::expect_error(
+      get_geos_info(path = 1),
+      regexp = "non-empty character vector"
+    )
+    testthat::expect_error(
+      get_merra2_info(path = NA_character_),
+      regexp = "non-empty character vector"
+    )
+    testthat::expect_error(
+      get_modis_info(path = list(".")),
+      regexp = "non-empty character vector"
+    )
+  }
+)
+
+testthat::test_that(
+  "get_modis_info(path=<empty hdf>): returns metadata-derived error",
+  {
+    withr::with_tempdir({
+      file.create("empty.hdf")
+      testthat::expect_error(
+        suppressWarnings(get_modis_info(path = ".")),
+        regexp = "No MODIS product-subdataset metadata could be derived"
+      )
+    })
+  }
+)
