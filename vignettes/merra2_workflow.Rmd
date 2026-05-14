@@ -215,8 +215,6 @@ This article demonstrates a compact, multi-variable workflow for NASA MERRA-2 da
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
-Each workflow uses two example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and a generated contiguous-US Uber H3 grid at resolution 4 for polygon extraction.
-
 ## Available inputs and data availability
 
 `download_data(dataset_name = "merra2", ...)` wraps `download_merra2()`.
@@ -279,6 +277,8 @@ knitr::kable(
 
 ## Download representative requests
 
+You can use the helper function `get_merra2_info()` to query available variables from each collection.
+
 ```{r download, eval = live_run}
 
 merra2_demo_specs <- data.frame(
@@ -305,6 +305,7 @@ download_data(
   acknowledgement = TRUE
 )
 
+get_merra2_info(path = paste0(directory_to_save,"/inst1_2d_int_Nx"))
 ```
 
 This single request intentionally mixes authenticated GES DISC collections with

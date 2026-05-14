@@ -732,6 +732,273 @@ get_tri_info <- function(
   return(out)
 }
 
+# Internal helper: resolve and filter metadata-inspection file paths
+info_resolve_paths <- function(path = NULL, pattern = NULL, source_name = "files") {
+  if (is.null(path) || !is.character(path) || length(path) < 1 || anyNA(path)) {
+    stop("`path` must be a non-empty character vector.\n")
+  }
+  if (!is.character(pattern) || length(pattern) != 1L || !nzchar(pattern)) {
+    stop("`pattern` must be a single non-empty character string.\n")
+  }
+
+  path_entries <- unique(path)
+  expanded_paths <- unlist(
+    lapply(path_entries, function(p) {
+      if (dir.exists(p)) {
+        list.files(
+          path = p,
+          recursive = TRUE,
+          full.names = TRUE
+        )
+      } else {
+        p
+      }
+    }),
+    use.names = FALSE
+  )
+  expanded_paths <- unique(expanded_paths[file.exists(expanded_paths)])
+  matched <- grep(pattern, expanded_paths, ignore.case = TRUE, value = TRUE)
+  matched <- unique(matched)
+  if (length(matched) == 0L) {
+    stop(sprintf("No %s files were found in `path`.\n", source_name))
+  }
+  matched
+}
+
+# Internal helper: normalize variable selectors from raster layer names
+info_normalize_layer_variables <- function(layer_names) {
+  vars <- as.character(layer_names)
+  vars <- trimws(vars)
+  vars <- vars[nzchar(vars)]
+  vars <- sub("_[0-9]+$", "", vars)
+  vars <- sub("_lev=.*$", "", vars)
+  sort(unique(vars))
+}
+
+#' Get GEOS variable lookup information
+#' @description
+#' Returns a lookup table of available GEOS collection and variable selectors
+#' from locally downloaded GEOS-CF netCDF files. This helper inspects layer
+#' metadata only and does not read raster values into memory.
+#' @param path character(1+) Path(s) to GEOS file(s) and/or directory(ies)
+#'   containing GEOS-CF `.nc4` files.
+#' @param include_file logical(1). If `TRUE`, include a `file` column showing
+#'   the source file for each collection-variable row. Default `FALSE`.
+#' @param ... Placeholders.
+#' @return a `data.frame` with GEOS collection and variable selectors.
+#' @author Kyle Messier
+#' @examples
+#' \dontrun{
+#' get_geos_info(path = "./data/geos")
+#' get_geos_info(path = "./data/geos", include_file = TRUE)
+#' }
+#' @importFrom terra rast
+#' @export
+get_geos_info <- function(
+  path = NULL,
+  include_file = FALSE,
+  ...
+) {
+  if (!is.logical(include_file) || length(include_file) != 1L || is.na(include_file)) {
+    stop("`include_file` must be a single logical value (TRUE/FALSE).\n")
+  }
+  files <- info_resolve_paths(
+    path = path,
+    pattern = "GEOS-CF\\.v01\\.rpl.*\\.nc4$",
+    source_name = "GEOS-CF .nc4"
+  )
+
+  out_rows <- lapply(files, function(f) {
+    data_raw <- terra::rast(f)
+    vars <- info_normalize_layer_variables(names(data_raw))
+    collection <- unique(amadeus::process_collection(
+      f,
+      source = "geos",
+      collection = TRUE
+    ))
+    if (length(vars) == 0L || length(collection) == 0L) {
+      return(NULL)
+    }
+    row <- data.frame(
+      collection = rep(collection[1], length(vars)),
+      variable = vars,
+      file = rep(f, length(vars)),
+      stringsAsFactors = FALSE
+    )
+    row
+  })
+  out <- data.table::rbindlist(out_rows, fill = TRUE)
+  out <- as.data.frame(out, stringsAsFactors = FALSE)
+  if (nrow(out) == 0L) {
+    stop("No GEOS collection-variable metadata could be derived from `path`.\n")
+  }
+  if (!isTRUE(include_file)) {
+    out <- unique(out[, c("collection", "variable"), drop = FALSE])
+    out <- out[order(out$collection, out$variable), , drop = FALSE]
+  } else {
+    out <- unique(out[, c("collection", "variable", "file"), drop = FALSE])
+    out <- out[order(out$collection, out$variable, out$file), , drop = FALSE]
+  }
+  rownames(out) <- NULL
+  out
+}
+
+#' Get MERRA2 variable lookup information
+#' @description
+#' Returns a lookup table of available MERRA2 collection and variable selectors
+#' from locally downloaded MERRA2 netCDF files. This helper inspects layer
+#' metadata only and does not read raster values into memory.
+#' @param path character(1+) Path(s) to MERRA2 file(s) and/or directory(ies)
+#'   containing MERRA2 `.nc4` files (and optional FWI `.nc` files).
+#' @param include_file logical(1). If `TRUE`, include a `file` column showing
+#'   the source file for each collection-variable row. Default `FALSE`.
+#' @param ... Placeholders.
+#' @return a `data.frame` with MERRA2 collection and variable selectors.
+#' @author Kyle Messier
+#' @examples
+#' \dontrun{
+#' get_merra2_info(path = "./data/merra2")
+#' get_merra2_info(path = "./data/merra2", include_file = TRUE)
+#' }
+#' @importFrom terra rast
+#' @export
+get_merra2_info <- function(
+  path = NULL,
+  include_file = FALSE,
+  ...
+) {
+  if (!is.logical(include_file) || length(include_file) != 1L || is.na(include_file)) {
+    stop("`include_file` must be a single logical value (TRUE/FALSE).\n")
+  }
+  files <- info_resolve_paths(
+    path = path,
+    pattern = "(MERRA2_400\\..*\\.nc4$|FWI\\..*\\.nc$)",
+    source_name = "MERRA2 netCDF"
+  )
+
+  out_rows <- lapply(files, function(f) {
+    data_raw <- terra::rast(f)
+    collection <- unique(amadeus::process_collection(
+      f,
+      source = "merra2",
+      collection = TRUE
+    ))
+    vars <- info_normalize_layer_variables(names(data_raw))
+    if (length(collection) == 1L && collection == "fwi") {
+      vars <- sub("^MERRA2\\.CORRECTED_", "", vars)
+    }
+    vars <- sort(unique(vars[nzchar(vars)]))
+    if (length(vars) == 0L || length(collection) == 0L) {
+      return(NULL)
+    }
+    data.frame(
+      collection = rep(collection[1], length(vars)),
+      variable = vars,
+      file = rep(f, length(vars)),
+      stringsAsFactors = FALSE
+    )
+  })
+  out <- data.table::rbindlist(out_rows, fill = TRUE)
+  out <- as.data.frame(out, stringsAsFactors = FALSE)
+  if (nrow(out) == 0L) {
+    stop("No MERRA2 collection-variable metadata could be derived from `path`.\n")
+  }
+  if (!isTRUE(include_file)) {
+    out <- unique(out[, c("collection", "variable"), drop = FALSE])
+    out <- out[order(out$collection, out$variable), , drop = FALSE]
+  } else {
+    out <- unique(out[, c("collection", "variable", "file"), drop = FALSE])
+    out <- out[order(out$collection, out$variable, out$file), , drop = FALSE]
+  }
+  rownames(out) <- NULL
+  out
+}
+
+# Internal helper: derive MODIS subdataset labels without loading raster values
+info_modis_subdatasets <- function(path = NULL) {
+  sds_desc <- try(terra::describe(path, sds = TRUE), silent = TRUE)
+  if (!inherits(sds_desc, "try-error") && nrow(sds_desc) > 0) {
+    candidate_col <- if ("var" %in% names(sds_desc)) "var" else "name"
+    if (!is.null(candidate_col) && candidate_col %in% names(sds_desc)) {
+      sds <- trimws(as.character(sds_desc[[candidate_col]]))
+      sds <- sds[!is.na(sds) & nzchar(sds)]
+      if (length(sds) > 0L) {
+        return(sort(unique(sds)))
+      }
+    }
+  }
+  sds_read <- try(terra::rast(path, raw = TRUE), silent = TRUE)
+  if (inherits(sds_read, "try-error")) {
+    return(character(0))
+  }
+  sds <- trimws(as.character(names(sds_read)))
+  sds <- sds[!is.na(sds) & nzchar(sds)]
+  sort(unique(sds))
+}
+
+#' Get MODIS product subdataset lookup information
+#' @description
+#' Returns a lookup table of available MODIS product and subdataset selectors
+#' from locally downloaded MODIS/VIIRS-style HDF/H5 files. This helper uses
+#' metadata inspection (`terra::describe(..., sds = TRUE)` and layer names) and
+#' does not read raster values into memory.
+#' @param path character(1+) Path(s) to MODIS file(s) and/or directory(ies)
+#'   containing `.hdf`/`.h5` files.
+#' @param include_file logical(1). If `TRUE`, include a `file` column showing
+#'   the source file for each product-subdataset row. Default `FALSE`.
+#' @param ... Placeholders.
+#' @return a `data.frame` with MODIS product and subdataset selectors.
+#' @author Kyle Messier
+#' @examples
+#' \dontrun{
+#' get_modis_info(path = "./data/modis")
+#' get_modis_info(path = "./data/modis", include_file = TRUE)
+#' }
+#' @importFrom terra describe
+#' @importFrom terra rast
+#' @export
+get_modis_info <- function(
+  path = NULL,
+  include_file = FALSE,
+  ...
+) {
+  if (!is.logical(include_file) || length(include_file) != 1L || is.na(include_file)) {
+    stop("`include_file` must be a single logical value (TRUE/FALSE).\n")
+  }
+  files <- info_resolve_paths(
+    path = path,
+    pattern = "\\.(hdf|h5)$",
+    source_name = "MODIS HDF/H5"
+  )
+  out_rows <- lapply(files, function(f) {
+    sds <- info_modis_subdatasets(path = f)
+    product <- sub("\\..*$", "", basename(f))
+    if (length(sds) == 0L || !nzchar(product)) {
+      return(NULL)
+    }
+    data.frame(
+      product = rep(product, length(sds)),
+      subdataset = sds,
+      file = rep(f, length(sds)),
+      stringsAsFactors = FALSE
+    )
+  })
+  out <- data.table::rbindlist(out_rows, fill = TRUE)
+  out <- as.data.frame(out, stringsAsFactors = FALSE)
+  if (nrow(out) == 0L) {
+    stop("No MODIS product-subdataset metadata could be derived from `path`.\n")
+  }
+  if (!isTRUE(include_file)) {
+    out <- unique(out[, c("product", "subdataset"), drop = FALSE])
+    out <- out[order(out$product, out$subdataset), , drop = FALSE]
+  } else {
+    out <- unique(out[, c("product", "subdataset", "file"), drop = FALSE])
+    out <- out[order(out$product, out$subdataset, out$file), , drop = FALSE]
+  }
+  rownames(out) <- NULL
+  out
+}
+
 
 #' Check date format
 #' @description

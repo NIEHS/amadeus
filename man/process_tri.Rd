@@ -74,10 +74,10 @@ This function imports and cleans raw toxic release data,
 returning a single \code{SpatVector} (points) object for the selected \code{year}.
 }
 \note{
-Visit \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox}{TRI Data and Tools}
-to view the available years and variables. Use \code{\link[=get_tri_info]{get_tri_info()}} to inspect
+Use \code{\link[=get_tri_info]{get_tri_info()}} to inspect
 available TRI chemical IDs/names/CAS numbers and industry sector codes in
-local TRI files.
+local TRI files. Visit \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox}{TRI Data and Tools}
+to view the available years and variables.
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
@@ -96,5 +96,5 @@ tri <- process_tri(
 https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox
 }
 \author{
-Insang Song, Mariana Kassien
+Kyle Messier
 }

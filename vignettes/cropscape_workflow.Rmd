@@ -27,172 +27,12 @@ live_run <- local({
   force || !(on_ci || on_cran)
 })
 
-triangle_aqs_path <- c(
-  file.path("tests", "testdata", "aqs", "aqs_daily_88101_triangle.csv"),
-  file.path("..", "tests", "testdata", "aqs", "aqs_daily_88101_triangle.csv")
-)
-triangle_aqs_path <- triangle_aqs_path[file.exists(triangle_aqs_path)][1]
-if (is.na(triangle_aqs_path) || triangle_aqs_path == "") {
-  stop("Could not locate tests/testdata/aqs/aqs_daily_88101_triangle.csv")
-}
-triangle_aqs <- unique(utils::read.csv(triangle_aqs_path)[
-  c("State.Code", "County.Code", "Site.Num", "Latitude", "Longitude")
-])
-triangle_aqs$site_id <- paste(
-  triangle_aqs$State.Code,
-  triangle_aqs$County.Code,
-  triangle_aqs$Site.Num,
-  sep = "-"
-)
-example_points_sf <- sf::st_as_sf(
-  triangle_aqs[c("site_id", "Longitude", "Latitude")],
-  coords = c("Longitude", "Latitude"),
-  crs = 4269
-)
-example_points_sf <- sf::st_transform(example_points_sf, 4326)
-durham_hex_path <- system.file(
-  "extdata", "data_files", "durham_h3_res8.rds", package = "amadeus"
-)
-if (durham_hex_path == "") {
-  source_candidates <- c(
-    file.path("inst", "extdata", "data_files", "durham_h3_res8.rds"),
-    file.path("..", "inst", "extdata", "data_files", "durham_h3_res8.rds")
-  )
-  durham_hex_path <- source_candidates[file.exists(source_candidates)][1]
-}
-if (is.na(durham_hex_path) || durham_hex_path == "") {
-  stop("Could not locate inst/extdata/data_files/durham_h3_res8.rds")
-}
-durham_hex <- readRDS(durham_hex_path)
-durham_hex_sf <- sf::st_transform(sf::st_as_sf(durham_hex), 4326)
 
-workflow_bbox <- sf::st_bbox(c(
-  sf::st_geometry(example_points_sf),
-  sf::st_geometry(durham_hex_sf)
-))
-workflow_extent_wgs84 <- sf::st_as_sfc(sf::st_bbox(c(
-  xmin = workflow_bbox[["xmin"]] - 0.15,
-  xmax = workflow_bbox[["xmax"]] + 0.15,
-  ymin = workflow_bbox[["ymin"]] - 0.15,
-  ymax = workflow_bbox[["ymax"]] + 0.15
-), crs = sf::st_crs(4326)))
-
-
-pick_value_column <- function(x) {
-  geom_col <- attr(x, "sf_column")
-  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
-  candidates <- setdiff(names(x), excluded)
-  if (length(candidates) == 0) {
-    stop("No plottable covariate columns found.")
-  }
-  preferred <- candidates[vapply(x[candidates], function(col) {
-    is.numeric(col) || is.character(col) || is.factor(col)
-  }, logical(1))]
-  if (length(preferred) > 0) preferred[1] else candidates[1]
-}
-
-pick_fraction_columns <- function(x, n = 4) {
-  geom_col <- attr(x, "sf_column")
-  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
-  candidates <- setdiff(names(x), excluded)
-  numeric_candidates <- candidates[vapply(x[candidates], is.numeric, logical(1))]
-  numeric_candidates <- numeric_candidates[grepl("^cropscape_", numeric_candidates)]
-  if (length(numeric_candidates) == 0) {
-    stop("No numeric CropScape fraction columns found.")
-  }
-
-  means <- vapply(numeric_candidates, function(col) {
-    mean(x[[col]], na.rm = TRUE)
-  }, numeric(1))
-  means[is.na(means)] <- -Inf
-  numeric_candidates <- numeric_candidates[means > 0]
-  if (length(numeric_candidates) == 0) {
-    numeric_candidates <- names(sort(means, decreasing = TRUE))
-  } else {
-    numeric_candidates <- names(sort(means[numeric_candidates], decreasing = TRUE))
-  }
-
-  head(numeric_candidates, n)
-}
-
-make_fraction_plot_data <- function(x, n = 4) {
-  selected_cols <- pick_fraction_columns(x, n = n)
-  plot_df <- do.call(rbind, lapply(selected_cols, function(col) {
-    data.frame(
-      fraction = x[[col]],
-      variable = gsub("^cropscape_\\d+_", "", col),
-      stringsAsFactors = FALSE
-    )
-  }))
-  geometry <- do.call(c, rep(list(sf::st_geometry(x)), length(selected_cols)))
-  sf::st_sf(plot_df, geometry = geometry, crs = sf::st_crs(x))
-}
-
-coord_local_sf <- function(x) {
-  x_wgs84 <- sf::st_transform(sf::st_as_sf(x), 4326)
-  bbox <- sf::st_bbox(x_wgs84)
-  pad_x <- max((bbox[["xmax"]] - bbox[["xmin"]]) * 0.08, 0.05)
-  pad_y <- max((bbox[["ymax"]] - bbox[["ymin"]]) * 0.08, 0.05)
-  ggplot2::coord_sf(
-    xlim = c(bbox[["xmin"]] - pad_x, bbox[["xmax"]] + pad_x),
-    ylim = c(bbox[["ymin"]] - pad_y, bbox[["ymax"]] + pad_y),
-    expand = FALSE,
-    datum = NA
-  )
-}
-
-plot_points <- function(x, title) {
-  plot_data <- make_fraction_plot_data(x, n = 4)
-  ggplot2::ggplot(plot_data) +
-    ggplot2::geom_sf(
-      ggplot2::aes(color = fraction),
-      size = 1.6
-    ) +
-    ggplot2::facet_wrap(~ variable, ncol = 2) +
-    coord_local_sf(plot_data) +
-    ggplot2::scale_color_viridis_c(
-      limits = c(0, 1),
-      option = "C",
-      labels = scales::label_percent(accuracy = 1)
-    ) +
-    ggplot2::labs(title = title, color = "fraction") +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(
-      legend.position = "bottom",
-      legend.key.width = grid::unit(1.5, "cm"),
-      strip.text = ggplot2::element_text(face = "bold")
-    )
-}
-
-plot_polygons <- function(x, title) {
-  plot_data <- make_fraction_plot_data(x, n = 4)
-  ggplot2::ggplot(plot_data) +
-    ggplot2::geom_sf(
-      ggplot2::aes(fill = fraction),
-      color = NA
-    ) +
-    ggplot2::facet_wrap(~ variable, ncol = 2) +
-    coord_local_sf(plot_data) +
-    ggplot2::scale_fill_viridis_c(
-      limits = c(0, 1),
-      option = "C",
-      labels = scales::label_percent(accuracy = 1)
-    ) +
-    ggplot2::labs(title = title, fill = "fraction") +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(
-      legend.position = "bottom",
-      legend.key.width = grid::unit(1.5, "cm"),
-      strip.text = ggplot2::element_text(face = "bold")
-    )
-}
 ```
 
 This article demonstrates a compact workflow for USDA CropScape (Cropland Data Layer) rasters.
 
 This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
-
-Each workflow uses two small example surfaces: `example_points_sf`, a set of real Triangle-region AQS monitoring locations derived from `tests/testdata/aqs/aqs_daily_88101_triangle.csv`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
 ## Available inputs and data availability
 
@@ -339,14 +179,7 @@ knitr::kable(
 
 ```{r download, eval = live_run}
 directory_to_save <- file.path(tempdir(), "cropscape_workflow")
-download_data(
-  dataset_name = "cropscape",
-  year = 2019,
-  source = "GMU",
-  directory_to_save = directory_to_save,
-  acknowledgement = TRUE,
-  unzip = TRUE
-)
+
 download_data(
   dataset_name = "cropscape",
   year = 2020,
@@ -366,12 +199,11 @@ cropscape_path <- list.files(
   recursive = TRUE,
   full.names = TRUE
 )[1]
+
 cropscape_reference <- terra::rast(cropscape_path)
-points_projected <- terra::project(
-  terra::vect(example_points_sf),
-  terra::crs(cropscape_reference)
-)
-processing_extent <- terra::ext(points_projected)
+
+print(cropscape_reference)
+
 processed_data <- process_covariates(
   covariate = "cropscape",
   path = cropscape_path,
@@ -386,6 +218,28 @@ plot(processed_data, main = "Processed CropScape raster")
 Note that if no radius is specified, the point extraction will return the value of the raster cell containing each point. In this case, the output columns are binary indicators of whether each CropScape class is present at that location. With a radius specified, the output columns are a fraction of each class within the circular buffer around each point, so values can range from 0 to 1 and multiple classes can be present at the same location with varying proportions.
 
 ```{r calculate-points, eval = live_run}
+
+domain_x <- c(terra::xmin(processed_data), terra::xmax(processed_data))
+domain_y <- c(terra::ymin(processed_data), terra::ymax(processed_data))
+domain_dx <- diff(domain_x)
+domain_dy <- diff(domain_y)
+
+candidate_xy <- expand.grid(
+  lon = seq(domain_x[1] + 0.12 * domain_dx, domain_x[2] - 0.12 * domain_dx, length.out = 5),
+  lat = seq(domain_y[1] + 0.12 * domain_dy, domain_y[2] - 0.12 * domain_dy, length.out = 5)
+)
+raster_crs <- sf::st_crs(terra::crs(processed_data))
+if (is.na(raster_crs)) {
+  stop("`processed_data` is missing CRS; cannot build extraction points.")
+}
+example_points_sf <- sf::st_as_sf(
+  candidate_xy,
+  coords = c("lon", "lat"),
+  crs = raster_crs
+)
+example_points_sf$site_id <- paste0("site_", seq_len(nrow(example_points_sf)))
+
+
 point_values <- calculate_covariates(
   covariate = "cropscape",
   from = processed_data,
@@ -408,4 +262,3 @@ point_proportion_100m <- calculate_covariates(
 
 print(point_proportion_100m)
 ```
-

@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "2024-07-09"
-author: "Mitchell Manware"
+author: "Kyle Messier, Mitchell Manware"
 ---
 
 The `download_data` function from `amadeus` provides access to a variety of
@@ -27,8 +27,6 @@ automatically using that token.
 
 Visit [https://urs.earthdata.nasa.gov/](https://urs.earthdata.nasa.gov/) to
 register for or log into a NASA EarthData account.
-
-![NASA EarthData Account Landing Page](images/NASA_EarthData_login.png)
 
 Account registration provides access to NASA's Earth Observing System Data
 and Information System (EOSDIS) and its twelve Distributed Active Archive
@@ -57,8 +55,6 @@ After creating an account, navigate to "My Profile"
 which NASA EarthData applications can use your login credentials. For this
 example, ensure that authorization is enabled for "SEDAC Website",
 "SEDAC Website (Alpha)", and "SEDAC Website (Beta)".
-
-![NASA EarthData Approved Applications](images/NASA_EarthData_applications.png)
 
 ## Generating a NASA EarthData Token
 
@@ -166,33 +162,6 @@ to_cat <-
   )
 cat(to_cat)
 ```
-
-Check the downloaded data files.
-
-```{r, eval = FALSE}
-list.files("./sedac_population")
-```
-
-```{r, echo = FALSE}
-sedac_files <- c(
-  paste0(
-    "gpw_v4_population_density_adjusted_to_2015_unwpp_country_totals_",
-    "rev11_2020_1_deg_tif_readme.txt"
-  ),
-  paste0(
-    "gpw_v4_population_density_adjusted_to_2015_unwpp_country_totals_",
-    "rev11_2020_1_deg_tif.zip"
-  ),
-  paste0(
-    "gpw_v4_population_density_adjusted_to_2015_unwpp_country_totals_",
-    "rev11_2020_1_deg.tif"
-  )
-)
-sedac_files
-```
-
-As indicated by the files in `./sedac_population`, the data files have been
-downloaded properly.
 
 ## References
 

@@ -130,4 +130,14 @@ processed_chems <- process_covariates(
   year = 2023,
   variables = "ON-SITE RELEASE TOTAL"
 )
+
+point_values_chems <- calculate_covariates(
+  covariate = "tri",
+  from = processed_chems,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  decay_range = 5000, # 5 km decay range for illustrative purposes
+  use_threshold = FALSE,
+  geom = "sf"
+)
 ```
