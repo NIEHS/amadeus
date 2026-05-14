@@ -103,15 +103,10 @@
 #' Remove (\code{TRUE}) or keep (\code{FALSE})
 #' the text file containing download commands.
 #' @author Insang Song
-#' @note `extdata/openlandmap_assets.rds` contains the available assets in OpenLandMap.
-#' Users may want to check the available assets to download data directly.
-#' For developers: JSON files should be found at STAC catalog of OpenLandMap when updated.
 #' @return NULL; GeoTIFF (.tif) files will be stored in
 #' \code{directory_to_save}.
 #' @seealso [list_stac_files]
 #' @importFrom Rdpack reprompt
-#' @references
-#' \insertRef{data_hengl2023openlandmap}{amadeus}
 #' @examples
 #' \dontrun{
 #' download_olm(

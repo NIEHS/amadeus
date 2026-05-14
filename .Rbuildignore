@@ -22,6 +22,10 @@ tests
 R/ignore.R
 inst/extdata/air.2m
 inst/extdata/nasa/token.txt
+inst/extdata/presentations/
+inst/extdata/data_files/durham_h3_res8.rds
+inst/extdata/nasa/LAADS_query.2024-08-02T12_49.csv
+inst/extdata/nlcd_classes.csv
 LICENSE.md
 ^CRAN-SUBMISSION$
 ^tests/container/

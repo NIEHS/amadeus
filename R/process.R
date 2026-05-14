@@ -1378,13 +1378,13 @@ process_ecoregion <-
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Placeholders.
-#' @author Insang Song, Mariana Kassien
+#' @author Kyle Messier
 #' @return a `SpatVector` object (points) in `year`
 #' `year` is stored in a field named `"year"`.
-#' @note Visit [TRI Data and Tools](https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox)
-#' to view the available years and variables. Use [get_tri_info()] to inspect
+#' @note Use [get_tri_info()] to inspect
 #' available TRI chemical IDs/names/CAS numbers and industry sector codes in
-#' local TRI files.
+#' local TRI files. Visit [TRI Data and Tools](https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox)
+#' to view the available years and variables.
 #' @references
 #' https://www.epa.gov/toxics-release-inventory-tri-program/tri-toolbox
 #' @importFrom terra vect
@@ -1449,8 +1449,9 @@ process_tri <- function(
       stop("`chemical` cannot include empty patterns.\n")
     }
   }
-  if (!is.logical(ignore_case) || length(ignore_case) != 1 ||
-        is.na(ignore_case)) {
+  if (
+    !is.logical(ignore_case) || length(ignore_case) != 1 || is.na(ignore_case)
+  ) {
     stop("`ignore_case` must be TRUE or FALSE.\n")
   }
   industry_group <- match.arg(industry_group)
@@ -1660,7 +1661,10 @@ process_tri <- function(
       keepgeom = TRUE
     )
   attr(spvect_tri, "tri_year") <- year
-  tri_target_fields <- setdiff(names(spvect_tri), c("YEAR", "LONGITUDE", "LATITUDE"))
+  tri_target_fields <- setdiff(
+    names(spvect_tri),
+    c("YEAR", "LONGITUDE", "LATITUDE")
+  )
   attr(spvect_tri, "tri_target_fields") <- tri_target_fields
   attr(spvect_tri, "tri_grouping") <- names_from_cols
   attr(spvect_tri, "tri_variables") <- selected_variable_cols
@@ -3116,8 +3120,11 @@ process_geos <-
         available_base <- sort(unique(sub("_lev=.*$", "", names(data_raw))))
         stop(
           paste0(
-            "Variable '", variable, "' was not found in collection ",
-            collection, ".\n",
+            "Variable '",
+            variable,
+            "' was not found in collection ",
+            collection,
+            ".\n",
             "Available case-sensitive variables include: ",
             paste(available_base, collapse = ", "),
             ".\n"
@@ -3131,7 +3138,8 @@ process_geos <-
       matched_base <- sort(unique(sub("_lev=.*$", "", names(data_variable))))
       if (!(variable %in% matched_base)) {
         message(
-          "Requested variable '", variable,
+          "Requested variable '",
+          variable,
           "' matched case-sensitive variable(s): ",
           paste(matched_base, collapse = ", "),
           ".\n"

@@ -25,7 +25,6 @@ Imports:
     exactextractr,
     utils,
     stringi,
-    testthat (>= 3.0.0),
     stars,
     tidyr,
     rlang,
@@ -33,6 +32,7 @@ Imports:
     collapse,
     Rdpack
 Suggests:
+    testthat (>= 3.0.0),
     covr,
     withr,
     knitr,
