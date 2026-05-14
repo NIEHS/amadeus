@@ -733,7 +733,11 @@ get_tri_info <- function(
 }
 
 # Internal helper: resolve and filter metadata-inspection file paths
-info_resolve_paths <- function(path = NULL, pattern = NULL, source_name = "files") {
+info_resolve_paths <- function(
+  path = NULL,
+  pattern = NULL,
+  source_name = "files"
+) {
   if (is.null(path) || !is.character(path) || length(path) < 1 || anyNA(path)) {
     stop("`path` must be a non-empty character vector.\n")
   }
@@ -799,7 +803,11 @@ get_geos_info <- function(
   include_file = FALSE,
   ...
 ) {
-  if (!is.logical(include_file) || length(include_file) != 1L || is.na(include_file)) {
+  if (
+    !is.logical(include_file) ||
+      length(include_file) != 1L ||
+      is.na(include_file)
+  ) {
     stop("`include_file` must be a single logical value (TRUE/FALSE).\n")
   }
   files <- info_resolve_paths(
@@ -867,7 +875,11 @@ get_merra2_info <- function(
   include_file = FALSE,
   ...
 ) {
-  if (!is.logical(include_file) || length(include_file) != 1L || is.na(include_file)) {
+  if (
+    !is.logical(include_file) ||
+      length(include_file) != 1L ||
+      is.na(include_file)
+  ) {
     stop("`include_file` must be a single logical value (TRUE/FALSE).\n")
   }
   files <- info_resolve_paths(
@@ -901,7 +913,9 @@ get_merra2_info <- function(
   out <- data.table::rbindlist(out_rows, fill = TRUE)
   out <- as.data.frame(out, stringsAsFactors = FALSE)
   if (nrow(out) == 0L) {
-    stop("No MERRA2 collection-variable metadata could be derived from `path`.\n")
+    stop(
+      "No MERRA2 collection-variable metadata could be derived from `path`.\n"
+    )
   }
   if (!isTRUE(include_file)) {
     out <- unique(out[, c("collection", "variable"), drop = FALSE])
@@ -962,7 +976,11 @@ get_modis_info <- function(
   include_file = FALSE,
   ...
 ) {
-  if (!is.logical(include_file) || length(include_file) != 1L || is.na(include_file)) {
+  if (
+    !is.logical(include_file) ||
+      length(include_file) != 1L ||
+      is.na(include_file)
+  ) {
     stop("`include_file` must be a single logical value (TRUE/FALSE).\n")
   }
   files <- info_resolve_paths(

@@ -40,6 +40,7 @@ vignettes/images/vnp*
 vignettes/all_datasets_workflow.Rmd
 vignettes/.*_workflow\.Rmd$
 ^vignettes/calculate_time_grouping\.Rmd$
+^vignettes/testing\.Rmd$
 vignettes/all_datasets_workflow_files
 ^doc$
 ^Meta$

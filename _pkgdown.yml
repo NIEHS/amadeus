@@ -117,6 +117,9 @@ reference:
 - contents:
   - setup_nasa_token
   - get_tri_info
+  - get_geos_info
+  - get_merra2_info
+  - get_modis_info
 
 articles:
 - title: Articles
@@ -148,4 +151,3 @@ articles:
   - prism_workflow
   - terraclimate_workflow
   - tri_workflow
-  - testing
