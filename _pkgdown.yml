@@ -41,6 +41,8 @@ navbar:
           href: articles/groads_workflow.html
         - text: NOAA HMS Smoke
           href: articles/hms_workflow.html
+        - text: NOAA GOES Aerosol Detection Product (ADP)
+          href: articles/noaa_goes_workflow.html
         - text: USGS Hydrologic Unit Codes (HUC)
           href: articles/huc_workflow.html
         - text: Koppen-Geiger Climate Classes
@@ -140,6 +142,7 @@ articles:
   - gridmet_workflow
   - groads_workflow
   - hms_workflow
+  - noaa_goes_workflow
   - huc_workflow
   - koppen_workflow
   - merra2_workflow

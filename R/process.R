@@ -3078,7 +3078,7 @@ process_geos <-
       )
     )
     #### initiate for loop
-    data_return <- terra::rast()
+    data_list <- vector("list", length(data_paths))
     for (p in seq_along(data_paths)) {
       #### import .nc4 data
       data_raw <- terra::rast(data_paths[p])
@@ -3186,13 +3186,11 @@ process_geos <-
           "_000000"
         )
       }
-      #### combine data with same date
-      data_return <- c(
-        data_return,
-        data_variable,
-        warn = FALSE
-      )
+      #### store for one-shot stack creation
+      data_list[[p]] <- data_variable
     }
+    #### combine all layers in one call
+    data_return <- terra::rast(data_list)
     #### set coordinate reference system
     terra::crs(data_return) <- "EPSG:4326"
     #### optional daily aggregation
@@ -3376,7 +3374,7 @@ process_merra2 <-
       )
     )
     #### initiate for loop
-    data_return <- terra::rast()
+    data_list <- vector("list", length(data_paths))
     for (p in seq_along(data_paths)) {
       #### import .nc4 data
       data_raw <- terra::rast(data_paths[p], win = extent)
@@ -3489,12 +3487,11 @@ process_merra2 <-
           tz = "UTC"
         )
       }
-      data_return <- c(
-        data_return,
-        data_variable,
-        warn = FALSE
-      )
+      #### store for one-shot stack creation
+      data_list[[p]] <- data_variable
     }
+    #### combine all layers in one call
+    data_return <- terra::rast(data_list)
     if (collection == "fwi") {
       terra::crs(data_return) <- "EPSG:4326"
     } else {
@@ -4203,16 +4200,23 @@ process_huc <-
 #' @param date character(1 or 2). Date (YYYY-MM-DD) or start and end dates.
 #' @param variable character(1). Variable name to extract: \code{"Smoke"}
 #'   or \code{"Dust"}.
-#' @param path character(1). Directory with downloaded GOES ADP NetCDF files.
+#' @param path character(1+). Directory with downloaded GOES ADP NetCDF files
+#'   or a vector of full NetCDF file paths.
 #' @param extent numeric(4) or SpatExtent. Crop extent
 #'   (\code{xmin, xmax, ymin, ymax} in EPSG:4326). Default \code{NULL} loads
 #'   the full raster.
+#' @param daily_agg logical(1). If `TRUE`, aggregate sub-daily layers to daily
+#'   values using `fun`. Default `FALSE` preserves original sub-daily layers.
+#' @param fun character(1). Aggregation function passed to [terra::tapp()]
+#'   (e.g. `"mean"` or `"sum"`). Ignored when `daily_agg = FALSE`.
 #' @param ... Placeholders.
 #' @note
 #' \itemize{
 #'   \item Layer names follow the convention
-#'     \code{{variable}_{YYYYMMDD}_{HHMMSS}}, e.g.
-#'     \code{"Smoke_20240101_000000"}.
+#'     \code{{variable}_{YYYYMMDD}_{HHMMSS}} when `daily_agg = FALSE`, e.g.
+#'     \code{"Smoke_20240101_000000"}. With `daily_agg = TRUE`, layer names
+#'     contain \code{{variable}_{YYYYMMDD}} and `terra::time()` is set to
+#'     midnight UTC.
 #'   \item \code{terra::time()} is set to POSIXct UTC for each layer.
 #'   \item Files with GOES geostationary projection are reprojected to
 #'     EPSG:4326.
@@ -4226,6 +4230,7 @@ process_huc <-
 #' @importFrom terra subset
 #' @importFrom terra time
 #' @importFrom terra nlyr
+#' @importFrom terra tapp
 #' @examples
 #' ## NOTE: Example is wrapped in `\dontrun{}` as function requires downloaded
 #' ##       data files.
@@ -4235,6 +4240,13 @@ process_huc <-
 #'   variable = "Smoke",
 #'   path = "./data/goes/"
 #' )
+#' goes_daily <- process_goes(
+#'   date = c("2024-01-01", "2024-01-01"),
+#'   variable = "Smoke",
+#'   path = "./data/goes/",
+#'   daily_agg = TRUE,
+#'   fun = "mean"
+#' )
 #' }
 #' @export
 # nolint end
@@ -4243,10 +4255,22 @@ process_goes <- function(
   variable = NULL,
   path = NULL,
   extent = NULL,
+  daily_agg = FALSE,
+  fun = "mean",
   ...
 ) {
-  #### directory setup
-  path <- amadeus::download_sanitize_path(path)
+  #### resolve file paths from directory or explicit vector
+  if (length(path) == 1 && dir.exists(path)) {
+    path <- amadeus::download_sanitize_path(path)
+    paths <- list.files(
+      path,
+      pattern = "^OR_(ADP|ABI-L2-ADP)",
+      full.names = TRUE,
+      recursive = TRUE
+    )
+  } else {
+    paths <- path
+  }
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
@@ -4256,19 +4280,25 @@ process_goes <- function(
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### identify file paths matching GOES ADP naming convention
-  paths <- list.files(
-    path,
-    pattern = "^OR_ADP",
-    full.names = TRUE,
-    recursive = TRUE
-  )
-  paths <- grep("\\.nc$", paths, value = TRUE)
+  paths <- paths[grepl("^OR_(ADP|ABI-L2-ADP).*\\.nc$", basename(paths))]
   if (length(paths) == 0) {
     stop(
       paste0(
-        "No GOES ADP NetCDF files found in: ",
-        path,
-        "\nFiles must match pattern '^OR_ADP.*\\.nc$'.\n"
+        "No GOES ADP NetCDF files found in `path`.\n",
+        "When `path` is a directory, files must match ",
+        "'^OR_(ADP|ABI-L2-ADP).*\\.nc$'.\n",
+        "When `path` is a vector, provide full paths to matching GOES ADP ",
+        "NetCDF files.\n"
+      )
+    )
+  }
+  if (!all(file.exists(paths))) {
+    missing_paths <- paths[!file.exists(paths)]
+    stop(
+      paste0(
+        "Some GOES paths do not exist:\n",
+        paste0("  - ", missing_paths, collapse = "\n"),
+        "\nFiles must match pattern '^OR_(ADP|ABI-L2-ADP).*\\.nc$'.\n"
       )
     )
   }
@@ -4293,6 +4323,7 @@ process_goes <- function(
     file_dates >= date_from &
     file_dates <= date_to
   data_paths <- paths[mask]
+  data_paths <- data_paths[order(file_dates[mask], data_paths)]
   if (length(data_paths) == 0) {
     stop(paste0(
       "No GOES ADP files matching the requested date range were found.\n",
@@ -4303,63 +4334,123 @@ process_goes <- function(
       "\n"
     ))
   }
-  #### initiate loop over files
-  data_return <- terra::rast()
-  for (p in seq_along(data_paths)) {
-    #### parse datetime from filename
-    dt <- goes_parse_start_datetime(data_paths[p])
-    date_str <- format(dt, "%Y%m%d")
-    time_str <- format(dt, "%H%M%S")
-    message(paste0(
-      "Cleaning ",
-      variable,
-      " data for ",
-      format(dt, "%Y-%m-%d %H:%M:%S UTC"),
-      "...\n"
-    ))
-    #### load NetCDF
-    data_raw <- terra::rast(data_paths[p])
-    #### reproject to EPSG:4326 if file uses geostationary projection
-    crs_proj <- terra::crs(data_raw, proj = TRUE)
-    if (!is.na(crs_proj) && grepl("\\+proj=geos", crs_proj)) {
-      # nocov start
-      data_raw <- terra::project(data_raw, "EPSG:4326")
-    } else if (is.na(terra::crs(data_raw)) || terra::crs(data_raw) == "") {
-      terra::crs(data_raw) <- "EPSG:4326"
-    } # nocov end
-    #### subset to requested variable
-    var_idx <- grep(
-      paste0("^", variable, "$"),
-      names(data_raw)
-    )
-    if (length(var_idx) == 0) {
-      var_idx <- grep(variable, names(data_raw))
-    }
-    if (length(var_idx) == 0) {
-      stop(paste0(
-        "Requested variable '",
-        variable,
-        "' was not found in ",
-        basename(data_paths[p]),
-        ".\n"
-      ))
-    }
-    data_variable <- terra::subset(data_raw, subset = var_idx)
-    #### crop to extent (applied after reprojection)
-    if (!is.null(extent)) {
-      data_variable <- terra::crop(data_variable, extent)
-    }
-    #### set layer name: {variable}_{YYYYMMDD}_{HHMMSS}
-    names(data_variable) <- paste0(variable, "_", date_str, "_", time_str)
-    #### set time
-    terra::time(data_variable) <- dt
-    #### combine
-    data_return <- c(data_return, data_variable, warn = FALSE)
+  #### vectorized fast path for homogeneous GOES granules
+  data_first <- terra::rast(data_paths[1])
+  var_idx <- grep(
+    paste0("^", variable, "$"),
+    names(data_first)
+  )
+  if (length(var_idx) == 0) {
+    var_idx <- grep(variable, names(data_first))
   }
+  if (length(var_idx) == 0) {
+    stop(paste0(
+      "Requested variable '",
+      variable,
+      "' was not found in ",
+      basename(data_paths[1]),
+      ".\n"
+    ))
+  }
+  dt_chr <- vapply(
+    data_paths,
+    function(p) format(goes_parse_start_datetime(p), "%Y-%m-%d %H:%M:%S"),
+    character(1)
+  )
+  dt_vec <- as.POSIXct(dt_chr, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
+  message(paste0(
+    "Cleaning ",
+    variable,
+    " data for ",
+    length(data_paths),
+    " GOES files...\n"
+  ))
+  data_raw <- terra::rast(data_paths)
+  n_files <- length(data_paths)
+  n_total_layers <- terra::nlyr(data_raw)
+  if (n_total_layers %% n_files != 0) {
+    stop(
+      "GOES files are not structurally homogeneous; unable to map layers to files.\n"
+    )
+  }
+  layers_per_file <- n_total_layers / n_files
+  if (max(var_idx) > layers_per_file) {
+    stop(
+      "GOES variable layer index exceeds per-file layer count; files appear inconsistent.\n"
+    )
+  }
+  selected_idx <- unlist(lapply(
+    seq_len(n_files),
+    function(i) var_idx + (i - 1) * layers_per_file
+  ))
+  data_return <- terra::subset(data_raw, subset = selected_idx)
+  #### reproject to EPSG:4326 if file uses geostationary projection
+  crs_proj <- terra::crs(data_return, proj = TRUE)
+  if (!is.na(crs_proj) && grepl("\\+proj=geos", crs_proj)) {
+    # nocov start
+    data_return <- terra::project(data_return, "EPSG:4326")
+  } else if (is.na(terra::crs(data_return)) || terra::crs(data_return) == "") {
+    terra::crs(data_return) <- "EPSG:4326"
+  } # nocov end
+  #### crop to extent (applied after reprojection)
+  if (!is.null(extent)) {
+    data_return <- terra::crop(data_return, extent)
+  }
+  #### set layer name: {variable}_{YYYYMMDD}_{HHMMSS}
+  dt_layer <- rep(dt_vec, each = length(var_idx))
+  names(data_return) <- paste0(
+    variable,
+    "_",
+    format(dt_layer, "%Y%m%d"),
+    "_",
+    format(dt_layer, "%H%M%S")
+  )
+  #### set time
+  terra::time(data_return) <- dt_layer
   #### ensure EPSG:4326
   terra::crs(data_return) <- "EPSG:4326"
+  #### optional daily aggregation
+  if (isTRUE(daily_agg)) {
+    t <- terra::time(data_return)
+    if (!anyNA(t) && length(t) == terra::nlyr(data_return)) {
+      date_str <- format(as.Date(t), "%Y%m%d")
+    } else {
+      # nocov start
+      date_str <- regmatches(
+        names(data_return),
+        regexpr(
+          "(?<![0-9])[0-9]{8}(?![0-9])",
+          names(data_return),
+          perl = TRUE
+        )
+      )
+      if (length(date_str) != terra::nlyr(data_return)) {
+        stop("daily_agg: cannot determine dates from layer times or names.\n")
+      }
+    } # nocov end
+    var_prefix <- sub("_[0-9]{8}_[0-9]{6}$", "", names(data_return))
+    tapp_index <- paste(var_prefix, date_str, sep = "_")
+    saved_crs <- terra::crs(data_return)
+    data_return <- terra::tapp(
+      data_return,
+      tapp_index,
+      fun = fun,
+      na.rm = TRUE
+    )
+    terra::crs(data_return) <- saved_crs
+    out_dates <- regmatches(
+      names(data_return),
+      regexpr("[0-9]{8}$", names(data_return))
+    )
+    terra::time(data_return) <- as.POSIXct(
+      paste0(out_dates, " 00:00:00"),
+      format = "%Y%m%d %H:%M:%S",
+      tz = "UTC"
+    )
+  }
   message(paste0(
     "Returning ",
+    ifelse(isTRUE(daily_agg), "daily ", "sub-daily "),
     variable,
     " data from ",
     date[1],

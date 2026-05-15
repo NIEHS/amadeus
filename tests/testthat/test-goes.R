@@ -67,6 +67,49 @@ testthat::test_that("download_goes errors on invalid product", {
   )
 })
 
+testthat::test_that("download_goes maps product to ABI-L2 ADP S3 prefixes", {
+  for (prod in c("ADP-C", "ADP-F", "ADP-M")) {
+    seen_url <- NULL
+    testthat::local_mocked_bindings(
+      req_perform = function(req, ...) {
+        seen_url <<- req$url
+        structure(
+          list(
+            status_code = 200L,
+            body = charToRaw("<ListBucketResult></ListBucketResult>")
+          ),
+          class = "httr2_response"
+        )
+      },
+      resp_body_string = function(resp, ...) {
+        rawToChar(resp$body)
+      },
+      .package = "httr2"
+    )
+    withr::with_tempdir({
+      suppressMessages(
+        download_goes(
+          date = "2018-01-01",
+          satellite = "16",
+          product = prod,
+          directory_to_save = ".",
+          acknowledgement = TRUE
+        )
+      )
+    })
+    expected_prefix <- switch(
+      prod,
+      "ADP-C" = "ABI-L2-ADPC",
+      "ADP-F" = "ABI-L2-ADPF",
+      "ADP-M" = "ABI-L2-ADPM"
+    )
+    testthat::expect_true(grepl(
+      paste0("prefix=", expected_prefix, "/2018/001/"),
+      seen_url
+    ))
+  }
+})
+
 testthat::test_that("download_goes remove_command deprecation warning", {
   testthat::local_mocked_bindings(
     download_run_method = function(...) list(success = 0, failed = 0, skipped = 1),
@@ -126,7 +169,7 @@ testthat::test_that("download_goes mock: hash=TRUE returns hash", {
           body = charToRaw(
             paste0(
               "<ListBucketResult>",
-              "<Key>ADP-C/2018/001/OR_ADP-C3C02_G16_",
+              "<Key>ABI-L2-ADPC/2018/001/00/OR_ABI-L2-ADPC-M6_G16_",
               "s20180010000000_e20180010001000_c20180010002000.nc</Key>",
               "</ListBucketResult>"
             )
@@ -180,7 +223,7 @@ testthat::test_that("download_goes single-date + download=FALSE returns listing"
           body = charToRaw(
             paste0(
               "<ListBucketResult>",
-              "<Key>ADP-C/2018/001/OR_ADP-C3C02_G16_",
+              "<Key>ABI-L2-ADPC/2018/001/00/OR_ABI-L2-ADPC-M6_G16_",
               "s20180010000000_e20180010001000_c20180010002000.nc</Key>",
               "</ListBucketResult>"
             )
@@ -247,7 +290,7 @@ testthat::test_that("download_goes hash=FALSE returns download result", {
           body = charToRaw(
             paste0(
               "<ListBucketResult>",
-              "<Key>ADP-C/2018/001/OR_ADP-C3C02_G16_",
+              "<Key>ABI-L2-ADPC/2018/001/00/OR_ABI-L2-ADPC-M6_G16_",
               "s20180010000000_e20180010001000_c20180010002000.nc</Key>",
               "</ListBucketResult>"
             )
@@ -394,6 +437,79 @@ testthat::test_that("process_goes single date works", {
   )
   testthat::expect_s4_class(result, "SpatRaster")
   testthat::expect_gte(terra::nlyr(result), 1L)
+})
+
+testthat::test_that("process_goes(daily_agg=FALSE): default output remains unchanged", {
+  withr::local_package("terra")
+  goes_dir <- testthat::test_path("..", "testdata", "goes")
+  result_default <- suppressMessages(
+    process_goes(
+      date = c("2018-01-01", "2018-01-02"),
+      variable = "Smoke",
+      path = goes_dir
+    )
+  )
+  result_explicit_false <- suppressMessages(
+    process_goes(
+      date = c("2018-01-01", "2018-01-02"),
+      variable = "Smoke",
+      path = goes_dir,
+      daily_agg = FALSE
+    )
+  )
+  testthat::expect_equal(terra::nlyr(result_default), terra::nlyr(result_explicit_false))
+  testthat::expect_equal(terra::values(result_default), terra::values(result_explicit_false))
+})
+
+testthat::test_that("process_goes(daily_agg=TRUE, fun=...): aggregates sub-daily GOES layers by day", {
+  withr::local_package("terra")
+  goes_dir <- testthat::test_path("..", "testdata", "goes")
+  goes_subdaily <- suppressMessages(
+    process_goes(
+      date = c("2018-01-01", "2018-01-02"),
+      variable = "Smoke",
+      path = goes_dir
+    )
+  )
+  goes_daily_mean <- suppressMessages(
+    process_goes(
+      date = c("2018-01-01", "2018-01-02"),
+      variable = "Smoke",
+      path = goes_dir,
+      daily_agg = TRUE,
+      fun = "mean"
+    )
+  )
+  goes_daily_sum <- suppressMessages(
+    process_goes(
+      date = c("2018-01-01", "2018-01-02"),
+      variable = "Smoke",
+      path = goes_dir,
+      daily_agg = TRUE,
+      fun = "sum"
+    )
+  )
+  goes_daily_wrapper <- suppressMessages(
+    process_covariates(
+      covariate = "goes",
+      date = c("2018-01-01", "2018-01-02"),
+      variable = "Smoke",
+      path = goes_dir,
+      daily_agg = TRUE,
+      fun = "mean"
+    )
+  )
+  testthat::expect_gt(terra::nlyr(goes_subdaily), terra::nlyr(goes_daily_mean))
+  testthat::expect_equal(terra::nlyr(goes_daily_mean), 2L)
+  testthat::expect_equal(terra::nlyr(goes_daily_sum), 2L)
+  testthat::expect_equal(terra::nlyr(goes_daily_wrapper), 2L)
+  testthat::expect_true(all(
+    format(as.Date(terra::time(goes_daily_mean)), "%Y%m%d") %in% c("20180101", "20180102")
+  ))
+  testthat::expect_true(all(
+    terra::values(goes_daily_sum) >= terra::values(goes_daily_mean),
+    na.rm = TRUE
+  ))
 })
 
 testthat::test_that("process_goes extent crops result", {
@@ -759,3 +875,44 @@ testthat::test_that("process_goes single-date string expands to range", {
   )
   testthat::expect_equal(terra::nlyr(result_single), terra::nlyr(result_pair))
 })
+
+testthat::test_that(
+  "process_goes(path=<vector of files>): accepts high-frequency NetCDF path vectors",
+  {
+    withr::local_package("terra")
+    goes_dir <- testthat::test_path("..", "testdata", "goes")
+    goes_paths <- list.files(
+      goes_dir,
+      pattern = "\\.nc$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
+
+    result_vector <- suppressMessages(
+      process_goes(
+        date = "2018-01-01",
+        variable = "Smoke",
+        path = goes_paths
+      )
+    )
+    result_directory <- suppressMessages(
+      process_goes(
+        date = "2018-01-01",
+        variable = "Smoke",
+        path = goes_dir
+      )
+    )
+    result_wrapper <- suppressMessages(
+      process_covariates(
+        covariate = "goes",
+        date = "2018-01-01",
+        variable = "Smoke",
+        path = goes_paths
+      )
+    )
+
+    testthat::expect_s4_class(result_vector, "SpatRaster")
+    testthat::expect_equal(terra::nlyr(result_vector), terra::nlyr(result_directory))
+    testthat::expect_equal(terra::nlyr(result_wrapper), terra::nlyr(result_directory))
+  }
+)

@@ -4886,6 +4886,12 @@ download_goes <- function(
       ".\n"
     ))
   }
+  product_prefix <- switch(
+    product,
+    "ADP-C" = "ABI-L2-ADPC",
+    "ADP-F" = "ABI-L2-ADPF",
+    "ADP-M" = "ABI-L2-ADPM"
+  )
 
   #### Check dates
   if (length(date) == 1) {
@@ -4912,7 +4918,7 @@ download_goes <- function(
     d_date <- dates_seq[d]
     year <- format(d_date, "%Y")
     doy <- sprintf("%03d", as.integer(format(d_date, "%j")))
-    prefix <- paste0(product, "/", year, "/", doy, "/")
+    prefix <- paste0(product_prefix, "/", year, "/", doy, "/")
 
     # nolint start
     list_url <- paste0(

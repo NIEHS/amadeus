@@ -9,6 +9,8 @@ process_goes(
   variable = NULL,
   path = NULL,
   extent = NULL,
+  daily_agg = FALSE,
+  fun = "mean",
   ...
 )
 }
@@ -18,11 +20,18 @@ process_goes(
 \item{variable}{character(1). Variable name to extract: \code{"Smoke"}
 or \code{"Dust"}.}
 
-\item{path}{character(1). Directory with downloaded GOES ADP NetCDF files.}
+\item{path}{character(1+). Directory with downloaded GOES ADP NetCDF files
+or a vector of full NetCDF file paths.}
 
 \item{extent}{numeric(4) or SpatExtent. Crop extent
 (\code{xmin, xmax, ymin, ymax} in EPSG:4326). Default \code{NULL} loads
 the full raster.}
+
+\item{daily_agg}{logical(1). If \code{TRUE}, aggregate sub-daily layers to daily
+values using \code{fun}. Default \code{FALSE} preserves original sub-daily layers.}
+
+\item{fun}{character(1). Aggregation function passed to \code{\link[terra:tapp]{terra::tapp()}}
+(e.g. \code{"mean"} or \code{"sum"}). Ignored when \code{daily_agg = FALSE}.}
 
 \item{...}{Placeholders.}
 }
@@ -38,8 +47,10 @@ CRS \code{EPSG:4326}.
 \note{
 \itemize{
 \item Layer names follow the convention
-\code{{variable}_{YYYYMMDD}_{HHMMSS}}, e.g.
-\code{"Smoke_20240101_000000"}.
+\code{{variable}_{YYYYMMDD}_{HHMMSS}} when \code{daily_agg = FALSE}, e.g.
+\code{"Smoke_20240101_000000"}. With \code{daily_agg = TRUE}, layer names
+contain \code{{variable}_{YYYYMMDD}} and \code{terra::time()} is set to
+midnight UTC.
 \item \code{terra::time()} is set to POSIXct UTC for each layer.
 \item Files with GOES geostationary projection are reprojected to
 EPSG:4326.
@@ -53,6 +64,13 @@ goes <- process_goes(
   date = c("2024-01-01", "2024-01-01"),
   variable = "Smoke",
   path = "./data/goes/"
+)
+goes_daily <- process_goes(
+  date = c("2024-01-01", "2024-01-01"),
+  variable = "Smoke",
+  path = "./data/goes/",
+  daily_agg = TRUE,
+  fun = "mean"
 )
 }
 }
