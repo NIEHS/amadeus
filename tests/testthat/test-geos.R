@@ -443,6 +443,31 @@ testthat::test_that(
   }
 )
 
+testthat::test_that(
+  "process_covariates(covariate=geos, daily_agg=FALSE): matches process_geos default",
+  {
+    withr::local_package("terra")
+    geos_direct <- suppressMessages(
+      process_geos(
+        date = "2018-01-01",
+        variable = "O3",
+        path = testthat::test_path("..", "testdata", "geos", "c")
+      )
+    )
+    geos_wrapper <- suppressMessages(
+      process_covariates(
+        covariate = "geos",
+        date = "2018-01-01",
+        variable = "O3",
+        path = testthat::test_path("..", "testdata", "geos", "c"),
+        daily_agg = FALSE
+      )
+    )
+    testthat::expect_equal(terra::nlyr(geos_wrapper), terra::nlyr(geos_direct))
+    testthat::expect_equal(terra::values(geos_wrapper), terra::values(geos_direct))
+  }
+)
+
 
 testthat::test_that("calculate_geos", {
   withr::local_package("terra")

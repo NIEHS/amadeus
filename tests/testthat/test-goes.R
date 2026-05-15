@@ -916,3 +916,46 @@ testthat::test_that(
     testthat::expect_equal(terra::nlyr(result_wrapper), terra::nlyr(result_directory))
   }
 )
+
+testthat::test_that(
+  "process_goes(path=<heterogeneous files>): errors on non-homogeneous layer counts",
+  {
+    withr::local_package("terra")
+    withr::with_tempdir({
+      make_layer <- function(value) {
+        r <- terra::rast(
+          nrows = 2,
+          ncols = 2,
+          xmin = -100,
+          xmax = -99,
+          ymin = 35,
+          ymax = 36,
+          crs = "EPSG:4326"
+        )
+        terra::values(r) <- value
+        r
+      }
+
+      two_layers <- c(make_layer(1), make_layer(2))
+      one_layer <- make_layer(3)
+      names(two_layers) <- c("Smoke", "SmokeFlag")
+      names(one_layer) <- "Smoke"
+
+      f1 <- "OR_ADP-C3C02_G16_s20180010000000_e20180010001000_c20180010002000.nc"
+      f2 <- "OR_ADP-C3C02_G16_s20180010100000_e20180010101000_c20180010102000.nc"
+      suppressWarnings(terra::writeCDF(two_layers, f1, varname = "Smoke", overwrite = TRUE))
+      suppressWarnings(terra::writeCDF(one_layer, f2, varname = "Smoke", overwrite = TRUE))
+
+      testthat::expect_error(
+        suppressMessages(
+          process_goes(
+            date = "2018-01-01",
+            variable = "Smoke",
+            path = getwd()
+          )
+        ),
+        regexp = "not structurally homogeneous"
+      )
+    })
+  }
+)

@@ -836,6 +836,39 @@ testthat::test_that(
   }
 )
 
+testthat::test_that(
+  "process_covariates(covariate=merra|merra2, daily_agg=TRUE): alias dispatch is consistent",
+  {
+    withr::local_package("terra")
+    withr::with_tempdir({
+      tmpdir <- getwd()
+      make_merra2_hourly_fixture(tmpdir, n_hours = 3)
+      out_merra2 <- suppressMessages(
+        process_covariates(
+          covariate = "merra2",
+          date = "2018-01-01",
+          variable = "CPT",
+          path = tmpdir,
+          daily_agg = TRUE,
+          fun = "mean"
+        )
+      )
+      out_merra <- suppressMessages(
+        process_covariates(
+          covariate = "merra",
+          date = "2018-01-01",
+          variable = "CPT",
+          path = tmpdir,
+          daily_agg = TRUE,
+          fun = "mean"
+        )
+      )
+      testthat::expect_equal(terra::nlyr(out_merra), terra::nlyr(out_merra2))
+      testthat::expect_equal(terra::values(out_merra), terra::values(out_merra2))
+    })
+  }
+)
+
 testthat::test_that("process_merra2 daily_agg silently skipped for FWI", {
   withr::local_package("terra")
 

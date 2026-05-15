@@ -109,6 +109,7 @@ processed_data <- process_covariates(
   variable = "O3",
   date = geos_process_date,
   path = geos_process_path,
+  daily_agg = TRUE,
   extent = terra::ext(
     geos_live_extent[1], geos_live_extent[3],
     geos_live_extent[2], geos_live_extent[4]
