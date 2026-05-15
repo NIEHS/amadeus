@@ -947,14 +947,83 @@ testthat::test_that(
       suppressWarnings(terra::writeCDF(one_layer, f2, varname = "Smoke", overwrite = TRUE))
 
       testthat::expect_error(
-        suppressMessages(
+        suppressWarnings(suppressMessages(
           process_goes(
             date = "2018-01-01",
             variable = "Smoke",
             path = getwd()
           )
-        ),
+        )),
         regexp = "not structurally homogeneous"
+      )
+    })
+  }
+)
+
+testthat::test_that(
+  "process_goes(path=<vector with missing file>): errors with missing GOES paths",
+  {
+    goes_dir <- testthat::test_path("..", "testdata", "goes")
+    existing_path <- list.files(
+      goes_dir,
+      pattern = "\\.nc$",
+      recursive = TRUE,
+      full.names = TRUE
+    )[1]
+    missing_path <- file.path(
+      tempdir(),
+      "OR_ADP-C3C02_G16_s20180010000000_e20180010001000_c20180010002000.nc"
+    )
+
+    testthat::expect_error(
+      process_goes(
+        date = "2018-01-01",
+        variable = "Smoke",
+        path = c(existing_path, missing_path)
+      ),
+      regexp = "Some GOES paths do not exist"
+    )
+  }
+)
+
+testthat::test_that(
+  "process_goes(path=<inconsistent variable index>): errors on mismatched layer index",
+  {
+    withr::local_package("terra")
+    withr::with_tempdir({
+      make_layer <- function(value) {
+        r <- terra::rast(
+          nrows = 2,
+          ncols = 2,
+          xmin = -100,
+          xmax = -99,
+          ymin = 35,
+          ymax = 36,
+          crs = "EPSG:4326"
+        )
+        terra::values(r) <- value
+        r
+      }
+
+      first_file <- c(make_layer(1), make_layer(2), make_layer(3))
+      second_file <- make_layer(4)
+      names(first_file) <- c("Dummy", "SmokeFlag", "SmokeMask")
+      names(second_file) <- "SmokeFlag"
+
+      f1 <- "OR_ADP-C3C02_G16_s20180010000000_e20180010001000_c20180010002000.nc"
+      f2 <- "OR_ADP-C3C02_G16_s20180010100000_e20180010101000_c20180010102000.nc"
+      suppressWarnings(terra::writeCDF(first_file, f1, varname = "Smoke", overwrite = TRUE))
+      suppressWarnings(terra::writeCDF(second_file, f2, varname = "Smoke", overwrite = TRUE))
+
+      testthat::expect_error(
+        suppressWarnings(suppressMessages(
+          process_goes(
+            date = "2018-01-01",
+            variable = "Smoke",
+            path = getwd()
+          )
+        )),
+        regexp = "variable layer index exceeds per-file layer count"
       )
     })
   }
