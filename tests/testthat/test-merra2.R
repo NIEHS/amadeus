@@ -796,6 +796,46 @@ testthat::test_that("process_merra2 daily_agg collapses sub-daily layers", {
   })
 })
 
+testthat::test_that(
+  "process_covariates(covariate=merra2, daily_agg=TRUE): forwards daily aggregation args",
+  {
+    withr::local_package("terra")
+
+    withr::with_tempdir({
+      tmpdir <- getwd()
+      make_merra2_hourly_fixture(tmpdir, n_hours = 3)
+
+      merra2_daily_mean <- suppressMessages(
+        process_covariates(
+          covariate = "merra2",
+          date = "2018-01-01",
+          variable = "CPT",
+          path = tmpdir,
+          daily_agg = TRUE,
+          fun = "mean"
+        )
+      )
+      merra2_daily_sum <- suppressMessages(
+        process_covariates(
+          covariate = "merra2",
+          date = "2018-01-01",
+          variable = "CPT",
+          path = tmpdir,
+          daily_agg = TRUE,
+          fun = "sum"
+        )
+      )
+
+      testthat::expect_equal(terra::nlyr(merra2_daily_mean), 1L)
+      testthat::expect_equal(terra::nlyr(merra2_daily_sum), 1L)
+      testthat::expect_true(all(
+        terra::values(merra2_daily_sum) >= terra::values(merra2_daily_mean),
+        na.rm = TRUE
+      ))
+    })
+  }
+)
+
 testthat::test_that("process_merra2 daily_agg silently skipped for FWI", {
   withr::local_package("terra")
 

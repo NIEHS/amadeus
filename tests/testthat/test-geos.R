@@ -391,6 +391,58 @@ testthat::test_that("process_geos daily_agg collapses sub-daily layers", {
   })
 })
 
+testthat::test_that(
+  "process_covariates(covariate=geos, daily_agg=TRUE): forwards daily aggregation args",
+  {
+    withr::local_package("terra")
+    src_file <- testthat::test_path(
+      "..", "testdata", "geos", "c",
+      "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4"
+    )
+    src_file <- normalizePath(src_file, mustWork = TRUE)
+
+    withr::with_tempdir({
+      tmpdir <- getwd()
+      file.copy(
+        src_file,
+        file.path(tmpdir, "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4")
+      )
+      file.copy(
+        src_file,
+        file.path(tmpdir, "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0100z.nc4")
+      )
+
+      geos_daily_mean <- suppressMessages(
+        process_covariates(
+          covariate = "geos",
+          date = "2018-01-01",
+          variable = "O3",
+          path = tmpdir,
+          daily_agg = TRUE,
+          fun = "mean"
+        )
+      )
+      geos_daily_sum <- suppressMessages(
+        process_covariates(
+          covariate = "geos",
+          date = "2018-01-01",
+          variable = "O3",
+          path = tmpdir,
+          daily_agg = TRUE,
+          fun = "sum"
+        )
+      )
+
+      testthat::expect_equal(terra::nlyr(geos_daily_mean), 5L)
+      testthat::expect_equal(terra::nlyr(geos_daily_sum), 5L)
+      testthat::expect_true(all(
+        terra::values(geos_daily_sum) >= terra::values(geos_daily_mean),
+        na.rm = TRUE
+      ))
+    })
+  }
+)
+
 
 testthat::test_that("calculate_geos", {
   withr::local_package("terra")

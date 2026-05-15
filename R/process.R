@@ -4370,13 +4370,19 @@ process_goes <- function(
   n_total_layers <- terra::nlyr(data_raw)
   if (n_total_layers %% n_files != 0) {
     stop(
-      "GOES files are not structurally homogeneous; unable to map layers to files.\n"
+      paste0(
+        "GOES files are not structurally homogeneous; ",
+        "unable to map layers to files.\n"
+      )
     )
   }
   layers_per_file <- n_total_layers / n_files
   if (max(var_idx) > layers_per_file) {
     stop(
-      "GOES variable layer index exceeds per-file layer count; files appear inconsistent.\n"
+      paste0(
+        "GOES variable layer index exceeds per-file layer count; ",
+        "files appear inconsistent.\n"
+      )
     )
   }
   selected_idx <- unlist(lapply(
