@@ -35,6 +35,7 @@ jobs:
               any::covr
               any::rstac
               any::testthat
+              any::ncdf4
             needs: coverage
 
       - name: Cache C++ and R dependencies
