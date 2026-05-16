@@ -96,11 +96,30 @@ processed_sum <- process_covariates(
 )
 ```
 
+### Choosing a daily aggregation
+
+Use `fun = "mean"` when you want a daily field that behaves like a fractional
+or probability-like surface. For GOES Smoke/Dust, the mean is usually the better
+default for exposure-oriented summaries because it represents the typical share
+of available granules indicating smoke or dust at each pixel during the day.
+
+Use `fun = "sum"` when you want to integrate granule-level detections into a
+count-like daily total. This can be useful for identifying places with repeated
+detections across the day, but it is a coarse approximation because GOES granule
+cadence varies by sector, satellite operations, and data availability.
+
+For most epidemiologic or environmental exposure workflows, start with
+`fun = "mean"` unless your analysis specifically needs a detection-frequency
+metric.
+
+> **Computational notes:** For memory, runtime, and parallel-processing guidance,
+> see `vignette("computational_considerations", package = "amadeus")`.
+
 ## Calculate covariates at points
 
 ```{r calculate-points, eval = live_run}
-domain_x <- c(terra::xmin(processed_data), terra::xmax(processed_data))
-domain_y <- c(terra::ymin(processed_data), terra::ymax(processed_data))
+domain_x <- c(terra::xmin(processed_mean), terra::xmax(processed_mean))
+domain_y <- c(terra::ymin(processed_mean), terra::ymax(processed_mean))
 domain_dx <- diff(domain_x)
 domain_dy <- diff(domain_y)
 
@@ -117,7 +136,7 @@ example_points_sf$site_id <- paste0("site_", seq_len(nrow(example_points_sf)))
 
 point_values <- calculate_covariates(
   covariate = "goes",
-  from = processed_data,
+  from = processed_mean,
   locs = example_points_sf,
   locs_id = "site_id",
   radius = 0,
@@ -143,3 +162,44 @@ ggplot(data = point_values) +
   geom_sf(aes(color = .data[[smoke_col]])) +
   ggtitle("Daily GOES Smoke values")
 ```
+
+## Polygon (areal) extraction example
+
+The same processed daily raster can be summarized over polygon features. This
+example builds two small synthetic rectangles from the processed raster extent
+and extracts the mean daily Smoke value for each area.
+
+```{r calculate-polygons, eval = live_run}
+poly_x <- domain_x[1] + c(0.20, 0.35, 0.50) * domain_dx
+poly_y <- domain_y[1] + c(0.20, 0.40, 0.60) * domain_dy
+make_rect <- function(xmin, xmax, ymin, ymax) {
+  sf::st_polygon(list(rbind(
+    c(xmin, ymin),
+    c(xmax, ymin),
+    c(xmax, ymax),
+    c(xmin, ymax),
+    c(xmin, ymin)
+  )))
+}
+
+example_polys_sf <- sf::st_sf(
+  area_id = c("area_1", "area_2"),
+  geometry = sf::st_sfc(
+    make_rect(poly_x[1], poly_x[2], poly_y[1], poly_y[2]),
+    make_rect(poly_x[2], poly_x[3], poly_y[2], poly_y[3]),
+    crs = 4326
+  )
+)
+
+polygon_values <- calculate_covariates(
+  covariate = "goes",
+  from = processed_mean,
+  locs = example_polys_sf,
+  locs_id = "area_id",
+  radius = 0,
+  fun = "mean",
+  geom = "sf"
+)
+polygon_values
+```
+
