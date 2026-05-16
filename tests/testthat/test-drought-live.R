@@ -3,7 +3,10 @@
 ################################################################################
 
 testthat::test_that(
-  "download_drought(source='spei', timescale=1, date=<single>): downloads non-empty file",
+  paste0(
+    "download_drought(source='spei', timescale=1, date=<month>): ",
+    "downloads SPEI file"
+  ),
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
@@ -17,6 +20,49 @@ testthat::test_that(
     )
     files <- list.files(dir, recursive = TRUE, full.names = TRUE)
     testthat::expect_gt(length(files), 0)
-    testthat::expect_true(any(file.info(files)$size > 0))
+    testthat::expect_gt(sum(file.info(files)$size > 0), 0)
+  }
+)
+
+testthat::test_that(
+  paste0(
+    "download_drought(source='eddi', timescale=1, date=<Tuesday>): ",
+    "downloads EDDI file"
+  ),
+  {
+    skip_if_no_live_tests()
+    dir <- withr::local_tempdir()
+    amadeus::download_drought(
+      source = "eddi",
+      date = c("2022-01-04", "2022-01-04"),
+      timescale = 1L,
+      directory_to_save = dir,
+      acknowledgement = TRUE,
+      unzip = FALSE
+    )
+    files <- list.files(dir, recursive = TRUE, full.names = TRUE)
+    testthat::expect_gt(length(files), 0)
+    testthat::expect_gt(sum(file.info(files)$size > 0), 0)
+  }
+)
+
+testthat::test_that(
+  paste0(
+    "download_drought(source='usdm', date=<Tuesday>): ",
+    "downloads USDM file"
+  ),
+  {
+    skip_if_no_live_tests()
+    dir <- withr::local_tempdir()
+    amadeus::download_drought(
+      source = "usdm",
+      date = c("2022-01-04", "2022-01-04"),
+      directory_to_save = dir,
+      acknowledgement = TRUE,
+      unzip = FALSE
+    )
+    files <- list.files(dir, recursive = TRUE, full.names = TRUE)
+    testthat::expect_gt(length(files), 0)
+    testthat::expect_gt(sum(file.info(files)$size > 0), 0)
   }
 )
