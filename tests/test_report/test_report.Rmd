@@ -430,6 +430,14 @@ if (nrow(mixed) > 0) {
 
 # CI alignment
 
+## Recent migrate-branch progress
+
+- `91843ea` adds `ncdf4` to coverage CI so writeCDF-backed tests are exercised.
+- `0963c6f` hardens the weekly live-test workflow and auto-opens a
+  `live-test-failure` issue when live APIs regress.
+- `29021f9` expands live tests with representative parameter samples across
+  supported datasets.
+
 The repository ships these workflows touching tests:
 
 ```{r ci-audit, results = "asis"}
@@ -445,9 +453,11 @@ if (dir.exists(wf_dir)) {
 
 - `check-standard.yaml` — mac/win/linux × release/devel/oldrel. Mocked tests
   only (live tests skip because `AMADEUS_LIVE_TESTS` is unset).
-- `test-coverage-local.yaml` — daily coverage. Excludes live tests.
+- `test-coverage-local.yaml` — daily coverage. Excludes live tests and now
+  installs `ncdf4` for NetCDF/writeCDF-backed coverage paths.
 - `test-live.yaml` — weekly + `workflow_dispatch`. Runs **only**
-  `test-*-live.R`. Requires `EARTHDATA_TOKEN` secret.
+  `test-*-live.R`, installs `ncdf4`/parallel workflow Suggests, and opens a
+  live-test-failure issue on failure. Requires `EARTHDATA_TOKEN` secret.
 
 # Best-practice assessment
 
@@ -460,6 +470,8 @@ if (dir.exists(wf_dir)) {
    (`testthat/`).
 4. Live network tests are now isolated into `test-*-live.R` files and gated
    by `skip_if_no_live_tests()`.
+5. Live and coverage CI now install `ncdf4`, reducing the prior gap around
+   NetCDF/writeCDF-backed tests.
 
 ## File-specific recommendations
 

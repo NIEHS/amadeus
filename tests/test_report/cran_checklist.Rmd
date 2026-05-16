@@ -37,26 +37,36 @@ and the maintainer guide [R Packages (2e)](https://r-pkgs.org/release.html).
 ```{r summary-table}
 sm <- tibble::tribble(
   ~Area,                          ~Status,         ~Blocker,
-  "DESCRIPTION metadata",         status_badge("warn"), "Move `testthat` to Suggests",
-  "Package size (built tarball)", status_badge("fail"), "Strip large data from `inst/extdata/`",
-  "Test data (`tests/testdata/`)", status_badge("pass"), "Excluded via `.Rbuildignore`",
-  "Example timings",              status_badge("pass"), "132/155 Rd files wrap network examples in `\\dontrun{}`/`\\donttest{}`",
+  "DESCRIPTION metadata",         status_badge("warn"), "`testthat` remains in Imports and is used from R/ code",
+  "Package size (built tarball)", status_badge("fail"), "Strip large data from `inst/extdata/` (~204 MB)",
+  "Test data (`tests/testdata/`)", status_badge("pass"), "Large fixtures excluded via `.Rbuildignore`",
+  "Example timings",              status_badge("pass"), "Most network examples are wrapped; generated counts below",
   "Network / credential skips",   status_badge("pass"), "Live tests gated by `AMADEUS_LIVE_TESTS`; mocked tests offline",
-  "Vignettes build offline",      status_badge("warn"), "Audit each vignette for network calls",
-  "R CMD check on CI",            status_badge("pass"), "R-CMD-check workflow green on latest commit",
+  "Vignettes build offline",      status_badge("pass"), "Network chunks use `eval = FALSE` or the `live_run` guard",
+  "R CMD check on CI",            status_badge("pass"), "Standard check workflow present; live/coverage workflows hardened on migrate",
   "Spelling / URL checks",        status_badge("info"), "Run `urlchecker::url_check()` and `spelling::spell_check_package()` before submission",
   "Reverse dependencies",         status_badge("info"), "No known revdeps on CRAN (first 2.x submission)",
-  "Versioning",                   status_badge("info"), "Bump to 2.0.0 on release; document breaking changes in NEWS",
+  "Versioning",                   status_badge("info"), "Current dev version is 2.0.0.0001; choose final CRAN version before submission",
   "CRAN-SUBMISSION history",      status_badge("info"), "Last accepted release was 1.0.7 (2024-09-02)"
 )
 knitr::kable(sm)
 ```
 
-**Verdict:** the package is **NOT yet CRAN-ready** but is close. The blockers
-are (1) `testthat` being declared under `Imports` instead of `Suggests`, and
-(2) `inst/extdata/` weighing in at ~204 MB which will blow past CRAN's 5 MB
-tarball ceiling. Both are mechanical fixes. Once cleared, the suite/docs/CI
-already meet CRAN expectations.
+**Verdict:** the package is **NOT yet CRAN-ready** but has made meaningful
+migrate-branch progress. The hard blockers are still (1) `testthat` being
+declared under `Imports` and used from package code, and (2) `inst/extdata/`
+weighing in at ~204 MB, which will blow past CRAN's 5 MB tarball ceiling. The
+previous ncdf4 CI gap, GOES vignette bug, missing HUC README coverage, and
+vignette network-call audit items are now resolved or materially improved.
+
+### Recent changes since v1.0.7 (migrate branch)
+
+- `91843ea` — CI coverage now installs `ncdf4`, so writeCDF-backed tests can run.
+- `b20f294` — Incremented the development version to `2.0.0.0001`.
+- `0963c6f` — Live-test workflow now hardens execution and auto-opens a GitHub issue on failure.
+- `6d99c79` — GOES workflow vignette now includes aggregation guidance and polygon extraction; the stale `processed_data` reference is resolved.
+- `a8bf913` — README/pkgdown docs now include HUC, `setup_nasa_token()`, computational-considerations guidance, and dev-site publishing.
+- `29021f9` — Live coverage expanded with representative parameter samples across datasets.
 
 ---
 
@@ -70,17 +80,20 @@ knitr::kable(imp)
 
 ### Findings
 
-- **`testthat` is under `Imports`** (`Imports: ..., testthat (>= 3.0.0)`).
-  CRAN policy requires that `testthat` be a `Suggests` dependency since it is a
-  test-time tool. This is a hard blocker. Fix:
+- **`testthat` is still under `Imports`** (`Imports: ..., testthat (>= 3.0.0)`).
+  CRAN policy expects `testthat` to be a `Suggests` dependency when it is only a
+  test-time tool. This remains a hard blocker because `R/download_auxiliary.R`
+  currently calls `testthat::expect_true()` in package code; replace those
+  runtime assertions with ordinary validation before moving `testthat` to
+  `Suggests`. Fix target:
 
   ```diff
   - Imports: ..., testthat (>= 3.0.0), ...
   + Suggests: ..., testthat (>= 3.0.0), ...
   ```
 
-  After the move, audit the R source for any non-test use of `testthat::` and
-  remove it (CRAN will reject usage of a Suggests package without a guard).
+  After the move, re-run an R-source audit for `testthat::` so CRAN will not see
+  unguarded use of a Suggests package.
 
 - **`Authors@R`** is correctly populated with maintainer + cph.
 - **`Description`** field contains a method reference in canonical
@@ -107,7 +120,7 @@ knitr::kable(sizes)
 
 CRAN tarballs must typically be ≤ 5 MB (waivers exist for data packages but
 require justification). The current `inst/extdata/` directory holds ~204 MB of
-fixtures; nothing in `inst/` is git-ignored or build-ignored, so it ships.
+fixtures; most of `inst/` still ships, so this remains the largest CRAN blocker.
 
 ### Fix options
 
@@ -120,9 +133,9 @@ fixtures; nothing in `inst/` is git-ignored or build-ignored, so it ships.
 3. **Drop redundant fixtures** that exist in both `inst/extdata/` and
    `tests/testdata/`.
 
-The `tests/testdata/` directory (~331 MB) is already excluded from the build
-tarball by the `tests` rule in `.Rbuildignore`. Note that this also excludes
-the test suite from CRAN — see §5.
+The `tests/testdata/` directory (~328 MB) is already excluded from the build
+tarball by the broad `tests` rule in `.Rbuildignore`. Note that this also
+excludes the test suite from CRAN — see §5.
 
 ---
 
@@ -240,20 +253,23 @@ vigs <- list.files("vignettes", pattern = "\\.Rmd$", full.names = TRUE)
 v_audit <- function(f) {
   txt <- paste(readLines(f, warn = FALSE), collapse = "\n")
   data.frame(
-    file       = basename(f),
-    bytes      = file.info(f)$size,
-    eval_false = grepl("eval\\s*=\\s*FALSE", txt),
-    download   = grepl("download_", txt)
+    file          = basename(f),
+    bytes         = file.info(f)$size,
+    eval_false    = grepl("eval\\s*=\\s*FALSE", txt),
+    uses_live_run = grepl("live_run", txt),
+    download      = grepl("download_", txt),
+    httr2_request = grepl("httr2::request", txt)
   )
 }
 do.call(rbind, lapply(vigs, v_audit)) |> knitr::kable()
 ```
 
 Vignettes are built by CRAN with `Sys.setenv("_R_CHECK_LIMIT_CORES_" = TRUE)`
-and **no internet access**. Every chunk that calls `download_*` must either
-be `eval = FALSE` or be guarded by `tryCatch()` + a `knitr::knit_exit()`
-fallback. Audit any vignette in the table above where `download` is `TRUE`
-and `eval_false` is `FALSE`.
+and **no internet access**. The migrate-branch workflow vignettes now use a
+shared `live_run` guard that skips heavy download/process/extraction chunks on
+CI, CRAN checks, and pkgdown unless `AMADEUS_RUN_VIGNETTES=true`; older overview
+vignettes use `eval = FALSE` for credential/network examples. This closes the
+prior open vignette-network blocker; keep this audit in place before release.
 
 ---
 
@@ -261,10 +277,12 @@ and `eval_false` is `FALSE`.
 
 - The last release on CRAN was `1.0.7` (2024-09-02). The next submission will
   be the first under the refactored 2.x line.
+- `DESCRIPTION` currently carries development version `2.0.0.0001`; do not bump
+  it in this report-refresh workstream, but choose the final CRAN release
+  version deliberately before submission.
 - `NEWS.md` already flags `process_tri()` / `calculate_tri()` as the only
   intentional breaking change — keep the prominent callout.
-- Recommend bumping `Version:` to `2.0.0` on submission and tagging
-  `v2.0.0-cran` on merge.
+- Recommend tagging the accepted release (for example `v2.0.0-cran`) on merge.
 - No known CRAN reverse dependencies; still run `revdepcheck::revdep_check()`
   for safety.
 
@@ -302,13 +320,16 @@ resolved.
 
 ## 9. Open blockers — short list
 
-1. **Move `testthat` from `Imports` to `Suggests`** in `DESCRIPTION`.
+1. **Remove package-code use of `testthat::` and move `testthat` from `Imports`
+   to `Suggests`** in `DESCRIPTION`.
 2. **Reduce `inst/extdata/` to ≤ 5 MB** (move fixtures to `tests/testdata/`
    or to an external data repo).
-3. **Audit vignette chunks** that call `download_*` — make sure they are
-   `eval = FALSE` or guarded.
-4. **Re-enable shipped tests** (mocked tier) by editing `.Rbuildignore`.
+3. **Re-enable shipped tests** (mocked tier) by editing `.Rbuildignore`, or
+   explicitly document why CRAN should only run examples.
+4. **Choose/finalize the CRAN release version** from current `2.0.0.0001`
+   without changing it in this workstream.
 5. **Run `R CMD check --as-cran`** locally and resolve any remaining
    NOTEs / WARNINGs.
 
-Once items 1–5 are clean, the package is ready to submit.
+The prior vignette-network, ncdf4 CI, GOES vignette, and README HUC blockers are
+closed; once items 1–5 are clean, the package is ready to submit.
