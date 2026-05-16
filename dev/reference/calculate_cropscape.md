@@ -1,0 +1,85 @@
+# Calculate Cropscape covariates
+
+Extract Cropscape (CDL) values at point locations. Returns a
+`data.frame` object containing `locs_id` and crop specific cell
+fractions.
+
+## Usage
+
+``` r
+calculate_cropscape(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  weights = NULL,
+  geom = FALSE,
+  ...
+)
+```
+
+## Arguments
+
+- from:
+
+  SpatRaster(1). Output from
+  [`process_cropscape()`](https://niehs.github.io/amadeus/dev/reference/process_cropscape.md).
+
+- locs:
+
+  data.frame. character to file path, SpatVector, or sf object.
+
+- locs_id:
+
+  character(1). Column within `locations` CSV file containing identifier
+  for each unique coordinate location.
+
+- radius:
+
+  integer(1). Circular buffer distance around site locations. (Default =
+  0).
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
+
+- geom:
+
+  FALSE/"sf"/"terra".. Should the function return with geometry? Default
+  is `FALSE`, options with geometry are "sf" or "terra". The coordinate
+  reference system of the `sf` or `SpatVector` is that of `from.`
+
+- ...:
+
+  Placeholders.
+
+## Value
+
+a data.frame or SpatVector object
+
+## See also
+
+[`process_cropscape()`](https://niehs.github.io/amadeus/dev/reference/process_cropscape.md)
+
+## Author
+
+Insang Song
+
+## Examples
+
+``` r
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
+if (FALSE) { # \dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+calculate_cropscape(
+  from = cropscape, # derived from process_cropscape() example
+  locs = loc,
+  locs_id = "id",
+  radius = 0,
+  geom = FALSE
+)
+} # }
+```

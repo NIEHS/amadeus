@@ -1,0 +1,36 @@
+pandoc: 3.8.3
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  aqs_workflow: aqs_workflow.html
+  calculate_time_grouping: calculate_time_grouping.html
+  computational_considerations: computational_considerations.html
+  cropscape_workflow: cropscape_workflow.html
+  download_functions: download_functions.html
+  drought_workflow: drought_workflow.html
+  ecoregion_workflow: ecoregion_workflow.html
+  edgar_workflow: edgar_workflow.html
+  epa_download: epa_download.html
+  geos_workflow: geos_workflow.html
+  gmted_workflow: gmted_workflow.html
+  gridmet_workflow: gridmet_workflow.html
+  groads_workflow: groads_workflow.html
+  hms_workflow: hms_workflow.html
+  huc_workflow: huc_workflow.html
+  koppen_workflow: koppen_workflow.html
+  merra2_workflow: merra2_workflow.html
+  modis_workflow: modis_workflow.html
+  narr_workflow: narr_workflow.html
+  nei_workflow: nei_workflow.html
+  nlcd_workflow: nlcd_workflow.html
+  noaa_goes_workflow: noaa_goes_workflow.html
+  pm_data_workflow: pm_data_workflow.html
+  population_workflow: population_workflow.html
+  prism_workflow: prism_workflow.html
+  protected_datasets: protected_datasets.html
+  terraclimate_workflow: terraclimate_workflow.html
+  tri_workflow: tri_workflow.html
+last_built: 2026-05-16T03:46Z
+urls:
+  reference: https://niehs.github.io/amadeus/reference
+  article: https://niehs.github.io/amadeus/articles

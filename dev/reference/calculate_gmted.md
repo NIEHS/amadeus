@@ -1,0 +1,95 @@
+# Calculate elevation covariates
+
+Extract elevation values at point locations. Returns a `data.frame`
+object containing `locs_id`, year of release, and elevation variable.
+Elevation variable column name reflects the elevation statistic, spatial
+resolution of `from`, and circular buffer radius (ie. Breakline Emphasis
+at 7.5 arc-second resolution with 0 meter buffer:
+breakline_emphasis_r75_0).
+
+## Usage
+
+``` r
+calculate_gmted(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  fun = "mean",
+  weights = NULL,
+  geom = FALSE,
+  ...
+)
+```
+
+## Arguments
+
+- from:
+
+  SpatRaster(1). Output from
+  [`process_gmted()`](https://niehs.github.io/amadeus/dev/reference/process_gmted.md).
+
+- locs:
+
+  data.frame. character to file path, SpatVector, or sf object.
+
+- locs_id:
+
+  character(1). Column within `locations` CSV file containing identifier
+  for each unique coordinate location.
+
+- radius:
+
+  integer(1). Circular buffer distance around site locations. (Default =
+  0).
+
+- fun:
+
+  character(1). Function used to summarize multiple raster cells within
+  sites location buffer (Default = `mean`).
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
+
+- geom:
+
+  FALSE/"sf"/"terra".. Should the function return with geometry? Default
+  is `FALSE`, options with geometry are "sf" or "terra". The coordinate
+  reference system of the `sf` or `SpatVector` is that of `from.`
+
+- ...:
+
+  Placeholders
+
+## Value
+
+a data.frame or SpatVector object
+
+## See also
+
+[`process_gmted()`](https://niehs.github.io/amadeus/dev/reference/process_gmted.md)
+
+## Author
+
+Mitchell Manware
+
+## Examples
+
+``` r
+## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+##       amount of data which is not included in the package.
+if (FALSE) { # \dontrun{
+loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+calculate_gmted(
+  from = gmted, # derived from process_gmted() example
+  locs = loc,
+  locs_id = "id",
+  radius = 0,
+  fun = "mean",
+  geom = FALSE
+)
+} # }
+```
