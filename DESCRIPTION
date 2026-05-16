@@ -34,20 +34,23 @@ Imports:
     testthat (>= 3.0.0)
 Suggests:
     covr,
-    withr,
-    knitr,
-    rmarkdown,
-    lwgeom,
-    FNN,
-    doRNG,
     devtools,
+    doRNG,
+    FNN,
+    furrr,
     ggplot2,
+    knitr,
+    lwgeom,
     maps,
+    mirai,
     nhdplusTools,
-    stringr,
-    tigris,
+    patrick,
+    rmarkdown,
     spelling,
-    patrick
+    stringr,
+    targets,
+    tigris,
+    withr
 RdMacros: Rdpack
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown

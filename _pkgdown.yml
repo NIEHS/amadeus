@@ -1,4 +1,6 @@
 url: https://niehs.github.io/amadeus/
+development:
+  mode: auto
 template:
   bootstrap: 5
   bootswatch: minty
@@ -18,6 +20,8 @@ navbar:
           href: articles/calculate_time_grouping.html
         - text: Protected Data Sources
           href: articles/protected_datasets.html
+        - text: Computational Considerations
+          href: articles/computational_considerations.html
         - text: Downloading EPA Daily Data
           href: articles/epa_download.html
         - text: Dataset Workflows
@@ -130,6 +134,7 @@ articles:
   - download_functions
   - calculate_time_grouping
   - protected_datasets
+  - computational_considerations
   - epa_download
   - pm_data_workflow
   - aqs_workflow

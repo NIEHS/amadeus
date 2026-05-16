@@ -41,6 +41,7 @@ pak::pak("NIEHS/amadeus")
 | [NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/) | netCDF | Atmosphere<br>Meteorology | Global | `_merra2` |
 | [NASA SEDAC[^3] UN WPP-Adjusted Population Density](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11) | GeoTIFF<br>netCDF | Population | Global | `_population` |
 | [NASA SEDAC Global Roads Open Access Data Set](https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1) | Shapefile<br>Geodatabase | Roadways | Global | `_groads` |
+| [USGS[^6] Hydrologic Unit Codes (HUC)](https://www.usgs.gov/national-hydrography/access-national-hydrography-products) | Geodatabase<br>Shapefile | Hydrology | United States | `_huc` |
 | [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere<br>Meteorology | Global | `_geos` |
 | [EDGAR Emissions Database for Global Atmospheric Research](https://edgar.jrc.ec.europa.eu/) | netCDF<br>TXT | Emissions | Global | `_edgar` |
 | [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#about) | Shapefile<br>KML | Wildfire Smoke | North America | `_hms` |
@@ -58,6 +59,19 @@ pak::pak("NIEHS/amadeus")
 See the "[download_data](https://niehs.github.io/amadeus/articles/download_functions.html)" vignette for a detailed description of source-specific download functions.
 
 For TRI, `download_tri()` can retrieve EPA annual basic data files for the nationwide dataset (`jurisdiction = "US"`), individual states or territories (`jurisdiction = "AZ"`, `"NC"`, etc.), and the tribal file (`jurisdiction = "tbl"`).
+
+## NASA Earthdata authentication with `setup_nasa_token()`
+
+Many NASA-hosted datasets require an Earthdata Login bearer token. In `amadeus`, this includes `modis`, `merra2`, `geos`, and `population` (NASA SEDAC). Use `setup_nasa_token()` to store the token before calling the corresponding `download_*()` functions. See `vignette("protected_datasets", package = "amadeus")` for more detail.
+
+`setup_nasa_token()` supports three storage methods: `method = "renviron"` writes `NASA_EARTHDATA_TOKEN` to `~/.Renviron` for persistent personal use; `method = "file"` writes a local token file such as `~/.nasa_earthdata_token`; and `method = "session"` uses `Sys.setenv()` for the current R session only.
+
+```r
+setup_nasa_token()                              # prompts interactively
+setup_nasa_token(method = "renviron", token = "<your_token>")
+```
+
+Never commit Earthdata tokens to git or include them in shared scripts. Prefer `method = "renviron"` on personal machines, and `method = "session"` for shared systems or CI jobs where the token is supplied from a CI secret.
 
 Example use of `download_data` using NOAA NCEP North American Regional Reanalysis's (NARR) "weasd" (Daily Accumulated Snow at Surface) variable.
 
@@ -165,6 +179,12 @@ Projected CRS: unnamed
 4 001 2022-01-04 0.000000000 POINT (8184606 3523283)
 5 001 2022-01-05 0.001953125 POINT (8184606 3523283)
 ```
+
+## Computational considerations
+
+`amadeus` builds on `terra` and `exactextractr`, which are C++-backed and efficient for individual raster, vector, and extraction operations. For large spatial or temporal domains, however, the cumulative wall-clock cost of many `process_*()` or `calculate_*()` calls can still be significant.
+
+These workloads are often embarrassingly parallel across dates, variables, or location chunks. See `vignette("computational_considerations", package = "amadeus")` for examples using sequential baselines, process-level parallelism, and reproducible pipeline tools.
 
 ### Calculate_* buffer radius information
 
