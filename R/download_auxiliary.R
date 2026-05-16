@@ -943,32 +943,6 @@ check_urls <- function(
   }
 }
 
-#' Download unit tests
-#' @description
-#' Implement directory, file, and download URL unit tests.
-#' @param directory_to_save directory to test saving
-#' @param commands_path file path with download commands
-#' @param url_status logical vector for URL status = 200
-#' @importFrom testthat expect_true
-#' @return NULL; returns stop error if one or more tests fail
-#' @keywords internal
-#' @export
-test_download_functions <- function(
-  directory_to_save = directory_to_save,
-  commands_path = commands_path,
-  url_status = url_status
-) {
-  # test that directory_to_save exists
-  testthat::expect_true(dir.exists(directory_to_save))
-  # test that commands_path exists
-  testthat::expect_true(file.exists(commands_path))
-  if (!(is.null(url_status))) {
-    # test that sample of download URLs all have HTTP status 200
-    testthat::expect_true(all(url_status))
-  }
-}
-
-
 #' Sort NOAA NARR variables
 #' @description
 #' Determine whether a NOAA NARR variable selected for download is a

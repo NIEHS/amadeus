@@ -30,8 +30,7 @@ Imports:
     rlang,
     archive,
     collapse,
-    Rdpack,
-    testthat (>= 3.0.0)
+    Rdpack
 Suggests:
     covr,
     devtools,
@@ -49,6 +48,7 @@ Suggests:
     spelling,
     stringr,
     targets,
+    testthat (>= 3.0.0),
     tigris,
     withr
 RdMacros: Rdpack
