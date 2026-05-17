@@ -35,10 +35,17 @@ state of the `migrate` branch. Each item is graded against the
 and the maintainer guide [R Packages (2e)](https://r-pkgs.org/release.html).
 
 ```{r summary-table}
+extdata_mb <- round(sum(fs::dir_info("inst/extdata", recurse = TRUE)$size) / 1024^2, 3)
+extdata_status <- if (is.finite(extdata_mb) && extdata_mb <= 5) "pass" else "fail"
+extdata_note <- if (extdata_status == "pass") {
+  sprintf("`inst/extdata/` is %.3f MB (below 5 MB)", extdata_mb)
+} else {
+  sprintf("`inst/extdata/` is %.3f MB (reduce below 5 MB)", extdata_mb)
+}
 sm <- tibble::tribble(
   ~Area,                          ~Status,         ~Blocker,
-  "DESCRIPTION metadata",         status_badge("warn"), "`testthat` remains in Imports and is used from R/ code",
-  "Package size (built tarball)", status_badge("fail"), "Strip large data from `inst/extdata/` (~204 MB)",
+  "DESCRIPTION metadata",         status_badge("pass"), "`testthat` is in Suggests and removed from package runtime code",
+  "Package size (built tarball)", status_badge(extdata_status), extdata_note,
   "Test data (`tests/testdata/`)", status_badge("pass"), "Large fixtures excluded via `.Rbuildignore`",
   "Example timings",              status_badge("pass"), "Most network examples are wrapped; generated counts below",
   "Network / credential skips",   status_badge("pass"), "Live tests gated by `AMADEUS_LIVE_TESTS`; mocked tests offline",
@@ -52,12 +59,12 @@ sm <- tibble::tribble(
 knitr::kable(sm)
 ```
 
-**Verdict:** the package is **NOT yet CRAN-ready** but has made meaningful
-migrate-branch progress. The hard blockers are still (1) `testthat` being
-declared under `Imports` and used from package code, and (2) `inst/extdata/`
-weighing in at ~204 MB, which will blow past CRAN's 5 MB tarball ceiling. The
-previous ncdf4 CI gap, GOES vignette bug, missing HUC README coverage, and
-vignette network-call audit items are now resolved or materially improved.
+**Verdict:** the package is **closer to CRAN-ready** and has made meaningful
+migrate-branch progress. The prior hard blockers around `testthat` imports and
+`inst/extdata/` size are now resolved in this working tree. Remaining readiness
+items are primarily final check hygiene (see open blockers in §9). The previous
+ncdf4 CI gap, GOES vignette bug, missing HUC README coverage, and vignette
+network-call audit items are now resolved or materially improved.
 
 ### Recent changes since v1.0.7 (migrate branch)
 
@@ -80,20 +87,8 @@ knitr::kable(imp)
 
 ### Findings
 
-- **`testthat` is still under `Imports`** (`Imports: ..., testthat (>= 3.0.0)`).
-  CRAN policy expects `testthat` to be a `Suggests` dependency when it is only a
-  test-time tool. This remains a hard blocker because `R/download_auxiliary.R`
-  currently calls `testthat::expect_true()` in package code; replace those
-  runtime assertions with ordinary validation before moving `testthat` to
-  `Suggests`. Fix target:
-
-  ```diff
-  - Imports: ..., testthat (>= 3.0.0), ...
-  + Suggests: ..., testthat (>= 3.0.0), ...
-  ```
-
-  After the move, re-run an R-source audit for `testthat::` so CRAN will not see
-  unguarded use of a Suggests package.
+- **`testthat` is in `Suggests` and no longer used in package runtime code**.
+  This aligns with CRAN expectations for test-only dependencies.
 
 - **`Authors@R`** is correctly populated with maintainer + cph.
 - **`Description`** field contains a method reference in canonical
@@ -119,19 +114,18 @@ knitr::kable(sizes)
 ```
 
 CRAN tarballs must typically be ≤ 5 MB (waivers exist for data packages but
-require justification). The current `inst/extdata/` directory holds ~204 MB of
-fixtures; most of `inst/` still ships, so this remains the largest CRAN blocker.
+require justification). The current `inst/extdata/` footprint is
+`r round(size_one("inst/extdata") / 1024^2, 3)` MB, which is below the 5 MB
+threshold.
 
-### Fix options
+### Remaining optional cleanup
 
-1. **Move all fixtures to `tests/testdata/`** (already excluded via
-   `.Rbuildignore`) and load via `system.file()` only for examples that truly
-   require them. *Recommended*.
-2. **Mirror large fixtures externally** (Zenodo / NIEHS data portal) and
-   download on demand in vignettes, gated by `interactive()` /
-   `Sys.getenv()`.
-3. **Drop redundant fixtures** that exist in both `inst/extdata/` and
-   `tests/testdata/`.
+1. **Keep `sn_bound_10deg.txt`** in `inst/extdata/` because it is used at
+   runtime by `extent_to_modis_tiles()`.
+2. **Keep `data_files/durham_h3_res8.rds`** while workflow vignettes still use
+   it.
+3. **Remove any extdata fixture that has no code, test, or vignette references**
+   to prevent future size creep.
 
 The `tests/testdata/` directory (~328 MB) is already excluded from the build
 tarball by the broad `tests` rule in `.Rbuildignore`. Note that this also
@@ -313,23 +307,21 @@ rhub::check_for_cran()
 # revdepcheck::revdep_check(num_workers = 2)
 ```
 
-Submit only after all of the above are clean and the §1 & §2 blockers are
-resolved.
+Submit only after all of the above are clean.
 
 ---
 
 ## 9. Open blockers — short list
 
-1. **Remove package-code use of `testthat::` and move `testthat` from `Imports`
-   to `Suggests`** in `DESCRIPTION`.
-2. **Reduce `inst/extdata/` to ≤ 5 MB** (move fixtures to `tests/testdata/`
-   or to an external data repo).
-3. **Re-enable shipped tests** (mocked tier) by editing `.Rbuildignore`, or
+1. **`inst/extdata/` size check**: currently below 5 MB; keep monitoring after
+   adding any new packaged fixtures.
+2. **Re-enable shipped tests** (mocked tier) by editing `.Rbuildignore`, or
    explicitly document why CRAN should only run examples.
-4. **Choose/finalize the CRAN release version** from current `2.0.0.0001`
+3. **Choose/finalize the CRAN release version** from current `2.0.0.0001`
    without changing it in this workstream.
-5. **Run `R CMD check --as-cran`** locally and resolve any remaining
+4. **Run `R CMD check --as-cran`** locally and resolve any remaining
    NOTEs / WARNINGs.
 
-The prior vignette-network, ncdf4 CI, GOES vignette, and README HUC blockers are
-closed; once items 1–5 are clean, the package is ready to submit.
+The prior vignette-network, ncdf4 CI, GOES vignette, README HUC, `testthat`
+dependency, and `inst/extdata` size blockers are closed; once items 1–4 are
+clean, the package is ready to submit.

@@ -97,3 +97,4 @@ coverage-repro.log
 tests/test_report/*.html
 tests/test_report/*.pdf
 tests/test_report/*_files/
+tests/test_report/cran_checklist.html
