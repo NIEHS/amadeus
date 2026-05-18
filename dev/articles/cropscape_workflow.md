@@ -175,7 +175,17 @@ processed_data <- process_covariates(
   covariate = "cropscape",
   path = cropscape_path,
   year = 2020,
-  extent = terra::ext(-114.9, -102.0, 31.3, 41.1)
+  extent = {
+    ref_ext <- terra::ext(cropscape_reference)
+    dx <- terra::xmax(ref_ext) - terra::xmin(ref_ext)
+    dy <- terra::ymax(ref_ext) - terra::ymin(ref_ext)
+    terra::ext(
+      terra::xmin(ref_ext) + 0.35 * dx,
+      terra::xmin(ref_ext) + 0.65 * dx,
+      terra::ymin(ref_ext) + 0.35 * dy,
+      terra::ymin(ref_ext) + 0.65 * dy
+    )
+  }
 )
 plot(processed_data, main = "Processed CropScape raster")
 ```
