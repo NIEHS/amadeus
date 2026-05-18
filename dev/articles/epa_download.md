@@ -77,11 +77,11 @@ for (n in seq_along(csv_names)) {
 }
 ```
 
-    [1] "reading and processing file: /tmp/Rtmpg1N1TD/daily_88101_2018.csv ..."
-    [1] "reading and processing file: /tmp/Rtmpg1N1TD/daily_88101_2019.csv ..."
-    [1] "reading and processing file: /tmp/Rtmpg1N1TD/daily_88101_2020.csv ..."
-    [1] "reading and processing file: /tmp/Rtmpg1N1TD/daily_88101_2021.csv ..."
-    [1] "reading and processing file: /tmp/Rtmpg1N1TD/daily_88101_2022.csv ..."
+    [1] "reading and processing file: /tmp/RtmpFZiOmK/daily_88101_2018.csv ..."
+    [1] "reading and processing file: /tmp/RtmpFZiOmK/daily_88101_2019.csv ..."
+    [1] "reading and processing file: /tmp/RtmpFZiOmK/daily_88101_2020.csv ..."
+    [1] "reading and processing file: /tmp/RtmpFZiOmK/daily_88101_2021.csv ..."
+    [1] "reading and processing file: /tmp/RtmpFZiOmK/daily_88101_2022.csv ..."
 
 ### Downloading monitor metadata
 
