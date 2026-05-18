@@ -250,7 +250,10 @@ Institute of Environmental Health Science’s (NIEHS) Connecting Health
 Outcomes Research Data Systems (CHORDS) program. CHORDS aims to “build
 and strengthen data infrastructure for patient-centered outcomes
 research on environment and health” by providing curated data, analysis
-tools, and educational resources.
+tools, and educational resources. As the CHORDS project comes to an end
+in FY26, it is being absorbed into the larger NIH Health and Extreme
+Weather program and the NIH Accelerator program
+(<https://www.niehs.nih.gov/research/programs/chords/hew-data>).
 
 ## Future Development, Maintenance, and Opportunities for Contribution
 
@@ -295,8 +298,17 @@ covered or type of functionality provided.
 | [`ecmwfr`](https://cran.r-project.org/package=ecmwfr) | [ECMWF Reanalysis v5 (ERA5)](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) |
 | [`rNOMADS`](https://cran.r-project.org/package=rNOMADS) | [NOAA Operational Model Archive and Distribution System](https://nomads.ncep.noaa.gov/) |
 | [`sen2r`](https://github.com/ranghetti/sen2r)[^1] | [Sentinel-2](https://sentiwiki.copernicus.eu/web/s2-mission) |
+| [`eddi`](https://github.com/earthlab/eddi) | [EDDI](https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data) |
+| [`heat`](https://github.com/echolab-stanford/heat) | \[Harmonized Environmental Exposure Aggregation Tools\] (<https://github.com/echolab-stanford>) |
 
-## Contribution
+## Contribution and AI use
+
+The long-term sustainability and continuous improvements and development
+of `amadeus` is relying on contributions from agentic AI products.
+GitHub Copilot is currently being used to assist with code development,
+documentation, and testing. To ensure the quality and reliability of the
+package, all contributions are reviewed and extensively tested by the
+maintainers before being merged into the main branch.
 
 To add or edit functionality for new data sources or datasets, open a
 [Pull request](https://github.com/NIEHS/amadeus/pulls) into the main

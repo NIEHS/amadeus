@@ -42,7 +42,6 @@
     <li><a class="dropdown-item" href="articles/calculate_time_grouping.html">Time grouping in calculate_* functions</a></li>
     <li><a class="dropdown-item" href="articles/protected_datasets.html">Protected Data Sources</a></li>
     <li><a class="dropdown-item" href="articles/computational_considerations.html">Computational Considerations</a></li>
-    <li><a class="dropdown-item" href="articles/epa_download.html">Downloading EPA Daily Data</a></li>
     <li><h6 class="dropdown-header" data-toc-skip>Dataset Workflows</h6></li>
     <li><a class="dropdown-item" href="articles/pm_data_workflow.html">Particulate Matter (PM) Networks (AQS + IMPROVE)</a></li>
     <li><a class="dropdown-item" href="articles/cropscape_workflow.html">USDA CropScape</a></li>
@@ -408,7 +407,7 @@ Projected CRS: unnamed
 <div class="section level2">
 <h2 id="connecting-health-outcomes-research-data-systems">Connecting Health Outcomes Research Data Systems<a class="anchor" aria-label="anchor" href="#connecting-health-outcomes-research-data-systems"></a>
 </h2>
-<p>The <code>amadeus</code> package has been developed as part of the National Institute of Environmental Health Science’s (NIEHS) Connecting Health Outcomes Research Data Systems (CHORDS) program. CHORDS aims to “build and strengthen data infrastructure for patient-centered outcomes research on environment and health” by providing curated data, analysis tools, and educational resources.</p>
+<p>The <code>amadeus</code> package has been developed as part of the National Institute of Environmental Health Science’s (NIEHS) Connecting Health Outcomes Research Data Systems (CHORDS) program. CHORDS aims to “build and strengthen data infrastructure for patient-centered outcomes research on environment and health” by providing curated data, analysis tools, and educational resources. As the CHORDS project comes to an end in FY26, it is being absorbed into the larger NIH Health and Extreme Weather program and the NIH Accelerator program (<a href="https://www.niehs.nih.gov/research/programs/chords/hew-data" class="external-link uri">https://www.niehs.nih.gov/research/programs/chords/hew-data</a>).</p>
 </div>
 <div class="section level2">
 <h2 id="future-development-maintenance-and-opportunities-for-contribution">Future Development, Maintenance, and Opportunities for Contribution<a class="anchor" aria-label="anchor" href="#future-development-maintenance-and-opportunities-for-contribution"></a>
@@ -458,12 +457,21 @@ Projected CRS: unnamed
 </td>
 <td align="left"><a href="https://sentiwiki.copernicus.eu/web/s2-mission" class="external-link">Sentinel-2</a></td>
 </tr>
+<tr>
+<td align="left"><a href="https://github.com/earthlab/eddi" class="external-link"><code>eddi</code></a></td>
+<td align="left"><a href="https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data" class="external-link">EDDI</a></td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/echolab-stanford/heat" class="external-link"><code>heat</code></a></td>
+<td align="left">[Harmonized Environmental Exposure Aggregation Tools] (<a href="https://github.com/echolab-stanford" class="external-link uri">https://github.com/echolab-stanford</a>)</td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="section level2">
-<h2 id="contribution">Contribution<a class="anchor" aria-label="anchor" href="#contribution"></a>
+<h2 id="contribution-and-ai-use">Contribution and AI use<a class="anchor" aria-label="anchor" href="#contribution-and-ai-use"></a>
 </h2>
+<p>The long-term sustainability and continuous improvements and development of <code>amadeus</code> is relying on contributions from agentic AI products. GitHub Copilot is currently being used to assist with code development, documentation, and testing. To ensure the quality and reliability of the package, all contributions are reviewed and extensively tested by the maintainers before being merged into the main branch.</p>
 <p>To add or edit functionality for new data sources or datasets, open a <a href="https://github.com/NIEHS/amadeus/pulls" class="external-link">Pull request</a> into the main branch with a detailed description of the proposed changes. Pull requests must pass all status checks, and then will be approved or rejected by <code>amadeus</code>’s authors.</p>
 <p>Utilize <a href="https://github.com/NIEHS/amadeus/issues" class="external-link">Issues</a> to notify the authors of bugs, questions, or recommendations. Identify each issue with the appropriate label to help ensure a timely response.</p>
 </div>

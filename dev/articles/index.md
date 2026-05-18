@@ -10,8 +10,6 @@
   Sources](https://niehs.github.io/amadeus/dev/articles/protected_datasets.md):
 - [Computational
   Considerations](https://niehs.github.io/amadeus/dev/articles/computational_considerations.md):
-- [Downloading EPA Daily
-  Data](https://niehs.github.io/amadeus/dev/articles/epa_download.md):
 - [Particulate Matter (PM) data network
   workflows](https://niehs.github.io/amadeus/dev/articles/pm_data_workflow.md):
 - [US EPA Air Quality System
