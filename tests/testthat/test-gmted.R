@@ -355,6 +355,9 @@ testthat::test_that("calculate_gmted", {
             radius = radii[a],
             fun = "mean"
           )
+        testthat::expect_true(
+          paste0("gmted_", radii[a]) %in% names(gmted_covariate)
+        )
         # set column names
         gmted_covariate <- calc_setcolumns(
           from = gmted_covariate,

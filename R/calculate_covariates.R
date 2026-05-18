@@ -2899,9 +2899,8 @@ calculate_hms <- function(
 #' @description
 #' Extract elevation values at point locations. Returns a \code{data.frame}
 #' object containing \code{locs_id}, year of release, and elevation variable.
-#' Elevation variable column name reflects the elevation statistic, spatial
-#' resolution of \code{from}, and circular buffer radius (ie. Breakline Emphasis
-#' at 7.5 arc-second resolution with 0 meter buffer: breakline_emphasis_r75_0).
+#' Elevation variable column name follows the pattern
+#' \code{gmted_<radius>} (for example, \code{gmted_0} or \code{gmted_100}).
 #' @param from SpatRaster(1). Output from \code{process_gmted()}.
 #' @param locs data.frame. character to file path, SpatVector, or sf object.
 #' @param locs_id character(1). Column within `locations` CSV file
@@ -2976,39 +2975,7 @@ calculate_gmted <- function(
     weights = weights
   )
   #### variable column name
-  statistic_codes <- c("be", "ds", "md", "mi", "mn", "mx", "sd")
-  statistic_to <- c(
-    "BRK",
-    "SUB",
-    "MED",
-    "MEA",
-    "MIN",
-    "MAX",
-    "STD"
-  )
-  name_from <- names(from)
-  code_unique <-
-    regmatches(
-      name_from,
-      regexpr(
-        paste0("(", paste(statistic_codes, collapse = "|"), ")[0-9]{2,2}"),
-        name_from
-      )
-    )
-  statistic <- substr(code_unique, 1, 2)
-  resolution <- substr(code_unique, 3, 4)
-  statistic_to <-
-    sprintf(
-      "%s%s",
-      statistic_to[match(statistic, statistic_codes)],
-      resolution
-    )
-
-  variable_name <- paste0(
-    statistic_to,
-    "_",
-    sprintf("%05d", as.integer(radius))
-  )
+  variable_name <- paste0("gmted_", as.integer(radius))
   if (geom %in% c("sf", "terra")) {
     #### convert integer to numeric
     sites_extracted[, 4] <- as.numeric(sites_extracted[, 4])

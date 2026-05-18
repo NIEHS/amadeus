@@ -148,6 +148,5 @@ print(polygon_values)
 ## Visualize the point outputs
 
 ```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
-ggplot(data = point_values) + geom_sf(aes(color = `_00000`))
+ggplot(data = point_values) + geom_sf(aes(color = gmted_0))
 ```
-
