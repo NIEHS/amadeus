@@ -931,6 +931,62 @@ testthat::test_that("calculate_drought (USDM baseline)", {
   testthat::expect_equal(result$usdm_dm_0, c(2, 2))
 })
 
+testthat::test_that("calculate_drought(source=usdm, radius=1000): returns USDM class proportion columns", {
+  withr::local_package("terra")
+
+  usdm <- process_drought(
+    source = "usdm",
+    path = testdata_usdm,
+    date = c("2020-01-07", "2020-01-14")
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from    = usdm,
+    locs    = locs,
+    locs_id = "site_id",
+    radius  = 1000L
+  ))
+
+  prop_cols <- grep("^usdm_dm_[0-4]_1000$", names(result), value = TRUE)
+  testthat::expect_length(prop_cols, 5L)
+  testthat::expect_true("usdm_dm_0" %in% names(result))
+  testthat::expect_true(
+    all(vapply(result[, prop_cols, drop = FALSE], is.numeric, logical(1)))
+  )
+})
+
+testthat::test_that("calculate_drought(source=usdm, radius=1000): class proportions are bounded and sum to one", {
+  withr::local_package("terra")
+
+  usdm <- process_drought(
+    source = "usdm",
+    path = testdata_usdm,
+    date = c("2020-01-07", "2020-01-14")
+  )
+  locs <- data.frame(site_id = "001", lon = -97.5, lat = 37.5)
+
+  result <- suppressMessages(calculate_drought(
+    from    = usdm,
+    locs    = locs,
+    locs_id = "site_id",
+    radius  = 1000L
+  ))
+
+  prop_cols <- grep("^usdm_dm_[0-4]_1000$", names(result), value = TRUE)
+  prop_mat <- as.matrix(result[, prop_cols, drop = FALSE])
+
+  testthat::expect_true(all(prop_mat >= 0, na.rm = TRUE))
+  testthat::expect_true(all(prop_mat <= 1, na.rm = TRUE))
+  testthat::expect_equal(
+    as.numeric(rowSums(prop_mat)),
+    rep(1, nrow(result)),
+    tolerance = 1e-6
+  )
+  testthat::expect_equal(result$usdm_dm_2_1000, rep(1, nrow(result)))
+  testthat::expect_equal(result$usdm_dm_0, c(2, 2))
+})
+
 testthat::test_that("calculate_drought (USDM point outside polygon → NA)", {
   withr::local_package("terra")
 

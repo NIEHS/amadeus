@@ -4774,8 +4774,9 @@ calculate_goes <- function(
 #' @param locs_id character(1). Name of the unique location identifier column
 #'   in \code{locs}. Default \code{"site_id"}.
 #' @param radius integer(1). Circular buffer radius in metres around each
-#'   site location used for raster extraction (SPEI/EDDI only; ignored for
-#'   USDM). Default \code{0L}.
+#'   site location used for extraction. For SPEI/EDDI this controls raster
+#'   buffering; for USDM, \code{radius > 0} additionally returns class
+#'   proportions within the buffer. Default \code{0L}.
 #' @param fun character(1). Summary function applied to raster cells within
 #'   the buffer (SPEI/EDDI only). Default \code{"mean"}.
 #' @param geom \code{FALSE}, \code{"sf"}, or \code{"terra"}. Whether to
@@ -4792,8 +4793,8 @@ calculate_goes <- function(
 #'   \item The column name for extracted drought values follows the pattern
 #'     \code{"<source>_<timescale>_<radius>"} (e.g. \code{"spei_01_0"}) for
 #'     SPEI/EDDI, and \code{"usdm_dm_0"} for USDM.
-#'   \item For USDM, \code{radius} is accepted but currently unused; future
-#'     versions may support majority-class extraction within a buffer.
+#'   \item For USDM with \code{radius > 0}, proportion columns are added as
+#'     \code{"usdm_dm_<class>_<radius>"} for classes 0–4.
 #' }
 #' @author Insang Song
 #' @return A \code{data.frame} (default) or \code{SpatVector}/\code{sf}
@@ -4941,18 +4942,25 @@ calculate_drought <- function(
     }
     crs_from <- terra::crs(from)
   } else if (inherits(from, "SpatVector")) {
-    #### USDM polygon overlay (radius not used for point-in-polygon)
+    #### USDM polygon overlay and optional buffered class proportions
+    use_usdm_buffer <- as.numeric(radius) > 0
+    prep_radius <- if (use_usdm_buffer) radius else 0L
     sites_list <- amadeus::calc_prepare_locs(
       from = from,
       locs = locs,
       locs_id = locs_id,
-      radius = 0L,
+      radius = prep_radius,
       geom = geom
     )
     sites_e <- sites_list[[1]]
     sites_id <- sites_list[[2]]
 
     col_name <- "usdm_dm_0"
+    prop_col_names <- if (use_usdm_buffer) {
+      paste0("usdm_dm_", 0:4, "_", radius)
+    } else {
+      character(0)
+    }
     dates_unique <- sort(unique(terra::values(from)$date))
 
     result_list <- vector("list", length(dates_unique))
@@ -4960,23 +4968,90 @@ calculate_drought <- function(
       d <- dates_unique[i]
       from_date <- from[terra::values(from)$date == d, ]
       d_posix <- as.POSIXct(as.Date(d), tz = "UTC")
-
-      extracted <- terra::extract(from_date, sites_e)
       dm_values <- rep(NA_real_, nrow(sites_id))
-      if (!is.null(extracted) && nrow(extracted) > 0L) {
-        #### keep first match per site (polygons should not overlap)
-        first_per_site <- !duplicated(extracted$id.y)
-        dm_values[extracted$id.y[first_per_site]] <-
-          extracted$DM[first_per_site]
+
+      if (!use_usdm_buffer) {
+        extracted <- terra::extract(from_date, sites_e)
+        if (!is.null(extracted) && nrow(extracted) > 0L) {
+          #### keep first match per site (polygons should not overlap)
+          first_per_site <- !duplicated(extracted$id.y)
+          dm_values[extracted$id.y[first_per_site]] <-
+            extracted$DM[first_per_site]
+        }
+
+        row_df <- data.frame(
+          sites_id,
+          time = rep(d_posix, nrow(sites_id)),
+          dm = dm_values,
+          stringsAsFactors = FALSE
+        )
+        colnames(row_df) <- c(colnames(sites_id), "time", col_name)
+      } else {
+        sites_buffer <- sites_e
+        if (terra::geomtype(sites_buffer) != "polygons") {
+          sites_buffer <- terra::buffer(sites_buffer, width = radius)
+        }
+        site_index_col <- ".__site_row__"
+        sites_buffer[[site_index_col]] <- seq_len(nrow(sites_buffer))
+
+        prop_values <- matrix(
+          NA_real_,
+          nrow = nrow(sites_id),
+          ncol = length(prop_col_names),
+          dimnames = list(NULL, prop_col_names)
+        )
+
+        intersections <- terra::intersect(sites_buffer, from_date)
+        if (!is.null(intersections) && nrow(intersections) > 0L) {
+          inter_df <- data.frame(
+            site_row = terra::values(intersections)[[site_index_col]],
+            dm = terra::values(intersections)[["DM"]],
+            area = terra::expanse(intersections, unit = "m"),
+            stringsAsFactors = FALSE
+          )
+          inter_df <- inter_df[!(is.na(inter_df$site_row) | is.na(inter_df$dm)), , drop = FALSE]
+
+          if (nrow(inter_df) > 0L) {
+            site_dm_area <- stats::aggregate(
+              area ~ site_row + dm,
+              data = inter_df,
+              FUN = sum
+            )
+            site_area <- terra::expanse(sites_buffer, unit = "m")
+            by_site <- split(site_dm_area, site_dm_area$site_row)
+
+            for (site_row_chr in names(by_site)) {
+              site_row <- as.integer(site_row_chr)
+              dm_area <- by_site[[site_row_chr]]
+              dm_values[site_row] <- as.numeric(dm_area$dm[which.max(dm_area$area)])
+
+              prop_values[site_row, ] <- 0
+              denom <- site_area[site_row]
+              if (is.finite(denom) && denom > 0) {
+                for (j in seq_len(nrow(dm_area))) {
+                  dm_class <- as.integer(dm_area$dm[j])
+                  if (!is.na(dm_class) && dm_class %in% 0:4) {
+                    prop_values[site_row, dm_class + 1L] <- dm_area$area[j] / denom
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        row_df <- data.frame(
+          sites_id,
+          time = rep(d_posix, nrow(sites_id)),
+          dm = dm_values,
+          prop_values,
+          check.names = FALSE,
+          stringsAsFactors = FALSE
+        )
+        colnames(row_df)[seq_len(ncol(sites_id))] <- colnames(sites_id)
+        colnames(row_df)[ncol(sites_id) + 1L] <- "time"
+        colnames(row_df)[ncol(sites_id) + 2L] <- col_name
       }
 
-      row_df <- data.frame(
-        sites_id,
-        time = rep(d_posix, nrow(sites_id)),
-        dm = dm_values,
-        stringsAsFactors = FALSE
-      )
-      colnames(row_df) <- c(colnames(sites_id), "time", col_name)
       result_list[[i]] <- row_df
     }
     sites_extracted <- do.call(rbind, result_list)

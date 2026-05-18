@@ -30,8 +30,9 @@ calculate_drought(
 in \code{locs}. Default \code{"site_id"}.}
 
 \item{radius}{integer(1). Circular buffer radius in metres around each
-site location used for raster extraction (SPEI/EDDI only; ignored for
-USDM). Default \code{0L}.}
+site location used for extraction. For SPEI/EDDI this controls raster
+buffering; for USDM, \code{radius > 0} additionally returns class
+proportions within the buffer. Default \code{0L}.}
 
 \item{fun}{character(1). Summary function applied to raster cells within
 the buffer (SPEI/EDDI only). Default \code{"mean"}.}
@@ -85,8 +86,8 @@ all other \code{calculate_*()} functions in this package.
 \item The column name for extracted drought values follows the pattern
 \code{"<source>_<timescale>_<radius>"} (e.g. \code{"spei_01_0"}) for
 SPEI/EDDI, and \code{"usdm_dm_0"} for USDM.
-\item For USDM, \code{radius} is accepted but currently unused; future
-versions may support majority-class extraction within a buffer.
+\item For USDM with \code{radius > 0}, proportion columns are added as
+\code{"usdm_dm_<class>_<radius>"} for classes 0–4.
 }
 }
 \examples{
