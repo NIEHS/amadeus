@@ -113,5 +113,5 @@ print(polygon_values)
 
 ``` r
 
-ggplot(data = point_values) + geom_sf(aes(color = `_00000`))
+ggplot(data = point_values) + geom_sf(aes(color = gmted_0))
 ```
