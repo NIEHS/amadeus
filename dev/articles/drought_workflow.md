@@ -126,8 +126,8 @@ ggplot2::ggplot(usdm_sf) +
 
 sample_locs <- data.frame(
   site_id = c("site_1", "site_2", "site_3"),
-  lon = c(-99.0, -97.5, -96.0),
-  lat = c(37.0, 36.0, 35.0)
+  lon = c(-115.0, -97.5, -96.0),
+  lat = c(45.0, 36.0, 39.0)
 )
 
 calc_spei <- calculate_drought(
@@ -142,7 +142,7 @@ calc_eddi <- calculate_drought(
   from = eddi_processed,
   locs = sample_locs,
   locs_id = "site_id",
-  radius = 0L,
+  radius = 1000L,
   fun = "mean"
 )
 
@@ -150,7 +150,7 @@ calc_usdm <- calculate_drought(
   from = usdm_processed,
   locs = sample_locs,
   locs_id = "site_id",
-  radius = 1000
+  radius = 50000
 )
 ```
 

@@ -276,8 +276,8 @@ end)</months>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sample_locs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  site_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"site_1"</span>, <span class="st">"site_2"</span>, <span class="st">"site_3"</span><span class="op">)</span>,</span>
-<span>  lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">99.0</span>, <span class="op">-</span><span class="fl">97.5</span>, <span class="op">-</span><span class="fl">96.0</span><span class="op">)</span>,</span>
-<span>  lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">37.0</span>, <span class="fl">36.0</span>, <span class="fl">35.0</span><span class="op">)</span></span>
+<span>  lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">115.0</span>, <span class="op">-</span><span class="fl">97.5</span>, <span class="op">-</span><span class="fl">96.0</span><span class="op">)</span>,</span>
+<span>  lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">45.0</span>, <span class="fl">36.0</span>, <span class="fl">39.0</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">calc_spei</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_drought.html">calculate_drought</a></span><span class="op">(</span></span>
@@ -292,7 +292,7 @@ end)</months>
 <span>  from <span class="op">=</span> <span class="va">eddi_processed</span>,</span>
 <span>  locs <span class="op">=</span> <span class="va">sample_locs</span>,</span>
 <span>  locs_id <span class="op">=</span> <span class="st">"site_id"</span>,</span>
-<span>  radius <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  radius <span class="op">=</span> <span class="fl">1000L</span>,</span>
 <span>  fun <span class="op">=</span> <span class="st">"mean"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -300,7 +300,7 @@ end)</months>
 <span>  from <span class="op">=</span> <span class="va">usdm_processed</span>,</span>
 <span>  locs <span class="op">=</span> <span class="va">sample_locs</span>,</span>
 <span>  locs_id <span class="op">=</span> <span class="st">"site_id"</span>,</span>
-<span>  radius <span class="op">=</span> <span class="fl">1000</span></span>
+<span>  radius <span class="op">=</span> <span class="fl">50000</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">

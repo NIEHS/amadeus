@@ -92,3 +92,62 @@ point_values <- calculate_covariates(
 
 print(point_values)
 ```
+
+## Calculate covariates at polygons and demonstrate the `weighted_mean` function
+
+Here we calculate and compare a simple mean and a population-weighted
+mean for the same set of polygons. The `weighted_mean` function uses the
+population density values as weights, so it will give more influence to
+areas with higher population density within the specified radius.
+
+``` r
+
+
+nc <- st_read(system.file("shape/nc.shp", package="sf"))
+directory_prism <- file.path(tempdir(), "population_workflow","prism")
+
+# Get prism data 
+download_data(
+  dataset_name = "prism",
+  time = "201005",
+  element = "tmax",
+  data_type = "ts",
+  directory_to_save = directory_prism,
+  acknowledgement = TRUE,
+  unzip = TRUE,
+  remove_zip = FALSE
+)
+
+processed_prism <- process_covariates(
+  covariate = "prism",
+  path = list.files(
+    paste0(directory_prism,"/data_files/"),
+    pattern = ".nc",
+    recursive = TRUE,
+    full.names = TRUE
+  )[1],
+  element = "tmax",
+  time = "201005"
+)
+
+pop_weighted_values <- calculate_covariates(
+  covariate = "prism",
+  from = processed_prism,
+  locs = nc,
+  locs_id = "FIPS",
+  weights = processed_data,
+  geom = "sf"
+)
+
+print(pop_weighted_values)
+
+area_weighted_values <- calculate_covariates(
+  covariate = "prism",
+  from = processed_prism,
+  locs = nc,
+  locs_id = "FIPS",
+  geom = "sf"
+)
+
+print(area_weighted_values)
+```
