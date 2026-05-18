@@ -134,7 +134,7 @@ calc_spei <- calculate_drought(
   from = spei_processed,
   locs = sample_locs,
   locs_id = "site_id",
-  radius = 0L,
+  radius = 1000L,
   fun = "mean"
 )
 
@@ -149,7 +149,8 @@ calc_eddi <- calculate_drought(
 calc_usdm <- calculate_drought(
   from = usdm_processed,
   locs = sample_locs,
-  locs_id = "site_id"
+  locs_id = "site_id",
+  radius = 1000
 )
 ```
 

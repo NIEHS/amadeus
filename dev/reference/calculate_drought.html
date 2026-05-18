@@ -146,8 +146,9 @@ in <code>locs</code>. Default <code>"site_id"</code>.</p></dd>
 
 <dt id="arg-radius">radius<a class="anchor" aria-label="anchor" href="#arg-radius"></a></dt>
 <dd><p>integer(1). Circular buffer radius in metres around each
-site location used for raster extraction (SPEI/EDDI only; ignored for
-USDM). Default <code>0L</code>.</p></dd>
+site location used for extraction. For SPEI/EDDI this controls raster
+buffering; for USDM, <code>radius &gt; 0</code> additionally returns class
+proportions within the buffer. Default <code>0L</code>.</p></dd>
 
 
 <dt id="arg-fun">fun<a class="anchor" aria-label="anchor" href="#arg-fun"></a></dt>
@@ -199,8 +200,8 @@ aggregated to the specified resolution via <code><a href="calc_summarize_by.html
 <ul><li><p>The column name for extracted drought values follows the pattern
 <code>"&lt;source&gt;_&lt;timescale&gt;_&lt;radius&gt;"</code> (e.g. <code>"spei_01_0"</code>) for
 SPEI/EDDI, and <code>"usdm_dm_0"</code> for USDM.</p></li>
-<li><p>For USDM, <code>radius</code> is accepted but currently unused; future
-versions may support majority-class extraction within a buffer.</p></li>
+<li><p>For USDM with <code>radius &gt; 0</code>, proportion columns are added as
+<code>"usdm_dm_&lt;class&gt;_&lt;radius&gt;"</code> for classes 0–4.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

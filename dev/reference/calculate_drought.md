@@ -64,8 +64,9 @@ calculate_drought(
 - radius:
 
   integer(1). Circular buffer radius in metres around each site location
-  used for raster extraction (SPEI/EDDI only; ignored for USDM). Default
-  `0L`.
+  used for extraction. For SPEI/EDDI this controls raster buffering; for
+  USDM, `radius > 0` additionally returns class proportions within the
+  buffer. Default `0L`.
 
 - fun:
 
@@ -119,8 +120,8 @@ resolution via
   `"<source>_<timescale>_<radius>"` (e.g. `"spei_01_0"`) for SPEI/EDDI,
   and `"usdm_dm_0"` for USDM.
 
-- For USDM, `radius` is accepted but currently unused; future versions
-  may support majority-class extraction within a buffer.
+- For USDM with `radius > 0`, proportion columns are added as
+  `"usdm_dm_<class>_<radius>"` for classes 0–4.
 
 ## See also
 
