@@ -5201,7 +5201,7 @@ download_improve <- function(
 #'     \url{https://spei.csic.es}.
 #'   \item \strong{EDDI} (Evaporative Demand Drought Index): Weekly raster
 #'     files by timescale from
-#'     \url{https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data}.
+#'     \url{ftp://ftp.cdc.noaa.gov/Projects/EDDI/CONUS_archive/data}.
 #'   \item \strong{USDM} (U.S. Drought Monitor): Weekly drought class
 #'     shapefiles from
 #'     \url{https://droughtmonitor.unl.edu}.
@@ -5232,7 +5232,7 @@ download_improve <- function(
 #' @param ... Reserved for future use; currently ignored.
 #' @note
 #' \itemize{
-#'   \item SPEI and EDDI are raster products (netCDF); USDM is a polygon
+#'   \item SPEI and EDDI are raster products; USDM is a polygon
 #'     product (shapefile). Their \code{process_drought()} and
 #'     \code{calculate_drought()} handling differ accordingly.
 #'   \item No authentication is required for any of these sources.
@@ -5365,16 +5365,8 @@ download_drought <- function(
     # EDDI: weekly CONUS rasters by timescale, organised in year folders
     # nolint start
     ts_str <- sprintf("%02d", timescale)
-    eddi_templates <- list(
-      list(
-        base = "https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data",
-        ext = "asc"
-      ),
-      list(
-        base = "https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_Archive/data",
-        ext = "nc"
-      )
-    )
+    eddi_base <- "ftp://ftp.cdc.noaa.gov/Projects/EDDI/CONUS_archive/data"
+    eddi_ext <- "asc"
     # nolint end
 
     week_dates <- amadeus::drought_weekly_dates(date[1], date[2])
@@ -5388,49 +5380,22 @@ download_drought <- function(
     all_urls <- character(0)
     all_destfiles <- character(0)
 
-    template_idx <- NULL
-    first_wd <- week_dates[1]
-    first_year <- substr(first_wd, 1, 4)
-    for (i in seq_along(eddi_templates)) {
-      tmpl <- eddi_templates[[i]]
-      first_url <- sprintf(
-        "%s/%s/EDDI_ETrs_%smn_%s.%s",
-        tmpl$base,
-        first_year,
-        ts_str,
-        first_wd,
-        tmpl$ext
-      )
-      if (amadeus::check_url_status(first_url)) {
-        template_idx <- i
-        break
-      }
-    }
-
-    if (is.null(template_idx)) {
-      stop(
-        "First EDDI URL returned HTTP 404. ",
-        "Check `date` and `timescale` parameters.\n"
-      )
-    }
-
-    template <- eddi_templates[[template_idx]]
     for (wd in week_dates) {
       year_str <- substr(wd, 1, 4)
       url <- sprintf(
         "%s/%s/EDDI_ETrs_%smn_%s.%s",
-        template$base,
+        eddi_base,
         year_str,
         ts_str,
         wd,
-        template$ext
+        eddi_ext
       )
       destfile <- sprintf(
         "%sEDDI_ETrs_%smn_%s.%s",
         directory_to_save,
         ts_str,
         wd,
-        template$ext
+        eddi_ext
       )
       if (amadeus::check_destfile(destfile)) {
         all_urls <- c(all_urls, url)

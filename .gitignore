@@ -89,6 +89,8 @@ tests/testthat/testthat-problems.rds
 
 .vscode/
 vignettes/local_run.sh
+tools/
+tools/vignettes/live_outputs/
 inst/extdata/presentations/*
 local_cov.Rout
 coverage-repro.log
@@ -98,3 +100,4 @@ tests/test_report/*.html
 tests/test_report/*.pdf
 tests/test_report/*_files/
 tests/test_report/cran_checklist.html
+tools/run-live-workflow-vignettes.sh

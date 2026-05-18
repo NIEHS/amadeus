@@ -551,19 +551,14 @@ testthat::test_that(
       # January 2020 Tuesdays: 7, 14, 21, 28 → 4 files
       testthat::expect_equal(result$success, 4L)
       testthat::expect_true(all(grepl("EDDI_ETrs_01mn_2020", captured_urls)))
-      testthat::expect_true(all(grepl("psl.noaa.gov", captured_urls)))
+      testthat::expect_true(all(grepl("ftp.cdc.noaa.gov", captured_urls)))
     })
   }
 )
 
-testthat::test_that("download_drought EDDI prefers current CONUS_archive endpoint", {
-  checked_urls <- character(0)
+testthat::test_that("download_drought EDDI uses CONUS_archive ftp endpoint", {
   captured_urls <- NULL
   testthat::local_mocked_bindings(
-    check_url_status = function(url) {
-      checked_urls <<- c(checked_urls, url)
-      grepl("CONUS_archive/data/2020/EDDI_ETrs_01mn_20200107\\.asc$", url)
-    },
     check_destfile = function(...) TRUE,
     download_run_method = function(urls, ...) {
       captured_urls <<- urls
@@ -581,35 +576,9 @@ testthat::test_that("download_drought EDDI prefers current CONUS_archive endpoin
         acknowledgement = TRUE
       )
     )
-    testthat::expect_true(any(grepl("CONUS_archive/data/2020/EDDI_ETrs_01mn_20200107\\.asc$", checked_urls)))
     testthat::expect_true(all(grepl("CONUS_archive/data/2020/EDDI_ETrs_01mn_2020", captured_urls)))
+    testthat::expect_true(all(grepl("ftp.cdc.noaa.gov", captured_urls)))
     testthat::expect_true(all(grepl("\\.asc$", captured_urls)))
-  })
-})
-
-testthat::test_that("download_drought EDDI falls back to legacy CONUS_Archive endpoint", {
-  captured_urls <- NULL
-  testthat::local_mocked_bindings(
-    check_url_status = function(url) grepl("CONUS_Archive/data/2020/EDDI_ETrs_01mn_20200107\\.nc$", url),
-    check_destfile = function(...) TRUE,
-    download_run_method = function(urls, ...) {
-      captured_urls <<- urls
-      list(success = length(urls), failed = 0, skipped = 0)
-    },
-    .package = "amadeus"
-  )
-  withr::with_tempdir({
-    suppressMessages(
-      download_drought(
-        source = "eddi",
-        date = c("2020-01-01", "2020-01-31"),
-        timescale = 1L,
-        directory_to_save = ".",
-        acknowledgement = TRUE
-      )
-    )
-    testthat::expect_true(all(grepl("CONUS_Archive/data/2020/EDDI_ETrs_01mn_2020", captured_urls)))
-    testthat::expect_true(all(grepl("\\.nc$", captured_urls)))
   })
 })
 
@@ -640,8 +609,8 @@ testthat::test_that("download_drought EDDI timescale 12 URL has 12mn", {
 
 testthat::test_that("download_drought EDDI 404 error propagates", {
   testthat::local_mocked_bindings(
-    check_url_status = function(...) FALSE,
     check_destfile = function(...) TRUE,
+    download_run_method = function(...) stop("HTTP 404"),
     .package = "amadeus"
   )
   withr::with_tempdir({

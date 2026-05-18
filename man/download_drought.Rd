@@ -68,7 +68,7 @@ Multi-year netCDF files by timescale from
 \url{https://spei.csic.es}.
 \item \strong{EDDI} (Evaporative Demand Drought Index): Weekly raster
 files by timescale from
-\url{https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data}.
+\url{ftp://ftp.cdc.noaa.gov/Projects/EDDI/CONUS_archive/data}.
 \item \strong{USDM} (U.S. Drought Monitor): Weekly drought class
 shapefiles from
 \url{https://droughtmonitor.unl.edu}.
@@ -76,7 +76,7 @@ shapefiles from
 }
 \note{
 \itemize{
-\item SPEI and EDDI are raster products (netCDF); USDM is a polygon
+\item SPEI and EDDI are raster products; USDM is a polygon
 product (shapefile). Their \code{process_drought()} and
 \code{calculate_drought()} handling differ accordingly.
 \item No authentication is required for any of these sources.
