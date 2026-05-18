@@ -22,8 +22,6 @@ navbar:
           href: articles/protected_datasets.html
         - text: Computational Considerations
           href: articles/computational_considerations.html
-        - text: Downloading EPA Daily Data
-          href: articles/epa_download.html
         - text: Dataset Workflows
         - text: Particulate Matter (PM) Networks (AQS + IMPROVE)
           href: articles/pm_data_workflow.html
@@ -135,7 +133,6 @@ articles:
   - calculate_time_grouping
   - protected_datasets
   - computational_considerations
-  - epa_download
   - pm_data_workflow
   - aqs_workflow
   - cropscape_workflow

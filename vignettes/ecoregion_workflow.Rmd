@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 library(amadeus)
 library(sf)
-
+library(terra)
 live_run <- local({
   force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
   on_ci <- nzchar(Sys.getenv("CI")) ||

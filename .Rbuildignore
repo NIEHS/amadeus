@@ -18,7 +18,10 @@ pkgdown
 output
 manuscript
 input
-tests
+^tests/testdata$
+^tests/test_report$
+^tests/lint_tests\.R$
+^tests/testthat/test-.*-live\.R$
 R/ignore.R
 inst/extdata/air.2m
 inst/extdata/nasa/token.txt
