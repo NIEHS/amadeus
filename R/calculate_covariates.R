@@ -5009,7 +5009,11 @@ calculate_drought <- function(
             area = terra::expanse(intersections, unit = "m"),
             stringsAsFactors = FALSE
           )
-          inter_df <- inter_df[!(is.na(inter_df$site_row) | is.na(inter_df$dm)), , drop = FALSE]
+          inter_df <- inter_df[
+            !(is.na(inter_df$site_row) | is.na(inter_df$dm)),
+            ,
+            drop = FALSE
+          ]
 
           if (nrow(inter_df) > 0L) {
             site_dm_area <- stats::aggregate(
@@ -5023,7 +5027,9 @@ calculate_drought <- function(
             for (site_row_chr in names(by_site)) {
               site_row <- as.integer(site_row_chr)
               dm_area <- by_site[[site_row_chr]]
-              dm_values[site_row] <- as.numeric(dm_area$dm[which.max(dm_area$area)])
+              dm_values[site_row] <- as.numeric(
+                dm_area$dm[which.max(dm_area$area)]
+              )
 
               prop_values[site_row, ] <- 0
               denom <- site_area[site_row]
@@ -5031,7 +5037,8 @@ calculate_drought <- function(
                 for (j in seq_len(nrow(dm_area))) {
                   dm_class <- as.integer(dm_area$dm[j])
                   if (!is.na(dm_class) && dm_class %in% 0:4) {
-                    prop_values[site_row, dm_class + 1L] <- dm_area$area[j] / denom
+                    prop_values[site_row, dm_class + 1L] <-
+                      dm_area$area[j] / denom
                   }
                 }
               }
