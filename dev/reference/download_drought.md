@@ -8,7 +8,7 @@ publicly available sources. Three source datasets are supported:
 
 - **EDDI** (Evaporative Demand Drought Index): Weekly raster files by
   timescale from
-  <https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data>.
+  <ftp://ftp.cdc.noaa.gov/Projects/EDDI/CONUS_archive/data>.
 
 - **USDM** (U.S. Drought Monitor): Weekly drought class shapefiles from
   <https://droughtmonitor.unl.edu>.
@@ -96,7 +96,7 @@ download_drought(
 
 ## Note
 
-- SPEI and EDDI are raster products (netCDF); USDM is a polygon product
+- SPEI and EDDI are raster products; USDM is a polygon product
   (shapefile). Their
   [`process_drought()`](https://niehs.github.io/amadeus/dev/reference/process_drought.md)
   and

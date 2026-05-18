@@ -13,6 +13,9 @@ parallelize naturally because dates, variables, and location chunks can
 often be processed independently and recombined after each worker writes
 its result.
 
+We provide a few examples using common R parallel backend packages such
+as `purr`, `future` + `furrr`, `mirai`, and `targets`.
+
 ## Reference: sequential `purrr` baseline
 
 ``` r
