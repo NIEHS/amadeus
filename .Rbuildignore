@@ -18,10 +18,7 @@ pkgdown
 output
 manuscript
 input
-^tests/testdata$
-^tests/test_report$
-^tests/lint_tests\.R$
-^tests/testthat/test-.*-live\.R$
+^tests$
 R/ignore.R
 inst/extdata/air.2m
 inst/extdata/nasa/token.txt
@@ -31,7 +28,6 @@ inst/extdata/nasa/LAADS_query.2024-08-02T12_49.csv
 inst/extdata/nlcd_classes.csv
 LICENSE.md
 ^CRAN-SUBMISSION$
-^tests/container/
 air.toml
 interactive.sh
 container.sif

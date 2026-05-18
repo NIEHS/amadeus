@@ -207,7 +207,8 @@ print(cropscape_reference)
 processed_data <- process_covariates(
   covariate = "cropscape",
   path = cropscape_path,
-  year = 2020
+  year = 2020,
+  extent = terra::ext(-114.9, -102.0, 31.3, 41.1)
 )
 plot(processed_data, main = "Processed CropScape raster")
 
