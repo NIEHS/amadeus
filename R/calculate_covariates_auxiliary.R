@@ -162,9 +162,15 @@ calc_message <- function(
   variable,
   time,
   time_type,
-  level
+  level,
+  layer_time = NULL
 ) {
-  message_time <- calc_time(time, time_type)
+  message_time <- calc_time(
+    time = time,
+    format = time_type,
+    dataset = dataset,
+    layer_time = layer_time
+  )
   if (dataset == "skip") {
     return()
   }
@@ -558,7 +564,8 @@ calc_time <- function(
     if (length(time_chr) >= 2) {
       date_digits <- gsub("[^0-9]", "", time_chr[1])
       hour_digits <- gsub("[^0-9]", "", time_chr[2])
-      if (nchar(date_digits) == 8 && nchar(hour_digits) >= 2) {
+      if (!is.na(date_digits) && !is.na(hour_digits) &&
+          nchar(date_digits) == 8 && nchar(hour_digits) >= 2) {
         hour_digits <- sprintf("%06d", as.integer(substr(hour_digits, 1, 6)))
         return(
           to_posixlt_utc(ISOdatetime(
@@ -727,6 +734,7 @@ calc_worker <- function(
   for (l in seq_len(terra::nlyr(from))) {
     #### select data layer
     data_layer <- from[[l]]
+    layer_time <- NULL
     #### split layer name
     data_split <- strsplit(
       names(data_layer),
@@ -761,7 +769,8 @@ calc_worker <- function(
       variable = data_name,
       time = layer_time_msg,
       time_type = time_type,
-      level = data_level
+      level = data_level,
+      layer_time = layer_time
     )
     #### extract layer data at sites
     if (terra::geomtype(locs_vector) == "polygons") {

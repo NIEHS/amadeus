@@ -1015,6 +1015,20 @@ testthat::test_that("calc_time parses collapsed datetime token and rejects bad f
   testthat::expect_error(calc_time("20200101", "invalid"), regexp = "Unsupported")
 })
 
+testthat::test_that("calc_time(format=hour, layer_time set): falls back to layer metadata when token hour is missing", {
+  out_hour <- calc_time(
+    time = c("20180101", NA_character_),
+    format = "hour",
+    dataset = "geos",
+    layer_name = "O3_lev.1000_20180101",
+    layer_time = as.POSIXct("2018-01-01 00:00:00", tz = "UTC")
+  )
+  testthat::expect_equal(
+    format(as.POSIXct(out_hour, tz = "UTC"), "%Y-%m-%d %H:%M:%S"),
+    "2018-01-01 00:00:00"
+  )
+})
+
 testthat::test_that("calc_prepare_weights handles vector fallback and overlap checks", {
   withr::local_package("terra")
 
