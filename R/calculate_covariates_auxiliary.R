@@ -312,9 +312,9 @@ calc_extents_overlap <- function(x, y) {
   ext_x <- as.vector(terra::ext(x))
   ext_y <- as.vector(terra::ext(y))
   !(ext_x[2] < ext_y[1] ||
-    ext_y[2] < ext_x[1] ||
-    ext_x[4] < ext_y[3] ||
-    ext_y[4] < ext_x[3])
+      ext_y[2] < ext_x[1] ||
+      ext_x[4] < ext_y[3] ||
+      ext_y[4] < ext_x[3])
 }
 
 #' Prepare optional weighting raster
