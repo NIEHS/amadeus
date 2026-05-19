@@ -104,9 +104,12 @@ sample files) lives in `tests/testdata/`.
 lintr::lint_package()
 ```
 
-Rules (`.lintr`): max line length 100, `commented_code_linter` and
-`return_linter` disabled. Vignettes and
-`tests/testthat/test-download_functions.R` are excluded.
+Rules (`.lintr`): max line length 80; `commented_code_linter`,
+`return_linter`, and `indentation_linter` are disabled. `tests/`,
+`inst/migration-to-httr-guide.R`, and vignettes are excluded. Temporary
+ratchet policy: keep `indentation_linter` disabled until `air`
+formatting and lint style are reconciled; re-enable after the active
+modules are cleaned to pass without indentation exceptions.
 
 ### R CMD CHECK
 

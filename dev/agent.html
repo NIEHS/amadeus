@@ -162,7 +162,7 @@
 <h3 id="linting">Linting<a class="anchor" aria-label="anchor" href="#linting"></a></h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">lintr</span><span class="fu">::</span><span class="fu">lint_package</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>Rules (<code>.lintr</code>): max line length 100, <code>commented_code_linter</code> and <code>return_linter</code> disabled. Vignettes and <code>tests/testthat/test-download_functions.R</code> are excluded.</p>
+<p>Rules (<code>.lintr</code>): max line length 80; <code>commented_code_linter</code>, <code>return_linter</code>, and <code>indentation_linter</code> are disabled. <code>tests/</code>, <code>inst/migration-to-httr-guide.R</code>, and vignettes are excluded. Temporary ratchet policy: keep <code>indentation_linter</code> disabled until <code>air</code> formatting and lint style are reconciled; re-enable after the active modules are cleaned to pass without indentation exceptions.</p>
 </div>
 <div class="section level3">
 <h3 id="r-cmd-check">R CMD CHECK<a class="anchor" aria-label="anchor" href="#r-cmd-check"></a></h3>
