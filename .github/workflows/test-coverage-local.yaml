@@ -270,12 +270,13 @@ jobs:
           badgen -j coverage -s "$COV%" -c "$COLOR" > badges/coverage.svg
   
       - name: Deploy Badges
-        if: steps.coverage.outcome == 'success'
+        if: ${{ github.event_name != 'pull_request' && steps.coverage.outcome == 'success' }}
+        continue-on-error: true
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Update badges [skip ci] & cov_current.Rout"
           branch: gh-pages
-          skip_fetch: true
+          skip_fetch: false
           skip_checkout: true
           create_branch: true
   
