@@ -311,8 +311,10 @@ calc_prepare_locs <- function(
 calc_extents_overlap <- function(x, y) {
   ext_x <- as.vector(terra::ext(x))
   ext_y <- as.vector(terra::ext(y))
-  !(ext_x[2] < ext_y[1] || ext_y[2] < ext_x[1] ||
-      ext_x[4] < ext_y[3] || ext_y[4] < ext_x[3])
+  !(ext_x[2] < ext_y[1] ||
+    ext_y[2] < ext_x[1] ||
+    ext_x[4] < ext_y[3] ||
+    ext_y[4] < ext_x[3])
 }
 
 #' Prepare optional weighting raster
@@ -514,7 +516,8 @@ calc_time <- function(
     }
     gsub("[^0-9]", "", token)
   }
-  has_layer_time <- !is.null(layer_time) && length(layer_time) > 0 &&
+  has_layer_time <- !is.null(layer_time) &&
+    length(layer_time) > 0 &&
     !all(is.na(layer_time))
 
   if (format == "timeless") {
@@ -564,8 +567,12 @@ calc_time <- function(
     if (length(time_chr) >= 2) {
       date_digits <- gsub("[^0-9]", "", time_chr[1])
       hour_digits <- gsub("[^0-9]", "", time_chr[2])
-      if (!is.na(date_digits) && !is.na(hour_digits) &&
-          nchar(date_digits) == 8 && nchar(hour_digits) >= 2) {
+      if (
+        !is.na(date_digits) &&
+          !is.na(hour_digits) &&
+          nchar(date_digits) == 8 &&
+          nchar(hour_digits) >= 2
+      ) {
         hour_digits <- sprintf("%06d", as.integer(substr(hour_digits, 1, 6)))
         return(
           to_posixlt_utc(ISOdatetime(
@@ -787,7 +794,8 @@ calc_worker <- function(
         extract_args$weights <- weights_prepared
       }
       sites_extracted_layer <- do.call(
-        exactextractr::exact_extract, extract_args
+        exactextractr::exact_extract,
+        extract_args
       )
     } else if (terra::geomtype(locs_vector) == "points") {
       if (is.null(weights_prepared)) {
@@ -1107,13 +1115,20 @@ check_by_time <- function(.by_time) {
     )
   }
   allowed <- c(
-    "minute", "minutes",
-    "hour", "hours",
-    "day", "days",
-    "week", "weeks",
-    "month", "months",
-    "quarter", "quarters",
-    "year", "years"
+    "minute",
+    "minutes",
+    "hour",
+    "hours",
+    "day",
+    "days",
+    "week",
+    "weeks",
+    "month",
+    "months",
+    "quarter",
+    "quarters",
+    "year",
+    "years"
   )
   if (!.by_time %in% allowed) {
     stop(
@@ -1655,7 +1670,8 @@ calculate_modis_daily <- function(
     bufs <- terra::project(bufs, terra::crs(surf))
     # extract raster values
     weights_norm <- amadeus::calc_prepare_weights(
-      from = surf[[1]], weights = weights
+      from = surf[[1]],
+      weights = weights
     )
     func_extract <- amadeus::calc_weighted_fun(
       fun = func,
