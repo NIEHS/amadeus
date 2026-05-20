@@ -9,59 +9,186 @@ download_narr(
   year = c(2018, 2022),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
-\item{variables}{character. Variable(s) name acronym. See \href{https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf}{List of Variables in NARR Files}
-for variable names and acronym codes.}
+\item{variables}{character. Variable(s) name acronym. See the
+\emph{Available NARR Variables} section below for the complete list of
+supported abbreviations.}
 
-\item{year}{integer(1 or 2). length of 4. Year or start/end years for downloading data.}
+\item{year}{integer(1 or 2). Year or start/end years for downloading data.}
 
-\item{directory_to_save}{character(1). Directory(s) to save downloaded data
+\item{directory_to_save}{character(1). Directory to save downloaded data
 files.}
 
-\item{acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledges that the data downloaded using this function may be very
-large and use lots of machine storage and memory.}
+\item{acknowledgement}{logical(1). Must be TRUE to proceed with download.}
 
-\item{download}{logical(1). \code{FALSE} will generate a *.txt file
-containing all download commands. By setting \code{TRUE} the function
-will download all of the requested data files.}
+\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
 
-\item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE})
-the text file containing download commands.}
+\item{remove_command}{logical(1). DEPRECATED, ignored.}
 
-\item{hash}{logical(1). By setting \code{TRUE} the function will return
-an \code{rlang::hash_file()} hash character corresponding to the
-downloaded files. Default is \code{FALSE}.}
+\item{show_progress}{logical(1). Show download progress (default TRUE)}
+
+\item{hash}{logical(1). Return hash of downloaded files (default FALSE)}
+
+\item{max_tries}{integer(1). Maximum download retry attempts (default 20)}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
-\itemize{
-\item For \code{hash = FALSE}, NULL
-\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item netCDF (.nc) files will be stored in
-\code{directory_to_save}.
-}
+invisible list with download results; or hash character if hash=TRUE
 }
 \description{
-The \code{download_narr} function accesses and downloads daily meteorological data from \href{https://psl.noaa.gov/data/gridded/data.narr.html}{NOAA's North American Regional Reanalysis (NARR) model}.
+The \code{download_narr} function accesses and downloads daily meteorological
+data from NOAA's North American Regional Reanalysis (NARR) model via the
+NOAA Physical Sciences Laboratory (PSL) NARR Dailies server
+(\url{https://downloads.psl.noaa.gov/Datasets/NARR/Dailies/}).
 }
 \note{
-"Pressure levels" variables contain variable values at 29 atmospheric levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be downloaded for each variable.
+"Pressure levels" variables contain variable values at 29 atmospheric
+levels, ranging from 1000 hPa to 100 hPa. All pressure levels data will be
+downloaded for each variable.
+
+The 88 variables supported by this function represent the complete set
+of variables available as individual NetCDF files on the PSL NARR Dailies
+server. The NARR archive also contains additional variables (e.g., cloud
+water mixing ratio, ice mixing ratio, surface friction velocity, momentum
+fluxes, and static land/soil properties) that are only present in the raw
+merged GRIB files (\code{merged_AWIP32.YYYYMMDDHH}) available at
+\url{https://ftp.cpc.ncep.noaa.gov/NARR/}. Those variables cannot be
+downloaded with this function.
 }
+\section{Available NARR Variables}{
+
+The \code{variables} argument accepts one or more of the following
+abbreviations. Variables are grouped into three categories that determine
+the source URL path used for download.
+
+\strong{Monolevel variables} (single vertical level, surface / near-surface
+fields):
+\describe{
+\item{\code{acpcp}}{Convective precipitation}
+\item{\code{air.2m}}{Air temperature at 2 m}
+\item{\code{air.sfc}}{Air temperature at surface}
+\item{\code{albedo}}{Surface albedo}
+\item{\code{apcp}}{Total accumulated precipitation}
+\item{\code{bgrun}}{Baseflow-groundwater runoff}
+\item{\code{bmixl.hl1}}{Blackadar mixing length scale at hybrid level 1}
+\item{\code{cape}}{Convective available potential energy}
+\item{\code{ccond}}{Canopy conductance}
+\item{\code{cdcon}}{Convective cloud cover}
+\item{\code{cdlyr}}{Non-convective cloud cover}
+\item{\code{cfrzr}}{Categorical freezing rain}
+\item{\code{cicep}}{Categorical ice pellets}
+\item{\code{cin}}{Convective inhibition}
+\item{\code{cnwat}}{Plant canopy surface water}
+\item{\code{crain}}{Categorical rain}
+\item{\code{csnow}}{Categorical snow}
+\item{\code{dlwrf}}{Downward longwave radiation flux}
+\item{\code{dpt.2m}}{Dew point temperature at 2 m}
+\item{\code{dswrf}}{Downward shortwave radiation flux}
+\item{\code{evap}}{Evaporation}
+\item{\code{gflux}}{Ground heat flux}
+\item{\code{hcdc}}{High cloud cover}
+\item{\code{hgt.tropo}}{Geopotential height at tropopause}
+\item{\code{hlcy}}{Storm relative helicity}
+\item{\code{hpbl}}{Planetary boundary layer height}
+\item{\code{lcdc}}{Low cloud cover}
+\item{\code{lftx4}}{Best (4-layer) lifted index}
+\item{\code{lhtfl}}{Latent heat net flux}
+\item{\code{mcdc}}{Mid-cloud cover}
+\item{\code{mconv.hl1}}{Horizontal moisture divergence at hybrid level 1}
+\item{\code{mslet}}{Mean sea level pressure (ETA model reduction)}
+\item{\code{mstav}}{Moisture availability}
+\item{\code{pevap}}{Potential evaporation}
+\item{\code{pottmp.hl1}}{Potential temperature at hybrid level 1}
+\item{\code{pottmp.sfc}}{Potential temperature at surface}
+\item{\code{prate}}{Precipitation rate}
+\item{\code{pres.sfc}}{Surface pressure}
+\item{\code{pres.tropo}}{Pressure at tropopause}
+\item{\code{prmsl}}{Pressure reduced to mean sea level}
+\item{\code{pr_wtr}}{Precipitable water}
+\item{\code{rcq}}{Specific humidity tendency from all physics}
+\item{\code{rcs}}{Snowfall water equivalent tendency}
+\item{\code{rcsol}}{Solar radiative heating rates}
+\item{\code{rct}}{Temperature tendency from all physics}
+\item{\code{rhum.2m}}{Relative humidity at 2 m}
+\item{\code{shtfl}}{Sensible heat net flux}
+\item{\code{shum.2m}}{Specific humidity at 2 m}
+\item{\code{snod}}{Snow depth}
+\item{\code{snohf}}{Snow phase-change heat flux}
+\item{\code{snom}}{Snow melt}
+\item{\code{snowc}}{Snow cover}
+\item{\code{soilm}}{Soil moisture content (0–200 cm layer)}
+\item{\code{ssrun}}{Storm surface runoff}
+\item{\code{tcdc}}{Total cloud cover}
+\item{\code{tke.hl1}}{Turbulent kinetic energy at hybrid level 1}
+\item{\code{ulwrf.ntat}}{Upward longwave radiation flux at nominal
+top of atmosphere}
+\item{\code{ulwrf.sfc}}{Upward longwave radiation flux at surface}
+\item{\code{ustm}}{U-component of storm motion}
+\item{\code{uswrf.ntat}}{Upward shortwave radiation flux at nominal
+top of atmosphere}
+\item{\code{uswrf.sfc}}{Upward shortwave radiation flux at surface}
+\item{\code{uwnd.10m}}{U-component of wind at 10 m}
+\item{\code{veg}}{Vegetation fraction}
+\item{\code{vis}}{Visibility}
+\item{\code{vstm}}{V-component of storm motion}
+\item{\code{vvel.hl1}}{Vertical velocity at hybrid level 1}
+\item{\code{vwnd.10m}}{V-component of wind at 10 m}
+\item{\code{vwsh.tropo}}{Vertical wind shear at tropopause}
+\item{\code{wcconv}}{Convective wetting of vegetation canopy}
+\item{\code{wcinc}}{Wetting of vegetation canopy}
+\item{\code{wcuflx}}{U-component of convective canopy moisture flux}
+\item{\code{wcvflx}}{V-component of convective canopy moisture flux}
+\item{\code{weasd}}{Water-equivalent accumulated snow depth}
+\item{\code{wvconv}}{Convective column moisture convergence}
+\item{\code{wvinc}}{Column moisture increase}
+\item{\code{wvuflx}}{U-component of vertically-integrated moisture flux}
+\item{\code{wvvflx}}{V-component of vertically-integrated moisture flux}
+}
+
+\strong{Pressure level variables} (29 atmospheric pressure levels from
+1000 to 100 hPa; all levels are downloaded together):
+\describe{
+\item{\code{air}}{Air temperature}
+\item{\code{hgt}}{Geopotential height}
+\item{\code{omega}}{Vertical velocity (pressure / omega)}
+\item{\code{shum}}{Specific humidity}
+\item{\code{tke}}{Turbulent kinetic energy}
+\item{\code{uwnd}}{U-component of wind}
+\item{\code{vwnd}}{V-component of wind}
+}
+
+\strong{Subsurface (soil) variables} (4 soil layers):
+\describe{
+\item{\code{soill}}{Liquid volumetric soil moisture (non-frozen fraction)}
+\item{\code{soilw}}{Volumetric soil moisture content}
+\item{\code{tsoil}}{Soil temperature}
+}
+}
+
 \examples{
 \dontrun{
 download_narr(
   variables = c("weasd", "omega"),
   year = 2023,
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE
+  acknowledgement = TRUE
+)
+
+# Multiple years
+download_narr(
+  variables = c("air.2m", "rhum.2m"),
+  year = c(2020, 2022),
+  directory_to_save = tempdir(),
+  acknowledgement = TRUE
 )
 }
 }
@@ -69,5 +196,5 @@ download_narr(
 \insertRef{mesinger_north_2006}{amadeus}
 }
 \author{
-Mitchell Manware, Insang Song
+Mitchell Manware, Insang Song, Kyle Messier
 }

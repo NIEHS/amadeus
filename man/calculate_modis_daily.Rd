@@ -12,6 +12,7 @@ calculate_modis_daily(
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
+  weights = NULL,
   max_cells = 3e+07,
   geom = FALSE,
   scale = NULL,
@@ -37,6 +38,10 @@ are stored. Default is \code{"site_id"}}
 multilayer rasters. Passed to \code{foo}. See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}}
 for details.}
 
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
+
 \item{max_cells}{integer(1). Maximum number of cells to be read at once.
 Higher values will expedite processing, but will increase memory usage.
 Maximum possible value is \code{2^31 - 1}.}
@@ -47,9 +52,11 @@ coordinate reference system of the \code{sf} or \code{SpatVector} is that of \co
 See \code{\link[exactextractr:exact_extract]{exactextractr::exact_extract}} for details.}
 
 \item{scale}{character(1). Scale expression to be applied to the raw values.
-It is crucial that users review the technical documentatio of the MODIS product
+It is crucial that users review the technical documentation of the MODIS
+product
 they are using to ensure proper scale.
-An example for the MOD11A1 product's LST_Day_1km variable (land surface temperature)
+An example for the MOD11A1 product's LST_Day_1km variable (land surface
+temperature)
 would be \code{scale = "* 0.02"}.
 Default is \code{NULL}, which applies no scale.}
 

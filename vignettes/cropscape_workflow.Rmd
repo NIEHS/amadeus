@@ -1,0 +1,276 @@
+---
+title: "USDA CropScape"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{USDA CropScape}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "`r Sys.Date()`"
+author: "Kyle Messier, with assistance from GitHub Copilot"
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ""
+)
+library(amadeus)
+library(sf)
+library(terra)
+
+live_run <- local({
+  force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
+  on_ci <- nzchar(Sys.getenv("CI")) ||
+    nzchar(Sys.getenv("GITHUB_ACTIONS")) ||
+    identical(tolower(Sys.getenv("IN_PKGDOWN", "")), "true")
+  on_cran <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")) ||
+    identical(tolower(Sys.getenv("NOT_CRAN", "")), "false")
+  force || !(on_ci || on_cran)
+})
+
+
+```
+
+This article demonstrates a compact workflow for USDA CropScape (Cropland Data Layer) rasters.
+
+This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
+
+## Available inputs and data availability
+
+- `download_data(dataset_name = "cropscape", ...)` accepts a `year` and `source = "USDA"` or `"GMU"`.
+- CropScape is an annual 30 m Cropland Data Layer product: USDA downloads are available from 2008 through the latest release, while GMU extends back to 1997.
+- File formats depend on source: USDA serves yearly ZIP archives and GMU serves yearly `.tar.gz` archives.
+- CropScape values are categorical crop/land-use classes. Covariate calculation are a fraction of each land cover class within the specified radius or areal unit.
+
+The table below reproduces the crop and related land-use classes listed in the
+official USDA CDL metadata used by CropScape; see the
+[2024 CDL metadata](https://www.nass.usda.gov/Research_and_Science/Cropland/metadata/metadata_CDL24_FGDC-STD-001-1998.htm)
+for the complete legend and additional class details.
+
+```{r cropscape-class-reference, echo = FALSE}
+cropscape_classes <- read.delim(
+  text = paste(
+    c(
+      "code\tclass",
+      "1\tCorn",
+      "2\tCotton",
+      "3\tRice",
+      "4\tSorghum",
+      "5\tSoybeans",
+      "6\tSunflower",
+      "10\tPeanuts",
+      "11\tTobacco",
+      "12\tSweet Corn",
+      "13\tPop or Orn Corn",
+      "14\tMint",
+      "21\tBarley",
+      "22\tDurum Wheat",
+      "23\tSpring Wheat",
+      "24\tWinter Wheat",
+      "25\tOther Small Grains",
+      "26\tDbl Crop WinWht/Soybeans",
+      "27\tRye",
+      "28\tOats",
+      "29\tMillet",
+      "30\tSpeltz",
+      "31\tCanola",
+      "32\tFlaxseed",
+      "33\tSafflower",
+      "34\tRape Seed",
+      "35\tMustard",
+      "36\tAlfalfa",
+      "37\tOther Hay/Non Alfalfa",
+      "38\tCamelina",
+      "39\tBuckwheat",
+      "41\tSugarbeets",
+      "42\tDry Beans",
+      "43\tPotatoes",
+      "44\tOther Crops",
+      "45\tSugarcane",
+      "46\tSweet Potatoes",
+      "47\tMisc Vegs & Fruits",
+      "48\tWatermelons",
+      "49\tOnions",
+      "50\tCucumbers",
+      "51\tChick Peas",
+      "52\tLentils",
+      "53\tPeas",
+      "54\tTomatoes",
+      "55\tCaneberries",
+      "56\tHops",
+      "57\tHerbs",
+      "58\tClover/Wildflowers",
+      "59\tSod/Grass Seed",
+      "60\tSwitchgrass",
+      "61\tFallow/Idle Cropland",
+      "64\tShrubland",
+      "66\tCherries",
+      "67\tPeaches",
+      "68\tApples",
+      "69\tGrapes",
+      "70\tChristmas Trees",
+      "71\tOther Tree Crops",
+      "72\tCitrus",
+      "74\tPecans",
+      "75\tAlmonds",
+      "76\tWalnuts",
+      "77\tPears",
+      "92\tAquaculture",
+      "204\tPistachios",
+      "205\tTriticale",
+      "206\tCarrots",
+      "207\tAsparagus",
+      "208\tGarlic",
+      "209\tCantaloupes",
+      "210\tPrunes",
+      "211\tOlives",
+      "212\tOranges",
+      "213\tHoneydew Melons",
+      "214\tBroccoli",
+      "215\tAvocados",
+      "216\tPeppers",
+      "217\tPomegranates",
+      "218\tNectarines",
+      "219\tGreens",
+      "220\tPlums",
+      "221\tStrawberries",
+      "222\tSquash",
+      "223\tApricots",
+      "224\tVetch",
+      "225\tDbl Crop WinWht/Corn",
+      "226\tDbl Crop Oats/Corn",
+      "227\tLettuce",
+      "228\tDbl Crop Triticale/Corn",
+      "229\tPumpkins",
+      "230\tDbl Crop Lettuce/Durum Wht",
+      "231\tDbl Crop Lettuce/Cantaloupe",
+      "232\tDbl Crop Lettuce/Cotton",
+      "233\tDbl Crop Lettuce/Barley",
+      "236\tDbl Crop WinWht/Sorghum",
+      "237\tDbl Crop Barley/Corn",
+      "238\tDbl Crop WinWht/Cotton",
+      "239\tDbl Crop Soybeans/Cotton",
+      "240\tDbl Crop Soybeans/Oats",
+      "241\tDbl Crop Corn/Soybeans",
+      "242\tBlueberries",
+      "243\tCabbage",
+      "244\tCauliflower",
+      "245\tCelery",
+      "246\tRadishes",
+      "247\tTurnips",
+      "248\tEggplants",
+      "249\tGourds",
+      "250\tCranberries",
+      "254\tDbl Crop Barley/Soybeans"
+    ),
+    collapse = "\n"
+  ),
+  stringsAsFactors = FALSE,
+  check.names = FALSE
+)
+
+knitr::kable(
+  cropscape_classes,
+  col.names = c("CDL code", "cropland class"),
+  align = c("r", "l")
+)
+```
+
+## Download representative requests
+
+```{r download, eval = live_run}
+directory_to_save <- file.path(tempdir(), "cropscape_workflow")
+
+download_data(
+  dataset_name = "cropscape",
+  year = 2020,
+  source = "USDA",
+  directory_to_save = file.path(directory_to_save, "usda_2020"),
+  acknowledgement = TRUE,
+  unzip = TRUE
+)
+```
+
+## Process one workflow-ready data product
+
+```{r process, eval = live_run}
+cropscape_path <- list.files(
+  file.path(directory_to_save, "usda_2020"),
+  pattern = "2020.*\\.tif$",
+  recursive = TRUE,
+  full.names = TRUE
+)[1]
+
+cropscape_reference <- terra::rast(cropscape_path)
+
+print(cropscape_reference)
+
+processed_data <- process_covariates(
+  covariate = "cropscape",
+  path = cropscape_path,
+  year = 2020,
+  extent = {
+    ref_ext <- terra::ext(cropscape_reference)
+    dx <- terra::xmax(ref_ext) - terra::xmin(ref_ext)
+    dy <- terra::ymax(ref_ext) - terra::ymin(ref_ext)
+    terra::ext(
+      terra::xmin(ref_ext) + 0.35 * dx,
+      terra::xmin(ref_ext) + 0.65 * dx,
+      terra::ymin(ref_ext) + 0.35 * dy,
+      terra::ymin(ref_ext) + 0.65 * dy
+    )
+  }
+)
+plot(processed_data, main = "Processed CropScape raster")
+
+```
+
+## Calculate covariates at points
+
+Note that if no radius is specified, the point extraction will return the value of the raster cell containing each point. In this case, the output columns are binary indicators of whether each CropScape class is present at that location. With a radius specified, the output columns are a fraction of each class within the circular buffer around each point, so values can range from 0 to 1 and multiple classes can be present at the same location with varying proportions.
+
+```{r calculate-points, eval = live_run}
+
+domain_x <- c(terra::xmin(processed_data), terra::xmax(processed_data))
+domain_y <- c(terra::ymin(processed_data), terra::ymax(processed_data))
+domain_dx <- diff(domain_x)
+domain_dy <- diff(domain_y)
+
+candidate_xy <- expand.grid(
+  lon = seq(domain_x[1] + 0.12 * domain_dx, domain_x[2] - 0.12 * domain_dx, length.out = 5),
+  lat = seq(domain_y[1] + 0.12 * domain_dy, domain_y[2] - 0.12 * domain_dy, length.out = 5)
+)
+raster_crs <- sf::st_crs(terra::crs(processed_data))
+if (is.na(raster_crs)) {
+  stop("`processed_data` is missing CRS; cannot build extraction points.")
+}
+example_points_sf <- sf::st_as_sf(
+  candidate_xy,
+  coords = c("lon", "lat"),
+  crs = raster_crs
+)
+example_points_sf$site_id <- paste0("site_", seq_len(nrow(example_points_sf)))
+
+
+point_values <- calculate_covariates(
+  covariate = "cropscape",
+  from = processed_data,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  geom = "sf"
+)
+
+print(point_values)
+
+point_proportion_100m <- calculate_covariates(
+  covariate = "cropscape",
+  from = processed_data,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 100,
+  geom = "sf"
+)
+
+print(point_proportion_100m)
+```

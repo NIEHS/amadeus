@@ -1,4 +1,6 @@
 url: https://niehs.github.io/amadeus/
+development:
+  mode: auto
 template:
   bootstrap: 5
   bootswatch: minty
@@ -11,22 +13,60 @@ navbar:
     articles:
       text: Articles
       menu:
-        - text: Miscellaneous
+        - text: General Articles
         - text: download_data Function
           href: articles/download_functions.html
-        - text: Protected Datasets
+        - text: Time grouping in calculate_* functions
+          href: articles/calculate_time_grouping.html
+        - text: Protected Data Sources
           href: articles/protected_datasets.html
-        - text: Source-Specific Workflows
+        - text: Computational Considerations
+          href: articles/computational_considerations.html
+        - text: Dataset Workflows
+        - text: Particulate Matter (PM) Networks (AQS + IMPROVE)
+          href: articles/pm_data_workflow.html
+        - text: USDA CropScape
+          href: articles/cropscape_workflow.html
+        - text: EDGAR Emissions
+          href: articles/edgar_workflow.html
+        - text: US EPA Ecoregions
+          href: articles/ecoregion_workflow.html
+        - text: Drought (SPEI, EDDI, USDM)
+          href: articles/drought_workflow.html
+        - text: NASA GEOS-CF
+          href: articles/geos_workflow.html
+        - text: USGS GMTED2010
+          href: articles/gmted_workflow.html
+        - text: Climatology Lab gridMET
+          href: articles/gridmet_workflow.html
+        - text: NASA SEDAC gROADS
+          href: articles/groads_workflow.html
+        - text: NOAA HMS Smoke
+          href: articles/hms_workflow.html
+        - text: NOAA GOES Aerosol Detection Product (ADP)
+          href: articles/noaa_goes_workflow.html
+        - text: USGS Hydrologic Unit Codes (HUC)
+          href: articles/huc_workflow.html
+        - text: Koppen-Geiger Climate Classes
+          href: articles/koppen_workflow.html
+        - text: NASA MERRA-2
+          href: articles/merra2_workflow.html
+        - text: NASA MODIS
+          href: articles/modis_workflow.html
+        - text: NOAA NARR
+          href: articles/narr_workflow.html
+        - text: US EPA National Emissions Inventory (NEI)
+          href: articles/nei_workflow.html
+        - text: MRLC National Land Cover Database (NLCD)
+          href: articles/nlcd_workflow.html
+        - text: NASA SEDAC Population Density
+          href: articles/population_workflow.html
+        - text: PRISM Climate Data
+          href: articles/prism_workflow.html
         - text: Climatology Lab TerraClimate
           href: articles/terraclimate_workflow.html
-        - text: Climatology Lab GridMET
-          href: articles/gridmet_workflow.html
-        - text: NASA Moderate Resolution Imaging Spectroradiometer (MODIS)
-          href: articles/modis_workflow.html
-        - text: NOAA North American Regional Reanalysis (NARR)
-          href: articles/narr_workflow.html
-        - text: US EPA Air Quality System (AQS)
-          href: articles/epa_download.html
+        - text: US EPA Toxic Release Inventory (TRI)
+          href: articles/tri_workflow.html
 
 reference:
 - subtitle: Download
@@ -34,34 +74,85 @@ reference:
 - contents:
   - download_data
   - starts_with("download_")
+  - -download_hash
+  - -download_permit
+  - -download_remove_command
+  - -download_remove_zips
+  - -download_run
+  - -download_run_method
+  - -download_sanitize_path
+  - -download_setup_dir
+  - -download_sink
+  - -download_unzip
 - subtitle: Process
   desc: Functions which import and clean raw data
 - contents:
   - process_covariates
   - starts_with("process_")
+  - -apply_extent
+  - -process_collection
+  - -process_conformity
+  - -process_flatten_sds
+  - -process_gmted_codes
+  - -process_gridmet_codes
+  - -process_locs_radius
+  - -process_locs_vector
+  - -process_merra2_time
+  - -process_modis_warp
+  - -process_sedac_codes
+  - -process_terraclimate_codes
+  - -process_variable_codes
 - subtitle: Covariates
   desc: Functions which extract data values at user-defined points
 - contents:
   - calculate_covariates
   - starts_with("calculate_")
+  - -calculate_modis_daily
   - sum_edc
 - subtitle: Spatio-Temporal
   desc: Functions which convert to, from, and between spatio-temporal data types
 - contents:
   - has_keyword("spacetime")
-- subtitle: Auxiliary
-  desc: Functions which support the download, process, and covariate calculation functions
+  - -check_mysf
+  - -check_mysftime
+  - -rename_time
+- subtitle: Utilities
+  desc: Utility helpers intended for direct user workflows
 - contents:
-  - has_keyword("auxiliary")
+  - setup_nasa_token
+  - get_tri_info
+  - get_geos_info
+  - get_merra2_info
+  - get_modis_info
 
 articles:
 - title: Articles
   navbar: ~
   contents:
   - download_functions
+  - calculate_time_grouping
   - protected_datasets
-  - terraclimate_workflow
+  - computational_considerations
+  - pm_data_workflow
+  - aqs_workflow
+  - cropscape_workflow
+  - edgar_workflow
+  - ecoregion_workflow
+  - drought_workflow
+  - geos_workflow
+  - gmted_workflow
   - gridmet_workflow
+  - groads_workflow
+  - hms_workflow
+  - noaa_goes_workflow
+  - huc_workflow
+  - koppen_workflow
+  - merra2_workflow
   - modis_workflow
   - narr_workflow
-  - epa_download
+  - nei_workflow
+  - nlcd_workflow
+  - population_workflow
+  - prism_workflow
+  - terraclimate_workflow
+  - tri_workflow

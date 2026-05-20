@@ -7,6 +7,7 @@
 testthat::test_that("process_covariates", {
   withr::local_package("terra")
   withr::local_package("sf")
+  withr::local_package("data.table")
   withr::local_options(list(sf_use_s2 = FALSE))
 
   # main test
@@ -34,6 +35,56 @@ testthat::test_that("process_covariates", {
   )
   # expect
   testthat::expect_s4_class(covar, "SpatVector")
+
+  aqs_proc <- process_covariates(
+    covariate = "aqs",
+    path = testthat::test_path(
+      "..",
+      "testdata",
+      "aqs",
+      "aqs_daily_88101_triangle.csv"
+    ),
+    date = c("2022-02-04", "2022-02-28"),
+    mode = "location",
+    return_format = "terra"
+  )
+  testthat::expect_s4_class(aqs_proc, "SpatVector")
+
+  aqs_proc_sf <- process_covariates(
+    covariate = "aqs",
+    path = testthat::test_path(
+      "..",
+      "testdata",
+      "aqs",
+      "aqs_daily_88101_triangle.csv"
+    ),
+    date = c("2022-02-04", "2022-02-28"),
+    mode = "location",
+    return_format = "sf"
+  )
+  testthat::expect_s3_class(aqs_proc_sf, "sf")
+
+  withr::with_tempdir({
+    edgar_raster <- terra::rast(
+      ncols = 3,
+      nrows = 2,
+      xmin = -80,
+      xmax = -77,
+      ymin = 35,
+      ymax = 37,
+      crs = "EPSG:4326"
+    )
+    terra::values(edgar_raster) <- seq_len(terra::ncell(edgar_raster))
+    names(edgar_raster) <- "emi_nox"
+    edgar_path <- file.path(".", "edgar_2021_total_emi.tif")
+    terra::writeRaster(edgar_raster, edgar_path, overwrite = TRUE)
+
+    edgar_proc <- process_covariates(
+      covariate = "edgar",
+      path = edgar_path
+    )
+    testthat::expect_s4_class(edgar_proc, "SpatRaster")
+  })
 
   path_vnp46 <-
     list.files(
@@ -69,9 +120,31 @@ testthat::test_that("process_covariates", {
   )
   testthat::expect_s4_class(bm_proc, "SpatRaster")
 
+  withr::with_tempdir({
+    mcd14ml_path <- file.path(".", "MODIS_C6_1_Global_MCD14ML_NRT_2026074.txt")
+    data.table::fwrite(
+      data.frame(
+        latitude = 35.95013,
+        longitude = -78.8277,
+        acq_date = "2026-03-15",
+        acq_time = 1230,
+        frp = 11.5
+      ),
+      mcd14ml_path
+    )
+
+    mcd14ml_proc <- process_covariates(
+      covariate = "mcd14ml",
+      path = mcd14ml_path,
+      date = "2026-03-15"
+    )
+    testthat::expect_s4_class(mcd14ml_proc, "SpatVector")
+  })
+
   covar_types <- c(
     "modis_swath",
     "modis_merge",
+    "mcd14ml",
     "koppen-geiger",
     "blackmarble",
     "koeppen-geiger",
@@ -79,9 +152,10 @@ testthat::test_that("process_covariates", {
     "koeppen",
     "geos",
     "dummies",
-    "gmted",
-    "hms",
-    "smoke",
+      "gmted",
+      "aqs",
+      "hms",
+      "smoke",
     "sedac_population",
     "population",
     "sedac_groads",
@@ -95,10 +169,11 @@ testthat::test_that("process_covariates", {
     "huc",
     "cropscape",
     "cdl",
-    "prism",
-    "terraclimate",
-    "gridmet"
-  )
+      "prism",
+      "terraclimate",
+      "gridmet",
+      "edgar"
+    )
   for (cty in covar_types) {
     testthat::expect_error(
       process_covariates(
@@ -189,6 +264,18 @@ testthat::test_that("process_collection", {
   # expect YYYYMMDD dates
   testthat::expect_true(
     unique(nchar(path_split_dt)) == 12
+  )
+})
+
+testthat::test_that("process_parse_ncdf_day_codes parses gridmet day codes", {
+  parsed <- process_parse_ncdf_day_codes(
+    c("precipitation_amount_day=43101", "precipitation_amount_day=43102")
+  )
+  testthat::expect_equal(parsed[1], as.Date("2018-01-03"))
+  testthat::expect_equal(parsed[2], as.Date("2018-01-04"))
+  testthat::expect_error(
+    process_parse_ncdf_day_codes("precipitation_amount_day=bad"),
+    regexp = "Unable to parse"
   )
 })
 
@@ -377,4 +464,60 @@ testthat::test_that("apply_extent", {
   testthat::expect_s3_class(dfsftr, "sf")
   testthat::expect_s4_class(dfdftr, "SpatVector")
 })
+
+testthat::test_that("process_covariates dispatches goes and improve", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  withr::with_tempdir({
+    # "goes", "goes_adp", "GOES" all route to process_goes
+    for (alias in c("goes", "goes_adp", "GOES")) {
+      testthat::expect_error(
+        process_covariates(covariate = alias, path = ".")
+      )
+    }
+    # "improve" and "IMPROVE" route to process_improve (no-files error)
+    for (alias in c("improve", "IMPROVE")) {
+      testthat::expect_error(
+        process_covariates(covariate = alias, path = ".")
+      )
+    }
+  })
+})
 # nolint end
+
+################################################################################
+##### process_modis_swath: all-NA layers branch coverage
+
+testthat::test_that("process_modis_swath emits message when all layers are NA", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+
+  msgs <- character(0)
+  # Pass an empty path so paths_today is empty, making mod06_element empty
+  result <- withCallingHandlers(
+    process_modis_swath(
+      path = character(0),
+      date = as.Date("2020-01-01"),
+      subdataset = "Cloud_Fraction",
+      suffix = ":mod06:",
+      resolution = 0.5
+    ),
+    message = function(m) {
+      msgs <<- c(msgs, conditionMessage(m))
+      invokeRestart("muffleMessage")
+    }
+  )
+  testthat::expect_true(any(grepl("All layers are NA", msgs)))
+  testthat::expect_s4_class(result, "SpatRaster")
+})
+
+testthat::test_that("process_modis_daily expands single date and rethrows unexpected errors", {
+  testthat::expect_error(
+    process_modis_daily(
+      path = 1,
+      date = "2020-01-01",
+      subdataset = "LST_Day_1km",
+      return_type = "list"
+    )
+  )
+})

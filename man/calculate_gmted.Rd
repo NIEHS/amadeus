@@ -10,6 +10,7 @@ calculate_gmted(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -28,6 +29,10 @@ containing identifier for each unique coordinate location.}
 \item{fun}{character(1). Function used to summarize multiple raster cells
 within sites location buffer (Default = \code{mean}).}
 
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
+
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
@@ -40,9 +45,8 @@ a data.frame or SpatVector object
 \description{
 Extract elevation values at point locations. Returns a \code{data.frame}
 object containing \code{locs_id}, year of release, and elevation variable.
-Elevation variable column name reflects the elevation statistic, spatial
-resolution of \code{from}, and circular buffer radius (ie. Breakline Emphasis
-at 7.5 arc-second resolution with 0 meter buffer: breakline_emphasis_r75_0).
+Elevation variable column name follows the pattern
+\code{gmted_<radius>} (for example, \code{gmted_0} or \code{gmted_100}).
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large

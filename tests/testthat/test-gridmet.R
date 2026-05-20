@@ -4,87 +4,94 @@
 ################################################################################
 ##### download_gridmet
 testthat::test_that("download_gridmet (no errors)", {
+  testthat::skip_if_offline()
   withr::local_package("httr2")
   withr::local_package("stringr")
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
   # function parameters
   year_start <- 2018
   year_end <- 2023
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/gridmet/")
+
   # run download function
-  download_data(
-    dataset_name = "gridmet",
-    year = c(year_start, year_end),
-    variables = variables,
-    directory_to_save = directory_to_save,
-    acknowledgement = TRUE,
-    download = FALSE
+  result <- suppressWarnings(
+    download_data(
+      dataset_name = "gridmet",
+      year = c(year_start, year_end),
+      variables = variables,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    )
   )
-  # define path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "/gridmet_",
-    year_start,
-    "_",
-    year_end,
-    "_curl_commands.txt"
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
   )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
+
+  # Assert structured return values from httr2-based download discovery
+  testthat::expect_type(result, "list")
+  testthat::expect_equal(
+    result$n_files,
+    year_end - year_start + 1L
   )
-  # remove file with commands after test
-  file.remove(commands_path)
+  testthat::expect_true(
+    all(
+      grepl(
+        "northwestknowledge.net/metdata/data/pr_",
+        result$urls
+      )
+    )
+  )
+
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_gridmet (single year)", {
+  testthat::skip_if_offline()
   withr::local_package("httr2")
   withr::local_package("stringr")
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
   # function parameters
   year <- 2020
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/gridmet/")
+
   # run download function
-  download_data(
-    dataset_name = "gridmet",
-    year = year,
-    variables = variables,
-    directory_to_save = directory_to_save,
-    acknowledgement = TRUE,
-    download = FALSE
+  result <- suppressWarnings(
+    download_data(
+      dataset_name = "gridmet",
+      year = year,
+      variables = variables,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    )
   )
-  # define path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "/gridmet_",
-    year,
-    "_",
-    year,
-    "_curl_commands.txt"
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
   )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
+
+  # Assert structured return values from httr2-based download discovery
+  testthat::expect_type(result, "list")
+  testthat::expect_equal(result$n_files, 1L)
+  testthat::expect_true(
+    grepl(
+      paste0("northwestknowledge.net/metdata/data/pr_", year, ".nc"),
+      result$urls
+    )
   )
-  # remove file with commands after test
-  file.remove(commands_path)
+
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -110,6 +117,50 @@ testthat::test_that("download_gridmet (expected errors - invalid variables)", {
       directory_to_save = paste0(tempdir(), "/g/")
     )
   )
+})
+
+testthat::test_that("download_gridmet remove_command deprecation warning", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      download_gridmet(
+        variables = "Precipitation",
+        year = c(2018, 2018),
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = TRUE
+      ),
+      regexp = "remove_command.*deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_gridmet mock download with hash", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_gridmet(
+          variables = "Precipitation",
+          year = c(2018, 2018),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
 })
 
 ################################################################################
@@ -354,4 +405,190 @@ testthat::test_that("calculate_gridmet", {
       geom = TRUE
     )
   )
+})
+
+testthat::test_that("calculate_gridmet supports .by_time summaries", {
+  withr::local_package("terra")
+  locs <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "3799900018810101")
+  gridmet <- process_gridmet(
+    date = c("2018-01-03", "2018-01-03"),
+    variable = "pr",
+    path = testthat::test_path("..", "testdata", "gridmet", "pr")
+  )
+
+  by_time <- calculate_gridmet(
+    from = gridmet,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0,
+    .by_time = "day",
+    fun = "mean"
+  )
+
+  testthat::expect_true("time" %in% names(by_time))
+  testthat::expect_s3_class(by_time$time, "POSIXct")
+  testthat::expect_true(any(grepl("_0$", names(by_time))))
+})
+
+testthat::test_that("calculate_gridmet summarizes at native daily scale when .by_time is NULL", {
+  withr::local_package("terra")
+  r <- terra::rast(nrows = 1, ncols = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1)
+  r <- c(r, r)
+  terra::values(r) <- matrix(c(1, 3), ncol = 2)
+  names(r) <- c("pr_20180103", "pr_20180103_dup")
+  terra::time(r) <- as.Date(c("2018-01-03", "2018-01-03"))
+  locs <- data.frame(lon = 0.5, lat = 0.5, site_id = "s1")
+
+  out <- calculate_gridmet(
+    from = r,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0,
+    fun = "mean"
+  )
+
+  testthat::expect_equal(nrow(out), 1L)
+  testthat::expect_equal(out$pr_0, 2)
+  testthat::expect_s3_class(out$time, "POSIXct")
+})
+
+testthat::test_that("calculate_gridmet errors when deprecated .by is supplied", {
+  withr::local_package("terra")
+  locs <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "3799900018810101")
+  gridmet <- process_gridmet(
+    date = c("2018-01-03", "2018-01-03"),
+    variable = "pr",
+    path = testthat::test_path("..", "testdata", "gridmet", "pr")
+  )
+
+  testthat::expect_error(
+    calculate_gridmet(
+      from = gridmet,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "day",
+      fun = "mean"
+    ),
+    regexp = "no longer supported"
+  )
+})
+
+
+testthat::test_that("calculate_gridmet supports weighted extraction", {
+  withr::local_package("terra")
+  from <- terra::rast(
+    nrows = 2,
+    ncols = 2,
+    xmin = 0,
+    xmax = 2,
+    ymin = 0,
+    ymax = 2,
+    crs = "EPSG:4326"
+  )
+  terra::values(from) <- c(1, 2, 3, 4)
+  names(from) <- "pr_20200101"
+
+  locs <- terra::as.polygons(terra::ext(from), crs = terra::crs(from))
+  locs$site_id <- "poly_1"
+
+  weights <- from
+  terra::values(weights) <- c(1, 1, 1, 10)
+
+  res_unweighted <- calculate_gridmet(
+    from = from,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0
+  )
+  res_weighted <- calculate_gridmet(
+    from = from,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0,
+    weights = weights
+  )
+
+  testthat::expect_true(res_weighted$pr_0 != res_unweighted$pr_0)
+  testthat::expect_no_error({
+    point_res <- calculate_gridmet(
+      from = from,
+      locs = data.frame(lon = 1, lat = 1, site_id = "pt_1"),
+      locs_id = "site_id",
+      radius = 0,
+      weights = weights
+    )
+    testthat::expect_true(is.numeric(point_res$pr_0))
+  })
+})
+
+testthat::test_that("calculate_gridmet accepts polygon weights and validates CRS", {
+  withr::local_package("terra")
+  from <- terra::rast(
+    nrows = 2,
+    ncols = 2,
+    xmin = 0,
+    xmax = 2,
+    ymin = 0,
+    ymax = 2,
+    crs = "EPSG:4326"
+  )
+  terra::values(from) <- c(1, 2, 3, 4)
+  names(from) <- "pr_20200101"
+
+  locs <- terra::as.polygons(terra::ext(from), crs = terra::crs(from))
+  locs$site_id <- "poly_1"
+
+  weight_poly <- terra::as.polygons(from)
+  weight_poly$wt <- c(1, 2, 3, 4)
+  testthat::expect_no_error(
+    calculate_gridmet(
+      from = from,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      weights = weight_poly
+    )
+  )
+
+  bad_weights <- from
+  terra::crs(bad_weights) <- ""
+  testthat::expect_error(
+    calculate_gridmet(
+      from = from,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      weights = bad_weights
+    ),
+    "missing CRS"
+  )
+})
+
+################################################################################
+##### download_gridmet hash=FALSE branch
+
+testthat::test_that("download_gridmet mock download hash=FALSE", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_gridmet(
+          variables = "Precipitation",
+          year = c(2018, 2018),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 1)
+  })
 })

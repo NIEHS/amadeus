@@ -1,0 +1,83 @@
+# Scheduled live-API test workflow.
+#
+# Runs every Monday at 06:00 UTC, plus on-demand (with optional `filter`
+# input). Sets AMADEUS_LIVE_TESTS=true so that `skip_if_no_live_tests()`
+# does not skip the `test-*-live.R` files. On failure, an issue is
+# auto-opened (label: live-test-failure) so repo watchers receive an
+# email notification.
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      filter:
+        description: 'testthat filter (regex applied to test file names)'
+        required: false
+        default: '-live$'
+
+name: test-live
+
+jobs:
+  test-live:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      issues: write
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
+      NASA_EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
+      AMADEUS_LIVE_TESTS: "true"
+      NOT_CRAN: "true"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::pak
+            any::testthat
+            any::devtools
+            any::rstac
+            any::patrick
+            any::ncdf4
+            any::withr
+            any::furrr
+            any::mirai
+            any::targets
+          needs: check
+
+      - name: Run live tests only
+        shell: Rscript {0}
+        env:
+          AMADEUS_TEST_FILTER: ${{ github.event.inputs.filter || '-live$' }}
+        run: |
+          options(testthat.progress.max_fails = 50)
+          filter <- Sys.getenv("AMADEUS_TEST_FILTER", "-live$")
+          devtools::load_all(".")
+          res <- testthat::test_dir(
+            "tests/testthat",
+            filter = filter,
+            stop_on_failure = FALSE,
+            reporter = testthat::SummaryReporter$new()
+          )
+          df <- as.data.frame(res)
+          n_fail <- sum(df$failed)
+          n_err  <- sum(df$error)
+          cat(sprintf("\nLive tests: %d failed, %d error\n", n_fail, n_err))
+          if (n_fail + n_err > 0) quit(status = 1)
+
+      - name: Open issue on failure
+        if: failure()
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: .github/ISSUE_TEMPLATE/live-test-failure.md
+          update_existing: true
+          search_existing: open

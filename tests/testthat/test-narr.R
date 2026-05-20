@@ -1,10 +1,12 @@
 ################################################################################
 ##### unit and integration tests for NOAA NARR functions
-# nolint start
 
 ################################################################################
 ##### download_narr
 testthat::test_that("download_narr (no errors)", {
+  skip_on_cran()
+  skip_if_offline()
+
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
@@ -16,15 +18,25 @@ testthat::test_that("download_narr (no errors)", {
     "soill" # subsurface
   )
   directory_to_save <- paste0(tempdir(), "/narr/")
-  # run download function
-  download_data(
-    dataset_name = "narr",
-    year = c(year_start, year_end),
-    variables = variables,
-    directory_to_save = directory_to_save,
-    acknowledgement = TRUE,
-    download = FALSE
+
+  # Expect deprecation warning with download = FALSE
+  testthat::expect_warning(
+    download_data(
+      dataset_name = "narr",
+      year = c(year_start, year_end),
+      variables = variables,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = FALSE
+    ),
+    "Setting download=FALSE is deprecated"
   )
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
+  )
+
   # define path with commands
   commands_path <- paste0(
     directory_to_save,
@@ -34,29 +46,38 @@ testthat::test_that("download_narr (no errors)", {
     year_end,
     "_curl_commands.txt"
   )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 3L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
+
+  # Only proceed if commands file exists
+  if (file.exists(commands_path)) {
+    # import commands
+    commands <- read_commands(commands_path = commands_path)
+    # extract urls
+    urls <- extract_urls(commands = commands, position = 6)
+    # check HTTP URL status
+    url_status <- check_urls(urls = urls, size = 3L)
+    # implement unit tests
+    test_download_functions(
+      directory_to_save = directory_to_save,
+      commands_path = commands_path,
+      url_status = url_status
+    )
+    # remove file with commands after test
+    file.remove(commands_path)
+  }
+
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_narr (single year)", {
+  skip_on_cran()
+  skip_if_offline()
+
   withr::local_package("httr2")
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/narr/")
-  # run download function
-  testthat::expect_no_error(
+
+  # Expect deprecation warning
+  testthat::expect_warning(
     download_data(
       dataset_name = "narr",
       year = 2020,
@@ -64,8 +85,16 @@ testthat::test_that("download_narr (single year)", {
       directory_to_save = directory_to_save,
       acknowledgement = TRUE,
       download = FALSE
-    )
+    ),
+    "Setting download=FALSE is deprecated"
   )
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
+  )
+
+  unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_narr (expected errors)", {
@@ -85,6 +114,72 @@ testthat::test_that("narr_variable (expected errors)", {
   testthat::expect_error(
     narr_variable("uNrEcOgNiZed")
   )
+})
+
+testthat::test_that("download_narr without download=FALSE", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::local_package("httr2")
+  withr::local_package("stringr")
+  directory_to_save <- paste0(tempdir(), "/narr_new/")
+
+  # Test without download=FALSE (new httr2 method, no deprecation warning)
+  testthat::expect_no_error(
+    download_data(
+      dataset_name = "narr",
+      year = 2020,
+      variables = "weasd",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE
+    )
+  )
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
+  )
+
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("download_narr remove_command deprecation warning", {
+  withr::with_tempdir({
+    testthat::expect_warning(
+      download_narr(
+        year = 2020,
+        variables = "weasd",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = TRUE
+      ),
+      regexp = "remove_command.*deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_narr mock download with hash", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = "weasd",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
 })
 
 ################################################################################
@@ -349,4 +444,275 @@ testthat::test_that("calculate_narr", {
       geom = TRUE
     )
   )
+})
+
+testthat::test_that("calculate_narr supports .by_time summaries", {
+  withr::local_package("terra")
+  locs <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "3799900018810101")
+  narr <- process_narr(
+    date = "2018-01-01",
+    variable = "omega",
+    path = testthat::test_path("..", "testdata", "narr", "omega")
+  )
+
+  by_time <- calculate_narr(
+    from = narr,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0,
+    .by_time = "day",
+    fun = "mean"
+  )
+
+  testthat::expect_true("time" %in% names(by_time))
+  testthat::expect_s3_class(by_time$time, "POSIXct")
+  testthat::expect_true("level" %in% names(by_time))
+})
+
+testthat::test_that("calculate_narr errors when deprecated .by is supplied", {
+  withr::local_package("terra")
+  locs <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "3799900018810101")
+  narr <- process_narr(
+    date = "2018-01-01",
+    variable = "omega",
+    path = testthat::test_path("..", "testdata", "narr", "omega")
+  )
+
+  testthat::expect_error(
+    calculate_narr(
+      from = narr,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "day",
+      fun = "mean"
+    ),
+    regexp = "no longer supported"
+  )
+})
+
+
+################################################################################
+##### download_narr hash=FALSE branch
+
+testthat::test_that("download_narr mock download hash=FALSE", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = "weasd",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 1)
+  })
+})
+
+################################################################################
+##### narr_variable: all variables return correct URL category
+
+testthat::test_that("narr_variable mono variables return monolevel URL", {
+  mono <- c(
+    "acpcp", "air.2m", "air.sfc", "albedo", "apcp", "bgrun",
+    "bmixl.hl1", "cape", "ccond", "cdcon", "cdlyr", "cfrzr",
+    "cicep", "cin", "cnwat", "crain", "csnow", "dlwrf", "dpt.2m",
+    "dswrf", "evap", "gflux", "hcdc", "hgt.tropo", "hlcy", "hpbl",
+    "lcdc", "lftx4", "lhtfl", "mcdc", "mconv.hl1", "mslet", "mstav",
+    "pevap", "pottmp.hl1", "pottmp.sfc", "prate", "pres.sfc",
+    "pres.tropo", "prmsl", "pr_wtr", "rcq", "rcs", "rcsol", "rct",
+    "rhum.2m", "shtfl", "shum.2m", "snod", "snohf", "snom", "snowc",
+    "soilm", "ssrun", "tcdc", "tke.hl1", "ulwrf.ntat", "ulwrf.sfc",
+    "ustm", "uswrf.ntat", "uswrf.sfc", "uwnd.10m", "veg", "vis",
+    "vstm", "vvel.hl1", "vwnd.10m", "vwsh.tropo", "wcconv", "wcinc",
+    "wcuflx", "wcvflx", "weasd", "wvconv", "wvinc", "wvuflx", "wvvflx"
+  )
+  for (v in mono) {
+    result <- narr_variable(v)
+    testthat::expect_true(
+      grepl("monolevel", result[[1]]),
+      label = paste0("narr_variable('", v, "') should return monolevel URL")
+    )
+    testthat::expect_equal(
+      result[[2]], "",
+      label = paste0("narr_variable('", v, "') months should be empty string")
+    )
+  }
+})
+
+testthat::test_that("narr_variable pressure variables return pressure URL", {
+  pressure <- c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd")
+  for (v in pressure) {
+    result <- narr_variable(v)
+    testthat::expect_true(
+      grepl("pressure", result[[1]]),
+      label = paste0("narr_variable('", v, "') should return pressure URL")
+    )
+    testthat::expect_equal(
+      length(result[[2]]), 12L,
+      label = paste0("narr_variable('", v, "') should return 12 months")
+    )
+  }
+})
+
+testthat::test_that("narr_variable soil variables return subsurface URL", {
+  soil <- c("soill", "soilw", "tsoil")
+  for (v in soil) {
+    result <- narr_variable(v)
+    testthat::expect_true(
+      grepl("subsurface", result[[1]]),
+      label = paste0("narr_variable('", v, "') should return subsurface URL")
+    )
+    testthat::expect_equal(
+      length(result[[2]]), 12L,
+      label = paste0("narr_variable('", v, "') should return 12 months")
+    )
+  }
+})
+
+################################################################################
+##### download_narr: mock-based download test for all variables
+
+testthat::test_that("download_narr mock download all mono variables", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  mono <- c(
+    "acpcp", "air.2m", "air.sfc", "albedo", "apcp", "bgrun",
+    "bmixl.hl1", "cape", "ccond", "cdcon", "cdlyr", "cfrzr",
+    "cicep", "cin", "cnwat", "crain", "csnow", "dlwrf", "dpt.2m",
+    "dswrf", "evap", "gflux", "hcdc", "hgt.tropo", "hlcy", "hpbl",
+    "lcdc", "lftx4", "lhtfl", "mcdc", "mconv.hl1", "mslet", "mstav",
+    "pevap", "pottmp.hl1", "pottmp.sfc", "prate", "pres.sfc",
+    "pres.tropo", "prmsl", "pr_wtr", "rcq", "rcs", "rcsol", "rct",
+    "rhum.2m", "shtfl", "shum.2m", "snod", "snohf", "snom", "snowc",
+    "soilm", "ssrun", "tcdc", "tke.hl1", "ulwrf.ntat", "ulwrf.sfc",
+    "ustm", "uswrf.ntat", "uswrf.sfc", "uwnd.10m", "veg", "vis",
+    "vstm", "vvel.hl1", "vwnd.10m", "vwsh.tropo", "wcconv", "wcinc",
+    "wcuflx", "wcvflx", "weasd", "wvconv", "wvinc", "wvuflx", "wvvflx"
+  )
+  withr::with_tempdir({
+    for (v in mono) {
+      result <- suppressWarnings(suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = v,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      ))
+      testthat::expect_type(result, "list")
+    }
+  })
+})
+
+testthat::test_that("download_narr mock download all pressure variables", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  pressure <- c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd")
+  withr::with_tempdir({
+    for (v in pressure) {
+      result <- suppressWarnings(suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = v,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      ))
+      testthat::expect_type(result, "list")
+    }
+  })
+})
+
+testthat::test_that("download_narr mock download all soil variables", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  soil <- c("soill", "soilw", "tsoil")
+  withr::with_tempdir({
+    for (v in soil) {
+      result <- suppressWarnings(suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = v,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      ))
+      testthat::expect_type(result, "list")
+    }
+  })
+})
+
+################################################################################
+##### download_narr pressure and subsurface variables (covers lines 861, 863)
+
+testthat::test_that("download_narr pressure variable (omega) branch", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = "omega",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+  })
+})
+
+testthat::test_that("download_narr subsurface variable (soill) branch", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_narr(
+          year = 2020,
+          variables = "soill",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+  })
 })

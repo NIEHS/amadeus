@@ -3,88 +3,57 @@
 
 ################################################################################
 ##### download_terraclimate
-testthat::test_that("download_terraclimate (no errors)", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
+testthat::test_that("download_terraclimate (url discovery)", {
+  testthat::skip_if_offline()
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
   year_start <- 2018
   year_end <- 2023
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/terracclimate/")
-  # run download function
-  download_data(
+
+  result <- suppressWarnings(download_data(
     dataset_name = "terraclimate",
     year = c(year_start, year_end),
     variables = variables,
     directory_to_save = directory_to_save,
     acknowledgement = TRUE,
     download = FALSE
-  )
-  # define path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "/terraclimate_",
-    year_start,
-    "_",
-    year_end,
-    "_curl_commands.txt"
-  )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 3L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
+  ))
+
+  # 6 years × 1 variable = 6 files
+  testthat::expect_equal(result$n_files, 6L)
+  testthat::expect_true(all(grepl("^https://", result$urls)))
+  testthat::expect_true(all(grepl("TerraClimate_ppt", result$urls)))
+
   unlink(directory_to_save, recursive = TRUE)
 })
 
 testthat::test_that("download_terraclimate (single year)", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
+  testthat::skip_if_offline()
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
   year <- 2019
   variables <- "Precipitation"
   directory_to_save <- paste0(tempdir(), "/terraclimate/")
-  # run download function
-  download_data(
+
+  result <- suppressWarnings(download_data(
     dataset_name = "terraclimate",
     year = year,
     variables = variables,
     directory_to_save = directory_to_save,
     acknowledgement = TRUE,
     download = FALSE
-  )
-  # define path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "/terraclimate_",
-    year,
-    "_",
-    year,
-    "_curl_commands.txt"
-  )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 6)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 5L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  file.remove(commands_path)
+  ))
+
+  testthat::expect_equal(result$n_files, 1L)
+  testthat::expect_true(grepl("2019", result$urls))
+  testthat::expect_true(grepl("^https://", result$urls))
+
   unlink(directory_to_save, recursive = TRUE)
 })
 
@@ -110,6 +79,53 @@ testthat::test_that("download_terraclimate (expected errors - variables)", {
       directory_to_save = paste0(tempdir(), "/epa/")
     )
   )
+})
+
+testthat::test_that(
+  "download_terraclimate remove_command deprecation warning",
+  {
+    testthat::local_mocked_bindings(
+      check_url_status = function(...) TRUE,
+      .package = "amadeus"
+    )
+    withr::with_tempdir({
+      testthat::expect_warning(
+        download_terraclimate(
+          variables = "ppt",
+          year = c(2018, 2018),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE,
+          remove_command = TRUE
+        ),
+        regexp = "remove_command.*deprecated"
+      )
+    })
+  }
+)
+
+testthat::test_that("download_terraclimate mock download with hash", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_terraclimate(
+          variables = "ppt",
+          year = c(2018, 2018),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
 })
 
 ################################################################################
@@ -354,4 +370,78 @@ testthat::test_that("calculate_terraclimate", {
       geom = TRUE
     )
   )
+})
+
+testthat::test_that("calculate_terraclimate supports .by_time summaries", {
+  withr::local_package("terra")
+  locs <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "3799900018810101")
+  terraclimate <- process_terraclimate(
+    date = c("2018-01-01", "2018-01-01"),
+    variable = "Precipitation",
+    path = testthat::test_path("..", "testdata", "terraclimate", "ppt")
+  )
+
+  by_time <- calculate_terraclimate(
+    from = terraclimate,
+    locs = locs,
+    locs_id = "site_id",
+    radius = 0,
+    .by_time = "month",
+    fun = "mean"
+  )
+
+  testthat::expect_true("time" %in% names(by_time))
+  testthat::expect_s3_class(by_time$time, "POSIXct")
+  testthat::expect_true(any(grepl("_0$", names(by_time))))
+})
+
+testthat::test_that("calculate_terraclimate errors when deprecated .by is supplied", {
+  withr::local_package("terra")
+  locs <- data.frame(lon = -78.8277, lat = 35.95013, site_id = "3799900018810101")
+  terraclimate <- process_terraclimate(
+    date = c("2018-01-01", "2018-01-01"),
+    variable = "Precipitation",
+    path = testthat::test_path("..", "testdata", "terraclimate", "ppt")
+  )
+
+  testthat::expect_error(
+    calculate_terraclimate(
+      from = terraclimate,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "day",
+      fun = "mean"
+    ),
+    regexp = "no longer supported"
+  )
+})
+
+
+################################################################################
+##### download_terraclimate hash=FALSE branch
+
+testthat::test_that("download_terraclimate mock download hash=FALSE", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_terraclimate(
+          variables = "Precipitation",
+          year = c(2018, 2018),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 1)
+  })
 })

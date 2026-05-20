@@ -10,6 +10,7 @@ calculate_population(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -27,6 +28,10 @@ containing identifier for each unique coordinate location.}
 
 \item{fun}{character(1). Function used to summarize multiple raster cells
 within sites location buffer (Default = \code{mean}).}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

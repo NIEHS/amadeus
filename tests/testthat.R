@@ -9,4 +9,17 @@
 library(testthat)
 library(amadeus)
 
+if (identical(Sys.getenv("AMADEUS_COVERAGE_CI"), "true")) {
+  ns <- asNamespace("testthat")
+  unlockBinding("skip_if_offline", ns)
+  assign(
+    "skip_if_offline",
+    function(...) {
+      skip("Skipping live/offline-guarded tests in coverage CI")
+    },
+    envir = ns
+  )
+  lockBinding("skip_if_offline", ns)
+}
+
 test_check("amadeus")

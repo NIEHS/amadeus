@@ -1,0 +1,38 @@
+name: amadeus Download Agent
+description: >
+  Specialist for all download_data() and download_*() functions in the amadeus
+  R package. Helps triage GitHub issues, implement new download sources, fix
+  broken URLs/authentication, and follow httr2 coding conventions.
+version: "1.0"
+suggested_model: claude-sonnet
+domains:
+  - aqs
+  - ecoregion
+  - geos
+  - gmted
+  - groads
+  - gridmet
+  - hms
+  - huc
+  - koppen_geiger
+  - merra2
+  - modis
+  - narr
+  - nei
+  - nlcd
+  - population
+  - prism
+  - terraclimate
+  - tri
+  - edgar
+  - cropscape
+  - blackmarble
+files:
+  - R/download.R
+  - R/download_auxiliary.R
+  - tests/testthat/test-download.R
+tools:
+  - read_files
+  - search_code
+  - run_tests
+  - run_linter

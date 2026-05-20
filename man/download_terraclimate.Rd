@@ -9,56 +9,53 @@ download_terraclimate(
   year = c(2018, 2022),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
-\item{variables}{character(1). Variable(s) name(s). See \href{https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php}{TerraClimate Direct Downloads}
-for variable names and acronym codes.}
+\item{variables}{character. Variable(s) name(s).}
 
-\item{year}{integer(1 or 2). length of 4. Year or start/end years for downloading data.}
+\item{year}{integer(1 or 2). Year or start/end years for downloading data.}
 
-\item{directory_to_save}{character(1). Directory(s) to save downloaded data
-files.}
+\item{directory_to_save}{character(1). Directory to save data.}
 
-\item{acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledges that the data downloaded using this function may be very
-large and use lots of machine storage and memory.}
+\item{acknowledgement}{logical(1). Must be TRUE to proceed.}
 
-\item{download}{logical(1). \code{FALSE} will generate a *.txt file
-containing all download commands. By setting \code{TRUE} the function
-will download all of the requested data files.}
+\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
 
-\item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE})
-the text file containing download commands.}
+\item{remove_command}{logical(1). Deprecated, ignored.}
 
-\item{hash}{logical(1). By setting \code{TRUE} the function will return
-an \code{rlang::hash_file()} hash character corresponding to the
-downloaded files. Default is \code{FALSE}.}
+\item{show_progress}{logical(1). Show download progress (default TRUE)}
+
+\item{hash}{logical(1). Return hash of downloaded files (default FALSE)}
+
+\item{max_tries}{integer(1). Maximum retry attempts (default 20)}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
-\itemize{
-\item For \code{hash = FALSE}, NULL
-\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item netCDF (.nc) files will be stored in a variable-specific
-folder within \code{directory_to_save}.
-}
+invisible list with download results; or hash character if hash=TRUE
 }
 \description{
-The \code{download_terraclimate} function accesses and downloads climate and water balance data from the \href{https://www.climatologylab.org/terraclimate.html}{University of California Merced Climatology Lab's TerraClimate dataset}.
+The \code{download_terraclimate} function accesses and downloads climate
+and water balance data from the University of California Merced
+Climatology Lab's TerraClimate dataset.
+}
+\note{
+TerraClimate data does not require authentication.
 }
 \examples{
 \dontrun{
 download_terraclimate(
-  variables = "Precipitation",
+  variables = "ppt",
   year = 2023,
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE
+  acknowledgement = TRUE
 )
 }
 }

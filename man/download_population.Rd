@@ -10,72 +10,71 @@ download_population(
   year = "2020",
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2,
+  nasa_earth_data_token = NULL
 )
 }
 \arguments{
-\item{data_resolution}{character(1). Available resolutions are 30 second
-(approx. 1 km), 2.5 minute (approx. 5 km), 15 minute (approx. 30 km),
-30 minute (approx. 55 km), and 60 minute (approx. 110 km).}
+\item{data_resolution}{character(1). Available resolutions.}
 
-\item{data_format}{character(1). Individual year data can be downloaded as
-\code{"ASCII"} or \code{"GeoTIFF"}. "all" years is downloaded as \code{"netCDF"}.}
+\item{data_format}{character(1). "ASCII", "GeoTIFF", or "netCDF".}
 
-\item{year}{character(1). Available years are \code{2000}, \code{2005}, \code{2010}, \code{2015}, and
-\code{2020}, or \code{"all"} for all years.}
+\item{year}{character(1). Available years or "all".}
 
-\item{directory_to_save}{character(1). Directory to save data. Two
-sub-directories will be created for the downloaded zip files ("/zip_files")
-and the unzipped shapefiles ("/data_files").}
+\item{directory_to_save}{character(1). Directory to save data.}
 
-\item{acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledges that the data downloaded using this function may be very
-large and use lots of machine storage and memory.}
+\item{acknowledgement}{logical(1). Must be TRUE to proceed.}
 
-\item{download}{logical(1). \code{FALSE} will generate a *.txt file
-containing all download commands. By setting \code{TRUE} the function
-will download all of the requested data files.}
+\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
 
-\item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE})
-the text file containing download commands.}
+\item{remove_command}{logical(1). Deprecated, ignored.}
 
-\item{unzip}{logical(1). Unzip zip files. Default is \code{TRUE}.}
+\item{unzip}{logical(1). Unzip zip files (default TRUE).}
 
-\item{remove_zip}{logical(1). Remove zip files from directory_to_download.
-Default is \code{FALSE}.}
+\item{remove_zip}{logical(1). Remove zip files after unzipping (default
+FALSE).}
 
-\item{hash}{logical(1). By setting \code{TRUE} the function will return
-an \code{rlang::hash_file()} hash character corresponding to the
-downloaded files. Default is \code{FALSE}.}
+\item{show_progress}{logical(1). Show download progress (default TRUE)}
+
+\item{hash}{logical(1). Return hash of downloaded files (default FALSE)}
+
+\item{max_tries}{integer(1). Maximum retry attempts (default 20)}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
+
+\item{nasa_earth_data_token}{character(1). NASA EarthData bearer token.
+If NULL (default), reads from the \code{NASA_EARTHDATA_TOKEN} environment
+variable via \code{get_token()}.}
 }
 \value{
-\itemize{
-\item For \code{hash = FALSE}, NULL
-\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item Zip and/or data files will be downloaded and stored in
-respective sub-directories within \code{directory_to_save}.
-}
+invisible list with download results; or hash character if hash=TRUE
 }
 \description{
 The \code{download_population()} function accesses and downloads
-population density data from \href{https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11}{NASA's UN WPP-Adjusted Population Density, v4.11}.
+population density data from NASA's UN WPP-Adjusted Population Density.
+}
+\note{
+Population data may require NASA EarthData authentication depending on
+access method.
 }
 \examples{
 \dontrun{
+# RECOMMENDED: Set up token once (persists across sessions)
+setup_nasa_token()
+
 download_population(
   data_resolution = "30 second",
   data_format = "GeoTIFF",
   year = "2020",
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE,
-  unzip = FALSE
+  acknowledgement = TRUE
 )
 }
 }

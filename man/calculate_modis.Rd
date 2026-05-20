@@ -2,10 +2,11 @@
 % Please edit documentation in R/calculate_covariates.R
 \name{calculate_modis}
 \alias{calculate_modis}
-\title{Calculate MODIS product covariates in multiple CPU threads}
+\title{Calculate MODIS product covariates}
 \usage{
 calculate_modis(
   from = NULL,
+  from_secondary = NULL,
   locs = NULL,
   locs_id = "site_id",
   radius = c(0L, 1000L, 10000L, 50000L),
@@ -13,16 +14,26 @@ calculate_modis(
   name_covariates = NULL,
   subdataset = NULL,
   fun_summary = "mean",
+  .by_time = NULL,
+  weights = NULL,
   package_list_add = NULL,
   export_list_add = NULL,
   max_cells = 3e+07,
   geom = FALSE,
   scale = NULL,
+  fusion_method = c("mean", "primary_first", "secondary_first"),
   ...
 )
 }
 \arguments{
-\item{from}{character. List of paths to MODIS/VIIRS files.}
+\item{from}{character, SpatRaster, or SpatVector. Either a list of
+MODIS/VIIRS file paths (raw path mode), a preprocessed raster (direct raster
+mode), or processed MODIS fire detections as a SpatVector with \code{time},
+\code{fire_count}, and \code{frp} fields.}
+
+\item{from_secondary}{character or SpatRaster. Optional secondary input for
+fused temporal coverage in raster/path workflows. Type must match \code{from}
+(\code{character} with \code{character}, or \code{SpatRaster} with \code{SpatRaster}).}
 
 \item{locs}{sf/SpatVector object. Unique locs where covariates
 will be calculated.}
@@ -32,7 +43,8 @@ will be calculated.}
 \item{radius}{numeric. Radii to calculate covariates.
 Default is \code{c(0, 1000, 10000, 50000)}.}
 
-\item{preprocess}{function. Function to handle HDF files.}
+\item{preprocess}{function. Function to handle HDF files in raw path mode.
+Ignored when \code{from} is a \code{SpatRaster} or \code{SpatVector}.}
 
 \item{name_covariates}{character. Name header of covariates.
 e.g., \code{"MOD_NDVIF_0_"}.
@@ -47,13 +59,18 @@ Find detail usage of the argument in notes.}
 \item{fun_summary}{character or function. Function to summarize
 extracted raster values.}
 
-\item{package_list_add}{character. A vector with package names to load
-these in each thread. Note that \code{sf}, \code{terra}, \code{exactextractr},
-\code{doParallel}, \code{parallelly} and \code{dplyr} are the default packages to be
-loaded.}
+\item{.by_time}{NULL or character(1). Optional time grouping key used
+with \code{.by_time} for temporal summaries.}
 
-\item{export_list_add}{character. A vector with object names to export
-to each thread. It should be minimized to spare memory.}
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
+
+\item{package_list_add}{character. Reserved for backward compatibility;
+currently not used by \code{calculate_modis()}.}
+
+\item{export_list_add}{character. Reserved for backward compatibility;
+currently not used by \code{calculate_modis()}.}
 
 \item{max_cells}{integer(1). Maximum number of cells to be read at once.
 Higher values will expedite processing, but will increase memory usage.
@@ -65,11 +82,18 @@ Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
 
 \item{scale}{character(1). Scale expression to be applied to the raw values.
-It is crucial that users review the technical documentatio of the MODIS product
+It is crucial that users review the technical documentation of the MODIS
+product
 they are using to ensure proper scale.
-An example for the MOD11A1 product's LST_Day_1km variable (land surface temperature)
+An example for the MOD11A1 product's LST_Day_1km variable (land surface
+temperature)
 would be \code{scale = "* 0.02"}.
 Default is \code{NULL}, which applies no scale.}
+
+\item{fusion_method}{character(1). Fusion method used only when
+\code{from_secondary} is provided. Options are \code{"mean"} (pixel-wise mean with
+\code{na.rm = TRUE}), \code{"primary_first"} (use \code{from} first), and
+\code{"secondary_first"} (use \code{from_secondary} first).}
 
 \item{...}{Arguments passed to \code{preprocess}.}
 }
@@ -78,23 +102,24 @@ A data.frame or SpatVector with an attribute:
 \itemize{
 \item \code{attr(., "dates_dropped")}: Dates with insufficient tiles.
 Note that the dates mean the dates with insufficient tiles,
-not the dates without available tiles.
+not the dates without available tiles. When \code{.by_time} is provided,
+rows are summarized with \code{calc_summarize_by()} semantics.
 }
 }
 \description{
-\code{calculate_modis} essentially runs \code{\link{calculate_modis_daily}} function
-in each thread (subprocess). Based on daily resolution, each day's workload
-will be distributed to each thread. With \code{product} argument,
-the files are processed by a customized function where the unique structure
-and/or characteristics of the products are considered.
+\code{calculate_modis} orchestrates daily extraction using
+\code{\link[=calculate_modis_daily]{calculate_modis_daily()}}. In raw-path mode, files are grouped by inferred
+date, preprocessed for each day, and then extracted over requested radii.
+With product-specific preprocessing, files are handled according to each
+product's structure and naming conventions.
 }
 \note{
-Overall, this function and dependent routines assume that the file
-system can handle concurrent access to the (network) disk by multiple
-processes. File system characteristics, package versions, and hardware
-settings and specification can affect the processing efficiency.
-\code{locs} is expected to be convertible to \code{sf} object. \code{sf}, \code{SpatVector}, and
-other class objects that could be converted to \code{sf} can be used.
+\code{locs} is expected to be convertible to \code{sf} object.
+\code{sf}, \code{SpatVector}, and other class objects that could be converted to
+\code{sf} can be used.
+In raw path mode, \code{preprocess} is called once per inferred day using a
+single-date value. Temporal aggregation across extracted rows should be done
+with \code{.by_time}.
 Common arguments in \code{preprocess} functions such as \code{date} and \code{path} are
 automatically detected and passed to the function. Please note that
 \code{locs} here and \code{path} in \code{preprocess} functions are assumed to have a
@@ -108,12 +133,39 @@ e.g., \code{"^LST_"}
 e.g., \code{c("Cloud_Fraction_Day", "Cloud_Fraction_Night")}
 \item \code{process_blackmarble()}: Subdataset number.
 e.g., for VNP46A2 product, 3L.
+}
+
+For MOD13/MYD13 families, Terra and Aqua composites are 16-day phased
+products offset by 8 days; combining both can improve effective temporal
+coverage. This behavior aligns with NASA MOD13 product guidance:
+\url{https://modis.gsfc.nasa.gov/data/dataprod/mod13.php}
+
+For MCD19A2 MAIAC, common sub-datasets include both optical depth and
+plume injection height layers. Typical selectors are
+\code{"(Optical_Depth|Injection_Height)"} for both families or
+\code{"(Injection_Height)"} when targeting plume height only.
+
+For MOD14A1/MYD14A1 fire grids, the \code{FireMask} raw values are commonly
+interpreted as:
+\tabular{rll}{
+Raw value \tab Meaning \tab Binary fire mask?\cr
+0 \tab not processed, missing input \tab NA / no observation\cr
+1 \tab obsolete, not used since Collection 1 \tab NA\cr
+2 \tab not processed, other reason \tab NA\cr
+3 \tab non-fire water pixel \tab 0\cr
+4 \tab cloud, land or water \tab NA or 0, depending on analysis\cr
+5 \tab non-fire land pixel \tab 0\cr
+6 \tab unknown, land or water \tab NA\cr
+7 \tab fire, low confidence \tab 1, or exclude for stricter mask\cr
+8 \tab fire, nominal confidence \tab 1\cr
+9 \tab fire, high confidence \tab 1\cr
+}
+
 Dates with less than 80 percent of the expected number of tiles,
 which are determined by the mode of the number of tiles, are removed.
 Users will be informed of the dates with insufficient tiles.
 The result data.frame will have an attribute with the dates with
 insufficient tiles.
-}
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large

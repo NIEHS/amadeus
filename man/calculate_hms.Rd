@@ -4,7 +4,17 @@
 \alias{calculate_hms}
 \title{Calculate wildfire smoke covariates}
 \usage{
-calculate_hms(from, locs, locs_id = NULL, radius = 0, geom = FALSE, ...)
+calculate_hms(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  weights = NULL,
+  .by_time = NULL,
+  frac = FALSE,
+  geom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{from}{SpatVector(1). Output of \code{process_hms()}.}
@@ -17,6 +27,19 @@ containing identifier for each unique coordinate location.}
 \item{radius}{integer(1). Circular buffer distance around site locations.
 (Default = 0).}
 
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
+
+\item{.by_time}{NULL or character(1). Optional time grouping key used
+when \code{.by_time} is provided. When supplied, HMS indicators are
+summarized by \code{sum} (smoke-day counts) for \code{frac = FALSE}, or
+\code{mean} for \code{frac = TRUE}.}
+
+\item{frac}{logical(1). Default \code{FALSE}. If \code{FALSE}, return binary 0/1 smoke
+indicators by density class. If \code{TRUE}, return fractional overlap by density
+class.}
+
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
@@ -24,13 +47,14 @@ coordinate reference system of the \code{sf} or \code{SpatVector} is that of \co
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame or SpatVector object
+a data.frame or SpatVector object. When \code{.by_time} is provided,
+rows are aggregated using \code{calc_summarize_by()}.
 }
 \description{
-Extract wildfire smoke plume values at point locations. Returns a
-\code{data.frame} object containing \code{locs_id}, date, and binary variable
-for wildfire smoke plume density inherited from \code{from} (0 = point not
-covered by wildfire smoke plume; 1 = point covered by wildfire smoke plume).
+Extract wildfire smoke plume values at point or buffered locations. Returns a
+\code{data.frame} object containing \code{locs_id}, date, and either binary
+indicators (\code{frac = FALSE}) or fractional overlap values (\code{frac = TRUE}) for
+wildfire smoke plume density inherited from \code{from}.
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large

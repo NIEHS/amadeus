@@ -1,0 +1,486 @@
+---
+title: "NASA MERRA-2"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{NASA MERRA-2}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "`r Sys.Date()`"
+author: "Kyle Messier, with assistance from GitHub Copilot"
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "",
+  out.width = "100%"
+)
+library(amadeus)
+library(sf)
+library(ggplot2)
+live_run <- local({
+  force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
+  on_ci <- nzchar(Sys.getenv("CI")) ||
+    nzchar(Sys.getenv("GITHUB_ACTIONS")) ||
+    identical(tolower(Sys.getenv("IN_PKGDOWN", "")), "true")
+  on_cran <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")) ||
+    identical(tolower(Sys.getenv("NOT_CRAN", "")), "false")
+  force || !(on_ci || on_cran)
+})
+
+find_merra2_collection_dir <- function(root, collection) {
+  pattern <- if (collection == "fwi") {
+    "^FWI\\..*\\.nc$"
+  } else {
+    paste0("^MERRA2_[0-9]{3}\\.", collection, "\\..*\\.nc4$")
+  }
+  files <- list.files(
+    root,
+    pattern = pattern,
+    recursive = TRUE,
+    full.names = TRUE
+  )
+  if (length(files) == 0) {
+    stop("Could not locate files for collection ", collection, ".")
+  }
+  dirname(files[1])
+}
+
+has_merra2_collection_files <- function(root, collection) {
+  pattern <- if (collection == "fwi") {
+    "^FWI\\..*\\.nc$"
+  } else {
+    paste0("^MERRA2_[0-9]{3}\\.", collection, "\\..*\\.nc4$")
+  }
+  length(list.files(
+    root,
+    pattern = pattern,
+    recursive = TRUE,
+    full.names = TRUE
+  )) > 0
+}
+
+summarize_na_counts <- function(x, value_pattern) {
+  data <- if ("sf" %in% class(x)) {
+    sf::st_drop_geometry(x)
+  } else {
+    x
+  }
+  value_cols <- grep(value_pattern, names(data), value = TRUE)
+  if (length(value_cols) == 0) {
+    return(data.frame(
+      variable = character(0),
+      missing_values = integer(0),
+      stringsAsFactors = FALSE
+    ))
+  }
+  data.frame(
+    variable = value_cols,
+    missing_values = vapply(data[value_cols], function(col) {
+      sum(is.na(col))
+    }, integer(1)),
+    stringsAsFactors = FALSE
+  )
+}
+
+merra2_demo_variables <- data.frame(
+  collection = c(
+    "`inst1_2d_int_Nx`",
+    "`inst3_2d_gas_Nx`",
+    "`statD_2d_slv_Nx`",
+    "`tavg1_2d_adg_Nx`",
+    "`fwi`",
+    "`fwi`"
+  ),
+  variable = c(
+    "`CPT`",
+    "`AODANA`",
+    "`HOURNORAIN`",
+    "`BCEMAN`",
+    "`FFMC`",
+    "`FWI`"
+  ),
+  workflow_role = c(
+    "Instantaneous meteorology / diagnostics example",
+    "3-hourly gas or aerosol example",
+    "Daily surface statistic example",
+    "Hourly aerosol diagnostics example aggregated to a daily summary",
+    "Daily fire weather layer used in extraction demos",
+    "Daily fire weather layer used in extraction demos"
+  ),
+  stringsAsFactors = FALSE
+)
+
+merra2_collection_reference <- data.frame(
+  collection_family = c(
+    "`inst1_2d_asm_Nx`, `inst1_2d_int_Nx`, `inst1_2d_lfo_Nx`",
+    "`inst3_2d_gas_Nx`",
+    paste(
+      "`inst3_3d_asm_Np`, `inst3_3d_aer_Nv`, `inst3_3d_asm_Nv`,",
+      "`inst3_3d_chm_Nv`, `inst3_3d_gas_Nv`, `inst6_3d_ana_Np`,",
+      "`inst6_3d_ana_Nv`"
+    ),
+    paste(
+      "`tavg1_2d_adg_Nx`, `tavg1_2d_aer_Nx`, `tavg1_2d_chm_Nx`,",
+      "`tavg1_2d_csp_Nx`, `tavg1_2d_flx_Nx`, `tavg1_2d_int_Nx`,",
+      "`tavg1_2d_lfo_Nx`, `tavg1_2d_lnd_Nx`, `tavg1_2d_ocn_Nx`,",
+      "`tavg1_2d_rad_Nx`, `tavg1_2d_slv_Nx`"
+    ),
+    paste(
+      "`tavg3_3d_mst_Ne`, `tavg3_3d_trb_Ne`, `tavg3_3d_nav_Ne`,",
+      "`tavg3_3d_cld_Np`, `tavg3_3d_mst_Np`, `tavg3_3d_rad_Np`,",
+      "`tavg3_3d_tdt_Np`, `tavg3_3d_trb_Np`, `tavg3_3d_udt_Np`,",
+      "`tavg3_3d_odt_Np`, `tavg3_3d_qdt_Np`, `tavg3_3d_asm_Nv`,",
+      "`tavg3_3d_cld_Nv`, `tavg3_3d_mst_Nv`, `tavg3_3d_rad_Nv`,",
+      "`tavg3_2d_glc_Nx`"
+    ),
+    "`statD_2d_slv_Nx`",
+    "`fwi`"
+  ),
+  cadence = c(
+    "Hourly instantaneous",
+    "3-hourly instantaneous",
+    "3-hourly or 6-hourly instantaneous",
+    "Hourly time averaged",
+    "3-hourly time averaged",
+    "Daily statistics",
+    "Daily corrected fire weather"
+  ),
+  files = c(
+    "Daily `.nc4`",
+    "Daily `.nc4`",
+    "Daily `.nc4`",
+    "Daily `.nc4`",
+    "Daily `.nc4`",
+    "Daily `.nc4`",
+    "Daily `.nc`"
+  ),
+  auth = c(
+    "NASA EarthData token required",
+    "NASA EarthData token required",
+    "NASA EarthData token required",
+    "NASA EarthData token required",
+    "NASA EarthData token required",
+    "NASA EarthData token required",
+    "Public GlobalFWI portal; no token required"
+  ),
+  example_variables = c(
+    "`CPT`",
+    "`AODANA`",
+    "`AIRDENS`, `SLP`",
+    "`BCEMAN`, `COCL`",
+    "`DUDTANA`",
+    "`HOURNORAIN`",
+    "`DC`, `DMC`, `FFMC`, `ISI`, `BUI`, `FWI`"
+  ),
+  stringsAsFactors = FALSE
+)
+
+merra2_variable_reference <- data.frame(
+  collection = c(
+    "`inst1_2d_int_Nx`",
+    "`inst3_2d_gas_Nx`",
+    "`inst3_3d_chm_Nv`",
+    "`inst6_3d_ana_Np`",
+    "`statD_2d_slv_Nx`",
+    "`tavg1_2d_chm_Nx`",
+    "`tavg3_3d_udt_Np`",
+    "`fwi`"
+  ),
+  example_variable = c(
+    "`CPT`",
+    "`AODANA`",
+    "`AIRDENS`",
+    "`SLP`",
+    "`HOURNORAIN`",
+    "`COCL`",
+    "`DUDTANA`",
+    "`FWI` or raw layer `MERRA2.CORRECTED_FWI`"
+  ),
+  output_time_structure = c(
+    "Hourly layers with date and hour in layer names",
+    "3-hourly layers with date and hour in layer names",
+    "3-hourly layers; 3-D collection keeps pressure-level metadata",
+    "6-hourly layers; 3-D collection keeps pressure-level metadata",
+    "Daily layers with collection-specific timestamps",
+    "Hourly layers with date and hour in layer names",
+    "3-hourly layers; 3-D collection keeps pressure-level metadata",
+    "Daily layers named as `MERRA2.CORRECTED.<var>_<YYYYMMDD>`"
+  ),
+  stringsAsFactors = FALSE
+)
+```
+
+This article demonstrates a compact, multi-variable workflow for NASA MERRA-2 data. Standard MERRA-2 GES DISC downloads require a NASA EarthData token, while the public FWI collection does not.
+
+This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
+
+## Available inputs and data availability
+
+`download_data(dataset_name = "merra2", ...)` wraps `download_merra2()`.
+
+`process_covariates(covariate = "merra2", variable = ...)` accepts native layer
+names from the selected MERRA-2 collection. For the new public FWI product,
+processable variables are `DC`, `DMC`, `FFMC`, `ISI`, `BUI`, and `FWI` (or the
+raw layer name, such as `MERRA2.CORRECTED_FWI`).
+
+```{r merra2-collection-reference, echo = FALSE, results = "asis"}
+knitr::kable(
+  merra2_collection_reference,
+  col.names = c(
+    "Supported collection family",
+    "Temporal cadence",
+    "File type returned by download",
+    "Authentication / source",
+    "Representative variables you can process"
+  ),
+  escape = FALSE
+)
+```
+
+```{r merra2-variable-reference, echo = FALSE, results = "asis"}
+knitr::kable(
+  merra2_variable_reference,
+  col.names = c(
+    "Collection",
+    "Example `variable =` value",
+    "What the processed output looks like"
+  ),
+  escape = FALSE
+)
+```
+
+- `date` can be a single day or a start/end range.
+- Downloads are global only; clip to a study area during processing rather than at download time.
+- Standard GES DISC collections save companion `.xml` metadata files under each collection's `metadata/` folder.
+- If you need to discover additional variables inside a downloaded file, inspect the native layer names with `names(terra::rast(path_to_file))` before calling `process_covariates()`.
+
+## Workflow demonstration variables
+
+The live example below processes six variables spanning standard MERRA-2 and
+the new public FWI product. The point and polygon extraction chunks focus on
+the two FWI layers so the extracted values stay dense over the Durham example
+locations and hexagons, and a separate hourly `BCEMAN` example shows how to
+roll a 1-hour product up to a daily summary for extraction.
+
+```{r merra2-demo-reference, echo = FALSE, results = "asis"}
+knitr::kable(
+  merra2_demo_variables,
+  col.names = c(
+    "Collection",
+    "Variable shown in the workflow",
+    "Why it is included"
+  ),
+  escape = FALSE
+)
+```
+
+## Download representative requests
+
+You can use the helper function `get_merra2_info()` to query available variables from each collection.
+
+```{r download, eval = live_run}
+
+merra2_demo_specs <- data.frame(
+  collection = c(
+    "inst1_2d_int_Nx",
+    "inst3_2d_gas_Nx",
+    "statD_2d_slv_Nx",
+    "tavg1_2d_adg_Nx",
+    "fwi",
+    "fwi"
+  ),
+  variable = c("CPT", "AODANA", "HOURNORAIN", "BCEMAN", "FFMC", "FWI"),
+  date = rep("2024-08-11", 6),
+  use_for_extraction = c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE),
+  stringsAsFactors = FALSE
+)
+
+directory_to_save <- file.path(tempdir(), "merra2_workflow")
+download_data(
+  dataset_name = "merra2",
+  collection = unique(merra2_demo_specs$collection),
+  date = "2024-08-11",
+  directory_to_save = directory_to_save,
+  acknowledgement = TRUE
+)
+
+get_merra2_info(path = paste0(directory_to_save,"/inst1_2d_int_Nx"))
+```
+
+This single request intentionally mixes authenticated GES DISC collections with
+the public `fwi` collection so the vignette demonstrates both download paths in
+the same workflow.
+## Process six workflow-ready data products
+
+```{r process, eval = live_run}
+processed_examples <- setNames(
+  vector("list", nrow(merra2_demo_specs)),
+  merra2_demo_specs$variable
+)
+
+find_merra2_collection_dir <- function(root, collection) {
+  pattern <- if (collection == "fwi") {
+    "^FWI\\..*\\.nc$"
+  } else {
+    paste0("^MERRA2_[0-9]{3}\\.", collection, "\\..*\\.nc4$")
+  }
+  files <- list.files(
+    root,
+    pattern = pattern,
+    recursive = TRUE,
+    full.names = TRUE
+  )
+  if (length(files) == 0) {
+    stop("Could not locate files for collection ", collection, ".")
+  }
+  dirname(files[1])
+}
+
+for (i in seq_len(nrow(merra2_demo_specs))) {
+  spec <- merra2_demo_specs[i, ]
+  processed_examples[[spec$variable]] <- process_covariates(
+    covariate = "merra2",
+    variable = spec$variable,
+    date = spec$date,
+    path = find_merra2_collection_dir(directory_to_save, spec$collection)
+  )
+}
+processed_summary <- data.frame(
+  variable = merra2_demo_specs$variable,
+  collection = merra2_demo_specs$collection,
+  n_layers = vapply(processed_examples, function(x) as.integer(terra::nlyr(x)), integer(1)),
+  first_output_layer = vapply(processed_examples, function(x) {
+    names(x)[1]
+  }, character(1)),
+  stringsAsFactors = FALSE
+)
+knitr::kable(
+  processed_summary,
+  col.names = c(
+    "Variable",
+    "Collection",
+    "Layers returned",
+    "First layer name in the processed raster"
+  )
+)
+```
+
+## Plot one processed raster
+
+```{r plot-processed-raster, eval = live_run, fig.width = 12, fig.height = 8, fig.alt = "Global map of the processed daily Fire Weather Index raster for the workflow date."}
+terra::plot(
+  processed_examples$FWI,
+  main = "MERRA-2 corrected FWI on 2024-08-11",
+  plg = list(x = "bottom", title = "FWI")
+)
+```
+
+## Demonstrate hourly MERRA-2 data with `tavg1_2d_adg_Nx`
+
+Many MERRA-2 datasets are at 1, 3, or 6 hour increments. Here, we inspect the hourly timestamps.
+
+```{r bceman-hourly-summary, eval = live_run}
+bceman_hourly_layers <- data.frame(
+  layer_name = names(processed_examples$BCEMAN),
+  time_utc = as.character(terra::time(processed_examples$BCEMAN)),
+  stringsAsFactors = FALSE
+)
+knitr::kable(
+  head(bceman_hourly_layers, 8),
+  col.names = c("Hourly layer name", "Timestamp (UTC)")
+)
+```
+
+
+
+## View the daily BCEMAN summary
+
+Process and calculate functions currently return results in the native time resolution of the data. Here, again, that is hourly. To calculate a daily summary we simply use an apply style function from `terra`. 
+
+```{r bceman-daily-summary, eval = live_run}
+bceman_daily <- terra::app(processed_examples$BCEMAN, mean, na.rm = TRUE)
+names(bceman_daily) <- "BCEMAN_20240811_0000"
+terra::time(bceman_daily) <- as.POSIXct("2024-08-11 00:00:00", tz = "UTC")
+```
+```{r plot-bceman-daily, eval = live_run, fig.width = 12, fig.height = 8, fig.alt = "Global map of the daily mean BCEMAN raster summarized from hourly MERRA-2 data."}
+terra::plot(
+  bceman_daily,
+  main = "Daily mean BCEMAN from tavg1_2d_adg_Nx on 2024-08-11",
+  plg = list(x = "bottom", title = "BCEMAN")
+)
+```
+
+## Calculate daily BCEMAN at points 
+
+```{r calculate-bceman-daily, eval = live_run}
+
+
+df <- data.frame(
+  site_id = c("site_1", "site_2", "site_3","site_4"),
+  lon = c(-78.6382, -47.8825, 116.4074, 36.8219),
+  lat = c(35.7796, -15.7942, 39.9042, -1.2921)
+)
+example_points_sf <- sf::st_as_sf(
+  df,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+
+bceman_point_values <- calculate_covariates(
+  covariate = "merra2",
+  from = bceman_daily,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  fun = "mean",
+  geom = "sf"
+)
+
+print(bceman_point_values)
+```
+
+## Calculate covariates at points with dense-coverage FWI layers
+
+```{r calculate-points, eval = live_run}
+point_ffmc <- calculate_covariates(
+  covariate = "merra2",
+  from = processed_examples$FFMC,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  fun = "mean",
+  geom = "sf"
+)
+point_fwi <- calculate_covariates(
+  covariate = "merra2",
+  from = processed_examples$FWI,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  fun = "mean",
+  geom = "sf"
+)
+point_values <- dplyr::left_join(
+  point_ffmc,
+  sf::st_drop_geometry(point_fwi),
+  by = c("site_id", "time")
+)
+
+print(point_values)
+
+```
+
+
+## Visualize the point outputs
+
+```{r plot-points, eval = live_run, fig.width = 12, fig.height = 8, fig.alt = "Map of point-based extraction results for the daily Fire Weather Index layer used in this workflow."}
+
+point_basemap <-
+  sf::st_as_sf(maps::map("world", plot = FALSE, fill = TRUE))
+
+ggplot() + geom_sf(data = point_basemap) + geom_sf(data = point_values,aes(color = `MERRA2.CORRECTED.FWI_0`)) + ggtitle("FWI values at example points on 2024-08-11")
+
+
+```
+

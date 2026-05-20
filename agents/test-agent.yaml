@@ -1,0 +1,22 @@
+name: amadeus Test Agent
+description: >
+  Specialist for writing, fixing, and extending testthat unit and integration
+  tests for the amadeus R package. Model-agnostic prompt: knows the two-tier
+  (mocked + live) architecture, helper inventory, skip patterns, mocking
+  convention, naming convention, and assertion conventions.
+version: "2.0"
+suggested_model: any
+domains:
+  - all
+files:
+  - tests/testthat/
+  - tests/testdata/
+  - tests/test_report/
+  - vignettes/testing.Rmd
+  - .github/workflows/test-live.yaml
+tools:
+  - read_files
+  - search_code
+  - run_tests
+  - run_linter
+  - run_coverage

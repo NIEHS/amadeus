@@ -8,32 +8,48 @@ calculate_koppen_geiger(
   from = NULL,
   locs = NULL,
   locs_id = "site_id",
+  weights = NULL,
   geom = FALSE,
+  frac = FALSE,
+  radius = 0,
   ...
 )
 }
 \arguments{
-\item{from}{SpatVector(1). Output of \code{process_koppen_geiger()}.}
+\item{from}{SpatRaster(1). Output of \code{process_koppen_geiger()}.}
 
 \item{locs}{sf/SpatVector. Unique locs. Should include
 a unique identifier field named \code{locs_id}}
 
 \item{locs_id}{character(1). Name of unique identifier.}
 
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
+
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
 
+\item{frac}{logical(1). Default \code{FALSE}. If \code{FALSE}, return binary 0/1
+indicators by climate group. If \code{TRUE}, return fractional overlap in the
+extraction footprint.}
+
+\item{radius}{numeric(1). Circular buffer size (meters) around point
+locations. Use \code{0} (default) for exact point extraction.}
+
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame or SpatVector object
+a data.frame or SpatVector object with climate columns named like
+\code{DUM_CLRGA_00000} (\code{frac = FALSE}) or \code{FRC_CLRGA_100000} (\code{frac = TRUE})
+where the suffix reflects the extraction radius.
 }
 \description{
-Extract climate classification values at point locations. Returns a
-\code{data.frame} object containing \code{locs_id} and
-binary (0 = point not in climate region; 1 = point in climate region)
-variables for each climate classification region.
+Extract Koppen-Geiger climate classes at point or buffered locations. Returns
+a \code{data.frame} with \code{locs_id}, a \code{description} column, and
+either binary indicators (\code{frac = FALSE}) or fractional overlap values
+(\code{frac = TRUE}) for climate groups A-E.
 }
 \note{
 The returned object contains a

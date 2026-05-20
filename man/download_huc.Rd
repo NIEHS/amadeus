@@ -9,15 +9,19 @@ download_huc(
   type = c("Seamless", "OceanCatchment"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = FALSE,
-  hash = FALSE
+  hash = FALSE,
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
 \item{region}{character(1). One of \code{c("Lower48", "Islands")}.
-When \code{"Islands"} is selected, the data will be downloaded for Hawaii, Puerto Rico, and Virgin Islands.}
+When \code{"Islands"} is selected, the data will be downloaded for Hawaii,
+Puerto Rico, and Virgin Islands.}
 
 \item{type}{character(1). One of \code{c("Seamless", "OceanCatchment")}.}
 
@@ -36,11 +40,20 @@ Remove (\code{TRUE}) or keep (\code{FALSE})
 the text file containing download commands.}
 
 \item{unzip}{logical(1). Unzip the downloaded compressed files.
-Default is \code{FALSE}. Not working for this function since HUC data is in 7z format.}
+Default is \code{FALSE}. Supports ".7z" extraction via \pkg{archive}.}
 
 \item{hash}{logical(1). By setting \code{TRUE} the function will return
 an \code{rlang::hash_file()} hash character corresponding to the
 downloaded files. Default is \code{FALSE}.}
+
+\item{show_progress}{logical(1). Show download progress.
+Default is \code{TRUE}.}
+
+\item{max_tries}{integer(1). Maximum download retry attempts.
+Default is \code{20}.}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests.
+Default is \code{2}.}
 }
 \value{
 \itemize{

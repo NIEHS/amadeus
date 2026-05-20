@@ -2,18 +2,18 @@
 % Please edit documentation in R/download_auxiliary.R
 \name{download_run}
 \alias{download_run}
-\title{Run download commands}
+\title{Legacy download_run function for backwards compatibility}
 \usage{
 download_run(download = FALSE, commands_txt = NULL, remove = FALSE)
 }
 \arguments{
-\item{download}{logical(1). Execute (\code{TRUE}) or
-skip (\code{FALSE}) download.}
+\item{download}{logical(1). Execute (\code{TRUE}) or skip (\code{FALSE})
+download.}
 
 \item{commands_txt}{character(1). Path of download commands}
 
-\item{remove}{logical(1). Remove (\code{TRUE}) or
-keep (\code{FALSE}) command. Passed to \code{download_remove_commands}.}
+\item{remove}{logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
+command.}
 }
 \value{
 NULL; runs download commands with shell (Unix/Linux) or
@@ -21,6 +21,9 @@ command prompt (Windows) and removes \code{commands_txt} file if
 \code{remove = TRUE}.
 }
 \description{
+\strong{DEPRECATED}: This function is maintained for backwards compatibility.
+New code should use \code{download_run_method()} directly.
+
 Execute or skip the commands listed in the ...wget/curl_commands.txt file
 produced by one of the data download functions.
 }

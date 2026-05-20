@@ -1,6 +1,6 @@
 Package: amadeus
 Title: Accessing and Analyzing Large-Scale Environmental Data
-Version: 1.3.2.1
+Version: 2.0.0
 Authors@R: c(
     person(given = "Mitchell", family = "Manware", role = c("aut", "ctb"), comment = c(ORCID = "0009-0003-6440-6106")),
     person(given = "Insang", family = "Song", role = c("aut", "ctb"), comment = c(ORCID = "0000-0001-8732-3256")),
@@ -22,31 +22,34 @@ Imports:
     methods,
     data.table,
     httr2,
-    rvest,
     exactextractr,
     utils,
     stringi,
-    testthat (>= 3.0.0),
     stars,
     tidyr,
     rlang,
-    nhdplusTools,
     archive,
     collapse,
-    Rdpack,
-    jsonlite
+    Rdpack
 Suggests:
     covr,
-    withr,
-    knitr,
-    rmarkdown,
-    lwgeom,
-    FNN,
-    doRNG,
     devtools,
+    doRNG,
+    FNN,
+    furrr,
+    ggplot2,
+    knitr,
+    lwgeom,
+    maps,
+    mirai,
+    nhdplusTools,
+    rmarkdown,
+    spelling,
     stringr,
+    targets,
+    testthat (>= 3.0.0),
     tigris,
-    spelling
+    withr
 RdMacros: Rdpack
 Encoding: UTF-8
 VignetteBuilder: knitr, rmarkdown

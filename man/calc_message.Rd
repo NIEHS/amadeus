@@ -4,7 +4,7 @@
 \alias{calc_message}
 \title{Send progress messages}
 \usage{
-calc_message(dataset, variable, time, time_type, level)
+calc_message(dataset, variable, time, time_type, level, layer_time = NULL)
 }
 \arguments{
 \item{dataset}{character(1). Data source.}

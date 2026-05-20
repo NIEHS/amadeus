@@ -8,6 +8,7 @@ calculate_temporal_dummies(
   locs,
   locs_id = "site_id",
   year = seq(2018L, 2022L),
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -20,6 +21,10 @@ Default is \code{"site_id"}.}
 
 \item{year}{integer. Year domain to dummify.
 Default is \code{seq(2018L, 2022L)}.}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

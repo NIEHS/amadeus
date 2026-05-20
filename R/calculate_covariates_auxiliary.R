@@ -162,9 +162,15 @@ calc_message <- function(
   variable,
   time,
   time_type,
-  level
+  level,
+  layer_time = NULL
 ) {
-  message_time <- calc_time(time, time_type)
+  message_time <- calc_time(
+    time = time,
+    format = time_type,
+    dataset = dataset,
+    layer_time = layer_time
+  )
   if (dataset == "skip") {
     return()
   }
@@ -252,6 +258,7 @@ calc_prepare_locs <- function(
   if (!locs_id %in% names(locs)) {
     stop(sprintf("locs should include columns named %s.\n", locs_id))
   }
+  locs_id_values <- as.data.frame(locs)[[locs_id]]
   #### prepare sites
   sites_e <- amadeus::process_locs_vector(
     locs,
@@ -264,19 +271,202 @@ calc_prepare_locs <- function(
   if (geom %in% c("sf", "terra")) {
     geom <- TRUE
   }
+  sites_df <- if (geom) {
+    terra::as.data.frame(sites_e, geom = "WKT")
+  } else {
+    terra::as.data.frame(sites_e)
+  }
+  if (!locs_id %in% names(sites_df)) {
+    if (nrow(sites_df) != length(locs_id_values)) {
+      stop(
+        paste0(
+          "`locs_id` was not retained in prepared locations and could not ",
+          "be reconstructed because row counts differ."
+        )
+      )
+    }
+    sites_df[[locs_id]] <- locs_id_values
+  }
   if (geom) {
     sites_id <- subset(
-      terra::as.data.frame(sites_e, geom = "WKT"),
+      sites_df,
       select = c(locs_id, "geometry")
     )
   } else {
     #### site identifiers only
     sites_id <- subset(
-      terra::as.data.frame(sites_e),
+      sites_df,
       select = locs_id
     )
   }
   return(list(sites_e, sites_id))
+}
+
+#' Validate extents overlap
+#' @param x SpatRaster(1)
+#' @param y SpatRaster(1)
+#' @return logical(1)
+#' @keywords internal auxiliary
+#' @export
+calc_extents_overlap <- function(x, y) {
+  ext_x <- as.vector(terra::ext(x))
+  ext_y <- as.vector(terra::ext(y))
+  !(ext_x[2] < ext_y[1] ||
+      ext_y[2] < ext_x[1] ||
+      ext_x[4] < ext_y[3] ||
+      ext_y[4] < ext_x[3])
+}
+
+#' Prepare optional weighting raster
+#' @param from SpatRaster(1). Template raster.
+#' @param weights NULL, SpatRaster, SpatVector/sf polygon, or file path.
+#' @return NULL or single-layer SpatRaster aligned to `from`.
+#' @keywords internal auxiliary
+#' @export
+calc_prepare_weights <- function(from, weights = NULL) {
+  if (is.null(weights)) {
+    return(NULL)
+  }
+  if (!inherits(from, "SpatRaster")) {
+    stop("`from` must be a SpatRaster when `weights` are supplied.")
+  }
+
+  normalize_vector_weights <- function(vect_weights) {
+    if (terra::geomtype(vect_weights)[1] != "polygons") {
+      stop(
+        "`weights` vector input must contain polygons when supplied as ",
+        "SpatVector/sf."
+      )
+    }
+    from_crs <- terra::crs(from)
+    if (is.na(from_crs) || from_crs == "") {
+      stop("`from` is missing CRS; cannot validate weighted extraction CRS.")
+    }
+    vect_weights <- terra::project(vect_weights, from_crs)
+    vect_df <- terra::as.data.frame(vect_weights)
+    val_cols <- names(vect_weights)
+    val_cols <- val_cols[sapply(val_cols, function(x) {
+      is.numeric(vect_df[[x]])
+    })]
+    if (length(val_cols) == 0L) {
+      vect_weights$.amadeus_weight <- 1
+      val_col <- ".amadeus_weight"
+    } else {
+      val_col <- val_cols[1]
+      if (length(val_cols) > 1L) {
+        message(
+          "Multiple numeric columns found in `weights`; using first column: ",
+          val_col
+        )
+      }
+    }
+    if (any(vect_df[[val_col]] < 0, na.rm = TRUE)) {
+      stop("`weights` values must be non-negative.")
+    }
+    weights_r <- terra::rasterize(
+      vect_weights,
+      from[[1]],
+      field = val_col,
+      background = NA,
+      touches = TRUE
+    )
+    if (all(is.na(terra::values(weights_r)))) {
+      stop("`weights` polygons do not overlap `from` extent.")
+    }
+    weights_r
+  }
+
+  weights_obj <- weights
+  if (is.character(weights) && length(weights) == 1L) {
+    weights_obj <- try(terra::rast(weights), silent = TRUE)
+    if (inherits(weights_obj, "try-error")) {
+      weights_obj <- try(terra::vect(weights), silent = TRUE)
+      if (inherits(weights_obj, "try-error")) {
+        stop("`weights` path could not be read as raster or vector data.")
+      }
+    }
+  }
+
+  if (inherits(weights_obj, c("sf", "sfc"))) {
+    weights_obj <- terra::vect(weights_obj)
+  }
+
+  if (inherits(weights_obj, "SpatVector")) {
+    return(normalize_vector_weights(weights_obj))
+  }
+  if (!inherits(weights_obj, "SpatRaster")) {
+    stop(
+      "`weights` must be NULL, SpatRaster, polygon SpatVector/sf, ",
+      "or a file path to one of those."
+    )
+  }
+  if (terra::nlyr(weights_obj) != 1L) {
+    stop("`weights` raster must have exactly one layer.")
+  }
+  if (!is.numeric(terra::values(weights_obj)[, 1])) {
+    stop("`weights` raster values must be numeric.")
+  }
+  if (any(terra::values(weights_obj)[, 1] < 0, na.rm = TRUE)) {
+    stop("`weights` values must be non-negative.")
+  }
+
+  from_crs <- terra::crs(from)
+  weights_crs <- terra::crs(weights_obj)
+  if (is.na(from_crs) || from_crs == "") {
+    stop("`from` is missing CRS; cannot validate weighted extraction CRS.")
+  }
+  if (is.na(weights_crs) || weights_crs == "") {
+    stop("`weights` is missing CRS; cannot validate weighted extraction CRS.")
+  }
+
+  weights_re <- terra::project(weights_obj, from[[1]], method = "bilinear")
+  if (!calc_extents_overlap(from[[1]], weights_re)) {
+    stop("`weights` extent does not overlap `from` extent.")
+  }
+  terra::resample(weights_re, from[[1]], method = "bilinear")
+}
+
+#' Convert point extractions to tiny polygons for exact extraction
+#' @param locs_vector SpatVector(1)
+#' @param radius numeric(1)
+#' @return sf object for exactextractr
+#' @keywords internal auxiliary
+#' @export
+calc_prepare_exact_geoms <- function(locs_vector, radius) {
+  geom_type <- terra::geomtype(locs_vector)[1]
+  if (geom_type == "polygons") {
+    return(sf::st_as_sf(locs_vector))
+  }
+  if (geom_type != "points") {
+    stop("Unsupported location geometry for weighted extraction.")
+  }
+  width <- as.numeric(radius)
+  if (!is.finite(width) || width <= 0) {
+    if (terra::is.lonlat(locs_vector)) {
+      width <- 1e-6
+    } else {
+      width <- 1
+    }
+  }
+  sf::st_as_sf(terra::buffer(locs_vector, width = width, quadsegs = 90L))
+}
+
+#' Resolve weighted summary function names for exactextractr
+#' @param fun character(1)
+#' @param weighted logical(1)
+#' @return character(1)
+#' @keywords internal auxiliary
+#' @export
+calc_weighted_fun <- function(fun, weighted = FALSE) {
+  if (!weighted) {
+    return(fun)
+  }
+  switch(
+    fun,
+    mean = "weighted_mean",
+    sum = "weighted_sum",
+    fun
+  )
 }
 
 #' Prepare time values
@@ -293,32 +483,168 @@ calc_prepare_locs <- function(
 #' @export
 calc_time <- function(
   time,
-  format
+  format,
+  dataset = NULL,
+  layer_name = NULL,
+  layer_time = NULL
 ) {
+  parse_gridmet_day_code <- function(x) {
+    x_chr <- as.character(x)
+    if (!grepl("^[0-9]+$", x_chr)) {
+      return(as.Date(NA))
+    }
+    as.Date(as.numeric(x_chr), origin = "1900-01-01")
+  }
+  extract_ymd_from_text <- function(x) {
+    x_chr <- as.character(x)
+    x_digits <- gsub("[^0-9]", "", x_chr)
+    if (grepl("^[0-9]{8}$", x_digits)) {
+      return(as.Date(x_digits, format = "%Y%m%d"))
+    }
+    if (grepl("^[0-9]{7}$", x_digits)) {
+      return(as.Date(x_digits, format = "%Y%j"))
+    }
+    as.Date(NA)
+  }
+  to_posixlt_utc <- function(x) {
+    as.POSIXlt(as.POSIXct(x, tz = "UTC"))
+  }
+  extract_digits <- function(x) {
+    token <- as.character(x)[1]
+    if (is.na(token)) {
+      return("")
+    }
+    gsub("[^0-9]", "", token)
+  }
+  has_layer_time <- !is.null(layer_time) &&
+    length(layer_time) > 0 &&
+    !all(is.na(layer_time))
+
   if (format == "timeless") {
     return(time)
-  } else if (format == "date") {
-    return_time <- as.POSIXlt(
-      time,
-      format = "%Y%m%d",
-      tz = "UTC"
-    )
-  } else if (format == "hour") {
-    return_time <- as.POSIXlt(
-      ISOdatetime(
-        year = substr(time[1], 1, 4),
-        month = substr(time[1], 5, 6),
-        day = substr(time[1], 7, 8),
-        hour = substr(time[2], 1, 2),
-        min = substr(time[2], 3, 4),
-        sec = substr(time[2], 5, 6),
-        tz = "UTC"
+  }
+
+  if (has_layer_time) {
+    if (format == "hour") {
+      return(to_posixlt_utc(layer_time[1]))
+    }
+    if (format == "date") {
+      return(to_posixlt_utc(as.Date(layer_time[1])))
+    }
+    if (format == "year") {
+      return(as.integer(format(as.Date(layer_time[1]), "%Y")))
+    }
+    if (format == "yearmonth") {
+      return(as.integer(format(as.Date(layer_time[1]), "%Y%m")))
+    }
+  }
+
+  if (format == "date") {
+    time_chr <- as.character(time[1])
+    parsed <- extract_ymd_from_text(time_chr)
+    if (!is.na(parsed)) {
+      return(to_posixlt_utc(parsed))
+    }
+    if (!is.null(layer_name) && grepl("=[0-9]+$", layer_name)) {
+      day_code <- sub(".*=([0-9]+)$", "\\1", layer_name)
+      parsed <- parse_gridmet_day_code(day_code)
+      if (!is.na(parsed)) {
+        return(to_posixlt_utc(parsed))
+      }
+    }
+    stop(
+      sprintf(
+        "Unable to parse date for dataset '%s' from token '%s' (layer '%s').\n",
+        ifelse(is.null(dataset), "unknown", dataset),
+        paste(time, collapse = "_"),
+        ifelse(is.null(layer_name), "unknown", layer_name)
       )
     )
-  } else if (format %in% c("yearmonth", "year")) {
-    return_time <- as.integer(time)
   }
-  return(return_time)
+
+  if (format == "hour") {
+    time_chr <- as.character(time)
+    if (length(time_chr) >= 2) {
+      date_digits <- gsub("[^0-9]", "", time_chr[1])
+      hour_digits <- gsub("[^0-9]", "", time_chr[2])
+      if (
+        !is.na(date_digits) &&
+          !is.na(hour_digits) &&
+          nchar(date_digits) == 8 &&
+          nchar(hour_digits) >= 2
+      ) {
+        hour_digits <- sprintf("%06d", as.integer(substr(hour_digits, 1, 6)))
+        return(
+          to_posixlt_utc(ISOdatetime(
+            year = substr(date_digits, 1, 4),
+            month = substr(date_digits, 5, 6),
+            day = substr(date_digits, 7, 8),
+            hour = substr(hour_digits, 1, 2),
+            min = substr(hour_digits, 3, 4),
+            sec = substr(hour_digits, 5, 6),
+            tz = "UTC"
+          ))
+        )
+      }
+    }
+    full_digits <- gsub("[^0-9]", "", paste(time_chr, collapse = ""))
+    if (nchar(full_digits) >= 10) {
+      dt <- as.POSIXct(
+        substr(full_digits, 1, 14),
+        format = "%Y%m%d%H%M%S",
+        tz = "UTC"
+      )
+      if (!is.na(dt)) {
+        return(to_posixlt_utc(dt))
+      }
+    }
+    stop(
+      sprintf(
+        paste0(
+          "Unable to parse datetime for dataset '%s' from token '%s' ",
+          "(layer '%s').\n"
+        ),
+        ifelse(is.null(dataset), "unknown", dataset),
+        paste(time, collapse = "_"),
+        ifelse(is.null(layer_name), "unknown", layer_name)
+      )
+    )
+  }
+
+  if (format == "yearmonth") {
+    digits <- extract_digits(time)
+    if (nchar(digits) >= 6) {
+      return(as.integer(substr(digits, 1, 6)))
+    }
+    stop(
+      sprintf(
+        paste0(
+          "Unable to parse year-month for dataset '%s' from token '%s' ",
+          "(layer '%s').\n"
+        ),
+        ifelse(is.null(dataset), "unknown", dataset),
+        paste(time, collapse = "_"),
+        ifelse(is.null(layer_name), "unknown", layer_name)
+      )
+    )
+  }
+
+  if (format == "year") {
+    digits <- extract_digits(time)
+    if (nchar(digits) >= 4) {
+      return(as.integer(substr(digits, 1, 4)))
+    }
+    stop(
+      sprintf(
+        "Unable to parse year for dataset '%s' from token '%s' (layer '%s').\n",
+        ifelse(is.null(dataset), "unknown", dataset),
+        paste(time, collapse = "_"),
+        ifelse(is.null(layer_name), "unknown", layer_name)
+      )
+    )
+  }
+
+  stop("Unsupported time format.\n")
 }
 
 #' Check time values
@@ -376,6 +702,8 @@ calc_check_time <- function(
 #' Higher values will expedite processing, but will increase memory usage.
 #' Maximum possible value is `2^31 - 1`.
 #' See [`exactextractr::exact_extract`] for details.
+#' @param weights NULL, SpatRaster, polygon SpatVector/sf, or file path.
+#'   Optional weighting surface used for weighted extraction.
 #' @param ... Placeholders.
 #' @importFrom terra nlyr
 #' @importFrom terra extract
@@ -389,21 +717,31 @@ calc_worker <- function(
   from,
   locs_vector,
   locs_df,
-  fun,
+  fun = "mean",
   variable = 1,
   time,
   time_type = c("date", "hour", "year", "yearmonth", "timeless"),
   radius,
   level = NULL,
   max_cells = 1e8,
+  weights = NULL,
   ...
 ) {
   #### empty location data.frame
   sites_extracted <- NULL
   time_type <- match.arg(time_type)
+  weights_prepared <- amadeus::calc_prepare_weights(
+    from = from[[1]],
+    weights = weights
+  )
+  fun_extract <- amadeus::calc_weighted_fun(
+    fun = fun,
+    weighted = !is.null(weights_prepared)
+  )
   for (l in seq_len(terra::nlyr(from))) {
     #### select data layer
     data_layer <- from[[l]]
+    layer_time <- NULL
     #### split layer name
     data_split <- strsplit(
       names(data_layer),
@@ -412,10 +750,17 @@ calc_worker <- function(
     #### extract variable
     data_name <- data_split[variable]
     if (!is.null(time)) {
+      layer_time <- try(terra::time(data_layer), silent = TRUE)
+      if (inherits(layer_time, "try-error")) {
+        layer_time <- NULL
+      }
       #### extract time
       data_time <- calc_time(
-        data_split[time],
-        time_type
+        time = data_split[time],
+        format = time_type,
+        dataset = dataset,
+        layer_name = names(data_layer),
+        layer_time = layer_time
       )
     }
     #### extract level (if applicable)
@@ -424,35 +769,60 @@ calc_worker <- function(
     } else {
       data_level <- NULL
     }
+    layer_time_msg <- if (!is.null(time)) data_split[time] else NA_character_
     #### message
     calc_message(
       dataset = dataset,
       variable = data_name,
-      time = data_split[time],
+      time = layer_time_msg,
       time_type = time_type,
-      level = data_level
+      level = data_level,
+      layer_time = layer_time
     )
     #### extract layer data at sites
     if (terra::geomtype(locs_vector) == "polygons") {
       ### apply exactextractr::exact_extract for polygons
-      sites_extracted_layer <- exactextractr::exact_extract(
-        data_layer,
-        sf::st_as_sf(locs_vector),
+      extract_args <- list(
+        x = data_layer,
+        y = sf::st_as_sf(locs_vector),
         progress = FALSE,
         force_df = TRUE,
-        fun = fun,
+        fun = fun_extract,
         max_cells_in_memory = max_cells
       )
-    } else if (terra::geomtype(locs_vector) == "points") {
-      #### apply terra::extract for points
-      sites_extracted_layer <- terra::extract(
-        data_layer,
-        locs_vector,
-        method = "simple",
-        ID = FALSE,
-        bind = FALSE,
-        na.rm = TRUE
+      if (!is.null(weights_prepared)) {
+        extract_args$weights <- weights_prepared
+      }
+      sites_extracted_layer <- do.call(
+        exactextractr::exact_extract,
+        extract_args
       )
+    } else if (terra::geomtype(locs_vector) == "points") {
+      if (is.null(weights_prepared)) {
+        #### apply terra::extract for points
+        sites_extracted_layer <- terra::extract(
+          data_layer,
+          locs_vector,
+          method = "simple",
+          ID = FALSE,
+          bind = FALSE,
+          na.rm = TRUE
+        )
+      } else {
+        weighted_geoms <- amadeus::calc_prepare_exact_geoms(
+          locs_vector = locs_vector,
+          radius = radius
+        )
+        sites_extracted_layer <- exactextractr::exact_extract(
+          x = data_layer,
+          y = weighted_geoms,
+          weights = weights_prepared,
+          progress = FALSE,
+          force_df = TRUE,
+          fun = fun_extract,
+          max_cells_in_memory = max_cells
+        )
+      }
     }
     # merge with site_id, time, and pressure levels (if applicable)
     if (time_type == "timeless") {
@@ -554,12 +924,38 @@ calc_return_locs <- function(
   # nolint end
   # if geom, convert to and return SpatVector
   if (geom %in% c("terra", "sf")) {
+    if (nrow(covar) == 0) {
+      if ("geometry" %in% names(covar)) {
+        covar_sf <- sf::st_as_sf(covar, wkt = "geometry", crs = crs)
+      } else if (all(c("lon", "lat") %in% names(covar))) {
+        covar_sf <- sf::st_as_sf(
+          covar,
+          coords = c("lon", "lat"),
+          crs = crs,
+          remove = FALSE
+        )
+      } else {
+        warning(
+          paste(
+            "`geom` was requested but no geometry columns were found in",
+            "`covar`; returning data.frame."
+          )
+        )
+        return(data.frame(covar))
+      }
+      if (geom == "sf") {
+        return(covar_sf)
+      }
+      return(suppressWarnings(terra::vect(covar_sf)))
+    }
+    covar_return <- NULL
     if ("geometry" %in% names(covar)) {
-      covar_return <- terra::vect(
-        covar,
-        geom = "geometry",
-        crs = crs
-      )
+      covar_sf <- sf::st_as_sf(covar, wkt = "geometry", crs = crs)
+      covar_return <- if (geom == "sf") {
+        covar_sf
+      } else {
+        suppressWarnings(terra::vect(covar_sf))
+      }
     } else if (all(c("lon", "lat") %in% names(covar))) {
       covar_return <- terra::vect(
         covar,
@@ -567,10 +963,25 @@ calc_return_locs <- function(
         crs = crs
       )
     }
+    if (is.null(covar_return)) {
+      warning(
+        paste(
+          "`geom` was requested but no geometry columns were found in",
+          "`covar`; returning data.frame."
+        )
+      )
+      return(data.frame(covar))
+    }
     if (geom == "terra") {
       return(covar_return)
     } else if (geom == "sf") {
-      return(sf::st_as_sf(covar_return))
+      return(
+        if (inherits(covar_return, "sf")) {
+          covar_return
+        } else {
+          sf::st_as_sf(covar_return)
+        }
+      )
     }
   } else {
     return(data.frame(covar))
@@ -589,6 +1000,567 @@ check_geom <- function(geom) {
   if (!geom %in% c(FALSE, "sf", "terra")) {
     stop("`geom` must be one of FALSE, 'sf', or 'terra'.")
   }
+}
+
+
+#' Validate the `fun_temporal` parameter
+#' @description
+#' Validates the `fun_temporal` argument used by covariate
+#' extraction functions.  When \code{NULL} (the default), no
+#' temporal aggregation is applied and existing per-layer
+#' extraction behavior is preserved.  When non-\code{NULL},
+#' the value must be one of \code{"mean"}, \code{"median"},
+#' \code{"sum"}, \code{"max"}, or \code{"min"}.
+#' @param fun_temporal NULL or character(1). Name of the
+#'   temporal summary function. \code{NULL} means no temporal
+#'   aggregation (default / backward-compatible behavior).
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return \code{NULL} invisibly; stops with an informative
+#'   error if the value is invalid.
+#' @export
+check_fun_temporal <- function(fun_temporal) {
+  if (is.null(fun_temporal)) {
+    return(invisible(NULL))
+  }
+  allowed <- c("mean", "median", "sum", "max", "min")
+  if (
+    !is.character(fun_temporal) ||
+      length(fun_temporal) != 1L
+  ) {
+    stop(
+      paste0(
+        "`fun_temporal` must be NULL or a single ",
+        "character string.\n"
+      )
+    )
+  }
+  if (!fun_temporal %in% allowed) {
+    stop(
+      sprintf(
+        paste0(
+          "`fun_temporal` must be one of: %s.\n"
+        ),
+        paste(allowed, collapse = ", ")
+      )
+    )
+  }
+  invisible(NULL)
+}
+
+
+#' Build standardized error for legacy grouping usage
+#' @keywords internal
+#' @noRd
+stop_legacy_by_error <- function() {
+  stop(
+    paste0(
+      "`.by` is no longer supported in calculate APIs. ",
+      "Use `.by_time` for temporal summarization (e.g., 'day', ",
+      "'week', 'month', or 'year').\n"
+    )
+  )
+}
+
+
+#' Reject deprecated legacy grouping argument in dots
+#' @description
+#' Internal helper for calculate APIs that now support temporal
+#' summarization via \code{.by_time} only. Stops immediately when a
+#' deprecated legacy grouping argument is supplied through \code{...}.
+#' @param ... Placeholders.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return \code{NULL} invisibly; stops on deprecated legacy grouping input.
+#' @export
+check_unsupported_by <- function(..., .call = NULL) {
+  dots <- list(...)
+  call_names <- character(0)
+  if (!is.null(.call)) {
+    call_names <- names(as.list(.call)[-1])
+  }
+  if (".by" %in% names(dots) || ".by" %in% call_names) {
+    stop_legacy_by_error()
+  }
+  invisible(NULL)
+}
+
+
+#' Validate the `.by_time` temporal summarization argument
+#' @description
+#' Validates the \code{.by_time} argument used by covariate extraction
+#' functions for temporal summarization. When non-\code{NULL},
+#' \code{.by_time} must be a single character string naming a supported
+#' temporal unit token (singular or plural): \code{"minute"},
+#' \code{"hour"}, \code{"day"}, \code{"week"}, \code{"month"},
+#' \code{"quarter"}, or \code{"year"}.
+#' @param .by_time NULL or character(1). Temporal summarization unit.
+#'   \code{NULL} means no temporal summarization.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return \code{NULL} invisibly; stops with an informative error if the
+#'   value is invalid.
+#' @export
+check_by_time <- function(.by_time) {
+  if (is.null(.by_time)) {
+    return(invisible(NULL))
+  }
+  if (!is.character(.by_time) || length(.by_time) != 1L) {
+    stop(
+      paste0(
+        "`.by_time` must be NULL or a single character string naming ",
+        "a temporal unit.
+"
+      )
+    )
+  }
+  allowed <- c(
+    "minute",
+    "minutes",
+    "hour",
+    "hours",
+    "day",
+    "days",
+    "week",
+    "weeks",
+    "month",
+    "months",
+    "quarter",
+    "quarters",
+    "year",
+    "years"
+  )
+  if (!.by_time %in% allowed) {
+    stop(
+      paste0(
+        "`.by_time` must be one of: ",
+        paste(allowed, collapse = ", "),
+        ".
+"
+      )
+    )
+  }
+  invisible(NULL)
+}
+
+#' Normalize `.by_time` time-unit aliases
+#' @description Internal helper that maps singular/plural `.by_time` tokens
+#' to canonical units.
+#' @param unit character(1). Time-unit alias.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return character(1). Canonical unit.
+#' @export
+normalize_by_time_unit <- function(unit) {
+  aliases <- c(
+    minute = "minute",
+    minutes = "minute",
+    hour = "hour",
+    hours = "hour",
+    day = "day",
+    days = "day",
+    week = "week",
+    weeks = "week",
+    month = "month",
+    months = "month",
+    quarter = "quarter",
+    quarters = "quarter",
+    year = "year",
+    years = "year"
+  )
+  if (!is.character(unit) || length(unit) != 1L || !unit %in% names(aliases)) {
+    stop("`unit` must be one valid `.by_time` time-unit token.\n")
+  }
+  aliases[[unit]]
+}
+
+
+#' Bucket a time column to a `.by_time` unit
+#' @description Buckets time values to one of the supported `.by_time` units.
+#' @param time_vals vector. Time values to bucket.
+#' @param unit character(1). A valid `.by_time` time-unit token.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return vector. Bucketed values as POSIXct (minute/hour) or Date.
+#' @export
+bucket_time_by_unit <- function(time_vals, unit) {
+  unit_norm <- normalize_by_time_unit(unit)
+  if (unit_norm %in% c("minute", "hour")) {
+    breaks <- if (unit_norm == "minute") "min" else "hour"
+    return(as.POSIXct(cut(as.POSIXct(time_vals, tz = "UTC"), breaks = breaks)))
+  }
+  time_vals_chr <- as.character(time_vals)
+  if (all(grepl("^[0-9]{8}$", time_vals_chr))) {
+    time_date <- as.Date(time_vals_chr, format = "%Y%m%d")
+  } else if (all(grepl("^[0-9]{7}$", time_vals_chr))) {
+    time_date <- as.Date(time_vals_chr, format = "%Y%j")
+  } else if (all(grepl("^[0-9]{6}$", time_vals_chr))) {
+    time_date <- as.Date(paste0(time_vals_chr, "01"), format = "%Y%m%d")
+  } else if (all(grepl("^[0-9]{4}$", time_vals_chr))) {
+    time_date <- as.Date(paste0(time_vals_chr, "-01-01"))
+  } else {
+    time_date <- as.Date(time_vals, tz = "UTC")
+    if (any(is.na(time_date))) {
+      stop(
+        "Unable to bucket time values. Provide parseable Date/POSIXct values ",
+        "or recognized numeric encodings (YYYYDDD, YYYYMMDD, YYYYMM, YYYY).\n"
+      )
+    }
+  }
+  switch(
+    unit_norm,
+    day = time_date,
+    week = as.Date(cut(time_date, breaks = "week")),
+    month = as.Date(cut(time_date, breaks = "month")),
+    quarter = as.Date(cut(time_date, breaks = "quarter")),
+    year = as.Date(cut(time_date, breaks = "year"))
+  )
+}
+
+
+#' Summarize extracted covariates by `.by_time` temporal unit
+#' @description
+#' Generic temporal summarizer for covariate tables. When
+#' \code{.by_time} is \code{NULL}, the input is returned unchanged.
+#' Otherwise, numeric covariates are summarized by
+#' \code{locs_id + bucketed time + group_cols_extra}.
+#' @param covar data.frame. Extracted covariates.
+#' @param fun_summary character(1) or function. Summary function
+#'   (e.g., \code{"mean"}, \code{"sum"}).
+#' @param locs_id character(1). Location-id column.
+#' @param time_col character(1). Time column in \code{covar}.
+#' @param .by_time NULL or character(1). Temporal unit token.
+#' @param group_cols_extra character or NULL. Extra grouping columns.
+#' @param ... Placeholders.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return a data.frame.
+#' @importFrom dplyr across all_of group_by summarize left_join
+#' @export
+calc_summarize_by <- function(
+  covar,
+  fun_summary = "mean",
+  locs_id = "site_id",
+  time_col = "time",
+  .by_time = NULL,
+  group_cols_extra = NULL,
+  ...
+) {
+  check_unsupported_by(..., .call = sys.call())
+  if (is.null(.by_time)) {
+    return(covar)
+  }
+  stopifnot(is.data.frame(covar))
+  check_by_time(.by_time)
+
+  if (!locs_id %in% names(covar)) {
+    stop(sprintf("`locs_id` column '%s' not found in `covar`.\n", locs_id))
+  }
+  if (!time_col %in% names(covar)) {
+    stop(sprintf("`time_col` column '%s' not found in `covar`.\n", time_col))
+  }
+  if (!is.null(group_cols_extra)) {
+    missing_extra <- setdiff(group_cols_extra, names(covar))
+    if (length(missing_extra) > 0L) {
+      stop(
+        sprintf(
+          "Grouping column(s) not found in `covar`: %s.\n",
+          paste(missing_extra, collapse = ", ")
+        )
+      )
+    }
+  }
+
+  if (is.character(fun_summary)) {
+    if (length(fun_summary) != 1L) {
+      stop("`fun_summary` must be a single function name.\n")
+    }
+    fun_r <- match.fun(fun_summary)
+  } else if (is.function(fun_summary)) {
+    fun_r <- fun_summary
+  } else {
+    stop("`fun_summary` must be a character string or function.\n")
+  }
+
+  group_cols <- c(locs_id, time_col, group_cols_extra)
+  group_cols <- unique(stats::na.omit(group_cols))
+  covar2 <- covar
+  covar2[[time_col]] <- bucket_time_by_unit(covar2[[time_col]], .by_time)
+
+  cov_cols <- names(covar2)[vapply(covar2, is.numeric, logical(1))]
+  cov_cols <- setdiff(cov_cols, group_cols)
+  if (length(cov_cols) == 0L) {
+    stop("No numeric covariate columns found to summarize.\n")
+  }
+
+  summary_df <- covar2 |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(group_cols))) |>
+    dplyr::summarize(
+      dplyr::across(dplyr::all_of(cov_cols), \(x) fun_r(x, na.rm = TRUE)),
+      .groups = "drop"
+    )
+
+  if ("geometry" %in% names(covar2)) {
+    geom_first <- covar2[
+      !duplicated(covar2[, group_cols, drop = FALSE]),
+      c(group_cols, "geometry"),
+      drop = FALSE
+    ]
+    summary_df <- dplyr::left_join(summary_df, geom_first, by = group_cols)
+  }
+
+  col_order <- c(group_cols, cov_cols)
+  if ("geometry" %in% names(summary_df)) {
+    col_order <- c(col_order, "geometry")
+  }
+  data.frame(summary_df[, unique(col_order), drop = FALSE])
+}
+
+#' Summarize extracted covariates at native temporal grain
+#' @description Internal helper that summarizes numeric covariates by
+#' \code{locs_id + time + group_cols_extra} while preserving the original time
+#' representation.
+#' @param covar data.frame. Extracted covariates.
+#' @param fun_summary character(1) or function. Summary function.
+#' @param locs_id character(1). Location-id column.
+#' @param time_col character(1). Time column in \code{covar}.
+#' @param group_cols_extra character or NULL. Extra grouping columns.
+#' @return a data.frame.
+#' @keywords internal auxiliary
+#' @export
+calc_summarize_native_time <- function(
+  covar,
+  fun_summary = "mean",
+  locs_id = "site_id",
+  time_col = "time",
+  group_cols_extra = NULL
+) {
+  stopifnot(is.data.frame(covar))
+  if (!locs_id %in% names(covar)) {
+    stop(sprintf("`locs_id` column '%s' not found in `covar`.\n", locs_id))
+  }
+  if (!time_col %in% names(covar)) {
+    stop(sprintf("`time_col` column '%s' not found in `covar`.\n", time_col))
+  }
+  if (!is.null(group_cols_extra)) {
+    missing_extra <- setdiff(group_cols_extra, names(covar))
+    if (length(missing_extra) > 0L) {
+      stop(
+        sprintf(
+          "Grouping column(s) not found in `covar`: %s.\n",
+          paste(missing_extra, collapse = ", ")
+        )
+      )
+    }
+  }
+  if (is.character(fun_summary)) {
+    if (length(fun_summary) != 1L) {
+      stop("`fun_summary` must be a single function name.\n")
+    }
+    fun_r <- match.fun(fun_summary)
+  } else if (is.function(fun_summary)) {
+    fun_r <- fun_summary
+  } else {
+    stop("`fun_summary` must be a character string or function.\n")
+  }
+
+  group_cols <- unique(stats::na.omit(c(locs_id, time_col, group_cols_extra)))
+  cov_cols <- names(covar)[vapply(covar, is.numeric, logical(1))]
+  cov_cols <- setdiff(cov_cols, group_cols)
+  if (length(cov_cols) == 0L) {
+    stop("No numeric covariate columns found to summarize.\n")
+  }
+
+  summary_df <- covar |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(group_cols))) |>
+    dplyr::summarize(
+      dplyr::across(dplyr::all_of(cov_cols), \(x) fun_r(x, na.rm = TRUE)),
+      .groups = "drop"
+    )
+
+  if ("geometry" %in% names(covar)) {
+    geom_first <- covar[
+      !duplicated(covar[, group_cols, drop = FALSE]),
+      c(group_cols, "geometry"),
+      drop = FALSE
+    ]
+    summary_df <- dplyr::left_join(summary_df, geom_first, by = group_cols)
+  }
+
+  col_order <- c(group_cols, cov_cols)
+  if ("geometry" %in% names(summary_df)) {
+    col_order <- c(col_order, "geometry")
+  }
+  data.frame(summary_df[, unique(col_order), drop = FALSE])
+}
+
+#' Apply default/native or explicit temporal summarization
+#' @param covar data.frame.
+#' @param .by_time NULL or character(1).
+#' @param fun_summary character(1) or function.
+#' @param locs_id character(1).
+#' @param time_col character(1).
+#' @param group_cols_extra character or NULL.
+#' @return data.frame
+#' @keywords internal auxiliary
+#' @export
+calc_apply_time_summary <- function(
+  covar,
+  .by_time = NULL,
+  fun_summary = "mean",
+  locs_id = "site_id",
+  time_col = "time",
+  group_cols_extra = NULL
+) {
+  if (is.null(.by_time)) {
+    return(
+      calc_summarize_native_time(
+        covar = covar,
+        fun_summary = fun_summary,
+        locs_id = locs_id,
+        time_col = time_col,
+        group_cols_extra = group_cols_extra
+      )
+    )
+  }
+  calc_summarize_by(
+    covar = covar,
+    fun_summary = fun_summary,
+    locs_id = locs_id,
+    time_col = time_col,
+    .by_time = .by_time,
+    group_cols_extra = group_cols_extra
+  )
+}
+
+
+#' Summarize extracted covariates by temporal bucket
+#' @description
+#' Applies a named summary function across covariate columns
+#' after bucketing the \code{time} column to a coarser temporal
+#' resolution (daily by default).  When \code{fun_temporal} is
+#' \code{NULL}, the input is returned unchanged
+#' (backward-compatible default).  A WKT \code{"geometry"} column
+#' produced by \code{calc_prepare_locs()} is preserved by
+#' carrying forward the first observed geometry per group.
+#' @param covar data.frame. Extracted covariate table, typically
+#'   the output of \code{calc_worker()} or a
+#'   \code{calculate_*()} function before the
+#'   \code{calc_return_locs()} call. Must contain the columns
+#'   named by \code{locs_id} and \code{time_col}.
+#' @param fun_temporal NULL or character(1). Name of the summary
+#'   function.  One of \code{"mean"}, \code{"median"},
+#'   \code{"sum"}, \code{"max"}, \code{"min"}, or \code{NULL}
+#'   (no aggregation; backward-compatible default).
+#' @param locs_id character(1). Name of the location-identifier
+#'   column in \code{covar}. Default \code{"site_id"}.
+#' @param time_col character(1). Name of the time column in
+#'   \code{covar}. Default \code{"time"}.
+#' @param time_bucket character(1). Temporal resolution to
+#'   summarise to.  One of \code{"day"} (default),
+#'   \code{"week"}, \code{"month"}, or \code{"year"}.
+#' @param group_cols_extra character or NULL. Additional column
+#'   names to include in the grouping key (e.g. \code{"level"}
+#'   for pressure-level data). Default \code{NULL}.
+#' @keywords internal auxiliary
+#' @author Insang Song
+#' @return a data.frame.  When \code{fun_temporal} is
+#'   \code{NULL}, \code{covar} is returned as-is.  Otherwise
+#'   each row represents one unique group / time-bucket
+#'   combination with covariate columns aggregated by
+#'   \code{fun_temporal}.
+#' @importFrom dplyr across all_of group_by summarize left_join
+#' @export
+calc_summarize_temporal <- function(
+  covar,
+  fun_temporal,
+  locs_id = "site_id",
+  time_col = "time",
+  time_bucket = "day",
+  group_cols_extra = NULL
+) {
+  if (is.null(fun_temporal)) {
+    return(covar)
+  }
+  stopifnot(is.data.frame(covar))
+  if (!locs_id %in% names(covar)) {
+    stop(sprintf(
+      "`locs_id` column '%s' not found in `covar`.",
+      locs_id
+    ))
+  }
+  if (!time_col %in% names(covar)) {
+    stop(sprintf(
+      "`time_col` column '%s' not found in `covar`.",
+      time_col
+    ))
+  }
+  if (!is.null(group_cols_extra)) {
+    missing_extra <- setdiff(group_cols_extra, names(covar))
+    if (length(missing_extra) > 0L) {
+      stop(sprintf(
+        paste0(
+          "Extra grouping column(s) not found in `covar`: %s."
+        ),
+        paste(missing_extra, collapse = ", ")
+      ))
+    }
+  }
+  time_bucket <- match.arg(
+    time_bucket,
+    c("day", "week", "month", "year")
+  )
+  grp_cols <- c(locs_id, group_cols_extra, time_col)
+  skip_cols <- c(grp_cols, "geometry")
+  cov_cols <- setdiff(names(covar), skip_cols)
+  has_geom <- "geometry" %in% names(covar)
+  if (length(cov_cols) == 0L) {
+    stop(paste0(
+      "No covariate columns found in `covar` to summarize."
+    ))
+  }
+  covar2 <- covar
+  covar2[[time_col]] <- switch(
+    time_bucket,
+    day = as.Date(covar[[time_col]]),
+    week = as.Date(
+      cut(as.Date(covar[[time_col]]), breaks = "week")
+    ),
+    month = as.Date(
+      cut(as.Date(covar[[time_col]]), breaks = "month")
+    ),
+    year = as.Date(
+      cut(as.Date(covar[[time_col]]), breaks = "year")
+    )
+  )
+  fun_r <- match.fun(fun_temporal)
+  force(fun_r)
+  summary_df <- covar2 |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(grp_cols))) |>
+    dplyr::summarize(
+      dplyr::across(
+        dplyr::all_of(cov_cols),
+        \(x) fun_r(x, na.rm = TRUE)
+      ),
+      .groups = "drop"
+    )
+  if (has_geom) {
+    geom_first <- covar2[
+      !duplicated(covar2[, grp_cols, drop = FALSE]),
+      c(grp_cols, "geometry"),
+      drop = FALSE
+    ]
+    summary_df <- dplyr::left_join(
+      summary_df,
+      geom_first,
+      by = grp_cols
+    )
+  }
+  col_order <- c(grp_cols, cov_cols)
+  if (has_geom) {
+    col_order <- c(col_order, "geometry")
+  }
+  data.frame(summary_df[, col_order, drop = FALSE])
 }
 
 
@@ -612,11 +1584,16 @@ check_geom <- function(geom) {
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
 #' See [`exactextractr::exact_extract`] for details.
 #' @param scale character(1). Scale expression to be applied to the raw values.
-#' It is crucial that users review the technical documentatio of the MODIS product
+#' It is crucial that users review the technical documentation of the MODIS
+#' product
 #' they are using to ensure proper scale.
-#' An example for the MOD11A1 product's LST_Day_1km variable (land surface temperature)
+#' An example for the MOD11A1 product's LST_Day_1km variable (land surface
+#' temperature)
 #' would be `scale = "* 0.02"`.
 #' Default is `NULL`, which applies no scale.
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
 #' @param ... Placeholders.
 #' @description The function operates at MODIS/VIIRS products
 #' on a daily basis. Given that the raw hdf files are downloaded from
@@ -660,6 +1637,7 @@ calculate_modis_daily <- function(
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
+  weights = NULL,
   max_cells = 3e7,
   geom = FALSE,
   scale = NULL,
@@ -681,6 +1659,7 @@ calculate_modis_daily <- function(
     radius,
     id,
     func = "mean",
+    weights = NULL,
     maxcells = NULL
   ) {
     # generate buffers
@@ -690,17 +1669,28 @@ calculate_modis_daily <- function(
     bufs <- terra::buffer(points, width = radius, quadsegs = 180L)
     bufs <- terra::project(bufs, terra::crs(surf))
     # extract raster values
-    surf_at_bufs <-
-      exactextractr::exact_extract(
-        x = surf,
-        y = sf::st_as_sf(bufs),
-        fun = func,
-        force_df = TRUE,
-        stack_apply = TRUE,
-        append_cols = id,
-        progress = FALSE,
-        max_cells_in_memory = maxcells
-      )
+    weights_norm <- amadeus::calc_prepare_weights(
+      from = surf[[1]],
+      weights = weights
+    )
+    func_extract <- amadeus::calc_weighted_fun(
+      fun = func,
+      weighted = !is.null(weights_norm)
+    )
+    extract_args <- list(
+      x = surf,
+      y = sf::st_as_sf(bufs),
+      fun = func_extract,
+      force_df = TRUE,
+      stack_apply = TRUE,
+      append_cols = id,
+      progress = FALSE,
+      max_cells_in_memory = maxcells
+    )
+    if (!is.null(weights_norm)) {
+      extract_args$weights <- weights_norm
+    }
+    surf_at_bufs <- do.call(exactextractr::exact_extract, extract_args)
     return(surf_at_bufs)
   }
 
@@ -722,6 +1712,7 @@ calculate_modis_daily <- function(
       id = locs_id,
       radius = radius,
       func = fun_summary,
+      weights = weights,
       maxcells = max_cells
     )
   # cleaning names

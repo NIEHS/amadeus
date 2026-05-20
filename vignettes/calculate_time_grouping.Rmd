@@ -1,0 +1,84 @@
+---
+title: "Time grouping in calculate_* functions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Time grouping in calculate_* functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "`r Sys.Date()`"
+author: "amadeus contributors"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(amadeus)
+library(terra)
+```
+
+## How `.by_time` works
+
+`calculate_*()` functions use `.by_time` for optional temporal summarization:
+
+- If `.by_time = NULL`, results keep the native processed time rows.
+- If `.by_time` is a time unit (`"day"`, `"week"`, `"month"`, `"quarter"`, `"year"`),
+  rows are grouped by site and that temporal bucket.
+- Supported sub-daily tokens are also available (`"minute"`, `"hour"`), depending on
+  the underlying dataset time resolution.
+
+## Minimal reproducible example using `calculate_geos()`
+
+```{r}
+# Build a toy 4-layer raster with GEOS-style layer names
+r <- terra::rast(
+  ncols = 2, nrows = 1, xmin = -81, xmax = -79, ymin = 35, ymax = 36,
+  crs = "EPSG:4326", nlyrs = 4
+)
+terra::values(r[[1]]) <- c(1, 2)
+terra::values(r[[2]]) <- c(3, 4)
+terra::values(r[[3]]) <- c(5, 6)
+terra::values(r[[4]]) <- c(7, 8)
+names(r) <- c(
+  "no2_lev=850_20200101_010000",
+  "no2_lev=850_20200101_130000",
+  "no2_lev=850_20200201_010000",
+  "no2_lev=850_20200201_130000"
+)
+
+locs <- data.frame(
+  site_id = c("A", "B"),
+  lon = c(-80.5, -79.5),
+  lat = c(35.5, 35.5)
+)
+```
+
+### 1) Default behavior: native temporal resolution
+
+```{r}
+native_rows <- calculate_geos(
+  from = r,
+  locs = locs,
+  locs_id = "site_id",
+  radius = 0,
+  geom = FALSE
+)
+head(native_rows)
+```
+
+### 2) Time bucketing with `.by_time`
+
+```{r}
+monthly <- calculate_geos(
+  from = r,
+  locs = locs,
+  locs_id = "site_id",
+  radius = 0,
+  .by_time = "month",
+  geom = FALSE
+)
+monthly
+```
+
+## Practical guidance
+
+1. Use default `.by_time = NULL` when you want native temporal output.
+2. Use `.by_time` for coarser temporal summaries at the scale needed for analysis.

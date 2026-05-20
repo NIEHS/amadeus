@@ -10,6 +10,8 @@ calculate_merra2(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
+  .by_time = NULL,
   geom = FALSE,
   ...
 )
@@ -28,6 +30,13 @@ containing identifier for each unique coordinate location.}
 \item{fun}{character(1). Function used to summarize multiple raster cells
 within sites location buffer (Default = \code{mean}).}
 
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
+
+\item{.by_time}{NULL or character(1). Optional time grouping key used
+with \code{.by_time} for temporal summaries.}
+
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
@@ -35,7 +44,8 @@ coordinate reference system of the \code{sf} or \code{SpatVector} is that of \co
 \item{...}{Placeholders}
 }
 \value{
-a data.frame or SpatVector object
+a data.frame or SpatVector object. When \code{.by_time} is provided,
+rows are aggregated using \code{calc_summarize_by()}.
 }
 \description{
 Extract meteorological and atmospheric values at point locations. Returns a

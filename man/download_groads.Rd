@@ -8,58 +8,63 @@ download_groads(
   data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East",
     "Oceania West"),
   data_format = c("Shapefile", "Geodatabase"),
+  nasa_earth_data_token = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
-\item{data_region}{character(1). Data can be downloaded for \code{"Global"},
-\code{"Africa"}, \code{"Asia"}, \code{"Europe"}, \code{"Americas"}, \code{"Oceania East"}, and \code{"Oceania West"}.}
+\item{data_region}{character(1). Data region.}
 
-\item{data_format}{character(1). Data can be downloaded as \code{"Shapefile"} or
-\code{"Geodatabase"}. (Only \code{"Geodatabase"} available for \code{"Global"} region).}
+\item{data_format}{character(1). "Shapefile" or "Geodatabase".}
 
-\item{directory_to_save}{character(1). Directory to save data. Two
-sub-directories will be created for the downloaded zip files ("/zip_files")
-and the unzipped shapefiles ("/data_files").}
+\item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData
+authentication token. Can be a token string, a path to a file
+containing the token, or \code{NULL} to read from the
+\code{NASA_EARTHDATA_TOKEN} environment variable.}
 
-\item{acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledges that the data downloaded using this function may be very
-large and use lots of machine storage and memory.}
+\item{directory_to_save}{character(1). Directory to save data.}
 
-\item{download}{logical(1). \code{FALSE} will generate a *.txt file
-containing all download commands. By setting \code{TRUE} the function
-will download all of the requested data files.}
+\item{acknowledgement}{logical(1). Must be TRUE to proceed.}
 
-\item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE})
-the text file containing download commands.}
+\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
 
-\item{unzip}{logical(1). Unzip zip files. Default is \code{TRUE}.}
+\item{remove_command}{logical(1). Deprecated, ignored.}
 
-\item{remove_zip}{logical(1). Remove zip files from directory_to_download.
-Default is \code{FALSE}.}
+\item{unzip}{logical(1). Unzip zip files (default TRUE).}
 
-\item{hash}{logical(1). By setting \code{TRUE} the function will return
-an \code{rlang::hash_file()} hash character corresponding to the
-downloaded files. Default is \code{FALSE}.}
+\item{remove_zip}{logical(1). Remove zip files after unzipping (default
+FALSE).}
+
+\item{show_progress}{logical(1). Show download progress (default TRUE)}
+
+\item{hash}{logical(1). Return hash of downloaded files (default FALSE)}
+
+\item{max_tries}{integer(1). Maximum retry attempts (default 20)}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
-\itemize{
-\item For \code{hash = FALSE}, NULL
-\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item Zip and/or data files will be downloaded and stored in
-respective sub-directories within \code{directory_to_save}.
-}
+invisible list with download results; or hash character if hash=TRUE
 }
 \description{
 The \code{download_groads()} function accesses and downloads
-roads data from \href{https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1}{NASA's Global Roads Open Access Data Set (gROADS), v1 (1980-2010)}.
+roads data from NASA's Global Roads Open Access Data Set (gROADS).
+}
+\note{
+gROADS data is hosted on NASA EarthData and requires a valid
+NASA EarthData token for authentication. Set the
+\code{NASA_EARTHDATA_TOKEN} environment variable or pass the token
+directly via \code{nasa_earth_data_token}.
+Use \code{setup_nasa_token()} for setup.
 }
 \examples{
 \dontrun{
@@ -67,10 +72,7 @@ download_groads(
   data_region = "Americas",
   data_format = "Shapefile",
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE,
-  unzip = FALSE
+  acknowledgement = TRUE
 )
 }
 }

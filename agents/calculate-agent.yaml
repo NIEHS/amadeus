@@ -1,0 +1,35 @@
+name: amadeus Calculate Agent
+description: >
+  Specialist for all calculate_covariates() and calculate_*() functions in the
+  amadeus R package. Helps triage GitHub issues about covariate extraction,
+  locs/locs_id/geom patterns, exactextractr usage, and output formatting.
+version: "1.0"
+suggested_model: claude-sonnet
+domains:
+  - cropscape
+  - ecoregion
+  - geos
+  - gmted
+  - gridmet
+  - groads
+  - hms
+  - huc
+  - koppen_geiger
+  - merra2
+  - modis
+  - narr
+  - nei
+  - nlcd
+  - population
+  - prism
+  - terraclimate
+  - tri
+files:
+  - R/calculate_covariates.R
+  - R/calculate_covariates_auxiliary.R
+  - R/manipulate_spacetime_data.R
+tools:
+  - read_files
+  - search_code
+  - run_tests
+  - run_linter

@@ -2,81 +2,93 @@
 % Please edit documentation in R/download.R
 \name{download_nlcd}
 \alias{download_nlcd}
-\title{Download land cover data}
+\title{Download National Land Cover Database (NLCD) data}
 \usage{
 download_nlcd(
   product = "Land Cover",
   year = 2021,
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
-\item{product}{character(1). "Land Cover", "Land Cover Change", "Land Cover Confidence",
-"Fractional Impervious Surface", "Impervious Descriptor", or
-"Spectral Change Day of Year ".}
+\item{product}{character(1). NLCD product type. One of:
+\itemize{
+\item "Land Cover" (default)
+\item "Land Cover Change"
+\item "Land Cover Confidence"
+\item "Fractional Impervious Surface"
+\item "Impervious Descriptor"
+\item "Spectral Change Day of Year"
+}}
 
-\item{year}{integer(1). Available years for Coterminous United States range
-from 1985 to 2023.}
+\item{year}{integer(1). Year of NLCD data (1985-2024). Default is 2021.}
 
-\item{directory_to_save}{character(1). Directory to save data. Two
-sub-directories will be created for the downloaded zip files ("/zip_files")
-and the unzipped shapefiles ("/data_files").}
+\item{directory_to_save}{character(1). Directory to save downloaded files.}
 
-\item{acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledges that the data downloaded using this function may be very
-large and use lots of machine storage and memory.}
+\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed with
+download.}
 
-\item{download}{logical(1). \code{FALSE} will generate a *.txt file
-containing all download commands. By setting \code{TRUE} the function
-will download all of the requested data files.}
+\item{download}{logical(1). DEPRECATED. Downloads now happen automatically.
+Set to FALSE to skip downloading (generates file list only).}
 
-\item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE})
-the text file containing download commands.}
+\item{remove_command}{logical(1). Deprecated, ignored.}
 
-\item{unzip}{logical(1). Unzip zip files. Default is \code{TRUE}.}
+\item{unzip}{logical(1). Unzip downloaded files? Default is \code{TRUE}.}
 
-\item{remove_zip}{logical(1). Remove zip files from directory_to_download.
-Default is \code{FALSE}.}
+\item{remove_zip}{logical(1). Remove zip files after extraction? Default is
+\code{FALSE}.}
 
-\item{hash}{logical(1). By setting \code{TRUE} the function will return
-an \code{rlang::hash_file()} hash character corresponding to the
-downloaded files. Default is \code{FALSE}.}
+\item{show_progress}{logical(1). Show download progress? Default is
+\code{TRUE}.}
+
+\item{hash}{logical(1). Return hash of downloaded files? Default is
+\code{FALSE}.}
+
+\item{max_tries}{integer(1). Maximum download retry attempts. Default is 20.}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
-\itemize{
-\item For \code{hash = FALSE}, NULL
-\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item Zip and/or data files will be downloaded and stored in
-respective sub-directories within \code{directory_to_save}.
-}
+invisible NULL; or hash character if hash=TRUE
 }
 \description{
-The \code{download_nlcd()} function accesses and downloads
-annual land cover data from the
-\href{https://www.mrlc.gov/data/project/annual-nlcd}{Multi-Resolution Land Characteristics (MRLC) Consortium's National Land Cover Database (NLCD) products data base}.
+Downloads NLCD data products from the Multi-Resolution Land Characteristics
+(MRLC) Consortium. NLCD provides nationwide land cover and land cover change
+information for the United States at a 30m resolution.
 }
 \examples{
 \dontrun{
+# Download 2021 Land Cover
 download_nlcd(
   product = "Land Cover",
   year = 2021,
   directory_to_save = tempdir(),
+  acknowledgement = TRUE
+)
+
+# Download Land Cover Change for 2019
+download_nlcd(
+  product = "Land Cover Change",
+  year = 2019,
+  directory_to_save = tempdir(),
   acknowledgement = TRUE,
-  download = FALSE # NOTE: download skipped for examples
+  unzip = TRUE,
+  remove_zip = TRUE
 )
 }
 }
 \references{
-\insertRef{dewitz_national_2023}{amadeus}\if{html}{\out{<br/>}}
-\insertRef{dewitz_national_2024}{amadeus}
+\insertRef{dewitz_national_2023}{amadeus}
 }
 \author{
-Mitchell Manware, Insang Song
+Mitchell Manware, Insang Song, Kyle Messier
 }

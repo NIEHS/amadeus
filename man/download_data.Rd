@@ -5,13 +5,16 @@
 \title{Download raw data wrapper function}
 \usage{
 download_data(
-  dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "gmted", "koppen",
-    "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd", "noaa", "sedac_groads",
-    "sedac_population", "groads", "population", "hms", "smoke", "tri", "nei", "gridmet",
-    "terraclimate", "huc", "cropscape", "cdl", "prism"),
+  dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "goes", "goes_adp", "GOES",
+    "gmted", "koppen", "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd",
+    "noaa", "sedac_groads", "sedac_population", "groads", "population", "hms", "smoke",
+    "tri", "nei", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
+    "improve", "IMPROVE", "drought", "spei", "eddi", "usdm"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   hash = FALSE,
+  nasa_earth_data_token = NULL,
+  rate_limit = 2,
   ...
 )
 }
@@ -29,7 +32,18 @@ large and use lots of machine storage and memory.}
 an \code{rlang::hash_file()} hash character corresponding to the
 downloaded files. Default is \code{FALSE}.}
 
-\item{...}{Arguments passed to each download function.}
+\item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData
+authentication token. Required for NASA EarthData datasets: \code{"geos"},
+\code{"merra2"}, \code{"modis"}, \code{"sedac_groads"} / \code{"groads"}, and
+\code{"sedac_population"} / \code{"population"}. Can be a token string, a path to a
+file containing the token, or \code{NULL} to read from the
+\code{NASA_EARTHDATA_TOKEN} environment variable. Ignored for datasets that
+do not use NASA EarthData authentication.}
+
+\item{rate_limit}{numeric(1). Minimum seconds between HTTP requests
+(default 2). Passed to the underlying download function.}
+
+\item{...}{Additional arguments passed to each download function.}
 }
 \value{
 \itemize{
@@ -41,7 +55,9 @@ sub-directory names depend on data source and dataset of interest.
 }
 }
 \description{
-The \code{download_data()} function accesses and downloads atmospheric, meteorological, and environmental data from various open-access data sources.
+The \code{download_data()} function accesses and downloads atmospheric,
+meteorological, and environmental data from various open-access data
+sources.
 }
 \note{
 \itemize{
@@ -68,6 +84,7 @@ Please refer to:
 \item \code{\link{download_aqs}}: \code{"aqs"}, \code{"AQS"}
 \item \code{\link{download_ecoregion}}: \code{"ecoregions"}, \code{"ecoregion"}
 \item \code{\link{download_geos}}: \code{"geos"}
+\item \code{\link{download_goes}}: \code{"goes"}, \code{"goes_adp"}, \code{"GOES"}
 \item \code{\link{download_gmted}}: \code{"gmted"}, \code{"GMTED"}
 \item \code{\link{download_koppen_geiger}}: \code{"koppen"}, \code{"koppengeiger"}
 \item \code{\link{download_merra2}}: "merra2", \code{"merra"}, \code{"MERRA"}, \code{"MERRA2"}
@@ -85,7 +102,9 @@ Please refer to:
 \item \code{\link{download_huc}}: \code{"huc"}
 \item \code{\link{download_cropscape}}: \code{"cropscape"}, \code{"cdl"}
 \item \code{\link{download_prism}}: \code{"prism"}
-\item \code{\link{download_edgar}}: \code{"edgar"}, \code{"EDGAR"}
+\item \code{\link{download_edgar}}: \code{"edgar"}
+\item \code{\link{download_improve}}: \code{"improve"}, \code{"IMPROVE"}
+\item \code{\link{download_drought}}: \code{"drought"}, \code{"spei"}, \code{"eddi"}, \code{"usdm"}
 }
 }
 \author{

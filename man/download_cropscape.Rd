@@ -9,10 +9,13 @@ download_cropscape(
   source = c("USDA", "GMU"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
-  hash = FALSE
+  hash = FALSE,
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
@@ -20,8 +23,10 @@ download_cropscape(
 
 \item{source}{character(1). Data source, one of \code{c("USDA", "GMU")}.
 \itemize{
-\item \code{"USDA"} will download the national data from the USDA website (available in 2008-last year).
-\item \code{"GMU"} will download the data from the George Mason University website (available in 1997-last year).
+\item \code{"USDA"} will download the national data from the USDA website
+(available in 2008-last year).
+\item \code{"GMU"} will download the data from the George Mason University
+website (available in 1997-last year).
 }}
 
 \item{directory_to_save}{character(1). Directory to download files.}
@@ -44,6 +49,15 @@ Default is \code{FALSE}.}
 \item{hash}{logical(1). By setting \code{TRUE} the function will return
 an \code{rlang::hash_file()} hash character corresponding to the
 downloaded files. Default is \code{FALSE}.}
+
+\item{show_progress}{logical(1). Show download progress.
+Default is \code{TRUE}.}
+
+\item{max_tries}{integer(1). Maximum download retry attempts.
+Default is \code{20}.}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests.
+Default is \code{2}.}
 }
 \value{
 \itemize{

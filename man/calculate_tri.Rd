@@ -8,7 +8,10 @@ calculate_tri(
   from = NULL,
   locs,
   locs_id = "site_id",
-  radius = c(1000L, 10000L, 50000L),
+  decay_range = c(1000L, 10000L, 50000L),
+  C0 = NULL,
+  use_threshold = TRUE,
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -21,8 +24,22 @@ calculate_tri(
 \item{locs_id}{character(1). Unique site identifier column name.
 Default is \code{"site_id"}.}
 
-\item{radius}{Circular buffer radius.
+\item{decay_range}{Circular buffer radius.
 Default is \code{c(1000, 10000, 50000)} (meters)}
+
+\item{C0}{\code{NULL} or character vector of column names in \code{from}.
+Optional source-value columns used by \code{sum_edc()}. If \code{NULL} and
+there is one TRI target field, that field is inferred with a warning.
+If \code{NULL} and there are multiple TRI target fields, each TRI target field
+is used as its own source values (for example \verb{STACK_AIR_*}).}
+
+\item{use_threshold}{logical(1). Passed to \code{sum_edc()}. If \code{TRUE}
+(default), include only source points within \code{5 * decay_range}.
+If \code{FALSE}, include all source points in \code{from}.}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
@@ -36,7 +53,9 @@ a data.frame or SpatVector object
 \description{
 Calculate toxic release values for polygons or isotropic buffer point
 locations. Returns a \code{data.frame} object containing \code{locs_id}
-and variables for each chemical in \code{from}.
+and variables for each processed TRI field in \code{from}. Target fields are
+derived from metadata attached by \code{process_tri()}, with a fallback to
+non-coordinate columns in \code{from}.
 }
 \note{
 U.S. context.
@@ -50,7 +69,7 @@ calculate_tri(
   from = tri, # derived from process_tri() example
   locs = loc,
   locs_id = "id",
-  radius = c(1e3L, 1e4L, 5e4L)
+  decay_range = c(1e3L, 1e4L, 5e4L)
 )
 }
 }

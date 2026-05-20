@@ -6,173 +6,401 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "`r Sys.Date()`"
-author: "Mitchell Manware"
+author: "Kyle Messier, with assistance from GitHub Copilot"
 ---
 
 ```{r setup, include = FALSE}
-# packages
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = ""
 )
 library(amadeus)
+library(sf)
+
+live_run <- local({
+  force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
+  on_ci <- nzchar(Sys.getenv("CI")) ||
+    nzchar(Sys.getenv("GITHUB_ACTIONS")) ||
+    identical(tolower(Sys.getenv("IN_PKGDOWN", "")), "true")
+  on_cran <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")) ||
+    identical(tolower(Sys.getenv("NOT_CRAN", "")), "false")
+  force || !(on_ci || on_cran)
+})
+
+triangle_aqs_path <- c(
+  file.path("tests", "testdata", "aqs", "aqs_daily_88101_triangle.csv"),
+  file.path("..", "tests", "testdata", "aqs", "aqs_daily_88101_triangle.csv")
+)
+triangle_aqs_path <- triangle_aqs_path[file.exists(triangle_aqs_path)][1]
+if (is.na(triangle_aqs_path) || triangle_aqs_path == "") {
+  stop("Could not locate tests/testdata/aqs/aqs_daily_88101_triangle.csv")
+}
+triangle_aqs <- unique(utils::read.csv(triangle_aqs_path)[
+  c("State.Code", "County.Code", "Site.Num", "Latitude", "Longitude")
+])
+triangle_aqs$site_id <- paste(
+  triangle_aqs$State.Code,
+  triangle_aqs$County.Code,
+  triangle_aqs$Site.Num,
+  sep = "-"
+)
+example_points_sf <- sf::st_as_sf(
+  triangle_aqs[c("site_id", "Longitude", "Latitude")],
+  coords = c("Longitude", "Latitude"),
+  crs = 4269
+)
+example_points_sf <- sf::st_transform(example_points_sf, 4326)
+durham_hex_path <- system.file(
+  "extdata", "data_files", "durham_h3_res8.rds", package = "amadeus"
+)
+if (durham_hex_path == "") {
+  source_candidates <- c(
+    file.path("inst", "extdata", "data_files", "durham_h3_res8.rds"),
+    file.path("..", "inst", "extdata", "data_files", "durham_h3_res8.rds")
+  )
+  durham_hex_path <- source_candidates[file.exists(source_candidates)][1]
+}
+if (is.na(durham_hex_path) || durham_hex_path == "") {
+  stop("Could not locate inst/extdata/data_files/durham_h3_res8.rds")
+}
+durham_hex <- readRDS(durham_hex_path)
+
+
+pick_value_column <- function(x) {
+  geom_col <- attr(x, "sf_column")
+  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
+  candidates <- setdiff(names(x), excluded)
+  if (length(candidates) == 0) {
+    stop("No plottable covariate columns found.")
+  }
+  preferred <- candidates[vapply(x[candidates], function(col) {
+    is.numeric(col) || is.character(col) || is.factor(col)
+  }, logical(1))]
+  if (length(preferred) > 0) preferred[1] else candidates[1]
+}
+
+pick_time_columns <- function(x, n = 4) {
+  geom_col <- attr(x, "sf_column")
+  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
+  candidates <- setdiff(names(x), excluded)
+  numeric_candidates <- candidates[vapply(candidates, function(col) {
+    is.numeric(x[[col]])
+  }, logical(1))]
+  if (length(numeric_candidates) == 0) {
+    stop("No numeric NARR columns found to plot.")
+  }
+  head(sort(numeric_candidates), n)
+}
+
+format_time_label <- function(x) {
+  label <- sub(".*_([0-9]{8}).*", "\\1", x)
+  parsed <- as.Date(label, format = "%Y%m%d")
+  ifelse(
+    is.na(parsed),
+    x,
+    format(parsed, "%Y-%m-%d")
+  )
+}
+
+make_time_plot_data <- function(x, n = 4) {
+  selected_cols <- pick_time_columns(x, n = n)
+  plot_df <- do.call(rbind, lapply(selected_cols, function(col) {
+    data.frame(
+      value = x[[col]],
+      time_slice = format_time_label(col),
+      stringsAsFactors = FALSE
+    )
+  }))
+  geometry <- do.call(c, rep(list(sf::st_geometry(x)), length(selected_cols)))
+  sf::st_sf(plot_df, geometry = geometry, crs = sf::st_crs(x))
+}
+
+coord_local_sf <- function(x) {
+  x_wgs84 <- sf::st_transform(sf::st_as_sf(x), 4326)
+  bbox <- sf::st_bbox(x_wgs84)
+  pad_x <- max((bbox[["xmax"]] - bbox[["xmin"]]) * 0.08, 0.05)
+  pad_y <- max((bbox[["ymax"]] - bbox[["ymin"]]) * 0.08, 0.05)
+  ggplot2::coord_sf(
+    xlim = c(bbox[["xmin"]] - pad_x, bbox[["xmax"]] + pad_x),
+    ylim = c(bbox[["ymin"]] - pad_y, bbox[["ymax"]] + pad_y),
+    expand = FALSE,
+    datum = NA
+  )
+}
+
+plot_points <- function(x, title) {
+  plot_data <- make_time_plot_data(x, n = 4)
+  ggplot2::ggplot(plot_data) +
+    ggplot2::geom_sf(
+      ggplot2::aes(color = value),
+      size = 2
+    ) +
+    ggplot2::facet_wrap(~ time_slice, ncol = 2) +
+    coord_local_sf(plot_data) +
+    ggplot2::scale_color_viridis_c(option = "C") +
+    ggplot2::labs(title = title, color = "value") +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      legend.position = "bottom",
+      legend.key.width = grid::unit(1.5, "cm"),
+      strip.text = ggplot2::element_text(face = "bold")
+    )
+}
+
+plot_polygons <- function(x, title) {
+  plot_data <- make_time_plot_data(x, n = 4)
+  ggplot2::ggplot(plot_data) +
+    ggplot2::geom_sf(
+      ggplot2::aes(fill = value),
+      color = NA
+    ) +
+    ggplot2::facet_wrap(~ time_slice, ncol = 2) +
+    coord_local_sf(plot_data) +
+    ggplot2::scale_fill_viridis_c(option = "C") +
+    ggplot2::labs(title = title, fill = "value") +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      legend.position = "bottom",
+      legend.key.width = grid::unit(1.5, "cm"),
+      strip.text = ggplot2::element_text(face = "bold")
+    )
+}
 ```
 
-This vignette demonstrates how to download, process, and calculate covariates from the [NOAA North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) dataset using `amadeus` functions.
-Details are provided for each function's parameters and outputs.
-The examples utilize daily air temperature at 2m height ("air.2m") data.
-The messages returned by `amadeus` functions have been omitted for brevity.
+This article demonstrates a compact workflow for NOAA NARR data.
 
-### Download
+This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
-Start by downloading the netCDF data files with `download_data`.
+Each workflow uses two small example surfaces: `example_points_sf`, a set of real Triangle-region AQS monitoring locations derived from `tests/testdata/aqs/aqs_daily_88101_triangle.csv`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
 
-* `dataset_name = "narr"`: NARR dataset acronym.
-* `variable = "air.2m"`: air temperature at 2m height variable code.
-* `year = c(2021, 2022)`: years of interest.
-* `directory_to_save = dir`: directory to save the downloaded files.
-* `acknowledgement = TRUE`: acknowledge that the raw data files are large and may consume lots of local storage.
-* `download = TRUE`: download the data files.
-* `remove_command = TRUE`: remove the temporary command file used to download the data.
-* `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
+## Available inputs and data availability
 
-```{r, eval = FALSE}
-dir <- tempdir()
-amadeus::download_data(
+`download_data(dataset_name = "narr", ...)` expects NARR variable abbreviations.
+
+- Temporal resolution: daily meteorology from the NOAA PSL NARR Dailies archive.
+- Year input: use a single year (for example, `2020`) or a start/end pair such as `c(2020, 2022)`; the wrapper supports years from 1979 through the current calendar year.
+- Major constraints:
+  - Pressure-level variables (`air`, `hgt`, `omega`, `shum`, `tke`, `uwnd`, `vwnd`) always download all 29 pressure levels from 1000 to 100 hPa.
+  - Subsurface variables (`soill`, `soilw`, `tsoil`) include all 4 soil layers.
+  - Variables that are only available in the raw merged GRIB archive are not supported by this wrapper.
+
+```{r narr-variable-reference, echo = FALSE, results = "asis"}
+narr_monolevel <- data.frame(
+  variable = c(
+    "acpcp", "air.2m", "air.sfc", "albedo", "apcp", "bgrun", "bmixl.hl1",
+    "cape", "ccond", "cdcon", "cdlyr", "cfrzr", "cicep", "cin", "cnwat",
+    "crain", "csnow", "dlwrf", "dpt.2m", "dswrf", "evap", "gflux", "hcdc",
+    "hgt.tropo", "hlcy", "hpbl", "lcdc", "lftx4", "lhtfl", "mcdc",
+    "mconv.hl1", "mslet", "mstav", "pevap", "pottmp.hl1", "pottmp.sfc",
+    "prate", "pres.sfc", "pres.tropo", "prmsl", "pr_wtr", "rcq", "rcs",
+    "rcsol", "rct", "rhum.2m", "shtfl", "shum.2m", "snod", "snohf",
+    "snom", "snowc", "soilm", "ssrun", "tcdc", "tke.hl1", "ulwrf.ntat",
+    "ulwrf.sfc", "ustm", "uswrf.ntat", "uswrf.sfc", "uwnd.10m", "veg",
+    "vis", "vstm", "vvel.hl1", "vwnd.10m", "vwsh.tropo", "wcconv", "wcinc",
+    "wcuflx", "wcvflx", "weasd", "wvconv", "wvinc", "wvuflx", "wvvflx"
+  ),
+  description = c(
+    "Convective precipitation",
+    "Air temperature at 2 m",
+    "Air temperature at surface",
+    "Surface albedo",
+    "Total accumulated precipitation",
+    "Baseflow-groundwater runoff",
+    "Blackadar mixing length scale at hybrid level 1",
+    "Convective available potential energy",
+    "Canopy conductance",
+    "Convective cloud cover",
+    "Non-convective cloud cover",
+    "Categorical freezing rain",
+    "Categorical ice pellets",
+    "Convective inhibition",
+    "Plant canopy surface water",
+    "Categorical rain",
+    "Categorical snow",
+    "Downward longwave radiation flux",
+    "Dew point temperature at 2 m",
+    "Downward shortwave radiation flux",
+    "Evaporation",
+    "Ground heat flux",
+    "High cloud cover",
+    "Geopotential height at tropopause",
+    "Storm relative helicity",
+    "Planetary boundary layer height",
+    "Low cloud cover",
+    "Best (4-layer) lifted index",
+    "Latent heat net flux",
+    "Mid-cloud cover",
+    "Horizontal moisture divergence at hybrid level 1",
+    "Mean sea level pressure (ETA model reduction)",
+    "Moisture availability",
+    "Potential evaporation",
+    "Potential temperature at hybrid level 1",
+    "Potential temperature at surface",
+    "Precipitation rate",
+    "Surface pressure",
+    "Pressure at tropopause",
+    "Pressure reduced to mean sea level",
+    "Precipitable water",
+    "Specific humidity tendency from all physics",
+    "Snowfall water equivalent tendency",
+    "Solar radiative heating rates",
+    "Temperature tendency from all physics",
+    "Relative humidity at 2 m",
+    "Sensible heat net flux",
+    "Specific humidity at 2 m",
+    "Snow depth",
+    "Snow phase-change heat flux",
+    "Snow melt",
+    "Snow cover",
+    "Soil moisture content (0-200 cm layer)",
+    "Storm surface runoff",
+    "Total cloud cover",
+    "Turbulent kinetic energy at hybrid level 1",
+    "Upward longwave radiation flux at nominal top of atmosphere",
+    "Upward longwave radiation flux at surface",
+    "U-component of storm motion",
+    "Upward shortwave radiation flux at nominal top of atmosphere",
+    "Upward shortwave radiation flux at surface",
+    "U-component of wind at 10 m",
+    "Vegetation fraction",
+    "Visibility",
+    "V-component of storm motion",
+    "Vertical velocity at hybrid level 1",
+    "V-component of wind at 10 m",
+    "Vertical wind shear at tropopause",
+    "Convective wetting of vegetation canopy",
+    "Wetting of vegetation canopy",
+    "U-component of convective canopy moisture flux",
+    "V-component of convective canopy moisture flux",
+    "Water-equivalent accumulated snow depth",
+    "Convective column moisture convergence",
+    "Column moisture increase",
+    "U-component of vertically-integrated moisture flux",
+    "V-component of vertically-integrated moisture flux"
+  ),
+  stringsAsFactors = FALSE
+)
+
+narr_pressure <- data.frame(
+  variable = c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd"),
+  description = c(
+    "Air temperature",
+    "Geopotential height",
+    "Vertical velocity (pressure / omega)",
+    "Specific humidity",
+    "Turbulent kinetic energy",
+    "U-component of wind",
+    "V-component of wind"
+  ),
+  stringsAsFactors = FALSE
+)
+
+narr_soil <- data.frame(
+  variable = c("soill", "soilw", "tsoil"),
+  description = c(
+    "Liquid volumetric soil moisture (non-frozen fraction)",
+    "Volumetric soil moisture content",
+    "Soil temperature"
+  ),
+  stringsAsFactors = FALSE
+)
+
+cat("### Monolevel variables\n\n")
+print(knitr::kable(
+  narr_monolevel,
+  col.names = c("variable", "description"),
+  align = c("l", "l")
+))
+cat("\n\n### Pressure level variables\n\n")
+print(knitr::kable(
+  narr_pressure,
+  col.names = c("variable", "description"),
+  align = c("l", "l")
+))
+cat("\n\n### Subsurface (soil) variables\n\n")
+print(knitr::kable(
+  narr_soil,
+  col.names = c("variable", "description"),
+  align = c("l", "l")
+))
+```
+
+## Download representative requests
+
+```{r download, eval = live_run}
+directory_to_save <- file.path(tempdir(), "narr_workflow")
+download_data(
   dataset_name = "narr",
-  variable = "air.2m",
-  year = c(2021, 2022),
-  directory_to_save = dir,
-  acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE,
-  hash = TRUE
-)
-```
-```{r, echo = FALSE}
-cat('[1] "3a382ac1c383c1d048f4044214cb450f"')
-```
-
-Check the downloaded netCDF files.
-
-```{r, eval = FALSE}
-list.files(dir, recursive = TRUE, pattern = "air.2m")
-```
-
-```{r, echo = FALSE}
-cat('[1] "air.2m/air.2m.2021.nc" "air.2m/air.2m.2022.nc"')
-```
-
-### Process
-
-Import and process the downloaded netCDF files with `process_covariates`.
-
-* `covariate = "narr"`: NARR dataset acronym.
-* `variable = "air.2m"`: air temperature at 2m height variable code.
-* `date = c("2021-12-28", "2022-01-03")`: date range of interest.
-* `path = paste0(dir, "/air.2m")`: directory containing the downloaded files.
-
-```{r, eval = FALSE}
-air2m_process <- amadeus::process_covariates(
-  covariate = "narr",
-  variable = "air.2m",
-  date = c("2021-12-28", "2022-01-03"),
-  path = file.path(dir, "/air.2m")
+  variables = c("dpt.2m", "air.2m"),
+  year = 2020,
+  directory_to_save = directory_to_save,
+  acknowledgement = TRUE
 )
 ```
 
-Check the processed `SpatRaster` object.
+## Process one workflow-ready data product
 
-```{r, eval = FALSE}
-air2m_process
-```
-
-```{r, echo = FALSE}
-cat("class       : SpatRaster
-dimensions  : 277, 349, 7  (nrow, ncol, nlyr)
-resolution  : 32462.99, 32463  (x, y)
-extent      : -16231.49, 11313351, -16231.5, 8976020  (xmin, xmax, ymin, ymax)
-coord. ref. : +proj=lcc +lat_0=50 +lon_0=-107 +lat_1=50 +lat_2=50 +x_0=5632642.22547 +y_0=4612545.65137 +datum=WGS84 +units=m +no_defs
-sources     : air.2m.2021.nc:air  (4 layers)
-              air.2m.2022.nc:air  (3 layers)
-varnames    : air (Daily Air Temperature at 2 m)
-              air (Daily Air Temperature at 2 m)
-names       : air.2~11228, air.2~11229, air.2~11230, air.2~11231, air.2~20101, air.2~20102, ...
-unit        :           K,           K,           K,           K,           K,           K, ...
-time        : 2021-12-28 to 2022-01-03 UTC
-")
-```
-
-```{r, eval = FALSE}
-terra::plot(air2m_process[[1]])
-```
-
-![](images/air2m_process.png){style="display: block; margin-left: auto; margin-right: auto;"}
-
-### Calculate covariates
-
-Calculate covariates for North Carolina county boundaries with `calculate_covariates`.
-County boundaries are accessed with the `tigris::counties` function.\insertRef{package_tigris}
-
-* `covariate = "narr"`: NARR dataset acronym.
-* `from = air2m_process`: processed `SpatRaster` object.
-* `locs = tigris::counties("NC", year = 2021)`: North Carolina county boundaries.
-* `locs_id = "NAME"`: county name identifier.
-* `radius = 0`: size of buffer radius around each county.
-* `geom = "terra"`: return covariates as a `SpatVector` object.
-
-```{r, eval = FALSE}
-library(tigris)
-air2m_covar <- amadeus::calculate_covariates(
+```{r process, eval = live_run}
+processed_data <- process_covariates(
   covariate = "narr",
-  from = air2m_process,
-  locs = tigris::counties("NC", year = 2021),
-  locs_id = "NAME",
+  variable = "air.2m",
+  date = c("2020-01-01", "2020-01-10"),
+  path = file.path(directory_to_save, "air.2m")
+)
+```
+
+## Calculate covariates at points
+
+```{r calculate-areal-hex, eval = live_run}
+hex_values <- calculate_covariates(
+  covariate = "narr",
+  from = processed_data,
+  locs = durham_hex,
+  locs_id = "h3_id",
   radius = 0,
-  geom = "terra"
+  fun = "mean",
+  geom = "sf"
 )
-```
-
-Check the calculated covariates `SpatVector` object.
-
-```{r, eval = FALSE}
-air2m_covar
-```
-
-```{r, echo = FALSE}
-cat("class       : SpatVector
-geometry    : polygons
-dimensions  : 700, 3  (geometries, attributes)
-extent      : 7731783, 8506154, 3248490, 3694532  (xmin, xmax, ymin, ymax)
-coord. ref. : +proj=lcc +lat_0=50 +lon_0=-107 +lat_1=50 +lat_2=50 +x_0=5632642.22547 +y_0=4612545.65137 +datum=WGS84 +units=m +no_defs
-names       :     NAME       time air.2m_0
-type        :    <chr>   <POSIXt>    <num>
-values      :  Chatham 2021-12-28    289.3
-              Alamance 2021-12-28    288.8
-              Davidson 2021-12-28    289.1
-")
+print(hex_values)
 ```
 
 
-### Temporal summaries
+## Visualize the data and point outputs
 
-The `aggregate` function can be used to calculate a summary statistic for each unique spatial point or polygon.
-In the following example, average `air.2m_0` is calculated for each county for the time period December 28, 2021 to January 3, 2022.
-`air.2m_0 ~ NAME` directs the function to summarize `air.2m_0` values per unique `NAME`.
-The `FUN = mean` directs the function to take the mean value.
-The `head()` function is applied to show only the first few entries, as the entire `data.frame` is 100 rows long.
+```{r plot-raster, eval = live_run, fig.width = 10, fig.height = 6, fig.alt = "Map of NARR air temperature at 2m raster for 2020-01-01 over the continental USA."}
+usa <- sf::st_as_sf(maps::map("usa", plot = FALSE, fill = TRUE))
+bb <- sf::st_bbox(usa)
 
-```{r, eval = FALSE}
-head(aggregate(air.2m_0 ~ NAME, data = air2m_covar, FUN = mean))
+# Project first layer to WGS84 and convert to data frame for safe ggplot2 rendering
+lyr1 <- terra::project(processed_data[[1]], "EPSG:4326")
+lyr1_df <- as.data.frame(lyr1, xy = TRUE)
+names(lyr1_df)[3] <- "value"
+
+ggplot2::ggplot() +
+  ggplot2::geom_raster(
+    data = lyr1_df,
+    ggplot2::aes(x = x, y = y, fill = value)
+  ) +
+  ggplot2::geom_sf(data = usa, fill = NA, color = "grey80", linewidth = 0.3) +
+  ggplot2::scale_fill_viridis_c(option = "C", na.value = "white") +
+  ggplot2::coord_sf(xlim = bb[c(1, 3)], ylim = bb[c(2, 4)], expand = FALSE) +
+  ggplot2::labs(x = NULL, y = NULL, fill = "air temp at 2m (K)") +
+  ggplot2::theme_minimal()
 ```
 
-```{r, echo = FALSE}
-cat("       NAME air.2m_0
-1  Alamance 289.5930
-2 Alexander 289.1961
-3 Alleghany 286.9486
-4     Anson 290.5306
-5      Ashe 285.5771
-6     Avery 285.2288
-")
+
+We plot the NARR 2m air temperature at the Uber H3 hexagons. NARR is fairly coarse spatial resolution at ~32sq-km, so we don't see much spatial variability, but the facets show the daily trend
+```{r plot-hex, eval = live_run, fig.width = 10, fig.height = 8, fig.alt = "Faceted maps showing NARR covariate values at AQS monitoring locations across four daily time slices."}
+
+ggplot2::ggplot() +
+ggplot2::geom_sf(data = hex_values, ggplot2::aes(fill = air.2m_0)) +
+ggplot2::scale_fill_viridis_c() +
+ggplot2::facet_wrap(~time)
 ```
+
+
+
+## Notes
+
+- The download request now covers both snow water equivalent (`weasd`) and 2m air temperature (`air.2m`).
+- NARR uses projected source data internally, so the vignette leaves reprojection to `amadeus` and keeps the extraction geometry in WGS84 input coordinates.

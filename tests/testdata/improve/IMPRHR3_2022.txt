@@ -1,0 +1,5 @@
+SiteCode|POC|FactDate|ParamCode|MethodID|Units|FactValue|IGroup|Status|ProviderStatus|good_year|PatchedOrSubbedFlag|n_impairment|nyear|sn
+ACAD1|1|2022-01-02|dv|3001|dv|1.52|10|V0|NM|1|REG|5|15|120
+ACAD1|1|2022-01-05|dv|3001|dv|1.73|10|V0|NM|1|REG|5|15|120
+BIBE1|1|2022-01-02|dv|3001|dv|0.98|10|V0|NM|1|REG|3|15|115
+BIBE1|1|2022-01-05|dv|3001|dv|1.05|10|V0|NM|1|REG|3|15|115

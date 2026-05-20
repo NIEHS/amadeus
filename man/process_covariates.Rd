@@ -5,11 +5,12 @@
 \title{Process raw data wrapper function}
 \usage{
 process_covariates(
-  covariate = c("modis_swath", "modis_merge", "koppen-geiger", "blackmarble",
-    "koeppen-geiger", "koppen", "koeppen", "geos", "dummies", "gmted", "hms", "smoke",
-    "sedac_population", "population", "sedac_groads", "groads", "roads", "nlcd", "tri",
-    "narr", "nei", "ecoregions", "ecoregion", "merra", "merra2", "gridmet",
-    "terraclimate", "huc", "cropscape", "cdl", "prism"),
+  covariate = c("modis_swath", "modis_merge", "mcd14ml", "koppen-geiger", "blackmarble",
+    "koeppen-geiger", "koppen", "koeppen", "geos", "goes", "goes_adp", "GOES", "dummies",
+    "gmted", "aqs", "hms", "smoke", "sedac_population", "population", "sedac_groads",
+    "groads", "roads", "nlcd", "tri", "narr", "nei", "ecoregions", "ecoregion", "merra",
+    "merra2", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
+    "improve", "IMPROVE", "drought", "spei", "eddi", "usdm"),
   path = NULL,
   ...
 )
@@ -23,7 +24,7 @@ depending on \code{covariate} value.}
 \item{...}{Arguments passed to each raw data processing function.}
 }
 \value{
-\code{SpatVector}, \code{SpatRaster}, \code{sf}, or \code{character} depending on
+\code{SpatVector}, \code{SpatRaster}, \code{sf}, \code{data.table}, or \code{character} depending on
 covariate type and selections.
 }
 \description{
@@ -56,8 +57,11 @@ process_covariates(
 \item \code{\link{process_tri}}: "tri", "TRI"
 \item \code{\link{process_nei}}: "nei", "NEI"
 \item \code{\link{process_geos}}: "geos", "GEOS"
+\item \code{\link{process_goes}}: "goes", "goes_adp", "GOES"
 \item \code{\link{process_gmted}}: "gmted", "GMTED"
 \item \code{\link{process_aqs}}: "aqs", "AQS"
+\item \code{\link{process_edgar}}: "edgar"
+\item \code{\link{process_improve}}: "improve", "IMPROVE"
 \item \code{\link{process_hms}}: "hms", "smoke", "HMS"
 \item \code{\link{process_narr}}: "narr", "NARR"
 \item \code{\link{process_groads}}: "sedac_groads", "roads", "groads"
@@ -68,6 +72,7 @@ process_covariates(
 \item \code{\link{process_huc}}: "huc", "HUC"
 \item \code{\link{process_cropscape}}: "cropscape", "cdl"
 \item \code{\link{process_prism}}: "prism", "PRISM"
+\item \code{\link{process_drought}}: "drought", "spei", "eddi", "usdm"
 }
 }
 \author{

@@ -1,0 +1,37 @@
+name: amadeus Process Agent
+description: >
+  Specialist for all process_covariates() and process_*() functions in the
+  amadeus R package. Helps triage GitHub issues about file reading, CRS
+  handling, spatiotemporal dimension management, and SpatRaster/sf output types.
+version: "1.0"
+suggested_model: claude-sonnet
+domains:
+  - aqs
+  - blackmarble
+  - cropscape
+  - ecoregion
+  - geos
+  - gmted
+  - gridmet
+  - groads
+  - hms
+  - huc
+  - koppen_geiger
+  - merra2
+  - modis
+  - narr
+  - nei
+  - nlcd
+  - population
+  - prism
+  - terraclimate
+  - tri
+files:
+  - R/process.R
+  - R/process_auxiliary.R
+  - R/manipulate_spacetime_data.R
+tools:
+  - read_files
+  - search_code
+  - run_tests
+  - run_linter

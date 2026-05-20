@@ -2,124 +2,264 @@
 ##### unit and integration tests for U.S. EPA AQS functions
 
 ################################################################################
-##### download_epa
-testthat::test_that("download_aqs", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
-  year_start <- 2018
-  year_end <- 2022
-  resolution_temporal <- "daily"
-  parameter_code <- 88101
-  directory_to_save <- paste0(tempdir(), "/epa/")
-  # run download function
-  download_data(
-    dataset_name = "aqs",
-    year = c(year_start, year_end),
-    directory_to_save = directory_to_save,
-    acknowledgement = TRUE,
-    unzip = FALSE,
-    remove_zip = FALSE,
-    download = FALSE,
-    remove_command = FALSE
-  )
-  # expect sub-directories to be created
-  testthat::expect_true(
-    length(
-      list.files(
-        directory_to_save,
-        include.dirs = TRUE
+##### download_aqs
+testthat::test_that("download_aqs returns proper URL list", {
+  withr::with_tempdir({
+    year_start <- 2018
+    year_end <- 2022
+
+    # Suppress deprecation warning for download=FALSE
+    result <- suppressWarnings(
+      download_aqs(
+        year = c(year_start, year_end),
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
       )
-    ) ==
-      3
-  )
-  # define file path with commands
-  commands_path <-
-    paste0(
-      download_sanitize_path(directory_to_save),
-      "aqs_",
-      parameter_code,
-      "_",
-      year_start,
-      "_",
-      year_end,
-      "_",
-      resolution_temporal,
-      "_curl_commands.txt"
     )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 4)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L)
-  # implement unit tets
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  unlink(directory_to_save, recursive = TRUE)
+
+    # Check return structure
+    testthat::expect_type(result, "list")
+    testthat::expect_named(result, c("urls", "destfiles", "n_files"))
+    testthat::expect_equal(length(result$urls), length(result$destfiles))
+    testthat::expect_equal(result$n_files, length(result$urls))
+
+    # Check URLs are valid format
+    testthat::expect_true(all(grepl("^https?://", result$urls)))
+
+    # Check destfiles have proper extension
+    testthat::expect_true(all(grepl("\\.zip$", result$destfiles)))
+
+    # Check expected number of files (5 years)
+    testthat::expect_equal(result$n_files, 5)
+  })
 })
 
 testthat::test_that("download_aqs (single year)", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
-  year <- 2018
-  resolution_temporal <- "daily"
-  parameter_code <- 88101
-  directory_to_save <- paste0(tempdir(), "/epa/")
-  # run download function
-  download_data(
-    dataset_name = "aqs",
-    year = year,
-    directory_to_save = directory_to_save,
-    acknowledgement = TRUE,
-    unzip = FALSE,
-    remove_zip = FALSE,
-    download = FALSE,
-    remove_command = FALSE
-  )
-  # expect sub-directories to be created
-  testthat::expect_true(
-    length(
-      list.files(
-        directory_to_save,
-        include.dirs = TRUE
+  withr::with_tempdir({
+    year <- 2018
+
+    # Suppress deprecation warning
+    result <- suppressWarnings(
+      download_aqs(
+        year = year,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
       )
-    ) ==
-      3
-  )
-  # define file path with commands
-  commands_path <-
-    paste0(
-      download_sanitize_path(directory_to_save),
-      "aqs_",
-      parameter_code,
-      "_",
-      year,
-      "_",
-      year,
-      "_",
-      resolution_temporal,
-      "_curl_commands.txt"
     )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 4)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 1L)
-  # implement unit tets
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
-  # remove file with commands after test
-  unlink(directory_to_save, recursive = TRUE)
+
+    # Check return structure
+    testthat::expect_type(result, "list")
+    testthat::expect_named(result, c("urls", "destfiles", "n_files"))
+
+    # Check single year returns single file
+    testthat::expect_equal(result$n_files, 1)
+
+    # Check URL is valid
+    testthat::expect_true(grepl("^https?://", result$urls))
+    testthat::expect_true(grepl("2018", result$urls))
+    testthat::expect_true(grepl("\\.zip$", result$destfiles))
+  })
+})
+
+testthat::test_that("download_aqs validates URLs", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::with_tempdir({
+    # Get URLs for a recent year
+    result <- suppressWarnings(
+      download_aqs(
+        year = 2022,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+
+    # Check first URL is accessible
+    testthat::expect_true(check_url_status(result$urls[1]))
+  })
+})
+
+testthat::test_that("download_aqs creates proper directory structure", {
+  withr::with_tempdir({
+    suppressWarnings(
+      download_aqs(
+        year = 2020,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+
+    # Check directories were created
+    testthat::expect_true(dir.exists("zip_files"))
+    testthat::expect_true(dir.exists("data_files"))
+  })
+})
+
+testthat::test_that("download_normalize_aqs_unzip flattens nested AQS output", {
+  withr::with_tempdir({
+    data_dir <- file.path(".", "data_files")
+    nested_dir <- file.path(data_dir, "daily_88101_2022")
+    dir.create(nested_dir, recursive = TRUE, showWarnings = FALSE)
+    nested_csv <- file.path(nested_dir, "daily_88101_2022.csv")
+    writeLines("x,y\n1,2", nested_csv)
+
+    amadeus:::download_normalize_aqs_unzip(
+      directory_to_unzip = data_dir,
+      resolution_temporal = "daily",
+      parameter_code = 88101,
+      year = 2022
+    )
+
+    testthat::expect_false(dir.exists(nested_dir))
+    testthat::expect_true(
+      file.exists(file.path(data_dir, "daily_88101_2022.csv"))
+    )
+  })
+})
+
+testthat::test_that("download_normalize_aqs_unzip no-ops when nested dir is absent", {
+  withr::with_tempdir({
+    data_dir <- file.path(".", "data_files")
+    dir.create(data_dir, recursive = TRUE, showWarnings = FALSE)
+
+    testthat::expect_invisible(
+      amadeus:::download_normalize_aqs_unzip(
+        directory_to_unzip = data_dir,
+        resolution_temporal = "daily",
+        parameter_code = 88101,
+        year = 2022
+      )
+    )
+    testthat::expect_false(
+      dir.exists(file.path(data_dir, "daily_88101_2022"))
+    )
+  })
+})
+
+testthat::test_that("download_normalize_aqs_unzip no-ops without nested files", {
+  withr::with_tempdir({
+    data_dir <- file.path(".", "data_files")
+    dir.create(data_dir, recursive = TRUE, showWarnings = FALSE)
+    nested_dir <- file.path(data_dir, "daily_88101_2022")
+    dir.create(file.path(nested_dir, "subdir"), recursive = TRUE, showWarnings = FALSE)
+
+    testthat::expect_invisible(
+      amadeus:::download_normalize_aqs_unzip(
+        directory_to_unzip = data_dir,
+        resolution_temporal = "daily",
+        parameter_code = 88101,
+        year = 2022
+      )
+    )
+
+    testthat::expect_true(dir.exists(nested_dir))
+    testthat::expect_true(dir.exists(file.path(nested_dir, "subdir")))
+  })
+})
+
+testthat::test_that("download_normalize_aqs_unzip skips existing target files", {
+  withr::with_tempdir({
+    data_dir <- file.path(".", "data_files")
+    nested_dir <- file.path(data_dir, "daily_88101_2022")
+    dir.create(nested_dir, recursive = TRUE, showWarnings = FALSE)
+    target_csv <- file.path(data_dir, "daily_88101_2022.csv")
+    nested_csv <- file.path(nested_dir, "daily_88101_2022.csv")
+    writeLines("existing", target_csv)
+    writeLines("nested", nested_csv)
+
+    testthat::expect_invisible(
+      amadeus:::download_normalize_aqs_unzip(
+        directory_to_unzip = data_dir,
+        resolution_temporal = "daily",
+        parameter_code = 88101,
+        year = 2022
+      )
+    )
+
+    testthat::expect_true(file.exists(target_csv))
+    testthat::expect_false(file.exists(nested_csv))
+    testthat::expect_false(dir.exists(nested_dir))
+    testthat::expect_equal(readLines(target_csv), "existing")
+  })
+})
+
+testthat::test_that("download_aqs handles parameter_code correctly", {
+  withr::with_tempdir({
+    # Test with specific parameter code
+    result <- suppressWarnings(
+      download_aqs(
+        year = 2020,
+        parameter_code = 88502, # Different parameter
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+
+    # Check parameter code is in URLs
+    testthat::expect_true(any(grepl("88502", result$urls)))
+  })
+})
+
+testthat::test_that("download_aqs handles temporal resolution", {
+  withr::with_tempdir({
+    # Test with hourly data
+    result <- suppressWarnings(
+      download_aqs(
+        year = 2020,
+        resolution_temporal = "hourly",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    )
+
+    testthat::expect_type(result, "list")
+    testthat::expect_true(result$n_files > 0)
+  })
+})
+
+testthat::test_that("download_aqs validates year range", {
+  withr::with_tempdir({
+    # Test that invalid years are rejected
+    testthat::expect_error(
+      download_aqs(
+        year = c(1900, 1901),
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      ),
+      "year"
+    )
+  })
+})
+
+testthat::test_that("download_aqs (LIVE - small download)", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::with_tempdir({
+    # Download one recent year
+    result <- download_aqs(
+      year = 2022,
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      download = TRUE,
+      unzip = FALSE
+    )
+
+    # Check files were downloaded
+    zip_files <- list.files("zip_files", pattern = "\\.zip$")
+    testthat::expect_true(length(zip_files) > 0)
+
+    # Check file sizes are reasonable
+    zip_paths <- list.files("zip_files", pattern = "\\.zip$", full.names = TRUE)
+    testthat::expect_true(all(file.size(zip_paths) > 1000))
+  })
 })
 
 ################################################################################
@@ -289,7 +429,8 @@ testthat::test_that("process_aqs", {
     process_aqs(path = 1L)
   )
   testthat::expect_error(
-    process_aqs(path = aqssub, date = c("January", "Januar"))
+    process_aqs(path = aqssub, date = c("January", "Januar")),
+    "date has invalid format"
   )
   testthat::expect_error(
     process_aqs(
@@ -328,4 +469,269 @@ testthat::test_that("process_aqs", {
     ),
     "Extent is not applicable for data.table. Returning data.table..."
   )
+})
+
+testthat::test_that("process_aqs handles mixed AQS date and duration formats", {
+  withr::local_package("data.table")
+  withr::local_package("sf")
+  withr::local_package("dplyr")
+  withr::with_tempdir({
+    aqs_path <- file.path(".", "aqs_mixed_formats.csv")
+    mixed_aqs <- data.frame(
+      State.Code = c(37, 37),
+      County.Code = c(63, 63),
+      Site.Num = c(15, 15),
+      Parameter.Code = c(88101, 42602),
+      POC = c(1, 1),
+      Latitude = c(36.032955, 35.7796),
+      Longitude = c(-78.904037, -78.6382),
+      Datum = c("WGS84", "WGS84"),
+      Parameter.Name = c("PM2.5 - Local Conditions", "Nitrogen dioxide (NO2)"),
+      Sample.Duration = c("1 HOUR", "24 HOUR"),
+      Pollutant.Standard = c("", ""),
+      Date.Local = c("1/2/2022", "2022-01-03"),
+      Units.of.Measure = c("Micrograms/cubic meter (LC)", "Parts per billion"),
+      Event.Type = c("None", "None"),
+      Observation.Count = c(24, 1),
+      Observation.Percent = c(100, 100),
+      Arithmetic.Mean = c(10.5, 12.1),
+      X1st.Max.Value = c(23, 13),
+      X1st.Max.Hour = c(23, 15),
+      AQI = c(NA, NA),
+      Method.Code = c(170, 600),
+      Method.Name = c("Method A", "Method B"),
+      Local.Site.Name = c("Durham Armory", "Raleigh Site"),
+      Address = c("801 STADIUM DRIVE", "123 MAIN ST"),
+      State.Name = c("North Carolina", "North Carolina"),
+      County.Name = c("Durham", "Wake"),
+      City.Name = c("Durham", "Raleigh"),
+      CBSA.Name = c("Durham-Chapel Hill, NC", "Raleigh-Cary, NC"),
+      Date.of.Last.Change = c("2022-09-26", "2022-09-26")
+    )
+    utils::write.csv(mixed_aqs, aqs_path, row.names = FALSE)
+
+    aqs_processed <- process_aqs(
+      path = aqs_path,
+      date = c("2022-01-01", "2022-01-03"),
+      mode = "available-data",
+      return_format = "data.table"
+    )
+
+    testthat::expect_equal(nrow(aqs_processed), 2)
+    testthat::expect_true(all(aqs_processed$time %in% c("2022-01-02", "2022-01-03")))
+  })
+})
+
+testthat::test_that("process_aqs handles WGS84-only input", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  withr::local_package("sf")
+  withr::local_package("dplyr")
+  withr::local_options(list(sf_use_s2 = FALSE))
+
+  withr::with_tempdir({
+    aqs_wgs84 <- data.frame(
+      State.Code = c(37, 37),
+      County.Code = c(63, 63),
+      Site.Num = c(1, 2),
+      Parameter.Code = c(88101, 88101),
+      Date.Local = c("2022-02-10", "2022-02-11"),
+      Sample.Duration = c("24-HR BLK AVG", "24-HR BLK AVG"),
+      POC = c(1, 1),
+      Longitude = c(-78.9040, -78.8803),
+      Latitude = c(36.0330, 36.1702),
+      Datum = c("WGS84", "WGS84")
+    )
+    csv_path <- file.path(".", "aqs_wgs84_only.csv")
+    utils::write.csv(aqs_wgs84, csv_path, row.names = FALSE)
+
+    testthat::expect_no_error(
+      out_sf <- process_aqs(
+        path = csv_path,
+        date = c("2022-02-01", "2022-02-28"),
+        mode = "location",
+        return_format = "sf"
+      )
+    )
+    testthat::expect_s3_class(out_sf, "sf")
+    testthat::expect_equal(nrow(out_sf), 2)
+  })
+})
+
+testthat::test_that("download_aqs remove_command deprecation warning", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+      download_aqs(
+        year = 2022,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = TRUE
+      ),
+      regexp = "remove_command.*deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_aqs all files exist branch", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    check_destfile = function(...) FALSE,
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_aqs(
+          year = 2022,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 0)
+    testthat::expect_equal(result$skipped, 1)
+  })
+})
+
+testthat::test_that("download_aqs hash = TRUE path", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    check_destfile = function(...) FALSE,
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_aqs(
+          year = 2022,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
+testthat::test_that("download_aqs -> process_aqs integration (basic)", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::with_tempdir({
+    # Download one recent year
+    result <- download_aqs(
+      year = 2022,
+      directory_to_save = ".",
+      acknowledgement = TRUE,
+      download = TRUE,
+      unzip = TRUE
+    )
+
+    # Check that download succeeded
+    data_dir <- "./data_files"
+    testthat::expect_true(dir.exists(data_dir))
+
+    csv_files <- list.files(
+      data_dir,
+      pattern = "\\.csv$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
+    testthat::expect_true(
+      length(csv_files) > 0,
+      info = "At least one CSV file should be downloaded"
+    )
+
+    # Verify files have content
+    if (length(csv_files) > 0) {
+      file_sizes <- file.size(csv_files)
+      testthat::expect_true(
+        all(file_sizes > 100),
+        info = "Downloaded CSV files should have content"
+      )
+    }
+
+    testthat::expect_false(
+      dir.exists(file.path(data_dir, "daily_88101_2022"))
+    )
+    testthat::expect_true(
+      file.exists(file.path(data_dir, "daily_88101_2022.csv"))
+    )
+  })
+})
+
+################################################################################
+##### download_aqs download_run_method branch (files need downloading)
+
+testthat::test_that("download_aqs mock download with download_run_method", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_aqs(
+          year = c(2018, 2018),
+          resolution_temporal = "daily",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
+})
+
+testthat::test_that("download_aqs all files exist path", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) FALSE,
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    withCallingHandlers(
+      suppressWarnings(
+        download_aqs(
+          year = c(2018, 2018),
+          resolution_temporal = "daily",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("already exist", msgs)))
+  })
 })

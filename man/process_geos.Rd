@@ -9,6 +9,8 @@ process_geos(
   variable = NULL,
   path = NULL,
   extent = NULL,
+  daily_agg = FALSE,
+  fun = "mean",
   ...
 )
 }
@@ -16,12 +18,23 @@ process_geos(
 \item{date}{character(1 or 2). Date (1) or start and end dates (2).
 Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 
-\item{variable}{character(1). GEOS-CF variable name(s).}
+\item{variable}{character(1). GEOS-CF variable name(s). See \emph{Notes}
+for collection-specific variable-name guidance.}
 
 \item{path}{character(1). Directory with downloaded netCDF (.nc4) files.}
 
 \item{extent}{numeric(4) or SpatExtent giving the extent of the raster
 if \code{NULL} (default), the entire raster is loaded}
+
+\item{daily_agg}{logical(1). If \code{TRUE}, aggregate sub-daily layers to daily
+values using \code{fun}. Default \code{FALSE} preserves the original hourly output.
+Aggregation groups layers by variable/level and date so that pressure-level
+structure is preserved. Not meaningful for collections that are already
+daily.}
+
+\item{fun}{character(1). Aggregation function passed to \code{\link[terra:tapp]{terra::tapp()}}
+(e.g. \code{"mean"}, \code{"max"}, \code{"min"}, \code{"sum"}). Ignored when
+\code{daily_agg = FALSE}.}
 
 \item{...}{Placeholders.}
 }
@@ -32,9 +45,81 @@ a \code{SpatRaster} object;
 The \code{process_geos()} function imports and cleans raw atmospheric
 composition data, returning a single \code{SpatRaster} object.
 }
+\details{
+GEOS-CF netCDF collections currently supported by \code{download_geos()} are:
+\code{"aqc_tavg_1hr_g1440x721_v1"},
+\code{"chm_tavg_1hr_g1440x721_v1"},
+\code{"met_tavg_1hr_g1440x721_x1"},
+\code{"xgc_tavg_1hr_g1440x721_x1"},
+\code{"chm_inst_1hr_g1440x721_p23"}, and
+\code{"met_inst_1hr_g1440x721_p23"}.
+}
 \note{
 Layer names of the returned \code{SpatRaster} object contain the variable,
-pressure level, date, and hour.
+pressure level, date, and hour when \code{daily_agg = FALSE} (default). When
+\code{daily_agg = TRUE}, layer names contain the variable, pressure level, and
+date only, and \code{terra::time()} is set to midnight UTC of each date.
+
+Collection-specific variable names accepted by \code{variable}:
+\tabular{ll}{
+\strong{Collection}\tab \strong{Variables}\cr
+\code{aqc_tavg_1hr_g1440x721_v1}\tab
+\code{no2}, \code{co}, \code{so2}, \code{pm25_rh35_gcc}, \code{o3}\cr
+\code{chm_tavg_1hr_g1440x721_v1}\tab
+\code{ocpi}, \code{bcpo}, \code{pm25soa_rh35_gc}, \code{dst4}, \code{prpe},
+\code{macr}, \code{pm25ss_rh35_gcc}, \code{hno4}, \code{ch4}, \code{nh3},
+\code{h2o2}, \code{rcho}, \code{hno3}, \code{dst1}, \code{pan},
+\code{pm25oc_rh35_gcc}, \code{c3h8}, \code{soas}, \code{no}, \code{tolu},
+\code{mvk}, \code{xyle}, \code{isop}, \code{noy}, \code{sala}, \code{so2},
+\code{co}, \code{n2o5}, \code{eoh}, \code{o3}, \code{acet}, \code{c2h6},
+\code{mek}, \code{nit}, \code{benz}, \code{soap}, \code{alk4}, \code{ocpo},
+\code{ald2}, \code{hcho}, \code{pm25_rh35_gocar}, \code{dst3},
+\code{pm25su_rh35_gcc}, \code{pm25_rh35_gcc}, \code{pm25ni_rh35_gcc},
+\code{pm25bc_rh35_gcc}, \code{dst2}, \code{pm25du_rh35_gcc}, \code{bcpi},
+\code{no2}, \code{salc}, \code{nh4}\cr
+\code{met_tavg_1hr_g1440x721_x1}\tab
+\code{zl}, \code{zpbl}, \code{ps}, \code{v2m}, \code{v}, \code{q2m},
+\code{u}, \code{t2m}, \code{troppb}, \code{q}, \code{t}, \code{v10m},
+\code{t10m}, \code{u2m}, \code{q10m}, \code{ts}, \code{slp}, \code{cldtt},
+\code{phis}, \code{tprec}, \code{u10m}, \code{rh}\cr
+\code{xgc_tavg_1hr_g1440x721_x1}\tab
+\code{wetdepflx_nh4}, \code{aod550_dst6}, \code{wetdepflx_dst1},
+\code{tropcol_io}, \code{totcol_o3}, \code{tropcol_hcho},
+\code{drydepflx_bcpi}, \code{aod550_cloud}, \code{aod550_dst5},
+\code{wetdepflx_hcho}, \code{aod550_salc}, \code{aod550_dust},
+\code{wetdepflx_so2}, \code{wetdepflx_salc}, \code{wetdepflx_dst3},
+\code{drydepflx_nit}, \code{wetdepflx_so4}, \code{aod550_sala},
+\code{aod550_dst1}, \code{tropcol_co}, \code{wetdepflx_bcpi},
+\code{drydepflx_sala}, \code{wetdepflx_nh3}, \code{tropcol_no2},
+\code{wetdepflx_nit}, \code{aod550_sulfate}, \code{wetdepflx_ocpi},
+\code{drydepflx_hcho}, \code{drydepflx_dst4}, \code{tropcol_so2},
+\code{drydepflx_ocpi}, \code{tropcol_o3}, \code{drydepflx_nh4},
+\code{aod550_dst7}, \code{totcol_co}, \code{totcol_so2}, \code{totcol_io},
+\code{drydepflx_nh3}, \code{wetdepflx_sala}, \code{wetdepflx_dst4},
+\code{drydepflx_o3}, \code{drydepflx_hno3}, \code{aod550_dst4},
+\code{aod550_oc}, \code{totcol_no2}, \code{drydepflx_dst2},
+\code{tropcol_bro}, \code{wetdepflx_bcpo}, \code{drydepflx_bcpo},
+\code{wetdepflx_dst2}, \code{drydepflx_dst1}, \code{aod550_dst2},
+\code{aod550_bc}, \code{aod550_dst3}, \code{wetdepflx_ocpo},
+\code{drydepflx_dst3}, \code{drydepflx_salc}, \code{wetdepflx_hno3},
+\code{drydepflx_ocpo}, \code{drydepflx_no2}, \code{totcol_hcho},
+\code{totcol_bro}\cr
+\code{chm_inst_1hr_g1440x721_p23}\tab
+\code{pm25soa_rh35_gc}, \code{pm25ss_rh35_gcc}, \code{so2}, \code{co},
+\code{o3}, \code{pm25oc_rh35_gcc}, \code{pm25du_rh35_gcc}, \code{noy},
+\code{no2}, \code{pm25ni_rh35_gcc}, \code{pm25bc_rh35_gcc},
+\code{pm25_rh35_gcc}, \code{pm25su_rh35_gcc}\cr
+\code{met_inst_1hr_g1440x721_p23}\tab
+\code{omega}, \code{t}, \code{eth}, \code{q}, \code{epv}, \code{rh},
+\code{slp}, \code{airdens}, \code{ps}, \code{h}, \code{th}, \code{v},
+\code{u}, \code{airvol_chem}\cr
+}
+
+\code{variable} matching is case-insensitive (for example, \code{"o3"}
+matches \code{"O3"}).
+
+Reference: NASA GEOS-CF OpenDAP catalog
+\url{https://opendap.nccs.nasa.gov/dods/gmao/geos-cf/assim}.
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
@@ -44,6 +129,14 @@ geos <- process_geos(
   date = c("2024-01-01", "2024-01-10"),
   variable = "O3",
   path = "./data/aqc_tavg_1hr_g1440x721_v1"
+)
+## daily mean across all sub-daily layers per variable/level
+geos_daily <- process_geos(
+  date = c("2024-01-01", "2024-01-10"),
+  variable = "O3",
+  path = "./data/aqc_tavg_1hr_g1440x721_v1",
+  daily_agg = TRUE,
+  fun = "mean"
 )
 }
 }

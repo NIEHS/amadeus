@@ -8,50 +8,64 @@ download_tri(
   year = c(2018L, 2022L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  jurisdiction = "US",
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
-\item{year}{integer(1 or 2). length of 4. Year or start/end years for downloading data.}
+\item{year}{integer(1 or 2). Year or start/end years for downloading data.}
 
 \item{directory_to_save}{character(1). Directory to download files.}
 
-\item{acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledges that the data downloaded using this function may be very
-large and use lots of machine storage and memory.}
+\item{acknowledgement}{logical(1). Must be TRUE to proceed.}
 
-\item{download}{logical(1). \code{FALSE} will generate a *.txt file
-containing all download commands. By setting \code{TRUE} the function
-will download all of the requested data files.}
+\item{jurisdiction}{character(1). TRI file variant to download. Use
+\code{"US"} for the nationwide file, a two-letter state or territory code
+such as \code{"AZ"} or \code{"NC"} for a jurisdiction-specific file, or
+\code{"tbl"} for the tribal file. Default is \code{"US"}.}
 
-\item{remove_command}{logical(1). Remove (\code{TRUE}) or keep (\code{FALSE})
-the text file containing download commands.}
+\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
 
-\item{hash}{logical(1). By setting \code{TRUE} the function will return
-an \code{rlang::hash_file()} hash character corresponding to the
-downloaded files. Default is \code{FALSE}.}
+\item{remove_command}{logical(1). Deprecated, ignored.}
+
+\item{show_progress}{logical(1). Show download progress (default TRUE)}
+
+\item{hash}{logical(1). Return hash of downloaded files (default FALSE)}
+
+\item{max_tries}{integer(1). Maximum retry attempts (default 20)}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
-\itemize{
-\item For \code{hash = FALSE}, NULL
-\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item Comma-separated value (CSV) files will be stored in
-\code{directory_to_save}.
-}
+invisible list with download results; or hash character if hash=TRUE
 }
 \description{
-The \code{download_tri()} function accesses and downloads toxic release data from the \href{https://www.epa.gov/toxics-release-inventory-tri-program/tri-data-action-0}{U.S. Environmental Protection Agency's (EPA) Toxic Release Inventory (TRI) Program}.
+The \code{download_tri()} function accesses and downloads toxic release
+data from the U.S. Environmental Protection Agency's (EPA) Toxic Release
+Inventory (TRI) Program. The EPA TRI basic data files contain annual,
+facility-reported toxic chemical release and waste management information.
+EPA publishes TRI basic files in multiple annual variants under the same
+service endpoint: a nationwide file (\code{"US"}), state-specific files
+identified by two-letter postal abbreviations (for example \code{"AZ"} or
+\code{"NC"}), and a tribal file (\code{"tbl"}).
+}
+\note{
+TRI data does not require authentication. State and tribal downloads
+are saved with jurisdiction-specific file names, while the U.S.-wide
+download keeps the historical \code{tri_raw_<year>.csv} naming pattern.
 }
 \examples{
 \dontrun{
 download_tri(
   year = 2021L,
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE
+  jurisdiction = "NC",
+  acknowledgement = TRUE
 )
 }
 }

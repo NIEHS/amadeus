@@ -9,6 +9,7 @@ calculate_cropscape(
   locs,
   locs_id = "site_id",
   radius = 0,
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -23,6 +24,10 @@ containing identifier for each unique coordinate location.}
 
 \item{radius}{integer(1). Circular buffer distance around site locations.
 (Default = 0).}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

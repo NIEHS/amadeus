@@ -8,24 +8,37 @@ calculate_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
     "dummies", "gmted", "sedac_groads", "groads", "roads", "ecoregions", "ecoregion",
     "hms", "smoke", "gmted", "narr", "geos", "sedac_population", "population", "nlcd",
-    "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "prism", "cropscape",
-    "cdl", "huc"),
+    "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "mcd14ml", "prism",
+    "cropscape", "cdl", "huc", "edgar", "goes", "goes_adp", "GOES", "drought", "spei",
+    "eddi", "usdm"),
   from,
   locs,
   locs_id = "site_id",
+  .by_time = NULL,
+  weights = NULL,
   ...
 )
 }
 \arguments{
 \item{covariate}{character(1). Covariate type.}
 
-\item{from}{character. Single or multiple from strings.}
+\item{from}{character, SpatRaster, SpatVector, or data.frame depending on
+the selected \code{covariate} route.}
 
 \item{locs}{sf/SpatVector. Unique locations. Should include
 a unique identifier field named \code{locs_id}}
 
 \item{locs_id}{character(1). Name of unique identifier.
 Default is \code{"site_id"}.}
+
+\item{.by_time}{NULL or character(1). Name of the time column to use
+temporal summarization unit token. \code{NULL} (default) disables
+temporal summarization.}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Passed through to the underlying source-specific function for
+weighted extraction. If \code{NULL} (default), unweighted extraction is
+performed.}
 
 \item{...}{Arguments passed to each covariate calculation
 function.}
@@ -69,6 +82,7 @@ calculate_covariates(
 \item \code{\link{calculate_gmted}}: "gmted", "GMTED"
 \item \code{\link{calculate_narr}}: "narr", "NARR"
 \item \code{\link{calculate_geos}}: "geos", "geos_cf", "GEOS"
+\item \code{\link{calculate_goes}}: "goes", "goes_adp", "GOES"
 \item \code{\link{calculate_population}}: "population", "sedac_population"
 \item \code{\link{calculate_groads}}: "roads", "groads", "sedac_groads"
 \item \code{\link{calculate_nlcd}}: "nlcd", "NLCD"
@@ -80,6 +94,8 @@ calculate_covariates(
 \item \code{\link{calculate_prism}}: "prism", "PRISM"
 \item \code{\link{calculate_cropscape}}: "cropscape", "cdl"
 \item \code{\link{calculate_huc}}: "huc", "HUC"
+\item \code{\link{calculate_edgar}}: "edgar"
+\item \code{\link{calculate_drought}}: "drought", "spei", "eddi", "usdm"
 }
 }
 \author{

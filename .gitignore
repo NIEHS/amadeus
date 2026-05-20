@@ -82,3 +82,22 @@ tests/testthat/test-dev.R
 README_files/
 
 tutorials/
+inst/migration-to-httr-guide.R
+
+# testthat auto-generated problem files
+tests/testthat/testthat-problems.rds
+
+.vscode/
+vignettes/local_run.sh
+tools/
+tools/vignettes/live_outputs/
+inst/extdata/presentations/*
+local_cov.Rout
+coverage-repro.log
+
+# generated test report outputs
+tests/test_report/*.html
+tests/test_report/*.pdf
+tests/test_report/*_files/
+tests/test_report/cran_checklist.html
+tools/run-live-workflow-vignettes.sh

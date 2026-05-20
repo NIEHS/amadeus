@@ -15,19 +15,29 @@ download_merra2(
     
     "tavg3_3d_mst_Np", "tavg3_3d_rad_Np", "tavg3_3d_tdt_Np", "tavg3_3d_trb_Np",
     "tavg3_3d_udt_Np", "tavg3_3d_odt_Np", "tavg3_3d_qdt_Np", "tavg3_3d_asm_Nv",
-    "tavg3_3d_cld_Nv", "tavg3_3d_mst_Nv", "tavg3_3d_rad_Nv", "tavg3_2d_glc_Nx"),
+    "tavg3_3d_cld_Nv", "tavg3_3d_mst_Nv", "tavg3_3d_rad_Nv", "tavg3_2d_glc_Nx", "fwi"),
+  nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  hash = FALSE,
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
-\item{collection}{character(1). MERRA-2 data collection file name.}
+\item{collection}{character(1). MERRA-2 data collection file name, or
+\code{"fwi"} for the daily corrected Global Fire Weather Index product
+(\code{MERRA2.CORRECTED}).}
 
-\item{date}{character(1 or 2). length of 10. Date or start/end dates for downloading data.
+\item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData
+authentication token.}
+
+\item{date}{character(1 or 2). length of 10. Date or start/end dates
+for downloading data.
 Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}).}
 
 \item{directory_to_save}{character(1). Directory to save data.}
@@ -36,29 +46,34 @@ Format "YYYY-MM-DD" (ex. January 1, 2018 = \code{"2018-01-01"}).}
 user acknowledges that the data downloaded using this function may be very
 large and use lots of machine storage and memory.}
 
-\item{download}{logical(1). \code{FALSE} will generate a *.txt file
-containing all download commands. By setting \code{TRUE} the function
-will download all of the requested data files.}
+\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
 
-\item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE}).}
+\item{remove_command}{logical(1). Deprecated, ignored.}
 
 \item{hash}{logical(1). By setting \code{TRUE} the function will return
 an \code{rlang::hash_file()} hash character corresponding to the
-downloaded files. Default is \code{FALSE}.
-the text file containing download commands.}
+downloaded files. Default is \code{FALSE}.}
+
+\item{show_progress}{logical(1). Show download progress (default TRUE)}
+
+\item{max_tries}{integer(1). Maximum retry attempts (default 20)}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
-\itemize{
-\item For \code{hash = FALSE}, NULL
-\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item netCDF (.nc4) files will be stored in a
-collection-specific folder within \code{directory_to_save}.
-}
+invisible list with download results; or hash character if hash=TRUE
 }
 \description{
 The \code{download_merra2()} function accesses and downloads various
-meteorological and atmospheric collections from \href{https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/}{NASA's Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model}.
+meteorological and atmospheric collections from \href{https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/}{NASA's Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2) model}, and the
+daily corrected Global Fire Weather Index (FWI) product derived from MERRA-2
+weather inputs.
+}
+\note{
+Due to NASA data access policies, standard MERRA-2 GES DISC downloads
+require a valid NASA Earthdata token for authentication. Use
+\code{setup_nasa_token()} for setup. The \code{"fwi"} collection is hosted on the
+public GlobalFWI portal and does not require Earthdata authentication.
 }
 \examples{
 \dontrun{
@@ -66,199 +81,10 @@ download_merra2(
   collection = "inst1_2d_int_Nx",
   date = "2024-01-01",
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE,
+  acknowledgement = TRUE
 )
 }
 }
-\references{
-\insertRef{data_gmao_merra-inst1_2d_asm_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-inst1_2d_int_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-inst1_2d_lfo_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-inst3_3d_asm_Np}{amadeus}
-
-\insertRef{data_gmao_merra-inst3_3d_aer_Nv}{amadeus}
-
-\insertRef{data_gmao_merra-inst3_3d_asm_Nv}{amadeus}
-
-\insertRef{data_gmao_merra-inst3_3d_chm_Nv}{amadeus}
-
-\insertRef{data_gmao_merra-inst3_3d_gas_Nv}{amadeus}
-
-\insertRef{data_gmao_merra-inst3_2d_gas_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-inst6_3d_ana_Np}{amadeus}
-
-\insertRef{data_gmao_merra-inst6_3d_ana_Nv}{amadeus}
-
-\insertRef{data_gmao_merra-statD_2d_slv_Nx_m}{amadeus}
-
-\insertRef{data_gmao_merra-statD_2d_slv_Nx_d}{amadeus}
-
-\insertRef{data_gmao_merra-tavg1_2d_adg_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavg1_2d_aer_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavg1_2d_chm_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavg1_2d_csp_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavg1_2d_flx_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavg1_2d_int_Nx}{amadeus}
-
-\insertRef{pawson_merra-2_2020}{amadeus}
-
-\insertRef{data_gmao_merra-tavg1_2d_lnd_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavg1_2d_ocn_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavg1_2d_rad_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavg1_2d_slv_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_mst_Ne}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_trb_Ne}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_nav_Ne}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_cld_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_mst_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_rad_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_tdt_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_trb_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_udt_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_odt_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_qdt_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_asm_Nv}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_cld_Nv}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_mst_Nv}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_3d_rad_Nv}{amadeus}
-
-\insertRef{data_gmao_merra-tavg3_2d_glc_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-instM_2d_asm_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-instM_2d_int_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-instM_2d_lfo_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-instM_2d_gas_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-instM_3d_asm_Np}{amadeus}
-
-\insertRef{data_gmao_merra-instM_3d_ana_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_2d_adg_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_2d_aer_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_2d_chm_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_2d_csp_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_2d_flx_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_2d_int_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_2d_lfo_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_2d_lnd_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_2d_ocn_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_2d_rad_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_2d_slv_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_2d_glc_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_3d_cld_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_3d_mst_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_3d_rad_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_3d_tdt_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_3d_trb_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_3d_udt_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_3d_odt_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgM_3d_qdt_Np}{amadeus}
-
-\insertRef{data_gmao_merra-const_2d_asm_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-instU_2d_asm_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-instU_2d_int_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-instU_2d_lfo_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-instU_2d_gas_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-instU_3d_asm_Np}{amadeus}
-
-\insertRef{data_gmao_merra-instU_3d_ana_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_2d_adg_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_2d_aer_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_2d_chm_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_2d_csp_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_2d_flx_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_2d_int_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_2d_lfo_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_2d_lnd_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_2d_ocn_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_2d_rad_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_2d_slv_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_2d_glc_Nx}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_3d_cld_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_3d_mst_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_3d_rad_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_3d_tdt_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_3d_trb_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_3d_udt_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_3d_odt_Np}{amadeus}
-
-\insertRef{data_gmao_merra-tavgU_3d_qdt_Np}{amadeus}
-}
 \author{
-Mitchell Manware, Insang Song
+Mitchell Manware, Insang Song, Kyle Messier
 }

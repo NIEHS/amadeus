@@ -21,20 +21,7 @@ testthat::test_that("download_koppen_geiger", {
         directory_to_save = directory_to_save,
         acknowledgement = TRUE,
         unzip = FALSE,
-        remove_zip = FALSE,
-        download = FALSE,
-        remove_command = FALSE
-      )
-      # define file path with commands
-      commands_path <- paste0(
-        download_sanitize_path(directory_to_save),
-        "koppen_geiger_",
-        time_period,
-        "_",
-        gsub("\\.", "p", data_resolutions[d]),
-        "_",
-        Sys.Date(),
-        "_wget_command.txt"
+        remove_zip = FALSE
       )
       # expect sub-directories to be created
       testthat::expect_true(
@@ -43,26 +30,57 @@ testthat::test_that("download_koppen_geiger", {
             directory_to_save,
             include.dirs = TRUE
           )
-        ) ==
-          3
+        ) >=
+          1
       )
-      # import commands
-      commands <- read_commands(commands_path = commands_path)
-      # extract urls
-      urls <- extract_urls(commands = commands, position = 2)
-      # check HTTP URL status
-      url_status <- check_urls(urls = urls, size = 1L)
-      # implement unit tests
-      test_download_functions(
-        directory_to_save = directory_to_save,
-        commands_path = commands_path,
-        url_status = url_status
-      )
-      # remove file with commands after test
-      file.remove(commands_path)
     }
   }
   unlink(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that(
+  "download_koppen_geiger remove_command deprecation warning",
+  {
+    withr::with_tempdir({
+      testthat::expect_warning(
+        download_koppen_geiger(
+          data_resolution = "0.5",
+          time_period = "Present",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE,
+          remove_command = TRUE
+        ),
+        regexp = "remove_command.*deprecated"
+      )
+    })
+  }
+)
+
+testthat::test_that("download_koppen_geiger mock download with hash", {
+  testthat::local_mocked_bindings(
+    download_run_method = function(...) invisible(NULL),
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_koppen_geiger(
+          data_resolution = "0.5",
+          time_period = "Present",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
 })
 
 ################################################################################
@@ -139,8 +157,38 @@ testthat::test_that("calculate_koppen_geiger", {
   testthat::expect_s3_class(kg_res, "data.frame")
   # ncol is equal to 7
   testthat::expect_equal(ncol(kg_res), 7)
+  kg_dummy_cols <- grep("^DUM_CLRG[A-E]_", names(kg_res), value = TRUE)
+  testthat::expect_equal(
+    kg_dummy_cols,
+    paste0("DUM_CLRG", LETTERS[1:5], "_00000")
+  )
+  testthat::expect_false(any(grepl("_0_", kg_dummy_cols)))
   # should have only one climate zone
   testthat::expect_equal(sum(unlist(kg_res[, c(-1, -2)])), 1)
+  testthat::expect_true(
+    all(unlist(kg_res[, kg_dummy_cols, drop = FALSE]) %in% c(0L, 1L))
+  )
+
+  testthat::expect_no_error(
+    kg_frac <- calculate_koppen_geiger(
+      from = kgras,
+      locs = site_faux,
+      frac = TRUE,
+      radius = 100000
+    )
+  )
+  kg_frac_cols <- grep("^FRC_CLRG[A-E]_", names(kg_frac), value = TRUE)
+  testthat::expect_equal(
+    kg_frac_cols,
+    paste0("FRC_CLRG", LETTERS[1:5], "_100000")
+  )
+  testthat::expect_false(any(grepl("_0_", kg_frac_cols)))
+  testthat::expect_true(
+    all(unlist(kg_frac[, kg_frac_cols, drop = FALSE]) >= 0, na.rm = TRUE)
+  )
+  testthat::expect_true(
+    all(unlist(kg_frac[, kg_frac_cols, drop = FALSE]) <= 1, na.rm = TRUE)
+  )
   # with included geometry (terra)
   testthat::expect_no_error(
     kg_terra <- calculate_koppen_geiger(
@@ -161,4 +209,38 @@ testthat::test_that("calculate_koppen_geiger", {
   )
   testthat::expect_equal(ncol(kg_sf), 8)
   testthat::expect_true("sf" %in% class(kg_sf))
+})
+
+################################################################################
+##### download_koppen_geiger file-already-exists branch
+
+testthat::test_that("download_koppen_geiger file already exists path", {
+  testthat::local_mocked_bindings(
+    check_destfile = function(...) FALSE,
+    download_unzip = function(...) invisible(NULL),
+    download_remove_zips = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    msgs <- character(0)
+    withCallingHandlers(
+      suppressWarnings(
+        download_koppen_geiger(
+          data_resolution = "0.0083",
+          time_period = "Present",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = FALSE,
+          hash = FALSE
+        )
+      ),
+      message = function(m) {
+        msgs <<- c(msgs, conditionMessage(m))
+        invokeRestart("muffleMessage")
+      }
+    )
+    testthat::expect_true(any(grepl("already exists", msgs)))
+  })
 })

@@ -9,60 +9,52 @@ download_koppen_geiger(
   time_period = c("Present", "Future"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 )
 }
 \arguments{
-\item{data_resolution}{character(1). Available resolutions are \code{"0.0083"}
-degrees (approx. 1 km), \code{"0.083"} degrees (approx. 10 km), and
-\code{"0.5"} degrees (approx. 50 km).}
+\item{data_resolution}{character(1). Available resolutions.}
 
-\item{time_period}{character(1). Available times are \code{"Present"} (1980-2016)
-and \code{"Future"} (2071-2100). ("Future" classifications are based on scenario
-RCP8.5).}
+\item{time_period}{character(1). "Present" (1980-2016) or "Future"
+(2071-2100).}
 
-\item{directory_to_save}{character(1). Directory to save data. Two
-sub-directories will be created for the downloaded zip files ("/zip_files")
-and the unzipped shapefiles ("/data_files").}
+\item{directory_to_save}{character(1). Directory to save data.}
 
-\item{acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledges that the data downloaded using this function may be very
-large and use lots of machine storage and memory.}
+\item{acknowledgement}{logical(1). Must be TRUE to proceed.}
 
-\item{download}{logical(1). \code{FALSE} will generate a *.txt file
-containing all download commands. By setting \code{TRUE} the function
-will download all of the requested data files.}
+\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
 
-\item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE})
-the text file containing download commands.}
+\item{remove_command}{logical(1). Deprecated, ignored.}
 
-\item{unzip}{logical(1). Unzip zip files. Default is \code{TRUE}.}
+\item{unzip}{logical(1). Unzip zip files (default TRUE).}
 
-\item{remove_zip}{logical(1). Remove zip files from directory_to_download.
-Default is \code{FALSE}.}
+\item{remove_zip}{logical(1). Remove zip files after unzipping (default
+FALSE).}
 
-\item{hash}{logical(1). By setting \code{TRUE} the function will return
-an \code{rlang::hash_file()} hash character corresponding to the
-downloaded files. Default is \code{FALSE}.}
+\item{show_progress}{logical(1). Show download progress (default TRUE)}
+
+\item{hash}{logical(1). Return hash of downloaded files (default FALSE)}
+
+\item{max_tries}{integer(1). Maximum retry attempts (default 20)}
+
+\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
-\itemize{
-\item For \code{hash = FALSE}, NULL
-\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item Zip and/or data files will be downloaded and stored in
-respective sub-directories within \code{directory_to_save}.
-}
+invisible list with download results; or hash character if hash=TRUE
 }
 \description{
 The \code{download_koppen_geiger()} function accesses and downloads
-climate classification data from the \emph{Present and future
-Köppen-Geiger climate classification maps at
-1-km resolution}(\href{https://www.nature.com/articles/sdata2018214}{link for article}; \href{https://figshare.com/articles/dataset/Present_and_future_K_ppen-Geiger_climate_classification_maps_at_1-km_resolution/6396959/2}{link for data}).
+climate classification data.
+}
+\note{
+Köppen-Geiger data does not require authentication.
 }
 \examples{
 \dontrun{
@@ -70,16 +62,12 @@ download_koppen_geiger(
   data_resolution = "0.0083",
   time_period = "Present",
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE,
-  unzip = FALSE
+  acknowledgement = TRUE
 )
 }
 }
 \references{
 \insertRef{article_beck2023koppen}{amadeus}
-
 \insertRef{article_beck2018present}{amadeus}
 }
 \author{

@@ -10,6 +10,8 @@ calculate_groads(
   locs_id = NULL,
   radius = 1000,
   fun = "sum",
+  drop = FALSE,
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -27,6 +29,13 @@ containing identifier for each unique coordinate location.}
 
 \item{fun}{function(1). Function used to summarize the length of roads
 within sites location buffer (Default is \code{sum}).}
+
+\item{drop}{logical(1). Should locations with zero roads in the extraction
+buffer be dropped from results? Default is \code{FALSE} (retain all locations).}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

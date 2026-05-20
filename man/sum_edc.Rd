@@ -8,8 +8,10 @@ sum_edc(
   from = NULL,
   locs = NULL,
   locs_id = NULL,
-  sedc_bandwidth = NULL,
+  decay_range = NULL,
   target_fields = NULL,
+  C0 = NULL,
+  use_threshold = TRUE,
   geom = FALSE
 )
 }
@@ -22,11 +24,20 @@ decaying contributions are calculated.}
 
 \item{locs_id}{character(1). Name of the unique id field in \code{point_to}.}
 
-\item{sedc_bandwidth}{numeric(1).
+\item{decay_range}{numeric(1).
 Distance at which the source concentration is reduced to
 \code{exp(-3)} (approximately -95 \%)}
 
 \item{target_fields}{character(varying). Field names in characters.}
+
+\item{C0}{\code{NULL}, character(1), or numeric vector of length \code{nrow(from)}.
+Optional initial source values at pollutant locations. If \code{NULL}
+(default), all source values are set to 1. If character(1), the value
+is treated as a column name in \code{from} and used as source values.}
+
+\item{use_threshold}{logical(1). If \code{TRUE} (default), include only source
+points within \code{5 * decay_range} from each target location. If \code{FALSE},
+include all source points in \code{from}.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
@@ -37,7 +48,7 @@ a data.frame (tibble) or SpatVector object with input field names with
 a suffix \code{"_sedc"} where the sums of EDC are stored.
 Additional attributes are attached for the EDC information.
 \itemize{
-\item `attr(result, "sedc_bandwidth")``: the bandwidth where
+\item `attr(result, "decay_range")``: the range where
 concentration reduces to approximately five percent
 \item `attr(result, "sedc_threshold")``: the threshold distance
 at which emission source points are excluded beyond that

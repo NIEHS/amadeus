@@ -1,0 +1,361 @@
+---
+title: "EDGAR Emissions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{EDGAR Emissions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "`r Sys.Date()`"
+author: "Kyle Messier, with assistance from GitHub Copilot"
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ""
+)
+library(amadeus)
+library(sf)
+
+live_run <- local({
+  force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
+  on_ci <- nzchar(Sys.getenv("CI")) ||
+    nzchar(Sys.getenv("GITHUB_ACTIONS")) ||
+    identical(tolower(Sys.getenv("IN_PKGDOWN", "")), "true")
+  on_cran <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")) ||
+    identical(tolower(Sys.getenv("NOT_CRAN", "")), "false")
+  force || !(on_ci || on_cran)
+})
+
+aqs_sample_path <- c(
+  file.path("tests", "testdata", "aqs", "aqs-location-sample.rds"),
+  file.path("..", "tests", "testdata", "aqs", "aqs-location-sample.rds")
+)
+aqs_sample_path <- aqs_sample_path[file.exists(aqs_sample_path)][1]
+if (is.na(aqs_sample_path) || aqs_sample_path == "") {
+  stop("Could not locate tests/testdata/aqs/aqs-location-sample.rds")
+}
+example_points_sf <- sf::st_as_sf(readRDS(aqs_sample_path))
+durham_hex_path <- system.file(
+  "extdata", "data_files", "durham_h3_res8.rds", package = "amadeus"
+)
+if (durham_hex_path == "") {
+  source_candidates <- c(
+    file.path("inst", "extdata", "data_files", "durham_h3_res8.rds"),
+    file.path("..", "inst", "extdata", "data_files", "durham_h3_res8.rds")
+  )
+  durham_hex_path <- source_candidates[file.exists(source_candidates)][1]
+}
+if (is.na(durham_hex_path) || durham_hex_path == "") {
+  stop("Could not locate inst/extdata/data_files/durham_h3_res8.rds")
+}
+durham_hex <- readRDS(durham_hex_path)
+
+
+pick_value_column <- function(x) {
+  geom_col <- attr(x, "sf_column")
+  excluded <- c("site_id", "h3_id", "resolution", "area_km2", "name", "NAME", geom_col)
+  candidates <- setdiff(names(x), excluded)
+  if (length(candidates) == 0) {
+    stop("No plottable covariate columns found.")
+  }
+  preferred <- candidates[vapply(x[candidates], function(col) {
+    is.numeric(col) || is.character(col) || is.factor(col)
+  }, logical(1))]
+  if (length(preferred) > 0) preferred[1] else candidates[1]
+}
+
+coord_local_sf <- function(x) {
+  x_wgs84 <- sf::st_transform(sf::st_as_sf(x), 4326)
+  bbox <- sf::st_bbox(x_wgs84)
+  pad_x <- max((bbox[["xmax"]] - bbox[["xmin"]]) * 0.08, 0.05)
+  pad_y <- max((bbox[["ymax"]] - bbox[["ymin"]]) * 0.08, 0.05)
+  ggplot2::coord_sf(
+    xlim = c(bbox[["xmin"]] - pad_x, bbox[["xmax"]] + pad_x),
+    ylim = c(bbox[["ymin"]] - pad_y, bbox[["ymax"]] + pad_y),
+    expand = FALSE,
+    datum = NA
+  )
+}
+
+plot_points <- function(x, title) {
+  value_col <- pick_value_column(x)
+  ggplot2::ggplot() +
+    ggplot2::geom_sf(
+      data = x,
+      ggplot2::aes(color = !!rlang::sym(value_col)),
+      size = 2
+    ) +
+    coord_local_sf(x) +
+    ggplot2::scale_color_viridis_c(
+      trans = log10_zero,
+      option = "plasma",
+      na.value = "grey70"
+    ) +
+    ggplot2::labs(title = title, color = value_col) +
+    ggplot2::guides(
+      color = ggplot2::guide_colorbar(
+        barwidth  = ggplot2::unit(0.4, "npc"),
+        barheight = ggplot2::unit(0.4, "lines"),
+        title.position = "top",
+        title.hjust = 0.5
+      )
+    ) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      legend.position   = "bottom",
+      legend.title      = ggplot2::element_text(size = 8),
+      legend.text       = ggplot2::element_text(size = 7),
+      plot.title        = ggplot2::element_text(size = 10, hjust = 0.5),
+      plot.margin       = ggplot2::margin(4, 4, 4, 4)
+    )
+}
+
+plot_polygons <- function(x, title) {
+  value_col <- pick_value_column(x)
+  ggplot2::ggplot() +
+    ggplot2::geom_sf(
+      data = x,
+      ggplot2::aes(fill = !!rlang::sym(value_col)),
+      color = NA
+    ) +
+    coord_local_sf(x) +
+    ggplot2::scale_fill_viridis_c(
+      trans = log10_zero,
+      option = "plasma",
+      na.value = "grey70"
+    ) +
+    ggplot2::labs(title = title, fill = value_col) +
+    ggplot2::guides(
+      fill = ggplot2::guide_colorbar(
+        barwidth  = ggplot2::unit(0.4, "npc"),
+        barheight = ggplot2::unit(0.4, "lines"),
+        title.position = "top",
+        title.hjust = 0.5
+      )
+    ) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      legend.position   = "bottom",
+      legend.title      = ggplot2::element_text(size = 8),
+      legend.text       = ggplot2::element_text(size = 7),
+      plot.title        = ggplot2::element_text(size = 10, hjust = 0.5),
+      plot.margin       = ggplot2::margin(4, 4, 4, 4)
+    )
+}
+
+# log10 transform that floors zeros (and negatives) to 0 instead of -Inf
+log10_zero <- scales::trans_new(
+  name      = "log10_zero",
+  transform = function(x) ifelse(is.na(x) | x <= 0, 0, log10(x)),
+  inverse   = function(x) 10^x,
+  breaks    = scales::log_breaks(base = 10),
+  domain    = c(0, Inf)
+)
+```
+
+This article demonstrates a compact workflow for EDGAR emissions surfaces supported by `amadeus`.
+
+This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
+
+Each workflow uses two small example surfaces: `example_points_sf`, a saved subset of AQS monitor locations from `tests/testdata/aqs/aqs-location-sample.rds`, for point extraction; and the packaged Durham County Uber H3 resolution-8 hexagons at `system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")` for polygon extraction.
+
+## Available EDGAR variables and information
+
+The `species` argument in `download_data(dataset_name = "edgar", ...)`
+currently supports the following EDGAR air-pollutant emissions variables.
+For the emissions downloads used in this vignette, values are reported in
+tonnes.
+
+```{r edgar-variable-reference, echo = FALSE}
+edgar_variables <- data.frame(
+  variable = c("BC", "CO", "NH3", "NMVOC", "NOx", "OC", "PM10", "PM2.5", "SO2"),
+  description = c(
+    "Black carbon (carbonaceous particulate fraction)",
+    "Carbon monoxide",
+    "Ammonia",
+    "Non-methane volatile organic compounds",
+    "Nitrogen oxides",
+    "Organic carbon (carbonaceous particulate fraction)",
+    "Particulate matter <= 10 um aerodynamic diameter",
+    "Particulate matter <= 2.5 um aerodynamic diameter",
+    "Sulfur dioxide"
+  ),
+  stringsAsFactors = FALSE
+)
+
+knitr::kable(
+  edgar_variables,
+  col.names = c("amadeus variable name", "short description"),
+  align = c("l", "l")
+)
+```
+
+`download_edgar()` also exposes several other useful switches that determine
+which EDGAR products are available:
+
+- `version = "8.1"` covers the standard EDGAR air-pollutant products shown in
+  this vignette.
+- `version = "8.1_voc"` switches to VOC speciation products instead of the
+  standard pollutant grids.
+- `temp_res` supports `"yearly"`, `"monthly"`, and `"timeseries"` for
+  `version = "8.1"`. VOC speciation downloads do not use `temp_res`.
+- `output` supports `"emi"` for emissions and `"flx"` for flux products.
+- `format` is typically `"nc"` or `"txt"`, but monthly outputs and flux
+  outputs are only available in NetCDF form.
+- `year_range` can be a single year or a range. Yearly EDGAR products span
+  `1970-2022`, while monthly and VOC-speciation products span `2000-2022`.
+
+The sector arguments depend on which EDGAR product family you request:
+
+```{r edgar-option-reference, echo = FALSE}
+edgar_options <- data.frame(
+  input = c(
+    "sector_yearly",
+    "sector_monthly",
+    "sector_voc",
+    "voc"
+  ),
+  supported_values = c(
+    paste(
+      c(
+        "AGS", "AWB", "CHE", "ENE", "IND", "MNM", "NMM", "PRU_SOL",
+        "RCO", "REF_TRF", "SWD_INC", "SWD_LDF", "TNR_Aviation_CDS",
+        "TNR_Aviation_CRS", "TNR_Aviation_LTO", "TNR_Aviation_SPS",
+        "TNR_Other", "TNR_Ship", "TRO", "WWT"
+      ),
+      collapse = ", "
+    ),
+    paste(
+      c(
+        "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
+        "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY",
+        "TRANSPORT", "WASTE"
+      ),
+      collapse = ", "
+    ),
+    paste(
+      c(
+        "AGRICULTURE", "BUILDINGS", "FUEL_EXPLOITATION",
+        "IND_COMBUSTION", "IND_PROCESSES", "POWER_INDUSTRY",
+        "TRANSPORT", "WASTE"
+      ),
+      collapse = ", "
+    ),
+    "Integers 1-25 for VOC speciation groups"
+  ),
+  when_used = c(
+    "Yearly standard EDGAR products (`version = \"8.1\"`)",
+    "Monthly standard EDGAR products (`version = \"8.1\"`)",
+    "VOC speciation products (`version = \"8.1_voc\"`)",
+    "VOC speciation products (`version = \"8.1_voc\"`)"
+  ),
+  stringsAsFactors = FALSE
+)
+
+knitr::kable(
+  edgar_options,
+  col.names = c("input", "supported values", "when used"),
+  align = c("l", "l", "l")
+)
+```
+
+EDGAR groups these variables broadly as ozone precursors (`CO`, `NOx`, `NMVOC`), acidifying gases (`NH3`, `NOx`, `SO2`), and primary particulates (`PM10`, `PM2.5`, `BC`, `OC`).
+
+## Download representative requests
+
+```{r download, eval = live_run}
+directory_to_save <- file.path(tempdir(), "edgar_workflow")
+download_data(
+  dataset_name = "edgar",
+  species = c("CO", "NOx"),
+  temp_res = "yearly",
+  sector_yearly = "ENE",
+  year_range = 2021,
+  directory_to_save = directory_to_save,
+  acknowledgement = TRUE,
+  unzip = TRUE,
+  remove_zip = FALSE
+)
+```
+
+## Process one workflow-ready data product
+
+Amadeus process functions returns a `terra::SpatRaster`  so we can apply the terra extent option on the bounding box of the points to reduce processing time.
+
+```{r process, eval = live_run}
+processed_data <- process_covariates(
+  covariate = "edgar",
+  path = list.files(
+    directory_to_save,
+    pattern = "\\.(tif|tiff|nc4?|grd|img)$",
+    recursive = TRUE,
+    full.names = TRUE
+  ),
+  extent = sf::st_bbox(example_points_sf)
+)
+```
+
+## Calculate covariates at points
+
+We start with a radius of 0, which extracts the raster gric cell value at each point with no smoothing or averaging over an area.
+
+```{r calculate-points, eval = live_run}
+point_values <- calculate_covariates(
+  covariate = "edgar",
+  from = processed_data,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  geom = "sf"
+)
+
+print(point_values)
+```
+
+At point-level extractions, we often see more NA because data has to overlap exactly. Here, we smooth out the covariate calculation by using a buffer radius.
+
+```{r calculate-points-buffer, eval = live_run}
+point_values_1km <- calculate_covariates(
+  covariate = "edgar",
+  from = processed_data,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 1000, # distance units are in meters, see crs(processed_data)
+  geom = "sf"
+)
+
+print(point_values_1km)
+
+point_values_10km <- calculate_covariates(
+  covariate = "edgar",
+  from = processed_data,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 10000,
+  geom = "sf"
+)
+
+print(point_values_10km)
+
+```
+## Calculate covariates across Durham County H3 hexagons
+
+```{r calculate-polygons, eval = live_run}
+polygon_values <- calculate_covariates(
+  covariate = "edgar",
+  from = processed_data,
+  locs = durham_hex,
+  locs_id = "h3_id",
+  radius = 0,
+  geom = "sf"
+)
+```
+
+## Visualize the point outputs
+
+```{r plot-points, eval = live_run, fig.alt = "Map of point-based covariate extraction results for this workflow."}
+plot_points(point_values, paste0("EDGAR Emissions", ": point extraction"))
+```
+
+

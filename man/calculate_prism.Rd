@@ -4,7 +4,16 @@
 \alias{calculate_prism}
 \title{Calculate PRISM covariates}
 \usage{
-calculate_prism(from, locs, locs_id = "site_id", radius = 0, geom = FALSE, ...)
+calculate_prism(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  weights = NULL,
+  .by_time = NULL,
+  geom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{from}{SpatRaster(1). Output from \code{process_prism()}.}
@@ -16,6 +25,13 @@ containing identifier for each unique coordinate location.}
 
 \item{radius}{integer(1). Circular buffer distance around site locations.
 (Default = 0).}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
+
+\item{.by_time}{NULL or character(1). Optional time grouping key used
+with \code{.by_time} for temporal summaries.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

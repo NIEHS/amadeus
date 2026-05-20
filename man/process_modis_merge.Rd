@@ -9,6 +9,8 @@ process_modis_merge(
   date = NULL,
   subdataset = NULL,
   fun_agg = "mean",
+  path_secondary = NULL,
+  fusion_method = c("mean", "primary_first", "secondary_first"),
   ...
 )
 }
@@ -27,13 +29,19 @@ which subdatasets will be imported.}
 \item{fun_agg}{Function name or custom function to aggregate overlapping
 cell values. See \code{fun} description in \code{\link[terra:tapp]{terra::tapp}} for details.}
 
+\item{path_secondary}{character. Optional secondary list of HDF/H5 paths
+(e.g., Aqua files) to fuse with \code{path} for improved temporal coverage.}
+
+\item{fusion_method}{character(1). Fusion method when \code{path_secondary} is
+provided: \code{"mean"}, \code{"primary_first"}, \code{"secondary_first"}.}
+
 \item{...}{For internal use.}
 }
 \value{
 a \code{SpatRaster} object
 }
 \description{
-Get mosaicked or merged raster from multiple MODIS hdf files.
+Get mosaic or merged raster from multiple MODIS hdf files.
 }
 \note{
 Curvilinear products (i.e., swaths) will not be accepted.

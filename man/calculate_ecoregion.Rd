@@ -4,7 +4,18 @@
 \alias{calculate_ecoregion}
 \title{Calculate ecoregions covariates}
 \usage{
-calculate_ecoregion(from = NULL, locs, locs_id = "site_id", geom = FALSE, ...)
+calculate_ecoregion(
+  from = NULL,
+  locs,
+  locs_id = "site_id",
+  colnames = c("coded", "full_ecoregion"),
+  frac = FALSE,
+  drop = FALSE,
+  weights = NULL,
+  geom = FALSE,
+  radius = 0,
+  ...
+)
 }
 \arguments{
 \item{from}{SpatVector(1). Output of \code{\link{process_ecoregion}}.}
@@ -14,25 +25,51 @@ a unique identifier field named \code{locs_id}}
 
 \item{locs_id}{character(1). Name of unique identifier.}
 
+\item{colnames}{character(1). Naming convention for ecoregion indicator
+columns. Default is \code{"coded"} for the existing numeric key-based names.
+Use \code{"full_ecoregion"} to emit sanitized full ecoregion names.}
+
+\item{frac}{logical(1). Default \code{FALSE}. If \code{FALSE}, returns binary dummy
+indicators (0/1). If \code{TRUE}, returns fractional overlap values.}
+
+\item{drop}{logical(1). Default \code{FALSE}. If \code{TRUE}, remove ecoregion columns
+that are all 0 or \code{NA} across returned locations.}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
+
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
 
+\item{radius}{numeric(1). Circular buffer size (meters) around point
+locations. Use \code{0} (default) for exact point extraction.}
+
 \item{...}{Placeholders.}
 }
 \value{
-a data.frame or SpatVector object object with dummy variables and
-attributes of:
+a data.frame or SpatVector object with ecoregion indicator/fraction
+variables and attributes of:
 \itemize{
+\item Indicator names are controlled by \code{colnames}: \code{"coded"} (default)
+creates key-based names such as \code{DUM_E2083_00000} and
+\code{DUM_E3064_00000} when \code{frac = FALSE}, or \code{FRC_E2083_00000} and
+\code{FRC_E3064_00000} when \code{frac = TRUE}; \code{"full_ecoregion"} creates
+sanitized name-based columns such as
+\code{DUM_E2_SOUTHEASTERN_USA_PLAINS_00000} /
+\code{FRC_E2_SOUTHEASTERN_USA_PLAINS_00000} and
+\code{DUM_E3_NORTHERN_PIEDMONT_00000} /
+\code{FRC_E3_NORTHERN_PIEDMONT_00000} (duplicates are suffixed, e.g. \verb{_1}).
 \item \code{attr(., "ecoregion2_code")}: Ecoregion lv.2 code and key
 \item \code{attr(., "ecoregion3_code")}: Ecoregion lv.3 code and key
 }
 }
 \description{
-Extract ecoregions covariates (U.S. EPA Ecoregions Level 2/3) at point
-locations. Returns a \code{data.frame} object containing \code{locs_id} and
-binary (0 = point not in ecoregion; 1 = point in ecoregion) variables for
-each ecoregion.
+Extract ecoregions covariates (U.S. EPA Ecoregions Level 2/3) at point or
+polygon locations. Returns a \code{data.frame} object containing \code{locs_id} and
+either dummy indicators (\code{frac = FALSE}) or area fractions (\code{frac = TRUE})
+for each ecoregion.
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
@@ -43,6 +80,7 @@ calculate_ecoregion(
   from = ecoregion, # derived from process_ecoregion() example
   locs = loc,
   locs_id = "id",
+  colnames = "coded",
   geom = FALSE
 )
 }

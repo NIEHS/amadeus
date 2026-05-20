@@ -4,7 +4,7 @@
 \alias{calc_time}
 \title{Prepare time values}
 \usage{
-calc_time(time, format)
+calc_time(time, format, dataset = NULL, layer_name = NULL, layer_time = NULL)
 }
 \arguments{
 \item{time}{Time value}

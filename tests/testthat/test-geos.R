@@ -5,102 +5,114 @@
 ################################################################################
 ##### download_geos
 testthat::test_that("download_geos", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
-  # function parameters
-  date_start <- "2019-09-09"
-  date_end <- "2019-09-09"
-  collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
-  directory_to_save <- paste0(tempdir(), "/geos/")
-  # run download function
-  testthat::expect_no_error(
-    download_data(
-      dataset_name = "geos",
-      date = c(date_start, date_end),
-      collection = collections,
-      nasa_earth_data_token = nasa_earth_data_token,
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE
+  skip_if_offline()
+  skip_if(
+    Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
+    message = "No NASA token available"
+  )
+
+  withr::with_tempdir({
+    # function parameters
+    date_start <- "2019-09-09"
+    date_end <- "2019-09-09"
+    collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
+
+    result <- suppressWarnings(
+      download_geos(
+        date = c(date_start, date_end),
+        collection = collections,
+        nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      )
     )
-  )
-  # define file path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "geos_",
-    date_start,
-    "_",
-    date_end,
-    "_wget_commands.txt"
-  )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 10)[[5]] %>%
-    gsub("'", "", .)
 
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
-  )
+    # Check return structure (httr2 download_run_method pattern)
+    testthat::expect_type(result, "list")
+    testthat::expect_true(all(c("success", "failed", "skipped") %in% names(result)))
 
-  # remove file with commands after test
-  file.remove(commands_path)
-  unlink(directory_to_save, recursive = TRUE)
+    # Check that some files were processed
+    total <- result$success + result$failed + result$skipped
+    testthat::expect_gt(total, 0)
+  })
 })
 
-nasa_earth_data_token <- Sys.getenv("EARTHDATA_TOKEN")
-
 testthat::test_that("download_geos (single date)", {
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  # function parameters
-  date <- "2019-09-09"
-  collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
-  directory_to_save <- paste0(tempdir(), "/geos/")
-  # run download function
-  testthat::expect_no_error(
-    download_data(
-      dataset_name = "geos",
-      date = date,
-      nasa_earth_data_token = nasa_earth_data_token,
-      collection = collections,
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE
-    )
-  )
-  # define file path with commands
-  commands_path <- paste0(
-    directory_to_save,
-    "geos_",
-    date,
-    "_",
-    date,
-    "_wget_commands.txt"
-  )
-  # import commands
-  commands <- read_commands(commands_path = commands_path)
-  # extract urls
-  urls <- extract_urls(commands = commands, position = 10)[[5]] %>%
-    gsub("'", "", .)
-  # check HTTP URL status
-  url_status <- check_urls(urls = urls, size = 2L)
-  # implement unit tests
-  test_download_functions(
-    directory_to_save = directory_to_save,
-    commands_path = commands_path,
-    url_status = url_status
+  skip_if_offline()
+  skip_if(
+    Sys.getenv("NASA_EARTHDATA_TOKEN") == "",
+    message = "No NASA token available"
   )
 
-  # remove file with commands after test
-  file.remove(commands_path)
-  unlink(directory_to_save, recursive = TRUE)
+  withr::with_tempdir({
+    # function parameters
+    date <- "2019-09-09"
+    collections <- c("aqc_tavg_1hr_g1440x721_v1", "chm_inst_1hr_g1440x721_p23")
+
+    result <- suppressWarnings(
+      download_geos(
+        date = date,
+        collection = collections,
+        nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
+        directory_to_save = ".",
+        acknowledgement = TRUE
+      )
+    )
+
+    # Check return structure (httr2 download_run_method pattern)
+    testthat::expect_type(result, "list")
+    testthat::expect_true(all(c("success", "failed", "skipped") %in% names(result)))
+
+    # Check that some files were processed
+    total <- result$success + result$failed + result$skipped
+    testthat::expect_gt(total, 0)
+  })
+})
+
+testthat::test_that("download_geos remove_command deprecation warning", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    testthat::expect_warning(
+        download_geos(
+          date = "2019-09-09",
+          collection = "aqc_tavg_1hr_g1440x721_v1",
+          nasa_earth_data_token = "fake_token",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = FALSE,
+          remove_command = TRUE
+      ),
+      regexp = "remove_command.*deprecated"
+    )
+  })
+})
+
+testthat::test_that("download_geos mock download with hash", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) invisible(NULL),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_geos(
+          date = "2019-09-09",
+          collection = "aqc_tavg_1hr_g1440x721_v1",
+          nasa_earth_data_token = "fake_token",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          hash = TRUE
+        )
+      )
+    )
+    testthat::expect_equal(result, "fakehash")
+  })
 })
 
 ################################################################################
@@ -261,10 +273,46 @@ testthat::test_that("process_geos (single date)", {
   )
 })
 
+testthat::test_that("process_geos variable matching is case-insensitive", {
+  withr::local_package("terra")
+  geos_upper <- suppressMessages(
+    process_geos(
+      date = "2018-01-01",
+      variable = "O3",
+      path = testthat::test_path("..", "testdata", "geos", "c")
+    )
+  )
+  geos_lower <- suppressMessages(
+    process_geos(
+      date = "2018-01-01",
+      variable = "o3",
+      path = testthat::test_path("..", "testdata", "geos", "c")
+    )
+  )
+  testthat::expect_equal(terra::nlyr(geos_upper), terra::nlyr(geos_lower))
+  testthat::expect_equal(terra::values(geos_upper), terra::values(geos_lower))
+  testthat::expect_equal(terra::time(geos_upper), terra::time(geos_lower))
+})
+
 testthat::test_that("process_geos (expected errors)", {
   # expect error without variable
   testthat::expect_error(
     process_geos()
+  )
+  testthat::expect_error(
+    process_geos(
+      variable = "",
+      path = testthat::test_path("..", "testdata", "geos", "c")
+    ),
+    regexp = "single non-empty character string"
+  )
+  testthat::expect_error(
+    process_geos(
+      date = "2018-01-01",
+      variable = "NOT_A_GEOS_VARIABLE",
+      path = testthat::test_path("..", "testdata", "geos", "c")
+    ),
+    regexp = "Variable 'NOT_A_GEOS_VARIABLE' was not found"
   )
   # expect error on directory without data
   testthat::expect_error(
@@ -276,7 +324,151 @@ testthat::test_that("process_geos (expected errors)", {
 })
 
 ################################################################################
-##### calculate_geos
+##### process_geos daily_agg
+testthat::test_that("process_geos daily_agg=FALSE default is unchanged", {
+  withr::local_package("terra")
+  # Default (daily_agg=FALSE) must return same result as before
+  geos_default <- process_geos(
+    date = "2018-01-01",
+    variable = "O3",
+    path = testthat::test_path("..", "testdata", "geos", "c")
+  )
+  geos_explicit_false <- process_geos(
+    date = "2018-01-01",
+    variable = "O3",
+    path = testthat::test_path("..", "testdata", "geos", "c"),
+    daily_agg = FALSE
+  )
+  testthat::expect_equal(terra::nlyr(geos_default), terra::nlyr(geos_explicit_false))
+  testthat::expect_equal(terra::values(geos_default), terra::values(geos_explicit_false))
+})
+
+testthat::test_that("process_geos daily_agg collapses sub-daily layers", {
+  withr::local_package("terra")
+  src_file <- testthat::test_path(
+    "..", "testdata", "geos", "c",
+    "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4"
+  )
+  # Make src_file absolute before entering withr::with_tempdir
+  src_file <- normalizePath(src_file, mustWork = TRUE)
+
+  withr::with_tempdir({
+    tmpdir <- getwd()
+    # Two files: 0000z and 0100z for the same day
+    file.copy(src_file, file.path(tmpdir, "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4"))
+    file.copy(src_file, file.path(tmpdir, "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0100z.nc4"))
+
+    geos_sub <- suppressMessages(
+      process_geos(date = "2018-01-01", variable = "O3", path = tmpdir)
+    )
+    geos_daily_mean <- suppressMessages(
+      process_geos(date = "2018-01-01", variable = "O3", path = tmpdir,
+                   daily_agg = TRUE, fun = "mean")
+    )
+    geos_daily_max <- suppressMessages(
+      process_geos(date = "2018-01-01", variable = "O3", path = tmpdir,
+                   daily_agg = TRUE, fun = "max")
+    )
+
+    # Two files × 5 pressure levels = 10 sub-daily layers
+    testthat::expect_equal(terra::nlyr(geos_sub), 10)
+    # Daily agg preserves pressure level structure: 5 output layers
+    testthat::expect_equal(terra::nlyr(geos_daily_mean), 5)
+    # CRS is preserved
+    testthat::expect_false(terra::crs(geos_daily_mean) == "")
+    testthat::expect_match(terra::crs(geos_daily_mean, describe = TRUE)$code, "4326")
+    # Time is set to midnight UTC of the aggregated date
+    testthat::expect_true("POSIXt" %in% class(terra::time(geos_daily_mean)))
+    testthat::expect_true(all(
+      format(as.Date(terra::time(geos_daily_mean)), "%Y%m%d") == "20180101"
+    ))
+    # max >= mean (both files are identical, so max == mean == values)
+    testthat::expect_equal(terra::nlyr(geos_daily_max), 5)
+    testthat::expect_true(all(
+      terra::values(geos_daily_max) >= terra::values(geos_daily_mean),
+      na.rm = TRUE
+    ))
+  })
+})
+
+testthat::test_that(
+  "process_covariates(covariate=geos, daily_agg=TRUE): forwards daily aggregation args",
+  {
+    withr::local_package("terra")
+    src_file <- testthat::test_path(
+      "..", "testdata", "geos", "c",
+      "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4"
+    )
+    src_file <- normalizePath(src_file, mustWork = TRUE)
+
+    withr::with_tempdir({
+      tmpdir <- getwd()
+      file.copy(
+        src_file,
+        file.path(tmpdir, "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4")
+      )
+      file.copy(
+        src_file,
+        file.path(tmpdir, "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0100z.nc4")
+      )
+
+      geos_daily_mean <- suppressMessages(
+        process_covariates(
+          covariate = "geos",
+          date = "2018-01-01",
+          variable = "O3",
+          path = tmpdir,
+          daily_agg = TRUE,
+          fun = "mean"
+        )
+      )
+      geos_daily_sum <- suppressMessages(
+        process_covariates(
+          covariate = "geos",
+          date = "2018-01-01",
+          variable = "O3",
+          path = tmpdir,
+          daily_agg = TRUE,
+          fun = "sum"
+        )
+      )
+
+      testthat::expect_equal(terra::nlyr(geos_daily_mean), 5L)
+      testthat::expect_equal(terra::nlyr(geos_daily_sum), 5L)
+      testthat::expect_true(all(
+        terra::values(geos_daily_sum) >= terra::values(geos_daily_mean),
+        na.rm = TRUE
+      ))
+    })
+  }
+)
+
+testthat::test_that(
+  "process_covariates(covariate=geos, daily_agg=FALSE): matches process_geos default",
+  {
+    withr::local_package("terra")
+    geos_direct <- suppressMessages(
+      process_geos(
+        date = "2018-01-01",
+        variable = "O3",
+        path = testthat::test_path("..", "testdata", "geos", "c")
+      )
+    )
+    geos_wrapper <- suppressMessages(
+      process_covariates(
+        covariate = "geos",
+        date = "2018-01-01",
+        variable = "O3",
+        path = testthat::test_path("..", "testdata", "geos", "c"),
+        daily_agg = FALSE
+      )
+    )
+    testthat::expect_equal(terra::nlyr(geos_wrapper), terra::nlyr(geos_direct))
+    testthat::expect_equal(terra::values(geos_wrapper), terra::values(geos_direct))
+  }
+)
+
+
 testthat::test_that("calculate_geos", {
   withr::local_package("terra")
   withr::local_package("data.table")
@@ -388,3 +580,141 @@ testthat::test_that("calculate_geos", {
   )
 })
 # nolint end
+
+################################################################################
+##### calculate_geos .by_time interface
+
+testthat::test_that("calculate_geos .by_time wiring aggregates rows", {
+  withr::local_package("terra")
+  from_rast <- terra::rast(nrows = 2, ncols = 2, vals = 5)
+  terra::ext(from_rast) <- c(-80, -78, 34, 36)
+  terra::crs(from_rast) <- "EPSG:4326"
+  names(from_rast) <- "pm25_850_20200101_000000"
+  locs_df <- data.frame(site_id = "A", lon = -79, lat = 35)
+  fake_extracted <- data.frame(
+    site_id = c("A", "A"),
+    time = as.POSIXlt(
+      c("2020-01-01 00:00:00", "2020-01-01 06:00:00"),
+      tz = "UTC"
+    ),
+    level = c("850", "850"),
+    pm25_0 = c(10.0, 20.0)
+  )
+  testthat::local_mocked_bindings(
+    calc_prepare_locs = function(from, locs, locs_id, radius, geom) {
+      sv <- terra::vect(locs_df, geom = c("lon", "lat"), crs = "EPSG:4326")
+      list(sv, data.frame(site_id = "A"))
+    },
+    calc_worker = function(...) fake_extracted,
+    .package = "amadeus"
+  )
+  result_null <- suppressMessages(
+    calculate_geos(
+      from = from_rast,
+      locs = locs_df,
+      locs_id = "site_id",
+      radius = 0,
+      geom = FALSE
+    )
+  )
+  testthat::expect_equal(nrow(result_null), 2L)
+  result_mean <- suppressMessages(
+    calculate_geos(
+      from = from_rast,
+      locs = locs_df,
+      locs_id = "site_id",
+      radius = 0,
+      .by_time = "day",
+      geom = FALSE
+    )
+  )
+  testthat::expect_equal(nrow(result_mean), 1L)
+  testthat::expect_equal(result_mean$pm25_0, 15)
+  testthat::expect_s3_class(result_mean$time, "POSIXct")
+})
+
+testthat::test_that("download_geos mock download hash=FALSE", {
+  testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
+    download_run_method = function(...) list(success = 1, failed = 0),
+    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_geos(
+          date = "2019-09-09",
+          collection = "aqc_tavg_1hr_g1440x721_v1",
+          nasa_earth_data_token = "fake_token",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          hash = FALSE
+        )
+      )
+    )
+    testthat::expect_type(result, "list")
+    testthat::expect_equal(result$success, 1)
+  })
+})
+
+
+testthat::test_that("calculate_geos errors when deprecated .by is supplied", {
+  withr::local_package("terra")
+  from_rast <- terra::rast(nrows = 2, ncols = 2, vals = 5)
+  terra::ext(from_rast) <- c(-80, -78, 34, 36)
+  terra::crs(from_rast) <- "EPSG:4326"
+  names(from_rast) <- "pm25_850_20200101_000000"
+  locs_df <- data.frame(site_id = "A", lon = -79, lat = 35)
+
+  testthat::expect_error(
+    calculate_geos(
+      from = from_rast,
+      locs = locs_df,
+      locs_id = "site_id",
+      radius = 0,
+      .by = "day"
+    ),
+    regexp = "no longer supported"
+  )
+})
+
+################################################################################
+##### calculate_geos .by_time backward compatibility
+
+testthat::test_that("calculate_geos default without .by_time is backward-compatible", {
+  withr::local_package("terra")
+  from_rast <- terra::rast(nrows = 2, ncols = 2, vals = 5)
+  terra::ext(from_rast) <- c(-80, -78, 34, 36)
+  terra::crs(from_rast) <- "EPSG:4326"
+  names(from_rast) <- "pm25_850_20200101_000000"
+  locs_df <- data.frame(site_id = "A", lon = -79, lat = 35)
+  fake_extracted <- data.frame(
+    site_id = c("A", "A"),
+    time = as.POSIXlt(
+      c("2020-01-01 00:00:00", "2020-01-01 06:00:00"),
+      tz = "UTC"
+    ),
+    level = c("850", "850"),
+    pm25_0 = c(10.0, 20.0)
+  )
+  testthat::local_mocked_bindings(
+    calc_prepare_locs = function(from, locs, locs_id, radius, geom) {
+      sv <- terra::vect(locs_df, geom = c("lon", "lat"), crs = "EPSG:4326")
+      list(sv, data.frame(site_id = "A"))
+    },
+    calc_worker = function(...) fake_extracted,
+    .package = "amadeus"
+  )
+  # Default (no .by_time) returns all rows unchanged
+  result_default <- suppressMessages(
+    calculate_geos(
+      from = from_rast,
+      locs = locs_df,
+      locs_id = "site_id",
+      radius = 0,
+      geom = FALSE
+    )
+  )
+  testthat::expect_equal(nrow(result_default), 2L)
+})

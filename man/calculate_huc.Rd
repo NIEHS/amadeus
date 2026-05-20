@@ -4,7 +4,14 @@
 \alias{calculate_huc}
 \title{Calculate HUC covariates}
 \usage{
-calculate_huc(from, locs, locs_id = "site_id", geom = FALSE, ...)
+calculate_huc(
+  from,
+  locs,
+  locs_id = "site_id",
+  weights = NULL,
+  geom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{from}{SpatVector(1). Output from \code{process_huc()}.}
@@ -13,6 +20,10 @@ calculate_huc(from, locs, locs_id = "site_id", geom = FALSE, ...)
 
 \item{locs_id}{character(1). Column within \code{locations} CSV file
 containing identifier for each unique coordinate location.}
+
+\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
+path. Optional weights raster for weighted extraction. If \code{NULL}
+(default), unweighted extraction is performed.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The

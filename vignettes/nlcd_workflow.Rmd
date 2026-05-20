@@ -1,0 +1,102 @@
+---
+title: "MRLC National Land Cover Database (NLCD)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{MRLC National Land Cover Database (NLCD)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "`r Sys.Date()`"
+author: "Kyle Messier, with assistance from GitHub Copilot"
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ""
+)
+library(amadeus)
+library(sf)
+
+live_run <- local({
+  force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
+  on_ci <- nzchar(Sys.getenv("CI")) ||
+    nzchar(Sys.getenv("GITHUB_ACTIONS")) ||
+    identical(tolower(Sys.getenv("IN_PKGDOWN", "")), "true")
+  on_cran <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_")) ||
+    identical(tolower(Sys.getenv("NOT_CRAN", "")), "false")
+  force || !(on_ci || on_cran)
+})
+
+```
+
+This article demonstrates a compact workflow for NLCD land-cover products.
+
+This vignette runs its live workflow when rendered locally. The heavy download, processing, extraction, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
+
+
+## Available inputs and data availability
+
+- `download_data(dataset_name = "nlcd", ...)` accepts `product` values of `"Land Cover"`, `"Land Cover Change"`, `"Land Cover Confidence"`, `"Fractional Impervious Surface"`, `"Impervious Descriptor"`, and `"Spectral Change Day of Year"`.
+- NLCD is a nationwide U.S. product at 30 m resolution, with `year` values available from 1985 through 2024.
+- Downloads arrive as zipped MRLC raster bundles.
+- Interpretation depends on the product: land-cover-style layers are class/code rasters, fractional impervious surface is a continuous percent-style surface, and spectral change day of year encodes the timing of detected change.
+
+## Download representative requests
+
+```{r download, eval = live_run}
+directory_to_save <- file.path(tempdir(), "nlcd_workflow")
+download_data(
+  dataset_name = "nlcd",
+  product = "Land Cover",
+  year = 2021,
+  directory_to_save = directory_to_save,
+  acknowledgement = TRUE,
+  unzip = TRUE,
+  remove_zip = FALSE
+)
+
+```
+
+## Process one workflow-ready data product
+
+```{r process, eval = live_run}
+data_dir <- paste0(directory_to_save, "/data_files")
+
+processed_data <- process_covariates(
+  covariate = "nlcd",
+  path = data_dir,
+  year = 2021
+)
+```
+
+## Calculate covariates at points
+
+```{r calculate-points, eval = live_run}
+
+ example_points_terra <- terra::spatSample(
+   processed_data[[1]],
+   size = 25,
+   method = "regular",
+   as.points = TRUE,
+   na.rm = TRUE,
+   values = FALSE
+ )
+ example_points_sf <- sf::st_as_sf(example_points_terra)
+ example_points_sf$site_id <- paste0("site_", seq_len(nrow(example_points_sf)))
+
+ point_values <- calculate_covariates(
+   covariate = "nlcd",
+   from = processed_data,
+   locs = example_points_sf,
+   locs_id = "site_id",
+   mode = "terra",
+   radius = 1000,
+   geom = "sf",
+   drop = FALSE
+ )
+
+print(point_values, n = 25)
+```
+
+
+

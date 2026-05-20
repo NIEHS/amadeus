@@ -11,7 +11,8 @@ check_urls(urls = urls, size = NULL, method = NULL)
 
 \item{size}{number of observations to be sampled from \code{urls}}
 
-\item{method}{If set to \code{"SKIP"}, the HTTP status will not be checked and returned.}
+\item{method}{If set to \code{"SKIP"}, the HTTP status will not be checked and
+returned.}
 }
 \value{
 logical vector for URL status = 200

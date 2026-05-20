@@ -17,9 +17,10 @@
 #' @export
 process_conformity <-
   function(
-      locs = NULL,
-      check_time = FALSE,
-      locs_epsg = "EPSG:4326") {
+    locs = NULL,
+    check_time = FALSE,
+    locs_epsg = "EPSG:4326"
+  ) {
     keyword <- c("lon", "lat", "time")
     if (!check_time) {
       keyword <- keyword[-3]
@@ -60,11 +61,12 @@ process_conformity <-
 #' @export
 process_collection <-
   function(
-      path,
-      source,
-      collection = FALSE,
-      date = FALSE,
-      datetime = FALSE) {
+    path,
+    source,
+    collection = FALSE,
+    date = FALSE,
+    datetime = FALSE
+  ) {
     #### check for more than one true
     parameters <- c(collection, date, datetime)
     if (length(parameters[parameters == TRUE]) > 1) {
@@ -77,6 +79,24 @@ process_collection <-
     #### source names
     geos <- c("geos", "GEOS", "geos-cf", "GEOS-CF")
     merra2 <- c("merra", "merra2", "MERRA", "MERRA2")
+    #### handle GlobalFWI daily corrected MERRA2 files
+    if (source %in% merra2 && grepl("^FWI\\.", basename(path))) {
+      split_period <- unlist(
+        strsplit(
+          basename(path),
+          "\\."
+        )
+      )
+      if (collection == TRUE) {
+        return("fwi")
+      }
+      if (date == TRUE) {
+        return(split_period[length(split_period) - 1])
+      }
+      if (datetime == TRUE) {
+        return(split_period[length(split_period) - 1])
+      }
+    }
     #### string split point
     if (source %in% merra2) {
       code <- "MERRA2_400."
@@ -189,6 +209,8 @@ process_merra2_time <-
       step <- seq(from = 0030, to = 2330, by = 100)
     } else if (code == "tavg3") {
       step <- seq(from = 0130, to = 2330, by = 300)
+    } else if (collection == "fwi") {
+      step <- 0000
     }
     pad_l <- stringi::stri_pad(step, side = "left", width = 4, pad = 0)
     pad_r <- stringi::stri_pad(pad_l, side = "right", width = 6, pad = 0)
@@ -232,14 +254,18 @@ process_merra2_time <-
 #' @export
 process_gmted_codes <-
   function(
-      string,
-      statistic = FALSE,
-      resolution = FALSE,
-      invert = FALSE) {
+    string,
+    statistic = FALSE,
+    resolution = FALSE,
+    invert = FALSE
+  ) {
     statistics <- c(
-      "Breakline Emphasis", "Systematic Subsample",
-      "Median Statistic", "Minimum Statistic",
-      "Mean Statistic", "Maximum Statistic",
+      "Breakline Emphasis",
+      "Systematic Subsample",
+      "Median Statistic",
+      "Minimum Statistic",
+      "Mean Statistic",
+      "Maximum Statistic",
       "Standard Deviation Statistic"
     )
     statistic_codes <- c("be", "ds", "md", "mi", "mn", "mx", "sd")
@@ -271,16 +297,23 @@ process_gmted_codes <-
 #' @export
 process_sedac_codes <-
   function(
-      string,
-      invert = FALSE) {
+    string,
+    invert = FALSE
+  ) {
     resolution_namecodes <- cbind(
       c(
-        "60 minute", "30 second", "2.5 minute",
-        "15 minute", "30 minute"
+        "60 minute",
+        "30 second",
+        "2.5 minute",
+        "15 minute",
+        "30 minute"
       ),
       c(
-        "1_deg", "30_sec", "2pt5_min",
-        "15_min", "30_min"
+        "1_deg",
+        "30_sec",
+        "2pt5_min",
+        "15_min",
+        "30_min"
       )
     )
     if (invert == FALSE) {
@@ -306,8 +339,9 @@ process_sedac_codes <-
 #' @export
 process_locs_radius <-
   function(
-      locs,
-      radius) {
+    locs,
+    radius
+  ) {
     if (radius == 0) {
       return(locs)
     } else if (radius > 0) {
@@ -404,24 +438,46 @@ process_locs_vector <-
 #' @export
 process_gridmet_codes <-
   function(
-      string,
-      invert = FALSE) {
+    string,
+    invert = FALSE
+  ) {
     names <- c(
-      "Near-Surface Specific Humidity", "Mean Vapor Pressure Deficit",
-      "Precipitation", "Minimum Near-Surface Relative Humidity",
+      "Near-Surface Specific Humidity",
+      "Mean Vapor Pressure Deficit",
+      "Precipitation",
+      "Minimum Near-Surface Relative Humidity",
       "Maximum Near-Surface Relative Humidity",
       "Surface Downwelling Solar Radiation",
       "Minimum Near-Surface Air Temperature",
       "Maximum Near-Surface Air Temperature",
-      "Wind speed at 10 m", "Wind direction at 10 m",
-      "Palmer Drought Severity Index", "Reference grass evaportranspiration",
-      "Reference alfalfa evaportranspiration", "Energy Release Component",
-      "Burning Index", "100-hour dead fuel moisture",
+      "Wind speed at 10 m",
+      "Wind direction at 10 m",
+      "Palmer Drought Severity Index",
+      "Reference grass evaportranspiration",
+      "Reference alfalfa evaportranspiration",
+      "Energy Release Component",
+      "Burning Index",
+      "100-hour dead fuel moisture",
       "1000-hour dead fuel moisture"
     )
     codes <- c(
-      "sph", "vpd", "pr", "rmin", "rmax", "srad", "tmmn", "tmmx", "vs",
-      "th", "pdsi", "pet", "etr", "ERC", "BI", "FM100", "FM1000"
+      "sph",
+      "vpd",
+      "pr",
+      "rmin",
+      "rmax",
+      "srad",
+      "tmmn",
+      "tmmx",
+      "vs",
+      "th",
+      "pdsi",
+      "pet",
+      "etr",
+      "ERC",
+      "BI",
+      "FM100",
+      "FM1000"
     )
     names_codes <- cbind(tolower(names), codes)
     if (string == "all") {
@@ -447,19 +503,40 @@ process_gridmet_codes <-
 #' @export
 process_terraclimate_codes <-
   function(
-      string,
-      invert = FALSE) {
+    string,
+    invert = FALSE
+  ) {
     names <- c(
-      "Actual Evapotranspiration", "Climate Water Deficit",
-      "Potential evapotranspiration", "Precipitation", "Runoff",
-      "Soil Moisture", "Downward surface shortwave radiation",
-      "Snow water equivalent - at end of month", "Max Temperature",
-      "Min Temperature", "Vapor pressure", "Wind speed",
-      "Vapor Pressure Deficit", "Palmer Drought Severity Index"
+      "Actual Evapotranspiration",
+      "Climate Water Deficit",
+      "Potential evapotranspiration",
+      "Precipitation",
+      "Runoff",
+      "Soil Moisture",
+      "Downward surface shortwave radiation",
+      "Snow water equivalent - at end of month",
+      "Max Temperature",
+      "Min Temperature",
+      "Vapor pressure",
+      "Wind speed",
+      "Vapor Pressure Deficit",
+      "Palmer Drought Severity Index"
     )
     codes <- c(
-      "aet", "def", "pet", "ppt", "q", "soil", "srad", "swe", "tmax", "tmin",
-      "vap", "ws", "vpd", "PDSI"
+      "aet",
+      "def",
+      "pet",
+      "ppt",
+      "q",
+      "soil",
+      "srad",
+      "swe",
+      "tmax",
+      "tmin",
+      "vap",
+      "ws",
+      "vpd",
+      "PDSI"
     )
     names_codes <- cbind(tolower(names), codes)
     if (string == "all") {
@@ -486,8 +563,9 @@ process_terraclimate_codes <-
 #' @export
 process_variable_codes <-
   function(
-      variables,
-      source = c("gridmet", "terraclimate")) {
+    variables,
+    source = c("gridmet", "terraclimate")
+  ) {
     if (tolower(source) == "gridmet") {
       code_function <- process_gridmet_codes
     } else if (tolower(source) == "terraclimate") {
@@ -515,6 +593,430 @@ process_variable_codes <-
     }
   }
 
+# Internal TRI helper: read and normalize TRI csv column names
+tri_read_raw <- function(path = NULL) {
+  csvs_tri_from <-
+    list.files(path = path, pattern = "*.csv$", full.names = TRUE)
+  if (length(csvs_tri_from) < 1) {
+    stop("No TRI CSV files found in `path`.\n")
+  }
+  csvs_tri <- lapply(csvs_tri_from, read.csv)
+  dt_tri <- data.table::rbindlist(csvs_tri)
+  tri_cns <- colnames(dt_tri)
+  tri_cns <- sub(".*?\\.\\.", "", tri_cns)
+  tri_cns <- sub("^[^A-Za-z]*", "", tri_cns)
+  tri_cns <- gsub("\\.", "_", tri_cns)
+  dt_tri <- stats::setNames(dt_tri, tri_cns)
+  dt_tri <- as.data.frame(dt_tri, stringsAsFactors = FALSE)
+  return(dt_tri)
+}
+
+#' Get TRI lookup information for chemicals or industries
+#' @description
+#' Returns a lookup table from local TRI files. By default it returns chemical
+#' information (`TRI_CHEMICAL_COMPOUND_ID`, `CHEMICAL`, `CASN`). Set
+#' `type = "industries"` to return industry sector information
+#' (`INDUSTRY_SECTOR_CODE`, `INDUSTRY_SECTOR`).
+#' @param path character(1). Path to the directory with TRI CSV files
+#'   (from `download_tri`).
+#' @param type character(1). Lookup table to return. One of `"chemicals"`
+#'   (default) or `"industries"`.
+#' @param year `NULL` or integer(1). Optional single year filter. If `NULL`
+#'   (default), all years in `path` are included.
+#' @param include_na logical(1). If `FALSE` (default), rows where lookup fields
+#'   are all missing are removed.
+#' @param ... Placeholders.
+#' @return a `data.frame` containing the requested TRI lookup table.
+#' @author Kyle Messier
+#' @examples
+#' \dontrun{
+#' get_tri_info(path = "./data")
+#' get_tri_info(path = "./data", type = "industries")
+#' get_tri_info(path = "./data", year = 2020)
+#' }
+#' @export
+get_tri_info <- function(
+  path = NULL,
+  type = c("chemicals", "industries"),
+  year = NULL,
+  include_na = FALSE,
+  ...
+) {
+  type <- match.arg(type)
+  dt_tri <- tri_read_raw(path = path)
+  if (!is.null(year)) {
+    if (!is.numeric(year) || length(year) != 1 || is.na(year)) {
+      stop("`year` must be NULL or a single numeric value.\n")
+    }
+    if (!("YEAR" %in% names(dt_tri))) {
+      stop("TRI input is missing `YEAR` column needed for filtering.\n")
+    }
+    dt_tri <- dt_tri[dt_tri$YEAR == year, , drop = FALSE]
+  }
+
+  if (type == "chemicals") {
+    required_cols <- c("TRI_CHEMICAL_COMPOUND_ID", "CHEMICAL")
+    missing_cols <- setdiff(required_cols, names(dt_tri))
+    if (length(missing_cols) > 0) {
+      stop(
+        "TRI input is missing required chemical lookup columns: ",
+        paste(missing_cols, collapse = ", "),
+        "\n"
+      )
+    }
+    cas_col <- if ("CAS" %in% names(dt_tri)) {
+      "CAS"
+    } else if ("CAS_" %in% names(dt_tri)) {
+      "CAS_"
+    } else {
+      NULL
+    }
+    cas_vals <- if (is.null(cas_col)) {
+      rep(NA_character_, nrow(dt_tri))
+    } else {
+      as.character(dt_tri[[cas_col]])
+    }
+    out <- data.frame(
+      TRI_CHEMICAL_COMPOUND_ID = as.character(dt_tri$TRI_CHEMICAL_COMPOUND_ID),
+      CHEMICAL = as.character(dt_tri$CHEMICAL),
+      CASN = cas_vals,
+      stringsAsFactors = FALSE
+    )
+    if (!include_na) {
+      out <- out[
+        !(is.na(out$TRI_CHEMICAL_COMPOUND_ID) &
+            is.na(out$CHEMICAL) &
+            is.na(out$CASN)),
+        ,
+        drop = FALSE
+      ]
+    }
+    out <- unique(out)
+    out <- out[
+      order(out$CHEMICAL, out$TRI_CHEMICAL_COMPOUND_ID, out$CASN),
+      ,
+      drop = FALSE
+    ]
+  } else {
+    required_cols <- c("INDUSTRY_SECTOR_CODE", "INDUSTRY_SECTOR")
+    missing_cols <- setdiff(required_cols, names(dt_tri))
+    if (length(missing_cols) > 0) {
+      stop(
+        "TRI input is missing required industry lookup columns: ",
+        paste(missing_cols, collapse = ", "),
+        "\n"
+      )
+    }
+    out <- data.frame(
+      INDUSTRY_SECTOR_CODE = as.character(dt_tri$INDUSTRY_SECTOR_CODE),
+      INDUSTRY_SECTOR = as.character(dt_tri$INDUSTRY_SECTOR),
+      stringsAsFactors = FALSE
+    )
+    if (!include_na) {
+      out <- out[
+        !(is.na(out$INDUSTRY_SECTOR_CODE) &
+            is.na(out$INDUSTRY_SECTOR)),
+        ,
+        drop = FALSE
+      ]
+    }
+    out <- unique(out)
+    out <- out[
+      order(out$INDUSTRY_SECTOR_CODE, out$INDUSTRY_SECTOR),
+      ,
+      drop = FALSE
+    ]
+  }
+
+  rownames(out) <- NULL
+  return(out)
+}
+
+# Internal helper: resolve and filter metadata-inspection file paths
+info_resolve_paths <- function(
+  path = NULL,
+  pattern = NULL,
+  source_name = "files"
+) {
+  if (is.null(path) || !is.character(path) || length(path) < 1 || anyNA(path)) {
+    stop("`path` must be a non-empty character vector.\n")
+  }
+  if (!is.character(pattern) || length(pattern) != 1L || !nzchar(pattern)) {
+    stop("`pattern` must be a single non-empty character string.\n")
+  }
+
+  path_entries <- unique(path)
+  expanded_paths <- unlist(
+    lapply(path_entries, function(p) {
+      if (dir.exists(p)) {
+        list.files(
+          path = p,
+          recursive = TRUE,
+          full.names = TRUE
+        )
+      } else {
+        p
+      }
+    }),
+    use.names = FALSE
+  )
+  expanded_paths <- unique(expanded_paths[file.exists(expanded_paths)])
+  matched <- grep(pattern, expanded_paths, ignore.case = TRUE, value = TRUE)
+  matched <- unique(matched)
+  if (length(matched) == 0L) {
+    stop(sprintf("No %s files were found in `path`.\n", source_name))
+  }
+  matched
+}
+
+# Internal helper: normalize variable selectors from raster layer names
+info_normalize_layer_variables <- function(layer_names) {
+  vars <- as.character(layer_names)
+  vars <- trimws(vars)
+  vars <- vars[nzchar(vars)]
+  vars <- sub("_[0-9]+$", "", vars)
+  vars <- sub("_lev=.*$", "", vars)
+  sort(unique(vars))
+}
+
+#' Get GEOS variable lookup information
+#' @description
+#' Returns a lookup table of available GEOS collection and variable selectors
+#' from locally downloaded GEOS-CF netCDF files. This helper inspects layer
+#' metadata only and does not read raster values into memory.
+#' @param path character(1+) Path(s) to GEOS file(s) and/or directory(ies)
+#'   containing GEOS-CF `.nc4` files.
+#' @param include_file logical(1). If `TRUE`, include a `file` column showing
+#'   the source file for each collection-variable row. Default `FALSE`.
+#' @param ... Placeholders.
+#' @return a `data.frame` with GEOS collection and variable selectors.
+#' @author Kyle Messier
+#' @examples
+#' \dontrun{
+#' get_geos_info(path = "./data/geos")
+#' get_geos_info(path = "./data/geos", include_file = TRUE)
+#' }
+#' @importFrom terra rast
+#' @export
+get_geos_info <- function(
+  path = NULL,
+  include_file = FALSE,
+  ...
+) {
+  if (
+    !is.logical(include_file) ||
+      length(include_file) != 1L ||
+      is.na(include_file)
+  ) {
+    stop("`include_file` must be a single logical value (TRUE/FALSE).\n")
+  }
+  files <- info_resolve_paths(
+    path = path,
+    pattern = "GEOS-CF\\.v01\\.rpl.*\\.nc4$",
+    source_name = "GEOS-CF .nc4"
+  )
+
+  out_rows <- lapply(files, function(f) {
+    data_raw <- terra::rast(f)
+    vars <- info_normalize_layer_variables(names(data_raw))
+    collection <- unique(amadeus::process_collection(
+      f,
+      source = "geos",
+      collection = TRUE
+    ))
+    if (length(vars) == 0L || length(collection) == 0L) {
+      return(NULL)
+    }
+    row <- data.frame(
+      collection = rep(collection[1], length(vars)),
+      variable = vars,
+      file = rep(f, length(vars)),
+      stringsAsFactors = FALSE
+    )
+    row
+  })
+  out <- data.table::rbindlist(out_rows, fill = TRUE)
+  out <- as.data.frame(out, stringsAsFactors = FALSE)
+  if (nrow(out) == 0L) {
+    stop("No GEOS collection-variable metadata could be derived from `path`.\n")
+  }
+  if (!isTRUE(include_file)) {
+    out <- unique(out[, c("collection", "variable"), drop = FALSE])
+    out <- out[order(out$collection, out$variable), , drop = FALSE]
+  } else {
+    out <- unique(out[, c("collection", "variable", "file"), drop = FALSE])
+    out <- out[order(out$collection, out$variable, out$file), , drop = FALSE]
+  }
+  rownames(out) <- NULL
+  out
+}
+
+#' Get MERRA2 variable lookup information
+#' @description
+#' Returns a lookup table of available MERRA2 collection and variable selectors
+#' from locally downloaded MERRA2 netCDF files. This helper inspects layer
+#' metadata only and does not read raster values into memory.
+#' @param path character(1+) Path(s) to MERRA2 file(s) and/or directory(ies)
+#'   containing MERRA2 `.nc4` files (and optional FWI `.nc` files).
+#' @param include_file logical(1). If `TRUE`, include a `file` column showing
+#'   the source file for each collection-variable row. Default `FALSE`.
+#' @param ... Placeholders.
+#' @return a `data.frame` with MERRA2 collection and variable selectors.
+#' @author Kyle Messier
+#' @examples
+#' \dontrun{
+#' get_merra2_info(path = "./data/merra2")
+#' get_merra2_info(path = "./data/merra2", include_file = TRUE)
+#' }
+#' @importFrom terra rast
+#' @export
+get_merra2_info <- function(
+  path = NULL,
+  include_file = FALSE,
+  ...
+) {
+  if (
+    !is.logical(include_file) ||
+      length(include_file) != 1L ||
+      is.na(include_file)
+  ) {
+    stop("`include_file` must be a single logical value (TRUE/FALSE).\n")
+  }
+  files <- info_resolve_paths(
+    path = path,
+    pattern = "(MERRA2_400\\..*\\.nc4$|FWI\\..*\\.nc$)",
+    source_name = "MERRA2 netCDF"
+  )
+
+  out_rows <- lapply(files, function(f) {
+    data_raw <- terra::rast(f)
+    collection <- unique(amadeus::process_collection(
+      f,
+      source = "merra2",
+      collection = TRUE
+    ))
+    vars <- info_normalize_layer_variables(names(data_raw))
+    if (length(collection) == 1L && collection == "fwi") {
+      vars <- sub("^MERRA2\\.CORRECTED_", "", vars)
+    }
+    vars <- sort(unique(vars[nzchar(vars)]))
+    if (length(vars) == 0L || length(collection) == 0L) {
+      return(NULL)
+    }
+    data.frame(
+      collection = rep(collection[1], length(vars)),
+      variable = vars,
+      file = rep(f, length(vars)),
+      stringsAsFactors = FALSE
+    )
+  })
+  out <- data.table::rbindlist(out_rows, fill = TRUE)
+  out <- as.data.frame(out, stringsAsFactors = FALSE)
+  if (nrow(out) == 0L) {
+    stop(
+      "No MERRA2 collection-variable metadata could be derived from `path`.\n"
+    )
+  }
+  if (!isTRUE(include_file)) {
+    out <- unique(out[, c("collection", "variable"), drop = FALSE])
+    out <- out[order(out$collection, out$variable), , drop = FALSE]
+  } else {
+    out <- unique(out[, c("collection", "variable", "file"), drop = FALSE])
+    out <- out[order(out$collection, out$variable, out$file), , drop = FALSE]
+  }
+  rownames(out) <- NULL
+  out
+}
+
+# Internal helper: derive MODIS subdataset labels without loading raster values
+info_modis_subdatasets <- function(path = NULL) {
+  sds_desc <- try(terra::describe(path, sds = TRUE), silent = TRUE)
+  if (!inherits(sds_desc, "try-error") && nrow(sds_desc) > 0) {
+    candidate_col <- if ("var" %in% names(sds_desc)) "var" else "name"
+    if (!is.null(candidate_col) && candidate_col %in% names(sds_desc)) {
+      sds <- trimws(as.character(sds_desc[[candidate_col]]))
+      sds <- sds[!is.na(sds) & nzchar(sds)]
+      if (length(sds) > 0L) {
+        return(sort(unique(sds)))
+      }
+    }
+  }
+  sds_read <- try(terra::rast(path, raw = TRUE), silent = TRUE)
+  if (inherits(sds_read, "try-error")) {
+    return(character(0))
+  }
+  sds <- trimws(as.character(names(sds_read)))
+  sds <- sds[!is.na(sds) & nzchar(sds)]
+  sort(unique(sds))
+}
+
+#' Get MODIS product subdataset lookup information
+#' @description
+#' Returns a lookup table of available MODIS product and subdataset selectors
+#' from locally downloaded MODIS/VIIRS-style HDF/H5 files. This helper uses
+#' metadata inspection (`terra::describe(..., sds = TRUE)` and layer names) and
+#' does not read raster values into memory.
+#' @param path character(1+) Path(s) to MODIS file(s) and/or directory(ies)
+#'   containing `.hdf`/`.h5` files.
+#' @param include_file logical(1). If `TRUE`, include a `file` column showing
+#'   the source file for each product-subdataset row. Default `FALSE`.
+#' @param ... Placeholders.
+#' @return a `data.frame` with MODIS product and subdataset selectors.
+#' @author Kyle Messier
+#' @examples
+#' \dontrun{
+#' get_modis_info(path = "./data/modis")
+#' get_modis_info(path = "./data/modis", include_file = TRUE)
+#' }
+#' @importFrom terra describe
+#' @importFrom terra rast
+#' @export
+get_modis_info <- function(
+  path = NULL,
+  include_file = FALSE,
+  ...
+) {
+  if (
+    !is.logical(include_file) ||
+      length(include_file) != 1L ||
+      is.na(include_file)
+  ) {
+    stop("`include_file` must be a single logical value (TRUE/FALSE).\n")
+  }
+  files <- info_resolve_paths(
+    path = path,
+    pattern = "\\.(hdf|h5)$",
+    source_name = "MODIS HDF/H5"
+  )
+  out_rows <- lapply(files, function(f) {
+    sds <- info_modis_subdatasets(path = f)
+    product <- sub("\\..*$", "", basename(f))
+    if (length(sds) == 0L || !nzchar(product)) {
+      return(NULL)
+    }
+    data.frame(
+      product = rep(product, length(sds)),
+      subdataset = sds,
+      file = rep(f, length(sds)),
+      stringsAsFactors = FALSE
+    )
+  })
+  out <- data.table::rbindlist(out_rows, fill = TRUE)
+  out <- as.data.frame(out, stringsAsFactors = FALSE)
+  if (nrow(out) == 0L) {
+    stop("No MODIS product-subdataset metadata could be derived from `path`.\n")
+  }
+  if (!isTRUE(include_file)) {
+    out <- unique(out[, c("product", "subdataset"), drop = FALSE])
+    out <- out[order(out$product, out$subdataset), , drop = FALSE]
+  } else {
+    out <- unique(out[, c("product", "subdataset", "file"), drop = FALSE])
+    out <- out[order(out$product, out$subdataset, out$file), , drop = FALSE]
+  }
+  rownames(out) <- NULL
+  out
+}
+
 
 #' Check date format
 #' @description
@@ -536,9 +1038,42 @@ is_date_proper <- function(
   argnames <- mget(ls())
   datestr <- try(strftime(instr, format = format))
   if (inherits(datestr, "try-error")) {
-    stop(sprintf("%s does not conform to the required format
-         \"YYYY-MM-DD\".\n", names(argnames)[2]))
+    stop(sprintf(
+      "%s does not conform to the required format
+         \"YYYY-MM-DD\".\n",
+      names(argnames)[2]
+    ))
   }
+}
+
+#' Parse netCDF day codes from layer names
+#' @description Parse day-code suffixes from netCDF layer names such as
+#' \code{"precipitation_amount_day=43101"} and convert to \code{Date}.
+#' @param layer_names character. Layer names.
+#' @param source character(1). Source label used in error messages.
+#' @param origin character(1). Date origin for numeric day codes.
+#' @return Date vector.
+#' @keywords internal auxiliary
+#' @export
+process_parse_ncdf_day_codes <- function(
+  layer_names,
+  source = "gridmet",
+  origin = "1900-01-01"
+) {
+  stopifnot(is.character(layer_names))
+  day_codes <- sub(".*=([0-9]+)$", "\\1", layer_names)
+  valid_code <- grepl("^[0-9]+$", day_codes)
+  if (!all(valid_code)) {
+    bad_layers <- paste(layer_names[!valid_code], collapse = ", ")
+    stop(
+      sprintf(
+        "Unable to parse %s layer time from: %s.\n",
+        source,
+        bad_layers
+      )
+    )
+  }
+  as.Date(as.numeric(day_codes), origin = origin)
 }
 
 
