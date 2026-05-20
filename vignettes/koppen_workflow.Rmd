@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 )
 library(amadeus)
 library(sf)
+library(terra)
+library(ggplot2)
 
 live_run <- local({
   force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")

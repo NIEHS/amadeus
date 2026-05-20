@@ -89,7 +89,7 @@ processed_data <- process_covariates(
   extent = terra::ext(-114.9, -102.0, 31.3, 41.1)
 )
 
-plot(processed_data, main = "TerraClimate ppt for Jan-Feb 2019")
+terra::plot(processed_data, main = "TerraClimate ppt for Jan-Feb 2019")
 ```
 
 ## Calculate covariates at points

@@ -828,7 +828,7 @@ Here we demonstrate with EVI a monthly temporal aggregation by polygon. For MODI
 
 #### Vegetation indices: `MOD13*` or `MYD13*`
 
-```{r vegetation-template, eval = FALSE}
+```{r vegetation-template, eval = live_run}
 vegetation_dir <- file.path(tempdir(), "modis_workflow", "vegetation")
 vegetation_window <- c("2019-01-01", "2019-04-30")
 download_modis(
@@ -881,8 +881,8 @@ vegetation_daily_raster <- process_modis_daily(
   subdataset = "(EVI)"
 )
 
-plot(vegetation_raster, main = "MOD13A2 EVI averaged over Jan-Apr 2019")
-plot(vegetation_daily_raster)
+terra::plot(vegetation_raster, main = "MOD13A2 EVI averaged over Jan-Apr 2019")
+terra::plot(vegetation_daily_raster)
 
 ```
 
@@ -892,7 +892,7 @@ This same averaging pattern applies to `MOD13A1`, `MYD13A1`, and `MYD13A2` when 
 
 When using fire-grid products with the `FireMask` layer, the raw values are typically interpreted as follows.
 
-```{r fire-mask-reference, echo = FALSE, results = "asis"}
+```{r fire-mask-reference, echo = live_run, results = "asis"}
 fire_mask_reference <- data.frame(
   raw_value = 0:9,
   meaning = c(
@@ -930,7 +930,7 @@ knitr::kable(
 
 Given the typical interpretation of the `FireMask` layer, users often want to create a binary fire mask where 1 indicates a fire detection and 0 indicates no fire. The exact values to include in the binary fire mask depend on the confidence level you want to include. For example, you might choose to include only high-confidence fires (raw value 9) or to include both nominal and high-confidence fires (raw values 8 and 9). Low-confidence fires (raw value 7) can be included for a more inclusive mask, but they may also include more false positives. To create the binary fire mask from the process or calculate amadeus functions, we simply add a scale argument to recode the raw values to 1s and 0s based on the confidence levels we want to include. For example, if we want to include both nominal and high-confidence fires, we can use `scale = " %in% c(8, 9)"` to recode raw values 8 and 9 to 1 and all other values to 0.
 
-```{r fire-grid-template, eval = FALSE}
+```{r fire-grid-template, eval = live_run}
 fire_grid_dir <- file.path(tempdir(), "modis_workflow", "fire_grid")
 fire_grid_window <- c("2019-01-01", "2019-04-30")
 download_data(
@@ -984,9 +984,9 @@ terra::plot(fire_grid_raster, main = "MOD14A1 processed raster")
 
 MAIAC MCD19A2 provides information on daily atmospheric properties, of which the most helpful are likely aerosol optical depth and smoke plume height. 
 
-```{r maiac-template, eval = FALSE}
+```{r maiac-template, eval = live_run}
 maiac_dir <- file.path(tempdir(), "modis_workflow", "maiac")
-MAIAC_grid_window <- c("2019-05-01", "2019-06-30")
+MAIAC_grid_window <- c("2019-05-01", "2019-05-30")
 maiac_extent <- c(-124.5, 32.5, -114.0, 42.0) # California
 download_data(
   dataset_name = "modis",
@@ -1041,7 +1041,7 @@ terra::plot(maiac_PH, main = "MCD19A2 Plume Injection Height processed raster")
 
 ### Nighttime lights: `VNP46A2`
 
-```{r blackmarble-template, eval = FALSE}
+```{r blackmarble-template, eval = live_run}
 blackmarble_dir <- file.path(tempdir(), "modis_workflow", "blackmarble")
 download_data(
   dataset_name = "modis",

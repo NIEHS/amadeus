@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 )
 library(amadeus)
 library(sf)
+library(ggplot2)
 
 live_run <- local({
   force <- tolower(Sys.getenv("AMADEUS_RUN_VIGNETTES", "")) %in% c("1", "true", "yes")
@@ -127,6 +128,7 @@ ggplot() +
 processed_chems <- process_covariates(
   covariate = "tri",
   path = directory_to_save,
+  chemical = c("Polychlorinated biphenyls", "Vinyl Chloride", "Tetrachloroethylene"),
   year = 2023,
   variables = "ON-SITE RELEASE TOTAL"
 )
