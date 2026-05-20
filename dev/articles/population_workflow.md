@@ -61,7 +61,7 @@ processed_data <- process_covariates(
     full.names = TRUE
   )[1]
 )
-plot(log10(processed_data))
+terra::plot(log10(processed_data))
 ```
 
 ## Calculate covariates at points

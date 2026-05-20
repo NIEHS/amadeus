@@ -411,8 +411,8 @@ vegetation_daily_raster <- process_modis_daily(
   subdataset = "(EVI)"
 )
 
-plot(vegetation_raster, main = "MOD13A2 EVI averaged over Jan-Apr 2019")
-plot(vegetation_daily_raster)
+terra::plot(vegetation_raster, main = "MOD13A2 EVI averaged over Jan-Apr 2019")
+terra::plot(vegetation_daily_raster)
 ```
 
 This same averaging pattern applies to `MOD13A1`, `MYD13A1`, and
@@ -511,7 +511,7 @@ height.
 ``` r
 
 maiac_dir <- file.path(tempdir(), "modis_workflow", "maiac")
-MAIAC_grid_window <- c("2019-05-01", "2019-06-30")
+MAIAC_grid_window <- c("2019-05-01", "2019-05-30")
 maiac_extent <- c(-124.5, 32.5, -114.0, 42.0) # California
 download_data(
   dataset_name = "modis",

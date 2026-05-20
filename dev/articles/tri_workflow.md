@@ -120,6 +120,7 @@ ggplot() +
 processed_chems <- process_covariates(
   covariate = "tri",
   path = directory_to_save,
+  chemical = c("Polychlorinated biphenyls", "Vinyl Chloride", "Tetrachloroethylene"),
   year = 2023,
   variables = "ON-SITE RELEASE TOTAL"
 )
