@@ -25,7 +25,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/NIEHS/amadeus/blob/migrate/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/NIEHS/amadeus/blob/main/DESCRIPTION)
 
 Manware M, Song I, Marques E, Alifa Kassien M, Messier K (2026).
 *amadeus: Accessing and Analyzing Large-Scale Environmental Data*. R
