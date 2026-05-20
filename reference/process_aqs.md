@@ -72,7 +72,10 @@ a SpatVector, sf, or data.table object depending on the `return_format`
 Choose `date` and `mode` values with caution. The function may return a
 massive data.table depending on the time range, resulting in a long
 processing time or even a crash if data is too large for your computing
-environment to process.
+environment to process. AQS data are generally intended for use as
+dependent variables, so `process_aqs()` does not have a companion route
+in
+[`calculate_covariates()`](https://niehs.github.io/amadeus/reference/calculate_covariates.md).
 
 ## See also
 
@@ -90,7 +93,7 @@ if (FALSE) { # \dontrun{
 aqs <- process_aqs(
   path = "./data/aqs_daily_example.csv",
   date = c("2022-12-01", "2023-01-31"),
-  mode = "full",
+  mode = "date-location",
   return_format = "terra"
 )
 } # }

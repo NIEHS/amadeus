@@ -13,6 +13,8 @@ calculate_nlcd(
   locs_id = "site_id",
   mode = c("exact", "terra"),
   radius = 1000,
+  drop = FALSE,
+  weights = NULL,
   max_cells = 5e+07,
   geom = FALSE,
   ...
@@ -45,6 +47,19 @@ calculate_nlcd(
 - radius:
 
   numeric (non-negative) giving the radius of buffer around points.
+
+- drop:
+
+  logical(1). Default `FALSE`. For buffered outputs (`radius > 0`),
+  retain NLCD class columns even when all values are 0 (`drop = FALSE`)
+  or remove class columns that are all 0 across all locations
+  (`drop = TRUE`).
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
 
 - max_cells:
 

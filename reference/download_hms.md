@@ -1,8 +1,8 @@
 # Download wildfire smoke data
 
 The `download_hms()` function accesses and downloads wildfire smoke
-plume coverage data from [NOAA's Hazard Mapping System Fire and Smoke
-Product](https://www.ospo.noaa.gov/products/land/hms.html#0).
+plume coverage data from NOAA's Hazard Mapping System Fire and Smoke
+Product.
 
 ## Usage
 
@@ -12,11 +12,14 @@ download_hms(
   date = c("2018-01-01", "2018-01-01"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 )
 ```
 
@@ -28,63 +31,55 @@ download_hms(
 
 - date:
 
-  character(1 or 2). length of 10. Date or start/end dates for
-  downloading data. Format "YYYY-MM-DD" (ex. January 1, 2018 =
-  `"2018-01-01"`). NOAA HMS data is available from August 5, 2005
-  through present day. Data is unavailable for August 10, 2005.
+  character(1 or 2). Date range "YYYY-MM-DD" format
 
 - directory_to_save:
 
-  character(1). Directory to save data. If `data_format = "Shapefile"`,
-  two sub-directories will be created for the downloaded zip files
-  ("/zip_files") and the unzipped shapefiles ("/data_files"). If
-  `data_format = "KML"`, a single sub-directory ("/data_files") will be
-  created.
+  character(1). Directory to save data.
 
 - acknowledgement:
 
-  logical(1). By setting `TRUE` the user acknowledges that the data
-  downloaded using this function may be very large and use lots of
-  machine storage and memory.
+  logical(1). Must be TRUE to proceed.
 
 - download:
 
-  logical(1). `FALSE` will generate a \*.txt file containing all
-  download commands. By setting `TRUE` the function will download all of
-  the requested data files.
+  logical(1). DEPRECATED. Downloads happen automatically.
 
 - remove_command:
 
-  logical(1). Remove (`TRUE`) or keep (`FALSE`) the text file containing
-  download commands.
+  logical(1). Deprecated, ignored.
 
 - unzip:
 
-  logical(1). Unzip zip files. Default is `TRUE`. (Ignored if
-  `data_format = "KML"`.)
+  logical(1). Unzip zip files (default TRUE).
 
 - remove_zip:
 
-  logical(1). Remove zip files from directory_to_download. Default is
-  `FALSE`. (Ignored if `data_format = "KML"`.)
+  logical(1). Remove zip files after unzipping (default FALSE).
+
+- show_progress:
+
+  logical(1). Show download progress (default TRUE)
 
 - hash:
 
-  logical(1). By setting `TRUE` the function will return an
-  [`rlang::hash_file()`](https://rlang.r-lib.org/reference/hash.html)
-  hash character corresponding to the downloaded files. Default is
-  `FALSE`.
+  logical(1). Return hash of downloaded files (default FALSE)
+
+- max_tries:
+
+  integer(1). Maximum retry attempts (default 20)
+
+- rate_limit:
+
+  numeric(1). Minimum seconds between requests (default 2)
 
 ## Value
 
-- For `hash = FALSE`, NULL
+invisible list with download results; or hash character if hash=TRUE
 
-- For `hash = TRUE`, an
-  [`rlang::hash_file`](https://rlang.r-lib.org/reference/hash.html)
-  character.
+## Note
 
-- Zip and/or data files will be downloaded and stored in respective
-  sub-directories within `directory_to_save`.
+HMS data does not require authentication.
 
 ## References
 
@@ -104,10 +99,7 @@ download_hms(
   data_format = "Shapefile",
   date = "2024-01-01",
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE,
-  unzip = FALSE
+  acknowledgement = TRUE
 )
 } # }
 ```

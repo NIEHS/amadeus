@@ -1,4 +1,9 @@
-# Run download commands
+# Legacy download_run function for backwards compatibility
+
+**DEPRECATED**: This function is maintained for backwards compatibility.
+New code should use
+[`download_run_method()`](https://niehs.github.io/amadeus/reference/download_run_method.md)
+directly.
 
 Execute or skip the commands listed in the ...wget/curl_commands.txt
 file produced by one of the data download functions.
@@ -21,8 +26,7 @@ download_run(download = FALSE, commands_txt = NULL, remove = FALSE)
 
 - remove:
 
-  logical(1). Remove (`TRUE`) or keep (`FALSE`) command. Passed to
-  `download_remove_commands`.
+  logical(1). Remove (`TRUE`) or keep (`FALSE`) command.
 
 ## Value
 

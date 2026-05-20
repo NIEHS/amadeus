@@ -12,10 +12,13 @@ download_huc(
   type = c("Seamless", "OceanCatchment"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = FALSE,
-  hash = FALSE
+  hash = FALSE,
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2
 )
 ```
 
@@ -55,7 +58,7 @@ download_huc(
 - unzip:
 
   logical(1). Unzip the downloaded compressed files. Default is `FALSE`.
-  Not working for this function since HUC data is in 7z format.
+  Supports ".7z" extraction via archive.
 
 - hash:
 
@@ -63,6 +66,18 @@ download_huc(
   [`rlang::hash_file()`](https://rlang.r-lib.org/reference/hash.html)
   hash character corresponding to the downloaded files. Default is
   `FALSE`.
+
+- show_progress:
+
+  logical(1). Show download progress. Default is `TRUE`.
+
+- max_tries:
+
+  integer(1). Maximum download retry attempts. Default is `20`.
+
+- rate_limit:
+
+  numeric(1). Minimum seconds between requests. Default is `2`.
 
 ## Value
 

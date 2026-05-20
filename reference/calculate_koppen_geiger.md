@@ -1,9 +1,9 @@
 # Calculate climate classification covariates
 
-Extract climate classification values at point locations. Returns a
-`data.frame` object containing `locs_id` and binary (0 = point not in
-climate region; 1 = point in climate region) variables for each climate
-classification region.
+Extract Koppen-Geiger climate classes at point or buffered locations.
+Returns a `data.frame` with `locs_id`, a `description` column, and
+either binary indicators (`frac = FALSE`) or fractional overlap values
+(`frac = TRUE`) for climate groups A-E.
 
 ## Usage
 
@@ -12,7 +12,10 @@ calculate_koppen_geiger(
   from = NULL,
   locs = NULL,
   locs_id = "site_id",
+  weights = NULL,
   geom = FALSE,
+  frac = FALSE,
+  radius = 0,
   ...
 )
 ```
@@ -21,7 +24,7 @@ calculate_koppen_geiger(
 
 - from:
 
-  SpatVector(1). Output of
+  SpatRaster(1). Output of
   [`process_koppen_geiger()`](https://niehs.github.io/amadeus/reference/process_koppen_geiger.md).
 
 - locs:
@@ -33,11 +36,28 @@ calculate_koppen_geiger(
 
   character(1). Name of unique identifier.
 
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
+
 - geom:
 
   FALSE/"sf"/"terra".. Should the function return with geometry? Default
   is `FALSE`, options with geometry are "sf" or "terra". The coordinate
   reference system of the `sf` or `SpatVector` is that of `from.`
+
+- frac:
+
+  logical(1). Default `FALSE`. If `FALSE`, return binary 0/1 indicators
+  by climate group. If `TRUE`, return fractional overlap in the
+  extraction footprint.
+
+- radius:
+
+  numeric(1). Circular buffer size (meters) around point locations. Use
+  `0` (default) for exact point extraction.
 
 - ...:
 
@@ -45,7 +65,9 @@ calculate_koppen_geiger(
 
 ## Value
 
-a data.frame or SpatVector object
+a data.frame or SpatVector object with climate columns named like
+`DUM_CLRGA_00000` (`frac = FALSE`) or `FRC_CLRGA_100000` (`frac = TRUE`)
+where the suffix reflects the extraction radius.
 
 ## Note
 

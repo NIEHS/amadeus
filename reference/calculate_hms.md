@@ -1,15 +1,24 @@
 # Calculate wildfire smoke covariates
 
-Extract wildfire smoke plume values at point locations. Returns a
-`data.frame` object containing `locs_id`, date, and binary variable for
-wildfire smoke plume density inherited from `from` (0 = point not
-covered by wildfire smoke plume; 1 = point covered by wildfire smoke
-plume).
+Extract wildfire smoke plume values at point or buffered locations.
+Returns a `data.frame` object containing `locs_id`, date, and either
+binary indicators (`frac = FALSE`) or fractional overlap values
+(`frac = TRUE`) for wildfire smoke plume density inherited from `from`.
 
 ## Usage
 
 ``` r
-calculate_hms(from, locs, locs_id = NULL, radius = 0, geom = FALSE, ...)
+calculate_hms(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  weights = NULL,
+  .by_time = NULL,
+  frac = FALSE,
+  geom = FALSE,
+  ...
+)
 ```
 
 ## Arguments
@@ -33,6 +42,24 @@ calculate_hms(from, locs, locs_id = NULL, radius = 0, geom = FALSE, ...)
   integer(1). Circular buffer distance around site locations. (Default =
   0).
 
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
+
+- .by_time:
+
+  NULL or character(1). Optional time grouping key used when `.by_time`
+  is provided. When supplied, HMS indicators are summarized by `sum`
+  (smoke-day counts) for `frac = FALSE`, or `mean` for `frac = TRUE`.
+
+- frac:
+
+  logical(1). Default `FALSE`. If `FALSE`, return binary 0/1 smoke
+  indicators by density class. If `TRUE`, return fractional overlap by
+  density class.
+
 - geom:
 
   FALSE/"sf"/"terra".. Should the function return with geometry? Default
@@ -45,7 +72,9 @@ calculate_hms(from, locs, locs_id = NULL, radius = 0, geom = FALSE, ...)
 
 ## Value
 
-a data.frame or SpatVector object
+a data.frame or SpatVector object. When `.by_time` is provided, rows are
+aggregated using
+[`calc_summarize_by()`](https://niehs.github.io/amadeus/reference/calc_summarize_by.md).
 
 ## See also
 

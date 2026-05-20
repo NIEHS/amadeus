@@ -6,7 +6,14 @@ containing `locs_id` and HUC IDs.
 ## Usage
 
 ``` r
-calculate_huc(from, locs, locs_id = "site_id", geom = FALSE, ...)
+calculate_huc(
+  from,
+  locs,
+  locs_id = "site_id",
+  weights = NULL,
+  geom = FALSE,
+  ...
+)
 ```
 
 ## Arguments
@@ -24,6 +31,12 @@ calculate_huc(from, locs, locs_id = "site_id", geom = FALSE, ...)
 
   character(1). Column within `locations` CSV file containing identifier
   for each unique coordinate location.
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
 
 - geom:
 

@@ -14,6 +14,7 @@ calculate_population(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -44,6 +45,12 @@ calculate_population(
 
   character(1). Function used to summarize multiple raster cells within
   sites location buffer (Default = `mean`).
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
 
 - geom:
 

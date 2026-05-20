@@ -8,13 +8,16 @@ sources.
 
 ``` r
 download_data(
-  dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "gmted", "koppen",
-    "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd", "noaa", "sedac_groads",
-    "sedac_population", "groads", "population", "hms", "smoke", "tri", "nei", "gridmet",
-    "terraclimate", "huc", "cropscape", "cdl", "prism"),
+  dataset_name = c("aqs", "ecoregion", "ecoregions", "geos", "goes", "goes_adp", "GOES",
+    "gmted", "koppen", "koppengeiger", "merra2", "merra", "modis", "narr", "nlcd",
+    "noaa", "sedac_groads", "sedac_population", "groads", "population", "hms", "smoke",
+    "tri", "nei", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
+    "improve", "IMPROVE", "drought", "spei", "eddi", "usdm"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   hash = FALSE,
+  nasa_earth_data_token = NULL,
+  rate_limit = 2,
   ...
 )
 ```
@@ -43,9 +46,24 @@ download_data(
   hash character corresponding to the downloaded files. Default is
   `FALSE`.
 
+- nasa_earth_data_token:
+
+  character(1) or NULL. NASA EarthData authentication token. Required
+  for NASA EarthData datasets: `"geos"`, `"merra2"`, `"modis"`,
+  `"sedac_groads"` / `"groads"`, and `"sedac_population"` /
+  `"population"`. Can be a token string, a path to a file containing the
+  token, or `NULL` to read from the `NASA_EARTHDATA_TOKEN` environment
+  variable. Ignored for datasets that do not use NASA EarthData
+  authentication.
+
+- rate_limit:
+
+  numeric(1). Minimum seconds between HTTP requests (default 2). Passed
+  to the underlying download function.
+
 - ...:
 
-  Arguments passed to each download function.
+  Additional arguments passed to each download function.
 
 ## Value
 
@@ -75,6 +93,9 @@ For details of each download function per dataset, Please refer to:
 
 - [`download_geos`](https://niehs.github.io/amadeus/reference/download_geos.md):
   `"geos"`
+
+- [`download_goes`](https://niehs.github.io/amadeus/reference/download_goes.md):
+  `"goes"`, `"goes_adp"`, `"GOES"`
 
 - [`download_gmted`](https://niehs.github.io/amadeus/reference/download_gmted.md):
   `"gmted"`, `"GMTED"`
@@ -125,7 +146,13 @@ For details of each download function per dataset, Please refer to:
   `"prism"`
 
 - [`download_edgar`](https://niehs.github.io/amadeus/reference/download_edgar.md):
-  `"edgar"`, `"EDGAR"`
+  `"edgar"`
+
+- [`download_improve`](https://niehs.github.io/amadeus/reference/download_improve.md):
+  `"improve"`, `"IMPROVE"`
+
+- [`download_drought`](https://niehs.github.io/amadeus/reference/download_drought.md):
+  `"drought"`, `"spei"`, `"eddi"`, `"usdm"`
 
 ## Author
 

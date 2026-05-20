@@ -1,9 +1,8 @@
 # Download TerraClimate data
 
 The `download_terraclimate` function accesses and downloads climate and
-water balance data from the [University of California Merced Climatology
-Lab's TerraClimate
-dataset](https://www.climatologylab.org/terraclimate.html).
+water balance data from the University of California Merced Climatology
+Lab's TerraClimate dataset.
 
 ## Usage
 
@@ -13,9 +12,12 @@ download_terraclimate(
   year = c(2018, 2022),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 )
 ```
 
@@ -23,53 +25,51 @@ download_terraclimate(
 
 - variables:
 
-  character(1). Variable(s) name(s). See [TerraClimate Direct
-  Downloads](https://climate.northwestknowledge.net/TERRACLIMATE/index_directDownloads.php)
-  for variable names and acronym codes.
+  character. Variable(s) name(s).
 
 - year:
 
-  integer(1 or 2). length of 4. Year or start/end years for downloading
-  data.
+  integer(1 or 2). Year or start/end years for downloading data.
 
 - directory_to_save:
 
-  character(1). Directory(s) to save downloaded data files.
+  character(1). Directory to save data.
 
 - acknowledgement:
 
-  logical(1). By setting `TRUE` the user acknowledges that the data
-  downloaded using this function may be very large and use lots of
-  machine storage and memory.
+  logical(1). Must be TRUE to proceed.
 
 - download:
 
-  logical(1). `FALSE` will generate a \*.txt file containing all
-  download commands. By setting `TRUE` the function will download all of
-  the requested data files.
+  logical(1). DEPRECATED. Downloads happen automatically.
 
 - remove_command:
 
-  logical(1). Remove (`TRUE`) or keep (`FALSE`) the text file containing
-  download commands.
+  logical(1). Deprecated, ignored.
+
+- show_progress:
+
+  logical(1). Show download progress (default TRUE)
 
 - hash:
 
-  logical(1). By setting `TRUE` the function will return an
-  [`rlang::hash_file()`](https://rlang.r-lib.org/reference/hash.html)
-  hash character corresponding to the downloaded files. Default is
-  `FALSE`.
+  logical(1). Return hash of downloaded files (default FALSE)
+
+- max_tries:
+
+  integer(1). Maximum retry attempts (default 20)
+
+- rate_limit:
+
+  numeric(1). Minimum seconds between requests (default 2)
 
 ## Value
 
-- For `hash = FALSE`, NULL
+invisible list with download results; or hash character if hash=TRUE
 
-- For `hash = TRUE`, an
-  [`rlang::hash_file`](https://rlang.r-lib.org/reference/hash.html)
-  character.
+## Note
 
-- netCDF (.nc) files will be stored in a variable-specific folder within
-  `directory_to_save`.
+TerraClimate data does not require authentication.
 
 ## References
 
@@ -87,12 +87,10 @@ Mitchell Manware, Insang Song
 ``` r
 if (FALSE) { # \dontrun{
 download_terraclimate(
-  variables = "Precipitation",
+  variables = "ppt",
   year = 2023,
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE
+  acknowledgement = TRUE
 )
 } # }
 ```

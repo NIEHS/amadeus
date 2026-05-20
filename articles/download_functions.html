@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>download_data Function • amadeus</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="download_data Function">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,15 +33,34 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><h6 class="dropdown-header" data-toc-skip>Miscellaneous</h6></li>
+<li><h6 class="dropdown-header" data-toc-skip>General Articles</h6></li>
     <li><a class="dropdown-item" href="../articles/download_functions.html">download_data Function</a></li>
-    <li><a class="dropdown-item" href="../articles/protected_datasets.html">Protected Datasets</a></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Source-Specific Workflows</h6></li>
+    <li><a class="dropdown-item" href="../articles/calculate_time_grouping.html">Time grouping in calculate_* functions</a></li>
+    <li><a class="dropdown-item" href="../articles/protected_datasets.html">Protected Data Sources</a></li>
+    <li><a class="dropdown-item" href="../articles/computational_considerations.html">Computational Considerations</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Dataset Workflows</h6></li>
+    <li><a class="dropdown-item" href="../articles/pm_data_workflow.html">Particulate Matter (PM) Networks (AQS + IMPROVE)</a></li>
+    <li><a class="dropdown-item" href="../articles/cropscape_workflow.html">USDA CropScape</a></li>
+    <li><a class="dropdown-item" href="../articles/edgar_workflow.html">EDGAR Emissions</a></li>
+    <li><a class="dropdown-item" href="../articles/ecoregion_workflow.html">US EPA Ecoregions</a></li>
+    <li><a class="dropdown-item" href="../articles/drought_workflow.html">Drought (SPEI, EDDI, USDM)</a></li>
+    <li><a class="dropdown-item" href="../articles/geos_workflow.html">NASA GEOS-CF</a></li>
+    <li><a class="dropdown-item" href="../articles/gmted_workflow.html">USGS GMTED2010</a></li>
+    <li><a class="dropdown-item" href="../articles/gridmet_workflow.html">Climatology Lab gridMET</a></li>
+    <li><a class="dropdown-item" href="../articles/groads_workflow.html">NASA SEDAC gROADS</a></li>
+    <li><a class="dropdown-item" href="../articles/hms_workflow.html">NOAA HMS Smoke</a></li>
+    <li><a class="dropdown-item" href="../articles/noaa_goes_workflow.html">NOAA GOES Aerosol Detection Product (ADP)</a></li>
+    <li><a class="dropdown-item" href="../articles/huc_workflow.html">USGS Hydrologic Unit Codes (HUC)</a></li>
+    <li><a class="dropdown-item" href="../articles/koppen_workflow.html">Koppen-Geiger Climate Classes</a></li>
+    <li><a class="dropdown-item" href="../articles/merra2_workflow.html">NASA MERRA-2</a></li>
+    <li><a class="dropdown-item" href="../articles/modis_workflow.html">NASA MODIS</a></li>
+    <li><a class="dropdown-item" href="../articles/narr_workflow.html">NOAA NARR</a></li>
+    <li><a class="dropdown-item" href="../articles/nei_workflow.html">US EPA National Emissions Inventory (NEI)</a></li>
+    <li><a class="dropdown-item" href="../articles/nlcd_workflow.html">MRLC National Land Cover Database (NLCD)</a></li>
+    <li><a class="dropdown-item" href="../articles/population_workflow.html">NASA SEDAC Population Density</a></li>
+    <li><a class="dropdown-item" href="../articles/prism_workflow.html">PRISM Climate Data</a></li>
     <li><a class="dropdown-item" href="../articles/terraclimate_workflow.html">Climatology Lab TerraClimate</a></li>
-    <li><a class="dropdown-item" href="../articles/gridmet_workflow.html">Climatology Lab GridMET</a></li>
-    <li><a class="dropdown-item" href="../articles/modis_workflow.html">NASA Moderate Resolution Imaging Spectroradiometer (MODIS)</a></li>
-    <li><a class="dropdown-item" href="../articles/narr_workflow.html">NOAA North American Regional Reanalysis (NARR)</a></li>
-    <li><a class="dropdown-item" href="../articles/epa_download.html">US EPA Air Quality System (AQS)</a></li>
+    <li><a class="dropdown-item" href="../articles/tri_workflow.html">US EPA Toxic Release Inventory (TRI)</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -69,7 +88,7 @@ Manware</h4>
             
             <h4 data-toc-skip class="date">2024-07-09</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/NIEHS/amadeus/blob/main/vignettes/download_functions.Rmd" class="external-link"><code>vignettes/download_functions.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/NIEHS/amadeus/blob/migrate/vignettes/download_functions.Rmd" class="external-link"><code>vignettes/download_functions.Rmd</code></a></small>
       <div class="d-none name"><code>download_functions.Rmd</code></div>
     </div>
 
@@ -98,13 +117,17 @@ useful for repeated code or automated analysis pipelines.</p>
 datasets, collections, and variables from a variety of sources. This
 wrapper function calls source-specific data download functions, each
 utilizing a unique combination of input parameters, host URL, naming
-convention, and data formats.</p>
+convention, and data formats. For example, EPA TRI basic data files are
+available as nationwide (<code>jurisdiction = "US"</code>), state or
+territory-specific (<code>jurisdiction = "AZ"</code>, <code>"NC"</code>,
+etc.), and tribal (<code>jurisdiction = "tbl"</code>) annual CSV
+downloads via <code><a href="../reference/download_tri.html">download_tri()</a></code>.</p>
 <table class="table">
 <caption>Source-specific download functions and data sources</caption>
 <colgroup>
 <col width="2%">
-<col width="21%">
-<col width="75%">
+<col width="19%">
+<col width="77%">
 </colgroup>
 <thead><tr class="header">
 <th align="left"></th>
@@ -113,81 +136,81 @@ convention, and data formats.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">14</td>
+<td align="left">7</td>
 <td align="left">download_gridmet</td>
 <td align="left"><a href="https://www.climatologylab.org/gridmet.html" class="external-link">Climatology Lab
-GridMet</a></td>
+GridMET</a></td>
 </tr>
 <tr class="even">
-<td align="left">13</td>
+<td align="left">19</td>
 <td align="left">download_terraclimate</td>
 <td align="left"><a href="https://www.climatologylab.org/terraclimate.html" class="external-link">Climatology Lab
 TerraClimate</a></td>
 </tr>
 <tr class="odd">
-<td align="left">5</td>
+<td align="left">4</td>
+<td align="left">download_edgar</td>
+<td align="left"><a href="https://edgar.jrc.ec.europa.eu/" class="external-link">EU JRC
+Emissions Database for Global Atmospheric Research (EDGAR)</a></td>
+</tr>
+<tr class="even">
+<td align="left">11</td>
 <td align="left">download_koppen_geiger</td>
 <td align="left"><a href="https://www.nature.com/articles/sdata2018214" class="external-link">Köppen-Geiger
 Climate Classification (Beck et al., 2018)</a></td>
 </tr>
-<tr class="even">
-<td align="left">8</td>
+<tr class="odd">
+<td align="left">16</td>
 <td align="left">download_nlcd</td>
 <td align="left"><a href="https://www.mrlc.gov/data" class="external-link">MRLC Consortium
 National Land Cover Database (NLCD)</a></td>
 </tr>
-<tr class="odd">
-<td align="left">3</td>
+<tr class="even">
+<td align="left">5</td>
 <td align="left">download_geos</td>
 <td align="left"><a href="https://gmao.gsfc.nasa.gov/GEOS_systems/" class="external-link">NASA
 Goddard Earth Observing System Composition Forecasting
 (GEOS-CF)</a></td>
 </tr>
-<tr class="even">
-<td align="left">12</td>
+<tr class="odd">
+<td align="left">13</td>
 <td align="left">download_modis</td>
 <td align="left"><a href="https://modis.gsfc.nasa.gov/data/" class="external-link">NASA
 Moderate Resolution Imaging Spectroradiometer (MODIS)</a></td>
 </tr>
-<tr class="odd">
-<td align="left">6</td>
+<tr class="even">
+<td align="left">12</td>
 <td align="left">download_merra2</td>
 <td align="left"><a href="https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/" class="external-link">NASA Modern-Era
 Retrospective analysis for Research and Applications, Version 2
 (MERRA-2)</a></td>
 </tr>
-<tr class="even">
-<td align="left">10</td>
-<td align="left">download_sedac_groads</td>
-<td align="left"><a href="https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/groads/groads-global-roads-open-access-v1" class="external-link">NASA
+<tr class="odd">
+<td align="left">8</td>
+<td align="left">download_groads</td>
+<td align="left"><a href="https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00" class="external-link">NASA
 SEDAC Global Roads Open Access Data Set</a></td>
 </tr>
-<tr class="odd">
-<td align="left">11</td>
-<td align="left">download_sedac_population</td>
-<td align="left"><a href="https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/population-density-adjusted-to-2015-unwpp-country-totals-rev11" class="external-link">NASA
+<tr class="even">
+<td align="left">17</td>
+<td align="left">download_population</td>
+<td align="left"><a href="https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11" class="external-link">NASA
 SEDAC UN WPP-Adjusted Population Density</a></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">9</td>
 <td align="left">download_hms</td>
 <td align="left"><a href="https://www.ospo.noaa.gov/products/land/hms.html#0" class="external-link">NOAA Hazard
 Mapping System Fire and Smoke Product</a></td>
 </tr>
-<tr class="odd">
-<td align="left">7</td>
+<tr class="even">
+<td align="left">14</td>
 <td align="left">download_narr</td>
 <td align="left"><a href="https://psl.noaa.gov/data/gridded/data.narr.html" class="external-link">NOAA NCEP North
 American Regional Reanalysis (NARR)</a></td>
 </tr>
-<tr class="even">
-<td align="left">15</td>
-<td align="left">download_osm</td>
-<td align="left"><a href="https://opengeohub.org/about-openlandmap/" class="external-link">OpenGeoHub Foundation
-OpenLandMap</a></td>
-</tr>
 <tr class="odd">
-<td align="left">16</td>
+<td align="left">18</td>
 <td align="left">download_prism</td>
 <td align="left"><a href="https://elibrary.asabe.org/abstract.asp??JID=3&amp;AID=3101&amp;CID=t2000&amp;v=43&amp;i=6&amp;T=1" class="external-link">Parameter
 Elevation Regression on Independent Slopes Model (PRISM)</a></td>
@@ -199,31 +222,38 @@ Elevation Regression on Independent Slopes Model (PRISM)</a></td>
 Data Pre-Generated Data Files</a></td>
 </tr>
 <tr class="odd">
-<td align="left">2</td>
+<td align="left">3</td>
 <td align="left">download_ecoregion</td>
 <td align="left"><a href="https://www.epa.gov/eco-research/ecoregions" class="external-link">US EPA
 Ecoregions</a></td>
 </tr>
 <tr class="even">
-<td align="left">17</td>
+<td align="left">15</td>
 <td align="left">download_nei</td>
 <td align="left"><a href="https://www.epa.gov/air-emissions-inventories" class="external-link">US EPA National
 Emissions Inventory (NEI)</a></td>
 </tr>
 <tr class="odd">
-<td align="left">18</td>
+<td align="left">20</td>
 <td align="left">download_tri</td>
 <td align="left"><a href="https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present" class="external-link">US
 EPA Toxic Release Inventory (TRI) Program</a></td>
 </tr>
 <tr class="even">
-<td align="left">4</td>
+<td align="left">2</td>
+<td align="left">download_cropscape</td>
+<td align="left"><a href="https://nassgeodata.gmu.edu/CropScape/" class="external-link">USDA
+National Agricultural Statistics Service CropScape (Cropland Data
+Layer)</a></td>
+</tr>
+<tr class="odd">
+<td align="left">6</td>
 <td align="left">download_gmted</td>
 <td align="left"><a href="https://www.usgs.gov/coastal-changes-and-impacts/gmted2010" class="external-link">USGS
 Global Multi-resolution Terrain Elevation Data (GMTED2010)</a></td>
 </tr>
-<tr class="odd">
-<td align="left">19</td>
+<tr class="even">
+<td align="left">10</td>
 <td align="left">download_huc</td>
 <td align="left"><a href="https://www.sciencebase.gov/catalog/item/4f5545cce4b018de15819ca9" class="external-link">USGS
 National Hydrography Dataset (NHD)</a></td>
@@ -243,13 +273,15 @@ parameters for each source can be checked with
 <code>names(formals())</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_hms</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "data_format"       "date"              "directory_to_save"</span></span>
-<span><span class="co">#&gt; [4] "acknowledgement"   "download"          "remove_command"   </span></span>
-<span><span class="co">#&gt; [7] "unzip"             "remove_zip"        "hash"</span></span>
+<span><span class="co">#&gt;  [1] "data_format"       "date"              "directory_to_save"</span></span>
+<span><span class="co">#&gt;  [4] "acknowledgement"   "download"          "remove_command"   </span></span>
+<span><span class="co">#&gt;  [7] "unzip"             "remove_zip"        "show_progress"    </span></span>
+<span><span class="co">#&gt; [10] "hash"              "max_tries"         "rate_limit"</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_narr</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "variables"         "year"              "directory_to_save"</span></span>
-<span><span class="co">#&gt; [4] "acknowledgement"   "download"          "remove_command"   </span></span>
-<span><span class="co">#&gt; [7] "hash"</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] "variables"         "year"              "directory_to_save"</span></span>
+<span><span class="co">#&gt;  [4] "acknowledgement"   "download"          "remove_command"   </span></span>
+<span><span class="co">#&gt;  [7] "show_progress"     "hash"              "max_tries"        </span></span>
+<span><span class="co">#&gt; [10] "rate_limit"</span></span></code></pre></div>
 <p>The two functions have different required parameters because
 <code>download_hms</code> uses a daily temporal resolution while
 <code>download_narr</code> uses yearly, but they share some common,
@@ -257,13 +289,13 @@ standard parameters.</p>
 <div class="section level4">
 <h4 id="standard-parameters">Standard parameters<a class="anchor" aria-label="anchor" href="#standard-parameters"></a>
 </h4>
-<p>Four parameters are included in all of the data download
+<p>Three parameters are included in all of the data download
 functions.</p>
 <table class="table">
 <colgroup>
-<col width="9%">
-<col width="5%">
-<col width="85%">
+<col width="8%">
+<col width="4%">
+<col width="86%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Parameter</th>
@@ -281,19 +313,15 @@ Default = ‘./input/DATASET_NAME/’.</td>
 <td align="left">acknowledgement</td>
 <td align="left">Logical</td>
 <td align="left">User must acknowledge that downloading geospatial data
-can be very lage and may use lots of machine storage and memory.</td>
+can be very large and may use lots of machine storage and memory.</td>
 </tr>
 <tr class="odd">
 <td align="left">download</td>
 <td align="left">Logical</td>
-<td align="left">Run or skip the data download. Utilized primarily for
-unit tests (see <a href="#unit-tests">Unit Tests</a>).</td>
-</tr>
-<tr class="even">
-<td align="left">remove_command</td>
-<td align="left">Logical</td>
-<td align="left">Remove or retain the text file containing the generated
-download commands. Utilized primarily for unit tests (see <a href="#unit-tests">Unit Tests</a> and <a href="#initiate-commands.txt">4. Initiate “…commands.txt”</a>).</td>
+<td align="left">DEPRECATED. Downloads now use httr2 by default. When
+FALSE, the function returns early with a list of URLs and destination
+file paths (useful for unit tests — see <a href="#unit-tests">Unit
+Tests</a>).</td>
 </tr>
 </tbody>
 </table>
@@ -310,16 +338,12 @@ follow the same general structure. The following chunks of code have
 been adopted from <code>download_hms</code> to demonstrate the
 functions’ structure.</p>
 <p><a href="#clean-parameters">1. Clean Parameters</a></p>
-<p><a href="#generate-download-urls">2. Generate Download URLs</a></p>
-<p><a href="#generate-download-file-names">3. Generate download file
-names</a></p>
-<p><a href="#initiate-commands.txt">4. Initiate “…commands.txt”</a></p>
-<p><a href="#concatenate-download-commands">5. Concatenate download
-commands</a></p>
-<p><a href="#finalize-commands.txt">6. Finalize “…commands.txt”</a></p>
-<p><a href="#run-commands-in-commands.txt">7. Run commands in
-“…commands.txt”</a></p>
-<p><a href="#zip-files-if-applicable">8. Zip files (if
+<p><a href="#generate-download-urls-and-destination-file-paths">2.
+Generate Download URLs and destination file paths</a></p>
+<p><a href="#validate-urls">3. Validate URLs</a></p>
+<p><a href="#download-files-with-httr2">4. Download files with
+httr2</a></p>
+<p><a href="#zip-files-if-applicable">5. Zip files (if
 applicable)</a></p>
 <div class="section level4">
 <h4 id="clean-parameters">1. Clean parameters<a class="anchor" aria-label="anchor" href="#clean-parameters"></a>
@@ -343,18 +367,21 @@ given temporal range and required format, in this case
 <span><span class="co">#&gt; [1] "20231228" "20231229" "20231230" "20231231" "20240101" "20240102"</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="generate-download-urls">2. Generate download URLs<a class="anchor" aria-label="anchor" href="#generate-download-urls"></a>
+<h4 id="generate-download-urls-and-destination-file-paths">2. Generate download URLs and destination file paths<a class="anchor" aria-label="anchor" href="#generate-download-urls-and-destination-file-paths"></a>
 </h4>
 <p>The URL base and pattern are identified by manually inspecting the
 download link on the source-specific web page. <code>download_hms</code>
 utilizes the year, month, date, and data format to generate the download
-url.</p>
+URL and a corresponding destination file path.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># user defined parameters</span></span>
 <span><span class="va">data_format</span> <span class="op">&lt;-</span> <span class="st">"Shapefile"</span></span>
-<span><span class="va">suffix</span> <span class="op">&lt;-</span> <span class="st">".zip"</span></span></code></pre></div>
+<span><span class="va">suffix</span> <span class="op">&lt;-</span> <span class="st">".zip"</span></span>
+<span><span class="va">directory_to_save</span> <span class="op">&lt;-</span> <span class="st">"./data/"</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">urls</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<code class="sourceCode R"><span><span class="va">all_urls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">all_destfiles</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">d</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">date_sequence</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">year</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">date_sequence</span><span class="op">[</span><span class="va">d</span><span class="op">]</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span></span>
 <span>  <span class="va">month</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">date_sequence</span><span class="op">[</span><span class="va">d</span><span class="op">]</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span></span>
@@ -370,178 +397,60 @@ url.</p>
 <span>    <span class="va">date_sequence</span><span class="op">[</span><span class="va">d</span><span class="op">]</span>,</span>
 <span>    <span class="va">suffix</span></span>
 <span>  <span class="op">)</span></span>
-<span>  <span class="va">urls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">urls</span>, <span class="va">url</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">urls</span></span>
-<span><span class="co">#&gt; [1] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231228.zip"</span></span>
-<span><span class="co">#&gt; [2] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231229.zip"</span></span>
-<span><span class="co">#&gt; [3] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231230.zip"</span></span>
-<span><span class="co">#&gt; [4] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231231.zip"</span></span>
-<span><span class="co">#&gt; [5] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2024/01/hms_smoke20240101.zip"</span></span>
-<span><span class="co">#&gt; [6] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2024/01/hms_smoke20240102.zip"</span></span></code></pre></div>
-<p>A download URL is created for each date in <code>date_sequence</code>
-based on the fixed pattern.</p>
-</div>
-<div class="section level4">
-<h4 id="generate-download-file-names">3. Generate download file names<a class="anchor" aria-label="anchor" href="#generate-download-file-names"></a>
-</h4>
-<p>The generation of download file names also follows a fixed pattern,
-typically a combination of the user-defined download directory, dataset
-name, spatiotemporal characteristic, data type, and, if applicable,
-specific variable name. Unlike the download URLs, the download file
-names can be defined in any way by the writer of the function, but using
-the previously defined characteristics is useful for identification.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># user defined parameters</span></span>
-<span><span class="va">directory_to_download</span> <span class="op">&lt;-</span> <span class="st">"./data/"</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">download_file_names</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
-<span><span class="kw">for</span> <span class="op">(</span><span class="va">d</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">date_sequence</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">download_file_name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>    <span class="va">directory_to_download</span>,</span>
+<span>  <span class="va">destfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>    <span class="va">directory_to_save</span>,</span>
 <span>    <span class="st">"hms_smoke_"</span>,</span>
 <span>    <span class="va">data_format</span>,</span>
 <span>    <span class="st">"_"</span>,</span>
 <span>    <span class="va">date_sequence</span><span class="op">[</span><span class="va">d</span><span class="op">]</span>,</span>
 <span>    <span class="va">suffix</span></span>
 <span>  <span class="op">)</span></span>
-<span>  <span class="va">download_file_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">download_file_names</span>, <span class="va">download_file_name</span><span class="op">)</span></span>
+<span>  <span class="va">all_urls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">all_urls</span>, <span class="va">url</span><span class="op">)</span></span>
+<span>  <span class="va">all_destfiles</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">all_destfiles</span>, <span class="va">destfile</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="va">download_file_names</span></span>
-<span><span class="co">#&gt; [1] "./data/hms_smoke_Shapefile_20231228.zip"</span></span>
-<span><span class="co">#&gt; [2] "./data/hms_smoke_Shapefile_20231229.zip"</span></span>
-<span><span class="co">#&gt; [3] "./data/hms_smoke_Shapefile_20231230.zip"</span></span>
-<span><span class="co">#&gt; [4] "./data/hms_smoke_Shapefile_20231231.zip"</span></span>
-<span><span class="co">#&gt; [5] "./data/hms_smoke_Shapefile_20240101.zip"</span></span>
-<span><span class="co">#&gt; [6] "./data/hms_smoke_Shapefile_20240102.zip"</span></span></code></pre></div>
-<p>A download URL is created for each date in <code>date_sequence</code>
-based on the fixed pattern.</p>
+<span><span class="va">all_urls</span></span>
+<span><span class="co">#&gt; [1] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231228.zip"</span></span>
+<span><span class="co">#&gt; [2] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231229.zip"</span></span>
+<span><span class="co">#&gt; [3] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231230.zip"</span></span>
+<span><span class="co">#&gt; [4] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2023/12/hms_smoke20231231.zip"</span></span>
+<span><span class="co">#&gt; [5] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2024/01/hms_smoke20240101.zip"</span></span>
+<span><span class="co">#&gt; [6] "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/2024/01/hms_smoke20240102.zip"</span></span></code></pre></div>
+<p>A URL and destination file path are created for each date in
+<code>date_sequence</code> based on fixed patterns.</p>
 </div>
 <div class="section level4">
-<h4 id="initiate-commands-txt">4. Initiate “…commands.txt”<a class="anchor" aria-label="anchor" href="#initiate-commands-txt"></a>
+<h4 id="validate-urls">3. Validate URLs<a class="anchor" aria-label="anchor" href="#validate-urls"></a>
 </h4>
-<p>An important aspect of the data download function is its
-<code>sink...cat...sink</code> structure. Rather than using the
-<code><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">utils::download.file</a></code> function, a text file is created to
-store all of the download commands generated from the URLs and file
-names.</p>
-<p>This structure is utilized for several reasons:</p>
-<ul>
-<li><p>Consistent structure for all the source-specific download
-functions.</p></li>
-<li><p>The <code>download.file</code> function cannot accept vectors of
-URLs and destination files for downloading. An additional
-<code>for</code> loop to download data will increase function complexity
-and may reduce performance.</p></li>
-<li><p>Writing commands in Bash (Unix shell) script allows for specific
-arguments and flags.</p></li>
-<li><p>Storing the download URLs without immediately running the
-download allows for unit testing and URL checking (more on this in <a href="#unit-tests">Unit Tests</a>).</p></li>
-</ul>
-<p>The text file containing the download commands is named based on the
-dataset, temporal range, and data transfer method.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">commands_txt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>  <span class="va">directory_to_download</span>,</span>
-<span>  <span class="st">"hms_smoke_"</span>,</span>
-<span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">date_sequence</span>, n <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="st">"_"</span>,</span>
-<span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">date_sequence</span>, n <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  <span class="st">"_curl_commands.txt"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>Create and sink the text file.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span><span class="va">commands_txt</span><span class="op">)</span></span></code></pre></div>
+<p>Before initiating downloads, the first URL in the list is validated
+internally. This guards against common user errors such as invalid dates
+or unsupported data formats — an error is raised early rather than
+partway through a large download batch.</p>
 </div>
 <div class="section level4">
-<h4 id="concatenate-download-commands">5. Concatenate download commands<a class="anchor" aria-label="anchor" href="#concatenate-download-commands"></a>
+<h4 id="download-files-with-httr2">4. Download files with httr2<a class="anchor" aria-label="anchor" href="#download-files-with-httr2"></a>
 </h4>
-<p>The Linux-based download commands are written according to the data
-transfer method, download URL, download file name, and additional
-arguments. Which additional arguments are included, and their order,
-depend on the data transfer method and URL type.</p>
-<p>For more information on <code>curl</code> and <code>wget</code>, the
-two data transfer methods utilized by the data download functions, see
-<a href="https://curl.se/docs/manpage.html" class="external-link">curl.1 the man page</a> and
-<a href="https://www.gnu.org/software/wget/manual/wget.html" class="external-link">GNU Wget
-1.21.1-dirty Manual</a> (latest version as of January 8, 2024).</p>
-<p>The <code><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat()</a></code> function will store each of the download
-commands written in the <code>for</code> loop to the previously sunk
-commands text file (<code>commands_txt</code>).</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">d</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">date_sequence</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">download_comamnd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>    <span class="st">"curl -s -o "</span>,</span>
-<span>    <span class="va">download_file_names</span><span class="op">[</span><span class="va">d</span><span class="op">]</span>,</span>
-<span>    <span class="st">" --url "</span>,</span>
-<span>    <span class="va">urls</span><span class="op">[</span><span class="va">d</span><span class="op">]</span>,</span>
-<span>    <span class="st">"\n"</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">download_comamnd</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="finalize-commands-txt">6. Finalize “…commands.txt”<a class="anchor" aria-label="anchor" href="#finalize-commands-txt"></a>
-</h4>
-<p>After the download commands have been concatenated to the commands
-text file, a second <code>sink</code> command is run to finalize the
-file and stop the appending of R output.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sink.html" class="external-link">sink</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="run-commands-in-commands-txt">7. Run commands in “…commands.txt”<a class="anchor" aria-label="anchor" href="#run-commands-in-commands-txt"></a>
-</h4>
-<p>A “system command” must be created to run all of the download
-commands stored in the commands text file. In bash script,
-<code>.</code> indicates to run all of the commands within a given
-script. In this case, we will run all of the commands within the
-commands text file.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">system_command</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>  <span class="st">". "</span>,</span>
-<span>  <span class="va">commands_txt</span>,</span>
-<span>  <span class="st">"\n"</span></span>
+<p>All source-specific download functions use <code>httr2</code>
+internally to provide robust retry logic, rate-limiting, token-based
+authentication (for NASA datasets), and streaming downloads directly to
+disk.</p>
+<p>When <code>download = FALSE</code> is passed to a source-specific
+function (or <code><a href="../reference/download_data.html">download_data()</a></code>), the function returns early
+with a named list instead of downloading:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_data.html">download_data</a></span><span class="op">(</span></span>
+<span>  dataset_name <span class="op">=</span> <span class="st">"hms"</span>,</span>
+<span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2023-12-28"</span>, <span class="st">"2024-01-02"</span><span class="op">)</span>,</span>
+<span>  data_format <span class="op">=</span> <span class="st">"Shapefile"</span>,</span>
+<span>  directory_to_save <span class="op">=</span> <span class="st">"./data/"</span>,</span>
+<span>  acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  download <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">system_command</span></span>
-<span><span class="co">#&gt; [1] ". ./data/hms_smoke_20231228_20240102_curl_commands.txt\n"</span></span></code></pre></div>
-<p>Running the <code>system_command</code> deploys an “auxiliary”
-function, <code>download_run</code>, a function created to reduce
-repeated code across the source-specific download functions. The
-function takes two parameters, <code>system_command</code>, which
-indicates the command to be run, and <code>download</code>, a
-user-defined logical parameter.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">download_run</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
-<span>  <span class="va">download</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  <span class="va">system_command</span> <span class="op">=</span> <span class="cn">NULL</span></span>
-<span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">download</span> <span class="op">==</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Downloading requested files...\n"</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/system.html" class="external-link">system</a></span><span class="op">(</span>command <span class="op">=</span> <span class="va">system_command</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Requested files have been downloaded.\n"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Skipping data download.\n"</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>The data download is initiated by running <code>download_run</code>
-with the system command identified and <code>download = TRUE</code>.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/download_run.html">download_run</a></span><span class="op">(</span></span>
-<span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  system_command <span class="op">=</span> <span class="va">system_command</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>Checking the download directory shows that all of the requested files
-have been downloaded.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">directory_to_download</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; [1] "hms_smoke_Shapefile_20231228.zip" "hms_smoke_Shapefile_20231229.zip"</span></span>
-<span><span class="co">#&gt; [3] "hms_smoke_Shapefile_20231230.zip" "hms_smoke_Shapefile_20231231.zip"</span></span>
-<span><span class="co">#&gt; [5] "hms_smoke_Shapefile_20240101.zip" "hms_smoke_Shapefile_20240102.zip"</span></span></code></pre>
+<span><span class="co"># result$urls       — character vector of download URLs</span></span>
+<span><span class="co"># result$destfiles  — character vector of destination paths</span></span>
+<span><span class="co"># result$n_files    — integer count</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="zip-files-if-applicable">8. Zip files (if applicable)<a class="anchor" aria-label="anchor" href="#zip-files-if-applicable"></a>
+<h4 id="zip-files-if-applicable">5. Zip files (if applicable)<a class="anchor" aria-label="anchor" href="#zip-files-if-applicable"></a>
 </h4>
 <p>All of the source-specific data download functions follow this
 general pattern, but those functions which download zip files require
@@ -552,7 +461,7 @@ are run by the user-defined <code>unzip</code> and
 <p><code>download_unzip</code> inflates zip files if
 <code>unzip = TRUE</code>, and skips inflation if
 <code>unzip = FALSE</code>.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">download_unzip</span> <span class="op">&lt;-</span></span>
 <span>  <span class="kw">function</span><span class="op">(</span><span class="va">file_name</span>,</span>
 <span>           <span class="va">directory_to_unzip</span>,</span>
@@ -574,7 +483,7 @@ are run by the user-defined <code>unzip</code> and
 <p><code>download_remove_zips</code> removes the downloaded zip files if
 <code>remove = TRUE</code>, and skips removal if
 <code>remove = FALSE</code>.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">download_remove_zips</span> <span class="op">&lt;-</span></span>
 <span>  <span class="kw">function</span><span class="op">(</span><span class="va">remove</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>           <span class="va">download_name</span><span class="op">)</span> <span class="op">{</span></span>
@@ -586,16 +495,16 @@ are run by the user-defined <code>unzip</code> and
 <span>  <span class="op">}</span></span></code></pre></div>
 <p>For this demonstration we will unzip (inflate) the downloaded zip
 files but we will not delete them.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">f</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">download_file_names</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">f</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">all_destfiles</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/download_unzip.html">download_unzip</a></span><span class="op">(</span></span>
-<span>    file_name <span class="op">=</span> <span class="va">download_file_names</span><span class="op">[</span><span class="va">f</span><span class="op">]</span>,</span>
-<span>    directory_to_unzip <span class="op">=</span> <span class="va">directory_to_download</span>,</span>
+<span>    file_name <span class="op">=</span> <span class="va">all_destfiles</span><span class="op">[</span><span class="va">f</span><span class="op">]</span>,</span>
+<span>    directory_to_unzip <span class="op">=</span> <span class="va">directory_to_save</span>,</span>
 <span>    unzip <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="../reference/download_remove_zips.html">download_remove_zips</a></span><span class="op">(</span></span>
-<span>  download_name <span class="op">=</span> <span class="va">download_file_names</span>,</span>
+<span>  download_name <span class="op">=</span> <span class="va">all_destfiles</span>,</span>
 <span>  remove <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Unzipping files...</span></span>
@@ -612,8 +521,8 @@ files but we will not delete them.</p>
 <span><span class="co">#&gt; Files unzipped and saved in ./data/.</span></span></code></pre>
 <p>Listing the files again shows that the contents of the zip files have
 been inflated and the zip files have been retained.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">directory_to_download</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">directory_to_save</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;  [1] "hms_smoke_Shapefile_20231228.zip" "hms_smoke_Shapefile_20231229.zip"</span></span>
 <span><span class="co">#&gt;  [3] "hms_smoke_Shapefile_20231230.zip" "hms_smoke_Shapefile_20231231.zip"</span></span>
 <span><span class="co">#&gt;  [5] "hms_smoke_Shapefile_20240101.zip" "hms_smoke_Shapefile_20240102.zip"</span></span>
@@ -640,76 +549,21 @@ been inflated and the zip files have been retained.</p>
 and downloaded data, but how can we be sure that it will continue to
 work with different temporal ranges and data types? To this end, unit
 tests have been implemented to ensure that each data download function
-runs properly and that URLs produced by <a href="#generate-download-urls">2. Generate download URLs</a> are valid
-and accessible. Like the download functions, the unit tests rely on
-“helper” functions to reduce repeated code across the tests.</p>
+runs properly and that the URLs it generates are valid and accessible.
+Like the download functions, the unit tests rely on helper functions to
+reduce repeated code across the tests.</p>
 <div class="section level3">
 <h3 id="helper-functions">Helper functions<a class="anchor" aria-label="anchor" href="#helper-functions"></a>
 </h3>
-<p><code>read_commands</code> imports the commands text file and
-converts the data frame to a vector.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">read_commands</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
-<span>  <span class="va">commands_path</span> <span class="op">=</span> <span class="va">commands_path</span></span>
-<span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">commands</span> <span class="op">&lt;-</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">commands_path</span>, header <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span>  <span class="va">commands</span> <span class="op">&lt;-</span> <span class="va">commands</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">commands</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">commands</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p><code>extract_urls</code> extracts each download URL from the vector
-of commands. The <code>position</code> of the URL within the download
-command is determined in <a href="#concatenate-download-commands">5.
-Concatenate download commands</a>.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># function to extract URLs from vector</span></span>
-<span><span class="va">extract_urls</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
-<span>  <span class="va">commands</span> <span class="op">=</span> <span class="va">commands</span>,</span>
-<span>  <span class="va">position</span> <span class="op">=</span> <span class="cn">NULL</span></span>
-<span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">position</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"URL position in command is not defined.\n"</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span>  <span class="va">url_list</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
-<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">c</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">commands</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">url</span> <span class="op">&lt;-</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_split.html" class="external-link">str_split_i</a></span><span class="op">(</span><span class="va">commands</span><span class="op">[</span><span class="va">c</span><span class="op">]</span>, <span class="st">" "</span>, <span class="va">position</span><span class="op">)</span></span>
-<span>    <span class="va">url_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">url_list</span>, <span class="va">url</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">url_list</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p><code>check_url_status</code> is the most important of the download
-test “helper” functions. This function utilizes <code><a href="https://httr.r-lib.org/reference/HEAD.html" class="external-link">httr::HEAD</a></code>
-and <code><a href="https://httr.r-lib.org/reference/GET.html" class="external-link">httr::GET</a></code> to check the HTTP response status of a given
-URL. The desired HTTP response status is 200, which means the URL is
-valid and accessible. <code>check_url_status</code> returns a logical
-value to indicate whether the URL returns HTTP status 200
-(<code>TRUE</code>) or not (<code>FALSE</code>). For more information on
-HTTP status’, see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status" class="external-link">HTTP
-response status codes</a>.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">check_url_status</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
-<span>  <span class="va">url</span>,</span>
-<span>  <span class="va">method</span> <span class="op">=</span> <span class="st">"HEAD"</span></span>
-<span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">http_status_ok</span> <span class="op">&lt;-</span> <span class="fl">200</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">method</span> <span class="op">==</span> <span class="st">"HEAD"</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">hd</span> <span class="op">&lt;-</span> <span class="fu">httr</span><span class="fu">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/HEAD.html" class="external-link">HEAD</a></span><span class="op">(</span><span class="va">url</span><span class="op">)</span></span>
-<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">method</span> <span class="op">==</span> <span class="st">"GET"</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">hd</span> <span class="op">&lt;-</span> <span class="fu">httr</span><span class="fu">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/GET.html" class="external-link">GET</a></span><span class="op">(</span><span class="va">url</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span>  <span class="va">status</span> <span class="op">&lt;-</span> <span class="va">hd</span><span class="op">$</span><span class="va">status_code</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">status</span> <span class="op">==</span> <span class="va">http_status_ok</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p><code>check_urls</code> applies <code>check_url_status</code> to a
-random sample of URLs extracted by <code>extract_urls</code>. The sample
-size will vary based on the dataset and spatio-temporal parameters being
-tested. The function returns a logical vector containing the output from
-<code>check_url_status</code>.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<p>URL validation in the unit tests uses <code>httr2</code> to check the
+HTTP response status of a given URL. The desired HTTP response status is
+200 (or 206), which means the URL is valid and accessible. A helper
+<code>check_urls</code> applies this check to a random sample of URLs,
+returning a logical vector.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">check_urls</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>  <span class="va">urls</span> <span class="op">=</span> <span class="va">urls</span>,</span>
-<span>  <span class="va">size</span> <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">method</span> <span class="op">=</span> <span class="st">"HEAD"</span></span>
+<span>  <span class="va">size</span> <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">size</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"URL sample size is not defined.\n"</span><span class="op">)</span><span class="op">)</span></span>
@@ -719,10 +573,17 @@ tested. The function returns a logical vector containing the output from
 <span>    <span class="va">size</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">urls</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span>  <span class="va">url_sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">urls</span>, <span class="va">size</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span>  <span class="va">url_status</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">url_sample</span>,</span>
-<span>    <span class="va">check_url_status</span>,</span>
-<span>    method <span class="op">=</span> <span class="va">method</span></span>
-<span>  <span class="op">)</span></span>
+<span>  <span class="va">url_status</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">url_sample</span>, <span class="kw">function</span><span class="op">(</span><span class="va">url</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>      <span class="va">status</span> <span class="op">&lt;-</span> <span class="fu">httr2</span><span class="fu">::</span><span class="fu"><a href="https://httr2.r-lib.org/reference/request.html" class="external-link">request</a></span><span class="op">(</span><span class="va">url</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>        <span class="fu">httr2</span><span class="fu">::</span><span class="fu"><a href="https://httr2.r-lib.org/reference/req_method.html" class="external-link">req_method</a></span><span class="op">(</span><span class="st">"HEAD"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>        <span class="fu">httr2</span><span class="fu">::</span><span class="fu"><a href="https://httr2.r-lib.org/reference/req_error.html" class="external-link">req_error</a></span><span class="op">(</span>is_error <span class="op">=</span> \<span class="op">(</span><span class="va">resp</span><span class="op">)</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>        <span class="fu">httr2</span><span class="fu">::</span><span class="fu"><a href="https://httr2.r-lib.org/reference/req_perform.html" class="external-link">req_perform</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>        <span class="fu">httr2</span><span class="fu">::</span><span class="fu"><a href="https://httr2.r-lib.org/reference/resp_status.html" class="external-link">resp_status</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span>      <span class="va">status</span> <span class="op"><a href="https://rspatial.github.io/terra/reference/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">200L</span>, <span class="fl">206L</span><span class="op">)</span></span>
+<span>    <span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">url_status</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
@@ -730,9 +591,12 @@ tested. The function returns a logical vector containing the output from
 <h3 id="testthat">testthat<a class="anchor" aria-label="anchor" href="#testthat"></a>
 </h3>
 <p>To demonstrate a test in action, test the URLs generated by
-<code>download_data</code> for the NOAA HMS Smoke dataset.</p>
+<code>download_data</code> for the NOAA HMS Smoke dataset. When called
+with <code>download = FALSE</code>, functions return a list with
+<code>$urls</code>, <code>$destfiles</code>, and <code>$n_files</code> —
+no files are written and no system commands are executed.</p>
 <p>For more information see <a href="https://testthat.r-lib.org/" class="external-link">testthat</a>.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org" class="external-link">testthat</a></span><span class="op">)</span></span>
 <span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Valid dates return HTTP response status = 200."</span>,</span>
@@ -741,37 +605,24 @@ tested. The function returns a logical vector containing the output from
 <span>    <span class="va">test_start</span> <span class="op">&lt;-</span> <span class="st">"2023-12-28"</span></span>
 <span>    <span class="va">test_end</span> <span class="op">&lt;-</span> <span class="st">"2024-01-02"</span></span>
 <span>    <span class="va">test_directory</span> <span class="op">&lt;-</span> <span class="st">"./data/"</span></span>
-<span>    <span class="co"># download</span></span>
-<span>    <span class="fu"><a href="../reference/download_data.html">download_data</a></span><span class="op">(</span></span>
+<span>    <span class="co"># download = FALSE returns a list with $urls (no files downloaded)</span></span>
+<span>    <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_data.html">download_data</a></span><span class="op">(</span></span>
 <span>      dataset_name <span class="op">=</span> <span class="st">"hms"</span>,</span>
 <span>      date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">test_start</span>, <span class="va">test_end</span><span class="op">)</span>,</span>
 <span>      data_format <span class="op">=</span> <span class="st">"Shapefile"</span>,</span>
 <span>      directory_to_save <span class="op">=</span> <span class="va">test_directory</span>,</span>
 <span>      acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>      download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>      remove_command <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>      unzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>      remove_zip <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>      download <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>    <span class="op">)</span></span>
-<span>    <span class="va">commands_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>      <span class="va">test_directory</span>,</span>
-<span>      <span class="st">"hms_smoke_"</span>,</span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"-"</span>, <span class="st">""</span>, <span class="va">test_start</span><span class="op">)</span>,</span>
-<span>      <span class="st">"_"</span>,</span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"-"</span>, <span class="st">""</span>, <span class="va">test_end</span><span class="op">)</span>,</span>
-<span>      <span class="st">"_curl_commands.txt"</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="co"># helpers</span></span>
-<span>    <span class="va">commands</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_commands.html">read_commands</a></span><span class="op">(</span>commands_path <span class="op">=</span> <span class="va">commands_path</span><span class="op">)</span></span>
-<span>    <span class="va">urls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_urls.html">extract_urls</a></span><span class="op">(</span>commands <span class="op">=</span> <span class="va">commands</span>, position <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
-<span>    <span class="va">url_status</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_urls.html">check_urls</a></span><span class="op">(</span>urls <span class="op">=</span> <span class="va">urls</span>, size <span class="op">=</span> <span class="fl">6</span>, method <span class="op">=</span> <span class="st">"HEAD"</span><span class="op">)</span></span>
+<span>    <span class="va">urls</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">$</span><span class="va">urls</span></span>
+<span>    <span class="va">url_status</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_urls.html">check_urls</a></span><span class="op">(</span>urls <span class="op">=</span> <span class="va">urls</span>, size <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
 <span>    <span class="co"># test for true</span></span>
 <span>    <span class="fu"><a href="https://testthat.r-lib.org/reference/logical-expectations.html" class="external-link">expect_true</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">url_status</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="font-weight: bold;">Test passed with 1 success 🎊</span>.</span></span></code></pre>
-<p>Although the <code>testthat::test_that(...)</code> chunk contains 32
-lines of code, the unit test is performed by
+<p>Although the <code>testthat::test_that(...)</code> chunk contains
+code to generate and check URLs, the unit test is performed by
 <code>expect_true(all(url_status))</code>. In words, this line is
 expecting (<code>expect_true</code>) that all (<code>all</code>) of the
 sampled URLs return HTTP response status 200 (<code>url_status</code>).
@@ -782,7 +633,7 @@ exist, we expect the function will fail. This test utilizes
 <code><a href="https://testthat.r-lib.org/reference/expect_error.html" class="external-link">expect_error()</a></code> because the <code>download_data</code>
 wrapper function returns an error message if the underlying
 source-specific download function returns an error.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Invalid dates cause function to fail."</span>,</span>
 <span>  <span class="op">{</span></span>
@@ -796,11 +647,9 @@ source-specific download function returns an error.</p>
 <span>        dataset_name <span class="op">=</span> <span class="st">"hms"</span>,</span>
 <span>        date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">test_start</span>, <span class="va">test_end</span><span class="op">)</span>,</span>
 <span>        data_format <span class="op">=</span> <span class="st">"Shapefile"</span>,</span>
-<span>        directory_to_download <span class="op">=</span> <span class="va">test_directory</span>,</span>
 <span>        directory_to_save <span class="op">=</span> <span class="va">test_directory</span>,</span>
 <span>        acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>        download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>        remove_command <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>        unzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>        remove_zip <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>      <span class="op">)</span></span>
@@ -813,7 +662,7 @@ source-specific download function returns an error.</p>
 the underlying source-specific download function returns an error. If we
 directly used the <code>download_hms</code> function, we would expect
 and receive an error.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span></span>
 <span>  <span class="st">"Invalid dates cause function to fail."</span>,</span>
 <span>  <span class="op">{</span></span>
@@ -826,11 +675,9 @@ and receive an error.</p>
 <span>      <span class="fu"><a href="../reference/download_hms.html">download_hms</a></span><span class="op">(</span></span>
 <span>        date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">test_start</span>, <span class="va">test_end</span><span class="op">)</span>,</span>
 <span>        data_format <span class="op">=</span> <span class="st">"Shapefile"</span>,</span>
-<span>        directory_to_download <span class="op">=</span> <span class="va">test_directory</span>,</span>
 <span>        directory_to_save <span class="op">=</span> <span class="va">test_directory</span>,</span>
 <span>        acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>        download <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>        remove_command <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>        unzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>        remove_zip <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>      <span class="op">)</span></span>
@@ -852,30 +699,28 @@ code.</p>
 <p>With the function structure outlined and the unit tests in place, we
 can now perform a data download. To begin, check the parameters required
 by the source-specific data download function.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formals.html" class="external-link">formals</a></span><span class="op">(</span><span class="va">download_hms</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "data_format"       "date"              "directory_to_save"</span></span>
-<span><span class="co">#&gt; [4] "acknowledgement"   "download"          "remove_command"   </span></span>
-<span><span class="co">#&gt; [7] "unzip"             "remove_zip"        "hash"</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] "data_format"       "date"              "directory_to_save"</span></span>
+<span><span class="co">#&gt;  [4] "acknowledgement"   "download"          "remove_command"   </span></span>
+<span><span class="co">#&gt;  [7] "unzip"             "remove_zip"        "show_progress"    </span></span>
+<span><span class="co">#&gt; [10] "hash"              "max_tries"         "rate_limit"</span></span></code></pre></div>
 <p>Define the parameters.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2023-12-28"</span>, <span class="st">"2024-01-02"</span><span class="op">)</span></span>
 <span><span class="va">data_format</span> <span class="op">&lt;-</span> <span class="st">"Shapefile"</span></span>
 <span><span class="va">data_directory</span> <span class="op">&lt;-</span> <span class="st">"./download_example/"</span></span>
 <span><span class="va">acknowledgement</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
-<span><span class="va">download</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># run data download</span></span>
-<span><span class="va">remove_command</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># delete "...commands.txt" file</span></span>
 <span><span class="va">unzip</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># inflate (unzip) downloaded zip files</span></span>
 <span><span class="va">remove_zip</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> <span class="co"># retain downloaded zip files</span></span></code></pre></div>
 <p>Download the data.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/download_data.html">download_data</a></span><span class="op">(</span></span>
 <span>  dataset_name <span class="op">=</span> <span class="st">"hms"</span>,</span>
 <span>  date <span class="op">=</span> <span class="va">dates</span>,</span>
+<span>  data_format <span class="op">=</span> <span class="va">data_format</span>,</span>
 <span>  directory_to_save <span class="op">=</span> <span class="va">data_directory</span>,</span>
 <span>  acknowledgement <span class="op">=</span> <span class="va">acknowledgement</span>,</span>
-<span>  download <span class="op">=</span> <span class="va">download</span>,</span>
-<span>  remove_command <span class="op">=</span> <span class="va">remove_command</span>,</span>
 <span>  unzip <span class="op">=</span> <span class="va">unzip</span>,</span>
 <span>  remove_zip <span class="op">=</span> <span class="va">remove_zip</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -896,7 +741,7 @@ by the source-specific data download function.</p>
 <p>Checking the directory shows that all of our desired data has been
 downloaded and inflated, and the original zip files have been
 retained.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">data_directory</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;  [1] "hms_smoke_Shapefile_20231228.zip" "hms_smoke_Shapefile_20231229.zip"</span></span>
 <span><span class="co">#&gt;  [3] "hms_smoke_Shapefile_20231230.zip" "hms_smoke_Shapefile_20231231.zip"</span></span>
@@ -920,12 +765,12 @@ retained.</p>
 </h2>
 <p>The following is the entire R code used to create
 <code>download_hms</code>.</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">download_hms</span></span>
 <span><span class="co">#&gt; function (data_format = "Shapefile", date = c("2018-01-01", "2018-01-01"), </span></span>
-<span><span class="co">#&gt;     directory_to_save = NULL, acknowledgement = FALSE, download = FALSE, </span></span>
+<span><span class="co">#&gt;     directory_to_save = NULL, acknowledgement = FALSE, download = TRUE, </span></span>
 <span><span class="co">#&gt;     remove_command = FALSE, unzip = TRUE, remove_zip = FALSE, </span></span>
-<span><span class="co">#&gt;     hash = FALSE) </span></span>
+<span><span class="co">#&gt;     show_progress = TRUE, hash = FALSE, max_tries = 20, rate_limit = 2) </span></span>
 <span><span class="co">#&gt; {</span></span>
 <span><span class="co">#&gt;     amadeus::download_permit(acknowledgement = acknowledgement)</span></span>
 <span><span class="co">#&gt;     amadeus::check_for_null_parameters(mget(ls()))</span></span>
@@ -942,6 +787,13 @@ retained.</p>
 <span><span class="co">#&gt;         zip = TRUE)</span></span>
 <span><span class="co">#&gt;     directory_to_download &lt;- directories[1]</span></span>
 <span><span class="co">#&gt;     directory_to_save &lt;- directories[2]</span></span>
+<span><span class="co">#&gt;     if (!isTRUE(download)) {</span></span>
+<span><span class="co">#&gt;         warning("Setting download=FALSE is deprecated.\n", call. = FALSE)</span></span>
+<span><span class="co">#&gt;     }</span></span>
+<span><span class="co">#&gt;     if (remove_command != FALSE) {</span></span>
+<span><span class="co">#&gt;         warning("Parameter 'remove_command' is deprecated and ignored.\n", </span></span>
+<span><span class="co">#&gt;             call. = FALSE)</span></span>
+<span><span class="co">#&gt;     }</span></span>
 <span><span class="co">#&gt;     if (unzip == FALSE &amp;&amp; remove_zip == TRUE) {</span></span>
 <span><span class="co">#&gt;         stop(paste0("Arguments unzip = FALSE and remove_zip = TRUE are not ", </span></span>
 <span><span class="co">#&gt;             "acceptable together. Please change one.\n"))</span></span>
@@ -949,11 +801,8 @@ retained.</p>
 <span><span class="co">#&gt;     date_sequence &lt;- amadeus::generate_date_sequence(date[1], </span></span>
 <span><span class="co">#&gt;         date[2], sub_hyphen = TRUE)</span></span>
 <span><span class="co">#&gt;     base &lt;- "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/"</span></span>
-<span><span class="co">#&gt;     commands_txt &lt;- paste0(directory_original, "hms_smoke_", </span></span>
-<span><span class="co">#&gt;         utils::head(date_sequence, n = 1), "_", utils::tail(date_sequence, </span></span>
-<span><span class="co">#&gt;             n = 1), "_curl_commands.txt")</span></span>
-<span><span class="co">#&gt;     amadeus::download_sink(commands_txt)</span></span>
-<span><span class="co">#&gt;     download_names &lt;- NULL</span></span>
+<span><span class="co">#&gt;     all_urls &lt;- character()</span></span>
+<span><span class="co">#&gt;     all_destfiles &lt;- character()</span></span>
 <span><span class="co">#&gt;     for (f in seq_along(date_sequence)) {</span></span>
 <span><span class="co">#&gt;         year &lt;- substr(date_sequence[f], 1, 4)</span></span>
 <span><span class="co">#&gt;         month &lt;- substr(date_sequence[f], 5, 6)</span></span>
@@ -970,38 +819,54 @@ retained.</p>
 <span><span class="co">#&gt;         url &lt;- paste0(base, data_format, "/", year, "/", month, </span></span>
 <span><span class="co">#&gt;             "/hms_smoke", date_sequence[f], suffix)</span></span>
 <span><span class="co">#&gt;         if (f == 1) {</span></span>
-<span><span class="co">#&gt;             if (!(amadeus::check_url_status(url))) {</span></span>
-<span><span class="co">#&gt;                 sink()</span></span>
-<span><span class="co">#&gt;                 file.remove(commands_txt)</span></span>
+<span><span class="co">#&gt;             if (!amadeus::check_url_status(url)) {</span></span>
 <span><span class="co">#&gt;                 stop(paste0("Invalid date returns HTTP code 404. ", </span></span>
 <span><span class="co">#&gt;                   "Check `date` parameter.\n"))</span></span>
 <span><span class="co">#&gt;             }</span></span>
 <span><span class="co">#&gt;         }</span></span>
 <span><span class="co">#&gt;         destfile &lt;- paste0(directory_to_cat, "hms_smoke_", data_format, </span></span>
 <span><span class="co">#&gt;             "_", date_sequence[f], suffix)</span></span>
-<span><span class="co">#&gt;         download_names &lt;- c(download_names, destfile)</span></span>
-<span><span class="co">#&gt;         command &lt;- paste0("curl -s -o ", destfile, " --url ", </span></span>
-<span><span class="co">#&gt;             url, "\n")</span></span>
 <span><span class="co">#&gt;         if (amadeus::check_destfile(destfile)) {</span></span>
-<span><span class="co">#&gt;             cat(command)</span></span>
+<span><span class="co">#&gt;             all_urls &lt;- c(all_urls, url)</span></span>
+<span><span class="co">#&gt;             all_destfiles &lt;- c(all_destfiles, destfile)</span></span>
 <span><span class="co">#&gt;         }</span></span>
 <span><span class="co">#&gt;     }</span></span>
-<span><span class="co">#&gt;     sink()</span></span>
-<span><span class="co">#&gt;     amadeus::download_run(download = download, commands_txt = commands_txt, </span></span>
-<span><span class="co">#&gt;         remove = remove_command)</span></span>
+<span><span class="co">#&gt;     if (!isTRUE(download)) {</span></span>
+<span><span class="co">#&gt;         message(sprintf("Skipping download. Found %d files available for download.\n", </span></span>
+<span><span class="co">#&gt;             length(all_urls)))</span></span>
+<span><span class="co">#&gt;         return(invisible(list(urls = all_urls, destfiles = all_destfiles, </span></span>
+<span><span class="co">#&gt;             n_files = length(all_urls))))</span></span>
+<span><span class="co">#&gt;     }</span></span>
+<span><span class="co">#&gt;     if (length(all_urls) == 0L) {</span></span>
+<span><span class="co">#&gt;         message("All requested HMS files already exist. Nothing to download.\n")</span></span>
+<span><span class="co">#&gt;         return(invisible(list(success = 0, failed = 0, skipped = length(date_sequence))))</span></span>
+<span><span class="co">#&gt;     }</span></span>
+<span><span class="co">#&gt;     download_result &lt;- amadeus::download_run_method(urls = all_urls, </span></span>
+<span><span class="co">#&gt;         destfiles = all_destfiles, token = NULL, show_progress = show_progress, </span></span>
+<span><span class="co">#&gt;         max_tries = max_tries, rate_limit = rate_limit)</span></span>
 <span><span class="co">#&gt;     if (data_format == "KML") {</span></span>
 <span><span class="co">#&gt;         unlink(directory_to_download, recursive = TRUE)</span></span>
-<span><span class="co">#&gt;         message(paste0("KML files cannot be unzipped.\n"))</span></span>
-<span><span class="co">#&gt;         return(TRUE)</span></span>
+<span><span class="co">#&gt;         message("KML files cannot be unzipped.\n")</span></span>
+<span><span class="co">#&gt;         if (hash) {</span></span>
+<span><span class="co">#&gt;             return(amadeus::download_hash(hash = TRUE, directory_to_save))</span></span>
+<span><span class="co">#&gt;         }</span></span>
+<span><span class="co">#&gt;         else {</span></span>
+<span><span class="co">#&gt;             return(invisible(download_result))</span></span>
+<span><span class="co">#&gt;         }</span></span>
 <span><span class="co">#&gt;     }</span></span>
-<span><span class="co">#&gt;     for (d in seq_along(download_names)) {</span></span>
-<span><span class="co">#&gt;         amadeus::download_unzip(file_name = download_names[d], </span></span>
+<span><span class="co">#&gt;     for (d in seq_along(all_destfiles)) {</span></span>
+<span><span class="co">#&gt;         amadeus::download_unzip(file_name = all_destfiles[d], </span></span>
 <span><span class="co">#&gt;             directory_to_unzip = directory_to_save, unzip = unzip)</span></span>
 <span><span class="co">#&gt;     }</span></span>
-<span><span class="co">#&gt;     amadeus::download_remove_zips(remove = remove_zip, download_name = download_names)</span></span>
-<span><span class="co">#&gt;     return(amadeus::download_hash(hash, directory_to_save))</span></span>
+<span><span class="co">#&gt;     amadeus::download_remove_zips(remove = remove_zip, download_name = all_destfiles)</span></span>
+<span><span class="co">#&gt;     if (hash) {</span></span>
+<span><span class="co">#&gt;         return(amadeus::download_hash(hash = TRUE, directory_to_save))</span></span>
+<span><span class="co">#&gt;     }</span></span>
+<span><span class="co">#&gt;     else {</span></span>
+<span><span class="co">#&gt;         return(invisible(download_result))</span></span>
+<span><span class="co">#&gt;     }</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x5617651986d0&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55eb2c6f79c8&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:amadeus&gt;</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

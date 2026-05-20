@@ -1,6 +1,6 @@
 # Process MODIS .hdf files
 
-Get mosaicked or merged raster from multiple MODIS hdf files.
+Get mosaic or merged raster from multiple MODIS hdf files.
 
 ## Usage
 
@@ -10,6 +10,8 @@ process_modis_merge(
   date = NULL,
   subdataset = NULL,
   fun_agg = "mean",
+  path_secondary = NULL,
+  fusion_method = c("mean", "primary_first", "secondary_first"),
   ...
 )
 ```
@@ -39,6 +41,16 @@ process_modis_merge(
   See `fun` description in
   [`terra::tapp`](https://rspatial.github.io/terra/reference/tapp.html)
   for details.
+
+- path_secondary:
+
+  character. Optional secondary list of HDF/H5 paths (e.g., Aqua files)
+  to fuse with `path` for improved temporal coverage.
+
+- fusion_method:
+
+  character(1). Fusion method when `path_secondary` is provided:
+  `"mean"`, `"primary_first"`, `"secondary_first"`.
 
 - ...:
 

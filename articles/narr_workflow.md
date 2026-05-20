@@ -1,161 +1,224 @@
 # NOAA North American Regional Reanalysis (NARR)
 
-This vignette demonstrates how to download, process, and calculate
-covariates from the [NOAA North American Regional Reanalysis
-(NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) dataset using
-`amadeus` functions. Details are provided for each function’s parameters
-and outputs. The examples utilize daily air temperature at 2m height
-(“air.2m”) data. The messages returned by `amadeus` functions have been
-omitted for brevity.
+This article demonstrates a compact workflow for NOAA NARR data.
 
-### Download
+This vignette runs its live workflow when rendered locally. The heavy
+download, processing, extraction, and plotting chunks are skipped
+automatically on CI, CRAN checks, and pkgdown builds; set
+`AMADEUS_RUN_VIGNETTES=true` to force live execution in those
+environments.
 
-Start by downloading the netCDF data files with `download_data`.
+Each workflow uses two small example surfaces: `example_points_sf`, a
+set of real Triangle-region AQS monitoring locations derived from
+`tests/testdata/aqs/aqs_daily_88101_triangle.csv`, for point extraction;
+and the packaged Durham County Uber H3 resolution-8 hexagons at
+`system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")`
+for polygon extraction.
 
-- `dataset_name = "narr"`: NARR dataset acronym.
-- `variable = "air.2m"`: air temperature at 2m height variable code.
-- `year = c(2021, 2022)`: years of interest.
-- `directory_to_save = dir`: directory to save the downloaded files.
-- `acknowledgement = TRUE`: acknowledge that the raw data files are
-  large and may consume lots of local storage.
-- `download = TRUE`: download the data files.
-- `remove_command = TRUE`: remove the temporary command file used to
-  download the data.
-- `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
+## Available inputs and data availability
+
+`download_data(dataset_name = "narr", ...)` expects NARR variable
+abbreviations.
+
+- Temporal resolution: daily meteorology from the NOAA PSL NARR Dailies
+  archive.
+- Year input: use a single year (for example, `2020`) or a start/end
+  pair such as `c(2020, 2022)`; the wrapper supports years from 1979
+  through the current calendar year.
+- Major constraints:
+  - Pressure-level variables (`air`, `hgt`, `omega`, `shum`, `tke`,
+    `uwnd`, `vwnd`) always download all 29 pressure levels from 1000 to
+    100 hPa.
+  - Subsurface variables (`soill`, `soilw`, `tsoil`) include all 4 soil
+    layers.
+  - Variables that are only available in the raw merged GRIB archive are
+    not supported by this wrapper.
+
+### Monolevel variables
+
+| variable   | description                                                  |
+|:-----------|:-------------------------------------------------------------|
+| acpcp      | Convective precipitation                                     |
+| air.2m     | Air temperature at 2 m                                       |
+| air.sfc    | Air temperature at surface                                   |
+| albedo     | Surface albedo                                               |
+| apcp       | Total accumulated precipitation                              |
+| bgrun      | Baseflow-groundwater runoff                                  |
+| bmixl.hl1  | Blackadar mixing length scale at hybrid level 1              |
+| cape       | Convective available potential energy                        |
+| ccond      | Canopy conductance                                           |
+| cdcon      | Convective cloud cover                                       |
+| cdlyr      | Non-convective cloud cover                                   |
+| cfrzr      | Categorical freezing rain                                    |
+| cicep      | Categorical ice pellets                                      |
+| cin        | Convective inhibition                                        |
+| cnwat      | Plant canopy surface water                                   |
+| crain      | Categorical rain                                             |
+| csnow      | Categorical snow                                             |
+| dlwrf      | Downward longwave radiation flux                             |
+| dpt.2m     | Dew point temperature at 2 m                                 |
+| dswrf      | Downward shortwave radiation flux                            |
+| evap       | Evaporation                                                  |
+| gflux      | Ground heat flux                                             |
+| hcdc       | High cloud cover                                             |
+| hgt.tropo  | Geopotential height at tropopause                            |
+| hlcy       | Storm relative helicity                                      |
+| hpbl       | Planetary boundary layer height                              |
+| lcdc       | Low cloud cover                                              |
+| lftx4      | Best (4-layer) lifted index                                  |
+| lhtfl      | Latent heat net flux                                         |
+| mcdc       | Mid-cloud cover                                              |
+| mconv.hl1  | Horizontal moisture divergence at hybrid level 1             |
+| mslet      | Mean sea level pressure (ETA model reduction)                |
+| mstav      | Moisture availability                                        |
+| pevap      | Potential evaporation                                        |
+| pottmp.hl1 | Potential temperature at hybrid level 1                      |
+| pottmp.sfc | Potential temperature at surface                             |
+| prate      | Precipitation rate                                           |
+| pres.sfc   | Surface pressure                                             |
+| pres.tropo | Pressure at tropopause                                       |
+| prmsl      | Pressure reduced to mean sea level                           |
+| pr_wtr     | Precipitable water                                           |
+| rcq        | Specific humidity tendency from all physics                  |
+| rcs        | Snowfall water equivalent tendency                           |
+| rcsol      | Solar radiative heating rates                                |
+| rct        | Temperature tendency from all physics                        |
+| rhum.2m    | Relative humidity at 2 m                                     |
+| shtfl      | Sensible heat net flux                                       |
+| shum.2m    | Specific humidity at 2 m                                     |
+| snod       | Snow depth                                                   |
+| snohf      | Snow phase-change heat flux                                  |
+| snom       | Snow melt                                                    |
+| snowc      | Snow cover                                                   |
+| soilm      | Soil moisture content (0-200 cm layer)                       |
+| ssrun      | Storm surface runoff                                         |
+| tcdc       | Total cloud cover                                            |
+| tke.hl1    | Turbulent kinetic energy at hybrid level 1                   |
+| ulwrf.ntat | Upward longwave radiation flux at nominal top of atmosphere  |
+| ulwrf.sfc  | Upward longwave radiation flux at surface                    |
+| ustm       | U-component of storm motion                                  |
+| uswrf.ntat | Upward shortwave radiation flux at nominal top of atmosphere |
+| uswrf.sfc  | Upward shortwave radiation flux at surface                   |
+| uwnd.10m   | U-component of wind at 10 m                                  |
+| veg        | Vegetation fraction                                          |
+| vis        | Visibility                                                   |
+| vstm       | V-component of storm motion                                  |
+| vvel.hl1   | Vertical velocity at hybrid level 1                          |
+| vwnd.10m   | V-component of wind at 10 m                                  |
+| vwsh.tropo | Vertical wind shear at tropopause                            |
+| wcconv     | Convective wetting of vegetation canopy                      |
+| wcinc      | Wetting of vegetation canopy                                 |
+| wcuflx     | U-component of convective canopy moisture flux               |
+| wcvflx     | V-component of convective canopy moisture flux               |
+| weasd      | Water-equivalent accumulated snow depth                      |
+| wvconv     | Convective column moisture convergence                       |
+| wvinc      | Column moisture increase                                     |
+| wvuflx     | U-component of vertically-integrated moisture flux           |
+| wvvflx     | V-component of vertically-integrated moisture flux           |
+
+### Pressure level variables
+
+| variable | description                          |
+|:---------|:-------------------------------------|
+| air      | Air temperature                      |
+| hgt      | Geopotential height                  |
+| omega    | Vertical velocity (pressure / omega) |
+| shum     | Specific humidity                    |
+| tke      | Turbulent kinetic energy             |
+| uwnd     | U-component of wind                  |
+| vwnd     | V-component of wind                  |
+
+### Subsurface (soil) variables
+
+| variable | description                                           |
+|:---------|:------------------------------------------------------|
+| soill    | Liquid volumetric soil moisture (non-frozen fraction) |
+| soilw    | Volumetric soil moisture content                      |
+| tsoil    | Soil temperature                                      |
+
+## Download representative requests
 
 ``` r
-dir <- tempdir()
-amadeus::download_data(
+
+directory_to_save <- file.path(tempdir(), "narr_workflow")
+download_data(
   dataset_name = "narr",
-  variable = "air.2m",
-  year = c(2021, 2022),
-  directory_to_save = dir,
-  acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE,
-  hash = TRUE
+  variables = c("dpt.2m", "air.2m"),
+  year = 2020,
+  directory_to_save = directory_to_save,
+  acknowledgement = TRUE
 )
 ```
 
-    [1] "3a382ac1c383c1d048f4044214cb450f"
-
-Check the downloaded netCDF files.
+## Process one workflow-ready data product
 
 ``` r
-list.files(dir, recursive = TRUE, pattern = "air.2m")
-```
 
-    [1] "air.2m/air.2m.2021.nc" "air.2m/air.2m.2022.nc"
-
-### Process
-
-Import and process the downloaded netCDF files with
-`process_covariates`.
-
-- `covariate = "narr"`: NARR dataset acronym.
-- `variable = "air.2m"`: air temperature at 2m height variable code.
-- `date = c("2021-12-28", "2022-01-03")`: date range of interest.
-- `path = paste0(dir, "/air.2m")`: directory containing the downloaded
-  files.
-
-``` r
-air2m_process <- amadeus::process_covariates(
+processed_data <- process_covariates(
   covariate = "narr",
   variable = "air.2m",
-  date = c("2021-12-28", "2022-01-03"),
-  path = file.path(dir, "/air.2m")
+  date = c("2020-01-01", "2020-01-10"),
+  path = file.path(directory_to_save, "air.2m")
 )
 ```
 
-Check the processed `SpatRaster` object.
+## Calculate covariates at points
 
 ``` r
-air2m_process
-```
 
-    class       : SpatRaster
-    dimensions  : 277, 349, 7  (nrow, ncol, nlyr)
-    resolution  : 32462.99, 32463  (x, y)
-    extent      : -16231.49, 11313351, -16231.5, 8976020  (xmin, xmax, ymin, ymax)
-    coord. ref. : +proj=lcc +lat_0=50 +lon_0=-107 +lat_1=50 +lat_2=50 +x_0=5632642.22547 +y_0=4612545.65137 +datum=WGS84 +units=m +no_defs
-    sources     : air.2m.2021.nc:air  (4 layers)
-                  air.2m.2022.nc:air  (3 layers)
-    varnames    : air (Daily Air Temperature at 2 m)
-                  air (Daily Air Temperature at 2 m)
-    names       : air.2~11228, air.2~11229, air.2~11230, air.2~11231, air.2~20101, air.2~20102, ...
-    unit        :           K,           K,           K,           K,           K,           K, ...
-    time        : 2021-12-28 to 2022-01-03 UTC
-
-``` r
-terra::plot(air2m_process[[1]])
-```
-
-![](images/air2m_process.png)
-
-### Calculate covariates
-
-Calculate covariates for North Carolina county boundaries with
-`calculate_covariates`. County boundaries are accessed with the
-[`tigris::counties`](https://rdrr.io/pkg/tigris/man/counties.html)
-function.
-
-- `covariate = "narr"`: NARR dataset acronym.
-- `from = air2m_process`: processed `SpatRaster` object.
-- `locs = tigris::counties("NC", year = 2021)`: North Carolina county
-  boundaries.
-- `locs_id = "NAME"`: county name identifier.
-- `radius = 0`: size of buffer radius around each county.
-- `geom = "terra"`: return covariates as a `SpatVector` object.
-
-``` r
-library(tigris)
-air2m_covar <- amadeus::calculate_covariates(
+hex_values <- calculate_covariates(
   covariate = "narr",
-  from = air2m_process,
-  locs = tigris::counties("NC", year = 2021),
-  locs_id = "NAME",
+  from = processed_data,
+  locs = durham_hex,
+  locs_id = "h3_id",
   radius = 0,
-  geom = "terra"
+  fun = "mean",
+  geom = "sf"
 )
+print(hex_values)
 ```
 
-Check the calculated covariates `SpatVector` object.
+## Visualize the data and point outputs
 
 ``` r
-air2m_covar
+
+usa <- sf::st_as_sf(maps::map("usa", plot = FALSE, fill = TRUE))
+bb <- sf::st_bbox(usa)
+
+# Project first layer to WGS84 and convert to data frame for safe ggplot2 rendering
+lyr1 <- terra::project(processed_data[[1]], "EPSG:4326")
+lyr1_df <- as.data.frame(lyr1, xy = TRUE)
+names(lyr1_df)[3] <- "value"
+
+ggplot2::ggplot() +
+  ggplot2::geom_raster(
+    data = lyr1_df,
+    ggplot2::aes(x = x, y = y, fill = value)
+  ) +
+  ggplot2::geom_sf(data = usa, fill = NA, color = "grey80", linewidth = 0.3) +
+  ggplot2::scale_fill_viridis_c(option = "C", na.value = "white") +
+  ggplot2::coord_sf(xlim = bb[c(1, 3)], ylim = bb[c(2, 4)], expand = FALSE) +
+  ggplot2::labs(x = NULL, y = NULL, fill = "air temp at 2m (K)") +
+  ggplot2::theme_minimal()
 ```
 
-    class       : SpatVector
-    geometry    : polygons
-    dimensions  : 700, 3  (geometries, attributes)
-    extent      : 7731783, 8506154, 3248490, 3694532  (xmin, xmax, ymin, ymax)
-    coord. ref. : +proj=lcc +lat_0=50 +lon_0=-107 +lat_1=50 +lat_2=50 +x_0=5632642.22547 +y_0=4612545.65137 +datum=WGS84 +units=m +no_defs
-    names       :     NAME       time air.2m_0
-    type        :    <chr>   <POSIXt>    <num>
-    values      :  Chatham 2021-12-28    289.3
-                  Alamance 2021-12-28    288.8
-                  Davidson 2021-12-28    289.1
-
-### Temporal summaries
-
-The `aggregate` function can be used to calculate a summary statistic
-for each unique spatial point or polygon. In the following example,
-average `air.2m_0` is calculated for each county for the time period
-December 28, 2021 to January 3, 2022. `air.2m_0 ~ NAME` directs the
-function to summarize `air.2m_0` values per unique `NAME`. The
-`FUN = mean` directs the function to take the mean value. The
-[`head()`](https://rspatial.github.io/terra/reference/headtail.html)
-function is applied to show only the first few entries, as the entire
-`data.frame` is 100 rows long.
+We plot the NARR 2m air temperature at the Uber H3 hexagons. NARR is
+fairly coarse spatial resolution at ~32sq-km, so we don’t see much
+spatial variability, but the facets show the daily trend
 
 ``` r
-head(aggregate(air.2m_0 ~ NAME, data = air2m_covar, FUN = mean))
+
+
+ggplot2::ggplot() +
+ggplot2::geom_sf(data = hex_values, ggplot2::aes(fill = air.2m_0)) +
+ggplot2::scale_fill_viridis_c() +
+ggplot2::facet_wrap(~time)
 ```
 
-           NAME air.2m_0
-    1  Alamance 289.5930
-    2 Alexander 289.1961
-    3 Alleghany 286.9486
-    4     Anson 290.5306
-    5      Ashe 285.5771
-    6     Avery 285.2288
+## Notes
+
+- The download request now covers both snow water equivalent (`weasd`)
+  and 2m air temperature (`air.2m`).
+- NARR uses projected source data internally, so the vignette leaves
+  reprojection to `amadeus` and keeps the extraction geometry in WGS84
+  input coordinates.

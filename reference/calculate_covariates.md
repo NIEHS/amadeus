@@ -15,11 +15,14 @@ calculate_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
     "dummies", "gmted", "sedac_groads", "groads", "roads", "ecoregions", "ecoregion",
     "hms", "smoke", "gmted", "narr", "geos", "sedac_population", "population", "nlcd",
-    "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "prism", "cropscape",
-    "cdl", "huc"),
+    "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "mcd14ml", "prism",
+    "cropscape", "cdl", "huc", "edgar", "goes", "goes_adp", "GOES", "drought", "spei",
+    "eddi", "usdm"),
   from,
   locs,
   locs_id = "site_id",
+  .by_time = NULL,
+  weights = NULL,
   ...
 )
 ```
@@ -32,7 +35,8 @@ calculate_covariates(
 
 - from:
 
-  character. Single or multiple from strings.
+  character, SpatRaster, SpatVector, or data.frame depending on the
+  selected `covariate` route.
 
 - locs:
 
@@ -42,6 +46,18 @@ calculate_covariates(
 - locs_id:
 
   character(1). Name of unique identifier. Default is `"site_id"`.
+
+- .by_time:
+
+  NULL or character(1). Name of the time column to use temporal
+  summarization unit token. `NULL` (default) disables temporal
+  summarization.
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path. Passed
+  through to the underlying source-specific function for weighted
+  extraction. If `NULL` (default), unweighted extraction is performed.
 
 - ...:
 
@@ -81,6 +97,9 @@ Calculated covariates as a data.frame or SpatVector object
 - [`calculate_geos`](https://niehs.github.io/amadeus/reference/calculate_geos.md):
   "geos", "geos_cf", "GEOS"
 
+- [`calculate_goes`](https://niehs.github.io/amadeus/reference/calculate_goes.md):
+  "goes", "goes_adp", "GOES"
+
 - [`calculate_population`](https://niehs.github.io/amadeus/reference/calculate_population.md):
   "population", "sedac_population"
 
@@ -113,6 +132,12 @@ Calculated covariates as a data.frame or SpatVector object
 
 - [`calculate_huc`](https://niehs.github.io/amadeus/reference/calculate_huc.md):
   "huc", "HUC"
+
+- [`calculate_edgar`](https://niehs.github.io/amadeus/reference/calculate_edgar.md):
+  "edgar"
+
+- [`calculate_drought`](https://niehs.github.io/amadeus/reference/calculate_drought.md):
+  "drought", "spei", "eddi", "usdm"
 
 ## Author
 

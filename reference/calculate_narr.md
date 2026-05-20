@@ -14,6 +14,8 @@ calculate_narr(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
+  .by_time = NULL,
   geom = FALSE,
   ...
 )
@@ -44,6 +46,17 @@ calculate_narr(
 
   character(1). Function used to summarize multiple raster cells within
   sites location buffer (Default = `mean`).
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
+
+- .by_time:
+
+  NULL or character(1). Optional time grouping key used when `.by_time`
+  is provided.
 
 - geom:
 

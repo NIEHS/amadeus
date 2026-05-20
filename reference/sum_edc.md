@@ -10,8 +10,10 @@ sum_edc(
   from = NULL,
   locs = NULL,
   locs_id = NULL,
-  sedc_bandwidth = NULL,
+  decay_range = NULL,
   target_fields = NULL,
+  C0 = NULL,
+  use_threshold = TRUE,
   geom = FALSE
 )
 ```
@@ -32,7 +34,7 @@ sum_edc(
 
   character(1). Name of the unique id field in `point_to`.
 
-- sedc_bandwidth:
+- decay_range:
 
   numeric(1). Distance at which the source concentration is reduced to
   `exp(-3)` (approximately -95 %)
@@ -40,6 +42,19 @@ sum_edc(
 - target_fields:
 
   character(varying). Field names in characters.
+
+- C0:
+
+  `NULL`, character(1), or numeric vector of length `nrow(from)`.
+  Optional initial source values at pollutant locations. If `NULL`
+  (default), all source values are set to 1. If character(1), the value
+  is treated as a column name in `from` and used as source values.
+
+- use_threshold:
+
+  logical(1). If `TRUE` (default), include only source points within
+  `5 * decay_range` from each target location. If `FALSE`, include all
+  source points in `from`.
 
 - geom:
 
@@ -53,8 +68,8 @@ a data.frame (tibble) or SpatVector object with input field names with a
 suffix `"_sedc"` where the sums of EDC are stored. Additional attributes
 are attached for the EDC information.
 
-- \`attr(result, "sedc_bandwidth")“: the bandwidth where concentration
-  reduces to approximately five percent
+- \`attr(result, "decay_range")“: the range where concentration reduces
+  to approximately five percent
 
 - \`attr(result, "sedc_threshold")“: the threshold distance at which
   emission source points are excluded beyond that
@@ -72,7 +87,7 @@ should be carefully chosen by users.
 Messier KP, Akita Y, Serre ML (2012). “Integrating Address Geocoding,
 Land Use Regression, and Spatiotemporal Geostatistical Estimation for
 Groundwater Tetrachloroethylene.” *Environmental Science & Technology*,
-**46**(5), 2772–2780. ISSN 0013-936X,
+**46**(5), 2772–2780. ISSN 0013-936X.
 [doi:10.1021/es203152a](https://doi.org/10.1021/es203152a) .
 
 Wiesner C (????). “Euclidean Sum of Exponentially Decaying Contributions

@@ -5,7 +5,7 @@ Send messages updating covariate extraction progress.
 ## Usage
 
 ``` r
-calc_message(dataset, variable, time, time_type, level)
+calc_message(dataset, variable, time, time_type, level, layer_time = NULL)
 ```
 
 ## Arguments

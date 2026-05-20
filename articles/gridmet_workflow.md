@@ -1,140 +1,127 @@
 # Climatology Lab gridMET
 
-This vignette demonstrates how to download, process, and calculate
-covariates from the Climatology Lab’s
-[gridMET](https://www.climatologylab.org/gridmet.html) dataset using
-`amadeus` functions. Details are provided for each function’s parameters
-and outputs. The examples utilize daily specific humidity data. See
-<https://www.climatologylab.org/wget-gridmet.html> for full variable
-names and acronyms. The messages returned by `amadeus` functions have
-been omitted for brevity.
+This article demonstrates a compact workflow for Climatology Lab
+`gridMET` data using multiple variables, multiple summaries, and both
+point and polygon extraction.
 
-### Download
+This vignette runs its live workflow when rendered locally. The heavy
+download, processing, extraction, and plotting chunks are skipped
+automatically on CI, CRAN checks, and pkgdown builds; set
+`AMADEUS_RUN_VIGNETTES=true` to force live execution in those
+environments.
 
-Start by downloading the netCDF data files with `download_data`.
+## Available inputs and data availability
 
-- `dataset_name = "gridmet"`: gridMET dataset name.
-- `variable = "Near-Surface Specific Humidity"`: specific humidity
-  variable name.
-- `year = c(2019, 2020)`: years of interest.
-- `directory_to_save = dir`: directory to save the downloaded files.
-- `acknowledgement = TRUE`: acknowledge that the raw data files are
-  large and may consume lots of local storage.
-- `download = TRUE`: download the data files.
-- `remove_command = TRUE`: remove the temporary command file used to
-  download the data.
-- `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
+`download_data(dataset_name = "gridmet", ...)` accepts either the full
+variable names below or their gridMET codes.
+
+| Code     | Variable                               |
+|----------|----------------------------------------|
+| `sph`    | Near-Surface Specific Humidity         |
+| `vpd`    | Mean Vapor Pressure Deficit            |
+| `pr`     | Precipitation                          |
+| `rmin`   | Minimum Near-Surface Relative Humidity |
+| `rmax`   | Maximum Near-Surface Relative Humidity |
+| `srad`   | Surface Downwelling Solar Radiation    |
+| `tmmn`   | Minimum Near-Surface Air Temperature   |
+| `tmmx`   | Maximum Near-Surface Air Temperature   |
+| `vs`     | Wind speed at 10 m                     |
+| `th`     | Wind direction at 10 m                 |
+| `pdsi`   | Palmer Drought Severity Index          |
+| `pet`    | Reference grass evapotranspiration     |
+| `etr`    | Reference alfalfa evapotranspiration   |
+| `ERC`    | Energy Release Component               |
+| `BI`     | Burning Index                          |
+| `FM100`  | 100-hour dead fuel moisture            |
+| `FM1000` | 1000-hour dead fuel moisture           |
+
+- Temporal resolution: daily; each download is an annual NetCDF file for
+  one variable.
+- Year input: use a single year or a start/end pair such as
+  `c(2018, 2022)`.
+- Availability check: the wrapper validates the first requested
+  variable-year URL and stops if that request returns HTTP 404.
+- Major constraint: gridMET downloads do not require authentication.
+
+## Download representative requests
 
 ``` r
-dir <- tempdir()
-amadeus::download_data(
+
+directory_to_save <- file.path(tempdir(), "gridmet_workflow")
+download_data(
   dataset_name = "gridmet",
-  variable = "Near-Surface Specific Humidity",
-  year = c(2019, 2020),
-  directory_to_save = dir,
-  acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE,
-  hash = TRUE
+  variables = c("tmmx"),
+  year = 2020,
+  directory_to_save = directory_to_save,
+  acknowledgement = TRUE
 )
 ```
 
-    [1] "aa5116525468299d1fc483b108b3e841fc40d7e5"
-
-Check the downloaded netCDF files.
+## Process workflow-ready data product
 
 ``` r
-list.files(dir, recursive = TRUE, pattern = "sph")
-```
 
-    [1] "sph/sph_2019.nc" "sph/sph_2020.nc"
-
-### Process
-
-Import and process the downloaded netCDF files with
-`process_covariates`.
-
-- `covariate = "gridmet"`: gridMET dataset name.
-- `variable = "Near-Surface Specific Humidity"`: specific humidity
-  variable name.
-- `date = c("2019-12-13", "2022-01-10")`: date range of interest.
-- `path = paste0(dir, "/sph")`: directory containing the downloaded
-  files.
-
-``` r
-sph_process <- amadeus::process_covariates(
+processed_data <- process_covariates(
   covariate = "gridmet",
-  variable = "Near-Surface Specific Humidity",
-  date = c("2019-12-18", "2020-01-10"),
-  path = file.path(dir, "/sph")
+  variable = "tmmx",
+  date = c("2020-01-01", "2020-01-31"),
+  path = file.path(directory_to_save, "tmmx"),
+  extent = terra::ext(-79.2, -78.6, 35.8, 36.3)
 )
 ```
 
-Check the processed `SpatRaster` object.
+## Calculate covariates at points using native daily temporal resolution and use .by_time to calculate monthly means
 
 ``` r
-sph_process
-```
 
-    class       : SpatRaster 
-    dimensions  : 585, 1386, 24  (nrow, ncol, nlyr)
-    resolution  : 0.04166667, 0.04166667  (x, y)
-    extent      : -124.7875, -67.0375, 25.04583, 49.42083  (xmin, xmax, ymin, ymax)
-    coord. ref. : lon/lat WGS 84 (EPSG:4326) 
-    sources     : sph_2019.nc  (14 layers) 
-                  sph_2020.nc  (10 layers) 
-    varnames    : sph (near-surface specific humidity) 
-                  sph (near-surface specific humidity) 
-    names       : sph_20191218, sph_20191219, sph_20191220, sph_20191221, sph_20191222, sph_20191223, ... 
-    unit        :        kg/kg,        kg/kg,        kg/kg,        kg/kg,        kg/kg,        kg/kg, ... 
-    time (days) : 2019-12-18 to 2020-01-10 
 
-``` r
-terra::plot(sph_process[[1]])
-```
 
-![](images/sph_process.png)
+domain_x <- c(terra::xmin(processed_data), terra::xmax(processed_data))
+domain_y <- c(terra::ymin(processed_data), terra::ymax(processed_data))
+domain_dx <- diff(domain_x)
+domain_dy <- diff(domain_y)
 
-### Calculate covariates
+candidate_xy <- expand.grid(
+  lon = seq(domain_x[1] + 0.12 * domain_dx, domain_x[2] - 0.12 * domain_dx, length.out = 5),
+  lat = seq(domain_y[1] + 0.12 * domain_dy, domain_y[2] - 0.12 * domain_dy, length.out = 5)
+)
+example_points_sf <- sf::st_as_sf(
+  candidate_xy,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+example_points_sf$site_id <- paste0("site_", seq_len(nrow(example_points_sf)))
 
-Calculate covariates for California county boundaries with
-`calculate_covariates`. County boundaries are accessed with the
-[`tigris::counties`](https://rdrr.io/pkg/tigris/man/counties.html)
-function.
 
-- `covariate = "gridmet"`: gridMET dataset name.
-- `from = sph_process`: processed `SpatRaster` object.
-- `locs = tigris::counties("CA", year = 2019)`: California county
-  boundaries.
-- `locs_id = "NAME"`: county name identifier.
-- `radius = 0`: size of buffer radius around each county.
-- `geom = "sf"`: return covariates as an `sf` object.
-
-``` r
-library(tigris)
-sph_covar <- amadeus::calculate_covariates(
+point_values <- calculate_covariates(
   covariate = "gridmet",
-  from = sph_process,
-  locs = tigris::counties("CA", year = 2019),
-  locs_id = "NAME",
+  from = processed_data,
+  locs = example_points_sf,
+  locs_id = "site_id",
   radius = 0,
-  geom = "terra"
+  fun = "mean",
+  geom = "sf"
 )
+
+point_values_month <- calculate_covariates(
+  covariate = "gridmet",
+  from = processed_data,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  .by_time = "month",
+  radius = 0,
+  fun = "mean",
+  geom = "sf"
+)
+
+print(point_values)
+print(point_values_month)
 ```
 
-Check the calculated covariates `sf` object.
+## Visualize the point outputs
 
 ``` r
-sph_covar
-```
 
-    class       : SpatVector 
-    geometry    : polygons 
-    dimensions  : 1392, 3  (geometries, attributes)
-    extent      : -124.482, -114.1312, 32.52883, 42.0095  (xmin, xmax, ymin, ymax)
-    coord. ref. : lon/lat WGS 84 (EPSG:4326) 
-    names       :          NAME       time    sph_0
-    type        :         <chr>   <POSIXt>    <num>
-    values      :        Sierra 2019-12-18 0.003101
-                     Sacramento 2019-12-18 0.005791
-                  Santa Barbara 2019-12-18 0.004594
+
+ggplot(data = point_values) + geom_sf(aes(color = `tmmx_0`)) + ggtitle("Daily values")
+```

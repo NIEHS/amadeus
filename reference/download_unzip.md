@@ -1,6 +1,6 @@
-# Unzip zip files
+# Extract downloaded archives
 
-Unzip (inflate) downloaded ".zip" files.
+Extract downloaded ".zip" or ".7z" files.
 
 ## Usage
 
@@ -12,16 +12,16 @@ download_unzip(file_name, directory_to_unzip, unzip = TRUE)
 
 - file_name:
 
-  character(1). Full zip file path
+  character(1). Full archive file path
 
 - directory_to_unzip:
 
-  character(1). Directory to unzip data
+  character(1). Directory to extract data
 
 - unzip:
 
-  logical(1). Unzip (`TRUE`) or not.
+  logical(1). Extract (`TRUE`) or not.
 
 ## Value
 
-NULL; unzips downloaded zip files
+NULL; extracts downloaded archive files

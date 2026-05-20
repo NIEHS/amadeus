@@ -1,8 +1,7 @@
 # Download roads data
 
 The `download_groads()` function accesses and downloads roads data from
-[NASA's Global Roads Open Access Data Set (gROADS), v1
-(1980-2010)](https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1).
+NASA's Global Roads Open Access Data Set (gROADS).
 
 ## Usage
 
@@ -11,13 +10,17 @@ download_groads(
   data_region = c("Americas", "Global", "Africa", "Asia", "Europe", "Oceania East",
     "Oceania West"),
   data_format = c("Shapefile", "Geodatabase"),
+  nasa_earth_data_token = NULL,
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 )
 ```
 
@@ -25,65 +28,70 @@ download_groads(
 
 - data_region:
 
-  character(1). Data can be downloaded for `"Global"`, `"Africa"`,
-  `"Asia"`, `"Europe"`, `"Americas"`, `"Oceania East"`, and
-  `"Oceania West"`.
+  character(1). Data region.
 
 - data_format:
 
-  character(1). Data can be downloaded as `"Shapefile"` or
-  `"Geodatabase"`. (Only `"Geodatabase"` available for `"Global"`
-  region).
+  character(1). "Shapefile" or "Geodatabase".
+
+- nasa_earth_data_token:
+
+  character(1) or NULL. NASA EarthData authentication token. Can be a
+  token string, a path to a file containing the token, or `NULL` to read
+  from the `NASA_EARTHDATA_TOKEN` environment variable.
 
 - directory_to_save:
 
-  character(1). Directory to save data. Two sub-directories will be
-  created for the downloaded zip files ("/zip_files") and the unzipped
-  shapefiles ("/data_files").
+  character(1). Directory to save data.
 
 - acknowledgement:
 
-  logical(1). By setting `TRUE` the user acknowledges that the data
-  downloaded using this function may be very large and use lots of
-  machine storage and memory.
+  logical(1). Must be TRUE to proceed.
 
 - download:
 
-  logical(1). `FALSE` will generate a \*.txt file containing all
-  download commands. By setting `TRUE` the function will download all of
-  the requested data files.
+  logical(1). DEPRECATED. Downloads happen automatically.
 
 - remove_command:
 
-  logical(1). Remove (`TRUE`) or keep (`FALSE`) the text file containing
-  download commands.
+  logical(1). Deprecated, ignored.
 
 - unzip:
 
-  logical(1). Unzip zip files. Default is `TRUE`.
+  logical(1). Unzip zip files (default TRUE).
 
 - remove_zip:
 
-  logical(1). Remove zip files from directory_to_download. Default is
-  `FALSE`.
+  logical(1). Remove zip files after unzipping (default FALSE).
+
+- show_progress:
+
+  logical(1). Show download progress (default TRUE)
 
 - hash:
 
-  logical(1). By setting `TRUE` the function will return an
-  [`rlang::hash_file()`](https://rlang.r-lib.org/reference/hash.html)
-  hash character corresponding to the downloaded files. Default is
-  `FALSE`.
+  logical(1). Return hash of downloaded files (default FALSE)
+
+- max_tries:
+
+  integer(1). Maximum retry attempts (default 20)
+
+- rate_limit:
+
+  numeric(1). Minimum seconds between requests (default 2)
 
 ## Value
 
-- For `hash = FALSE`, NULL
+invisible list with download results; or hash character if hash=TRUE
 
-- For `hash = TRUE`, an
-  [`rlang::hash_file`](https://rlang.r-lib.org/reference/hash.html)
-  character.
+## Note
 
-- Zip and/or data files will be downloaded and stored in respective
-  sub-directories within `directory_to_save`.
+gROADS data is hosted on NASA EarthData and requires a valid NASA
+EarthData token for authentication. Set the `NASA_EARTHDATA_TOKEN`
+environment variable or pass the token directly via
+`nasa_earth_data_token`. Use
+[`setup_nasa_token()`](https://niehs.github.io/amadeus/reference/setup_nasa_token.md)
+for setup.
 
 ## References
 
@@ -91,7 +99,7 @@ Center For International Earth Science Information
 Network-CIESIN-Columbia University, Information Technology Outreach
 Services-ITOS-University Of Georgia (2013). “Global Roads Open Access
 Data Set, Version 1 (gROADSv1).”
-[doi:10.7927/H4VD6WCT](https://doi.org/10.7927/H4VD6WCT) ,
+[doi:10.7927/H4VD6WCT](https://doi.org/10.7927/H4VD6WCT) .
 <https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1>.
 
 ## Author
@@ -106,10 +114,7 @@ download_groads(
   data_region = "Americas",
   data_format = "Shapefile",
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE,
-  unzip = FALSE
+  acknowledgement = TRUE
 )
 } # }
 ```

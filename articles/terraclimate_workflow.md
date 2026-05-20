@@ -1,103 +1,141 @@
 # Climatology Lab TerraClimate
 
-This vignette demonstrates how to download, process, and calculate
-covariates from the Climatology Lab’s
-[TerraClimate](https://www.climatologylab.org/terraclimate.html) dataset
-using `amadeus` functions. Details are provided for each function’s
-parameters and outputs. The examples utilize monthly wind speed data.
-See <https://www.climatologylab.org/wget-terraclimate.html> for full
-variable names and acronyms. The messages returned by `amadeus`
-functions have been omitted for brevity.
+This article demonstrates a compact workflow for Climatology Lab
+TerraClimate data.
 
-### Download
+This vignette runs its live workflow when rendered locally. The heavy
+download, processing, extraction, and plotting chunks are skipped
+automatically on CI, CRAN checks, and pkgdown builds; set
+`AMADEUS_RUN_VIGNETTES=true` to force live execution in those
+environments.
 
-Start by downloading the netCDF data files with `download_data`.
+## Available inputs and data availability
 
-- `dataset_name = "terraclimate"`: TerraClimate dataset name.
-- `variable = "Wind Speed"`: wind speed variable name.
-- `year = c(2021, 2022)`: years of interest.
-- `directory_to_save = dir`: directory to save the downloaded files.
-- `acknowledgement = TRUE`: acknowledge that the raw data files are
-  large and may consume lots of local storage.
-- `download = TRUE`: download the data files.
-- `remove_command = TRUE`: remove the temporary command file used to
-  download the data.
-- `hash = TRUE`: generate unique SHA-1 hash for the downloaded files.
+`download_data(dataset_name = "terraclimate", ...)` accepts either the
+full variable names below or their TerraClimate codes.
+
+| Code   | Variable                                |
+|--------|-----------------------------------------|
+| `aet`  | Actual Evapotranspiration               |
+| `def`  | Climate Water Deficit                   |
+| `pet`  | Potential evapotranspiration            |
+| `ppt`  | Precipitation                           |
+| `q`    | Runoff                                  |
+| `soil` | Soil Moisture                           |
+| `srad` | Downward surface shortwave radiation    |
+| `swe`  | Snow water equivalent - at end of month |
+| `tmax` | Max Temperature                         |
+| `tmin` | Min Temperature                         |
+| `vap`  | Vapor pressure                          |
+| `ws`   | Wind speed                              |
+| `vpd`  | Vapor Pressure Deficit                  |
+| `PDSI` | Palmer Drought Severity Index           |
+
+- Temporal resolution: monthly; each download is an annual NetCDF file
+  containing monthly layers for one variable.
+- Year input: use a single year or a start/end pair such as
+  `c(2018, 2022)`.
+- Availability check: the wrapper validates the first requested
+  variable-year URL and stops if that request returns HTTP 404.
+- Major constraint: TerraClimate downloads do not require
+  authentication.
+
+## Download representative requests
 
 ``` r
-dir <- tempdir()
-amadeus::download_data(
+
+directory_to_save <- file.path(tempdir(), "terraclimate_workflow")
+download_data(
   dataset_name = "terraclimate",
-  variable = "Wind Speed",
-  year = c(2021, 2022),
-  directory_to_save = dir,
-  acknowledgement = TRUE,
-  download = TRUE,
-  remove_command = TRUE,
-  hash = TRUE
+  variables = c("Precipitation"),
+  year = 2019,
+  directory_to_save = directory_to_save,
+  acknowledgement = TRUE
 )
 ```
 
-    [1] "344cddba906371b701f661ccebeef3f427b2d8ec"
-
-Check the downloaded netCDF files.
+## Process one workflow-ready data product
 
 ``` r
-list.files(dir, recursive = TRUE, pattern = "ws")
-```
 
-    [1] "ws/ws_2021.nc" "ws/ws_2022.nc"
-
-### Process
-
-Import and process the downloaded netCDF files with
-`process_covariates`.
-
-**Parameters:**
-
-- `covariate = "terraclimate"`: TerraClimate dataset name.
-- `variable = "Wind Speed"`: wind speed variable name.
-- `date = c("2021-12-28", "2022-01-03")`: date range of interest.
-- `path = paste0(dir, "/ws")`: directory containing the downloaded
-  files.
-
-``` r
-ws_process <- amadeus::process_covariates(
+processed_data <- process_covariates(
   covariate = "terraclimate",
-  variable = "Wind Speed",
-  date = c("2021-12-28", "2022-01-03"),
-  path = file.path(dir, "/ws")
+  variable = "ppt",
+  date = c("2019-01-01", "2019-02-01"),
+  path = dirname(list.files(
+    directory_to_save,
+    pattern = "\\.nc$",
+    recursive = TRUE,
+    full.names = TRUE
+  )[1]),
+  extent = terra::ext(-114.9, -102.0, 31.3, 41.1)
 )
+
+terra::plot(processed_data, main = "TerraClimate ppt for Jan-Feb 2019")
 ```
 
-Check the processed `SpatRaster` object. **Note** Climatology Lab
-TerraClimate is a monthly dataset, so the `SpatRaster` contains two
-layers for December 2021 and January 2022.
+## Calculate covariates at points
 
 ``` r
-ws_process
+
+
+domain_x <- c(terra::xmin(processed_data), terra::xmax(processed_data))
+domain_y <- c(terra::ymin(processed_data), terra::ymax(processed_data))
+domain_dx <- diff(domain_x)
+domain_dy <- diff(domain_y)
+
+candidate_xy <- expand.grid(
+  lon = seq(domain_x[1] + 0.12 * domain_dx, domain_x[2] - 0.12 * domain_dx, length.out = 5),
+  lat = seq(domain_y[1] + 0.12 * domain_dy, domain_y[2] - 0.12 * domain_dy, length.out = 5)
+)
+example_points_sf <- sf::st_as_sf(
+  candidate_xy,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+example_points_sf$site_id <- paste0("site_", seq_len(nrow(example_points_sf)))
+
+
+point_values <- calculate_covariates(
+  covariate = "terraclimate",
+  from = processed_data,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  fun = "mean",
+  geom = "sf"
+)
+
+print(point_values)
 ```
 
-    class       : SpatRaster 
-    dimensions  : 4320, 8640, 2  (nrow, ncol, nlyr)
-    resolution  : 0.04166667, 0.04166667  (x, y)
-    extent      : -180, 180, -90, 90  (xmin, xmax, ymin, ymax)
-    coord. ref. : +proj=longlat +ellps=WGS84 +no_defs 
-    sources     : ws_2021.nc  
-                  ws_2022.nc  
-    varnames    : ws (wind speed) 
-                  ws (wind speed) 
-    names       : ws_202112, ws_202201 
-    unit        :       m/s,       m/s 
-    time (days) : 2021-12-01 to 2022-01-01 
+## Workflow for an annual average covariate
 
 ``` r
-terra::plot(ws_process[[1]])
+
+annual_process <- process_covariates(
+  covariate = "terraclimate",
+  variable = "ppt",
+  date = c("2019-01-01", "2019-12-31"),
+  path = dirname(list.files(
+    directory_to_save,
+    pattern = "\\.nc$",
+    recursive = TRUE,
+    full.names = TRUE
+  )[1]),
+  extent = terra::ext(-114.9, -102.0, 31.3, 41.1)
+)
+
+point_year <- calculate_covariates(
+  covariate = "terraclimate",
+  from = annual_process,
+  locs = example_points_sf,
+  locs_id = "site_id",
+  radius = 0,
+  .by_time = "year",
+  fun = "mean",
+  geom = "sf"
+)
+
+print(point_year)
 ```
-
-![](images/ws_process.png)
-
-### Calculate covariates
-
-Covariate calculation with Climatology Lab TerraClimate data is
-undergoing updates.

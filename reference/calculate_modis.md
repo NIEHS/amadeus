@@ -1,17 +1,18 @@
-# Calculate MODIS product covariates in multiple CPU threads
+# Calculate MODIS product covariates
 
-`calculate_modis` essentially runs
-[`calculate_modis_daily`](https://niehs.github.io/amadeus/reference/calculate_modis_daily.md)
-function in each thread (subprocess). Based on daily resolution, each
-day's workload will be distributed to each thread. With `product`
-argument, the files are processed by a customized function where the
-unique structure and/or characteristics of the products are considered.
+`calculate_modis` orchestrates daily extraction using
+[`calculate_modis_daily()`](https://niehs.github.io/amadeus/reference/calculate_modis_daily.md).
+In raw-path mode, files are grouped by inferred date, preprocessed for
+each day, and then extracted over requested radii. With product-specific
+preprocessing, files are handled according to each product's structure
+and naming conventions.
 
 ## Usage
 
 ``` r
 calculate_modis(
   from = NULL,
+  from_secondary = NULL,
   locs = NULL,
   locs_id = "site_id",
   radius = c(0L, 1000L, 10000L, 50000L),
@@ -19,11 +20,14 @@ calculate_modis(
   name_covariates = NULL,
   subdataset = NULL,
   fun_summary = "mean",
+  .by_time = NULL,
+  weights = NULL,
   package_list_add = NULL,
   export_list_add = NULL,
   max_cells = 3e+07,
   geom = FALSE,
   scale = NULL,
+  fusion_method = c("mean", "primary_first", "secondary_first"),
   ...
 )
 ```
@@ -32,7 +36,16 @@ calculate_modis(
 
 - from:
 
-  character. List of paths to MODIS/VIIRS files.
+  character, SpatRaster, or SpatVector. Either a list of MODIS/VIIRS
+  file paths (raw path mode), a preprocessed raster (direct raster
+  mode), or processed MODIS fire detections as a SpatVector with `time`,
+  `fire_count`, and `frp` fields.
+
+- from_secondary:
+
+  character or SpatRaster. Optional secondary input for fused temporal
+  coverage in raster/path workflows. Type must match `from` (`character`
+  with `character`, or `SpatRaster` with `SpatRaster`).
 
 - locs:
 
@@ -49,7 +62,8 @@ calculate_modis(
 
 - preprocess:
 
-  function. Function to handle HDF files.
+  function. Function to handle HDF files in raw path mode. Ignored when
+  `from` is a `SpatRaster` or `SpatVector`.
 
 - name_covariates:
 
@@ -68,16 +82,26 @@ calculate_modis(
 
   character or function. Function to summarize extracted raster values.
 
+- .by_time:
+
+  NULL or character(1). Optional time grouping key used with `.by_time`
+  for temporal summaries.
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
+
 - package_list_add:
 
-  character. A vector with package names to load these in each thread.
-  Note that `sf`, `terra`, `exactextractr`, `doParallel`, `parallelly`
-  and `dplyr` are the default packages to be loaded.
+  character. Reserved for backward compatibility; currently not used by
+  `calculate_modis()`.
 
 - export_list_add:
 
-  character. A vector with object names to export to each thread. It
-  should be minimized to spare memory.
+  character. Reserved for backward compatibility; currently not used by
+  `calculate_modis()`.
 
 - max_cells:
 
@@ -96,11 +120,18 @@ calculate_modis(
 - scale:
 
   character(1). Scale expression to be applied to the raw values. It is
-  crucial that users review the technical documentatio of the MODIS
+  crucial that users review the technical documentation of the MODIS
   product they are using to ensure proper scale. An example for the
   MOD11A1 product's LST_Day_1km variable (land surface temperature)
   would be `scale = "* 0.02"`. Default is `NULL`, which applies no
   scale.
+
+- fusion_method:
+
+  character(1). Fusion method used only when `from_secondary` is
+  provided. Options are `"mean"` (pixel-wise mean with `na.rm = TRUE`),
+  `"primary_first"` (use `from` first), and `"secondary_first"` (use
+  `from_secondary` first).
 
 - ...:
 
@@ -112,22 +143,23 @@ A data.frame or SpatVector with an attribute:
 
 - `attr(., "dates_dropped")`: Dates with insufficient tiles. Note that
   the dates mean the dates with insufficient tiles, not the dates
-  without available tiles.
+  without available tiles. When `.by_time` is provided, rows are
+  summarized with
+  [`calc_summarize_by()`](https://niehs.github.io/amadeus/reference/calc_summarize_by.md)
+  semantics.
 
 ## Note
 
-Overall, this function and dependent routines assume that the file
-system can handle concurrent access to the (network) disk by multiple
-processes. File system characteristics, package versions, and hardware
-settings and specification can affect the processing efficiency. `locs`
-is expected to be convertible to `sf` object. `sf`, `SpatVector`, and
-other class objects that could be converted to `sf` can be used. Common
-arguments in `preprocess` functions such as `date` and `path` are
-automatically detected and passed to the function. Please note that
-`locs` here and `path` in `preprocess` functions are assumed to have a
-standard naming convention of raw files from NASA. The argument
-`subdataset` should be in a proper format depending on `preprocess`
-function:
+`locs` is expected to be convertible to `sf` object. `sf`, `SpatVector`,
+and other class objects that could be converted to `sf` can be used. In
+raw path mode, `preprocess` is called once per inferred day using a
+single-date value. Temporal aggregation across extracted rows should be
+done with `.by_time`. Common arguments in `preprocess` functions such as
+`date` and `path` are automatically detected and passed to the function.
+Please note that `locs` here and `path` in `preprocess` functions are
+assumed to have a standard naming convention of raw files from NASA. The
+argument `subdataset` should be in a proper format depending on
+`preprocess` function:
 
 - [`process_modis_merge()`](https://niehs.github.io/amadeus/reference/process_modis_merge.md):
   Regular expression pattern. e.g., `"^LST_"`
@@ -137,11 +169,40 @@ function:
   `c("Cloud_Fraction_Day", "Cloud_Fraction_Night")`
 
 - [`process_blackmarble()`](https://niehs.github.io/amadeus/reference/process_blackmarble.md):
-  Subdataset number. e.g., for VNP46A2 product, 3L. Dates with less than
-  80 percent of the expected number of tiles, which are determined by
-  the mode of the number of tiles, are removed. Users will be informed
-  of the dates with insufficient tiles. The result data.frame will have
-  an attribute with the dates with insufficient tiles.
+  Subdataset number. e.g., for VNP46A2 product, 3L.
+
+For MOD13/MYD13 families, Terra and Aqua composites are 16-day phased
+products offset by 8 days; combining both can improve effective temporal
+coverage. This behavior aligns with NASA MOD13 product guidance:
+<https://modis.gsfc.nasa.gov/data/dataprod/mod13.php>
+
+For MCD19A2 MAIAC, common sub-datasets include both optical depth and
+plume injection height layers. Typical selectors are
+`"(Optical_Depth|Injection_Height)"` for both families or
+`"(Injection_Height)"` when targeting plume height only.
+
+For MOD14A1/MYD14A1 fire grids, the `FireMask` raw values are commonly
+interpreted as:
+
+|  |  |  |
+|----|----|----|
+| Raw value | Meaning | Binary fire mask? |
+| 0 | not processed, missing input | NA / no observation |
+| 1 | obsolete, not used since Collection 1 | NA |
+| 2 | not processed, other reason | NA |
+| 3 | non-fire water pixel | 0 |
+| 4 | cloud, land or water | NA or 0, depending on analysis |
+| 5 | non-fire land pixel | 0 |
+| 6 | unknown, land or water | NA |
+| 7 | fire, low confidence | 1, or exclude for stricter mask |
+| 8 | fire, nominal confidence | 1 |
+| 9 | fire, high confidence | 1 |
+
+Dates with less than 80 percent of the expected number of tiles, which
+are determined by the mode of the number of tiles, are removed. Users
+will be informed of the dates with insufficient tiles. The result
+data.frame will have an attribute with the dates with insufficient
+tiles.
 
 ## See also
 

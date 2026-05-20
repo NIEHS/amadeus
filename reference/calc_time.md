@@ -6,7 +6,7 @@ value.
 ## Usage
 
 ``` r
-calc_time(time, format)
+calc_time(time, format, dataset = NULL, layer_name = NULL, layer_time = NULL)
 ```
 
 ## Arguments

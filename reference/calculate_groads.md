@@ -16,6 +16,8 @@ calculate_groads(
   locs_id = NULL,
   radius = 1000,
   fun = "sum",
+  drop = FALSE,
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -45,6 +47,17 @@ calculate_groads(
 
   function(1). Function used to summarize the length of roads within
   sites location buffer (Default is `sum`).
+
+- drop:
+
+  logical(1). Should locations with zero roads in the extraction buffer
+  be dropped from results? Default is `FALSE` (retain all locations).
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
 
 - geom:
 

@@ -14,9 +14,14 @@ download_prism(
   format = c("nc", "asc", "grib2"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
-  hash = FALSE
+  unzip = TRUE,
+  remove_zip = FALSE,
+  hash = FALSE,
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2
 )
 ```
 
@@ -91,12 +96,35 @@ download_prism(
   logical(1). Remove (`TRUE`) or keep (`FALSE`) the text file containing
   download commands.
 
+- unzip:
+
+  logical(1). Unzip the downloaded zip file to extract the data files
+  (nc, grib2, etc.) into `directory_to_save`. Default is `TRUE`. The
+  PRISM API always returns a zip regardless of the requested format.
+
+- remove_zip:
+
+  logical(1). Remove the zip file after unzipping. Default is `FALSE`.
+  Only applies when `unzip = TRUE`.
+
 - hash:
 
   logical(1). By setting `TRUE` the function will return an
   [`rlang::hash_file()`](https://rlang.r-lib.org/reference/hash.html)
   hash character corresponding to the downloaded files. Default is
   `FALSE`.
+
+- show_progress:
+
+  logical(1). Show download progress. Default is `TRUE`.
+
+- max_tries:
+
+  integer(1). Maximum download retry attempts. Default is `20`.
+
+- rate_limit:
+
+  numeric(1). Minimum seconds between requests. Default is `2`.
 
 ## Value
 
@@ -114,8 +142,8 @@ download_prism(
 Daly C, Taylor GH, Gibson WP, Parzybok TW, Johnson GL, Pasteris PA
 (2000). “HIGH-QUALITY SPATIAL CLIMATE DATA SETS FOR THE UNITED STATES
 AND BEYOND.” *Transactions of the ASAE*, **43**(6), 1957–1962. ISSN
-2151-0059, [doi:10.13031/2013.3101](https://doi.org/10.13031/2013.3101)
-,
+2151-0059. [doi:10.13031/2013.3101](https://doi.org/10.13031/2013.3101)
+.
 <http://elibrary.asabe.org/abstract.asp??JID=3&AID=3101&CID=t2000&v=43&i=6&T=1>.
 
 - [PRISM Climate Group](https://prism.oregonstate.edu/)

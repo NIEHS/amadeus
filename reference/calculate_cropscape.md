@@ -12,6 +12,7 @@ calculate_cropscape(
   locs,
   locs_id = "site_id",
   radius = 0,
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -37,6 +38,12 @@ calculate_cropscape(
 
   integer(1). Circular buffer distance around site locations. (Default =
   0).
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
 
 - geom:
 

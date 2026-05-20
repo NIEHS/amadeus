@@ -19,6 +19,7 @@ calculate_modis_daily(
   date = NULL,
   name_extracted = NULL,
   fun_summary = "mean",
+  weights = NULL,
   max_cells = 3e+07,
   geom = FALSE,
   scale = NULL,
@@ -61,6 +62,12 @@ calculate_modis_daily(
   [`exactextractr::exact_extract`](https://isciences.gitlab.io/exactextractr/reference/exact_extract.html)
   for details.
 
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
+
 - max_cells:
 
   integer(1). Maximum number of cells to be read at once. Higher values
@@ -78,7 +85,7 @@ calculate_modis_daily(
 - scale:
 
   character(1). Scale expression to be applied to the raw values. It is
-  crucial that users review the technical documentatio of the MODIS
+  crucial that users review the technical documentation of the MODIS
   product they are using to ensure proper scale. An example for the
   MOD11A1 product's LST_Day_1km variable (land surface temperature)
   would be `scale = "* 0.02"`. Default is `NULL`, which applies no

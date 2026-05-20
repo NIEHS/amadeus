@@ -2,10 +2,8 @@
 
 Extract elevation values at point locations. Returns a `data.frame`
 object containing `locs_id`, year of release, and elevation variable.
-Elevation variable column name reflects the elevation statistic, spatial
-resolution of `from`, and circular buffer radius (ie. Breakline Emphasis
-at 7.5 arc-second resolution with 0 meter buffer:
-breakline_emphasis_r75_0).
+Elevation variable column name follows the pattern `gmted_<radius>` (for
+example, `gmted_0` or `gmted_100`).
 
 ## Usage
 
@@ -16,6 +14,7 @@ calculate_gmted(
   locs_id = NULL,
   radius = 0,
   fun = "mean",
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -46,6 +45,12 @@ calculate_gmted(
 
   character(1). Function used to summarize multiple raster cells within
   sites location buffer (Default = `mean`).
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
 
 - geom:
 

@@ -1,9 +1,8 @@
 # Download elevation data
 
 The `download_gmted()` function accesses and downloads Global
-Multi-resolution Terrain Elevation Data (GMTED2010) from [U.S.
-Geological Survey and National Geospatial-Intelligence
-Agency](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010).
+Multi-resolution Terrain Elevation Data (GMTED2010) from U.S. Geological
+Survey.
 
 ## Usage
 
@@ -15,11 +14,14 @@ download_gmted(
   resolution = c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
 )
 ```
 
@@ -27,65 +29,59 @@ download_gmted(
 
 - statistic:
 
-  character(1). Available statistics include `"Breakline Emphasis"`,
-  `"Systematic Subsample"`, `"Median Statistic"`, `"Minimum Statistic"`,
-  `"Mean Statistic"`, `"Maximum Statistic"`, and
-  `"Standard Deviation Statistic"`.
+  character(1). Available statistics.
 
 - resolution:
 
-  character(1). Available resolutions include `"7.5 arc-seconds"`,
-  `"15 arc-seconds"`, and `"30 arc-seconds"`.
+  character(1). Available resolutions.
 
 - directory_to_save:
 
-  character(1). Directory to save data. Two sub-directories will be
-  created for the downloaded zip files ("/zip_files") and the unzipped
-  data files ("/data_files").
+  character(1). Directory to save data.
 
 - acknowledgement:
 
-  logical(1). By setting `TRUE` the user acknowledges that the data
-  downloaded using this function may be very large and use lots of
-  machine storage and memory.
+  logical(1). Must be TRUE to proceed.
 
 - download:
 
-  logical(1). `FALSE` will generate a \*.txt file containing all
-  download commands. By setting `TRUE` the function will download all of
-  the requested data files.
+  logical(1). DEPRECATED. Downloads happen automatically.
 
 - remove_command:
 
-  logical(1). Remove (`TRUE`) or keep (`FALSE`) the text file containing
-  download commands. Default is FALSE.
+  logical(1). Deprecated, ignored.
 
 - unzip:
 
-  logical(1). Unzip zip files. Default is `TRUE`.
+  logical(1). Unzip zip files (default TRUE).
 
 - remove_zip:
 
-  logical(1). Remove zip file from directory_to_download. Default is
-  `FALSE`.
+  logical(1). Remove zip files after unzipping (default FALSE).
+
+- show_progress:
+
+  logical(1). Show download progress (default TRUE)
 
 - hash:
 
-  logical(1). By setting `TRUE` the function will return an
-  [`rlang::hash_file()`](https://rlang.r-lib.org/reference/hash.html)
-  hash character corresponding to the downloaded files. Default is
-  `FALSE`.
+  logical(1). Return hash of downloaded files (default FALSE)
+
+- max_tries:
+
+  integer(1). Maximum retry attempts (default 20)
+
+- rate_limit:
+
+  numeric(1). Minimum seconds between requests (default 2)
 
 ## Value
 
-- For `hash = FALSE`, NULL
+invisible list with download results; or hash character if hash=TRUE
 
-- For `hash = TRUE`, an
-  [`rlang::hash_file`](https://rlang.r-lib.org/reference/hash.html)
-  character.
+## Note
 
-- Zip and/or data files will be downloaded and stored in
-  `directory_to_save`.
+GMTED data does not require authentication.
 
 ## References
 
@@ -106,10 +102,7 @@ download_gmted(
   statistic = "Breakline Emphasis",
   resolution = "7.5 arc-seconds",
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE,
-  unzip = FALSE
+  acknowledgement = TRUE
 )
 } # }
 ```

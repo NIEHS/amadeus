@@ -11,6 +11,7 @@ calculate_temporal_dummies(
   locs,
   locs_id = "site_id",
   year = seq(2018L, 2022L),
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -30,6 +31,12 @@ calculate_temporal_dummies(
 - year:
 
   integer. Year domain to dummify. Default is `seq(2018L, 2022L)`.
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
 
 - geom:
 

@@ -2,7 +2,10 @@
 
 Calculate toxic release values for polygons or isotropic buffer point
 locations. Returns a `data.frame` object containing `locs_id` and
-variables for each chemical in `from`.
+variables for each processed TRI field in `from`. Target fields are
+derived from metadata attached by
+[`process_tri()`](https://niehs.github.io/amadeus/reference/process_tri.md),
+with a fallback to non-coordinate columns in `from`.
 
 ## Usage
 
@@ -11,7 +14,10 @@ calculate_tri(
   from = NULL,
   locs,
   locs_id = "site_id",
-  radius = c(1000L, 10000L, 50000L),
+  decay_range = c(1000L, 10000L, 50000L),
+  C0 = NULL,
+  use_threshold = TRUE,
+  weights = NULL,
   geom = FALSE,
   ...
 )
@@ -33,9 +39,32 @@ calculate_tri(
   character(1). Unique site identifier column name. Default is
   `"site_id"`.
 
-- radius:
+- decay_range:
 
   Circular buffer radius. Default is `c(1000, 10000, 50000)` (meters)
+
+- C0:
+
+  `NULL` or character vector of column names in `from`. Optional
+  source-value columns used by
+  [`sum_edc()`](https://niehs.github.io/amadeus/reference/sum_edc.md).
+  If `NULL` and there is one TRI target field, that field is inferred
+  with a warning. If `NULL` and there are multiple TRI target fields,
+  each TRI target field is used as its own source values (for example
+  `STACK_AIR_*`).
+
+- use_threshold:
+
+  logical(1). Passed to
+  [`sum_edc()`](https://niehs.github.io/amadeus/reference/sum_edc.md).
+  If `TRUE` (default), include only source points within
+  `5 * decay_range`. If `FALSE`, include all source points in `from`.
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
 
 - geom:
 
@@ -75,7 +104,7 @@ calculate_tri(
   from = tri, # derived from process_tri() example
   locs = loc,
   locs_id = "id",
-  radius = c(1e3L, 1e4L, 5e4L)
+  decay_range = c(1e3L, 1e4L, 5e4L)
 )
 } # }
 ```

@@ -22,9 +22,7 @@ process_flatten_sds(path = NULL, subdataset = NULL, fun_agg = "mean", ...)
 
 - subdataset:
 
-  character(1). Exact or regular expression filter of sub-dataset. See
-  [process_modis_sds](https://niehs.github.io/amadeus/reference/process_modis_sds.md)
-  for details.
+  character(1). Exact or regular expression filter of sub-dataset.
 
 - fun_agg:
 
@@ -69,7 +67,7 @@ if (FALSE) { # \dontrun{
 mod09ga_flatten <- process_flatten_sds(
   path =
     list.files("./data", pattern = "MOD09GA.", full.names = TRUE)[1],
-  subdataset = process_modis_sds("MOD09GA"),
+  subdataset = "(sur_refl_b0)",
   fun_agg = "mean"
 )
 } # }

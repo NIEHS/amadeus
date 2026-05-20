@@ -10,6 +10,8 @@ Functions which download data from URLs
   : Download air quality data
 - [`download_cropscape()`](https://niehs.github.io/amadeus/reference/download_cropscape.md)
   : Download CropScape data
+- [`download_drought()`](https://niehs.github.io/amadeus/reference/download_drought.md)
+  : Download drought index data
 - [`download_ecoregion()`](https://niehs.github.io/amadeus/reference/download_ecoregion.md)
   : Download ecoregion data
 - [`download_edgar()`](https://niehs.github.io/amadeus/reference/download_edgar.md)
@@ -18,6 +20,8 @@ Functions which download data from URLs
   : Download atmospheric composition data
 - [`download_gmted()`](https://niehs.github.io/amadeus/reference/download_gmted.md)
   : Download elevation data
+- [`download_goes()`](https://niehs.github.io/amadeus/reference/download_goes.md)
+  : Download NOAA GOES ADP data
 - [`download_gridmet()`](https://niehs.github.io/amadeus/reference/download_gridmet.md)
   : Download gridMET data
 - [`download_groads()`](https://niehs.github.io/amadeus/reference/download_groads.md)
@@ -26,6 +30,8 @@ Functions which download data from URLs
   : Download wildfire smoke data
 - [`download_huc()`](https://niehs.github.io/amadeus/reference/download_huc.md)
   : Download National Hydrography Dataset (NHD) data
+- [`download_improve()`](https://niehs.github.io/amadeus/reference/download_improve.md)
+  : Download IMPROVE aerosol monitoring data
 - [`download_koppen_geiger()`](https://niehs.github.io/amadeus/reference/download_koppen_geiger.md)
   : Download climate classification data
 - [`download_merra2()`](https://niehs.github.io/amadeus/reference/download_merra2.md)
@@ -37,7 +43,7 @@ Functions which download data from URLs
 - [`download_nei()`](https://niehs.github.io/amadeus/reference/download_nei.md)
   : Download road emissions data
 - [`download_nlcd()`](https://niehs.github.io/amadeus/reference/download_nlcd.md)
-  : Download land cover data
+  : Download National Land Cover Database (NLCD) data
 - [`download_population()`](https://niehs.github.io/amadeus/reference/download_population.md)
   : Download population density data
 - [`download_prism()`](https://niehs.github.io/amadeus/reference/download_prism.md)
@@ -60,12 +66,18 @@ Functions which import and clean raw data
   merged raster
 - [`process_cropscape()`](https://niehs.github.io/amadeus/reference/process_cropscape.md)
   : Process CropScape data
+- [`process_drought()`](https://niehs.github.io/amadeus/reference/process_drought.md)
+  : Process drought index data
 - [`process_ecoregion()`](https://niehs.github.io/amadeus/reference/process_ecoregion.md)
   : Process ecoregion data
+- [`process_edgar()`](https://niehs.github.io/amadeus/reference/process_edgar.md)
+  : Process EDGAR emissions data
 - [`process_geos()`](https://niehs.github.io/amadeus/reference/process_geos.md)
   : Process atmospheric composition data
 - [`process_gmted()`](https://niehs.github.io/amadeus/reference/process_gmted.md)
   : Process elevation data
+- [`process_goes()`](https://niehs.github.io/amadeus/reference/process_goes.md)
+  : Process NOAA GOES ADP data
 - [`process_gridmet()`](https://niehs.github.io/amadeus/reference/process_gridmet.md)
   : Process gridMET data
 - [`process_groads()`](https://niehs.github.io/amadeus/reference/process_groads.md)
@@ -74,14 +86,16 @@ Functions which import and clean raw data
   : Process wildfire smoke data
 - [`process_huc()`](https://niehs.github.io/amadeus/reference/process_huc.md)
   : Retrieve Hydrologic Unit Code (HUC) data
+- [`process_improve()`](https://niehs.github.io/amadeus/reference/process_improve.md)
+  : Process IMPROVE aerosol monitoring data
 - [`process_koppen_geiger()`](https://niehs.github.io/amadeus/reference/process_koppen_geiger.md)
   : Process climate classification data
 - [`process_merra2()`](https://niehs.github.io/amadeus/reference/process_merra2.md)
   : Process meteorological and atmospheric data
+- [`process_modis_daily()`](https://niehs.github.io/amadeus/reference/process_modis_daily.md)
+  : Process MODIS files as daily outputs
 - [`process_modis_merge()`](https://niehs.github.io/amadeus/reference/process_modis_merge.md)
   : Process MODIS .hdf files
-- [`process_modis_sds()`](https://niehs.github.io/amadeus/reference/process_modis_sds.md)
-  : Process MODIS sub-datasets
 - [`process_modis_swath()`](https://niehs.github.io/amadeus/reference/process_modis_swath.md)
   : Mosaic MODIS swaths
 - [`process_narr()`](https://niehs.github.io/amadeus/reference/process_narr.md)
@@ -107,12 +121,18 @@ Functions which extract data values at user-defined points
   : Calculate covariates wrapper function
 - [`calculate_cropscape()`](https://niehs.github.io/amadeus/reference/calculate_cropscape.md)
   : Calculate Cropscape covariates
+- [`calculate_drought()`](https://niehs.github.io/amadeus/reference/calculate_drought.md)
+  : Calculate drought index covariates
 - [`calculate_ecoregion()`](https://niehs.github.io/amadeus/reference/calculate_ecoregion.md)
   : Calculate ecoregions covariates
+- [`calculate_edgar()`](https://niehs.github.io/amadeus/reference/calculate_edgar.md)
+  : Calculate EDGAR covariates
 - [`calculate_geos()`](https://niehs.github.io/amadeus/reference/calculate_geos.md)
   : Calculate atmospheric composition covariates
 - [`calculate_gmted()`](https://niehs.github.io/amadeus/reference/calculate_gmted.md)
   : Calculate elevation covariates
+- [`calculate_goes()`](https://niehs.github.io/amadeus/reference/calculate_goes.md)
+  : Calculate NOAA GOES ADP covariates
 - [`calculate_gridmet()`](https://niehs.github.io/amadeus/reference/calculate_gridmet.md)
   : Calculate gridMET covariates
 - [`calculate_groads()`](https://niehs.github.io/amadeus/reference/calculate_groads.md)
@@ -128,7 +148,7 @@ Functions which extract data values at user-defined points
 - [`calculate_merra2()`](https://niehs.github.io/amadeus/reference/calculate_merra2.md)
   : Calculate meteorological and atmospheric covariates
 - [`calculate_modis()`](https://niehs.github.io/amadeus/reference/calculate_modis.md)
-  : Calculate MODIS product covariates in multiple CPU threads
+  : Calculate MODIS product covariates
 - [`calculate_narr()`](https://niehs.github.io/amadeus/reference/calculate_narr.md)
   : Calculate meteorological covariates
 - [`calculate_nei()`](https://niehs.github.io/amadeus/reference/calculate_nei.md)
@@ -158,25 +178,10 @@ Functions which convert to, from, and between spatio-temporal data types
 
   Create an `sftime` object
 
-- [`check_mysf()`](https://niehs.github.io/amadeus/reference/check_mysf.md)
-  :
-
-  Check `sf` object
-
-- [`check_mysftime()`](https://niehs.github.io/amadeus/reference/check_mysftime.md)
-  :
-
-  Check `sftime` object
-
 - [`dt_as_mysftime()`](https://niehs.github.io/amadeus/reference/dt_as_mysftime.md)
   :
 
   Convert a `data.table` to an `sftime`
-
-- [`rename_time()`](https://niehs.github.io/amadeus/reference/rename_time.md)
-  :
-
-  Rename `$time`
 
 - [`sf_as_mysftime()`](https://niehs.github.io/amadeus/reference/sf_as_mysftime.md)
   :
@@ -223,98 +228,17 @@ Functions which convert to, from, and between spatio-temporal data types
 
   Convert a `SpatVector` to an `sftime`
 
-### Auxiliary
+### Utilities
 
-Functions which support the download, process, and covariate calculation
-functions
+Utility helpers intended for direct user workflows
 
-- [`apply_extent()`](https://niehs.github.io/amadeus/reference/apply_extent.md)
-  : Apply extent to the processed data
-
-- [`calc_check_time()`](https://niehs.github.io/amadeus/reference/calc_check_time.md)
-  : Check time values
-
-- [`calc_message()`](https://niehs.github.io/amadeus/reference/calc_message.md)
-  : Send progress messages
-
-- [`calc_prepare_locs()`](https://niehs.github.io/amadeus/reference/calc_prepare_locs.md)
-  : Prepare extraction locations
-
-- [`calc_return_locs()`](https://niehs.github.io/amadeus/reference/calc_return_locs.md)
-  : Prepare covariates for return
-
-- [`calc_setcolumns()`](https://niehs.github.io/amadeus/reference/calc_setcolumns.md)
-  : Set column names
-
-- [`calc_time()`](https://niehs.github.io/amadeus/reference/calc_time.md)
-  : Prepare time values
-
-- [`calc_worker()`](https://niehs.github.io/amadeus/reference/calc_worker.md)
-  : Perform covariate extraction
-
-- [`check_destfile()`](https://niehs.github.io/amadeus/reference/check_destfile.md)
-  : Check if destination file exists or is 0 bytes.
-
-- [`check_geom()`](https://niehs.github.io/amadeus/reference/check_geom.md)
-  :
-
-  Check that `geom` value is one of `FALSE`, `"sf"`, or `"terra"`
-
-- [`check_url_status()`](https://niehs.github.io/amadeus/reference/check_url_status.md)
-  : Check HTTP status
-
-- [`check_urls()`](https://niehs.github.io/amadeus/reference/check_urls.md)
-  :
-
-  Implement `check_url_status`
-
-- [`collapse_nlcd()`](https://niehs.github.io/amadeus/reference/collapse_nlcd.md)
-  : Collapse listed NLCD values while filling in NA for sites outside
-  data.
-
-- [`download_hash()`](https://niehs.github.io/amadeus/reference/download_hash.md)
-  : Create hash of downloaded files.
-
-- [`generate_date_sequence()`](https://niehs.github.io/amadeus/reference/generate_date_sequence.md)
-  : Generate date sequence
-
-- [`generate_time_sequence()`](https://niehs.github.io/amadeus/reference/generate_time_sequence.md)
-  : Generate time sequence
-
-- [`is_date_proper()`](https://niehs.github.io/amadeus/reference/is_date_proper.md)
-  : Check date format
-
-- [`narr_variable()`](https://niehs.github.io/amadeus/reference/narr_variable.md)
-  : Sort NOAA NARR variables
-
-- [`process_collection()`](https://niehs.github.io/amadeus/reference/process_collection.md)
-  : Process GEOS-CF and MERRA2 collection codes
-
-- [`process_conformity()`](https://niehs.github.io/amadeus/reference/process_conformity.md)
-  : Check input assumptions
-
-- [`process_gmted_codes()`](https://niehs.github.io/amadeus/reference/process_gmted_codes.md)
-  : Process elevation statistic and resolution codes
-
-- [`process_gridmet_codes()`](https://niehs.github.io/amadeus/reference/process_gridmet_codes.md)
-  : Process gridMET variable codes
-
-- [`process_locs_radius()`](https://niehs.github.io/amadeus/reference/process_locs_radius.md)
-  : Process locations buffer
-
-- [`process_locs_vector()`](https://niehs.github.io/amadeus/reference/process_locs_vector.md)
-  :
-
-  Process locations as `SpatVector`
-
-- [`process_merra2_time()`](https://niehs.github.io/amadeus/reference/process_merra2_time.md)
-  : Process MERRA2 time steps
-
-- [`process_sedac_codes()`](https://niehs.github.io/amadeus/reference/process_sedac_codes.md)
-  : Process population resolution code
-
-- [`process_terraclimate_codes()`](https://niehs.github.io/amadeus/reference/process_terraclimate_codes.md)
-  : Process terraClimate variable codes
-
-- [`process_variable_codes()`](https://niehs.github.io/amadeus/reference/process_variable_codes.md)
-  : Filter gridMET and terraClimate variable names and variable codes
+- [`setup_nasa_token()`](https://niehs.github.io/amadeus/reference/setup_nasa_token.md)
+  : Set up NASA EarthData authentication
+- [`get_tri_info()`](https://niehs.github.io/amadeus/reference/get_tri_info.md)
+  : Get TRI lookup information for chemicals or industries
+- [`get_geos_info()`](https://niehs.github.io/amadeus/reference/get_geos_info.md)
+  : Get GEOS variable lookup information
+- [`get_merra2_info()`](https://niehs.github.io/amadeus/reference/get_merra2_info.md)
+  : Get MERRA2 variable lookup information
+- [`get_modis_info()`](https://niehs.github.io/amadeus/reference/get_modis_info.md)
+  : Get MODIS product subdataset lookup information

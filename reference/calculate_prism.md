@@ -7,7 +7,16 @@ reflects the PRISM variable and circular buffer radius.
 ## Usage
 
 ``` r
-calculate_prism(from, locs, locs_id = "site_id", radius = 0, geom = FALSE, ...)
+calculate_prism(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  weights = NULL,
+  .by_time = NULL,
+  geom = FALSE,
+  ...
+)
 ```
 
 ## Arguments
@@ -30,6 +39,17 @@ calculate_prism(from, locs, locs_id = "site_id", radius = 0, geom = FALSE, ...)
 
   integer(1). Circular buffer distance around site locations. (Default =
   0).
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
+
+- .by_time:
+
+  NULL or character(1). Optional time grouping key used with `.by_time`
+  for temporal summaries.
 
 - geom:
 

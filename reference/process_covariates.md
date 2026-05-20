@@ -11,11 +11,12 @@ errors, **do not edit the raw data files before passing to
 
 ``` r
 process_covariates(
-  covariate = c("modis_swath", "modis_merge", "koppen-geiger", "blackmarble",
-    "koeppen-geiger", "koppen", "koeppen", "geos", "dummies", "gmted", "hms", "smoke",
-    "sedac_population", "population", "sedac_groads", "groads", "roads", "nlcd", "tri",
-    "narr", "nei", "ecoregions", "ecoregion", "merra", "merra2", "gridmet",
-    "terraclimate", "huc", "cropscape", "cdl", "prism"),
+  covariate = c("modis_swath", "modis_merge", "mcd14ml", "koppen-geiger", "blackmarble",
+    "koeppen-geiger", "koppen", "koeppen", "geos", "goes", "goes_adp", "GOES", "dummies",
+    "gmted", "aqs", "hms", "smoke", "sedac_population", "population", "sedac_groads",
+    "groads", "roads", "nlcd", "tri", "narr", "nei", "ecoregions", "ecoregion", "merra",
+    "merra2", "gridmet", "terraclimate", "huc", "cropscape", "cdl", "prism", "edgar",
+    "improve", "IMPROVE", "drought", "spei", "eddi", "usdm"),
   path = NULL,
   ...
 )
@@ -38,8 +39,8 @@ process_covariates(
 
 ## Value
 
-`SpatVector`, `SpatRaster`, `sf`, or `character` depending on covariate
-type and selections.
+`SpatVector`, `SpatRaster`, `sf`, `data.table`, or `character` depending
+on covariate type and selections.
 
 ## See also
 
@@ -70,11 +71,20 @@ type and selections.
 - [`process_geos`](https://niehs.github.io/amadeus/reference/process_geos.md):
   "geos", "GEOS"
 
+- [`process_goes`](https://niehs.github.io/amadeus/reference/process_goes.md):
+  "goes", "goes_adp", "GOES"
+
 - [`process_gmted`](https://niehs.github.io/amadeus/reference/process_gmted.md):
   "gmted", "GMTED"
 
 - [`process_aqs`](https://niehs.github.io/amadeus/reference/process_aqs.md):
   "aqs", "AQS"
+
+- [`process_edgar`](https://niehs.github.io/amadeus/reference/process_edgar.md):
+  "edgar"
+
+- [`process_improve`](https://niehs.github.io/amadeus/reference/process_improve.md):
+  "improve", "IMPROVE"
 
 - [`process_hms`](https://niehs.github.io/amadeus/reference/process_hms.md):
   "hms", "smoke", "HMS"
@@ -105,6 +115,9 @@ type and selections.
 
 - [`process_prism`](https://niehs.github.io/amadeus/reference/process_prism.md):
   "prism", "PRISM"
+
+- [`process_drought`](https://niehs.github.io/amadeus/reference/process_drought.md):
+  "drought", "spei", "eddi", "usdm"
 
 ## Author
 

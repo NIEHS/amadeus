@@ -5,7 +5,14 @@ Calculate road emissions covariates
 ## Usage
 
 ``` r
-calculate_nei(from = NULL, locs = NULL, locs_id = "site_id", geom = FALSE, ...)
+calculate_nei(
+  from = NULL,
+  locs = NULL,
+  locs_id = "site_id",
+  weights = NULL,
+  geom = FALSE,
+  ...
+)
 ```
 
 ## Arguments
@@ -23,6 +30,12 @@ calculate_nei(from = NULL, locs = NULL, locs_id = "site_id", geom = FALSE, ...)
 
   character(1). Unique site identifier column name. Unused but kept for
   compatibility.
+
+- weights:
+
+  `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file path.
+  Optional weights raster for weighted extraction. If `NULL` (default),
+  unweighted extraction is performed.
 
 - geom:
 

@@ -1,8 +1,7 @@
 # Download population density data
 
 The `download_population()` function accesses and downloads population
-density data from [NASA's UN WPP-Adjusted Population Density,
-v4.11](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11).
+density data from NASA's UN WPP-Adjusted Population Density.
 
 ## Usage
 
@@ -13,11 +12,15 @@ download_population(
   year = "2020",
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  download = FALSE,
+  download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
   remove_zip = FALSE,
-  hash = FALSE
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2,
+  nasa_earth_data_token = NULL
 )
 ```
 
@@ -25,76 +28,77 @@ download_population(
 
 - data_resolution:
 
-  character(1). Available resolutions are 30 second (approx. 1 km), 2.5
-  minute (approx. 5 km), 15 minute (approx. 30 km), 30 minute (approx.
-  55 km), and 60 minute (approx. 110 km).
+  character(1). Available resolutions.
 
 - data_format:
 
-  character(1). Individual year data can be downloaded as `"ASCII"` or
-  `"GeoTIFF"`. "all" years is downloaded as `"netCDF"`.
+  character(1). "ASCII", "GeoTIFF", or "netCDF".
 
 - year:
 
-  character(1). Available years are `2000`, `2005`, `2010`, `2015`, and
-  `2020`, or `"all"` for all years.
+  character(1). Available years or "all".
 
 - directory_to_save:
 
-  character(1). Directory to save data. Two sub-directories will be
-  created for the downloaded zip files ("/zip_files") and the unzipped
-  shapefiles ("/data_files").
+  character(1). Directory to save data.
 
 - acknowledgement:
 
-  logical(1). By setting `TRUE` the user acknowledges that the data
-  downloaded using this function may be very large and use lots of
-  machine storage and memory.
+  logical(1). Must be TRUE to proceed.
 
 - download:
 
-  logical(1). `FALSE` will generate a \*.txt file containing all
-  download commands. By setting `TRUE` the function will download all of
-  the requested data files.
+  logical(1). DEPRECATED. Downloads happen automatically.
 
 - remove_command:
 
-  logical(1). Remove (`TRUE`) or keep (`FALSE`) the text file containing
-  download commands.
+  logical(1). Deprecated, ignored.
 
 - unzip:
 
-  logical(1). Unzip zip files. Default is `TRUE`.
+  logical(1). Unzip zip files (default TRUE).
 
 - remove_zip:
 
-  logical(1). Remove zip files from directory_to_download. Default is
-  `FALSE`.
+  logical(1). Remove zip files after unzipping (default FALSE).
+
+- show_progress:
+
+  logical(1). Show download progress (default TRUE)
 
 - hash:
 
-  logical(1). By setting `TRUE` the function will return an
-  [`rlang::hash_file()`](https://rlang.r-lib.org/reference/hash.html)
-  hash character corresponding to the downloaded files. Default is
-  `FALSE`.
+  logical(1). Return hash of downloaded files (default FALSE)
+
+- max_tries:
+
+  integer(1). Maximum retry attempts (default 20)
+
+- rate_limit:
+
+  numeric(1). Minimum seconds between requests (default 2)
+
+- nasa_earth_data_token:
+
+  character(1). NASA EarthData bearer token. If NULL (default), reads
+  from the `NASA_EARTHDATA_TOKEN` environment variable via
+  [`get_token()`](https://niehs.github.io/amadeus/reference/get_token.md).
 
 ## Value
 
-- For `hash = FALSE`, NULL
+invisible list with download results; or hash character if hash=TRUE
 
-- For `hash = TRUE`, an
-  [`rlang::hash_file`](https://rlang.r-lib.org/reference/hash.html)
-  character.
+## Note
 
-- Zip and/or data files will be downloaded and stored in respective
-  sub-directories within `directory_to_save`.
+Population data may require NASA EarthData authentication depending on
+access method.
 
 ## References
 
 Center For International Earth Science Information
 Network-CIESIN-Columbia University (2017). “Gridded Population of the
 World, Version 4 (GPWv4): Population Density, Revision 11.”
-[doi:10.7927/H49C6VHW](https://doi.org/10.7927/H49C6VHW) ,
+[doi:10.7927/H49C6VHW](https://doi.org/10.7927/H49C6VHW) .
 <https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-popdens-r11-4.11>.
 
 ## Author
@@ -105,15 +109,15 @@ Mitchell Manware, Insang Song
 
 ``` r
 if (FALSE) { # \dontrun{
+# RECOMMENDED: Set up token once (persists across sessions)
+setup_nasa_token()
+
 download_population(
   data_resolution = "30 second",
   data_format = "GeoTIFF",
   year = "2020",
   directory_to_save = tempdir(),
-  acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE,
-  unzip = FALSE
+  acknowledgement = TRUE
 )
 } # }
 ```

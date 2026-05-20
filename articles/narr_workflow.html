@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>NOAA North American Regional Reanalysis (NARR) • amadeus</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="NOAA North American Regional Reanalysis (NARR)">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">amadeus</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,15 +33,34 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><h6 class="dropdown-header" data-toc-skip>Miscellaneous</h6></li>
+<li><h6 class="dropdown-header" data-toc-skip>General Articles</h6></li>
     <li><a class="dropdown-item" href="../articles/download_functions.html">download_data Function</a></li>
-    <li><a class="dropdown-item" href="../articles/protected_datasets.html">Protected Datasets</a></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Source-Specific Workflows</h6></li>
+    <li><a class="dropdown-item" href="../articles/calculate_time_grouping.html">Time grouping in calculate_* functions</a></li>
+    <li><a class="dropdown-item" href="../articles/protected_datasets.html">Protected Data Sources</a></li>
+    <li><a class="dropdown-item" href="../articles/computational_considerations.html">Computational Considerations</a></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Dataset Workflows</h6></li>
+    <li><a class="dropdown-item" href="../articles/pm_data_workflow.html">Particulate Matter (PM) Networks (AQS + IMPROVE)</a></li>
+    <li><a class="dropdown-item" href="../articles/cropscape_workflow.html">USDA CropScape</a></li>
+    <li><a class="dropdown-item" href="../articles/edgar_workflow.html">EDGAR Emissions</a></li>
+    <li><a class="dropdown-item" href="../articles/ecoregion_workflow.html">US EPA Ecoregions</a></li>
+    <li><a class="dropdown-item" href="../articles/drought_workflow.html">Drought (SPEI, EDDI, USDM)</a></li>
+    <li><a class="dropdown-item" href="../articles/geos_workflow.html">NASA GEOS-CF</a></li>
+    <li><a class="dropdown-item" href="../articles/gmted_workflow.html">USGS GMTED2010</a></li>
+    <li><a class="dropdown-item" href="../articles/gridmet_workflow.html">Climatology Lab gridMET</a></li>
+    <li><a class="dropdown-item" href="../articles/groads_workflow.html">NASA SEDAC gROADS</a></li>
+    <li><a class="dropdown-item" href="../articles/hms_workflow.html">NOAA HMS Smoke</a></li>
+    <li><a class="dropdown-item" href="../articles/noaa_goes_workflow.html">NOAA GOES Aerosol Detection Product (ADP)</a></li>
+    <li><a class="dropdown-item" href="../articles/huc_workflow.html">USGS Hydrologic Unit Codes (HUC)</a></li>
+    <li><a class="dropdown-item" href="../articles/koppen_workflow.html">Koppen-Geiger Climate Classes</a></li>
+    <li><a class="dropdown-item" href="../articles/merra2_workflow.html">NASA MERRA-2</a></li>
+    <li><a class="dropdown-item" href="../articles/modis_workflow.html">NASA MODIS</a></li>
+    <li><a class="dropdown-item" href="../articles/narr_workflow.html">NOAA NARR</a></li>
+    <li><a class="dropdown-item" href="../articles/nei_workflow.html">US EPA National Emissions Inventory (NEI)</a></li>
+    <li><a class="dropdown-item" href="../articles/nlcd_workflow.html">MRLC National Land Cover Database (NLCD)</a></li>
+    <li><a class="dropdown-item" href="../articles/population_workflow.html">NASA SEDAC Population Density</a></li>
+    <li><a class="dropdown-item" href="../articles/prism_workflow.html">PRISM Climate Data</a></li>
     <li><a class="dropdown-item" href="../articles/terraclimate_workflow.html">Climatology Lab TerraClimate</a></li>
-    <li><a class="dropdown-item" href="../articles/gridmet_workflow.html">Climatology Lab GridMET</a></li>
-    <li><a class="dropdown-item" href="../articles/modis_workflow.html">NASA Moderate Resolution Imaging Spectroradiometer (MODIS)</a></li>
-    <li><a class="dropdown-item" href="../articles/narr_workflow.html">NOAA North American Regional Reanalysis (NARR)</a></li>
-    <li><a class="dropdown-item" href="../articles/epa_download.html">US EPA Air Quality System (AQS)</a></li>
+    <li><a class="dropdown-item" href="../articles/tri_workflow.html">US EPA Toxic Release Inventory (TRI)</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -64,183 +83,528 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.svg" class="logo" alt=""><h1>NOAA North American Regional Reanalysis (NARR)</h1>
-                        <h4 data-toc-skip class="author">Mitchell
-Manware</h4>
+                        <h4 data-toc-skip class="author">Kyle Messier,
+with assistance from GitHub Copilot</h4>
             
-            <h4 data-toc-skip class="date">2026-01-27</h4>
+            <h4 data-toc-skip class="date">2026-05-20</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/NIEHS/amadeus/blob/main/vignettes/narr_workflow.Rmd" class="external-link"><code>vignettes/narr_workflow.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/NIEHS/amadeus/blob/migrate/vignettes/narr_workflow.Rmd" class="external-link"><code>vignettes/narr_workflow.Rmd</code></a></small>
       <div class="d-none name"><code>narr_workflow.Rmd</code></div>
     </div>
 
     
     
-<p>This vignette demonstrates how to download, process, and calculate
-covariates from the <a href="https://psl.noaa.gov/data/gridded/data.narr.html" class="external-link">NOAA North
-American Regional Reanalysis (NARR)</a> dataset using
-<code>amadeus</code> functions. Details are provided for each function’s
-parameters and outputs. The examples utilize daily air temperature at 2m
-height (“air.2m”) data. The messages returned by <code>amadeus</code>
-functions have been omitted for brevity.</p>
-<div class="section level3">
-<h3 id="download">Download<a class="anchor" aria-label="anchor" href="#download"></a>
-</h3>
-<p>Start by downloading the netCDF data files with
-<code>download_data</code>.</p>
+<p>This article demonstrates a compact workflow for NOAA NARR data.</p>
+<p>This vignette runs its live workflow when rendered locally. The heavy
+download, processing, extraction, and plotting chunks are skipped
+automatically on CI, CRAN checks, and pkgdown builds; set
+<code>AMADEUS_RUN_VIGNETTES=true</code> to force live execution in those
+environments.</p>
+<p>Each workflow uses two small example surfaces:
+<code>example_points_sf</code>, a set of real Triangle-region AQS
+monitoring locations derived from
+<code>tests/testdata/aqs/aqs_daily_88101_triangle.csv</code>, for point
+extraction; and the packaged Durham County Uber H3 resolution-8 hexagons
+at
+<code>system.file("extdata", "data_files", "durham_h3_res8.rds", package = "amadeus")</code>
+for polygon extraction.</p>
+<div class="section level2">
+<h2 id="available-inputs-and-data-availability">Available inputs and data availability<a class="anchor" aria-label="anchor" href="#available-inputs-and-data-availability"></a>
+</h2>
+<p><code>download_data(dataset_name = "narr", ...)</code> expects NARR
+variable abbreviations.</p>
 <ul>
-<li>
-<code>dataset_name = "narr"</code>: NARR dataset acronym.</li>
-<li>
-<code>variable = "air.2m"</code>: air temperature at 2m height
-variable code.</li>
-<li>
-<code>year = c(2021, 2022)</code>: years of interest.</li>
-<li>
-<code>directory_to_save = dir</code>: directory to save the
-downloaded files.</li>
-<li>
-<code>acknowledgement = TRUE</code>: acknowledge that the raw data
-files are large and may consume lots of local storage.</li>
-<li>
-<code>download = TRUE</code>: download the data files.</li>
-<li>
-<code>remove_command = TRUE</code>: remove the temporary command
-file used to download the data.</li>
-<li>
-<code>hash = TRUE</code>: generate unique SHA-1 hash for the
-downloaded files.</li>
+<li>Temporal resolution: daily meteorology from the NOAA PSL NARR
+Dailies archive.</li>
+<li>Year input: use a single year (for example, <code>2020</code>) or a
+start/end pair such as <code>c(2020, 2022)</code>; the wrapper supports
+years from 1979 through the current calendar year.</li>
+<li>Major constraints:
+<ul>
+<li>Pressure-level variables (<code>air</code>, <code>hgt</code>,
+<code>omega</code>, <code>shum</code>, <code>tke</code>,
+<code>uwnd</code>, <code>vwnd</code>) always download all 29 pressure
+levels from 1000 to 100 hPa.</li>
+<li>Subsurface variables (<code>soill</code>, <code>soilw</code>,
+<code>tsoil</code>) include all 4 soil layers.</li>
+<li>Variables that are only available in the raw merged GRIB archive are
+not supported by this wrapper.</li>
 </ul>
+</li>
+</ul>
+<div class="section level3">
+<h3 id="monolevel-variables">Monolevel variables<a class="anchor" aria-label="anchor" href="#monolevel-variables"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="15%">
+<col width="84%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">variable</th>
+<th align="left">description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">acpcp</td>
+<td align="left">Convective precipitation</td>
+</tr>
+<tr class="even">
+<td align="left">air.2m</td>
+<td align="left">Air temperature at 2 m</td>
+</tr>
+<tr class="odd">
+<td align="left">air.sfc</td>
+<td align="left">Air temperature at surface</td>
+</tr>
+<tr class="even">
+<td align="left">albedo</td>
+<td align="left">Surface albedo</td>
+</tr>
+<tr class="odd">
+<td align="left">apcp</td>
+<td align="left">Total accumulated precipitation</td>
+</tr>
+<tr class="even">
+<td align="left">bgrun</td>
+<td align="left">Baseflow-groundwater runoff</td>
+</tr>
+<tr class="odd">
+<td align="left">bmixl.hl1</td>
+<td align="left">Blackadar mixing length scale at hybrid level 1</td>
+</tr>
+<tr class="even">
+<td align="left">cape</td>
+<td align="left">Convective available potential energy</td>
+</tr>
+<tr class="odd">
+<td align="left">ccond</td>
+<td align="left">Canopy conductance</td>
+</tr>
+<tr class="even">
+<td align="left">cdcon</td>
+<td align="left">Convective cloud cover</td>
+</tr>
+<tr class="odd">
+<td align="left">cdlyr</td>
+<td align="left">Non-convective cloud cover</td>
+</tr>
+<tr class="even">
+<td align="left">cfrzr</td>
+<td align="left">Categorical freezing rain</td>
+</tr>
+<tr class="odd">
+<td align="left">cicep</td>
+<td align="left">Categorical ice pellets</td>
+</tr>
+<tr class="even">
+<td align="left">cin</td>
+<td align="left">Convective inhibition</td>
+</tr>
+<tr class="odd">
+<td align="left">cnwat</td>
+<td align="left">Plant canopy surface water</td>
+</tr>
+<tr class="even">
+<td align="left">crain</td>
+<td align="left">Categorical rain</td>
+</tr>
+<tr class="odd">
+<td align="left">csnow</td>
+<td align="left">Categorical snow</td>
+</tr>
+<tr class="even">
+<td align="left">dlwrf</td>
+<td align="left">Downward longwave radiation flux</td>
+</tr>
+<tr class="odd">
+<td align="left">dpt.2m</td>
+<td align="left">Dew point temperature at 2 m</td>
+</tr>
+<tr class="even">
+<td align="left">dswrf</td>
+<td align="left">Downward shortwave radiation flux</td>
+</tr>
+<tr class="odd">
+<td align="left">evap</td>
+<td align="left">Evaporation</td>
+</tr>
+<tr class="even">
+<td align="left">gflux</td>
+<td align="left">Ground heat flux</td>
+</tr>
+<tr class="odd">
+<td align="left">hcdc</td>
+<td align="left">High cloud cover</td>
+</tr>
+<tr class="even">
+<td align="left">hgt.tropo</td>
+<td align="left">Geopotential height at tropopause</td>
+</tr>
+<tr class="odd">
+<td align="left">hlcy</td>
+<td align="left">Storm relative helicity</td>
+</tr>
+<tr class="even">
+<td align="left">hpbl</td>
+<td align="left">Planetary boundary layer height</td>
+</tr>
+<tr class="odd">
+<td align="left">lcdc</td>
+<td align="left">Low cloud cover</td>
+</tr>
+<tr class="even">
+<td align="left">lftx4</td>
+<td align="left">Best (4-layer) lifted index</td>
+</tr>
+<tr class="odd">
+<td align="left">lhtfl</td>
+<td align="left">Latent heat net flux</td>
+</tr>
+<tr class="even">
+<td align="left">mcdc</td>
+<td align="left">Mid-cloud cover</td>
+</tr>
+<tr class="odd">
+<td align="left">mconv.hl1</td>
+<td align="left">Horizontal moisture divergence at hybrid level 1</td>
+</tr>
+<tr class="even">
+<td align="left">mslet</td>
+<td align="left">Mean sea level pressure (ETA model reduction)</td>
+</tr>
+<tr class="odd">
+<td align="left">mstav</td>
+<td align="left">Moisture availability</td>
+</tr>
+<tr class="even">
+<td align="left">pevap</td>
+<td align="left">Potential evaporation</td>
+</tr>
+<tr class="odd">
+<td align="left">pottmp.hl1</td>
+<td align="left">Potential temperature at hybrid level 1</td>
+</tr>
+<tr class="even">
+<td align="left">pottmp.sfc</td>
+<td align="left">Potential temperature at surface</td>
+</tr>
+<tr class="odd">
+<td align="left">prate</td>
+<td align="left">Precipitation rate</td>
+</tr>
+<tr class="even">
+<td align="left">pres.sfc</td>
+<td align="left">Surface pressure</td>
+</tr>
+<tr class="odd">
+<td align="left">pres.tropo</td>
+<td align="left">Pressure at tropopause</td>
+</tr>
+<tr class="even">
+<td align="left">prmsl</td>
+<td align="left">Pressure reduced to mean sea level</td>
+</tr>
+<tr class="odd">
+<td align="left">pr_wtr</td>
+<td align="left">Precipitable water</td>
+</tr>
+<tr class="even">
+<td align="left">rcq</td>
+<td align="left">Specific humidity tendency from all physics</td>
+</tr>
+<tr class="odd">
+<td align="left">rcs</td>
+<td align="left">Snowfall water equivalent tendency</td>
+</tr>
+<tr class="even">
+<td align="left">rcsol</td>
+<td align="left">Solar radiative heating rates</td>
+</tr>
+<tr class="odd">
+<td align="left">rct</td>
+<td align="left">Temperature tendency from all physics</td>
+</tr>
+<tr class="even">
+<td align="left">rhum.2m</td>
+<td align="left">Relative humidity at 2 m</td>
+</tr>
+<tr class="odd">
+<td align="left">shtfl</td>
+<td align="left">Sensible heat net flux</td>
+</tr>
+<tr class="even">
+<td align="left">shum.2m</td>
+<td align="left">Specific humidity at 2 m</td>
+</tr>
+<tr class="odd">
+<td align="left">snod</td>
+<td align="left">Snow depth</td>
+</tr>
+<tr class="even">
+<td align="left">snohf</td>
+<td align="left">Snow phase-change heat flux</td>
+</tr>
+<tr class="odd">
+<td align="left">snom</td>
+<td align="left">Snow melt</td>
+</tr>
+<tr class="even">
+<td align="left">snowc</td>
+<td align="left">Snow cover</td>
+</tr>
+<tr class="odd">
+<td align="left">soilm</td>
+<td align="left">Soil moisture content (0-200 cm layer)</td>
+</tr>
+<tr class="even">
+<td align="left">ssrun</td>
+<td align="left">Storm surface runoff</td>
+</tr>
+<tr class="odd">
+<td align="left">tcdc</td>
+<td align="left">Total cloud cover</td>
+</tr>
+<tr class="even">
+<td align="left">tke.hl1</td>
+<td align="left">Turbulent kinetic energy at hybrid level 1</td>
+</tr>
+<tr class="odd">
+<td align="left">ulwrf.ntat</td>
+<td align="left">Upward longwave radiation flux at nominal top of
+atmosphere</td>
+</tr>
+<tr class="even">
+<td align="left">ulwrf.sfc</td>
+<td align="left">Upward longwave radiation flux at surface</td>
+</tr>
+<tr class="odd">
+<td align="left">ustm</td>
+<td align="left">U-component of storm motion</td>
+</tr>
+<tr class="even">
+<td align="left">uswrf.ntat</td>
+<td align="left">Upward shortwave radiation flux at nominal top of
+atmosphere</td>
+</tr>
+<tr class="odd">
+<td align="left">uswrf.sfc</td>
+<td align="left">Upward shortwave radiation flux at surface</td>
+</tr>
+<tr class="even">
+<td align="left">uwnd.10m</td>
+<td align="left">U-component of wind at 10 m</td>
+</tr>
+<tr class="odd">
+<td align="left">veg</td>
+<td align="left">Vegetation fraction</td>
+</tr>
+<tr class="even">
+<td align="left">vis</td>
+<td align="left">Visibility</td>
+</tr>
+<tr class="odd">
+<td align="left">vstm</td>
+<td align="left">V-component of storm motion</td>
+</tr>
+<tr class="even">
+<td align="left">vvel.hl1</td>
+<td align="left">Vertical velocity at hybrid level 1</td>
+</tr>
+<tr class="odd">
+<td align="left">vwnd.10m</td>
+<td align="left">V-component of wind at 10 m</td>
+</tr>
+<tr class="even">
+<td align="left">vwsh.tropo</td>
+<td align="left">Vertical wind shear at tropopause</td>
+</tr>
+<tr class="odd">
+<td align="left">wcconv</td>
+<td align="left">Convective wetting of vegetation canopy</td>
+</tr>
+<tr class="even">
+<td align="left">wcinc</td>
+<td align="left">Wetting of vegetation canopy</td>
+</tr>
+<tr class="odd">
+<td align="left">wcuflx</td>
+<td align="left">U-component of convective canopy moisture flux</td>
+</tr>
+<tr class="even">
+<td align="left">wcvflx</td>
+<td align="left">V-component of convective canopy moisture flux</td>
+</tr>
+<tr class="odd">
+<td align="left">weasd</td>
+<td align="left">Water-equivalent accumulated snow depth</td>
+</tr>
+<tr class="even">
+<td align="left">wvconv</td>
+<td align="left">Convective column moisture convergence</td>
+</tr>
+<tr class="odd">
+<td align="left">wvinc</td>
+<td align="left">Column moisture increase</td>
+</tr>
+<tr class="even">
+<td align="left">wvuflx</td>
+<td align="left">U-component of vertically-integrated moisture flux</td>
+</tr>
+<tr class="odd">
+<td align="left">wvvflx</td>
+<td align="left">V-component of vertically-integrated moisture flux</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="pressure-level-variables">Pressure level variables<a class="anchor" aria-label="anchor" href="#pressure-level-variables"></a>
+</h3>
+<table class="table">
+<thead><tr class="header">
+<th align="left">variable</th>
+<th align="left">description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">air</td>
+<td align="left">Air temperature</td>
+</tr>
+<tr class="even">
+<td align="left">hgt</td>
+<td align="left">Geopotential height</td>
+</tr>
+<tr class="odd">
+<td align="left">omega</td>
+<td align="left">Vertical velocity (pressure / omega)</td>
+</tr>
+<tr class="even">
+<td align="left">shum</td>
+<td align="left">Specific humidity</td>
+</tr>
+<tr class="odd">
+<td align="left">tke</td>
+<td align="left">Turbulent kinetic energy</td>
+</tr>
+<tr class="even">
+<td align="left">uwnd</td>
+<td align="left">U-component of wind</td>
+</tr>
+<tr class="odd">
+<td align="left">vwnd</td>
+<td align="left">V-component of wind</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="subsurface-soil-variables">Subsurface (soil) variables<a class="anchor" aria-label="anchor" href="#subsurface-soil-variables"></a>
+</h3>
+<table class="table">
+<thead><tr class="header">
+<th align="left">variable</th>
+<th align="left">description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">soill</td>
+<td align="left">Liquid volumetric soil moisture (non-frozen
+fraction)</td>
+</tr>
+<tr class="even">
+<td align="left">soilw</td>
+<td align="left">Volumetric soil moisture content</td>
+</tr>
+<tr class="odd">
+<td align="left">tsoil</td>
+<td align="left">Soil temperature</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section level2">
+<h2 id="download-representative-requests">Download representative requests<a class="anchor" aria-label="anchor" href="#download-representative-requests"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/download_data.html">download_data</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">directory_to_save</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"narr_workflow"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/download_data.html">download_data</a></span><span class="op">(</span></span>
 <span>  dataset_name <span class="op">=</span> <span class="st">"narr"</span>,</span>
-<span>  variable <span class="op">=</span> <span class="st">"air.2m"</span>,</span>
-<span>  year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2021</span>, <span class="fl">2022</span><span class="op">)</span>,</span>
-<span>  directory_to_save <span class="op">=</span> <span class="va">dir</span>,</span>
-<span>  acknowledgement <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  remove_command <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  hash <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dpt.2m"</span>, <span class="st">"air.2m"</span><span class="op">)</span>,</span>
+<span>  year <span class="op">=</span> <span class="fl">2020</span>,</span>
+<span>  directory_to_save <span class="op">=</span> <span class="va">directory_to_save</span>,</span>
+<span>  acknowledgement <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code>[1] "3a382ac1c383c1d048f4044214cb450f"</code></pre>
-<p>Check the downloaded netCDF files.</p>
+</div>
+<div class="section level2">
+<h2 id="process-one-workflow-ready-data-product">Process one workflow-ready data product<a class="anchor" aria-label="anchor" href="#process-one-workflow-ready-data-product"></a>
+</h2>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">processed_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/process_covariates.html">process_covariates</a></span><span class="op">(</span></span>
+<span>  covariate <span class="op">=</span> <span class="st">"narr"</span>,</span>
+<span>  variable <span class="op">=</span> <span class="st">"air.2m"</span>,</span>
+<span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2020-01-01"</span>, <span class="st">"2020-01-10"</span><span class="op">)</span>,</span>
+<span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">directory_to_save</span>, <span class="st">"air.2m"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="calculate-covariates-at-points">Calculate covariates at points<a class="anchor" aria-label="anchor" href="#calculate-covariates-at-points"></a>
+</h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">dir</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, pattern <span class="op">=</span> <span class="st">"air.2m"</span><span class="op">)</span></span></code></pre></div>
-<pre><code>[1] "air.2m/air.2m.2021.nc" "air.2m/air.2m.2022.nc"</code></pre>
-</div>
-<div class="section level3">
-<h3 id="process">Process<a class="anchor" aria-label="anchor" href="#process"></a>
-</h3>
-<p>Import and process the downloaded netCDF files with
-<code>process_covariates</code>.</p>
-<ul>
-<li>
-<code>covariate = "narr"</code>: NARR dataset acronym.</li>
-<li>
-<code>variable = "air.2m"</code>: air temperature at 2m height
-variable code.</li>
-<li>
-<code>date = c("2021-12-28", "2022-01-03")</code>: date range of
-interest.</li>
-<li>
-<code>path = paste0(dir, "/air.2m")</code>: directory containing the
-downloaded files.</li>
-</ul>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">air2m_process</span> <span class="op">&lt;-</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/process_covariates.html">process_covariates</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">hex_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_covariates.html">calculate_covariates</a></span><span class="op">(</span></span>
 <span>  covariate <span class="op">=</span> <span class="st">"narr"</span>,</span>
-<span>  variable <span class="op">=</span> <span class="st">"air.2m"</span>,</span>
-<span>  date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2021-12-28"</span>, <span class="st">"2022-01-03"</span><span class="op">)</span>,</span>
-<span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">dir</span>, <span class="st">"/air.2m"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>Check the processed <code>SpatRaster</code> object.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">air2m_process</span></span></code></pre></div>
-<pre><code>class       : SpatRaster
-dimensions  : 277, 349, 7  (nrow, ncol, nlyr)
-resolution  : 32462.99, 32463  (x, y)
-extent      : -16231.49, 11313351, -16231.5, 8976020  (xmin, xmax, ymin, ymax)
-coord. ref. : +proj=lcc +lat_0=50 +lon_0=-107 +lat_1=50 +lat_2=50 +x_0=5632642.22547 +y_0=4612545.65137 +datum=WGS84 +units=m +no_defs
-sources     : air.2m.2021.nc:air  (4 layers)
-              air.2m.2022.nc:air  (3 layers)
-varnames    : air (Daily Air Temperature at 2 m)
-              air (Daily Air Temperature at 2 m)
-names       : air.2~11228, air.2~11229, air.2~11230, air.2~11231, air.2~20101, air.2~20102, ...
-unit        :           K,           K,           K,           K,           K,           K, ...
-time        : 2021-12-28 to 2022-01-03 UTC</code></pre>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">air2m_process</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="images/air2m_process.png" style="display: block; margin-left: auto; margin-right: auto;"></p>
-</div>
-<div class="section level3">
-<h3 id="calculate-covariates">Calculate covariates<a class="anchor" aria-label="anchor" href="#calculate-covariates"></a>
-</h3>
-<p>Calculate covariates for North Carolina county boundaries with
-<code>calculate_covariates</code>. County boundaries are accessed with
-the <code><a href="https://rdrr.io/pkg/tigris/man/counties.html" class="external-link">tigris::counties</a></code> function.</p>
-<ul>
-<li>
-<code>covariate = "narr"</code>: NARR dataset acronym.</li>
-<li>
-<code>from = air2m_process</code>: processed <code>SpatRaster</code>
-object.</li>
-<li>
-<code>locs = tigris::counties("NC", year = 2021)</code>: North
-Carolina county boundaries.</li>
-<li>
-<code>locs_id = "NAME"</code>: county name identifier.</li>
-<li>
-<code>radius = 0</code>: size of buffer radius around each
-county.</li>
-<li>
-<code>geom = "terra"</code>: return covariates as a
-<code>SpatVector</code> object.</li>
-</ul>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/walkerke/tigris" class="external-link">tigris</a></span><span class="op">)</span></span>
-<span><span class="va">air2m_covar</span> <span class="op">&lt;-</span> <span class="fu">amadeus</span><span class="fu">::</span><span class="fu"><a href="../reference/calculate_covariates.html">calculate_covariates</a></span><span class="op">(</span></span>
-<span>  covariate <span class="op">=</span> <span class="st">"narr"</span>,</span>
-<span>  from <span class="op">=</span> <span class="va">air2m_process</span>,</span>
-<span>  locs <span class="op">=</span> <span class="fu">tigris</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tigris/man/counties.html" class="external-link">counties</a></span><span class="op">(</span><span class="st">"NC"</span>, year <span class="op">=</span> <span class="fl">2021</span><span class="op">)</span>,</span>
-<span>  locs_id <span class="op">=</span> <span class="st">"NAME"</span>,</span>
+<span>  from <span class="op">=</span> <span class="va">processed_data</span>,</span>
+<span>  locs <span class="op">=</span> <span class="va">durham_hex</span>,</span>
+<span>  locs_id <span class="op">=</span> <span class="st">"h3_id"</span>,</span>
 <span>  radius <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  geom <span class="op">=</span> <span class="st">"terra"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>Check the calculated covariates <code>SpatVector</code> object.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">air2m_covar</span></span></code></pre></div>
-<pre><code>class       : SpatVector
-geometry    : polygons
-dimensions  : 700, 3  (geometries, attributes)
-extent      : 7731783, 8506154, 3248490, 3694532  (xmin, xmax, ymin, ymax)
-coord. ref. : +proj=lcc +lat_0=50 +lon_0=-107 +lat_1=50 +lat_2=50 +x_0=5632642.22547 +y_0=4612545.65137 +datum=WGS84 +units=m +no_defs
-names       :     NAME       time air.2m_0
-type        :    &lt;chr&gt;   &lt;POSIXt&gt;    &lt;num&gt;
-values      :  Chatham 2021-12-28    289.3
-              Alamance 2021-12-28    288.8
-              Davidson 2021-12-28    289.1</code></pre>
+<span>  fun <span class="op">=</span> <span class="st">"mean"</span>,</span>
+<span>  geom <span class="op">=</span> <span class="st">"sf"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">hex_values</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="temporal-summaries">Temporal summaries<a class="anchor" aria-label="anchor" href="#temporal-summaries"></a>
-</h3>
-<p>The <code>aggregate</code> function can be used to calculate a
-summary statistic for each unique spatial point or polygon. In the
-following example, average <code>air.2m_0</code> is calculated for each
-county for the time period December 28, 2021 to January 3, 2022.
-<code>air.2m_0 ~ NAME</code> directs the function to summarize
-<code>air.2m_0</code> values per unique <code>NAME</code>. The
-<code>FUN = mean</code> directs the function to take the mean value. The
-<code><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head()</a></code> function is applied to show only the first few
-entries, as the entire <code>data.frame</code> is 100 rows long.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/aggregate.html" class="external-link">aggregate</a></span><span class="op">(</span><span class="va">air.2m_0</span> <span class="op">~</span> <span class="va">NAME</span>, data <span class="op">=</span> <span class="va">air2m_covar</span>, FUN <span class="op">=</span> <span class="va">mean</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code>       NAME air.2m_0
-1  Alamance 289.5930
-2 Alexander 289.1961
-3 Alleghany 286.9486
-4     Anson 290.5306
-5      Ashe 285.5771
-6     Avery 285.2288</code></pre>
+<div class="section level2">
+<h2 id="visualize-the-data-and-point-outputs">Visualize the data and point outputs<a class="anchor" aria-label="anchor" href="#visualize-the-data-and-point-outputs"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">usa</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="fu">maps</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/maps/man/map.html" class="external-link">map</a></span><span class="op">(</span><span class="st">"usa"</span>, plot <span class="op">=</span> <span class="cn">FALSE</span>, fill <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">bb</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">usa</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Project first layer to WGS84 and convert to data frame for safe ggplot2 rendering</span></span>
+<span><span class="va">lyr1</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/project.html" class="external-link">project</a></span><span class="op">(</span><span class="va">processed_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"EPSG:4326"</span><span class="op">)</span></span>
+<span><span class="va">lyr1_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">lyr1</span>, xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">lyr1_df</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"value"</span></span>
+<span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_raster</a></span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">lyr1_df</span>,</span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">value</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">usa</span>, fill <span class="op">=</span> <span class="cn">NA</span>, color <span class="op">=</span> <span class="st">"grey80"</span>, linewidth <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_c</a></span><span class="op">(</span>option <span class="op">=</span> <span class="st">"C"</span>, na.value <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">coord_sf</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="va">bb</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">]</span>, ylim <span class="op">=</span> <span class="va">bb</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span><span class="op">]</span>, expand <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="cn">NULL</span>, fill <span class="op">=</span> <span class="st">"air temp at 2m (K)"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>We plot the NARR 2m air temperature at the Uber H3 hexagons. NARR is
+fairly coarse spatial resolution at ~32sq-km, so we don’t see much
+spatial variability, but the facets show the daily trend</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">hex_values</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">air.2m_0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_c</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">time</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>
+</h2>
+<ul>
+<li>The download request now covers both snow water equivalent
+(<code>weasd</code>) and 2m air temperature (<code>air.2m</code>).</li>
+<li>NARR uses projected source data internally, so the vignette leaves
+reprojection to <code>amadeus</code> and keeps the extraction geometry
+in WGS84 input coordinates.</li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
