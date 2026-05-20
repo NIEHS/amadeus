@@ -45,10 +45,10 @@ pak::pak("NIEHS/amadeus")
 | [NASA Goddard Earth Observing System Composition Forcasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) | netCDF | Atmosphere<br>Meteorology | Global | `_geos` |
 | [EDGAR Emissions Database for Global Atmospheric Research](https://edgar.jrc.ec.europa.eu/) | netCDF<br>TXT | Emissions | Global | `_edgar` |
 | [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#about) | Shapefile<br>KML | Wildfire Smoke | North America | `_hms` |
-| [NOAA GOES Aerosol Detection Product (ADP)](https://www.nesdis.noaa.gov/our-satellites/currently-flying/goes-east-west) | netCDF | Atmosphere<br>Satellite | Americas<br>Pacific | `_goes` |
+| [NOAA GOES Aerosol Detection Product (ADP)](https://www.star.nesdis.noaa.gov/goes/) | netCDF | Atmosphere<br>Satellite | Americas<br>Pacific | `_goes` |
 | [NOAA NCEP[^4] North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) | netCDF | Atmosphere<br>Meteorology | North America | `_narr` |
 | [PRISM Climate Group](https://prism.oregonstate.edu/) | netCDF<br>ASCII Grid<br>GRIB2 | Meteorology<br>Climate | Contiguous United States | `_prism` |
-| [Drought indices ([SPEI](https://spei.csic.es), [EDDI](https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data), [USDM](https://droughtmonitor.unl.edu))](https://droughtmonitor.unl.edu) | netCDF<br>ASCII Grid<br>Shapefile | Drought | Global<br>Contiguous United States | `_drought` |
+| [Drought indices ([SPEI](https://spei.csic.es), [EDDI](https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/), [USDM](https://droughtmonitor.unl.edu))](https://droughtmonitor.unl.edu) | netCDF<br>ASCII Grid<br>Shapefile | Drought | Global<br>Contiguous United States | `_drought` |
 | [US EPA[^5] Air Data Pre-Generated Data Files](https://aqs.epa.gov/aqsweb/airdata/download_files.html) | CSV | Air Pollution | United States | `_aqs` |
 | [IMPROVE aerosol monitoring program](https://vibe.cira.colostate.edu/data/export/) | TXT (pipe-delimited) | Air Pollution<br>Aerosols | United States | `_improve` |
 | [US EPA Ecoregions](https://www.epa.gov/eco-research/ecoregions) | Shapefile | Climate Regions | North America | `_ecoregions` |
@@ -219,7 +219,7 @@ The following R packages can also be used to access environmental and weather da
 | [`ecmwfr`](https://cran.r-project.org/package=ecmwfr) | [ECMWF Reanalysis v5 (ERA5)](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) |
 | [`rNOMADS`](https://cran.r-project.org/package=rNOMADS) | [NOAA Operational Model Archive and Distribution System](https://nomads.ncep.noaa.gov/) |
 | [`sen2r`[^8]](https://github.com/ranghetti/sen2r) | [Sentinel-2](https://sentiwiki.copernicus.eu/web/s2-mission) |
-| [`eddi`](https://github.com/earthlab/eddi) | [EDDI](https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data) |
+| [`eddi`](https://github.com/earthlab/eddi) | [EDDI](https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/) |
 | [`heat`](https://github.com/echolab-stanford/heat) | [Harmonized Environmental Exposure Aggregation Tools] (https://github.com/echolab-stanford) |
 
 ## Contribution and AI use 

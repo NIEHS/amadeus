@@ -1456,7 +1456,7 @@ process_tri <- function(
   }
   industry_group <- match.arg(industry_group)
 
-  dt_tri <- amadeus:::tri_read_raw(path = path)
+  dt_tri <- tri_read_raw(path = path)
 
   required_cols <- c(
     "YEAR",

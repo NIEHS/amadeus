@@ -98,9 +98,8 @@ link <- c(
   "https://www.usgs.gov/coastal-changes-and-impacts/gmted2010",
   "https://www.climatologylab.org/gridmet.html",
   paste0(
-    "https://data.earthdata.nasa.gov/nasa-earth/",
-    "human-dimensions/sedac-root/downloads/data/groads/",
-    "groads-global-roads-open-access-v1"
+    "https://earthdata.nasa.gov/data/catalog/",
+    "sedac-ciesin-sedac-groads-v1-1.00"
   ),
   "https://www.ospo.noaa.gov/products/land/hms.html#0",
   "https://www.sciencebase.gov/catalog/item/4f5545cce4b018de15819ca9",
@@ -111,10 +110,8 @@ link <- c(
   "https://www.epa.gov/air-emissions-inventories",
   "https://www.mrlc.gov/data",
   paste0(
-    "https://data.earthdata.nasa.gov/nasa-earth/",
-    "human-dimensions/sedac-root/downloads/data/gpw-v4/",
-    "population-density-adjusted-to-2015-unwpp-country-",
-    "totals-rev11"
+    "https://earthdata.nasa.gov/data/catalog/",
+    "sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11"
   ),
   paste0(
     "https://elibrary.asabe.org/abstract.asp??JID=3&",

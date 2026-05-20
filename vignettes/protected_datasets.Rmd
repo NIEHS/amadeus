@@ -45,7 +45,7 @@ Centers (DAAC), including:
 -   Physical Oceanography DAAC (PO.DAAC)
 -   Socioeconomic Data and Applications Center (SEDAC)
 
-See <https://www.earthdata.nasa.gov/eosdis/daacs> for more information.
+    <https://www.earthdata.nasa.gov/centers> for more information.
 
 ### Approved applications
 
@@ -168,7 +168,7 @@ cat(to_cat)
 -   EOSDIS Distributed Active Archive Centers (DAAC).
     *National Aeronautics and Space Administration (NASA)*.
     Date accessed: January 3, 2024.
-    <https://www.earthdata.nasa.gov/eosdis/daacs>.
+    <https://www.earthdata.nasa.gov/centers>.
 -   NASA EarthData Token Documentation.
     *National Aeronautics and Space Administration (NASA)*.
     <https://urs.earthdata.nasa.gov/documentation/for_users/user_token>.

@@ -4719,11 +4719,11 @@ calculate_goes <- function(
 #' \itemize{
 #'   \item \strong{SPEI / EDDI} (\code{SpatRaster}): cell values are
 #'     extracted at each location using the standard raster-extraction
-#'     pipeline (\code{calc_prepare_locs()} → \code{calc_worker()} →
+#'     pipeline (\code{calc_prepare_locs()} -> \code{calc_worker()} ->
 #'     \code{calc_return_locs()}).  Time column format is
 #'     \code{"YYYY-MM-DD"}.
 #'   \item \strong{USDM} (\code{SpatVector} polygons): the drought monitor
-#'     class (\code{DM}, integer 0–4) at each location is determined via
+#'     class (\code{DM}, integer 0-4) at each location is determined via
 #'     spatial overlay. A \code{time} column of class \code{Date} is
 #'     populated from the \code{date} attribute of \code{from}.
 #' }

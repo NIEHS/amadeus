@@ -948,7 +948,6 @@ download_gmted <- function(
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song, Kyle Messier
 #' @return invisible list with download results; or hash character if hash=TRUE
-#' @notes
 #' @importFrom Rdpack reprompt
 #' @examples
 #' \dontrun{

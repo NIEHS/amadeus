@@ -45,9 +45,8 @@ a data.frame or SpatVector object
 \description{
 Extract elevation values at point locations. Returns a \code{data.frame}
 object containing \code{locs_id}, year of release, and elevation variable.
-Elevation variable column name reflects the elevation statistic, spatial
-resolution of \code{from}, and circular buffer radius (ie. Breakline Emphasis
-at 7.5 arc-second resolution with 0 meter buffer: breakline_emphasis_r75_0).
+Elevation variable column name follows the pattern
+\code{gmted_<radius>} (for example, \code{gmted_0} or \code{gmted_100}).
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large

@@ -1,4 +1,4 @@
-# amadeus 2.0.0 (dev)
+# amadeus 2.0.0
 ## Major updates to code base - breaking changes have been minmized but please report if 1.3.x versions are not working as expected
 
 - Refactored code base to improve maintainability and utilize modern R API designs and best practices
@@ -47,7 +47,7 @@ that returns the fraction of each category in the radius buffer.
     <https://spei.csic.es>
   - **EDDI** (Evaporative Demand Drought Index): weekly files by accumulation
     timescale from NOAA PSL
-    (<https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data>);
+    (<https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/>);
     legacy netCDF files from the `CONUS_Archive` path are also supported
   - **USDM** (U.S. Drought Monitor): weekly polygon shapefiles from
     <https://droughtmonitor.unl.edu>

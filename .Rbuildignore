@@ -43,3 +43,15 @@ vignettes/.*_workflow\.Rmd$
 vignettes/all_datasets_workflow_files
 ^doc$
 ^Meta$
+^tutorials$
+^README_files$
+^\.quarto$
+^\.vscode$
+^\.Renviron$
+^slurm$
+^amadeus_.*\.tar\.gz$
+^amadeus\.Rcheck$
+^\.\.Rcheck$
+^local_cov\.Rout$
+^cran-comments\.md$
+^revdep$
