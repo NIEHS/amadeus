@@ -40,7 +40,7 @@ nationwide (`jurisdiction = "US"`), state or territory-specific
 | 5 | download_geos | [NASA Goddard Earth Observing System Composition Forecasting (GEOS-CF)](https://gmao.gsfc.nasa.gov/GEOS_systems/) |
 | 13 | download_modis | [NASA Moderate Resolution Imaging Spectroradiometer (MODIS)](https://modis.gsfc.nasa.gov/data/) |
 | 12 | download_merra2 | [NASA Modern-Era Retrospective analysis for Research and Applications, Version 2 (MERRA-2)](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/) |
-| 8 | download_groads | [NASA SEDAC Global Roads Open Access Data Set](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-groads-v1-1.00) |
+| 8 | download_groads | [NASA SEDAC Global Roads Open Access Data Set](https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1) |
 | 17 | download_population | [NASA SEDAC UN WPP-Adjusted Population Density](https://earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-gpwv4-apdens-wpp-2015-r11-4.11) |
 | 9 | download_hms | [NOAA Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/products/land/hms.html#0) |
 | 14 | download_narr | [NOAA NCEP North American Regional Reanalysis (NARR)](https://psl.noaa.gov/data/gridded/data.narr.html) |
@@ -51,7 +51,7 @@ nationwide (`jurisdiction = "US"`), state or territory-specific
 | 20 | download_tri | [US EPA Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present) |
 | 2 | download_cropscape | [USDA National Agricultural Statistics Service CropScape (Cropland Data Layer)](https://nassgeodata.gmu.edu/CropScape/) |
 | 6 | download_gmted | [USGS Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) |
-| 10 | download_huc | [USGS National Hydrography Dataset (NHD)](https://www.sciencebase.gov/catalog/item/4f5545cce4b018de15819ca9) |
+| 10 | download_huc | [USGS National Hydrography Dataset (NHD)](https://www.epa.gov/waterdata/get-nhdplus-national-hydrography-dataset-plus-data) |
 
 Source-specific download functions and data sources {.table}
 
@@ -691,6 +691,6 @@ download_hms
 #>         return(invisible(download_result))
 #>     }
 #> }
-#> <bytecode: 0x561da7bd0d70>
+#> <bytecode: 0x55d09c2fdd50>
 #> <environment: namespace:amadeus>
 ```
