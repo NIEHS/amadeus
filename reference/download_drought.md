@@ -7,7 +7,8 @@ publicly available sources. Three source datasets are supported:
   Multi-year netCDF files by timescale from <https://spei.csic.es>.
 
 - **EDDI** (Evaporative Demand Drought Index): Weekly raster files by
-  timescale from NOAA PSL EDDI <https://psl.noaa.gov/eddi/>.
+  timescale from
+  <https://www.drought.gov/data-maps-tools/evaporative-demand-drought-index-eddi>.
 
 - **USDM** (U.S. Drought Monitor): Weekly drought class shapefiles from
   <https://droughtmonitor.unl.edu>.
