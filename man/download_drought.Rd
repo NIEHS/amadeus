@@ -67,8 +67,8 @@ publicly available sources. Three source datasets are supported:
 Multi-year netCDF files by timescale from
 \url{https://spei.csic.es}.
 \item \strong{EDDI} (Evaporative Demand Drought Index): Weekly raster
-files by timescale from
-\url{ftp://ftp.cdc.noaa.gov/Projects/EDDI/CONUS_archive/data}.
+files by timescale from NOAA PSL EDDI
+\url{https://psl.noaa.gov/eddi/}.
 \item \strong{USDM} (U.S. Drought Monitor): Weekly drought class
 shapefiles from
 \url{https://droughtmonitor.unl.edu}.

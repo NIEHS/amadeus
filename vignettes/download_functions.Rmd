@@ -97,12 +97,9 @@ link <- c(
   "https://gmao.gsfc.nasa.gov/GEOS_systems/",
   "https://www.usgs.gov/coastal-changes-and-impacts/gmted2010",
   "https://www.climatologylab.org/gridmet.html",
-  paste0(
-    "https://earthdata.nasa.gov/data/catalog/",
-    "sedac-ciesin-sedac-groads-v1-1.00"
-  ),
+  "https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1",
   "https://www.ospo.noaa.gov/products/land/hms.html#0",
-  "https://www.sciencebase.gov/catalog/item/4f5545cce4b018de15819ca9",
+  "https://www.epa.gov/waterdata/get-nhdplus-national-hydrography-dataset-plus-data",
   "https://www.nature.com/articles/sdata2018214",
   "https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/",
   "https://modis.gsfc.nasa.gov/data/",

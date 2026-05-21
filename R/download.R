@@ -5200,7 +5200,7 @@ download_improve <- function(
 #'     \url{https://spei.csic.es}.
 #'   \item \strong{EDDI} (Evaporative Demand Drought Index): Weekly raster
 #'     files by timescale from
-#'     \url{ftp://ftp.cdc.noaa.gov/Projects/EDDI/CONUS_archive/data}.
+#'     \url{https://www.drought.gov/data-maps-tools/evaporative-demand-drought-index-eddi}.
 #'   \item \strong{USDM} (U.S. Drought Monitor): Weekly drought class
 #'     shapefiles from
 #'     \url{https://droughtmonitor.unl.edu}.
