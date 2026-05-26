@@ -1,13 +1,13 @@
 # Scheduled live-API test workflow.
 #
-# Runs every Monday at 06:00 UTC, plus on-demand (with optional `filter`
+# Runs nightly at 06:00 UTC, plus on-demand (with optional `filter`
 # input). Sets AMADEUS_LIVE_TESTS=true so that `skip_if_no_live_tests()`
 # does not skip the `test-*-live.R` files. On failure, an issue is
 # auto-opened (label: live-test-failure) so repo watchers receive an
 # email notification.
 on:
   schedule:
-    - cron: '0 6 * * 1'
+    - cron: '0 6 * * *'
   workflow_dispatch:
     inputs:
       filter:
@@ -25,8 +25,8 @@ jobs:
       issues: write
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
-      NASA_EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
+      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN || secrets.NASA_EARTHDATA_TOKEN }}
+      NASA_EARTHDATA_TOKEN: ${{ secrets.NASA_EARTHDATA_TOKEN || secrets.EARTHDATA_TOKEN }}
       AMADEUS_LIVE_TESTS: "true"
       NOT_CRAN: "true"
 

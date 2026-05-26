@@ -10,7 +10,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-amadeus::download_edgar(
+    amadeus::download_edgar(
       species = "CO",
       version = "8.1",
       temp_res = "yearly",
@@ -35,7 +35,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-amadeus::download_edgar(
+    amadeus::download_edgar(
       species = "SO2",
       version = "8.1",
       temp_res = "monthly",
@@ -53,15 +53,15 @@ amadeus::download_edgar(
 
 testthat::test_that(
   paste0(
-    "download_edgar(version='8.1_voc', voc='01'): ",
+    "download_edgar(version='8.1_voc', voc='1'): ",
     "downloads VOC speciation file"
   ),
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-amadeus::download_edgar(
+    amadeus::download_edgar(
       version = "8.1_voc",
-      voc = "01",
+      voc = "1",
       format = "nc",
       output = "emi",
       directory_to_save = dir,

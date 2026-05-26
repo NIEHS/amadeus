@@ -9,13 +9,15 @@ testthat::test_that(
   ),
   {
     skip_if_no_live_tests()
-    testthat::skip_if(!nzchar(Sys.getenv("EARTHDATA_TOKEN")),
-                      "no Earthdata token")
+    testthat::skip_if(
+      !nzchar(Sys.getenv("NASA_EARTHDATA_TOKEN")),
+      "no Earthdata token"
+    )
     dir <- withr::local_tempdir()
     amadeus::download_modis(
       product = "MOD09GA",
       version = "061",
-      nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+      nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
       date = c("2024-01-01", "2024-01-01"),
       extent = c(-79, 35, -78, 36),
       directory_to_save = dir,
@@ -34,13 +36,15 @@ testthat::test_that(
   ),
   {
     skip_if_no_live_tests()
-    testthat::skip_if(!nzchar(Sys.getenv("EARTHDATA_TOKEN")),
-                      "no Earthdata token")
+    testthat::skip_if(
+      !nzchar(Sys.getenv("NASA_EARTHDATA_TOKEN")),
+      "no Earthdata token"
+    )
     dir <- withr::local_tempdir()
     amadeus::download_modis(
       product = "MOD11A1",
       version = "061",
-      nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+      nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
       date = c("2022-01-01", "2022-01-01"),
       extent = c(-79, 35, -78, 36),
       directory_to_save = dir,
@@ -59,13 +63,15 @@ testthat::test_that(
   ),
   {
     skip_if_no_live_tests()
-    testthat::skip_if(!nzchar(Sys.getenv("EARTHDATA_TOKEN")),
-                      "no Earthdata token")
+    testthat::skip_if(
+      !nzchar(Sys.getenv("NASA_EARTHDATA_TOKEN")),
+      "no Earthdata token"
+    )
     dir <- withr::local_tempdir()
     amadeus::download_modis(
       product = "MCD19A2",
       version = "061",
-      nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
+      nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
       date = c("2022-01-01", "2022-01-01"),
       extent = c(-79, 35, -78, 36),
       directory_to_save = dir,
@@ -79,18 +85,20 @@ testthat::test_that(
 
 testthat::test_that(
   paste0(
-    "download_modis(product='MOD06_L2', date=<single day>, extent=<NC>): ",
+    "download_modis(product='MOD06_L2', date=<month range>, extent=<NC>): ",
     "downloads cloud product file"
   ),
   {
     skip_if_no_live_tests()
-    testthat::skip_if(!nzchar(Sys.getenv("EARTHDATA_TOKEN")),
-                      "no Earthdata token")
+    testthat::skip_if(
+      !nzchar(Sys.getenv("NASA_EARTHDATA_TOKEN")),
+      "no Earthdata token"
+    )
     dir <- withr::local_tempdir()
     amadeus::download_modis(
       product = "MOD06_L2",
-      nasa_earth_data_token = Sys.getenv("EARTHDATA_TOKEN"),
-      date = c("2022-01-01", "2022-01-01"),
+      nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
+      date = c("2022-01-01", "2022-01-31"),
       extent = c(-79, 35, -78, 36),
       directory_to_save = dir,
       acknowledgement = TRUE

@@ -842,9 +842,9 @@ check_url_status <- function(
 ) {
   http_status_ok <- c(200, 206)
 
-  tryCatch(
+  status_head <- tryCatch(
     {
-      status <- url |>
+      url |>
         httr2::request() |>
         httr2::req_method("HEAD") |>
         httr2::req_error(is_error = \(resp) FALSE) |>
@@ -854,15 +854,34 @@ check_url_status <- function(
         ) |>
         httr2::req_perform() |>
         httr2::resp_status()
-
-      Sys.sleep(1)
-      return(status %in% http_status_ok)
     },
-    error = function(e) {
-      # Return FALSE for any errors (network, DNS, SSL, etc.)
-      return(FALSE)
-    }
+    error = function(e) NA_integer_
   )
+
+  if (!is.na(status_head) && status_head %in% http_status_ok) {
+    Sys.sleep(1)
+    return(TRUE)
+  }
+
+  # Some hosts reject/flake on HEAD; probe with a tiny ranged GET.
+  status_get <- tryCatch(
+    {
+      url |>
+        httr2::request() |>
+        httr2::req_headers(Range = "bytes=0-0") |>
+        httr2::req_error(is_error = \(resp) FALSE) |>
+        httr2::req_retry(
+          max_tries = max_tries,
+          retry_on_failure = TRUE
+        ) |>
+        httr2::req_perform() |>
+        httr2::resp_status()
+    },
+    error = function(e) NA_integer_
+  )
+
+  Sys.sleep(1)
+  !is.na(status_get) && status_get %in% http_status_ok
 }
 
 #' Import download commands
