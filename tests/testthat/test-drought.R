@@ -1567,6 +1567,39 @@ testthat::test_that(
   }
 )
 
+testthat::test_that(
+  "download_drought SPEI retries alternate endpoint after failed download result",
+  {
+    captured_urls <- character(0)
+    testthat::local_mocked_bindings(
+      check_destfile = function(...) TRUE,
+      check_url_status = function(url) grepl("spei_database_2_11", url),
+      download_run_method = function(urls, ...) {
+        captured_urls <<- c(captured_urls, urls)
+        if (grepl("spei_database_2_11", urls)) {
+          return(list(success = 0, failed = 1, skipped = 0))
+        }
+        list(success = 1, failed = 0, skipped = 0)
+      },
+      .package = "amadeus"
+    )
+    withr::with_tempdir({
+      result <- suppressMessages(
+        amadeus::download_drought(
+          source = "spei",
+          date = "2020-01-01",
+          timescale = 1L,
+          directory_to_save = ".",
+          acknowledgement = TRUE
+        )
+      )
+      testthat::expect_equal(result$success, 1L)
+      testthat::expect_equal(length(captured_urls), 2L)
+      testthat::expect_true(grepl("spei_database_2_10", captured_urls[2]))
+    })
+  }
+)
+
 testthat::test_that("download_drought EDDI returns hash when hash=TRUE", {
   testthat::local_mocked_bindings(
     check_destfile = function(...) TRUE,

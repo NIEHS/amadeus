@@ -128,6 +128,37 @@ testthat::test_that("download_terraclimate mock download with hash", {
   })
 })
 
+testthat::test_that(
+  "download_terraclimate continues when preflight check fails transiently",
+  {
+    run_called <- FALSE
+    testthat::local_mocked_bindings(
+      check_url_status = function(...) FALSE,
+      check_destfile = function(...) TRUE,
+      download_run_method = function(...) {
+        run_called <<- TRUE
+        list(success = 1, failed = 0, skipped = 0)
+      },
+      .package = "amadeus"
+    )
+    withr::with_tempdir({
+      testthat::expect_warning(
+        result <- suppressMessages(
+          download_terraclimate(
+            variables = "ppt",
+            year = c(2018, 2018),
+            directory_to_save = ".",
+            acknowledgement = TRUE
+          )
+        ),
+        regexp = "Preflight URL check failed"
+      )
+      testthat::expect_true(run_called)
+      testthat::expect_equal(result$success, 1L)
+    })
+  }
+)
+
 ################################################################################
 ##### process_terraclimate
 testthat::test_that("process_terraclimate", {
