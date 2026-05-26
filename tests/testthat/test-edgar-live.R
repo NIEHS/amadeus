@@ -61,7 +61,7 @@ testthat::test_that(
     dir <- withr::local_tempdir()
 amadeus::download_edgar(
       version = "8.1_voc",
-      voc = "01",
+      voc = "1",
       format = "nc",
       output = "emi",
       directory_to_save = dir,
