@@ -2,6 +2,8 @@
 
 ## amadeus 2.0.0
 
+CRAN release: 2026-05-21
+
 ### Major updates to code base - breaking changes have been minmized but please report if 1.3.x versions are not working as expected
 
 - Refactored code base to improve maintainability and utilize modern R
