@@ -5330,38 +5330,29 @@ download_drought <- function(
       return(invisible(list(success = 0, failed = 0, skipped = 1)))
     }
 
-    download_result <- NULL
-    selected_url <- NULL
-
+    url <- NULL
     for (candidate_url in spei_url_candidates) {
-      download_result <- amadeus::download_run_method(
-        urls = candidate_url,
-        destfiles = destfile,
-        token = NULL,
-        show_progress = show_progress,
-        max_tries = max_tries,
-        rate_limit = rate_limit
-      )
-
-      if (
-        isTRUE(download_result$success > 0) &&
-          file.exists(destfile) &&
-          file.info(destfile)$size > 0
-      ) {
-        selected_url <- candidate_url
+      if (amadeus::check_url_status(candidate_url)) {
+        url <- candidate_url
         break
       }
     }
 
-    if (is.null(selected_url)) {
+    if (is.null(url)) {
       stop(sprintf(
-        paste0(
-          "SPEI timescale %s was unavailable from all known source URLs. ",
-          "Check upstream SPEI service status and `timescale` parameter.\n"
-        ),
+        "SPEI timescale %s returned HTTP 404. Check `timescale` parameter.\n",
         ts_str
       ))
     }
+
+    download_result <- amadeus::download_run_method(
+      urls = url,
+      destfiles = destfile,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = rate_limit
+    )
 
     if (hash) {
       return(amadeus::download_hash(hash = TRUE, directory_to_save))
