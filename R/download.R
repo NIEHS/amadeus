@@ -5322,6 +5322,17 @@ download_drought <- function(
     # nolint end
     destfile <- paste0(directory_to_save, "spei", ts_str, ".nc")
 
+    download_spei <- function(url) {
+      amadeus::download_run_method(
+        urls = url,
+        destfiles = destfile,
+        token = NULL,
+        show_progress = show_progress,
+        max_tries = max_tries,
+        rate_limit = rate_limit
+      )
+    }
+
     if (!amadeus::check_destfile(destfile)) {
       message("SPEI file already exists. Skipping download.\n")
       if (hash) {
@@ -5339,20 +5350,32 @@ download_drought <- function(
     }
 
     if (is.null(url)) {
+      # Some hosts intermittently fail preflight checks; try direct downloads.
+      last_error <- NULL
+      for (candidate_url in spei_url_candidates) {
+        attempt <- tryCatch(
+          download_spei(candidate_url),
+          error = function(e) e
+        )
+        if (!inherits(attempt, "error")) {
+          if (hash) {
+            return(amadeus::download_hash(hash = TRUE, directory_to_save))
+          }
+          return(invisible(attempt))
+        }
+        last_error <- conditionMessage(attempt)
+      }
       stop(sprintf(
-        "SPEI timescale %s returned HTTP 404. Check `timescale` parameter.\n",
-        ts_str
+        paste0(
+          "SPEI timescale %s returned HTTP 404. Check `timescale` ",
+          "parameter.\nLast error: %s\n"
+        ),
+        ts_str,
+        if (is.null(last_error)) "none" else last_error
       ))
     }
 
-    download_result <- amadeus::download_run_method(
-      urls = url,
-      destfiles = destfile,
-      token = NULL,
-      show_progress = show_progress,
-      max_tries = max_tries,
-      rate_limit = rate_limit
-    )
+    download_result <- download_spei(url)
 
     if (hash) {
       return(amadeus::download_hash(hash = TRUE, directory_to_save))

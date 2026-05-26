@@ -1518,6 +1518,7 @@ testthat::test_that("download_drought SPEI URL 404 raises error", {
   testthat::local_mocked_bindings(
     check_destfile = function(...) TRUE,
     check_url_status = function(...) FALSE,
+    download_run_method = function(...) stop("HTTP 404"),
     .package = "amadeus"
   )
   withr::with_tempdir({
@@ -1529,10 +1530,42 @@ testthat::test_that("download_drought SPEI URL 404 raises error", {
         directory_to_save = ".",
         acknowledgement = TRUE
       ),
-      "HTTP 404"
+      "HTTP 404|SPEI timescale"
     )
   })
 })
+
+testthat::test_that(
+  "download_drought SPEI falls back to direct download when preflight fails",
+  {
+    captured_urls <- character(0)
+    testthat::local_mocked_bindings(
+      check_destfile = function(...) TRUE,
+      check_url_status = function(...) FALSE,
+      download_run_method = function(urls, ...) {
+        captured_urls <<- c(captured_urls, urls)
+        list(success = 1, failed = 0, skipped = 0)
+      },
+      .package = "amadeus"
+    )
+    withr::with_tempdir({
+      result <- suppressMessages(
+        amadeus::download_drought(
+          source = "spei",
+          date = "2020-01-01",
+          timescale = 1L,
+          directory_to_save = ".",
+          acknowledgement = TRUE
+        )
+      )
+      testthat::expect_equal(result$success, 1L)
+      testthat::expect_equal(
+        captured_urls[1],
+        "https://spei.csic.es/spei_database_2_11/nc/spei01.nc"
+      )
+    })
+  }
+)
 
 testthat::test_that("download_drought EDDI returns hash when hash=TRUE", {
   testthat::local_mocked_bindings(
