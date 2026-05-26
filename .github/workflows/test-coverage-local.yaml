@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
-      NASA_EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
+      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN || secrets.NASA_EARTHDATA_TOKEN }}
+      NASA_EARTHDATA_TOKEN: ${{ secrets.NASA_EARTHDATA_TOKEN || secrets.EARTHDATA_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
