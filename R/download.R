@@ -3496,10 +3496,13 @@ download_gridmet <- function(
       # Validate first URL only
       if (v == 1 && y == 1) {
         if (!amadeus::check_url_status(url)) {
-          stop(paste0(
-            "Invalid year returns HTTP code 404. ",
-            "Check `year` parameter.\n"
-          ))
+          warning(
+            paste0(
+              "Preflight URL check failed; attempting direct download ",
+              "for year validation.\n"
+            ),
+            call. = FALSE
+          )
         }
       }
 
@@ -3665,10 +3668,13 @@ download_terraclimate <- function(
       # Validate first URL only
       if (v == 1 && y == 1) {
         if (!amadeus::check_url_status(url)) {
-          stop(paste0(
-            "Invalid year returns HTTP code 404. ",
-            "Check `year` parameter.\n"
-          ))
+          warning(
+            paste0(
+              "Preflight URL check failed; attempting direct download ",
+              "for year validation.\n"
+            ),
+            call. = FALSE
+          )
         }
       }
 
@@ -5348,34 +5354,48 @@ download_drought <- function(
         break
       }
     }
+    candidate_order <- if (is.null(url)) {
+      spei_url_candidates
+    } else {
+      c(url, setdiff(spei_url_candidates, url))
+    }
+    last_error <- NULL
+    download_result <- NULL
 
-    if (is.null(url)) {
-      # Some hosts intermittently fail preflight checks; try direct downloads.
-      last_error <- NULL
-      for (candidate_url in spei_url_candidates) {
-        attempt <- tryCatch(
-          download_spei(candidate_url),
-          error = function(e) e
-        )
-        if (!inherits(attempt, "error")) {
-          if (hash) {
-            return(amadeus::download_hash(hash = TRUE, directory_to_save))
-          }
-          return(invisible(attempt))
-        }
+    for (candidate_url in candidate_order) {
+      attempt <- tryCatch(
+        download_spei(candidate_url),
+        error = function(e) e
+      )
+      if (inherits(attempt, "error")) {
         last_error <- conditionMessage(attempt)
+        next
       }
+
+      success_n <- if (!is.null(attempt$success)) attempt$success else 0
+      failed_n <- if (!is.null(attempt$failed)) attempt$failed else 0
+      if (failed_n == 0 && success_n > 0) {
+        download_result <- attempt
+        break
+      }
+
+      last_error <- sprintf(
+        "%s file(s) failed to download from %s",
+        failed_n,
+        candidate_url
+      )
+    }
+
+    if (is.null(download_result)) {
       stop(sprintf(
         paste0(
-          "SPEI timescale %s returned HTTP 404. Check `timescale` ",
-          "parameter.\nLast error: %s\n"
+          "SPEI timescale %s could not be downloaded. Check upstream ",
+          "availability and `timescale` parameter.\nLast error: %s\n"
         ),
         ts_str,
         if (is.null(last_error)) "none" else last_error
       ))
     }
-
-    download_result <- download_spei(url)
 
     if (hash) {
       return(amadeus::download_hash(hash = TRUE, directory_to_save))

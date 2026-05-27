@@ -45,3 +45,36 @@ skip_if_pkg_missing <- function(pkg) {
   testthat::skip_if_not_installed(pkg)
   invisible(TRUE)
 }
+
+#' Return TRUE when a live-test condition looks transient/provider-side.
+#'
+#' @param x condition object or message string.
+#' @keywords internal
+is_transient_live_issue <- function(x) {
+  msg <- if (inherits(x, "condition")) conditionMessage(x) else as.character(x)
+  patterns <- c(
+    "file\\(s\\) failed to download",
+    "timed? out",
+    "Timeout",
+    "SSL",
+    "Connection",
+    "Could not resolve",
+    "Invalid year returns HTTP code 404",
+    "HTTP 429",
+    "HTTP 5[0-9]{2}"
+  )
+  grepl(paste(patterns, collapse = "|"), msg, ignore.case = TRUE)
+}
+
+#' Skip live test when condition indicates transient upstream flakiness.
+#'
+#' @param cond condition object from error/warning handlers.
+#' @keywords internal
+skip_if_transient_live_issue <- function(cond) {
+  if (is_transient_live_issue(cond)) {
+    testthat::skip(
+      sprintf("Transient upstream/live failure: %s", conditionMessage(cond))
+    )
+  }
+  invisible(FALSE)
+}

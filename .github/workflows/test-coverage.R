@@ -36,7 +36,11 @@ dir.create(pkg_dir, showWarnings = FALSE, recursive = TRUE)
 message("\n=== Starting Coverage Calculation ===")
 tryCatch(
   {
-    # Try coverage with more verbose output
+    # Keep `type = "all"` so coverage matches the historical baseline on
+    # main (tests + vignettes + \donttest{} examples). Sporadic hangs in
+    # vignette/example network downloads are bounded by `timeout-minutes`
+    # on the job in test-coverage-local.yaml, so a stuck run fails fast
+    # instead of consuming the 6-hour job budget.
     cov <- covr::package_coverage(
       type = "all",
       quiet = FALSE,

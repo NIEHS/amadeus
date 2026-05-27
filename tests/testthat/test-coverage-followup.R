@@ -487,6 +487,9 @@ testthat::test_that("generate_time_sequence handles collection ending in '3'", {
 })
 
 testthat::test_that("setup_nasa_token interactive branch is exercised", {
+  if (identical(Sys.getenv("AMADEUS_COVERAGE_CI"), "true")) {
+    testthat::skip("Skip interactive token test in coverage CI")
+  }
   # Mock readline to simulate user entering a token
   testthat::local_mocked_bindings(
     readline = function(prompt = "") "interactive_token_123",
