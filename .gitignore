@@ -101,3 +101,4 @@ tests/test_report/*.pdf
 tests/test_report/*_files/
 tests/test_report/cran_checklist.html
 tools/run-live-workflow-vignettes.sh
+live_test.sh
