@@ -36,9 +36,14 @@ dir.create(pkg_dir, showWarnings = FALSE, recursive = TRUE)
 message("\n=== Starting Coverage Calculation ===")
 tryCatch(
   {
-    # Try coverage with more verbose output
+    # Coverage from tests only. `type = "all"` additionally rebuilds
+    # vignettes and runs \donttest{} examples, both of which trigger
+    # heavy network downloads on CI and have previously hung the
+    # workflow at the 6-hour job timeout. The tests/ suite already
+    # exercises every public function (see test_report) and is the
+    # canonical signal for patch coverage.
     cov <- covr::package_coverage(
-      type = "all",
+      type = "tests",
       quiet = FALSE,
       clean = FALSE,
       install_path = pkg_dir,

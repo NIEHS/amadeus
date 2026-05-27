@@ -16,6 +16,7 @@ name: test-coverage-local
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN || secrets.NASA_EARTHDATA_TOKEN }}
