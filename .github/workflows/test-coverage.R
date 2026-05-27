@@ -36,14 +36,13 @@ dir.create(pkg_dir, showWarnings = FALSE, recursive = TRUE)
 message("\n=== Starting Coverage Calculation ===")
 tryCatch(
   {
-    # Coverage from tests only. `type = "all"` additionally rebuilds
-    # vignettes and runs \donttest{} examples, both of which trigger
-    # heavy network downloads on CI and have previously hung the
-    # workflow at the 6-hour job timeout. The tests/ suite already
-    # exercises every public function (see test_report) and is the
-    # canonical signal for patch coverage.
+    # Keep `type = "all"` so coverage matches the historical baseline on
+    # main (tests + vignettes + \donttest{} examples). Sporadic hangs in
+    # vignette/example network downloads are bounded by `timeout-minutes`
+    # on the job in test-coverage-local.yaml, so a stuck run fails fast
+    # instead of consuming the 6-hour job budget.
     cov <- covr::package_coverage(
-      type = "tests",
+      type = "all",
       quiet = FALSE,
       clean = FALSE,
       install_path = pkg_dir,
