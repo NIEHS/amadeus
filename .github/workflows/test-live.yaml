@@ -1,13 +1,18 @@
-# Scheduled live-API test workflow.
+# Live-API test workflow.
 #
-# Runs nightly at 06:00 UTC, plus on-demand (with optional `filter`
-# input). Sets AMADEUS_LIVE_TESTS=true so that `skip_if_no_live_tests()`
-# does not skip the `test-*-live.R` files. On failure, an issue is
-# auto-opened (label: live-test-failure) so repo watchers receive an
-# email notification.
+# DISABLED on the schedule trigger: the GitHub-hosted runner network is
+# too unreliable for multi-GB downloads against upstream science
+# servers (SPEI, MERRA-2, etc.), producing constant false-positive
+# failure issues. Run these tests locally instead — see
+# `vignettes/testing.Rmd` ("Running live tests locally") or the README
+# section "Live tests".
+#
+# `workflow_dispatch` is kept so an authorized user can still trigger a
+# one-off run from the Actions tab when needed.
+#
+# Sets AMADEUS_LIVE_TESTS=true so that `skip_if_no_live_tests()` does
+# not skip the `test-*-live.R` files.
 on:
-  schedule:
-    - cron: '0 6 * * *'
   workflow_dispatch:
     inputs:
       filter:
