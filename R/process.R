@@ -343,8 +343,7 @@ the input then flatten it manually."
     }
 
     # describe provides subdataset information
-    if (!any(grepl(":", path))) {
-      if (
+    if (!any(grepl("^HDF", path))) {
         !is.character(subdataset) ||
           length(subdataset) != 1L ||
           is.na(subdataset) ||
@@ -354,10 +353,10 @@ the input then flatten it manually."
       }
       # we use var to get detailed information in subdatasets
       sds_desc <- terra::describe(path, sds = TRUE)
-      index_sds <- unique(c(
+      index_sds <- sort(unique(c(
         grep(subdataset, sds_desc$var),
         grep(subdataset, sds_desc$name)
-      ))
+      )))
       if (length(index_sds) == 0L) {
         available_sds <- paste(stats::na.omit(sds_desc$var), collapse = ", ")
         stop(
