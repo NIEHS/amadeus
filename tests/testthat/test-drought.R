@@ -1675,29 +1675,17 @@ testthat::test_that("drought_set_time_nc stops when filename has no year", {
   )
 })
 
-testthat::test_that("drought_process_nc sets CRS when raster CRS is empty", {
+testthat::test_that("drought_ensure_crs(crs=empty): sets EPSG:4326", {
   withr::local_package("terra")
-  spei_path <- testthat::test_path("..", "testdata", "drought", "spei")
 
-  crs_call_count <- 0L
-  testthat::local_mocked_bindings(
-    crs = function(x, ...) {
-      if (missing(x)) terra::crs(x)
-      crs_call_count <<- crs_call_count + 1L
-      if (crs_call_count == 1L) NA_character_
-      else ""
-    },
-    .package = "terra"
-  )
-  testthat::expect_no_error(
-    suppressMessages(
-      amadeus:::drought_process_nc(
-        path = spei_path,
-        date = c("2020-01-01", "2020-01-01"),
-        timescale = 1L,
-        source = "spei",
-        extent = NULL
-      )
-    )
+  r <- terra::rast(nrows = 2, ncols = 2, xmin = 0, xmax = 2, ymin = 0, ymax = 2)
+  terra::values(r) <- seq_len(terra::ncell(r))
+  terra::crs(r) <- ""
+
+  testthat::expect_true(is.na(terra::crs(r)) || terra::crs(r) == "")
+  out <- amadeus:::drought_ensure_crs(r)
+  testthat::expect_match(
+    terra::crs(out),
+    "4326|WGS 84|longlat"
   )
 })

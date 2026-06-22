@@ -4899,6 +4899,15 @@ process_drought <- function(
 }
 
 
+#### Internal helper: ensure drought raster CRS
+drought_ensure_crs <- function(data_return) {
+  data_crs <- terra::crs(data_return)
+  if (is.na(data_crs) || data_crs == "") {
+    terra::crs(data_return) <- "EPSG:4326"
+  }
+  data_return
+}
+
 #### Internal helper: SPEI / EDDI netCDF pathway
 drought_process_nc <- function(source, path, date, timescale, extent) {
   ts_fmt <- sprintf("%02d", as.integer(timescale))
@@ -4979,9 +4988,7 @@ drought_process_nc <- function(source, path, date, timescale, extent) {
   data_return <- terra::subset(data_full, keep_idx)
 
   #### Ensure EPSG:4326
-  if (is.na(terra::crs(data_return)) || terra::crs(data_return) == "") {
-    terra::crs(data_return) <- "EPSG:4326"
-  }
+  data_return <- drought_ensure_crs(data_return)
 
   if (!is.null(extent)) {
     data_return <- terra::crop(data_return, extent)
