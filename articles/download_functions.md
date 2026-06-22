@@ -421,14 +421,12 @@ testthat::test_that(
 )
 ```
 
-    #> Test passed with 1 success 🎊.
-
 Although the `testthat::test_that(...)` chunk contains code to generate
 and check URLs, the unit test is performed by
 `expect_true(all(url_status))`. In words, this line is expecting
 (`expect_true`) that all (`all`) of the sampled URLs return HTTP
-response status 200 (`url_status`). Since this expectation was met, the
-test passed!
+response status 200 (`url_status`). When the generated URLs are
+reachable, this expectation is met and the test passes.
 
 For an alternate example, we can use a start and end date that are known
 to not have data. As the URLs associated with these dates do not exist,
@@ -461,7 +459,7 @@ testthat::test_that(
     )
   }
 )
-#> Test passed with 1 success 🎊.
+#> Test passed with 1 success 🥇.
 ```
 
 This test utilizes
@@ -494,7 +492,7 @@ testthat::test_that(
     )
   }
 )
-#> Test passed with 1 success 🌈.
+#> Test passed with 1 success 🎊.
 ```
 
 As expected, the test passes because the NOAA HMS Smoke dataset does not
@@ -691,6 +689,6 @@ download_hms
 #>         return(invisible(download_result))
 #>     }
 #> }
-#> <bytecode: 0x5585ed26e260>
+#> <bytecode: 0x55fcf23720e8>
 #> <environment: namespace:amadeus>
 ```
