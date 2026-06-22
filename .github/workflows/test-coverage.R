@@ -76,6 +76,17 @@ tryCatch(
     message("\n!!! ERROR during coverage calculation !!!")
     message("Error message: ", conditionMessage(e))
 
+    escape_annotation <- function(x) {
+      x <- gsub("%", "%25", x, fixed = TRUE)
+      x <- gsub("\r", "%0D", x, fixed = TRUE)
+      gsub("\n", "%0A", x, fixed = TRUE)
+    }
+    emit_error_annotation <- function(title, lines) {
+      msg <- paste(lines, collapse = "\n")
+      msg <- substr(msg, 1L, 6000L)
+      message("::error title=", title, "::", escape_annotation(msg))
+    }
+
     # Try to find and display the test failure file
     fail_files <- list.files(
       runnertemp,
@@ -86,7 +97,9 @@ tryCatch(
 
     if (length(fail_files) > 0) {
       message("\n=== Content of ", fail_files[1], " ===")
-      cat(readLines(fail_files[1]), sep = "\n")
+      fail_lines <- readLines(fail_files[1])
+      cat(fail_lines, sep = "\n")
+      emit_error_annotation("Coverage testthat.Rout.fail", tail(fail_lines, 120))
     }
 
     # Look for any .Rout files
@@ -110,6 +123,15 @@ tryCatch(
             message("Could not read file: ", conditionMessage(e2))
           }
         )
+      }
+      if (length(fail_files) == 0) {
+        testthat_rout <- rout_files[basename(rout_files) == "testthat.Rout"]
+        if (length(testthat_rout) > 0) {
+          emit_error_annotation(
+            "Coverage testthat.Rout",
+            tail(readLines(testthat_rout[1]), 120)
+          )
+        }
       }
     }
 
