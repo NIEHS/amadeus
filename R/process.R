@@ -344,6 +344,7 @@ the input then flatten it manually."
 
     # describe provides subdataset information
     if (!any(grepl("^HDF", path))) {
+      if (
         !is.character(subdataset) ||
           length(subdataset) != 1L ||
           is.na(subdataset) ||
