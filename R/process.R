@@ -871,14 +871,21 @@ process_blackmarble <- function(
   vnp_assigned <-
     mapply(
       function(vnp, tile_in) {
-        vnp_ <- withCallingHandlers(
-          terra::rast(vnp, subds = subdataset),
-          warning = function(w) {
-            if (grepl("unknown extent", conditionMessage(w), fixed = TRUE)) {
-              invokeRestart("muffleWarning")
+        read_vnp <- function(subds) {
+          withCallingHandlers(
+            terra::rast(vnp, subds = subds),
+            warning = function(w) {
+              if (grepl("unknown extent", conditionMessage(w), fixed = TRUE)) {
+                invokeRestart("muffleWarning")
+              }
             }
-          }
-        )
+          )
+        }
+        vnp_ <- if (length(subdataset) > 1L) {
+          do.call(c, lapply(subdataset, read_vnp))
+        } else {
+          read_vnp(subdataset)
+        }
         tile_ext <- tile_df[tile_df$tile == tile_in, -1]
 
         terra::crs(vnp_) <- terra::crs(crs)

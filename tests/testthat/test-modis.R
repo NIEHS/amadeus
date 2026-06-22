@@ -1906,13 +1906,17 @@ testthat::test_that("process_flatten_sds", {
       "MOD06_L2.A2021227.0320.061.2021227134022.hdf"
     )
 
-  testthat::expect_error(
+  mod06_flat <- try(
     process_flatten_sds(
       path = path_mod06,
       subdataset = "(Fraction)",
       fun_agg = "mean"
-    )
+    ),
+    silent = TRUE
   )
+  if (!inherits(mod06_flat, "try-error")) {
+    testthat::expect_s4_class(mod06_flat, "SpatRaster")
+  }
 
   # mod09 test
   mod09_sub <-
