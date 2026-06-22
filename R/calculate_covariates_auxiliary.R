@@ -928,11 +928,9 @@ calc_return_locs <- function(
       if ("geometry" %in% names(covar)) {
         covar_sf <- sf::st_as_sf(covar, wkt = "geometry", crs = crs)
       } else if (all(c("lon", "lat") %in% names(covar))) {
-        covar_sf <- sf::st_as_sf(
+        covar_sf <- sf::st_sf(
           covar,
-          coords = c("lon", "lat"),
-          crs = crs,
-          remove = FALSE
+          geometry = sf::st_sfc(crs = crs)
         )
       } else {
         warning(

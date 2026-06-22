@@ -723,7 +723,10 @@ testthat::test_that("calculate_edgar handles empty sf locations", {
       lon = numeric(),
       lat = numeric()
     )
-    locs_empty <- sf::st_as_sf(locs_empty, coords = c("lon", "lat"), crs = 4326)
+    locs_empty <- sf::st_sf(
+      locs_empty,
+      geometry = sf::st_sfc(crs = 4326)
+    )
 
     testthat::expect_no_error(
       out <- calculate_edgar(

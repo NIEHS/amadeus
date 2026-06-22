@@ -1354,7 +1354,7 @@ process_ecoregion <-
     }
     ecoreg$time <- paste0(
       "1997 - ",
-      data.table::year(Sys.time())
+      format(Sys.Date(), "%Y")
     )
     ecoreg <- terra::vect(ecoreg)
     if (!is.null(extent)) {
@@ -3247,12 +3247,18 @@ process_geos <-
       } # nocov end
       var_prefix <- sub("_[0-9]{8}.*$", "", names(data_return))
       tapp_index <- paste(var_prefix, date_str, sep = "_")
-      data_return <- terra::tapp(
-        data_return,
-        tapp_index,
-        fun = fun,
-        na.rm = TRUE
-      )
+      if (length(unique(tapp_index)) == 1L) {
+        out_name <- unique(tapp_index)
+        data_return <- terra::app(data_return, fun = fun, na.rm = TRUE)
+        names(data_return) <- out_name
+      } else {
+        data_return <- terra::tapp(
+          data_return,
+          tapp_index,
+          fun = fun,
+          na.rm = TRUE
+        )
+      }
       terra::crs(data_return) <- "EPSG:4326"
       out_dates <- regmatches(
         names(data_return),
@@ -3552,12 +3558,18 @@ process_merra2 <-
       var_prefix <- sub("_[0-9]{8}.*$", "", names(data_return))
       tapp_index <- paste(var_prefix, date_str, sep = "_")
       saved_crs <- terra::crs(data_return)
-      data_return <- terra::tapp(
-        data_return,
-        tapp_index,
-        fun = fun,
-        na.rm = TRUE
-      )
+      if (length(unique(tapp_index)) == 1L) {
+        out_name <- unique(tapp_index)
+        data_return <- terra::app(data_return, fun = fun, na.rm = TRUE)
+        names(data_return) <- out_name
+      } else {
+        data_return <- terra::tapp(
+          data_return,
+          tapp_index,
+          fun = fun,
+          na.rm = TRUE
+        )
+      }
       terra::crs(data_return) <- saved_crs
       out_dates <- regmatches(
         names(data_return),
@@ -4470,12 +4482,18 @@ process_goes <- function(
     var_prefix <- sub("_[0-9]{8}_[0-9]{6}$", "", names(data_return))
     tapp_index <- paste(var_prefix, date_str, sep = "_")
     saved_crs <- terra::crs(data_return)
-    data_return <- terra::tapp(
-      data_return,
-      tapp_index,
-      fun = fun,
-      na.rm = TRUE
-    )
+    if (length(unique(tapp_index)) == 1L) {
+      out_name <- unique(tapp_index)
+      data_return <- terra::app(data_return, fun = fun, na.rm = TRUE)
+      names(data_return) <- out_name
+    } else {
+      data_return <- terra::tapp(
+        data_return,
+        tapp_index,
+        fun = fun,
+        na.rm = TRUE
+      )
+    }
     terra::crs(data_return) <- saved_crs
     out_dates <- regmatches(
       names(data_return),

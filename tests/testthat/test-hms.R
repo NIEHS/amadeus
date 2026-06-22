@@ -5,6 +5,8 @@
 ################################################################################
 ##### download_hms
 testthat::test_that("download_hms (no errors)", {
+  testthat::skip_if_offline()
+
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters
@@ -710,7 +712,7 @@ testthat::test_that("calculate_hms frac with no plume overlap returns zeros", {
     date = c("2022-06-10", "2022-06-11"),
     path = testthat::test_path("..", "testdata", "hms")
   )
-  hms_far <- suppressMessages(
+  hms_far <- suppressWarnings(suppressMessages(
     calculate_hms(
       from = hms,
       locs = locs_far,
@@ -719,7 +721,7 @@ testthat::test_that("calculate_hms frac with no plume overlap returns zeros", {
       frac = TRUE,
       geom = FALSE
     )
-  )
+  ))
   smoke_cols <- grep("^(light|medium|heavy)_", names(hms_far), value = TRUE)
   testthat::expect_true(length(smoke_cols) == 3)
   testthat::expect_true(
