@@ -130,7 +130,11 @@ testthat::test_that("download_modis (expected errors)", {
   vec_extent <- c(-124, 25, -105, 40)
 
   # with token (if available) - should work
-  if (Sys.getenv("CI") != "true" && Sys.getenv("NASA_EARTHDATA_TOKEN") != "") {
+  if (
+    Sys.getenv("AMADEUS_LIVE_TESTS") == "true" &&
+      Sys.getenv("CI") != "true" &&
+      Sys.getenv("NASA_EARTHDATA_TOKEN") != ""
+  ) {
     testthat::expect_warning(
       download_data(
         dataset_name = "modis",
@@ -3232,8 +3236,7 @@ testthat::test_that("download_modis surfaces CMR query failures", {
         date = "2023-01-01",
         product = "MOD14A1",
         directory_to_save = ".",
-        acknowledgement = TRUE,
-        download = FALSE
+        acknowledgement = TRUE
       ),
       "Failed to query NASA CMR"
     )

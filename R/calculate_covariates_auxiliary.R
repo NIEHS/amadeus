@@ -378,9 +378,9 @@ calc_prepare_weights <- function(from, weights = NULL) {
 
   weights_obj <- weights
   if (is.character(weights) && length(weights) == 1L) {
-    weights_obj <- try(terra::rast(weights), silent = TRUE)
+    weights_obj <- suppressWarnings(try(terra::rast(weights), silent = TRUE))
     if (inherits(weights_obj, "try-error")) {
-      weights_obj <- try(terra::vect(weights), silent = TRUE)
+      weights_obj <- suppressWarnings(try(terra::vect(weights), silent = TRUE))
       if (inherits(weights_obj, "try-error")) {
         stop("`weights` path could not be read as raster or vector data.")
       }
@@ -1644,7 +1644,7 @@ calculate_modis_daily <- function(
   ...
 ) {
   if (!methods::is(locs, "SpatVector")) {
-    locs <- try(terra::vect(locs))
+    locs <- try(terra::vect(locs), silent = TRUE)
     if (inherits(locs, "try-error")) {
       stop("locs should be a SpatVector or convertible object.")
     }

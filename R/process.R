@@ -871,7 +871,14 @@ process_blackmarble <- function(
   vnp_assigned <-
     mapply(
       function(vnp, tile_in) {
-        vnp_ <- terra::rast(vnp, subds = subdataset)
+        vnp_ <- withCallingHandlers(
+          terra::rast(vnp, subds = subdataset),
+          warning = function(w) {
+            if (grepl("unknown extent", conditionMessage(w), fixed = TRUE)) {
+              invokeRestart("muffleWarning")
+            }
+          }
+        )
         tile_ext <- tile_df[tile_df$tile == tile_in, -1]
 
         terra::crs(vnp_) <- terra::crs(crs)
@@ -1754,7 +1761,7 @@ process_nei <- function(
     stop("county argument is required.")
   }
   if (!methods::is(county, "SpatVector")) {
-    county <- try(terra::vect(county))
+    county <- try(terra::vect(county), silent = TRUE)
     if (inherits(county, "try-error")) {
       stop("county is unable to be converted to SpatVector.\n")
     }
