@@ -878,7 +878,7 @@ testthat::test_that("calculate_prism derives time from metags when terra::time r
 
   # 8-digit date in metags (YYYYMMDD -> lines 3472-3473)
   meta_r8 <- from_r
-  terra::metags(meta_r8) <- data.frame(name = "time", value = "20200115")
+  terra::metags(meta_r8) <- "time=20200115"
   r8 <- amadeus::calculate_prism(
     from = meta_r8, locs = locs, locs_id = "site_id",
     radius = 0, .by_time = "day"
@@ -888,7 +888,7 @@ testthat::test_that("calculate_prism derives time from metags when terra::time r
 
   # 6-digit date in metags (YYYYMM -> lines 3474-3475)
   meta_r6 <- from_r
-  terra::metags(meta_r6) <- data.frame(name = "time", value = "202003")
+  terra::metags(meta_r6) <- "time=202003"
   r6 <- amadeus::calculate_prism(
     from = meta_r6, locs = locs, locs_id = "site_id",
     radius = 0, .by_time = "month"
@@ -898,7 +898,7 @@ testthat::test_that("calculate_prism derives time from metags when terra::time r
 
   # 4-digit year in metags (YYYY -> lines 3476-3477)
   meta_r4 <- from_r
-  terra::metags(meta_r4) <- data.frame(name = "time", value = "2021")
+  terra::metags(meta_r4) <- "time=2021"
   r4 <- amadeus::calculate_prism(
     from = meta_r4, locs = locs, locs_id = "site_id",
     radius = 0, .by_time = "year"

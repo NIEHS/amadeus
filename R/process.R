@@ -1141,9 +1141,9 @@ process_koppen_geiger <-
       "_"
     )[[1]][4]
     if (period == "present") {
-      terra::metags(kg_rast) <- c(year = "1980 - 2016")
+      terra::metags(kg_rast) <- "year=1980 - 2016"
     } else {
-      terra::metags(kg_rast) <- c(year = "2071 - 2100")
+      terra::metags(kg_rast) <- "year=2071 - 2100"
     }
     return(kg_rast)
   }
@@ -1288,7 +1288,7 @@ process_nlcd <-
     }
 
     nlcd <- terra::rast(nlcd_file, win = extent)
-    terra::metags(nlcd) <- c(Year = as.character(year)) # Changed to capital Y
+    terra::metags(nlcd) <- paste0("Year=", year) # Changed to capital Y
     return(nlcd)
   }
 
@@ -2262,7 +2262,7 @@ process_population <- function(
       "...\n"
     ))
     #### year
-    terra::metags(data) <- c(year = split2[1])
+    terra::metags(data) <- paste0("year=", split2[1])
   }
   return(data)
 }
@@ -2657,8 +2657,7 @@ process_gmted <- function(
     ")"
   )
   #### year
-  terra::metags(data) <-
-    c(year = 2010L)
+  terra::metags(data) <- "year=2010"
   #### set coordinate reference system
   return(data)
 }
@@ -4046,9 +4045,9 @@ process_prism <-
     if (terra::nlyr(prism) == 1L) {
       names(prism) <- prism_layer_name_from_file(prism_file, element)
     }
-    terra::metags(prism) <- cbind(
-      c("time", "element"),
-      c(time, element)
+    terra::metags(prism) <- c(
+      paste0("time=", time),
+      paste0("element=", element)
     )
     return(prism)
   }
@@ -4105,7 +4104,7 @@ process_cropscape <-
       cdl_file <- path
     }
     cdl <- terra::rast(cdl_file, win = extent)
-    terra::metags(cdl) <- c(year = year)
+    terra::metags(cdl) <- paste0("year=", year)
     return(cdl)
   }
 
