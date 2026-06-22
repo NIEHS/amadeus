@@ -183,8 +183,9 @@ testthat::test_that("process_cropscape", {
   testthat::expect_true(inherits(result, "SpatRaster"))
 
   # Check the metadata
+  result_meta <- terra::metags(result)
   testthat::expect_equal(
-    unname(terra::metags(result)[2, 2]), # manual index to 'year' metags
+    unname(result_meta[result_meta$name == "year", "value"]),
     as.character(year)
   )
 

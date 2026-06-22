@@ -572,7 +572,9 @@ testthat::test_that("calculate_ecoregion full_ecoregion disambiguates duplicates
   erras_unique <- erras[unique_idx, ]
   erras_unique$US_L3NAME[1:2] <- "Duplicate Name"
 
-  locs <- sf::st_point_on_surface(sf::st_as_sf(erras_unique[1:2, ]))
+  locs <- suppressWarnings(
+    sf::st_point_on_surface(sf::st_as_sf(erras_unique[1:2, ]))
+  )
   locs <- terra::vect(locs)
   locs$site_id <- c("dup_1", "dup_2")
 

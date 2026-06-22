@@ -2087,10 +2087,10 @@ sum_edc <-
   ) {
     amadeus::check_geom(geom)
     if (!methods::is(locs, "SpatVector")) {
-      locs <- try(terra::vect(locs))
+      locs <- try(terra::vect(locs), silent = TRUE)
     }
     if (!methods::is(from, "SpatVector")) {
-      from <- try(terra::vect(from))
+      from <- try(terra::vect(from), silent = TRUE)
     }
 
     if (!is.numeric(decay_range) || length(decay_range) != 1L ||
@@ -2514,7 +2514,7 @@ calculate_nei <- function(
   amadeus::check_unsupported_by(..., .call = sys.call())
   amadeus::check_geom(geom)
   if (!methods::is(locs, "SpatVector")) {
-    locs <- try(terra::vect(locs))
+    locs <- try(terra::vect(locs), silent = TRUE)
     if (inherits(locs, "try-error")) {
       stop("locs is unable to be converted to SpatVector.\n")
     }

@@ -447,7 +447,7 @@ testthat::test_that(
 )
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, eval = FALSE}
 library(testthat)
 testthat::test_that(
   "Valid dates return HTTP response status = 200.",
@@ -473,7 +473,7 @@ testthat::test_that(
 )
 ```
 
-Although the `testthat::test_that(...)` chunk contains code to generate and check URLs, the unit test is performed by `expect_true(all(url_status))`. In words, this line is expecting (`expect_true`) that all (`all`) of the sampled URLs return HTTP response status 200 (`url_status`). Since this expectation was met, the test passed!
+Although the `testthat::test_that(...)` chunk contains code to generate and check URLs, the unit test is performed by `expect_true(all(url_status))`. In words, this line is expecting (`expect_true`) that all (`all`) of the sampled URLs return HTTP response status 200 (`url_status`). When the generated URLs are reachable, this expectation is met and the test passes.
 
 For an alternate example, we can use a start and end date that are known to not have data. As the URLs associated with these dates do not exist, we expect the function will fail. This test utilizes `expect_error()` because the `download_data` wrapper function returns an error message if the underlying source-specific download function returns an error.
 

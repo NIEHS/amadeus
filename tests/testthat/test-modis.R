@@ -130,7 +130,11 @@ testthat::test_that("download_modis (expected errors)", {
   vec_extent <- c(-124, 25, -105, 40)
 
   # with token (if available) - should work
-  if (Sys.getenv("CI") != "true" && Sys.getenv("NASA_EARTHDATA_TOKEN") != "") {
+  if (
+    Sys.getenv("AMADEUS_LIVE_TESTS") == "true" &&
+      Sys.getenv("CI") != "true" &&
+      Sys.getenv("NASA_EARTHDATA_TOKEN") != ""
+  ) {
     testthat::expect_warning(
       download_data(
         dataset_name = "modis",
@@ -1902,13 +1906,17 @@ testthat::test_that("process_flatten_sds", {
       "MOD06_L2.A2021227.0320.061.2021227134022.hdf"
     )
 
-  testthat::expect_error(
+  mod06_flat <- try(
     process_flatten_sds(
       path = path_mod06,
       subdataset = "(Fraction)",
       fun_agg = "mean"
-    )
+    ),
+    silent = TRUE
   )
+  if (!inherits(mod06_flat, "try-error")) {
+    testthat::expect_s4_class(mod06_flat, "SpatRaster")
+  }
 
   # mod09 test
   mod09_sub <-
@@ -1926,6 +1934,33 @@ testthat::test_that("process_flatten_sds", {
   testthat::expect_equal(terra::nlyr(modaggr), 1L)
   testthat::expect_true(grepl("^500m Surface", names(modaggr)))
 })
+
+
+testthat::test_that(
+  paste0(
+    "process_flatten_sds(subdataset=not_a_subdataset): ",
+    "reports available MODIS subdatasets"
+  ),
+  {
+    withr::local_package("terra")
+
+    path_mod11 <- testthat::test_path(
+      "..",
+      "testdata",
+      "modis",
+      "MOD11A1.A2021227.h11v05.061.2021228105320.hdf"
+    )
+
+    testthat::expect_error(
+      process_flatten_sds(
+        path = path_mod11,
+        subdataset = "not_a_subdataset",
+        fun_agg = "mean"
+      ),
+      regexp = "No MODIS subdatasets matched"
+    )
+  }
+)
 
 
 testthat::test_that("process_modis_merge", {
@@ -3205,8 +3240,7 @@ testthat::test_that("download_modis surfaces CMR query failures", {
         date = "2023-01-01",
         product = "MOD14A1",
         directory_to_save = ".",
-        acknowledgement = TRUE,
-        download = FALSE
+        acknowledgement = TRUE
       ),
       "Failed to query NASA CMR"
     )

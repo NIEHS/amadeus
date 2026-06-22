@@ -21,7 +21,7 @@ testthat::test_that("download_groads", {
         unlink(directory_to_save, recursive = TRUE)
       }
 
-      testthat::expect_no_error(
+      testthat::expect_warning(
         download_data(
           dataset_name = "sedac_groads",
           directory_to_save = directory_to_save,
@@ -32,7 +32,8 @@ testthat::test_that("download_groads", {
           unzip = FALSE,
           remove_zip = FALSE,
           remove_command = FALSE
-        )
+        ),
+        "download=FALSE is deprecated"
       )
 
       # Check that directory was created
@@ -81,7 +82,7 @@ testthat::test_that("download_groads", {
     }
   }
 
-  testthat::expect_message(
+  testthat::expect_warning(
     download_data(
       dataset_name = "sedac_groads",
       data_format = "Shapefile",
@@ -92,7 +93,8 @@ testthat::test_that("download_groads", {
       unzip = FALSE,
       remove_zip = FALSE,
       remove_command = TRUE
-    )
+    ),
+    "download=FALSE|remove_command"
   )
   # remove temporary groads
   unlink(directory_to_save, recursive = TRUE)

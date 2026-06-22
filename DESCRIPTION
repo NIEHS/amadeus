@@ -18,7 +18,7 @@ Imports:
     sf,
     sftime,
     stats,
-    terra (>= 1.8-50),
+    terra (>= 1.8-42),
     methods,
     data.table,
     httr2,

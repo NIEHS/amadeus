@@ -132,7 +132,7 @@ testthat::test_that("download_gmted with download_data function", {
   directory_to_save <- paste0(tempdir(), "/gmted_download_test/")
 
   # Test that download_data creates proper structure with download = FALSE
-  testthat::expect_no_error(
+  testthat::expect_warning(
     download_data(
       dataset_name = "gmted",
       statistic = "Breakline Emphasis",
@@ -142,7 +142,8 @@ testthat::test_that("download_gmted with download_data function", {
       unzip = FALSE,
       remove_zip = FALSE,
       download = FALSE # Don't actually download
-    )
+    ),
+    "download=FALSE is deprecated"
   )
 
   # Check directory was created

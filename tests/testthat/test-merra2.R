@@ -131,6 +131,8 @@ testthat::test_that("download_merra2 (no errors)", {
 })
 
 testthat::test_that("download_merra2 deprecation warning with download=FALSE", {
+  testthat::skip_if_offline()
+
   withr::local_package("httr2")
   withr::local_package("stringr")
   # function parameters

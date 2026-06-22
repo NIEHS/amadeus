@@ -317,7 +317,9 @@ testthat::test_that("calculate_prism", {
 
   testthat::expect_message(
     {
-      result_r <- calculate_prism(proc, locs, radius = 1000)
+      result_r <- suppressWarnings(
+        calculate_prism(proc, locs, radius = 1000)
+      )
     },
     "Calculating PRISM covariates with 1000 meters radius..."
   )
@@ -325,7 +327,9 @@ testthat::test_that("calculate_prism", {
   locs_sf <- sf::st_as_sf(locs)
   testthat::expect_message(
     {
-      result_r_sf <- calculate_prism(proc, locs_sf, radius = 1000)
+      result_r_sf <- suppressWarnings(
+        calculate_prism(proc, locs_sf, radius = 1000)
+      )
     },
     "Calculating PRISM covariates with 1000 meters radius..."
   )
@@ -353,7 +357,9 @@ testthat::test_that("calculate_prism strips exactextractr mean. prefix on multi-
 
   locs <- data.frame(site_id = "001", lon = -79, lat = 36)
 
-  res <- calculate_prism(rr, locs, locs_id = "site_id", radius = 1000)
+  res <- suppressWarnings(
+    calculate_prism(rr, locs, locs_id = "site_id", radius = 1000)
+  )
   testthat::expect_true(all(c("ppt_1000", "tmin_1000") %in% colnames(res)))
 })
 

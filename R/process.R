@@ -343,13 +343,38 @@ the input then flatten it manually."
     }
 
     # describe provides subdataset information
-    if (!any(grepl(":", path))) {
+    if (!any(grepl("^HDF", path))) {
+      if (
+        !is.character(subdataset) ||
+          length(subdataset) != 1L ||
+          is.na(subdataset) ||
+          !nzchar(subdataset)
+      ) {
+        stop("Argument subdataset should be a non-empty character value.\n")
+      }
       # we use var to get detailed information in subdatasets
       sds_desc <- terra::describe(path, sds = TRUE)
-      index_sds <- grep(subdataset, sds_desc$var)
+      index_sds <- sort(unique(c(
+        grep(subdataset, sds_desc$var),
+        grep(subdataset, sds_desc$name)
+      )))
+      if (length(index_sds) == 0L) {
+        available_sds <- paste(stats::na.omit(sds_desc$var), collapse = ", ")
+        stop(
+          sprintf(
+            paste0(
+              "No MODIS subdatasets matched `subdataset = \"%s\"` ",
+              "in `%s`.\nAvailable subdatasets: %s\n"
+            ),
+            subdataset,
+            path,
+            available_sds
+          )
+        )
+      }
       sds_desc <- sds_desc[index_sds, c("name", "var", "nlyr")]
       # raw is TRUE to ignore scaling factor.
-      sds_read <- terra::rast(path, subds = index_sds, raw = TRUE)
+      sds_read <- terra::rast(sds_desc$name, raw = TRUE)
       sds_nsds <- nrow(sds_desc)
       sds_nlyr <- sds_desc$nlyr
       sds_varn <- sds_desc$var
@@ -361,6 +386,8 @@ the input then flatten it manually."
     }
     if (all(sds_nlyr == 1L)) {
       sds_agg <- sds_read
+    } else if (sds_nsds == 1L) {
+      sds_agg <- terra::app(sds_read, fun = fun_agg, na.rm = TRUE)
     } else {
       sds_aggindex <- rep(seq_len(sds_nsds), times = sds_nlyr)
       # if there are multiple layers in a subdataset,
@@ -844,7 +871,21 @@ process_blackmarble <- function(
   vnp_assigned <-
     mapply(
       function(vnp, tile_in) {
-        vnp_ <- terra::rast(vnp, subds = subdataset)
+        read_vnp <- function(subds) {
+          withCallingHandlers(
+            terra::rast(vnp, subds = subds),
+            warning = function(w) {
+              if (grepl("unknown extent", conditionMessage(w), fixed = TRUE)) {
+                invokeRestart("muffleWarning")
+              }
+            }
+          )
+        }
+        vnp_ <- if (length(subdataset) > 1L) {
+          do.call(c, lapply(subdataset, read_vnp))
+        } else {
+          read_vnp(subdataset)
+        }
         tile_ext <- tile_df[tile_df$tile == tile_in, -1]
 
         terra::crs(vnp_) <- terra::crs(crs)
@@ -1114,9 +1155,9 @@ process_koppen_geiger <-
       "_"
     )[[1]][4]
     if (period == "present") {
-      terra::metags(kg_rast) <- c(year = "1980 - 2016")
+      terra::metags(kg_rast) <- "year=1980 - 2016"
     } else {
-      terra::metags(kg_rast) <- c(year = "2071 - 2100")
+      terra::metags(kg_rast) <- "year=2071 - 2100"
     }
     return(kg_rast)
   }
@@ -1261,7 +1302,7 @@ process_nlcd <-
     }
 
     nlcd <- terra::rast(nlcd_file, win = extent)
-    terra::metags(nlcd) <- c(Year = as.character(year)) # Changed to capital Y
+    terra::metags(nlcd) <- paste0("Year=", year) # Changed to capital Y
     return(nlcd)
   }
 
@@ -1320,7 +1361,7 @@ process_ecoregion <-
     }
     ecoreg$time <- paste0(
       "1997 - ",
-      data.table::year(Sys.time())
+      format(Sys.Date(), "%Y")
     )
     ecoreg <- terra::vect(ecoreg)
     if (!is.null(extent)) {
@@ -1727,7 +1768,7 @@ process_nei <- function(
     stop("county argument is required.")
   }
   if (!methods::is(county, "SpatVector")) {
-    county <- try(terra::vect(county))
+    county <- try(terra::vect(county), silent = TRUE)
     if (inherits(county, "try-error")) {
       stop("county is unable to be converted to SpatVector.\n")
     }
@@ -2235,7 +2276,7 @@ process_population <- function(
       "...\n"
     ))
     #### year
-    terra::metags(data) <- c(year = split2[1])
+    terra::metags(data) <- paste0("year=", split2[1])
   }
   return(data)
 }
@@ -2630,8 +2671,7 @@ process_gmted <- function(
     ")"
   )
   #### year
-  terra::metags(data) <-
-    c(year = 2010L)
+  terra::metags(data) <- "year=2010"
   #### set coordinate reference system
   return(data)
 }
@@ -3214,12 +3254,18 @@ process_geos <-
       } # nocov end
       var_prefix <- sub("_[0-9]{8}.*$", "", names(data_return))
       tapp_index <- paste(var_prefix, date_str, sep = "_")
-      data_return <- terra::tapp(
-        data_return,
-        tapp_index,
-        fun = fun,
-        na.rm = TRUE
-      )
+      if (length(unique(tapp_index)) == 1L) {
+        out_name <- unique(tapp_index)
+        data_return <- terra::app(data_return, fun = fun, na.rm = TRUE)
+        names(data_return) <- out_name
+      } else {
+        data_return <- terra::tapp(
+          data_return,
+          tapp_index,
+          fun = fun,
+          na.rm = TRUE
+        )
+      }
       terra::crs(data_return) <- "EPSG:4326"
       out_dates <- regmatches(
         names(data_return),
@@ -3519,12 +3565,18 @@ process_merra2 <-
       var_prefix <- sub("_[0-9]{8}.*$", "", names(data_return))
       tapp_index <- paste(var_prefix, date_str, sep = "_")
       saved_crs <- terra::crs(data_return)
-      data_return <- terra::tapp(
-        data_return,
-        tapp_index,
-        fun = fun,
-        na.rm = TRUE
-      )
+      if (length(unique(tapp_index)) == 1L) {
+        out_name <- unique(tapp_index)
+        data_return <- terra::app(data_return, fun = fun, na.rm = TRUE)
+        names(data_return) <- out_name
+      } else {
+        data_return <- terra::tapp(
+          data_return,
+          tapp_index,
+          fun = fun,
+          na.rm = TRUE
+        )
+      }
       terra::crs(data_return) <- saved_crs
       out_dates <- regmatches(
         names(data_return),
@@ -4019,9 +4071,9 @@ process_prism <-
     if (terra::nlyr(prism) == 1L) {
       names(prism) <- prism_layer_name_from_file(prism_file, element)
     }
-    terra::metags(prism) <- cbind(
-      c("time", "element"),
-      c(time, element)
+    terra::metags(prism) <- c(
+      paste0("time=", time),
+      paste0("element=", element)
     )
     return(prism)
   }
@@ -4078,7 +4130,7 @@ process_cropscape <-
       cdl_file <- path
     }
     cdl <- terra::rast(cdl_file, win = extent)
-    terra::metags(cdl) <- c(year = year)
+    terra::metags(cdl) <- paste0("year=", year)
     return(cdl)
   }
 
@@ -4437,12 +4489,18 @@ process_goes <- function(
     var_prefix <- sub("_[0-9]{8}_[0-9]{6}$", "", names(data_return))
     tapp_index <- paste(var_prefix, date_str, sep = "_")
     saved_crs <- terra::crs(data_return)
-    data_return <- terra::tapp(
-      data_return,
-      tapp_index,
-      fun = fun,
-      na.rm = TRUE
-    )
+    if (length(unique(tapp_index)) == 1L) {
+      out_name <- unique(tapp_index)
+      data_return <- terra::app(data_return, fun = fun, na.rm = TRUE)
+      names(data_return) <- out_name
+    } else {
+      data_return <- terra::tapp(
+        data_return,
+        tapp_index,
+        fun = fun,
+        na.rm = TRUE
+      )
+    }
     terra::crs(data_return) <- saved_crs
     out_dates <- regmatches(
       names(data_return),
@@ -4873,6 +4931,15 @@ process_drought <- function(
 }
 
 
+#### Internal helper: ensure drought raster CRS
+drought_ensure_crs <- function(data_return) {
+  data_crs <- terra::crs(data_return)
+  if (is.na(data_crs) || data_crs == "") {
+    terra::crs(data_return) <- "EPSG:4326"
+  }
+  data_return
+}
+
 #### Internal helper: SPEI / EDDI netCDF pathway
 drought_process_nc <- function(source, path, date, timescale, extent) {
   ts_fmt <- sprintf("%02d", as.integer(timescale))
@@ -4953,9 +5020,7 @@ drought_process_nc <- function(source, path, date, timescale, extent) {
   data_return <- terra::subset(data_full, keep_idx)
 
   #### Ensure EPSG:4326
-  if (is.na(terra::crs(data_return)) || terra::crs(data_return) == "") {
-    terra::crs(data_return) <- "EPSG:4326"
-  }
+  data_return <- drought_ensure_crs(data_return)
 
   if (!is.null(extent)) {
     data_return <- terra::crop(data_return, extent)
