@@ -1928,6 +1928,33 @@ testthat::test_that("process_flatten_sds", {
 })
 
 
+testthat::test_that(
+  paste0(
+    "process_flatten_sds(subdataset=not_a_subdataset): ",
+    "reports available MODIS subdatasets"
+  ),
+  {
+    withr::local_package("terra")
+
+    path_mod11 <- testthat::test_path(
+      "..",
+      "testdata",
+      "modis",
+      "MOD11A1.A2021227.h11v05.061.2021228105320.hdf"
+    )
+
+    testthat::expect_error(
+      process_flatten_sds(
+        path = path_mod11,
+        subdataset = "not_a_subdataset",
+        fun_agg = "mean"
+      ),
+      regexp = "No MODIS subdatasets matched"
+    )
+  }
+)
+
+
 testthat::test_that("process_modis_merge", {
   withr::local_package("terra")
   withr::local_package("stars")
