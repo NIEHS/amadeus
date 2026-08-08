@@ -1672,7 +1672,7 @@ download_narr <- function(
 #'   \item "Impervious Descriptor"
 #'   \item "Spectral Change Day of Year"
 #' }
-#' @param year integer(1). Year of NLCD data (1985-2024). Default is 2021.
+#' @param year integer(1). Year of NLCD data (1985-2025). Default is 2021.
 #' @param directory_to_save character(1). Directory to save downloaded files.
 #' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with
 #' download.
@@ -1759,7 +1759,7 @@ download_nlcd <- function(
   }
 
   #### Check for valid years
-  valid_years <- 1985:2024L
+  valid_years <- 1985:2025L
   if (!(as.integer(year) %in% valid_years)) {
     stop(paste0("Requested year is not recognized.\n"))
   }
@@ -1787,7 +1787,7 @@ download_nlcd <- function(
     collection_code,
     "_",
     year,
-    "_CU_C1V1.zip"
+    "_CU_C1V2.zip"
   )
 
   #### Build download file name
@@ -1797,7 +1797,7 @@ download_nlcd <- function(
     collection_code,
     "_",
     year,
-    "_CU_C1V1.zip"
+    "_CU_C1V2.zip"
   )
 
   #### Exit early if download=FALSE
@@ -3188,15 +3188,20 @@ download_tri <- function(
   }
 }
 
-#' Download road emissions data
+#' Download National Emissions Inventory data
 #' @description
-#' The \code{download_nei()} function accesses and downloads road emissions
-#' data from the U.S Environmental Protection Agency's (EPA) National
-#' Emissions Inventory (NEI).
+#' The \code{download_nei()} function accesses and downloads point, on-road,
+#' and non-road emissions data from the U.S Environmental Protection Agency's
+#' (EPA) National Emissions Inventory (NEI).
 #' @note NEI data does not require authentication.
-#' @param epa_certificate_path TO BE DEPRECATED. Certificate path.
-#' @param certificate_url TO BE DEPRECATED. Certificate URL.
-#' @param year integer(1). Available years of NEI data.
+#' @details When \code{year = 2023L} and \code{unzip = TRUE}, ZIP archives
+#'   directly inside the downloaded archive are also extracted under the
+#'   inventory's data directory. Deeper ZIP files are not extracted.
+#' @param year integer(1). NEI inventory year. Available years are 2017, 2020,
+#'   and 2023.
+#' @param type character(1). Source-inventory type. One of
+#'   \code{"onroad"} (default), \code{"nonroad"}, or \code{"point"} for
+#'   facility/process emissions.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
@@ -3217,19 +3222,21 @@ download_tri <- function(
 #' \dontrun{
 #' download_nei(
 #'   year = c(2017L, 2020L),
+#'   type = "nonroad",
+#'   directory_to_save = tempdir(),
+#'   acknowledgement = TRUE
+#' )
+#' download_nei(
+#'   year = c(2023L),
+#'   type = "onroad",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE
 #' )
 #' }
 #' @export
 download_nei <- function(
-  epa_certificate_path = NULL,
-  certificate_url = paste0(
-    # nolint: line_length_linter.
-    "http://cacerts.digicert.com/",
-    "DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
-  ),
-  year = c(2017L, 2020L),
+  year = c(2017L, 2020L, 2023L),
+  type = c("onroad", "nonroad", "point"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -3243,6 +3250,9 @@ download_nei <- function(
 ) {
   #### Check acknowledgement
   amadeus::download_permit(acknowledgement = acknowledgement)
+
+  #### Validate inventory type
+  type <- match.arg(type)
 
   #### Directory setup
   directory_original <- amadeus::download_sanitize_path(directory_to_save)
@@ -3268,49 +3278,57 @@ download_nei <- function(
     )
   }
 
-  if (
-    !is.null(epa_certificate_path) ||
-      certificate_url !=
-        "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
-  ) {
-    warning(
-      "Parameters 'epa_certificate_path' and 'certificate_url'",
-      " are deprecated.\n",
-      "SSL certificates are now handled automatically by httr2.\n",
-      call. = FALSE
-    )
-  }
-
   #### Define measurement data paths
   # Each NEI year has a distinct URL path suffix; use a named lookup so the
   # function works correctly whether `year` is a scalar (as dispatched from
   # the targets pipeline via pattern = map()) or a full c(2017, 2020) vector.
   url_download_base <- "https://gaftp.epa.gov/air/nei/%s/data_summaries/"
   nei_url_map <- c(
-    "2017" = "2017v1/2017neiApr_onroad_byregions.zip",
-    "2020" = "2020nei_onroad_byregion.zip"
+    "2017_onroad" = "2017v1/2017neiApr_onroad_byregions.zip",
+    "2017_nonroad" = "2017v1/2017neiApr_nonroad_byregions.zip",
+    "2017_point" = "2017v1/2017neiJan_facility_process_byregions.zip",
+    "2020_onroad" = "2020nei_onroad_byregion.zip",
+    "2020_nonroad" = "2020nei_nonroad_byregion.zip",
+    "2020_point" = "2020nei_facility_process_byregions.zip",
+    "2023_onroad" = "2023nei_onroad_byregion_21jul2026.zip",
+    "2023_nonroad" = "2023nei_nonroad_byregion_21jul2026.zip",
+    "2023_point" = "2023nei_facility_process_byregion_21jul2026.zip"
   )
   nei_file_map <- c(
-    "2017" = "2017neiApr_onroad_byregions.zip",
-    "2020" = "2020nei_onroad_byregion.zip"
+    "2017_onroad" = "2017neiApr_onroad_byregions.zip",
+    "2017_nonroad" = "2017neiApr_nonroad_byregions.zip",
+    "2017_point" = "2017neiJan_facility_process_byregions.zip",
+    "2020_onroad" = "2020nei_onroad_byregion.zip",
+    "2020_nonroad" = "2020nei_nonroad_byregion.zip",
+    "2020_point" = "2020nei_facility_process_byregions.zip",
+    "2023_onroad" = "2023nei_onroad_byregion_21jul2026.zip",
+    "2023_nonroad" = "2023nei_nonroad_byregion_21jul2026.zip",
+    "2023_point" = "2023nei_facility_process_byregion_21jul2026.zip"
   )
   year_chr <- as.character(year)
-  unknown <- setdiff(year_chr, names(nei_url_map))
+  available_years <- unique(sub("_.*$", "", names(nei_url_map)))
+  unknown <- setdiff(year_chr, available_years)
   if (length(unknown) > 0) {
     stop(paste0(
       "NEI data is not available for year(s): ",
       paste(unknown, collapse = ", "),
       ". Available years: ",
-      paste(names(nei_url_map), collapse = ", "),
+      paste(available_years, collapse = ", "),
       ".\n"
     ))
   }
+  map_keys <- paste(year_chr, type, sep = "_")
   download_urls <- vapply(
-    year_chr,
-    function(y) paste0(sprintf(url_download_base, y), nei_url_map[y]),
+    seq_along(year_chr),
+    function(i) {
+      paste0(
+        sprintf(url_download_base, year_chr[i]),
+        nei_url_map[map_keys[i]]
+      )
+    },
     character(1)
   )
-  download_names_file <- unname(nei_file_map[year_chr])
+  download_names_file <- unname(nei_file_map[map_keys])
   download_names <- paste0(directory_to_download, download_names_file)
 
   #### Filter to files that need downloading
@@ -3362,6 +3380,25 @@ download_nei <- function(
           dir.create(dir_unzip[fn], recursive = TRUE)
         }
         utils::unzip(zipfile = download_names[fn], exdir = dir_unzip[fn])
+        # 2023 NEI nested zip files
+        if (year_chr[fn] == "2023") {
+          nested_zips <- list.files(
+            dir_unzip[fn],
+            pattern = "\\.zip$",
+            recursive = TRUE,
+            full.names = TRUE,
+            ignore.case = TRUE
+          )
+          if (length(nested_zips) > 0L) {
+            message("Unzipping 2023 NEI nested archives.\n")
+            for (nested_zip in nested_zips) {
+              utils::unzip(
+                zipfile = nested_zip,
+                exdir = dir_unzip[fn]
+              )
+            }
+          }
+        }
       }
     }
   }

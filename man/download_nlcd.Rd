@@ -30,7 +30,7 @@ download_nlcd(
 \item "Spectral Change Day of Year"
 }}
 
-\item{year}{integer(1). Year of NLCD data (1985-2024). Default is 2021.}
+\item{year}{integer(1). Year of NLCD data (1985-2025). Default is 2021.}
 
 \item{directory_to_save}{character(1). Directory to save downloaded files.}
 

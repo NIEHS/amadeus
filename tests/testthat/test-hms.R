@@ -355,6 +355,24 @@ testthat::test_that("process_hms (single date)", {
   )
 })
 
+testthat::test_that(
+  "process_hms(aggregate=FALSE): retains plume timing fields and IDs",
+  {
+    withr::local_package("terra")
+    hms <- suppressMessages(process_hms(
+      date = "2022-06-10",
+      path = testthat::test_path("..", "testdata", "hms"),
+      aggregate = FALSE
+    ))
+    testthat::expect_s4_class(hms, "SpatVector")
+    testthat::expect_true(all(
+      c("Satellite", "Start", "End", "Density", "Date", ".plume_id") %in%
+        names(hms)
+    ))
+    testthat::expect_length(unique(hms$.plume_id), nrow(hms))
+  }
+)
+
 testthat::test_that("process_hms (absent polygons - 12/31/2018)", {
   withr::local_package("terra")
   # expect function
@@ -728,6 +746,69 @@ testthat::test_that("calculate_hms frac with no plume overlap returns zeros", {
     all(as.matrix(hms_far[, smoke_cols, drop = FALSE]) == 0, na.rm = TRUE)
   )
 })
+
+testthat::test_that(
+  "calculate_hms(include_plume_metrics=TRUE): returns counts and durations",
+  {
+    withr::local_package("terra")
+    plume_wkt <- rep(
+      paste0(
+        "POLYGON((-78.84 35.94,-78.81 35.94,-78.81 35.97,",
+        "-78.84 35.97,-78.84 35.94))"
+      ),
+      3L
+    )
+    hms <- terra::vect(plume_wkt, crs = "EPSG:4326")
+    hms$Satellite <- rep("GOES-WEST", 3L)
+    hms$Start <- c("2026193 1200", "2026193 1300", "2026193 1200")
+    hms$End <- c("2026193 1500", "2026193 1500", "2026193 1300")
+    hms$Density <- c("Light", "Light", "Medium")
+    hms$Date <- rep(as.Date("2026-07-12"), 3L)
+    hms$.plume_id <- paste0("20260712_", 1:3)
+    locs <- data.frame(
+      site_id = "site_1",
+      lon = -78.8277,
+      lat = 35.95013
+    )
+
+    result <- suppressMessages(calculate_hms(
+      from = hms,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 10000,
+      include_plume_metrics = TRUE
+    ))
+
+    testthat::expect_equal(result$light_10000_count, 2L)
+    testthat::expect_equal(result$medium_10000_count, 1L)
+    testthat::expect_equal(result$heavy_10000_count, 0L)
+    testthat::expect_equal(result$duration_light_10000, 5)
+    testthat::expect_equal(result$duration_medium_10000, 1)
+    testthat::expect_equal(result$duration_heavy_10000, 0)
+  }
+)
+
+testthat::test_that(
+  "calculate_hms(include_plume_metrics=TRUE): rejects aggregated HMS input",
+  {
+    withr::local_package("terra")
+    hms <- suppressMessages(process_hms(
+      date = "2022-06-10",
+      path = testthat::test_path("..", "testdata", "hms")
+    ))
+    locs <- data.frame(site_id = "site_1", lon = -78.8277, lat = 35.95013)
+    testthat::expect_error(
+      calculate_hms(
+        from = hms,
+        locs = locs,
+        locs_id = "site_id",
+        radius = 10000,
+        include_plume_metrics = TRUE
+      ),
+      "process_hms\\(aggregate = FALSE\\)"
+    )
+  }
+)
 
 testthat::test_that("calculate_hms character skip path supports .by_time summarization", {
   withr::local_package("terra")

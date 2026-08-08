@@ -748,6 +748,118 @@ testthat::test_that("calc_summarize_by supports temporal .by_time units", {
   testthat::expect_s3_class(out$time, "Date")
 })
 
+testthat::test_that(
+  "calc_prepare_locs(radius=1000): converts metres for a foot CRS",
+  {
+    withr::local_package("terra")
+    from <- terra::rast(
+      nrows = 2,
+      ncols = 2,
+      xmin = 1900000,
+      xmax = 2100000,
+      ymin = 600000,
+      ymax = 800000,
+      crs = "EPSG:2264"
+    )
+    locs <- terra::vect(
+      data.frame(site_id = "A", x = 2000000, y = 700000),
+      geom = c("x", "y"),
+      crs = "EPSG:2264"
+    )
+    testthat::expect_warning(
+      prepared <- suppressMessages(calc_prepare_locs(
+        from = from,
+        locs = locs,
+        locs_id = "site_id",
+        radius = 1000
+      )),
+      "non-SI linear unit"
+    )
+    unit_info <- prepared[[3]]
+    testthat::expect_equal(unit_info$radius_input, 1000)
+    testthat::expect_equal(unit_info$radius_used, 3280.833, tolerance = 1e-3)
+    testthat::expect_equal(unit_info$metres_per_crs_unit, 0.3048006)
+    testthat::expect_equal(
+      terra::expanse(prepared[[1]], unit = "m"),
+      pi * 1000^2,
+      tolerance = 1e-3
+    )
+  }
+)
+
+testthat::test_that(
+  "calc_prepare_locs(radius=1000): supports disabled unit conversion",
+  {
+    withr::local_package("terra")
+    withr::local_options(amadeus.convert_linear_units = FALSE)
+    from <- terra::rast(
+      nrows = 2,
+      ncols = 2,
+      xmin = 1900000,
+      xmax = 2100000,
+      ymin = 600000,
+      ymax = 800000,
+      crs = "EPSG:2264"
+    )
+    locs <- terra::vect(
+      data.frame(site_id = "A", x = 2000000, y = 700000),
+      geom = c("x", "y"),
+      crs = "EPSG:2264"
+    )
+    testthat::expect_warning(
+      prepared <- suppressMessages(calc_prepare_locs(
+        from = from,
+        locs = locs,
+        locs_id = "site_id",
+        radius = 1000
+      )),
+      "non-SI linear unit"
+    )
+    testthat::expect_equal(prepared[[3]]$radius_used, 1000)
+    testthat::expect_false(prepared[[3]]$automatic_conversion)
+  }
+)
+
+testthat::test_that(
+  "calc_return_locs(crs=foot): attaches linear-unit metadata",
+  {
+    result <- calc_return_locs(
+      covar = data.frame(site_id = "A", value = 1),
+      POSIXt = FALSE,
+      geom = FALSE,
+      crs = "EPSG:2264"
+    )
+    unit_info <- attr(result, "amadeus_linear_units")
+    testthat::expect_type(unit_info, "list")
+    testthat::expect_equal(unit_info$crs_linear_unit, "US survey foot")
+    testthat::expect_equal(unit_info$metres_per_crs_unit, 0.3048006)
+  }
+)
+
+testthat::test_that(
+  "calculate_covariates(convert_linear_units=FALSE): propagates local option",
+  {
+    original_option <- getOption("amadeus.convert_linear_units")
+    testthat::local_mocked_bindings(
+      calculate_gmted = function(...) {
+        getOption("amadeus.convert_linear_units", TRUE)
+      },
+      .package = "amadeus"
+    )
+    result <- calculate_covariates(
+      covariate = "gmted",
+      from = NULL,
+      locs = NULL,
+      convert_linear_units = FALSE
+    )
+    testthat::expect_false(result)
+    testthat::expect_identical(
+      getOption("amadeus.convert_linear_units"),
+      original_option
+    )
+  }
+)
+
 testthat::test_that("calc_summarize_by rejects deprecated .by argument clearly", {
   df <- data.frame(
     site_id = c("A", "A"),

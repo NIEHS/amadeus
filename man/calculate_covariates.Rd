@@ -16,6 +16,7 @@ calculate_covariates(
   locs_id = "site_id",
   .by_time = NULL,
   weights = NULL,
+  convert_linear_units = TRUE,
   ...
 )
 }
@@ -40,11 +41,18 @@ path. Passed through to the underlying source-specific function for
 weighted extraction. If \code{NULL} (default), unweighted extraction is
 performed.}
 
+\item{convert_linear_units}{logical(1). If \code{TRUE} (default), buffer
+radii documented in metres are converted to the native linear unit of a
+projected input CRS. If \code{FALSE}, radii are used as native CRS units
+and a warning is emitted for non-metric projected CRSs.}
+
 \item{...}{Arguments passed to each covariate calculation
 function.}
 }
 \value{
-Calculated covariates as a data.frame or SpatVector object
+Calculated covariates as a data.frame or SpatVector object with an
+\code{amadeus_linear_units} attribute describing the CRS linear unit and
+whether automatic radius conversion was enabled.
 }
 \description{
 The \code{calculate_covariates()} function extracts values at point

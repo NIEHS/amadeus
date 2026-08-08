@@ -20,7 +20,8 @@ calc_return_locs(covar, POSIXt = TRUE, geom, crs)
 \code{from}).}
 }
 \value{
-a data.frame or SpatVector object (depending on \code{geom} paramter)
+a data.frame or SpatVector object (depending on \code{geom} parameter)
+with an \code{amadeus_linear_units} attribute.
 }
 \description{
 Check the time column for proper class and, if \code{geom = TRUE},

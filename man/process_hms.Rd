@@ -4,7 +4,13 @@
 \alias{process_hms}
 \title{Process wildfire smoke data}
 \usage{
-process_hms(date = "2018-01-01", path = NULL, extent = NULL, ...)
+process_hms(
+  date = "2018-01-01",
+  path = NULL,
+  extent = NULL,
+  aggregate = TRUE,
+  ...
+)
 }
 \arguments{
 \item{date}{character(1 or 2). Date (1) or start and end dates (2).
@@ -14,6 +20,11 @@ Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").}
 
 \item{extent}{numeric(4) or SpatExtent giving the extent of the output
 if \code{NULL} (default), the entire data is returned}
+
+\item{aggregate}{logical(1). If \code{TRUE} (default), overlapping plume
+polygons are dissolved and the highest density is retained. If
+\code{FALSE}, original plume polygons and their \code{Satellite},
+\code{Start}, and \code{End} fields are retained for plume-level metrics.}
 
 \item{...}{Placeholders.}
 }

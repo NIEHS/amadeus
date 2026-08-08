@@ -4,7 +4,12 @@
 \alias{process_locs_vector}
 \title{Process locations as \code{SpatVector}}
 \usage{
-process_locs_vector(locs, crs, radius)
+process_locs_vector(
+  locs,
+  crs,
+  radius,
+  convert_linear_units = getOption("AMADEUS_CONVERT_LINEAR_UNITS", TRUE)
+)
 }
 \arguments{
 \item{locs}{data.frame(1). Data frame containing columns for unique
@@ -15,9 +20,14 @@ be named "lat" and "lon", respectively.}
 \code{terra::crs()}.}
 
 \item{radius}{integer(1). Circular buffer size (meters).}
+
+\item{convert_linear_units}{logical(1). Convert the metre-based radius to
+native units for a projected non-metric CRS? Defaults to the
+\code{AMADEUS_CONVERT_LINEAR_UNITS} option, or \code{TRUE} when unset.}
 }
 \value{
-a \code{SpatVector} object
+a \code{SpatVector} object with an \code{amadeus_linear_units} attribute
+describing the radius conversion.
 }
 \description{
 Detect \code{SpatVector} object, or convert locations from class \code{sf},

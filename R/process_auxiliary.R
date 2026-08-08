@@ -366,8 +366,12 @@ process_locs_radius <-
 #' @param crs Coordinate reference system (CRS) description utilizing
 #' `terra::crs()`.
 #' @param radius integer(1). Circular buffer size (meters).
+#' @param convert_linear_units logical(1). Convert the metre-based radius to
+#'   native units for a projected non-metric CRS? Defaults to the
+#'   \code{AMADEUS_CONVERT_LINEAR_UNITS} option, or \code{TRUE} when unset.
 #' @keywords internal auxiliary
-#' @return a `SpatVector` object
+#' @return a `SpatVector` object with an \code{amadeus_linear_units} attribute
+#'   describing the radius conversion.
 #' @importFrom terra crs
 #' @importFrom terra vect
 #' @importFrom terra project
@@ -376,8 +380,19 @@ process_locs_vector <-
   function(
     locs,
     crs,
-    radius
+    radius,
+    convert_linear_units = getOption(
+      "AMADEUS_CONVERT_LINEAR_UNITS",
+      TRUE
+    )
   ) {
+    if (
+      !is.logical(convert_linear_units) ||
+        length(convert_linear_units) != 1L ||
+        is.na(convert_linear_units)
+    ) {
+      stop("`convert_linear_units` must be a single logical value.")
+    }
     #### detect SpatVector
     if (methods::is(locs, "SpatVector")) {
       message(
@@ -423,10 +438,65 @@ process_locs_vector <-
       sites_v,
       crs
     )
+    radius_native <- as.numeric(radius)
+    metres_per_unit <- suppressWarnings(terra::linearUnits(sites_p))
+    is_longlat <- isTRUE(suppressWarnings(terra::is.lonlat(sites_p)))
+    crs_info <- sf::st_crs(terra::crs(sites_p))
+    crs_unit <- crs_info$units_gdal
+    if (is.null(crs_unit) || is.na(crs_unit) || !nzchar(crs_unit)) {
+      crs_unit <- if (is_longlat) "degree" else "unknown"
+    }
+    if (radius_native > 0 && !is_longlat) {
+      if (!is.finite(metres_per_unit) || metres_per_unit <= 0) {
+        stop(
+          "Could not determine the projected CRS linear unit for buffering."
+        )
+      }
+      is_metric <- isTRUE(all.equal(metres_per_unit, 1, tolerance = 1e-8))
+      if (!is_metric) {
+        warning(
+          sprintf(
+            paste0(
+              "The input CRS uses %s (%.9g metres per unit); ",
+              "this is a non-SI linear unit."
+            ),
+            crs_unit,
+            metres_per_unit
+          ),
+          call. = FALSE
+        )
+        if (isTRUE(convert_linear_units)) {
+          radius_native <- radius_native / metres_per_unit
+          message(sprintf(
+            paste0(
+              "Converted buffer radius from %.6g metres to %.6g %s ",
+              "for the input CRS.\n"
+            ),
+            radius,
+            radius_native,
+            crs_unit
+          ))
+        } else {
+          message(
+            "Automatic linear-unit conversion is disabled; `radius` is ",
+            "being interpreted in native CRS units.\n"
+          )
+        }
+      }
+    }
     #### buffer SpatVector
     sites_b <- process_locs_radius(
       sites_p,
-      radius
+      radius_native
+    )
+    attr(sites_b, "amadeus_linear_units") <- list(
+      radius_input = as.numeric(radius),
+      radius_input_unit = "metre",
+      radius_used = radius_native,
+      crs_linear_unit = crs_unit,
+      metres_per_crs_unit = metres_per_unit,
+      automatic_conversion = isTRUE(convert_linear_units),
+      geographic_crs = is_longlat
     )
     return(sites_b)
   }

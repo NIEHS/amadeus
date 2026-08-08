@@ -22,6 +22,10 @@
 #'   path. Passed through to the underlying source-specific function for
 #'   weighted extraction. If `NULL` (default), unweighted extraction is
 #'   performed.
+#' @param convert_linear_units logical(1). If \code{TRUE} (default), buffer
+#'   radii documented in metres are converted to the native linear unit of a
+#'   projected input CRS. If \code{FALSE}, radii are used as native CRS units
+#'   and a warning is emitted for non-metric projected CRSs.
 #' @param ... Arguments passed to each covariate calculation
 #'  function.
 #' @note `covariate` argument value is converted to lowercase.
@@ -48,7 +52,9 @@
 #' * \code{\link{calculate_huc}}: "huc", "HUC"
 #' * \code{\link{calculate_edgar}}: "edgar"
 #' * \code{\link{calculate_drought}}: "drought", "spei", "eddi", "usdm"
-#' @return Calculated covariates as a data.frame or SpatVector object
+#' @return Calculated covariates as a data.frame or SpatVector object with an
+#'   \code{amadeus_linear_units} attribute describing the CRS linear unit and
+#'   whether automatic radius conversion was enabled.
 #' @author Insang Song
 #' @examples
 #' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
@@ -114,10 +120,22 @@ calculate_covariates <-
     locs_id = "site_id",
     .by_time = NULL,
     weights = NULL,
+    convert_linear_units = TRUE,
     ...
   ) {
     amadeus::check_unsupported_by(..., .call = sys.call())
     amadeus::check_by_time(.by_time)
+    if (
+      !is.logical(convert_linear_units) ||
+        length(convert_linear_units) != 1L ||
+        is.na(convert_linear_units)
+    ) {
+      stop("`convert_linear_units` must be a single logical value.")
+    }
+    old_linear_unit_option <- options(
+      amadeus.convert_linear_units = convert_linear_units
+    )
+    on.exit(options(old_linear_unit_option), add = TRUE)
     covariate <- tolower(covariate)
     covariate <- match.arg(covariate)
     if (startsWith(covariate, "ko")) {
@@ -620,7 +638,7 @@ calculate_nlcd <- function(
     )
   }
   year <- as.integer(terra::metags(from)$value[nrow(terra::metags(from))])
-  stopifnot(year %in% 1985:2024L)
+  stopifnot(year %in% 1985:2025L)
 
   # select points within mainland US and reproject on nlcd crs if necessary
   data_vect_b <-
@@ -677,7 +695,10 @@ calculate_nlcd <- function(
     }
   } else {
     # create circle buffers with buf_radius
-    bufs_pol <- terra::buffer(data_vect_b, width = radius)
+    bufs_pol <- terra::buffer(
+      data_vect_b,
+      width = locs_prepared[[3]]$radius_used
+    )
     if (mode == "terra") {
       # terra mode
       # class_query <- "names"
@@ -2556,6 +2577,10 @@ calculate_nei <- function(
 #' @param frac logical(1). Default `FALSE`. If `FALSE`, return binary 0/1 smoke
 #' indicators by density class. If `TRUE`, return fractional overlap by density
 #' class.
+#' @param include_plume_metrics logical(1). If \code{TRUE}, additionally return
+#'   the number of intersecting plume polygons and summed plume exposure
+#'   duration in hours by density. This requires \code{from} to have been
+#'   created with \code{process_hms(aggregate = FALSE)}.
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
@@ -2566,7 +2591,9 @@ calculate_nei <- function(
 #' @seealso [process_hms()]
 #' @author Mitchell Manware
 #' @return a data.frame or SpatVector object. When \code{.by_time} is provided,
-#'   rows are aggregated using \code{calc_summarize_by()}.
+#'   rows are aggregated using \code{calc_summarize_by()}. With
+#'   \code{include_plume_metrics = TRUE}, count columns are integer plume
+#'   counts and duration columns are summed plume-hours.
 #' @importFrom terra vect as.data.frame time extract crs
 #' @importFrom tidyr pivot_wider
 #' @importFrom dplyr all_of
@@ -2593,6 +2620,7 @@ calculate_hms <- function(
   weights = NULL,
   .by_time = NULL,
   frac = FALSE,
+  include_plume_metrics = FALSE,
   geom = FALSE,
   ...
 ) {
@@ -2605,6 +2633,36 @@ calculate_hms <- function(
   if (!is.logical(frac) || length(frac) != 1L || is.na(frac)) {
     stop("`frac` should be a single logical value (TRUE/FALSE).")
   }
+  if (
+    !is.logical(include_plume_metrics) ||
+      length(include_plume_metrics) != 1L ||
+      is.na(include_plume_metrics)
+  ) {
+    stop(
+      "`include_plume_metrics` should be a single logical value (TRUE/FALSE)."
+    )
+  }
+  if (isTRUE(include_plume_metrics) && isTRUE(frac) && !is.null(.by_time)) {
+    stop(
+      "`include_plume_metrics = TRUE` cannot currently be combined with ",
+      "`frac = TRUE` and `.by_time` because their temporal summaries differ."
+    )
+  }
+  radius_label <- sprintf("%05d", as.integer(radius))
+  levels_acceptable <- c("Light", "Medium", "Heavy")
+  count_colnames <- paste0(
+    tolower(levels_acceptable),
+    "_",
+    radius_label,
+    "_count"
+  )
+  duration_colnames <- paste0(
+    "duration_",
+    tolower(levels_acceptable),
+    "_",
+    radius_label
+  )
+  metric_colnames <- c(count_colnames, duration_colnames)
   #### from == character indicates no wildfire smoke plumes are present
   #### return 0 for all densities, locs and dates
   if (is.character(from)) {
@@ -2614,7 +2672,7 @@ calculate_hms <- function(
     ))
     zero_value <- if (isTRUE(frac)) 0 else 0L
     skip_df <- data.frame(
-      as.POSIXlt(from),
+      as.POSIXct(as.Date(from), tz = "UTC"),
       zero_value,
       zero_value,
       zero_value
@@ -2625,6 +2683,13 @@ calculate_hms <- function(
       paste0("medium_", sprintf("%05d", radius)),
       paste0("heavy_", sprintf("%05d", radius))
     )
+    if (isTRUE(include_plume_metrics)) {
+      skip_df[metric_colnames] <- 0
+      skip_df[count_colnames] <- lapply(
+        skip_df[count_colnames],
+        as.integer
+      )
+    }
     # fixed: locs is replicated per the length of from
     skip_merge <-
       Reduce(
@@ -2659,6 +2724,20 @@ calculate_hms <- function(
       crs = "EPSG:4326"
     )
     return(skip_return)
+  }
+  if (isTRUE(include_plume_metrics)) {
+    required_plume_fields <- c(
+      "Satellite", "Start", "End", "Density", "Date", ".plume_id"
+    )
+    missing_plume_fields <- setdiff(required_plume_fields, names(from))
+    if (length(missing_plume_fields) > 0L) {
+      stop(
+        "Plume count and duration metrics require `from` created with ",
+        "`process_hms(aggregate = FALSE)`. Missing fields: ",
+        paste(missing_plume_fields, collapse = ", "),
+        "."
+      )
+    }
   }
   #### prepare locations list
   sites_list <- amadeus::calc_prepare_locs(
@@ -2753,6 +2832,83 @@ calculate_hms <- function(
       }
     }
 
+    metrics_wide <- NULL
+    if (isTRUE(include_plume_metrics)) {
+      metric_fields <- c(
+        locs_id, "Date", "Density", ".plume_id", "Start", "End"
+      )
+      metric_rows <- unique(
+        sites_extracted_layer[, metric_fields, drop = FALSE]
+      )
+      metric_rows <- metric_rows[
+        !is.na(metric_rows[[locs_id]]) & !is.na(metric_rows$.plume_id),
+        ,
+        drop = FALSE
+      ]
+      metrics_wide <- unique(data_template[, c(locs_id, "time")])
+      names(metrics_wide)[names(metrics_wide) == "time"] <- "Date"
+      for (density_index in seq_along(levels_acceptable)) {
+        density_value <- levels_acceptable[density_index]
+        density_rows <- metric_rows[
+          metric_rows$Density == density_value,
+          ,
+          drop = FALSE
+        ]
+        if (nrow(density_rows) > 0L) {
+          start_time <- as.POSIXct(
+            density_rows$Start,
+            format = "%Y%j %H%M",
+            tz = "UTC"
+          )
+          end_time <- as.POSIXct(
+            density_rows$End,
+            format = "%Y%j %H%M",
+            tz = "UTC"
+          )
+          density_rows$.duration_hours <- pmax(
+            as.numeric(difftime(end_time, start_time, units = "hours")),
+            0
+          )
+          density_rows$.count <- 1L
+          density_summary <- stats::aggregate(
+            cbind(.count, .duration_hours) ~ .,
+            data = density_rows[
+              , c(locs_id, "Date", ".count", ".duration_hours"),
+              drop = FALSE
+            ],
+            FUN = sum,
+            na.rm = TRUE
+          )
+          names(density_summary)[
+            names(density_summary) == ".count"
+          ] <- count_colnames[density_index]
+          names(density_summary)[
+            names(density_summary) == ".duration_hours"
+          ] <- duration_colnames[density_index]
+          metrics_wide <- merge(
+            metrics_wide,
+            density_summary,
+            by = c(locs_id, "Date"),
+            all.x = TRUE
+          )
+        } else {
+          metrics_wide[[count_colnames[density_index]]] <- 0L
+          metrics_wide[[duration_colnames[density_index]]] <- 0
+        }
+      }
+      for (metric_col in metric_colnames) {
+        if (!metric_col %in% names(metrics_wide)) {
+          metrics_wide[[metric_col]] <- 0
+        }
+        metrics_wide[[metric_col]][is.na(metrics_wide[[metric_col]])] <- 0
+      }
+      metrics_wide[count_colnames] <- lapply(
+        metrics_wide[count_colnames],
+        as.integer
+      )
+      names(metrics_wide)[names(metrics_wide) == "Date"] <- "time"
+    }
+
     # remove duplicates and aggregate by site/date/density
     if (nrow(sites_extracted_layer) > 0) {
       sites_extracted_layer <- unique(
@@ -2786,7 +2942,6 @@ calculate_hms <- function(
       )
 
     # Fill in missing columns
-    levels_acceptable <- c("Light", "Medium", "Heavy")
     # Detect missing columns
     col_tofill <-
       setdiff(levels_acceptable, names(sites_extracted_layer))
@@ -2821,6 +2976,14 @@ calculate_hms <- function(
       by = c(locs_id, "time"),
       all.x = TRUE
     )
+    if (isTRUE(include_plume_metrics)) {
+      site_extracted <- merge(
+        site_extracted,
+        metrics_wide,
+        by = c(locs_id, "time"),
+        all.x = TRUE
+      )
+    }
     # append list with the extracted data.frame
     return_list[[i]] <- site_extracted
   }
@@ -2829,26 +2992,35 @@ calculate_hms <- function(
   sites_extracted <- do.call(rbind, return_list)
 
   #### define column names
-  colname_common <- c(locs_id, "time", binary_colname)
+  colname_common <- c(
+    locs_id,
+    "time",
+    binary_colname,
+    if (isTRUE(include_plume_metrics)) metric_colnames else character(0)
+  )
   if (geom %in% c("sf", "terra")) {
     sites_extracted <-
       merge(sites_extracted, sites_id, by = locs_id)
-    sites_extracted <-
-      stats::setNames(
-        sites_extracted,
-        c(colname_common, "geometry")
-      )
+    sites_extracted <- sites_extracted[
+      , c(colname_common, "geometry"),
+      drop = FALSE
+    ]
   } else {
-    sites_extracted <-
-      stats::setNames(
-        sites_extracted,
-        colname_common
-      )
+    sites_extracted <- sites_extracted[, colname_common, drop = FALSE]
   }
   # Filling NAs to 0 for smoke columns
   for (smoke_col in binary_colname) {
     sites_extracted[[smoke_col]][is.na(sites_extracted[[smoke_col]])] <-
       if (isTRUE(frac)) 0 else 0L
+  }
+  if (isTRUE(include_plume_metrics)) {
+    for (metric_col in metric_colnames) {
+      sites_extracted[[metric_col]][is.na(sites_extracted[[metric_col]])] <- 0
+    }
+    sites_extracted[count_colnames] <- lapply(
+      sites_extracted[count_colnames],
+      as.integer
+    )
   }
 
   if (!is.null(.by_time)) {
@@ -4100,7 +4272,7 @@ calculate_prism <- function(
     # use exactextractr::exact_extract for polygon locations and buffered points
     sites_e_sf <- sf::st_as_sf(sites_e)
     sites_e_buf <- if (radius > 0) {
-      sf::st_buffer(sites_e_sf, dist = radius)
+      sf::st_buffer(sites_e_sf, dist = sites_list[[3]]$radius_used)
     } else {
       sites_e_sf
     }
@@ -4473,7 +4645,7 @@ calculate_cropscape <- function(
   } else {
     sites_e_sf <- sf::st_as_sf(sites_e)
     sites_e_buf <- if (radius > 0) {
-      sf::st_buffer(sites_e_sf, dist = radius)
+      sf::st_buffer(sites_e_sf, dist = sites_list[[3]]$radius_used)
     } else {
       sites_e_sf
     }

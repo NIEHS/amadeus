@@ -1,0 +1,102 @@
+---
+title: "Calculate variables at H3 Polygons"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Calculate variables at H3 Polygons}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "`r Sys.Date()`"
+author: "Insang Song, with assistance from Codex"
+---
+
+# What is H3?
+H3 is a hexagonal hierarchical geospatial indexing system developed by Uber. It divides the world into hexagonal cells at different resolutions, allowing for efficient spatial indexing and analysis. Each cell is identified by a unique H3 index, which can be used to perform spatial operations and aggregations.
+
+
+# When to use H3
+H3 is particularly useful for spatial analysis and visualization, especially when dealing with large datasets. It allows for efficient spatial queries, aggregation of data within hexagonal cells, and visualization of spatial patterns. With fairly high resolution, H3 can represent sub-building level features, making it suitable for transportation and mobility analysis, micro-scale exposure assessment, and other applications that require fine-grained spatial analysis.
+
+
+# How to use H3 in R
+Standard `amadeus` workflow accepts generic vector data in `calculate_covariates()` and `process_covariates()`. However, H3 is a special case that requires additional steps to convert H3 indices into spatial polygons before performing calculations. The following workflow demonstrates how to calculate variables at H3 polygons using `amadeus`.
+
+Here we use `h3jsr` package to convert H3 indices into spatial polygons. The `h3jsr` package provides functions to convert H3 indices into `sf` objects. This vignette demonstrates how to use `h3jsr` but does not require it as a dependency. If you want to run this vignette, please install `h3jsr` package first.
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ""
+)
+
+if (!requireNamespace("h3jsr", quietly = TRUE)) {
+  stop("Please install the 'h3jsr' package to run this vignette.")
+}
+
+library(amadeus)
+library(sf)
+library(terra)
+library(h3jsr)
+```
+
+
+## 1. Define spatial extent and H3 resolution
+
+H3 cell identifiers are generated based on a real-world spatial extent and a specified resolution. The coordinate system of the spatial extent should be WGS 1984 (EPSG:4326). The resolution determines the size of the hexagonal cells, with higher resolutions resulting in smaller cells. In this example, we will use a bounding box to define the spatial extent and set the H3 resolution to 10.
+
+```{r define_extent, eval = FALSE}
+extent <- st_bbox(c(xmin = -118.278, xmax = -118.265, ymin = 34.032, ymax = 34.054), crs = st_crs(4326))
+extent_sf <- st_as_sfc(extent)
+
+h3_z10 <- h3jsr::polygon_to_cells(extent_sf, res = 10)
+h3_z10_sf <- h3jsr::cell_to_polygon(h3_z10, simple = FALSE)
+
+plot(h3_z10_sf)
+```
+
+# Prepare SPEI data
+
+For demonstration, the main preprocessing steps are borrowed from the drought workflow vignette.
+
+```{r download-spei, eval = FALSE}
+drought_download_dir <- file.path(tempdir(), "drought_workflow_download")
+date_range <- c("2020-01-01", "2020-03-31")
+download_drought(
+  source = "spei",
+  date = date_range,
+  timescale = 1L,
+  directory_to_save = drought_download_dir,
+  acknowledgement = TRUE
+)
+```
+
+
+```{r process-spei, eval = FALSE}
+spei_processed <- process_drought(
+  source = "spei",
+  path = drought_download_dir,
+  date = date_range,
+  timescale = 1L
+)
+
+spei_map <- terra::as.data.frame(spei_processed[[1]], xy = TRUE, na.rm = TRUE)
+names(spei_map)[3] <- "value"
+spei_map$source <- "SPEI"
+
+```
+
+
+# Calculate SPEI values at H3 polygons
+
+Now we have SPEI raster data and H3 polygons. We can use `calculate_covariates()` to calculate the mean SPEI value within each H3 polygon. Note that radius should be set to 0 to avoid buffering the H3 polygons, as they are already defined by their boundaries. The H3 polygons using `h3jsr` are in `sf` class, and its unique identifier is stored in the `h3_address` column. This column is used to define `locs_id` in `calculate_covariates()`.
+
+```{r calculate-spei-h3, eval = FALSE}
+
+calc_spei <- calculate_drought(
+  from = spei_processed,
+  locs = h3_z10_sf,
+  locs_id = "h3_address",
+  radius = 0L,
+  fun = "mean"
+)
+```

@@ -12,6 +12,7 @@ calculate_hms(
   weights = NULL,
   .by_time = NULL,
   frac = FALSE,
+  include_plume_metrics = FALSE,
   geom = FALSE,
   ...
 )
@@ -40,6 +41,11 @@ summarized by \code{sum} (smoke-day counts) for \code{frac = FALSE}, or
 indicators by density class. If \code{TRUE}, return fractional overlap by density
 class.}
 
+\item{include_plume_metrics}{logical(1). If \code{TRUE}, additionally return
+the number of intersecting plume polygons and summed plume exposure
+duration in hours by density. This requires \code{from} to have been
+created with \code{process_hms(aggregate = FALSE)}.}
+
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
 coordinate reference system of the \code{sf} or \code{SpatVector} is that of \code{from.}}
@@ -48,7 +54,9 @@ coordinate reference system of the \code{sf} or \code{SpatVector} is that of \co
 }
 \value{
 a data.frame or SpatVector object. When \code{.by_time} is provided,
-rows are aggregated using \code{calc_summarize_by()}.
+rows are aggregated using \code{calc_summarize_by()}. With
+\code{include_plume_metrics = TRUE}, count columns are integer plume
+counts and duration columns are summed plume-hours.
 }
 \description{
 Extract wildfire smoke plume values at point or buffered locations. Returns a

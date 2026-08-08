@@ -25,7 +25,8 @@ Passed from \code{calc_\*()}.}
 geometry, but will use \code{terra} for extraction.}
 }
 \value{
-A \code{list} containing \code{SpatVector} and \code{data.frame} objects
+A three-element \code{list} containing the prepared \code{SpatVector}, the
+location-ID \code{data.frame}, and linear-unit metadata.
 }
 \description{
 Prepare the point locations for extracting data by transforming \code{locs} to

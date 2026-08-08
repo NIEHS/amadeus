@@ -199,50 +199,6 @@ testthat::test_that("download_nei mock download with hash", {
   })
 })
 
-testthat::test_that("download_nei epa_certificate_path deprecation warning", {
-  skip_on_cran()
-
-  withr::with_tempdir({
-    testthat::local_mocked_bindings(
-      check_url_status = function(...) TRUE,
-      check_destfile = function(...) FALSE,
-      download_run_method = function(...) {
-        invisible(list(success = 0, failed = 0, skipped = 2))
-      },
-      download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
-      .package = "amadeus"
-    )
-
-    # epa_certificate_path != NULL should trigger deprecation warning
-    testthat::expect_warning(
-      suppressMessages(
-        download_nei(
-          year = 2020,
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = FALSE,
-          epa_certificate_path = "/fake/cert.pem"
-        )
-      ),
-      "epa_certificate_path.*deprecated|deprecated.*epa_certificate"
-    )
-
-    # certificate_url != default should also trigger warning
-    testthat::expect_warning(
-      suppressMessages(
-        download_nei(
-          year = 2020,
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = FALSE,
-          certificate_url = "https://other.cert.url/cert.crt"
-        )
-      ),
-      "certificate_url.*deprecated|deprecated.*certificate_url"
-    )
-  })
-})
-
 ################################################################################
 ##### process_nei
 testthat::test_that("process_nei", {
@@ -464,34 +420,6 @@ testthat::test_that("download_nei mock download hash=FALSE", {
 })
 
 ################################################################################
-##### download_nei epa_certificate_path deprecation and unzip paths
-
-testthat::test_that("download_nei epa_certificate_path deprecation warning", {
-  testthat::local_mocked_bindings(
-    check_url_status = function(...) TRUE,
-    download_run_method = function(...) list(success = 1, failed = 0),
-    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
-    .package = "amadeus"
-  )
-  withr::with_tempdir({
-    testthat::expect_warning(
-      suppressMessages(
-        download_nei(
-          year = c(2017, 2020),
-          epa_certificate_path = "/fake/cert.pem",
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = TRUE,
-          unzip = FALSE,
-          hash = FALSE
-        )
-      ),
-      "deprecated"
-    )
-  })
-})
-
-################################################################################
 ##### download_nei unzip and remove_zip paths (covers lines 3096-3114)
 
 testthat::test_that("download_nei unzip and remove_zip path executes", {
@@ -526,6 +454,81 @@ testthat::test_that("download_nei unzip and remove_zip path executes", {
     testthat::expect_equal(result$success, 2)
   })
 })
+
+testthat::test_that(
+  "download_nei(year=c(2020,2023), unzip=TRUE): expands one nested level",
+  {
+    fixture_dir <- withr::local_tempdir()
+    withr::with_dir(fixture_dir, {
+      writeLines("depth 1", "depth1.txt")
+      utils::zip("nested1.zip", c("depth1.txt"))
+      utils::zip("outer.zip", "nested1.zip")
+    })
+    outer_zip <- file.path(fixture_dir, "outer.zip")
+
+    testthat::local_mocked_bindings(
+      download_run_method = function(destfiles, ...) {
+        for (destfile in destfiles) {
+          file.copy(outer_zip, destfile)
+        }
+        list(success = length(destfiles), failed = 0, skipped = 0)
+      },
+      .package = "amadeus"
+    )
+
+    withr::with_tempdir({
+      suppressMessages(download_nei(
+        year = c(2020L, 2023L),
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        unzip = TRUE
+      ))
+
+      data_dir <- file.path("data_files")
+      dir_2020 <- file.path(data_dir, "2020nei_onroad_byregion")
+      dir_2023 <- file.path(
+        data_dir,
+        "2023nei_onroad_byregion_21jul2026"
+      )
+      testthat::expect_false(file.exists(file.path(dir_2020, "depth1.txt")))
+      testthat::expect_true(file.exists(file.path(dir_2023, "depth1.txt")))
+    })
+  }
+)
+
+testthat::test_that(
+  "download_nei(year=2023, unzip=TRUE): handles no nested ZIP files",
+  {
+    fixture_dir <- withr::local_tempdir()
+    withr::with_dir(fixture_dir, {
+      writeLines("flat archive", "flat.txt")
+      utils::zip("outer.zip", "flat.txt")
+    })
+    outer_zip <- file.path(fixture_dir, "outer.zip")
+
+    testthat::local_mocked_bindings(
+      download_run_method = function(destfiles, ...) {
+        file.copy(outer_zip, destfiles)
+        list(success = length(destfiles), failed = 0, skipped = 0)
+      },
+      .package = "amadeus"
+    )
+
+    withr::with_tempdir({
+      suppressMessages(download_nei(
+        year = 2023L,
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        unzip = TRUE
+      ))
+      testthat::expect_true(file.exists(file.path(
+        "data_files",
+        "2023nei_onroad_byregion_21jul2026",
+        "flat.txt"
+      )))
+    })
+  }
+)
 
 ################################################################################
 ##### download_nei: scalar year URL construction fix
@@ -588,6 +591,96 @@ testthat::test_that("download_nei scalar year=2020 constructs correct URL", {
   testthat::expect_no_match(captured_urls, "/2020/.*2017")
 })
 
+testthat::test_that(
+  "download_nei(type=nonroad, year=c(2017,2020)): constructs EPA URLs",
+  {
+    captured_urls <- NULL
+    testthat::local_mocked_bindings(
+      download_run_method = function(urls, ...) {
+        captured_urls <<- urls
+        invisible(list(success = 2, failed = 0))
+      },
+      .package = "amadeus"
+    )
+    withr::with_tempdir({
+      suppressWarnings(suppressMessages(
+        download_nei(
+          year = c(2017L, 2020L),
+          type = "nonroad",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          unzip = FALSE
+        )
+      ))
+    })
+    testthat::expect_equal(
+      unname(captured_urls),
+      c(
+        paste0(
+          "https://gaftp.epa.gov/air/nei/2017/data_summaries/",
+          "2017v1/2017neiApr_nonroad_byregions.zip"
+        ),
+        paste0(
+          "https://gaftp.epa.gov/air/nei/2020/data_summaries/",
+          "2020nei_nonroad_byregion.zip"
+        )
+      )
+    )
+  }
+)
+
+testthat::test_that(
+  "download_nei(type=invalid): rejects inventory type",
+  {
+    testthat::expect_error(
+      download_nei(
+        year = 2020L,
+        type = "marine",
+        directory_to_save = tempdir(),
+        acknowledgement = TRUE
+      ),
+      "should be one of"
+    )
+  }
+)
+
+testthat::test_that(
+  "download_nei(type=point, year=c(2017,2020,2023)): constructs EPA URLs",
+  {
+    captured_urls <- NULL
+    testthat::local_mocked_bindings(
+      download_run_method = function(urls, ...) {
+        captured_urls <<- urls
+        invisible(list(success = 3, failed = 0))
+      },
+      .package = "amadeus"
+    )
+    withr::with_tempdir({
+      suppressWarnings(suppressMessages(
+        download_nei(
+          year = c(2017L, 2020L, 2023L),
+          type = "point",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          unzip = FALSE
+        )
+      ))
+    })
+    testthat::expect_match(
+      captured_urls[1],
+      "2017v1/2017neiJan_facility_process_byregions\\.zip$"
+    )
+    testthat::expect_match(
+      captured_urls[2],
+      "2020nei_facility_process_byregions\\.zip$"
+    )
+    testthat::expect_match(
+      captured_urls[3],
+      "2023nei_facility_process_byregion_21jul2026\\.zip$"
+    )
+  }
+)
+
 testthat::test_that("download_nei vector year=c(2017,2020) constructs 2 correct URLs", {
   captured_urls <- NULL
   testthat::local_mocked_bindings(
@@ -614,15 +707,18 @@ testthat::test_that("download_nei vector year=c(2017,2020) constructs 2 correct 
   testthat::expect_match(captured_urls[2], "/2020/.*2020nei")
 })
 
-testthat::test_that("download_nei stops on unrecognized year", {
-  testthat::expect_error(
-    suppressMessages(
-      download_nei(
-        year = 2019L,
-        directory_to_save = tempdir(),
-        acknowledgement = TRUE
-      )
-    ),
-    "NEI data is not available for year"
-  )
-})
+testthat::test_that(
+  "download_nei(year=2026): rejects release year as inventory year",
+  {
+    testthat::expect_error(
+      suppressMessages(
+        download_nei(
+          year = 2026L,
+          directory_to_save = tempdir(),
+          acknowledgement = TRUE
+        )
+      ),
+      "NEI data is not available for year"
+    )
+  }
+)

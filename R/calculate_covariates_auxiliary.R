@@ -240,7 +240,8 @@ calc_message <- function(
 #' @param geom logical(1). Should the geometry of `locs` be returned in the
 #' `data.frame`? Default is `FALSE`, options "sf" or "terra" will preserve
 #' geometry, but will use `terra` for extraction.
-#' @return A `list` containing `SpatVector` and `data.frame` objects
+#' @return A three-element `list` containing the prepared `SpatVector`, the
+#'   location-ID `data.frame`, and linear-unit metadata.
 #' @seealso [`process_locs_vector()`], [`check_for_null_parameters()`]
 #' @keywords internal auxiliary
 #' @importFrom terra as.data.frame
@@ -265,6 +266,7 @@ calc_prepare_locs <- function(
     terra::crs(from),
     radius
   )
+  linear_unit_info <- attr(sites_e, "amadeus_linear_units")
   #### site identifiers and geometry
   # check geom
   amadeus::check_geom(geom)
@@ -299,7 +301,35 @@ calc_prepare_locs <- function(
       select = locs_id
     )
   }
-  return(list(sites_e, sites_id))
+  return(list(sites_e, sites_id, linear_unit_info))
+}
+
+#' Describe linear units used for covariate calculations
+#' @param crs Coordinate reference system accepted by \code{terra::crs()}.
+#' @return A named list describing CRS and buffer units.
+#' @keywords internal auxiliary
+calc_linear_unit_metadata <- function(crs) {
+  template <- terra::vect(
+    data.frame(x = 0, y = 0),
+    geom = c("x", "y"),
+    crs = crs
+  )
+  is_longlat <- isTRUE(suppressWarnings(terra::is.lonlat(template)))
+  crs_info <- sf::st_crs(crs)
+  crs_unit <- crs_info$units_gdal
+  if (is.null(crs_unit) || is.na(crs_unit) || !nzchar(crs_unit)) {
+    crs_unit <- if (is_longlat) "degree" else "unknown"
+  }
+  list(
+    radius_input_unit = "metre",
+    crs_linear_unit = crs_unit,
+    metres_per_crs_unit = suppressWarnings(terra::linearUnits(template)),
+    automatic_conversion = isTRUE(getOption(
+      "amadeus.convert_linear_units",
+      TRUE
+    )),
+    geographic_crs = is_longlat
+  )
 }
 
 #' Validate extents overlap
@@ -908,7 +938,8 @@ calc_worker <- function(
 #' @importFrom terra vect
 #' @keywords internal auxiliary
 #' @author Mitchell Manware
-#' @return a data.frame or SpatVector object (depending on `geom` paramter)
+#' @return a data.frame or SpatVector object (depending on `geom` parameter)
+#'   with an \code{amadeus_linear_units} attribute.
 #' @export
 # nolint start
 calc_return_locs <- function(
@@ -917,6 +948,10 @@ calc_return_locs <- function(
   geom,
   crs
 ) {
+  finalize_return <- function(x) {
+    attr(x, "amadeus_linear_units") <- calc_linear_unit_metadata(crs)
+    x
+  }
   # time value check
   if ("time" %in% names(covar)) {
     calc_check_time(covar = covar, POSIXt = POSIXt)
@@ -939,12 +974,12 @@ calc_return_locs <- function(
             "`covar`; returning data.frame."
           )
         )
-        return(data.frame(covar))
+        return(finalize_return(data.frame(covar)))
       }
       if (geom == "sf") {
-        return(covar_sf)
+        return(finalize_return(covar_sf))
       }
-      return(suppressWarnings(terra::vect(covar_sf)))
+      return(finalize_return(suppressWarnings(terra::vect(covar_sf))))
     }
     covar_return <- NULL
     if ("geometry" %in% names(covar)) {
@@ -968,21 +1003,21 @@ calc_return_locs <- function(
           "`covar`; returning data.frame."
         )
       )
-      return(data.frame(covar))
+      return(finalize_return(data.frame(covar)))
     }
     if (geom == "terra") {
-      return(covar_return)
+      return(finalize_return(covar_return))
     } else if (geom == "sf") {
-      return(
+      return(finalize_return(
         if (inherits(covar_return, "sf")) {
           covar_return
         } else {
           sf::st_as_sf(covar_return)
         }
-      )
+      ))
     }
   } else {
-    return(data.frame(covar))
+    return(finalize_return(data.frame(covar)))
   }
 }
 

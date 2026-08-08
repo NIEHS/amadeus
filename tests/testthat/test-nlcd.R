@@ -920,6 +920,31 @@ testthat::test_that("download_nlcd stops with invalid year", {
   )
 })
 
+testthat::test_that(
+  "download_nlcd(year=2025): constructs Collection 1.2 URL",
+  {
+    result <- suppressWarnings(suppressMessages(
+      download_nlcd(
+        year = 2025L,
+        product = "Land Cover",
+        directory_to_save = tempdir(),
+        acknowledgement = TRUE,
+        download = FALSE,
+        unzip = FALSE
+      )
+    ))
+    testthat::expect_equal(result$n_files, 1L)
+    testthat::expect_match(
+      result$urls,
+      "Annual_NLCD_LndCov_2025_CU_C1V2\\.zip$"
+    )
+    testthat::expect_match(
+      result$destfiles,
+      "Annual_NLCD_LndCov_2025_CU_C1V2\\.zip$"
+    )
+  }
+)
+
 ################################################################################
 ##### process_nlcd aux.xml hiding (covers lines 931-944)
 

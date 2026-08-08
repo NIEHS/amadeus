@@ -2,13 +2,11 @@
 % Please edit documentation in R/download.R
 \name{download_nei}
 \alias{download_nei}
-\title{Download road emissions data}
+\title{Download National Emissions Inventory data}
 \usage{
 download_nei(
-  epa_certificate_path = NULL,
-  certificate_url = paste0("http://cacerts.digicert.com/",
-    "DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"),
-  year = c(2017L, 2020L),
+  year = c(2017L, 2020L, 2023L),
+  type = c("onroad", "nonroad", "point"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -22,11 +20,12 @@ download_nei(
 )
 }
 \arguments{
-\item{epa_certificate_path}{TO BE DEPRECATED. Certificate path.}
+\item{year}{integer(1). NEI inventory year. Available years are 2017, 2020,
+and 2023.}
 
-\item{certificate_url}{TO BE DEPRECATED. Certificate URL.}
-
-\item{year}{integer(1). Available years of NEI data.}
+\item{type}{character(1). Source-inventory type. One of
+\code{"onroad"} (default), \code{"nonroad"}, or \code{"point"} for
+facility/process emissions.}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
@@ -53,9 +52,14 @@ FALSE).}
 invisible list with download results; or hash character if hash=TRUE
 }
 \description{
-The \code{download_nei()} function accesses and downloads road emissions
-data from the U.S Environmental Protection Agency's (EPA) National
-Emissions Inventory (NEI).
+The \code{download_nei()} function accesses and downloads point, on-road,
+and non-road emissions data from the U.S Environmental Protection Agency's
+(EPA) National Emissions Inventory (NEI).
+}
+\details{
+When \code{year = 2023L} and \code{unzip = TRUE}, ZIP archives
+directly inside the downloaded archive are also extracted under the
+inventory's data directory. Deeper ZIP files are not extracted.
 }
 \note{
 NEI data does not require authentication.
@@ -64,6 +68,13 @@ NEI data does not require authentication.
 \dontrun{
 download_nei(
   year = c(2017L, 2020L),
+  type = "nonroad",
+  directory_to_save = tempdir(),
+  acknowledgement = TRUE
+)
+download_nei(
+  year = c(2023L),
+  type = "onroad",
   directory_to_save = tempdir(),
   acknowledgement = TRUE
 )

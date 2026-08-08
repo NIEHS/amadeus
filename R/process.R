@@ -2353,6 +2353,10 @@ process_groads <- function(
 #' @param path character(1). Directory with downloaded NOAA HMS data files.
 #' @param extent numeric(4) or SpatExtent giving the extent of the output
 #'   if `NULL` (default), the entire data is returned
+#' @param aggregate logical(1). If \code{TRUE} (default), overlapping plume
+#'   polygons are dissolved and the highest density is retained. If
+#'   \code{FALSE}, original plume polygons and their \code{Satellite},
+#'   \code{Start}, and \code{End} fields are retained for plume-level metrics.
 #' @param ... Placeholders.
 #' @note
 #' \code{process_hms()} will return a character object if there are no wildfire
@@ -2378,12 +2382,16 @@ process_hms <- function(
   date = "2018-01-01",
   path = NULL,
   extent = NULL,
+  aggregate = TRUE,
   ...
 ) {
   #### directory setup
   path <- amadeus::download_sanitize_path(path)
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
+  if (!is.logical(aggregate) || length(aggregate) != 1L || is.na(aggregate)) {
+    stop("`aggregate` should be a single logical value (TRUE/FALSE).")
+  }
   #### check dates
   if (length(date) == 1) {
     date <- c(date, date)
@@ -2455,6 +2463,22 @@ process_hms <- function(
         date[1],
         "..."
       ))
+      if (!isTRUE(aggregate)) {
+        data_density$Date <- date
+        data_density$.plume_id <- paste0(
+          format(date, "%Y%m%d"),
+          "_",
+          seq_len(nrow(data_density))
+        )
+        keep_fields <- c(
+          "Satellite", "Start", "End", "Density", "Date", ".plume_id"
+        )
+        data_density <- data_density[, keep_fields]
+        data_return <- rbind(data_return, data_density)
+        reext <- terra::ext(c(-180, 180, -65, 85))
+        data_return <- terra::crop(data_return, reext)
+        next
+      }
       #### zero buffer to avoid self intersection
       data_0_buffer <- terra::buffer(
         data_density,
