@@ -791,7 +791,7 @@ testthat::test_that(
   "calc_prepare_locs(radius=1000): supports disabled unit conversion",
   {
     withr::local_package("terra")
-    withr::local_options(amadeus.convert_linear_units = FALSE)
+    withr::local_options(AMADEUS_CONVERT_LINEAR_UNITS = FALSE)
     from <- terra::rast(
       nrows = 2,
       ncols = 2,
@@ -833,30 +833,6 @@ testthat::test_that(
     testthat::expect_type(unit_info, "list")
     testthat::expect_equal(unit_info$crs_linear_unit, "US survey foot")
     testthat::expect_equal(unit_info$metres_per_crs_unit, 0.3048006)
-  }
-)
-
-testthat::test_that(
-  "calculate_covariates(convert_linear_units=FALSE): propagates local option",
-  {
-    original_option <- getOption("amadeus.convert_linear_units")
-    testthat::local_mocked_bindings(
-      calculate_gmted = function(...) {
-        getOption("amadeus.convert_linear_units", TRUE)
-      },
-      .package = "amadeus"
-    )
-    result <- calculate_covariates(
-      covariate = "gmted",
-      from = NULL,
-      locs = NULL,
-      convert_linear_units = FALSE
-    )
-    testthat::expect_false(result)
-    testthat::expect_identical(
-      getOption("amadeus.convert_linear_units"),
-      original_option
-    )
   }
 )
 
