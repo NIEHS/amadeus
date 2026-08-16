@@ -55,6 +55,7 @@
 #' * \code{\link{download_edgar}}: `"edgar"`
 #' * \code{\link{download_improve}}: `"improve"`, `"IMPROVE"`
 #' * \code{\link{download_drought}}: `"drought"`, `"spei"`, `"eddi"`, `"usdm"`
+#' * \code{\link{download_xis}}: `"xis"`
 #' @return
 #' * For \code{hash = FALSE}, NULL
 #' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
@@ -113,7 +114,8 @@ download_data <-
       "drought",
       "spei",
       "eddi",
-      "usdm"
+      "usdm",
+      "xis"
     ),
     directory_to_save = NULL,
     acknowledgement = FALSE,
@@ -162,7 +164,8 @@ download_data <-
       drought = download_drought,
       spei = download_drought,
       eddi = download_drought,
-      usdm = download_drought
+      usdm = download_drought,
+      xis = download_xis
     )
 
     call_args <- c(
@@ -200,6 +203,106 @@ download_data <-
 
     return(return)
   }
+
+
+#' Download XIS prediction maps
+#' @description
+#' The \code{download_xis()} function downloads the XIS daily environmental
+#' exposure prediction maps from Zenodo. The data are supplied as a Parquet
+#' table containing coordinates and predicted values.
+#' @param directory_to_save character(1). Directory to save the downloaded
+#'   Parquet file.
+#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed.
+#' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#'   If \code{FALSE}, return the discovered URL and destination without
+#'   downloading.
+#' @param remove_command logical(1). Deprecated, ignored.
+#' @param show_progress logical(1). Show download progress (default
+#'   \code{TRUE}).
+#' @param hash logical(1). Return a hash of downloaded files (default
+#'   \code{FALSE}).
+#' @param max_tries integer(1). Maximum retry attempts (default \code{20}).
+#' @param rate_limit numeric(1). Minimum seconds between requests (default
+#'   \code{2}).
+#' @return An invisible download-result list, or a hash character when
+#'   \code{hash = TRUE}. With \code{download = FALSE}, an invisible list
+#'   containing the URL, destination, and file count.
+#' @author Insang Song
+#' @seealso \code{\link{process_xis}}, \code{\link{calculate_xis}}
+#' @examples
+#' \dontrun{
+#' download_xis(
+#'   directory_to_save = tempdir(),
+#'   acknowledgement = TRUE
+#' )
+#' }
+#' @export
+download_xis <- function(
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = TRUE,
+  remove_command = FALSE,
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
+) {
+  amadeus::download_permit(acknowledgement = acknowledgement)
+  amadeus::check_for_null_parameters(mget(ls()))
+
+  amadeus::download_setup_dir(directory_to_save)
+  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
+
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated.",
+      " Downloads now use httr2 by default.\n",
+      "To skip downloading, the function will return",
+      " after discovering files.\n",
+      call. = FALSE
+    )
+  }
+  if (!isFALSE(remove_command)) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  download_url <- paste0(
+    "https://zenodo.org/records/17815670/files/",
+    "prediction_maps.parquet"
+  )
+  download_name <- file.path(directory_to_save, "prediction_maps.parquet")
+
+  if (!isTRUE(download)) {
+    message("Skipping download.\n")
+    return(invisible(list(
+      urls = download_url,
+      destfiles = download_name,
+      n_files = 1
+    )))
+  }
+
+  if (amadeus::check_destfile(download_name)) {
+    download_result <- amadeus::download_run_method(
+      urls = download_url,
+      destfiles = download_name,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = rate_limit
+    )
+  } else {
+    message("XIS prediction maps already present. Skipping download.\n")
+    download_result <- list(success = 0, failed = 0, skipped = 1)
+  }
+
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  }
+  return(invisible(download_result))
+}
 
 
 #' Download air quality data

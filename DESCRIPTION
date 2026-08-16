@@ -21,6 +21,7 @@ Imports:
     terra (>= 1.8-42),
     methods,
     data.table,
+    nanoparquet,
     httr2,
     exactextractr,
     utils,

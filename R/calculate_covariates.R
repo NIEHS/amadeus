@@ -52,6 +52,7 @@
 #' * \code{\link{calculate_huc}}: "huc", "HUC"
 #' * \code{\link{calculate_edgar}}: "edgar"
 #' * \code{\link{calculate_drought}}: "drought", "spei", "eddi", "usdm"
+#' * \code{\link{calculate_xis}}: "xis"
 #' @return Calculated covariates as a data.frame or SpatVector object with an
 #'   \code{amadeus_linear_units} attribute describing the CRS linear unit and
 #'   whether automatic radius conversion was enabled.
@@ -113,7 +114,8 @@ calculate_covariates <-
       "drought",
       "spei",
       "eddi",
-      "usdm"
+      "usdm",
+      "xis"
     ),
     from,
     locs,
@@ -178,7 +180,8 @@ calculate_covariates <-
       drought = amadeus::calculate_drought,
       spei = amadeus::calculate_drought,
       eddi = amadeus::calculate_drought,
-      usdm = amadeus::calculate_drought
+      usdm = amadeus::calculate_drought,
+      xis = amadeus::calculate_xis
     )
 
     res_covariate <-
@@ -5228,4 +5231,106 @@ calculate_drought <- function(
     geom = geom,
     crs = crs_from
   )
+}
+
+#' Calculate XIS covariates
+#' @description
+#' Extract multitemporal XIS prediction values at input locations. A nonzero
+#' \code{radius} creates circular buffers around point locations and summarizes
+#' intersecting raster cells with \code{fun}.
+#' @param from SpatRaster. Output of \code{process_xis()}.
+#' @param locs data.frame, sf, or SpatVector. Unique locations containing
+#'   \code{locs_id}. A data.frame must contain \code{lon} and \code{lat}.
+#' @param locs_id character(1). Name of the unique location identifier.
+#' @param radius numeric(1). Circular buffer radius in metres. Use \code{0}
+#'   (default) for point extraction.
+#' @param fun character(1) or function. Function used to summarize raster cells
+#'   within buffered or polygon locations. Default is \code{"mean"}.
+#' @param weights NULL, SpatRaster, polygon SpatVector/sf, or file path.
+#'   Optional weighting surface for buffered extraction.
+#' @param .by_time NULL or character(1). Optional temporal grouping unit.
+#' @param geom FALSE, \code{"sf"}, or \code{"terra"}. Return geometry in the
+#'   requested form.
+#' @param max_cells integer(1). Maximum cells read at once during exact
+#'   extraction.
+#' @param ... Placeholders.
+#' @return A data.frame, sf object, or SpatVector containing one row per
+#'   location and XIS time layer, with columns for the location identifier,
+#'   time, and extracted value.
+#' @author Insang Song
+#' @seealso \code{\link{download_xis}}, \code{\link{process_xis}}
+#' @examples
+#' \dontrun{
+#' calculate_xis(
+#'   from = xis,
+#'   locs = locations,
+#'   locs_id = "site_id",
+#'   radius = 1000
+#' )
+#' }
+#' @importFrom terra crs
+#' @export
+calculate_xis <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  fun = "mean",
+  weights = NULL,
+  .by_time = NULL,
+  geom = FALSE,
+  max_cells = 1e8,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+  if (!inherits(from, "SpatRaster")) {
+    stop("`from` must be a SpatRaster returned by `process_xis()`.")
+  }
+  if (!is.numeric(radius) || length(radius) != 1L || is.na(radius)) {
+    stop("`radius` must be a single numeric value.")
+  }
+  if (radius < 0) {
+    stop("`radius` must be greater than or equal to 0.")
+  }
+
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_extracted <- amadeus::calc_worker(
+    dataset = "xis",
+    from = from,
+    locs_vector = sites_list[[1]],
+    locs_df = sites_list[[2]],
+    radius = radius,
+    fun = fun,
+    variable = 1,
+    time = 2,
+    time_type = "date",
+    max_cells = max_cells,
+    weights = weights
+  )
+
+  if (!is.null(.by_time)) {
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = fun,
+      locs_id = locs_id
+    )
+  }
+  if ("time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+  }
+
+  return(amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  ))
 }

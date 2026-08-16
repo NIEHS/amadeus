@@ -2360,7 +2360,8 @@ testthat::test_that("download_data passes nasa_earth_data_token only to NASA fun
     "download_koppen_geiger",
     "download_hms", "download_gmted", "download_narr", "download_tri",
     "download_nei", "download_gridmet", "download_terraclimate",
-    "download_huc", "download_cropscape", "download_prism", "download_edgar"
+    "download_huc", "download_cropscape", "download_prism", "download_edgar",
+    "download_xis"
   )
 
   for (fn_name in nasa_fns) {
@@ -2456,7 +2457,8 @@ testthat::test_that("all download functions have rate_limit parameter", {
     download_merra2, download_narr, download_nlcd, download_groads,
     download_population, download_hms, download_koppen_geiger, download_modis,
     download_tri, download_nei, download_gridmet, download_terraclimate,
-    download_huc, download_prism, download_edgar, download_cropscape
+    download_huc, download_prism, download_edgar, download_cropscape,
+    download_xis
   )
   fn_names <- c(
     "download_aqs", "download_ecoregion", "download_geos", "download_gmted",
@@ -2464,7 +2466,7 @@ testthat::test_that("all download functions have rate_limit parameter", {
     "download_population", "download_hms", "download_koppen_geiger",
     "download_modis", "download_tri", "download_nei", "download_gridmet",
     "download_terraclimate", "download_huc", "download_prism", "download_edgar",
-    "download_cropscape"
+    "download_cropscape", "download_xis"
   )
   for (i in seq_along(fns)) {
     testthat::expect_true(

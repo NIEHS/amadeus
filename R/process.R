@@ -36,6 +36,7 @@
 #' * \code{\link{process_cropscape}}: "cropscape", "cdl"
 #' * \code{\link{process_prism}}: "prism", "PRISM"
 #' * \code{\link{process_drought}}: "drought", "spei", "eddi", "usdm"
+#' * \code{\link{process_xis}}: "xis"
 #' @return `SpatVector`, `SpatRaster`, `sf`, `data.table`, or `character` depending on
 #' covariate type and selections.
 #' @author Insang Song
@@ -97,7 +98,8 @@ process_covariates <-
       "drought",
       "spei",
       "eddi",
-      "usdm"
+      "usdm",
+      "xis"
     ),
     path = NULL,
     ...
@@ -153,7 +155,8 @@ process_covariates <-
       },
       usdm = function(path, ...) {
         process_drought(path = path, source = "usdm", ...)
-      }
+      },
+      xis = process_xis
     )
 
     res_covariate <-
@@ -5175,4 +5178,141 @@ drought_process_usdm <- function(path, date, extent) {
     if (length(shp_files) == 1L) "" else "s"
   ))
   data_return
+}
+
+
+#' Process XIS prediction maps
+#' @description
+#' The \code{process_xis()} function reads the XIS prediction-map Parquet
+#' file, filters it by map and date, and converts its regular x-y coordinate
+#' table to a multitemporal \code{SpatRaster}.
+#' @param path character(1). Path to \code{prediction_maps.parquet} or the
+#'   directory containing it.
+#' @param variable character(1). One of \code{"pm"}, \code{"humid"}, or
+#'   \code{"temp"}.
+#' @param date character(1 or 2). Date or start and end dates in
+#'   \code{"YYYY-MM-DD"} format.
+#'   Only maps within the date range are returned.
+#'   Default is \code{c("2019-01-01", "2019-01-31")}.
+#' @param extent NULL, numeric(4), or SpatExtent. Optional extent in the XIS
+#'   projected coordinate system, ordered as xmin, xmax, ymin, ymax.
+#' @param ... Placeholders.
+#' @return A SpatRaster object with temporal layers for
+#'   each date in the requested range. Layer names are in the format
+#'   \code{"us.<variable>_<YYYYMMDD>"}. The CRS is EPSG:2163 and
+#'   \code{terra::time()} contains the corresponding dates.
+#' @author Insang Song
+#' @seealso \code{\link{download_xis}}, \code{\link{calculate_xis}}
+#' @examples
+#' \dontrun{
+#' process_xis(
+#'   path = "./data/xis",
+#'   variable = "pm",
+#'   date = c("2019-01-01", "2019-01-31")
+#' )
+#' }
+#' @importFrom nanoparquet read_parquet
+#' @importFrom terra rast
+#' @importFrom terra time
+#' @importFrom terra varnames
+#' @export
+process_xis <- function(
+  path = NULL,
+  variable = c("pm", "humid", "temp"),
+  date = c("2019-01-01", "2019-01-31"),
+  extent = NULL,
+  ...
+) {
+  if (!is.character(path) || length(path) != 1L || is.na(path)) {
+    stop("`path` must be a single file or directory path.")
+  }
+  parq_path <- if (dir.exists(path)) {
+    list.files(
+      path,
+      pattern = "^prediction_maps\\.parquet$",
+      full.names = TRUE
+    )
+  } else if (file.exists(path)) {
+    path
+  } else {
+    character(0)
+  }
+  if (length(parq_path) != 1L) {
+    stop("Could not find exactly one `prediction_maps.parquet` file.")
+  }
+
+  variable <- paste0("us.", match.arg(variable))
+  if (!is.character(date) || !length(date) %in% c(1L, 2L)) {
+    stop("`date` must be character(1 or 2) in YYYY-MM-DD format.")
+  }
+  if (length(date) == 1L) {
+    date <- rep(date, 2L)
+  }
+  date <- as.Date(date)
+  if (anyNA(date)) {
+    stop("`date` must contain valid dates in YYYY-MM-DD format.")
+  }
+  date <- sort(date)
+
+  parq_in <- nanoparquet::read_parquet(
+    parq_path,
+    col_select = c("map", "date", "x", "y", "prediction")
+  )
+  parq_in <- as.data.frame(parq_in)
+  required_columns <- c("map", "date", "x", "y", "prediction")
+  missing_columns <- setdiff(required_columns, names(parq_in))
+  if (length(missing_columns) > 0L) {
+    stop(sprintf(
+      "XIS data are missing required column(s): %s.",
+      paste(missing_columns, collapse = ", ")
+    ))
+  }
+
+  parq_in$date <- as.Date(parq_in$date)
+  parq_in <- parq_in[
+    parq_in$map == variable &
+      parq_in$date >= date[1] &
+      parq_in$date <= date[2],
+    ,
+    drop = FALSE
+  ]
+  extent_target <- NULL
+  if (!is.null(extent)) {
+    extent_target <- as.vector(terra::ext(extent))
+    if (length(extent_target) != 4L || any(!is.finite(extent_target))) {
+      stop("`extent` must contain four finite values.")
+    }
+  }
+  if (nrow(parq_in) == 0L) {
+    stop("No XIS predictions matched `variable` and `date`.")
+  }
+  if (any(!is.finite(parq_in$x)) || any(!is.finite(parq_in$y))) {
+    stop("XIS `x` and `y` coordinates must be finite.")
+  }
+  if (anyDuplicated(parq_in[c("date", "x", "y")])) {
+    stop("XIS data contain duplicate coordinates within a date.")
+  }
+
+  date_target <- sort(unique(parq_in$date))
+
+  ras_out <- lapply(
+    date_target,
+    function(d) {
+      parq_in_d <- parq_in[parq_in$date == d, , drop = FALSE]
+      rast_out <- suppressWarnings(terra::rast(
+        parq_in_d[, c("x", "y", "prediction")],
+        type = "xyz",
+        crs = "EPSG:2163"
+      ))
+      names(rast_out) <- paste0(variable, "_", format(d, "%Y%m%d"))
+      return(rast_out)
+    }
+  )
+  ras_out <- do.call(c, ras_out)
+  if (!is.null(extent_target)) {
+    ras_out <- terra::crop(ras_out, terra::ext(extent_target))
+  }
+  terra::time(ras_out) <- date_target
+  terra::varnames(ras_out) <- variable
+  return(ras_out)
 }

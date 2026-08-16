@@ -10,7 +10,7 @@ calculate_covariates(
     "hms", "smoke", "gmted", "narr", "geos", "sedac_population", "population", "nlcd",
     "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "mcd14ml", "prism",
     "cropscape", "cdl", "huc", "edgar", "goes", "goes_adp", "GOES", "drought", "spei",
-    "eddi", "usdm"),
+    "eddi", "usdm", "xis"),
   from,
   locs,
   locs_id = "site_id",
@@ -104,6 +104,7 @@ calculate_covariates(
 \item \code{\link{calculate_huc}}: "huc", "HUC"
 \item \code{\link{calculate_edgar}}: "edgar"
 \item \code{\link{calculate_drought}}: "drought", "spei", "eddi", "usdm"
+\item \code{\link{calculate_xis}}: "xis"
 }
 }
 \author{

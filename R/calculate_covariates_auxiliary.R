@@ -1142,8 +1142,7 @@ check_by_time <- function(.by_time) {
     stop(
       paste0(
         "`.by_time` must be NULL or a single character string naming ",
-        "a temporal unit.
-"
+        "a temporal unit."
       )
     )
   }
@@ -1168,8 +1167,7 @@ check_by_time <- function(.by_time) {
       paste0(
         "`.by_time` must be one of: ",
         paste(allowed, collapse = ", "),
-        ".
-"
+        "."
       )
     )
   }
