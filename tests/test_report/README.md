@@ -1,6 +1,6 @@
 # Test Reports
 
-This directory holds reproducible reports about the amadeus test suite.
+This directory holds reproducible reports about the amadeus test suite. I have just added this text after the full stop to check if git is working on ddn.
 
 | File | Purpose |
 |---|---|
