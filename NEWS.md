@@ -1,3 +1,8 @@
+# amadeus 2.0.2
+
+- Fixed process_gridmet() to use valid native NetCDF time metadata from terra::time() when available and fall back to layer-name parsing when needed
+- Fixed download_gridmet() to handle cases where all requested files already exist locally without calling download_run_method() with an empty URL list
+
 # amadeus 2.0.0
 ## Major updates to code base - breaking changes have been minmized but please report if 1.3.x versions are not working as expected
 
