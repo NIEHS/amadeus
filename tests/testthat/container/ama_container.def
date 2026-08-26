@@ -1,0 +1,116 @@
+Bootstrap: docker
+From: rocker/geospatial:4.4.3
+
+%post
+    # ------------------------------------------------------------
+    # System configuration
+    # ------------------------------------------------------------
+
+    apt-get update
+
+    apt-get install -y --no-install-recommends \
+        locales \
+        fonts-dejavu \
+        fonts-liberation \
+        fonts-noto \
+        fonts-unifont \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        ca-certificates \
+        curl \
+        slurm-client \
+        git-lfs \
+        libarchive-dev \
+        libgit2-dev
+
+    # Configure UTF-8 locale
+    locale-gen en_US.UTF-8
+
+    echo "LANG=en_US.UTF-8" >> /etc/default/locale
+    echo "LC_ALL=en_US.UTF-8" >> /etc/default/locale
+
+    # Configure git-lfs
+    git lfs install --system
+
+    # Clean apt cache
+    rm -rf /var/lib/apt/lists/*
+
+
+    # ------------------------------------------------------------
+    # Create directories
+    # ------------------------------------------------------------
+
+    mkdir -p /pipeline
+    mkdir -p /input
+    mkdir -p /opt/_targets
+
+
+    # ------------------------------------------------------------
+    # R package installation
+    # ------------------------------------------------------------
+
+    # Install pak first
+    Rscript -e "install.packages('pak', repos='https://cloud.r-project.org')"
+
+    # Install terra explicitly at a version satisfying
+    # the package requirement: terra >= 1.8-42
+    #Rscript -e "pak::pkg_install('terra>=1.8-42')"
+
+    # Install archive and collapse explicitly
+    #Rscript -e "pak::pkg_install(c('archive', 'collapse'))"
+
+    Rscript -e "install.packages(c('terra', 'archive', 'collapse'), repos='https://cloud.r-project.org')"
+
+
+
+
+    # Development/testing packages
+    Rscript -e "pak::pkg_install(c(
+        'devtools',
+        'targets',
+        'tarchetypes',
+        'testthat',
+        'tidymodels',
+        'bonsai',
+        'qs2',
+        'kernlab',
+        'lightgbm',
+        'lwgeom',
+        'doRNG',
+        'quarto'
+    ))"
+
+
+    # ------------------------------------------------------------
+    # Verify critical packages
+    # ------------------------------------------------------------
+
+    Rscript -e "stopifnot(
+        packageVersion('terra') >= '1.8.42',
+        requireNamespace('archive', quietly=TRUE),
+        requireNamespace('collapse', quietly=TRUE)
+    )"
+
+    Rscript -e "cat('R version:', R.version.string, '\n')"
+    Rscript -e "cat('terra version:', as.character(packageVersion('terra')), '\n')"
+    Rscript -e "cat('archive version:', as.character(packageVersion('archive')), '\n')"
+    Rscript -e "cat('collapse version:', as.character(packageVersion('collapse')), '\n')"
+
+
+%environment
+    export LANG=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+    export TERM=xterm-256color
+
+    # Make R use UTF-8
+    export R_DEFAULT_PACKAGES="datasets,utils,grDevices,graphics,stats,methods"
+
+
+%runscript
+    exec R "$@"
+
+
+%labels
+    Description "R 4.4.3 geospatial environment with targets, testing, terra >= 1.8-42, archive, collapse, and Unicode support"
+    R_version "4.4.3"
+    terra_min_version "1.8-42"
