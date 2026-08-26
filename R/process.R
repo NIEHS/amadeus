@@ -3729,7 +3729,7 @@ process_gridmet <- function(
       ),
       "...\n"
     ))
-    
+
     existing_time <- terra::time(data_year)
 
     if (
