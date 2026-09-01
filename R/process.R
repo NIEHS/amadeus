@@ -3729,11 +3729,27 @@ process_gridmet <- function(
       ),
       "...\n"
     ))
-    terra::time(data_year) <- amadeus::process_parse_ncdf_day_codes(
-      layer_names = names(data_year),
-      source = "gridmet",
-      origin = "1900-01-01"
-    )
+    # terra::time(data_year) <- amadeus::process_parse_ncdf_day_codes(
+    #   layer_names = names(data_year),
+    #   source = "gridmet",
+    #   origin = "1900-01-01"
+    # )
+
+    layer_time <- terra::time(data_year)
+
+    if (
+      length(layer_time) != terra::nlyr(data_year) ||
+        anyNA(layer_time)
+    ) {
+      layer_time <- amadeus::process_parse_ncdf_day_codes(
+        layer_names = names(data_year),
+        source = "gridmet",
+        origin = "1900-01-01"
+      )
+    }
+
+    terra::time(data_year) <- layer_time
+
     names(data_year) <- paste0(
       variable_checked,
       "_",
