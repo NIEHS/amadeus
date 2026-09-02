@@ -435,3 +435,87 @@ testthat::test_that("calculate_prism .by_time branch derives time and validates 
     regexp = "Could not derive PRISM time"
   )
 })
+
+testthat::test_that("calculate_prism(radius=1000): buffer diameter is 2000 meters", {
+  withr::local_package("terra")
+
+  from <- terra::rast(
+    ncols = 4,
+    nrows = 4,
+    xmin = -2000,
+    xmax = 2000,
+    ymin = -2000,
+    ymax = 2000,
+    crs = "EPSG:3857"
+  )
+  terra::values(from) <- 1
+  names(from) <- "ppt"
+  locs <- terra::vect(
+    data.frame(site_id = "s1", x = 0, y = 0),
+    geom = c("x", "y"),
+    crs = "EPSG:3857"
+  )
+
+  result <- calculate_prism(from, locs, radius = 1000, geom = "terra")
+  result_extent <- terra::ext(result)
+  result_coordinates <- terra::crds(result)
+  location_coordinates <- terra::crds(locs)
+  distances <- sqrt(rowSums(
+    (result_coordinates - location_coordinates[1, ])^2
+  ))
+
+  testthat::expect_equal(
+    unname(result_extent[2] - result_extent[1]),
+    2000,
+    tolerance = 1
+  )
+  testthat::expect_equal(
+    unname(result_extent[4] - result_extent[3]),
+    2000,
+    tolerance = 1
+  )
+  testthat::expect_equal(max(distances), 1000, tolerance = 1)
+})
+
+testthat::test_that(
+  "calculate_prism(radius=1000): extraction uses a single buffer",
+  {
+    withr::local_package("terra")
+    withr::local_package("sf")
+    withr::local_package("exactextractr")
+
+    from <- terra::rast(
+      ncols = 8,
+      nrows = 8,
+      xmin = -2000,
+      xmax = 2000,
+      ymin = -2000,
+      ymax = 2000,
+      crs = "EPSG:3857"
+    )
+    cell_coordinates <- terra::xyFromCell(
+      from,
+      seq_len(terra::ncell(from))
+    )
+    terra::values(from) <- sqrt(rowSums(cell_coordinates^2))
+    names(from) <- "ppt"
+
+    locs <- terra::vect(
+      data.frame(site_id = "s1", x = 0, y = 0),
+      geom = c("x", "y"),
+      crs = "EPSG:3857"
+    )
+    single_buffer <- terra::buffer(locs, width = 1000, quadsegs = 180L)
+    expected <- exactextractr::exact_extract(
+      from,
+      sf::st_as_sf(single_buffer),
+      fun = "mean",
+      force_df = TRUE,
+      progress = FALSE
+    )
+
+    result <- calculate_prism(from, locs, radius = 1000)
+
+    testthat::expect_equal(result$ppt_1000, expected[[1]])
+  }
+)
