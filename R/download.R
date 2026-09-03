@@ -3537,14 +3537,24 @@ download_gridmet <- function(
   }
 
   #### Download files using httr2
-  download_result <- amadeus::download_run_method(
-    urls = all_urls,
-    destfiles = all_destfiles,
-    token = NULL,
-    show_progress = show_progress,
-    max_tries = max_tries,
-    rate_limit = rate_limit
-  )
+  if (length(all_urls) > 0) {
+    download_result <- amadeus::download_run_method(
+      urls = all_urls,
+      destfiles = all_destfiles,
+      token = NULL,
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = rate_limit
+    )
+  } else {
+    message("All files already exist. Nothing to download.\n")
+
+    download_result <- list(
+      success = 0,
+      failed = 0,
+      skipped = length(variables_list) * length(years)
+    )
+  }
 
   if (hash) {
     return(amadeus::download_hash(hash = TRUE, directory_to_save))
