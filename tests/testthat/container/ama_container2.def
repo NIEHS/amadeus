@@ -1,0 +1,100 @@
+Bootstrap: docker
+From: rocker/geospatial:4.4.3
+
+%post
+    # ------------------------------------------------------------
+    # System configuration
+    # ------------------------------------------------------------
+
+    apt-get update
+
+    apt-get install -y --no-install-recommends \
+        locales \
+        fonts-dejavu \
+        fonts-liberation \
+        fonts-noto \
+        fonts-unifont \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        ca-certificates \
+        curl \
+        slurm-client \
+        git-lfs \
+        libarchive-dev \
+        libgit2-dev
+
+    # Configure UTF-8 locale
+    locale-gen en_US.UTF-8
+
+    echo "LANG=en_US.UTF-8" >> /etc/default/locale
+    echo "LC_ALL=en_US.UTF-8" >> /etc/default/locale
+
+    git lfs install --system
+
+    rm -rf /var/lib/apt/lists/
+
+
+    # ------------------------------------------------------------
+    # Create directories
+    # ------------------------------------------------------------
+
+    mkdir -p /pipeline
+    mkdir -p /input
+    mkdir -p /opt/_targets
+
+
+    # ------------------------------------------------------------
+    # Install R packages
+    # ------------------------------------------------------------
+
+    Rscript -e "install.packages('pak', repos='https://cloud.r-project.org')"
+
+    # targets
+    Rscript -e "pak::pkg_install('targets@1.10.0')"
+
+    # Critical packages
+    Rscript -e "install.packages(
+        c('terra', 'archive', 'collapse','exactextractr',
+        'Rdpack'),
+        repos='https://cloud.r-project.org'
+    )"
+
+
+    # Other project packages
+    Rscript -e "install.packages(
+        c(
+            'devtools',
+            'tarchetypes',
+            'testthat',
+            'tidymodels',
+            'bonsai',
+            'qs2',
+            'kernlab',
+            'lightgbm',
+            'lwgeom',
+            'doRNG',
+            'quarto'
+        ),
+        repos='https://cloud.r-project.org'
+    )"
+
+
+    # ------------------------------------------------------------
+    # Verify critical package versions
+    # ------------------------------------------------------------
+
+    Rscript -e "cat('R version:', R.version.string, '\n')"
+
+    Rscript -e "cat(
+        'terra version:',
+        as.character(packageVersion('terra')),
+        '\n'
+    )"
+
+    Rscript -e "stopifnot(
+        packageVersion('terra') >= '1.8.42',
+        requireNamespace('archive', quietly=TRUE),
+        requireNamespace('collapse', quietly=TRUE)
+    )"
+
+    Rscript -e "cat('Critical R packages successfully installed.\n')"

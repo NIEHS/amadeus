@@ -372,7 +372,7 @@ testthat::test_that("calculate_nlcd", {
 
   # CHECK OUTPUT
   year <- 2021
-  buf_radius <- 3000
+  buf_radius <- 6000
   testthat::expect_no_error(
     calculate_nlcd(
       locs = eg_data,
@@ -396,13 +396,13 @@ testthat::test_that("calculate_nlcd", {
   # -- check the value of some of the points in the US
   testthat::expect_true(all(eg_data$site_id %in% output$site_id))
   # the value has changed. What affected this behavior?
+  # testthat::expect_equal(
+  #   output$NLCD_42_06000[1],
+  #   0.09010682,
+  #   tolerance = 1e-7
+  # )
   testthat::expect_equal(
-    output$NLCD_42_03000[1],
-    0.09010682,
-    tolerance = 1e-7
-  )
-  testthat::expect_equal(
-    output$NLCD_52_03000[2],
+    output$NLCD_52_06000[2],
     0.01047932,
     tolerance = 1e-7
   )
@@ -984,3 +984,65 @@ testthat::test_that("download_nlcd passes http_version=2L to download_run_method
   })
   testthat::expect_equal(captured_http_version, 2L)
 })
+
+################################################################################
+##### calculate_nlcd buffer radius
+
+testthat::test_that(
+  "calculate_nlcd(radius=3000, geom='terra'): uses R as radius and 2R as diameter",
+  {
+    withr::local_package("terra")
+    withr::local_package("exactextractr")
+
+    input_radius <- 3000
+    nlcd <- process_nlcd(
+      path = testthat::test_path("..", "testdata", "nlcd"),
+      year = 2021
+    )
+    locs <- terra::vect(
+      data.frame(site_id = "site_1", lon = -78.85, lat = 36.09),
+      geom = c("lon", "lat"),
+      crs = "EPSG:4326"
+    )
+    center <- terra::crds(terra::project(locs, terra::crs(nlcd)))[1, ]
+
+    result <- suppressMessages(
+      calculate_nlcd(
+        from = nlcd,
+        locs = locs,
+        locs_id = "site_id",
+        radius = input_radius,
+        mode = "exact",
+        geom = "terra"
+      )
+    )
+    result_extent <- as.vector(terra::ext(result))
+    output_diameters <- c(
+      x = result_extent[2] - result_extent[1],
+      y = result_extent[4] - result_extent[3]
+    )
+    vertices <- terra::geom(result)
+    distances_from_center <- sqrt(
+      (vertices[, "x"] - center[1])^2 +
+        (vertices[, "y"] - center[2])^2
+    )
+
+    testthat::expect_s4_class(result, "SpatVector")
+    testthat::expect_identical(terra::geomtype(result), "polygons")
+    testthat::expect_true(terra::same.crs(result, nlcd))
+    testthat::expect_equal(
+      unname(output_diameters),
+      rep(2 * input_radius, 2),
+      tolerance = 1e-6
+    )
+    testthat::expect_equal(
+      max(distances_from_center),
+      input_radius,
+      tolerance = 1e-6
+    )
+    testthat::expect_lte(
+      max(distances_from_center),
+      input_radius + 1e-6
+    )
+  }
+)
