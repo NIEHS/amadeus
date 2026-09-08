@@ -4155,9 +4155,9 @@ process_cropscape <-
 #'  lower level HUCs.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
-#' @param ... Arguments passed to `nhdplusTools::get_huc()`
+#' @param ... Arguments passed to `hydrogeofetch::get_huc()`
 #' @return a `SpatVector` object
-#' @seealso [`nhdplusTools::get_huc`]
+#' @seealso [`hydrogeofetch::get_huc`]
 #' @importFrom terra vect
 #' @importFrom terra vector_layers
 #' @importFrom rlang inject
@@ -4201,15 +4201,15 @@ process_huc <-
     # exclude the coverage due to write permission related to memoization
     #nocov start
     if (missing(path) || (!file.exists(path) && !dir.exists(path))) {
-      if (!requireNamespace("nhdplusTools", quietly = TRUE)) {
+      if (!requireNamespace("hydrogeofetch", quietly = TRUE)) {
         stop(
-          "Package 'nhdplusTools' is required when fetching HUC data ",
+          "Package 'hydrogeofetch' is required when fetching HUC data ",
           "remotely. ",
           "Please install it and try again."
         )
       }
       hucpoly <- try(
-        rlang::inject(nhdplusTools::get_huc(!!!list(...)))
+        rlang::inject(hydrogeofetch::get_huc(!!!list(...)))
       )
       if (inherits(hucpoly, "try-error")) {
         stop("HUC data was not found.")
