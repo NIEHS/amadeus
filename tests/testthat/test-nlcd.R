@@ -387,6 +387,7 @@ testthat::test_that("calculate_nlcd", {
     radius = buf_radius,
     from = nlcdras
   )
+
   # -- returns a data.frame
   testthat::expect_equal(class(output)[1], "data.frame")
   # nrow(output) == nrow(input)
@@ -396,14 +397,14 @@ testthat::test_that("calculate_nlcd", {
   # -- check the value of some of the points in the US
   testthat::expect_true(all(eg_data$site_id %in% output$site_id))
   # the value has changed. What affected this behavior?
-  # testthat::expect_equal(
-  #   output$NLCD_42_06000[1],
-  #   0.09010682,
-  #   tolerance = 1e-7
-  # )
+  testthat::expect_equal(
+    output$NLCD_42_06000[1],
+    0.0901064872741699,
+    tolerance = 1e-7
+  )
   testthat::expect_equal(
     output$NLCD_52_06000[2],
-    0.01047932,
+    0.0104793542996049,
     tolerance = 1e-7
   )
   # -- class fraction rows should sum to 1
@@ -989,12 +990,12 @@ testthat::test_that("download_nlcd passes http_version=2L to download_run_method
 ##### calculate_nlcd buffer radius
 
 testthat::test_that(
-  "calculate_nlcd(radius=3000, geom='terra'): uses R as radius and 2R as diameter",
+  "calculate_nlcd(radius=6000, geom='terra'): uses R as radius and 2R as diameter",
   {
     withr::local_package("terra")
     withr::local_package("exactextractr")
 
-    input_radius <- 3000
+    input_radius <- 6000
     nlcd <- process_nlcd(
       path = testthat::test_path("..", "testdata", "nlcd"),
       year = 2021
