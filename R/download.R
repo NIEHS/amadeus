@@ -160,9 +160,9 @@ download_data <-
       edgar = download_edgar,
       improve = download_improve,
       drought = download_drought,
-      spei = download_drought,
-      eddi = download_drought,
-      usdm = download_drought
+      spei = function(...) download_drought(source = "spei", ...),
+      eddi = function(...) download_drought(source = "eddi", ...),
+      usdm = function(...) download_drought(source = "usdm", ...)
     )
 
     call_args <- c(

@@ -31,8 +31,7 @@ testthat::test_that("download_ecoregion returns proper URL list", {
 })
 
 testthat::test_that("download_ecoregion validates URL", {
-  skip_on_cran()
-  skip_if_offline()
+  skip_if_no_live_tests()
 
   withr::with_tempdir({
     result <- suppressWarnings(
@@ -90,8 +89,7 @@ testthat::test_that("download_ecoregion skips existing files", {
 })
 
 testthat::test_that("download_ecoregion (LIVE - small download)", {
-  skip_on_cran()
-  skip_if_offline()
+  skip_if_no_live_tests()
 
   withr::with_tempdir({
     result <- download_ecoregion(
@@ -968,8 +966,7 @@ testthat::test_that("download_ecoregion mock download hash = FALSE", {
 ################################################################################
 ##### Integration test: download -> process -> calculate workflow
 testthat::test_that("download_ecoregion integration (basic)", {
-  skip_on_cran()
-  skip_if_offline()
+  skip_if_no_live_tests()
 
   withr::with_tempdir({
     # Download ecoregion data
@@ -1076,3 +1073,133 @@ testthat::test_that("calculate_ecoregion errors when required field missing from
     "Required ecoregion field missing"
   )
 })
+
+################################################################################
+##### Recommended linked mock workflow
+
+testthat::test_that(
+  "ecoregion linked mock workflow: creates process-ready GPKG and calculates indicators",
+  {
+    withr::local_package("terra")
+
+    fixture <- normalizePath(
+      testthat::test_path(
+        "..",
+        "testdata",
+        "ecoregions",
+        "eco_l3_clip.gpkg"
+      ),
+      mustWork = TRUE
+    )
+    download_directory <- withr::local_tempdir()
+    downloaded_archive <- NULL
+    extracted_gpkg <- NULL
+
+    local_download_mocks(
+      download_run_method = function(urls, destfiles, ...) {
+        testthat::expect_match(
+          urls,
+          "us_eco_l3_state_boundaries\\.zip$"
+        )
+        testthat::expect_identical(
+          basename(destfiles),
+          "us_eco_l3_state_boundaries.zip"
+        )
+        downloaded_archive <<- destfiles
+        dir.create(
+          dirname(destfiles),
+          recursive = TRUE,
+          showWarnings = FALSE
+        )
+        writeBin(charToRaw("mock archive"), destfiles)
+        list(success = 1L, failed = 0L, skipped = 0L)
+      },
+      download_unzip = function(file_name, directory_to_unzip, ...) {
+        testthat::expect_identical(file_name, downloaded_archive)
+        dir.create(
+          directory_to_unzip,
+          recursive = TRUE,
+          showWarnings = FALSE
+        )
+        extracted_gpkg <<- file.path(
+          directory_to_unzip,
+          basename(fixture)
+        )
+        copied <- file.copy(fixture, extracted_gpkg, overwrite = TRUE)
+        testthat::expect_true(copied)
+        invisible(NULL)
+      },
+      download_remove_zips = function(...) invisible(NULL)
+    )
+
+    suppressMessages(download_data(
+      dataset_name = "ecoregion",
+      directory_to_save = download_directory,
+      acknowledgement = TRUE,
+      show_progress = FALSE,
+      rate_limit = 0
+    ))
+
+    testthat::expect_true(file.exists(downloaded_archive))
+    testthat::expect_gt(file.size(downloaded_archive), 0)
+    testthat::expect_true(file.exists(extracted_gpkg))
+    testthat::expect_gt(file.size(extracted_gpkg), 0)
+
+    processed <- suppressMessages(process_covariates(
+      covariate = "ecoregion",
+      path = extracted_gpkg
+    ))
+
+    required_fields <- c(
+      "L2_KEY",
+      "L3_KEY",
+      "NA_L2NAME",
+      "US_L3NAME",
+      "NA_L3NAME",
+      "time"
+    )
+    testthat::expect_s4_class(processed, "SpatVector")
+    testthat::expect_gt(terra::nrow(processed), 0L)
+    testthat::expect_true(all(terra::is.valid(processed)))
+    testthat::expect_true(all(required_fields %in% names(processed)))
+    testthat::expect_true(nzchar(terra::crs(processed)))
+    testthat::expect_false(anyNA(processed$L3_KEY))
+
+    n_locations <- min(3L, terra::nrow(processed))
+    centers <- terra::centroids(processed[seq_len(n_locations), ])
+    coordinates <- terra::crds(centers)
+    locations <- terra::vect(
+      data.frame(
+        site_id = sprintf("site_%02d", seq_len(n_locations)),
+        x = coordinates[, 1L],
+        y = coordinates[, 2L]
+      ),
+      geom = c("x", "y"),
+      crs = terra::crs(processed)
+    )
+
+    result <- suppressMessages(calculate_covariates(
+      covariate = "ecoregion",
+      from = processed,
+      locs = locations,
+      locs_id = "site_id",
+      frac = FALSE,
+      drop = TRUE
+    ))
+
+    indicator_columns <- grep(
+      "^DUM_E[23]",
+      names(result),
+      value = TRUE
+    )
+    testthat::expect_s3_class(result, "data.frame")
+    testthat::expect_equal(nrow(result), n_locations)
+    testthat::expect_identical(result$site_id, locations$site_id)
+    testthat::expect_gt(length(indicator_columns), 0L)
+    testthat::expect_true(all(vapply(
+      result[indicator_columns],
+      function(values) all(values %in% c(0L, 1L), na.rm = TRUE),
+      logical(1)
+    )))
+  }
+)
