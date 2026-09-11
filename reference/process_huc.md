@@ -42,7 +42,7 @@ process_huc(
 - ...:
 
   Arguments passed to
-  [`nhdplusTools::get_huc()`](https://doi-usgs.github.io/nhdplusTools/reference/get_huc.html)
+  [`nhdplusTools::get_huc()`](https://rdrr.io/pkg/nhdplusTools/man/get_huc.html)
 
 ## Value
 
@@ -50,7 +50,7 @@ a `SpatVector` object
 
 ## See also
 
-[`nhdplusTools::get_huc`](https://doi-usgs.github.io/nhdplusTools/reference/get_huc.html)
+[`nhdplusTools::get_huc`](https://rdrr.io/pkg/nhdplusTools/man/get_huc.html)
 
 ## Author
 
