@@ -987,6 +987,43 @@ testthat::test_that("calculate_drought(source=usdm, radius=1000): class proporti
   testthat::expect_equal(result$usdm_dm_0, c(2, 2))
 })
 
+testthat::test_that(
+  "calculate_drought(source=usdm, radius=1000): handles location attributes that collide with USDM fields",
+  {
+    withr::local_package("terra")
+
+    usdm <- process_drought(
+      source = "usdm",
+      path = testdata_usdm,
+      date = c("2020-01-07", "2020-01-14")
+    )
+
+    # A centroid derived from USDM deliberately retains provider fields such
+    # as date and DM. These must not collide with fields during intersection.
+    locs <- terra::centroids(usdm[1L, ])
+    locs$site_id <- "001"
+
+    result <- suppressMessages(calculate_drought(
+      from = usdm,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 1000L
+    ))
+
+    prop_cols <- paste0("usdm_dm_", 0:4, "_1000")
+    testthat::expect_s3_class(result, "data.frame")
+    testthat::expect_equal(nrow(result), 2L)
+    testthat::expect_true(all(prop_cols %in% names(result)))
+    testthat::expect_equal(result$usdm_dm_0, c(2, 2))
+    testthat::expect_equal(result$usdm_dm_2_1000, c(1, 1))
+    testthat::expect_equal(
+      as.numeric(rowSums(result[, prop_cols, drop = FALSE])),
+      c(1, 1),
+      tolerance = 1e-6
+    )
+  }
+)
+
 testthat::test_that("calculate_drought (USDM point outside polygon → NA)", {
   withr::local_package("terra")
 
