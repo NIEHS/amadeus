@@ -3707,6 +3707,17 @@ process_gridmet <- function(
       value = TRUE
     )
   )
+  if (length(data_paths) == 0) {
+    stop(
+      paste0(
+        "No gridMET NetCDF files for variable '",
+        variable_checked,
+        "' and requested year(s) were found in `path`: ",
+        path
+      ),
+      call. = FALSE
+    )
+  }
   #### initiate for loop
   data_full <- terra::rast()
   for (p in seq_along(data_paths)) {
@@ -3734,7 +3745,7 @@ process_gridmet <- function(
 
     if (
       length(existing_time) == terra::nlyr(data_year) &&
-      !all(is.na(existing_time))
+      !anyNA(existing_time)
     ) {
       terra::time(data_year) <- existing_time
     } else {
@@ -3763,17 +3774,27 @@ process_gridmet <- function(
     )
   }
   #### subset years to dates of interest
-  data_return <- terra::subset(
-    data_full,
-    which(
-      substr(
-        names(data_full),
-        nchar(names(data_full)) - 7,
-        nchar(names(data_full))
-      ) %in%
-        date_sequence
-    )
+  selected_layers <- which(
+    substr(
+      names(data_full),
+      nchar(names(data_full)) - 7,
+      nchar(names(data_full))
+    ) %in%
+      date_sequence
   )
+  if (length(selected_layers) == 0) {
+    stop(
+      paste0(
+        "No gridMET layers fall within the requested date range ",
+        date[1],
+        " to ",
+        date[2],
+        "."
+      ),
+      call. = FALSE
+    )
+  }
+  data_return <- terra::subset(data_full, selected_layers)
   message(paste0(
     "Returning daily ",
     variable_checked_long,
