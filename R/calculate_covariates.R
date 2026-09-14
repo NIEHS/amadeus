@@ -4949,8 +4949,16 @@ calculate_drought <- function(
         if (terra::geomtype(sites_buffer) != "polygons") {
           sites_buffer <- terra::buffer(sites_buffer, width = radius)
         }
-        site_index_col <- ".__site_row__"
+        # Use an internal field name that cannot collide with either the
+        # location attributes or the USDM polygon attributes. Retain only
+        # this field before intersecting so same-named user/provider fields
+        # cannot be renamed unpredictably by terra::intersect().
+        site_index_col <- ".amadeus_site_row"
+        while (site_index_col %in% c(names(sites_buffer), names(from_date))) {
+          site_index_col <- paste0(site_index_col, "_")
+        }
         sites_buffer[[site_index_col]] <- seq_len(nrow(sites_buffer))
+        sites_buffer <- sites_buffer[, site_index_col, drop = FALSE]
 
         prop_values <- matrix(
           NA_real_,

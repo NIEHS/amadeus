@@ -1,0 +1,1475 @@
+---
+title: "Reproducible Unit and Mocked Testing"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Reproducible Unit and Mocked Testing}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Scope and objective
+
+This article describes how to make the `amadeus` unit and mocked tests more
+reproducible while retaining the detailed dataset-specific coverage already in
+the package. It focuses on the three public workflow stages:
+
+```text
+download_data()
+    -> process_covariates()
+        -> calculate_covariates()
+```
+
+Live tests are intentionally outside the main scope. A live test contacts the
+real upstream provider and is useful for detecting URL, authentication, and
+file-format changes. A unit or mocked test must instead run without network
+access and must produce the same result from the same repository revision and
+fixture.
+
+The recommended test structure has two CRAN-safe levels:
+
+1. **Unit tests** exercise one function, validation rule, or branch with small
+   controlled inputs.
+2. **Mocked integration tests** exercise several real package functions
+   together while replacing only external network or expensive I/O boundaries.
+
+The ecoregion examples below are derived from `test-download.R`,
+`test-ecoregion.R`, `helper-mocks-download.R`, and the standalone ecoregion
+simulation. The EDGAR tests provide an additional model, particularly the
+fixture factories and parameterized discovery-to-calculation workflow in
+`test-edgar.R`.
+
+# Reproducibility requirements
+
+A reproducible unit or mocked test should satisfy all of the following:
+
+| Requirement | Implementation |
+|---|---|
+| No external network dependency | Mock URL checks and the download runner |
+| Controlled input | Use a small fixture committed under `tests/testdata/` |
+| Isolated filesystem | Use `withr::local_tempdir()` or `withr::with_tempdir()` |
+| Deterministic locations | Use fixed coordinates or deterministic feature/cell selection |
+| Explicit contracts | Check class, dimensions, schema, CRS, IDs, and values |
+| Actionable failure messages | Use typed expectations and `info` where needed |
+| No persistent side effects | Keep routine test artifacts inside temporary directories |
+| Stable test naming | Use `"<fn>(<arg=value>, ...): <expected behavior>"` |
+| Separate performance evidence | Record timings diagnostically; do not use fragile wall-time limits |
+
+The same fixture must always yield the same semantic result. Timestamps and
+temporary paths may vary, but they must not affect calculated covariates.
+
+# Download tests
+
+## Existing patterns
+
+`test-download.R` provides broad coverage of acknowledgement checks, directory
+validation, URL handling, hashes, retries, progress modes, zero-byte files,
+existing files, path handling, and argument forwarding. Dataset files such as
+`test-edgar.R` also test URL construction and error branches.
+
+A typical live-oriented download test has this form:
+
+```{r download-original-live}
+testthat::test_that(
+  "download_ecoregion(show_progress=FALSE, hash=FALSE): downloads archive",
+  {
+    skip_on_cran()
+    skip_if_offline()
+
+    withr::with_tempdir({
+      result <- download_ecoregion(
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = FALSE,
+        show_progress = FALSE,
+        hash = FALSE
+      )
+
+      testthat::expect_null(result)
+      testthat::expect_true(dir.exists("zip_files"))
+      zip_files <- list.files(
+        "zip_files",
+        pattern = "\\.zip$",
+        full.names = TRUE
+      )
+      testthat::expect_gt(length(zip_files), 0L)
+      testthat::expect_true(all(file.size(zip_files) > 0L))
+    })
+  }
+)
+```
+
+This checks real service availability, but its outcome depends on DNS, the
+provider, network speed, and the current remote file. It belongs in a live test,
+not in the routine mocked suite.
+
+A simple mock commonly replaces the external functions with no-ops:
+
+```{r download-original-mock}
+testthat::local_mocked_bindings(
+  check_url_status = function(...) TRUE,
+  download_run_method = function(...) invisible(NULL),
+  download_unzip = function(...) invisible(NULL),
+  download_remove_zips = function(...) invisible(NULL),
+  download_hash = function(hash, directory) {
+    if (isTRUE(hash)) "fakehash" else NULL
+  },
+  .package = "amadeus"
+)
+```
+
+This is deterministic, but a no-op downloader and unzipper do not verify the
+filesystem contract that connects downloading to processing.
+
+## Improvement: preserve download side effects without using the network
+
+The improved mock should replace the network boundary while preserving the
+expected archive and extracted-data layout:
+
+```{r download-improved-mock}
+fixture_path <- testthat::test_path(
+  "..",
+  "testdata",
+  "ecoregions",
+  "eco_l3_clip.gpkg"
+)
+download_root <- withr::local_tempdir()
+
+archive_url <- NULL
+archive_destination <- NULL
+unzip_destination <- NULL
+download_call_count <- 0L
+
+local_download_mocks(
+  download_run_method = function(urls, destfiles, ...) {
+    archive_url <<- urls
+    archive_destination <<- destfiles
+    download_call_count <<- download_call_count + length(urls)
+
+    dir.create(
+      dirname(destfiles),
+      recursive = TRUE,
+      showWarnings = FALSE
+    )
+    writeBin(charToRaw("mock ecoregion archive"), destfiles)
+
+    list(
+      success = length(destfiles),
+      failed = 0L,
+      skipped = 0L
+    )
+  },
+  download_unzip = function(
+    file_name,
+    directory_to_unzip,
+    ...
+  ) {
+    unzip_destination <<- directory_to_unzip
+    dir.create(
+      directory_to_unzip,
+      recursive = TRUE,
+      showWarnings = FALSE
+    )
+
+    copied <- file.copy(
+      fixture_path,
+      file.path(directory_to_unzip, basename(fixture_path)),
+      overwrite = TRUE
+    )
+    if (!all(copied)) {
+      stop("Could not install the ecoregion fixture.", call. = FALSE)
+    }
+
+    invisible(NULL)
+  },
+  download_remove_zips = function(...) invisible(NULL)
+)
+```
+
+Specific changes from the simple mock are:
+
+| Original | Improved | Reason |
+|---|---|---|
+| `function(...) invisible(NULL)` | Capture `urls` and `destfiles` | Make the requested operation observable |
+| Return no download status | Return typed success/failure/skip counts | Preserve the internal function contract |
+| Create no archive | Write a small fake archive at `destfiles` | Validate archive path construction |
+| Unzip is a no-op | Copy a real fixture to `data_files/` | Validate the download-to-process boundary |
+| Assume copying succeeded | Stop when `file.copy()` fails | Prevent false-positive tests |
+| Report a hard-coded count | Increment `download_call_count` | Keep diagnostic counts synchronized with behavior |
+
+The fake archive is deliberately not a valid ZIP. The unzip operation is mocked
+and real archive extraction is tested separately. The extracted GPKG is real,
+because it becomes input to the real process function.
+
+## Improvement: exercise the public download dispatcher
+
+Some dataset tests call `download_ecoregion()` directly. Keep those focused unit
+tests, but add one mocked integration test through the public dispatcher:
+
+```{r download-improved-dispatch}
+testthat::test_that(
+  "download_data(dataset_name=ecoregion): creates archive and extracted fixture",
+  {
+    # Install the side-effect-preserving mocks defined above.
+
+    result <- amadeus::download_data(
+      dataset_name = "ecoregion",
+      directory_to_save = download_root,
+      acknowledgement = TRUE,
+      hash = FALSE,
+      show_progress = FALSE,
+      rate_limit = 0
+    )
+
+    extracted_path <- file.path(
+      unzip_destination,
+      basename(fixture_path)
+    )
+
+    testthat::expect_null(result)
+    testthat::expect_identical(download_call_count, 1L)
+    testthat::expect_match(
+      archive_url,
+      "us_eco_l3_state_boundaries\\.zip$"
+    )
+    testthat::expect_identical(
+      basename(archive_destination),
+      "us_eco_l3_state_boundaries.zip"
+    )
+    testthat::expect_true(file.exists(archive_destination))
+    testthat::expect_gt(file.size(archive_destination), 0L)
+    testthat::expect_true(file.exists(extracted_path))
+    testthat::expect_identical(
+      unname(tools::md5sum(extracted_path)),
+      unname(tools::md5sum(fixture_path))
+    )
+  }
+)
+```
+
+This test adds evidence for all of the following:
+
+- `download_data()` dispatches `"ecoregion"` correctly.
+- Arguments reach the selected dataset function.
+- The correct URL and archive name are constructed.
+- The archive is written to the expected directory.
+- Extraction produces the expected process input.
+- The copied fixture is byte-for-byte identical to the source fixture.
+
+It does not replace unit tests for acknowledgement, invalid paths, hashes,
+existing files, retry behavior, or other datasets.
+
+## Download validation checklist
+
+A dataset-specific mocked download test should check, where applicable:
+
+```{r download-contract}
+testthat::expect_length(urls, expected_file_count)
+testthat::expect_length(destfiles, expected_file_count)
+testthat::expect_true(all(grepl("^https://", urls)))
+testthat::expect_false(anyDuplicated(destfiles) > 0L)
+testthat::expect_true(all(file.exists(destfiles)))
+testthat::expect_true(all(file.size(destfiles) > 0L))
+testthat::expect_true(all(file.exists(extracted_files)))
+```
+
+For parameterized datasets such as EDGAR, also verify that the discovery matrix
+and file matrix agree:
+
+```{r download-edgar-contract}
+testthat::expect_equal(length(discovery$urls), discovery$n_files)
+testthat::expect_equal(length(discovery$destfiles), discovery$n_files)
+testthat::expect_false(anyDuplicated(discovery$destfiles) > 0L)
+```
+
+# Process tests
+
+## Existing pattern
+
+The existing ecoregion process test verifies that the fixture can be read and
+that a nonempty, valid `SpatVector` is returned:
+
+```{r process-original}
+path_eco <- testthat::test_path(
+  "..",
+  "testdata",
+  "ecoregions",
+  "eco_l3_clip.gpkg"
+)
+
+testthat::expect_no_error(
+  eco <- process_ecoregion(path_eco)
+)
+testthat::expect_s4_class(eco, "SpatVector")
+testthat::expect_true(all(terra::is.valid(eco)))
+testthat::expect_gt(terra::nrow(eco), 0L)
+```
+
+These checks are useful, but `expect_no_error()` plus a class check does not
+prove that the output retains the schema, CRS, time information, and data needed
+by calculation.
+
+## Improvement: validate the process contract
+
+```{r process-improved-contract}
+testthat::test_that(
+  "process_covariates(covariate=ecoregion): returns calculation-ready data",
+  {
+    fixture_path <- testthat::test_path(
+      "..",
+      "testdata",
+      "ecoregions",
+      "eco_l3_clip.gpkg"
+    )
+    fixture_hash_before <- unname(tools::md5sum(fixture_path))
+
+    processed <- amadeus::process_covariates(
+      covariate = "ecoregion",
+      path = fixture_path
+    )
+
+    required_fields <- c(
+      "L2_KEY",
+      "L3_KEY",
+      "NA_L2NAME",
+      "US_L3NAME",
+      "NA_L3NAME",
+      "time"
+    )
+    missing_fields <- setdiff(required_fields, names(processed))
+
+    testthat::expect_s4_class(processed, "SpatVector")
+    testthat::expect_gt(terra::nrow(processed), 0L)
+    testthat::expect_true(all(terra::is.valid(processed)))
+    testthat::expect_length(
+      missing_fields,
+      0L,
+      info = paste(
+        "Missing calculation fields:",
+        paste(missing_fields, collapse = ", ")
+      )
+    )
+    testthat::expect_true(nzchar(terra::crs(processed)))
+    testthat::expect_false(anyNA(processed$L3_KEY))
+    testthat::expect_identical(
+      unname(tools::md5sum(fixture_path)),
+      fixture_hash_before,
+      info = "Processing must not modify its source fixture."
+    )
+  }
+)
+```
+
+The specific improvements are:
+
+| Original assertion | Improved assertion | Failure detected |
+|---|---|---|
+| No unexpected error | Typed spatial class | Incorrect return type |
+| Row count is positive | Row count plus key checks | Empty or malformed features |
+| Geometry is valid | Geometry validity plus CRS | Invalid or unreferenced spatial output |
+| No schema check | Required-field contract | Fields dropped or renamed during processing |
+| No input-side-effect check | Fixture hash before and after | Accidental modification of test data |
+
+Do not assert a specific CRS unless the function contract requires one. Instead,
+assert that it is nonempty and, where required, compare it with the documented
+target CRS.
+
+## Improvement: compare wrapper and direct dispatch
+
+At least one test per dataset should verify that the public wrapper selects the
+same implementation as the direct function:
+
+```{r process-dispatch-parity}
+via_wrapper <- amadeus::process_covariates(
+  covariate = "ecoregion",
+  path = fixture_path
+)
+via_direct <- amadeus::process_ecoregion(
+  path = fixture_path
+)
+
+testthat::expect_identical(
+  names(via_wrapper),
+  names(via_direct)
+)
+testthat::expect_equal(
+  terra::nrow(via_wrapper),
+  terra::nrow(via_direct)
+)
+testthat::expect_true(
+  terra::same.crs(via_wrapper, via_direct)
+)
+```
+
+This detects dispatch errors without duplicating every dataset-specific process
+test at the wrapper level.
+
+## Raster process contract
+
+For EDGAR and other raster datasets, use a raster-specific contract:
+
+```{r process-raster-contract}
+processed <- amadeus::process_edgar(path = raster_path)
+
+testthat::expect_s4_class(processed, "SpatRaster")
+testthat::expect_gt(terra::nlyr(processed), 0L)
+testthat::expect_gt(terra::ncell(processed), 0L)
+testthat::expect_true(nzchar(terra::crs(processed)))
+testthat::expect_false(anyDuplicated(names(processed)) > 0L)
+testthat::expect_true(all(grepl("^edgar_", names(processed))))
+testthat::expect_true(any(!is.na(terra::values(processed))))
+```
+
+The existing EDGAR tests already check the `SpatRaster` class, layer count,
+informative names, and parsed time. Adding CRS, duplicate-name, and non-NA-value
+checks would complete the calculation-ready contract.
+
+## Process determinism
+
+For a small fixture, run processing twice and compare semantic properties:
+
+```{r process-determinism}
+processed_first <- amadeus::process_ecoregion(fixture_path)
+processed_second <- amadeus::process_ecoregion(fixture_path)
+
+testthat::expect_identical(
+  names(processed_first),
+  names(processed_second)
+)
+testthat::expect_equal(
+  terra::nrow(processed_first),
+  terra::nrow(processed_second)
+)
+testthat::expect_true(
+  terra::same.crs(processed_first, processed_second)
+)
+testthat::expect_equal(
+  as.data.frame(processed_first),
+  as.data.frame(processed_second)
+)
+```
+
+This catches hidden dependence on row ordering, session state, or nondeterministic
+parallel execution. It should only be used with sufficiently small fixtures.
+
+# Calculate tests
+
+## Existing pattern
+
+The existing ecoregion test uses one hard-coded site and checks specific output
+columns:
+
+```{r calculate-original}
+site_faux <- data.frame(
+  site_id = "37999109988101",
+  lon = -77.576,
+  lat = 39.40,
+  date = as.Date("2022-01-01")
+)
+
+site_faux <- terra::vect(
+  site_faux,
+  geom = c("lon", "lat"),
+  keepgeom = TRUE,
+  crs = "EPSG:4326"
+)
+site_faux <- terra::project(site_faux, "EPSG:5070")
+
+ecor_res <- calculate_ecoregion(
+  from = processed,
+  locs = site_faux,
+  locs_id = "site_id"
+)
+
+testthat::expect_s3_class(ecor_res, "data.frame")
+testthat::expect_equal(
+  colnames(ecor_res)[-(1:2)],
+  c("DUM_E2083_00000", "DUM_E3064_00000")
+)
+```
+
+The exact expected columns are a valuable semantic oracle, but one location does
+not validate row preservation, identifier uniqueness, or behavior across more
+than one ecoregion.
+
+## Improvement: deterministic multi-location probes
+
+```{r calculate-deterministic-locations}
+sample_size <- min(3L, terra::nrow(processed))
+centroids <- terra::centroids(
+  processed[seq_len(sample_size), ]
+)
+coordinates <- terra::crds(centroids)
+
+locations <- terra::vect(
+  data.frame(
+    site_id = sprintf("site_%02d", seq_len(sample_size)),
+    x = coordinates[, 1L],
+    y = coordinates[, 2L]
+  ),
+  geom = c("x", "y"),
+  crs = terra::crs(processed)
+)
+```
+
+This changes the test as follows:
+
+| Original | Improved | Benefit |
+|---|---|---|
+| One manually selected point | Three feature-derived points | Exercises multiple result rows |
+| Manual CRS assignment and projection | Inherit processed CRS | Avoids CRS mismatch in test setup |
+| Coordinate may leave fixture after fixture edits | Centroids remain within selected features | More robust fixture evolution |
+| One site identifier | Stable `site_01`, `site_02`, ... IDs | Enables order and uniqueness checks |
+
+The selection is deterministic; no random-number seed is required.
+
+For raster datasets, select fixed cell centers instead:
+
+```{r calculate-raster-locations}
+probe_cells <- unique(c(
+  1L,
+  ceiling(terra::ncell(processed) / 2),
+  terra::ncell(processed)
+))
+probe_xy <- terra::xyFromCell(processed, probe_cells)
+
+locations <- terra::vect(
+  data.frame(
+    site_id = sprintf("site_%02d", seq_along(probe_cells)),
+    x = probe_xy[, 1L],
+    y = probe_xy[, 2L]
+  ),
+  geom = c("x", "y"),
+  crs = terra::crs(processed)
+)
+```
+
+## Improvement: validate calculation invariants
+
+```{r calculate-improved-contract}
+calculated <- amadeus::calculate_covariates(
+  covariate = "ecoregion",
+  from = processed,
+  locs = locations,
+  locs_id = "site_id",
+  frac = FALSE,
+  drop = TRUE
+)
+
+indicator_names <- grep(
+  "^DUM_E[23]",
+  names(calculated),
+  value = TRUE
+)
+
+testthat::expect_s3_class(calculated, "data.frame")
+testthat::expect_equal(nrow(calculated), sample_size)
+testthat::expect_identical(
+  calculated$site_id,
+  locations$site_id
+)
+testthat::expect_length(
+  unique(calculated$site_id),
+  sample_size
+)
+testthat::expect_gt(length(indicator_names), 0L)
+testthat::expect_true(
+  all(vapply(
+    calculated[indicator_names],
+    function(values) {
+      all(values %in% c(0L, 1L), na.rm = TRUE)
+    },
+    logical(1)
+  ))
+)
+```
+
+These assertions detect:
+
+- Incorrect return class.
+- Missing or duplicated rows.
+- Lost or reordered location identifiers.
+- Missing indicator columns.
+- Invalid indicator values outside the binary domain.
+
+For EDGAR, replace the binary-domain assertion with numeric and nonmissing-value
+contracts:
+
+```{r calculate-edgar-contract}
+value_columns <- setdiff(names(calculated), "site_id")
+
+testthat::expect_s3_class(calculated, "data.frame")
+testthat::expect_identical(calculated$site_id, locations$site_id)
+testthat::expect_gt(length(value_columns), 0L)
+testthat::expect_true(
+  all(vapply(calculated[value_columns], is.numeric, logical(1)))
+)
+testthat::expect_true(
+  any(!is.na(as.matrix(calculated[value_columns])))
+)
+```
+
+Only assert that values are nonnegative if the documented dataset contract
+guarantees nonnegative values.
+
+## Improvement: combine invariants with exact semantic expectations
+
+Dynamic invariant checks should not replace known-answer tests. Keep at least
+one small oracle whose expected classifications or values are explicit:
+
+```{r calculate-known-answer}
+expected_positive_indicators <- list(
+  site_01 = c("DUM_E2083_00000", "DUM_E3045_00000"),
+  site_02 = c("DUM_E2083_00000", "DUM_E3064_00000"),
+  site_03 = c("DUM_E2083_00000", "DUM_E3064_00000")
+)
+
+positive_indicators <- lapply(
+  seq_len(nrow(calculated)),
+  function(row_number) {
+    sort(indicator_names[vapply(
+      indicator_names,
+      function(column_name) {
+        value <- calculated[[column_name]][row_number]
+        !is.na(value) && value > 0
+      },
+      logical(1)
+    )])
+  }
+)
+names(positive_indicators) <- calculated$site_id
+
+testthat::expect_identical(
+  positive_indicators,
+  expected_positive_indicators
+)
+```
+
+The invariant test answers “is the output structurally valid?” The known-answer
+test answers “is the scientific classification still correct?” Both are needed.
+
+## Improvement: wrapper and direct-function parity
+
+```{r calculate-dispatch-parity}
+via_wrapper <- amadeus::calculate_covariates(
+  covariate = "ecoregion",
+  from = processed,
+  locs = locations,
+  locs_id = "site_id",
+  frac = FALSE,
+  drop = TRUE
+)
+
+via_direct <- amadeus::calculate_ecoregion(
+  from = processed,
+  locs = locations,
+  locs_id = "site_id",
+  frac = FALSE,
+  drop = TRUE
+)
+
+testthat::expect_equal(via_wrapper, via_direct)
+```
+
+One parity test is sufficient. Dataset-specific tests should continue to cover
+the full argument matrix directly, including fraction, radius, geometry-return,
+column-naming, missing-location, and invalid-input branches.
+
+# Mocked end-to-end workflow test
+
+After the three stage contracts are tested separately, add one compact mocked
+integration test. The test should reuse the side-effect-preserving download mock
+and keep processing and calculation real:
+
+```{r mocked-workflow}
+testthat::test_that(
+  "ecoregion workflow(n=3): mocked download feeds process and calculate",
+  {
+    download_root <- withr::local_tempdir()
+
+    # Install local_download_mocks() so the fake archive and real fixture are
+    # created under download_root without a network request.
+
+    amadeus::download_data(
+      dataset_name = "ecoregion",
+      directory_to_save = download_root,
+      acknowledgement = TRUE,
+      hash = FALSE,
+      show_progress = FALSE,
+      rate_limit = 0
+    )
+
+    raw_path <- file.path(
+      unzip_destination,
+      basename(fixture_path)
+    )
+    testthat::expect_true(file.exists(raw_path))
+
+    processed <- amadeus::process_covariates(
+      covariate = "ecoregion",
+      path = raw_path
+    )
+    testthat::expect_s4_class(processed, "SpatVector")
+
+    # Construct deterministic locations from processed features.
+    calculated <- amadeus::calculate_covariates(
+      covariate = "ecoregion",
+      from = processed,
+      locs = locations,
+      locs_id = "site_id",
+      frac = FALSE,
+      drop = TRUE
+    )
+
+    testthat::expect_s3_class(calculated, "data.frame")
+    testthat::expect_identical(
+      calculated$site_id,
+      locations$site_id
+    )
+  }
+)
+```
+
+This does not replace the stage-specific tests. Its purpose is to prove that the
+output contract of each stage satisfies the input contract of the next stage.
+
+# Efficiency of the routine test suite
+
+Reproducibility and efficiency reinforce one another. Apply these practices to
+the default test suite:
+
+1. Use small committed fixtures instead of full datasets.
+2. Mock only external boundaries; keep package transformations real.
+3. Process a fixture once per test block and reuse the result for option checks.
+4. Use parameterized case lists rather than duplicating nearly identical setup.
+5. Do not sleep for rate-limit tests; mock the sleep boundary and inspect its
+   requested duration.
+6. Keep actual network and full-data comparisons in `test-<dataset>-live.R`.
+7. Avoid loading `sf`, `terra`, or other large packages in tests that do not use
+   them.
+8. Avoid `expect_no_error()` around calls followed by stronger typed
+   expectations; unexpected errors already fail the test.
+
+The EDGAR discovery matrix is a good parameterized example:
+
+```{r efficient-case-matrix}
+discovery_cases <- list(
+  yearly_sector = list(
+    species = "CO",
+    temp_res = "yearly",
+    sector_yearly = "ENE",
+    year_range = 2021
+  ),
+  monthly_sector = list(
+    species = "SO2",
+    temp_res = "monthly",
+    sector_monthly = "BUILDINGS"
+  ),
+  timeseries = list(
+    species = "NOx",
+    temp_res = "timeseries"
+  )
+)
+```
+
+Each case should be labeled in assertion diagnostics so a failure identifies the
+input combination.
+
+# Performance diagnostics
+
+Timing code measures performance; it does not itself make the package faster.
+Do not place strict elapsed-time assertions in routine unit tests because CI
+hardware, filesystem load, and spatial-library builds vary.
+
+For a standalone reproducibility run, time each stage separately:
+
+```{r performance-diagnostics}
+download_timing <- system.time(
+  amadeus::download_data(...)
+)
+process_timing <- system.time(
+  processed <- amadeus::process_covariates(...)
+)
+calculate_timing <- system.time(
+  calculated <- amadeus::calculate_covariates(...)
+)
+
+performance <- data.frame(
+  stage = c("download", "process", "calculate"),
+  elapsed_seconds = c(
+    unname(download_timing[["elapsed"]]),
+    unname(process_timing[["elapsed"]]),
+    unname(calculate_timing[["elapsed"]])
+  )
+)
+```
+
+Use repeated measurements and medians before drawing performance conclusions:
+
+```{r repeated-performance}
+measure_elapsed <- function(operation, iterations = 5L) {
+  timings <- replicate(
+    iterations,
+    system.time(operation())[["elapsed"]]
+  )
+
+  data.frame(
+    iterations = iterations,
+    minimum = min(timings),
+    median = stats::median(timings),
+    maximum = max(timings)
+  )
+}
+```
+
+Run performance diagnostics outside the routine unit suite, save the raw
+measurements, and compare like-for-like fixtures and environments.
+
+# Reproducibility metadata for standalone runs
+
+Routine tests should leave no persistent files. A standalone simulation or
+benchmark should save enough provenance to reproduce the result:
+
+```{r provenance}
+provenance <- data.frame(
+  field = c(
+    "timestamp_utc",
+    "r_version",
+    "platform",
+    "amadeus_version",
+    "git_commit",
+    "fixture_path",
+    "fixture_md5"
+  ),
+  value = c(
+    format(Sys.time(), tz = "UTC"),
+    R.version.string,
+    R.version$platform,
+    as.character(utils::packageVersion("amadeus")),
+    system2(
+      "git",
+      c("-C", repository, "rev-parse", "HEAD"),
+      stdout = TRUE
+    ),
+    fixture_path,
+    unname(tools::md5sum(fixture_path))
+  )
+)
+```
+
+At minimum, save:
+
+- The Git commit.
+- Whether the worktree contained uncommitted changes.
+- R and package versions.
+- Platform and relevant spatial-library versions.
+- Fixture path and checksum.
+- Exact function arguments.
+- Per-stage timing.
+- Contract results and calculated output.
+
+# Recommended file organization
+
+Use the following division for each dataset:
+
+```text
+tests/testthat/
+|-- helper-fixtures.R
+|-- helper-mocks-download.R
+|-- test-<dataset>.R
+|-- test-<dataset>-download-mock.R
+`-- test-<dataset>-live.R
+```
+
+Responsibilities are:
+
+| File | Responsibility |
+|---|---|
+| `helper-fixtures.R` | Small deterministic input factories and committed-fixture paths |
+| `helper-mocks-download.R` | Reusable network and download-boundary mocks |
+| `test-<dataset>.R` | Process, calculate, validation, and dataset-specific unit tests |
+| `test-<dataset>-download-mock.R` | Network-free download and mocked workflow integration |
+| `test-<dataset>-live.R` | Explicitly gated real-provider integration |
+
+# Adoption checklist
+
+For each dataset, adopt the changes in this order:
+
+1. Identify or create the smallest scientifically representative fixture.
+2. Add typed unit assertions for download discovery and validation.
+3. Add a side-effect-preserving download mock.
+4. Validate process class, dimensions, schema, CRS, validity, names, and time.
+5. Create deterministic point or polygon probes.
+6. Validate calculation class, IDs, row count, names, value domain, and one
+   known-answer result.
+7. Add one public-wrapper parity test per stage.
+8. Add one compact mocked download-to-calculate integration test.
+9. Keep network calls and full datasets out of the routine suite.
+10. Record performance and provenance in a separate diagnostic workflow.
+
+# Ordered implementation and comparison plan
+
+The following plan translates the checklist into concrete edits. Apply one
+change at a time, run the focused tests after each change, and record both test
+time and the additional contracts exercised. A stronger test can perform a few
+more local operations than a no-op test; efficiency must therefore be evaluated
+using reliability and coverage as well as elapsed time.
+
+## Step 1: extend the reusable download helper
+
+**Current code:** `helper-mocks-download.R` returns statuses but leaves download
+and unzip as no-ops:
+
+```{r adoption-helper-before}
+download_run_method = function(...) {
+  list(success = success, failed = failed, skipped = skipped)
+},
+download_unzip = function(...) NULL
+```
+
+**Recommended addition:** retain these fast defaults and add a separate fixture
+installer for tests that need a real download-to-process boundary:
+
+```{r adoption-helper-after}
+local_fixture_download_mocks <- function(
+  fixture_path,
+  downloaded_name = basename(fixture_path),
+  envir = parent.frame()
+) {
+  local_download_mocks(
+    download_run_method = function(urls, destfiles, ...) {
+      vapply(
+        destfiles,
+        function(destination) {
+          dir.create(
+            dirname(destination),
+            recursive = TRUE,
+            showWarnings = FALSE
+          )
+          writeBin(charToRaw("mock archive"), destination)
+          TRUE
+        },
+        logical(1)
+      )
+      list(
+        success = length(destfiles),
+        failed = 0L,
+        skipped = 0L
+      )
+    },
+    download_unzip = function(
+      file_name,
+      directory_to_unzip,
+      ...
+    ) {
+      dir.create(
+        directory_to_unzip,
+        recursive = TRUE,
+        showWarnings = FALSE
+      )
+      copied <- file.copy(
+        fixture_path,
+        file.path(directory_to_unzip, downloaded_name),
+        overwrite = TRUE
+      )
+      if (!all(copied)) {
+        stop("Could not install fixture.", call. = FALSE)
+      }
+      invisible(NULL)
+    },
+    download_remove_zips = function(...) invisible(NULL),
+    envir = envir
+  )
+}
+```
+
+**Expected comparison:** the original helper should remain fastest for narrow
+return-value tests. The fixture helper should additionally create an archive and
+process-ready file. Do not judge this step only by milliseconds; compare the
+number of verified filesystem and stage-boundary contracts.
+
+## Step 2: add one network-free dataset download test
+
+**Current code:** a live ecoregion test calls `download_ecoregion()` and depends
+on the upstream service:
+
+```{r adoption-download-before}
+skip_on_cran()
+skip_if_offline()
+result <- download_ecoregion(
+  directory_to_save = ".",
+  acknowledgement = TRUE,
+  unzip = FALSE,
+  show_progress = FALSE,
+  hash = FALSE
+)
+```
+
+**Recommended addition:** put a focused test in
+`test-ecoregion-download-mock.R`, install the fixture mock, and call the public
+dispatcher:
+
+```{r adoption-download-after}
+testthat::test_that(
+  "download_data(dataset_name=ecoregion): creates process-ready fixture",
+  {
+    output <- withr::local_tempdir()
+    local_fixture_download_mocks(fixture_path)
+
+    result <- amadeus::download_data(
+      dataset_name = "ecoregion",
+      directory_to_save = output,
+      acknowledgement = TRUE,
+      hash = FALSE,
+      show_progress = FALSE,
+      rate_limit = 0
+    )
+
+    archive <- file.path(
+      output,
+      "zip_files",
+      "us_eco_l3_state_boundaries.zip"
+    )
+    extracted <- file.path(
+      output,
+      "data_files",
+      basename(fixture_path)
+    )
+
+    testthat::expect_null(result)
+    testthat::expect_true(file.exists(archive))
+    testthat::expect_gt(file.size(archive), 0L)
+    testthat::expect_true(file.exists(extracted))
+    testthat::expect_identical(
+      unname(tools::md5sum(extracted)),
+      unname(tools::md5sum(fixture_path))
+    )
+  }
+)
+```
+
+**Expected comparison:** the live test validates the provider; the new mocked
+test validates package orchestration. The mocked test should pass offline on
+every routine run. Retain one separately gated live test rather than replacing
+provider validation entirely.
+
+## Step 3: use the smallest representative fixture
+
+**Current approach:** live tests or local scripts may process the complete
+national file.
+
+**Recommended change:** use the committed GPKG for routine tests and document its
+checksum:
+
+```{r adoption-fixture}
+fixture_path <- testthat::test_path(
+  "..",
+  "testdata",
+  "ecoregions",
+  "eco_l3_clip.gpkg"
+)
+fixture_md5 <- unname(tools::md5sum(fixture_path))
+```
+
+**Expected comparison:** record file size, feature count, and processing time for
+the fixture and full file. The fixture should be substantially faster while
+retaining every field and classification used by the unit test. A full-data run
+is diagnostic evidence, not a routine test dependency.
+
+## Step 4: replace minimal process checks with a stage contract
+
+**Current code:**
+
+```{r adoption-process-before}
+testthat::expect_no_error(
+  processed <- process_ecoregion(fixture_path)
+)
+testthat::expect_s4_class(processed, "SpatVector")
+testthat::expect_gt(terra::nrow(processed), 0L)
+```
+
+**Recommended code:**
+
+```{r adoption-process-after}
+processed <- amadeus::process_covariates(
+  covariate = "ecoregion",
+  path = fixture_path
+)
+missing_fields <- setdiff(required_fields, names(processed))
+
+testthat::expect_s4_class(processed, "SpatVector")
+testthat::expect_gt(terra::nrow(processed), 0L)
+testthat::expect_true(all(terra::is.valid(processed)))
+testthat::expect_true(nzchar(terra::crs(processed)))
+testthat::expect_length(missing_fields, 0L)
+testthat::expect_false(anyNA(processed$L3_KEY))
+```
+
+**Expected comparison:** processing time should remain approximately the same,
+because both versions call the process function once. The recommended version
+checks more failure modes and should identify a schema or CRS regression before
+calculation begins.
+
+## Step 5: reuse each processed object
+
+**Inefficient pattern to avoid:**
+
+```{r adoption-reuse-before}
+testthat::expect_s4_class(
+  process_ecoregion(fixture_path),
+  "SpatVector"
+)
+testthat::expect_gt(
+  terra::nrow(process_ecoregion(fixture_path)),
+  0L
+)
+testthat::expect_true(
+  all(terra::is.valid(process_ecoregion(fixture_path)))
+)
+```
+
+**Recommended pattern:**
+
+```{r adoption-reuse-after}
+processed <- process_ecoregion(fixture_path)
+
+testthat::expect_s4_class(processed, "SpatVector")
+testthat::expect_gt(terra::nrow(processed), 0L)
+testthat::expect_true(all(terra::is.valid(processed)))
+
+calc_zero <- calculate_ecoregion(
+  from = processed,
+  locs = locations,
+  radius = 0
+)
+calc_buffer <- calculate_ecoregion(
+  from = processed,
+  locs = locations,
+  radius = 1000
+)
+```
+
+**Expected comparison:** count process calls in addition to timing. The first
+pattern performs three reads and transformations; the recommended pattern
+performs one and reuses the result. Existing tests that already process once and
+reuse the object require no change.
+
+## Step 6: add one linked mocked workflow
+
+**Current separated pattern:** the download mock returns success, while the
+process test independently reads `fixture_path`. Both tests can pass even if the
+download output path is incompatible with processing.
+
+```{r adoption-workflow-before}
+local_download_mocks()
+download_ecoregion(...)
+
+# In a separate test:
+processed <- process_ecoregion(fixture_path)
+```
+
+**Recommended linked pattern:**
+
+```{r adoption-workflow-after}
+local_fixture_download_mocks(fixture_path)
+amadeus::download_data(
+  dataset_name = "ecoregion",
+  directory_to_save = output,
+  acknowledgement = TRUE,
+  rate_limit = 0
+)
+
+raw_path <- file.path(
+  output,
+  "data_files",
+  basename(fixture_path)
+)
+processed <- amadeus::process_covariates(
+  covariate = "ecoregion",
+  path = raw_path
+)
+calculated <- amadeus::calculate_covariates(
+  covariate = "ecoregion",
+  from = processed,
+  locs = locations,
+  locs_id = "site_id",
+  drop = TRUE
+)
+```
+
+**Expected comparison:** the key new metric is
+`download_output_feeds_process = TRUE`. Elapsed time may be slightly higher than
+separated no-op mocks because the recommended test writes and reads a real local
+fixture. It remains independent of the network and provides much stronger
+workflow evidence.
+
+## Step 7: parameterize repeated cases
+
+**Current duplicated pattern:** separate blocks repeat fixture construction,
+processing, and nearly identical assertions for each option.
+
+**Recommended pattern:** use a named case matrix, as in the EDGAR workflow test:
+
+```{r adoption-cases}
+cases <- list(
+  zero_radius = list(radius = 0, suffix = "_0"),
+  buffered = list(radius = 1000, suffix = "_1000")
+)
+
+for (case_name in names(cases)) {
+  current <- cases[[case_name]]
+  result <- calculate_edgar(
+    from = processed,
+    locs = locations,
+    locs_id = "site_id",
+    radius = current$radius
+  )
+  value_names <- setdiff(names(result), "site_id")
+  testthat::expect_true(
+    all(endsWith(value_names, current$suffix)),
+    info = paste("Failed case:", case_name)
+  )
+}
+```
+
+**Expected comparison:** runtime may be similar, but setup duplication and the
+number of repeated process calls should decline. Maintenance becomes safer
+because a new case requires one list entry rather than another full test block.
+
+## Step 8: compare performance outside routine assertions
+
+For a stage-by-stage comparison of the original `test-*.R` blocks with the
+recommended download, process, and calculate tests for ecoregion, drought, and
+CropScape, see
+[Original versus recommended Amadeus tests](original-vs-recommended-test-comparison.md).
+For the ordered implementation checklist, verification gates, commit sequence,
+and pull-request structure, see
+[Incremental testing implementation plan](testing-implementation-plan.md).
+
+**Current behavior:** routine tests usually report only pass, fail, and skip.
+
+**Recommended diagnostic:** measure each strategy repeatedly, save every run,
+and compare medians. Do not repeatedly benchmark a live download.
+
+The repository includes a runnable, network-free comparison script:
+
+```{sh adoption-run-comparison, eval=FALSE}
+Rscript vignettes/scripts/compare-test-strategies.r \
+  . \
+  5 \
+  /tmp/amadeus-test-strategy-comparison
+```
+
+The equivalent named form is less sensitive to argument order:
+
+```{sh adoption-run-comparison-named, eval=FALSE}
+Rscript vignettes/scripts/compare-test-strategies.r \
+  --repository=. \
+  --iterations=5 \
+  --output=/tmp/amadeus-test-strategy-comparison \
+  --dataset=ecoregion,drought,cropscape
+```
+
+`drought` expands to the three distinct specifications `spei`, `eddi`, and
+`usdm`. Use `--dataset=all` for every implemented specification, or select one
+directly, for example `--dataset=spei`. The default remains `ecoregion` for
+backward compatibility.
+
+When the default of five iterations is acceptable, the output directory can be
+the second positional argument:
+
+```{sh adoption-run-comparison-default-iterations, eval=FALSE}
+Rscript vignettes/scripts/compare-test-strategies.r \
+  . \
+  /tmp/amadeus-test-strategy-comparison
+```
+
+It runs two strategies:
+
+| Strategy | Download | Process input | Calculation probes |
+|---|---|---|---|
+| `original_separated` | Successful no-op mock | Fixture prepared independently | Dataset-specific deterministic locations |
+| `recommended_linked` | Process-ready file or extracted fixture | Exact simulated download output | The same dataset-specific calculation contract |
+
+The runner defines a `strategy_specs` registry. Each entry supplies only the
+parts that vary by source: download arguments, fixture installation, process
+input discovery, processing contracts, calculation locations, and calculation
+contracts. Timing, repetition, mock setup, summaries, and report writing occur
+once in the shared runner. Adding another source therefore requires one new
+specification rather than a copy of the benchmarking script.
+
+| Specification | Simulated download output | Real processed object | Main calculation contract |
+|---|---|---|---|
+| `ecoregion` | ZIP plus extracted GPKG | `SpatVector` | Binary ecoregion indicators and preserved IDs |
+| `spei` | `spei01.nc` | Three-layer `SpatRaster` | Three dated rows per location and `spei_01_0` |
+| `eddi` | Dated ASCII grid | One-layer `SpatRaster` | Correct filename-derived date and `eddi_01_0` |
+| `usdm` | Two ZIPs plus complete shapefile bundles | Two-date `SpatVector` | Drought class plus bounded 1,000 m proportions summing to one |
+| `cropscape` | `tar.gz` plus extracted TIFF | Classified `SpatRaster` | Bounded 300 m class fractions summing to one |
+
+The active `test-cropscape.R` implements the CropScape specification for both
+GMU and USDA archive layouts. Its focused tests additionally cover exact year
+metadata, raster values and CRS, zero-radius crop classes, `sf` geometry,
+location-ID preservation, and nonmissing 300 m fractions.
+
+The USDM specification deliberately constructs locations from USDM polygon
+centroids. Such locations retain source attributes named `DM`, `date`, and
+`source`, which previously collided with identically named fields during
+`terra::intersect()`. The package now reduces the buffered location object to a
+stable internal row identifier before intersection. This keeps site-to-result
+mapping while ensuring that `DM` always refers to the authoritative drought
+polygon. The regression test verifies both dates, the dominant class, five
+proportion columns, bounded values, and row sums of one.
+
+The `recommended_linked` strategy is the **linked simulation**. Simulation does
+not mean that the whole workflow is fake. Only external boundaries are replaced;
+the package workflow remains real:
+
+| Component | Mode | What the code does | Produced evidence |
+|---|---|---|---|
+| `check_url_status()` | Simulated | Returns `TRUE` without contacting the provider | No network dependency |
+| `check_destfile()` | Simulated | Returns `TRUE` so the download branch runs | Predictable branch selection |
+| `download_run_method()` | Simulated | Writes a small archive or process-ready raster | Dataset-specific local download artifact |
+| `download_unzip()` / `archive_extract()` | Simulated | Installs a committed GPKG, TIFF, or shapefile bundle | Process-ready extracted files |
+| `download_remove_zips()` | Simulated | Does nothing | Archive remains inspectable |
+| `download_data()` | Real | Dispatches to the selected source downloader | Wrapper and alias coverage |
+| Source `download_*()` | Real | Builds URLs, destinations, and directories | Real download orchestration |
+| `process_covariates()` | Real | Dispatches to the selected source processor | Wrapper and alias coverage |
+| Source `process_*()` | Real | Reads and transforms the installed fixture | Real `SpatVector` or `SpatRaster` output |
+| `calculate_covariates()` | Real | Dispatches to calculation | Wrapper coverage |
+| Source `calculate_*()` | Real | Extracts deterministic locations | Real covariate rows and semantic values |
+| Contract checks | Real | Checks files, schema, CRS, IDs, and values | Pass rates and contract counts |
+
+The efficiency gain comes from replacing remote and large-data operations, not
+from replacing the scientific transformations being tested.
+
+It writes:
+
+- `strategy-comparison-report.txt`: a formatted plain-text report with run
+  metadata, a compact summary, key findings, failures, per-iteration results,
+  the simulation boundary, and interpretation guidance.
+- `strategy-comparison-runs.csv`: every measured iteration.
+- `strategy-comparison-summary.csv`: median/minimum/maximum time, pass rate,
+  artifact creation, workflow linkage, and contract counts.
+- `simulation-component-map.csv`: a machine-readable list of what was simulated,
+  what remained real, and the evidence produced by each block.
+
+## Producing retained simulation outputs
+
+The strategy-comparison runner uses temporary directories for each iteration so
+repeated measurements do not reuse files from earlier runs. It retains the
+reports and metrics, but removes the per-iteration fake archives and extracted
+fixtures when each iteration finishes.
+
+Use `SimulateDownloadProcessCalculate.r` when the intermediate workflow files
+and calculated covariates must also be retained. From the `amadeus` repository,
+run a simulation without a full-data comparison as follows:
+
+```{sh adoption-run-retained-simulation, eval=FALSE}
+Rscript ../SimulateDownloadProcessCalculate.r \
+  . \
+  "" \
+  /tmp/ecoregion-simulation-results
+```
+
+To compare the simulated fixture with a full downloaded ecoregion file:
+
+```{sh adoption-run-retained-comparison, eval=FALSE}
+Rscript ../SimulateDownloadProcessCalculate.r \
+  . \
+  /path/to/us_eco_l3_state_boundaries.shp \
+  /tmp/ecoregion-simulation-results
+```
+
+Each run creates a timestamped directory containing:
+
+| Output | Code block that produces it | Purpose |
+|---|---|---|
+| `simulated-download/zip_files/*.zip` | Simulated `download_run_method()` | Confirms archive destination behavior |
+| `simulated-download/data_files/eco_l3_clip.gpkg` | Simulated `download_unzip()` | Provides real input to processing |
+| `simulation-test-report.txt` | `SummaryReporter` plus `writeLines()` | Retains assertion status and process messages |
+| `simulation-summary.csv` | `simulation_summary` plus `write.csv()` | Records requests, files, features, locations, rows, and columns |
+| `simulation-covariates.csv` | Calculated result plus `write.csv()` | Retains the actual scientific output |
+| `performance.csv` | Three `system.time()` blocks | Separates download, process, and calculate time |
+| `comparison-summary.csv` | Simulated and actual summary block | Compares scale and output dimensions |
+| `probe-comparison.csv` | Positive-indicator comparison block | Compares classifications at identical locations |
+| `contract-checks.csv` | Schema, geometry, CRS, row, and classification checks | Identifies the exact failed contract |
+| `comparison-report.txt` | Comparison status plus `writeLines()` | Provides a readable simulated-versus-actual conclusion |
+
+The two scripts answer different questions:
+
+| Script | Comparison | Files retained |
+|---|---|---|
+| `compare-test-strategies.r` | Original separated tests versus linked simulation | Text report, summary CSV, run CSV, component map |
+| `SimulateDownloadProcessCalculate.r` | Simulated fixture workflow versus optional full-data workflow | Archive, extracted fixture, covariates, timings, contracts, reports |
+
+The simulation blocks improve test efficiency in the following specific ways:
+
+1. `check_url_status = function(...) TRUE` removes URL requests and retry time.
+2. `check_destfile = function(...) TRUE` makes branch selection deterministic.
+3. The simulated `download_run_method()` writes only a few bytes instead of
+   transferring a large archive.
+4. The simulated `download_unzip()` copies a small committed fixture instead of
+   extracting the complete national dataset.
+5. The real `process_ecoregion()` processes 23 fixture features while still
+   exercising geometry, CRS, schema, and time handling.
+6. Deterministic centroids limit calculation to three known locations.
+7. Stage-specific timers show whether remaining cost is in local download
+   setup, spatial processing, or calculation.
+8. The optional full-data comparison verifies that the faster fixture workflow
+   preserves the classifications needed for scientific confidence.
+
+Thus, the simulation is not merely a fake successful return. It replaces costly
+external operations with controlled artifacts and then passes those artifacts
+through the real processing and calculation implementations.
+
+The runner performs one unmeasured warm-up for each dataset and strategy and
+alternates strategy order across measured iterations. This reduces systematic bias from
+package initialization and filesystem caching, although it is still a
+diagnostic comparison rather than a formal microbenchmark.
+
+Interpret the output using this matrix:
+
+| Field | Expected interpretation |
+|---|---|
+| `pass_rate` | `1` for both strategies across repeated runs |
+| `downloaded_artifacts_created` | `TRUE` for the recommended strategy |
+| `process_input_created` | `TRUE` for both; only the recommended input comes from download |
+| `download_output_feeds_process` | `TRUE` for the recommended strategy |
+| `process_contracts` | More explicit contracts in the recommended strategy |
+| `calculate_contracts` | More explicit contracts in the recommended strategy |
+| `median_elapsed_seconds` | Low and stable; interpret with added coverage |
+
+A significant improvement does not require the recommended no-network test to
+beat the no-op mock by elapsed time. The practical success criteria are:
+
+1. It remains fast enough for routine CI.
+2. It passes consistently without a network connection.
+3. It produces the archive and extracted-file layout expected by users.
+4. Its downloaded output is the actual input passed to processing.
+5. It checks more process and calculate contracts.
+6. It produces identical semantic results over repeated runs.
+
+Do not compare a five-iteration mocked median with one live download and call the
+difference a package runtime improvement. Report it as a test-suite reliability
+and efficiency improvement. Runtime optimization of `download_*()` or
+`process_*()` requires a separate, like-for-like benchmark of the implementation.
+
+The result is a test suite with three complementary forms of evidence:
+
+```text
+unit contracts
+    + mocked cross-stage workflow
+        + separately gated live-provider checks
+```
+
+Unit contracts identify the function that failed. The mocked workflow identifies
+incompatible stage boundaries. Live tests, maintained separately, identify
+changes in external services.
