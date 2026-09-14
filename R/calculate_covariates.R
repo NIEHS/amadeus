@@ -677,7 +677,8 @@ calculate_nlcd <- function(
     }
   } else {
     # create circle buffers with buf_radius
-    bufs_pol <- terra::buffer(data_vect_b, width = radius)
+    #bufs_pol <- terra::buffer(data_vect_b, width = radius)
+    bufs_pol <- data_vect_b
     if (mode == "terra") {
       # terra mode
       # class_query <- "names"
@@ -4098,12 +4099,7 @@ calculate_prism <- function(
     sites_extracted <- sites_extracted[, -1, drop = FALSE]
   } else {
     # use exactextractr::exact_extract for polygon locations and buffered points
-    sites_e_sf <- sf::st_as_sf(sites_e)
-    sites_e_buf <- if (radius > 0) {
-      sf::st_buffer(sites_e_sf, dist = radius)
-    } else {
-      sites_e_sf
-    }
+    sites_e_buf <- sf::st_as_sf(sites_e)
     extract_args <- c(
       list(
         x = from,
@@ -4471,12 +4467,7 @@ calculate_cropscape <- function(
     # rename
     colnames(sites_extracted) <- paste0("cropscape_", radius)
   } else {
-    sites_e_sf <- sf::st_as_sf(sites_e)
-    sites_e_buf <- if (radius > 0) {
-      sf::st_buffer(sites_e_sf, dist = radius)
-    } else {
-      sites_e_sf
-    }
+    sites_e_buf <- sf::st_as_sf(sites_e)
 
     # fractions
     extract_args <- c(
