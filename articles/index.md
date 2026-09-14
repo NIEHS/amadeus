@@ -2,6 +2,8 @@
 
 ### Articles
 
+- [Reproducible Unit and Mocked
+  Testing](https://niehs.github.io/amadeus/articles/testing.md):
 - [download_data
   Function](https://niehs.github.io/amadeus/articles/download_functions.md):
 - [Time grouping in calculate\_\*

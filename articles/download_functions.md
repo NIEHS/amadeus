@@ -3,6 +3,9 @@
 ``` r
 
 library(amadeus)
+#> Registered S3 method overwritten by 'stars':
+#>   method                  from
+#>   st_interpolate_aw.stars sf
 ```
 
 ## Motivation
@@ -689,6 +692,6 @@ download_hms
 #>         return(invisible(download_result))
 #>     }
 #> }
-#> <bytecode: 0x5652650a2ae0>
+#> <bytecode: 0x55e13f2a5aa0>
 #> <environment: namespace:amadeus>
 ```
