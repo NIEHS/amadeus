@@ -515,6 +515,12 @@ calculate_koppen_geiger <-
 #'   or `"terra"` (using [`terra::freq()`]). Ignored if `locs` are points.
 #' @param radius numeric (non-negative) giving the
 #' radius of buffer around points.
+#' @param class_names character(1). Column naming scheme for land-cover
+#' classes. Use `"code"` (default) for NLCD numeric class values or `"mrlc"`
+#' for standardized MRLC class names. For the Land Cover Change product,
+#' four-digit change codes are named as
+#' `"<from_class>_to_<to_class>"`; unchanged two-digit classes retain their
+#' standard MRLC names.
 #' @param drop logical(1). Default `FALSE`. For buffered outputs (`radius > 0`),
 #'   retain NLCD class columns even when all values are 0 (`drop = FALSE`) or
 #'   remove class columns that are all 0 across all locations (`drop = TRUE`).
@@ -566,6 +572,7 @@ calculate_nlcd <- function(
   locs_id = "site_id",
   mode = c("exact", "terra"),
   radius = 1000,
+  class_names = c("code", "mrlc"),
   drop = FALSE,
   weights = NULL,
   max_cells = 5e7,
@@ -575,6 +582,7 @@ calculate_nlcd <- function(
   amadeus::check_unsupported_by(..., .call = sys.call())
   # check inputs
   mode <- match.arg(mode)
+  class_names <- match.arg(class_names)
   if (!is.numeric(radius)) {
     stop("radius is not a numeric.")
   }
@@ -791,6 +799,9 @@ calculate_nlcd <- function(
         },
         character(1)
       )
+      if (class_names == "mrlc") {
+        nlcd_codes <- format_nlcd_mrlc_classes(nlcd_codes)
+      }
       names(new_data_core)[match(value_cols, names(new_data_core))] <- sprintf(
         "NLCD_%s_%05d",
         nlcd_codes,
@@ -828,7 +839,7 @@ calculate_nlcd <- function(
       fixed_cols <- c(locs_id, "geometry", "time")
     }
     nlcd_cols <- grep(
-      "^NLCD_[0-9]+_[0-9]{5}$",
+      "^NLCD_.+_[0-9]{5}$",
       names(new_data_vect),
       value = TRUE
     )
@@ -2754,6 +2765,15 @@ calculate_hms <- function(
       }
     }
 
+    # remove unmatched extraction placeholders before aggregating
+    if (nrow(sites_extracted_layer) > 0) {
+      sites_extracted_layer <- sites_extracted_layer[
+        !is.na(sites_extracted_layer$Date) &
+          !is.na(sites_extracted_layer$Density),
+        ,
+        drop = FALSE
+      ]
+    }
     # remove duplicates and aggregate by site/date/density
     if (nrow(sites_extracted_layer) > 0) {
       sites_extracted_layer <- unique(
@@ -4949,16 +4969,8 @@ calculate_drought <- function(
         if (terra::geomtype(sites_buffer) != "polygons") {
           sites_buffer <- terra::buffer(sites_buffer, width = radius)
         }
-        # Use an internal field name that cannot collide with either the
-        # location attributes or the USDM polygon attributes. Retain only
-        # this field before intersecting so same-named user/provider fields
-        # cannot be renamed unpredictably by terra::intersect().
-        site_index_col <- ".amadeus_site_row"
-        while (site_index_col %in% c(names(sites_buffer), names(from_date))) {
-          site_index_col <- paste0(site_index_col, "_")
-        }
+        site_index_col <- ".__site_row__"
         sites_buffer[[site_index_col]] <- seq_len(nrow(sites_buffer))
-        sites_buffer <- sites_buffer[, site_index_col, drop = FALSE]
 
         prop_values <- matrix(
           NA_real_,

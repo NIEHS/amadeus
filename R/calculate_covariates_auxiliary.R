@@ -1812,3 +1812,40 @@ collapse_nlcd <- function(
 
   return(data_filled)
 }
+
+#' Format NLCD class codes using MRLC class names
+#' @param codes character. NLCD class codes. Four-digit Land Cover Change
+#'   values are interpreted as concatenated from/to class codes.
+#' @return A character vector of filesystem-safe MRLC class names.
+#' @noRd
+format_nlcd_mrlc_classes <- function(codes) {
+  nlcd_classes <- utils::read.csv(
+    system.file("extdata", "nlcd_classes.csv", package = "amadeus"),
+    stringsAsFactors = FALSE
+  )
+  class_lookup <- stats::setNames(nlcd_classes$names, nlcd_classes$value)
+
+  formatted <- vapply(
+    codes,
+    function(code) {
+      if (grepl("^[0-9]{4}$", code)) {
+        from_name <- unname(class_lookup[substr(code, 1L, 2L)])
+        to_name <- unname(class_lookup[substr(code, 3L, 4L)])
+        if (!is.na(from_name) && !is.na(to_name)) {
+          return(paste(from_name, "to", to_name, sep = "_"))
+        }
+      }
+
+      class_name <- unname(class_lookup[code])
+      if (is.na(class_name)) {
+        paste0("Unknown_", code)
+      } else {
+        class_name
+      }
+    },
+    character(1)
+  )
+
+  formatted <- gsub("[^[:alnum:]]+", "_", formatted)
+  gsub("(^_+|_+$)", "", formatted)
+}

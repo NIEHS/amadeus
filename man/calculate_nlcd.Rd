@@ -10,6 +10,7 @@ calculate_nlcd(
   locs_id = "site_id",
   mode = c("exact", "terra"),
   radius = 1000,
+  class_names = c("code", "mrlc"),
   drop = FALSE,
   weights = NULL,
   max_cells = 5e+07,
@@ -30,6 +31,13 @@ or \code{"terra"} (using \code{\link[terra:freq]{terra::freq()}}). Ignored if \c
 
 \item{radius}{numeric (non-negative) giving the
 radius of buffer around points.}
+
+\item{class_names}{character(1). Column naming scheme for land-cover
+classes. Use \code{"code"} (default) for NLCD numeric class values or \code{"mrlc"}
+for standardized MRLC class names. For the Land Cover Change product,
+four-digit change codes are named as
+\code{"<from_class>_to_<to_class>"}; unchanged two-digit classes retain their
+standard MRLC names.}
 
 \item{drop}{logical(1). Default \code{FALSE}. For buffered outputs (\code{radius > 0}),
 retain NLCD class columns even when all values are 0 (\code{drop = FALSE}) or
