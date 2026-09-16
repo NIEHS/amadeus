@@ -45,7 +45,7 @@ Each wrapper delegates to source-specific functions (e.g.,
 - **Land use**: NLCD, MODIS, Cropscape (CDL), Ecoregions
 - **Emissions/Air quality**: EPA AQS, NEI, EDGAR, HMS smoke, Open
   Landmap
-- **Hydrology**: HUC (via nhdplusTools), GEO-roads
+- **Hydrology**: HUC (via hydrogeofetch), GEO-roads
 - **Elevation**: GMTED2010
 - **Population**: NASA SEDAC
 - **Climate zones**: Köppen-Geiger
@@ -169,7 +169,7 @@ release, oldrel-1) via `.github/workflows/check-standard.yaml`. Requires
 | `data.table`                 | Fast tabular operations            |
 | `httr2`                      | HTTP downloads with retry/throttle |
 | `rvest`                      | Web scraping for URL discovery     |
-| `nhdplusTools`               | HUC delineation                    |
+| `hydrogeofetch`              | HUC delineation                    |
 | `dplyr`, `tidyr`, `collapse` | Data manipulation                  |
 | `Rdpack`                     | Documentation macros               |
 
