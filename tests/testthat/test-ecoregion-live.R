@@ -3,6 +3,20 @@
 ################################################################################
 
 testthat::test_that(
+  "download_ecoregion(download=FALSE): provider URL is accessible",
+  {
+    skip_if_no_live_tests()
+    dir <- withr::local_tempdir()
+    result <- suppressWarnings(amadeus::download_ecoregion(
+      directory_to_save = dir,
+      acknowledgement = TRUE,
+      download = FALSE
+    ))
+    testthat::expect_true(amadeus::check_url_status(result$urls))
+  }
+)
+
+testthat::test_that(
   paste0(
     "download_ecoregion(unzip=FALSE): ",
     "downloads non-empty zip"
