@@ -491,7 +491,7 @@ process_gridmet_codes <-
       name_code <- names_codes[names_codes[, 1] == tolower(string), ]
       return(name_code[2])
     } else if (invert == TRUE) {
-      name_code <- names_codes[names_codes[, 2] == tolower(string), ]
+      name_code <- names_codes[tolower(names_codes[, 2]) == tolower(string), ]
       return(name_code[1])
     }
   }
@@ -576,8 +576,13 @@ process_variable_codes <-
       code_function <- process_terraclimate_codes
     }
     names_codes <- do.call(code_function, list(string = "all"))
-    if (all(variables %in% names_codes[, 2]) == TRUE) {
-      return(variables)
+    variables <- as.character(variables)
+    code_matches <- match(
+      tolower(variables),
+      tolower(names_codes[, 2])
+    )
+    if (all(!is.na(code_matches))) {
+      return(tolower(names_codes[code_matches, 2]))
     } else {
       if (all(tolower(variables) %in% names_codes[, 1]) == TRUE) {
         codes_return <- lapply(
@@ -586,7 +591,7 @@ process_variable_codes <-
             do.call(code_function, list(var, invert = FALSE))
           }
         )
-        return(as.vector(unlist(codes_return)))
+        return(tolower(as.vector(unlist(codes_return))))
       } else {
         stop(
           paste0(
