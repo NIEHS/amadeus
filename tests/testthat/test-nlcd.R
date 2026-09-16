@@ -1047,3 +1047,56 @@ testthat::test_that(
     )
   }
 )
+
+testthat::test_that(
+  "calculate_nlcd(class_names='code'/'mrlc'): returns equivalent named classes",
+  {
+    withr::local_package("terra")
+    withr::local_package("exactextractr")
+    withr::local_options(list(sf_use_s2 = FALSE))
+
+    nlcd <- process_nlcd(
+      path = testthat::test_path("..", "testdata", "nlcd"),
+      year = 2021
+    )
+    locs <- terra::vect(
+      data.frame(
+        site_id = 1:2,
+        lon = c(-78.85, -78.73),
+        lat = c(36.09, 35.96)
+      ),
+      geom = c("lon", "lat"),
+      crs = "EPSG:4326"
+    )
+
+    output_code <- calculate_nlcd(
+      from = nlcd,
+      locs = locs,
+      radius = 6000,
+      class_names = "code"
+    )
+    output_mrlc <- calculate_nlcd(
+      from = nlcd,
+      locs = locs,
+      radius = 6000,
+      class_names = "mrlc"
+    )
+
+    code_cols <- grep("^NLCD_", names(output_code), value = TRUE)
+    mrlc_cols <- grep("^NLCD_", names(output_mrlc), value = TRUE)
+
+    testthat::expect_match(code_cols, "^NLCD_[0-9]+_06000$")
+    testthat::expect_contains(
+      mrlc_cols,
+      c(
+        "NLCD_Evergreen_Forest_06000",
+        "NLCD_Shrub_Scrub_06000"
+      )
+    )
+    testthat::expect_equal(length(mrlc_cols), length(code_cols))
+    testthat::expect_equal(
+    unname(as.matrix(output_mrlc[mrlc_cols])),
+    unname(as.matrix(output_code[code_cols]))
+)
+  }
+)
