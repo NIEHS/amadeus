@@ -10,7 +10,7 @@
 
 `amadeus` is **a** **m**ech**a**nism for **d**ata, **e**nvironments, and **u**ser **s**etup for common environmental and weather datasets in R. `amadeus` has been developed to improve access to and utility with large scale, publicly available environmental data in R.
 
-See the peer-reviewed publication, [Amadeus: Accessing and analyzing large scale environmental data in R](https://www.sciencedirect.com/science/article/pii/S1364815225000362), for full description and details.
+See the peer-reviewed publication, [Amadeus: Accessing and analyzing large scale environmental data in R](https://doi.org/10.1016/j.envsoft.2025.106352), for full description and details.
 
 Cite `amadeus` as:
 > Manware, M., Song, I., Marques, E. S., Kassien, M. A., Clark, L. P., & Messier, K. P. (2025). Amadeus: Accessing and analyzing large scale environmental data in R. Environmental Modelling & Software, 186, 106352.
@@ -215,8 +215,8 @@ The following R packages can also be used to access environmental and weather da
 | Package | Source |
 | :--- | :----- |
 | [`dataRetrieval`](https://cran.r-project.org/package=dataRetrieval) | [USGS Hydrological Data](https://www.usgs.gov/mission-areas/water-resources/data) and [EPA Water Quality Data](https://www.epa.gov/waterdata/water-quality-data) |
-| [`daymetr`](https://cran.r-project.org/package=daymetr) | [Daymet](https://daac.ornl.gov/cgi-bin/dataset_lister.pl?p=32) |
-| [`ecmwfr`](https://cran.r-project.org/package=ecmwfr) | [ECMWF Reanalysis v5 (ERA5)](https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5) |
+| [`daymetr`](https://cran.r-project.org/package=daymetr) | [Daymet](https://www.earthdata.nasa.gov/data/projects/daymet) |
+| [`ecmwfr`](https://cran.r-project.org/package=ecmwfr) | [ECMWF Reanalysis v5 (ERA5)](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=overview) |
 | [`rNOMADS`](https://cran.r-project.org/package=rNOMADS) | [NOAA Operational Model Archive and Distribution System](https://nomads.ncep.noaa.gov/) |
 | [`sen2r`[^8]](https://github.com/ranghetti/sen2r) | [Sentinel-2](https://sentiwiki.copernicus.eu/web/s2-mission) |
 | [`eddi`](https://github.com/earthlab/eddi) | [EDDI](https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/) |
