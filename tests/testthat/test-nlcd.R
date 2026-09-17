@@ -1100,3 +1100,67 @@ testthat::test_that(
 )
   }
 )
+
+testthat::test_that(
+  "format_nlcd_mrlc_classes(product='ImpDsc'): uses descriptor class names",
+  {
+    testthat::expect_equal(
+      format_nlcd_mrlc_classes(
+        c("0", "1", "2", "250"),
+        product = "ImpDsc"
+      ),
+      c("Non_Urban", "Roads", "Urban", "NoData")
+    )
+  }
+)
+
+testthat::test_that(
+  "get_nlcd_product(Product='ImpDsc'): identifies descriptor metadata",
+  {
+    withr::local_package("terra")
+    nlcd <- terra::rast(nrows = 1, ncols = 1)
+    terra::metags(nlcd) <- c("Year=2020", "Product=ImpDsc")
+
+    testthat::expect_equal(get_nlcd_product(nlcd), "ImpDsc")
+  }
+)
+
+testthat::test_that(
+  "calculate_nlcd(class_names='mrlc', product='ImpDsc'): names descriptor classes",
+  {
+    withr::local_package("terra")
+    nlcd <- terra::rast(
+      nrows = 1,
+      ncols = 3,
+      xmin = 0,
+      xmax = 300,
+      ymin = 0,
+      ymax = 100,
+      crs = "EPSG:3857"
+    )
+    terra::values(nlcd) <- 0:2
+    terra::metags(nlcd) <- c("Year=2020", "Product=ImpDsc")
+    locs <- terra::vect(
+      data.frame(site_id = "site_1", x = 150, y = 50),
+      geom = c("x", "y"),
+      crs = "EPSG:3857"
+    )
+
+    output <- calculate_nlcd(
+      from = nlcd,
+      locs = locs,
+      radius = 300,
+      mode = "terra",
+      class_names = "mrlc"
+    )
+
+    testthat::expect_contains(
+      names(output),
+      c(
+        "NLCD_Non_Urban_00300",
+        "NLCD_Roads_00300",
+        "NLCD_Urban_00300"
+      )
+    )
+  }
+)

@@ -627,7 +627,12 @@ calculate_nlcd <- function(
       )
     )
   }
-  year <- as.integer(terra::metags(from)$value[nrow(terra::metags(from))])
+  nlcd_metadata <- terra::metags(from)
+  year_index <- which(tolower(nlcd_metadata$name) == "year")
+  if (length(year_index) == 0L) {
+    year_index <- nrow(nlcd_metadata)
+  }
+  year <- as.integer(nlcd_metadata$value[year_index[1]])
   stopifnot(year %in% 1985:2024L)
 
   # select points within mainland US and reproject on nlcd crs if necessary
@@ -800,7 +805,10 @@ calculate_nlcd <- function(
         character(1)
       )
       if (class_names == "mrlc") {
-        nlcd_codes <- format_nlcd_mrlc_classes(nlcd_codes)
+        nlcd_codes <- format_nlcd_mrlc_classes(
+          nlcd_codes,
+          product = get_nlcd_product(from)
+        )
       }
       names(new_data_core)[match(value_cols, names(new_data_core))] <- sprintf(
         "NLCD_%s_%05d",

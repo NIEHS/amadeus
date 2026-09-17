@@ -1816,11 +1816,17 @@ collapse_nlcd <- function(
 #' Format NLCD class codes using MRLC class names
 #' @param codes character. NLCD class codes. Four-digit Land Cover Change
 #'   values are interpreted as concatenated from/to class codes.
+#' @param product character(1). Annual NLCD product code.
 #' @return A character vector of filesystem-safe MRLC class names.
 #' @noRd
-format_nlcd_mrlc_classes <- function(codes) {
+format_nlcd_mrlc_classes <- function(codes, product = "LndCov") {
+  lookup_file <- switch(
+    product,
+    "ImpDsc" = "Impervious_Descriptor.csv",
+    "nlcd_classes.csv"
+  )
   nlcd_classes <- utils::read.csv(
-    system.file("extdata", "nlcd_classes.csv", package = "amadeus"),
+    system.file("extdata", lookup_file, package = "amadeus"),
     stringsAsFactors = FALSE
   )
   class_lookup <- stats::setNames(nlcd_classes$names, nlcd_classes$value)
@@ -1847,5 +1853,56 @@ format_nlcd_mrlc_classes <- function(codes) {
   )
 
   formatted <- gsub("[^[:alnum:]]+", "_", formatted)
-  gsub("(^_+|_+$)", "", formatted)
+  unname(gsub("(^_+|_+$)", "", formatted))
+}
+
+#' Identify an Annual NLCD product
+#' @param from SpatRaster(1). An Annual NLCD raster.
+#' @return A character(1) Annual NLCD product code.
+#' @noRd
+get_nlcd_product <- function(from) {
+  product_codes <- c(
+    "LndCov",
+    "LndChg",
+    "LndCnf",
+    "FctImp",
+    "ImpDsc",
+    "SpcChg"
+  )
+  metadata <- terra::metags(from)
+  product_index <- which(tolower(metadata$name) == "product")
+  if (length(product_index) > 0L) {
+    product <- metadata$value[product_index[1]]
+    product_match <- match(tolower(product), tolower(product_codes))
+    if (!is.na(product_match)) {
+      return(product_codes[product_match])
+    }
+  }
+
+  identifiers <- names(from)
+  raster_sources <- tryCatch(
+    terra::sources(from),
+    error = function(e) character()
+  )
+  identifiers <- c(identifiers, as.character(raster_sources))
+  matches <- unique(unlist(lapply(
+    identifiers,
+    function(x) {
+      product <- regmatches(
+        x,
+        regexpr(
+          paste(product_codes, collapse = "|"),
+          x,
+          ignore.case = TRUE
+        )
+      )
+      product_codes[match(tolower(product), tolower(product_codes))]
+    }
+  )))
+  matches <- matches[!is.na(matches)]
+  if (length(matches) == 1L) {
+    return(matches)
+  }
+
+  "LndCov"
 }
