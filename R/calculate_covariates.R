@@ -515,10 +515,12 @@ calculate_koppen_geiger <-
 #'   or `"terra"` (using [`terra::freq()`]). Ignored if `locs` are points.
 #' @param radius numeric (non-negative) giving the
 #' radius of buffer around points.
-#' @param class_names character(1). Column naming scheme for land-cover
-#' classes. Use `"code"` (default) for NLCD numeric class values or `"mrlc"`
-#' for standardized MRLC class names. For the Land Cover Change product,
-#' four-digit change codes are named as
+#' @param class_names character(1). Column naming scheme for categorical NLCD
+#' products. Use `"code"` (default) for numeric values or `"mrlc"` for
+#' standardized MRLC class names. The `"mrlc"` option is not available for
+#' Land Cover Confidence, Fractional Impervious Surface, or Spectral Change
+#' Day of Year because their values are not MRLC classes. For the Land Cover
+#' Change product, four-digit change codes are named as
 #' `"<from_class>_to_<to_class>"`; unchanged two-digit classes retain their
 #' standard MRLC names.
 #' @param drop logical(1). Default `FALSE`. For buffered outputs (`radius > 0`),
@@ -602,6 +604,27 @@ calculate_nlcd <- function(
       paste0(
         "`from` contains more than one data layer. Current version ",
         "only processes one year worth of NLCD data."
+      )
+    )
+  }
+
+  nlcd_product <- get_nlcd_product(from)
+  products_without_classes <- c(
+    LndCnf = "Land Cover Confidence",
+    FctImp = "Fractional Impervious Surface",
+    SpcChg = "Spectral Change Day of Year"
+  )
+  if (
+    class_names == "mrlc" &&
+      nlcd_product %in% names(products_without_classes)
+  ) {
+    stop(
+      sprintf(
+        paste0(
+          "`class_names = \"mrlc\"` is not available for %s because its ",
+          "values are not MRLC classes; use `class_names = \"code\"`."
+        ),
+        unname(products_without_classes[nlcd_product])
       )
     )
   }
@@ -807,7 +830,7 @@ calculate_nlcd <- function(
       if (class_names == "mrlc") {
         nlcd_codes <- format_nlcd_mrlc_classes(
           nlcd_codes,
-          product = get_nlcd_product(from)
+          product = nlcd_product
         )
       }
       names(new_data_core)[match(value_cols, names(new_data_core))] <- sprintf(

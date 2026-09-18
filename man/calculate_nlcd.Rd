@@ -32,10 +32,12 @@ or \code{"terra"} (using \code{\link[terra:freq]{terra::freq()}}). Ignored if \c
 \item{radius}{numeric (non-negative) giving the
 radius of buffer around points.}
 
-\item{class_names}{character(1). Column naming scheme for land-cover
-classes. Use \code{"code"} (default) for NLCD numeric class values or \code{"mrlc"}
-for standardized MRLC class names. For the Land Cover Change product,
-four-digit change codes are named as
+\item{class_names}{character(1). Column naming scheme for categorical NLCD
+products. Use \code{"code"} (default) for numeric values or \code{"mrlc"} for
+standardized MRLC class names. The \code{"mrlc"} option is not available for
+Land Cover Confidence, Fractional Impervious Surface, or Spectral Change
+Day of Year because their values are not MRLC classes. For the Land Cover
+Change product, four-digit change codes are named as
 \code{"<from_class>_to_<to_class>"}; unchanged two-digit classes retain their
 standard MRLC names.}
 

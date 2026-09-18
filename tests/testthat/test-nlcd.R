@@ -1126,6 +1126,98 @@ testthat::test_that(
 )
 
 testthat::test_that(
+  "calculate_nlcd(class_names='mrlc', product=non-class): rejects class names",
+  {
+    withr::local_package("terra")
+
+    product_names <- c(
+      LndCnf = "Land Cover Confidence",
+      FctImp = "Fractional Impervious Surface",
+      SpcChg = "Spectral Change Day of Year"
+    )
+    locs <- terra::vect(
+      data.frame(site_id = "site_1", x = 50, y = 50),
+      geom = c("x", "y"),
+      crs = "EPSG:3857"
+    )
+
+    for (product_code in names(product_names)) {
+      nlcd <- terra::rast(
+        nrows = 1,
+        ncols = 1,
+        xmin = 0,
+        xmax = 100,
+        ymin = 0,
+        ymax = 100,
+        crs = "EPSG:3857"
+      )
+      terra::values(nlcd) <- 1
+      terra::metags(nlcd) <- c(
+        "Year=2020",
+        paste0("Product=", product_code)
+      )
+
+      testthat::expect_error(
+        calculate_nlcd(
+          from = nlcd,
+          locs = locs,
+          class_names = "mrlc"
+        ),
+        paste0("not available for ", product_names[[product_code]])
+      )
+    }
+  }
+)
+
+testthat::test_that(
+  paste0(
+    "calculate_nlcd(class_names='code', product=non-class): ",
+    "retains numeric columns"
+  ),
+  {
+    withr::local_package("terra")
+    withr::local_options(list(sf_use_s2 = FALSE))
+
+    product_codes <- c("LndCnf", "FctImp", "SpcChg")
+    locs <- terra::vect(
+      data.frame(site_id = "site_1", x = 100, y = 50),
+      geom = c("x", "y"),
+      crs = "EPSG:3857"
+    )
+
+    for (product_code in product_codes) {
+      nlcd <- terra::rast(
+        nrows = 1,
+        ncols = 2,
+        xmin = 0,
+        xmax = 200,
+        ymin = 0,
+        ymax = 100,
+        crs = "EPSG:3857"
+      )
+      terra::values(nlcd) <- c(0, 26)
+      terra::metags(nlcd) <- c(
+        "Year=2020",
+        paste0("Product=", product_code)
+      )
+
+      output <- calculate_nlcd(
+        from = nlcd,
+        locs = locs,
+        radius = 300,
+        mode = "terra",
+        class_names = "code"
+      )
+
+      testthat::expect_contains(
+        names(output),
+        c("NLCD_0_00300", "NLCD_26_00300")
+      )
+    }
+  }
+)
+
+testthat::test_that(
   "calculate_nlcd(class_names='mrlc', product='ImpDsc'): names descriptor classes",
   {
     withr::local_package("terra")
