@@ -2282,7 +2282,8 @@ download_population <- function(
 #' @export
 download_hms <- function(
   data_format = "Shapefile",
-  date = c("2018-01-01", "2018-01-01"),
+  #date = c("2018-01-01", "2018-01-01"),
+  date = c("8/9/05", "8/9/05"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -2352,6 +2353,8 @@ download_hms <- function(
   #### Collect all URLs and destination files
   all_urls <- character()
   all_destfiles <- character()
+  unavailable_dates <- character()
+  n_existing <- 0L
 
   for (f in seq_along(date_sequence)) {
     year <- substr(date_sequence[f], 1, 4)
@@ -2379,16 +2382,6 @@ download_hms <- function(
       suffix
     )
 
-    # Validate first URL only
-    if (f == 1) {
-      if (!amadeus::check_url_status(url)) {
-        stop(paste0(
-          "Invalid date returns HTTP code 404. ",
-          "Check `date` parameter.\n"
-        ))
-      }
-    }
-
     destfile <- paste0(
       directory_to_cat,
       "hms_smoke_",
@@ -2399,9 +2392,55 @@ download_hms <- function(
     )
 
     if (amadeus::check_destfile(destfile)) {
-      all_urls <- c(all_urls, url)
-      all_destfiles <- c(all_destfiles, destfile)
+      availability <- check_hms_url_availability(
+        url = url,
+        max_tries = min(as.integer(max_tries), 5L),
+        rate_limit = rate_limit
+      )
+      if (availability$state == "available") {
+        all_urls <- c(all_urls, url)
+        all_destfiles <- c(all_destfiles, destfile)
+      } else if (availability$state == "missing") {
+        unavailable_dates <- c(unavailable_dates, date_sequence[f])
+      } else {
+        stop(
+          sprintf(
+            paste0(
+              "Failed to check HMS data availability for %s. ",
+              "%s\n"
+            ),
+            date_sequence[f],
+            availability$error
+          ),
+          call. = FALSE
+        )
+      }
+    } else {
+      n_existing <- n_existing + 1L
     }
+  }
+
+  if (length(unavailable_dates) > 0L) {
+    if (length(all_urls) == 0L && n_existing == 0L) {
+      stop(
+        sprintf(
+          "No HMS data are available for the requested date(s): %s.\n",
+          paste(unavailable_dates, collapse = ", ")
+        ),
+        call. = FALSE
+      )
+    }
+    warning(
+      sprintf(
+        paste0(
+          "HMS data are unavailable for %d requested date(s): %s. ",
+          "Continuing with available files.\n"
+        ),
+        length(unavailable_dates),
+        paste(unavailable_dates, collapse = ", ")
+      ),
+      call. = FALSE
+    )
   }
 
   #### Exit early if download=FALSE
@@ -2413,7 +2452,9 @@ download_hms <- function(
     return(invisible(list(
       urls = all_urls,
       destfiles = all_destfiles,
-      n_files = length(all_urls)
+      n_files = length(all_urls),
+      unavailable = length(unavailable_dates),
+      unavailable_dates = unavailable_dates
     )))
   }
 
@@ -2422,7 +2463,9 @@ download_hms <- function(
     return(invisible(list(
       success = 0,
       failed = 0,
-      skipped = length(date_sequence)
+      skipped = n_existing,
+      unavailable = length(unavailable_dates),
+      unavailable_dates = unavailable_dates
     )))
   }
 
@@ -2435,6 +2478,12 @@ download_hms <- function(
     max_tries = max_tries,
     rate_limit = rate_limit
   )
+  download_result$unavailable <- length(unavailable_dates)
+  download_result$unavailable_dates <- unavailable_dates
+
+  downloaded_destfiles <- all_destfiles[
+    file.exists(all_destfiles) & file.size(all_destfiles) > 0
+  ]
 
   #### Handle KML (no unzipping needed)
   if (data_format == "KML") {
@@ -2448,19 +2497,21 @@ download_hms <- function(
   }
 
   #### Unzip downloaded zip files
-  for (d in seq_along(all_destfiles)) {
+  for (d in seq_along(downloaded_destfiles)) {
     amadeus::download_unzip(
-      file_name = all_destfiles[d],
+      file_name = downloaded_destfiles[d],
       directory_to_unzip = directory_to_save,
       unzip = unzip
     )
   }
 
   #### Remove zip files
-  amadeus::download_remove_zips(
-    remove = remove_zip,
-    download_name = all_destfiles
-  )
+  if (length(downloaded_destfiles) > 0L) {
+    amadeus::download_remove_zips(
+      remove = remove_zip,
+      download_name = downloaded_destfiles
+    )
+  }
 
   if (hash) {
     return(amadeus::download_hash(hash = TRUE, directory_to_save))

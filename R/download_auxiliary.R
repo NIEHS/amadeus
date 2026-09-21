@@ -884,6 +884,99 @@ check_url_status <- function(
   !is.na(status_get) && status_get %in% http_status_ok
 }
 
+
+#' Check HMS file availability
+#' @description
+#' Probe an HMS file URL while preserving the distinction between an available
+#' file, an unpublished file, and a request failure. Unlike
+#' [check_url_status()], transport and server failures are not treated as
+#' missing data.
+#' @param url character(1). HMS file URL.
+#' @param max_tries integer(1). Maximum attempts for transient HTTP and
+#' transport failures.
+#' @param rate_limit numeric(1). Minimum seconds between requests.
+#' @return A list with `state`, `status`, and `error` elements.
+#' @keywords internal
+#' @noRd
+check_hms_url_availability <- function(
+  url,
+  max_tries = 3L,
+  rate_limit = 2
+) {
+  probe <- function(method = c("HEAD", "GET")) {
+    method <- match.arg(method)
+    req <- httr2::request(url) |>
+      httr2::req_method(method) |>
+      httr2::req_error(is_error = \(resp) FALSE) |>
+      httr2::req_retry(
+        max_tries = max_tries,
+        is_transient = \(resp) {
+          httr2::resp_status(resp) %in% c(429, 500, 502, 503, 504)
+        },
+        retry_on_failure = TRUE
+      ) |>
+      httr2::req_timeout(120) |>
+      httr2::req_options(connecttimeout = 30L) |>
+      httr2::req_throttle(rate = 1 / rate_limit)
+
+    if (method == "GET") {
+      req <- req |> httr2::req_headers(Range = "bytes=0-0")
+    }
+
+    tryCatch(
+      list(
+        status = req |> httr2::req_perform() |> httr2::resp_status(),
+        error = NULL
+      ),
+      error = function(e) {
+        list(status = NA_integer_, error = conditionMessage(e))
+      }
+    )
+  }
+
+  classify <- function(result) {
+    if (!is.na(result$status) && result$status %in% c(200L, 206L)) {
+      return("available")
+    }
+    if (!is.na(result$status) && result$status %in% c(404L, 410L)) {
+      return("missing")
+    }
+    "error"
+  }
+
+  head_result <- probe("HEAD")
+  head_state <- classify(head_result)
+  if (head_state != "error") {
+    return(list(
+      state = head_state,
+      status = head_result$status,
+      error = NULL
+    ))
+  }
+
+  # Some servers do not support HEAD reliably. Confirm an ambiguous HEAD
+  # response with a one-byte ranged GET before reporting a request failure.
+  get_result <- probe("GET")
+  get_state <- classify(get_result)
+  if (get_state != "error") {
+    return(list(
+      state = get_state,
+      status = get_result$status,
+      error = NULL
+    ))
+  }
+
+  error_detail <- get_result$error
+  if (is.null(error_detail)) {
+    error_detail <- sprintf("HTTP status %s", get_result$status)
+  }
+  list(
+    state = "error",
+    status = get_result$status,
+    error = error_detail
+  )
+}
+
 #' Import download commands
 #' @description
 #' Read download commands from .txt file and convert to character vector.
