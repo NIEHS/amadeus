@@ -4238,7 +4238,7 @@ process_huc <-
       hucpoly <- terra::vect(hucpoly)
     }
     #nocov end
-    if (file.exists(path) || dir.exists(path)) {
+    if (!missing(path) && (file.exists(path) || dir.exists(path))) {
       if (!is.null(huc_header)) {
         querybase <-
           sprintf(
