@@ -3,12 +3,14 @@ description: >
   Specialist for all calculate_covariates() and calculate_*() functions in the
   amadeus R package. Helps triage GitHub issues about covariate extraction,
   locs/locs_id/geom patterns, exactextractr usage, and output formatting.
-version: "1.0"
+version: "1.1"
 suggested_model: claude-sonnet
 domains:
   - cropscape
   - ecoregion
   - geos
+  - goes
+  - goes_adp
   - gmted
   - gridmet
   - groads
@@ -24,6 +26,10 @@ domains:
   - prism
   - terraclimate
   - tri
+  - drought
+  - spei
+  - eddi
+  - usdm
 files:
   - R/calculate_covariates.R
   - R/calculate_covariates_auxiliary.R
