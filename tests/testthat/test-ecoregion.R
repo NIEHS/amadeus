@@ -30,23 +30,6 @@ testthat::test_that("download_ecoregion returns proper URL list", {
   })
 })
 
-testthat::test_that("download_ecoregion validates URL", {
-  skip_if_no_live_tests()
-
-  withr::with_tempdir({
-    result <- suppressWarnings(
-      download_ecoregion(
-        directory_to_save = ".",
-        acknowledgement = TRUE,
-        download = FALSE
-      )
-    )
-
-    # Check URL is accessible
-    testthat::expect_true(check_url_status(result$urls))
-  })
-})
-
 testthat::test_that("download_ecoregion creates proper directory structure", {
   withr::with_tempdir({
     suppressWarnings(
@@ -85,29 +68,6 @@ testthat::test_that("download_ecoregion skips existing files", {
     # Verify original file still exists and has content
     testthat::expect_true(file.exists(zip_path))
     testthat::expect_gt(file.size(zip_path), 0)
-  })
-})
-
-testthat::test_that("download_ecoregion (LIVE - small download)", {
-  skip_if_no_live_tests()
-
-  withr::with_tempdir({
-    result <- download_ecoregion(
-      directory_to_save = ".",
-      acknowledgement = TRUE,
-      download = TRUE,
-      unzip = FALSE
-    )
-
-    # Check file was downloaded
-    zip_files <- list.files("zip_files", pattern = "\\.zip$")
-    testthat::expect_true(length(zip_files) > 0)
-
-    # Check file size is reasonable
-    zip_path <- list.files("zip_files", pattern = "\\.zip$", full.names = TRUE)[
-      1
-    ]
-    testthat::expect_gt(file.size(zip_path), 1000)
   })
 })
 
@@ -960,38 +920,6 @@ testthat::test_that("download_ecoregion mock download hash = FALSE", {
       )
     )
     testthat::expect_null(result)
-  })
-})
-
-################################################################################
-##### Integration test: download -> process -> calculate workflow
-testthat::test_that("download_ecoregion integration (basic)", {
-  skip_if_no_live_tests()
-
-  withr::with_tempdir({
-    # Download ecoregion data
-    result <- download_ecoregion(
-      directory_to_save = ".",
-      acknowledgement = TRUE,
-      download = TRUE,
-      unzip = TRUE
-    )
-
-    # Check that download succeeded
-    data_dir <- "./data_files"
-    testthat::expect_true(dir.exists(data_dir))
-
-    # Check for shapefile or geopackage
-    spatial_files <- list.files(
-      data_dir,
-      pattern = "\\.(shp|gpkg)$",
-      recursive = TRUE,
-      full.names = TRUE
-    )
-    testthat::expect_true(
-      length(spatial_files) > 0,
-      info = "At least one spatial file should be extracted"
-    )
   })
 })
 

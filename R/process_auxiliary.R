@@ -591,7 +591,7 @@ process_variable_codes <-
             do.call(code_function, list(var, invert = FALSE))
           }
         )
-        return(as.vector(unlist(codes_return)))
+        return(tolower(as.vector(unlist(codes_return))))
       } else {
         stop(
           paste0(

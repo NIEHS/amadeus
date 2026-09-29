@@ -115,7 +115,7 @@ testthat::test_that("download_huc supports unzip via archive extraction", {
 testthat::test_that("process_huc", {
   withr::local_package("terra")
   withr::local_package("sf")
-  withr::local_package("nhdplusTools")
+  withr::local_package("hydrogeofetch")
   withr::local_options(list(sf_use_s2 = FALSE))
   # Set up test data
   path <- testthat::test_path(
@@ -187,7 +187,7 @@ testthat::test_that("process_huc", {
 testthat::test_that("calculate_huc", {
   withr::local_package("terra")
   withr::local_package("sf")
-  withr::local_package("nhdplusTools")
+  withr::local_package("hydrogeofetch")
   withr::local_options(list(sf_use_s2 = FALSE))
 
   # Set up test data
