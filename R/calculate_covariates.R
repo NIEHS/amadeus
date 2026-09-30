@@ -5002,6 +5002,7 @@ calculate_drought <- function(
         }
         site_index_col <- ".__site_row__"
         sites_buffer[[site_index_col]] <- seq_len(nrow(sites_buffer))
+        sites_buffer <- sites_buffer[, site_index_col, drop = FALSE]
 
         prop_values <- matrix(
           NA_real_,
