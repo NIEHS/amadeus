@@ -82,6 +82,7 @@ time (year), and computed ratio for each land cover class.</p>
 <span>  locs_id <span class="op">=</span> <span class="st">"site_id"</span>,</span>
 <span>  mode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"exact"</span>, <span class="st">"terra"</span><span class="op">)</span>,</span>
 <span>  radius <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  class_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"code"</span>, <span class="st">"mrlc"</span><span class="op">)</span>,</span>
 <span>  drop <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  max_cells <span class="op">=</span> <span class="fl">5e+07</span>,</span>
@@ -115,6 +116,17 @@ or <code>"terra"</code> (using <code><a href="https://rspatial.github.io/terra/r
 <dt id="arg-radius">radius<a class="anchor" aria-label="anchor" href="#arg-radius"></a></dt>
 <dd><p>numeric (non-negative) giving the
 radius of buffer around points.</p></dd>
+
+
+<dt id="arg-class-names">class_names<a class="anchor" aria-label="anchor" href="#arg-class-names"></a></dt>
+<dd><p>character(1). Column naming scheme for categorical NLCD
+products. Use <code>"code"</code> (default) for numeric values or <code>"mrlc"</code> for
+standardized MRLC class names. The <code>"mrlc"</code> option is not available for
+Land Cover Confidence, Fractional Impervious Surface, or Spectral Change
+Day of Year because their values are not MRLC classes. For the Land Cover
+Change product, four-digit change codes are named as
+<code>"&lt;from_class&gt;_to_&lt;to_class&gt;"</code>; unchanged two-digit classes retain their
+standard MRLC names.</p></dd>
 
 
 <dt id="arg-drop">drop<a class="anchor" aria-label="anchor" href="#arg-drop"></a></dt>

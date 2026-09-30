@@ -13,6 +13,7 @@ calculate_nlcd(
   locs_id = "site_id",
   mode = c("exact", "terra"),
   radius = 1000,
+  class_names = c("code", "mrlc"),
   drop = FALSE,
   weights = NULL,
   max_cells = 5e+07,
@@ -47,6 +48,17 @@ calculate_nlcd(
 - radius:
 
   numeric (non-negative) giving the radius of buffer around points.
+
+- class_names:
+
+  character(1). Column naming scheme for categorical NLCD products. Use
+  `"code"` (default) for numeric values or `"mrlc"` for standardized
+  MRLC class names. The `"mrlc"` option is not available for Land Cover
+  Confidence, Fractional Impervious Surface, or Spectral Change Day of
+  Year because their values are not MRLC classes. For the Land Cover
+  Change product, four-digit change codes are named as
+  `"<from_class>_to_<to_class>"`; unchanged two-digit classes retain
+  their standard MRLC names.
 
 - drop:
 
