@@ -1302,7 +1302,29 @@ process_nlcd <-
     }
 
     nlcd <- terra::rast(nlcd_file, win = extent)
-    terra::metags(nlcd) <- paste0("Year=", year) # Changed to capital Y
+    nlcd_product <- unique(unlist(lapply(
+      nlcd_file_base,
+      function(x) {
+        product_code <- regmatches(
+          x,
+          regexpr(
+            paste(product_codes, collapse = "|"),
+            x,
+            ignore.case = TRUE
+          )
+        )
+        product_codes[match(tolower(product_code), tolower(product_codes))]
+      }
+    )))
+    nlcd_product <- nlcd_product[!is.na(nlcd_product)]
+    nlcd_metadata <- paste0("Year=", year)
+    if (length(nlcd_product) == 1L) {
+      nlcd_metadata <- c(
+        nlcd_metadata,
+        paste0("Product=", nlcd_product)
+      )
+    }
+    terra::metags(nlcd) <- nlcd_metadata
     return(nlcd)
   }
 
