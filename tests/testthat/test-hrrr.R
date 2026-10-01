@@ -10,60 +10,15 @@ testthat::test_that("download_hrrr (single date)", {
   withr::local_package("stringr")
   directory_to_save <- paste0(tempdir(), "/hrrr/")
 
-  # Expect deprecation warning
-  testthat::expect_warning(
-    download_data(
-      dataset_name = "hrrr",
-      date = "2021-05-04",
-      product = "surface",
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE
-    ),
-    "Setting download=FALSE is deprecated"
-  )
-
-  # Check that directory was created
-  testthat::expect_true(
-    dir.exists(directory_to_save)
-  )
-
-  unlink(directory_to_save, recursive = TRUE)
-})
-
-testthat::test_that("download_hrrr (expected errors)", {
-  testthat::expect_error(
-    download_data(
-      dataset_name = "hrrr",
-      product = "surface",
-      date = c(10, 11),
-      acknowledgement = TRUE,
-      directory_to_save = testthat::test_path("..", "testdata/", "")
-    )
-  )
-})
-
-testthat::test_that("hrrr_variable (expected errors)", {
-  # expected error due to unrecognized variable name
-  testthat::expect_error(
-    hrrr_variable("uNrEcOgNiZed")
-  )
-})
-
-testthat::test_that("download_hrrr without download=FALSE", {
-  skip_on_cran()
-  skip_if_offline()
-
-  withr::local_package("httr2")
-  withr::local_package("stringr")
-  directory_to_save <- paste0(tempdir(), "/hrrr_new/")
-
-  # Test without download=FALSE (new httr2 method, no deprecation warning)
+  # no errors, no warnings
   testthat::expect_no_error(
     download_data(
       dataset_name = "hrrr",
       date = "2021-05-04",
-      product = "surface",
+      product = "2d surface",
+      sector = "conus",
+      cycle_runtime = 0L,
+      forecast_hour = 1L,
       directory_to_save = directory_to_save,
       acknowledgement = TRUE
     )
@@ -77,20 +32,132 @@ testthat::test_that("download_hrrr without download=FALSE", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
-testthat::test_that("download_hrrr remove_command deprecation warning", {
-  withr::with_tempdir({
-    testthat::expect_warning(
-      download_hrrr(
-        date = "2021-05-04",
-        product = "surface",
-        directory_to_save = ".",
-        acknowledgement = TRUE,
-        download = FALSE,
-        remove_command = TRUE
-      ),
-      regexp = "remove_command.*deprecated"
+testthat::test_that("download_hrrr (date range)", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::local_package("httr2")
+  withr::local_package("stringr")
+  directory_to_save <- paste0(tempdir(), "/hrrr/")
+
+  # Expect deprecation warning
+  testthat::expect_no_error(
+    download_data(
+      dataset_name = "hrrr",
+      date = c("2021-05-04", "2021-05-05"),
+      product = "2d surface",
+      sector = "conus",
+      cycle_runtime = 0L,
+      forecast_hour = 1L,
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE
     )
-  })
+  )
+
+  # Check that directory was created
+  testthat::expect_true(
+    dir.exists(directory_to_save)
+  )
+
+  unlink(directory_to_save, recursive = TRUE)
+})
+
+testthat::test_that("download_hrrr (expected errors)", {
+  # input year instead of date
+  testthat::expect_error(
+    download_data(
+      dataset_name = "hrrr",
+      date = "2021",
+      product = "2d surface",
+      sector = "conus",
+      cycle_runtime = 0:4L,
+      forecast_hour = 1:5L,
+      acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", "")
+    )
+  )
+  # invalid cycle runtime (out of bounds)
+  testthat::expect_error(
+    download_data(
+      dataset_name = "hrrr",
+      date = "2021-05-04",
+      product = "2d surface",
+      sector = "conus",
+      cycle_runtime = 25L,
+      forecast_hour = 1:5L,
+      acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", "")
+    )
+  )
+  # invalid cycle runtime (character)
+  testthat::expect_error(
+    download_data(
+      dataset_name = "hrrr",
+      date = "2021-05-04",
+      product = "2d surface",
+      sector = "conus",
+      cycle_runtime = "four",
+      forecast_hour = 1:5L,
+      acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", "")
+    )
+  )
+
+  # invalid forecast hour (out of bounds)
+  testthat::expect_error(
+    download_data(
+      dataset_name = "hrrr",
+      date = "2021-05-04",
+      product = "2d surface",
+      sector = "conus",
+      cycle_runtime = 4L,
+      forecast_hour = 500L,
+      acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", "")
+    )
+  )
+
+  # invalid forecast hour (character)
+  testthat::expect_error(
+    download_data(
+      dataset_name = "hrrr",
+      date = "2021-05-04",
+      product = "2d surface",
+      sector = "conus",
+      cycle_runtime = 4L,
+      forecast_hour = "five",
+      acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", "")
+    )
+  )
+
+  # unknown product
+  testthat::expect_error(
+    download_data(
+      dataset_name = "hrrr",
+      date = "2021-05-04",
+      product = "4d spacetime",
+      sector = "conus",
+      cycle_runtime = 4L,
+      forecast_hour = 5L,
+      acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", "")
+    )
+  )
+
+  # unknown sector
+  testthat::expect_error(
+    download_data(
+      dataset_name = "hrrr",
+      date = "2021-05-04",
+      product = "2d surface",
+      sector = "europe",
+      cycle_runtime = 4L,
+      forecast_hour = 5L,
+      acknowledgement = TRUE,
+      directory_to_save = testthat::test_path("..", "testdata/", "")
+    )
+  )
 })
 
 testthat::test_that("download_hrrr mock download with hash", {
@@ -104,10 +171,12 @@ testthat::test_that("download_hrrr mock download with hash", {
       suppressMessages(
         download_hrrr(
           date = "2021-05-04",
-          product = "surface",
+          product = "2d surface",
+          sector = "conus",
+          cycle_runtime = 0L,
+          forecast_hour = 1L,
           directory_to_save = ".",
           acknowledgement = TRUE,
-          download = TRUE,
           hash = TRUE
         )
       )

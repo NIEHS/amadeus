@@ -1,7 +1,6 @@
 ################################################################################
 # Live network tests for download_hrrr(). Mocked tests: test-hrrr.R.
 ################################################################################
-
 testthat::test_that(
   paste0(
     "download_hrrr(product = 'surface', date = '2021-04-05')): ",
@@ -11,8 +10,11 @@ testthat::test_that(
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
     amadeus::download_hrrr(
-      product = "surface",
-      date = "2021-04-05",
+      date = "2021-05-04",
+      product = "2d surface",
+      sector = "conus",
+      cycle_runtime = 0L,
+      forecast_hour = 1L,
       directory_to_save = dir,
       acknowledgement = TRUE
     )
@@ -24,15 +26,18 @@ testthat::test_that(
 
 testthat::test_that(
   paste0(
-    "download_hrrr(product = 'pressure', date = '2021-04-05')): ",
+    "download_hrrr(product = '3d pressure', date = '2021-04-05')): ",
     "downloads monolevel snow water equivalent file"
   ),
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
     amadeus::download_hrrr(
-      product = "pressure",
-      date = "2021-04-05",
+      date = "2021-05-04",
+      product = "2d surface",
+      sector = "conus",
+      cycle_runtime = 0L,
+      forecast_hour = 1L,
       directory_to_save = dir,
       acknowledgement = TRUE
     )
@@ -51,7 +56,11 @@ testthat::test_that(
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
     amadeus::download_hrrr(
+      date = "2021-05-04",
       product = "native",
+      sector = "conus",
+      cycle_runtime = 0L,
+      forecast_hour = 1L,
       date = "2021-04-05",
       directory_to_save = dir,
       acknowledgement = TRUE
