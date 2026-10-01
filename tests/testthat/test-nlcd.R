@@ -1047,3 +1047,212 @@ testthat::test_that(
     )
   }
 )
+
+testthat::test_that(
+  "calculate_nlcd(class_names='code'/'mrlc'): returns equivalent named classes",
+  {
+    withr::local_package("terra")
+    withr::local_package("exactextractr")
+    withr::local_options(list(sf_use_s2 = FALSE))
+
+    nlcd <- process_nlcd(
+      path = testthat::test_path("..", "testdata", "nlcd"),
+      year = 2021
+    )
+    locs <- terra::vect(
+      data.frame(
+        site_id = 1:2,
+        lon = c(-78.85, -78.73),
+        lat = c(36.09, 35.96)
+      ),
+      geom = c("lon", "lat"),
+      crs = "EPSG:4326"
+    )
+
+    output_code <- calculate_nlcd(
+      from = nlcd,
+      locs = locs,
+      radius = 6000,
+      class_names = "code"
+    )
+    output_mrlc <- calculate_nlcd(
+      from = nlcd,
+      locs = locs,
+      radius = 6000,
+      class_names = "mrlc"
+    )
+
+    code_cols <- grep("^NLCD_", names(output_code), value = TRUE)
+    mrlc_cols <- grep("^NLCD_", names(output_mrlc), value = TRUE)
+
+    testthat::expect_match(code_cols, "^NLCD_[0-9]+_06000$")
+    testthat::expect_contains(
+      mrlc_cols,
+      c(
+        "NLCD_Evergreen_Forest_06000",
+        "NLCD_Shrub_Scrub_06000"
+      )
+    )
+    testthat::expect_equal(length(mrlc_cols), length(code_cols))
+    testthat::expect_equal(
+    unname(as.matrix(output_mrlc[mrlc_cols])),
+    unname(as.matrix(output_code[code_cols]))
+)
+  }
+)
+
+testthat::test_that(
+  "format_nlcd_mrlc_classes(product='ImpDsc'): uses descriptor class names",
+  {
+    testthat::expect_equal(
+      format_nlcd_mrlc_classes(
+        c("0", "1", "2", "250"),
+        product = "ImpDsc"
+      ),
+      c("Non_Urban", "Roads", "Urban", "NoData")
+    )
+  }
+)
+
+testthat::test_that(
+  "get_nlcd_product(Product='ImpDsc'): identifies descriptor metadata",
+  {
+    withr::local_package("terra")
+    nlcd <- terra::rast(nrows = 1, ncols = 1)
+    terra::metags(nlcd) <- c("Year=2020", "Product=ImpDsc")
+
+    testthat::expect_equal(get_nlcd_product(nlcd), "ImpDsc")
+  }
+)
+
+testthat::test_that(
+  "calculate_nlcd(class_names='mrlc', product=non-class): rejects class names",
+  {
+    withr::local_package("terra")
+
+    product_names <- c(
+      LndCnf = "Land Cover Confidence",
+      FctImp = "Fractional Impervious Surface",
+      SpcChg = "Spectral Change Day of Year"
+    )
+    locs <- terra::vect(
+      data.frame(site_id = "site_1", x = 50, y = 50),
+      geom = c("x", "y"),
+      crs = "EPSG:3857"
+    )
+
+    for (product_code in names(product_names)) {
+      nlcd <- terra::rast(
+        nrows = 1,
+        ncols = 1,
+        xmin = 0,
+        xmax = 100,
+        ymin = 0,
+        ymax = 100,
+        crs = "EPSG:3857"
+      )
+      terra::values(nlcd) <- 1
+      terra::metags(nlcd) <- c(
+        "Year=2020",
+        paste0("Product=", product_code)
+      )
+
+      testthat::expect_error(
+        calculate_nlcd(
+          from = nlcd,
+          locs = locs,
+          class_names = "mrlc"
+        ),
+        paste0("not available for ", product_names[[product_code]])
+      )
+    }
+  }
+)
+
+testthat::test_that(
+  paste0(
+    "calculate_nlcd(class_names='code', product=non-class): ",
+    "retains numeric columns"
+  ),
+  {
+    withr::local_package("terra")
+    withr::local_options(list(sf_use_s2 = FALSE))
+
+    product_codes <- c("LndCnf", "FctImp", "SpcChg")
+    locs <- terra::vect(
+      data.frame(site_id = "site_1", x = 100, y = 50),
+      geom = c("x", "y"),
+      crs = "EPSG:3857"
+    )
+
+    for (product_code in product_codes) {
+      nlcd <- terra::rast(
+        nrows = 1,
+        ncols = 2,
+        xmin = 0,
+        xmax = 200,
+        ymin = 0,
+        ymax = 100,
+        crs = "EPSG:3857"
+      )
+      terra::values(nlcd) <- c(0, 26)
+      terra::metags(nlcd) <- c(
+        "Year=2020",
+        paste0("Product=", product_code)
+      )
+
+      output <- calculate_nlcd(
+        from = nlcd,
+        locs = locs,
+        radius = 300,
+        mode = "terra",
+        class_names = "code"
+      )
+
+      testthat::expect_contains(
+        names(output),
+        c("NLCD_0_00300", "NLCD_26_00300")
+      )
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_nlcd(class_names='mrlc', product='ImpDsc'): names descriptor classes",
+  {
+    withr::local_package("terra")
+    nlcd <- terra::rast(
+      nrows = 1,
+      ncols = 3,
+      xmin = 0,
+      xmax = 300,
+      ymin = 0,
+      ymax = 100,
+      crs = "EPSG:3857"
+    )
+    terra::values(nlcd) <- 0:2
+    terra::metags(nlcd) <- c("Year=2020", "Product=ImpDsc")
+    locs <- terra::vect(
+      data.frame(site_id = "site_1", x = 150, y = 50),
+      geom = c("x", "y"),
+      crs = "EPSG:3857"
+    )
+
+    output <- calculate_nlcd(
+      from = nlcd,
+      locs = locs,
+      radius = 300,
+      mode = "terra",
+      class_names = "mrlc"
+    )
+
+    testthat::expect_contains(
+      names(output),
+      c(
+        "NLCD_Non_Urban_00300",
+        "NLCD_Roads_00300",
+        "NLCD_Urban_00300"
+      )
+    )
+  }
+)
