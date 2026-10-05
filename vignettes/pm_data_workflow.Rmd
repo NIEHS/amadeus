@@ -42,7 +42,13 @@ improve_date_window <- c("2022-01-01", "2022-03-31")
 
 ```
 
-This article demonstrates compact PM monitoring workflows for AQS and IMPROVE. Because these measurements are typically used as outcome data, the example uses `download_aqs()` / `process_aqs()` and `download_improve()` / `process_improve()` directly rather than routing through `calculate_covariates()`.
+This article demonstrates compact PM monitoring workflows for AQS and IMPROVE.
+Because these measurements are typically used as outcome data, the examples
+below use `download_aqs()` / `process_aqs()` and `download_improve()` /
+`process_improve()` directly. When IMPROVE observations are needed as
+location-level covariates, `calculate_improve()` (or
+`calculate_covariates(covariate = "improve")`) can join the nearest monitor, or
+all monitors within a specified radius, to user-supplied point locations.
 
 This vignette runs its live workflow when rendered locally. The download, processing, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
