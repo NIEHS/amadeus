@@ -1,3 +1,7 @@
+# amadeus 2.0.3
+
+- Fixed `download_narr()` base URL to drop the "Datasets" directory.
+
 # amadeus 2.0.2
 
 - Fixed process_gridmet() to use valid native NetCDF time metadata from terra::time() when available and fall back to layer-name parsing when needed
