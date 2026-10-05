@@ -31,7 +31,8 @@ Each wrapper delegates to source-specific functions (e.g., `download_modis()`, `
 ### Supported data sources
 - **Climate/Weather**: TerraClimate, GridMET, MERRA-2, NARR, GEOS-CF, PRISM
 - **Land use**: NLCD, MODIS, Cropscape (CDL), Ecoregions
-- **Emissions/Air quality**: EPA AQS, NEI, EDGAR, HMS smoke, Open Landmap
+- **Emissions/Air quality**: EPA AQS, IMPROVE, NEI, EDGAR, HMS smoke,
+  Open Landmap
 - **Hydrology**: HUC (via hydrogeofetch), GEO-roads
 - **Elevation**: GMTED2010
 - **Population**: NASA SEDAC

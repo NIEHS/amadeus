@@ -14,6 +14,7 @@ domains:
   - groads
   - hms
   - huc
+  - improve
   - koppen_geiger
   - merra2
   - modis

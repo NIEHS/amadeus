@@ -50,6 +50,7 @@ unless tracing a bug that crosses tiers.
 | `calculate_groads()` | `SpatVector` | Road density/distance |
 | `calculate_hms()` | `SpatRaster` or `SpatVector` | Smoke presence/density |
 | `calculate_huc()` | `SpatVector` | HUC watershed membership |
+| `calculate_improve()` | `SpatVector` | IMPROVE nearest-monitor observations |
 | `calculate_koppen_geiger()` | `SpatRaster` | Climate zone classification |
 | `calculate_lagged()` | `SpatRaster` | Generic lag calculation helper |
 | `calculate_merra2()` | `SpatRaster` | Reanalysis variables |
