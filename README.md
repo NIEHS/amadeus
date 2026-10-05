@@ -141,6 +141,34 @@ time        : 2022-01-01 to 2022-01-05 UTC
 
 `calculate_covariates` stems from the [`beethoven`](https://github.com/NIEHS/beethoven) project's need for various types of data extracted at precise locations. `calculate_covariates`, therefore, extracts data from the "cleaned" `SpatRaster` or `SpatVector` object at user defined locations. Users can choose to buffer the locations. The function returns a `data.frame`, `sf`, or `SpatVector` with data extracted at all locations for each layer or row in the `SpatRaster` or `SpatVector` object, respectively.
 
+IMPROVE follows the same download → process → calculate workflow:
+
+```r
+directory <- file.path(tempdir(), "improve")
+download_data(
+  "improve", directory_to_save = directory,
+  year = 2022, product = "raw", acknowledgement = TRUE
+)
+improve <- process_covariates(
+  "improve", path = directory, product = "raw",
+  date = c("2022-01-01", "2022-01-31")
+)
+locs <- data.frame(site_id = "001", lon = -68.2608, lat = 44.3771)
+improve_covar <- calculate_covariates(
+  "improve", from = improve, locs = locs, variable = "FPM",
+  radius = 1000, .by_time = "month", geom = "sf"
+)
+```
+
+`calculate_improve()` returns `time`, `ParamCode`, `Units`, and `FactValue`
+alongside the location identifier. The default summary is the unweighted mean
+of measurement rows within each footprint; temporal means give each available
+date equal weight. `radius = 0` requires coincident points or uses supplied
+polygons. Locations without measurements return missing values. Status flags
+and numeric sentinel values are not automatically filtered or recoded. The
+`rhr2` and `rhr3` products use the same calculation route with their own
+`ParamCode` values and units.
+
 Example of `calculate_covariates` using processed "weasd" data.
 
 ```r

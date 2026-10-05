@@ -47,6 +47,7 @@
 #' * \code{\link{calculate_cropscape}}: "cropscape", "cdl"
 #' * \code{\link{calculate_huc}}: "huc", "HUC"
 #' * \code{\link{calculate_edgar}}: "edgar"
+#' * \code{\link{calculate_improve}}: "improve", "IMPROVE"
 #' * \code{\link{calculate_drought}}: "drought", "spei", "eddi", "usdm"
 #' @return Calculated covariates as a data.frame or SpatVector object
 #' @author Insang Song
@@ -101,6 +102,7 @@ calculate_covariates <-
       "cdl",
       "huc",
       "edgar",
+      "improve",
       "goes",
       "goes_adp",
       "GOES",
@@ -155,6 +157,7 @@ calculate_covariates <-
       cdl = amadeus::calculate_cropscape,
       huc = amadeus::calculate_huc,
       edgar = amadeus::calculate_edgar,
+      improve = amadeus::calculate_improve,
       goes = amadeus::calculate_goes,
       goes_adp = amadeus::calculate_goes,
       drought = amadeus::calculate_drought,
@@ -194,6 +197,226 @@ calculate_covariates <-
 
     return(res_covariate)
   }
+
+
+#' Calculate IMPROVE aerosol monitoring covariates
+#' @description
+#' Summarize measurements returned by [process_improve()] at exact point
+#' locations or within buffers or polygons. Supports the processed raw,
+#' RHR2, and RHR3 products through their shared measurement columns.
+#' @param from SpatVector, sf, or data.frame. Output of [process_improve()].
+#'   Spatial inputs must contain points with a CRS. Tables (including
+#'   data.table) must contain finite `Longitude` and `Latitude` in EPSG:4326.
+#' @param locs sf/SpatVector or data.frame. Unique point or polygon locations.
+#'   Tables must contain `lon` and `lat` in EPSG:4326.
+#' @param locs_id character(1). Unique, nonmissing location identifier column.
+#'   Default is `"site_id"`.
+#' @param radius numeric(1). Nonnegative circular buffer radius in meters.
+#'   Default `0` uses exact point matches or the supplied polygons.
+#' @param variable character or NULL. `ParamCode` values to include, matched
+#'   exactly. Default `NULL` includes all parameters.
+#' @param fun_summary character(1) or function. Summary accepting `na.rm`
+#'   and returning one numeric value. Default `"mean"`.
+#' @param .by_time NULL or character(1). Optional temporal unit such as
+#'   `"month"` or `"year"`. Default `NULL` retains measurement dates.
+#' @param weights NULL. Weighted extraction is not supported for IMPROVE.
+#' @param geom FALSE/"sf"/"terra". Return a data.frame (default), sf, or
+#'   SpatVector. Geometry represents the extraction footprint in the CRS
+#'   of `from` (EPSG:4326 for processed IMPROVE data).
+#' @param ... Placeholders. Legacy `.by` grouping is not supported.
+#' @details
+#' Measurements intersecting each extraction footprint, including its
+#' boundary, are summarized separately by date, `ParamCode`, and `Units`.
+#' Every measurement row receives equal weight, including colocated records
+#' with different POC or MethodID values. Only `FactValue` is summarized;
+#' auxiliary numeric metadata is excluded. Values and units are used as
+#' supplied by processing, with no automatic Status filtering, sentinel
+#' recoding, scaling, nearest-monitor assignment, or interpolation.
+#'
+#' Missing values are removed from summaries. All-missing groups and
+#' footprints with no matching measurements return `NA_real_`, even for
+#' `fun_summary = "sum"`. Each location retains all date/parameter/unit
+#' combinations present in the selected input. Unobserved dates are not
+#' filled. An empty input returns zero rows with the same output schema.
+#'
+#' When `.by_time` is supplied, spatial summaries are summarized again by
+#' temporal bucket, parameter, and unit using `fun_summary`. For the default
+#' mean, each available date receives equal weight, regardless of its
+#' number of contributing measurements.
+#' @return A data.frame, sf, or SpatVector with `locs_id`, `time` (UTC),
+#'   `ParamCode`, `Units`, and `FactValue`. Rows follow the input location
+#'   order, then time, parameter, and unit. Units are retained from `from`.
+#' @author Mitchell Manware
+#' @seealso [download_improve()], [process_improve()],
+#'   [calculate_covariates()]
+#' @examples
+#' improve <- process_improve(
+#'   path = system.file("testdata/improve", package = "amadeus")
+#' )
+#' locs <- data.frame(site_id = "001", lon = -68.2608, lat = 44.3771)
+#' calculate_improve(improve, locs, variable = "FPM", radius = 1000)
+#' calculate_covariates(
+#'   "improve", improve, locs, variable = "FPM", .by_time = "month"
+#' )
+#' @export
+calculate_improve <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  variable = NULL,
+  fun_summary = "mean",
+  .by_time = NULL,
+  weights = NULL,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+  amadeus::check_geom(geom)
+  if (!is.null(weights)) {
+    stop("`weights` must be NULL; IMPROVE supports unweighted summaries.")
+  }
+  if (!is.numeric(radius) || length(radius) != 1L ||
+      !is.finite(radius) || radius < 0) {
+    stop("`radius` must be a single finite, nonnegative number.")
+  }
+  result_fields <- c("time", "ParamCode", "Units", "FactValue", "geometry")
+  if (!is.character(locs_id) || length(locs_id) != 1L ||
+      is.na(locs_id) || !nzchar(locs_id) || locs_id %in% result_fields) {
+    stop("`locs_id` must name one identifier column, not an output field.")
+  }
+  if (!locs_id %in% names(locs)) {
+    stop("`locs_id` column was not found in `locs`.")
+  }
+  ids <- as.data.frame(locs)[[locs_id]]
+  if (anyNA(ids) || anyDuplicated(ids)) {
+    stop("`locs_id` values must be unique and nonmissing.")
+  }
+  if (!is.null(variable) && (!is.character(variable) ||
+      !length(variable) || anyNA(variable))) {
+    stop("`variable` must be NULL or a nonempty character vector.")
+  }
+  fun <- match.fun(fun_summary)
+  summarize_value <- function(x, ...) {
+    if (all(is.na(x))) {
+      NA_real_
+    } else {
+      value <- fun(x, na.rm = TRUE)
+      if (!is.numeric(value) || length(value) != 1L) {
+        stop("`fun_summary` must return one numeric value per group.")
+      }
+      value
+    }
+  }
+
+  if (inherits(from, "sf")) {
+    from <- if (nrow(from) == 0L) {
+      suppressWarnings(terra::vect(from))
+    } else {
+      terra::vect(from)
+    }
+  } else if (is.data.frame(from)) {
+    from <- as.data.frame(from)
+    coords <- c("Longitude", "Latitude")
+    if (!all(coords %in% names(from)) ||
+        !all(vapply(from[, coords, drop = FALSE], function(x) {
+          is.numeric(x) && all(is.finite(x))
+        }, logical(1)))) {
+      stop(
+        "Table `from` requires finite Longitude and Latitude columns; ",
+        "use process_improve(return_format = 'terra') for spatial input."
+      )
+    }
+    from <- if (nrow(from) == 0L) {
+      # Preserve fields and CRS when there are no measurement rows.
+      suppressWarnings(terra::vect(sf::st_sf(
+        from, geometry = sf::st_sfc(crs = 4326)
+      )))
+    } else {
+      terra::vect(from, geom = coords, crs = "EPSG:4326")
+    }
+  }
+  if (!methods::is(from, "SpatVector") ||
+      (nrow(from) > 0L && terra::geomtype(from) != "points") ||
+      !nzchar(terra::crs(from))) {
+    stop("`from` must contain IMPROVE points with a CRS.")
+  }
+  required <- c("FactDate", "ParamCode", "FactValue", "Units")
+  if (!all(required %in% names(from))) {
+    stop("`from` must contain FactDate, ParamCode, FactValue, and Units.")
+  }
+  measurements <- as.data.frame(from)[, required, drop = FALSE]
+  if (!is.numeric(measurements$FactValue)) {
+    stop("`FactValue` must be numeric.")
+  }
+  dates <- tryCatch(as.Date(measurements$FactDate), error = function(e) NULL)
+  if (is.null(dates) || anyNA(dates)) {
+    stop("`FactDate` must contain valid, nonmissing dates.")
+  }
+  measurements$time <- as.POSIXct(dates, tz = "UTC")
+  measurements$FactDate <- NULL
+  if (anyNA(measurements$ParamCode) || anyNA(measurements$Units)) {
+    stop("`ParamCode` and `Units` must be nonmissing.")
+  }
+  if (!is.null(variable)) {
+    if (any(!variable %in% measurements$ParamCode)) {
+      stop("Requested `variable` values were not found in `ParamCode`.")
+    }
+    selected <- measurements$ParamCode %in% variable
+    from <- from[selected, ]
+    measurements <- measurements[selected, , drop = FALSE]
+  }
+
+  locations <- as.data.frame(locs)[, locs_id, drop = FALSE]
+  if (length(ids) > 0L) {
+    prepared <- amadeus::calc_prepare_locs(
+      from = from, locs = locs, locs_id = locs_id, radius = radius, geom = geom
+    )
+    footprints <- prepared[[1]]
+    locations <- prepared[[2]]
+    if (!terra::geomtype(footprints) %in% c("points", "polygons")) {
+      stop("`locs` must contain points or polygons.")
+    }
+  } else if (geom %in% c("sf", "terra")) {
+    locations$geometry <- character(0)
+  }
+  keys <- c("time", "ParamCode", "Units")
+  result <- as.data.frame(tidyr::expand_grid(
+    locations, unique(measurements[, keys, drop = FALSE])
+  ))
+  result$FactValue <- rep(NA_real_, nrow(result))
+  if (length(ids) > 0L && nrow(from) > 0L) {
+    pairs <- terra::relate(footprints, from, "intersects", pairs = TRUE)
+    if (nrow(pairs) > 0L) {
+      matched <- measurements[pairs[, 2], , drop = FALSE]
+      matched[[locs_id]] <- locations[[locs_id]][pairs[, 1]]
+      summarized <- amadeus::calc_summarize_native_time(
+        covar = matched, fun_summary = summarize_value, locs_id = locs_id,
+        group_cols_extra = c("ParamCode", "Units")
+      )
+      result$FactValue <- NULL
+      result <- dplyr::left_join(
+        result, summarized, by = c(locs_id, keys)
+      )
+    }
+  }
+  if (!is.null(.by_time) && nrow(result) > 0L) {
+    result <- amadeus::calc_summarize_by(
+      covar = result, fun_summary = summarize_value, locs_id = locs_id,
+      .by_time = .by_time, group_cols_extra = c("ParamCode", "Units")
+    )
+    result$time <- as.POSIXct(result$time, tz = "UTC")
+  }
+  result <- result[order(
+    match(result[[locs_id]], ids), result$time, result$ParamCode, result$Units
+  ), c(locs_id, keys, "FactValue", intersect("geometry", names(result))),
+  drop = FALSE]
+  rownames(result) <- NULL
+  amadeus::calc_return_locs(
+    covar = result, POSIXt = TRUE, geom = geom, crs = terra::crs(from)
+  )
+}
 
 
 #' Calculate climate classification covariates
