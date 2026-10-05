@@ -49,6 +49,7 @@ unless tracing a bug that crosses tiers.
 | `calculate_gridmet()` | `SpatRaster` | Daily climate variables |
 | `calculate_groads()` | `SpatVector` | Road density/distance |
 | `calculate_hms()` | `SpatRaster` or `SpatVector` | Smoke presence/density |
+| `calculate_improve()` | `data.frame`, `sf`, or `SpatVector` | Exact site-code matching; preserves observations |
 | `calculate_huc()` | `SpatVector` | HUC watershed membership |
 | `calculate_koppen_geiger()` | `SpatRaster` | Climate zone classification |
 | `calculate_lagged()` | `SpatRaster` | Generic lag calculation helper |

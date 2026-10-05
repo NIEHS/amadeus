@@ -7,10 +7,10 @@
 calculate_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
     "dummies", "gmted", "sedac_groads", "groads", "roads", "ecoregions", "ecoregion",
-    "hms", "smoke", "gmted", "narr", "geos", "sedac_population", "population", "nlcd",
-    "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "mcd14ml", "prism",
-    "cropscape", "cdl", "huc", "edgar", "goes", "goes_adp", "GOES", "drought", "spei",
-    "eddi", "usdm"),
+    "hms", "improve", "smoke", "gmted", "narr", "geos", "sedac_population", "population",
+    "nlcd", "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "mcd14ml",
+    "prism", "cropscape", "cdl", "huc", "edgar", "goes", "goes_adp", "GOES", "drought",
+    "spei", "eddi", "usdm"),
   from,
   locs,
   locs_id = "site_id",
@@ -79,6 +79,7 @@ calculate_covariates(
 \item \code{\link{calculate_ecoregion}}: "ecoregion", "ecoregions"
 \item \code{\link{calculate_temporal_dummies}}: "dummies", "Dummies"
 \item \code{\link{calculate_hms}}: "hms", "smoke", "HMS"
+\item \code{\link{calculate_improve}}: "improve", "IMPROVE"
 \item \code{\link{calculate_gmted}}: "gmted", "GMTED"
 \item \code{\link{calculate_narr}}: "narr", "NARR"
 \item \code{\link{calculate_geos}}: "geos", "geos_cf", "GEOS"
