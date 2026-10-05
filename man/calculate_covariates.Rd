@@ -8,9 +8,9 @@ calculate_covariates(
   covariate = c("modis", "koppen-geiger", "koeppen-geiger", "koppen", "koeppen", "geos",
     "dummies", "gmted", "sedac_groads", "groads", "roads", "ecoregions", "ecoregion",
     "hms", "smoke", "gmted", "narr", "geos", "sedac_population", "population", "nlcd",
-    "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "mcd14ml", "prism",
-    "cropscape", "cdl", "huc", "edgar", "goes", "goes_adp", "GOES", "drought", "spei",
-    "eddi", "usdm"),
+    "merra", "merra2", "gridmet", "terraclimate", "tri", "nei", "improve", "mcd14ml",
+    "prism", "cropscape", "cdl", "huc", "edgar", "goes", "goes_adp", "GOES", "drought",
+    "spei", "eddi", "usdm"),
   from,
   locs,
   locs_id = "site_id",
@@ -87,6 +87,7 @@ calculate_covariates(
 \item \code{\link{calculate_groads}}: "roads", "groads", "sedac_groads"
 \item \code{\link{calculate_nlcd}}: "nlcd", "NLCD"
 \item \code{\link{calculate_tri}}: "tri", "TRI"
+\item \code{\link{calculate_improve}}: "improve", "IMPROVE"
 \item \code{\link{calculate_nei}}: "nei", "NEI"
 \item \code{\link{calculate_merra2}}: "merra", "MERRA", "merra2", "MERRA2"
 \item \code{\link{calculate_gridmet}}: "gridMET", "gridmet"

@@ -39,6 +39,7 @@
 #' * \code{\link{calculate_groads}}: "roads", "groads", "sedac_groads"
 #' * \code{\link{calculate_nlcd}}: "nlcd", "NLCD"
 #' * \code{\link{calculate_tri}}: "tri", "TRI"
+#' * \code{\link{calculate_improve}}: "improve", "IMPROVE"
 #' * \code{\link{calculate_nei}}: "nei", "NEI"
 #' * \code{\link{calculate_merra2}}: "merra", "MERRA", "merra2", "MERRA2"
 #' * \code{\link{calculate_gridmet}}: "gridMET", "gridmet"
@@ -95,6 +96,7 @@ calculate_covariates <-
       "terraclimate",
       "tri",
       "nei",
+      "improve",
       "mcd14ml",
       "prism",
       "cropscape",
@@ -141,6 +143,7 @@ calculate_covariates <-
       sedac_population = amadeus::calculate_population,
       population = amadeus::calculate_population,
       nei = amadeus::calculate_nei,
+      improve = amadeus::calculate_improve,
       mcd14ml = amadeus::calculate_modis,
       tri = amadeus::calculate_tri,
       geos = amadeus::calculate_geos,
@@ -5099,4 +5102,135 @@ calculate_drought <- function(
     geom = geom,
     crs = crs_from
   )
+}
+
+
+#' Extract intersecting IMPROVE station records
+#' @description
+#' Return measurements from stations intersecting each location or buffer.
+#' Records retain their original columns, values, units, dates, and flags.
+#' No status filtering, interpolation, or aggregation is performed.
+#' @param from SpatVector, sf, or data.frame. Output of
+#'   [process_improve()]. Tabular input must contain finite numeric
+#'   `Longitude` and `Latitude` columns in EPSG:4326.
+#' @param locs sf, SpatVector, or data.frame. Unique point or polygon
+#'   locations. Tabular locations require `lon` and `lat` columns.
+#' @param locs_id character(1). Unique, nonmissing location identifier
+#'   column. Default is `"site_id"`. Must not duplicate a measurement column.
+#' @param radius numeric(1). Nonnegative buffer radius in meters. Default
+#'   is zero; unbuffered points match only coincident stations.
+#' @param geom FALSE or character(1). `FALSE` returns a data.frame;
+#'   `"sf"` or `"terra"` attaches the prepared location/buffer geometry.
+#' @param .by_time NULL. Temporal aggregation is not supported.
+#' @param weights NULL. Weighting is not supported.
+#' @param ... Additional arguments. Unsupported arguments are rejected.
+#' @return A data.frame, sf, or SpatVector with `locs_id` and every source
+#'   attribute. One row is returned per intersecting location and source
+#'   record, in location order then source-row order. Overlapping locations
+#'   each receive the matching records. Locations without matches contribute
+#'   no rows. Dates without observations are not filled. Geometry uses the
+#'   source CRS. Empty intersections return zero rows with the same schema.
+#' @seealso [download_improve()], [process_improve()],
+#'   [calculate_covariates()]
+#' @author Amadeus contributors
+#' @examples
+#' \dontrun{
+#' download_data("improve", year = 2022, directory_to_save = "improve",
+#'               acknowledgement = TRUE)
+#' measurements <- process_covariates("improve", path = "improve")
+#' sites <- data.frame(site_id = "001", lon = -68.2608, lat = 44.3771)
+#' calculate_covariates("improve", from = measurements, locs = sites,
+#'                      radius = 1000)
+#' }
+#' @export
+calculate_improve <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  geom = FALSE,
+  .by_time = NULL,
+  weights = NULL,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  if (length(list(...))) {
+    stop("Unused arguments in `...`.")
+  }
+  amadeus::check_geom(geom)
+  if (!is.null(.by_time) || !is.null(weights)) {
+    stop("IMPROVE record extraction requires `.by_time` and `weights` NULL.")
+  }
+  if (!is.numeric(radius) || length(radius) != 1L ||
+      !is.finite(radius) || radius < 0) {
+    stop("`radius` must be one finite nonnegative number in meters.")
+  }
+  if (!is.character(locs_id) || length(locs_id) != 1L ||
+      is.na(locs_id) || !locs_id %in% names(locs)) {
+    stop("`locs_id` must name a location identifier column.")
+  }
+  ids <- as.data.frame(locs)[[locs_id]]
+  if (anyNA(ids) || anyDuplicated(ids)) {
+    stop("Location identifiers must be unique and nonmissing.")
+  }
+  if (methods::is(from, "SpatVector")) {
+    source <- sf::st_as_sf(from)
+  } else if (inherits(from, "sf")) {
+    source <- from
+  } else if (is.data.frame(from)) {
+    coords <- c("Longitude", "Latitude")
+    if (!all(coords %in% names(from)) ||
+        !all(vapply(as.data.frame(from)[, coords, drop = FALSE], function(x) {
+          is.numeric(x) && all(is.finite(x))
+        }, logical(1)))) {
+      stop("Tabular `from` requires finite numeric Longitude and Latitude.")
+    }
+    source <- sf::st_as_sf(as.data.frame(from), coords = coords,
+                           crs = 4326, remove = FALSE)
+  } else {
+    stop("`from` must be processed IMPROVE spatial or tabular data.")
+  }
+  required <- c("SiteCode", "FactDate", "ParamCode", "FactValue", "Units")
+  if (!all(required %in% names(source))) {
+    stop("`from` must contain SiteCode, FactDate, ParamCode, FactValue, Units.")
+  }
+  records <- sf::st_drop_geometry(source)
+  if (locs_id %in% names(records)) {
+    stop("`locs_id` conflicts with a source column; rename the location ID.")
+  }
+  if (is.na(sf::st_crs(source)) ||
+      any(sf::st_geometry_type(source) != "POINT") ||
+      any(sf::st_is_empty(source))) {
+    stop("`from` must have nonempty POINT geometries and a known CRS.")
+  }
+  prepared <- amadeus::calc_prepare_locs(
+    from = terra::vect(source), locs = locs, locs_id = locs_id,
+    radius = radius, geom = FALSE
+  )
+  locations <- sf::st_as_sf(prepared[[1]])
+  matches <- sf::st_intersects(locations, source)
+  location_rows <- rep(seq_along(matches), lengths(matches))
+  source_rows <- unlist(matches, use.names = FALSE)
+  result <- cbind(
+    prepared[[2]][location_rows, , drop = FALSE],
+    records[source_rows, , drop = FALSE]
+  )
+  rownames(result) <- NULL
+  if (identical(geom, FALSE)) {
+    result
+  } else {
+    result <- sf::st_sf(result,
+      geometry = sf::st_geometry(locations)[location_rows])
+    if (geom == "terra") {
+      if (nrow(result) == 0L) {
+        empty <- prepared[[1]][0, ]
+        terra::values(empty) <- sf::st_drop_geometry(result)
+        empty
+      } else {
+        terra::vect(result)
+      }
+    } else {
+      result
+    }
+  }
 }
