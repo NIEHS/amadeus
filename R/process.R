@@ -1834,29 +1834,37 @@ process_nei <- function(
 }
 
 # nolint start
-#' Process U.S. EPA AQS daily CSV data
+#' Process U.S. EPA AQS daily or hourly CSV data
 #' @description
 #' The \code{process_aqs()} function cleans and imports raw air quality
-#' monitoring sites from pre-generated daily CSV files, returning a single
-#' `SpatVector` or `sf` object.
+#' monitoring sites from pre-generated daily or hourly CSV files, returning
+#' a single `SpatVector`, `sf`, or `data.table` object.
 #' `date` is used to filter the raw data read from csv files.
 #' Filtered rows are then processed according to `mode` argument.
 #' Some sites report multiple measurements per day with and without
 #' [exceptional events](https://www.epa.gov/sites/default/files/2016-10/documents/exceptional_events.pdf)
 #' the internal procedure of this function keeps "Included" if there
 #' are multiple event types per site-time.
-#' @param path character(1). Directory path to daily measurement data.
+#' @param path character(1). Directory or CSV file path to measurement data.
 #' @param date character(1 or 2). Date (1) or start and end dates (2).
 #'  Should be in `"YYYY-MM-DD"` format and sorted.
 #' @param mode character(1). One of
 #'   * "date-location" (all dates * all locations)
 #'   * "available-data" (date-location pairs with available data)
 #'   * "location" (unique locations).
-#' @param data_field character(1). Data field to extract.
+#' @param data_field character(1). Data field to extract. Defaults to
+#'   "Arithmetic.Mean" for daily data and "Sample.Measurement" for hourly data.
 #' @param return_format character(1). `"terra"` or `"sf"` or `"data.table"`.
 #' @param extent numeric(4). Spatial extent of the resulting object.
 #'   The order should be `c(xmin, xmax, ymin, ymax)`.
 #'   The coordinate system should be WGS84 (EPSG:4326).
+#' @param resolution_temporal character(1). "daily" (default) or "hourly".
+#'   Dates and hourly `time` strings use local standard time at each monitor.
+#'   Hourly times have format `YYYY-MM-DD HH:MM:SS`; no time zone conversion
+#'   is performed. Date filtering includes every hour of the end date.
+#'   In hourly mode, "date-location" creates 24 hours per date and location,
+#'   and "available-data" retains individual measurements without averaging.
+#'   Daily and hourly files in a directory are selected by their CSV columns.
 #' @param ... Placeholders.
 #' @seealso
 #' * [`download_aqs()`]
@@ -1894,8 +1902,16 @@ process_aqs <-
     data_field = "Arithmetic.Mean",
     return_format = c("terra", "sf", "data.table"),
     extent = NULL,
-    ...
+    ...,
+    resolution_temporal = "daily"
   ) {
+    resolution_temporal <- match.arg(
+      resolution_temporal, c("daily", "hourly")
+    )
+    hourly <- resolution_temporal == "hourly"
+    if (hourly && missing(data_field)) {
+      data_field <- "Sample.Measurement"
+    }
     mode <- match.arg(mode)
     return_format <- match.arg(return_format)
     if (!is.null(date)) {
@@ -1926,6 +1942,12 @@ process_aqs <-
     }
     pathfiles <- lapply(path, read.csv)
 
+    pathfiles <- Filter(function(x) {
+      ("Time.Local" %in% names(x)) == hourly
+    }, pathfiles)
+    if (length(pathfiles) == 0) {
+      stop("No ", resolution_temporal, " AQS CSV files found in path.")
+    }
     sites <- data.table::rbindlist(pathfiles, fill = TRUE)
 
     ## get unique sites
@@ -1959,13 +1981,27 @@ process_aqs <-
     )
     parsed_dates[dash_idx] <- as.Date(raw_dates[dash_idx], format = "%Y-%m-%d")
     sites$Date.Local <- parsed_dates
-    duration_keep <- startsWith(as.character(sites$Sample.Duration), "24")
-    if ("Observation.Count" %in% names(sites)) {
-      duration_keep <-
-        duration_keep |
-        (!is.na(sites$Observation.Count) & sites$Observation.Count == 24)
+    if (hourly) {
+      # Use a fixed clock to format local standard time without DST shifts.
+      hourly_time <- as.POSIXct(
+        paste(sites$Date.Local, sites$Time.Local),
+        format = "%Y-%m-%d %H:%M", tz = "UTC"
+      )
+      if (anyNA(hourly_time)) {
+        stop("Hourly AQS data contain invalid Date.Local or Time.Local.")
+      }
+      sites$time <- format(hourly_time, "%Y-%m-%d %H:%M:%S", tz = "UTC")
+      sites$duration_keep <- TRUE
+    } else {
+      duration_keep <- startsWith(as.character(sites$Sample.Duration), "24")
+      if ("Observation.Count" %in% names(sites)) {
+        duration_keep <-
+          duration_keep |
+          (!is.na(sites$Observation.Count) & sites$Observation.Count == 24)
+      }
+      sites$duration_keep <- duration_keep
+      sites$time <- as.character(sites$Date.Local)
     }
-    sites$duration_keep <- duration_keep
 
     # select relevant fields only
     sites <- sites |>
@@ -1974,31 +2010,34 @@ process_aqs <-
       dplyr::filter(duration_keep) |>
       dplyr::group_by(site_id) |>
       dplyr::filter(POC == min(POC)) |>
-      dplyr::mutate(time = as.character(Date.Local)) |>
       dplyr::ungroup()
     col_sel <- c("site_id", "Longitude", "Latitude", "Datum")
     if (mode != "available-data") {
       sites_v <- unique(sites[, col_sel])
     } else {
-      col_sel <- append(col_sel, "Event.Type")
+      if (!hourly) {
+        col_sel <- append(col_sel, "Event.Type")
+      }
       col_sel <- append(col_sel, "time")
       col_sel <- append(col_sel, data_field)
       sites_v <- sites |>
         dplyr::select(dplyr::all_of(col_sel)) |>
         dplyr::distinct()
-      # excluding site-time with multiple event types
-      # sites_vdup will be "subtracted" from the original sites_v
-      sites_vdup <- sites_v |>
-        dplyr::group_by(site_id, time) |>
-        dplyr::filter(dplyr::n() > 1) |>
-        dplyr::filter(!!dplyr::sym("Event.Type") == "Excluded") |>
-        dplyr::ungroup()
-      sites_v <-
-        dplyr::anti_join(
-          sites_v,
-          sites_vdup,
-          by = c("site_id", "time", "Event.Type")
-        )
+      if (!hourly) {
+        # excluding site-time with multiple event types
+        # sites_vdup will be "subtracted" from the original sites_v
+        sites_vdup <- sites_v |>
+          dplyr::group_by(site_id, time) |>
+          dplyr::filter(dplyr::n() > 1) |>
+          dplyr::filter(!!dplyr::sym("Event.Type") == "Excluded") |>
+          dplyr::ungroup()
+        sites_v <-
+          dplyr::anti_join(
+            sites_v,
+            sites_vdup,
+            by = c("site_id", "time", "Event.Type")
+          )
+      }
     }
     names(sites_v)[2:3] <- c("lon", "lat")
     sites_v <- data.table::as.data.table(sites_v)
@@ -2035,6 +2074,16 @@ process_aqs <-
       ]
 
     if (mode == "date-location") {
+      if (hourly) {
+        date_sequence <- format(
+          seq(
+            as.POSIXct(date_start, tz = "UTC"),
+            as.POSIXct(date_end + 1, tz = "UTC") - 3600,
+            by = "hour"
+          ),
+          "%Y-%m-%d %H:%M:%S", tz = "UTC"
+        )
+      }
       final_sites <-
         split(as.character(date_sequence), as.character(date_sequence)) |>
         lapply(function(x) {
