@@ -5071,7 +5071,7 @@ download_goes <- function(
 #'   \code{hash = TRUE}.
 #' @importFrom httr2 request req_retry req_timeout req_perform resp_status
 #' @seealso
-#'   \code{\link{process_improve}}
+#'   [process_improve()], [calculate_improve()]
 #' @examples
 #' \dontrun{
 #' download_improve(

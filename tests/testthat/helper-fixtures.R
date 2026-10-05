@@ -49,3 +49,12 @@ fixture_aoi <- function() {
 fixture_dates <- function() {
   c("2024-01-01", "2024-01-02")
 }
+
+# Locations at the two bundled IMPROVE sites, plus an uncovered location.
+fixture_improve_locs <- function() {
+  data.frame(
+    station = c("020", "003", "001"),
+    lon = c(-103.1774, -68.2608, 0),
+    lat = c(29.3025, 44.3771, 0)
+  )
+}

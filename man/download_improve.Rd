@@ -82,7 +82,7 @@ download_improve(
 }
 }
 \seealso{
-\code{\link{process_improve}}
+\code{\link[=process_improve]{process_improve()}}, \code{\link[=calculate_improve]{calculate_improve()}}
 }
 \author{
 Insang Song, Mitchell Manware

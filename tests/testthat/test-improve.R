@@ -398,3 +398,304 @@ testthat::test_that("download_improve hash=FALSE returns download_result", {
     testthat::expect_true(grepl("IMPAER_2022\\.txt\\.zip$", captured$destfiles[1]))
   })
 })
+
+testthat::test_that(
+  "calculate_improve(radius=0): retains values, dates, units and custom IDs",
+  {
+    from <- amadeus::process_improve(improve_path)
+    locs <- fixture_improve_locs()
+    out <- amadeus::calculate_improve(from, locs, locs_id = "station")
+    testthat::expect_s3_class(out, "data.frame")
+    testthat::expect_named(
+      out, c("station", "time", "ParamCode", "Units", "FactValue")
+    )
+    testthat::expect_equal(nrow(out), 18L)
+    testthat::expect_identical(out$station, rep(locs$station, each = 6))
+    testthat::expect_s3_class(out$time, "POSIXct")
+    testthat::expect_identical(attr(out$time, "tzone"), "UTC")
+    testthat::expect_equal(
+      unique(as.Date(out$time)), as.Date(c("2022-01-02", "2022-01-05"))
+    )
+    testthat::expect_identical(unique(out$Units), "ug/m^3")
+    testthat::expect_equal(
+      out$FactValue[out$ParamCode == "FPM"],
+      c(1.98, 2.05, 2.85, 3.12, NA, NA)
+    )
+    testthat::expect_equal(
+      out$FactValue[out$ParamCode == "ALf"],
+      c(0.00120, 0.00098, 0.00044, 0.00062, NA, NA)
+    )
+    reordered <- amadeus::calculate_improve(
+      from, locs[3:1, ], locs_id = "station"
+    )
+    testthat::expect_identical(reordered$station, rep(rev(locs$station), each = 6))
+    testthat::expect_equal(
+      reordered$FactValue[reordered$ParamCode == "FPM"],
+      c(NA, NA, 2.85, 3.12, 1.98, 2.05)
+    )
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(from=processed formats): accepts terra, sf and data.table",
+  {
+    locs <- fixture_improve_locs()
+    for (format in c("terra", "sf", "data.table")) {
+      from <- amadeus::process_improve(improve_path, return_format = format)
+      out <- amadeus::calculate_improve(
+        from, locs, locs_id = "station", variable = "FPM"
+      )
+      testthat::expect_equal(nrow(out), 6L, info = format)
+      testthat::expect_equal(out$FactValue, c(1.98, 2.05, 2.85, 3.12, NA, NA))
+      testthat::expect_identical(unique(out$ParamCode), "FPM")
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(radius=1000): buffers locations in meters",
+  {
+    from <- amadeus::process_improve(improve_path)
+    locs <- fixture_improve_locs()[2, ]
+    locs$lon <- locs$lon + 0.005
+    for (radius in c(0, 50, 1000)) {
+      out <- amadeus::calculate_improve(
+        from, locs, locs_id = "station", radius = radius, variable = "FPM"
+      )
+      expected <- if (radius == 1000) c(2.85, 3.12) else c(NA_real_, NA_real_)
+      testthat::expect_equal(out$FactValue, expected, info = radius)
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(locs=polygon): summarizes intersecting monitors",
+  {
+    from <- amadeus::process_improve(improve_path)
+    locs <- fixture_aoi()
+    locs$station <- "002"
+    out <- amadeus::calculate_improve(
+      from, locs, locs_id = "station", variable = "FPM"
+    )
+    testthat::expect_equal(out$FactValue, c(2.415, 2.585))
+    monthly <- amadeus::calculate_improve(
+      from, locs, locs_id = "station", variable = "FPM", .by_time = "month"
+    )
+    testthat::expect_equal(monthly$FactValue, 2.5)
+    summed <- amadeus::calculate_improve(
+      from, locs, locs_id = "station", variable = "FPM", fun_summary = "sum"
+    )
+    testthat::expect_equal(summed$FactValue, c(4.83, 5.17))
+    boundary <- terra::vect(terra::ext(-68.2608, -68, 44, 45), crs = "EPSG:4326")
+    boundary$station <- "003"
+    out_boundary <- amadeus::calculate_improve(
+      from, boundary, locs_id = "station", variable = "FPM"
+    )
+    testthat::expect_equal(out_boundary$FactValue, c(2.85, 3.12))
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(geom='sf'/'terra'): aligns projected IDs and geometry",
+  {
+    from <- amadeus::process_improve(improve_path)
+    locs <- sf::st_as_sf(fixture_improve_locs(), coords = c("lon", "lat"), crs = 4326)
+    projected <- sf::st_transform(locs, 3857)
+    for (geom in c("sf", "terra")) {
+      input <- if (geom == "sf") projected else terra::vect(projected)
+      out <- amadeus::calculate_improve(
+        from, input, locs_id = "station", variable = "FPM",
+        radius = 1000, .by_time = "month", geom = geom
+      )
+      if (geom == "sf") {
+        testthat::expect_s3_class(out, "sf")
+      } else {
+        testthat::expect_s4_class(out, "SpatVector")
+      }
+      out_sf <- sf::st_as_sf(out)
+      testthat::expect_identical(out_sf$station, c("020", "003", "001"))
+      testthat::expect_equal(out_sf$FactValue, c(2.015, 2.985, NA))
+      testthat::expect_identical(sf::st_crs(out_sf)$epsg, 4326L)
+      testthat::expect_identical(as.character(sf::st_geometry_type(out_sf)), rep("POLYGON", 3))
+      testthat::expect_identical(
+        lapply(sf::st_intersects(out_sf, locs), identity), list(1L, 2L, 3L)
+      )
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_covariates(covariate='IMPROVE', .by_time='month'): forwards options",
+  {
+    from <- amadeus::process_improve(improve_path)
+    locs <- fixture_improve_locs()
+    for (alias in c("improve", "IMPROVE")) {
+      out <- amadeus::calculate_covariates(
+        alias, from, locs, locs_id = "station", variable = "FPM",
+        .by_time = "month", fun_summary = "max"
+      )
+      testthat::expect_equal(out$FactValue, c(2.05, 3.12, NA))
+      testthat::expect_equal(as.Date(out$time), rep(as.Date("2022-01-01"), 3))
+      testthat::expect_identical(out$station, locs$station)
+    }
+    testthat::expect_error(
+      amadeus::calculate_covariates("improve", from, locs, weights = 1),
+      "IMPROVE supports unweighted"
+    )
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(.by_time='month'): separates units and averages dates equally",
+  {
+    from <- data.frame(
+      FactDate = as.Date(c("2022-01-02", "2022-01-02", "2022-01-05", "2022-01-02")),
+      ParamCode = "FPM", Units = c("ug/m^3", "ug/m^3", "ug/m^3", "ng/m^3"),
+      FactValue = c(10, 20, 40, 1000), POC = c(1, 2, 1, 1),
+      MethodID = 5017, Latitude = 44.3771, Longitude = -68.2608
+    )
+    out <- amadeus::calculate_improve(
+      from, fixture_improve_locs()[2, ], locs_id = "station", .by_time = "month"
+    )
+    testthat::expect_equal(nrow(out), 2L)
+    testthat::expect_equal(out$FactValue[out$Units == "ug/m^3"], 27.5)
+    testthat::expect_equal(out$FactValue[out$Units == "ng/m^3"], 1000)
+    testthat::expect_named(out, c("station", "time", "ParamCode", "Units", "FactValue"))
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(FactValue=NA/0): distinguishes missing values and valid zero",
+  {
+    from <- amadeus::process_improve(improve_path, return_format = "data.table")
+    from$FactValue[from$ParamCode == "ALf"] <- NA_real_
+    from$FactValue[from$ParamCode == "ECf"] <- 0
+    from$FactValue[from$ParamCode == "FPM" & from$SiteCode == "BIBE1"] <- NA_real_
+    locs <- fixture_aoi()
+    locs$site_id <- "003"
+    out <- amadeus::calculate_improve(from, locs, .by_time = "month")
+    testthat::expect_identical(out$FactValue[out$ParamCode == "ALf"], NA_real_)
+    testthat::expect_equal(out$FactValue[out$ParamCode == "ECf"], 0)
+    testthat::expect_equal(out$FactValue[out$ParamCode == "FPM"], 2.985)
+    out_sum <- amadeus::calculate_improve(from, locs, fun_summary = "sum")
+    testthat::expect_identical(out_sum$FactValue[out_sum$ParamCode == "ALf"], c(NA_real_, NA_real_))
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(from=<empty>, locs=<empty>): returns typed empty results",
+  {
+    from <- amadeus::process_improve(improve_path)
+    locs <- fixture_improve_locs()
+    for (geom in list(FALSE, "sf", "terra")) {
+      for (empty_source in c(TRUE, FALSE)) {
+        out <- amadeus::calculate_improve(
+          if (empty_source) from[FALSE, ] else from,
+          if (empty_source) locs else locs[FALSE, ],
+          locs_id = "station", geom = geom, .by_time = "month"
+        )
+        testthat::expect_equal(nrow(out), 0L)
+        if (identical(geom, FALSE)) testthat::expect_s3_class(out, "data.frame")
+        if (identical(geom, "sf")) testthat::expect_s3_class(out, "sf")
+        if (identical(geom, "terra")) testthat::expect_s4_class(out, "SpatVector")
+        testthat::expect_type(out$FactValue, "double")
+      }
+    }
+    table <- amadeus::process_improve(improve_path, return_format = "data.table")
+    empty_table <- amadeus::calculate_improve(
+      table[FALSE, ], locs, locs_id = "station"
+    )
+    testthat::expect_equal(nrow(empty_table), 0L)
+    testthat::expect_named(
+      empty_table, c("station", "time", "ParamCode", "Units", "FactValue")
+    )
+    testthat::expect_s3_class(empty_table$time, "POSIXct")
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(inputs=<invalid>): rejects ambiguous or unsupported inputs",
+  {
+    from <- amadeus::process_improve(improve_path)
+    locs <- fixture_improve_locs()
+    calculate <- function(...) amadeus::calculate_improve(from, locs, locs_id = "station", ...)
+    for (radius in list(-1, NA_real_, Inf, c(1, 2), "1000")) {
+      testthat::expect_error(calculate(radius = radius), "`radius`")
+    }
+    testthat::expect_error(calculate(variable = "unknown"), "not found in `ParamCode`")
+    testthat::expect_error(calculate(variable = NA_character_), "`variable`")
+    testthat::expect_error(calculate(.by_time = "invalid"), "`.by_time`")
+    testthat::expect_error(
+      amadeus::calculate_improve(from, locs, locs_id = "station", .by = "year"),
+      "no longer supported"
+    )
+    testthat::expect_error(calculate(geom = TRUE), "`geom`")
+    testthat::expect_error(calculate(weights = 1), "`weights`")
+    testthat::expect_error(calculate(fun_summary = function(x, ...) c(1, 2)), "one numeric value")
+    testthat::expect_error(amadeus::calculate_improve(from, locs), "not found in `locs`")
+    testthat::expect_error(amadeus::calculate_improve(from, locs, locs_id = "time"), "output field")
+    locs$station[2] <- locs$station[1]
+    testthat::expect_error(calculate(), "unique and nonmissing")
+    locs$station[2] <- NA_character_
+    testthat::expect_error(calculate(), "unique and nonmissing")
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(from=<invalid>): validates measurement and spatial schema",
+  {
+    from <- amadeus::process_improve(improve_path, return_format = "data.table")
+    from <- as.data.frame(from)
+    calculate <- function(x) amadeus::calculate_improve(x, fixture_improve_locs(), locs_id = "station")
+    testthat::expect_error(calculate(from[, setdiff(names(from), "Longitude")]), "Longitude and Latitude")
+    testthat::expect_error(calculate(from[, setdiff(names(from), "FactValue")]), "must contain FactDate")
+    bad <- from
+    bad$FactDate[1] <- NA
+    testthat::expect_error(calculate(bad), "valid, nonmissing dates")
+    bad <- from
+    bad$Units[1] <- NA_character_
+    testthat::expect_error(calculate(bad), "must be nonmissing")
+    bad <- from
+    bad$FactValue <- as.character(bad$FactValue)
+    testthat::expect_error(calculate(bad), "must be numeric")
+    testthat::expect_error(calculate(fixture_spatraster()), "points with a CRS")
+    bad <- amadeus::process_improve(improve_path)
+    terra::crs(bad) <- ""
+    testthat::expect_error(calculate(bad), "points with a CRS")
+  }
+)
+
+testthat::test_that(
+  "download_data(dataset_name='improve'): all products reach calculation offline",
+  {
+    tmp <- withr::local_tempdir()
+    local_download_mocks(download_run_method = function(urls, destfiles, ...) {
+      fixture <- sub("\\.zip$", "", basename(destfiles))
+      utils::zip(destfiles, file.path(improve_path, fixture), flags = "-jq")
+      list(success = 1L, failed = 0L, skipped = 0L)
+    })
+    expected <- list(
+      raw = list(parameter = "FPM", units = "ug/m^3", values = c(1.98, 2.05, 2.85, 3.12)),
+      rhr2 = list(parameter = "bext", units = "1/Mm", values = c(8.9, 9.2, 12.3, 14.7)),
+      rhr3 = list(parameter = "dv", units = "dv", values = c(0.98, 1.05, 1.52, 1.73))
+    )
+    for (product in names(expected)) {
+      download <- amadeus::download_data(
+        "improve", tmp, acknowledgement = TRUE, year = 2022, product = product
+      )
+      testthat::expect_equal(download$success, 1L)
+      processed <- amadeus::process_covariates("IMPROVE", path = tmp, product = product)
+      # Use embedded site metadata, as a real download does.
+      sites <- processed[match(c("BIBE1", "ACAD1"), processed$SiteCode), "SiteCode"]
+      sites$station <- c("020", "003")
+      out <- amadeus::calculate_covariates(
+        "IMPROVE", processed, sites, locs_id = "station",
+        variable = expected[[product]]$parameter
+      )
+      testthat::expect_equal(out$FactValue, expected[[product]]$values)
+      testthat::expect_identical(unique(out$Units), expected[[product]]$units)
+      testthat::expect_identical(out$station, rep(c("020", "003"), each = 2))
+      testthat::expect_length(list.files(tmp, pattern = "\\.zip$"), 0L)
+    }
+  }
+)
