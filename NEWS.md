@@ -1,5 +1,8 @@
 # amadeus 2.0.2
 
+- Added `calculate_improve()` and the `calculate_covariates("improve", ...)`
+  route for spatial matching of processed monitoring observations, with
+  optional temporal means and geometry output.
 - Fixed process_gridmet() to use valid native NetCDF time metadata from terra::time() when available and fall back to layer-name parsing when needed
 - Fixed download_gridmet() to handle cases where all requested files already exist locally without calling download_run_method() with an empty URL list
 
