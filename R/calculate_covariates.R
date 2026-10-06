@@ -35,6 +35,7 @@
 #' * \code{\link{calculate_narr}}: "narr", "NARR"
 #' * \code{\link{calculate_geos}}: "geos", "geos_cf", "GEOS"
 #' * \code{\link{calculate_goes}}: "goes", "goes_adp", "GOES"
+#' * \code{\link{calculate_improve}}: "improve", "IMPROVE"
 #' * \code{\link{calculate_population}}: "population", "sedac_population"
 #' * \code{\link{calculate_groads}}: "roads", "groads", "sedac_groads"
 #' * \code{\link{calculate_nlcd}}: "nlcd", "NLCD"
@@ -104,6 +105,8 @@ calculate_covariates <-
       "goes",
       "goes_adp",
       "GOES",
+      "improve",
+      "IMPROVE",
       "drought",
       "spei",
       "eddi",
@@ -157,6 +160,7 @@ calculate_covariates <-
       edgar = amadeus::calculate_edgar,
       goes = amadeus::calculate_goes,
       goes_adp = amadeus::calculate_goes,
+      improve = amadeus::calculate_improve,
       drought = amadeus::calculate_drought,
       spei = amadeus::calculate_drought,
       eddi = amadeus::calculate_drought,
@@ -4750,6 +4754,356 @@ calculate_goes <- function(
     crs = terra::crs(from)
   )
   return(sites_return)
+}
+
+################################################################################
+# nolint start
+#' Calculate IMPROVE aerosol monitoring covariates
+#' @description
+#' Join observations from the IMPROVE (Interagency Monitoring of Protected
+#' Visual Environments) network to user-supplied point locations. The function
+#' finds monitoring sites within `radius` metres and, by default, selects the
+#' nearest monitor before attaching its measurement records.
+#' @details
+#' Monitor selection is performed once per unique `SiteCode`, rather than once
+#' per measurement row. This keeps all dates and parameters from a selected
+#' monitor aligned with each query location. Distances are geodesic distances
+#' in metres. IMPROVE validity flags are retained but not filtered; callers may
+#' filter fields such as `Status` before or after calculation.
+#'
+#' With `.by_time = NULL`, all matching measurement records and their metadata
+#' are returned. Otherwise, `FactValue` and `distance_m` are averaged within
+#' the requested time bucket and grouped by query location, monitor, parameter,
+#' units, and available sampler, method, and status fields.
+#' @param from SpatVector(1). Point observations returned by
+#'   `process_improve(return_format = "terra")`.
+#' @param locs data.frame, `SpatVector`, or `sf` object containing point query
+#'   locations and the column named by `locs_id`. A data.frame must contain
+#'   columns named `lon` and `lat`.
+#' @param locs_id character(1). Column containing a unique query-location
+#'   identifier. Default is `"site_id"`.
+#' @param radius numeric(1). Maximum monitor search distance in metres.
+#'   Default is `50000` (50 km). Use `0` to match co-located points only.
+#' @param nearest_only logical(1). If `TRUE` (default), return observations
+#'   from the closest monitor within `radius`. If `FALSE`, return observations
+#'   from every monitor within `radius`.
+#' @param weights `NULL`. Included for compatibility with
+#'   `calculate_covariates()`; weighted extraction is not defined for IMPROVE
+#'   point-monitor joins.
+#' @param .by_time NULL or character(1). Optional temporal unit accepted by
+#'   `calc_summarize_by()`, such as `"month"` or `"year"`. `NULL` (default)
+#'   preserves individual observations.
+#' @param geom `FALSE`, `"sf"`, or `"terra"`. If geometry is requested,
+#'   attach query-location geometry. Monitor coordinates remain available in
+#'   `Longitude` and `Latitude`.
+#' @param ... Placeholders. The removed `.by` argument is rejected.
+#' @return A `data.frame`, `SpatVector`, or `sf` object with the query
+#'   identifier, a POSIXct `time` column, `FactDate`, IMPROVE measurement
+#'   fields, monitor coordinates, and `distance_m`. Query locations without a
+#'   monitor inside `radius` are retained with missing measurement fields.
+#' @seealso [download_improve()], [process_improve()]
+#' @author Insang Song, Mitchell Manware
+#' @examples
+#' improve <- process_improve(
+#'   path = system.file("testdata/improve", package = "amadeus"),
+#'   product = "raw",
+#'   return_format = "terra"
+#' )
+#' locs <- data.frame(
+#'   site_id = c("near_acad", "near_bibe"),
+#'   lon = c(-68.3, -103.2),
+#'   lat = c(44.4, 29.3)
+#' )
+#' calculate_improve(
+#'   from = improve,
+#'   locs = locs,
+#'   locs_id = "site_id",
+#'   radius = 100000
+#' )
+#' @export
+# nolint end
+calculate_improve <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 50000,
+  nearest_only = TRUE,
+  weights = NULL,
+  .by_time = NULL,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+  amadeus::check_geom(geom)
+
+  if (!is.null(weights)) {
+    stop("`weights` is not supported for IMPROVE point-monitor joins.\n")
+  }
+  if (!inherits(from, "SpatVector")) {
+    stop(
+      "`from` must be a SpatVector returned by ",
+      "process_improve(return_format = 'terra').\n"
+    )
+  }
+  if (!is.character(locs_id) || length(locs_id) != 1L ||
+      is.na(locs_id) || !nzchar(trimws(locs_id))) {
+    stop("`locs_id` must be a single non-empty character value.\n")
+  }
+  reserved_fields <- unique(c(
+    names(from),
+    "time",
+    "distance_m",
+    "geometry",
+    ".query_idx",
+    ".monitor_idx",
+    ".monitor_code"
+  ))
+  if (locs_id %in% reserved_fields) {
+    stop("`locs_id` conflicts with a reserved IMPROVE result column.\n")
+  }
+  if (!is.numeric(radius) || length(radius) != 1L || is.na(radius) ||
+      !is.finite(radius) || radius < 0) {
+    stop("`radius` must be a single finite non-negative numeric value.\n")
+  }
+  if (!is.logical(nearest_only) || length(nearest_only) != 1L ||
+      is.na(nearest_only)) {
+    stop("`nearest_only` must be TRUE or FALSE.\n")
+  }
+  if (!all(tolower(terra::geomtype(from)) %in% c("point", "points"))) {
+    stop("`from` must contain point geometries from process_improve().\n")
+  }
+
+  from_crs <- terra::crs(from)
+  if (is.na(from_crs) || !nzchar(from_crs)) {
+    stop("`from` must have a defined coordinate reference system.\n")
+  }
+  from_df <- terra::as.data.frame(from)
+  required_fields <- c("SiteCode", "FactDate", "ParamCode", "FactValue")
+  missing_fields <- setdiff(required_fields, names(from_df))
+  if (length(missing_fields) > 0L) {
+    stop(
+      "`from` is missing required IMPROVE field(s): ",
+      paste(missing_fields, collapse = ", "),
+      ".\n"
+    )
+  }
+  if (nrow(from_df) == 0L) {
+    stop("`from` does not contain any IMPROVE observations.\n")
+  }
+
+  from_df$SiteCode <- as.character(from_df$SiteCode)
+  from_df$ParamCode <- as.character(from_df$ParamCode)
+  if (anyNA(from_df$SiteCode) ||
+      any(!nzchar(trimws(from_df$SiteCode)))) {
+    stop("`from$SiteCode` must not contain missing or empty values.\n")
+  }
+  if (anyNA(from_df$ParamCode) ||
+      any(!nzchar(trimws(from_df$ParamCode)))) {
+    stop("`from$ParamCode` must not contain missing or empty values.\n")
+  }
+  if (!is.numeric(from_df$FactValue)) {
+    stop("`from$FactValue` must be numeric.\n")
+  }
+
+  fact_date <- suppressWarnings(try(
+    as.Date(from_df$FactDate),
+    silent = TRUE
+  ))
+  if (inherits(fact_date, "try-error") || anyNA(fact_date)) {
+    stop("`from$FactDate` must contain non-missing, parseable dates.\n")
+  }
+  from_df$FactDate <- fact_date
+
+  locs_prepared <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = 0,
+    geom = geom
+  )
+  locs_vector <- locs_prepared[[1]]
+  locs_return <- data.frame(locs_prepared[[2]], check.names = FALSE)
+  if (!all(tolower(terra::geomtype(locs_vector)) %in%
+      c("point", "points"))) {
+    stop("`locs` must contain point geometries.\n")
+  }
+  if (nrow(locs_return) == 0L) {
+    stop("`locs` must contain at least one query location.\n")
+  }
+  locs_id_values <- locs_return[[locs_id]]
+  empty_locs_id <- is.character(locs_id_values) &&
+    any(!nzchar(trimws(locs_id_values)))
+  if (anyNA(locs_id_values) || anyDuplicated(locs_id_values) > 0L ||
+      empty_locs_id) {
+    stop("`locs_id` values must be unique and non-missing.\n")
+  }
+
+  monitor_rows <- !duplicated(from_df$SiteCode)
+  monitors <- from[monitor_rows, ]
+  monitor_codes <- from_df$SiteCode[monitor_rows]
+  monitor_wgs84 <- terra::project(monitors, "EPSG:4326")
+  monitor_coords <- terra::crds(monitor_wgs84)
+  longitude_by_site <- stats::setNames(
+    monitor_coords[, 1],
+    monitor_codes
+  )
+  latitude_by_site <- stats::setNames(
+    monitor_coords[, 2],
+    monitor_codes
+  )
+  from_df$Longitude <- unname(longitude_by_site[from_df$SiteCode])
+  from_df$Latitude <- unname(latitude_by_site[from_df$SiteCode])
+
+  match_index <- terra::nearby(
+    locs_vector,
+    monitors,
+    distance = radius
+  )
+  matches <- data.frame(
+    .query_idx = integer(0),
+    .monitor_idx = integer(0),
+    .monitor_code = character(0),
+    distance_m = numeric(0)
+  )
+  if (nrow(match_index) > 0L) {
+    match_distances <- as.vector(terra::distance(
+      locs_vector[match_index[, 1], ],
+      monitors[match_index[, 2], ],
+      pairwise = TRUE,
+      unit = "m"
+    ))
+    matches <- data.frame(
+      .query_idx = match_index[, 1],
+      .monitor_idx = match_index[, 2],
+      .monitor_code = monitor_codes[match_index[, 2]],
+      distance_m = match_distances,
+      stringsAsFactors = FALSE
+    )
+    matches <- matches[
+      is.finite(matches$distance_m) & matches$distance_m <= radius,
+      ,
+      drop = FALSE
+    ]
+    matches <- matches[
+      order(
+        matches$.query_idx,
+        matches$distance_m,
+        matches$.monitor_code
+      ),
+      ,
+      drop = FALSE
+    ]
+    if (isTRUE(nearest_only)) {
+      matches <- matches[!duplicated(matches$.query_idx), , drop = FALSE]
+    }
+  }
+
+  matched_queries <- unique(matches$.query_idx)
+  unmatched_count <- nrow(locs_return) - length(matched_queries)
+  if (unmatched_count > 0L) {
+    warning(
+      sprintf(
+        paste0(
+          "No IMPROVE monitor was found within `radius` for %d of %d ",
+          "query location(s); unmatched locations contain missing values.\n"
+        ),
+        unmatched_count,
+        nrow(locs_return)
+      ),
+      call. = FALSE
+    )
+  }
+
+  query_table <- data.frame(.query_idx = seq_len(nrow(locs_return)))
+  query_table[[locs_id]] <- locs_return[[locs_id]]
+  if ("geometry" %in% names(locs_return)) {
+    query_table$geometry <- locs_return$geometry
+  }
+  query_matches <- dplyr::left_join(
+    query_table,
+    matches,
+    by = ".query_idx"
+  )
+  from_df$.monitor_code <- from_df$SiteCode
+  result <- dplyr::left_join(
+    query_matches,
+    from_df,
+    by = ".monitor_code"
+  )
+  result$time <- as.POSIXct(result$FactDate, tz = "UTC")
+
+  result$.query_idx <- NULL
+  result$.monitor_idx <- NULL
+  result$.monitor_code <- NULL
+  result <- data.frame(result, check.names = FALSE)
+
+  if (!is.null(.by_time)) {
+    grouping_candidates <- c(
+      "SiteCode",
+      "ParamCode",
+      "Units",
+      "POC",
+      "MethodID",
+      "Status",
+      "ProviderStatus",
+      "Longitude",
+      "Latitude"
+    )
+    group_cols <- intersect(grouping_candidates, names(result))
+    summary_cols <- unique(c(
+      locs_id,
+      "time",
+      group_cols,
+      "FactValue",
+      "distance_m",
+      if ("geometry" %in% names(result)) "geometry"
+    ))
+    summary_input <- result[, summary_cols, drop = FALSE]
+    has_time <- !is.na(summary_input$time)
+    unmatched_summary <- summary_input[!has_time, , drop = FALSE]
+    unmatched_summary <- unmatched_summary[
+      !duplicated(unmatched_summary[[locs_id]]),
+      ,
+      drop = FALSE
+    ]
+    if (any(has_time)) {
+      result <- amadeus::calc_summarize_by(
+        covar = summary_input[has_time, , drop = FALSE],
+        .by_time = .by_time,
+        fun_summary = "mean",
+        locs_id = locs_id,
+        group_cols_extra = group_cols
+      )
+      result <- dplyr::bind_rows(result, unmatched_summary)
+    } else {
+      result <- unmatched_summary
+    }
+    result$FactDate <- as.Date(result$time)
+    result$time <- as.POSIXct(result$time, tz = "UTC")
+  }
+
+  first_cols <- c(
+    locs_id,
+    "time",
+    "FactDate",
+    "SiteCode",
+    "ParamCode",
+    "FactValue",
+    "Units",
+    "distance_m",
+    "Longitude",
+    "Latitude"
+  )
+  first_cols <- intersect(first_cols, names(result))
+  result <- result[, c(first_cols, setdiff(names(result), first_cols))]
+
+  amadeus::calc_return_locs(
+    covar = result,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = from_crs
+  )
 }
 
 # nolint start
