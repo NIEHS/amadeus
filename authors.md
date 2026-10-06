@@ -26,12 +26,12 @@ Source:
 
 Manware M, Song I, Tedla G, Gemechu N, Messier K (2026). *amadeus:
 Accessing and Analyzing Large-Scale Environmental Data*. R package
-version 2.0.2, <https://niehs.github.io/amadeus/>.
+version 2.0.3, <https://niehs.github.io/amadeus/>.
 
     @Manual{,
       title = {amadeus: Accessing and Analyzing Large-Scale Environmental Data},
       author = {Mitchell Manware and Insang Song and Getachew Tedla and Nigussie Gemechu and Kyle Messier},
       year = {2026},
-      note = {R package version 2.0.2},
+      note = {R package version 2.0.3},
       url = {https://niehs.github.io/amadeus/},
     }

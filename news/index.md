@@ -1,5 +1,11 @@
 # Changelog
 
+## amadeus 2.0.3
+
+- Fixed
+  [`download_narr()`](https://niehs.github.io/amadeus/reference/download_narr.md)
+  base URL to drop the “Datasets” directory.
+
 ## amadeus 2.0.2
 
 - Fixed process_gridmet() to use valid native NetCDF time metadata from
