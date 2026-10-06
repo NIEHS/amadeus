@@ -56,6 +56,7 @@ unless tracing a bug that crosses tiers.
 | `calculate_merra2()` | `SpatRaster` | Reanalysis variables |
 | `calculate_modis()` | `SpatRaster` | MODIS/VIIRS land products; needs `scale` |
 | `calculate_narr()` | `SpatRaster` | NARR reanalysis |
+| `calculate_improve()` | `SpatVector`, `sf`, or table | IMPROVE means by parameter/date within locations or buffers |
 | `calculate_nei()` | `sf` | Point-source emissions |
 | `calculate_nlcd()` | `SpatRaster` | Land cover class fractions |
 | `calculate_population()` | `SpatRaster` | Population density |
@@ -67,8 +68,8 @@ unless tracing a bug that crosses tiers.
 `calculate_covariates()` exposes `goes` and `goes_adp` for
 `calculate_goes()`. The names `drought`, `spei`, `eddi`, and `usdm` dispatch
 to `calculate_drought()`; the processed input type determines the raster or
-USDM polygon pathway. IMPROVE does not currently have a calculate-tier
-function.
+USDM polygon pathway. The `improve` alias dispatches to
+`calculate_improve()` for spatially intersecting IMPROVE measurements.
 
 ---
 

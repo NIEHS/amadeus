@@ -62,7 +62,7 @@ Three-tier API:
   `process_drought()`, and `calculate_drought()`. The public dispatcher names
   `spei`, `eddi`, and `usdm` select the corresponding drought source; `drought`
   uses the function's `source` argument.
-- IMPROVE is supported by `download_improve()` and `process_improve()`.
-  There is currently no `calculate_improve()` function, so agents must not add
-  IMPROVE to the calculate tier unless that functionality is explicitly being
-  implemented.
+- IMPROVE is supported in all three tiers by `download_improve()`,
+  `process_improve()`, and `calculate_improve()`, using the `improve` alias.
+  Calculation summarizes measurements intersecting locations or buffers by
+  parameter and observed date; quality flags are not filtered automatically.

@@ -21,6 +21,7 @@ domains:
   - modis
   - narr
   - nei
+  - improve
   - nlcd
   - population
   - prism

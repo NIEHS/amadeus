@@ -47,6 +47,7 @@
 #' * \code{\link{calculate_cropscape}}: "cropscape", "cdl"
 #' * \code{\link{calculate_huc}}: "huc", "HUC"
 #' * \code{\link{calculate_edgar}}: "edgar"
+#' * \code{\link{calculate_improve}}: "improve", "IMPROVE"
 #' * \code{\link{calculate_drought}}: "drought", "spei", "eddi", "usdm"
 #' @return Calculated covariates as a data.frame or SpatVector object
 #' @author Insang Song
@@ -107,7 +108,8 @@ calculate_covariates <-
       "drought",
       "spei",
       "eddi",
-      "usdm"
+      "usdm",
+      "improve"
     ),
     from,
     locs,
@@ -160,7 +162,8 @@ calculate_covariates <-
       drought = amadeus::calculate_drought,
       spei = amadeus::calculate_drought,
       eddi = amadeus::calculate_drought,
-      usdm = amadeus::calculate_drought
+      usdm = amadeus::calculate_drought,
+      improve = amadeus::calculate_improve
     )
 
     res_covariate <-
@@ -5054,5 +5057,188 @@ calculate_drought <- function(
     POSIXt = TRUE,
     geom = geom,
     crs = crs_from
+  )
+}
+
+#' Calculate IMPROVE aerosol monitoring covariates
+#' @description
+#' Summarize processed IMPROVE measurements intersecting locations or their
+#' buffers, separately for each parameter and observed date.
+#' @param from SpatVector, sf, or data.frame (including data.table). Output of
+#'   [process_improve()]. Tables must include Longitude and Latitude in
+#'   EPSG:4326; spatial inputs must have a CRS and point geometry.
+#' @param locs sf, SpatVector, or data.frame with lon and lat columns.
+#'   Point or polygon locations containing unique, nonmissing identifiers.
+#' @param locs_id character(1). Location identifier column. Default "site_id".
+#' @param radius numeric(1). Nonnegative buffer radius in meters. Default 0
+#'   uses spatial intersection only; unbuffered points must coincide with a
+#'   monitor. No nearest-monitor assignment or interpolation is performed.
+#' @param geom logical(1) or character(1). FALSE returns a data.frame;
+#'   TRUE or "terra" returns a SpatVector; "sf" returns an sf object.
+#' @param .by_time NULL or character(1). Optional temporal aggregation unit,
+#'   as accepted by [calculate_covariates()]. Default retains observed dates.
+#' @param ... Additional arguments. The obsolete `.by` argument is rejected.
+#' @details
+#' Works with raw, rhr2, and rhr3 products. Arithmetic means of nonmissing
+#' FactValue observations are calculated per location, FactDate, and ParamCode.
+#' Duplicate observations contribute equally. Units must be consistent within
+#' each parameter. Status flags and numeric sentinel values are not filtered;
+#' callers must apply any required quality filtering before calculation.
+#' Optional temporal aggregation averages the daily spatial means, giving
+#' each observed date equal weight. Dates absent from the input are not filled.
+#' @return A data.frame, SpatVector, or sf object containing `locs_id`, UTC
+#'   POSIXct `time`, and `improve_<ParamCode>` columns in the original units.
+#'   Each location is retained for each observed date; unmatched or entirely
+#'   missing measurements yield NA. Empty input yields zero rows. Returned
+#'   geometry is the prepared location (including any buffer), in the input
+#'   measurements' CRS.
+#' @author amadeus contributors
+#' @seealso [download_improve()], [process_improve()], [calculate_covariates()]
+#' @examples
+#' from <- process_improve(
+#'   system.file("testdata/improve", package = "amadeus")
+#' )
+#' locs <- data.frame(site_id = "Acadia", lon = -68.2608, lat = 44.3771)
+#' calculate_improve(from, locs, radius = 1000)
+#' @export
+calculate_improve <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  geom = FALSE,
+  .by_time = NULL,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+  if (isTRUE(geom)) geom <- "terra"
+  if (length(geom) != 1L || anyNA(geom)) {
+    stop("`geom` must be FALSE, TRUE, 'sf', or 'terra'.")
+  }
+  amadeus::check_geom(geom)
+  if (!is.numeric(radius) || length(radius) != 1L ||
+      !is.finite(radius) || radius < 0) {
+    stop("`radius` must be a finite nonnegative number in meters.")
+  }
+  if (!is.character(locs_id) || length(locs_id) != 1L ||
+      anyNA(locs_id) || !locs_id %in% names(locs)) {
+    stop("`locs_id` must name an identifier column in `locs`.")
+  }
+  ids <- as.data.frame(locs)[[locs_id]]
+  if (anyNA(ids) || anyDuplicated(ids)) {
+    stop("`locs_id` values must be unique and nonmissing.")
+  }
+  if (locs_id %in% c("time", "geometry", "parameter", "value") ||
+      startsWith(locs_id, "improve_")) {
+    stop("`locs_id` conflicts with a calculation output column.")
+  }
+
+  spatial <- inherits(from, c("SpatVector", "sf"))
+  if (!spatial && !is.data.frame(from)) {
+    stop("`from` must be processed IMPROVE spatial data or a data.frame.")
+  }
+  values <- if (inherits(from, "sf")) {
+    sf::st_drop_geometry(from)
+  } else {
+    as.data.frame(from)
+  }
+  required <- c("FactDate", "ParamCode", "FactValue")
+  if (!all(required %in% names(values))) {
+    stop("`from` must contain FactDate, ParamCode, and FactValue.")
+  }
+  if (!is.numeric(values$FactValue)) {
+    stop("`FactValue` must be numeric.")
+  }
+  dates <- tryCatch(as.Date(values$FactDate), error = function(e) NULL)
+  if (is.null(dates) || anyNA(dates)) {
+    stop("`FactDate` must contain valid, nonmissing dates.")
+  }
+  parameters <- as.character(values$ParamCode)
+  if (anyNA(parameters) || any(!nzchar(parameters))) {
+    stop("`ParamCode` must contain nonempty, nonmissing parameter codes.")
+  }
+  if ("Units" %in% names(values)) {
+    units <- split(as.character(values$Units), parameters)
+    if (any(vapply(units, function(x) {
+      length(unique(stats::na.omit(x))) > 1L
+    }, logical(1)))) {
+      stop("`Units` must be consistent within each ParamCode.")
+    }
+  }
+
+  if (spatial) {
+    if (inherits(from, "sf")) from <- terra::vect(from)
+    if (!nzchar(terra::crs(from)) ||
+        (nrow(from) > 0L && terra::geomtype(from) != "points")) {
+      stop("`from` must have a CRS and point geometry.")
+    }
+  } else {
+    if (!all(c("Longitude", "Latitude") %in% names(values))) {
+      stop("Tabular `from` must contain Longitude and Latitude.")
+    }
+    coords <- values[c("Longitude", "Latitude")]
+    if (!all(vapply(coords, is.numeric, logical(1))) ||
+        any(!is.finite(as.matrix(coords)))) {
+      stop("Longitude and Latitude must be finite numeric coordinates.")
+    }
+    from <- terra::vect(
+      values, geom = c("Longitude", "Latitude"), crs = "EPSG:4326"
+    )
+    terra::crs(from) <- "EPSG:4326"
+  }
+  prepared <- amadeus::calc_prepare_locs(
+    from, locs, locs_id, radius, geom
+  )
+  if (nrow(prepared[[1]]) > 0L &&
+      !terra::geomtype(prepared[[1]]) %in% c("points", "polygons")) {
+    stop("`locs` must contain point or polygon geometry.")
+  }
+
+  #### Sparse spatial matching, retaining the input measurement row indices
+  matches <- sf::st_intersects(
+    sf::st_as_sf(prepared[[1]]), sf::st_as_sf(from)
+  )
+  rows <- unlist(matches, use.names = FALSE)
+  matched <- data.frame(
+    time = as.POSIXct(dates[rows], tz = "UTC"),
+    parameter = paste0("improve_", parameters)[rows],
+    value = values$FactValue[rows]
+  )
+  matched[[locs_id]] <- ids[rep(seq_along(matches), lengths(matches))]
+  mean_available <- function(x, ...) {
+    if (all(is.na(x))) NA_real_ else mean(x, ...)
+  }
+  summarized <- amadeus::calc_summarize_native_time(
+    matched, fun_summary = mean_available, locs_id = locs_id,
+    group_cols_extra = "parameter"
+  )
+  wide <- tidyr::pivot_wider(
+    summarized, names_from = "parameter", values_from = "value"
+  )
+  grid <- prepared[[2]][
+    rep(seq_along(ids), each = length(unique(dates))), , drop = FALSE
+  ]
+  grid$time <- rep(
+    as.POSIXct(sort(unique(dates)), tz = "UTC"), times = length(ids)
+  )
+  covar <- as.data.frame(dplyr::left_join(
+    grid, wide, by = c(locs_id, "time")
+  ))
+  covariates <- paste0("improve_", unique(parameters))[
+    seq_along(unique(parameters))
+  ]
+  missing_columns <- setdiff(covariates, names(covar))
+  covar[missing_columns] <- rep(
+    list(rep(NA_real_, nrow(covar))), length(missing_columns)
+  )
+  if (!is.null(.by_time) && nrow(covar) > 0L) {
+    covar <- amadeus::calc_apply_time_summary(
+      covar, .by_time, fun_summary = mean_available, locs_id = locs_id
+    )
+  }
+  covar$time <- as.POSIXct(covar$time, tz = "UTC")
+  amadeus::calc_return_locs(
+    covar, geom = geom, crs = terra::crs(from)
   )
 }
