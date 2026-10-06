@@ -1302,7 +1302,29 @@ process_nlcd <-
     }
 
     nlcd <- terra::rast(nlcd_file, win = extent)
-    terra::metags(nlcd) <- paste0("Year=", year) # Changed to capital Y
+    nlcd_product <- unique(unlist(lapply(
+      nlcd_file_base,
+      function(x) {
+        product_code <- regmatches(
+          x,
+          regexpr(
+            paste(product_codes, collapse = "|"),
+            x,
+            ignore.case = TRUE
+          )
+        )
+        product_codes[match(tolower(product_code), tolower(product_codes))]
+      }
+    )))
+    nlcd_product <- nlcd_product[!is.na(nlcd_product)]
+    nlcd_metadata <- paste0("Year=", year)
+    if (length(nlcd_product) == 1L) {
+      nlcd_metadata <- c(
+        nlcd_metadata,
+        paste0("Product=", nlcd_product)
+      )
+    }
+    terra::metags(nlcd) <- nlcd_metadata
     return(nlcd)
   }
 
@@ -3707,6 +3729,17 @@ process_gridmet <- function(
       value = TRUE
     )
   )
+  if (length(data_paths) == 0) {
+    stop(
+      paste0(
+        "No gridMET NetCDF files for variable '",
+        variable_checked,
+        "' and requested year(s) were found in `path`: ",
+        path
+      ),
+      call. = FALSE
+    )
+  }
   #### initiate for loop
   data_full <- terra::rast()
   for (p in seq_along(data_paths)) {
@@ -3734,7 +3767,7 @@ process_gridmet <- function(
 
     if (
       length(existing_time) == terra::nlyr(data_year) &&
-      !all(is.na(existing_time))
+      !anyNA(existing_time)
     ) {
       terra::time(data_year) <- existing_time
     } else {
@@ -3763,17 +3796,27 @@ process_gridmet <- function(
     )
   }
   #### subset years to dates of interest
-  data_return <- terra::subset(
-    data_full,
-    which(
-      substr(
-        names(data_full),
-        nchar(names(data_full)) - 7,
-        nchar(names(data_full))
-      ) %in%
-        date_sequence
-    )
+  selected_layers <- which(
+    substr(
+      names(data_full),
+      nchar(names(data_full)) - 7,
+      nchar(names(data_full))
+    ) %in%
+      date_sequence
   )
+  if (length(selected_layers) == 0) {
+    stop(
+      paste0(
+        "No gridMET layers fall within the requested date range ",
+        date[1],
+        " to ",
+        date[2],
+        "."
+      ),
+      call. = FALSE
+    )
+  }
+  data_return <- terra::subset(data_full, selected_layers)
   message(paste0(
     "Returning daily ",
     variable_checked_long,
@@ -4155,9 +4198,9 @@ process_cropscape <-
 #'  lower level HUCs.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
-#' @param ... Arguments passed to `nhdplusTools::get_huc()`
+#' @param ... Arguments passed to `hydrogeofetch::get_huc()`
 #' @return a `SpatVector` object
-#' @seealso [`nhdplusTools::get_huc`]
+#' @seealso [`hydrogeofetch::get_huc`]
 #' @importFrom terra vect
 #' @importFrom terra vector_layers
 #' @importFrom rlang inject
@@ -4201,15 +4244,15 @@ process_huc <-
     # exclude the coverage due to write permission related to memoization
     #nocov start
     if (missing(path) || (!file.exists(path) && !dir.exists(path))) {
-      if (!requireNamespace("nhdplusTools", quietly = TRUE)) {
+      if (!requireNamespace("hydrogeofetch", quietly = TRUE)) {
         stop(
-          "Package 'nhdplusTools' is required when fetching HUC data ",
+          "Package 'hydrogeofetch' is required when fetching HUC data ",
           "remotely. ",
           "Please install it and try again."
         )
       }
       hucpoly <- try(
-        rlang::inject(nhdplusTools::get_huc(!!!list(...)))
+        rlang::inject(hydrogeofetch::get_huc(!!!list(...)))
       )
       if (inherits(hucpoly, "try-error")) {
         stop("HUC data was not found.")
@@ -4217,7 +4260,7 @@ process_huc <-
       hucpoly <- terra::vect(hucpoly)
     }
     #nocov end
-    if (file.exists(path) || dir.exists(path)) {
+    if (!missing(path) && (file.exists(path) || dir.exists(path))) {
       if (!is.null(huc_header)) {
         querybase <-
           sprintf(

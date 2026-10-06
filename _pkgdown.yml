@@ -14,6 +14,8 @@ navbar:
       text: Articles
       menu:
         - text: General Articles
+        - text: Reproducible Testing
+          href: articles/testing.html
         - text: download_data Function
           href: articles/download_functions.html
         - text: Time grouping in calculate_* functions
@@ -129,6 +131,7 @@ articles:
 - title: Articles
   navbar: ~
   contents:
+  - testing
   - download_functions
   - calculate_time_grouping
   - protected_datasets

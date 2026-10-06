@@ -373,7 +373,8 @@ testthat::test_that("process_hms (absent polygons - 12/31/2018)", {
       )
     )
   # expect character (absent polygons path returns vector of dates)
-  testthat::expect_true(is.character(hms))
+  testthat::expect_type(hms, "character")
+  testthat::expect_identical(hms, "2018-12-31")
 })
 
 ################################################################################
@@ -463,6 +464,14 @@ testthat::test_that("calculate_hms (with geometry)", {
     hms_covariate_terra,
     "SpatVector"
   )
+  testthat::expect_identical(
+    terra::geomtype(hms_covariate_terra),
+    "points"
+  )
+  testthat::expect_true(all(terra::is.valid(hms_covariate_terra)))
+  testthat::expect_true(
+    terra::same.crs(hms_covariate_terra, hms)
+  )
   hms_covariate_sf <- calculate_hms(
     from = hms,
     locs = ncp,
@@ -475,7 +484,9 @@ testthat::test_that("calculate_hms (with geometry)", {
     ncol(hms_covariate_sf),
     6
   )
-  testthat::expect_true("sf" %in% class(hms_covariate_sf))
+  testthat::expect_s3_class(hms_covariate_sf, "sf")
+  testthat::expect_true(all(sf::st_is_valid(hms_covariate_sf)))
+  testthat::expect_equal(sf::st_crs(hms_covariate_sf)$epsg, 4326)
 
   testthat::expect_error(
     calculate_hms(
@@ -887,3 +898,327 @@ testthat::test_that("download_hms skips cleanly when all files already exist", {
     testthat::expect_equal(result$skipped, 2)
   })
 })
+
+testthat::test_that(
+  "HMS Shapefile fixture: contains valid polygon geometry and required fields",
+  {
+    shapefile <- testthat::test_path(
+      "..",
+      "testdata",
+      "hms",
+      "hms_smoke20220610.shp"
+    )
+    sidecars <- paste0(
+      sub("[.]shp$", "", shapefile),
+      c(".shp", ".shx", ".dbf", ".prj")
+    )
+    hms_raw <- terra::vect(shapefile)
+
+    testthat::expect_true(all(file.exists(sidecars)))
+    testthat::expect_true(all(file.info(sidecars)$size > 0))
+    testthat::expect_s4_class(hms_raw, "SpatVector")
+    testthat::expect_gt(nrow(hms_raw), 0L)
+    testthat::expect_identical(terra::geomtype(hms_raw), "polygons")
+    testthat::expect_true(all(terra::is.valid(hms_raw)))
+    testthat::expect_true(terra::same.crs(hms_raw, "EPSG:4326"))
+    testthat::expect_true(
+      all(c("Start", "End", "Density") %in% names(hms_raw))
+    )
+    testthat::expect_true(
+      all(hms_raw$Density %in% c("Light", "Medium", "Heavy"))
+    )
+    testthat::expect_true(all(grepl("^[0-9]{7} [0-9]{4}$", hms_raw$Start)))
+  }
+)
+
+testthat::test_that(
+  "process_hms(date=c('2022-06-10','2022-06-13')): returns exact vector contract",
+  {
+    hms <- suppressMessages(
+      process_hms(
+        date = c("2022-06-10", "2022-06-13"),
+        path = testthat::test_path("..", "testdata", "hms")
+      )
+    )
+    hms_data <- as.data.frame(hms)
+
+    testthat::expect_s4_class(hms, "SpatVector")
+    testthat::expect_equal(nrow(hms), 3L)
+    testthat::expect_identical(names(hms), c("Density", "Date"))
+    testthat::expect_identical(terra::geomtype(hms), "polygons")
+    testthat::expect_true(all(terra::is.valid(hms)))
+    testthat::expect_true(terra::same.crs(hms, "EPSG:4326"))
+    testthat::expect_equal(terra::crs(hms, describe = TRUE)$code, "4326")
+    testthat::expect_s3_class(hms_data$Density, "factor")
+    testthat::expect_setequal(
+      levels(hms_data$Density),
+      c("Light", "Medium", "Heavy")
+    )
+    testthat::expect_identical(
+      as.character(hms_data$Density),
+      rep("Light", 3L)
+    )
+    testthat::expect_s3_class(hms_data$Date, "Date")
+    testthat::expect_identical(
+      hms_data$Date,
+      as.Date(c("2022-06-10", "2022-06-11", "2022-06-13"))
+    )
+    testthat::expect_false(anyNA(hms_data))
+
+    hms_extent <- as.vector(terra::ext(hms))
+    testthat::expect_true(all(is.finite(hms_extent)))
+    testthat::expect_gte(hms_extent[1], -180)
+    testthat::expect_lte(hms_extent[2], 180)
+    testthat::expect_gte(hms_extent[3], -65)
+    testthat::expect_lte(hms_extent[4], 85)
+  }
+)
+
+testthat::test_that(
+  "process_hms(extent=SpatExtent): filters features by spatial intersection",
+  {
+    requested_extent <- terra::ext(-79, -78.6, 35.6, 36.1)
+    hms <- suppressMessages(
+      process_hms(
+        date = c("2022-06-10", "2022-06-13"),
+        path = testthat::test_path("..", "testdata", "hms"),
+        extent = requested_extent
+      )
+    )
+    extent_polygon <- terra::as.polygons(
+      requested_extent,
+      crs = "EPSG:4326"
+    )
+
+    testthat::expect_s4_class(hms, "SpatVector")
+    testthat::expect_equal(nrow(hms), 3L)
+    testthat::expect_identical(
+      as.data.frame(hms)$Date,
+      as.Date(c("2022-06-10", "2022-06-11", "2022-06-13"))
+    )
+    testthat::expect_true(
+      all(terra::relate(hms, extent_polygon, relation = "intersects"))
+    )
+    testthat::expect_true(all(terra::is.valid(hms)))
+    testthat::expect_true(terra::same.crs(hms, "EPSG:4326"))
+
+    no_intersection <- suppressMessages(
+      process_hms(
+        date = c("2022-06-10", "2022-06-13"),
+        path = testthat::test_path("..", "testdata", "hms"),
+        extent = terra::ext(0, 1, 0, 1)
+      )
+    )
+    testthat::expect_type(no_intersection, "character")
+    testthat::expect_identical(
+      no_intersection,
+      as.character(seq(
+        as.Date("2022-06-10"),
+        as.Date("2022-06-13"),
+        by = "day"
+      ))
+    )
+  }
+)
+
+testthat::test_that(
+  "process_hms(overlapping densities): retains the highest density at each point",
+  {
+    hms_dir <- withr::local_tempdir()
+    smoke <- terra::vect(
+      c(
+        "POLYGON((0 0,3 0,3 3,0 3,0 0))",
+        "POLYGON((1 1,3 1,3 3,1 3,1 1))",
+        "POLYGON((2 2,3 2,3 3,2 3,2 2))"
+      ),
+      crs = "EPSG:4326"
+    )
+    smoke$Start <- rep("2020001 0000", 3L)
+    smoke$End <- rep("2020001 2359", 3L)
+    smoke$Density <- c("Light", "Medium", "Heavy")
+    terra::writeVector(
+      smoke,
+      file.path(hms_dir, "hms_smoke20200101.shp"),
+      overwrite = TRUE
+    )
+
+    hms <- suppressMessages(process_hms("2020-01-01", hms_dir))
+    result <- suppressMessages(
+      calculate_hms(
+        from = hms,
+        locs = data.frame(
+          site_id = c("light", "medium", "heavy"),
+          lon = c(0.5, 1.5, 2.5),
+          lat = c(0.5, 1.5, 2.5)
+        ),
+        locs_id = "site_id",
+        radius = 0
+      )
+    )
+    result <- result[
+      match(c("light", "medium", "heavy"), as.character(result$site_id)),
+    ]
+
+    testthat::expect_setequal(
+      as.character(as.data.frame(hms)$Density),
+      c("Light", "Medium", "Heavy")
+    )
+    testthat::expect_true(all(terra::is.valid(hms)))
+    testthat::expect_identical(result$light_00000, c(1L, 0L, 0L))
+    testthat::expect_identical(result$medium_00000, c(0L, 1L, 0L))
+    testthat::expect_identical(result$heavy_00000, c(0L, 0L, 1L))
+  }
+)
+
+testthat::test_that(
+  "calculate_hms(radius=1000, geom='terra'): uses R as radius and 2R as diameter",
+  {
+    input_radius <- 1000
+    smoke <- terra::vect(
+      paste0(
+        "POLYGON((1500 -500,2500 -500,2500 500,",
+        "1500 500,1500 -500))"
+      ),
+      crs = "EPSG:3857"
+    )
+    smoke$Density <- factor(
+      "Light",
+      levels = c("Light", "Medium", "Heavy")
+    )
+    smoke$Date <- as.Date("2020-01-01")
+
+    result <- suppressWarnings(
+      suppressMessages(
+        calculate_hms(
+          from = smoke,
+          locs = data.frame(site_id = "site_1", lon = 0, lat = 0),
+          locs_id = "site_id",
+          radius = input_radius,
+          geom = "terra"
+        )
+      )
+    )
+    result_extent <- as.vector(terra::ext(result))
+    output_diameters <- c(
+      x = result_extent[2] - result_extent[1],
+      y = result_extent[4] - result_extent[3]
+    )
+    output_radii <- output_diameters / 2
+    density_columns <- c("light_01000", "medium_01000", "heavy_01000")
+
+    testthat::expect_s4_class(result, "SpatVector")
+    testthat::expect_identical(terra::geomtype(result), "polygons")
+    testthat::expect_true(terra::same.crs(result, smoke))
+    testthat::expect_equal(
+      unname(output_diameters),
+      rep(2 * input_radius, 2),
+      tolerance = 1e-8
+    )
+    testthat::expect_equal(
+      unname(output_radii),
+      rep(input_radius, 2),
+      tolerance = 1e-8
+    )
+    testthat::expect_lte(max(output_radii), input_radius + 1e-8)
+
+    testthat::expect_true(all(density_columns %in% names(result)))
+    testthat::expect_equal(
+      sum(unlist(as.data.frame(result)[density_columns], use.names = FALSE)),
+      0L
+    )
+  }
+)
+
+testthat::test_that(
+  "calculate_hms(frac=TRUE, half overlap): returns approximately 0.5",
+  {
+    input_radius <- 1000
+    smoke <- terra::vect(
+      paste0(
+        "POLYGON((0 -2000,2000 -2000,2000 2000,",
+        "0 2000,0 -2000))"
+      ),
+      crs = "EPSG:3857"
+    )
+    smoke$Density <- factor(
+      "Light",
+      levels = c("Light", "Medium", "Heavy")
+    )
+    smoke$Date <- as.Date("2020-01-01")
+
+    result <- suppressMessages(
+      calculate_hms(
+        from = smoke,
+        locs = data.frame(site_id = "site_1", lon = 0, lat = 0),
+        locs_id = "site_id",
+        radius = input_radius,
+        frac = TRUE
+      )
+    )
+
+    testthat::expect_s3_class(result, "data.frame")
+    testthat::expect_equal(nrow(result), 1L)
+    testthat::expect_type(result$light_01000, "double")
+    testthat::expect_equal(result$light_01000, 0.5, tolerance = 0.01)
+    testthat::expect_equal(result$medium_01000, 0)
+    testthat::expect_equal(result$heavy_01000, 0)
+  }
+)
+
+testthat::test_that(
+  "calculate_hms(locs in EPSG:4326 and EPSG:3857): extracts equal indicators",
+  {
+    hms <- suppressMessages(
+      process_hms(
+        date = "2022-06-10",
+        path = testthat::test_path("..", "testdata", "hms")
+      )
+    )
+    smoke_point <- suppressWarnings(
+      terra::centroids(hms[1, ], inside = TRUE)
+    )
+    smoke_coordinates <- terra::crds(smoke_point)
+    locs_4326 <- sf::st_as_sf(
+      data.frame(
+        site_id = "site_1",
+        lon = smoke_coordinates[1, 1],
+        lat = smoke_coordinates[1, 2]
+      ),
+      coords = c("lon", "lat"),
+      crs = 4326
+    )
+    locs_3857 <- sf::st_transform(locs_4326, 3857)
+
+    result_4326 <- suppressMessages(
+      calculate_hms(
+        from = hms,
+        locs = locs_4326,
+        locs_id = "site_id",
+        radius = 0
+      )
+    )
+    result_3857 <- suppressMessages(
+      calculate_hms(
+        from = hms,
+        locs = locs_3857,
+        locs_id = "site_id",
+        radius = 0
+      )
+    )
+    density_columns <- c("light_00000", "medium_00000", "heavy_00000")
+
+    testthat::expect_identical(
+      as.character(result_4326$site_id),
+      as.character(result_3857$site_id)
+    )
+    testthat::expect_identical(result_4326$time, result_3857$time)
+    testthat::expect_identical(
+      result_4326[density_columns],
+      result_3857[density_columns]
+    )
+    testthat::expect_equal(
+      sum(unlist(result_4326[density_columns], use.names = FALSE)),
+      1L
+    )
+  }
+)
