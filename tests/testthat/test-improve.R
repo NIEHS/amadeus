@@ -509,3 +509,72 @@ testthat::test_that(
                            "conflicts")
   }
 )
+
+testthat::test_that(
+  "calculate_improve(geom=NA/vector): rejects ambiguous geometry requests",
+  {
+    source <- process_improve(improve_path, return_format = "data.table")
+    targets <- data.frame(site_id = "001", SiteCode = "ACAD1")
+    for (geom in list(NA, character(), c("sf", "terra"))) {
+      testthat::expect_error(
+        calculate_improve(source, targets, geom = geom),
+        "`geom` must be one of", fixed = TRUE
+      )
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(locs_id/site_code=invalid): requires single column names",
+  {
+    source <- process_improve(improve_path, return_format = "data.table")
+    targets <- data.frame(site_id = "001", SiteCode = "ACAD1")
+    for (column in list(NULL, NA_character_, "", 1, c("a", "b"))) {
+      testthat::expect_error(
+        calculate_improve(source, targets, locs_id = column),
+        "must be single column names", fixed = TRUE
+      )
+      testthat::expect_error(
+        calculate_improve(source, targets, site_code = column),
+        "must be single column names", fixed = TRUE
+      )
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(from/locs=list): rejects inputs without a table structure",
+  {
+    source <- process_improve(improve_path, return_format = "data.table")
+    targets <- data.frame(site_id = "001", SiteCode = "ACAD1")
+    testthat::expect_error(
+      calculate_improve(as.list(source), targets),
+      "must be tables, sf, or SpatVector objects", fixed = TRUE
+    )
+    testthat::expect_error(
+      calculate_improve(source, as.list(targets)),
+      "must be tables, sf, or SpatVector objects", fixed = TRUE
+    )
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(from/locs=duplicate columns): rejects ambiguous schemas",
+  {
+    source <- process_improve(improve_path, return_format = "data.table")
+    targets <- data.frame(site_id = "001", SiteCode = "ACAD1")
+    duplicate_source <- as.data.frame(source)
+    duplicate_source$extra <- duplicate_source$FactValue
+    names(duplicate_source)[ncol(duplicate_source)] <- "FactValue"
+    testthat::expect_error(
+      calculate_improve(duplicate_source, targets),
+      "Input column names must be unique", fixed = TRUE
+    )
+    targets$extra <- targets$SiteCode
+    names(targets)[ncol(targets)] <- "SiteCode"
+    testthat::expect_error(
+      calculate_improve(source, targets),
+      "Input column names must be unique", fixed = TRUE
+    )
+  }
+)
