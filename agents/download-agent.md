@@ -46,6 +46,7 @@ crosses tiers.
 | `download_ecoregion()` | EPA Level III/IV Ecoregions | No |
 | `download_edgar()` | EDGAR greenhouse gas emissions | No |
 | `download_geos()` | NASA GEOS-CF atmospheric composition | NASA token |
+| `download_goes()` | NOAA GOES-16/18 Aerosol Detection Product | No |
 | `download_gmted()` | USGS GMTED2010 elevation | No |
 | `download_gridmet()` | GridMET climate | No |
 | `download_groads()` | SEDAC Global Roads | No |
@@ -62,6 +63,12 @@ crosses tiers.
 | `download_terraclimate()` | TerraClimate | No |
 | `download_tri()` | EPA Toxic Release Inventory | No |
 | `download_cropscape()` | USDA CropScape CDL | No |
+| `download_drought()` | SPEI, EDDI, and USDM drought products | No |
+| `download_improve()` | IMPROVE aerosol monitoring | No |
+
+`download_data()` exposes `goes` and `goes_adp` for `download_goes()`;
+`drought`, `spei`, `eddi`, and `usdm` dispatch to `download_drought()`. The
+source-specific drought aliases forward the matching `source` value.
 
 ### Key helpers in `download_auxiliary.R`
 | Helper | Purpose |

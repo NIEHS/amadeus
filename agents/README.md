@@ -52,3 +52,17 @@ Three-tier API:
 1. `download_data(dataset_name, ...)` → raw files on disk
 2. `process_covariates(covariate, path, ...)` → `SpatRaster` / `SpatVector` / `sf`
 3. `calculate_covariates(covariate, from, locs, locs_id, ...)` → `data.frame` / `SpatVector`
+
+## Dataset support notes
+
+- GOES ADP is supported in all three tiers by `download_goes()`,
+  `process_goes()`, and `calculate_goes()`. The public aliases are `goes` and
+  `goes_adp` (matching is case-insensitive in the dispatchers).
+- Drought data are supported in all three tiers by `download_drought()`,
+  `process_drought()`, and `calculate_drought()`. The public dispatcher names
+  `spei`, `eddi`, and `usdm` select the corresponding drought source; `drought`
+  uses the function's `source` argument.
+- IMPROVE is supported in all three tiers by `download_improve()`,
+  `process_improve()`, and `calculate_improve()`, using the `improve` alias.
+  Calculation summarizes measurements intersecting locations or buffers by
+  parameter and observed date; quality flags are not filtered automatically.

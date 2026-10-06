@@ -25,7 +25,7 @@ download_aqs(
 \item{parameter_code}{integer(1). EPA pollutant parameter code. See
 Details for a short list of common codes.}
 
-\item{resolution_temporal}{character(1). Currently only "daily" is supported.}
+\item{resolution_temporal}{character(1). "daily" (default) or "hourly".}
 
 \item{year}{integer(1 or 2). Year or start/end years for downloading data.}
 

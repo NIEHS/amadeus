@@ -45,6 +45,7 @@ unless tracing a bug that crosses tiers.
 | `calculate_cropscape()` | `SpatRaster` | Categorical raster; returns class fractions |
 | `calculate_ecoregion()` | `SpatVector` | Join by spatial overlap |
 | `calculate_geos()` | `SpatRaster` | Temporal extraction with lag support |
+| `calculate_goes()` | `SpatRaster` | Sub-daily or daily GOES ADP extraction |
 | `calculate_gmted()` | `SpatRaster` | Elevation statistics |
 | `calculate_gridmet()` | `SpatRaster` | Daily climate variables |
 | `calculate_groads()` | `SpatVector` | Road density/distance |
@@ -55,12 +56,20 @@ unless tracing a bug that crosses tiers.
 | `calculate_merra2()` | `SpatRaster` | Reanalysis variables |
 | `calculate_modis()` | `SpatRaster` | MODIS/VIIRS land products; needs `scale` |
 | `calculate_narr()` | `SpatRaster` | NARR reanalysis |
+| `calculate_improve()` | `SpatVector`, `sf`, or table | IMPROVE means by parameter/date within locations or buffers |
 | `calculate_nei()` | `sf` | Point-source emissions |
 | `calculate_nlcd()` | `SpatRaster` | Land cover class fractions |
 | `calculate_population()` | `SpatRaster` | Population density |
 | `calculate_prism()` | `SpatRaster` | PRISM climate |
 | `calculate_terraclimate()` | `SpatRaster` | TerraClimate variables |
 | `calculate_tri()` | `sf` | Toxic release site proximity |
+| `calculate_drought()` | `SpatRaster` or `SpatVector` | SPEI/EDDI values or USDM drought classes |
+
+`calculate_covariates()` exposes `goes` and `goes_adp` for
+`calculate_goes()`. The names `drought`, `spei`, `eddi`, and `usdm` dispatch
+to `calculate_drought()`; the processed input type determines the raster or
+USDM polygon pathway. The `improve` alias dispatches to
+`calculate_improve()` for spatially intersecting IMPROVE measurements.
 
 ---
 

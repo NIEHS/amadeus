@@ -46,6 +46,7 @@ Your domain is **tier 2 only**. You do not modify `download_*.R` or
 | `process_cropscape()` | USDA CropScape CDL | `SpatRaster` |
 | `process_ecoregion()` | EPA Ecoregions | `SpatVector` |
 | `process_geos()` | NASA GEOS-CF | `SpatRaster` |
+| `process_goes()` | NOAA GOES-16/18 ADP | `SpatRaster` |
 | `process_gmted()` | USGS GMTED2010 | `SpatRaster` |
 | `process_gridmet()` | GridMET | `SpatRaster` |
 | `process_groads()` | SEDAC Global Roads | `SpatVector` |
@@ -62,6 +63,13 @@ Your domain is **tier 2 only**. You do not modify `download_*.R` or
 | `process_prism()` | PRISM climate | `SpatRaster` |
 | `process_terraclimate()` | TerraClimate | `SpatRaster` |
 | `process_tri()` | EPA TRI | `sf` |
+| `process_improve()` | IMPROVE aerosol monitoring | `SpatVector`, `sf`, or `data.table` |
+| `process_drought()` | SPEI/EDDI rasters or USDM polygons | `SpatRaster` or `SpatVector` |
+
+`process_covariates()` exposes `goes` and `goes_adp` for `process_goes()`;
+`drought`, `spei`, `eddi`, and `usdm` dispatch to `process_drought()`. The
+source-specific drought aliases forward the matching `source` value. IMPROVE
+is available under `improve`.
 
 ---
 

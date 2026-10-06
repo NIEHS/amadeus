@@ -3,12 +3,14 @@ description: >
   Specialist for all download_data() and download_*() functions in the amadeus
   R package. Helps triage GitHub issues, implement new download sources, fix
   broken URLs/authentication, and follow httr2 coding conventions.
-version: "1.0"
+version: "1.1"
 suggested_model: claude-sonnet
 domains:
   - aqs
   - ecoregion
   - geos
+  - goes
+  - goes_adp
   - gmted
   - groads
   - gridmet
@@ -27,6 +29,11 @@ domains:
   - edgar
   - cropscape
   - blackmarble
+  - improve
+  - drought
+  - spei
+  - eddi
+  - usdm
 files:
   - R/download.R
   - R/download_auxiliary.R

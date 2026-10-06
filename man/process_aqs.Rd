@@ -2,7 +2,7 @@
 % Please edit documentation in R/process.R
 \name{process_aqs}
 \alias{process_aqs}
-\title{Process U.S. EPA AQS daily CSV data}
+\title{Process U.S. EPA AQS daily or hourly CSV data}
 \usage{
 process_aqs(
   path = NULL,
@@ -11,11 +11,12 @@ process_aqs(
   data_field = "Arithmetic.Mean",
   return_format = c("terra", "sf", "data.table"),
   extent = NULL,
-  ...
+  ...,
+  resolution_temporal = "daily"
 )
 }
 \arguments{
-\item{path}{character(1). Directory path to daily measurement data.}
+\item{path}{character(1). Directory or CSV file path to measurement data.}
 
 \item{date}{character(1 or 2). Date (1) or start and end dates (2).
 Should be in \code{"YYYY-MM-DD"} format and sorted.}
@@ -27,7 +28,8 @@ Should be in \code{"YYYY-MM-DD"} format and sorted.}
 \item "location" (unique locations).
 }}
 
-\item{data_field}{character(1). Data field to extract.}
+\item{data_field}{character(1). Data field to extract. Defaults to
+"Arithmetic.Mean" for daily data and "Sample.Measurement" for hourly data.}
 
 \item{return_format}{character(1). \code{"terra"} or \code{"sf"} or \code{"data.table"}.}
 
@@ -36,14 +38,22 @@ The order should be \code{c(xmin, xmax, ymin, ymax)}.
 The coordinate system should be WGS84 (EPSG:4326).}
 
 \item{...}{Placeholders.}
+
+\item{resolution_temporal}{character(1). "daily" (default) or "hourly".
+Dates and hourly \code{time} strings use local standard time at each monitor.
+Hourly times have format \code{YYYY-MM-DD HH:MM:SS}; no time zone conversion
+is performed. Date filtering includes every hour of the end date.
+In hourly mode, "date-location" creates 24 hours per date and location,
+and "available-data" retains individual measurements without averaging.
+Daily and hourly files in a directory are selected by their CSV columns.}
 }
 \value{
 a SpatVector, sf, or data.table object depending on the \code{return_format}
 }
 \description{
 The \code{process_aqs()} function cleans and imports raw air quality
-monitoring sites from pre-generated daily CSV files, returning a single
-\code{SpatVector} or \code{sf} object.
+monitoring sites from pre-generated daily or hourly CSV files, returning
+a single \code{SpatVector}, \code{sf}, or \code{data.table} object.
 \code{date} is used to filter the raw data read from csv files.
 Filtered rows are then processed according to \code{mode} argument.
 Some sites report multiple measurements per day with and without

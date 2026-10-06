@@ -61,3 +61,24 @@ amadeus::download_improve(
     testthat::expect_gt(sum(file.info(files)$size > 0), 0)
   }
 )
+
+testthat::test_that(
+  "calculate_improve(product='rhr3'): calculates live processed measurements",
+  {
+    skip_if_no_live_tests()
+    path <- withr::local_tempdir()
+    amadeus::download_improve(
+      year = 2022, product = "rhr3", directory_to_save = path,
+      acknowledgement = TRUE
+    )
+    from <- amadeus::process_improve(
+      path, product = "rhr3", date = c("2022-01-01", "2022-01-31")
+    )
+    locs <- fixture_aoi()
+    locs$site_id <- "region"
+    out <- amadeus::calculate_covariates("improve", from, locs)
+    testthat::expect_s3_class(out, "data.frame")
+    testthat::expect_gt(nrow(out), 0L)
+    testthat::expect_gt(sum(is.finite(out$improve_dv)), 0L)
+  }
+)

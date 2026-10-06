@@ -220,7 +220,9 @@ testthat::test_that("download_hms (live + single date)", {
 ##### download_hms additional coverage tests
 testthat::test_that("download_hms remove_command deprecation warning", {
   testthat::local_mocked_bindings(
-    check_url_status = function(...) TRUE,
+    check_hms_url_availability = function(...) {
+      list(state = "available", status = 200L, error = NULL)
+    },
     .package = "amadeus"
   )
   withr::with_tempdir({
@@ -239,7 +241,9 @@ testthat::test_that("download_hms remove_command deprecation warning", {
 
 testthat::test_that("download_hms mock download with hash", {
   testthat::local_mocked_bindings(
-    check_url_status = function(...) TRUE,
+    check_hms_url_availability = function(...) {
+      list(state = "available", status = 200L, error = NULL)
+    },
     download_run_method = function(...) invisible(NULL),
     download_unzip = function(...) invisible(NULL),
     download_remove_zips = function(...) invisible(NULL),
@@ -787,7 +791,9 @@ testthat::test_that("calculate_hms character single-date .by_time is no-op", {
 
 testthat::test_that("download_hms KML format mock download", {
   testthat::local_mocked_bindings(
-    check_url_status = function(...) TRUE,
+    check_hms_url_availability = function(...) {
+      list(state = "available", status = 200L, error = NULL)
+    },
     download_run_method = function(...) list(success = 1, failed = 0),
     download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
     .package = "amadeus"
@@ -818,7 +824,9 @@ testthat::test_that("download_hms KML format mock download", {
 
 testthat::test_that("download_hms KML format mock download hash=TRUE", {
   testthat::local_mocked_bindings(
-    check_url_status = function(...) TRUE,
+    check_hms_url_availability = function(...) {
+      list(state = "available", status = 200L, error = NULL)
+    },
     download_run_method = function(...) list(success = 1, failed = 0),
     download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
     .package = "amadeus"
@@ -843,7 +851,9 @@ testthat::test_that("download_hms KML format mock download hash=TRUE", {
 
 testthat::test_that("download_hms Shapefile mock download hash=FALSE", {
   testthat::local_mocked_bindings(
-    check_url_status = function(...) TRUE,
+    check_hms_url_availability = function(...) {
+      list(state = "available", status = 200L, error = NULL)
+    },
     download_run_method = function(...) list(success = 1, failed = 0),
     download_unzip = function(...) invisible(NULL),
     download_remove_zips = function(...) invisible(NULL),
@@ -871,7 +881,9 @@ testthat::test_that("download_hms Shapefile mock download hash=FALSE", {
 
 testthat::test_that("download_hms skips cleanly when all files already exist", {
   testthat::local_mocked_bindings(
-    check_url_status = function(...) TRUE,
+    check_hms_url_availability = function(...) {
+      list(state = "available", status = 200L, error = NULL)
+    },
     check_destfile = function(...) FALSE,
     download_run_method = function(...) stop("download_run_method should not be called"),
     download_unzip = function(...) invisible(NULL),
@@ -898,6 +910,239 @@ testthat::test_that("download_hms skips cleanly when all files already exist", {
     testthat::expect_equal(result$skipped, 2)
   })
 })
+
+testthat::test_that(
+  "download_hms(date=first missing): downloads later available dates",
+  {
+    downloaded_urls <- character()
+    testthat::local_mocked_bindings(
+      check_hms_url_availability = function(url, ...) {
+        if (grepl("20180101", url, fixed = TRUE)) {
+          list(state = "missing", status = 404L, error = NULL)
+        } else {
+          list(state = "available", status = 200L, error = NULL)
+        }
+      },
+      download_run_method = function(urls, ...) {
+        downloaded_urls <<- urls
+        list(success = length(urls), failed = 0L, skipped = 0L)
+      },
+      .package = "amadeus"
+    )
+
+    withr::with_tempdir({
+      result <- testthat::expect_warning(
+        download_hms(
+          date = c("2018-01-01", "2018-01-02"),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          unzip = FALSE
+        ),
+        "unavailable for 1 requested date"
+      )
+      testthat::expect_length(downloaded_urls, 1L)
+      testthat::expect_match(downloaded_urls, "20180102")
+      testthat::expect_equal(result$unavailable, 1L)
+      testthat::expect_equal(result$unavailable_dates, "20180101")
+    })
+  }
+)
+
+testthat::test_that(
+  "download_hms(date=later missing): excludes missing URLs from download",
+  {
+    downloaded_urls <- character()
+    testthat::local_mocked_bindings(
+      check_hms_url_availability = function(url, ...) {
+        if (grepl("20180102", url, fixed = TRUE)) {
+          list(state = "missing", status = 404L, error = NULL)
+        } else {
+          list(state = "available", status = 200L, error = NULL)
+        }
+      },
+      download_run_method = function(urls, ...) {
+        downloaded_urls <<- urls
+        list(success = length(urls), failed = 0L, skipped = 0L)
+      },
+      .package = "amadeus"
+    )
+
+    withr::with_tempdir({
+      result <- testthat::expect_warning(
+        download_hms(
+          date = c("2018-01-01", "2018-01-02"),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          unzip = FALSE
+        ),
+        "unavailable for 1 requested date"
+      )
+      testthat::expect_length(downloaded_urls, 1L)
+      testthat::expect_match(downloaded_urls, "20180101")
+      testthat::expect_equal(result$unavailable_dates, "20180102")
+    })
+  }
+)
+
+testthat::test_that(
+  "download_hms(date=all missing): stops before download",
+  {
+    testthat::local_mocked_bindings(
+      check_hms_url_availability = function(...) {
+        list(state = "missing", status = 404L, error = NULL)
+      },
+      download_run_method = function(...) {
+        stop("download_run_method should not be called")
+      },
+      .package = "amadeus"
+    )
+
+    withr::with_tempdir({
+      testthat::expect_error(
+        download_hms(
+          date = c("2041-01-01", "2041-01-02"),
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          unzip = FALSE
+        ),
+        "No HMS data are available"
+      )
+    })
+  }
+)
+
+testthat::test_that(
+  "download_hms(availability=network error): reports request failure",
+  {
+    testthat::local_mocked_bindings(
+      check_hms_url_availability = function(...) {
+        list(
+          state = "error",
+          status = NA_integer_,
+          error = "mock DNS failure"
+        )
+      },
+      .package = "amadeus"
+    )
+
+    withr::with_tempdir({
+      testthat::expect_error(
+        download_hms(
+          date = "2018-01-01",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          unzip = FALSE
+        ),
+        "Failed to check HMS data availability.*mock DNS failure"
+      )
+    })
+  }
+)
+
+testthat::test_that(
+  "check_hms_url_availability(status=404): reports missing data",
+  {
+    testthat::local_mocked_bindings(
+      req_perform = function(...) {
+        structure(
+          list(status_code = 404L, headers = list(), body = raw()),
+          class = "httr2_response"
+        )
+      },
+      .package = "httr2"
+    )
+
+    result <- check_hms_url_availability(
+      "https://example.com/missing.zip",
+      max_tries = 1L
+    )
+    testthat::expect_identical(result$state, "missing")
+    testthat::expect_identical(result$status, 404L)
+    testthat::expect_null(result$error)
+  }
+)
+
+testthat::test_that(
+  "check_hms_url_availability(request fails): reports an error",
+  {
+    testthat::local_mocked_bindings(
+      req_perform = function(...) stop("mock connection failure"),
+      .package = "httr2"
+    )
+
+    result <- check_hms_url_availability(
+      "https://example.com/unreachable.zip",
+      max_tries = 1L
+    )
+    testthat::expect_identical(result$state, "error")
+    testthat::expect_true(is.na(result$status))
+    testthat::expect_match(result$error, "mock connection failure")
+  }
+)
+
+testthat::test_that(
+  "check_hms_url_availability(status=503): reports a server error",
+  {
+    testthat::local_mocked_bindings(
+      req_perform = function(...) {
+        structure(
+          list(status_code = 503L, headers = list(), body = raw()),
+          class = "httr2_response"
+        )
+      },
+      .package = "httr2"
+    )
+
+    result <- check_hms_url_availability(
+      "https://example.com/unavailable.zip",
+      max_tries = 1L
+    )
+    testthat::expect_identical(result$state, "error")
+    testthat::expect_identical(result$status, 503L)
+    testthat::expect_match(result$error, "HTTP status 503")
+  }
+)
+
+testthat::test_that(
+  "download_hms(download=partial failure): extracts successful files only",
+  {
+    extracted_files <- character()
+    testthat::local_mocked_bindings(
+      check_hms_url_availability = function(...) {
+        list(state = "available", status = 200L, error = NULL)
+      },
+      download_run_method = function(destfiles, ...) {
+        writeBin(charToRaw("downloaded"), destfiles[1])
+        list(
+          success = 1L,
+          failed = 1L,
+          skipped = 0L,
+          failed_urls = "mock-url",
+          failed_files = basename(destfiles[2])
+        )
+      },
+      download_unzip = function(file_name, ...) {
+        extracted_files <<- c(extracted_files, file_name)
+        invisible(NULL)
+      },
+      download_remove_zips = function(...) invisible(NULL),
+      .package = "amadeus"
+    )
+
+    withr::with_tempdir({
+      result <- download_hms(
+        date = c("2018-01-01", "2018-01-02"),
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        unzip = TRUE
+      )
+      testthat::expect_equal(result$success, 1L)
+      testthat::expect_equal(result$failed, 1L)
+      testthat::expect_length(extracted_files, 1L)
+      testthat::expect_match(extracted_files, "20180101")
+    })
+  }
+)
 
 testthat::test_that(
   "HMS Shapefile fixture: contains valid polygon geometry and required fields",

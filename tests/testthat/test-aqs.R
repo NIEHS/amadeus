@@ -735,3 +735,149 @@ testthat::test_that("download_aqs all files exist path", {
     testthat::expect_true(any(grepl("already exist", msgs)))
   })
 })
+
+testthat::test_that(
+  "download_data(aqs, resolution_temporal='hourly'): uses hourly archives",
+  {
+    captured <- NULL
+    local_download_mocks(download_run_method = function(urls, destfiles, ...) {
+      captured <<- list(urls = urls, destfiles = destfiles)
+      list(success = length(urls), failed = 0L)
+    })
+    out <- download_data(
+      dataset_name = "aqs", resolution_temporal = "hourly",
+      year = c(2021, 2022), parameter_code = 88101,
+      directory_to_save = withr::local_tempdir(),
+      acknowledgement = TRUE, unzip = FALSE
+    )
+    testthat::expect_equal(out$success, 2)
+    testthat::expect_equal(captured$urls, paste0(
+      "https://aqs.epa.gov/aqsweb/airdata/hourly_88101_", 2021:2022, ".zip"
+    ))
+    testthat::expect_equal(basename(captured$destfiles), paste0(
+      "aqs_hourly_88101_", 2021:2022, ".zip"
+    ))
+  }
+)
+
+testthat::test_that(
+  "process_covariates(aqs, resolution_temporal='hourly'): preserves samples",
+  {
+    path <- testthat::test_path(
+      "..", "testdata", "aqs", "aqs_hourly_88101_sample.csv"
+    )
+    out <- process_covariates(
+      covariate = "aqs", path = path, date = "2022-02-04",
+      resolution_temporal = "hourly", mode = "available-data",
+      return_format = "data.table"
+    )
+    testthat::expect_s3_class(out, "data.table")
+    testthat::expect_equal(out$time, paste("2022-02-04", c(
+      "00:00:00", "01:00:00", "23:00:00"
+    )))
+    testthat::expect_equal(out$Sample.Measurement, c(10, 20, 30))
+    testthat::expect_equal(unique(out$site_id), "37063001588101")
+    testthat::expect_false("Event.Type" %in% names(out))
+    custom <- process_aqs(
+      path, "2022-02-04", mode = "available-data", data_field = "MDL",
+      resolution_temporal = "hourly", return_format = "data.table"
+    )
+    testthat::expect_equal(custom$MDL, rep(0.5, 3))
+  }
+)
+
+testthat::test_that(
+  "process_aqs(resolution_temporal='hourly'): supports all modes and formats",
+  {
+    path <- testthat::test_path(
+      "..", "testdata", "aqs", "aqs_hourly_88101_sample.csv"
+    )
+    for (mode in c("available-data", "date-location", "location")) {
+      for (fmt in c("data.table", "sf", "terra")) {
+        out <- process_aqs(
+          path, "2022-02-04", mode = mode, return_format = fmt,
+          resolution_temporal = "hourly"
+        )
+        if (fmt == "terra") {
+          testthat::expect_s4_class(out, "SpatVector")
+        } else {
+          testthat::expect_s3_class(out, fmt)
+        }
+        testthat::expect_equal(nrow(out), switch(
+          mode, "available-data" = 3L, "date-location" = 24L, "location" = 1L
+        ))
+        if (mode == "date-location") {
+          testthat::expect_equal(out$time, paste(
+            "2022-02-04", sprintf("%02d:00:00", 0:23)
+          ))
+        }
+      }
+    }
+  }
+)
+
+testthat::test_that(
+  "process_aqs(resolution_temporal='daily'): preserves daily results",
+  {
+    daily <- testthat::test_path(
+      "..", "testdata", "aqs", "aqs_daily_88101_triangle.csv"
+    )
+    hourly <- testthat::test_path(
+      "..", "testdata", "aqs", "aqs_hourly_88101_sample.csv"
+    )
+    for (mode in c("available-data", "date-location", "location")) {
+      default <- process_aqs(
+        daily, "2022-02-04", mode = mode, return_format = "data.table"
+      )
+      mixed <- process_aqs(
+        c(daily, hourly), "2022-02-04", mode = mode,
+        return_format = "data.table", resolution_temporal = "daily"
+      )
+      testthat::expect_equal(mixed, default)
+    }
+    testthat::expect_error(
+      process_aqs(daily, resolution_temporal = "hourly"),
+      "No hourly AQS CSV files"
+    )
+    testthat::expect_error(
+      process_aqs(hourly, resolution_temporal = "monthly"), "arg.*should be"
+    )
+  }
+)
+
+testthat::test_that(
+  "process_aqs(resolution_temporal='hourly', path=<mixed>): selects hourly data",
+  {
+    dir <- withr::local_tempdir()
+    files <- testthat::test_path("..", "testdata", "aqs", c(
+      "aqs_daily_88101_triangle.csv", "aqs_hourly_88101_sample.csv"
+    ))
+    file.copy(files, dir)
+    out <- process_aqs(
+      dir, c("2022-02-04", "2022-02-05"), mode = "available-data",
+      return_format = "data.table", resolution_temporal = "hourly"
+    )
+    testthat::expect_equal(out$Sample.Measurement, c(10, 20, 30, 40))
+    grid <- process_aqs(
+      dir, c("2022-02-04", "2022-02-05"), mode = "date-location",
+      return_format = "data.table", resolution_temporal = "hourly"
+    )
+    testthat::expect_equal(nrow(grid), 48L)
+    testthat::expect_equal(tail(grid$time, 1), "2022-02-05 23:00:00")
+  }
+)
+
+testthat::test_that(
+  "download_normalize_aqs_unzip(resolution_temporal='hourly'): flattens archive",
+  {
+    dir <- withr::local_tempdir()
+    nested <- file.path(dir, "hourly_88101_2022")
+    dir.create(nested)
+    writeLines("hourly fixture", file.path(nested, "hourly_88101_2022.csv"))
+    download_normalize_aqs_unzip(dir, "hourly", 88101, 2022)
+    testthat::expect_equal(
+      readLines(file.path(dir, "hourly_88101_2022.csv")), "hourly fixture"
+    )
+    testthat::expect_false(dir.exists(nested))
+  }
+)

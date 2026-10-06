@@ -191,3 +191,34 @@ ggplot2::ggplot(
 - This workflow treats AQS as outcome data and therefore uses `download_aqs()` and `process_aqs()` directly.
 - The two explicit pollutant parameters are PM2.5 (`88101`) and NO2 (`42602`).
 - `process_aqs(mode = "location")` is useful for monitor maps, while `process_aqs(mode = "available-data")` is useful for daily observational summaries such as time series.
+
+## Hourly measurements
+
+Use `resolution_temporal = "hourly"` in both steps. Omitting it retains the
+existing daily workflow. Hourly output uses `Sample.Measurement` by default
+and character `time` values in monitor-local standard time
+(`YYYY-MM-DD HH:MM:SS`). The date range includes all hours of its final day.
+
+```{r hourly-example, eval = FALSE}
+download_aqs(
+  parameter_code = 88101,
+  resolution_temporal = "hourly",
+  year = 2022,
+  directory_to_save = aqs_dir,
+  acknowledgement = TRUE
+)
+hourly_data <- process_aqs(
+  path = file.path(aqs_dir, "data_files", "hourly_88101_2022.csv"),
+  date = aqs_date_window,
+  resolution_temporal = "hourly",
+  mode = "available-data",
+  return_format = "data.table"
+)
+```
+
+The same option passes through `download_data(dataset_name = "aqs", ...)`
+and `process_covariates(covariate = "aqs", ...)`. The existing minimum-POC
+monitor selection and spatial processing also apply to hourly data.
+`mode = "date-location"` creates every hour/location pair; `mode = "location"`
+returns unique locations. As with daily AQS, measurements are returned by
+processing; there is no AQS route in `calculate_covariates()`.

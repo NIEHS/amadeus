@@ -398,3 +398,174 @@ testthat::test_that("download_improve hash=FALSE returns download_result", {
     testthat::expect_true(grepl("IMPAER_2022\\.txt\\.zip$", captured$destfiles[1]))
   })
 })
+
+testthat::test_that(
+  "calculate_improve(from=<processed>): preserves product values and dates",
+  {
+    locs <- data.frame(id = c("Acadia", "unmatched"),
+                       lon = c(-68.2608, 0), lat = c(44.3771, 0))
+    expected <- list(raw = c(2.85, 3.12), rhr2 = c(12.3, 14.7),
+                     rhr3 = c(1.52, 1.73))
+    columns <- c(raw = "improve_FPM", rhr2 = "improve_bext",
+                 rhr3 = "improve_dv")
+    for (product in names(expected)) {
+      for (format in c("terra", "sf", "data.table")) {
+        from <- amadeus::process_improve(
+          improve_path, product = product, return_format = format
+        )
+        out <- amadeus::calculate_covariates(
+          "IMPROVE", from, locs, locs_id = "id"
+        )
+        testthat::expect_s3_class(out, "data.frame")
+        testthat::expect_identical(out$id,
+                                   c("Acadia", "Acadia", "unmatched",
+                                     "unmatched"))
+        testthat::expect_equal(out[[columns[[product]]]],
+                              c(expected[[product]], NA, NA))
+        testthat::expect_s3_class(out$time, "POSIXct")
+        testthat::expect_equal(as.Date(out$time),
+                              rep(as.Date(c("2022-01-02", "2022-01-05")), 2))
+      }
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(locs=<polygon>, .by_time='month'): averages observations",
+  {
+    from <- amadeus::process_improve(improve_path)
+    locs <- fixture_aoi()
+    locs$site_id <- "region"
+    out <- amadeus::calculate_improve(from, locs)
+    testthat::expect_equal(out$improve_FPM, c((2.85 + 1.98) / 2,
+                                           (3.12 + 2.05) / 2))
+    monthly <- amadeus::calculate_covariates(
+      "improve", from, locs, .by_time = "month"
+    )
+    testthat::expect_equal(monthly$improve_FPM, mean(c(2.85, 1.98, 3.12, 2.05)))
+    testthat::expect_equal(nrow(monthly), 1L)
+  }
+)
+
+testthat::test_that(
+  paste0("calculate_improve(radius=1000, geom=<format>): ",
+         "aligns CRS and keeps geometry"),
+  {
+    from <- amadeus::process_improve(improve_path)
+    locs <- terra::vect(
+      data.frame(site_id = "nearby", lon = -68.261, lat = 44.377),
+      geom = c("lon", "lat"), crs = "EPSG:4326"
+    )
+    projected <- terra::project(locs, "EPSG:3857")
+    for (geom in list(TRUE, "terra", "sf")) {
+      out <- amadeus::calculate_improve(
+        from, projected, radius = 1000, geom = geom
+      )
+      if (identical(geom, "sf")) {
+        testthat::expect_s3_class(out, "sf")
+        values <- sf::st_drop_geometry(out)
+      } else {
+        testthat::expect_s4_class(out, "SpatVector")
+        values <- as.data.frame(out)
+      }
+      testthat::expect_equal(values$improve_FPM, c(2.85, 3.12))
+      testthat::expect_equal(sf::st_crs(sf::st_as_sf(out))$epsg, 4326L)
+    }
+    direct <- amadeus::calculate_improve(from, locs)
+    testthat::expect_equal(direct$improve_FPM, c(NA_real_, NA_real_))
+  }
+)
+
+testthat::test_that(
+  paste0("calculate_improve(FactValue=NA, from=<empty>): ",
+         "retains missingness and schema"),
+  {
+    from <- amadeus::process_improve(improve_path, return_format = "data.table")
+    locs <- fixture_aoi()
+    locs$site_id <- "region"
+    from$FactValue[from$ParamCode == "FPM"] <- NA_real_
+    out <- amadeus::calculate_improve(from, locs, .by_time = "month")
+    testthat::expect_identical(out$improve_FPM, NA_real_)
+    empty <- amadeus::calculate_improve(from[0, ], locs)
+    testthat::expect_equal(nrow(empty), 0L)
+    testthat::expect_named(empty, c("site_id", "time"))
+    empty_locs <- amadeus::calculate_improve(from, locs[0, ])
+    testthat::expect_equal(nrow(empty_locs), 0L)
+    testthat::expect_setequal(names(empty_locs),
+                             c("site_id", "time", "improve_ALf",
+                               "improve_ECf", "improve_FPM"))
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(from=<invalid>, locs_id=<invalid>): reports input errors",
+  {
+    from <- amadeus::process_improve(improve_path, return_format = "data.table")
+    locs <- fixture_points(2)
+    testthat::expect_error(amadeus::calculate_improve(from, locs, radius = -1),
+                           "radius")
+    testthat::expect_error(amadeus::calculate_improve(from, locs, geom = NA),
+                           "geom")
+    testthat::expect_error(
+      amadeus::calculate_improve(from, locs, locs_id = "x"), "identifier"
+    )
+    locs$site_id <- c("same", "same")
+    testthat::expect_error(amadeus::calculate_improve(from, locs), "unique")
+    locs$site_id <- c("a", "b")
+    bad <- as.data.frame(from)
+    bad$FactValue <- NULL
+    testthat::expect_error(amadeus::calculate_improve(bad, locs), "FactValue")
+    bad <- as.data.frame(from)
+    bad$Longitude <- NULL
+    testthat::expect_error(amadeus::calculate_improve(bad, locs), "Longitude")
+    bad <- as.data.frame(from)
+    bad$FactDate[1] <- NA
+    testthat::expect_error(amadeus::calculate_improve(bad, locs), "FactDate")
+    bad <- as.data.frame(from)
+    bad$Units[1] <- "different"
+    testthat::expect_error(amadeus::calculate_improve(bad, locs), "Units")
+    testthat::expect_error(
+      amadeus::calculate_improve(from, locs, .by = "month"), "by"
+    )
+  }
+)
+
+testthat::test_that(
+  paste0("calculate_covariates(covariate='improve'): ",
+         "completes mocked download workflow"),
+  {
+    path <- withr::local_tempdir()
+    local_download_mocks(download_run_method = function(...) {
+      file.copy(list.files(improve_path, full.names = TRUE), path)
+      list(success = 1L, failed = 0L)
+    })
+    amadeus::download_data(
+      "improve", directory_to_save = path, acknowledgement = TRUE,
+      year = 2022, product = "raw"
+    )
+    from <- amadeus::process_covariates("improve", path = path)
+    locs <- fixture_aoi()
+    locs$site_id <- "region"
+    out <- amadeus::calculate_covariates("improve", from, locs)
+    testthat::expect_equal(out$improve_FPM, c(2.415, 2.585))
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(from=<duplicates>): averages available values per date",
+  {
+    from <- as.data.frame(amadeus::process_improve(
+      improve_path, return_format = "data.table"
+    ))
+    from <- from[from$SiteCode == "ACAD1" & from$ParamCode == "FPM", ]
+    from <- from[c(1, 1, 2), ]
+    from$FactValue <- c(2, 4, NA_real_)
+    locs <- data.frame(site_id = 42L, lon = -68.2608, lat = 44.3771)
+    out <- amadeus::calculate_improve(from, locs)
+    testthat::expect_identical(out$site_id, c(42L, 42L))
+    testthat::expect_equal(out$improve_FPM, c(3, NA_real_))
+    monthly <- amadeus::calculate_improve(from, locs, .by_time = "month")
+    testthat::expect_equal(monthly$improve_FPM, 3)
+    testthat::expect_equal(as.Date(monthly$time), as.Date("2022-01-01"))
+  }
+)
