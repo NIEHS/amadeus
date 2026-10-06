@@ -19,6 +19,15 @@ amadeus::download_improve(
     files <- list.files(dir, recursive = TRUE, full.names = TRUE)
     testthat::expect_gt(length(files), 0)
     testthat::expect_gt(sum(file.info(files)$size > 0), 0)
+    processed <- process_covariates(
+      "improve", path = dir, return_format = "data.table"
+    )
+    sites <- data.frame(site_id = unique(processed$SiteCode)[1])
+    out <- calculate_covariates("improve", from = processed, locs = sites)
+    expected <- processed[processed$SiteCode == sites$site_id, ]
+    testthat::expect_equal(out$FactValue, expected$FactValue)
+    testthat::expect_equal(nrow(out), nrow(expected))
+    testthat::expect_equal(as.Date(out$time), as.Date(expected$FactDate))
   }
 )
 
