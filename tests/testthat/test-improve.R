@@ -4,6 +4,33 @@
 
 improve_path <- testthat::test_path("..", "testdata", "improve")
 
+improve_calculate_fixture <- function() {
+  measurements <- data.frame(
+    SiteCode = c("MON_A", "MON_A", "MON_A", "MON_B", "MON_B"),
+    POC = 1L,
+    FactDate = as.Date(c(
+      "2022-01-02",
+      "2022-01-05",
+      "2022-01-02",
+      "2022-01-02",
+      "2022-01-05"
+    )),
+    ParamCode = c("FPM", "FPM", "ECf", "FPM", "FPM"),
+    MethodID = c(5017L, 5017L, 917L, 5017L, 5017L),
+    Units = "ug/m^3",
+    FactValue = c(2, 4, 0.5, 10, 12),
+    Status = "V0",
+    ProviderStatus = "NM",
+    lon = c(0, 0, 0, 1, 1),
+    lat = c(0, 0, 0, 0, 0)
+  )
+  terra::vect(
+    measurements,
+    geom = c("lon", "lat"),
+    crs = "EPSG:4326"
+  )
+}
+
 ################################################################################
 ##### process_improve
 
@@ -140,6 +167,251 @@ testthat::test_that("process_covariates dispatches IMPROVE uppercase", {
   )
   testthat::expect_s3_class(result, "data.table")
 })
+
+################################################################################
+##### calculate_improve
+
+testthat::test_that(
+  "calculate_improve(nearest_only=TRUE): returns nearest monitor records",
+  {
+    locs <- data.frame(
+      site_id = c("near_a", "near_b"),
+      lon = c(0.02, 0.98),
+      lat = c(0, 0)
+    )
+
+    result <- calculate_improve(
+      from = improve_calculate_fixture(),
+      locs = locs,
+      locs_id = "site_id",
+      radius = 200000
+    )
+
+    testthat::expect_s3_class(result, "data.frame")
+    testthat::expect_setequal(unique(result$site_id), locs$site_id)
+    testthat::expect_setequal(
+      unique(result$SiteCode[result$site_id == "near_a"]),
+      "MON_A"
+    )
+    testthat::expect_setequal(
+      unique(result$SiteCode[result$site_id == "near_b"]),
+      "MON_B"
+    )
+    testthat::expect_equal(sum(result$site_id == "near_a"), 3L)
+    testthat::expect_gt(min(result$distance_m), 2000)
+    testthat::expect_lt(max(result$distance_m), 2300)
+    testthat::expect_s3_class(result$FactDate, "Date")
+    testthat::expect_s3_class(result$time, "POSIXct")
+  }
+)
+
+testthat::test_that(
+  "calculate_covariates(covariate='IMPROVE'): completes processed workflow",
+  {
+    from <- process_covariates(
+      covariate = "improve",
+      path = improve_path,
+      product = "raw",
+      return_format = "terra"
+    )
+    locs <- data.frame(
+      site_id = c("near_acad", "near_bibe"),
+      lon = c(-68.26, -103.18),
+      lat = c(44.38, 29.30)
+    )
+
+    result <- calculate_covariates(
+      covariate = "IMPROVE",
+      from = from,
+      locs = locs,
+      locs_id = "site_id",
+      radius = 100000
+    )
+
+    testthat::expect_s3_class(result, "data.frame")
+    testthat::expect_setequal(unique(result$site_id), locs$site_id)
+    testthat::expect_setequal(unique(result$SiteCode), c("ACAD1", "BIBE1"))
+    testthat::expect_setequal(
+      unique(result$ParamCode),
+      c("ALf", "ECf", "FPM")
+    )
+    testthat::expect_lt(max(result$distance_m), 1000)
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(product=rhr2/rhr3): preserves product parameters",
+  {
+    expected_parameters <- c(rhr2 = "bext", rhr3 = "dv")
+
+    for (product in names(expected_parameters)) {
+      from <- process_improve(
+        path = improve_path,
+        product = product,
+        return_format = "terra"
+      )
+      result <- calculate_improve(
+        from = from,
+        locs = data.frame(
+          site_id = "near_acad",
+          lon = -68.26,
+          lat = 44.38
+        ),
+        locs_id = "site_id",
+        radius = 100000
+      )
+
+      testthat::expect_setequal(
+        unique(result$ParamCode),
+        unname(expected_parameters[[product]])
+      )
+      testthat::expect_lt(max(result$distance_m), 1000)
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(nearest_only=FALSE): returns all nearby monitors",
+  {
+    result <- calculate_improve(
+      from = improve_calculate_fixture(),
+      locs = data.frame(site_id = "mid", lon = 0.5, lat = 0),
+      locs_id = "site_id",
+      radius = 60000,
+      nearest_only = FALSE
+    )
+
+    testthat::expect_setequal(unique(result$SiteCode), c("MON_A", "MON_B"))
+    testthat::expect_false(anyNA(result$distance_m))
+    testthat::expect_gt(min(result$distance_m), 55000)
+    testthat::expect_lt(max(result$distance_m), 56000)
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(radius=0): matches only co-located monitors",
+  {
+    testthat::expect_warning(
+      result <- calculate_improve(
+        from = improve_calculate_fixture(),
+        locs = data.frame(
+          site_id = c("exact", "offset"),
+          lon = c(0, 0.01),
+          lat = c(0, 0)
+        ),
+        locs_id = "site_id",
+        radius = 0,
+        .by_time = "month"
+      ),
+      regexp = "1 of 2"
+    )
+
+    exact <- result[result$site_id == "exact", , drop = FALSE]
+    offset <- result[result$site_id == "offset", , drop = FALSE]
+    testthat::expect_setequal(unique(exact$SiteCode), "MON_A")
+    testthat::expect_equal(unique(exact$distance_m), 0)
+    testthat::expect_equal(nrow(offset), 1L)
+    testthat::expect_true(is.na(offset$SiteCode))
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(.by_time='month'): averages values by parameter",
+  {
+    result <- calculate_improve(
+      from = improve_calculate_fixture(),
+      locs = data.frame(site_id = "query", lon = 0.01, lat = 0),
+      locs_id = "site_id",
+      radius = 5000,
+      .by_time = "month"
+    )
+
+    fpm <- result[result$ParamCode == "FPM", , drop = FALSE]
+    ecf <- result[result$ParamCode == "ECf", , drop = FALSE]
+    testthat::expect_equal(nrow(fpm), 1L)
+    testthat::expect_equal(fpm$FactValue, 3)
+    testthat::expect_equal(ecf$FactValue, 0.5)
+    testthat::expect_identical(fpm$FactDate, as.Date("2022-01-01"))
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(radius=no matches): retains query identifiers",
+  {
+    testthat::expect_warning(
+      result <- calculate_improve(
+        from = improve_calculate_fixture(),
+        locs = data.frame(site_id = "far", lon = 10, lat = 10),
+        locs_id = "site_id",
+        radius = 100,
+        .by_time = "month"
+      ),
+      regexp = "1 of 1"
+    )
+
+    testthat::expect_equal(nrow(result), 1L)
+    testthat::expect_identical(result$site_id, "far")
+    testthat::expect_true(is.na(result$SiteCode))
+    testthat::expect_true(is.na(result$FactValue))
+    testthat::expect_s3_class(result$time, "POSIXct")
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(geom='terra'): returns query-location geometry",
+  {
+    result <- calculate_improve(
+      from = improve_calculate_fixture(),
+      locs = data.frame(site_id = "query", lon = 0.1, lat = 0.2),
+      locs_id = "site_id",
+      radius = 50000,
+      geom = "terra"
+    )
+
+    testthat::expect_s4_class(result, "SpatVector")
+    result_coords <- unique(terra::crds(result))
+    testthat::expect_equal(unname(result_coords[, 1]), 0.1, tolerance = 1e-8)
+    testthat::expect_equal(unname(result_coords[, 2]), 0.2, tolerance = 1e-8)
+    testthat::expect_equal(unique(result$Longitude), 0)
+    testthat::expect_equal(unique(result$Latitude), 0)
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(arguments=invalid): reports actionable errors",
+  {
+    from <- improve_calculate_fixture()
+    locs <- data.frame(site_id = "query", lon = 0.01, lat = 0)
+
+    testthat::expect_error(
+      calculate_improve(from = data.frame(), locs = locs),
+      regexp = "SpatVector"
+    )
+    testthat::expect_error(
+      calculate_improve(from = from, locs = locs, radius = -1),
+      regexp = "non-negative"
+    )
+    testthat::expect_error(
+      calculate_improve(from = from, locs = locs, nearest_only = NA),
+      regexp = "TRUE or FALSE"
+    )
+    testthat::expect_error(
+      calculate_improve(from = from, locs = locs, weights = 1),
+      regexp = "not supported"
+    )
+    testthat::expect_error(
+      calculate_improve(
+        from = from,
+        locs = data.frame(
+          site_id = c("duplicate", "duplicate"),
+          lon = c(0, 1),
+          lat = c(0, 0)
+        )
+      ),
+      regexp = "unique"
+    )
+  }
+)
 
 ################################################################################
 ##### download_improve (arg-validation only — no network)
