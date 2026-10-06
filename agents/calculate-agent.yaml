@@ -13,6 +13,7 @@ domains:
   - gridmet
   - groads
   - hms
+  - improve
   - huc
   - koppen_geiger
   - merra2

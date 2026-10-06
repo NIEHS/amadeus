@@ -31,6 +31,7 @@
 #' * \code{\link{calculate_ecoregion}}: "ecoregion", "ecoregions"
 #' * \code{\link{calculate_temporal_dummies}}: "dummies", "Dummies"
 #' * \code{\link{calculate_hms}}: "hms", "smoke", "HMS"
+#' * \code{\link{calculate_improve}}: "improve", "IMPROVE"
 #' * \code{\link{calculate_gmted}}: "gmted", "GMTED"
 #' * \code{\link{calculate_narr}}: "narr", "NARR"
 #' * \code{\link{calculate_geos}}: "geos", "geos_cf", "GEOS"
@@ -82,6 +83,7 @@ calculate_covariates <-
       "ecoregions",
       "ecoregion",
       "hms",
+      "improve",
       "smoke",
       "gmted",
       "narr",
@@ -135,6 +137,7 @@ calculate_covariates <-
       nlcd = amadeus::calculate_nlcd,
       smoke = amadeus::calculate_hms,
       hms = amadeus::calculate_hms,
+      improve = amadeus::calculate_improve,
       sedac_groads = amadeus::calculate_groads,
       roads = amadeus::calculate_groads,
       groads = amadeus::calculate_groads,
@@ -5099,4 +5102,139 @@ calculate_drought <- function(
     geom = geom,
     crs = crs_from
   )
+}
+
+#' Calculate IMPROVE observations by monitoring site
+#' @description
+#' Associate processed IMPROVE observations with target locations by exact,
+#' case-sensitive site code. This route does not estimate exposure at arbitrary
+#' coordinates: targets must explicitly identify an IMPROVE monitoring site.
+#' @param from data.frame, data.table, sf, or SpatVector. Output of
+#'   \code{process_improve()} for raw, rhr2, or rhr3 data.
+#' @param locs data.frame, sf, or SpatVector. Target locations containing a
+#'   unique, nonmissing identifier and an IMPROVE site-code column.
+#' @param locs_id character(1). Target identifier column. Default "site_id".
+#' @param site_code character(1). Column in \code{locs} matched to
+#'   \code{from$SiteCode}. Default "SiteCode".
+#' @param geom logical(1) or character(1). FALSE returns a data.frame;
+#'   "sf" or "terra" returns target geometry in its original CRS.
+#' @param .by_time NULL. Temporal aggregation is not supported.
+#' @param weights NULL. Weighted extraction is not supported.
+#' @param ... Additional arguments. Unused arguments cause an error.
+#' @return A data.frame, sf, or SpatVector with the target identifier followed
+#'   by all nongeometry source columns. Rows follow target order, then source
+#'   observation order. Each matching observation is retained, including
+#'   duplicates, missing values, and all status flags. Unmatched targets get
+#'   one row with the requested SiteCode and missing measurement fields.
+#' @details
+#' No status filtering, scaling, interpolation, spatial assignment, or temporal
+#'   averaging is performed. Only observed dates are returned for matched
+#'   sites. Parameters, units, POC, MethodID, and product-specific metadata
+#'   remain separate; site and date alone need not uniquely identify a row.
+#'   Multiple targets may refer to the same monitor. Missing target site codes
+#'   never match missing source codes. Geometry, when requested, belongs to
+#'   the target and is repeated for each observation.
+#' @author Amadeus contributors
+#' @seealso \code{\link{process_improve}}, \code{\link{calculate_covariates}}
+#' @examples
+#' observations <- data.frame(
+#'   SiteCode = "ACAD1", FactDate = as.Date("2022-01-02"),
+#'   ParamCode = "FPM", FactValue = 2.85, Units = "ug/m^3"
+#' )
+#' targets <- data.frame(site_id = "001", SiteCode = "ACAD1")
+#' calculate_improve(observations, targets)
+#' @export
+calculate_improve <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  site_code = "SiteCode",
+  geom = FALSE,
+  .by_time = NULL,
+  weights = NULL,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  if (length(list(...))) {
+    stop("Unused arguments in `...`.")
+  }
+  if (length(geom) != 1L || is.na(geom)) {
+    stop("`geom` must be one of FALSE, 'sf', or 'terra'.")
+  }
+  amadeus::check_geom(geom)
+  if (!is.null(.by_time) || !is.null(weights)) {
+    stop("IMPROVE requires `.by_time = NULL` and `weights = NULL`.")
+  }
+  for (column in list(locs_id, site_code)) {
+    if (!is.character(column) || length(column) != 1L ||
+        is.na(column) || !nzchar(column)) {
+      stop("`locs_id` and `site_code` must be single column names.")
+    }
+  }
+  target_sf <- NULL
+  if (inherits(locs, "SpatVector")) {
+    locs <- sf::st_as_sf(locs)
+  }
+  if (inherits(locs, "sf")) {
+    target_sf <- locs
+    locs <- sf::st_drop_geometry(locs)
+  }
+  if (inherits(from, "SpatVector")) {
+    from <- as.data.frame(from)
+  } else if (inherits(from, "sf")) {
+    from <- sf::st_drop_geometry(from)
+  }
+  if (!is.data.frame(from) || !is.data.frame(locs)) {
+    stop("`from` and `locs` must be tables, sf, or SpatVector objects.")
+  }
+  from <- as.data.frame(from)
+  locs <- as.data.frame(locs)
+  required <- c("SiteCode", "FactDate", "ParamCode", "FactValue", "Units")
+  if (!all(required %in% names(from))) {
+    stop("`from` must contain SiteCode, FactDate, ParamCode, FactValue, Units.")
+  }
+  if (anyDuplicated(names(from)) || anyDuplicated(names(locs))) {
+    stop("Input column names must be unique.")
+  }
+  if (!all(c(locs_id, site_code) %in% names(locs))) {
+    stop("`locs` must contain the `locs_id` and `site_code` columns.")
+  }
+  if (anyNA(locs[[locs_id]]) || anyDuplicated(locs[[locs_id]])) {
+    stop("`locs_id` values must be unique and nonmissing.")
+  }
+  if (locs_id %in% names(from) &&
+      !(locs_id == "SiteCode" && site_code == "SiteCode")) {
+    stop("`locs_id` conflicts with a source column; choose another name.")
+  }
+  if (!identical(geom, FALSE) && is.null(target_sf)) {
+    stop("Spatial `locs` are required when `geom` is requested.")
+  }
+
+  # Join row indices so source metadata cannot collide with internal names.
+  targets <- data.table::data.table(
+    code = as.character(locs[[site_code]]), target = seq_len(nrow(locs))
+  )
+  observations <- data.table::data.table(
+    code = as.character(from$SiteCode), observation = seq_len(nrow(from))
+  )
+  observations <- observations[!is.na(observations$code), ]
+  indices <- merge(
+    targets, observations, by = "code", all.x = TRUE,
+    sort = FALSE, allow.cartesian = TRUE
+  )
+  indices <- indices[order(indices$target, indices$observation), ]
+  result <- from[indices$observation, , drop = FALSE]
+  result$SiteCode <- indices$code
+  result[[locs_id]] <- locs[[locs_id]][indices$target]
+  result <- result[, c(locs_id, setdiff(names(result), locs_id)), drop = FALSE]
+  rownames(result) <- NULL
+  if (!identical(geom, FALSE)) {
+    result <- sf::st_sf(
+      result, geometry = sf::st_geometry(target_sf)[indices$target]
+    )
+    if (geom == "terra") {
+      result <- terra::vect(result)
+    }
+  }
+  result
 }
