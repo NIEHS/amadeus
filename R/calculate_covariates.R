@@ -48,6 +48,7 @@
 #' * \code{\link{calculate_huc}}: "huc", "HUC"
 #' * \code{\link{calculate_edgar}}: "edgar"
 #' * \code{\link{calculate_drought}}: "drought", "spei", "eddi", "usdm"
+#' * \code{\link{calculate_improve}}: "improve", "IMPROVE"
 #' @return Calculated covariates as a data.frame or SpatVector object
 #' @author Insang Song
 #' @examples
@@ -107,7 +108,8 @@ calculate_covariates <-
       "drought",
       "spei",
       "eddi",
-      "usdm"
+      "usdm",
+      "improve"
     ),
     from,
     locs,
@@ -160,7 +162,8 @@ calculate_covariates <-
       drought = amadeus::calculate_drought,
       spei = amadeus::calculate_drought,
       eddi = amadeus::calculate_drought,
-      usdm = amadeus::calculate_drought
+      usdm = amadeus::calculate_drought,
+      improve = amadeus::calculate_improve
     )
 
     res_covariate <-
@@ -5055,5 +5058,171 @@ calculate_drought <- function(
     POSIXt = TRUE,
     geom = geom,
     crs = crs_from
+  )
+}
+
+#' Calculate IMPROVE observations at monitoring sites
+#' @description Match processed IMPROVE observations to locations by exact
+#' site code. Each matching observation is retained, including parameter,
+#' method, units, quality flags, missing values, and repeated measurements.
+#' No spatial interpolation, scaling, or temporal aggregation is performed.
+#' @param from data.frame, data.table, sf, or SpatVector. Output of
+#'   [process_improve()] containing `SiteCode` and `FactDate`.
+#' @param locs data.frame, data.table, sf, or SpatVector. Locations containing
+#'   unique identifiers and a `SiteCode` column. If `SiteCode` is absent,
+#'   values in `locs_id` are interpreted as IMPROVE site codes.
+#' @param locs_id character(1). Unique location identifier column.
+#'   Default is `"site_id"`. Multiple locations may share a site code.
+#' @param geom FALSE, "sf", or "terra". Output geometry format. Geometry
+#'   comes from `locs`; spatial locations must have a CRS. Tabular locations
+#'   must contain finite `lon` and `lat` coordinates in EPSG:4326.
+#' @param .by_time NULL. Temporal aggregation is not supported for these
+#'   observation records; non-NULL values produce an error.
+#' @param weights NULL. Spatial weighting is not supported; non-NULL values
+#'   produce an error.
+#' @param ... Additional arguments are not supported.
+#' @return A data.frame, sf, or SpatVector with the original observation
+#'   fields, `locs_id`, and `time` (UTC POSIXct derived from `FactDate`).
+#'   Rows follow location order, then observation order. Unmatched locations
+#'   produce a warning and no rows. Empty input returns an empty result.
+#'   Source columns named `time`, `geometry`, or a custom `locs_id` are
+#'   rejected to prevent overwriting observation fields.
+#' @author Amadeus contributors
+#' @seealso [download_improve()], [process_improve()],
+#'   [calculate_covariates()]
+#' @examples
+#' \dontrun{
+#' download_data(
+#'   dataset_name = "improve", year = c(2022, 2022), product = "raw",
+#'   directory_to_save = "improve", acknowledgement = TRUE
+#' )
+#' observations <- process_covariates(
+#'   covariate = "improve", path = "improve", return_format = "data.table"
+#' )
+#' sites <- data.frame(site_id = "001", SiteCode = "ACAD1")
+#' calculate_covariates("improve", from = observations, locs = sites)
+#' }
+#' @export
+calculate_improve <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  geom = FALSE,
+  .by_time = NULL,
+  weights = NULL,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  if (length(list(...)) > 0L) {
+    stop("Additional arguments are not supported by `calculate_improve()`.")
+  }
+  if (!is.null(.by_time) || !is.null(weights)) {
+    stop("IMPROVE observation matching requires `.by_time` and `weights` NULL.")
+  }
+  if (!(identical(geom, FALSE) || identical(geom, "sf") ||
+        identical(geom, "terra"))) {
+    stop("`geom` must be FALSE, 'sf', or 'terra'.")
+  }
+  if (!is.character(locs_id) || length(locs_id) != 1L ||
+      is.na(locs_id) || !nzchar(locs_id)) {
+    stop("`locs_id` must be a single nonempty column name.")
+  }
+  if (!(is.data.frame(from) || inherits(from, "SpatVector")) ||
+      !(is.data.frame(locs) || inherits(locs, "SpatVector"))) {
+    stop("`from` and `locs` must be data.frame, sf, or SpatVector objects.")
+  }
+  observations <- if (inherits(from, "sf")) {
+    as.data.frame(sf::st_drop_geometry(from))
+  } else {
+    as.data.frame(from)
+  }
+  locations <- if (inherits(locs, "sf")) {
+    as.data.frame(sf::st_drop_geometry(locs))
+  } else {
+    as.data.frame(locs)
+  }
+  if (anyDuplicated(names(observations)) ||
+      anyDuplicated(names(locations))) {
+    stop("Input column names must be unique.")
+  }
+  if (!all(c("SiteCode", "FactDate") %in% names(observations))) {
+    stop(
+      "`from` must contain `SiteCode` and `FactDate` from process_improve()."
+    )
+  }
+  if (!locs_id %in% names(locations) ||
+      anyNA(locations[[locs_id]]) ||
+      anyDuplicated(locations[[locs_id]])) {
+    stop("`locs_id` must identify a column with unique, nonmissing values.")
+  }
+  reserved <- c("time", "geometry", setdiff(locs_id, "SiteCode"))
+  if (any(reserved %in% names(observations)) ||
+      locs_id %in% c("time", "geometry")) {
+    stop("Output column names conflict with `from` or `locs_id`.")
+  }
+  site_column <- if ("SiteCode" %in% names(locations)) "SiteCode" else locs_id
+  site_codes <- as.character(locations[[site_column]])
+  source_codes <- as.character(observations$SiteCode)
+  if (anyNA(site_codes) || any(!nzchar(site_codes)) ||
+      anyNA(source_codes) || any(!nzchar(source_codes))) {
+    stop("Site codes must be nonmissing and nonempty.")
+  }
+  dates <- tryCatch(
+    as.Date(as.character(observations$FactDate)),
+    error = function(e) stop("`FactDate` must contain valid dates.")
+  )
+  if (anyNA(dates)) {
+    stop("`FactDate` must contain valid dates.")
+  }
+  observations$time <- as.POSIXct(dates, tz = "UTC")
+
+  # Join indices so observation fields and their types remain intact.
+  location_key <- data.frame(
+    code = site_codes, location = seq_along(site_codes)
+  )
+  observation_key <- data.frame(
+    code = source_codes, observation = seq_along(source_codes)
+  )
+  matched <- merge(location_key, observation_key, by = "code", sort = FALSE)
+  matched <- matched[
+    order(matched$location, matched$observation), , drop = FALSE
+  ]
+  if (any(!site_codes %in% source_codes)) {
+    warning("Some locations have no matching IMPROVE observations.",
+            call. = FALSE)
+  }
+  result <- observations[matched$observation, , drop = FALSE]
+  result[[locs_id]] <- locations[[locs_id]][matched$location]
+  rownames(result) <- NULL
+
+  output_crs <- "EPSG:4326"
+  if (!identical(geom, FALSE)) {
+    sites_sf <- if (inherits(locs, "SpatVector")) {
+      sf::st_as_sf(locs)
+    } else if (inherits(locs, "sf")) {
+      locs
+    } else {
+      if (!all(c("lon", "lat") %in% names(locations)) ||
+          !is.numeric(locations$lon) || !is.numeric(locations$lat) ||
+          any(!is.finite(locations$lon)) ||
+          any(!is.finite(locations$lat))) {
+        stop("Geometry requires spatial `locs` or finite `lon` and `lat`.")
+      }
+      if (nrow(locations) == 0L) {
+        sf::st_sf(locations, geometry = sf::st_sfc(crs = output_crs))
+      } else {
+        sf::st_as_sf(locations, coords = c("lon", "lat"), crs = output_crs)
+      }
+    }
+    if (is.na(sf::st_crs(sites_sf))) {
+      stop("Spatial `locs` must have a CRS for geometry output.")
+    }
+    output_crs <- sf::st_crs(sites_sf)$wkt
+    result$geometry <- sf::st_as_text(
+      sf::st_geometry(sites_sf), digits = 17
+    )[matched$location]
+  }
+  amadeus::calc_return_locs(
+    covar = result, POSIXt = TRUE, geom = geom, crs = output_crs
   )
 }

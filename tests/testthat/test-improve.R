@@ -398,3 +398,186 @@ testthat::test_that("download_improve hash=FALSE returns download_result", {
     testthat::expect_true(grepl("IMPAER_2022\\.txt\\.zip$", captured$destfiles[1]))
   })
 })
+
+################################################################################
+# Calculate observations using the real processor and existing fixtures.
+
+testthat::test_that(
+  "calculate_improve(from=processed): preserves all products and formats",
+  {
+    sites <- data.frame(id = c("002", "001"), SiteCode = c("BIBE1", "ACAD1"))
+    for (product in c("raw", "rhr2", "rhr3")) {
+      for (format in c("data.table", "sf", "terra")) {
+        processed <- process_covariates(
+          "improve", path = improve_path, product = product,
+          return_format = format
+        )
+        source <- if (inherits(processed, "sf")) {
+          as.data.frame(sf::st_drop_geometry(processed))
+        } else {
+          as.data.frame(processed)
+        }
+        expected <- rbind(
+          source[source$SiteCode == "BIBE1", , drop = FALSE],
+          source[source$SiteCode == "ACAD1", , drop = FALSE]
+        )
+        rownames(expected) <- NULL
+        out <- calculate_covariates(
+          "IMPROVE", from = processed, locs = sites, locs_id = "id"
+        )
+        testthat::expect_identical(class(out), "data.frame")
+        testthat::expect_equal(out[names(expected)], expected)
+        testthat::expect_identical(
+          out$id, sites$id[match(out$SiteCode, sites$SiteCode)]
+        )
+        testthat::expect_equal(as.Date(out$time), as.Date(out$FactDate))
+        testthat::expect_s3_class(out$time, "POSIXct")
+      }
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(locs_id='SiteCode'): retains repeated observations",
+  {
+    source <- data.frame(
+      SiteCode = c("001", "001", "002"),
+      FactDate = as.Date(c("2022-01-01", "2022-01-01", "2022-02-01")),
+      ParamCode = c("FPM", "ECf", "FPM"),
+      FactValue = c(0, NA_real_, -999), Units = "ug/m^3"
+    )
+    sites <- data.frame(SiteCode = c("002", "001"))
+    out <- calculate_improve(source, sites, locs_id = "SiteCode")
+    testthat::expect_identical(out$SiteCode, c("002", "001", "001"))
+    testthat::expect_identical(out$FactValue, c(-999, 0, NA_real_))
+    testthat::expect_identical(out$ParamCode, c("FPM", "FPM", "ECf"))
+    testthat::expect_identical(out$Units, rep("ug/m^3", 3))
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(geom='sf'/'terra'): aligns geometry and custom IDs",
+  {
+    source <- process_improve(improve_path, return_format = "data.table")
+    sites <- data.frame(
+      id = c("002", "001"), SiteCode = c("ACAD1", "ACAD1"),
+      lon = c(-70, -71), lat = c(42, 43)
+    )
+    projected <- sf::st_transform(
+      sf::st_as_sf(sites, coords = c("lon", "lat"), crs = 4326), 3857
+    )
+    for (locs in list(sites, projected, terra::vect(projected))) {
+      for (geom in c("sf", "terra")) {
+        out <- calculate_improve(source, locs, locs_id = "id", geom = geom)
+        if (geom == "sf") {
+          testthat::expect_s3_class(out, "sf")
+        } else {
+          testthat::expect_s4_class(out, "SpatVector")
+        }
+        out_sf <- sf::st_as_sf(out)
+        expected_crs <- if (is.data.frame(locs) && !inherits(locs, "sf")) {
+          sf::st_crs(4326)
+        } else {
+          sf::st_crs(3857)
+        }
+        testthat::expect_identical(sf::st_crs(out_sf) == expected_crs, TRUE)
+        coords <- sf::st_coordinates(sf::st_transform(out_sf, 4326))
+        testthat::expect_equal(
+          unname(coords[, 1]), sites$lon[match(out_sf$id, sites$id)]
+        )
+        testthat::expect_equal(
+          unname(coords[, 2]), sites$lat[match(out_sf$id, sites$id)]
+        )
+      }
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(locs=unmatched/empty): returns a typed empty result",
+  {
+    source <- process_improve(improve_path, return_format = "data.table")
+    sites <- data.frame(site_id = "missing", lon = -70, lat = 42)
+    for (geom in list(FALSE, "sf", "terra")) {
+      testthat::expect_warning(
+        out <- calculate_improve(source, sites, geom = geom), "no matching"
+      )
+      testthat::expect_equal(nrow(out), 0L)
+      empty <- calculate_improve(source, sites[FALSE, ], geom = geom)
+      testthat::expect_equal(nrow(empty), 0L)
+    }
+    testthat::expect_warning(
+      out <- calculate_improve(source[0, ], sites), "no matching"
+    )
+    testthat::expect_s3_class(out$time, "POSIXct")
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(from=invalid, locs=invalid): validates the contract",
+  {
+    source <- data.frame(SiteCode = "ACAD1", FactDate = as.Date("2022-01-01"))
+    sites <- data.frame(site_id = "001", SiteCode = "ACAD1")
+    testthat::expect_error(calculate_improve(NULL, sites), "must be data.frame")
+    testthat::expect_error(
+      calculate_improve(source["SiteCode"], sites), "must contain"
+    )
+    testthat::expect_error(
+      calculate_improve(source, rbind(sites, sites)), "unique, nonmissing"
+    )
+    testthat::expect_error(
+      calculate_improve(source, sites, locs_id = "missing"), "unique, nonmissing"
+    )
+    testthat::expect_error(
+      calculate_improve(source, sites, geom = TRUE), "geom"
+    )
+    testthat::expect_error(
+      calculate_improve(source, sites, geom = "sf"), "Geometry requires"
+    )
+    testthat::expect_error(
+      calculate_improve(source, sites, radius = 100), "Additional arguments"
+    )
+    testthat::expect_error(
+      calculate_covariates("improve", source, sites, weights = 1), "weights"
+    )
+    testthat::expect_error(
+      calculate_covariates("improve", source, sites, .by_time = "month"),
+      "observation matching"
+    )
+    source$FactDate <- "invalid"
+    testthat::expect_error(calculate_improve(source, sites), "valid dates")
+    source$FactDate <- as.Date("2022-01-01")
+    source$time <- 1
+    testthat::expect_error(calculate_improve(source, sites), "conflict")
+  }
+)
+
+
+testthat::test_that(
+  "calculate_covariates(covariate='improve'): completes the offline workflow",
+  {
+    path <- withr::local_tempdir()
+    fixture <- normalizePath(file.path(improve_path, "IMPAER_2022.txt"))
+    local_download_mocks(
+      download_run_method = function(urls, destfiles, ...) {
+        withr::with_dir(dirname(fixture), {
+          utils::zip(destfiles, files = basename(fixture), flags = "-q")
+        })
+        list(success = 1L, failed = 0L)
+      }
+    )
+    download_data(
+      "improve", year = 2022, directory_to_save = path,
+      acknowledgement = TRUE
+    )
+    testthat::expect_gt(file.info(file.path(path, basename(fixture)))$size, 0)
+    processed <- process_covariates(
+      "improve", path = path, return_format = "data.table"
+    )
+    out <- calculate_covariates(
+      "improve", from = processed, locs = data.frame(site_id = "ACAD1")
+    )
+    testthat::expect_equal(out$FactValue[out$ParamCode == "FPM"], c(2.85, 3.12))
+    testthat::expect_identical(unique(out$site_id), "ACAD1")
+  }
+)
