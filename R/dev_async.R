@@ -9,6 +9,8 @@ download_run_mirai <- function(
   daemons = NULL,
   ...
 ) {
+  mirai::require_daemons()
+
   # Parallel download using available mirai daemons.
   int_daemons <- as.integer(daemons)
 
@@ -323,7 +325,7 @@ calc_worker_mirai <- function(
   )
 
   # Prepare extraction locations.
-  locs_list <- amadeus::calc_prepare_locs(
+  locs_list <- calc_prepare_locs2(
     from = from,
     locs = locs,
     locs_id = locs_id,
@@ -353,6 +355,7 @@ calc_worker_mirai <- function(
   )
 
   if (shared_args$mirai) {
+    mirai::require_daemons()
     # Dispatch calc_extract across {mirai} daemons.
     message(sprintf(
       "Running across %02d {mirai} daemons.",
@@ -362,10 +365,20 @@ calc_worker_mirai <- function(
       list_from,
       function(x) terra::wrap(x, proxy = TRUE)
     )
-    shared_args$locs_vector <- terra::wrap(locs_vector)
+    # shared_args$locs_vector <- terra::wrap(locs_vector)
+    shared_args$locs_vector <- mori::share(shared_args$locs_vector)
     if (!is.null(shared_args$weights_prepared)) {
       shared_args$weights_prepared <- terra::wrap(weights_prepared)
     }
+    message(paste0(
+      "mori::is_shared(shared_args): ",
+      mori::is_shared(shared_args)
+    ))
+    message(paste0(
+      "mori::is_shared(shared_args$locs_vector): ",
+      mori::is_shared(shared_args$locs_vector)
+    ))
+
     jobs <- do.call(
       mirai::mirai_map,
       list(.x = list_wrapped, .f = calc_extract, .args = shared_args)
@@ -404,7 +417,7 @@ calc_extract <- function(
   if (mirai) {
     #### Unwrap PackedSpatRaster
     layer <- terra::unwrap(layer)
-    locs_vector <- terra::unwrap(locs_vector)
+    # locs_vector <- terra::unwrap(locs_vector)
     weights_prepared <- terra::unwrap(weights_prepared)
   }
 
@@ -454,11 +467,11 @@ calc_extract <- function(
   }
 
   #### extract layer data at sites
-  if (terra::geomtype(locs_vector) == "polygons") {
+  if (all(sf::st_is(locs_vector, "POLYGON"))) {
     ### apply exactextractr::exact_extract for polygons
     extract_args <- list(
       x = layer,
-      y = sf::st_as_sf(locs_vector),
+      y = locs_vector,
       progress = FALSE,
       force_df = TRUE,
       fun = fun_extract,
@@ -471,12 +484,12 @@ calc_extract <- function(
       exactextractr::exact_extract,
       extract_args
     )
-  } else if (terra::geomtype(locs_vector) == "points") {
+  } else if (all(sf::st_is(locs_vector, "POINT"))) {
     if (is.null(weights_prepared)) {
       #### apply terra::extract for points
       sites_extracted_layer <- terra::extract(
         layer,
-        locs_vector,
+        terra::vect(locs_vector),
         method = "simple",
         ID = FALSE,
         bind = FALSE,
@@ -554,3 +567,115 @@ calc_extract <- function(
   }
   sites_extracted_layer
 }
+
+
+################################################################################
+calc_prepare_locs2 <- function(
+  from,
+  locs,
+  locs_id,
+  radius,
+  geom = FALSE
+) {
+  #### check for null parameters
+  amadeus::check_for_null_parameters(mget(ls()))
+  if (!locs_id %in% names(locs)) {
+    stop(sprintf("locs should include columns named %s.\n", locs_id))
+  }
+  locs_id_values <- as.data.frame(locs)[[locs_id]]
+  #### prepare sites
+  sites_e <- process_locs_sf(
+    locs,
+    terra::crs(from),
+    radius
+  )
+  #### site identifiers and geometry
+  # check geom
+  amadeus::check_geom(geom)
+  if (geom %in% c("sf", "terra")) {
+    geom <- TRUE
+  }
+
+  sites_df <- if (geom) {
+    sites_i <- sf::st_drop_geometry(sites_e)
+    sites_i$geometry <- sf::st_as_text(sf::st_geometry(sites_e))
+    sites_i
+  } else {
+    sf::st_drop_geometry(sites_e)
+  }
+
+  if (!locs_id %in% names(sites_df)) {
+    if (nrow(sites_df) != length(locs_id_values)) {
+      stop(
+        paste0(
+          "`locs_id` was not retained in prepared locations and could not ",
+          "be reconstructed because row counts differ."
+        )
+      )
+    }
+    sites_df[[locs_id]] <- locs_id_values
+  }
+  chr_retain <- if (geom) c(locs_id, "geometry") else locs_id
+  list(sites_e, subset(sites_df, select = chr_retain))
+}
+
+################################################################################
+process_locs_sf <-
+  function(
+    locs,
+    crs,
+    radius
+  ) {
+    #### detect sf
+    if (methods::is(locs, "sf")) {
+      sites_sf <- locs
+    } else if (methods::is(locs, "SpatVector")) {
+      #### detect terra::SpatVector
+      sites_sf <- if (nrow(locs) == 0L) {
+        suppressWarnings(sf::st_as_sf(locs))
+      } else {
+        sf::st_as_sf(locs)
+      }
+      ### detect data.frame object
+    } else if (methods::is(locs, "data.frame")) {
+      sites_sf <- sf::st_as_sf(
+        data.frame(locs),
+        geom = c("lon", "lat"),
+        crs = "EPSG:4326",
+        keepgeom = TRUE
+      )
+    } else {
+      stop(
+        paste0(
+          "`locs` is not a `SpatVector`, `sf`, or `data.frame` object.\n"
+        )
+      )
+    }
+    ##### project to desired coordinate reference system
+    sites_p <- sf::st_transform(
+      sites_sf,
+      crs
+    )
+    #### buffer SpatVector
+    process_locs_radius_sf(
+      sites_p,
+      radius
+    )
+  }
+
+################################################################################
+process_locs_radius_sf <-
+  function(
+    locs,
+    radius
+  ) {
+    if (radius == 0) {
+      locs
+    } else if (radius > 0) {
+      sf::st_buffer(
+        locs,
+        radius,
+        nQuadSegs = 180L
+      )
+    }
+  }
