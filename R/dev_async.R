@@ -640,9 +640,9 @@ process_locs_sf <-
     } else if (methods::is(locs, "data.frame")) {
       sites_sf <- sf::st_as_sf(
         data.frame(locs),
-        geom = c("lon", "lat"),
-        crs = "EPSG:4326",
-        keepgeom = TRUE
+        coords = c("lon", "lat"),
+        crs = sf::st_crs("EPSG:4326"),
+        remove = FALSE
       )
     } else {
       stop(
