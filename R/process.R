@@ -2466,6 +2466,12 @@ process_hms <- function(
         substr(data_density$Start[1], 1, 7),
         format = "%Y%j"
       )
+      ##### hard patch to correct May 24, 2022 data being assigned May 25 date
+      date <- if (dates_of_interest[d] == "20220524") {
+        as.Date("2022144", format = "%Y%j")
+      } else {
+        date
+      }
       message(paste0(
         "Cleaning smoke data for date ",
         date[1],

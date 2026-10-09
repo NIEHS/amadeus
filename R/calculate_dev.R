@@ -457,6 +457,7 @@ calculate_narr_mirai <- function(
     crs = terra::crs(from)
   )
 }
+
 ################################################################################
 # {calculate_hms} updated with the mirai optional dispatcher.
 calculate_hms_map <- function(
