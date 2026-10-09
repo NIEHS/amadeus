@@ -559,7 +559,8 @@ calculate_hms_map <- function(
   )
 
   # Convert {from} to a list
-  list_from <- lapply(seq_len(nrow(from)), function(x) from[x, ])
+  list_from <- lapply(date_sequence, function(x) from[from$Date == x])
+
   # Define shared arguments (includes mirai detection)
   shared_args <- list(
     sites_e = sites_e,
@@ -671,7 +672,7 @@ calc_hms_extract <- function(
 ) {
   from <- if (mirai) terra::unwrap(from) else from
   sites_e <- if (mirai) terra::unwrap(sites_e) else sites_e
-  date <- from$Date
+  date <- unique(from$Date)
   ### Expand full spatiotemporal range
   data_template <- expand.grid(
     id = sites_id[[locs_id]],
