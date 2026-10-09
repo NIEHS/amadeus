@@ -232,3 +232,196 @@ download_narr_map <- function(
     return(invisible(download_result))
   }
 }
+
+################################################################################
+# {download_hms} updated with the mirai optional dispatcher.
+download_hms_map <- function(
+  data_format = "Shapefile",
+  date = c("2018-01-01", "2018-01-01"),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = TRUE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
+) {
+  #### Check acknowledgement
+  amadeus::download_permit(acknowledgement = acknowledgement)
+
+  #### Check for null parameters
+  amadeus::check_for_null_parameters(mget(ls()))
+
+  #### Check dates
+  date <- if (length(date) == 1) rep(date, 2) else date
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
+  if (as.Date(date[1]) < as.Date("2005-08-05")) {
+    stop("NOAA HMS wildfire smoke data begins at August 05, 2005.")
+  }
+
+  #### Directory setup
+  directory_original <- amadeus::download_sanitize_path(directory_to_save)
+  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
+  directory_to_download <- directories[1]
+  directory_to_save <- directories[2]
+
+  #### Handle deprecated parameters
+  if (!isTRUE(download)) {
+    warning(
+      "Setting download=FALSE is deprecated.\n",
+      call. = FALSE
+    )
+  }
+
+  if (remove_command != FALSE) {
+    warning(
+      "Parameter 'remove_command' is deprecated and ignored.\n",
+      call. = FALSE
+    )
+  }
+
+  #### Check for unzip/remove_zip conflict
+  if (unzip == FALSE && remove_zip == TRUE) {
+    stop(paste0(
+      "Arguments unzip = FALSE and remove_zip = TRUE are not ",
+      "acceptable together. Please change one.\n"
+    ))
+  }
+
+  #### Define date sequence
+  date_sequence <- amadeus::generate_date_sequence(
+    date[1],
+    date[2],
+    sub_hyphen = TRUE
+  )
+
+  #### Define URL base
+  base <- "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/"
+
+  if (tolower(data_format) == "shapefile") {
+    data_format <- "Shapefile"
+    suffix <- ".zip"
+    directory_to_cat <- directory_to_download
+  } else if (tolower(data_format) == "kml") {
+    data_format <- "KML"
+    suffix <- ".kml"
+    directory_to_cat <- directory_to_save
+  }
+
+  #### Define all URLs and destination files
+  urls <- paste0(
+    base,
+    data_format,
+    "/",
+    substr(date_sequence, 1, 4),
+    "/",
+    substr(date_sequence, 5, 6),
+    "/hms_smoke",
+    date_sequence,
+    suffix
+  )
+  destfiles <- paste0(
+    directory_to_cat,
+    "hms_smoke_",
+    data_format,
+    "_",
+    date_sequence,
+    suffix
+  )
+  needs_download <- vapply(
+    destfiles,
+    amadeus::check_destfile,
+    FUN.VALUE = logical(1)
+  )
+
+  #### Validate first URL only
+  if (!amadeus::check_url_status(urls[1])) {
+    stop(paste0(
+      "Invalid date returns HTTP code 404. ",
+      "Check `date` parameter.\n"
+    ))
+  }
+
+  #### Retain URLs and destfiles to be downloaded
+  all_urls <- urls[needs_download]
+  all_destfiles <- destfiles[needs_download]
+  stopifnot(length(all_urls) == length(all_destfiles))
+
+  #### Exit early if download = FALSE
+  if (!isTRUE(download)) {
+    message(
+      sprintf(
+        "Skipping download. Found %d files available for download.\n",
+        length(all_urls)
+      )
+    )
+    return(
+      invisible(
+        list(
+          urls = all_urls,
+          destfiles = all_destfiles,
+          n_files = length(all_urls)
+        )
+      )
+    )
+  }
+
+  #### Download files using httr2 (sequential or concurrent with mirai)
+  if (length(all_urls) == 0L) {
+    download_result <- list(success = 0L, failed = 0L, skipped = 0L)
+  } else if (!mirai::daemons_set()) {
+    # Sequential download if mirai daemons are not set.
+    download_result <- amadeus::download_run_method(
+      urls = all_urls,
+      destfiles = all_destfiles,
+      token = NULL, # HMS doesn't use token authentication
+      show_progress = show_progress,
+      max_tries = max_tries,
+      rate_limit = rate_limit
+    )
+  } else {
+    download_result <- download_run_mirai(
+      urls = all_urls,
+      destfiles = all_destfiles,
+      token = NULL, # HMS doesn't use token authentication
+      max_tries = max_tries,
+      rate_limit = rate_limit,
+      daemons = mirai::nextget("n")
+    )
+  }
+
+  #### Handle KML (no unzipping needed)
+  if (data_format == "KML") {
+    unlink(directory_to_download, recursive = TRUE)
+    message("KML files cannot be unzipped.\n")
+    if (hash) {
+      return(amadeus::download_hash(hash = TRUE, directory_to_save))
+    } else {
+      return(invisible(download_result))
+    }
+  }
+
+  #### Unzip downloaded zip files if unzip = TRUE
+  invisible(lapply(
+    all_destfiles,
+    function(x) {
+      amadeus::download_unzip(x, directory_to_save, unzip)
+    }
+  ))
+
+  #### Remove zip files if remove_zip = TRUE
+  amadeus::download_remove_zips(
+    remove = remove_zip,
+    download_name = all_destfiles
+  )
+
+  if (hash) {
+    return(amadeus::download_hash(hash = TRUE, directory_to_save))
+  } else {
+    return(invisible(download_result))
+  }
+}
