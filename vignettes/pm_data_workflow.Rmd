@@ -42,7 +42,11 @@ improve_date_window <- c("2022-01-01", "2022-03-31")
 
 ```
 
-This article demonstrates compact PM monitoring workflows for AQS and IMPROVE. Because these measurements are typically used as outcome data, the example uses `download_aqs()` / `process_aqs()` and `download_improve()` / `process_improve()` directly rather than routing through `calculate_covariates()`.
+This article demonstrates compact PM monitoring workflows for AQS and IMPROVE.
+The download and process functions provide monitor observations for outcome
+modeling. IMPROVE also supports `calculate_improve()` and the
+`calculate_covariates(covariate = "improve")` route for summarizing observations
+at study locations.
 
 This vignette runs its live workflow when rendered locally. The download, processing, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
@@ -241,6 +245,37 @@ improve_locations <- unique(
   ][, c("SiteCode", "ParamCode", "Status")]
 )
 ```
+
+## Calculate IMPROVE covariates at study locations
+
+For covariates at study locations, pass the processed measurements to
+`calculate_covariates()`. The download and process wrappers accept the same
+`"improve"` dataset name, completing the download → process → calculate workflow.
+This example averages valid `FPM` measurements within 10 km of each location,
+then averages those spatial summaries by month:
+
+```{r calculate-improve, eval = live_run}
+study_locations <- data.frame(
+  site_id = "Acadia", lon = -68.2608, lat = 44.3771
+)
+improve_covariates <- calculate_covariates(
+  covariate = "improve",
+  from = improve_locations_raw,
+  locs = study_locations,
+  radius = 10000,
+  param_code = "FPM",
+  status = "V0",
+  .by_time = "month"
+)
+```
+
+The result contains `site_id`, UTC `time`, and `improve_FPM_10000` in the
+measurement's original units. Omit `.by_time` to retain sampling dates.
+`radius = 0` matches coincident monitors for points or intersecting monitors
+for polygons. Locations without measurements receive `NA`; sampling gaps are
+not filled. Status filtering is opt-in. `geom = "sf"` or `geom = "terra"`
+returns the extraction geometry, including any buffer. The same calculation
+supports processed `"rhr2"` and `"rhr3"` data, using their `ParamCode` values.
 
 ## Plot IMPROVE monitor locations
 
