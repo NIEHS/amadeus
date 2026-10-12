@@ -26,7 +26,7 @@ lower level HUCs.}
 \item{extent}{numeric(4) or SpatExtent giving the extent of the raster
 if \code{NULL} (default), the entire raster is loaded}
 
-\item{...}{Arguments passed to \code{nhdplusTools::get_huc()}}
+\item{...}{Arguments passed to \code{hydrogeofetch::get_huc()}}
 }
 \value{
 a \code{SpatVector} object
@@ -63,7 +63,7 @@ test3 <- process_huc(
 }
 }
 \seealso{
-\code{\link[nhdplusTools:get_huc]{nhdplusTools::get_huc}}
+\code{\link[hydrogeofetch:get_huc]{hydrogeofetch::get_huc}}
 }
 \author{
 Insang Song

@@ -397,7 +397,7 @@ download_run_method <- function(
               httr2::resp_status(resp) %in% c(429, 502, 503, 504)
             },
             retry_on_failure = TRUE,
-            backoff = \(i) stats::runif(1) * pmin(i ^ 2, 30)
+            backoff = \(i) stats::runif(1) * pmin(i^2, 30)
           ) |>
           httr2::req_timeout(timeout) |>
           httr2::req_options(connecttimeout = 30L) |>
@@ -1056,7 +1056,7 @@ narr_variable <- function(variable) {
   )
   pressure <- c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd")
   soil <- c("soill", "soilw", "tsoil")
-  base <- "https://downloads.psl.noaa.gov//Datasets/NARR/Dailies/"
+  base <- "https://downloads.psl.noaa.gov/NARR/Dailies/"
   if (variable %in% mono) {
     base <- paste0(base, "monolevel/")
     months <- ""
@@ -1271,7 +1271,9 @@ extent_to_modis_tiles <- function(extent) {
   )
 
   bounds_file <- system.file(
-    "extdata", "sn_bound_10deg.txt", package = "amadeus"
+    "extdata",
+    "sn_bound_10deg.txt",
+    package = "amadeus"
   )
   stopifnot(
     "sn_bound_10deg.txt not found in inst/extdata/" = nzchar(bounds_file)
@@ -1280,7 +1282,7 @@ extent_to_modis_tiles <- function(extent) {
   lines <- readLines(bounds_file, warn = FALSE)
   data_lines <- grep("^ *[0-9]", lines, value = TRUE)
   tiles_df <- utils::read.table(
-    text    = paste(data_lines, collapse = "\n"),
+    text = paste(data_lines, collapse = "\n"),
     col.names = c("iv", "ih", "lon_min", "lon_max", "lat_min", "lat_max")
   )
 
@@ -1296,8 +1298,10 @@ extent_to_modis_tiles <- function(extent) {
   #   tile_lon_max >= xmin  AND  tile_lon_min <= xmax
   #   tile_lat_max >= ymin  AND  tile_lat_min <= ymax
   hits <- tiles_df[
-    tiles_df$lon_max >= xmin & tiles_df$lon_min <= xmax &
-      tiles_df$lat_max >= ymin & tiles_df$lat_min <= ymax,
+    tiles_df$lon_max >= xmin &
+      tiles_df$lon_min <= xmax &
+      tiles_df$lat_max >= ymin &
+      tiles_df$lat_min <= ymax,
   ]
 
   sprintf("h%02dv%02d", hits$ih, hits$iv)
