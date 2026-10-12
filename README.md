@@ -55,6 +55,7 @@ pak::pak("NIEHS/amadeus")
 | [US EPA National Emissions Inventory (NEI)](https://www.epa.gov/air-emissions-inventories) | CSV | Emissions | United States | `_nei` |
 | [US EPA Toxic Release Inventory (TRI) Program](https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present) | CSV | Chemicals<br>Pollution | United States | `_tri` |
 | [USGS[^6] Global Multi-resolution Terrain Elevation Data (GMTED2010)](https://www.usgs.gov/coastal-changes-and-impacts/gmted2010) | ESRI ASCII Grid | Elevation | Global | `_gmted` |
+| [XIS: A daily spatiotemporal machine-learning model for environmental exposures in the contiguous United States](https://zenodo.org/records/17815670) | Parquet | Air Pollution | Contiguous United States | `_xis` |
 
 See the "[download_data](https://niehs.github.io/amadeus/articles/download_functions.html)" vignette for a detailed description of source-specific download functions.
 
