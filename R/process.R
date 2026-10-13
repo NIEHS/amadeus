@@ -2469,9 +2469,14 @@ process_hms <- function(
         )
       )
       ##### patch to correct multiple dates in satellite Start/End data
-      # If two dates, assumption is that the second date comes from Start/End
-      # indicating midnight on subsquent day
-      date <- if (length(date) == 1) date else min(date)
+      # If two dates, overwrite based on date derived from the generated
+      # date sequence
+      date <- if (length(date) == 1) {
+        date
+      } else {
+        idx_date <- match(dates_of_interest[d], gsub("-", "", date))
+        date[idx_date]
+      }
       message(paste0(
         "Cleaning smoke data for date ",
         date,
