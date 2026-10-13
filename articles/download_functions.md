@@ -600,9 +600,9 @@ download_hms
 #> {
 #>     amadeus::download_permit(acknowledgement = acknowledgement)
 #>     amadeus::check_for_null_parameters(mget(ls()))
-#>     if (length(date) == 1) {
-#>         date <- c(date, date)
-#>     }
+#>     date <- if (length(date) == 1) 
+#>         rep(date, 2)
+#>     else date
 #>     stopifnot(length(date) == 2)
 #>     date <- date[order(as.Date(date))]
 #>     if (as.Date(date[1]) < as.Date("2005-08-05")) {
@@ -692,6 +692,6 @@ download_hms
 #>         return(invisible(download_result))
 #>     }
 #> }
-#> <bytecode: 0x55d9e93df188>
+#> <bytecode: 0x556ca6eac418>
 #> <environment: namespace:amadeus>
 ```
