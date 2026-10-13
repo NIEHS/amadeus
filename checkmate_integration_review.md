@@ -312,6 +312,76 @@ checkmate::assertDirectoryExists(path)</code></pre></td><td><ul><li>P2 — Conso
       file.remove(command_txt)
     }
     sink(file = command_txt, append = FALSE)</code></pre></td><td><ul><li>P2 — Optional preflight check before deleting/recreating a command-log file; preserve existing sink behavior.</li><li>Behavior change: overwrite = TRUE requires an existing file to be readable and writable, whereas deletion/recreation can depend on parent permissions instead.</li><li>Test new/existing files, missing parents and directory-valued paths. Existing test-download.R:536–547 covers an existing writable file; no automatic expectation rewrite is needed.</li><li>Do not replace directory creation, mixed file/directory expansion, HUC/USDM discovery branches or download cache checks with unconditional assertions.</li></ul></td></tr>
+<tr><td><code>R/calculate_covariates.R</code></td><td>TRI via sum_edc; user-supplied emissions data.</td><td>2100–2103</td><td><pre><code class="language-r">    if (!is.numeric(decay_range) || length(decay_range) != 1L ||
+          is.na(decay_range) || decay_range &lt;= 0) {
+      stop(&quot;`decay_range` must be a single positive numeric value.\n&quot;)
+    }</code></pre></td><td><pre><code class="language-r">    if (!checkmate::testNumber(decay_range, finite = FALSE) || decay_range &lt;= 0) {
+      stop(&quot;`decay_range` must be a single positive numeric value.\n&quot;)
+    }</code></pre></td><td><ul><li>P1 — Shared decay-range contract: consolidate numeric scalar validation; retain the strict positive check, Inf acceptance and existing error.</li></ul></td></tr>
+<tr><td><code>R/calculate_covariates.R</code></td><td>TRI via sum_edc; user-supplied emissions data.</td><td>2104–2106</td><td><pre><code class="language-r">    if (!is.character(target_fields) || length(target_fields) &lt; 1L) {
+      stop(&quot;`target_fields` must be a non-empty character vector.\n&quot;)
+    }</code></pre></td><td><pre><code class="language-r">    if (!checkmate::testCharacter(target_fields, min.len = 1L, any.missing = TRUE, typed.missing = TRUE)) {
+      stop(&quot;`target_fields` must be a non-empty character vector.\n&quot;)
+    }</code></pre></td><td><ul><li>P1 — Shared target-column selector contract: preserve NA_character_ acceptance and subsequent missing-column detection. Retain the existing error; add no nonblank restriction.</li></ul></td></tr>
+<tr><td><code>R/calculate_covariates.R</code></td><td>TRI (calculate_tri).</td><td>2350–2352</td><td><pre><code class="language-r">  if (!is.numeric(decay_range)) {
+    stop(&quot;`decay_range` should be numeric.\n&quot;)
+  }</code></pre></td><td><pre><code class="language-r">  if (!checkmate::testNumeric(decay_range, any.missing = TRUE, typed.missing = TRUE, finite = FALSE)) {
+    stop(&quot;`decay_range` should be numeric.\n&quot;)
+  }</code></pre></td><td><ul><li>P1 — Shared decay-range argument: retain type-only validation, typed empty/missing values, Inf and later checks. Preserve the error; verify classed/dimensioned inputs before adoption.</li></ul></td></tr>
+<tr><td><code>R/calculate_covariates.R</code></td><td>TRI (calculate_tri target-field values).</td><td>2424–2426</td><td><pre><code class="language-r">              if (!is.numeric(tri_col_c0)) {
+                stop(&quot;TRI target field `&quot;, tri_col, &quot;` is not numeric.\n&quot;)
+              }</code></pre></td><td><pre><code class="language-r">              if (!checkmate::testNumeric(tri_col_c0, any.missing = TRUE, typed.missing = TRUE, finite = FALSE)) {
+                stop(&quot;TRI target field `&quot;, tri_col, &quot;` is not numeric.\n&quot;)
+              }</code></pre></td><td><ul><li>P1 — Validate numeric schema values while preserving typed empty/missing values and Inf. Retain the field-specific error; verify classed/dimensioned inputs before adoption.</li></ul></td></tr>
+<tr><td><code>R/calculate_covariates.R</code></td><td>HMS (calculate_hms).</td><td>2609–2611</td><td><pre><code class="language-r">  if (!is.logical(frac) || length(frac) != 1L || is.na(frac)) {
+    stop(&quot;`frac` should be a single logical value (TRUE/FALSE).&quot;)
+  }</code></pre></td><td><pre><code class="language-r">  if (!checkmate::testFlag(frac)) {
+    stop(&quot;`frac` should be a single logical value (TRUE/FALSE).&quot;)
+  }</code></pre></td><td><ul><li>P1 — Extend the shared frac flag pattern to HMS. Preserve TRUE/FALSE acceptance, the existing stop message and validation position.</li></ul></td></tr>
+<tr><td><code>R/calculate_covariates.R</code></td><td>GRoADS (calculate_groads).</td><td>3413–3415</td><td><pre><code class="language-r">  if (!is.logical(drop) || length(drop) != 1 || is.na(drop)) {
+    stop(&quot;`drop` should be a single logical value (TRUE/FALSE).&quot;)
+  }</code></pre></td><td><pre><code class="language-r">  if (!checkmate::testFlag(drop)) {
+    stop(&quot;`drop` should be a single logical value (TRUE/FALSE).&quot;)
+  }</code></pre></td><td><ul><li>P1 — Extend the shared drop flag pattern to GRoADS. Preserve TRUE/FALSE acceptance, the existing stop message and validation position.</li></ul></td></tr>
+<tr><td><code>R/calculate_covariates.R</code></td><td>EDGAR (calculate_edgar).</td><td>4275–4277</td><td><pre><code class="language-r">  if (!is.numeric(radius) || length(radius) != 1) {
+    stop(&quot;`radius` must be numeric(1).&quot;)
+  }</code></pre></td><td><pre><code class="language-r">  if (!checkmate::testNumeric(radius, len = 1L, any.missing = TRUE, finite = FALSE, typed.missing = TRUE)) {
+    stop(&quot;`radius` must be numeric(1).&quot;)
+  }</code></pre></td><td><ul><li>P1 — Shared radius argument: preserve this guard&#x27;s numeric NA/NaN, Inf and negative-value acceptance. Logical NA remains invalid; retain the existing error. Verify classed/dimensioned inputs before adoption.</li></ul></td></tr>
+<tr><td><code>R/calculate_covariates_auxiliary.R</code></td><td>Datasets using shared temporal-summary helpers (check_by_time).</td><td>1106–1114</td><td><pre><code class="language-r">  if (!is.character(.by_time) || length(.by_time) != 1L) {
+    stop(
+      paste0(
+        &quot;`.by_time` must be NULL or a single character string naming &quot;,
+        &quot;a temporal unit.
+&quot;
+      )
+    )
+  }</code></pre></td><td><pre><code class="language-r">  if (!checkmate::testCharacter(.by_time, len = 1L, any.missing = TRUE, typed.missing = TRUE)) {
+    stop(
+      paste0(
+        &quot;`.by_time` must be NULL or a single character string naming &quot;,
+        &quot;a temporal unit.
+&quot;
+      )
+    )
+  }</code></pre></td><td><ul><li>P1 — Shared temporal-grouping interface: preserve optional NULL and first-stage NA_character_ acceptance; retain the subsequent membership error and invisible(NULL) return.</li></ul></td></tr>
+</tbody></table>
+</div>
+
+## Summary: strongest meaning-preserving replacements
+
+These are the strongest replacement candidates, not mandatory fixes. Replace only the condition inside the existing `if (...) stop(...)` block; retain the exact stop body, validation position and surrounding logic. The conditions below are whitespace-normalized. They preserve the reviewed ordinary-input contracts; confirm classed/attributed inputs against a pinned checkmate version before implementation.
+
+<div class="table-scroll">
+<table class="validation-table">
+<thead><tr><th>Scope</th><th>Current condition</th><th>Checkmate replacement condition</th><th>Preserve</th></tr></thead>
+<tbody>
+<tr><td>Scalar logical flags (frac, drop, use_threshold, include_file)</td><td><pre><code class="language-r">!is.logical(frac) || length(frac) != 1L || is.na(frac)</code></pre></td><td><pre><code class="language-r">!checkmate::testFlag(frac)</code></pre></td><td>Use the corresponding argument name; TRUE and FALSE remain valid.</td></tr>
+<tr><td>Numeric scalar radius — R/calculate_covariates.R:270–272, 1015–1017</td><td><pre><code class="language-r">!is.numeric(radius) || length(radius) != 1L || is.na(radius)</code></pre></td><td><pre><code class="language-r">!checkmate::testNumber(radius, finite = FALSE)</code></pre></td><td>Keep the separate negative-radius guard; retain Inf acceptance.</td></tr>
+<tr><td>Finite nonnegative radius — R/calculate_covariates.R:5120–5123</td><td><pre><code class="language-r">!is.numeric(radius) || length(radius) != 1L || !is.finite(radius) || radius &lt; 0</code></pre></td><td><pre><code class="language-r">!checkmate::testNumber(radius, lower = 0, finite = TRUE)</code></pre></td><td>Preserve the existing finite, nonnegative scalar requirement.</td></tr>
+<tr><td>Positive decay range — R/calculate_covariates.R:2100–2103</td><td><pre><code class="language-r">!is.numeric(decay_range) || length(decay_range) != 1L || is.na(decay_range) || decay_range &lt;= 0</code></pre></td><td><pre><code class="language-r">!checkmate::testNumber(decay_range, finite = FALSE) || decay_range &lt;= 0</code></pre></td><td>Retain strict positivity and positive Inf acceptance.</td></tr>
+<tr><td>Required MCD14ML columns — R/process.R:692–694</td><td><pre><code class="language-r">!all(required_cols %in% names(txt_data))</code></pre></td><td><pre><code class="language-r">!checkmate::testSubset(required_cols, names(txt_data))</code></pre></td><td>Internally constructed character names; extra/reordered columns remain valid.</td></tr>
+<tr><td>Required IMPROVE columns — R/calculate_covariates.R:5147–5149</td><td><pre><code class="language-r">!all(required %in% names(values))</code></pre></td><td><pre><code class="language-r">!checkmate::testSubset(required, names(values))</code></pre></td><td>Keep subset direction and the existing required-field error; do not constrain data values.</td></tr>
 </tbody></table>
 </div>
 
@@ -337,118 +407,15 @@ checkmate::assertDirectoryExists(path)</code></pre></td><td><ul><li>P2 — Conso
 
 # test_R
 
-- The existing optional credential-helper recommendation is retained below as lower priority.
-- Eight additional source blocks, spanning six recommendation groups, follow it.
-- This document proposes changes only; no test helper or test implementation has been created.
+## Checkmate replacement suggestions
 
-<div class="table-scroll">
-<table class="validation-table">
-<thead><tr><th>File path</th><th>Start–end lines</th><th>Current code</th><th>Suggested checkmate code</th><th>Reason for replacement</th></tr></thead>
-<tbody>
-<tr><td><code>tests/testthat/helper-skips.R</code></td><td>32–32</td><td><pre><code class="language-r">  stopifnot(length(var) == 1L, is.character(var))</code></pre></td><td><pre><code class="language-r">checkmate::assert_character(var, len = 1L,
-  any.missing = TRUE, typed.missing = TRUE)</code></pre></td><td><ul><li>Low priority — Optional test-helper input assertion: report an invalid environment-variable-name argument directly. any.missing=TRUE deliberately preserves the current guard&#x27;s acceptance of NA_character_; rejecting NA/empty names would be a separate, reasonable tightening. typed.missing=TRUE retains rejection of logical NA.</li><li>Keep Sys.getenv and testthat::skip below it so absent credentials remain skips, not failures.</li><li>Error text changes; no direct skip_if_no_credentials error-message expectation was found.</li></ul></td></tr>
-</tbody></table>
-</div>
+The two tables classify complete recommendation blocks by their actual dependency on production changes. The dependent table retains its existing diagnostic-impact column names and order; the standalone table retains the existing six-column layout (including Affected dataset). Earlier five-column standalone entries gain dataset metadata without altering their code. Diagnostic entries moved to the standalone table retain their impact text in Reason for replacement.
 
+There are **4 dependent recommendations** and **38 standalone recommendations**. All 44 original entries are accounted for: two identical code pairs are consolidated across their GEOS and HMS line ranges, yielding 42 rows. No distinct test location, explanation or code alternative was discarded. The two unchanged gridMET/SPEI entries are retained as preservation recommendations, not new replacements.
 
-## Useful compound output expectations from the optimization review
+## Test replacements dependent on proposed changes to the major R files
 
-<div class="table-scroll">
-<table class="validation-table">
-<thead><tr><th>File path</th><th>Start–end lines</th><th>Current code</th><th>Suggested checkmate code</th><th>Reason for replacement</th></tr></thead>
-<tbody>
-<tr><td><code>tests/testthat/test-cropscape.R</code></td><td>415–417</td><td><pre><code class="language-r">      testthat::expect_type(fractions, &quot;double&quot;)
-      testthat::expect_false(anyNA(fractions))
-      testthat::expect_true(all(fractions &gt;= 0 &amp; fractions &lt;= 1))</code></pre></td><td><pre><code class="language-r">checkmate::expect_double(fractions, lower = 0, upper = 1,
-  any.missing = FALSE, typed.missing = TRUE)</code></pre></td><td><ul><li>P1 — Combine the existing double type, missingness and [0, 1] contract into one diagnostic expectation.</li><li>Keep the column-count check at 414 and sum/tolerance at 418.</li><li>Do not use expect_numeric (which admits integers), min.len or unique.</li><li>Expectation counts and failure text change; verify classed/dimensioned outputs before adoption.</li></ul></td></tr>
-<tr><td><code>tests/testthat/test-ecoregion.R</code></td><td>592–600</td><td><pre><code class="language-r">  testthat::expect_true(
-    all(vapply(ecor_frac[, frc_cols, drop = FALSE], is.numeric, logical(1)))
-  )
-  testthat::expect_true(
-    all(as.matrix(ecor_frac[, frc_cols, drop = FALSE]) &gt;= 0, na.rm = TRUE)
-  )
-  testthat::expect_true(
-    all(as.matrix(ecor_frac[, frc_cols, drop = FALSE]) &lt;= 1, na.rm = TRUE)
-  )</code></pre></td><td><pre><code class="language-r">expect_fraction_columns(ecor_frac, frc_cols,
-  any.missing = TRUE, label = &quot;ecor_frac&quot;)</code></pre></td><td><ul><li>P1 — Use the proposed helper below to identify the failing fraction column and avoid repeated matrix conversion.</li><li>Preserve integer/double acceptance, empty numeric columns and missing/all-missing values.</li><li>Keep the independent minimum column count at 591.</li><li>Custom numeric classes/coercion methods need equivalence checks; expectation count and failure text change.</li></ul></td></tr>
-<tr><td><code>tests/testthat/test-hms.R</code></td><td>687–695</td><td><pre><code class="language-r">  testthat::expect_true(
-    all(vapply(hms_frac[, smoke_cols], is.numeric, logical(1)))
-  )
-  testthat::expect_true(
-    all(as.matrix(hms_frac[, smoke_cols]) &gt;= 0, na.rm = TRUE)
-  )
-  testthat::expect_true(
-    all(as.matrix(hms_frac[, smoke_cols]) &lt;= 1, na.rm = TRUE)
-  )</code></pre></td><td><pre><code class="language-r">expect_fraction_columns(hms_frac, smoke_cols,
-  any.missing = TRUE, label = &quot;hms_frac&quot;)</code></pre></td><td><ul><li>P1 — Reuse the same fraction contract and column-labelled diagnostics.</li><li>Preserve the three-column check at 686 and allow numeric NA/NaN values as the current na.rm=TRUE checks do.</li><li>If the selection regresses to one column, the helper avoids the old dropping-subset failure; that diagnostic behavior deliberately changes.</li></ul></td></tr>
-<tr><td><code>tests/testthat/test-download.R</code></td><td>2676–2679</td><td><pre><code class="language-r">  testthat::expect_true(is.character(tiles))
-  testthat::expect_true(length(tiles) &gt; 0)
-  testthat::expect_true(all(grepl(&quot;^h[0-9]{2}v[0-9]{2}$&quot;, tiles)))
-  testthat::expect_true(length(unique(tiles)) &gt;= 10)</code></pre></td><td><pre><code class="language-r">checkmate::expect_character(tiles, min.len = 1L,
-  any.missing = FALSE, typed.missing = TRUE,
-  pattern = &quot;^h[0-9]{2}v[0-9]{2}$&quot;)
-testthat::expect_gte(length(unique(tiles)), 10L)</code></pre></td><td><ul><li>P2 — Consolidate character type, nonempty vector and tile format while retaining the distinct-count requirement.</li><li>Duplicates remain allowed; unique=TRUE would change the contract.</li><li>Preserve regex anchors.</li><li>NA already fails the old regex test.</li><li>Expectation count and failure diagnostics change.</li></ul></td></tr>
-<tr><td><code>tests/testthat/test-download.R</code></td><td>681–682</td><td><pre><code class="language-r">    testthat::expect_true(is.character(result))
-    testthat::expect_true(nchar(result) &gt; 0)</code></pre></td><td><pre><code class="language-r">checkmate::expect_string(result, min.chars = 1L)</code></pre></td><td><ul><li>P2 — Express the existing scalar nonempty character hash contract directly.</li><li>The old expect_true(nchar(result) &gt; 0) already rejects missing, empty and multi-element results.</li><li>Do not add hexadecimal or fixed-length restrictions at this site.</li><li>Verify classed/dimensioned strings; diagnostics change.</li></ul></td></tr>
-<tr><td><code>tests/testthat/test-download.R</code></td><td>733–735</td><td><pre><code class="language-r">    testthat::expect_type(result, &quot;character&quot;)
-    testthat::expect_true(nchar(result) &gt; 0)
-    testthat::expect_true(grepl(&quot;^[a-f0-9]+$&quot;, result)) # MD5 hash format</code></pre></td><td><pre><code class="language-r">checkmate::expect_string(result, min.chars = 1L,
-  pattern = &quot;^[a-f0-9]+$&quot;)</code></pre></td><td><ul><li>P2 — Combine the existing scalar nonempty character and lowercase hexadecimal requirements.</li><li>A 32-character MD5 restriction is not currently tested and is not proposed.</li><li>Expectation counts and diagnostic text change; no material runtime gain is claimed.</li></ul></td></tr>
-<tr><td><code>tests/testthat/helper-download-tests.R</code></td><td>7–7</td><td><pre><code class="language-r">  testthat::expect_true(dir.exists(directory_to_save))</code></pre></td><td><pre><code class="language-r">testthat::expect_length(directory_to_save, 1L)
-checkmate::expect_directory_exists(directory_to_save)</code></pre></td><td><ul><li>P2 — Improve missing-directory diagnostics in the shared helper.</li><li>Retain an explicit length-one expectation: directory existence validators can accept vectors, whereas the old expect_true(dir.exists(...)) requires a scalar result.</li><li>Intended inputs are character paths; the validator may reject coercible non-character inputs accepted by dir.exists.</li><li>Do not add access permissions.</li><li>Preserve file.exists(commands_path) at 8 and the separate all(url_status) requirement.</li></ul></td></tr>
-<tr><td><code>tests/testthat/test-aqs.R</code></td><td>98–99</td><td><pre><code class="language-r">    testthat::expect_true(dir.exists(&quot;zip_files&quot;))
-    testthat::expect_true(dir.exists(&quot;data_files&quot;))</code></pre></td><td><pre><code class="language-r">checkmate::expect_directory_exists(&quot;zip_files&quot;)
-checkmate::expect_directory_exists(&quot;data_files&quot;)</code></pre></td><td><ul><li>P2 — Literal scalar directory paths need no additional length check.</li><li>Directory-specific errors are more informative than a failed TRUE comparison.</li><li>Preserve negative directory checks elsewhere and do not reinterpret base file.exists checks as regular-file-only checks.</li><li>Diagnostics change; filesystem work remains.</li></ul></td></tr>
-</tbody></table>
-</div>
-
-### Proposed shared fraction helper
-
-- The two fraction-column rows above depend on this proposed test-only helper, suitable for a future `tests/testthat/helper-validation.R`.
-- It is shown here only; the file has not been created.
-
-```r
-expect_fraction_columns <- function(data, columns, any.missing, label) {
-  invisible(lapply(columns, function(column) {
-    checkmate::expect_numeric(
-      data[[column]],
-      lower = 0,
-      upper = 1,
-      any.missing = any.missing,
-      all.missing = TRUE,
-      typed.missing = TRUE,
-      label = paste0(label, "[[", dQuote(column), "]]")
-    )
-  }))
-}
-```
-
-- Keep column selection/count and fraction-sum expectations at the call sites.
-- An empty selection makes no expectations in this helper, so those count checks are essential.
-- Do not add a helper-level nonempty assertion or force missingness to FALSE.
-- Ordinary integer/double fraction columns retain their existing bounds contract; test reporter output and custom numeric classes still need verification.
-- Direct `expect_numeric()` preserves the diagnostic reason that `expect_true(testNumeric(...))` would discard.
-
-- The documented [double expectations](https://mllg.github.io/checkmate/reference/checkDouble.html), [numeric expectations](https://mllg.github.io/checkmate/reference/checkNumeric.html), [character expectations](https://mllg.github.io/checkmate/reference/checkCharacter.html), [string expectations](https://mllg.github.io/checkmate/reference/checkString.html), and [directory expectations](https://mllg.github.io/checkmate/reference/checkDirectoryExists.html) support these proposals.
-- Fewer temporary vectors or matrix conversions may help, but no performance improvement has been measured.
-
-### Suggestions intentionally not carried over
-
-- The README's native class/count cleanup and shared live-download postcondition are useful independent maintenance ideas, but neither requires checkmate; they are outside this replacement table.
-- Preserve native `expect_length()`, `expect_gt()`, S3/S4 checks and the distinction between at least one nonempty downloaded file and all files being nonempty.
-- Do not add MD5 length restrictions, read/write permissions, strict nonmissing tokens, regular-file requirements or numeric checks where the old tests establish only bounds.
-- Keep mock failures, skips, error expectations, exact results and binary set-membership tests.
-
-- For a test-only adoption, declare checkmate in Suggests; if the major_R runtime recommendations are also implemented, Imports already supplies it and a duplicate Suggests entry is unnecessary.
-- Select a minimum version supporting the proposed expectation arguments and verify compatibility with the project's testthat setup.
-- Do not silently skip these core assertions when checkmate is absent.
-
-## Existing test expectations affected by major_R
-
-- Preserve package calls, invalid inputs and enclosing test structure.
-- Verify proposed error regexes against the selected checkmate version.
-- Match argument names and constraints; avoid generic or unqualified error checks.
-- Disjoint source excerpts follow the listed line-range order.
+Implement these complete blocks only with the corresponding diagnostic-changing source proposals. The download URL, negative NLCD radius and TRI use_threshold regexes require new messages; the sum_edc block also contains a use_threshold regex that requires the proposed change. Adopting diagnostic-preserving test* predicates alone does not justify these edits. Existing provisional-regex caveats remain applicable.
 
 <div class="table-scroll">
 <table class="validation-table">
@@ -493,52 +460,6 @@ expect_fraction_columns <- function(data, columns, any.missing, label) {
     ),
     &quot;urls.*(character|length)&quot;
   )</code></pre></td></tr>
-<tr><td><code>tests/testthat/test-info-helpers.R</code></td><td>90–101</td><td>Matches `single logical value` for include_file; assertFlag changes wording.</td><td><pre><code class="language-r">    testthat::expect_error(
-      get_geos_info(path = geos_path, include_file = &quot;yes&quot;),
-      regexp = &quot;single logical value&quot;
-    )
-    testthat::expect_error(
-      get_merra2_info(path = merra_path, include_file = NA),
-      regexp = &quot;single logical value&quot;
-    )
-    testthat::expect_error(
-      get_modis_info(path = modis_path, include_file = c(TRUE, FALSE)),
-      regexp = &quot;single logical value&quot;
-    )</code></pre></td><td><ul><li>Preserve calls and inputs; verify provisional regexes against the selected checkmate version.</li></ul><pre><code class="language-r">    testthat::expect_error(
-      get_geos_info(path = geos_path, include_file = &quot;yes&quot;),
-      regexp = &quot;include_file.*(logical|length|NA|missing)&quot;
-    )
-    testthat::expect_error(
-      get_merra2_info(path = merra_path, include_file = NA),
-      regexp = &quot;include_file.*(logical|length|NA|missing)&quot;
-    )
-    testthat::expect_error(
-      get_modis_info(path = modis_path, include_file = c(TRUE, FALSE)),
-      regexp = &quot;include_file.*(logical|length|NA|missing)&quot;
-    )</code></pre></td></tr>
-<tr><td><code>tests/testthat/test-info-helpers.R</code></td><td>108–119</td><td>Matches `non-empty character vector` for path; assertCharacter changes wording.</td><td><pre><code class="language-r">    testthat::expect_error(
-      get_geos_info(path = 1),
-      regexp = &quot;non-empty character vector&quot;
-    )
-    testthat::expect_error(
-      get_merra2_info(path = NA_character_),
-      regexp = &quot;non-empty character vector&quot;
-    )
-    testthat::expect_error(
-      get_modis_info(path = list(&quot;.&quot;)),
-      regexp = &quot;non-empty character vector&quot;
-    )</code></pre></td><td><ul><li>Preserve calls and inputs; verify provisional regexes against the selected checkmate version.</li></ul><pre><code class="language-r">    testthat::expect_error(
-      get_geos_info(path = 1),
-      regexp = &quot;path.*(character|length|NA|missing)&quot;
-    )
-    testthat::expect_error(
-      get_merra2_info(path = NA_character_),
-      regexp = &quot;path.*(character|length|NA|missing)&quot;
-    )
-    testthat::expect_error(
-      get_modis_info(path = list(&quot;.&quot;)),
-      regexp = &quot;path.*(character|length|NA|missing)&quot;
-    )</code></pre></td></tr>
 <tr><td><code>tests/testthat/test-nlcd.R</code></td><td>281–288; 298–305</td><td>Matches `radius is not a numeric.` and `radius has not a likely value.`; both change.</td><td><pre><code class="language-r">  testthat::expect_error(
     calculate_nlcd(
       locs = eg_data,
@@ -586,102 +507,6 @@ expect_fraction_columns <- function(data, columns, any.missing, label) {
       use_threshold = NA
     ),
     regexp = &quot;use_threshold.*(logical|NA|missing)&quot;
-  )</code></pre></td></tr>
-<tr><td><code>tests/testthat/test-goes.R</code></td><td>45–54</td><td>Matches `satellite must be`; assertChoice changes wording/capitalization and quoting.</td><td><pre><code class="language-r">  testthat::expect_error(
-    download_goes(
-      date = c(&quot;2024-01-01&quot;, &quot;2024-01-01&quot;),
-      satellite = &quot;99&quot;,
-      product = &quot;ADP-C&quot;,
-      directory_to_save = tempdir(),
-      acknowledgement = TRUE
-    ),
-    regexp = &quot;satellite must be&quot;
-  )</code></pre></td><td><ul><li>Preserve calls and inputs; verify provisional regexes against the selected checkmate version.</li></ul><pre><code class="language-r">  testthat::expect_error(
-    download_goes(
-      date = c(&quot;2024-01-01&quot;, &quot;2024-01-01&quot;),
-      satellite = &quot;99&quot;,
-      product = &quot;ADP-C&quot;,
-      directory_to_save = tempdir(),
-      acknowledgement = TRUE
-    ),
-    regexp = &quot;satellite.*(16|18)&quot;
-  )</code></pre></td></tr>
-<tr><td><code>tests/testthat/test-calc.R</code></td><td>698–712</td><td>Matches `single` and `must be one of` for fun_temporal; verify against assertString/assertChoice wording.</td><td><pre><code class="language-r">  testthat::expect_error(
-    check_fun_temporal(42),
-    regexp = &quot;single&quot;
-  )
-  testthat::expect_error(
-    check_fun_temporal(c(&quot;mean&quot;, &quot;sum&quot;)),
-    regexp = &quot;single&quot;
-  )
-})
-
-testthat::test_that(&quot;check_fun_temporal errors on unknown function name&quot;, {
-  testthat::expect_error(
-    check_fun_temporal(&quot;variance&quot;),
-    regexp = &quot;must be one of&quot;
-  )</code></pre></td><td><ul><li>Preserve calls and inputs; verify provisional regexes against the selected checkmate version.</li></ul><pre><code class="language-r">  testthat::expect_error(
-    check_fun_temporal(42),
-    regexp = &quot;fun_temporal.*(string|character|length)&quot;
-  )
-  testthat::expect_error(
-    check_fun_temporal(c(&quot;mean&quot;, &quot;sum&quot;)),
-    regexp = &quot;fun_temporal.*(string|character|length)&quot;
-  )
-})
-
-testthat::test_that(&quot;check_fun_temporal errors on unknown function name&quot;, {
-  testthat::expect_error(
-    check_fun_temporal(&quot;variance&quot;),
-    regexp = &quot;fun_temporal.*(mean|median|sum|max|min)&quot;
-  )</code></pre></td></tr>
-<tr><td><code>tests/testthat/test-gridmet.R</code></td><td>264–278</td><td>Matches `acknowledgement is set to FALSE`; the proposed hybrid guard deliberately preserves it and the before-directory-creation behavior.</td><td><pre><code class="language-r">  &quot;download_gridmet(acknowledgement=FALSE): stops before creating directories&quot;,
-  {
-    directory_to_save &lt;- file.path(withr::local_tempdir(), &quot;gridmet&quot;)
-
-    testthat::expect_error(
-      download_gridmet(
-        variables = &quot;pr&quot;,
-        year = 2018,
-        directory_to_save = directory_to_save,
-        acknowledgement = FALSE
-      ),
-      regexp = &quot;acknowledgement is set to FALSE&quot;
-    )
-    testthat::expect_false(dir.exists(directory_to_save))
-  }</code></pre></td><td><ul><li>No change: the proposed assertFlag plus retained FALSE stop preserves this diagnostic.</li><li>Keep the package call and negative directory-existence expectation; do not replace the latter with a positive directory validator.</li></ul><pre><code class="language-r">  &quot;download_gridmet(acknowledgement=FALSE): stops before creating directories&quot;,
-  {
-    directory_to_save &lt;- file.path(withr::local_tempdir(), &quot;gridmet&quot;)
-
-    testthat::expect_error(
-      download_gridmet(
-        variables = &quot;pr&quot;,
-        year = 2018,
-        directory_to_save = directory_to_save,
-        acknowledgement = FALSE
-      ),
-      regexp = &quot;acknowledgement is set to FALSE&quot;
-    )
-    testthat::expect_false(dir.exists(directory_to_save))
-  }</code></pre></td></tr>
-<tr><td><code>tests/testthat/test-drought.R</code></td><td>251–260</td><td>Matches `timescale`; expected to remain meaningful after assertInt, but still rerun.</td><td><pre><code class="language-r">  testthat::expect_error(
-    download_drought(
-      source = &quot;spei&quot;,
-      date = &quot;2020-06-01&quot;,
-      timescale = -1L,
-      directory_to_save = withr::local_tempdir(),
-      acknowledgement = TRUE
-    ),
-    regexp = &quot;timescale&quot;
-  )</code></pre></td><td><ul><li>No change required to the existing argument-name regex. assertInt runs in production after as.integer; retain this package call.</li><li>A future test may also match the lower-bound constraint once actual wording is verified.</li></ul><pre><code class="language-r">  testthat::expect_error(
-    download_drought(
-      source = &quot;spei&quot;,
-      date = &quot;2020-06-01&quot;,
-      timescale = -1L,
-      directory_to_save = withr::local_tempdir(),
-      acknowledgement = TRUE
-    ),
-    regexp = &quot;timescale&quot;
   )</code></pre></td></tr>
 <tr><td><code>tests/testthat/test-sedc.R</code></td><td>123–180</td><td>C0, target_fields, use_threshold and decay_range errors mostly have no regex; retained errors alone do not verify equivalent accepted inputs.</td><td><pre><code class="language-r">  testthat::expect_error(
     sum_edc(
@@ -802,7 +627,204 @@ testthat::test_that(&quot;check_fun_temporal errors on unknown function name&quo
       target_fields = targcols[1]
     )
   )</code></pre></td></tr>
-<tr><td><code>tests/testthat/test-ecoregion.R</code></td><td>296–311</td><td>Invalid frac/drop cases check only an error; verify valid FALSE as well as TRUE when implementing the shared flag pattern.</td><td><pre><code class="language-r">  testthat::expect_error(
+</tbody></table>
+</div>
+
+## Standalone unit and integration test replacements
+
+These suggestions require no changes to the main R files. This includes diagnostic regexes that already match current source messages, even when their original explanations discussed future Checkmate adoption. Each such row explains its independent applicability. Preserve the existing compatibility caveats: independence does not remove the need to verify the proposed test-only changes. The fraction rows require only the proposed test helper shown below, and test-only adoption requires the documented Checkmate dependency.
+
+<div class="table-scroll">
+<table class="validation-table">
+<thead><tr><th>File path</th><th>Affected dataset</th><th>Start–end lines</th><th>Current code</th><th>Suggested checkmate code</th><th>Reason for replacement</th></tr></thead>
+<tbody>
+<tr><td><code>tests/testthat/helper-skips.R</code></td><td>Shared live-test credential helper</td><td>32–32</td><td><pre><code class="language-r">  stopifnot(length(var) == 1L, is.character(var))</code></pre></td><td><pre><code class="language-r">checkmate::assert_character(var, len = 1L,
+  any.missing = TRUE, typed.missing = TRUE)</code></pre></td><td><ul><li>Low priority — Optional test-helper input assertion: report an invalid environment-variable-name argument directly. any.missing=TRUE deliberately preserves the current guard&#x27;s acceptance of NA_character_; rejecting NA/empty names would be a separate, reasonable tightening. typed.missing=TRUE retains rejection of logical NA.</li><li>Keep Sys.getenv and testthat::skip below it so absent credentials remain skips, not failures.</li><li>Error text changes; no direct skip_if_no_credentials error-message expectation was found.</li></ul></td></tr>
+<tr><td><code>tests/testthat/test-cropscape.R</code></td><td>CropScape/CDL</td><td>415–417</td><td><pre><code class="language-r">      testthat::expect_type(fractions, &quot;double&quot;)
+      testthat::expect_false(anyNA(fractions))
+      testthat::expect_true(all(fractions &gt;= 0 &amp; fractions &lt;= 1))</code></pre></td><td><pre><code class="language-r">checkmate::expect_double(fractions, lower = 0, upper = 1,
+  any.missing = FALSE, typed.missing = TRUE)</code></pre></td><td><ul><li>P1 — Combine the existing double type, missingness and [0, 1] contract into one diagnostic expectation.</li><li>Keep the column-count check at 414 and sum/tolerance at 418.</li><li>Do not use expect_numeric (which admits integers), min.len or unique.</li><li>Expectation counts and failure text change; verify classed/dimensioned outputs before adoption.</li></ul></td></tr>
+<tr><td><code>tests/testthat/test-ecoregion.R</code></td><td>Ecoregions</td><td>592–600</td><td><pre><code class="language-r">  testthat::expect_true(
+    all(vapply(ecor_frac[, frc_cols, drop = FALSE], is.numeric, logical(1)))
+  )
+  testthat::expect_true(
+    all(as.matrix(ecor_frac[, frc_cols, drop = FALSE]) &gt;= 0, na.rm = TRUE)
+  )
+  testthat::expect_true(
+    all(as.matrix(ecor_frac[, frc_cols, drop = FALSE]) &lt;= 1, na.rm = TRUE)
+  )</code></pre></td><td><pre><code class="language-r">expect_fraction_columns(ecor_frac, frc_cols,
+  any.missing = TRUE, label = &quot;ecor_frac&quot;)</code></pre></td><td><ul><li>P1 — Use the proposed helper below to identify the failing fraction column and avoid repeated matrix conversion.</li><li>Preserve integer/double acceptance, empty numeric columns and missing/all-missing values.</li><li>Keep the independent minimum column count at 591.</li><li>Custom numeric classes/coercion methods need equivalence checks; expectation count and failure text change.</li></ul></td></tr>
+<tr><td><code>tests/testthat/test-hms.R</code></td><td>HMS smoke</td><td>687–695</td><td><pre><code class="language-r">  testthat::expect_true(
+    all(vapply(hms_frac[, smoke_cols], is.numeric, logical(1)))
+  )
+  testthat::expect_true(
+    all(as.matrix(hms_frac[, smoke_cols]) &gt;= 0, na.rm = TRUE)
+  )
+  testthat::expect_true(
+    all(as.matrix(hms_frac[, smoke_cols]) &lt;= 1, na.rm = TRUE)
+  )</code></pre></td><td><pre><code class="language-r">expect_fraction_columns(hms_frac, smoke_cols,
+  any.missing = TRUE, label = &quot;hms_frac&quot;)</code></pre></td><td><ul><li>P1 — Reuse the same fraction contract and column-labelled diagnostics.</li><li>Preserve the three-column check at 686 and allow numeric NA/NaN values as the current na.rm=TRUE checks do.</li><li>If the selection regresses to one column, the helper avoids the old dropping-subset failure; that diagnostic behavior deliberately changes.</li></ul></td></tr>
+<tr><td><code>tests/testthat/test-download.R</code></td><td>Shared download helpers; MODIS tile lookup</td><td>2676–2679</td><td><pre><code class="language-r">  testthat::expect_true(is.character(tiles))
+  testthat::expect_true(length(tiles) &gt; 0)
+  testthat::expect_true(all(grepl(&quot;^h[0-9]{2}v[0-9]{2}$&quot;, tiles)))
+  testthat::expect_true(length(unique(tiles)) &gt;= 10)</code></pre></td><td><pre><code class="language-r">checkmate::expect_character(tiles, min.len = 1L,
+  any.missing = FALSE, typed.missing = TRUE,
+  pattern = &quot;^h[0-9]{2}v[0-9]{2}$&quot;)
+testthat::expect_gte(length(unique(tiles)), 10L)</code></pre></td><td><ul><li>P2 — Consolidate character type, nonempty vector and tile format while retaining the distinct-count requirement.</li><li>Duplicates remain allowed; unique=TRUE would change the contract.</li><li>Preserve regex anchors.</li><li>NA already fails the old regex test.</li><li>Expectation count and failure diagnostics change.</li></ul></td></tr>
+<tr><td><code>tests/testthat/test-download.R</code></td><td>Shared download helpers; MODIS tile lookup</td><td>681–682</td><td><pre><code class="language-r">    testthat::expect_true(is.character(result))
+    testthat::expect_true(nchar(result) &gt; 0)</code></pre></td><td><pre><code class="language-r">checkmate::expect_string(result, min.chars = 1L)</code></pre></td><td><ul><li>P2 — Express the existing scalar nonempty character hash contract directly.</li><li>The old expect_true(nchar(result) &gt; 0) already rejects missing, empty and multi-element results.</li><li>Do not add hexadecimal or fixed-length restrictions at this site.</li><li>Verify classed/dimensioned strings; diagnostics change.</li></ul></td></tr>
+<tr><td><code>tests/testthat/test-download.R</code></td><td>Shared download helpers; MODIS tile lookup</td><td>733–735</td><td><pre><code class="language-r">    testthat::expect_type(result, &quot;character&quot;)
+    testthat::expect_true(nchar(result) &gt; 0)
+    testthat::expect_true(grepl(&quot;^[a-f0-9]+$&quot;, result)) # MD5 hash format</code></pre></td><td><pre><code class="language-r">checkmate::expect_string(result, min.chars = 1L,
+  pattern = &quot;^[a-f0-9]+$&quot;)</code></pre></td><td><ul><li>P2 — Combine the existing scalar nonempty character and lowercase hexadecimal requirements.</li><li>A 32-character MD5 restriction is not currently tested and is not proposed.</li><li>Expectation counts and diagnostic text change; no material runtime gain is claimed.</li></ul></td></tr>
+<tr><td><code>tests/testthat/helper-download-tests.R</code></td><td>Shared download tests</td><td>7–7</td><td><pre><code class="language-r">  testthat::expect_true(dir.exists(directory_to_save))</code></pre></td><td><pre><code class="language-r">testthat::expect_length(directory_to_save, 1L)
+checkmate::expect_directory_exists(directory_to_save)</code></pre></td><td><ul><li>P2 — Improve missing-directory diagnostics in the shared helper.</li><li>Retain an explicit length-one expectation: directory existence validators can accept vectors, whereas the old expect_true(dir.exists(...)) requires a scalar result.</li><li>Intended inputs are character paths; the validator may reject coercible non-character inputs accepted by dir.exists.</li><li>Do not add access permissions.</li><li>Preserve file.exists(commands_path) at 8 and the separate all(url_status) requirement.</li></ul></td></tr>
+<tr><td><code>tests/testthat/test-aqs.R</code></td><td>AQS</td><td>98–99</td><td><pre><code class="language-r">    testthat::expect_true(dir.exists(&quot;zip_files&quot;))
+    testthat::expect_true(dir.exists(&quot;data_files&quot;))</code></pre></td><td><pre><code class="language-r">checkmate::expect_directory_exists(&quot;zip_files&quot;)
+checkmate::expect_directory_exists(&quot;data_files&quot;)</code></pre></td><td><ul><li>P2 — Literal scalar directory paths need no additional length check.</li><li>Directory-specific errors are more informative than a failed TRUE comparison.</li><li>Preserve negative directory checks elsewhere and do not reinterpret base file.exists checks as regular-file-only checks.</li><li>Diagnostics change; filesystem work remains.</li></ul></td></tr>
+<tr><td><code>tests/testthat/test-info-helpers.R</code></td><td>GEOS; MERRA-2; MODIS</td><td>90–101</td><td><pre><code class="language-r">    testthat::expect_error(
+      get_geos_info(path = geos_path, include_file = &quot;yes&quot;),
+      regexp = &quot;single logical value&quot;
+    )
+    testthat::expect_error(
+      get_merra2_info(path = merra_path, include_file = NA),
+      regexp = &quot;single logical value&quot;
+    )
+    testthat::expect_error(
+      get_modis_info(path = modis_path, include_file = c(TRUE, FALSE)),
+      regexp = &quot;single logical value&quot;
+    )</code></pre></td><td><ul><li>Preserve calls and inputs; verify provisional regexes against the selected checkmate version.</li></ul><pre><code class="language-r">    testthat::expect_error(
+      get_geos_info(path = geos_path, include_file = &quot;yes&quot;),
+      regexp = &quot;include_file.*(logical|length|NA|missing)&quot;
+    )
+    testthat::expect_error(
+      get_merra2_info(path = merra_path, include_file = NA),
+      regexp = &quot;include_file.*(logical|length|NA|missing)&quot;
+    )
+    testthat::expect_error(
+      get_modis_info(path = modis_path, include_file = c(TRUE, FALSE)),
+      regexp = &quot;include_file.*(logical|length|NA|missing)&quot;
+    )</code></pre></td><td>Matches `single logical value` for include_file; assertFlag changes wording.<p>Independent: the current include_file messages already contain the argument name and “logical”.</p></td></tr>
+<tr><td><code>tests/testthat/test-info-helpers.R</code></td><td>GEOS; MERRA-2; MODIS</td><td>108–119</td><td><pre><code class="language-r">    testthat::expect_error(
+      get_geos_info(path = 1),
+      regexp = &quot;non-empty character vector&quot;
+    )
+    testthat::expect_error(
+      get_merra2_info(path = NA_character_),
+      regexp = &quot;non-empty character vector&quot;
+    )
+    testthat::expect_error(
+      get_modis_info(path = list(&quot;.&quot;)),
+      regexp = &quot;non-empty character vector&quot;
+    )</code></pre></td><td><ul><li>Preserve calls and inputs; verify provisional regexes against the selected checkmate version.</li></ul><pre><code class="language-r">    testthat::expect_error(
+      get_geos_info(path = 1),
+      regexp = &quot;path.*(character|length|NA|missing)&quot;
+    )
+    testthat::expect_error(
+      get_merra2_info(path = NA_character_),
+      regexp = &quot;path.*(character|length|NA|missing)&quot;
+    )
+    testthat::expect_error(
+      get_modis_info(path = list(&quot;.&quot;)),
+      regexp = &quot;path.*(character|length|NA|missing)&quot;
+    )</code></pre></td><td>Matches `non-empty character vector` for path; assertCharacter changes wording.<p>Independent: the current path message already contains “path” and “character”.</p></td></tr>
+<tr><td><code>tests/testthat/test-goes.R</code></td><td>GOES</td><td>45–54</td><td><pre><code class="language-r">  testthat::expect_error(
+    download_goes(
+      date = c(&quot;2024-01-01&quot;, &quot;2024-01-01&quot;),
+      satellite = &quot;99&quot;,
+      product = &quot;ADP-C&quot;,
+      directory_to_save = tempdir(),
+      acknowledgement = TRUE
+    ),
+    regexp = &quot;satellite must be&quot;
+  )</code></pre></td><td><ul><li>Preserve calls and inputs; verify provisional regexes against the selected checkmate version.</li></ul><pre><code class="language-r">  testthat::expect_error(
+    download_goes(
+      date = c(&quot;2024-01-01&quot;, &quot;2024-01-01&quot;),
+      satellite = &quot;99&quot;,
+      product = &quot;ADP-C&quot;,
+      directory_to_save = tempdir(),
+      acknowledgement = TRUE
+    ),
+    regexp = &quot;satellite.*(16|18)&quot;
+  )</code></pre></td><td>Matches `satellite must be`; assertChoice changes wording/capitalization and quoting.<p>Independent: the current satellite message already lists 16 and 18.</p></td></tr>
+<tr><td><code>tests/testthat/test-calc.R</code></td><td>Shared temporal-function validation</td><td>698–712</td><td><pre><code class="language-r">  testthat::expect_error(
+    check_fun_temporal(42),
+    regexp = &quot;single&quot;
+  )
+  testthat::expect_error(
+    check_fun_temporal(c(&quot;mean&quot;, &quot;sum&quot;)),
+    regexp = &quot;single&quot;
+  )
+})
+
+testthat::test_that(&quot;check_fun_temporal errors on unknown function name&quot;, {
+  testthat::expect_error(
+    check_fun_temporal(&quot;variance&quot;),
+    regexp = &quot;must be one of&quot;
+  )</code></pre></td><td><ul><li>Preserve calls and inputs; verify provisional regexes against the selected checkmate version.</li></ul><pre><code class="language-r">  testthat::expect_error(
+    check_fun_temporal(42),
+    regexp = &quot;fun_temporal.*(string|character|length)&quot;
+  )
+  testthat::expect_error(
+    check_fun_temporal(c(&quot;mean&quot;, &quot;sum&quot;)),
+    regexp = &quot;fun_temporal.*(string|character|length)&quot;
+  )
+})
+
+testthat::test_that(&quot;check_fun_temporal errors on unknown function name&quot;, {
+  testthat::expect_error(
+    check_fun_temporal(&quot;variance&quot;),
+    regexp = &quot;fun_temporal.*(mean|median|sum|max|min)&quot;
+  )</code></pre></td><td>Matches `single` and `must be one of` for fun_temporal; verify against assertString/assertChoice wording.<p>Independent: current type errors name fun_temporal and “character string”; the choice error already lists the allowed functions.</p></td></tr>
+<tr><td><code>tests/testthat/test-gridmet.R</code></td><td>gridMET</td><td>264–278</td><td><pre><code class="language-r">  &quot;download_gridmet(acknowledgement=FALSE): stops before creating directories&quot;,
+  {
+    directory_to_save &lt;- file.path(withr::local_tempdir(), &quot;gridmet&quot;)
+
+    testthat::expect_error(
+      download_gridmet(
+        variables = &quot;pr&quot;,
+        year = 2018,
+        directory_to_save = directory_to_save,
+        acknowledgement = FALSE
+      ),
+      regexp = &quot;acknowledgement is set to FALSE&quot;
+    )
+    testthat::expect_false(dir.exists(directory_to_save))
+  }</code></pre></td><td><ul><li>No change: the proposed assertFlag plus retained FALSE stop preserves this diagnostic.</li><li>Keep the package call and negative directory-existence expectation; do not replace the latter with a positive directory validator.</li></ul><pre><code class="language-r">  &quot;download_gridmet(acknowledgement=FALSE): stops before creating directories&quot;,
+  {
+    directory_to_save &lt;- file.path(withr::local_tempdir(), &quot;gridmet&quot;)
+
+    testthat::expect_error(
+      download_gridmet(
+        variables = &quot;pr&quot;,
+        year = 2018,
+        directory_to_save = directory_to_save,
+        acknowledgement = FALSE
+      ),
+      regexp = &quot;acknowledgement is set to FALSE&quot;
+    )
+    testthat::expect_false(dir.exists(directory_to_save))
+  }</code></pre></td><td>Matches `acknowledgement is set to FALSE`; the proposed hybrid guard deliberately preserves it and the before-directory-creation behavior.<p>Independent preservation case: current and suggested code are identical; retain this test whether or not production validation changes.</p></td></tr>
+<tr><td><code>tests/testthat/test-drought.R</code></td><td>Drought — SPEI</td><td>251–260</td><td><pre><code class="language-r">  testthat::expect_error(
+    download_drought(
+      source = &quot;spei&quot;,
+      date = &quot;2020-06-01&quot;,
+      timescale = -1L,
+      directory_to_save = withr::local_tempdir(),
+      acknowledgement = TRUE
+    ),
+    regexp = &quot;timescale&quot;
+  )</code></pre></td><td><ul><li>No change required to the existing argument-name regex. assertInt runs in production after as.integer; retain this package call.</li><li>A future test may also match the lower-bound constraint once actual wording is verified.</li></ul><pre><code class="language-r">  testthat::expect_error(
+    download_drought(
+      source = &quot;spei&quot;,
+      date = &quot;2020-06-01&quot;,
+      timescale = -1L,
+      directory_to_save = withr::local_tempdir(),
+      acknowledgement = TRUE
+    ),
+    regexp = &quot;timescale&quot;
+  )</code></pre></td><td>Matches `timescale`; expected to remain meaningful after assertInt, but still rerun.<p>Independent preservation case: current and suggested code are identical; the existing timescale diagnostic already matches.</p></td></tr>
+<tr><td><code>tests/testthat/test-ecoregion.R</code></td><td>Ecoregions</td><td>296–311</td><td><pre><code class="language-r">  testthat::expect_error(
     calculate_ecoregion(
       from = erras,
       locs = site_faux,
@@ -834,8 +856,8 @@ testthat::test_that(&quot;check_fun_temporal errors on unknown function name&quo
       drop = NA
     ),
     regexp = &quot;drop.*(logical|NA|missing)&quot;
-  )</code></pre></td></tr>
-<tr><td><code>tests/testthat/test-nlcd.R</code></td><td>202–209</td><td>NLCD path type/existence messages change with assertString and assertDirectoryExists.</td><td><pre><code class="language-r">  testthat::expect_error(
+  )</code></pre></td><td>Invalid frac/drop cases check only an error; verify valid FALSE as well as TRUE when implementing the shared flag pattern.<p>Independent: current frac/drop diagnostics already contain each argument name and “logical”.</p></td></tr>
+<tr><td><code>tests/testthat/test-nlcd.R</code></td><td>NLCD</td><td>202–209</td><td><pre><code class="language-r">  testthat::expect_error(
     process_nlcd(path = 1L),
     &quot;path is not a character&quot;
   )
@@ -849,8 +871,8 @@ testthat::test_that(&quot;check_fun_temporal errors on unknown function name&quo
   testthat::expect_error(
     process_nlcd(path = &quot;/universe/galaxy/solarsys/earth/usa.nc&quot;),
     &quot;path.*(exist|directory)&quot;
-  )</code></pre></td></tr>
-<tr><td><code>tests/testthat/test-nlcd.R</code></td><td>360–371</td><td>NLCD path type/existence messages change with assertString and assertDirectoryExists.</td><td><pre><code class="language-r">  testthat::expect_error(
+  )</code></pre></td><td>NLCD path type/existence messages change with assertString and assertDirectoryExists.<p>Independent: current path diagnostics already match both proposed regexes.</p></td></tr>
+<tr><td><code>tests/testthat/test-nlcd.R</code></td><td>NLCD</td><td>360–371</td><td><pre><code class="language-r">  testthat::expect_error(
     process_nlcd(path = 3, year = 2),
     &quot;path is not a character.&quot;
   )
@@ -872,8 +894,8 @@ testthat::test_that(&quot;check_fun_temporal errors on unknown function name&quo
       path = nice_sentence
     ),
     &quot;path.*(exist|directory)&quot;
-  )</code></pre></td></tr>
-<tr><td><code>tests/testthat/test-goes.R</code></td><td>978–985</td><td>GOES missing-path wording changes if assertFileExists replaces the contextual error.</td><td><pre><code class="language-r">    testthat::expect_error(
+  )</code></pre></td><td>NLCD path type/existence messages change with assertString and assertDirectoryExists.<p>Independent: current path diagnostics already match both proposed regexes.</p></td></tr>
+<tr><td><code>tests/testthat/test-goes.R</code></td><td>GOES</td><td>978–985</td><td><pre><code class="language-r">    testthat::expect_error(
       process_goes(
         date = &quot;2018-01-01&quot;,
         variable = &quot;Smoke&quot;,
@@ -887,9 +909,80 @@ testthat::test_that(&quot;check_fun_temporal errors on unknown function name&quo
         path = c(existing_path, missing_path)
       ),
       regexp = &quot;paths.*exist&quot;
-    )</code></pre></td></tr>
+    )</code></pre></td><td>GOES missing-path wording changes if assertFileExists replaces the contextual error.<p>Independent: the current “Some GOES paths do not exist” message already matches paths.*exist.</p></td></tr>
+<tr><td><code>tests/testthat/test-by-summarize.R</code></td><td>Shared temporal summarization (synthetic data)</td><td>37–37</td><td><pre><code class="language-r">  testthat::expect_true(all(c(&quot;site_id&quot;, &quot;time&quot;, &quot;level&quot;, &quot;value&quot;) %in% names(out_day)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;site_id&quot;, &quot;time&quot;, &quot;level&quot;, &quot;value&quot;),<br>  choices = names(out_day)<br>)</code></pre></td><td>Checks the four required grouping/value columns. Retain the row-count and NULL-summary identity expectations.</td></tr>
+<tr><td><code>tests/testthat/test-coverage-followup.R</code></td><td>MODIS fire points</td><td>401–401</td><td><pre><code class="language-r">  testthat::expect_true(all(c(&quot;fire_count_00000&quot;, &quot;frp_00000&quot;) %in% names(vector_result)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;fire_count_00000&quot;, &quot;frp_00000&quot;),<br>  choices = names(vector_result)<br>)</code></pre></td><td>Checks both fire output fields. Retain data.frame, fire-count, formatted-date and dates_dropped assertions.</td></tr>
+<tr><td><code>tests/testthat/test-drought.R</code></td><td>Drought — USDM</td><td>114–114</td><td><pre><code class="language-r">  testthat::expect_true(all(c(&quot;DM&quot;, &quot;date&quot;, &quot;source&quot;) %in% names(usdm)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;DM&quot;, &quot;date&quot;, &quot;source&quot;),<br>  choices = names(usdm)<br>)</code></pre></td><td>Checks the processed weekly schema. Retain SpatVector, two-row, source-value and EPSG:4326 assertions.</td></tr>
+<tr><td><code>tests/testthat/test-drought.R</code></td><td>Drought — USDM</td><td>2033–2033</td><td><pre><code class="language-r">    testthat::expect_true(all(c(&quot;DM&quot;, &quot;date&quot;, &quot;source&quot;) %in% names(processed)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;DM&quot;, &quot;date&quot;, &quot;source&quot;),<br>  choices = names(processed)<br>)</code></pre></td><td>Checks the processed multi-date schema. Retain spatial class, row count and exact dates.</td></tr>
+<tr><td><code>tests/testthat/test-ecoregion.R</code></td><td>Ecoregions</td><td>429–431</td><td><pre><code class="language-r">  testthat::expect_true(<br>    all(c(&quot;NA_L2NAME&quot;, &quot;US_L3NAME&quot;, &quot;NA_L3NAME&quot;) %in% names(erras))<br>  )</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;NA_L2NAME&quot;, &quot;US_L3NAME&quot;, &quot;NA_L3NAME&quot;),<br>  choices = names(erras)<br>)</code></pre></td><td>Checks all three regional-name fields before exercising the missing-US_L3NAME fallback; preserve that subsequent scenario.</td></tr>
+<tr><td><code>tests/testthat/test-geos.R</code></td><td>GEOS-CF</td><td>32–32; 64–64</td><td><pre><code class="language-r">    testthat::expect_true(all(c(&quot;success&quot;, &quot;failed&quot;, &quot;skipped&quot;) %in% names(result)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;success&quot;, &quot;failed&quot;, &quot;skipped&quot;),<br>  choices = names(result)<br>)</code></pre></td><td>Checks the download summary fields for a date range. Retain list type, positive processed total, credential skips and the download call.<br>Checks the download summary fields for a single date. Retain list type, positive processed total and the separate single-date scenario.</td></tr>
+<tr><td><code>tests/testthat/test-hms.R</code></td><td>HMS smoke</td><td>300–302; 345–347</td><td><pre><code class="language-r">  testthat::expect_true(<br>    all(c(&quot;Density&quot;, &quot;Date&quot;) %in% names(hms))<br>  )</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;Density&quot;, &quot;Date&quot;),<br>  choices = names(hms)<br>)</code></pre></td><td>Checks Density and Date for a date range. Retain the two-column, spatial-class, CRS and cropping assertions.<br>Checks Density and Date for a single date. Retain the two-column, spatial-class, CRS and cropping assertions.</td></tr>
+<tr><td><code>tests/testthat/test-hms.R</code></td><td>HMS smoke</td><td>1169–1171</td><td><pre><code class="language-r">    testthat::expect_true(<br>      all(c(&quot;Start&quot;, &quot;End&quot;, &quot;Density&quot;) %in% names(hms_raw))<br>    )</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;Start&quot;, &quot;End&quot;, &quot;Density&quot;),<br>  choices = names(hms_raw)<br>)</code></pre></td><td>Checks raw polygon metadata fields. Retain geometry validity, CRS, row count and the separate Density-value membership check.</td></tr>
+<tr><td><code>tests/testthat/test-improve.R</code></td><td>IMPROVE</td><td>16–16</td><td><pre><code class="language-r">  testthat::expect_true(all(c(&quot;SiteCode&quot;, &quot;Latitude&quot;, &quot;Longitude&quot;, &quot;ProgramKey&quot;) %in% names(sites)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;SiteCode&quot;, &quot;Latitude&quot;, &quot;Longitude&quot;, &quot;ProgramKey&quot;),<br>  choices = names(sites)<br>)</code></pre></td><td>Checks built-in site metadata fields. Retain data.table class, site count, unique SiteCode and known-site/program assertions.</td></tr>
+<tr><td><code>tests/testthat/test-info-helpers.R</code></td><td>GEOS-CF</td><td>11–11</td><td><pre><code class="language-r">    testthat::expect_true(all(c(&quot;collection&quot;, &quot;variable&quot;) %in% names(geos_info)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;collection&quot;, &quot;variable&quot;),<br>  choices = names(geos_info)<br>)</code></pre></td><td>Checks metadata column presence. Retain data.frame class and specific collection/variable-value assertions.</td></tr>
+<tr><td><code>tests/testthat/test-info-helpers.R</code></td><td>GEOS-CF</td><td>17–17</td><td><pre><code class="language-r">    testthat::expect_true(all(c(&quot;collection&quot;, &quot;variable&quot;, &quot;file&quot;) %in% names(geos_info_file)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;collection&quot;, &quot;variable&quot;, &quot;file&quot;),<br>  choices = names(geos_info_file)<br>)</code></pre></td><td>Checks the include_file=TRUE schema. Retain the separate filename-pattern assertion.</td></tr>
+<tr><td><code>tests/testthat/test-info-helpers.R</code></td><td>MERRA-2</td><td>29–29</td><td><pre><code class="language-r">    testthat::expect_true(all(c(&quot;collection&quot;, &quot;variable&quot;) %in% names(merra_info)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;collection&quot;, &quot;variable&quot;),<br>  choices = names(merra_info)<br>)</code></pre></td><td>Checks metadata column presence. Retain data.frame class and specific collection/variable-value assertions.</td></tr>
+<tr><td><code>tests/testthat/test-info-helpers.R</code></td><td>MERRA-2</td><td>37–37</td><td><pre><code class="language-r">    testthat::expect_true(all(c(&quot;collection&quot;, &quot;variable&quot;, &quot;file&quot;) %in% names(merra_info_file)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;collection&quot;, &quot;variable&quot;, &quot;file&quot;),<br>  choices = names(merra_info_file)<br>)</code></pre></td><td>Checks the include_file=TRUE schema. Retain the separate MERRA-2/FWI filename-pattern assertion.</td></tr>
+<tr><td><code>tests/testthat/test-info-helpers.R</code></td><td>MODIS</td><td>49–49</td><td><pre><code class="language-r">    testthat::expect_true(all(c(&quot;product&quot;, &quot;subdataset&quot;) %in% names(modis_info)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;product&quot;, &quot;subdataset&quot;),<br>  choices = names(modis_info)<br>)</code></pre></td><td>Checks product/subdataset metadata columns. Retain class and named-product/subdataset-value assertions.</td></tr>
+<tr><td><code>tests/testthat/test-info-helpers.R</code></td><td>MODIS</td><td>58–58</td><td><pre><code class="language-r">    testthat::expect_true(all(c(&quot;product&quot;, &quot;subdataset&quot;, &quot;file&quot;) %in% names(modis_info_file)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;product&quot;, &quot;subdataset&quot;, &quot;file&quot;),<br>  choices = names(modis_info_file)<br>)</code></pre></td><td>Checks the include_file=TRUE schema. Retain the separate HDF/H5 extension assertion.</td></tr>
+<tr><td><code>tests/testthat/test-prism.R</code></td><td>PRISM</td><td>363–363</td><td><pre><code class="language-r">  testthat::expect_true(all(c(&quot;ppt_1000&quot;, &quot;tmin_1000&quot;) %in% colnames(res)))</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;ppt_1000&quot;, &quot;tmin_1000&quot;),<br>  choices = colnames(res)<br>)</code></pre></td><td>Checks both radius-suffixed covariates. Keep colnames(res), the 1000-metre calculation and its warning handling unchanged.</td></tr>
+<tr><td><code>tests/testthat/test-tri.R</code></td><td>TRI</td><td>280–282</td><td><pre><code class="language-r">  testthat::expect_true(<br>    all(c(&quot;TRI_CHEMICAL_COMPOUND_ID&quot;, &quot;CHEMICAL&quot;, &quot;CASN&quot;) %in% names(chems))<br>  )</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;TRI_CHEMICAL_COMPOUND_ID&quot;, &quot;CHEMICAL&quot;, &quot;CASN&quot;),<br>  choices = names(chems)<br>)</code></pre></td><td>Checks chemical metadata fields. Retain data.frame class and exact BENZENE/CASN/filter assertions.</td></tr>
+<tr><td><code>tests/testthat/test-tri.R</code></td><td>TRI</td><td>291–293</td><td><pre><code class="language-r">  testthat::expect_true(<br>    all(c(&quot;INDUSTRY_SECTOR_CODE&quot;, &quot;INDUSTRY_SECTOR&quot;) %in% names(inds))<br>  )</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;INDUSTRY_SECTOR_CODE&quot;, &quot;INDUSTRY_SECTOR&quot;),<br>  choices = names(inds)<br>)</code></pre></td><td>Checks industry metadata fields. Retain data.frame class and expected sector-code/name assertions.</td></tr>
+<tr><td><code>tests/testthat/test-tri.R</code></td><td>TRI</td><td>590–592</td><td><pre><code class="language-r">  testthat::expect_true(<br>    all(c(&quot;STACK_AIR_100&quot;, &quot;STACK_AIR_200&quot;) %in% names(tri_multi_chem))<br>  )</code></pre></td><td><pre><code class="language-r">checkmate::expect_subset(<br>  c(&quot;STACK_AIR_100&quot;, &quot;STACK_AIR_200&quot;),<br>  choices = names(tri_multi_chem)<br>)</code></pre></td><td>Checks both requested chemical output columns. Retain the BENZENE/TOLUENE filtering inputs and STACK_AIR variable.</td></tr>
 </tbody></table>
 </div>
+
+- This document proposes changes only; no test helper or test implementation has been created.
+
+
+### Proposed shared fraction helper
+
+- The two fraction-column rows above depend on this proposed test-only helper, suitable for a future `tests/testthat/helper-validation.R`.
+- It is shown here only; the file has not been created.
+
+```r
+expect_fraction_columns <- function(data, columns, any.missing, label) {
+  invisible(lapply(columns, function(column) {
+    checkmate::expect_numeric(
+      data[[column]],
+      lower = 0,
+      upper = 1,
+      any.missing = any.missing,
+      all.missing = TRUE,
+      typed.missing = TRUE,
+      label = paste0(label, "[[", dQuote(column), "]]")
+    )
+  }))
+}
+```
+
+- Keep column selection/count and fraction-sum expectations at the call sites.
+- An empty selection makes no expectations in this helper, so those count checks are essential.
+- Do not add a helper-level nonempty assertion or force missingness to FALSE.
+- Ordinary integer/double fraction columns retain their existing bounds contract; test reporter output and custom numeric classes still need verification.
+- Direct `expect_numeric()` preserves the diagnostic reason that `expect_true(testNumeric(...))` would discard.
+
+- The documented [double expectations](https://mllg.github.io/checkmate/reference/checkDouble.html), [numeric expectations](https://mllg.github.io/checkmate/reference/checkNumeric.html), [character expectations](https://mllg.github.io/checkmate/reference/checkCharacter.html), [string expectations](https://mllg.github.io/checkmate/reference/checkString.html), and [directory expectations](https://mllg.github.io/checkmate/reference/checkDirectoryExists.html) support these proposals.
+- Fewer temporary vectors or matrix conversions may help, but no performance improvement has been measured.
+
+### Suggestions intentionally not carried over
+
+- The README's native class/count cleanup and shared live-download postcondition are useful independent maintenance ideas, but neither requires checkmate; they are outside this replacement table.
+- Preserve native `expect_length()`, `expect_gt()`, S3/S4 checks and the distinction between at least one nonempty downloaded file and all files being nonempty.
+- Do not add MD5 length restrictions, read/write permissions, strict nonmissing tokens, regular-file requirements or numeric checks where the old tests establish only bounds.
+- Keep mock failures, skips, error expectations, exact results and binary set-membership tests.
+
+- For a test-only adoption, declare checkmate in Suggests; if the major_R runtime recommendations are also implemented, Imports already supplies it and a duplicate Suggests entry is unnecessary.
+- Select a minimum version supporting the proposed expectation arguments and verify compatibility with the project's testthat setup.
+- Do not silently skip these core assertions when checkmate is absent.
+
+## Diagnostic compatibility and implementation notes
+
+- Preserve package calls, invalid inputs and enclosing test structure.
+- Verify proposed error regexes against the selected checkmate version.
+- Match argument names and constraints; avoid generic or unqualified error checks.
+- Disjoint source excerpts follow the listed line-range order.
+
 
 - Examples deliberately excluded from replacement are the simulated HTTP 404 in `test-drought.R:613`, missing-argument trap in `test-drought.R:1464`, network failures in `test-download.R`, and live-test rethrows.
 - Skips and mock dispatch branches should retain their current meaning; checkmate would not improve them.
@@ -905,3 +998,12 @@ testthat::test_that(&quot;check_fun_temporal errors on unknown function name&quo
 - The optimization README and test-impact excerpts were reconciled; only this review document was edited.
 - Rscript was unavailable because `libRblas.so` was missing; checks were static, with no R execution or HTML rendering.
 - Before implementation, pin checkmate and run affected mocked tests, including classed-value and diagnostic compatibility checks.
+
+
+## Additional behavior-preserving test recommendations (2026-10-13)
+
+The compound required-name entries in the standalone table preserve the additional recommendations from this review. Each replacement remains one testthat expectation with the same pass/fail condition for the inspected column-name checks; failure wording becomes checkmate-specific. Required names are literal character vectors and `names()`/`colnames()` supply character names or NULL, so no mixed-type coercion is lost. Extra names, duplicate names and reordered names remain allowed; absent required names still fail. Do not reverse the subset arguments or replace these checks with exact-set equality.
+
+The maintainer's [subset reference](https://mllg.github.io/checkmate/reference/checkSubset.html) documents `expect_subset()`, its testthat integration and type-matching rule. Also reviewed the maintainer references for [numeric vectors](https://mllg.github.io/checkmate/reference/checkNumeric.html), [character vectors](https://mllg.github.io/checkmate/reference/checkCharacter.html), [numbers](https://mllg.github.io/checkmate/reference/checkNumber.html), [strings](https://mllg.github.io/checkmate/reference/checkString.html), [flags](https://mllg.github.io/checkmate/reference/checkFlag.html), [choices](https://mllg.github.io/checkmate/reference/checkChoice.html), [vectors](https://mllg.github.io/checkmate/reference/checkVector.html), [integer scalars](https://mllg.github.io/checkmate/reference/checkInt.html) and [directories](https://mllg.github.io/checkmate/reference/checkDirectoryExists.html). No additional recommendations are made for those families where replacements would add constraints, weaken behavioral checks or duplicate earlier rows. Existing helpers were inspected; the credential guard and directory helper are already documented, and mock/skip behavior remains outside these proposals.
+
+Paths, inclusive line ranges and current snippets for those entries were checked against repository files. Verification is static: Rscript cannot start because `libRblas.so` is missing. No runtime equivalence or test-suite execution is claimed. The earlier test-only dependency guidance still applies; no implementation or dependency files were changed.
