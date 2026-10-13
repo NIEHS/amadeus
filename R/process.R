@@ -598,10 +598,7 @@ process_modis_daily <- function(
   return_type <- match.arg(return_type)
   amadeus::is_date_proper(instr = date)
 
-  if (length(date) == 1L) {
-    date <- rep(date, 2L)
-  }
-
+  date <- if (length(date) == 1) rep(date, 2) else date
   date_seq <- format(
     seq(as.Date(date[1]), as.Date(date[2]), by = "day"),
     "%Y-%m-%d"
@@ -694,9 +691,8 @@ process_mcd14ml <- function(
   }
 
   if (!is.null(date)) {
-    if (length(date) == 1L) {
-      date <- c(date, date)
-    }
+    date <- if (length(date) == 1) rep(date, 2) else date
+
     amadeus::is_date_proper(instr = date)
     txt_data$acq_date <- as.Date(txt_data$acq_date)
     txt_data <- txt_data[
@@ -2407,9 +2403,7 @@ process_hms <- function(
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### identify file paths
@@ -2468,13 +2462,24 @@ process_hms <- function(
       ))
       next
     } else {
-      date <- as.Date(
-        substr(data_density$Start[1], 1, 7),
-        format = "%Y%j"
+      date <- unique(
+        as.Date(
+          substr(data_density$Start, 1, 7),
+          format = "%Y%j"
+        )
       )
+      ##### patch to correct multiple dates in satellite Start/End data
+      # If two dates, overwrite based on date derived from the generated
+      # date sequence
+      date <- if (length(date) == 1) {
+        date
+      } else {
+        idx_date <- match(dates_of_interest[d], gsub("-", "", date))
+        date[idx_date]
+      }
       message(paste0(
         "Cleaning smoke data for date ",
-        date[1],
+        date,
         "..."
       ))
       #### zero buffer to avoid self intersection
@@ -2744,9 +2749,7 @@ process_narr <- function(
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### identify file paths
@@ -3095,9 +3098,7 @@ process_geos <-
     }
     variable <- trimws(variable)
     #### check dates
-    if (length(date) == 1) {
-      date <- c(date, date)
-    }
+    date <- if (length(date) == 1) rep(date, 2) else date
     stopifnot(length(date) == 2)
     date <- date[order(as.Date(date))]
     #### identify file paths
@@ -3393,9 +3394,7 @@ process_merra2 <-
     #### check for variable
     amadeus::check_for_null_parameters(mget(ls()))
     #### check dates
-    if (length(date) == 1) {
-      date <- c(date, date)
-    }
+    date <- if (length(date) == 1) rep(date, 2) else date
     stopifnot(length(date) == 2)
     date <- date[order(as.Date(date))]
     #### identify file paths
@@ -3679,9 +3678,7 @@ process_gridmet <- function(
   #### directory setup
   path <- amadeus::download_sanitize_path(path)
   #### check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### check for variable
@@ -3767,7 +3764,7 @@ process_gridmet <- function(
 
     if (
       length(existing_time) == terra::nlyr(data_year) &&
-      !anyNA(existing_time)
+        !anyNA(existing_time)
     ) {
       terra::time(data_year) <- existing_time
     } else {
@@ -3884,9 +3881,7 @@ process_terraclimate <- function(
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   variable_checked <- amadeus::process_variable_codes(
@@ -4380,9 +4375,7 @@ process_goes <- function(
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### identify file paths matching GOES ADP naming convention
@@ -4734,9 +4727,7 @@ process_improve <- function(
 
   #### Filter by date if provided
   if (!is.null(date)) {
-    if (length(date) == 1) {
-      date <- c(date, date)
-    }
+    date <- if (length(date) == 1) rep(date, 2) else date
     stopifnot(length(date) == 2)
     d_start <- as.Date(date[1])
     d_end <- as.Date(date[2])
@@ -4957,9 +4948,7 @@ process_drought <- function(
   path <- amadeus::download_sanitize_path(path)
 
   #### Validate dates
-  if (length(date) == 1L) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2L)
   date <- date[order(as.Date(date))]
 
