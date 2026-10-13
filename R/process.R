@@ -2462,19 +2462,19 @@ process_hms <- function(
       ))
       next
     } else {
-      date <- as.Date(
-        substr(data_density$Start[1], 1, 7),
-        format = "%Y%j"
+      date <- unique(
+        as.Date(
+          substr(data_density$Start, 1, 7),
+          format = "%Y%j"
+        )
       )
-      ##### hard patch to correct May 24, 2022 data being assigned May 25 date
-      date <- if (dates_of_interest[d] == "20220524") {
-        as.Date("2022144", format = "%Y%j")
-      } else {
-        date
-      }
+      ##### patch to correct multiple dates in satellite Start/End data
+      # If two dates, assumption is that the second date comes from Start/End
+      # indicating midnight on subsquent day
+      date <- if (length(date) == 1) date else min(date)
       message(paste0(
         "Cleaning smoke data for date ",
-        date[1],
+        date,
         "..."
       ))
       #### zero buffer to avoid self intersection
