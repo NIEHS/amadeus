@@ -42,7 +42,10 @@ improve_date_window <- c("2022-01-01", "2022-03-31")
 
 ```
 
-This article demonstrates compact PM monitoring workflows for AQS and IMPROVE. Because these measurements are typically used as outcome data, the example uses `download_aqs()` / `process_aqs()` and `download_improve()` / `process_improve()` directly rather than routing through `calculate_covariates()`.
+This article demonstrates compact PM monitoring workflows for AQS and IMPROVE.
+The examples use downloaded observations as outcome data. IMPROVE observations
+can also be matched to study locations using `calculate_improve()` or
+`calculate_covariates("improve", ...)`, as shown below.
 
 This vignette runs its live workflow when rendered locally. The download, processing, and plotting chunks are skipped automatically on CI, CRAN checks, and pkgdown builds; set `AMADEUS_RUN_VIGNETTES=true` to force live execution in those environments.
 
@@ -241,6 +244,35 @@ improve_locations <- unique(
   ][, c("SiteCode", "ParamCode", "Status")]
 )
 ```
+
+## Calculate IMPROVE observations at study locations
+
+To extract IMPROVE measurements for study locations, pass the processed
+observations through the calculation wrapper. All three products (`raw`,
+`rhr2`, and `rhr3`) use this same workflow.
+
+```{r calculate-improve, eval = FALSE}
+observations <- process_covariates(
+  "improve", path = improve_dir, product = "raw", return_format = "sf"
+)
+study_sites <- data.frame(site_id = "001", lon = -68.26, lat = 44.38)
+site_observations <- calculate_covariates(
+  "improve", from = observations, locs = study_sites, radius = 1000
+)
+monthly_observations <- calculate_covariates(
+  "improve", from = observations, locs = study_sites,
+  radius = 1000, .by_time = "month", geom = "sf"
+)
+```
+
+The radius is in meters; zero uses exact spatial intersection. Polygons select
+monitors they intersect. Each observation remains a separate row with its
+source parameter, units, date, value, and flags. Unmatched locations have missing
+measurement fields. Apply any desired status or parameter filtering before
+calculation. Temporal means summarize `FactValue` separately for each location,
+monitor, parameter, unit, POC, method, and status; they omit other metadata and
+do not fill sampling gaps. No interpolation or nearest-monitor assignment is
+performed. Geometry output represents the location or its buffer.
 
 ## Plot IMPROVE monitor locations
 

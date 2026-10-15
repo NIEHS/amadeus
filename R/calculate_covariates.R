@@ -40,6 +40,7 @@
 #' * \code{\link{calculate_nlcd}}: "nlcd", "NLCD"
 #' * \code{\link{calculate_tri}}: "tri", "TRI"
 #' * \code{\link{calculate_nei}}: "nei", "NEI"
+#' * \code{\link{calculate_improve}}: "improve", "IMPROVE"
 #' * \code{\link{calculate_merra2}}: "merra", "MERRA", "merra2", "MERRA2"
 #' * \code{\link{calculate_gridmet}}: "gridMET", "gridmet"
 #' * \code{\link{calculate_terraclimate}}: "terraclimate", "TerraClimate"
@@ -95,6 +96,7 @@ calculate_covariates <-
       "terraclimate",
       "tri",
       "nei",
+      "improve",
       "mcd14ml",
       "prism",
       "cropscape",
@@ -141,6 +143,7 @@ calculate_covariates <-
       sedac_population = amadeus::calculate_population,
       population = amadeus::calculate_population,
       nei = amadeus::calculate_nei,
+      improve = amadeus::calculate_improve,
       mcd14ml = amadeus::calculate_modis,
       tri = amadeus::calculate_tri,
       geos = amadeus::calculate_geos,
@@ -2578,6 +2581,168 @@ calculate_nei <- function(
     locs_re <- as.data.frame(locs_re)
     return(locs_re)
   }
+}
+
+#' Calculate IMPROVE monitoring covariates
+#' @description Join processed IMPROVE observations to intersecting locations.
+#' Supports the raw, rhr2, and rhr3 products from [process_improve()].
+#' @param from SpatVector, sf, or data.frame. Output of [process_improve()].
+#'   Tables must contain numeric `Longitude` and `Latitude` in EPSG:4326.
+#' @param locs sf/SpatVector or data.frame. Unique point or polygon locations.
+#'   Tables must contain `lon` and `lat` in EPSG:4326.
+#' @param locs_id character(1). Unique location identifier column.
+#'   Default is `"site_id"`; must not duplicate a measurement column name.
+#' @param radius numeric(1). Nonnegative buffer radius in meters. Default
+#'   `0` matches intersecting points or polygons without buffering.
+#' @param .by_time NULL or character(1). Optional temporal unit, such as
+#'   `"month"`. Default `NULL` retains individual observations.
+#' @param weights NULL. Weighted extraction is not supported.
+#' @param geom FALSE/"sf"/"terra". Output geometry format; default `FALSE`.
+#'   Geometry represents the extraction location (including its buffer),
+#'   in the CRS of `from`.
+#' @param ... Placeholders. Legacy `.by` is not supported.
+#' @details
+#' Each intersecting observation is returned separately, including multiple
+#' monitors within a polygon or buffer. Locations without matches receive
+#' one row with missing measurement fields. No nearest-monitor assignment,
+#' interpolation, unit conversion, status filtering, or sentinel replacement
+#' is performed. Filter source observations before calling when needed.
+#'
+#' Temporal summaries are arithmetic means of `FactValue`, excluding `NA`,
+#' grouped by location, monitor (`SiteCode`), parameter (`ParamCode`), units,
+#' and, when present, `POC`, `MethodID`, and `Status`. Other source metadata
+#' are omitted from summaries. All-missing groups return `NA`. Sampling gaps
+#' are not filled or duration-weighted. `FactDate` is the observation date,
+#' or the start of the requested temporal interval.
+#' @return A data.frame, sf, or SpatVector containing `locs_id` and IMPROVE
+#'   measurement columns. Without summarization, all source attributes are
+#'   retained. Values and units retain their processed meaning.
+#' @author Getachew Tedla
+#' @seealso [download_improve()], [process_improve()], [calculate_covariates()]
+#' @examples
+#' \dontrun{
+#' download_data("improve", year = 2022, product = "raw",
+#'   directory_to_save = "improve", acknowledgement = TRUE)
+#' observations <- process_covariates("improve", path = "improve")
+#' sites <- data.frame(site_id = "001", lon = -68.26, lat = 44.38)
+#' calculate_covariates("improve", from = observations, locs = sites,
+#'   radius = 1000, .by_time = "month")
+#' }
+#' @export
+calculate_improve <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  .by_time = NULL,
+  weights = NULL,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+  amadeus::check_geom(geom)
+  if (!is.null(weights)) {
+    stop("`weights` is not supported for IMPROVE observations.")
+  }
+  if (!is.numeric(radius) || length(radius) != 1L ||
+      is.na(radius) || !is.finite(radius) || radius < 0) {
+    stop("`radius` must be one finite nonnegative number in meters.")
+  }
+  if (!is.character(locs_id) || length(locs_id) != 1L ||
+      is.na(locs_id) || !locs_id %in% names(locs)) {
+    stop("`locs_id` must name a column in `locs`.")
+  }
+  ids <- as.data.frame(locs)[[locs_id]]
+  if (anyNA(ids) || anyDuplicated(ids)) {
+    stop("`locs_id` values must be unique and nonmissing.")
+  }
+
+  if (inherits(from, "sf")) {
+    from <- terra::vect(from)
+  } else if (is.data.frame(from)) {
+    coords <- c("Longitude", "Latitude")
+    if (!all(coords %in% names(from))) {
+      stop("`from` requires Longitude and Latitude; use process_improve().")
+    }
+    from <- as.data.frame(from)
+    if (!all(vapply(from[coords], is.numeric, logical(1))) ||
+        any(!is.finite(as.matrix(from[coords])))) {
+      stop("`from` coordinates must be numeric, finite, and nonmissing.")
+    }
+    from <- terra::vect(
+      from, geom = coords, crs = "EPSG:4326", keepgeom = TRUE
+    )
+  }
+  if (!methods::is(from, "SpatVector") ||
+      terra::geomtype(from) != "points") {
+    stop("`from` must contain processed IMPROVE point observations.")
+  }
+  if (!nzchar(terra::crs(from))) {
+    stop("`from` must have a defined CRS.")
+  }
+  measurements <- as.data.frame(from)
+  required <- c("SiteCode", "FactDate", "ParamCode", "Units", "FactValue")
+  if (!all(required %in% names(measurements))) {
+    stop("`from` must contain SiteCode, FactDate, ParamCode, Units, FactValue.")
+  }
+  if (locs_id %in% c(names(measurements), "geometry")) {
+    stop("`locs_id` must not duplicate an IMPROVE column or 'geometry'.")
+  }
+  if (!is.numeric(measurements$FactValue)) {
+    stop("`FactValue` must be numeric.")
+  }
+  dates <- tryCatch(as.Date(measurements$FactDate), error = function(e) NULL)
+  if (is.null(dates) || anyNA(dates)) {
+    stop("`FactDate` must contain valid, nonmissing dates.")
+  }
+  measurements$FactDate <- dates
+
+  prepared <- amadeus::calc_prepare_locs(
+    from, locs, locs_id, radius, geom
+  )
+  sites <- prepared[[1L]]
+  # Sparse matches retain every observation without a dense distance matrix.
+  matches <- sf::st_intersects(sf::st_as_sf(sites), sf::st_as_sf(from))
+  location_rows <- rep(seq_along(matches), pmax(lengths(matches), 1L))
+  observation_rows <- unlist(lapply(matches, function(x) {
+    if (length(x)) x else NA_integer_
+  }), use.names = FALSE)
+  result <- cbind(
+    prepared[[2L]][location_rows, , drop = FALSE],
+    measurements[observation_rows, , drop = FALSE]
+  )
+  rownames(result) <- NULL
+
+  if (!is.null(.by_time)) {
+    groups <- intersect(
+      c("SiteCode", "ParamCode", "Units", "POC", "MethodID", "Status"),
+      names(result)
+    )
+    columns <- c(locs_id, "FactDate", groups, "FactValue")
+    if (geom %in% c("sf", "terra")) columns <- c(columns, "geometry")
+    result <- result[, columns, drop = FALSE]
+    unmatched <- result[is.na(result$FactDate), , drop = FALSE]
+    matched <- result[!is.na(result$FactDate), , drop = FALSE]
+    result <- if (nrow(matched)) {
+      amadeus::calc_summarize_by(
+        covar = matched,
+        fun_summary = function(x, ...) {
+          if (all(is.na(x))) NA_real_ else mean(x, ...)
+        },
+        locs_id = locs_id,
+        time_col = "FactDate",
+        .by_time = .by_time,
+        group_cols_extra = groups
+      )
+    } else {
+      matched
+    }
+    result <- rbind(result, unmatched)
+  }
+  amadeus::calc_return_locs(
+    result, POSIXt = FALSE, geom = geom, crs = terra::crs(from)
+  )
 }
 
 #' Calculate wildfire smoke covariates

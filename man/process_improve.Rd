@@ -78,5 +78,5 @@ improve <- process_improve(
 )
 }
 \seealso{
-\code{\link{download_improve}}
+\code{\link{download_improve}}, \code{\link{calculate_improve}}
 }
