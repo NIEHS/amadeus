@@ -1,8 +1,8 @@
 # amadeus Agent Definitions
 
 This directory contains LLM/AI specialist agent definitions for the
-**amadeus** R package. Each agent is a system prompt + YAML metadata file
-for one tier of the amadeus three-tier API.
+**amadeus** R package. The specialists cover the three API tiers and
+cross-cutting test work; each has a prompt and descriptive YAML metadata.
 
 > **Note:** This directory is listed in `.Rbuildignore` — it has no impact
 > on `R CMD CHECK`, test coverage, or any CI/CD workflow.
@@ -16,32 +16,63 @@ for one tier of the amadeus three-tier API.
 | [`calculate-agent.md`](calculate-agent.md) | [`calculate-agent.yaml`](calculate-agent.yaml) | `calculate_covariates()` + all `calculate_*()` functions |
 | [`test-agent.md`](test-agent.md) | [`test-agent.yaml`](test-agent.yaml) | testthat unit/integration tests |
 
-## How to use
+## How agent resources work together for repository tasks
 
-### As a system prompt in any LLM
+These files are complementary, not competing sources of instructions. Each has
+a distinct role:
 
-1. Open your preferred LLM interface (Claude, ChatGPT, GitHub Copilot Chat, etc.)
-2. Create a new conversation and paste the contents of the relevant `*-agent.md`
-   file as the system prompt (or "custom instructions").
-3. Ask questions, request issue triage, or ask for code generation in that domain.
+| Component | Role | Use it for |
+|---|---|---|
+| [Repository instructions](../AGENTS.md) | Package-wide context and conventions | General repository guidance |
+| [Amadeus AI Coding Protocol](Amadeus_AI_Coding_Protocol.md) | Shared governance and development workflow | Operating mode, risk, approval, validation, and handoff requirements |
+| Tier skill checklists | Task-specific checks | Detailed tier practices; consult the matching file under `../.agents/skills/` |
+| Specialist prompts | Focused role and domain context | Selecting the lead agent and scoping its work |
+| Specialist YAML | Descriptive agent metadata | Finding relevant domains, files, and declared tools; not an executable prompt by itself |
+| Source code, tests, and documentation | Evidence of current package behavior | Confirming the actual implementation and contracts |
 
-### With GitHub Copilot workspace
+The protocol is authoritative for the shared workflow. Specialist prompts and
+skills should add role-specific context without overriding it. Repository code,
+tests, and documentation determine current behavior; verify prompt inventories
+and examples against them before relying on those details.
 
-Add a reference in `.github/copilot-instructions.md`:
+### Select a lead specialist
 
-```markdown
-For download function issues, refer to agents/download-agent.md.
-For process function issues, refer to agents/process-agent.md.
-For calculate function issues, refer to agents/calculate-agent.md.
-For test writing, refer to agents/test-agent.md.
-```
+- **Download Agent** — provider selection, authentication, transfers, archives,
+  and downloaded-file layout. See [prompt](download-agent.md), [metadata](download-agent.yaml),
+  and [download skill](../.agents/skills/download.md).
+- **Process Agent** — reading source files and producing spatial or
+  spatiotemporal objects. See [prompt](process-agent.md), [metadata](process-agent.yaml),
+  and [process skill](../.agents/skills/process.md).
+- **Calculate Agent** — extracting covariates and shaping location-level
+  results. See [prompt](calculate-agent.md), [metadata](calculate-agent.yaml),
+  and [calculate skill](../.agents/skills/calculate.md).
+- **Test Agent** — test design and verification across all tiers. See
+  [prompt](test-agent.md), [metadata](test-agent.yaml), and
+  [test skill](../.agents/skills/test.md). Testing is cross-cutting; it is not
+  a fourth data-processing tier.
 
-### Choosing the right agent
+For a task crossing tiers, choose one lead to own the overall change and
+involve the other affected specialists for bounded reviews or implementation
+tasks. Make the handoff contract between tiers explicit.
 
-- **Broken URL / new data source / authentication error** → Download Agent
-- **Wrong output type / CRS mismatch / missing time dimension** → Process Agent
-- **Wrong extracted values / missing locs_id column / geom handling** → Calculate Agent
-- **Missing tests / failing tests / adding a new source** → Test Agent
+### Apply the materials to a task
+
+1. Start with the repository instructions and the shared protocol.
+2. Select the lead specialist by the code path or behavior in scope.
+3. Add the relevant specialist prompt and any substantive tier skill to the
+   task context. Use YAML as descriptive routing metadata unless your agent
+   environment explicitly supports it.
+4. Have the agent inspect current implementation, tests, and downstream
+   contracts before proposing or making changes.
+5. Follow the protocol's mandatory workflow and handoff requirements; use the
+   skill for additional checks specific to the tier.
+
+Skills, prompts, and YAML files are repository resources; their presence does
+not guarantee that a particular editor or agent runtime automatically loads
+them. Configure your environment's supported instructions, prompt, or skill
+mechanism, or explicitly provide the relevant files when starting a task.
+Keep detailed workflow rules in the protocol and detailed tier checks in the
+skills rather than duplicating them here.
 
 ## Package overview (shared context)
 

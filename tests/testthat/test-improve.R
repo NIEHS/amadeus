@@ -398,3 +398,183 @@ testthat::test_that("download_improve hash=FALSE returns download_result", {
     testthat::expect_true(grepl("IMPAER_2022\\.txt\\.zip$", captured$destfiles[1]))
   })
 })
+
+testthat::test_that(
+  "calculate_improve(site_code=monitor): preserves observations and target order",
+  {
+    source <- process_improve(improve_path, return_format = "data.table")
+    before <- data.table::copy(source)
+    targets <- data.frame(id = c("009", "001", "005", "003"),
+                          monitor = c("BIBE1", "ACAD1", "NONE", "BIBE1"))
+    result <- calculate_improve(source, targets, "id", "monitor")
+    testthat::expect_s3_class(result, "data.frame")
+    testthat::expect_identical(unique(result$id), targets$id)
+    testthat::expect_equal(result$FactValue[result$id == "009"],
+                          source$FactValue[source$SiteCode == "BIBE1"])
+    testthat::expect_equal(result$FactValue[result$id == "003"],
+                          source$FactValue[source$SiteCode == "BIBE1"])
+    testthat::expect_equal(result$FactValue[result$id == "001" &
+                            result$ParamCode == "FPM" &
+                            !is.na(result$ParamCode)], c(2.85, 3.12))
+    testthat::expect_equal(sum(result$id == "005"), 1L)
+    testthat::expect_identical(result$SiteCode[result$id == "005"], "NONE")
+    testthat::expect_identical(result$FactValue[result$id == "005"], NA_real_)
+    testthat::expect_s3_class(result$FactDate, "Date")
+    testthat::expect_identical(source, before)
+  }
+)
+
+testthat::test_that(
+  "calculate_covariates(covariate=IMPROVE): accepts every processed format/product",
+  {
+    targets <- data.frame(site_id = "001", SiteCode = "ACAD1")
+    for (product in c("raw", "rhr2", "rhr3")) {
+      for (format in c("data.table", "sf", "terra")) {
+        source <- process_covariates("improve", path = improve_path,
+                                    product = product, return_format = format)
+        result <- calculate_covariates("IMPROVE", source, targets)
+        expected <- switch(product, raw = c(0.00044, 0.03816, 2.85,
+                                           0.00062, 0.04201, 3.12),
+                           rhr2 = c(12.3, 14.7), rhr3 = c(1.52, 1.73))
+        testthat::expect_equal(result$FactValue, expected)
+        testthat::expect_identical(unique(result$site_id), "001")
+      }
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(geom=sf/terra): repeats target geometry and preserves CRS",
+  {
+    source <- process_improve(improve_path, return_format = "sf")
+    targets <- sf::st_as_sf(
+      data.frame(id = c("007", "002"), SiteCode = c("BIBE1", "ACAD1"),
+                 x = c(-100, -70), y = c(30, 40)),
+      coords = c("x", "y"), crs = 4326
+    )
+    targets <- sf::st_transform(targets, 3857)
+    result <- calculate_improve(source, targets, "id", geom = "sf")
+    testthat::expect_s3_class(result, "sf")
+    testthat::expect_identical(sf::st_crs(result), sf::st_crs(targets))
+    testthat::expect_identical(sf::st_geometry(result),
+                              sf::st_geometry(targets)[match(result$id,
+                                                            targets$id)])
+    vector <- calculate_improve(source, terra::vect(targets), "id",
+                                geom = "terra")
+    testthat::expect_s4_class(vector, "SpatVector")
+    testthat::expect_equal(as.data.frame(vector)$id, result$id)
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(from=duplicates/missing): retains flags, zeros and rows",
+  {
+    source <- data.frame(SiteCode = c("A", "A", "A", NA),
+                         FactDate = as.Date("2022-01-02"), ParamCode = "x",
+                         FactValue = c(0, NA, 0, 99), Units = "u",
+                         Status = c("V0", "invalid", "V0", "V0"))
+    targets <- data.frame(site_id = c("01", "02"), SiteCode = c("A", NA))
+    result <- calculate_improve(source, targets)
+    testthat::expect_equal(result$FactValue, c(0, NA, 0, NA))
+    testthat::expect_equal(result$Status, c("V0", "invalid", "V0", NA))
+    testthat::expect_equal(nrow(result), 4L)
+    testthat::expect_equal(nrow(calculate_improve(source[FALSE, ], targets)), 2L)
+    testthat::expect_equal(nrow(calculate_improve(source, targets[FALSE, ])), 0L)
+    codes <- data.frame(SiteCode = "A")
+    testthat::expect_equal(nrow(calculate_improve(source, codes, "SiteCode")), 3L)
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(invalid inputs): rejects ambiguity and unsupported options",
+  {
+    source <- process_improve(improve_path, return_format = "data.table")
+    targets <- data.frame(site_id = "001", SiteCode = "ACAD1")
+    testthat::expect_error(calculate_improve(source, rbind(targets, targets)),
+                           "unique and nonmissing")
+    testthat::expect_error(calculate_improve(source, targets, "missing"),
+                           "must contain")
+    testthat::expect_error(calculate_improve(source, targets, geom = "sf"),
+                           "Spatial")
+    testthat::expect_error(calculate_improve(source, targets, radius = 100),
+                           "Unused")
+    testthat::expect_error(calculate_improve(source, targets, .by_time = "month"),
+                           "requires")
+    testthat::expect_error(calculate_covariates("improve", source, targets,
+                                               weights = 1), "requires")
+    testthat::expect_error(calculate_improve(data.frame(x = 1), targets),
+                           "must contain")
+    targets$FactValue <- targets$site_id
+    testthat::expect_error(calculate_improve(source, targets, "FactValue"),
+                           "conflicts")
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(geom=NA/vector): rejects ambiguous geometry requests",
+  {
+    source <- process_improve(improve_path, return_format = "data.table")
+    targets <- data.frame(site_id = "001", SiteCode = "ACAD1")
+    for (geom in list(NA, character(), c("sf", "terra"))) {
+      testthat::expect_error(
+        calculate_improve(source, targets, geom = geom),
+        "`geom` must be one of", fixed = TRUE
+      )
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(locs_id/site_code=invalid): requires single column names",
+  {
+    source <- process_improve(improve_path, return_format = "data.table")
+    targets <- data.frame(site_id = "001", SiteCode = "ACAD1")
+    for (column in list(NULL, NA_character_, "", 1, c("a", "b"))) {
+      testthat::expect_error(
+        calculate_improve(source, targets, locs_id = column),
+        "must be single column names", fixed = TRUE
+      )
+      testthat::expect_error(
+        calculate_improve(source, targets, site_code = column),
+        "must be single column names", fixed = TRUE
+      )
+    }
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(from/locs=list): rejects inputs without a table structure",
+  {
+    source <- process_improve(improve_path, return_format = "data.table")
+    targets <- data.frame(site_id = "001", SiteCode = "ACAD1")
+    testthat::expect_error(
+      calculate_improve(as.list(source), targets),
+      "must be tables, sf, or SpatVector objects", fixed = TRUE
+    )
+    testthat::expect_error(
+      calculate_improve(source, as.list(targets)),
+      "must be tables, sf, or SpatVector objects", fixed = TRUE
+    )
+  }
+)
+
+testthat::test_that(
+  "calculate_improve(from/locs=duplicate columns): rejects ambiguous schemas",
+  {
+    source <- process_improve(improve_path, return_format = "data.table")
+    targets <- data.frame(site_id = "001", SiteCode = "ACAD1")
+    duplicate_source <- as.data.frame(source)
+    duplicate_source$extra <- duplicate_source$FactValue
+    names(duplicate_source)[ncol(duplicate_source)] <- "FactValue"
+    testthat::expect_error(
+      calculate_improve(duplicate_source, targets),
+      "Input column names must be unique", fixed = TRUE
+    )
+    targets$extra <- targets$SiteCode
+    names(targets)[ncol(targets)] <- "SiteCode"
+    testthat::expect_error(
+      calculate_improve(source, targets),
+      "Input column names must be unique", fixed = TRUE
+    )
+  }
+)
