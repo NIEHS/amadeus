@@ -146,7 +146,11 @@ testthat::test_that("download_normalize_aqs_unzip no-ops without nested files", 
     data_dir <- file.path(".", "data_files")
     dir.create(data_dir, recursive = TRUE, showWarnings = FALSE)
     nested_dir <- file.path(data_dir, "daily_88101_2022")
-    dir.create(file.path(nested_dir, "subdir"), recursive = TRUE, showWarnings = FALSE)
+    dir.create(
+      file.path(nested_dir, "subdir"),
+      recursive = TRUE,
+      showWarnings = FALSE
+    )
 
     testthat::expect_invisible(
       amadeus:::download_normalize_aqs_unzip(
@@ -518,7 +522,9 @@ testthat::test_that("process_aqs handles mixed AQS date and duration formats", {
     )
 
     testthat::expect_equal(nrow(aqs_processed), 2)
-    testthat::expect_true(all(aqs_processed$time %in% c("2022-01-02", "2022-01-03")))
+    testthat::expect_true(all(
+      aqs_processed$time %in% c("2022-01-02", "2022-01-03")
+    ))
   })
 })
 
@@ -556,6 +562,67 @@ testthat::test_that("process_aqs handles WGS84-only input", {
     testthat::expect_s3_class(out_sf, "sf")
     testthat::expect_equal(nrow(out_sf), 2)
   })
+})
+
+testthat::test_that("process_aqs(resolution_temporal = 'hourly')", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  withr::local_package("sf")
+  withr::local_package("dplyr")
+
+  testthat::expect_no_error(
+    dt_aqs1 <- process_aqs(
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "aqs",
+        "hourly_88101_2020.csv"
+      ),
+      date = c("2020-01-01", "2020-12-31"),
+      mode = "available-data",
+      resolution_temporal = "hourly",
+      data_field = "Sample.Measurement"
+    )
+  )
+  # ensure character time which contains date and hour
+  testthat::expect_true(is.character(dt_aqs1$time))
+  testthat::expect_equal(unique(nchar(dt_aqs1$time)), 16)
+  # ensure all rows are retained when mode = "available-data"
+  testthat::expect_equal(nrow(dt_aqs1), 100L)
+
+  testthat::expect_no_error(
+    dt_aqs2 <- process_aqs(
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "aqs",
+        "hourly_88101_2020.csv"
+      ),
+      date = c("2020-01-01", "2020-12-31"),
+      mode = "location",
+      resolution_temporal = "hourly",
+      data_field = "Sample.Measurement"
+    )
+  )
+  # ensure only one row for one included site is retained for mode = "location"
+  testthat::expect_equal(nrow(dt_aqs2), 1L)
+
+  testthat::expect_no_error(
+    dt_aqs3 <- process_aqs(
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "aqs",
+        "hourly_88101_2020.csv"
+      ),
+      date = c("2020-01-16", "2020-01-18"),
+      mode = "date-location",
+      resolution_temporal = "hourly",
+      data_field = "Sample.Measurement"
+    )
+  )
+  # date-location and "hourly" expands dates * times * sites
+  testthat::expect_equal(nrow(dt_aqs3), 72L)
 })
 
 testthat::test_that("download_aqs remove_command deprecation warning", {

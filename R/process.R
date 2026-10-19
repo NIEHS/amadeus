@@ -1872,6 +1872,8 @@ process_nei <- function(
 #'   * "location" (unique locations).
 #' @param data_field character(1). Data field to extract.
 #' @param return_format character(1). `"terra"` or `"sf"` or `"data.table"`.
+#' @param resolution_temporal character(1). Daily or hourly data, must match
+#' `resolution_temporal` argument passed to `amadeus::download_aqs`
 #' @param extent numeric(4). Spatial extent of the resulting object.
 #'   The order should be `c(xmin, xmax, ymin, ymax)`.
 #'   The coordinate system should be WGS84 (EPSG:4326).
@@ -1912,10 +1914,13 @@ process_aqs <-
     data_field = "Arithmetic.Mean",
     return_format = c("terra", "sf", "data.table"),
     extent = NULL,
+    resolution_temporal = c("daily", "hourly"),
     ...
   ) {
     mode <- match.arg(mode)
     return_format <- match.arg(return_format)
+    resolution_temporal <- match.arg(resolution_temporal)
+
     if (!is.null(date)) {
       date <- try(as.Date(date), silent = TRUE)
       if (inherits(date, "try-error")) {
@@ -1966,6 +1971,7 @@ process_aqs <-
     date_start <- as.Date(date[1])
     date_end <- as.Date(date[2])
     date_sequence <- seq(date_start, date_end, "day")
+    time_sequence <- sprintf("%02d:00", 0:23)
 
     parsed_dates <- as.Date(rep(NA_character_, nrow(sites)))
     raw_dates <- as.character(sites$Date.Local)
@@ -1982,41 +1988,57 @@ process_aqs <-
       duration_keep <-
         duration_keep |
         (!is.na(sites$Observation.Count) & sites$Observation.Count == 24)
+    } else {
+      duration_keep <- rep(TRUE, nrow(sites))
     }
     sites$duration_keep <- duration_keep
+
+    # Time column
+    chr_time <- if (resolution_temporal == "daily") {
+      as.character(sites$Date.Local)
+    } else {
+      as.character(paste0(sites$Date.Local, " ", sites$Time.Local))
+    }
 
     # select relevant fields only
     sites <- sites |>
       dplyr::as_tibble() |>
+      dplyr::mutate(time = chr_time) |>
       dplyr::filter(Date.Local %in% date_sequence) |>
       dplyr::filter(duration_keep) |>
       dplyr::group_by(site_id) |>
       dplyr::filter(POC == min(POC)) |>
-      dplyr::mutate(time = as.character(Date.Local)) |>
       dplyr::ungroup()
+
     col_sel <- c("site_id", "Longitude", "Latitude", "Datum")
     if (mode != "available-data") {
       sites_v <- unique(sites[, col_sel])
     } else {
-      col_sel <- append(col_sel, "Event.Type")
-      col_sel <- append(col_sel, "time")
-      col_sel <- append(col_sel, data_field)
+      col_sel <- unique(c(
+        col_sel,
+        if (resolution_temporal == "daily") "Event.Type",
+        "time",
+        data_field
+      ))
       sites_v <- sites |>
         dplyr::select(dplyr::all_of(col_sel)) |>
         dplyr::distinct()
-      # excluding site-time with multiple event types
-      # sites_vdup will be "subtracted" from the original sites_v
-      sites_vdup <- sites_v |>
-        dplyr::group_by(site_id, time) |>
-        dplyr::filter(dplyr::n() > 1) |>
-        dplyr::filter(!!dplyr::sym("Event.Type") == "Excluded") |>
-        dplyr::ungroup()
-      sites_v <-
-        dplyr::anti_join(
-          sites_v,
-          sites_vdup,
-          by = c("site_id", "time", "Event.Type")
-        )
+
+      if ("Event.Type" %in% col_sel) {
+        # excluding site-time with multiple event types
+        # sites_vdup will be "subtracted" from the original sites_v
+        sites_vdup <- sites_v |>
+          dplyr::group_by(site_id, time) |>
+          dplyr::filter(dplyr::n() > 1) |>
+          dplyr::filter(!!dplyr::sym("Event.Type") == "Excluded") |>
+          dplyr::ungroup()
+        sites_v <-
+          dplyr::anti_join(
+            sites_v,
+            sites_vdup,
+            by = c("site_id", "time", "Event.Type")
+          )
+      }
     }
     names(sites_v)[2:3] <- c("lon", "lat")
     sites_v <- data.table::as.data.table(sites_v)
@@ -2053,8 +2075,14 @@ process_aqs <-
       ]
 
     if (mode == "date-location") {
+      dl_sequence <- if (resolution_temporal == "daily") {
+        date_sequence
+      } else {
+        df_sequence <- expand.grid(date_sequence, time_sequence)
+        paste0(df_sequence[, 1], " ", df_sequence[, 2])
+      }
       final_sites <-
-        split(as.character(date_sequence), as.character(date_sequence)) |>
+        split(as.character(dl_sequence), as.character(dl_sequence)) |>
         lapply(function(x) {
           fs_time <- final_sites
           fs_time$time <- x
