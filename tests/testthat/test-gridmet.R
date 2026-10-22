@@ -1101,6 +1101,89 @@ testthat::test_that(
     testthat::expect_equal(result[[column]], c(0, 1))
   }
 )
+
+for (index in c("eddi", "spei")) {
+  testthat::test_that(
+    sprintf(
+      paste0(
+        "calculate_gridmet(variable='%s14d', fun='mean'): ",
+        "excludes packed 32767 fill pixels from polygon statistics"
+      ),
+      index
+    ),
+    {
+      testthat::skip_if_not_installed("ncdf4")
+      directory <- withr::local_tempdir()
+      code <- paste0(index, "14d")
+      filename <- file.path(directory, paste0(code, ".nc"))
+      dates <- as.Date(c("2020-01-04", "2020-01-09"))
+      raster <- terra::rast(
+        nrows = 2, ncols = 2, nlyrs = 2,
+        xmin = -79, xmax = -79 + 2 / 24,
+        ymin = 35, ymax = 35 + 2 / 24, crs = "EPSG:4326"
+      )
+      # Match the native packed index: value = raw * 0.01 - 5.
+      # The first date decodes to -1, 0, 2, NA; the second is all missing.
+      terra::values(raster) <- cbind(c(400, 500, 700, 32767), rep(32767, 4))
+      terra::time(raster) <- dates
+      terra::writeCDF(
+        raster, filename, varname = index, prec = "short", missval = 32767
+      )
+      local({
+        nc <- ncdf4::nc_open(filename, write = TRUE)
+        on.exit(ncdf4::nc_close(nc))
+        ncdf4::ncatt_put(nc, index, "missing_value", 32767, prec = "short")
+        ncdf4::ncatt_put(nc, index, "scale_factor", 0.01, prec = "double")
+        ncdf4::ncatt_put(nc, index, "add_offset", -5, prec = "double")
+        ncdf4::ncatt_put(nc, index, "_Unsigned", "true")
+        testthat::expect_equal(
+          ncdf4::ncatt_get(nc, index, "_FillValue")$value, 32767
+        )
+        raw <- ncdf4::ncvar_get(nc, index, raw_datavals = TRUE)
+        testthat::expect_equal(sum(raw == 32767), 5L)
+      })
+
+      processed <- process_gridmet(
+        variable = code, date = as.character(dates), path = directory
+      )
+      testthat::expect_s4_class(processed, "SpatRaster")
+      testthat::expect_identical(
+        names(processed), paste0(code, "_", format(dates, "%Y%m%d"))
+      )
+      testthat::expect_equal(
+        sort(terra::values(processed)[, 1], na.last = TRUE), c(-1, 0, 2, NA)
+      )
+      testthat::expect_identical(
+        is.na(terra::values(processed)[, 2]), rep(TRUE, 4)
+      )
+
+      zone <- terra::as.polygons(
+        terra::ext(processed), crs = terra::crs(processed)
+      )
+      zone$site_id <- "zone_1"
+      direct <- exactextractr::exact_extract(
+        processed, sf::st_as_sf(zone), fun = "mean", progress = FALSE,
+        force_df = TRUE
+      )
+      # Only the three valid cells contribute: (-1 + 0 + 2) / 3.
+      # This also rejects treating missing pixels as neutral (zero) values.
+      testthat::expect_equal(as.numeric(direct[1, 1]), 1 / 3)
+      testthat::expect_identical(is.na(direct[[2]]), TRUE)
+
+      result <- calculate_gridmet(
+        from = processed, locs = zone, locs_id = "site_id", radius = 0,
+        fun = "mean"
+      )
+      testthat::expect_s3_class(result, "data.frame")
+      testthat::expect_equal(nrow(result), 2L)
+      testthat::expect_identical(as.Date(result$time), dates)
+      testthat::expect_identical(result$site_id, rep("zone_1", 2))
+      testthat::expect_equal(result[[paste0(code, "_0")]][1], 1 / 3)
+      testthat::expect_identical(is.na(result[[paste0(code, "_0")]][2]), TRUE)
+    }
+  )
+}
+
 testthat::test_that(
   "download_gridmet(variables=<EDDI codes>, year=c(2019,2021)): uses one multi-year file per period",
   {
