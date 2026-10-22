@@ -1184,6 +1184,57 @@ for (index in c("eddi", "spei")) {
   )
 }
 
+for (index in c("eddi", "spei")) {
+  testthat::test_that(
+    sprintf(
+      paste0(
+        "calculate_gridmet(from=%s14d, locs=<partial-cell polygon>, ",
+        "fun='mean'): weights boundary cells by coverage fraction"
+      ),
+      index
+    ),
+    {
+      code <- paste0(index, "14d")
+      date <- as.Date("2020-01-04")
+      raster <- terra::rast(
+        nrows = 1, ncols = 3,
+        xmin = -79, xmax = -79 + 3 / 24,
+        ymin = 35, ymax = 35 + 1 / 24, crs = "EPSG:4326"
+      )
+      terra::values(raster) <- c(-2, 1, 4)
+      terra::time(raster) <- date
+      names(raster) <- paste0(code, "_20200104")
+
+      # Cover the first cell fully, half the second, and none of the third.
+      zone <- terra::as.polygons(
+        terra::ext(-79, -79 + 1.5 / 24, 35, 35 + 1 / 24),
+        crs = terra::crs(raster)
+      )
+      zone$site_id <- "partial_zone"
+      # (-2 * 1 + 1 * 0.5) / (1 + 0.5) = -1.
+      # Equal inclusion of the two intersected cells would give -0.5;
+      # excluding the partial cell would give -2.
+      expected_mean <- -1
+      direct <- exactextractr::exact_extract(
+        raster, sf::st_as_sf(zone), fun = "mean", progress = FALSE
+      )
+      testthat::expect_equal(direct, expected_mean, tolerance = 1e-7)
+
+      result <- calculate_gridmet(
+        from = raster, locs = zone, locs_id = "site_id", radius = 0,
+        fun = "mean"
+      )
+      testthat::expect_s3_class(result, "data.frame")
+      testthat::expect_equal(nrow(result), 1L)
+      testthat::expect_identical(result$site_id, "partial_zone")
+      testthat::expect_identical(as.Date(result$time), date)
+      testthat::expect_equal(
+        result[[paste0(code, "_0")]], expected_mean, tolerance = 1e-7
+      )
+    }
+  )
+}
+
 testthat::test_that(
   "download_gridmet(variables=<EDDI codes>, year=c(2019,2021)): uses one multi-year file per period",
   {
