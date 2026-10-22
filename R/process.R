@@ -3635,6 +3635,22 @@ process_merra2 <-
 #' @importFrom terra rast
 #' @importFrom terra time
 #' @importFrom terra subset
+#' @details
+#' EDDI uses the same native GRIDMET multi-year workflow as SPEI.
+#' Use \code{eddi14d}, \code{eddi30d}, \code{eddi90d}, \code{eddi180d},
+#' \code{eddi270d}, \code{eddi1y}, \code{eddi2y}, or \code{eddi5y};
+#' \code{eddi} defaults to \code{eddi30d}. Both indices retain the native
+#' 1/24-degree grid and five-day observation dates. Select dataset
+#' \code{gridmet} in the wrapper functions to use these products; the
+#' standalone drought source aliases continue to select their separate products.
+#' GRIDMET SPEI uses native five-day observations, not daily values.
+#' Use \code{variable = "spei"} (alias for \code{"spei30d"}) or an explicit
+#' accumulation code: \code{"spei14d"}, \code{"spei30d"}, \code{"spei90d"},
+#' \code{"spei180d"}, \code{"spei270d"}, \code{"spei1y"}, \code{"spei2y"},
+#' or \code{"spei5y"}. Set \code{path} to the code directory created by
+#' \code{download_gridmet()} (e.g., spei30d). The multi-year file is subset
+#' using its observation dates; no daily interpolation is performed.
+#' Layer names retain the accumulation period (e.g., spei30d_20200105).
 #' @examples
 #' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
 #' ##       amount of data which is not included in the package.
@@ -3696,17 +3712,19 @@ process_gridmet <- function(
       4
     )
   )
-  #### subset file paths to only dates of interest
-  data_paths <- unique(
-    grep(
-      paste(
-        yoi,
-        collapse = "|"
-      ),
-      data_paths,
-      value = TRUE
+  #### SPEI files span all years; annual covariates encode years in filenames.
+  if (grepl("^(spei|eddi)", variable_checked)) {
+    data_paths <- data_paths[basename(data_paths) == paste0(variable_checked, ".nc")]
+  } else {
+    #### subset file paths to only dates of interest
+    data_paths <- unique(
+      grep(
+        paste(yoi, collapse = "|"),
+        data_paths,
+        value = TRUE
+      )
     )
-  )
+  }
   if (length(data_paths) == 0) {
     stop(
       paste0(
@@ -3722,22 +3740,19 @@ process_gridmet <- function(
   data_full <- terra::rast()
   for (p in seq_along(data_paths)) {
     #### import data
-    data_year <- terra::rast(data_paths[p], win = extent)
+    # Native drought files also contain a category raster. Read only the
+    # continuous index, which carries its own CRS and time coordinates.
+    if (grepl("^(spei|eddi)", variable_checked)) {
+      index_name <- sub("[0-9].*$", "", variable_checked)
+      data_year <- terra::rast(data_paths[p], subds = index_name, win = extent)
+    } else {
+      data_year <- terra::rast(data_paths[p], win = extent)
+    }
     message(paste0(
-      "Cleaning daily ",
+      "Cleaning ",
       variable_checked,
-      " data for year ",
-      gsub(
-        ".nc",
-        "",
-        strsplit(
-          data_paths[p],
-          paste0(
-            variable_checked,
-            "_"
-          )
-        )[[1]][2]
-      ),
+      " data from ",
+      basename(data_paths[p]),
       "...\n"
     ))
 
@@ -3796,7 +3811,7 @@ process_gridmet <- function(
   }
   data_return <- terra::subset(data_full, selected_layers)
   message(paste0(
-    "Returning daily ",
+    "Returning ",
     variable_checked_long,
     " data from ",
     as.Date(

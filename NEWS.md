@@ -1,5 +1,9 @@
 # amadeus 2.0.2
 
+- Added GRIDMET EDDI integration for all eight accumulation periods, with `eddi` defaulting to `eddi30d`.
+
+- Added native 4-km GRIDMET SPEI downloads and extraction for eight accumulation periods, retaining five-day observation dates; `spei` defaults to `spei30d`.
+
 - Fixed process_gridmet() to use valid native NetCDF time metadata from terra::time() when available and fall back to layer-name parsing when needed
 - Fixed download_gridmet() to handle cases where all requested files already exist locally without calling download_run_method() with an empty URL list
 

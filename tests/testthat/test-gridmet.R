@@ -571,9 +571,9 @@ testthat::test_that(
   {
     mappings <- process_gridmet_codes("all")
 
-    testthat::expect_identical(dim(mappings), c(17L, 2L))
-    testthat::expect_length(unique(mappings[, 1]), 17L)
-    testthat::expect_length(unique(mappings[, 2]), 17L)
+    testthat::expect_identical(dim(mappings), c(33L, 2L))
+    testthat::expect_length(unique(mappings[, 1]), 33L)
+    testthat::expect_length(unique(mappings[, 2]), 33L)
 
     for (i in seq_len(nrow(mappings))) {
       testthat::expect_equal(
@@ -1022,5 +1022,157 @@ testthat::test_that(
       expected,
       tolerance = 1e-7
     )
+  }
+)
+
+
+testthat::test_that(
+  "download_gridmet(variables=<SPEI codes>, year=c(2019,2021)): uses one multi-year file per period",
+  {
+    captured <- NULL
+    testthat::local_mocked_bindings(
+      check_url_status = function(...) TRUE,
+      check_destfile = function(...) TRUE,
+      download_run_method = function(...) {
+        captured <<- list(...)
+        list(success = 8L, failed = 0L, skipped = 0L)
+      },
+      .package = "amadeus"
+    )
+    codes <- paste0("spei", c("14d", "30d", "90d", "180d", "270d", "1y", "2y", "5y"))
+    directory <- withr::local_tempdir()
+    download_gridmet(
+      variables = codes, year = c(2019, 2021),
+      directory_to_save = directory, acknowledgement = TRUE
+    )
+    testthat::expect_identical(
+      captured$urls,
+      paste0("https://www.northwestknowledge.net/metdata/data/", codes, ".nc")
+    )
+    testthat::expect_identical(
+      captured$destfiles, file.path(directory, codes, paste0(codes, ".nc"))
+    )
+    testthat::expect_identical(
+      unname(process_variable_codes("SPEI", "gridmet")),
+      "spei30d"
+    )
+  }
+)
+
+testthat::test_that(
+  "process_gridmet(variable='spei', date=<2020>): calculates native pentad values from a multi-year file",
+  {
+    testthat::skip_if_not_installed("ncdf4")
+    directory <- withr::local_tempdir()
+    raster <- terra::rast(
+      nrows = 2, ncols = 2, nlyrs = 4,
+      xmin = -79, xmax = -79 + 2 / 24,
+      ymin = 35, ymax = 35 + 2 / 24, crs = "EPSG:4326"
+    )
+    terra::values(raster) <- matrix(rep(c(-1, 0, 1, 2), each = 4), nrow = 4)
+    dates <- as.Date(c("2019-12-30", "2020-01-04", "2020-01-09", "2021-01-03"))
+    terra::time(raster) <- dates
+    terra::writeCDF(raster, file.path(directory, "spei30d.nc"), varname = "spei")
+    nc <- ncdf4::nc_open(file.path(directory, "spei30d.nc"), write = TRUE)
+    category <- ncdf4::ncvar_def(
+      "category", "1", nc$var[["spei"]]$dim, missval = -9999
+    )
+    nc <- ncdf4::ncvar_add(nc, category)
+    ncdf4::ncvar_put(nc, "category", rep(8, 16))
+    ncdf4::nc_close(nc)
+    processed <- process_gridmet(
+      variable = "spei", date = c("2020-01-01", "2020-12-31"), path = directory
+    )
+    testthat::expect_s4_class(processed, "SpatRaster")
+    testthat::expect_equal(terra::res(processed), c(1 / 24, 1 / 24))
+    testthat::expect_true(terra::same.crs(processed, "EPSG:4326"))
+    testthat::expect_identical(terra::time(processed), dates[2:3])
+    testthat::expect_identical(names(processed), c("spei30d_20200104", "spei30d_20200109"))
+    result <- calculate_gridmet(
+      from = processed, locs = data.frame(id = "001", lon = -79 + 1 / 48, lat = 35 + 1 / 48),
+      locs_id = "id", radius = 0, geom = FALSE
+    )
+    testthat::expect_s3_class(result, "data.frame")
+    testthat::expect_equal(nrow(result), 2L)
+    testthat::expect_identical(as.Date(result$time), dates[2:3])
+    column <- setdiff(names(result), c("id", "time"))
+    testthat::expect_length(column, 1L)
+    testthat::expect_match(column, "spei30d")
+    testthat::expect_equal(result[[column]], c(0, 1))
+  }
+)
+testthat::test_that(
+  "download_gridmet(variables=<EDDI codes>, year=c(2019,2021)): uses one multi-year file per period",
+  {
+    captured <- NULL
+    testthat::local_mocked_bindings(
+      check_url_status = function(...) TRUE,
+      check_destfile = function(...) TRUE,
+      download_run_method = function(...) {
+        captured <<- list(...)
+        list(success = 8L, failed = 0L, skipped = 0L)
+      },
+      .package = "amadeus"
+    )
+    codes <- paste0("eddi", c("14d", "30d", "90d", "180d", "270d", "1y", "2y", "5y"))
+    directory <- withr::local_tempdir()
+    download_gridmet(
+      variables = codes, year = c(2019, 2021),
+      directory_to_save = directory, acknowledgement = TRUE
+    )
+    testthat::expect_identical(
+      captured$urls,
+      paste0("https://www.northwestknowledge.net/metdata/data/", codes, ".nc")
+    )
+    testthat::expect_identical(
+      captured$destfiles, file.path(directory, codes, paste0(codes, ".nc"))
+    )
+    testthat::expect_identical(
+      unname(process_variable_codes("EDDI", "gridmet")),
+      "eddi30d"
+    )
+  }
+)
+
+testthat::test_that(
+  "process_gridmet(variable='eddi', date=<2020>): calculates native pentad values from a multi-year file",
+  {
+    testthat::skip_if_not_installed("ncdf4")
+    directory <- withr::local_tempdir()
+    raster <- terra::rast(
+      nrows = 2, ncols = 2, nlyrs = 4,
+      xmin = -79, xmax = -79 + 2 / 24,
+      ymin = 35, ymax = 35 + 2 / 24, crs = "EPSG:4326"
+    )
+    terra::values(raster) <- matrix(rep(c(-1, 0, 1, 2), each = 4), nrow = 4)
+    dates <- as.Date(c("2019-12-30", "2020-01-04", "2020-01-09", "2021-01-03"))
+    terra::time(raster) <- dates
+    terra::writeCDF(raster, file.path(directory, "eddi30d.nc"), varname = "eddi")
+    nc <- ncdf4::nc_open(file.path(directory, "eddi30d.nc"), write = TRUE)
+    category <- ncdf4::ncvar_def(
+      "category", "1", nc$var[["eddi"]]$dim, missval = -9999
+    )
+    nc <- ncdf4::ncvar_add(nc, category)
+    ncdf4::ncvar_put(nc, "category", rep(8, 16))
+    ncdf4::nc_close(nc)
+    processed <- process_gridmet(
+      variable = "eddi", date = c("2020-01-01", "2020-12-31"), path = directory
+    )
+    testthat::expect_s4_class(processed, "SpatRaster")
+    testthat::expect_equal(terra::res(processed), c(1 / 24, 1 / 24))
+    testthat::expect_true(terra::same.crs(processed, "EPSG:4326"))
+    testthat::expect_identical(terra::time(processed), dates[2:3])
+    testthat::expect_identical(names(processed), c("eddi30d_20200104", "eddi30d_20200109"))
+    result <- calculate_gridmet(
+      from = processed, locs = data.frame(id = "001", lon = -79 + 1 / 48, lat = 35 + 1 / 48),
+      locs_id = "id", radius = 0, geom = FALSE
+    )
+    testthat::expect_s3_class(result, "data.frame")
+    testthat::expect_equal(nrow(result), 2L)
+    testthat::expect_identical(as.Date(result$time), dates[2:3])
+    column <- setdiff(names(result), c("id", "time"))
+    testthat::expect_length(column, 1L)
+    testthat::expect_match(column, "eddi30d")
+    testthat::expect_equal(result[[column]], c(0, 1))
   }
 )
