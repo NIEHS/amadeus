@@ -3391,6 +3391,25 @@ download_nei <- function(
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{article_abatzoglou2013development}{amadeus}
+#' @details
+#' EDDI uses the same native GRIDMET multi-year workflow as SPEI.
+#' Use \code{eddi14d}, \code{eddi30d}, \code{eddi90d}, \code{eddi180d},
+#' \code{eddi270d}, \code{eddi1y}, \code{eddi2y}, or \code{eddi5y};
+#' \code{eddi} defaults to \code{eddi30d}. Both indices retain the native
+#' 1/24-degree grid and five-day observation dates. Select dataset
+#' \code{gridmet} in the wrapper functions to use these products; the
+#' standalone drought source aliases continue to select their separate products.
+#' GRIDMET SPEI is available directly from the provider as multi-year files
+#' (one file per accumulation period), at native five-day intervals on the
+#' approximately 4-km grid. Use \code{"spei14d"}, \code{"spei30d"},
+#' \code{"spei90d"}, \code{"spei180d"}, \code{"spei270d"}, \code{"spei1y"},
+#' \code{"spei2y"}, or \code{"spei5y"}; \code{"spei"} aliases \code{"spei30d"}.
+#' For SPEI, \code{year} does not subset the download: the complete multi-year
+#' file is saved under its resolved code directory (e.g., spei30d/spei30d.nc).
+#' Subset dates with \code{process_gridmet()}. These files are several GB each.
+#' This is distinct from the global CSIC SPEI product in
+#' \code{download_drought()}.
+#' See \url{https://www.northwestknowledge.net/metdata/data/}.
 #' @examples
 #' \dontrun{
 #' download_gridmet(
@@ -3473,9 +3492,16 @@ download_gridmet <- function(
       dir.create(folder, recursive = TRUE)
     }
 
-    for (y in seq_along(years)) {
-      year_l <- years[y]
-      url <- paste0(base, variable, "_", year_l, ".nc")
+    # SPEI is a single multi-year file per accumulation period.
+    variable_years <- if (grepl("^(spei|eddi)", variable)) years[1] else years
+    for (y in seq_along(variable_years)) {
+      year_l <- variable_years[y]
+      filename <- if (grepl("^(spei|eddi)", variable)) {
+        paste0(variable, ".nc")
+      } else {
+        paste0(variable, "_", year_l, ".nc")
+      }
+      url <- paste0(base, filename)
 
       # Validate first URL only
       if (v == 1 && y == 1) {
@@ -3490,15 +3516,7 @@ download_gridmet <- function(
         }
       }
 
-      destfile <- paste0(
-        directory_to_save,
-        variable,
-        "/",
-        variable,
-        "_",
-        year_l,
-        ".nc"
-      )
+      destfile <- paste0(folder, filename)
 
       if (amadeus::check_destfile(destfile)) {
         all_urls <- c(all_urls, url)
@@ -3536,7 +3554,9 @@ download_gridmet <- function(
     download_result <- list(
       success = 0,
       failed = 0,
-      skipped = length(variables_list) * length(years)
+      skipped = sum(ifelse(
+        grepl("^(spei|eddi)", variables_list), 1L, length(years)
+      ))
     )
   }
 
