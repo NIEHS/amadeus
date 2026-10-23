@@ -360,6 +360,33 @@ testthat::test_that(
   }
 )
 
+testthat::test_that(
+  "download_gridmet(existing files=all): skips downloading and counts files",
+  {
+    testthat::local_mocked_bindings(
+      check_url_status = function(...) TRUE,
+      check_destfile = function(...) FALSE,
+      download_run_method = function(...) {
+        stop("Downloader must not be called when all files already exist")
+      },
+      .package = "amadeus"
+    )
+
+    result <- suppressMessages(
+      download_gridmet(
+        variables = c("pr", "spei30d", "eddi14d"),
+        year = c(2019, 2021),
+        directory_to_save = withr::local_tempdir(),
+        acknowledgement = TRUE
+      )
+    )
+
+    testthat::expect_equal(result$success, 0)
+    testthat::expect_equal(result$failed, 0)
+    testthat::expect_equal(result$skipped, 5)
+  }
+)
+
 ################################################################################
 ##### process_gridmet
 testthat::test_that("process_gridmet", {
@@ -565,6 +592,72 @@ testthat::test_that(
     )
   }
 )
+
+testthat::test_that(
+  "process_gridmet(path=<empty>): reports missing NetCDF files",
+  {
+    testthat::expect_error(
+      process_gridmet(
+        date = "2020-01-01",
+        variable = "pr",
+        path = withr::local_tempdir()
+      ),
+      regexp = "No gridMET NetCDF files"
+    )
+  }
+)
+
+for (index in c("spei", "eddi")) {
+  testthat::test_that(
+    sprintf(
+      paste0(
+        "process_gridmet(variable='%s30d', date=<unobserved>): ",
+        "reports no matching layers in a multi-year file"
+      ),
+      index
+    ),
+    {
+      testthat::skip_if_not_installed("ncdf4")
+      directory <- withr::local_tempdir()
+      code <- paste0(index, "30d")
+      raster <- terra::rast(
+        nrows = 2, ncols = 2, nlyrs = 3,
+        xmin = -79, xmax = -79 + 2 / 24,
+        ymin = 35, ymax = 35 + 2 / 24, crs = "EPSG:4326"
+      )
+      dates <- as.Date(c("2019-12-30", "2020-01-04", "2020-01-09"))
+      terra::values(raster) <- matrix(rep(c(-1, 0, 1), each = 4), nrow = 4)
+      terra::time(raster) <- dates
+      terra::writeCDF(
+        raster, file.path(directory, paste0(code, ".nc")), varname = index
+      )
+
+      # A native observation is available from the yearless filename.
+      observed <- suppressMessages(
+        process_gridmet(variable = code, date = "2020-01-04", path = directory)
+      )
+      testthat::expect_s4_class(observed, "SpatRaster")
+      testthat::expect_identical(terra::time(observed), dates[2])
+      testthat::expect_identical(names(observed), paste0(code, "_20200104"))
+      testthat::expect_equal(as.vector(terra::values(observed)), rep(0, 4))
+
+      # Neither gaps between pentads nor years outside the file are filled.
+      for (requested_date in c("2020-01-05", "2021-01-04")) {
+        testthat::expect_error(
+          suppressMessages(
+            process_gridmet(
+              variable = code, date = requested_date, path = directory
+            )
+          ),
+          regexp = paste0(
+            "No gridMET layers fall within the requested date range ",
+            requested_date, " to ", requested_date
+          )
+        )
+      }
+    }
+  )
+}
 
 testthat::test_that(
   "process_gridmet_codes(all codes): supports complete reversible mappings",
