@@ -1,3 +1,7 @@
+# amadeus 2.0.3
+
+- Fixed `download_narr()` base URL to drop the "Datasets" directory.
+
 # amadeus 2.0.2
 
 - Added GRIDMET EDDI integration for all eight accumulation periods, with `eddi` defaulting to `eddi30d`.

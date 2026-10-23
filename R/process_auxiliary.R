@@ -491,10 +491,10 @@ process_gridmet_codes <-
       "pdsi",
       "pet",
       "etr",
-      "ERC",
-      "BI",
-      "FM100",
-      "FM1000"
+      "erc",
+      "bi",
+      "fm100",
+      "fm1000"
     )
     names_codes <- cbind(tolower(names), codes)
     if (string == "all") {
@@ -504,7 +504,11 @@ process_gridmet_codes <-
       name_code <- names_codes[names_codes[, 1] == tolower(string), ]
       return(name_code[2])
     } else if (invert == TRUE) {
-      name_code <- names_codes[tolower(names_codes[, 2]) == tolower(string), ]
+      name_code <- names_codes[
+        tolower(names_codes[, 2]) == tolower(string),
+        ,
+        drop = FALSE
+      ]
       return(name_code[1])
     }
   }
@@ -599,7 +603,7 @@ process_variable_codes <-
       tolower(names_codes[, 2])
     )
     if (all(!is.na(code_matches))) {
-      return(tolower(names_codes[code_matches, 2]))
+      return(unname(names_codes[code_matches, 2]))
     } else {
       if (all(tolower(variables) %in% names_codes[, 1]) == TRUE) {
         codes_return <- lapply(

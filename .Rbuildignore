@@ -4,6 +4,7 @@
 ^manuscript/
 ^output/
 ^\.github/
+^\.git$
 ^amadeus\.Rproj$
 ^\.Rproj\.user$
 ^\.github$
@@ -36,6 +37,7 @@ vignettes/data
 ^vignettes/.*\.html$
 ^agent\.md$
 ^AGENTS\.md$
+^SECURITY\.md$
 vignettes/all_datasets_workflow.Rmd
 vignettes/.*_workflow\.Rmd$
 ^vignettes/calculate_time_grouping\.Rmd$

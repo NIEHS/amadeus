@@ -1,6 +1,22 @@
 ################################################################################
-# Live network tests for download_huc(). Mocked tests: test-huc.R.
+# Live network tests for HUC workflows. Mocked tests: test-huc.R.
 ################################################################################
+
+testthat::test_that(
+  paste0(
+    "process_huc(id='030202011003'): ",
+    "retrieves remote HUC data with hydrogeofetch"
+  ),
+  {
+    skip_if_no_live_tests()
+    skip_if_pkg_missing("hydrogeofetch")
+
+    result <- amadeus::process_huc(id = "030202011003")
+
+    testthat::expect_s4_class(result, "SpatVector")
+    testthat::expect_gt(nrow(result), 0)
+  }
+)
 
 testthat::test_that(
   paste0(

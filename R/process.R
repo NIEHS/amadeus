@@ -598,10 +598,7 @@ process_modis_daily <- function(
   return_type <- match.arg(return_type)
   amadeus::is_date_proper(instr = date)
 
-  if (length(date) == 1L) {
-    date <- rep(date, 2L)
-  }
-
+  date <- if (length(date) == 1) rep(date, 2) else date
   date_seq <- format(
     seq(as.Date(date[1]), as.Date(date[2]), by = "day"),
     "%Y-%m-%d"
@@ -694,9 +691,8 @@ process_mcd14ml <- function(
   }
 
   if (!is.null(date)) {
-    if (length(date) == 1L) {
-      date <- c(date, date)
-    }
+    date <- if (length(date) == 1) rep(date, 2) else date
+
     amadeus::is_date_proper(instr = date)
     txt_data$acq_date <- as.Date(txt_data$acq_date)
     txt_data <- txt_data[
@@ -1302,7 +1298,29 @@ process_nlcd <-
     }
 
     nlcd <- terra::rast(nlcd_file, win = extent)
-    terra::metags(nlcd) <- paste0("Year=", year) # Changed to capital Y
+    nlcd_product <- unique(unlist(lapply(
+      nlcd_file_base,
+      function(x) {
+        product_code <- regmatches(
+          x,
+          regexpr(
+            paste(product_codes, collapse = "|"),
+            x,
+            ignore.case = TRUE
+          )
+        )
+        product_codes[match(tolower(product_code), tolower(product_codes))]
+      }
+    )))
+    nlcd_product <- nlcd_product[!is.na(nlcd_product)]
+    nlcd_metadata <- paste0("Year=", year)
+    if (length(nlcd_product) == 1L) {
+      nlcd_metadata <- c(
+        nlcd_metadata,
+        paste0("Product=", nlcd_product)
+      )
+    }
+    terra::metags(nlcd) <- nlcd_metadata
     return(nlcd)
   }
 
@@ -2385,9 +2403,7 @@ process_hms <- function(
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### identify file paths
@@ -2446,13 +2462,24 @@ process_hms <- function(
       ))
       next
     } else {
-      date <- as.Date(
-        substr(data_density$Start[1], 1, 7),
-        format = "%Y%j"
+      date <- unique(
+        as.Date(
+          substr(data_density$Start, 1, 7),
+          format = "%Y%j"
+        )
       )
+      ##### patch to correct multiple dates in satellite Start/End data
+      # If two dates, overwrite based on date derived from the generated
+      # date sequence
+      date <- if (length(date) == 1) {
+        date
+      } else {
+        idx_date <- match(dates_of_interest[d], gsub("-", "", date))
+        date[idx_date]
+      }
       message(paste0(
         "Cleaning smoke data for date ",
-        date[1],
+        date,
         "..."
       ))
       #### zero buffer to avoid self intersection
@@ -2722,9 +2749,7 @@ process_narr <- function(
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### identify file paths
@@ -3073,9 +3098,7 @@ process_geos <-
     }
     variable <- trimws(variable)
     #### check dates
-    if (length(date) == 1) {
-      date <- c(date, date)
-    }
+    date <- if (length(date) == 1) rep(date, 2) else date
     stopifnot(length(date) == 2)
     date <- date[order(as.Date(date))]
     #### identify file paths
@@ -3371,9 +3394,7 @@ process_merra2 <-
     #### check for variable
     amadeus::check_for_null_parameters(mget(ls()))
     #### check dates
-    if (length(date) == 1) {
-      date <- c(date, date)
-    }
+    date <- if (length(date) == 1) rep(date, 2) else date
     stopifnot(length(date) == 2)
     date <- date[order(as.Date(date))]
     #### identify file paths
@@ -3673,9 +3694,7 @@ process_gridmet <- function(
   #### directory setup
   path <- amadeus::download_sanitize_path(path)
   #### check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### check for variable
@@ -3760,7 +3779,7 @@ process_gridmet <- function(
 
     if (
       length(existing_time) == terra::nlyr(data_year) &&
-      !anyNA(existing_time)
+        !anyNA(existing_time)
     ) {
       terra::time(data_year) <- existing_time
     } else {
@@ -3877,9 +3896,7 @@ process_terraclimate <- function(
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   variable_checked <- amadeus::process_variable_codes(
@@ -4191,9 +4208,9 @@ process_cropscape <-
 #'  lower level HUCs.
 #' @param extent numeric(4) or SpatExtent giving the extent of the raster
 #'   if `NULL` (default), the entire raster is loaded
-#' @param ... Arguments passed to `nhdplusTools::get_huc()`
+#' @param ... Arguments passed to `hydrogeofetch::get_huc()`
 #' @return a `SpatVector` object
-#' @seealso [`nhdplusTools::get_huc`]
+#' @seealso [`hydrogeofetch::get_huc`]
 #' @importFrom terra vect
 #' @importFrom terra vector_layers
 #' @importFrom rlang inject
@@ -4237,15 +4254,15 @@ process_huc <-
     # exclude the coverage due to write permission related to memoization
     #nocov start
     if (missing(path) || (!file.exists(path) && !dir.exists(path))) {
-      if (!requireNamespace("nhdplusTools", quietly = TRUE)) {
+      if (!requireNamespace("hydrogeofetch", quietly = TRUE)) {
         stop(
-          "Package 'nhdplusTools' is required when fetching HUC data ",
+          "Package 'hydrogeofetch' is required when fetching HUC data ",
           "remotely. ",
           "Please install it and try again."
         )
       }
       hucpoly <- try(
-        rlang::inject(nhdplusTools::get_huc(!!!list(...)))
+        rlang::inject(hydrogeofetch::get_huc(!!!list(...)))
       )
       if (inherits(hucpoly, "try-error")) {
         stop("HUC data was not found.")
@@ -4253,7 +4270,7 @@ process_huc <-
       hucpoly <- terra::vect(hucpoly)
     }
     #nocov end
-    if (file.exists(path) || dir.exists(path)) {
+    if (!missing(path) && (file.exists(path) || dir.exists(path))) {
       if (!is.null(huc_header)) {
         querybase <-
           sprintf(
@@ -4373,9 +4390,7 @@ process_goes <- function(
   #### check for variable
   amadeus::check_for_null_parameters(mget(ls()))
   #### check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   #### identify file paths matching GOES ADP naming convention
@@ -4727,9 +4742,7 @@ process_improve <- function(
 
   #### Filter by date if provided
   if (!is.null(date)) {
-    if (length(date) == 1) {
-      date <- c(date, date)
-    }
+    date <- if (length(date) == 1) rep(date, 2) else date
     stopifnot(length(date) == 2)
     d_start <- as.Date(date[1])
     d_end <- as.Date(date[2])
@@ -4950,9 +4963,7 @@ process_drought <- function(
   path <- amadeus::download_sanitize_path(path)
 
   #### Validate dates
-  if (length(date) == 1L) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2L)
   date <- date[order(as.Date(date))]
 

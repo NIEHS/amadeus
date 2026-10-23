@@ -282,9 +282,7 @@ download_aqs <-
     amadeus::check_for_null_parameters(mget(ls()))
 
     #### Check years
-    if (length(year) == 1) {
-      year <- c(year, year)
-    }
+    year <- if (length(year) == 1) rep(year, 2) else year
     stopifnot(length(year) == 2)
     year <- year[order(year)]
 
@@ -611,9 +609,7 @@ download_geos <- function(
   amadeus::download_permit(acknowledgement = acknowledgement)
 
   #### 2. Check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
 
@@ -1022,9 +1018,7 @@ download_merra2 <- function(
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
 
   #### 3. Check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
 
@@ -1538,9 +1532,7 @@ download_narr <- function(
   amadeus::check_for_null_parameters(mget(ls()))
 
   #### 3. Check years
-  if (length(year) == 1) {
-    year <- c(year, year)
-  }
+  year <- if (length(year) == 1) rep(year, 2) else year
   stopifnot(length(year) == 2)
   year <- year[order(year)]
 
@@ -2301,9 +2293,7 @@ download_hms <- function(
   amadeus::check_for_null_parameters(mget(ls()))
 
   #### Check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
   if (as.Date(date[1]) < as.Date("2005-08-05")) {
@@ -2770,9 +2760,7 @@ download_modis <- function(
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
 
   #### 3. Check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
 
@@ -3064,9 +3052,7 @@ download_tri <- function(
   directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
 
   #### Check years
-  if (length(year) == 1) {
-    year <- c(year, year)
-  }
+  year <- if (length(year) == 1) rep(year, 2) else year
   stopifnot(length(year) == 2)
   year <- year[order(year)]
 
@@ -3452,9 +3438,7 @@ download_gridmet <- function(
   amadeus::check_for_null_parameters(mget(ls()))
 
   #### Check years
-  if (length(year) == 1) {
-    year <- c(year, year)
-  }
+  year <- if (length(year) == 1) rep(year, 2) else year
   stopifnot(length(year) == 2)
   year <- year[order(year)]
 
@@ -3630,9 +3614,7 @@ download_terraclimate <- function(
   amadeus::check_for_null_parameters(mget(ls()))
 
   #### Check years
-  if (length(year) == 1) {
-    year <- c(year, year)
-  }
+  year <- if (length(year) == 1) rep(year, 2) else year
   stopifnot(length(year) == 2)
   year <- year[order(year)]
 
@@ -4926,9 +4908,7 @@ download_goes <- function(
   )
 
   #### Check dates
-  if (length(date) == 1) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)
   date <- date[order(as.Date(date))]
 
@@ -5142,9 +5122,7 @@ download_improve <- function(
   file_prefix <- prefix_map[[product]]
 
   #### Check years
-  if (length(year) == 1) {
-    year <- c(year, year)
-  }
+  year <- if (length(year) == 1) rep(year, 2) else year
   stopifnot(length(year) == 2)
   year <- year[order(year)]
   year_sequence <- seq(year[1], year[2], 1)
@@ -5314,9 +5292,7 @@ download_drought <- function(
   amadeus::check_for_null_parameters(mget(ls()))
 
   #### Validate date
-  if (length(date) == 1L) {
-    date <- c(date, date)
-  }
+  date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2L)
   date <- date[order(as.Date(date))]
 
