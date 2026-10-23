@@ -3407,7 +3407,8 @@ download_nei <- function(
 #' For SPEI, \code{year} does not subset the download: the complete multi-year
 #' file is saved under its resolved code directory (e.g., spei30d/spei30d.nc).
 #' Subset dates with \code{process_gridmet()}. These files are several GB each.
-#' This is distinct from the global CSIC SPEI product in \code{download_drought()}.
+#' This is distinct from the global CSIC SPEI product in
+#' \code{download_drought()}.
 #' See \url{https://www.northwestknowledge.net/metdata/data/}.
 #' @examples
 #' \dontrun{
@@ -3553,7 +3554,9 @@ download_gridmet <- function(
     download_result <- list(
       success = 0,
       failed = 0,
-      skipped = sum(ifelse(grepl("^(spei|eddi)", variables_list), 1L, length(years)))
+      skipped = sum(ifelse(
+        grepl("^(spei|eddi)", variables_list), 1L, length(years)
+      ))
     )
   }
 

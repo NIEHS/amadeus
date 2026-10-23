@@ -3733,7 +3733,9 @@ process_gridmet <- function(
   )
   #### SPEI files span all years; annual covariates encode years in filenames.
   if (grepl("^(spei|eddi)", variable_checked)) {
-    data_paths <- data_paths[basename(data_paths) == paste0(variable_checked, ".nc")]
+    data_paths <- data_paths[
+      basename(data_paths) == paste0(variable_checked, ".nc")
+    ]
   } else {
     #### subset file paths to only dates of interest
     data_paths <- unique(
