@@ -69,8 +69,10 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.2" id="amadeus-202">amadeus 2.0.2<a class="anchor" aria-label="anchor" href="#amadeus-202"></a></h2>
-<ul><li>Fixed process_gridmet() to use valid native NetCDF time metadata from terra::time() when available and fall back to layer-name parsing when needed</li>
-<li>Fixed download_gridmet() to handle cases where all requested files already exist locally without calling download_run_method() with an empty URL list</li>
+<ul><li><p>Added GRIDMET EDDI integration for all eight accumulation periods, with <code>eddi</code> defaulting to <code>eddi30d</code>.</p></li>
+<li><p>Added native 4-km GRIDMET SPEI downloads and extraction for eight accumulation periods, retaining five-day observation dates; <code>spei</code> defaults to <code>spei30d</code>.</p></li>
+<li><p>Fixed process_gridmet() to use valid native NetCDF time metadata from terra::time() when available and fall back to layer-name parsing when needed</p></li>
+<li><p>Fixed download_gridmet() to handle cases where all requested files already exist locally without calling download_run_method() with an empty URL list</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.0" id="amadeus-200">amadeus 2.0.0<a class="anchor" aria-label="anchor" href="#amadeus-200"></a></h2><p class="text-muted">CRAN release: 2026-05-21</p>

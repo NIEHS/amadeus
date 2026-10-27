@@ -71,6 +71,21 @@ calculate_gridmet(
 
 a data.frame or SpatVector object
 
+## Details
+
+EDDI uses the same native GRIDMET multi-year workflow as SPEI. Use
+`eddi14d`, `eddi30d`, `eddi90d`, `eddi180d`, `eddi270d`, `eddi1y`,
+`eddi2y`, or `eddi5y`; `eddi` defaults to `eddi30d`. Both indices retain
+the native 1/24-degree grid and five-day observation dates. Select
+dataset `gridmet` in the wrapper functions to use these products; the
+standalone drought source aliases continue to select their separate
+products. GRIDMET SPEI rasters from
+[`process_gridmet()`](https://niehs.github.io/amadeus/reference/process_gridmet.md)
+use the same extraction workflow as other GRIDMET covariates.
+Accumulation codes are retained in output column names (e.g., spei30d),
+and native five-day observation dates are preserved when
+`.by_time = NULL`; no daily interpolation is performed.
+
 ## See also
 
 [`process_gridmet()`](https://niehs.github.io/amadeus/reference/process_gridmet.md)

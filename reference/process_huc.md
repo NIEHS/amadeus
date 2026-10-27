@@ -42,7 +42,7 @@ process_huc(
 - ...:
 
   Arguments passed to
-  [`hydrogeofetch::get_huc()`](https://doi-usgs.github.io/nhdplusTools/reference/get_huc.html)
+  [`hydrogeofetch::get_huc()`](https://doi-usgs.github.io/hydrogeofetch/reference/get_huc.html)
 
 ## Value
 
@@ -50,7 +50,7 @@ a `SpatVector` object
 
 ## See also
 
-[`hydrogeofetch::get_huc`](https://doi-usgs.github.io/nhdplusTools/reference/get_huc.html)
+[`hydrogeofetch::get_huc`](https://doi-usgs.github.io/hydrogeofetch/reference/get_huc.html)
 
 ## Author
 

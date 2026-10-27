@@ -71,6 +71,27 @@ invisible list with download results; or hash character if hash=TRUE
 
 gridMET data does not require authentication.
 
+## Details
+
+EDDI uses the same native GRIDMET multi-year workflow as SPEI. Use
+`eddi14d`, `eddi30d`, `eddi90d`, `eddi180d`, `eddi270d`, `eddi1y`,
+`eddi2y`, or `eddi5y`; `eddi` defaults to `eddi30d`. Both indices retain
+the native 1/24-degree grid and five-day observation dates. Select
+dataset `gridmet` in the wrapper functions to use these products; the
+standalone drought source aliases continue to select their separate
+products. GRIDMET SPEI is available directly from the provider as
+multi-year files (one file per accumulation period), at native five-day
+intervals on the approximately 4-km grid. Use `"spei14d"`, `"spei30d"`,
+`"spei90d"`, `"spei180d"`, `"spei270d"`, `"spei1y"`, `"spei2y"`, or
+`"spei5y"`; `"spei"` aliases `"spei30d"`. For SPEI, `year` does not
+subset the download: the complete multi-year file is saved under its
+resolved code directory (e.g., spei30d/spei30d.nc). Subset dates with
+[`process_gridmet()`](https://niehs.github.io/amadeus/reference/process_gridmet.md).
+These files are several GB each. This is distinct from the global CSIC
+SPEI product in
+[`download_drought()`](https://niehs.github.io/amadeus/reference/download_drought.md).
+See <https://www.northwestknowledge.net/metdata/data/>.
+
 ## References
 
 Abatzoglou JT (2013). “Development of gridded surface meteorological
