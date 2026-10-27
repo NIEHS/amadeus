@@ -1921,6 +1921,13 @@ process_aqs <-
     mode <- match.arg(mode)
     return_format <- match.arg(return_format)
     resolution_temporal <- match.arg(resolution_temporal)
+    if (missing(data_field)) {
+      data_field <- if (resolution_temporal == "hourly") {
+        "Sample.Measurement"
+      } else {
+        "Arithmetic.Mean"
+      }
+    }
     tz <- match.arg(tz)
     date_tz <- ifelse(tz == "local", "Date.Local", "Date.GMT")
     if (resolution_temporal == "daily" & tz == "gmt") {
