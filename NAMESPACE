@@ -163,96 +163,114 @@ import(stars)
 importFrom(Rdpack,reprompt)
 importFrom(archive,archive_extract)
 importFrom(collapse,rowbind)
-importFrom(data.table,.SD)
-importFrom(data.table,as.data.table)
-importFrom(data.table,fread)
-importFrom(data.table,month)
-importFrom(data.table,rbindlist)
-importFrom(data.table,setnames)
-importFrom(data.table,year)
-importFrom(dplyr,across)
-importFrom(dplyr,all_of)
-importFrom(dplyr,as_tibble)
-importFrom(dplyr,bind_rows)
-importFrom(dplyr,distinct)
-importFrom(dplyr,ends_with)
-importFrom(dplyr,filter)
-importFrom(dplyr,group_by)
-importFrom(dplyr,lag)
-importFrom(dplyr,left_join)
-importFrom(dplyr,mutate)
-importFrom(dplyr,select)
-importFrom(dplyr,summarize)
-importFrom(dplyr,ungroup)
+importFrom(data.table,
+  .SD,
+  as.data.table,
+  fread,
+  month,
+  rbindlist,
+  setnames,
+  year
+)
+importFrom(dplyr,
+  across,
+  all_of,
+  as_tibble,
+  bind_rows,
+  distinct,
+  ends_with,
+  filter,
+  group_by,
+  lag,
+  left_join,
+  mutate,
+  select,
+  summarize,
+  ungroup
+)
 importFrom(exactextractr,exact_extract)
-importFrom(httr2,req_error)
-importFrom(httr2,req_headers)
-importFrom(httr2,req_method)
-importFrom(httr2,req_options)
-importFrom(httr2,req_perform)
-importFrom(httr2,req_progress)
-importFrom(httr2,req_retry)
-importFrom(httr2,req_throttle)
-importFrom(httr2,req_timeout)
-importFrom(httr2,request)
-importFrom(httr2,resp_body_string)
-importFrom(httr2,resp_status)
+importFrom(httr2,
+  req_error,
+  req_headers,
+  req_method,
+  req_options,
+  req_perform,
+  req_progress,
+  req_retry,
+  req_throttle,
+  req_timeout,
+  request,
+  resp_body_string,
+  resp_status
+)
 importFrom(methods,is)
-importFrom(rlang,inject)
-importFrom(rlang,sym)
-importFrom(sf,st_as_sf)
-importFrom(sf,st_as_sfc)
-importFrom(sf,st_bbox)
-importFrom(sf,st_buffer)
-importFrom(sf,st_crs)
-importFrom(sf,st_drop_geometry)
-importFrom(sf,st_geometry)
-importFrom(sf,st_intersects)
-importFrom(sf,st_read)
-importFrom(sf,st_transform)
-importFrom(sf,st_union)
-importFrom(stars,read_stars)
-importFrom(stars,st_mosaic)
-importFrom(stars,st_warp)
-importFrom(stats,aggregate)
-importFrom(stats,na.omit)
-importFrom(stats,runif)
-importFrom(stats,setNames)
+importFrom(rlang,
+  inject,
+  sym
+)
+importFrom(sf,
+  st_as_sf,
+  st_as_sfc,
+  st_bbox,
+  st_buffer,
+  st_crs,
+  st_drop_geometry,
+  st_geometry,
+  st_intersects,
+  st_read,
+  st_transform,
+  st_union
+)
+importFrom(stars,
+  read_stars,
+  st_mosaic,
+  st_warp
+)
+importFrom(stats,
+  aggregate,
+  na.omit,
+  runif,
+  setNames
+)
 importFrom(stringi,stri_pad)
-importFrom(terra,aggregate)
-importFrom(terra,as.data.frame)
-importFrom(terra,buffer)
-importFrom(terra,coltab)
-importFrom(terra,crop)
-importFrom(terra,crs)
-importFrom(terra,describe)
-importFrom(terra,distance)
-importFrom(terra,expanse)
-importFrom(terra,ext)
-importFrom(terra,extract)
-importFrom(terra,intersect)
-importFrom(terra,is.rotated)
-importFrom(terra,linearUnits)
-importFrom(terra,merge)
-importFrom(terra,metags)
-importFrom(terra,mosaic)
-importFrom(terra,names)
-importFrom(terra,nearby)
-importFrom(terra,nlyr)
-importFrom(terra,perim)
-importFrom(terra,project)
-importFrom(terra,rast)
-importFrom(terra,set.crs)
-importFrom(terra,sprc)
-importFrom(terra,subset)
-importFrom(terra,tapp)
-importFrom(terra,time)
-importFrom(terra,values)
-importFrom(terra,varnames)
-importFrom(terra,vect)
-importFrom(terra,vector_layers)
+importFrom(terra,
+  aggregate,
+  as.data.frame,
+  buffer,
+  coltab,
+  crop,
+  crs,
+  describe,
+  distance,
+  expanse,
+  ext,
+  extract,
+  intersect,
+  is.rotated,
+  linearUnits,
+  merge,
+  metags,
+  mosaic,
+  names,
+  nearby,
+  nlyr,
+  perim,
+  project,
+  rast,
+  set.crs,
+  sprc,
+  subset,
+  tapp,
+  time,
+  values,
+  varnames,
+  vect,
+  vector_layers
+)
 importFrom(tidyr,pivot_wider)
 importFrom(tools,file_path_sans_ext)
-importFrom(utils,head)
-importFrom(utils,read.csv)
-importFrom(utils,tail)
+importFrom(utils,
+  head,
+  read.csv,
+  tail
+)

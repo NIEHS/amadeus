@@ -11,6 +11,8 @@ process_aqs(
   data_field = "Arithmetic.Mean",
   return_format = c("terra", "sf", "data.table"),
   extent = NULL,
+  resolution_temporal = c("daily", "hourly"),
+  tz = c("local", "gmt"),
   ...
 )
 }
@@ -34,6 +36,9 @@ Should be in \code{"YYYY-MM-DD"} format and sorted.}
 \item{extent}{numeric(4). Spatial extent of the resulting object.
 The order should be \code{c(xmin, xmax, ymin, ymax)}.
 The coordinate system should be WGS84 (EPSG:4326).}
+
+\item{resolution_temporal}{character(1). Daily or hourly data, must match
+\code{resolution_temporal} argument passed to \code{amadeus::download_aqs}}
 
 \item{...}{Placeholders.}
 }

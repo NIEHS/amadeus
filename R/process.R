@@ -1872,6 +1872,8 @@ process_nei <- function(
 #'   * "location" (unique locations).
 #' @param data_field character(1). Data field to extract.
 #' @param return_format character(1). `"terra"` or `"sf"` or `"data.table"`.
+#' @param resolution_temporal character(1). Daily or hourly data, must match
+#' `resolution_temporal` argument passed to `amadeus::download_aqs`
 #' @param extent numeric(4). Spatial extent of the resulting object.
 #'   The order should be `c(xmin, xmax, ymin, ymax)`.
 #'   The coordinate system should be WGS84 (EPSG:4326).
@@ -1912,10 +1914,30 @@ process_aqs <-
     data_field = "Arithmetic.Mean",
     return_format = c("terra", "sf", "data.table"),
     extent = NULL,
+    resolution_temporal = c("daily", "hourly"),
+    tz = c("local", "gmt"),
     ...
   ) {
     mode <- match.arg(mode)
     return_format <- match.arg(return_format)
+    resolution_temporal <- match.arg(resolution_temporal)
+    if (missing(data_field)) {
+      data_field <- if (resolution_temporal == "hourly") {
+        "Sample.Measurement"
+      } else {
+        "Arithmetic.Mean"
+      }
+    }
+    tz <- match.arg(tz)
+    date_tz <- ifelse(tz == "local", "Date.Local", "Date.GMT")
+    if (resolution_temporal == "daily" & tz == "gmt") {
+      message(
+        "GMT time zone not applicable for daily data; using `Date.Local`."
+      )
+      date_tz <- "Date.Local"
+    }
+    time_tz <- ifelse(tz == "local", "Time.Local", "Time.GMT")
+
     if (!is.null(date)) {
       date <- try(as.Date(date), silent = TRUE)
       if (inherits(date, "try-error")) {
@@ -1966,9 +1988,10 @@ process_aqs <-
     date_start <- as.Date(date[1])
     date_end <- as.Date(date[2])
     date_sequence <- seq(date_start, date_end, "day")
+    time_sequence <- sprintf("%02d:00", 0:23)
 
     parsed_dates <- as.Date(rep(NA_character_, nrow(sites)))
-    raw_dates <- as.character(sites$Date.Local)
+    raw_dates <- as.character(sites[[date_tz]])
     slash_idx <- grepl("/", raw_dates, fixed = TRUE)
     dash_idx <- grepl("-", raw_dates, fixed = TRUE)
     parsed_dates[slash_idx] <- as.Date(
@@ -1976,47 +1999,62 @@ process_aqs <-
       format = "%m/%d/%Y"
     )
     parsed_dates[dash_idx] <- as.Date(raw_dates[dash_idx], format = "%Y-%m-%d")
-    sites$Date.Local <- parsed_dates
+    sites[[date_tz]] <- parsed_dates
     duration_keep <- startsWith(as.character(sites$Sample.Duration), "24")
-    if ("Observation.Count" %in% names(sites)) {
+    if (resolution_temporal == "hourly") {
+      duration_keep <- rep(TRUE, nrow(sites))
+    } else if ("Observation.Count" %in% names(sites)) {
       duration_keep <-
         duration_keep |
         (!is.na(sites$Observation.Count) & sites$Observation.Count == 24)
     }
     sites$duration_keep <- duration_keep
 
+    # Time column
+    chr_time <- if (resolution_temporal == "daily") {
+      as.character(sites[[date_tz]])
+    } else {
+      as.character(paste0(sites[[date_tz]], " ", sites[[time_tz]]))
+    }
     # select relevant fields only
     sites <- sites |>
       dplyr::as_tibble() |>
-      dplyr::filter(Date.Local %in% date_sequence) |>
+      dplyr::mutate(time = chr_time) |>
+      dplyr::filter(.data[[date_tz]] %in% date_sequence) |>
       dplyr::filter(duration_keep) |>
       dplyr::group_by(site_id) |>
       dplyr::filter(POC == min(POC)) |>
-      dplyr::mutate(time = as.character(Date.Local)) |>
       dplyr::ungroup()
+
     col_sel <- c("site_id", "Longitude", "Latitude", "Datum")
     if (mode != "available-data") {
       sites_v <- unique(sites[, col_sel])
     } else {
-      col_sel <- append(col_sel, "Event.Type")
-      col_sel <- append(col_sel, "time")
-      col_sel <- append(col_sel, data_field)
+      col_sel <- unique(c(
+        col_sel,
+        if (resolution_temporal == "daily") "Event.Type",
+        "time",
+        data_field
+      ))
       sites_v <- sites |>
         dplyr::select(dplyr::all_of(col_sel)) |>
         dplyr::distinct()
-      # excluding site-time with multiple event types
-      # sites_vdup will be "subtracted" from the original sites_v
-      sites_vdup <- sites_v |>
-        dplyr::group_by(site_id, time) |>
-        dplyr::filter(dplyr::n() > 1) |>
-        dplyr::filter(!!dplyr::sym("Event.Type") == "Excluded") |>
-        dplyr::ungroup()
-      sites_v <-
-        dplyr::anti_join(
-          sites_v,
-          sites_vdup,
-          by = c("site_id", "time", "Event.Type")
-        )
+
+      if ("Event.Type" %in% col_sel) {
+        # excluding site-time with multiple event types
+        # sites_vdup will be "subtracted" from the original sites_v
+        sites_vdup <- sites_v |>
+          dplyr::group_by(site_id, time) |>
+          dplyr::filter(dplyr::n() > 1) |>
+          dplyr::filter(!!dplyr::sym("Event.Type") == "Excluded") |>
+          dplyr::ungroup()
+        sites_v <-
+          dplyr::anti_join(
+            sites_v,
+            sites_vdup,
+            by = c("site_id", "time", "Event.Type")
+          )
+      }
     }
     names(sites_v)[2:3] <- c("lon", "lat")
     sites_v <- data.table::as.data.table(sites_v)
@@ -2053,8 +2091,14 @@ process_aqs <-
       ]
 
     if (mode == "date-location") {
+      dl_sequence <- if (resolution_temporal == "daily") {
+        date_sequence
+      } else {
+        df_sequence <- expand.grid(date_sequence, time_sequence)
+        paste0(df_sequence[, 1], " ", df_sequence[, 2])
+      }
       final_sites <-
-        split(as.character(date_sequence), as.character(date_sequence)) |>
+        split(as.character(dl_sequence), as.character(dl_sequence)) |>
         lapply(function(x) {
           fs_time <- final_sites
           fs_time$time <- x
@@ -2095,7 +2139,6 @@ process_aqs <-
 
     return(final_sites)
   }
-
 
 # nolint start
 #' Process EDGAR emissions data
