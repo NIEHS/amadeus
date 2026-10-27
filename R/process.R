@@ -2001,12 +2001,12 @@ process_aqs <-
     parsed_dates[dash_idx] <- as.Date(raw_dates[dash_idx], format = "%Y-%m-%d")
     sites[[date_tz]] <- parsed_dates
     duration_keep <- startsWith(as.character(sites$Sample.Duration), "24")
-    if ("Observation.Count" %in% names(sites)) {
+    if (resolution_temporal == "hourly") {
+      duration_keep <- rep(TRUE, nrow(sites))
+    } else if ("Observation.Count" %in% names(sites)) {
       duration_keep <-
         duration_keep |
         (!is.na(sites$Observation.Count) & sites$Observation.Count == 24)
-    } else {
-      duration_keep <- rep(TRUE, nrow(sites))
     }
     sites$duration_keep <- duration_keep
 
