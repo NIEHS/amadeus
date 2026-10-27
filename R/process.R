@@ -1915,11 +1915,21 @@ process_aqs <-
     return_format = c("terra", "sf", "data.table"),
     extent = NULL,
     resolution_temporal = c("daily", "hourly"),
+    tz = c("local", "gmt"),
     ...
   ) {
     mode <- match.arg(mode)
     return_format <- match.arg(return_format)
     resolution_temporal <- match.arg(resolution_temporal)
+    tz <- match.arg(tz)
+    date_tz <- ifelse(tz == "local", "Date.Local", "Date.GMT")
+    if (resolution_temporal == "daily" & tz == "gmt") {
+      message(
+        "GMT time zone not applicable for daily data; using `Date.Local`."
+      )
+      date_tz <- "Date.Local"
+    }
+    time_tz <- ifelse(tz == "local", "Time.Local", "Time.GMT")
 
     if (!is.null(date)) {
       date <- try(as.Date(date), silent = TRUE)
@@ -1974,7 +1984,7 @@ process_aqs <-
     time_sequence <- sprintf("%02d:00", 0:23)
 
     parsed_dates <- as.Date(rep(NA_character_, nrow(sites)))
-    raw_dates <- as.character(sites$Date.Local)
+    raw_dates <- as.character(sites[[date_tz]])
     slash_idx <- grepl("/", raw_dates, fixed = TRUE)
     dash_idx <- grepl("-", raw_dates, fixed = TRUE)
     parsed_dates[slash_idx] <- as.Date(
@@ -1982,7 +1992,7 @@ process_aqs <-
       format = "%m/%d/%Y"
     )
     parsed_dates[dash_idx] <- as.Date(raw_dates[dash_idx], format = "%Y-%m-%d")
-    sites$Date.Local <- parsed_dates
+    sites[[date_tz]] <- parsed_dates
     duration_keep <- startsWith(as.character(sites$Sample.Duration), "24")
     if ("Observation.Count" %in% names(sites)) {
       duration_keep <-
@@ -1995,16 +2005,15 @@ process_aqs <-
 
     # Time column
     chr_time <- if (resolution_temporal == "daily") {
-      as.character(sites$Date.Local)
+      as.character(sites[[date_tz]])
     } else {
-      as.character(paste0(sites$Date.Local, " ", sites$Time.Local))
+      as.character(paste0(sites[[date_tz]], " ", sites[[time_tz]]))
     }
-
     # select relevant fields only
     sites <- sites |>
       dplyr::as_tibble() |>
       dplyr::mutate(time = chr_time) |>
-      dplyr::filter(Date.Local %in% date_sequence) |>
+      dplyr::filter(.data[[date_tz]] %in% date_sequence) |>
       dplyr::filter(duration_keep) |>
       dplyr::group_by(site_id) |>
       dplyr::filter(POC == min(POC)) |>
@@ -2123,7 +2132,6 @@ process_aqs <-
 
     return(final_sites)
   }
-
 
 # nolint start
 #' Process EDGAR emissions data

@@ -12,6 +12,7 @@ process_aqs(
   return_format = c("terra", "sf", "data.table"),
   extent = NULL,
   resolution_temporal = c("daily", "hourly"),
+  tz = c("local", "gmt"),
   ...
 )
 }

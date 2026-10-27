@@ -473,6 +473,35 @@ testthat::test_that("process_aqs", {
     ),
     "Extent is not applicable for data.table. Returning data.table..."
   )
+
+  # Time zone tests.
+  testthat::expect_no_error(
+    dt_aqs_local <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "available-data",
+      return_format = "sf",
+      tz = "local"
+    )
+  )
+  # ensure character time which contains date and hour
+  testthat::expect_true(is.character(dt_aqs_local$time))
+  testthat::expect_equal(unique(nchar(dt_aqs_local$time)), 10)
+  testthat::expect_message(
+    dt_aqs_gmt <- process_aqs(
+      path = aqssub,
+      date = c("2022-02-04", "2022-02-28"),
+      mode = "available-data",
+      return_format = "sf",
+      tz = "gmt"
+    )
+  )
+  # ensure character time which contains date and hour
+  testthat::expect_true(is.character(dt_aqs_gmt$time))
+  testthat::expect_equal(unique(nchar(dt_aqs_gmt$time)), 10)
+
+  # Expect same  dates for local and GMT when resolution = "daily"
+  testthat::expect_all_true(dt_aqs_local$time == dt_aqs_gmt$time)
 })
 
 testthat::test_that("process_aqs handles mixed AQS date and duration formats", {
@@ -623,6 +652,56 @@ testthat::test_that("process_aqs(resolution_temporal = 'hourly')", {
   )
   # date-location and "hourly" expands dates * times * sites
   testthat::expect_equal(nrow(dt_aqs3), 72L)
+})
+
+testthat::test_that("process_aqs('hourly', tz = 'local')", {
+  withr::local_package("terra")
+  withr::local_package("data.table")
+  withr::local_package("sf")
+  withr::local_package("dplyr")
+
+  # No error when tz = "gmt"
+  testthat::expect_no_error(
+    dt_aqs_gmt <- process_aqs(
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "aqs",
+        "hourly_88101_2020.csv"
+      ),
+      date = c("2020-01-01", "2020-12-31"),
+      mode = "available-data",
+      resolution_temporal = "hourly",
+      data_field = "Sample.Measurement",
+      tz = "gmt"
+    )
+  )
+  # ensure character time which contains date and hour
+  testthat::expect_true(is.character(dt_aqs_gmt$time))
+  testthat::expect_equal(unique(nchar(dt_aqs_gmt$time)), 16)
+
+  # No error when tz = "local"
+  testthat::expect_no_error(
+    dt_aqs_local <- process_aqs(
+      path = testthat::test_path(
+        "..",
+        "testdata",
+        "aqs",
+        "hourly_88101_2020.csv"
+      ),
+      date = c("2020-01-01", "2020-12-31"),
+      mode = "available-data",
+      resolution_temporal = "hourly",
+      data_field = "Sample.Measurement",
+      tz = "local"
+    )
+  )
+  # ensure character time which contains date and hour
+  testthat::expect_true(is.character(dt_aqs_local$time))
+  testthat::expect_equal(unique(nchar(dt_aqs_local$time)), 16)
+
+  # Expect differences between local and GMT times.
+  testthat::expect_all_false(dt_aqs_local$time == dt_aqs_gmt$time)
 })
 
 testthat::test_that("download_aqs remove_command deprecation warning", {
