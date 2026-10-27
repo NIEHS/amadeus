@@ -446,6 +446,15 @@ process_gridmet_codes <-
     invert = FALSE
   ) {
     names <- c(
+      paste0("Evaporative Demand Drought Index (",
+             c("14 day", "30 day", "90 day", "180 day", "270 day",
+               "1 year", "2 year", "5 year"), ")"),
+      paste0(
+        "Standardized Precipitation Evapotranspiration Index (",
+        c("14 day", "30 day", "90 day", "180 day", "270 day",
+          "1 year", "2 year", "5 year"),
+        ")"
+      ),
       "Near-Surface Specific Humidity",
       "Mean Vapor Pressure Deficit",
       "Precipitation",
@@ -465,6 +474,10 @@ process_gridmet_codes <-
       "1000-hour dead fuel moisture"
     )
     codes <- c(
+      "eddi14d", "eddi30d", "eddi90d", "eddi180d", "eddi270d",
+      "eddi1y", "eddi2y", "eddi5y",
+      "spei14d", "spei30d", "spei90d", "spei180d", "spei270d",
+      "spei1y", "spei2y", "spei5y",
       "sph",
       "vpd",
       "pr",
@@ -580,7 +593,15 @@ process_variable_codes <-
       code_function <- process_terraclimate_codes
     }
     names_codes <- do.call(code_function, list(string = "all"))
-    code_matches <- match(tolower(variables), tolower(names_codes[, 2]))
+    variables <- as.character(variables)
+    if (tolower(source) == "gridmet") {
+      variables[tolower(variables) == "spei"] <- "spei30d"
+      variables[tolower(variables) == "eddi"] <- "eddi30d"
+    }
+    code_matches <- match(
+      tolower(variables),
+      tolower(names_codes[, 2])
+    )
     if (all(!is.na(code_matches))) {
       return(unname(names_codes[code_matches, 2]))
     } else {

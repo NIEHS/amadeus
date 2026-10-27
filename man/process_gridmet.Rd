@@ -38,6 +38,23 @@ data, returning a single \code{SpatRaster} object.
 Layer names of the returned \code{SpatRaster} object contain the variable acronym,
 and date.
 }
+\details{
+EDDI uses the same native GRIDMET multi-year workflow as SPEI.
+Use \code{eddi14d}, \code{eddi30d}, \code{eddi90d}, \code{eddi180d},
+\code{eddi270d}, \code{eddi1y}, \code{eddi2y}, or \code{eddi5y};
+\code{eddi} defaults to \code{eddi30d}. Both indices retain the native
+1/24-degree grid and five-day observation dates. Select dataset
+\code{gridmet} in the wrapper functions to use these products; the
+standalone drought source aliases continue to select their separate products.
+GRIDMET SPEI uses native five-day observations, not daily values.
+Use \code{variable = "spei"} (alias for \code{"spei30d"}) or an explicit
+accumulation code: \code{"spei14d"}, \code{"spei30d"}, \code{"spei90d"},
+\code{"spei180d"}, \code{"spei270d"}, \code{"spei1y"}, \code{"spei2y"},
+or \code{"spei5y"}. Set \code{path} to the code directory created by
+\code{download_gridmet()} (e.g., spei30d). The multi-year file is subset
+using its observation dates; no daily interpolation is performed.
+Layer names retain the accumulation period (e.g., spei30d_20200105).
+}
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
 ##       amount of data which is not included in the package.

@@ -51,6 +51,19 @@ Extract gridMET values at point locations. Returns a \code{data.frame}
 object containing \code{locs_id} and gridMET variable. gridMET variable
 column name reflects the gridMET variable and circular buffer radius.
 }
+\details{
+EDDI uses the same native GRIDMET multi-year workflow as SPEI.
+Use \code{eddi14d}, \code{eddi30d}, \code{eddi90d}, \code{eddi180d},
+\code{eddi270d}, \code{eddi1y}, \code{eddi2y}, or \code{eddi5y};
+\code{eddi} defaults to \code{eddi30d}. Both indices retain the native
+1/24-degree grid and five-day observation dates. Select dataset
+\code{gridmet} in the wrapper functions to use these products; the
+standalone drought source aliases continue to select their separate products.
+GRIDMET SPEI rasters from \code{process_gridmet()} use the same extraction
+workflow as other GRIDMET covariates. Accumulation codes are retained in
+output column names (e.g., spei30d), and native five-day observation dates
+are preserved when \code{.by_time = NULL}; no daily interpolation is performed.
+}
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
 ##       amount of data which is not included in the package.

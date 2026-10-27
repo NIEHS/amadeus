@@ -49,6 +49,25 @@ Climatology Lab's gridMET dataset.
 \note{
 gridMET data does not require authentication.
 }
+\details{
+EDDI uses the same native GRIDMET multi-year workflow as SPEI.
+Use \code{eddi14d}, \code{eddi30d}, \code{eddi90d}, \code{eddi180d},
+\code{eddi270d}, \code{eddi1y}, \code{eddi2y}, or \code{eddi5y};
+\code{eddi} defaults to \code{eddi30d}. Both indices retain the native
+1/24-degree grid and five-day observation dates. Select dataset
+\code{gridmet} in the wrapper functions to use these products; the
+standalone drought source aliases continue to select their separate products.
+GRIDMET SPEI is available directly from the provider as multi-year files
+(one file per accumulation period), at native five-day intervals on the
+approximately 4-km grid. Use \code{"spei14d"}, \code{"spei30d"},
+\code{"spei90d"}, \code{"spei180d"}, \code{"spei270d"}, \code{"spei1y"},
+\code{"spei2y"}, or \code{"spei5y"}; \code{"spei"} aliases \code{"spei30d"}.
+For SPEI, \code{year} does not subset the download: the complete multi-year
+file is saved under its resolved code directory (e.g., spei30d/spei30d.nc).
+Subset dates with \code{process_gridmet()}. These files are several GB each.
+This is distinct from the global CSIC SPEI product in \code{download_drought()}.
+See \url{https://www.northwestknowledge.net/metdata/data/}.
+}
 \examples{
 \dontrun{
 download_gridmet(
