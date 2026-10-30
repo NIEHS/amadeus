@@ -19,23 +19,21 @@ calculate_groads(
 \arguments{
 \item{from}{SpatVector(1). Output of \code{process_groads}.}
 
-\item{locs}{data.frame, characater to file path, SpatVector, or sf object.}
+\item{locs}{data.frame, SpatVector, or sf object with point or polygon
+locations. Tabular coordinates must be WGS84 \code{lon} and \code{lat}; spatial
+inputs must have a known CRS. Polygons are expanded by \code{radius} metres.}
 
-\item{locs_id}{character(1). Column within \code{locations} CSV file
-containing identifier for each unique coordinate location.}
+\item{locs_id}{character(1). Column containing unique, non-missing site IDs.}
 
-\item{radius}{integer(1). Circular buffer distance around site locations.
-(Default = 1000).}
+\item{radius}{integer(1). Positive circular buffer distance in metres
+(default = 1000).}
 
-\item{fun}{function(1). Function used to summarize the length of roads
-within sites location buffer (Default is \code{sum}).}
+\item{fun}{character(1) or function. Must be \code{"sum"} or \code{base::sum}.}
 
 \item{drop}{logical(1). Should locations with zero roads in the extraction
 buffer be dropped from results? Default is \code{FALSE} (retain all locations).}
 
-\item{weights}{\code{NULL}, \code{SpatRaster}, polygon \code{SpatVector}/\code{sf}, or file
-path. Optional weights raster for weighted extraction. If \code{NULL}
-(default), unweighted extraction is performed.}
+\item{weights}{NULL. Weighted road extraction is not supported.}
 
 \item{geom}{FALSE/"sf"/"terra".. Should the function return with geometry?
 Default is \code{FALSE}, options with geometry are "sf" or "terra". The
@@ -47,15 +45,17 @@ coordinate reference system of the \code{sf} or \code{SpatVector} is that of \co
 a data.frame or SpatVector object
 }
 \description{
-Prepared groads data is clipped with the buffer polygons
-of \code{radius}. The total length of the roads are calculated.
-Then the density of the roads is calculated by dividing
-the total length from the area of the buffer. \code{terra::linearUnits()}
-is used to convert the unit of length to meters.
+Roads are clipped to geographic buffers of \code{radius} metres.
+Lengths and each buffer's area are measured on the ellipsoid and returned
+as total kilometres and kilometres per square kilometre. Buffers are
+approximated by polygons with 180 segments per quadrant. Source CRS units
+do not change the buffer distance or measurement units.
 }
 \note{
-Unit is km / sq km. The returned \code{data.frame} object contains a
-\verb{$time} column to represent the temporal range covered by the
+Total length is in km and density is in km / sq km. A zero means
+no supplied road geometry intersects the buffer, not verified data coverage.
+Recorded line features are summed without deduplication. The returned
+\verb{$description} column represents the temporal range covered by the
 dataset. For more information, see \url{https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1}.
 }
 \examples{

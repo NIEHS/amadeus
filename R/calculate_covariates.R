@@ -3338,31 +3338,31 @@ calculate_population <- function(
 
 
 #' Calculate roads covariates
-#' @description Prepared groads data is clipped with the buffer polygons
-#' of `radius`. The total length of the roads are calculated.
-#' Then the density of the roads is calculated by dividing
-#' the total length from the area of the buffer. `terra::linearUnits()`
-#' is used to convert the unit of length to meters.
+#' @description Roads are clipped to geographic buffers of `radius` metres.
+#' Lengths and each buffer's area are measured on the ellipsoid and returned
+#' as total kilometres and kilometres per square kilometre. Buffers are
+#' approximated by polygons with 180 segments per quadrant. Source CRS units
+#' do not change the buffer distance or measurement units.
 #' @param from SpatVector(1). Output of `process_groads`.
-#' @param locs data.frame, characater to file path, SpatVector, or sf object.
-#' @param locs_id character(1). Column within `locations` CSV file
-#' containing identifier for each unique coordinate location.
-#' @param radius integer(1). Circular buffer distance around site locations.
-#' (Default = 1000).
-#' @param fun function(1). Function used to summarize the length of roads
-#' within sites location buffer (Default is `sum`).
+#' @param locs data.frame, SpatVector, or sf object with point or polygon
+#'   locations. Tabular coordinates must be WGS84 `lon` and `lat`; spatial
+#'   inputs must have a known CRS. Polygons are expanded by `radius` metres.
+#' @param locs_id character(1). Column containing unique, non-missing site IDs.
+#' @param radius integer(1). Positive circular buffer distance in metres
+#'   (default = 1000).
+#' @param fun character(1) or function. Must be `"sum"` or `base::sum`.
 #' @param drop logical(1). Should locations with zero roads in the extraction
 #' buffer be dropped from results? Default is `FALSE` (retain all locations).
 #' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
 #' Default is `FALSE`, options with geometry are "sf" or "terra". The
 #' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
-#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
-#'   path. Optional weights raster for weighted extraction. If `NULL`
-#'   (default), unweighted extraction is performed.
+#' @param weights NULL. Weighted road extraction is not supported.
 #' @param ... Placeholders.
 # nolint start
-#' @note Unit is km / sq km. The returned `data.frame` object contains a
-#' `$time` column to represent the temporal range covered by the
+#' @note Total length is in km and density is in km / sq km. A zero means
+#' no supplied road geometry intersects the buffer, not verified data coverage.
+#' Recorded line features are summed without deduplication. The returned
+#' `$description` column represents the temporal range covered by the
 #' dataset. For more information, see <https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1>.
 # nolint end
 #' @author Insang Song
@@ -3406,115 +3406,128 @@ calculate_groads <- function(
   ...
 ) {
   amadeus::check_unsupported_by(..., .call = sys.call())
-  #### check for null parameters
-  if (radius <= 0) {
-    stop("radius should be greater than 0.\n")
+  amadeus::check_geom(geom)
+  if (!is.numeric(radius) || length(radius) != 1L ||
+      !is.finite(radius) || radius <= 0 || radius != floor(radius)) {
+    stop("`radius` must be a single positive, finite integer in metres.")
   }
-  if (!is.logical(drop) || length(drop) != 1 || is.na(drop)) {
+  if (!is.logical(drop) || length(drop) != 1L || is.na(drop)) {
     stop("`drop` should be a single logical value (TRUE/FALSE).")
   }
-  #### prepare locations list
-  sites_list <- amadeus::calc_prepare_locs(
-    from = from,
-    locs = locs,
-    locs_id = locs_id,
-    radius = radius,
-    geom = geom
-  )
-  sites_e <- sites_list[[1]]
-
-  from_re <- terra::project(from, terra::crs(sites_e))
-  from_re <- from[terra::ext(sites_e), ]
-  from_clip <- terra::intersect(sites_e, from_re)
-  area_buffer <- sites_e[1, ]
-  area_buffer <- terra::expanse(area_buffer)
-
-  # assign road lengths to rlength field
-  from_clip$rlength <- terra::perim(from_clip)
-  from_clip <-
-    aggregate(
-      from_clip$rlength,
-      by = from_clip[[locs_id]],
-      FUN = fun,
-      na.rm = TRUE
-    )
-  # linear unit conversion
-  # if no unit is detected, set to 1
-  det_unit <- terra::linearUnits(from_re)
-  if (det_unit == 0) {
-    det_unit <- 1
+  if (!identical(match.fun(fun), base::sum)) {
+    stop("`fun` must be 'sum' to calculate total road length and density.")
+  }
+  if (!is.null(weights)) {
+    stop("`weights` is not supported for road length and density.")
+  }
+  if (!inherits(from, "SpatVector") ||
+      (nrow(from) > 0L && terra::geomtype(from) != "lines")) {
+    stop("`from` must be a SpatVector containing road lines.")
+  }
+  source_crs <- terra::crs(from)
+  if (is.na(source_crs) || !nzchar(source_crs)) {
+    stop("`from` must have a known CRS.")
+  }
+  if (!is.character(locs_id) || length(locs_id) != 1L ||
+      is.na(locs_id) || !locs_id %in% names(locs)) {
+    stop("`locs_id` must name a location identifier column.")
+  }
+  if (inherits(locs, c("sf", "SpatVector"))) {
+    locs_vector <- if (inherits(locs, "sf")) terra::vect(locs) else locs
+    locs_crs <- terra::crs(locs_vector)
+    if (is.na(locs_crs) || !nzchar(locs_crs)) {
+      stop("`locs` must have a known CRS.")
+    }
+  }
+  sites_id <- as.data.frame(locs)[, locs_id, drop = FALSE]
+  if (anyNA(sites_id[[locs_id]]) || anyDuplicated(sites_id[[locs_id]])) {
+    stop("Location identifiers must be unique and non-missing.")
   }
   total_name <- sprintf("GRD_TOTAL_%05d", radius)
   density_name <- sprintf("GRD_DENKM_%05d", radius)
+  result <- sites_id
+  result$description <- rep("1980 - 2010", nrow(result))
+  result[[total_name]] <- numeric(nrow(result))
+  result[[density_name]] <- numeric(nrow(result))
 
-  # km / sq km
-  if (nrow(from_clip) > 0) {
-    from_clip[["x"]] <- (from_clip[["x"]] * det_unit / 1e3)
-    from_clip$density <-
-      from_clip[["x"]] / (area_buffer * (det_unit^2) / 1e6)
-    from_clip <-
-      setNames(
-        from_clip,
-        c(
-          locs_id,
-          total_name,
-          density_name
+  # Geographic buffering takes metres regardless of the source CRS units.
+  if (nrow(result) > 0L) {
+    sites <- amadeus::process_locs_vector(locs, "EPSG:4326", radius = 0)
+    if (!terra::geomtype(sites) %in% c("points", "polygons")) {
+      stop("`locs` must contain points or polygons.")
+    }
+    if (any(sf::st_is_empty(sf::st_as_sf(sites))) ||
+        any(!terra::is.valid(sites)) || any(!is.finite(terra::crds(sites)))) {
+      stop("Location geometries must be non-empty, finite and valid.")
+    }
+    buffers_ll <- terra::buffer(sites, width = radius, quadsegs = 180L)
+    area_km2 <- terra::expanse(buffers_ll, unit = "km", transform = TRUE)
+    if (any(!is.finite(area_km2) | area_km2 <= 0)) {
+      stop("Location buffers must have finite, positive areas.")
+    }
+    buffers <- terra::project(buffers_ll, source_crs)
+    if (any(sf::st_is_empty(sf::st_as_sf(buffers))) ||
+        any(!terra::is.valid(buffers)) ||
+        any(!is.finite(terra::crds(buffers)))) {
+      stop("Buffers cannot be represented in the road CRS.")
+    }
+    # Internal row keys prevent road attributes from colliding with site IDs.
+    terra::values(buffers) <- data.frame(.amadeus_site = seq_len(nrow(sites)))
+    roads <- from
+    if (nrow(roads) > 0L) {
+      roads <- roads[terra::ext(buffers), ]
+    }
+    if (nrow(roads) > 0L) {
+      if (any(!terra::is.valid(roads)) ||
+          any(!is.finite(terra::crds(roads)))) {
+        stop("Road geometries must be finite and valid.")
+      }
+      terra::values(roads) <- data.frame(.amadeus_road = seq_len(nrow(roads)))
+      clipped <- terra::intersect(buffers, roads)
+      if (nrow(clipped) > 0L) {
+        # Preserve projected line paths before measuring on the ellipsoid.
+        # densify(), unlike perim(), takes projected coordinate units.
+        if (!terra::is.lonlat(clipped)) {
+          metres_per_unit <- terra::linearUnits(clipped)
+          if (!is.finite(metres_per_unit) || metres_per_unit <= 0) {
+            stop("Road CRS must have known, positive linear units.")
+          }
+          clipped <- terra::densify(
+            clipped, interval = min(radius / 10, 1000) / metres_per_unit
+          )
+        }
+        length_km <- terra::perim(terra::project(clipped, "EPSG:4326")) / 1000
+        if (any(!is.finite(length_km) | length_km < 0)) {
+          stop("Clipped roads must have finite, non-negative lengths.")
+        }
+        totals <- stats::aggregate(
+          length_km,
+          by = terra::as.data.frame(clipped)[".amadeus_site"],
+          FUN = sum
         )
-      )
-    from_clip <- data.frame(from_clip)
-  } else {
-    from_clip <- data.frame(sites_list[[2]])[0, locs_id, drop = FALSE]
-    from_clip[[total_name]] <- numeric(0)
-    from_clip[[density_name]] <- numeric(0)
+        result[[total_name]][totals$.amadeus_site] <- totals$x
+      }
+    }
+    result[[density_name]] <- result[[total_name]] / area_km2
+    if (geom %in% c("sf", "terra")) {
+      result$geometry <- terra::as.data.frame(buffers, geom = "WKT")$geometry
+    }
+  } else if (geom %in% c("sf", "terra")) {
+    result$geometry <- character(0)
   }
-  from_clip$description <- "1980 - 2010"
-
-  if (geom %in% c("sf", "terra")) {
-    sites_geom <- data.frame(sites_list[[2]])
-    from_clip <- merge(
-      x = sites_geom,
-      y = from_clip[, c(locs_id, "description", total_name, density_name)],
-      by = locs_id,
-      all.x = TRUE,
-      sort = FALSE
-    )
-  } else {
-    sites_id <- data.frame(sites_list[[2]])[, locs_id, drop = FALSE]
-    from_clip <- merge(
-      x = sites_id,
-      y = from_clip[, c(locs_id, "description", total_name, density_name)],
-      by = locs_id,
-      all.x = TRUE,
-      sort = FALSE
-    )
-  }
-
-  from_clip[[total_name]][is.na(from_clip[[total_name]])] <- 0
-  from_clip[[density_name]][is.na(from_clip[[density_name]])] <- 0
-  from_clip$description[is.na(from_clip$description)] <- "1980 - 2010"
-
   if (drop) {
-    from_clip <- from_clip[from_clip[[total_name]] > 0, , drop = FALSE]
+    result <- result[result[[total_name]] > 0, , drop = FALSE]
   }
-
+  columns <- c(locs_id, "description", total_name, density_name)
   if (geom %in% c("sf", "terra")) {
-    from_clip_reorder <- from_clip[, c(
-      locs_id, "geometry", "description", total_name, density_name
-    )]
-  } else {
-    #### reorder
-    from_clip_reorder <- from_clip[, c(
-      locs_id, "description", total_name, density_name
-    )]
+    columns <- c(locs_id, "geometry", "description", total_name, density_name)
   }
-  sites_return <- amadeus::calc_return_locs(
-    covar = from_clip_reorder,
+  amadeus::calc_return_locs(
+    covar = result[, columns, drop = FALSE],
     POSIXt = TRUE,
     geom = geom,
-    crs = terra::crs(from)
+    crs = source_crs
   )
-  #### return data.frame
-  return(sites_return)
 }
 
 #' Calculate meteorological and atmospheric covariates

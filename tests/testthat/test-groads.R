@@ -172,146 +172,258 @@ testthat::test_that("process_groads", {
 
 ################################################################################
 ##### calculate_groads
-testthat::test_that("calculate_groads", {
-  withr::local_package("terra")
-  withr::local_package("sf")
-  withr::local_options(list(sf_use_s2 = FALSE))
+# An equatorial geodesic has length a * longitude_difference (radians).
+# This gives an independent ellipsoidal reference, including survey feet.
+groads_equatorial_fixture <- function(half_length_m = 500 * 1200 / 3937) {
+  delta <- half_length_m / 6378137 * 180 / pi
+  roads <- terra::vect(
+    sprintf("LINESTRING (%.15f 0, %.15f 0)", 3 - delta, 3 + delta),
+    crs = "EPSG:4326"
+  )
+  list(
+    roads = roads,
+    locs = data.frame(site_id = "center", lon = 3, lat = 0),
+    length_km = 2 * half_length_m / 1000
+  )
+}
 
-  # test data generation
-  ncp <- data.frame(
-    site_id = c("1", "2"),
-    lon = c(-78.899, -78.643669),
-    lat = c(35.8774, 35.785342),
-    time = c(2022, 2022)
-  )
-  # ncp <- terra::vect(ncp, keepgeom = TRUE, crs = "EPSG:4326")
-  path_groads <- testthat::test_path(
-    "..",
-    "testdata",
-    "groads",
-    "groads_test.shp"
-  )
-  groads <- terra::vect(path_groads)
+groads_test_crs <- c(
+  geographic = "EPSG:4326",
+  metres = "+proj=utm +zone=31 +datum=WGS84 +units=m",
+  feet = "+proj=utm +zone=31 +datum=WGS84 +units=ft",
+  survey_feet = "+proj=utm +zone=31 +datum=WGS84 +units=us-ft"
+)
 
-  testthat::expect_no_error(
-    groads_res <- calculate_groads(
-      from = groads,
-      locs = ncp,
-      locs_id = "site_id",
-      radius = 5000
-    )
-  )
-
-  testthat::expect_error(
-    calculate_groads(
-      from = groads,
-      locs = ncp,
-      locs_id = "site_id",
-      radius = 0
-    )
-  )
-
-  # expect data.frame
-  testthat::expect_s3_class(groads_res, "data.frame")
-
-  # return with geometry terra
-  testthat::expect_no_error(
-    groads_terra <- calculate_groads(
-      from = groads,
-      locs = ncp,
-      locs_id = "site_id",
-      radius = 5000,
-      geom = "terra"
-    )
-  )
-  testthat::expect_equal(
-    ncol(groads_terra),
-    4
-  )
-  testthat::expect_true(
-    "SpatVector" %in% class(groads_terra)
-  )
-
-  # return with geometry sf
-  testthat::expect_no_error(
-    groads_sf <- calculate_groads(
-      from = groads,
-      locs = ncp,
-      locs_id = "site_id",
-      radius = 5000,
-      geom = "sf"
-    )
-  )
-  testthat::expect_equal(
-    ncol(groads_sf),
-    5
-  )
-  testthat::expect_true(
-    "sf" %in% class(groads_sf)
-  )
-
-  # sf extraction with a non-overlapping location should still return geometry
-  ncp_sf <- sf::st_as_sf(
-    data.frame(
-      site_id = c("1", "2", "outside"),
-      lon = c(-78.899, -78.643669, -10),
-      lat = c(35.8774, 35.785342, 0),
-      time = c(2022, 2022, 2022)
+for (crs_name in names(groads_test_crs)) {
+  testthat::test_that(
+    sprintf(
+      "calculate_groads(from=process_groads(), crs='%s'): returns km and km/km2",
+      crs_name
     ),
-    coords = c("lon", "lat"),
-    crs = "EPSG:4326",
-    remove = FALSE
+    {
+      fixture <- groads_equatorial_fixture()
+      roads <- terra::project(fixture$roads, groads_test_crs[[crs_name]])
+      # A road ID with the same name must not replace the location ID.
+      roads$site_id <- "road-id"
+      path <- file.path(withr::local_tempdir(), "roads.shp")
+      terra::writeVector(roads, path)
+      processed <- process_groads(path)
+      testthat::expect_equal(terra::linearUnits(processed),
+                             terra::linearUnits(roads))
+      locs <- terra::vect(fixture$locs, geom = c("lon", "lat"),
+                          crs = "EPSG:4326")
+      locs <- terra::project(locs, groads_test_crs[[crs_name]])
+      result <- calculate_groads(
+        from = processed, locs = locs, locs_id = "site_id", radius = 1000,
+        geom = "terra"
+      )
+      testthat::expect_s4_class(result, "SpatVector")
+      testthat::expect_identical(result$site_id, "center")
+      testthat::expect_equal(result$GRD_TOTAL_01000, fixture$length_km,
+                             tolerance = 1e-6)
+      # 720-sided geographic buffer approximates a 1 km radius circle.
+      testthat::expect_equal(result$GRD_DENKM_01000,
+                             fixture$length_km / pi, tolerance = 2e-5)
+      testthat::expect_identical(terra::crs(result), terra::crs(processed))
+      testthat::expect_equal(
+        terra::expanse(result, unit = "km"), pi, tolerance = 2e-5
+      )
+    }
   )
-  testthat::expect_no_error(
-    groads_sf_partial <- calculate_groads(
-      from = groads,
-      locs = ncp_sf,
-      locs_id = "site_id",
-      radius = 5000,
-      geom = "sf"
-    )
+  testthat::test_that(
+    sprintf(
+      "calculate_groads(crs='%s', radius=1000): clips a crossing road to 2 km",
+      crs_name
+    ),
+    {
+      fixture <- groads_equatorial_fixture(half_length_m = 2000)
+      # Tabular WGS84 locations deliberately differ from projected roads.
+      result <- calculate_groads(
+        from = terra::project(fixture$roads, groads_test_crs[[crs_name]]),
+        locs = fixture$locs, locs_id = "site_id", radius = 1000
+      )
+      testthat::expect_equal(result$GRD_TOTAL_01000, 2, tolerance = 1e-6)
+      testthat::expect_equal(result$GRD_DENKM_01000, 2 / pi,
+                             tolerance = 2e-5)
+    }
   )
-  testthat::expect_true(
-    "sf" %in% class(groads_sf_partial)
-  )
-  testthat::expect_equal(nrow(groads_sf_partial), 3)
-  testthat::expect_equal(
-    groads_sf_partial$GRD_TOTAL_05000[groads_sf_partial$site_id == "outside"],
-    0
-  )
+}
 
-  testthat::expect_no_error(
-    groads_drop <- calculate_groads(
-      from = groads,
-      locs = ncp_sf,
-      locs_id = "site_id",
-      radius = 5000,
-      geom = "sf",
-      drop = TRUE
-    )
-  )
-  testthat::expect_false("outside" %in% groads_drop$site_id)
-  testthat::expect_equal(nrow(groads_drop), 2)
+testthat::test_that(
+  "calculate_groads(latitude=60, CRS=m/ft/us-ft): agrees with geographic input",
+  {
+    roads <- terra::vect("LINESTRING (2.997 60, 3.003 60)", crs = "EPSG:4326")
+    locs <- data.frame(site_id = "north", lon = 3, lat = 60)
+    reference <- calculate_groads(roads, locs, "site_id")
+    testthat::expect_equal(reference$GRD_TOTAL_01000,
+                           terra::perim(roads) / 1000, tolerance = 1e-8)
+    for (crs in groads_test_crs[-1]) {
+      result <- calculate_groads(terra::project(roads, crs), locs, "site_id")
+      testthat::expect_equal(result, reference, tolerance = 1e-6)
+    }
+  }
+)
 
-  testthat::expect_error(
-    calculate_groads(
-      from = groads,
-      locs = ncp,
-      locs_id = "site_id",
-      radius = 5000,
-      geom = TRUE
+testthat::test_that(
+  "calculate_groads(locs=sf, geom='sf'): transforms mixed CRSs and retains order",
+  {
+    fixture <- groads_equatorial_fixture()
+    locs <- sf::st_as_sf(
+      data.frame(site_id = c("z", "a"), lon = c(3, 3), lat = c(0, 0)),
+      coords = c("lon", "lat"), crs = 4326
     )
+    locs <- sf::st_transform(locs, groads_test_crs[["survey_feet"]])
+    roads <- terra::project(fixture$roads, groads_test_crs[["metres"]])
+    roads$site_id <- "road-id"
+    roads$.amadeus_site <- 999L
+    result <- calculate_groads(roads, locs, "site_id", geom = "sf")
+    testthat::expect_s3_class(result, "sf")
+    testthat::expect_identical(result$site_id, c("z", "a"))
+    testthat::expect_equal(result$GRD_TOTAL_01000,
+                           rep(fixture$length_km, 2), tolerance = 1e-6)
+    testthat::expect_equal(sf::st_crs(result), sf::st_crs(terra::crs(roads)))
+  }
+)
+
+testthat::test_that(
+  "calculate_groads(locs=polygons, radius=100): divides by each site's own area",
+  {
+    locs <- terra::vect(c(
+      "POLYGON ((2.999 -0.001,3.001 -0.001,3.001 0.001,2.999 0.001,2.999 -0.001))",
+      "POLYGON ((3.045 -0.005,3.055 -0.005,3.055 0.005,3.045 0.005,3.045 -0.005))"
+    ), crs = "EPSG:4326")
+    locs$site_id <- c("z", "a")
+    roads <- terra::vect("LINESTRING (2.98 0,3.07 0)", crs = "EPSG:4326")
+    result <- calculate_groads(roads, locs, "site_id", radius = 100,
+                                geom = "terra")
+    areas <- terra::expanse(result, unit = "km")
+    testthat::expect_gt(areas[2], 5 * areas[1])
+    testthat::expect_equal(result$GRD_DENKM_00100,
+                           result$GRD_TOTAL_00100 / areas, tolerance = 1e-8)
+    testthat::expect_identical(result$site_id, c("z", "a"))
+  }
+)
+
+for (return_geom in list(FALSE, "sf", "terra")) {
+  testthat::test_that(
+    sprintf(
+      "calculate_groads(geom='%s', drop=FALSE/TRUE): handles all-outside sites",
+      return_geom
+    ),
+    {
+      fixture <- groads_equatorial_fixture()
+      # The combined extent includes the road, but neither buffer does.
+      locs <- data.frame(site_id = c("west", "east"), lon = c(2, 4), lat = 0)
+      result <- calculate_groads(fixture$roads, locs, "site_id",
+                                 geom = return_geom)
+      testthat::expect_equal(nrow(result), 2L)
+      testthat::expect_equal(result$GRD_TOTAL_01000, c(0, 0))
+      testthat::expect_equal(result$GRD_DENKM_01000, c(0, 0))
+      dropped <- calculate_groads(fixture$roads, locs, "site_id",
+                                  geom = return_geom, drop = TRUE)
+      testthat::expect_equal(nrow(dropped), 0L)
+      if (identical(return_geom, "sf")) {
+        testthat::expect_s3_class(dropped, "sf")
+      } else if (identical(return_geom, "terra")) {
+        testthat::expect_s4_class(dropped, "SpatVector")
+      }
+      empty <- calculate_groads(fixture$roads, locs[0, ], "site_id",
+                                geom = return_geom)
+      testthat::expect_equal(nrow(empty), 0L)
+    }
   )
-  testthat::expect_error(
-    calculate_groads(
-      from = groads,
-      locs = ncp,
-      locs_id = "site_id",
-      radius = 5000,
-      drop = NA
+}
+
+testthat::test_that(
+  "calculate_groads(locs=partial_overlap, drop=TRUE): retains only matching sites",
+  {
+    fixture <- groads_equatorial_fixture()
+    locs <- rbind(fixture$locs, data.frame(site_id = "outside", lon = 4, lat = 0))
+    result <- calculate_groads(fixture$roads, locs, "site_id")
+    testthat::expect_identical(result$site_id, c("center", "outside"))
+    testthat::expect_equal(result$GRD_TOTAL_01000,
+                           c(fixture$length_km, 0), tolerance = 1e-6)
+    dropped <- calculate_groads(fixture$roads, locs, "site_id", drop = TRUE)
+    testthat::expect_identical(dropped$site_id, "center")
+    empty_roads <- fixture$roads[FALSE, ]
+    empty <- calculate_groads(empty_roads, fixture$locs, "site_id")
+    testthat::expect_equal(empty$GRD_TOTAL_01000, 0)
+  }
+)
+
+testthat::test_that(
+  "calculate_groads(from=split_lines, fun=sum): is invariant to segmentation",
+  {
+    fixture <- groads_equatorial_fixture()
+    coordinates <- terra::crds(fixture$roads)
+    split <- terra::vect(c(
+      sprintf("LINESTRING (%.15f 0, 3 0)", coordinates[1, 1]),
+      sprintf("LINESTRING (3 0, %.15f 0)", coordinates[2, 1])
+    ), crs = "EPSG:4326")
+    result <- calculate_groads(split, fixture$locs, "site_id", fun = base::sum)
+    testthat::expect_equal(result$GRD_TOTAL_01000, fixture$length_km,
+                           tolerance = 1e-8)
+  }
+)
+
+testthat::test_that(
+  "calculate_groads(radius=invalid, CRS=missing): rejects invalid inputs",
+  {
+    fixture <- groads_equatorial_fixture()
+    for (radius in list(0, -1, NA_real_, Inf, numeric(0), c(1, 2), "1000", 1.5)) {
+      testthat::expect_error(
+        calculate_groads(fixture$roads, fixture$locs, "site_id", radius = radius),
+        "radius.*single positive"
+      )
+    }
+    testthat::expect_error(
+      calculate_groads(fixture$roads, fixture$locs, "site_id", fun = "mean"),
+      "fun.*sum"
     )
-  )
-})
+    testthat::expect_error(
+      calculate_groads(fixture$roads, fixture$locs, "site_id", weights = 1),
+      "weights.*not supported"
+    )
+    testthat::expect_error(
+      calculate_groads(fixture$roads, fixture$locs, "site_id", drop = NA),
+      "drop.*single logical"
+    )
+    testthat::expect_error(
+      calculate_groads(fixture$roads, fixture$locs, "site_id", geom = TRUE)
+    )
+    invalid <- fixture$locs
+    invalid$lat <- NA_real_
+    testthat::expect_error(
+      calculate_groads(fixture$roads, invalid, "site_id")
+    )
+    duplicate <- rbind(fixture$locs, fixture$locs)
+    testthat::expect_error(
+      calculate_groads(fixture$roads, duplicate, "site_id"), "unique"
+    )
+    missing <- fixture$locs
+    missing$site_id <- NA_character_
+    testthat::expect_error(
+      calculate_groads(fixture$roads, missing, "site_id"), "non-missing"
+    )
+    invalid_road <- terra::vect("LINESTRING (3 0,3 0)", crs = "EPSG:4326")
+    testthat::expect_error(
+      calculate_groads(invalid_road, fixture$locs, "site_id"),
+      "Road geometries.*valid"
+    )
+    locs <- terra::vect(fixture$locs, geom = c("lon", "lat"), crs = "EPSG:4326")
+    testthat::expect_error(
+      calculate_groads(locs, fixture$locs, "site_id"), "road lines"
+    )
+    terra::crs(locs) <- ""
+    testthat::expect_error(
+      calculate_groads(fixture$roads, locs, "site_id"), "locs.*known CRS"
+    )
+    terra::crs(fixture$roads) <- ""
+    testthat::expect_error(
+      calculate_groads(fixture$roads, fixture$locs, "site_id"), "from.*known CRS"
+    )
+  }
+)
 
 ################################################################################
 ##### download_groads hash=FALSE and file-already-exists branches
