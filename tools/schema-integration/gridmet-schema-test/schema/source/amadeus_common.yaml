@@ -1,0 +1,769 @@
+id: https://w3id.org/niehs/amadeus/common
+name: amadeus-common
+title: AmadeusDB — Common Types, Enums and Shared Slots
+version: "0.1.0"
+description: |-
+  Shared types, enumerations and identifier slots for the AmadeusDB data model.
+
+  Design notes
+  ------------
+  * Every enum here is either (a) taken verbatim from EnVar or the HEW Catalog
+    Data Model so the three layers agree, or (b) an explicit, annotated
+    *extension* where amadeus has a case those schemas do not cover. Extensions
+    carry `annotations: extends` naming the upstream enum, so the reconciliation
+    conversation has a concrete list rather than a diff.
+  * `WktLiteral` is the load-bearing type for the SQL story. LinkML has no
+    spatial type, and SedonaDB refuses a `GEOMETRY` column in `CREATE TABLE`
+    (DuckDB's spatial extension accepts one, so text is the common denominator
+    across both). Geometry therefore lands in the database as WKT text and is
+    lifted to a real geometry by a generated view
+    (`scripts/gen_backend_ddl.py`). Slots typed `WktLiteral` are what that
+    generator looks for — the type is the contract.
+license: MIT
+
+prefixes:
+  amadeus: https://w3id.org/niehs/amadeus/
+  linkml: https://w3id.org/linkml/
+  envar: https://w3id.org/linkml/microschemas/envar/
+  hew: https://w3id.org/hew/schema/
+  geo: http://www.opengis.net/ont/geosparql#
+  prov: http://www.w3.org/ns/prov#
+  dcterms: http://purl.org/dc/terms/
+  CF: http://vocab.nerc.ac.uk/standard_name/
+  UCUM: https://ucum.org/
+  EPSG: https://epsg.io/
+  ECTO: http://purl.obolibrary.org/obo/ECTO_
+  ENVO: http://purl.obolibrary.org/obo/ENVO_
+  SPDX: https://spdx.org/licenses/
+default_prefix: amadeus
+default_range: string
+
+imports:
+- linkml:types
+
+#────────────────────────────────────────────────────────────────
+# TYPES
+#────────────────────────────────────────────────────────────────
+
+types:
+
+  WktLiteral:
+    uri: geo:wktLiteral
+    base: str
+    typeof: string
+    description: >-
+      A geometry serialised as OGC Well-Known Text. Stored as text in every
+      backend; promoted to a native geometry by the generated
+      `*_geo` views via `ST_SetSRID(ST_GeomFromText(...), srid)`.
+    examples:
+    - value: "POINT (-78.8277 35.95013)"
+    - value: "POLYGON ((-79 35, -78 35, -78 36, -79 36, -79 35))"
+    annotations:
+      sql_promotion: geometry
+      note: >-
+        Verified against sedonadb 0.4.1 / DataFusion 52.5.0: `CREATE TABLE t (g
+        GEOMETRY)` fails with "Unsupported SQL type GEOMETRY" — as do
+        GEOGRAPHY, POINT, WKB and every parameterised spelling. DuckDB with the
+        spatial extension loaded does accept `GEOMETRY`, so text is a
+        portability choice, not a universal limit. Meanwhile
+        `ST_SetSRID(ST_GeomFromText(text), 4326)` in a view produces
+        `geometry<Wkb>` and supports spatial predicates and joins.
+
+  Iso8601Duration:
+    uri: xsd:duration
+    base: str
+    typeof: string
+    description: >-
+      An ISO 8601 duration. Used wherever the HEW catalog uses one (it encodes
+      `P3D`, which EnVar's `TemporalResolutionEnum` cannot); the enum-valued
+      companion slot is kept alongside for validation.
+    pattern: "^P(?!$)(\\d+Y)?(\\d+M)?(\\d+D)?(T(?=\\d)(\\d+H)?(\\d+M)?(\\d+(\\.\\d+)?S)?)?$"
+    examples:
+    - value: "P1D"
+    - value: "PT1H"
+
+  Sha256:
+    uri: xsd:string
+    base: str
+    typeof: string
+    description: A lowercase hex SHA-256 digest.
+    pattern: "^[0-9a-f]{64}$"
+
+  H3CellIndex:
+    uri: xsd:string
+    base: str
+    typeof: string
+    description: >-
+      An H3 cell index in its canonical 15-character lowercase hex form. The
+      harmonization target for the C-HER hexification work (objective O-09).
+    pattern: "^[0-9a-f]{15}$"
+    examples:
+    - value: "8844c0a9241ffff"
+
+#────────────────────────────────────────────────────────────────
+# ENUMS
+#────────────────────────────────────────────────────────────────
+
+enums:
+
+  SpatialSupportTypeEnum:
+    title: Spatial Support Type
+    description: >-
+      What a single value spatially *is* — the source-side question. Distinct
+      from `TargetGeographyTypeEnum`, which says what a value gets attached to.
+      Both are needed; neither replaces the other.
+    exact_mappings:
+    - hew:SpatialSupportTypeEnum
+    annotations:
+      extends: hew:SpatialSupportTypeEnum
+      extension_note: >-
+        Adds `hex_cell` (H3, required by O-09) and `line_feature` (SEDAC
+        gROADS). Proposed back to HEW rather than forked.
+    permissible_values:
+      point:
+        description: A dimensionless location.
+      monitoring_station:
+        description: A fixed instrument with an identity that persists across time.
+      raster_grid_cell:
+        description: A cell of an observational or retrieval grid.
+      model_grid_cell:
+        description: A cell of a model or reanalysis grid.
+      polygon:
+        description: An arbitrary polygon feature (a smoke plume, a drought area).
+      administrative_area:
+        description: A governmental unit (county, state).
+      statistical_area:
+        description: A statistical unit (census tract, block group, ZCTA).
+      hex_cell:
+        description: A hierarchical hexagonal cell, in practice H3.
+        annotations:
+          amadeus_extension: "true"
+      line_feature:
+        description: A linear feature (a road segment, a stream reach).
+        annotations:
+          amadeus_extension: "true"
+      other:
+
+  TargetGeographyTypeEnum:
+    title: Target Geography Type
+    description: The geography a value is delivered against, after extraction.
+    exact_mappings:
+    - envar:TargetGeographyTypeEnum
+    permissible_values:
+      point_location:
+        description: >-
+          A coordinate pair supplied by the user. Deliberately *not* named
+          `point_residence` — amadeus knows nothing about residences.
+      buffered_point:
+      census_block_group:
+      census_tract:
+      zcta:
+      county:
+      state:
+      hydrologic_unit:
+      h3_hex:
+      grid_cell:
+      public_water_system:
+
+  TemporalResolutionEnum:
+    title: Temporal Resolution
+    exact_mappings:
+    - envar:TemporalResolutionEnum
+    annotations:
+      extends: envar:TemporalResolutionEnum
+      extension_note: >-
+        Adds `subhourly` (GOES ADP, HRRR sub-cycle), `multi_year_epoch` (NLCD
+        2001/2006/2011/2016/2019/2021 — not a regular series) and `timeless`
+        (GMTED elevation, Köppen-Geiger, gROADS). Without `timeless` a third of
+        the amadeus catalog is unrepresentable.
+    permissible_values:
+      instantaneous:
+      subhourly:
+        annotations:
+          amadeus_extension: "true"
+      hourly:
+      three_hourly:
+      daily:
+      monthly:
+      seasonal:
+      annual:
+      multi_year_epoch:
+        description: >-
+          Irregularly spaced named epochs rather than a regular series.
+        annotations:
+          amadeus_extension: "true"
+      timeless:
+        description: >-
+          Static: the product asserts no valid time. Modelled as an unbounded
+          valid interval rather than a null, so time predicates still work.
+        annotations:
+          amadeus_extension: "true"
+
+  TemporalAlignmentEnum:
+    title: Temporal Alignment
+    description: >-
+      Where in the aggregation window the timestamp sits. Taken from HEW, which
+      has it and EnVar does not — a genuine gap EnVar should close.
+    exact_mappings:
+    - hew:TemporalAlignmentEnum
+    permissible_values:
+      start:
+      center:
+      end:
+      interval:
+        description: The record carries both bounds explicitly.
+      unknown:
+
+  DayBoundaryConventionEnum:
+    title: Day Boundary Convention
+    description: >-
+      Where a "day" starts for a daily product. This is the slot behind the
+      Daymet/GridMET 1.26 °C discrepancy: same variable, same place, same date,
+      different day boundary.
+    exact_mappings:
+    - envar:DayBoundaryConventionEnum
+    permissible_values:
+      local_midnight:
+      utc_midnight:
+      ending_1200_gmt:
+      solar_noon_centered:
+      observation_dependent:
+      not_applicable:
+
+  CalendarEnum:
+    exact_mappings:
+    - envar:CalendarEnum
+    permissible_values:
+      gregorian:
+      proleptic_gregorian:
+      noleap:
+      daymet_365:
+      all_leap:
+      day_360:
+      julian:
+
+  AggregationMethodEnum:
+    title: Aggregation Method
+    description: >-
+      How many values became one. Which members are *legal* for a given
+      variable is determined by `VariableExtensivityEnum` — see the rules on
+      `ExtractionRequest`.
+    exact_mappings:
+    - hew:AggregationMethodEnum
+    annotations:
+      extends: hew:AggregationMethodEnum
+      extension_note: >-
+        Adds the weighted and categorical members amadeus actually computes:
+        `area_weighted_mean` (exactextractr on polygons), `population_weighted_mean`,
+        `mode` and `class_proportion` (NLCD land-cover fractions), `density`
+        (gROADS road density), `nearest` (point lookup).
+    permissible_values:
+      instantaneous:
+      mean:
+      minimum:
+      maximum:
+      median:
+      sum:
+      count:
+      percentile:
+      cumulative:
+      area_weighted_mean:
+        annotations:
+          amadeus_extension: "true"
+      population_weighted_mean:
+        annotations:
+          amadeus_extension: "true"
+      mode:
+        annotations:
+          amadeus_extension: "true"
+      class_proportion:
+        description: Fraction of the support occupied by one categorical class.
+        annotations:
+          amadeus_extension: "true"
+      density:
+        description: Feature quantity per unit area.
+        annotations:
+          amadeus_extension: "true"
+      nearest:
+      other:
+
+  ExtractionMethodEnum:
+    title: Extraction Method
+    description: How a value was pulled out of its source support at a location.
+    exact_mappings:
+    - envar:ExtractionMethodEnum
+    permissible_values:
+      nearest_cell:
+      bilinear:
+      inverse_distance_weighted_4_nearest_cells:
+      area_weighted_polygon_mean:
+      population_weighted_mean:
+      point_station_lookup:
+      nearest_station:
+      intersection_area_proportion:
+      raster_zonal_sum:
+      feature_density:
+      exact_extract:
+        description: >-
+          `exactextractr::exact_extract` — fractional cell coverage weighting.
+          amadeus's default for polygon and buffered-point extraction.
+        annotations:
+          amadeus_extension: "true"
+
+  VariableExtensivityEnum:
+    title: Variable Extensivity
+    description: >-
+      Whether a quantity is intensive (independent of the size of its support —
+      a temperature) or extensive (scales with it — a population count, an
+      emission mass). **This is the slot that makes aggregation checkable.**
+      Averaging an extensive variable over a buffer is a silent, plausible-looking
+      error; summing an intensive one is worse. Requested explicitly by the
+      project lead and tracked as amadeus issue #249.
+    annotations:
+      requested_by: "Kyle Messier (2026-09-09); NIEHS/amadeus#249"
+      no_upstream_equivalent: >-
+        Neither EnVar nor HEW models extensivity. Candidate contribution from
+        amadeus back up to both.
+    permissible_values:
+      intensive:
+        description: >-
+          Value is independent of support size. Legal aggregations: mean,
+          min, max, median, percentile, area/population-weighted mean, nearest.
+        annotations:
+          legal_aggregations: "mean,minimum,maximum,median,percentile,area_weighted_mean,population_weighted_mean,nearest,instantaneous"
+      extensive:
+        description: >-
+          Value scales with support size; aggregation must conserve the total.
+          Legal aggregations: sum, count, cumulative, raster zonal sum, density.
+        annotations:
+          legal_aggregations: "sum,count,cumulative,density"
+      categorical:
+        description: >-
+          Nominal class label. Legal aggregations: mode, class_proportion.
+        annotations:
+          legal_aggregations: "mode,class_proportion,nearest"
+      unknown:
+        description: >-
+          Not yet assessed. Permitted so migration does not require assessing
+          every legacy variable at once, but blocks strict-mode extraction.
+
+  ValueDataTypeEnum:
+    title: Value Data Type
+    description: The measurement kind, not the storage type.
+    exact_mappings:
+    - envar:DataTypeEnum
+    annotations:
+      extends: envar:DataTypeEnum
+      extension_note: Adds `proportion` (NLCD class fractions, impervious surface %).
+    permissible_values:
+      continuous_numeric:
+      categorical:
+      binary_flag:
+      count:
+      event_marker:
+      proportion:
+        annotations:
+          amadeus_extension: "true"
+
+  DataStatusEnum:
+    title: Data Status
+    description: >-
+      The quality state of a value *as the source declares it*. Load-bearing for
+      the AQS/AirNow harmonization rule (plan §4.6.1): an AirNow preliminary
+      value must never overwrite an AQS quality-controlled value in place, so
+      status has to be carried on every row, not on the dataset.
+    annotations:
+      no_upstream_equivalent: >-
+        EnVar has `source_homogenisation_status` at dataset level only. This is
+        per-row and is required by the harmonization rule.
+    permissible_values:
+      preliminary:
+        description: Near-real-time, unvalidated. AirNow.
+      provisional:
+      quality_controlled:
+        description: Passed the producer's QA process. AQS.
+      final:
+      forecast:
+        description: Model output valid in the future relative to its reference time.
+      reanalysis:
+      superseded:
+        description: >-
+          Replaced by a later revision. Retained rather than deleted — revisions
+          create new records, they do not mutate old ones.
+      unknown:
+
+  NullSemanticsEnum:
+    title: Null Semantics
+    description: Why a value is absent, or why a zero is a zero.
+    exact_mappings:
+    - envar:NullSemanticsEnum
+    permissible_values:
+      present:
+      structural_null:
+        description: The quantity cannot exist here (sea-surface temperature on land).
+      derived_null:
+        description: Inputs were missing so the derivation could not run.
+      true_zero:
+        description: >-
+          A measured zero, not a missing value. The nodata-versus-zero edge case
+          the plan's test matrix calls out.
+
+  MissingReasonEnum:
+    title: Missing Reason
+    description: >-
+      Why a *metadata* field is empty. Distinguishes "the source does not
+      provide this" from "nobody has looked yet" — the difference that decides
+      whether a gap is someone's task.
+    exact_mappings:
+    - envar:MissingReasonEnum
+    permissible_values:
+      not_provided_by_source:
+      available_but_not_extracted:
+        description: >-
+          It is in the source file and amadeus discards it. The Tier 1 gap — the
+          cheapest possible win, and the one to count.
+      upstream_data_not_propagated:
+      under_investigation:
+      not_applicable:
+
+  ConceptStatusEnum:
+    title: Concept Status
+    description: >-
+      State of the mapping from a variable to a target vocabulary. HEW's value
+      set, which is strictly better than EnVar's three-valued one: it keeps
+      standard/non-standard apart (OMOP-critical) and "nobody looked" apart from
+      "we looked and there is nothing".
+    exact_mappings:
+    - hew:ConceptStatusEnum
+    permissible_values:
+      mapped_standard:
+      mapped_nonstandard:
+      candidate_mapping:
+      vocabulary_gap:
+      not_evaluated:
+
+  NativeFormatEnum:
+    title: Native Format
+    description: The format the source actually ships.
+    exact_mappings:
+    - envar:SourceNativeFormatEnum
+    annotations:
+      extends: envar:SourceNativeFormatEnum
+      extension_note: >-
+        EnVar's enum covers eight formats; the amadeus catalog ships fifteen.
+        Every addition here is a format some current `download_*` function
+        already handles.
+    permissible_values:
+      netcdf4_cf:
+      netcdf3:
+      hdf4:
+        description: MODIS. Not in EnVar's enum; amadeus reads it today.
+        annotations:
+          amadeus_extension: "true"
+      hdf5:
+      geotiff:
+      cloud_optimized_geotiff:
+        annotations:
+          amadeus_extension: "true"
+      ascii_grid:
+        description: GMTED2010, PRISM `.asc`.
+        annotations:
+          amadeus_extension: "true"
+      grib1:
+      grib2:
+      bil:
+        description: PRISM binary interleaved.
+        annotations:
+          amadeus_extension: "true"
+      shapefile:
+        annotations:
+          amadeus_extension: "true"
+      geodatabase:
+        annotations:
+          amadeus_extension: "true"
+      kml:
+        annotations:
+          amadeus_extension: "true"
+      csv_station_observations:
+      pipe_delimited_text:
+        description: IMPROVE aerosol exports.
+        annotations:
+          amadeus_extension: "true"
+      fixed_width_text:
+        annotations:
+          amadeus_extension: "true"
+      zarr:
+      parquet:
+      geoparquet:
+        annotations:
+          amadeus_extension: "true"
+
+  DataGenreEnum:
+    title: Data Genre
+    description: >-
+      The thematic classification already used in the amadeus README's source
+      table. Promoted from prose to an enum so it can drive discovery.
+    permissible_values:
+      meteorology:
+      climate:
+      climate_classification:
+      air_pollution:
+      aerosols:
+      atmosphere:
+      emissions:
+      chemicals:
+      land_use:
+      agriculture:
+      population:
+      hydrology:
+      water:
+      elevation:
+      roadways:
+      wildfire_smoke:
+      drought:
+      satellite:
+      built_environment:
+
+  AccessProtocolEnum:
+    title: Access Protocol
+    description: >-
+      How amadeus reaches a source. Determines whether subsetting can be pushed
+      to the provider, which is the whole point of the "subset early" principle.
+    permissible_values:
+      https_bulk_file:
+        description: Fetch whole files over HTTPS. No server-side subsetting.
+      ftp:
+      s3_object_store:
+      stac_api:
+        description: Spatio-temporal asset search. Supports geometry/time pushdown.
+      opendap:
+        description: Supports variable and index-range pushdown.
+      thredds:
+      rest_api:
+        description: Provider-specific API with query parameters (AQS, AirNow, USGS).
+      harmony:
+      arcgis_service:
+
+  MaterializationModeEnum:
+    title: Materialization Mode
+    description: >-
+      How much of a source asset had to be brought local to answer a request.
+      Taken verbatim from the modernization plan §4.7.2 so "streaming" is a
+      recorded, auditable property of a run rather than an ungoverned side path.
+    annotations:
+      source: "amadeus-nextgen-meeting-plan.pdf §4.7.2"
+    permissible_values:
+      direct_remote_scan:
+        description: Only the required columns, row groups, ranges or tiles were read.
+      server_side_subset:
+        description: The provider API returned exactly the requested subset.
+      bounded_cache:
+        description: Selected assets or chunks cached with checksums and a reuse policy.
+      full_materialization:
+        description: >-
+          The complete asset was downloaded because no reliable subset path
+          exists. Cost and storage must be made visible before execution.
+
+  RunRoleEnum:
+    title: Run Role
+    description: >-
+      Which amadeus verb a tool run represents. The three public verbs plus the
+      database-era additions.
+    permissible_values:
+      download:
+      process:
+      calculate:
+      register:
+        description: An asset was catalogued without materialising its values.
+      harmonize:
+        description: Cross-source reconciliation, hexification, unit conversion.
+      import:
+        description: An externally supplied dataset was brought into the catalog.
+      export:
+        description: An EnVar record or analysis-ready table was emitted.
+
+  PhiStatusEnum:
+    title: PHI Status
+    description: >-
+      Whether a location set, and anything derived from it, is protected health
+      information. An enum rather than a boolean for two reasons: it matches
+      EnVar's `phi_status` exactly, and — see `ValueMaterializationEnum` — a
+      boolean cannot be used as a LinkML rule precondition.
+    exact_mappings:
+    - envar:PhiStatusEnum
+    permissible_values:
+      no_phi:
+      aggregated_no_phi:
+      phi_present:
+
+  ValueMaterializationEnum:
+    title: Value Materialization
+    description: >-
+      Whether an asset's values exist as rows in a value table, or the asset is
+      catalogued for discovery only.
+
+      **This was a boolean and had to stop being one.** LinkML's only equality
+      construct in a rule precondition is `equals_string`, which generates
+      `{"const": "true"}` — the JSON *string* `"true"` — and therefore never
+      matches the JSON boolean `true`. A rule keyed on a boolean silently never
+      fires. Verified 2026-09-18 on linkml 1.9.x; see REPORT.md.
+    permissible_values:
+      registered_only:
+        description: Catalogued and discoverable; no value rows written.
+      materialized:
+        description: Value rows exist in a value table.
+
+  StatusMixingPolicyEnum:
+    title: Status Mixing Policy
+    description: >-
+      Whether a request may combine values of different `data_status` — in
+      practice, AirNow preliminary alongside AQS quality-controlled. Defaults to
+      refusing. An enum for the same reason as `ValueMaterializationEnum`: it is
+      a rule precondition, and booleans cannot be.
+    permissible_values:
+      refuse:
+        description: >-
+          Reject the request if the candidate values differ in status. The
+          default, per the harmonization rule in plan section 4.6.1.
+      allow_with_policy:
+        description: >-
+          Permitted, and `source_priority_policy` must state how values are
+          reconciled.
+
+  StrictnessEnum:
+    title: Strictness
+    permissible_values:
+      strict:
+      permissive:
+
+  RunStatusEnum:
+    permissible_values:
+      succeeded:
+      failed:
+      partial:
+      cancelled:
+
+  GeometryTypeEnum:
+    exact_mappings:
+    - hew:GeometryTypeEnum
+    permissible_values:
+      point:
+      multipoint:
+      linestring:
+      multilinestring:
+      polygon:
+      multipolygon:
+      geometrycollection:
+
+  TableOrientationEnum:
+    exact_mappings:
+    - envar:TableOrientationEnum
+    permissible_values:
+      wide:
+        description: >-
+          One column per variable. What `calculate_covariates()` returns today
+          (`weasd_0`, `tmmx_10000`, …).
+      long:
+        description: >-
+          One row per variable-time-location. The database-native orientation,
+          and the only one that generalises across products.
+
+  TemporalGroupingEnum:
+    title: Temporal Grouping
+    description: >-
+      The `.by_time` argument of `calculate_covariates()`, made declarative.
+    permissible_values:
+      none:
+      hour:
+      day:
+      month:
+      year:
+
+#────────────────────────────────────────────────────────────────
+# SHARED SLOTS
+#────────────────────────────────────────────────────────────────
+
+slots:
+
+  id:
+    identifier: true
+    range: uriorcurie
+    description: Stable identifier for this entity within an AmadeusDB instance.
+
+  name:
+    range: string
+    description: A short machine-friendly name.
+
+  label:
+    range: string
+    description: A human-readable display label.
+
+  description:
+    range: string
+    slot_uri: dcterms:description
+
+  schema_version:
+    range: string
+    required: true
+    description: >-
+      Version of the AmadeusDB schema a record conforms to, so consumers can
+      branch on schema evolution rather than guess.
+    exact_mappings:
+    - envar:schema_version
+
+  crs:
+    range: string
+    description: >-
+      Coordinate reference system as an authority code. Stored as the string
+      form (`EPSG:4326`) because that is what both `terra` and the SQL engines
+      accept; the numeric SRID is derived for `ST_SetSRID`.
+    pattern: "^[A-Za-z]+:[0-9]+$"
+    examples:
+    - value: "EPSG:4326"
+    - value: "EPSG:5070"
+    exact_mappings:
+    - envar:crs
+    - hew:coordinate_reference_system_uri
+
+  srid:
+    range: integer
+    description: >-
+      Numeric spatial reference identifier, derived from `crs`. Materialised
+      because `ST_SetSRID` takes an integer and the geometry views need it
+      without a lookup.
+
+  bbox_wkt:
+    range: WktLiteral
+    description: Bounding geometry as WKT.
+
+  valid_time_start:
+    range: datetime
+    description: >-
+      Inclusive start of the interval the value is valid for. Left-closed,
+      right-open by default (`[start, end)`) — declared here once so no
+      individual dataset has to litigate it.
+
+  valid_time_end:
+    range: datetime
+    description: Exclusive end of the validity interval.
+
+  retrieval_time_utc:
+    range: datetime
+    description: >-
+      When amadeus obtained the value. Required by the AQS/AirNow rule: with
+      revisable sources, "when we asked" is part of the value's identity.
+
+  sha256:
+    range: Sha256
+    description: SHA-256 of the byte stream, for integrity and idempotency.
+
+  missing_reason:
+    range: MissingReasonEnum
+    exact_mappings:
+    - envar:missing_reason
+
+  # Shared across catalog (Asset), request (ExtractionRequest) and provenance
+  # (ToolRun). Defined here, with its enum, so that amadeus_provenance does not
+  # have to import the whole catalog layer for one slot.
+  materialization_mode:
+    range: MaterializationModeEnum

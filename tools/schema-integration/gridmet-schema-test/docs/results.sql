@@ -1,0 +1,1 @@
+SELECT p.amadeus_variable_code AS variable,l.location_key AS site_id,CAST(v.valid_time_start AS VARCHAR) AS nominal_date_label,v.value,v.value_unit_ucum,v.asset,v.processing_run FROM "AmbientValueAtLocation" v JOIN "ProductVariable" p ON v.product_variable=p.id JOIN "Location" l ON v.location=l.id ORDER BY p.amadeus_variable_code,l.location_key,v.valid_time_start;

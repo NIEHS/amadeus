@@ -1,0 +1,14 @@
+flowchart TD
+ U["User variables, dates, locations and directory"] --> D["Ordinary Amadeus download_data"]
+ D --> P["Ordinary Amadeus process_covariates"]
+ P --> C["Ordinary Amadeus calculate_covariates"]
+ C --> O["Unchanged ordinary result objects and native CSV"]
+ O --> H["Explicit external schema hand-off"]
+ S["Pinned model: YAML sources, generated R, JSON Schema, SQL"] --> H
+ H --> V["Structure, references, profile semantics, hashes and roundtrip"]
+ V --> A["Accepted JSON/YAML and receipt"]
+ A --> B["Optional native R DuckDB or SedonaDB adapter"]
+ B --> Q["Queryable records, integrity and numeric fidelity receipts"]
+ A --> T["Team positive and negative tests"]
+ T --> R["Human review; physical-time and ontology approval pending"]
+ Q --> R

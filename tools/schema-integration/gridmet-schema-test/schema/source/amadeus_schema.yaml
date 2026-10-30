@@ -1,0 +1,182 @@
+id: https://w3id.org/niehs/amadeus
+name: amadeus-schema
+title: AmadeusDB — Data Model
+version: "0.1.0"
+description: |-
+  A candidate data model for the next-generation, database-backed amadeus
+  ("AmadeusDB"). Prototype for the Database-and-Schema agenda item of the
+  Amadeus Next-Generation Maintenance and Modernization plan (v1.0, 2026-09-18).
+
+  Four layers, five modules
+  -------------------------
+  * `amadeus_common`      types, enums, shared slots — and the reconciliation
+                          record against EnVar and HEW
+  * `amadeus_catalog`     what data exists and what it means
+                          (DataSource → Product → ProductVariable →
+                          CanonicalVariable; GridDefinition; Asset)
+  * `amadeus_value`       the data rows, in four spatial shapes
+                          (StationObservation, GridCellValue, AreaValue,
+                          HexCellValue) plus VectorFeature
+  * `amadeus_request`     the query-first contract
+                          (LocationSet, Location, ExtractionRequest,
+                          AmbientValueAtLocation)
+  * `amadeus_provenance`  ToolRun and the derivation DAG
+
+  The three load-bearing claims
+  -----------------------------
+  1. **One schema, not one per source type.** The 24 amadeus sources vary on
+     five orthogonal axes recorded on `Product` and `CanonicalVariable`
+     (spatial support, temporal resolution, value kind, native format,
+     extensivity), and on exactly one axis that needs a different table: what
+     geometry identifies a value. Four value tables cover all of them.
+  2. **`CanonicalVariable` ← `ProductVariable` answers the actual question.**
+     "Is the schema for this variable the same as for the same variable from
+     another source?" Yes at the canonical level, no at the product level, and
+     every reason for the difference is a slot.
+  3. **Extensivity makes aggregation checkable.** Intensive vs extensive is not
+     documentation; it is the precondition on which aggregation methods are
+     legal, enforced by a rule on `ExtractionRequest`.
+
+  Relationship to the neighbouring schemas
+  ----------------------------------------
+  This model sits *between* HEW and EnVar and is designed to be projectable to
+  both, not to replace either:
+
+      HEW Catalog    dataset grain    what exists           ← Product, DataSource roll up
+      AmadeusDB      row grain        the values themselves  ← this schema
+      EnVar          run grain        what one number means  ← Asset + ToolRun + Product project out
+
+  Every slot that has an upstream equivalent carries `exact_mappings` to it.
+  Every enum that extends an upstream one carries `annotations: extends` plus a
+  note on why, so enum reconciliation is a finite list of decisions rather than
+  a diff. Three things this model has that neither upstream does — per-row
+  `data_status`, `VariableExtensivityEnum`, and `GridDefinition` — are candidate
+  contributions upward.
+license: MIT
+
+prefixes:
+  amadeus: https://w3id.org/niehs/amadeus/
+  linkml: https://w3id.org/linkml/
+  envar: https://w3id.org/linkml/microschemas/envar/
+  hew: https://w3id.org/hew/schema/
+  geo: http://www.opengis.net/ont/geosparql#
+  prov: http://www.w3.org/ns/prov#
+default_prefix: amadeus
+default_range: string
+
+see_also:
+- https://monarch-initiative.github.io/linkml-microschemas-envar/overview/
+- https://github.com/NIEHS/HEW_Catalog_Data_Model/tree/develop
+- https://github.com/NIEHS/amadeus/issues/249
+
+imports:
+- linkml:types
+- amadeus_common
+- amadeus_catalog
+- amadeus_value
+- amadeus_request
+- amadeus_provenance
+
+classes:
+
+  AmadeusDatabase:
+    title: Amadeus Database
+    tree_root: true
+    description: >-
+      Container for a complete or partial AmadeusDB instance. Exists so a
+      catalog snapshot, a sample dataset or an import bundle can be validated
+      as one document with `linkml-validate`, and so the SQL generator has a
+      root from which to reach every table.
+
+      All collections are optional: a catalog-only bundle (the normal shape of
+      a curation pull request) is as valid as a full instance.
+    slots:
+    - schema_version
+    - data_sources
+    - products
+    - grid_definitions
+    - canonical_variables
+    - product_variables
+    - assets
+    - station_observations
+    - grid_cell_values
+    - area_values
+    - hex_cell_values
+    - vector_features
+    - location_sets
+    - locations
+    - extraction_requests
+    - ambient_values_at_location
+    - tool_runs
+    - provenance_chains
+
+slots:
+
+  data_sources:
+    range: DataSource
+    multivalued: true
+    inlined_as_list: true
+  products:
+    range: Product
+    multivalued: true
+    inlined_as_list: true
+  grid_definitions:
+    range: GridDefinition
+    multivalued: true
+    inlined_as_list: true
+  canonical_variables:
+    range: CanonicalVariable
+    multivalued: true
+    inlined_as_list: true
+  product_variables:
+    range: ProductVariable
+    multivalued: true
+    inlined_as_list: true
+  assets:
+    range: Asset
+    multivalued: true
+    inlined_as_list: true
+  station_observations:
+    range: StationObservation
+    multivalued: true
+    inlined_as_list: true
+  grid_cell_values:
+    range: GridCellValue
+    multivalued: true
+    inlined_as_list: true
+  area_values:
+    range: AreaValue
+    multivalued: true
+    inlined_as_list: true
+  hex_cell_values:
+    range: HexCellValue
+    multivalued: true
+    inlined_as_list: true
+  vector_features:
+    range: VectorFeature
+    multivalued: true
+    inlined_as_list: true
+  location_sets:
+    range: LocationSet
+    multivalued: true
+    inlined_as_list: true
+  locations:
+    range: Location
+    multivalued: true
+    inlined_as_list: true
+  extraction_requests:
+    range: ExtractionRequest
+    multivalued: true
+    inlined_as_list: true
+  ambient_values_at_location:
+    range: AmbientValueAtLocation
+    multivalued: true
+    inlined_as_list: true
+  tool_runs:
+    range: ToolRun
+    multivalued: true
+    inlined_as_list: true
+  provenance_chains:
+    range: ProvenanceChain
+    multivalued: true
+    inlined_as_list: true

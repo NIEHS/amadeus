@@ -1,0 +1,1077 @@
+id: https://w3id.org/niehs/amadeus/catalog
+name: amadeus-catalog
+title: AmadeusDB — Catalog Layer
+version: "0.1.0"
+description: |-
+  The catalog: what data *exists*, what it means, and where the bytes are. Small,
+  persistent, hand-curated or adapter-generated — one row per source, product,
+  variable, grid and asset, never one row per measurement.
+
+  This is the layer neither EnVar nor HEW provides at the grain amadeus needs.
+  HEW catalogs *resources* for discovery by humans; EnVar describes a *run* for
+  reproducibility. Neither gives a query planner the information it needs to
+  decide which file to open, which variable is the same as which, or whether a
+  buffer mean is a legal operation. That is this layer's job.
+
+  The five-entity spine
+  ---------------------
+      DataSource  ──1:n──▶  Product  ──1:n──▶  ProductVariable  ──n:1──▶  CanonicalVariable
+                               │  │                     ▲
+                               │  └──n:1──▶ GridDefinition
+                               └──1:n──▶  Asset
+
+  `CanonicalVariable` ← `ProductVariable` is the single most important
+  relationship in the model. It is the direct answer to the project lead's
+  framing of the whole schema ask:
+
+      "When we write a function for a variable — what is the schema for that
+       variable, and is it the same as the schema for the same variable from
+       another data source?"
+
+  A `CanonicalVariable` is the harmonised quantity ("daily maximum near-surface
+  air temperature"). A `ProductVariable` is one source's delivery of it
+  (`gridmet.tmmx` in K on a 4 km grid with a noon-GMT day boundary;
+  `prism.tmax` in °C on an 800 m grid with local midnight). Two
+  `ProductVariable`s pointing at the same `CanonicalVariable` are *comparable
+  but not interchangeable* — and every reason they are not interchangeable is a
+  slot here.
+license: MIT
+
+prefixes:
+  amadeus: https://w3id.org/niehs/amadeus/
+  linkml: https://w3id.org/linkml/
+  envar: https://w3id.org/linkml/microschemas/envar/
+  hew: https://w3id.org/hew/schema/
+  dcterms: http://purl.org/dc/terms/
+  schema: http://schema.org/
+default_prefix: amadeus
+default_range: string
+
+imports:
+- linkml:types
+- amadeus_common
+
+#────────────────────────────────────────────────────────────────
+# CLASSES
+#────────────────────────────────────────────────────────────────
+
+classes:
+
+  DataSource:
+    title: Data Source
+    description: >-
+      A provider programme that publishes one or more products: EPA AQS, NASA
+      MODIS, NOAA NARR, Climatology Lab. One row per row of the amadeus README
+      source table.
+    exact_mappings:
+    - hew:HEWResource
+    slots:
+    - id
+    - name
+    - label
+    - description
+    - producer_institution
+    - homepage
+    - access_protocol
+    - requires_authentication
+    - auth_mechanism
+    - rate_limit_requests_per_second
+    - license_spdx
+    - citation_apa
+    - doi
+    - amadeus_function_suffix
+    slot_usage:
+      name:
+        required: true
+        examples:
+        - value: "epa_aqs"
+        - value: "noaa_ncep_narr"
+      amadeus_function_suffix:
+        examples:
+        - value: "_narr"
+        - value: "_aqs"
+
+  Product:
+    title: Product
+    description: >-
+      A specific, versioned data product from a source — the unit a user
+      actually requests, and the unit that carries the *profile*: spatial
+      support, temporal support, format, calendar, day boundary.
+
+      This is where the answer to "do we need different schemas for different
+      types of source data?" lives. We do not. The variation across the amadeus
+      catalog decomposes into five orthogonal axes recorded here
+      (`spatial_support_type`, `temporal_resolution`, `value` kind via the
+      variables, `native_format`, and extensivity via the variables). One schema,
+      one product table; a MODIS swath and an AQS monitor differ in their
+      *values on these axes*, not in their structure.
+    exact_mappings:
+    - hew:DatasetResource
+    - envar:SourceDataset
+    slots:
+    - id
+    - name
+    - label
+    - description
+    - data_source
+    - product_version
+    - data_genre
+    - native_format
+    - spatial_support_type
+    - grid_definition
+    - crs
+    - srid
+    - spatial_extent_bbox_wkt
+    - spatial_extent_descriptor
+    - native_spatial_resolution_m
+    - native_spatial_resolution_descriptor
+    - temporal_resolution
+    - temporal_resolution_iso
+    - temporal_alignment
+    - day_boundary_convention
+    - calendar
+    - temporal_coverage_start
+    - temporal_coverage_end
+    - update_cadence_iso
+    - typical_latency_iso
+    - default_data_status
+    - homogenisation_status
+    - doi
+    - license_spdx
+    - citation_apa
+    - access_url
+    - amadeus_dataset_name
+    - amadeus_process_covariate
+    - amadeus_calculate_covariate
+    - supports_server_side_subset
+    - stac_collection_id
+    slot_usage:
+      name:
+        required: true
+      data_source:
+        required: true
+      spatial_support_type:
+        required: true
+      temporal_resolution:
+        required: true
+      grid_definition:
+        description: >-
+          Required when `spatial_support_type` is a grid cell type, forbidden
+          otherwise. Enforced by the rules below rather than by two separate
+          classes — the project lead's "grid size is a dataset-level property"
+          becomes a foreign key, not a copied field.
+    rules:
+    - preconditions:
+        slot_conditions:
+          spatial_support_type:
+            any_of:
+            - equals_string: raster_grid_cell
+            - equals_string: model_grid_cell
+      postconditions:
+        slot_conditions:
+          grid_definition:
+            required: true
+      description: >-
+        A gridded product must declare its grid. Without this, "1 km" lives in
+        a description string and no query can reason about resolution.
+    - preconditions:
+        slot_conditions:
+          temporal_resolution:
+            equals_string: daily
+      postconditions:
+        slot_conditions:
+          day_boundary_convention:
+            required: true
+      description: >-
+        A daily product must declare where its day starts. This rule alone
+        would have caught the Daymet/GridMET 1.26 °C discrepancy at
+        registration time.
+    # Two rules, not one with two ABSENT postconditions. LinkML compiles
+    # several ABSENT postconditions into a single negated `required: [a, b]`,
+    # which means "not BOTH present" — so a timeless product declaring only a
+    # start date validates. One rule per slot negates each independently.
+    # Verified 2026-09-18 on linkml 1.9.x; see REPORT.md.
+    - preconditions:
+        slot_conditions:
+          temporal_resolution:
+            equals_string: timeless
+      postconditions:
+        slot_conditions:
+          temporal_coverage_start:
+            value_presence: ABSENT
+      description: >-
+        A timeless product (GMTED elevation, Köppen-Geiger) asserts no temporal
+        coverage start. Modelled as absence rather than a sentinel date.
+    - preconditions:
+        slot_conditions:
+          temporal_resolution:
+            equals_string: timeless
+      postconditions:
+        slot_conditions:
+          temporal_coverage_end:
+            value_presence: ABSENT
+      description: A timeless product asserts no temporal coverage end.
+
+  GridDefinition:
+    title: Grid Definition
+    description: >-
+      A reusable description of a raster or model grid. Its own entity because
+      several products share one grid (all NARR monolevel variables) and because
+      resolution, projection and vertical levels must be computable, not prose.
+    slots:
+    - id
+    - name
+    - label
+    - crs
+    - srid
+    - grid_mapping_name
+    - proj_string
+    - resolution_x
+    - resolution_y
+    - resolution_unit
+    - n_columns
+    - n_rows
+    - origin_x
+    - origin_y
+    - vertical_level_type
+    - vertical_level_unit
+    - vertical_levels
+    slot_usage:
+      crs:
+        required: true
+      resolution_x:
+        required: true
+      resolution_y:
+        required: true
+      vertical_levels:
+        description: >-
+          The pressure or height levels present, when the product is
+          multi-level. NARR and MERRA-2/GEOS pressure-level products encode the
+          level in the `terra` layer name (`variable_level_YYYYMMDD`); recording
+          the level set here is what lets that be parsed reliably instead of
+          positionally.
+
+  CanonicalVariable:
+    title: Canonical Variable
+    description: >-
+      A harmonised environmental quantity, independent of who publishes it.
+      The cross-source identity anchor: `gridmet.tmmx`, `prism.tmax` and
+      `daymet.tmax` are three `ProductVariable`s over *one*
+      `CanonicalVariable`, and that is what makes "is it the same variable?"
+      answerable by a join rather than by a conversation.
+
+      Carries the semantics that must be identical across sources
+      (`standard_name`, canonical units, extensivity, plausible range, concept
+      bindings). Everything that legitimately differs per source lives on
+      `ProductVariable`.
+    exact_mappings:
+    - hew:EnvironmentalVariable
+    - envar:VariableIdentity
+    slots:
+    - id
+    - name
+    - label
+    - description
+    - standard_name
+    - standard_name_authority
+    - units_ucum
+    - units_display
+    - value_data_type
+    - extensivity
+    - default_aggregation_method
+    - plausible_min
+    - plausible_max
+    - concept_mappings
+    - omop_concept_binding
+    - envar_variable_family
+    slot_usage:
+      name:
+        required: true
+        examples:
+        - value: "air_temperature_daily_maximum"
+        - value: "pm25_mass_concentration"
+      standard_name:
+        required: true
+      units_ucum:
+        required: true
+      value_data_type:
+        required: true
+      extensivity:
+        required: true
+    rules:
+    - preconditions:
+        slot_conditions:
+          value_data_type:
+            equals_string: categorical
+      postconditions:
+        slot_conditions:
+          extensivity:
+            equals_string: categorical
+      description: A categorical value must declare categorical extensivity.
+    # One rule per slot, for the reason documented on the `timeless` rules
+    # above: two ABSENT postconditions in one rule mean "not BOTH present",
+    # so a categorical variable declaring only a minimum would slip through.
+    # Caught by tests/test_schema.py::test_at_most_one_absent_postcondition_per_rule
+    # after the same mistake was made here.
+    - preconditions:
+        slot_conditions:
+          extensivity:
+            equals_string: categorical
+      postconditions:
+        slot_conditions:
+          plausible_min:
+            value_presence: ABSENT
+      description: >-
+        A plausible numeric minimum is meaningless for a nominal class label.
+    - preconditions:
+        slot_conditions:
+          extensivity:
+            equals_string: categorical
+      postconditions:
+        slot_conditions:
+          plausible_max:
+            value_presence: ABSENT
+      description: >-
+        A plausible numeric maximum is meaningless for a nominal class label.
+
+  ProductVariable:
+    title: Product Variable
+    description: >-
+      One source's delivery of one canonical variable: the native name, the
+      native units and conversion, the CF metadata, the aggregation actually
+      applied, and the layer-name template amadeus parses.
+
+      Every slot here exists because it is a reason two sources of "the same"
+      variable are not interchangeable. `native_units_ucum` +
+      `native_value_scale_factor` + `native_value_offset` are the gridMET
+      Kelvin→Celsius case, where the conversion happened at render time and was
+      recorded nowhere.
+    exact_mappings:
+    - envar:VariableIdentity
+    slots:
+    - id
+    - product
+    - canonical_variable
+    - native_name
+    - label
+    - native_units_ucum
+    - native_value_scale_factor
+    - native_value_offset
+    - unit_conversion_formula
+    - cf_standard_name
+    - cf_cell_methods
+    - aggregation_method
+    - aggregation_window_iso
+    - temporal_alignment
+    - vertical_level_type
+    - missing_value_sentinel
+    - quality_flag_vocabulary
+    - layer_name_template
+    - amadeus_variable_code
+    - value_data_type
+    - extensivity
+    - harmonization_note
+    - metadata_gaps
+    slot_usage:
+      product:
+        required: true
+      canonical_variable:
+        required: true
+      native_name:
+        required: true
+        examples:
+        - value: "weasd"
+        - value: "tmmx"
+        - value: "88101"
+      layer_name_template:
+        examples:
+        - value: "{native_name}_{YYYYMMDD}"
+        - value: "{native_name}_{level}_{YYYYMMDD}"
+        - value: "{native_name}_{YYYYMMDD}_{HHMMSS}"
+      value_data_type:
+        description: >-
+          Optional override. Absent means "as the canonical variable declares".
+          Present means this source genuinely differs — e.g. a source that
+          publishes a binary exceedance flag for a quantity that is continuous
+          elsewhere.
+      extensivity:
+        description: >-
+          Optional override, same semantics as `value_data_type`. Overriding it
+          is a strong signal something is wrong and should be reviewed.
+    rules:
+    - preconditions:
+        slot_conditions:
+          native_value_scale_factor:
+            value_presence: PRESENT
+      postconditions:
+        slot_conditions:
+          native_units_ucum:
+            required: true
+      description: >-
+        A scale factor without the unit it scales from is uninterpretable.
+    - preconditions:
+        slot_conditions:
+          vertical_level_type:
+            value_presence: PRESENT
+      postconditions:
+        slot_conditions:
+          layer_name_template:
+            pattern: ".*\\{level\\}.*"
+      description: >-
+        A multi-level variable's layer names must carry the level, or the level
+        cannot be recovered when the raster is flattened.
+
+  OmopConceptBinding:
+    title: OMOP Concept Binding
+    description: >-
+      Binding of a canonical variable to an OMOP concept. Taken structurally
+      from HEW so the two schemas exchange bindings without an adapter.
+    exact_mappings:
+    - hew:OMOPConceptBinding
+    slots:
+    - omop_concept_id
+    - omop_concept_name
+    - omop_vocabulary_id
+    - omop_domain_id
+    - omop_standard_concept
+    - concept_status
+    slot_usage:
+      concept_status:
+        required: true
+
+  Asset:
+    title: Asset
+    description: >-
+      A concrete byte stream: a file on disk, an object in a bucket, a STAC
+      asset, or a provider API response. The unit of download, caching,
+      integrity checking and idempotency.
+
+      **Asset-centric by design.** The modernization plan's own instruction is
+      "adopt an asset-centric schema; avoid mandatory cell-row ingestion". An
+      asset can be registered — catalogued, discoverable, queryable by extent
+      and time — without any of its values ever being materialised into a value
+      table. `materialization_mode` records how much was actually read, so the
+      four streaming modes of plan §4.7.2 become auditable properties of the
+      catalog rather than an ungoverned side path.
+    slots:
+    - id
+    - product
+    - asset_key
+    - url
+    - local_path
+    - media_type
+    - native_format
+    - size_bytes
+    - sha256
+    - source_last_modified
+    - download_timestamp_utc
+    - valid_time_start
+    - valid_time_end
+    - reference_time
+    - bbox_wkt
+    - srid
+    - variables_present
+    - vertical_levels_present
+    - stac_collection_id
+    - stac_item_id
+    - materialization_mode
+    - cache_expires_at
+    - value_state
+    - produced_by_run
+    slot_usage:
+      product:
+        required: true
+      materialization_mode:
+        required: true
+      value_state:
+        required: true
+      url:
+        description: >-
+          Where the bytes live upstream. Retained even after local caching so a
+          result can be re-derived from source.
+      local_path:
+        description: >-
+          Present only when bytes were actually written locally. Absent for
+          `direct_remote_scan` and `server_side_subset`.
+    rules:
+    - preconditions:
+        slot_conditions:
+          materialization_mode:
+            any_of:
+            - equals_string: bounded_cache
+            - equals_string: full_materialization
+      postconditions:
+        slot_conditions:
+          local_path:
+            required: true
+          sha256:
+            required: true
+      description: >-
+        Anything cached or fully downloaded must record where it went and what
+        it hashes to — otherwise "resumable, idempotent processing" is not
+        checkable.
+    - preconditions:
+        slot_conditions:
+          value_state:
+            equals_string: materialized
+      postconditions:
+        slot_conditions:
+          produced_by_run:
+            required: true
+      description: >-
+        If values were written into a value table, the run that wrote them must
+        be identified. This is the link that makes every derived number resolve
+        to a processing run (objective O-02).
+
+#────────────────────────────────────────────────────────────────
+# SLOTS
+#────────────────────────────────────────────────────────────────
+
+slots:
+
+  # ── DataSource ────────────────────────────────────────────────
+  producer_institution:
+    range: string
+    exact_mappings:
+    - envar:source_producer_institution
+    examples:
+    - value: "US Environmental Protection Agency"
+
+  homepage:
+    range: uri
+
+  access_protocol:
+    range: AccessProtocolEnum
+    description: >-
+      Primary access mechanism. Determines whether "subset early" is achievable
+      at all for this source.
+
+  requires_authentication:
+    range: boolean
+    description: >-
+      Whether a credential is needed. True for all NASA Earthdata sources
+      (`modis`, `merra2`, `geos`, SEDAC `population`).
+
+  auth_mechanism:
+    range: string
+    examples:
+    - value: "NASA Earthdata bearer token"
+    - value: "EPA AQS email + API key"
+
+  rate_limit_requests_per_second:
+    range: float
+    description: >-
+      Provider rate limit, as `download_data(rate_limit=)` already takes. In the
+      catalog so a query planner can respect it without hard-coding.
+
+  license_spdx:
+    range: string
+    exact_mappings:
+    - envar:source_license_spdx
+    examples:
+    - value: "CC0-1.0"
+    - value: "NOASSERTION"
+
+  citation_apa:
+    range: string
+    exact_mappings:
+    - envar:source_citation_apa
+
+  doi:
+    range: string
+    pattern: "^10\\.[0-9]{4,9}/.+$"
+
+  amadeus_function_suffix:
+    range: string
+    description: >-
+      The suffix amadeus uses for this source's functions (`_narr` →
+      `download_narr`, `process_narr`, `calculate_narr`). Recorded so the
+      catalog and the R API can be checked against each other mechanically —
+      a catalog entry with no implementing function, or a function with no
+      catalog entry, is a test failure.
+
+  # ── Product ───────────────────────────────────────────────────
+  data_source:
+    range: DataSource
+    description: The publishing programme.
+
+  product_version:
+    range: string
+    exact_mappings:
+    - envar:source_dataset_version
+    examples:
+    - value: "061"
+    - value: "v1.5"
+    - value: "2021"
+
+  data_genre:
+    range: DataGenreEnum
+    multivalued: true
+    description: Thematic classification, from the README source table.
+
+  native_format:
+    range: NativeFormatEnum
+    exact_mappings:
+    - envar:source_native_format
+
+  spatial_support_type:
+    range: SpatialSupportTypeEnum
+    exact_mappings:
+    - hew:support_type
+
+  grid_definition:
+    range: GridDefinition
+
+  spatial_extent_bbox_wkt:
+    range: WktLiteral
+    description: Coverage footprint as WKT, so extent is a spatial predicate.
+
+  spatial_extent_descriptor:
+    range: string
+    exact_mappings:
+    - envar:spatial_extent_descriptor
+    examples:
+    - value: "Contiguous United States"
+    - value: "Global"
+
+  native_spatial_resolution_m:
+    range: float
+    exact_mappings:
+    - envar:native_spatial_resolution_m
+    description: >-
+      Nominal resolution in metres. Computable, and therefore the one a query
+      planner uses — but meaningless for non-grid supports, hence the
+      descriptor alongside it.
+
+  native_spatial_resolution_descriptor:
+    range: string
+    exact_mappings:
+    - envar:native_spatial_resolution_descriptor
+    - hew:spatial_resolution
+    examples:
+    - value: "4 km"
+    - value: "census tract"
+
+  temporal_resolution:
+    range: TemporalResolutionEnum
+    exact_mappings:
+    - envar:temporal_resolution
+
+  temporal_resolution_iso:
+    range: Iso8601Duration
+    description: >-
+      The same fact as `temporal_resolution`, as an ISO 8601 duration. Both are
+      kept because the enum is validatable and the duration is expressive
+      (`P3D` has no enum member). HEW uses the duration, EnVar the enum; this is
+      the reconciliation, and it is generated, not hand-maintained.
+    exact_mappings:
+    - hew:temporal_resolution
+
+  temporal_alignment:
+    range: TemporalAlignmentEnum
+    exact_mappings:
+    - hew:temporal_alignment
+
+  day_boundary_convention:
+    range: DayBoundaryConventionEnum
+    exact_mappings:
+    - envar:day_boundary_convention
+
+  calendar:
+    range: CalendarEnum
+    exact_mappings:
+    - envar:calendar
+
+  temporal_coverage_start:
+    range: date
+    exact_mappings:
+    - envar:temporal_coverage_start
+
+  temporal_coverage_end:
+    range: date
+    description: Absent means "ongoing".
+    exact_mappings:
+    - envar:temporal_coverage_end
+
+  update_cadence_iso:
+    range: Iso8601Duration
+    description: How often the source publishes new data.
+
+  typical_latency_iso:
+    range: Iso8601Duration
+    description: >-
+      Typical delay between observation and availability. The field that makes
+      the AQS-versus-AirNow trade-off explicit: AQS is quality-controlled and
+      months late, AirNow is preliminary and hourly.
+
+  default_data_status:
+    range: DataStatusEnum
+    description: >-
+      The status values from this product carry unless a row says otherwise.
+
+  homogenisation_status:
+    range: HomogenisationStatusEnum
+    exact_mappings:
+    - envar:source_homogenisation_status
+
+  access_url:
+    range: uri
+    exact_mappings:
+    - envar:source_access_url
+
+  amadeus_dataset_name:
+    range: string
+    description: >-
+      The exact string accepted by `download_data(dataset_name=)`. The bridge
+      between the catalog and the existing R API.
+    examples:
+    - value: "narr"
+    - value: "gridmet"
+
+  amadeus_process_covariate:
+    range: string
+    description: The string accepted by `process_covariates(covariate=)`.
+
+  amadeus_calculate_covariate:
+    range: string
+    description: >-
+      The string accepted by `calculate_covariates(covariate=)`. Distinct from
+      the process name — `modis_swath`/`modis_merge` both calculate as `modis`,
+      and `aqs` processes but does not calculate.
+
+  supports_server_side_subset:
+    range: boolean
+    description: >-
+      Whether the provider will return a geometry/time/variable subset. Drives
+      the achievable `MaterializationModeEnum`.
+
+  stac_collection_id:
+    range: string
+    description: STAC collection identifier, where the product is STAC-published.
+
+  # ── GridDefinition ────────────────────────────────────────────
+  grid_mapping_name:
+    range: string
+    description: CF grid mapping name.
+    examples:
+    - value: "lambert_conformal_conic"
+    - value: "latitude_longitude"
+
+  proj_string:
+    range: string
+    description: Full PROJ or WKT2 CRS definition, for grids with no authority code.
+
+  resolution_x:
+    range: float
+  resolution_y:
+    range: float
+  resolution_unit:
+    range: string
+    examples:
+    - value: "m"
+    - value: "deg"
+  n_columns:
+    range: integer
+  n_rows:
+    range: integer
+  origin_x:
+    range: float
+  origin_y:
+    range: float
+
+  vertical_level_type:
+    range: string
+    examples:
+    - value: "isobaric_pressure_hPa"
+    - value: "height_above_ground_m"
+
+  vertical_level_unit:
+    range: string
+
+  vertical_levels:
+    range: float
+    multivalued: true
+
+  # ── CanonicalVariable ─────────────────────────────────────────
+  standard_name:
+    range: uriorcurie
+    description: >-
+      The standard-name identifier for the physical quantity, as a CURIE so no
+      single naming authority is privileged. Prefer a CF standard name where one
+      exists; fall back to ECTO/ENVO or a minted `AMADEUS:` term. The prefix
+      carries the authority; the slot name does not.
+    exact_mappings:
+    - envar:standard_name
+    - hew:measured_property
+    examples:
+    - value: "CF:air_temperature"
+    - value: "CF:mass_concentration_of_pm2p5_ambient_aerosol_particles_in_air"
+
+  standard_name_authority:
+    range: string
+    examples:
+    - value: "CF Standard Name Table v85"
+
+  units_ucum:
+    range: string
+    description: >-
+      Canonical units in UCUM notation, bare (not CURIE-prefixed). HEW prefixes
+      (`UCUM:Cel`), EnVar does not (`Cel`); we follow EnVar and note the
+      difference, because it is exactly the kind of thing a mechanical mapper
+      gets wrong silently.
+    exact_mappings:
+    - envar:units_ucum
+    - hew:unit
+    examples:
+    - value: "Cel"
+    - value: "ug/m3"
+
+  units_display:
+    range: string
+    exact_mappings:
+    - envar:units_display
+
+  value_data_type:
+    range: ValueDataTypeEnum
+    exact_mappings:
+    - envar:value_data_type
+
+  extensivity:
+    range: VariableExtensivityEnum
+    description: >-
+      Intensive, extensive or categorical. Determines which aggregation methods
+      are legal for this variable — see `ExtractionRequest`.
+
+  default_aggregation_method:
+    range: AggregationMethodEnum
+    description: >-
+      The aggregation applied when a request does not name one. Must be legal
+      for the declared extensivity.
+
+  plausible_min:
+    range: float
+    exact_mappings:
+    - envar:value_range_plausible_min
+
+  plausible_max:
+    range: float
+    exact_mappings:
+    - envar:value_range_plausible_max
+
+  concept_mappings:
+    range: uriorcurie
+    multivalued: true
+    description: >-
+      Mappings to any target vocabulary. One generic list rather than a slot per
+      standard, so adding a vocabulary is a new prefix, not a schema change.
+      EnVar and HEW arrived at this identical design independently.
+    exact_mappings:
+    - envar:concept_mappings
+    - hew:concept_mappings
+
+  omop_concept_binding:
+    range: OmopConceptBinding
+    inlined: true
+    exact_mappings:
+    - hew:omop_concept_binding
+
+  envar_variable_family:
+    range: string
+    description: >-
+      Which EnVar variable family this belongs to, and therefore which
+      variable-specific extension block an emitted EnVar record must carry
+      (`derived_heat_metric` for the heat family).
+    examples:
+    - value: "heat"
+    - value: "air_quality"
+
+  omop_concept_id:
+    range: integer
+  omop_concept_name:
+    range: string
+  omop_vocabulary_id:
+    range: string
+  omop_domain_id:
+    range: string
+  omop_standard_concept:
+    range: string
+  concept_status:
+    range: ConceptStatusEnum
+
+  # ── ProductVariable ───────────────────────────────────────────
+  product:
+    range: Product
+
+  canonical_variable:
+    range: CanonicalVariable
+
+  native_name:
+    range: string
+    description: >-
+      The variable's name in the source: a netCDF variable name, a MODIS
+      subdataset, an AQS parameter code.
+
+  native_units_ucum:
+    range: string
+    exact_mappings:
+    - envar:native_units_ucum
+
+  native_value_scale_factor:
+    range: float
+    exact_mappings:
+    - envar:native_value_scale_factor
+
+  native_value_offset:
+    range: float
+    exact_mappings:
+    - envar:native_value_offset
+
+  unit_conversion_formula:
+    range: string
+    exact_mappings:
+    - envar:unit_conversion_formula
+    examples:
+    - value: "value_Cel = value_K - 273.15"
+
+  cf_standard_name:
+    range: string
+    description: >-
+      The CF `standard_name` attribute as it appears in the source file. A Tier 1
+      field: already in the netCDF, currently discarded on conversion to `terra`.
+
+  cf_cell_methods:
+    range: string
+    exact_mappings:
+    - envar:cf_cell_methods
+    description: >-
+      The CF `cell_methods` attribute verbatim. CF already has a standard way to
+      say "daily maximum" and it is sitting unread in the file.
+    examples:
+    - value: "time: maximum"
+    - value: "time: mean within days time: maximum over days"
+
+  aggregation_method:
+    range: AggregationMethodEnum
+    exact_mappings:
+    - envar:temporal_aggregation_method
+    - hew:aggregation_method
+
+  aggregation_window_iso:
+    range: Iso8601Duration
+    exact_mappings:
+    - hew:aggregation_window
+
+  missing_value_sentinel:
+    range: string
+    exact_mappings:
+    - envar:missing_value_sentinel
+    examples:
+    - value: "-9999"
+
+  quality_flag_vocabulary:
+    range: string
+    exact_mappings:
+    - envar:quality_flag_vocabulary
+
+  layer_name_template:
+    range: string
+    description: >-
+      How amadeus composes `terra` layer names for this variable. Recorded
+      because `calc_worker()` currently recovers variable, level and time by
+      splitting the layer name on `_` and indexing by position; a declared
+      template turns that from an implicit convention into a checkable one.
+    examples:
+    - value: "{native_name}_{YYYYMMDD}"
+
+  amadeus_variable_code:
+    range: string
+    description: >-
+      The string a user passes as `variable=` to the amadeus download/process
+      functions, where it differs from `native_name`.
+
+  harmonization_note:
+    range: string
+    description: >-
+      Free text on why this delivery is not interchangeable with a sibling
+      delivery of the same canonical variable. Deliberately unstructured: it is
+      the intake queue for future first-class slots, not a permanent home.
+
+  metadata_gaps:
+    range: MissingReasonEnum
+    multivalued: true
+    description: >-
+      Which metadata this delivery is missing, and why. Makes the Tier 1
+      backlog ("in the file, discarded by amadeus") countable and therefore
+      reportable as progress.
+
+  # ── Asset ─────────────────────────────────────────────────────
+  asset_key:
+    range: string
+    description: STAC asset key or other within-item key.
+
+  url:
+    range: uri
+  local_path:
+    range: string
+  media_type:
+    range: string
+    examples:
+    - value: "application/x-netcdf"
+  size_bytes:
+    range: integer
+  source_last_modified:
+    range: datetime
+  download_timestamp_utc:
+    range: datetime
+
+  reference_time:
+    range: datetime
+    description: >-
+      Model initialisation / cycle time, distinct from valid time. Required for
+      HRRR and any forecast product: "valid versus reference time" is called out
+      explicitly in the P0 subdaily work.
+
+  variables_present:
+    range: ProductVariable
+    multivalued: true
+    description: >-
+      Which variables this asset actually contains. Lets a request skip assets
+      that cannot satisfy it without opening them.
+
+  vertical_levels_present:
+    range: float
+    multivalued: true
+
+  stac_item_id:
+    range: string
+
+  cache_expires_at:
+    range: datetime
+
+  value_state:
+    range: ValueMaterializationEnum
+    description: >-
+      Whether rows for this asset exist in a value table. `registered_only` is
+      the normal case for the asset-centric discovery path.
+
+  produced_by_run:
+    range: string
+    description: >-
+      Identifier of the tool run that registered or materialised this asset.
+      Typed as a string rather than an object reference to keep the catalog and
+      provenance modules independently loadable; the FK is added by the SQL
+      post-processor.
+
+#────────────────────────────────────────────────────────────────
+# ADDITIONAL ENUMS
+#────────────────────────────────────────────────────────────────
+
+enums:
+
+  HomogenisationStatusEnum:
+    exact_mappings:
+    - envar:HomogenisationStatusEnum
+    permissible_values:
+      homogenised:
+      not_homogenised:
+      partial:

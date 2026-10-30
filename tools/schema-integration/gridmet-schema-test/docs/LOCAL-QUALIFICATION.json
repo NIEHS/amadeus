@@ -1,0 +1,96 @@
+{
+  "qualified_date": "2026-10-30",
+  "scope": "New direct-request entrypoint; tmmx/pr;2021-07-01through2021-07-03;Raleigh/Denver;12native results",
+  "amadeus_version": "2.0.2",
+  "amadeus_release_status": "existing local2.0.2 build; official-release equivalence not asserted",
+  "fresh_source_files": 2,
+  "source_files_absent_before_native_download": true,
+  "schema_records": 12,
+  "JSON_YAML_agree": true,
+  "schema_tests": {
+    "cases": 16,
+    "passed": 16,
+    "failed": 0,
+    "scientific_values_changed": false,
+    "physical_time_and_ontology_approved": false,
+    "human_signoff": "pending",
+    "package_implementation_changed": false
+  },
+  "engines": {
+    "duckdb": {
+      "engine": "duckdb",
+      "engine_version": "v1.1.3-dev165",
+      "records": 12,
+      "inserted_rows": 72,
+      "integrity_queries": 102,
+      "all_within_declared_tolerances": true,
+      "maximum_numeric_storage_difference": 1.22070312613687e-05,
+      "persistent_reopen_passed": true,
+      "profile": "Core SQL/WKT; spatial SQL not tested",
+      "production_approved": false
+    },
+    "sedonadb": {
+      "engine": "sedonadb",
+      "engine_version": "Apache DataFusion 54.1.0, x86_64 on linux",
+      "records": 12,
+      "inserted_rows": 72,
+      "integrity_queries": 102,
+      "all_within_declared_tolerances": true,
+      "maximum_numeric_storage_difference": 1.22070312613687e-05,
+      "persistent_reopen_passed": false,
+      "profile": "Core SQL/WKT; spatial SQL not tested",
+      "production_approved": false
+    }
+  },
+  "saved_DuckDB_query_passed": true,
+  "fresh_Sedona_session_query_passed": true,
+  "relocated_folder_schema_tests_passed": true,
+  "old_pilot_scripts_data_checkpoints_or_library_paths_required": false,
+  "full_16_variable_clean_entrypoint_qualified": false,
+  "fresh_machine_portability_qualified": false,
+  "production_approved": false,
+  "scope_limit": "No prior recovery/performance qualification is inherited; physical time/ontology decisions remain pending.",
+  "R_version": "R version 4.3.2 (2023-10-31)",
+  "platform": "x86_64-pc-linux-gnu",
+  "observed_package_versions": {
+    "terra": "1.9.48",
+    "sf": "1.0.14",
+    "jsonlite": "2.0.0",
+    "yaml": "2.3.12",
+    "digest": "0.6.33",
+    "checkmate": "2.2.0",
+    "jsonvalidate": "1.5.0",
+    "ncdf4": "1.22",
+    "DBI": "1.1.3",
+    "duckdb": "1.1.3",
+    "sedonadb": "0.4.1.9000"
+  },
+  "current_interface": "Explicit --variables,--start,--end,--sites,--engine required; no default scientific request",
+  "previous_small_request_observation": "The earlier12-row result documents a supplied request tested before the explicit-required interface update, not a request automatically selected now.",
+  "explicit_interface_checks": {
+    "missing_partial_empty_requests_rejected_before_outputs": true,
+    "request": {
+      "variables": [
+        "pr"
+      ],
+      "start_date": "2021-07-02",
+      "end_date": "2021-07-03",
+      "site_count": 1
+    },
+    "expected_records": 2,
+    "accepted_records": 2,
+    "schema_tests": {
+      "cases": 16,
+      "passed": 16,
+      "failed": 0,
+      "scientific_values_changed": false,
+      "physical_time_and_ontology_approved": false,
+      "human_signoff": "pending",
+      "package_implementation_changed": false
+    },
+    "duckdb_records": 2,
+    "SQL_integrity_queries": 102,
+    "source_mode": "Deliberate reuse of newly downloaded clean-test data; no new live retrieval claimed for this interface check",
+    "same_instructions_for_all_testers": true
+  }
+}

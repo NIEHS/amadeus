@@ -1,0 +1,1 @@
+reviewer,date,git_commit,amadeus_version,R_version,variables,start_date,end_date,site_count,source_fresh_or_reused,expected_records,actual_R_records,schema_accepted,schema_test_cases,schema_test_failures,engine,database_records,integrity_queries,precision_passed,first_error_or_finding,decision

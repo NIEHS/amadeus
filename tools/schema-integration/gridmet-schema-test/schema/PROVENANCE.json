@@ -1,0 +1,24 @@
+{
+  "schema_source_repository": "https://github.com/matentzn/amadeus_schema",
+  "source_checkout_commit": "5914923820f89a1a70b30aef3775e5c779c94436",
+  "schema_version": "0.1.0",
+  "note": "Pinned schema definitions and generated artifacts taken from schema repository. No earlier pilot scripts/data included. Commit identifies checkout; file SHA256 is authoritative for actual supplied bytes.",
+  "files": {
+    "amadeus.schema.json": "cb8a1481cf4604aad68e05ffd599a39c85bd021784a8e10adaac8420e7de119e",
+    "amadeus_duckdb.sql": "263d1658f61e85f7d14fb4edd103bcd3633a5411658bcef549d8276a5432edb2",
+    "amadeus_generic.sql": "1c707bc1f714ca708d1cfa491a11170339703e97a651aae728f28ef1fa0d75fd",
+    "amadeus_sedonadb.sql": "8e046af78a817f3053001fdb328e6c5dc5dba6c13b925e22102cc596350073dd",
+    "amadeus_validators.R": "7b0f06f4de74138dfcd5335f1c7cfdbe83d199ac9021ac9a8bb606202138fb1c",
+    "build_contract.py": "6e6c28ae8a39f901490efc2655a9a3c738c091a95349dea8f145432c0afce7c5",
+    "contract.json": "b094c086af155262ab84cd8abd6f562dfffeedb7989618fb4a3c2db1f2bba8d7",
+    "integrity.sql": "63d7f9b77d9c5fd36b7afbdf92e67ac4573cd2d239ec7288c1ef9603fb68bda5",
+    "source/amadeus_catalog.yaml": "8a8ed1fe7e2cbdb731ae5fff6e9d053d986f5dfb4ddd355de3b8763edcd1f24c",
+    "source/amadeus_common.yaml": "cd773cc64129f695bc5b441ee5b800cf0dd8470c8cdbf1d1e2dbff3ca7a954e9",
+    "source/amadeus_provenance.yaml": "fcfbec8df00fb12c64de73ce6846f183215a071f181607d38f6a790ccde3295b",
+    "source/amadeus_request.yaml": "3d130ec952b44e258f1fe92e0a8d657c99ddfb6ca2631c6ad7e5a5eba5347b07",
+    "source/amadeus_schema.yaml": "a4fa06de0f04f1e3ba2fa91035dce55f80d6038e7e0b1ecb6ff28c54e59d7f02",
+    "source/amadeus_value.yaml": "8b6d5d640a18cb2c225b63b28c7ffc7503a8ac0f96b52453675dfb50f0b3e3fc",
+    "README.md": "8ad1cc18ab9c04f40e42898c844b797b76ce3feed110f7572fc41c8d7ef4946a"
+  },
+  "contract_generation": "LinkML SchemaView at build time; no runtime Python reflection"
+}

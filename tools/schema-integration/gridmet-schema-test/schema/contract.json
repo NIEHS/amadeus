@@ -1,0 +1,228 @@
+{
+  "collections": {
+    "data_sources": "DataSource",
+    "products": "Product",
+    "grid_definitions": "GridDefinition",
+    "canonical_variables": "CanonicalVariable",
+    "product_variables": "ProductVariable",
+    "assets": "Asset",
+    "station_observations": "StationObservation",
+    "grid_cell_values": "GridCellValue",
+    "area_values": "AreaValue",
+    "hex_cell_values": "HexCellValue",
+    "vector_features": "VectorFeature",
+    "location_sets": "LocationSet",
+    "locations": "Location",
+    "extraction_requests": "ExtractionRequest",
+    "ambient_values_at_location": "AmbientValueAtLocation",
+    "tool_runs": "ToolRun",
+    "provenance_chains": "ProvenanceChain"
+  },
+  "classes": {
+    "DataSource": {
+      "multiple": [],
+      "inline": {},
+      "references": {}
+    },
+    "Product": {
+      "multiple": [
+        "data_genre"
+      ],
+      "inline": {},
+      "references": {
+        "data_source": "DataSource",
+        "grid_definition": "GridDefinition"
+      }
+    },
+    "GridDefinition": {
+      "multiple": [
+        "vertical_levels"
+      ],
+      "inline": {},
+      "references": {}
+    },
+    "CanonicalVariable": {
+      "multiple": [
+        "concept_mappings"
+      ],
+      "inline": {
+        "omop_concept_binding": "OmopConceptBinding"
+      },
+      "references": {}
+    },
+    "ProductVariable": {
+      "multiple": [
+        "metadata_gaps"
+      ],
+      "inline": {},
+      "references": {
+        "product": "Product",
+        "canonical_variable": "CanonicalVariable"
+      }
+    },
+    "OmopConceptBinding": {
+      "multiple": [],
+      "inline": {},
+      "references": {}
+    },
+    "Asset": {
+      "multiple": [
+        "variables_present",
+        "vertical_levels_present"
+      ],
+      "inline": {},
+      "references": {
+        "product": "Product",
+        "variables_present": "ProductVariable"
+      }
+    },
+    "AmbientValue": {
+      "multiple": [],
+      "inline": {},
+      "references": {
+        "product_variable": "ProductVariable",
+        "canonical_variable": "CanonicalVariable",
+        "asset": "Asset"
+      }
+    },
+    "StationObservation": {
+      "multiple": [],
+      "inline": {},
+      "references": {
+        "product_variable": "ProductVariable",
+        "canonical_variable": "CanonicalVariable",
+        "asset": "Asset"
+      }
+    },
+    "GridCellValue": {
+      "multiple": [],
+      "inline": {},
+      "references": {
+        "grid_definition": "GridDefinition",
+        "product_variable": "ProductVariable",
+        "canonical_variable": "CanonicalVariable",
+        "asset": "Asset"
+      }
+    },
+    "AreaValue": {
+      "multiple": [],
+      "inline": {},
+      "references": {
+        "product_variable": "ProductVariable",
+        "canonical_variable": "CanonicalVariable",
+        "asset": "Asset"
+      }
+    },
+    "HexCellValue": {
+      "multiple": [],
+      "inline": {},
+      "references": {
+        "product_variable": "ProductVariable",
+        "canonical_variable": "CanonicalVariable",
+        "asset": "Asset"
+      }
+    },
+    "VectorFeature": {
+      "multiple": [],
+      "inline": {},
+      "references": {
+        "product": "Product",
+        "asset": "Asset"
+      }
+    },
+    "LocationSet": {
+      "multiple": [],
+      "inline": {},
+      "references": {}
+    },
+    "Location": {
+      "multiple": [],
+      "inline": {},
+      "references": {
+        "location_set": "LocationSet"
+      }
+    },
+    "ExtractionRequest": {
+      "multiple": [
+        "requested_canonical_variables",
+        "requested_product_variables",
+        "lag_days"
+      ],
+      "inline": {},
+      "references": {
+        "location_set": "LocationSet",
+        "requested_canonical_variables": "CanonicalVariable",
+        "requested_product_variables": "ProductVariable",
+        "weighting_product_variable": "ProductVariable"
+      }
+    },
+    "AmbientValueAtLocation": {
+      "multiple": [],
+      "inline": {},
+      "references": {
+        "location": "Location",
+        "extraction_request": "ExtractionRequest",
+        "product_variable": "ProductVariable",
+        "canonical_variable": "CanonicalVariable",
+        "asset": "Asset"
+      }
+    },
+    "ToolRun": {
+      "multiple": [
+        "input_asset_ids",
+        "upstream_runs"
+      ],
+      "inline": {},
+      "references": {}
+    },
+    "ProvenanceChain": {
+      "multiple": [
+        "chain_steps",
+        "compatibility_assertions"
+      ],
+      "inline": {},
+      "references": {}
+    },
+    "AmadeusDatabase": {
+      "multiple": [
+        "data_sources",
+        "products",
+        "grid_definitions",
+        "canonical_variables",
+        "product_variables",
+        "assets",
+        "station_observations",
+        "grid_cell_values",
+        "area_values",
+        "hex_cell_values",
+        "vector_features",
+        "location_sets",
+        "locations",
+        "extraction_requests",
+        "ambient_values_at_location",
+        "tool_runs",
+        "provenance_chains"
+      ],
+      "inline": {
+        "data_sources": "DataSource",
+        "products": "Product",
+        "grid_definitions": "GridDefinition",
+        "canonical_variables": "CanonicalVariable",
+        "product_variables": "ProductVariable",
+        "assets": "Asset",
+        "station_observations": "StationObservation",
+        "grid_cell_values": "GridCellValue",
+        "area_values": "AreaValue",
+        "hex_cell_values": "HexCellValue",
+        "vector_features": "VectorFeature",
+        "location_sets": "LocationSet",
+        "locations": "Location",
+        "extraction_requests": "ExtractionRequest",
+        "ambient_values_at_location": "AmbientValueAtLocation",
+        "tool_runs": "ToolRun",
+        "provenance_chains": "ProvenanceChain"
+      },
+      "references": {}
+    }
+  }
+}
