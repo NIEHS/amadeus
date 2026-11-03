@@ -1,0 +1,10 @@
+Area,Owner observed result,Tester reported result,Interpretation / limit
+Request,16 variables;2sites;2025-02-01/02,Same stated scope,Exact tester code/arguments not confirmed
+Scientific values,64/64 finite,64/64 missing,Different outcomes; not a complete cause diagnosis
+tmmx source SHA,b8583ca388c016ceb2f6c071072e91bf29c106a57de5b2f372b05f5684c8e746,Matching SHA reported,Matches only this source file; not all16 independently compared
+Raleigh tmmx tile,25finite/layer,0finite/layer,Original saved tile values diverge; pre-write boundary unresolved
+Raleigh tmmx calculation,288.1K;281.1K,NaN;NaN,Missingness upstream of schema/database
+Schema acceptance,accepted=true,Final error/receipt pending,Cannot claim tester rejection or acceptance
+Schema test pack,16/16 on saved snapshot during review,Not supplied,Later owner QA; not original-run event or independent replication
+DuckDB,64results;102checks;reopen passed,Not confirmed for failed run,Owner path demonstrated only
+Conclusion,Bounded end-to-end evidence,Independent reproducibility unresolved,No production or universal compatibility claim

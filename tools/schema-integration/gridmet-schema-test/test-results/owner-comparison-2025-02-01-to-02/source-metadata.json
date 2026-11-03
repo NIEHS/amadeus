@@ -1,0 +1,418 @@
+{
+  "tmmx": {
+    "source_variable": "air_temperature",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "K",
+      "description": "Daily Maximum Temperature (2m)",
+      "long_name": "tmmx",
+      "standard_name": "tmmx",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 220,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "b8583ca388c016ceb2f6c071072e91bf29c106a57de5b2f372b05f5684c8e746",
+    "bytes": 151880260,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/tmmx_2025.nc"
+  },
+  "tmmn": {
+    "source_variable": "air_temperature",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "K",
+      "description": "Daily Minimum Temperature (2m)",
+      "long_name": "tmmn",
+      "standard_name": "tmmn",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 210,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "62b0a40cf97a8112ee96b6968a62471e77231a697d57b4809049691b4e00b417",
+    "bytes": 153438217,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/tmmn_2025.nc"
+  },
+  "pr": {
+    "source_variable": "precipitation_amount",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "mm",
+      "description": "Daily Accumulated Precipitation",
+      "long_name": "pr",
+      "standard_name": "pr",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "d5b1b1cc8c1af17fbd7d3bb0f376088d3cc627a489f06aa5402aa8ad9be151b7",
+    "bytes": 59045725,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/pr_2025.nc"
+  },
+  "pet": {
+    "source_variable": "potential_evapotranspiration",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "mm",
+      "description": "Daily reference evapotranspiration (short grass)",
+      "long_name": "pet",
+      "standard_name": "pet",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "43c12f8ecd937ad4f946d1ca19c4df5e9cb620343d6b9b7559326499720334c8",
+    "bytes": 70389911,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/pet_2025.nc"
+  },
+  "etr": {
+    "source_variable": "potential_evapotranspiration",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "mm",
+      "description": "Daily reference evapotranspiration (alfalfa)",
+      "long_name": "etr",
+      "standard_name": "etr",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "78e60ca29674b21cdbe6d02d5707a28ac16519171f01e3c0148de8121f6c2c91",
+    "bytes": 93084661,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/etr_2025.nc"
+  },
+  "rmax": {
+    "source_variable": "relative_humidity",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "%",
+      "description": "Daily Maximum Relative Humidity (2m)",
+      "long_name": "rmax",
+      "standard_name": "rmax",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "88822d789142316e65d3b5d815c12d31c992d4732a5389f172ebddb567a5c87b",
+    "bytes": 175390786,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/rmax_2025.nc"
+  },
+  "rmin": {
+    "source_variable": "relative_humidity",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "%",
+      "description": "Daily Minimum Relative Humidity (2m)",
+      "long_name": "rmin",
+      "standard_name": "rmin",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "d055302b8b90f49a8e2744b09624df108031f028487e96de49ace5775ff2def1",
+    "bytes": 196329919,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/rmin_2025.nc"
+  },
+  "sph": {
+    "source_variable": "specific_humidity",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "kg/kg",
+      "description": "Daily mean specific humidity (2m)",
+      "long_name": "sph",
+      "standard_name": "sph",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 1e-05,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "6b709fb187a4ad05eae1746866e62a4ed11d8df0673018e883eaf8e11520b8db",
+    "bytes": 187991883,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/sph_2025.nc"
+  },
+  "vpd": {
+    "source_variable": "mean_vapor_pressure_deficit",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "kPa",
+      "description": "mean vapor presure deficit",
+      "long_name": "vpd",
+      "standard_name": "vpd",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.01,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "4ee7918c61431e23fcf93b01a76b15993f5cdd236e2ecf1439a4a1b45e9f5992",
+    "bytes": 137656814,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/vpd_2025.nc"
+  },
+  "srad": {
+    "source_variable": "surface_downwelling_shortwave_flux_in_air",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "W m-2",
+      "description": "Daily Mean downward shortwave radiation at surface",
+      "long_name": "srad",
+      "standard_name": "srad",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "eddba336f8d5c8b12d38235d54df6fe3f6dd9e5867deaf80cd7555187300af8b",
+    "bytes": 205861745,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/srad_2025.nc"
+  },
+  "vs": {
+    "source_variable": "wind_speed",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "m/s",
+      "description": "Daily Mean Wind Speed (10m)",
+      "long_name": "vs",
+      "standard_name": "vs",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "cc5b654c51c6bae8e55dd2d9dd1f015712dc6cd71ba302ece1da9cc152218e42",
+    "bytes": 59785856,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/vs_2025.nc"
+  },
+  "th": {
+    "source_variable": "wind_from_direction",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "Degrees Clockwise from north",
+      "description": "Daily mean wind direction (10m)",
+      "long_name": "th",
+      "standard_name": "th",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "9b01a692fdcae7754cdb737126590364e871f9804f86682730c8c6a23e9b1bab",
+    "bytes": 28089159,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/th_2025.nc"
+  },
+  "erc": {
+    "source_variable": "energy_release_component-g",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "Unitless",
+      "description": "ERC-G",
+      "long_name": "erc",
+      "standard_name": "erc",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "79f126d0b193786946563bd42e79693a4b840974c85ec1b01d948584bb241f99",
+    "bytes": 88732709,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/erc_2025.nc"
+  },
+  "bi": {
+    "source_variable": "burning_index_g",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "Unitless",
+      "description": "BI-G",
+      "long_name": "bi",
+      "standard_name": "bi",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "ad419bb08c492774cf465c7bb10ef5b05d29f7f68955b6a882bdfc88777136cc",
+    "bytes": 64829299,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/bi_2025.nc"
+  },
+  "fm100": {
+    "source_variable": "dead_fuel_moisture_100hr",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "Percent",
+      "description": "100 hour fuel moisture",
+      "long_name": "fm100",
+      "standard_name": "fm100",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "93f58e7b1481a58177b1936d3395d6846b4beb9fcbc1f9b2c2a522e40b592234",
+    "bytes": 137188004,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/fm100_2025.nc"
+  },
+  "fm1000": {
+    "source_variable": "dead_fuel_moisture_1000hr",
+    "spacing_degrees": [
+      0.0416666666666667,
+      0.0416666666666667
+    ],
+    "attributes": {
+      "_FillValue": 32767,
+      "units": "Percent",
+      "description": "1000 hour fuel moisture",
+      "long_name": "fm1000",
+      "standard_name": "fm1000",
+      "missing_value": 32767,
+      "dimensions": "lon lat time",
+      "grid_mapping": "crs",
+      "coordinate_system": "WGS84,EPSG:4326",
+      "scale_factor": 0.1,
+      "add_offset": 0,
+      "coordinates": "lon lat time",
+      "_Unsigned": "true"
+    },
+    "sha256": "2158e6cf4e8abd87c659fc2996c182382e14e315f823058dbfa14f6cacc98647",
+    "bytes": 135445972,
+    "acquisition": "file absent before public downloader call",
+    "declared_provider_url": "https://www.northwestknowledge.net/metdata/data/fm1000_2025.nc"
+  }
+}

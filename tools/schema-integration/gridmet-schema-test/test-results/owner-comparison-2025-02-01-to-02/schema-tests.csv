@@ -1,0 +1,19 @@
+"test","expected","observed","passed"
+"Actual ordinary results and schema records","accept","accepted",TRUE
+"Schema: missing version","schema_version","1 error validating json:
+	-  (#/required): must have required property 'schema_version'",TRUE
+"Schema: invalid status","data_status","1 error validating json:
+	- /ambient_values_at_location/0/data_status (#/$defs/DataStatusEnum/enum): must be equal to one of the allowed values",TRUE
+"Duplicate identifier","Duplicate identifier","Duplicate identifier in locations",TRUE
+"Dangling location","Dangling reference","Dangling reference: AmbientValueAtLocation.location",TRUE
+"Wrong canonical binding","Variable binding","Variable binding or unit mismatch",TRUE
+"Reversed request","Reversed/invalid request","Reversed/invalid request window",TRUE
+"Malformed WKT","OGR|WKT|geometry|ParseException","OGR error",TRUE
+"Wrong date-label clock","date-label clock","Result date-label clock or value differs from ordinary Amadeus result",TRUE
+"Wrong processing run","processing-run mismatch","Result/asset/processing-run mismatch",TRUE
+"Wrong location-set membership","membership mismatch","Request/location/variable membership mismatch",TRUE
+"Cyclic provenance","Cyclic provenance","Cyclic provenance",TRUE
+"Changed value","Invalid/changed native value","Invalid/changed native value",TRUE
+"Incorrect present/missing semantics","zero/missing status","Incorrect zero/missing status",TRUE
+"Omitted result","Missing/duplicate result keys","Missing/duplicate result keys",TRUE
+"Descriptive text is not an automatic scientific truth check","accept","accepted",TRUE

@@ -1,0 +1,3334 @@
+schema_version: 0.1.0
+data_sources:
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/source/gridmet
+  name: gridmet
+  homepage: https://www.climatologylab.org/gridmet.html
+  access_protocol: https_bulk_file
+products:
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  name: gridmet_daily
+  data_source: gridmetteam:run-ae1adb1cc291ba7a91cf/source/gridmet
+  spatial_support_type: raster_grid_cell
+  grid_definition: gridmetteam:run-ae1adb1cc291ba7a91cf/grid/native
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution: daily
+  day_boundary_convention: observation_dependent
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+  description: 'Team test: source date label encoded at nominal00:00UTC for serialization
+    only. No verified physical sample interval, timezone or ontology equivalence asserted.
+    No temporal aggregation.'
+grid_definitions:
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/grid/native
+  crs: EPSG:4326
+  resolution_x: 0.0416666666666667
+  resolution_y: 0.0416666666666667
+  resolution_unit: deg
+canonical_variables:
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmx
+  name: gridmet_native_tmmx
+  standard_name: gridmetteam:native_tmmx
+  units_ucum: K
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmn
+  name: gridmet_native_tmmn
+  standard_name: gridmetteam:native_tmmn
+  units_ucum: K
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pr
+  name: gridmet_native_pr
+  standard_name: gridmetteam:native_pr
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pet
+  name: gridmet_native_pet
+  standard_name: gridmetteam:native_pet
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/etr
+  name: gridmet_native_etr
+  standard_name: gridmetteam:native_etr
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmax
+  name: gridmet_native_rmax
+  standard_name: gridmetteam:native_rmax
+  units_ucum: '%'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmin
+  name: gridmet_native_rmin
+  standard_name: gridmetteam:native_rmin
+  units_ucum: '%'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/sph
+  name: gridmet_native_sph
+  standard_name: gridmetteam:native_sph
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vpd
+  name: gridmet_native_vpd
+  standard_name: gridmetteam:native_vpd
+  units_ucum: kPa
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/srad
+  name: gridmet_native_srad
+  standard_name: gridmetteam:native_srad
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vs
+  name: gridmet_native_vs
+  standard_name: gridmetteam:native_vs
+  units_ucum: m/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/th
+  name: gridmet_native_th
+  standard_name: gridmetteam:native_th
+  units_ucum: deg
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/erc
+  name: gridmet_native_erc
+  standard_name: gridmetteam:native_erc
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/bi
+  name: gridmet_native_bi
+  standard_name: gridmetteam:native_bi
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm100
+  name: gridmet_native_fm100
+  standard_name: gridmetteam:native_fm100
+  units_ucum: '%'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm1000
+  name: gridmet_native_fm1000
+  standard_name: gridmetteam:native_fm1000
+  units_ucum: '%'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Local candidate for native point quantity; spatial support classification
+    only; no temporal aggregation approval.
+product_variables:
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmx
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmx
+  native_name: air_temperature
+  native_units_ucum: K
+  amadeus_variable_code: tmmx
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmn
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmn
+  native_name: air_temperature
+  native_units_ucum: K
+  amadeus_variable_code: tmmn
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pr
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pr
+  native_name: precipitation_amount
+  native_units_ucum: mm
+  amadeus_variable_code: pr
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pet
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pet
+  native_name: potential_evapotranspiration
+  native_units_ucum: mm
+  amadeus_variable_code: pet
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/etr
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/etr
+  native_name: potential_evapotranspiration
+  native_units_ucum: mm
+  amadeus_variable_code: etr
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmax
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmax
+  native_name: relative_humidity
+  native_units_ucum: '%'
+  amadeus_variable_code: rmax
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmin
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmin
+  native_name: relative_humidity
+  native_units_ucum: '%'
+  amadeus_variable_code: rmin
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/sph
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/sph
+  native_name: specific_humidity
+  native_units_ucum: '1'
+  amadeus_variable_code: sph
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vpd
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vpd
+  native_name: mean_vapor_pressure_deficit
+  native_units_ucum: kPa
+  amadeus_variable_code: vpd
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/srad
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/srad
+  native_name: surface_downwelling_shortwave_flux_in_air
+  native_units_ucum: W/m2
+  amadeus_variable_code: srad
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vs
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vs
+  native_name: wind_speed
+  native_units_ucum: m/s
+  amadeus_variable_code: vs
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/th
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/th
+  native_name: wind_from_direction
+  native_units_ucum: deg
+  amadeus_variable_code: th
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/erc
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/erc
+  native_name: energy_release_component-g
+  native_units_ucum: '1'
+  amadeus_variable_code: erc
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/bi
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/bi
+  native_name: burning_index_g
+  native_units_ucum: '1'
+  amadeus_variable_code: bi
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm100
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm100
+  native_name: dead_fuel_moisture_100hr
+  native_units_ucum: '%'
+  amadeus_variable_code: fm100
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm1000
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm1000
+  native_name: dead_fuel_moisture_1000hr
+  native_units_ucum: '%'
+  amadeus_variable_code: fm1000
+  harmonization_note: Identity numeric mapping; source unit spelling normalized only.
+    Original attributes retained in source-metadata.json.
+location_sets:
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/location-set/user
+  locs_id_field: site_id
+  crs: EPSG:4326
+  phi_status: no_phi
+  location_count: 2
+locations:
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  location_set: gridmetteam:run-ae1adb1cc291ba7a91cf/location-set/user
+  location_key: raleigh
+  location_geom_wkt: POINT (-78.638200000000 35.779600000000)
+  srid: 4326
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  location_set: gridmetteam:run-ae1adb1cc291ba7a91cf/location-set/user
+  location_key: denver
+  location_geom_wkt: POINT (-104.990300000000 39.739200000000)
+  srid: 4326
+extraction_requests:
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  location_set: gridmetteam:run-ae1adb1cc291ba7a91cf/location-set/user
+  requested_canonical_variables:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmx
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmn
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pr
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pet
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/etr
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmax
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmin
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/sph
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vpd
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/srad
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vs
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/th
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/erc
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/bi
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm100
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm1000
+  requested_product_variables:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmx
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmn
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pr
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pet
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/etr
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmax
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmin
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/sph
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vpd
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/srad
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vs
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/th
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/erc
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/bi
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm100
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm1000
+  time_window_start: '2025-02-01T00:00:00Z'
+  time_window_end: '2025-02-03T00:00:00Z'
+  extraction_method: nearest_cell
+  buffer_radius_m: 0
+  temporal_grouping: day
+  request_hash: 6c488ce164beb0b34448691b725d2f3c09563aa6760803e16e1a1057e13b2ad7
+tool_runs:
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  run_role: download
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: download_data
+  run_arguments: '{"dataset_name":"gridmet","variables":["tmmx","tmmn","pr","pet","etr","rmax","rmin","sph","vpd","srad","vs","th","erc","bi","fm100","fm1000"],"year":2025}'
+  run_timestamp_utc: '2026-11-02T20:50:22Z'
+  run_duration_seconds: 823.65885066986095353
+  status: succeeded
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/tmmx/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"tmmx","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:06Z'
+  run_duration_seconds: 0.41571688652038602
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/tmmx
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmx/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"tmmx","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:06Z'
+  run_duration_seconds: 0.32847809791564903
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/tmmx/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/tmmx/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/tmmx/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"tmmx","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:06Z'
+  run_duration_seconds: 0.16188549995422399
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/tmmx
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmx/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"tmmx","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:07Z'
+  run_duration_seconds: 0.0674483776092529
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/tmmx/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/tmmx/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/tmmn/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"tmmn","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:07Z'
+  run_duration_seconds: 0.193258762359619
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/tmmn
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmn/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"tmmn","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:07Z'
+  run_duration_seconds: 0.0273983478546143
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/tmmn/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/tmmn/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/tmmn/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"tmmn","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:07Z'
+  run_duration_seconds: 0.108489274978638
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/tmmn
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmn/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"tmmn","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:07Z'
+  run_duration_seconds: 0.0275635719299316
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/tmmn/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/tmmn/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/pr/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"pr","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:07Z'
+  run_duration_seconds: 0.26148891448974598
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/pr
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pr/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"pr","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:07Z'
+  run_duration_seconds: 0.0261564254760742
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/pr/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/pr/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/pr/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"pr","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:07Z'
+  run_duration_seconds: 0.0927424430847168
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/pr
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pr/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"pr","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:07Z'
+  run_duration_seconds: 0.0248548984527588
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/pr/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/pr/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/pet/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"pet","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:07Z'
+  run_duration_seconds: 0.16554713249206501
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/pet
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pet/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"pet","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:08Z'
+  run_duration_seconds: 0.0402040481567383
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/pet/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/pet/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/pet/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"pet","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:08Z'
+  run_duration_seconds: 0.10136866569519
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/pet
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pet/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"pet","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:08Z'
+  run_duration_seconds: 0.0503780841827393
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/pet/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/pet/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/etr/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"etr","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:08Z'
+  run_duration_seconds: 0.17960929870605499
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/etr
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/etr/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"etr","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:08Z'
+  run_duration_seconds: 0.0282807350158691
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/etr/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/etr/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/etr/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"etr","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:08Z'
+  run_duration_seconds: 0.101390600204468
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/etr
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/etr/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"etr","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:08Z'
+  run_duration_seconds: 0.0252218246459961
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/etr/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/etr/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/rmax/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"rmax","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:08Z'
+  run_duration_seconds: 0.18538975715637199
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/rmax
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmax/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"rmax","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:08Z'
+  run_duration_seconds: 0.0314996242523193
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/rmax/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/rmax/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/rmax/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"rmax","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:08Z'
+  run_duration_seconds: 0.124156713485718
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/rmax
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmax/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"rmax","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:08Z'
+  run_duration_seconds: 0.0248284339904785
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/rmax/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/rmax/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/rmin/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"rmin","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:08Z'
+  run_duration_seconds: 0.209705114364624
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/rmin
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmin/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"rmin","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:09Z'
+  run_duration_seconds: 0.0254364013671875
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/rmin/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/rmin/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/rmin/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"rmin","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:09Z'
+  run_duration_seconds: 0.100454568862915
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/rmin
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmin/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"rmin","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:09Z'
+  run_duration_seconds: 0.0241594314575195
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/rmin/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/rmin/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/sph/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"sph","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:09Z'
+  run_duration_seconds: 0.15984296798706099
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/sph
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/sph/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"sph","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:09Z'
+  run_duration_seconds: 0.0240788459777832
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/sph/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/sph/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/sph/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"sph","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:09Z'
+  run_duration_seconds: 0.126688957214355
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/sph
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/sph/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"sph","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:09Z'
+  run_duration_seconds: 0.0258512496948242
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/sph/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/sph/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/vpd/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"vpd","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:09Z'
+  run_duration_seconds: 0.14879441261291501
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/vpd
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vpd/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"vpd","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:09Z'
+  run_duration_seconds: 0.0259225368499756
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/vpd/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/vpd/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/vpd/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"vpd","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:09Z'
+  run_duration_seconds: 0.0989220142364502
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/vpd
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vpd/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"vpd","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:09Z'
+  run_duration_seconds: 0.024390697479248
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/vpd/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/vpd/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/srad/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"srad","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:09Z'
+  run_duration_seconds: 0.12967443466186501
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/srad
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/srad/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"srad","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.0274958610534668
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/srad/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/srad/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/srad/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"srad","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.09738039970397951
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/srad
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/srad/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"srad","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.0258104801177979
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/srad/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/srad/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/vs/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"vs","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.0947291851043701
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/vs
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vs/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"vs","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.0248713493347168
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/vs/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/vs/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/vs/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"vs","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.0792598724365234
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/vs
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vs/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"vs","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.0244042873382568
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/vs/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/vs/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/th/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"th","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.08689332008361821
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/th
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/th/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"th","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.0244460105895996
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/th/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/th/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/th/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"th","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.0766642093658447
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/th
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/th/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"th","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.0236639976501465
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/th/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/th/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/erc/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"erc","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.08788514137268071
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/erc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/erc/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"erc","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.0244019031524658
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/erc/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/erc/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/erc/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"erc","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.08250331878662109
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/erc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/erc/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"erc","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:10Z'
+  run_duration_seconds: 0.0433764457702637
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/erc/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/erc/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/bi/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"bi","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:11Z'
+  run_duration_seconds: 0.10671281814575199
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/bi
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/bi/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"bi","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:11Z'
+  run_duration_seconds: 0.0248048305511475
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/bi/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/bi/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/bi/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"bi","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:11Z'
+  run_duration_seconds: 0.0793914794921875
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/bi
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/bi/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"bi","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:11Z'
+  run_duration_seconds: 0.02402663230896
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/bi/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/bi/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/fm100/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"fm100","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:11Z'
+  run_duration_seconds: 0.0904502868652344
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/fm100
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm100/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"fm100","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:11Z'
+  run_duration_seconds: 0.0609397888183594
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/fm100/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/fm100/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/fm100/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"fm100","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:11Z'
+  run_duration_seconds: 0.09268069267272951
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/fm100
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm100/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"fm100","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:11Z'
+  run_duration_seconds: 0.0252275466918945
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/fm100/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/fm100/denver
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/fm1000/raleigh
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"fm1000","site_id":"raleigh","dates":["2025-02-01","2025-02-02"],"extent":[-78.7582,-78.5182,35.6596,35.8996],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:11Z'
+  run_duration_seconds: 0.0936520099639893
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/fm1000
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm1000/raleigh
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"fm1000","site_id":"raleigh","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:11Z'
+  run_duration_seconds: 0.0257511138916016
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/fm1000/raleigh
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/fm1000/raleigh
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/fm1000/denver
+  run_role: process
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: process_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"fm1000","site_id":"denver","dates":["2025-02-01","2025-02-02"],"extent":[-105.1103,-104.8703,39.6192,39.8592],"output_row_count_convention":"0
+    tabular rows for raster output; raster dimensions are in the saved file"}'
+  run_timestamp_utc: '2026-11-02T21:04:11Z'
+  run_duration_seconds: 0.0937809944152832
+  status: succeeded
+  output_row_count: 0
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/fm1000
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm1000/denver
+  run_role: calculate
+  tool_name: amadeus
+  tool_version: 2.0.4
+  function_name: calculate_covariates
+  run_arguments: '{"covariate":"gridmet","variable":"fm1000","site_id":"denver","radius":0,"fun":"mean","by_time":"NULL;
+    existing daily gridMET route","geom":false}'
+  run_timestamp_utc: '2026-11-02T21:04:11Z'
+  run_duration_seconds: 0.0283405780792236
+  status: succeeded
+  output_row_count: 2
+  upstream_runs:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/fm1000/denver
+  input_asset_ids:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/fm1000/denver
+assets:
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/tmmx
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/tmmx/tmmx_2025.nc
+  size_bytes: 151880260
+  sha256: b8583ca388c016ceb2f6c071072e91bf29c106a57de5b2f372b05f5684c8e746
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmx
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/tmmx_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/tmmn
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/tmmn/tmmn_2025.nc
+  size_bytes: 153438217
+  sha256: 62b0a40cf97a8112ee96b6968a62471e77231a697d57b4809049691b4e00b417
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmn
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/tmmn_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/pr
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/pr/pr_2025.nc
+  size_bytes: 59045725
+  sha256: d5b1b1cc8c1af17fbd7d3bb0f376088d3cc627a489f06aa5402aa8ad9be151b7
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pr
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/pr_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/pet
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/pet/pet_2025.nc
+  size_bytes: 70389911
+  sha256: 43c12f8ecd937ad4f946d1ca19c4df5e9cb620343d6b9b7559326499720334c8
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pet
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/pet_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/etr
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/etr/etr_2025.nc
+  size_bytes: 93084661
+  sha256: 78e60ca29674b21cdbe6d02d5707a28ac16519171f01e3c0148de8121f6c2c91
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/etr
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/etr_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/rmax
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/rmax/rmax_2025.nc
+  size_bytes: 175390786
+  sha256: 88822d789142316e65d3b5d815c12d31c992d4732a5389f172ebddb567a5c87b
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmax
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/rmax_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/rmin
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/rmin/rmin_2025.nc
+  size_bytes: 196329919
+  sha256: d055302b8b90f49a8e2744b09624df108031f028487e96de49ace5775ff2def1
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmin
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/rmin_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/sph
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/sph/sph_2025.nc
+  size_bytes: 187991883
+  sha256: 6b709fb187a4ad05eae1746866e62a4ed11d8df0673018e883eaf8e11520b8db
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/sph
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/sph_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/vpd
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/vpd/vpd_2025.nc
+  size_bytes: 137656814
+  sha256: 4ee7918c61431e23fcf93b01a76b15993f5cdd236e2ecf1439a4a1b45e9f5992
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vpd
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/vpd_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/srad
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/srad/srad_2025.nc
+  size_bytes: 205861745
+  sha256: eddba336f8d5c8b12d38235d54df6fe3f6dd9e5867deaf80cd7555187300af8b
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/srad
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/srad_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/vs
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/vs/vs_2025.nc
+  size_bytes: 59785856
+  sha256: cc5b654c51c6bae8e55dd2d9dd1f015712dc6cd71ba302ece1da9cc152218e42
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vs
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/vs_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/th
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/th/th_2025.nc
+  size_bytes: 28089159
+  sha256: 9b01a692fdcae7754cdb737126590364e871f9804f86682730c8c6a23e9b1bab
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/th
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/th_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/erc
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/erc/erc_2025.nc
+  size_bytes: 88732709
+  sha256: 79f126d0b193786946563bd42e79693a4b840974c85ec1b01d948584bb241f99
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/erc
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/erc_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/bi
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/bi/bi_2025.nc
+  size_bytes: 64829299
+  sha256: ad419bb08c492774cf465c7bb10ef5b05d29f7f68955b6a882bdfc88777136cc
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/bi
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/bi_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/fm100
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/fm100/fm100_2025.nc
+  size_bytes: 137188004
+  sha256: 93f58e7b1481a58177b1936d3395d6846b4beb9fcbc1f9b2c2a522e40b592234
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm100
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/fm100_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/raw/fm1000
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/raw/fm1000/fm1000_2025.nc
+  size_bytes: 135445972
+  sha256: 2158e6cf4e8abd87c659fc2996c182382e14e315f823058dbfa14f6cacc98647
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/download
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm1000
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: netcdf4_cf
+  url: https://www.northwestknowledge.net/metdata/data/fm1000_2025.nc
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/tmmx/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/tmmx-raleigh.tif
+  size_bytes: 1426
+  sha256: 612a9a40cb63ec4904aa78e4a92a67d89bd0d82f1b6b7765988c67faba8942f8
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/tmmx/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmx
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/tmmx/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/tmmx-raleigh.rds
+  size_bytes: 217
+  sha256: dfe46534c8b0c9879fe68f74f13e5c8fef43238f2d6af87b57b5f69616a3b59e
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmx/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmx
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/tmmx/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/tmmx-denver.tif
+  size_bytes: 1467
+  sha256: 2d993a53f379e7c9056367a039ba08baf7ff24edcf98ec3302acfb81f869894d
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/tmmx/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmx
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/tmmx/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/tmmx-denver.rds
+  size_bytes: 217
+  sha256: 0d661be004cf4f32722d32cd44ba4a695a21f609e97be77accabcd7054ee52c8
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmx/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmx
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/tmmn/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/tmmn-raleigh.tif
+  size_bytes: 1424
+  sha256: c79499f937eb720eee9caea52c2ea67756eecfef0718000ed4f1ac1ec5a0c97f
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/tmmn/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmn
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/tmmn/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/tmmn-raleigh.rds
+  size_bytes: 218
+  sha256: ebab1ceb0e79fd4615369040870065726ed843d0cbf78567673bc2d75f656289
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmn/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmn
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/tmmn/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/tmmn-denver.tif
+  size_bytes: 1476
+  sha256: 63803396e201db7e39cd8a0ab33d94d43f85db541fd1fdffd123a166e590ec76
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/tmmn/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmn
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/tmmn/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/tmmn-denver.rds
+  size_bytes: 216
+  sha256: 2522989f27cf4374df42ed0fe61af25f11e787c5747f30eebbabb6d39264251b
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmn/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmn
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/pr/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/pr-raleigh.tif
+  size_bytes: 1262
+  sha256: 951250e92aa210141701a3c13319887aaa140f4e9d33ffc2313fe74ff28c744c
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/pr/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pr
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/pr/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/pr-raleigh.rds
+  size_bytes: 206
+  sha256: 676487de5389c70385984397427c1d383d8c93b1ee745033d265c2e71760d0ba
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pr/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pr
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/pr/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/pr-denver.tif
+  size_bytes: 1269
+  sha256: 2b0e6d736ccfd93ddc6834cb8e3dccec23b30193e4da5f8efd5cce9089ca5c97
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/pr/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pr
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/pr/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/pr-denver.rds
+  size_bytes: 205
+  sha256: 7bd5bd48f0b428c832ab37009a80c39e5e888a9ce4c0a03c0c5ceae3e62b97c6
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pr/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pr
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/pet/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/pet-raleigh.tif
+  size_bytes: 1372
+  sha256: dc2494d78e96f8a1bcb6c5d2106fe78e39ae66cdfd823677178559b8744d50b2
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/pet/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pet
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/pet/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/pet-raleigh.rds
+  size_bytes: 216
+  sha256: 204f3256d69f17178691f0161e7d21196bcf5048b4824a41aa17ff381786c865
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pet/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pet
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/pet/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/pet-denver.tif
+  size_bytes: 1438
+  sha256: ac578320699e18715a88e705fd9495ea191ae074adaef6df9c1c649fda16a3e0
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/pet/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pet
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/pet/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/pet-denver.rds
+  size_bytes: 215
+  sha256: ffe962953c04b77f408b312544c5c9238c6cbd561a36199bd4762b1e56d92047
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pet/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pet
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/etr/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/etr-raleigh.tif
+  size_bytes: 1394
+  sha256: 0d296bec3b3405df32b4df381359aeb84ad55af1dddf21b7790e1e57ac292ee0
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/etr/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/etr
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/etr/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/etr-raleigh.rds
+  size_bytes: 216
+  sha256: afd92c45ef70157f67cf5a8f2704618a7b6fcf65f9068c975a71cf9279f11ba2
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/etr/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/etr
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/etr/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/etr-denver.tif
+  size_bytes: 1449
+  sha256: 73033a9104ba33941a3bb6a285e544047203c486c3b1534adaabc264b5e63b33
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/etr/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/etr
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/etr/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/etr-denver.rds
+  size_bytes: 214
+  sha256: 848127525a4b161dd4ff8ff71d622d6d51974e30394ad033108f5deb1f482ed7
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/etr/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/etr
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/rmax/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/rmax-raleigh.tif
+  size_bytes: 1406
+  sha256: d72158e7e9d3ea4fa8f57b41adf6040927cd77ebd7a78f9198752268e856abea
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/rmax/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmax
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/rmax/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/rmax-raleigh.rds
+  size_bytes: 218
+  sha256: e9f37d6774ee1f7d8b3ba50eebba87eeee6d91a04d5d4df7e54db6855f2ac686
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmax/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmax
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/rmax/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/rmax-denver.tif
+  size_bytes: 1499
+  sha256: ea1bee9c2b9f6fd50c46129aea4436f96d552dabb01cee50d7f80b8f1283fbc1
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/rmax/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmax
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/rmax/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/rmax-denver.rds
+  size_bytes: 215
+  sha256: 3c1e6fbe009d325ab5c721a430d6722a673b61307d2880d526f14a0122ca3b00
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmax/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmax
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/rmin/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/rmin-raleigh.tif
+  size_bytes: 1434
+  sha256: e38d63099c920acd3a4ff55a030690421c08b077d4cab06855532c87bc3e7273
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/rmin/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmin
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/rmin/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/rmin-raleigh.rds
+  size_bytes: 218
+  sha256: 0194636f58348324e1cc9148d44e732fad6f0747d039e76a757c98efa24f6e1d
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmin/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmin
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/rmin/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/rmin-denver.tif
+  size_bytes: 1458
+  sha256: 105c11f9d5abd1ad3d441c9a0ac1e0f21857a9a8bc0338351e23732ea727592b
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/rmin/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmin
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/rmin/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/rmin-denver.rds
+  size_bytes: 217
+  sha256: e1ad5c27fa29a510370bd8d4555f871e4e553ba83afeaf54b503d95f4d6154f7
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmin/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmin
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/sph/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/sph-raleigh.tif
+  size_bytes: 1532
+  sha256: 2472c962abdc349764e7f437098a925a6a0137c06853fbb95c59b85121fb8e7b
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/sph/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/sph
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/sph/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/sph-raleigh.rds
+  size_bytes: 221
+  sha256: 9c6bd4d37caf6f2f978d9784b3014cedb157921dab7bd8e0e6927be5a0648914
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/sph/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/sph
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/sph/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/sph-denver.tif
+  size_bytes: 1730
+  sha256: 84c9e276ad11f4b77b45a35a65621ca5398b3cb9aefb9583dec5d544cd33e4b5
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/sph/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/sph
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/sph/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/sph-denver.rds
+  size_bytes: 221
+  sha256: dcf3c3228e36cf39dfdd19958216fac1b8131eb8fd88452575ed6615a0613165
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/sph/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/sph
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/vpd/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/vpd-raleigh.tif
+  size_bytes: 1452
+  sha256: 4680b1f2b1d08447b5d228106930cbd7b233794b2e02064740e7a3ba727b1720
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/vpd/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vpd
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/vpd/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/vpd-raleigh.rds
+  size_bytes: 219
+  sha256: 85798b81691a6b9894a0f86c730043ea97bf2294b7b00ae84202b3f9f14a7fdf
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vpd/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vpd
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/vpd/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/vpd-denver.tif
+  size_bytes: 1545
+  sha256: 7acbd60f1d2c82f94ffcab720d9ce787fa8cca0fee6264ad22f4020953260ed5
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/vpd/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vpd
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/vpd/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/vpd-denver.rds
+  size_bytes: 219
+  sha256: 72cf6573a7957590ba0aa4ea0fc662259a8e7ab03b1b6676d22df196a45bffd9
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vpd/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vpd
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/srad/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/srad-raleigh.tif
+  size_bytes: 1455
+  sha256: ec573196ad915add4763e3aae9db7558739c78d4361206b987a9c5104b3407d2
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/srad/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/srad
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/srad/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/srad-raleigh.rds
+  size_bytes: 218
+  sha256: 6cf6d9ef136dd3b710d8980a4a3998003eacd8d90a4d0acd7af476d9afa9aa4a
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/srad/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/srad
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/srad/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/srad-denver.tif
+  size_bytes: 1505
+  sha256: 8e82354c10658b73fb45bf6025fb8c4ed0b6e82fddf21977b06d0403db660175
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/srad/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/srad
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/srad/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/srad-denver.rds
+  size_bytes: 219
+  sha256: ca56c1a7631c9161122158a6a81154a116d24abe8a454956e54fbfe42db441ff
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/srad/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/srad
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/vs/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/vs-raleigh.tif
+  size_bytes: 1363
+  sha256: 2b147e5fd546664b30df7432432e474883108079f267e96e81d678c1897960a7
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/vs/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vs
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/vs/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/vs-raleigh.rds
+  size_bytes: 215
+  sha256: 331cd4fc9c58bc497597275c73094340245bf9df5a07d065033e79497fdf7dc4
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vs/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vs
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/vs/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/vs-denver.tif
+  size_bytes: 1435
+  sha256: 462eb414a70e85e448083f83cb8afdadbb8a7fe401bb583f3e6b31d2b4c81fb5
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/vs/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vs
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/vs/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/vs-denver.rds
+  size_bytes: 213
+  sha256: 45531ed04cf2cd7a88e95cfca77024077a2da855cf31f8e43bf47680edb07221
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vs/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vs
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/th/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/th-raleigh.tif
+  size_bytes: 1392
+  sha256: 3ec4c966d07f7b3b1c8f1be1f6d3979ecaf2251cbb892ab7e84741cb23500a83
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/th/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/th
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/th/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/th-raleigh.rds
+  size_bytes: 212
+  sha256: fea6a0c14cfe09e4fd8807a8e26671e3f8eb561081e253e9290a5711c1b2ad03
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/th/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/th
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/th/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/th-denver.tif
+  size_bytes: 1435
+  sha256: 4d7635119328ade3d4f21a850561717e9c1271b6ffee684f75cb55359e2868d5
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/th/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/th
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/th/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/th-denver.rds
+  size_bytes: 211
+  sha256: 5d0237d1b4f674608d1d48cfb81aa273a6ada34525f41476000d7d2ffa1d1159
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/th/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/th
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/erc/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/erc-raleigh.tif
+  size_bytes: 1351
+  sha256: bf6ed59296d8d0878734605f28739e2b721654b54cd171e2fabf44705e717eaf
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/erc/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/erc
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/erc/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/erc-raleigh.rds
+  size_bytes: 214
+  sha256: 1bb386ad9b6a6439aa9798d091fc42efda0781192f10690f59b4b2b6bf8a520c
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/erc/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/erc
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/erc/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/erc-denver.tif
+  size_bytes: 1383
+  sha256: 30bf67047739500f340338939a61658dbab8526154e96fa85e92b80c62586be6
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/erc/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/erc
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/erc/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/erc-denver.rds
+  size_bytes: 213
+  sha256: abdb32c68bbcce44d4e0b4b13bf76ca758c1d71c7b761cb0cd4370a9c2a98452
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/erc/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/erc
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/bi/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/bi-raleigh.tif
+  size_bytes: 1347
+  sha256: 0fe2e9e53b28d3add564d2b45e7f1fadcb7db4d9aa55e09de35dc0f9fb31a669
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/bi/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/bi
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/bi/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/bi-raleigh.rds
+  size_bytes: 213
+  sha256: ed887b40524e77d485af2eba9ce65653fa3f4ba822e1f4fad5a55faf3b0649eb
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/bi/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/bi
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/bi/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/bi-denver.tif
+  size_bytes: 1395
+  sha256: af3d890f8ab45e597c18fb6e9626a93f43cf16aa7cab314a6895d0ce47666544
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/bi/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/bi
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/bi/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/bi-denver.rds
+  size_bytes: 211
+  sha256: 801b2ed3ba763152b1d878c8ebe7fc370453f21db3d18c20cf15f3ba37601aab
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/bi/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/bi
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/fm100/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/fm100-raleigh.tif
+  size_bytes: 1410
+  sha256: ad5329407d4f54a80884d8e60e04832649c1185176da2ef6b1214d116a80e4e5
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/fm100/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm100
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/fm100/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/fm100-raleigh.rds
+  size_bytes: 217
+  sha256: 4f2c5896d3298ae7b9440d318e1c9bf29c90bb0a23fc648fb5db6a7954cda25b
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm100/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm100
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/fm100/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/fm100-denver.tif
+  size_bytes: 1450
+  sha256: 0cf37fe92f217d2d6b50f8ce6604e56b04a67d846e194319c7b1531ab83c6518
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/fm100/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm100
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/fm100/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/fm100-denver.rds
+  size_bytes: 213
+  sha256: 92bd005984ea8c072ef0b9f7f9460b874894430f78eae5edf07d843e701d12fd
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm100/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm100
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/fm1000/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/fm1000-raleigh.tif
+  size_bytes: 1409
+  sha256: c6bbb33cd840369b1704ae91334f5cc60409a40c0741edb532626467f5848f0e
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/fm1000/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm1000
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/fm1000/raleigh
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/fm1000-raleigh.rds
+  size_bytes: 219
+  sha256: b893e590bbb5a531ccf34e33591544d683a27c98637b428881cb5d37f8060759
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm1000/raleigh
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm1000
+  materialization_mode: full_materialization
+  value_state: materialized
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/process/fm1000/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/processed/fm1000-denver.tif
+  size_bytes: 1461
+  sha256: a7a984b3f5429f9c89707cb4512b97ceec5411ffb34582c197726a6ad656c768
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/process/fm1000/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm1000
+  materialization_mode: full_materialization
+  value_state: materialized
+  native_format: geotiff
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/fm1000/denver
+  product: gridmetteam:run-ae1adb1cc291ba7a91cf/product/daily
+  local_path: /ddn/gs1/home/gemechunb/amadeus-direct-request-review/tools/schema-integration/gridmet-schema-test/outputs/run-ae1adb1cc291ba7a91cf/ordinary/fm1000-denver.rds
+  size_bytes: 218
+  sha256: a530dbe6f97f7a91259d43a680edcbb44ad9d486d19f84cf74ec6228ff3e8601
+  produced_by_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm1000/denver
+  variables_present:
+  - gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm1000
+  materialization_mode: full_materialization
+  value_state: materialized
+ambient_values_at_location:
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/tmmx/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmx
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmx
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/tmmx/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmx/raleigh
+  value: 288.10000000000002274
+  native_value: 288.10000000000002274
+  value_unit_ucum: K
+  native_value_unit_ucum: K
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/tmmx/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmx
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmx
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/tmmx/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmx/raleigh
+  value: 281.10000000000002274
+  native_value: 281.10000000000002274
+  value_unit_ucum: K
+  native_value_unit_ucum: K
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/tmmx/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmx
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmx
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/tmmx/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmx/denver
+  value: 293.80000000000001137
+  native_value: 293.80000000000001137
+  value_unit_ucum: K
+  native_value_unit_ucum: K
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/tmmx/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmx
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmx
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/tmmx/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmx/denver
+  value: 300.5
+  native_value: 300.5
+  value_unit_ucum: K
+  native_value_unit_ucum: K
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/tmmn/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmn
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmn
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/tmmn/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmn/raleigh
+  value: 274.69999999999998863
+  native_value: 274.69999999999998863
+  value_unit_ucum: K
+  native_value_unit_ucum: K
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/tmmn/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmn
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmn
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/tmmn/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmn/raleigh
+  value: 273.60000000000002274
+  native_value: 273.60000000000002274
+  value_unit_ucum: K
+  native_value_unit_ucum: K
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/tmmn/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmn
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmn
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/tmmn/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmn/denver
+  value: 280.19999999999998863
+  native_value: 280.19999999999998863
+  value_unit_ucum: K
+  native_value_unit_ucum: K
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/tmmn/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/tmmn
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/tmmn
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/tmmn/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/tmmn/denver
+  value: 280
+  native_value: 280
+  value_unit_ucum: K
+  native_value_unit_ucum: K
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/pr/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pr
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pr
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/pr/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pr/raleigh
+  value: 0
+  native_value: 0
+  value_unit_ucum: mm
+  native_value_unit_ucum: mm
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: true_zero
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/pr/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pr
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pr
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/pr/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pr/raleigh
+  value: 0
+  native_value: 0
+  value_unit_ucum: mm
+  native_value_unit_ucum: mm
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: true_zero
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/pr/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pr
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pr
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/pr/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pr/denver
+  value: 0
+  native_value: 0
+  value_unit_ucum: mm
+  native_value_unit_ucum: mm
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: true_zero
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/pr/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pr
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pr
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/pr/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pr/denver
+  value: 0
+  native_value: 0
+  value_unit_ucum: mm
+  native_value_unit_ucum: mm
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: true_zero
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/pet/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pet
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pet
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/pet/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pet/raleigh
+  value: 1.80000000000000004
+  native_value: 1.80000000000000004
+  value_unit_ucum: mm
+  native_value_unit_ucum: mm
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/pet/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pet
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pet
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/pet/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pet/raleigh
+  value: 1.19999999999999996
+  native_value: 1.19999999999999996
+  value_unit_ucum: mm
+  native_value_unit_ucum: mm
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/pet/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pet
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pet
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/pet/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pet/denver
+  value: 3.70000000000000018
+  native_value: 3.70000000000000018
+  value_unit_ucum: mm
+  native_value_unit_ucum: mm
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/pet/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/pet
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/pet
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/pet/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/pet/denver
+  value: 4.59999999999999964
+  native_value: 4.59999999999999964
+  value_unit_ucum: mm
+  native_value_unit_ucum: mm
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/etr/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/etr
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/etr
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/etr/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/etr/raleigh
+  value: 2.60000000000000009
+  native_value: 2.60000000000000009
+  value_unit_ucum: mm
+  native_value_unit_ucum: mm
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/etr/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/etr
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/etr
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/etr/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/etr/raleigh
+  value: 1.60000000000000009
+  native_value: 1.60000000000000009
+  value_unit_ucum: mm
+  native_value_unit_ucum: mm
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/etr/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/etr
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/etr
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/etr/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/etr/denver
+  value: 6.09999999999999964
+  native_value: 6.09999999999999964
+  value_unit_ucum: mm
+  native_value_unit_ucum: mm
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/etr/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/etr
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/etr
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/etr/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/etr/denver
+  value: 7.5
+  native_value: 7.5
+  value_unit_ucum: mm
+  native_value_unit_ucum: mm
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/rmax/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmax
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmax
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/rmax/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmax/raleigh
+  value: 100
+  native_value: 100
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/rmax/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmax
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmax
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/rmax/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmax/raleigh
+  value: 92.90000000000000568
+  native_value: 92.90000000000000568
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/rmax/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmax
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmax
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/rmax/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmax/denver
+  value: 32.39999999999999858
+  native_value: 32.39999999999999858
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/rmax/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmax
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmax
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/rmax/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmax/denver
+  value: 46.5
+  native_value: 46.5
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/rmin/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmin
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmin
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/rmin/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmin/raleigh
+  value: 50
+  native_value: 50
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/rmin/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmin
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmin
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/rmin/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmin/raleigh
+  value: 59.29999999999999716
+  native_value: 59.29999999999999716
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/rmin/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmin
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmin
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/rmin/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmin/denver
+  value: 9.90000000000000036
+  native_value: 9.90000000000000036
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/rmin/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/rmin
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/rmin
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/rmin/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/rmin/denver
+  value: 9.59999999999999964
+  native_value: 9.59999999999999964
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/sph/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/sph
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/sph
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/sph/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/sph/raleigh
+  value: 0.0054
+  native_value: 0.0054
+  value_unit_ucum: '1'
+  native_value_unit_ucum: '1'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/sph/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/sph
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/sph
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/sph/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/sph/raleigh
+  value: 0.00396
+  native_value: 0.00396
+  value_unit_ucum: '1'
+  native_value_unit_ucum: '1'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/sph/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/sph
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/sph
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/sph/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/sph/denver
+  value: 0.00233
+  native_value: 0.00233
+  value_unit_ucum: '1'
+  native_value_unit_ucum: '1'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/sph/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/sph
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/sph
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/sph/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/sph/denver
+  value: 0.00342
+  native_value: 0.00342
+  value_unit_ucum: '1'
+  native_value_unit_ucum: '1'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/vpd/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vpd
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vpd
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/vpd/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vpd/raleigh
+  value: 0.32000000000000001
+  native_value: 0.32000000000000001
+  value_unit_ucum: kPa
+  native_value_unit_ucum: kPa
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/vpd/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vpd
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vpd
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/vpd/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vpd/raleigh
+  value: 0.20999999999999999
+  native_value: 0.20999999999999999
+  value_unit_ucum: kPa
+  native_value_unit_ucum: kPa
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/vpd/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vpd
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vpd
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/vpd/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vpd/denver
+  value: 1.40999999999999992
+  native_value: 1.40999999999999992
+  value_unit_ucum: kPa
+  native_value_unit_ucum: kPa
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/vpd/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vpd
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vpd
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/vpd/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vpd/denver
+  value: 1.8600000000000001
+  native_value: 1.8600000000000001
+  value_unit_ucum: kPa
+  native_value_unit_ucum: kPa
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/srad/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/srad
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/srad
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/srad/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/srad/raleigh
+  value: 145.5
+  native_value: 145.5
+  value_unit_ucum: W/m2
+  native_value_unit_ucum: W/m2
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/srad/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/srad
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/srad
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/srad/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/srad/raleigh
+  value: 96.70000000000000284
+  native_value: 96.70000000000000284
+  value_unit_ucum: W/m2
+  native_value_unit_ucum: W/m2
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/srad/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/srad
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/srad
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/srad/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/srad/denver
+  value: 124.20000000000000284
+  native_value: 124.20000000000000284
+  value_unit_ucum: W/m2
+  native_value_unit_ucum: W/m2
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/srad/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/srad
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/srad
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/srad/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/srad/denver
+  value: 126.79999999999999716
+  native_value: 126.79999999999999716
+  value_unit_ucum: W/m2
+  native_value_unit_ucum: W/m2
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/vs/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vs
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vs
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/vs/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vs/raleigh
+  value: 5.29999999999999982
+  native_value: 5.29999999999999982
+  value_unit_ucum: m/s
+  native_value_unit_ucum: m/s
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/vs/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vs
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vs
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/vs/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vs/raleigh
+  value: 3.60000000000000009
+  native_value: 3.60000000000000009
+  value_unit_ucum: m/s
+  native_value_unit_ucum: m/s
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/vs/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vs
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vs
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/vs/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vs/denver
+  value: 3.79999999999999982
+  native_value: 3.79999999999999982
+  value_unit_ucum: m/s
+  native_value_unit_ucum: m/s
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/vs/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/vs
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/vs
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/vs/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/vs/denver
+  value: 4
+  native_value: 4
+  value_unit_ucum: m/s
+  native_value_unit_ucum: m/s
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/th/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/th
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/th
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/th/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/th/raleigh
+  value: 5
+  native_value: 5
+  value_unit_ucum: deg
+  native_value_unit_ucum: deg
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/th/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/th
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/th
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/th/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/th/raleigh
+  value: 95
+  native_value: 95
+  value_unit_ucum: deg
+  native_value_unit_ucum: deg
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/th/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/th
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/th
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/th/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/th/denver
+  value: 242
+  native_value: 242
+  value_unit_ucum: deg
+  native_value_unit_ucum: deg
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/th/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/th
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/th
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/th/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/th/denver
+  value: 234
+  native_value: 234
+  value_unit_ucum: deg
+  native_value_unit_ucum: deg
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/erc/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/erc
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/erc
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/erc/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/erc/raleigh
+  value: 38
+  native_value: 38
+  value_unit_ucum: '1'
+  native_value_unit_ucum: '1'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/erc/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/erc
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/erc
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/erc/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/erc/raleigh
+  value: 35
+  native_value: 35
+  value_unit_ucum: '1'
+  native_value_unit_ucum: '1'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/erc/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/erc
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/erc
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/erc/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/erc/denver
+  value: 72
+  native_value: 72
+  value_unit_ucum: '1'
+  native_value_unit_ucum: '1'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/erc/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/erc
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/erc
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/erc/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/erc/denver
+  value: 73
+  native_value: 73
+  value_unit_ucum: '1'
+  native_value_unit_ucum: '1'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/bi/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/bi
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/bi
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/bi/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/bi/raleigh
+  value: 38
+  native_value: 38
+  value_unit_ucum: '1'
+  native_value_unit_ucum: '1'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/bi/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/bi
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/bi
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/bi/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/bi/raleigh
+  value: 30
+  native_value: 30
+  value_unit_ucum: '1'
+  native_value_unit_ucum: '1'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/bi/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/bi
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/bi
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/bi/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/bi/denver
+  value: 63
+  native_value: 63
+  value_unit_ucum: '1'
+  native_value_unit_ucum: '1'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/bi/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/bi
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/bi
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/bi/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/bi/denver
+  value: 66
+  native_value: 66
+  value_unit_ucum: '1'
+  native_value_unit_ucum: '1'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/fm100/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm100
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm100
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/fm100/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm100/raleigh
+  value: 15.30000000000000071
+  native_value: 15.30000000000000071
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/fm100/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm100
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm100
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/fm100/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm100/raleigh
+  value: 16.19999999999999929
+  native_value: 16.19999999999999929
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/fm100/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm100
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm100
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/fm100/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm100/denver
+  value: 6.09999999999999964
+  native_value: 6.09999999999999964
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/fm100/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm100
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm100
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/fm100/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm100/denver
+  value: 6.09999999999999964
+  native_value: 6.09999999999999964
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/fm1000/raleigh/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm1000
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm1000
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/fm1000/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm1000/raleigh
+  value: 13.5
+  native_value: 13.5
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/fm1000/raleigh/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/raleigh
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm1000
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm1000
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/fm1000/raleigh
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm1000/raleigh
+  value: 13.69999999999999929
+  native_value: 13.69999999999999929
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/fm1000/denver/2025-02-01
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm1000
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm1000
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/fm1000/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm1000/denver
+  value: 9.69999999999999929
+  native_value: 9.69999999999999929
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-01T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present
+- id: gridmetteam:run-ae1adb1cc291ba7a91cf/value/fm1000/denver/2025-02-02
+  location: gridmetteam:run-ae1adb1cc291ba7a91cf/location/denver
+  extraction_request: gridmetteam:run-ae1adb1cc291ba7a91cf/request/user
+  extraction_method: nearest_cell
+  product_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/product-variable/fm1000
+  canonical_variable: gridmetteam:run-ae1adb1cc291ba7a91cf/variable/fm1000
+  asset: gridmetteam:run-ae1adb1cc291ba7a91cf/asset/calculate/fm1000/denver
+  processing_run: gridmetteam:run-ae1adb1cc291ba7a91cf/run/calculate/fm1000/denver
+  value: 9.5
+  native_value: 9.5
+  value_unit_ucum: '%'
+  native_value_unit_ucum: '%'
+  valid_time_start: '2025-02-02T00:00:00Z'
+  temporal_grouping: day
+  contributing_value_count: 1
+  data_status: unknown
+  source_system: gridmet
+  null_semantics: present

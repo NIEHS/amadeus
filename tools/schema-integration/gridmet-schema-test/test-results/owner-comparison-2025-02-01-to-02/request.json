@@ -1,0 +1,28 @@
+{
+  "dataset": "gridmet",
+  "variables": [
+    "tmmx",
+    "tmmn",
+    "pr",
+    "pet",
+    "etr",
+    "rmax",
+    "rmin",
+    "sph",
+    "vpd",
+    "srad",
+    "vs",
+    "th",
+    "erc",
+    "bi",
+    "fm100",
+    "fm1000"
+  ],
+  "start": "2025-02-01",
+  "end": "2025-02-02",
+  "sites_file": "sites.csv",
+  "engine": "duckdb",
+  "expected_values": 64,
+  "input_scope": "same stated request as tester report; exact tester code/arguments still pending",
+  "source_mode": "Original owner run recorded source files absent before public downloader call; this evidence preparation did not download or rerun science"
+}

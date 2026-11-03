@@ -1,0 +1,30 @@
+{
+  "review_date": "2026-11-03",
+  "original_run_id": "run-ae1adb1cc291ba7a91cf",
+  "scientific_execution": "Existing saved successful owner run; not rerun when preparing this folder",
+  "result_rows": 64,
+  "missing_values": 0,
+  "schema_accepted": true,
+  "JSON_YAML_agree": true,
+  "duckdb_result_rows": 64,
+  "duckdb_inserted_rows": 488,
+  "SQL_integrity_queries": 102,
+  "persistent_reopen_passed": true,
+  "maximum_numeric_storage_difference": 1.22070312613687e-05,
+  "schema_test_pack": {
+    "cases": 16,
+    "passed": 16,
+    "failed": 0,
+    "execution": "Executed during evidence preparation against byte-identical copy of saved JSON, results and acceptance receipt; original run untouched",
+    "original_run_did_not_have_pack_receipt": true
+  },
+  "pilot_checkout_at_evidence_review": "a78369a60458d27a6dbafaefd046e90a6bce2b19",
+  "pilot_checkout_at_original_execution": "not independently captured",
+  "installed_amadeus_version": "2.0.4",
+  "installed_amadeus_source_commit": "not captured",
+  "tmmx_source_sha256": "b8583ca388c016ceb2f6c071072e91bf29c106a57de5b2f372b05f5684c8e746",
+  "tester_tmmx_sha256_matches": "reported by tester",
+  "tester_container_reproduced": false,
+  "tester_failure_resolved": false,
+  "production_approved": false
+}

@@ -1,0 +1,12 @@
+{
+  "accepted": true,
+  "records": 64,
+  "schema_sha256": "cb8a1481cf4604aad68e05ffd599a39c85bd021784a8e10adaac8420e7de119e",
+  "instance_sha256": "9fa84aba498ef810fc975396e0915f0bddffa0e8f242a9691043c15424679993",
+  "ordinary_results_sha256": "22b2be0bf80b2a070f0186ab7e7404eeedb9ec4c8828744f12acc27325e4277a",
+  "amadeus_version": "2.0.4",
+  "scientific_transformations": false,
+  "JSON_YAML_agree": true,
+  "date_convention": "Nominal UTC00 date labels only; physical interval/timezone unqualified",
+  "production_approved": false
+}
