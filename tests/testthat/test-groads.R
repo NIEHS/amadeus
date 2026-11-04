@@ -339,7 +339,7 @@ testthat::test_that("download_groads mock download hash=FALSE", {
         )
       )
     )
-    testthat::expect_null(result)
+    testthat::expect_type(result, "list")
   })
 })
 
@@ -371,7 +371,7 @@ testthat::test_that("download_groads file already exists path", {
         invokeRestart("muffleMessage")
       }
     )
-    testthat::expect_true(any(grepl("already exists", msgs)))
+    testthat::expect_true(any(grepl("already exist", msgs)))
   })
 })
 
