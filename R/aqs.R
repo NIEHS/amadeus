@@ -131,16 +131,11 @@ download_aqs <- function(
     int_years
   )
   # ----------------------------------------------------------------------------
-  # Filter to missing/empty files only.
-  idx_needsdownload <- sapply(chr_filenames, amadeus::check_destfile)
-  chr_dlurls <- chr_urls[idx_needsdownload]
-  chr_dlnames <- chr_filenames[idx_needsdownload]
-  # ----------------------------------------------------------------------------
   # Check first URL for valid generation; error if not.
   if (
     isTRUE(download) &&
-      length(chr_dlurls) > 0 &&
-      !amadeus::check_url_status(chr_dlurls[1])
+      length(chr_urls) > 0 &&
+      !amadeus::check_url_status(chr_urls[1])
   ) {
     stop(paste0(
       "Invalid year returns HTTP code 404. ",
@@ -152,12 +147,12 @@ download_aqs <- function(
   if (!isTRUE(download)) {
     message(sprintf(
       "Skipping download. Found %d files available for download.\n",
-      length(chr_dlurls)
+      length(chr_urls)
     ))
     return(invisible(list(
-      urls = chr_dlurls,
-      destfiles = chr_dlnames,
-      n_files = length(chr_dlurls)
+      urls = chr_urls,
+      destfiles = chr_filenames,
+      n_files = length(chr_urls)
     )))
   }
   # ----------------------------------------------------------------------------
