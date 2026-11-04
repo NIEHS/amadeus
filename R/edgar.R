@@ -553,7 +553,8 @@ process_edgar <- function(
     if (length(txt_paths) > 0) {
       stop(
         "process_edgar() currently supports gridded raster files only. ",
-        "Re-download EDGAR with format = \"nc\" or provide extracted raster files.\n"
+        "Re-download EDGAR with format = \"nc\" or provide extracted ",
+        "raster files.\n"
       )
     }
     stop("path does not contain supported EDGAR raster files.\n")
