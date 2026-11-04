@@ -268,4 +268,83 @@ process_huc <-
     }
     return(hucpoly)
   }
+
+################################################################################
+# {calculate} tier
+################################################################################
+#' Calculate HUC covariates
+#' @description
+#' Extract HUC IDs at point locations. Returns a \code{data.frame}
+#' object containing \code{locs_id} and HUC IDs.
+#' @param from SpatVector(1). Output from \code{process_huc()}.
+#' @param locs data.frame. character to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Placeholders.
+#' @author Insang Song
+#' @seealso [`process_huc()`]
+#' @return a data.frame or SpatVector object
+#' @importFrom terra vect
+#' @importFrom terra intersect
+#' @importFrom terra crs
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_huc(
+#'   from = huc, # derived from process_huc() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_huc <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  weights = NULL,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  if (!inherits(from, "SpatVector")) {
+    stop("`from` must be the output of process_huc().")
+  }
+
+  #### prepare locations list
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = 0, # radius irrelevant for point-in-poly usually, or treated as 0
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+
+  message("Calculating HUC covariates...")
+
+  # intersect
+  sites_extracted <- terra::intersect(sites_e, from)
+  sites_df <- terra::as.data.frame(sites_extracted)
+
+  # Remove valid geometry columns if present
+  cols_to_keep <- c(locs_id, setdiff(names(sites_df), locs_id))
+  sites_df <- sites_df[, cols_to_keep, drop = FALSE]
+
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_df,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  return(sites_return)
+}
 ################################################################################

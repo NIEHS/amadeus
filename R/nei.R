@@ -317,4 +317,72 @@ process_nei <- function(
   cnty_vect <- cnty_vect[, c("geoid", "time", "TRF_NEINP_0_00000")]
   return(cnty_vect)
 }
+
+################################################################################
+# {calculate} tier
+################################################################################
+#' Calculate road emissions covariates
+#' @param from SpatVector(1). Output of \code{process_nei()}.
+#' @param locs sf/SpatVector. Locations at NEI values are joined.
+#' @param locs_id character(1). Unique site identifier column name.
+#' Unused but kept for compatibility.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Placeholders.
+#' @author Insang Song, Ranadeep Daw
+#' @seealso [`process_nei`]
+#' @return a data.frame or SpatVector object
+#' @importFrom terra vect
+#' @importFrom methods is
+#' @importFrom terra project
+#' @importFrom terra intersect
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_nei(
+#'   from = nei, # derived from process_nei example
+#'   locs = loc,
+#'   locs_id = "id"
+#' )
+#' }
+#' @export
+calculate_nei <- function(
+  from = NULL,
+  locs = NULL,
+  locs_id = "site_id",
+  weights = NULL,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_geom(geom)
+  if (!methods::is(locs, "SpatVector")) {
+    locs <- try(terra::vect(locs), silent = TRUE)
+    if (inherits(locs, "try-error")) {
+      stop("locs is unable to be converted to SpatVector.\n")
+    }
+  }
+  # spatial join
+  locs_re <- terra::project(locs, terra::crs(from))
+  locs_re <- terra::intersect(locs_re, from)
+
+  # If returning geometry, keep as SpatVector
+  if (geom %in% c("terra", "sf")) {
+    if (geom == "terra") {
+      return(locs_re)
+    } else if (geom == "sf") {
+      return(sf::st_as_sf(locs_re))
+    }
+  } else {
+    # Only convert to data.frame if geom = FALSE
+    locs_re <- as.data.frame(locs_re)
+    return(locs_re)
+  }
+}
 ################################################################################

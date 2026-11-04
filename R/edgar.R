@@ -613,4 +613,174 @@ process_edgar <- function(
   names(edgar) <- make.unique(names(edgar), sep = "_")
   return(edgar)
 }
+
+################################################################################
+# {calculate} tier
+################################################################################
+#' Calculate EDGAR covariates
+#' @description
+#' Extract EDGAR gridded emissions values at point locations. For
+#' `radius = 0`, cell values are extracted directly. For `radius > 0`,
+#' means are calculated over a circular buffer around each location.
+#' @param from SpatRaster(1). Output from \code{process_edgar()}.
+#' @param locs data.frame, character to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file containing
+#'   identifier for each unique coordinate location.
+#' @param radius numeric(1). Circular buffer distance around site locations.
+#'   Default is `0`.
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#'   with \code{.by_time} for temporal summaries.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Placeholders.
+#' @author Mariana Alifa Kassien, Insang Song
+#' @seealso [`process_edgar()`]
+#' @return a data.frame or SpatVector object
+#' @importFrom terra extract crs
+#' @importFrom sf st_as_sf st_buffer
+#' @importFrom exactextractr exact_extract
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires data that is
+#' ##       not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_edgar(
+#'   from = edgar, # derived from process_edgar() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_edgar <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  weights = NULL,
+  .by_time = NULL,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+  if (!inherits(from, "SpatRaster")) {
+    stop("`from` must be a SpatRaster object.")
+  }
+  if (!is.numeric(radius) || length(radius) != 1) {
+    stop("`radius` must be numeric(1).")
+  }
+
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+
+  is_polygon_locs <- inherits(sites_e, "SpatVector") &&
+    !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
+  weights_prepared <- amadeus::calc_prepare_weights(
+    from = from[[1]],
+    weights = weights
+  )
+  fun_extract <- amadeus::calc_weighted_fun(
+    fun = "mean",
+    weighted = !is.null(weights_prepared)
+  )
+  if (radius == 0 && !is_polygon_locs && is.null(weights_prepared)) {
+    sites_extracted <- terra::extract(from, sites_e)
+    sites_extracted <- sites_extracted[, -1, drop = FALSE]
+  } else {
+    if (inherits(sites_e, "SpatVector")) {
+      sites_e <- sf::st_as_sf(sites_e)
+    }
+    extract_args <- c(
+      list(
+        x = from,
+        y = sites_e,
+        fun = fun_extract,
+        force_df = TRUE,
+        progress = FALSE
+      ),
+      list(...)
+    )
+    if (!is.null(weights_prepared)) {
+      extract_args$weights <- weights_prepared
+    }
+    sites_extracted <- do.call(exactextractr::exact_extract, extract_args)
+    exact_names <- names(sites_extracted)
+    if (length(exact_names) == 1 && identical(exact_names, "mean")) {
+      exact_names <- names(from)[1]
+    } else {
+      exact_names <- gsub("^mean\\.", "", exact_names)
+    }
+    names(sites_extracted) <- exact_names
+  }
+
+  names(sites_extracted) <- sprintf("%s_%d", names(sites_extracted), radius)
+  sites_extracted[[locs_id]] <- sites_id[, 1]
+  if (
+    "geometry" %in% names(sites_id) && !"geometry" %in% names(sites_extracted)
+  ) {
+    sites_extracted$geometry <- sites_id$geometry
+  }
+  ordered_cols <- c(
+    locs_id,
+    if ("geometry" %in% names(sites_extracted)) "geometry",
+    setdiff(names(sites_extracted), c(locs_id, "geometry"))
+  )
+  sites_extracted <- sites_extracted[, ordered_cols]
+
+  posixt_out <- FALSE
+  if (!is.null(.by_time)) {
+    if (!"time" %in% names(sites_extracted)) {
+      value_cols_now <- setdiff(names(sites_extracted), c(locs_id, "geometry"))
+      if (length(value_cols_now) != 1L) {
+        stop(
+          "EDGAR `.by_time` summarization requires a single covariate column ",
+          "or an existing `time` column.\n"
+        )
+      }
+      edgar_time <- NA
+      time_vals <- try(terra::time(from), silent = TRUE)
+      if (!inherits(time_vals, "try-error") && length(time_vals) >= 1L) {
+        edgar_time <- time_vals[1]
+      }
+      if (is.na(edgar_time)) {
+        stop(
+          "Could not derive EDGAR time for `.by_time` summarization. ",
+          "Provide data with explicit time in layer metadata.\n"
+        )
+      }
+      sites_extracted$time <- edgar_time
+    }
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = "mean",
+      locs_id = locs_id
+    )
+    if ("time" %in% names(sites_extracted)) {
+      sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+      posixt_out <- TRUE
+    }
+  }
+
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = posixt_out,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  return(sites_return)
+}
 ################################################################################

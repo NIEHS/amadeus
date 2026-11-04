@@ -658,4 +658,120 @@ get_geos_info <- function(
   rownames(out) <- NULL
   out
 }
+
+################################################################################
+# {calculate} tier
+################################################################################
+#' Calculate atmospheric composition covariates
+#' @description
+#' Extract atmospheric composition values at point locations. Returns a
+#' \code{data.frame} object containing \code{locs_id}, date and hour, vertical
+#' pressure level, and atmospheric composition variable. Atmospheric
+#' composition variable column name reflects variable and circular buffer
+#' radius.
+#' @param from SpatRaster(1). Output of \code{process_geos()}.
+#' @param locs data.frame, characater to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param fun character(1). Function used to summarize multiple raster cells
+#' within sites location buffer (Default = `mean`).
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#' when \code{.by_time} is provided.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Placeholders.
+#' @author Mitchell Manware
+#' @seealso [process_geos()]
+#' @return a data.frame or SpatVector object. When \code{.by_time} is provided,
+#'   rows are aggregated using \code{calc_summarize_by()}.
+#' @importFrom terra vect
+#' @importFrom terra buffer
+#' @importFrom terra as.data.frame
+#' @importFrom terra time
+#' @importFrom terra extract
+#' @importFrom terra nlyr
+#' @importFrom terra crs
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_geos(
+#'   from = geos, # derived from process_geos() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_geos <- function(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  fun = "mean",
+  weights = NULL,
+  .by_time = NULL,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+  #### prepare locations list
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### perform extraction
+  sites_extracted <- amadeus::calc_worker(
+    dataset = "geos",
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
+    fun = fun,
+    variable = 1,
+    time = c(3, 4),
+    time_type = "hour",
+    level = 2,
+    weights = weights,
+    ...
+  )
+  if (!is.null(.by_time)) {
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = "mean",
+      locs_id = locs_id,
+      group_cols_extra = "level"
+    )
+    did_summarize <- TRUE
+  } else {
+    did_summarize <- FALSE
+  }
+  if (did_summarize && "time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+  }
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  #### return data.frame
+  return(sites_return)
+}
 ################################################################################

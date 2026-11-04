@@ -453,4 +453,373 @@ process_hms <- function(
     return(data_return)
   }
 }
+
+################################################################################
+# {calculate} tier
+################################################################################
+#' Calculate wildfire smoke covariates
+#' @description
+#' Extract wildfire smoke plume values at point or buffered locations. Returns a
+#' \code{data.frame} object containing \code{locs_id}, date, and either binary
+#' indicators (`frac = FALSE`) or fractional overlap values (`frac = TRUE`) for
+#' wildfire smoke plume density inherited from \code{from}.
+#' @param from SpatVector(1). Output of \code{process_hms()}.
+#' @param locs data.frame, characater to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#' when \code{.by_time} is provided. When supplied, HMS indicators are
+#' summarized by \code{sum} (smoke-day counts) for `frac = FALSE`, or
+#' \code{mean} for `frac = TRUE`.
+#' @param frac logical(1). Default `FALSE`. If `FALSE`, return binary 0/1 smoke
+#' indicators by density class. If `TRUE`, return fractional overlap by density
+#' class.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Placeholders.
+#' @seealso [process_hms()]
+#' @author Mitchell Manware
+#' @return a data.frame or SpatVector object. When \code{.by_time} is provided,
+#'   rows are aggregated using \code{calc_summarize_by()}.
+#' @importFrom terra vect as.data.frame time extract crs
+#' @importFrom tidyr pivot_wider
+#' @importFrom dplyr all_of
+#' @importFrom stats setNames
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_hms(
+#'   from = hms, # derived from process_hms() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_hms <- function(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  weights = NULL,
+  .by_time = NULL,
+  frac = FALSE,
+  geom = FALSE,
+  ...
+) {
+  #### check for null parameters (.by_time is optional)
+  params_check <- mget(ls())
+  params_check[c(".by_time", "weights")] <- NULL
+  amadeus::check_for_null_parameters(params_check)
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+  if (!is.logical(frac) || length(frac) != 1L || is.na(frac)) {
+    stop("`frac` should be a single logical value (TRUE/FALSE).")
+  }
+  #### from == character indicates no wildfire smoke plumes are present
+  #### return 0 for all densities, locs and dates
+  if (is.character(from)) {
+    amadeus::check_geom(geom)
+    message(paste0(
+      "Inherited list of dates due to absent smoke plume polygons.\n"
+    ))
+    zero_value <- if (isTRUE(frac)) 0 else 0L
+    skip_df <- data.frame(
+      as.POSIXlt(from),
+      zero_value,
+      zero_value,
+      zero_value
+    )
+    colnames(skip_df) <- c(
+      "time",
+      paste0("light_", sprintf("%05d", radius)),
+      paste0("medium_", sprintf("%05d", radius)),
+      paste0("heavy_", sprintf("%05d", radius))
+    )
+    # fixed: locs is replicated per the length of from
+    skip_merge <-
+      Reduce(
+        rbind,
+        Map(
+          function(x) {
+            cbind(locs, skip_df[rep(x, nrow(locs)), ])
+          },
+          seq_len(nrow(skip_df))
+        )
+      )
+
+    if (!is.null(.by_time)) {
+      hms_fun_summary <- if (isTRUE(frac)) "mean" else "sum"
+      skip_merge <- amadeus::calc_summarize_by(
+        covar = skip_merge,
+        .by_time = .by_time,
+        fun_summary = hms_fun_summary,
+        locs_id = locs_id
+      )
+      did_summarize <- TRUE
+    } else {
+      did_summarize <- FALSE
+    }
+    if (did_summarize && "time" %in% names(skip_merge)) {
+      skip_merge$time <- as.POSIXct(skip_merge$time, tz = "UTC")
+    }
+    skip_return <- amadeus::calc_return_locs(
+      skip_merge,
+      POSIXt = TRUE,
+      geom = geom,
+      crs = "EPSG:4326"
+    )
+    return(skip_return)
+  }
+  #### prepare locations list
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+
+  #### generate date sequence for missing polygon patch
+  date_sequence <- amadeus::generate_date_sequence(
+    date_start = as.Date(
+      from$Date[1],
+      format = "%Y%m%d"
+    ),
+    date_end = as.Date(
+      from$Date[nrow(from)],
+      format = "%Y%m%d"
+    ),
+    sub_hyphen = FALSE
+  )
+
+  ### split date_sequence by 30 days
+  date_sequence_split <-
+    split(date_sequence, ceiling(seq_along(date_sequence) / 30))
+  return_list <- vector("list", length(date_sequence_split))
+
+  ### extract layer data at sites
+  for (i in seq_along(date_sequence_split)) {
+    message(paste0(
+      "Calculating smoke intensity covariates for date range: ",
+      date_sequence_split[[i]][1],
+      " to ",
+      date_sequence_split[[i]][length(date_sequence_split[[i]])]
+    ))
+
+    ### Full SPT
+    data_template <- expand.grid(
+      id = sites_id[[locs_id]],
+      time = date_sequence_split[[i]]
+    )
+    data_template <- stats::setNames(data_template, c(locs_id, "time"))
+    from_sub <- from[from$Date %in% date_sequence_split[[i]], ]
+
+    is_point_locs <- all(
+      tolower(terra::geomtype(sites_e)) %in% c("points", "point")
+    )
+    if (nrow(from_sub) == 0) {
+      sites_extracted_layer <- data.frame(
+        setNames(list(character(0)), locs_id),
+        Date = character(0),
+        Density = character(0),
+        base_value = numeric(0)
+      )
+    } else if (radius == 0 && is_point_locs) {
+      sites_extracted_layer <- terra::extract(from_sub, sites_e)
+      sites_extracted_layer$id.y <-
+        unlist(sites_e[[locs_id]])[sites_extracted_layer$id.y]
+      names(sites_extracted_layer)[
+        names(sites_extracted_layer) == "id.y"
+      ] <- locs_id
+      sites_extracted_layer$base_value <- 1
+    } else {
+      intersections <- terra::intersect(sites_e, from_sub)
+      if (nrow(intersections) > 0) {
+        inter_area <- terra::expanse(intersections)
+        sites_extracted_layer <- terra::as.data.frame(intersections)
+        if (isTRUE(frac)) {
+          site_area <- terra::expanse(sites_e)
+          site_lookup <- setNames(site_area, as.character(sites_e[[locs_id]]))
+          denom <- as.numeric(
+            site_lookup[as.character(sites_extracted_layer[[locs_id]])]
+          )
+          denom[!is.finite(denom) | denom <= 0] <- NA_real_
+          sites_extracted_layer$base_value <- inter_area / denom
+          sites_extracted_layer$base_value[
+            !is.finite(sites_extracted_layer$base_value)
+          ] <- 0
+        } else {
+          sites_extracted_layer$base_value <- 1
+        }
+      } else {
+        sites_extracted_layer <- data.frame(
+          setNames(list(character(0)), locs_id),
+          Date = character(0),
+          Density = character(0),
+          base_value = numeric(0)
+        )
+      }
+    }
+
+    # remove unmatched extraction placeholders before aggregating
+    if (nrow(sites_extracted_layer) > 0) {
+      sites_extracted_layer <- sites_extracted_layer[
+        !is.na(sites_extracted_layer$Date) &
+          !is.na(sites_extracted_layer$Density),
+        ,
+        drop = FALSE
+      ]
+    }
+    # remove duplicates and aggregate by site/date/density
+    if (nrow(sites_extracted_layer) > 0) {
+      sites_extracted_layer <- unique(
+        sites_extracted_layer[, c(locs_id, "Date", "Density", "base_value")]
+      )
+      sites_extracted_layer <- stats::aggregate(
+        base_value ~ .,
+        data = sites_extracted_layer,
+        FUN = sum
+      )
+      if (!isTRUE(frac)) {
+        sites_extracted_layer$base_value <- as.integer(
+          sites_extracted_layer$base_value > 0
+        )
+      } else {
+        sites_extracted_layer$base_value <- pmin(
+          sites_extracted_layer$base_value,
+          1
+        )
+      }
+    }
+
+    #### merge with site_id and date
+    sites_extracted_layer <-
+      tidyr::pivot_wider(
+        data = sites_extracted_layer,
+        names_from = "Density",
+        values_from = "base_value",
+        id_cols = dplyr::all_of(c(locs_id, "Date")),
+        values_fill = list(base_value = 0)
+      )
+
+    # Fill in missing columns
+    levels_acceptable <- c("Light", "Medium", "Heavy")
+    # Detect missing columns
+    col_tofill <-
+      setdiff(levels_acceptable, names(sites_extracted_layer))
+    # Fill zeros
+    if (length(col_tofill) > 0) {
+      sites_extracted_layer[col_tofill] <- if (isTRUE(frac)) 0 else 0L
+    }
+    col_order <- c(locs_id, "Date", levels_acceptable)
+    sites_extracted_layer <- sites_extracted_layer[, col_order]
+    sites_extracted_layer <-
+      stats::setNames(
+        sites_extracted_layer,
+        c(locs_id, "time", levels_acceptable)
+      )
+
+    binary_colname <-
+      paste0(tolower(levels_acceptable), "_", sprintf("%05d", radius))
+    # sites_extracted_layer$time <- as.Date(sites_extracted_layer$time)
+    sites_extracted_layer <-
+      stats::setNames(
+        sites_extracted_layer,
+        c(locs_id, "time", binary_colname)
+      )
+
+    # Filling NAs to 0 (explicit integer)
+    # sites_extracted_layer[is.na(sites_extracted_layer)] <- 0L
+
+    # Join full space-time pairs with extracted data
+    site_extracted <- merge(
+      data_template,
+      sites_extracted_layer,
+      by = c(locs_id, "time"),
+      all.x = TRUE
+    )
+    # append list with the extracted data.frame
+    return_list[[i]] <- site_extracted
+  }
+
+  ### Merge data.frame in list
+  sites_extracted <- do.call(rbind, return_list)
+
+  #### define column names
+  colname_common <- c(locs_id, "time", binary_colname)
+  if (geom %in% c("sf", "terra")) {
+    sites_extracted <-
+      merge(sites_extracted, sites_id, by = locs_id)
+    sites_extracted <-
+      stats::setNames(
+        sites_extracted,
+        c(colname_common, "geometry")
+      )
+  } else {
+    sites_extracted <-
+      stats::setNames(
+        sites_extracted,
+        colname_common
+      )
+  }
+  # Filling NAs to 0 for smoke columns
+  for (smoke_col in binary_colname) {
+    sites_extracted[[smoke_col]][is.na(sites_extracted[[smoke_col]])] <-
+      if (isTRUE(frac)) 0 else 0L
+  }
+
+  if (!is.null(.by_time)) {
+    hms_fun_summary <- if (isTRUE(frac)) "mean" else "sum"
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = hms_fun_summary,
+      locs_id = locs_id
+    )
+    did_summarize <- TRUE
+  } else {
+    did_summarize <- FALSE
+  }
+
+  # Messaging
+  timevals <- sites_extracted[["time"]]
+  intensities <- sites_extracted[, binary_colname, drop = FALSE]
+  intensities <- apply(intensities, 1, sum)
+  time_allzero <- unique(timevals[intensities == 0])
+  time_allzero_c <- paste(time_allzero, collapse = "\n")
+  message(paste0(
+    "No intersecting smoke plume polygons for date(s):\n",
+    time_allzero_c
+  ))
+
+  #### date to POSIXct
+  if ("time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time)
+  }
+  #### order by date
+  sites_extracted_ordered <- as.data.frame(
+    sites_extracted[order(sites_extracted$time), ]
+  )
+  message("Returning smoke intensity covariates.")
+  sites_extracted_ordered <- amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  #### return data.frame
+  return(sites_extracted_ordered)
+}
 ################################################################################

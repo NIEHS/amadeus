@@ -721,4 +721,356 @@ drought_process_usdm <- function(path, date, extent) {
   ))
   data_return
 }
+
+################################################################################
+# {calculate} tier
+################################################################################
+# nolint start
+#' Calculate drought index covariates
+#' @description
+#' The \code{calculate_drought()} function extracts drought index values at
+#' point locations from an object returned by \code{process_drought()}.
+#' Three source datasets are supported:
+#' \itemize{
+#'   \item \strong{SPEI / EDDI} (\code{SpatRaster}): cell values are
+#'     extracted at each location using the standard raster-extraction
+#'     pipeline (\code{calc_prepare_locs()} -> \code{calc_worker()} ->
+#'     \code{calc_return_locs()}).  Time column format is
+#'     \code{"YYYY-MM-DD"}.
+#'   \item \strong{USDM} (\code{SpatVector} polygons): the drought monitor
+#'     class (\code{DM}, integer 0-4) at each location is determined via
+#'     spatial overlay. A \code{time} column of class \code{Date} is
+#'     populated from the \code{date} attribute of \code{from}.
+#' }
+#' When \code{.by_time} is supplied the extracted result is
+#' passed through \code{calc_summarize_by()} using the same semantics as
+#' all other \code{calculate_*()} functions in this package.
+# nolint end
+#' @param from SpatRaster or SpatVector. Output of \code{process_drought()}.
+#'   \itemize{
+#'     \item \code{SpatRaster} for SPEI or EDDI sources.
+#'     \item \code{SpatVector} (polygons) for USDM source.
+#'   }
+#' @param locs data.frame, character (path to CSV), \code{SpatVector}, or
+#'   \code{sf} object. Point locations at which to extract values.
+#' @param locs_id character(1). Name of the unique location identifier column
+#'   in \code{locs}. Default \code{"site_id"}.
+#' @param radius integer(1). Circular buffer radius in metres around each
+#'   site location used for extraction. For SPEI/EDDI this controls raster
+#'   buffering; for USDM, \code{radius > 0} additionally returns class
+#'   proportions within the buffer. Default \code{0L}.
+#' @param fun character(1). Summary function applied to raster cells within
+#'   the buffer (SPEI/EDDI only). Default \code{"mean"}.
+#' @param geom \code{FALSE}, \code{"sf"}, or \code{"terra"}. Whether to
+#'   attach geometry to the returned object. Default \code{FALSE}.
+#' @param .by_time NULL or character(1). Name of the time column to use
+#'   temporal summarization unit token. \code{NULL} disables
+#'   \code{"time"}.
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Reserved for future use; currently ignored.
+#' @note
+#' \itemize{
+#'   \item The column name for extracted drought values follows the pattern
+#'     \code{"<source>_<timescale>_<radius>"} (e.g. \code{"spei_01_0"}) for
+#'     SPEI/EDDI, and \code{"usdm_dm_0"} for USDM.
+#'   \item For USDM with \code{radius > 0}, proportion columns are added as
+#'     \code{"usdm_dm_<class>_<radius>"} for classes 0–4.
+#' }
+#' @author Insang Song
+#' @return A \code{data.frame} (default) or \code{SpatVector}/\code{sf}
+#'   object (when \code{geom} is set) with columns:
+#'   \describe{
+#'     \item{\code{<locs_id>}}{Location identifier.}
+#'     \item{\code{time}}{Date of the observation (\code{Date} or
+#'       \code{"YYYY-MM-DD"} character).}
+#'     \item{\code{<value_column>}}{Extracted drought index or class value.}
+#'   }
+#'   When \code{.by_time} is non-\code{NULL}, rows are
+#'   aggregated to the specified resolution via \code{calc_summarize_by()}.
+#' @importFrom terra extract
+#' @importFrom terra time
+#' @importFrom terra crs
+#' @seealso
+#' \code{\link{process_drought}}, \code{\link{download_drought}},
+#' \code{\link{calc_summarize_by}}
+#' @examples
+#' \dontrun{
+#' locs <- data.frame(site_id = "001", lon = -97.5, lat = 35.5)
+#' ## SPEI example
+#' spei <- process_drought(
+#'   source = "spei",
+#'   path = "./data/drought",
+#'   date = c("2020-01-01", "2020-12-31"),
+#'   timescale = 1L
+#' )
+#' calculate_drought(
+#'   from = spei,
+#'   locs = locs,
+#'   locs_id = "site_id",
+#'   radius = 0L,
+#'   fun = "mean"
+#' )
+#' ## USDM example
+#' usdm <- process_drought(
+#'   source = "usdm",
+#'   path = "./data/drought",
+#'   date = c("2020-01-07", "2020-03-31")
+#' )
+#' calculate_drought(
+#'   from = usdm,
+#'   locs = locs,
+#'   locs_id = "site_id"
+#' )
+#' }
+#' @export
+calculate_drought <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0L,
+  fun = "mean",
+  weights = NULL,
+  geom = FALSE,
+  .by_time = NULL,
+  ...
+) {
+  #### Validate .by_time
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+
+  #### Dispatch on input type
+  if (inherits(from, "SpatRaster")) {
+    #### SPEI / EDDI raster extraction pipeline
+    sites_list <- amadeus::calc_prepare_locs(
+      from = from,
+      locs = locs,
+      locs_id = locs_id,
+      radius = radius,
+      geom = geom
+    )
+    sites_e <- sites_list[[1]]
+    sites_id <- sites_list[[2]]
+
+    #### Derive source and timescale from first layer name
+    #### (e.g. "spei_01_2020-01-01")
+    lyr_parts <- strsplit(names(from)[1], "_")[[1]]
+    src_name <- lyr_parts[1]
+    ts_fmt <- lyr_parts[2]
+    col_name <- paste0(src_name, "_", ts_fmt, "_", radius)
+    weighted_drought <- amadeus::calc_prepare_weights(
+      from = from[[1]],
+      weights = weights
+    )
+    drought_fun_extract <- amadeus::calc_weighted_fun(
+      fun = fun,
+      weighted = !is.null(weighted_drought)
+    )
+
+    sites_extracted <- NULL
+    for (l in seq_len(terra::nlyr(from))) {
+      data_layer <- from[[l]]
+      data_time <- as.POSIXct(as.Date(terra::time(data_layer)), tz = "UTC")
+
+      if (terra::geomtype(sites_e) == "polygons") {
+        extract_args <- list(
+          x = data_layer,
+          y = sf::st_as_sf(sites_e),
+          fun = drought_fun_extract,
+          progress = FALSE,
+          force_df = TRUE,
+          max_cells_in_memory = 1e8
+        )
+        if (!is.null(weighted_drought)) {
+          extract_args$weights <- weighted_drought
+        }
+        layer_vals <- do.call(exactextractr::exact_extract, extract_args)
+      } else {
+        if (is.null(weighted_drought)) {
+          layer_vals <- terra::extract(
+            data_layer,
+            sites_e,
+            method = "simple",
+            ID = FALSE,
+            bind = FALSE,
+            na.rm = TRUE
+          )
+        } else {
+          weighted_geoms <- amadeus::calc_prepare_exact_geoms(
+            locs_vector = sites_e,
+            radius = radius
+          )
+          layer_vals <- exactextractr::exact_extract(
+            x = data_layer,
+            y = weighted_geoms,
+            weights = weighted_drought,
+            fun = drought_fun_extract,
+            progress = FALSE,
+            force_df = TRUE,
+            max_cells_in_memory = 1e8
+          )
+        }
+      }
+
+      row_df <- data.frame(
+        sites_id,
+        time = rep(data_time, nrow(sites_id)),
+        val = layer_vals[[1]],
+        stringsAsFactors = FALSE
+      )
+      colnames(row_df) <- c(colnames(sites_id), "time", col_name)
+      sites_extracted <- rbind(sites_extracted, row_df)
+    }
+    crs_from <- terra::crs(from)
+  } else if (inherits(from, "SpatVector")) {
+    #### USDM polygon overlay and optional buffered class proportions
+    use_usdm_buffer <- as.numeric(radius) > 0
+    prep_radius <- if (use_usdm_buffer) radius else 0L
+    sites_list <- amadeus::calc_prepare_locs(
+      from = from,
+      locs = locs,
+      locs_id = locs_id,
+      radius = prep_radius,
+      geom = geom
+    )
+    sites_e <- sites_list[[1]]
+    sites_id <- sites_list[[2]]
+
+    col_name <- "usdm_dm_0"
+    prop_col_names <- if (use_usdm_buffer) {
+      paste0("usdm_dm_", 0:4, "_", radius)
+    } else {
+      character(0)
+    }
+    dates_unique <- sort(unique(terra::values(from)$date))
+
+    result_list <- vector("list", length(dates_unique))
+    for (i in seq_along(dates_unique)) {
+      d <- dates_unique[i]
+      from_date <- from[terra::values(from)$date == d, ]
+      d_posix <- as.POSIXct(as.Date(d), tz = "UTC")
+      dm_values <- rep(NA_real_, nrow(sites_id))
+
+      if (!use_usdm_buffer) {
+        extracted <- terra::extract(from_date, sites_e)
+        if (!is.null(extracted) && nrow(extracted) > 0L) {
+          #### keep first match per site (polygons should not overlap)
+          first_per_site <- !duplicated(extracted$id.y)
+          dm_values[extracted$id.y[first_per_site]] <-
+            extracted$DM[first_per_site]
+        }
+
+        row_df <- data.frame(
+          sites_id,
+          time = rep(d_posix, nrow(sites_id)),
+          dm = dm_values,
+          stringsAsFactors = FALSE
+        )
+        colnames(row_df) <- c(colnames(sites_id), "time", col_name)
+      } else {
+        sites_buffer <- sites_e
+        if (terra::geomtype(sites_buffer) != "polygons") {
+          sites_buffer <- terra::buffer(sites_buffer, width = radius)
+        }
+        site_index_col <- ".__site_row__"
+        sites_buffer[[site_index_col]] <- seq_len(nrow(sites_buffer))
+        sites_buffer <- sites_buffer[, site_index_col, drop = FALSE]
+
+        prop_values <- matrix(
+          NA_real_,
+          nrow = nrow(sites_id),
+          ncol = length(prop_col_names),
+          dimnames = list(NULL, prop_col_names)
+        )
+
+        intersections <- terra::intersect(sites_buffer, from_date)
+        if (!is.null(intersections) && nrow(intersections) > 0L) {
+          inter_df <- data.frame(
+            site_row = terra::values(intersections)[[site_index_col]],
+            dm = terra::values(intersections)[["DM"]],
+            area = terra::expanse(intersections, unit = "m"),
+            stringsAsFactors = FALSE
+          )
+          inter_df <- inter_df[
+            !(is.na(inter_df$site_row) | is.na(inter_df$dm)),
+            ,
+            drop = FALSE
+          ]
+
+          if (nrow(inter_df) > 0L) {
+            site_dm_area <- stats::aggregate(
+              area ~ site_row + dm,
+              data = inter_df,
+              FUN = sum
+            )
+            site_area <- terra::expanse(sites_buffer, unit = "m")
+            by_site <- split(site_dm_area, site_dm_area$site_row)
+
+            for (site_row_chr in names(by_site)) {
+              site_row <- as.integer(site_row_chr)
+              dm_area <- by_site[[site_row_chr]]
+              dm_values[site_row] <- as.numeric(
+                dm_area$dm[which.max(dm_area$area)]
+              )
+
+              prop_values[site_row, ] <- 0
+              denom <- site_area[site_row]
+              if (is.finite(denom) && denom > 0) {
+                for (j in seq_len(nrow(dm_area))) {
+                  dm_class <- as.integer(dm_area$dm[j])
+                  if (!is.na(dm_class) && dm_class %in% 0:4) {
+                    prop_values[site_row, dm_class + 1L] <-
+                      dm_area$area[j] / denom
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        row_df <- data.frame(
+          sites_id,
+          time = rep(d_posix, nrow(sites_id)),
+          dm = dm_values,
+          prop_values,
+          check.names = FALSE,
+          stringsAsFactors = FALSE
+        )
+        colnames(row_df)[seq_len(ncol(sites_id))] <- colnames(sites_id)
+        colnames(row_df)[ncol(sites_id) + 1L] <- "time"
+        colnames(row_df)[ncol(sites_id) + 2L] <- col_name
+      }
+
+      result_list[[i]] <- row_df
+    }
+    sites_extracted <- do.call(rbind, result_list)
+    crs_from <- terra::crs(from)
+  } else {
+    stop("`from` must be a SpatRaster (SPEI/EDDI) or SpatVector (USDM).\n")
+  }
+
+  #### Optional .by_time summarization
+  did_summarize <- FALSE
+  if (!is.null(.by_time)) {
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = fun,
+      locs_id = locs_id
+    )
+    did_summarize <- TRUE
+  }
+
+  if (did_summarize && "time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+  }
+
+  amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = crs_from
+  )
+}
 ################################################################################

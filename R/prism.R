@@ -376,4 +376,220 @@ process_prism <-
     return(prism)
   }
 # nolint end
+
+################################################################################
+# {calculate} tier
+################################################################################
+# prism, cropscape, huc
+#' Calculate PRISM covariates
+#' @description
+#' Extract PRISM values at point locations. Returns a \code{data.frame}
+#' object containing \code{locs_id} and PRISM variable. PRISM
+#' variable column name reflects the PRISM variable and
+#' circular buffer radius.
+#' @param from SpatRaster(1). Output from \code{process_prism()}.
+#' @param locs data.frame. character to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#'   with \code{.by_time} for temporal summaries.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Placeholders.
+#' @author Insang Song
+#' @seealso [`process_prism()`]
+#' @return a data.frame or SpatVector object
+#' @importFrom terra vect
+#' @importFrom terra as.data.frame
+#' @importFrom terra time
+#' @importFrom terra extract
+#' @importFrom terra nlyr
+#' @importFrom terra crs
+#' @importFrom exactextractr exact_extract
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_prism(
+#'   from = prism, # derived from process_prism() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_prism <- function(
+  from,
+  locs,
+  locs_id = "site_id",
+  radius = 0,
+  weights = NULL,
+  .by_time = NULL,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+  # check input class
+  if (!inherits(from, "SpatRaster")) {
+    stop("`from` must be a SpatRaster object.")
+  }
+  #### prepare locations list
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### perform extraction
+
+  message(
+    sprintf(
+      "Calculating PRISM covariates with %d meters radius...",
+      radius
+    )
+  )
+
+  # extract
+  is_polygon_locs <- inherits(sites_e, "SpatVector") &&
+    !all(tolower(terra::geomtype(sites_e)) %in% c("points", "point"))
+  weights_prepared <- amadeus::calc_prepare_weights(
+    from = from[[1]],
+    weights = weights
+  )
+  fun_extract <- amadeus::calc_weighted_fun(
+    fun = "mean",
+    weighted = !is.null(weights_prepared)
+  )
+  if (radius == 0 && !is_polygon_locs && is.null(weights_prepared)) {
+    # use terra::extract for point locations
+    sites_extracted <- terra::extract(from, sites_e)
+    sites_extracted <- sites_extracted[, -1, drop = FALSE]
+  } else {
+    # use exactextractr::exact_extract for polygon locations and buffered points
+    sites_e_buf <- sf::st_as_sf(sites_e)
+    extract_args <- c(
+      list(
+        x = from,
+        y = sites_e_buf,
+        fun = fun_extract,
+        force_df = TRUE,
+        progress = FALSE
+      ),
+      list(...)
+    )
+    if (!is.null(weights_prepared)) {
+      extract_args$weights <- weights_prepared
+    }
+    sites_extracted <- do.call(exactextractr::exact_extract, extract_args)
+  }
+
+  # clean up names if they are from exact_extract (prefix "mean.")
+  if (radius > 0 || is_polygon_locs) {
+    exact_names <- colnames(sites_extracted)
+    if (length(exact_names) == 1 && identical(exact_names, "mean")) {
+      exact_names <- names(from)[1]
+    } else {
+      exact_names <- gsub("^mean\\.", "", exact_names)
+    }
+    colnames(sites_extracted) <- exact_names
+  }
+
+  # append radius
+  new_names <- sprintf("%s_%d", colnames(sites_extracted), radius)
+  colnames(sites_extracted) <- new_names
+
+  # Combine with IDs
+  sites_extracted[[locs_id]] <- sites_id[, 1]
+  if (
+    "geometry" %in% names(sites_id) && !"geometry" %in% names(sites_extracted)
+  ) {
+    sites_extracted$geometry <- sites_id$geometry
+  }
+  # reorder to put ID first
+  sites_extracted <- sites_extracted[, c(
+    locs_id,
+    if ("geometry" %in% names(sites_extracted)) "geometry",
+    setdiff(names(sites_extracted), c(locs_id, "geometry"))
+  )]
+
+  posixt_out <- FALSE
+  if (!is.null(.by_time)) {
+    if (!"time" %in% names(sites_extracted)) {
+      value_cols_now <- setdiff(names(sites_extracted), c(locs_id, "geometry"))
+      if (length(value_cols_now) != 1L) {
+        stop(
+          "PRISM `.by_time` summarization requires a single covariate column ",
+          "or an existing `time` column.\n"
+        )
+      }
+      prism_time <- NA
+      time_vals <- try(terra::time(from), silent = TRUE)
+      if (
+        !inherits(time_vals, "try-error") &&
+          length(time_vals) >= 1L &&
+          !is.na(time_vals[1])
+      ) {
+        prism_time <- time_vals[1]
+      }
+      if (is.na(prism_time)) {
+        meta <- try(terra::metags(from), silent = TRUE)
+        if (
+          !inherits(meta, "try-error") &&
+            is.data.frame(meta) &&
+            nrow(meta) > 0
+        ) {
+          idx_time <- which(meta[, 1] == "time")
+          if (length(idx_time) == 1L) {
+            time_raw <- meta[idx_time, 2]
+            if (grepl("^[0-9]{8}$", time_raw)) {
+              prism_time <- as.Date(time_raw, format = "%Y%m%d")
+            } else if (grepl("^[0-9]{6}$", time_raw)) {
+              prism_time <- as.Date(paste0(time_raw, "01"), format = "%Y%m%d")
+            } else if (grepl("^[0-9]{4}$", time_raw)) {
+              prism_time <- as.Date(paste0(time_raw, "-01-01"))
+            }
+          }
+        }
+      }
+      if (is.na(prism_time)) {
+        stop(
+          "Could not derive PRISM time for `.by_time` summarization. ",
+          "Provide data with explicit time in layer metadata.\n"
+        )
+      }
+      sites_extracted$time <- prism_time
+    }
+    sites_extracted <- amadeus::calc_summarize_by(
+      covar = sites_extracted,
+      .by_time = .by_time,
+      fun_summary = "mean",
+      locs_id = locs_id
+    )
+    if ("time" %in% names(sites_extracted)) {
+      sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+      posixt_out <- TRUE
+    }
+  }
+
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = posixt_out,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  #### return data.frame
+  return(sites_return)
+}
 ################################################################################

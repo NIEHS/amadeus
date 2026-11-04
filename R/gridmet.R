@@ -505,4 +505,123 @@ process_gridmet_codes <-
       return(name_code[1])
     }
   }
+
+################################################################################
+# {calculate} tier
+################################################################################
+#' Calculate gridMET covariates
+#' @description
+#' Extract gridMET values at point locations. Returns a \code{data.frame}
+#' object containing \code{locs_id} and gridMET variable. gridMET variable
+#' column name reflects the gridMET variable and circular buffer radius.
+#' @param from SpatRaster(1). Output from \code{process_gridmet()}.
+#' @param locs data.frame. character to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param fun character(1). Function used to summarize multiple raster cells
+#' within sites location buffer (Default = `mean`).
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#'   with \code{.by_time} for temporal summaries.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Placeholders.
+#' @author Mitchell Manware
+#' @seealso [`process_gridmet()`]
+#' @return a data.frame or SpatVector object
+#' @importFrom terra vect
+#' @importFrom terra as.data.frame
+#' @importFrom terra time
+#' @importFrom terra extract
+#' @importFrom terra nlyr
+#' @importFrom terra crs
+#' @details
+#' EDDI uses the same native GRIDMET multi-year workflow as SPEI.
+#' Use \code{eddi14d}, \code{eddi30d}, \code{eddi90d}, \code{eddi180d},
+#' \code{eddi270d}, \code{eddi1y}, \code{eddi2y}, or \code{eddi5y};
+#' \code{eddi} defaults to \code{eddi30d}. Both indices retain the native
+#' 1/24-degree grid and five-day observation dates. Select dataset
+#' \code{gridmet} in the wrapper functions to use these products; the
+#' standalone drought source aliases continue to select their separate products.
+#' GRIDMET SPEI rasters from \code{process_gridmet()} use the same extraction
+#' workflow as other GRIDMET covariates. Accumulation codes are retained in
+#' output column names (e.g., spei30d), and native five-day observation dates
+#' are preserved when \code{.by_time = NULL}; no daily interpolation is
+#' performed.
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_gridmet(
+#'   from = gridmet, # derived from process_gridmet() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_gridmet <- function(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  fun = "mean",
+  weights = NULL,
+  .by_time = NULL,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_by_time(.by_time)
+  #### prepare locations list
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### perform extraction
+  sites_extracted <- amadeus::calc_worker(
+    dataset = "gridmet",
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
+    fun = fun,
+    variable = 1,
+    time = 2,
+    time_type = "date",
+    weights = weights,
+    ...
+  )
+  by_time_resolved <- if (is.null(.by_time)) "day" else .by_time
+  sites_extracted <- amadeus::calc_summarize_by(
+    covar = sites_extracted,
+    .by_time = by_time_resolved,
+    fun_summary = "mean",
+    locs_id = locs_id
+  )
+  if ("time" %in% names(sites_extracted)) {
+    sites_extracted$time <- as.POSIXct(sites_extracted$time, tz = "UTC")
+  }
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  #### return data.frame
+  return(sites_return)
+}
 ################################################################################

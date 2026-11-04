@@ -1615,4 +1615,879 @@ get_modis_info <- function(
   rownames(out) <- NULL
   out
 }
+
+################################################################################
+# {calculate} tier
+################################################################################
+#' Calculate MODIS product covariates
+#' @param from character, SpatRaster, or SpatVector. Either a list of
+#' MODIS/VIIRS file paths (raw path mode), a preprocessed raster (direct raster
+#' mode), or processed MODIS fire detections as a SpatVector with `time`,
+#' `fire_count`, and `frp` fields.
+#' @param from_secondary character or SpatRaster. Optional secondary input for
+#' fused temporal coverage in raster/path workflows. Type must match `from`
+#' (`character` with `character`, or `SpatRaster` with `SpatRaster`).
+#' @param locs sf/SpatVector object. Unique locs where covariates
+#' will be calculated.
+#' @param locs_id character(1). Site identifier. Default is `"site_id"`
+#' @param radius numeric. Radii to calculate covariates.
+#' Default is `c(0, 1000, 10000, 50000)`.
+#' @param preprocess function. Function to handle HDF files in raw path mode.
+#' Ignored when `from` is a `SpatRaster` or `SpatVector`.
+#' @param name_covariates character. Name header of covariates.
+#' e.g., `"MOD_NDVIF_0_"`.
+#' The calculated covariate names will have a form of
+#' "\code{\{name_covariates\}\{zero-padded buffer radius in meters\}}",
+#' e.g., 'MOD_NDVIF_0_50000' where 50 km radius circular buffer
+#' was used to calculate mean NDVI value.
+#' @param subdataset Indices, names, or search patterns for subdatasets.
+#' Find detail usage of the argument in notes.
+#' @param fun_summary character or function. Function to summarize
+#'  extracted raster values.
+#' @param .by_time NULL or character(1). Optional time grouping key used
+#'   with \code{.by_time} for temporal summaries.
+#' @param package_list_add character. Reserved for backward compatibility;
+#'   currently not used by `calculate_modis()`.
+#' @param export_list_add character. Reserved for backward compatibility;
+#'   currently not used by `calculate_modis()`.
+#' @param max_cells integer(1). Maximum number of cells to be read at once.
+#' Higher values will expedite processing, but will increase memory usage.
+#' Maximum possible value is `2^31 - 1`.
+#' See [`exactextractr::exact_extract`] for details.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param scale character(1). Scale expression to be applied to the raw values.
+#' It is crucial that users review the technical documentation of the MODIS
+#' product
+#' they are using to ensure proper scale.
+#' An example for the MOD11A1 product's LST_Day_1km variable (land surface
+#' temperature)
+#' would be `scale = "* 0.02"`.
+#' Default is `NULL`, which applies no scale.
+#' @param fusion_method character(1). Fusion method used only when
+#' `from_secondary` is provided. Options are `"mean"` (pixel-wise mean with
+#' `na.rm = TRUE`), `"primary_first"` (use `from` first), and
+#' `"secondary_first"` (use `from_secondary` first).
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Arguments passed to `preprocess`.
+# nolint start
+#' @description `calculate_modis` orchestrates daily extraction using
+#' [`calculate_modis_daily()`]. In raw-path mode, files are grouped by inferred
+#' date, preprocessed for each day, and then extracted over requested radii.
+#' With product-specific preprocessing, files are handled according to each
+#' product's structure and naming conventions.
+# nolint end
+#' @note `locs` is expected to be convertible to `sf` object.
+#' `sf`, `SpatVector`, and other class objects that could be converted to
+#' `sf` can be used.
+#' In raw path mode, `preprocess` is called once per inferred day using a
+#' single-date value. Temporal aggregation across extracted rows should be done
+#' with `.by_time`.
+#' Common arguments in `preprocess` functions such as `date` and `path` are
+#' automatically detected and passed to the function. Please note that
+#' `locs` here and `path` in `preprocess` functions are assumed to have a
+#' standard naming convention of raw files from NASA.
+#' The argument `subdataset` should be in a proper format
+#' depending on `preprocess` function:
+#' * `process_modis_merge()`: Regular expression pattern.
+#'   e.g., `"^LST_"`
+#' * `process_modis_swath()`: Subdataset names.
+#'   e.g., `c("Cloud_Fraction_Day", "Cloud_Fraction_Night")`
+#' * `process_blackmarble()`: Subdataset number.
+#'   e.g., for VNP46A2 product, 3L.
+#'
+#' For MOD13/MYD13 families, Terra and Aqua composites are 16-day phased
+#' products offset by 8 days; combining both can improve effective temporal
+#' coverage. This behavior aligns with NASA MOD13 product guidance:
+#' <https://modis.gsfc.nasa.gov/data/dataprod/mod13.php>
+#'
+#' For MCD19A2 MAIAC, common sub-datasets include both optical depth and
+#' plume injection height layers. Typical selectors are
+#' `"(Optical_Depth|Injection_Height)"` for both families or
+#' `"(Injection_Height)"` when targeting plume height only.
+#'
+#' For MOD14A1/MYD14A1 fire grids, the `FireMask` raw values are commonly
+#' interpreted as:
+#' \tabular{rll}{
+#' Raw value \tab Meaning \tab Binary fire mask?\cr
+#' 0 \tab not processed, missing input \tab NA / no observation\cr
+#' 1 \tab obsolete, not used since Collection 1 \tab NA\cr
+#' 2 \tab not processed, other reason \tab NA\cr
+#' 3 \tab non-fire water pixel \tab 0\cr
+#' 4 \tab cloud, land or water \tab NA or 0, depending on analysis\cr
+#' 5 \tab non-fire land pixel \tab 0\cr
+#' 6 \tab unknown, land or water \tab NA\cr
+#' 7 \tab fire, low confidence \tab 1, or exclude for stricter mask\cr
+#' 8 \tab fire, nominal confidence \tab 1\cr
+#' 9 \tab fire, high confidence \tab 1\cr
+#' }
+#'
+#' Dates with less than 80 percent of the expected number of tiles,
+#' which are determined by the mode of the number of tiles, are removed.
+#' Users will be informed of the dates with insufficient tiles.
+#' The result data.frame will have an attribute with the dates with
+#' insufficient tiles.
+#' @return A data.frame or SpatVector with an attribute:
+#' * `attr(., "dates_dropped")`: Dates with insufficient tiles.
+#'   Note that the dates mean the dates with insufficient tiles,
+#'   not the dates without available tiles. When \code{.by_time} is provided,
+#'   rows are summarized with \code{calc_summarize_by()} semantics.
+#' @seealso
+#' This function leverages the calculation of single-day MODIS
+#' covariates:
+#' * [`calculate_modis_daily()`]
+#'
+#' Also, for preprocessing, please refer to:
+#' * [`process_modis_merge()`]
+#' * [`process_modis_swath()`]
+#' * [`process_blackmarble()`]
+#' @importFrom methods is
+#' @importFrom sf st_as_sf st_drop_geometry
+#' @importFrom terra nlyr
+#' @importFrom dplyr bind_rows left_join
+#' @importFrom rlang inject
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
+#' locs <- terra::vect(locs, geom = c("lon", "lat"), crs = "EPSG:4326")
+#' calculate_modis(
+#'   from =
+#'     list.files("./data", pattern = "VNP46A2.", full.names = TRUE),
+#'   locs = locs,
+#'   locs_id = "site_id",
+#'   radius = c(0L, 1000L),
+#'   preprocess = process_modis_merge,
+#'   name_covariates = "cloud_fraction_0",
+#'   subdataset = "Cloud_Fraction",
+#'   fun_summary = "mean"
+#' )
+#' }
+#' @export
+calculate_modis <-
+  function(
+    from = NULL,
+    from_secondary = NULL,
+    locs = NULL,
+    locs_id = "site_id",
+    radius = c(0L, 1e3L, 1e4L, 5e4L),
+    preprocess = amadeus::process_modis_merge,
+    name_covariates = NULL,
+    subdataset = NULL,
+    fun_summary = "mean",
+    .by_time = NULL,
+    weights = NULL,
+    package_list_add = NULL,
+    export_list_add = NULL,
+    max_cells = 3e7,
+    geom = FALSE,
+    scale = NULL,
+    fusion_method = c("mean", "primary_first", "secondary_first"),
+    ...
+  ) {
+    amadeus::check_geom(geom)
+    amadeus::check_unsupported_by(..., .call = sys.call())
+    amadeus::check_by_time(.by_time)
+    fusion_method <- match.arg(fusion_method)
+    from_is_character <- is.character(from)
+    from_is_raster <- inherits(from, "SpatRaster")
+    from_is_vector <- inherits(from, "SpatVector")
+    if (!from_is_character && !from_is_raster && !from_is_vector) {
+      stop(
+        paste0(
+          "from should be a character vector of paths, SpatRaster, ",
+          "or SpatVector.\n"
+        )
+      )
+    }
+    if (from_is_character) {
+      if (!is.null(from_secondary) && !is.character(from_secondary)) {
+        stop("from_secondary should be a character vector of file paths.\n")
+      }
+    } else if (from_is_raster) {
+      if (!is.null(from_secondary) && !inherits(from_secondary, "SpatRaster")) {
+        stop("from_secondary should be SpatRaster when from is SpatRaster.\n")
+      }
+    } else if (!is.null(from_secondary)) {
+      stop(
+        paste0(
+          "from_secondary is only supported for character ",
+          "or SpatRaster inputs.\n"
+        )
+      )
+    }
+    if (from_is_character && !is.function(preprocess)) {
+      stop(
+        "preprocess should be one of process_modis_merge,
+process_modis_swath, or process_blackmarble."
+      )
+    }
+    # read all arguments
+    # nolint start
+    hdf_args <- c(as.list(environment()), list(...))
+    # nolint end
+    if (from_is_character) {
+      dates_available_m <-
+        vapply(from, modis_extract_temporal_key, character(1))
+      date_scales <- vapply(from, modis_extract_temporal_scale, character(1))
+      if (!is.null(from_secondary)) {
+        dates_secondary_m <-
+          vapply(from_secondary, modis_extract_temporal_key, character(1))
+        date_scales_secondary <-
+          vapply(from_secondary, modis_extract_temporal_scale, character(1))
+        dates_available_m <- c(dates_available_m, dates_secondary_m)
+        date_scales <- c(date_scales, date_scales_secondary)
+      }
+      date_scale_unique <- unique(stats::na.omit(date_scales))
+      if (length(date_scale_unique) != 1L) {
+        stop(
+          "MODIS input files contain mixed or unsupported temporal patterns.\n"
+        )
+      }
+      dates_available <- sort(unique(dates_available_m))
+
+      if (is.null(from_secondary)) {
+        # When multiple dates are concerned,
+        # the number of tiles are expected to be the same.
+        # Exceptions could exist, so here the number of tiles are checked.
+        summary_available <- table(dates_available_m)
+        summary_available_mode <-
+          sort(table(summary_available), decreasing = TRUE)[1]
+        summary_available_mode <- as.numeric(names(summary_available_mode))
+        summary_available_insuf <-
+          which(summary_available < floor(summary_available_mode * 0.8))
+
+        if (length(summary_available_insuf) > 0) {
+          dates_insuf <-
+            modis_key_to_date(
+              dates_available[summary_available_insuf],
+              date_scale_unique
+            )
+          message(
+            paste0(
+              "The number of tiles on the following dates are insufficient: ",
+              paste(dates_insuf, collapse = ", "),
+              ".\n"
+            )
+          )
+          # finally it removes the dates with insufficient tiles
+          dates_available <- dates_available[-summary_available_insuf]
+        } else {
+          dates_insuf <- NA
+        }
+      } else {
+        dates_insuf <- NA
+      }
+    } else {
+      date_scale_unique <- NA_character_
+      dates_available <- NA_character_
+      dates_insuf <- NA
+    }
+
+    locs_input <- try(sf::st_as_sf(locs), silent = TRUE)
+    if (inherits(locs_input, "try-error")) {
+      stop(
+        "locs cannot be convertible to sf.
+      Please convert locs into a sf object to proceed.\n"
+      )
+    }
+
+    if (from_is_vector) {
+      calc_results_return <-
+        calculate_modis_fire_vector(
+          from = from,
+          locs_input = locs_input,
+          locs_id = locs_id,
+          radius = radius,
+          fun_summary = fun_summary,
+          .by_time = .by_time,
+          geom = geom
+        )
+      attr(calc_results_return, "dates_dropped") <- NA
+      return(calc_results_return)
+    }
+
+    if (!is.null(scale)) {
+      stopifnot(is.character(scale))
+    }
+    if (is.null(scale)) {
+      warning(
+        paste0(
+          "`scale` parameter not defined. Review technical documentation ",
+          "to apply proper scale. Calculation proceeding with unscaled values."
+        )
+      )
+      scale <- "* 1"
+    }
+
+    export_list <- c()
+    package_list <-
+      c(
+        "sf",
+        "terra",
+        "exactextractr",
+        "data.table",
+        "stars",
+        "dplyr",
+        "parallelly",
+        "rlang",
+        "amadeus"
+      )
+    if (!is.null(export_list_add)) {
+      export_list <- append(export_list, export_list_add)
+    }
+    if (!is.null(package_list_add)) {
+      package_list <- append(package_list, package_list_add)
+    }
+
+    # make clusters
+    if (from_is_character) {
+      idx_date_available <- seq_along(dates_available)
+      list_date_available <-
+        split(idx_date_available, idx_date_available)
+    } else {
+      list_date_available <- list(1L)
+    }
+    calc_results <-
+      lapply(
+        list_date_available,
+        FUN = function(datei) {
+          options(sf_use_s2 = FALSE)
+          radiusindex <- seq_along(radius)
+          radiusindexlist <- split(radiusindex, radiusindex)
+          if (from_is_character) {
+            # nolint start
+            day_to_pick <- dates_available[datei]
+            # nolint end
+            day_to_pick <- modis_key_to_date(day_to_pick, date_scale_unique)
+            calc_time <- as.character(day_to_pick)
+            hdf_args <- c(hdf_args, list(date = day_to_pick))
+            if (is.null(from_secondary)) {
+              hdf_args <- c(hdf_args, list(path = hdf_args$from))
+              # unified interface with rlang::inject
+              vrt_today <- rlang::inject(preprocess(!!!hdf_args))
+            } else {
+              day_key <- dates_available[datei]
+              has_primary <- day_key %in%
+                vapply(
+                  hdf_args$from,
+                  modis_extract_temporal_key,
+                  character(1)
+                )
+              has_secondary <- day_key %in%
+                vapply(
+                  hdf_args$from_secondary,
+                  modis_extract_temporal_key,
+                  character(1)
+                )
+              if (!has_primary && !has_secondary) {
+                stop("No MODIS files found for selected fusion date.\n")
+              }
+
+              raster_primary <- NULL
+              raster_secondary <- NULL
+
+              if (has_primary) {
+                hdf_args_primary <- hdf_args
+                hdf_args_primary$path <- hdf_args$from
+                hdf_args_primary$from_secondary <- NULL
+                raster_primary <- rlang::inject(preprocess(!!!hdf_args_primary))
+              }
+              if (has_secondary) {
+                hdf_args_secondary <- hdf_args
+                hdf_args_secondary$path <- hdf_args$from_secondary
+                hdf_args_secondary$from_secondary <- NULL
+                raster_secondary <-
+                  rlang::inject(preprocess(!!!hdf_args_secondary))
+              }
+
+              if (is.null(raster_primary)) {
+                vrt_today <- raster_secondary
+              } else if (is.null(raster_secondary)) {
+                vrt_today <- raster_primary
+              } else {
+                if (
+                  !isTRUE(terra::compareGeom(
+                    raster_primary,
+                    raster_secondary,
+                    stopOnError = FALSE
+                  ))
+                ) {
+                  stop(
+                    "Primary and secondary MODIS rasters have incompatible ",
+                    "geometry.\n"
+                  )
+                }
+                if (
+                  terra::nlyr(raster_primary) != terra::nlyr(raster_secondary)
+                ) {
+                  stop(
+                    "Primary and secondary MODIS rasters have different ",
+                    "layer counts.\n"
+                  )
+                }
+                if (fusion_method == "primary_first") {
+                  vrt_today <- terra::cover(raster_primary, raster_secondary)
+                } else if (fusion_method == "secondary_first") {
+                  vrt_today <- terra::cover(raster_secondary, raster_primary)
+                } else {
+                  idx_layers <- seq_len(terra::nlyr(raster_primary))
+                  fused <- lapply(idx_layers, function(k) {
+                    terra::app(
+                      c(raster_primary[[k]], raster_secondary[[k]]),
+                      mean,
+                      na.rm = TRUE
+                    )
+                  })
+                  vrt_today <- do.call(c, fused)
+                  names(vrt_today) <- names(raster_primary)
+                }
+              }
+            }
+          } else {
+            calc_time <- NA_character_
+            if (is.null(from_secondary)) {
+              vrt_today <- from
+            } else {
+              raster_primary <- from
+              raster_secondary <- from_secondary
+              if (
+                !isTRUE(terra::compareGeom(
+                  raster_primary,
+                  raster_secondary,
+                  stopOnError = FALSE
+                ))
+              ) {
+                stop(
+                  "Primary and secondary MODIS rasters have incompatible ",
+                  "geometry.\n"
+                )
+              }
+              if (
+                terra::nlyr(raster_primary) != terra::nlyr(raster_secondary)
+              ) {
+                stop(
+                  "Primary and secondary MODIS rasters have different ",
+                  "layer counts.\n"
+                )
+              }
+              if (fusion_method == "primary_first") {
+                vrt_today <- terra::cover(raster_primary, raster_secondary)
+              } else if (fusion_method == "secondary_first") {
+                vrt_today <- terra::cover(raster_secondary, raster_primary)
+              } else {
+                idx_layers <- seq_len(terra::nlyr(raster_primary))
+                fused <- lapply(idx_layers, function(k) {
+                  terra::app(
+                    c(raster_primary[[k]], raster_secondary[[k]]),
+                    mean,
+                    na.rm = TRUE
+                  )
+                })
+                vrt_today <- do.call(c, fused)
+                names(vrt_today) <- names(raster_primary)
+              }
+            }
+          }
+
+          if (sum(terra::nlyr(vrt_today)) != length(name_covariates)) {
+            message(
+              "The number of layers in the input raster do not match
+                    the length of name_covariates.\n"
+            )
+          }
+
+          res0 <-
+            lapply(radiusindexlist, function(k) {
+              name_radius <-
+                sprintf("%s%05d", name_covariates, radius[k])
+              extracted <-
+                try(
+                  amadeus::calculate_modis_daily(
+                    locs = locs_input,
+                    from = vrt_today,
+                    locs_id = locs_id,
+                    date = calc_time,
+                    fun_summary = fun_summary,
+                    name_extracted = name_radius,
+                    radius = radius[k],
+                    weights = weights,
+                    max_cells = max_cells,
+                    geom = FALSE,
+                    scale = scale
+                  )
+                )
+              if (inherits(extracted, "try-error")) {
+                # coerce to avoid errors
+                error_df <- data.frame(
+                  matrix(
+                    -99999,
+                    ncol = length(name_radius) + 1,
+                    nrow = nrow(locs_input)
+                  )
+                )
+                error_df <- stats::setNames(error_df, c(locs_id, name_radius))
+                error_df[[locs_id]] <- unlist(locs_input[[locs_id]])
+                if (is.na(calc_time)) {
+                  error_df$time <- as.POSIXlt(as.Date(NA))
+                } else {
+                  error_df$time <- as.POSIXlt(calc_time, tz = "UTC")
+                }
+                extracted <- error_df
+              }
+              return(extracted)
+            })
+          res <-
+            Reduce(
+              function(x, y) {
+                dplyr::left_join(x, y, by = c(locs_id, "time"))
+              },
+              res0
+            )
+          return(res)
+        }
+      )
+    calc_results <- do.call(dplyr::bind_rows, calc_results)
+    if (!is.null(.by_time)) {
+      calc_results <- amadeus::calc_summarize_by(
+        covar = calc_results,
+        .by_time = .by_time,
+        fun_summary = fun_summary,
+        locs_id = locs_id
+      )
+    }
+    if (geom %in% c("sf", "terra")) {
+      # merge
+      calc_results_return <- merge(
+        locs_input[, locs_id],
+        calc_results,
+        by = locs_id
+      )
+      if (geom == "terra") {
+        calc_results_return <- terra::vect(calc_results_return)
+      }
+    } else {
+      calc_results_return <- calc_results
+    }
+    attr(calc_results_return, "dates_dropped") <- dates_insuf
+    Sys.sleep(1L)
+    return(calc_results_return)
+  }
+
+################################################################################
+calculate_modis_fire_vector <- function(
+  from,
+  locs_input,
+  locs_id,
+  radius,
+  fun_summary,
+  .by_time,
+  geom
+) {
+  if (!methods::is(from, "SpatVector")) {
+    stop("from should be a SpatVector returned by process_mcd14ml.\n")
+  }
+  if (!all(c("time", "fire_count", "frp") %in% names(from))) {
+    stop("from is missing required MCD14ML fields.\n")
+  }
+
+  locs_base <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs_input,
+    locs_id = locs_id,
+    radius = 0L,
+    geom = geom
+  )
+  locs_points <- locs_base[[1]]
+  locs_return <- locs_base[[2]]
+  loc_index <- seq_len(nrow(locs_points))
+
+  date_keys <- sort(unique(as.integer(from$time)))
+  results_by_day <- lapply(date_keys, function(day_key) {
+    from_day <- from[from$time == day_key, ]
+    results_by_radius <- lapply(radius, function(radius_i) {
+      col_count <- sprintf("fire_count_%05d", radius_i)
+      col_frp <- sprintf("frp_%05d", radius_i)
+
+      dist_matrix <- terra::distance(locs_points, from_day)
+      dist_df <- data.frame(
+        expand.grid(
+          loc_index = loc_index,
+          from_index = seq_len(nrow(from_day))
+        ),
+        distance = as.vector(dist_matrix)
+      )
+      if (radius_i == 0L) {
+        dist_df <- dist_df[dist_df$distance == 0, ]
+      } else {
+        dist_df <- dist_df[dist_df$distance <= radius_i, ]
+      }
+
+      if (nrow(dist_df) == 0) {
+        result_empty <- data.frame(
+          loc_index = loc_index,
+          fire_count = 0,
+          frp = 0
+        )
+      } else {
+        dist_df$fire_count <- from_day$fire_count[dist_df$from_index]
+        dist_df$frp <- from_day$frp[dist_df$from_index]
+        result_empty <-
+          stats::aggregate(
+            cbind(fire_count, frp) ~ loc_index,
+            data = dist_df,
+            FUN = sum,
+            na.rm = TRUE
+          )
+        result_empty <-
+          merge(
+            data.frame(loc_index = loc_index),
+            result_empty,
+            by = "loc_index",
+            all.x = TRUE
+          )
+        result_empty$fire_count[is.na(result_empty$fire_count)] <- 0
+        result_empty$frp[is.na(result_empty$frp)] <- 0
+      }
+
+      names(result_empty)[names(result_empty) == "fire_count"] <- col_count
+      names(result_empty)[names(result_empty) == "frp"] <- col_frp
+      result_empty
+    })
+
+    result_day <- Reduce(
+      function(x, y) merge(x, y, by = "loc_index", all = TRUE),
+      results_by_radius
+    )
+    result_day[[locs_id]] <- locs_return[[locs_id]]
+    result_day$time <- as.POSIXlt(
+      as.character(day_key),
+      format = "%Y%m%d",
+      tz = "UTC"
+    )
+    ordered_cols <- c(
+      locs_id,
+      "time",
+      setdiff(names(result_day), c("loc_index", locs_id, "time"))
+    )
+    result_day[, ordered_cols]
+  })
+
+  result_all <- do.call(rbind, results_by_day)
+  if (!is.null(.by_time)) {
+    result_all <- amadeus::calc_summarize_by(
+      covar = result_all,
+      .by_time = .by_time,
+      fun_summary = fun_summary,
+      locs_id = locs_id
+    )
+  }
+  if (geom %in% c("sf", "terra")) {
+    result_all <- merge(locs_return, result_all, by = locs_id)
+  }
+
+  amadeus::calc_return_locs(
+    covar = result_all,
+    POSIXt = TRUE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+}
+
+################################################################################
+#' A single-date MODIS worker
+#' @param from SpatRaster. Preprocessed objects.
+#' @param locs SpatVector/sf/sftime object. Locations where MODIS values
+#' are summarized.
+#' @param locs_id character(1). Field name where unique site identifiers
+#' are stored. Default is `"site_id"`
+#' @param radius numeric. Radius to generate circular buffers.
+#' @param date Date(1). date to query.
+#' @param name_extracted character. Names of calculated covariates.
+#' @param fun_summary function. Summary function for
+#' multilayer rasters. Passed to `foo`. See [`exactextractr::exact_extract`]
+#' for details.
+#' @param max_cells integer(1). Maximum number of cells to be read at once.
+#' Higher values will expedite processing, but will increase memory usage.
+#' Maximum possible value is `2^31 - 1`.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' See [`exactextractr::exact_extract`] for details.
+#' @param scale character(1). Scale expression to be applied to the raw values.
+#' It is crucial that users review the technical documentation of the MODIS
+#' product
+#' they are using to ensure proper scale.
+#' An example for the MOD11A1 product's LST_Day_1km variable (land surface
+#' temperature)
+#' would be `scale = "* 0.02"`.
+#' Default is `NULL`, which applies no scale.
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Placeholders.
+#' @description The function operates at MODIS/VIIRS products
+#' on a daily basis. Given that the raw hdf files are downloaded from
+#' NASA, standard file names include a data retrieval date flag starting
+#' with letter "A". Leveraging that piece of information, the function will
+#' select files of scope on the date of interest.
+#' Please note that this function does not provide a function to filter
+#' swaths or tiles, so it is strongly recommended to check and pre-filter
+#' the file names at users' discretion.
+#' @seealso
+#' * Preprocessing: [process_modis_merge()], [process_modis_swath()],
+#'     [process_blackmarble()]
+#' @keywords internal
+#' @author Insang Song
+#' @return a data.frame or SpatVector object.
+#' @importFrom terra extract project vect nlyr describe
+#' @importFrom methods is
+#' @importFrom sf st_as_sf st_drop_geometry
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' locs <- data.frame(lon = -78.8277, lat = 35.95013, id = "001")
+#' calculate_modis_daily(
+#'   from = mod06l2_warp, # dervied from process_modis() example
+#'   locs = locs,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   date = "2024-01-01",
+#'   name_extracted = "cloud_fraction_0",
+#'   fun_summary = "mean",
+#'   max_cells = 3e7
+#' )
+#' }
+#' @export
+calculate_modis_daily <- function(
+  from = NULL,
+  locs = NULL,
+  locs_id = "site_id",
+  radius = 0L,
+  date = NULL,
+  name_extracted = NULL,
+  fun_summary = "mean",
+  weights = NULL,
+  max_cells = 3e7,
+  geom = FALSE,
+  scale = NULL,
+  ...
+) {
+  if (!methods::is(locs, "SpatVector")) {
+    locs <- try(terra::vect(locs), silent = TRUE)
+    if (inherits(locs, "try-error")) {
+      stop("locs should be a SpatVector or convertible object.")
+    }
+  }
+  if (!locs_id %in% names(locs)) {
+    stop(sprintf("locs should include columns named %s.\n", locs_id))
+  }
+
+  extract_with_buffer <- function(
+    points,
+    surf,
+    radius,
+    id,
+    func = "mean",
+    weights = NULL,
+    maxcells = NULL
+  ) {
+    # generate buffers
+    if (radius == 0) {
+      radius <- 1e-6
+    } # approximately 1 meter in degree
+    bufs <- terra::buffer(points, width = radius, quadsegs = 180L)
+    bufs <- terra::project(bufs, terra::crs(surf))
+    # extract raster values
+    weights_norm <- amadeus::calc_prepare_weights(
+      from = surf[[1]],
+      weights = weights
+    )
+    func_extract <- amadeus::calc_weighted_fun(
+      fun = func,
+      weighted = !is.null(weights_norm)
+    )
+    extract_args <- list(
+      x = surf,
+      y = sf::st_as_sf(bufs),
+      fun = func_extract,
+      force_df = TRUE,
+      stack_apply = TRUE,
+      append_cols = id,
+      progress = FALSE,
+      max_cells_in_memory = maxcells
+    )
+    if (!is.null(weights_norm)) {
+      extract_args$weights <- weights_norm
+    }
+    surf_at_bufs <- do.call(exactextractr::exact_extract, extract_args)
+    return(surf_at_bufs)
+  }
+
+  ## NaN to NA
+  from[is.nan(from)] <- NA
+
+  # apply scale as expression to `from` values
+  chr_scale <- paste0("from ", scale)
+  # Evaluate the scale expression
+  from_scale <- eval(parse(text = chr_scale)[[1]])
+
+  # from_scale[is.nan(from_scale)] <- NA
+
+  # raster used to be vrt_today
+  extracted <-
+    extract_with_buffer(
+      points = locs,
+      surf = from_scale,
+      id = locs_id,
+      radius = radius,
+      func = fun_summary,
+      weights = weights,
+      maxcells = max_cells
+    )
+  # cleaning names
+  # assuming that extracted is a data.frame
+  name_offset <- terra::nlyr(from)
+  # multiple columns will get proper names
+  name_range <- seq(ncol(extracted) - name_offset + 1, ncol(extracted), 1)
+  colnames(extracted)[name_range] <- name_extracted
+  extracted$time <- as.POSIXlt(date)
+  check_geom(geom)
+  if (geom %in% c("sf", "terra")) {
+    # convert to base date, as terra::vect does not like class "POSIXlt"
+    extracted$time <- as.Date.POSIXlt(extracted$time)
+    # location ID with geometry
+    locs_geom_id <- suppressMessages(calc_prepare_locs(
+      from = from,
+      locs = locs,
+      locs_id = locs_id,
+      radius = radius,
+      geom = geom
+    )[[2]])
+    # merge
+    extracted_merge <- merge(
+      locs_geom_id,
+      extracted,
+      by = locs_id
+    )
+    # re-convert to POSIXlt after creating the vect
+    extracted_merge$time <- as.POSIXlt(extracted_merge$time)
+    extracted_return <- calc_return_locs(
+      covar = extracted_merge,
+      POSIXt = TRUE,
+      geom = geom,
+      crs = terra::crs(from)
+    )
+  } else {
+    calc_check_time(covar = extracted, POSIXt = TRUE)
+    extracted_return <- extracted
+  }
+  gc()
+  return(extracted_return)
+}
 ################################################################################

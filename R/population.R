@@ -340,4 +340,113 @@ process_sedac_codes <-
     }
     return(resolution)
   }
+
+################################################################################
+# {calculate} tier
+################################################################################
+#' Calculate population density covariates
+#' @description
+#' Extract population density values at point locations. Returns a
+#' \code{data.frame} object containing \code{locs_id}, year, and population
+#' density variable. Population density variable column name reflects
+#' spatial resolution of \code{from} and circular buffer radius.
+#' @param from SpatRaster(1). Output of \code{process_population()}.
+#' @param locs data.frame, characater to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param fun character(1). Function used to summarize multiple raster cells
+#' within sites location buffer (Default = `mean`).
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Placeholders
+#' @author Mitchell Manware
+#' @seealso [process_population()]
+#' @return a data.frame or SpatVector object
+#' @importFrom methods is
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_population(
+#'   from = pop, # derived from process_population() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_population <- function(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  fun = "mean",
+  weights = NULL,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  #### prepare locations list
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### message information
+  name_split <- strsplit(
+    names(from),
+    "_"
+  )[[1]]
+  message(
+    paste0(
+      "Calculating population covariates for ",
+      name_split[4],
+      " at ",
+      amadeus::process_sedac_codes(
+        paste0(
+          name_split[5],
+          "_",
+          name_split[6]
+        ),
+        invert = TRUE
+      ),
+      " resolution...\n"
+    )
+  )
+  #### perform extraction
+  sites_extracted <- amadeus::calc_worker(
+    dataset = "skip",
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
+    fun = fun,
+    variable = 3,
+    time = 4,
+    time_type = "year",
+    weights = weights,
+    ...
+  )
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  #### return data.frame
+  return(sites_return)
+}
 ################################################################################

@@ -677,4 +677,213 @@ get_tri_info <- function(
   rownames(out) <- NULL
   return(out)
 }
+
+################################################################################
+# {calculate} tier
+################################################################################
+#' Calculate toxic release covariates
+#' @description
+#' Calculate toxic release values for polygons or isotropic buffer point
+#' locations. Returns a \code{data.frame} object containing \code{locs_id}
+#' and variables for each processed TRI field in \code{from}. Target fields are
+#' derived from metadata attached by \code{process_tri()}, with a fallback to
+#' non-coordinate columns in \code{from}.
+#' @param from SpatVector(1). Output of \code{process_tri()}.
+#' @param locs sf/SpatVector. Locations where TRI variables are calculated.
+#' @param locs_id character(1). Unique site identifier column name.
+#'  Default is `"site_id"`.
+#' @param decay_range Circular buffer radius.
+#' Default is \code{c(1000, 10000, 50000)} (meters)
+#' @param C0 `NULL` or character vector of column names in `from`.
+#' Optional source-value columns used by `sum_edc()`. If `NULL` and
+#' there is one TRI target field, that field is inferred with a warning.
+#' If `NULL` and there are multiple TRI target fields, each TRI target field
+#' is used as its own source values (for example `STACK_AIR_*`).
+#' @param use_threshold logical(1). Passed to \code{sum_edc()}. If `TRUE`
+#' (default), include only source points within \code{5 * decay_range}.
+#' If `FALSE`, include all source points in `from`.
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Placeholders.
+#' @author Insang Song, Mariana Kassien
+#' @return a data.frame or SpatVector object
+#' @note U.S. context.
+#' @seealso [`sum_edc`], [`process_tri`]
+#' @importFrom terra vect
+#' @importFrom terra crs
+#' @importFrom terra nearby
+#' @importFrom methods is
+#' @importFrom data.table .SD
+#' @importFrom utils read.csv
+#' @importFrom data.table rbindlist
+#' @importFrom dplyr filter
+#' @importFrom dplyr mutate
+#' @importFrom dplyr across
+#' @importFrom dplyr ends_with
+#' @importFrom dplyr all_of
+#' @importFrom dplyr group_by
+#' @importFrom dplyr ungroup
+#' @importFrom dplyr summarize
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_tri(
+#'   from = tri, # derived from process_tri() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   decay_range = c(1e3L, 1e4L, 5e4L)
+#' )
+#' }
+#' @export
+calculate_tri <- function(
+  from = NULL,
+  locs,
+  locs_id = "site_id",
+  decay_range = c(1e3L, 1e4L, 5e4L),
+  C0 = NULL, # nolint: object_name_linter
+  use_threshold = TRUE,
+  weights = NULL,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  amadeus::check_geom(geom)
+  if (!methods::is(locs, "SpatVector")) {
+    if (methods::is(locs, "sf")) {
+      locs <- terra::vect(locs)
+    }
+  }
+  if (!is.numeric(decay_range)) {
+    stop("`decay_range` should be numeric.\n")
+  }
+  if (!is.logical(use_threshold) || length(use_threshold) != 1L ||
+        is.na(use_threshold)) {
+    stop("`use_threshold` must be TRUE or FALSE.\n")
+  }
+  c0_input <- C0
+  if (!is.null(c0_input) &&
+        (!is.character(c0_input) || length(c0_input) < 1L ||
+           anyNA(c0_input) ||
+           any(!nzchar(trimws(c0_input))))) {
+    stop("`C0` must be NULL or a non-empty character vector of column names.\n")
+  }
+  locs_re <- terra::project(locs, terra::crs(from))
+
+  # split by year: locs and tri locations
+  tri_cols <- attr(from, "tri_target_fields")
+  if (is.null(tri_cols) || length(tri_cols) < 1) {
+    tri_cols <- setdiff(names(from), c("YEAR", "LONGITUDE", "LATITUDE"))
+  }
+  # error fix: no whitespace
+  tri_cols <- sub(" ", "_", tri_cols)
+  if (length(tri_cols) < 1) {
+    stop(
+      "No TRI target fields found in `from`. ",
+      "Process TRI data using `process_tri()` before calculation.\n"
+    )
+  }
+  if (is.null(c0_input)) {
+    if (length(tri_cols) == 1L) {
+      warning(
+        "`C0` is NULL and only one TRI field is available; ",
+        "using `", tri_cols[1], "` as source values.\n"
+      )
+    }
+    c0_cols <- tri_cols
+  } else {
+    missing_c0_cols <- setdiff(c0_input, names(from))
+    if (length(missing_c0_cols) > 0L) {
+      stop(
+        "The following `C0` columns are missing in `from`: ",
+        paste(missing_c0_cols, collapse = ", "),
+        "\n"
+      )
+    }
+    if (length(c0_input) == 1L) {
+      c0_cols <- rep(c0_input, length(tri_cols))
+    } else if (length(c0_input) == length(tri_cols)) {
+      c0_cols <- c0_input
+    } else {
+      stop(
+        "`C0` must have length 1 or match the number of TRI target fields (",
+        length(tri_cols),
+        ").\n"
+      )
+    }
+  }
+
+  # inner lapply
+  list_decay_range <- split(decay_range, decay_range)
+  list_locs_tri <-
+    Map(
+      function(x) {
+        locs_tri_s <- Reduce(
+          function(df_x, df_y) dplyr::full_join(df_x, df_y, by = locs_id),
+          lapply(
+            seq_along(tri_cols),
+            function(i) {
+              tri_col <- tri_cols[i]
+              tri_col_c0 <- from[[c0_cols[i]]]
+              if (is.data.frame(tri_col_c0) && ncol(tri_col_c0) == 1L) {
+                tri_col_c0 <- tri_col_c0[[1]]
+              }
+              if (!is.numeric(tri_col_c0)) {
+                stop("TRI target field `", tri_col, "` is not numeric.\n")
+              }
+              sum_edc(
+                locs = locs_re,
+                from = from,
+                locs_id = locs_id,
+                decay_range = x,
+                target_fields = tri_col,
+                C0 = tri_col_c0,
+                use_threshold = use_threshold,
+                geom = FALSE
+              )
+            }
+          )
+        )
+        return(locs_tri_s)
+      },
+      list_decay_range
+    )
+
+  # bind element data.frames into one
+  df_tri <- Reduce(function(x, y) dplyr::full_join(x, y), list_locs_tri)
+  locs_df <- as.data.frame(locs)
+  if (!locs_id %in% names(locs_df)) {
+    stop("`locs_id` was not found in `locs`.\n")
+  }
+  if (geom %in% c("sf", "terra")) {
+    locs_geom <- terra::as.data.frame(locs_re, geom = "WKT")
+    if (!locs_id %in% names(locs_geom)) {
+      stop("`locs_id` was not found in `locs` after CRS transformation.\n")
+    }
+    df_tri <- dplyr::left_join(
+      locs_geom[, c(locs_id, "geometry"), drop = FALSE],
+      df_tri,
+      by = locs_id
+    )
+  } else if (nrow(df_tri) != nrow(locs)) {
+    df_tri <- dplyr::left_join(locs_df, df_tri, by = locs_id)
+  }
+
+  df_tri_return <- amadeus::calc_return_locs(
+    covar = df_tri,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+
+  # read attr
+  df_tri_return$time <- as.integer(attr(from, "tri_year"))
+
+  return(df_tri_return)
+}
 ################################################################################

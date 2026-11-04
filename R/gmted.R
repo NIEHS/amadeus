@@ -345,4 +345,107 @@ process_gmted_codes <-
     }
     return(code)
   }
+
+################################################################################
+# {calculate} tier
+################################################################################
+#' Calculate elevation covariates
+#' @description
+#' Extract elevation values at point locations. Returns a \code{data.frame}
+#' object containing \code{locs_id}, year of release, and elevation variable.
+#' Elevation variable column name follows the pattern
+#' \code{gmted_<radius>} (for example, \code{gmted_0} or \code{gmted_100}).
+#' @param from SpatRaster(1). Output from \code{process_gmted()}.
+#' @param locs data.frame. character to file path, SpatVector, or sf object.
+#' @param locs_id character(1). Column within `locations` CSV file
+#' containing identifier for each unique coordinate location.
+#' @param radius integer(1). Circular buffer distance around site locations.
+#' (Default = 0).
+#' @param fun character(1). Function used to summarize multiple raster cells
+#' within sites location buffer (Default = `mean`).
+#' @param geom FALSE/"sf"/"terra".. Should the function return with geometry?
+#' Default is `FALSE`, options with geometry are "sf" or "terra". The
+#' coordinate reference system of the `sf` or `SpatVector` is that of `from.`
+#' @param weights `NULL`, `SpatRaster`, polygon `SpatVector`/`sf`, or file
+#'   path. Optional weights raster for weighted extraction. If `NULL`
+#'   (default), unweighted extraction is performed.
+#' @param ... Placeholders
+#' @author Mitchell Manware
+#' @seealso [`process_gmted()`]
+#' @return a data.frame or SpatVector object
+#' @importFrom terra vect
+#' @importFrom terra as.data.frame
+#' @importFrom terra time
+#' @importFrom terra extract
+#' @importFrom terra nlyr
+#' @importFrom terra crs
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' loc <- data.frame(id = "001", lon = -78.90, lat = 35.97)
+#' calculate_gmted(
+#'   from = gmted, # derived from process_gmted() example
+#'   locs = loc,
+#'   locs_id = "id",
+#'   radius = 0,
+#'   fun = "mean",
+#'   geom = FALSE
+#' )
+#' }
+#' @export
+calculate_gmted <- function(
+  from,
+  locs,
+  locs_id = NULL,
+  radius = 0,
+  fun = "mean",
+  weights = NULL,
+  geom = FALSE,
+  ...
+) {
+  amadeus::check_unsupported_by(..., .call = sys.call())
+  #### prepare locations list
+  sites_list <- amadeus::calc_prepare_locs(
+    from = from,
+    locs = locs,
+    locs_id = locs_id,
+    radius = radius,
+    geom = geom
+  )
+  sites_e <- sites_list[[1]]
+  sites_id <- sites_list[[2]]
+  #### perform extraction
+  sites_extracted <- amadeus::calc_worker(
+    dataset = "gmted",
+    from = from,
+    locs_vector = sites_e,
+    locs_df = sites_id,
+    radius = radius,
+    fun = fun,
+    variable = 2,
+    time = 3,
+    time_type = "year",
+    weights = weights
+  )
+  #### variable column name
+  variable_name <- paste0("gmted_", as.integer(radius))
+  if (geom %in% c("sf", "terra")) {
+    #### convert integer to numeric
+    sites_extracted[, 4] <- as.numeric(sites_extracted[, 4])
+    names(sites_extracted) <- c(locs_id, "geometry", "time", variable_name)
+  } else {
+    #### convert integer to numeric
+    sites_extracted[, 3] <- as.numeric(sites_extracted[, 3])
+    names(sites_extracted) <- c(locs_id, "time", variable_name)
+  }
+  sites_return <- amadeus::calc_return_locs(
+    covar = sites_extracted,
+    POSIXt = FALSE,
+    geom = geom,
+    crs = terra::crs(from)
+  )
+  #### return data.frame
+  return(sites_return)
+}
 ################################################################################
