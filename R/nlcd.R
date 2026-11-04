@@ -123,7 +123,6 @@ download_nlcd <- function(
     "impervious descriptor" = "ImpDsc",
     "spectral change day of year" = "SpcChg"
   )
-
   # ----------------------------------------------------------------------------
   # Check `years` and generate sequence.
   int_years <- amadeus:::sequence_years(year)

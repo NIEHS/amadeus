@@ -477,8 +477,12 @@ testthat::test_that("calculate_ecoregion full_ecoregion sanitizes missing names"
     "eco_l3_clip.gpkg"
   )
   erras <- process_ecoregion(ecol3)
-  erras$NA_L2NAME[erras$L2_KEY == "8.3  SOUTHEASTERN USA PLAINS"] <- NA_character_
-  erras$US_L3NAME[erras$L3_KEY == "64  Northern Piedmont"] <- "Northern/Piedmont"
+  erras$NA_L2NAME[
+    erras$L2_KEY == "8.3  SOUTHEASTERN USA PLAINS"
+  ] <- NA_character_
+  erras$US_L3NAME[
+    erras$L3_KEY == "64  Northern Piedmont"
+  ] <- "Northern/Piedmont"
 
   site_faux <-
     data.frame(
@@ -545,10 +549,13 @@ testthat::test_that("calculate_ecoregion full_ecoregion disambiguates duplicates
     )
   )
   testthat::expect_true(
-    all(c(
-      "DUM_E3_DUPLICATE_NAME_00000",
-      "DUM_E3_DUPLICATE_NAME_00000_1"
-    ) %in% colnames(ecor_res))
+    all(
+      c(
+        "DUM_E3_DUPLICATE_NAME_00000",
+        "DUM_E3_DUPLICATE_NAME_00000_1"
+      ) %in%
+        colnames(ecor_res)
+    )
   )
 })
 
@@ -600,56 +607,53 @@ testthat::test_that("calculate_ecoregion frac works for polygon locs with drop",
   )
 })
 
-testthat::test_that(
-  "calculate_ecoregion radius is applied for point frac extraction",
-  {
-    withr::local_package("terra")
-    withr::local_package("sf")
-    withr::local_options(list(sf_use_s2 = FALSE))
+testthat::test_that("calculate_ecoregion radius is applied for point frac extraction", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_options(list(sf_use_s2 = FALSE))
 
-    ecol3 <- testthat::test_path(
-      "..",
-      "testdata",
-      "ecoregions",
-      "eco_l3_clip.gpkg"
-    )
-    erras <- process_ecoregion(ecol3)
+  ecol3 <- testthat::test_path(
+    "..",
+    "testdata",
+    "ecoregions",
+    "eco_l3_clip.gpkg"
+  )
+  erras <- process_ecoregion(ecol3)
 
-    loc_pt <- data.frame(
-      site_id = "37999109988101",
-      lon = -77.576,
-      lat = 39.40
-    )
-    loc_pt <- sf::st_as_sf(loc_pt, coords = c("lon", "lat"), crs = 4326)
-    loc_pt <- sf::st_transform(loc_pt, sf::st_crs(terra::crs(erras)))
+  loc_pt <- data.frame(
+    site_id = "37999109988101",
+    lon = -77.576,
+    lat = 39.40
+  )
+  loc_pt <- sf::st_as_sf(loc_pt, coords = c("lon", "lat"), crs = 4326)
+  loc_pt <- sf::st_transform(loc_pt, sf::st_crs(terra::crs(erras)))
 
-    loc_poly <- terra::buffer(terra::vect(loc_pt), width = 100000)
+  loc_poly <- terra::buffer(terra::vect(loc_pt), width = 100000)
 
-    out_radius <- calculate_ecoregion(
-      from = erras,
-      locs = loc_pt,
-      locs_id = "site_id",
-      frac = TRUE,
-      radius = 100000
-    )
-    out_poly <- calculate_ecoregion(
-      from = erras,
-      locs = loc_poly,
-      locs_id = "site_id",
-      frac = TRUE
-    )
+  out_radius <- calculate_ecoregion(
+    from = erras,
+    locs = loc_pt,
+    locs_id = "site_id",
+    frac = TRUE,
+    radius = 100000
+  )
+  out_poly <- calculate_ecoregion(
+    from = erras,
+    locs = loc_poly,
+    locs_id = "site_id",
+    frac = TRUE
+  )
 
-    frc_cols <- grep("^FRC_", names(out_radius), value = TRUE)
-    testthat::expect_true(length(frc_cols) > 0)
-    testthat::expect_true(all(grepl("_100000$", frc_cols)))
-    frc_cols_poly <- sub("_100000$", "_00000", frc_cols)
-    testthat::expect_equal(
-      as.numeric(out_radius[1, frc_cols, drop = TRUE]),
-      as.numeric(out_poly[1, frc_cols_poly, drop = TRUE]),
-      tolerance = 1e-3
-    )
-  }
-)
+  frc_cols <- grep("^FRC_", names(out_radius), value = TRUE)
+  testthat::expect_true(length(frc_cols) > 0)
+  testthat::expect_true(all(grepl("_100000$", frc_cols)))
+  frc_cols_poly <- sub("_100000$", "_00000", frc_cols)
+  testthat::expect_equal(
+    as.numeric(out_radius[1, frc_cols, drop = TRUE]),
+    as.numeric(out_poly[1, frc_cols_poly, drop = TRUE]),
+    tolerance = 1e-3
+  )
+})
 
 testthat::test_that("calculate_ecoregion option combinations stay coherent", {
   withr::local_package("terra")
@@ -673,18 +677,51 @@ testthat::test_that("calculate_ecoregion option combinations stay coherent", {
   loc_pt <- sf::st_transform(loc_pt, sf::st_crs(terra::crs(erras)))
 
   combos <- list(
-    list(frac = FALSE, radius = 0, drop = FALSE, geom = FALSE, colnames = "coded"),
-    list(frac = FALSE, radius = 0, drop = TRUE, geom = "sf", colnames = "full_ecoregion"),
-    list(frac = TRUE, radius = 0, drop = FALSE, geom = FALSE, colnames = "coded"),
-    list(frac = TRUE, radius = 100000, drop = FALSE, geom = FALSE, colnames = "coded"),
-    list(frac = TRUE, radius = 100000, drop = TRUE, geom = "terra", colnames = "full_ecoregion")
+    list(
+      frac = FALSE,
+      radius = 0,
+      drop = FALSE,
+      geom = FALSE,
+      colnames = "coded"
+    ),
+    list(
+      frac = FALSE,
+      radius = 0,
+      drop = TRUE,
+      geom = "sf",
+      colnames = "full_ecoregion"
+    ),
+    list(
+      frac = TRUE,
+      radius = 0,
+      drop = FALSE,
+      geom = FALSE,
+      colnames = "coded"
+    ),
+    list(
+      frac = TRUE,
+      radius = 100000,
+      drop = FALSE,
+      geom = FALSE,
+      colnames = "coded"
+    ),
+    list(
+      frac = TRUE,
+      radius = 100000,
+      drop = TRUE,
+      geom = "terra",
+      colnames = "full_ecoregion"
+    )
   )
 
   for (cfg in combos) {
-    out <- do.call(calculate_ecoregion, c(
-      list(from = erras, locs = loc_pt, locs_id = "site_id"),
-      cfg
-    ))
+    out <- do.call(
+      calculate_ecoregion,
+      c(
+        list(from = erras, locs = loc_pt, locs_id = "site_id"),
+        cfg
+      )
+    )
     out_df <- as.data.frame(out)
     val_cols <- grep("^(DUM|FRC)_", names(out_df), value = TRUE)
     testthat::expect_true(length(val_cols) > 0)
@@ -738,7 +775,10 @@ testthat::test_that("calculate_ecoregion positional args remain valid", {
   val_cols <- grep("^FRC_", names(out_df), value = TRUE)
   testthat::expect_true(length(val_cols) > 0)
   testthat::expect_true(
-    any(out_df[1, val_cols, drop = TRUE] > 0 & out_df[1, val_cols, drop = TRUE] < 1)
+    any(
+      out_df[1, val_cols, drop = TRUE] > 0 &
+        out_df[1, val_cols, drop = TRUE] < 1
+    )
   )
 })
 
@@ -769,7 +809,9 @@ testthat::test_that("calculate_ecoregion frac with radius works for multi-row sf
   frc_cols <- grep("^FRC_", names(out_df), value = TRUE)
   testthat::expect_true(length(frc_cols) > 0)
   testthat::expect_true(all(grepl("_100000$", frc_cols)))
-  testthat::expect_true(all(rowSums(out_df[, frc_cols, drop = FALSE], na.rm = TRUE) > 0))
+  testthat::expect_true(all(
+    rowSums(out_df[, frc_cols, drop = FALSE], na.rm = TRUE) > 0
+  ))
 })
 
 testthat::test_that("calc_return_locs covers geometry return branches", {
@@ -864,11 +906,11 @@ testthat::test_that("calc_return_locs covers geometry return branches", {
 testthat::test_that("download_ecoregion remove_command deprecation warning", {
   withr::with_tempdir({
     testthat::expect_warning(
-        download_ecoregion(
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = FALSE,
-          remove_command = TRUE
+      download_ecoregion(
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = TRUE
       ),
       regexp = "remove_command.*deprecated"
     )
@@ -984,9 +1026,14 @@ testthat::test_that("calculate_ecoregion errors when required field missing from
   testthat::local_mocked_bindings(
     intersect = function(x, y) {
       sf_obj <- sf::st_as_sf(
-        data.frame(site_id = "37999109988101", some_other_field = 1L,
-                   lon = -77.576, lat = 39.40),
-        coords = c("lon", "lat"), crs = 4326
+        data.frame(
+          site_id = "37999109988101",
+          some_other_field = 1L,
+          lon = -77.576,
+          lat = 39.40
+        ),
+        coords = c("lon", "lat"),
+        crs = 4326
       )
       terra::vect(sf_obj)
     },
@@ -1005,129 +1052,126 @@ testthat::test_that("calculate_ecoregion errors when required field missing from
 ################################################################################
 ##### Recommended linked mock workflow
 
-testthat::test_that(
-  "ecoregion linked mock workflow: creates process-ready GPKG and calculates indicators",
-  {
-    withr::local_package("terra")
+testthat::test_that("ecoregion linked mock workflow: creates process-ready GPKG and calculates indicators", {
+  withr::local_package("terra")
 
-    fixture <- normalizePath(
-      testthat::test_path(
-        "..",
-        "testdata",
-        "ecoregions",
-        "eco_l3_clip.gpkg"
-      ),
-      mustWork = TRUE
-    )
-    download_directory <- withr::local_tempdir()
-    downloaded_archive <- NULL
-    extracted_gpkg <- NULL
+  fixture <- normalizePath(
+    testthat::test_path(
+      "..",
+      "testdata",
+      "ecoregions",
+      "eco_l3_clip.gpkg"
+    ),
+    mustWork = TRUE
+  )
+  download_directory <- withr::local_tempdir()
+  downloaded_archive <- NULL
+  extracted_gpkg <- NULL
 
-    local_download_mocks(
-      download_run_method = function(urls, destfiles, ...) {
-        testthat::expect_match(
-          urls,
-          "us_eco_l3_state_boundaries\\.zip$"
-        )
-        testthat::expect_identical(
-          basename(destfiles),
-          "us_eco_l3_state_boundaries.zip"
-        )
-        downloaded_archive <<- destfiles
-        dir.create(
-          dirname(destfiles),
-          recursive = TRUE,
-          showWarnings = FALSE
-        )
-        writeBin(charToRaw("mock archive"), destfiles)
-        list(success = 1L, failed = 0L, skipped = 0L)
-      },
-      download_unzip = function(file_name, directory_to_unzip, ...) {
-        testthat::expect_identical(file_name, downloaded_archive)
-        dir.create(
-          directory_to_unzip,
-          recursive = TRUE,
-          showWarnings = FALSE
-        )
-        extracted_gpkg <<- file.path(
-          directory_to_unzip,
-          basename(fixture)
-        )
-        copied <- file.copy(fixture, extracted_gpkg, overwrite = TRUE)
-        testthat::expect_true(copied)
-        invisible(NULL)
-      },
-      download_remove_zips = function(...) invisible(NULL)
-    )
+  local_download_mocks(
+    download_run_method = function(urls, destfiles, ...) {
+      testthat::expect_match(
+        urls,
+        "us_eco_l3_state_boundaries\\.zip$"
+      )
+      testthat::expect_identical(
+        basename(destfiles),
+        "us_eco_l3_state_boundaries.zip"
+      )
+      downloaded_archive <<- destfiles
+      dir.create(
+        dirname(destfiles),
+        recursive = TRUE,
+        showWarnings = FALSE
+      )
+      writeBin(charToRaw("mock archive"), destfiles)
+      list(success = 1L, failed = 0L, skipped = 0L)
+    },
+    download_unzip = function(file_name, directory_to_unzip, ...) {
+      testthat::expect_identical(file_name, downloaded_archive)
+      dir.create(
+        directory_to_unzip,
+        recursive = TRUE,
+        showWarnings = FALSE
+      )
+      extracted_gpkg <<- file.path(
+        directory_to_unzip,
+        basename(fixture)
+      )
+      copied <- file.copy(fixture, extracted_gpkg, overwrite = TRUE)
+      testthat::expect_true(copied)
+      invisible(NULL)
+    },
+    download_remove_zips = function(...) invisible(NULL)
+  )
 
-    suppressMessages(download_data(
-      dataset_name = "ecoregion",
-      directory_to_save = download_directory,
-      acknowledgement = TRUE,
-      show_progress = FALSE,
-      rate_limit = 0
-    ))
+  suppressMessages(download_data(
+    dataset_name = "ecoregion",
+    directory_to_save = download_directory,
+    acknowledgement = TRUE,
+    show_progress = FALSE,
+    rate_limit = 0
+  ))
 
-    testthat::expect_true(file.exists(downloaded_archive))
-    testthat::expect_gt(file.size(downloaded_archive), 0)
-    testthat::expect_true(file.exists(extracted_gpkg))
-    testthat::expect_gt(file.size(extracted_gpkg), 0)
+  testthat::expect_true(file.exists(downloaded_archive))
+  testthat::expect_gt(file.size(downloaded_archive), 0)
+  testthat::expect_true(file.exists(extracted_gpkg))
+  testthat::expect_gt(file.size(extracted_gpkg), 0)
 
-    processed <- suppressMessages(process_covariates(
-      covariate = "ecoregion",
-      path = extracted_gpkg
-    ))
+  processed <- suppressMessages(process_covariates(
+    covariate = "ecoregion",
+    path = extracted_gpkg
+  ))
 
-    required_fields <- c(
-      "L2_KEY",
-      "L3_KEY",
-      "NA_L2NAME",
-      "US_L3NAME",
-      "NA_L3NAME",
-      "time"
-    )
-    testthat::expect_s4_class(processed, "SpatVector")
-    testthat::expect_gt(terra::nrow(processed), 0L)
-    testthat::expect_true(all(terra::is.valid(processed)))
-    testthat::expect_true(all(required_fields %in% names(processed)))
-    testthat::expect_true(nzchar(terra::crs(processed)))
-    testthat::expect_false(anyNA(processed$L3_KEY))
+  required_fields <- c(
+    "L2_KEY",
+    "L3_KEY",
+    "NA_L2NAME",
+    "US_L3NAME",
+    "NA_L3NAME",
+    "time"
+  )
+  testthat::expect_s4_class(processed, "SpatVector")
+  testthat::expect_gt(terra::nrow(processed), 0L)
+  testthat::expect_true(all(terra::is.valid(processed)))
+  testthat::expect_true(all(required_fields %in% names(processed)))
+  testthat::expect_true(nzchar(terra::crs(processed)))
+  testthat::expect_false(anyNA(processed$L3_KEY))
 
-    n_locations <- min(3L, terra::nrow(processed))
-    centers <- terra::centroids(processed[seq_len(n_locations), ])
-    coordinates <- terra::crds(centers)
-    locations <- terra::vect(
-      data.frame(
-        site_id = sprintf("site_%02d", seq_len(n_locations)),
-        x = coordinates[, 1L],
-        y = coordinates[, 2L]
-      ),
-      geom = c("x", "y"),
-      crs = terra::crs(processed)
-    )
+  n_locations <- min(3L, terra::nrow(processed))
+  centers <- terra::centroids(processed[seq_len(n_locations), ])
+  coordinates <- terra::crds(centers)
+  locations <- terra::vect(
+    data.frame(
+      site_id = sprintf("site_%02d", seq_len(n_locations)),
+      x = coordinates[, 1L],
+      y = coordinates[, 2L]
+    ),
+    geom = c("x", "y"),
+    crs = terra::crs(processed)
+  )
 
-    result <- suppressMessages(calculate_covariates(
-      covariate = "ecoregion",
-      from = processed,
-      locs = locations,
-      locs_id = "site_id",
-      frac = FALSE,
-      drop = TRUE
-    ))
+  result <- suppressMessages(calculate_covariates(
+    covariate = "ecoregion",
+    from = processed,
+    locs = locations,
+    locs_id = "site_id",
+    frac = FALSE,
+    drop = TRUE
+  ))
 
-    indicator_columns <- grep(
-      "^DUM_E[23]",
-      names(result),
-      value = TRUE
-    )
-    testthat::expect_s3_class(result, "data.frame")
-    testthat::expect_equal(nrow(result), n_locations)
-    testthat::expect_identical(result$site_id, locations$site_id)
-    testthat::expect_gt(length(indicator_columns), 0L)
-    testthat::expect_true(all(vapply(
-      result[indicator_columns],
-      function(values) all(values %in% c(0L, 1L), na.rm = TRUE),
-      logical(1)
-    )))
-  }
-)
+  indicator_columns <- grep(
+    "^DUM_E[23]",
+    names(result),
+    value = TRUE
+  )
+  testthat::expect_s3_class(result, "data.frame")
+  testthat::expect_equal(nrow(result), n_locations)
+  testthat::expect_identical(result$site_id, locations$site_id)
+  testthat::expect_gt(length(indicator_columns), 0L)
+  testthat::expect_true(all(vapply(
+    result[indicator_columns],
+    function(values) all(values %in% c(0L, 1L), na.rm = TRUE),
+    logical(1)
+  )))
+})

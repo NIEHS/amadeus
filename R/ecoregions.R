@@ -14,6 +14,7 @@
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#'   Set to FALSE to skip downloading and return the planned file list.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
 #' @param remove_zip logical(1). Remove zip files after unzipping (default
@@ -23,7 +24,19 @@
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Insang Song
-#' @return invisible list with download results; or hash character if hash=TRUE
+#' @return
+#' When `download = TRUE` and `hash = FALSE`, an invisible list containing
+#' `success`, `failed`, and `skipped` file counts. If the requested archive
+#' already exists and is nonempty, no file is downloaded; the returned list
+#' contains `success = 0`, `failed = 0`, and `skipped = 1`. When a download is
+#' attempted, the list also contains `failed_urls` and `failed_files` character
+#' vectors, empty if the download succeeded.
+#'
+#' When `download = FALSE`, an invisible list containing `urls`, `destfiles`,
+#' and `n_files = 1` is returned without downloading, regardless of `hash`.
+#'
+#' When `download = TRUE` and `hash = TRUE`, a character(1) combined MD5 hash
+#' of the files in the `data_files` directory is returned instead of a list.
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{article_omernik2014ecoregions}{amadeus}
@@ -47,90 +60,75 @@ download_ecoregion <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### Check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### Directory setup
-  directory_original <- amadeus::download_sanitize_path(directory_to_save)
-  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
-  directory_to_download <- directories[1]
-  directory_to_save <- directories[2]
-
-  #### Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return",
-      " after discovering files.\n",
-      call. = FALSE
-    )
-  }
-
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### Define download URL
-  download_url <- paste0(
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  amadeus:::download_check(
+    dataset_name = "ecoregions",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip,
+    remove_zip = remove_zip,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_directories <- amadeus::download_setup_dir(
+    amadeus::download_sanitize_path(directory_to_save),
+    zip = TRUE
+  )
+  chr_dir_to_download <- chr_directories[1]
+  chr_dir_to_save <- chr_directories[2]
+  # ----------------------------------------------------------------------------
+  # Standard download URLs.
+  chr_url <- paste0(
     "https://dmap-prod-oms-edc.s3.us-east-1.amazonaws.com/ORD/Ecoregions/us/",
     "us_eco_l3_state_boundaries.zip"
   )
-
-  #### Build download file name
-  download_name <- file.path(
-    directory_to_download,
+  # ----------------------------------------------------------------------------
+  # Generate download file names.
+  chr_filename <- file.path(
+    chr_dir_to_download,
     "us_eco_l3_state_boundaries.zip"
   )
-
-  #### Exit early if download=FALSE
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message("Skipping download.\n")
+    message(sprintf(
+      "Skipping download. Found %d files available for download.\n",
+      length(chr_url)
+    ))
     return(invisible(list(
-      urls = download_url,
-      destfiles = download_name,
-      n_files = 1
+      urls = chr_url,
+      destfiles = chr_filename,
+      n_files = length(chr_url)
     )))
   }
-
-  #### Download file using httr2
-  if (amadeus::check_destfile(download_name)) {
-    amadeus::download_run_method(
-      urls = download_url,
-      destfiles = download_name,
-      token = NULL,
-      show_progress = show_progress,
-      max_tries = max_tries,
-      rate_limit = rate_limit
-    )
-  } else {
-    message("File already exists. Skipping download.\n")
-  }
-
-  #### Unzip files
+  # ----------------------------------------------------------------------------
+  # Run download.
+  download_result <- amadeus::download_run_method(
+    urls = chr_url,
+    destfiles = chr_filename,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+  # ----------------------------------------------------------------------------
+  # Unzip downloaded .zip files.
   amadeus::download_unzip(
-    file_name = download_name,
-    directory_to_unzip = directory_to_save,
-    unzip = unzip
+    file_name = chr_filename,
+    directory_to_unzip = chr_dir_to_save,
+    unzip = unzip,
+    remove = remove_zip
   )
-
-  #### Remove zip files
-  amadeus::download_remove_zips(
-    remove = remove_zip,
-    download_name = download_name
-  )
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(NULL))
-  }
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
@@ -304,9 +302,15 @@ calculate_ecoregion <-
             lookup$key,
             regexpr("\\d{1,2}\\.[1-9]", lookup$key)
           )
-          key_num <- sprintf("%s_%s%03d_%s", value_prefix, prefix, as.integer(
-            10 * as.numeric(key_num)
-          ), radius_suffix)
+          key_num <- sprintf(
+            "%s_%s%03d_%s",
+            value_prefix,
+            prefix,
+            as.integer(
+              10 * as.numeric(key_num)
+            ),
+            radius_suffix
+          )
         } else {
           key_num <- regmatches(
             lookup$key,
