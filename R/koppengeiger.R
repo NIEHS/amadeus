@@ -16,6 +16,7 @@
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#'   Set to FALSE to skip downloading and return the planned file list.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
 #' @param remove_zip logical(1). Remove zip files after unzipping (default
@@ -25,7 +26,19 @@
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song
-#' @return invisible list with download results; or hash character if hash=TRUE
+#' @return
+#' When `download = TRUE` and `hash = FALSE`, an invisible list containing
+#' `success`, `failed`, and `skipped` file counts. If the requested archive
+#' already exists and is nonempty, no file is downloaded; the returned list
+#' contains `success = 0`, `failed = 0`, and `skipped = 1`. When a download is
+#' attempted, the list also contains `failed_urls` and `failed_files` character
+#' vectors, empty if the download succeeded.
+#'
+#' When `download = FALSE`, an invisible list containing `urls`, `destfiles`,
+#' and `n_files = 1` is returned without downloading, regardless of `hash`.
+#'
+#' When `download = TRUE` and `hash = TRUE`, a character(1) combined MD5 hash
+#' of the files in the `data_files` directory is returned instead of a list.
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{article_beck2023koppen}{amadeus}
@@ -54,103 +67,78 @@ download_koppen_geiger <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### Check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### Directory setup
-  directory_original <- amadeus::download_sanitize_path(directory_to_save)
-  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
-  directory_to_download <- directories[1]
-  directory_to_save <- directories[2]
-
-  #### Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.\n",
-      call. = FALSE
-    )
-  }
-
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### Check for data resolution
-  data_resolution <- match.arg(data_resolution)
-
-  #### Check for valid time period
-  time_period <- match.arg(time_period)
-
-  #### Define time period
-  period <- tolower(time_period)
-
-  #### Define data resolution
-  data_resolution <- gsub("\\.", "p", data_resolution)
-
-  #### Define download URL
-  download_url <- paste0(
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  amadeus:::download_check(
+    dataset_name = "koppengeiger",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip,
+    remove_zip = remove_zip,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  checkmate::assert_choice(data_resolution, c("0.0083", "0.083", "0.5"))
+  checkmate::assert_choice(time_period, c("Present", "Future"))
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_directories <- amadeus::download_setup_dir(
+    amadeus::download_sanitize_path(directory_to_save),
+    zip = TRUE
+  )
+  chr_dir_to_download <- chr_directories[1]
+  chr_dir_to_save <- chr_directories[2]
+  # ----------------------------------------------------------------------------
+  # Generate download URL.
+  chr_url <- paste0(
     "https://s3-eu-west-1.amazonaws.com/",
     "pfigshare-u-files/12407516/Beck_KG_V1.zip"
   )
-
-  #### Build download file name
-  download_name <- paste0(
-    directory_to_download,
+  # ----------------------------------------------------------------------------
+  # Generate download file name.
+  chr_filename <- paste0(
+    chr_dir_to_download,
     "koppen_geiger_",
-    period,
+    tolower(time_period),
     "_",
-    data_resolution,
+    gsub("\\.", "p", data_resolution),
     ".zip"
   )
-
-  #### Exit early if download=FALSE
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
     message("Skipping download.\n")
     return(invisible(list(
-      urls = download_url,
-      destfiles = download_name,
+      urls = chr_url,
+      destfiles = chr_filename,
       n_files = 1
     )))
   }
-
-  #### Download file using httr2
-  if (amadeus::check_destfile(download_name)) {
-    amadeus::download_run_method(
-      urls = download_url,
-      destfiles = download_name,
-      token = NULL,
-      show_progress = show_progress,
-      max_tries = max_tries,
-      rate_limit = rate_limit
-    )
-  } else {
-    message("File already exists. Skipping download.\n")
-  }
-
-  #### Unzip
+  # ----------------------------------------------------------------------------
+  # Run download.
+  download_result <- amadeus::download_run_method(
+    urls = chr_url,
+    destfiles = chr_filename,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+  # ----------------------------------------------------------------------------
+  # Unzip downloaded .zip files and remove if requested.
   amadeus::download_unzip(
-    file_name = download_name,
-    directory_to_unzip = directory_to_save,
-    unzip = unzip
+    file_name = chr_filename,
+    directory_to_unzip = chr_dir_to_save,
+    unzip = unzip,
+    remove = remove_zip
   )
-
-  #### Remove zip files
-  amadeus::download_remove_zips(
-    remove = remove_zip,
-    download_name = download_name
-  )
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(NULL))
-  }
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
@@ -483,8 +471,7 @@ calculate_koppen_geiger <-
     }
     kg_extracted$description <- description
     if (geom %in% c("sf", "terra")) {
-      kg_extracted <- kg_extracted[
-        ,
+      kg_extracted <- kg_extracted[,
         c(locs_id, "geometry", "description", column_names),
         drop = FALSE
       ]
@@ -497,8 +484,7 @@ calculate_koppen_geiger <-
       #### return data.frame
       return(sites_return)
     } else {
-      kg_extracted <- kg_extracted[
-        ,
+      kg_extracted <- kg_extracted[,
         c(locs_id, "description", column_names),
         drop = FALSE
       ]

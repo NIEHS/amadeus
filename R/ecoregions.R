@@ -63,7 +63,7 @@ download_ecoregion <- function(
   # ----------------------------------------------------------------------------
   # Check arguments.
   amadeus:::download_check(
-    dataset_name = "ecoregions",
+    dataset_name = "ecoregion",
     acknowledgement = acknowledgement,
     download = download,
     remove_command = remove_command,

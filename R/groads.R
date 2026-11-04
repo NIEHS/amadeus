@@ -85,7 +85,7 @@ download_groads <- function(
   # ----------------------------------------------------------------------------
   # Check arguments.
   amadeus:::download_check(
-    dataset_name = "aqs",
+    dataset_name = "groads",
     acknowledgement = acknowledgement,
     download = download,
     remove_command = remove_command,
