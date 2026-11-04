@@ -30,7 +30,8 @@ download_gmted(
 
 \item{acknowledgement}{logical(1). Must be TRUE to proceed.}
 
-\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
+\item{download}{logical(1). DEPRECATED. Downloads happen automatically.
+Set to FALSE to skip downloading and return the planned file list.}
 
 \item{remove_command}{logical(1). Deprecated, ignored.}
 
@@ -48,7 +49,18 @@ FALSE).}
 \item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
 }
 \value{
-invisible list with download results; or hash character if hash=TRUE
+When \code{download = TRUE} and \code{hash = FALSE}, an invisible list containing
+\code{success}, \code{failed}, and \code{skipped} file counts. If all requested archives
+already exist and are nonempty, no files are downloaded; the returned list
+contains \code{success = 0}, \code{failed = 0}, and \code{skipped} equal to the number of
+requested files. When downloads are attempted, the list also contains
+\code{failed_urls} and \code{failed_files} character vectors, empty if none failed.
+
+When \code{download = FALSE}, an invisible list containing \code{urls}, \code{destfiles},
+and \code{n_files} is returned without downloading, regardless of \code{hash}.
+
+When \code{download = TRUE} and \code{hash = TRUE}, a character(1) combined MD5 hash
+of the files in the \code{data_files} directory is returned instead of a list.
 }
 \description{
 The \code{download_gmted()} function accesses and downloads Global

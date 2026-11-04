@@ -17,6 +17,7 @@
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#'   Set to FALSE to skip downloading and return the planned file list.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
 #' @param remove_zip logical(1). Remove zip files after unzipping (default
@@ -26,7 +27,19 @@
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song
-#' @return invisible list with download results; or hash character if hash=TRUE
+#' @return
+#' When `download = TRUE` and `hash = FALSE`, an invisible list containing
+#' `success`, `failed`, and `skipped` file counts. If all requested archives
+#' already exist and are nonempty, no files are downloaded; the returned list
+#' contains `success = 0`, `failed = 0`, and `skipped` equal to the number of
+#' requested files. When downloads are attempted, the list also contains
+#' `failed_urls` and `failed_files` character vectors, empty if none failed.
+#'
+#' When `download = FALSE`, an invisible list containing `urls`, `destfiles`,
+#' and `n_files` is returned without downloading, regardless of `hash`.
+#'
+#' When `download = TRUE` and `hash = TRUE`, a character(1) combined MD5 hash
+#' of the files in the `data_files` directory is returned instead of a list.
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{danielson_global_2011}{amadeus}

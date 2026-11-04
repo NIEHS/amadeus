@@ -36,7 +36,19 @@
 #' @param max_tries integer(1). Maximum download retry attempts. Default is 20.
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
 #' @author Mitchell Manware, Insang Song, Kyle Messier
-#' @return invisible NULL; or hash character if hash=TRUE
+#' @return
+#' When `download = TRUE` and `hash = FALSE`, an invisible list containing
+#' `success`, `failed`, and `skipped` file counts. If all requested archives
+#' already exist and are nonempty, no files are downloaded; the returned list
+#' contains `success = 0`, `failed = 0`, and `skipped` equal to the number of
+#' requested files. When downloads are attempted, the list also contains
+#' `failed_urls` and `failed_files` character vectors, empty if none failed.
+#'
+#' When `download = FALSE`, an invisible list containing `urls`, `destfiles`,
+#' and `n_files` is returned without downloading, regardless of `hash`.
+#'
+#' When `download = TRUE` and `hash = TRUE`, a character(1) combined MD5 hash
+#' of the files in the `data_files` directory is returned instead of a list.
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{dewitz_national_2023}{amadeus}
@@ -75,50 +87,34 @@ download_nlcd <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### Check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### Directory setup
-  directory_original <- amadeus::download_sanitize_path(directory_to_save)
-  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
-  directory_to_download <- directories[1]
-  directory_to_save <- directories[2]
-
-  #### Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return",
-      " after discovering files.\n",
-      call. = FALSE
-    )
-  }
-
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### Check for valid years
-  valid_years <- 1985:2024L
-  if (!(as.integer(year) %in% valid_years)) {
-    stop(paste0("Requested year is not recognized.\n"))
-  }
-
-  #### Define URL base
-  base <- paste0(
-    "https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/",
-    "data-bundles/Annual_NLCD_"
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  amadeus:::download_check(
+    dataset_name = "nlcd",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip,
+    remove_zip = remove_zip,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
   )
-
-  #### Define collection code
-  collection_code <- switch(
+  checkmate::assert_choice(
+    tolower(product),
+    c(
+      "land cover",
+      "land cover change",
+      "land cover confidence",
+      "fractional impervious surface",
+      "impervious descriptor",
+      "spectral change day of year"
+    )
+  )
+  # ----------------------------------------------------------------------------
+  chr_collection <- switch(
     tolower(product),
     "land cover" = "LndCov",
     "land cover change" = "LndChg",
@@ -128,70 +124,76 @@ download_nlcd <- function(
     "spectral change day of year" = "SpcChg"
   )
 
-  #### Build URL
-  download_url <- paste0(
-    base,
-    collection_code,
-    "_",
-    year,
-    "_CU_C1V1.zip"
+  # ----------------------------------------------------------------------------
+  # Check `years` and generate sequence.
+  int_years <- amadeus:::sequence_years(year)
+  if (!all(int_years %in% 1985:2024L)) {
+    stop(paste0("Requested year is not recognized.\n"))
+  }
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_directories <- amadeus::download_setup_dir(
+    amadeus::download_sanitize_path(directory_to_save),
+    zip = TRUE
   )
-
-  #### Build download file name
-  download_name <- paste0(
-    directory_to_download,
-    "Annual_NLCD_",
-    collection_code,
-    "_",
-    year,
-    "_CU_C1V1.zip"
+  chr_dir_to_download <- chr_directories[1]
+  chr_dir_to_save <- chr_directories[2]
+  # ----------------------------------------------------------------------------
+  # Generate download URLs.
+  chr_urls <- sprintf(
+    paste0(
+      "https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/",
+      "data-bundles/Annual_NLCD_%s_%d_CU_C1V1.zip"
+    ),
+    chr_collection,
+    int_years
   )
-
-  #### Exit early if download=FALSE
+  # ----------------------------------------------------------------------------
+  # Generate download file names.
+  chr_filenames <- sprintf(
+    paste0(chr_dir_to_download, "Annual_NLCD_%s_%d_CU_C1V1.zip"),
+    chr_collection,
+    int_years
+  )
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
     message("Skipping download.\n")
     return(invisible(list(
-      urls = download_url,
-      destfiles = download_name,
+      urls = chr_urls,
+      destfiles = chr_filenames,
       n_files = 1
     )))
   }
-
-  #### Download file using httr2
+  # ----------------------------------------------------------------------------
+  # Run download.
   # http_version = 2L forces HTTP/1.1 to avoid nghttp2 PROTOCOL_ERRORs from
   # www.mrlc.gov, which drops HTTP/2 connections mid-transfer.
-  if (amadeus::check_destfile(download_name)) {
-    amadeus::download_run_method(
-      urls = download_url,
-      destfiles = download_name,
-      token = NULL,
-      show_progress = show_progress,
-      max_tries = max_tries,
-      rate_limit = rate_limit,
-      http_version = 2L
-    )
-  } else {
-    message("File already exists. Skipping download.\n")
-  }
-
-  #### Unzip
+  download_result <- amadeus::download_run_method(
+    urls = chr_urls,
+    destfiles = chr_filenames,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    http_version = 2L
+  )
+  # ----------------------------------------------------------------------------
+  # Unzip downloaded .zip files.
   amadeus::download_unzip(
-    file_name = download_name,
-    directory_to_unzip = directory_to_save,
+    file_name = chr_filenames,
+    directory_to_unzip = chr_dir_to_save,
     unzip = unzip
   )
-
-  #### Remove zip files
+  # ----------------------------------------------------------------------------
+  # Remove zip files.
   amadeus::download_remove_zips(
     remove = remove_zip,
-    download_name = download_name
+    download_name = chr_filenames
   )
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(NULL))
-  }
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
@@ -556,7 +558,8 @@ calculate_nlcd <- function(
       new_data_vect <- cbind(
         new_data_vect[, c(locs_id, "geometry"), drop = FALSE],
         as.integer(year),
-        new_data_vect[, setdiff(names(new_data_vect), c(locs_id, "geometry")),
+        new_data_vect[,
+          setdiff(names(new_data_vect), c(locs_id, "geometry")),
           drop = FALSE
         ]
       )
@@ -603,8 +606,7 @@ calculate_nlcd <- function(
         nlcd_at_bufs_fill <- data.frame(row.names = seq_len(nrow(locs_df)))
       }
       if (ncol(nlcd_at_bufs_fill) > 0) {
-        nlcd_cellcnt <- nlcd_at_bufs_fill[
-          ,
+        nlcd_cellcnt <- nlcd_at_bufs_fill[,
           seq_len(ncol(nlcd_at_bufs_fill)),
           drop = FALSE
         ]
@@ -654,8 +656,7 @@ calculate_nlcd <- function(
       if (length(nlcd_val_cols) == 0) {
         nlcd_at_bufs_fill <- nlcd_at_bufs_fill[, locs_id, drop = FALSE]
       } else {
-        nlcd_at_bufs_fill <- nlcd_at_bufs_fill[
-          ,
+        nlcd_at_bufs_fill <- nlcd_at_bufs_fill[,
           c(locs_id, nlcd_val_cols),
           drop = FALSE
         ]
@@ -707,8 +708,7 @@ calculate_nlcd <- function(
       new_data_vect <- cbind(
         new_data_core[, c(locs_id, "geometry"), drop = FALSE],
         as.integer(year),
-        new_data_core[
-          ,
+        new_data_core[,
           setdiff(names(new_data_core), c(locs_id, "geometry")),
           drop = FALSE
         ]
