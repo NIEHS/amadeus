@@ -21,8 +21,9 @@ download_aqs(
 )
 }
 \arguments{
-\item{parameter_code}{integer(1). EPA pollutant parameter code. See
-Details for a short list of common codes.}
+\item{parameter_code}{numeric(1) or character(1). EPA parameter code as a
+positive integer-valued number or non-empty string. Character codes are
+used unchanged. See Details for a short list of common pollutant codes.}
 
 \item{resolution_temporal}{character(1). "daily" or "hourly".}
 

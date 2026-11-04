@@ -19,15 +19,19 @@ testthat::test_that(
 
     amadeus::download_aqs(
       resolution_temporal = "daily",
-      parameter_code = "88101",
+      parameter_code = 88101,
       year = 2022,
       directory_to_save = dir,
       acknowledgement = TRUE,
       unzip = FALSE
     )
 
-    zips <- list.files(dir, pattern = "\\.zip$", recursive = TRUE,
-                       full.names = TRUE)
+    zips <- list.files(
+      dir,
+      pattern = "\\.zip$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
     testthat::expect_gt(length(zips), 0)
     testthat::expect_true(all(file.info(zips)$size > 0))
   }
@@ -44,15 +48,19 @@ testthat::test_that(
 
     amadeus::download_aqs(
       resolution_temporal = "daily",
-      parameter_code = "44201",
+      parameter_code = 44201,
       year = 2022,
       directory_to_save = dir,
       acknowledgement = TRUE,
       unzip = FALSE
     )
 
-    zips <- list.files(dir, pattern = "\\.zip$", recursive = TRUE,
-                       full.names = TRUE)
+    zips <- list.files(
+      dir,
+      pattern = "\\.zip$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
     testthat::expect_gt(length(zips), 0)
     testthat::expect_true(all(file.info(zips)$size > 0))
   }
@@ -69,15 +77,19 @@ testthat::test_that(
 
     amadeus::download_aqs(
       resolution_temporal = "daily",
-      parameter_code = "42101",
+      parameter_code = 42101,
       year = 2022,
       directory_to_save = dir,
       acknowledgement = TRUE,
       unzip = FALSE
     )
 
-    zips <- list.files(dir, pattern = "\\.zip$", recursive = TRUE,
-                       full.names = TRUE)
+    zips <- list.files(
+      dir,
+      pattern = "\\.zip$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
     testthat::expect_gt(length(zips), 0)
     testthat::expect_true(all(file.info(zips)$size > 0))
   }
@@ -94,15 +106,19 @@ testthat::test_that(
 
     amadeus::download_aqs(
       resolution_temporal = "daily",
-      parameter_code = "42401",
+      parameter_code = 42401,
       year = 2022,
       directory_to_save = dir,
       acknowledgement = TRUE,
       unzip = FALSE
     )
 
-    zips <- list.files(dir, pattern = "\\.zip$", recursive = TRUE,
-                       full.names = TRUE)
+    zips <- list.files(
+      dir,
+      pattern = "\\.zip$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
     testthat::expect_gt(length(zips), 0)
     testthat::expect_true(all(file.info(zips)$size > 0))
   }
@@ -119,15 +135,19 @@ testthat::test_that(
 
     amadeus::download_aqs(
       resolution_temporal = "daily",
-      parameter_code = "42602",
+      parameter_code = 42602,
       year = 2022,
       directory_to_save = dir,
       acknowledgement = TRUE,
       unzip = FALSE
     )
 
-    zips <- list.files(dir, pattern = "\\.zip$", recursive = TRUE,
-                       full.names = TRUE)
+    zips <- list.files(
+      dir,
+      pattern = "\\.zip$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
     testthat::expect_gt(length(zips), 0)
     testthat::expect_true(all(file.info(zips)$size > 0))
   }
@@ -144,15 +164,19 @@ testthat::test_that(
 
     amadeus::download_aqs(
       resolution_temporal = "daily",
-      parameter_code = "81102",
+      parameter_code = 81102,
       year = 2022,
       directory_to_save = dir,
       acknowledgement = TRUE,
       unzip = FALSE
     )
 
-    zips <- list.files(dir, pattern = "\\.zip$", recursive = TRUE,
-                       full.names = TRUE)
+    zips <- list.files(
+      dir,
+      pattern = "\\.zip$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
     testthat::expect_gt(length(zips), 0)
     testthat::expect_true(all(file.info(zips)$size > 0))
   }
@@ -169,15 +193,19 @@ testthat::test_that(
 
     amadeus::download_aqs(
       resolution_temporal = "hourly",
-      parameter_code = "88101",
+      parameter_code = 88101,
       year = 2022,
       directory_to_save = dir,
       acknowledgement = TRUE,
       unzip = FALSE
     )
 
-    zips <- list.files(dir, pattern = "\\.zip$", recursive = TRUE,
-                       full.names = TRUE)
+    zips <- list.files(
+      dir,
+      pattern = "\\.zip$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
     testthat::expect_gt(length(zips), 0)
     testthat::expect_true(all(file.info(zips)$size > 0))
   }
@@ -194,15 +222,19 @@ testthat::test_that(
 
     amadeus::download_aqs(
       resolution_temporal = "daily",
-      parameter_code = "88101",
+      parameter_code = 88101,
       year = 2020,
       directory_to_save = dir,
       acknowledgement = TRUE,
       unzip = FALSE
     )
 
-    zips <- list.files(dir, pattern = "\\.zip$", recursive = TRUE,
-                       full.names = TRUE)
+    zips <- list.files(
+      dir,
+      pattern = "\\.zip$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
     testthat::expect_gt(length(zips), 0)
     testthat::expect_true(all(file.info(zips)$size > 0))
   }
