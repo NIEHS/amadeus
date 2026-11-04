@@ -27,8 +27,7 @@
 #' AQS parameter code table.
 #' @param parameter_code integer(1). EPA pollutant parameter code. See
 #'   Details for a short list of common codes.
-#' @param resolution_temporal character(1). Currently only "daily" is supported.
-#' @param url_aqs_download character(1). URL to the AQS pre-generated datasets.
+#' @param resolution_temporal character(1). "daily" or "hourly".
 #' @param year integer(1 or 2). Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
@@ -61,170 +60,149 @@
 #' )
 #' }
 #' @export
-download_aqs <-
-  function(
-    parameter_code = 88101,
-    resolution_temporal = "daily",
-    year = c(2018, 2022),
-    url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = TRUE,
-    remove_command = FALSE,
-    unzip = TRUE,
-    remove_zip = FALSE,
-    show_progress = TRUE,
-    hash = FALSE,
-    max_tries = 20,
-    rate_limit = 2
+download_aqs <- function(
+  parameter_code = 88101,
+  resolution_temporal = "daily",
+  year = c(2018, 2022),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = TRUE,
+  remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
+  show_progress = TRUE,
+  hash = FALSE,
+  max_tries = 20,
+  rate_limit = 2
+) {
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  amadeus:::download_check(
+    dataset_name = "aqs",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip,
+    remove_zip = remove_zip,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  checkmate::assert_int(parameter_code, lower = 1L)
+  checkmate::assert_choice(resolution_temporal, c("daily", "hourly"))
+  # ----------------------------------------------------------------------------
+  # Check `years` and generate sequence.
+  int_years <- amadeus:::sequence_years(year)
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_directories <- amadeus::download_setup_dir(
+    amadeus::download_sanitize_path(directory_to_save),
+    zip = TRUE
+  )
+  chr_dir_to_download <- chr_directories[1]
+  chr_dir_to_save <- chr_directories[2]
+  # ----------------------------------------------------------------------------
+  # Generate download URLs.
+  chr_urls <- sprintf(
+    paste(
+      "https://aqs.epa.gov/aqsweb/airdata/",
+      resolution_temporal,
+      "_",
+      parameter_code,
+      "_%d.zip",
+      sep = ""
+    ),
+    int_years
+  )
+  # ----------------------------------------------------------------------------
+  # Generate download file names.
+  chr_filenames <- sprintf(
+    paste(
+      chr_dir_to_download,
+      "aqs_",
+      resolution_temporal,
+      "_",
+      parameter_code,
+      "_%d.zip",
+      sep = ""
+    ),
+    int_years
+  )
+  # ----------------------------------------------------------------------------
+  # Filter to missing/empty files only.
+  idx_needsdownload <- sapply(chr_filenames, amadeus::check_destfile)
+  chr_dlurls <- chr_urls[idx_needsdownload]
+  chr_dlnames <- chr_filenames[idx_needsdownload]
+  # ----------------------------------------------------------------------------
+  # Check first URL for valid generation; error if not.
+  if (
+    isTRUE(download) &&
+      length(chr_dlurls) > 0 &&
+      !amadeus::check_url_status(chr_dlurls[1])
   ) {
-    #### Check acknowledgement
-    amadeus::download_permit(acknowledgement = acknowledgement)
-
-    #### Check for null parameters
-    amadeus::check_for_null_parameters(mget(ls()))
-
-    #### Check years
-    year <- if (length(year) == 1) rep(year, 2) else year
-    stopifnot(length(year) == 2)
-    year <- year[order(year)]
-
-    #### Directory setup
-    directory_original <- amadeus::download_sanitize_path(directory_to_save)
-    directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
-    directory_to_download <- directories[1]
-    directory_to_save <- directories[2]
-
-    #### Handle deprecated parameters
-    if (!isTRUE(download)) {
-      warning(
-        "Setting download=FALSE is deprecated.",
-        " Downloads now use httr2 by default.\n",
-        "To skip downloading, the function will return",
-        " after discovering files.\n",
-        call. = FALSE
-      )
-    }
-
-    if (remove_command != FALSE) {
-      warning(
-        "Parameter 'remove_command' is deprecated and ignored.\n",
-        call. = FALSE
-      )
-    }
-
-    #### Define year sequence
-    year_sequence <- seq(year[1], year[2], 1)
-
-    #### Build URLs
-    download_urls <- sprintf(
-      paste(
-        url_aqs_download,
-        resolution_temporal,
-        "_",
-        parameter_code,
-        "_%d.zip",
-        sep = ""
-      ),
-      year_sequence
-    )
-
-    #### Build download file names
-    download_names <- sprintf(
-      paste(
-        directory_to_download,
-        "aqs_",
-        resolution_temporal,
-        "_",
-        parameter_code,
-        "_%d.zip",
-        sep = ""
-      ),
-      year_sequence
-    )
-
-    #### Filter to files that need downloading
-    needs_download <- sapply(download_names, amadeus::check_destfile)
-    download_urls_filtered <- download_urls[needs_download]
-    download_names_filtered <- download_names[needs_download]
-
-    #### Check for valid URL only when actually downloading new files
-    if (
-      isTRUE(download) &&
-        length(download_urls_filtered) > 0 &&
-        !amadeus::check_url_status(download_urls_filtered[1])
-    ) {
-      stop(paste0(
-        "Invalid year returns HTTP code 404. ",
-        "Check `year` parameter.\n"
-      ))
-    }
-
-    #### Exit early if download=FALSE
-    if (!isTRUE(download)) {
-      message(sprintf(
-        "Skipping download. Found %d files available for download.\n",
-        length(download_urls_filtered)
-      ))
-      return(invisible(list(
-        urls = download_urls_filtered,
-        destfiles = download_names_filtered,
-        n_files = length(download_urls_filtered)
-      )))
-    }
-
-    #### Download files using httr2
-    if (length(download_urls_filtered) > 0) {
-      download_result <- amadeus::download_run_method(
-        urls = download_urls_filtered,
-        destfiles = download_names_filtered,
-        token = NULL,
-        show_progress = show_progress,
-        max_tries = max_tries,
-        rate_limit = rate_limit
-      )
-    } else {
-      message("All files already exist. Nothing to download.\n")
-      download_result <- list(
-        success = 0,
-        failed = 0,
-        skipped = length(download_names)
-      )
-    }
-
-    #### Unzip data
-    sapply(
-      download_names,
-      amadeus::download_unzip,
-      directory_to_unzip = directory_to_save,
-      unzip = unzip
-    )
-    if (isTRUE(unzip)) {
-      sapply(
-        year_sequence,
-        function(year_i) {
-          download_normalize_aqs_unzip(
-            # nolint: object_usage_linter
-            directory_to_unzip = directory_to_save,
-            resolution_temporal = resolution_temporal,
-            parameter_code = parameter_code,
-            year = year_i
-          )
-        }
-      )
-    }
-
-    amadeus::download_remove_zips(
-      remove = remove_zip,
-      download_name = download_names
-    )
-
-    if (hash) {
-      return(amadeus::download_hash(hash = TRUE, directory_to_save))
-    } else {
-      return(invisible(download_result))
-    }
+    stop(paste0(
+      "Invalid year returns HTTP code 404. ",
+      "Check `year` parameter.\n"
+    ))
   }
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
+  if (!isTRUE(download)) {
+    message(sprintf(
+      "Skipping download. Found %d files available for download.\n",
+      length(chr_dlurls)
+    ))
+    return(invisible(list(
+      urls = chr_dlurls,
+      destfiles = chr_dlnames,
+      n_files = length(chr_dlurls)
+    )))
+  }
+  # ----------------------------------------------------------------------------
+  # Run download.
+  download_result <- amadeus::download_run_method(
+    urls = chr_urls,
+    destfiles = chr_filenames,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+  # ----------------------------------------------------------------------------
+  # Unzip downloaded .zip files.
+  sapply(
+    chr_filenames,
+    amadeus::download_unzip,
+    directory_to_unzip = chr_dir_to_save,
+    unzip = unzip
+  )
+  # ----------------------------------------------------------------------------
+  # Flatten nested AQS CSV output.
+  if (isTRUE(unzip)) {
+    sapply(
+      int_years,
+      function(year_i) {
+        amadeus:::download_normalize_aqs_unzip(
+          directory_to_unzip = chr_dir_to_save,
+          resolution_temporal = resolution_temporal,
+          parameter_code = parameter_code,
+          year = year_i
+        )
+      }
+    )
+  }
+  # ----------------------------------------------------------------------------
+  # Remove zip files.
+  amadeus::download_remove_zips(
+    remove = remove_zip,
+    download_name = chr_filenames
+  )
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+}
 
 ################################################################################
 #' Normalize AQS unzip layout
@@ -246,25 +224,31 @@ download_normalize_aqs_unzip <- function(
   parameter_code,
   year
 ) {
+  # ----------------------------------------------------------------------------
+  # Locate the nested directory for this AQS year.
   nested_dir <- file.path(
     directory_to_unzip,
     sprintf("%s_%s_%s", resolution_temporal, parameter_code, year)
   )
-
+  # ----------------------------------------------------------------------------
+  # Skip years without a nested directory.
   if (!dir.exists(nested_dir)) {
     return(invisible(NULL))
   }
-
+  # ----------------------------------------------------------------------------
+  # List the immediate contents of the nested directory.
   nested_files <- list.files(
     nested_dir,
     full.names = TRUE,
     recursive = FALSE
   )
-
+  # ----------------------------------------------------------------------------
+  # Leave empty directories or further nested layouts unchanged.
   if (length(nested_files) == 0 || any(dir.exists(nested_files))) {
     return(invisible(NULL))
   }
-
+  # ----------------------------------------------------------------------------
+  # Move files into the main data directory.
   for (nested_file in nested_files) {
     target_file <- file.path(directory_to_unzip, basename(nested_file))
     if (!file.exists(target_file)) {
@@ -278,10 +262,12 @@ download_normalize_aqs_unzip <- function(
         # nocov end
       }
     } else {
+      # Keep the existing destination and remove this nested file.
       unlink(nested_file)
     }
   }
-
+  # ----------------------------------------------------------------------------
+  # Remove the flattened directory.
   unlink(nested_dir, recursive = TRUE)
   invisible(NULL)
 }
