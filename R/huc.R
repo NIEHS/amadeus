@@ -1,3 +1,11 @@
+################################################################################
+# {amadeus} functions for National Hydrography Dataset (NHDPlus) and
+# hydrologic units.
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 # nolint start
 #' Download National Hydrography Dataset (NHD) data
 #' @description
@@ -152,3 +160,112 @@ download_huc <-
   }
 # nolint end
 
+################################################################################
+# {process} tier
+################################################################################
+#' Retrieve Hydrologic Unit Code (HUC) data
+#' @author Insang Song
+#' @param path character. Path to the file or the directory containing HUC data.
+#' @param layer_name character(1). Layer name in the `path`
+#' @param huc_level character(1). Field name of HUC level
+#' @param huc_header character(1). The upper level HUC code header to extract
+#'  lower level HUCs.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param ... Arguments passed to `hydrogeofetch::get_huc()`
+#' @return a `SpatVector` object
+#' @seealso [`hydrogeofetch::get_huc`]
+#' @importFrom terra vect
+#' @importFrom terra vector_layers
+#' @importFrom rlang inject
+#' @examples
+#' ## NOTE: Examples are wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' library(terra)
+#' getf <- "WBD_National_GDB.gdb"
+#' # check the layer name to read
+#' terra::vector_layers(getf)
+#' test1 <- process_huc(
+#'   getf,
+#'   layer_name = "WBDHU8",
+#'   huc_level = "huc8"
+#' )
+#' test2 <- process_huc(
+#'   getf,
+#'   layer_name = "WBDHU8",
+#'   huc_level = "huc8"
+#' )
+#' test3 <- process_huc(
+#'   "",
+#'   layer_name = NULL,
+#'   huc_level = NULL,
+#'   huc_header = NULL,
+#'   id = "030202",
+#'   type = "huc06"
+#' )
+#' }
+#' @export
+process_huc <-
+  function(
+    path,
+    layer_name = NULL,
+    huc_level = NULL,
+    huc_header = NULL,
+    extent = NULL,
+    ...
+  ) {
+    # exclude the coverage due to write permission related to memoization
+    #nocov start
+    if (missing(path) || (!file.exists(path) && !dir.exists(path))) {
+      if (!requireNamespace("hydrogeofetch", quietly = TRUE)) {
+        stop(
+          "Package 'hydrogeofetch' is required when fetching HUC data ",
+          "remotely. ",
+          "Please install it and try again."
+        )
+      }
+      hucpoly <- try(
+        rlang::inject(hydrogeofetch::get_huc(!!!list(...)))
+      )
+      if (inherits(hucpoly, "try-error")) {
+        stop("HUC data was not found.")
+      }
+      hucpoly <- terra::vect(hucpoly)
+    }
+    #nocov end
+    if (!missing(path) && (file.exists(path) || dir.exists(path))) {
+      if (!is.null(huc_header)) {
+        querybase <-
+          sprintf(
+            "SELECT * FROM %s WHERE %s LIKE '%s%%'",
+            layer_name,
+            huc_level,
+            huc_header
+          )
+      } else {
+        querybase <-
+          sprintf("SELECT * FROM %s", layer_name)
+      }
+      if (!layer_name %in% terra::vector_layers(path)) {
+        stop(
+          paste0(
+            "Layer ",
+            layer_name,
+            " not found in ",
+            path
+          )
+        )
+      }
+
+      hucpoly <- try(
+        terra::vect(
+          path,
+          query = querybase,
+          extent = extent
+        )
+      )
+    }
+    return(hucpoly)
+  }
+################################################################################

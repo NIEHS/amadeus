@@ -1,3 +1,10 @@
+################################################################################
+# {amadeus} functions for US EPA Ecoregions.
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 #' Download ecoregion data
 #' @description
 #' The \code{download_ecoregion()} function accesses and downloads United
@@ -125,3 +132,73 @@ download_ecoregion <- function(
     return(invisible(NULL))
   }
 }
+
+################################################################################
+# {process} tier
+################################################################################
+#' Process ecoregion data
+#' @description
+#' The [`process_ecoregion`] function imports and cleans raw ecoregion
+#' data, returning a `SpatVector` object.
+#' @param path character(1). Path to Ecoregion Shapefiles
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param ... Placeholders.
+#' @note The function will fix Tukey's bridge in Portland, ME.
+#' This fix will ensure that the EPA air quality monitoring sites
+#' will be located within the ecoregion.
+#' @author Insang Song
+#' @return a `SpatVector` object
+#' @importFrom terra vect
+#' @importFrom sf st_read st_crs st_as_sfc st_transform st_intersects st_union
+#' @importFrom data.table year
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' ecoregion <- process_ecoregion(
+#'   path = "./data/epa_ecoregion.gpkg"
+#' )
+#' }
+#' @export
+process_ecoregion <-
+  function(
+    path = NULL,
+    extent = NULL,
+    ...
+  ) {
+    ecoreg <- sf::st_read(path)
+    # fix Tukey's bridge in Portland, ME
+    # nolint start
+    poly_tukey <-
+      "POLYGON ((-70.258 43.68, -70.2555 43.68, -70.255 43.6733, -70.2576 43.6732, -70.258 43.68))"
+    poly_tukey <- sf::st_as_sfc(poly_tukey, crs = "EPSG:4326")
+    poly_tukey <- sf::st_transform(poly_tukey, sf::st_crs(ecoreg))
+
+    # nolint end
+    ecoreg <- ecoreg[,
+      grepl(
+        "^(L2_KEY|L3_KEY|NA_L2NAME|US_L3NAME|NA_L3NAME)",
+        names(ecoreg)
+      )
+    ]
+    ecoreg_edit_idx <- sf::st_intersects(ecoreg, poly_tukey, sparse = FALSE)
+    ecoreg_edit_idx <- vapply(ecoreg_edit_idx, function(x) any(x), logical(1))
+    if (!all(ecoreg_edit_idx == 0)) {
+      ecoreg_else <- ecoreg[!ecoreg_edit_idx, ]
+      ecoreg_edit <- sf::st_union(ecoreg[ecoreg_edit_idx, ], poly_tukey)
+      ecoreg <- rbind(ecoreg_else, ecoreg_edit)
+    }
+    ecoreg$time <- paste0(
+      "1997 - ",
+      format(Sys.Date(), "%Y")
+    )
+    ecoreg <- terra::vect(ecoreg)
+    if (!is.null(extent)) {
+      ecoreg_crop <- terra::crop(ecoreg, extent)
+      return(ecoreg_crop)
+    } else {
+      return(ecoreg)
+    }
+  }
+################################################################################

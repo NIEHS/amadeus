@@ -1,3 +1,11 @@
+################################################################################
+# {amadeus} functions for Global Multi-resolution Terrain Elevation Data
+# (GMTED2010).
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 #' Download elevation data
 #' @description
 #' The \code{download_gmted()} function accesses and downloads Global
@@ -168,3 +176,173 @@ download_gmted <- function(
   }
 }
 
+################################################################################
+# {process} tier
+################################################################################
+#' Process elevation data
+#' @description
+#' The \code{process_gmted()} function imports and cleans raw elevation data,
+#' returning a single `SpatRaster` object.
+#' @param variable vector(1). Vector containing the GMTED statistic first and
+#' the resolution second. (Example: variable = c("Breakline Emphasis",
+#' "7.5 arc-seconds")).
+#' * Statistic options: "Breakline Emphasis", "Systematic Subsample",
+#'   "Median Statistic", "Minimum Statistic", "Mean Statistic",
+#'   "Maximum Statistic", "Standard Deviation Statistic"
+#' * Resolution options: "30 arc-seconds", "15 arc-seconds", "7.5 arc-seconds"
+#' @param path character(1). Directory with downloaded GMTED  "*_grd"
+#' folder containing .adf files.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param ... Placeholders.
+#' @author Mitchell Manware
+#' @note
+#' `SpatRaster` layer name indicates selected variable and resolution, and year
+#' of release (2010).
+#' @return a `SpatRaster` object
+#' @importFrom terra rast
+#' @importFrom terra varnames
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' gmted <- process_gmted(
+#'   variable = c("Breakline Emphasis", "7.5 arc-seconds"),
+#'   path = "./data/be75_grd"
+#' )
+#' }
+#' @export
+process_gmted <- function(
+  variable = NULL,
+  path = NULL,
+  extent = NULL,
+  ...
+) {
+  #### directory setup
+  path <- amadeus::download_sanitize_path(path)
+  #### check for variable
+  amadeus::check_for_null_parameters(mget(ls()))
+  #### check for length of variable
+  if (!(length(variable) == 2)) {
+    stop(
+      paste0(
+        "Please provide a vector with the statistic and resolution.\n"
+      )
+    )
+  }
+  #### identify statistic and resolution
+  statistic <- variable[1]
+  statistic_code <- amadeus::process_gmted_codes(
+    statistic,
+    statistic = TRUE,
+    invert = FALSE
+  )
+  resolution <- variable[2]
+  resolution_code <- amadeus::process_gmted_codes(
+    resolution,
+    resolution = TRUE,
+    invert = FALSE
+  )
+  message(paste0(
+    "Cleaning ",
+    statistic,
+    " data at ",
+    resolution,
+    " resolution.\n"
+  ))
+  #### identify file path
+  paths <- list.files(
+    path,
+    full.names = TRUE,
+    recursive = TRUE
+  )
+
+  #### select only the folder containing data
+  data_paths <- unique(
+    grep(
+      paste0(
+        statistic_code,
+        resolution_code,
+        "_grd",
+        collapse = "|"
+      ),
+      paths,
+      value = TRUE
+    )
+  )
+  data_path <- data_paths[grep("(_grd$|w001001.adf)", data_paths)]
+  #### import data
+  data <- terra::rast(data_path, win = extent)
+  #### layer name
+  names(data) <- paste0(
+    "elevation_",
+    gsub(
+      "_grd",
+      "",
+      names(data)
+    ),
+    "_2010"
+  )
+  #### varnames
+  terra::varnames(data) <- paste0(
+    "Elevation: ",
+    statistic,
+    " (",
+    resolution,
+    ")"
+  )
+  #### year
+  terra::metags(data) <- "year=2010"
+  #### set coordinate reference system
+  return(data)
+}
+
+################################################################################
+#' Process elevation statistic and resolution codes
+#' @description
+#' Identify the GMTED statistic and resolution based on the file path. Convert
+#' statistic and resolution to/from full string to/from statistic and
+#' resolution code.
+#' @param string character(1). File path to GMTED data file.
+#' @param statistic logical(1). Matches statistic to statistic code.
+#' @param resolution logical(1). Matches resolution to resolution code.
+#' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
+#' provides statistic or resolution code, and returns full length statistic
+#' or resolution.
+#' @keywords internal auxiliary
+#' @return character
+#' @export
+process_gmted_codes <-
+  function(
+    string,
+    statistic = FALSE,
+    resolution = FALSE,
+    invert = FALSE
+  ) {
+    statistics <- c(
+      "Breakline Emphasis",
+      "Systematic Subsample",
+      "Median Statistic",
+      "Minimum Statistic",
+      "Mean Statistic",
+      "Maximum Statistic",
+      "Standard Deviation Statistic"
+    )
+    statistic_codes <- c("be", "ds", "md", "mi", "mn", "mx", "sd")
+    statistic_codes <- cbind(statistics, statistic_codes)
+    resolutions <- c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds")
+    resolution_codes <- c("75", "15", "30")
+    resolution_codes <- cbind(resolutions, resolution_codes)
+    if (statistic == TRUE && invert == FALSE) {
+      code <- statistic_codes[statistic_codes[, 1] == string][2]
+    } else if (statistic == TRUE && invert == TRUE) {
+      code <- statistic_codes[statistic_codes[, 2] == string][1]
+    }
+    if (resolution == TRUE && invert == FALSE) {
+      code <- resolution_codes[resolution_codes[, 1] == string][2]
+    } else if (resolution == TRUE && invert == TRUE) {
+      code <- resolution_codes[resolution_codes[, 2] == string][1]
+    }
+    return(code)
+  }
+################################################################################

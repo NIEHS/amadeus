@@ -1,4 +1,11 @@
 ################################################################################
+# {amadeus} functions for Emissions Database for Global Atmospheric Research
+# (EDGAR).
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 # 2. Emissions Database for Global Atmospheric Research (EDGAR)
 # nolint start
 #' Download EDGAR Emissions Data
@@ -481,4 +488,129 @@ download_edgar <- function(
   return(amadeus::download_hash(hash, directory_to_save))
 }
 
+################################################################################
+# {process} tier
+################################################################################
+# nolint start
+#' Process EDGAR emissions data
+#' @description
+#' The \code{process_edgar()} function imports extracted EDGAR gridded emissions
+#' files and returns a single `SpatRaster` object. Raster formats supported by
+#' `terra::rast()` such as NetCDF (`.nc`, `.nc4`) and GeoTIFF (`.tif`,
+#' `.tiff`) are supported.
+#' @param path character. Directory containing extracted EDGAR raster files or
+#'   one or more file paths.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster;
+#'   if `NULL` (default), the entire raster is loaded.
+#' @param ... Placeholders.
+#' @note
+#' `process_edgar()` currently supports gridded raster outputs from
+#' `download_edgar()` such as the default `format = "nc"`. Plain-text EDGAR
+#' downloads should be re-downloaded as raster outputs before processing.
+#' @return a `SpatRaster` object
+#' @author Mariana Alifa Kassien, Insang Song
+#' @seealso [`download_edgar()`], [`calculate_edgar()`]
+#' @importFrom terra rast nlyr time
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires data that is
+#' ##       not included in the package.
+#' \dontrun{
+#' edgar <- process_edgar(
+#'   path = "./data/edgar",
+#'   extent = c(-85, -75, 33, 37)
+#' )
+#' }
+#' @export
+# nolint end
+process_edgar <- function(
+  path = NULL,
+  extent = NULL,
+  ...
+) {
+  amadeus::check_for_null_parameters(mget(ls()))
 
+  if (length(path) == 1 && dir.exists(path)) {
+    path <- list.files(
+      path = amadeus::download_sanitize_path(path),
+      recursive = TRUE,
+      full.names = TRUE
+    )
+  }
+
+  if (length(path) == 0) {
+    stop("path does not contain files.")
+  }
+
+  raster_paths <- grep(
+    "\\.(nc4?|tif|tiff|grd|img)$",
+    path,
+    ignore.case = TRUE,
+    value = TRUE
+  )
+
+  if (length(raster_paths) == 0) {
+    txt_paths <- grep("\\.txt$", path, ignore.case = TRUE, value = TRUE)
+    if (length(txt_paths) > 0) {
+      stop(
+        "process_edgar() currently supports gridded raster files only. ",
+        "Re-download EDGAR with format = \"nc\" or provide extracted raster files.\n"
+      )
+    }
+    stop("path does not contain supported EDGAR raster files.\n")
+  }
+
+  clean_name <- function(x) {
+    x <- tolower(x)
+    x <- gsub("[^a-z0-9]+", "_", x)
+    x <- gsub("^_+|_+$", "", x)
+    x
+  }
+
+  edgar_rasters <- lapply(
+    raster_paths,
+    function(pth) {
+      data <- terra::rast(pth, win = extent)
+      base_name <- clean_name(tools::file_path_sans_ext(basename(pth)))
+      layer_names <- clean_name(names(data))
+
+      if (
+        terra::nlyr(data) == 1 ||
+          any(layer_names == "") ||
+          all(grepl("^lyr_?[0-9]+$", layer_names))
+      ) {
+        names(data) <- sprintf(
+          "edgar_%s_%03d",
+          base_name,
+          seq_len(terra::nlyr(data))
+        )
+        if (terra::nlyr(data) == 1) {
+          names(data) <- paste0("edgar_", base_name)
+        }
+      } else {
+        names(data) <- paste0("edgar_", layer_names)
+      }
+
+      if (terra::nlyr(data) == 1) {
+        year_gregexpr <- gregexpr(
+          "(?<!\\d)\\d{4}(?!\\d)",
+          basename(pth),
+          perl = TRUE
+        )[[1]]
+        if (year_gregexpr[1] != -1) {
+          year_match <- regmatches(
+            basename(pth),
+            gregexpr("(?<!\\d)\\d{4}(?!\\d)", basename(pth), perl = TRUE)
+          )[[1]][1]
+          terra::time(data) <- as.Date(sprintf("%s-01-01", year_match))
+        }
+      }
+
+      data
+    }
+  )
+
+  edgar <- do.call(c, c(edgar_rasters, warn = FALSE))
+  names(edgar) <- make.unique(names(edgar), sep = "_")
+  return(edgar)
+}
+################################################################################

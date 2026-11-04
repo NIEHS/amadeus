@@ -1,4 +1,10 @@
 ################################################################################
+# {amadeus} functions for PRISM Climate Group data.
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 # 3. PRISM Climate Group Web Service
 # nolint start
 #' Download PRISM data
@@ -265,4 +271,109 @@ download_prism <- function(
   )
 }
 
+################################################################################
+# {process} tier
+################################################################################
+#' Process PRISM data
+#' @description
+#' This function imports and cleans raw PRISM data,
+#' returning a single `SpatRaster` object.
+#' @param path character giving PRISM data path
+#' Both file and directory path are acceptable.
+#' @param element character(1). PRISM element name
+#' @param time character(1). PRISM time name.
+#' Should be character in length of 2, 4, 6, or 8.
+#' "annual" is acceptable.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param ... Placeholders.
+#' @description Reads time series or 30-year normal PRISM data.
+#' @return a `SpatRaster` object with metadata of time and element.
+#' @seealso [`terra::rast`], [`terra::metags`]
+#' @author Insang Song
+#' @importFrom utils read.csv
+#' @importFrom terra rast
+#' @importFrom terra metags
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' prism <- process_prism(
+#'   path = "./data/PRISM_ppt_stable_4kmM3_202104_nc.nc",
+#'   element = "ppt",
+#'   time = "202104"
+#' )
+#' }
+#' @export
+# nolint start
+process_prism <-
+  function(
+    path = NULL,
+    element = NULL,
+    time = NULL,
+    extent = NULL,
+    ...
+  ) {
+    prism_layer_name_from_file <- function(prism_file, fallback_element) {
+      stem <- tools::file_path_sans_ext(basename(prism_file[1]))
+      stem <- gsub("^(?i)prism_", "", stem, perl = TRUE)
+      tokens <- strsplit(stem, "_", fixed = TRUE)[[1]]
+      tokens <- tokens[nzchar(tokens)]
 
+      if (length(tokens) == 0L) {
+        return(tolower(fallback_element))
+      }
+
+      gsub("[^a-z0-9_]", "", tolower(tokens[1]))
+    }
+
+    # check inputs
+    if (
+      !element %in%
+        c(
+          "ppt",
+          "tmin",
+          "tmax",
+          "tmean",
+          "tdmean",
+          "vpdmin",
+          "vpdmax",
+          "solslope",
+          "soltotal",
+          "solclear",
+          "soltrans"
+        )
+    ) {
+      stop("element is not a valid PRISM element.")
+    }
+    if (!is.character(path) || is.null(path)) {
+      stop("path is not a character.")
+    }
+    if (!nchar(time) %in% seq(2, 8, 2)) {
+      stop("time does not have valid length.")
+    }
+
+    if (dir.exists(path)) {
+      pattern <- "PRISM_%s*.*_%s_*.*(bil|nc|grib2|asc)$"
+      pattern <- sprintf(pattern, element, time)
+      prism_file <-
+        list.files(
+          path,
+          pattern = pattern,
+          full.names = TRUE
+        )
+    } else {
+      prism_file <- path
+    }
+    prism <- terra::rast(prism_file, win = extent)
+    if (terra::nlyr(prism) == 1L) {
+      names(prism) <- prism_layer_name_from_file(prism_file, element)
+    }
+    terra::metags(prism) <- c(
+      paste0("time=", time),
+      paste0("element=", element)
+    )
+    return(prism)
+  }
+# nolint end
+################################################################################

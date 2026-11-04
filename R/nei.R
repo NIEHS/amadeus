@@ -1,3 +1,10 @@
+################################################################################
+# {amadeus} functions for US EPA National Emissions Inventory (NEI).
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 #' Download road emissions data
 #' @description
 #' The \code{download_nei()} function accesses and downloads road emissions
@@ -194,3 +201,120 @@ download_nei <- function(
   }
 }
 
+################################################################################
+# {process} tier
+################################################################################
+# nolint start
+#' Process road emissions data
+#' @description
+#' The \code{process_nei()} function imports and cleans raw road emissions data,
+#' returning a single `SpatVector` object.
+#' @param path character(1). Directory with NEI csv files.
+#' @param county `SpatVector`/`sf`. County boundaries.
+#' @param year integer(1) Year to use. Currently only 2017 or 2020
+#' is accepted.
+#' @param ... Placeholders.
+#' @return a `SpatVector` object
+#' @author Insang Song
+#' @note Base files for `county` argument can be downloaded directly from
+#' [U.S. Census Bureau](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html)
+#' or by using `tigris` package. This function does not reproject census boundaries.
+#' Users should be aware of the coordinate system of census boundary data for
+#' other analyses.
+#' @description NEI data comprises multiple csv files where emissions of
+#' 50+ pollutants are recorded at county level. With raw data files,
+#' this function will join a combined table of NEI data and county
+#' boundary, then perform a spatial join to target locations.
+#' @importFrom terra vect
+#' @importFrom terra crs
+#' @importFrom methods is
+#' @importFrom data.table .SD
+#' @importFrom data.table fread
+#' @importFrom data.table rbindlist
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' nei <- process_nei(
+#'   path = "./data",
+#'   county = system.file("gpkg/nc.gpkg", package = "sf"),
+#'   year = 2017
+#' )
+#' }
+#' @export
+# nolint end
+process_nei <- function(
+  path = NULL,
+  county = NULL,
+  year = c(2017, 2020),
+  ...
+) {
+  if (is.null(county)) {
+    stop("county argument is required.")
+  }
+  if (!methods::is(county, "SpatVector")) {
+    county <- try(terra::vect(county), silent = TRUE)
+    if (inherits(county, "try-error")) {
+      stop("county is unable to be converted to SpatVector.\n")
+    }
+  }
+  if (!"GEOID" %in% names(county)) {
+    stop("county should include a field named \"GEOID\"")
+  }
+  if (!as.character(year) %in% c("2017", "2020")) {
+    stop("year should be one of 2017 or 2020.\n")
+  }
+  # Concatenate NEI csv files
+  csvs_nei <-
+    list.files(
+      path = path,
+      pattern = "*.csv$",
+      recursive = TRUE,
+      full.names = TRUE
+    )
+  csvs_nei <- grep(year, csvs_nei, value = TRUE)
+  if (is.null(csvs_nei) || length(csvs_nei) == 0) {
+    stop("No files found for the year. The file names should include the year")
+  }
+  csvs_nei <- lapply(csvs_nei, data.table::fread)
+  csvs_nei <- data.table::rbindlist(csvs_nei)
+  # column name readjustment
+  target_nm <- c("fips code", "total emissions", "emissions uom")
+  # not grep-ping at once for flexibility
+  target_cns <- sapply(target_nm, function(x) grep(x, colnames(csvs_nei)))
+  colnames(csvs_nei)[target_cns] <-
+    c("geoid", "emissions_total", "unit_measurement")
+
+  # unify unit of measurement
+  # TON here is short tonne, which is 2000 lbs.
+  csvs_nei$emissions_total_ton <-
+    ifelse(
+      csvs_nei$unit_measurement == "TON",
+      csvs_nei$emissions_total,
+      csvs_nei$emissions_total / 2000
+    )
+  emissions_total_ton <- NULL
+  geoid <- NULL
+  # yearabbr <- substr(year, 3, 4)
+  csvs_nei$geoid <- sprintf("%05d", as.integer(csvs_nei$geoid))
+  csvs_nei <-
+    csvs_nei[,
+      list(
+        TRF_NEINP_0_00000 = sum(emissions_total_ton, na.rm = TRUE)
+      ),
+      by = geoid
+    ]
+  csvs_nei$time <- as.integer(year)
+
+  # read county vector
+  county$GEOID <- sprintf("%05d", as.integer(county$GEOID))
+  csvs_nei_df <- as.data.frame(csvs_nei)
+  county_rows <- match(county$GEOID, csvs_nei_df$geoid)
+  county$time <- csvs_nei_df$time[county_rows]
+  county$TRF_NEINP_0_00000 <- csvs_nei_df$TRF_NEINP_0_00000[county_rows]
+  county$geoid <- county$GEOID
+  cnty_vect <- county[!is.na(county$TRF_NEINP_0_00000), ]
+  cnty_vect <- cnty_vect[, c("geoid", "time", "TRF_NEINP_0_00000")]
+  return(cnty_vect)
+}
+################################################################################

@@ -1,3 +1,10 @@
+################################################################################
+# {amadeus} functions for Köppen-Geiger climate classification.
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 #' Download climate classification data
 #' @description
 #' The \code{download_koppen_geiger()} function accesses and downloads
@@ -145,3 +152,49 @@ download_koppen_geiger <- function(
     return(invisible(NULL))
   }
 }
+
+################################################################################
+# {process} tier
+################################################################################
+#' Process climate classification data
+#' @description
+#' The \code{process_koppen_geiger()} function imports and cleans raw climate
+#' classification data, returning a single `SpatRaster` object.
+#' @param path character(1). Path to Koppen-Geiger
+#'  climate zone raster file
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param ... Placeholders.
+#' @return a `SpatRaster` object
+#' @author Insang Song
+#' @importFrom terra rast
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' kg <- process_koppen_geiger(
+#'   path = "./data/koppen_geiger_data.tif"
+#' )
+#' }
+#' @export
+process_koppen_geiger <-
+  function(
+    path = NULL,
+    extent = NULL,
+    ...
+  ) {
+    # import data
+    kg_rast <- terra::rast(path, win = extent)
+    # identify time period
+    period <- strsplit(
+      names(kg_rast),
+      "_"
+    )[[1]][4]
+    if (period == "present") {
+      terra::metags(kg_rast) <- "year=1980 - 2016"
+    } else {
+      terra::metags(kg_rast) <- "year=2071 - 2100"
+    }
+    return(kg_rast)
+  }
+################################################################################

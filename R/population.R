@@ -1,3 +1,10 @@
+################################################################################
+# {amadeus} functions for NASA SEDAC population density data.
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 #' Download population density data
 #' @description
 #' The \code{download_population()} function accesses and downloads
@@ -211,3 +218,126 @@ download_population <- function(
   }
 }
 
+################################################################################
+# {process} tier
+################################################################################
+# nolint start
+#' Process population density data
+#' @description
+#' The \code{process_secac_population()} function imports and cleans raw
+#' population density data, returning a single `SpatRaster` object.
+#' @param path character(1). Path to GeoTIFF (.tif) or netCDF (.nc) file.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param ... Placeholders.
+#' @author Mitchell Manware
+#' @return a `SpatRaster` object
+#' @importFrom terra rast
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' pop <- process_population(
+#'   path = "./data/sedac_population_example.tif"
+#' )
+#' }
+#' @export
+# nolint end
+process_population <- function(
+  path = NULL,
+  extent = NULL,
+  ...
+) {
+  if (substr(path, nchar(path) - 2, nchar(path)) == ".nc") {
+    message(
+      paste0(
+        "netCDF functionality for SEDAC data is under construction.\n"
+      )
+    )
+    return()
+  }
+  #### check for variable
+  amadeus::check_for_null_parameters(mget(ls()))
+  #### import data
+  data <- terra::rast(path, win = extent)
+  #### identify names
+  names_raw <- names(data)
+  #### create new names
+  for (r in seq_along(names_raw)) {
+    split1 <- strsplit(
+      names_raw[r],
+      "_rev11_",
+    )[[1]][[2]]
+    split2 <- strsplit(
+      split1,
+      "_"
+    )[[1]]
+    names(data[[r]]) <- paste0(
+      "gpw_v4_population_",
+      split2[1],
+      "_",
+      split2[2],
+      "_",
+      split2[3]
+    )
+    message(paste0(
+      "Cleaning ",
+      amadeus::process_sedac_codes(
+        paste0(
+          split2[2],
+          "_",
+          split2[3]
+        ),
+        invert = TRUE
+      ),
+      " population data for year ",
+      split2[1],
+      "...\n"
+    ))
+    #### year
+    terra::metags(data) <- paste0("year=", split2[1])
+  }
+  return(data)
+}
+
+################################################################################
+#' Process population resolution code
+#' @description
+#' Convert full length resolution name to/from resolution code.
+#' @param string character(1). Resolution name or code.
+#' @param invert logical(1). Default = FALSE. `invert = TRUE` assumes `string`
+#' provides resolution code, and returns full length resolution.
+#' @keywords internal auxiliary
+#' @return character
+#' @export
+process_sedac_codes <-
+  function(
+    string,
+    invert = FALSE
+  ) {
+    resolution_namecodes <- cbind(
+      c(
+        "60 minute",
+        "30 second",
+        "2.5 minute",
+        "15 minute",
+        "30 minute"
+      ),
+      c(
+        "1_deg",
+        "30_sec",
+        "2pt5_min",
+        "15_min",
+        "30_min"
+      )
+    )
+    if (invert == FALSE) {
+      resolution <-
+        resolution_namecodes[resolution_namecodes[, 1] == string][2]
+    } else if (invert == TRUE) {
+      resolution <-
+        resolution_namecodes[resolution_namecodes[, 2] == string][1]
+    }
+    return(resolution)
+  }
+################################################################################

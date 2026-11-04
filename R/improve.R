@@ -1,4 +1,11 @@
 ################################################################################
+# {amadeus} functions for Interagency Monitoring of Protected Visual
+# Environments (IMPROVE).
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 # nolint start
 #' Download IMPROVE aerosol monitoring data
 #' @description
@@ -173,3 +180,250 @@ download_improve <- function(
   return(invisible(download_result))
 }
 
+################################################################################
+# {process} tier
+################################################################################
+# nolint start
+#' Process IMPROVE aerosol monitoring data
+#' @description
+#' The \code{process_improve()} function reads pipe-delimited IMPROVE
+#' (Interagency Monitoring of Protected Visual Environments) measurement
+#' files downloaded by \code{download_improve()} and joins them with a site
+#' metadata table to attach geographic coordinates and auxiliary site
+#' attributes. Returns a
+#' \code{SpatVector}, \code{sf}, or \code{data.table} object.
+#' @details
+#' Three product types are supported via \code{product}:
+#' \describe{
+#'   \item{\code{"raw"}}{IMPAER speciated aerosol mass concentrations.
+#'     Key columns: \code{SiteCode}, \code{FactDate}, \code{ParamCode},
+#'     \code{FactValue}, \code{Units}.}
+#'   \item{\code{"rhr2"}}{IMPRHR2 Regional Haze Rule II light extinction
+#'     (\code{bext}, \eqn{Mm^{-1}}).}
+#'   \item{\code{"rhr3"}}{IMPRHR3 Regional Haze Rule III deciview index
+#'     (\code{dv}).}
+#' }
+#' Measurement values are \strong{not} filtered by \code{Status}; callers
+#' may apply their own validity flags (e.g., keep only \code{Status == "V0"}).
+#' @param path character(1). Directory containing downloaded IMPROVE
+#'   \code{.txt} files.
+#' @param product character(1). Product type: \code{"raw"} (default),
+#'   \code{"rhr2"}, or \code{"rhr3"}.
+#' @param date character(1 or 2). Date (\code{"YYYY-MM-DD"}) or start/end
+#'   date pair to filter measurements. Defaults to no filtering when
+#'   \code{NULL}.
+#' @param sites_file character(1) or \code{NULL}. Path to a site metadata
+#'   file. When \code{NULL} (default), the function first looks for a file
+#'   named \code{improve_sites.txt} inside \code{path}, then falls back to an
+#'   embedded IMPROVE aerosol site table included in \code{amadeus}.
+#' @param return_format character(1). Return object type: \code{"terra"},
+#'   \code{"sf"}, or \code{"data.table"}.
+#' @param extent numeric(4) or \code{NULL}. Optional crop extent
+#'   \code{c(xmin, xmax, ymin, ymax)} in WGS84 / EPSG:4326. Applied only
+#'   when \code{return_format} is \code{"terra"} or \code{"sf"}.
+#' @param ... Placeholders.
+#' @seealso \code{\link{download_improve}}
+#' @return a \code{SpatVector}, \code{sf}, or \code{data.table} object
+#'   depending on \code{return_format}.
+#' @note IMPROVE data are measured on an every-third-day sampling schedule.
+#'   Gaps between measurement dates are expected.
+#' @importFrom data.table fread rbindlist as.data.table setnames
+#' @importFrom terra vect crop ext project
+#' @importFrom sf st_as_sf
+#' @examples
+#' improve <- process_improve(
+#'   path = system.file("testdata/improve", package = "amadeus"),
+#'   product = "raw",
+#'   date = c("2022-01-01", "2022-01-31"),
+#'   return_format = "data.table"
+#' )
+#' @export
+# nolint end
+process_improve <- function(
+  path = NULL,
+  product = c("raw", "rhr2", "rhr3"),
+  date = NULL,
+  sites_file = NULL,
+  return_format = c("terra", "sf", "data.table"),
+  extent = NULL,
+  ...
+) {
+  product <- match.arg(product)
+  return_format <- match.arg(return_format)
+
+  #### Validate path
+  if (is.null(path) || !dir.exists(path)) {
+    stop("`path` must be a valid directory path.\n")
+  }
+  path <- amadeus::download_sanitize_path(path)
+
+  #### Resolve file prefix from product
+  prefix_map <- c(raw = "IMPAER", rhr2 = "IMPRHR2", rhr3 = "IMPRHR3")
+  prefix <- prefix_map[[product]]
+
+  #### Find measurement files
+  meas_files <- list.files(
+    path,
+    pattern = paste0("^", prefix, "_[0-9]{4}\\.txt$"),
+    full.names = TRUE
+  )
+  if (length(meas_files) == 0) {
+    stop(sprintf(
+      "No %s_YYYY.txt files found in '%s'.\n",
+      prefix,
+      path
+    ))
+  }
+
+  #### Read and bind measurement files
+  meas_list <- lapply(meas_files, function(f) {
+    dt <- data.table::fread(
+      f,
+      sep = "|",
+      header = TRUE,
+      showProgress = FALSE,
+      data.table = TRUE
+    )
+    dt
+  })
+  meas <- data.table::rbindlist(meas_list, fill = TRUE)
+
+  #### Standardise date column
+  data.table::set(
+    meas,
+    j = "FactDate",
+    value = as.Date(meas[["FactDate"]])
+  )
+
+  #### Filter by date if provided
+  if (!is.null(date)) {
+    date <- if (length(date) == 1) rep(date, 2) else date
+    stopifnot(length(date) == 2)
+    d_start <- as.Date(date[1])
+    d_end <- as.Date(date[2])
+    meas <- meas[
+      get("FactDate") >= d_start & get("FactDate") <= d_end,
+    ]
+    if (nrow(meas) == 0) {
+      warning(
+        "No IMPROVE measurements found for the specified date range.\n",
+        call. = FALSE
+      )
+      return(meas)
+    }
+  }
+
+  #### Resolve and read site metadata
+  if (is.null(sites_file)) {
+    candidate <- file.path(path, "improve_sites.txt")
+    if (file.exists(candidate)) {
+      sites_file <- candidate
+    }
+  }
+
+  if (!is.null(sites_file) && file.exists(sites_file)) {
+    sites <- data.table::fread(
+      sites_file,
+      sep = "|",
+      header = TRUE,
+      showProgress = FALSE,
+      data.table = TRUE
+    )
+  } else {
+    sites <- process_improve_sites_builtin() # nolint: object_usage_linter.
+  }
+
+  #### Deduplicate site table and merge all available metadata columns
+  if ("SiteCode" %in% names(sites)) {
+    sites <- data.table::as.data.table(sites)
+    if (all(c("DataEndDate", "DataStartDate") %in% names(sites))) {
+      data.table::set(
+        sites,
+        j = "DataEndDate_sort",
+        value = as.Date(sites[["DataEndDate"]], format = "%m/%d/%y")
+      )
+      data.table::set(
+        sites,
+        j = "DataStartDate_sort",
+        value = as.Date(sites[["DataStartDate"]], format = "%m/%d/%y")
+      )
+      ord <- order(
+        sites[["SiteCode"]],
+        sites[["DataEndDate_sort"]],
+        sites[["DataStartDate_sort"]],
+        decreasing = c(FALSE, TRUE, TRUE),
+        method = "radix",
+        na.last = TRUE
+      )
+      sites <- sites[ord]
+      sites <- sites[!duplicated(sites[["SiteCode"]])]
+      data.table::set(sites, j = "DataEndDate_sort", value = NULL)
+      data.table::set(sites, j = "DataStartDate_sort", value = NULL)
+    } else {
+      sites <- sites[!duplicated(sites[["SiteCode"]])]
+    }
+
+    coord_cols <- c("SiteCode", "Latitude", "Longitude")
+    coord_cols_present <- coord_cols[coord_cols %in% names(sites)]
+    if (length(coord_cols_present) < 3) {
+      warning(
+        "Sites file is missing Latitude and/or Longitude columns.\n",
+        call. = FALSE
+      )
+    } else {
+      meas <- merge(meas, sites, by = "SiteCode", all.x = TRUE)
+    }
+  }
+
+  #### Enforce numeric coordinate columns when present
+  if ("Latitude" %in% names(meas)) {
+    data.table::set(
+      meas,
+      j = "Latitude",
+      value = suppressWarnings(as.numeric(meas[["Latitude"]]))
+    )
+  }
+  if ("Longitude" %in% names(meas)) {
+    data.table::set(
+      meas,
+      j = "Longitude",
+      value = suppressWarnings(as.numeric(meas[["Longitude"]]))
+    )
+  }
+
+  #### Return early as data.table if requested or no coordinates
+  has_coords <- all(c("Latitude", "Longitude") %in% names(meas))
+  if (return_format == "data.table" || !has_coords) {
+    if (!has_coords && return_format != "data.table") {
+      warning(
+        "No site coordinates available; returning data.table.\n",
+        call. = FALSE
+      )
+    }
+    return(meas)
+  }
+
+  #### Build spatial object
+  # nolint start: object_usage_linter.
+  meas_complete <- meas[
+    !is.na(get("Latitude")) & !is.na(get("Longitude")),
+  ]
+  # nolint end
+  sv <- terra::vect(
+    meas_complete,
+    geom = c("Longitude", "Latitude"),
+    crs = "EPSG:4326"
+  )
+
+  #### Apply optional extent crop
+  if (!is.null(extent)) {
+    sv <- terra::crop(sv, terra::ext(extent))
+  }
+
+  if (return_format == "terra") {
+    return(sv)
+  } else {
+    return(sf::st_as_sf(sv))
+  }
+}
+################################################################################

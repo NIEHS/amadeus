@@ -1,3 +1,10 @@
+################################################################################
+# {amadeus} functions for National Land Cover Database (NLCD).
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 #' Download National Land Cover Database (NLCD) data
 #' @description
 #' Downloads NLCD data products from the Multi-Resolution Land Characteristics
@@ -187,3 +194,171 @@ download_nlcd <- function(
   }
 }
 
+################################################################################
+# {process} tier
+################################################################################
+#' Process land cover data
+#' @description
+#' The \code{process_nlcd()} function imports and cleans raw land cover data,
+#' returning a single `SpatRaster` object.
+#' @param path character giving nlcd data path
+#' @param year numeric giving the year of NLCD data used
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param ... Placeholders.
+#' @description Reads NLCD file of selected `year`.
+#' @return a `SpatRaster` object
+#' @author Eva Marques, Insang Song
+#' @importFrom utils read.csv
+#' @importFrom tools file_path_sans_ext
+#' @importFrom terra rast metags
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' nlcd <- process_nlcd(
+#'   path = "./data/",
+#'   year = 2021
+#' )
+#' }
+#' @export
+process_nlcd <-
+  function(
+    path = NULL,
+    year = 2021,
+    extent = NULL,
+    ...
+  ) {
+    # check inputs
+    if (!is.character(path) || is.null(path)) {
+      stop("path is not a character.")
+    }
+    if (!dir.exists(path)) {
+      stop("path does not exist.")
+    }
+    if (!is.numeric(year)) {
+      stop("year is not a numeric.")
+    }
+    product_codes <- c(
+      "LndCov",
+      "LndChg",
+      "LndCnf",
+      "FctImp",
+      "ImpDsc",
+      "SpcChg"
+    )
+    # open nlcd file corresponding to the year
+    # Try new naming convention (with recursive search for subdirectories)
+    nlcd_file <-
+      list.files(
+        path,
+        pattern = paste0(
+          "Annual_NLCD_(",
+          paste(product_codes, collapse = "|"),
+          ")_",
+          year,
+          "_.*\\.(tif|img)$"
+        ),
+        full.names = TRUE,
+        recursive = TRUE, # ADD THIS - files may be in subdirectories
+        ignore.case = TRUE # ADD THIS - for robustness
+      )
+
+    if (length(nlcd_file) == 0) {
+      message("No NLCD files detected. Trying deprecated file names...")
+      nlcd_file <-
+        list.files(
+          path,
+          pattern = paste0("nlcd_", year, "_.*\\.(tif|img)$"),
+          full.names = TRUE,
+          recursive = TRUE, # ADD THIS
+          ignore.case = TRUE # ADD THIS
+        )
+      if (length(nlcd_file) > 0) {
+        # FIXED: was > 1, should be > 0
+        message(
+          paste0(
+            "Deprecated file paths detected. Data still imported, but ",
+            "see https://www.mrlc.gov/data/project/annual-nlcd for updated ",
+            "NLCD documentation and availability."
+          )
+        )
+      }
+    }
+
+    # check if name without extension is duplicated
+    nlcd_file_base <- basename(nlcd_file)
+    nlcd_file_base <- tools::file_path_sans_ext(nlcd_file_base)
+    if (any(duplicated(nlcd_file_base))) {
+      stop("Duplicated NLCD files are detected. Please remove duplicates.")
+    }
+    if (length(nlcd_file) == 0) {
+      stop("NLCD data not available for this year.")
+    }
+
+    # NLCD C1V1 bug
+    # `.aux.xml` metadata file was causing `NA` values to be read as `NaN`,
+    # corrupting the factor/integer data values when used downstream.
+    # File is hidden with preceding `._` for retention but exclusion in
+    # metadata definitions.
+    chr_aux_xml_path <- list.files(
+      path,
+      pattern = paste0(
+        "Annual_NLCD_(",
+        paste(product_codes, collapse = "|"),
+        ")_",
+        year,
+        "_.*\\.aux\\.xml$" # FIXED: escaped the dot before xml
+      ),
+      full.names = FALSE,
+      recursive = TRUE, # ADD THIS
+      ignore.case = TRUE # ADD THIS
+    )
+
+    if (length(chr_aux_xml_path) > 0) {
+      # FIXED: handle multiple files
+      for (aux_file in chr_aux_xml_path) {
+        chr_aux_xml_hide <- file.path(
+          dirname(file.path(path, aux_file)),
+          paste0("._", basename(aux_file))
+        )
+        chr_aux_xml_full <- file.path(path, aux_file)
+
+        if (file.exists(chr_aux_xml_full) && !file.exists(chr_aux_xml_hide)) {
+          message(paste0(
+            "Hiding corrupt ",
+            basename(aux_file),
+            " metadata file."
+          ))
+          file.rename(chr_aux_xml_full, chr_aux_xml_hide)
+        }
+      }
+    }
+
+    nlcd <- terra::rast(nlcd_file, win = extent)
+    nlcd_product <- unique(unlist(lapply(
+      nlcd_file_base,
+      function(x) {
+        product_code <- regmatches(
+          x,
+          regexpr(
+            paste(product_codes, collapse = "|"),
+            x,
+            ignore.case = TRUE
+          )
+        )
+        product_codes[match(tolower(product_code), tolower(product_codes))]
+      }
+    )))
+    nlcd_product <- nlcd_product[!is.na(nlcd_product)]
+    nlcd_metadata <- paste0("Year=", year)
+    if (length(nlcd_product) == 1L) {
+      nlcd_metadata <- c(
+        nlcd_metadata,
+        paste0("Product=", nlcd_product)
+      )
+    }
+    terra::metags(nlcd) <- nlcd_metadata
+    return(nlcd)
+  }
+################################################################################

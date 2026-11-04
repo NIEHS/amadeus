@@ -1,4 +1,10 @@
-###############################################################################
+################################################################################
+# {amadeus} functions for USDA CropScape Cropland Data Layer.
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 # 4. USDA Cropscape
 # nolint start
 #' Download CropScape data
@@ -153,3 +159,61 @@ download_cropscape <- function(
 }
 # nolint end
 
+################################################################################
+# {process} tier
+################################################################################
+#' Process CropScape data
+#' @description
+#' This function imports and cleans raw CropScape data,
+#' returning a single `SpatRaster` object.
+#' @param path character giving CropScape data path
+#' @param year numeric giving the year of CropScape data used
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param ... Placeholders.
+#' @description Reads CropScape file of selected `year`.
+#' @return a `SpatRaster` object
+#' @author Insang Song
+#' @importFrom utils read.csv
+#' @importFrom terra rast
+#' @importFrom terra metags
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' cropscape <- process_cropscape(
+#'   path = "./data/cropscape_example.tif",
+#'   year = 2020
+#' )
+#' }
+#' @export
+process_cropscape <-
+  function(
+    path = NULL,
+    year = 2021,
+    extent = NULL,
+    ...
+  ) {
+    # check inputs
+    if (!is.character(path) || is.null(path)) {
+      stop("path is not a character.")
+    }
+    if (!is.numeric(year)) {
+      stop("year is not a numeric.")
+    }
+    # open cdl file corresponding to the year
+    if (dir.exists(path)) {
+      cdl_file <-
+        list.files(
+          path,
+          pattern = paste0("cdl_30m_*.*", year, "_*.*.tif$"),
+          full.names = TRUE
+        )
+    } else {
+      cdl_file <- path
+    }
+    cdl <- terra::rast(cdl_file, win = extent)
+    terra::metags(cdl) <- paste0("year=", year)
+    return(cdl)
+  }
+################################################################################

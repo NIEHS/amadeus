@@ -1,3 +1,10 @@
+################################################################################
+# {amadeus} functions for NOAA North American Regional Reanalysis (NARR).
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 #' Download meteorological data
 #' @description
 #' The \code{download_narr} function accesses and downloads daily meteorological
@@ -295,6 +302,7 @@ download_narr <- function(
   }
 }
 
+################################################################################
 #' Sort NOAA NARR variables
 #' @description
 #' Determine whether a NOAA NARR variable selected for download is a
@@ -412,3 +420,261 @@ narr_variable <- function(variable) {
   return(list(base, months))
 }
 
+################################################################################
+# {process} tier
+################################################################################
+# nolint start
+#' Process meteorological data
+#' @description
+#' The \code{process_narr()} function imports and cleans raw meteorological
+#' data, returning a single `SpatRaster` object.
+#' @param date character(1 or 2). Date (1) or start and end dates (2).
+#' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
+#' @param variable character(1). Variable name acronym. See [List of Variables in NARR Files](https://ftp.cpc.ncep.noaa.gov/NARR/fixed/merged_land_AWIP32corrected.pdf)
+#' for variable names and acronym codes.
+#' @param path character(1). Directory with downloaded netCDF (.nc) files.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param ... Placeholders.
+#' @note
+#' Layer names of the returned `SpatRaster` object contain the variable acronym,
+#' pressure level, and date.
+#' @author Mitchell Manware
+#' @return a `SpatRaster` object
+#' @importFrom terra rast
+#' @importFrom terra time
+#' @importFrom terra subset
+#' @importFrom stringi stri_pad
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' process_narr(
+#'   date = c("2018-01-01", "2018-01-10"),
+#'   variable = "weasd",
+#'   path = "./tests/testdata/narr/weasd"
+#' )
+#' }
+#' @export
+# nolint end
+process_narr <- function(
+  date = "2023-09-01",
+  variable = NULL,
+  path = NULL,
+  extent = NULL,
+  ...
+) {
+  #### directory setup
+  path <- amadeus::download_sanitize_path(path)
+  #### check for variable
+  amadeus::check_for_null_parameters(mget(ls()))
+  #### check dates
+  date <- if (length(date) == 1) rep(date, 2) else date
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
+  #### identify file paths
+  data_paths <- list.files(
+    path,
+    pattern = variable,
+    recursive = TRUE,
+    full.names = TRUE
+  )
+  data_paths <- grep(
+    sprintf("%s*.*.nc", variable),
+    data_paths,
+    value = TRUE
+  )
+  #### define date sequence
+  date_sequence <- amadeus::generate_date_sequence(
+    date[1],
+    date[2],
+    sub_hyphen = TRUE
+  )
+  #### path ncar
+  path_ncar <- nchar(
+    strsplit(
+      data_paths[1],
+      paste0(
+        variable,
+        "."
+      )
+    )[[1]][3]
+  )
+  if (path_ncar == 9) {
+    #### define year-months of interest
+    ym_of_interest <- unique(
+      substr(
+        date_sequence,
+        1,
+        6
+      )
+    )
+  } else if (path_ncar == 7) {
+    #### define years of interest
+    ym_of_interest <- unique(
+      substr(
+        date_sequence,
+        1,
+        4
+      )
+    )
+  }
+  #### subset file paths to only dates of interest
+  data_paths_ym <- unique(
+    grep(
+      paste(
+        ym_of_interest,
+        collapse = "|"
+      ),
+      data_paths,
+      value = TRUE
+    )
+  )
+  #### initiate for loop
+  data_full <- terra::rast()
+  for (p in seq_along(data_paths_ym)) {
+    #### import data
+    data_year <- terra::rast(data_paths_ym[p], win = extent)
+    #### check for mono or pressure levels
+    if (grepl("level", names(data_year)[1])) {
+      #### pressure levels data
+      message(paste0("Detected pressure levels data...\n"))
+      message(paste0(
+        "Cleaning ",
+        variable,
+        " data for ",
+        month.name[
+          as.numeric(
+            substr(
+              gsub(
+                "-",
+                "",
+                terra::time(data_year)[1]
+              ),
+              5,
+              6
+            )
+          )
+        ],
+        ", ",
+        substr(
+          gsub(
+            "-",
+            "",
+            terra::time(data_year)[1]
+          ),
+          1,
+          4
+        ),
+        "...\n"
+      ))
+      days <- sapply(
+        strsplit(
+          names(data_year),
+          "_"
+        ),
+        function(x) x[3]
+      )
+      terra::time(data_year) <- as.Date(
+        paste0(
+          substr(
+            terra::time(data_year),
+            1,
+            4
+          ),
+          substr(
+            gsub(
+              "-",
+              "",
+              terra::time(data_year)
+            ),
+            5,
+            6
+          ),
+          days
+        ),
+        format = "%Y%m%d"
+      )
+      names(data_year) <- paste0(
+        variable,
+        "_",
+        sapply(
+          strsplit(
+            names(data_year),
+            "_"
+          ),
+          function(x) x[2]
+        ),
+        "_",
+        gsub(
+          "-",
+          "",
+          terra::time(data_year)
+        )
+      )
+    } else {
+      #### mono level data
+      message(paste0("Detected monolevel data...\n"))
+      message(paste0(
+        "Cleaning ",
+        variable,
+        " data for ",
+        substr(
+          gsub(
+            "-",
+            "",
+            terra::time(data_year)[1]
+          ),
+          1,
+          4
+        ),
+        "...\n"
+      ))
+
+      names(data_year) <- paste0(
+        variable,
+        "_",
+        gsub(
+          "-",
+          "",
+          terra::time(data_year)
+        )
+      )
+    }
+    data_full <- c(
+      data_full,
+      data_year,
+      warn = FALSE
+    )
+  }
+  #### subset years to dates of interest
+  data_return <- terra::subset(
+    data_full,
+    which(
+      substr(
+        names(data_full),
+        nchar(names(data_full)) - 7,
+        nchar(names(data_full))
+      ) %in%
+        date_sequence
+    )
+  )
+  message(paste0(
+    "Returning daily ",
+    variable,
+    " data from ",
+    as.Date(
+      date_sequence[1],
+      format = "%Y%m%d"
+    ),
+    " to ",
+    as.Date(
+      date_sequence[length(date_sequence)],
+      format = "%Y%m%d"
+    ),
+    ".\n"
+  ))
+  #### return SpatRaster
+  return(data_return)
+}
+################################################################################

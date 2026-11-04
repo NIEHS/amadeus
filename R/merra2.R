@@ -1,3 +1,11 @@
+################################################################################
+# {amadeus} functions for Modern-Era Retrospective Analysis for Research and
+# Applications (MERRA-2).
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 # nolint start
 #' Download meteorological and atmospheric data
 #' @description
@@ -442,3 +450,453 @@ download_merra2 <- function(
   }
 }
 
+################################################################################
+# {process} tier
+################################################################################
+#' Process meteorological and atmospheric data
+#' @description
+#' The \code{process_merra2()} function imports and cleans raw atmospheric,
+#' meteorological, and MERRA2-based Fire Weather Index data, returning a single
+#' `SpatRaster` object.
+#' @param date character(1 or 2). Date (1) or start and end dates (2).
+#' Format YYYY-MM-DD (ex. September 1, 2023 = "2023-09-01").
+#' @param variable character(1). MERRA2 variable name(s). For daily corrected
+#'   Fire Weather Index files (`collection = "fwi"` during download), use one
+#'   of `"DC"`, `"DMC"`, `"FFMC"`, `"ISI"`, `"BUI"`, or `"FWI"` (or the full raw
+#'   layer name).
+#' @param path character(1). Directory with downloaded netCDF (`.nc4` or `.nc`)
+#'   files.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param daily_agg logical(1). If `TRUE`, aggregate sub-daily layers to daily
+#'   values using `fun`. Default `FALSE` preserves the original sub-daily
+#'   output. Aggregation groups layers by variable/level and date. Silently
+#'   ignored for FWI collections, which are already daily.
+#' @param fun character(1). Aggregation function passed to [terra::tapp()]
+#'   (e.g. `"mean"`, `"max"`, `"min"`, `"sum"`). Ignored when
+#'   `daily_agg = FALSE`.
+#' @param ... Placeholders.
+#' @note
+#' Layer names of the returned `SpatRaster` object contain the variable,
+#' pressure level, date, and hour for standard MERRA-2 collections when
+#' `daily_agg = FALSE` (default). When `daily_agg = TRUE`, layer names contain
+#' the variable, pressure level, and date only, and `terra::time()` is set to
+#' midnight UTC of each date. For daily Fire Weather Index files, layer names
+#' contain the variable and date only regardless of `daily_agg`.
+#' Pressure level values utilized for layer names are taken directly from raw
+#' data and are not edited to retain pressure level information.
+#' @author Mitchell Manware
+#' @return a `SpatRaster` object;
+#' @importFrom terra rast
+#' @importFrom terra tapp
+#' @importFrom terra time
+#' @importFrom terra names
+#' @importFrom terra crs
+#' @importFrom terra subset
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' merra2 <- process_merra2(
+#'   date = c("2024-01-01", "2024-01-10"),
+#'   variable = "CPT",
+#'   path = "./data/inst1_2d_int_Nx"
+#' )
+#' ## daily mean CPT
+#' merra2_daily <- process_merra2(
+#'   date = c("2024-01-01", "2024-01-10"),
+#'   variable = "CPT",
+#'   path = "./data/inst1_2d_int_Nx",
+#'   daily_agg = TRUE,
+#'   fun = "mean"
+#' )
+#' }
+#' @export
+process_merra2 <-
+  function(
+    date = c("2018-01-01", "2018-01-10"),
+    variable = NULL,
+    path = NULL,
+    extent = NULL,
+    daily_agg = FALSE,
+    fun = "mean",
+    ...
+  ) {
+    #### directory setup
+    path <- amadeus::download_sanitize_path(path)
+    #### check for variable
+    amadeus::check_for_null_parameters(mget(ls()))
+    #### check dates
+    date <- if (length(date) == 1) rep(date, 2) else date
+    stopifnot(length(date) == 2)
+    date <- date[order(as.Date(date))]
+    #### identify file paths
+    paths <- list.files(
+      path,
+      pattern = "MERRA2_400|^FWI\\.",
+      full.names = TRUE
+    )
+    paths <- paths[grep(
+      "\\.nc4?$",
+      paths
+    )]
+    #### identify dates based on user input
+    dates_of_interest <- amadeus::generate_date_sequence(
+      date[1],
+      date[2],
+      sub_hyphen = TRUE
+    )
+    #### subset file paths to only dates of interest
+    data_paths <- unique(
+      grep(
+        paste(
+          dates_of_interest,
+          collapse = "|"
+        ),
+        paths,
+        value = TRUE
+      )
+    )
+    if (length(data_paths) == 0) {
+      stop("No MERRA2 files matching the requested date were found.\n")
+    }
+    #### identify collection
+    collection <- amadeus::process_collection(
+      data_paths[1],
+      source = "merra2",
+      collection = TRUE
+    )
+    message(
+      paste0(
+        "Identified collection ",
+        collection,
+        ".\n"
+      )
+    )
+    #### initiate for loop
+    data_list <- vector("list", length(data_paths))
+    for (p in seq_along(data_paths)) {
+      #### import .nc4 data
+      data_raw <- terra::rast(data_paths[p], win = extent)
+      data_date <- amadeus::process_collection(
+        data_paths[p],
+        source = "merra2",
+        date = TRUE
+      )
+      message(
+        paste0(
+          "Cleaning ",
+          variable,
+          " data for ",
+          as.Date(
+            data_date,
+            format = "%Y%m%d"
+          ),
+          "...\n"
+        )
+      )
+      #### subset to user-selected variable
+      data_variable_index <- grep(
+        variable,
+        names(data_raw),
+        fixed = TRUE
+      )
+      if (length(data_variable_index) == 0) {
+        data_variable_index <- grep(
+          variable,
+          names(data_raw)
+        )
+      }
+      if (length(data_variable_index) == 0) {
+        stop(
+          paste0(
+            "Requested variable ",
+            variable,
+            " was not found in ",
+            basename(data_paths[p]),
+            ".\n"
+          )
+        )
+      }
+      data_variable <- terra::subset(
+        data_raw,
+        subset = data_variable_index
+      )
+      if (collection == "fwi") {
+        #### set layer names for daily GlobalFWI files
+        names(data_variable) <- paste0(
+          gsub("_", ".", names(data_variable)),
+          "_",
+          data_date
+        )
+        #### set layer times
+        terra::time(data_variable) <- ISOdatetime(
+          year = substr(data_date, 1, 4),
+          month = substr(data_date, 5, 6),
+          day = substr(data_date, 7, 8),
+          hour = 0,
+          min = 0,
+          sec = 0,
+          tz = "UTC"
+        )
+      } else {
+        #### identify time step
+        times <- amadeus::process_merra2_time(
+          collection = collection,
+          from = data_variable
+        )
+        #### identify unique pressure levels
+        levels <-
+          unique(
+            grep(
+              "lev=",
+              unlist(
+                strsplit(names(data_variable), "_")
+              ),
+              value = TRUE
+            )
+          )
+        #### empty `levels` if 2 dimensional data
+        if (length(levels) == 0) {
+          levels <- ""
+        }
+        #### merge levels and times
+        leveltimes <- merge(levels, times)
+        #### set layer names
+        names(data_variable) <- gsub(
+          "__",
+          "_",
+          paste0(
+            variable,
+            "_",
+            leveltimes[, 1],
+            "_",
+            data_date,
+            "_",
+            leveltimes[, 2]
+          )
+        )
+        #### set layer times
+        terra::time(data_variable) <- ISOdatetime(
+          year = substr(data_date, 1, 4),
+          month = substr(data_date, 5, 6),
+          day = substr(data_date, 7, 8),
+          hour = substr(leveltimes[, 2], 1, 2),
+          min = substr(leveltimes[, 2], 3, 4),
+          sec = substr(leveltimes[, 2], 5, 6),
+          tz = "UTC"
+        )
+      }
+      #### store for one-shot stack creation
+      data_list[[p]] <- data_variable
+    }
+    #### combine all layers in one call
+    data_return <- terra::rast(data_list)
+    if (collection == "fwi") {
+      terra::crs(data_return) <- "EPSG:4326"
+    } else {
+      terra::crs(data_return) <- "EPSG:4267"
+    }
+    #### optional daily aggregation (not applicable to already-daily FWI)
+    if (isTRUE(daily_agg) && collection != "fwi") {
+      t <- terra::time(data_return)
+      if (!anyNA(t) && length(t) == terra::nlyr(data_return)) {
+        date_str <- format(as.Date(t), "%Y%m%d")
+      } else {
+        # nocov start
+        date_str <- regmatches(
+          names(data_return),
+          regexpr(
+            "(?<![0-9])[0-9]{8}(?![0-9])",
+            names(data_return),
+            perl = TRUE
+          )
+        )
+        if (length(date_str) != terra::nlyr(data_return)) {
+          stop("daily_agg: cannot determine dates from layer times or names.\n")
+        }
+      } # nocov end
+      var_prefix <- sub("_[0-9]{8}.*$", "", names(data_return))
+      tapp_index <- paste(var_prefix, date_str, sep = "_")
+      saved_crs <- terra::crs(data_return)
+      if (length(unique(tapp_index)) == 1L) {
+        out_name <- unique(tapp_index)
+        data_return <- terra::app(data_return, fun = fun, na.rm = TRUE)
+        names(data_return) <- out_name
+      } else {
+        data_return <- terra::tapp(
+          data_return,
+          tapp_index,
+          fun = fun,
+          na.rm = TRUE
+        )
+      }
+      terra::crs(data_return) <- saved_crs
+      out_dates <- regmatches(
+        names(data_return),
+        regexpr("[0-9]{8}$", names(data_return))
+      )
+      terra::time(data_return) <- as.POSIXct(
+        paste0(out_dates, " 00:00:00"),
+        format = "%Y%m%d %H:%M:%S",
+        tz = "UTC"
+      )
+    }
+    message(paste0(
+      "Returning ",
+      ifelse(
+        collection == "fwi" || isTRUE(daily_agg),
+        "daily ",
+        "hourly "
+      ),
+      variable,
+      " data from ",
+      as.Date(
+        dates_of_interest[1],
+        format = "%Y%m%d"
+      ),
+      " to ",
+      as.Date(
+        dates_of_interest[length(dates_of_interest)],
+        format = "%Y%m%d"
+      ),
+      ".\n"
+    ))
+    #### return SpatRaster
+    return(data_return)
+  }
+
+################################################################################
+#' Process MERRA2 time steps
+#' @description
+#' Identify the time step of data observations based on MERRA2 collection and
+#' filter to time values in `from`.
+#' @param collection character(1). MERRA2 collection name.
+#' @param from SpatRaster(1). Object to extract time values from.
+#' @importFrom stringi stri_pad
+#' @keywords internal auxiliary
+#' @return character
+#' @export
+process_merra2_time <-
+  function(collection, from) {
+    split <- unlist(strsplit(collection, "_"))
+    code <- split[1]
+    if (code == "inst1") {
+      step <- seq(from = 0, to = 2300, by = 100)
+    } else if (code == "inst3") {
+      step <- seq(from = 0, to = 2100, by = 300)
+    } else if (code == "inst6") {
+      step <- seq(from = 0, to = 1800, by = 600)
+    } else if (code == "statD") {
+      step <- 1200
+    } else if (code == "tavg1") {
+      step <- seq(from = 0030, to = 2330, by = 100)
+    } else if (code == "tavg3") {
+      step <- seq(from = 0130, to = 2330, by = 300)
+    } else if (collection == "fwi") {
+      step <- 0000
+    }
+    pad_l <- stringi::stri_pad(step, side = "left", width = 4, pad = 0)
+    pad_r <- stringi::stri_pad(pad_l, side = "right", width = 6, pad = 0)
+    time_f <- gsub(
+      " ",
+      "",
+      gsub(
+        "-",
+        "",
+        gsub(
+          ":",
+          "",
+          terra::time(from)
+        )
+      )
+    )
+    for (f in seq_along(time_f)) {
+      if (nchar(time_f[f]) == 8) {
+        time_f[f] <- paste0(time_f[f], "000000")
+      }
+    }
+    time_return <- pad_r[
+      pad_r %in% unique(substr(time_f, 9, 14))
+    ]
+    return(time_return)
+  }
+
+################################################################################
+#' Get MERRA2 variable lookup information
+#' @description
+#' Returns a lookup table of available MERRA2 collection and variable selectors
+#' from locally downloaded MERRA2 netCDF files. This helper inspects layer
+#' metadata only and does not read raster values into memory.
+#' @param path character(1+) Path(s) to MERRA2 file(s) and/or directory(ies)
+#'   containing MERRA2 `.nc4` files (and optional FWI `.nc` files).
+#' @param include_file logical(1). If `TRUE`, include a `file` column showing
+#'   the source file for each collection-variable row. Default `FALSE`.
+#' @param ... Placeholders.
+#' @return a `data.frame` with MERRA2 collection and variable selectors.
+#' @author Kyle Messier
+#' @examples
+#' \dontrun{
+#' get_merra2_info(path = "./data/merra2")
+#' get_merra2_info(path = "./data/merra2", include_file = TRUE)
+#' }
+#' @importFrom terra rast
+#' @export
+get_merra2_info <- function(
+  path = NULL,
+  include_file = FALSE,
+  ...
+) {
+  if (
+    !is.logical(include_file) ||
+      length(include_file) != 1L ||
+      is.na(include_file)
+  ) {
+    stop("`include_file` must be a single logical value (TRUE/FALSE).\n")
+  }
+  files <- info_resolve_paths(
+    path = path,
+    pattern = "(MERRA2_400\\..*\\.nc4$|FWI\\..*\\.nc$)",
+    source_name = "MERRA2 netCDF"
+  )
+
+  out_rows <- lapply(files, function(f) {
+    data_raw <- terra::rast(f)
+    collection <- unique(amadeus::process_collection(
+      f,
+      source = "merra2",
+      collection = TRUE
+    ))
+    vars <- info_normalize_layer_variables(names(data_raw))
+    if (length(collection) == 1L && collection == "fwi") {
+      vars <- sub("^MERRA2\\.CORRECTED_", "", vars)
+    }
+    vars <- sort(unique(vars[nzchar(vars)]))
+    if (length(vars) == 0L || length(collection) == 0L) {
+      return(NULL)
+    }
+    data.frame(
+      collection = rep(collection[1], length(vars)),
+      variable = vars,
+      file = rep(f, length(vars)),
+      stringsAsFactors = FALSE
+    )
+  })
+  out <- data.table::rbindlist(out_rows, fill = TRUE)
+  out <- as.data.frame(out, stringsAsFactors = FALSE)
+  if (nrow(out) == 0L) {
+    stop(
+      "No MERRA2 collection-variable metadata could be derived from `path`.\n"
+    )
+  }
+  if (!isTRUE(include_file)) {
+    out <- unique(out[, c("collection", "variable"), drop = FALSE])
+    out <- out[order(out$collection, out$variable), , drop = FALSE]
+  } else {
+    out <- unique(out[, c("collection", "variable", "file"), drop = FALSE])
+    out <- out[order(out$collection, out$variable, out$file), , drop = FALSE]
+  }
+  rownames(out) <- NULL
+  out
+}
+################################################################################

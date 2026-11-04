@@ -1,4 +1,10 @@
 ################################################################################
+# {amadeus} functions for NOAA GOES Aerosol Detection Product (ADP).
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 # nolint start
 #' Download NOAA GOES ADP data
 #' @description
@@ -228,3 +234,328 @@ download_goes <- function(
   }
 }
 
+################################################################################
+# {process} tier
+################################################################################
+# nolint start
+#' Process NOAA GOES ADP data
+#' @description
+#' The \code{process_goes()} function imports and cleans NOAA GOES-16/18
+#' Aerosol Detection Product (ADP) NetCDF files downloaded by
+#' \code{download_goes()}, returning a single \code{SpatRaster} object with
+#' CRS \code{EPSG:4326}.
+#' @param date character(1 or 2). Date (YYYY-MM-DD) or start and end dates.
+#' @param variable character(1). Variable name to extract: \code{"Smoke"}
+#'   or \code{"Dust"}.
+#' @param path character(1+). Directory with downloaded GOES ADP NetCDF files
+#'   or a vector of full NetCDF file paths.
+#' @param extent numeric(4) or SpatExtent. Crop extent
+#'   (\code{xmin, xmax, ymin, ymax} in EPSG:4326). Default \code{NULL} loads
+#'   the full raster.
+#' @param daily_agg logical(1). If `TRUE`, aggregate sub-daily layers to daily
+#'   values using `fun`. Default `FALSE` preserves original sub-daily layers.
+#' @param fun character(1). Aggregation function passed to [terra::tapp()]
+#'   (e.g. `"mean"` or `"sum"`). Ignored when `daily_agg = FALSE`.
+#' @param ... Placeholders.
+#' @note
+#' \itemize{
+#'   \item Layer names follow the convention
+#'     \code{{variable}_{YYYYMMDD}_{HHMMSS}} when `daily_agg = FALSE`, e.g.
+#'     \code{"Smoke_20240101_000000"}. With `daily_agg = TRUE`, layer names
+#'     contain \code{{variable}_{YYYYMMDD}} and `terra::time()` is set to
+#'     midnight UTC.
+#'   \item \code{terra::time()} is set to POSIXct UTC for each layer.
+#'   \item Files with GOES geostationary projection are reprojected to
+#'     EPSG:4326.
+#' }
+#' @author Mitchell Manware
+#' @return a \code{SpatRaster} object
+#' @importFrom terra rast
+#' @importFrom terra crs
+#' @importFrom terra project
+#' @importFrom terra crop
+#' @importFrom terra subset
+#' @importFrom terra time
+#' @importFrom terra nlyr
+#' @importFrom terra tapp
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires downloaded
+#' ##       data files.
+#' \dontrun{
+#' goes <- process_goes(
+#'   date = c("2024-01-01", "2024-01-01"),
+#'   variable = "Smoke",
+#'   path = "./data/goes/"
+#' )
+#' goes_daily <- process_goes(
+#'   date = c("2024-01-01", "2024-01-01"),
+#'   variable = "Smoke",
+#'   path = "./data/goes/",
+#'   daily_agg = TRUE,
+#'   fun = "mean"
+#' )
+#' }
+#' @export
+# nolint end
+process_goes <- function(
+  date = c("2024-01-01", "2024-01-01"),
+  variable = NULL,
+  path = NULL,
+  extent = NULL,
+  daily_agg = FALSE,
+  fun = "mean",
+  ...
+) {
+  #### resolve file paths from directory or explicit vector
+  if (length(path) == 1 && dir.exists(path)) {
+    path <- amadeus::download_sanitize_path(path)
+    paths <- list.files(
+      path,
+      pattern = "^OR_(ADP|ABI-L2-ADP)",
+      full.names = TRUE,
+      recursive = TRUE
+    )
+  } else {
+    paths <- path
+  }
+  #### check for variable
+  amadeus::check_for_null_parameters(mget(ls()))
+  #### check dates
+  date <- if (length(date) == 1) rep(date, 2) else date
+  stopifnot(length(date) == 2)
+  date <- date[order(as.Date(date))]
+  #### identify file paths matching GOES ADP naming convention
+  paths <- paths[grepl("^OR_(ADP|ABI-L2-ADP).*\\.nc$", basename(paths))]
+  if (length(paths) == 0) {
+    stop(
+      paste0(
+        "No GOES ADP NetCDF files found in `path`.\n",
+        "When `path` is a directory, files must match ",
+        "'^OR_(ADP|ABI-L2-ADP).*\\.nc$'.\n",
+        "When `path` is a vector, provide full paths to matching GOES ADP ",
+        "NetCDF files.\n"
+      )
+    )
+  }
+  if (!all(file.exists(paths))) {
+    missing_paths <- paths[!file.exists(paths)]
+    stop(
+      paste0(
+        "Some GOES paths do not exist:\n",
+        paste0("  - ", missing_paths, collapse = "\n"),
+        "\nFiles must match pattern '^OR_(ADP|ABI-L2-ADP).*\\.nc$'.\n"
+      )
+    )
+  }
+  #### parse start datetime from each filename and filter to date range
+  date_from <- as.Date(date[1])
+  date_to <- as.Date(date[2])
+  file_dates <- vapply(
+    paths,
+    function(p) {
+      tryCatch(
+        {
+          as.Date(goes_parse_start_datetime(p))
+        },
+        error = function(e) {
+          as.Date(NA)
+        }
+      )
+    },
+    FUN.VALUE = as.Date(NA)
+  )
+  mask <- !is.na(file_dates) &
+    file_dates >= date_from &
+    file_dates <= date_to
+  data_paths <- paths[mask]
+  data_paths <- data_paths[order(file_dates[mask], data_paths)]
+  if (length(data_paths) == 0) {
+    stop(paste0(
+      "No GOES ADP files matching the requested date range were found.\n",
+      "Date range: ",
+      date[1],
+      " to ",
+      date[2],
+      "\n"
+    ))
+  }
+  #### vectorized fast path for homogeneous GOES granules
+  data_first <- terra::rast(data_paths[1])
+  var_idx <- grep(
+    paste0("^", variable, "$"),
+    names(data_first)
+  )
+  if (length(var_idx) == 0) {
+    var_idx <- grep(variable, names(data_first))
+  }
+  if (length(var_idx) == 0) {
+    stop(paste0(
+      "Requested variable '",
+      variable,
+      "' was not found in ",
+      basename(data_paths[1]),
+      ".\n"
+    ))
+  }
+  dt_chr <- vapply(
+    data_paths,
+    function(p) format(goes_parse_start_datetime(p), "%Y-%m-%d %H:%M:%S"),
+    character(1)
+  )
+  dt_vec <- as.POSIXct(dt_chr, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
+  message(paste0(
+    "Cleaning ",
+    variable,
+    " data for ",
+    length(data_paths),
+    " GOES files...\n"
+  ))
+  data_raw <- terra::rast(data_paths)
+  n_files <- length(data_paths)
+  n_total_layers <- terra::nlyr(data_raw)
+  if (n_total_layers %% n_files != 0) {
+    stop(
+      paste0(
+        "GOES files are not structurally homogeneous; ",
+        "unable to map layers to files.\n"
+      )
+    )
+  }
+  layers_per_file <- n_total_layers / n_files
+  if (max(var_idx) > layers_per_file) {
+    stop(
+      paste0(
+        "GOES variable layer index exceeds per-file layer count; ",
+        "files appear inconsistent.\n"
+      )
+    )
+  }
+  selected_idx <- unlist(lapply(
+    seq_len(n_files),
+    function(i) var_idx + (i - 1) * layers_per_file
+  ))
+  data_return <- terra::subset(data_raw, subset = selected_idx)
+  #### reproject to EPSG:4326 if file uses geostationary projection
+  crs_proj <- terra::crs(data_return, proj = TRUE)
+  if (!is.na(crs_proj) && grepl("\\+proj=geos", crs_proj)) {
+    # nocov start
+    data_return <- terra::project(data_return, "EPSG:4326")
+  } else if (is.na(terra::crs(data_return)) || terra::crs(data_return) == "") {
+    terra::crs(data_return) <- "EPSG:4326"
+  } # nocov end
+  #### crop to extent (applied after reprojection)
+  if (!is.null(extent)) {
+    data_return <- terra::crop(data_return, extent)
+  }
+  #### set layer name: {variable}_{YYYYMMDD}_{HHMMSS}
+  dt_layer <- rep(dt_vec, each = length(var_idx))
+  names(data_return) <- paste0(
+    variable,
+    "_",
+    format(dt_layer, "%Y%m%d"),
+    "_",
+    format(dt_layer, "%H%M%S")
+  )
+  #### set time
+  terra::time(data_return) <- dt_layer
+  #### ensure EPSG:4326
+  terra::crs(data_return) <- "EPSG:4326"
+  #### optional daily aggregation
+  if (isTRUE(daily_agg)) {
+    t <- terra::time(data_return)
+    if (!anyNA(t) && length(t) == terra::nlyr(data_return)) {
+      date_str <- format(as.Date(t), "%Y%m%d")
+    } else {
+      # nocov start
+      date_str <- regmatches(
+        names(data_return),
+        regexpr(
+          "(?<![0-9])[0-9]{8}(?![0-9])",
+          names(data_return),
+          perl = TRUE
+        )
+      )
+      if (length(date_str) != terra::nlyr(data_return)) {
+        stop("daily_agg: cannot determine dates from layer times or names.\n")
+      }
+    } # nocov end
+    var_prefix <- sub("_[0-9]{8}_[0-9]{6}$", "", names(data_return))
+    tapp_index <- paste(var_prefix, date_str, sep = "_")
+    saved_crs <- terra::crs(data_return)
+    if (length(unique(tapp_index)) == 1L) {
+      out_name <- unique(tapp_index)
+      data_return <- terra::app(data_return, fun = fun, na.rm = TRUE)
+      names(data_return) <- out_name
+    } else {
+      data_return <- terra::tapp(
+        data_return,
+        tapp_index,
+        fun = fun,
+        na.rm = TRUE
+      )
+    }
+    terra::crs(data_return) <- saved_crs
+    out_dates <- regmatches(
+      names(data_return),
+      regexpr("[0-9]{8}$", names(data_return))
+    )
+    terra::time(data_return) <- as.POSIXct(
+      paste0(out_dates, " 00:00:00"),
+      format = "%Y%m%d %H:%M:%S",
+      tz = "UTC"
+    )
+  }
+  message(paste0(
+    "Returning ",
+    ifelse(isTRUE(daily_agg), "daily ", "sub-daily "),
+    variable,
+    " data from ",
+    date[1],
+    " to ",
+    date[2],
+    ".\n"
+  ))
+  return(data_return)
+}
+
+################################################################################
+#' Parse GOES start datetime from filename
+#' @description
+#' Extracts the scan start datetime from a GOES-R series ADP filename.
+#' The start timestamp field uses the format \code{sYYYYDDDHHMMSSf}
+#' where \code{DDD} is the day of year (1--366).
+#' @param path character(1). Full or base file path.
+#' @return POSIXct scalar (UTC).
+#' @keywords internal auxiliary
+#' @export
+goes_parse_start_datetime <- function(path) {
+  fname <- basename(path)
+  m <- regmatches(fname, regexpr("_s([0-9]{14})_", fname))
+  if (length(m) == 0 || nchar(m) < 16) {
+    stop(paste0(
+      "Cannot parse GOES start datetime from filename: ",
+      fname,
+      "\n"
+    ))
+  }
+  ts <- substr(m, 3, 16)
+  year <- as.integer(substr(ts, 1, 4))
+  doy <- as.integer(substr(ts, 5, 7))
+  hour <- as.integer(substr(ts, 8, 9))
+  min <- as.integer(substr(ts, 10, 11))
+  sec <- as.integer(substr(ts, 12, 13))
+  base_date <- as.Date(
+    paste0(year, sprintf("%03d", doy)),
+    format = "%Y%j"
+  )
+  ISOdatetime(
+    year = year,
+    month = as.integer(format(base_date, "%m")),
+    day = as.integer(format(base_date, "%d")),
+    hour = hour,
+    min = min,
+    sec = sec,
+    tz = "UTC"
+  )
+}
+################################################################################

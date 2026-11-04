@@ -1,3 +1,10 @@
+################################################################################
+# {amadeus} functions for Global Roads Open Access Data Set (gROADS).
+################################################################################
+
+################################################################################
+# {download} tier
+################################################################################
 #' Download roads data
 #' @description
 #' The \code{download_groads()} function accesses and downloads
@@ -183,3 +190,66 @@ download_groads <- function(
   }
 }
 
+################################################################################
+# {process} tier
+################################################################################
+# nolint start
+#' Process roads data
+#' @description
+#' The \code{process_groads()} function imports and cleans raw road data,
+#' returning a single `SpatVector` object.
+#' @param path character(1). Path to geodatabase or shapefiles.
+#' @param extent numeric(4) or SpatExtent giving the extent of the raster
+#'   if `NULL` (default), the entire raster is loaded
+#' @param ... Placeholders.
+#' @note U.S. context. The returned `SpatVector` object contains a
+#' `$description` column to represent the temporal range covered by the
+#' dataset. For more information, see <https://data.nasa.gov/dataset/global-roads-open-access-data-set-version-1-groadsv1>.
+#' @author Insang Song
+#' @return a `SpatVector` object
+#' @importFrom terra vect
+#' @examples
+#' ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
+#' ##       amount of data which is not included in the package.
+#' \dontrun{
+#' groads <- process_groads(
+#'   path = "./data/groads_example.shp"
+#' )
+#' }
+#' @export
+# nolint end
+process_groads <- function(
+  path = NULL,
+  extent = NULL,
+  ...
+) {
+  #### check for variable
+  amadeus::check_for_null_parameters(mget(ls()))
+  if (!is.character(path) || length(path) != 1 || is.na(path)) {
+    stop(
+      "`path` must be a single file path to a .shp or .gdb roads file."
+    )
+  }
+  if (!file.exists(path)) {
+    stop(
+      sprintf(
+        "`path` does not exist: %s",
+        path
+      )
+    )
+  }
+  if (!grepl("\\.(shp|gdb)$", tolower(path))) {
+    stop(
+      paste0(
+        "`path` must point to a .shp or .gdb file. Received: ",
+        path
+      )
+    )
+  }
+  #### import data
+  data <- terra::vect(path, extent = extent)
+  #### time period
+  data$description <- "1980 - 2010"
+  return(data)
+}
+################################################################################
