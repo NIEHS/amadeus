@@ -40,6 +40,8 @@ The coordinate system should be WGS84 (EPSG:4326).}
 \item{resolution_temporal}{character(1). Daily or hourly data, must match
 \code{resolution_temporal} argument passed to \code{amadeus::download_aqs}}
 
+\item{tz}{character(1). "local" or "gmt" for time zone associated with hourly data.}
+
 \item{...}{Placeholders.}
 }
 \value{

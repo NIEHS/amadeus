@@ -312,6 +312,7 @@ download_normalize_aqs_unzip <- function(
 #' @param return_format character(1). `"terra"` or `"sf"` or `"data.table"`.
 #' @param resolution_temporal character(1). Daily or hourly data, must match
 #' `resolution_temporal` argument passed to `amadeus::download_aqs`
+#' @param tz character(1). "local" or "gmt" for time zone associated with hourly data.
 #' @param extent numeric(4). Spatial extent of the resulting object.
 #'   The order should be `c(xmin, xmax, ymin, ymax)`.
 #'   The coordinate system should be WGS84 (EPSG:4326).
