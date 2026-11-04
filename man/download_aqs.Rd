@@ -8,7 +8,6 @@ download_aqs(
   parameter_code = 88101,
   resolution_temporal = "daily",
   year = c(2018, 2022),
-  url_aqs_download = "https://aqs.epa.gov/aqsweb/airdata/",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -25,11 +24,9 @@ download_aqs(
 \item{parameter_code}{integer(1). EPA pollutant parameter code. See
 Details for a short list of common codes.}
 
-\item{resolution_temporal}{character(1). Currently only "daily" is supported.}
+\item{resolution_temporal}{character(1). "daily" or "hourly".}
 
 \item{year}{integer(1 or 2). Year or start/end years for downloading data.}
-
-\item{url_aqs_download}{character(1). URL to the AQS pre-generated datasets.}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
