@@ -723,7 +723,7 @@ testthat::test_that("download_population ASCII format year branch", {
     result <- suppressWarnings(
       suppressMessages(
         download_population(
-          year = 2020,
+          year = "2020",
           data_format = "ASCII",
           data_resolution = "60 minute",
           directory_to_save = ".",
@@ -817,7 +817,7 @@ testthat::test_that("download_population netCDF format branch", {
     result <- suppressWarnings(
       suppressMessages(
         download_population(
-          year = 2020,
+          year = "2020",
           data_format = "netCDF",
           data_resolution = "60 minute",
           directory_to_save = ".",
@@ -828,7 +828,7 @@ testthat::test_that("download_population netCDF format branch", {
         )
       )
     )
-    testthat::expect_null(result)
+    testthat::expect_type(result, "list")
   })
 })
 
@@ -879,7 +879,7 @@ testthat::test_that("download_population file already exists path", {
     withCallingHandlers(
       suppressWarnings(
         download_population(
-          year = 2020,
+          year = "2020",
           data_format = "GeoTIFF",
           data_resolution = "60 minute",
           directory_to_save = ".",
@@ -894,7 +894,7 @@ testthat::test_that("download_population file already exists path", {
         invokeRestart("muffleMessage")
       }
     )
-    testthat::expect_true(any(grepl("already exists", msgs)))
+    testthat::expect_true(any(grepl("already exist", msgs)))
   })
 })
 
@@ -907,7 +907,7 @@ testthat::test_that("download_population download=FALSE deprecated warning", {
     testthat::expect_warning(
       suppressMessages(
         download_population(
-          year = 2020,
+          year = "2020",
           data_format = "GeoTIFF",
           data_resolution = "60 minute",
           directory_to_save = ".",
@@ -934,7 +934,7 @@ testthat::test_that("download_population remove_command deprecated warning", {
     testthat::expect_warning(
       suppressMessages(
         download_population(
-          year = 2020,
+          year = "2020",
           data_format = "GeoTIFF",
           data_resolution = "60 minute",
           directory_to_save = ".",

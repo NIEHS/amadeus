@@ -13,10 +13,12 @@
 #' access method.
 #' @param data_resolution character(1). Available resolutions.
 #' @param data_format character(1). "ASCII", "GeoTIFF", or "netCDF".
-#' @param year character(1). Available years or "all".
+#' @param year character(1). One of "2000", "2005", "2010", "2015",
+#'   or "2020"; use "all" for all available years.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
+#'   Set to FALSE to skip downloading and return the planned file list.
 #' @param remove_command logical(1). Deprecated, ignored.
 #' @param unzip logical(1). Unzip zip files (default TRUE).
 #' @param remove_zip logical(1). Remove zip files after unzipping (default
@@ -29,7 +31,19 @@
 #' If NULL (default), reads from the \code{NASA_EARTHDATA_TOKEN} environment
 #' variable via \code{get_token()}.
 #' @author Mitchell Manware, Insang Song
-#' @return invisible list with download results; or hash character if hash=TRUE
+#' @return
+#' When `download = TRUE` and `hash = FALSE`, an invisible list containing
+#' `success`, `failed`, and `skipped` file counts. If the requested archive
+#' already exists and is nonempty, no file is downloaded; the returned list
+#' contains `success = 0`, `failed = 0`, and `skipped = 1`. When a download is
+#' attempted, the list also contains `failed_urls` and `failed_files` character
+#' vectors, empty if the download succeeded.
+#'
+#' When `download = FALSE`, an invisible list containing `urls`, `destfiles`,
+#' and `n_files = 1` is returned without downloading, regardless of `hash`.
+#'
+#' When `download = TRUE` and `hash = TRUE`, a character(1) combined MD5 hash
+#' of the files in the `data_files` directory is returned instead of a list.
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_ciesin2017gpwv4}{amadeus}
@@ -63,159 +77,148 @@ download_population <- function(
   rate_limit = 2,
   nasa_earth_data_token = NULL
 ) {
-  #### Retrieve NASA EarthData token
-  nasa_earth_data_token <- amadeus::get_token(
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  amadeus:::download_check(
+    dataset_name = "groads",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip,
+    remove_zip = remove_zip,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  checkmate::assert_choice(
+    data_resolution,
+    c(
+      "60 minute",
+      "30 second",
+      "2.5 minute",
+      "15 minute",
+      "30 minute"
+    )
+  )
+  checkmate::assert_choice(data_format, c("GeoTIFF", "ASCII", "netCDF"))
+  checkmate::assert_choice(
+    year,
+    c("2000", "2005", "2010", "2015", "2020", "all")
+  )
+  # ----------------------------------------------------------------------------
+  # Check NASA EarthData token.
+  chr_nasatoken <- amadeus::get_token(
     token = nasa_earth_data_token,
     env_var = "NASA_EARTHDATA_TOKEN"
   )
-
-  #### Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### Check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### Directory setup
-  directory_original <- amadeus::download_sanitize_path(directory_to_save)
-  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
-  directory_to_download <- directories[1]
-  directory_to_save <- directories[2]
-
-  #### Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.\n",
-      call. = FALSE
-    )
-  }
-
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### Define URL base
-  base <- paste0(
-    paste0(
-      "https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/",
-      "sedac-root/downloads/data/gpw-v4/"
-    )
+  checkmate::assert_string(chr_nasatoken, min.chars = 1L)
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_directories <- amadeus::download_setup_dir(
+    amadeus::download_sanitize_path(directory_to_save),
+    zip = TRUE
   )
-
-  #### Define year
-  year <- ifelse(year == "all", "totpop", as.character(year))
-
-  #### Define data resolution
-  resolution <- amadeus::process_sedac_codes(data_resolution)
-
-  #### 30 second resolution not available for all years
-  if (year == "totpop" && resolution == "30_sec") {
-    resolution <- "2pt5_min"
+  chr_dir_to_download <- chr_directories[1]
+  chr_dir_to_save <- chr_directories[2]
+  # ----------------------------------------------------------------------------
+  # Define year.
+  chr_year <- ifelse(year == "all", "totpop", as.character(year))
+  # ----------------------------------------------------------------------------
+  # Query resolution code.
+  chr_resolution <- amadeus::process_sedac_codes(data_resolution)
+  # ----------------------------------------------------------------------------
+  # Fallback for total population and 30-second resolution mismatch.
+  if (chr_year == "totpop" && chr_resolution == "30_sec") {
+    chr_resolution <- "2pt5_min"
     message(paste0(
       "30 second resolution not available for all years. Returning",
       " highest (2.5 minute) resolution.\n"
     ))
   }
-
-  data_format <- match.arg(data_format)
-
-  #### Define data format
+  # ----------------------------------------------------------------------------
+  # Define data format.
   if (data_format == "GeoTIFF") {
-    if (year != "totpop") {
-      format <- "tif"
+    if (chr_year != "totpop") {
+      chr_format <- "tif"
     } else {
-      format <- "nc"
+      chr_format <- "nc"
       message(paste0(
         "Data for all years is only available in netCDF format. ",
         "Data will be downloaded as netCDF.\n"
       ))
     }
   } else if (data_format == "ASCII") {
-    if (year != "totpop") {
-      format <- "asc"
+    if (chr_year != "totpop") {
+      chr_format <- "asc"
     } else {
-      format <- "nc"
+      chr_format <- "nc"
       message(paste0(
         "Data for all years is only available in netCDF format. ",
         "Data will be downloaded as netCDF.\n"
       ))
     }
   } else if (data_format == "netCDF") {
-    format <- "nc"
+    chr_format <- "nc"
   }
-
-  #### Build download URL
-  download_url <- paste0(
-    base,
+  # ----------------------------------------------------------------------------
+  # Generate download URL.
+  chr_url <- paste0(
+    paste0(
+      "https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/",
+      "sedac-root/downloads/data/gpw-v4/"
+    ),
     "gpw-v4-population-density-adjusted-to-2015-unwpp-",
     "country-totals-rev11/",
     "gpw-v4-population-density-adjusted-to-2015-unwpp-",
     "country-totals-rev11_",
-    year,
+    chr_year,
     "_",
-    resolution,
+    chr_resolution,
     "_",
-    format,
+    chr_format,
     ".zip"
   )
-
-  #### Build download file name
-  download_name <- paste0(
-    directory_to_download,
+  # ----------------------------------------------------------------------------
+  # Generate download file names.
+  chr_filename <- paste0(
+    chr_dir_to_download,
     "gpw_v4_population_density_adjusted_to_2015_unwpp_",
     "country_totals_rev11_",
-    year,
+    chr_year,
     "_",
-    resolution,
+    chr_resolution,
     "_",
-    format,
+    chr_format,
     ".zip"
   )
-
-  #### Exit early if download=FALSE
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message("Skipping download.\n")
-    return(invisible(list(
-      urls = download_url,
-      destfiles = download_name,
-      n_files = 1
-    )))
+    return(invisible(amadeus::download_preview(chr_url, chr_filename)))
   }
-
-  #### Download file using httr2
-  if (amadeus::check_destfile(download_name)) {
-    amadeus::download_run_method(
-      urls = download_url,
-      destfiles = download_name,
-      token = nasa_earth_data_token,
-      show_progress = show_progress,
-      max_tries = max_tries,
-      rate_limit = rate_limit
-    )
-  } else {
-    message("File already exists. Skipping download.\n")
-  }
-
-  #### Unzip
+  # ----------------------------------------------------------------------------
+  # Run download.
+  download_result <- amadeus::download_run_method(
+    urls = chr_url,
+    destfiles = chr_filename,
+    token = chr_nasatoken,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+  # ----------------------------------------------------------------------------
+  # Unzip downloaded .zip files and remove if requested.
   amadeus::download_unzip(
-    file_name = download_name,
-    directory_to_unzip = directory_to_save,
-    unzip = unzip
+    file_name = chr_filename,
+    directory_to_unzip = chr_dir_to_save,
+    unzip = unzip,
+    remove = remove_zip
   )
-
-  #### Remove zip files
-  amadeus::download_remove_zips(
-    remove = remove_zip,
-    download_name = download_name
-  )
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(NULL))
-  }
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
