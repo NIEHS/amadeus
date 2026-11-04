@@ -631,6 +631,44 @@ check_urls <- function(
 }
 
 ################################################################################
+#' Preview planned downloads
+#' @description
+#' Print a message reporting the number of planned downloads and return their
+#' URLs and destination paths without downloading files.
+#' @param urls character vector. Planned download URLs.
+#' @param destfiles character vector. Corresponding destination file paths,
+#'   in the same order and of the same length as `urls`.
+#' @details
+#' The file count is based on the supplied URLs; remote availability and
+#' existing local files are not checked. The calling download function handles
+#' the `download = FALSE` condition and exits using
+#' `return(invisible(download_preview(urls, destfiles)))`.
+#' @return A list, returned visibly, containing:
+#' * `urls`: the supplied download URLs.
+#' * `destfiles`: the supplied destination file paths.
+#' * `n_files`: the number of supplied URLs, calculated as `length(urls)`.
+#' @author Mitchell Manware
+#' @seealso [download_run_method()]
+#' @keywords internal
+#' @examples
+#' download_preview(
+#'   urls = "https://example.com/data.zip",
+#'   destfiles = file.path(tempdir(), "data.zip")
+#' )
+#' @export
+download_preview <- function(urls, destfiles) {
+  message(sprintf(
+    "Skipping download. Found %d files available for download.\n",
+    length(urls)
+  ))
+  list(
+    urls = urls,
+    destfiles = destfiles,
+    n_files = length(urls)
+  )
+}
+
+################################################################################
 #' Download files using httr2
 #' @description
 #' Execute downloads using httr2 with robust retry logic and rate limiting.

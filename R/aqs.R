@@ -145,15 +145,7 @@ download_aqs <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message(sprintf(
-      "Skipping download. Found %d files available for download.\n",
-      length(chr_urls)
-    ))
-    return(invisible(list(
-      urls = chr_urls,
-      destfiles = chr_filenames,
-      n_files = length(chr_urls)
-    )))
+    return(invisible(amadeus::download_preview(chr_urls, chr_filenames)))
   }
   # ----------------------------------------------------------------------------
   # Run download.

@@ -152,12 +152,7 @@ download_gmted <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message("Skipping download.\n")
-    return(invisible(list(
-      urls = chr_url,
-      destfiles = chr_filename,
-      n_files = 1
-    )))
+    return(invisible(amadeus::download_preview(chr_url, chr_filename)))
   }
   # ----------------------------------------------------------------------------
   # Run download.

@@ -98,15 +98,7 @@ download_ecoregion <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message(sprintf(
-      "Skipping download. Found %d files available for download.\n",
-      length(chr_url)
-    ))
-    return(invisible(list(
-      urls = chr_url,
-      destfiles = chr_filename,
-      n_files = length(chr_url)
-    )))
+    return(invisible(amadeus::download_preview(chr_url, chr_filename)))
   }
   # ----------------------------------------------------------------------------
   # Run download.

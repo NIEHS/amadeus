@@ -157,12 +157,7 @@ download_nlcd <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message("Skipping download.\n")
-    return(invisible(list(
-      urls = chr_urls,
-      destfiles = chr_filenames,
-      n_files = 1
-    )))
+    return(invisible(amadeus::download_preview(chr_urls, chr_filenames)))
   }
   # ----------------------------------------------------------------------------
   # Run download.
