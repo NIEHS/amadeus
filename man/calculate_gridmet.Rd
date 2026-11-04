@@ -62,7 +62,8 @@ standalone drought source aliases continue to select their separate products.
 GRIDMET SPEI rasters from \code{process_gridmet()} use the same extraction
 workflow as other GRIDMET covariates. Accumulation codes are retained in
 output column names (e.g., spei30d), and native five-day observation dates
-are preserved when \code{.by_time = NULL}; no daily interpolation is performed.
+are preserved when \code{.by_time = NULL}; no daily interpolation is
+performed.
 }
 \examples{
 ## NOTE: Example is wrapped in `\dontrun{}` as function requires a large
