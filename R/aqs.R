@@ -25,9 +25,8 @@
 #'
 #' This list is not exhaustive; for the full official table, see the linked EPA
 #' AQS parameter code table.
-#' @param parameter_code numeric(1) or character(1). EPA parameter code as a
-#'   positive integer-valued number or non-empty string. Character codes are
-#'   used unchanged. See Details for a short list of common pollutant codes.
+#' @param parameter_code integer(1). EPA pollutant parameter code. See
+#'   Details for a short list of common codes.
 #' @param resolution_temporal character(1). "daily" or "hourly".
 #' @param year integer(1 or 2). Year or start/end years for downloading data.
 #' @param directory_to_save character(1). Directory to save data.
@@ -91,12 +90,7 @@ download_aqs <- function(
     rate_limit = rate_limit,
     hash = hash
   )
-  checkmate::assert(
-    checkmate::check_int(parameter_code, lower = 1L),
-    checkmate::check_string(parameter_code, min.chars = 1L),
-    combine = "or",
-    .var.name = "parameter_code"
-  )
+  checkmate::assert_int(parameter_code, lower = 1L)
   checkmate::assert_choice(resolution_temporal, c("daily", "hourly"))
   # ----------------------------------------------------------------------------
   # Check `years` and generate sequence.
@@ -213,8 +207,8 @@ download_aqs <- function(
 #' @param directory_to_unzip character(1). Directory where files were unzipped.
 #' @param resolution_temporal character(1). Temporal resolution used in the
 #'   AQS archive name.
-#' @param parameter_code numeric(1) or character(1). AQS parameter code used in
-#'   the archive name.
+#' @param parameter_code integer(1). AQS parameter code used in the archive
+#'   name.
 #' @param year integer(1). Year represented by the archive.
 #' @return NULL; normalizes the AQS data file layout in place
 #' @keywords internal
