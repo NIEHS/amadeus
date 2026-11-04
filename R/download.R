@@ -887,30 +887,46 @@ format_file_size <- function(bytes) {
 #' @param directory_to_unzip character(1). Directory to extract
 #' data
 #' @param unzip logical(1). Extract (\code{TRUE}) or not.
+#' @param remove logical(1). Confirm removal. Default is FALSE.
 #' @return NULL; extracts downloaded archive files
 #' @keywords internal
 #' @export
-download_unzip <-
-  function(file_name, directory_to_unzip, unzip = TRUE) {
-    if (!unzip) {
-      message(paste0("Downloaded files will not be unzipped.\n"))
-      return(NULL)
-    }
-    ext <- tolower(tools::file_ext(file_name))
-    message(paste0("Unzipping files...\n"))
-    if (ext == "zip") {
-      unzip(file_name, exdir = directory_to_unzip)
-    } else if (ext == "7z") {
-      archive::archive_extract(file_name, dir = directory_to_unzip)
-    } else {
-      stop("Unsupported archive format. Expected .zip or .7z.")
-    }
-    message(paste0(
-      "Files unzipped and saved in ",
-      directory_to_unzip,
-      ".\n"
-    ))
+download_unzip <- function(
+  file_name,
+  directory_to_unzip,
+  unzip = TRUE,
+  remove = FALSE
+) {
+  # ----------------------------------------------------------------------------
+  # Return NULL if `unzip = FALSE`
+  if (!unzip) {
+    message(paste0("Downloaded files will not be unzipped.\n"))
+    return(NULL)
   }
+  # ----------------------------------------------------------------------------
+  # Unzip according to compression type.
+  ext <- tolower(tools::file_ext(file_name))
+  message(paste0("Unzipping files...\n"))
+  if (ext == "zip") {
+    unzip(file_name, exdir = directory_to_unzip)
+  } else if (ext == "7z") {
+    archive::archive_extract(file_name, dir = directory_to_unzip)
+  } else {
+    stop("Unsupported archive format. Expected .zip or .7z.")
+  }
+  # ----------------------------------------------------------------------------
+  message(paste0(
+    "Files unzipped and saved in ",
+    directory_to_unzip,
+    ".\n"
+  ))
+  # ----------------------------------------------------------------------------
+  # Remove zip files if `remove = TRUE`
+  amadeus::download_remove_zips(
+    remove = remove,
+    download_name = file_name
+  )
+}
 
 ################################################################################
 #' Remove zip files
@@ -926,18 +942,20 @@ download_unzip <-
 #' @return NULL; removes downloaded zip files after they are unzipped
 #' @keywords internal
 #' @export
-download_remove_zips <-
-  function(remove = FALSE, download_name) {
-    #### remove zip files
-    if (remove) {
-      message(paste0("Removing download files...\n"))
-      file.remove(download_name)
-      # oftentimes zipfiles are stored in zip_files under
-      # directory_to_save in download functions.
-      unlink(dirname(download_name), recursive = TRUE)
-      message(paste0("Download files removed.\n"))
-    }
+download_remove_zips <- function(
+  remove = FALSE,
+  download_name
+) {
+  #### remove zip files
+  if (remove) {
+    message(paste0("Removing download files...\n"))
+    file.remove(download_name)
+    # oftentimes zipfiles are stored in zip_files under
+    # directory_to_save in download functions.
+    unlink(dirname(download_name), recursive = TRUE)
+    message(paste0("Download files removed.\n"))
   }
+}
 
 ################################################################################
 #' Create hash of downloaded files.

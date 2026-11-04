@@ -4,7 +4,7 @@
 \alias{download_unzip}
 \title{Extract downloaded archives}
 \usage{
-download_unzip(file_name, directory_to_unzip, unzip = TRUE)
+download_unzip(file_name, directory_to_unzip, unzip = TRUE, remove = FALSE)
 }
 \arguments{
 \item{file_name}{character(1). Full archive file path}
@@ -13,6 +13,8 @@ download_unzip(file_name, directory_to_unzip, unzip = TRUE)
 data}
 
 \item{unzip}{logical(1). Extract (\code{TRUE}) or not.}
+
+\item{remove}{logical(1). Confirm removal. Default is FALSE.}
 }
 \value{
 NULL; extracts downloaded archive files
