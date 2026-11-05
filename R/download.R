@@ -226,7 +226,8 @@ sequence_years <- function(year) {
   checkmate::assert_integerish(
     int_years,
     len = 2L,
-    lower = 0,
+    lower = 1900,
+    upper = as.integer(format(Sys.Date(), "%Y")),
     any.missing = FALSE
   )
   # ----------------------------------------------------------------------------
@@ -265,27 +266,35 @@ download_sanitize_path <-
   }
 
 ################################################################################
-#' Setup directory
+#' Set up download directories
 #' @description
-#' Create \code{directory} if it does not already exist.
-#' @param directory character(1) directory path
-#' @param zip logical(1). Should sub-directories be created for zip files and
-#' data files? If `TRUE`, a vector of sub-directoy names will be returned.
-#' @description If directory does not exist, the directory
-#' will be created.
-#' @return NULL; if `zip = TRUE` a vector of directories for zip files and
-#' data files
+#' Create missing download directories, including parent directories, and
+#' return their paths with trailing forward slashes.
+#' @param directory character(1). Directory path for downloads.
+#' @param zip logical(1). If `TRUE`, also create `zip_files` and `data_files`
+#' subdirectories within `directory`. Default is `FALSE`.
+#' @return If `zip = FALSE`, a character scalar containing `directory` with
+#' a trailing forward slash. If `zip = TRUE`, a character vector containing
+#' the paths to `zip_files` and `data_files`, in that order, each with a
+#' trailing forward slash. Paths are returned whether the directories
+#' already existed or were newly created.
+#' @seealso [download_sanitize_path()]
+#' @examples
+#' directory <- file.path(tempdir(), "amadeus_downloads")
+#' download_setup_dir(directory)
+#' download_setup_dir(directory, zip = TRUE)
 #' @keywords internal
 #' @export
 download_setup_dir <-
   function(directory, zip = FALSE) {
-    if (!dir.exists(directory)) {
-      dir.create(directory, recursive = TRUE)
+    chr_dir_sanitized <- amadeus::download_sanitize_path(directory)
+    if (!dir.exists(chr_dir_sanitized)) {
+      dir.create(chr_dir_sanitized, recursive = TRUE)
     }
     if (zip) {
       directory_zip <- amadeus::download_sanitize_path(
         paste0(
-          amadeus::download_sanitize_path(directory),
+          chr_dir_sanitized,
           "zip_files"
         )
       )
@@ -294,7 +303,7 @@ download_setup_dir <-
       }
       directory_data <- amadeus::download_sanitize_path(
         paste0(
-          amadeus::download_sanitize_path(directory),
+          chr_dir_sanitized,
           "data_files"
         )
       )
@@ -302,6 +311,8 @@ download_setup_dir <-
         dir.create(directory_data, recursive = TRUE)
       }
       return(c(directory_zip, directory_data))
+    } else {
+      chr_dir_sanitized
     }
   }
 

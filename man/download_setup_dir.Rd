@@ -2,24 +2,33 @@
 % Please edit documentation in R/download.R
 \name{download_setup_dir}
 \alias{download_setup_dir}
-\title{Setup directory}
+\title{Set up download directories}
 \usage{
 download_setup_dir(directory, zip = FALSE)
 }
 \arguments{
-\item{directory}{character(1) directory path}
+\item{directory}{character(1). Directory path for downloads.}
 
-\item{zip}{logical(1). Should sub-directories be created for zip files and
-data files? If \code{TRUE}, a vector of sub-directoy names will be returned.}
+\item{zip}{logical(1). If \code{TRUE}, also create \code{zip_files} and \code{data_files}
+subdirectories within \code{directory}. Default is \code{FALSE}.}
 }
 \value{
-NULL; if \code{zip = TRUE} a vector of directories for zip files and
-data files
+If \code{zip = FALSE}, a character scalar containing \code{directory} with
+a trailing forward slash. If \code{zip = TRUE}, a character vector containing
+the paths to \code{zip_files} and \code{data_files}, in that order, each with a
+trailing forward slash. Paths are returned whether the directories
+already existed or were newly created.
 }
 \description{
-Create \code{directory} if it does not already exist.
-
-If directory does not exist, the directory
-will be created.
+Create missing download directories, including parent directories, and
+return their paths with trailing forward slashes.
+}
+\examples{
+directory <- file.path(tempdir(), "amadeus_downloads")
+download_setup_dir(directory)
+download_setup_dir(directory, zip = TRUE)
+}
+\seealso{
+\code{\link[=download_sanitize_path]{download_sanitize_path()}}
 }
 \keyword{internal}
