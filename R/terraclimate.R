@@ -48,131 +48,80 @@ download_terraclimate <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### Check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### Check years
-  year <- if (length(year) == 1) rep(year, 2) else year
-  stopifnot(length(year) == 2)
-  year <- year[order(year)]
-
-  #### Directory setup
-  amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-
-  #### Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return",
-      " after discovering files.\n",
-      call. = FALSE
-    )
-  }
-
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### Define years sequence
-  if (any(nchar(year[1]) != 4, nchar(year[2]) != 4)) {
-    stop("years should be 4-digit integers.\n")
-  }
-  years <- seq(year[1], year[2], 1)
-
-  #### Define variables
-  variables_list <- amadeus::process_variable_codes(
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  amadeus:::download_check(
+    dataset_name = "terraclimate",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = FALSE,
+    remove_zip = FALSE,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  checkmate::expect_character(variables, min.char = 1L)
+  # ----------------------------------------------------------------------------
+  # Check `years` and generate sequence.
+  int_years <- amadeus:::sequence_years(year)
+  # ----------------------------------------------------------------------------
+  # Generate saving directory.
+  chr_dir_to_save <- amadeus::download_setup_dir(directory_to_save)
+  # ----------------------------------------------------------------------------
+  # Switch variables names to codes.
+  chr_variables <- amadeus::process_variable_codes(
     variables = variables,
     source = "terraclimate"
   )
-
-  #### Define URL base
-  base <- paste0(
-    "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/",
-    "TerraClimate_"
+  # ----------------------------------------------------------------------------
+  # Apply URL formula for all variables.
+  df_download <- expand.grid(
+    base = paste0(
+      "https://climate.northwestknowledge.net/TERRACLIMATE-DATA/",
+      "TerraClimate_"
+    ),
+    variable = chr_variables,
+    years = int_years,
+    dir = chr_dir_to_save
   )
-
-  #### Collect all URLs and destination files
-  all_urls <- character()
-  all_destfiles <- character()
-
-  for (v in seq_along(variables_list)) {
-    variable <- variables_list[v]
-    folder <- paste0(directory_to_save, variable, "/")
-
-    if (!dir.exists(folder)) {
-      dir.create(folder, recursive = TRUE)
-    }
-
-    for (y in seq_along(years)) {
-      year_l <- years[y]
-      url <- paste0(base, variable, "_", year_l, ".nc")
-
-      # Validate first URL only
-      if (v == 1 && y == 1) {
-        if (!amadeus::check_url_status(url)) {
-          warning(
-            paste0(
-              "Preflight URL check failed; attempting direct download ",
-              "for year validation.\n"
-            ),
-            call. = FALSE
-          )
-        }
-      }
-
-      destfile <- paste0(
-        directory_to_save,
-        variable,
-        "/",
-        variable,
-        "_",
-        year_l,
-        ".nc"
-      )
-
-      if (amadeus::check_destfile(destfile)) {
-        all_urls <- c(all_urls, url)
-        all_destfiles <- c(all_destfiles, destfile)
-      }
-    }
-  }
-
-  #### Exit early if download=FALSE
+  # ----------------------------------------------------------------------------
+  # Generate download URLs, file names, and variable-specific directories.
+  df_download$file <- with(df_download, paste0(variable, "_", years, ".nc"))
+  df_download$url <- with(df_download, paste0(base, file))
+  df_download$vdir <- with(df_download, paste0(dir, variable, "/"))
+  df_download$destfile <- with(df_download, paste0(vdir, file))
+  # ----------------------------------------------------------------------------
+  # Create missing directories.
+  invisible(suppressWarnings(sapply(unique(df_download$vdir), dir.create)))
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity. First only because sequential `int_years` will
+  # ensure first URL is earliest year requested or only non-temporal SPEI/EDDI
+  # request.
+  amadeus:::check_preflight(df_download$url[1])
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message(sprintf(
-      "Skipping download. Found %d files available for download.\n",
-      length(all_urls)
-    ))
-    return(invisible(list(
-      urls = all_urls,
-      destfiles = all_destfiles,
-      n_files = length(all_urls)
+    return(invisible(amadeus::download_preview(
+      df_download$url,
+      df_download$destfile
     )))
   }
-
-  #### Download files using httr2
+  # ----------------------------------------------------------------------------
+  # Run download.
   download_result <- amadeus::download_run_method(
-    urls = all_urls,
-    destfiles = all_destfiles,
+    urls = df_download$url,
+    destfiles = df_download$destfile,
     token = NULL,
     show_progress = show_progress,
     max_tries = max_tries,
     rate_limit = rate_limit
   )
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(download_result))
-  }
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################

@@ -133,15 +133,7 @@ download_gridmet <- function(
   # Check first URL for validity. First only because sequential `int_years` will
   # ensure first URL is earliest year requested or only non-temporal SPEI/EDDI
   # request.
-  if (!amadeus::check_url_status(df_download$url[1])) {
-    warning(
-      paste0(
-        "Preflight URL check failed; attempting direct download ",
-        "for year validation.\n"
-      ),
-      call. = FALSE
-    )
-  }
+  amadeus:::check_preflight(df_download$url[1])
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
