@@ -11,14 +11,17 @@ testthat::test_that(
   ),
   {
     skip_if_no_live_tests()
-    testthat::skip_if(!nzchar(Sys.getenv("NASA_EARTHDATA_TOKEN")),
-                      "no NASA Earthdata token")
+    testthat::skip_if(
+      !nzchar(Sys.getenv("NASA_EARTHDATA_TOKEN")),
+      "no NASA Earthdata token"
+    )
     dir <- withr::local_tempdir()
     amadeus::download_geos(
       collection = "aqc_tavg_1hr_g1440x721_v1",
       date = c("2024-01-01", "2024-01-01"),
       directory_to_save = dir,
-      acknowledgement = TRUE
+      acknowledgement = TRUE,
+      hours = 0
     )
     files <- list.files(dir, recursive = TRUE, full.names = TRUE)
     testthat::expect_gt(length(files), 0)
@@ -33,14 +36,17 @@ testthat::test_that(
   ),
   {
     skip_if_no_live_tests()
-    testthat::skip_if(!nzchar(Sys.getenv("NASA_EARTHDATA_TOKEN")),
-                      "no NASA Earthdata token")
+    testthat::skip_if(
+      !nzchar(Sys.getenv("NASA_EARTHDATA_TOKEN")),
+      "no NASA Earthdata token"
+    )
     dir <- withr::local_tempdir()
     amadeus::download_geos(
       collection = "chm_tavg_1hr_g1440x721_v1",
       date = c("2022-01-01", "2022-01-01"),
       directory_to_save = dir,
-      acknowledgement = TRUE
+      acknowledgement = TRUE,
+      hours = 0
     )
     files <- list.files(dir, recursive = TRUE, full.names = TRUE)
     testthat::expect_gt(length(files), 0)
@@ -55,14 +61,17 @@ testthat::test_that(
   ),
   {
     skip_if_no_live_tests()
-    testthat::skip_if(!nzchar(Sys.getenv("NASA_EARTHDATA_TOKEN")),
-                      "no NASA Earthdata token")
+    testthat::skip_if(
+      !nzchar(Sys.getenv("NASA_EARTHDATA_TOKEN")),
+      "no NASA Earthdata token"
+    )
     dir <- withr::local_tempdir()
     amadeus::download_geos(
       collection = "met_tavg_1hr_g1440x721_x1",
       date = c("2022-01-01", "2022-01-01"),
       directory_to_save = dir,
-      acknowledgement = TRUE
+      acknowledgement = TRUE,
+      hours = 0
     )
     files <- list.files(dir, recursive = TRUE, full.names = TRUE)
     testthat::expect_gt(length(files), 0)

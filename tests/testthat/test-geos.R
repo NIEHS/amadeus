@@ -23,13 +23,16 @@ testthat::test_that("download_geos", {
         collection = collections,
         nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
         directory_to_save = ".",
-        acknowledgement = TRUE
+        acknowledgement = TRUE,
+        hours = 0
       )
     )
 
     # Check return structure (httr2 download_run_method pattern)
     testthat::expect_type(result, "list")
-    testthat::expect_true(all(c("success", "failed", "skipped") %in% names(result)))
+    testthat::expect_true(all(
+      c("success", "failed", "skipped") %in% names(result)
+    ))
 
     # Check that some files were processed
     total <- result$success + result$failed + result$skipped
@@ -55,13 +58,16 @@ testthat::test_that("download_geos (single date)", {
         collection = collections,
         nasa_earth_data_token = Sys.getenv("NASA_EARTHDATA_TOKEN"),
         directory_to_save = ".",
-        acknowledgement = TRUE
+        acknowledgement = TRUE,
+        hours = 0
       )
     )
 
     # Check return structure (httr2 download_run_method pattern)
     testthat::expect_type(result, "list")
-    testthat::expect_true(all(c("success", "failed", "skipped") %in% names(result)))
+    testthat::expect_true(all(
+      c("success", "failed", "skipped") %in% names(result)
+    ))
 
     # Check that some files were processed
     total <- result$success + result$failed + result$skipped
@@ -76,14 +82,14 @@ testthat::test_that("download_geos remove_command deprecation warning", {
   )
   withr::with_tempdir({
     testthat::expect_warning(
-        download_geos(
-          date = "2019-09-09",
-          collection = "aqc_tavg_1hr_g1440x721_v1",
-          nasa_earth_data_token = "fake_token",
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = FALSE,
-          remove_command = TRUE
+      download_geos(
+        date = "2019-09-09",
+        collection = "aqc_tavg_1hr_g1440x721_v1",
+        nasa_earth_data_token = "fake_token",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = TRUE
       ),
       regexp = "remove_command.*deprecated"
     )
@@ -339,14 +345,23 @@ testthat::test_that("process_geos daily_agg=FALSE default is unchanged", {
     path = testthat::test_path("..", "testdata", "geos", "c"),
     daily_agg = FALSE
   )
-  testthat::expect_equal(terra::nlyr(geos_default), terra::nlyr(geos_explicit_false))
-  testthat::expect_equal(terra::values(geos_default), terra::values(geos_explicit_false))
+  testthat::expect_equal(
+    terra::nlyr(geos_default),
+    terra::nlyr(geos_explicit_false)
+  )
+  testthat::expect_equal(
+    terra::values(geos_default),
+    terra::values(geos_explicit_false)
+  )
 })
 
 testthat::test_that("process_geos daily_agg collapses sub-daily layers", {
   withr::local_package("terra")
   src_file <- testthat::test_path(
-    "..", "testdata", "geos", "c",
+    "..",
+    "testdata",
+    "geos",
+    "c",
     "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4"
   )
   # Make src_file absolute before entering withr::with_tempdir
@@ -355,19 +370,41 @@ testthat::test_that("process_geos daily_agg collapses sub-daily layers", {
   withr::with_tempdir({
     tmpdir <- getwd()
     # Two files: 0000z and 0100z for the same day
-    file.copy(src_file, file.path(tmpdir, "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4"))
-    file.copy(src_file, file.path(tmpdir, "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0100z.nc4"))
+    file.copy(
+      src_file,
+      file.path(
+        tmpdir,
+        "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4"
+      )
+    )
+    file.copy(
+      src_file,
+      file.path(
+        tmpdir,
+        "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0100z.nc4"
+      )
+    )
 
     geos_sub <- suppressMessages(
       process_geos(date = "2018-01-01", variable = "O3", path = tmpdir)
     )
     geos_daily_mean <- suppressMessages(
-      process_geos(date = "2018-01-01", variable = "O3", path = tmpdir,
-                   daily_agg = TRUE, fun = "mean")
+      process_geos(
+        date = "2018-01-01",
+        variable = "O3",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "mean"
+      )
     )
     geos_daily_max <- suppressMessages(
-      process_geos(date = "2018-01-01", variable = "O3", path = tmpdir,
-                   daily_agg = TRUE, fun = "max")
+      process_geos(
+        date = "2018-01-01",
+        variable = "O3",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "max"
+      )
     )
 
     # Two files × 5 pressure levels = 10 sub-daily layers
@@ -376,7 +413,10 @@ testthat::test_that("process_geos daily_agg collapses sub-daily layers", {
     testthat::expect_equal(terra::nlyr(geos_daily_mean), 5)
     # CRS is preserved
     testthat::expect_false(terra::crs(geos_daily_mean) == "")
-    testthat::expect_match(terra::crs(geos_daily_mean, describe = TRUE)$code, "4326")
+    testthat::expect_match(
+      terra::crs(geos_daily_mean, describe = TRUE)$code,
+      "4326"
+    )
     # Time is set to midnight UTC of the aggregated date
     testthat::expect_true("POSIXt" %in% class(terra::time(geos_daily_mean)))
     testthat::expect_true(all(
@@ -391,82 +431,88 @@ testthat::test_that("process_geos daily_agg collapses sub-daily layers", {
   })
 })
 
-testthat::test_that(
-  "process_covariates(covariate=geos, daily_agg=TRUE): forwards daily aggregation args",
-  {
-    withr::local_package("terra")
-    src_file <- testthat::test_path(
-      "..", "testdata", "geos", "c",
-      "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4"
-    )
-    src_file <- normalizePath(src_file, mustWork = TRUE)
+testthat::test_that("process_covariates(covariate=geos, daily_agg=TRUE): forwards daily aggregation args", {
+  withr::local_package("terra")
+  src_file <- testthat::test_path(
+    "..",
+    "testdata",
+    "geos",
+    "c",
+    "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4"
+  )
+  src_file <- normalizePath(src_file, mustWork = TRUE)
 
-    withr::with_tempdir({
-      tmpdir <- getwd()
-      file.copy(
-        src_file,
-        file.path(tmpdir, "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4")
-      )
-      file.copy(
-        src_file,
-        file.path(tmpdir, "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0100z.nc4")
-      )
-
-      geos_daily_mean <- suppressMessages(
-        process_covariates(
-          covariate = "geos",
-          date = "2018-01-01",
-          variable = "O3",
-          path = tmpdir,
-          daily_agg = TRUE,
-          fun = "mean"
-        )
-      )
-      geos_daily_sum <- suppressMessages(
-        process_covariates(
-          covariate = "geos",
-          date = "2018-01-01",
-          variable = "O3",
-          path = tmpdir,
-          daily_agg = TRUE,
-          fun = "sum"
-        )
-      )
-
-      testthat::expect_equal(terra::nlyr(geos_daily_mean), 5L)
-      testthat::expect_equal(terra::nlyr(geos_daily_sum), 5L)
-      testthat::expect_true(all(
-        terra::values(geos_daily_sum) >= terra::values(geos_daily_mean),
-        na.rm = TRUE
-      ))
-    })
-  }
-)
-
-testthat::test_that(
-  "process_covariates(covariate=geos, daily_agg=FALSE): matches process_geos default",
-  {
-    withr::local_package("terra")
-    geos_direct <- suppressMessages(
-      process_geos(
-        date = "2018-01-01",
-        variable = "O3",
-        path = testthat::test_path("..", "testdata", "geos", "c")
+  withr::with_tempdir({
+    tmpdir <- getwd()
+    file.copy(
+      src_file,
+      file.path(
+        tmpdir,
+        "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4"
       )
     )
-    geos_wrapper <- suppressMessages(
+    file.copy(
+      src_file,
+      file.path(
+        tmpdir,
+        "GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0100z.nc4"
+      )
+    )
+
+    geos_daily_mean <- suppressMessages(
       process_covariates(
         covariate = "geos",
         date = "2018-01-01",
         variable = "O3",
-        path = testthat::test_path("..", "testdata", "geos", "c"),
-        daily_agg = FALSE
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "mean"
       )
     )
-    testthat::expect_equal(terra::nlyr(geos_wrapper), terra::nlyr(geos_direct))
-    testthat::expect_equal(terra::values(geos_wrapper), terra::values(geos_direct))
-  }
-)
+    geos_daily_sum <- suppressMessages(
+      process_covariates(
+        covariate = "geos",
+        date = "2018-01-01",
+        variable = "O3",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "sum"
+      )
+    )
+
+    testthat::expect_equal(terra::nlyr(geos_daily_mean), 5L)
+    testthat::expect_equal(terra::nlyr(geos_daily_sum), 5L)
+    testthat::expect_true(all(
+      terra::values(geos_daily_sum) >= terra::values(geos_daily_mean),
+      na.rm = TRUE
+    ))
+  })
+})
+
+testthat::test_that("process_covariates(covariate=geos, daily_agg=FALSE): matches process_geos default", {
+  withr::local_package("terra")
+  geos_direct <- suppressMessages(
+    process_geos(
+      date = "2018-01-01",
+      variable = "O3",
+      path = testthat::test_path("..", "testdata", "geos", "c")
+    )
+  )
+  geos_wrapper <- suppressMessages(
+    process_covariates(
+      covariate = "geos",
+      date = "2018-01-01",
+      variable = "O3",
+      path = testthat::test_path("..", "testdata", "geos", "c"),
+      daily_agg = FALSE
+    )
+  )
+  testthat::expect_equal(terra::nlyr(geos_wrapper), terra::nlyr(geos_direct))
+  testthat::expect_equal(
+    terra::values(geos_wrapper),
+    terra::values(geos_direct)
+  )
+})
 
 
 testthat::test_that("calculate_geos", {

@@ -201,7 +201,7 @@ download_narr <- function(
   chr_dir_to_save <- amadeus::download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Store variables as `list`.
-  list_variables <- as.vector(variables)
+  list_variables <- as.list(variables)
   # ----------------------------------------------------------------------------
   # Generate download URLs, file names, and variable-specific directories.
   df_download <- do.call(

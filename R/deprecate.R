@@ -216,3 +216,31 @@ generate_date_sequence <-
       return(dates_original)
     }
   }
+
+################################################################################
+#' Generate time sequence
+#' @description
+#' Generate a sequence of time values based on the GEOS-CF collection.
+#' @param collection character(1). GEOS-CF data collection
+#' @return vector
+#' @note
+#' GEOS-CF hourly values are observed on the hour (ie. 0000 = 12:00:00 AM, 0100
+#' = 01:00:00 AM) or the half hour (ie. 0030 = 12:30:00 AM, 0130 = 01:30:00 AM).
+#' Typically, 2-dimensional collections (latitude and longitude only) utilize
+#' half hour, and 3-dimensional collections (latitude, longitude, and time)
+#' utilize hour.
+#' @keywords internal auxiliary
+#' @export
+generate_time_sequence <-
+  function(
+    collection
+  ) {
+    collection_end <- substr(collection, nchar(collection), nchar(collection))
+    if (collection_end == "1") {
+      ts <- seq(from = 30, to = 2330, by = 100)
+    } else if (collection_end == "3") {
+      ts <- seq(from = 0, to = 2300, by = 100)
+    }
+    time_sequence <- sprintf("%04d", ts)
+    return(time_sequence)
+  }

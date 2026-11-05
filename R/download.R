@@ -552,6 +552,63 @@ sequence_dates <- function(date, hyphen = FALSE) {
 }
 
 ################################################################################
+#' Generate a daily sequence of clock times
+#' @description
+#' Generate equally spaced clock times throughout a day, starting at an
+#' offset from midnight and ending before the next midnight, then retain
+#' only the requested hours.
+#' @param by integer(1). Positive interval in minutes. Default is 60.
+#' @param offset integer(1). Minutes after midnight at which the sequence
+#' starts, from 0 through 1439. Default is 0.
+#' @param colon logical(1). Include a colon in returned time strings.
+#' If `FALSE` (the default), return `"HHMM"`; if `TRUE`, return `"HH:MM"`.
+#' @param hours integer vector. Non-empty selection of hours from 0 through
+#' 23 to retain. Default is `0:23`, which retains all hours. Input order and
+#' repeated hours do not affect the output.
+#' @details The interval and offset define the daily schedule before filtering
+#' by `hours`; selecting hours does not restart the interval at each hour.
+#' @return A character vector of retained times in ascending order. Times never
+#' extend past `"23:59"` or wrap into the next day. Returns `character(0)` when
+#' no scheduled times fall within the requested hours.
+#' @examples
+#' sequence_times()
+#' sequence_times(by = 60, offset = 30)
+#' sequence_times(by = 90, offset = 45, colon = TRUE)
+#' sequence_times(offset = 30, hours = c(0, 6, 12, 18))
+#' @keywords internal
+#' @noRd
+sequence_times <- function(
+  by = 60L,
+  offset = 0L,
+  colon = FALSE,
+  hours = 0:23
+) {
+  # ----------------------------------------------------------------------------
+  # Check output format, interval, starting offset, and selected hours.
+  checkmate::assert_flag(colon)
+  checkmate::assert_int(by, lower = 1L)
+  checkmate::assert_int(offset, lower = 0L, upper = 1439L)
+  checkmate::assert_integerish(
+    hours,
+    lower = 0L,
+    upper = 23L,
+    min.len = 1L,
+    any.missing = FALSE
+  )
+  # ----------------------------------------------------------------------------
+  # Generate the sequence in minutes and retain the requested hours.
+  int_seq <- seq.int(from = offset, to = 1439L, by = by)
+  int_seq <- int_seq[int_seq %/% 60L %in% hours]
+  # ----------------------------------------------------------------------------
+  # Format clock times.
+  sprintf(
+    if (colon) "%02d:%02d" else "%02d%02d",
+    int_seq %/% 60L,
+    int_seq %% 60L
+  )
+}
+
+################################################################################
 #' Check if destination file exists or is 0 bytes.
 #' @description
 #' Check if destination file exists or is 0 bytes. If either condition is

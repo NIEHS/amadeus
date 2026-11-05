@@ -10,6 +10,7 @@ download_geos(
     "chm_inst_1hr_g1440x721_p23", "met_inst_1hr_g1440x721_p23"),
   nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
+  hours = 0:23,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -27,6 +28,10 @@ download_geos(
 authentication token.}
 
 \item{date}{character(1 or 2). Date range "YYYY-MM-DD" format}
+
+\item{hours}{integer(1 to 24). Hours of day to download for each date,
+in UTC. Supply values from 0 through 23. Default is \code{0:23}, which selects
+all hours. The collection determines the minute within each selected hour.}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
@@ -53,6 +58,15 @@ atmospheric composition collections from NASA's Global Earth Observing
 System (GEOS)
 compositional forecast model.
 }
+\details{
+Hour selection uses the timestamps of the requested collection. Hourly
+time-averaged collections (\verb{_tavg_1hr_}) use timestamps at 30 minutes past
+the hour, while hourly instantaneous collections (\verb{_inst_1hr_}) use
+timestamps on the hour. For example, \code{hours = c(0, 6)} selects \code{00:30}
+and \code{06:30} UTC for time-averaged collections, or \code{00:00} and \code{06:00} UTC
+for instantaneous collections. The same hour selection applies to every
+date in the requested range.
+}
 \note{
 Due to NASA data access policies, downloads require a valid NASA
 Earthdata token for authentication. Use \code{setup_nasa_token()} for setup.
@@ -62,6 +76,7 @@ Earthdata token for authentication. Use \code{setup_nasa_token()} for setup.
 download_geos(
   collection = "aqc_tavg_1hr_g1440x721_v1",
   date = "2024-01-01",
+  hours = c(0, 6, 12, 18),
   directory_to_save = tempdir(),
   acknowledgement = TRUE
 )

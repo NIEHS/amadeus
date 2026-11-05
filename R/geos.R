@@ -17,6 +17,9 @@
 #' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
 #' authentication token.
 #' @param date character(1 or 2). Date range "YYYY-MM-DD" format
+#' @param hours integer(1 to 24). Hours of day to download for each date,
+#' in UTC. Supply values from 0 through 23. Default is `0:23`, which selects
+#' all hours. The collection determines the minute within each selected hour.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be \code{TRUE} to proceed
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
@@ -30,11 +33,20 @@
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{keller_description_2021}{amadeus}
+#' @details
+#' Hour selection uses the timestamps of the requested collection. Hourly
+#' time-averaged collections (`_tavg_1hr_`) use timestamps at 30 minutes past
+#' the hour, while hourly instantaneous collections (`_inst_1hr_`) use
+#' timestamps on the hour. For example, `hours = c(0, 6)` selects `00:30`
+#' and `06:30` UTC for time-averaged collections, or `00:00` and `06:00` UTC
+#' for instantaneous collections. The same hour selection applies to every
+#' date in the requested range.
 #' @examples
 #' \dontrun{
 #' download_geos(
 #'   collection = "aqc_tavg_1hr_g1440x721_v1",
 #'   date = "2024-01-01",
+#'   hours = c(0, 6, 12, 18),
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE
 #' )
@@ -51,6 +63,7 @@ download_geos <- function(
   ),
   nasa_earth_data_token = NULL,
   date = c("2018-01-01", "2018-01-01"),
+  hours = 0:23,
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -60,166 +73,127 @@ download_geos <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### 1. Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### 2. Check dates
-  date <- if (length(date) == 1) rep(date, 2) else date
-  stopifnot(length(date) == 2)
-  date <- date[order(as.Date(date))]
-
-  #### 3. Directory setup
-  amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-
-  #### 4. Check and retrieve NASA token
-  nasa_earth_data_token <- amadeus::get_token(
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  amadeus:::download_check(
+    dataset_name = "geos",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = FALSE,
+    remove_zip = FALSE,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  checkmate::assert_character(collection, min.char = 1L)
+  checkmate::assert_subset(
+    collection,
+    c(
+      "aqc_tavg_1hr_g1440x721_v1",
+      "chm_tavg_1hr_g1440x721_v1",
+      "met_tavg_1hr_g1440x721_x1",
+      "xgc_tavg_1hr_g1440x721_x1",
+      "chm_inst_1hr_g1440x721_p23",
+      "met_inst_1hr_g1440x721_p23"
+    )
+  )
+  # ----------------------------------------------------------------------------
+  # Check NASA EarthData token.
+  chr_nasatoken <- amadeus::get_token(
     token = nasa_earth_data_token,
     env_var = "NASA_EARTHDATA_TOKEN"
   )
-
-  #### 5. Check for null parameters (AFTER token retrieval)
-  params_to_check <- mget(ls())
-  params_to_check <- params_to_check
-  amadeus::check_for_null_parameters(params_to_check)
-
-  #### 6. Match collection
-  collection <- match.arg(collection, several.ok = TRUE)
-
-  #### 7. Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return",
-      " after discovering files.\n",
-      call. = FALSE
-    )
-  }
-
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### 8. Define date sequence
-  date_sequence <- amadeus::generate_date_sequence(
-    date[1],
-    date[2],
-    sub_hyphen = TRUE
-  )
-
-  #### 9. Define URL base
-  base <- "https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/"
-
-  #### 10. Collect all URLs and destination files
-  all_urls <- character()
-  all_destfiles <- character()
-
-  for (c in seq_along(collection)) {
-    collection_loop <- collection[c]
-    download_folder <- paste0(directory_to_save, collection_loop, "/")
-
-    if (!dir.exists(download_folder)) {
-      dir.create(download_folder, recursive = TRUE)
-    }
-
-    for (d in seq_along(date_sequence)) {
-      date_str <- date_sequence[d]
-      year <- substr(date_str, 1, 4)
-      month <- substr(date_str, 5, 6)
-      day <- substr(date_str, 7, 8)
-      time_sequence <- amadeus::generate_time_sequence(collection_loop)
-
-      for (t in seq_along(time_sequence)) {
-        download_url_base <- paste0(
-          base,
-          "Y",
-          year,
-          "/M",
-          month,
-          "/D",
-          day,
-          "/"
+  checkmate::assert_string(chr_nasatoken, min.chars = 1L)
+  # ----------------------------------------------------------------------------
+  # Check `date` and generate sequence.
+  chr_dates <- amadeus:::sequence_dates(date, hyphen = FALSE)
+  # ----------------------------------------------------------------------------
+  # Generate saving directory.
+  chr_dir_to_save <- amadeus::download_setup_dir(directory_to_save)
+  # ----------------------------------------------------------------------------
+  # Store collections as a `list`.
+  list_collections <- as.list(collection)
+  # ----------------------------------------------------------------------------
+  # Generate download URLs, file names, and collection-specific directories.
+  df_download <- do.call(
+    rbind,
+    lapply(
+      list_collections,
+      function(x) {
+        # ----------------------------------------------------------------------
+        # Set collection-specific time sequence (e.g. 0000 vs 0030).
+        int_offset <- if (grepl("_tavg_1hr_", x)) 30L else 0L
+        chr_times <- amadeus:::sequence_times(
+          by = 60L,
+          offset = int_offset,
+          hours = hours
         )
-        download_name <- paste0(
-          "GEOS-CF.v01.rpl.",
-          collection_loop,
-          ".",
-          date_str,
-          "_",
-          time_sequence[t],
-          "z.nc4"
+        # ----------------------------------------------------------------------
+        # Apply URL formula for all variables.
+        df_x <- expand.grid(
+          base = "https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/",
+          collection = x,
+          date = chr_dates,
+          time = chr_times,
+          dir = chr_dir_to_save
         )
-        download_url <- paste0(download_url_base, download_name)
-
-        # Validate first URL only
-        if (c == 1 && d == 1 && t == 1) {
-          if (!amadeus::check_url_status(download_url)) {
-            stop(paste0(
-              download_url,
-              " Invalid date returns HTTP code 404. ",
-              "Check `date` parameter.\n"
-            ))
-          }
-        }
-
-        download_folder_name <- paste0(download_folder, download_name)
-
-        if (amadeus::check_destfile(download_folder_name)) {
-          all_urls <- c(all_urls, download_url)
-          all_destfiles <- c(all_destfiles, download_folder_name)
-        }
+        df_x$file <- with(
+          df_x,
+          paste0("GEOS-CF.v01.rpl.", collection, ".", date, "_", time, "z.nc4")
+        )
+        df_x$url <- with(
+          df_x,
+          paste0(
+            base,
+            "Y",
+            substr(date, 1, 4),
+            "/M",
+            substr(date, 5, 6),
+            "/D",
+            substr(date, 7, 8),
+            "/",
+            file
+          )
+        )
+        df_x$vdir <- with(df_x, paste0(chr_dir_to_save, collection, "/"))
+        df_x$destfile <- with(df_x, paste0(vdir, file))
+        df_x
       }
-    }
+    )
+  )
+  # ----------------------------------------------------------------------------
+  # Create missing directories.
+  invisible(suppressWarnings(sapply(unique(df_download$vdir), dir.create)))
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity. First only because sequential `int_years` will
+  # ensure first URL is earliest year requested or only non-temporal SPEI/EDDI
+  # request.
+  amadeus:::check_preflight(df_download$url[1])
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
+  if (!isTRUE(download)) {
+    return(invisible(amadeus::download_preview(
+      df_download$url,
+      df_download$destfile
+    )))
   }
-
-  #### 11. Download files using httr2
+  # ----------------------------------------------------------------------------
+  # Run download.
   download_result <- amadeus::download_run_method(
-    urls = all_urls,
-    destfiles = all_destfiles,
-    token = nasa_earth_data_token,
+    urls = df_download$url,
+    destfiles = df_download$destfile,
+    token = chr_nasatoken,
     show_progress = show_progress,
     max_tries = max_tries,
     rate_limit = rate_limit
   )
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(download_result))
-  }
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
-
-################################################################################
-#' Generate time sequence
-#' @description
-#' Generate a sequence of time values based on the GEOS-CF collection.
-#' @param collection character(1). GEOS-CF data collection
-#' @return vector
-#' @note
-#' GEOS-CF hourly values are observed on the hour (ie. 0000 = 12:00:00 AM, 0100
-#' = 01:00:00 AM) or the half hour (ie. 0030 = 12:30:00 AM, 0130 = 01:30:00 AM).
-#' Typically, 2-dimensional collections (latitude and longitude only) utilize
-#' half hour, and 3-dimensional collections (latitude, longitude, and time)
-#' utilize hour.
-#' @keywords internal auxiliary
-#' @export
-generate_time_sequence <-
-  function(
-    collection
-  ) {
-    collection_end <- substr(collection, nchar(collection), nchar(collection))
-    if (collection_end == "1") {
-      ts <- seq(from = 30, to = 2330, by = 100)
-    } else if (collection_end == "3") {
-      ts <- seq(from = 0, to = 2300, by = 100)
-    }
-    time_sequence <- sprintf("%04d", ts)
-    return(time_sequence)
-  }
 
 ################################################################################
 # {process} tier
