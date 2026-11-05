@@ -239,6 +239,8 @@ download_modis <- function(
   message("Querying NASA CMR for available granules...\n")
   chr_extent <- paste(extent, collapse = ",")
   query_granules <- function(short_name, version) {
+    # --------------------------------------------------------------------------
+    # Query CMR for granules matching the product, version, dates, and extent.
     resp <- tryCatch(
       httr2::request(
         "https://cmr.earthdata.nasa.gov/search/granules.json"
@@ -255,6 +257,8 @@ download_modis <- function(
         httr2::req_timeout(120) |>
         httr2::req_perform(),
       error = function(e) {
+        # ----------------------------------------------------------------------
+        # Report the query failure with the original request error.
         stop(
           "Failed to query NASA CMR (cmr.earthdata.nasa.gov). ",
           "Check network connectivity and NASA EarthData status at ",
@@ -263,6 +267,8 @@ download_modis <- function(
         )
       }
     )
+    # --------------------------------------------------------------------------
+    # Return the parsed granule response.
     resp |> httr2::resp_body_json()
   }
   granules <- query_granules(product, str_version)
@@ -391,8 +397,12 @@ download_modis <- function(
 
 ################################################################################
 modis_extract_temporal_key <- function(path) {
+  # ----------------------------------------------------------------------------
+  # Extract the filename from the supplied path.
   filename <- basename(path)
 
+  # ----------------------------------------------------------------------------
+  # Read the year and day-of-year key from an AYYYYDDD filename pattern.
   key_daily <- regmatches(
     filename,
     regexpr("A20\\d{5}", filename)
@@ -401,6 +411,8 @@ modis_extract_temporal_key <- function(path) {
     return(sub("^A", "", key_daily))
   }
 
+  # ----------------------------------------------------------------------------
+  # Read the year and day-of-year key from a _YYYYDDD filename pattern.
   key_txt <- regmatches(
     filename,
     regexpr("_[12][0-9]{6}", filename)
@@ -409,6 +421,8 @@ modis_extract_temporal_key <- function(path) {
     return(sub("^_", "", key_txt))
   }
 
+  # ----------------------------------------------------------------------------
+  # Read the year and month key from a .YYYYMM. filename pattern.
   key_monthly <- regmatches(
     filename,
     regexpr("\\.20[0-9]{4}\\.", filename)
@@ -417,13 +431,19 @@ modis_extract_temporal_key <- function(path) {
     return(gsub("\\.", "", key_monthly))
   }
 
+  # ----------------------------------------------------------------------------
+  # Return a missing key when no supported pattern is found.
   return(NA_character_)
 }
 
 ################################################################################
 modis_extract_temporal_scale <- function(path) {
+  # ----------------------------------------------------------------------------
+  # Extract the filename from the supplied path.
   filename <- basename(path)
 
+  # ----------------------------------------------------------------------------
+  # Classify supported filename patterns as daily or monthly.
   if (grepl("A20\\d{5}", filename)) {
     return("daily")
   }
@@ -434,6 +454,8 @@ modis_extract_temporal_scale <- function(path) {
     return("monthly")
   }
 
+  # ----------------------------------------------------------------------------
+  # Return a missing scale when no supported pattern is found.
   return(NA_character_)
 }
 
@@ -442,22 +464,34 @@ modis_key_to_date <- function(
   key,
   scale
 ) {
+  # ----------------------------------------------------------------------------
+  # Repeat a single temporal scale and check that each key has a scale.
   if (length(scale) == 1L) {
     scale <- rep(scale, length(key))
   }
   stopifnot(length(key) == length(scale))
 
+  # ----------------------------------------------------------------------------
+  # Convert each temporal key according to its scale.
   as_date <- mapply(
     function(key_i, scale_i) {
+      # ------------------------------------------------------------------------
+      # Preserve missing keys or scales as missing dates.
       if (is.na(key_i) || is.na(scale_i)) {
         return(as.Date(NA))
       }
+      # ------------------------------------------------------------------------
+      # Parse daily keys as a year and day of year.
       if (scale_i == "daily") {
         return(as.Date(key_i, format = "%Y%j"))
       }
+      # ------------------------------------------------------------------------
+      # Parse monthly keys as the first day of the month.
       if (scale_i == "monthly") {
         return(as.Date(paste0(key_i, "01"), format = "%Y%m%d"))
       }
+      # ------------------------------------------------------------------------
+      # Reject unsupported temporal scales.
       stop("Unsupported MODIS temporal scale.\n")
     },
     key,
@@ -466,6 +500,8 @@ modis_key_to_date <- function(
     USE.NAMES = FALSE
   )
 
+  # ----------------------------------------------------------------------------
+  # Restore the Date class after simplifying the converted values.
   return(as.Date(as_date, origin = "1970-01-01"))
 }
 
@@ -474,37 +510,55 @@ modis_filter_paths_by_date <- function(
   paths,
   date
 ) {
+  # ----------------------------------------------------------------------------
+  # Return early when there are no paths to filter.
   if (length(paths) == 0) {
     return(paths)
   }
+  # ----------------------------------------------------------------------------
+  # Use a single date as both range endpoints.
   if (length(date) == 1L) {
     date <- rep(date, 2L)
   }
 
+  # ----------------------------------------------------------------------------
+  # Extract temporal keys and scales from the filenames.
   keys <- vapply(paths, modis_extract_temporal_key, character(1))
   scales <- vapply(paths, modis_extract_temporal_scale, character(1))
 
+  # ----------------------------------------------------------------------------
+  # Return no paths when temporal keys or scales cannot be identified.
   if (all(is.na(keys)) || all(is.na(scales))) {
     return(character(0))
   }
 
+  # ----------------------------------------------------------------------------
+  # Require one recognized temporal scale across the paths.
   scales_unique <- unique(stats::na.omit(scales))
   if (length(scales_unique) != 1L) {
     stop("MODIS paths contain mixed or unsupported temporal patterns.\n")
   }
 
+  # ----------------------------------------------------------------------------
+  # Select files within the requested monthly or daily range.
   scale_target <- scales_unique[[1]]
   if (scale_target == "monthly") {
+    # --------------------------------------------------------------------------
+    # Match monthly keys against every month touched by the date range.
     month_start <- as.Date(format(as.Date(date[1]), "%Y-%m-01"))
     month_end <- as.Date(format(as.Date(date[2]), "%Y-%m-01"))
     month_sequence <- seq(month_start, month_end, by = "month")
     target_keys <- format(month_sequence, "%Y%m")
     keep <- keys %in% target_keys
   } else {
+    # --------------------------------------------------------------------------
+    # Match parsed daily dates against the inclusive date range.
     parsed_dates <- modis_key_to_date(keys, scales)
     keep <- parsed_dates >= as.Date(date[1]) & parsed_dates <= as.Date(date[2])
   }
 
+  # ----------------------------------------------------------------------------
+  # Return matching paths in their original order.
   return(paths[keep])
 }
 
@@ -539,6 +593,8 @@ modis_filter_paths_by_date <- function(
 #' @keywords internal auxiliary
 #' @export
 extent_to_modis_tiles <- function(extent) {
+  # ----------------------------------------------------------------------------
+  # Check the geographic bounding box and coordinate order.
   stopifnot(
     "extent must be numeric(4)" = is.numeric(extent) && length(extent) == 4,
     "extent[1] (xmin) must be >= -180" = extent[1] >= -180,
@@ -549,6 +605,8 @@ extent_to_modis_tiles <- function(extent) {
     "ymin must be < ymax" = extent[2] < extent[4]
   )
 
+  # ----------------------------------------------------------------------------
+  # Locate the bundled MODIS tile bounds table.
   bounds_file <- system.file(
     "extdata",
     "sn_bound_10deg.txt",
@@ -558,6 +616,8 @@ extent_to_modis_tiles <- function(extent) {
     "sn_bound_10deg.txt not found in inst/extdata/" = nzchar(bounds_file)
   )
 
+  # ----------------------------------------------------------------------------
+  # Read the tile coordinates and geographic bounds.
   lines <- readLines(bounds_file, warn = FALSE)
   data_lines <- grep("^ *[0-9]", lines, value = TRUE)
   tiles_df <- utils::read.table(
@@ -565,17 +625,19 @@ extent_to_modis_tiles <- function(extent) {
     col.names = c("iv", "ih", "lon_min", "lon_max", "lat_min", "lat_max")
   )
 
-  # Drop fill tiles (lon_min == -999)
+  # ----------------------------------------------------------------------------
+  # Drop fill tiles with invalid longitude bounds.
   tiles_df <- tiles_df[tiles_df$lon_min > -900, ]
 
+  # ----------------------------------------------------------------------------
+  # Extract the requested longitude and latitude limits.
   xmin <- extent[1]
   ymin <- extent[2]
   xmax <- extent[3]
   ymax <- extent[4]
 
-  # Bounding-box overlap: tile overlaps query if
-  #   tile_lon_max >= xmin  AND  tile_lon_min <= xmax
-  #   tile_lat_max >= ymin  AND  tile_lat_min <= ymax
+  # ----------------------------------------------------------------------------
+  # Retain tiles whose geographic bounds overlap the requested extent.
   hits <- tiles_df[
     tiles_df$lon_max >= xmin &
       tiles_df$lon_min <= xmax &
@@ -583,6 +645,8 @@ extent_to_modis_tiles <- function(extent) {
       tiles_df$lat_min <= ymax,
   ]
 
+  # ----------------------------------------------------------------------------
+  # Format the matching horizontal and vertical tile indices.
   sprintf("h%02dv%02d", hits$ih, hits$iv)
 }
 

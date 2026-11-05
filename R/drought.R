@@ -137,6 +137,8 @@ download_drought <- function(
     destfile <- paste0(directory_to_save, "spei", ts_str, ".nc")
 
     download_spei <- function(url) {
+      # ------------------------------------------------------------------------
+      # Download the candidate SPEI file with the selected request settings.
       amadeus::download_run_method(
         urls = url,
         destfiles = destfile,
@@ -370,11 +372,15 @@ download_drought <- function(
 #' @keywords internal
 #' @export
 drought_weekly_dates <- function(date_start, date_end) {
+  # ----------------------------------------------------------------------------
+  # Generate daily dates within the requested range.
   all_dates <- seq(
     as.Date(date_start, format = "%Y-%m-%d"),
     as.Date(date_end, format = "%Y-%m-%d"),
     by = "day"
   )
+  # ----------------------------------------------------------------------------
+  # Retain Tuesdays and format them as compact date strings.
   tuesdays <- all_dates[weekdays(all_dates) == "Tuesday"]
   format(tuesdays, "%Y%m%d")
 }

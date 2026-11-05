@@ -213,6 +213,8 @@ list_stac_files <-
     which = NULL,
     id_only = FALSE
   ) {
+    # --------------------------------------------------------------------------
+    # Read the STAC catalog and extract its collection IDs.
     allcollections <-
       rstac::read_stac(
         stac_json
@@ -220,10 +222,14 @@ list_stac_files <-
       rstac:::read_collections.catalog()
     collection <- allcollections$collections
     collection_ids <- sapply(collection, \(x) x$id)
+    # --------------------------------------------------------------------------
+    # Return collection IDs when file URLs are not requested.
     if (id_only) {
       return(collection_ids)
     }
 
+    # --------------------------------------------------------------------------
+    # Report the available collection IDs.
     message(
       sprintf(
         "Names of collections include: %s",
@@ -234,9 +240,13 @@ list_stac_files <-
       )
     )
 
+    # --------------------------------------------------------------------------
+    # Select collections by name pattern or index.
     which <- if (!is.numeric(which)) grep(which, collection_ids) else which
     collection <- if (is.null(which)) collection else collection[which]
 
+    # --------------------------------------------------------------------------
+    # Collect asset URLs and retain those matching the requested format.
     collection_assets <-
       lapply(
         collection,
@@ -245,6 +255,8 @@ list_stac_files <-
     collection_assets <- unlist(collection_assets)
     list_assets <- grep(sprintf("%s$", format), collection_assets, value = TRUE)
 
+    # --------------------------------------------------------------------------
+    # Return the matching asset URLs.
     return(list_assets)
   }
 

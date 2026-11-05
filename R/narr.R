@@ -274,7 +274,11 @@ download_narr <- function(
 #' @keywords internal auxiliary
 #' @export
 narr_variable <- function(variable) {
+  # ----------------------------------------------------------------------------
+  # Require a single variable.
   stopifnot(length(variable) == 1)
+  # ----------------------------------------------------------------------------
+  # Define the variable groups used by the NARR download directories.
   mono <- c(
     "acpcp",
     "air.2m",
@@ -356,6 +360,8 @@ narr_variable <- function(variable) {
   )
   pressure <- c("air", "hgt", "omega", "shum", "tke", "uwnd", "vwnd")
   soil <- c("soill", "soilw", "tsoil")
+  # ----------------------------------------------------------------------------
+  # Select the directory and monthly suffixes for the requested variable.
   base <- "https://downloads.psl.noaa.gov/NARR/Dailies/"
   if (variable %in% mono) {
     base <- paste0(base, "monolevel/")
@@ -376,6 +382,8 @@ narr_variable <- function(variable) {
       )
     }
   }
+  # ----------------------------------------------------------------------------
+  # Return the URL base and month suffixes.
   return(list(base, months))
 }
 

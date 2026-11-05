@@ -249,7 +249,8 @@ sequence_years <- function(year) {
 #' @export
 download_sanitize_path <-
   function(directory) {
-    #### 1. directory setup
+    # --------------------------------------------------------------------------
+    # Append a forward slash if the directory path does not end with one.
     chars_dir <- nchar(directory)
     if (
       substr(
@@ -262,6 +263,8 @@ download_sanitize_path <-
       directory <-
         paste(directory, "/", sep = "")
     }
+    # --------------------------------------------------------------------------
+    # Return the directory path.
     return(directory)
   }
 
@@ -287,11 +290,17 @@ download_sanitize_path <-
 #' @export
 download_setup_dir <-
   function(directory, zip = FALSE) {
+    # --------------------------------------------------------------------------
+    # Sanitize the download path and create missing parent directories.
     chr_dir_sanitized <- amadeus::download_sanitize_path(directory)
     if (!dir.exists(chr_dir_sanitized)) {
       dir.create(chr_dir_sanitized, recursive = TRUE)
     }
+    # --------------------------------------------------------------------------
+    # Set up separate archive and data directories when requested.
     if (zip) {
+      # ------------------------------------------------------------------------
+      # Create the archive directory.
       directory_zip <- amadeus::download_sanitize_path(
         paste0(
           chr_dir_sanitized,
@@ -301,6 +310,8 @@ download_setup_dir <-
       if (!dir.exists(directory_zip)) {
         dir.create(directory_zip, recursive = TRUE)
       }
+      # ------------------------------------------------------------------------
+      # Create the extracted data directory.
       directory_data <- amadeus::download_sanitize_path(
         paste0(
           chr_dir_sanitized,
@@ -310,8 +321,12 @@ download_setup_dir <-
       if (!dir.exists(directory_data)) {
         dir.create(directory_data, recursive = TRUE)
       }
+      # ------------------------------------------------------------------------
+      # Return the archive and data paths, in that order.
       return(c(directory_zip, directory_data))
     } else {
+      # ------------------------------------------------------------------------
+      # Return the main download path.
       chr_dir_sanitized
     }
   }
@@ -347,9 +362,12 @@ setup_nasa_token <- function(
   method = c("renviron", "file", "session"),
   token = NULL
 ) {
+  # ----------------------------------------------------------------------------
+  # Check the token storage method.
   method <- match.arg(method)
 
-  # Get token if not provided
+  # ----------------------------------------------------------------------------
+  # Prompt for a token when none is supplied.
   if (is.null(token)) {
     if (interactive()) {
       cat("Enter your NASA EarthData token: ")
@@ -360,19 +378,25 @@ setup_nasa_token <- function(
     }
   }
 
+  # ----------------------------------------------------------------------------
+  # Reject an empty token.
   if (!nzchar(token)) {
     stop("Token cannot be empty.\n", call. = FALSE)
   }
 
+  # ----------------------------------------------------------------------------
+  # Store the token using the selected method.
   switch(
     method,
     renviron = {
+      # ------------------------------------------------------------------------
+      # Locate the user environment file.
       renviron_path <- path.expand("~/.Renviron")
 
-      # Read existing .Renviron
+      # ------------------------------------------------------------------------
+      # Read existing settings and remove previous token entries.
       if (file.exists(renviron_path)) {
         renviron_lines <- readLines(renviron_path)
-        # Remove any existing NASA_EARTHDATA_TOKEN lines
         renviron_lines <- renviron_lines[
           !grepl("^NASA_EARTHDATA_TOKEN=", renviron_lines)
         ]
@@ -380,13 +404,16 @@ setup_nasa_token <- function(
         renviron_lines <- character(0)
       }
 
-      # Add new token
+      # ------------------------------------------------------------------------
+      # Save the token alongside the existing environment settings.
       renviron_lines <- c(
         renviron_lines,
         paste0("NASA_EARTHDATA_TOKEN=", token)
       )
       writeLines(renviron_lines, renviron_path)
 
+      # ------------------------------------------------------------------------
+      # Report where the token was saved and how to load it.
       message(sprintf(
         "Token saved to %s\n",
         renviron_path
@@ -398,14 +425,19 @@ setup_nasa_token <- function(
     },
 
     file = {
+      # ------------------------------------------------------------------------
+      # Save the token in the user token file.
       token_path <- path.expand("~/.nasa_earthdata_token")
       writeLines(token, token_path)
 
-      # Set file permissions to user-only (Unix-like systems)
+      # ------------------------------------------------------------------------
+      # Restrict file access to the owner on Unix-like systems.
       if (.Platform$OS.type != "windows") {
         Sys.chmod(token_path, mode = "0600")
       }
 
+      # ------------------------------------------------------------------------
+      # Report where the token was saved and how to use it.
       message(sprintf("Token saved to %s\n", token_path))
       message(
         "  Use in functions:",
@@ -414,6 +446,8 @@ setup_nasa_token <- function(
     },
 
     session = {
+      # ------------------------------------------------------------------------
+      # Set the token for the current session and report its lifetime.
       Sys.setenv(NASA_EARTHDATA_TOKEN = token)
       message("Token set for current R session\n")
       message(
@@ -423,6 +457,8 @@ setup_nasa_token <- function(
     }
   )
 
+  # ----------------------------------------------------------------------------
+  # Return invisibly after configuring authentication.
   invisible(NULL)
 }
 
@@ -444,15 +480,19 @@ setup_nasa_token <- function(
 #' @keywords internal
 #' @export
 get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
-  # Priority 1: Check environment variable
+  # ----------------------------------------------------------------------------
+  # Use the environment variable first when it contains a token.
   token_env <- Sys.getenv(env_var, unset = NA)
   if (!is.na(token_env) && nzchar(token_env)) {
     message(sprintf("Using token from environment variable: %s\n", env_var))
     return(trimws(token_env))
   }
 
-  # Priority 2: If token provided, check if it's a file path
+  # ----------------------------------------------------------------------------
+  # Check the supplied value when no environment token is available.
   if (!is.null(token)) {
+    # --------------------------------------------------------------------------
+    # Read and validate the token when the supplied value is a file path.
     if (length(token) == 1 && file.exists(token)) {
       message(sprintf("Reading token from file: %s\n", token))
       token_file <- trimws(readLines(token, n = 1, warn = FALSE))
@@ -462,16 +502,16 @@ get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
       return(token_file)
     }
 
-    # Priority 3: Use token string directly
-    # (warn if looks like it's being hard-coded)
+    # --------------------------------------------------------------------------
+    # Use a supplied token string without printing its contents.
     if (length(token) == 1 && nzchar(token)) {
-      # Don't show the actual token in any messages!
       message("Using provided token string.\n")
       return(trimws(token))
     }
   }
 
-  # No token found
+  # ----------------------------------------------------------------------------
+  # Explain how to provide a token when no source contains one.
   stop(
     "No authentication token found. Please provide a token using one of:\n",
     sprintf(
@@ -518,7 +558,7 @@ get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
 #' @keywords internal auxiliary
 #' @export
 sequence_dates <- function(date, hyphen = FALSE) {
-  #-----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Ensure `hyphen` is TRUE/FALSE.
   checkmate::assert_flag(hyphen)
   # ----------------------------------------------------------------------------
@@ -618,6 +658,8 @@ sequence_times <- function(
 #' @keywords internal auxiliary
 #' @export
 check_destfile <- function(destfile) {
+  # ----------------------------------------------------------------------------
+  # Request a download when the destination is missing or empty.
   if (!file.exists(destfile) || file.size(destfile) == 0) {
     return(TRUE)
   } else {
@@ -642,8 +684,12 @@ check_url_status <- function(
   url,
   max_tries = 3L
 ) {
+  # ----------------------------------------------------------------------------
+  # Define successful HTTP status codes.
   http_status_ok <- c(200, 206)
 
+  # ----------------------------------------------------------------------------
+  # Probe the URL with a HEAD request and retry transient failures.
   status_head <- tryCatch(
     {
       url |>
@@ -660,12 +706,15 @@ check_url_status <- function(
     error = function(e) NA_integer_
   )
 
+  # ----------------------------------------------------------------------------
+  # Pause and return early when the HEAD request succeeds.
   if (!is.na(status_head) && status_head %in% http_status_ok) {
     Sys.sleep(1)
     return(TRUE)
   }
 
-  # Some hosts reject/flake on HEAD; probe with a tiny ranged GET.
+  # ----------------------------------------------------------------------------
+  # Fall back to a ranged GET when the HEAD request fails.
   status_get <- tryCatch(
     {
       url |>
@@ -682,6 +731,8 @@ check_url_status <- function(
     error = function(e) NA_integer_
   )
 
+  # ----------------------------------------------------------------------------
+  # Pause and return whether the GET request succeeded.
   Sys.sleep(1)
   !is.na(status_get) && status_get %in% http_status_ok
 }
@@ -702,17 +753,25 @@ check_urls <- function(
   size = NULL,
   method = NULL
 ) {
+  # ----------------------------------------------------------------------------
+  # Return early when no sample size is supplied.
   if (is.null(size)) {
     message(paste0("URL sample size is not defined.\n"))
     return(NULL)
   }
+  # ----------------------------------------------------------------------------
+  # Limit the sample size to the number of available URLs.
   if (length(urls) < size) {
     size <- length(urls)
   }
+  # ----------------------------------------------------------------------------
+  # Skip the status checks when requested.
   if (!is.null(method) && toupper(method) == "SKIP") {
     message(paste0("Skipping HTTP status check...\n"))
     return(NULL)
   } else {
+    # --------------------------------------------------------------------------
+    # Sample URLs without replacement and return their status checks.
     url_sample <- sample(urls, size, replace = FALSE)
     url_status <- sapply(
       url_sample,
@@ -738,6 +797,8 @@ check_urls <- function(
 #' @keywords internal
 #' @noRd
 check_preflight <- function(url) {
+  # ----------------------------------------------------------------------------
+  # Warn if the URL check fails so the caller can continue downloading.
   if (!amadeus::check_url_status(url)) {
     warning(
       paste0(
@@ -776,10 +837,14 @@ check_preflight <- function(url) {
 #' )
 #' @export
 download_preview <- function(urls, destfiles) {
+  # ----------------------------------------------------------------------------
+  # Report the number of planned downloads.
   message(sprintf(
     "Skipping download. Found %d files available for download.\n",
     length(urls)
   ))
+  # ----------------------------------------------------------------------------
+  # Return the planned URLs, destination paths, and file count.
   list(
     urls = urls,
     destfiles = destfiles,
@@ -827,7 +892,8 @@ download_run_method <- function(
   timeout = 3600,
   http_version = NULL
 ) {
-  # Validate inputs
+  # ----------------------------------------------------------------------------
+  # Check that URLs and matching destination paths are supplied.
   if (is.null(urls) || length(urls) == 0) {
     stop("No URLs provided for download.\n")
   }
@@ -835,16 +901,21 @@ download_run_method <- function(
     stop("destfiles must have same length as urls.\n")
   }
 
-  # Filter to only files that need downloading
+  # ----------------------------------------------------------------------------
+  # Retain destinations that are missing or empty.
   needs_download <- sapply(destfiles, amadeus::check_destfile)
   urls_filtered <- urls[needs_download]
   destfiles_filtered <- destfiles[needs_download]
 
+  # ----------------------------------------------------------------------------
+  # Return early when all destination files already contain data.
   if (length(urls_filtered) == 0) {
     message("All files already exist. Nothing to download.\n")
     return(invisible(list(success = 0, failed = 0, skipped = length(urls))))
   }
 
+  # ----------------------------------------------------------------------------
+  # Report the download count and initialize result tracking.
   message(sprintf(
     "Downloading %d files using httr2 (skipped %d existing files)...\n",
     length(urls_filtered),
@@ -857,17 +928,23 @@ download_run_method <- function(
   failed_urls <- character(0)
   failed_files <- character(0)
 
+  # ----------------------------------------------------------------------------
+  # Download each file and record successes and failures.
   for (i in seq_along(urls_filtered)) {
+    # --------------------------------------------------------------------------
+    # Select the URL and destination for this download.
     url <- urls_filtered[i]
     destfile <- destfiles_filtered[i]
 
-    # Create directory if needed
+    # --------------------------------------------------------------------------
+    # Create the destination directory if needed.
     destdir <- dirname(destfile)
     if (!dir.exists(destdir)) {
       dir.create(destdir, recursive = TRUE)
     }
 
-    # Progress message: only show file number when progress is on
+    # --------------------------------------------------------------------------
+    # Report the current file number when progress is enabled.
     progress_prefix <- sprintf("[%d/%d] ", i, n_files)
     if (show_progress) {
       message(sprintf(
@@ -877,26 +954,23 @@ download_run_method <- function(
       ))
     }
 
+    # --------------------------------------------------------------------------
+    # Handle request failures without interrupting the remaining downloads.
     tryCatch(
       {
-        # Build request
+        # ----------------------------------------------------------------------
+        # Build the request and add authentication when a token is supplied.
         req <- httr2::request(url)
 
-        # Add authentication if token provided
         if (!is.null(token)) {
           req <- req |>
             httr2::req_headers(Authorization = paste("Bearer", token))
         }
 
-        # Configure retry, throttle, timeout, and error handling.
-        # Note: 500 is excluded from is_transient because some APIs
-        # (e.g. EPA TRI)
-        # return HTTP 500 with valid response bodies on every request. Retrying
-        # would make redundant requests. 502/503/504 are gateway errors that
-        # are genuinely transient.
-        # retry_on_failure retries transport-level errors (SSL drops, etc.)
-        # but is capped at min(max_tries, 3L) to avoid long hangs on DNS
-        # timeouts (each timeout attempt takes ~10s).
+        # ----------------------------------------------------------------------
+        # Configure retries, rate limiting, timeouts, and HTTP error handling.
+        # Allow HTTP 500 because some APIs return it with valid response bodies.
+        # Retry HTTP 429/502/503/504 and transport failures up to `max_tries`.
         req <- req |>
           httr2::req_retry(
             max_tries = max_tries,
@@ -914,22 +988,28 @@ download_run_method <- function(
             status >= 400 && !(status %in% c(429, 500, 502, 503, 504))
           })
 
+        # ----------------------------------------------------------------------
+        # Apply an HTTP version override when supplied.
         if (!is.null(http_version)) {
           req <- req |> httr2::req_options(http_version = http_version)
         }
 
-        # Add progress only if requested
+        # ----------------------------------------------------------------------
+        # Enable the download progress bar when requested.
         if (show_progress) {
           req <- req |> httr2::req_progress(type = "down")
         }
 
-        # Perform the request
+        # ----------------------------------------------------------------------
+        # Stream the response to the destination file.
         req |> httr2::req_perform(path = destfile)
 
-        # Verify file was created and has content
+        # ----------------------------------------------------------------------
+        # Verify the downloaded file exists and contains data.
         if (file.exists(destfile) && file.size(destfile) > 0) {
+          # --------------------------------------------------------------------
+          # Record the successful download and report its size.
           n_success <- n_success + 1
-          # Success message: format with or without progress prefix
           success_msg <- sprintf(
             "Success: %s (%s)",
             basename(destfile),
@@ -941,7 +1021,8 @@ download_run_method <- function(
             success_msg
           ))
         } else {
-          # File failed validation
+          # --------------------------------------------------------------------
+          # Record the failed validation and remove any empty destination.
           n_failed <- n_failed + 1
           failed_urls <- c(failed_urls, url)
           failed_files <- c(failed_files, basename(destfile))
@@ -950,7 +1031,8 @@ download_run_method <- function(
             file.remove(destfile)
           }
 
-          # Failure message: always show, format based on progress mode
+          # --------------------------------------------------------------------
+          # Report the failed validation using the selected progress format.
           failure_msg <- sprintf(
             "Failed: %s (0 bytes)",
             basename(destfile)
@@ -962,17 +1044,21 @@ download_run_method <- function(
           ))
         }
 
-        # Brief pause between downloads
+        # ----------------------------------------------------------------------
+        # Pause briefly before the next download.
         if (i < n_files) {
           Sys.sleep(runif(1, 0.5, 1.5))
         }
       },
       error = function(e) {
+        # ----------------------------------------------------------------------
+        # Record the failed request.
         n_failed <<- n_failed + 1
         failed_urls <<- c(failed_urls, url)
         failed_files <<- c(failed_files, basename(destfile))
 
-        # Error message: always show
+        # ----------------------------------------------------------------------
+        # Report the request error.
         error_msg <- sprintf(
           "Failed: %s - %s",
           basename(destfile),
@@ -984,7 +1070,8 @@ download_run_method <- function(
           error_msg
         ))
 
-        # Clean up failed download
+        # ----------------------------------------------------------------------
+        # Remove any file left by the failed download.
         if (file.exists(destfile)) {
           file.remove(destfile)
         }
@@ -992,7 +1079,8 @@ download_run_method <- function(
     )
   }
 
-  # Summary message
+  # ----------------------------------------------------------------------------
+  # Report the download totals.
   message(sprintf(
     "\n=== Download Summary ===\n%d succeeded, %d failed, %d skipped\n",
     n_success,
@@ -1000,6 +1088,8 @@ download_run_method <- function(
     sum(!needs_download)
   ))
 
+  # ----------------------------------------------------------------------------
+  # Warn with the names of files that failed to download.
   if (n_failed > 0) {
     warning(
       sprintf(
@@ -1011,6 +1101,8 @@ download_run_method <- function(
     )
   }
 
+  # ----------------------------------------------------------------------------
+  # Return the counts and failed file details invisibly.
   invisible(list(
     success = n_success,
     failed = n_failed,
@@ -1025,6 +1117,8 @@ download_run_method <- function(
 #' @keywords internal
 #' @noRd
 format_file_size <- function(bytes) {
+  # ----------------------------------------------------------------------------
+  # Format the byte count in B, KB, MB, or GB according to its size.
   if (bytes < 1024) {
     return(sprintf("%d B", bytes))
   } else if (bytes < 1024^2) {
@@ -1055,7 +1149,7 @@ download_unzip <- function(
   remove = FALSE
 ) {
   # ----------------------------------------------------------------------------
-  # Return NULL if `unzip = FALSE`
+  # Return NULL if `unzip = FALSE`.
   if (!unzip) {
     message(paste0("Downloaded files will not be unzipped.\n"))
     return(NULL)
@@ -1072,13 +1166,14 @@ download_unzip <- function(
     stop("Unsupported archive format. Expected .zip or .7z.")
   }
   # ----------------------------------------------------------------------------
+  # Report where the extracted files were saved.
   message(paste0(
     "Files unzipped and saved in ",
     directory_to_unzip,
     ".\n"
   ))
   # ----------------------------------------------------------------------------
-  # Remove zip files if `remove = TRUE`
+  # Remove downloaded archives and their parent directories when requested.
   amadeus::download_remove_zips(
     remove = remove,
     download_name = file_name
@@ -1103,12 +1198,13 @@ download_remove_zips <- function(
   remove = FALSE,
   download_name
 ) {
-  #### remove zip files
+  # ----------------------------------------------------------------------------
+  # Remove the downloaded files when requested.
   if (remove) {
     message(paste0("Removing download files...\n"))
     file.remove(download_name)
-    # oftentimes zipfiles are stored in zip_files under
-    # directory_to_save in download functions.
+    # --------------------------------------------------------------------------
+    # Remove their parent directories recursively, including remaining contents.
     unlink(dirname(download_name), recursive = TRUE)
     message(paste0("Download files removed.\n"))
   }
@@ -1127,12 +1223,18 @@ download_hash <- function(
   hash = TRUE,
   dir = NULL
 ) {
+  # ----------------------------------------------------------------------------
+  # Calculate a combined file hash when requested.
   if (hash) {
+    # --------------------------------------------------------------------------
+    # Build the command to hash all files within the directory.
     h_command <- paste0(
       "find ",
       shQuote(dir),
       " -type f -exec md5sum {} + | awk '{print $1}' | sort -k 2 | md5sum"
     )
+    # --------------------------------------------------------------------------
+    # Run the command and return the hash without the trailing filename marker.
     h <- system(h_command, intern = TRUE)
     h_clean <- sub("  -$", "", h)
     return(h_clean)
@@ -1160,6 +1262,8 @@ download_return <- function(
   hash,
   directory_to_save
 ) {
+  # ----------------------------------------------------------------------------
+  # Return a directory hash or an invisible download summary.
   if (hash) {
     amadeus::download_hash(hash = hash, directory_to_save)
   } else {

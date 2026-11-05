@@ -13,6 +13,8 @@
 #' @export
 download_permit <-
   function(acknowledgement) {
+    # --------------------------------------------------------------------------
+    # Stop when the download acknowledgement has not been given.
     if (!acknowledgement) {
       stop(paste0(
         "Data download acknowledgement is set to FALSE. ",
@@ -37,9 +39,13 @@ check_for_null_parameters <-
   function(
     parameters
   ) {
+    # --------------------------------------------------------------------------
+    # Exclude the optional spatial extent from required parameters.
     if ("extent" %in% names(parameters)) {
       parameters <- parameters[-grep("extent", names(parameters))]
     }
+    # --------------------------------------------------------------------------
+    # Stop if any remaining parameter is NULL.
     parameters_status <- any(unlist(lapply(parameters, is.null)))
     if (parameters_status) {
       stop(paste0("One or more parameters are NULL\n"))
@@ -57,9 +63,13 @@ check_for_null_parameters <-
 #' @export
 download_sink <-
   function(command_txt) {
+    # --------------------------------------------------------------------------
+    # Remove an existing download command file.
     if (file.exists(command_txt)) {
       file.remove(command_txt)
     }
+    # --------------------------------------------------------------------------
+    # Redirect subsequent output to a new command file.
     sink(file = command_txt, append = FALSE)
   }
 
@@ -75,6 +85,8 @@ download_sink <-
 read_commands <- function(
   commands_path = commands_path
 ) {
+  # ----------------------------------------------------------------------------
+  # Read the command file and return its rows as a vector.
   commands <- utils::read.csv(commands_path, header = FALSE)
   commands <- commands[seq_len(nrow(commands)), ]
   return(commands)
@@ -93,10 +105,14 @@ extract_urls <- function(
   commands = commands,
   position = NULL
 ) {
+  # ----------------------------------------------------------------------------
+  # Return early when the URL position is unspecified.
   if (is.null(position)) {
     message("URL position in command is not defined.")
     return(NULL)
   }
+  # ----------------------------------------------------------------------------
+  # Extract the requested space-delimited field from each command.
   urls <- sapply(
     strsplit(
       trimws(commands),
@@ -131,7 +147,8 @@ download_run <- function(
   commands_txt = NULL,
   remove = FALSE
 ) {
-  # Show deprecation warning once per session
+  # ----------------------------------------------------------------------------
+  # Warn about the legacy command runner once per session.
   if (!isTRUE(getOption("amadeus.download_run.warned"))) {
     warning(
       "download_run() is deprecated. Use download_run_method() instead.\n",
@@ -142,6 +159,8 @@ download_run <- function(
     options(amadeus.download_run.warned = TRUE)
   }
 
+  # ----------------------------------------------------------------------------
+  # Prepare the command file and runner for the current operating system.
   if (tolower(.Platform$OS.type) == "windows") {
     # nocov start
     runner <- ""
@@ -155,6 +174,8 @@ download_run <- function(
       commands_txt <- paste0("./", commands_txt)
     }
   }
+  # ----------------------------------------------------------------------------
+  # Execute or skip the saved download commands.
   system_command <- paste0(runner, shQuote(commands_txt))
   if (download == TRUE) {
     message(paste0("Downloading requested files...\n"))
@@ -163,6 +184,8 @@ download_run <- function(
   } else {
     message(paste0("Skipping data download.\n"))
   }
+  # ----------------------------------------------------------------------------
+  # Remove the command file when requested.
   amadeus::download_remove_command(
     commands_txt = commands_txt,
     remove = remove
@@ -181,6 +204,8 @@ download_run <- function(
 #' @export
 download_remove_command <-
   function(commands_txt = NULL, remove = FALSE) {
+    # --------------------------------------------------------------------------
+    # Remove the command file when requested.
     if (remove) {
       file.remove(commands_txt)
     }
@@ -204,11 +229,15 @@ generate_date_sequence <-
     date_end,
     sub_hyphen = TRUE
   ) {
+    # --------------------------------------------------------------------------
+    # Generate daily dates between the supplied endpoints.
     dates_original <- seq(
       as.Date(date_start, format = "%Y-%m-%d"),
       as.Date(date_end, format = "%Y-%m-%d"),
       "day"
     )
+    # --------------------------------------------------------------------------
+    # Return compact date strings or retain the Date vector.
     if (sub_hyphen) {
       dates_sub_hyphen <- gsub("-", "", as.character(dates_original))
       return(dates_sub_hyphen)
@@ -235,12 +264,16 @@ generate_time_sequence <-
   function(
     collection
   ) {
+    # --------------------------------------------------------------------------
+    # Select whole-hour or half-hour values using the collection suffix.
     collection_end <- substr(collection, nchar(collection), nchar(collection))
     if (collection_end == "1") {
       ts <- seq(from = 30, to = 2330, by = 100)
     } else if (collection_end == "3") {
       ts <- seq(from = 0, to = 2300, by = 100)
     }
+    # --------------------------------------------------------------------------
+    # Format the sequence as four-digit clock times.
     time_sequence <- sprintf("%04d", ts)
     return(time_sequence)
   }

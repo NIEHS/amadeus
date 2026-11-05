@@ -237,6 +237,8 @@ download_normalize_aqs_unzip <- function(
   # ----------------------------------------------------------------------------
   # Move files into the main data directory.
   for (nested_file in nested_files) {
+    # --------------------------------------------------------------------------
+    # Move a nested file when its destination does not already exist.
     target_file <- file.path(directory_to_unzip, basename(nested_file))
     if (!file.exists(target_file)) {
       moved <- file.rename(nested_file, target_file)
@@ -249,6 +251,7 @@ download_normalize_aqs_unzip <- function(
         # nocov end
       }
     } else {
+      # ------------------------------------------------------------------------
       # Keep the existing destination and remove this nested file.
       unlink(nested_file)
     }
