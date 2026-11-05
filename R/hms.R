@@ -54,177 +54,104 @@ download_hms <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### Check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### Check dates
-  date <- if (length(date) == 1) rep(date, 2) else date
-  stopifnot(length(date) == 2)
-  date <- date[order(as.Date(date))]
-  if (as.Date(date[1]) < as.Date("2005-08-05")) {
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  amadeus:::download_check(
+    dataset_name = "hms",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip,
+    remove_zip = remove_zip,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  chr_format <- tolower(data_format)
+  checkmate::assert_choice(chr_format, c("shapefile", "kml"))
+  # ----------------------------------------------------------------------------
+  # Check `date` and generate sequence.
+  chr_dates <- amadeus:::sequence_dates(date, hyphen = FALSE)
+  if (as.Date(chr_dates[1], format = "%Y%m%d") < as.Date("2005-08-05")) {
     stop("NOAA HMS wildfire smoke data begins at August 05, 2005.")
   }
-
-  #### Directory setup
-  directory_original <- amadeus::download_sanitize_path(directory_to_save)
-  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
-  directory_to_download <- directories[1]
-  directory_to_save <- directories[2]
-
-  #### Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.\n",
-      call. = FALSE
-    )
-  }
-
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### Check for unzip/remove_zip conflict
-  if (unzip == FALSE && remove_zip == TRUE) {
-    stop(paste0(
-      "Arguments unzip = FALSE and remove_zip = TRUE are not ",
-      "acceptable together. Please change one.\n"
-    ))
-  }
-
-  #### Define date sequence
-  date_sequence <- amadeus::generate_date_sequence(
-    date[1],
-    date[2],
-    sub_hyphen = TRUE
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_directories <- amadeus::download_setup_dir(
+    amadeus::download_sanitize_path(directory_to_save),
+    zip = TRUE
   )
-
-  #### Define URL base
-  base <- "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/"
-
-  #### Collect all URLs and destination files
-  all_urls <- character()
-  all_destfiles <- character()
-
-  for (f in seq_along(date_sequence)) {
-    year <- substr(date_sequence[f], 1, 4)
-    month <- substr(date_sequence[f], 5, 6)
-
-    if (tolower(data_format) == "shapefile") {
-      data_format <- "Shapefile"
-      suffix <- ".zip"
-      directory_to_cat <- directory_to_download
-    } else if (tolower(data_format) == "kml") {
-      data_format <- "KML"
-      suffix <- ".kml"
-      directory_to_cat <- directory_to_save
-    }
-
-    url <- paste0(
-      base,
-      data_format,
-      "/",
-      year,
-      "/",
-      month,
-      "/hms_smoke",
-      date_sequence[f],
-      suffix
-    )
-
-    # Validate first URL only
-    if (f == 1) {
-      if (!amadeus::check_url_status(url)) {
-        stop(paste0(
-          "Invalid date returns HTTP code 404. ",
-          "Check `date` parameter.\n"
-        ))
-      }
-    }
-
-    destfile <- paste0(
-      directory_to_cat,
+  chr_dir_to_download <- chr_directories[1]
+  chr_dir_to_save <- chr_directories[2]
+  # ----------------------------------------------------------------------------
+  # Define file suffix and download directory.
+  if (chr_format == "shapefile") {
+    chr_format <- "Shapefile"
+    chr_suffix <- ".zip"
+  } else {
+    chr_format <- "KML"
+    chr_suffix <- ".kml"
+    chr_dir_to_download <- chr_dir_to_save
+  }
+  # ----------------------------------------------------------------------------
+  # Generate download URLs.
+  chr_urls <- sprintf(
+    paste0(
+      "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/",
+      chr_format,
+      "/%s/%s/hms_smoke%s",
+      chr_suffix
+    ),
+    substr(chr_dates, 1, 4),
+    substr(chr_dates, 5, 6),
+    chr_dates
+  )
+  # ----------------------------------------------------------------------------
+  # Generate download file names.
+  chr_filenames <- sprintf(
+    paste0(
+      chr_dir_to_download,
       "hms_smoke_",
-      data_format,
-      "_",
-      date_sequence[f],
-      suffix
-    )
-
-    if (amadeus::check_destfile(destfile)) {
-      all_urls <- c(all_urls, url)
-      all_destfiles <- c(all_destfiles, destfile)
-    }
-  }
-
-  #### Exit early if download=FALSE
+      chr_format,
+      "_%s",
+      chr_suffix
+    ),
+    chr_dates
+  )
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(chr_urls[1])
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message(sprintf(
-      "Skipping download. Found %d files available for download.\n",
-      length(all_urls)
-    ))
-    return(invisible(list(
-      urls = all_urls,
-      destfiles = all_destfiles,
-      n_files = length(all_urls)
-    )))
+    return(invisible(amadeus::download_preview(chr_urls, chr_filenames)))
   }
-
-  if (length(all_urls) == 0L) {
-    message("All requested HMS files already exist. Nothing to download.\n")
-    return(invisible(list(
-      success = 0,
-      failed = 0,
-      skipped = length(date_sequence)
-    )))
-  }
-
-  #### Download files using httr2
+  # ----------------------------------------------------------------------------
+  # Run download.
   download_result <- amadeus::download_run_method(
-    urls = all_urls,
-    destfiles = all_destfiles,
+    urls = chr_urls,
+    destfiles = chr_filenames,
     token = NULL,
     show_progress = show_progress,
     max_tries = max_tries,
     rate_limit = rate_limit
   )
-
-  #### Handle KML (no unzipping needed)
-  if (data_format == "KML") {
-    unlink(directory_to_download, recursive = TRUE)
-    message("KML files cannot be unzipped.\n")
-    if (hash) {
-      return(amadeus::download_hash(hash = TRUE, directory_to_save))
-    } else {
-      return(invisible(download_result))
-    }
-  }
-
-  #### Unzip downloaded zip files
-  for (d in seq_along(all_destfiles)) {
-    amadeus::download_unzip(
-      file_name = all_destfiles[d],
-      directory_to_unzip = directory_to_save,
-      unzip = unzip
+  # ----------------------------------------------------------------------------
+  # `unzip` and `remove` parameters if data_format = "Shapefile".
+  if (chr_format == "Shapefile") {
+    vunzip <- Vectorize(amadeus::download_unzip)
+    vunzip(
+      file_name = chr_filenames,
+      directory_to_unzip = chr_dir_to_save,
+      unzip = unzip,
+      remove = remove_zip
     )
   }
-
-  #### Remove zip files
-  amadeus::download_remove_zips(
-    remove = remove_zip,
-    download_name = all_destfiles
-  )
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(download_result))
-  }
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################

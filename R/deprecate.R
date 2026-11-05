@@ -185,3 +185,34 @@ download_remove_command <-
       file.remove(commands_txt)
     }
   }
+
+################################################################################
+#' Generate date sequence
+#' @description
+#' Generate a sequence of dates from \code{date_start} to \code{date_end}.
+#' @param date_start character(1). Beginning of date sequence.
+#' @param date_end character(1). End of date sequence.
+#' @param sub_hyphen logical(1). Substitute hyphen in dates. If `TRUE`, returns
+#' date sequence as "YYYYMMDD". If `FALSE`, returns date sequence as
+#' "YYYY-MM-DD".
+#' @return vector
+#' @keywords internal auxiliary
+#' @export
+generate_date_sequence <-
+  function(
+    date_start,
+    date_end,
+    sub_hyphen = TRUE
+  ) {
+    dates_original <- seq(
+      as.Date(date_start, format = "%Y-%m-%d"),
+      as.Date(date_end, format = "%Y-%m-%d"),
+      "day"
+    )
+    if (sub_hyphen) {
+      dates_sub_hyphen <- gsub("-", "", as.character(dates_original))
+      return(dates_sub_hyphen)
+    } else {
+      return(dates_original)
+    }
+  }

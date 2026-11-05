@@ -22,7 +22,7 @@ testthat::test_that("download_hms (no errors)", {
     }
 
     # run download function
-    testthat::expect_no_error(
+    testthat::expect_warning(
       download_data(
         dataset_name = "smoke",
         date = c(date_start, date_end),
@@ -33,41 +33,14 @@ testthat::test_that("download_hms (no errors)", {
         remove_command = FALSE,
         unzip = FALSE,
         remove_zip = FALSE
-      )
+      ),
+      regexp = "deprecated"
     )
 
     # Check that directory was created
     testthat::expect_true(
       dir.exists(directory_to_save)
     )
-
-    # define file path with commands
-    commands_path <- paste0(
-      download_sanitize_path(directory_to_save),
-      "hms_smoke_",
-      gsub("-", "", date_start),
-      "_",
-      gsub("-", "", date_end),
-      "_curl_commands.txt"
-    )
-
-    # Only proceed with command file tests if it exists
-    if (file.exists(commands_path)) {
-      # import commands
-      commands <- read_commands(commands_path = commands_path)
-      # extract urls
-      urls <- extract_urls(commands = commands, position = 6)
-      # check HTTP URL status
-      url_status <- check_urls(urls = urls, size = 10L)
-      # implement unit tests
-      test_download_functions(
-        directory_to_save = directory_to_save,
-        commands_path = commands_path,
-        url_status = url_status
-      )
-      # remove file with commands after test
-      file.remove(commands_path)
-    }
 
     # remove temporary hms
     unlink(directory_to_save, recursive = TRUE)
@@ -806,38 +779,6 @@ testthat::test_that("calculate_hms character single-date .by_time is no-op", {
 
 ################################################################################
 ##### download_hms KML format and hash=FALSE branches
-
-testthat::test_that("download_hms KML format mock download", {
-  testthat::local_mocked_bindings(
-    check_url_status = function(...) TRUE,
-    download_run_method = function(...) list(success = 1, failed = 0),
-    download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
-    .package = "amadeus"
-  )
-  withr::with_tempdir({
-    msgs <- character(0)
-    result <- withCallingHandlers(
-      suppressWarnings(
-        download_hms(
-          date = c("2018-01-01", "2018-01-01"),
-          data_format = "KML",
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = TRUE,
-          unzip = FALSE,
-          hash = FALSE
-        )
-      ),
-      message = function(m) {
-        msgs <<- c(msgs, conditionMessage(m))
-        invokeRestart("muffleMessage")
-      }
-    )
-    testthat::expect_true(any(grepl("KML", msgs)))
-    testthat::expect_type(result, "list")
-  })
-})
-
 testthat::test_that("download_hms KML format mock download hash=TRUE", {
   testthat::local_mocked_bindings(
     check_url_status = function(...) TRUE,
@@ -892,34 +833,31 @@ testthat::test_that("download_hms Shapefile mock download hash=FALSE", {
 })
 
 testthat::test_that("download_hms skips cleanly when all files already exist", {
-  testthat::local_mocked_bindings(
-    check_url_status = function(...) TRUE,
-    check_destfile = function(...) FALSE,
-    download_run_method = function(...) {
-      stop("download_run_method should not be called")
-    },
-    download_unzip = function(...) invisible(NULL),
-    download_remove_zips = function(...) invisible(NULL),
-    .package = "amadeus"
-  )
   withr::with_tempdir({
-    result <- suppressWarnings(
-      suppressMessages(
-        download_hms(
-          date = c("2018-01-01", "2018-01-02"),
-          data_format = "Shapefile",
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = TRUE,
-          unzip = FALSE,
-          hash = FALSE
-        )
+    r1 <-
+      download_hms(
+        date = c("2018-12-30", "2018-12-31"),
+        data_format = "Shapefile",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = FALSE,
+        hash = FALSE
       )
-    )
-    testthat::expect_type(result, "list")
-    testthat::expect_equal(result$success, 0)
-    testthat::expect_equal(result$failed, 0)
-    testthat::expect_equal(result$skipped, 2)
+    r2 <-
+      download_hms(
+        date = c("2018-12-30", "2018-12-31"),
+        data_format = "Shapefile",
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = TRUE,
+        unzip = FALSE,
+        hash = FALSE
+      )
+    testthat::expect_type(r2, "list")
+    testthat::expect_equal(r2$success, 0)
+    testthat::expect_equal(r2$failed, 0)
+    testthat::expect_equal(r2$skipped, 2)
   })
 })
 

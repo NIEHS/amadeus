@@ -219,7 +219,7 @@ download_data <-
 #' @noRd
 sequence_years <- function(year) {
   # ----------------------------------------------------------------------------
-  # Repeat year if only one.
+  # Repeat `year` if only one.
   int_years <- if (length(year) == 1) rep(year, 2) else year
   # ----------------------------------------------------------------------------
   # Ensure `year` is length 2.
@@ -232,7 +232,7 @@ sequence_years <- function(year) {
   )
   # ----------------------------------------------------------------------------
   # Order years.
-  int_years <- int_years[order(int_years)]
+  int_years <- sort(int_years)
   # ----------------------------------------------------------------------------
   # Generate sequence.
   seq(int_years[1], int_years[2], 1)
@@ -497,35 +497,59 @@ get_token <- function(token = NULL, env_var = "NASA_EARTHDATA_TOKEN") {
 }
 
 ################################################################################
-#' Generate date sequence
+#' Generate an inclusive sequence of dates
 #' @description
-#' Generate a sequence of dates from \code{date_start} to \code{date_end}.
-#' @param date_start character(1). Beginning of date sequence.
-#' @param date_end character(1). End of date sequence.
-#' @param sub_hyphen logical(1). Substitute hyphen in dates. If `TRUE`, returns
-#' date sequence as "YYYYMMDD". If `FALSE`, returns date sequence as
-#' "YYYY-MM-DD".
-#' @return vector
+#' Generate consecutive daily dates from a single date or two range endpoints.
+#' Range endpoints are ordered before generating the sequence.
+#' @param date character(1 or 2). A single date or two range endpoints in
+#' `"YYYY-MM-DD"` format. Endpoints may be supplied in either order.
+#' @param hyphen logical(1). Include hyphens in the returned date strings.
+#' If `FALSE` (the default), return `"YYYYMMDD"`; if `TRUE`, return
+#' `"YYYY-MM-DD"`.
+#' @return A character vector of daily dates in ascending order, including
+#' both endpoints. A single input date returns one date string. The output
+#' format is controlled by `hyphen`.
+#' @author Mitchell Manware
+#' @seealso [base::seq.Date()], [base::as.Date()]
+#' @examples
+#' sequence_dates("2020-05-05")
+#' sequence_dates(c("2020-05-07", "2020-05-05"))
+#' sequence_dates(c("2020-05-05", "2020-05-07"), hyphen = TRUE)
 #' @keywords internal auxiliary
 #' @export
-generate_date_sequence <-
-  function(
-    date_start,
-    date_end,
-    sub_hyphen = TRUE
-  ) {
-    dates_original <- seq(
-      as.Date(date_start, format = "%Y-%m-%d"),
-      as.Date(date_end, format = "%Y-%m-%d"),
+sequence_dates <- function(date, hyphen = FALSE) {
+  #-----------------------------------------------------------------------------
+  # Ensure `hyphen` is TRUE/FALSE.
+  checkmate::assert_flag(hyphen)
+  # ----------------------------------------------------------------------------
+  # Repeat date if only one.
+  chr_dates <- if (length(date) == 1) rep(date, 2) else date
+  # ----------------------------------------------------------------------------
+  # Ensure `date` is length 2.
+  checkmate::assert_character(chr_dates, n.chars = 10, len = 2)
+  # ----------------------------------------------------------------------------
+  # Order dates.
+  chr_dates <- sort(chr_dates)
+  # ----------------------------------------------------------------------------
+  # Ensure valid date range.
+  checkmate::assert_date(
+    as.Date(chr_dates, "%Y-%m-%d"),
+    lower = as.Date("1950-01-01"),
+    upper = Sys.Date()
+  )
+  # ----------------------------------------------------------------------------
+  # Generate sequence.
+  date_seq <- as.character(
+    seq(
+      as.Date(chr_dates[1], format = "%Y-%m-%d"),
+      as.Date(chr_dates[2], format = "%Y-%m-%d"),
       "day"
     )
-    if (sub_hyphen) {
-      dates_sub_hyphen <- gsub("-", "", as.character(dates_original))
-      return(dates_sub_hyphen)
-    } else {
-      return(dates_original)
-    }
-  }
+  )
+  # ----------------------------------------------------------------------------
+  # Format dates according to `hyphen`.
+  if (hyphen) date_seq else gsub("-", "", as.character(date_seq))
+}
 
 ################################################################################
 #' Check if destination file exists or is 0 bytes.
