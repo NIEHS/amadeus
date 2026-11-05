@@ -177,129 +177,88 @@ download_narr <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### 1. Check for data download acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### 2. Check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### 3. Check years
-  year <- if (length(year) == 1) rep(year, 2) else year
-  stopifnot(length(year) == 2)
-  year <- year[order(year)]
-
-  #### 4. Directory setup
-  amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-
-  #### 5. Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return",
-      " after discovering files.\n",
-      call. = FALSE
-    )
-  }
-
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### 6. Define years sequence
-  if (any(nchar(year[1]) != 4, nchar(year[2]) != 4)) {
-    stop("years should be 4-digit integers.\n")
-  }
-  stopifnot(
-    all(
-      seq(year[1], year[2], 1) %in%
-        seq(1979, as.numeric(substr(Sys.Date(), 1, 4)), 1)
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  amadeus:::download_check(
+    dataset_name = "narr",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = FALSE,
+    remove_zip = FALSE,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  checkmate::expect_character(variables, min.char = 1L)
+  # ----------------------------------------------------------------------------
+  # Check `years` and generate sequence.
+  int_years <- amadeus:::sequence_years(year)
+  # ----------------------------------------------------------------------------
+  # Generate saving directory.
+  chr_dir_to_save <- amadeus::download_setup_dir(directory_to_save)
+  # ----------------------------------------------------------------------------
+  # Store variables as `list`.
+  list_variables <- as.vector(variables)
+  # ----------------------------------------------------------------------------
+  # Generate download URLs, file names, and variable-specific directories.
+  df_download <- do.call(
+    rbind,
+    lapply(
+      list_variables,
+      function(x) {
+        # ----------------------------------------------------------------------
+        # Extract variable-specific URL base and months.
+        list_narrvar <- amadeus::narr_variable(x)
+        # ----------------------------------------------------------------------
+        # Apply URL formula for all variables.
+        # Multi-pressure level variables have monthly files.
+        df_x <- expand.grid(
+          base = list_narrvar[[1]],
+          variable = x,
+          year = int_years,
+          month = list_narrvar[[2]],
+          dir = chr_dir_to_save
+        )
+        df_x$file <- with(df_x, paste0(variable, ".", year, month, ".nc"))
+        df_x$url <- with(df_x, paste0(base, file))
+        df_x$vdir <- with(df_x, paste0(dir, variable, "/"))
+        df_x$destfile <- with(df_x, paste0(vdir, file))
+        df_x
+      }
     )
   )
-  years <- seq(year[1], year[2], 1)
-
-  #### 7. Define variables
-  variables_list <- as.vector(variables)
-
-  #### 8. Collect all URLs and destination files
-  all_urls <- character()
-  all_destfiles <- character()
-
-  for (v in seq_along(variables_list)) {
-    variable <- variables_list[v]
-    folder <- paste0(directory_to_save, variable, "/")
-
-    # Implement variable sorting function
-    base <- amadeus::narr_variable(variable)[[1]]
-    months <- amadeus::narr_variable(variable)[[2]]
-
-    if (!dir.exists(folder)) {
-      dir.create(folder, recursive = TRUE)
-    }
-
-    for (y in seq_along(years)) {
-      year_l <- years[y]
-      for (m in seq_along(months)) {
-        url <- paste0(
-          base,
-          variable,
-          ".",
-          year_l,
-          months[m],
-          ".nc"
-        )
-        destfile <- paste0(
-          directory_to_save,
-          variable,
-          "/",
-          variable,
-          ".",
-          year_l,
-          months[m],
-          ".nc"
-        )
-
-        # Only add if file doesn't exist or is 0 bytes
-        if (amadeus::check_destfile(destfile)) {
-          all_urls <- c(all_urls, url)
-          all_destfiles <- c(all_destfiles, destfile)
-        }
-      }
-    }
-  }
-
-  #### 9. Exit early if download=FALSE (deprecated behavior)
+  # ----------------------------------------------------------------------------
+  # Create missing directories.
+  invisible(suppressWarnings(sapply(unique(df_download$vdir), dir.create)))
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity. First only because sequential `int_years` will
+  # ensure first URL is earliest year requested or only non-temporal SPEI/EDDI
+  # request.
+  amadeus:::check_preflight(df_download$url[1])
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message(sprintf(
-      "Skipping download. Found %d files available for download.\n",
-      length(all_urls)
-    ))
-    return(invisible(list(
-      urls = all_urls,
-      destfiles = all_destfiles,
-      n_files = length(all_urls)
+    return(invisible(amadeus::download_preview(
+      df_download$url,
+      df_download$destfile
     )))
   }
-
-  #### 10. Download files using httr2
+  # ----------------------------------------------------------------------------
+  # Run download.
   download_result <- amadeus::download_run_method(
-    urls = all_urls,
-    destfiles = all_destfiles,
-    token = NULL, # NARR doesn't use token authentication
+    urls = df_download$url,
+    destfiles = df_download$destfile,
+    token = NULL,
     show_progress = show_progress,
     max_tries = max_tries,
     rate_limit = rate_limit
   )
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(download_result))
-  }
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
