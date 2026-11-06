@@ -407,21 +407,19 @@ testthat::test_that("download_merra2 supports mixed FWI and standard requests", 
   fake_xml <- paste0(fake_nc4, ".xml")
   fake_html <- sprintf(
     '<html><a href="%s">%s</a><a href="%s">%s</a></html>',
-    fake_nc4, fake_nc4, fake_xml, fake_xml
+    fake_nc4,
+    fake_nc4,
+    fake_xml,
+    fake_xml
   )
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
-      structure(
-        list(
-          status_code = 200L,
-          headers = list(`Content-Type` = "text/html"),
-          body = charToRaw(fake_html)
-        ),
-        class = "httr2_response"
+      httr2::response(
+        status_code = 200L,
+        url = req$url,
+        headers = list(`Content-Type` = "text/html"),
+        body = charToRaw(fake_html)
       )
-    },
-    resp_body_string = function(resp, ...) {
-      rawToChar(resp$body)
     },
     .package = "httr2"
   )
@@ -721,7 +719,10 @@ make_merra2_hourly_fixture <- function(path, n_hours = 3) {
     layer
   }
 
-  layers <- do.call(c, lapply(seq_len(n_hours), function(i) build_layer(i * 10)))
+  layers <- do.call(
+    c,
+    lapply(seq_len(n_hours), function(i) build_layer(i * 10))
+  )
   terra::time(layers) <- as.POSIXct(
     paste0("2018-01-01 0", seq(0, n_hours - 1), ":00:00"),
     format = "%Y-%m-%d %H:%M:%S",
@@ -755,8 +756,14 @@ testthat::test_that("process_merra2 daily_agg=FALSE default is unchanged", {
       daily_agg = FALSE
     )
   )
-  testthat::expect_equal(terra::nlyr(merra2_default), terra::nlyr(merra2_explicit_false))
-  testthat::expect_equal(terra::values(merra2_default), terra::values(merra2_explicit_false))
+  testthat::expect_equal(
+    terra::nlyr(merra2_default),
+    terra::nlyr(merra2_explicit_false)
+  )
+  testthat::expect_equal(
+    terra::values(merra2_default),
+    terra::values(merra2_explicit_false)
+  )
 })
 
 testthat::test_that("process_merra2 daily_agg collapses sub-daily layers", {
@@ -770,12 +777,22 @@ testthat::test_that("process_merra2 daily_agg collapses sub-daily layers", {
       process_merra2(date = "2018-01-01", variable = "CPT", path = tmpdir)
     )
     merra2_daily_mean <- suppressMessages(
-      process_merra2(date = "2018-01-01", variable = "CPT", path = tmpdir,
-                     daily_agg = TRUE, fun = "mean")
+      process_merra2(
+        date = "2018-01-01",
+        variable = "CPT",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "mean"
+      )
     )
     merra2_daily_max <- suppressMessages(
-      process_merra2(date = "2018-01-01", variable = "CPT", path = tmpdir,
-                     daily_agg = TRUE, fun = "max")
+      process_merra2(
+        date = "2018-01-01",
+        variable = "CPT",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "max"
+      )
     )
 
     # 3 sub-daily layers
@@ -798,78 +815,72 @@ testthat::test_that("process_merra2 daily_agg collapses sub-daily layers", {
   })
 })
 
-testthat::test_that(
-  "process_covariates(covariate=merra2, daily_agg=TRUE): forwards daily aggregation args",
-  {
-    withr::local_package("terra")
+testthat::test_that("process_covariates(covariate=merra2, daily_agg=TRUE): forwards daily aggregation args", {
+  withr::local_package("terra")
 
-    withr::with_tempdir({
-      tmpdir <- getwd()
-      make_merra2_hourly_fixture(tmpdir, n_hours = 3)
+  withr::with_tempdir({
+    tmpdir <- getwd()
+    make_merra2_hourly_fixture(tmpdir, n_hours = 3)
 
-      merra2_daily_mean <- suppressMessages(
-        process_covariates(
-          covariate = "merra2",
-          date = "2018-01-01",
-          variable = "CPT",
-          path = tmpdir,
-          daily_agg = TRUE,
-          fun = "mean"
-        )
+    merra2_daily_mean <- suppressMessages(
+      process_covariates(
+        covariate = "merra2",
+        date = "2018-01-01",
+        variable = "CPT",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "mean"
       )
-      merra2_daily_sum <- suppressMessages(
-        process_covariates(
-          covariate = "merra2",
-          date = "2018-01-01",
-          variable = "CPT",
-          path = tmpdir,
-          daily_agg = TRUE,
-          fun = "sum"
-        )
+    )
+    merra2_daily_sum <- suppressMessages(
+      process_covariates(
+        covariate = "merra2",
+        date = "2018-01-01",
+        variable = "CPT",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "sum"
       )
+    )
 
-      testthat::expect_equal(terra::nlyr(merra2_daily_mean), 1L)
-      testthat::expect_equal(terra::nlyr(merra2_daily_sum), 1L)
-      testthat::expect_true(all(
-        terra::values(merra2_daily_sum) >= terra::values(merra2_daily_mean),
-        na.rm = TRUE
-      ))
-    })
-  }
-)
+    testthat::expect_equal(terra::nlyr(merra2_daily_mean), 1L)
+    testthat::expect_equal(terra::nlyr(merra2_daily_sum), 1L)
+    testthat::expect_true(all(
+      terra::values(merra2_daily_sum) >= terra::values(merra2_daily_mean),
+      na.rm = TRUE
+    ))
+  })
+})
 
-testthat::test_that(
-  "process_covariates(covariate=merra|merra2, daily_agg=TRUE): alias dispatch is consistent",
-  {
-    withr::local_package("terra")
-    withr::with_tempdir({
-      tmpdir <- getwd()
-      make_merra2_hourly_fixture(tmpdir, n_hours = 3)
-      out_merra2 <- suppressMessages(
-        process_covariates(
-          covariate = "merra2",
-          date = "2018-01-01",
-          variable = "CPT",
-          path = tmpdir,
-          daily_agg = TRUE,
-          fun = "mean"
-        )
+testthat::test_that("process_covariates(covariate=merra|merra2, daily_agg=TRUE): alias dispatch is consistent", {
+  withr::local_package("terra")
+  withr::with_tempdir({
+    tmpdir <- getwd()
+    make_merra2_hourly_fixture(tmpdir, n_hours = 3)
+    out_merra2 <- suppressMessages(
+      process_covariates(
+        covariate = "merra2",
+        date = "2018-01-01",
+        variable = "CPT",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "mean"
       )
-      out_merra <- suppressMessages(
-        process_covariates(
-          covariate = "merra",
-          date = "2018-01-01",
-          variable = "CPT",
-          path = tmpdir,
-          daily_agg = TRUE,
-          fun = "mean"
-        )
+    )
+    out_merra <- suppressMessages(
+      process_covariates(
+        covariate = "merra",
+        date = "2018-01-01",
+        variable = "CPT",
+        path = tmpdir,
+        daily_agg = TRUE,
+        fun = "mean"
       )
-      testthat::expect_equal(terra::nlyr(out_merra), terra::nlyr(out_merra2))
-      testthat::expect_equal(terra::values(out_merra), terra::values(out_merra2))
-    })
-  }
-)
+    )
+    testthat::expect_equal(terra::nlyr(out_merra), terra::nlyr(out_merra2))
+    testthat::expect_equal(terra::values(out_merra), terra::values(out_merra2))
+  })
+})
 
 testthat::test_that("process_merra2 daily_agg silently skipped for FWI", {
   withr::local_package("terra")
@@ -881,12 +892,22 @@ testthat::test_that("process_merra2 daily_agg silently skipped for FWI", {
       process_merra2(date = "2024-08-11", variable = "FWI", path = tmpdir)
     )
     merra2_fwi_agg <- suppressMessages(
-      process_merra2(date = "2024-08-11", variable = "FWI", path = tmpdir,
-                     daily_agg = TRUE)
+      process_merra2(
+        date = "2024-08-11",
+        variable = "FWI",
+        path = tmpdir,
+        daily_agg = TRUE
+      )
     )
     # FWI is already daily; daily_agg should not change the output
-    testthat::expect_equal(terra::nlyr(merra2_fwi_default), terra::nlyr(merra2_fwi_agg))
-    testthat::expect_equal(terra::values(merra2_fwi_default), terra::values(merra2_fwi_agg))
+    testthat::expect_equal(
+      terra::nlyr(merra2_fwi_default),
+      terra::nlyr(merra2_fwi_agg)
+    )
+    testthat::expect_equal(
+      terra::values(merra2_fwi_default),
+      terra::values(merra2_fwi_agg)
+    )
   })
 })
 
@@ -1115,21 +1136,19 @@ testthat::test_that("download_merra2 actual download path via httr2 mock", {
   fake_xml <- "MERRA2_400.inst1_2d_asm_Nx.20220214.nc4.xml"
   fake_html <- sprintf(
     '<html><a href="%s">%s</a><a href="%s">%s</a></html>',
-    fake_nc4, fake_nc4, fake_xml, fake_xml
+    fake_nc4,
+    fake_nc4,
+    fake_xml,
+    fake_xml
   )
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
-      structure(
-        list(
-          status_code = 200L,
-          headers = list(`Content-Type` = "text/html"),
-          body = charToRaw(fake_html)
-        ),
-        class = "httr2_response"
+      httr2::response(
+        status_code = 200L,
+        url = req$url,
+        headers = list(`Content-Type` = "text/html"),
+        body = charToRaw(fake_html)
       )
-    },
-    resp_body_string = function(resp, ...) {
-      rawToChar(resp$body)
     },
     .package = "httr2"
   )
@@ -1174,7 +1193,7 @@ testthat::test_that("download_merra2 handles req_perform error with warning", {
     .package = "httr2"
   )
   withr::with_tempdir({
-    testthat::expect_warning(
+    testthat::expect_error(
       suppressMessages(
         download_merra2(
           collection = "inst1_2d_asm_Nx",
@@ -1186,7 +1205,7 @@ testthat::test_that("download_merra2 handles req_perform error with warning", {
           hash = FALSE
         )
       ),
-      "Failed to get directory listing"
+      "Failed to read MERRA-2 listing"
     )
   })
 })
@@ -1208,20 +1227,18 @@ testthat::test_that("download_merra2 download=FALSE returns url list", {
   fake_nc4 <- "MERRA2_400.inst1_2d_asm_Nx.20220214.nc4"
   fake_html <- sprintf(
     '<html><a href="%s">%s</a></html>',
-    fake_nc4, fake_nc4
+    fake_nc4,
+    fake_nc4
   )
   testthat::local_mocked_bindings(
     req_perform = function(req, path = NULL, ...) {
-      structure(
-        list(
-          status_code = 200L,
-          headers = list(`Content-Type` = "text/html"),
-          body = charToRaw(fake_html)
-        ),
-        class = "httr2_response"
+      httr2::response(
+        status_code = 200L,
+        url = req$url,
+        headers = list(`Content-Type` = "text/html"),
+        body = charToRaw(fake_html)
       )
     },
-    resp_body_string = function(resp, ...) rawToChar(resp$body),
     .package = "httr2"
   )
   withr::with_tempdir({

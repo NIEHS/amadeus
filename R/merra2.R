@@ -17,38 +17,99 @@
 #' weather inputs.
 #' @note Due to NASA data access policies, standard MERRA-2 GES DISC downloads
 #' require a valid NASA Earthdata token for authentication. Use
-#' \code{setup_nasa_token()} for setup. The `"fwi"` collection is hosted on the
+#' [setup_nasa_token()] for setup. The `"fwi"` collection is hosted on the
 #' public GlobalFWI portal and does not require Earthdata authentication.
-#' @param collection character(1). MERRA-2 data collection file name, or
-#'   `"fwi"` for the daily corrected Global Fire Weather Index product
-#'   (`MERRA2.CORRECTED`).
-#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
-#'   authentication token.
-#' @param date character(1 or 2). length of 10. Date or start/end dates
-#'   for downloading data.
-#' Format "YYYY-MM-DD" (ex. January 1, 2018 = `"2018-01-01"`).
-#' @param directory_to_save character(1). Directory to save data.
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). DEPRECATED. Downloads happen automatically.
-#' @param remove_command logical(1). Deprecated, ignored.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
-#' @param show_progress logical(1). Show download progress (default TRUE)
-#' @param max_tries integer(1). Maximum retry attempts (default 20)
-#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @param collection character vector. One or more supported MERRA-2 collection
+#'   identifiers, or `"fwi"` for the daily corrected Global Fire Weather Index
+#'   product (`MERRA2.CORRECTED`). Repeated identifiers are removed. The default
+#'   selects all collections listed in the function signature, including FWI.
+#'   Supported identifiers and product metadata are stored in the installed
+#'   `extdata/df_merra2.csv` lookup table.
+#' @param nasa_earth_data_token character(1) or NULL. NASA Earthdata token,
+#'   path to a file containing a token, or `NULL` to use the
+#'   `NASA_EARTHDATA_TOKEN` environment variable. [get_token()] checks the
+#'   environment variable first, then a supplied file path or token string.
+#'   Token lookup is required when any standard MERRA-2 collection is requested.
+#' @param date character(1 or 2). A single day or two range endpoints in
+#'   `"YYYY-MM-DD"` format. Endpoints may be supplied in either order; the
+#'   resulting daily sequence includes both endpoints.
+#' @param directory_to_save character(1). Non-empty directory path for downloads.
+#'   A path must be supplied despite the `NULL` default. Data files are saved
+#'   under a subdirectory named for each collection; available XML companions
+#'   are saved in that collection's `metadata` subdirectory.
+#' @param acknowledgement logical(1). Must be `TRUE` to proceed, acknowledging
+#'   that the downloads may require substantial storage and memory.
+#' @param download logical(1). Deprecated. `FALSE` emits a warning and returns
+#'   a download preview. Authentication checks, file discovery, directory
+#'   creation, and the preflight URL check still run before returning.
+#' @param remove_command logical(1). Deprecated and ignored. `TRUE` emits a
+#'   warning.
+#' @param hash logical(1). If `TRUE`, return the combined MD5 hash calculated
+#'   by [download_hash()] for all files under `directory_to_save`, including
+#'   metadata and files from earlier downloads. Default is `FALSE`. Ignored
+#'   when `download = FALSE`.
+#' @param show_progress logical(1). Show per-file progress messages and download
+#'   progress bars. Default is `TRUE`; summary and status messages may still be
+#'   printed when `FALSE`.
+#' @param max_tries integer(1). Maximum attempts per listing or file request,
+#'   including the initial attempt. Must be at least 1. Default is 20.
+#' @param rate_limit numeric(1). Non-negative request-throttling interval in
+#'   seconds. Default is 2. Passed to both discovery and file downloads; their
+#'   throttling behavior is described below.
+#' @details
+#' Standard MERRA-2 file URLs are discovered from monthly HTML directory
+#' listings. Published stream and revision prefixes are retained, and all
+#' matching files are included when more than one revision is listed for a
+#' date. Every requested date must have at least one matching `.nc4` file in
+#' its directory. Companion `.nc4.xml` metadata is optional and is included
+#' only when the corresponding data file is also listed. FWI `.nc` URLs are
+#' constructed directly from the requested dates.
+#'
+#' Discovery stops before file downloads if a monthly listing cannot be read,
+#' a requested data date is missing, or different URLs in a listing would
+#' use the same local filename. Once discovery succeeds, [download_run_method()]
+#' skips existing non-empty files and records individual download failures,
+#' warning after the remaining files have been attempted.
+#'
+#' Listing requests to the same host are spaced by at least `rate_limit`
+#' seconds; 0 disables listing throttling. File downloads use the host-based
+#' token bucket described in [download_run_method()]. The preflight URL check
+#' uses its own request settings. Discovery and file downloads use their
+#' default per-attempt timeout of 3600 seconds; this function does not expose
+#' a `timeout` argument.
 #' @author Mitchell Manware, Insang Song, Kyle Messier
-#' @return invisible list with download results; or hash character if hash=TRUE
+#' @return
+#' With `download = TRUE` and `hash = FALSE`, an invisible list containing
+#' `success`, `failed`, and `skipped` file counts. If any downloads were
+#' attempted, it also contains `failed_urls` and `failed_files` character
+#' vectors, which are empty when no files failed. These two fields are absent
+#' when every file was skipped. Counts include XML metadata files.
+#'
+#' With `download = TRUE` and `hash = TRUE`, a character scalar containing the
+#' combined directory MD5 hash, returned visibly.
+#'
+#' With `download = FALSE`, an invisible preview list containing `urls`,
+#' `destfiles`, and `n_files`, regardless of `hash`.
+#' @seealso [setup_nasa_token()], [get_token()], [download_run_method()],
+#'   [download_hash()], [process_merra2()], [get_merra2_info()]
 #' @importFrom Rdpack reprompt
 #' @examples
 #' \dontrun{
+#' # Configure NASA_EARTHDATA_TOKEN with setup_nasa_token() before downloading.
 #' download_merra2(
 #'   collection = "inst1_2d_int_Nx",
 #'   date = "2024-01-01",
 #'   directory_to_save = tempdir(),
 #'   acknowledgement = TRUE
+#' )
+#'
+#' # Download two collections for an inclusive date range.
+#' download_merra2(
+#'   collection = c("inst1_2d_int_Nx", "tavg1_2d_slv_Nx"),
+#'   date = c("2024-01-01", "2024-01-02"),
+#'   directory_to_save = file.path(tempdir(), "merra2"),
+#'   acknowledgement = TRUE,
+#'   max_tries = 3
 #' )
 #' }
 #' @export
@@ -107,347 +168,415 @@ download_merra2 <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### 1. Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### 2. Directory setup (can be done early)
-  amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-
-  #### 3. Check dates
-  date <- if (length(date) == 1) rep(date, 2) else date
-  stopifnot(length(date) == 2)
-  date <- date[order(as.Date(date))]
-
-  #### 3a. Handle deprecated parameters BEFORE token check
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return",
-      " after discovering files.\n",
-      call. = FALSE
-    )
-  }
-
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### 4. Check and retrieve NASA token for standard MERRA-2 collections only
-  standard_collection <- collection != "fwi"
-  if (any(standard_collection)) {
-    nasa_earth_data_token <- amadeus::get_token(
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  amadeus:::download_check(
+    dataset_name = "geos",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = FALSE,
+    remove_zip = FALSE,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  checkmate::assert_character(collection, min.char = 1L)
+  checkmate::assert_subset(collection, .amadeus$df_merra2$collection_id)
+  # ----------------------------------------------------------------------------
+  # Check NASA EarthData token.
+  chr_nasatoken <- NULL
+  if (any(!grepl("fwi", collection))) {
+    chr_nasatoken <- amadeus::get_token(
       token = nasa_earth_data_token,
       env_var = "NASA_EARTHDATA_TOKEN"
     )
+    checkmate::assert_string(chr_nasatoken, min.chars = 1L)
   }
-
-  #### 5. Now check for null parameters
-  parameters <- mget(ls())
-  if (!any(standard_collection)) {
-    parameters$nasa_earth_data_token <- ""
-  }
-  parameters <- parameters
-  amadeus::check_for_null_parameters(parameters)
-
-  #### 7. Check if collection is recognized
-  identifiers <- c(
-    "inst1_2d_asm_Nx M2I1NXASM 10.5067/3Z173KIE2TPD",
-    "inst1_2d_int_Nx M2I1NXINT 10.5067/G0U6NGQ3BLE0",
-    "inst1_2d_lfo_Nx M2I1NXLFO 10.5067/RCMZA6TL70BG",
-    "inst3_3d_asm_Np M2I3NPASM 10.5067/QBZ6MG944HW0",
-    "inst3_3d_aer_Nv M2I3NVAER 10.5067/LTVB4GPCOTK2",
-    "inst3_3d_asm_Nv M2I3NVASM 10.5067/WWQSXQ8IVFW8",
-    "inst3_3d_chm_Nv M2I3NVCHM 10.5067/HO9OVZWF3KW2",
-    "inst3_3d_gas_Nv M2I3NVGAS 10.5067/96BUID8HGGX5",
-    "inst3_2d_gas_Nx M2I3NXGAS 10.5067/HNGA0EWW0R09",
-    "inst6_3d_ana_Np M2I6NPANA 10.5067/A7S6XP56VZWS",
-    "inst6_3d_ana_Nv M2I6NVANA 10.5067/IUUF4WB9FT4W",
-    "statD_2d_slv_Nx M2SDNXSLV 10.5067/9SC1VNTWGWV3",
-    "tavg1_2d_adg_Nx M2T1NXADG 10.5067/HM00OHQBHKTP",
-    "tavg1_2d_aer_Nx M2T1NXAER 10.5067/KLICLTZ8EM9D",
-    "tavg1_2d_chm_Nx M2T1NXCHM 10.5067/3RQ5YS674DGQ",
-    "tavg1_2d_csp_Nx M2T1NXCSP 10.5067/H0VVAD8F6MX5",
-    "tavg1_2d_flx_Nx M2T1NXFLX 10.5067/7MCPBJ41Y0K6",
-    "tavg1_2d_int_Nx M2T1NXINT 10.5067/Q5GVUVUIVGO7",
-    "tavg1_2d_lfo_Nx M2T1NXLFO 10.5067/L0T5GEG1NYFA",
-    "tavg1_2d_lnd_Nx M2T1NXLND 10.5067/RKPHT8KC1Y1T",
-    "tavg1_2d_ocn_Nx M2T1NXOCN 10.5067/Y67YQ1L3ZZ4R",
-    "tavg1_2d_rad_Nx M2T1NXRAD 10.5067/Q9QMY5PBNV1T",
-    "tavg1_2d_slv_Nx M2T1NXSLV 10.5067/VJAFPLI1CSIV",
-    "tavg3_3d_mst_Ne M2T3NEMST 10.5067/JRUZ3SJ3ZJ72",
-    "tavg3_3d_trb_Ne M2T3NETRB 10.5067/4I7ZI35QRH8K",
-    "tavg3_3d_nav_Ne M2T3NENAV 10.5067/N5WAKNS1UYQN",
-    "tavg3_3d_cld_Np M2T3NPCLD 10.5067/TX10URJSKT53",
-    "tavg3_3d_mst_Np M2T3NPMST 10.5067/0TUFO90Q2PMS",
-    "tavg3_3d_rad_Np M2T3NPRAD 10.5067/3UGE8WQXZAOK",
-    "tavg3_3d_tdt_Np M2T3NPTDT 10.5067/9NCR9DDDOPFI",
-    "tavg3_3d_trb_Np M2T3NPTRB 10.5067/ZRRJPGWL8AVL",
-    "tavg3_3d_udt_Np M2T3NPUDT 10.5067/CWV0G3PPPWFW",
-    "tavg3_3d_odt_Np M2T3NPODT 10.5067/S0LYTK57786Z",
-    "tavg3_3d_qdt_Np M2T3NPQDT 10.5067/A9KWADY78YHQ",
-    "tavg3_3d_asm_Nv M2T3NVASM 10.5067/SUOQESM06LPK",
-    "tavg3_3d_cld_Nv M2T3NVCLD 10.5067/F9353J0FAHIH",
-    "tavg3_3d_mst_Nv M2T3NVMST 10.5067/ZXTJ28TQR1TR",
-    "tavg3_3d_rad_Nv M2T3NVRAD 10.5067/7GFQKO1T43RW",
-    "tavg3_2d_glc_Nx M2T3NXGLC 10.5067/9ETB4TT5J6US"
-  )
-  identifiers <- lapply(identifiers, strsplit, split = " ")
-  identifiers <- lapply(identifiers, function(x) matrix(x[[1]], nrow = 1))
-  identifiers <- do.call(rbind, identifiers)
-  identifiers_df <- as.data.frame(identifiers)
-  colnames(identifiers_df) <- c("collection_id", "esdt_name", "DOI")
-
-  if (!all(collection[standard_collection] %in% identifiers_df$collection_id)) {
-    message(identifiers_df)
-    stop(paste0(
-      "Requested collection is not recognized.\n",
-      "Please refer to the table above to find a proper collection.\n"
-    ))
-  }
-
-  #### 8. Define date sequence
-  date_sequence <- amadeus::generate_date_sequence(
-    date[1],
-    date[2],
-    sub_hyphen = TRUE
-  )
-
-  #### 9. Define year + month sequence
-  yearmonth_sequence <- unique(substr(date_sequence, 1, 6))
-
-  #### 10. Collect all URLs and destination files
-  all_urls <- character()
-  all_destfiles <- character()
-
-  for (c in seq_along(collection)) {
-    collection_loop <- collection[c]
-
-    if (collection_loop == "fwi") {
-      base <- paste0(
-        "https://portal.nccs.nasa.gov/datashare/GlobalFWI/v2.0/",
-        "fwiCalcs.MERRA2/Default/MERRA2.CORRECTED/"
-      )
-      download_folder <- paste0(directory_to_save, collection_loop)
-      if (!dir.exists(download_folder)) {
-        dir.create(download_folder, recursive = TRUE)
-      }
-      for (d in seq_along(date_sequence)) {
-        date_loop <- date_sequence[d]
-        year <- substr(date_loop, 1, 4)
-        file_name <- paste0(
-          "FWI.MERRA2.CORRECTED.Daily.Default.",
-          date_loop,
-          ".nc"
+  # ----------------------------------------------------------------------------
+  # Check `date` and generate sequence.
+  chr_dates <- amadeus:::sequence_dates(date, hyphen = FALSE)
+  # ----------------------------------------------------------------------------
+  # Generate saving directory.
+  chr_dir_to_save <- amadeus::download_setup_dir(directory_to_save)
+  # ----------------------------------------------------------------------------
+  # Store collections as a list.
+  list_collections <- as.list(unique(collection))
+  # ----------------------------------------------------------------------------
+  # Generate download URLs, file names, and collection-specific directories.
+  df_download <- do.call(
+    rbind,
+    lapply(
+      list_collections,
+      function(x) {
+        # ----------------------------------------------------------------------
+        # Extract collection-specific metadata.
+        df_p <- .amadeus$df_merra2[
+          match(x, .amadeus$df_merra2$collection_id),
+          ,
+          drop = FALSE
+        ]
+        # ----------------------------------------------------------------------
+        # Expand collection and date combinations.
+        df_x <- expand.grid(
+          base = df_p$base_url,
+          collection = x,
+          date = chr_dates,
+          dir = chr_dir_to_save,
+          stringsAsFactors = FALSE
         )
-        download_url <- paste0(base, year, "/", file_name)
-        download_name <- paste0(download_folder, "/", file_name)
-        if (amadeus::check_destfile(download_name)) {
-          all_urls <- c(all_urls, download_url)
-          all_destfiles <- c(all_destfiles, download_name)
+        df_x$year <- substr(df_x$date, 1, 4)
+        df_x$month <- substr(df_x$date, 5, 6)
+        df_x$vdir <- with(df_x, paste0(dir, collection, "/"))
+        # ----------------------------------------------------------------------
+        # Construct FWI file names and URLs directly.
+        if (x == "fwi") {
+          df_x$file <- with(
+            df_x,
+            paste0(
+              "FWI.MERRA2.CORRECTED.Daily.Default.",
+              date,
+              df_p$file_extension
+            )
+          )
+          df_x$url <- with(df_x, paste0(base, year, "/", file))
+          df_x$destfile <- with(df_x, paste0(vdir, file))
+          return(df_x)
         }
+        # ----------------------------------------------------------------------
+        # Construct standard MERRA-2 monthly directory URLs.
+        df_x$base <- with(
+          df_x,
+          paste0(
+            base,
+            df_p$esdt_name,
+            ".",
+            df_p$version,
+            "/",
+            year,
+            "/",
+            month,
+            "/"
+          )
+        )
+        # ----------------------------------------------------------------------
+        # Discover and filter daily URLs from monthly base directory.
+        amadeus:::discover_merra2(
+          df = df_x,
+          collection = x,
+          max_tries = max_tries,
+          rate_limit = rate_limit
+        )
       }
-      next
-    }
-
-    #### Define ESDT name
-    identifiers_df_requested <- subset(
-      identifiers_df,
-      subset = identifiers_df$collection_id == collection_loop
     )
-    esdt_name <- identifiers_df_requested[, 2]
+  )
+  # ----------------------------------------------------------------------------
+  # Create missing directories.
+  invisible(suppressWarnings(sapply(unique(df_download$vdir), dir.create)))
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(df_download$url[1])
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
+  if (!isTRUE(download)) {
+    return(invisible(amadeus::download_preview(
+      df_download$url,
+      df_download$destfile
+    )))
+  }
+  # ----------------------------------------------------------------------------
+  # Run download.
+  download_result <- amadeus::download_run_method(
+    urls = df_download$url,
+    destfiles = df_download$destfile,
+    token = chr_nasatoken,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+}
 
-    #### Define URL base (goldsmr4 vs goldsmr5)
-    esdt_name_4 <- c(
-      "M2I1NXASM",
-      "M2I1NXINT",
-      "M2I1NXLFO",
-      "M2I3NXGAS",
-      "M2SDNXSLV",
-      "M2T1NXADG",
-      "M2T1NXAER",
-      "M2T1NXCHM",
-      "M2T1NXCSP",
-      "M2T1NXFLX",
-      "M2T1NXINT",
-      "M2T1NXLFO",
-      "M2T1NXLND",
-      "M2T1NXOCN",
-      "M2T1NXRAD",
-      "M2T1NXSLV",
-      "M2T3NXGLC"
+################################################################################
+#' Discover MERRA-2 download files
+#' @description
+#' Read monthly HTML directory listings for one standard MERRA-2 collection
+#' and build a download table for the requested dates. Uses the filenames
+#' published by the server, including their stream and revision prefixes.
+#' @param df data.frame. Non-empty table with the following character columns:
+#'   \describe{
+#'     \item{base}{Monthly HTTP(S) directory URL ending in a forward slash.}
+#'     \item{date}{Requested date in \code{"YYYYMMDD"} format.}
+#'     \item{vdir}{Local directory in which to save the collection's data
+#'      files.}
+#'   }
+#'   Each \code{base}/\code{date} pair must identify one input row after
+#'   identical rows are removed. If a \code{collection} column is present,
+#'   it is checked for a single unique character value. The caller is
+#'   responsible for ensuring this value matches the \code{collection}
+#'   argument, which controls filename matching. Other columns are carried
+#'   into the returned table.
+#' @param collection character(1). Standard MERRA-2 collection identifier,
+#'   such as \code{"inst1_2d_asm_Nx"}. FWI URLs are constructed separately by
+#'   [download_merra2()].
+#' @param max_tries integer(1). Maximum number of attempts for each listing
+#'   request, including the initial attempt. Must be at least 1. Default is 20.
+#'   Validated by the caller's \code{download_check()} call.
+#' @param rate_limit numeric(1). Minimum seconds between listing requests to
+#'   the same host. Must be non-negative. Default is 2; 0 disables throttling.
+#'   Validated by the caller's \code{download_check()} call.
+#' @param timeout numeric(1). Timeout in seconds for each request attempt.
+#'   Must be at least 0.001. Default is 3600. This is not a time limit for
+#'   discovery across all directories and retries.
+#' @details
+#' Each distinct monthly directory is read once, subject to retries for
+#' transient HTTP errors and transport failures. HTML listings are parsed
+#' with \pkg{xml2} to extract anchor \code{href} attributes and decode HTML
+#' entities. This reads links present in the HTML response; JavaScript is not
+#' executed. Relative links are resolved against the final response URL after
+#' redirects. Download URLs retain their directory paths and query parameters.
+#' All matching stream and revision prefixes are retained, including multiple
+#' revisions for one date; the helper does not select a preferred revision.
+#'
+#' Every requested date within each directory must have at least one matching
+#' \code{.nc4} data file. XML metadata is optional and is included only when its
+#' corresponding data file is also listed. Duplicate URLs are removed.
+#' Discovery stops if data dates are missing, a listing request fails after
+#' retries, or different URLs in one listing share the same filename.
+#'
+#' Directory creation and data-file downloads are handled by
+#' [download_merra2()] and [download_run_method()].
+#' @return
+#' A \code{data.frame} retaining the input columns, with one row per discovered
+#' data file or associated XML metadata file. The following columns are added
+#' or updated:
+#' \describe{
+#'   \item{file}{Decoded filename, without URL directories or query parameters.}
+#'   \item{url}{Absolute download URL resolved from the directory listing.}
+#'   \item{vdir}{Destination directory; XML rows use its \code{metadata}
+#'     subdirectory.}
+#'   \item{destfile}{Local file path formed from \code{vdir} and \code{file}.}
+#' }
+#' @seealso [download_merra2()], [download_run_method()]
+#' @examples
+#' \dontrun{
+#' df <- data.frame(
+#'   base = paste0(
+#'     "https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/",
+#'     "M2I1NXASM.5.12.4/2024/01/"
+#'   ),
+#'   date = "20240101",
+#'   vdir = file.path(tempdir(), "inst1_2d_asm_Nx")
+#' )
+#' amadeus:::discover_merra2(
+#'   df = df,
+#'   collection = "inst1_2d_asm_Nx",
+#'   max_tries = 3,
+#'   timeout = 60
+#' )
+#' }
+#' @keywords internal
+discover_merra2 <- function(
+  df,
+  collection,
+  max_tries = 20,
+  rate_limit = 2,
+  timeout = 3600
+) {
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  checkmate::assert_data_frame(df, min.rows = 1L)
+  checkmate::assert_subset(c("base", "date", "vdir"), names(df))
+  checkmate::assert_string(collection, pattern = "^[A-Za-z0-9_]+$")
+  checkmate::assert_number(timeout, lower = 0.001, finite = TRUE)
+  # ----------------------------------------------------------------------------
+  # Ensure non-missing columns.
+  for (column in c("base", "date", "vdir")) {
+    checkmate::assert_character(
+      df[[column]],
+      any.missing = FALSE,
+      min.chars = 1L
     )
-    esdt_name_5 <- c(
-      "M2I3NPASM",
-      "M2I3NVAER",
-      "M2I3NVASM",
-      "M2I3NVCHM",
-      "M2I3NVGAS",
-      "M2I6NPANA",
-      "M2I6NVANA",
-      "M2T3NEMST",
-      "M2T3NENAV",
-      "M2T3NETRB",
-      "M2T3NPCLD",
-      "M2T3NPMST",
-      "M2T3NPODT",
-      "M2T3NPQDT",
-      "M2T3NPRAD",
-      "M2T3NPTDT",
-      "M2T3NPTRB",
-      "M2T3NPUDT",
-      "M2T3NVASM",
-      "M2T3NVCLD",
-      "M2T3NVMST",
-      "M2T3NVRAD"
-    )
-
-    if (esdt_name %in% esdt_name_4) {
-      base <- "https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/"
-    } else if (esdt_name %in% esdt_name_5) {
-      base <- "https://goldsmr5.gesdisc.eosdis.nasa.gov/data/MERRA2/"
-    }
-    #### Get file listings using httr2
-    for (y in seq_along(yearmonth_sequence)) {
-      year <- substr(yearmonth_sequence[y], 1, 4)
-      month <- substr(yearmonth_sequence[y], 5, 6)
-
-      base_url <- paste0(
-        base,
-        esdt_name,
-        ".5.12.4/",
-        year,
-        "/",
-        month,
-        "/"
-      )
-      # Validate first URL only
-      if (c == 1 && y == 1) {
-        if (!amadeus::check_url_status(base_url)) {
-          stop(paste0(
-            "Invalid date returns HTTP code 404. ",
-            "Check `date` parameter.\n"
-          ))
+  }
+  # ----------------------------------------------------------------------------
+  # Ensure each base is HTTP(s) and open (e.g. ends in "/" not ".nc4").
+  if (any(!grepl("^https?://", df$base)) || any(!endsWith(df$base, "/"))) {
+    stop("Each base must be an HTTP(S) directory URL ending in '/'.")
+  }
+  # ----------------------------------------------------------------------------
+  # Parse dates.
+  date_parsed <- as.Date(df$date, format = "%Y%m%d")
+  if (
+    any(!grepl("^[0-9]{8}$", df$date)) ||
+      anyNA(date_parsed) ||
+      any(format(date_parsed, "%Y%m%d") != df$date)
+  ) {
+    stop("Dates must be valid YYYYMMDD strings.")
+  }
+  # ----------------------------------------------------------------------------
+  # Ensure single collection per discovery request.
+  if ("collection" %in% names(df)) {
+    checkmate::assert_character(unique(df$collection), len = 1L)
+  }
+  # ----------------------------------------------------------------------------
+  # Deduplicate identical rows; reject conflicting rows for one base/date.
+  df <- unique(as.data.frame(df))
+  if (anyDuplicated(df[c("base", "date")])) {
+    stop("Each base/date pair must identify exactly one input row.")
+  }
+  # ----------------------------------------------------------------------------
+  # Read child URLs from each monthly base.
+  df_download <- do.call(
+    rbind,
+    lapply(
+      unique(df$base),
+      function(y) {
+        # ----------------------------------------------------------------------
+        # Extract base `y`
+        df_month <- df[df$base == y, , drop = FALSE]
+        # ----------------------------------------------------------------------
+        # Retry transport failures and transient HTTP errors. max_tries includes
+        # the first attempt; timeout applies to each attempt.
+        req <- httr2::request(y) |>
+          httr2::req_retry(
+            max_tries = max_tries,
+            retry_on_failure = TRUE,
+            is_transient = function(resp) {
+              httr2::resp_status(resp) %in% c(429, 500, 502, 503, 504)
+            },
+            backoff = function(i) stats::runif(1) * pmin(i^2, 30)
+          ) |>
+          httr2::req_timeout(timeout) |>
+          httr2::req_options(connecttimeout = min(30, timeout))
+        # ----------------------------------------------------------------------
+        # Apply throttling limit.
+        if (rate_limit > 0) {
+          req <- httr2::req_throttle(
+            req,
+            capacity = 1L,
+            fill_time_s = rate_limit,
+            realm = paste0("amadeus:merra2:", httr2::url_parse(y)$hostname)
+          )
         }
-      }
-
-      # Get directory listing using httr2
-      tryCatch(
-        {
-          resp <- httr2::request(base_url) |>
-            httr2::req_perform()
-
-          html_content <- httr2::resp_body_string(resp)
-
-          # Extract .nc4 files from HTML
-          nc4_pattern <- 'href="([^"]*\\.nc4)"'
-          nc4_matches <- gregexpr(nc4_pattern, html_content, perl = TRUE)
-          list_urls_month <- regmatches(html_content, nc4_matches)[[1]]
-          list_urls_month <- gsub('href="|"', "", list_urls_month)
-
-          # Also get .xml files
-          xml_pattern <- 'href="([^"]*\\.nc4\\.xml)"'
-          xml_matches <- gregexpr(xml_pattern, html_content, perl = TRUE)
-          list_xml_month <- regmatches(html_content, xml_matches)[[1]]
-          list_xml_month <- gsub('href="|"', "", list_xml_month)
-
-          # Filter by date sequence and remove duplicate links from HTML listing
-          list_urls_date_sequence <- unique(list_urls_month[
-            substr(basename(list_urls_month), 28, 35) %in% date_sequence
-          ])
-          list_xml_date_sequence <- unique(list_xml_month[
-            substr(basename(list_xml_month), 28, 35) %in% date_sequence
-          ])
-
-          # Create download folder
-          download_folder <- paste0(directory_to_save, collection_loop)
-          if (!dir.exists(download_folder)) {
-            dir.create(download_folder, recursive = TRUE)
+        # ----------------------------------------------------------------------
+        # Perform request.
+        resp <- tryCatch(
+          httr2::req_perform(req),
+          error = function(e) {
+            stop(
+              "Failed to read MERRA-2 listing at ",
+              y,
+              ": ",
+              conditionMessage(e),
+              call. = FALSE
+            )
           }
-
-          # Create metadata folder
-          download_folder_metadata <- paste0(download_folder, "/metadata/")
-          if (!dir.exists(download_folder_metadata)) {
-            dir.create(download_folder_metadata, recursive = TRUE)
-          }
-
-          # Build URLs and destination files for data
-          for (f in list_urls_date_sequence) {
-            download_url <- paste0(base_url, f)
-            download_name <- paste0(download_folder, "/", f)
-
-            if (amadeus::check_destfile(download_name)) {
-              all_urls <- c(all_urls, download_url)
-              all_destfiles <- c(all_destfiles, download_name)
-            }
-          }
-
-          # Build URLs and destination files for metadata
-          for (f in list_xml_date_sequence) {
-            download_url_metadata <- paste0(base_url, f)
-            download_name_metadata <- paste0(download_folder_metadata, f)
-
-            if (amadeus::check_destfile(download_name_metadata)) {
-              all_urls <- c(all_urls, download_url_metadata)
-              all_destfiles <- c(all_destfiles, download_name_metadata)
-            }
-          }
-        },
-        error = function(e) {
-          warning(
-            sprintf(
-              "Failed to get directory listing for %s: %s\n",
-              base_url,
-              conditionMessage(e)
-            ),
+        )
+        # ----------------------------------------------------------------------
+        # Parse the listing as HTML.
+        # Handles quoted/unquoted attributes and excludes commented-out links
+        # from the selected elements.
+        chr_hrefs <- httr2::resp_body_html(resp) |>
+          xml2::xml_find_all(".//a[@href]") |>
+          xml2::xml_attr("href")
+        chr_hrefs <- trimws(chr_hrefs)
+        # ----------------------------------------------------------------------
+        # Keep relative and HTTP(S) links; navigation fragments are not files.
+        chr_hrefs <- unique(chr_hrefs[
+          nzchar(chr_hrefs) &
+            !startsWith(chr_hrefs, "#") &
+            (!grepl("^[A-Za-z][A-Za-z0-9+.-]*:", chr_hrefs) |
+              grepl("^https?://", chr_hrefs, ignore.case = TRUE))
+        ])
+        # ----------------------------------------------------------------------
+        # Resolve hrefs against the final response URL; 1 href -> 1 URL.
+        chr_listing_url <- httr2::resp_url(resp)
+        chr_urls <- unique(vapply(
+          chr_hrefs,
+          function(href) {
+            httr2::req_url_relative(
+              httr2::request(chr_listing_url),
+              href
+            )$url
+          },
+          character(1),
+          USE.NAMES = FALSE
+        ))
+        # ----------------------------------------------------------------------
+        # Match 1 URL -> 1 filename; clean '?query'/'#fragment'.
+        chr_files <- vapply(
+          chr_urls,
+          function(url) {
+            utils::URLdecode(basename(httr2::url_parse(url)$path))
+          },
+          character(1),
+          USE.NAMES = FALSE
+        )
+        # ----------------------------------------------------------------------
+        # Enforce file naming convention:
+        # MERRA2_<3 digits>.<collection>.<8-digit date>.nc4[.xml].
+        chr_pattern <- paste0(
+          "^MERRA2_[0-9]{3}\\.",
+          collection,
+          "\\.([0-9]{8})\\.nc4(\\.xml)?$"
+        )
+        # ----------------------------------------------------------------------
+        # Filter to to-download URL and filename pairs.
+        lgl_keep <- grepl(chr_pattern, chr_files)
+        chr_urls <- chr_urls[lgl_keep]
+        chr_files <- chr_files[lgl_keep]
+        # ----------------------------------------------------------------------
+        # Replace complete match with '\\1' for caputred date.
+        chr_file_dates <- sub(chr_pattern, "\\1", chr_files)
+        lgl_keep <- chr_file_dates %in% df_month$date
+        chr_urls <- chr_urls[lgl_keep]
+        chr_files <- chr_files[lgl_keep]
+        chr_file_dates <- chr_file_dates[lgl_keep]
+        # ----------------------------------------------------------------------
+        # Require .nc4 data for every requested date; stop on partial result.
+        lgl_data <- endsWith(chr_files, ".nc4")
+        chr_missing <- setdiff(df_month$date, chr_file_dates[lgl_data])
+        if (length(chr_missing) > 0L) {
+          stop(
+            "Missing MERRA-2 data for ",
+            paste(chr_missing, collapse = ", "),
+            " in: ",
+            y,
             call. = FALSE
           )
         }
-      )
-    }
-  }
-
-  #### 11. Exit early if download=FALSE
-  if (!isTRUE(download)) {
-    message(sprintf(
-      "Skipping download. Found %d files available for download.\n",
-      length(all_urls)
-    ))
-    return(invisible(list(
-      urls = all_urls,
-      destfiles = all_destfiles,
-      n_files = length(all_urls)
-    )))
-  }
-
-  #### 12. Download files using httr2
-  if (length(all_urls) > 0) {
-    download_result <- amadeus::download_run_method(
-      urls = all_urls,
-      destfiles = all_destfiles,
-      token = nasa_earth_data_token, # Now passing the NASA token!
-      show_progress = show_progress,
-      max_tries = max_tries,
-      rate_limit = rate_limit
+        lgl_keep <- lgl_data |
+          sub("\\.xml$", "", chr_files) %in% chr_files[lgl_data]
+        chr_urls <- chr_urls[lgl_keep]
+        chr_files <- chr_files[lgl_keep]
+        chr_file_dates <- chr_file_dates[lgl_keep]
+        # ----------------------------------------------------------------------
+        # Check for duplicates after duplicate filtering above.
+        if (anyDuplicated(chr_files)) {
+          stop("Multiple URLs map to the same file name in: ", y, call. = FALSE)
+        }
+        # ----------------------------------------------------------------------
+        # Return files, URLs, collection directory, and destination file.
+        df_y <- df_month[match(chr_file_dates, df_month$date), , drop = FALSE]
+        df_y$file <- chr_files
+        df_y$url <- chr_urls
+        lgl_meta <- endsWith(df_y$file, ".xml")
+        df_y$vdir[lgl_meta] <- file.path(df_y$vdir[lgl_meta], "metadata")
+        df_y$destfile <- file.path(df_y$vdir, df_y$file)
+        df_y
+      }
     )
-  } else {
-    message("All files already exist. Nothing to download.\n")
-    download_result <- list(
-      success = 0,
-      failed = 0,
-      skipped = length(all_destfiles)
-    )
-  }
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(download_result))
-  }
+  )
+  # ----------------------------------------------------------------------------
+  # Drop row names.
+  rownames(df_download) <- NULL
+  # ----------------------------------------------------------------------------
+  # Return prepared data.frame.
+  df_download
 }
 
 ################################################################################

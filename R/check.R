@@ -5,6 +5,33 @@
 ################################################################################
 # {download} tier
 ################################################################################
+#' Validate shared download arguments
+#' @description
+#' Check the common arguments supplied to source-specific download functions
+#' before discovery or downloading. Invalid arguments raise errors; deprecated
+#' argument values emit warnings without being changed.
+#' @param dataset_name character(1). Non-empty dataset label. This helper
+#'   checks its type and length; supported dataset names are checked by callers.
+#' @param acknowledgement logical(1). Must be `TRUE` to proceed.
+#' @param download logical(1). Deprecated download flag. `FALSE` emits a
+#'   warning; the caller handles returning a preview.
+#' @param remove_command logical(1). Deprecated flag. `TRUE` emits a warning.
+#' @param unzip logical(1). Whether downloaded archives should be extracted.
+#' @param remove_zip logical(1). Whether downloaded archives should be removed.
+#'   May be `TRUE` only when `unzip = TRUE`.
+#' @param directory_to_save character(1). Non-empty output directory path.
+#'   Existence and write permissions are not checked here.
+#' @param show_progress logical(1). Whether download progress is requested.
+#' @param max_tries integer(1). Maximum attempts per request, including the
+#'   initial attempt. Must be at least 1.
+#' @param rate_limit numeric(1). Finite, non-negative request-throttling interval
+#'   in seconds. The caller determines how this value is applied.
+#' @param hash logical(1). Whether a directory hash is requested.
+#' @return Called for validation and warnings; callers should ignore the
+#'   return value. An invalid argument stops execution with an error.
+#' @seealso [download_setup_dir()], [download_preview()], [download_run_method()]
+#' @keywords internal
+#' @noRd
 download_check <- function(
   dataset_name,
   acknowledgement,

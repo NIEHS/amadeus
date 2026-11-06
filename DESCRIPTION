@@ -30,7 +30,8 @@ Imports:
     rlang,
     archive,
     collapse,
-    Rdpack
+    Rdpack,
+    xml2
 Suggests:
     covr,
     devtools,

@@ -63,7 +63,7 @@ download_terraclimate <- function(
     rate_limit = rate_limit,
     hash = hash
   )
-  checkmate::expect_character(variables, min.char = 1L)
+  checkmate::assert_character(variables, min.char = 1L)
   # ----------------------------------------------------------------------------
   # Check `years` and generate sequence.
   int_years <- amadeus:::sequence_years(year)
