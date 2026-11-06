@@ -171,7 +171,7 @@ download_merra2 <- function(
   # ----------------------------------------------------------------------------
   # Check arguments.
   amadeus:::download_check(
-    dataset_name = "geos",
+    dataset_name = "merra2",
     acknowledgement = acknowledgement,
     download = download,
     remove_command = remove_command,

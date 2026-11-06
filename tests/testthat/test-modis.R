@@ -153,49 +153,60 @@ testthat::test_that("download_modis (expected errors)", {
 
   # no token - should error
   withr::local_envvar(NASA_EARTHDATA_TOKEN = "")
-  testthat::expect_error(
-    download_data(
-      dataset_name = "modis",
-      date = c(date_start, date_end),
-      product = product,
-      version = version,
-      extent = vec_extent,
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE,
-      remove_command = FALSE
+  testthat::expect_warning(
+    testthat::expect_error(
+      download_data(
+        dataset_name = "modis",
+        date = c(date_start, date_end),
+        product = product,
+        version = version,
+        extent = vec_extent,
+        directory_to_save = directory_to_save,
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = FALSE
+      ),
+      "NASA_EARTHDATA_TOKEN"
     ),
-    "NASA_EARTHDATA_TOKEN"
+    "download=FALSE is deprecated"
   )
 
   # year difference between date_start and date_end
-  testthat::expect_error(
-    download_data(
-      dataset_name = "modis",
-      date = c(date_start, "2024-03-28"),
-      product = "MOD11A1",
-      version = version,
-      extent = vec_extent,
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE,
-      remove_command = FALSE
-    )
+  testthat::expect_warning(
+    testthat::expect_error(
+      download_data(
+        dataset_name = "modis",
+        date = c(date_start, "2024-03-28"),
+        product = "MOD11A1",
+        version = version,
+        nasa_earth_data_token = "mock-token",
+        extent = vec_extent,
+        directory_to_save = directory_to_save,
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = FALSE
+      ),
+      "same year"
+    ),
+    "download=FALSE is deprecated"
   )
 
   # null version
-  testthat::expect_error(
-    download_data(
-      dataset_name = "modis",
-      date = c(date_start, date_end),
-      product = product,
-      version = NULL,
-      extent = vec_extent,
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE,
-      remove_command = FALSE
-    )
+  testthat::expect_warning(
+    testthat::expect_error(
+      download_data(
+        dataset_name = "modis",
+        date = c(date_start, date_end),
+        product = product,
+        version = NULL,
+        extent = vec_extent,
+        directory_to_save = directory_to_save,
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = FALSE
+      )
+    ),
+    "download=FALSE is deprecated"
   )
 
   unlink(directory_to_save, recursive = TRUE)
@@ -342,7 +353,7 @@ testthat::test_that("download_modis remove_command warning and hash=TRUE (mock)"
   })
 })
 
-testthat::test_that("download_modis warns when date range exceeds 31 days (mock)", {
+testthat::test_that("download_modis(date=<long range>): does not warn", {
   skip_on_cran()
 
   testthat::local_mocked_bindings(
@@ -390,8 +401,8 @@ testthat::test_that("download_modis warns when date range exceeds 31 days (mock)
   )
 
   withr::with_tempdir({
-    # date range > 31 days in same year triggers warning
-    testthat::expect_warning(
+    # date range > 31 days in same year no longer triggers warning
+    testthat::expect_no_warning(
       suppressMessages(
         download_modis(
           date = c("2023-01-01", "2023-03-15"),
@@ -400,8 +411,7 @@ testthat::test_that("download_modis warns when date range exceeds 31 days (mock)
           acknowledgement = TRUE,
           hash = FALSE
         )
-      ),
-      "31 days"
+      )
     )
   })
 })
@@ -772,6 +782,7 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
     req_options = function(req, ...) req,
     req_retry = function(req, ...) req,
     req_timeout = function(req, ...) req,
+    req_throttle = function(req, ...) req,
     req_perform = function(req, path = NULL, ...) {
       structure(
         list(
@@ -794,16 +805,16 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
           "https://example.com/MCD64CMQ.200101.006.01.hdf"
         ),
         MCD64A1 = c(
-          "https://example.com/MCD64A1.A2026365.h11v05.061.2027001000000.hdf",
-          "https://example.com/MCD64A1.A2027001.h11v05.061.2027002000000.hdf"
+          "https://example.com/MCD64A1.A2023365.h11v05.061.2024001000000.hdf",
+          "https://example.com/MCD64A1.A2024001.h11v05.061.2024002000000.hdf"
         ),
         VNP64A1 = c(
-          "https://example.com/VNP64A1.A2026365.h11v05.001.2027001000000.h5",
-          "https://example.com/VNP64A1.A2027001.h11v05.001.2027002000000.h5"
+          "https://example.com/VNP64A1.A2023365.h11v05.001.2024001000000.h5",
+          "https://example.com/VNP64A1.A2024001.h11v05.001.2024002000000.h5"
         ),
         MCD14ML = c(
-          "https://example.com/MODIS_C6_1_Global_MCD14ML_NRT_2026365.txt",
-          "https://example.com/MODIS_C6_1_Global_MCD14ML_NRT_2027001.txt"
+          "https://example.com/MODIS_C6_1_Global_MCD14ML_NRT_2023365.txt",
+          "https://example.com/MODIS_C6_1_Global_MCD14ML_NRT_2024001.txt"
         )
       )
       list(
@@ -855,7 +866,7 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
     burned_result <- suppressWarnings(
       suppressMessages(
         download_modis(
-          date = c("2026-12-31", "2027-01-01"),
+          date = c("2023-12-31", "2024-01-01"),
           product = mock_product,
           directory_to_save = ".",
           acknowledgement = TRUE,
@@ -869,7 +880,7 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
     viirs_burned_result <- suppressWarnings(
       suppressMessages(
         download_modis(
-          date = c("2026-12-31", "2027-01-01"),
+          date = c("2023-12-31", "2024-01-01"),
           product = mock_product,
           directory_to_save = ".",
           acknowledgement = TRUE,
@@ -883,7 +894,7 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
     txt_result <- suppressWarnings(
       suppressMessages(
         download_modis(
-          date = c("2026-12-31", "2027-01-01"),
+          date = c("2023-12-31", "2024-01-01"),
           product = mock_product,
           directory_to_save = ".",
           acknowledgement = TRUE,
@@ -899,6 +910,7 @@ testthat::test_that("download_modis fire products allow cross-year filtering", {
 
 testthat::test_that("download_modis fire products use product-specific versions and data links", {
   mock_product <- NULL
+  mock_query <- NULL
 
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
@@ -913,10 +925,14 @@ testthat::test_that("download_modis fire products use product-specific versions 
 
   testthat::local_mocked_bindings(
     request = function(url) list(url = url),
-    req_url_query = function(req, ...) req,
+    req_url_query = function(req, ...) {
+      mock_query <<- list(...)
+      req
+    },
     req_options = function(req, ...) req,
     req_retry = function(req, ...) req,
     req_timeout = function(req, ...) req,
+    req_throttle = function(req, ...) req,
     req_perform = function(req, path = NULL, ...) {
       structure(
         list(
@@ -1017,6 +1033,7 @@ testthat::test_that("download_modis fire products use product-specific versions 
 
       testthat::expect_equal(result$n_files, 1L)
       testthat::expect_match(result$urls[[1]], cases[[i]]$expected_pattern)
+      testthat::expect_identical(mock_query$version, cases[[i]]$expected_version)
     }
   })
 })
@@ -1530,7 +1547,13 @@ testthat::test_that("calculate_modis uses per-day preprocess before .by_time sum
   )
   preprocess_dates <- character(0)
   testthat::local_mocked_bindings(
-    process_modis_merge = function(path, date, subdataset, fun_agg = "mean", ...) {
+    process_modis_merge = function(
+      path,
+      date,
+      subdataset,
+      fun_agg = "mean",
+      ...
+    ) {
       testthat::expect_length(date, 1L)
       preprocess_dates <<- c(preprocess_dates, as.character(date))
       r <- terra::rast(nrows = 1, ncols = 1, vals = 1)
@@ -1539,7 +1562,14 @@ testthat::test_that("calculate_modis uses per-day preprocess before .by_time sum
       names(r) <- "mock_layer"
       r
     },
-    calculate_modis_daily = function(from, locs, locs_id, date, name_extracted, ...) {
+    calculate_modis_daily = function(
+      from,
+      locs,
+      locs_id,
+      date,
+      name_extracted,
+      ...
+    ) {
       data.frame(
         site_id = "site_1",
         time = as.Date(date),
@@ -1563,17 +1593,32 @@ testthat::test_that("calculate_modis uses per-day preprocess before .by_time sum
     )
   )
 
-  testthat::expect_equal(sort(unique(preprocess_dates)), c("2021-01-01", "2021-01-02"))
+  testthat::expect_equal(
+    sort(unique(preprocess_dates)),
+    c("2021-01-01", "2021-01-02")
+  )
   testthat::expect_equal(nrow(result), 1L)
   testthat::expect_equal(result$cov_00000, 1.5)
 })
 
 
 testthat::test_that("process_modis_sds returns fire mask regex for fire products", {
-  testthat::expect_equal(amadeus:::process_modis_sds(product = "MOD14A1"), "(FireMask)")
-  testthat::expect_equal(amadeus:::process_modis_sds(product = "MYD14A1"), "(FireMask)")
-  testthat::expect_equal(amadeus:::process_modis_sds(product = "MOD14A2"), "(FireMask)")
-  testthat::expect_equal(amadeus:::process_modis_sds(product = "MYD14A2"), "(FireMask)")
+  testthat::expect_equal(
+    amadeus:::process_modis_sds(product = "MOD14A1"),
+    "(FireMask)"
+  )
+  testthat::expect_equal(
+    amadeus:::process_modis_sds(product = "MYD14A1"),
+    "(FireMask)"
+  )
+  testthat::expect_equal(
+    amadeus:::process_modis_sds(product = "MOD14A2"),
+    "(FireMask)"
+  )
+  testthat::expect_equal(
+    amadeus:::process_modis_sds(product = "MYD14A2"),
+    "(FireMask)"
+  )
 })
 
 
@@ -3016,7 +3061,13 @@ testthat::test_that("calculate_modis supports direct SpatRaster mode and type pa
 
   # direct raster fusion guardrails
   r_mismatch_geom <- terra::rast(
-    ncols = 1, nrows = 1, xmin = 10, xmax = 12, ymin = 10, ymax = 12, crs = "EPSG:4326"
+    ncols = 1,
+    nrows = 1,
+    xmin = 10,
+    xmax = 12,
+    ymin = 10,
+    ymax = 12,
+    crs = "EPSG:4326"
   )
   terra::values(r_mismatch_geom) <- 20
   names(r_mismatch_geom) <- "mock_layer"
@@ -3179,7 +3230,7 @@ testthat::test_that("download_modis single date branch (mock, no skip)", {
 })
 
 ################################################################################
-##### download_modis remove_command, 31-day warning, no granules (no skip)
+##### download_modis remove_command, long date ranges, no granules (no skip)
 
 testthat::test_that("download_modis no granules found path (no skip)", {
   testthat::local_mocked_bindings(
@@ -3366,9 +3417,9 @@ testthat::test_that("download_modis remove_command deprecated warning", {
 })
 
 ################################################################################
-##### download_modis 31-day warning (covers lines 2722-2724)
+##### download_modis accepts date ranges longer than 31 days
 
-testthat::test_that("download_modis 31-day range warning (no skip)", {
+testthat::test_that("download_modis(date=<two months>): does not warn", {
   testthat::local_mocked_bindings(
     get_token = function(...) "fake_token",
     download_run_method = function(...) {
@@ -3410,7 +3461,7 @@ testthat::test_that("download_modis 31-day range warning (no skip)", {
     .package = "httr2"
   )
   withr::with_tempdir({
-    testthat::expect_warning(
+    testthat::expect_no_warning(
       suppressMessages(
         download_modis(
           date = c("2023-01-01", "2023-03-01"),
@@ -3419,8 +3470,7 @@ testthat::test_that("download_modis 31-day range warning (no skip)", {
           acknowledgement = TRUE,
           hash = FALSE
         )
-      ),
-      "31 days"
+      )
     )
   })
 })

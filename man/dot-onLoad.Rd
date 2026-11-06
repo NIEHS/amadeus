@@ -14,8 +14,8 @@ package. Supplied by R when the namespace is loaded.}
 when the namespace is loaded.}
 }
 \value{
-Invisibly, the data frame assigned to \code{.amadeus$df_merra2}. The hook is called
-for its initialization side effect.
+Invisibly, the data frame assigned to \code{.amadeus$df_merra2}. The hook is
+called for its initialization side effect.
 }
 \description{
 Initialize \code{.amadeus$df_merra2} from the CSV file installed with the

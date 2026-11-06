@@ -5,45 +5,71 @@
 ################################################################################
 # {download} tier
 ################################################################################
-#' Download MODIS product files
-#' @description Downloads MODIS data using httr2 with robust retry logic and
-#' rate limiting. This function queries NASA's CMR API for available granules
-#' and downloads relevant tiles based on the specified extent.
-#' @note Due to NASA data access policies, downloads require a valid NASA
-#' Earthdata token for authentication. For security, it's recommended to store
-#' your token in an environment variable or file rather than in your code.
-#' Use \code{setup_nasa_token()} for easy, secure token setup.
-#' @note Both dates in \code{date} should be in the same year.
-#'  Directory structure:
-#'  input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
-#' @param product character(1). MODIS product code
-#' @param version character(1). Default is `"061"`, meaning v061.
-#' @param nasa_earth_data_token character(1) or NULL. NASA EarthData
-#' authentication token.
-#'   For security, recommended options (in priority order):
-#'   \itemize{
-#'     \item NULL (default): Reads from NASA_EARTHDATA_TOKEN environment
-#'     variable
-#'     \item File path: e.g., "~/.nasa_earthdata_token"
-#'     \item Token string: Direct token (not recommended for scripts)
-#'   }
-#'   Use \code{setup_nasa_token()} for interactive setup.
-#' @param date character(1 or 2). Date range "YYYY-MM-DD" format
-#' @param extent numeric(4). Bounding box `c(min_lon, max_lon, min_lat,
-#' max_lat)`.
-#' Default covers continental US: `c(-125, 22, -64, 50)`.
-#' @param directory_to_save character(1). Directory to save data.
-#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with
-#' download
-#' @param download logical(1). DEPRECATED. Downloads now happen automatically.
-#'   Set to FALSE to skip downloading (generates file list only).
-#' @param remove_command logical(1). Deprecated, ignored.
-#' @param show_progress logical(1). Show download progress (default TRUE)
-#' @param hash logical(1). Return hash of downloaded files (default FALSE)
-#' @param max_tries integer(1). Maximum download retry attempts (default 20)
-#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' Download MODIS product files using the shared download workflow
+#' @description
+#' Query NASA CMR for file URLs, prepare a download table, and download MODIS
+#' or VIIRS files using the shared validation, preview, download, and return
+#' helpers.
+#' @param product character(1). Supported MODIS or VIIRS product code. The
+#'   default selects the first listed product.
+#' @param version character(1). Requested CMR version, default `"061"`.
+#'   Existing product-specific overrides are retained; see Details.
+#' @param nasa_earth_data_token character(1) or NULL. NASA Earthdata token,
+#'   token-file path, or `NULL` to use `NASA_EARTHDATA_TOKEN`. Resolved by
+#'   [get_token()], which checks the environment variable first.
+#' @param date character(1 or 2). Single date or range endpoints in
+#'   `"YYYY-MM-DD"` format. Endpoints may be supplied in either order.
+#' @param extent numeric(4). Bounding box in decimal degrees, ordered
+#'   `c(west, south, east, north)`. Default covers the continental US.
+#' @param directory_to_save character(1). Non-empty output directory. Files
+#'   are saved directly in this directory.
+#' @param acknowledgement logical(1). Must be `TRUE` to proceed.
+#' @param download logical(1). Deprecated. `FALSE` warns and returns a preview
+#'   after token lookup, discovery, directory creation, and the preflight check.
+#' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
+#' @param show_progress logical(1). Show per-file download progress. Discovery
+#'   and summary messages may still be printed when `FALSE`.
+#' @param hash logical(1). Return the combined directory MD5 hash when `TRUE`.
+#'   Ignored when `download = FALSE`.
+#' @param max_tries integer(1). Maximum attempts per CMR or file request,
+#'   including the first attempt. Default is 20.
+#' @param rate_limit numeric(1). Non-negative request-throttling interval in
+#'   seconds, passed to discovery and downloads. Default is 2. Discovery uses
+#'   a capacity-one bucket; 0 disables discovery throttling. File downloads
+#'   follow the throttling policy in [download_run_method()].
+#' @details
+#' Product-specific version overrides and a CM1-to-A2 fallback are applied
+#' before filename date filtering. Files use a flat destination directory.
+#' MOD06_L2 uses `"6.1"`; MOD14CM1/MYD14CM1 use `"005"`; MCD64CMQ uses
+#' `"006"`; MCD14ML uses `"6.1NRT"`; VNP46A2/VNP64A1 omit the version filter.
+#' An empty CM1 response triggers the existing A2 version `"006"` fallback.
+#'
+#' Cross-year ranges remain restricted to MOD06_L2, MOD14CM1, MYD14CM1,
+#' MCD14ML, MCD64A1, MCD64CMQ, and VNP64A1. Discovery retrieves successive CMR
+#' pages of up to 2000 granules using the `CMR-Search-After` response header.
+#' There is no 31-day warning or restriction. The query parameters, retry
+#' settings, timeout, and throttle are retained across pages.
+#'
+#' When supplied, `CMR-Hits` is checked against the number of retrieved granule
+#' records before link or date filtering. Discovery stops if a page request
+#' fails, the reported count changes, a required continuation value is missing
+#' or repeated, or the final record count does not match `CMR-Hits`.
+#'
+#' CMR supplies actual file URLs, so a product/date Cartesian grid is not
+#' needed. The inclusive date sequence is used to establish ordered query
+#' endpoints. A file count is reported without claiming daily or monthly
+#' completeness for tiled, swath, or composite products.
+#'
+#' Discovery keeps the existing 120-second per-attempt timeout; file downloads
+#' use [download_run_method()]'s default timeout. The preflight check uses its
+#' own request settings.
+#' @return
+#' With `download = FALSE`, an invisible preview list containing `urls`,
+#' `destfiles`, and `n_files`. Otherwise, with `hash = FALSE`, the invisible
+#' download summary from [download_run_method()]. With `hash = TRUE`, a visible
+#' combined MD5 hash for all files under `directory_to_save`.
 #' @author Mitchell Manware, Insang Song
-#' @return invisible list with download results; or hash character if hash=TRUE
+#' @seealso [download_data()], [download_merra2()], [download_run_method()]
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_mcd19a22021}{amadeus}
@@ -54,46 +80,13 @@
 #' \insertRef{article_roman2018vnp46}{amadeus}
 #' @examples
 #' \dontrun{
-#' # RECOMMENDED: Set up token once (persists across sessions)
-#' setup_nasa_token()
-#'
-#' # Then download without specifying token
 #' download_modis(
 #'   product = "MOD09GA",
-#'   version = "061",
-#'   date = "2024-01-01",
+#'   date = c("2024-01-01", "2024-01-03"),
 #'   extent = c(-80, 35, -75, 40),
-#'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE
-#' )
-#'
-#' # ALTERNATIVE: Token from file
-#' download_modis(
-#'   product = "MOD09GA",
-#'   version = "061",
-#'   date = "2024-01-01",
-#'   extent = c(-80, 35, -75, 40),
-#'   nasa_earth_data_token = "~/.nasa_earthdata_token",
-#'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE
-#' )
-#'
-#' # ALTERNATIVE: Set token for current session
-#' Sys.setenv(NASA_EARTHDATA_TOKEN = "your_token_here")
-#' download_modis(
-#'   product = "MOD09GA",
-#'   date = "2024-01-01",
-#'   acknowledgement = TRUE
-#' )
-#'
-#' # Date range
-#' download_modis(
-#'   product = "MOD09GA",
-#'   version = "061",
-#'   date = c("2024-01-01", "2024-01-07"),
-#'   extent = c(-80, 35, -75, 40),
-#'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE
+#'   directory_to_save = file.path(tempdir(), "modis"),
+#'   acknowledgement = TRUE,
+#'   download = FALSE
 #' )
 #' }
 #' @export
@@ -151,32 +144,49 @@ download_modis <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### 1. Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### 2. Directory setup
-  amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-
-  #### 3. Check dates
-  date <- if (length(date) == 1) rep(date, 2) else date
-  stopifnot(length(date) == 2)
-  date <- date[order(as.Date(date))]
-
-  #### 4. Check and retrieve NASA token (BEFORE null check)
-  nasa_earth_data_token <- amadeus::get_token(
+  # ----------------------------------------------------------------------------
+  # Check shared arguments before token lookup or filesystem/network activity.
+  amadeus:::download_check(
+    dataset_name = "modis",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = FALSE,
+    remove_zip = FALSE,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  product <- match.arg(product)
+  checkmate::assert_string(version, min.chars = 1L)
+  checkmate::assert_numeric(
+    extent,
+    len = 4L,
+    any.missing = FALSE,
+    finite = TRUE
+  )
+  checkmate::assert_numeric(extent[c(1L, 3L)], lower = -180, upper = 180)
+  checkmate::assert_numeric(extent[c(2L, 4L)], lower = -90, upper = 90)
+  checkmate::assert_true(extent[2L] < extent[4L])
+  # ----------------------------------------------------------------------------
+  # Check NASA Earthdata token, including when a preview is requested.
+  chr_nasatoken <- amadeus::get_token(
     token = nasa_earth_data_token,
     env_var = "NASA_EARTHDATA_TOKEN"
   )
-
-  #### 5. Check for null parameters (AFTER token retrieval)
-  params_to_check <- mget(ls())
-  params_to_check <- params_to_check
-  amadeus::check_for_null_parameters(params_to_check)
-  product <- match.arg(product)
-
-  if (substr(date[1], 1, 4) != substr(date[2], 1, 4)) {
-    if (
+  checkmate::assert_string(chr_nasatoken, min.chars = 1L)
+  # ----------------------------------------------------------------------------
+  # Check `date` and generate the same inclusive sequence as other downloaders.
+  # CMR takes range endpoints, not one query per requested day. Repeat the sole
+  # date for a one-day request; otherwise select the first and last dates.
+  chr_dates <- amadeus:::sequence_dates(date, hyphen = TRUE)
+  chr_date_range <- chr_dates[c(1L, length(chr_dates))]
+  # ----------------------------------------------------------------------------
+  # Retain the existing cross-year policy during the consistency migration.
+  if (
+    substr(chr_date_range[1L], 1L, 4L) != substr(chr_date_range[2L], 1L, 4L) &&
       !product %in%
         c(
           "MOD06_L2",
@@ -187,212 +197,406 @@ download_modis <- function(
           "MCD64CMQ",
           "VNP64A1"
         )
-    ) {
-      stop("dates should be in the same year.\n")
-    }
-  }
-
-  #### 7. Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return",
-      " after querying available files.\n",
-      call. = FALSE
-    )
-  }
-
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### 8. Warning for excessive query
-  dt_date <- as.Date(date)
-  if (diff(dt_date) > 31) {
-    warning(
-      "Date range is greater than 31 days. ",
-      "The results may not include all dates in the range.",
-      call. = FALSE
-    )
-  }
-
-  #### 9. Version fix
-  if (product == "MOD06_L2") {
-    str_version <- "6.1"
-  } else if (product %in% c("MOD14CM1", "MYD14CM1")) {
-    str_version <- "005"
-  } else if (product == "MCD64CMQ") {
-    str_version <- "006"
-  } else if (product == "MCD14ML") {
-    str_version <- "6.1NRT"
-  } else if (product %in% c("VNP46A2", "VNP64A1")) {
-    str_version <- NULL
-  } else {
-    str_version <- version
-  }
-
-  #### 10. Query CMR
-  message("Querying NASA CMR for available granules...\n")
-  chr_extent <- paste(extent, collapse = ",")
-  query_granules <- function(short_name, version) {
-    # --------------------------------------------------------------------------
-    # Query CMR for granules matching the product, version, dates, and extent.
-    resp <- tryCatch(
-      httr2::request(
-        "https://cmr.earthdata.nasa.gov/search/granules.json"
-      ) |>
-        httr2::req_url_query(
-          short_name = short_name,
-          version = version,
-          temporal = paste(date[1], date[2], sep = ","),
-          bounding_box = chr_extent,
-          page_size = 2000
-        ) |>
-        httr2::req_options(connecttimeout = 30L) |>
-        httr2::req_retry(retry_on_failure = TRUE, max_tries = 5L) |>
-        httr2::req_timeout(120) |>
-        httr2::req_perform(),
-      error = function(e) {
-        # ----------------------------------------------------------------------
-        # Report the query failure with the original request error.
-        stop(
-          "Failed to query NASA CMR (cmr.earthdata.nasa.gov). ",
-          "Check network connectivity and NASA EarthData status at ",
-          "https://status.earthdata.nasa.gov. Original error: ",
-          conditionMessage(e)
-        )
-      }
-    )
-    # --------------------------------------------------------------------------
-    # Return the parsed granule response.
-    resp |> httr2::resp_body_json()
-  }
-  granules <- query_granules(product, str_version)
-
-  if (
-    product %in% c("MOD14CM1", "MYD14CM1") && length(granules$feed$entry) == 0
   ) {
-    product_fallback <- switch(
-      product,
-      MOD14CM1 = "MOD14A2",
-      MYD14CM1 = "MYD14A2"
-    )
-    message(
-      sprintf(
-        "No granules found for %s; retrying with %s (v006).\n",
-        product,
-        product_fallback
-      )
-    )
-    granules <- query_granules(product_fallback, "006")
+    stop("dates should be in the same year.\n")
   }
-
-  # Extract product data URLs.
-  granule_entries <- granules$feed$entry
-  urls <- vapply(
-    granule_entries,
-    function(g) {
-      links <- g$links
-      data_links <- Filter(
-        function(l) {
-          grepl("data#", l$rel) &&
-            if (product == "MCD14ML") {
-              grepl("\\.txt$", l$href, ignore.case = TRUE)
-            } else {
-              grepl("\\.(hdf|h5)$", l$href, ignore.case = TRUE)
-            }
-        },
-        links
-      )
-      if (length(data_links) > 0) data_links[[1]]$href else NA_character_
-    },
-    character(1)
+  # ----------------------------------------------------------------------------
+  # Generate saving directory.
+  chr_dir_to_save <- amadeus::download_setup_dir(directory_to_save)
+  # ----------------------------------------------------------------------------
+  # Resolve the existing CMR version overrides in one place. Explicit NULL
+  # omits the version query parameter; it does not mean "latest version".
+  chr_version <- switch(
+    product,
+    MOD06_L2 = "6.1",
+    MOD14CM1 = "005",
+    MYD14CM1 = "005",
+    MCD64CMQ = "006",
+    MCD14ML = "6.1NRT",
+    VNP46A2 = NULL,
+    VNP64A1 = NULL,
+    version
   )
-
-  keep <- !is.na(urls)
-  urls <- urls[keep]
-
-  if (length(urls) == 0) {
-    stop("No granules found for the specified query parameters.\n")
-  }
-
-  #### 12. Filter by date range
-  urls_filtered <- modis_filter_paths_by_date(urls, date = date)
-  if (length(urls_filtered) == 0) {
-    stop("No granules matched the requested date range.\n")
-  }
-
-  keep_date <- urls %in% urls_filtered
-  urls <- urls[keep_date]
-  download_names <- basename(urls)
-
-  scale_detected <- modis_extract_temporal_scale(download_names[1])
-  if (scale_detected == "monthly") {
-    month_start <- as.Date(format(as.Date(date[1]), "%Y-%m-01"))
-    month_end <- as.Date(format(as.Date(date[2]), "%Y-%m-01"))
-    month_sequence <- seq(month_start, month_end, by = "month")
-    message(sprintf(
-      "Found %d / %d monthly files in the queried date range.\n",
-      length(urls),
-      length(month_sequence)
-    ))
-  } else {
-    date_sequence <- vapply(
-      download_names,
-      modis_extract_temporal_key,
-      character(1)
-    )
-    date_sequence <- unique(date_sequence[!is.na(date_sequence)])
-    date_start_i <- as.integer(strftime(date[1], "%Y%j"))
-    date_end_i <- as.integer(strftime(date[2], "%Y%j"))
-    date_range_julian <- seq(date_start_i, date_end_i)
-    date_sequence_i <- as.integer(date_sequence)
-    date_sequence_in <- date_sequence_i %in% date_range_julian
-
-    message(sprintf(
-      "Found %d / %d days of data in the queried date range.\n",
-      sum(date_sequence_in),
-      length(date_range_julian)
-    ))
-  }
-
-  #### 13. Prepare download paths
-  destfiles <- paste0(directory_to_save, download_names)
-
-  #### 14. Exit early if download=FALSE (deprecated behavior)
+  # ----------------------------------------------------------------------------
+  # Discover actual URLs and construct the common download table.
+  df_download <- amadeus:::discover_modis(
+    product = product,
+    version = chr_version,
+    date = chr_date_range,
+    extent = extent,
+    directory_to_save = chr_dir_to_save,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity, including before a preview.
+  amadeus:::check_preflight(df_download$url[1L])
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message(sprintf(
-      "Skipping download. Found %d files available for download.\n",
-      length(urls)
-    ))
-    return(invisible(list(
-      urls = urls,
-      destfiles = destfiles,
-      n_files = length(urls)
+    return(invisible(amadeus::download_preview(
+      df_download$url,
+      df_download$destfile
     )))
   }
-
-  #### 15. Download files using httr2
+  # ----------------------------------------------------------------------------
+  # Run download using the same retry and rate-limit inputs as discovery.
   download_result <- amadeus::download_run_method(
-    urls = urls,
-    destfiles = destfiles,
-    token = nasa_earth_data_token,
+    urls = df_download$url,
+    destfiles = df_download$destfile,
+    token = chr_nasatoken,
     show_progress = show_progress,
     max_tries = max_tries,
     rate_limit = rate_limit
   )
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+}
 
-  message("Download process complete.\n")
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(download_result))
+################################################################################
+#' Discover MODIS files and build a download table
+#' @description
+#' Query CMR for one product and return a download table. Keeps the current
+#' MODIS fallback, first-data-link selection, and filename date filtering.
+#' @param product character(1). Validated product code.
+#' @param version character(1) or NULL. Resolved CMR version. `NULL` omits the
+#'   version filter. Product-specific overrides are handled by the caller.
+#' @param date character(2). Validated, ordered range endpoints in
+#'   `"YYYY-MM-DD"` format. For one day, supply that date twice.
+#' @param extent numeric(4). Validated bounding box, ordered
+#'   `c(west, south, east, north)`.
+#' @param directory_to_save character(1). Sanitized destination directory,
+#'   ending in a forward slash, as returned by [download_setup_dir()].
+#' @param max_tries integer(1). Maximum attempts per CMR request, including
+#'   the initial attempt. Validated by the caller's `download_check()` call.
+#' @param rate_limit numeric(1). Minimum seconds between CMR requests. Zero
+#'   disables throttling. Validated by the caller's `download_check()` call.
+#' @param timeout numeric(1). Per-attempt timeout in seconds, at least 0.001.
+#'   Default is 120, retaining the original MODIS discovery timeout.
+#' @details
+#' [query_modis_granules()] retrieves and checks the complete CMR result set
+#' before this function selects file URLs. Query parameters and request
+#' controls are passed explicitly for the original and fallback products.
+#'
+#' CM1 queries returning no entries use the existing A2 version `"006"`
+#' fallback, which starts a fresh paginated query for another product. The
+#' download table records the product/version used for the successful query;
+#' an omitted version is recorded as `NA_character_`.
+#'
+#' Each granule can contain several links. The first link whose relation
+#' contains `"data#"` and whose URL ends in an accepted extension is retained.
+#' MCD14ML accepts `.txt`; other products accept `.hdf` or `.h5`. Granules with
+#' no matching link are omitted. Published URLs and their order are retained.
+#'
+#' Revised version/fallback rules, malformed links, URL query strings, and
+#' duplicate destination handling remain for the later bug pass.
+#' Filename date filtering reuses the existing MODIS helper shared with the
+#' processing tier. No daily or monthly completeness requirement is imposed.
+#' @return A data.frame with `product`, `version`, `file`, `url`, `vdir`, and
+#'   `destfile` columns, one row per selected granule. Stops if the CMR request
+#'   fails, pagination cannot be completed, or no URLs remain before or after
+#'   date filtering.
+#' @seealso [download_modis()], [query_modis_granules()], [discover_merra2()]
+#' @keywords internal
+#' @noRd
+discover_modis <- function(
+  product,
+  version,
+  date,
+  extent,
+  directory_to_save,
+  max_tries = 20,
+  rate_limit = 2,
+  timeout = 120
+) {
+  # ----------------------------------------------------------------------------
+  # Query the requested product/version first.
+  message("Querying NASA CMR for available granules...\n")
+  list_granules <- amadeus:::query_modis_granules(
+    product = product,
+    version = version,
+    date = date,
+    extent = extent,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    timeout = timeout
+  )
+  # ----------------------------------------------------------------------------
+  # Preserve the legacy fallback. This substitutes another science product;
+  # it is not a second mirror of the originally requested CM1 files.
+  if (product %in% c("MOD14CM1", "MYD14CM1") && length(list_granules) == 0L) {
+    chr_fallback <- switch(
+      product,
+      MOD14CM1 = "MOD14A2",
+      MYD14CM1 = "MYD14A2"
+    )
+    message(sprintf(
+      "No granules found for %s; retrying with %s (v006).\n",
+      product,
+      chr_fallback
+    ))
+    list_granules <- amadeus:::query_modis_granules(
+      product = chr_fallback,
+      version = "006",
+      date = date,
+      extent = extent,
+      max_tries = max_tries,
+      rate_limit = rate_limit,
+      timeout = timeout
+    )
+    # Record the actual fallback query in the returned table.
+    product <- chr_fallback
+    version <- "006"
   }
+  # ----------------------------------------------------------------------------
+  # Decide the filename extension once, rather than once for every CMR link.
+  # `\\.` matches a literal period; `$` requires the extension at the URL end.
+  chr_file_pattern <- if (product == "MCD14ML") {
+    "\\.txt$"
+  } else {
+    "\\.(hdf|h5)$"
+  }
+  # ----------------------------------------------------------------------------
+  # A granule can include data, metadata, and browse-image links. Filter()
+  # keeps the links for which this predicate returns TRUE, in their input order.
+  is_data_link <- function(link) {
+    grepl("data#", link$rel) &&
+      grepl(chr_file_pattern, link$href, ignore.case = TRUE)
+  }
+  # ----------------------------------------------------------------------------
+  # Preserve the existing first-match policy: one URL per granule, or NA when
+  # no data link matches. The scalar return makes vapply()'s type explicit.
+  first_data_url <- function(granule) {
+    links <- Filter(is_data_link, granule$links)
+    if (length(links) == 0L) {
+      return(NA_character_)
+    }
+    links[[1L]]$href
+  }
+  chr_urls <- vapply(list_granules, first_data_url, character(1))
+  chr_urls <- chr_urls[!is.na(chr_urls)]
+  if (length(chr_urls) == 0L) {
+    stop("No granules found for the specified query parameters.\n")
+  }
+  # ----------------------------------------------------------------------------
+  # The existing helper returns the selected paths in their original order.
+  # Assign that result directly; a second membership filter is unnecessary.
+  chr_urls <- amadeus:::modis_filter_paths_by_date(chr_urls, date = date)
+  # An unrecognized filename date can yield NA in the helper's subset. Drop
+  # those placeholders, as the original membership filter did implicitly.
+  chr_urls <- chr_urls[!is.na(chr_urls)]
+  if (length(chr_urls) == 0L) {
+    stop("No granules matched the requested date range.\n")
+  }
+  # ----------------------------------------------------------------------------
+  # Build one row per discovered file, preserving the current flat layout.
+  # NA records an unspecified version; it must not be labeled as "latest".
+  df_download <- data.frame(
+    product = product,
+    version = if (is.null(version)) NA_character_ else version,
+    file = basename(chr_urls),
+    url = chr_urls,
+    vdir = directory_to_save,
+    stringsAsFactors = FALSE
+  )
+  df_download$destfile <- with(df_download, paste0(vdir, file))
+  # ----------------------------------------------------------------------------
+  # Count files only: several tiles may share a date, and a filename date can
+  # label a multi-day composite. File counts do not demonstrate completeness.
+  message(sprintf(
+    "Found %d MODIS files in the queried date range.\n",
+    nrow(df_download)
+  ))
+  df_download
+}
+
+################################################################################
+#' Query CMR for MODIS granule records
+#' @description
+#' Retrieve the complete CMR result set for one product and version. Handles
+#' request construction, retries, throttling, pagination, and record counts.
+#' [discover_modis()] handles fallback products, file-link selection, date
+#' filtering, and destination paths after the query returns.
+#' @param product character(1). Validated MODIS or VIIRS product short name.
+#' @param version character(1) or NULL. Resolved CMR version. `NULL` omits the
+#'   version filter. Product-specific overrides are handled by the caller.
+#' @param date character(2). Validated, ordered range endpoints in
+#'   `"YYYY-MM-DD"` format. For one day, supply that date twice.
+#' @param extent numeric(4). Validated bounding box, ordered
+#'   `c(west, south, east, north)`.
+#' @param max_tries integer(1). Maximum attempts per CMR page request,
+#'   including the initial attempt. Validated by `download_check()`.
+#' @param rate_limit numeric(1). Minimum seconds between CMR requests to the
+#'   same host; 0 disables throttling. Validated by `download_check()`.
+#' @param timeout numeric(1). Per-attempt timeout in seconds, at least 0.001.
+#'   Default is 120. Applies separately to each page request and retry.
+#' @details
+#' Each query reads successive pages of up to 2000 granules. The opaque
+#' `CMR-Search-After` response header is sent unchanged with the next request;
+#' the product, version, temporal bounds, and spatial extent remain fixed.
+#' A short or empty page, or reaching `CMR-Hits`, ends the query. A full page
+#' with an unknown or incomplete total requires a new continuation value.
+#' Missing or repeated continuation values raise an error in that case.
+#'
+#' If `CMR-Hits` is supplied, it must remain constant across pages and match
+#' the final number of retrieved records. This check precedes link and date
+#' filtering, which may legitimately retain fewer URLs. CMR is a live catalog;
+#' the count check does not guarantee a fixed snapshot if records change while
+#' paging. A failed page request or count mismatch stops the query.
+#'
+#' Each call has its own page and continuation state. The shared throttle realm
+#' spaces requests to the CMR host across calls, including fallback queries.
+#' @return A list of CMR granule records in page order, preserving each record's
+#'   nested metadata and links. Returns `NULL` when the query finds no records.
+#'   This helper creates no directories and downloads no data files.
+#' @seealso [discover_modis()], [download_modis()]
+#' @keywords internal
+#' @noRd
+query_modis_granules <- function(
+  product,
+  version,
+  date,
+  extent,
+  max_tries = 20,
+  rate_limit = 2,
+  timeout = 120
+) {
+  # ----------------------------------------------------------------------------
+  # Shared inputs have already been validated by download_modis(). Only the
+  # query-specific timeout needs an additional check here.
+  checkmate::assert_number(timeout, lower = 0.001, finite = TRUE)
+  # ----------------------------------------------------------------------------
+  # Encode this query's explicit bounds once and reuse them for every page.
+  chr_extent <- paste(extent, collapse = ",")
+  chr_temporal <- paste(date, collapse = ",")
+  chr_base <- "https://cmr.earthdata.nasa.gov/search/granules.json"
+  int_page_size <- 2000L
+  # --------------------------------------------------------------------------
+  # CMR returns published URLs in JSON. Do not infer tile names, production
+  # timestamps, or download-host directory layouts from dates.
+  req <- httr2::request(chr_base) |>
+    httr2::req_url_query(
+      short_name = product,
+      version = version,
+      temporal = chr_temporal,
+      bounding_box = chr_extent,
+      page_size = int_page_size
+    ) |>
+    httr2::req_retry(max_tries = max_tries, retry_on_failure = TRUE) |>
+    httr2::req_timeout(timeout) |>
+    httr2::req_options(connecttimeout = min(30, timeout))
+  # --------------------------------------------------------------------------
+  # Match MERRA-2 discovery's capacity-one throttle. A shared realm also
+  # spaces the fallback and subsequent discovery calls to this CMR host.
+  if (rate_limit > 0) {
+    req <- httr2::req_throttle(
+      req,
+      capacity = 1L,
+      fill_time_s = rate_limit,
+      realm = paste0("amadeus:modis:", httr2::url_parse(chr_base)$hostname)
+    )
+  }
+  # --------------------------------------------------------------------------
+  # Collect whole pages, then combine them once. Count raw granule records:
+  # some records will later be excluded by the link or filename date filters.
+  list_pages <- list()
+  chr_cursors <- character()
+  num_received <- 0
+  num_hits <- NA_real_
+  repeat {
+    # ------------------------------------------------------------------------
+    # Every page uses the same request settings. A failure on any page stops
+    # discovery so a partial set cannot reach the download or preview step.
+    resp <- tryCatch(
+      httr2::req_perform(req),
+      error = function(e) {
+        stop(
+          "Failed to query NASA CMR (cmr.earthdata.nasa.gov). ",
+          "Check network connectivity and NASA EarthData status at ",
+          "https://status.earthdata.nasa.gov. Original error: ",
+          conditionMessage(e),
+          call. = FALSE
+        )
+      }
+    )
+    # ------------------------------------------------------------------------
+    # Read the total before filtering. If the catalog's reported total changes
+    # between pages, ask for a fresh query instead of claiming completeness.
+    chr_hits <- httr2::resp_header(resp, "CMR-Hits")
+    if (!is.null(chr_hits)) {
+      num_page_hits <- suppressWarnings(as.numeric(chr_hits))
+      checkmate::assert_number(num_page_hits, lower = 0, finite = TRUE)
+      if (!is.na(num_hits) && num_page_hits != num_hits) {
+        stop(
+          "CMR result count changed during pagination; retry the query.",
+          call. = FALSE
+        )
+      }
+      num_hits <- num_page_hits
+    }
+    # ------------------------------------------------------------------------
+    # Each page is a list of granule records, each with its own nested links.
+    list_page <- httr2::resp_body_json(resp)$feed$entry
+    int_count <- length(list_page)
+    if (int_count > 0L) {
+      list_pages[[length(list_pages) + 1L]] <- list_page
+    }
+    num_received <- num_received + int_count
+    # ------------------------------------------------------------------------
+    # A short page ends the search. A known total also avoids an unnecessary
+    # empty-page request when the final page contains exactly 2000 records.
+    # The count check below rejects a short page that arrived prematurely.
+    if (
+      int_count < int_page_size ||
+        (!is.na(num_hits) && num_received >= num_hits)
+    ) {
+      break
+    }
+    # ------------------------------------------------------------------------
+    # "Search after" identifies where the next batch starts. Keep this opaque
+    # value exactly as supplied by CMR; do not parse or reconstruct its JSON.
+    chr_cursor <- httr2::resp_header(resp, "CMR-Search-After")
+    if (is.null(chr_cursor) || !nzchar(chr_cursor)) {
+      stop(
+        "CMR pagination is incomplete: missing CMR-Search-After header.",
+        call. = FALSE
+      )
+    }
+    # ------------------------------------------------------------------------
+    # Detect a repeated continuation value rather than requesting the same
+    # batch indefinitely. Only this header changes for the next request.
+    if (chr_cursor %in% chr_cursors) {
+      stop(
+        "CMR pagination is incomplete: repeated CMR-Search-After value.",
+        call. = FALSE
+      )
+    }
+    chr_cursors <- c(chr_cursors, chr_cursor)
+    req <- httr2::req_headers(req, `CMR-Search-After` = chr_cursor)
+  }
+  # --------------------------------------------------------------------------
+  # The retrieved raw record count must match the advertised total, when
+  # available. Do not compare CMR-Hits with the filtered number of file URLs.
+  if (!is.na(num_hits) && num_received != num_hits) {
+    stop(
+      sprintf(
+        "CMR pagination is incomplete: retrieved %d of %d granule records.",
+        num_received,
+        num_hits
+      ),
+      call. = FALSE
+    )
+  }
+  message(sprintf(
+    "Retrieved %d CMR granule records for %s.\n",
+    num_received,
+    product
+  ))
+  # --------------------------------------------------------------------------
+  # Concatenate only the page lists; preserve the nested metadata and links
+  # within each granule. An empty query returns no entries for fallback logic.
+  do.call(c, list_pages)
 }
 
 ################################################################################
@@ -400,7 +604,6 @@ modis_extract_temporal_key <- function(path) {
   # ----------------------------------------------------------------------------
   # Extract the filename from the supplied path.
   filename <- basename(path)
-
   # ----------------------------------------------------------------------------
   # Read the year and day-of-year key from an AYYYYDDD filename pattern.
   key_daily <- regmatches(
@@ -410,7 +613,6 @@ modis_extract_temporal_key <- function(path) {
   if (length(key_daily) > 0 && nzchar(key_daily)) {
     return(sub("^A", "", key_daily))
   }
-
   # ----------------------------------------------------------------------------
   # Read the year and day-of-year key from a _YYYYDDD filename pattern.
   key_txt <- regmatches(
@@ -420,7 +622,6 @@ modis_extract_temporal_key <- function(path) {
   if (length(key_txt) > 0 && nzchar(key_txt)) {
     return(sub("^_", "", key_txt))
   }
-
   # ----------------------------------------------------------------------------
   # Read the year and month key from a .YYYYMM. filename pattern.
   key_monthly <- regmatches(
@@ -430,7 +631,6 @@ modis_extract_temporal_key <- function(path) {
   if (length(key_monthly) > 0 && nzchar(key_monthly)) {
     return(gsub("\\.", "", key_monthly))
   }
-
   # ----------------------------------------------------------------------------
   # Return a missing key when no supported pattern is found.
   return(NA_character_)
@@ -441,7 +641,6 @@ modis_extract_temporal_scale <- function(path) {
   # ----------------------------------------------------------------------------
   # Extract the filename from the supplied path.
   filename <- basename(path)
-
   # ----------------------------------------------------------------------------
   # Classify supported filename patterns as daily or monthly.
   if (grepl("A20\\d{5}", filename)) {
@@ -453,7 +652,6 @@ modis_extract_temporal_scale <- function(path) {
   if (grepl("\\.20[0-9]{4}\\.", filename)) {
     return("monthly")
   }
-
   # ----------------------------------------------------------------------------
   # Return a missing scale when no supported pattern is found.
   return(NA_character_)
@@ -470,7 +668,6 @@ modis_key_to_date <- function(
     scale <- rep(scale, length(key))
   }
   stopifnot(length(key) == length(scale))
-
   # ----------------------------------------------------------------------------
   # Convert each temporal key according to its scale.
   as_date <- mapply(
@@ -499,7 +696,6 @@ modis_key_to_date <- function(
     SIMPLIFY = TRUE,
     USE.NAMES = FALSE
   )
-
   # ----------------------------------------------------------------------------
   # Restore the Date class after simplifying the converted values.
   return(as.Date(as_date, origin = "1970-01-01"))
@@ -520,25 +716,21 @@ modis_filter_paths_by_date <- function(
   if (length(date) == 1L) {
     date <- rep(date, 2L)
   }
-
   # ----------------------------------------------------------------------------
   # Extract temporal keys and scales from the filenames.
   keys <- vapply(paths, modis_extract_temporal_key, character(1))
   scales <- vapply(paths, modis_extract_temporal_scale, character(1))
-
   # ----------------------------------------------------------------------------
   # Return no paths when temporal keys or scales cannot be identified.
   if (all(is.na(keys)) || all(is.na(scales))) {
     return(character(0))
   }
-
   # ----------------------------------------------------------------------------
   # Require one recognized temporal scale across the paths.
   scales_unique <- unique(stats::na.omit(scales))
   if (length(scales_unique) != 1L) {
     stop("MODIS paths contain mixed or unsupported temporal patterns.\n")
   }
-
   # ----------------------------------------------------------------------------
   # Select files within the requested monthly or daily range.
   scale_target <- scales_unique[[1]]
@@ -556,7 +748,6 @@ modis_filter_paths_by_date <- function(
     parsed_dates <- modis_key_to_date(keys, scales)
     keep <- parsed_dates >= as.Date(date[1]) & parsed_dates <= as.Date(date[2])
   }
-
   # ----------------------------------------------------------------------------
   # Return matching paths in their original order.
   return(paths[keep])

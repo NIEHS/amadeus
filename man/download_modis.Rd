@@ -2,7 +2,7 @@
 % Please edit documentation in R/modis.R
 \name{download_modis}
 \alias{download_modis}
-\title{Download MODIS product files}
+\title{Download MODIS product files using the shared download workflow}
 \usage{
 download_modis(
   product = c("MOD09GA", "MYD09GA", "MOD09GQ", "MYD09GQ", "MOD09A1", "MYD09A1",
@@ -26,104 +26,93 @@ download_modis(
 )
 }
 \arguments{
-\item{product}{character(1). MODIS product code}
+\item{product}{character(1). Supported MODIS or VIIRS product code. The
+default selects the first listed product.}
 
-\item{version}{character(1). Default is \code{"061"}, meaning v061.}
+\item{version}{character(1). Requested CMR version, default \code{"061"}.
+Existing product-specific overrides are retained; see Details.}
 
-\item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData
-authentication token.
-For security, recommended options (in priority order):
-\itemize{
-\item NULL (default): Reads from NASA_EARTHDATA_TOKEN environment
-variable
-\item File path: e.g., "~/.nasa_earthdata_token"
-\item Token string: Direct token (not recommended for scripts)
-}
-Use \code{setup_nasa_token()} for interactive setup.}
+\item{nasa_earth_data_token}{character(1) or NULL. NASA Earthdata token,
+token-file path, or \code{NULL} to use \code{NASA_EARTHDATA_TOKEN}. Resolved by
+\code{\link[=get_token]{get_token()}}, which checks the environment variable first.}
 
-\item{date}{character(1 or 2). Date range "YYYY-MM-DD" format}
+\item{date}{character(1 or 2). Single date or range endpoints in
+\code{"YYYY-MM-DD"} format. Endpoints may be supplied in either order.}
 
-\item{extent}{numeric(4). Bounding box \code{c(min_lon, max_lon, min_lat, max_lat)}.
-Default covers continental US: \code{c(-125, 22, -64, 50)}.}
+\item{extent}{numeric(4). Bounding box in decimal degrees, ordered
+\code{c(west, south, east, north)}. Default covers the continental US.}
 
-\item{directory_to_save}{character(1). Directory to save data.}
+\item{directory_to_save}{character(1). Non-empty output directory. Files
+are saved directly in this directory.}
 
-\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed with
-download}
+\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed.}
 
-\item{download}{logical(1). DEPRECATED. Downloads now happen automatically.
-Set to FALSE to skip downloading (generates file list only).}
+\item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a preview
+after token lookup, discovery, directory creation, and the preflight check.}
 
-\item{remove_command}{logical(1). Deprecated, ignored.}
+\item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.}
 
-\item{show_progress}{logical(1). Show download progress (default TRUE)}
+\item{show_progress}{logical(1). Show per-file download progress. Discovery
+and summary messages may still be printed when \code{FALSE}.}
 
-\item{hash}{logical(1). Return hash of downloaded files (default FALSE)}
+\item{hash}{logical(1). Return the combined directory MD5 hash when \code{TRUE}.
+Ignored when \code{download = FALSE}.}
 
-\item{max_tries}{integer(1). Maximum download retry attempts (default 20)}
+\item{max_tries}{integer(1). Maximum attempts per CMR or file request,
+including the first attempt. Default is 20.}
 
-\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
+\item{rate_limit}{numeric(1). Non-negative request-throttling interval in
+seconds, passed to discovery and downloads. Default is 2. Discovery uses
+a capacity-one bucket; 0 disables discovery throttling. File downloads
+follow the throttling policy in \code{\link[=download_run_method]{download_run_method()}}.}
 }
 \value{
-invisible list with download results; or hash character if hash=TRUE
+With \code{download = FALSE}, an invisible preview list containing \code{urls},
+\code{destfiles}, and \code{n_files}. Otherwise, with \code{hash = FALSE}, the invisible
+download summary from \code{\link[=download_run_method]{download_run_method()}}. With \code{hash = TRUE}, a visible
+combined MD5 hash for all files under \code{directory_to_save}.
 }
 \description{
-Downloads MODIS data using httr2 with robust retry logic and
-rate limiting. This function queries NASA's CMR API for available granules
-and downloads relevant tiles based on the specified extent.
+Query NASA CMR for file URLs, prepare a download table, and download MODIS
+or VIIRS files using the shared validation, preview, download, and return
+helpers.
 }
-\note{
-Due to NASA data access policies, downloads require a valid NASA
-Earthdata token for authentication. For security, it's recommended to store
-your token in an environment variable or file rather than in your code.
-Use \code{setup_nasa_token()} for easy, secure token setup.
+\details{
+Product-specific version overrides and a CM1-to-A2 fallback are applied
+before filename date filtering. Files use a flat destination directory.
+MOD06_L2 uses \code{"6.1"}; MOD14CM1/MYD14CM1 use \code{"005"}; MCD64CMQ uses
+\code{"006"}; MCD14ML uses \code{"6.1NRT"}; VNP46A2/VNP64A1 omit the version filter.
+An empty CM1 response triggers the existing A2 version \code{"006"} fallback.
 
-Both dates in \code{date} should be in the same year.
-Directory structure:
-input/modis/raw/\{version\}/\{product\}/\{year\}/\{day_of_year\}.
+Cross-year ranges remain restricted to MOD06_L2, MOD14CM1, MYD14CM1,
+MCD14ML, MCD64A1, MCD64CMQ, and VNP64A1. Discovery retrieves successive CMR
+pages of up to 2000 granules using the \code{CMR-Search-After} response header.
+There is no 31-day warning or restriction. The query parameters, retry
+settings, timeout, and throttle are retained across pages.
+
+When supplied, \code{CMR-Hits} is checked against the number of retrieved granule
+records before link or date filtering. Discovery stops if a page request
+fails, the reported count changes, a required continuation value is missing
+or repeated, or the final record count does not match \code{CMR-Hits}.
+
+CMR supplies actual file URLs, so a product/date Cartesian grid is not
+needed. The inclusive date sequence is used to establish ordered query
+endpoints. A file count is reported without claiming daily or monthly
+completeness for tiled, swath, or composite products.
+
+Discovery keeps the existing 120-second per-attempt timeout; file downloads
+use \code{\link[=download_run_method]{download_run_method()}}'s default timeout. The preflight check uses its
+own request settings.
 }
 \examples{
 \dontrun{
-# RECOMMENDED: Set up token once (persists across sessions)
-setup_nasa_token()
-
-# Then download without specifying token
 download_modis(
   product = "MOD09GA",
-  version = "061",
-  date = "2024-01-01",
+  date = c("2024-01-01", "2024-01-03"),
   extent = c(-80, 35, -75, 40),
-  directory_to_save = tempdir(),
-  acknowledgement = TRUE
-)
-
-# ALTERNATIVE: Token from file
-download_modis(
-  product = "MOD09GA",
-  version = "061",
-  date = "2024-01-01",
-  extent = c(-80, 35, -75, 40),
-  nasa_earth_data_token = "~/.nasa_earthdata_token",
-  directory_to_save = tempdir(),
-  acknowledgement = TRUE
-)
-
-# ALTERNATIVE: Set token for current session
-Sys.setenv(NASA_EARTHDATA_TOKEN = "your_token_here")
-download_modis(
-  product = "MOD09GA",
-  date = "2024-01-01",
-  acknowledgement = TRUE
-)
-
-# Date range
-download_modis(
-  product = "MOD09GA",
-  version = "061",
-  date = c("2024-01-01", "2024-01-07"),
-  extent = c(-80, 35, -75, 40),
-  directory_to_save = tempdir(),
-  acknowledgement = TRUE
+  directory_to_save = file.path(tempdir(), "modis"),
+  acknowledgement = TRUE,
+  download = FALSE
 )
 }
 }
@@ -134,6 +123,9 @@ download_modis(
 \insertRef{data_mod11a12021}{amadeus}
 \insertRef{data_mod13a22021}{amadeus}
 \insertRef{article_roman2018vnp46}{amadeus}
+}
+\seealso{
+\code{\link[=download_data]{download_data()}}, \code{\link[=download_merra2]{download_merra2()}}, \code{\link[=download_run_method]{download_run_method()}}
 }
 \author{
 Mitchell Manware, Insang Song
