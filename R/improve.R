@@ -30,9 +30,9 @@
 #'   extracted into `data_files/`.
 #' @param acknowledgement logical(1). Must be `TRUE` to proceed. Downloaded
 #'   archives and extracted measurement files can require substantial storage.
-#' @param download logical(1). Deprecated. `FALSE` emits a warning but does
-#'   not skip downloading or return a preview in the current implementation.
-#'   Default is `TRUE`.
+#' @param download logical(1). Deprecated. `FALSE` emits a warning and returns
+#'   a preview of the planned files without downloading archives or extracting
+#'   their contents. Default is `TRUE`.
 #' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
 #'   No command file is generated. Default is `FALSE`.
 #' @param unzip logical(1). Extract downloaded ZIP archives into
@@ -45,7 +45,8 @@
 #' @param show_progress logical(1). Show file download progress. Default is
 #'   `TRUE`. Other status messages may still be printed when `FALSE`.
 #' @param hash logical(1). Return a combined MD5 hash of the files under
-#'   `data_files/` instead of the download summary. Default is `FALSE`.
+#'   `data_files/` instead of the download summary when `download = TRUE`.
+#'   Ignored when `download = FALSE`. Default is `FALSE`.
 #' @param max_tries integer(1). Maximum attempts per file download request,
 #'   including the initial attempt. Default is 20.
 #' @param rate_limit numeric(1). Non-negative throttling interval in seconds,
@@ -54,7 +55,12 @@
 #' The selected product determines the filename prefix. For example,
 #' `product = "raw"` and `year = 2022` request `IMPAER_2022.txt.zip`.
 #' `zip_files/` and `data_files/` are sibling directories created beneath
-#' `directory_to_save`, including when `unzip = FALSE`.
+#' `directory_to_save`, including when `unzip = FALSE` or `download = FALSE`.
+#'
+#' The first planned URL is checked before returning a preview or downloading.
+#' A failed preflight check emits a warning and allows execution to continue;
+#' it does not verify availability for every requested year. Preview mode
+#' therefore still makes network requests and may create directories.
 #'
 #' All archives share `data_files/` as their extraction destination. Names
 #' and paths stored inside each archive are preserved. Pass the directory
@@ -70,10 +76,16 @@
 #' uses `data_files/`, which may be empty or contain previously extracted data.
 #' @author Insang Song, Mitchell Manware
 #' @return
-#' After downloading and optional extraction, `hash = FALSE` returns the
-#' download summary from [download_run_method()] invisibly, including counts
-#' of successful, failed, and skipped files. With `hash = TRUE`, returns a
-#' visible character scalar containing the combined MD5 hash of `data_files/`.
+#' When `download = FALSE`, an invisible list containing `urls`, `destfiles`,
+#' and `n_files` is returned regardless of `hash`. These describe all planned
+#' downloads, including files that already exist locally; `n_files` is the
+#' number of planned URLs.
+#'
+#' When `download = TRUE`, after downloading and optional extraction,
+#' `hash = FALSE` returns the download summary from [download_run_method()]
+#' invisibly, including counts of successful, failed, and skipped files.
+#' With `hash = TRUE`, returns a visible character scalar containing the
+#' combined MD5 hash of `data_files/`.
 #' @importFrom httr2 request req_retry req_timeout req_perform resp_status
 #' @seealso [download_setup_dir()], [download_unzip()], [process_improve()]
 #' @examples
@@ -155,6 +167,14 @@ download_improve <- function(
     chr_prefix,
     int_years
   )
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(chr_urls[1])
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
+  if (!isTRUE(download)) {
+    return(invisible(amadeus::download_preview(chr_urls, chr_filenames)))
+  }
   # ----------------------------------------------------------------------------
   # Run download.
   download_result <- amadeus::download_run_method(

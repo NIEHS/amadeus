@@ -38,9 +38,9 @@ extracted into \verb{data_files/}.}
 \item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed. Downloaded
 archives and extracted measurement files can require substantial storage.}
 
-\item{download}{logical(1). Deprecated. \code{FALSE} emits a warning but does
-not skip downloading or return a preview in the current implementation.
-Default is \code{TRUE}.}
+\item{download}{logical(1). Deprecated. \code{FALSE} emits a warning and returns
+a preview of the planned files without downloading archives or extracting
+their contents. Default is \code{TRUE}.}
 
 \item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
 No command file is generated. Default is \code{FALSE}.}
@@ -58,7 +58,8 @@ have been extracted. Default is \code{FALSE}. May be \code{TRUE} only when
 \code{TRUE}. Other status messages may still be printed when \code{FALSE}.}
 
 \item{hash}{logical(1). Return a combined MD5 hash of the files under
-\verb{data_files/} instead of the download summary. Default is \code{FALSE}.}
+\verb{data_files/} instead of the download summary when \code{download = TRUE}.
+Ignored when \code{download = FALSE}. Default is \code{FALSE}.}
 
 \item{max_tries}{integer(1). Maximum attempts per file download request,
 including the initial attempt. Default is 20.}
@@ -67,10 +68,16 @@ including the initial attempt. Default is 20.}
 passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
 }
 \value{
-After downloading and optional extraction, \code{hash = FALSE} returns the
-download summary from \code{\link[=download_run_method]{download_run_method()}} invisibly, including counts
-of successful, failed, and skipped files. With \code{hash = TRUE}, returns a
-visible character scalar containing the combined MD5 hash of \verb{data_files/}.
+When \code{download = FALSE}, an invisible list containing \code{urls}, \code{destfiles},
+and \code{n_files} is returned regardless of \code{hash}. These describe all planned
+downloads, including files that already exist locally; \code{n_files} is the
+number of planned URLs.
+
+When \code{download = TRUE}, after downloading and optional extraction,
+\code{hash = FALSE} returns the download summary from \code{\link[=download_run_method]{download_run_method()}}
+invisibly, including counts of successful, failed, and skipped files.
+With \code{hash = TRUE}, returns a visible character scalar containing the
+combined MD5 hash of \verb{data_files/}.
 }
 \description{
 Download annual IMPROVE (Interagency Monitoring of Protected Visual
@@ -82,7 +89,12 @@ extracted to pipe-delimited \code{.txt} files using the shared download workflow
 The selected product determines the filename prefix. For example,
 \code{product = "raw"} and \code{year = 2022} request \code{IMPAER_2022.txt.zip}.
 \verb{zip_files/} and \verb{data_files/} are sibling directories created beneath
-\code{directory_to_save}, including when \code{unzip = FALSE}.
+\code{directory_to_save}, including when \code{unzip = FALSE} or \code{download = FALSE}.
+
+The first planned URL is checked before returning a preview or downloading.
+A failed preflight check emits a warning and allows execution to continue;
+it does not verify availability for every requested year. Preview mode
+therefore still makes network requests and may create directories.
 
 All archives share \verb{data_files/} as their extraction destination. Names
 and paths stored inside each archive are preserved. Pass the directory
