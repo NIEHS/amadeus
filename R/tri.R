@@ -18,21 +18,69 @@
 #' @note TRI data does not require authentication. State and tribal downloads
 #'   are saved with jurisdiction-specific file names, while the U.S.-wide
 #'   download keeps the historical \code{tri_raw_<year>.csv} naming pattern.
-#' @param year integer(1 or 2). Year or start/end years for downloading data.
-#' @param directory_to_save character(1). Directory to download files.
-#' @param acknowledgement logical(1). Must be TRUE to proceed.
+#' @param year integer(1 or more). One year, two endpoints, or a non-empty
+#'   vector of years. Every year from the minimum through the maximum is
+#'   requested, including gaps: `c(2018, 2023)` requests `2018:2023`.
+#'   Default is `c(2018L, 2022L)`. Missing, fractional, pre-1900, and future
+#'   years are rejected. File availability depends on EPA coverage for the
+#'   selected jurisdiction.
 #' @param jurisdiction character(1). TRI file variant to download. Use
-#'   \code{"US"} for the nationwide file, a two-letter state or territory code
-#'   such as \code{"AZ"} or \code{"NC"} for a jurisdiction-specific file, or
-#'   \code{"tbl"} for the tribal file. Default is \code{"US"}.
-#' @param download logical(1). DEPRECATED. Downloads happen automatically.
-#' @param remove_command logical(1). Deprecated, ignored.
-#' @param show_progress logical(1). Show download progress (default TRUE)
-#' @param hash logical(1). Return hash of downloaded files (default FALSE)
-#' @param max_tries integer(1). Maximum retry attempts (default 20)
-#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#'   `"US"` (default) for the nationwide file, a two-letter state or territory
+#'   code such as `"AZ"` or `"NC"`, or `"tbl"` for the tribal file. Leading and
+#'   trailing whitespace is removed and case is normalized, so `" nc "` and
+#'   `"TBL"` are accepted. Validation accepts any two-letter alphabetic code
+#'   or `"tbl"`; it does not check a list of supported jurisdiction codes.
+#' @param directory_to_save character(1). Non-empty output directory path.
+#'   CSV files are saved directly in this directory, which is created if
+#'   missing, including when `download = FALSE`.
+#' @param acknowledgement logical(1). Must be `TRUE` to proceed.
+#' @param download logical(1). Deprecated. `FALSE` emits a warning and returns
+#'   a preview of the planned files without downloading CSV files.
+#'   Default is `TRUE`.
+#' @param remove_command logical(1). Deprecated and ignored; `TRUE` emits a
+#'   warning. Default is `FALSE`.
+#' @param show_progress logical(1). Show file download progress. Default is
+#'   `TRUE`. Other status messages may still be printed when `FALSE`.
+#' @param hash logical(1). Return a combined MD5 hash of the files under
+#'   `directory_to_save` instead of the download summary when `download = TRUE`.
+#'   Ignored when `download = FALSE`. Default is `FALSE`.
+#' @param max_tries integer(1). Maximum attempts per file download request,
+#'   including the initial attempt. Default is 20.
+#' @param rate_limit numeric(1). Request-throttling interval in seconds,
+#'   passed to [download_run_method()]. Controls the average request rate,
+#'   rather than guaranteeing a minimum gap between requests. Default is 2.
+#' @details
+#' File names depend on the selected jurisdiction. For example, requests for
+#' 2020 produce `tri_raw_2020.csv` for `"US"`, `tri_raw_2020_NC.csv` for `"NC"`,
+#' and `tri_raw_2020_TBL.csv` for `"tbl"`. Tribal download URLs use lowercase
+#' `tbl`, while local file names use uppercase `TBL`.
+#'
+#' The output directory is created and the first planned URL is checked before
+#' returning a preview or downloading. A failed preflight check emits a warning
+#' and allows execution to continue; it does not verify availability for every
+#' requested year. Preview mode therefore still makes network requests and may
+#' create directories.
+#'
+#' Previews include all planned files, including those already present locally.
+#' During downloading, [download_run_method()] skips existing non-empty files;
+#' missing or empty destination files are downloaded.
+#'
+#' Hashing includes all files recursively under `directory_to_save`, including
+#' existing files and files unrelated to the requested years or jurisdiction.
 #' @author Mariana Kassien, Insang Song
-#' @return invisible list with download results; or hash character if hash=TRUE
+#' @return
+#' When `download = FALSE`, an invisible list containing `urls`, `destfiles`,
+#' and `n_files` is returned regardless of `hash`. The file count is the number
+#' of planned URLs, including files that already exist locally.
+#'
+#' When `download = TRUE` and `hash = FALSE`, returns the download summary from
+#' [download_run_method()] invisibly, including `success`, `failed`, and
+#' `skipped` file counts. When downloads are attempted, the summary also
+#' contains `failed_urls` and `failed_files` character vectors.
+#'
+#' When `download = TRUE` and `hash = TRUE`, returns a visible character scalar
+#' containing the combined MD5 hash of the files under `directory_to_save`.
+#' @seealso [download_run_method()], [process_tri()]
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{web_usepa2024tri}{amadeus}
@@ -48,9 +96,9 @@
 #' @export
 download_tri <- function(
   year = c(2018L, 2022L),
+  jurisdiction = "US",
   directory_to_save = NULL,
   acknowledgement = FALSE,
-  jurisdiction = "US",
   download = TRUE,
   remove_command = FALSE,
   show_progress = TRUE,
@@ -58,134 +106,75 @@ download_tri <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### Directory setup
-  amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-
-  #### Check years
-  year <- if (length(year) == 1) rep(year, 2) else year
-  stopifnot(length(year) == 2)
-  year <- year[order(year)]
-
-  #### Check jurisdiction
-  if (
-    !is.character(jurisdiction) ||
-      length(jurisdiction) != 1 ||
-      is.na(jurisdiction)
-  ) {
-    stop(
-      "`jurisdiction` must be a single character value such as ",
-      "\"US\", \"AZ\", or \"tbl\".\n",
-      call. = FALSE
-    )
-  }
-  jurisdiction <- trimws(jurisdiction)
-  if (!nzchar(jurisdiction)) {
-    stop(
-      "`jurisdiction` must be \"US\", a two-letter state code, or \"tbl\".\n",
-      call. = FALSE
-    )
-  }
-  jurisdiction_upper <- toupper(jurisdiction)
-  if (identical(jurisdiction_upper, "TBL")) {
-    jurisdiction_url <- "tbl"
-    jurisdiction_suffix <- "_tbl"
-  } else if (
-    identical(jurisdiction_upper, "US") ||
-      grepl("^[A-Z]{2}$", jurisdiction_upper)
-  ) {
-    jurisdiction_url <- jurisdiction_upper
-    jurisdiction_suffix <- if (identical(jurisdiction_upper, "US")) {
-      ""
-    } else {
-      paste0("_", jurisdiction_upper)
-    }
-  } else {
-    stop(
-      "`jurisdiction` must be \"US\", a two-letter state code such as ",
-      "\"AZ\", or \"tbl\".\n",
-      call. = FALSE
-    )
-  }
-
-  #### Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return",
-      " after discovering files.\n",
-      call. = FALSE
-    )
-  }
-
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### Define measurement data paths
-  url_download <- paste0(
-    # nolint: line_length_linter.
-    "https://data.epa.gov/efservice/downloads/tri/",
-    "mv_tri_basic_download/"
+  # ----------------------------------------------------------------------------
+  # Check common arguments.
+  amadeus:::download_check(
+    dataset_name = "tri",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = FALSE,
+    remove_zip = FALSE,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
   )
-  year_sequence <- seq(year[1], year[2], 1)
-  download_urls <- paste0(
-    url_download,
-    year_sequence,
-    "_",
-    jurisdiction_url,
-    "/csv"
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
+  checkmate::assert_string(jurisdiction)
+  chr_juris <- toupper(trimws(jurisdiction))
+  checkmate::assert_string(chr_juris, pattern = "^([A-Z]{2}|TBL)$")
+  # ----------------------------------------------------------------------------
+  # Check `years` and generate sequence.
+  int_years <- amadeus:::sequence_years(year)
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_dir_to_save <- amadeus::download_setup_dir(directory_to_save)
+  # ----------------------------------------------------------------------------
+  # Format the validated jurisdiction for URLs and file names.
+  chr_jurl <- if (chr_juris == "TBL") "tbl" else chr_juris
+  chr_suffix <- if (chr_juris == "US") "" else paste0("_", chr_juris)
+  # ----------------------------------------------------------------------------
+  chr_urls <- sprintf(
+    paste0(
+      "https://data.epa.gov/efservice/downloads/tri/",
+      "mv_tri_basic_download/%d_%s/csv"
+    ),
+    int_years,
+    chr_jurl
   )
-  download_names <- paste0(
-    directory_to_save,
+  # ----------------------------------------------------------------------------
+  # Generate download file names.
+  chr_filenames <- paste0(
+    chr_dir_to_save,
     "tri_raw_",
-    year_sequence,
-    jurisdiction_suffix,
+    int_years,
+    chr_suffix,
     ".csv"
   )
-
-  #### Filter to files that need downloading
-  needs_download <- sapply(download_names, amadeus::check_destfile)
-  download_urls_filtered <- download_urls[needs_download]
-  download_names_filtered <- download_names[needs_download]
-
-  #### Exit early if download=FALSE
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(chr_urls[1])
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message(sprintf(
-      "Skipping download. Found %d files available for download.\n",
-      length(download_urls_filtered)
-    ))
-    return(invisible(list(
-      urls = download_urls_filtered,
-      destfiles = download_names_filtered,
-      n_files = length(download_urls_filtered)
-    )))
+    return(invisible(amadeus::download_preview(chr_urls, chr_filenames)))
   }
-
-  #### Download files using httr2
+  # ----------------------------------------------------------------------------
+  # Run download.
   download_result <- amadeus::download_run_method(
-    urls = download_urls_filtered,
-    destfiles = download_names_filtered,
+    urls = chr_urls,
+    destfiles = chr_filenames,
     token = NULL,
     show_progress = show_progress,
     max_tries = max_tries,
     rate_limit = rate_limit
   )
-
-  message("Requests were processed.\n")
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(download_result))
-  }
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
@@ -631,8 +620,8 @@ get_tri_info <- function(
     if (!include_na) {
       out <- out[
         !(is.na(out$TRI_CHEMICAL_COMPOUND_ID) &
-            is.na(out$CHEMICAL) &
-            is.na(out$CASN)),
+          is.na(out$CHEMICAL) &
+          is.na(out$CASN)),
         ,
         drop = FALSE
       ]
@@ -661,7 +650,7 @@ get_tri_info <- function(
     if (!include_na) {
       out <- out[
         !(is.na(out$INDUSTRY_SECTOR_CODE) &
-            is.na(out$INDUSTRY_SECTOR)),
+          is.na(out$INDUSTRY_SECTOR)),
         ,
         drop = FALSE
       ]
@@ -762,15 +751,21 @@ calculate_tri <- function(
   if (!is.numeric(decay_range)) {
     stop("`decay_range` should be numeric.\n")
   }
-  if (!is.logical(use_threshold) || length(use_threshold) != 1L ||
-        is.na(use_threshold)) {
+  if (
+    !is.logical(use_threshold) ||
+      length(use_threshold) != 1L ||
+      is.na(use_threshold)
+  ) {
     stop("`use_threshold` must be TRUE or FALSE.\n")
   }
   c0_input <- C0
-  if (!is.null(c0_input) &&
-        (!is.character(c0_input) || length(c0_input) < 1L ||
-           anyNA(c0_input) ||
-           any(!nzchar(trimws(c0_input))))) {
+  if (
+    !is.null(c0_input) &&
+      (!is.character(c0_input) ||
+        length(c0_input) < 1L ||
+        anyNA(c0_input) ||
+        any(!nzchar(trimws(c0_input))))
+  ) {
     stop("`C0` must be NULL or a non-empty character vector of column names.\n")
   }
   locs_re <- terra::project(locs, terra::crs(from))
@@ -792,7 +787,9 @@ calculate_tri <- function(
     if (length(tri_cols) == 1L) {
       warning(
         "`C0` is NULL and only one TRI field is available; ",
-        "using `", tri_cols[1], "` as source values.\n"
+        "using `",
+        tri_cols[1],
+        "` as source values.\n"
       )
     }
     c0_cols <- tri_cols

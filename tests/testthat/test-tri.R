@@ -76,7 +76,7 @@ testthat::test_that("download_tri supports state and tribal jurisdictions", {
   testthat::expect_match(tribal_result$urls, "2024_tbl/csv$")
   testthat::expect_match(
     basename(tribal_result$destfiles),
-    "^tri_raw_2024_tbl\\.csv$"
+    "^tri_raw_2024_TBL\\.csv$"
   )
 
   unlink(directory_to_save, recursive = TRUE)
@@ -85,14 +85,16 @@ testthat::test_that("download_tri supports state and tribal jurisdictions", {
 testthat::test_that("download_tri validates jurisdiction input", {
   withr::with_tempdir({
     testthat::expect_error(
-      download_tri(
-        year = 2024L,
-        directory_to_save = ".",
-        acknowledgement = TRUE,
-        jurisdiction = "northcarolina",
-        download = FALSE
+      testthat::expect_warning(
+        download_tri(
+          year = 2024L,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          jurisdiction = "northcarolina",
+          download = FALSE
+        )
       ),
-      regexp = "jurisdiction"
+      regexp = "juris"
     )
   })
 })
@@ -100,79 +102,122 @@ testthat::test_that("download_tri validates jurisdiction input", {
 testthat::test_that("download_tri rejects empty, NA, and non-scalar jurisdictions", {
   withr::with_tempdir({
     testthat::expect_error(
-      download_tri(
-        year = 2024L,
-        directory_to_save = ".",
-        acknowledgement = TRUE,
-        jurisdiction = "",
-        download = FALSE
+      testthat::expect_warning(
+        download_tri(
+          year = 2024L,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          jurisdiction = "",
+          download = FALSE
+        )
       ),
-      regexp = "jurisdiction"
+      regexp = "juris"
     )
     testthat::expect_error(
-      download_tri(
-        year = 2024L,
-        directory_to_save = ".",
-        acknowledgement = TRUE,
-        jurisdiction = NA_character_,
-        download = FALSE
+      testthat::expect_warning(
+        download_tri(
+          year = 2024L,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          jurisdiction = NA_character_,
+          download = FALSE
+        )
       ),
-      regexp = "jurisdiction"
+      regexp = "juris"
     )
     testthat::expect_error(
-      download_tri(
-        year = 2024L,
-        directory_to_save = ".",
-        acknowledgement = TRUE,
-        jurisdiction = c("US", "AZ"),
-        download = FALSE
+      testthat::expect_warning(
+        download_tri(
+          year = 2024L,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          jurisdiction = c("US", "AZ"),
+          download = FALSE
+        )
       ),
-      regexp = "jurisdiction"
+      regexp = "juris"
     )
     testthat::expect_error(
-      download_tri(
-        year = 2024L,
-        directory_to_save = ".",
-        acknowledgement = TRUE,
-        jurisdiction = 42,
-        download = FALSE
+      testthat::expect_warning(
+        download_tri(
+          year = 2024L,
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          jurisdiction = 42,
+          download = FALSE
+        )
       ),
-      regexp = "jurisdiction"
+      regexp = "juris"
     )
   })
 })
 
-testthat::test_that("download_tri normalizes jurisdiction and filters existing files", {
-  download_urls_seen <- NULL
-  destfiles_seen <- NULL
+testthat::test_that('download_tri(jurisdiction = " nc "): normalizes and skips existing files', {
+  download_urls_seen <- character()
+  destfiles_seen <- character()
 
+  # --------------------------------------------------------------------------
+  # Prevent the preflight check from accessing the network.
   testthat::local_mocked_bindings(
-    check_destfile = function(path) !grepl("2021_NC", path),
-    download_run_method = function(urls, destfiles, ...) {
-      download_urls_seen <<- urls
-      destfiles_seen <<- destfiles
-      list(success = length(urls), failed = 0)
-    },
+    check_preflight = function(...) invisible(NULL),
     .package = "amadeus"
   )
 
+  # --------------------------------------------------------------------------
+  # Mock HTTP transfers; retain real filtering and download-result handling.
+  testthat::local_mocked_bindings(
+    req_perform = function(req, path, ...) {
+      download_urls_seen <<- c(download_urls_seen, req$url)
+      destfiles_seen <<- c(destfiles_seen, path)
+      writeLines(c("YEAR,STATE", "2020,NC"), path)
+      invisible(NULL)
+    },
+    .package = "httr2"
+  )
+
   withr::with_tempdir({
-    result <- suppressMessages(download_tri(
+    # ------------------------------------------------------------------------
+    # Create a nonempty file that the shared runner should skip.
+    existing_file <- "tri_raw_2021_NC.csv"
+    existing_content <- c("YEAR,STATE", "2021,NC")
+    writeLines(existing_content, existing_file)
+
+    # ------------------------------------------------------------------------
+    # Request both years using whitespace and lowercase jurisdiction input.
+    result <- suppressMessages(amadeus::download_tri(
       year = c(2020L, 2021L),
       directory_to_save = ".",
       acknowledgement = TRUE,
       jurisdiction = " nc ",
       download = TRUE,
       show_progress = FALSE,
-      rate_limit = 0
+      hash = FALSE,
+      max_tries = 1L,
+      rate_limit = 1
     ))
 
+    # ------------------------------------------------------------------------
+    # Only the missing year should reach the HTTP request.
     testthat::expect_equal(result$success, 1L)
+    testthat::expect_equal(result$failed, 0L)
+    testthat::expect_equal(result$skipped, 1L)
+
     testthat::expect_length(download_urls_seen, 1L)
     testthat::expect_match(download_urls_seen, "2020_NC/csv$")
-    testthat::expect_match(
+    testthat::expect_identical(
       basename(destfiles_seen),
-      "^tri_raw_2020_NC\\.csv$"
+      "tri_raw_2020_NC.csv"
+    )
+
+    # ------------------------------------------------------------------------
+    # Verify the new file was written and the existing file was preserved.
+    testthat::expect_identical(
+      readLines("tri_raw_2020_NC.csv"),
+      c("YEAR,STATE", "2020,NC")
+    )
+    testthat::expect_identical(
+      readLines(existing_file),
+      existing_content
     )
   })
 })
@@ -205,7 +250,7 @@ testthat::test_that("download_tri (LIVE - state and tribal)", {
     testthat::expect_type(tribal_result, "list")
 
     state_file <- "tri_raw_2024_AZ.csv"
-    tribal_file <- "tri_raw_2024_tbl.csv"
+    tribal_file <- "tri_raw_2024_TBL.csv"
 
     testthat::expect_true(file.exists(state_file))
     testthat::expect_true(file.exists(tribal_file))
@@ -313,7 +358,10 @@ testthat::test_that("get_tri_info covers lookup edge cases", {
   })
 
   withr::with_tempdir({
-    write_tri_csv(data.frame(TRI_CHEMICAL_COMPOUND_ID = "100", CHEMICAL = "BENZENE"))
+    write_tri_csv(data.frame(
+      TRI_CHEMICAL_COMPOUND_ID = "100",
+      CHEMICAL = "BENZENE"
+    ))
     testthat::expect_error(
       get_tri_info(path = ".", year = 2018),
       regexp = "missing `YEAR`"
@@ -388,10 +436,16 @@ testthat::test_that("process_tri", {
   testthat::expect_false(any(grepl("^FUGITIVE_AIR_", names(tri_r))))
   testthat::expect_equal(attr(tri_r, "tri_variables"), "STACK_AIR")
   testthat::expect_false(
-    any(is.na(as.data.frame(tri_r)[, attr(tri_r, "tri_target_fields"), drop = FALSE]))
+    any(is.na(as.data.frame(tri_r)[,
+      attr(tri_r, "tri_target_fields"),
+      drop = FALSE
+    ]))
   )
   testthat::expect_true(
-    identical(attr(tri_r, "tri_target_fields"), c("STACK_AIR_100", "STACK_AIR_200"))
+    identical(
+      attr(tri_r, "tri_target_fields"),
+      c("STACK_AIR_100", "STACK_AIR_200")
+    )
   )
 
   testthat::expect_no_error(
@@ -412,7 +466,10 @@ testthat::test_that("process_tri", {
       chemical = "benzene"
     )
   )
-  testthat::expect_true(all(grepl("_100$", attr(tri_benzene, "tri_target_fields"))))
+  testthat::expect_true(all(grepl(
+    "_100$",
+    attr(tri_benzene, "tri_target_fields")
+  )))
 
   testthat::expect_no_error(
     tri_cas <- process_tri(
@@ -536,7 +593,11 @@ testthat::test_that("process_tri validates and errors on unsupported input paths
       STACK_AIR = 1
     ))
     testthat::expect_error(
-      process_tri(path = ".", variables = "STACK_AIR", industry_group = "industry_sector"),
+      process_tri(
+        path = ".",
+        variables = "STACK_AIR",
+        industry_group = "industry_sector"
+      ),
       regexp = "missing industry grouping columns"
     )
   })
