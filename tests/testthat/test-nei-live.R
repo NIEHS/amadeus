@@ -10,7 +10,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-amadeus::download_nei(
+    amadeus::download_nei(
       year = c(2020L, 2020L),
       directory_to_save = dir,
       acknowledgement = TRUE,
@@ -30,7 +30,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-amadeus::download_nei(
+    amadeus::download_nei(
       year = c(2017L, 2017L),
       directory_to_save = dir,
       acknowledgement = TRUE,
@@ -50,7 +50,7 @@ testthat::test_that(
   {
     skip_if_no_live_tests()
     dir <- withr::local_tempdir()
-amadeus::download_nei(
+    amadeus::download_nei(
       year = c(2017L, 2020L),
       directory_to_save = dir,
       acknowledgement = TRUE,

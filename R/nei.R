@@ -5,28 +5,80 @@
 ################################################################################
 # {download} tier
 ################################################################################
-#' Download road emissions data
+#' Download NEI onroad emissions data
 #' @description
-#' The \code{download_nei()} function accesses and downloads road emissions
-#' data from the U.S Environmental Protection Agency's (EPA) National
-#' Emissions Inventory (NEI).
+#' Download onroad emissions CSV archives from the U.S. Environmental
+#' Protection Agency's National Emissions Inventory (NEI). Archives and
+#' extracted data are stored in separate subdirectories using the shared
+#' download workflow.
 #' @note NEI data does not require authentication.
-#' @param epa_certificate_path TO BE DEPRECATED. Certificate path.
-#' @param certificate_url TO BE DEPRECATED. Certificate URL.
-#' @param year integer(1). Available years of NEI data.
-#' @param directory_to_save character(1). Directory to save data.
-#' @param acknowledgement logical(1). Must be TRUE to proceed.
-#' @param download logical(1). DEPRECATED. Downloads happen automatically.
-#' @param remove_command logical(1). Deprecated, ignored.
-#' @param unzip logical(1). Unzip zip files (default TRUE).
-#' @param remove_zip logical(1). Remove zip files after unzipping (default
-#' FALSE).
-#' @param show_progress logical(1). Show download progress (default TRUE)
-#' @param hash logical(1). Return hash of downloaded files (default FALSE)
-#' @param max_tries integer(1). Maximum retry attempts (default 20)
-#' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @param year integer(1 or more). Selected inventory years. Supported values
+#'   are 2008, 2011, 2014, 2017, 2020, and 2023. Default is
+#'   `c(2017L, 2020L)`. Each value selects an individual inventory;
+#'   `c(2017, 2023)` requests only those two years, without filling gaps.
+#'   Unsupported years are omitted with a warning that lists the retained
+#'   years. If no supported years remain, the function stops before creating
+#'   directories or contacting the provider.
+#' @param directory_to_save character(1). Non-empty parent directory.
+#'   Archives are downloaded into `zip_files/` and, when `unzip = TRUE`,
+#'   extracted into separate per-archive directories under `data_files/`.
+#' @param acknowledgement logical(1). Must be `TRUE` to proceed. Downloaded
+#'   archives and extracted CSV files can require substantial storage.
+#' @param download logical(1). Deprecated. `FALSE` warns and returns a preview
+#'   after directory creation and a preflight check of the first URL. No
+#'   archives are downloaded or extracted in preview mode. Default is `TRUE`.
+#' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
+#'   No command file is generated. Default is `FALSE`.
+#' @param unzip logical(1). Extract downloaded ZIP archives into per-archive
+#'   directories under `data_files/`. Default is `TRUE`; `FALSE` skips
+#'   extraction and creation of the per-archive directories.
+#' @param remove_zip logical(1). Remove downloaded archives and their
+#'   `zip_files/` directory, including remaining contents, after all archives
+#'   have been extracted. Default is `FALSE`. May be `TRUE` only when
+#'   `unzip = TRUE`. No removal occurs when `download = FALSE`.
+#' @param show_progress logical(1). Show file download progress. Default is
+#'   `TRUE`. Other status messages may still be printed when `FALSE`.
+#' @param hash logical(1). Return a combined MD5 hash of the files under
+#'   `data_files/` instead of the download summary. Default is `FALSE`.
+#'   Ignored when `download = FALSE`.
+#' @param max_tries integer(1). Maximum attempts per file download request,
+#'   including the initial attempt. Default is 20.
+#' @param rate_limit numeric(1). Non-negative throttling interval in seconds,
+#'   passed to [download_run_method()]. Default is 2.
+#' @details
+#' A year-specific lookup selects the provider's archive path and filename.
+#' NEI releases use different version directories and naming conventions.
+#'
+#' `zip_files/` and `data_files/` are sibling directories created beneath
+#' `directory_to_save`, including for previews and when `unzip = FALSE`.
+#' Each archive is extracted into a directory named after the archive with
+#' its `.zip` suffix removed. For example, the 2020 archive is saved as
+#' `zip_files/2020nei_onroad_byregion.zip` and extracted into
+#' `data_files/2020nei_onroad_byregion/`. This isolates duplicate filenames
+#' across inventories. Paths stored inside each archive are preserved.
+#'
+#' Preview destinations refer to the archives in `zip_files/`, including
+#' files that already exist locally. For actual downloads,
+#' [download_run_method()] skips existing non-empty archives; they are still
+#' passed to extraction when `unzip = TRUE`.
+#' The preflight check contacts the first URL even in preview mode; a failed
+#' check emits a warning. Its request settings are separate from those used
+#' for file downloads.
+#'
+#' Hashing covers all files under `data_files/`, including existing files,
+#' and excludes archives in `zip_files/`. With `unzip = FALSE`, hashing still
+#' uses `data_files/`, which may be empty or contain previously extracted data.
+#'
+#' Download support covers more inventory years than [process_nei()], which
+#' currently accepts only 2017 and 2020.
 #' @author Kyle Messier, Insang Song
-#' @return invisible list with download results; or hash character if hash=TRUE
+#' @return
+#' With `download = FALSE`, an invisible preview list containing `urls`,
+#' `destfiles`, and `n_files`. Otherwise, after downloading and optional
+#' extraction, `hash = FALSE` returns the download summary from
+#' [download_run_method()] invisibly. With `hash = TRUE`, returns a visible
+#' character scalar containing the combined MD5 hash of `data_files/`.
+#' @seealso [download_setup_dir()], [download_unzip()], [process_nei()]
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{web_usepa2024nei}{amadeus}
@@ -34,17 +86,13 @@
 #' \dontrun{
 #' download_nei(
 #'   year = c(2017L, 2020L),
-#'   directory_to_save = tempdir(),
-#'   acknowledgement = TRUE
+#'   directory_to_save = file.path(tempdir(), "nei"),
+#'   acknowledgement = TRUE,
+#'   download = FALSE # Preview selected inventory URLs and archive paths.
 #' )
 #' }
 #' @export
 download_nei <- function(
-  epa_certificate_path = NULL,
-  certificate_url = paste0(
-    "http://cacerts.digicert.com/",
-    "DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
-  ),
   year = c(2017L, 2020L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -57,147 +105,146 @@ download_nei <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### Directory setup
-  directory_original <- amadeus::download_sanitize_path(directory_to_save)
-  directories <- amadeus::download_setup_dir(directory_original, zip = TRUE)
-  directory_to_download <- directories[1]
-  directory_to_save <- directories[2]
-
-  #### Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return",
-      " after discovering files.\n",
-      call. = FALSE
-    )
-  }
-
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  if (
-    !is.null(epa_certificate_path) ||
-      certificate_url !=
-        "http://cacerts.digicert.com/DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
-  ) {
-    warning(
-      "Parameters 'epa_certificate_path' and 'certificate_url'",
-      " are deprecated.\n",
-      "SSL certificates are now handled automatically by httr2.\n",
-      call. = FALSE
-    )
-  }
-
-  #### Define measurement data paths
-  # Each NEI year has a distinct URL path suffix; use a named lookup so the
-  # function works correctly whether `year` is a scalar (as dispatched from
-  # the targets pipeline via pattern = map()) or a full c(2017, 2020) vector.
-  url_download_base <- "https://gaftp.epa.gov/air/nei/%s/data_summaries/"
-  nei_url_map <- c(
-    "2017" = "2017v1/2017neiApr_onroad_byregions.zip",
-    "2020" = "2020nei_onroad_byregion.zip"
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  amadeus:::download_check(
+    dataset_name = "nei",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip,
+    remove_zip = remove_zip,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
   )
-  nei_file_map <- c(
-    "2017" = "2017neiApr_onroad_byregions.zip",
-    "2020" = "2020nei_onroad_byregion.zip"
-  )
-  year_chr <- as.character(year)
-  unknown <- setdiff(year_chr, names(nei_url_map))
-  if (length(unknown) > 0) {
-    stop(paste0(
+  # ----------------------------------------------------------------------------
+  # Manage `year` argument.
+  idx_year <- year %in% c(2008, 2011, 2014, 2017, 2020, 2023)
+  int_year <- year[idx_year]
+  if (any(!idx_year)) {
+    # --------------------------------------------------------------------------
+    # If request includes any invalid years.
+    chr_year_message <- paste0(
       "NEI data is not available for year(s): ",
-      paste(unknown, collapse = ", "),
-      ". Available years: ",
-      paste(names(nei_url_map), collapse = ", "),
-      ".\n"
-    ))
+      paste(year[!idx_year], collapse = ", "),
+      ". Available years: 2008, 2011, 2014, 2017, 2020, 2023."
+    )
+    # --------------------------------------------------------------------------
+    # Error if all years requested are invalid.
+    if (length(int_year) == 0L) {
+      stop(chr_year_message, " No available years to download.", call. = FALSE)
+    }
+    # --------------------------------------------------------------------------
+    # Continue with valid year downlod but warn some requests were invalid.
+    warning(
+      chr_year_message,
+      "\nProceeding with download for year(s): ",
+      paste(int_year, collapse = ", "),
+      ".",
+      call. = FALSE
+    )
   }
-  download_urls <- vapply(
-    year_chr,
-    function(y) paste0(sprintf(url_download_base, y), nei_url_map[y]),
-    character(1)
+  checkmate::assert_integerish(int_year, lower = 2008, min.len = 1L)
+  checkmate::assert_subset(int_year, c(2008, 2011, 2014, 2017, 2020, 2023))
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_directories <- amadeus::download_setup_dir(
+    amadeus::download_sanitize_path(directory_to_save),
+    zip = TRUE
   )
-  download_names_file <- unname(nei_file_map[year_chr])
-  download_names <- paste0(directory_to_download, download_names_file)
-
-  #### Filter to files that need downloading
-  needs_download <- sapply(download_names, amadeus::check_destfile)
-  download_urls_filtered <- download_urls[needs_download]
-  download_names_filtered <- download_names[needs_download]
-
-  #### Exit early if download=FALSE
+  chr_dir_to_download <- chr_directories[1]
+  chr_dir_to_save <- chr_directories[2]
+  # ----------------------------------------------------------------------------
+  # Map year selection to file name; subsetting to year selections.
+  chr_urlmap <- c(
+    "2008" = "2008neiv3_onroad_byregions.zip",
+    "2011" = "2011v2/2011neiv2_onroad_byregions.zip",
+    "2014" = "2014v2/2014neiv2_onroad_byregions.zip",
+    "2017" = "2017v1/2017neiApr_onroad_byregions.zip",
+    "2020" = "2020nei_onroad_byregion.zip",
+    "2023" = "2023nei_onroad_byregion_21jul2026.zip"
+  )
+  chr_urlmap <- unname(
+    grep(
+      paste0(int_year, collapse = "|"),
+      chr_urlmap,
+      value = TRUE
+    )
+  )
+  chr_filemap <- c(
+    "2008" = "2008neiv3_onroad_byregions.zip",
+    "2011" = "2011neiv2_onroad_byregions.zip",
+    "2014" = "2014neiv2_onroad_byregions.zip",
+    "2017" = "2017neiApr_onroad_byregions.zip",
+    "2020" = "2020nei_onroad_byregion.zip",
+    "2023" = "2023nei_onroad_byregion_21jul2026.zip"
+  )
+  chr_filemap <- unname(
+    grep(
+      paste0(int_year, collapse = "|"),
+      chr_filemap,
+      value = TRUE
+    )
+  )
+  # ----------------------------------------------------------------------------
+  # Generate download URLs.
+  chr_urls <- sprintf(
+    "https://gaftp.epa.gov/air/nei/%s/data_summaries/%s",
+    int_year,
+    chr_urlmap
+  )
+  # ----------------------------------------------------------------------------
+  # Generate download file names.
+  chr_filenames <- paste0(chr_dir_to_download, chr_filemap)
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(chr_urls[1])
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message(sprintf(
-      "Skipping download. Found %d files available for download.\n",
-      length(download_urls_filtered)
-    ))
-    return(invisible(list(
-      urls = download_urls_filtered,
-      destfiles = download_names_filtered,
-      n_files = length(download_urls_filtered)
-    )))
+    return(invisible(amadeus::download_preview(chr_urls, chr_filenames)))
   }
-
-  #### Download files using httr2
-  if (length(download_urls_filtered) > 0) {
-    download_result <- amadeus::download_run_method(
-      urls = download_urls_filtered,
-      destfiles = download_names_filtered,
-      token = NULL,
-      show_progress = show_progress,
-      max_tries = max_tries,
-      rate_limit = rate_limit
-    )
-  } else {
-    message("All files already exist. Nothing to download.\n")
-    download_result <- list(
-      success = 0,
-      failed = 0,
-      skipped = length(download_names)
-    )
+  # ----------------------------------------------------------------------------
+  # Run download.
+  download_result <- amadeus::download_run_method(
+    urls = chr_urls,
+    destfiles = chr_filenames,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+  # ----------------------------------------------------------------------------
+  # Per-file directories to avoid filename collisions.
+  chr_dirs_to_unzip <- paste0(
+    chr_dir_to_save,
+    sub("\\.(zip|tar\\.gz)$", "", basename(chr_filenames))
+  )
+  if (isTRUE(unzip)) {
+    invisible(lapply(chr_dirs_to_unzip, amadeus::download_setup_dir))
   }
-
-  #### Unzip data (custom unzipping to separate directories per file)
-  if (unzip) {
-    dir_unzip <- paste0(
-      directory_to_save,
-      sub(".zip", "", download_names_file)
-    )
-    for (fn in seq_along(dir_unzip)) {
-      if (file.exists(download_names[fn])) {
-        if (!dir.exists(dir_unzip[fn])) {
-          dir.create(dir_unzip[fn], recursive = TRUE)
-        }
-        utils::unzip(zipfile = download_names[fn], exdir = dir_unzip[fn])
-      }
-    }
-  }
-
-  #### Remove zip files
-  if (remove_zip) {
-    for (fn in download_names) {
-      if (file.exists(fn)) {
-        file.remove(fn)
-      }
-    }
-  }
-
-  message("Requests were processed.\n")
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(download_result))
-  }
+  # ----------------------------------------------------------------------------
+  # Pair each archive with its own destination. Cleanup follows all extractions.
+  mapply(
+    amadeus::download_unzip,
+    file_name = chr_filenames,
+    directory_to_unzip = chr_dirs_to_unzip,
+    MoreArgs = list(unzip = unzip),
+    SIMPLIFY = FALSE,
+    USE.NAMES = FALSE
+  )
+  # ----------------------------------------------------------------------------
+  # Remove zip files.
+  amadeus::download_remove_zips(
+    remove = remove_zip,
+    download_name = chr_filenames
+  )
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################

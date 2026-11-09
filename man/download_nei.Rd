@@ -2,12 +2,9 @@
 % Please edit documentation in R/nei.R
 \name{download_nei}
 \alias{download_nei}
-\title{Download road emissions data}
+\title{Download NEI onroad emissions data}
 \usage{
 download_nei(
-  epa_certificate_path = NULL,
-  certificate_url = paste0("http://cacerts.digicert.com/",
-    "DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"),
   year = c(2017L, 2020L),
   directory_to_save = NULL,
   acknowledgement = FALSE,
@@ -22,40 +19,89 @@ download_nei(
 )
 }
 \arguments{
-\item{epa_certificate_path}{TO BE DEPRECATED. Certificate path.}
+\item{year}{integer(1 or more). Selected inventory years. Supported values
+are 2008, 2011, 2014, 2017, 2020, and 2023. Default is
+\code{c(2017L, 2020L)}. Each value selects an individual inventory;
+\code{c(2017, 2023)} requests only those two years, without filling gaps.
+Unsupported years are omitted with a warning that lists the retained
+years. If no supported years remain, the function stops before creating
+directories or contacting the provider.}
 
-\item{certificate_url}{TO BE DEPRECATED. Certificate URL.}
+\item{directory_to_save}{character(1). Non-empty parent directory.
+Archives are downloaded into \verb{zip_files/} and, when \code{unzip = TRUE},
+extracted into separate per-archive directories under \verb{data_files/}.}
 
-\item{year}{integer(1). Available years of NEI data.}
+\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed. Downloaded
+archives and extracted CSV files can require substantial storage.}
 
-\item{directory_to_save}{character(1). Directory to save data.}
+\item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a preview
+after directory creation and a preflight check of the first URL. No
+archives are downloaded or extracted in preview mode. Default is \code{TRUE}.}
 
-\item{acknowledgement}{logical(1). Must be TRUE to proceed.}
+\item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
+No command file is generated. Default is \code{FALSE}.}
 
-\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
+\item{unzip}{logical(1). Extract downloaded ZIP archives into per-archive
+directories under \verb{data_files/}. Default is \code{TRUE}; \code{FALSE} skips
+extraction and creation of the per-archive directories.}
 
-\item{remove_command}{logical(1). Deprecated, ignored.}
+\item{remove_zip}{logical(1). Remove downloaded archives and their
+\verb{zip_files/} directory, including remaining contents, after all archives
+have been extracted. Default is \code{FALSE}. May be \code{TRUE} only when
+\code{unzip = TRUE}. No removal occurs when \code{download = FALSE}.}
 
-\item{unzip}{logical(1). Unzip zip files (default TRUE).}
+\item{show_progress}{logical(1). Show file download progress. Default is
+\code{TRUE}. Other status messages may still be printed when \code{FALSE}.}
 
-\item{remove_zip}{logical(1). Remove zip files after unzipping (default
-FALSE).}
+\item{hash}{logical(1). Return a combined MD5 hash of the files under
+\verb{data_files/} instead of the download summary. Default is \code{FALSE}.
+Ignored when \code{download = FALSE}.}
 
-\item{show_progress}{logical(1). Show download progress (default TRUE)}
+\item{max_tries}{integer(1). Maximum attempts per file download request,
+including the initial attempt. Default is 20.}
 
-\item{hash}{logical(1). Return hash of downloaded files (default FALSE)}
-
-\item{max_tries}{integer(1). Maximum retry attempts (default 20)}
-
-\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2)}
+\item{rate_limit}{numeric(1). Non-negative throttling interval in seconds,
+passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
 }
 \value{
-invisible list with download results; or hash character if hash=TRUE
+With \code{download = FALSE}, an invisible preview list containing \code{urls},
+\code{destfiles}, and \code{n_files}. Otherwise, after downloading and optional
+extraction, \code{hash = FALSE} returns the download summary from
+\code{\link[=download_run_method]{download_run_method()}} invisibly. With \code{hash = TRUE}, returns a visible
+character scalar containing the combined MD5 hash of \verb{data_files/}.
 }
 \description{
-The \code{download_nei()} function accesses and downloads road emissions
-data from the U.S Environmental Protection Agency's (EPA) National
-Emissions Inventory (NEI).
+Download onroad emissions CSV archives from the U.S. Environmental
+Protection Agency's National Emissions Inventory (NEI). Archives and
+extracted data are stored in separate subdirectories using the shared
+download workflow.
+}
+\details{
+A year-specific lookup selects the provider's archive path and filename.
+NEI releases use different version directories and naming conventions.
+
+\verb{zip_files/} and \verb{data_files/} are sibling directories created beneath
+\code{directory_to_save}, including for previews and when \code{unzip = FALSE}.
+Each archive is extracted into a directory named after the archive with
+its \code{.zip} suffix removed. For example, the 2020 archive is saved as
+\verb{zip_files/2020nei_onroad_byregion.zip} and extracted into
+\verb{data_files/2020nei_onroad_byregion/}. This isolates duplicate filenames
+across inventories. Paths stored inside each archive are preserved.
+
+Preview destinations refer to the archives in \verb{zip_files/}, including
+files that already exist locally. For actual downloads,
+\code{\link[=download_run_method]{download_run_method()}} skips existing non-empty archives; they are still
+passed to extraction when \code{unzip = TRUE}.
+The preflight check contacts the first URL even in preview mode; a failed
+check emits a warning. Its request settings are separate from those used
+for file downloads.
+
+Hashing covers all files under \verb{data_files/}, including existing files,
+and excludes archives in \verb{zip_files/}. With \code{unzip = FALSE}, hashing still
+uses \verb{data_files/}, which may be empty or contain previously extracted data.
+
+Download support covers more inventory years than \code{\link[=process_nei]{process_nei()}}, which
+currently accepts only 2017 and 2020.
 }
 \note{
 NEI data does not require authentication.
@@ -64,13 +110,17 @@ NEI data does not require authentication.
 \dontrun{
 download_nei(
   year = c(2017L, 2020L),
-  directory_to_save = tempdir(),
-  acknowledgement = TRUE
+  directory_to_save = file.path(tempdir(), "nei"),
+  acknowledgement = TRUE,
+  download = FALSE # Preview selected inventory URLs and archive paths.
 )
 }
 }
 \references{
 \insertRef{web_usepa2024nei}{amadeus}
+}
+\seealso{
+\code{\link[=download_setup_dir]{download_setup_dir()}}, \code{\link[=download_unzip]{download_unzip()}}, \code{\link[=process_nei]{process_nei()}}
 }
 \author{
 Kyle Messier, Insang Song

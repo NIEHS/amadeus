@@ -117,6 +117,56 @@ testthat::test_that("download_nei (live)", {
   unlink(directory_to_save, recursive = TRUE)
 })
 
+testthat::test_that("download_nei range (live)", {
+  skip_on_cran()
+  skip_if_offline()
+
+  withr::local_package("httr2")
+  withr::local_package("stringr")
+  # function parameters
+  directory_to_save <- paste0(tempdir(), "/nei/")
+
+  # run download function
+  year <- 2017:2020
+  testthat::expect_warning(
+    download_data(
+      dataset_name = "nei",
+      directory_to_save = directory_to_save,
+      acknowledgement = TRUE,
+      download = TRUE,
+      year = year,
+      remove_command = FALSE,
+      unzip = TRUE,
+      remove_zip = FALSE # NOW THIS PARAMETER EXISTS!
+    ),
+    regexp = "Proceeding with "
+  )
+
+  # Check that files were downloaded
+  testthat::expect_true(
+    dir.exists(directory_to_save)
+  )
+
+  # Check for zip files if they exist
+  zip_dir <- paste0(directory_to_save, "/zip_files")
+  if (dir.exists(zip_dir)) {
+    testthat::expect_true(
+      length(list.files(zip_dir)) > 0
+    )
+  }
+
+  # Check for data files if they exist
+  data_dir <- paste0(directory_to_save, "/data_files")
+  if (dir.exists(data_dir)) {
+    testthat::expect_true(
+      length(list.files(data_dir, recursive = TRUE)) > 0
+    )
+  }
+
+  # remove temporary nei
+  unlink(directory_to_save, recursive = TRUE)
+})
+
 testthat::test_that("download_nei (expected errors)", {
   skip_on_cran()
   skip_if_offline()
@@ -126,6 +176,22 @@ testthat::test_that("download_nei (expected errors)", {
   # function parameters
   tdir <- tempdir()
   directory_to_save <- paste0(tempdir(), "/epa/")
+
+  # run download function
+  year <- 2000:2002
+  testthat::expect_error(
+    testthat::expect_warning(
+      download_data(
+        dataset_name = "nei",
+        directory_to_save = directory_to_save,
+        acknowledgement = TRUE,
+        download = FALSE,
+        year = year,
+        remove_command = FALSE
+      )
+    ),
+    "No available years to download."
+  )
 
   # run download function
   year <- c(2017L)
@@ -162,12 +228,12 @@ testthat::test_that("download_nei (expected errors)", {
 testthat::test_that("download_nei remove_command deprecation warning", {
   withr::with_tempdir({
     testthat::expect_warning(
-        download_nei(
-          year = c(2017L, 2017L),
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = FALSE,
-          remove_command = TRUE
+      download_nei(
+        year = c(2017L, 2017L),
+        directory_to_save = ".",
+        acknowledgement = TRUE,
+        download = FALSE,
+        remove_command = TRUE
       ),
       regexp = "remove_command.*deprecated"
     )
@@ -196,50 +262,6 @@ testthat::test_that("download_nei mock download with hash", {
       )
     )
     testthat::expect_equal(result, "fakehash")
-  })
-})
-
-testthat::test_that("download_nei epa_certificate_path deprecation warning", {
-  skip_on_cran()
-
-  withr::with_tempdir({
-    testthat::local_mocked_bindings(
-      check_url_status = function(...) TRUE,
-      check_destfile = function(...) FALSE,
-      download_run_method = function(...) {
-        invisible(list(success = 0, failed = 0, skipped = 2))
-      },
-      download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
-      .package = "amadeus"
-    )
-
-    # epa_certificate_path != NULL should trigger deprecation warning
-    testthat::expect_warning(
-      suppressMessages(
-        download_nei(
-          year = 2020,
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = FALSE,
-          epa_certificate_path = "/fake/cert.pem"
-        )
-      ),
-      "epa_certificate_path.*deprecated|deprecated.*epa_certificate"
-    )
-
-    # certificate_url != default should also trigger warning
-    testthat::expect_warning(
-      suppressMessages(
-        download_nei(
-          year = 2020,
-          directory_to_save = ".",
-          acknowledgement = TRUE,
-          download = FALSE,
-          certificate_url = "https://other.cert.url/cert.crt"
-        )
-      ),
-      "certificate_url.*deprecated|deprecated.*certificate_url"
-    )
   })
 })
 
