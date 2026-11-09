@@ -1,0 +1,119 @@
+{
+  "reviewed_utc": "2026-11-06T03:17:07.235209+00:00",
+  "scope": "Schema-valid metadata profiles, not a claim that all provider products, rows or bytes are verified.",
+  "gaps": [
+    {
+      "dataset": "gridmet",
+      "field": "Product.default_data_status / product_version",
+      "reason": "Recent slices are revisable and no release version is asserted by the inspected headers.",
+      "impact": "Do not label the entire collection final or invent v1.5.",
+      "next_action": "Inspect status attributes on each retrieved annual file and archive its metadata/hash."
+    },
+    {
+      "dataset": "gridmet",
+      "field": "non-daily products",
+      "reason": "PDSI, SPI/SPEI/EDDI and elevation are outside this daily profile; the existing temporal enum lacks a five-day member.",
+      "impact": "The sixteen daily variables do not imply coverage of all gridMET variants.",
+      "next_action": "Create separate verified product profiles; review the existing enum extension proposal rather than call five-day output daily."
+    },
+    {
+      "dataset": "gridmet",
+      "field": "day_boundary_convention",
+      "reason": "local_midnight alone does not encode fixed MST/UTC-07; archived sample ending_1200_gmt conflicts with current provider evidence.",
+      "impact": "Consumers must read the explicit MST convention; this is not station-local civil midnight.",
+      "next_action": "Reuse description now; review a structured timezone/day-offset addition before automated temporal joins."
+    },
+    {
+      "dataset": "aqs",
+      "field": "row-selection semantics",
+      "reason": "Daily files can have multiple Sample Duration, Pollutant Standard, Event Type and POC combinations. Existing catalog has no typed selection profile.",
+      "impact": "Parameter identity alone does not authorize combining rows; ozone rolling-average summaries are not raw daily ozone means.",
+      "next_action": "Select an analysis-specific combination and retain these fields; consider scoped selection metadata only if executable catalog-driven selection is required."
+    },
+    {
+      "dataset": "aqs",
+      "field": "CRS / temporal coverage / quality",
+      "reason": "Datum varies per row; overall start date and a universal quality/certification state are not established.",
+      "impact": "No EPSG:4326 default, guessed coverage start or unconditional quality_controlled/final value is supplied.",
+      "next_action": "Read Datum and station metadata, resolve dates/offsets by monitor, and assess the requested annual file."
+    },
+    {
+      "dataset": "aqs",
+      "field": "additional parameters and routes",
+      "reason": "Seven common pollutant parameters only; hourly files, grouped parameters and the authenticated API are separate profiles.",
+      "impact": "This is not a complete inventory of every AQS parameter.",
+      "next_action": "Extend from the official parameter table, with validated units and separate temporal/access profiles."
+    },
+    {
+      "dataset": "hms",
+      "field": "irregular imagery support",
+      "reason": "Existing temporal enum cannot distinguish daily file organization from variable-duration imagery intervals.",
+      "impact": "The daily product label must not be interpreted as continuous daily observation coverage.",
+      "next_action": "Use feature Start/End for scientific time support; review an irregular-support enum/descriptor before automated temporal queries."
+    },
+    {
+      "dataset": "hms",
+      "field": "historical classes / version / missingness",
+      "reason": "Raw encodings and density completeness vary historically; no archive-wide fill sentinel or release version is verified.",
+      "impact": "Do not map 5/16/21 to measured concentration or infer no smoke from unavailable data.",
+      "next_action": "Inspect the requested archive date and preserve unmatched labels and observation availability."
+    },
+    {
+      "dataset": "nlcd",
+      "field": "GridDefinition.crs / srid / origin",
+      "reason": "Native WGS84 Albers has no verified external authority code in the source metadata. The schema requires a code-like crs even when proj_string is present.",
+      "impact": "AMADEUS:100001 is explicitly a catalog-local registration identifier; srid and unverified affine origin are omitted. Do not send 100001 or fallback 4326/5070 to ST_SetSRID.",
+      "next_action": "Resolve the exact existing proj_string with PROJ/terra; before database ingestion, define an explicit CRS/SRID policy or relax the schema to permit a verified full CRS without an authority code."
+    },
+    {
+      "dataset": "nlcd",
+      "field": "version and product-specific verification",
+      "reason": "C1V1 is deliberately pinned; the provider now lists C1V2. Only the C1V1 Land Cover archive XML was read directly; the other five profiles use the official shared guide.",
+      "impact": "No latest-release claim or successful current-download claim for all years/products is made.",
+      "next_action": "Inspect requested product/year header, checksums, classes and C1V1 availability before execution; register C1V2 separately after review."
+    },
+    {
+      "dataset": "nlcd",
+      "field": "adapter semantic coverage",
+      "reason": "Download/process recognize six products, but generic categorical extraction is not scientific validation of confidence, transitions, impervious fraction or spectral dates.",
+      "impact": "Only land cover carries calculate_covariates dispatch in these specs.",
+      "next_action": "Verify each product-specific extraction policy; use nearest for classes, area fractions for land cover, weighted means for impervious fraction and appropriate event handling for change DOY."
+    },
+    {
+      "dataset": "all",
+      "field": "license / QA / additional fields",
+      "reason": "Detailed government-source terms, native bounds, bit vocabularies and some release/coverage information lack exact implemented slots or verified values.",
+      "impact": "No unsupported SPDX identifier, plausible physical bound, OMOP binding, dataset version, quality status or fake asset checksum is created.",
+      "next_action": "Retain source statements in descriptions/notes; adopt only reviewed catalog extensions. Acquire actual assets before claiming byte-level validation."
+    },
+    {
+      "dataset": "aqs",
+      "field": "bulk release months",
+      "reason": "The source row correctly distinguishes nominal twice-yearly bulk publication from daily database updates. The EPA page itself contains differing month descriptions.",
+      "impact": "P6M is nominal frequency only, not an exact calendar or availability guarantee.",
+      "next_action": "Use actual annual-file modification dates; resolve month-specific release claims with EPA if needed."
+    },
+    {
+      "dataset": "hms",
+      "field": "programme contribution history vs smoke support",
+      "reason": "The workbook B5:F25 table covers programme systems, including dates before smoke polygons began. In use and chart endpoint values do not establish final contribution dates.",
+      "impact": "Twenty-one paired source assertions are preserved in DataSource.description; none is asserted as a smoke-product-specific sensor/date relationship.",
+      "next_action": "Verify historical programme assertions and smoke-specific participation before typed contribution queries; do not introduce ambiguous scalar Product fields."
+    },
+    {
+      "dataset": "all",
+      "field": "first-release, rights, lifecycle and coverage vocabulary",
+      "reason": "All relevant inventory assertions are retained as attributed, scoped text. Dedicated proposed slots/enums have not been incorporated into the existing schema.",
+      "impact": "Metadata is preserved but not uniformly available as structured filter fields. Inventory claims do not become verified release dates, SPDX terms, implementation status or observation QA.",
+      "next_action": "Approve only justified extensions from the final Markdown gap review if typed queries are required; otherwise use the existing descriptions and audit trace."
+    },
+    {
+      "dataset": "nlcd",
+      "field": "legacy and Tree Canopy Cover scope",
+      "reason": "The workbook mixes legacy citations/years with Annual status and lists Tree Canopy Cover under multiple themes. Neither establishes a new verified Annual C1V1 product.",
+      "impact": "Legacy and canopy information is retained in scope decisions rather than copied into Annual records or registered twice.",
+      "next_action": "Verify and register these distinct product families only when expanding the stated scope."
+    }
+  ],
+  "resource_reviewed_utc": "2026-11-06T03:37:47.435490+00:00"
+}

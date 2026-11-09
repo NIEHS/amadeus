@@ -1,0 +1,240 @@
+# Discovery projection of the corresponding dataset spec; identical stable IDs/metadata.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/koppen_geiger_beck
+  name: koppen_geiger_beck
+  label: Beck et al. Köppen–Geiger maps
+  producer_institution: Beck et al. author team; Figshare data repository
+  homepage: https://doi.org/10.6084/m9.figshare.6396959
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _koppen_geiger
+  description: 'Pinned Beck_KG_V1.zip, Figshare file 12407516, matching the current R adapter. The workbook
+    also cites the scientifically distinct 2023 V2 release; that reference must not replace the V1 methods
+    or future scenario. [Resource reconciliation: inventory rights and history] Inventory usage/citation
+    statement (Amadeus data sources!I5): CC BY 4.0; cite Beck et al. (2018). Inventory source status (H5):
+    Available (V1; superseded by V2, 2023); this is not observation QA, API availability or verified support
+    for every product. Inventory first-release/history wording (J5): 2018. The adapter pins the Beck V1
+    archive. The separate 2023 reference describes V2 and does not change the V1 scenario, period or version.
+    Static availability is not an annual update cadence.'
+  license_spdx: CC-BY-4.0
+  citation_apa: Beck, H. E., et al. (2018). Present and future Köppen–Geiger climate classification maps
+    at 1-km resolution. Scientific Data, 5, 180214. https://doi.org/10.1038/sdata.2018.214
+products:
+- id: amadeus:product/koppen_v1_present_0p0083
+  name: koppen_v1_present_0p0083
+  label: Köppen–Geiger V1 present, 0.0083 degree
+  data_source: amadeus:source/koppen_geiger_beck
+  data_genre:
+  - climate
+  - climate_classification
+  native_format: geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Static classification and companion agreement maps summarizing 1980–2016. timeless follows
+    the existing schema convention for static Köppen maps: no temporal_coverage dates are asserted. The
+    climatological reference periods remain explicit here; this is not an annual observation series. 1980–2016
+    spans 37 years, despite the workbook generic 30-year wording. The 2018 V1 future map is RCP8.5, not
+    the 2023 V2 ensemble. Nominal 0.0083/0.083 labels are rounded; exact spacings and dimensions come
+    from all twelve TIFF headers. [Resource reconciliation: inventory completeness] Inventory coverage
+    statement (Amadeus data sources!N5): Yes (global land). This statement does not establish validity
+    of every cell/date or fill observation gaps.'
+  product_version: Beck_KG_V1 (2018)
+  grid_definition: amadeus:grid/koppen_v1_0p0083
+  crs: EPSG:4326
+  srid: 4326
+  native_spatial_resolution_descriptor: 0.008333333333333333 degrees; latitude-dependent physical spacing
+  spatial_extent_descriptor: Global land; rectangular geographic grid includes non-classified ocean cells
+  doi: 10.6084/m9.figshare.6396959
+  license_spdx: CC-BY-4.0
+  access_url: https://ndownloader.figshare.com/files/12407516
+  amadeus_dataset_name: koppen
+  amadeus_process_covariate: koppen
+  amadeus_calculate_covariate: koppen
+- id: amadeus:product/koppen_v1_future_0p0083
+  name: koppen_v1_future_0p0083
+  label: Köppen–Geiger V1 future, 0.0083 degree
+  data_source: amadeus:source/koppen_geiger_beck
+  data_genre:
+  - climate
+  - climate_classification
+  native_format: geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Static classification and companion agreement maps summarizing 2071–2100, CMIP5 RCP8.5
+    ensemble. timeless follows the existing schema convention for static Köppen maps: no temporal_coverage
+    dates are asserted. The climatological reference periods remain explicit here; this is not an annual
+    observation series. 1980–2016 spans 37 years, despite the workbook generic 30-year wording. The 2018
+    V1 future map is RCP8.5, not the 2023 V2 ensemble. Nominal 0.0083/0.083 labels are rounded; exact
+    spacings and dimensions come from all twelve TIFF headers. [Resource reconciliation: inventory completeness]
+    Inventory coverage statement (Amadeus data sources!N5): Yes (global land). This statement does not
+    establish validity of every cell/date or fill observation gaps.'
+  product_version: Beck_KG_V1 (2018)
+  grid_definition: amadeus:grid/koppen_v1_0p0083
+  crs: EPSG:4326
+  srid: 4326
+  native_spatial_resolution_descriptor: 0.008333333333333333 degrees; latitude-dependent physical spacing
+  spatial_extent_descriptor: Global land; rectangular geographic grid includes non-classified ocean cells
+  doi: 10.6084/m9.figshare.6396959
+  license_spdx: CC-BY-4.0
+  access_url: https://ndownloader.figshare.com/files/12407516
+  amadeus_dataset_name: koppen
+  amadeus_process_covariate: koppen
+  amadeus_calculate_covariate: koppen
+- id: amadeus:product/koppen_v1_present_0p083
+  name: koppen_v1_present_0p083
+  label: Köppen–Geiger V1 present, 0.083 degree
+  data_source: amadeus:source/koppen_geiger_beck
+  data_genre:
+  - climate
+  - climate_classification
+  native_format: geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Static classification and companion agreement maps summarizing 1980–2016. timeless follows
+    the existing schema convention for static Köppen maps: no temporal_coverage dates are asserted. The
+    climatological reference periods remain explicit here; this is not an annual observation series. 1980–2016
+    spans 37 years, despite the workbook generic 30-year wording. The 2018 V1 future map is RCP8.5, not
+    the 2023 V2 ensemble. Nominal 0.0083/0.083 labels are rounded; exact spacings and dimensions come
+    from all twelve TIFF headers. [Resource reconciliation: inventory completeness] Inventory coverage
+    statement (Amadeus data sources!N5): Yes (global land). This statement does not establish validity
+    of every cell/date or fill observation gaps.'
+  product_version: Beck_KG_V1 (2018)
+  grid_definition: amadeus:grid/koppen_v1_0p083
+  crs: EPSG:4326
+  srid: 4326
+  native_spatial_resolution_descriptor: 0.08333333333333333 degrees; latitude-dependent physical spacing
+  spatial_extent_descriptor: Global land; rectangular geographic grid includes non-classified ocean cells
+  doi: 10.6084/m9.figshare.6396959
+  license_spdx: CC-BY-4.0
+  access_url: https://ndownloader.figshare.com/files/12407516
+  amadeus_dataset_name: koppen
+  amadeus_process_covariate: koppen
+  amadeus_calculate_covariate: koppen
+- id: amadeus:product/koppen_v1_future_0p083
+  name: koppen_v1_future_0p083
+  label: Köppen–Geiger V1 future, 0.083 degree
+  data_source: amadeus:source/koppen_geiger_beck
+  data_genre:
+  - climate
+  - climate_classification
+  native_format: geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Static classification and companion agreement maps summarizing 2071–2100, CMIP5 RCP8.5
+    ensemble. timeless follows the existing schema convention for static Köppen maps: no temporal_coverage
+    dates are asserted. The climatological reference periods remain explicit here; this is not an annual
+    observation series. 1980–2016 spans 37 years, despite the workbook generic 30-year wording. The 2018
+    V1 future map is RCP8.5, not the 2023 V2 ensemble. Nominal 0.0083/0.083 labels are rounded; exact
+    spacings and dimensions come from all twelve TIFF headers. [Resource reconciliation: inventory completeness]
+    Inventory coverage statement (Amadeus data sources!N5): Yes (global land). This statement does not
+    establish validity of every cell/date or fill observation gaps.'
+  product_version: Beck_KG_V1 (2018)
+  grid_definition: amadeus:grid/koppen_v1_0p083
+  crs: EPSG:4326
+  srid: 4326
+  native_spatial_resolution_descriptor: 0.08333333333333333 degrees; latitude-dependent physical spacing
+  spatial_extent_descriptor: Global land; rectangular geographic grid includes non-classified ocean cells
+  doi: 10.6084/m9.figshare.6396959
+  license_spdx: CC-BY-4.0
+  access_url: https://ndownloader.figshare.com/files/12407516
+  amadeus_dataset_name: koppen
+  amadeus_process_covariate: koppen
+  amadeus_calculate_covariate: koppen
+- id: amadeus:product/koppen_v1_present_0p5
+  name: koppen_v1_present_0p5
+  label: Köppen–Geiger V1 present, 0.5 degree
+  data_source: amadeus:source/koppen_geiger_beck
+  data_genre:
+  - climate
+  - climate_classification
+  native_format: geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Static classification and companion agreement maps summarizing 1980–2016. timeless follows
+    the existing schema convention for static Köppen maps: no temporal_coverage dates are asserted. The
+    climatological reference periods remain explicit here; this is not an annual observation series. 1980–2016
+    spans 37 years, despite the workbook generic 30-year wording. The 2018 V1 future map is RCP8.5, not
+    the 2023 V2 ensemble. Nominal 0.0083/0.083 labels are rounded; exact spacings and dimensions come
+    from all twelve TIFF headers. [Resource reconciliation: inventory completeness] Inventory coverage
+    statement (Amadeus data sources!N5): Yes (global land). This statement does not establish validity
+    of every cell/date or fill observation gaps.'
+  product_version: Beck_KG_V1 (2018)
+  grid_definition: amadeus:grid/koppen_v1_0p5
+  crs: EPSG:4326
+  srid: 4326
+  native_spatial_resolution_descriptor: 0.5 degrees; latitude-dependent physical spacing
+  spatial_extent_descriptor: Global land; rectangular geographic grid includes non-classified ocean cells
+  doi: 10.6084/m9.figshare.6396959
+  license_spdx: CC-BY-4.0
+  access_url: https://ndownloader.figshare.com/files/12407516
+  amadeus_dataset_name: koppen
+  amadeus_process_covariate: koppen
+  amadeus_calculate_covariate: koppen
+- id: amadeus:product/koppen_v1_future_0p5
+  name: koppen_v1_future_0p5
+  label: Köppen–Geiger V1 future, 0.5 degree
+  data_source: amadeus:source/koppen_geiger_beck
+  data_genre:
+  - climate
+  - climate_classification
+  native_format: geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Static classification and companion agreement maps summarizing 2071–2100, CMIP5 RCP8.5
+    ensemble. timeless follows the existing schema convention for static Köppen maps: no temporal_coverage
+    dates are asserted. The climatological reference periods remain explicit here; this is not an annual
+    observation series. 1980–2016 spans 37 years, despite the workbook generic 30-year wording. The 2018
+    V1 future map is RCP8.5, not the 2023 V2 ensemble. Nominal 0.0083/0.083 labels are rounded; exact
+    spacings and dimensions come from all twelve TIFF headers. [Resource reconciliation: inventory completeness]
+    Inventory coverage statement (Amadeus data sources!N5): Yes (global land). This statement does not
+    establish validity of every cell/date or fill observation gaps.'
+  product_version: Beck_KG_V1 (2018)
+  grid_definition: amadeus:grid/koppen_v1_0p5
+  crs: EPSG:4326
+  srid: 4326
+  native_spatial_resolution_descriptor: 0.5 degrees; latitude-dependent physical spacing
+  spatial_extent_descriptor: Global land; rectangular geographic grid includes non-classified ocean cells
+  doi: 10.6084/m9.figshare.6396959
+  license_spdx: CC-BY-4.0
+  access_url: https://ndownloader.figshare.com/files/12407516
+  amadeus_dataset_name: koppen
+  amadeus_process_covariate: koppen
+  amadeus_calculate_covariate: koppen
+grid_definitions:
+- id: amadeus:grid/koppen_v1_0p0083
+  name: koppen_v1_0p0083
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.008333333333333333
+  resolution_y: 0.008333333333333333
+  resolution_unit: deg
+  n_columns: 43200
+  n_rows: 21600
+  origin_x: -180.0
+  origin_y: 90.0
+- id: amadeus:grid/koppen_v1_0p083
+  name: koppen_v1_0p083
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.08333333333333333
+  resolution_y: 0.08333333333333333
+  resolution_unit: deg
+  n_columns: 4320
+  n_rows: 2160
+  origin_x: -180.0
+  origin_y: 90.0
+- id: amadeus:grid/koppen_v1_0p5
+  name: koppen_v1_0p5
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.5
+  resolution_y: 0.5
+  resolution_unit: deg
+  n_columns: 720
+  n_rows: 360
+  origin_x: -180.0
+  origin_y: 90.0

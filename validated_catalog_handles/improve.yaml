@@ -1,0 +1,104 @@
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/improve_cira_adms
+  name: improve_cira_adms
+  label: IMPROVE ADMS exports
+  producer_institution: IMPROVE programme; National Park Service; UC Davis; CIRA, Colorado State University
+  homepage: https://views.cira.colostate.edu/adms/DataFiles/
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _improve
+  description: Rural/background aerosol-monitoring network plus partner sites, not continuous spatial coverage.
+    Daily sample support on a nominal one-in-three-day schedule is not a three-day composite or daily complete series.
+    Native raw, RHR2 and RHR3 deliveries have different reconstruction/selection/QA semantics and cannot be concatenated
+    as duplicates. Public access; acknowledge IMPROVE and follow provider use/citation guidance. No unsupported
+    SPDX license or universal station datum is assigned.
+products:
+- id: amadeus:product/improve_raw
+  name: improve_raw
+  label: IMPROVE IMPAER native daily records
+  data_source: amadeus:source/improve_cira_adms
+  spatial_support_type: monitoring_station
+  temporal_resolution: daily
+  description: 2020 original pipe-delimited annual archive fully inspected for its parameter/unit dictionary. FactValue
+    is a physical measurement or derived metric, not universally aerosol mass. Preserve SiteCode, POC, FactDate,
+    ParamCode, MethodID, Units and Status plus product-specific flags. Raw Unc and MDL have the same units as the
+    corresponding FactValue; do not zero negative or below-MDL observations automatically. Invalid/missing statuses
+    require an explicit row policy; no blanket numeric sentinel was established. RHR HGroup/IGroup distinguish haze
+    versus impairment rankings; their zero means unavailable ranking, not a measured concentration. Patched/substituted
+    values and completeness indicators remain separate. Deciviews are already logarithmic visibility metrics, represented
+    as dimensionless indices, not ug/m3 or inverse megametres. Native R unit on FlowRate/S_Rayleigh remains ambiguous
+    and those bindings are withheld. process_improve preserves statuses without filtering, and selects latest station
+    metadata by SiteCode; historical site moves/datum need explicit review. No calculate_covariates dispatch exists
+    for IMPROVE.
+  data_genre:
+  - air_pollution
+  - aerosols
+  native_format: pipe_delimited_text
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  access_url: https://vibe.cira.colostate.edu/data/export/IMPAER/
+  spatial_extent_descriptor: Monitoring sites present in each archive, including partner locations; no spatial interpolation
+    implied
+  native_spatial_resolution_descriptor: SiteCode/POC/parameter/method-specific monitoring record
+  amadeus_dataset_name: improve
+  amadeus_process_covariate: improve
+- id: amadeus:product/improve_rhr2
+  name: improve_rhr2
+  label: IMPROVE IMPRHR2 native daily records
+  data_source: amadeus:source/improve_cira_adms
+  spatial_support_type: monitoring_station
+  temporal_resolution: daily
+  description: 2020 original pipe-delimited annual archive fully inspected for its parameter/unit dictionary. FactValue
+    is a physical measurement or derived metric, not universally aerosol mass. Preserve SiteCode, POC, FactDate,
+    ParamCode, MethodID, Units and Status plus product-specific flags. Raw Unc and MDL have the same units as the
+    corresponding FactValue; do not zero negative or below-MDL observations automatically. Invalid/missing statuses
+    require an explicit row policy; no blanket numeric sentinel was established. RHR HGroup/IGroup distinguish haze
+    versus impairment rankings; their zero means unavailable ranking, not a measured concentration. Patched/substituted
+    values and completeness indicators remain separate. Deciviews are already logarithmic visibility metrics, represented
+    as dimensionless indices, not ug/m3 or inverse megametres. Native R unit on FlowRate/S_Rayleigh remains ambiguous
+    and those bindings are withheld. process_improve preserves statuses without filtering, and selects latest station
+    metadata by SiteCode; historical site moves/datum need explicit review. No calculate_covariates dispatch exists
+    for IMPROVE.
+  data_genre:
+  - air_pollution
+  - aerosols
+  native_format: pipe_delimited_text
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  access_url: https://vibe.cira.colostate.edu/data/export/IMPRHR2/
+  spatial_extent_descriptor: Monitoring sites present in each archive, including partner locations; no spatial interpolation
+    implied
+  native_spatial_resolution_descriptor: SiteCode/POC/parameter/method-specific monitoring record
+  amadeus_dataset_name: improve
+  amadeus_process_covariate: improve
+- id: amadeus:product/improve_rhr3
+  name: improve_rhr3
+  label: IMPROVE IMPRHR3 native daily records
+  data_source: amadeus:source/improve_cira_adms
+  spatial_support_type: monitoring_station
+  temporal_resolution: daily
+  description: 2020 original pipe-delimited annual archive fully inspected for its parameter/unit dictionary. FactValue
+    is a physical measurement or derived metric, not universally aerosol mass. Preserve SiteCode, POC, FactDate,
+    ParamCode, MethodID, Units and Status plus product-specific flags. Raw Unc and MDL have the same units as the
+    corresponding FactValue; do not zero negative or below-MDL observations automatically. Invalid/missing statuses
+    require an explicit row policy; no blanket numeric sentinel was established. RHR HGroup/IGroup distinguish haze
+    versus impairment rankings; their zero means unavailable ranking, not a measured concentration. Patched/substituted
+    values and completeness indicators remain separate. Deciviews are already logarithmic visibility metrics, represented
+    as dimensionless indices, not ug/m3 or inverse megametres. Native R unit on FlowRate/S_Rayleigh remains ambiguous
+    and those bindings are withheld. process_improve preserves statuses without filtering, and selects latest station
+    metadata by SiteCode; historical site moves/datum need explicit review. No calculate_covariates dispatch exists
+    for IMPROVE.
+  data_genre:
+  - air_pollution
+  - aerosols
+  native_format: pipe_delimited_text
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  access_url: https://vibe.cira.colostate.edu/data/export/IMPRHR3/
+  spatial_extent_descriptor: Monitoring sites present in each archive, including partner locations; no spatial interpolation
+    implied
+  native_spatial_resolution_descriptor: SiteCode/POC/parameter/method-specific monitoring record
+  amadeus_dataset_name: improve
+  amadeus_process_covariate: improve
+grid_definitions: []

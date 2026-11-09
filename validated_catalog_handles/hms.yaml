@@ -1,0 +1,70 @@
+# Discovery projection of the corresponding dataset spec; identical stable IDs/metadata.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/noaa_hms
+  name: noaa_hms
+  label: NOAA HMS smoke plume archive
+  producer_institution: NOAA NESDIS Office of Satellite and Product Operations
+  homepage: https://www.ospo.noaa.gov/products/land/hms.html
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _hms
+  citation_apa: 'NOAA Office of Satellite and Product Operations. Hazard Mapping System Fire and Smoke
+    Product: smoke polygons. https://www.ospo.noaa.gov/products/land/hms.html'
+  description: 'Raw NOAA analyst smoke polygons. This profile excludes fire detections and third-party
+    gap-filled/processed HMS-Smoke products; their algorithms and QA fields must not be attributed to
+    the raw archive. [Resource reconciliation: inventory rights and history] Inventory usage/citation
+    statement (Amadeus data sources!I15): Public domain (NOAA); citation requested. Inventory source status
+    (H15): Active; this is not observation QA, API availability or verified support for every product.
+    Inventory first-release/history wording (J15): 2005. Programme operation from 2003 and smoke-polygon
+    availability from August 2005 describe different scopes. [Resource reconciliation: programme observing-system
+    history] Workbook-asserted HMS programme contribution table (NOAA Hazard Mapping System!B5:F25), including
+    fire and other programme inputs; these are not verified start/end dates for the smoke-only product.
+    GOES-11 Imager (west orbit): 2003-06-16 to 2011-12-06; GOES-12 Imager (east orbit): 2003-06-16 to
+    2010-04-14; Terra/MODIS: 2003-06-16 to 2022-10-10; Aqua/MODIS: 2003-06-16 to 2018-10-02; NOAA-14/AVHRR:
+    2012-09-24 to 2013-06-10; NOAA-15/AVHRR: 2003-06-16 to 2018-05-17; NOAA-16/AVHRR: 2003-06-16 to 2005-11-28;
+    NOAA-17/AVHRR: 2003-04-16 to 2010-10-03; NOAA-18/AVHRR: 2005-11-29 to 2018-05-15; NOAA-19/AVHRR: 2009-06-30
+    to 2019-02-24; GOES-13 Imager (east orbit): 2010-04-14 to 2017-12-28; GOES-15 Imager (west orbit):
+    2011-12-06 to 2015-02-28; MetOp-A/AVHRR1: 2011-04-14 to 2019-12-31; MetOp-B/AVHRR: 2013-03-26 to 2019-12-31;
+    S-NPP/VIIRS2: 2016-10-20 to end not asserted (In use); GOES-16/ABI (east orbit): 2017-12-28 to 2025-04-07;
+    NOAA-20/VIIRS: 2018-10-03 to end not asserted (In use); GOES-17/ABI (west orbit): 2019-02-28 to 2023-01-04;
+    GOES-18/ABI (west orbit): 2023-01-04 to end not asserted (In use); NOAA-21/VIIRS: 2024-02-07 to end
+    not asserted (In use); GOES-19/ABI (east orbit): 2025-04-07 to end not asserted (In use). Chart date
+    46324 is not a retirement date. Trailing digits in source system labels are preserved without interpreting
+    possible footnote markers.'
+products:
+- id: amadeus:product/hms_smoke
+  name: hms_smoke
+  label: HMS daily smoke-polygon archive
+  data_source: amadeus:source/noaa_hms
+  data_genre:
+  - wildfire_smoke
+  - air_pollution
+  native_format: shapefile
+  spatial_support_type: polygon
+  crs: EPSG:4326
+  srid: 4326
+  spatial_extent_descriptor: North America; only areas where smoke is delineated from available imagery.
+  native_spatial_resolution_descriptor: Analyst-delineated, irregular smoke polygons; not a fixed-resolution
+    raster.
+  temporal_resolution: daily
+  temporal_alignment: interval
+  day_boundary_convention: observation_dependent
+  calendar: gregorian
+  temporal_coverage_start: '2005-08-05'
+  access_url: https://www.ospo.noaa.gov/pub/Land/HMS/Smoke_Polygons/Shapefile/
+  amadeus_dataset_name: hms
+  amadeus_process_covariate: hms
+  amadeus_calculate_covariate: hms
+  description: 'Daily refers to archive reporting/packaging, not uniform 24-hour observations. Each polygon
+    Start/End records its own UTC imagery interval and can cross midnight; equal start/end values are
+    possible. Preserve YYYYDDD and HHMM literally and resolve day-of-year correctly. Filename date is
+    not authoritative for interval endpoints. Density is an ordinal light/medium/heavy class, historically
+    also encoded 5/16/21; these are not measured ground-level concentrations. Missing/unread files and
+    cloud/observation gaps are not smoke absence. The local downloader still names the older satepsanone
+    host; current OSPO route is recorded here. [Resource reconciliation: inventory completeness] Inventory
+    coverage statement (Amadeus data sources!N15): No (only where smoke is observed). This statement does
+    not establish validity of every cell/date or fill observation gaps. [Resource reconciliation: history
+    scope] The publishing DataSource retains the workbook programme contribution history. Do not treat
+    that programme table as proof that each listed instrument contributed smoke polygons throughout those
+    dates.'

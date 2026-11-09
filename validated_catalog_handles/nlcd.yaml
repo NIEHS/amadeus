@@ -1,0 +1,201 @@
+# Discovery projection of the corresponding dataset spec; identical stable IDs/metadata.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/mrlc_nlcd
+  name: mrlc_nlcd
+  label: USGS / MRLC Annual NLCD
+  producer_institution: U.S. Geological Survey, EROS; MRLC Consortium
+  homepage: https://www.mrlc.gov/data
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _nlcd
+  doi: 10.5066/P94UXNTS
+  citation_apa: U.S. Geological Survey. (2025). Annual National Land Cover Database (NLCD), Collection
+    1, Version 1.1. U.S. Geological Survey data release. https://doi.org/10.5066/P94UXNTS
+  description: 'Annual NLCD is distinct from Legacy NLCD. This catalog pins C1V1 (map years 1985–2024)
+    to match the local downloader and verified release metadata. C1V2 is a separate newer release; the
+    shared DOI alone is not a version pin. [Resource reconciliation: inventory rights and history] Inventory
+    usage/citation statement (Amadeus data sources!I6): Public domain (U.S. Gov); citation requested.
+    Inventory source status (H6): Active (Annual NLCD); this is not observation QA, API availability or
+    verified support for every product. Inventory first-release/history wording (J6): 2024. The source
+    row describes the Annual series launch in 2024, while the broader inventory and bibliography also
+    contain Legacy NLCD. Neither the Legacy dates nor Legacy DOIs identify Annual C1V1.'
+products:
+- id: amadeus:product/nlcd_annual_c1v1_lndcov
+  name: nlcd_annual_c1v1_lndcov
+  label: Annual NLCD C1V1 CONUS — Land Cover
+  data_source: amadeus:source/mrlc_nlcd
+  product_version: Collection 1 Version 1.1 (C1V1)
+  data_genre:
+  - land_use
+  native_format: cloud_optimized_geotiff
+  spatial_support_type: raster_grid_cell
+  grid_definition: amadeus:grid/nlcd_annual_c1_conus_30m
+  crs: AMADEUS:100001
+  spatial_extent_descriptor: Conterminous United States; map years 1985–2024, C1V1.
+  native_spatial_resolution_m: 30.0
+  native_spatial_resolution_descriptor: Native 30 m equal-area pixels on WGS84 Albers; not EPSG:5070.
+  temporal_resolution: annual
+  calendar: gregorian
+  doi: 10.5066/P94UXNTS
+  access_url: https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/
+  amadeus_dataset_name: nlcd
+  amadeus_process_covariate: nlcd
+  description: 'Pinned Annual NLCD C1V1; select download_nlcd(product="Land Cover", year=YYYY). Archive
+    Annual_NLCD_LndCov_YYYY_CU_C1V1.zip. Each annual map is a modelled land-surface product, not a year-long
+    measurement at every pixel. Nominal land-cover classes; use class proportions or nearest-category
+    lookup, never a mean of integer IDs. Local crs AMADEUS:100001 is defined by the linked grid proj_string;
+    it is not an EPSG code or database SRID. A newer C1V2 release must not be silently substituted. [Resource
+    reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N6): Yes
+    (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  amadeus_calculate_covariate: nlcd
+- id: amadeus:product/nlcd_annual_c1v1_lndchg
+  name: nlcd_annual_c1v1_lndchg
+  label: Annual NLCD C1V1 CONUS — Land Cover Change
+  data_source: amadeus:source/mrlc_nlcd
+  product_version: Collection 1 Version 1.1 (C1V1)
+  data_genre:
+  - land_use
+  native_format: cloud_optimized_geotiff
+  spatial_support_type: raster_grid_cell
+  grid_definition: amadeus:grid/nlcd_annual_c1_conus_30m
+  crs: AMADEUS:100001
+  spatial_extent_descriptor: Conterminous United States; map years 1985–2024, C1V1.
+  native_spatial_resolution_m: 30.0
+  native_spatial_resolution_descriptor: Native 30 m equal-area pixels on WGS84 Albers; not EPSG:5070.
+  temporal_resolution: annual
+  calendar: gregorian
+  doi: 10.5066/P94UXNTS
+  access_url: https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/
+  amadeus_dataset_name: nlcd
+  amadeus_process_covariate: nlcd
+  description: 'Pinned Annual NLCD C1V1; select download_nlcd(product="Land Cover Change", year=YYYY).
+    Archive Annual_NLCD_LndChg_YYYY_CU_C1V1.zip. Each annual map is a modelled land-surface product, not
+    a year-long measurement at every pixel. Unchanged pixels retain a class code; changed pixels concatenate
+    previous/current codes. These are nominal transitions, not numeric magnitudes. Local crs AMADEUS:100001
+    is defined by the linked grid proj_string; it is not an EPSG code or database SRID. A newer C1V2 release
+    must not be silently substituted. [Resource reconciliation: inventory completeness] Inventory coverage
+    statement (Amadeus data sources!N6): Yes (CONUS). This statement does not establish validity of every
+    cell/date or fill observation gaps.'
+- id: amadeus:product/nlcd_annual_c1v1_lndcnf
+  name: nlcd_annual_c1v1_lndcnf
+  label: Annual NLCD C1V1 CONUS — Land Cover Confidence
+  data_source: amadeus:source/mrlc_nlcd
+  product_version: Collection 1 Version 1.1 (C1V1)
+  data_genre:
+  - land_use
+  native_format: cloud_optimized_geotiff
+  spatial_support_type: raster_grid_cell
+  grid_definition: amadeus:grid/nlcd_annual_c1_conus_30m
+  crs: AMADEUS:100001
+  spatial_extent_descriptor: Conterminous United States; map years 1985–2024, C1V1.
+  native_spatial_resolution_m: 30.0
+  native_spatial_resolution_descriptor: Native 30 m equal-area pixels on WGS84 Albers; not EPSG:5070.
+  temporal_resolution: annual
+  calendar: gregorian
+  doi: 10.5066/P94UXNTS
+  access_url: https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/
+  amadeus_dataset_name: nlcd
+  amadeus_process_covariate: nlcd
+  description: 'Pinned Annual NLCD C1V1; select download_nlcd(product="Land Cover Confidence", year=YYYY).
+    Archive Annual_NLCD_LndCnf_YYYY_CU_C1V1.zip. Each annual map is a modelled land-surface product, not
+    a year-long measurement at every pixel. Confidence score on a 1–100 scale; not calibrated correctness
+    probability. Local crs AMADEUS:100001 is defined by the linked grid proj_string; it is not an EPSG
+    code or database SRID. A newer C1V2 release must not be silently substituted. [Resource reconciliation:
+    inventory completeness] Inventory coverage statement (Amadeus data sources!N6): Yes (CONUS). This
+    statement does not establish validity of every cell/date or fill observation gaps.'
+- id: amadeus:product/nlcd_annual_c1v1_fctimp
+  name: nlcd_annual_c1v1_fctimp
+  label: Annual NLCD C1V1 CONUS — Fractional Impervious Surface
+  data_source: amadeus:source/mrlc_nlcd
+  product_version: Collection 1 Version 1.1 (C1V1)
+  data_genre:
+  - land_use
+  native_format: cloud_optimized_geotiff
+  spatial_support_type: raster_grid_cell
+  grid_definition: amadeus:grid/nlcd_annual_c1_conus_30m
+  crs: AMADEUS:100001
+  spatial_extent_descriptor: Conterminous United States; map years 1985–2024, C1V1.
+  native_spatial_resolution_m: 30.0
+  native_spatial_resolution_descriptor: Native 30 m equal-area pixels on WGS84 Albers; not EPSG:5070.
+  temporal_resolution: annual
+  calendar: gregorian
+  doi: 10.5066/P94UXNTS
+  access_url: https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/
+  amadeus_dataset_name: nlcd
+  amadeus_process_covariate: nlcd
+  description: 'Pinned Annual NLCD C1V1; select download_nlcd(product="Fractional Impervious Surface",
+    year=YYYY). Archive Annual_NLCD_FctImp_YYYY_CU_C1V1.zip. Each annual map is a modelled land-surface
+    product, not a year-long measurement at every pixel. Percentage of pixel area covered by impervious
+    surface; zero is valid, 250 is missing. Local crs AMADEUS:100001 is defined by the linked grid proj_string;
+    it is not an EPSG code or database SRID. A newer C1V2 release must not be silently substituted. [Resource
+    reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N6): Yes
+    (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+- id: amadeus:product/nlcd_annual_c1v1_impdsc
+  name: nlcd_annual_c1v1_impdsc
+  label: Annual NLCD C1V1 CONUS — Impervious Descriptor
+  data_source: amadeus:source/mrlc_nlcd
+  product_version: Collection 1 Version 1.1 (C1V1)
+  data_genre:
+  - land_use
+  native_format: cloud_optimized_geotiff
+  spatial_support_type: raster_grid_cell
+  grid_definition: amadeus:grid/nlcd_annual_c1_conus_30m
+  crs: AMADEUS:100001
+  spatial_extent_descriptor: Conterminous United States; map years 1985–2024, C1V1.
+  native_spatial_resolution_m: 30.0
+  native_spatial_resolution_descriptor: Native 30 m equal-area pixels on WGS84 Albers; not EPSG:5070.
+  temporal_resolution: annual
+  calendar: gregorian
+  doi: 10.5066/P94UXNTS
+  access_url: https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/
+  amadeus_dataset_name: nlcd
+  amadeus_process_covariate: nlcd
+  description: 'Pinned Annual NLCD C1V1; select download_nlcd(product="Impervious Descriptor", year=YYYY).
+    Archive Annual_NLCD_ImpDsc_YYYY_CU_C1V1.zip. Each annual map is a modelled land-surface product, not
+    a year-long measurement at every pixel. 0 non-urban, 1 roads, 2 urban; zero is a valid class. Local
+    crs AMADEUS:100001 is defined by the linked grid proj_string; it is not an EPSG code or database SRID.
+    A newer C1V2 release must not be silently substituted. [Resource reconciliation: inventory completeness]
+    Inventory coverage statement (Amadeus data sources!N6): Yes (CONUS). This statement does not establish
+    validity of every cell/date or fill observation gaps.'
+- id: amadeus:product/nlcd_annual_c1v1_spcchg
+  name: nlcd_annual_c1v1_spcchg
+  label: Annual NLCD C1V1 CONUS — Spectral Change Day of Year
+  data_source: amadeus:source/mrlc_nlcd
+  product_version: Collection 1 Version 1.1 (C1V1)
+  data_genre:
+  - land_use
+  native_format: cloud_optimized_geotiff
+  spatial_support_type: raster_grid_cell
+  grid_definition: amadeus:grid/nlcd_annual_c1_conus_30m
+  crs: AMADEUS:100001
+  spatial_extent_descriptor: Conterminous United States; map years 1985–2024, C1V1.
+  native_spatial_resolution_m: 30.0
+  native_spatial_resolution_descriptor: Native 30 m equal-area pixels on WGS84 Albers; not EPSG:5070.
+  temporal_resolution: annual
+  calendar: gregorian
+  doi: 10.5066/P94UXNTS
+  access_url: https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/
+  amadeus_dataset_name: nlcd
+  amadeus_process_covariate: nlcd
+  description: 'Pinned Annual NLCD C1V1; select download_nlcd(product="Spectral Change Day of Year", year=YYYY).
+    Archive Annual_NLCD_SpcChg_YYYY_CU_C1V1.zip. Each annual map is a modelled land-surface product, not
+    a year-long measurement at every pixel. Values 1–366 are day-of-year labels; 0 means no detected change.
+    Not a Julian calendar date or a duration; do not average these labels. Local crs AMADEUS:100001 is
+    defined by the linked grid proj_string; it is not an EPSG code or database SRID. A newer C1V2 release
+    must not be silently substituted. [Resource reconciliation: inventory completeness] Inventory coverage
+    statement (Amadeus data sources!N6): Yes (CONUS). This statement does not establish validity of every
+    cell/date or fill observation gaps.'
+grid_definitions:
+- id: amadeus:grid/nlcd_annual_c1_conus_30m
+  name: nlcd_annual_c1_conus_30m
+  label: Annual NLCD Collection 1 native CONUS 30 m WGS84 Albers grid
+  crs: AMADEUS:100001
+  proj_string: +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=WGS84 +units=m
+    +no_defs
+  grid_mapping_name: albers_conical_equal_area
+  resolution_x: 30.0
+  resolution_y: 30.0
+  resolution_unit: m
+  n_rows: 105000
+  n_columns: 160000

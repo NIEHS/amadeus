@@ -1,0 +1,294 @@
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/noaa_psl_narr
+  name: noaa_psl_narr
+  label: NOAA PSL NARR daily products
+  producer_institution: NOAA NCEP; NOAA Physical Sciences Laboratory
+  homepage: https://psl.noaa.gov/data/gridded/data.narr.html
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _narr
+  description: Daily derivatives of NCEP NARR. All 87 variables enumerated by the current R narr_variable
+    helper have freshly inspected provider DAS metadata. The workbook claim that the archive ended around
+    2021 is superseded by current PSL documentation. Daily means and daily sums are not native three-hourly
+    instantaneous products; native statistic and vertical support govern each binding.
+  citation_apa: Mesinger et al. (2006). North American Regional Reanalysis. Bulletin of the American Meteorological
+    Society 87, 343–360. https://doi.org/10.1175/BAMS-87-3-343. NCEP NARR data provided by NOAA PSL, Boulder,
+    Colorado, USA.
+products:
+- id: amadeus:product/narr_psl_daily_surface
+  name: narr_psl_daily_surface
+  label: NARR PSL daily surface
+  data_source: amadeus:source/noaa_psl_narr
+  data_genre:
+  - meteorology
+  - atmosphere
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: daily
+  description: 'Native PSL daily file grouping. Source time coordinate defines the start and a one-day
+    period; means combine native 00–21 UTC samples, while named sum fields retain their native Sum statistic.
+    349 × 277 Lambert grid: native x/y coordinates give nominal 32463 m spacing, distinct from a rounded
+    32 km or the example model spacing. CF Lambert parameters are lat_0=50, lon_0=-107, parallels 50/50,
+    false easting 5632642.22547 m, northing 4612545.65137 m. No radius/datum is supplied in these headers;
+    AMADEUS:100005 is an explicit unresolved placeholder, not WGS84 or a registered engine CRS. Grid coordinates
+    and decoded values are known, but geographic transformation awaits verified earth-model metadata.
+    TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
+    labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
+    Rewritten local fixtures are not native evidence.'
+  grid_definition: amadeus:grid/narr_psl_daily_surface
+  crs: AMADEUS:100005
+  temporal_resolution_iso: P1D
+  day_boundary_convention: utc_midnight
+  temporal_alignment: start
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: Native PSL projected coordinate spacing approximately 32.463 km
+  spatial_extent_descriptor: North American Lambert domain; coverage differs from CONUS-only products
+  access_url: https://downloads.psl.noaa.gov/NARR/Dailies/
+  amadeus_process_covariate: narr
+  amadeus_calculate_covariate: narr
+  amadeus_dataset_name: narr
+- id: amadeus:product/narr_psl_daily_pressure_29
+  name: narr_psl_daily_pressure_29
+  label: NARR PSL daily pressure_29
+  data_source: amadeus:source/noaa_psl_narr
+  data_genre:
+  - meteorology
+  - atmosphere
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: daily
+  description: 'Native PSL daily file grouping. Source time coordinate defines the start and a one-day
+    period; means combine native 00–21 UTC samples, while named sum fields retain their native Sum statistic.
+    349 × 277 Lambert grid: native x/y coordinates give nominal 32463 m spacing, distinct from a rounded
+    32 km or the example model spacing. CF Lambert parameters are lat_0=50, lon_0=-107, parallels 50/50,
+    false easting 5632642.22547 m, northing 4612545.65137 m. No radius/datum is supplied in these headers;
+    AMADEUS:100005 is an explicit unresolved placeholder, not WGS84 or a registered engine CRS. Grid coordinates
+    and decoded values are known, but geographic transformation awaits verified earth-model metadata.
+    TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
+    labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
+    Rewritten local fixtures are not native evidence.'
+  grid_definition: amadeus:grid/narr_psl_daily_pressure_29
+  crs: AMADEUS:100005
+  temporal_resolution_iso: P1D
+  day_boundary_convention: utc_midnight
+  temporal_alignment: start
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: Native PSL projected coordinate spacing approximately 32.463 km
+  spatial_extent_descriptor: North American Lambert domain; coverage differs from CONUS-only products
+  access_url: https://downloads.psl.noaa.gov/NARR/Dailies/
+  amadeus_process_covariate: narr
+  amadeus_calculate_covariate: narr
+  amadeus_dataset_name: narr
+- id: amadeus:product/narr_psl_daily_soil_4
+  name: narr_psl_daily_soil_4
+  label: NARR PSL daily soil_4
+  data_source: amadeus:source/noaa_psl_narr
+  data_genre:
+  - meteorology
+  - atmosphere
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: daily
+  description: 'Native PSL daily file grouping. Source time coordinate defines the start and a one-day
+    period; means combine native 00–21 UTC samples, while named sum fields retain their native Sum statistic.
+    349 × 277 Lambert grid: native x/y coordinates give nominal 32463 m spacing, distinct from a rounded
+    32 km or the example model spacing. CF Lambert parameters are lat_0=50, lon_0=-107, parallels 50/50,
+    false easting 5632642.22547 m, northing 4612545.65137 m. No radius/datum is supplied in these headers;
+    AMADEUS:100005 is an explicit unresolved placeholder, not WGS84 or a registered engine CRS. Grid coordinates
+    and decoded values are known, but geographic transformation awaits verified earth-model metadata.
+    TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
+    labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
+    Rewritten local fixtures are not native evidence.'
+  grid_definition: amadeus:grid/narr_psl_daily_soil_4
+  crs: AMADEUS:100005
+  temporal_resolution_iso: P1D
+  day_boundary_convention: utc_midnight
+  temporal_alignment: start
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: Native PSL projected coordinate spacing approximately 32.463 km
+  spatial_extent_descriptor: North American Lambert domain; coverage differs from CONUS-only products
+  access_url: https://downloads.psl.noaa.gov/NARR/Dailies/
+  amadeus_process_covariate: narr
+  amadeus_calculate_covariate: narr
+  amadeus_dataset_name: narr
+- id: amadeus:product/narr_psl_daily_pressure_15
+  name: narr_psl_daily_pressure_15
+  label: NARR PSL daily pressure_15
+  data_source: amadeus:source/noaa_psl_narr
+  data_genre:
+  - meteorology
+  - atmosphere
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: daily
+  description: 'Native PSL daily file grouping. Source time coordinate defines the start and a one-day
+    period; means combine native 00–21 UTC samples, while named sum fields retain their native Sum statistic.
+    349 × 277 Lambert grid: native x/y coordinates give nominal 32463 m spacing, distinct from a rounded
+    32 km or the example model spacing. CF Lambert parameters are lat_0=50, lon_0=-107, parallels 50/50,
+    false easting 5632642.22547 m, northing 4612545.65137 m. No radius/datum is supplied in these headers;
+    AMADEUS:100005 is an explicit unresolved placeholder, not WGS84 or a registered engine CRS. Grid coordinates
+    and decoded values are known, but geographic transformation awaits verified earth-model metadata.
+    TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
+    labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
+    Rewritten local fixtures are not native evidence.'
+  grid_definition: amadeus:grid/narr_psl_daily_pressure_15
+  crs: AMADEUS:100005
+  temporal_resolution_iso: P1D
+  day_boundary_convention: utc_midnight
+  temporal_alignment: start
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: Native PSL projected coordinate spacing approximately 32.463 km
+  spatial_extent_descriptor: North American Lambert domain; coverage differs from CONUS-only products
+  access_url: https://downloads.psl.noaa.gov/NARR/Dailies/
+  amadeus_process_covariate: narr
+  amadeus_calculate_covariate: narr
+  amadeus_dataset_name: narr
+- id: amadeus:product/narr_psl_daily_soil_5
+  name: narr_psl_daily_soil_5
+  label: NARR PSL daily soil_5
+  data_source: amadeus:source/noaa_psl_narr
+  data_genre:
+  - meteorology
+  - atmosphere
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: daily
+  description: 'Native PSL daily file grouping. Source time coordinate defines the start and a one-day
+    period; means combine native 00–21 UTC samples, while named sum fields retain their native Sum statistic.
+    349 × 277 Lambert grid: native x/y coordinates give nominal 32463 m spacing, distinct from a rounded
+    32 km or the example model spacing. CF Lambert parameters are lat_0=50, lon_0=-107, parallels 50/50,
+    false easting 5632642.22547 m, northing 4612545.65137 m. No radius/datum is supplied in these headers;
+    AMADEUS:100005 is an explicit unresolved placeholder, not WGS84 or a registered engine CRS. Grid coordinates
+    and decoded values are known, but geographic transformation awaits verified earth-model metadata.
+    TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
+    labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
+    Rewritten local fixtures are not native evidence.'
+  grid_definition: amadeus:grid/narr_psl_daily_soil_5
+  crs: AMADEUS:100005
+  temporal_resolution_iso: P1D
+  day_boundary_convention: utc_midnight
+  temporal_alignment: start
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: Native PSL projected coordinate spacing approximately 32.463 km
+  spatial_extent_descriptor: North American Lambert domain; coverage differs from CONUS-only products
+  access_url: https://downloads.psl.noaa.gov/NARR/Dailies/
+  amadeus_process_covariate: narr
+  amadeus_calculate_covariate: narr
+  amadeus_dataset_name: narr
+grid_definitions:
+- id: amadeus:grid/narr_psl_daily_surface
+  name: narr_psl_daily_surface
+  crs: AMADEUS:100005
+  resolution_x: 32463.0
+  resolution_y: 32463.0
+  resolution_unit: m
+  grid_mapping_name: lambert_conformal_conic
+  n_columns: 349
+  n_rows: 277
+- id: amadeus:grid/narr_psl_daily_pressure_29
+  name: narr_psl_daily_pressure_29
+  crs: AMADEUS:100005
+  resolution_x: 32463.0
+  resolution_y: 32463.0
+  resolution_unit: m
+  grid_mapping_name: lambert_conformal_conic
+  vertical_level_type: isobaric_pressure_hPa
+  vertical_level_unit: hPa
+  vertical_levels:
+  - 1000.0
+  - 975.0
+  - 950.0
+  - 925.0
+  - 900.0
+  - 875.0
+  - 850.0
+  - 825.0
+  - 800.0
+  - 775.0
+  - 750.0
+  - 725.0
+  - 700.0
+  - 650.0
+  - 600.0
+  - 550.0
+  - 500.0
+  - 450.0
+  - 400.0
+  - 350.0
+  - 300.0
+  - 275.0
+  - 250.0
+  - 225.0
+  - 200.0
+  - 175.0
+  - 150.0
+  - 125.0
+  - 100.0
+  n_columns: 349
+  n_rows: 277
+- id: amadeus:grid/narr_psl_daily_soil_4
+  name: narr_psl_daily_soil_4
+  crs: AMADEUS:100005
+  resolution_x: 32463.0
+  resolution_y: 32463.0
+  resolution_unit: m
+  grid_mapping_name: lambert_conformal_conic
+  vertical_level_type: native_soil_level_cm
+  vertical_level_unit: cm
+  vertical_levels:
+  - 0.0
+  - 10.0
+  - 40.0
+  - 100.0
+  n_columns: 349
+  n_rows: 277
+- id: amadeus:grid/narr_psl_daily_pressure_15
+  name: narr_psl_daily_pressure_15
+  crs: AMADEUS:100005
+  resolution_x: 32463.0
+  resolution_y: 32463.0
+  resolution_unit: m
+  grid_mapping_name: lambert_conformal_conic
+  vertical_level_type: isobaric_pressure_hPa
+  vertical_level_unit: hPa
+  vertical_levels:
+  - 1000.0
+  - 975.0
+  - 950.0
+  - 925.0
+  - 900.0
+  - 875.0
+  - 850.0
+  - 825.0
+  - 800.0
+  - 775.0
+  - 750.0
+  - 725.0
+  - 700.0
+  - 650.0
+  - 600.0
+  n_columns: 349
+  n_rows: 277
+- id: amadeus:grid/narr_psl_daily_soil_5
+  name: narr_psl_daily_soil_5
+  crs: AMADEUS:100005
+  resolution_x: 32463.0
+  resolution_y: 32463.0
+  resolution_unit: m
+  grid_mapping_name: lambert_conformal_conic
+  vertical_level_type: native_soil_level_cm
+  vertical_level_unit: cm
+  vertical_levels:
+  - 0.0
+  - 10.0
+  - 40.0
+  - 100.0
+  - 800.0
+  n_columns: 349
+  n_rows: 277

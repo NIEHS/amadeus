@@ -1,0 +1,99 @@
+{
+  "validated_utc": "2026-11-06T03:40:28.690926+00:00",
+  "schema": "amadeus_schema_archived/src/amadeus_schema/schema/amadeus_schema.yaml",
+  "target_class": "AmadeusDatabase",
+  "package_versions": {
+    "linkml": "1.12.1",
+    "linkml-runtime": "1.12.1",
+    "PyYAML": "6.0.3"
+  },
+  "linkml_results": [
+    {
+      "file": "dataset_spec_objects/aqs.yaml",
+      "passed": true,
+      "sha256": "36863ec4fbacf7994daf1d51154cd4ad79ce578f999a0c669f2e29f2f41865ec",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/gridmet.yaml",
+      "passed": true,
+      "sha256": "57c7dce3d7eda7fc60f0179a8c2b12a3bd6a5a91fd4594684f12cd9fadc3356c",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/hms.yaml",
+      "passed": true,
+      "sha256": "cca18febd7d7d2272515f241c0c862ad543140153fdef59869744529985a4376",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/nlcd.yaml",
+      "passed": true,
+      "sha256": "96f9d3b8bb9bf92773a53475d51265913a79844e4e893ae5f66f4c3b95a2e404",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/aqs.yaml",
+      "passed": true,
+      "sha256": "d5100ed690ed54c293aa781275b3d6ec45ab770d518ee21d9a8b411581d1a1f1",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/global_catalog.yaml",
+      "passed": true,
+      "sha256": "bb1bc33165e0d87e92e7839eb58730cc65d6410ffb375a59ea48d8bf6dc5b2b7",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/gridmet.yaml",
+      "passed": true,
+      "sha256": "54f17e3029576b01b9e50e6a13c6a0177500e2ce84a378f00185cf469ba2b01d",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/hms.yaml",
+      "passed": true,
+      "sha256": "c7d4803f552ce7b6e218a6f2d442b442415f8c73f5dcb5dc9f4ef39cb9d13d5c",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/nlcd.yaml",
+      "passed": true,
+      "sha256": "d6593471f62f1a536a86336f76c9b2ce228b802216bd0c56a16e545e9b95df1f",
+      "validator_output": "No issues found"
+    }
+  ],
+  "semantic_checks": [
+    "PASS gridmet: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS aqs: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS hms: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS nlcd: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS global_catalog: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS global union and all four discovery projections match their source specs exactly",
+    "PASS gridMET: provider attributes, 16 daily fields, centre/corner geometry, fixed MST and circular wind semantics",
+    "PASS AQS: public bulk route, seven parameters, shared PM2.5 identity and explicit row-selection caveats",
+    "PASS HMS: polygon/class semantics and feature-time qualifications",
+    "PASS NLCD: six C1V1 products, verified native projection, local CRS registration and product-specific nodata",
+    "PASS input schemas/workbooks/documentation and provider-evidence checksums",
+    "PASS three-resource audit: actual Excel values, mapping rows/statuses, target fields, all definitions and scoped HMS history"
+  ],
+  "semantic_errors": [],
+  "r_object_and_projection_checks": {
+    "checks": {
+      "gridmet_rds": "PASS: RDS equals YAML-loaded named list",
+      "aqs_rds": "PASS: RDS equals YAML-loaded named list",
+      "hms_rds": "PASS: RDS equals YAML-loaded named list",
+      "nlcd_rds": "PASS: RDS equals YAML-loaded named list",
+      "nlcd_projection": "PASS: exact WGS84 Albers parses; (-96,23) maps to (0,0); no EPSG match asserted"
+    },
+    "packages": {
+      "R": "4.6.0",
+      "yaml": "2.3.12",
+      "sf": "1.1.3"
+    }
+  },
+  "passed": true,
+  "scope": "Metadata schema, references and stated scientific checks. No runtime data access or database ingestion is certified.",
+  "open_verification_items": "../dataset_spec_objects/verification_gaps.json",
+  "database_backend_execution_tested": false
+}

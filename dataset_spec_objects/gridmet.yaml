@@ -1,0 +1,2129 @@
+# Authoritative schema: amadeus_schema/src/amadeus_schema/schema/amadeus_schema.yaml
+# Metadata profile; source reconciliation documented in resource_audit.json.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/climatology_lab
+  name: climatology_lab
+  label: Climatology Lab gridMET
+  producer_institution: Climatology Lab, University of California, Merced
+  homepage: https://www.climatologylab.org/gridmet.html
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _gridmet
+  license_spdx: CC0-1.0
+  citation_apa: Abatzoglou, J. T. (2013). Development of gridded surface meteorological data for ecological
+    applications and modelling. International Journal of Climatology, 33(1), 121–131. https://doi.org/10.1002/joc.3413
+  description: 'Public daily gridded meteorology. Provider attribution currently UC Merced; workbook University
+    of Idaho attribution is historical. The cited DOI identifies the methods article, not a versioned
+    dataset release. [Resource reconciliation: inventory rights and history] Inventory usage/citation
+    statement (Amadeus data sources!I4): Public domain (CC0); cite Abatzoglou (2013). Inventory source
+    status (H4): Active; this is not observation QA, API availability or verified support for every product.
+    Inventory first-release/history wording (J4): 2013. The inventory lists 2013, which also identifies
+    the cited methods publication; an exact first data-release date is not established.'
+products:
+- id: amadeus:product/gridmet
+  name: gridmet
+  label: gridMET daily surface meteorology
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - meteorology
+  - climate
+  - water
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  spatial_extent_bbox_wkt: POLYGON ((-124.78749996666667 25.04583333333333, -67.03749996666669 25.04583333333333,
+    -67.03749996666669 49.420833333333334, -124.78749996666667 49.420833333333334, -124.78749996666667
+    25.04583333333333))
+  spatial_extent_descriptor: Contiguous United States native grid; rectangular grid envelope includes
+    areas outside valid land cells.
+  native_spatial_resolution_m: 4000.0
+  native_spatial_resolution_descriptor: 1/24 degree, approximately 4 km; axis coordinates are cell centres.
+  temporal_resolution: daily
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  day_boundary_convention: local_midnight
+  calendar: gregorian
+  temporal_coverage_start: '1979-01-01'
+  update_cadence_iso: P1D
+  access_url: https://www.northwestknowledge.net/metdata/data/
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+  description: 'Daily support is fixed Mountain Standard Time: 07:00 UTC on the labelled date through
+    07:00 UTC the next date, without daylight-saving adjustment. local_midnight denotes this provider
+    MST convention, not the pixel civil timezone. Recent dates can be revised. Files use {code}_{YYYY}.nc;
+    code distinguishes variables sharing a netCDF name. This profile covers sixteen daily fields and excludes
+    five-day drought indices and PDSI. Publication release version and per-slice status must be inspected;
+    no fixed default quality status is asserted. [Resource reconciliation: inventory completeness] Inventory
+    coverage statement (Amadeus data sources!N4): Yes (CONUS). This statement does not establish validity
+    of every cell/date or fill observation gaps.'
+- id: amadeus:product/gridmet_drought_spei14d
+  name: gridmet_drought_spei14d
+  label: GridMET SPEI 14d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei14d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei14d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei30d
+  name: gridmet_drought_spei30d
+  label: GridMET SPEI 30d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei30d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei30d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei90d
+  name: gridmet_drought_spei90d
+  label: GridMET SPEI 90d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei90d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei90d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei180d
+  name: gridmet_drought_spei180d
+  label: GridMET SPEI 180d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei180d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei180d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei270d
+  name: gridmet_drought_spei270d
+  label: GridMET SPEI 270d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei270d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei270d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei1y
+  name: gridmet_drought_spei1y
+  label: GridMET SPEI 1y
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei1y.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei1y.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei2y
+  name: gridmet_drought_spei2y
+  label: GridMET SPEI 2y
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei2y.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei2y.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei5y
+  name: gridmet_drought_spei5y
+  label: GridMET SPEI 5y
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei5y.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei5y.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi14d
+  name: gridmet_drought_eddi14d
+  label: GridMET EDDI 14d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi14d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi14d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi30d
+  name: gridmet_drought_eddi30d
+  label: GridMET EDDI 30d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi30d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi30d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi90d
+  name: gridmet_drought_eddi90d
+  label: GridMET EDDI 90d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi90d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi90d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi180d
+  name: gridmet_drought_eddi180d
+  label: GridMET EDDI 180d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi180d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi180d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi270d
+  name: gridmet_drought_eddi270d
+  label: GridMET EDDI 270d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi270d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi270d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi1y
+  name: gridmet_drought_eddi1y
+  label: GridMET EDDI 1y
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi1y.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi1y.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi2y
+  name: gridmet_drought_eddi2y
+  label: GridMET EDDI 2y
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi2y.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi2y.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi5y
+  name: gridmet_drought_eddi5y
+  label: GridMET EDDI 5y
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi5y.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi5y.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+grid_definitions:
+- id: amadeus:grid/gridmet_4km
+  name: gridmet_4km
+  label: gridMET native 1/24-degree grid
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.041666666666671404
+  resolution_y: 0.041666666666671404
+  resolution_unit: deg
+  n_columns: 1386
+  n_rows: 585
+  origin_x: -124.78749996666667
+  origin_y: 49.420833333333334
+canonical_variables:
+- id: amadeus:var/precipitation_daily_amount
+  name: precipitation_daily_amount
+  label: Daily Accumulated Precipitation
+  standard_name: https://w3id.org/niehs/amadeus/var/precipitation_daily_amount
+  standard_name_authority: AMADEUS project-local semantic identifier; no external ontology equivalence
+    asserted
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  default_aggregation_method: mean
+  description: Accumulated precipitation expressed as depth, intensive with respect to spatial support;
+    do not sum depths across cells as if they were volumes.
+- id: amadeus:var/relative_humidity_daily_maximum
+  name: relative_humidity_daily_maximum
+  label: Daily Maximum Relative Humidity (2m)
+  standard_name: CF:relative_humidity
+  standard_name_authority: CF Standard Name Table
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  default_aggregation_method: mean
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/relative_humidity_daily_minimum
+  name: relative_humidity_daily_minimum
+  label: Daily Minimum Relative Humidity (2m)
+  standard_name: CF:relative_humidity
+  standard_name_authority: CF Standard Name Table
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  default_aggregation_method: mean
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/specific_humidity_daily_mean
+  name: specific_humidity_daily_mean
+  label: Daily mean specific humidity (2m)
+  standard_name: CF:specific_humidity
+  standard_name_authority: CF Standard Name Table
+  units_ucum: kg/kg
+  value_data_type: proportion
+  extensivity: intensive
+  default_aggregation_method: mean
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/surface_downwelling_shortwave_flux_daily_mean
+  name: surface_downwelling_shortwave_flux_daily_mean
+  label: Daily Mean downward shortwave radiation at surface
+  standard_name: CF:surface_downwelling_shortwave_flux_in_air
+  standard_name_authority: CF Standard Name Table
+  units_ucum: W/m2
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  default_aggregation_method: mean
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/wind_direction_10m_daily_mean
+  name: wind_direction_10m_daily_mean
+  label: Daily mean wind direction (10m)
+  standard_name: CF:wind_from_direction
+  standard_name_authority: CF Standard Name Table
+  units_ucum: deg
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Circular bearing clockwise from north; scalar arithmetic means of angles are invalid. Use
+    a separately specified circular/vector method.
+- id: amadeus:var/air_temperature_daily_minimum
+  name: air_temperature_daily_minimum
+  label: Daily Minimum Temperature (2m)
+  standard_name: CF:air_temperature
+  standard_name_authority: CF Standard Name Table
+  units_ucum: Cel
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  default_aggregation_method: mean
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/air_temperature_daily_maximum
+  name: air_temperature_daily_maximum
+  label: Daily Maximum Temperature (2m)
+  standard_name: CF:air_temperature
+  standard_name_authority: CF Standard Name Table
+  units_ucum: Cel
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  default_aggregation_method: mean
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/wind_speed_10m_daily_mean
+  name: wind_speed_10m_daily_mean
+  label: Daily Mean Wind Speed (10m)
+  standard_name: CF:wind_speed
+  standard_name_authority: CF Standard Name Table
+  units_ucum: m/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  default_aggregation_method: mean
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/burning_index_fuel_model_g
+  name: burning_index_fuel_model_g
+  label: BI-G
+  standard_name: https://w3id.org/niehs/amadeus/var/burning_index_fuel_model_g
+  standard_name_authority: AMADEUS project-local semantic identifier; no external ontology equivalence
+    asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/dead_fuel_moisture_100hr
+  name: dead_fuel_moisture_100hr
+  label: 100 hour fuel moisture
+  standard_name: https://w3id.org/niehs/amadeus/var/dead_fuel_moisture_100hr
+  standard_name_authority: AMADEUS project-local semantic identifier; no external ontology equivalence
+    asserted
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/dead_fuel_moisture_1000hr
+  name: dead_fuel_moisture_1000hr
+  label: 1000 hour fuel moisture
+  standard_name: https://w3id.org/niehs/amadeus/var/dead_fuel_moisture_1000hr
+  standard_name_authority: AMADEUS project-local semantic identifier; no external ontology equivalence
+    asserted
+  units_ucum: '%'
+  value_data_type: proportion
+  extensivity: intensive
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/energy_release_component_fuel_model_g
+  name: energy_release_component_fuel_model_g
+  label: ERC-G
+  standard_name: https://w3id.org/niehs/amadeus/var/energy_release_component_fuel_model_g
+  standard_name_authority: AMADEUS project-local semantic identifier; no external ontology equivalence
+    asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/alfalfa_reference_evapotranspiration_daily_amount
+  name: alfalfa_reference_evapotranspiration_daily_amount
+  label: Daily reference evapotranspiration (alfalfa)
+  standard_name: https://w3id.org/niehs/amadeus/var/alfalfa_reference_evapotranspiration_daily_amount
+  standard_name_authority: AMADEUS project-local semantic identifier; no external ontology equivalence
+    asserted
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  default_aggregation_method: mean
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/grass_reference_evapotranspiration_daily_amount
+  name: grass_reference_evapotranspiration_daily_amount
+  label: Daily reference evapotranspiration (short grass)
+  standard_name: https://w3id.org/niehs/amadeus/var/grass_reference_evapotranspiration_daily_amount
+  standard_name_authority: AMADEUS project-local semantic identifier; no external ontology equivalence
+    asserted
+  units_ucum: mm
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  default_aggregation_method: mean
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/vapor_pressure_deficit_daily_mean
+  name: vapor_pressure_deficit_daily_mean
+  label: mean vapor presure deficit
+  standard_name: https://w3id.org/niehs/amadeus/var/vapor_pressure_deficit_daily_mean
+  standard_name_authority: AMADEUS project-local semantic identifier; no external ontology equivalence
+    asserted
+  units_ucum: kPa
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  default_aggregation_method: mean
+  description: Source-specific daily statistic; time support is defined by Product.
+- id: amadeus:var/gridmet_drought_spei_category
+  name: gridmet_drought_spei_category
+  label: GridMET SPEI provider category code
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_spei_category
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: categorical
+  extensivity: categorical
+  description: Provider companion code, not an official US Drought Monitor observation. Header threshold
+    text contains malformed intervals; no repaired thresholds or cross-index dry/wet equivalence are asserted.
+- id: amadeus:var/gridmet_drought_spei14d
+  name: gridmet_drought_spei14d
+  label: SPEI 14d standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_spei14d
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_spei30d
+  name: gridmet_drought_spei30d
+  label: SPEI 30d standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_spei30d
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_spei90d
+  name: gridmet_drought_spei90d
+  label: SPEI 90d standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_spei90d
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_spei180d
+  name: gridmet_drought_spei180d
+  label: SPEI 180d standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_spei180d
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_spei270d
+  name: gridmet_drought_spei270d
+  label: SPEI 270d standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_spei270d
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_spei1y
+  name: gridmet_drought_spei1y
+  label: SPEI 1y standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_spei1y
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_spei2y
+  name: gridmet_drought_spei2y
+  label: SPEI 2y standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_spei2y
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_spei5y
+  name: gridmet_drought_spei5y
+  label: SPEI 5y standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_spei5y
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_eddi_category
+  name: gridmet_drought_eddi_category
+  label: GridMET EDDI provider category code
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_eddi_category
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: categorical
+  extensivity: categorical
+  description: Provider companion code, not an official US Drought Monitor observation. Header threshold
+    text contains malformed intervals; no repaired thresholds or cross-index dry/wet equivalence are asserted.
+- id: amadeus:var/gridmet_drought_eddi14d
+  name: gridmet_drought_eddi14d
+  label: EDDI 14d standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_eddi14d
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_eddi30d
+  name: gridmet_drought_eddi30d
+  label: EDDI 30d standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_eddi30d
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_eddi90d
+  name: gridmet_drought_eddi90d
+  label: EDDI 90d standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_eddi90d
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_eddi180d
+  name: gridmet_drought_eddi180d
+  label: EDDI 180d standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_eddi180d
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_eddi270d
+  name: gridmet_drought_eddi270d
+  label: EDDI 270d standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_eddi270d
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_eddi1y
+  name: gridmet_drought_eddi1y
+  label: EDDI 1y standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_eddi1y
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_eddi2y
+  name: gridmet_drought_eddi2y
+  label: EDDI 2y standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_eddi2y
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+- id: amadeus:var/gridmet_drought_eddi5y
+  name: gridmet_drought_eddi5y
+  label: EDDI 5y standardized index
+  standard_name: https://w3id.org/niehs/amadeus/var/gridmet_drought_eddi5y
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Window-specific standardized index; calibration and source transformation qualifications
+    are retained on the product. Not interchangeable across windows, providers or calibration periods;
+    an area mean is not an index recomputed from area-mean inputs.
+product_variables:
+- id: amadeus:pvar/gridmet.pr
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/precipitation_daily_amount
+  native_name: precipitation_amount
+  label: Daily Accumulated Precipitation
+  native_units_ucum: mm
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 0.1 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: pr
+  aggregation_method: sum
+  aggregation_window_iso: P1D
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: pr
+  harmonization_note: 'Verified provider netCDF member is precipitation_amount; file selector is pr. Provider
+    standard_name=pr is preserved verbatim and is not asserted to be a valid CF table entry. Mask packed
+    sentinel 32767 before decoding.  Provider _Unsigned=true: interpret the 16-bit storage bits as unsigned
+    before masking fill and decoding; do not substitute a default signed-integer nodata value. [Resource
+    reconciliation: aggregation scope] sum describes a temporal daily accumulated depth in mm. The depth
+    remains intensive with respect to spatial area. Summing depths across grid cells is not a volume calculation;
+    spatial aggregation requires an explicitly appropriate area-weighted depth or depth-times-area calculation.
+    The shared import checker conflates these axes.'
+- id: amadeus:pvar/gridmet.rmax
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/relative_humidity_daily_maximum
+  native_name: relative_humidity
+  label: Daily Maximum Relative Humidity (2m)
+  native_units_ucum: '%'
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 0.1 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: rmax
+  aggregation_method: maximum
+  aggregation_window_iso: P1D
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: rmax
+  harmonization_note: 'Verified provider netCDF member is relative_humidity; file selector is rmax. Provider
+    standard_name=rmax is preserved verbatim and is not asserted to be a valid CF table entry. Mask packed
+    sentinel 32767 before decoding.  Provider _Unsigned=true: interpret the 16-bit storage bits as unsigned
+    before masking fill and decoding; do not substitute a default signed-integer nodata value.'
+- id: amadeus:pvar/gridmet.rmin
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/relative_humidity_daily_minimum
+  native_name: relative_humidity
+  label: Daily Minimum Relative Humidity (2m)
+  native_units_ucum: '%'
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 0.1 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: rmin
+  aggregation_method: minimum
+  aggregation_window_iso: P1D
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: rmin
+  harmonization_note: 'Verified provider netCDF member is relative_humidity; file selector is rmin. Provider
+    standard_name=rmin is preserved verbatim and is not asserted to be a valid CF table entry. Mask packed
+    sentinel 32767 before decoding.  Provider _Unsigned=true: interpret the 16-bit storage bits as unsigned
+    before masking fill and decoding; do not substitute a default signed-integer nodata value.'
+- id: amadeus:pvar/gridmet.sph
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/specific_humidity_daily_mean
+  native_name: specific_humidity
+  label: Daily mean specific humidity (2m)
+  native_units_ucum: kg/kg
+  native_value_scale_factor: 1.0e-05
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 1.0E-5 + 0.0; canonical_value = decoded_native; if the reader has
+    already decoded packing, do not apply scale/offset again.
+  cf_standard_name: sph
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: sph
+  harmonization_note: 'Verified provider netCDF member is specific_humidity; file selector is sph. Provider
+    standard_name=sph is preserved verbatim and is not asserted to be a valid CF table entry. Mask packed
+    sentinel 32767 before decoding.  Provider _Unsigned=true: interpret the 16-bit storage bits as unsigned
+    before masking fill and decoding; do not substitute a default signed-integer nodata value.'
+- id: amadeus:pvar/gridmet.srad
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/surface_downwelling_shortwave_flux_daily_mean
+  native_name: surface_downwelling_shortwave_flux_in_air
+  label: Daily Mean downward shortwave radiation at surface
+  native_units_ucum: W/m2
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 0.1 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: srad
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: srad
+  harmonization_note: 'Verified provider netCDF member is surface_downwelling_shortwave_flux_in_air; file
+    selector is srad. Provider standard_name=srad is preserved verbatim and is not asserted to be a valid
+    CF table entry. Mask packed sentinel 32767 before decoding.  Provider _Unsigned=true: interpret the
+    16-bit storage bits as unsigned before masking fill and decoding; do not substitute a default signed-integer
+    nodata value.'
+- id: amadeus:pvar/gridmet.th
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/wind_direction_10m_daily_mean
+  native_name: wind_from_direction
+  label: Daily mean wind direction (10m)
+  native_units_ucum: deg
+  native_value_scale_factor: 1.0
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 1.0 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: th
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: th
+  harmonization_note: 'Verified provider netCDF member is wind_from_direction; file selector is th. Provider
+    standard_name=th is preserved verbatim and is not asserted to be a valid CF table entry. Mask packed
+    sentinel 32767 before decoding. Daily direction is a bearing; circular aggregation is required. Exact
+    source temporal reduction is not separately asserted beyond the provider label.  Provider _Unsigned=true:
+    interpret the 16-bit storage bits as unsigned before masking fill and decoding; do not substitute
+    a default signed-integer nodata value. [Resource reconciliation: aggregation scope] The provider explicitly
+    labels this a daily mean wind direction; mean records that source statistic, not permission for scalar
+    arithmetic averaging of bearings. No particular provider circular/vector algorithm is asserted. Spatial
+    and temporal re-aggregation require a verified circular method; no default aggregation is supplied.'
+- id: amadeus:pvar/gridmet.tmmn
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/air_temperature_daily_minimum
+  native_name: air_temperature
+  label: Daily Minimum Temperature (2m)
+  native_units_ucum: K
+  native_value_scale_factor: 0.1
+  native_value_offset: 210.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 0.1 + 210.0; canonical_value = decoded_native - 273.15; if the reader
+    has already decoded packing, do not apply scale/offset again.
+  cf_standard_name: tmmn
+  aggregation_method: minimum
+  aggregation_window_iso: P1D
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: tmmn
+  harmonization_note: 'Verified provider netCDF member is air_temperature; file selector is tmmn. Provider
+    standard_name=tmmn is preserved verbatim and is not asserted to be a valid CF table entry. Mask packed
+    sentinel 32767 before decoding.  Provider _Unsigned=true: interpret the 16-bit storage bits as unsigned
+    before masking fill and decoding; do not substitute a default signed-integer nodata value.'
+- id: amadeus:pvar/gridmet.tmmx
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/air_temperature_daily_maximum
+  native_name: air_temperature
+  label: Daily Maximum Temperature (2m)
+  native_units_ucum: K
+  native_value_scale_factor: 0.1
+  native_value_offset: 220.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 0.1 + 220.0; canonical_value = decoded_native - 273.15; if the reader
+    has already decoded packing, do not apply scale/offset again.
+  cf_standard_name: tmmx
+  aggregation_method: maximum
+  aggregation_window_iso: P1D
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: tmmx
+  harmonization_note: 'Verified provider netCDF member is air_temperature; file selector is tmmx. Provider
+    standard_name=tmmx is preserved verbatim and is not asserted to be a valid CF table entry. Mask packed
+    sentinel 32767 before decoding.  Provider _Unsigned=true: interpret the 16-bit storage bits as unsigned
+    before masking fill and decoding; do not substitute a default signed-integer nodata value.'
+- id: amadeus:pvar/gridmet.vs
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/wind_speed_10m_daily_mean
+  native_name: wind_speed
+  label: Daily Mean Wind Speed (10m)
+  native_units_ucum: m/s
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 0.1 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: vs
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: vs
+  harmonization_note: 'Verified provider netCDF member is wind_speed; file selector is vs. Provider standard_name=vs
+    is preserved verbatim and is not asserted to be a valid CF table entry. Mask packed sentinel 32767
+    before decoding.  Provider _Unsigned=true: interpret the 16-bit storage bits as unsigned before masking
+    fill and decoding; do not substitute a default signed-integer nodata value.'
+- id: amadeus:pvar/gridmet.bi
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/burning_index_fuel_model_g
+  native_name: burning_index_g
+  label: BI-G
+  native_units_ucum: '1'
+  native_value_scale_factor: 1.0
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 1.0 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: bi
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: bi
+  harmonization_note: 'Verified provider netCDF member is burning_index_g; file selector is bi. Provider
+    standard_name=bi is preserved verbatim and is not asserted to be a valid CF table entry. Mask packed
+    sentinel 32767 before decoding. Exact source temporal reduction is not separately asserted beyond
+    the provider label.  Provider _Unsigned=true: interpret the 16-bit storage bits as unsigned before
+    masking fill and decoding; do not substitute a default signed-integer nodata value. [Resource reconciliation:
+    aggregation scope] Daily publication does not establish a temporal reduction or integration window.
+    The provider label does not supply one; aggregation_method and aggregation_window_iso are intentionally
+    absent. Fuel-moisture lag names are not observation-window durations. Choose an analysis-specific
+    aggregation only after checking its scientific meaning.'
+- id: amadeus:pvar/gridmet.fm100
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/dead_fuel_moisture_100hr
+  native_name: dead_fuel_moisture_100hr
+  label: 100 hour fuel moisture
+  native_units_ucum: '%'
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 0.1 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: fm100
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: fm100
+  harmonization_note: 'Verified provider netCDF member is dead_fuel_moisture_100hr; file selector is fm100.
+    Provider standard_name=fm100 is preserved verbatim and is not asserted to be a valid CF table entry.
+    Mask packed sentinel 32767 before decoding. Exact source temporal reduction is not separately asserted
+    beyond the provider label.  Provider _Unsigned=true: interpret the 16-bit storage bits as unsigned
+    before masking fill and decoding; do not substitute a default signed-integer nodata value. [Resource
+    reconciliation: aggregation scope] Daily publication does not establish a temporal reduction or integration
+    window. The provider label does not supply one; aggregation_method and aggregation_window_iso are
+    intentionally absent. Fuel-moisture lag names are not observation-window durations. Choose an analysis-specific
+    aggregation only after checking its scientific meaning.'
+- id: amadeus:pvar/gridmet.fm1000
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/dead_fuel_moisture_1000hr
+  native_name: dead_fuel_moisture_1000hr
+  label: 1000 hour fuel moisture
+  native_units_ucum: '%'
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 0.1 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: fm1000
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: fm1000
+  harmonization_note: 'Verified provider netCDF member is dead_fuel_moisture_1000hr; file selector is
+    fm1000. Provider standard_name=fm1000 is preserved verbatim and is not asserted to be a valid CF table
+    entry. Mask packed sentinel 32767 before decoding. Exact source temporal reduction is not separately
+    asserted beyond the provider label.  Provider _Unsigned=true: interpret the 16-bit storage bits as
+    unsigned before masking fill and decoding; do not substitute a default signed-integer nodata value.
+    [Resource reconciliation: aggregation scope] Daily publication does not establish a temporal reduction
+    or integration window. The provider label does not supply one; aggregation_method and aggregation_window_iso
+    are intentionally absent. Fuel-moisture lag names are not observation-window durations. Choose an
+    analysis-specific aggregation only after checking its scientific meaning.'
+- id: amadeus:pvar/gridmet.erc
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/energy_release_component_fuel_model_g
+  native_name: energy_release_component-g
+  label: ERC-G
+  native_units_ucum: '1'
+  native_value_scale_factor: 1.0
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 1.0 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: erc
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: erc
+  harmonization_note: 'Verified provider netCDF member is energy_release_component-g; file selector is
+    erc. Provider standard_name=erc is preserved verbatim and is not asserted to be a valid CF table entry.
+    Mask packed sentinel 32767 before decoding. Exact source temporal reduction is not separately asserted
+    beyond the provider label.  Provider _Unsigned=true: interpret the 16-bit storage bits as unsigned
+    before masking fill and decoding; do not substitute a default signed-integer nodata value. [Resource
+    reconciliation: aggregation scope] Daily publication does not establish a temporal reduction or integration
+    window. The provider label does not supply one; aggregation_method and aggregation_window_iso are
+    intentionally absent. Fuel-moisture lag names are not observation-window durations. Choose an analysis-specific
+    aggregation only after checking its scientific meaning.'
+- id: amadeus:pvar/gridmet.etr
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/alfalfa_reference_evapotranspiration_daily_amount
+  native_name: potential_evapotranspiration
+  label: Daily reference evapotranspiration (alfalfa)
+  native_units_ucum: mm
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 0.1 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: etr
+  aggregation_method: sum
+  aggregation_window_iso: P1D
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: etr
+  harmonization_note: 'Verified provider netCDF member is potential_evapotranspiration; file selector
+    is etr. Provider standard_name=etr is preserved verbatim and is not asserted to be a valid CF table
+    entry. Mask packed sentinel 32767 before decoding.  Provider _Unsigned=true: interpret the 16-bit
+    storage bits as unsigned before masking fill and decoding; do not substitute a default signed-integer
+    nodata value. [Resource reconciliation: aggregation scope] sum describes a temporal daily accumulated
+    depth in mm. The depth remains intensive with respect to spatial area. Summing depths across grid
+    cells is not a volume calculation; spatial aggregation requires an explicitly appropriate area-weighted
+    depth or depth-times-area calculation. The shared import checker conflates these axes.'
+- id: amadeus:pvar/gridmet.pet
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/grass_reference_evapotranspiration_daily_amount
+  native_name: potential_evapotranspiration
+  label: Daily reference evapotranspiration (short grass)
+  native_units_ucum: mm
+  native_value_scale_factor: 0.1
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 0.1 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: pet
+  aggregation_method: sum
+  aggregation_window_iso: P1D
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: pet
+  harmonization_note: 'Verified provider netCDF member is potential_evapotranspiration; file selector
+    is pet. Provider standard_name=pet is preserved verbatim and is not asserted to be a valid CF table
+    entry. Mask packed sentinel 32767 before decoding.  Provider _Unsigned=true: interpret the 16-bit
+    storage bits as unsigned before masking fill and decoding; do not substitute a default signed-integer
+    nodata value. [Resource reconciliation: aggregation scope] sum describes a temporal daily accumulated
+    depth in mm. The depth remains intensive with respect to spatial area. Summing depths across grid
+    cells is not a volume calculation; spatial aggregation requires an explicitly appropriate area-weighted
+    depth or depth-times-area calculation. The shared import checker conflates these axes.'
+- id: amadeus:pvar/gridmet.vpd
+  product: amadeus:product/gridmet
+  canonical_variable: amadeus:var/vapor_pressure_deficit_daily_mean
+  native_name: mean_vapor_pressure_deficit
+  label: mean vapor presure deficit
+  native_units_ucum: kPa
+  native_value_scale_factor: 0.01
+  native_value_offset: 0.0
+  unit_conversion_formula: First interpret storage as unsigned 16-bit and mask the declared fill sentinel;
+    decoded_native = packed_value * 0.01 + 0.0; canonical_value = decoded_native; if the reader has already
+    decoded packing, do not apply scale/offset again.
+  cf_standard_name: vpd
+  aggregation_method: mean
+  aggregation_window_iso: P1D
+  temporal_alignment: interval
+  missing_value_sentinel: '32767'
+  amadeus_variable_code: vpd
+  harmonization_note: 'Verified provider netCDF member is mean_vapor_pressure_deficit; file selector is
+    vpd. Provider standard_name=vpd is preserved verbatim and is not asserted to be a valid CF table entry.
+    Mask packed sentinel 32767 before decoding.  Provider _Unsigned=true: interpret the 16-bit storage
+    bits as unsigned before masking fill and decoding; do not substitute a default signed-integer nodata
+    value.'
+- id: amadeus:pvar/gridmet_drought.spei14d
+  product: amadeus:product/gridmet_drought_spei14d
+  canonical_variable: amadeus:var/gridmet_drought_spei14d
+  native_name: spei
+  amadeus_variable_code: spei14d
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: spei14d
+  temporal_alignment: end
+  layer_name_template: spei14d_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare spei is the adapter alias for spei30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+  aggregation_window_iso: P14D
+- id: amadeus:pvar/gridmet_drought.spei14d.category
+  product: amadeus:product/gridmet_drought_spei14d
+  canonical_variable: amadeus:var/gridmet_drought_spei_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.spei30d
+  product: amadeus:product/gridmet_drought_spei30d
+  canonical_variable: amadeus:var/gridmet_drought_spei30d
+  native_name: spei
+  amadeus_variable_code: spei30d
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: spei30d
+  temporal_alignment: end
+  layer_name_template: spei30d_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare spei is the adapter alias for spei30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+  aggregation_window_iso: P30D
+- id: amadeus:pvar/gridmet_drought.spei30d.category
+  product: amadeus:product/gridmet_drought_spei30d
+  canonical_variable: amadeus:var/gridmet_drought_spei_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.spei90d
+  product: amadeus:product/gridmet_drought_spei90d
+  canonical_variable: amadeus:var/gridmet_drought_spei90d
+  native_name: spei
+  amadeus_variable_code: spei90d
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: spei90d
+  temporal_alignment: end
+  layer_name_template: spei90d_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare spei is the adapter alias for spei30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+  aggregation_window_iso: P90D
+- id: amadeus:pvar/gridmet_drought.spei90d.category
+  product: amadeus:product/gridmet_drought_spei90d
+  canonical_variable: amadeus:var/gridmet_drought_spei_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.spei180d
+  product: amadeus:product/gridmet_drought_spei180d
+  canonical_variable: amadeus:var/gridmet_drought_spei180d
+  native_name: spei
+  amadeus_variable_code: spei180d
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: spei180d
+  temporal_alignment: end
+  layer_name_template: spei180d_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare spei is the adapter alias for spei30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+  aggregation_window_iso: P180D
+- id: amadeus:pvar/gridmet_drought.spei180d.category
+  product: amadeus:product/gridmet_drought_spei180d
+  canonical_variable: amadeus:var/gridmet_drought_spei_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.spei270d
+  product: amadeus:product/gridmet_drought_spei270d
+  canonical_variable: amadeus:var/gridmet_drought_spei270d
+  native_name: spei
+  amadeus_variable_code: spei270d
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: spei270d
+  temporal_alignment: end
+  layer_name_template: spei270d_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare spei is the adapter alias for spei30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+  aggregation_window_iso: P270D
+- id: amadeus:pvar/gridmet_drought.spei270d.category
+  product: amadeus:product/gridmet_drought_spei270d
+  canonical_variable: amadeus:var/gridmet_drought_spei_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.spei1y
+  product: amadeus:product/gridmet_drought_spei1y
+  canonical_variable: amadeus:var/gridmet_drought_spei1y
+  native_name: spei
+  amadeus_variable_code: spei1y
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: spei1y
+  temporal_alignment: end
+  layer_name_template: spei1y_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare spei is the adapter alias for spei30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+- id: amadeus:pvar/gridmet_drought.spei1y.category
+  product: amadeus:product/gridmet_drought_spei1y
+  canonical_variable: amadeus:var/gridmet_drought_spei_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.spei2y
+  product: amadeus:product/gridmet_drought_spei2y
+  canonical_variable: amadeus:var/gridmet_drought_spei2y
+  native_name: spei
+  amadeus_variable_code: spei2y
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: spei2y
+  temporal_alignment: end
+  layer_name_template: spei2y_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare spei is the adapter alias for spei30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+- id: amadeus:pvar/gridmet_drought.spei2y.category
+  product: amadeus:product/gridmet_drought_spei2y
+  canonical_variable: amadeus:var/gridmet_drought_spei_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.spei5y
+  product: amadeus:product/gridmet_drought_spei5y
+  canonical_variable: amadeus:var/gridmet_drought_spei5y
+  native_name: spei
+  amadeus_variable_code: spei5y
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: spei5y
+  temporal_alignment: end
+  layer_name_template: spei5y_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare spei is the adapter alias for spei30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+- id: amadeus:pvar/gridmet_drought.spei5y.category
+  product: amadeus:product/gridmet_drought_spei5y
+  canonical_variable: amadeus:var/gridmet_drought_spei_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.eddi14d
+  product: amadeus:product/gridmet_drought_eddi14d
+  canonical_variable: amadeus:var/gridmet_drought_eddi14d
+  native_name: eddi
+  amadeus_variable_code: eddi14d
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: eddi14d
+  temporal_alignment: end
+  layer_name_template: eddi14d_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare eddi is the adapter alias for eddi30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+  aggregation_window_iso: P14D
+- id: amadeus:pvar/gridmet_drought.eddi14d.category
+  product: amadeus:product/gridmet_drought_eddi14d
+  canonical_variable: amadeus:var/gridmet_drought_eddi_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.eddi30d
+  product: amadeus:product/gridmet_drought_eddi30d
+  canonical_variable: amadeus:var/gridmet_drought_eddi30d
+  native_name: eddi
+  amadeus_variable_code: eddi30d
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: eddi30d
+  temporal_alignment: end
+  layer_name_template: eddi30d_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare eddi is the adapter alias for eddi30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+  aggregation_window_iso: P30D
+- id: amadeus:pvar/gridmet_drought.eddi30d.category
+  product: amadeus:product/gridmet_drought_eddi30d
+  canonical_variable: amadeus:var/gridmet_drought_eddi_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.eddi90d
+  product: amadeus:product/gridmet_drought_eddi90d
+  canonical_variable: amadeus:var/gridmet_drought_eddi90d
+  native_name: eddi
+  amadeus_variable_code: eddi90d
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: eddi90d
+  temporal_alignment: end
+  layer_name_template: eddi90d_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare eddi is the adapter alias for eddi30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+  aggregation_window_iso: P90D
+- id: amadeus:pvar/gridmet_drought.eddi90d.category
+  product: amadeus:product/gridmet_drought_eddi90d
+  canonical_variable: amadeus:var/gridmet_drought_eddi_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.eddi180d
+  product: amadeus:product/gridmet_drought_eddi180d
+  canonical_variable: amadeus:var/gridmet_drought_eddi180d
+  native_name: eddi
+  amadeus_variable_code: eddi180d
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: eddi180d
+  temporal_alignment: end
+  layer_name_template: eddi180d_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare eddi is the adapter alias for eddi30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+  aggregation_window_iso: P180D
+- id: amadeus:pvar/gridmet_drought.eddi180d.category
+  product: amadeus:product/gridmet_drought_eddi180d
+  canonical_variable: amadeus:var/gridmet_drought_eddi_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.eddi270d
+  product: amadeus:product/gridmet_drought_eddi270d
+  canonical_variable: amadeus:var/gridmet_drought_eddi270d
+  native_name: eddi
+  amadeus_variable_code: eddi270d
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: eddi270d
+  temporal_alignment: end
+  layer_name_template: eddi270d_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare eddi is the adapter alias for eddi30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+  aggregation_window_iso: P270D
+- id: amadeus:pvar/gridmet_drought.eddi270d.category
+  product: amadeus:product/gridmet_drought_eddi270d
+  canonical_variable: amadeus:var/gridmet_drought_eddi_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.eddi1y
+  product: amadeus:product/gridmet_drought_eddi1y
+  canonical_variable: amadeus:var/gridmet_drought_eddi1y
+  native_name: eddi
+  amadeus_variable_code: eddi1y
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: eddi1y
+  temporal_alignment: end
+  layer_name_template: eddi1y_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare eddi is the adapter alias for eddi30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+- id: amadeus:pvar/gridmet_drought.eddi1y.category
+  product: amadeus:product/gridmet_drought_eddi1y
+  canonical_variable: amadeus:var/gridmet_drought_eddi_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.eddi2y
+  product: amadeus:product/gridmet_drought_eddi2y
+  canonical_variable: amadeus:var/gridmet_drought_eddi2y
+  native_name: eddi
+  amadeus_variable_code: eddi2y
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: eddi2y
+  temporal_alignment: end
+  layer_name_template: eddi2y_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare eddi is the adapter alias for eddi30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+- id: amadeus:pvar/gridmet_drought.eddi2y.category
+  product: amadeus:product/gridmet_drought_eddi2y
+  canonical_variable: amadeus:var/gridmet_drought_eddi_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+- id: amadeus:pvar/gridmet_drought.eddi5y
+  product: amadeus:product/gridmet_drought_eddi5y
+  canonical_variable: amadeus:var/gridmet_drought_eddi5y
+  native_name: eddi
+  amadeus_variable_code: eddi5y
+  native_units_ucum: '1'
+  native_value_scale_factor: 0.01
+  native_value_offset: -5.0
+  unit_conversion_formula: physical = raw * native_value_scale_factor + native_value_offset
+  missing_value_sentinel: '32767'
+  cf_standard_name: eddi5y
+  temporal_alignment: end
+  layer_name_template: eddi5y_{YYYYMMDD}
+  harmonization_note: Provider units attribute is empty; standardized index is dimensionless. Interpret
+    _Unsigned=true before masking raw 32767 and applying raw*0.01-5. Do not mask valid negative/zero decoded
+    values, clip to +/-5, or scale twice. Bare eddi is the adapter alias for eddi30d. No sum/mean temporal
+    reduction is implied by index computation. Year-suffixed windows retain native labels without an invented
+    P365D/P1Y equivalence.
+- id: amadeus:pvar/gridmet_drought.eddi5y.category
+  product: amadeus:product/gridmet_drought_eddi5y
+  canonical_variable: amadeus:var/gridmet_drought_eddi_category
+  native_name: category
+  native_units_ucum: '1'
+  missing_value_sentinel: '32767'
+  quality_flag_vocabulary: '11 Categories align with US Drought monitor classifications for standardized
+    drought indices: 0: value<-2, 1: -2<value<=-1.5, 2: -1.5<value<=--1.2,3:-1.2<value<=-0.7, 4:-0.7<value<=-0.5,
+    5:-0.5<value<=-0.5, 6: 0.5<value<=0.7, 7: 0.7<value<=1.2, 8:1.2<value<=1.5, 9:1.5<value<=2, 10:2<=value'
+  metadata_gaps:
+  - under_investigation
+  harmonization_note: Raw categorical codes are preserved without scaling or arithmetic averaging. Provider
+    text includes --1.2 and an empty -0.5<value<=-0.5 interval; do not silently repair labels or derive
+    categories using this text. The R processor intentionally selects the continuous index and omits this
+    array.
+assets:
+- id: amadeus:asset/gridmet_drought.spei14d
+  product: amadeus:product/gridmet_drought_spei14d
+  asset_key: spei14d.nc
+  url: https://www.northwestknowledge.net/metdata/data/spei14d.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.spei14d
+  - amadeus:pvar/gridmet_drought.spei14d.category
+- id: amadeus:asset/gridmet_drought.spei30d
+  product: amadeus:product/gridmet_drought_spei30d
+  asset_key: spei30d.nc
+  url: https://www.northwestknowledge.net/metdata/data/spei30d.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.spei30d
+  - amadeus:pvar/gridmet_drought.spei30d.category
+- id: amadeus:asset/gridmet_drought.spei90d
+  product: amadeus:product/gridmet_drought_spei90d
+  asset_key: spei90d.nc
+  url: https://www.northwestknowledge.net/metdata/data/spei90d.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.spei90d
+  - amadeus:pvar/gridmet_drought.spei90d.category
+- id: amadeus:asset/gridmet_drought.spei180d
+  product: amadeus:product/gridmet_drought_spei180d
+  asset_key: spei180d.nc
+  url: https://www.northwestknowledge.net/metdata/data/spei180d.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.spei180d
+  - amadeus:pvar/gridmet_drought.spei180d.category
+- id: amadeus:asset/gridmet_drought.spei270d
+  product: amadeus:product/gridmet_drought_spei270d
+  asset_key: spei270d.nc
+  url: https://www.northwestknowledge.net/metdata/data/spei270d.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.spei270d
+  - amadeus:pvar/gridmet_drought.spei270d.category
+- id: amadeus:asset/gridmet_drought.spei1y
+  product: amadeus:product/gridmet_drought_spei1y
+  asset_key: spei1y.nc
+  url: https://www.northwestknowledge.net/metdata/data/spei1y.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.spei1y
+  - amadeus:pvar/gridmet_drought.spei1y.category
+- id: amadeus:asset/gridmet_drought.spei2y
+  product: amadeus:product/gridmet_drought_spei2y
+  asset_key: spei2y.nc
+  url: https://www.northwestknowledge.net/metdata/data/spei2y.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.spei2y
+  - amadeus:pvar/gridmet_drought.spei2y.category
+- id: amadeus:asset/gridmet_drought.spei5y
+  product: amadeus:product/gridmet_drought_spei5y
+  asset_key: spei5y.nc
+  url: https://www.northwestknowledge.net/metdata/data/spei5y.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.spei5y
+  - amadeus:pvar/gridmet_drought.spei5y.category
+- id: amadeus:asset/gridmet_drought.eddi14d
+  product: amadeus:product/gridmet_drought_eddi14d
+  asset_key: eddi14d.nc
+  url: https://www.northwestknowledge.net/metdata/data/eddi14d.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.eddi14d
+  - amadeus:pvar/gridmet_drought.eddi14d.category
+- id: amadeus:asset/gridmet_drought.eddi30d
+  product: amadeus:product/gridmet_drought_eddi30d
+  asset_key: eddi30d.nc
+  url: https://www.northwestknowledge.net/metdata/data/eddi30d.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.eddi30d
+  - amadeus:pvar/gridmet_drought.eddi30d.category
+- id: amadeus:asset/gridmet_drought.eddi90d
+  product: amadeus:product/gridmet_drought_eddi90d
+  asset_key: eddi90d.nc
+  url: https://www.northwestknowledge.net/metdata/data/eddi90d.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.eddi90d
+  - amadeus:pvar/gridmet_drought.eddi90d.category
+- id: amadeus:asset/gridmet_drought.eddi180d
+  product: amadeus:product/gridmet_drought_eddi180d
+  asset_key: eddi180d.nc
+  url: https://www.northwestknowledge.net/metdata/data/eddi180d.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.eddi180d
+  - amadeus:pvar/gridmet_drought.eddi180d.category
+- id: amadeus:asset/gridmet_drought.eddi270d
+  product: amadeus:product/gridmet_drought_eddi270d
+  asset_key: eddi270d.nc
+  url: https://www.northwestknowledge.net/metdata/data/eddi270d.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.eddi270d
+  - amadeus:pvar/gridmet_drought.eddi270d.category
+- id: amadeus:asset/gridmet_drought.eddi1y
+  product: amadeus:product/gridmet_drought_eddi1y
+  asset_key: eddi1y.nc
+  url: https://www.northwestknowledge.net/metdata/data/eddi1y.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.eddi1y
+  - amadeus:pvar/gridmet_drought.eddi1y.category
+- id: amadeus:asset/gridmet_drought.eddi2y
+  product: amadeus:product/gridmet_drought_eddi2y
+  asset_key: eddi2y.nc
+  url: https://www.northwestknowledge.net/metdata/data/eddi2y.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.eddi2y
+  - amadeus:pvar/gridmet_drought.eddi2y.category
+- id: amadeus:asset/gridmet_drought.eddi5y
+  product: amadeus:product/gridmet_drought_eddi5y
+  asset_key: eddi5y.nc
+  url: https://www.northwestknowledge.net/metdata/data/eddi5y.nc
+  native_format: netcdf4_cf
+  materialization_mode: direct_remote_scan
+  value_state: registered_only
+  variables_present:
+  - amadeus:pvar/gridmet_drought.eddi5y
+  - amadeus:pvar/gridmet_drought.eddi5y.category

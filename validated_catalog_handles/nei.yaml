@@ -1,0 +1,73 @@
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/epa_nei_onroad
+  name: epa_nei_onroad
+  label: EPA NEI on-road summaries
+  producer_institution: U.S. Environmental Protection Agency
+  homepage: https://www.epa.gov/air-emissions-inventories
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _nei
+  description: On-road county/SCC/pollutant inventory summaries, not the whole NEI and not ambient concentrations.
+    Supported adapter inventory years are 2017 v1 (April summary) and 2020. Native LB is international avoirdupois
+    pound; TON is US short ton, 2000 lb, never metric tonne. Public EPA data; cite inventory year/version and retrieval.
+    Workbook first-release history 1999 and triennial programme cadence do not define annual observations or interpolation.
+    County geometry/GEOID and its CRS are external inputs, not supplied by these CSVs.
+products:
+- id: amadeus:product/nei_onroad_2017
+  name: nei_onroad_2017
+  label: NEI 2017 county on-road emissions by pollutant and SCC
+  data_source: amadeus:source/epa_nei_onroad
+  spatial_support_type: administrative_area
+  temporal_resolution: annual
+  description: Native ZIP contains regional CSV partitions. Preserve five-character county FIPS, SCC, pollutant
+    code/description, pollutant classification, reporting period, operating type and inventory label. Select county
+    records and disjoint SCC detail before any aggregation; national/state/regional totals must not be combined
+    with component counties. Do not add CAP/HAP species, overlapping particulate definitions or different reporting
+    bases together. Current process_nei drops pollutant/SCC identity and sums species into TRF_NEINP_0_00000; that
+    output is not a validated pollutant-specific quantity and is not a binding here. No county-area allocation model
+    is implied. Generic CSV has no accurate NativeFormatEnum member; native_format is intentionally unset, not station
+    CSV.
+  data_genre:
+  - emissions
+  - air_pollution
+  product_version: 2017v1 April summary
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '2017-01-01'
+  temporal_coverage_end: '2017-12-31'
+  spatial_extent_descriptor: US on-road inventory geography; actual county/FIPS rows and supplied geometry determine
+    coverage
+  native_spatial_resolution_descriptor: County inventory records with source classification code detail
+  access_url: https://gaftp.epa.gov/air/nei/2017/data_summaries/2017v1/2017neiApr_onroad_byregions.zip
+  amadeus_dataset_name: nei
+  amadeus_process_covariate: nei
+  amadeus_calculate_covariate: nei
+- id: amadeus:product/nei_onroad_2020
+  name: nei_onroad_2020
+  label: NEI 2020 county on-road emissions by pollutant and SCC
+  data_source: amadeus:source/epa_nei_onroad
+  spatial_support_type: administrative_area
+  temporal_resolution: annual
+  description: Native ZIP contains regional CSV partitions. Preserve five-character county FIPS, SCC, pollutant
+    code/description, pollutant classification, reporting period, operating type and inventory label. Select county
+    records and disjoint SCC detail before any aggregation; national/state/regional totals must not be combined
+    with component counties. Do not add CAP/HAP species, overlapping particulate definitions or different reporting
+    bases together. Current process_nei drops pollutant/SCC identity and sums species into TRF_NEINP_0_00000; that
+    output is not a validated pollutant-specific quantity and is not a binding here. No county-area allocation model
+    is implied. Generic CSV has no accurate NativeFormatEnum member; native_format is intentionally unset, not station
+    CSV.
+  data_genre:
+  - emissions
+  - air_pollution
+  product_version: 2020 NEI onroad summary
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '2020-01-01'
+  temporal_coverage_end: '2020-12-31'
+  spatial_extent_descriptor: US on-road inventory geography; actual county/FIPS rows and supplied geometry determine
+    coverage
+  native_spatial_resolution_descriptor: County inventory records with source classification code detail
+  access_url: https://gaftp.epa.gov/air/nei/2020/data_summaries/2020nei_onroad_byregion.zip
+  amadeus_dataset_name: nei
+  amadeus_process_covariate: nei
+  amadeus_calculate_covariate: nei
+grid_definitions: []

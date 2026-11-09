@@ -1,0 +1,980 @@
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/ec_jrc_edgar
+  name: ec_jrc_edgar
+  label: EDGAR v8.1 air-pollutant inventory
+  producer_institution: European Commission, Joint Research Centre
+  homepage: https://edgar.jrc.ec.europa.eu/dataset_ap81
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _edgar
+  description: Pinned EDGAR v8.1 FT2022 AP inventory, nine adapter-listed air pollutants. Excludes large-scale
+    biomass burning and LULUCF. Primary PM emissions are not ambient concentrations or secondary particulate
+    formation. SO2 shipping was revised in November 2024; retrieve current corrected files and retain
+    per-file checksums. No methods-paper DOI is asserted as a dataset DOI. Workbook I14 says CC BY 4.0,
+    but the inspected release headers refer to conditions URLs without naming a verified SPDX license.
+    The inventory assertion is preserved in the audit; license_spdx is left unset pending release-specific
+    confirmation.
+  citation_apa: European Commission, Joint Research Centre. EDGAR v8.1 global air pollutant emissions,
+    1970–2022. https://edgar.jrc.ec.europa.eu/dataset_ap81. Follow the provider how-to-cite and attribution
+    conditions.
+products:
+- id: amadeus:product/edgar_v81_bc_annual_totals_emi
+  name: edgar_v81_bc_annual_totals_emi
+  label: EDGAR v8.1 BC annual TOTALS emi
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/BC/TOTALS/emi_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_bc_annual_totals_flx
+  name: edgar_v81_bc_annual_totals_flx
+  label: EDGAR v8.1 BC annual TOTALS flx
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/BC/TOTALS/flx_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_co_annual_totals_emi
+  name: edgar_v81_co_annual_totals_emi
+  label: EDGAR v8.1 CO annual TOTALS emi
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/CO/TOTALS/emi_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_co_annual_totals_flx
+  name: edgar_v81_co_annual_totals_flx
+  label: EDGAR v8.1 CO annual TOTALS flx
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/CO/TOTALS/flx_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_nh3_annual_totals_emi
+  name: edgar_v81_nh3_annual_totals_emi
+  label: EDGAR v8.1 NH3 annual TOTALS emi
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/NH3/TOTALS/emi_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_nh3_annual_totals_flx
+  name: edgar_v81_nh3_annual_totals_flx
+  label: EDGAR v8.1 NH3 annual TOTALS flx
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/NH3/TOTALS/flx_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_nmvoc_annual_totals_emi
+  name: edgar_v81_nmvoc_annual_totals_emi
+  label: EDGAR v8.1 NMVOC annual TOTALS emi
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/NMVOC/TOTALS/emi_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_nmvoc_annual_totals_flx
+  name: edgar_v81_nmvoc_annual_totals_flx
+  label: EDGAR v8.1 NMVOC annual TOTALS flx
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/NMVOC/TOTALS/flx_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_nox_annual_totals_emi
+  name: edgar_v81_nox_annual_totals_emi
+  label: EDGAR v8.1 NOx annual TOTALS emi
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/NOx/TOTALS/emi_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_nox_annual_totals_flx
+  name: edgar_v81_nox_annual_totals_flx
+  label: EDGAR v8.1 NOx annual TOTALS flx
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/NOx/TOTALS/flx_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_oc_annual_totals_emi
+  name: edgar_v81_oc_annual_totals_emi
+  label: EDGAR v8.1 OC annual TOTALS emi
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/OC/TOTALS/emi_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_oc_annual_totals_flx
+  name: edgar_v81_oc_annual_totals_flx
+  label: EDGAR v8.1 OC annual TOTALS flx
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/OC/TOTALS/flx_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_pm10_annual_totals_emi
+  name: edgar_v81_pm10_annual_totals_emi
+  label: EDGAR v8.1 PM10 annual TOTALS emi
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/PM10/TOTALS/emi_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_pm10_annual_totals_flx
+  name: edgar_v81_pm10_annual_totals_flx
+  label: EDGAR v8.1 PM10 annual TOTALS flx
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/PM10/TOTALS/flx_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_pm25_annual_totals_emi
+  name: edgar_v81_pm25_annual_totals_emi
+  label: EDGAR v8.1 PM2.5 annual TOTALS emi
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/PM2.5/TOTALS/emi_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_pm25_annual_totals_flx
+  name: edgar_v81_pm25_annual_totals_flx
+  label: EDGAR v8.1 PM2.5 annual TOTALS flx
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/PM2.5/TOTALS/flx_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_so2_annual_totals_emi
+  name: edgar_v81_so2_annual_totals_emi
+  label: EDGAR v8.1 SO2 annual TOTALS emi
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/SO2/TOTALS/emi_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+- id: amadeus:product/edgar_v81_so2_annual_totals_flx
+  name: edgar_v81_so2_annual_totals_flx
+  label: EDGAR v8.1 SO2 annual TOTALS flx
+  data_source: amadeus:source/ec_jrc_edgar
+  data_genre:
+  - emissions
+  - air_pollution
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'All-sector annual totals delivery, 1970–2022. The 2022 original file for this exact species/output
+    was inspected. Emissions are tonnes per cell for the named year; fluxes are kg/m2/s. These are distinct
+    products and cannot use the same polygon reduction. calculate_edgar currently hardcodes a mean: that
+    is not a polygon total for cell mass. A total needs clipped cell-mass allocation; a flux integral
+    needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
+    scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
+    datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
+    unresolved required-slot placeholder; no geometry execution is certified.'
+  product_version: EDGARv8.1 FT2022 AP
+  grid_definition: amadeus:grid/edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '1970-01-01'
+  temporal_coverage_end: '2022-12-31'
+  native_spatial_resolution_descriptor: 0.1 degree cells; 3600 × 1800
+  spatial_extent_descriptor: Global inventory grid; excluded sources and missing values remain qualified
+  access_url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v81_FT2022_AP_new/SO2/TOTALS/flx_nc/
+  amadeus_process_covariate: edgar
+  amadeus_calculate_covariate: edgar
+  amadeus_dataset_name: edgar
+grid_definitions:
+- id: amadeus:grid/edgar_v81_global_01deg
+  name: edgar_v81_global_01deg
+  crs: AMADEUS:100007
+  resolution_x: 0.1
+  resolution_y: 0.1
+  resolution_unit: deg
+  grid_mapping_name: latitude_longitude
+  n_columns: 3600
+  n_rows: 1800
+  origin_x: -180
+  origin_y: 90
+canonical_variables:
+- id: amadeus:var/edgar_v81_bc_annual_totals_emi
+  name: edgar_v81_bc_annual_totals_emi
+  label: Annual cell emission mass of BC
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_bc_annual_totals_emi
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg
+  value_data_type: continuous_numeric
+  extensivity: extensive
+  description: Provider inventory species BC. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_bc_annual_totals_flx
+  name: edgar_v81_bc_annual_totals_flx
+  label: Annual inventory emission flux density of BC
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_bc_annual_totals_flx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Provider inventory species BC. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_co_annual_totals_emi
+  name: edgar_v81_co_annual_totals_emi
+  label: Annual cell emission mass of CO
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_co_annual_totals_emi
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg
+  value_data_type: continuous_numeric
+  extensivity: extensive
+  description: Provider inventory species CO. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_co_annual_totals_flx
+  name: edgar_v81_co_annual_totals_flx
+  label: Annual inventory emission flux density of CO
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_co_annual_totals_flx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Provider inventory species CO. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_nh3_annual_totals_emi
+  name: edgar_v81_nh3_annual_totals_emi
+  label: Annual cell emission mass of NH3
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_nh3_annual_totals_emi
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg
+  value_data_type: continuous_numeric
+  extensivity: extensive
+  description: Provider inventory species NH3. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_nh3_annual_totals_flx
+  name: edgar_v81_nh3_annual_totals_flx
+  label: Annual inventory emission flux density of NH3
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_nh3_annual_totals_flx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Provider inventory species NH3. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_nmvoc_annual_totals_emi
+  name: edgar_v81_nmvoc_annual_totals_emi
+  label: Annual cell emission mass of NMVOC
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_nmvoc_annual_totals_emi
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg
+  value_data_type: continuous_numeric
+  extensivity: extensive
+  description: Provider inventory species NMVOC. Reporting basis is preserved; do not equate NOx with
+    ambient NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion
+    between flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_nmvoc_annual_totals_flx
+  name: edgar_v81_nmvoc_annual_totals_flx
+  label: Annual inventory emission flux density of NMVOC
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_nmvoc_annual_totals_flx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Provider inventory species NMVOC. Reporting basis is preserved; do not equate NOx with
+    ambient NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion
+    between flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_nox_annual_totals_emi
+  name: edgar_v81_nox_annual_totals_emi
+  label: Annual cell emission mass of NOx
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_nox_annual_totals_emi
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg
+  value_data_type: continuous_numeric
+  extensivity: extensive
+  description: Provider inventory species NOx. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_nox_annual_totals_flx
+  name: edgar_v81_nox_annual_totals_flx
+  label: Annual inventory emission flux density of NOx
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_nox_annual_totals_flx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Provider inventory species NOx. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_oc_annual_totals_emi
+  name: edgar_v81_oc_annual_totals_emi
+  label: Annual cell emission mass of OC
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_oc_annual_totals_emi
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg
+  value_data_type: continuous_numeric
+  extensivity: extensive
+  description: Provider inventory species OC. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_oc_annual_totals_flx
+  name: edgar_v81_oc_annual_totals_flx
+  label: Annual inventory emission flux density of OC
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_oc_annual_totals_flx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Provider inventory species OC. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_pm10_annual_totals_emi
+  name: edgar_v81_pm10_annual_totals_emi
+  label: Annual cell emission mass of PM10
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_pm10_annual_totals_emi
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg
+  value_data_type: continuous_numeric
+  extensivity: extensive
+  description: Provider inventory species PM10. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_pm10_annual_totals_flx
+  name: edgar_v81_pm10_annual_totals_flx
+  label: Annual inventory emission flux density of PM10
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_pm10_annual_totals_flx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Provider inventory species PM10. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_pm25_annual_totals_emi
+  name: edgar_v81_pm25_annual_totals_emi
+  label: Annual cell emission mass of PM2.5
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_pm25_annual_totals_emi
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg
+  value_data_type: continuous_numeric
+  extensivity: extensive
+  description: Provider inventory species PM2.5. Reporting basis is preserved; do not equate NOx with
+    ambient NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion
+    between flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_pm25_annual_totals_flx
+  name: edgar_v81_pm25_annual_totals_flx
+  label: Annual inventory emission flux density of PM2.5
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_pm25_annual_totals_flx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Provider inventory species PM2.5. Reporting basis is preserved; do not equate NOx with
+    ambient NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion
+    between flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_so2_annual_totals_emi
+  name: edgar_v81_so2_annual_totals_emi
+  label: Annual cell emission mass of SO2
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_so2_annual_totals_emi
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg
+  value_data_type: continuous_numeric
+  extensivity: extensive
+  description: Provider inventory species SO2. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+- id: amadeus:var/edgar_v81_so2_annual_totals_flx
+  name: edgar_v81_so2_annual_totals_flx
+  label: Annual inventory emission flux density of SO2
+  standard_name: https://w3id.org/niehs/amadeus/var/edgar_v81_so2_annual_totals_flx
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: kg/m2/s
+  value_data_type: continuous_numeric
+  extensivity: intensive
+  description: Provider inventory species SO2. Reporting basis is preserved; do not equate NOx with ambient
+    NO2, NMVOC with a single molecule, or inventory PM with ambient PM concentration. No conversion between
+    flux and cell mass is attempted without provider cell areas and time conventions.
+product_variables:
+- id: amadeus:pvar/edgar_v81_bc_annual_totals_emi.BC
+  product: amadeus:product/edgar_v81_bc_annual_totals_emi
+  canonical_variable: amadeus:var/edgar_v81_bc_annual_totals_emi
+  native_name: emissions
+  native_units_ucum: t
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: BC
+  missing_value_sentinel: NaN
+  unit_conversion_formula: canonical = native_decoded * 1000
+- id: amadeus:pvar/edgar_v81_bc_annual_totals_flx.BC
+  product: amadeus:product/edgar_v81_bc_annual_totals_flx
+  canonical_variable: amadeus:var/edgar_v81_bc_annual_totals_flx
+  native_name: fluxes
+  native_units_ucum: kg/m2/s
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: BC
+  missing_value_sentinel: NaN
+- id: amadeus:pvar/edgar_v81_co_annual_totals_emi.CO
+  product: amadeus:product/edgar_v81_co_annual_totals_emi
+  canonical_variable: amadeus:var/edgar_v81_co_annual_totals_emi
+  native_name: emissions
+  native_units_ucum: t
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: CO
+  missing_value_sentinel: NaN
+  unit_conversion_formula: canonical = native_decoded * 1000
+- id: amadeus:pvar/edgar_v81_co_annual_totals_flx.CO
+  product: amadeus:product/edgar_v81_co_annual_totals_flx
+  canonical_variable: amadeus:var/edgar_v81_co_annual_totals_flx
+  native_name: fluxes
+  native_units_ucum: kg/m2/s
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: CO
+  missing_value_sentinel: NaN
+- id: amadeus:pvar/edgar_v81_nh3_annual_totals_emi.NH3
+  product: amadeus:product/edgar_v81_nh3_annual_totals_emi
+  canonical_variable: amadeus:var/edgar_v81_nh3_annual_totals_emi
+  native_name: emissions
+  native_units_ucum: t
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: NH3
+  missing_value_sentinel: NaN
+  unit_conversion_formula: canonical = native_decoded * 1000
+- id: amadeus:pvar/edgar_v81_nh3_annual_totals_flx.NH3
+  product: amadeus:product/edgar_v81_nh3_annual_totals_flx
+  canonical_variable: amadeus:var/edgar_v81_nh3_annual_totals_flx
+  native_name: fluxes
+  native_units_ucum: kg/m2/s
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: NH3
+  missing_value_sentinel: NaN
+- id: amadeus:pvar/edgar_v81_nmvoc_annual_totals_emi.NMVOC
+  product: amadeus:product/edgar_v81_nmvoc_annual_totals_emi
+  canonical_variable: amadeus:var/edgar_v81_nmvoc_annual_totals_emi
+  native_name: emissions
+  native_units_ucum: t
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: NMVOC
+  missing_value_sentinel: NaN
+  unit_conversion_formula: canonical = native_decoded * 1000
+- id: amadeus:pvar/edgar_v81_nmvoc_annual_totals_flx.NMVOC
+  product: amadeus:product/edgar_v81_nmvoc_annual_totals_flx
+  canonical_variable: amadeus:var/edgar_v81_nmvoc_annual_totals_flx
+  native_name: fluxes
+  native_units_ucum: kg/m2/s
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: NMVOC
+  missing_value_sentinel: NaN
+- id: amadeus:pvar/edgar_v81_nox_annual_totals_emi.NOx
+  product: amadeus:product/edgar_v81_nox_annual_totals_emi
+  canonical_variable: amadeus:var/edgar_v81_nox_annual_totals_emi
+  native_name: emissions
+  native_units_ucum: t
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: NOx
+  missing_value_sentinel: NaN
+  unit_conversion_formula: canonical = native_decoded * 1000
+- id: amadeus:pvar/edgar_v81_nox_annual_totals_flx.NOx
+  product: amadeus:product/edgar_v81_nox_annual_totals_flx
+  canonical_variable: amadeus:var/edgar_v81_nox_annual_totals_flx
+  native_name: fluxes
+  native_units_ucum: kg/m2/s
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: NOx
+  missing_value_sentinel: NaN
+- id: amadeus:pvar/edgar_v81_oc_annual_totals_emi.OC
+  product: amadeus:product/edgar_v81_oc_annual_totals_emi
+  canonical_variable: amadeus:var/edgar_v81_oc_annual_totals_emi
+  native_name: emissions
+  native_units_ucum: t
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: OC
+  missing_value_sentinel: NaN
+  unit_conversion_formula: canonical = native_decoded * 1000
+- id: amadeus:pvar/edgar_v81_oc_annual_totals_flx.OC
+  product: amadeus:product/edgar_v81_oc_annual_totals_flx
+  canonical_variable: amadeus:var/edgar_v81_oc_annual_totals_flx
+  native_name: fluxes
+  native_units_ucum: kg/m2/s
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: OC
+  missing_value_sentinel: NaN
+- id: amadeus:pvar/edgar_v81_pm10_annual_totals_emi.PM10
+  product: amadeus:product/edgar_v81_pm10_annual_totals_emi
+  canonical_variable: amadeus:var/edgar_v81_pm10_annual_totals_emi
+  native_name: emissions
+  native_units_ucum: t
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: PM10
+  missing_value_sentinel: NaN
+  unit_conversion_formula: canonical = native_decoded * 1000
+- id: amadeus:pvar/edgar_v81_pm10_annual_totals_flx.PM10
+  product: amadeus:product/edgar_v81_pm10_annual_totals_flx
+  canonical_variable: amadeus:var/edgar_v81_pm10_annual_totals_flx
+  native_name: fluxes
+  native_units_ucum: kg/m2/s
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: PM10
+  missing_value_sentinel: NaN
+- id: amadeus:pvar/edgar_v81_pm25_annual_totals_emi.PM2.5
+  product: amadeus:product/edgar_v81_pm25_annual_totals_emi
+  canonical_variable: amadeus:var/edgar_v81_pm25_annual_totals_emi
+  native_name: emissions
+  native_units_ucum: t
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: PM2.5
+  missing_value_sentinel: NaN
+  unit_conversion_formula: canonical = native_decoded * 1000
+- id: amadeus:pvar/edgar_v81_pm25_annual_totals_flx.PM2.5
+  product: amadeus:product/edgar_v81_pm25_annual_totals_flx
+  canonical_variable: amadeus:var/edgar_v81_pm25_annual_totals_flx
+  native_name: fluxes
+  native_units_ucum: kg/m2/s
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: PM2.5
+  missing_value_sentinel: NaN
+- id: amadeus:pvar/edgar_v81_so2_annual_totals_emi.SO2
+  product: amadeus:product/edgar_v81_so2_annual_totals_emi
+  canonical_variable: amadeus:var/edgar_v81_so2_annual_totals_emi
+  native_name: emissions
+  native_units_ucum: t
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: SO2
+  missing_value_sentinel: NaN
+  unit_conversion_formula: canonical = native_decoded * 1000
+- id: amadeus:pvar/edgar_v81_so2_annual_totals_flx.SO2
+  product: amadeus:product/edgar_v81_so2_annual_totals_flx
+  canonical_variable: amadeus:var/edgar_v81_so2_annual_totals_flx
+  native_name: fluxes
+  native_units_ucum: kg/m2/s
+  harmonization_note: Native Float32 with NaN fill and no supplied packing. Mask missing values first;
+    Tonnes → kg is exactly ×1000 once, independently of any future native packing. Flux is already kg/m2/s
+    and is not multiplied by 1000. Preserve the literal inventory species basis. Geometry/aggregation
+    execution is not certified; actual bounds are inventory coverage, not file availability.
+  amadeus_variable_code: SO2
+  missing_value_sentinel: NaN

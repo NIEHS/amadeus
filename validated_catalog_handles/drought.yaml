@@ -1,0 +1,1844 @@
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/csic_speibase
+  name: csic_speibase
+  label: CSIC SPEIbase
+  producer_institution: CSIC; IPE; experimental station Aula Dei
+  homepage: https://spei.csic.es/database.html
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _drought
+  description: 'SPEIbase v2.11.0: CRU TS 4.09 monthly precipitation and FAO-56 Penman–Monteith PET, 1901–2024.
+    All 48 native lookback headers/coordinate arrays were inspected via original HDF5 prefixes; no full
+    science arrays were downloaded. Distinct from GridMET SPEI and the Thornthwaite-based real-time SPEI
+    Global Drought Monitor. The R adapter can fall back to older versions or reuse cached files; verify
+    native version before selecting this profile. ODbL database terms and individual-content terms apply
+    as documented by CSIC.'
+  license_spdx: ODbL-1.0
+  citation_apa: 'Beguería S., Vicente-Serrano S., Reig F., Latorre B. (2014) Standardized precipitation
+    evapotranspiration index (SPEI) revisited: Parameter fitting, evapotranspiration models, tools, datasets
+    and drought monitoring. International Journal of Climatology 34, 3001-3023. Vicente-Serrano S.M.,
+    Beguería S., López-Moreno J.I. (2010) A Multiscalar Drought Index Sensitive to Global Warming: The
+    Standardized Precipitation Evapotranspiration Index. Journal of Climate 23, 1696–1718. Beguería S.,
+    Vicente-Serrano S., Angulo-Martínez M. (2010) A multi-scalar global drought data set: the SPEIbase.
+    Bulletin of the American Meteorological Society 91(10), 1351–1356.'
+- id: amadeus:source/noaa_psl_eddi
+  name: noaa_psl_eddi
+  label: NOAA PSL EDDI CONUS archive
+  producer_institution: NOAA Physical Sciences Laboratory
+  homepage: https://psl.noaa.gov/eddi/
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _drought
+  description: Daily standardized evaporative-demand anomalies from FAO56 0.5 m tall-reference-crop ET
+    driven by NLDAS-2, rank-based/nonparametric standardization. Provider describes same-window full-period
+    reference (1979–present), not GridMET 1980–2016 calibration. The AMADEUS downloader samples Tuesdays
+    and uses a legacy FTP hostname; sampling does not make the native daily archive weekly. Preserve changing
+    archive/method vintages.
+  citation_apa: 'Hobbins et al. (2016), EDDI methodology. https://doi.org/10.1175/JHM-D-15-0121.1. Data
+    and current method description: https://psl.noaa.gov/eddi/.'
+- id: amadeus:source/ndmc_usdm
+  name: ndmc_usdm
+  label: U.S. Drought Monitor
+  producer_institution: NDMC, USDA and NOAA partnership; see current provider credits
+  homepage: https://droughtmonitor.unl.edu/
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _drought
+  description: Weekly expert drought synthesis, not an instrumental index or a county-native measurement.
+    Credit NDMC/USDA/NOAA as requested by the provider; do not copy NOAA-only public-domain or SPEI database
+    licensing to this joint product.
+  citation_apa: U.S. Drought Monitor. Credit the National Drought Mitigation Center, U.S. Department of
+    Agriculture and NOAA as requested at https://droughtmonitor.unl.edu/DmData/GISData.aspx; identify
+    the weekly assessment date.
+products:
+- id: amadeus:product/speibase_211_01month
+  name: speibase_211_01month
+  label: SPEIbase v2.11 1-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei01.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_02month
+  name: speibase_211_02month
+  label: SPEIbase v2.11 2-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei02.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_03month
+  name: speibase_211_03month
+  label: SPEIbase v2.11 3-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei03.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_04month
+  name: speibase_211_04month
+  label: SPEIbase v2.11 4-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei04.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_05month
+  name: speibase_211_05month
+  label: SPEIbase v2.11 5-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei05.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_06month
+  name: speibase_211_06month
+  label: SPEIbase v2.11 6-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei06.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_07month
+  name: speibase_211_07month
+  label: SPEIbase v2.11 7-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei07.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_08month
+  name: speibase_211_08month
+  label: SPEIbase v2.11 8-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei08.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_09month
+  name: speibase_211_09month
+  label: SPEIbase v2.11 9-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei09.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_10month
+  name: speibase_211_10month
+  label: SPEIbase v2.11 10-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei10.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_11month
+  name: speibase_211_11month
+  label: SPEIbase v2.11 11-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei11.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_12month
+  name: speibase_211_12month
+  label: SPEIbase v2.11 12-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei12.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_13month
+  name: speibase_211_13month
+  label: SPEIbase v2.11 13-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei13.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_14month
+  name: speibase_211_14month
+  label: SPEIbase v2.11 14-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei14.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_15month
+  name: speibase_211_15month
+  label: SPEIbase v2.11 15-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei15.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_16month
+  name: speibase_211_16month
+  label: SPEIbase v2.11 16-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei16.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_17month
+  name: speibase_211_17month
+  label: SPEIbase v2.11 17-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei17.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_18month
+  name: speibase_211_18month
+  label: SPEIbase v2.11 18-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei18.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_19month
+  name: speibase_211_19month
+  label: SPEIbase v2.11 19-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei19.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_20month
+  name: speibase_211_20month
+  label: SPEIbase v2.11 20-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei20.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_21month
+  name: speibase_211_21month
+  label: SPEIbase v2.11 21-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei21.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_22month
+  name: speibase_211_22month
+  label: SPEIbase v2.11 22-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei22.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_23month
+  name: speibase_211_23month
+  label: SPEIbase v2.11 23-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei23.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_24month
+  name: speibase_211_24month
+  label: SPEIbase v2.11 24-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei24.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_25month
+  name: speibase_211_25month
+  label: SPEIbase v2.11 25-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei25.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_26month
+  name: speibase_211_26month
+  label: SPEIbase v2.11 26-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei26.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_27month
+  name: speibase_211_27month
+  label: SPEIbase v2.11 27-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei27.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_28month
+  name: speibase_211_28month
+  label: SPEIbase v2.11 28-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei28.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_29month
+  name: speibase_211_29month
+  label: SPEIbase v2.11 29-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei29.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_30month
+  name: speibase_211_30month
+  label: SPEIbase v2.11 30-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei30.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_31month
+  name: speibase_211_31month
+  label: SPEIbase v2.11 31-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei31.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_32month
+  name: speibase_211_32month
+  label: SPEIbase v2.11 32-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei32.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_33month
+  name: speibase_211_33month
+  label: SPEIbase v2.11 33-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei33.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_34month
+  name: speibase_211_34month
+  label: SPEIbase v2.11 34-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei34.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_35month
+  name: speibase_211_35month
+  label: SPEIbase v2.11 35-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei35.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_36month
+  name: speibase_211_36month
+  label: SPEIbase v2.11 36-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei36.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_37month
+  name: speibase_211_37month
+  label: SPEIbase v2.11 37-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei37.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_38month
+  name: speibase_211_38month
+  label: SPEIbase v2.11 38-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei38.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_39month
+  name: speibase_211_39month
+  label: SPEIbase v2.11 39-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei39.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_40month
+  name: speibase_211_40month
+  label: SPEIbase v2.11 40-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei40.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_41month
+  name: speibase_211_41month
+  label: SPEIbase v2.11 41-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei41.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_42month
+  name: speibase_211_42month
+  label: SPEIbase v2.11 42-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei42.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_43month
+  name: speibase_211_43month
+  label: SPEIbase v2.11 43-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei43.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_44month
+  name: speibase_211_44month
+  label: SPEIbase v2.11 44-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei44.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_45month
+  name: speibase_211_45month
+  label: SPEIbase v2.11 45-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei45.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_46month
+  name: speibase_211_46month
+  label: SPEIbase v2.11 46-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei46.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_47month
+  name: speibase_211_47month
+  label: SPEIbase v2.11 47-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei47.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/speibase_211_48month
+  name: speibase_211_48month
+  label: SPEIbase v2.11 48-month
+  data_source: amadeus:source/csic_speibase
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: Calendar-month CRU water-balance lookback, distinct from observation cadence P1M. Native
+    representative timestamps are mid-month points (first 1901-01-16, final 2024-12-16), not verified
+    interval bounds or lookback endpoints. Preserve these native coordinates; no interpolation or independent
+    monthly-sum interpretation of SPEI. Initial lookback periods and masked land/ocean cells can be missing.
+    Source methods and native version identify the index, but an undocumented fit/reference interval is
+    not inferred from data coverage. SPEIbase is not a companion categorical drought map.
+  product_version: 2.11.0
+  grid_definition: amadeus:grid/csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  srid: 4326
+  calendar: gregorian
+  temporal_resolution_iso: P1M
+  temporal_coverage_start: '1901-01-16'
+  temporal_coverage_end: '2024-12-16'
+  native_spatial_resolution_descriptor: 0.5 degree global cell centres verified from native coordinates
+  spatial_extent_descriptor: Global 720 × 360 geographic grid; terrestrial index masks apply
+  access_url: https://spei.csic.es/spei_database_2_11/nc/spei48.nc
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/noaa_eddi_01mn
+  name: noaa_eddi_01mn
+  label: NOAA EDDI native daily 1-month window
+  data_source: amadeus:source/noaa_psl_eddi
+  data_genre:
+  - drought
+  - climate
+  native_format: ascii_grid
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Provider-native daily ASCII, not weekly physical support. Filename date denotes the end/reference
+    date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
+    monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
+    no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+  grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  native_spatial_resolution_descriptor: 0.125 degree; 464 × 224
+  spatial_extent_descriptor: CONUS archive rectangle -125..-67 longitude, 25..53 latitude
+  access_url: https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/noaa_eddi_02mn
+  name: noaa_eddi_02mn
+  label: NOAA EDDI native daily 2-month window
+  data_source: amadeus:source/noaa_psl_eddi
+  data_genre:
+  - drought
+  - climate
+  native_format: ascii_grid
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Provider-native daily ASCII, not weekly physical support. Filename date denotes the end/reference
+    date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
+    monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
+    no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+  grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  native_spatial_resolution_descriptor: 0.125 degree; 464 × 224
+  spatial_extent_descriptor: CONUS archive rectangle -125..-67 longitude, 25..53 latitude
+  access_url: https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/noaa_eddi_03mn
+  name: noaa_eddi_03mn
+  label: NOAA EDDI native daily 3-month window
+  data_source: amadeus:source/noaa_psl_eddi
+  data_genre:
+  - drought
+  - climate
+  native_format: ascii_grid
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Provider-native daily ASCII, not weekly physical support. Filename date denotes the end/reference
+    date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
+    monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
+    no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+  grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  native_spatial_resolution_descriptor: 0.125 degree; 464 × 224
+  spatial_extent_descriptor: CONUS archive rectangle -125..-67 longitude, 25..53 latitude
+  access_url: https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/noaa_eddi_04mn
+  name: noaa_eddi_04mn
+  label: NOAA EDDI native daily 4-month window
+  data_source: amadeus:source/noaa_psl_eddi
+  data_genre:
+  - drought
+  - climate
+  native_format: ascii_grid
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Provider-native daily ASCII, not weekly physical support. Filename date denotes the end/reference
+    date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
+    monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
+    no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+  grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  native_spatial_resolution_descriptor: 0.125 degree; 464 × 224
+  spatial_extent_descriptor: CONUS archive rectangle -125..-67 longitude, 25..53 latitude
+  access_url: https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/noaa_eddi_05mn
+  name: noaa_eddi_05mn
+  label: NOAA EDDI native daily 5-month window
+  data_source: amadeus:source/noaa_psl_eddi
+  data_genre:
+  - drought
+  - climate
+  native_format: ascii_grid
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Provider-native daily ASCII, not weekly physical support. Filename date denotes the end/reference
+    date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
+    monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
+    no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+  grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  native_spatial_resolution_descriptor: 0.125 degree; 464 × 224
+  spatial_extent_descriptor: CONUS archive rectangle -125..-67 longitude, 25..53 latitude
+  access_url: https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/noaa_eddi_06mn
+  name: noaa_eddi_06mn
+  label: NOAA EDDI native daily 6-month window
+  data_source: amadeus:source/noaa_psl_eddi
+  data_genre:
+  - drought
+  - climate
+  native_format: ascii_grid
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Provider-native daily ASCII, not weekly physical support. Filename date denotes the end/reference
+    date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
+    monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
+    no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+  grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  native_spatial_resolution_descriptor: 0.125 degree; 464 × 224
+  spatial_extent_descriptor: CONUS archive rectangle -125..-67 longitude, 25..53 latitude
+  access_url: https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/noaa_eddi_07mn
+  name: noaa_eddi_07mn
+  label: NOAA EDDI native daily 7-month window
+  data_source: amadeus:source/noaa_psl_eddi
+  data_genre:
+  - drought
+  - climate
+  native_format: ascii_grid
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Provider-native daily ASCII, not weekly physical support. Filename date denotes the end/reference
+    date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
+    monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
+    no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+  grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  native_spatial_resolution_descriptor: 0.125 degree; 464 × 224
+  spatial_extent_descriptor: CONUS archive rectangle -125..-67 longitude, 25..53 latitude
+  access_url: https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/noaa_eddi_08mn
+  name: noaa_eddi_08mn
+  label: NOAA EDDI native daily 8-month window
+  data_source: amadeus:source/noaa_psl_eddi
+  data_genre:
+  - drought
+  - climate
+  native_format: ascii_grid
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Provider-native daily ASCII, not weekly physical support. Filename date denotes the end/reference
+    date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
+    monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
+    no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+  grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  native_spatial_resolution_descriptor: 0.125 degree; 464 × 224
+  spatial_extent_descriptor: CONUS archive rectangle -125..-67 longitude, 25..53 latitude
+  access_url: https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/noaa_eddi_09mn
+  name: noaa_eddi_09mn
+  label: NOAA EDDI native daily 9-month window
+  data_source: amadeus:source/noaa_psl_eddi
+  data_genre:
+  - drought
+  - climate
+  native_format: ascii_grid
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Provider-native daily ASCII, not weekly physical support. Filename date denotes the end/reference
+    date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
+    monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
+    no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+  grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  native_spatial_resolution_descriptor: 0.125 degree; 464 × 224
+  spatial_extent_descriptor: CONUS archive rectangle -125..-67 longitude, 25..53 latitude
+  access_url: https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/noaa_eddi_10mn
+  name: noaa_eddi_10mn
+  label: NOAA EDDI native daily 10-month window
+  data_source: amadeus:source/noaa_psl_eddi
+  data_genre:
+  - drought
+  - climate
+  native_format: ascii_grid
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Provider-native daily ASCII, not weekly physical support. Filename date denotes the end/reference
+    date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
+    monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
+    no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+  grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  native_spatial_resolution_descriptor: 0.125 degree; 464 × 224
+  spatial_extent_descriptor: CONUS archive rectangle -125..-67 longitude, 25..53 latitude
+  access_url: https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/noaa_eddi_11mn
+  name: noaa_eddi_11mn
+  label: NOAA EDDI native daily 11-month window
+  data_source: amadeus:source/noaa_psl_eddi
+  data_genre:
+  - drought
+  - climate
+  native_format: ascii_grid
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Provider-native daily ASCII, not weekly physical support. Filename date denotes the end/reference
+    date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
+    monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
+    no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+  grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  native_spatial_resolution_descriptor: 0.125 degree; 464 × 224
+  spatial_extent_descriptor: CONUS archive rectangle -125..-67 longitude, 25..53 latitude
+  access_url: https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/noaa_eddi_12mn
+  name: noaa_eddi_12mn
+  label: NOAA EDDI native daily 12-month window
+  data_source: amadeus:source/noaa_psl_eddi
+  data_genre:
+  - drought
+  - climate
+  native_format: ascii_grid
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Provider-native daily ASCII, not weekly physical support. Filename date denotes the end/reference
+    date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
+    monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
+    no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+  grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  temporal_resolution_iso: P1D
+  day_boundary_convention: observation_dependent
+  native_spatial_resolution_descriptor: 0.125 degree; 464 × 224
+  spatial_extent_descriptor: CONUS archive rectangle -125..-67 longitude, 25..53 latitude
+  access_url: https://downloads.psl.noaa.gov/Projects/EDDI/CONUS_archive/data/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+- id: amadeus:product/usdm_weekly_merged_m
+  name: usdm_weekly_merged_m
+  label: USDM weekly merged M polygons
+  data_source: amadeus:source/ndmc_usdm
+  data_genre:
+  - drought
+  native_format: shapefile
+  spatial_support_type: polygon
+  temporal_resolution: multi_day
+  description: 'Pinned merged M shapefile family used by the R downloader. The inspected 2020 M file has
+    mutually exclusive class interiors: all ten pairwise intersections have zero area. Do not confuse
+    these polygons with cumulative D0–D4 summary statistics or raw/unmerged delivery families. Class-specific
+    area fractions use exclusive intersections; cumulative Dk-or-worse statistics are derived by summing
+    exclusive classes k through 4. Validate topology in each selected vintage. Absence is not automatically
+    no drought without confirmed assessment coverage. Tuesday represents assessment date; routine publication
+    is Thursday. Observed weekly status is not a seven-day mean. Native WGS84 PRJ was inspected.'
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P7D
+  update_cadence_iso: P7D
+  spatial_extent_descriptor: U.S. assessment polygons in the selected weekly M archive
+  native_spatial_resolution_descriptor: Drought assessment polygons, not county-native support
+  access_url: https://droughtmonitor.unl.edu/Data/shapefiles_m/
+  amadeus_process_covariate: drought
+  amadeus_calculate_covariate: drought
+  amadeus_dataset_name: drought
+grid_definitions:
+- id: amadeus:grid/csic_speibase_211_global_05deg
+  name: csic_speibase_211_global_05deg
+  crs: EPSG:4326
+  resolution_x: 0.5
+  resolution_y: 0.5
+  resolution_unit: deg
+  grid_mapping_name: latitude_longitude
+  srid: 4326
+  n_columns: 720
+  n_rows: 360
+  origin_x: -180
+  origin_y: 90
+- id: amadeus:grid/noaa_eddi_conus_0125deg
+  name: noaa_eddi_conus_0125deg
+  crs: AMADEUS:100006
+  resolution_x: 0.125
+  resolution_y: 0.125
+  resolution_unit: deg
+  grid_mapping_name: latitude_longitude
+  n_columns: 464
+  n_rows: 224
+  origin_x: -125
+  origin_y: 53

@@ -1,0 +1,675 @@
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/usgs_nga_gmted2010
+  name: usgs_nga_gmted2010
+  label: GMTED2010
+  producer_institution: U.S. Geological Survey; National Geospatial-Intelligence Agency
+  homepage: https://www.usgs.gov/coastal-changes-and-impacts/gmted2010
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _gmted
+  description: Static multi-source terrain compilation, published 2011. Horizontal WGS84; predominant vertical EGM96
+    with provider-documented source exceptions. Compilation label 2010 is not observation year. Source acquisition
+    dates, coverage and accuracy vary; nominal angular spacing is not constant ground metres. USGS public-domain
+    data; cite Danielson and Gesch (2011), USGS Open-File Report 2011-1073.
+  citation_apa: Danielson, J.J., and Gesch, D.B. (2011). Global Multi-resolution Terrain Elevation Data 2010 (GMTED2010).
+    USGS Open-File Report 2011-1073. https://doi.org/10.3133/ofr20111073
+products:
+- id: amadeus:product/gmted2010_be15_arcgrid
+  name: gmted2010_be15_arcgrid
+  label: GMTED2010 Breakline Emphasis 15 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_15_33600
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 15 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/be15_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_be30_arcgrid
+  name: gmted2010_be30_arcgrid
+  label: GMTED2010 Breakline Emphasis 30 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_30_16800
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 30 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/be30_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_be75_arcgrid
+  name: gmted2010_be75_arcgrid
+  label: GMTED2010 Breakline Emphasis 7.5 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_75_67200
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 7.5 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/be75_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_ds15_arcgrid
+  name: gmted2010_ds15_arcgrid
+  label: GMTED2010 Systematic Subsample 15 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_15_33600
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 15 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/ds15_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_ds30_arcgrid
+  name: gmted2010_ds30_arcgrid
+  label: GMTED2010 Systematic Subsample 30 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_30_20880
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 30 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/ds30_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_ds75_arcgrid
+  name: gmted2010_ds75_arcgrid
+  label: GMTED2010 Systematic Subsample 7.5 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_75_67200
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 7.5 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/ds75_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_md15_arcgrid
+  name: gmted2010_md15_arcgrid
+  label: GMTED2010 Median Statistic 15 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_15_33600
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 15 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/md15_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_md30_arcgrid
+  name: gmted2010_md30_arcgrid
+  label: GMTED2010 Median Statistic 30 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_30_16800
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 30 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/md30_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_md75_arcgrid
+  name: gmted2010_md75_arcgrid
+  label: GMTED2010 Median Statistic 7.5 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_75_67200
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 7.5 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/md75_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_mi15_arcgrid
+  name: gmted2010_mi15_arcgrid
+  label: GMTED2010 Minimum Statistic 15 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_15_33600
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 15 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mi15_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_mi30_arcgrid
+  name: gmted2010_mi30_arcgrid
+  label: GMTED2010 Minimum Statistic 30 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_30_16800
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 30 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mi30_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_mi75_arcgrid
+  name: gmted2010_mi75_arcgrid
+  label: GMTED2010 Minimum Statistic 7.5 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_75_67200
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 7.5 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mi75_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_mn15_arcgrid
+  name: gmted2010_mn15_arcgrid
+  label: GMTED2010 Mean Statistic 15 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_15_33600
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 15 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mn15_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_mn30_arcgrid
+  name: gmted2010_mn30_arcgrid
+  label: GMTED2010 Mean Statistic 30 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_30_20880
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 30 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mn30_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_mn75_arcgrid
+  name: gmted2010_mn75_arcgrid
+  label: GMTED2010 Mean Statistic 7.5 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_75_67200
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 7.5 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mn75_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_mx15_arcgrid
+  name: gmted2010_mx15_arcgrid
+  label: GMTED2010 Maximum Statistic 15 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_15_33600
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 15 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mx15_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_mx30_arcgrid
+  name: gmted2010_mx30_arcgrid
+  label: GMTED2010 Maximum Statistic 30 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_30_16800
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 30 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mx30_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_mx75_arcgrid
+  name: gmted2010_mx75_arcgrid
+  label: GMTED2010 Maximum Statistic 7.5 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_75_67200
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 7.5 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/mx75_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_sd15_arcgrid
+  name: gmted2010_sd15_arcgrid
+  label: GMTED2010 Standard Deviation Statistic 15 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_15_33600
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 15 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/sd15_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_sd30_arcgrid
+  name: gmted2010_sd30_arcgrid
+  label: GMTED2010 Standard Deviation Statistic 30 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_30_16800
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 30 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/sd30_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+- id: amadeus:product/gmted2010_sd75_arcgrid
+  name: gmted2010_sd75_arcgrid
+  label: GMTED2010 Standard Deviation Statistic 7.5 arcsec
+  data_source: amadeus:source/usgs_nga_gmted2010
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: 'Original provider Arc/Info binary grid (AIG), not ASCII Grid. Native archive metadata for this exact
+    variant verifies dimensions, geotransform, WGS84 and Int16 nodata -32768. AIG has no existing accurate format
+    enum; native_format is intentionally unset. No scale or offset supplied: valid signed elevations are metres,
+    negative elevations and zero are valid. GMTED standard deviation measures sub-cell elevation variation, not
+    DEM accuracy or absolute elevation. Native GeoTIFF sample metadata independently corroborates every statistic/resolution;
+    TIFF tile extent is not the full ArcGrid extent. Angular grids retain a half-arcsecond offset; do not snap to
+    -180/90. Thirty-arcsecond mean/subsample grids have 20880 rows, others 16800; finer archives have 33600/67200
+    rows. Not all statistic/resolution combinations share polar coverage. Floating writer differences below 0.001
+    cell across the domain share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json.
+    No synthetic time interval is assigned.'
+  data_genre:
+  - elevation
+  product_version: GMTED2010
+  grid_definition: amadeus:grid/gmted2010_arcgrid_75_67200
+  crs: EPSG:4326
+  srid: 4326
+  doi: 10.3133/ofr20111073
+  spatial_extent_descriptor: Native archive extent; land coverage and polar fill vary by statistic/resolution
+  native_spatial_resolution_descriptor: 7.5 arcseconds; exact archive geotransform retained
+  access_url: https://edcintl.cr.usgs.gov/downloads/sciweb1/shared/topo/downloads/GMTED/Grid_ZipFiles/sd75_grd.zip
+  amadeus_dataset_name: gmted
+  amadeus_process_covariate: gmted
+  amadeus_calculate_covariate: gmted
+grid_definitions:
+- id: amadeus:grid/gmted2010_arcgrid_15_33600
+  name: gmted2010_arcgrid_15_33600
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.0041666666666667
+  resolution_y: 0.0041666666666667
+  resolution_unit: deg
+  n_columns: 86400
+  n_rows: 33600
+  origin_x: -180.00013888888893
+  origin_y: 83.999861111111
+- id: amadeus:grid/gmted2010_arcgrid_30_16800
+  name: gmted2010_arcgrid_30_16800
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.0083333333333334
+  resolution_y: 0.0083333333333334
+  resolution_unit: deg
+  n_columns: 43200
+  n_rows: 16800
+  origin_x: -180.00013888888893
+  origin_y: 83.99986111111168
+- id: amadeus:grid/gmted2010_arcgrid_75_67200
+  name: gmted2010_arcgrid_75_67200
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.0020833333333333
+  resolution_y: 0.0020833333333333
+  resolution_unit: deg
+  n_columns: 172800
+  n_rows: 67200
+  origin_x: -180.00013888888893
+  origin_y: 83.99986111111106
+- id: amadeus:grid/gmted2010_arcgrid_30_20880
+  name: gmted2010_arcgrid_30_20880
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.0083333333
+  resolution_y: 0.0083333333
+  resolution_unit: deg
+  n_columns: 43200
+  n_rows: 20880
+  origin_x: -180.00013888888893
+  origin_y: 83.9998604151113

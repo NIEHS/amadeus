@@ -1,0 +1,734 @@
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/osu_prism
+  name: osu_prism
+  label: PRISM Climate Group
+  producer_institution: PRISM Climate Group, Oregon State University
+  homepage: https://prism.oregonstate.edu/
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _prism
+  description: Station-based physiographically informed climate modelling. Seven adapter time-series fields
+    at daily/monthly/annual support and 1991–2020 monthly normals are distinguished. Source quality/version/release
+    changes are per file, not a blanket final status. Attribution and provider redistribution/use terms
+    are retained; free access does not establish an SPDX license.
+  citation_apa: PRISM Climate Group, Oregon State University. https://prism.oregonstate.edu/; identify
+    dataset type, variable, resolution, observation period and retrieval date as required by provider
+    terms.
+products:
+- id: amadeus:product/prism_ppt_daily_4km
+  name: prism_ppt_daily_4km
+  label: PRISM ppt daily 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1D
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/ppt/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+  day_boundary_convention: ending_1200_gmt
+- id: amadeus:product/prism_tmin_daily_4km
+  name: prism_tmin_daily_4km
+  label: PRISM tmin daily 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1D
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/tmin/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+  day_boundary_convention: ending_1200_gmt
+- id: amadeus:product/prism_tmax_daily_4km
+  name: prism_tmax_daily_4km
+  label: PRISM tmax daily 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1D
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/tmax/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+  day_boundary_convention: ending_1200_gmt
+- id: amadeus:product/prism_tmean_daily_4km
+  name: prism_tmean_daily_4km
+  label: PRISM tmean daily 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1D
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/tmean/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+  day_boundary_convention: ending_1200_gmt
+- id: amadeus:product/prism_tdmean_daily_4km
+  name: prism_tdmean_daily_4km
+  label: PRISM tdmean daily 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1D
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/tdmean/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+  day_boundary_convention: ending_1200_gmt
+- id: amadeus:product/prism_vpdmin_daily_4km
+  name: prism_vpdmin_daily_4km
+  label: PRISM vpdmin daily 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1D
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/vpdmin/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+  day_boundary_convention: ending_1200_gmt
+- id: amadeus:product/prism_vpdmax_daily_4km
+  name: prism_vpdmax_daily_4km
+  label: PRISM vpdmax daily 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1D
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/vpdmax/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+  day_boundary_convention: ending_1200_gmt
+- id: amadeus:product/prism_ppt_monthly_4km
+  name: prism_ppt_monthly_4km
+  label: PRISM ppt monthly 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1M
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/ppt/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_tmin_monthly_4km
+  name: prism_tmin_monthly_4km
+  label: PRISM tmin monthly 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1M
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/tmin/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_tmax_monthly_4km
+  name: prism_tmax_monthly_4km
+  label: PRISM tmax monthly 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1M
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/tmax/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_tmean_monthly_4km
+  name: prism_tmean_monthly_4km
+  label: PRISM tmean monthly 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1M
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/tmean/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_tdmean_monthly_4km
+  name: prism_tdmean_monthly_4km
+  label: PRISM tdmean monthly 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1M
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/tdmean/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_vpdmin_monthly_4km
+  name: prism_vpdmin_monthly_4km
+  label: PRISM vpdmin monthly 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1M
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/vpdmin/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_vpdmax_monthly_4km
+  name: prism_vpdmax_monthly_4km
+  label: PRISM vpdmax monthly 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: monthly
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1M
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/vpdmax/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_ppt_annual_4km
+  name: prism_ppt_annual_4km
+  label: PRISM ppt annual 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1Y
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/ppt/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_tmin_annual_4km
+  name: prism_tmin_annual_4km
+  label: PRISM tmin annual 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1Y
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/tmin/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_tmax_annual_4km
+  name: prism_tmax_annual_4km
+  label: PRISM tmax annual 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1Y
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/tmax/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_tmean_annual_4km
+  name: prism_tmean_annual_4km
+  label: PRISM tmean annual 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1Y
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/tmean/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_tdmean_annual_4km
+  name: prism_tdmean_annual_4km
+  label: PRISM tdmean annual 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1Y
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/tdmean/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_vpdmin_annual_4km
+  name: prism_vpdmin_annual_4km
+  label: PRISM vpdmin annual 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1Y
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/vpdmin/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_vpdmax_annual_4km
+  name: prism_vpdmax_annual_4km
+  label: PRISM vpdmax annual 4 km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'Current service NetCDF delivery verified for this exact element/support (2020 sample).
+    Generic Band1 carries no units attribute; authoritative XML/dataset guide and filename supply element
+    identity/units. Float32 physical values use nodata -9999; do not apply a legacy hundredths factor.
+    NAD83 is explicitly encoded, not EPSG:4326. Daily PRISM day ends at 12:00 UTC; monthly/annual temperatures
+    average daily statistics and precipitation totals retain their distinct support. Actual file info.txt
+    records per-file dataset version, release number and source processing dates; one sample is not a
+    historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
+    expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
+    early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
+    field.'
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  temporal_resolution_iso: P1Y
+  native_spatial_resolution_descriptor: 2.5 arc-minutes, nominal 4 km; geographic cell area varies
+  spatial_extent_descriptor: Conterminous United States PRISM grid; masks/quality/release state apply
+  access_url: https://services.nacse.org/prism/data/get/us/4km/vpdmax/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+  amadeus_dataset_name: prism
+- id: amadeus:product/prism_norm91_monthly_4km
+  name: prism_norm91_monthly_4km
+  label: PRISM 1991–2020 monthly normals 4km
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: cloud_optimized_geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: Twelve recurring calendar-month climatologies for baseline 1991–2020, not observed 2020
+    monthly values. Filename 202001_avg_30y labels January of the period ending 2020. Monthly precipitation
+    normal is the mean of monthly totals; temperatures/VPD retain mean daily-statistic semantics. Native
+    TIFF headers and companion XML were verified for every registered field using January examples. Solar
+    fields are published at 800 m here, not invented at 4 km. Solar energy values are mean daily amounts;
+    do not multiply by month length to relabel them as source monthly totals. Legacy adapter normals service
+    route returns an error body with HTTP 200; the verified provider directory is used for discovery,
+    and no working download_data route is asserted. Full-file process_prism works with explicit file selection.
+    Daily/annual normals remain separate, unregistered scopes.
+  grid_definition: amadeus:grid/prism_current_conus_25arcmin
+  crs: EPSG:4269
+  srid: 4269
+  spatial_extent_descriptor: CONUS; native NAD83 geographic grid
+  native_spatial_resolution_descriptor: 2.5 arc-minutes
+  access_url: https://data.prism.oregonstate.edu/normals/us/4km/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+- id: amadeus:product/prism_norm91_monthly_800m
+  name: prism_norm91_monthly_800m
+  label: PRISM 1991–2020 monthly normals 800m
+  data_source: amadeus:source/osu_prism
+  data_genre:
+  - climate
+  - meteorology
+  native_format: cloud_optimized_geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: timeless
+  description: Twelve recurring calendar-month climatologies for baseline 1991–2020, not observed 2020
+    monthly values. Filename 202001_avg_30y labels January of the period ending 2020. Monthly precipitation
+    normal is the mean of monthly totals; temperatures/VPD retain mean daily-statistic semantics. Native
+    TIFF headers and companion XML were verified for every registered field using January examples. Solar
+    fields are published at 800 m here, not invented at 4 km. Solar energy values are mean daily amounts;
+    do not multiply by month length to relabel them as source monthly totals. Legacy adapter normals service
+    route returns an error body with HTTP 200; the verified provider directory is used for discovery,
+    and no working download_data route is asserted. Full-file process_prism works with explicit file selection.
+    Daily/annual normals remain separate, unregistered scopes.
+  grid_definition: amadeus:grid/prism_norm91_monthly_800m
+  crs: EPSG:4269
+  srid: 4269
+  spatial_extent_descriptor: CONUS; native NAD83 geographic grid
+  native_spatial_resolution_descriptor: 30 arc-seconds
+  access_url: https://data.prism.oregonstate.edu/normals/us/800m/
+  amadeus_process_covariate: prism
+  amadeus_calculate_covariate: prism
+grid_definitions:
+- id: amadeus:grid/prism_current_conus_25arcmin
+  name: prism_current_conus_25arcmin
+  crs: EPSG:4269
+  resolution_x: 0.041666666667
+  resolution_y: 0.04166666666700001
+  resolution_unit: deg
+  grid_mapping_name: latitude_longitude
+  srid: 4269
+  n_columns: 1405
+  n_rows: 621
+  origin_x: -125.0208333333335
+  origin_y: 49.9375000000005
+- id: amadeus:grid/prism_norm91_monthly_800m
+  name: prism_norm91_monthly_800m
+  crs: EPSG:4269
+  resolution_x: 0.00833333333
+  resolution_y: 0.00833333333
+  resolution_unit: deg
+  grid_mapping_name: latitude_longitude
+  srid: 4269
+  n_columns: 7025
+  n_rows: 3105
+  origin_x: -125.020833333331
+  origin_y: 49.937500332221

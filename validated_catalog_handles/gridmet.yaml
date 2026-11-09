@@ -1,0 +1,699 @@
+# Discovery projection of the corresponding dataset spec; identical stable IDs/metadata.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/climatology_lab
+  name: climatology_lab
+  label: Climatology Lab gridMET
+  producer_institution: Climatology Lab, University of California, Merced
+  homepage: https://www.climatologylab.org/gridmet.html
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _gridmet
+  license_spdx: CC0-1.0
+  citation_apa: Abatzoglou, J. T. (2013). Development of gridded surface meteorological data for ecological
+    applications and modelling. International Journal of Climatology, 33(1), 121–131. https://doi.org/10.1002/joc.3413
+  description: 'Public daily gridded meteorology. Provider attribution currently UC Merced; workbook University
+    of Idaho attribution is historical. The cited DOI identifies the methods article, not a versioned
+    dataset release. [Resource reconciliation: inventory rights and history] Inventory usage/citation
+    statement (Amadeus data sources!I4): Public domain (CC0); cite Abatzoglou (2013). Inventory source
+    status (H4): Active; this is not observation QA, API availability or verified support for every product.
+    Inventory first-release/history wording (J4): 2013. The inventory lists 2013, which also identifies
+    the cited methods publication; an exact first data-release date is not established.'
+products:
+- id: amadeus:product/gridmet
+  name: gridmet
+  label: gridMET daily surface meteorology
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - meteorology
+  - climate
+  - water
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  spatial_extent_bbox_wkt: POLYGON ((-124.78749996666667 25.04583333333333, -67.03749996666669 25.04583333333333,
+    -67.03749996666669 49.420833333333334, -124.78749996666667 49.420833333333334, -124.78749996666667
+    25.04583333333333))
+  spatial_extent_descriptor: Contiguous United States native grid; rectangular grid envelope includes
+    areas outside valid land cells.
+  native_spatial_resolution_m: 4000.0
+  native_spatial_resolution_descriptor: 1/24 degree, approximately 4 km; axis coordinates are cell centres.
+  temporal_resolution: daily
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  day_boundary_convention: local_midnight
+  calendar: gregorian
+  temporal_coverage_start: '1979-01-01'
+  update_cadence_iso: P1D
+  access_url: https://www.northwestknowledge.net/metdata/data/
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+  description: 'Daily support is fixed Mountain Standard Time: 07:00 UTC on the labelled date through
+    07:00 UTC the next date, without daylight-saving adjustment. local_midnight denotes this provider
+    MST convention, not the pixel civil timezone. Recent dates can be revised. Files use {code}_{YYYY}.nc;
+    code distinguishes variables sharing a netCDF name. This profile covers sixteen daily fields and excludes
+    five-day drought indices and PDSI. Publication release version and per-slice status must be inspected;
+    no fixed default quality status is asserted. [Resource reconciliation: inventory completeness] Inventory
+    coverage statement (Amadeus data sources!N4): Yes (CONUS). This statement does not establish validity
+    of every cell/date or fill observation gaps.'
+- id: amadeus:product/gridmet_drought_spei14d
+  name: gridmet_drought_spei14d
+  label: GridMET SPEI 14d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei14d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei14d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei30d
+  name: gridmet_drought_spei30d
+  label: GridMET SPEI 30d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei30d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei30d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei90d
+  name: gridmet_drought_spei90d
+  label: GridMET SPEI 90d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei90d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei90d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei180d
+  name: gridmet_drought_spei180d
+  label: GridMET SPEI 180d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei180d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei180d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei270d
+  name: gridmet_drought_spei270d
+  label: GridMET SPEI 270d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei270d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei270d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei1y
+  name: gridmet_drought_spei1y
+  label: GridMET SPEI 1y
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei1y.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei1y.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei2y
+  name: gridmet_drought_spei2y
+  label: GridMET SPEI 2y
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei2y.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei2y.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_spei5y
+  name: gridmet_drought_spei5y
+  label: GridMET SPEI 5y
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native spei5y.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/spei5y.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi14d
+  name: gridmet_drought_eddi14d
+  label: GridMET EDDI 14d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi14d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi14d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi30d
+  name: gridmet_drought_eddi30d
+  label: GridMET EDDI 30d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi30d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi30d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi90d
+  name: gridmet_drought_eddi90d
+  label: GridMET EDDI 90d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi90d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi90d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi180d
+  name: gridmet_drought_eddi180d
+  label: GridMET EDDI 180d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi180d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi180d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi270d
+  name: gridmet_drought_eddi270d
+  label: GridMET EDDI 270d
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi270d.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi270d.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi1y
+  name: gridmet_drought_eddi1y
+  label: GridMET EDDI 1y
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi1y.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi1y.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi2y
+  name: gridmet_drought_eddi2y
+  label: GridMET EDDI 2y
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi2y.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi2y.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+- id: amadeus:product/gridmet_drought_eddi5y
+  name: gridmet_drought_eddi5y
+  label: GridMET EDDI 5y
+  data_source: amadeus:source/climatology_lab
+  data_genre:
+  - drought
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Native eddi5y.nc multi-year index and category arrays. Calibration: 1980-2016 base period.
+    Transformation: Indices calculated using a nonparameteric transformation using Tukey plotting position
+    and inverse normal approximation. Day label: Days correspond approximately to calendar days ending
+    at midnight, Mountain Standard Time (7 UTC the next calendar day). Nominal five-day observations;
+    native time coordinates include six-day transitions ({5.0: 3406, 6.0: 12}) and must be preserved.
+    The observation interval differs from the trailing index lookback. No daily interpolation or reconstruction
+    of missing dates. Only continuous index extraction is routed by the current R processor; companion
+    categories are separately catalogued with unresolved threshold meanings. Date coverage is the inspected
+    time-axis snapshot, not a promise of valid values at all cells/times; initial lookback periods may
+    be fill. No whole-file final status/version or update cadence is guessed. SPEI denotes a standardized
+    precipitation-minus-evaporative-demand balance; EDDI denotes standardized evaporative demand. Do not
+    invert or equate their signs without an explicit GridMET-specific comparison policy. ET reference
+    formulation and exact year-window day-count conventions remain unverified in the inspected metadata.
+    [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N4):
+    Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.'
+  grid_definition: amadeus:grid/gridmet_4km
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5D
+  temporal_alignment: end
+  calendar: gregorian
+  temporal_coverage_start: '1980-01-05'
+  temporal_coverage_end: '2026-11-01'
+  native_spatial_resolution_descriptor: Native 1/24 degree; exact shared grid confirmed by all axes
+  spatial_extent_descriptor: Contiguous United States native GridMET envelope; masked cells remain missing
+  access_url: https://www.northwestknowledge.net/metdata/data/eddi5y.nc
+  amadeus_dataset_name: gridmet
+  amadeus_process_covariate: gridmet
+  amadeus_calculate_covariate: gridmet
+grid_definitions:
+- id: amadeus:grid/gridmet_4km
+  name: gridmet_4km
+  label: gridMET native 1/24-degree grid
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.041666666666671404
+  resolution_y: 0.041666666666671404
+  resolution_unit: deg
+  n_columns: 1386
+  n_rows: 585
+  origin_x: -124.78749996666667
+  origin_y: 49.420833333333334

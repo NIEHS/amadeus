@@ -1,0 +1,41 @@
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/us_epa_ecoregions
+  name: us_epa_ecoregions
+  label: U.S. EPA ecoregions
+  producer_institution: U.S. Environmental Protection Agency and collaborating mapping agencies
+  homepage: https://www.epa.gov/eco-research/level-iii-and-iv-ecoregions-continental-united-states
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _ecoregion
+  description: Ecological regions integrate geology, physiography, vegetation, climate, soils, land use
+    and hydrology. They are not climate-only classes or land-use observations. Current CONUS Level III
+    state-split archive is pinned by retrieved checksum. Methods-paper date 2014 and programme history
+    1987 are not asserted as this file release date.
+  citation_apa: 'Omernik, J. M., and Griffith, G. E. (2014). Ecoregions of the conterminous United States:
+    evolution of a hierarchical spatial framework. Environmental Management 54, 1249–1266. https://doi.org/10.1007/s00267-014-0364-1.
+    Methods reference; identify the actual EPA map file separately.'
+products:
+- id: amadeus:product/epa_ecoregions_l3_state_boundaries
+  name: epa_ecoregions_l3_state_boundaries
+  label: EPA CONUS Level III ecoregions with state boundaries
+  data_source: amadeus:source/us_epa_ecoregions
+  data_genre: []
+  native_format: shapefile
+  spatial_support_type: polygon
+  temporal_resolution: timeless
+  description: 'Native 1631 state-split polygon features, with Level I/II/III identifiers and labels.
+    A state split does not define a new ecoregion class. Native ESRI:102039 explicitly uses NAD83 Albers;
+    no numeric database SRID is invented. data_genre is deliberately empty: the existing enum lacks ecology/ecoregionalization,
+    and climate_classification would misstate this multi-factor concept. No schema edit is made. Current
+    R processing retains L2_KEY/L3_KEY/NA_L2NAME/US_L3NAME/NA_L3NAME and modifies geometry near Tukey
+    Bridge. Its synthetic 1997–current-year time label is not provider coverage and is excluded. Raw provider
+    boundaries and any processed correction are distinct states.'
+  crs: ESRI:102039
+  native_spatial_resolution_descriptor: Ecological-region polygons; variable area; state-split geometry
+  spatial_extent_descriptor: Conterminous United States; not all North America
+  access_url: https://dmap-prod-oms-edc.s3.us-east-1.amazonaws.com/ORD/Ecoregions/us/us_eco_l3_state_boundaries.zip
+  amadeus_process_covariate: ecoregion
+  amadeus_calculate_covariate: ecoregion
+  amadeus_dataset_name: ecoregion
+grid_definitions: []

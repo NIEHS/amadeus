@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/epa_tri_basic
+  name: epa_tri_basic
+  label: EPA TRI Basic data
+  producer_institution: U.S. Environmental Protection Agency
+  homepage: https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _tri
+  description: Annual facility-reported chemical release/transfer inventory under TRI reporting scope and thresholds.
+    Release mass is not environmental concentration, exposure or toxicity-weighted risk. Dioxin-category mass is
+    grams; other chemicals are pounds. Grams-TEQ is a separate quantity requiring congener/TEF information. Historical
+    submissions may be revised; pin retrieved file checksums. EPA public data; credit EPA TRI and reporting year.
+products:
+- id: amadeus:product/tri_basic_2020_verified_chemicals
+  name: tri_basic_2020_verified_chemicals
+  label: 'TRI Basic 2020: native-verified chemical/mass fields'
+  data_source: amadeus:source/epa_tri_basic
+  spatial_support_type: point
+  temporal_resolution: annual
+  description: 'Native 2020 North Carolina CSV verifies chemical identities, exact column headers and unit strata.
+    Bindings cover only the chemicals observed in that sample and six separately documented release fields; they
+    are not a complete national chemical register or every Basic column. The national download route accepts US,
+    state and tbl scopes; this profile points to the inspected NC delivery. Preserve TRIFD/FRS, document control,
+    chemical/CAS/category ID, Form type, YEAR, unit, datum and industry. Off-site totals are attributed to reporting
+    facilities, not the off-site destination geometry. Totals overlap their component fields and must not be added
+    together. Non-reporting and Form A blank amounts are not automatically zero. HORIZONTAL DATUM is blank in all
+    sample rows: do not assert a uniform EPSG:4326. Generic CSV is not csv_station_observations, so native_format
+    is unset. process_tri uses 0.453592 kg/lb (slightly truncated), may group facilities by shared coordinates,
+    and regex-selects columns; these are adapter limitations. calculate_tri creates a distance-decay indicator,
+    not an atmospheric dispersion or exposure model.'
+  data_genre:
+  - emissions
+  - chemicals
+  - air_pollution
+  temporal_resolution_iso: P1Y
+  temporal_coverage_start: '2020-01-01'
+  temporal_coverage_end: '2020-12-31'
+  update_cadence_iso: P1Y
+  spatial_extent_descriptor: Reporting facilities in the inspected North Carolina 2020 file; no continuous coverage
+  native_spatial_resolution_descriptor: Facility-reported point, with row-level horizontal datum
+  access_url: https://data.epa.gov/efservice/downloads/tri/mv_tri_basic_download/2020_NC/csv
+  amadeus_dataset_name: tri
+  amadeus_process_covariate: tri
+  amadeus_calculate_covariate: tri
+grid_definitions: []

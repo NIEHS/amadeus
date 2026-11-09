@@ -1,0 +1,478 @@
+# Discovery projection of the corresponding dataset spec; identical stable IDs/metadata.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/nasa_gmao_merra2
+  name: nasa_gmao_merra2
+  label: NASA MERRA-2
+  producer_institution: NASA GMAO; NASA GES DISC
+  homepage: https://gmao.gsfc.nasa.gov/gmao-products/merra-2/
+  access_protocol: https_bulk_file
+  requires_authentication: true
+  amadeus_function_suffix: _merra2
+  description: 'MERRA-2 reanalysis V5.12.4. Seven collection profiles and all 45 science fields in their
+    NASA specification tables are registered. Other adapter collections, monthly products and FWI are
+    outside this verified scope. FWI is not silently treated as one of these NASA reanalysis collections.
+    [Resource reconciliation: inventory rights and history] Inventory usage/citation statement (Amadeus
+    data sources!I9): No restrictions (NASA GES DISC); cite Gelaro et al. (2017); Earthdata login required.
+    Inventory source status (H9): Active; this is not observation QA, API availability or verified support
+    for every product. Inventory first-release/history wording (J9): 2015. 2015 is release history, not
+    the 1980 reanalysis start. Current NASA CMR/specification correct the daily-statistics DOI and the
+    workbook three-hourly label on the hourly chemistry collection. Monthly duplicate row 80 is excluded
+    as a distinct product.'
+  auth_mechanism: NASA Earthdata Login / bearer token for protected data downloads; public metadata needs
+    no token
+  citation_apa: Gelaro et al. (2017). The Modern-Era Retrospective Analysis for Research and Applications,
+    Version 2 (MERRA-2). https://doi.org/10.1175/JCLI-D-16-0758.1. Collection-specific data citations
+    are retained on Product.
+products:
+- id: amadeus:product/inst1_2d_int_Nx
+  name: inst1_2d_int_Nx
+  label: 'MERRA-2 inst1_2d_int_Nx: 2d,1-Hourly,Instantaneous,Single-Level,Assimilation,Vertically Integrated
+    Diagnostics 0.625 x 0.5 degree V5.12.4 (M2I1NXINT)'
+  data_source: amadeus:source/nasa_gmao_merra2
+  data_genre:
+  - atmosphere
+  - meteorology
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: instantaneous
+  description: 'NASA MERRA-2 delivered regular longitude/latitude grid, not the native dynamics cube sphere.
+    For instantaneous collections temporal_resolution=instantaneous and temporal_resolution_iso stores
+    sampling cadence (including PT6H); this does not assert a six-hour mean or require a new enum. Pressure
+    coordinates are not altitude. Hybrid layers require native coefficients/DELP and PS for physical pressure;
+    index 1 is near the top, not the surface. Column and surface fields in 3-D collections remain 2-D
+    as their native dimensions indicate. No forecast lead time is asserted. Daily temperature extrema
+    cover 00:00–23:59 UTC; preserve actual timestamps/bounds for other daily diagnostics, including HOURNORAIN
+    whose reduction is not specified. Current NASA DOI and timing supersede conflicting workbook bibliography/cadence.
+    Required CRS slot uses an explicitly unresolved project-local placeholder; geographic axis spacing
+    is verified, but datum/radius and numeric engine SRID are not established. Nominal monthly publication
+    has approximately three weeks latency after month end in current NASA CMR; publication cadence is
+    not observation frequency or a file-specific availability guarantee. [Resource reconciliation: inventory
+    completeness] Inventory coverage statement (Amadeus data sources!N9): Yes (global). This statement
+    does not establish validity of every cell/date or fill observation gaps.'
+  product_version: 5.12.4
+  doi: 10.5067/G0U6NGQ3BLE0
+  grid_definition: amadeus:grid/merra2_0625x05_single_level
+  crs: AMADEUS:100003
+  temporal_resolution_iso: PT1H
+  temporal_coverage_start: '1980-01-01'
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: 0.625 degree longitude × 0.5 degree latitude; 576 × 361 coordinate
+    points
+  spatial_extent_descriptor: Global; masks and vertical below-ground missing values apply
+  access_url: https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/M2I1NXINT.5.12.4/
+  amadeus_dataset_name: merra2
+  amadeus_process_covariate: merra2
+  amadeus_calculate_covariate: merra2
+  citation_apa: 'Global Modeling and Assimilation Office (GMAO) (2015). MERRA-2 inst1_2d_int_Nx: 2d,1-Hourly,Instantaneous,Single-Level,Assimilation,Vertically
+    Integrated Diagnostics V5.12.4. Goddard Earth Sciences Data and Information Services Center (GES DISC).
+    https://doi.org/10.5067/G0U6NGQ3BLE0'
+- id: amadeus:product/inst3_2d_gas_Nx
+  name: inst3_2d_gas_Nx
+  label: 'MERRA-2 inst3_2d_gas_Nx: 2d,3-Hourly,Instantaneous,Single-Level,Assimilation,Aerosol Optical
+    Depth Analysis 0.625 x 0.5 degree V5.12.4 (M2I3NXGAS)'
+  data_source: amadeus:source/nasa_gmao_merra2
+  data_genre:
+  - atmosphere
+  - meteorology
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: instantaneous
+  description: 'NASA MERRA-2 delivered regular longitude/latitude grid, not the native dynamics cube sphere.
+    For instantaneous collections temporal_resolution=instantaneous and temporal_resolution_iso stores
+    sampling cadence (including PT6H); this does not assert a six-hour mean or require a new enum. Pressure
+    coordinates are not altitude. Hybrid layers require native coefficients/DELP and PS for physical pressure;
+    index 1 is near the top, not the surface. Column and surface fields in 3-D collections remain 2-D
+    as their native dimensions indicate. No forecast lead time is asserted. Daily temperature extrema
+    cover 00:00–23:59 UTC; preserve actual timestamps/bounds for other daily diagnostics, including HOURNORAIN
+    whose reduction is not specified. Current NASA DOI and timing supersede conflicting workbook bibliography/cadence.
+    Required CRS slot uses an explicitly unresolved project-local placeholder; geographic axis spacing
+    is verified, but datum/radius and numeric engine SRID are not established. Nominal monthly publication
+    has approximately three weeks latency after month end in current NASA CMR; publication cadence is
+    not observation frequency or a file-specific availability guarantee. [Resource reconciliation: inventory
+    completeness] Inventory coverage statement (Amadeus data sources!N9): Yes (global). This statement
+    does not establish validity of every cell/date or fill observation gaps.'
+  product_version: 5.12.4
+  doi: 10.5067/HNGA0EWW0R09
+  grid_definition: amadeus:grid/merra2_0625x05_single_level
+  crs: AMADEUS:100003
+  temporal_resolution_iso: PT3H
+  temporal_coverage_start: '1980-01-01'
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: 0.625 degree longitude × 0.5 degree latitude; 576 × 361 coordinate
+    points
+  spatial_extent_descriptor: Global; masks and vertical below-ground missing values apply
+  access_url: https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/M2I3NXGAS.5.12.4/
+  amadeus_dataset_name: merra2
+  amadeus_process_covariate: merra2
+  amadeus_calculate_covariate: merra2
+  citation_apa: 'Global Modeling and Assimilation Office (GMAO) (2015). MERRA-2 inst3_2d_gas_Nx: 2d,3-Hourly,Instantaneous,Single-Level,Assimilation,Aerosol
+    Optical Depth Analysis V5.12.4. Goddard Earth Sciences Data and Information Services Center (GES DISC).
+    https://doi.org/10.5067/HNGA0EWW0R09'
+- id: amadeus:product/inst3_3d_chm_Nv
+  name: inst3_3d_chm_Nv
+  label: 'MERRA-2 inst3_3d_chm_Nv: 3d,3-Hourly,Instantaneous,Model-Level,Assimilation,Carbon Monoxide
+    and Ozone Mixing Ratio 0.625 x 0.5 degree V5.12.4 (M2I3NVCHM)'
+  data_source: amadeus:source/nasa_gmao_merra2
+  data_genre:
+  - atmosphere
+  - meteorology
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: instantaneous
+  description: 'NASA MERRA-2 delivered regular longitude/latitude grid, not the native dynamics cube sphere.
+    For instantaneous collections temporal_resolution=instantaneous and temporal_resolution_iso stores
+    sampling cadence (including PT6H); this does not assert a six-hour mean or require a new enum. Pressure
+    coordinates are not altitude. Hybrid layers require native coefficients/DELP and PS for physical pressure;
+    index 1 is near the top, not the surface. Column and surface fields in 3-D collections remain 2-D
+    as their native dimensions indicate. No forecast lead time is asserted. Daily temperature extrema
+    cover 00:00–23:59 UTC; preserve actual timestamps/bounds for other daily diagnostics, including HOURNORAIN
+    whose reduction is not specified. Current NASA DOI and timing supersede conflicting workbook bibliography/cadence.
+    Required CRS slot uses an explicitly unresolved project-local placeholder; geographic axis spacing
+    is verified, but datum/radius and numeric engine SRID are not established. Nominal monthly publication
+    has approximately three weeks latency after month end in current NASA CMR; publication cadence is
+    not observation frequency or a file-specific availability guarantee. [Resource reconciliation: inventory
+    completeness] Inventory coverage statement (Amadeus data sources!N9): Yes (global). This statement
+    does not establish validity of every cell/date or fill observation gaps.'
+  product_version: 5.12.4
+  doi: 10.5067/HO9OVZWF3KW2
+  grid_definition: amadeus:grid/merra2_0625x05_hybrid_model_layer_index
+  crs: AMADEUS:100003
+  temporal_resolution_iso: PT3H
+  temporal_coverage_start: '1980-01-01'
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: 0.625 degree longitude × 0.5 degree latitude; 576 × 361 coordinate
+    points
+  spatial_extent_descriptor: Global; masks and vertical below-ground missing values apply
+  access_url: https://goldsmr5.gesdisc.eosdis.nasa.gov/data/MERRA2/M2I3NVCHM.5.12.4/
+  amadeus_dataset_name: merra2
+  amadeus_process_covariate: merra2
+  amadeus_calculate_covariate: merra2
+  citation_apa: 'Global Modeling and Assimilation Office (GMAO) (2015). MERRA-2 inst3_3d_chm_Nv: 3d,3-Hourly,Instantaneous,Model-Level,Assimilation,Carbon
+    Monoxide and Ozone Mixing Ratio V5.12.4. Goddard Earth Sciences Data and Information Services Center
+    (GES DISC). https://doi.org/10.5067/HO9OVZWF3KW2'
+- id: amadeus:product/inst6_3d_ana_Np
+  name: inst6_3d_ana_Np
+  label: 'MERRA-2 inst6_3d_ana_Np: 3d,6-Hourly,Instantaneous,Pressure-Level,Analysis,Analyzed Meteorological
+    Fields 0.625 x 0.5 degree V5.12.4 (M2I6NPANA)'
+  data_source: amadeus:source/nasa_gmao_merra2
+  data_genre:
+  - atmosphere
+  - meteorology
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: instantaneous
+  description: 'NASA MERRA-2 delivered regular longitude/latitude grid, not the native dynamics cube sphere.
+    For instantaneous collections temporal_resolution=instantaneous and temporal_resolution_iso stores
+    sampling cadence (including PT6H); this does not assert a six-hour mean or require a new enum. Pressure
+    coordinates are not altitude. Hybrid layers require native coefficients/DELP and PS for physical pressure;
+    index 1 is near the top, not the surface. Column and surface fields in 3-D collections remain 2-D
+    as their native dimensions indicate. No forecast lead time is asserted. Daily temperature extrema
+    cover 00:00–23:59 UTC; preserve actual timestamps/bounds for other daily diagnostics, including HOURNORAIN
+    whose reduction is not specified. Current NASA DOI and timing supersede conflicting workbook bibliography/cadence.
+    Required CRS slot uses an explicitly unresolved project-local placeholder; geographic axis spacing
+    is verified, but datum/radius and numeric engine SRID are not established. Nominal monthly publication
+    has approximately three weeks latency after month end in current NASA CMR; publication cadence is
+    not observation frequency or a file-specific availability guarantee. [Resource reconciliation: inventory
+    completeness] Inventory coverage statement (Amadeus data sources!N9): Yes (global). This statement
+    does not establish validity of every cell/date or fill observation gaps.'
+  product_version: 5.12.4
+  doi: 10.5067/A7S6XP56VZWS
+  grid_definition: amadeus:grid/merra2_0625x05_isobaric_pressure_hPa
+  crs: AMADEUS:100003
+  temporal_resolution_iso: PT6H
+  temporal_coverage_start: '1980-01-01'
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: 0.625 degree longitude × 0.5 degree latitude; 576 × 361 coordinate
+    points
+  spatial_extent_descriptor: Global; masks and vertical below-ground missing values apply
+  access_url: https://goldsmr5.gesdisc.eosdis.nasa.gov/data/MERRA2/M2I6NPANA.5.12.4/
+  amadeus_dataset_name: merra2
+  amadeus_process_covariate: merra2
+  amadeus_calculate_covariate: merra2
+  citation_apa: 'Global Modeling and Assimilation Office (GMAO) (2015). MERRA-2 inst6_3d_ana_Np: 3d,6-Hourly,Instantaneous,Pressure-Level,Analysis,Analyzed
+    Meteorological Fields V5.12.4. Goddard Earth Sciences Data and Information Services Center (GES DISC).
+    https://doi.org/10.5067/A7S6XP56VZWS'
+- id: amadeus:product/statD_2d_slv_Nx
+  name: statD_2d_slv_Nx
+  label: 'MERRA-2 statD_2d_slv_Nx: 2d,Daily,Aggregated Statistics,Single-Level,Assimilation,Single-Level
+    Diagnostics 0.625 x 0.5 degree V5.12.4 (M2SDNXSLV)'
+  data_source: amadeus:source/nasa_gmao_merra2
+  data_genre:
+  - atmosphere
+  - meteorology
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: daily
+  description: 'NASA MERRA-2 delivered regular longitude/latitude grid, not the native dynamics cube sphere.
+    For instantaneous collections temporal_resolution=instantaneous and temporal_resolution_iso stores
+    sampling cadence (including PT6H); this does not assert a six-hour mean or require a new enum. Pressure
+    coordinates are not altitude. Hybrid layers require native coefficients/DELP and PS for physical pressure;
+    index 1 is near the top, not the surface. Column and surface fields in 3-D collections remain 2-D
+    as their native dimensions indicate. No forecast lead time is asserted. Daily temperature extrema
+    cover 00:00–23:59 UTC; preserve actual timestamps/bounds for other daily diagnostics, including HOURNORAIN
+    whose reduction is not specified. Current NASA DOI and timing supersede conflicting workbook bibliography/cadence.
+    Required CRS slot uses an explicitly unresolved project-local placeholder; geographic axis spacing
+    is verified, but datum/radius and numeric engine SRID are not established. Nominal monthly publication
+    has approximately three weeks latency after month end in current NASA CMR; publication cadence is
+    not observation frequency or a file-specific availability guarantee. [Resource reconciliation: inventory
+    completeness] Inventory coverage statement (Amadeus data sources!N9): Yes (global). This statement
+    does not establish validity of every cell/date or fill observation gaps.'
+  product_version: 5.12.4
+  doi: 10.5067/9SC1VNTWGWV3
+  grid_definition: amadeus:grid/merra2_0625x05_single_level
+  crs: AMADEUS:100003
+  temporal_resolution_iso: P1D
+  temporal_coverage_start: '1980-01-01'
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: 0.625 degree longitude × 0.5 degree latitude; 576 × 361 coordinate
+    points
+  spatial_extent_descriptor: Global; masks and vertical below-ground missing values apply
+  access_url: https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/M2SDNXSLV.5.12.4/
+  amadeus_dataset_name: merra2
+  amadeus_process_covariate: merra2
+  amadeus_calculate_covariate: merra2
+  day_boundary_convention: utc_midnight
+  citation_apa: 'Global Modeling and Assimilation Office (GMAO) (2015). MERRA-2 statD_2d_slv_Nx: 2d,Daily,Aggregated
+    Statistics,Single-Level,Assimilation,Single-Level Diagnostics V5.12.4. Goddard Earth Sciences Data
+    and Information Services Center (GES DISC). https://doi.org/10.5067/9SC1VNTWGWV3'
+- id: amadeus:product/tavg1_2d_chm_Nx
+  name: tavg1_2d_chm_Nx
+  label: 'MERRA-2 tavg1_2d_chm_Nx: 2d,1-Hourly,Time-Averaged,Single-Level,Assimilation,Carbon Monoxide
+    and Ozone Diagnostics 0.625 x 0.5 degree V5.12.4 (M2T1NXCHM) '
+  data_source: amadeus:source/nasa_gmao_merra2
+  data_genre:
+  - atmosphere
+  - meteorology
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: hourly
+  description: 'NASA MERRA-2 delivered regular longitude/latitude grid, not the native dynamics cube sphere.
+    For instantaneous collections temporal_resolution=instantaneous and temporal_resolution_iso stores
+    sampling cadence (including PT6H); this does not assert a six-hour mean or require a new enum. Pressure
+    coordinates are not altitude. Hybrid layers require native coefficients/DELP and PS for physical pressure;
+    index 1 is near the top, not the surface. Column and surface fields in 3-D collections remain 2-D
+    as their native dimensions indicate. No forecast lead time is asserted. Daily temperature extrema
+    cover 00:00–23:59 UTC; preserve actual timestamps/bounds for other daily diagnostics, including HOURNORAIN
+    whose reduction is not specified. Current NASA DOI and timing supersede conflicting workbook bibliography/cadence.
+    Required CRS slot uses an explicitly unresolved project-local placeholder; geographic axis spacing
+    is verified, but datum/radius and numeric engine SRID are not established. Nominal monthly publication
+    has approximately three weeks latency after month end in current NASA CMR; publication cadence is
+    not observation frequency or a file-specific availability guarantee. [Resource reconciliation: inventory
+    completeness] Inventory coverage statement (Amadeus data sources!N9): Yes (global). This statement
+    does not establish validity of every cell/date or fill observation gaps.'
+  product_version: 5.12.4
+  doi: 10.5067/3RQ5YS674DGQ
+  grid_definition: amadeus:grid/merra2_0625x05_single_level
+  crs: AMADEUS:100003
+  temporal_resolution_iso: PT1H
+  temporal_coverage_start: '1980-01-01'
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: 0.625 degree longitude × 0.5 degree latitude; 576 × 361 coordinate
+    points
+  spatial_extent_descriptor: Global; masks and vertical below-ground missing values apply
+  access_url: https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/M2T1NXCHM.5.12.4/
+  amadeus_dataset_name: merra2
+  amadeus_process_covariate: merra2
+  amadeus_calculate_covariate: merra2
+  citation_apa: 'Global Modeling and Assimilation Office (GMAO) (2015). MERRA-2 tavg1_2d_chm_Nx: 2d,1-Hourly,Time-Averaged,Single-Level,Assimilation,Carbon
+    Monoxide and Ozone Diagnostics V5.12.4. Goddard Earth Sciences Data and Information Services Center
+    (GES DISC). https://doi.org/10.5067/3RQ5YS674DGQ'
+  temporal_alignment: center
+- id: amadeus:product/tavg3_3d_udt_Np
+  name: tavg3_3d_udt_Np
+  label: 'MERRA-2 tavg3_3d_udt_Np: 3d,3-Hourly,Time-Averaged,Pressure-Level,Assimilation,Wind Tendencies
+    0.625 x 0.5 degree V5.12.4 (M2T3NPUDT) '
+  data_source: amadeus:source/nasa_gmao_merra2
+  data_genre:
+  - atmosphere
+  - meteorology
+  - climate
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: three_hourly
+  description: 'NASA MERRA-2 delivered regular longitude/latitude grid, not the native dynamics cube sphere.
+    For instantaneous collections temporal_resolution=instantaneous and temporal_resolution_iso stores
+    sampling cadence (including PT6H); this does not assert a six-hour mean or require a new enum. Pressure
+    coordinates are not altitude. Hybrid layers require native coefficients/DELP and PS for physical pressure;
+    index 1 is near the top, not the surface. Column and surface fields in 3-D collections remain 2-D
+    as their native dimensions indicate. No forecast lead time is asserted. Daily temperature extrema
+    cover 00:00–23:59 UTC; preserve actual timestamps/bounds for other daily diagnostics, including HOURNORAIN
+    whose reduction is not specified. Current NASA DOI and timing supersede conflicting workbook bibliography/cadence.
+    Required CRS slot uses an explicitly unresolved project-local placeholder; geographic axis spacing
+    is verified, but datum/radius and numeric engine SRID are not established. Nominal monthly publication
+    has approximately three weeks latency after month end in current NASA CMR; publication cadence is
+    not observation frequency or a file-specific availability guarantee. [Resource reconciliation: inventory
+    completeness] Inventory coverage statement (Amadeus data sources!N9): Yes (global). This statement
+    does not establish validity of every cell/date or fill observation gaps.'
+  product_version: 5.12.4
+  doi: 10.5067/CWV0G3PPPWFW
+  grid_definition: amadeus:grid/merra2_0625x05_isobaric_pressure_hPa
+  crs: AMADEUS:100003
+  temporal_resolution_iso: PT3H
+  temporal_coverage_start: '1980-01-01'
+  update_cadence_iso: P1M
+  native_spatial_resolution_descriptor: 0.625 degree longitude × 0.5 degree latitude; 576 × 361 coordinate
+    points
+  spatial_extent_descriptor: Global; masks and vertical below-ground missing values apply
+  access_url: https://goldsmr5.gesdisc.eosdis.nasa.gov/data/MERRA2/M2T3NPUDT.5.12.4/
+  amadeus_dataset_name: merra2
+  amadeus_process_covariate: merra2
+  amadeus_calculate_covariate: merra2
+  citation_apa: 'Global Modeling and Assimilation Office (GMAO) (2015). MERRA-2 tavg3_3d_udt_Np: 3d,3-Hourly,Time-Averaged,Pressure-Level,Assimilation,Wind
+    Tendencies V5.12.4. Goddard Earth Sciences Data and Information Services Center (GES DISC). https://doi.org/10.5067/CWV0G3PPPWFW'
+  temporal_alignment: center
+grid_definitions:
+- id: amadeus:grid/merra2_0625x05_single_level
+  name: merra2_0625x05_single_level
+  crs: AMADEUS:100003
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.625
+  resolution_y: 0.5
+  resolution_unit: deg
+  n_columns: 576
+  n_rows: 361
+- id: amadeus:grid/merra2_0625x05_hybrid_model_layer_index
+  name: merra2_0625x05_hybrid_model_layer_index
+  crs: AMADEUS:100003
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.625
+  resolution_y: 0.5
+  resolution_unit: deg
+  n_columns: 576
+  n_rows: 361
+  vertical_level_type: hybrid_model_layer_index
+  vertical_level_unit: '1'
+  vertical_levels:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 51
+  - 52
+  - 53
+  - 54
+  - 55
+  - 56
+  - 57
+  - 58
+  - 59
+  - 60
+  - 61
+  - 62
+  - 63
+  - 64
+  - 65
+  - 66
+  - 67
+  - 68
+  - 69
+  - 70
+  - 71
+  - 72
+- id: amadeus:grid/merra2_0625x05_isobaric_pressure_hPa
+  name: merra2_0625x05_isobaric_pressure_hPa
+  crs: AMADEUS:100003
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.625
+  resolution_y: 0.5
+  resolution_unit: deg
+  n_columns: 576
+  n_rows: 361
+  vertical_level_type: isobaric_pressure_hPa
+  vertical_level_unit: hPa
+  vertical_levels:
+  - 1000
+  - 975
+  - 950
+  - 925
+  - 900
+  - 875
+  - 850
+  - 825
+  - 800
+  - 775
+  - 750
+  - 725
+  - 700
+  - 650
+  - 600
+  - 550
+  - 500
+  - 450
+  - 400
+  - 350
+  - 300
+  - 250
+  - 200
+  - 150
+  - 100
+  - 70
+  - 50
+  - 40
+  - 30
+  - 20
+  - 10
+  - 7
+  - 5
+  - 4
+  - 3
+  - 2
+  - 1
+  - 0.7
+  - 0.5
+  - 0.4
+  - 0.3
+  - 0.1

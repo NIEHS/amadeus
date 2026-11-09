@@ -1,0 +1,254 @@
+# Discovery projection of the corresponding dataset spec; identical stable IDs/metadata.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/epa_aqs
+  name: epa_aqs
+  label: US EPA AQS AirData bulk daily summaries
+  producer_institution: U.S. Environmental Protection Agency
+  homepage: https://aqs.epa.gov/aqsweb/airdata/download_files.html
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _aqs
+  citation_apa: U.S. Environmental Protection Agency. (2023). Air Quality System Data Mart [Internet database].
+    https://www.epa.gov/outdoor-air-quality-data
+  description: 'The public bulk CSV route needs no API key. This source profile does not describe the
+    separately authenticated AQS REST API. Monitoring data have mixed row-level coordinate datums and
+    may be revised; no uniform CRS or final/certified quality status is assigned. [Resource reconciliation:
+    inventory rights and history] Inventory usage/citation statement (Amadeus data sources!I20): Public
+    domain (U.S. EPA); citation requested. Inventory source status (H20): Active; this is not observation
+    QA, API availability or verified support for every product. Inventory first-release/history wording
+    (J20): 1980 (record start). The inventory explicitly labels 1980 as record start; this is not a release
+    date. The broader inventory has an approximate 1970s/1980s database-history statement.'
+products:
+- id: amadeus:product/aqs_daily_88101
+  name: aqs_daily_88101
+  label: AQS daily summaries — PM2.5 - Local Conditions
+  data_source: amadeus:source/epa_aqs
+  data_genre:
+  - air_pollution
+  native_format: csv_station_observations
+  spatial_support_type: monitoring_station
+  spatial_extent_descriptor: United States and reporting jurisdictions; sparse monitoring sites, not continuous
+    coverage.
+  native_spatial_resolution_descriptor: Monitor-level summary; preserve state/county/site/parameter/POC
+    identity.
+  temporal_resolution: daily
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  day_boundary_convention: local_midnight
+  calendar: gregorian
+  access_url: https://aqs.epa.gov/aqsweb/airdata/
+  amadeus_dataset_name: aqs
+  amadeus_process_covariate: aqs
+  description: 'Bulk files daily_88101_YYYY.zip. Parameter 88101: PM2.5 - Local Conditions. The value
+    field is Arithmetic Mean; Date Local uses local standard time. Preserve Sample Duration, Pollutant
+    Standard, Event Type, Method Code, POC, Observation Count, Datum and Date of Last Change before selection.
+    No single daily summary row is implicitly selected. Current process_aqs applies duration/minimum-POC/event
+    filters; it is not a lossless generic reader. AQS has no calculate_covariates dispatch route. [Resource
+    reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N20): No
+    (point monitors). This statement does not establish validity of every cell/date or fill observation
+    gaps. [Resource reconciliation: bulk publication cadence] Nominal twice-yearly bulk-file refresh (Amadeus
+    data sources!K20), corroborated by the EPA AirData download page. P6M describes nominal publication
+    frequency, not exact release dates or daily observation support. EPA page sections differ on month
+    labels (June/December versus late May/November); use actual file modification metadata for availability.
+    Environmental Datasets!G2 describes the broader database update stream and is not the bulk-file schedule.'
+  update_cadence_iso: P6M
+- id: amadeus:product/aqs_daily_88502
+  name: aqs_daily_88502
+  label: AQS daily summaries — Acceptable PM2.5 AQI & Speciation Mass
+  data_source: amadeus:source/epa_aqs
+  data_genre:
+  - air_pollution
+  native_format: csv_station_observations
+  spatial_support_type: monitoring_station
+  spatial_extent_descriptor: United States and reporting jurisdictions; sparse monitoring sites, not continuous
+    coverage.
+  native_spatial_resolution_descriptor: Monitor-level summary; preserve state/county/site/parameter/POC
+    identity.
+  temporal_resolution: daily
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  day_boundary_convention: local_midnight
+  calendar: gregorian
+  access_url: https://aqs.epa.gov/aqsweb/airdata/
+  amadeus_dataset_name: aqs
+  amadeus_process_covariate: aqs
+  description: 'Bulk files daily_88502_YYYY.zip. Parameter 88502: Acceptable PM2.5 AQI & Speciation Mass.
+    The value field is Arithmetic Mean; Date Local uses local standard time. Preserve Sample Duration,
+    Pollutant Standard, Event Type, Method Code, POC, Observation Count, Datum and Date of Last Change
+    before selection. No single daily summary row is implicitly selected. Current process_aqs applies
+    duration/minimum-POC/event filters; it is not a lossless generic reader. AQS has no calculate_covariates
+    dispatch route. [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus
+    data sources!N20): No (point monitors). This statement does not establish validity of every cell/date
+    or fill observation gaps. [Resource reconciliation: bulk publication cadence] Nominal twice-yearly
+    bulk-file refresh (Amadeus data sources!K20), corroborated by the EPA AirData download page. P6M describes
+    nominal publication frequency, not exact release dates or daily observation support. EPA page sections
+    differ on month labels (June/December versus late May/November); use actual file modification metadata
+    for availability. Environmental Datasets!G2 describes the broader database update stream and is not
+    the bulk-file schedule.'
+  update_cadence_iso: P6M
+- id: amadeus:product/aqs_daily_81102
+  name: aqs_daily_81102
+  label: AQS daily summaries — PM10 Total 0-10um STP
+  data_source: amadeus:source/epa_aqs
+  data_genre:
+  - air_pollution
+  native_format: csv_station_observations
+  spatial_support_type: monitoring_station
+  spatial_extent_descriptor: United States and reporting jurisdictions; sparse monitoring sites, not continuous
+    coverage.
+  native_spatial_resolution_descriptor: Monitor-level summary; preserve state/county/site/parameter/POC
+    identity.
+  temporal_resolution: daily
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  day_boundary_convention: local_midnight
+  calendar: gregorian
+  access_url: https://aqs.epa.gov/aqsweb/airdata/
+  amadeus_dataset_name: aqs
+  amadeus_process_covariate: aqs
+  description: 'Bulk files daily_81102_YYYY.zip. Parameter 81102: PM10 Total 0-10um STP. The value field
+    is Arithmetic Mean; Date Local uses local standard time. Preserve Sample Duration, Pollutant Standard,
+    Event Type, Method Code, POC, Observation Count, Datum and Date of Last Change before selection. No
+    single daily summary row is implicitly selected. Current process_aqs applies duration/minimum-POC/event
+    filters; it is not a lossless generic reader. AQS has no calculate_covariates dispatch route. [Resource
+    reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N20): No
+    (point monitors). This statement does not establish validity of every cell/date or fill observation
+    gaps. [Resource reconciliation: bulk publication cadence] Nominal twice-yearly bulk-file refresh (Amadeus
+    data sources!K20), corroborated by the EPA AirData download page. P6M describes nominal publication
+    frequency, not exact release dates or daily observation support. EPA page sections differ on month
+    labels (June/December versus late May/November); use actual file modification metadata for availability.
+    Environmental Datasets!G2 describes the broader database update stream and is not the bulk-file schedule.'
+  update_cadence_iso: P6M
+- id: amadeus:product/aqs_daily_44201
+  name: aqs_daily_44201
+  label: AQS daily summaries — Ozone
+  data_source: amadeus:source/epa_aqs
+  data_genre:
+  - air_pollution
+  native_format: csv_station_observations
+  spatial_support_type: monitoring_station
+  spatial_extent_descriptor: United States and reporting jurisdictions; sparse monitoring sites, not continuous
+    coverage.
+  native_spatial_resolution_descriptor: Monitor-level summary; preserve state/county/site/parameter/POC
+    identity.
+  temporal_resolution: daily
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  day_boundary_convention: local_midnight
+  calendar: gregorian
+  access_url: https://aqs.epa.gov/aqsweb/airdata/
+  amadeus_dataset_name: aqs
+  amadeus_process_covariate: aqs
+  description: 'Bulk files daily_44201_YYYY.zip. Parameter 44201: Ozone. The value field is Arithmetic
+    Mean; Date Local uses local standard time. Preserve Sample Duration, Pollutant Standard, Event Type,
+    Method Code, POC, Observation Count, Datum and Date of Last Change before selection. No single daily
+    summary row is implicitly selected. Current process_aqs applies duration/minimum-POC/event filters;
+    it is not a lossless generic reader. AQS has no calculate_covariates dispatch route. [Resource reconciliation:
+    inventory completeness] Inventory coverage statement (Amadeus data sources!N20): No (point monitors).
+    This statement does not establish validity of every cell/date or fill observation gaps. [Resource
+    reconciliation: bulk publication cadence] Nominal twice-yearly bulk-file refresh (Amadeus data sources!K20),
+    corroborated by the EPA AirData download page. P6M describes nominal publication frequency, not exact
+    release dates or daily observation support. EPA page sections differ on month labels (June/December
+    versus late May/November); use actual file modification metadata for availability. Environmental Datasets!G2
+    describes the broader database update stream and is not the bulk-file schedule.'
+  update_cadence_iso: P6M
+- id: amadeus:product/aqs_daily_42602
+  name: aqs_daily_42602
+  label: AQS daily summaries — Nitrogen dioxide (NO2)
+  data_source: amadeus:source/epa_aqs
+  data_genre:
+  - air_pollution
+  native_format: csv_station_observations
+  spatial_support_type: monitoring_station
+  spatial_extent_descriptor: United States and reporting jurisdictions; sparse monitoring sites, not continuous
+    coverage.
+  native_spatial_resolution_descriptor: Monitor-level summary; preserve state/county/site/parameter/POC
+    identity.
+  temporal_resolution: daily
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  day_boundary_convention: local_midnight
+  calendar: gregorian
+  access_url: https://aqs.epa.gov/aqsweb/airdata/
+  amadeus_dataset_name: aqs
+  amadeus_process_covariate: aqs
+  description: 'Bulk files daily_42602_YYYY.zip. Parameter 42602: Nitrogen dioxide (NO2). The value field
+    is Arithmetic Mean; Date Local uses local standard time. Preserve Sample Duration, Pollutant Standard,
+    Event Type, Method Code, POC, Observation Count, Datum and Date of Last Change before selection. No
+    single daily summary row is implicitly selected. Current process_aqs applies duration/minimum-POC/event
+    filters; it is not a lossless generic reader. AQS has no calculate_covariates dispatch route. [Resource
+    reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N20): No
+    (point monitors). This statement does not establish validity of every cell/date or fill observation
+    gaps. [Resource reconciliation: bulk publication cadence] Nominal twice-yearly bulk-file refresh (Amadeus
+    data sources!K20), corroborated by the EPA AirData download page. P6M describes nominal publication
+    frequency, not exact release dates or daily observation support. EPA page sections differ on month
+    labels (June/December versus late May/November); use actual file modification metadata for availability.
+    Environmental Datasets!G2 describes the broader database update stream and is not the bulk-file schedule.'
+  update_cadence_iso: P6M
+- id: amadeus:product/aqs_daily_42401
+  name: aqs_daily_42401
+  label: AQS daily summaries — Sulfur dioxide
+  data_source: amadeus:source/epa_aqs
+  data_genre:
+  - air_pollution
+  native_format: csv_station_observations
+  spatial_support_type: monitoring_station
+  spatial_extent_descriptor: United States and reporting jurisdictions; sparse monitoring sites, not continuous
+    coverage.
+  native_spatial_resolution_descriptor: Monitor-level summary; preserve state/county/site/parameter/POC
+    identity.
+  temporal_resolution: daily
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  day_boundary_convention: local_midnight
+  calendar: gregorian
+  access_url: https://aqs.epa.gov/aqsweb/airdata/
+  amadeus_dataset_name: aqs
+  amadeus_process_covariate: aqs
+  description: 'Bulk files daily_42401_YYYY.zip. Parameter 42401: Sulfur dioxide. The value field is Arithmetic
+    Mean; Date Local uses local standard time. Preserve Sample Duration, Pollutant Standard, Event Type,
+    Method Code, POC, Observation Count, Datum and Date of Last Change before selection. No single daily
+    summary row is implicitly selected. Current process_aqs applies duration/minimum-POC/event filters;
+    it is not a lossless generic reader. AQS has no calculate_covariates dispatch route. [Resource reconciliation:
+    inventory completeness] Inventory coverage statement (Amadeus data sources!N20): No (point monitors).
+    This statement does not establish validity of every cell/date or fill observation gaps. [Resource
+    reconciliation: bulk publication cadence] Nominal twice-yearly bulk-file refresh (Amadeus data sources!K20),
+    corroborated by the EPA AirData download page. P6M describes nominal publication frequency, not exact
+    release dates or daily observation support. EPA page sections differ on month labels (June/December
+    versus late May/November); use actual file modification metadata for availability. Environmental Datasets!G2
+    describes the broader database update stream and is not the bulk-file schedule.'
+  update_cadence_iso: P6M
+- id: amadeus:product/aqs_daily_42101
+  name: aqs_daily_42101
+  label: AQS daily summaries — Carbon monoxide
+  data_source: amadeus:source/epa_aqs
+  data_genre:
+  - air_pollution
+  native_format: csv_station_observations
+  spatial_support_type: monitoring_station
+  spatial_extent_descriptor: United States and reporting jurisdictions; sparse monitoring sites, not continuous
+    coverage.
+  native_spatial_resolution_descriptor: Monitor-level summary; preserve state/county/site/parameter/POC
+    identity.
+  temporal_resolution: daily
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  day_boundary_convention: local_midnight
+  calendar: gregorian
+  access_url: https://aqs.epa.gov/aqsweb/airdata/
+  amadeus_dataset_name: aqs
+  amadeus_process_covariate: aqs
+  description: 'Bulk files daily_42101_YYYY.zip. Parameter 42101: Carbon monoxide. The value field is
+    Arithmetic Mean; Date Local uses local standard time. Preserve Sample Duration, Pollutant Standard,
+    Event Type, Method Code, POC, Observation Count, Datum and Date of Last Change before selection. No
+    single daily summary row is implicitly selected. Current process_aqs applies duration/minimum-POC/event
+    filters; it is not a lossless generic reader. AQS has no calculate_covariates dispatch route. [Resource
+    reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N20): No
+    (point monitors). This statement does not establish validity of every cell/date or fill observation
+    gaps. [Resource reconciliation: bulk publication cadence] Nominal twice-yearly bulk-file refresh (Amadeus
+    data sources!K20), corroborated by the EPA AirData download page. P6M describes nominal publication
+    frequency, not exact release dates or daily observation support. EPA page sections differ on month
+    labels (June/December versus late May/November); use actual file modification metadata for availability.
+    Environmental Datasets!G2 describes the broader database update stream and is not the bulk-file schedule.'
+  update_cadence_iso: P6M

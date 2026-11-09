@@ -1,0 +1,74 @@
+# Discovery projection of the corresponding dataset spec; identical stable IDs/metadata.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/climatology_lab_terraclimate
+  name: climatology_lab_terraclimate
+  label: Climatology Lab TerraClimate
+  producer_institution: Climatology Lab, University of California, Merced
+  homepage: https://www.climatologylab.org/terraclimate.html
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _terraclimate
+  description: 'Publishing programme distinct from gridMET. Current v1.1 uses ERA5 anomalies; legacy v1.0
+    used CRU/JRA-55. Do not mix versions. The workbook describes the older 1958-based record. Source catalog
+    and 2018-file global attributes confirm v1.1 and 1950-based coverage. Counterfactual and +2/+4 degree
+    pseudo-climates are excluded. [Resource reconciliation: inventory rights and history] Inventory usage/citation
+    statement (Amadeus data sources!I3): CC0 1.0 (public domain); cite Abatzoglou et al. (2018). Inventory
+    source status (H3): Active; this is not observation QA, API availability or verified support for every
+    product. Inventory first-release/history wording (J3): 2018. The 2018 methods citation describes the
+    original 1958-based release. Current provider catalog/global metadata confirm ERA5-driven v1.1 with
+    historical coverage from 1950. Original methods DOI is not a v1.1 dataset DOI.'
+  license_spdx: CC0-1.0
+  citation_apa: Abatzoglou, J. T., Dobrowski, S. Z., Parks, S. A., & Hegewisch, K. C. (2018). TerraClimate,
+    a high-resolution global dataset of monthly climate and climatic water balance from 1958–2015. Scientific
+    Data, 5, 170191. https://doi.org/10.1038/sdata.2017.191 Methods citation for the original release;
+    v1.1 methodology differs as documented by the provider.
+products:
+- id: amadeus:product/terraclimate_v1_1_monthly
+  name: terraclimate_v1_1_monthly
+  label: TerraClimate v1.1 monthly historical climate and water balance
+  data_source: amadeus:source/climatology_lab_terraclimate
+  data_genre:
+  - meteorology
+  - climate
+  - water
+  - drought
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: monthly
+  description: 'ERA5-driven historical reconstruction, not direct independent observations. Monthly mean
+    daily maxima/minima are not monthly absolute temperature extrema. Monthly accumulated depths remain
+    spatially intensive. Soil, SWE and PDSI are end-of-month states. Global rectangle includes masked
+    land/ocean cells. First model year may contain spin-up effects. Native 2018 headers inspected for
+    all fourteen fields; per-file revisions and future availability must be checked. Legacy downloader
+    URLs are mutable and do not prove delivery version; verify file version before use. [Resource reconciliation:
+    inventory completeness] Inventory coverage statement (Amadeus data sources!N3): Yes (global land).
+    This statement does not establish validity of every cell/date or fill observation gaps.'
+  product_version: '1.1'
+  grid_definition: amadeus:grid/terraclimate_global_1_24deg
+  crs: EPSG:4326
+  srid: 4326
+  native_spatial_resolution_descriptor: 1/24 degree; approximately 4 km, latitude dependent
+  spatial_extent_descriptor: Global terrestrial surfaces; grid envelope -180..180, -90..90
+  temporal_resolution_iso: P1M
+  temporal_alignment: start
+  calendar: gregorian
+  temporal_coverage_start: '1950-01-01'
+  update_cadence_iso: P1Y
+  access_url: https://thredds.northwestknowledge.net/thredds/catalog/TERRACLIMATE_ALL/data/catalog.html
+  amadeus_dataset_name: terraclimate
+  amadeus_process_covariate: terraclimate
+  amadeus_calculate_covariate: terraclimate
+grid_definitions:
+- id: amadeus:grid/terraclimate_global_1_24deg
+  name: terraclimate_global_1_24deg
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.041666666666666664
+  resolution_y: 0.041666666666666664
+  resolution_unit: deg
+  n_columns: 8640
+  n_rows: 4320
+  origin_x: -180.0
+  origin_y: 90.0

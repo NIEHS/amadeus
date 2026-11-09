@@ -1,0 +1,332 @@
+# Discovery projection of the corresponding dataset spec; identical stable IDs/metadata.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/nasa_modis
+  name: nasa_modis
+  label: NASA MODIS (Terra/Aqua)
+  producer_institution: NASA EOSDIS; LP DAAC and LAADS DAAC
+  homepage: https://modis.gsfc.nasa.gov/data/
+  access_protocol: https_bulk_file
+  requires_authentication: true
+  amadeus_function_suffix: _modis
+  description: 'Product-specific MODIS Collection 6.1 profiles. MOD prefix denotes Terra; MCD combines
+    Terra and Aqua. Public metadata is open; protected data downloads require Earthdata credentials. NASA
+    unrestricted use statement is not converted to an unsupported SPDX identifier. Cite each product DOI.
+    VIIRS products accepted by the same R adapter are outside this MODIS source. MOD13A2 is registered
+    using the multi_day enum extension and a verified inverse decoder; the legacy R processors retain
+    raw values by design. [Resource reconciliation: inventory rights and history] Inventory usage/citation
+    statement (Amadeus data sources!I8): No restrictions (NASA EOSDIS); cite product DOI; Earthdata login
+    required. Inventory source status (H8): Active (Terra/Aqua extended mission); this is not observation
+    QA, API availability or verified support for every product. Inventory first-release/history wording
+    (J8): 2000. 2000 is family history, not the start date of every MODIS product/version. Product dates
+    come from NASA CMR where available. DOI-specific citations are supplied on the actual product records,
+    not as a single family citation.'
+  auth_mechanism: NASA Earthdata Login / bearer token for protected data downloads; public metadata needs
+    no token
+products:
+- id: amadeus:product/mod11a1_061_1km
+  name: mod11a1_061_1km
+  label: MOD11A1.061 1km native delivery
+  data_source: amadeus:source/nasa_modis
+  data_genre:
+  - meteorology
+  - satellite
+  native_format: hdf4
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Native HDF-EOS Collection 6.1. Separate resolution groups reuse one DOI; they are profiles
+    of the same delivery, not new NASA products. Daily files retain observation times/orbits and are not
+    automatically daily means or complete cloud-free coverage. Tile origins depend on h/v; global array
+    dimensions are not copied from a sample tile. Header coordinate rounding differs by less than 0.0001
+    m across inspected collections. AMADEUS:100002 is an explicitly registered project-local CRS label
+    for the exact sphere/projection, not an EPSG code or database SRID. Only the stated bands are registered;
+    full native inventories remain in evidence. MOD11/MOD09 sample archive ranges are UTC-midnight to
+    23:59:59; this archive-day convention does not convert MOD11 local-solar viewing hours into UTC. MAIAC
+    preserves per-orbit acquisition intervals with observation-dependent support. The existing processor
+    defaults select science bands only; explicit custom_sel is required for the registered QA/ancillary
+    bands and resolution groups. NASA CMR collection identifier C1748058432-LPCLOUD; this is not a STAC
+    identifier. [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus
+    data sources!N8): Yes (global; cloud/swath gaps). This statement does not establish validity of every
+    cell/date or fill observation gaps.'
+  product_version: '061'
+  doi: 10.5067/MODIS/MOD11A1.061
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  calendar: gregorian
+  access_url: https://doi.org/10.5067/MODIS/MOD11A1.061
+  amadeus_dataset_name: modis
+  amadeus_process_covariate: modis_merge
+  grid_definition: amadeus:grid/modis_sinusoidal_1km
+  crs: AMADEUS:100002
+  day_boundary_convention: utc_midnight
+  spatial_extent_descriptor: Global MODIS tiled coverage; QA, clouds, land/ocean and retrieval masks apply
+  native_spatial_resolution_descriptor: Nominal 1km; exact sinusoidal spacing in GridDefinition
+  amadeus_calculate_covariate: modis
+  temporal_coverage_start: '2000-02-24'
+  citation_apa: Wan, Zhengming, Simon Hook, and Glynn Hulley. 2021. “MODIS/Terra Land Surface Temperature/Emissivity
+    Daily L3 Global 1km SIN Grid V061.” NASA EOSDIS Land Processes Distributed Active Archive Center.
+    https://doi.org/10.5067/MODIS/MOD11A1.061.
+- id: amadeus:product/mcd19a2_061_1km
+  name: mcd19a2_061_1km
+  label: MCD19A2.061 1km native delivery
+  data_source: amadeus:source/nasa_modis
+  data_genre:
+  - aerosols
+  - atmosphere
+  - satellite
+  native_format: hdf4
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Native HDF-EOS Collection 6.1. Separate resolution groups reuse one DOI; they are profiles
+    of the same delivery, not new NASA products. Daily files retain observation times/orbits and are not
+    automatically daily means or complete cloud-free coverage. Tile origins depend on h/v; global array
+    dimensions are not copied from a sample tile. Header coordinate rounding differs by less than 0.0001
+    m across inspected collections. AMADEUS:100002 is an explicitly registered project-local CRS label
+    for the exact sphere/projection, not an EPSG code or database SRID. Only the stated bands are registered;
+    full native inventories remain in evidence. MOD11/MOD09 sample archive ranges are UTC-midnight to
+    23:59:59; this archive-day convention does not convert MOD11 local-solar viewing hours into UTC. MAIAC
+    preserves per-orbit acquisition intervals with observation-dependent support. The existing processor
+    defaults select science bands only; explicit custom_sel is required for the registered QA/ancillary
+    bands and resolution groups. NASA CMR collection identifier C2324689816-LPCLOUD; this is not a STAC
+    identifier. [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus
+    data sources!N8): Yes (global; cloud/swath gaps). This statement does not establish validity of every
+    cell/date or fill observation gaps.'
+  product_version: '061'
+  doi: 10.5067/MODIS/MCD19A2.061
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  calendar: gregorian
+  access_url: https://doi.org/10.5067/MODIS/MCD19A2.061
+  amadeus_dataset_name: modis
+  amadeus_process_covariate: modis_merge
+  grid_definition: amadeus:grid/modis_sinusoidal_1km
+  crs: AMADEUS:100002
+  day_boundary_convention: observation_dependent
+  spatial_extent_descriptor: Global MODIS tiled coverage; QA, clouds, land/ocean and retrieval masks apply
+  native_spatial_resolution_descriptor: Nominal 1km; exact sinusoidal spacing in GridDefinition
+  amadeus_calculate_covariate: modis
+  temporal_coverage_start: '2000-02-24'
+  citation_apa: Lyapustin, Alexei, and Yujie Wang. 2022. “MODIS/Terra+Aqua Land Aerosol Optical Depth
+    Daily L2G Global 1km SIN Grid V061.” NASA EOSDIS Land Processes Distributed Active Archive Center.
+    https://doi.org/10.5067/MODIS/MCD19A2.061.
+- id: amadeus:product/mcd19a2_061_5km
+  name: mcd19a2_061_5km
+  label: MCD19A2.061 5km native delivery
+  data_source: amadeus:source/nasa_modis
+  data_genre:
+  - aerosols
+  - atmosphere
+  - satellite
+  native_format: hdf4
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Native HDF-EOS Collection 6.1. Separate resolution groups reuse one DOI; they are profiles
+    of the same delivery, not new NASA products. Daily files retain observation times/orbits and are not
+    automatically daily means or complete cloud-free coverage. Tile origins depend on h/v; global array
+    dimensions are not copied from a sample tile. Header coordinate rounding differs by less than 0.0001
+    m across inspected collections. AMADEUS:100002 is an explicitly registered project-local CRS label
+    for the exact sphere/projection, not an EPSG code or database SRID. Only the stated bands are registered;
+    full native inventories remain in evidence. MOD11/MOD09 sample archive ranges are UTC-midnight to
+    23:59:59; this archive-day convention does not convert MOD11 local-solar viewing hours into UTC. MAIAC
+    preserves per-orbit acquisition intervals with observation-dependent support. The existing processor
+    defaults select science bands only; explicit custom_sel is required for the registered QA/ancillary
+    bands and resolution groups. NASA CMR collection identifier C2324689816-LPCLOUD; this is not a STAC
+    identifier. [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus
+    data sources!N8): Yes (global; cloud/swath gaps). This statement does not establish validity of every
+    cell/date or fill observation gaps.'
+  product_version: '061'
+  doi: 10.5067/MODIS/MCD19A2.061
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  calendar: gregorian
+  access_url: https://doi.org/10.5067/MODIS/MCD19A2.061
+  amadeus_dataset_name: modis
+  amadeus_process_covariate: modis_merge
+  grid_definition: amadeus:grid/modis_sinusoidal_5km
+  crs: AMADEUS:100002
+  day_boundary_convention: observation_dependent
+  spatial_extent_descriptor: Global MODIS tiled coverage; QA, clouds, land/ocean and retrieval masks apply
+  native_spatial_resolution_descriptor: Nominal 5km; exact sinusoidal spacing in GridDefinition
+  amadeus_calculate_covariate: modis
+  temporal_coverage_start: '2000-02-24'
+  citation_apa: Lyapustin, Alexei, and Yujie Wang. 2022. “MODIS/Terra+Aqua Land Aerosol Optical Depth
+    Daily L2G Global 1km SIN Grid V061.” NASA EOSDIS Land Processes Distributed Active Archive Center.
+    https://doi.org/10.5067/MODIS/MCD19A2.061.
+- id: amadeus:product/mod09ga_061_1km
+  name: mod09ga_061_1km
+  label: MOD09GA.061 1km native delivery
+  data_source: amadeus:source/nasa_modis
+  data_genre:
+  - land_use
+  - satellite
+  native_format: hdf4
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Native HDF-EOS Collection 6.1. Separate resolution groups reuse one DOI; they are profiles
+    of the same delivery, not new NASA products. Daily files retain observation times/orbits and are not
+    automatically daily means or complete cloud-free coverage. Tile origins depend on h/v; global array
+    dimensions are not copied from a sample tile. Header coordinate rounding differs by less than 0.0001
+    m across inspected collections. AMADEUS:100002 is an explicitly registered project-local CRS label
+    for the exact sphere/projection, not an EPSG code or database SRID. Only the stated bands are registered;
+    full native inventories remain in evidence. MOD11/MOD09 sample archive ranges are UTC-midnight to
+    23:59:59; this archive-day convention does not convert MOD11 local-solar viewing hours into UTC. MAIAC
+    preserves per-orbit acquisition intervals with observation-dependent support. The existing processor
+    defaults select science bands only; explicit custom_sel is required for the registered QA/ancillary
+    bands and resolution groups. NASA CMR collection identifier C2202497474-LPCLOUD; this is not a STAC
+    identifier. [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus
+    data sources!N8): Yes (global; cloud/swath gaps). This statement does not establish validity of every
+    cell/date or fill observation gaps.'
+  product_version: '061'
+  doi: 10.5067/MODIS/MOD09GA.061
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  calendar: gregorian
+  access_url: https://doi.org/10.5067/MODIS/MOD09GA.061
+  amadeus_dataset_name: modis
+  amadeus_process_covariate: modis_merge
+  grid_definition: amadeus:grid/modis_sinusoidal_1km
+  crs: AMADEUS:100002
+  day_boundary_convention: utc_midnight
+  spatial_extent_descriptor: Global MODIS tiled coverage; QA, clouds, land/ocean and retrieval masks apply
+  native_spatial_resolution_descriptor: Nominal 1km; exact sinusoidal spacing in GridDefinition
+  amadeus_calculate_covariate: modis
+  temporal_coverage_start: '2000-02-24'
+  citation_apa: Vermote, Eric, and Robert Wolfe. 2021. “MODIS/Terra Surface Reflectance Daily L2G Global
+    1km and 500m SIN Grid V061.” NASA EOSDIS Land Processes Distributed Active Archive Center. https://doi.org/10.5067/MODIS/MOD09GA.061.
+- id: amadeus:product/mod09ga_061_500m
+  name: mod09ga_061_500m
+  label: MOD09GA.061 500m native delivery
+  data_source: amadeus:source/nasa_modis
+  data_genre:
+  - land_use
+  - satellite
+  native_format: hdf4
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: daily
+  description: 'Native HDF-EOS Collection 6.1. Separate resolution groups reuse one DOI; they are profiles
+    of the same delivery, not new NASA products. Daily files retain observation times/orbits and are not
+    automatically daily means or complete cloud-free coverage. Tile origins depend on h/v; global array
+    dimensions are not copied from a sample tile. Header coordinate rounding differs by less than 0.0001
+    m across inspected collections. AMADEUS:100002 is an explicitly registered project-local CRS label
+    for the exact sphere/projection, not an EPSG code or database SRID. Only the stated bands are registered;
+    full native inventories remain in evidence. MOD11/MOD09 sample archive ranges are UTC-midnight to
+    23:59:59; this archive-day convention does not convert MOD11 local-solar viewing hours into UTC. MAIAC
+    preserves per-orbit acquisition intervals with observation-dependent support. The existing processor
+    defaults select science bands only; explicit custom_sel is required for the registered QA/ancillary
+    bands and resolution groups. NASA CMR collection identifier C2202497474-LPCLOUD; this is not a STAC
+    identifier. [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus
+    data sources!N8): Yes (global; cloud/swath gaps). This statement does not establish validity of every
+    cell/date or fill observation gaps.'
+  product_version: '061'
+  doi: 10.5067/MODIS/MOD09GA.061
+  temporal_resolution_iso: P1D
+  temporal_alignment: interval
+  calendar: gregorian
+  access_url: https://doi.org/10.5067/MODIS/MOD09GA.061
+  amadeus_dataset_name: modis
+  amadeus_process_covariate: modis_merge
+  grid_definition: amadeus:grid/modis_sinusoidal_500m
+  crs: AMADEUS:100002
+  day_boundary_convention: utc_midnight
+  spatial_extent_descriptor: Global MODIS tiled coverage; QA, clouds, land/ocean and retrieval masks apply
+  native_spatial_resolution_descriptor: Nominal 500m; exact sinusoidal spacing in GridDefinition
+  amadeus_calculate_covariate: modis
+  temporal_coverage_start: '2000-02-24'
+  citation_apa: Vermote, Eric, and Robert Wolfe. 2021. “MODIS/Terra Surface Reflectance Daily L2G Global
+    1km and 500m SIN Grid V061.” NASA EOSDIS Land Processes Distributed Active Archive Center. https://doi.org/10.5067/MODIS/MOD09GA.061.
+- id: amadeus:product/mod06_l2_061_swath5km
+  name: mod06_l2_061_swath5km
+  label: MOD06_L2.061 swath5km native delivery
+  data_source: amadeus:source/nasa_modis
+  data_genre:
+  - atmosphere
+  - satellite
+  native_format: hdf4
+  spatial_support_type: other
+  temporal_resolution: subhourly
+  description: 'Native HDF-EOS Collection 6.1. Separate resolution groups reuse one DOI; they are profiles
+    of the same delivery, not new NASA products. Daily files retain observation times/orbits and are not
+    automatically daily means or complete cloud-free coverage. Tile origins depend on h/v; global array
+    dimensions are not copied from a sample tile. Header coordinate rounding differs by less than 0.0001
+    m across inspected collections. AMADEUS:100002 is an explicitly registered project-local CRS label
+    for the exact sphere/projection, not an EPSG code or database SRID. Only the stated bands are registered;
+    full native inventories remain in evidence. MOD06 is an irregular geolocated swath; existing support=other
+    is deliberate. No affine GridDefinition or fixed CRS/SRID is asserted. Use per-pixel geolocation.
+    Five-minute granule duration is not a daily averaging window. Scope: five 5-km cloud-top/fraction/phase
+    bands, not every swath retrieval. [Resource reconciliation: inventory completeness] Inventory coverage
+    statement (Amadeus data sources!N8): Yes (global; cloud/swath gaps). This statement does not establish
+    validity of every cell/date or fill observation gaps.'
+  product_version: '061'
+  doi: 10.5067/MODIS/MOD06_L2.061
+  temporal_resolution_iso: PT5M
+  temporal_alignment: interval
+  calendar: gregorian
+  access_url: https://doi.org/10.5067/MODIS/MOD06_L2.061
+  amadeus_dataset_name: modis
+  amadeus_process_covariate: modis_swath
+  native_spatial_resolution_descriptor: Nominal 5 km retrieval region; variable swath footprint, use geolocation
+    arrays
+  spatial_extent_descriptor: Global orbital sampling; each granule covers a swath, not the whole globe
+  citation_apa: MODIS Atmosphere Science Team. 2017. “MODIS/Terra Clouds 5-Min L2 Swath 1km and 5km.”
+    NASA Level 1; Atmosphere Archive; Distribution System Distributed Active Archive Center. https://doi.org/10.5067/MODIS/MOD06_L2.061.
+- id: amadeus:product/mod13a2_061_1km
+  name: mod13a2_061_1km
+  label: MOD13A2.061 vegetation indices 16-day 1km
+  data_source: amadeus:source/nasa_modis
+  data_genre:
+  - land_use
+  - satellite
+  native_format: hdf4
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_day
+  description: 'Collection 6.1 nominal 16-day composite, not a mean of 16 daily index values. NASA MOD13
+    guide section 6/Table 8 supplies decoder multipliers. Native HDF scale_factor is its reciprocal for
+    VI/reflectance/angles; preserve the attribute and divide. Read actual RANGEBEGINNING/ENDINGDATE/TIME
+    from every granule, including year-end cycles; never synthesize all bounds from P16D. Composite day
+    of year is a selected-pixel acquisition-day label, not Julian calendar time. Default R selection loads
+    NDVI only and returns raw values; explicitly select other bands and decode once before physical calculations.
+    QA policies require an explicit analysis choice; category/QA values are never averaged. [Resource
+    reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N8): Yes
+    (global; cloud/swath gaps). This statement does not establish validity of every cell/date or fill
+    observation gaps.'
+  product_version: '061'
+  grid_definition: amadeus:grid/modis_sinusoidal_1km
+  crs: AMADEUS:100002
+  native_spatial_resolution_descriptor: Nominal 1 km; native spherical sinusoidal grid
+  spatial_extent_descriptor: Global tiled land coverage; cloud, snow and retrieval QA apply
+  temporal_resolution_iso: P16D
+  temporal_alignment: interval
+  calendar: gregorian
+  temporal_coverage_start: '2000-02-18'
+  doi: 10.5067/MODIS/MOD13A2.061
+  access_url: https://doi.org/10.5067/MODIS/MOD13A2.061
+  amadeus_dataset_name: modis
+  amadeus_process_covariate: modis_merge
+  amadeus_calculate_covariate: modis
+  citation_apa: Didan, Kamel. 2021. “MODIS/Terra Vegetation Indices 16-Day L3 Global 1km SIN Grid V061.”
+    NASA EOSDIS Land Processes Distributed Active Archive Center. https://doi.org/10.5067/MODIS/MOD13A2.061.
+grid_definitions:
+- id: amadeus:grid/modis_sinusoidal_500m
+  name: modis_sinusoidal_500m
+  crs: AMADEUS:100002
+  grid_mapping_name: sinusoidal
+  proj_string: +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs
+  resolution_x: 463.3127165279169
+  resolution_y: 463.3127165279169
+  resolution_unit: m
+- id: amadeus:grid/modis_sinusoidal_1km
+  name: modis_sinusoidal_1km
+  crs: AMADEUS:100002
+  grid_mapping_name: sinusoidal
+  proj_string: +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs
+  resolution_x: 926.6254330558338
+  resolution_y: 926.6254330558338
+  resolution_unit: m
+- id: amadeus:grid/modis_sinusoidal_5km
+  name: modis_sinusoidal_5km
+  crs: AMADEUS:100002
+  grid_mapping_name: sinusoidal
+  proj_string: +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +R=6371007.181 +units=m +no_defs
+  resolution_x: 4633.127165279169
+  resolution_y: 4633.127165279169
+  resolution_unit: m

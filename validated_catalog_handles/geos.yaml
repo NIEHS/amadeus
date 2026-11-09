@@ -1,0 +1,332 @@
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/nasa_gmao_geos_cf_v1
+  name: nasa_gmao_geos_cf_v1
+  label: NASA GEOS-CF v1 replay
+  producer_institution: NASA Global Modeling and Assimilation Office
+  homepage: https://gmao.gsfc.nasa.gov/gmao-products/geos-cf/
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _geos
+  description: 'NASA GEOS-CF v1 replay/constituent simulation, distinct from GEOS-FP, v2 and forecasts.
+    The selected NCCS /v1/ana/ HTTPS route is public: six original GEOS-CF.v01.rpl files were inspected
+    without credentials on 2026-11-09. This is endpoint-specific evidence, not a claim about all NASA
+    services. The current download_geos R adapter separately requires an Earthdata token; it was not changed.
+    The workbook Amadeus data sources!I13 says Earthdata login required; that does not describe access
+    to these tested public URLs. The schema slot description also generalizes GEOS authentication; the
+    boolean here describes the selected provider route. Inventory H13 Active is source status, J13 2018
+    is history, N13 global is coverage context; none establishes per-file availability or validity. Cite
+    Keller et al. (2021), methods DOI 10.1029/2020MS002413, not a collection DOI. See geos_review_20261109/README.md
+    for evidence and outstanding datum/ETH/TH questions. No verified archive end date is asserted.'
+  citation_apa: Keller et al. (2021). Description of the NASA GEOS Composition Forecast Modeling System
+    GEOS-CF v1.0. https://doi.org/10.1029/2020MS002413. Methods citation, not a collection-specific data
+    DOI.
+products:
+- id: amadeus:product/aqc_tavg_1hr_g1440x721_v1
+  name: aqc_tavg_1hr_g1440x721_v1
+  label: GEOS-CF v1 replay aqc_tavg_1hr_g1440x721_v1
+  data_source: amadeus:source/nasa_gmao_geos_cf_v1
+  data_genre:
+  - atmosphere
+  - meteorology
+  - air_pollution
+  - aerosols
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: hourly
+  description: 'Pinned original GEOS-CF v01 replay collection, NASA Office Note 17 v1.3 (2022), section
+    6. All registered fields verified in GEOS-CF.v01.rpl.aqc_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+    on 2026-11-09. Native timestamp 2018-01-01 00:30:00 represents the 00:00–01:00 hourly average, corroborated
+    by native global RangeBeginning/Ending attributes. No explicit CF time bounds, calendar, or science
+    cell_methods attribute occurs in this sample; global range metadata are separate evidence, not fabricated
+    CF bounds. Read each delivered file time, dimensions, fill and packing attributes; this one-granule
+    check does not establish archive-wide coverage or invariance. Coordinates have 1440 longitudes (-180
+    to 179.75) and 721 latitudes (-90 to 90), both 0.25 degree spacing. The sample supplies no grid_mapping
+    or explicit datum/earth radius; AMADEUS:100004 remains unresolved and geometry ingestion/transformation
+    must fail closed. Model layer 72 is the lowest model layer, not a fixed measurement height. p23 has
+    23 native hPa levels; PS/SLP retain their actual 2-D spatial dimensions. XGC has no lev coordinate.
+    Dry-air mole fraction, aerosol schemes, columns and deposition bases remain distinct. ETH and TH remain
+    separate unresolved identities. No v2 or forecast substitution, forecast-reference-time assumption,
+    physical valid range, or archive end date is added. Evidence and further actions: geos_review_20261109/README.md.'
+  product_version: GEOS-CF v1.0; file specification v1.3 (2022)
+  grid_definition: amadeus:grid/geos_cf_v1_025_hybrid_model_layer_index
+  crs: AMADEUS:100004
+  temporal_resolution_iso: PT1H
+  native_spatial_resolution_descriptor: 0.25 degree longitude × 0.25 degree latitude; 1440 × 721 coordinate
+    points
+  spatial_extent_descriptor: Global model grid; per-variable masks and pressure-level below-ground fill
+    apply
+  access_url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/
+  citation_apa: Keller et al. (2021). Description of the NASA GEOS Composition Forecast Modeling System
+    GEOS-CF v1.0. https://doi.org/10.1029/2020MS002413. Methods citation, not a collection-specific data
+    DOI.
+  amadeus_dataset_name: geos
+  amadeus_process_covariate: geos
+  amadeus_calculate_covariate: geos
+  temporal_alignment: center
+- id: amadeus:product/chm_tavg_1hr_g1440x721_v1
+  name: chm_tavg_1hr_g1440x721_v1
+  label: GEOS-CF v1 replay chm_tavg_1hr_g1440x721_v1
+  data_source: amadeus:source/nasa_gmao_geos_cf_v1
+  data_genre:
+  - atmosphere
+  - meteorology
+  - air_pollution
+  - aerosols
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: hourly
+  description: 'Pinned original GEOS-CF v01 replay collection, NASA Office Note 17 v1.3 (2022), section
+    6. All registered fields verified in GEOS-CF.v01.rpl.chm_tavg_1hr_g1440x721_v1.20180101_0030z.nc4
+    on 2026-11-09. Native timestamp 2018-01-01 00:30:00 represents the 00:00–01:00 hourly average, corroborated
+    by native global RangeBeginning/Ending attributes. No explicit CF time bounds, calendar, or science
+    cell_methods attribute occurs in this sample; global range metadata are separate evidence, not fabricated
+    CF bounds. Read each delivered file time, dimensions, fill and packing attributes; this one-granule
+    check does not establish archive-wide coverage or invariance. Coordinates have 1440 longitudes (-180
+    to 179.75) and 721 latitudes (-90 to 90), both 0.25 degree spacing. The sample supplies no grid_mapping
+    or explicit datum/earth radius; AMADEUS:100004 remains unresolved and geometry ingestion/transformation
+    must fail closed. Model layer 72 is the lowest model layer, not a fixed measurement height. p23 has
+    23 native hPa levels; PS/SLP retain their actual 2-D spatial dimensions. XGC has no lev coordinate.
+    Dry-air mole fraction, aerosol schemes, columns and deposition bases remain distinct. ETH and TH remain
+    separate unresolved identities. No v2 or forecast substitution, forecast-reference-time assumption,
+    physical valid range, or archive end date is added. Evidence and further actions: geos_review_20261109/README.md.'
+  product_version: GEOS-CF v1.0; file specification v1.3 (2022)
+  grid_definition: amadeus:grid/geos_cf_v1_025_hybrid_model_layer_index
+  crs: AMADEUS:100004
+  temporal_resolution_iso: PT1H
+  native_spatial_resolution_descriptor: 0.25 degree longitude × 0.25 degree latitude; 1440 × 721 coordinate
+    points
+  spatial_extent_descriptor: Global model grid; per-variable masks and pressure-level below-ground fill
+    apply
+  access_url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/
+  citation_apa: Keller et al. (2021). Description of the NASA GEOS Composition Forecast Modeling System
+    GEOS-CF v1.0. https://doi.org/10.1029/2020MS002413. Methods citation, not a collection-specific data
+    DOI.
+  amadeus_dataset_name: geos
+  amadeus_process_covariate: geos
+  amadeus_calculate_covariate: geos
+  temporal_alignment: center
+- id: amadeus:product/met_tavg_1hr_g1440x721_x1
+  name: met_tavg_1hr_g1440x721_x1
+  label: GEOS-CF v1 replay met_tavg_1hr_g1440x721_x1
+  data_source: amadeus:source/nasa_gmao_geos_cf_v1
+  data_genre:
+  - atmosphere
+  - meteorology
+  - air_pollution
+  - aerosols
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: hourly
+  description: 'Pinned original GEOS-CF v01 replay collection, NASA Office Note 17 v1.3 (2022), section
+    6. All registered fields verified in GEOS-CF.v01.rpl.met_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+    on 2026-11-09. Native timestamp 2018-01-01 00:30:00 represents the 00:00–01:00 hourly average, corroborated
+    by native global RangeBeginning/Ending attributes. No explicit CF time bounds, calendar, or science
+    cell_methods attribute occurs in this sample; global range metadata are separate evidence, not fabricated
+    CF bounds. Read each delivered file time, dimensions, fill and packing attributes; this one-granule
+    check does not establish archive-wide coverage or invariance. Coordinates have 1440 longitudes (-180
+    to 179.75) and 721 latitudes (-90 to 90), both 0.25 degree spacing. The sample supplies no grid_mapping
+    or explicit datum/earth radius; AMADEUS:100004 remains unresolved and geometry ingestion/transformation
+    must fail closed. Model layer 72 is the lowest model layer, not a fixed measurement height. p23 has
+    23 native hPa levels; PS/SLP retain their actual 2-D spatial dimensions. XGC has no lev coordinate.
+    Dry-air mole fraction, aerosol schemes, columns and deposition bases remain distinct. ETH and TH remain
+    separate unresolved identities. No v2 or forecast substitution, forecast-reference-time assumption,
+    physical valid range, or archive end date is added. Evidence and further actions: geos_review_20261109/README.md.'
+  product_version: GEOS-CF v1.0; file specification v1.3 (2022)
+  grid_definition: amadeus:grid/geos_cf_v1_025_hybrid_model_layer_index
+  crs: AMADEUS:100004
+  temporal_resolution_iso: PT1H
+  native_spatial_resolution_descriptor: 0.25 degree longitude × 0.25 degree latitude; 1440 × 721 coordinate
+    points
+  spatial_extent_descriptor: Global model grid; per-variable masks and pressure-level below-ground fill
+    apply
+  access_url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/
+  citation_apa: Keller et al. (2021). Description of the NASA GEOS Composition Forecast Modeling System
+    GEOS-CF v1.0. https://doi.org/10.1029/2020MS002413. Methods citation, not a collection-specific data
+    DOI.
+  amadeus_dataset_name: geos
+  amadeus_process_covariate: geos
+  amadeus_calculate_covariate: geos
+  temporal_alignment: center
+- id: amadeus:product/xgc_tavg_1hr_g1440x721_x1
+  name: xgc_tavg_1hr_g1440x721_x1
+  label: GEOS-CF v1 replay xgc_tavg_1hr_g1440x721_x1
+  data_source: amadeus:source/nasa_gmao_geos_cf_v1
+  data_genre:
+  - atmosphere
+  - meteorology
+  - air_pollution
+  - aerosols
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: hourly
+  description: 'Pinned original GEOS-CF v01 replay collection, NASA Office Note 17 v1.3 (2022), section
+    6. All registered fields verified in GEOS-CF.v01.rpl.xgc_tavg_1hr_g1440x721_x1.20180101_0030z.nc4
+    on 2026-11-09. Native timestamp 2018-01-01 00:30:00 represents the 00:00–01:00 hourly average, corroborated
+    by native global RangeBeginning/Ending attributes. No explicit CF time bounds, calendar, or science
+    cell_methods attribute occurs in this sample; global range metadata are separate evidence, not fabricated
+    CF bounds. Read each delivered file time, dimensions, fill and packing attributes; this one-granule
+    check does not establish archive-wide coverage or invariance. Coordinates have 1440 longitudes (-180
+    to 179.75) and 721 latitudes (-90 to 90), both 0.25 degree spacing. The sample supplies no grid_mapping
+    or explicit datum/earth radius; AMADEUS:100004 remains unresolved and geometry ingestion/transformation
+    must fail closed. Model layer 72 is the lowest model layer, not a fixed measurement height. p23 has
+    23 native hPa levels; PS/SLP retain their actual 2-D spatial dimensions. XGC has no lev coordinate.
+    Dry-air mole fraction, aerosol schemes, columns and deposition bases remain distinct. ETH and TH remain
+    separate unresolved identities. No v2 or forecast substitution, forecast-reference-time assumption,
+    physical valid range, or archive end date is added. Evidence and further actions: geos_review_20261109/README.md.'
+  product_version: GEOS-CF v1.0; file specification v1.3 (2022)
+  grid_definition: amadeus:grid/geos_cf_v1_025_surface_fields
+  crs: AMADEUS:100004
+  temporal_resolution_iso: PT1H
+  native_spatial_resolution_descriptor: 0.25 degree longitude × 0.25 degree latitude; 1440 × 721 coordinate
+    points
+  spatial_extent_descriptor: Global model grid; per-variable masks and pressure-level below-ground fill
+    apply
+  access_url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/
+  citation_apa: Keller et al. (2021). Description of the NASA GEOS Composition Forecast Modeling System
+    GEOS-CF v1.0. https://doi.org/10.1029/2020MS002413. Methods citation, not a collection-specific data
+    DOI.
+  amadeus_dataset_name: geos
+  amadeus_process_covariate: geos
+  amadeus_calculate_covariate: geos
+  temporal_alignment: center
+- id: amadeus:product/chm_inst_1hr_g1440x721_p23
+  name: chm_inst_1hr_g1440x721_p23
+  label: GEOS-CF v1 replay chm_inst_1hr_g1440x721_p23
+  data_source: amadeus:source/nasa_gmao_geos_cf_v1
+  data_genre:
+  - atmosphere
+  - meteorology
+  - air_pollution
+  - aerosols
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: instantaneous
+  description: 'Pinned original GEOS-CF v01 replay collection, NASA Office Note 17 v1.3 (2022), section
+    6. All registered fields verified in GEOS-CF.v01.rpl.chm_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+    on 2026-11-09. Instantaneous sample at 2018-01-01 00:00:00; native global range start equals end.
+    No explicit CF time bounds, calendar, or science cell_methods attribute occurs in this sample; global
+    range metadata are separate evidence, not fabricated CF bounds. Read each delivered file time, dimensions,
+    fill and packing attributes; this one-granule check does not establish archive-wide coverage or invariance.
+    Coordinates have 1440 longitudes (-180 to 179.75) and 721 latitudes (-90 to 90), both 0.25 degree
+    spacing. The sample supplies no grid_mapping or explicit datum/earth radius; AMADEUS:100004 remains
+    unresolved and geometry ingestion/transformation must fail closed. Model layer 72 is the lowest model
+    layer, not a fixed measurement height. p23 has 23 native hPa levels; PS/SLP retain their actual 2-D
+    spatial dimensions. XGC has no lev coordinate. Dry-air mole fraction, aerosol schemes, columns and
+    deposition bases remain distinct. ETH and TH remain separate unresolved identities. No v2 or forecast
+    substitution, forecast-reference-time assumption, physical valid range, or archive end date is added.
+    Evidence and further actions: geos_review_20261109/README.md.'
+  product_version: GEOS-CF v1.0; file specification v1.3 (2022)
+  grid_definition: amadeus:grid/geos_cf_v1_025_isobaric_pressure_hPa
+  crs: AMADEUS:100004
+  temporal_resolution_iso: PT1H
+  native_spatial_resolution_descriptor: 0.25 degree longitude × 0.25 degree latitude; 1440 × 721 coordinate
+    points
+  spatial_extent_descriptor: Global model grid; per-variable masks and pressure-level below-ground fill
+    apply
+  access_url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/
+  citation_apa: Keller et al. (2021). Description of the NASA GEOS Composition Forecast Modeling System
+    GEOS-CF v1.0. https://doi.org/10.1029/2020MS002413. Methods citation, not a collection-specific data
+    DOI.
+  amadeus_dataset_name: geos
+  amadeus_process_covariate: geos
+  amadeus_calculate_covariate: geos
+- id: amadeus:product/met_inst_1hr_g1440x721_p23
+  name: met_inst_1hr_g1440x721_p23
+  label: GEOS-CF v1 replay met_inst_1hr_g1440x721_p23
+  data_source: amadeus:source/nasa_gmao_geos_cf_v1
+  data_genre:
+  - atmosphere
+  - meteorology
+  - air_pollution
+  - aerosols
+  native_format: netcdf4_cf
+  spatial_support_type: model_grid_cell
+  temporal_resolution: instantaneous
+  description: 'Pinned original GEOS-CF v01 replay collection, NASA Office Note 17 v1.3 (2022), section
+    6. All registered fields verified in GEOS-CF.v01.rpl.met_inst_1hr_g1440x721_p23.20180101_0000z.nc4
+    on 2026-11-09. Instantaneous sample at 2018-01-01 00:00:00; native global range start equals end.
+    No explicit CF time bounds, calendar, or science cell_methods attribute occurs in this sample; global
+    range metadata are separate evidence, not fabricated CF bounds. Read each delivered file time, dimensions,
+    fill and packing attributes; this one-granule check does not establish archive-wide coverage or invariance.
+    Coordinates have 1440 longitudes (-180 to 179.75) and 721 latitudes (-90 to 90), both 0.25 degree
+    spacing. The sample supplies no grid_mapping or explicit datum/earth radius; AMADEUS:100004 remains
+    unresolved and geometry ingestion/transformation must fail closed. Model layer 72 is the lowest model
+    layer, not a fixed measurement height. p23 has 23 native hPa levels; PS/SLP retain their actual 2-D
+    spatial dimensions. XGC has no lev coordinate. Dry-air mole fraction, aerosol schemes, columns and
+    deposition bases remain distinct. ETH and TH remain separate unresolved identities. No v2 or forecast
+    substitution, forecast-reference-time assumption, physical valid range, or archive end date is added.
+    Evidence and further actions: geos_review_20261109/README.md.'
+  product_version: GEOS-CF v1.0; file specification v1.3 (2022)
+  grid_definition: amadeus:grid/geos_cf_v1_025_isobaric_pressure_hPa
+  crs: AMADEUS:100004
+  temporal_resolution_iso: PT1H
+  native_spatial_resolution_descriptor: 0.25 degree longitude × 0.25 degree latitude; 1440 × 721 coordinate
+    points
+  spatial_extent_descriptor: Global model grid; per-variable masks and pressure-level below-ground fill
+    apply
+  access_url: https://portal.nccs.nasa.gov/datashare/gmao/geos-cf/v1/ana/
+  citation_apa: Keller et al. (2021). Description of the NASA GEOS Composition Forecast Modeling System
+    GEOS-CF v1.0. https://doi.org/10.1029/2020MS002413. Methods citation, not a collection-specific data
+    DOI.
+  amadeus_dataset_name: geos
+  amadeus_process_covariate: geos
+  amadeus_calculate_covariate: geos
+grid_definitions:
+- id: amadeus:grid/geos_cf_v1_025_hybrid_model_layer_index
+  name: geos_cf_v1_025_hybrid_model_layer_index
+  crs: AMADEUS:100004
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.25
+  resolution_y: 0.25
+  resolution_unit: deg
+  n_columns: 1440
+  n_rows: 721
+  vertical_level_type: hybrid_model_layer_index
+  vertical_level_unit: '1'
+  vertical_levels:
+  - 72
+- id: amadeus:grid/geos_cf_v1_025_surface_fields
+  name: geos_cf_v1_025_surface_fields
+  crs: AMADEUS:100004
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.25
+  resolution_y: 0.25
+  resolution_unit: deg
+  n_columns: 1440
+  n_rows: 721
+- id: amadeus:grid/geos_cf_v1_025_isobaric_pressure_hPa
+  name: geos_cf_v1_025_isobaric_pressure_hPa
+  crs: AMADEUS:100004
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.25
+  resolution_y: 0.25
+  resolution_unit: deg
+  n_columns: 1440
+  n_rows: 721
+  vertical_level_type: isobaric_pressure_hPa
+  vertical_level_unit: hPa
+  vertical_levels:
+  - 1000
+  - 975
+  - 950
+  - 925
+  - 900
+  - 850
+  - 800
+  - 750
+  - 700
+  - 650
+  - 600
+  - 550
+  - 500
+  - 450
+  - 400
+  - 350
+  - 300
+  - 250
+  - 200
+  - 150
+  - 100
+  - 50
+  - 10

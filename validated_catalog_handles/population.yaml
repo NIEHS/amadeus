@@ -1,0 +1,249 @@
+# Discovery projection of the corresponding dataset spec; identical stable IDs/metadata.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/ciesin_gpwv4_unwpp_adjusted_density
+  name: ciesin_gpwv4_unwpp_adjusted_density
+  label: SEDAC GPWv4 UN WPP-adjusted population density
+  producer_institution: CIESIN, Columbia University; NASA SEDAC
+  homepage: https://doi.org/10.7927/H4F47M65
+  access_protocol: https_bulk_file
+  requires_authentication: true
+  amadeus_function_suffix: _population
+  description: 'GPWv4 Revision 11 population density adjusted to 2015 UN WPP country totals. Not unadjusted
+    density DOI H49C6VHW, not population count, not WorldPop. CMR abstract contains 2011, whereas its
+    five explicit epoch timestamps include 2010; the timestamp list and workbook agree on 2000/2005/2010/2015/2020.
+    [Resource reconciliation: inventory rights and history] Inventory usage/citation statement (Amadeus
+    data sources!I10): CC BY 4.0; cite CIESIN (2018); Earthdata login required. Inventory source status
+    (H10): Static (final GPWv4 release); this is not observation QA, API availability or verified support
+    for every product. Inventory first-release/history wording (J10): 2018. The adapter uses UN WPP-adjusted
+    density DOI H4F47M65. The unadjusted H49C6VHW bibliography/ASP row is not its citation. Five named
+    epochs are not annual observations. The CMR abstract 2011 typo is overridden by its explicit 2010
+    epoch timestamp.'
+  license_spdx: CC-BY-4.0
+  auth_mechanism: NASA Earthdata Login / bearer token for protected data downloads; public metadata needs
+    no token
+  citation_apa: 'Center for International Earth Science Information Network - CIESIN - Columbia University
+    (2018). Gridded Population of the World, Version 4 (GPWv4): Population Density Adjusted to Match 2015
+    Revision UN WPP Country Totals, Revision 11. https://doi.org/10.7927/H4F47M65'
+products:
+- id: amadeus:product/gpwv4_unwpp2015_density_r11_30_sec
+  name: gpwv4_unwpp2015_density_r11_30_sec
+  label: GPWv4 Revision 11 UN-adjusted density 30_sec
+  data_source: amadeus:source/ciesin_gpwv4_unwpp_adjusted_density
+  data_genre:
+  - population
+  native_format: geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_year_epoch
+  description: 'Five modelled mid-year epochs: 2000-07-01, 2005-07-01, 2010-07-01, 2015-07-01, 2020-07-01.
+    P5Y describes spacing between these named epochs, not continuous annual observations or an update
+    schedule. Coarser densities are derived from aggregated counts and land areas; do not obtain them
+    with an unweighted average of fine-cell densities. This profile is GeoTIFF; ASCII is an alternative
+    delivery. Adapter year=all requests netCDF, whose process branch remains unimplemented; this profile
+    does not certify that route. Fixture establishes only a rewritten 2020 30-second subset, not native
+    nodata or global affine bounds. [Resource reconciliation: inventory completeness] Inventory coverage
+    statement (Amadeus data sources!N10): Yes (global land). This statement does not establish validity
+    of every cell/date or fill observation gaps.'
+  product_version: '4.11'
+  doi: 10.7927/H4F47M65
+  license_spdx: CC-BY-4.0
+  grid_definition: amadeus:grid/gpwv4_r11_30_sec
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5Y
+  temporal_coverage_start: '2000-07-01'
+  temporal_coverage_end: '2020-07-01'
+  citation_apa: 'Center for International Earth Science Information Network - CIESIN - Columbia University
+    (2018). Gridded Population of the World, Version 4 (GPWv4): Population Density Adjusted to Match 2015
+    Revision UN WPP Country Totals, Revision 11. https://doi.org/10.7927/H4F47M65'
+  native_spatial_resolution_descriptor: 30 sec geographic grid; land-area denominator
+  spatial_extent_descriptor: Global land; input census dates and administrative unit sizes vary
+  access_url: https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11/
+  amadeus_dataset_name: population
+  amadeus_process_covariate: population
+  amadeus_calculate_covariate: population
+- id: amadeus:product/gpwv4_unwpp2015_density_r11_2pt5_min
+  name: gpwv4_unwpp2015_density_r11_2pt5_min
+  label: GPWv4 Revision 11 UN-adjusted density 2pt5_min
+  data_source: amadeus:source/ciesin_gpwv4_unwpp_adjusted_density
+  data_genre:
+  - population
+  native_format: geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_year_epoch
+  description: 'Five modelled mid-year epochs: 2000-07-01, 2005-07-01, 2010-07-01, 2015-07-01, 2020-07-01.
+    P5Y describes spacing between these named epochs, not continuous annual observations or an update
+    schedule. Coarser densities are derived from aggregated counts and land areas; do not obtain them
+    with an unweighted average of fine-cell densities. This profile is GeoTIFF; ASCII is an alternative
+    delivery. Adapter year=all requests netCDF, whose process branch remains unimplemented; this profile
+    does not certify that route. Fixture establishes only a rewritten 2020 30-second subset, not native
+    nodata or global affine bounds. [Resource reconciliation: inventory completeness] Inventory coverage
+    statement (Amadeus data sources!N10): Yes (global land). This statement does not establish validity
+    of every cell/date or fill observation gaps.'
+  product_version: '4.11'
+  doi: 10.7927/H4F47M65
+  license_spdx: CC-BY-4.0
+  grid_definition: amadeus:grid/gpwv4_r11_2pt5_min
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5Y
+  temporal_coverage_start: '2000-07-01'
+  temporal_coverage_end: '2020-07-01'
+  citation_apa: 'Center for International Earth Science Information Network - CIESIN - Columbia University
+    (2018). Gridded Population of the World, Version 4 (GPWv4): Population Density Adjusted to Match 2015
+    Revision UN WPP Country Totals, Revision 11. https://doi.org/10.7927/H4F47M65'
+  native_spatial_resolution_descriptor: 2pt5 min geographic grid; land-area denominator
+  spatial_extent_descriptor: Global land; input census dates and administrative unit sizes vary
+  access_url: https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11/
+  amadeus_dataset_name: population
+  amadeus_process_covariate: population
+  amadeus_calculate_covariate: population
+- id: amadeus:product/gpwv4_unwpp2015_density_r11_15_min
+  name: gpwv4_unwpp2015_density_r11_15_min
+  label: GPWv4 Revision 11 UN-adjusted density 15_min
+  data_source: amadeus:source/ciesin_gpwv4_unwpp_adjusted_density
+  data_genre:
+  - population
+  native_format: geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_year_epoch
+  description: 'Five modelled mid-year epochs: 2000-07-01, 2005-07-01, 2010-07-01, 2015-07-01, 2020-07-01.
+    P5Y describes spacing between these named epochs, not continuous annual observations or an update
+    schedule. Coarser densities are derived from aggregated counts and land areas; do not obtain them
+    with an unweighted average of fine-cell densities. This profile is GeoTIFF; ASCII is an alternative
+    delivery. Adapter year=all requests netCDF, whose process branch remains unimplemented; this profile
+    does not certify that route. Fixture establishes only a rewritten 2020 30-second subset, not native
+    nodata or global affine bounds. [Resource reconciliation: inventory completeness] Inventory coverage
+    statement (Amadeus data sources!N10): Yes (global land). This statement does not establish validity
+    of every cell/date or fill observation gaps.'
+  product_version: '4.11'
+  doi: 10.7927/H4F47M65
+  license_spdx: CC-BY-4.0
+  grid_definition: amadeus:grid/gpwv4_r11_15_min
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5Y
+  temporal_coverage_start: '2000-07-01'
+  temporal_coverage_end: '2020-07-01'
+  citation_apa: 'Center for International Earth Science Information Network - CIESIN - Columbia University
+    (2018). Gridded Population of the World, Version 4 (GPWv4): Population Density Adjusted to Match 2015
+    Revision UN WPP Country Totals, Revision 11. https://doi.org/10.7927/H4F47M65'
+  native_spatial_resolution_descriptor: 15 min geographic grid; land-area denominator
+  spatial_extent_descriptor: Global land; input census dates and administrative unit sizes vary
+  access_url: https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11/
+  amadeus_dataset_name: population
+  amadeus_process_covariate: population
+  amadeus_calculate_covariate: population
+- id: amadeus:product/gpwv4_unwpp2015_density_r11_30_min
+  name: gpwv4_unwpp2015_density_r11_30_min
+  label: GPWv4 Revision 11 UN-adjusted density 30_min
+  data_source: amadeus:source/ciesin_gpwv4_unwpp_adjusted_density
+  data_genre:
+  - population
+  native_format: geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_year_epoch
+  description: 'Five modelled mid-year epochs: 2000-07-01, 2005-07-01, 2010-07-01, 2015-07-01, 2020-07-01.
+    P5Y describes spacing between these named epochs, not continuous annual observations or an update
+    schedule. Coarser densities are derived from aggregated counts and land areas; do not obtain them
+    with an unweighted average of fine-cell densities. This profile is GeoTIFF; ASCII is an alternative
+    delivery. Adapter year=all requests netCDF, whose process branch remains unimplemented; this profile
+    does not certify that route. Fixture establishes only a rewritten 2020 30-second subset, not native
+    nodata or global affine bounds. [Resource reconciliation: inventory completeness] Inventory coverage
+    statement (Amadeus data sources!N10): Yes (global land). This statement does not establish validity
+    of every cell/date or fill observation gaps.'
+  product_version: '4.11'
+  doi: 10.7927/H4F47M65
+  license_spdx: CC-BY-4.0
+  grid_definition: amadeus:grid/gpwv4_r11_30_min
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5Y
+  temporal_coverage_start: '2000-07-01'
+  temporal_coverage_end: '2020-07-01'
+  citation_apa: 'Center for International Earth Science Information Network - CIESIN - Columbia University
+    (2018). Gridded Population of the World, Version 4 (GPWv4): Population Density Adjusted to Match 2015
+    Revision UN WPP Country Totals, Revision 11. https://doi.org/10.7927/H4F47M65'
+  native_spatial_resolution_descriptor: 30 min geographic grid; land-area denominator
+  spatial_extent_descriptor: Global land; input census dates and administrative unit sizes vary
+  access_url: https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11/
+  amadeus_dataset_name: population
+  amadeus_process_covariate: population
+  amadeus_calculate_covariate: population
+- id: amadeus:product/gpwv4_unwpp2015_density_r11_60_min
+  name: gpwv4_unwpp2015_density_r11_60_min
+  label: GPWv4 Revision 11 UN-adjusted density 60_min
+  data_source: amadeus:source/ciesin_gpwv4_unwpp_adjusted_density
+  data_genre:
+  - population
+  native_format: geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: multi_year_epoch
+  description: 'Five modelled mid-year epochs: 2000-07-01, 2005-07-01, 2010-07-01, 2015-07-01, 2020-07-01.
+    P5Y describes spacing between these named epochs, not continuous annual observations or an update
+    schedule. Coarser densities are derived from aggregated counts and land areas; do not obtain them
+    with an unweighted average of fine-cell densities. This profile is GeoTIFF; ASCII is an alternative
+    delivery. Adapter year=all requests netCDF, whose process branch remains unimplemented; this profile
+    does not certify that route. Fixture establishes only a rewritten 2020 30-second subset, not native
+    nodata or global affine bounds. [Resource reconciliation: inventory completeness] Inventory coverage
+    statement (Amadeus data sources!N10): Yes (global land). This statement does not establish validity
+    of every cell/date or fill observation gaps.'
+  product_version: '4.11'
+  doi: 10.7927/H4F47M65
+  license_spdx: CC-BY-4.0
+  grid_definition: amadeus:grid/gpwv4_r11_60_min
+  crs: EPSG:4326
+  srid: 4326
+  temporal_resolution_iso: P5Y
+  temporal_coverage_start: '2000-07-01'
+  temporal_coverage_end: '2020-07-01'
+  citation_apa: 'Center for International Earth Science Information Network - CIESIN - Columbia University
+    (2018). Gridded Population of the World, Version 4 (GPWv4): Population Density Adjusted to Match 2015
+    Revision UN WPP Country Totals, Revision 11. https://doi.org/10.7927/H4F47M65'
+  native_spatial_resolution_descriptor: 60 min geographic grid; land-area denominator
+  spatial_extent_descriptor: Global land; input census dates and administrative unit sizes vary
+  access_url: https://data.earthdata.nasa.gov/nasa-earth/human-dimensions/sedac-root/downloads/data/gpw-v4/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11/
+  amadeus_dataset_name: population
+  amadeus_process_covariate: population
+  amadeus_calculate_covariate: population
+grid_definitions:
+- id: amadeus:grid/gpwv4_r11_30_sec
+  name: gpwv4_r11_30_sec
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.008333333333333333
+  resolution_y: 0.008333333333333333
+  resolution_unit: deg
+- id: amadeus:grid/gpwv4_r11_2pt5_min
+  name: gpwv4_r11_2pt5_min
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.041666666666666664
+  resolution_y: 0.041666666666666664
+  resolution_unit: deg
+- id: amadeus:grid/gpwv4_r11_15_min
+  name: gpwv4_r11_15_min
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.25
+  resolution_y: 0.25
+  resolution_unit: deg
+- id: amadeus:grid/gpwv4_r11_30_min
+  name: gpwv4_r11_30_min
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 0.5
+  resolution_y: 0.5
+  resolution_unit: deg
+- id: amadeus:grid/gpwv4_r11_60_min
+  name: gpwv4_r11_60_min
+  crs: EPSG:4326
+  srid: 4326
+  grid_mapping_name: latitude_longitude
+  resolution_x: 1.0
+  resolution_y: 1.0
+  resolution_unit: deg
