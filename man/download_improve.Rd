@@ -7,11 +7,12 @@
 download_improve(
   year = c(2018, 2022),
   product = c("raw", "rhr2", "rhr3"),
-  url_improve = "https://vibe.cira.colostate.edu/data/export/",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
   remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
@@ -19,70 +20,100 @@ download_improve(
 )
 }
 \arguments{
-\item{year}{integer(1 or 2). Year or start/end years.}
+\item{year}{integer(1 or more). One year, two endpoints, or a non-empty
+vector of years. Every year from the minimum through the maximum is
+requested, including gaps: \code{c(2018, 2023)} requests \code{2018:2023}.
+Default is \code{c(2018, 2022)}. Missing, fractional, pre-1900, and future
+years are rejected. File availability depends on the selected product
+and provider; local validation does not check product coverage.}
 
-\item{product}{character(1). Product selector:
-\code{"raw"} (aerosol, default), \code{"rhr2"} (Regional Haze Rule II),
-or \code{"rhr3"} (Regional Haze Rule III).}
+\item{product}{character(1). Product selector: \code{"raw"} (default) for
+aerosol measurements (\code{IMPAER}), \code{"rhr2"} for Regional Haze Rule II
+data (\code{IMPRHR2}), or \code{"rhr3"} for Regional Haze Rule III data (\code{IMPRHR3}).}
 
-\item{url_improve}{character(1). Base URL to the IMPROVE data export
-service.}
+\item{directory_to_save}{character(1). Non-empty parent directory.
+Archives are downloaded into \verb{zip_files/} and, when \code{unzip = TRUE},
+extracted into \verb{data_files/}.}
 
-\item{directory_to_save}{character(1). Directory to save downloaded files.}
+\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed. Downloaded
+archives and extracted measurement files can require substantial storage.}
 
-\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed.}
+\item{download}{logical(1). Deprecated. \code{FALSE} emits a warning but does
+not skip downloading or return a preview in the current implementation.
+Default is \code{TRUE}.}
 
-\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
+\item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
+No command file is generated. Default is \code{FALSE}.}
 
-\item{remove_command}{logical(1). Deprecated, ignored.}
+\item{unzip}{logical(1). Extract downloaded ZIP archives into
+\verb{data_files/}. Default is \code{TRUE}; \code{FALSE} retains the archives without
+extracting their contents.}
 
-\item{show_progress}{logical(1). Show download progress (default
-\code{TRUE}).}
+\item{remove_zip}{logical(1). Remove downloaded archives and their
+\verb{zip_files/} directory, including remaining contents, after all archives
+have been extracted. Default is \code{FALSE}. May be \code{TRUE} only when
+\code{unzip = TRUE}.}
 
-\item{hash}{logical(1). Return hash of downloaded files (default
-\code{FALSE}).}
+\item{show_progress}{logical(1). Show file download progress. Default is
+\code{TRUE}. Other status messages may still be printed when \code{FALSE}.}
 
-\item{max_tries}{integer(1). Maximum retry attempts (default 20).}
+\item{hash}{logical(1). Return a combined MD5 hash of the files under
+\verb{data_files/} instead of the download summary. Default is \code{FALSE}.}
 
-\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2).}
+\item{max_tries}{integer(1). Maximum attempts per file download request,
+including the initial attempt. Default is 20.}
+
+\item{rate_limit}{numeric(1). Non-negative throttling interval in seconds,
+passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
 }
 \value{
-invisible list with download results; or hash character if
-\code{hash = TRUE}.
+After downloading and optional extraction, \code{hash = FALSE} returns the
+download summary from \code{\link[=download_run_method]{download_run_method()}} invisibly, including counts
+of successful, failed, and skipped files. With \code{hash = TRUE}, returns a
+visible character scalar containing the combined MD5 hash of \verb{data_files/}.
 }
 \description{
-The \code{download_improve()} function accesses and downloads IMPROVE
-(Interagency Monitoring of Protected Visual Environments) data files
-from the VIEWS/VIBE data export service hosted at CIRA/CSU. Annual files
-are downloaded as \code{.txt.zip} archives and extracted to
-pipe-delimited \code{.txt} files containing aerosol measurements at
-federal-land monitoring stations.
+Download annual IMPROVE (Interagency Monitoring of Protected Visual
+Environments) measurement files from the VIEWS/VIBE data export service
+hosted at CIRA/CSU. Files are downloaded as \code{.txt.zip} archives and can be
+extracted to pipe-delimited \code{.txt} files using the shared download workflow.
+}
+\details{
+The selected product determines the filename prefix. For example,
+\code{product = "raw"} and \code{year = 2022} request \code{IMPAER_2022.txt.zip}.
+\verb{zip_files/} and \verb{data_files/} are sibling directories created beneath
+\code{directory_to_save}, including when \code{unzip = FALSE}.
+
+All archives share \verb{data_files/} as their extraction destination. Names
+and paths stored inside each archive are preserved. Pass the directory
+containing the extracted \code{PREFIX_YYYY.txt} files, normally \verb{data_files/},
+as \code{path} to \code{\link[=process_improve]{process_improve()}}.
+
+\code{\link[=download_run_method]{download_run_method()}} skips existing non-empty archives in \verb{zip_files/}.
+Those archives are still passed to extraction when \code{unzip = TRUE}.
+Existing extracted \code{.txt} files alone do not cause a download to be skipped.
+
+Hashing covers all files under \verb{data_files/}, including existing files,
+and excludes archives in \verb{zip_files/}. With \code{unzip = FALSE}, hashing still
+uses \verb{data_files/}, which may be empty or contain previously extracted data.
 }
 \note{
-\itemize{
-\item IMPROVE data does not require authentication.
-\item Three product types are available:
-\code{"raw"} (IMPAER — speciated aerosol mass concentrations),
-\code{"rhr2"} (IMPRHR2 — Regional Haze Rule II light extinction),
-\code{"rhr3"} (IMPRHR3 — Regional Haze Rule III deciview index).
-\item Site metadata is handled by \code{\link{process_improve}} using an
-embedded table; annual downloads include measurement files only.
-\item IMPROVE monitors ~\eqn{1 \mu g / m^3} precision instruments
-deployed at Class I and other federal land areas.
-}
+IMPROVE data does not require authentication. Annual downloads contain
+measurement files; site metadata is resolved separately by
+\code{\link[=process_improve]{process_improve()}}.
 }
 \examples{
 \dontrun{
 download_improve(
   year = 2022,
   product = "raw",
-  directory_to_save = "./data/improve/",
+  directory_to_save = file.path(tempdir(), "improve"),
   acknowledgement = TRUE
 )
 }
 }
 \seealso{
-\code{\link{process_improve}}
+\code{\link[=download_setup_dir]{download_setup_dir()}}, \code{\link[=download_unzip]{download_unzip()}}, \code{\link[=process_improve]{process_improve()}}
 }
 \author{
 Insang Song, Mitchell Manware

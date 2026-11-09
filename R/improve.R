@@ -9,52 +9,79 @@
 # nolint start
 #' Download IMPROVE aerosol monitoring data
 #' @description
-#' The \code{download_improve()} function accesses and downloads IMPROVE
-#' (Interagency Monitoring of Protected Visual Environments) data files
-#' from the VIEWS/VIBE data export service hosted at CIRA/CSU. Annual files
-#' are downloaded as \code{.txt.zip} archives and extracted to
-#' pipe-delimited \code{.txt} files containing aerosol measurements at
-#' federal-land monitoring stations.
-#' @note
-#' \itemize{
-#'   \item IMPROVE data does not require authentication.
-#'   \item Three product types are available:
-#'     \code{"raw"} (IMPAER — speciated aerosol mass concentrations),
-#'     \code{"rhr2"} (IMPRHR2 — Regional Haze Rule II light extinction),
-#'     \code{"rhr3"} (IMPRHR3 — Regional Haze Rule III deciview index).
-#'   \item Site metadata is handled by \code{\link{process_improve}} using an
-#'     embedded table; annual downloads include measurement files only.
-#'   \item IMPROVE monitors ~\eqn{1 \mu g / m^3} precision instruments
-#'     deployed at Class I and other federal land areas.
-#' }
-#' @param year integer(1 or 2). Year or start/end years.
-#' @param product character(1). Product selector:
-#'   \code{"raw"} (aerosol, default), \code{"rhr2"} (Regional Haze Rule II),
-#'   or \code{"rhr3"} (Regional Haze Rule III).
-#' @param url_improve character(1). Base URL to the IMPROVE data export
-#'   service.
-#' @param directory_to_save character(1). Directory to save downloaded files.
-#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed.
-#' @param download logical(1). DEPRECATED. Downloads happen automatically.
-#' @param remove_command logical(1). Deprecated, ignored.
-#' @param show_progress logical(1). Show download progress (default
-#'   \code{TRUE}).
-#' @param hash logical(1). Return hash of downloaded files (default
-#'   \code{FALSE}).
-#' @param max_tries integer(1). Maximum retry attempts (default 20).
-#' @param rate_limit numeric(1). Minimum seconds between requests (default 2).
+#' Download annual IMPROVE (Interagency Monitoring of Protected Visual
+#' Environments) measurement files from the VIEWS/VIBE data export service
+#' hosted at CIRA/CSU. Files are downloaded as `.txt.zip` archives and can be
+#' extracted to pipe-delimited `.txt` files using the shared download workflow.
+#' @note IMPROVE data does not require authentication. Annual downloads contain
+#'   measurement files; site metadata is resolved separately by
+#'   [process_improve()].
+#' @param year integer(1 or more). One year, two endpoints, or a non-empty
+#'   vector of years. Every year from the minimum through the maximum is
+#'   requested, including gaps: `c(2018, 2023)` requests `2018:2023`.
+#'   Default is `c(2018, 2022)`. Missing, fractional, pre-1900, and future
+#'   years are rejected. File availability depends on the selected product
+#'   and provider; local validation does not check product coverage.
+#' @param product character(1). Product selector: `"raw"` (default) for
+#'   aerosol measurements (`IMPAER`), `"rhr2"` for Regional Haze Rule II
+#'   data (`IMPRHR2`), or `"rhr3"` for Regional Haze Rule III data (`IMPRHR3`).
+#' @param directory_to_save character(1). Non-empty parent directory.
+#'   Archives are downloaded into `zip_files/` and, when `unzip = TRUE`,
+#'   extracted into `data_files/`.
+#' @param acknowledgement logical(1). Must be `TRUE` to proceed. Downloaded
+#'   archives and extracted measurement files can require substantial storage.
+#' @param download logical(1). Deprecated. `FALSE` emits a warning but does
+#'   not skip downloading or return a preview in the current implementation.
+#'   Default is `TRUE`.
+#' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
+#'   No command file is generated. Default is `FALSE`.
+#' @param unzip logical(1). Extract downloaded ZIP archives into
+#'   `data_files/`. Default is `TRUE`; `FALSE` retains the archives without
+#'   extracting their contents.
+#' @param remove_zip logical(1). Remove downloaded archives and their
+#'   `zip_files/` directory, including remaining contents, after all archives
+#'   have been extracted. Default is `FALSE`. May be `TRUE` only when
+#'   `unzip = TRUE`.
+#' @param show_progress logical(1). Show file download progress. Default is
+#'   `TRUE`. Other status messages may still be printed when `FALSE`.
+#' @param hash logical(1). Return a combined MD5 hash of the files under
+#'   `data_files/` instead of the download summary. Default is `FALSE`.
+#' @param max_tries integer(1). Maximum attempts per file download request,
+#'   including the initial attempt. Default is 20.
+#' @param rate_limit numeric(1). Non-negative throttling interval in seconds,
+#'   passed to [download_run_method()]. Default is 2.
+#' @details
+#' The selected product determines the filename prefix. For example,
+#' `product = "raw"` and `year = 2022` request `IMPAER_2022.txt.zip`.
+#' `zip_files/` and `data_files/` are sibling directories created beneath
+#' `directory_to_save`, including when `unzip = FALSE`.
+#'
+#' All archives share `data_files/` as their extraction destination. Names
+#' and paths stored inside each archive are preserved. Pass the directory
+#' containing the extracted `PREFIX_YYYY.txt` files, normally `data_files/`,
+#' as `path` to [process_improve()].
+#'
+#' [download_run_method()] skips existing non-empty archives in `zip_files/`.
+#' Those archives are still passed to extraction when `unzip = TRUE`.
+#' Existing extracted `.txt` files alone do not cause a download to be skipped.
+#'
+#' Hashing covers all files under `data_files/`, including existing files,
+#' and excludes archives in `zip_files/`. With `unzip = FALSE`, hashing still
+#' uses `data_files/`, which may be empty or contain previously extracted data.
 #' @author Insang Song, Mitchell Manware
-#' @return invisible list with download results; or hash character if
-#'   \code{hash = TRUE}.
+#' @return
+#' After downloading and optional extraction, `hash = FALSE` returns the
+#' download summary from [download_run_method()] invisibly, including counts
+#' of successful, failed, and skipped files. With `hash = TRUE`, returns a
+#' visible character scalar containing the combined MD5 hash of `data_files/`.
 #' @importFrom httr2 request req_retry req_timeout req_perform resp_status
-#' @seealso
-#'   \code{\link{process_improve}}
+#' @seealso [download_setup_dir()], [download_unzip()], [process_improve()]
 #' @examples
 #' \dontrun{
 #' download_improve(
 #'   year = 2022,
 #'   product = "raw",
-#'   directory_to_save = "./data/improve/",
+#'   directory_to_save = file.path(tempdir(), "improve"),
 #'   acknowledgement = TRUE
 #' )
 #' }
@@ -63,121 +90,98 @@
 download_improve <- function(
   year = c(2018, 2022),
   product = c("raw", "rhr2", "rhr3"),
-  url_improve = "https://vibe.cira.colostate.edu/data/export/",
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
   remove_command = FALSE,
+  unzip = TRUE,
+  remove_zip = FALSE,
   show_progress = TRUE,
   hash = FALSE,
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### Check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      call. = FALSE
-    )
-  }
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### Validate product
-  product <- match.arg(product)
-
-  #### Map product to file prefix
-  prefix_map <- c(raw = "IMPAER", rhr2 = "IMPRHR2", rhr3 = "IMPRHR3")
-  file_prefix <- prefix_map[[product]]
-
-  #### Check years
-  year <- if (length(year) == 1) rep(year, 2) else year
-  stopifnot(length(year) == 2)
-  year <- year[order(year)]
-  year_sequence <- seq(year[1], year[2], 1)
-
-  #### Directory setup
-  amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-
-  #### Build download URLs and destination paths
-  # nolint start
-  download_urls <- sprintf(
+  # ----------------------------------------------------------------------------
+  # Check common arguments.
+  amadeus:::download_check(
+    dataset_name = "improve",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip,
+    remove_zip = remove_zip,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  # ----------------------------------------------------------------------------
+  # Check `years` and generate sequence.
+  int_years <- amadeus:::sequence_years(year)
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
+  chr_product <- match.arg(product)
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_directories <- amadeus::download_setup_dir(
+    amadeus::download_sanitize_path(directory_to_save),
+    zip = TRUE
+  )
+  chr_dir_to_download <- chr_directories[1]
+  chr_dir_to_save <- chr_directories[2]
+  # ----------------------------------------------------------------------------
+  # Define file prefix based on product.
+  chr_prefix <- switch(
+    chr_product,
+    raw = "IMPAER",
+    rhr2 = "IMPRHR2",
+    rhr3 = "IMPRHR3"
+  )
+  # ----------------------------------------------------------------------------
+  # Generate download URLs.
+  chr_urls <- sprintf(
     "%s%s/%s_%d.txt.zip",
-    url_improve,
-    file_prefix,
-    file_prefix,
-    year_sequence
+    "https://vibe.cira.colostate.edu/data/export/",
+    chr_prefix,
+    chr_prefix,
+    int_years
   )
-  # nolint end
-  download_names <- sprintf(
-    "%s%s_%d.txt",
-    directory_to_save,
-    file_prefix,
-    year_sequence
+  # ----------------------------------------------------------------------------
+  # Generate download file names.
+  chr_filenames <- sprintf(
+    "%s%s_%d.txt.zip",
+    chr_dir_to_download,
+    chr_prefix,
+    int_years
   )
-
-  #### Filter to files that need downloading
-  needs_dl <- vapply(download_names, amadeus::check_destfile, logical(1))
-  download_urls <- download_urls[needs_dl]
-  download_names <- download_names[needs_dl]
-
-  if (length(download_urls) == 0) {
-    message("All IMPROVE files already present.\n")
-    if (hash) {
-      return(amadeus::download_hash(hash = TRUE, directory_to_save))
-    }
-    return(invisible(list(
-      success = 0,
-      failed = 0,
-      skipped = length(download_names)
-    )))
-  }
-
-  #### Download files
-  zip_destfiles <- sprintf("%s.zip", download_names)
-  zip_destfiles <- sub("\\.txt\\.zip$", ".txt.zip", zip_destfiles)
-
+  # ----------------------------------------------------------------------------
+  # Run download.
   download_result <- amadeus::download_run_method(
-    urls = download_urls,
-    destfiles = zip_destfiles,
+    urls = chr_urls,
+    destfiles = chr_filenames,
     token = NULL,
     show_progress = show_progress,
     max_tries = max_tries,
     rate_limit = rate_limit
   )
-
-  #### Extract annual IMPROVE zip files to text files
-  zip_targets <- zip_destfiles[grepl("\\.txt\\.zip$", zip_destfiles)]
-  if (length(zip_targets) > 0) {
-    for (zip_file in zip_targets) {
-      if (!file.exists(zip_file)) {
-        next
-      }
-      utils::unzip(
-        zipfile = zip_file,
-        exdir = directory_to_save,
-        overwrite = TRUE
-      )
-      file.remove(zip_file)
-    }
-  }
-
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  }
-  return(invisible(download_result))
+  # ----------------------------------------------------------------------------
+  # Unzip downloaded .zip files.
+  sapply(
+    chr_filenames,
+    amadeus::download_unzip,
+    directory_to_unzip = chr_dir_to_save,
+    unzip = unzip
+  )
+  # ----------------------------------------------------------------------------
+  # Remove zip files.
+  amadeus::download_remove_zips(
+    remove = remove_zip,
+    download_name = chr_filenames
+  )
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
 
 ################################################################################
