@@ -85,7 +85,12 @@ testthat::test_that("download_huc supports unzip via archive extraction", {
   unzip_called <- FALSE
   testthat::local_mocked_bindings(
     download_run_method = function(...) invisible(NULL),
-    download_unzip = function(file_name, directory_to_unzip, unzip = TRUE) {
+    download_unzip = function(
+      file_name,
+      directory_to_unzip,
+      unzip = TRUE,
+      remove = FALSE
+    ) {
       unzip_called <<- isTRUE(unzip) && grepl("\\.7z$", file_name)
       invisible(NULL)
     },

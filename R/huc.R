@@ -7,46 +7,79 @@
 # {download} tier
 ################################################################################
 # nolint start
-#' Download National Hydrography Dataset (NHD) data
+#' Download National Hydrography Dataset Plus (NHDPlus) data
 #' @description
-#' NHDPlus data provides the most comprehensive and high-resolution
-#' hydrography data. This function downloads **national** dataset from
-#' NHDPlus Version 2.1 on USGS Amazon S3 storage.
+#' Download a national NHDPlus Version 2.1 `.7z` archive from Amazon S3.
+#' The selected region and data type determine the archive to download.
 #' @note
 #' For HUC, set `type = "Seamless"`. HUC12 layer presents in the seamless
 #' geodatabase. Users can aggregate HUC12 layer to make HUC6, HUC8, HUC10, etc.
 #' For whom wants to download a specific region,
 #' please visit [Get NHDPlus Data](https://www.epa.gov/waterdata/get-nhdplus-national-hydrography-dataset-plus-data#ListofAreas)
-#' @param region character(1). One of `c("Lower48", "Islands")`.
-#' When `"Islands"` is selected, the data will be downloaded for Hawaii,
-#' Puerto Rico, and Virgin Islands.
-#' @param type character(1). One of `c("Seamless", "OceanCatchment")`.
-#' @param directory_to_save character(1). Directory to download files.
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param unzip logical(1). Unzip the downloaded compressed files.
-#' Default is \code{FALSE}. Supports ".7z" extraction via \pkg{archive}.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
-#' @param show_progress logical(1). Show download progress.
-#'   Default is \code{TRUE}.
-#' @param max_tries integer(1). Maximum download retry attempts.
-#'   Default is \code{20}.
-#' @param rate_limit numeric(1). Minimum seconds between requests.
-#'   Default is \code{2}.
+#' @param region character(1). Archive region: `"Lower48"` (default) or
+#'   `"Islands"`.
+#' @param type character(1). Data type: `"Seamless"` (default) or
+#'   `"OceanCatchment"`.
+#' @param directory_to_save character(1). Non-empty parent directory.
+#'   The `.7z` archive is saved in `zip_files/`; when `unzip = TRUE`, its
+#'   contents are extracted into `data_files/`.
+#' @param acknowledgement logical(1). Must be `TRUE` to proceed. Downloaded
+#'   archives and extracted data can require substantial storage.
+#' @param download logical(1). Deprecated. `FALSE` emits a warning and returns
+#'   a preview of the planned archive without downloading or extracting it.
+#'   Default is `TRUE`.
+#' @param remove_command logical(1). Deprecated and ignored; `TRUE` emits a
+#'   warning. No command file is generated. Default is `FALSE`.
+#' @param unzip logical(1). Extract the downloaded `.7z` archive into
+#'   `data_files/` using the \pkg{archive} package. Default is `FALSE`, which
+#'   retains the archive without extracting its contents.
+#' @param remove_zip logical(1). Remove the downloaded `.7z` archive and its
+#'   `zip_files/` directory, including remaining contents, after extraction.
+#'   Default is `FALSE`. May be `TRUE` only when `unzip = TRUE`.
+#' @param hash logical(1). Return a combined MD5 hash of the files under
+#'   `data_files/` instead of the download summary when `download = TRUE`.
+#'   Ignored when `download = FALSE`. Default is `FALSE`.
+#' @param show_progress logical(1). Show file download progress. Default is
+#'   `TRUE`. Other status messages may still be printed when `FALSE`.
+#' @param max_tries integer(1). Maximum attempts per file download request,
+#'   including the initial attempt. Default is 20.
+#' @param rate_limit numeric(1). Request-throttling interval in seconds,
+#'   passed to [download_run_method()]. Controls the average request rate,
+#'   rather than guaranteeing a minimum gap between requests. Default is 2.
+#' @details
+#' `region` and `type` each select one value. Matching is case-sensitive, and
+#' unambiguous abbreviations are accepted. If omitted, each argument uses its
+#' first listed choice.
+#'
+#' `zip_files/` and `data_files/` are sibling directories created beneath
+#' `directory_to_save`, including when `unzip = FALSE` or `download = FALSE`.
+#' Preview mode returns the planned archive even if it already exists locally
+#' and does not check remote availability.
+#'
+#' During downloading, [download_run_method()] skips an existing non-empty
+#' archive in `zip_files/`. That archive is still passed to extraction when
+#' `unzip = TRUE`. Existing extracted data alone do not cause a download to
+#' be skipped. Archive member names and paths are preserved beneath
+#' `data_files/`; pass the extracted geodatabase path to [process_huc()].
+#'
+#' Hashing includes all files recursively under `data_files/`, including
+#' existing files, and excludes archives in `zip_files/`. With `unzip = FALSE`,
+#' hashing still uses `data_files/`, which may be empty or contain previously
+#' extracted data.
 #' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Downloaded files will be stored in \code{directory_to_save}.
+#' When `download = FALSE`, an invisible list containing `urls`, `destfiles`,
+#' and `n_files = 1` is returned regardless of `hash`.
+#'
+#' When `download = TRUE` and `hash = FALSE`, returns the download summary from
+#' [download_run_method()] invisibly, including `success`, `failed`, and
+#' `skipped` file counts. When a download is attempted, the summary also
+#' contains `failed_urls` and `failed_files` character vectors. Counts describe
+#' archive downloads, not extracted files.
+#'
+#' When `download = TRUE` and `hash = TRUE`, returns a visible character scalar
+#' containing the combined MD5 hash of the files under `data_files/`.
 #' @author Insang Song
+#' @seealso [download_setup_dir()], [download_unzip()], [process_huc()]
 #' @importFrom Rdpack reprompt
 #' @references
 #' \insertRef{data_usgs2023nhd}{amadeus}
@@ -55,110 +88,105 @@
 #' download_huc(
 #'   region = "Lower48",
 #'   type = "Seamless",
-#'   directory_to_save = tempdir(),
+#'   directory_to_save = file.path(tempdir(), "nhdplus"),
 #'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE,
-#'   unzip = FALSE
+#'   unzip = TRUE
 #' )
 #' }
+# nolint end
 #' @export
 # @importFrom archive archive_extract
-download_huc <-
-  function(
-    region = c("Lower48", "Islands"),
-    type = c("Seamless", "OceanCatchment"),
-    directory_to_save = NULL,
-    acknowledgement = FALSE,
-    download = TRUE,
-    remove_command = FALSE,
-    unzip = FALSE,
-    hash = FALSE,
-    show_progress = TRUE,
-    max_tries = 20,
-    rate_limit = 2
-  ) {
-    #### 1. check for data download acknowledgement
-    amadeus::download_permit(acknowledgement = acknowledgement)
-    #### 2. directory setup
-    amadeus::download_setup_dir(directory_to_save)
-    directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-
-    region <- match.arg(region)
-    type <- match.arg(type)
-
-    #### Handle deprecated parameters
-    if (!isTRUE(download)) {
-      warning(
-        "Setting download=FALSE is deprecated.",
-        " Downloads now use httr2 by default.\n",
-        "To skip downloading, the function will return",
-        " after discovering files.\n",
-        call. = FALSE
-      )
-    }
-    if (!isFALSE(remove_command)) {
-      warning(
-        "Parameter 'remove_command' is deprecated and ignored.\n",
-        call. = FALSE
-      )
-    }
-    url_base <-
-      "https://dmap-data-commons-ow.s3.amazonaws.com/NHDPlusV21/Data/NationalData/"
-
-    if (region == "Lower48") {
-      if (type == "Seamless") {
-        url_template_nat <-
-          "NHDPlusV21_NationalData_Seamless_Geodatabase_Lower48_07.7z"
-      }
-      if (type == "OceanCatchment") {
-        url_template_nat <-
-          "NHDPlusV21_NationalData_OceanCatchment_Lower48_fgdb_01.7z"
-      }
-    }
-    if (region == "Islands") {
-      if (type == "Seamless") {
-        url_template_nat <-
-          "NHDPlusV21_NationalData_Seamless_Geodatabase_HI_PR_VI_PI_03.7z"
-      }
-      if (type == "OceanCatchment") {
-        url_template_nat <-
-          "NHDPlusV21_NationalData_OceanCatchment_Islands_fgdb_01.7z"
-      }
-    }
-    download_urls <- paste0(url_base, url_template_nat)
-    download_names <- paste0(directory_to_save, url_template_nat)
-
-    #### Exit early if download=FALSE
-    if (!isTRUE(download)) {
-      message("Skipping download.\n")
-      return(invisible(list(
-        urls = download_urls,
-        destfiles = download_names,
-        n_files = 1
-      )))
-    }
-
-    #### Download using httr2
-    amadeus::download_run_method(
-      urls = download_urls,
-      destfiles = download_names,
-      token = NULL,
-      show_progress = show_progress,
-      max_tries = max_tries,
-      rate_limit = rate_limit
-    )
-    sapply(
-      download_names,
-      amadeus::download_unzip,
-      directory_to_unzip = directory_to_save,
-      unzip = unzip
-    )
-
-    message("Requests were processed.\n")
-    return(amadeus::download_hash(hash, directory_to_save))
+download_huc <- function(
+  region = c("Lower48", "Islands"),
+  type = c("Seamless", "OceanCatchment"),
+  directory_to_save = NULL,
+  acknowledgement = FALSE,
+  download = TRUE,
+  remove_command = FALSE,
+  unzip = FALSE,
+  remove_zip = FALSE,
+  hash = FALSE,
+  show_progress = TRUE,
+  max_tries = 20,
+  rate_limit = 2
+) {
+  # ----------------------------------------------------------------------------
+  # Check common arguments.
+  amadeus:::download_check(
+    dataset_name = "huc",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip,
+    remove_zip = remove_zip,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
+  chr_region <- match.arg(region)
+  chr_type <- match.arg(type)
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_directories <- amadeus::download_setup_dir(
+    amadeus::download_sanitize_path(directory_to_save),
+    zip = TRUE
+  )
+  chr_dir_to_download <- chr_directories[1]
+  chr_dir_to_save <- chr_directories[2]
+  # ----------------------------------------------------------------------------
+  # Define template based on region and data type.
+  chr_template <- switch(
+    paste0(chr_region, "_", chr_type),
+    Lower48_Seamless = "Seamless_Geodatabase_Lower48_07.7z",
+    Lower48_OceanCatchment = "OceanCatchment_Lower48_fgdb_01.7z",
+    Islands_Seamless = "Seamless_Geodatabase_HI_PR_VI_PI_03.7z",
+    Islands_OceanCatchment = "OceanCatchment_Islands_fgdb_01.7z"
+  )
+  # ----------------------------------------------------------------------------
+  # Generate download URLs.
+  chr_url <- paste0(
+    "https://dmap-data-commons-ow.s3.amazonaws.com/NHDPlusV21/",
+    "Data/NationalData/NHDPlusV21_NationalData_",
+    chr_template
+  )
+  # ----------------------------------------------------------------------------
+  # Generate download file names.
+  chr_filename <- paste0(
+    chr_dir_to_download,
+    "NHDPlusV21_NationalData_",
+    chr_template
+  )
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
+  if (!isTRUE(download)) {
+    return(invisible(amadeus::download_preview(chr_url, chr_filename)))
   }
-# nolint end
+  # ----------------------------------------------------------------------------
+  # Run download.
+  download_result <- amadeus::download_run_method(
+    urls = chr_url,
+    destfiles = chr_filename,
+    token = NULL,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+  # ----------------------------------------------------------------------------
+  # Unzip downloaded .zip files.
+  amadeus::download_unzip(
+    file_name = chr_filename,
+    directory_to_unzip = chr_dir_to_save,
+    unzip = unzip,
+    remove = remove_zip
+  )
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+}
 
 ################################################################################
 # {process} tier
