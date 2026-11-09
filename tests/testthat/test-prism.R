@@ -81,62 +81,62 @@ testthat::test_that("download_prism (expected errors)", {
   directory_to_save <- paste0(tempdir(), "/prism/")
 
   # sol* elements not valid for ts data_type
-  testthat::expect_error(
-    download_prism(
-      time = "202105",
-      element = "soltotal",
-      data_type = "ts",
-      format = "nc",
-      directory_to_save = directory_to_save,
-      acknowledgement = TRUE,
-      download = FALSE
-    )
+  testthat::expect_warning(
+    testthat::expect_error(
+      download_prism(
+        time = "202105",
+        element = "soltotal",
+        data_type = "ts",
+        format = "nc",
+        directory_to_save = directory_to_save,
+        acknowledgement = TRUE,
+        download = FALSE
+      )
+    ),
+    regexp = "download=FALSE"
   )
 
   unlink(directory_to_save, recursive = TRUE)
 })
 
-testthat::test_that(
-  "download_prism mock download (unzip + remove_zip + hash)",
-  {
-    hash_dir <- NULL
-    testthat::local_mocked_bindings(
-      download_run_method = function(urls, destfiles, ...) {
-        payload <- tempfile(fileext = ".txt")
-        writeLines("prism test payload", payload)
-        utils::zip(destfiles, payload, flags = "-q")
-        unlink(payload)
-        invisible(NULL)
-      },
-      download_unzip = function(...) invisible(NULL),
-      download_hash = function(hash, dir) {
-        hash_dir <<- dir
-        if (isTRUE(hash)) "fakehash" else NULL
-      },
-      .package = "amadeus"
-    )
-    withr::with_tempdir({
-      result <- suppressWarnings(
-        suppressMessages(
-          download_prism(
-            time = "201005",
-            element = "ppt",
-            data_type = "ts",
-            format = "nc",
-            directory_to_save = ".",
-            acknowledgement = TRUE,
-            download = TRUE,
-            unzip = TRUE,
-            remove_zip = TRUE,
-            hash = TRUE
-          )
+testthat::test_that("download_prism mock download (unzip + remove_zip + hash)", {
+  hash_dir <- NULL
+  testthat::local_mocked_bindings(
+    download_run_method = function(urls, destfiles, ...) {
+      payload <- tempfile(fileext = ".txt")
+      writeLines("prism test payload", payload)
+      utils::zip(destfiles, payload, flags = "-q")
+      unlink(payload)
+      invisible(NULL)
+    },
+    download_unzip = function(...) invisible(NULL),
+    download_hash = function(hash, dir) {
+      hash_dir <<- dir
+      if (isTRUE(hash)) "fakehash" else NULL
+    },
+    .package = "amadeus"
+  )
+  withr::with_tempdir({
+    result <- suppressWarnings(
+      suppressMessages(
+        download_prism(
+          time = "201005",
+          element = "ppt",
+          data_type = "ts",
+          format = "nc",
+          directory_to_save = ".",
+          acknowledgement = TRUE,
+          download = TRUE,
+          unzip = TRUE,
+          remove_zip = TRUE,
+          hash = TRUE
         )
       )
-      testthat::expect_equal(result, "fakehash")
-      testthat::expect_true(grepl("/data_files/$", hash_dir))
-    })
-  }
-)
+    )
+    testthat::expect_equal(result, "fakehash")
+    testthat::expect_true(grepl("/data_files/$", hash_dir))
+  })
+})
 
 testthat::test_that("download_prism mock download (hash = FALSE)", {
   testthat::local_mocked_bindings(
@@ -334,7 +334,6 @@ testthat::test_that("calculate_prism", {
     "Calculating PRISM covariates with 1000 meters radius..."
   )
 
-
   # error cases
   testthat::expect_error(
     calculate_prism(list(), locs),
@@ -347,8 +346,24 @@ testthat::test_that("calculate_prism strips exactextractr mean. prefix on multi-
   withr::local_package("sf")
   withr::local_package("exactextractr")
 
-  r1 <- terra::rast(ncols = 2, nrows = 2, xmin = -80, xmax = -78, ymin = 35, ymax = 37, crs = "EPSG:4326")
-  r2 <- terra::rast(ncols = 2, nrows = 2, xmin = -80, xmax = -78, ymin = 35, ymax = 37, crs = "EPSG:4326")
+  r1 <- terra::rast(
+    ncols = 2,
+    nrows = 2,
+    xmin = -80,
+    xmax = -78,
+    ymin = 35,
+    ymax = 37,
+    crs = "EPSG:4326"
+  )
+  r2 <- terra::rast(
+    ncols = 2,
+    nrows = 2,
+    xmin = -80,
+    xmax = -78,
+    ymin = 35,
+    ymax = 37,
+    crs = "EPSG:4326"
+  )
   terra::values(r1) <- 1:4
   terra::values(r2) <- 5:8
   rr <- c(r1, r2)
@@ -365,7 +380,15 @@ testthat::test_that("calculate_prism strips exactextractr mean. prefix on multi-
 
 testthat::test_that("calculate_prism errors when deprecated .by is supplied", {
   withr::local_package("terra")
-  from <- terra::rast(ncols = 1, nrows = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326")
+  from <- terra::rast(
+    ncols = 1,
+    nrows = 1,
+    xmin = 0,
+    xmax = 1,
+    ymin = 0,
+    ymax = 1,
+    crs = "EPSG:4326"
+  )
   terra::values(from) <- 5
   names(from) <- "ppt"
   locs <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
@@ -385,7 +408,15 @@ testthat::test_that("calculate_prism errors when deprecated .by is supplied", {
 
 testthat::test_that("calculate_prism .by_time branch derives time and validates inputs", {
   withr::local_package("terra")
-  from <- terra::rast(ncols = 1, nrows = 1, xmin = 0, xmax = 1, ymin = 0, ymax = 1, crs = "EPSG:4326")
+  from <- terra::rast(
+    ncols = 1,
+    nrows = 1,
+    xmin = 0,
+    xmax = 1,
+    ymin = 0,
+    ymax = 1,
+    crs = "EPSG:4326"
+  )
   terra::values(from) <- 5
   names(from) <- "ppt"
   locs <- data.frame(site_id = "s1", lon = 0.5, lat = 0.5)
@@ -407,7 +438,11 @@ testthat::test_that("calculate_prism .by_time branch derives time and validates 
 
   from_multi <- c(from, from)
   names(from_multi) <- c("ppt", "tmean")
-  terra::time(from_multi) <- as.POSIXct(c(NA, NA), origin = "1970-01-01", tz = "UTC")
+  terra::time(from_multi) <- as.POSIXct(
+    c(NA, NA),
+    origin = "1970-01-01",
+    tz = "UTC"
+  )
   testthat::expect_error(
     calculate_prism(
       from = from_multi,
@@ -477,45 +512,42 @@ testthat::test_that("calculate_prism(radius=1000): buffer diameter is 2000 meter
   testthat::expect_equal(max(distances), 1000, tolerance = 1)
 })
 
-testthat::test_that(
-  "calculate_prism(radius=1000): extraction uses a single buffer",
-  {
-    withr::local_package("terra")
-    withr::local_package("sf")
-    withr::local_package("exactextractr")
+testthat::test_that("calculate_prism(radius=1000): extraction uses a single buffer", {
+  withr::local_package("terra")
+  withr::local_package("sf")
+  withr::local_package("exactextractr")
 
-    from <- terra::rast(
-      ncols = 8,
-      nrows = 8,
-      xmin = -2000,
-      xmax = 2000,
-      ymin = -2000,
-      ymax = 2000,
-      crs = "EPSG:3857"
-    )
-    cell_coordinates <- terra::xyFromCell(
-      from,
-      seq_len(terra::ncell(from))
-    )
-    terra::values(from) <- sqrt(rowSums(cell_coordinates^2))
-    names(from) <- "ppt"
+  from <- terra::rast(
+    ncols = 8,
+    nrows = 8,
+    xmin = -2000,
+    xmax = 2000,
+    ymin = -2000,
+    ymax = 2000,
+    crs = "EPSG:3857"
+  )
+  cell_coordinates <- terra::xyFromCell(
+    from,
+    seq_len(terra::ncell(from))
+  )
+  terra::values(from) <- sqrt(rowSums(cell_coordinates^2))
+  names(from) <- "ppt"
 
-    locs <- terra::vect(
-      data.frame(site_id = "s1", x = 0, y = 0),
-      geom = c("x", "y"),
-      crs = "EPSG:3857"
-    )
-    single_buffer <- terra::buffer(locs, width = 1000, quadsegs = 180L)
-    expected <- exactextractr::exact_extract(
-      from,
-      sf::st_as_sf(single_buffer),
-      fun = "mean",
-      force_df = TRUE,
-      progress = FALSE
-    )
+  locs <- terra::vect(
+    data.frame(site_id = "s1", x = 0, y = 0),
+    geom = c("x", "y"),
+    crs = "EPSG:3857"
+  )
+  single_buffer <- terra::buffer(locs, width = 1000, quadsegs = 180L)
+  expected <- exactextractr::exact_extract(
+    from,
+    sf::st_as_sf(single_buffer),
+    fun = "mean",
+    force_df = TRUE,
+    progress = FALSE
+  )
 
-    result <- calculate_prism(from, locs, radius = 1000)
+  result <- calculate_prism(from, locs, radius = 1000)
 
-    testthat::expect_equal(result$ppt_1000, expected[[1]])
-  }
-)
+  testthat::expect_equal(result$ppt_1000, expected[[1]])
+})

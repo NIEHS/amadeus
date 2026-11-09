@@ -23,90 +23,100 @@ download_prism(
 )
 }
 \arguments{
-\item{time}{character(1). Length of 2, 4, 6, or 8. Time period for
-time series or normals. According to the PRISM Web Service Guide,
-acceptable formats include (disclaimer: the following is a direct quote;
-minimal formatting is applied):
-\strong{Time Series}:
-\itemize{
-\item \code{YYYYMMDD} for daily data (between yesterday and January 1st, 1981)
-– returns a single grid in a .zip file
-\item \code{YYYYMM} for monthly data (between last month and January 1981)
-– returns a single grid in a .zip file
-\item \code{YYYY} for annual data (between last year and 1981) - returns a single
-grid in a .zip file
-\item \code{YYYY} for historical data (between 1980 and 1895) - returns a single
-zip file containing 12 monthly grids for \code{YYYY} plus the annual.
-}
+\item{time}{character(1). Single time-period code, retaining leading zeros.
+For \code{data_type = "ts"}, use \code{YYYYMMDD} for a daily grid (from 1981),
+\code{YYYYMM} for a monthly grid (from 1895), or \code{YYYY} for an annual grid
+(from 1895). Each time-series request selects one grid.
+The legacy normals options use \code{MM} for a monthly normal, \code{"14"} for
+an annual normal, or \code{MMDD} for a daily normal; see Details for service
+availability. Local validation requires a character scalar with 2, 4,
+6, or 8 characters; it does not validate calendar dates or availability.}
 
-\strong{Normals}:
-\itemize{
-\item Monthly normal: date is \code{MM} (i.e., 04 for April) or the value 14,
-which returns the annual normal
-\item Daily normal: date is \code{MMDD} (i.e., 0430 for April 30)
-}}
+\item{element}{character(1). Climate element: \code{"ppt"} (default), \code{"tmin"},
+\code{"tmax"}, \code{"tmean"}, \code{"tdmean"}, \code{"vpdmin"}, or \code{"vpdmax"}.
+The legacy normals options also accept \code{"solslope"}, \code{"soltotal"},
+\code{"solclear"}, and \code{"soltrans"}; these are rejected for \code{"ts"}.}
 
-\item{element}{character(1). Data element.
-One of \code{c("ppt", "tmin", "tmax", "tmean", "tdmean", "vpdmin", "vpdmax")}
-For normals, \code{c("solslope", "soltotal", "solclear", "soltrans")}
-are also accepted.}
+\item{data_type}{character(1). Selected data type: \code{"ts"} (default) for
+4 km time series, \code{"normals_800"} for the legacy 800 m normals URL
+template, or \code{"normals"} for the legacy 4 km normals URL template.
+See Details for service availability.}
 
-\item{data_type}{character(1). Data type.
-\itemize{
-\item \code{"ts"}: 4km resolution time series.
-\item \code{"normals_800"}: 800m resolution normals.
-\item \code{"normals"}: 4km resolution normals.
-}}
+\item{format}{character(1). Requested time-series raster format: \code{"nc"}
+(default), \code{"asc"}, or \code{"grib2"}. The argument is validated but omitted
+from normals requests, with a message. See Details for provider support.}
 
-\item{format}{character(1). Data format. Only applicable for
-\code{data_type = "ts"}.}
+\item{directory_to_save}{character(1). Non-empty parent directory.
+Archives are downloaded into \verb{zip_files/} and, when \code{unzip = TRUE},
+extracted into \verb{data_files/}.}
 
-\item{directory_to_save}{character(1). Directory to download files.}
+\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed. Downloaded
+archives and extracted rasters can require substantial storage.}
 
-\item{acknowledgement}{logical(1). By setting \code{TRUE} the
-user acknowledges that the data downloaded using this function may be very
-large and use lots of machine storage and memory.}
+\item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a preview
+after directory creation, without contacting the service, downloading,
+or validating archives. Default is \code{TRUE}.}
 
-\item{download}{logical(1). \code{FALSE} will generate a *.txt file
-containing all download commands. By setting \code{TRUE} the function
-will download all of the requested data files.}
+\item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
+No command file is generated. Default is \code{FALSE}.}
 
-\item{remove_command}{logical(1).
-Remove (\code{TRUE}) or keep (\code{FALSE})
-the text file containing download commands.}
+\item{unzip}{logical(1). Extract the validated ZIP archive into
+\verb{data_files/}. Default is \code{TRUE}. \code{FALSE} retains the archive without
+extracting it; ZIP validation still runs when \code{download = TRUE}.}
 
-\item{unzip}{logical(1). Unzip the downloaded zip file to extract the
-data files (nc, grib2, etc.) into \code{directory_to_save}.
-Default is \code{TRUE}. The PRISM API always returns a zip
-regardless of the requested format.}
+\item{remove_zip}{logical(1). Remove the downloaded archive and its
+\verb{zip_files/} directory, including remaining contents, after extraction.
+Default is \code{FALSE}. May be \code{TRUE} only when \code{unzip = TRUE}.
+No removal occurs when \code{download = FALSE}.}
 
-\item{remove_zip}{logical(1). Remove the zip file after unzipping.
-Default is \code{FALSE}. Only applies when \code{unzip = TRUE}.}
+\item{hash}{logical(1). Return a combined MD5 hash of the files under
+\verb{data_files/} instead of the download summary. Default is \code{FALSE}.
+Ignored when \code{download = FALSE}.}
 
-\item{hash}{logical(1). By setting \code{TRUE} the function will return
-an \code{rlang::hash_file()} hash character corresponding to the
-downloaded files. Default is \code{FALSE}.}
+\item{show_progress}{logical(1). Show file download progress. Default is
+\code{TRUE}. Other status messages may still be printed when \code{FALSE}.}
 
-\item{show_progress}{logical(1). Show download progress.
-Default is \code{TRUE}.}
+\item{max_tries}{integer(1). Maximum attempts per file download request,
+including the initial attempt. Default is 20.}
 
-\item{max_tries}{integer(1). Maximum download retry attempts.
-Default is \code{20}.}
-
-\item{rate_limit}{numeric(1). Minimum seconds between requests.
-Default is \code{2}.}
+\item{rate_limit}{numeric(1). Non-negative throttling interval in seconds,
+passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
 }
 \value{
-\itemize{
-\item For \code{hash = FALSE}, NULL
-\item For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-\item .bil (normals) or single grid files depending on the format
-choice will be stored in \code{directory_to_save}.
-}
+With \code{download = FALSE}, an invisible preview list containing \code{urls},
+\code{destfiles}, and \code{n_files}. Otherwise, after downloading, validation, and
+optional extraction, \code{hash = FALSE} returns the download summary from
+\code{\link[=download_run_method]{download_run_method()}} invisibly. With \code{hash = TRUE}, returns a visible
+character scalar containing the combined MD5 hash of \verb{data_files/}.
 }
 \description{
-Accesses and downloads Oregon State University's
-PRISM data from the PRISM Climate Group Web Service
+Download one time period and climate element from the PRISM Climate Group
+Web Service. ZIP archives and extracted data are stored in separate
+subdirectories using the shared download workflow.
+}
+\details{
+\verb{zip_files/} and \verb{data_files/} are sibling directories created beneath
+\code{directory_to_save}, including for previews and when \code{unzip = FALSE}.
+The local archive name is constructed from the requested element, data
+type, time, and, for time series, format. Names and paths inside the
+archive are preserved during extraction.
+
+After downloading, the destination archive is checked by listing its
+contents with \code{\link[utils:unzip]{utils::unzip()}}. This check also applies to existing
+non-empty archives skipped by \code{\link[=download_run_method]{download_run_method()}}. An unreadable ZIP
+raises an error, with a preview of the response text when available.
+Listing an archive does not fully verify its members or raster contents.
+
+Hashing covers all files under \verb{data_files/}, including existing files,
+and excludes archives in \verb{zip_files/}. With \code{unzip = FALSE}, hashing still
+uses \verb{data_files/}, which may be empty or contain previously extracted data.
+
+The PRISM Web Service Guide dated 26 March 2025 documents time-series ZIP
+downloads, with daily data from 1981 and monthly and annual data from 1895.
+It states that normals are unavailable through this service and lists
+\code{nc}, \code{asc}, and \code{bil} format conversions, rather than \code{grib2}. The normals
+and \code{grib2} options remain accepted by this function but are not documented
+as supported by the current service. See the guide in References.
 }
 \examples{
 \dontrun{
@@ -115,20 +125,21 @@ download_prism(
   element = "ppt",
   data_type = "ts",
   format = "nc",
-  directory_to_save = tempdir(),
+  directory_to_save = file.path(tempdir(), "prism"),
   acknowledgement = TRUE,
-  download = FALSE, # NOTE: download skipped for examples,
-  remove_command = TRUE
+  download = FALSE # Preview the URL and zip_files/ destination.
 )
 }
 }
 \references{
 \insertRef{article_daly2000prism}{amadeus}
-
 \itemize{
 \item \href{https://prism.oregonstate.edu/}{PRISM Climate Group}
 \item \href{https://prism.oregonstate.edu/documents/PRISM_downloads_web_service.pdf}{PRISM Web Service Guide}
 }
+}
+\seealso{
+\code{\link[=download_setup_dir]{download_setup_dir()}}, \code{\link[=download_unzip]{download_unzip()}}, \code{\link[=process_prism]{process_prism()}}
 }
 \author{
 Insang Song

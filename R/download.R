@@ -1170,6 +1170,76 @@ format_file_size <- function(bytes) {
 }
 
 ################################################################################
+#' Validate ZIP archive listings
+#' @description
+#' Check that each supplied file can be listed as a ZIP archive, without
+#' extracting its contents. This detects responses such as text or HTML
+#' notices saved under a ZIP filename.
+#' @param files character. Paths to ZIP archives to check, in order.
+#' @details
+#' Calls [utils::unzip()] with `list = TRUE` for each file. A warning or error
+#' while listing is treated as a validation failure. Validation stops at the
+#' first failure and identifies the archive by its basename.
+#'
+#' When possible, the error includes the first three lines read from the
+#' failed file as text. This preview can expose a provider's error or service
+#' notice. Files are neither extracted nor removed, and callers may validate
+#' archives even when extraction is disabled.
+#'
+#' A successful listing does not fully verify archive-member integrity or
+#' the type, contents, or scientific validity of the extracted data.
+#' @return `NULL`, invisibly, when all supplied archives can be listed
+#' without warnings or errors, including when `files` is empty. Otherwise,
+#' raises an error; no per-file logical result is returned.
+#' @seealso [download_prism()], [download_unzip()], [utils::unzip()]
+#' @keywords internal
+#' @noRd
+validate_zip <- function(files) {
+  # ----------------------------------------------------------------------------
+  # Loop over all files.
+  for (f in files) {
+    # --------------------------------------------------------------------------
+    # Return `TRUE` if unzip to list successful; `FALSE` if not.
+    lgl_zip <- tryCatch(
+      {
+        withCallingHandlers(
+          {
+            utils::unzip(f, list = TRUE)
+            TRUE
+          },
+          warning = function(w) {
+            stop(conditionMessage(w), call. = FALSE)
+          }
+        )
+      },
+      error = function(e) FALSE
+    )
+    # --------------------------------------------------------------------------
+    # If unzip to list successful, read and report first lines.
+    if (!lgl_zip) {
+      chr_preview <- tryCatch(
+        {
+          paste0(readLines(f, n = 3, warn = FALSE), collapse = " ")
+        },
+        error = function(e) ""
+      )
+      stop(
+        sprintf(
+          "Downloaded archive '%s' is not a valid zip file.%s",
+          basename(f),
+          if (nzchar(chr_preview)) {
+            paste0("Response preview: ", chr_preview)
+          } else {
+            ""
+          }
+        ),
+        call. = FALSE
+      )
+    }
+  }
+}
+
+################################################################################
 #' Extract downloaded archives
 #' @description
 #' Extract downloaded ".zip" or ".7z" files.
