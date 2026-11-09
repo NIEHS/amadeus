@@ -19,7 +19,11 @@
 #'   \item "Impervious Descriptor"
 #'   \item "Spectral Change Day of Year"
 #' }
-#' @param year integer(1). Year of NLCD data (1985-2024). Default is 2021.
+#' @param year integer(1 or more). One year, two endpoints, or a non-empty
+#'   vector of years. Every year from the minimum through the maximum is
+#'   requested, including gaps: `c(2018, 2023)` requests `2018:2023`.
+#'   Requested years must be within 1985-2024. Default is 2021.
+#'   Missing, fractional, and future years are rejected.
 #' @param directory_to_save character(1). Directory to save downloaded files.
 #' @param acknowledgement logical(1). Must be \code{TRUE} to proceed with
 #' download.

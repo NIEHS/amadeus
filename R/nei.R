@@ -42,7 +42,6 @@
 download_nei <- function(
   epa_certificate_path = NULL,
   certificate_url = paste0(
-    # nolint: line_length_linter.
     "http://cacerts.digicert.com/",
     "DigiCertGlobalG2TLSRSASHA2562020CA1-1.crt"
   ),

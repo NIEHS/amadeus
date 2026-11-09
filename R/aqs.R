@@ -28,7 +28,11 @@
 #' @param parameter_code integer(1). EPA pollutant parameter code. See
 #'   Details for a short list of common codes.
 #' @param resolution_temporal character(1). "daily" or "hourly".
-#' @param year integer(1 or 2). Year or start/end years for downloading data.
+#' @param year integer(1 or more). One year, two endpoints, or a non-empty
+#'   vector of years. Every year from the minimum through the maximum is
+#'   requested, including gaps: `c(2018, 2023)` requests `2018:2023`.
+#'   Default is `c(2018, 2022)`. Missing, fractional, and future years are
+#'   rejected.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
@@ -131,17 +135,8 @@ download_aqs <- function(
     int_years
   )
   # ----------------------------------------------------------------------------
-  # Check first URL for valid generation; error if not.
-  if (
-    isTRUE(download) &&
-      length(chr_urls) > 0 &&
-      !amadeus::check_url_status(chr_urls[1])
-  ) {
-    stop(paste0(
-      "Invalid year returns HTTP code 404. ",
-      "Check `year` parameter.\n"
-    ))
-  }
+  # Check first URL for validity.
+  amadeus:::check_preflight(chr_urls[1])
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {

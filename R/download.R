@@ -208,34 +208,35 @@ download_data <-
 ################################################################################
 #' Generate an inclusive sequence of years
 #' @description
-#' Validate a single year or two range endpoints, order the endpoints, and
-#' generate all years in the range.
-#' @param year numeric(1 or 2). Non-missing, non-negative, integer-valued years.
-#'   Supply a single year or two range endpoints in either order.
-#' @details Source-specific data availability limits are not checked.
+#' Validate all supplied years and generate every year from the minimum
+#' through the maximum, including both endpoints.
+#' @param year numeric(1 or more). A non-empty vector of non-missing,
+#'   integer-valued years between 1900 and the current calendar year.
+#'   A single year, two endpoints, or a longer vector may be supplied in
+#'   any order; repeated years are accepted.
+#' @details Gaps are filled automatically: `c(2018, 2023)` and
+#'   `c(2018, 2020, 2023)` both return `2018:2023`.
+#'   Source-specific data availability limits are checked by the caller.
 #' @return Numeric vector of consecutive years in ascending order, including
 #'   both endpoints. A single input year returns one value.
 #' @keywords internal
 #' @noRd
 sequence_years <- function(year) {
   # ----------------------------------------------------------------------------
-  # Repeat `year` if only one.
-  int_years <- if (length(year) == 1) rep(year, 2) else year
-  # ----------------------------------------------------------------------------
-  # Ensure `year` is length 2.
+  # Validate every supplied year before selecting the range.
   checkmate::assert_integerish(
-    int_years,
-    len = 2L,
+    year,
+    min.len = 1L,
     lower = 1900,
     upper = as.integer(format(Sys.Date(), "%Y")),
     any.missing = FALSE
   )
   # ----------------------------------------------------------------------------
-  # Order years.
-  int_years <- sort(int_years)
+  # Find the earliest and latest years.
+  int_years <- range(year)
   # ----------------------------------------------------------------------------
-  # Generate sequence.
-  seq(int_years[1], int_years[2], 1)
+  # Generate the inclusive sequence.
+  seq(int_years[1L], int_years[2L], by = 1)
 }
 
 ################################################################################
@@ -1198,10 +1199,10 @@ download_unzip <- function(
   message(paste0("Unzipping files...\n"))
   if (ext == "zip") {
     unzip(file_name, exdir = directory_to_unzip)
-  } else if (ext == "7z") {
+  } else if (ext %in% c("7z", "gz", "tar")) {
     archive::archive_extract(file_name, dir = directory_to_unzip)
   } else {
-    stop("Unsupported archive format. Expected .zip or .7z.")
+    stop("Unsupported archive format. Expected .zip, .7z., .tar, or .gz")
   }
   # ----------------------------------------------------------------------------
   # Report where the extracted files were saved.

@@ -20,7 +20,12 @@ download_gridmet(
 \arguments{
 \item{variables}{character. Variable(s) name(s).}
 
-\item{year}{integer(1 or 2). Year or start/end years for downloading data.}
+\item{year}{integer(1 or more). One year, two endpoints, or a non-empty
+vector of years. Every year from the minimum through the maximum is
+requested, including gaps: \code{c(2018, 2023)} requests \code{2018:2023}.
+Default is \code{c(2018, 2022)}. Missing, fractional, and future years are
+rejected. For SPEI/EDDI, complete multi-year files are downloaded
+regardless of \code{year}; see Details.}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
