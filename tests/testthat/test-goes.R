@@ -50,7 +50,7 @@ testthat::test_that("download_goes errors on invalid satellite", {
       directory_to_save = tempdir(),
       acknowledgement = TRUE
     ),
-    regexp = "satellite must be"
+    regexp = "'arg' should be one of “16”, “18”"
   )
 })
 
@@ -63,26 +63,36 @@ testthat::test_that("download_goes errors on invalid product", {
       directory_to_save = tempdir(),
       acknowledgement = TRUE
     ),
-    regexp = "product must be one of"
+    regexp = "'arg' should be one of “ADP-C”, “ADP-F”, “ADP-M”"
   )
 })
 
 testthat::test_that("download_goes maps product to ABI-L2 ADP S3 prefixes", {
+  testthat::local_mocked_bindings(
+    check_preflight = function(...) invisible(NULL),
+    download_run_method = function(...) {
+      list(success = 1, failed = 0, skipped = 0)
+    },
+    .package = "amadeus"
+  )
   for (prod in c("ADP-C", "ADP-F", "ADP-M")) {
     seen_url <- NULL
     testthat::local_mocked_bindings(
       req_perform = function(req, ...) {
-        seen_url <<- req$url
-        structure(
-          list(
-            status_code = 200L,
-            body = charToRaw("<ListBucketResult></ListBucketResult>")
-          ),
-          class = "httr2_response"
+        # Compare the query's decoded prefix, independent of URL encoding.
+        seen_url <<- utils::URLdecode(req$url)
+        httr2::response(
+          status_code = 200L,
+          url = req$url,
+          headers = list(`Content-Type` = "application/xml"),
+          body = charToRaw(paste0(
+            '<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">',
+            "<Contents><Key>",
+            httr2::url_parse(req$url)$query$prefix,
+            "00/mock.nc</Key></Contents>",
+            "</ListBucketResult>"
+          ))
         )
-      },
-      resp_body_string = function(resp, ...) {
-        rawToChar(resp$body)
       },
       .package = "httr2"
     )
@@ -112,7 +122,16 @@ testthat::test_that("download_goes maps product to ABI-L2 ADP S3 prefixes", {
 
 testthat::test_that("download_goes remove_command deprecation warning", {
   testthat::local_mocked_bindings(
-    download_run_method = function(...) list(success = 0, failed = 0, skipped = 1),
+    discover_goes = function(df, ...) {
+      data.frame(
+        url = paste0(df$base, df$prefix, "00/mock.nc"),
+        destfile = paste0(df$dir, df$prefix, "00/mock.nc")
+      )
+    },
+    check_preflight = function(...) invisible(NULL),
+    download_run_method = function(...) {
+      list(success = 0, failed = 0, skipped = 1)
+    },
     .package = "amadeus"
   )
   withr::with_tempdir({
@@ -134,7 +153,16 @@ testthat::test_that("download_goes remove_command deprecation warning", {
 
 testthat::test_that("download_goes download=FALSE deprecation warning", {
   testthat::local_mocked_bindings(
-    download_run_method = function(...) list(success = 0, failed = 0, skipped = 1),
+    discover_goes = function(df, ...) {
+      data.frame(
+        url = paste0(df$base, df$prefix, "00/mock.nc"),
+        destfile = paste0(df$dir, df$prefix, "00/mock.nc")
+      )
+    },
+    check_preflight = function(...) invisible(NULL),
+    download_run_method = function(...) {
+      list(success = 0, failed = 0, skipped = 1)
+    },
     .package = "amadeus"
   )
   withr::with_tempdir({
@@ -156,6 +184,7 @@ testthat::test_that("download_goes download=FALSE deprecation warning", {
 
 testthat::test_that("download_goes mock: hash=TRUE returns hash", {
   testthat::local_mocked_bindings(
+    check_preflight = function(...) invisible(NULL),
     download_run_method = function(...) list(success = 1, failed = 0),
     download_hash = function(hash, dir) if (isTRUE(hash)) "fakehash" else NULL,
     .package = "amadeus"
@@ -163,23 +192,19 @@ testthat::test_that("download_goes mock: hash=TRUE returns hash", {
   # Mock httr2 request/response to return a fake XML with one file key
   testthat::local_mocked_bindings(
     req_perform = function(req, ...) {
-      structure(
-        list(
-          status_code = 200L,
-          body = charToRaw(
-            paste0(
-              "<ListBucketResult>",
-              "<Key>ABI-L2-ADPC/2018/001/00/OR_ABI-L2-ADPC-M6_G16_",
-              "s20180010000000_e20180010001000_c20180010002000.nc</Key>",
-              "</ListBucketResult>"
-            )
+      httr2::response(
+        status_code = 200L,
+        url = req$url,
+        headers = list(`Content-Type` = "application/xml"),
+        body = charToRaw(
+          paste0(
+            '<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">',
+            "<Contents><Key>ABI-L2-ADPC/2018/001/00/OR_ABI-L2-ADPC-M6_G16_",
+            "s20180010000000_e20180010001000_c20180010002000.nc</Key></Contents>",
+            "</ListBucketResult>"
           )
-        ),
-        class = "httr2_response"
+        )
       )
-    },
-    resp_body_string = function(resp, ...) {
-      rawToChar(resp$body)
     },
     .package = "httr2"
   )
@@ -216,24 +241,24 @@ testthat::test_that("download_goes dispatch via download_data", {
 
 testthat::test_that("download_goes single-date + download=FALSE returns listing", {
   testthat::local_mocked_bindings(
+    check_preflight = function(...) invisible(NULL),
+    .package = "amadeus"
+  )
+  testthat::local_mocked_bindings(
     req_perform = function(req, ...) {
-      structure(
-        list(
-          status_code = 200L,
-          body = charToRaw(
-            paste0(
-              "<ListBucketResult>",
-              "<Key>ABI-L2-ADPC/2018/001/00/OR_ABI-L2-ADPC-M6_G16_",
-              "s20180010000000_e20180010001000_c20180010002000.nc</Key>",
-              "</ListBucketResult>"
-            )
+      httr2::response(
+        status_code = 200L,
+        url = req$url,
+        headers = list(`Content-Type` = "application/xml"),
+        body = charToRaw(
+          paste0(
+            '<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">',
+            "<Contents><Key>ABI-L2-ADPC/2018/001/00/OR_ABI-L2-ADPC-M6_G16_",
+            "s20180010000000_e20180010001000_c20180010002000.nc</Key></Contents>",
+            "</ListBucketResult>"
           )
-        ),
-        class = "httr2_response"
+        )
       )
-    },
-    resp_body_string = function(resp, ...) {
-      rawToChar(resp$body)
     },
     .package = "httr2"
   )
@@ -257,7 +282,7 @@ testthat::test_that("download_goes single-date + download=FALSE returns listing"
   })
 })
 
-testthat::test_that("download_goes warns when listing fails for one day", {
+testthat::test_that("download_goes errors when listing fails for one day", {
   testthat::local_mocked_bindings(
     req_perform = function(req, ...) {
       stop("synthetic listing failure")
@@ -265,8 +290,8 @@ testthat::test_that("download_goes warns when listing fails for one day", {
     .package = "httr2"
   )
   withr::with_tempdir({
-    testthat::expect_warning(
-      out <- suppressMessages(
+    testthat::expect_error(
+      suppressMessages(
         download_goes(
           date = "2018-01-01",
           satellite = "16",
@@ -277,34 +302,30 @@ testthat::test_that("download_goes warns when listing fails for one day", {
       ),
       regexp = "Failed to list GOES files"
     )
-    testthat::expect_true(is.list(out))
   })
 })
 
 testthat::test_that("download_goes hash=FALSE returns download result", {
   testthat::local_mocked_bindings(
     req_perform = function(req, ...) {
-      structure(
-        list(
-          status_code = 200L,
-          body = charToRaw(
-            paste0(
-              "<ListBucketResult>",
-              "<Key>ABI-L2-ADPC/2018/001/00/OR_ABI-L2-ADPC-M6_G16_",
-              "s20180010000000_e20180010001000_c20180010002000.nc</Key>",
-              "</ListBucketResult>"
-            )
+      httr2::response(
+        status_code = 200L,
+        url = req$url,
+        headers = list(`Content-Type` = "application/xml"),
+        body = charToRaw(
+          paste0(
+            '<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">',
+            "<Contents><Key>ABI-L2-ADPC/2018/001/00/OR_ABI-L2-ADPC-M6_G16_",
+            "s20180010000000_e20180010001000_c20180010002000.nc</Key></Contents>",
+            "</ListBucketResult>"
           )
-        ),
-        class = "httr2_response"
+        )
       )
-    },
-    resp_body_string = function(resp, ...) {
-      rawToChar(resp$body)
     },
     .package = "httr2"
   )
   testthat::local_mocked_bindings(
+    check_preflight = function(...) invisible(NULL),
     download_run_method = function(...) {
       list(success = 1, failed = 0, skipped = 0)
     },
@@ -457,8 +478,14 @@ testthat::test_that("process_goes(daily_agg=FALSE): default output remains uncha
       daily_agg = FALSE
     )
   )
-  testthat::expect_equal(terra::nlyr(result_default), terra::nlyr(result_explicit_false))
-  testthat::expect_equal(terra::values(result_default), terra::values(result_explicit_false))
+  testthat::expect_equal(
+    terra::nlyr(result_default),
+    terra::nlyr(result_explicit_false)
+  )
+  testthat::expect_equal(
+    terra::values(result_default),
+    terra::values(result_explicit_false)
+  )
 })
 
 testthat::test_that("process_goes(daily_agg=TRUE, fun=...): aggregates sub-daily GOES layers by day", {
@@ -504,7 +531,8 @@ testthat::test_that("process_goes(daily_agg=TRUE, fun=...): aggregates sub-daily
   testthat::expect_equal(terra::nlyr(goes_daily_sum), 2L)
   testthat::expect_equal(terra::nlyr(goes_daily_wrapper), 2L)
   testthat::expect_true(all(
-    format(as.Date(terra::time(goes_daily_mean)), "%Y%m%d") %in% c("20180101", "20180102")
+    format(as.Date(terra::time(goes_daily_mean)), "%Y%m%d") %in%
+      c("20180101", "20180102")
   ))
   testthat::expect_true(all(
     terra::values(goes_daily_sum) >= terra::values(goes_daily_mean),
@@ -810,36 +838,6 @@ testthat::test_that("calculate_goes dispatch via calculate_covariates", {
 
 # nolint end
 
-testthat::test_that("download_goes empty S3 listing returns early", {
-  testthat::local_mocked_bindings(
-    req_perform = function(req, ...) {
-      structure(
-        list(
-          status_code = 200L,
-          body = charToRaw("<ListBucketResult></ListBucketResult>")
-        ),
-        class = "httr2_response"
-      )
-    },
-    resp_body_string = function(resp, ...) rawToChar(resp$body),
-    .package = "httr2"
-  )
-  withr::with_tempdir({
-    out <- suppressMessages(
-      download_goes(
-        date = "2018-01-01",
-        satellite = "16",
-        product = "ADP-C",
-        directory_to_save = ".",
-        acknowledgement = TRUE
-      )
-    )
-    testthat::expect_true(is.list(out))
-    testthat::expect_equal(out$success, 0)
-    testthat::expect_equal(out$skipped, 0)
-  })
-})
-
 testthat::test_that("process_goes uses partial match fallback for variable name", {
   withr::local_package("terra")
   goes_dir <- testthat::test_path("..", "testdata", "goes")
@@ -876,155 +874,169 @@ testthat::test_that("process_goes single-date string expands to range", {
   testthat::expect_equal(terra::nlyr(result_single), terra::nlyr(result_pair))
 })
 
-testthat::test_that(
-  "process_goes(path=<vector of files>): accepts high-frequency NetCDF path vectors",
-  {
-    withr::local_package("terra")
-    goes_dir <- testthat::test_path("..", "testdata", "goes")
-    goes_paths <- list.files(
-      goes_dir,
-      pattern = "\\.nc$",
-      recursive = TRUE,
-      full.names = TRUE
-    )
+testthat::test_that("process_goes(path=<vector of files>): accepts high-frequency NetCDF path vectors", {
+  withr::local_package("terra")
+  goes_dir <- testthat::test_path("..", "testdata", "goes")
+  goes_paths <- list.files(
+    goes_dir,
+    pattern = "\\.nc$",
+    recursive = TRUE,
+    full.names = TRUE
+  )
 
-    result_vector <- suppressMessages(
-      process_goes(
-        date = "2018-01-01",
-        variable = "Smoke",
-        path = goes_paths
+  result_vector <- suppressMessages(
+    process_goes(
+      date = "2018-01-01",
+      variable = "Smoke",
+      path = goes_paths
+    )
+  )
+  result_directory <- suppressMessages(
+    process_goes(
+      date = "2018-01-01",
+      variable = "Smoke",
+      path = goes_dir
+    )
+  )
+  result_wrapper <- suppressMessages(
+    process_covariates(
+      covariate = "goes",
+      date = "2018-01-01",
+      variable = "Smoke",
+      path = goes_paths
+    )
+  )
+
+  testthat::expect_s4_class(result_vector, "SpatRaster")
+  testthat::expect_equal(
+    terra::nlyr(result_vector),
+    terra::nlyr(result_directory)
+  )
+  testthat::expect_equal(
+    terra::nlyr(result_wrapper),
+    terra::nlyr(result_directory)
+  )
+})
+
+testthat::test_that("process_goes(path=<heterogeneous files>): errors on non-homogeneous layer counts", {
+  withr::local_package("terra")
+  withr::with_tempdir({
+    make_layer <- function(value) {
+      r <- terra::rast(
+        nrows = 2,
+        ncols = 2,
+        xmin = -100,
+        xmax = -99,
+        ymin = 35,
+        ymax = 36,
+        crs = "EPSG:4326"
       )
-    )
-    result_directory <- suppressMessages(
-      process_goes(
-        date = "2018-01-01",
-        variable = "Smoke",
-        path = goes_dir
-      )
-    )
-    result_wrapper <- suppressMessages(
-      process_covariates(
-        covariate = "goes",
-        date = "2018-01-01",
-        variable = "Smoke",
-        path = goes_paths
-      )
-    )
+      terra::values(r) <- value
+      r
+    }
 
-    testthat::expect_s4_class(result_vector, "SpatRaster")
-    testthat::expect_equal(terra::nlyr(result_vector), terra::nlyr(result_directory))
-    testthat::expect_equal(terra::nlyr(result_wrapper), terra::nlyr(result_directory))
-  }
-)
+    two_layers <- c(make_layer(1), make_layer(2))
+    one_layer <- make_layer(3)
+    names(two_layers) <- c("Smoke", "SmokeFlag")
+    names(one_layer) <- "Smoke"
 
-testthat::test_that(
-  "process_goes(path=<heterogeneous files>): errors on non-homogeneous layer counts",
-  {
-    withr::local_package("terra")
-    withr::with_tempdir({
-      make_layer <- function(value) {
-        r <- terra::rast(
-          nrows = 2,
-          ncols = 2,
-          xmin = -100,
-          xmax = -99,
-          ymin = 35,
-          ymax = 36,
-          crs = "EPSG:4326"
-        )
-        terra::values(r) <- value
-        r
-      }
-
-      two_layers <- c(make_layer(1), make_layer(2))
-      one_layer <- make_layer(3)
-      names(two_layers) <- c("Smoke", "SmokeFlag")
-      names(one_layer) <- "Smoke"
-
-      f1 <- "OR_ADP-C3C02_G16_s20180010000000_e20180010001000_c20180010002000.nc"
-      f2 <- "OR_ADP-C3C02_G16_s20180010100000_e20180010101000_c20180010102000.nc"
-      suppressWarnings(terra::writeCDF(two_layers, f1, varname = "Smoke", overwrite = TRUE))
-      suppressWarnings(terra::writeCDF(one_layer, f2, varname = "Smoke", overwrite = TRUE))
-
-      testthat::expect_error(
-        suppressWarnings(suppressMessages(
-          process_goes(
-            date = "2018-01-01",
-            variable = "Smoke",
-            path = getwd()
-          )
-        )),
-        regexp = "not structurally homogeneous"
-      )
-    })
-  }
-)
-
-testthat::test_that(
-  "process_goes(path=<vector with missing file>): errors with missing GOES paths",
-  {
-    goes_dir <- testthat::test_path("..", "testdata", "goes")
-    existing_path <- list.files(
-      goes_dir,
-      pattern = "\\.nc$",
-      recursive = TRUE,
-      full.names = TRUE
-    )[1]
-    missing_path <- file.path(
-      tempdir(),
-      "OR_ADP-C3C02_G16_s20180010000000_e20180010001000_c20180010002000.nc"
-    )
+    f1 <- "OR_ADP-C3C02_G16_s20180010000000_e20180010001000_c20180010002000.nc"
+    f2 <- "OR_ADP-C3C02_G16_s20180010100000_e20180010101000_c20180010102000.nc"
+    suppressWarnings(terra::writeCDF(
+      two_layers,
+      f1,
+      varname = "Smoke",
+      overwrite = TRUE
+    ))
+    suppressWarnings(terra::writeCDF(
+      one_layer,
+      f2,
+      varname = "Smoke",
+      overwrite = TRUE
+    ))
 
     testthat::expect_error(
-      process_goes(
-        date = "2018-01-01",
-        variable = "Smoke",
-        path = c(existing_path, missing_path)
-      ),
-      regexp = "Some GOES paths do not exist"
-    )
-  }
-)
-
-testthat::test_that(
-  "process_goes(path=<inconsistent variable index>): errors on mismatched layer index",
-  {
-    withr::local_package("terra")
-    withr::with_tempdir({
-      make_layer <- function(value) {
-        r <- terra::rast(
-          nrows = 2,
-          ncols = 2,
-          xmin = -100,
-          xmax = -99,
-          ymin = 35,
-          ymax = 36,
-          crs = "EPSG:4326"
+      suppressWarnings(suppressMessages(
+        process_goes(
+          date = "2018-01-01",
+          variable = "Smoke",
+          path = getwd()
         )
-        terra::values(r) <- value
-        r
-      }
+      )),
+      regexp = "not structurally homogeneous"
+    )
+  })
+})
 
-      first_file <- c(make_layer(1), make_layer(2), make_layer(3))
-      second_file <- make_layer(4)
-      names(first_file) <- c("Dummy", "SmokeFlag", "SmokeMask")
-      names(second_file) <- "SmokeFlag"
+testthat::test_that("process_goes(path=<vector with missing file>): errors with missing GOES paths", {
+  goes_dir <- testthat::test_path("..", "testdata", "goes")
+  existing_path <- list.files(
+    goes_dir,
+    pattern = "\\.nc$",
+    recursive = TRUE,
+    full.names = TRUE
+  )[1]
+  missing_path <- file.path(
+    tempdir(),
+    "OR_ADP-C3C02_G16_s20180010000000_e20180010001000_c20180010002000.nc"
+  )
 
-      f1 <- "OR_ADP-C3C02_G16_s20180010000000_e20180010001000_c20180010002000.nc"
-      f2 <- "OR_ADP-C3C02_G16_s20180010100000_e20180010101000_c20180010102000.nc"
-      suppressWarnings(terra::writeCDF(first_file, f1, varname = "Smoke", overwrite = TRUE))
-      suppressWarnings(terra::writeCDF(second_file, f2, varname = "Smoke", overwrite = TRUE))
+  testthat::expect_error(
+    process_goes(
+      date = "2018-01-01",
+      variable = "Smoke",
+      path = c(existing_path, missing_path)
+    ),
+    regexp = "Some GOES paths do not exist"
+  )
+})
 
-      testthat::expect_error(
-        suppressWarnings(suppressMessages(
-          process_goes(
-            date = "2018-01-01",
-            variable = "Smoke",
-            path = getwd()
-          )
-        )),
-        regexp = "variable layer index exceeds per-file layer count"
+testthat::test_that("process_goes(path=<inconsistent variable index>): errors on mismatched layer index", {
+  withr::local_package("terra")
+  withr::with_tempdir({
+    make_layer <- function(value) {
+      r <- terra::rast(
+        nrows = 2,
+        ncols = 2,
+        xmin = -100,
+        xmax = -99,
+        ymin = 35,
+        ymax = 36,
+        crs = "EPSG:4326"
       )
-    })
-  }
-)
+      terra::values(r) <- value
+      r
+    }
+
+    first_file <- c(make_layer(1), make_layer(2), make_layer(3))
+    second_file <- make_layer(4)
+    names(first_file) <- c("Dummy", "SmokeFlag", "SmokeMask")
+    names(second_file) <- "SmokeFlag"
+
+    f1 <- "OR_ADP-C3C02_G16_s20180010000000_e20180010001000_c20180010002000.nc"
+    f2 <- "OR_ADP-C3C02_G16_s20180010100000_e20180010101000_c20180010102000.nc"
+    suppressWarnings(terra::writeCDF(
+      first_file,
+      f1,
+      varname = "Smoke",
+      overwrite = TRUE
+    ))
+    suppressWarnings(terra::writeCDF(
+      second_file,
+      f2,
+      varname = "Smoke",
+      overwrite = TRUE
+    ))
+
+    testthat::expect_error(
+      suppressWarnings(suppressMessages(
+        process_goes(
+          date = "2018-01-01",
+          variable = "Smoke",
+          path = getwd()
+        )
+      )),
+      regexp = "variable layer index exceeds per-file layer count"
+    )
+  })
+})

@@ -8,37 +8,81 @@
 # nolint start
 #' Download NOAA GOES ADP data
 #' @description
-#' The \code{download_goes()} function accesses and downloads NOAA GOES-16 or
-#' GOES-18 Aerosol Detection Product (ADP) files from the
-#' NOAA Open Data Dissemination (NODD) AWS S3 bucket. Files are in NetCDF
-#' format and contain aerosol detection variables (e.g. \code{"Smoke"},
-#' \code{"Dust"}) on the GOES fixed geostationary grid.
+#' Discover and download NOAA GOES-16 or GOES-18 Aerosol Detection Product
+#' (ADP) files from the NOAA Open Data Dissemination (NODD) AWS S3 archive.
+#' Files are in NetCDF format and contain aerosol detection variables
+#' (e.g. `"Smoke"`, `"Dust"`) on the GOES fixed geostationary grid.
 #' @note
 #' \itemize{
 #'   \item GOES data does not require authentication.
-#'   \item GOES-16 (East) covers the Americas; GOES-18 (West) covers the
-#'     western hemisphere and Pacific.
 #'   \item ADP-C (CONUS) scans are produced approximately every 5 minutes.
 #'     A single day may contain several hundred files.
 #'   \item GOES ADP files use the GOES fixed geostationary projection. Use
 #'     \code{process_goes()} to load and reproject to EPSG:4326.
 #' }
-#' @param date character(1 or 2). Date (YYYY-MM-DD) or start and end dates.
-#' @param satellite character(1). GOES satellite number: \code{"16"} (East,
-#'   default) or \code{"18"} (West).
-#' @param product character(1). ADP scan sector: \code{"ADP-C"} (CONUS,
-#'   default), \code{"ADP-F"} (Full Disk), or \code{"ADP-M"} (Mesoscale).
-#' @param directory_to_save character(1). Directory to save downloaded files.
-#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed.
-#' @param download logical(1). DEPRECATED. Downloads happen automatically.
-#' @param remove_command logical(1). Deprecated, ignored.
-#' @param show_progress logical(1). Show download progress (default \code{TRUE}).
-#' @param hash logical(1). Return hash of downloaded files (default \code{FALSE}).
-#' @param max_tries integer(1). Maximum retry attempts (default 20).
-#' @param rate_limit numeric(1). Minimum seconds between requests (default 2).
+#' @param date character(1 or 2). Single date or inclusive range endpoints in
+#'   `"YYYY-MM-DD"` format. Endpoints may be supplied in either order.
+#' @param satellite character(1). GOES satellite number: `"16"` (default) or
+#'   `"18"`. Selects one satellite per call.
+#' @param product character(1). ADP scan sector: `"ADP-C"` (CONUS, default),
+#'   `"ADP-F"` (Full Disk), or `"ADP-M"` (Mesoscale). Selects one product per
+#'   call.
+#' @param directory_to_save character(1). Non-empty output directory, created
+#'   if needed. Files retain their S3 directory structure below this root;
+#'   see Details.
+#' @param acknowledgement logical(1). Must be `TRUE` to proceed.
+#' @param download logical(1). Deprecated. `FALSE` warns and returns a preview
+#'   after directory creation, discovery, and the preflight check, without
+#'   downloading data files. Default is `TRUE`.
+#' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
+#'   Default is `FALSE`.
+#' @param show_progress logical(1). Show per-file download progress. Default
+#'   is `TRUE`; discovery and summary messages may still be printed when
+#'   `FALSE`.
+#' @param hash logical(1). Return the combined directory MD5 hash when `TRUE`.
+#'   Default is `FALSE`. Ignored when `download = FALSE`.
+#' @param max_tries integer(1). Maximum attempts per listing or file request,
+#'   including the initial attempt. Default is 20.
+#' @param rate_limit numeric(1). Non-negative request-throttling interval in
+#'   seconds, passed to discovery and downloads. Default is 2. Discovery uses
+#'   a capacity-one bucket; 0 disables discovery throttling. File downloads
+#'   follow the throttling policy in [download_run_method()].
+#' @details
+#' `satellite` and `product` are matched with [base::match.arg()], allowing
+#' case-sensitive, unambiguous partial matches. Omitted arguments select the
+#' first listed choice. Products `"ADP-C"`, `"ADP-F"`, and `"ADP-M"` map to
+#' S3 prefixes `"ABI-L2-ADPC"`, `"ABI-L2-ADPF"`, and `"ABI-L2-ADPM"`.
+#'
+#' Daily listings supply the actual file names. Files are saved under
+#' `directory_to_save/<product-prefix>/<year>/<day-of-year>/<hour>/<filename>`.
+#' The day of year uses three digits, such as `"001"`. Existing non-empty
+#' destination files are skipped by [download_run_method()]; preview results
+#' include them because discovery does not filter local files.
+#'
+#' Discovery requests one S3 listing page of up to 1000 keys per day and keeps
+#' keys ending in `.nc`. Continuation tokens are not followed, so results can
+#' be incomplete when a daily listing spans multiple pages.
+#'
+#' A successfully retrieved listing with no matching files emits a message
+#' and contributes no rows. Errors while requesting, parsing, or processing
+#' any listing stop discovery before downloading. Files are not required for
+#' every requested date. If all listings are empty, the preflight check warns;
+#' `download = TRUE` then errors with `"No URLs provided for download."`,
+#' whereas `download = FALSE` returns an empty preview.
+#'
+#' Discovery uses a 60-second timeout per request attempt. File downloads use
+#' [download_run_method()]'s default timeout of 3600 seconds. The preflight
+#' check probes the first discovered URL using its own request settings; a
+#' failed check warns and allows the download or preview to proceed.
+#' @return
+#' With `download = FALSE`, an invisible preview list containing `urls`,
+#' `destfiles`, and `n_files`. Otherwise, with `hash = FALSE`, the invisible
+#' summary from [download_run_method()], including `success`, `failed`, and
+#' `skipped` counts. With `hash = TRUE`, a visible combined MD5 hash for all
+#' files under `directory_to_save`, including previously downloaded files.
 #' @author Mitchell Manware
-#' @return invisible list with download results; or hash character if
-#'   \code{hash = TRUE}
+#' @seealso [download_data()], [process_goes()], [download_run_method()],
+#'   [download_preview()]
 #' @importFrom httr2 request
 #' @importFrom httr2 req_retry
 #' @importFrom httr2 req_timeout
@@ -59,8 +103,8 @@
 # nolint end
 download_goes <- function(
   date = c("2024-01-01", "2024-01-01"),
-  satellite = "16",
-  product = "ADP-C",
+  satellite = c("16", "18"),
+  product = c("ADP-C", "ADP-F", "ADP-M"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -70,168 +114,252 @@ download_goes <- function(
   max_tries = 20,
   rate_limit = 2
 ) {
-  #### Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### Check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return",
-      " after discovering files.\n",
-      call. = FALSE
-    )
-  }
-  if (remove_command != FALSE) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-
-  #### Validate satellite
-  satellite <- as.character(satellite)
-  if (!satellite %in% c("16", "18")) {
-    stop("satellite must be '16' or '18'.\n")
-  }
-
-  #### Validate product
-  product <- toupper(product)
-  valid_products <- c("ADP-C", "ADP-F", "ADP-M")
-  if (!product %in% valid_products) {
-    stop(paste0(
-      "product must be one of: ",
-      paste(valid_products, collapse = ", "),
-      ".\n"
-    ))
-  }
-  product_prefix <- switch(
-    product,
+  # ----------------------------------------------------------------------------
+  # Check common arguments.
+  amadeus:::download_check(
+    dataset_name = "goes",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = FALSE,
+    remove_zip = FALSE,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
+  chr_satellite <- match.arg(satellite)
+  chr_product <- match.arg(product)
+  # ----------------------------------------------------------------------------
+  # Check `date` and generate sequence.
+  chr_dates <- amadeus:::sequence_dates(date, hyphen = FALSE)
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_dir_to_save <- amadeus::download_setup_dir(directory_to_save)
+  # ----------------------------------------------------------------------------
+  # Define prefix based on product code.
+  chr_prefix <- switch(
+    chr_product,
     "ADP-C" = "ABI-L2-ADPC",
     "ADP-F" = "ABI-L2-ADPF",
     "ADP-M" = "ABI-L2-ADPM"
   )
-
-  #### Check dates
-  date <- if (length(date) == 1) rep(date, 2) else date
-  stopifnot(length(date) == 2)
-  date <- date[order(as.Date(date))]
-
-  #### Directory setup
-  amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-
-  # nolint start
-  #### S3 bucket base URL (NOAA NODD public bucket, no auth required)
-  bucket_url <- paste0("https://noaa-goes", satellite, ".s3.amazonaws.com/")
-  # nolint end
-
-  #### Iterate over each day and list available files from S3
-  dates_seq <- seq(as.Date(date[1]), as.Date(date[2]), by = "day")
-  all_urls <- character()
-  all_destfiles <- character()
-
-  for (d in seq_along(dates_seq)) {
-    d_date <- dates_seq[d]
-    year <- format(d_date, "%Y")
-    doy <- sprintf("%03d", as.integer(format(d_date, "%j")))
-    prefix <- paste0(product_prefix, "/", year, "/", doy, "/")
-
-    # nolint start
-    list_url <- paste0(
-      bucket_url,
-      "?list-type=2&prefix=",
-      prefix,
-      "&max-keys=1000"
-    )
-    # nolint end
-
-    tryCatch(
-      {
-        resp <- httr2::request(list_url) |>
-          httr2::req_retry(
-            max_tries = 3,
-            is_transient = function(r) {
-              httr2::resp_status(r) %in% c(429, 503, 504)
-            }
-          ) |>
-          httr2::req_timeout(60) |>
-          httr2::req_perform()
-
-        xml_body <- httr2::resp_body_string(resp)
-        key_matches <- gregexpr("<Key>[^<]+\\.nc</Key>", xml_body)
-        keys <- regmatches(xml_body, key_matches)[[1]]
-        keys <- gsub("<Key>|</Key>", "", keys)
-
-        if (length(keys) > 0) {
-          for (k in seq_along(keys)) {
-            key <- keys[k]
-            file_url <- paste0(bucket_url, key)
-            destfile <- paste0(directory_to_save, key)
-            all_urls <- c(all_urls, file_url)
-            all_destfiles <- c(all_destfiles, destfile)
-          }
-        } else {
-          message(sprintf(
-            "No files found for %s on %s (DOY %s).\n",
-            product,
-            format(d_date, "%Y-%m-%d"),
-            doy
-          ))
-        }
-      },
-      error = function(e) {
-        warning(
-          sprintf(
-            "Failed to list GOES files for %s/%s/%s: %s\n",
-            product,
-            year,
-            doy,
-            conditionMessage(e)
-          ),
-          call. = FALSE
-        )
-      }
-    )
-  }
-
-  if (length(all_urls) == 0) {
-    message("No GOES ADP files found for the specified parameters.\n")
-    return(invisible(list(success = 0, failed = 0, skipped = 0)))
-  }
-
-  #### Exit early if download=FALSE (deprecated path)
+  # ----------------------------------------------------------------------------
+  # Define S3 bucket base URL.
+  chr_bucket <- paste0("https://noaa-goes", chr_satellite, ".s3.amazonaws.com/")
+  # ----------------------------------------------------------------------------
+  # Generate one listing row per date.
+  df_bucket <- expand.grid(
+    base = chr_bucket,
+    product = chr_product,
+    date = chr_dates,
+    dir = chr_dir_to_save,
+    stringsAsFactors = FALSE
+  )
+  df_bucket$year <- substr(df_bucket$date, 1, 4)
+  df_bucket$doy <- format(as.Date(df_bucket$date, format = "%Y%m%d"), "%j")
+  df_bucket$prefix <- with(
+    df_bucket,
+    paste0(chr_prefix, "/", year, "/", doy, "/")
+  )
+  # ----------------------------------------------------------------------------
+  # Discover actual files and construct the download table.
+  df_download <- amadeus:::discover_goes(
+    df = df_bucket,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(df_download$url[1])
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message(sprintf(
-      "Skipping download. Found %d files available.\n",
-      length(all_urls)
-    ))
-    return(invisible(list(
-      urls = all_urls,
-      destfiles = all_destfiles,
-      n_files = length(all_urls)
+    return(invisible(amadeus::download_preview(
+      df_download$url,
+      df_download$destfile
     )))
   }
-
-  #### Download files using httr2
+  # ----------------------------------------------------------------------------
+  # Run download.
   download_result <- amadeus::download_run_method(
-    urls = all_urls,
-    destfiles = all_destfiles,
+    urls = df_download$url,
+    destfiles = df_download$destfile,
     token = NULL,
     show_progress = show_progress,
     max_tries = max_tries,
     rate_limit = rate_limit
   )
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
+}
 
-  if (hash) {
-    return(amadeus::download_hash(hash = TRUE, directory_to_save))
-  } else {
-    return(invisible(download_result))
-  }
+################################################################################
+#' Discover GOES files from daily S3 listings
+#' @description
+#' Read the S3 listings described by a daily request table and return one row
+#' per discovered NetCDF file, with its download URL and local destination.
+#' This helper retrieves listing metadata; it creates no directories and
+#' downloads no data files.
+#' @param df data.frame. Non-empty listing table prepared by [download_goes()],
+#'   with one row per listing request and the following character columns:
+#'
+#'   * `base`: S3 bucket URL ending in a forward slash.
+#'   * `product`: Product code retained as metadata and used in messages.
+#'   * `date`: Date label retained as metadata and used in messages.
+#'   * `prefix`: S3 key prefix to query, such as `ABI-L2-ADPC/2024/001/`.
+#'   * `dir`: Sanitized local destination root ending in a forward slash.
+#'
+#'   Additional columns, such as `year` and `doy`, are retained. The caller
+#'   supplies validated inputs; this helper uses `prefix` directly and does
+#'   not parse `date` or derive a prefix from it.
+#' @param max_tries integer(1). Maximum attempts per listing request, including
+#'   the initial attempt. Default is 20. Passed to [httr2::req_retry()];
+#'   HTTP status codes 429, 503, and 504 are treated as transient.
+#' @param rate_limit numeric(1). Non-negative interval in seconds for listing
+#'   request throttling. Default is 2; zero disables throttling. Positive
+#'   values use a bucket capacity of one and the shared `amadeus:goes` realm
+#'   across listing requests and helper calls. Validated by the caller.
+#' @param timeout numeric(1). Per-attempt timeout in seconds. Default is 60.
+#'   Applies separately to each listing request and retry.
+#' @details
+#' One S3 ListObjectsV2 page is requested per input row, with `max-keys = 1000`.
+#' Continuation tokens are not followed and truncated listings are not
+#' detected, so results may be incomplete when a listing spans multiple pages.
+#'
+#' Listings are parsed as XML with namespaces removed. Keys under
+#' `Contents/Key` are retained only when they end in lowercase `.nc`.
+#' Each retained key receives a copy of its input row's metadata. The complete
+#' key is appended to `base` and `dir`, preserving the S3 directory structure
+#' in local destination paths. Results follow input-row and listing order;
+#' duplicate keys are not removed and existing local files are not checked.
+#'
+#' A listing with no matching keys emits a message and contributes no rows.
+#' An error while requesting, parsing, or processing any listing stops
+#' discovery with the product, date, and original error in the message.
+#' Successfully queried empty days are allowed, so a returned table can
+#' contain results for only some requested dates.
+#' @return
+#' A data.frame retaining the input columns, with one row per discovered `.nc`
+#' file and these additional columns:
+#'
+#' * `file`: File name without the S3 directory path.
+#' * `url`: Download URL formed from `base` and the complete S3 key.
+#' * `vdir`: Local destination directory ending in a forward slash.
+#' * `destfile`: Local file path formed from `dir` and the complete S3 key.
+#'
+#' For a non-empty input table, returns a zero-row data.frame with the same
+#' output columns if every listing is successfully queried but has no matching
+#' files. Listing errors stop execution instead of returning a table. Row
+#' names are reset.
+#' @seealso [download_goes()], [download_run_method()]
+#' @keywords internal
+#' @noRd
+discover_goes <- function(
+  df,
+  max_tries = 20,
+  rate_limit = 2,
+  timeout = 60
+) {
+  # ----------------------------------------------------------------------------
+  # Preserve the output columns when a listing is empty or fails.
+  df_empty <- cbind(
+    df[FALSE, , drop = FALSE],
+    data.frame(
+      file = character(),
+      url = character(),
+      vdir = character(),
+      destfile = character()
+    )
+  )
+  # ----------------------------------------------------------------------------
+  # Read each daily listing.
+  list_files <- lapply(seq_len(nrow(df)), function(i) {
+    df_day <- df[i, , drop = FALSE]
+    tryCatch(
+      {
+        # ----------------------------------------------------------------------
+        # Build the listing request using the parent's request controls.
+        req <- httr2::request(df_day$base) |>
+          httr2::req_url_query(
+            `list-type` = 2,
+            prefix = df_day$prefix,
+            `max-keys` = 1000
+          ) |>
+          httr2::req_retry(
+            max_tries = max_tries,
+            is_transient = function(resp) {
+              httr2::resp_status(resp) %in% c(429, 503, 504)
+            }
+          ) |>
+          httr2::req_timeout(timeout)
+        # ----------------------------------------------------------------------
+        # Apply rate limit.
+        if (rate_limit > 0) {
+          req <- httr2::req_throttle(
+            req,
+            capacity = 1L,
+            fill_time_s = rate_limit,
+            realm = "amadeus:goes"
+          )
+        }
+        # ----------------------------------------------------------------------
+        # Parse XML and remove namespaces to simplify element selection.
+        xml_listing <- httr2::req_perform(req) |>
+          httr2::resp_body_xml() |>
+          xml2::xml_ns_strip()
+        chr_keys <- xml2::xml_find_all(
+          xml_listing,
+          ".//Contents/Key"
+        ) |>
+          xml2::xml_text()
+        chr_keys <- chr_keys[endsWith(chr_keys, ".nc")]
+        # ----------------------------------------------------------------------
+        # Message for empty request.
+        if (length(chr_keys) == 0L) {
+          message(
+            "No GOES files found for ",
+            df_day$product,
+            " on ",
+            df_day$date,
+            "."
+          )
+          return(df_empty)
+        }
+        # ----------------------------------------------------------------------
+        # Repeat this listing's metadata once per discovered file.
+        df_files <- df_day[rep(1L, length(chr_keys)), , drop = FALSE]
+        # ----------------------------------------------------------------------
+        # Construct all paths together, preserving the S3 directory structure.
+        df_files$file <- basename(chr_keys)
+        df_files$url <- paste0(df_files$base, chr_keys)
+        df_files$destfile <- paste0(df_files$dir, chr_keys)
+        df_files$vdir <- paste0(dirname(df_files$destfile), "/")
+        df_files
+      },
+      error = function(e) {
+        stop(
+          "Failed to list GOES files for ",
+          df_day$product,
+          " on ",
+          df_day$date,
+          ": ",
+          conditionMessage(e),
+          call. = FALSE
+        )
+        df_empty
+      }
+    )
+  })
+  # ----------------------------------------------------------------------------
+  # Combine daily results into one download table.
+  df_download <- do.call(rbind, list_files)
+  rownames(df_download) <- NULL
+  df_download
 }
 
 ################################################################################

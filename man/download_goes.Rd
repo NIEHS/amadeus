@@ -6,8 +6,8 @@
 \usage{
 download_goes(
   date = c("2024-01-01", "2024-01-01"),
-  satellite = "16",
-  product = "ADP-C",
+  satellite = c("16", "18"),
+  product = c("ADP-C", "ADP-F", "ADP-M"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -19,46 +19,88 @@ download_goes(
 )
 }
 \arguments{
-\item{date}{character(1 or 2). Date (YYYY-MM-DD) or start and end dates.}
+\item{date}{character(1 or 2). Single date or inclusive range endpoints in
+\code{"YYYY-MM-DD"} format. Endpoints may be supplied in either order.}
 
-\item{satellite}{character(1). GOES satellite number: \code{"16"} (East,
-default) or \code{"18"} (West).}
+\item{satellite}{character(1). GOES satellite number: \code{"16"} (default) or
+\code{"18"}. Selects one satellite per call.}
 
-\item{product}{character(1). ADP scan sector: \code{"ADP-C"} (CONUS,
-default), \code{"ADP-F"} (Full Disk), or \code{"ADP-M"} (Mesoscale).}
+\item{product}{character(1). ADP scan sector: \code{"ADP-C"} (CONUS, default),
+\code{"ADP-F"} (Full Disk), or \code{"ADP-M"} (Mesoscale). Selects one product per
+call.}
 
-\item{directory_to_save}{character(1). Directory to save downloaded files.}
+\item{directory_to_save}{character(1). Non-empty output directory, created
+if needed. Files retain their S3 directory structure below this root;
+see Details.}
 
 \item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed.}
 
-\item{download}{logical(1). DEPRECATED. Downloads happen automatically.}
+\item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a preview
+after directory creation, discovery, and the preflight check, without
+downloading data files. Default is \code{TRUE}.}
 
-\item{remove_command}{logical(1). Deprecated, ignored.}
+\item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
+Default is \code{FALSE}.}
 
-\item{show_progress}{logical(1). Show download progress (default \code{TRUE}).}
+\item{show_progress}{logical(1). Show per-file download progress. Default
+is \code{TRUE}; discovery and summary messages may still be printed when
+\code{FALSE}.}
 
-\item{hash}{logical(1). Return hash of downloaded files (default \code{FALSE}).}
+\item{hash}{logical(1). Return the combined directory MD5 hash when \code{TRUE}.
+Default is \code{FALSE}. Ignored when \code{download = FALSE}.}
 
-\item{max_tries}{integer(1). Maximum retry attempts (default 20).}
+\item{max_tries}{integer(1). Maximum attempts per listing or file request,
+including the initial attempt. Default is 20.}
 
-\item{rate_limit}{numeric(1). Minimum seconds between requests (default 2).}
+\item{rate_limit}{numeric(1). Non-negative request-throttling interval in
+seconds, passed to discovery and downloads. Default is 2. Discovery uses
+a capacity-one bucket; 0 disables discovery throttling. File downloads
+follow the throttling policy in \code{\link[=download_run_method]{download_run_method()}}.}
 }
 \value{
-invisible list with download results; or hash character if
-\code{hash = TRUE}
+With \code{download = FALSE}, an invisible preview list containing \code{urls},
+\code{destfiles}, and \code{n_files}. Otherwise, with \code{hash = FALSE}, the invisible
+summary from \code{\link[=download_run_method]{download_run_method()}}, including \code{success}, \code{failed}, and
+\code{skipped} counts. With \code{hash = TRUE}, a visible combined MD5 hash for all
+files under \code{directory_to_save}, including previously downloaded files.
 }
 \description{
-The \code{download_goes()} function accesses and downloads NOAA GOES-16 or
-GOES-18 Aerosol Detection Product (ADP) files from the
-NOAA Open Data Dissemination (NODD) AWS S3 bucket. Files are in NetCDF
-format and contain aerosol detection variables (e.g. \code{"Smoke"},
-\code{"Dust"}) on the GOES fixed geostationary grid.
+Discover and download NOAA GOES-16 or GOES-18 Aerosol Detection Product
+(ADP) files from the NOAA Open Data Dissemination (NODD) AWS S3 archive.
+Files are in NetCDF format and contain aerosol detection variables
+(e.g. \code{"Smoke"}, \code{"Dust"}) on the GOES fixed geostationary grid.
+}
+\details{
+\code{satellite} and \code{product} are matched with \code{\link[base:match.arg]{base::match.arg()}}, allowing
+case-sensitive, unambiguous partial matches. Omitted arguments select the
+first listed choice. Products \code{"ADP-C"}, \code{"ADP-F"}, and \code{"ADP-M"} map to
+S3 prefixes \code{"ABI-L2-ADPC"}, \code{"ABI-L2-ADPF"}, and \code{"ABI-L2-ADPM"}.
+
+Daily listings supply the actual file names. Files are saved under
+\verb{directory_to_save/<product-prefix>/<year>/<day-of-year>/<hour>/<filename>}.
+The day of year uses three digits, such as \code{"001"}. Existing non-empty
+destination files are skipped by \code{\link[=download_run_method]{download_run_method()}}; preview results
+include them because discovery does not filter local files.
+
+Discovery requests one S3 listing page of up to 1000 keys per day and keeps
+keys ending in \code{.nc}. Continuation tokens are not followed, so results can
+be incomplete when a daily listing spans multiple pages.
+
+A successfully retrieved listing with no matching files emits a message
+and contributes no rows. Errors while requesting, parsing, or processing
+any listing stop discovery before downloading. Files are not required for
+every requested date. If all listings are empty, the preflight check warns;
+\code{download = TRUE} then errors with \code{"No URLs provided for download."},
+whereas \code{download = FALSE} returns an empty preview.
+
+Discovery uses a 60-second timeout per request attempt. File downloads use
+\code{\link[=download_run_method]{download_run_method()}}'s default timeout of 3600 seconds. The preflight
+check probes the first discovered URL using its own request settings; a
+failed check warns and allows the download or preview to proceed.
 }
 \note{
 \itemize{
 \item GOES data does not require authentication.
-\item GOES-16 (East) covers the Americas; GOES-18 (West) covers the
-western hemisphere and Pacific.
 \item ADP-C (CONUS) scans are produced approximately every 5 minutes.
 A single day may contain several hundred files.
 \item GOES ADP files use the GOES fixed geostationary projection. Use
@@ -75,6 +117,10 @@ download_goes(
   acknowledgement = TRUE
 )
 }
+}
+\seealso{
+\code{\link[=download_data]{download_data()}}, \code{\link[=process_goes]{process_goes()}}, \code{\link[=download_run_method]{download_run_method()}},
+\code{\link[=download_preview]{download_preview()}}
 }
 \author{
 Mitchell Manware
