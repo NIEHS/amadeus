@@ -24,12 +24,13 @@
 #' @param show_progress logical(1). Whether download progress is requested.
 #' @param max_tries integer(1). Maximum attempts per request, including the
 #'   initial attempt. Must be at least 1.
-#' @param rate_limit numeric(1). Finite, non-negative request-throttling interval
-#'   in seconds. The caller determines how this value is applied.
+#' @param rate_limit numeric(1). Finite, non-negative request-throttling
+#'   interval in seconds. The caller determines how this value is applied.
 #' @param hash logical(1). Whether a directory hash is requested.
 #' @return Called for validation and warnings; callers should ignore the
 #'   return value. An invalid argument stops execution with an error.
-#' @seealso [download_setup_dir()], [download_preview()], [download_run_method()]
+#' @seealso [download_setup_dir()], [download_preview()],
+#' [download_run_method()]
 #' @keywords internal
 #' @noRd
 download_check <- function(

@@ -53,7 +53,8 @@ An invisible list containing:
 \item \code{failed}: number of files whose download or non-empty-file check failed.
 \item \code{skipped}: number of existing non-empty destination files.
 \item \code{failed_urls}: character vector of URLs whose downloads failed.
-\item \code{failed_files}: character vector of the corresponding destination basenames.
+\item \code{failed_files}: character vector of the corresponding destination
+basenames.
 }
 
 When every file is skipped, only \code{success}, \code{failed}, and \code{skipped} are

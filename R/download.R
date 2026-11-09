@@ -902,7 +902,8 @@ download_preview <- function(urls, destfiles) {
 #' * `failed`: number of files whose download or non-empty-file check failed.
 #' * `skipped`: number of existing non-empty destination files.
 #' * `failed_urls`: character vector of URLs whose downloads failed.
-#' * `failed_files`: character vector of the corresponding destination basenames.
+#' * `failed_files`: character vector of the corresponding destination
+#'    basenames.
 #'
 #' When every file is skipped, only `success`, `failed`, and `skipped` are
 #' returned. Otherwise the two failure vectors are present, and are empty

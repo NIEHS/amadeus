@@ -161,9 +161,13 @@ download_goes <- function(
   )
   df_bucket$year <- substr(df_bucket$date, 1, 4)
   df_bucket$doy <- format(as.Date(df_bucket$date, format = "%Y%m%d"), "%j")
-  df_bucket$prefix <- with(
-    df_bucket,
-    paste0(chr_prefix, "/", year, "/", doy, "/")
+  df_bucket$prefix <- paste0(
+    chr_prefix,
+    "/",
+    df_bucket$year,
+    "/",
+    df_bucket$doy,
+    "/"
   )
   # ----------------------------------------------------------------------------
   # Discover actual files and construct the download table.
