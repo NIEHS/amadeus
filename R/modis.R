@@ -277,7 +277,7 @@ download_modis <- function(
 #' @param timeout numeric(1). Per-attempt timeout in seconds, at least 0.001.
 #'   Default is 120, retaining the original MODIS discovery timeout.
 #' @details
-#' [query_modis_granules()] retrieves and checks the complete CMR result set
+#' `query_modis_granules()` retrieves and checks the complete CMR result set
 #' before this function selects file URLs. Query parameters and request
 #' controls are passed explicitly for the original and fallback products.
 #'
@@ -299,7 +299,7 @@ download_modis <- function(
 #'   `destfile` columns, one row per selected granule. Stops if the CMR request
 #'   fails, pagination cannot be completed, or no URLs remain before or after
 #'   date filtering.
-#' @seealso [download_modis()], [query_modis_granules()], [discover_merra2()]
+#' @seealso [download_modis()], `query_modis_granules()`, `discover_merra2()`
 #' @keywords internal
 #' @noRd
 discover_modis <- function(
@@ -418,7 +418,7 @@ discover_modis <- function(
 #' @description
 #' Retrieve the complete CMR result set for one product and version. Handles
 #' request construction, retries, throttling, pagination, and record counts.
-#' [discover_modis()] handles fallback products, file-link selection, date
+#' `discover_modis()` handles fallback products, file-link selection, date
 #' filtering, and destination paths after the query returns.
 #' @param product character(1). Validated MODIS or VIIRS product short name.
 #' @param version character(1) or NULL. Resolved CMR version. `NULL` omits the
@@ -452,7 +452,7 @@ discover_modis <- function(
 #' @return A list of CMR granule records in page order, preserving each record's
 #'   nested metadata and links. Returns `NULL` when the query finds no records.
 #'   This helper creates no directories and downloads no data files.
-#' @seealso [discover_modis()], [download_modis()]
+#' @seealso `discover_modis()`, [download_modis()]
 #' @keywords internal
 #' @noRd
 query_modis_granules <- function(

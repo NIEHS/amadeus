@@ -63,7 +63,7 @@ test3 <- process_huc(
 }
 }
 \seealso{
-\code{\link[hydrogeofetch:get_huc]{hydrogeofetch::get_huc}}
+`hydrogeofetch::get_huc()``
 }
 \author{
 Insang Song

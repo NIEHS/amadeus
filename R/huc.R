@@ -202,7 +202,7 @@ download_huc <- function(
 #'   if `NULL` (default), the entire raster is loaded
 #' @param ... Arguments passed to `hydrogeofetch::get_huc()`
 #' @return a `SpatVector` object
-#' @seealso [`hydrogeofetch::get_huc`]
+#' @seealso `hydrogeofetch::get_huc()``
 #' @importFrom terra vect
 #' @importFrom terra vector_layers
 #' @importFrom rlang inject
