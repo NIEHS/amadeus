@@ -80,7 +80,7 @@ download_aqs <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "aqs",
     acknowledgement = acknowledgement,
@@ -94,6 +94,8 @@ download_aqs <- function(
     rate_limit = rate_limit,
     hash = hash
   )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
   checkmate::assert_int(parameter_code, lower = 1L)
   checkmate::assert_choice(resolution_temporal, c("daily", "hourly"))
   # ----------------------------------------------------------------------------

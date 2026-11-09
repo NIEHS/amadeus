@@ -74,7 +74,7 @@ download_geos <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "geos",
     acknowledgement = acknowledgement,
@@ -88,6 +88,8 @@ download_geos <- function(
     rate_limit = rate_limit,
     hash = hash
   )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
   checkmate::assert_character(collection, min.char = 1L)
   checkmate::assert_subset(
     collection,

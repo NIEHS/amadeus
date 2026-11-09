@@ -92,7 +92,7 @@ download_nlcd <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "nlcd",
     acknowledgement = acknowledgement,
@@ -106,6 +106,8 @@ download_nlcd <- function(
     rate_limit = rate_limit,
     hash = hash
   )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
   checkmate::assert_choice(
     tolower(product),
     c(

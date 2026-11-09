@@ -117,11 +117,11 @@ download_improve <- function(
     hash = hash
   )
   # ----------------------------------------------------------------------------
-  # Check `years` and generate sequence.
-  int_years <- amadeus:::sequence_years(year)
-  # ----------------------------------------------------------------------------
   # Check source-specific arguments.
   chr_product <- match.arg(product)
+  # ----------------------------------------------------------------------------
+  # Check `years` and generate sequence.
+  int_years <- amadeus:::sequence_years(year)
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
   chr_directories <- amadeus::download_setup_dir(

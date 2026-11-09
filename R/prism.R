@@ -137,7 +137,7 @@ download_prism <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "prism",
     acknowledgement = acknowledgement,
@@ -151,6 +151,8 @@ download_prism <- function(
     rate_limit = rate_limit,
     hash = hash
   )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
   chr_datatype <- match.arg(data_type)
   checkmate::assert_choice(chr_datatype, c("ts", "normals_800", "normals"))
   chr_element <- match.arg(element)

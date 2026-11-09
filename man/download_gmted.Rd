@@ -22,9 +22,13 @@ download_gmted(
 )
 }
 \arguments{
-\item{statistic}{character(1). Available statistics.}
+\item{statistic}{character(1). One of \code{"Breakline Emphasis"} (default),
+\code{"Systematic Subsample"}, \code{"Median Statistic"}, \code{"Minimum Statistic"},
+\code{"Mean Statistic"}, \code{"Maximum Statistic"}, or
+\code{"Standard Deviation Statistic"}.}
 
-\item{resolution}{character(1). Available resolutions.}
+\item{resolution}{character(1). One of \code{"7.5 arc-seconds"} (default),
+\code{"15 arc-seconds"}, or \code{"30 arc-seconds"}.}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
@@ -66,6 +70,11 @@ of the files in the \code{data_files} directory is returned instead of a list.
 The \code{download_gmted()} function accesses and downloads Global
 Multi-resolution Terrain Elevation Data (GMTED2010) from U.S. Geological
 Survey.
+}
+\details{
+\code{statistic} and \code{resolution} each select one value. Matching is
+case-sensitive, and unambiguous abbreviations are accepted. If omitted,
+each argument uses its first listed choice.
 }
 \note{
 GMTED data does not require authentication.

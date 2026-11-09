@@ -55,7 +55,7 @@ download_hms <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "hms",
     acknowledgement = acknowledgement,
@@ -69,6 +69,8 @@ download_hms <- function(
     rate_limit = rate_limit,
     hash = hash
   )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
   chr_format <- tolower(data_format)
   checkmate::assert_choice(chr_format, c("shapefile", "kml"))
   # ----------------------------------------------------------------------------

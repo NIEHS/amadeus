@@ -18,8 +18,10 @@
 #'   authentication token. Can be a token string, a path to a file
 #'   containing the token, or \code{NULL} to read from the
 #'   \code{NASA_EARTHDATA_TOKEN} environment variable.
-#' @param data_region character(1). Data region.
-#' @param data_format character(1). "Shapefile" or "Geodatabase".
+#' @param data_region character(1). One of `"Americas"` (default), `"Global"`,
+#'   `"Africa"`, `"Asia"`, `"Europe"`, `"Oceania East"`, or `"Oceania West"`.
+#' @param data_format character(1). Requested format: `"Shapefile"` (default)
+#'   or `"Geodatabase"`.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
@@ -32,6 +34,10 @@
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @details
+#' `data_region` and `data_format` each select one value. Matching is
+#' case-sensitive, and unambiguous abbreviations are accepted. If omitted,
+#' each argument uses its first listed choice.
 #' @author Mitchell Manware, Insang Song
 #' @return
 #' When `download = TRUE` and `hash = FALSE`, an invisible list containing
@@ -83,7 +89,7 @@ download_groads <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "groads",
     acknowledgement = acknowledgement,
@@ -97,19 +103,10 @@ download_groads <- function(
     rate_limit = rate_limit,
     hash = hash
   )
-  checkmate::assert_choice(
-    data_region,
-    c(
-      "Americas",
-      "Global",
-      "Africa",
-      "Asia",
-      "Europe",
-      "Oceania East",
-      "Oceania West"
-    )
-  )
-  checkmate::assert_choice(data_format, c("Shapefile", "Geodatabase"))
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
+  chr_dataregion <- match.arg(data_region)
+  chr_dataformat <- match.arg(data_format)
   # ----------------------------------------------------------------------------
   # Check NASA EarthData token.
   chr_nasatoken <- amadeus::get_token(
@@ -127,12 +124,12 @@ download_groads <- function(
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
   # Define data format.
-  if (data_format == "Shapefile" && data_region == "Global") {
+  if (chr_dataformat == "Shapefile" && chr_dataregion == "Global") {
     message("Geodatabase format utilized for 'Global' dataset.\n")
     chr_format <- "gdb"
-  } else if (data_format == "Shapefile" && !(data_region == "Global")) {
+  } else if (chr_dataformat == "Shapefile" && !(chr_dataregion == "Global")) {
     chr_format <- "shp"
-  } else if (data_format == "Geodatabase") {
+  } else if (chr_dataformat == "Geodatabase") {
     chr_format <- "gdb"
   }
   # ----------------------------------------------------------------------------
@@ -144,7 +141,7 @@ download_groads <- function(
       "groads-global-roads-open-access-v1/",
       "groads-v1-"
     ),
-    gsub(" ", "-", tolower(data_region)),
+    gsub(" ", "-", tolower(chr_dataregion)),
     "-",
     chr_format,
     ".zip"
@@ -154,7 +151,7 @@ download_groads <- function(
   chr_filename <- paste0(
     chr_dir_to_download,
     "groads_v1_",
-    gsub(" ", "-", tolower(data_region)),
+    gsub(" ", "-", tolower(chr_dataregion)),
     "_",
     chr_format,
     ".zip"

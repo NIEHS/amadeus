@@ -106,7 +106,7 @@ download_nei <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "nei",
     acknowledgement = acknowledgement,

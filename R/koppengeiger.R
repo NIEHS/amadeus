@@ -10,9 +10,10 @@
 #' The \code{download_koppen_geiger()} function accesses and downloads
 #' climate classification data.
 #' @note Köppen-Geiger data does not require authentication.
-#' @param data_resolution character(1). Available resolutions.
-#' @param time_period character(1). "Present" (1980-2016) or "Future"
-#' (2071-2100).
+#' @param data_resolution character(1). One of `"0.0083"` (default),
+#'   `"0.083"`, or `"0.5"`.
+#' @param time_period character(1). `"Present"` (default; 1980-2016) or
+#'   `"Future"` (2071-2100).
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
@@ -25,6 +26,10 @@
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @details
+#' `data_resolution` and `time_period` each select one value. Matching is
+#' case-sensitive, and unambiguous abbreviations are accepted. If omitted,
+#' each argument uses its first listed choice.
 #' @author Mitchell Manware, Insang Song
 #' @return
 #' When `download = TRUE` and `hash = FALSE`, an invisible list containing
@@ -68,7 +73,7 @@ download_koppen_geiger <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "koppengeiger",
     acknowledgement = acknowledgement,
@@ -82,8 +87,10 @@ download_koppen_geiger <- function(
     rate_limit = rate_limit,
     hash = hash
   )
-  checkmate::assert_choice(data_resolution, c("0.0083", "0.083", "0.5"))
-  checkmate::assert_choice(time_period, c("Present", "Future"))
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
+  chr_resolution <- match.arg(data_resolution)
+  chr_timeperiod <- match.arg(time_period)
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
   chr_directories <- amadeus::download_setup_dir(
@@ -103,9 +110,9 @@ download_koppen_geiger <- function(
   chr_filename <- paste0(
     chr_dir_to_download,
     "koppen_geiger_",
-    tolower(time_period),
+    tolower(chr_timeperiod),
     "_",
-    gsub("\\.", "p", data_resolution),
+    gsub("\\.", "p", chr_resolution),
     ".zip"
   )
   # ----------------------------------------------------------------------------

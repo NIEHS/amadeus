@@ -22,9 +22,11 @@ download_groads(
 )
 }
 \arguments{
-\item{data_region}{character(1). Data region.}
+\item{data_region}{character(1). One of \code{"Americas"} (default), \code{"Global"},
+\code{"Africa"}, \code{"Asia"}, \code{"Europe"}, \code{"Oceania East"}, or \code{"Oceania West"}.}
 
-\item{data_format}{character(1). "Shapefile" or "Geodatabase".}
+\item{data_format}{character(1). Requested format: \code{"Shapefile"} (default)
+or \code{"Geodatabase"}.}
 
 \item{nasa_earth_data_token}{character(1) or NULL. NASA EarthData
 authentication token. Can be a token string, a path to a file
@@ -70,6 +72,11 @@ of the files in the \code{data_files} directory is returned instead of a list.
 \description{
 The \code{download_groads()} function accesses and downloads
 roads data from NASA's Global Roads Open Access Data Set (gROADS).
+}
+\details{
+\code{data_region} and \code{data_format} each select one value. Matching is
+case-sensitive, and unambiguous abbreviations are accepted. If omitted,
+each argument uses its first listed choice.
 }
 \note{
 gROADS data is hosted on NASA EarthData and requires a valid

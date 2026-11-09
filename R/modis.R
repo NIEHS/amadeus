@@ -145,7 +145,7 @@ download_modis <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check shared arguments before token lookup or filesystem/network activity.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "modis",
     acknowledgement = acknowledgement,
@@ -159,6 +159,8 @@ download_modis <- function(
     rate_limit = rate_limit,
     hash = hash
   )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
   product <- match.arg(product)
   checkmate::assert_string(version, min.chars = 1L)
   checkmate::assert_numeric(

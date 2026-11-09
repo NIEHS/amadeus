@@ -73,7 +73,7 @@ download_gridmet <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "gridmet",
     acknowledgement = acknowledgement,
@@ -87,6 +87,8 @@ download_gridmet <- function(
     rate_limit = rate_limit,
     hash = hash
   )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
   checkmate::assert_character(variables, min.char = 1L)
   # ----------------------------------------------------------------------------
   # Check `years` and generate sequence.

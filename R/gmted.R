@@ -12,8 +12,12 @@
 #' Multi-resolution Terrain Elevation Data (GMTED2010) from U.S. Geological
 #' Survey.
 #' @note GMTED data does not require authentication.
-#' @param statistic character(1). Available statistics.
-#' @param resolution character(1). Available resolutions.
+#' @param statistic character(1). One of `"Breakline Emphasis"` (default),
+#'   `"Systematic Subsample"`, `"Median Statistic"`, `"Minimum Statistic"`,
+#'   `"Mean Statistic"`, `"Maximum Statistic"`, or
+#'   `"Standard Deviation Statistic"`.
+#' @param resolution character(1). One of `"7.5 arc-seconds"` (default),
+#'   `"15 arc-seconds"`, or `"30 arc-seconds"`.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
@@ -26,6 +30,10 @@
 #' @param hash logical(1). Return hash of downloaded files (default FALSE)
 #' @param max_tries integer(1). Maximum retry attempts (default 20)
 #' @param rate_limit numeric(1). Minimum seconds between requests (default 2)
+#' @details
+#' `statistic` and `resolution` each select one value. Matching is
+#' case-sensitive, and unambiguous abbreviations are accepted. If omitted,
+#' each argument uses its first listed choice.
 #' @author Mitchell Manware, Insang Song
 #' @return
 #' When `download = TRUE` and `hash = FALSE`, an invisible list containing
@@ -76,7 +84,7 @@ download_gmted <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "gmted",
     acknowledgement = acknowledgement,
@@ -90,22 +98,10 @@ download_gmted <- function(
     rate_limit = rate_limit,
     hash = hash
   )
-  checkmate::assert_choice(
-    statistic,
-    c(
-      "Breakline Emphasis",
-      "Systematic Subsample",
-      "Median Statistic",
-      "Minimum Statistic",
-      "Mean Statistic",
-      "Maximum Statistic",
-      "Standard Deviation Statistic"
-    )
-  )
-  checkmate::assert_choice(
-    resolution,
-    c("7.5 arc-seconds", "15 arc-seconds", "30 arc-seconds"),
-  )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
+  chr_statistic <- match.arg(statistic)
+  chr_resolution <- match.arg(resolution)
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
   chr_directories <- amadeus::download_setup_dir(
@@ -123,12 +119,12 @@ download_gmted <- function(
   # ----------------------------------------------------------------------------
   # Define GMTED-specific statistic and resolution.
   chr_statistic <- amadeus::process_gmted_codes(
-    statistic,
+    chr_statistic,
     statistic = TRUE,
     invert = FALSE
   )
   chr_resolution <- amadeus::process_gmted_codes(
-    resolution,
+    chr_resolution,
     resolution = TRUE,
     invert = FALSE
   )

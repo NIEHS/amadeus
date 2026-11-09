@@ -20,10 +20,11 @@ download_koppen_geiger(
 )
 }
 \arguments{
-\item{data_resolution}{character(1). Available resolutions.}
+\item{data_resolution}{character(1). One of \code{"0.0083"} (default),
+\code{"0.083"}, or \code{"0.5"}.}
 
-\item{time_period}{character(1). "Present" (1980-2016) or "Future"
-(2071-2100).}
+\item{time_period}{character(1). \code{"Present"} (default; 1980-2016) or
+\code{"Future"} (2071-2100).}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
@@ -64,6 +65,11 @@ of the files in the \code{data_files} directory is returned instead of a list.
 \description{
 The \code{download_koppen_geiger()} function accesses and downloads
 climate classification data.
+}
+\details{
+\code{data_resolution} and \code{time_period} each select one value. Matching is
+case-sensitive, and unambiguous abbreviations are accepted. If omitted,
+each argument uses its first listed choice.
 }
 \note{
 Köppen-Geiger data does not require authentication.

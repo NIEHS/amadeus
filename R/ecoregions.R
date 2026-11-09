@@ -61,7 +61,7 @@ download_ecoregion <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "ecoregion",
     acknowledgement = acknowledgement,

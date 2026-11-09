@@ -169,7 +169,7 @@ download_merra2 <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "merra2",
     acknowledgement = acknowledgement,
@@ -183,6 +183,8 @@ download_merra2 <- function(
     rate_limit = rate_limit,
     hash = hash
   )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
   checkmate::assert_character(collection, min.char = 1L)
   checkmate::assert_subset(collection, .amadeus$df_merra2$collection_id)
   # ----------------------------------------------------------------------------

@@ -5,9 +5,9 @@
 \title{Download population density data}
 \usage{
 download_population(
-  data_resolution = "60 minute",
+  data_resolution = c("60 minute", "30 second", "2.5 minute", "15 minute", "30 minute"),
   data_format = c("GeoTIFF", "ASCII", "netCDF"),
-  year = "2020",
+  year = c("2020", "2000", "2005", "2010", "2015", "all"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -22,12 +22,14 @@ download_population(
 )
 }
 \arguments{
-\item{data_resolution}{character(1). Available resolutions.}
+\item{data_resolution}{character(1). One of \code{"60 minute"} (default),
+\code{"30 second"}, \code{"2.5 minute"}, \code{"15 minute"}, or \code{"30 minute"}.}
 
-\item{data_format}{character(1). "ASCII", "GeoTIFF", or "netCDF".}
+\item{data_format}{character(1). Requested format: \code{"GeoTIFF"} (default),
+\code{"ASCII"}, or \code{"netCDF"}.}
 
-\item{year}{character(1). One of "2000", "2005", "2010", "2015",
-or "2020"; use "all" for all available years.}
+\item{year}{character(1). One year: \code{"2020"} (default), \code{"2000"}, \code{"2005"},
+\code{"2010"}, or \code{"2015"}; use \code{"all"} for all available years.}
 
 \item{directory_to_save}{character(1). Directory to save data.}
 
@@ -72,6 +74,11 @@ of the files in the \code{data_files} directory is returned instead of a list.
 \description{
 The \code{download_population()} function accesses and downloads
 population density data from NASA's UN WPP-Adjusted Population Density.
+}
+\details{
+\code{data_resolution}, \code{data_format}, and \code{year} each select one value.
+Matching is case-sensitive, and unambiguous abbreviations are accepted.
+If omitted, each argument uses its first listed choice.
 }
 \note{
 Population data may require NASA EarthData authentication depending on

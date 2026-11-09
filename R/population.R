@@ -11,10 +11,12 @@
 #' population density data from NASA's UN WPP-Adjusted Population Density.
 #' @note Population data may require NASA EarthData authentication depending on
 #' access method.
-#' @param data_resolution character(1). Available resolutions.
-#' @param data_format character(1). "ASCII", "GeoTIFF", or "netCDF".
-#' @param year character(1). One of "2000", "2005", "2010", "2015",
-#'   or "2020"; use "all" for all available years.
+#' @param data_resolution character(1). One of `"60 minute"` (default),
+#'   `"30 second"`, `"2.5 minute"`, `"15 minute"`, or `"30 minute"`.
+#' @param data_format character(1). Requested format: `"GeoTIFF"` (default),
+#'   `"ASCII"`, or `"netCDF"`.
+#' @param year character(1). One year: `"2020"` (default), `"2000"`, `"2005"`,
+#'   `"2010"`, or `"2015"`; use `"all"` for all available years.
 #' @param directory_to_save character(1). Directory to save data.
 #' @param acknowledgement logical(1). Must be TRUE to proceed.
 #' @param download logical(1). DEPRECATED. Downloads happen automatically.
@@ -30,6 +32,10 @@
 #' @param nasa_earth_data_token character(1). NASA EarthData bearer token.
 #' If NULL (default), reads from the \code{NASA_EARTHDATA_TOKEN} environment
 #' variable via \code{get_token()}.
+#' @details
+#' `data_resolution`, `data_format`, and `year` each select one value.
+#' Matching is case-sensitive, and unambiguous abbreviations are accepted.
+#' If omitted, each argument uses its first listed choice.
 #' @author Mitchell Manware, Insang Song
 #' @return
 #' When `download = TRUE` and `hash = FALSE`, an invisible list containing
@@ -62,9 +68,15 @@
 #' }
 #' @export
 download_population <- function(
-  data_resolution = "60 minute",
+  data_resolution = c(
+    "60 minute",
+    "30 second",
+    "2.5 minute",
+    "15 minute",
+    "30 minute"
+  ),
   data_format = c("GeoTIFF", "ASCII", "netCDF"),
-  year = "2020",
+  year = c("2020", "2000", "2005", "2010", "2015", "all"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
@@ -78,7 +90,7 @@ download_population <- function(
   nasa_earth_data_token = NULL
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "groads",
     acknowledgement = acknowledgement,
@@ -92,21 +104,11 @@ download_population <- function(
     rate_limit = rate_limit,
     hash = hash
   )
-  checkmate::assert_choice(
-    data_resolution,
-    c(
-      "60 minute",
-      "30 second",
-      "2.5 minute",
-      "15 minute",
-      "30 minute"
-    )
-  )
-  checkmate::assert_choice(data_format, c("GeoTIFF", "ASCII", "netCDF"))
-  checkmate::assert_choice(
-    year,
-    c("2000", "2005", "2010", "2015", "2020", "all")
-  )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
+  chr_resolution <- match.arg(data_resolution)
+  chr_format <- match.arg(data_format)
+  chr_year <- match.arg(year)
   # ----------------------------------------------------------------------------
   # Check NASA EarthData token.
   chr_nasatoken <- amadeus::get_token(
@@ -124,10 +126,10 @@ download_population <- function(
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
   # Define year.
-  chr_year <- ifelse(year == "all", "totpop", as.character(year))
+  chr_year <- ifelse(chr_year == "all", "totpop", as.character(chr_year))
   # ----------------------------------------------------------------------------
   # Query resolution code.
-  chr_resolution <- amadeus::process_sedac_codes(data_resolution)
+  chr_resolution <- amadeus::process_sedac_codes(chr_resolution)
   # ----------------------------------------------------------------------------
   # Fallback for total population and 30-second resolution mismatch.
   if (chr_year == "totpop" && chr_resolution == "30_sec") {
@@ -139,7 +141,7 @@ download_population <- function(
   }
   # ----------------------------------------------------------------------------
   # Define data format.
-  if (data_format == "GeoTIFF") {
+  if (chr_format == "GeoTIFF") {
     if (chr_year != "totpop") {
       chr_format <- "tif"
     } else {
@@ -149,7 +151,7 @@ download_population <- function(
         "Data will be downloaded as netCDF.\n"
       ))
     }
-  } else if (data_format == "ASCII") {
+  } else if (chr_format == "ASCII") {
     if (chr_year != "totpop") {
       chr_format <- "asc"
     } else {
@@ -159,7 +161,7 @@ download_population <- function(
         "Data will be downloaded as netCDF.\n"
       ))
     }
-  } else if (data_format == "netCDF") {
+  } else if (chr_format == "netCDF") {
     chr_format <- "nc"
   }
   # ----------------------------------------------------------------------------

@@ -100,7 +100,7 @@ download_cropscape <- function(
   rate_limit = 2
 ) {
   # ----------------------------------------------------------------------------
-  # Check arguments.
+  # Check common arguments.
   amadeus:::download_check(
     dataset_name = "cropscape",
     acknowledgement = acknowledgement,
@@ -114,6 +114,8 @@ download_cropscape <- function(
     rate_limit = rate_limit,
     hash = hash
   )
+  # ----------------------------------------------------------------------------
+  # Check source-specific arguments.
   chr_source <- match.arg(source)
   checkmate::assert_choice(chr_source, c("GMU", "USDA"))
   # ----------------------------------------------------------------------------
