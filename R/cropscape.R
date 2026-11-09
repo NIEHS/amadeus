@@ -5,157 +5,204 @@
 ################################################################################
 # {download} tier
 ################################################################################
-# 4. USDA Cropscape
 # nolint start
 #' Download CropScape data
 #' @description
-#' Accesses and downloads United States Department of Agriculture
-#' CropScape Cropland Data Layer data from
-#' the [USDA National Agricultural Statistics Service](https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.php) or the
-#' [George Mason University website](https://nassgeodata.gmu.edu/CropScape/).
-#' @param year integer(1). Year of the data to download.
-#' @param source character(1). Data source, one of `c("USDA", "GMU")`.
-#' * `"USDA"` will download the national data from the USDA website
-#'   (available in 2008-last year).
-#' * `"GMU"` will download the data from the George Mason University
-#'   website (available in 1997-last year).
-#' @param directory_to_save character(1). Directory to download files.
-#' @param acknowledgement logical(1). By setting \code{TRUE} the
-#' user acknowledges that the data downloaded using this function may be very
-#' large and use lots of machine storage and memory.
-#' @param download logical(1). \code{FALSE} will generate a *.txt file
-#' containing all download commands. By setting \code{TRUE} the function
-#' will download all of the requested data files.
-#' @param remove_command logical(1).
-#' Remove (\code{TRUE}) or keep (\code{FALSE})
-#' the text file containing download commands.
-#' @param unzip logical(1). Unzip the downloaded compressed files.
-#' Default is \code{FALSE}.
-#' @param hash logical(1). By setting \code{TRUE} the function will return
-#' an \code{rlang::hash_file()} hash character corresponding to the
-#' downloaded files. Default is \code{FALSE}.
-#' @param show_progress logical(1). Show download progress.
-#'   Default is \code{TRUE}.
-#' @param max_tries integer(1). Maximum download retry attempts.
-#'   Default is \code{20}.
-#' @param rate_limit numeric(1). Minimum seconds between requests.
-#'   Default is \code{2}.
+#' Download annual USDA Cropland Data Layer archives from the
+#' [USDA National Agricultural Statistics Service](https://www.nass.usda.gov/Research_and_Science/Cropland/Release/index.php)
+#' or [George Mason University](https://nassgeodata.gmu.edu/CropScape/).
+#' Archives and extracted raster data are stored in separate subdirectories
+#' using the shared download workflow.
+#' @param year integer(1 or more). One year, two endpoints, or a non-empty
+#'   vector of years. Every year from the minimum through the maximum is
+#'   requested, including gaps: `c(2018, 2023)` requests `2018:2023`.
+#'   Default is `1997:2023`. Missing, fractional, and future years are rejected.
+#' @param source character(1). Data source, either `"GMU"` (default) or
+#'   `"USDA"`. GMU requests use `YYYY_cdls.tar.gz` with a minimum year of
+#'   1997. USDA requests use `YYYY_30m_cdls.zip` with a minimum year of 2008;
+#'   supply a compatible `year` when choosing USDA. File availability is
+#'   determined by the selected provider.
+#' @param directory_to_save character(1). Non-empty parent directory.
+#'   Archives are downloaded into `zip_files/` and, when `unzip = TRUE`,
+#'   extracted into separate per-archive directories under `data_files/`.
+#' @param acknowledgement logical(1). Must be `TRUE` to proceed. CropScape
+#'   archives and extracted rasters can require substantial storage.
+#' @param download logical(1). Deprecated. `FALSE` warns and returns a preview
+#'   after directory creation and a preflight check of the first URL. No
+#'   archives are downloaded or extracted in preview mode. Default is `TRUE`.
+#' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
+#'   No command file is generated. Default is `FALSE`.
+#' @param unzip logical(1). Extract downloaded `.zip` or `.tar.gz` archives
+#'   into per-archive directories under `data_files/`. Default is `TRUE`;
+#'   `FALSE` skips extraction and creation of the per-archive directories.
+#' @param remove_zip logical(1). Remove downloaded archives and their
+#'   `zip_files/` directory, including its remaining contents, after the
+#'   extraction step. Default is `FALSE`. Ignored when `download = FALSE`.
+#' @param hash logical(1). Return a combined MD5 hash of the files under
+#'   `data_files/` instead of the download summary. Default is `FALSE`.
+#'   Ignored when `download = FALSE`.
+#' @param show_progress logical(1). Show file download progress. Default is
+#'   `TRUE`. Other status messages may still be printed when `FALSE`.
+#' @param max_tries integer(1). Maximum attempts per file download request,
+#'   including the initial attempt. Default is 20.
+#' @param rate_limit numeric(1). Non-negative throttling interval in seconds,
+#'   passed to [download_run_method()]. Default is 2.
+#' @details
+#' `zip_files/` and `data_files/` are sibling directories created beneath
+#' `directory_to_save`, including for previews and when `unzip = FALSE`.
+#' Both ZIP and compressed TAR downloads are stored in `zip_files/`.
+#' Each archive is extracted into its own directory under `data_files/`,
+#' named after the archive with the full `.zip` or `.tar.gz` suffix removed:
+#' `data_files/YYYY_30m_cdls/` for USDA and `data_files/YYYY_cdls/` for GMU.
+#' This isolates duplicate filenames across archives. Paths stored inside
+#' each archive are preserved. Pass the corresponding per-archive directory
+#' or an extracted TIFF path to [process_cropscape()].
+#'
+#' Preview destinations refer to the archive files in `zip_files/`.
+#' The preflight check contacts the first URL even in preview mode; a failed
+#' check emits a warning. Its request settings are separate from those used
+#' for file downloads.
+#'
+#' Hashing covers all files under `data_files/`, including existing files,
+#' and excludes archives in `zip_files/`. With `unzip = FALSE`, hashing still
+#' uses `data_files/`, which may be empty or contain previously extracted data.
 #' @author Insang Song
-#' @note JSON files should be found at STAC catalog of OpenLandMap
 #' @return
-#' * For \code{hash = FALSE}, NULL
-#' * For \code{hash = TRUE}, an \code{rlang::hash_file} character.
-#' * Yearly comma-separated value (CSV) files will be stored in
-#' \code{directory_to_save}.
+#' With `download = FALSE`, an invisible preview list containing `urls`,
+#' `destfiles`, and `n_files`. Otherwise, after downloading and optional
+#' extraction, `hash = FALSE` returns the download summary from
+#' [download_run_method()] invisibly. With `hash = TRUE`, returns a visible
+#' character scalar containing the combined MD5 hash of `data_files/`.
+#' @seealso [download_setup_dir()], [download_unzip()], [process_cropscape()]
 #' @examples
 #' \dontrun{
 #' download_cropscape(
 #'   year = 2020,
-#'   source = "USDA",
-#'   directory_to_save = tempdir(),
+#'   source = "GMU",
+#'   directory_to_save = file.path(tempdir(), "cropscape"),
 #'   acknowledgement = TRUE,
-#'   download = FALSE, # NOTE: download skipped for examples,
-#'   remove_command = TRUE,
-#'   unzip = FALSE
+#'   download = FALSE # Preview archive URLs and zip_files/ destinations.
 #' )
 #' }
-#' @importFrom archive archive_extract
 #' @export
 download_cropscape <- function(
   year = seq(1997, 2023),
-  source = c("USDA", "GMU"),
+  source = c("GMU", "USDA"),
   directory_to_save = NULL,
   acknowledgement = FALSE,
   download = TRUE,
   remove_command = FALSE,
   unzip = TRUE,
+  remove_zip = FALSE,
   hash = FALSE,
   show_progress = TRUE,
   max_tries = 20,
   rate_limit = 2
 ) {
-  source <- match.arg(source)
-  if (source == "GMU" && year < 1997) {
-    stop("Year should be equal to or greater than 1997.")
+  # ----------------------------------------------------------------------------
+  # Check arguments.
+  amadeus:::download_check(
+    dataset_name = "cropscape",
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    unzip = unzip,
+    remove_zip = remove_zip,
+    directory_to_save = directory_to_save,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit,
+    hash = hash
+  )
+  chr_source <- match.arg(source)
+  checkmate::assert_choice(chr_source, c("GMU", "USDA"))
+  # ----------------------------------------------------------------------------
+  # Check `years` and generate sequence.
+  int_years <- amadeus:::sequence_years(year)
+  # ----------------------------------------------------------------------------
+  # Check year and source combinations.
+  int_minyear <- switch(chr_source, USDA = 2008, GMU = 1997)
+  if (min(int_years) < int_minyear) {
+    stop(sprintf("Year should be equal to or greater than %d.", int_minyear))
   }
-  if (source == "USDA" && year < 2008) {
-    stop("Year should be equal to or greater than 2008.")
-  }
-  #### Handle deprecated parameters
-  if (!isTRUE(download)) {
-    warning(
-      "Setting download=FALSE is deprecated.",
-      " Downloads now use httr2 by default.\n",
-      "To skip downloading, the function will return",
-      " after discovering files.\n",
-      call. = FALSE
-    )
-  }
-  if (!isFALSE(remove_command)) {
-    warning(
-      "Parameter 'remove_command' is deprecated and ignored.\n",
-      call. = FALSE
-    )
-  }
-  #### 1. check for data download acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-  #### 2. directory setup
-  amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-
-  #### 3. define measurement data paths
-  url_download_base <- switch(
-    source,
-    USDA = "https://www.nass.usda.gov/Research_and_Science/Cropland/Release/datasets/",
+  # ----------------------------------------------------------------------------
+  # Generate zip and data file directories.
+  chr_directories <- amadeus::download_setup_dir(
+    amadeus::download_sanitize_path(directory_to_save),
+    zip = TRUE
+  )
+  chr_dir_to_download <- chr_directories[1]
+  chr_dir_to_save <- chr_directories[2]
+  # ----------------------------------------------------------------------------
+  # Define base URL and file name template based on source.
+  chr_base <- switch(
+    chr_source,
+    USDA = paste0(
+      "https://www.nass.usda.gov/sites/default/files/",
+      "Research_and_Science/Cropland/Release/datasets/"
+    ),
     GMU = "https://nassgeodata.gmu.edu/nass_data_cache/tar/"
   )
-  filename_template <- switch(
-    source,
+  chr_filetemplate <- switch(
+    chr_source,
     USDA = "%d_30m_cdls.zip",
     GMU = "%d_cdls.tar.gz"
   )
-  url_download_template <- paste0(url_download_base, filename_template)
-
-  download_urls <-
-    sprintf(url_download_template, year)
-  download_names_file <- sprintf(filename_template, year)
-  download_names <- paste0(directory_to_save, download_names_file)
-
-  #### Exit early if download=FALSE
+  # ----------------------------------------------------------------------------
+  # Generate download URLs.
+  chr_urls <- sprintf(paste0(chr_base, chr_filetemplate), int_years)
+  # ----------------------------------------------------------------------------
+  # Generate download file names.
+  chr_filenames <- sprintf(
+    paste0(chr_dir_to_download, chr_filetemplate),
+    int_years
+  )
+  # ----------------------------------------------------------------------------
+  # Check first URL for validity.
+  amadeus:::check_preflight(chr_urls[1])
+  # ----------------------------------------------------------------------------
+  # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    message("Skipping download.\n")
-    return(invisible(list(
-      urls = download_urls,
-      destfiles = download_names,
-      n_files = length(download_urls)
-    )))
+    return(invisible(amadeus::download_preview(chr_urls, chr_filenames)))
   }
-
-  #### Download using httr2
-  amadeus::download_run_method(
-    urls = download_urls,
-    destfiles = download_names,
+  # ----------------------------------------------------------------------------
+  # Run download.
+  download_result <- amadeus::download_run_method(
+    urls = chr_urls,
+    destfiles = chr_filenames,
     token = NULL,
     show_progress = show_progress,
     max_tries = max_tries,
     rate_limit = rate_limit
   )
-
-  #### Unzip data
-  # nocov start
-  if (unzip) {
-    extension <- ifelse(source == "USDA", "\\.zip", "(\\.tar|\\.tar\\.gz)")
-    dir_unzip <- gsub(extension, "", download_names)
-    for (fn in seq_along(dir_unzip)) {
-      if (!dir.exists(dir_unzip[fn])) {
-        dir.create(dir_unzip[fn], recursive = TRUE)
-      }
-      archive::archive_extract(download_names[fn], dir = dir_unzip[fn])
-    }
+  # ----------------------------------------------------------------------------
+  # Per-file directories to avoid filename collisions.
+  chr_dirs_to_unzip <- paste0(
+    chr_dir_to_save,
+    sub("\\.(zip|tar\\.gz)$", "", basename(chr_filenames))
+  )
+  if (isTRUE(unzip)) {
+    invisible(lapply(chr_dirs_to_unzip, amadeus::download_setup_dir))
   }
-  # nocov end
-  message("Requests were processed.\n")
-  return(amadeus::download_hash(hash, directory_to_save))
+  # ----------------------------------------------------------------------------
+  # Pair each archive with its own destination. Cleanup follows all extractions.
+  mapply(
+    amadeus::download_unzip,
+    file_name = chr_filenames,
+    directory_to_unzip = chr_dirs_to_unzip,
+    MoreArgs = list(unzip = unzip),
+    SIMPLIFY = FALSE,
+    USE.NAMES = FALSE
+  )
+  # ----------------------------------------------------------------------------
+  # Remove zip files.
+  amadeus::download_remove_zips(
+    remove = remove_zip,
+    download_name = chr_filenames
+  )
+  # ----------------------------------------------------------------------------
+  # Return results or hash.
+  amadeus:::download_return(download_result, hash, chr_dir_to_save)
 }
 # nolint end
 

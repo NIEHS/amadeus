@@ -163,7 +163,6 @@ import(sf)
 import(sftime)
 import(stars)
 importFrom(Rdpack,reprompt)
-importFrom(archive,archive_extract)
 importFrom(collapse,rowbind)
 importFrom(data.table,
   .SD,
