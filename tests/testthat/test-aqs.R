@@ -79,7 +79,7 @@ testthat::test_that("download_aqs validates URLs", {
     )
 
     # Check first URL is accessible
-    testthat::expect_true(check_url_status(result$urls[1]))
+    testthat::expect_true(amadeus:::check_url_status(result$urls[1]))
   })
 })
 

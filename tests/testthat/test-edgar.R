@@ -841,10 +841,10 @@ testthat::test_that("download_edgar validates live VOC URLs for all 25 groups", 
     acknowledgement = TRUE
   )
 
-  status_sector <- vapply(result$urls, amadeus::check_url_status, logical(1))
+  status_sector <- vapply(result$urls, amadeus:::check_url_status, logical(1))
   status_totals <- vapply(
     result_totals$urls,
-    amadeus::check_url_status,
+    amadeus:::check_url_status,
     logical(1)
   )
 

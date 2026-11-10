@@ -186,7 +186,7 @@ download_run <- function(
   }
   # ----------------------------------------------------------------------------
   # Remove the command file when requested.
-  amadeus::download_remove_command(
+  amadeus:::download_remove_command(
     commands_txt = commands_txt,
     remove = remove
   )

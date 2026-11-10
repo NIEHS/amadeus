@@ -272,7 +272,7 @@ process_drought <- function(
   source <- match.arg(source)
 
   #### Sanitize path
-  path <- amadeus::download_sanitize_path(path)
+  path <- amadeus:::download_sanitize_path(path)
 
   #### Validate dates
   date <- if (length(date) == 1) rep(date, 2) else date
@@ -280,7 +280,7 @@ process_drought <- function(
   date <- date[order(as.Date(date))]
 
   #### Check required parameters
-  amadeus::check_for_null_parameters(mget(ls()))
+  amadeus:::check_for_null_parameters(mget(ls()))
 
   #### Dispatch to source-specific pathway
   if (source %in% c("spei", "eddi")) {

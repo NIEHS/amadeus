@@ -323,7 +323,7 @@ testthat::test_that("download_gridmet(existing destination): sends only missing 
       if (is.null(destfiles) || length(destfiles) != length(urls)) {
         stop("destfiles must have same length as urls.\n")
       }
-      needs_download <- sapply(destfiles, amadeus::check_destfile)
+      needs_download <- sapply(destfiles, amadeus:::check_destfile)
       urls_filtered <- urls[needs_download]
       destfiles_filtered <- destfiles[needs_download]
       captured_urls <<- urls_filtered
@@ -358,7 +358,7 @@ testthat::test_that("download_gridmet(existing files=all): skips downloading and
       if (is.null(destfiles) || length(destfiles) != length(urls)) {
         stop("destfiles must have same length as urls.\n")
       }
-      needs_download <- sapply(destfiles, amadeus::check_destfile)
+      needs_download <- sapply(destfiles, amadeus:::check_destfile)
       urls_filtered <- urls[needs_download]
       destfiles_filtered <- destfiles[needs_download]
       if (length(urls_filtered) == 0) {

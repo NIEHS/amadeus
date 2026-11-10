@@ -292,7 +292,7 @@ download_edgar <- function(
   }
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_directories <- amadeus::download_setup_dir(directory_to_save, zip = TRUE)
+  chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)
   chr_dir_to_download <- chr_directories[1]
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
@@ -464,7 +464,7 @@ download_edgar <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus::download_preview(
+    return(invisible(amadeus:::download_preview(
       df_download$url,
       df_download$destfile
     )))
@@ -474,7 +474,7 @@ download_edgar <- function(
   amadeus:::check_preflight(df_download$url[1])
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus::download_run_method(
+  download_result <- amadeus:::download_run_method(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = NULL,
@@ -486,13 +486,13 @@ download_edgar <- function(
   # Unzip downloaded or existing archives.
   sapply(
     df_download$destfile,
-    amadeus::download_unzip,
+    amadeus:::download_unzip,
     directory_to_unzip = chr_dir_to_save,
     unzip = unzip
   )
   # ----------------------------------------------------------------------------
   # Remove zip files after all extractions.
-  amadeus::download_remove_zips(
+  amadeus:::download_remove_zips(
     remove = remove_zip,
     download_name = df_download$destfile
   )
@@ -540,11 +540,11 @@ process_edgar <- function(
   extent = NULL,
   ...
 ) {
-  amadeus::check_for_null_parameters(mget(ls()))
+  amadeus:::check_for_null_parameters(mget(ls()))
 
   if (length(path) == 1 && dir.exists(path)) {
     path <- list.files(
-      path = amadeus::download_sanitize_path(path),
+      path = amadeus:::download_sanitize_path(path),
       recursive = TRUE,
       full.names = TRUE
     )

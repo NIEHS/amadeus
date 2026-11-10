@@ -136,7 +136,7 @@ download_improve <- function(
   int_years <- amadeus:::sequence_years(year)
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_directories <- amadeus::download_setup_dir(directory_to_save, zip = TRUE)
+  chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)
   chr_dir_to_download <- chr_directories[1]
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
@@ -170,11 +170,11 @@ download_improve <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus::download_preview(chr_urls, chr_filenames)))
+    return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus::download_run_method(
+  download_result <- amadeus:::download_run_method(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,
@@ -186,13 +186,13 @@ download_improve <- function(
   # Unzip downloaded .zip files.
   sapply(
     chr_filenames,
-    amadeus::download_unzip,
+    amadeus:::download_unzip,
     directory_to_unzip = chr_dir_to_save,
     unzip = unzip
   )
   # ----------------------------------------------------------------------------
   # Remove zip files.
-  amadeus::download_remove_zips(
+  amadeus:::download_remove_zips(
     remove = remove_zip,
     download_name = chr_filenames
   )
@@ -276,7 +276,7 @@ process_improve <- function(
   if (is.null(path) || !dir.exists(path)) {
     stop("`path` must be a valid directory path.\n")
   }
-  path <- amadeus::download_sanitize_path(path)
+  path <- amadeus:::download_sanitize_path(path)
 
   #### Resolve file prefix from product
   prefix_map <- c(raw = "IMPAER", rhr2 = "IMPRHR2", rhr3 = "IMPRHR3")

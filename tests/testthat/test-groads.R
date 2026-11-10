@@ -54,7 +54,7 @@ testthat::test_that("download_groads", {
 
       # define file path with commands
       commands_path <- paste0(
-        download_sanitize_path(directory_to_save),
+        amadeus:::download_sanitize_path(directory_to_save),
         "sedac_groads_",
         gsub(" ", "_", tolower(data_region)),
         "_",
@@ -69,7 +69,7 @@ testthat::test_that("download_groads", {
         # extract urls
         urls <- extract_urls(commands = commands, position = 11)
         # check HTTP URL status
-        url_status <- check_urls(urls = urls, size = 1L)
+        url_status <- amadeus:::check_urls(urls = urls, size = 1L)
         # implement unit tests
         test_download_functions(
           directory_to_save = directory_to_save,

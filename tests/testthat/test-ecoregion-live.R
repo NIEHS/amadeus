@@ -10,7 +10,7 @@ testthat::test_that("download_ecoregion(download=FALSE): provider URL is accessi
     acknowledgement = TRUE,
     download = FALSE
   ))
-  testthat::expect_true(amadeus::check_url_status(result$urls))
+  testthat::expect_true(amadeus:::check_url_status(result$urls))
 })
 
 testthat::test_that(

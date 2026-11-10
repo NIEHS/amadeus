@@ -138,7 +138,7 @@ download_goes <- function(
   chr_dates <- amadeus:::sequence_dates(date, hyphen = FALSE)
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_dir_to_save <- amadeus::download_setup_dir(directory_to_save)
+  chr_dir_to_save <- amadeus:::download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Define prefix based on product code.
   chr_prefix <- switch(
@@ -182,14 +182,14 @@ download_goes <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus::download_preview(
+    return(invisible(amadeus:::download_preview(
       df_download$url,
       df_download$destfile
     )))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus::download_run_method(
+  download_result <- amadeus:::download_run_method(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = NULL,
@@ -440,7 +440,7 @@ process_goes <- function(
 ) {
   #### resolve file paths from directory or explicit vector
   if (length(path) == 1 && dir.exists(path)) {
-    path <- amadeus::download_sanitize_path(path)
+    path <- amadeus:::download_sanitize_path(path)
     paths <- list.files(
       path,
       pattern = "^OR_(ADP|ABI-L2-ADP)",
@@ -451,7 +451,7 @@ process_goes <- function(
     paths <- path
   }
   #### check for variable
-  amadeus::check_for_null_parameters(mget(ls()))
+  amadeus:::check_for_null_parameters(mget(ls()))
   #### check dates
   date <- if (length(date) == 1) rep(date, 2) else date
   stopifnot(length(date) == 2)

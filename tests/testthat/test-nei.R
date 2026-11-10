@@ -36,7 +36,7 @@ testthat::test_that("download_nei", {
 
   # define file path with commands
   commands_path <- paste0(
-    download_sanitize_path(directory_to_save),
+    amadeus:::download_sanitize_path(directory_to_save),
     "NEI_AADT_",
     paste(year, collapse = "-"),
     "_",

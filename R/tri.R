@@ -131,7 +131,7 @@ download_tri <- function(
   int_years <- amadeus:::sequence_years(year)
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_dir_to_save <- amadeus::download_setup_dir(directory_to_save)
+  chr_dir_to_save <- amadeus:::download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Format the validated jurisdiction for URLs and file names.
   chr_jurl <- if (chr_juris == "TBL") "tbl" else chr_juris
@@ -160,11 +160,11 @@ download_tri <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus::download_preview(chr_urls, chr_filenames)))
+    return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus::download_run_method(
+  download_result <- amadeus:::download_run_method(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,

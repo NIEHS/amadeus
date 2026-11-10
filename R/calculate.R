@@ -918,7 +918,7 @@ calc_prepare_locs <- function(
   geom = FALSE
 ) {
   #### check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
+  amadeus:::check_for_null_parameters(mget(ls()))
   if (!locs_id %in% names(locs)) {
     stop(sprintf("locs should include columns named %s.\n", locs_id))
   }

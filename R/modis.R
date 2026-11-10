@@ -174,7 +174,7 @@ download_modis <- function(
   checkmate::assert_true(extent[2L] < extent[4L])
   # ----------------------------------------------------------------------------
   # Check NASA Earthdata token, including when a preview is requested.
-  chr_nasatoken <- amadeus::get_token(
+  chr_nasatoken <- amadeus:::get_token(
     token = nasa_earth_data_token,
     env_var = "NASA_EARTHDATA_TOKEN"
   )
@@ -204,7 +204,7 @@ download_modis <- function(
   }
   # ----------------------------------------------------------------------------
   # Generate saving directory.
-  chr_dir_to_save <- amadeus::download_setup_dir(directory_to_save)
+  chr_dir_to_save <- amadeus:::download_setup_dir(directory_to_save)
   # ----------------------------------------------------------------------------
   # Resolve the existing CMR version overrides in one place. Explicit NULL
   # omits the version query parameter; it does not mean "latest version".
@@ -236,14 +236,14 @@ download_modis <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus::download_preview(
+    return(invisible(amadeus:::download_preview(
       df_download$url,
       df_download$destfile
     )))
   }
   # ----------------------------------------------------------------------------
   # Run download using the same retry and rate-limit inputs as discovery.
-  download_result <- amadeus::download_run_method(
+  download_result <- amadeus:::download_run_method(
     urls = df_download$url,
     destfiles = df_download$destfile,
     token = chr_nasatoken,

@@ -370,7 +370,7 @@ testthat::test_that("download_data routes 'usdm' alias to download_drought", {
 ##### drought_weekly_dates helper
 
 testthat::test_that("drought_weekly_dates returns Tuesdays only", {
-  dates <- drought_weekly_dates("2020-01-01", "2020-01-31")
+  dates <- amadeus:::drought_weekly_dates("2020-01-01", "2020-01-31")
   # January 2020 Tuesdays: 7, 14, 21, 28
   testthat::expect_equal(
     dates,
@@ -379,12 +379,12 @@ testthat::test_that("drought_weekly_dates returns Tuesdays only", {
 })
 
 testthat::test_that("drought_weekly_dates returns empty when no Tuesdays", {
-  dates <- drought_weekly_dates("2020-01-08", "2020-01-11")
+  dates <- amadeus:::drought_weekly_dates("2020-01-08", "2020-01-11")
   testthat::expect_length(dates, 0L)
 })
 
 testthat::test_that("drought_weekly_dates handles single-day range on Tuesday", {
-  dates <- drought_weekly_dates("2020-01-07", "2020-01-07")
+  dates <- amadeus:::drought_weekly_dates("2020-01-07", "2020-01-07")
   testthat::expect_equal(dates, "20200107")
 })
 

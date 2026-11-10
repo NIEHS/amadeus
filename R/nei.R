@@ -151,7 +151,7 @@ download_nei <- function(
   checkmate::assert_subset(int_year, c(2008, 2011, 2014, 2017, 2020, 2023))
   # ----------------------------------------------------------------------------
   # Generate zip and data file directories.
-  chr_directories <- amadeus::download_setup_dir(directory_to_save, zip = TRUE)
+  chr_directories <- amadeus:::download_setup_dir(directory_to_save, zip = TRUE)
   chr_dir_to_download <- chr_directories[1]
   chr_dir_to_save <- chr_directories[2]
   # ----------------------------------------------------------------------------
@@ -202,11 +202,11 @@ download_nei <- function(
   # ----------------------------------------------------------------------------
   # Exit early if download = FALSE. !! INVESTIGATE FOR DEPRECATION. !!
   if (!isTRUE(download)) {
-    return(invisible(amadeus::download_preview(chr_urls, chr_filenames)))
+    return(invisible(amadeus:::download_preview(chr_urls, chr_filenames)))
   }
   # ----------------------------------------------------------------------------
   # Run download.
-  download_result <- amadeus::download_run_method(
+  download_result <- amadeus:::download_run_method(
     urls = chr_urls,
     destfiles = chr_filenames,
     token = NULL,
@@ -221,12 +221,12 @@ download_nei <- function(
     sub("\\.(zip|tar\\.gz)$", "", basename(chr_filenames))
   )
   if (isTRUE(unzip)) {
-    invisible(lapply(chr_dirs_to_unzip, amadeus::download_setup_dir))
+    invisible(lapply(chr_dirs_to_unzip, amadeus:::download_setup_dir))
   }
   # ----------------------------------------------------------------------------
   # Pair each archive with its own destination. Cleanup follows all extractions.
   mapply(
-    amadeus::download_unzip,
+    amadeus:::download_unzip,
     file_name = chr_filenames,
     directory_to_unzip = chr_dirs_to_unzip,
     MoreArgs = list(unzip = unzip),
@@ -235,7 +235,7 @@ download_nei <- function(
   )
   # ----------------------------------------------------------------------------
   # Remove zip files.
-  amadeus::download_remove_zips(
+  amadeus:::download_remove_zips(
     remove = remove_zip,
     download_name = chr_filenames
   )

@@ -55,7 +55,7 @@ testthat::test_that(
       paste0("https://spei.csic.es/files/", spei_file)
     )
     reachable <- tryCatch(
-      vapply(candidates, amadeus::check_url_status, logical(1)),
+      vapply(candidates, amadeus:::check_url_status, logical(1)),
       error = function(e) {
         skip_if_transient_live_issue(e)
         stop(e)

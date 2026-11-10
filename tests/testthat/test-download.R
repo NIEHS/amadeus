@@ -161,12 +161,12 @@ testthat::test_that("download_data (expected errors - temporal range)", {
 ##### httr2-specific tests
 testthat::test_that("download_run_method validates inputs", {
   testthat::expect_error(
-    download_run_method(urls = NULL),
+    amadeus:::download_run_method(urls = NULL),
     "No URLs provided"
   )
 
   testthat::expect_error(
-    download_run_method(
+    amadeus:::download_run_method(
       urls = c("http://example.com"),
       destfiles = c("file1.nc", "file2.nc") # length mismatch
     ),
@@ -174,7 +174,7 @@ testthat::test_that("download_run_method validates inputs", {
   )
 
   testthat::expect_error(
-    download_run_method(
+    amadeus:::download_run_method(
       urls = character(0),
       destfiles = character(0)
     ),
@@ -183,7 +183,7 @@ testthat::test_that("download_run_method validates inputs", {
 })
 
 testthat::test_that("download_run_method has proper parameters", {
-  params <- names(formals(download_run_method))
+  params <- names(formals(amadeus:::download_run_method))
 
   testthat::expect_true("urls" %in% params)
   testthat::expect_true("destfiles" %in% params)
@@ -199,7 +199,7 @@ testthat::test_that("download_run_method skips existing files", {
     # Create existing file with content
     writeLines("existing data", "existing.txt")
 
-    result <- download_run_method(
+    result <- amadeus:::download_run_method(
       urls = "http://httpbin.org/status/200",
       destfiles = "existing.txt",
       show_progress = FALSE
@@ -213,7 +213,7 @@ testthat::test_that("download_run_method skips existing files", {
 testthat::test_that("get_token retrieves from environment variable", {
   withr::local_envvar(TEST_TOKEN = "env_token_value")
 
-  token <- get_token(token = NULL, env_var = "TEST_TOKEN")
+  token <- amadeus:::get_token(token = NULL, env_var = "TEST_TOKEN")
   testthat::expect_equal(token, "env_token_value")
 })
 
@@ -221,7 +221,7 @@ testthat::test_that("get_token reads from file", {
   withr::with_tempdir({
     writeLines("file_token_value", "token.txt")
 
-    token <- get_token(token = "token.txt", env_var = "NONEXISTENT")
+    token <- amadeus:::get_token(token = "token.txt", env_var = "NONEXISTENT")
     testthat::expect_equal(token, "file_token_value")
   })
 })
@@ -229,7 +229,7 @@ testthat::test_that("get_token reads from file", {
 testthat::test_that("get_token uses direct token string", {
   withr::local_envvar(TEST_TOKEN = "")
 
-  token <- get_token(token = "direct_token", env_var = "TEST_TOKEN")
+  token <- amadeus:::get_token(token = "direct_token", env_var = "TEST_TOKEN")
   testthat::expect_equal(token, "direct_token")
 })
 
@@ -237,7 +237,7 @@ testthat::test_that("get_token errors when no token found", {
   withr::local_envvar(NONEXISTENT_TOKEN = "")
 
   testthat::expect_error(
-    get_token(token = NULL, env_var = "NONEXISTENT_TOKEN"),
+    amadeus:::get_token(token = NULL, env_var = "NONEXISTENT_TOKEN"),
     "No authentication token found"
   )
 })
@@ -247,7 +247,7 @@ testthat::test_that("get_token handles empty file", {
     file.create("empty_token.txt")
 
     testthat::expect_error(
-      get_token(token = "empty_token.txt", env_var = "NONEXISTENT"),
+      amadeus:::get_token(token = "empty_token.txt", env_var = "NONEXISTENT"),
       "empty"
     )
   })
@@ -342,7 +342,7 @@ testthat::test_that("check_url_status with valid URL", {
   skip_if_offline()
 
   urls <- "https://google.com"
-  url_status <- check_url_status(url = urls)
+  url_status <- amadeus:::check_url_status(url = urls)
 
   testthat::expect_length(url_status, 1)
   testthat::expect_true(url_status)
@@ -354,7 +354,7 @@ testthat::test_that("check_url_status with valid NASA file endpoint", {
 
   # Use a known valid URL
   urls <- "https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/"
-  url_status <- check_url_status(url = urls)
+  url_status <- amadeus:::check_url_status(url = urls)
 
   testthat::expect_length(url_status, 1)
 })
@@ -365,7 +365,7 @@ testthat::test_that("check_url_status with invalid URL returns FALSE", {
 
   # Use a URL that will definitely fail
   urls <- "https://httpbin.org/status/404"
-  url_status <- check_url_status(url = urls)
+  url_status <- amadeus:::check_url_status(url = urls)
 
   testthat::expect_length(url_status, 1)
   testthat::expect_false(url_status)
@@ -376,19 +376,19 @@ testthat::test_that("check_url_status handles DNS failures gracefully", {
 
   # This should return FALSE, not error
   urls <- "https://invalid.domain.that.does.not.exist.12345/file.nc"
-  url_status <- check_url_status(url = urls)
+  url_status <- amadeus:::check_url_status(url = urls)
 
   testthat::expect_false(url_status)
 })
 
 testthat::test_that("check_url_status has max_tries parameter with default 3", {
-  params <- formals(check_url_status)
+  params <- formals(amadeus:::check_url_status)
   testthat::expect_true("max_tries" %in% names(params))
   testthat::expect_equal(params$max_tries, 3L)
 })
 
 testthat::test_that("check_url_status body includes retry_on_failure = TRUE", {
-  fn_body <- paste(deparse(body(check_url_status)), collapse = "\n")
+  fn_body <- paste(deparse(body(amadeus:::check_url_status)), collapse = "\n")
   testthat::expect_match(fn_body, "retry_on_failure\\s*=\\s*TRUE")
   testthat::expect_match(fn_body, "req_retry")
 })
@@ -396,14 +396,14 @@ testthat::test_that("check_url_status body includes retry_on_failure = TRUE", {
 ################################################################################
 ##### check_destfile
 testthat::test_that("check_destfile returns TRUE for non-existent file", {
-  testthat::expect_true(check_destfile("nonexistent.nc"))
+  testthat::expect_true(amadeus:::check_destfile("nonexistent.nc"))
 })
 
 testthat::test_that("check_destfile returns FALSE for existing file with content", {
   withr::with_tempdir({
     file_with_content <- "hasdata.nc"
     writeLines("data", file_with_content)
-    testthat::expect_false(check_destfile(file_with_content))
+    testthat::expect_false(amadeus:::check_destfile(file_with_content))
   })
 })
 
@@ -411,7 +411,7 @@ testthat::test_that("check_destfile returns TRUE for zero-byte file", {
   withr::with_tempdir({
     zero_byte <- "empty.nc"
     file.create(zero_byte)
-    testthat::expect_true(check_destfile(zero_byte))
+    testthat::expect_true(amadeus:::check_destfile(zero_byte))
   })
 })
 
@@ -484,7 +484,7 @@ testthat::test_that("check_urls returns NULL with undefined size", {
     "https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/",
     "Shapefile/2023/09/hms_smoke20230901.zip"
   )
-  url_status <- check_urls(urls = urls)
+  url_status <- amadeus:::check_urls(urls = urls)
   testthat::expect_true(
     is.null(url_status)
   )
@@ -499,7 +499,7 @@ testthat::test_that("check_urls handles size > length(urls)", {
     "Shapefile/2023/09/hms_smoke20230901.zip"
   )
   testthat::expect_no_error(
-    url_status <- check_urls(urls = urls, size = 10)
+    url_status <- amadeus:::check_urls(urls = urls, size = 10)
   )
   testthat::expect_length(url_status, 1)
 })
@@ -510,7 +510,7 @@ testthat::test_that("check_urls returns TRUE for valid URL", {
 
   urls <- "https://google.com"
   testthat::expect_no_error(
-    url_status <- check_urls(urls = urls, size = 1)
+    url_status <- amadeus:::check_urls(urls = urls, size = 1)
   )
   testthat::expect_length(url_status, 1)
   testthat::expect_true(url_status)
@@ -539,7 +539,7 @@ testthat::test_that("download_sink", {
   testfile <- paste0(dir, "sink_test.txt")
   file.create(testfile)
   testthat::expect_no_error(
-    download_sink(testfile)
+    amadeus:::download_sink(testfile)
   )
   sink()
   Sys.sleep(1.5)
@@ -558,7 +558,7 @@ testthat::test_that("download_remove_zips", {
   dir.create(dirname(testfile2), recursive = TRUE)
   file.create(testfile2, recursive = TRUE)
   testthat::expect_no_error(
-    download_remove_zips(remove = TRUE, testfile1)
+    amadeus:::download_remove_zips(remove = TRUE, testfile1)
   )
   # expect only the testfile1 directory to be removed
   testthat::expect_equal(
@@ -582,10 +582,10 @@ testthat::test_that("download_hash", {
   hashfile <- paste0(dir, "hash_test.txt")
   file.create(hashfile)
   testthat::expect_true(
-    is.character(download_hash(TRUE, dir))
+    is.character(amadeus:::download_hash(TRUE, dir))
   )
   testthat::expect_true(
-    is.null(download_hash(FALSE, dir))
+    is.null(amadeus:::download_hash(FALSE, dir))
   )
   Sys.sleep(1.5)
   file.remove(hashfile)
@@ -649,7 +649,7 @@ testthat::test_that("download_run shows deprecation warning", {
     options(amadeus.download_run.warned = NULL)
 
     testthat::expect_warning(
-      download_run(
+      amadeus:::download_run(
         download = FALSE,
         commands_txt = "commands.txt",
         remove = FALSE
@@ -777,7 +777,7 @@ testthat::test_that("download handles network errors gracefully", {
     # download_run_method should return a result with failures, not throw error
     result <- suppressWarnings(
       suppressMessages(
-        download_run_method(
+        amadeus:::download_run_method(
           urls = "https://invalid.domain.that.does.not.exist.12345/file.nc",
           destfiles = "output.nc",
           show_progress = FALSE,
@@ -797,12 +797,12 @@ testthat::test_that("download handles network errors gracefully", {
 testthat::test_that("download respects max_tries parameter", {
   # Check that max_tries parameter is respected in function signature
   testthat::expect_true(
-    "max_tries" %in% names(formals(download_run_method))
+    "max_tries" %in% names(formals(amadeus:::download_run_method))
   )
 
   # Check default value
   testthat::expect_equal(
-    formals(download_run_method)$max_tries,
+    formals(amadeus:::download_run_method)$max_tries,
     20
   )
 })
@@ -810,12 +810,12 @@ testthat::test_that("download respects max_tries parameter", {
 testthat::test_that("download respects rate_limit parameter", {
   # Check that rate_limit parameter exists
   testthat::expect_true(
-    "rate_limit" %in% names(formals(download_run_method))
+    "rate_limit" %in% names(formals(amadeus:::download_run_method))
   )
 
   # Check default value
   testthat::expect_equal(
-    formals(download_run_method)$rate_limit,
+    formals(amadeus:::download_run_method)$rate_limit,
     2
   )
 })
@@ -834,7 +834,7 @@ testthat::test_that("download_run_method with show_progress = TRUE", {
     destfile <- "test_progress_true.zip"
 
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = url,
         destfiles = destfile,
         show_progress = TRUE,
@@ -865,7 +865,7 @@ testthat::test_that("download_run_method with show_progress = FALSE", {
     destfile <- "test_progress_false.zip"
 
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = url,
         destfiles = destfile,
         show_progress = FALSE,
@@ -893,7 +893,7 @@ testthat::test_that("download_run_method handles failure with show_progress = TR
 
     result <- suppressWarnings(
       suppressMessages(
-        download_run_method(
+        amadeus:::download_run_method(
           urls = url,
           destfiles = destfile,
           show_progress = TRUE,
@@ -921,7 +921,7 @@ testthat::test_that("download_run_method handles failure with show_progress = FA
 
     result <- suppressWarnings(
       suppressMessages(
-        download_run_method(
+        amadeus:::download_run_method(
           urls = url,
           destfiles = destfile,
           show_progress = FALSE,
@@ -953,7 +953,7 @@ testthat::test_that("download_run_method handles mixed success/failure with show
 
     result <- suppressWarnings(
       suppressMessages(
-        download_run_method(
+        amadeus:::download_run_method(
           urls = urls,
           destfiles = destfiles,
           show_progress = TRUE,
@@ -985,7 +985,7 @@ testthat::test_that("download_run_method handles mixed success/failure with show
 
     result <- suppressWarnings(
       suppressMessages(
-        download_run_method(
+        amadeus:::download_run_method(
           urls = urls,
           destfiles = destfiles,
           show_progress = FALSE,
@@ -1015,7 +1015,7 @@ testthat::test_that("download_run_method skips existing files with both progress
 
     # Test with show_progress = TRUE
     result_true <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = url,
         destfiles = destfile,
         show_progress = TRUE,
@@ -1029,7 +1029,7 @@ testthat::test_that("download_run_method skips existing files with both progress
 
     # Test with show_progress = FALSE
     result_false <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = url,
         destfiles = destfile,
         show_progress = FALSE,
@@ -1058,7 +1058,7 @@ testthat::test_that("download_run_method respects rate limiting", {
 
     start_time <- Sys.time()
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = urls,
         destfiles = destfiles,
         show_progress = FALSE,
@@ -1109,7 +1109,7 @@ testthat::test_that("download_run_method handles http success", {
     destfile <- "test.zip"
 
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = url,
         destfiles = destfile,
         show_progress = FALSE,
@@ -1135,7 +1135,7 @@ testthat::test_that("download_run_method handles multiple files", {
     destfile <- "koppen_test.zip"
 
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = url,
         destfiles = destfile,
         show_progress = FALSE,
@@ -1167,7 +1167,7 @@ testthat::test_that("download_run_method handles failures correctly", {
 
     result <- suppressWarnings(
       suppressMessages(
-        download_run_method(
+        amadeus:::download_run_method(
           urls = urls,
           destfiles = destfiles,
           show_progress = FALSE,
@@ -1200,7 +1200,7 @@ testthat::test_that("download_run_method respects rate limiting", {
     # Time the download with rate limiting
     start_time <- Sys.time()
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = urls,
         destfiles = destfiles,
         show_progress = FALSE,
@@ -1234,7 +1234,7 @@ testthat::test_that("download_run_method skips existing files correctly", {
     url <- "https://dmap-prod-oms-edc.s3.us-east-1.amazonaws.com/ORD/Ecoregions/us/us_eco_l3_state_boundaries.zip"
 
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = url,
         destfiles = destfile,
         show_progress = FALSE,
@@ -1406,7 +1406,7 @@ testthat::test_that("download_setup_dir creates directories", {
     dir_path <- "./test_dir"
 
     testthat::expect_no_error(
-      download_setup_dir(dir_path)
+      amadeus:::download_setup_dir(dir_path)
     )
 
     testthat::expect_true(dir.exists(dir_path))
@@ -1417,7 +1417,7 @@ testthat::test_that("download_setup_dir creates zip subdirectories", {
   withr::with_tempdir({
     dir_path <- "./test_dir"
 
-    dirs <- download_setup_dir(dir_path, zip = TRUE)
+    dirs <- amadeus:::download_setup_dir(dir_path, zip = TRUE)
 
     testthat::expect_length(dirs, 2)
     testthat::expect_true(dir.exists(paste0(dir_path, "/zip_files")))
@@ -1428,12 +1428,12 @@ testthat::test_that("download_setup_dir creates zip subdirectories", {
 ################################################################################
 ##### Test download_sanitize_path
 testthat::test_that("download_sanitize_path adds trailing slash", {
-  result <- download_sanitize_path("/path/without/slash")
+  result <- amadeus:::download_sanitize_path("/path/without/slash")
   testthat::expect_equal(result, "/path/without/slash/")
 })
 
 testthat::test_that("download_sanitize_path preserves trailing slash", {
-  result <- download_sanitize_path("/path/with/slash/")
+  result <- amadeus:::download_sanitize_path("/path/with/slash/")
   testthat::expect_equal(result, "/path/with/slash/")
 })
 
@@ -1441,14 +1441,14 @@ testthat::test_that("download_sanitize_path preserves trailing slash", {
 ##### Test download_permit
 testthat::test_that("download_permit errors when FALSE", {
   testthat::expect_error(
-    download_permit(acknowledgement = FALSE),
+    amadeus:::download_permit(acknowledgement = FALSE),
     "acknowledgement"
   )
 })
 
 testthat::test_that("download_permit succeeds when TRUE", {
   testthat::expect_no_error(
-    download_permit(acknowledgement = TRUE)
+    amadeus:::download_permit(acknowledgement = TRUE)
   )
 })
 
@@ -1470,7 +1470,7 @@ testthat::test_that("download_unzip works correctly", {
 
     testthat::expect_no_error(
       suppressMessages(
-        download_unzip(
+        amadeus:::download_unzip(
           file_name = zip_file,
           directory_to_unzip = unzip_dir,
           unzip = TRUE
@@ -1490,7 +1490,7 @@ testthat::test_that("download_unzip respects unzip=FALSE", {
     dir.create(unzip_dir)
 
     testthat::expect_message(
-      download_unzip(
+      amadeus:::download_unzip(
         file_name = zip_file,
         directory_to_unzip = unzip_dir,
         unzip = FALSE
@@ -1516,7 +1516,7 @@ testthat::test_that("download_unzip uses archive for .7z files", {
     dir.create(unzip_dir)
     testthat::expect_no_error(
       suppressMessages(
-        download_unzip(
+        amadeus:::download_unzip(
           file_name = archive_file,
           directory_to_unzip = unzip_dir,
           unzip = TRUE
@@ -1535,7 +1535,7 @@ testthat::test_that("download_unzip errors on unsupported archive extension", {
     dir.create(unzip_dir)
     testthat::expect_error(
       suppressMessages(
-        download_unzip(
+        amadeus:::download_unzip(
           file_name = archive_file,
           directory_to_unzip = unzip_dir,
           unzip = TRUE
@@ -1552,7 +1552,7 @@ testthat::test_that("check_for_null_parameters detects nulls", {
   params <- list(a = 1, b = NULL, c = 3)
 
   testthat::expect_error(
-    check_for_null_parameters(params),
+    amadeus:::check_for_null_parameters(params),
     "NULL"
   )
 })
@@ -1561,7 +1561,7 @@ testthat::test_that("check_for_null_parameters allows extent to be NULL", {
   params <- list(a = 1, extent = NULL, c = 3)
 
   testthat::expect_no_error(
-    check_for_null_parameters(params)
+    amadeus:::check_for_null_parameters(params)
   )
 })
 
@@ -1569,7 +1569,7 @@ testthat::test_that("check_for_null_parameters passes with no nulls", {
   params <- list(a = 1, b = 2, c = 3)
 
   testthat::expect_no_error(
-    check_for_null_parameters(params)
+    amadeus:::check_for_null_parameters(params)
   )
 })
 
@@ -1672,7 +1672,7 @@ testthat::test_that("download_run_method with token adds Bearer auth header", {
 
     destfile <- "token_test.bin"
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "https://example.com/data.bin",
         destfiles = destfile,
         token = "test_bearer_token_123",
@@ -1715,7 +1715,7 @@ testthat::test_that("download_run_method handles 0-byte file after download", {
 
     destfile <- "zero_byte_test.bin"
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "https://example.com/data.bin",
         destfiles = destfile,
         show_progress = FALSE,
@@ -1754,7 +1754,7 @@ testthat::test_that("download_run_method 0-byte with show_progress=TRUE", {
 
     destfile <- "zero_byte_progress.bin"
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "https://example.com/data.bin",
         destfiles = destfile,
         show_progress = TRUE,
@@ -1797,7 +1797,7 @@ testthat::test_that(
       msgs <- character(0)
       withCallingHandlers(
         {
-          result <- download_run_method(
+          result <- amadeus:::download_run_method(
             urls = c(
               "https://example.com/file1.bin",
               "https://example.com/file2.bin"
@@ -1838,7 +1838,7 @@ testthat::test_that(
       msgs <- character(0)
       result <- suppressWarnings(
         withCallingHandlers(
-          download_run_method(
+          amadeus:::download_run_method(
             urls = "https://example.com/data.bin",
             destfiles = "error_test.bin",
             show_progress = FALSE,
@@ -1873,7 +1873,7 @@ testthat::test_that(
       msgs <- character(0)
       result <- suppressWarnings(
         withCallingHandlers(
-          download_run_method(
+          amadeus:::download_run_method(
             urls = "https://example.com/data.bin",
             destfiles = "error_progress_test.bin",
             show_progress = TRUE,
@@ -1984,7 +1984,7 @@ testthat::test_that("download_run_method success path (no skip)", {
   )
   withr::with_tempdir({
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "https://example.com/file1.bin",
         destfiles = "file1.bin",
         show_progress = TRUE,
@@ -2006,7 +2006,7 @@ testthat::test_that("download_run_method error handler path (no skip)", {
   )
   withr::with_tempdir({
     result <- suppressMessages(suppressWarnings(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "https://example.com/data.bin",
         destfiles = "error_test.bin",
         show_progress = FALSE,
@@ -2038,7 +2038,7 @@ testthat::test_that("download_run_method subdirectory creation (no skip)", {
   )
   withr::with_tempdir({
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "https://example.com/file.bin",
         destfiles = "subdir/nested/file.bin",
         show_progress = FALSE,
@@ -2064,7 +2064,7 @@ testthat::test_that("download_unzip actual unzip path (no skip)", {
     unzip_dir <- "unzipped"
     dir.create(unzip_dir)
     suppressMessages(
-      download_unzip(
+      amadeus:::download_unzip(
         file_name = zip_file,
         directory_to_unzip = unzip_dir,
         unzip = TRUE
@@ -2083,7 +2083,7 @@ testthat::test_that("check_urls size > length(urls) without skip", {
     .package = "amadeus"
   )
   urls <- "https://example.com/file.bin"
-  result <- suppressMessages(check_urls(urls = urls, size = 100))
+  result <- suppressMessages(amadeus:::check_urls(urls = urls, size = 100))
   testthat::expect_length(result, 1)
   testthat::expect_true(result)
 })
@@ -2094,14 +2094,14 @@ testthat::test_that("check_urls with method=NULL uses check_url_status", {
     .package = "amadeus"
   )
   urls <- c("https://example.com/a.bin", "https://example.com/b.bin")
-  result <- suppressMessages(check_urls(urls = urls, size = 2, method = NULL))
+  result <- suppressMessages(amadeus:::check_urls(urls = urls, size = 2, method = NULL))
   testthat::expect_length(result, 2)
   testthat::expect_true(all(result))
 })
 
 testthat::test_that("check_urls method=SKIP returns NULL (covers lines 722-723)", {
   urls <- c("https://example.com/a.bin", "https://example.com/b.bin")
-  result <- suppressMessages(check_urls(urls = urls, size = 2, method = "SKIP"))
+  result <- suppressMessages(amadeus:::check_urls(urls = urls, size = 2, method = "SKIP"))
   testthat::expect_null(result)
 })
 
@@ -2114,7 +2114,7 @@ testthat::test_that("download_run download=TRUE executes commands", {
     writeLines("#!/bin/bash\n# empty", cmds_file)
     Sys.chmod(cmds_file, "755")
     suppressMessages(suppressWarnings(
-      download_run(
+      amadeus:::download_run(
         commands_txt = cmds_file,
         download = TRUE,
         remove = FALSE
@@ -2132,7 +2132,7 @@ testthat::test_that("download_remove_command remove=TRUE deletes file", {
     f <- "cmds.txt"
     file.create(f)
     testthat::expect_true(file.exists(f))
-    download_remove_command(commands_txt = f, remove = TRUE)
+    amadeus:::download_remove_command(commands_txt = f, remove = TRUE)
     testthat::expect_false(file.exists(f))
   })
 })
@@ -2172,7 +2172,7 @@ testthat::test_that("download_run_method with token adds Bearer auth header", {
   )
   withr::with_tempdir({
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "https://example.com/data.bin",
         destfiles = "data.bin",
         token = "my_bearer_token",
@@ -2202,7 +2202,7 @@ testthat::test_that("download_run_method 0-byte file triggers failure path", {
   withr::with_tempdir({
     msgs <- character(0)
     result <- suppressWarnings(withCallingHandlers(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "https://example.com/data.bin",
         destfiles = "zero_byte.bin",
         show_progress = FALSE,
@@ -2234,7 +2234,7 @@ testthat::test_that("download_run_method 0-byte show_progress=TRUE triggers FAIL
   withr::with_tempdir({
     msgs <- character(0)
     result <- suppressWarnings(withCallingHandlers(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "https://example.com/data.bin",
         destfiles = "zero_progress.bin",
         show_progress = TRUE,
@@ -2269,7 +2269,7 @@ testthat::test_that("download_run_method multiple files triggers sleep", {
   )
   withr::with_tempdir({
     result <- suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = c("https://example.com/a.bin", "https://example.com/b.bin"),
         destfiles = c("a.bin", "b.bin"),
         show_progress = FALSE,
@@ -2296,7 +2296,7 @@ testthat::test_that("download_run_method error cleanup removes pre-existing file
   withr::with_tempdir({
     msgs <- character(0)
     result <- suppressWarnings(withCallingHandlers(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "https://example.com/data.bin",
         destfiles = "error_cleanup.bin",
         show_progress = FALSE,
@@ -2323,7 +2323,7 @@ testthat::test_that("check_url_status returns FALSE on network error", {
     },
     .package = "httr2"
   )
-  result <- check_url_status("https://nonexistent.invalid/file.bin")
+  result <- amadeus:::check_url_status("https://nonexistent.invalid/file.bin")
   testthat::expect_false(result)
 })
 
@@ -2480,9 +2480,9 @@ testthat::test_that("all download functions have rate_limit parameter", {
 ##### download_run_method: http_version parameter and retry_on_failure
 
 testthat::test_that("download_run_method has http_version parameter", {
-  params <- names(formals(download_run_method))
+  params <- names(formals(amadeus:::download_run_method))
   testthat::expect_true("http_version" %in% params)
-  testthat::expect_null(formals(download_run_method)$http_version)
+  testthat::expect_null(formals(amadeus:::download_run_method)$http_version)
 })
 
 testthat::test_that("download_run_method passes http_version to req_options", {
@@ -2497,7 +2497,7 @@ testthat::test_that("download_run_method passes http_version to req_options", {
   )
   withr::with_tempdir({
     suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "http://example.com/file.txt",
         destfiles = "file.txt",
         show_progress = FALSE,
@@ -2525,7 +2525,7 @@ testthat::test_that("download_run_method http_version=NULL skips req_options", {
   )
   withr::with_tempdir({
     suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "http://example.com/file.txt",
         destfiles = "file.txt",
         show_progress = FALSE,
@@ -2551,7 +2551,7 @@ testthat::test_that("download_run_method req_retry has retry_on_failure=TRUE", {
   )
   withr::with_tempdir({
     suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "http://example.com/file.txt",
         destfiles = "file.txt",
         show_progress = FALSE
@@ -2576,7 +2576,7 @@ testthat::test_that("download_run_method sets connecttimeout = 30L", {
   )
   withr::with_tempdir({
     suppressMessages(
-      download_run_method(
+      amadeus:::download_run_method(
         urls = "http://example.com/file.txt",
         destfiles = "file.txt",
         show_progress = FALSE
@@ -2671,7 +2671,7 @@ testthat::test_that("CMR endpoint is reachable and returns granules for MCD19A2"
 
 testthat::test_that("extent_to_modis_tiles returns expected tile ids", {
   us_extent <- c(-125, 24, -66, 50)
-  tiles <- extent_to_modis_tiles(us_extent)
+  tiles <- amadeus:::extent_to_modis_tiles(us_extent)
 
   testthat::expect_true(is.character(tiles))
   testthat::expect_true(length(tiles) > 0)
@@ -2681,19 +2681,19 @@ testthat::test_that("extent_to_modis_tiles returns expected tile ids", {
 
 testthat::test_that("extent_to_modis_tiles validates malformed extents", {
   testthat::expect_error(
-    extent_to_modis_tiles(c(-200, 20, -66, 50)),
+    amadeus:::extent_to_modis_tiles(c(-200, 20, -66, 50)),
     regexp = "xmin"
   )
   testthat::expect_error(
-    extent_to_modis_tiles(c(-125, -95, -66, 50)),
+    amadeus:::extent_to_modis_tiles(c(-125, -95, -66, 50)),
     regexp = "ymin"
   )
   testthat::expect_error(
-    extent_to_modis_tiles(c(-66, 24, -125, 50)),
+    amadeus:::extent_to_modis_tiles(c(-66, 24, -125, 50)),
     regexp = "xmin must be < xmax"
   )
   testthat::expect_error(
-    extent_to_modis_tiles(c(-125, 50, -66, 24)),
+    amadeus:::extent_to_modis_tiles(c(-125, 50, -66, 24)),
     regexp = "ymin must be < ymax"
   )
 })
