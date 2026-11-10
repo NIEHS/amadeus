@@ -16,78 +16,121 @@ download_drought(
   rate_limit = 2,
   unzip = TRUE,
   remove_zip = FALSE,
+  download = TRUE,
+  remove_command = FALSE,
+  version = c("2.11", "2.10", "legacy"),
   ...
 )
 }
 \arguments{
-\item{source}{character(1). Drought data source. One of \code{"spei"},
-\code{"eddi"}, or \code{"usdm"}.}
+\item{source}{character(1). \code{"spei"} (default), \code{"eddi"}, or \code{"usdm"}.
+Uses \code{\link[base:match.arg]{base::match.arg()}}, allowing unambiguous partial matches.}
 
-\item{date}{character(1 or 2). Single date or start/end dates.
-Format \code{"YYYY-MM-DD"}. For SPEI/EDDI the year component selects
-the annual file(s); for USDM the full date is used to select weekly
-release(s).}
+\item{date}{character(1 or 2). One date or inclusive range endpoints in
+\code{"YYYY-MM-DD"} format, in either order. EDDI and USDM select Tuesdays
+within the interval and stop if none occur. Dates must be between
+1950-01-01 and today. Default is \code{c("2020-01-01", "2020-12-31")}.
+Ignored for SPEI, which downloads a complete multi-year file.}
 
-\item{timescale}{integer(1). Accumulation timescale in months (SPEI/EDDI
-only; ignored for USDM). Typical values are 1, 3, 6, 12, 24, 48.
-Default is \code{1L}.}
+\item{timescale}{integer(1). Positive accumulation timescale in months,
+used by SPEI and EDDI. Default is \code{1L}. Ignored for USDM. Input validation
+does not establish whether the provider has a file for that timescale.}
 
-\item{directory_to_save}{character(1). Directory to save downloaded data.}
+\item{directory_to_save}{character(1). Non-empty output directory. SPEI
+and EDDI save files directly here. USDM uses \verb{zip_files/} for archives
+and \verb{data_files/} for extracted files beneath this directory.}
 
-\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed.}
+\item{acknowledgement}{logical(1). Must be \code{TRUE} to proceed, including
+for previews. Downloads and extracted files may require substantial
+storage. Default is \code{FALSE}.}
 
-\item{hash}{logical(1). Return \code{rlang::hash_file()} hash of
-downloaded files. Default \code{FALSE}.}
+\item{hash}{logical(1). Return a combined MD5 hash of the output directory
+instead of the download summary. Uses \code{directory_to_save} for SPEI/EDDI
+and \verb{data_files/} for USDM, including existing files. Default is \code{FALSE};
+ignored when \code{download = FALSE}.}
 
-\item{show_progress}{logical(1). Show download progress bar.
-Default \code{TRUE}.}
+\item{show_progress}{logical(1). Show file download progress. Default is
+\code{TRUE}. Other status and summary messages may still be printed when
+\code{FALSE}.}
 
-\item{max_tries}{integer(1). Maximum retry attempts. Default \code{3L}.}
+\item{max_tries}{integer(1). Maximum attempts per file request, including
+the initial attempt. Must be at least 1. Default is \code{3L}. Preflight
+checks use their own request settings.}
 
-\item{rate_limit}{numeric(1). Minimum seconds between HTTP requests.
-Default \code{2}.}
+\item{rate_limit}{numeric(1). Finite, non-negative request-throttling
+interval in seconds, passed to \code{\link[=download_run_method]{download_run_method()}}. Default is 2.}
 
-\item{unzip}{logical(1). Unzip downloaded zip archives (USDM only).
-Default \code{TRUE}.}
+\item{unzip}{logical(1). Extract USDM archives into \verb{data_files/}.
+Default is \code{TRUE}. Ignored for SPEI and EDDI.}
 
-\item{remove_zip}{logical(1). Remove zip archives after unzipping
-(USDM only). Default \code{FALSE}.}
+\item{remove_zip}{logical(1). Remove USDM archives and their \verb{zip_files/}
+directory recursively after extraction, including remaining contents.
+Requires \code{unzip = TRUE} for USDM. Default is \code{FALSE}. Ignored for SPEI
+and EDDI.}
 
-\item{...}{Reserved for future use; currently ignored.}
+\item{download}{logical(1). Deprecated. \code{FALSE} warns and returns a
+preview after directory creation, before preflight checks or downloading.
+Default is \code{TRUE}.}
+
+\item{remove_command}{logical(1). Deprecated and ignored; \code{TRUE} warns.
+No command file is generated. Default is \code{FALSE}.}
+
+\item{version}{character(1). SPEI selection: \code{"2.11"} (default),
+\code{"2.10"}, or \code{"legacy"}. The last choice uses the unversioned \verb{/files/}
+endpoint; its release is not identified by the URL. Uses
+\code{\link[base:match.arg]{base::match.arg()}}. No automatic fallback between versions occurs.
+Ignored for EDDI and USDM.}
+
+\item{...}{Additional arguments forwarded to the selected source function.
+Its \code{...} argument is currently reserved and ignored.}
 }
 \value{
-\code{invisible(NULL)} when \code{hash = FALSE}; a character hash
-string when \code{hash = TRUE}.
+The selected source function's result, with visibility preserved:
+\itemize{
+\item With \code{download = FALSE}, an invisible list containing \code{urls},
+\code{destfiles}, and \code{n_files}.
+\item With \code{download = TRUE} and \code{hash = FALSE}, an invisible download summary
+containing \code{success}, \code{failed}, and \code{skipped}. When any downloads are
+attempted, it also contains \code{failed_urls} and \code{failed_files}.
+\item With \code{download = TRUE} and \code{hash = TRUE}, a visible character scalar
+containing the combined MD5 hash of the source's output directory.
+}
+
+Counts describe file downloads, not extraction or scientific validity.
+Validation or extraction failures can prevent a normal return.
 }
 \description{
-The \code{download_drought()} function downloads drought index data from
-publicly available sources. Three source datasets are supported:
-\itemize{
-\item \strong{SPEI} (Standardized Precipitation-Evapotranspiration Index):
-Multi-year netCDF files by timescale from
-\url{https://spei.csic.es}.
-\item \strong{EDDI} (Evaporative Demand Drought Index): Weekly raster
-files by timescale from
-\url{https://www.drought.gov/data-maps-tools/evaporative-demand-drought-index-eddi}.
-\item \strong{USDM} (U.S. Drought Monitor): Weekly drought class
-shapefiles from
-\url{https://droughtmonitor.unl.edu}.
+Dispatch to \code{\link[=download_spei]{download_spei()}}, \code{\link[=download_eddi]{download_eddi()}}, or \code{\link[=download_usdm]{download_usdm()}}.
+The selected function validates its arguments, constructs download URLs,
+and handles previews, downloads, optional extraction, and return values.
 }
+\details{
+Only arguments relevant to the selected source are forwarded. Common
+validation occurs once in the source function; this wrapper does not
+repeat validation, directory creation, or download execution.
+
+Previews create the output directories but make no network requests.
+They include existing destination files. Actual downloads check the first
+URL before calling \code{\link[=download_run_method]{download_run_method()}}, which skips existing non-empty
+files and reports individual failures. A failed preflight warns and allows
+downloading to proceed. See the source functions for endpoint limitations
+and extraction behavior.
+
+SPEI retains the flat \code{speiNN.nc} filename across versions for compatibility
+with \code{\link[=process_drought]{process_drought()}}. Existing-file checks do not distinguish versions.
+The \code{date} argument does not subset SPEI downloads; temporal selection is
+performed during processing.
 }
 \note{
-\itemize{
-\item SPEI and EDDI are raster products; USDM is a polygon
-product (shapefile). Their \code{process_drought()} and
-\code{calculate_drought()} handling differ accordingly.
-\item No authentication is required for any of these sources.
-}
+No authentication is required. SPEI and EDDI provide raster inputs;
+USDM provides polygon inputs for the downstream drought workflow.
 }
 \examples{
 \dontrun{
 download_drought(
   source = "spei",
-  date = c("2020-01-01", "2020-12-31"),
   timescale = 1L,
+  version = "2.11",
   directory_to_save = "./data/drought",
   acknowledgement = TRUE
 )
@@ -100,7 +143,8 @@ download_drought(
 }
 }
 \seealso{
-\code{\link{process_drought}}, \code{\link{calculate_drought}}
+\code{\link[=download_spei]{download_spei()}}, \code{\link[=download_eddi]{download_eddi()}}, \code{\link[=download_usdm]{download_usdm()}},
+\code{\link[=process_drought]{process_drought()}}, \code{\link[=calculate_drought]{calculate_drought()}}
 }
 \author{
 Insang Song

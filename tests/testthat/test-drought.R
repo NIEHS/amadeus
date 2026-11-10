@@ -468,7 +468,7 @@ testthat::test_that("download_drought SPEI prefers current SPEIbase endpoint", {
   })
 })
 
-testthat::test_that("download_drought SPEI falls back to prior SPEIbase endpoint", {
+testthat::test_that("download_drought(version=2.10): uses requested SPEI endpoint", {
   captured_urls <- NULL
   testthat::local_mocked_bindings(
     check_url_status = function(url) grepl("spei_database_2_10/nc/spei01\\.nc$", url),
@@ -483,6 +483,7 @@ testthat::test_that("download_drought SPEI falls back to prior SPEIbase endpoint
     suppressMessages(
       download_drought(
         source = "spei",
+        version = "2.10",
         date = "2020-01-01",
         timescale = 1L,
         directory_to_save = ".",
@@ -493,8 +494,9 @@ testthat::test_that("download_drought SPEI falls back to prior SPEIbase endpoint
   })
 })
 
-testthat::test_that("download_drought SPEI file already exists skips download", {
+testthat::test_that("download_drought(source=spei): skips existing files", {
   testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
     check_destfile = function(...) FALSE,
     .package = "amadeus"
   )
@@ -514,7 +516,7 @@ testthat::test_that("download_drought SPEI file already exists skips download", 
         invokeRestart("muffleMessage")
       }
     )
-    testthat::expect_true(any(grepl("already exists|Skipping", msgs)))
+    testthat::expect_true(any(grepl("already exist|Skipping", msgs)))
     testthat::expect_equal(result$skipped, 1L)
   })
 })
@@ -556,9 +558,10 @@ testthat::test_that(
   }
 )
 
-testthat::test_that("download_drought EDDI uses CONUS_archive ftp endpoint", {
+testthat::test_that("download_drought(source=eddi): uses CONUS_archive FTP endpoint", {
   captured_urls <- NULL
   testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
     check_destfile = function(...) TRUE,
     download_run_method = function(urls, ...) {
       captured_urls <<- urls
@@ -607,8 +610,9 @@ testthat::test_that("download_drought EDDI timescale 12 URL has 12mn", {
   })
 })
 
-testthat::test_that("download_drought EDDI 404 error propagates", {
+testthat::test_that("download_drought(source=eddi): propagates download errors", {
   testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
     check_destfile = function(...) TRUE,
     download_run_method = function(...) stop("HTTP 404"),
     .package = "amadeus"
@@ -716,28 +720,47 @@ testthat::test_that("download_drought USDM hash=TRUE returns hash", {
   })
 })
 
-testthat::test_that("download_drought USDM 404 error propagates", {
-  testthat::local_mocked_bindings(
-    check_url_status = function(...) FALSE,
-    check_destfile = function(...) TRUE,
-    .package = "amadeus"
-  )
-  withr::with_tempdir({
-    testthat::expect_error(
-      download_drought(
-        source = "usdm",
-        date = "2020-01-07",
-        directory_to_save = ".",
-        acknowledgement = TRUE
-      ),
-      regexp = "HTTP 404"
+testthat::test_that(
+  "download_drought(source=usdm): continues after failed preflight", {
+    captured_urls <- NULL
+    testthat::local_mocked_bindings(
+      check_url_status = function(...) FALSE,
+      check_destfile = function(...) TRUE,
+      download_run_method = function(urls, ...) {
+        captured_urls <<- urls
+        list(success = 1L, failed = 0L, skipped = 0L)
+      },
+      download_unzip = function(...) invisible(NULL),
+      download_remove_zips = function(...) invisible(NULL),
+      .package = "amadeus"
     )
-  })
-})
+    withr::with_tempdir({
+      testthat::expect_warning(
+        result <- suppressMessages(download_drought(
+          source = "usdm",
+          date = "2020-01-07",
+          directory_to_save = ".",
+          acknowledgement = TRUE
+        )),
+        regexp = "Preflight URL check failed; attempting direct download"
+      )
+      testthat::expect_identical(
+        result,
+        list(success = 1L, failed = 0L, skipped = 0L)
+      )
+      testthat::expect_identical(
+        captured_urls,
+        "https://droughtmonitor.unl.edu/data/shapefiles_m/USDM_20200107_M.zip"
+      )
+    })
+  }
+)
 
-testthat::test_that("download_drought USDM skips when all files already exist", {
+testthat::test_that("download_drought(source=usdm): skips existing downloads", {
   testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
     check_destfile = function(...) FALSE,
+    download_unzip = function(...) invisible(NULL),
     .package = "amadeus"
   )
   withr::with_tempdir({
@@ -1530,8 +1553,9 @@ testthat::test_that("drought_process_usdm assigns CRS when shapefile has no CRS"
   testthat::expect_s4_class(result, "SpatVector")
 })
 
-testthat::test_that("download_drought SPEI file exists returns hash when hash=TRUE", {
+testthat::test_that("download_drought(source=spei, hash=TRUE): hashes existing files", {
   testthat::local_mocked_bindings(
+    check_url_status = function(...) TRUE,
     check_destfile = function(...) FALSE,
     download_hash = function(hash, directory) if (isTRUE(hash)) "spei-hash" else NULL,
     .package = "amadeus"
@@ -1551,7 +1575,7 @@ testthat::test_that("download_drought SPEI file exists returns hash when hash=TR
   })
 })
 
-testthat::test_that("download_drought SPEI URL 404 raises error", {
+testthat::test_that("download_drought(source=spei): warns before download errors", {
   testthat::local_mocked_bindings(
     check_destfile = function(...) TRUE,
     check_url_status = function(...) FALSE,
@@ -1559,21 +1583,24 @@ testthat::test_that("download_drought SPEI URL 404 raises error", {
     .package = "amadeus"
   )
   withr::with_tempdir({
-    testthat::expect_error(
-      amadeus::download_drought(
-        source = "spei",
-        date = "2020-01-01",
-        timescale = 1L,
-        directory_to_save = ".",
-        acknowledgement = TRUE
+    testthat::expect_warning(
+      testthat::expect_error(
+        amadeus::download_drought(
+          source = "spei",
+          date = "2020-01-01",
+          timescale = 1L,
+          directory_to_save = ".",
+          acknowledgement = TRUE
+        ),
+        "HTTP 404|SPEI timescale"
       ),
-      "HTTP 404|SPEI timescale"
+      "Preflight URL check failed; attempting direct download"
     )
   })
 })
 
 testthat::test_that(
-  "download_drought SPEI falls back to direct download when preflight fails",
+  "download_drought(source=spei): downloads after failed preflight",
   {
     captured_urls <- character(0)
     testthat::local_mocked_bindings(
@@ -1586,14 +1613,17 @@ testthat::test_that(
       .package = "amadeus"
     )
     withr::with_tempdir({
-      result <- suppressMessages(
-        amadeus::download_drought(
-          source = "spei",
-          date = "2020-01-01",
-          timescale = 1L,
-          directory_to_save = ".",
-          acknowledgement = TRUE
-        )
+      testthat::expect_warning(
+        result <- suppressMessages(
+          amadeus::download_drought(
+            source = "spei",
+            date = "2020-01-01",
+            timescale = 1L,
+            directory_to_save = ".",
+            acknowledgement = TRUE
+          )
+        ),
+        "Preflight URL check failed; attempting direct download"
       )
       testthat::expect_equal(result$success, 1L)
       testthat::expect_equal(
@@ -1605,7 +1635,7 @@ testthat::test_that(
 )
 
 testthat::test_that(
-  "download_drought SPEI retries alternate endpoint after failed download result",
+  "download_drought(source=spei): returns failure without version fallback",
   {
     captured_urls <- character(0)
     testthat::local_mocked_bindings(
@@ -1613,10 +1643,7 @@ testthat::test_that(
       check_url_status = function(url) grepl("spei_database_2_11", url),
       download_run_method = function(urls, ...) {
         captured_urls <<- c(captured_urls, urls)
-        if (grepl("spei_database_2_11", urls)) {
-          return(list(success = 0, failed = 1, skipped = 0))
-        }
-        list(success = 1, failed = 0, skipped = 0)
+        list(success = 0L, failed = 1L, skipped = 0L)
       },
       .package = "amadeus"
     )
@@ -1630,9 +1657,15 @@ testthat::test_that(
           acknowledgement = TRUE
         )
       )
-      testthat::expect_equal(result$success, 1L)
-      testthat::expect_equal(length(captured_urls), 2L)
-      testthat::expect_true(grepl("spei_database_2_10", captured_urls[2]))
+      testthat::expect_identical(
+        result,
+        list(success = 0L, failed = 1L, skipped = 0L)
+      )
+      testthat::expect_length(captured_urls, 1L)
+      testthat::expect_identical(
+        captured_urls,
+        "https://spei.csic.es/spei_database_2_11/nc/spei01.nc"
+      )
     })
   }
 )

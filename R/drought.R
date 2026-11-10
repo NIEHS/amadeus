@@ -5,63 +5,95 @@
 ################################################################################
 # {download} tier
 ################################################################################
-# nolint start
 #' Download drought index data
 #' @description
-#' The \code{download_drought()} function downloads drought index data from
-#' publicly available sources. Three source datasets are supported:
-#' \itemize{
-#'   \item \strong{SPEI} (Standardized Precipitation-Evapotranspiration Index):
-#'     Multi-year netCDF files by timescale from
-#'     \url{https://spei.csic.es}.
-#'   \item \strong{EDDI} (Evaporative Demand Drought Index): Weekly raster
-#'     files by timescale from
-#'     \url{https://www.drought.gov/data-maps-tools/evaporative-demand-drought-index-eddi}.
-#'   \item \strong{USDM} (U.S. Drought Monitor): Weekly drought class
-#'     shapefiles from
-#'     \url{https://droughtmonitor.unl.edu}.
-#' }
-# nolint end
-#' @param source character(1). Drought data source. One of \code{"spei"},
-#'   \code{"eddi"}, or \code{"usdm"}.
-#' @param date character(1 or 2). Single date or start/end dates.
-#'   Format \code{"YYYY-MM-DD"}. For SPEI/EDDI the year component selects
-#'   the annual file(s); for USDM the full date is used to select weekly
-#'   release(s).
-#' @param timescale integer(1). Accumulation timescale in months (SPEI/EDDI
-#'   only; ignored for USDM). Typical values are 1, 3, 6, 12, 24, 48.
-#'   Default is \code{1L}.
-#' @param directory_to_save character(1). Directory to save downloaded data.
-#' @param acknowledgement logical(1). Must be \code{TRUE} to proceed.
-#' @param hash logical(1). Return \code{rlang::hash_file()} hash of
-#'   downloaded files. Default \code{FALSE}.
-#' @param show_progress logical(1). Show download progress bar.
-#'   Default \code{TRUE}.
-#' @param max_tries integer(1). Maximum retry attempts. Default \code{3L}.
-#' @param rate_limit numeric(1). Minimum seconds between HTTP requests.
-#'   Default \code{2}.
-#' @param unzip logical(1). Unzip downloaded zip archives (USDM only).
-#'   Default \code{TRUE}.
-#' @param remove_zip logical(1). Remove zip archives after unzipping
-#'   (USDM only). Default \code{FALSE}.
-#' @param ... Reserved for future use; currently ignored.
-#' @note
-#' \itemize{
-#'   \item SPEI and EDDI are raster products; USDM is a polygon
-#'     product (shapefile). Their \code{process_drought()} and
-#'     \code{calculate_drought()} handling differ accordingly.
-#'   \item No authentication is required for any of these sources.
-#' }
+#' Dispatch to [download_spei()], [download_eddi()], or [download_usdm()].
+#' The selected function validates its arguments, constructs download URLs,
+#' and handles previews, downloads, optional extraction, and return values.
+#' @param source character(1). `"spei"` (default), `"eddi"`, or `"usdm"`.
+#'   Uses [base::match.arg()], allowing unambiguous partial matches.
+#' @param date character(1 or 2). One date or inclusive range endpoints in
+#'   `"YYYY-MM-DD"` format, in either order. EDDI and USDM select Tuesdays
+#'   within the interval and stop if none occur. Dates must be between
+#'   1950-01-01 and today. Default is `c("2020-01-01", "2020-12-31")`.
+#'   Ignored for SPEI, which downloads a complete multi-year file.
+#' @param timescale integer(1). Positive accumulation timescale in months,
+#'   used by SPEI and EDDI. Default is `1L`. Ignored for USDM. Input validation
+#'   does not establish whether the provider has a file for that timescale.
+#' @param directory_to_save character(1). Non-empty output directory. SPEI
+#'   and EDDI save files directly here. USDM uses `zip_files/` for archives
+#'   and `data_files/` for extracted files beneath this directory.
+#' @param acknowledgement logical(1). Must be `TRUE` to proceed, including
+#'   for previews. Downloads and extracted files may require substantial
+#'   storage. Default is `FALSE`.
+#' @param hash logical(1). Return a combined MD5 hash of the output directory
+#'   instead of the download summary. Uses `directory_to_save` for SPEI/EDDI
+#'   and `data_files/` for USDM, including existing files. Default is `FALSE`;
+#'   ignored when `download = FALSE`.
+#' @param show_progress logical(1). Show file download progress. Default is
+#'   `TRUE`. Other status and summary messages may still be printed when
+#'   `FALSE`.
+#' @param max_tries integer(1). Maximum attempts per file request, including
+#'   the initial attempt. Must be at least 1. Default is `3L`. Preflight
+#'   checks use their own request settings.
+#' @param rate_limit numeric(1). Finite, non-negative request-throttling
+#'   interval in seconds, passed to [download_run_method()]. Default is 2.
+#' @param unzip logical(1). Extract USDM archives into `data_files/`.
+#'   Default is `TRUE`. Ignored for SPEI and EDDI.
+#' @param remove_zip logical(1). Remove USDM archives and their `zip_files/`
+#'   directory recursively after extraction, including remaining contents.
+#'   Requires `unzip = TRUE` for USDM. Default is `FALSE`. Ignored for SPEI
+#'   and EDDI.
+#' @param download logical(1). Deprecated. `FALSE` warns and returns a
+#'   preview after directory creation, before preflight checks or downloading.
+#'   Default is `TRUE`.
+#' @param remove_command logical(1). Deprecated and ignored; `TRUE` warns.
+#'   No command file is generated. Default is `FALSE`.
+#' @param version character(1). SPEI selection: `"2.11"` (default),
+#'   `"2.10"`, or `"legacy"`. The last choice uses the unversioned `/files/`
+#'   endpoint; its release is not identified by the URL. Uses
+#'   [base::match.arg()]. No automatic fallback between versions occurs.
+#'   Ignored for EDDI and USDM.
+#' @param ... Additional arguments forwarded to the selected source function.
+#'   Its `...` argument is currently reserved and ignored.
+#' @details
+#' Only arguments relevant to the selected source are forwarded. Common
+#' validation occurs once in the source function; this wrapper does not
+#' repeat validation, directory creation, or download execution.
+#'
+#' Previews create the output directories but make no network requests.
+#' They include existing destination files. Actual downloads check the first
+#' URL before calling [download_run_method()], which skips existing non-empty
+#' files and reports individual failures. A failed preflight warns and allows
+#' downloading to proceed. See the source functions for endpoint limitations
+#' and extraction behavior.
+#'
+#' SPEI retains the flat `speiNN.nc` filename across versions for compatibility
+#' with [process_drought()]. Existing-file checks do not distinguish versions.
+#' The `date` argument does not subset SPEI downloads; temporal selection is
+#' performed during processing.
+#' @note No authentication is required. SPEI and EDDI provide raster inputs;
+#' USDM provides polygon inputs for the downstream drought workflow.
 #' @author Insang Song
-#' @return \code{invisible(NULL)} when \code{hash = FALSE}; a character hash
-#'   string when \code{hash = TRUE}.
-#' @seealso \code{\link{process_drought}}, \code{\link{calculate_drought}}
+#' @return The selected source function's result, with visibility preserved:
+#' * With `download = FALSE`, an invisible list containing `urls`,
+#'   `destfiles`, and `n_files`.
+#' * With `download = TRUE` and `hash = FALSE`, an invisible download summary
+#'   containing `success`, `failed`, and `skipped`. When any downloads are
+#'   attempted, it also contains `failed_urls` and `failed_files`.
+#' * With `download = TRUE` and `hash = TRUE`, a visible character scalar
+#'   containing the combined MD5 hash of the source's output directory.
+#'
+#' Counts describe file downloads, not extraction or scientific validity.
+#' Validation or extraction failures can prevent a normal return.
+#' @seealso [download_spei()], [download_eddi()], [download_usdm()],
+#'   [process_drought()], [calculate_drought()]
 #' @examples
 #' \dontrun{
 #' download_drought(
 #'   source = "spei",
-#'   date = c("2020-01-01", "2020-12-31"),
 #'   timescale = 1L,
+#'   version = "2.11",
 #'   directory_to_save = "./data/drought",
 #'   acknowledgement = TRUE
 #' )
@@ -85,279 +117,43 @@ download_drought <- function(
   rate_limit = 2,
   unzip = TRUE,
   remove_zip = FALSE,
+  download = TRUE,
+  remove_command = FALSE,
+  version = c("2.11", "2.10", "legacy"),
   ...
 ) {
-  #### Check acknowledgement
-  amadeus::download_permit(acknowledgement = acknowledgement)
-
-  #### Validate source
-  source <- match.arg(source)
-
-  #### Check for null parameters
-  amadeus::check_for_null_parameters(mget(ls()))
-
-  #### Validate date
-  date <- if (length(date) == 1) rep(date, 2) else date
-  stopifnot(length(date) == 2L)
-  date <- date[order(as.Date(date))]
-
-  #### Validate unzip/remove_zip
-  if (!unzip && remove_zip) {
-    stop(
-      "Arguments unzip = FALSE and remove_zip = TRUE are not ",
-      "acceptable together. Please change one.\n"
-    )
-  }
-
-  #### Validate timescale (SPEI/EDDI only)
-  timescale <- as.integer(timescale)
-  if (source %in% c("spei", "eddi")) {
-    if (is.na(timescale) || timescale < 1L) {
-      stop("`timescale` must be a positive integer (months).\n")
-    }
-  }
-
-  #### Directory setup
-  amadeus::download_setup_dir(directory_to_save)
-  directory_to_save <- amadeus::download_sanitize_path(directory_to_save)
-
-  #### Source-specific download logic
-
-  if (source == "spei") {
-    # SPEI: one global multi-year netCDF per timescale
-    # nolint start
-    ts_str <- sprintf("%02d", timescale)
-    spei_file <- paste0("spei", ts_str, ".nc")
-    spei_url_candidates <- c(
-      paste0("https://spei.csic.es/spei_database_2_11/nc/", spei_file),
-      paste0("https://spei.csic.es/spei_database_2_10/nc/", spei_file),
-      paste0("https://spei.csic.es/files/", spei_file)
-    )
-    # nolint end
-    destfile <- paste0(directory_to_save, "spei", ts_str, ".nc")
-
-    download_spei <- function(url) {
-      # ------------------------------------------------------------------------
-      # Download the candidate SPEI file with the selected request settings.
-      amadeus::download_run_method(
-        urls = url,
-        destfiles = destfile,
-        token = NULL,
-        show_progress = show_progress,
-        max_tries = max_tries,
-        rate_limit = rate_limit
-      )
-    }
-
-    if (!amadeus::check_destfile(destfile)) {
-      message("SPEI file already exists. Skipping download.\n")
-      if (hash) {
-        return(amadeus::download_hash(hash = TRUE, directory_to_save))
-      }
-      return(invisible(list(success = 0, failed = 0, skipped = 1)))
-    }
-
-    url <- NULL
-    for (candidate_url in spei_url_candidates) {
-      if (amadeus::check_url_status(candidate_url)) {
-        url <- candidate_url
-        break
-      }
-    }
-    candidate_order <- if (is.null(url)) {
-      spei_url_candidates
-    } else {
-      c(url, setdiff(spei_url_candidates, url))
-    }
-    last_error <- NULL
-    download_result <- NULL
-
-    for (candidate_url in candidate_order) {
-      attempt <- tryCatch(
-        download_spei(candidate_url),
-        error = function(e) e
-      )
-      if (inherits(attempt, "error")) {
-        last_error <- conditionMessage(attempt)
-        next
-      }
-
-      success_n <- if (!is.null(attempt$success)) attempt$success else 0
-      failed_n <- if (!is.null(attempt$failed)) attempt$failed else 0
-      if (failed_n == 0 && success_n > 0) {
-        download_result <- attempt
-        break
-      }
-
-      last_error <- sprintf(
-        "%s file(s) failed to download from %s",
-        failed_n,
-        candidate_url
-      )
-    }
-
-    if (is.null(download_result)) {
-      stop(sprintf(
-        paste0(
-          "SPEI timescale %s could not be downloaded. Check upstream ",
-          "availability and `timescale` parameter.\nLast error: %s\n"
-        ),
-        ts_str,
-        if (is.null(last_error)) "none" else last_error
-      ))
-    }
-
-    if (hash) {
-      return(amadeus::download_hash(hash = TRUE, directory_to_save))
-    }
-    return(invisible(download_result))
-  }
-
-  if (source == "eddi") {
-    # EDDI: weekly CONUS rasters by timescale, organised in year folders
-    # nolint start
-    ts_str <- sprintf("%02d", timescale)
-    eddi_base <- "ftp://ftp.cdc.noaa.gov/Projects/EDDI/CONUS_archive/data"
-    eddi_ext <- "asc"
-    # nolint end
-
-    week_dates <- amadeus::drought_weekly_dates(date[1], date[2])
-    if (length(week_dates) == 0) {
-      stop(
-        "No Tuesday dates found in the specified date range. ",
-        "EDDI is a weekly (Tuesday) product.\n"
-      )
-    }
-
-    all_urls <- character(0)
-    all_destfiles <- character(0)
-
-    for (wd in week_dates) {
-      year_str <- substr(wd, 1, 4)
-      url <- sprintf(
-        "%s/%s/EDDI_ETrs_%smn_%s.%s",
-        eddi_base,
-        year_str,
-        ts_str,
-        wd,
-        eddi_ext
-      )
-      destfile <- sprintf(
-        "%sEDDI_ETrs_%smn_%s.%s",
-        directory_to_save,
-        ts_str,
-        wd,
-        eddi_ext
-      )
-      if (amadeus::check_destfile(destfile)) {
-        all_urls <- c(all_urls, url)
-        all_destfiles <- c(all_destfiles, destfile)
-      }
-    }
-
-    if (length(all_urls) == 0L) {
-      message("All EDDI files already exist. Skipping download.\n")
-      if (hash) {
-        return(amadeus::download_hash(hash = TRUE, directory_to_save))
-      }
-      return(invisible(list(
-        success = 0,
-        failed = 0,
-        skipped = length(week_dates)
-      )))
-    }
-
-    download_result <- amadeus::download_run_method(
-      urls = all_urls,
-      destfiles = all_destfiles,
-      token = NULL,
-      show_progress = show_progress,
-      max_tries = max_tries,
-      rate_limit = rate_limit
-    )
-
-    if (hash) {
-      return(amadeus::download_hash(hash = TRUE, directory_to_save))
-    }
-    return(invisible(download_result))
-  }
-
-  if (source == "usdm") {
-    # USDM: weekly CONUS drought-class shapefiles (zip archives, Tuesdays)
-    directories <- amadeus::download_setup_dir(directory_to_save, zip = TRUE)
-    directory_to_download <- directories[1]
-    directory_to_unzip <- directories[2]
-
-    # nolint start
-    base <- "https://droughtmonitor.unl.edu/data/shapefiles_m"
-    # nolint end
-
-    week_dates <- amadeus::drought_weekly_dates(date[1], date[2])
-    if (length(week_dates) == 0) {
-      stop(
-        "No Tuesday dates found in the specified date range. ",
-        "USDM is a weekly (Tuesday) product.\n"
-      )
-    }
-
-    all_urls <- character(0)
-    all_destfiles <- character(0)
-
-    for (wd in week_dates) {
-      url <- sprintf("%s/USDM_%s_M.zip", base, wd)
-      destfile <- sprintf("%sUSDM_%s_M.zip", directory_to_download, wd)
-      if (amadeus::check_destfile(destfile)) {
-        all_urls <- c(all_urls, url)
-        all_destfiles <- c(all_destfiles, destfile)
-      }
-    }
-
-    if (length(all_urls) == 0L) {
-      message("All USDM files already exist. Skipping download.\n")
-      if (hash) {
-        return(amadeus::download_hash(hash = TRUE, directory_to_unzip))
-      }
-      return(invisible(list(
-        success = 0,
-        failed = 0,
-        skipped = length(week_dates)
-      )))
-    }
-
-    if (length(all_urls) > 0 && !amadeus::check_url_status(all_urls[1])) {
-      stop(
-        "First USDM URL returned HTTP 404. ",
-        "Check `date` parameter.\n"
-      )
-    }
-
-    download_result <- amadeus::download_run_method(
-      urls = all_urls,
-      destfiles = all_destfiles,
-      token = NULL,
-      show_progress = show_progress,
-      max_tries = max_tries,
-      rate_limit = rate_limit
-    )
-
-    for (d in seq_along(all_destfiles)) {
-      amadeus::download_unzip(
-        file_name = all_destfiles[d],
-        directory_to_unzip = directory_to_unzip,
-        unzip = unzip
-      )
-    }
-
-    amadeus::download_remove_zips(
-      remove = remove_zip,
-      download_name = all_destfiles
-    )
-
-    if (hash) {
-      return(amadeus::download_hash(hash = TRUE, directory_to_unzip))
-    }
-    return(invisible(download_result))
-  }
+  # ----------------------------------------------------------------------------
+  # Select the source-specific downloader; it handles argument validation.
+  chr_source <- match.arg(source)
+  fun_download <- switch(
+    chr_source,
+    spei = amadeus:::download_spei,
+    eddi = amadeus:::download_eddi,
+    usdm = amadeus:::download_usdm
+  )
+  # ----------------------------------------------------------------------------
+  # Forward the controls shared by all three sources.
+  list_common_args <- list(
+    directory_to_save = directory_to_save,
+    acknowledgement = acknowledgement,
+    download = download,
+    remove_command = remove_command,
+    hash = hash,
+    show_progress = show_progress,
+    max_tries = max_tries,
+    rate_limit = rate_limit
+  )
+  # ----------------------------------------------------------------------------
+  # Forward only the selections and archive options used by this source.
+  list_source_args <- switch(
+    chr_source,
+    spei = list(timescale = timescale, version = version),
+    eddi = list(date = date, timescale = timescale),
+    usdm = list(date = date, unzip = unzip, remove_zip = remove_zip)
+  )
+  # ----------------------------------------------------------------------------
+  # Return the delegated result without changing its visibility.
+  do.call(fun_download, c(list_common_args, list_source_args, list(...)))
 }
 
 ################################################################################
