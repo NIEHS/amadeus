@@ -36,7 +36,10 @@ products:
     and decoded values are known, but geographic transformation awaits verified earth-model metadata.
     TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
     labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
-    Rewritten local fixtures are not native evidence.'
+    Rewritten local fixtures are not native evidence. The NOAA PSL product page describes daily/monthly
+    versus eight-times-daily deliveries. It is not a substitute for this archive’s native header, variable-specific
+    level coordinates or a verified radius/datum; no new CRS or current archive endpoint is inferred from
+    a family-level page. Reference: https://psl.noaa.gov/data/gridded/data.narr.html.'
   grid_definition: amadeus:grid/narr_psl_daily_surface
   crs: AMADEUS:100005
   temporal_resolution_iso: P1D
@@ -69,7 +72,10 @@ products:
     and decoded values are known, but geographic transformation awaits verified earth-model metadata.
     TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
     labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
-    Rewritten local fixtures are not native evidence.'
+    Rewritten local fixtures are not native evidence. The NOAA PSL product page describes daily/monthly
+    versus eight-times-daily deliveries. It is not a substitute for this archive’s native header, variable-specific
+    level coordinates or a verified radius/datum; no new CRS or current archive endpoint is inferred from
+    a family-level page. Reference: https://psl.noaa.gov/data/gridded/data.narr.html.'
   grid_definition: amadeus:grid/narr_psl_daily_pressure_29
   crs: AMADEUS:100005
   temporal_resolution_iso: P1D
@@ -102,7 +108,10 @@ products:
     and decoded values are known, but geographic transformation awaits verified earth-model metadata.
     TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
     labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
-    Rewritten local fixtures are not native evidence.'
+    Rewritten local fixtures are not native evidence. The NOAA PSL product page describes daily/monthly
+    versus eight-times-daily deliveries. It is not a substitute for this archive’s native header, variable-specific
+    level coordinates or a verified radius/datum; no new CRS or current archive endpoint is inferred from
+    a family-level page. Reference: https://psl.noaa.gov/data/gridded/data.narr.html.'
   grid_definition: amadeus:grid/narr_psl_daily_soil_4
   crs: AMADEUS:100005
   temporal_resolution_iso: P1D
@@ -135,7 +144,10 @@ products:
     and decoded values are known, but geographic transformation awaits verified earth-model metadata.
     TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
     labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
-    Rewritten local fixtures are not native evidence.'
+    Rewritten local fixtures are not native evidence. The NOAA PSL product page describes daily/monthly
+    versus eight-times-daily deliveries. It is not a substitute for this archive’s native header, variable-specific
+    level coordinates or a verified radius/datum; no new CRS or current archive endpoint is inferred from
+    a family-level page. Reference: https://psl.noaa.gov/data/gridded/data.narr.html.'
   grid_definition: amadeus:grid/narr_psl_daily_pressure_15
   crs: AMADEUS:100005
   temporal_resolution_iso: P1D
@@ -168,7 +180,10 @@ products:
     and decoded values are known, but geographic transformation awaits verified earth-model metadata.
     TKE has 15 pressure levels, not the 29 of other pressure fields. Soil moisture has four native depth
     labels; soil temperature has five including 800 cm. Depth labels are not asserted as layer centres/bounds.
-    Rewritten local fixtures are not native evidence.'
+    Rewritten local fixtures are not native evidence. The NOAA PSL product page describes daily/monthly
+    versus eight-times-daily deliveries. It is not a substitute for this archive’s native header, variable-specific
+    level coordinates or a verified radius/datum; no new CRS or current archive endpoint is inferred from
+    a family-level page. Reference: https://psl.noaa.gov/data/gridded/data.narr.html.'
   grid_definition: amadeus:grid/narr_psl_daily_soil_5
   crs: AMADEUS:100005
   temporal_resolution_iso: P1D

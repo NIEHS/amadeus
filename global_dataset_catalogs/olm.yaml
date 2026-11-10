@@ -34,7 +34,9 @@ products:
     30/200 cm and water depth 10 cm are absent from the STAC items; probes of the analogous provider objects
     return 404, so they are not invented. The malformed empty-depth texture asset also returns 404 and
     is excluded. Native item GeoJSON has apparent reversed coordinate order; grid geometry is taken from
-    TIFF GeoKeys/tiepoints, not that polygon.'
+    TIFF GeoKeys/tiepoints, not that polygon. The helper in R/ignore.R is excluded from the built package
+    and has no public dataset dispatch for these profiles. These catalog records describe verified source
+    assets and conversions, not an enabled OLM download/process/calculate pipeline.'
   data_genre: []
   native_format: cloud_optimized_geotiff
   grid_definition: amadeus:grid/olm_longterm_soil_250m_geographic_1
@@ -68,7 +70,9 @@ products:
     30/200 cm and water depth 10 cm are absent from the STAC items; probes of the analogous provider objects
     return 404, so they are not invented. The malformed empty-depth texture asset also returns 404 and
     is excluded. Native item GeoJSON has apparent reversed coordinate order; grid geometry is taken from
-    TIFF GeoKeys/tiepoints, not that polygon.
+    TIFF GeoKeys/tiepoints, not that polygon. The helper in R/ignore.R is excluded from the built package
+    and has no public dataset dispatch for these profiles. These catalog records describe verified source
+    assets and conversions, not an enabled OLM download/process/calculate pipeline.
   data_genre: []
   native_format: cloud_optimized_geotiff
   grid_definition: amadeus:grid/olm_longterm_soil_250m_geographic_1
@@ -104,7 +108,10 @@ products:
     implement these conversions. Sand depths 30/200 cm and water depth 10 cm are absent from the STAC
     items; probes of the analogous provider objects return 404, so they are not invented. The malformed
     empty-depth texture asset also returns 404 and is excluded. Native item GeoJSON has apparent reversed
-    coordinate order; grid geometry is taken from TIFF GeoKeys/tiepoints, not that polygon.'
+    coordinate order; grid geometry is taken from TIFF GeoKeys/tiepoints, not that polygon. The helper
+    in R/ignore.R is excluded from the built package and has no public dataset dispatch for these profiles.
+    These catalog records describe verified source assets and conversions, not an enabled OLM download/process/calculate
+    pipeline.'
   data_genre: []
   native_format: cloud_optimized_geotiff
   grid_definition: amadeus:grid/olm_longterm_soil_250m_geographic_1
@@ -138,7 +145,10 @@ products:
     not implement these conversions. Sand depths 30/200 cm and water depth 10 cm are absent from the STAC
     items; probes of the analogous provider objects return 404, so they are not invented. The malformed
     empty-depth texture asset also returns 404 and is excluded. Native item GeoJSON has apparent reversed
-    coordinate order; grid geometry is taken from TIFF GeoKeys/tiepoints, not that polygon.
+    coordinate order; grid geometry is taken from TIFF GeoKeys/tiepoints, not that polygon. The helper
+    in R/ignore.R is excluded from the built package and has no public dataset dispatch for these profiles.
+    These catalog records describe verified source assets and conversions, not an enabled OLM download/process/calculate
+    pipeline.
   data_genre: []
   native_format: cloud_optimized_geotiff
   grid_definition: amadeus:grid/olm_longterm_soil_250m_geographic_2
@@ -178,7 +188,9 @@ products:
     30/200 cm and water depth 10 cm are absent from the STAC items; probes of the analogous provider objects
     return 404, so they are not invented. The malformed empty-depth texture asset also returns 404 and
     is excluded. Native item GeoJSON has apparent reversed coordinate order; grid geometry is taken from
-    TIFF GeoKeys/tiepoints, not that polygon.'
+    TIFF GeoKeys/tiepoints, not that polygon. The helper in R/ignore.R is excluded from the built package
+    and has no public dataset dispatch for these profiles. These catalog records describe verified source
+    assets and conversions, not an enabled OLM download/process/calculate pipeline.'
   data_genre: []
   native_format: cloud_optimized_geotiff
   grid_definition: amadeus:grid/olm_longterm_soil_250m_geographic_3
@@ -212,7 +224,9 @@ products:
     10 cm are absent from the STAC items; probes of the analogous provider objects return 404, so they
     are not invented. The malformed empty-depth texture asset also returns 404 and is excluded. Native
     item GeoJSON has apparent reversed coordinate order; grid geometry is taken from TIFF GeoKeys/tiepoints,
-    not that polygon.
+    not that polygon. The helper in R/ignore.R is excluded from the built package and has no public dataset
+    dispatch for these profiles. These catalog records describe verified source assets and conversions,
+    not an enabled OLM download/process/calculate pipeline.
   data_genre: []
   native_format: cloud_optimized_geotiff
   grid_definition: amadeus:grid/olm_longterm_soil_250m_geographic_1

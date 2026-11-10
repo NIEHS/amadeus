@@ -35,7 +35,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -66,7 +68,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -97,7 +101,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -128,7 +134,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -159,7 +167,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -190,7 +200,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -221,7 +233,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -252,7 +266,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -282,7 +298,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -312,7 +330,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -342,7 +362,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -372,7 +394,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -402,7 +426,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -432,7 +458,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -462,7 +490,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -492,7 +522,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -522,7 +554,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -552,7 +586,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -582,7 +618,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -612,7 +650,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -642,7 +682,9 @@ products:
     historical-series version assertion. Supply explicit file paths to process_prism: its directory regex
     expects old uppercase names while current provider filenames start lowercase prism_. Variable-specific
     early availability must be checked; family-wide 1895/1981 coverage is not silently applied to every
-    field.'
+    field. The supported explicit-file process_prism route also avoids its directory matcher limitation
+    for TIFF. A catalog access_url records the selected product source; it is not a successful current
+    download test, particularly for the separately qualified normals routes.'
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -671,7 +713,10 @@ products:
     do not multiply by month length to relabel them as source monthly totals. Legacy adapter normals service
     route returns an error body with HTTP 200; the verified provider directory is used for discovery,
     and no working download_data route is asserted. Full-file process_prism works with explicit file selection.
-    Daily/annual normals remain separate, unregistered scopes.
+    Daily/annual normals remain separate, unregistered scopes. The supported explicit-file process_prism
+    route also avoids its directory matcher limitation for TIFF. A catalog access_url records the selected
+    product source; it is not a successful current download test, particularly for the separately qualified
+    normals routes.
   grid_definition: amadeus:grid/prism_current_conus_25arcmin
   crs: EPSG:4269
   srid: 4269
@@ -698,7 +743,10 @@ products:
     do not multiply by month length to relabel them as source monthly totals. Legacy adapter normals service
     route returns an error body with HTTP 200; the verified provider directory is used for discovery,
     and no working download_data route is asserted. Full-file process_prism works with explicit file selection.
-    Daily/annual normals remain separate, unregistered scopes.
+    Daily/annual normals remain separate, unregistered scopes. The supported explicit-file process_prism
+    route also avoids its directory matcher limitation for TIFF. A catalog access_url records the selected
+    product source; it is not a successful current download test, particularly for the separately qualified
+    normals routes.
   grid_definition: amadeus:grid/prism_norm91_monthly_800m
   crs: EPSG:4269
   srid: 4269

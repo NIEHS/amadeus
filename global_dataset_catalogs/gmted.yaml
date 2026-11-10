@@ -31,7 +31,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -61,7 +63,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -91,7 +95,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -121,7 +127,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -151,7 +159,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -181,7 +191,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -211,7 +223,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -241,7 +255,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -271,7 +287,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -301,7 +319,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -331,7 +351,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -361,7 +383,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -391,7 +415,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -421,7 +447,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -451,7 +479,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -481,7 +511,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -511,7 +543,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -541,7 +575,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -571,7 +607,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -601,7 +639,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010
@@ -631,7 +671,9 @@ products:
     grids have 20880 rows, others 16800; finer archives have 33600/67200 rows. Not all statistic/resolution
     combinations share polar coverage. Floating writer differences below 0.001 cell across the domain
     share one GridDefinition; each exact native geotransform is retained in arcgrid_native.json. No synthetic
-    time interval is assigned.'
+    time interval is assigned. The USGS FGDC record describes source-elevation provenance and aggregate
+    accuracy; it does not by itself certify every native compressed block or a uniform vertical reference
+    for every contributing source. Those per-delivery checks remain open. Reference: https://topotools.cr.usgs.gov/gmted_viewer/gmted2010_fgdc_metadata.html.'
   data_genre:
   - elevation
   product_version: GMTED2010

@@ -979,8 +979,8 @@
       "canonical_variable": "amadeus:var/mod11a1_qc_day",
       "native_name": "QC_Day",
       "native_units_ucum": "1",
-      "harmonization_note": "Provider storage Byte; raw valid_range=0, 255; encoded bounds are not canonical physical plausibility limits. Mask raw fill and apply product QA before decoding. Inspect the requested granule for per-orbit/time dimensions; sample band count is not global scope. Complete version-specific QA bit definitions and selection policy are not extracted into this profile; quality_flag_vocabulary is an identifying reference, not an executable bit decoder. Native _FillValue=NA does not declare zero missing. GDAL reports synthetic noDataValue=0; ignore that generated default for QA, where zero is a valid good-quality word.",
-      "quality_flag_vocabulary": "MOD11A1.061 native QC_Day packed QA word; use the version-specific NASA bit definitions before selection. No scalar average or complete bit decode is asserted.",
+      "harmonization_note": "Provider storage Byte; raw valid_range=0, 255; encoded bounds are not canonical physical plausibility limits. Mask raw fill and apply product QA before decoding. Inspect the requested granule for per-orbit/time dimensions; sample band count is not global scope. Partial version-specific bit-layout and companion-SDS metadata are extracted in quality_flag_vocabulary. Complete code meanings, version discrepancies where identified and the analysis-specific acceptance policy remain unresolved; available_but_not_extracted is retained for that remaining scope. This text is not an executable QA decoder. Packed QA/orbit layers must not be averaged by the flattening wrappers. Native _FillValue=NA does not declare zero missing. GDAL reports synthetic noDataValue=0; ignore that generated default for QA, where zero is a valid good-quality word.",
+      "quality_flag_vocabulary": "MOD11A1.061 QC_Day: pair with LST_Day_1km. Bits 0–1 describe good/other/cloud-unproduced/other-unproduced retrievals. No QA fill is declared; zero can be valid. Bits 2–3 differ between the C6 guide and LAADS v61 specification; reconcile that discrepancy before full QA selection. https://ladsweb.modaps.eosdis.nasa.gov/filespec/MODIS/61/MOD11A1",
       "metadata_gaps": [
         "available_but_not_extracted"
       ]
@@ -1027,8 +1027,8 @@
       "canonical_variable": "amadeus:var/mod11a1_qc_night",
       "native_name": "QC_Night",
       "native_units_ucum": "1",
-      "harmonization_note": "Provider storage Byte; raw valid_range=0, 255; encoded bounds are not canonical physical plausibility limits. Mask raw fill and apply product QA before decoding. Inspect the requested granule for per-orbit/time dimensions; sample band count is not global scope. Complete version-specific QA bit definitions and selection policy are not extracted into this profile; quality_flag_vocabulary is an identifying reference, not an executable bit decoder. Native _FillValue=NA does not declare zero missing. GDAL reports synthetic noDataValue=0; ignore that generated default for QA, where zero is a valid good-quality word.",
-      "quality_flag_vocabulary": "MOD11A1.061 native QC_Night packed QA word; use the version-specific NASA bit definitions before selection. No scalar average or complete bit decode is asserted.",
+      "harmonization_note": "Provider storage Byte; raw valid_range=0, 255; encoded bounds are not canonical physical plausibility limits. Mask raw fill and apply product QA before decoding. Inspect the requested granule for per-orbit/time dimensions; sample band count is not global scope. Partial version-specific bit-layout and companion-SDS metadata are extracted in quality_flag_vocabulary. Complete code meanings, version discrepancies where identified and the analysis-specific acceptance policy remain unresolved; available_but_not_extracted is retained for that remaining scope. This text is not an executable QA decoder. Packed QA/orbit layers must not be averaged by the flattening wrappers. Native _FillValue=NA does not declare zero missing. GDAL reports synthetic noDataValue=0; ignore that generated default for QA, where zero is a valid good-quality word.",
+      "quality_flag_vocabulary": "MOD11A1.061 QC_Night: pair with LST_Night_1km. Bits 0–1 describe good/other/cloud-unproduced/other-unproduced retrievals. No QA fill is declared; zero can be valid. Bits 2–3 differ between the C6 guide and LAADS v61 specification; reconcile that discrepancy before full QA selection. https://ladsweb.modaps.eosdis.nasa.gov/filespec/MODIS/61/MOD11A1",
       "metadata_gaps": [
         "available_but_not_extracted"
       ]
@@ -1171,9 +1171,9 @@
       "canonical_variable": "amadeus:var/mcd19a2_aod_qa",
       "native_name": "AOD_QA",
       "native_units_ucum": "1",
-      "harmonization_note": "Provider storage UInt16; raw valid_range=1, 65535; encoded bounds are not canonical physical plausibility limits. Mask raw fill and apply product QA before decoding. Inspect the requested granule for per-orbit/time dimensions; sample band count is not global scope. Complete version-specific QA bit definitions and selection policy are not extracted into this profile; quality_flag_vocabulary is an identifying reference, not an executable bit decoder. Fixture global DOI still ends .006 despite filename/VERSIONID=61; current NASA CMR and workbook product DOI identify .061. Do not downgrade the product based on this stale global attribute.",
+      "harmonization_note": "Provider storage UInt16; raw valid_range=1, 65535; encoded bounds are not canonical physical plausibility limits. Mask raw fill and apply product QA before decoding. Inspect the requested granule for per-orbit/time dimensions; sample band count is not global scope. Partial version-specific bit-layout and companion-SDS metadata are extracted in quality_flag_vocabulary. Complete code meanings, version discrepancies where identified and the analysis-specific acceptance policy remain unresolved; available_but_not_extracted is retained for that remaining scope. This text is not an executable QA decoder. Packed QA/orbit layers must not be averaged by the flattening wrappers. Fixture global DOI still ends .006 despite filename/VERSIONID=61; current NASA CMR and workbook product DOI identify .061. Do not downgrade the product based on this stale global attribute.",
       "missing_value_sentinel": "0",
-      "quality_flag_vocabulary": "MCD19A2.061 native AOD_QA packed QA word; use the version-specific NASA bit definitions before selection. No scalar average or complete bit decode is asserted.",
+      "quality_flag_vocabulary": "MCD19A2.061 guide v3.1 section 5.4: bits 0–2 cloud mask, 3–4 land/water/snow/ice, 5–7 adjacency, 8–11 AOD quality, 12 glint, 13–14 aerosol model, 15 reserved. QA=0 is native fill. Pair with the same-orbit Optical_Depth_047/055 data; complete code selection remains analysis-specific. https://lpdaac.usgs.gov/documents/1500/MCD19_User_Guide_V61.pdf",
       "metadata_gaps": [
         "available_but_not_extracted"
       ]
@@ -1274,9 +1274,9 @@
       "canonical_variable": "amadeus:var/mod09ga_state_1km_1",
       "native_name": "state_1km_1",
       "native_units_ucum": "1",
-      "harmonization_note": "Provider storage UInt16; raw valid_range=0, 57335; encoded bounds are not canonical physical plausibility limits. Mask raw fill and apply product QA before decoding. Inspect the requested granule for per-orbit/time dimensions; sample band count is not global scope. Complete version-specific QA bit definitions and selection policy are not extracted into this profile; quality_flag_vocabulary is an identifying reference, not an executable bit decoder.",
+      "harmonization_note": "Provider storage UInt16; raw valid_range=0, 57335; encoded bounds are not canonical physical plausibility limits. Mask raw fill and apply product QA before decoding. Inspect the requested granule for per-orbit/time dimensions; sample band count is not global scope. Partial version-specific bit-layout and companion-SDS metadata are extracted in quality_flag_vocabulary. Complete code meanings, version discrepancies where identified and the analysis-specific acceptance policy remain unresolved; available_but_not_extracted is retained for that remaining scope. This text is not an executable QA decoder. Packed QA/orbit layers must not be averaged by the flattening wrappers.",
       "missing_value_sentinel": "65535",
-      "quality_flag_vocabulary": "MOD09GA.061 native state_1km_1 packed QA word; use the version-specific NASA bit definitions before selection. No scalar average or complete bit decode is asserted.",
+      "quality_flag_vocabulary": "MOD09GA.061 state_1km_1: bits 0–1 cloud state; 2 shadow; 3–5 land/water; 6–7 aerosol; 8–9 cirrus; 10 internal cloud; 11 fire; 12 MOD35 snow/ice; 13 cloud adjacency; 14 BRDF correction; 15 internal snow. Complete code meanings and analysis policy still require the version-matched table. https://ladsweb.modaps.eosdis.nasa.gov/filespec/MODIS/61/MOD09GA",
       "metadata_gaps": [
         "available_but_not_extracted"
       ]
@@ -1347,9 +1347,9 @@
       "canonical_variable": "amadeus:var/mod09ga_gflags_1",
       "native_name": "gflags_1",
       "native_units_ucum": "1",
-      "harmonization_note": "Provider storage Byte; raw valid_range=0, 248; encoded bounds are not canonical physical plausibility limits. Mask raw fill and apply product QA before decoding. Inspect the requested granule for per-orbit/time dimensions; sample band count is not global scope. Complete version-specific QA bit definitions and selection policy are not extracted into this profile; quality_flag_vocabulary is an identifying reference, not an executable bit decoder.",
+      "harmonization_note": "Provider storage Byte; raw valid_range=0, 248; encoded bounds are not canonical physical plausibility limits. Mask raw fill and apply product QA before decoding. Inspect the requested granule for per-orbit/time dimensions; sample band count is not global scope. Partial version-specific bit-layout and companion-SDS metadata are extracted in quality_flag_vocabulary. Complete code meanings, version discrepancies where identified and the analysis-specific acceptance policy remain unresolved; available_but_not_extracted is retained for that remaining scope. This text is not an executable QA decoder. Packed QA/orbit layers must not be averaged by the flattening wrappers.",
       "missing_value_sentinel": "255",
-      "quality_flag_vocabulary": "MOD09GA.061 native gflags_1 packed QA word; use the version-specific NASA bit definitions before selection. No scalar average or complete bit decode is asserted.",
+      "quality_flag_vocabulary": "MOD09GA.061 gflags_1: bits 0–2 unused zeros; bit 3 sensor range, 4 DEM quality, 5 terrain validity, 6 ellipsoid intersection, 7 input validity. For bits 3–7, zero indicates valid/good and one the adverse condition. Preserve native fill separately. https://ladsweb.modaps.eosdis.nasa.gov/filespec/MODIS/61/MOD09GA",
       "metadata_gaps": [
         "available_but_not_extracted"
       ]
@@ -1471,9 +1471,9 @@
       "canonical_variable": "amadeus:var/mod09ga_qc_500m_1",
       "native_name": "QC_500m_1",
       "native_units_ucum": "1",
-      "harmonization_note": "Provider storage UInt32; raw valid_range=0, 4294966019; encoded bounds are not canonical physical plausibility limits. Mask raw fill and apply product QA before decoding. Inspect the requested granule for per-orbit/time dimensions; sample band count is not global scope. Complete version-specific QA bit definitions and selection policy are not extracted into this profile; quality_flag_vocabulary is an identifying reference, not an executable bit decoder.",
+      "harmonization_note": "Provider storage UInt32; raw valid_range=0, 4294966019; encoded bounds are not canonical physical plausibility limits. Mask raw fill and apply product QA before decoding. Inspect the requested granule for per-orbit/time dimensions; sample band count is not global scope. Partial version-specific bit-layout and companion-SDS metadata are extracted in quality_flag_vocabulary. Complete code meanings, version discrepancies where identified and the analysis-specific acceptance policy remain unresolved; available_but_not_extracted is retained for that remaining scope. This text is not an executable QA decoder. Packed QA/orbit layers must not be averaged by the flattening wrappers.",
       "missing_value_sentinel": "787410671",
-      "quality_flag_vocabulary": "MOD09GA.061 native QC_500m_1 packed QA word; use the version-specific NASA bit definitions before selection. No scalar average or complete bit decode is asserted.",
+      "quality_flag_vocabulary": "MOD09GA.061 QC_500m_1: bits 0–1 MODLAND; seven four-bit band-quality fields occupy bits 2–29; 30 atmospheric correction and 31 adjacency correction. Consult the table for every band code; no packed-word averaging or default acceptance mask. https://ladsweb.modaps.eosdis.nasa.gov/filespec/MODIS/61/MOD09GA",
       "metadata_gaps": [
         "available_but_not_extracted"
       ]

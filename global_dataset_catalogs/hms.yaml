@@ -1,5 +1,3 @@
-# Authoritative schema: amadeus_schema/src/amadeus_schema/schema/amadeus_schema.yaml
-# Metadata profile; source reconciliation documented in resource_audit.json.
 schema_version: 0.1.0
 data_sources:
 - id: amadeus:source/noaa_hms
@@ -68,7 +66,10 @@ products:
     not establish validity of every cell/date or fill observation gaps. [Resource reconciliation: history
     scope] The publishing DataSource retains the workbook programme contribution history. Do not treat
     that programme table as proof that each listed instrument contributed smoke polygons throughout those
-    dates.'
+    dates. Current process_hms daily aggregation discards native Start/End intervals. The character-date
+    empty result handled by calculate_hms becomes zeros; it does not independently establish observed
+    smoke absence. Interval-specific or availability-aware analyses require the original feature/observation
+    context, not the daily summary alone.'
 canonical_variables:
 - id: amadeus:var/smoke_plume_density_class
   name: smoke_plume_density_class

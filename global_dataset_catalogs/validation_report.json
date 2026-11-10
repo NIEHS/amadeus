@@ -1,0 +1,785 @@
+{
+  "validated_utc": "2026-11-09T18:55:22.742311+00:00",
+  "schema": "amadeus_schema/src/amadeus_schema/schema/amadeus_schema.yaml",
+  "target_class": "AmadeusDatabase",
+  "package_versions": {
+    "linkml": "1.12.1",
+    "linkml-runtime": "1.12.1",
+    "PyYAML": "6.0.3"
+  },
+  "linkml_results": [
+    {
+      "file": "dataset_spec_objects/aqs.yaml",
+      "passed": true,
+      "sha256": "338b3d3c8704548877eed2afafcc75e2f6c44bca83ce56ff47a3fe7b2c9b6f0d",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/cropscape.yaml",
+      "passed": true,
+      "sha256": "0b131905cc1bd292284d450b87011043b032e6182dafa8ed1e9a2e1e52ff8e36",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/drought.yaml",
+      "passed": true,
+      "sha256": "5fe8706bc6f4919486da32404d6aaeb29c03cd710e5c6919afa96b7976773eb7",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/ecoregion.yaml",
+      "passed": true,
+      "sha256": "d5f94f8d4e1daa9489303eb92838cd624a658304a0bf2183a10f3984f807001e",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/edgar.yaml",
+      "passed": true,
+      "sha256": "6bd3fe4be3dae7b88b9a38b66e706d2c1bf483683c6c75f519f6190c79fa0980",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/geos.yaml",
+      "passed": true,
+      "sha256": "be6b564a49f9db3b53da92b3b046dd78bd8933dc1657a1bc1e3a73e1157f2cc7",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/gmted.yaml",
+      "passed": true,
+      "sha256": "0889bb43c0632cc12c344682bdedb5a3dc0db66882b5a5cda89e2cfb0eeb4bfd",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/gridmet.yaml",
+      "passed": true,
+      "sha256": "dea123b5cd581c1a476fc6357eb1b81060bb6d8bb43a1180fe02c47ed50f6595",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/groads.yaml",
+      "passed": true,
+      "sha256": "61f85323785b8c3527fc15523baba36363c459c7dc35c7bcfffe4a7dfc8d6e65",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/hms.yaml",
+      "passed": true,
+      "sha256": "9efeac4b4cb147e12ae5af51d97beab334aae097b3632b73aa43734e08494e46",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/huc.yaml",
+      "passed": true,
+      "sha256": "d1891fe242ff01b55ab718abb9e781138386182f7d2ef50331d9cbc731f5bd68",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/improve.yaml",
+      "passed": true,
+      "sha256": "cdb0d48562748b920ccaa865137d56d8b4b14733012a8e39ccf98289f3ad0dc9",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/koppen_geiger.yaml",
+      "passed": true,
+      "sha256": "bcca835097e654580d9281f0195c7c0c0194ba6ea6978fe48a084c9214202349",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/merra2.yaml",
+      "passed": true,
+      "sha256": "1687f36aa6fa2475186559669e4f65413f5c11a67eff7a1c4f9740b4ae0fd692",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/modis.yaml",
+      "passed": true,
+      "sha256": "933d8bb5840a6358d479c5d11f17d070bb4d46829f26e0a70a50a494f670941d",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/narr.yaml",
+      "passed": true,
+      "sha256": "5dcf75fa6a8e2081765776ae39df20daa90d8b5e981d66608d977edfa977736c",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/nei.yaml",
+      "passed": true,
+      "sha256": "8c58ad1b24413aa60300915ca31fa8e1bb88a90297c02a02aa8bd8258efbbd59",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/nlcd.yaml",
+      "passed": true,
+      "sha256": "5eb930dd3579663136f790a0cfaacf46dc403c5b098dc0a9f1ddebc71b89bd61",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/olm.yaml",
+      "passed": true,
+      "sha256": "8a6830481f2ec179a041b44f60d15054dc79f09e6533204c7a5becae8f1b4f6f",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/population.yaml",
+      "passed": true,
+      "sha256": "88e77d090298552017b74b143cb64ed653c93d76dd28b5acf4a463f9baa20663",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/prism.yaml",
+      "passed": true,
+      "sha256": "0003125153b051a0497cb777dffca4910f796007edf3f520d6766e6b5d6d86cc",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/terraclimate.yaml",
+      "passed": true,
+      "sha256": "bf241d38b3d8e61dfd1da42d47ae5d263b7243e061328a1b9efd499ba2fbb0f1",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "dataset_spec_objects/tri.yaml",
+      "passed": true,
+      "sha256": "c6ae19ea23396391446ad24db6903d5d0554e4c634c5c2c6f1ea05d3a879e58b",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/aqs.yaml",
+      "passed": true,
+      "sha256": "d5100ed690ed54c293aa781275b3d6ec45ab770d518ee21d9a8b411581d1a1f1",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/cropscape.yaml",
+      "passed": true,
+      "sha256": "ad0e5a0062d0a3b899b173bfecddf09f91bf26b4a007adeb0e624171029c1713",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/drought.yaml",
+      "passed": true,
+      "sha256": "8fb76783343fa12bd2237b05fa4c4d7c8ffa0d3a3284696a525af5242d8d0b3f",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/ecoregion.yaml",
+      "passed": true,
+      "sha256": "77883b33eee53464357c571c89499626a8ba84e76dea643a92a7a4e5916d0fa8",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/edgar.yaml",
+      "passed": true,
+      "sha256": "860f8b02036390386ea7c12e6ab840b35e599feabf94e5408f425915577bd1ec",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/geos.yaml",
+      "passed": true,
+      "sha256": "09097aa48885aaba9d97d9feed2e9783f1338924cf0701c97cc7b82888f1b412",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/global_catalog.yaml",
+      "passed": true,
+      "sha256": "b51af0b2a9121689a5eb846cbd618abffe9956d3e412c8758575806a0e7adbdc",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/gmted.yaml",
+      "passed": true,
+      "sha256": "7cdec9bc3ed8b195d45b6f6349af2ee0834eda3096c3637358cb42b24f56ef51",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/gridmet.yaml",
+      "passed": true,
+      "sha256": "32dd219d4d421d1748934c1293f8a41e1bc9cd17557b8771028a76fa42718447",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/groads.yaml",
+      "passed": true,
+      "sha256": "f495320b50b44a9c57b7cca5df0821609c34a5395383d009b7a0aa53f7ddb80a",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/hms.yaml",
+      "passed": true,
+      "sha256": "c7d4803f552ce7b6e218a6f2d442b442415f8c73f5dcb5dc9f4ef39cb9d13d5c",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/huc.yaml",
+      "passed": true,
+      "sha256": "da5efc3e10f2165259602f4d2f0aa893514124944b442be387d9541bb0cbe282",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/improve.yaml",
+      "passed": true,
+      "sha256": "4cc63b539e90005f08b4a5999a9e13e0922e24a0c0ece75f6fdace7fd18b8338",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/koppen_geiger.yaml",
+      "passed": true,
+      "sha256": "6d1cc19105cf57e1b5341360ee4ba01dafad43ecbfa302d7ffd6774e7740e5de",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/merra2.yaml",
+      "passed": true,
+      "sha256": "8fa3d1d04ddaed034f70382917b78c7ddab9d999faa64f8233b3b843e658e7e4",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/modis.yaml",
+      "passed": true,
+      "sha256": "422bb229c2a3636ebf1b7c05b0243e8aac4e68b0d78149daf3d581f830169659",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/narr.yaml",
+      "passed": true,
+      "sha256": "0c2a8d0e4069fbda5c5cac7b9173b268be8321783faa033e24c2048ef888bba3",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/nei.yaml",
+      "passed": true,
+      "sha256": "01c84f3a3bef652a88731ec7479686d0cdf9727e39a9fb9a774744271239ca8b",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/nlcd.yaml",
+      "passed": true,
+      "sha256": "d6593471f62f1a536a86336f76c9b2ce228b802216bd0c56a16e545e9b95df1f",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/olm.yaml",
+      "passed": true,
+      "sha256": "3ab85342e63c9e96b15a73a4f7de155bba8f1d5448bf46db661db9431789eae5",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/population.yaml",
+      "passed": true,
+      "sha256": "cf55b755633119dbab360266b13db4b0eda2f911a6a63cad84aa7ca348741e74",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/prism.yaml",
+      "passed": true,
+      "sha256": "b8bdaeec840bfb0b10d24da3dc74c8cc126fb52a7554911cded64d01e18cd49a",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/terraclimate.yaml",
+      "passed": true,
+      "sha256": "b99f65cb1e5eac440b2239b99ff0c0d0d990b31f648a2429700970a2430228f8",
+      "validator_output": "No issues found"
+    },
+    {
+      "file": "validated_catalog_handles/tri.yaml",
+      "passed": true,
+      "sha256": "4ce06c56578b41f7c966eee65baae0995345d039eb1bbfbbd5da2adfd9844347",
+      "validator_output": "No issues found"
+    }
+  ],
+  "semantic_checks": [
+    "PASS gridmet: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS aqs: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS hms: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS nlcd: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS terraclimate: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS koppen_geiger: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS cropscape: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS modis: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS merra2: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS population: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS groads: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS huc: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS geos: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS edgar: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS narr: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS prism: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS drought: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS ecoregion: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS nei: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS tri: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS gmted: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS olm: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS improve: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS global_catalog: unique IDs, closed references, categorical constraints, dispatch declarations",
+    "PASS global union and all 23 discovery projections match their source specs exactly",
+    "PASS gridMET: provider attributes, 16 daily fields, centre/corner geometry, fixed MST and circular wind semantics",
+    "PASS GridMET drought: 16 native XML/DAS pairs, actual sampling, calibration, windows, fill/packing and remote-only assets",
+    "PASS verified product decoding: NASA MOD13 inverse factors and MOD09 coverage fraction; unresolved fine-mode normalization fails closed",
+    "PASS AQS: public bulk route, seven parameters, shared PM2.5 identity and explicit row-selection caveats",
+    "PASS HMS: polygon/class semantics and feature-time qualifications",
+    "PASS NLCD: six C1V1 products, verified native projection, local CRS registration and product-specific nodata",
+    "PASS TerraClimate: fourteen v1.1 headers, monthly totals/means/end states, 1950 coverage and version-specific packing",
+    "PASS K\u00f6ppen\u2013Geiger: all twelve TIFF headers, thirty-class legend, three exact grids and distinct V1 periods/scenario",
+    "PASS CropScape: national-coverage/native-resolution distinction, NAD83 grid and categorical background semantics",
+    "PASS MODIS: 64 native bands, resolution profiles, product-specific inverse/affine cloud decoders and 16-day support",
+    "PASS approved existing-field updates: 168 literal GEOS CF attributes, 32 fresh unchanged GridMET metadata documents, 108 unique range-inspected remote Assets; all scientific identities, grids, flags, schemas and R preserved",
+    "PASS input schemas/workbooks/documentation and provider-evidence checksums",
+    "PASS three-resource audit: actual Excel values, mapping rows/statuses, target fields, all definitions and scoped HMS history",
+    "PASS existing MERRA2/population/GROADS/HUC checks; obsolete GEOS unknown-header assertions scoped to preserved baseline",
+    "PASS GEOS original-v1 review: six native files, 168 names/units/packing contracts, coordinates/time/vertical support, separate physical conversions, unresolved datum and ETH/TH retained",
+    "PASS EDGAR/NARR/PRISM/drought/ecoregion: native decoding, 87 NARR fields/level sets, 48 SPEI windows, daily EDDI, exclusive USDM classes, canonical reuse and write scope",
+    "PASS NEI/TRI/GMTED/OLM/IMPROVE: native dictionaries, exact unit conversions, geometry support, missing-value contracts; approved existing-field additions verified separately against immutable baselines",
+    "PASS authoritative import review: raw checker output retained; only metadata-backed temporal/spatial conflicts resolved",
+    "PASS explicit CRS requirements: local identifiers cannot trigger a guessed numeric SRID"
+  ],
+  "semantic_errors": [],
+  "r_object_and_projection_checks": {
+    "checks": {
+      "gridmet_rds": "PASS: RDS equals YAML-loaded named list",
+      "aqs_rds": "PASS: RDS equals YAML-loaded named list",
+      "hms_rds": "PASS: RDS equals YAML-loaded named list",
+      "nlcd_rds": "PASS: RDS equals YAML-loaded named list",
+      "terraclimate_rds": "PASS: RDS equals YAML-loaded named list",
+      "koppen_geiger_rds": "PASS: RDS equals YAML-loaded named list",
+      "cropscape_rds": "PASS: RDS equals YAML-loaded named list",
+      "modis_rds": "PASS: RDS equals YAML-loaded named list",
+      "merra2_rds": "PASS: RDS equals YAML-loaded named list",
+      "population_rds": "PASS: RDS equals YAML-loaded named list",
+      "groads_rds": "PASS: RDS equals YAML-loaded named list",
+      "huc_rds": "PASS: RDS equals YAML-loaded named list",
+      "geos_rds": "PASS: RDS equals YAML-loaded named list",
+      "edgar_rds": "PASS: RDS equals YAML-loaded named list",
+      "narr_rds": "PASS: RDS equals YAML-loaded named list",
+      "prism_rds": "PASS: RDS equals YAML-loaded named list",
+      "drought_rds": "PASS: RDS equals YAML-loaded named list",
+      "ecoregion_rds": "PASS: RDS equals YAML-loaded named list",
+      "nei_rds": "PASS: RDS equals YAML-loaded named list",
+      "tri_rds": "PASS: RDS equals YAML-loaded named list",
+      "gmted_rds": "PASS: RDS equals YAML-loaded named list",
+      "olm_rds": "PASS: RDS equals YAML-loaded named list",
+      "improve_rds": "PASS: RDS equals YAML-loaded named list",
+      "nlcd_projection": "PASS: exact WGS84 Albers parses; (-96,23) maps to (0,0); no EPSG match asserted",
+      "modis_projection": "PASS: native spherical sinusoidal parses; origin maps to (0,0); no EPSG/SRID assumed"
+    },
+    "packages": {
+      "R": "4.6.0",
+      "yaml": "2.3.12",
+      "sf": "1.1.3"
+    }
+  },
+  "authoritative_import_coherence": {
+    "checker": "amadeus_schema/scripts/import_external.py",
+    "checker_sha256": "33661c0c58f2e9b6441c9571d60f4229d4c3ecbeb0b9d18ec2e2876be2b6d3eb",
+    "raw_errors": [
+      "amadeus:pvar/gridmet.pr: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_daily_amount",
+      "amadeus:pvar/gridmet.etr: aggregation 'sum' is illegal for intensive variable amadeus:var/alfalfa_reference_evapotranspiration_daily_amount",
+      "amadeus:pvar/gridmet.pet: aggregation 'sum' is illegal for intensive variable amadeus:var/grass_reference_evapotranspiration_daily_amount",
+      "amadeus:pvar/narr_psl_daily_surface.acpcp: aggregation 'sum' is illegal for intensive variable amadeus:var/narr_daily_acpcp",
+      "amadeus:pvar/narr_psl_daily_surface.apcp: aggregation 'sum' is illegal for intensive variable amadeus:var/narr_daily_apcp",
+      "amadeus:pvar/narr_psl_daily_surface.bgrun: aggregation 'sum' is illegal for intensive variable amadeus:var/narr_daily_bgrun",
+      "amadeus:pvar/prism_ppt_daily_4km.ppt: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_daily_amount",
+      "amadeus:pvar/prism_ppt_monthly_4km.ppt: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_monthly_amount",
+      "amadeus:pvar/prism_ppt_annual_4km.ppt: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_annual_amount",
+      "amadeus:pvar/terraclimate.aet: aggregation 'sum' is illegal for intensive variable amadeus:var/actual_evapotranspiration_monthly_amount",
+      "amadeus:pvar/terraclimate.def: aggregation 'sum' is illegal for intensive variable amadeus:var/climatic_water_deficit_monthly_amount",
+      "amadeus:pvar/terraclimate.pet: aggregation 'sum' is illegal for intensive variable amadeus:var/reference_evapotranspiration_co2_adjusted_monthly_amount",
+      "amadeus:pvar/terraclimate.ppt: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_monthly_amount",
+      "amadeus:pvar/terraclimate.q: aggregation 'sum' is illegal for intensive variable amadeus:var/runoff_monthly_amount"
+    ],
+    "raw_output": "NOTE  amadeus:pvar/gridmet.rmax: source declares CF 'rmax' but the canonical variable is 'CF:relative_humidity'. Comparable? Or a modelling error?\n  NOTE  amadeus:pvar/gridmet.rmin: source declares CF 'rmin' but the canonical variable is 'CF:relative_humidity'. Comparable? Or a modelling error?\n  NOTE  amadeus:pvar/gridmet.sph: source declares CF 'sph' but the canonical variable is 'CF:specific_humidity'. Comparable? Or a modelling error?\n  NOTE  amadeus:pvar/gridmet.srad: source declares CF 'srad' but the canonical variable is 'CF:surface_downwelling_shortwave_flux_in_air'. Comparable? Or a modelling error?\n  NOTE  amadeus:pvar/gridmet.th: source declares CF 'th' but the canonical variable is 'CF:wind_from_direction'. Comparable? Or a modelling error?\n  NOTE  amadeus:pvar/gridmet.tmmn: source declares CF 'tmmn' but the canonical variable is 'CF:air_temperature'. Comparable? Or a modelling error?\n  NOTE  amadeus:pvar/gridmet.tmmx: source declares CF 'tmmx' but the canonical variable is 'CF:air_temperature'. Comparable? Or a modelling error?\n  NOTE  amadeus:pvar/gridmet.vs: source declares CF 'vs' but the canonical variable is 'CF:wind_speed'. Comparable? Or a modelling error?\n  FAIL  amadeus:pvar/gridmet.pr: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_daily_amount\n  FAIL  amadeus:pvar/gridmet.etr: aggregation 'sum' is illegal for intensive variable amadeus:var/alfalfa_reference_evapotranspiration_daily_amount\n  FAIL  amadeus:pvar/gridmet.pet: aggregation 'sum' is illegal for intensive variable amadeus:var/grass_reference_evapotranspiration_daily_amount\n  FAIL  amadeus:pvar/narr_psl_daily_surface.acpcp: aggregation 'sum' is illegal for intensive variable amadeus:var/narr_daily_acpcp\n  FAIL  amadeus:pvar/narr_psl_daily_surface.apcp: aggregation 'sum' is illegal for intensive variable amadeus:var/narr_daily_apcp\n  FAIL  amadeus:pvar/narr_psl_daily_surface.bgrun: aggregation 'sum' is illegal for intensive variable amadeus:var/narr_daily_bgrun\n  FAIL  amadeus:pvar/prism_ppt_daily_4km.ppt: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_daily_amount\n  FAIL  amadeus:pvar/prism_ppt_monthly_4km.ppt: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_monthly_amount\n  FAIL  amadeus:pvar/prism_ppt_annual_4km.ppt: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_annual_amount\n  FAIL  amadeus:pvar/terraclimate.aet: aggregation 'sum' is illegal for intensive variable amadeus:var/actual_evapotranspiration_monthly_amount\n  FAIL  amadeus:pvar/terraclimate.def: aggregation 'sum' is illegal for intensive variable amadeus:var/climatic_water_deficit_monthly_amount\n  FAIL  amadeus:pvar/terraclimate.pet: aggregation 'sum' is illegal for intensive variable amadeus:var/reference_evapotranspiration_co2_adjusted_monthly_amount\n  FAIL  amadeus:pvar/terraclimate.ppt: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_monthly_amount\n  FAIL  amadeus:pvar/terraclimate.q: aggregation 'sum' is illegal for intensive variable amadeus:var/runoff_monthly_amount",
+    "resolved_temporal_spatial_scope_conflicts": [
+      {
+        "product_variable": "amadeus:pvar/gridmet.pr",
+        "raw_message": "amadeus:pvar/gridmet.pr: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_daily_amount",
+        "source_metadata": "dataset_spec_objects/evidence/gridmet_pr.xml",
+        "interpretation": "Temporal daily depth accumulation; the quantity remains spatially intensive. This does not authorize spatial summation of depths."
+      },
+      {
+        "product_variable": "amadeus:pvar/gridmet.etr",
+        "raw_message": "amadeus:pvar/gridmet.etr: aggregation 'sum' is illegal for intensive variable amadeus:var/alfalfa_reference_evapotranspiration_daily_amount",
+        "source_metadata": "dataset_spec_objects/evidence/gridmet_etr.xml",
+        "interpretation": "Temporal daily depth accumulation; the quantity remains spatially intensive. This does not authorize spatial summation of depths."
+      },
+      {
+        "product_variable": "amadeus:pvar/gridmet.pet",
+        "raw_message": "amadeus:pvar/gridmet.pet: aggregation 'sum' is illegal for intensive variable amadeus:var/grass_reference_evapotranspiration_daily_amount",
+        "source_metadata": "dataset_spec_objects/evidence/gridmet_pet.xml",
+        "interpretation": "Temporal daily depth accumulation; the quantity remains spatially intensive. This does not authorize spatial summation of depths."
+      },
+      {
+        "product_variable": "amadeus:pvar/narr_psl_daily_surface.acpcp",
+        "raw_message": "amadeus:pvar/narr_psl_daily_surface.acpcp: aggregation 'sum' is illegal for intensive variable amadeus:var/narr_daily_acpcp",
+        "source_metadata": "dataset_spec_objects/integration_20261107/evidence/narr_acpcp.das",
+        "interpretation": "Provider temporal accumulation of a per-area amount; no spatial summation is authorized."
+      },
+      {
+        "product_variable": "amadeus:pvar/narr_psl_daily_surface.apcp",
+        "raw_message": "amadeus:pvar/narr_psl_daily_surface.apcp: aggregation 'sum' is illegal for intensive variable amadeus:var/narr_daily_apcp",
+        "source_metadata": "dataset_spec_objects/integration_20261107/evidence/narr_apcp.das",
+        "interpretation": "Provider temporal accumulation of a per-area amount; no spatial summation is authorized."
+      },
+      {
+        "product_variable": "amadeus:pvar/narr_psl_daily_surface.bgrun",
+        "raw_message": "amadeus:pvar/narr_psl_daily_surface.bgrun: aggregation 'sum' is illegal for intensive variable amadeus:var/narr_daily_bgrun",
+        "source_metadata": "dataset_spec_objects/integration_20261107/evidence/narr_bgrun.das",
+        "interpretation": "Provider temporal accumulation of a per-area amount; no spatial summation is authorized."
+      },
+      {
+        "product_variable": "amadeus:pvar/prism_ppt_daily_4km.ppt",
+        "raw_message": "amadeus:pvar/prism_ppt_daily_4km.ppt: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_daily_amount",
+        "source_metadata": "dataset_spec_objects/integration_20261107/native_metadata.json",
+        "support_evidence": "dataset_spec_objects/integration_20261107/evidence/prism_datasets.pdf",
+        "interpretation": "Provider temporal accumulation of a per-area amount; no spatial summation is authorized."
+      },
+      {
+        "product_variable": "amadeus:pvar/prism_ppt_monthly_4km.ppt",
+        "raw_message": "amadeus:pvar/prism_ppt_monthly_4km.ppt: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_monthly_amount",
+        "source_metadata": "dataset_spec_objects/integration_20261107/native_metadata.json",
+        "support_evidence": "dataset_spec_objects/integration_20261107/evidence/prism_datasets.pdf",
+        "interpretation": "Provider temporal accumulation of a per-area amount; no spatial summation is authorized."
+      },
+      {
+        "product_variable": "amadeus:pvar/prism_ppt_annual_4km.ppt",
+        "raw_message": "amadeus:pvar/prism_ppt_annual_4km.ppt: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_annual_amount",
+        "source_metadata": "dataset_spec_objects/integration_20261107/native_metadata.json",
+        "support_evidence": "dataset_spec_objects/integration_20261107/evidence/prism_datasets.pdf",
+        "interpretation": "Provider temporal accumulation of a per-area amount; no spatial summation is authorized."
+      },
+      {
+        "product_variable": "amadeus:pvar/terraclimate.aet",
+        "raw_message": "amadeus:pvar/terraclimate.aet: aggregation 'sum' is illegal for intensive variable amadeus:var/actual_evapotranspiration_monthly_amount",
+        "source_metadata": "dataset_spec_objects/evidence/terraclimate_aet.xml",
+        "support_evidence": "dataset_spec_objects/evidence/terraclimate_variables.html",
+        "interpretation": "Verified monthly accumulated depth, spatially intensive; this does not authorize spatial summation."
+      },
+      {
+        "product_variable": "amadeus:pvar/terraclimate.def",
+        "raw_message": "amadeus:pvar/terraclimate.def: aggregation 'sum' is illegal for intensive variable amadeus:var/climatic_water_deficit_monthly_amount",
+        "source_metadata": "dataset_spec_objects/evidence/terraclimate_def.xml",
+        "support_evidence": "dataset_spec_objects/evidence/terraclimate_variables.html",
+        "interpretation": "Verified monthly accumulated depth, spatially intensive; this does not authorize spatial summation."
+      },
+      {
+        "product_variable": "amadeus:pvar/terraclimate.pet",
+        "raw_message": "amadeus:pvar/terraclimate.pet: aggregation 'sum' is illegal for intensive variable amadeus:var/reference_evapotranspiration_co2_adjusted_monthly_amount",
+        "source_metadata": "dataset_spec_objects/evidence/terraclimate_pet.xml",
+        "support_evidence": "dataset_spec_objects/evidence/terraclimate_variables.html",
+        "interpretation": "Verified monthly accumulated depth, spatially intensive; this does not authorize spatial summation."
+      },
+      {
+        "product_variable": "amadeus:pvar/terraclimate.ppt",
+        "raw_message": "amadeus:pvar/terraclimate.ppt: aggregation 'sum' is illegal for intensive variable amadeus:var/precipitation_monthly_amount",
+        "source_metadata": "dataset_spec_objects/evidence/terraclimate_ppt.xml",
+        "support_evidence": "dataset_spec_objects/evidence/terraclimate_variables.html",
+        "interpretation": "Verified monthly accumulated depth, spatially intensive; this does not authorize spatial summation."
+      },
+      {
+        "product_variable": "amadeus:pvar/terraclimate.q",
+        "raw_message": "amadeus:pvar/terraclimate.q: aggregation 'sum' is illegal for intensive variable amadeus:var/runoff_monthly_amount",
+        "source_metadata": "dataset_spec_objects/evidence/terraclimate_q.xml",
+        "support_evidence": "dataset_spec_objects/evidence/terraclimate_variables.html",
+        "interpretation": "Verified monthly accumulated depth, spatially intensive; this does not authorize spatial summation."
+      }
+    ],
+    "unresolved_errors": [],
+    "unmodified_upstream_checker_passed": false,
+    "scope_aware_profile_check_passed": true
+  },
+  "crs_execution_requirements": {
+    "implicit_srid_fallback_allowed": false,
+    "grids": [
+      {
+        "grid": "amadeus:grid/cdl_conus_nad83_30m",
+        "catalog_identifier": "EPSG:5070",
+        "verified_database_srid": 5070,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/csic_speibase_211_global_05deg",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/noaa_eddi_conus_0125deg",
+        "catalog_identifier": "AMADEUS:100006",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/edgar_v81_global_01deg",
+        "catalog_identifier": "AMADEUS:100007",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/geos_cf_v1_025_hybrid_model_layer_index",
+        "catalog_identifier": "AMADEUS:100004",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/geos_cf_v1_025_surface_fields",
+        "catalog_identifier": "AMADEUS:100004",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/geos_cf_v1_025_isobaric_pressure_hPa",
+        "catalog_identifier": "AMADEUS:100004",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/gmted2010_arcgrid_15_33600",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/gmted2010_arcgrid_30_16800",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/gmted2010_arcgrid_75_67200",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/gmted2010_arcgrid_30_20880",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/gridmet_4km",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/koppen_v1_0p0083",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/koppen_v1_0p083",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/koppen_v1_0p5",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/merra2_0625x05_single_level",
+        "catalog_identifier": "AMADEUS:100003",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/merra2_0625x05_hybrid_model_layer_index",
+        "catalog_identifier": "AMADEUS:100003",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/merra2_0625x05_isobaric_pressure_hPa",
+        "catalog_identifier": "AMADEUS:100003",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/modis_sinusoidal_500m",
+        "catalog_identifier": "AMADEUS:100002",
+        "resolve_using": "GridDefinition.proj_string",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Resolve/transform the exact native projection or explicitly register a matching CRS in the target engine; reject implicit SRID fallback."
+      },
+      {
+        "grid": "amadeus:grid/modis_sinusoidal_1km",
+        "catalog_identifier": "AMADEUS:100002",
+        "resolve_using": "GridDefinition.proj_string",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Resolve/transform the exact native projection or explicitly register a matching CRS in the target engine; reject implicit SRID fallback."
+      },
+      {
+        "grid": "amadeus:grid/modis_sinusoidal_5km",
+        "catalog_identifier": "AMADEUS:100002",
+        "resolve_using": "GridDefinition.proj_string",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Resolve/transform the exact native projection or explicitly register a matching CRS in the target engine; reject implicit SRID fallback."
+      },
+      {
+        "grid": "amadeus:grid/narr_psl_daily_surface",
+        "catalog_identifier": "AMADEUS:100005",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/narr_psl_daily_pressure_29",
+        "catalog_identifier": "AMADEUS:100005",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/narr_psl_daily_soil_4",
+        "catalog_identifier": "AMADEUS:100005",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/narr_psl_daily_pressure_15",
+        "catalog_identifier": "AMADEUS:100005",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/narr_psl_daily_soil_5",
+        "catalog_identifier": "AMADEUS:100005",
+        "status": "unresolved placeholder, not a CRS definition",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Obtain authoritative native datum/radius before coordinate transformation or geometry ingestion; reject all SRID/CRS fallback."
+      },
+      {
+        "grid": "amadeus:grid/nlcd_annual_c1_conus_30m",
+        "catalog_identifier": "AMADEUS:100001",
+        "resolve_using": "GridDefinition.proj_string",
+        "verified_database_srid": null,
+        "database_geometry_ready": false,
+        "required_action": "Resolve/transform the exact native projection or explicitly register a matching CRS in the target engine; reject implicit SRID fallback."
+      },
+      {
+        "grid": "amadeus:grid/olm_longterm_soil_250m_geographic_1",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/olm_longterm_soil_250m_geographic_2",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/olm_longterm_soil_250m_geographic_3",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/gpwv4_r11_30_sec",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/gpwv4_r11_2pt5_min",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/gpwv4_r11_15_min",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/gpwv4_r11_30_min",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/gpwv4_r11_60_min",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/prism_current_conus_25arcmin",
+        "catalog_identifier": "EPSG:4269",
+        "verified_database_srid": 4269,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/prism_norm91_monthly_800m",
+        "catalog_identifier": "EPSG:4269",
+        "verified_database_srid": 4269,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      },
+      {
+        "grid": "amadeus:grid/terraclimate_global_1_24deg",
+        "catalog_identifier": "EPSG:4326",
+        "verified_database_srid": 4326,
+        "database_geometry_ready": true,
+        "scope": "CRS metadata readiness only; ingestion has not been tested."
+      }
+    ]
+  },
+  "passed": true,
+  "scope": "Metadata schema, references and stated scientific checks. No runtime data access or database ingestion is certified.",
+  "open_verification_items": "../dataset_spec_objects/verification_gaps.json",
+  "database_backend_execution_tested": false
+}

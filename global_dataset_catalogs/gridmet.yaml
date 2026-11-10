@@ -85,7 +85,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:34.827547+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei14d_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei14d_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -127,7 +132,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:34.828126+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei30d_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei30d_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -169,7 +179,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:35.728427+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei90d_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei90d_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -211,7 +226,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:35.859124+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei180d_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei180d_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -253,7 +273,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:36.460253+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei270d_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei270d_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -295,7 +320,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:36.609205+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei1y_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei1y_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -337,7 +367,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:37.109958+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei2y_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei2y_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -379,7 +414,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:37.336065+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei5y_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_spei5y_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -421,7 +461,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:37.821531+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi14d_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi14d_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -463,7 +508,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:38.090313+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi30d_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi30d_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -505,7 +555,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:38.794039+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi90d_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi90d_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -547,7 +602,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:38.908251+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi180d_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi180d_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -589,7 +649,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:39.524583+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi270d_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi270d_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -631,7 +696,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:39.640119+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi1y_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi1y_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -673,7 +743,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:40.263967+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi2y_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi2y_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326
@@ -715,7 +790,12 @@ products:
     Yes (CONUS). This statement does not establish validity of every cell/date or fill observation gaps.
     Coverage coordinates and XML/DAS attributes reverified at 2026-11-09T18:41:40.298822+00:00; 3419 native
     time labels, last label 2026-11-01. This is a metadata-axis snapshot, not a permanent archive end
-    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi5y_native.xml.'
+    or a claim of nonmissing observations. Fresh evidence: catalog_updates_20261109/evidence/gridmet_eddi5y_native.xml.
+    The Earth Engine GRIDMET/DROUGHT documentation reports 1981–2016 standardization and five-day image
+    cadence. That service lists continuous index interpretation, not the native companion category-code
+    mapping; its printed decimal intervals do not justify silently constructing continuous endpoint rules
+    or reversing EDDI signs. Existing companion-category interpretation remains restricted. Reference:
+    https://developers.google.com/earth-engine/datasets/catalog/GRIDMET_DROUGHT.'
   grid_definition: amadeus:grid/gridmet_4km
   crs: EPSG:4326
   srid: 4326

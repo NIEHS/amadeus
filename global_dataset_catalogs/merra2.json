@@ -1172,7 +1172,7 @@
       "native_name": "HOURNORAIN",
       "native_units_ucum": "s",
       "amadeus_variable_code": "HOURNORAIN",
-      "harmonization_note": "NASA specification section statD_2d_slv_Nx: time-during an hour with no precipitation; native dimensions tyx, literal units s. Read and mask actual per-file _FillValue/missing_value before any CF unpacking; honor native scale_factor/add_offset once. Rewritten test fixtures do not establish native packing, valid ranges, datum or full-grid dimensions. No arbitrary bounds or fill are assigned. ",
+      "harmonization_note": "NASA specification section statD_2d_slv_Nx: time-during an hour with no precipitation; native dimensions tyx, literal units s. Read and mask actual per-file _FillValue/missing_value before any CF unpacking; honor native scale_factor/add_offset once. Rewritten test fixtures do not establish native packing, valid ranges, datum or full-grid dimensions. No arbitrary bounds or fill are assigned.  The NASA GES DISC README table for statD_2d_slv_Nx independently repeats the supplied seconds unit, but does not establish a new hours conversion or the requested daily reduction. Preserve this unresolved source statistic, rather than infer an aggregation from its name. Reference: https://goldsmr4.gesdisc.eosdis.nasa.gov/data/MERRA2/M2T1NXLND.5.12.4/doc/MERRA2.README.pdf.",
       "metadata_gaps": [
         "under_investigation"
       ],

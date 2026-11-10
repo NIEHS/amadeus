@@ -6541,7 +6541,11 @@ product_variables:
     +/-1e15 are not scientifically validated physical limits. These attributes are sample-backed expectations,
     not permission to ignore other files’ headers. under_investigation remains because the native datum
     is unresolved; ETH/TH additionally require provider confirmation of their distinct scientific identities.
-    See geos_review_20261109/native_metadata.json and README.md.'
+    See geos_review_20261109/native_metadata.json and README.md. NASA’s current GrADS listing also labels
+    ETH and TH potential_temperature separately. This confirms that the published ambiguity persists;
+    it does not supply separate equations, justify merging the fields, establish a datum, or replace the
+    original v1 replay metadata with transformed GrADS attributes. Provider confirmation remains required:
+    https://opendap.nccs.nasa.gov/dods/gmao/geos-cf/assim/met_inst_1hr_g1440x721_p23.'
   metadata_gaps:
   - under_investigation
   vertical_level_type: isobaric_pressure_hPa
@@ -6747,7 +6751,11 @@ product_variables:
     +/-1e15 are not scientifically validated physical limits. These attributes are sample-backed expectations,
     not permission to ignore other files’ headers. under_investigation remains because the native datum
     is unresolved; ETH/TH additionally require provider confirmation of their distinct scientific identities.
-    See geos_review_20261109/native_metadata.json and README.md.'
+    See geos_review_20261109/native_metadata.json and README.md. NASA’s current GrADS listing also labels
+    ETH and TH potential_temperature separately. This confirms that the published ambiguity persists;
+    it does not supply separate equations, justify merging the fields, establish a datum, or replace the
+    original v1 replay metadata with transformed GrADS attributes. Provider confirmation remains required:
+    https://opendap.nccs.nasa.gov/dods/gmao/geos-cf/assim/met_inst_1hr_g1440x721_p23.'
   metadata_gaps:
   - under_investigation
   vertical_level_type: isobaric_pressure_hPa

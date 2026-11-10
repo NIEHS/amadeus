@@ -36,7 +36,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -66,7 +69,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -96,7 +102,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -126,7 +135,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -156,7 +168,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -186,7 +201,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -216,7 +234,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -246,7 +267,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -276,7 +300,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -306,7 +333,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -336,7 +366,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -366,7 +399,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -396,7 +432,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -426,7 +465,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -456,7 +498,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -486,7 +531,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -516,7 +564,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007
@@ -546,7 +597,10 @@ products:
     needs cell areas and verified time support, not an assumed 365-day multiplier. No monthly/sector-specific
     scale is copied from this profile. Global coordinate centres are verified, but the file has no explicit
     datum authority: GDAL CRS84 is an interpretation, not provider datum evidence. AMADEUS:100007 is an
-    unresolved required-slot placeholder; no geometry execution is certified.'
+    unresolved required-slot placeholder; no geometry execution is certified. The existing unit_conversion_formula
+    declares the native-to-canonical conversion; process_edgar does not execute that catalog formula.
+    Its current output remains in reader-decoded native units. Do not label an unconverted native-unit
+    spatial mean as a canonical-unit polygon total.'
   product_version: EDGARv8.1 FT2022 AP
   grid_definition: amadeus:grid/edgar_v81_global_01deg
   crs: AMADEUS:100007

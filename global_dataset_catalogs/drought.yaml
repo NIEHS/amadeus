@@ -1506,7 +1506,12 @@ products:
     date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
     monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
     no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
-    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.
+    NOAA documents replacement of EDDI archive data affected by erroneous NLDAS-2 forcing during August
+    2022 to March 2024; an old locally cached file is not established to contain that correction. See
+    https://psl.noaa.gov/eddi/warn.html. Record acquisition/version evidence for the requested archive;
+    this notice does not establish its missing native datum or timestamp cutoff and must not be transferred
+    to GridMET EDDI.'
   grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
   crs: AMADEUS:100006
   temporal_resolution_iso: P1D
@@ -1531,7 +1536,12 @@ products:
     date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
     monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
     no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
-    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.
+    NOAA documents replacement of EDDI archive data affected by erroneous NLDAS-2 forcing during August
+    2022 to March 2024; an old locally cached file is not established to contain that correction. See
+    https://psl.noaa.gov/eddi/warn.html. Record acquisition/version evidence for the requested archive;
+    this notice does not establish its missing native datum or timestamp cutoff and must not be transferred
+    to GridMET EDDI.'
   grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
   crs: AMADEUS:100006
   temporal_resolution_iso: P1D
@@ -1556,7 +1566,12 @@ products:
     date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
     monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
     no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
-    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.
+    NOAA documents replacement of EDDI archive data affected by erroneous NLDAS-2 forcing during August
+    2022 to March 2024; an old locally cached file is not established to contain that correction. See
+    https://psl.noaa.gov/eddi/warn.html. Record acquisition/version evidence for the requested archive;
+    this notice does not establish its missing native datum or timestamp cutoff and must not be transferred
+    to GridMET EDDI.'
   grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
   crs: AMADEUS:100006
   temporal_resolution_iso: P1D
@@ -1581,7 +1596,12 @@ products:
     date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
     monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
     no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
-    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.
+    NOAA documents replacement of EDDI archive data affected by erroneous NLDAS-2 forcing during August
+    2022 to March 2024; an old locally cached file is not established to contain that correction. See
+    https://psl.noaa.gov/eddi/warn.html. Record acquisition/version evidence for the requested archive;
+    this notice does not establish its missing native datum or timestamp cutoff and must not be transferred
+    to GridMET EDDI.'
   grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
   crs: AMADEUS:100006
   temporal_resolution_iso: P1D
@@ -1606,7 +1626,12 @@ products:
     date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
     monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
     no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
-    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.
+    NOAA documents replacement of EDDI archive data affected by erroneous NLDAS-2 forcing during August
+    2022 to March 2024; an old locally cached file is not established to contain that correction. See
+    https://psl.noaa.gov/eddi/warn.html. Record acquisition/version evidence for the requested archive;
+    this notice does not establish its missing native datum or timestamp cutoff and must not be transferred
+    to GridMET EDDI.'
   grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
   crs: AMADEUS:100006
   temporal_resolution_iso: P1D
@@ -1631,7 +1656,12 @@ products:
     date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
     monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
     no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
-    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.
+    NOAA documents replacement of EDDI archive data affected by erroneous NLDAS-2 forcing during August
+    2022 to March 2024; an old locally cached file is not established to contain that correction. See
+    https://psl.noaa.gov/eddi/warn.html. Record acquisition/version evidence for the requested archive;
+    this notice does not establish its missing native datum or timestamp cutoff and must not be transferred
+    to GridMET EDDI.'
   grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
   crs: AMADEUS:100006
   temporal_resolution_iso: P1D
@@ -1656,7 +1686,12 @@ products:
     date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
     monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
     no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
-    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.
+    NOAA documents replacement of EDDI archive data affected by erroneous NLDAS-2 forcing during August
+    2022 to March 2024; an old locally cached file is not established to contain that correction. See
+    https://psl.noaa.gov/eddi/warn.html. Record acquisition/version evidence for the requested archive;
+    this notice does not establish its missing native datum or timestamp cutoff and must not be transferred
+    to GridMET EDDI.'
   grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
   crs: AMADEUS:100006
   temporal_resolution_iso: P1D
@@ -1681,7 +1716,12 @@ products:
     date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
     monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
     no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
-    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.
+    NOAA documents replacement of EDDI archive data affected by erroneous NLDAS-2 forcing during August
+    2022 to March 2024; an old locally cached file is not established to contain that correction. See
+    https://psl.noaa.gov/eddi/warn.html. Record acquisition/version evidence for the requested archive;
+    this notice does not establish its missing native datum or timestamp cutoff and must not be transferred
+    to GridMET EDDI.'
   grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
   crs: AMADEUS:100006
   temporal_resolution_iso: P1D
@@ -1706,7 +1746,12 @@ products:
     date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
     monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
     no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
-    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.
+    NOAA documents replacement of EDDI archive data affected by erroneous NLDAS-2 forcing during August
+    2022 to March 2024; an old locally cached file is not established to contain that correction. See
+    https://psl.noaa.gov/eddi/warn.html. Record acquisition/version evidence for the requested archive;
+    this notice does not establish its missing native datum or timestamp cutoff and must not be transferred
+    to GridMET EDDI.'
   grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
   crs: AMADEUS:100006
   temporal_resolution_iso: P1D
@@ -1731,7 +1776,12 @@ products:
     date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
     monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
     no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
-    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.
+    NOAA documents replacement of EDDI archive data affected by erroneous NLDAS-2 forcing during August
+    2022 to March 2024; an old locally cached file is not established to contain that correction. See
+    https://psl.noaa.gov/eddi/warn.html. Record acquisition/version evidence for the requested archive;
+    this notice does not establish its missing native datum or timestamp cutoff and must not be transferred
+    to GridMET EDDI.'
   grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
   crs: AMADEUS:100006
   temporal_resolution_iso: P1D
@@ -1756,7 +1806,12 @@ products:
     date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
     monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
     no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
-    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.
+    NOAA documents replacement of EDDI archive data affected by erroneous NLDAS-2 forcing during August
+    2022 to March 2024; an old locally cached file is not established to contain that correction. See
+    https://psl.noaa.gov/eddi/warn.html. Record acquisition/version evidence for the requested archive;
+    this notice does not establish its missing native datum or timestamp cutoff and must not be transferred
+    to GridMET EDDI.'
   grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
   crs: AMADEUS:100006
   temporal_resolution_iso: P1D
@@ -1781,7 +1836,12 @@ products:
     date for the preceding native-labelled lookback. Tuesday selection is an R download policy; all twelve
     monthly window headers have been checked. Geographic coordinates/resolution/extent are explicit, but
     no datum accompanies the ASCII header: AMADEUS:100006 remains unresolved and must not imply EPSG:4326.
-    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.'
+    The legacy EDDI netCDF fixture was rewritten and is not evidence for current ASCII packing or cadence.
+    NOAA documents replacement of EDDI archive data affected by erroneous NLDAS-2 forcing during August
+    2022 to March 2024; an old locally cached file is not established to contain that correction. See
+    https://psl.noaa.gov/eddi/warn.html. Record acquisition/version evidence for the requested archive;
+    this notice does not establish its missing native datum or timestamp cutoff and must not be transferred
+    to GridMET EDDI.'
   grid_definition: amadeus:grid/noaa_eddi_conus_0125deg
   crs: AMADEUS:100006
   temporal_resolution_iso: P1D

@@ -257,7 +257,7 @@
       "canonical_variable": "amadeus:var/koppen_geiger_ensemble_agreement",
       "native_name": "Beck_KG_V1_present_conf_0p0083.tif",
       "native_units_ucum": "%",
-      "harmonization_note": "One unsigned 8-bit raster band in the named archive member. Native filename identifies the array; no extra named HDF/netCDF band is asserted. Class resampling must preserve labels (nearest/mode as appropriate); agreement percentages must not be processed as class codes. Background sentinel is not asserted because the inspected TIFF headers do not declare GDAL_NODATA. The covariate adapter extracts class maps; confidence extraction has not been verified."
+      "harmonization_note": "One unsigned 8-bit raster band in the named archive member. Native filename identifies the array; no extra named HDF/netCDF band is asserted. Class resampling must preserve labels (nearest/mode as appropriate); agreement percentages must not be processed as class codes. Background sentinel is not asserted because the inspected TIFF headers do not declare GDAL_NODATA. The covariate adapter extracts class maps; confidence extraction has not been verified. The registered Product calculate route is class-specific: this agreement binding is not supported by calculate_koppen_geiger class-fraction extraction. Its presence is source discovery, not a claim of executable agreement reduction."
     },
     {
       "id": "amadeus:pvar/koppen.Beck_KG_V1_future_0p0083",
@@ -274,7 +274,7 @@
       "canonical_variable": "amadeus:var/koppen_geiger_ensemble_agreement",
       "native_name": "Beck_KG_V1_future_conf_0p0083.tif",
       "native_units_ucum": "%",
-      "harmonization_note": "One unsigned 8-bit raster band in the named archive member. Native filename identifies the array; no extra named HDF/netCDF band is asserted. Class resampling must preserve labels (nearest/mode as appropriate); agreement percentages must not be processed as class codes. Background sentinel is not asserted because the inspected TIFF headers do not declare GDAL_NODATA. The covariate adapter extracts class maps; confidence extraction has not been verified."
+      "harmonization_note": "One unsigned 8-bit raster band in the named archive member. Native filename identifies the array; no extra named HDF/netCDF band is asserted. Class resampling must preserve labels (nearest/mode as appropriate); agreement percentages must not be processed as class codes. Background sentinel is not asserted because the inspected TIFF headers do not declare GDAL_NODATA. The covariate adapter extracts class maps; confidence extraction has not been verified. The registered Product calculate route is class-specific: this agreement binding is not supported by calculate_koppen_geiger class-fraction extraction. Its presence is source discovery, not a claim of executable agreement reduction."
     },
     {
       "id": "amadeus:pvar/koppen.Beck_KG_V1_present_0p083",
@@ -291,7 +291,7 @@
       "canonical_variable": "amadeus:var/koppen_geiger_ensemble_agreement",
       "native_name": "Beck_KG_V1_present_conf_0p083.tif",
       "native_units_ucum": "%",
-      "harmonization_note": "One unsigned 8-bit raster band in the named archive member. Native filename identifies the array; no extra named HDF/netCDF band is asserted. Class resampling must preserve labels (nearest/mode as appropriate); agreement percentages must not be processed as class codes. Background sentinel is not asserted because the inspected TIFF headers do not declare GDAL_NODATA. The covariate adapter extracts class maps; confidence extraction has not been verified."
+      "harmonization_note": "One unsigned 8-bit raster band in the named archive member. Native filename identifies the array; no extra named HDF/netCDF band is asserted. Class resampling must preserve labels (nearest/mode as appropriate); agreement percentages must not be processed as class codes. Background sentinel is not asserted because the inspected TIFF headers do not declare GDAL_NODATA. The covariate adapter extracts class maps; confidence extraction has not been verified. The registered Product calculate route is class-specific: this agreement binding is not supported by calculate_koppen_geiger class-fraction extraction. Its presence is source discovery, not a claim of executable agreement reduction."
     },
     {
       "id": "amadeus:pvar/koppen.Beck_KG_V1_future_0p083",
@@ -308,7 +308,7 @@
       "canonical_variable": "amadeus:var/koppen_geiger_ensemble_agreement",
       "native_name": "Beck_KG_V1_future_conf_0p083.tif",
       "native_units_ucum": "%",
-      "harmonization_note": "One unsigned 8-bit raster band in the named archive member. Native filename identifies the array; no extra named HDF/netCDF band is asserted. Class resampling must preserve labels (nearest/mode as appropriate); agreement percentages must not be processed as class codes. Background sentinel is not asserted because the inspected TIFF headers do not declare GDAL_NODATA. The covariate adapter extracts class maps; confidence extraction has not been verified."
+      "harmonization_note": "One unsigned 8-bit raster band in the named archive member. Native filename identifies the array; no extra named HDF/netCDF band is asserted. Class resampling must preserve labels (nearest/mode as appropriate); agreement percentages must not be processed as class codes. Background sentinel is not asserted because the inspected TIFF headers do not declare GDAL_NODATA. The covariate adapter extracts class maps; confidence extraction has not been verified. The registered Product calculate route is class-specific: this agreement binding is not supported by calculate_koppen_geiger class-fraction extraction. Its presence is source discovery, not a claim of executable agreement reduction."
     },
     {
       "id": "amadeus:pvar/koppen.Beck_KG_V1_present_0p5",
@@ -325,7 +325,7 @@
       "canonical_variable": "amadeus:var/koppen_geiger_ensemble_agreement",
       "native_name": "Beck_KG_V1_present_conf_0p5.tif",
       "native_units_ucum": "%",
-      "harmonization_note": "One unsigned 8-bit raster band in the named archive member. Native filename identifies the array; no extra named HDF/netCDF band is asserted. Class resampling must preserve labels (nearest/mode as appropriate); agreement percentages must not be processed as class codes. Background sentinel is not asserted because the inspected TIFF headers do not declare GDAL_NODATA. The covariate adapter extracts class maps; confidence extraction has not been verified."
+      "harmonization_note": "One unsigned 8-bit raster band in the named archive member. Native filename identifies the array; no extra named HDF/netCDF band is asserted. Class resampling must preserve labels (nearest/mode as appropriate); agreement percentages must not be processed as class codes. Background sentinel is not asserted because the inspected TIFF headers do not declare GDAL_NODATA. The covariate adapter extracts class maps; confidence extraction has not been verified. The registered Product calculate route is class-specific: this agreement binding is not supported by calculate_koppen_geiger class-fraction extraction. Its presence is source discovery, not a claim of executable agreement reduction."
     },
     {
       "id": "amadeus:pvar/koppen.Beck_KG_V1_future_0p5",
@@ -342,7 +342,7 @@
       "canonical_variable": "amadeus:var/koppen_geiger_ensemble_agreement",
       "native_name": "Beck_KG_V1_future_conf_0p5.tif",
       "native_units_ucum": "%",
-      "harmonization_note": "One unsigned 8-bit raster band in the named archive member. Native filename identifies the array; no extra named HDF/netCDF band is asserted. Class resampling must preserve labels (nearest/mode as appropriate); agreement percentages must not be processed as class codes. Background sentinel is not asserted because the inspected TIFF headers do not declare GDAL_NODATA. The covariate adapter extracts class maps; confidence extraction has not been verified."
+      "harmonization_note": "One unsigned 8-bit raster band in the named archive member. Native filename identifies the array; no extra named HDF/netCDF band is asserted. Class resampling must preserve labels (nearest/mode as appropriate); agreement percentages must not be processed as class codes. Background sentinel is not asserted because the inspected TIFF headers do not declare GDAL_NODATA. The covariate adapter extracts class maps; confidence extraction has not been verified. The registered Product calculate route is class-specific: this agreement binding is not supported by calculate_koppen_geiger class-fraction extraction. Its presence is source discovery, not a claim of executable agreement reduction."
     }
   ]
 }
