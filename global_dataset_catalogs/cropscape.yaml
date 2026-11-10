@@ -1,0 +1,94 @@
+# Authoritative schema: amadeus_schema/src/amadeus_schema/schema/amadeus_schema.yaml
+# Metadata profile; source reconciliation documented in resource_audit.json.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/usda_nass_cdl
+  name: usda_nass_cdl
+  label: USDA NASS Cropland Data Layer (CropScape)
+  producer_institution: USDA National Agricultural Statistics Service
+  homepage: https://www.nass.usda.gov/Research_and_Science/Cropland/SARS1a.php
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _cropscape
+  description: 'Public-domain USDA product; citation requested. CropScape/CroplandCROS is an access interface,
+    not a separate measurement. Programme began with partial-state coverage in 1997; complete CONUS coverage
+    begins in 2008. No SPDX identifier is invented for the public-domain statement. GMU archive and newer
+    native 10 m products are not conflated with the scoped USDA historical 30 m delivery. [Resource reconciliation:
+    inventory rights and history] Inventory usage/citation statement (Amadeus data sources!I7): Public
+    domain (USDA NASS); citation requested. Inventory source status (H7): Active; this is not observation
+    QA, API availability or verified support for every product. Inventory first-release/history wording
+    (J7): 1997. 1997 is programme start with partial coverage; 2008 is national coverage start. This profile
+    pins native 30 m years 2008–2023; 2024 onward has native 10 m resolution.'
+  citation_apa: 'Boryan, C., Yang, Z., Mueller, R., & Craig, M. (2011). Monitoring US agriculture: the
+    US Department of Agriculture, National Agricultural Statistics Service, Cropland Data Layer Program.
+    Geocarto International, 26(5), 341–358. https://doi.org/10.1080/10106049.2011.562309'
+products:
+- id: amadeus:product/cdl_usda_conus_30m_2008_2023
+  name: cdl_usda_conus_30m_2008_2023
+  label: USDA CDL annual CONUS 30 m, 2008–2023
+  data_source: amadeus:source/usda_nass_cdl
+  data_genre:
+  - land_use
+  - agriculture
+  - satellite
+  native_format: geotiff
+  spatial_support_type: raster_grid_cell
+  temporal_resolution: annual
+  description: 'Annual growing-season crop-specific land-cover classification, including non-crop classes.
+    Labels are nominal, not percentages or continuous crop yields. Map year follows harvest year, not
+    necessarily planting year. Pinned historical 30 m scope 2008–2023; native resolution becomes 10 m
+    in 2024. The R downloader names 30 m ZIPs; a later 30 m resample would be a distinct profile requiring
+    verification. Native EPSG:5070 is NAD83 and is not the WGS84 Albers grid used by Annual NLCD. Regional
+    processed fixtures cannot establish nationwide dimensions/origin or native storage type. [Resource
+    reconciliation: inventory completeness] Inventory coverage statement (Amadeus data sources!N7): Yes
+    (CONUS from 2008; partial states before). This statement does not establish validity of every cell/date
+    or fill observation gaps.'
+  grid_definition: amadeus:grid/cdl_conus_nad83_30m
+  crs: EPSG:5070
+  srid: 5070
+  native_spatial_resolution_m: 30
+  native_spatial_resolution_descriptor: 30 m native historical pixels
+  spatial_extent_descriptor: Contiguous United States, national coverage from 2008
+  temporal_resolution_iso: P1Y
+  temporal_alignment: interval
+  calendar: gregorian
+  temporal_coverage_start: '2008-01-01'
+  temporal_coverage_end: '2023-12-31'
+  access_url: https://www.nass.usda.gov/Research_and_Science/Cropland/Release/datasets/
+  amadeus_dataset_name: cropscape
+  amadeus_process_covariate: cropscape
+  amadeus_calculate_covariate: cropscape
+grid_definitions:
+- id: amadeus:grid/cdl_conus_nad83_30m
+  name: cdl_conus_nad83_30m
+  crs: EPSG:5070
+  srid: 5070
+  grid_mapping_name: albers_conical_equal_area
+  resolution_x: 30
+  resolution_y: 30
+  resolution_unit: m
+  proj_string: +proj=aea +lat_0=23 +lon_0=-96 +lat_1=29.5 +lat_2=45.5 +datum=NAD83 +units=m +no_defs
+canonical_variables:
+- id: amadeus:var/usda_cdl_crop_land_cover_class
+  name: usda_cdl_crop_land_cover_class
+  label: USDA CDL crop/land-cover class
+  standard_name: https://w3id.org/niehs/amadeus/var/usda_cdl_crop_land_cover_class
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: categorical
+  extensivity: categorical
+  description: CDL crop and non-crop legend; not interchangeable with NLCD categories or Köppen climate
+    classes. Year/state-specific legends must be retained.
+product_variables:
+- id: amadeus:pvar/cropscape.cdl_class
+  product: amadeus:product/cdl_usda_conus_30m_2008_2023
+  canonical_variable: amadeus:var/usda_cdl_crop_land_cover_class
+  native_name: CDL raster band 1
+  native_units_ucum: '1'
+  missing_value_sentinel: '0'
+  quality_flag_vocabulary: USDA NASS year/state CDL categorical legend; code 0 = background/no data; 1
+    = corn, 5 = soybeans. Full source legend is preserved in evidence/cropscape_nc19.html.
+  harmonization_note: Background policy follows USDA legend, not the processed R fixture nodata -2147483648.
+    Retain unclassified codes such as 81 where the year-specific legend defines them; do not mask all
+    zero/non-crop codes as crop absence. Verify each requested year/state legend and native header. Class-preserving
+    resampling required; averaging labels is invalid.

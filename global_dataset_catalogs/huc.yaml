@@ -1,0 +1,292 @@
+# Authoritative schema: amadeus_schema/src/amadeus_schema/schema/amadeus_schema.yaml
+# Metadata profile; source reconciliation documented in resource_audit.json.
+schema_version: 0.1.0
+data_sources:
+- id: amadeus:source/usgs_epa_nhdplus_v21
+  name: usgs_epa_nhdplus_v21
+  label: NHDPlus V2.1 National WBD snapshot
+  producer_institution: USGS and U.S. EPA
+  homepage: https://www.epa.gov/waterdata/nhdplus-national-data
+  access_protocol: https_bulk_file
+  requires_authentication: false
+  amadeus_function_suffix: _huc
+  description: 'Pinned NHDPlus V2.1 National Seamless Geodatabase WBD snapshot, not NHDPlus HR or current
+    WBD. Government public-domain statement and citation request are retained without inventing an SPDX
+    identifier. OceanCatchment archives contain a distinct feature family; remote hydrogeofetch fallback
+    does not prove the same vintage or fields as the pinned archive. [Resource reconciliation: inventory
+    rights and history] Inventory usage/citation statement (Amadeus data sources!I12): Public domain (U.S.
+    Gov); citation requested. Inventory source status (H12): Static (NHDPlus V2.1 no longer updated);
+    this is not observation QA, API availability or verified support for every product. Inventory first-release/history
+    wording (J12): 2012. NHDPlus V2.1 National Seamless WBD snapshot is distinct from current National
+    Map/NHDPlus HR. Generic NHD citation is context, not proof of archive version or layer CRS.'
+  citation_apa: U.S. Environmental Protection Agency. NHDPlus V2.1 National Seamless Geodatabase release
+    notes. https://dmap-data-commons-ow.s3.amazonaws.com/NHDPlusV21/Data/NationalData/0Release_Notes_NationalData_Seamless_GeoDatabase.pdf.
+    Archive suffixes are recorded on Product.
+products:
+- id: amadeus:product/nhdplus_v21_huc12_lower48_07
+  name: nhdplus_v21_huc12_lower48_07
+  label: nhdplus v21 huc12 lower48 07
+  data_source: amadeus:source/usgs_epa_nhdplus_v21
+  data_genre:
+  - hydrology
+  - water
+  native_format: geodatabase
+  spatial_support_type: polygon
+  temporal_resolution: timeless
+  description: 'Feature class WBDSnapshot/HUC12, explicitly documented in EPA National Seamless release
+    notes, pages 21–26. Not a catchment feature class. HUC_2/4/6 were added to this national snapshot;
+    HUC_8/10/12 and AreaHUC12 retain native names. Codes are categorical strings; HUC_12 must remain 12
+    digits with leading zeros. Parent codes express hierarchy without inventing subclass tables. Region-specific
+    release numbers are archive suffixes, not a new NHDPlus version. Check actual FileGDB layer name and
+    CRS before use. Fixture NAD83 EPSG:4269 establishes only its rewritten GeoPackage CRS and is not assigned
+    to the complete native archive. WBD_Date is feature snapshot provenance, not a contemporary observation
+    interval. [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus
+    data sources!N12): Yes (Lower 48 + HI/PR/VI). This statement does not establish validity of every
+    cell/date or fill observation gaps.'
+  product_version: NHDPlus V2.1 National Seamless Lower48_07
+  access_url: https://dmap-data-commons-ow.s3.amazonaws.com/NHDPlusV21/Data/NationalData/NHDPlusV21_NationalData_Seamless_Geodatabase_Lower48_07.7z
+  spatial_extent_descriptor: Contiguous United States (Lower 48)
+  native_spatial_resolution_descriptor: HUC12 watershed polygons; variable area; parent HUC2–10 identifiers
+  amadeus_dataset_name: huc
+  amadeus_process_covariate: huc
+  amadeus_calculate_covariate: huc
+- id: amadeus:product/nhdplus_v21_huc12_islands_03
+  name: nhdplus_v21_huc12_islands_03
+  label: nhdplus v21 huc12 islands 03
+  data_source: amadeus:source/usgs_epa_nhdplus_v21
+  data_genre:
+  - hydrology
+  - water
+  native_format: geodatabase
+  spatial_support_type: polygon
+  temporal_resolution: timeless
+  description: 'Feature class WBDSnapshot/HUC12, explicitly documented in EPA National Seamless release
+    notes, pages 21–26. Not a catchment feature class. HUC_2/4/6 were added to this national snapshot;
+    HUC_8/10/12 and AreaHUC12 retain native names. Codes are categorical strings; HUC_12 must remain 12
+    digits with leading zeros. Parent codes express hierarchy without inventing subclass tables. Region-specific
+    release numbers are archive suffixes, not a new NHDPlus version. Check actual FileGDB layer name and
+    CRS before use. Fixture NAD83 EPSG:4269 establishes only its rewritten GeoPackage CRS and is not assigned
+    to the complete native archive. WBD_Date is feature snapshot provenance, not a contemporary observation
+    interval. [Resource reconciliation: inventory completeness] Inventory coverage statement (Amadeus
+    data sources!N12): Yes (Lower 48 + HI/PR/VI). This statement does not establish validity of every
+    cell/date or fill observation gaps.'
+  product_version: NHDPlus V2.1 National Seamless HI_PR_VI_PI_03
+  access_url: https://dmap-data-commons-ow.s3.amazonaws.com/NHDPlusV21/Data/NationalData/NHDPlusV21_NationalData_Seamless_Geodatabase_HI_PR_VI_PI_03.7z
+  spatial_extent_descriptor: Hawaii, Puerto Rico, Virgin Islands and Pacific islands archive scope
+  native_spatial_resolution_descriptor: HUC12 watershed polygons; variable area; parent HUC2–10 identifiers
+  amadeus_dataset_name: huc
+  amadeus_process_covariate: huc
+  amadeus_calculate_covariate: huc
+grid_definitions: []
+canonical_variables:
+- id: amadeus:var/huc_huc_2
+  name: huc_huc_2
+  label: 2-digit Hydrologic Unit Code
+  standard_name: https://w3id.org/niehs/amadeus/var/huc_huc_2
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: categorical
+  extensivity: categorical
+  description: 2-digit Hydrologic Unit Code. Preserve identifier strings including leading zeros; do not
+    average nominal codes.
+- id: amadeus:var/huc_huc_4
+  name: huc_huc_4
+  label: 4-digit Hydrologic Unit Code
+  standard_name: https://w3id.org/niehs/amadeus/var/huc_huc_4
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: categorical
+  extensivity: categorical
+  description: 4-digit Hydrologic Unit Code. Preserve identifier strings including leading zeros; do not
+    average nominal codes.
+- id: amadeus:var/huc_huc_6
+  name: huc_huc_6
+  label: 6-digit Hydrologic Unit Code
+  standard_name: https://w3id.org/niehs/amadeus/var/huc_huc_6
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: categorical
+  extensivity: categorical
+  description: 6-digit Hydrologic Unit Code. Preserve identifier strings including leading zeros; do not
+    average nominal codes.
+- id: amadeus:var/huc_huc_8
+  name: huc_huc_8
+  label: 8-digit Hydrologic Unit Code
+  standard_name: https://w3id.org/niehs/amadeus/var/huc_huc_8
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: categorical
+  extensivity: categorical
+  description: 8-digit Hydrologic Unit Code. Preserve identifier strings including leading zeros; do not
+    average nominal codes.
+- id: amadeus:var/huc_huc_10
+  name: huc_huc_10
+  label: 10-digit Hydrologic Unit Code
+  standard_name: https://w3id.org/niehs/amadeus/var/huc_huc_10
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: categorical
+  extensivity: categorical
+  description: 10-digit Hydrologic Unit Code. Preserve identifier strings including leading zeros; do
+    not average nominal codes.
+- id: amadeus:var/huc_huc_12
+  name: huc_huc_12
+  label: 12-digit Hydrologic Unit Code
+  standard_name: https://w3id.org/niehs/amadeus/var/huc_huc_12
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: '1'
+  value_data_type: categorical
+  extensivity: categorical
+  description: 12-digit Hydrologic Unit Code. Preserve identifier strings including leading zeros; do
+    not average nominal codes.
+- id: amadeus:var/huc_areahuc12
+  name: huc_areahuc12
+  label: Source HUC12 area
+  standard_name: https://w3id.org/niehs/amadeus/var/huc_areahuc12
+  standard_name_authority: AMADEUS project-local semantic identifier; no ontology equivalence asserted
+  units_ucum: km2
+  value_data_type: continuous_numeric
+  extensivity: extensive
+  description: Source HUC12 area. Provider stored feature attribute; not recalculated for an intersected
+    fragment.
+product_variables:
+- id: amadeus:pvar/nhdplus_v21_huc12_lower48_07.HUC_2
+  product: amadeus:product/nhdplus_v21_huc12_lower48_07
+  canonical_variable: amadeus:var/huc_huc_2
+  native_name: HUC_2
+  native_units_ucum: '1'
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_lower48_07.HUC_4
+  product: amadeus:product/nhdplus_v21_huc12_lower48_07
+  canonical_variable: amadeus:var/huc_huc_4
+  native_name: HUC_4
+  native_units_ucum: '1'
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_lower48_07.HUC_6
+  product: amadeus:product/nhdplus_v21_huc12_lower48_07
+  canonical_variable: amadeus:var/huc_huc_6
+  native_name: HUC_6
+  native_units_ucum: '1'
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_lower48_07.HUC_8
+  product: amadeus:product/nhdplus_v21_huc12_lower48_07
+  canonical_variable: amadeus:var/huc_huc_8
+  native_name: HUC_8
+  native_units_ucum: '1'
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_lower48_07.HUC_10
+  product: amadeus:product/nhdplus_v21_huc12_lower48_07
+  canonical_variable: amadeus:var/huc_huc_10
+  native_name: HUC_10
+  native_units_ucum: '1'
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_lower48_07.HUC_12
+  product: amadeus:product/nhdplus_v21_huc12_lower48_07
+  canonical_variable: amadeus:var/huc_huc_12
+  native_name: HUC_12
+  native_units_ucum: '1'
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_lower48_07.AreaHUC12
+  product: amadeus:product/nhdplus_v21_huc12_lower48_07
+  canonical_variable: amadeus:var/huc_areahuc12
+  native_name: AreaHUC12
+  native_units_ucum: km2
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_islands_03.HUC_2
+  product: amadeus:product/nhdplus_v21_huc12_islands_03
+  canonical_variable: amadeus:var/huc_huc_2
+  native_name: HUC_2
+  native_units_ucum: '1'
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_islands_03.HUC_4
+  product: amadeus:product/nhdplus_v21_huc12_islands_03
+  canonical_variable: amadeus:var/huc_huc_4
+  native_name: HUC_4
+  native_units_ucum: '1'
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_islands_03.HUC_6
+  product: amadeus:product/nhdplus_v21_huc12_islands_03
+  canonical_variable: amadeus:var/huc_huc_6
+  native_name: HUC_6
+  native_units_ucum: '1'
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_islands_03.HUC_8
+  product: amadeus:product/nhdplus_v21_huc12_islands_03
+  canonical_variable: amadeus:var/huc_huc_8
+  native_name: HUC_8
+  native_units_ucum: '1'
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_islands_03.HUC_10
+  product: amadeus:product/nhdplus_v21_huc12_islands_03
+  canonical_variable: amadeus:var/huc_huc_10
+  native_name: HUC_10
+  native_units_ucum: '1'
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_islands_03.HUC_12
+  product: amadeus:product/nhdplus_v21_huc12_islands_03
+  canonical_variable: amadeus:var/huc_huc_12
+  native_name: HUC_12
+  native_units_ucum: '1'
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
+- id: amadeus:pvar/nhdplus_v21_huc12_islands_03.AreaHUC12
+  product: amadeus:product/nhdplus_v21_huc12_islands_03
+  canonical_variable: amadeus:var/huc_areahuc12
+  native_name: AreaHUC12
+  native_units_ucum: km2
+  harmonization_note: EPA National Seamless release notes pages 21–26 and local HUC fixture confirm the
+    field. Preserve string identifiers; do not cast to integer. Validate per-archive field availability
+    and layer name.
+  metadata_gaps:
+  - under_investigation
